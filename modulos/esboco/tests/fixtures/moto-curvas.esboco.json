@@ -1,0 +1,39 @@
+{
+  "vista": "isometrica",
+  "plano": "A moto de moto-componentes com as formas curvas da fatia 8: o tanque é um loft de seis seções elípticas (estreito atrás, cheio no meio, afunilando para a coluna), o banco é uma extrusão de perfil côncavo (a sela afundada entre o rabeta e o tanque), a carenagem é um loft de retângulos arredondados que afunila para a frente e o farol é uma revolução de um perfil de cinco pontos. Nenhum centro é calculado à mão: o tanque pousa no quadro e encosta na coluna, o banco pousa na roda traseira e encosta no tanque, a carenagem parte da face da frente da coluna e o farol encosta na ponta dela e se alinha ao centro da seção `nariz`, que é uma âncora nomeada da carenagem. O gate aprova as duas opções e a única exceção é o guidão que atravessa a coroa do garfo.",
+  "linhasCentro": false,
+  "legendas": "lista",
+  "parametros": {
+    "entreEixos": 1400,
+    "raioRoda": 305,
+    "diametroRoda": "=2*raioRoda",
+    "alturaMotor": 380,
+    "alturaColuna": 240,
+    "larguraGuidao": 760
+  },
+  "contato": {
+    "usar": true,
+    "pares": [
+      {"a": "guidao", "b": "garfoE.coroa", "tipo": "atravessa", "max": 20, "motivo": "a presilha do guidão abraça a coroa do garfo"}
+    ]
+  },
+  "formas": [
+    {"id": "rodaTras", "usa": "roda", "parametros": {"diametro": "diametroRoda", "largura": 140}, "centro": [0, "raioRoda", "=-entreEixos/2"], "rotulo": "1. roda_traseira"},
+    {"id": "rodaFrente", "usa": "roda", "parametros": {"diametro": "diametroRoda"}, "centro": [0, "raioRoda", "=entreEixos/2"], "rotulo": "2. roda_frente"},
+    {"id": "motor", "tipo": "caixa", "largura": 260, "altura": 300, "profundidade": 380, "raio": 40, "centro": [0, "alturaMotor", 0], "cor": "cinza", "rotulo": "3. motor"},
+    {"id": "quadro", "usa": "quadro", "parametros": {"alturaColuna": "alturaColuna"}, "sobre": "motor", "rotulo": "4. quadro"},
+    {"id": "tanque", "tipo": "loft", "eixo": "z", "secoes": [{"pos": 0, "forma": "elipse", "tamanho": [190, 105], "centro": [0, -22], "nome": "tras"}, {"pos": 70, "forma": "elipse", "tamanho": [260, 160], "centro": [0, -10]}, {"pos": 160, "forma": "elipse", "tamanho": [310, 200], "nome": "meio"}, {"pos": 250, "forma": "elipse", "tamanho": [300, 195], "centro": [0, 4]}, {"pos": 340, "forma": "elipse", "tamanho": [230, 160], "centro": [0, 12]}, {"pos": 420, "forma": "elipse", "tamanho": [140, 100], "centro": [0, 16], "nome": "bico"}], "sobre": "quadro", "encosta": {"referencia": "quadro.coluna", "direcao": "+z"}, "cor": "vermelho", "rotulo": "5. tanque"},
+    {"id": "banco", "tipo": "extrusao", "eixo": "x", "comprimento": 240, "perfil": [[0, 0], [560, 0], [560, 80], [430, 70], [320, 58], [210, 75], [100, 112], [0, 100]], "sobre": "rodaTras", "encosta": {"referencia": "tanque", "direcao": "+z"}, "cor": "preto", "rotulo": "6. banco"},
+    {"id": "balancimE", "tipo": "caixa", "largura": 40, "altura": 70, "profundidade": 520, "centro": "rodaTras.eixo", "alinha": {"com": "motor.-x", "eixos": ["x"]}, "encosta": {"referencia": "motor", "direcao": "+z"}, "cor": "azul", "rotulo": "7. balancim"},
+    {"id": "balancimD", "espelha": {"forma": "balancimE", "eixo": "x"}},
+    {"id": "garfoE", "usa": "garfo", "de": "rodaFrente.eixo", "para": "quadro.cabecote", "desloca": [-100, 0, 0], "rotulo": "8. garfo"},
+    {"id": "garfoD", "espelha": {"forma": "garfoE", "eixo": "x"}},
+    {"id": "guidao", "tipo": "cilindro", "diametro": 26, "comprimento": "larguraGuidao", "eixo": "x", "sobre": "quadro.coluna", "cor": "cinza", "rotulo": "9. guidao"},
+    {"id": "carenagem", "tipo": "loft", "eixo": "z", "secoes": [{"pos": 0, "tamanho": [140, 180], "raio": 50, "nome": "base"}, {"pos": 110, "tamanho": [124, 150], "raio": 44, "centro": [0, -6]}, {"pos": 200, "tamanho": [90, 100], "raio": 34, "centro": [0, -12], "nome": "nariz"}], "centro": "quadro.frente", "encosta": {"referencia": "quadro.coluna", "direcao": "-z"}, "cor": "azul", "rotulo": "10. carenagem"},
+    {"id": "farol", "tipo": "revolucao", "eixo": "z", "perfil": [[0, 0], [46, 0], [46, 18], [36, 46], [0, 56]], "ponta": {"id": "carenagem", "lado": "+z"}, "alinha": {"com": "carenagem.nariz", "eixos": ["x", "y"]}, "cor": "amarelo", "rotulo": "11. farol"}
+  ],
+  "opcoes": [
+    {"id": "naked", "titulo": "A. Naked", "nota": "Coluna alta e guidão largo"},
+    {"id": "cafe", "titulo": "B. Café racer", "nota": "Coluna baixa e guidão estreito, o cabeçote desce", "parametros": {"alturaColuna": 180, "larguraGuidao": 540}}
+  ]
+}

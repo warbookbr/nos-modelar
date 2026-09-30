@@ -58,13 +58,31 @@ function ponto(v, num, campo, contexto) {
   return v;
 }
 
+/* Ponto de perfil de revolução escrito como { raio, altura, nome }. */
+function numerosDoPontoDePerfil(q, num, campo, contexto) {
+  const g = { ...q };
+  for (const k of ['raio', 'altura']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
+  return g;
+}
+
+/* Seção de loft: posição, tamanho, centro, raio e polígono aceitam número, parâmetro ou expressão. */
+function numerosDaSecao(q, num, campo, contexto) {
+  if (!objeto(q)) return q;
+  const g = { ...q };
+  for (const k of ['pos', 'raio']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
+  for (const k of ['tamanho', 'centro']) if (g[k] !== undefined) g[k] = vetor(g[k], num, `${campo}.${k}`, contexto);
+  if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((p, i) => vetor(p, num, `${campo}.perfil[${i}]`, contexto));
+  return g;
+}
+
 export function numerosDaForma(f, num, contexto) {
   const g = { ...f };
   for (const k of ESCALARES) if (g[k] !== undefined) g[k] = num(g[k], k, contexto);
   for (const k of VETORES) if (g[k] !== undefined) g[k] = vetor(g[k], num, k, contexto);
   for (const k of VETORES_OU_REFERENCIA) if (g[k] !== undefined) g[k] = ponto(g[k], num, k, contexto);
   if (Array.isArray(g.caminho)) g.caminho = g.caminho.map((q, i) => ponto(q, num, `caminho[${i}]`, contexto));
-  if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((q, i) => vetor(q, num, `perfil[${i}]`, contexto));
+  if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((q, i) => (objeto(q) ? numerosDoPontoDePerfil(q, num, `perfil[${i}]`, contexto) : vetor(q, num, `perfil[${i}]`, contexto)));
+  if (Array.isArray(g.secoes)) g.secoes = g.secoes.map((q, i) => numerosDaSecao(q, num, `secoes[${i}]`, contexto));
   if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
   const r = g.rotacao;
   if (Array.isArray(r)) g.rotacao = vetor(r, num, 'rotacao', contexto);

@@ -14,7 +14,7 @@ diz como usá-la no alinhamento.
 
 ## Pare e planeje
 
-Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Como cada peça será detalhada com caixa (com `raio` ou `chanfro`), cilindro, anel, cone, esfera, extrusão de polígono convexo, tubo por pontos ou um componente pronto (`roda`, `garfo`, `quadro`, `mancal`), dizendo o que não dá para representar (perfil côncavo, curva livre). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. E as regras de contato: o gate `contato: { usar: true }` fica ligado por padrão quando o esboço tem 4 ou mais formas por opção, e desligá-lo é uma decisão que se escreve no `plano` com o motivo (por exemplo, conceito solto de proporção com peças sem relação entre si). Com o gate ligado, decida a tolerância, a penetração e as exceções declaradas: `atravessa` com o `max` esperado e o `motivo`, `encosta`, `livre` com o `motivo`. Declare `atravessa` só onde uma peça de fato passa pela outra (eixo em furo, anel em volta de cubo) e prefira desenhar as demais peças encostadas em vez de sobrepostas. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Como cada peça será detalhada com caixa (com `raio` ou `chanfro`), cilindro, anel, cone, esfera, extrusão de polígono convexo ou côncavo, `loft` por seções, `revolucao` por perfil, tubo por pontos ou um componente pronto (`roda`, `garfo`, `quadro`, `mancal`), dizendo o que não dá para representar (curva livre, seção côncava de loft, um sólido que vira de direção). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. E as regras de contato: o gate `contato: { usar: true }` fica ligado por padrão quando o esboço tem 4 ou mais formas por opção, e desligá-lo é uma decisão que se escreve no `plano` com o motivo (por exemplo, conceito solto de proporção com peças sem relação entre si). Com o gate ligado, decida a tolerância, a penetração e as exceções declaradas: `atravessa` com o `max` esperado e o `motivo`, `encosta`, `livre` com o `motivo`. Declare `atravessa` só onde uma peça de fato passa pela outra (eixo em furo, anel em volta de cubo) e prefira desenhar as demais peças encostadas em vez de sobrepostas. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
 
 ## Escrever e rodar
 
@@ -34,9 +34,17 @@ canto ou `chanfro` nas doze arestas, e `furos: [{ diametro, centro: [x, z] }]`),
 `cilindro` (`diametro`, `comprimento`, `eixo`, `achatado`), `anel`
 (`diametroExterno`, `diametroInterno`, `espessura`, `eixo`), `cone`
 (`diametro` da base, `diametroTopo` para o tronco, `comprimento`, `eixo`),
-`esfera` (`diametro`), `extrusao` (`perfil: [[u, v], ...]` convexo,
-`comprimento`, `eixo`) e `tubo` (`caminho` de 2 ou mais pontos, `diametro`,
-`raioCurva`). Não há perfil côncavo nem curva livre.
+`esfera` (`diametro`), `extrusao` (`perfil: [[u, v], ...]` polígono simples,
+convexo ou côncavo, `comprimento`, `eixo`), `loft` (`secoes: [{ pos, forma:
+"retangulo" | "elipse" | "poligono", tamanho: [u, v], centro: [u, v], raio,
+nome }, ...]` em ordem crescente de `pos`, `eixo`), `revolucao` (`perfil:
+[[raio, altura], ...]` do começo ao fim do eixo, `eixo`, `lados`) e `tubo`
+(`caminho` de 2 ou mais pontos, `diametro`, `raioCurva`). Para tanque, banco e
+carenagem use `loft` (a seção muda de tamanho e de centro ao longo do eixo, e
+`nome` numa seção vira a âncora `<id>.<nome>`), para uma sela ou um U use
+`extrusao` com o perfil côncavo, e para escapamento, cubo e farol use
+`revolucao`. Não há curva livre nem seção côncava de loft: as formas são
+facetadas, e mais seções ou mais pontos no perfil deixam a forma mais suave.
 
 Posicione pela relação e não por coordenada: a primeira forma leva
 `centro: [0, 0, 0]`; as demais usam `sobre: "<id>"` (base no topo daquela) ou

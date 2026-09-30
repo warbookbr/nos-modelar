@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-840 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+841 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -372,6 +372,7 @@
 - `componentes.test.js` — Componentes parametrizados (`usa`): expansão com ids prefixados, parâmetros no escopo do componente, entradas, âncoras expostas, pares do gate, espelho de in…
 - `conserto.test.js` — Conserto proposto pelo gate e `--ajustar`: qual forma se move, quanto, e o gate aprovando depois.
 - `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
+- `curvas.test.js` — Formas curvas: extrusão de perfil côncavo, loft por seções e revolução por perfil, em desenho (ordem das faces medida por lançamento de raios), âncoras, gate…
 - `descrever.test.js` — Leitura do esboço em texto (`--descrever`, `--descrever --mudou`) e âncoras nomeadas.
 - `esboco.test.js` — Contrato do esboço: posição relativa por sobre/ponta, recusa de referência inexistente e PNG no tamanho que o desenho declara.
 - `formas.test.js` — Formas novas: esfera, cone e tronco, extrusão de polígono, chanfro em caixa e tubo por pontos, em desenho, âncoras, gate de contato, espelho e arranjo, leitu…

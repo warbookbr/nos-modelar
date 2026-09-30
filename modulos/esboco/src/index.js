@@ -13,6 +13,9 @@ const LADOS_DA_ESFERA = 40;
 const FAIXAS_DA_ESFERA = 20;
 /* Cada seção cilíndrica de um tubo tem 48 lados (0,2% menor que o círculo). */
 const LADOS_DO_TUBO = 48;
+/* Elipse de uma seção do loft, e a contagem de pontos quando as seções misturam formas (amostragem radial). */
+const LADOS_DA_ELIPSE = 48;
+const LADOS_DA_REVOLUCAO = 48;
 /* Passo angular máximo, em graus, de cada seção reta numa curva do tubo. */
 const PASSO_DA_CURVA = 6;
 const PAINEL_L = 620;
@@ -105,6 +108,121 @@ function ehConvexo(perfil) {
     else if (Math.sign(z) !== sinal) return false;
   }
   return sinal !== 0;
+}
+
+/* Polígono simples? (3 pontos ou mais, sem ponto repetido, sem área nula e sem arestas que se cruzem ou se toquem
+   fora dos extremos comuns) */
+function ehSimples(perfil) {
+  const n = perfil.length;
+  const area = perfil.reduce((acc, q, i) => acc + q[0] * perfil[(i + 1) % n][1] - perfil[(i + 1) % n][0] * q[1], 0);
+  if (Math.abs(area) < 1e-9) return false;
+  const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+  const noSegmento = (a, b, c) => Math.min(a[0], b[0]) <= c[0] && c[0] <= Math.max(a[0], b[0]) && Math.min(a[1], b[1]) <= c[1] && c[1] <= Math.max(a[1], b[1]);
+  const cruza = (a, b, c, d) => {
+    const o1 = orient(a, b, c); const o2 = orient(a, b, d); const o3 = orient(c, d, a); const o4 = orient(c, d, b);
+    if (o1 !== o2 && o3 !== o4) return true;
+    return (o1 === 0 && noSegmento(a, b, c)) || (o2 === 0 && noSegmento(a, b, d)) || (o3 === 0 && noSegmento(c, d, a)) || (o4 === 0 && noSegmento(c, d, b));
+  };
+  for (let i = 0; i < n; i++) {
+    const a = perfil[i]; const b = perfil[(i + 1) % n];
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return false;
+    for (let j = i + 1; j < n; j++) {
+      if (j === i + 1 || (i === 0 && j === n - 1)) continue;
+      if (cruza(a, b, perfil[j], perfil[(j + 1) % n])) return false;
+    }
+  }
+  return true;
+}
+
+/* Amostra um polígono convexo em `n` raios igualmente espaçados em ângulo, a partir da média dos vértices
+   (a correspondência ponto a ponto entre seções de contagens diferentes). Começa no ângulo 0, anti-horário. */
+function amostrarRadial(poli, n) {
+  const c = [poli.reduce((a, q) => a + q[0], 0) / poli.length, poli.reduce((a, q) => a + q[1], 0) / poli.length];
+  const saida = [];
+  for (let k = 0; k < n; k++) {
+    const a = (2 * Math.PI * k) / n;
+    const d = [Math.cos(a), Math.sin(a)];
+    let melhor = 0;
+    for (let i = 0; i < poli.length; i++) {
+      const p = poli[i]; const q = poli[(i + 1) % poli.length];
+      const e = [q[0] - p[0], q[1] - p[1]];
+      const den = d[0] * e[1] - d[1] * e[0];
+      if (Math.abs(den) < 1e-12) continue;
+      const t = ((p[0] - c[0]) * e[1] - (p[1] - c[1]) * e[0]) / den;
+      const s = ((p[0] - c[0]) * d[1] - (p[1] - c[1]) * d[0]) / den;
+      if (s >= -1e-9 && s <= 1 + 1e-9 && t > melhor) melhor = t;
+    }
+    saida.push([c[0] + d[0] * melhor, c[1] + d[1] * melhor]);
+  }
+  return saida;
+}
+
+const CHAVES_DA_SECAO = ['pos', 'forma', 'tamanho', 'perfil', 'raio', 'centro', 'nome'];
+const FORMAS_DA_SECAO = ['retangulo', 'elipse', 'poligono'];
+const NOMES_RESERVADOS = ['centro', 'inicio', 'fim', ...LADOS];
+
+/* Lê uma seção do loft: o polígono convexo dela (relativo ao centro da seção, anti-horário) ou null para um ponto. */
+function lerSecao(s, onde, extremo) {
+  exigir(s && typeof s === 'object' && !Array.isArray(s), `${onde}: a seção deve ser { "pos": mm, "forma": "retangulo" | "elipse" | "poligono", "tamanho": [u, v], "centro": [u, v], "nome": "..." }`);
+  const fora = Object.keys(s).filter((k) => !CHAVES_DA_SECAO.includes(k));
+  exigir(fora.length === 0, `${onde}: a seção não tem o campo "${fora[0]}" (campos: ${CHAVES_DA_SECAO.join(', ')})`);
+  exigir(typeof s.pos === 'number' && Number.isFinite(s.pos), `${onde}: falta "pos", a posição da seção ao longo do eixo em mm`);
+  const forma = s.forma ?? 'retangulo';
+  exigir(FORMAS_DA_SECAO.includes(forma), `${onde}: "forma" deve ser um de ${FORMAS_DA_SECAO.join(', ')}`);
+  const centro = s.centro ?? [0, 0];
+  exigir(Array.isArray(centro) && centro.length === 2 && centro.every(Number.isFinite), `${onde}: "centro" deve ser [u, v] em mm, o deslocamento do centro da seção no plano do perfil`);
+  exigir(s.nome === undefined || (typeof s.nome === 'string' && s.nome), `${onde}: "nome" deve ser um texto não vazio`);
+  let pts;
+  if (forma === 'poligono') {
+    exigir(s.tamanho === undefined && s.raio === undefined, `${onde}: a seção "poligono" se define só por "perfil"; retire "tamanho" e "raio"`);
+    exigir(Array.isArray(s.perfil) && s.perfil.length >= 3 && s.perfil.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite)), `${onde}: a seção "poligono" precisa de "perfil": [[u, v], ...] com 3 ou mais pontos em mm`);
+    exigir(ehConvexo(s.perfil) && ehSimples(s.perfil), `${onde}: o "perfil" da seção precisa ser um polígono convexo (o loft não aceita seção côncava; use "extrusao" para o perfil côncavo)`);
+    pts = s.perfil.map((q) => [q[0], q[1]]);
+  } else {
+    exigir(s.perfil === undefined, `${onde}: "perfil" só vale na seção "poligono"`);
+    exigir(Array.isArray(s.tamanho) && s.tamanho.length === 2 && s.tamanho.every((x) => Number.isFinite(x) && x >= 0), `${onde}: falta "tamanho": [u, v] em mm (as duas medidas da seção no plano do perfil; [0, 0] fecha a ponta num ponto)`);
+    const [a, b] = s.tamanho;
+    if (a === 0 && b === 0) {
+      exigir(extremo, `${onde}: o tamanho [0, 0] (ponto) só vale na primeira e na última seção`);
+      pts = null;
+    } else {
+      exigir(a > 0 && b > 0, `${onde}: "tamanho" [${a}, ${b}] tem uma medida nula; use [0, 0] para um ponto ou medidas positivas`);
+      if (forma === 'elipse') {
+        exigir(s.raio === undefined, `${onde}: "raio" só vale na seção "retangulo"`);
+        pts = Array.from({ length: LADOS_DA_ELIPSE }, (_, i) => [(a / 2) * Math.cos((2 * Math.PI * i) / LADOS_DA_ELIPSE), (b / 2) * Math.sin((2 * Math.PI * i) / LADOS_DA_ELIPSE)]);
+      } else {
+        exigir(s.raio === undefined || (typeof s.raio === 'number' && Number.isFinite(s.raio) && s.raio >= 0), `${onde}: "raio" deve ser um número em mm, maior ou igual a zero`);
+        pts = retanguloArredondado(a, b, s.raio);
+      }
+    }
+  }
+  return { pos: s.pos, centro, nome: s.nome, pts };
+}
+
+/* Nomes das âncoras de seção (loft) ou de ponto do perfil (revolução), na ordem em que foram declarados. */
+function nomesDasPartes(lista) {
+  return Array.isArray(lista) ? lista.filter((q) => q && typeof q === 'object' && !Array.isArray(q) && typeof q.nome === 'string').map((q) => q.nome) : [];
+}
+
+function exigirNomes(nomes, onde) {
+  const vistos = new Set();
+  for (const n of nomes) {
+    exigir(!NOMES_RESERVADOS.includes(n), `${onde}: o nome "${n}" já é uma âncora da forma (${NOMES_RESERVADOS.join(', ')}); escolha outro`);
+    exigir(!vistos.has(n), `${onde}: o nome "${n}" está repetido`);
+    vistos.add(n);
+  }
+}
+
+/* Sólido em seções paralelas, centrado na caixa. Cada faixa entre duas seções é convexa (o gate a mede por faixa)
+   e o desenho fatia o sólido ao longo do eixo. `ancoras` são [u, v, w] antes de centrar. */
+function solidoEmSecoes(b, secoes, ancoras) {
+  const vs = secoes.flatMap((sc) => sc.perfil.map(([u, v]) => [u, v, sc.w]));
+  const lo = [0, 1, 2].map((i) => Math.min(...vs.map((p) => p[i])));
+  const hi = [0, 1, 2].map((i) => Math.max(...vs.map((p) => p[i])));
+  const c = lo.map((v, i) => (v + hi[i]) / 2);
+  const centradas = secoes.map((sc) => ({ w: sc.w - c[2], perfil: sc.perfil.map(([u, v]) => [u - c[0], v - c[1]]) }));
+  const ancorasLocais = Object.fromEntries(Object.entries(ancoras).map(([nome, p]) => [nome, [p[0] - c[0], p[1] - c[1], p[2] - c[2]]]));
+  return { b, perfil: centradas[0].perfil, furos: [], furo: null, comprimento: hi[2] - lo[2], secoes: centradas, porFaixas: true, naoConvexo: true, ancorasLocais };
 }
 
 /* Base local: eixo de extrusão e os dois eixos do perfil. */
@@ -259,17 +377,71 @@ function prisma(f, onde) {
     exigir(numPos(f.comprimento), `${onde}: extrusao precisa de "comprimento" positivo em mm (a altura do prisma ao longo do eixo)`);
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
-    const dica = `${onde}: extrusao precisa de "perfil": [[u, v], ...] com 3 ou mais pontos em mm, convexo (u e v são os eixos do plano perpendicular ao eixo: x e z para eixo y, z e y para eixo x, x e y para eixo z)`;
+    const dica = `${onde}: extrusao precisa de "perfil": [[u, v], ...] com 3 ou mais pontos em mm, um polígono simples convexo ou côncavo (u e v são os eixos do plano perpendicular ao eixo: x e z para eixo y, z e y para eixo x, x e y para eixo z)`;
     exigir(Array.isArray(f.perfil) && f.perfil.length >= 3 && f.perfil.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite)), dica);
-    exigir(ehConvexo(f.perfil), `${onde}: o "perfil" da extrusao precisa ser convexo (sem cantos voltados para dentro); divida a forma em duas extrusões`);
+    exigir(ehSimples(f.perfil), `${onde}: o "perfil" da extrusao precisa ser um polígono simples: sem ponto repetido, sem área nula e sem arestas que se cruzem`);
+    const convexo = ehConvexo(f.perfil);
     const area = f.perfil.reduce((acc, q, i) => acc + q[0] * f.perfil[(i + 1) % f.perfil.length][1] - f.perfil[(i + 1) % f.perfil.length][0] * q[1], 0);
     /* o centro da forma é o centro da caixa do perfil, qualquer que seja a origem em que ele foi declarado */
     const cu = (Math.min(...f.perfil.map((q) => q[0])) + Math.max(...f.perfil.map((q) => q[0]))) / 2;
     const cv = (Math.min(...f.perfil.map((q) => q[1])) + Math.max(...f.perfil.map((q) => q[1]))) / 2;
     const centrado = f.perfil.map((q) => [q[0] - cu, q[1] - cv]);
-    return { b: base(eixo), perfil: area >= 0 ? centrado : [...centrado].reverse(), furos: [], furo: null, comprimento: f.comprimento };
+    return { b: base(eixo), perfil: area >= 0 ? centrado : [...centrado].reverse(), furos: [], furo: null, comprimento: f.comprimento, ...(convexo ? {} : { naoConvexo: true }) };
   }
-  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao ou tubo`);
+  if (tipo === 'loft') {
+    exigir(f.comprimento === undefined, `${onde}: o loft tem o comprimento dado pelas posições das seções; retire "comprimento"`);
+    const eixo = f.eixo ?? 'y';
+    exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
+    exigir(Array.isArray(f.secoes) && f.secoes.length >= 2, `${onde}: loft precisa de "secoes": lista de 2 ou mais seções { "pos": mm, "forma": "retangulo" | "elipse" | "poligono", "tamanho": [u, v] } em ordem crescente de "pos" (u e v são os eixos do plano perpendicular ao eixo: x e z para eixo y, z e y para eixo x, x e y para eixo z)`);
+    const lidas = f.secoes.map((s, i) => lerSecao(s, `${onde}, secoes[${i}]`, i === 0 || i === f.secoes.length - 1));
+    lidas.forEach((sc, i) => { if (i > 0) exigir(sc.pos > lidas[i - 1].pos + 1e-9, `${onde}, secoes[${i}]: "pos" ${sc.pos} não passa da seção anterior (${lidas[i - 1].pos}); as seções vão em ordem crescente de posição`); });
+    exigirNomes(nomesDasPartes(f.secoes), onde);
+    const contagens = new Set(lidas.filter((sc) => sc.pts).map((sc) => sc.pts.length));
+    exigir(contagens.size > 0, `${onde}: o loft precisa de pelo menos uma seção com tamanho (todas são pontos)`);
+    const sentidos = new Set(lidas.filter((sc) => sc.pts).map((sc) => Math.sign(sc.pts.reduce((acc, q, i) => acc + q[0] * sc.pts[(i + 1) % sc.pts.length][1] - sc.pts[(i + 1) % sc.pts.length][0] * q[1], 0))));
+    exigir(sentidos.size === 1, `${onde}: os polígonos das seções têm sentidos opostos (horário e anti-horário); escreva todos no mesmo sentido`);
+    const horario = [...sentidos][0] < 0;
+    const n = contagens.size === 1 ? [...contagens][0] : LADOS_DA_ELIPSE;
+    const secoes = lidas.map((sc) => {
+      let pts = sc.pts && (horario ? [...sc.pts].reverse() : sc.pts);
+      if (pts && contagens.size > 1) pts = amostrarRadial(pts, n);
+      if (!pts) pts = Array.from({ length: n }, () => [0, 0]);
+      return { w: sc.pos, perfil: pts.map(([u, v]) => [u + sc.centro[0], v + sc.centro[1]]) };
+    });
+    const ancoras = { inicio: [...lidas[0].centro, lidas[0].pos], fim: [...lidas[lidas.length - 1].centro, lidas[lidas.length - 1].pos] };
+    lidas.forEach((sc) => { if (sc.nome) ancoras[sc.nome] = [...sc.centro, sc.pos]; });
+    return solidoEmSecoes(base(eixo), secoes, ancoras);
+  }
+  if (tipo === 'revolucao') {
+    exigir(f.comprimento === undefined, `${onde}: a revolução tem o comprimento dado pela altura do perfil; retire "comprimento"`);
+    const eixo = f.eixo ?? 'y';
+    exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
+    const lados = f.lados ?? LADOS_DA_REVOLUCAO;
+    exigir(Number.isInteger(lados) && lados >= 6 && lados <= 128, `${onde}: "lados" deve ser um inteiro de 6 a 128 (padrão ${LADOS_DA_REVOLUCAO})`);
+    const dica = `${onde}: revolucao precisa de "perfil": [[raio, altura], ...] com 2 ou mais pontos em mm, do começo ao fim do eixo; cada ponto também pode ser { "raio": mm, "altura": mm, "nome": "..." } para virar âncora`;
+    exigir(Array.isArray(f.perfil) && f.perfil.length >= 2, dica);
+    const pts = f.perfil.map((q, i) => {
+      if (Array.isArray(q)) { exigir(q.length === 2 && q.every(Number.isFinite), dica); return { raio: q[0], altura: q[1] }; }
+      exigir(q && typeof q === 'object' && Object.keys(q).every((k) => ['raio', 'altura', 'nome'].includes(k)) && Number.isFinite(q.raio) && Number.isFinite(q.altura), `${dica} (perfil[${i}])`);
+      exigir(q.nome === undefined || (typeof q.nome === 'string' && q.nome), `${onde}: perfil[${i}]: "nome" deve ser um texto não vazio`);
+      return q;
+    });
+    exigirNomes(nomesDasPartes(f.perfil), onde);
+    pts.forEach((q, i) => {
+      exigir(q.raio >= 0, `${onde}: perfil[${i}]: o raio ${q.raio} é negativo; o perfil dá o raio (maior ou igual a zero) e a altura ao longo do eixo`);
+      if (i === 0) return;
+      const a = pts[i - 1];
+      exigir(q.altura >= a.altura - 1e-9, `${onde}: perfil[${i}]: a altura ${q.altura} volta atrás (anterior ${a.altura}); o perfil sobe ao longo do eixo (dois pontos na mesma altura formam um degrau)`);
+      exigir(Math.hypot(q.raio - a.raio, q.altura - a.altura) > 1e-9, `${onde}: perfil[${i}] repete o ponto anterior`);
+      exigir(!(i < pts.length - 1 && q.raio === 0), `${onde}: perfil[${i}]: raio zero só vale no primeiro e no último ponto (uma cintura de raio zero parte o sólido em dois)`);
+    });
+    exigir(pts.some((q) => q.raio > 0), `${onde}: o perfil da revolução tem raio zero em todos os pontos`);
+    const secoes = pts.map((q) => ({ w: q.altura, perfil: circuloN(q.raio, lados) }));
+    const ancoras = { inicio: [0, 0, pts[0].altura], fim: [0, 0, pts[pts.length - 1].altura] };
+    pts.forEach((q) => { if (q.nome) ancoras[q.nome] = [0, 0, q.altura]; });
+    return solidoEmSecoes(base(eixo), secoes, ancoras);
+  }
+  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao, loft, revolucao ou tubo`);
 }
 
 function caixaLocal(pr, m) {
@@ -313,10 +485,12 @@ function lerPonta(f) {
 
 /* Âncoras nomeadas: `centro`; `inicio` e `fim` nas pontas do eixo (cilindro e anel); e o centro
    de cada face da caixa mínima (`+x` ... `-z`), na orientação do mundo depois da rotação. */
-const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao'];
+const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao', 'loft', 'revolucao'];
 
-export function nomesDeAncoras(tipo) {
-  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' ? ['inicio', 'fim'] : []), ...LADOS];
+/* O loft e a revolução ainda têm as âncoras nomeadas: `nome` de cada seção ou de cada ponto do perfil. */
+export function nomesDeAncoras(tipo, forma) {
+  const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : [];
+  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' ? ['inicio', 'fim'] : []), ...nomeadas, ...LADOS];
 }
 
 /* A parte de um tubo como forma resolvida própria: as partes guardam o centro relativo ao do tubo, e por
@@ -330,6 +504,12 @@ export function ancorasDe(r) {
   if (r.partes) {
     a.inicio = r.centro.map((c, i) => c + r.extremos.inicio[i]);
     a.fim = r.centro.map((c, i) => c + r.extremos.fim[i]);
+  } else if (r.prisma.ancorasLocais) {
+    /* loft e revolução: as pontas do eixo e as seções ou pontos nomeados, em coordenadas locais já centradas */
+    for (const [nome, [u, v, w]] of Object.entries(r.prisma.ancorasLocais)) {
+      const d = aplicarMatriz(ponto3(r.prisma.b, u, v, w), r.matriz);
+      a[nome] = [r.centro[0] + d[0], r.centro[1] + d[1], r.centro[2] + d[2]];
+    }
   } else if (TIPOS_COM_EIXO.includes(r.forma.tipo)) {
     const h = r.prisma.comprimento / 2;
     for (const [nome, w] of [['inicio', -h], ['fim', h]]) {
@@ -355,7 +535,7 @@ function ancoraDe(ref, onde, porId, resolver, visitando, campo = 'centro') {
   /* uma cópia (espelho ou arranjo) tem as âncoras da forma-fonte */
   let fonteDoTipo = porId.get(id);
   for (let n = 0; n < 20 && fonteDoTipo && fonteDoTipo.tipo === undefined; n++) fonteDoTipo = porId.get(fonteDoTipo.espelha?.forma ?? fonteDoTipo.arranjoDe?.fonte);
-  const validas = nomesDeAncoras((fonteDoTipo ?? porId.get(id)).tipo);
+  const validas = nomesDeAncoras((fonteDoTipo ?? porId.get(id)).tipo, fonteDoTipo ?? porId.get(id));
   exigir(validas.includes(nome), `${onde}: "${campo}" aponta para "${ref}", mas a forma "${id}" (${(fonteDoTipo ?? porId.get(id)).tipo}) não tem a âncora "${nome}" (válidas: ${validas.join(', ')})`);
   exigir(!visitando.has(id), `${onde}: referência circular em "${campo}": "${ref}" volta a depender desta forma (âncoras válidas de "${id}": ${validas.join(', ')})`);
   return ancorasDe(resolver(id))[nome];
@@ -431,6 +611,8 @@ export function relacaoDe(f) {
     const a = f.arranjoDe;
     partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
   }
+  if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções`);
+  if (f.tipo === 'revolucao' && Array.isArray(f.perfil)) partes.push(`revolução de um perfil de ${f.perfil.length} pontos`);
   if (f.tipo === 'tubo' && Array.isArray(f.caminho)) partes.push(`caminho de ${f.caminho.length} pontos${f.raioCurva ? `, raio de curva ${f.raioCurva} mm` : ''}`);
   if (f.daInstancia) partes.push(`${f.daInstancia.principal ? 'principal' : 'parte'} do componente ${f.daInstancia.id}`);
   if (f.de !== undefined) partes.push(`de ${v(f.de)} para ${v(f.para)}`);
@@ -871,7 +1053,8 @@ function fatiarSecoes(r, olho) {
   for (let k = 0; k < nb; k++) {
     const s0 = secoes[k];
     const s1 = secoes[k + 1];
-    const fatias = Math.max(1, Math.min(Math.ceil(comprimentos[k] / 5), Math.round((36 * comprimentos[k]) / total)));
+    /* uma fatia por faixa no loft e na revolução: a faixa é convexa, e as linhas de cada face saem coladas a ela */
+    const fatias = r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(Math.ceil(comprimentos[k] / 5), Math.round((36 * comprimentos[k]) / total)));
     const noPasso = (t) => ({ w: s0.w + t * (s1.w - s0.w), perfil: s0.perfil.map((q, i) => [q[0] + t * (s1.perfil[i][0] - q[0]), q[1] + t * (s1.perfil[i][1] - q[1])]) });
     for (let j = 0; j < fatias; j++) {
       const a = noPasso(j / fatias);
@@ -891,19 +1074,82 @@ function fatiarSecoes(r, olho) {
         const silD = dot(n, olho) > 0 && dot(nNext, olho) <= 0;
         const vincA = dot(n, nPrev) < cos25 && dot(n, olho) >= dot(nPrev, olho);
         const vincD = dot(n, nNext) < cos25 && dot(n, olho) > dot(nNext, olho);
-        lados.push({ papel: 'lado', n, pts: [P0(i), P0(i2), P1(i2), P1(i)] });
-        if ((silA || vincA) && diferentes(P0(i), P1(i))) linhas.push([P0(i), P1(i)]);
-        if ((silD || vincD) && diferentes(P0(i2), P1(i2))) linhas.push([P0(i2), P1(i2)]);
+        const doLado = [];
+        if ((silA || vincA) && diferentes(P0(i), P1(i))) doLado.push([P0(i), P1(i)]);
+        if ((silD || vincD) && diferentes(P0(i2), P1(i2))) doLado.push([P0(i2), P1(i2)]);
         if (j === 0 && diferentes(P0(i), P0(i2))
-          && (k === 0 ? !tampaVisivel[0] : (!visivel(k - 1, i) || dot(n, nm[k - 1][i]) < cos25))) linhas.push([P0(i), P0(i2)]);
+          && (k === 0 ? !tampaVisivel[0] : (!visivel(k - 1, i) || dot(n, nm[k - 1][i]) < cos25))) doLado.push([P0(i), P0(i2)]);
         if (j === fatias - 1 && diferentes(P1(i), P1(i2))
-          && (k === nb - 1 ? !tampaVisivel[1] : !visivel(k + 1, i))) linhas.push([P1(i), P1(i2)]);
+          && (k === nb - 1 ? !tampaVisivel[1] : !visivel(k + 1, i))) doLado.push([P1(i), P1(i2)]);
+        lados.push({ papel: 'lado', n, pts: [P0(i), P0(i2), P1(i2), P1(i)], ...(r.prisma.naoConvexo ? { linhas: doLado } : {}) });
+        linhas.push(...doLado);
       }
       chunks.push({ r, prof: dot(mundo(0, 0, (a.w + d.w) / 2), olho), lados, dentro: [], linhas, arcos: [], tampas: [] });
     }
   }
   if (tampaVisivel[1]) chunks.push(tampa(secoes[nb], eixoN(1), 'fim'));
+  /* o loft e a revolução podem ter cintura ou degrau: as fatias vão do fundo para a frente, e a de trás não cobre a da frente */
+  if (r.prisma.naoConvexo) chunks.sort((x, y) => x.prof - y.prof);
   return chunks;
+}
+
+/* Ordem de desenho (do fundo para a frente) das faces laterais visíveis de um prisma de perfil côncavo: uma face
+   vem antes de outra quando, onde as duas se cobrem na tela, a primeira está mais longe do observador. Ordenação
+   topológica; no ciclo (que um perfil simples não produz) sobra a ordem pela profundidade do centro. */
+function ordemDasFaces(lados, olho) {
+  const n = lados.length;
+  if (n < 2) return lados.map((_, i) => i);
+  const apoio = Math.abs(olho[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const S = normalizar([olho[1] * apoio[2] - olho[2] * apoio[1], olho[2] * apoio[0] - olho[0] * apoio[2], olho[0] * apoio[1] - olho[1] * apoio[0]]);
+  const T = [olho[1] * S[2] - olho[2] * S[1], olho[2] * S[0] - olho[0] * S[2], olho[0] * S[1] - olho[1] * S[0]];
+  const tela = lados.map((l) => l.pts.map((p) => [dot(p, S), dot(p, T)]));
+  const anti = (poli) => (poli.reduce((a, q, i) => a + q[0] * poli[(i + 1) % poli.length][1] - poli[(i + 1) % poli.length][0] * q[1], 0) >= 0 ? poli : [...poli].reverse());
+  const polis = tela.map(anti);
+  const recortar = (sujeito, clip) => {
+    let saida = sujeito;
+    for (let i = 0; i < clip.length && saida.length > 0; i++) {
+      const a = clip[i]; const b = clip[(i + 1) % clip.length];
+      const lado = (p) => (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
+      const entrada = saida; saida = [];
+      for (let j = 0; j < entrada.length; j++) {
+        const p = entrada[j]; const q = entrada[(j + 1) % entrada.length];
+        const dp = lado(p); const dq = lado(q);
+        if (dp >= 0) saida.push(p);
+        if ((dp > 0 && dq < 0) || (dp < 0 && dq > 0)) { const t = dp / (dp - dq); saida.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]); }
+      }
+    }
+    return saida;
+  };
+  const profundidade = (l, q) => {
+    const den = dot(l.n, olho);
+    return (dot(l.n, l.pts[0]) - q[0] * dot(l.n, S) - q[1] * dot(l.n, T)) / den;
+  };
+  const antes = Array.from({ length: n }, () => new Set());
+  const grau = new Array(n).fill(0);
+  for (let a = 0; a < n; a++) {
+    for (let b = a + 1; b < n; b++) {
+      const inter = recortar(polis[a], polis[b]);
+      if (inter.length < 3) continue;
+      const area = Math.abs(inter.reduce((acc, q, i) => acc + q[0] * inter[(i + 1) % inter.length][1] - inter[(i + 1) % inter.length][0] * q[1], 0)) / 2;
+      if (area < 1e-6) continue;
+      const c = [inter.reduce((acc, q) => acc + q[0], 0) / inter.length, inter.reduce((acc, q) => acc + q[1], 0) / inter.length];
+      const d = profundidade(lados[a], c) - profundidade(lados[b], c);
+      if (Math.abs(d) < 1e-9) continue;
+      const [longe, perto] = d < 0 ? [a, b] : [b, a];
+      if (!antes[longe].has(perto)) { antes[longe].add(perto); grau[perto]++; }
+    }
+  }
+  const centro = lados.map((l) => l.pts.reduce((acc, p) => acc + dot(p, olho), 0) / l.pts.length);
+  const ordem = [];
+  const feito = new Array(n).fill(false);
+  for (let k = 0; k < n; k++) {
+    let escolha = -1;
+    for (let i = 0; i < n; i++) if (!feito[i] && grau[i] === 0 && (escolha < 0 || centro[i] < centro[escolha])) escolha = i;
+    if (escolha < 0) for (let i = 0; i < n; i++) if (!feito[i] && (escolha < 0 || centro[i] < centro[escolha])) escolha = i;
+    feito[escolha] = true; ordem.push(escolha);
+    for (const q of antes[escolha]) grau[q]--;
+  }
+  return ordem;
 }
 
 export function fatiarForma(r, olho) {
@@ -929,7 +1175,8 @@ export function fatiarForma(r, olho) {
   const pe = anti(perfil);
   const fus = furosLista.map((fu) => anti(fu));
 
-  const fatias = comprimento <= 10 ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
+  /* o perfil côncavo vai numa fatia só: o prisma é exato e as faces se ordenam pelo perfil */
+  const fatias = comprimento <= 10 || r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
   const chunks = [];
 
   for (let j = 0; j < fatias; j++) {
@@ -978,10 +1225,12 @@ export function fatiarForma(r, olho) {
           mundo(a[0], a[1], w1),
         ];
 
-        if (para === 'fora' && (silA || vincA)) linhas.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
-        if (para === 'fora' && (silD || vincD)) linhas.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
+        const doLado = [];
+        if (para === 'fora' && (silA || vincA)) doLado.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
+        if (para === 'fora' && (silD || vincD)) doLado.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
+        linhas.push(...doLado);
 
-        destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts });
+        destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts, ...(r.prisma.naoConvexo ? { linhas: doLado } : {}) });
       }
 
       if (para === 'fora' && j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
@@ -1043,6 +1292,15 @@ export function fatiarForma(r, olho) {
     }
   }
 
+  if (r.prisma.naoConvexo) {
+    /* perfil côncavo: uma face lateral pode cobrir outra do mesmo sólido, e as fatias vão do fundo para a frente */
+    const modelo = chunks.find((ch) => ch.lados.length > 1);
+    if (modelo && olho) {
+      const ordem = ordemDasFaces(modelo.lados, olho);
+      for (const ch of chunks) if (ch.lados.length === ordem.length) ch.lados = ordem.map((i) => ch.lados[i]);
+    }
+    chunks.sort((x, y) => x.prof - y.prof);
+  }
   return chunks;
 }
 
@@ -1736,47 +1994,68 @@ export function desenharEsboco(esboco) {
       const translucida = g.r.opacidade !== undefined && g.r.opacidade < 1;
       if (translucida) partes.push(`<g opacity="${g.r.opacidade}">`);
 
-      // 1. Faces coloridas
-      for (const ch of g.chunks) {
-        for (const f of [...ch.dentro, ...ch.lados]) {
-          const c = tint(f.n);
-          partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
-        }
-      }
-
-      // 2. Tampas
-      for (const ch of g.chunks) {
-        for (const t of ch.tampas) {
-          let d = caminho(t.pts.map(V.p).map(tela));
-          if (t.furos && t.furos.length > 0) {
-            for (const f of t.furos) {
-              d += ' ' + caminho(f.map(V.p).map(tela));
-            }
-          } else if (t.furo) {
-            d += ' ' + caminho(t.furo.map(V.p).map(tela));
+      const pintarFaces = (chunks) => {
+        for (const ch of chunks) {
+          for (const f of [...ch.dentro, ...ch.lados]) {
+            const c = tint(f.n);
+            partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
           }
-          partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
         }
-      }
-
-      // 3. Arcos de borda traseira
-      for (const ch of g.chunks) {
-        for (const arc of ch.arcos ?? []) {
-          if (arc.length < 2) continue;
-          partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+      };
+      const pintarTampas = (chunks) => {
+        for (const ch of chunks) {
+          for (const t of ch.tampas) {
+            let d = caminho(t.pts.map(V.p).map(tela));
+            if (t.furos && t.furos.length > 0) {
+              for (const f of t.furos) {
+                d += ' ' + caminho(f.map(V.p).map(tela));
+              }
+            } else if (t.furo) {
+              d += ' ' + caminho(t.furo.map(V.p).map(tela));
+            }
+            partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+          }
         }
-      }
-
-      // 4. Silhuetas axiais contínuas encadeadas
-      const todasLinhas2d = g.chunks.flatMap((ch) => ch.linhas.map((l) => l.map(V.p).map(tela)));
-      const cadeias = encadearLinhas(todasLinhas2d);
-      for (const cadeia of cadeias) {
-        if (cadeia.length < 2) continue;
-        if (cadeia.length === 2) {
-          partes.push(`<line x1="${f1(cadeia[0][0])}" y1="${f1(cadeia[0][1])}" x2="${f1(cadeia[1][0])}" y2="${f1(cadeia[1][1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
-        } else {
-          partes.push(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+      };
+      const pintarArcos = (chunks) => {
+        for (const ch of chunks) {
+          for (const arc of ch.arcos ?? []) {
+            if (arc.length < 2) continue;
+            partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+          }
         }
+      };
+      const pintarSilhuetas = (chunks) => {
+        const todasLinhas2d = chunks.flatMap((ch) => ch.linhas.map((l) => l.map(V.p).map(tela)));
+        const cadeias = encadearLinhas(todasLinhas2d);
+        for (const cadeia of cadeias) {
+          if (cadeia.length < 2) continue;
+          if (cadeia.length === 2) {
+            partes.push(`<line x1="${f1(cadeia[0][0])}" y1="${f1(cadeia[0][1])}" x2="${f1(cadeia[1][0])}" y2="${f1(cadeia[1][1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+          } else {
+            partes.push(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+          }
+        }
+      };
+      if (g.r.prisma?.naoConvexo) {
+        /* forma côncava ou com cintura (extrusão côncava, loft, revolução): cada face leva as próprias linhas logo
+           depois dela, e a face da frente as cobre por cima em vez de as linhas de trás aparecerem sobre ela */
+        for (const ch of g.chunks) {
+          for (const f of [...ch.dentro, ...ch.lados]) {
+            pintarFaces([{ dentro: [], lados: [f] }]);
+            for (const l of f.linhas ?? []) {
+              const [a, b] = l.map(V.p).map(tela);
+              partes.push(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+            }
+          }
+          pintarTampas([ch]);
+          pintarArcos([ch]);
+        }
+      } else {
+        pintarFaces(g.chunks);
+        pintarTampas(g.chunks);
+        pintarArcos(g.chunks);
+        pintarSilhuetas(g.chunks);
       }
       if (translucida) partes.push('</g>');
     }

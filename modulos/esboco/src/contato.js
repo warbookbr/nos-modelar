@@ -116,6 +116,67 @@ function prismaDeSecoes(r) {
   return { verts, normais: unicas(normais), arestas: unicas(arestas), min, max, limitaArestas: true };
 }
 
+/* Um sólido de loft ou de revolução vira uma peça convexa por faixa entre duas seções consecutivas (o tronco
+   entre elas). Uma faixa de espessura nula (o degrau da revolução) não tem volume e não entra. */
+function pecasPorFaixas(r) {
+  const { secoes } = r.prisma;
+  const saida = [];
+  for (let k = 0; k + 1 < secoes.length; k++) {
+    if (secoes[k + 1].w - secoes[k].w <= 1e-9) continue;
+    saida.push(prismaDeSecoes({ ...r, prisma: { ...r.prisma, secoes: [secoes[k], secoes[k + 1]] } }));
+  }
+  return saida;
+}
+
+const areaDe = (poli) => poli.reduce((acc, q, i) => acc + q[0] * poli[(i + 1) % poli.length][1] - poli[(i + 1) % poli.length][0] * q[1], 0);
+
+/* Decomposição de um polígono simples em polígonos convexos anti-horários: earcut em triângulos e, depois, a fusão
+   gulosa de vizinhos que continuam convexos (Hertel-Mehlhorn). Vértices colineares são aceitos na fusão. */
+export function decomporConvexo(perfil) {
+  const idx = earcut(perfil.flat(), [], 2);
+  let polis = [];
+  for (let i = 0; i < idx.length; i += 3) {
+    const tri = [idx[i], idx[i + 1], idx[i + 2]];
+    if (Math.abs(areaDe(tri.map((k) => perfil[k]))) < 1e-9) continue;
+    polis.push(areaDe(tri.map((k) => perfil[k])) > 0 ? tri : [tri[0], tri[2], tri[1]]);
+  }
+  const convexo = (ids) => {
+    const n = ids.length;
+    for (let i = 0; i < n; i++) {
+      const a = perfil[ids[i]]; const b = perfil[ids[(i + 1) % n]]; const c = perfil[ids[(i + 2) % n]];
+      if ((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]) < -1e-9) return false;
+    }
+    return true;
+  };
+  const fundir = (A, B) => {
+    for (let i = 0; i < A.length; i++) {
+      const p = A[i]; const q = A[(i + 1) % A.length];
+      for (let j = 0; j < B.length; j++) {
+        if (B[j] !== q || B[(j + 1) % B.length] !== p) continue;
+        const nova = [];
+        for (let k = 1; k <= A.length; k++) nova.push(A[(i + k) % A.length]);
+        for (let k = 2; k < B.length; k++) nova.push(B[(j + k) % B.length]);
+        return convexo(nova) ? nova : null;
+      }
+    }
+    return null;
+  };
+  let mudou = true;
+  while (mudou) {
+    mudou = false;
+    for (let a = 0; a < polis.length && !mudou; a++) {
+      for (let b = a + 1; b < polis.length && !mudou; b++) {
+        const nova = fundir(polis[a], polis[b]);
+        if (!nova) continue;
+        polis = polis.filter((_, k) => k !== a && k !== b);
+        polis.push(nova);
+        mudou = true;
+      }
+    }
+  }
+  return polis.map((ids) => ids.map((k) => perfil[k]));
+}
+
 /* Peças convexas de uma forma resolvida. */
 export function pecasDe(r) {
   if (!memoPecas.has(r)) memoPecas.set(r, pecasSemMemoria(r));
@@ -129,9 +190,9 @@ const memoPares = new WeakMap();
 
 function pecasSemMemoria(r) {
   if (r.partes) return r.partes.flatMap((pt) => pecasDe(subforma(r, pt)));
-  if (r.prisma.secoes) return [prismaDeSecoes(r)];
+  if (r.prisma.secoes) return r.prisma.porFaixas ? pecasPorFaixas(r) : [prismaDeSecoes(r)];
   const { perfil, furos } = r.prisma;
-  if (furos.length === 0) return [prismaConvexo(r, perfil)];
+  if (furos.length === 0) return r.prisma.naoConvexo ? decomporConvexo(perfil).map((poli) => prismaConvexo(r, poli)) : [prismaConvexo(r, perfil)];
   if (r.forma.tipo === 'anel') {
     const n = perfil.length;
     const passo = n / SETORES;

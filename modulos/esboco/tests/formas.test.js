@@ -169,8 +169,8 @@ describe('extrusão de polígono', () => {
     perto(r.e.min, [-25, 20, -30]);
   });
 
-  it('recusa perfil côncavo, curto, com ponto que não é par e comprimento ausente', () => {
-    recusa([{ ...cunha, perfil: [[0, 0], [100, 0], [100, 100], [50, 20], [0, 100]] }], /precisa ser convexo/);
+  it('recusa perfil que se cruza, curto, com ponto que não é par e comprimento ausente', () => {
+    recusa([{ ...cunha, perfil: [[0, 0], [100, 100], [100, 0], [0, 100]] }], /polígono simples/);
     recusa([{ ...cunha, perfil: [[0, 0], [100, 0]] }], /extrusao precisa de "perfil"/);
     recusa([{ ...cunha, perfil: [[0, 0], [100, 0], [100]] }], /extrusao precisa de "perfil"/);
     recusa([{ ...cunha, comprimento: undefined }], /extrusao precisa de "comprimento"/);

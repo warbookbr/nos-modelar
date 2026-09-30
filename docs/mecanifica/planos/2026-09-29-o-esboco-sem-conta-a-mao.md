@@ -187,6 +187,9 @@ do naked por `parametros` na opção.
     não cita nenhum objeto específico.
 16. Tanque, banco e carenagem da moto de prova saem com forma curva (perfil
     côncavo, afunilamento ou loft), e não como caixa ou extrusão convexa.
+    Atendido em 2026-09-30 por `moto-curvas.esboco.json`: as imagens nas quatro
+    vistas mostram tanque e carenagem afunilados e o banco com a sela, e a
+    silhueta lateral de tanque e banco mede menos de 90% da caixa que os envolve.
 17. O Condutor roda o fluxo por estágios (Maquete, Conferência da maquete, Plano
     de detalhe, Detalhe por unidade, Montagem), grava o estado em arquivo legível
     por máquina e só libera o estágio seguinte quando o Portão de estágio do
@@ -222,9 +225,11 @@ do naked por `parametros` na opção.
    `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números
    escritos à mão.
 8. A validação da moto detalhada (2026-09-30) mostrou o que falta, na ordem em
-   que entra: primeiro as formas curvas (perfil côncavo, afunilamento, loft por
-   seções e superfície de revolução), porque tanque, banco e carenagem saíram
-   como caixas e extrusões convexas e a moto ficou sem cara de moto; depois o
+   que entra: primeiro as formas curvas, porque tanque, banco e carenagem saíram
+   como caixas e extrusões convexas e a moto ficou sem cara de moto (feita em
+   2026-09-30: `extrusao` de perfil côncavo, `loft` por seções e `revolucao`,
+   com gate por partes convexas e a moto de prova sem centro à mão; a forma
+   sai facetada e o banco tem largura constante); depois o
    desempenho (o `--analise` levou 6 min com uma opção e 11 min com duas, quase
    tudo na sugestão de explosão; meta de menos de 20 s por moto, com cache de
    silhuetas, filtro de pares por caixa envolvente e `sugerir` fora do padrão);
