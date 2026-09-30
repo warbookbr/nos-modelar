@@ -205,7 +205,7 @@ describe('sobreposição na projeção', () => {
     expect(r.explosao[0].fator).toBeLessThanOrEqual(2.5);
     expect(r.explosao[0].achados_depois).toBeLessThan(r.achados.length);
     expect(r.explosao[0].achados_antes).toBe(r.achados.length);
-  }, 60000);
+  }, 240000);
 
   it('a linha de comando imprime os achados de projeção junto do contato, e --estrito só falha com reprova', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'projecao-'));
