@@ -208,7 +208,18 @@ do naked por `parametros` na opção.
     não cita nenhum objeto específico.
 16. Tanque, banco e carenagem da moto de prova saem com forma curva (perfil
     côncavo, afunilamento ou loft), e não como caixa ou extrusão convexa.
-17. `npm run gates --completo` passa.
+17. O Condutor roda o fluxo por estágios (Maquete, Conferência da maquete, Plano
+    de detalhe, Detalhe por unidade, Montagem), grava o estado em arquivo legível
+    por máquina e só libera o estágio seguinte quando o Portão de estágio do
+    atual passa, provado por teste: pular estágio é recusado com a mensagem do
+    que falta.
+18. O Plano de detalhe agrupa em Unidades de detalhe as formas de acoplamento
+    apertado do grafo de relações e ordena por dependência, e a mudança do
+    agrupamento pela IA exige `motivo` de pelo menos 15 caracteres.
+19. O Envelope de cada unidade (o volume da maquete e as portas) é conferido
+    contra a versão detalhada, e o Marco chama o crítico visual sem contexto a
+    cada 25% do custo estimado das unidades feitas, com imagens limpas.
+20. `npm run gates --completo` passa.
 
 ## Fatias
 
@@ -247,7 +258,17 @@ do naked por `parametros` na opção.
    achado, com o par colorido e sem legenda; e o esquema do JSON com mensagem
    que diz o campo e o valor válido, junto dos bugs achados (`r.pneu` visível na
    leitura e recusado em `alinha`, concordância de `arranja.nomes`, "volume"
-   que é caixa envolvente).
+   que é caixa envolvente). O Condutor entra
+   nesta fatia: a leitura padrão só com divergências vira a saída do Portão de
+   estágio, e o nível de detalhe do pedido (esquemático, médio, detalhado) liga
+   ou desliga estágios. Os nomes: Condutor (a máquina de estados do fluxo),
+   Maquete (formas primitivas com dimensões e posições corretas), Plano de
+   detalhe (o algoritmo que agrupa e ordena), Unidade de detalhe (uma peça, ou
+   as peças de acoplamento apertado), Envelope (o volume da maquete que a peça
+   detalhada não ultrapassa, com as portas nos mesmos lugares), Portão de estágio
+   e Marco (o crítico visual a cada 25%). Mapeamento para o Mecanifica: a
+   Unidade de detalhe é a etapa da montagem, o Envelope é o gate de encaixe da
+   ponte, o Portão é o aceite por etapa e o Condutor generaliza o `objeto`.
 9. A referência e o fluxo. A conferência numérica contra a foto, reaproveitando
    `conferir:referencia`, com o desvio por parte e por vista; a extração das
    medidas da foto para parâmetros, com a origem de cada número; o fluxo na
