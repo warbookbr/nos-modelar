@@ -42,13 +42,9 @@ gerando o mesmo desenho, byte a byte.
 
 ## Estado de partida
 
-O módulo `modulos/esboco/` está na `main` com a numeração automática sem
-duplicar, `linhasCentro` no topo do JSON, `ocultar` e `oculto`, legendas em
-lista com balões sobre a peça, o campo `plano`, o "Pare e planeje" e o "Pare e
-analise" do esboço com a matriz de vistas sem linhas de centro, e o gate de
-contato opt-in com `tolerancia`, `penetracao`, `folga`, pares `atravessa`,
-`encosta` e `livre` e `atravessamentos` com profundidade. Esta seção é o que este
-plano não refaz.
+O módulo `modulos/esboco/` tinha numeração automática, `linhasCentro`, `ocultar`,
+legendas em lista, o campo `plano`, o "Pare e planeje" e o "Pare e analise" e o
+gate de contato opt-in. Esta seção é o que este plano não refaz.
 
 ## O que o estudo do Mecanifica decidiu
 
@@ -90,29 +86,12 @@ README dele.
 
 ## Incluído
 
-- a leitura em texto, `--descrever`, com cada forma resolvida (centro, extensões,
-  eixo), o grafo de quem toca quem, as âncoras livres, as sobreposições em
-  três dimensões e por vista, e o `--descrever --mudou`, que mostra só o que
-  mudou desde a última execução (o que passou a tocar em quê, o que ficou solto,
-  o que apareceu de novo), para a IA editar o JSON em passos pequenos e ler a
-  diferença em milissegundos, sem despejar o estado inteiro;
-- a sobreposição na projeção por vista: cada par cujas silhuetas se cobrem
-  além de um limiar, quem está na frente, e o que resolve (outra vista, vista
-  explodida por eixo, arestas ocultas tracejadas, opacidade), sem a IA declarar
-  camadas à mão;
-- âncoras nomeadas em cada forma (centro, pontas do eixo, faces, aro) e o
-  posicionamento por elas: `tubo` entre dois pontos, `encostar` com direção e
-  folga, `alinhar` de eixos;
-- simetria e repetição: `espelho` por eixo, com o gate tratando o par, e
-  `arranja` linear e radial;
-- `params` e valores por expressão (`"=entreEixos/2"`), para duas variantes
-  diferirem em dois números;
-- componentes parametrizados (`usa: "roda"`, `garfo`, `quadro de caixas`, `mancal`)
-  como uma pequena biblioteca em JSON;
-- as formas que o inventário do estudo pedir: tubo por pontos com raio, esfera,
-  cone e tronco, extrusão de polígono, chanfro;
-- o gate propondo o conserto (mova X em Y mm para encostar em Z) e `--ajustar`
-  gravando um arquivo novo com o deslocamento aplicado, sem sobrescrever;
+- feitas nas fatias 2 a 7: a leitura em texto `--descrever` (e `--mudou`), a
+  sobreposição na projeção por vista com vista explodida e arestas ocultas,
+  âncoras nomeadas com `tubo`, `encostar` e `alinhar`, `espelho` e `arranja`,
+  `params` e expressões, o gate propondo o conserto com `--ajustar`, os
+  componentes parametrizados (`roda`, `garfo`, `quadro`, `mancal`) e as formas
+  novas (tubo, esfera, cone, extrusão, chanfro);
 - o contrato de declaração do gate herdado do Mecanifica: `motivo` de pelo menos
   15 caracteres em toda exceção, `max` obrigatório em `atravessa`, o par do
   espelho herdando a declaração do original, e a decisão de política de a skill
