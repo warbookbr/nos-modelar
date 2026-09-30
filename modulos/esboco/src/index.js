@@ -310,8 +310,10 @@ function prisma(f, onde) {
     exigir(numPos(f.espessura), `${onde}: anel precisa de "espessura" positiva em mm`);
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
-    const furos = f.diametroInterno > 0 ? [circulo(f.diametroInterno / 2)] : [];
-    return { b: base(eixo), perfil: circulo(f.diametroExterno / 2), furos, furo: furos[0] ?? null, comprimento: f.espessura };
+    exigir(f.lados === undefined || (Number.isInteger(f.lados) && f.lados >= 32 && f.lados <= SEGMENTOS), `${onde}: "lados" do anel deve ser um inteiro de 32 a ${SEGMENTOS} (padrão ${SEGMENTOS})`);
+    const poligono = (r) => (f.lados ? circuloN(r, f.lados) : circulo(r));
+    const furos = f.diametroInterno > 0 ? [poligono(f.diametroInterno / 2)] : [];
+    return { b: base(eixo), perfil: poligono(f.diametroExterno / 2), furos, furo: furos[0] ?? null, comprimento: f.espessura };
   }
   if (tipo === 'caixa') {
     exigir(numPos(f.largura) && numPos(f.altura) && numPos(f.profundidade), `${onde}: caixa precisa de "largura", "altura" e "profundidade" positivas em mm`);
@@ -1152,10 +1154,13 @@ function ordemDasFaces(lados, olho) {
   return ordem;
 }
 
-export function fatiarForma(r, olho) {
+/* `semFatias`: uma face lateral por lado do perfil em vez de uma por fatia. A ordem de profundidade do desenho
+   precisa das fatias, mas a silhueta e a profundidade de cada célula da projeção não (as faces de uma mesma faixa
+   são coplanares), e a projeção passa de 36 fatias por forma a uma. */
+export function fatiarForma(r, olho, { semFatias = false } = {}) {
   if (r.partes) {
     /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
-    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
+    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
   }
   if (r.prisma.secoes) return fatiarSecoes(r, olho);
   const { b, perfil, furos, furo, comprimento } = r.prisma;
@@ -1176,7 +1181,7 @@ export function fatiarForma(r, olho) {
   const fus = furosLista.map((fu) => anti(fu));
 
   /* o perfil côncavo vai numa fatia só: o prisma é exato e as faces se ordenam pelo perfil */
-  const fatias = comprimento <= 10 || r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
+  const fatias = semFatias || comprimento <= 10 || r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
   const chunks = [];
 
   for (let j = 0; j < fatias; j++) {
@@ -1419,6 +1424,23 @@ export function lerExplosao(v, onde) {
   return { eixo: v.eixo, fator };
 }
 
+/* Cópia de uma forma resolvida com o centro e a caixa deslocados por `delta`. A cópia lembra de qual forma
+   veio e de quanto foi deslocada, para que a projeção reaproveite as faces da original em vez de refatiar. */
+const deslocamentos = new WeakMap();
+export function deslocarForma(r, delta) {
+  const somar = (v) => v.map((x, i) => x + delta[i]);
+  const nova = { ...r, centro: somar(r.centro), min: somar(r.min), max: somar(r.max) };
+  const origem = deslocamentos.get(r);
+  deslocamentos.set(nova, origem ? { base: origem.base, delta: somar0(origem.delta, delta) } : { base: r, delta: [...delta] });
+  return nova;
+}
+const somar0 = (a, b) => a.map((x, i) => x + b[i]);
+
+/* { base, delta } de uma cópia feita por `deslocarForma`, ou null para uma forma que não é cópia. */
+export function origemDoDeslocamento(r) {
+  return deslocamentos.get(r) ?? null;
+}
+
 /* Formas resolvidas com o centro afastado do centro do conjunto (a caixa que envolve todas
    elas) ao longo do eixo. Devolve cópias; as originais, e a geometria do gate, não mudam. */
 export function explodir(formas, explosao) {
@@ -1428,8 +1450,7 @@ export function explodir(formas, explosao) {
   return formas.map((r) => {
     const delta = (r.centro[k] - c) * (explosao.fator - 1);
     if (delta === 0) return r;
-    const desloca = (v) => v.map((x, i) => (i === k ? x + delta : x));
-    return { ...r, centro: desloca(r.centro), min: desloca(r.min), max: desloca(r.max) };
+    return deslocarForma(r, [0, 1, 2].map((i) => (i === k ? delta : 0)));
   });
 }
 
@@ -1440,9 +1461,45 @@ function lerOpacidade(v, onde) {
   return v;
 }
 
+/* Desenho com menos lados: o círculo de cilindros e anéis tem 128 lados, e numa moto de 66 formas isso dá um SVG de
+   10 MB por opção. Com `"ladosPorEscala": true` na raiz, cada cilindro e cada anel sem `lados` declarado recebe o menor
+   número de lados cuja flecha (o quanto o polígono inscrito se afasta do círculo) fica abaixo de FLECHA_PX na tela,
+   contando a escala que o painel dá ao conjunto. Sem o campo o desenho é o de sempre, byte a byte. Só o desenho lê o
+   campo: o gate de contato e a projeção medem sempre o esboço original, com os 128 lados. */
+export const FLECHA_PX = 0.35;
+const PX_DO_CONJUNTO = 500;
+const LADOS_MINIMOS = { cilindro: 16, anel: 32 };
+
+export function ladosPorEscala(rpx, minimo = 16) {
+  const passo = Math.acos(Math.max(-1, 1 - FLECHA_PX / Math.max(rpx, FLECHA_PX)));
+  return Math.max(minimo, Math.min(SEGMENTOS, Math.ceil(Math.PI / Math.max(passo, 1e-6))));
+}
+
+function comLadosPorEscala(esboco) {
+  let dimensao = 1;
+  for (const [i, o] of esboco.opcoes.entries()) {
+    const rs = resolverOpcao(o, `opção ${i + 1}`, esboco.pontos);
+    for (let e = 0; e < 3; e++) dimensao = Math.max(dimensao, Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e])));
+  }
+  const pxPorMm = PX_DO_CONJUNTO / dimensao;
+  return {
+    ...esboco,
+    opcoes: esboco.opcoes.map((o) => ({
+      ...o,
+      formas: (o.formas ?? []).map((f) => {
+        if (f.lados !== undefined || !Object.hasOwn(LADOS_MINIMOS, f.tipo)) return f;
+        const raio = (f.tipo === 'anel' ? f.diametroExterno : f.diametro) / 2;
+        return raio > 0 ? { ...f, lados: ladosPorEscala(raio * pxPorMm, LADOS_MINIMOS[f.tipo]) } : f;
+      }),
+    })),
+  };
+}
+
 export function validarEsboco(bruto) {
   exigir(bruto && typeof bruto === 'object', 'o esboço precisa ser um objeto JSON');
-  const esboco = expandirEsboco(bruto);
+  let esboco = expandirEsboco(bruto);
+  exigir(esboco.ladosPorEscala === undefined || typeof esboco.ladosPorEscala === 'boolean', '"ladosPorEscala" deve ser true ou false');
+  if (esboco.ladosPorEscala === true && Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0) esboco = comLadosPorEscala(esboco);
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
   const vista = esboco.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);

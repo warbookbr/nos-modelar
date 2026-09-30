@@ -229,21 +229,21 @@ do naked por `parametros` na opção.
    como caixas e extrusões convexas e a moto ficou sem cara de moto (feita em
    2026-09-30: `extrusao` de perfil côncavo, `loft` por seções e `revolucao`,
    com gate por partes convexas e a moto de prova sem centro à mão; a forma
-   sai facetada e o banco tem largura constante); depois o
-   desempenho (o `--analise` levou 6 min com uma opção e 11 min com duas, quase
-   tudo na sugestão de explosão; meta de menos de 20 s por moto, com cache de
-   silhuetas, filtro de pares por caixa envolvente e `sugerir` fora do padrão);
-   depois o contrato de relações no JSON, com `junta {pecas, max, motivo}` no
-   lugar de dezenas de pares `atravessa` (a moto teve 26), pontos-guia nomeados
-   no `caminho` do tubo e âncora com deslocamento; a leitura padrão do
-   `--descrever` reduzida às divergências, com o detalhe por forma só sob
-   pedido; a projeção agrupada por componente, sem espelhos nem contatos abaixo
-   de 10 mm, com os N achados mais graves (a moto teve 107); a imagem por
+   sai facetada e o banco tem largura constante); depois o desempenho (feito
+   em 2026-09-30, na moto de 66 formas e 2 opções: `--analise` com as 12 imagens
+   de 11 min para 36 s (18 s por opção), 4,7 s com `--rapido`, teste da moto em
+   `projecao.test.js` de 47 s para 3,3 s; `--sugerir`, fora do padrão, de 531 s
+   para 65 s, acima dos 20 s por opção); depois o contrato de relações no JSON,
+   com `junta {pecas, max, motivo}` no lugar de dezenas de pares `atravessa` (a
+   moto teve 26), pontos-guia nomeados no `caminho` do tubo e âncora com
+   deslocamento; a leitura padrão do `--descrever` reduzida às divergências, com
+   o detalhe por forma só sob pedido; a projeção agrupada por componente (feita
+   em 2026-09-30: sem espelhos nem folgas abaixo de 10 mm, 10 grupos por opção e
+   aviso de explosão sem convergência; a moto teve 107 achados); a imagem por
    achado, com o par colorido e sem legenda; e o esquema do JSON com mensagem
-   que diz o campo e o valor válido, junto dos bugs achados (`r.pneu` visível na
-   leitura e recusado em `alinha`, concordância de `arranja.nomes`, "volume"
-   que é caixa envolvente). O Condutor entra
-   nesta fatia: a leitura padrão só com divergências vira a saída do Portão de
+   que diz o campo e o valor válido, junto dos bugs (`r.pneu` visível na leitura
+   e recusado em `alinha` segue aberto; `arranja.nomes` e "volume" corrigidos).
+   O Condutor entra nesta fatia: a leitura padrão só com divergências vira a saída do Portão de
    estágio, e o nível de detalhe do pedido (esquemático, médio, detalhado) liga
    ou desliga estágios. Os nomes: Condutor (a máquina de estados do fluxo),
    Maquete (formas primitivas com dimensões e posições corretas), Plano de

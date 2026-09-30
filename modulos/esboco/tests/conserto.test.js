@@ -24,7 +24,7 @@ describe('sugestão por tipo de achado, aplicada até o gate aprovar', () => {
     const e = esboco([caixa('a', [0, 0, 0]), caixa('b', [10, 0, 0])]);
     const s = sugestao(verificarContato(e), 'colisao');
     expect(s).toMatchObject({ forma: 'b', fonte: 'b', delta: [10.9, 0, 0], aplicavel: true });
-    expect(s.texto).toMatch(/^mova b em \[10,9 0 0\] mm \(penetração de 10 mm mais margem de 0,9 mm; nenhuma depende da outra e b é a de menor volume/);
+    expect(s.texto).toMatch(/^mova b em \[10,9 0 0\] mm \(penetração de 10 mm mais margem de 0,9 mm; nenhuma depende da outra e b é a de menor caixa envolvente/);
     const r = ajustarEsboco(e);
     expect(r.aprovado).toBe(true);
     expect(r.parou).toBe('aprovou');
@@ -82,11 +82,12 @@ describe('sugestão por tipo de achado, aplicada até o gate aprovar', () => {
 });
 
 describe('qual forma se move', () => {
-  it('entre duas livres, a de menor volume, e diz por quê', () => {
+  it('entre duas livres, a de menor caixa envolvente, e diz por quê', () => {
     const e = esboco([caixa('grande', [0, 0, 0], 100, 100, 100), caixa('pequena', [55, 0, 0])]);
     const s = sugestao(verificarContato(e), 'colisao');
     expect(s.forma).toBe('pequena');
-    expect(s.motivo).toContain('nenhuma depende da outra e pequena é a de menor volume');
+    expect(s.motivo).toContain('nenhuma depende da outra e pequena é a de menor caixa envolvente');
+    expect(s.motivo).not.toContain('volume');
     const invertida = esboco([caixa('pequena', [55, 0, 0]), caixa('grande', [0, 0, 0], 100, 100, 100)]);
     expect(sugestao(verificarContato(invertida), 'colisao')).toMatchObject({ forma: 'pequena', delta: [5.9, 0, 0] });
   });

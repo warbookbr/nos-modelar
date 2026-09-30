@@ -108,7 +108,7 @@ export function criarConserto(formas, resolvidas) {
   };
 
   /* Quem se move num par: aquela que não arrasta a outra (mover a que a outra usa como referência
-     desfaria o conserto, pois a dependente acompanha). Se as duas servem, a de menor volume; se
+     desfaria o conserto, pois a dependente acompanha). Se as duas servem, a de menor caixa envolvente; se
      nenhuma serve, nenhuma. */
   const escolher = (a, b) => {
     const serve = (x, y) => !parteDeComponente(fonteDe(x, [0, 0, 0]).fonte) && !arrasta(fonteDe(x, [0, 0, 0]).fonte).has(y) && fonteDe(x, [0, 0, 0]).fonte !== fonteDe(y, [0, 0, 0]).fonte;
@@ -117,7 +117,7 @@ export function criarConserto(formas, resolvidas) {
       const va = volumes.get(a) ?? 0; const vb = volumes.get(b) ?? 0;
       const mover = va < vb ? a : b;
       const outro = mover === a ? b : a;
-      return { mover, motivo: `nenhuma depende da outra e ${mover} é a de menor volume (${mm1(Math.min(va, vb) / 1000)} cm³ contra ${mm1(Math.max(va, vb) / 1000)} cm³ de ${outro})` };
+      return { mover, motivo: `nenhuma depende da outra e ${mover} é a de menor caixa envolvente (${mm1(Math.min(va, vb) / 1000)} cm³ contra ${mm1(Math.max(va, vb) / 1000)} cm³ de ${outro})` };
     }
     if (sa || sb) {
       const mover = sa ? a : b; const outro = sa ? b : a;

@@ -162,8 +162,10 @@ export function expandirArranjos(formas, onde = 'opção') {
       dados = { eixo: a.eixo, centro: a.centro, graus };
     }
     if (a.nomes !== undefined) {
-      exigir(Array.isArray(a.nomes) && a.nomes.length === a.total - 1 && a.nomes.every((n) => typeof n === 'string' && n) && new Set(a.nomes).size === a.nomes.length,
-        `${contexto}: "arranja.nomes" deve listar ${a.total - 1} nomes distintos, um por cópia (a fonte "${a.forma}" já tem o nome dela)`);
+      const esperados = a.total - 1;
+      const veio = Array.isArray(a.nomes) ? a.nomes.length : 0;
+      exigir(Array.isArray(a.nomes) && a.nomes.length === esperados && a.nomes.every((n) => typeof n === 'string' && n) && new Set(a.nomes).size === a.nomes.length,
+        `${contexto}: "arranja.nomes" deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(a.nomes) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${a.forma}" já tem o nome dela`);
     }
     for (let k = 1; k < a.total; k++) {
       saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados } });

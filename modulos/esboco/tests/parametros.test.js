@@ -344,7 +344,12 @@ describe('arranja', () => {
     expect(tenta({ forma: 'p', modo: 'radial', total: 3, centro: [0, 0, 0] })).toThrow(/precisa de "eixo"/);
     expect(tenta({ forma: 'p', modo: 'radial', total: 3, eixo: 'y' })).toThrow(/precisa de "centro"/);
     expect(tenta({ forma: 'p', modo: 'linear', total: 3, passo: [0, 0, 1], eixo: 'y' })).toThrow(/valem só no modo radial/);
-    expect(tenta({ forma: 'p', modo: 'linear', total: 3, passo: [0, 0, 1], nomes: ['a'] })).toThrow(/"arranja.nomes" deve listar 2 nomes distintos/);
+    expect(tenta({ forma: 'p', modo: 'linear', total: 3, passo: [0, 0, 1], nomes: ['a'] })).toThrow(/"arranja.nomes" deve listar 2 nomes, veio 1/);
+    /* concordância: uma cópia é "1 nome", mais de uma é "N nomes", e a mensagem diz quantos vieram */
+    expect(tenta({ forma: 'p', modo: 'linear', total: 2, passo: [0, 0, 1], nomes: [] })).toThrow(/"arranja.nomes" deve listar 1 nome, veio 0;/);
+    expect(tenta({ forma: 'p', modo: 'linear', total: 4, passo: [0, 0, 1], nomes: ['a', 'b'] })).toThrow(/"arranja.nomes" deve listar 3 nomes, veio 2;/);
+    expect(tenta({ forma: 'p', modo: 'linear', total: 3, passo: [0, 0, 1], nomes: 'ab' })).toThrow(/"arranja.nomes" deve listar 2 nomes, veio 0 \(não é uma lista\)/);
+    expect(tenta({ forma: 'p', modo: 'linear', total: 3, passo: [0, 0, 1], nomes: ['a', 'a'] })).toThrow(/"arranja.nomes" deve listar 2 nomes, veio 2; um por cópia, textos não vazios e distintos/);
     expect(tenta({ forma: 'p', modo: 'linear', total: 3, passo: [0, 0, 1], cor: 'x' })).toThrow(/não tem o campo "cor"/);
     expect(tenta({ forma: 'nada', modo: 'linear', total: 3, passo: [0, 0, 1] })).toThrow(/"nada", que não existe/);
     expect(tenta({ forma: 'p', modo: 'linear', total: 2, passo: [0, 0, 1], nomes: ['p'] })).toThrow(/id "p" repetido/);

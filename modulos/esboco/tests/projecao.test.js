@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, ErroDeEsboco, explodir, resolverOpcao } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
-import { descreverProjecao, FATORES_DA_SUGESTAO, medirProjecaoDaOpcao, TIPO_DO_ACHADO, verificarProjecao } from '../src/projecao.js';
+import { descreverGrupoDaProjecao, descreverProjecao, FATORES_DA_SUGESTAO, FOLGA_MINIMA_PADRAO, MAXIMO_PADRAO, medirProjecaoDaOpcao, relatarOpcao, TIPO_DO_ACHADO, verificarProjecao } from '../src/projecao.js';
 import { analisarEsboco, ESCALA_RELATIVA_MINIMA, variante } from '../../../tools/mecanifica/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });
@@ -230,7 +230,7 @@ describe('sobreposição na projeção', () => {
     const arq = join(pasta, 'p.esboco.json');
     const origem = JSON.stringify(esboco(ladoALado(30, 5, 5)));
     writeFileSync(arq, origem);
-    const { pasta: saida, manifesto } = await analisarEsboco(arq);
+    const { pasta: saida, manifesto } = await analisarEsboco(arq, { sugerir: true });
     expect(manifesto.projecao).toMatchObject({ usar: true, limiar: 0.15, reprova: false, resultado: 'aviso' });
     expect(manifesto.projecao.porVista.lateral[0]).toMatchObject({ pecas: ['a', 'b'], cobre: 'b', fracao: expect.any(Number), folga_mm: expect.any(Number), alternativa: expect.any(Object) });
     expect(manifesto.projecao.explosao[0]).toMatchObject({ origem: 'sugerida', fator: 1.2, achados_antes: 2, achados_depois: 1 });
@@ -243,7 +243,7 @@ describe('sobreposição na projeção', () => {
     expect(readFileSync(arq, 'utf8')).toBe(origem);
     /* uma explosão declarada fica de fora das variantes normais e vale na explodida */
     writeFileSync(arq, JSON.stringify(esboco(ladoALado(30, 5, 5), {}, { explosao: { eixo: 'y', fator: 3 } })));
-    const dec = (await analisarEsboco(arq)).manifesto;
+    const dec = (await analisarEsboco(arq, { sugerir: true })).manifesto;
     expect(dec.forcado).toEqual({ linhasCentro: false, explosao: false, legendasExplodidaTransparente: 'lista' });
     expect(dec.projecao.explosao[0]).toMatchObject({ origem: 'declarada', eixo: 'y', fator: 3 });
     /* sem sobreposição nem explosão: as 8 imagens de sempre */
@@ -272,7 +272,7 @@ describe('sobreposição na projeção', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'projecao-'));
     const arq = join(pasta, 'moto.esboco.json');
     writeFileSync(arq, readFileSync(new URL('./fixtures/moto.esboco.json', import.meta.url)));
-    const { manifesto } = await analisarEsboco(arq);
+    const { manifesto } = await analisarEsboco(arq, { sugerir: true });
     const ex = manifesto.projecao.explosao[0];
     expect(ex.origem).toBe('sugerida');
     expect(ex.fator).toBeLessThanOrEqual(ex.fator_sugerido);
@@ -281,4 +281,117 @@ describe('sobreposição na projeção', () => {
     expect(ex.aviso).toBeUndefined();
     expect(manifesto.forcado.legendasExplodidaTransparente).toBe('lista');
   }, 240000);
+});
+
+describe('ruído da projeção', () => {
+  const comProj = (formas, projecao, extra = {}) => esboco(formas, { projecao }, extra);
+
+  it('o relato agrupa os achados por componente, do mais grave ao menos, e os achados completos ficam em porVista', () => {
+    const r = verificarProjecao(esboco([caixa('a', [0, 0, 0]), caixa('b', [30, 0, 0]), caixa('c', [60, 0, 0])]));
+    const [rel] = r.relatorio;
+    expect(rel).toMatchObject({ opcao: 'T', folgaMinima: FOLGA_MINIMA_PADRAO, maximo: MAXIMO_PADRAO, total: 2, ignorados: { espelho: 0, folga: 0 }, omitidos: { grupos: 0, achados: 0 } });
+    expect(rel.grupos.map((g) => g.componentes)).toEqual([['a', 'b'], ['b', 'c']]);
+    expect(rel.grupos[0]).toMatchObject({ achados: 1, vistas: ['lateral'], pior: { pecas: ['a', 'b'], vista: 'lateral' } });
+    expect(r.achados).toHaveLength(2);
+    expect(descreverGrupoDaProjecao(rel.grupos[0])).toBe(descreverProjecao(rel.grupos[0].pior));
+  });
+
+  it('achados entre as mesmas duas instâncias viram um grupo com o pior achado e a contagem dos outros', () => {
+    const moto = JSON.parse(readFileSync(new URL('./fixtures/moto-componentes.esboco.json', import.meta.url), 'utf8'));
+    const r = verificarProjecao(moto, { forcar: true });
+    for (const rel of r.relatorio) {
+      const noGrupo = rel.grupos.reduce((t, g) => t + g.achados, 0);
+      expect(rel.total, rel.opcao).toBe(rel.ignorados.espelho + rel.ignorados.folga + noGrupo + rel.omitidos.achados);
+      expect(rel.grupos.length).toBeLessThanOrEqual(MAXIMO_PADRAO);
+      const chaves = rel.grupos.map((g) => g.componentes.join('|'));
+      expect(new Set(chaves).size).toBe(chaves.length);
+      const fracoes = rel.grupos.map((g) => g.pior.fracao);
+      expect(fracoes).toEqual([...fracoes].sort((x, y) => y - x));
+      for (const g of rel.grupos) {
+        expect(g.pior.folga_mm).toBeGreaterThanOrEqual(FOLGA_MINIMA_PADRAO);
+        for (const c of g.componentes) expect(c).not.toMatch(/\./);
+      }
+    }
+    const agrupado = r.relatorio.flatMap((rel) => rel.grupos).find((g) => g.achados > 1);
+    expect(agrupado).toBeDefined();
+    expect(descreverGrupoDaProjecao(agrupado)).toMatch(/\n {4}mais \d+ achados? (entre .+ e .+|dentro de .+), nas vistas /);
+  });
+
+  it('pares de espelho e folgas abaixo de folgaMinima ficam fora do relato, contados em ignorados, e o limiar é declarável', () => {
+    /* b é o espelho de a no eixo x em 15 mm: a lateral cobre um com o outro a 10 mm */
+    const espelhados = [caixa('a', [0, 0, 0]), { id: 'b', espelha: { forma: 'a', eixo: 'x', pos: 15 } }];
+    const r = verificarProjecao(esboco(espelhados));
+    expect(r.achados).toHaveLength(1);
+    expect(r.relatorio[0]).toMatchObject({ total: 1, ignorados: { espelho: 1, folga: 0 }, grupos: [] });
+    /* as duas cópias de um mesmo espelho não se cobram uma a outra: o par delas é o do original */
+    const copias = [caixa('a', [0, 0, 0]), { id: 'b', espelha: { forma: 'a', eixo: 'x', pos: 15 } }, { id: 'c', espelha: { forma: 'a', eixo: 'x', pos: 15 } }];
+    expect(relatarOpcao('T', [{ pecas: ['b', 'c'], vista: 'lateral', fracao: 1, area_mm2: 1, folga_mm: 20 }], resolverOpcao({ formas: [copias[0], { ...copias[1], id: 'b' }, { ...copias[2], espelha: { forma: 'a', eixo: 'x', pos: 40 } }] })).ignorados.espelho).toBe(1);
+    /* a 10 mm: aparece com o padrão de 10 e some com folgaMinima 15; a 5 mm some com o padrão */
+    expect(verificarProjecao(esboco(ladoALado(30))).relatorio[0].grupos).toHaveLength(1);
+    const alto = verificarProjecao(comProj(ladoALado(30), { folgaMinima: 15 }));
+    expect(alto.relatorio[0]).toMatchObject({ folgaMinima: 15, total: 1, ignorados: { espelho: 0, folga: 1 }, grupos: [] });
+    expect(alto.achados).toHaveLength(1);
+    const cinco = verificarProjecao(esboco(ladoALado(25, 5, 5)));
+    expect(cinco.relatorio[0].ignorados.folga).toBeGreaterThan(0);
+    expect(cinco.relatorio[0].grupos).toEqual([]);
+    expect(verificarProjecao(comProj(ladoALado(25, 5, 5), { folgaMinima: 0 })).relatorio[0].grupos).toHaveLength(1);
+    /* a declaração da opção vence a da raiz */
+    const e = comProj(ladoALado(30), { folgaMinima: 15 });
+    e.opcoes[0].contato = { projecao: { folgaMinima: 0 } };
+    expect(verificarProjecao(e).relatorio[0]).toMatchObject({ folgaMinima: 0, ignorados: { folga: 0 } });
+  });
+
+  it('só os N grupos mais graves aparecem, com o total omitido (padrão 10, declarável)', () => {
+    const fila = Array.from({ length: 14 }, (_, k) => caixa(`f${k}`, [k * 30, 0, 0]));
+    const r = verificarProjecao(esboco(fila));
+    expect(r.relatorio[0].total).toBe(13);
+    expect(r.relatorio[0].grupos).toHaveLength(10);
+    expect(r.relatorio[0].omitidos).toEqual({ grupos: 3, achados: 3 });
+    const tres = verificarProjecao(comProj(fila, { maximo: 3 })).relatorio[0];
+    expect(tres).toMatchObject({ maximo: 3, omitidos: { grupos: 10, achados: 10 } });
+    expect(tres.grupos).toHaveLength(3);
+    expect(verificarProjecao(comProj(fila, { maximo: 50 })).relatorio[0].omitidos).toEqual({ grupos: 0, achados: 0 });
+    /* o mais grave vem primeiro: a fração coberta decide */
+    const desigual = [caixa('a', [0, 0, 0]), caixa('b', [30, 0, 0]), caixa('c', [60, 0, 0], { altura: 20 }), caixa('d', [90, 0, 6], { altura: 20 })];
+    const fr = verificarProjecao(comProj(desigual, { maximo: 1 })).relatorio[0];
+    expect(fr.grupos).toHaveLength(1);
+    expect(fr.grupos[0].pior.fracao).toBe(Math.max(...verificarProjecao(esboco(desigual)).achados.map((a) => a.fracao)));
+  });
+
+  it('a declaração de folgaMinima e maximo é validada com a mensagem do campo', () => {
+    expect(() => verificarProjecao(comProj(ladoALado(), { folgaMinima: -1 }))).toThrow(/"contato.projecao.folgaMinima" deve ser uma folga em mm/);
+    expect(() => verificarProjecao(comProj(ladoALado(), { folgaMinima: '10' }))).toThrow(/folgaMinima/);
+    expect(() => verificarProjecao(comProj(ladoALado(), { maximo: 0 }))).toThrow(/"contato.projecao.maximo" deve ser um inteiro de 1 ou mais/);
+    expect(() => verificarProjecao(comProj(ladoALado(), { maximo: 2.5 }))).toThrow(/maximo/);
+  });
+
+  it('a explosão sugerida diz se converge, e a linha de comando avisa quando não converge', () => {
+    const converge = verificarProjecao(esboco(ladoALado(30, 30, 30)), { sugerir: true }).explosao[0];
+    expect(converge).toMatchObject({ origem: 'sugerida', achados_depois: 0, converge: true });
+    const teimoso = verificarProjecao(esboco(ladoALado(30, 5, 5)), { sugerir: true }).explosao[0];
+    expect(teimoso).toMatchObject({ origem: 'sugerida', achados_depois: 1, converge: false });
+    const pasta = mkdtempSync(join(tmpdir(), 'ruido-'));
+    const arq = join(pasta, 'n.esboco.json');
+    writeFileSync(arq, JSON.stringify(esboco(ladoALado(30, 5, 5), { folga: 500 }, { contato: { usar: true, folga: 500, projecao: { folgaMinima: 0 } } })));
+    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--analise', '--rapido', '--sugerir'], { encoding: 'utf8' });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain('AVISO: a explosão sugerida não converge, e 1 dos 2 achados continuam com ela');
+    writeFileSync(arq, JSON.stringify(esboco(ladoALado(30, 30, 30))));
+    const bom = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--analise', '--rapido', '--sugerir'], { encoding: 'utf8' });
+    expect(bom.stdout).toContain('explosão sugerida [T]');
+    expect(bom.stdout).not.toContain('não converge');
+  }, 120000);
+
+  it('a saída da linha de comando lista os grupos, o que ficou de fora e como mudar', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'ruido-'));
+    const arq = join(pasta, 'f.esboco.json');
+    writeFileSync(arq, JSON.stringify(esboco(Array.from({ length: 14 }, (_, k) => caixa(`f${k}`, [k * 30, 0, 0])), { folga: 500 })));
+    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--analise', '--rapido'], { encoding: 'utf8' });
+    expect(r.status).toBe(0);
+    const linhas = r.stdout.split('\n').filter((l) => l.includes('sobreposição na projeção: na vista'));
+    expect(linhas).toHaveLength(10);
+    expect(r.stdout).toContain('[T] fora do relato: 3 grupos mais leves (3 achados), acima do máximo de 10');
+    expect(r.stdout).toContain('contato.projecao.maximo e contato.projecao.folgaMinima');
+    expect(r.stdout).toContain('rode com --sugerir');
+  }, 120000);
 });
