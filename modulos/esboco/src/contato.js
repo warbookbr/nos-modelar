@@ -14,6 +14,7 @@
    subestima um cruzamento que atravesse várias fatias do aro. */
 import earcut from 'earcut';
 import { ErroDeEsboco, resolverOpcao } from './index.js';
+import { expandirEsboco } from './expandir.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
 /* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
@@ -265,6 +266,45 @@ export function paresImplicitos(opcao, tolerancia) {
     .map((f) => ({ a: f.id, b: f.encosta.referencia, tipo: 'encosta', implicito: true }));
 }
 
+/* O par do espelho herda as declarações do original: `guidao ↔ garfoE` declarado (atravessa, livre ou
+   encosta, com o mesmo `motivo` e `max`) vale para `guidao ↔ garfoD` quando `garfoD` é o espelho de
+   `garfoE`. Se o outro lado do par também tem espelho no mesmo eixo e na mesma posição, o par dos dois
+   espelhos herda também (`balancimE ↔ rodaE` gera `balancimD ↔ rodaD`); o cruzado nunca. O par entre a
+   fonte e a cópia (`garfoE ↔ garfoD`) não herda nada e é cobrado como qualquer outro. Um par declarado
+   para a cópia prevalece. */
+export function herdarDoEspelho(pares, opcao) {
+  const copias = new Map();
+  for (const f of opcao?.formas ?? []) {
+    if (f?.espelha && typeof f.id === 'string' && typeof f.espelha.forma === 'string') {
+      if (!copias.has(f.espelha.forma)) copias.set(f.espelha.forma, []);
+      copias.get(f.espelha.forma).push({ id: f.id, eixo: f.espelha.eixo, pos: f.espelha.pos ?? 0 });
+    }
+  }
+  if (copias.size === 0) return pares;
+  const chave = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
+  const existentes = new Set(pares.map((p) => chave(p.a, p.b)));
+  const extras = [];
+  const somar = (p, a, b) => {
+    if (a === b || existentes.has(chave(a, b))) return;
+    existentes.add(chave(a, b));
+    extras.push({ ...p, a, b, herdado: true });
+  };
+  for (const p of pares) {
+    const ca = copias.get(p.a) ?? [];
+    const cb = copias.get(p.b) ?? [];
+    const casados = new Set();
+    for (const c of ca) {
+      const d = cb.find((x) => x.eixo === c.eixo && x.pos === c.pos);
+      if (!d || c.id === p.b || d.id === p.a) continue;
+      somar(p, c.id, d.id);
+      casados.add(c.id); casados.add(d.id);
+    }
+    for (const c of ca) if (!casados.has(c.id) && c.id !== p.b) somar(p, c.id, p.b);
+    for (const d of cb) if (!casados.has(d.id) && d.id !== p.a) somar(p, p.a, d.id);
+  }
+  return [...pares, ...extras];
+}
+
 const arred = (x) => Math.round(x * 10) / 10;
 
 /* Contrato de declaração: `atravessa` e `livre` são exceções e exigem `motivo` de
@@ -307,7 +347,8 @@ export function padroesDoContato(resolvidas) {
    sem `motivo` (mínimo MINIMO_DO_MOTIVO caracteres) e `atravessa` sem `max` são
    recusados com ErroDeEsboco. Sem `contato` no JSON (ou com `usar` falso em
    todas as opções) devolve `resultado: 'desligado'` sem medir. */
-export function verificarContato(esboco, { resolvidas: prontas } = {}) {
+export function verificarContato(bruto, { resolvidas: prontas } = {}) {
+  const esboco = expandirEsboco(bruto);
   const raiz = lerContato(esboco?.contato, 'esboço');
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const lidas = opcoes.map((o, i) => lerContato(o.contato, `opção ${i + 1}`));
@@ -345,7 +386,7 @@ export function verificarContato(esboco, { resolvidas: prontas } = {}) {
     const chave = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
     const maximos = new Map();
     const motivos = new Map();
-    for (const p of [...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) {
+    for (const p of herdarDoEspelho([...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])], o)) {
       tipos.set(chave(p.a, p.b), p.tipo);
       maximos.set(chave(p.a, p.b), p.max);
       motivos.set(chave(p.a, p.b), p.motivo?.trim());

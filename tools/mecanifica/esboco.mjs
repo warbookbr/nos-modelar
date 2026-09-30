@@ -10,6 +10,7 @@ import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/i
 import { descreverAchado, descreverAtravessamento, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverProjecao, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
 import { descreverEsboco, diferenca, formatarDescricao } from '../../modulos/esboco/src/descrever.js';
+import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
@@ -88,9 +89,12 @@ const declaraExplosao = (esboco) => esboco.explosao !== undefined || (esboco.opc
 export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros = false } = {}) {
   const caminho = resolve(arquivo);
   const texto = readFileSync(caminho, 'utf8');
-  const esboco = JSON.parse(texto);
+  const bruto = JSON.parse(texto);
+  /* parâmetros, formas herdadas e arranjos já resolvidos: as variantes editam o JSON simples */
+  const esboco = expandirEsboco(bruto);
   const contato = verificarContato(esboco);
   const projecao = verificarProjecao(esboco, { forcar: true, sugerir: true });
+  const parametros = Object.fromEntries((esboco.opcoes ?? []).flatMap((o, i) => (o?.parametros ? [[o.titulo ?? `Opção ${i + 1}`, o.parametros]] : [])));
   const pedidoDeZoom = zoom ? lerZoomDoEsboco(zoom) : null;
   const pasta = caminho.replace(/(\.esboco)?\.json$/i, '') + '-analise';
   mkdirSync(pasta, { recursive: true });
@@ -183,6 +187,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     centros: comCentros,
     forcado: { ...(comCentros ? {} : { linhasCentro: false }), ...(declaraExplosao(esboco) ? { explosao: false } : {}), ...(variantes.length > 0 ? { legendasExplodidaTransparente: 'lista' } : {}) },
     plano: typeof esboco.plano === 'string' ? esboco.plano : null,
+    ...(Object.keys(parametros).length > 0 ? { parametros } : {}),
     contato,
     projecao: { usar: projecao.usar, limiar: projecao.limiar, reprova: projecao.reprova, resultado: projecao.resultado, porVista: projecao.porVista, explosao: projecao.explosao, variantes },
     escalaPxPorMm: escalas,

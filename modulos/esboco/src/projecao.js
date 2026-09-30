@@ -8,7 +8,8 @@
    `penetracao` e que não é `atravessa`; ele diz a folga real e a vista em que o par não se cobre.
    A medida sai da geometria real: a `explosao` só afasta as formas no desenho. */
 import { ErroDeEsboco, VISTAS, explodir, fatiarForma, lerExplosao, resolverOpcao } from './index.js';
-import { lerContato, medirPar, padroesDoContato, pecasDe } from './contato.js';
+import { herdarDoEspelho, lerContato, medirPar, padroesDoContato, pecasDe } from './contato.js';
+import { expandirEsboco } from './expandir.js';
 
 export const LIMIAR_PADRAO = 0.15;
 export const TIPO_DO_ACHADO = 'sobreposicao-na-projecao';
@@ -209,7 +210,8 @@ function sugerirExplosao(ctx) {
    contrário devolve `resultado: 'desligado'` sem medir. `contato.projecao` ({ limiar, reprova })
    pode ser declarado na raiz e na opção, que sobrepõe a raiz. Com `sugerir`, cada opção com
    achado e sem `explosao` declarada ganha em `explosao` o eixo que mais separa o que se cobre. */
-export function verificarProjecao(esboco, { forcar = false, sugerir = false, resolvidas: prontas } = {}) {
+export function verificarProjecao(bruto, { forcar = false, sugerir = false, resolvidas: prontas } = {}) {
+  const esboco = expandirEsboco(bruto);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
   const lidas = opcoes.map((o, i) => lerContato(o.contato, `opção ${i + 1}`));
@@ -232,7 +234,7 @@ export function verificarProjecao(esboco, { forcar = false, sugerir = false, res
     const titulo = o.titulo ?? `Opção ${i + 1}`;
     if (!ativa(i)) { resumo.push({ opcao: titulo, usar: false, resultado: 'desligado' }); return; }
     const tipos = new Map();
-    for (const p of [...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) tipos.set(chave(p.a, p.b), p.tipo);
+    for (const p of herdarDoEspelho([...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])], o)) tipos.set(chave(p.a, p.b), p.tipo);
     const rs = resolvidas[i];
     const pecas = new Map();
     const memo = new Map();

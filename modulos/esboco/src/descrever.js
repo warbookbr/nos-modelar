@@ -2,7 +2,8 @@
    as formas soltas e as sobreposições (3D e por vista), sem desenhar nada. Também calcula a
    diferença entre duas leituras (`--descrever --mudou`). Puro: não lê nem grava arquivo. */
 import { ancorasDe, relacaoDe, resolverOpcao } from './index.js';
-import { lerContato, medirPar, paresImplicitos, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
+import { expandirEsboco } from './expandir.js';
+import { herdarDoEspelho, lerContato, medirPar, paresImplicitos, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
 import { verificarProjecao } from './projecao.js';
 
 const EIXOS = ['x', 'y', 'z'];
@@ -36,7 +37,8 @@ function descreverForma(r) {
 }
 
 /* { opcoes, ... } a partir do JSON já lido. */
-export function descreverEsboco(esboco) {
+export function descreverEsboco(bruto) {
+  const esboco = expandirEsboco(bruto);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
   const lidas = opcoes.map((o, i) => lerContato(o.contato, `opção ${i + 1}`));
@@ -53,7 +55,7 @@ export function descreverEsboco(esboco) {
     const tol = lidas[i]?.tolerancia ?? raiz?.tolerancia ?? padrao.padraoTol;
     const penMax = lidas[i]?.penetracao ?? raiz?.penetracao ?? padrao.padraoPen;
     const tipos = new Map();
-    for (const p of [...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) tipos.set(chaveSimetrica(p.a, p.b), p.tipo);
+    for (const p of herdarDoEspelho([...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])], o)) tipos.set(chaveSimetrica(p.a, p.b), p.tipo);
     const pecas = rs.map(pecasDe);
     const n = rs.length;
     const contatos = [];
@@ -84,6 +86,7 @@ export function descreverEsboco(esboco) {
     }));
     return {
       titulo,
+      ...(o.parametros && Object.keys(o.parametros).length ? { parametros: o.parametros } : {}),
       gate: declarado
         ? { declarado: true, tolerancia_mm: r2(tol), penetracao_mm: r2(penMax) }
         : { declarado: false, tolerancia_mm: r2(tol), penetracao_mm: r2(penMax) },
@@ -108,6 +111,7 @@ export function formatarDescricao(d) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
     L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
+    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
     L.push(o.gate.declarado
       ? `gate de contato declarado: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm`
       : `sem gate declarado (padrões do gate: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm)`);
@@ -141,6 +145,11 @@ export function diferenca(anterior, atual) {
     const rot = `[${o.titulo}]`;
     if (!p) { nota(`${rot} opção nova`, 'opcao-nova', { opcao: o.titulo }); return; }
     antes.delete(k);
+    const pa = p.parametros ?? {}; const pb = o.parametros ?? {};
+    for (const k of new Set([...Object.keys(pa), ...Object.keys(pb)])) {
+      if (pa[k] === pb[k]) continue;
+      nota(`${rot} parâmetro ${pa[k] === undefined ? 'novo' : pb[k] === undefined ? 'removido' : 'alterado'}: ${k}${pa[k] === undefined ? '' : ` de ${mm1(pa[k])}`}${pb[k] === undefined ? '' : ` para ${mm1(pb[k])}`}`, 'parametro', { opcao: o.titulo, parametro: k });
+    }
     const fa = new Map(p.formas.map((f) => [f.id, f]));
     const fb = new Map(o.formas.map((f) => [f.id, f]));
     for (const f of o.formas) if (!fa.has(f.id)) nota(`${rot} forma nova: ${f.id} (${f.tipo}), centro ${vetor(f.centro)}`, 'forma-nova', { opcao: o.titulo, forma: f.id });

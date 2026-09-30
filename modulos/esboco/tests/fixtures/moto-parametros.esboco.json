@@ -1,0 +1,40 @@
+{
+  "vista": "isometrica",
+  "plano": "A moto de moto-relacoes reescrita com parâmetros, espelho e formas herdadas da raiz. As doze formas são declaradas uma vez, na raiz. A opção A usa os parâmetros da raiz e a B (café racer) muda só alturaColuna e larguraGuidao, sem repetir a lista de formas: a coluna mais baixa desce o cabeçote e o guidão, que assenta no topo da coluna. As rodas são iguais (raioRoda e larguraRoda), os garfos saem de de/para entre o eixo da roda e o topo da coluna, o garfo direito e o balancim direito são espelhos dos esquerdos, e o guidão atravessar os garfos é a única exceção do gate. O par guidão e garfo direito herda a declaração do esquerdo.",
+  "linhasCentro": false,
+  "legendas": "lista",
+  "parametros": {
+    "entreEixos": 1400,
+    "raioRoda": 305,
+    "diametroRoda": "=2*raioRoda",
+    "aro": 420,
+    "larguraRoda": 125,
+    "raioCanto": 40,
+    "alturaColuna": 240,
+    "larguraGuidao": 760
+  },
+  "contato": {
+    "usar": true,
+    "pares": [
+      { "a": "guidao", "b": "garfoE", "tipo": "atravessa", "max": 15, "motivo": "a presilha do guidão abraça a bengala do garfo" }
+    ]
+  },
+  "formas": [
+    { "id": "rodaTras", "tipo": "anel", "diametroExterno": "diametroRoda", "diametroInterno": "aro", "espessura": "larguraRoda", "eixo": "x", "centro": [0, "raioRoda", "=-entreEixos/2"], "cor": "preto", "rotulo": "1. roda_traseira" },
+    { "id": "rodaFrente", "tipo": "anel", "diametroExterno": "diametroRoda", "diametroInterno": "aro", "espessura": "larguraRoda", "eixo": "x", "centro": [0, "raioRoda", "=entreEixos/2"], "cor": "preto", "rotulo": "2. roda_frente" },
+    { "id": "motor", "tipo": "caixa", "largura": 260, "altura": 300, "profundidade": 380, "raio": "raioCanto", "centro": [0, 380, 0], "cor": "cinza", "rotulo": "3. motor" },
+    { "id": "quadro", "tipo": "caixa", "largura": 80, "altura": 60, "profundidade": 560, "sobre": "motor", "cor": "cinza", "rotulo": "4. quadro" },
+    { "id": "coluna", "tipo": "caixa", "largura": 140, "altura": "alturaColuna", "profundidade": 240, "ponta": { "id": "quadro", "lado": "+z" }, "encosta": { "referencia": "quadro", "direcao": "-y" }, "cor": "cinza", "rotulo": "5. coluna" },
+    { "id": "tanque", "tipo": "caixa", "largura": 300, "altura": 200, "profundidade": 420, "raio": 80, "sobre": "quadro", "encosta": { "referencia": "coluna", "direcao": "+z" }, "cor": "vermelho", "rotulo": "6. tanque" },
+    { "id": "banco", "tipo": "caixa", "largura": 240, "altura": 90, "profundidade": 520, "raio": "raioCanto", "sobre": "rodaTras", "encosta": { "referencia": "tanque", "direcao": "+z" }, "cor": "preto", "rotulo": "7. banco" },
+    { "id": "balancimE", "tipo": "caixa", "largura": 40, "altura": 70, "profundidade": 520, "centro": "rodaTras.centro", "alinha": { "com": "motor.-x", "eixos": ["x"] }, "encosta": { "referencia": "motor", "direcao": "+z" }, "cor": "azul", "rotulo": "8. balancim" },
+    { "id": "balancimD", "espelha": { "forma": "balancimE", "eixo": "x" } },
+    { "id": "garfoE", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "coluna.+y", "desloca": [-90, 0, 0], "cor": "laranja", "rotulo": "9. garfo" },
+    { "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x" } },
+    { "id": "guidao", "tipo": "cilindro", "diametro": 26, "comprimento": "larguraGuidao", "eixo": "x", "sobre": "coluna", "cor": "cinza", "rotulo": "10. guidao" }
+  ],
+  "opcoes": [
+    { "id": "naked", "titulo": "A. Naked", "nota": "Coluna alta e guidão largo" },
+    { "id": "cafe", "titulo": "B. Café racer", "nota": "Coluna baixa e guidão estreito, o cabeçote desce", "parametros": { "alturaColuna": 180, "larguraGuidao": 540 } }
+  ]
+}

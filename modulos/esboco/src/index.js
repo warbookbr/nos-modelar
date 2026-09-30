@@ -3,6 +3,8 @@
    lado a lado na mesma escala, em SVG. Não depende de Three.js nem de domínio;
    a conversão para PNG fica na ferramenta de linha de comando. */
 
+import { expandirArranjos, expandirEsboco } from './expandir.js';
+
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
 const SEGMENTOS = 128;
@@ -279,10 +281,15 @@ const CHAVES_ALINHA = ['com', 'eixos'];
 export function relacaoDe(f) {
   const partes = [];
   const v = (x) => (Array.isArray(x) ? `[${x.join(' ')}]` : x);
+  if (f.espelha) partes.push(`espelho de ${f.espelha.forma} no eixo ${f.espelha.eixo} em ${f.espelha.pos ?? 0} mm`);
+  if (f.arranjoDe) {
+    const a = f.arranjoDe;
+    partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
+  }
   if (f.de !== undefined) partes.push(`de ${v(f.de)} para ${v(f.para)}`);
   if (f.alinha) partes.push(`alinha com ${f.alinha.com} nos eixos ${(f.alinha.eixos ?? []).join(' ')}`);
   if (f.encosta) partes.push(`encosta em ${f.encosta.referencia} na direção ${v(f.encosta.direcao)}${f.encosta.folga ? ` com folga ${f.encosta.folga} mm` : ''}`);
-  if ((f.de !== undefined || f.alinha || f.encosta) && f.desloca) partes.push(`desloca ${v(f.desloca)}`);
+  if ((f.de !== undefined || f.alinha || f.encosta || f.espelha) && f.desloca) partes.push(`desloca ${v(f.desloca)}`);
   return partes.join('; ');
 }
 
@@ -300,14 +307,100 @@ function lerPontos(raiz, opcao, rotuloOpcao) {
   return saida;
 }
 
+const IDENTIDADE = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+const limpo = (x) => (Math.abs(x) < 1e-12 ? 0 : x);
+
+function multiplicar(a, b) {
+  return [0, 1, 2].map((i) => [0, 1, 2].map((j) => limpo(a[i][0] * b[0][j] + a[i][1] * b[1][j] + a[i][2] * b[2][j])));
+}
+
+/* Rotação de `graus` em torno do eixo de mundo, pela regra da mão direita (a mesma de `rotacao`). */
+function rotacaoEmTorno(eixo, graus) {
+  const a = (graus * Math.PI) / 180;
+  const c = limpo(Math.cos(a)); const s = limpo(Math.sin(a));
+  if (eixo === 'x') return [[1, 0, 0], [0, c, -s], [0, s, c]];
+  if (eixo === 'y') return [[c, 0, s], [0, 1, 0], [-s, 0, c]];
+  return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+}
+
+const CHAVES_ESPELHA = ['forma', 'eixo', 'pos'];
+/* Campos de posição e de aparência que a cópia não herda da forma-fonte (a cópia refaz a posição
+   a partir da fonte já resolvida; `rotulo`, `oculto` e `opacidade` são só dela). */
+const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe'];
+const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha'];
+
+/* Cópia refletida (`espelha`) ou repetida (`arranjoDe`, vinda de `arranja`) de uma forma já resolvida:
+   a geometria sai da fonte resolvida, e não de uma regravação das relações dela. */
+function copiaResolvida(f, id, onde, referencia, pontoDe) {
+  const espelho = f.espelha !== undefined;
+  let fonte;
+  let m;
+  let centro;
+  let marca;
+  if (espelho) {
+    const e = f.espelha;
+    exigir(e && typeof e === 'object' && !Array.isArray(e), `${onde}: "espelha" deve ser { "forma": "<id>", "eixo": "x" | "y" | "z", "pos": mm }`);
+    const fora = Object.keys(e).filter((k) => !CHAVES_ESPELHA.includes(k));
+    exigir(fora.length === 0, `${onde}: "espelha" não tem o campo "${fora[0]}" (campos: ${CHAVES_ESPELHA.join(', ')})`);
+    exigir(EIXOS.includes(e.eixo), `${onde}: "espelha.eixo" deve ser "x", "y" ou "z" (o plano de reflexão é perpendicular a ele)`);
+    const pos = e.pos ?? 0;
+    exigir(Number.isFinite(pos), `${onde}: "espelha.pos" deve ser um número em mm`);
+    exigir(e.forma !== id, `${onde}: "espelha.forma" não pode ser a própria forma`);
+    const extras = Object.keys(f).filter((k) => !CAMPOS_DO_ESPELHO.includes(k));
+    exigir(extras.length === 0, `${onde}: uma forma com "espelha" copia a fonte e só aceita ${CAMPOS_DO_ESPELHO.filter((k) => k !== 'espelha').map((k) => `"${k}"`).join(', ')}; retire "${extras[0]}"`);
+    fonte = referencia('espelha.forma', e.forma);
+    const k = EIXOS.indexOf(e.eixo);
+    const S = IDENTIDADE.map((linha, i) => linha.map((v) => (i === k ? -v : v)));
+    m = multiplicar(S, fonte.matriz ?? IDENTIDADE);
+    centro = [...fonte.centro];
+    centro[k] = 2 * pos - centro[k];
+    marca = { espelha: { forma: e.forma, eixo: e.eixo, pos } };
+  } else {
+    const a = f.arranjoDe;
+    fonte = referencia('arranja.forma', a.fonte);
+    if (a.modo === 'linear') {
+      m = fonte.matriz;
+      centro = fonte.centro.map((c, i) => c + a.indice * a.passo[i]);
+    } else {
+      const eixoCentro = typeof a.centro === 'string' ? pontoDe(a.centro, 'arranja.centro') : a.centro;
+      const passo = Math.abs(a.graus) >= 360 ? a.graus / a.total : a.graus / (a.total - 1);
+      const R = rotacaoEmTorno(a.eixo, a.indice * passo);
+      const rel = fonte.centro.map((c, i) => c - eixoCentro[i]);
+      const girado = [0, 1, 2].map((i) => R[i][0] * rel[0] + R[i][1] * rel[1] + R[i][2] * rel[2]);
+      centro = girado.map((c, i) => eixoCentro[i] + c);
+      m = multiplicar(R, fonte.matriz ?? IDENTIDADE);
+    }
+    marca = { arranjoDe: a };
+  }
+  if (f.desloca !== undefined) {
+    exigir(Array.isArray(f.desloca) && f.desloca.length === 3 && f.desloca.every(Number.isFinite), `${onde}: "desloca" deve ser [dx, dy, dz] em mm`);
+    centro = centro.map((c, i) => c + f.desloca[i]);
+  }
+  const herdado = Object.fromEntries(Object.entries(fonte.forma).filter(([k]) => !NAO_HERDADOS.includes(k)));
+  const forma = {
+    ...herdado, id, cor: f.cor ?? fonte.forma.cor, ...marca,
+    ...(f.rotulo !== undefined ? { rotulo: f.rotulo } : {}),
+    ...(f.oculto !== undefined ? { oculto: f.oculto } : {}),
+    ...(f.opacidade !== undefined ? { opacidade: f.opacidade } : {}),
+  };
+  if (forma.cor === undefined) delete forma.cor;
+  const local = caixaLocal(fonte.prisma, m);
+  return {
+    id, forma, prisma: fonte.prisma, centro, matriz: m,
+    min: local.min.map((val, i) => val + centro[i]),
+    max: local.max.map((val, i) => val + centro[i]),
+  };
+}
+
 /* Resolve a posição de cada forma. Devolve formas com centro e caixa no mundo. `pontosDaRaiz` é o
    `pontos` da raiz do esboço. Ordem de aplicação: centro, sobre, ponta ou haste (`de`/`para`);
    depois `alinha`, `encosta` e `desloca`. */
 export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = undefined) {
   exigir(Array.isArray(opcao.formas) && opcao.formas.length > 0, `${rotuloOpcao}: "formas" precisa ser uma lista não vazia`);
   const pontos = lerPontos(pontosDaRaiz, opcao, rotuloOpcao);
+  const formas = expandirArranjos(opcao.formas, rotuloOpcao);
   const porId = new Map();
-  for (const [i, f] of opcao.formas.entries()) {
+  for (const [i, f] of formas.entries()) {
     exigir(typeof f.id === 'string' && f.id, `${rotuloOpcao}, forma ${i + 1}: falta "id"`);
     exigir(!porId.has(f.id), `${rotuloOpcao}: id "${f.id}" repetido`);
     porId.set(f.id, f);
@@ -336,6 +429,12 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       exigir(!visitando.has(refId), `${onde}: referência circular em "${campo}": "${refId}" volta a depender desta forma`);
       return resolver(refId);
     };
+    if (f.espelha !== undefined || f.arranjoDe !== undefined) {
+      const r = copiaResolvida(f, id, onde, referencia, pontoDe);
+      visitando.delete(id);
+      prontas.set(id, r);
+      return r;
+    }
     const haste = f.de !== undefined || f.para !== undefined;
     let fPrisma = f;
     let m;
@@ -428,7 +527,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
     prontas.set(id, r);
     return r;
   };
-  return opcao.formas.map((f) => resolver(f.id));
+  return formas.map((f) => resolver(f.id));
 }
 
 /* Projeções: tela (x para a direita, y para baixo) e profundidade para o observador. */
@@ -747,8 +846,9 @@ function lerOpacidade(v, onde) {
   return v;
 }
 
-export function validarEsboco(esboco) {
-  exigir(esboco && typeof esboco === 'object', 'o esboço precisa ser um objeto JSON');
+export function validarEsboco(bruto) {
+  exigir(bruto && typeof bruto === 'object', 'o esboço precisa ser um objeto JSON');
+  const esboco = expandirEsboco(bruto);
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
   const vista = esboco.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
