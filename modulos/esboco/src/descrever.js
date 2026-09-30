@@ -52,8 +52,9 @@ export function descreverEsboco(bruto) {
 
 /* A leitura e, junto dela, a lista numerada de divergências (`n` global, na ordem em que a leitura padrão as imprime:
    por opção, da mais grave para a menos). `projecao: false` pula a medida de sobreposição na vista, que não entra nas
-   divergências (só a leitura completa a mostra). Devolve { descricao, divergencias, plano }. */
-export function medirEsboco(bruto, { projecao: comProjecao = true, referencias } = {}) {
+   divergências (só a leitura completa a mostra). `unidades` (formaId -> unidade) é o Plano de detalhe do Condutor, que o gate usa para relaxar o `atravessa` dentro da
+   mesma unidade. Devolve { descricao, divergencias, plano }. */
+export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, unidades } = {}) {
   const esboco = expandirEsboco(bruto);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -61,7 +62,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias }
   const ativa = (i) => (lidas[i]?.usar ?? raiz?.usar) === true;
   const todas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
-  const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis }) : null;
+  const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis, unidades }) : null;
   const projecao = comProjecao ? verificarProjecao(esboco, { forcar: true, resolvidas: visiveis }) : { achados: [] };
   const plano = conferirPlano(esboco, visiveis, { referencias });
   const padrao = padroesDoContato(visiveis);

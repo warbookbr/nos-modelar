@@ -1,0 +1,215 @@
+/* Detalhar e integrar uma Unidade de detalhe: `detalharUnidade` devolve um esboço isolado da unidade (as entradas das outras
+   unidades com `oculto: true`, o plano mínimo), e `integrarUnidade` troca no mestre as entradas da unidade pelas do esboço
+   detalhado, mantendo parâmetros, pontos, juntas e pares que continuam valendo e removendo os que citam formas que saíram.
+   O mestre e o detalhado são JSON bruto (com instâncias, espelhos, arranjos e parâmetros, como a pessoa os escreveu). Puro:
+   não lê nem grava arquivo, e não muda o que recebe. */
+import { ErroDeEsboco, resolverOpcao } from './index.js';
+import { expandirArranjos, expandirEsboco } from './expandir.js';
+import { conferirEnvelope, montarUnidadesDoEstado, planoDeDetalhe, registrarEnvelope, unidadePorNome, abreviar } from './condutor.js';
+import { quisDizer } from './parecido.js';
+
+const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
+const clone = (v) => JSON.parse(JSON.stringify(v));
+const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
+const PLANO_MINIMO = (unidade) => ({ texto: `detalhe da unidade ${unidade}`, nivel: 'esquematico' });
+
+/* A lista de formas do mestre que vale para a primeira opção: a da opção, ou a da raiz. */
+function listaDoMestre(bruto) {
+  const opcao = bruto?.opcoes?.[0];
+  if (objeto(opcao) && Array.isArray(opcao.formas)) return { lista: opcao.formas, onde: 'opcao' };
+  exigir(Array.isArray(bruto?.formas), 'o esboço não tem lista de formas (nem na raiz nem na primeira opção)');
+  return { lista: bruto.formas, onde: 'raiz' };
+}
+
+/* Os ids das formas expandidas que cada entrada da lista bruta gera (uma forma, as de uma instância, as cópias de um arranjo). */
+function idsPorEntrada(lista, expandidas) {
+  return lista.map((f) => {
+    if (!objeto(f)) return [];
+    if (f.arranja !== undefined && f.id === undefined) return expandirArranjos([f]).map((v) => v.id);
+    if (typeof f.id !== 'string') return [];
+    return expandidas.filter((x) => x.id === f.id || x.daInstancia?.id === f.id).map((x) => x.id);
+  });
+}
+
+function unidadeDoEstado(bruto, estado, nome) {
+  const unidades = estado?.unidades?.length ? estado.unidades : planoDeDetalhe(bruto).unidades;
+  const unidade = unidadePorNome(unidades, nome);
+  const ids = unidades.map((u) => u.id);
+  exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
+  return { unidades, u: unidades.find((x) => x.id === unidade) };
+}
+
+/* Classifica cada entrada da lista bruta: 'dentro' (todas as formas visíveis dela são da unidade), 'fora' (nenhuma é) ou erro
+   (uma instância ou um arranjo dividido entre unidades por --mover de uma forma só). */
+function classificar(lista, ids, unidades, u) {
+  const donos = new Map(unidades.flatMap((x) => x.membros.map((m) => [m, x.id])));
+  return lista.map((f, k) => {
+    const nas = ids[k].filter((id) => donos.has(id));
+    const dentro = nas.filter((id) => u.membros.includes(id));
+    if (dentro.length === 0) return 'fora';
+    if (dentro.length === nas.length) return 'dentro';
+    const outras = [...new Set(nas.filter((id) => !u.membros.includes(id)).map((id) => donos.get(id)))];
+    throw new ErroDeEsboco(`a entrada "${f.id ?? f.arranja?.forma}" do esboço tem formas na unidade "${u.id}" e em ${outras.map((x) => `"${x}"`).join(', ')}: a troca da unidade não divide uma instância nem um arranjo; mova todas as formas dela para a mesma unidade (--mover ${f.id ?? f.arranja?.forma} --para ${u.id} --motivo <texto>) e tente de novo`);
+  });
+}
+
+/* O esboço isolado da unidade: as entradas dela como estão, as outras com `oculto: true` (só servem de referência de posição),
+   só a primeira opção e o plano mínimo. Parâmetros, pontos e contato do mestre ficam; as juntas e os pares que citam formas
+   ocultas não reprovam (o gate as ignora). */
+export function detalharUnidade(bruto, estado, nome) {
+  const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
+  const unidade = u.id;
+  const esboco = expandirEsboco(bruto);
+  const { lista, onde } = listaDoMestre(bruto);
+  const ids = idsPorEntrada(lista, esboco.opcoes[0].formas);
+  const tipo = classificar(lista, ids, unidades, u);
+  const formas = [];
+  lista.forEach((f, k) => {
+    if (tipo[k] === 'dentro' || !objeto(f)) { formas.push(clone(f)); return; }
+    if (f.arranja !== undefined && f.id === undefined) { formas.push(...expandirArranjos([f]).map((v) => ({ ...v, oculto: true }))); return; }
+    formas.push({ ...clone(f), oculto: true });
+  });
+  const d = clone(bruto);
+  d.plano = PLANO_MINIMO(unidade);
+  d.opcoes = [clone(bruto.opcoes[0])];
+  if (onde === 'opcao') { d.opcoes[0].formas = formas; delete d.formas; } else d.formas = formas;
+  return d;
+}
+
+const chaveDoPar = (p) => `${p.a}\u0000${p.b}\u0000${p.tipo}`;
+
+/* Junta os parâmetros e os pontos novos do detalhado aos do mestre: um nome que o mestre já tem fica como está, e se o
+   detalhado o redefine com outro valor é erro (renomeie no detalhado). */
+function juntarNomes(mestre, detalhado, campo) {
+  for (const de of [detalhado, detalhado?.opcoes?.[0]]) {
+    if (!objeto(de?.[campo])) continue;
+    for (const [nome, v] of Object.entries(de[campo])) {
+      const atual = mestre[campo]?.[nome] ?? mestre.opcoes?.[0]?.[campo]?.[nome];
+      if (atual === undefined) { mestre[campo] = { ...(mestre[campo] ?? {}), [nome]: clone(v) }; continue; }
+      exigir(JSON.stringify(atual) === JSON.stringify(v), `o detalhado redefine ${campo === 'parametros' ? 'o parâmetro' : 'o ponto'} "${nome}" (mestre ${JSON.stringify(atual)}, detalhado ${JSON.stringify(v)}): dê outro nome no detalhado`);
+    }
+  }
+}
+
+/* Junta os pares e as juntas do contato do detalhado (na raiz e na opção) ao do mestre, sem repetir. */
+function juntarContato(mestre, detalhado) {
+  const alvo = (m) => { m.contato = objeto(m.contato) ? m.contato : {}; return m.contato; };
+  for (const [de, para] of [[detalhado?.contato, () => alvo(mestre)], [detalhado?.opcoes?.[0]?.contato, () => alvo(mestre.opcoes[0])]]) {
+    if (!objeto(de)) continue;
+    for (const [campo, chave] of [['pares', chaveDoPar], ['juntas', (j) => JSON.stringify(j)]]) {
+      if (!Array.isArray(de[campo])) continue;
+      const c = para();
+      const tem = new Set((c[campo] ?? []).map(chave));
+      const novos = de[campo].filter((x) => !tem.has(chave(x))).map(clone);
+      if (novos.length) c[campo] = [...(c[campo] ?? []), ...novos];
+    }
+  }
+}
+
+const padraoDe = (q) => new RegExp(`^${q.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
+
+/* Tira do contato (raiz e primeira opção) os pares e as peças de junta que citam formas que não existem mais. */
+function limparContato(mestre, todos) {
+  const ids = new Set(todos.map((f) => f.id));
+  const instancias = new Set(todos.map((f) => f.daInstancia?.id).filter(Boolean));
+  const existe = (id) => ids.has(id) || instancias.has(id);
+  const removidos = { pares: 0, juntas: 0, pecas: 0 };
+  for (const c of [mestre.contato, mestre.opcoes?.[0]?.contato]) {
+    if (!objeto(c)) continue;
+    if (Array.isArray(c.pares)) {
+      const fica = c.pares.filter((p) => existe(p.a) && existe(p.b));
+      removidos.pares += c.pares.length - fica.length;
+      c.pares = fica;
+      if (fica.length === 0) delete c.pares;
+    }
+    if (Array.isArray(c.juntas)) {
+      const fica = [];
+      for (const j of c.juntas) {
+        const pecas = (j.pecas ?? []).filter((q) => (q.includes('*') ? todos.some((f) => padraoDe(q).test(f.id)) : existe(q)));
+        removidos.pecas += (j.pecas ?? []).length - pecas.length;
+        const casadas = new Set(pecas.flatMap((q) => (q.includes('*') ? todos.filter((f) => padraoDe(q).test(f.id)).map((f) => f.id) : [q])));
+        if (casadas.size < 2) { removidos.juntas += 1; continue; }
+        fica.push({ ...j, pecas });
+      }
+      c.juntas = fica;
+      if (fica.length === 0) delete c.juntas;
+    }
+  }
+  return removidos;
+}
+
+/* O esboço com o contato (raiz e primeira opção) sem o que cita formas que não existem nele. */
+function comContatoSaneado(doc) {
+  const d = clone(doc);
+  const provisorio = clone(doc);
+  for (const c of [provisorio.contato, provisorio.opcoes?.[0]?.contato]) if (objeto(c)) { delete c.pares; delete c.juntas; }
+  limparContato(d, expandirEsboco(provisorio).opcoes[0].formas);
+  return d;
+}
+
+/* Troca, no mestre, as entradas da unidade pelas visíveis do detalhado (as com `oculto: true` só são referência). Devolve
+   { mestre, estado, envelope, removidos, formas }: o mestre novo, o estado do Condutor com a unidade no mesmo lugar (os
+   membros dela passam a ser as formas novas, o Envelope da maquete continua e ganha o resultado da conferência contra o
+   detalhado, e o resto fica como estava), o resultado de `conferirEnvelope` (ou null sem Envelope), o que saiu do contato
+   e os ids novos da unidade. Sem estado, as unidades vêm do Plano de detalhe do próprio mestre e `estado` volta null. O mestre
+   novo precisa resolver (todas as referências das outras unidades às formas trocadas), ou a troca é recusada. */
+export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'detalhado' } = {}) {
+  const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
+  const unidade = u.id;
+  exigir(objeto(detalhado), 'integrar: o arquivo detalhado deve ser um esboço (objeto JSON)');
+  const esboco = expandirEsboco(bruto);
+  const { lista, onde } = listaDoMestre(bruto);
+  const ids = idsPorEntrada(lista, esboco.opcoes[0].formas);
+  const tipo = classificar(lista, ids, unidades, u);
+  const doDetalhe = detalhado.opcoes?.[0]?.formas ?? detalhado.formas;
+  exigir(Array.isArray(doDetalhe), 'integrar: o detalhado não tem lista de formas (nem na raiz nem na primeira opção)');
+  const novas = doDetalhe.filter((f) => !(objeto(f) && f.oculto === true)).map(clone);
+  exigir(novas.length > 0, 'integrar: o detalhado não tem nenhuma forma visível (as com "oculto": true só servem de referência)');
+  if (u.declarada) for (const f of novas) if (objeto(f) && f.arranja === undefined && f.unidade === undefined) f.unidade = unidade;
+  const mestre = clone(bruto);
+  const nova = [];
+  let posto = false;
+  lista.forEach((f, k) => {
+    if (tipo[k] === 'dentro') { if (!posto) { nova.push(...novas); posto = true; } return; }
+    nova.push(f);
+  });
+  exigir(posto, `integrar: a unidade "${unidade}" não tem entrada no esboço para trocar`);
+  if (onde === 'opcao') mestre.opcoes[0].formas = nova; else mestre.formas = nova;
+  juntarNomes(mestre, detalhado, 'parametros');
+  juntarNomes(mestre, detalhado, 'pontos');
+  juntarContato(mestre, detalhado);
+  /* as referências: o que resta do contato vale só para formas que existem */
+  const provisorio = clone(mestre);
+  for (const c of [provisorio.contato, provisorio.opcoes[0].contato]) if (objeto(c)) { delete c.pares; delete c.juntas; }
+  let depois;
+  try { depois = expandirEsboco(provisorio); } catch (e) {
+    if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`integrar: o esboço com a unidade "${unidade}" trocada não expande: ${e.message}`);
+    throw e;
+  }
+  const removidos = limparContato(mestre, depois.opcoes[0].formas);
+  let expandido;
+  try {
+    expandido = expandirEsboco(mestre);
+    resolverOpcao(expandido.opcoes[0], 'opção 1', expandido.pontos);
+  } catch (e) {
+    if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`integrar: o esboço com a unidade "${unidade}" trocada não resolve (alguma forma de outra unidade cita uma forma que saiu?): ${e.message}`);
+    throw e;
+  }
+  const visiveis = expandido.opcoes[0].formas.filter((f) => f.oculto !== true).map((f) => f.id);
+  const outras = new Set(unidades.filter((x) => x.id !== unidade).flatMap((x) => x.membros));
+  const formas = visiveis.filter((id) => !outras.has(id));
+  let envelope = null;
+  if (u.envelope) envelope = conferirEnvelope(bruto, { ...(estado ?? {}), unidades }, unidade, comContatoSaneado(detalhado));
+  let novoEstado = null;
+  if (estado?.unidades?.length) {
+    novoEstado = clone(estado);
+    const brutas = unidades.map((x) => ({ id: x.id, membros: x.id === unidade ? formas : x.membros, feito: x.feito, declarada: x.declarada }));
+    const refeitas = montarUnidadesDoEstado(mestre, brutas);
+    novoEstado.unidades = refeitas.map((x) => {
+      const antiga = unidades.find((y) => y.id === x.id);
+      return { ...x, ...(antiga?.envelope ? { envelope: antiga.envelope } : {}), ...(antiga?.envelopeConferido ? { envelopeConferido: antiga.envelopeConferido } : {}) };
+    });
+    if (envelope) novoEstado = registrarEnvelope(novoEstado, envelope, arquivo);
+  }
+  return { mestre, estado: novoEstado, envelope, removidos, formas };
+}

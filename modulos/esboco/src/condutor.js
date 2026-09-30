@@ -8,7 +8,7 @@
    crítico é da skill. Puro e determinístico: sem data nem sorteio, e sem ler nem gravar arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
-import { herdarDoEspelho, lerContato } from './contato.js';
+import { herdarDoEspelho, lerContato, unidadesDeclaradas } from './contato.js';
 import { medirEsboco } from './descrever.js';
 import { lerPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
@@ -182,7 +182,14 @@ function montarUnidades(unidades, formas, resolvidas) {
   const dependeDe = dependenciasDasUnidades(unidades, formas);
   const ordenadas = ordenar(unidades.map((u) => ({ ...u })), dependeDe);
   const envelopes = envelopesDasUnidades(ordenadas, formas, resolvidas);
-  return ordenadas.map((u) => ({ id: u.id, membros: u.membros, depende: [...dependeDe.get(u.id)], custo: u.membros.length, feito: u.feito === true, ...(u.ciclo ? { ciclo: true } : {}), envelope: envelopes.get(u.id) }));
+  return ordenadas.map((u) => ({ id: u.id, membros: u.membros, depende: [...dependeDe.get(u.id)], custo: u.membros.length, feito: u.feito === true, ...(u.declarada ? { declarada: true } : {}), ...(u.ciclo ? { ciclo: true } : {}), envelope: envelopes.get(u.id) }));
+}
+
+/* As unidades `{ id, membros, feito, declarada }` montadas de novo contra o esboço (dependências, ordem, custo e Envelope). */
+export function montarUnidadesDoEstado(bruto, brutas, { opcao = 0 } = {}) {
+  const e = expandirEsboco(bruto);
+  const o = e.opcoes[opcao];
+  return montarUnidades(brutas.filter((u) => u.membros.length > 0), o.formas.filter((f) => f.oculto !== true), resolverVisiveis(o, `opção ${opcao + 1}`, e.pontos));
 }
 
 /* As formas resolvidas e visíveis de uma opção, ou null se a geometria não resolve (o agrupamento não depende dela; só o
@@ -196,43 +203,66 @@ function resolverVisiveis(opcao, onde, pontos) {
   }
 }
 
-/* As formas visíveis da opção (a primeira, por padrão) e o mapa de acoplamento apertado: `atravessa` declarado (o eixo no
-   furo, a coroa na presilha) une as formas; o componente inteiro é uma unidade. */
+/* O agrupamento automático não junta mais de metade das formas numa unidade só (nem menos de 4 formas num esboço pequeno):
+   a união por `atravessa` que passaria do limite não acontece, e a fronteira do componente fica onde está. */
+export const MINIMO_DO_LIMITE = 4;
+
+/* As formas visíveis da opção (a primeira, por padrão) e o mapa de acoplamento apertado. A forma com `unidade` declarada
+   (na forma, na instância de componente ou herdada do espelho) fica na unidade que declara. As outras se agrupam sozinhas:
+   o componente inteiro é uma unidade, e `atravessa` declarado (o eixo no furo, a coroa na presilha) une as formas, desde
+   que a unidade não passe de metade das formas. */
 export function planoDeDetalhe(bruto, { opcao = 0 } = {}) {
   const esboco = expandirEsboco(bruto);
   const o = esboco.opcoes?.[opcao];
   exigir(o && Array.isArray(o.formas), `condutor: a opção ${opcao + 1} não existe ou não tem formas`);
   const formas = o.formas.filter((f) => f.oculto !== true);
+  const declarada = unidadesDeclaradas(o.formas);
   const chaveDe = (f) => f.daInstancia?.id ?? f.id;
   const pai = new Map();
+  const tamanho = new Map();
   const raizDe = (k) => { while (pai.get(k) !== k) { pai.set(k, pai.get(pai.get(k))); k = pai.get(k); } return k; };
-  for (const f of formas) if (!pai.has(chaveDe(f))) pai.set(chaveDe(f), chaveDe(f));
-  const donoDe = new Map(formas.map((f) => [f.id, chaveDe(f)]));
+  for (const f of formas) if (!declarada.has(f.id)) { const k = chaveDe(f); pai.set(k, pai.get(k) ?? k); tamanho.set(k, (tamanho.get(k) ?? 0) + 1); }
+  const limite = Math.max(MINIMO_DO_LIMITE, Math.floor(formas.length / 2));
+  const donoDe = new Map(formas.filter((f) => !declarada.has(f.id)).map((f) => [f.id, chaveDe(f)]));
   const raiz = lerContato(esboco.contato, 'esboço');
   const daOpcao = lerContato(o.contato, `opção ${opcao + 1}`);
   const pares = herdarDoEspelho([...(raiz?.pares ?? []), ...(daOpcao?.pares ?? [])], o).filter((p) => p.tipo === 'atravessa');
   for (const p of pares) {
     if (!donoDe.has(p.a) || !donoDe.has(p.b)) continue;
     const a = raizDe(donoDe.get(p.a)); const b = raizDe(donoDe.get(p.b));
-    if (a !== b) pai.set(b, a);
+    if (a === b || tamanho.get(a) + tamanho.get(b) > limite) continue;
+    pai.set(b, a);
+    tamanho.set(a, tamanho.get(a) + tamanho.get(b));
+  }
+  const chavesDaRaiz = new Map();
+  for (const f of formas) {
+    if (declarada.has(f.id)) continue;
+    const r = raizDe(chaveDe(f));
+    if (!chavesDaRaiz.has(r)) chavesDaRaiz.set(r, []);
+    if (!chavesDaRaiz.get(r).includes(chaveDe(f))) chavesDaRaiz.get(r).push(chaveDe(f));
   }
   const grupos = new Map();
   for (const f of formas) {
-    const r = raizDe(chaveDe(f));
-    if (!grupos.has(r)) grupos.set(r, { chaves: [], membros: [] });
-    const g = grupos.get(r);
-    if (!g.chaves.includes(chaveDe(f))) g.chaves.push(chaveDe(f));
+    const id = declarada.has(f.id) ? declarada.get(f.id) : chavesDaRaiz.get(raizDe(chaveDe(f))).join('+');
+    if (!grupos.has(id)) grupos.set(id, { id, membros: [], declarada: false });
+    const g = grupos.get(id);
     g.membros.push(f.id);
+    if (declarada.has(f.id)) g.declarada = true;
   }
   const resolvidas = resolverVisiveis(o, `opção ${opcao + 1}`, esboco.pontos);
-  const unidades = montarUnidades([...grupos.values()].map((g) => ({ id: g.chaves.join('+'), membros: g.membros })), formas, resolvidas);
+  const unidades = montarUnidades([...grupos.values()], formas, resolvidas);
   return { opcao: o.titulo ?? `Opção ${opcao + 1}`, unidades, formas: formas.map((f) => f.id) };
+}
+
+/* formaId -> unidade do estado do Condutor (o Plano de detalhe, com as mudanças de `--mover`), para o gate. */
+export function unidadesDoEstado(estado) {
+  return Object.fromEntries((estado?.unidades ?? []).flatMap((u) => u.membros.map((m) => [m, u.id])));
 }
 
 /* Mede o esboço para o Portão: divergências (gate, soltas, atravessamentos, medidas, contrato) e o que o nível pede do plano. */
 function medirParaOPortao(bruto, estado, referencias) {
   const nivel = estado.nivel;
-  const medido = medirEsboco(bruto, { projecao: false, referencias });
+  const medido = medirEsboco(bruto, { projecao: false, referencias, unidades: unidadesDoEstado(estado) });
   const { descricao, plano } = medido;
   /* a silhueta contra a referência é coisa da Conferência da maquete: na Maquete ainda se constrói, a menos que o nível
      não tenha Conferência (o esquemático) */
@@ -323,7 +353,7 @@ export function avancar(bruto, estadoBruto, { referencias } = {}) {
     novo.alteracoes = [];
     novo.marcos = [];
     const ciclos = p.unidades.filter((u) => u.ciclo).map((u) => u.id);
-    if (ciclos.length) novo.avisos.push(`dependência circular entre unidades (${ciclos.join(', ')}): a ordem segue a declaração`);
+    if (ciclos.length) novo.avisos.push(`dependência circular entre unidades (${ciclos.map(abreviar).join(', ')}): a ordem segue a declaração`);
   }
   return { ok: true, estado: novo, portao };
 }
@@ -334,52 +364,129 @@ const validarMotivo = (motivo, o) => {
   return m;
 };
 
-/* Muda o agrupamento: a forma vai para outra Unidade de detalhe (uma existente, ou uma nova com o nome dado). Só no
-   estágio Plano de detalhe e com `motivo` de pelo menos 15 caracteres. */
-export function moverForma(bruto, estadoBruto, { forma, para, motivo }) {
+/* As formas de uma unidade que um alvo de `--mover` designa: o id de uma forma, o id de uma instância de componente (todas as
+   formas dela, `garfoE.*`) ou um padrão com `*` (`garfoE.*`, `*.pneu`). */
+export function formasDoAlvo(alvo, membros) {
+  exigir(typeof alvo === 'string' && alvo, 'condutor: --mover precisa de uma forma, uma instância ou um padrão');
+  if (membros.includes(alvo)) return [alvo];
+  if (alvo.includes('*')) {
+    const re = new RegExp(`^${alvo.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
+    const casadas = membros.filter((m) => re.test(m));
+    exigir(casadas.length > 0, `condutor: o padrão "${alvo}" não casa com nenhuma forma de nenhuma unidade (formas: ${membros.join(', ')})`);
+    return casadas;
+  }
+  const daInstancia = membros.filter((m) => m.startsWith(`${alvo}.`));
+  exigir(daInstancia.length > 0, `condutor: "${alvo}" não é uma forma de nenhuma unidade${quisDizer(alvo, membros)} (formas: ${membros.join(', ')})`);
+  return daInstancia;
+}
+
+/* Muda o agrupamento: as formas vão para outra Unidade de detalhe (uma existente, ou uma nova com o nome dado). `formas` é uma
+   lista de alvos (ver `formasDoAlvo`), e `padrao` um alvo só; `forma` é o alvo único de antes. Só no estágio Plano de
+   detalhe e com `motivo` de pelo menos 15 caracteres. Devolve o estado novo. */
+export function moverFormas(bruto, estadoBruto, { forma, formas, padrao, para, motivo }) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   exigir(estado.atual === 'plano-de-detalhe', `condutor: o agrupamento só muda no estágio Plano de detalhe (o estágio atual é ${nomeDoEstagio(estado.atual)})`);
   const m = validarMotivo(motivo, 'mudar o agrupamento');
-  const membros = estado.unidades.flatMap((u) => u.membros);
-  exigir(membros.includes(forma), `condutor: "${forma}" não é uma forma de nenhuma unidade${quisDizer(forma, membros)} (formas: ${membros.join(', ')})`);
+  const alvos = [forma, ...(Array.isArray(formas) ? formas : []), padrao].filter((x) => x !== undefined);
+  exigir(alvos.length > 0, 'condutor: --mover precisa de uma forma, uma instância de componente ou um padrão (garfoE.*)');
   exigir(typeof para === 'string' && para, 'condutor: --mover <forma> --para <unidade> precisa da unidade de destino (uma existente ou um nome novo)');
-  const de = estado.unidades.find((u) => u.membros.includes(forma)).id;
-  exigir(de !== para, `condutor: "${forma}" já está na unidade "${para}"`);
-  const brutas = estado.unidades.map((u) => ({ id: u.id, membros: u.membros.filter((x) => x !== forma), feito: u.feito }));
+  const membros = estado.unidades.flatMap((u) => u.membros);
+  const escolhidas = [...new Set(alvos.flatMap((x) => formasDoAlvo(x, membros)))];
+  const de = new Map(estado.unidades.flatMap((u) => u.membros.map((x) => [x, u.id])));
+  const a_mover = escolhidas.filter((x) => de.get(x) !== para);
+  exigir(a_mover.length > 0, escolhidas.length === 1 ? `condutor: "${escolhidas[0]}" já está na unidade "${para}"` : `condutor: as ${escolhidas.length} formas já estão na unidade "${para}"`);
+  const saem = new Set(a_mover);
+  const brutas = estado.unidades.map((u) => ({ id: u.id, membros: u.membros.filter((x) => !saem.has(x)), feito: u.feito, declarada: u.declarada }));
   const destino = brutas.find((u) => u.id === para);
-  if (destino) destino.membros.push(forma); else brutas.push({ id: para, membros: [forma], feito: false });
+  if (destino) destino.membros.push(...a_mover); else brutas.push({ id: para, membros: [...a_mover], feito: false });
   const expandido = expandirEsboco(bruto);
   const visiveis = expandido.opcoes[0].formas.filter((f) => f.oculto !== true);
   const resolvidas = resolverVisiveis(expandido.opcoes[0], 'opção 1', expandido.pontos);
   const novo = clone(estado);
   novo.unidades = montarUnidades(brutas.filter((u) => u.membros.length > 0), visiveis, resolvidas);
-  novo.alteracoes.push({ forma, de, para, motivo: m });
+  for (const x of a_mover) novo.alteracoes.push({ forma: x, de: de.get(x), para, motivo: m });
   return novo;
 }
 
-/* Refaz o Plano de detalhe do zero (as formas do esboço mudaram); descarta as alterações de agrupamento, e por isso exige `motivo`. */
+/* `moverFormas` para uma forma só (a chamada de antes). */
+export function moverForma(bruto, estadoBruto, { forma, para, motivo }) {
+  return moverFormas(bruto, estadoBruto, { forma, para, motivo });
+}
+
+/* Uma lista de movimentos `{ formas | forma | padrao, para, motivo }`, aplicada em ordem; se um falha, nenhum vale. */
+export function moverEmLote(bruto, estadoBruto, movimentos) {
+  exigir(Array.isArray(movimentos) && movimentos.length > 0, 'condutor: --mover-lote precisa de uma lista não vazia de { "formas" | "padrao", "para", "motivo" }');
+  let estado = estadoBruto;
+  movimentos.forEach((mv, i) => {
+    exigir(mv && typeof mv === 'object' && !Array.isArray(mv), `condutor: --mover-lote, movimento ${i + 1}: deve ser { "formas": ["a", "b"] | "padrao": "garfoE.*", "para": "unidade", "motivo": "..." }`);
+    try { estado = moverFormas(bruto, estado, mv); } catch (e) {
+      if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`${e.message} (--mover-lote, movimento ${i + 1})`);
+      throw e;
+    }
+  });
+  return estado;
+}
+
+/* Refaz o Plano de detalhe (as formas do esboço mudaram) e exige `motivo`. A forma que continua existindo fica na unidade
+   em que estava; a forma com `unidade` declarada vai para a que declara; só as formas novas, sem declaração, recebem
+   unidade (a do vizinho do mesmo agrupamento automático ou uma nova), e vão listadas em `novas` da alteração. */
 export function replanejar(bruto, estadoBruto, { motivo }) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   exigir(['plano-de-detalhe', 'detalhe-por-unidade', 'montagem'].includes(estado.atual), `condutor: só há Plano de detalhe a refazer depois dele (o estágio atual é ${nomeDoEstagio(estado.atual)})`);
   const m = validarMotivo(motivo, 'refazer o Plano de detalhe');
   const p = planoDeDetalhe(bruto);
-  const feitas = new Set(estado.unidades.filter((u) => u.feito).map((u) => u.id));
+  const antigoDe = new Map(estado.unidades.flatMap((u) => u.membros.map((x) => [x, u.id])));
+  const autoDe = new Map(p.unidades.flatMap((u) => u.membros.map((x) => [x, u])));
+  const grupo = new Map();
+  const novas = [];
+  for (const id of p.formas) {
+    const auto = autoDe.get(id);
+    let unidade;
+    if (auto.declarada) unidade = auto.id;
+    else if (antigoDe.has(id)) unidade = antigoDe.get(id);
+    else {
+      const vizinha = auto.membros.find((x) => antigoDe.has(x) && !autoDe.get(x).declarada);
+      unidade = vizinha !== undefined ? antigoDe.get(vizinha) : auto.id;
+      novas.push({ forma: id, unidade });
+    }
+    if (!grupo.has(unidade)) grupo.set(unidade, { id: unidade, membros: [], declarada: false, feito: estado.unidades.find((u) => u.id === unidade)?.feito === true });
+    grupo.get(unidade).membros.push(id);
+    if (auto.declarada) grupo.get(unidade).declarada = true;
+  }
+  const expandido = expandirEsboco(bruto);
+  const visiveis = expandido.opcoes[0].formas.filter((f) => f.oculto !== true);
+  const resolvidas = resolverVisiveis(expandido.opcoes[0], 'opção 1', expandido.pontos);
   const novo = clone(estado);
-  novo.unidades = p.unidades.map((u) => {
+  novo.unidades = montarUnidades([...grupo.values()], visiveis, resolvidas).map((u) => {
     const antiga = estado.unidades.find((x) => x.id === u.id);
+    /* a unidade conferida guarda o Envelope da maquete: o esboço de agora pode já ter o detalhe dela */
+    if (antiga?.envelopeConferido?.ok && antiga.envelope) return { ...u, envelope: antiga.envelope, envelopeConferido: antiga.envelopeConferido };
     const igual = antiga?.envelopeConferido && JSON.stringify(antiga.envelope) === JSON.stringify(u.envelope);
-    return { ...u, feito: feitas.has(u.id), ...(igual ? { envelopeConferido: antiga.envelopeConferido } : {}) };
+    return { ...u, ...(igual ? { envelopeConferido: antiga.envelopeConferido } : {}) };
   });
-  novo.alteracoes.push({ replanejado: true, motivo: m });
+  novo.alteracoes.push({ replanejado: true, motivo: m, ...(novas.length ? { novas } : {}) });
   return novo;
 }
 
+/* A unidade que um nome designa: o id exato; o nome de uma forma ou de uma instância que só uma unidade contém (`rodaFrente`
+   para `rodaFrente+eixoFrente+...`); ou o primeiro nome de um id composto. Sem correspondência única devolve o próprio nome,
+   e a recusa de quem chama diz quais unidades existem. */
+export function unidadePorNome(unidades, nome) {
+  if (unidades.some((u) => u.id === nome)) return nome;
+  for (const acha of [(u) => u.id.startsWith(`${nome}+`), (u) => u.membros.includes(nome) || u.membros.some((m) => m.startsWith(`${nome}.`))]) {
+    const c = unidades.filter(acha);
+    if (c.length === 1) return c[0].id;
+  }
+  return nome;
+}
+
 /* Marca uma unidade como detalhada e registra os Marcos (25%, 50%, 75%, 100% do custo estimado) que ela cruzou. */
-export function marcarFeito(bruto, estadoBruto, unidade) {
+export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   const estado = sincronizarNivel(estadoBruto, bruto);
+  const unidade = unidadePorNome(estado.unidades ?? [], nomeDaUnidade);
   exigir(estado.atual === 'detalhe-por-unidade', `condutor: --feito vale no estágio Detalhe por unidade (o estágio atual é ${nomeDoEstagio(estado.atual)})`);
   const ids = estado.unidades.map((u) => u.id);
-  exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.join(', ')})`);
+  exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
   if (lerPlano(bruto?.plano)?.envelope !== undefined) {
     const conferida = estado.unidades.find((x) => x.id === unidade).envelopeConferido;
     exigir(conferida?.ok === true, `condutor: a unidade "${unidade}" só vira feita depois de o Envelope conferir a versão detalhada dela (plano.envelope está declarado): rode --envelope ${unidade} <arquivo-detalhado.esboco.json>${conferida ? `; a última conferência falhou: ${conferida.falta.join('; ')}` : ''}`);
@@ -401,7 +508,12 @@ export function marcarFeito(bruto, estadoBruto, unidade) {
 }
 
 /* Texto da situação: estágio, Portão e o que falta, unidades e custo. */
-export function formatarSituacao(estado, portao) {
+/* `historico` mostra também as linhas de "agrupamento alterado" (uma por forma movida), que a leitura padrão omite. */
+/* Nome de unidade com no máximo 48 caracteres: o agrupamento automático de um conjunto grande junta dezenas de nomes. */
+export const LIMITE_DO_NOME = 48;
+export const abreviar = (nome) => (typeof nome === 'string' && nome.length > LIMITE_DO_NOME ? `${nome.slice(0, LIMITE_DO_NOME - 1)}…` : nome);
+
+export function formatarSituacao(estado, portao, { historico = false } = {}) {
   const n = (x) => String(x).replace('.', ',');
   const L = [];
   L.push(`condutor de ${estado.esboco}: nível ${estado.nivel}${estado.nivelDoPlano ? '' : ' (padrão; declare plano.nivel)'}`);
@@ -413,12 +525,12 @@ export function formatarSituacao(estado, portao) {
     const c = custoDe(estado);
     L.push(`unidades de detalhe (${estado.unidades.length}, custo estimado ${c.total} formas, feito ${c.feito}, ${n(c.percentual)}%), na ordem de dependência:`);
     estado.unidades.forEach((u, i) => {
-      L.push(`  ${i + 1}. ${u.id}: ${u.custo} ${u.custo === 1 ? 'forma' : 'formas'}${u.depende.length ? `, depende de ${u.depende.join(', ')}` : ''}${u.feito ? ' [feita]' : ''}${u.ciclo ? ' [ciclo]' : ''}`);
-      if (portao?.envelopeDeclarado && u.envelope) L.push(`     ${textoDoEnvelope(u.envelope)}${u.envelopeConferido ? (u.envelopeConferido.ok ? ` [envelope conferido com ${u.envelopeConferido.arquivo}]` : ` [envelope reprovado com ${u.envelopeConferido.arquivo}]`) : ' [envelope a conferir]'}`);
+      L.push(`  ${i + 1}. ${abreviar(u.id)}: ${u.custo} ${u.custo === 1 ? 'forma' : 'formas'}${u.declarada ? ' (declarada)' : ''}${u.depende.length ? `, depende de ${u.depende.slice(0, 4).map(abreviar).join(', ')}${u.depende.length > 4 ? ` e mais ${u.depende.length - 4}` : ''}` : ''}${u.feito ? ' [feita]' : ''}${u.ciclo ? ' [ciclo]' : ''}`);
+      if (portao?.envelopeDeclarado && u.envelope) L.push(`     ${textoDoEnvelope(u.envelope, { curto: true })}${u.envelopeConferido ? (u.envelopeConferido.ok ? ` [envelope conferido com ${u.envelopeConferido.arquivo}]` : ` [envelope reprovado com ${u.envelopeConferido.arquivo}]`) : ' [envelope a conferir]'}`);
     });
   }
   for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
-  for (const a of estado.alteracoes ?? []) if (!a.replanejado) L.push(`agrupamento alterado: ${a.forma} de ${a.de} para ${a.para} (${a.motivo})`);
+  if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;
 }
@@ -427,8 +539,10 @@ const faixa = (f) => `${n1(f[0])}..${n1(f[1])}`;
 const n1 = (x) => String(r1(x)).replace('.', ',');
 
 /* Uma linha com a caixa e as portas de um Envelope. */
-export function textoDoEnvelope(e) {
-  return `envelope: x ${faixa(e.caixa.x)} y ${faixa(e.caixa.y)} z ${faixa(e.caixa.z)}; ${e.portas.length === 0 ? 'sem portas' : `portas ${e.portas.map((p) => `${p.forma}.${p.ancora} [${p.ponto.map(n1).join(' ')}] (usada por ${p.usadaPor.join(', ')})`).join('; ')}`}`;
+export function textoDoEnvelope(e, { curto = false } = {}) {
+  /* curto: nomes de unidade abreviados e no máximo 3 por porta (um agrupamento grande cita dezenas) */
+  const quem = (u) => (curto ? `${u.slice(0, 3).map(abreviar).join(', ')}${u.length > 3 ? ` e mais ${u.length - 3}` : ''}` : u.join(', '));
+  return `envelope: x ${faixa(e.caixa.x)} y ${faixa(e.caixa.y)} z ${faixa(e.caixa.z)}; ${e.portas.length === 0 ? 'sem portas' : `portas ${e.portas.map((p) => `${p.forma}.${p.ancora} [${p.ponto.map(n1).join(' ')}] (usada por ${quem(p.usadaPor)})`).join('; ')}`}`;
 }
 
 /* Confere que a versão detalhada de uma unidade (um esboço à parte, `detalhado`) cabe no Envelope que a maquete deu a ela e
@@ -436,10 +550,11 @@ export function textoDoEnvelope(e) {
    dimensão da caixa (no mínimo 1 mm). A versão detalhada usa a opção de mesmo título da maquete (ou a primeira) e precisa ter
    as formas e as âncoras das portas com os mesmos nomes. Devolve { unidade, ok, tolerancia_mm, tolerancia_declarada, caixa,
    portas, falta }; não lê nem grava arquivo. */
-export function conferirEnvelope(bruto, estadoBruto, unidade, detalhado) {
+export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
   const unidades = estadoBruto?.unidades?.length ? estadoBruto.unidades : planoDeDetalhe(bruto).unidades;
+  const unidade = unidadePorNome(unidades, nomeDaUnidade);
   const ids = unidades.map((u) => u.id);
-  exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.join(', ')})`);
+  exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
   const u = unidades.find((x) => x.id === unidade);
   exigir(u.envelope, `condutor: a unidade "${unidade}" não tem Envelope gravado (o estado é de antes do Envelope): refaça o Plano de detalhe com --replanejar e um motivo`);
   const plano = lerPlano(bruto?.plano);

@@ -252,16 +252,17 @@ módulo, que é a referência do formato.
    mover o plano para encerrados.
 10. A análise do transcript da moto nova (47 min, 138 chamadas, 106 KB dos 146
    KB escritos em Python que gera ou remenda o JSON, 14 recusas, 108 juntas em 29%
-   do arquivo, 2/3 delas dentro da mesma unidade) pediu: `unidade` declarada na
-   forma ou instância, com o algoritmo só como sugestão, `--mover` em lote e por
-   instância, e `--replanejar` que preserva o agrupamento; junta dentro da mesma
-   unidade sem declaração, com `motivo` e `max` só entre unidades; `--detalhar
-   <unidade>` (arquivo isolado, as outras ocultas) e `--integrar <unidade>
-   <arquivo>` sem zerar o Condutor, com o gate aceitando instância oculta e junta
-   com peça oculta; `--editar`; `estilos` e cor herdada por unidade, simetria
-   implícita e perfis gerados por função (estrela, arco); caminhos relativos
-   pelo diretório do chamador (`INIT_CWD`), saída resumida do Condutor, `--forma`
-   sem desenho e Envelope por forma.
+   do arquivo, 2/3 delas dentro da mesma unidade) pediu duas partes. A parte 10a
+   foi feita em 2026-09-30 em `modulos/esboco`: `unidade` declarada na forma,
+   instância e espelho (o agrupamento automático só agrupa as sem `unidade` e não
+   junta mais de metade das formas); `--mover` por instância, padrão e lista,
+   `--mover-lote` e `--replanejar` que preserva o agrupamento; `atravessa` dentro da
+   mesma unidade sem `motivo` nem `max` (max implícito, em `implicitas`), com o gate
+   ignorando forma oculta; `--detalhar` e `--integrar` sem zerar o Condutor; caminhos
+   por `INIT_CWD`, Condutor sem histórico, `--forma` sem desenho. Medido: a moto curva com `unidade` declarada dá 7 unidades com 0 `--mover`, contra 4
+   formas a mover no automático; 419 para 444 testes; SVG e leitura antigos iguais.
+   Parte 10b, a fazer: `--editar`, `estilos` e cor por unidade, simetria implícita,
+   perfis por função e Envelope por forma; o item 20 só se mede depois dela.
 
 ## Riscos e desvios
 

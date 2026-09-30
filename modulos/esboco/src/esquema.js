@@ -9,7 +9,7 @@ const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const EIXOS = ['x', 'y', 'z'];
 
 /* Campos de toda forma (posição, aparência e relações) e os internos que a expansão deixa nas formas já expandidas. */
-const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia'];
+const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'unidade'];
 export const CAMPOS_POR_TIPO = {
   caixa: ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'furos', 'furo'],
   cilindro: ['diametro', 'comprimento', 'eixo', 'achatado', 'lados'],
@@ -49,6 +49,7 @@ function conjunto(valor, validos, onde, campo) {
 
 function validarForma(f, onde) {
   if (!objeto(f)) throw new ErroDeEsboco(`${onde}: cada forma deve ser um objeto { id, tipo, ... }`);
+  if (f.unidade !== undefined && !(typeof f.unidade === 'string' && f.unidade.trim())) throw new ErroDeEsboco(`${onde}: "unidade" deve ser um texto não vazio, o nome da Unidade de detalhe da forma (veio ${JSON.stringify(f.unidade)})`);
   /* a instância de componente, o espelho e o arranjo têm a validação própria (componentes.js, index.js e expandir.js) */
   if (f.usa !== undefined || f.espelha !== undefined || f.arranja !== undefined || f.arranjoDe !== undefined || f.tipo === undefined) return;
   const rotuloDaForma = typeof f.id === 'string' ? onde.replace(/, forma \d+$/, `, forma "${f.id}"`) : onde;

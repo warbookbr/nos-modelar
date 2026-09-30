@@ -74,9 +74,9 @@ const titulosDe = (bruto) => (bruto.opcoes ?? []).map((o, i) => o?.titulo ?? `Op
 
 /* Resultado: { esboco, aprovado, parou, rodadas, inicial, final }. `parou`: 'ja-aprovava', 'aprovou',
    'sem-progresso' (a rodada não reduziu os achados e foi descartada), 'sem-sugestao' ou 'limite'. */
-export function ajustarEsboco(bruto, { maxRodadas = MAXIMO_DE_RODADAS } = {}) {
+export function ajustarEsboco(bruto, { maxRodadas = MAXIMO_DE_RODADAS, unidades } = {}) {
   let atual = clone(bruto);
-  let gate = verificarContato(atual);
+  let gate = verificarContato(atual, { unidades });
   if (!gate.usar) throw new ErroDeEsboco('--ajustar precisa do gate de contato ligado: declare "contato": { "usar": true } no esboço');
   const inicial = gate;
   const titulos = titulosDe(atual);
@@ -91,7 +91,7 @@ export function ajustarEsboco(bruto, { maxRodadas = MAXIMO_DE_RODADAS } = {}) {
       const ed = aplicarDeslocamento(candidato, p.indice, p.sugestao.fonte, p.sugestao.delta);
       if (ed) movidos.push({ opcao: p.achado.opcao, forma: p.sugestao.forma, fonte: p.sugestao.fonte, delta: p.sugestao.delta, achado: p.achado.tipo, texto: p.sugestao.texto, ...ed });
     }
-    const depois = verificarContato(candidato);
+    const depois = verificarContato(candidato, { unidades });
     const rodada = { rodada: n, achados_antes: gate.achados.length, achados_depois: depois.achados.length, movidos };
     if (depois.achados.length >= gate.achados.length) {
       rodadas.push({ ...rodada, descartada: true });

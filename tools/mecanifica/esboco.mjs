@@ -13,11 +13,22 @@ import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboc
 import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
 import { conferirReferenciaNaOpcao, lerPlano, textoDoPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { formatarConferencia, formatarMedidasDaReferencia, medidasDaReferencia, sobreposicaoDaReferencia } from '../../modulos/esboco/src/referencia.js';
-import { avancar, conferirEnvelope, criarEstado, formatarEnvelope, formatarSituacao, marcarFeito, moverForma, nomeDoEstagio, portaoDoEstagio, registrarEnvelope, replanejar } from '../../modulos/esboco/src/condutor.js';
+import { avancar, conferirEnvelope, criarEstado, formatarEnvelope, formatarSituacao, marcarFeito, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
+import { detalharUnidade, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
+
+/* Um caminho relativo vale a partir do diretório de quem chamou: `npm run` roda no repositório e deixa esse diretório em
+   `INIT_CWD`. Um caminho absoluto fica como está. */
+export const resolverCaminho = (caminho) => resolve(process.env.INIT_CWD || process.cwd(), caminho);
+
+/* As unidades do estado do Condutor gravado ao lado do esboço (formaId -> unidade), para o gate relaxar o `atravessa` dentro
+   da mesma unidade; vazio sem estado. */
+function unidadesGravadas(caminho) {
+  try { return unidadesDoEstado(JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8'))); } catch { return {}; }
+}
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
 export async function svgParaPng(svg, largura, altura, destino, navegador = null) {
@@ -99,12 +110,13 @@ const declaraExplosao = (esboco) => esboco.explosao !== undefined || (esboco.opc
    pedido). `rapido`: sem imagem e sem navegador, só a leitura em texto e o manifesto. As imagens da análise saem com
    `ladosPorEscala` (menos lados nos círculos), a menos que o esboço declare `"ladosPorEscala": false`. */
 export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros = false, sugerir = false, rapido = false } = {}) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const texto = readFileSync(caminho, 'utf8');
   const bruto = JSON.parse(texto);
   /* parâmetros, formas herdadas e arranjos já resolvidos: as variantes editam o JSON simples */
   const esboco = expandirEsboco(bruto);
-  const contato = verificarContato(esboco);
+  const unidades = unidadesGravadas(caminho);
+  const contato = verificarContato(esboco, { unidades });
   const projecao = verificarProjecao(esboco, { forcar: true, sugerir });
   const sugestoes = [
     ...contato.achados.filter((a) => a.sugestao).map((a) => ({ origem: 'contato', opcao: a.opcao, achado: a.tipo, pecas: a.pecas, ...semArrasto(a.sugestao) })),
@@ -112,7 +124,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
   ];
   const parametros = Object.fromEntries((esboco.opcoes ?? []).flatMap((o, i) => (o?.parametros ? [[o.titulo ?? `Opção ${i + 1}`, o.parametros]] : [])));
   /* medidas e contrato do plano estruturado, e a imagem de cada divergência (uma por achado, sem legenda numerada) */
-  const { descricao: leitura, divergencias, plano: conferido } = medirEsboco(bruto, { projecao: false, referencias: referenciasDoEsboco(bruto, dirname(caminho)) });
+  const { descricao: leitura, divergencias, plano: conferido } = medirEsboco(bruto, { projecao: false, referencias: referenciasDoEsboco(bruto, dirname(caminho)), unidades });
   const planoConferido = typeof esboco.plano === 'object' && esboco.plano !== null ? { nivel: conferido.nivel ?? null, resumo: conferido.resumo, opcoes: conferido.opcoes } : null;
   void leitura;
   const pedidoDeZoom = zoom ? lerZoomDoEsboco(zoom) : null;
@@ -237,11 +249,11 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
 /* `rapido`: só o SVG, com menos lados nos círculos (`ladosPorEscala`), sem PNG e sem navegador. O SVG do modo rápido
    é uma prévia: a medida do gate e da projeção continua sobre o esboço completo. */
 export async function gerarEsboco(arquivo, { rapido = false } = {}) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const base = caminho.replace(/(\.esboco)?\.json$/i, '');
   const esboco = JSON.parse(readFileSync(caminho, 'utf8'));
   const { svg, largura, altura, escala } = desenharEsboco(rapido ? { ...esboco, ladosPorEscala: esboco.ladosPorEscala ?? true } : esboco);
-  const contato = verificarContato(esboco);
+  const contato = verificarContato(esboco, { unidades: unidadesGravadas(caminho) });
   const projecao = verificarProjecao(esboco);
   writeFileSync(`${base}.svg`, svg);
   if (!rapido) await svgParaPng(svg, largura, altura, `${base}.png`);
@@ -282,9 +294,9 @@ function relatarProjecao(p) {
    todas. Com `mudou`, compara com a leitura completa gravada em `<arquivo>.descrever.json` ao lado do esboço, imprime só a
    diferença e regrava o arquivo. */
 export function descreverArquivo(arquivo, { mudou = false, json = false, completo = false, forma = null } = {}) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
-  const { descricao: atual, divergencias } = medirEsboco(bruto, { projecao: completo || json || mudou || forma !== null, referencias: referenciasDoEsboco(bruto, dirname(caminho)) });
+  const { descricao: atual, divergencias } = medirEsboco(bruto, { projecao: completo || json || mudou || forma !== null, referencias: referenciasDoEsboco(bruto, dirname(caminho)), unidades: unidadesGravadas(caminho) });
   const leitura = () => (forma !== null ? formatarForma(atual, divergencias, forma) : completo ? formatarDescricao(atual) : formatarResumo(atual, divergencias));
   if (!mudou) return { texto: json ? `${JSON.stringify(atual, null, 2)}\n` : leitura(), descricao: atual, divergencias };
   const memoria = `${caminho}.descrever.json`;
@@ -302,9 +314,9 @@ export function descreverArquivo(arquivo, { mudou = false, json = false, complet
 /* `--achado <n>`: grava `<nome>-achado-<n>.png` ao lado do esboço, com a divergência de número `n` da leitura padrão:
    o par envolvido colorido, o resto em cinza, sem legenda numerada e com zoom no ponto. */
 export async function achadoArquivo(arquivo, n, { vista = 'isometrica' } = {}) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
-  const { divergencias } = medirEsboco(bruto, { projecao: false, referencias: referenciasDoEsboco(bruto, dirname(caminho)) });
+  const { divergencias } = medirEsboco(bruto, { projecao: false, referencias: referenciasDoEsboco(bruto, dirname(caminho)), unidades: unidadesGravadas(caminho) });
   const d = divergencias.find((x) => x.n === n);
   if (!d) throw new ErroDeEsboco(divergencias.length === 0 ? `--achado ${n}: o esboço não tem divergência para desenhar (a leitura padrão diz "divergências: nenhuma")` : `--achado ${n}: não há a divergência ${n} (a leitura padrão numera de 1 a ${divergencias.length})`);
   const im = imagemDoAchado(bruto, d, { vista });
@@ -318,7 +330,7 @@ export async function achadoArquivo(arquivo, n, { vista = 'isometrica' } = {}) {
    `feito` marca uma unidade; `mover` (com `para` e `motivo`) e `replanejar` (com `motivo`) mudam o agrupamento. Devolve
    { texto, codigo }. */
 export function condutorArquivo(arquivo, acao = {}) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   const memoria = `${caminho}.condutor.json`;
   let estado = null;
@@ -331,7 +343,7 @@ export function condutorArquivo(arquivo, acao = {}) {
   if (acao.envelope !== undefined) {
     /* confere a versão detalhada de uma unidade contra o Envelope dela; só grava o resultado num estado que já existe */
     const { unidade, arquivo: detalhado } = acao.envelope;
-    const r = conferirEnvelope(bruto, estado, unidade, JSON.parse(readFileSync(resolve(detalhado), 'utf8')));
+    const r = conferirEnvelope(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')));
     if (!novo) writeFileSync(memoria, `${JSON.stringify(registrarEnvelope(estado, r, basename(detalhado)), null, 2)}\n`);
     return { texto: `${formatarEnvelope(r, basename(detalhado))}${novo ? `o estado do Condutor não existe (${basename(memoria)}): a conferência não foi gravada\n` : ''}`, codigo: r.ok ? 0 : 1, resultado: r };
   }
@@ -346,30 +358,87 @@ export function condutorArquivo(arquivo, acao = {}) {
     estado = r.estado;
     extra = `unidade ${acao.feito} marcada como feita\n${r.novosMarcos.map((m) => `marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado no estado; o despacho é da skill)\n`).join('')}`;
   } else if (acao.mover !== undefined) {
-    estado = moverForma(bruto, estado, { forma: acao.mover, para: acao.para, motivo: acao.motivo });
-    extra = `${acao.mover} foi para a unidade ${acao.para}\n`;
+    /* uma forma, uma instância de componente, um padrão (garfoE.*) ou várias separadas por vírgula */
+    const antes = estado.alteracoes.length;
+    estado = moverFormas(bruto, estado, { formas: String(acao.mover).split(',').map((x) => x.trim()).filter(Boolean), para: acao.para, motivo: acao.motivo });
+    extra = textoDoMovimento(estado.alteracoes.slice(antes), acao.para);
+  } else if (acao.moverLote !== undefined) {
+    let lista;
+    try { lista = JSON.parse(readFileSync(resolverCaminho(acao.moverLote), 'utf8')); } catch (e) {
+      if (e instanceof SyntaxError) throw new ErroDeEsboco(`--mover-lote: ${acao.moverLote} não é um JSON válido (${e.message})`);
+      throw e;
+    }
+    const movimentos = Array.isArray(lista) ? lista : lista?.movimentos;
+    const antes = estado.alteracoes.length;
+    estado = moverEmLote(bruto, estado, movimentos);
+    const feitas = estado.alteracoes.length - antes;
+    extra = `${feitas} ${feitas === 1 ? 'forma movida' : 'formas movidas'} em ${movimentos.length} ${movimentos.length === 1 ? 'movimento' : 'movimentos'}\n`;
   } else if (acao.replanejar) {
     estado = replanejar(bruto, estado, { motivo: acao.motivo });
-    extra = 'Plano de detalhe refeito\n';
+    const novas = estado.alteracoes[estado.alteracoes.length - 1].novas ?? [];
+    extra = `Plano de detalhe refeito; as formas que continuam existindo ficaram nas unidades em que estavam\n${novas.length ? `formas novas sem unidade declarada (${novas.length}): ${novas.slice(0, 12).map((n) => `${n.forma} em ${n.unidade}`).join(', ')}${novas.length > 12 ? `, e mais ${novas.length - 12}` : ''}; declare "unidade" nelas ou mude com --mover\n` : ''}`;
   }
   writeFileSync(memoria, `${JSON.stringify(estado, null, 2)}\n`);
   const portao = portaoDoEstagio(bruto, estado, { referencias });
-  return { texto: `${extra}${novo ? `estado criado em ${memoria}\n` : ''}${formatarSituacao(estado, portao)}`, codigo, estado, portao };
+  return { texto: `${extra}${novo ? `estado criado em ${memoria}\n` : ''}${formatarSituacao(estado, portao, { historico: acao.historico === true })}`, codigo, estado, portao };
 }
+
+/* Uma linha com o que o `--mover` fez. */
+function textoDoMovimento(movidas, para) {
+  if (movidas.length === 1) return `${movidas[0].forma} foi para a unidade ${para}\n`;
+  return `${movidas.length} formas foram para a unidade ${para}: ${movidas.slice(0, 8).map((m) => m.forma).join(', ')}${movidas.length > 8 ? `, e mais ${movidas.length - 8}` : ''}\n`;
+}
+
+/* `--detalhar <unidade> [arquivo]`: grava o esboço isolado da unidade (as outras com `oculto: true`, plano mínimo) e diz onde.
+   Sem `destino` vai para `<nome>-detalhe-<unidade>.esboco.json` ao lado do mestre. */
+export function detalharArquivo(arquivo, unidade, destino) {
+  const caminho = resolverCaminho(arquivo);
+  const texto = readFileSync(caminho, 'utf8');
+  const bruto = JSON.parse(texto);
+  let estado = null;
+  try { estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
+  const d = detalharUnidade(bruto, estado, unidade);
+  const saida = destino ? resolverCaminho(destino) : `${caminho.replace(/(\.esboco)?\.json$/i, '')}-detalhe-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}.esboco.json`;
+  writeFileSync(saida, serializarComoOriginal(d, texto));
+  const todas = estado?.unidades?.length ? estado.unidades : planoDeDetalhe(bruto).unidades;
+  const u = todas.find((x) => x.id === unidadePorNome(todas, unidade));
+  return { destino: saida, unidade: u, texto: `unidade ${unidade} (${u.membros.length} ${u.membros.length === 1 ? 'forma' : 'formas'}) isolada em ${saida}\nas outras unidades estão com "oculto": true; troque as formas da unidade e rode --integrar ${unidade} ${basename(saida)}\n` };
+}
+
+/* `--integrar <unidade> <arquivo-detalhado>`: troca no mestre as formas da unidade pelas do detalhado, regrava o mestre e
+   mantém o estado do Condutor (a unidade continua, e o Envelope é conferido contra o detalhado). Não grava nada se a troca
+   não resolve. */
+export function integrarArquivo(arquivo, unidade, detalhado) {
+  const caminho = resolverCaminho(arquivo);
+  const texto = readFileSync(caminho, 'utf8');
+  const bruto = JSON.parse(texto);
+  const memoria = `${caminho}.condutor.json`;
+  let estado = null;
+  try { estado = JSON.parse(readFileSync(memoria, 'utf8')); } catch { /* sem estado */ }
+  const r = integrarUnidade(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')), { arquivo: basename(detalhado) });
+  writeFileSync(caminho, serializarComoOriginal(r.mestre, texto));
+  if (r.estado) writeFileSync(memoria, `${JSON.stringify(r.estado, null, 2)}\n`);
+  const L = [`unidade ${unidade} integrada em ${basename(caminho)}: ${r.formas.length} ${r.formas.length === 1 ? 'forma' : 'formas'} (${r.formas.slice(0, 8).join(', ')}${r.formas.length > 8 ? ', ...' : ''})`];
+  const { pares, juntas, pecas } = r.removidos;
+  if (pares + juntas + pecas > 0) L.push(`removido do contato por citar formas que saíram: ${pares} ${pares === 1 ? 'par' : 'pares'}, ${juntas} ${juntas === 1 ? 'junta' : 'juntas'}, ${pecas} ${pecas === 1 ? 'peça' : 'peças'} de junta`);
+  L.push(r.estado ? 'o estado do Condutor foi mantido (a unidade continua onde estava)' : `sem estado do Condutor (${basename(memoria)}): só o esboço foi regravado`);
+  return { texto: `${L.join('\n')}\n${r.envelope ? formatarEnvelope(r.envelope, basename(detalhado)) : ''}`, resultado: r };
+}
+
 /* `--referencia <arquivo>`: confere, por vista e por parte, a silhueta do esboço com a da referência (um JSON de contornos ou
    uma imagem com `--ancoras`). Os limites e o mapa das partes vêm da entrada de `plano.referencia` que cita o mesmo arquivo;
    sem ela valem os padrões e a vista do `--vista` ou do nome do arquivo. Devolve { texto, codigo, conferencias }. */
 export function referenciaArquivo(arquivo, referencia, { vista = null, ancoras = null, imagem = false } = {}) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const base = dirname(caminho);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   const esboco = expandirEsboco(bruto);
-  const alvo = resolve(referencia);
-  const declarada = (lerPlano(bruto.plano)?.referencia ?? []).find((e) => resolve(base, e.arquivo) === alvo || resolve(e.arquivo) === alvo);
+  const alvo = resolverCaminho(referencia);
+  const declarada = (lerPlano(bruto.plano)?.referencia ?? []).find((e) => resolve(base, e.arquivo) === alvo || resolverCaminho(e.arquivo) === alvo);
   const vistaFinal = vista ?? declarada?.vista ?? vistaDoNome(referencia);
   if (!vistaFinal) throw new ErroDeEsboco(`--referencia: diga a vista que "${referencia}" mostra (--vista frontal, lateral ou superior), porque o nome do arquivo não a diz`);
   const entrada = { ...(declarada ?? {}), arquivo: referencia, vista: vistaFinal };
-  const ancorasAbs = ancoras ? resolve(ancoras) : (declarada?.ancoras ? resolve(base, declarada.ancoras) : undefined);
+  const ancorasAbs = ancoras ? resolverCaminho(ancoras) : (declarada?.ancoras ? resolve(base, declarada.ancoras) : undefined);
   const ref = lerReferenciaDeArquivo({ arquivo: alvo, ancoras: ancorasAbs, recorte: declarada?.recorte, limiar: declarada?.limiar }, base, `referência "${referencia}"`);
   const visiveis = visiveisDoEsboco(esboco);
   const conferencias = [];
@@ -400,15 +469,15 @@ export function referenciaArquivo(arquivo, referencia, { vista = null, ancoras =
    sugeridas de `plano.medidas` com `origem: "referencia"`. Com o esboço, o mapa `plano.referencia.partes` dá as formas de
    cada parte. */
 export function medidasDaReferenciaArquivo(contorno, { vista = null, esboco = null } = {}) {
-  const caminho = resolve(contorno);
+  const caminho = resolverCaminho(contorno);
   const vistaFinal = vista ?? vistaDoNome(contorno);
   if (!vistaFinal) throw new ErroDeEsboco(`--medidas-da-referencia: diga a vista que "${contorno}" mostra (--vista frontal, lateral ou superior), porque o nome do arquivo não a diz`);
   if (!/\.json$/i.test(caminho)) throw new ErroDeEsboco('--medidas-da-referencia lê o JSON de contornos (as partes vêm dele); uma imagem só tem a silhueta, e a conferência dela é a --referencia');
-  const ref = lerReferenciaDeArquivo({ arquivo: caminho }, process.cwd());
+  const ref = lerReferenciaDeArquivo({ arquivo: caminho }, process.env.INIT_CWD || process.cwd());
   let formasDa = {};
   if (esboco) {
-    const bruto = JSON.parse(readFileSync(resolve(esboco), 'utf8'));
-    const e = (lerPlano(bruto.plano)?.referencia ?? []).find((x) => resolve(dirname(resolve(esboco)), x.arquivo) === caminho);
+    const bruto = JSON.parse(readFileSync(resolverCaminho(esboco), 'utf8'));
+    const e = (lerPlano(bruto.plano)?.referencia ?? []).find((x) => resolve(dirname(resolverCaminho(esboco)), x.arquivo) === caminho);
     formasDa = e?.partes ?? {};
   }
   const m = medidasDaReferencia(ref, vistaFinal, { formasDa });
@@ -418,9 +487,9 @@ export function medidasDaReferenciaArquivo(contorno, { vista = null, esboco = nu
 /* `--ajustar`: grava `<nome>.ajustado.esboco.json` ao lado, com as sugestões de contato aplicadas, e nunca
    toca o original. Sem nenhuma forma movida, não grava nada. */
 export function ajustarArquivo(arquivo) {
-  const caminho = resolve(arquivo);
+  const caminho = resolverCaminho(arquivo);
   const texto = readFileSync(caminho, 'utf8');
-  const resultado = ajustarEsboco(JSON.parse(texto));
+  const resultado = ajustarEsboco(JSON.parse(texto), { unidades: unidadesGravadas(caminho) });
   const destino = `${caminho.replace(/(\.esboco)?\.json$/i, '')}.ajustado.esboco.json`;
   const moveu = resultado.rodadas.some((r) => !r.descartada && r.movidos.length > 0);
   if (moveu) writeFileSync(destino, serializarComoOriginal(resultado.esboco, texto));
@@ -428,9 +497,9 @@ export function ajustarArquivo(arquivo) {
 }
 
 /* Flags que levam um valor (`--forma garfoE` ou `--forma=garfoE`); o resto é booleano. `--condutor` leva o arquivo. */
-const FLAGS_COM_VALOR = ['--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope'];
-/* `--envelope <unidade> <arquivo-detalhado.esboco.json>` leva dois valores. */
-const FLAGS_COM_DOIS = ['--envelope'];
+const FLAGS_COM_VALOR = ['--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--mover-lote', '--detalhar', '--integrar'];
+/* `--envelope <unidade> <arquivo-detalhado.esboco.json>` e `--integrar <unidade> <arquivo-detalhado>` levam dois valores, e `--detalhar <unidade> [arquivo]` leva o segundo se vier. */
+const FLAGS_COM_DOIS = ['--envelope', '--detalhar', '--integrar'];
 
 /* { alvo, tem(flag), valor(flag) }: separa o arquivo dos valores das flags, para `--forma <id>` poder vir antes do arquivo. */
 export function lerArgumentos(argv) {
@@ -466,19 +535,30 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--proximo | --feito <unidade> | --mover <forma> --para <unidade> --motivo <texto> | --replanejar --motivo <texto>]] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
-    for (const f of ['--forma', '--achado', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--ancoras']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    for (const f of ['--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    if (args.tem('--integrar') && (args.valor('--integrar') === undefined || args.valor('--integrar', 1) === undefined)) throw new ErroDeEsboco('--integrar precisa da unidade e do arquivo detalhado (--integrar <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--envelope') && (args.valor('--envelope') === undefined || args.valor('--envelope', 1) === undefined)) throw new ErroDeEsboco('--envelope precisa da unidade e do arquivo detalhado (--envelope <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--referencia')) {
       const r = referenciaArquivo(alvo, args.valor('--referencia'), { vista: args.valor('--vista') ?? null, ancoras: args.valor('--ancoras') ?? null, imagem: args.tem('--imagem') });
       process.stdout.write(r.texto);
       return r.codigo;
     }
-    if (args.tem('--condutor') || args.tem('--envelope')) {
-      const r = condutorArquivo(alvo, { envelope: args.tem('--envelope') ? { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) } : undefined, proximo: args.tem('--proximo'), feito: args.valor('--feito'), mover: args.valor('--mover'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar') });
+    if (args.tem('--detalhar')) {
+      const r = detalharArquivo(alvo, args.valor('--detalhar'), args.valor('--detalhar', 1));
+      process.stdout.write(r.texto);
+      return 0;
+    }
+    if (args.tem('--integrar')) {
+      const r = integrarArquivo(alvo, args.valor('--integrar'), args.valor('--integrar', 1));
+      process.stdout.write(r.texto);
+      return r.resultado.envelope && !r.resultado.envelope.ok ? 1 : 0;
+    }
+    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--mover', '--mover-lote', '--replanejar'].some((f) => args.tem(f))) {
+      const r = condutorArquivo(alvo, { envelope: args.tem('--envelope') ? { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) } : undefined, proximo: args.tem('--proximo'), feito: args.valor('--feito'), mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar') });
       process.stdout.write(r.texto);
       return r.codigo;
     }
@@ -494,7 +574,8 @@ async function principal(argv) {
       process.stdout.write(`${formatarAjuste(resultado, descreverAchado)}\n${destino ? `gravado em ${destino} (o original não foi alterado)` : 'nenhum arquivo gravado'}\n${relatarContato(resultado.final)}`);
       return resultado.aprovado ? 0 : 1;
     }
-    if (args.tem('--descrever')) {
+    /* `--forma <id>` sozinha é a leitura da forma em texto: não desenha nem grava imagem */
+    if (args.tem('--descrever') || (args.tem('--forma') && !args.tem('--analise'))) {
       process.stdout.write(descreverArquivo(alvo, { mudou: args.tem('--mudou'), json: args.tem('--json'), completo: args.tem('--completo'), forma: args.valor('--forma') ?? null }).texto);
       return 0;
     }

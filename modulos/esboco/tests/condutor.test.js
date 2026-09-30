@@ -134,7 +134,8 @@ describe('Plano de detalhe', () => {
     const novo = moverForma(e, s, { forma: 'b', para: 'a', motivo: 'a e b são a mesma peça usinada' });
     expect(novo.unidades.map((u) => `${u.id}:${u.membros}`)).toEqual(['a:a,b', 'c:c', 'd:d']);
     expect(novo.alteracoes).toEqual([{ forma: 'b', de: 'b', para: 'a', motivo: 'a e b são a mesma peça usinada' }]);
-    expect(formatarSituacao(novo, portaoDoEstagio(e, novo))).toContain('agrupamento alterado: b de b para a (a e b são a mesma peça usinada)');
+    expect(formatarSituacao(novo, portaoDoEstagio(e, novo))).not.toContain('agrupamento alterado');
+    expect(formatarSituacao(novo, portaoDoEstagio(e, novo), { historico: true })).toContain('agrupamento alterado: b de b para a (a e b são a mesma peça usinada)');
     /* uma unidade nova leva o nome dado */
     expect(moverForma(e, s, { forma: 'd', para: 'ultima', motivo }).unidades.map((u) => u.id)).toEqual(['a', 'b', 'c', 'ultima']);
     /* fora do estágio */

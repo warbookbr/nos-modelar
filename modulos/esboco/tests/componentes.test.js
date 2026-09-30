@@ -227,7 +227,7 @@ describe('recusas', () => {
 
   it('parâmetro, campo, escolha e âncora inexistentes dizem o que é válido', () => {
     recusa([{ id: 'r', usa: 'roda', parametros: { raio: 3 } }], /o parâmetro "raio" não é do componente \(parâmetros: diametro, aro, largura, espessuraDisco, diametroCubo, salienciaCubo\)/);
-    recusa([{ id: 'r', usa: 'roda', tipo: 'anel' }], /o campo "tipo" não é do componente \(campos: id, usa, parametros, cor, rotulo, oculto, opacidade, centro, sobre, alinha, encosta, desloca\)/);
+    recusa([{ id: 'r', usa: 'roda', tipo: 'anel' }], /o campo "tipo" não é do componente \(campos: id, usa, parametros, cor, rotulo, oculto, opacidade, unidade, centro, sobre, alinha, encosta, desloca\)/);
     recusa([{ id: 'r', usa: 'roda' }, caixa('a', 'r.hélice')], /o componente "roda" \(instância "r"\) não tem a âncora "hélice" \(âncoras: eixo, topo, fundo, frente, tras, lateralE, lateralD, centro, inicio, fim,/);
     recusa([{ id: 'r', usa: 'roda', parametros: { diametro: '=2*naoExiste' } }], /o campo "parametros.diametro" com o valor "=2\*naoExiste" usa o parâmetro "naoExiste", que não existe/);
   });

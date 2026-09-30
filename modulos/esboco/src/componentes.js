@@ -18,6 +18,8 @@
      prefixados, a menos que o esboço já declare o mesmo par.
    - `{ "id": "garfoD", "usa": ... }` não existe para a cópia: `{ "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x" } }`
      com uma instância em `forma` espelha todas as formas dela.
+   - `unidade` na instância (ou no espelho dela) declara a Unidade de detalhe de todas as formas dela; o espelho sem
+     `unidade` herda a da fonte.
    - Cada forma sai marcada com `daInstancia: { id, principal }`, que o conserto e o `--ajustar` usam para saber que só a
      principal se move pela edição da instância.
 
@@ -28,7 +30,7 @@ import { COMPONENTES } from '../componentes/index.js';
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const clone = (v) => JSON.parse(JSON.stringify(v));
-const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade'];
+const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade'];
 const ANCORAS_DA_FORMA = ['centro', 'inicio', 'fim', '+x', '-x', '+y', '-y', '+z', '-z'];
 
 export const NOMES_DOS_COMPONENTES = Object.keys(COMPONENTES);
@@ -182,6 +184,7 @@ export function expandirComponentes(formas, ctx) {
       if (f.cor !== undefined) h.cor = f.cor;
       if (f.oculto !== undefined) h.oculto = f.oculto;
       if (f.opacidade !== undefined) h.opacidade = f.opacidade;
+      if (f.unidade !== undefined) h.unidade = f.unidade;
       if (principal && f.rotulo !== undefined) h.rotulo = f.rotulo;
       return h;
     });
@@ -193,8 +196,8 @@ export function expandirComponentes(formas, ctx) {
     const { comp, fonte } = dadosDe.get(f.id);
     const e = f.espelha;
     const contexto = `${onde}, espelho "${f.id}"`;
-    const extras = Object.keys(f).filter((k) => !['id', 'espelha', 'cor', 'rotulo', 'oculto', 'opacidade'].includes(k));
-    exigir(extras.length === 0, `${contexto}: o espelho de um componente só aceita "id", "espelha", "cor", "rotulo", "oculto" e "opacidade"; retire "${extras[0]}"`);
+    const extras = Object.keys(f).filter((k) => !['id', 'espelha', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade'].includes(k));
+    exigir(extras.length === 0, `${contexto}: o espelho de um componente só aceita "id", "espelha", "cor", "rotulo", "oculto", "opacidade" e "unidade"; retire "${extras[0]}"`);
     return expandidas.get(fonte).map((g) => {
       const local = g.id.slice(fonte.length + 1);
       const principal = local === comp.principal;
@@ -203,6 +206,7 @@ export function expandirComponentes(formas, ctx) {
       if (cor !== undefined) h.cor = cor;
       if (f.oculto !== undefined) h.oculto = f.oculto; else if (g.oculto !== undefined) h.oculto = g.oculto;
       if (f.opacidade !== undefined) h.opacidade = f.opacidade; else if (g.opacidade !== undefined) h.opacidade = g.opacidade;
+      if (f.unidade !== undefined) h.unidade = f.unidade; else if (g.unidade !== undefined) h.unidade = g.unidade;
       if (principal && f.rotulo !== undefined) h.rotulo = f.rotulo;
       return h;
     });
