@@ -8,6 +8,13 @@ import { expandirArranjos, expandirEsboco } from './expandir.js';
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
 const SEGMENTOS = 128;
+/* A esfera é uma pilha de anéis: 40 lados por anel e 20 faixas de polo a polo (inscrita, no máximo 0,3% menor). */
+const LADOS_DA_ESFERA = 40;
+const FAIXAS_DA_ESFERA = 20;
+/* Cada seção cilíndrica de um tubo tem 48 lados (0,2% menor que o círculo). */
+const LADOS_DO_TUBO = 48;
+/* Passo angular máximo, em graus, de cada seção reta numa curva do tubo. */
+const PASSO_DA_CURVA = 6;
 const PAINEL_L = 620;
 const PAINEL_A = 560;
 const TOPO = 70;
@@ -19,14 +26,15 @@ function exigir(cond, msg) { if (!cond) throw new ErroDeEsboco(msg); }
 const numPos = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 
 /* Perfil 2D (u, v) de cada forma e o eixo em que ele é extrudado. */
-function circulo(r) {
+function circuloN(r, n) {
   const p = [];
-  for (let i = 0; i < SEGMENTOS; i++) {
-    const a = (2 * Math.PI * i) / SEGMENTOS;
+  for (let i = 0; i < n; i++) {
+    const a = (2 * Math.PI * i) / n;
     p.push([r * Math.cos(a), r * Math.sin(a)]);
   }
   return p;
 }
+const circulo = (r) => circuloN(r, SEGMENTOS);
 
 function retanguloArredondado(l, p, r) {
   const rr = Math.min(r ?? 0, l / 2, p / 2);
@@ -57,6 +65,46 @@ function cortar(perfil, n, limite) {
     }
   }
   return saida;
+}
+
+/* Retângulo com os quatro cantos cortados a 45° (perfil de uma caixa chanfrada), anti-horário. */
+function retanguloChanfrado(l, p, c) {
+  return [[-l / 2 + c, -p / 2], [l / 2 - c, -p / 2], [l / 2, -p / 2 + c], [l / 2, p / 2 - c],
+    [l / 2 - c, p / 2], [-l / 2 + c, p / 2], [-l / 2, p / 2 - c], [-l / 2, -p / 2 + c]];
+}
+
+/* Perfil convexo anti-horário recuado de `d` para dentro: cada vértice anda pela bissetriz (meia-esquadria),
+   de modo que cada aresta fica paralela à original. Devolve null se alguma aresta some ou inverte. */
+function recuarPerfil(perfil, d) {
+  const n = perfil.length;
+  const dir = (a, b) => { const x = b[0] - a[0]; const y = b[1] - a[1]; const t = Math.hypot(x, y); return [x / t, y / t]; };
+  const novo = perfil.map((q, i) => {
+    const e1 = dir(perfil[(i - 1 + n) % n], q);
+    const e2 = dir(q, perfil[(i + 1) % n]);
+    const n1 = [-e1[1], e1[0]];
+    const n2 = [-e2[1], e2[0]];
+    const k = d / (1 + n1[0] * n2[0] + n1[1] * n2[1]);
+    return [q[0] + (n1[0] + n2[0]) * k, q[1] + (n1[1] + n2[1]) * k];
+  });
+  for (let i = 0; i < n; i++) {
+    const a = perfil[i]; const b = perfil[(i + 1) % n];
+    const c = novo[i]; const e = novo[(i + 1) % n];
+    if ((b[0] - a[0]) * (e[0] - c[0]) + (b[1] - a[1]) * (e[1] - c[1]) <= 1e-9) return null;
+  }
+  return novo;
+}
+
+/* Perfil convexo? (sem voltas para dentro; pontos colineares são aceitos) */
+function ehConvexo(perfil) {
+  let sinal = 0;
+  for (let i = 0; i < perfil.length; i++) {
+    const a = perfil[i]; const b = perfil[(i + 1) % perfil.length]; const c = perfil[(i + 2) % perfil.length];
+    const z = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]);
+    if (Math.abs(z) < 1e-9) continue;
+    if (sinal === 0) sinal = Math.sign(z);
+    else if (Math.sign(z) !== sinal) return false;
+  }
+  return sinal !== 0;
 }
 
 /* Base local: eixo de extrusão e os dois eixos do perfil. */
@@ -124,7 +172,7 @@ function prisma(f, onde) {
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
     const b = base(eixo);
-    let perfil = circulo(f.diametro / 2);
+    let perfil = f.lados ? circuloN(f.diametro / 2, f.lados) : circulo(f.diametro / 2);
     if (f.achatado) {
       const { lado, profundidade } = f.achatado;
       exigir(LADOS.includes(lado), `${onde}: "achatado.lado" deve ser um de ${LADOS.join(', ')}`);
@@ -168,12 +216,67 @@ function prisma(f, onde) {
       const r = f.furo.diametro / 2;
       furos.push(circulo(r).map(([u, v]) => [u + cf[0], v + cf[1]]));
     }
+    if (f.chanfro !== undefined) {
+      const c = f.chanfro;
+      exigir(numPos(c), `${onde}: "chanfro" deve ser um número positivo em mm`);
+      exigir(f.raio === undefined, `${onde}: use "raio" ou "chanfro" na caixa, não os dois`);
+      exigir(furos.length === 0, `${onde}: a caixa com "chanfro" não aceita "furo" nem "furos"`);
+      exigir(2 * c < Math.min(f.largura, f.altura, f.profundidade), `${onde}: "chanfro" de ${c} mm é grande demais para a caixa ${f.largura}x${f.altura}x${f.profundidade} (precisa ser menor que a metade da menor medida)`);
+      const cheio = retanguloChanfrado(f.largura, f.profundidade, c);
+      const topo = recuarPerfil(cheio, c);
+      exigir(topo, `${onde}: "chanfro" de ${c} mm é grande demais: a face de cima some antes de a aresta ser chanfrada`);
+      const h = f.altura / 2;
+      return {
+        b: base('y'), perfil: cheio, furos: [], furo: null, comprimento: f.altura,
+        secoes: [{ w: -h, perfil: topo }, { w: -h + c, perfil: cheio }, { w: h - c, perfil: cheio }, { w: h, perfil: topo }],
+      };
+    }
     return { b: base('y'), perfil: retanguloArredondado(f.largura, f.profundidade, f.raio), furos, furo: furos[0] ?? null, comprimento: f.altura };
   }
-  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel ou caixa`);
+  if (tipo === 'cone') {
+    exigir(numPos(f.diametro), `${onde}: cone precisa de "diametro" positivo em mm (o da base, no início do eixo)`);
+    exigir(numPos(f.comprimento), `${onde}: cone precisa de "comprimento" positivo em mm`);
+    const topo = f.diametroTopo ?? 0;
+    exigir(typeof topo === 'number' && Number.isFinite(topo) && topo >= 0, `${onde}: "diametroTopo" deve ser um número em mm, maior ou igual a zero (0 é o cone, maior que 0 é o tronco)`);
+    exigir(topo !== f.diametro, `${onde}: cone com "diametroTopo" igual ao "diametro" é um cilindro; use "cilindro"`);
+    const eixo = f.eixo ?? 'y';
+    exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
+    const h = f.comprimento / 2;
+    const base0 = circulo(f.diametro / 2);
+    return { b: base(eixo), perfil: base0, furos: [], furo: null, comprimento: f.comprimento, secoes: [{ w: -h, perfil: base0 }, { w: h, perfil: circulo(topo / 2) }] };
+  }
+  if (tipo === 'esfera') {
+    exigir(numPos(f.diametro), `${onde}: esfera precisa de "diametro" positivo em mm`);
+    const R = f.diametro / 2;
+    const secoes = [];
+    for (let k = 0; k <= FAIXAS_DA_ESFERA; k++) {
+      const t = (Math.PI * k) / FAIXAS_DA_ESFERA;
+      secoes.push({ w: k === 0 ? -R : k === FAIXAS_DA_ESFERA ? R : -R * Math.cos(t), perfil: circuloN(k === 0 || k === FAIXAS_DA_ESFERA ? 0 : R * Math.sin(t), LADOS_DA_ESFERA) });
+    }
+    return { b: base('y'), perfil: circuloN(R, LADOS_DA_ESFERA), furos: [], furo: null, comprimento: f.diametro, secoes };
+  }
+  if (tipo === 'extrusao') {
+    exigir(numPos(f.comprimento), `${onde}: extrusao precisa de "comprimento" positivo em mm (a altura do prisma ao longo do eixo)`);
+    const eixo = f.eixo ?? 'y';
+    exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
+    const dica = `${onde}: extrusao precisa de "perfil": [[u, v], ...] com 3 ou mais pontos em mm, convexo (u e v são os eixos do plano perpendicular ao eixo: x e z para eixo y, z e y para eixo x, x e y para eixo z)`;
+    exigir(Array.isArray(f.perfil) && f.perfil.length >= 3 && f.perfil.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite)), dica);
+    exigir(ehConvexo(f.perfil), `${onde}: o "perfil" da extrusao precisa ser convexo (sem cantos voltados para dentro); divida a forma em duas extrusões`);
+    const area = f.perfil.reduce((acc, q, i) => acc + q[0] * f.perfil[(i + 1) % f.perfil.length][1] - f.perfil[(i + 1) % f.perfil.length][0] * q[1], 0);
+    /* o centro da forma é o centro da caixa do perfil, qualquer que seja a origem em que ele foi declarado */
+    const cu = (Math.min(...f.perfil.map((q) => q[0])) + Math.max(...f.perfil.map((q) => q[0]))) / 2;
+    const cv = (Math.min(...f.perfil.map((q) => q[1])) + Math.max(...f.perfil.map((q) => q[1]))) / 2;
+    const centrado = f.perfil.map((q) => [q[0] - cu, q[1] - cv]);
+    return { b: base(eixo), perfil: area >= 0 ? centrado : [...centrado].reverse(), furos: [], furo: null, comprimento: f.comprimento };
+  }
+  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao ou tubo`);
 }
 
 function caixaLocal(pr, m) {
+  if (pr.secoes) {
+    const vs = verticesLocais(pr, m);
+    return { min: [0, 1, 2].map((i) => Math.min(...vs.map((p) => p[i]))), max: [0, 1, 2].map((i) => Math.max(...vs.map((p) => p[i]))) };
+  }
   if (!m) {
     const min = [0, 0, 0];
     const max = [0, 0, 0];
@@ -210,13 +313,24 @@ function lerPonta(f) {
 
 /* Âncoras nomeadas: `centro`; `inicio` e `fim` nas pontas do eixo (cilindro e anel); e o centro
    de cada face da caixa mínima (`+x` ... `-z`), na orientação do mundo depois da rotação. */
+const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao'];
+
 export function nomesDeAncoras(tipo) {
-  return ['centro', ...(tipo === 'cilindro' || tipo === 'anel' ? ['inicio', 'fim'] : []), ...LADOS];
+  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' ? ['inicio', 'fim'] : []), ...LADOS];
+}
+
+/* A parte de um tubo como forma resolvida própria: as partes guardam o centro relativo ao do tubo, e por
+   isso o tubo inteiro anda (explosão, cópia, deslocamento) mudando só o `centro` dele. */
+export function subforma(r, parte) {
+  return { id: r.id, forma: r.forma, prisma: parte.prisma, matriz: parte.matriz, centro: r.centro.map((c, i) => c + parte.dc[i]) };
 }
 
 export function ancorasDe(r) {
   const a = { centro: [...r.centro] };
-  if (r.forma.tipo === 'cilindro' || r.forma.tipo === 'anel') {
+  if (r.partes) {
+    a.inicio = r.centro.map((c, i) => c + r.extremos.inicio[i]);
+    a.fim = r.centro.map((c, i) => c + r.extremos.fim[i]);
+  } else if (TIPOS_COM_EIXO.includes(r.forma.tipo)) {
     const h = r.prisma.comprimento / 2;
     for (const [nome, w] of [['inicio', -h], ['fim', h]]) {
       const d = aplicarMatriz(ponto3(r.prisma.b, 0, 0, w), r.matriz);
@@ -238,8 +352,11 @@ function ancoraDe(ref, onde, porId, resolver, visitando, campo = 'centro') {
   const nome = ponto > 0 ? ref.slice(ponto + 1) : '';
   exigir(ponto > 0, `${onde}: "${campo}" como referência "${ref}" deve ter a forma "<id>.<ancora>", por exemplo "${id}.centro"`);
   exigir(porId.has(id), `${onde}: "${campo}" aponta para "${ref}", mas a forma "${id}" não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
-  const validas = nomesDeAncoras(porId.get(id).tipo);
-  exigir(validas.includes(nome), `${onde}: "${campo}" aponta para "${ref}", mas a forma "${id}" (${porId.get(id).tipo}) não tem a âncora "${nome}" (válidas: ${validas.join(', ')})`);
+  /* uma cópia (espelho ou arranjo) tem as âncoras da forma-fonte */
+  let fonteDoTipo = porId.get(id);
+  for (let n = 0; n < 20 && fonteDoTipo && fonteDoTipo.tipo === undefined; n++) fonteDoTipo = porId.get(fonteDoTipo.espelha?.forma ?? fonteDoTipo.arranjoDe?.fonte);
+  const validas = nomesDeAncoras((fonteDoTipo ?? porId.get(id)).tipo);
+  exigir(validas.includes(nome), `${onde}: "${campo}" aponta para "${ref}", mas a forma "${id}" (${(fonteDoTipo ?? porId.get(id)).tipo}) não tem a âncora "${nome}" (válidas: ${validas.join(', ')})`);
   exigir(!visitando.has(id), `${onde}: referência circular em "${campo}": "${ref}" volta a depender desta forma (âncoras válidas de "${id}": ${validas.join(', ')})`);
   return ancorasDe(resolver(id))[nome];
 }
@@ -267,10 +384,31 @@ function rotacaoEntre(a, b) {
 
 /* Vértices do prisma girado, relativos ao centro (o anel entra como o disco externo). */
 function verticesLocais(pr, m) {
+  if (pr.secoes) return pr.secoes.flatMap((sc) => sc.perfil.map(([u, v]) => aplicarMatriz(ponto3(pr.b, u, v, sc.w), m)));
   const h = pr.comprimento / 2;
   const saida = [];
   for (const w of [-h, h]) for (const [u, v] of pr.perfil) saida.push(aplicarMatriz(ponto3(pr.b, u, v, w), m));
   return saida;
+}
+
+/* Normal (unitária, no referencial local x, y, z) de cada face lateral de um sólido em seções: [faixa][aresta].
+   A face entre duas seções é o quadrilátero (planar, pois as seções são paralelas entre si) cujas arestas vêm
+   do mesmo lado do perfil; num prisma reto dá a normal (dv, -du) do perfil. */
+export function normaisDasFaixas({ b, secoes }) {
+  const N = secoes[0].perfil.length;
+  return secoes.slice(0, -1).map((s0, k) => {
+    const s1 = secoes[k + 1];
+    return Array.from({ length: N }, (_, i) => {
+      const j = (i + 1) % N;
+      const P = (sc, q) => [sc.perfil[q][0], sc.perfil[q][1], sc.w];
+      const A0 = P(s0, i); const D0 = P(s0, j); const A1 = P(s1, i); const D1 = P(s1, j);
+      const tA = [0, 1, 2].map((e) => D0[e] - A0[e] + D1[e] - A1[e]);
+      const tW = [0, 1, 2].map((e) => A1[e] - A0[e] + D1[e] - D0[e]);
+      const c = [tA[1] * tW[2] - tA[2] * tW[1], tA[2] * tW[0] - tA[0] * tW[2], tA[0] * tW[1] - tA[1] * tW[0]];
+      const t = Math.hypot(...c);
+      return ponto3(b, ...(t > 1e-12 ? c.map((x) => x / t) : [0, 0, 0]));
+    });
+  });
 }
 
 const EIXOS_ALINHA = ['x', 'y', 'z'];
@@ -280,16 +418,25 @@ const CHAVES_ALINHA = ['com', 'eixos'];
 /* Relações de posição de uma forma, em texto, para a leitura `--descrever`. */
 export function relacaoDe(f) {
   const partes = [];
-  const v = (x) => (Array.isArray(x) ? `[${x.join(' ')}]` : x);
+  const v = (x) => {
+    if (Array.isArray(x)) return `[${x.join(' ')}]`;
+    if (x && typeof x === 'object' && Array.isArray(x.entre)) {
+      const medida = x.t !== undefined ? `em t ${x.t}` : x.mm !== undefined ? `a ${x.mm} mm do primeiro` : `a ${x.mmAntes} mm do segundo`;
+      return `(entre ${v(x.entre[0])} e ${v(x.entre[1])} ${medida})`;
+    }
+    return x;
+  };
   if (f.espelha) partes.push(`espelho de ${f.espelha.forma} no eixo ${f.espelha.eixo} em ${f.espelha.pos ?? 0} mm`);
   if (f.arranjoDe) {
     const a = f.arranjoDe;
     partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
   }
+  if (f.tipo === 'tubo' && Array.isArray(f.caminho)) partes.push(`caminho de ${f.caminho.length} pontos${f.raioCurva ? `, raio de curva ${f.raioCurva} mm` : ''}`);
+  if (f.daInstancia) partes.push(`${f.daInstancia.principal ? 'principal' : 'parte'} do componente ${f.daInstancia.id}`);
   if (f.de !== undefined) partes.push(`de ${v(f.de)} para ${v(f.para)}`);
   if (f.alinha) partes.push(`alinha com ${f.alinha.com} nos eixos ${(f.alinha.eixos ?? []).join(' ')}`);
   if (f.encosta) partes.push(`encosta em ${f.encosta.referencia} na direção ${v(f.encosta.direcao)}${f.encosta.folga ? ` com folga ${f.encosta.folga} mm` : ''}`);
-  if ((f.de !== undefined || f.alinha || f.encosta || f.espelha) && f.desloca) partes.push(`desloca ${v(f.desloca)}`);
+  if ((f.de !== undefined || f.alinha || f.encosta || f.espelha || f.caminho) && f.desloca) partes.push(`desloca ${v(f.desloca)}`);
   return partes.join('; ');
 }
 
@@ -326,8 +473,8 @@ function rotacaoEmTorno(eixo, graus) {
 const CHAVES_ESPELHA = ['forma', 'eixo', 'pos'];
 /* Campos de posição e de aparência que a cópia não herda da forma-fonte (a cópia refaz a posição
    a partir da fonte já resolvida; `rotulo`, `oculto` e `opacidade` são só dela). */
-const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe'];
-const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha'];
+const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia'];
+const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha', 'daInstancia'];
 
 /* Cópia refletida (`espelha`) ou repetida (`arranjoDe`, vinda de `arranja`) de uma forma já resolvida:
    a geometria sai da fonte resolvida, e não de uma regravação das relações dela. */
@@ -384,12 +531,91 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     ...(f.opacidade !== undefined ? { opacidade: f.opacidade } : {}),
   };
   if (forma.cor === undefined) delete forma.cor;
+  if (fonte.partes) {
+    /* tubo: o sólido inteiro sofre a mesma transformação (`m`, que ainda pode ser nula) e as partes seguem o centro */
+    const partes = fonte.partes.map((pt) => ({ semTampa: pt.semTampa, prisma: pt.prisma, matriz: m ? multiplicar(m, pt.matriz ?? IDENTIDADE) : pt.matriz, dc: m ? aplicarMatriz(pt.dc, m) : pt.dc }));
+    const extremos = { inicio: m ? aplicarMatriz(fonte.extremos.inicio, m) : fonte.extremos.inicio, fim: m ? aplicarMatriz(fonte.extremos.fim, m) : fonte.extremos.fim };
+    const r = { id, forma, prisma: null, partes, extremos, centro, matriz: null };
+    return { ...r, ...caixaDeTubo(r) };
+  }
   const local = caixaLocal(fonte.prisma, m);
   return {
     id, forma, prisma: fonte.prisma, centro, matriz: m,
     min: local.min.map((val, i) => val + centro[i]),
     max: local.max.map((val, i) => val + centro[i]),
   };
+}
+
+/* Tubo por pontos: cada trecho reto é um cilindro (seção cilíndrica) e, com `raioCurva`, cada canto vira um
+   arco de raio `raioCurva` cortado em seções retas de no máximo PASSO_DA_CURVA graus; sem `raioCurva` cada canto
+   leva uma esfera do diâmetro do tubo. `pts` são os pontos do caminho já resolvidos, em mm. Devolve as partes
+   com o centro relativo ao centro da caixa do tubo, esse centro e os extremos. */
+function construirTubo(f, pts, onde) {
+  exigir(numPos(f.diametro), `${onde}: tubo precisa de "diametro" positivo em mm`);
+  const curva = f.raioCurva ?? 0;
+  exigir(typeof curva === 'number' && Number.isFinite(curva) && curva >= 0, `${onde}: "raioCurva" deve ser um número em mm, maior ou igual a zero`);
+  const sub = (a, b) => a.map((x, i) => x - b[i]);
+  const soma = (a, b) => a.map((x, i) => x + b[i]);
+  const mul = (a, k) => a.map((x) => x * k);
+  const trechos = pts.slice(0, -1).map((p, i) => Math.hypot(...sub(pts[i + 1], p)));
+  trechos.forEach((t, i) => exigir(t > 1e-9, `${onde}: os pontos ${i + 1} e ${i + 2} do "caminho" são o mesmo ponto`));
+  /* curva em cada canto interno: comprimento tangente T = raioCurva * tan(giro / 2) de cada lado */
+  const giro = pts.map(() => 0);
+  const tang = pts.map(() => 0);
+  for (let i = 1; i < pts.length - 1; i++) {
+    const d1 = unit(sub(pts[i], pts[i - 1]));
+    const d2 = unit(sub(pts[i + 1], pts[i]));
+    const g = Math.acos(Math.max(-1, Math.min(1, escalarV(d1, d2))));
+    exigir(g < Math.PI - 1e-6, `${onde}: o "caminho" volta sobre si mesmo no ponto ${i + 1}`);
+    if (g > 1e-6) { giro[i] = g; if (curva > 0) tang[i] = curva * Math.tan(g / 2); }
+  }
+  trechos.forEach((t, i) => exigir(tang[i] + tang[i + 1] <= t + 1e-9,
+    `${onde}: "raioCurva" de ${curva} mm não cabe no trecho ${i + 1} do "caminho" (${Math.round(t * 10) / 10} mm): as duas curvas pedem ${Math.round((tang[i] + tang[i + 1]) * 10) / 10} mm; reduza o raio ou afaste os pontos`));
+  const linha = [pts[0]];
+  const juntas = [];
+  for (let i = 1; i < pts.length - 1; i++) {
+    if (!(giro[i] > 0)) continue;
+    if (!(tang[i] > 0)) { linha.push(pts[i]); juntas.push(pts[i]); continue; }
+    const d1 = unit(sub(pts[i], pts[i - 1]));
+    const d2 = unit(sub(pts[i + 1], pts[i]));
+    const A = sub(pts[i], mul(d1, tang[i]));
+    const nn = unit(sub(d2, mul(d1, escalarV(d1, d2))));
+    const C = soma(A, mul(nn, curva));
+    const passos = Math.max(1, Math.ceil((giro[i] * 180) / Math.PI / PASSO_DA_CURVA));
+    for (let k = 0; k <= passos; k++) {
+      const t = (giro[i] * k) / passos;
+      linha.push(soma(C, soma(mul(nn, -curva * Math.cos(t)), mul(d1, curva * Math.sin(t)))));
+    }
+  }
+  linha.push(pts[pts.length - 1]);
+  const partes = [];
+  const brutas = [];
+  for (let i = 0; i < linha.length - 1; i++) {
+    const d = sub(linha[i + 1], linha[i]);
+    const len = Math.hypot(...d);
+    if (len < 1e-9) continue;
+    const pr = prisma({ tipo: 'cilindro', diametro: f.diametro, comprimento: len, eixo: 'y', lados: LADOS_DO_TUBO }, onde);
+    brutas.push({ prisma: pr, matriz: rotacaoEntre([0, 1, 0], unit(d)), centro: mul(soma(linha[i], linha[i + 1]), 0.5), semTampa: { inicio: i > 0, fim: i < linha.length - 2 } });
+  }
+  for (const p of juntas) brutas.push({ prisma: prisma({ tipo: 'esfera', diametro: f.diametro }, onde), matriz: null, centro: p, semTampa: { inicio: true, fim: true } });
+  const caixas = brutas.map((q) => { const l = caixaLocal(q.prisma, q.matriz); return { min: l.min.map((v, i) => v + q.centro[i]), max: l.max.map((v, i) => v + q.centro[i]) }; });
+  const min = [0, 1, 2].map((i) => Math.min(...caixas.map((c) => c.min[i])));
+  const max = [0, 1, 2].map((i) => Math.max(...caixas.map((c) => c.max[i])));
+  const centro = min.map((v, i) => (v + max[i]) / 2);
+  for (const q of brutas) partes.push({ prisma: q.prisma, matriz: q.matriz, dc: sub(q.centro, centro), semTampa: q.semTampa });
+  return { partes, centro, extremos: { inicio: sub(pts[0], centro), fim: sub(pts[pts.length - 1], centro) } };
+}
+
+/* Vértices de uma forma resolvida relativos ao centro dela (o anel entra como o disco externo). */
+function verticesDe(r) {
+  if (r.partes) return r.partes.flatMap((pt) => verticesLocais(pt.prisma, pt.matriz).map((v) => v.map((x, i) => x + pt.dc[i])));
+  return verticesLocais(r.prisma, r.matriz);
+}
+
+/* Caixa da forma em tubo, no mundo, a partir das partes. */
+function caixaDeTubo(r) {
+  const cs = r.partes.map((pt) => { const l = caixaLocal(pt.prisma, pt.matriz); return { min: l.min.map((v, i) => v + pt.dc[i] + r.centro[i]), max: l.max.map((v, i) => v + pt.dc[i] + r.centro[i]) }; });
+  return { min: [0, 1, 2].map((i) => Math.min(...cs.map((c) => c.min[i]))), max: [0, 1, 2].map((i) => Math.max(...cs.map((c) => c.max[i]))) };
 }
 
 /* Resolve a posição de cada forma. Devolve formas com centro e caixa no mundo. `pontosDaRaiz` é o
@@ -419,7 +645,22 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
         exigir(v.length === 3 && v.every(Number.isFinite), `${onde}: "${campo}" deve ser [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
         return [...v];
       }
-      exigir(typeof v === 'string', `${onde}: "${campo}" deve ser [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
+      if (v && typeof v === 'object') {
+        /* ponto entre dois pontos: { "entre": [A, B], "t": fração de A a B } ou { "entre": [A, B], "mm": distância a partir de A } */
+        const chaves = Object.keys(v);
+        const dica = `${onde}: "${campo}" como objeto deve ser { "entre": [A, B], "t": 0.25 }, { "entre": [A, B], "mm": 90 } (a partir de A) ou { "entre": [A, B], "mmAntes": 40 } (a partir de B, para A), com A e B pontos ([x, y, z], nomeado ou "<id>.<ancora>")`;
+        const medida = ['t', 'mm', 'mmAntes'].filter((k) => v[k] !== undefined);
+        exigir(Array.isArray(v.entre) && v.entre.length === 2 && chaves.every((k) => ['entre', 't', 'mm', 'mmAntes'].includes(k)) && medida.length === 1, dica);
+        exigir(Number.isFinite(v[medida[0]]), `${onde}: "${campo}": "${medida[0]}" deve ser um número`);
+        const a = pontoDe(v.entre[0], `${campo}.entre[0]`);
+        const b = pontoDe(v.entre[1], `${campo}.entre[1]`);
+        const d = b.map((x, i) => x - a[i]);
+        const dist = Math.hypot(...d);
+        exigir(dist > 1e-9, `${onde}: "${campo}": os dois pontos de "entre" são o mesmo ponto`);
+        const t = v.t !== undefined ? v.t : v.mm !== undefined ? v.mm / dist : 1 - v.mmAntes / dist;
+        return a.map((x, i) => x + d[i] * t);
+      }
+      exigir(typeof v === 'string', `${onde}: "${campo}" deve ser [x, y, z] em mm, um ponto nomeado, "<id>.<ancora>" ou { "entre": [A, B], "t": 0.5 }`);
       if (Object.hasOwn(pontos, v)) return [...pontos[v]];
       exigir(v.includes('.') || campo === 'centro', `${onde}: "${campo}" aponta para "${v}", que não é um ponto nomeado (pontos: ${Object.keys(pontos).join(', ') || 'nenhum'}) nem "<id>.<ancora>"`);
       return [...ancoraDe(v, onde, porId, resolver, visitando, campo)];
@@ -435,16 +676,68 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       prontas.set(id, r);
       return r;
     }
+    /* alinha, encosta e desloca, nessa ordem, sobre o centro já posicionado; `proprios` dá os vértices da forma relativos ao centro */
+    const relacionar = (centroInicial, proprios) => {
+      let centro = centroInicial;
+      if (f.alinha !== undefined) {
+        const al = f.alinha;
+        exigir(al && typeof al === 'object' && !Array.isArray(al), `${onde}: "alinha" deve ser { "com": "<id>", "eixos": ["x", "z"] }`);
+        const extras = Object.keys(al).filter((k) => !CHAVES_ALINHA.includes(k));
+        exigir(extras.length === 0, `${onde}: "alinha" não tem o campo "${extras[0]}" (campos: ${CHAVES_ALINHA.join(', ')})`);
+        exigir(Array.isArray(al.eixos) && al.eixos.length > 0 && al.eixos.every((e) => EIXOS_ALINHA.includes(e)) && new Set(al.eixos).size === al.eixos.length,
+          `${onde}: "alinha.eixos" deve listar eixos distintos entre "x", "y" e "z"`);
+        exigir(typeof al.com === 'string' && al.com, `${onde}: "alinha.com" deve ser o id de uma forma, "<id>.<ancora>" ou um ponto nomeado`);
+        const alvo = porId.has(al.com) ? referencia('alinha.com', al.com).centro : pontoDe(al.com, 'alinha.com');
+        for (const e of al.eixos) centro[EIXOS.indexOf(e)] = alvo[EIXOS.indexOf(e)];
+      }
+      if (f.encosta !== undefined) {
+        const en = f.encosta;
+        exigir(en && typeof en === 'object' && !Array.isArray(en), `${onde}: "encosta" deve ser { "referencia": "<id>", "direcao": [dx, dy, dz], "folga": mm }`);
+        const extras = Object.keys(en).filter((k) => !CHAVES_ENCOSTA.includes(k));
+        exigir(extras.length === 0, `${onde}: "encosta" não tem o campo "${extras[0]}" (campos: ${CHAVES_ENCOSTA.join(', ')})`);
+        const direcao = typeof en.direcao === 'string' && LADOS.includes(en.direcao)
+          ? EIXOS.map((e) => (e === en.direcao[1] ? (en.direcao[0] === '+' ? 1 : -1) : 0))
+          : en.direcao;
+        exigir(Array.isArray(direcao) && direcao.length === 3 && direcao.every(Number.isFinite) && Math.hypot(...direcao) > 0,
+          `${onde}: "encosta.direcao" deve ser um vetor [dx, dy, dz] não nulo ou um lado (${LADOS.join(', ')})`);
+        const folga = en.folga ?? 0;
+        exigir(Number.isFinite(folga), `${onde}: "encosta.folga" deve ser um número em mm`);
+        exigir(en.referencia !== id, `${onde}: "encosta" não pode ter a própria forma como referência`);
+        const alvo = referencia('encosta', en.referencia);
+        const dn = unit(direcao);
+        const maxMovel = Math.max(...proprios().map((v) => escalarV(dn, v))) + escalarV(dn, centro);
+        const minRef = Math.min(...verticesDe(alvo).map((v) => escalarV(dn, v))) + escalarV(dn, alvo.centro);
+        const t = minRef - maxMovel - folga;
+        centro = centro.map((c, i) => c + dn[i] * t);
+      }
+      if (f.desloca !== undefined) {
+        exigir(Array.isArray(f.desloca) && f.desloca.length === 3 && f.desloca.every(Number.isFinite), `${onde}: "desloca" deve ser [dx, dy, dz] em mm`);
+        centro = centro.map((c, i) => c + f.desloca[i]);
+      }
+      return centro;
+    };
+    if (f.tipo === 'tubo') {
+      const proibidos = ['centro', 'sobre', 'ponta', 'de', 'para', 'rotacao'].filter((k) => f[k] !== undefined);
+      exigir(proibidos.length === 0, `${onde}: o tubo se posiciona pelos pontos do "caminho"; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca", "alinha" ou "encosta" para afastá-lo)`);
+      exigir(Array.isArray(f.caminho) && f.caminho.length >= 2, `${onde}: tubo precisa de "caminho": lista de 2 ou mais pontos, cada um [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
+      const t = construirTubo(f, f.caminho.map((q, i) => pontoDe(q, `caminho[${i}]`)), onde);
+      const centro = relacionar(t.centro, () => verticesDe({ partes: t.partes }));
+      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, centro, matriz: null };
+      Object.assign(r, caixaDeTubo(r));
+      visitando.delete(id);
+      prontas.set(id, r);
+      return r;
+    }
     const haste = f.de !== undefined || f.para !== undefined;
     let fPrisma = f;
     let m;
     let centro = [0, 0, 0];
     if (haste) {
       exigir(f.de !== undefined && f.para !== undefined, `${onde}: "de" e "para" vêm juntos`);
-      exigir(f.tipo === 'cilindro' || f.tipo === 'caixa', `${onde}: "de"/"para" valem só em cilindro e caixa (a forma vira uma haste entre dois pontos)`);
+      exigir(f.tipo === 'cilindro' || f.tipo === 'caixa' || f.tipo === 'cone', `${onde}: "de"/"para" valem só em cilindro, caixa e cone (a forma vira uma haste entre dois pontos; para um caminho com várias pernas use "tubo")`);
       const proibidos = ['centro', 'sobre', 'ponta', 'rotacao', 'encosta', 'alinha'].filter((k) => f[k] !== undefined);
       exigir(proibidos.length === 0, `${onde}: "de"/"para" já definem o centro e a rotação; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca" para afastar a haste)`);
-      const campoLongo = f.tipo === 'cilindro' ? 'comprimento' : 'altura';
+      const campoLongo = f.tipo === 'caixa' ? 'altura' : 'comprimento';
       exigir(f[campoLongo] === undefined, `${onde}: "${campoLongo}" não pode vir junto de "de"/"para": o comprimento sai da distância entre os dois pontos`);
       const p0 = pontoDe(f.de, 'de');
       const p1 = pontoDe(f.para, 'para');
@@ -465,7 +758,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
     if (haste) {
       /* o centro já saiu dos dois pontos */
-    } else if (typeof f.centro === 'string') {
+    } else if (typeof f.centro === 'string' || (f.centro && typeof f.centro === 'object' && !Array.isArray(f.centro))) {
       centro = pontoDe(f.centro, 'centro');
     } else if (f.centro !== undefined) {
       exigir(Array.isArray(f.centro) && f.centro.length === 3 && f.centro.every(Number.isFinite), `${onde}: "centro" deve ser [x, y, z] em mm`);
@@ -483,41 +776,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       centro = [...alvo.centro];
       centro[k] = lado[0] === '+' ? alvo.max[k] - local.min[k] : alvo.min[k] - local.max[k];
     }
-    if (f.alinha !== undefined) {
-      const al = f.alinha;
-      exigir(al && typeof al === 'object' && !Array.isArray(al), `${onde}: "alinha" deve ser { "com": "<id>", "eixos": ["x", "z"] }`);
-      const extras = Object.keys(al).filter((k) => !CHAVES_ALINHA.includes(k));
-      exigir(extras.length === 0, `${onde}: "alinha" não tem o campo "${extras[0]}" (campos: ${CHAVES_ALINHA.join(', ')})`);
-      exigir(Array.isArray(al.eixos) && al.eixos.length > 0 && al.eixos.every((e) => EIXOS_ALINHA.includes(e)) && new Set(al.eixos).size === al.eixos.length,
-        `${onde}: "alinha.eixos" deve listar eixos distintos entre "x", "y" e "z"`);
-      exigir(typeof al.com === 'string' && al.com, `${onde}: "alinha.com" deve ser o id de uma forma, "<id>.<ancora>" ou um ponto nomeado`);
-      const alvo = porId.has(al.com) ? referencia('alinha.com', al.com).centro : pontoDe(al.com, 'alinha.com');
-      for (const e of al.eixos) centro[EIXOS.indexOf(e)] = alvo[EIXOS.indexOf(e)];
-    }
-    if (f.encosta !== undefined) {
-      const en = f.encosta;
-      exigir(en && typeof en === 'object' && !Array.isArray(en), `${onde}: "encosta" deve ser { "referencia": "<id>", "direcao": [dx, dy, dz], "folga": mm }`);
-      const extras = Object.keys(en).filter((k) => !CHAVES_ENCOSTA.includes(k));
-      exigir(extras.length === 0, `${onde}: "encosta" não tem o campo "${extras[0]}" (campos: ${CHAVES_ENCOSTA.join(', ')})`);
-      const direcao = typeof en.direcao === 'string' && LADOS.includes(en.direcao)
-        ? EIXOS.map((e) => (e === en.direcao[1] ? (en.direcao[0] === '+' ? 1 : -1) : 0))
-        : en.direcao;
-      exigir(Array.isArray(direcao) && direcao.length === 3 && direcao.every(Number.isFinite) && Math.hypot(...direcao) > 0,
-        `${onde}: "encosta.direcao" deve ser um vetor [dx, dy, dz] não nulo ou um lado (${LADOS.join(', ')})`);
-      const folga = en.folga ?? 0;
-      exigir(Number.isFinite(folga), `${onde}: "encosta.folga" deve ser um número em mm`);
-      exigir(en.referencia !== id, `${onde}: "encosta" não pode ter a própria forma como referência`);
-      const alvo = referencia('encosta', en.referencia);
-      const dn = unit(direcao);
-      const maxMovel = Math.max(...verticesLocais(pr, m).map((v) => escalarV(dn, v))) + escalarV(dn, centro);
-      const minRef = Math.min(...verticesLocais(alvo.prisma, alvo.matriz).map((v) => escalarV(dn, v))) + escalarV(dn, alvo.centro);
-      const t = minRef - maxMovel - folga;
-      centro = centro.map((c, i) => c + dn[i] * t);
-    }
-    if (f.desloca !== undefined) {
-      exigir(Array.isArray(f.desloca) && f.desloca.length === 3 && f.desloca.every(Number.isFinite), `${onde}: "desloca" deve ser [dx, dy, dz] em mm`);
-      centro = centro.map((c, i) => c + f.desloca[i]);
-    }
+    centro = relacionar(centro, () => verticesLocais(pr, m));
     const r = {
       id, forma: f, prisma: pr, centro, matriz: m,
       min: local.min.map((val, i) => val + centro[i]),
@@ -577,7 +836,82 @@ function extrairArcosBorda(anel, normais, olho, mundo, w) {
   return arcos;
 }
 
+/* Sólido em seções (cone, tronco, esfera, caixa chanfrada): cada faixa entre duas seções é uma fileira de faces
+   planas, fatiada no eixo como o prisma reto para a ordem de sobreposição. O sólido é convexo, então as faces
+   voltadas para o observador não se cobrem entre si. Além das silhuetas e dos vincos ao longo das faixas (como no
+   prisma), desenha o contorno dos anéis onde a face visível encontra uma face de trás ou um vinco. */
+function fatiarSecoes(r, olho) {
+  const { b, secoes } = r.prisma;
+  const c = r.centro;
+  const m = r.matriz;
+  const mundo = (u, v, w) => {
+    const pr = aplicarMatriz(ponto3(b, u, v, w), m);
+    return [pr[0] + c[0], pr[1] + c[1], pr[2] + c[2]];
+  };
+  const rotNormal = (nl) => normalizar(aplicarMatriz(nl, m));
+  const eixoN = (s) => rotNormal(ponto3(b, 0, 0, s));
+  const N = secoes[0].perfil.length;
+  const nb = secoes.length - 1;
+  const nm = normaisDasFaixas(r.prisma).map((fk) => fk.map((n) => rotNormal(n)));
+  const cos25 = Math.cos((25 * Math.PI) / 180);
+  const visivel = (k, i) => dot(nm[k][i], olho) > 1e-6;
+  const raioDe = (sc) => Math.max(...sc.perfil.map((q) => Math.hypot(q[0], q[1])));
+  const tampaVisivel = [
+    raioDe(secoes[0]) > 1e-9 && dot(eixoN(-1), olho) > 1e-6,
+    raioDe(secoes[nb]) > 1e-9 && dot(eixoN(1), olho) > 1e-6,
+  ];
+  const comprimentos = secoes.slice(1).map((sc, k) => sc.w - secoes[k].w);
+  const total = comprimentos.reduce((a, x) => a + x, 0);
+  const chunks = [];
+  const tampa = (sc, n, ponta) => ({
+    r, ponta, prof: dot(mundo(0, 0, sc.w), olho), lados: [], dentro: [], linhas: [], arcos: [],
+    tampas: [{ papel: 'tampa', n, pts: sc.perfil.map((q) => mundo(q[0], q[1], sc.w)), furos: [], furo: null }],
+  });
+  if (tampaVisivel[0]) chunks.push(tampa(secoes[0], eixoN(-1), 'inicio'));
+  for (let k = 0; k < nb; k++) {
+    const s0 = secoes[k];
+    const s1 = secoes[k + 1];
+    const fatias = Math.max(1, Math.min(Math.ceil(comprimentos[k] / 5), Math.round((36 * comprimentos[k]) / total)));
+    const noPasso = (t) => ({ w: s0.w + t * (s1.w - s0.w), perfil: s0.perfil.map((q, i) => [q[0] + t * (s1.perfil[i][0] - q[0]), q[1] + t * (s1.perfil[i][1] - q[1])]) });
+    for (let j = 0; j < fatias; j++) {
+      const a = noPasso(j / fatias);
+      const d = noPasso((j + 1) / fatias);
+      const P0 = (i) => mundo(a.perfil[i][0], a.perfil[i][1], a.w);
+      const P1 = (i) => mundo(d.perfil[i][0], d.perfil[i][1], d.w);
+      const lados = [];
+      const linhas = [];
+      const diferentes = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) > 1e-9;
+      for (let i = 0; i < N; i++) {
+        const i2 = (i + 1) % N;
+        const n = nm[k][i];
+        if (!visivel(k, i)) continue;
+        const nPrev = nm[k][(i - 1 + N) % N];
+        const nNext = nm[k][i2];
+        const silA = dot(n, olho) > 0 && dot(nPrev, olho) <= 0;
+        const silD = dot(n, olho) > 0 && dot(nNext, olho) <= 0;
+        const vincA = dot(n, nPrev) < cos25 && dot(n, olho) >= dot(nPrev, olho);
+        const vincD = dot(n, nNext) < cos25 && dot(n, olho) > dot(nNext, olho);
+        lados.push({ papel: 'lado', n, pts: [P0(i), P0(i2), P1(i2), P1(i)] });
+        if ((silA || vincA) && diferentes(P0(i), P1(i))) linhas.push([P0(i), P1(i)]);
+        if ((silD || vincD) && diferentes(P0(i2), P1(i2))) linhas.push([P0(i2), P1(i2)]);
+        if (j === 0 && diferentes(P0(i), P0(i2))
+          && (k === 0 ? !tampaVisivel[0] : (!visivel(k - 1, i) || dot(n, nm[k - 1][i]) < cos25))) linhas.push([P0(i), P0(i2)]);
+        if (j === fatias - 1 && diferentes(P1(i), P1(i2))
+          && (k === nb - 1 ? !tampaVisivel[1] : !visivel(k + 1, i))) linhas.push([P1(i), P1(i2)]);
+      }
+      chunks.push({ r, prof: dot(mundo(0, 0, (a.w + d.w) / 2), olho), lados, dentro: [], linhas, arcos: [], tampas: [] });
+    }
+  }
+  if (tampaVisivel[1]) chunks.push(tampa(secoes[nb], eixoN(1), 'fim'));
+  return chunks;
+}
+
 export function fatiarForma(r, olho) {
+  if (r.partes) {
+    /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
+    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
+  }
+  if (r.prisma.secoes) return fatiarSecoes(r, olho);
   const { b, perfil, furos, furo, comprimento } = r.prisma;
   const furosLista = furos ?? (furo ? [furo] : []);
   const c = r.centro;
@@ -667,6 +1001,7 @@ export function fatiarForma(r, olho) {
       if (!olho || dot(n, olho) > 1e-6) {
         chunks.push({
           r,
+          ponta: 'inicio',
           prof: dot(mundo(0, 0, w0), olho),
           lados: [],
           dentro: [],
@@ -690,6 +1025,7 @@ export function fatiarForma(r, olho) {
       if (!olho || dot(n, olho) > 1e-6) {
         chunks.push({
           r,
+          ponta: 'fim',
           prof: dot(mundo(0, 0, w1), olho),
           lados: [],
           dentro: [],
@@ -1271,7 +1607,7 @@ export function desenharEsboco(esboco) {
         return [pr[0] + it.r.centro[0], pr[1] + it.r.centro[1], pr[2] + it.r.centro[2]];
       };
 
-      if (f.tipo === 'cilindro' || f.tipo === 'anel') {
+      if (f.tipo === 'cilindro' || f.tipo === 'anel' || f.tipo === 'cone') {
         const L = it.r.prisma.comprimento;
         const p1 = mundoDe(0, 0, -L / 2);
         const p2 = mundoDe(0, 0, L / 2);

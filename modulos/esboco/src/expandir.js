@@ -4,13 +4,14 @@
    do núcleo do Mecanifica (92 linhas, nenhum import). Não lê nem grava arquivo. */
 import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js';
 import { ErroDeEsboco } from './index.js';
+import { expandirComponentes } from './componentes.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 
 /* Campos numéricos de uma forma que aceitam número, nome de parâmetro ou "=expressão". */
-const ESCALARES = ['diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'largura', 'altura', 'profundidade', 'raio', 'opacidade'];
+const ESCALARES = ['diametro', 'diametroTopo', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'largura', 'altura', 'profundidade', 'raio', 'raioCurva', 'chanfro', 'opacidade'];
 const VETORES = ['desloca'];
 const VETORES_OU_REFERENCIA = ['centro', 'de', 'para'];
 
@@ -26,7 +27,7 @@ function traduzir(e, contexto, campo, valor, validos) {
 }
 
 /* { num, valores }: `num(v, campo, contexto)` devolve o número de um valor; `valores` são os parâmetros resolvidos. */
-function resolvedor(dict, onde) {
+export function resolvedor(dict, onde) {
   const validos = Object.keys(dict);
   const r = criarResolverNumerico(dict);
   const num = (v, campo, contexto = onde) => {
@@ -45,10 +46,26 @@ function vetor(v, num, campo, contexto) {
   return Array.isArray(v) ? v.map((x, i) => num(x, `${campo}[${i}]`, contexto)) : v;
 }
 
-function numerosDaForma(f, num, contexto) {
+/* Um ponto: vetor (números, parâmetros ou expressões), texto (ponto nomeado ou "<id>.<ancora>", que fica como está)
+   ou { "entre": [A, B], "t" | "mm" | "mmAntes": número }, com A e B pontos e o número resolvido. */
+function ponto(v, num, campo, contexto) {
+  if (Array.isArray(v)) return vetor(v, num, campo, contexto);
+  if (objeto(v) && Array.isArray(v.entre)) {
+    const g = { ...v, entre: v.entre.map((q, i) => ponto(q, num, `${campo}.entre[${i}]`, contexto)) };
+    for (const k of ['t', 'mm', 'mmAntes']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
+    return g;
+  }
+  return v;
+}
+
+export function numerosDaForma(f, num, contexto) {
   const g = { ...f };
   for (const k of ESCALARES) if (g[k] !== undefined) g[k] = num(g[k], k, contexto);
-  for (const k of [...VETORES, ...VETORES_OU_REFERENCIA]) if (g[k] !== undefined) g[k] = vetor(g[k], num, k, contexto);
+  for (const k of VETORES) if (g[k] !== undefined) g[k] = vetor(g[k], num, k, contexto);
+  for (const k of VETORES_OU_REFERENCIA) if (g[k] !== undefined) g[k] = ponto(g[k], num, k, contexto);
+  if (Array.isArray(g.caminho)) g.caminho = g.caminho.map((q, i) => ponto(q, num, `caminho[${i}]`, contexto));
+  if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((q, i) => vetor(q, num, `perfil[${i}]`, contexto));
+  if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
   const r = g.rotacao;
   if (Array.isArray(r)) g.rotacao = vetor(r, num, 'rotacao', contexto);
   else if (typeof r === 'string' || typeof r === 'number') g.rotacao = num(r, 'rotacao', contexto);
@@ -154,6 +171,7 @@ export function expandirEsboco(esboco) {
   const raizTemExpressao = pontosDaRaiz && Object.values(pontosDaRaiz).some((v) => Array.isArray(v) && v.some((x) => typeof x === 'string'));
   if (pontosDaRaiz && !raizTemExpressao) saida.pontos = pontosDaRaiz;
   else delete saida.pontos;
+  const expansoes = [];
   saida.opcoes = esboco.opcoes.map((o, i) => {
     if (!objeto(o)) return o;
     const onde = `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`;
@@ -163,9 +181,12 @@ export function expandirEsboco(esboco) {
     delete g.parametros;
     if (Object.keys(valores).length > 0) g.parametros = valores;
     const fonte = o.formas ?? esboco.formas;
+    let componentes = { pares: [], aliasDeId: () => undefined, instancias: 0 };
     if (Array.isArray(fonte)) {
-      g.formas = expandirArranjos(fonte.map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
+      componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde });
+      g.formas = expandirArranjos(componentes.formas.map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
     }
+    expansoes.push(componentes);
     if (o.contato !== undefined) g.contato = numerosDoContato(o.contato, num, onde);
     if (o.explosao !== undefined) g.explosao = numerosDaExplosao(o.explosao, num, onde);
     if (objeto(o.pontos) || raizTemExpressao) {
@@ -174,6 +195,22 @@ export function expandirEsboco(esboco) {
     }
     return g;
   });
+  /* componentes: o id da instância nos pares do gate é a forma principal dela, e os pares do próprio
+     componente entram em cada opção que o usa, a menos que o esboço já declare o mesmo par */
+  if (expansoes.some((x) => x.instancias > 0)) {
+    const aliasDaRaiz = (id) => expansoes.map((x) => x.aliasDeId(id)).find((a) => a !== undefined);
+    const comAlias = (c, alias) => (objeto(c) && Array.isArray(c.pares) ? { ...c, pares: c.pares.map((p) => (objeto(p) ? { ...p, a: alias(p.a) ?? p.a, b: alias(p.b) ?? p.b } : p)) } : c);
+    if (saida.contato !== undefined) saida.contato = comAlias(saida.contato, aliasDaRaiz);
+    const chave = (p) => (p.a < p.b ? `${p.a}\u0000${p.b}` : `${p.b}\u0000${p.a}`);
+    saida.opcoes = saida.opcoes.map((g, i) => {
+      if (!objeto(g)) return g;
+      let h = g.contato !== undefined ? { ...g, contato: comAlias(g.contato, (id) => expansoes[i].aliasDeId(id) ?? aliasDaRaiz(id)) } : g;
+      const ja = new Set([...(saida.contato?.pares ?? []), ...(h.contato?.pares ?? [])].filter(objeto).map(chave));
+      const novos = expansoes[i].pares.filter((p) => !ja.has(chave(p)));
+      if (novos.length > 0) h = { ...h, contato: { ...(h.contato ?? {}), pares: [...(h.contato?.pares ?? []), ...novos] } };
+      return h;
+    });
+  }
   return saida;
 }
 

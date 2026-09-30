@@ -198,7 +198,14 @@ do naked por `parametros` na opção.
 4. `tubo`, `encostar` e `alinhar`.
 5. `espelho`, `arranja`, `params` e expressões.
 6. O gate propondo o conserto e `--ajustar`.
-7. Componentes e as formas novas.
+7. Componentes e as formas novas. Feita em 2026-09-30: `usa` com `roda`, `garfo`,
+   `quadro` e `mancal` em `modulos/esboco/componentes/`, expandidos em
+   `src/componentes.js` (ids prefixados, parâmetros no escopo do componente,
+   âncoras `<instancia>.<ancora>`, pares do gate, espelho de instância), o ponto
+   `entre`, e as formas `tubo`, `esfera`, `cone` (com tronco), `extrusao` e
+   `chanfro` na caixa, com gate, espelho, arranjo e `--ajustar`. A moto de prova
+   `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números
+   escritos à mão.
 8. Desempenho, esquema do JSON e conferência contra referência.
 9. A moto de prova, as fixtures e o fechamento.
 

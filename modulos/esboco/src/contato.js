@@ -13,7 +13,7 @@
    a folga é a menor entre elas e a penetração é a maior entre as peças, o que
    subestima um cruzamento que atravesse várias fatias do aro. */
 import earcut from 'earcut';
-import { ErroDeEsboco, resolverOpcao } from './index.js';
+import { ErroDeEsboco, normaisDasFaixas, resolverOpcao, subforma } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 
@@ -24,6 +24,8 @@ export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
    não importa o núcleo. */
 export const MINIMO_DO_MOTIVO = 15;
 const SETORES = 32;
+/* Acima deste número de pares de arestas o SAT dos sólidos em seções dispensa os eixos de aresta contra aresta. */
+const LIMITE_DE_ARESTAS = 25000;
 const EPS = 1e-9;
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -82,6 +84,38 @@ function prismaConvexo(r, poligono) {
   return { verts, normais: unicas(normais), arestas: unicas(arestas), min, max };
 }
 
+/* Peça convexa de um sólido em seções (cone, tronco, esfera, caixa chanfrada): a envoltória de todas as
+   seções. As faces laterais são planas (cada faixa entre duas seções é um trapézio), e por isso as normais
+   delas e as arestas de cada seção e de cada ponto ao seguinte bastam para o SAT. */
+function prismaDeSecoes(r) {
+  const { b, secoes } = r.prisma;
+  const M = r.matriz;
+  const mundo = (u, v, w) => somar(r.centro, girar(M, localParaMundo(b, u, v, w)));
+  const verts = [];
+  for (const sc of secoes) {
+    if (sc.perfil.every(([u, v]) => Math.abs(u) < 1e-12 && Math.abs(v) < 1e-12)) verts.push(mundo(0, 0, sc.w));
+    else for (const [u, v] of sc.perfil) verts.push(mundo(u, v, sc.w));
+  }
+  const eixo = girar(M, localParaMundo(b, 0, 0, 1));
+  const normais = [eixo];
+  const arestas = [eixo];
+  for (const faixa of normaisDasFaixas(r.prisma)) for (const n of faixa) normais.push(girar(M, n));
+  secoes.forEach((sc, k) => {
+    const N = sc.perfil.length;
+    for (let i = 0; i < N; i++) {
+      const p = sc.perfil[i]; const q = sc.perfil[(i + 1) % N];
+      arestas.push(girar(M, localParaMundo(b, q[0] - p[0], q[1] - p[1], 0)));
+      if (k > 0) {
+        const a = secoes[k - 1].perfil[i];
+        arestas.push(girar(M, localParaMundo(b, p[0] - a[0], p[1] - a[1], sc.w - secoes[k - 1].w)));
+      }
+    }
+  });
+  const min = [0, 1, 2].map((i) => Math.min(...verts.map((p) => p[i])));
+  const max = [0, 1, 2].map((i) => Math.max(...verts.map((p) => p[i])));
+  return { verts, normais: unicas(normais), arestas: unicas(arestas), min, max, limitaArestas: true };
+}
+
 /* Peças convexas de uma forma resolvida. */
 export function pecasDe(r) {
   if (!memoPecas.has(r)) memoPecas.set(r, pecasSemMemoria(r));
@@ -94,6 +128,8 @@ const memoPecas = new WeakMap();
 const memoPares = new WeakMap();
 
 function pecasSemMemoria(r) {
+  if (r.partes) return r.partes.flatMap((pt) => pecasDe(subforma(r, pt)));
+  if (r.prisma.secoes) return [prismaDeSecoes(r)];
   const { perfil, furos } = r.prisma;
   if (furos.length === 0) return [prismaConvexo(r, perfil)];
   if (r.forma.tipo === 'anel') {
@@ -196,7 +232,12 @@ function distanciaConvexa(A, B) {
    vetor unitário em que A se afasta de B com o menor deslocamento. */
 function sobreposicaoConvexa(A, B) {
   const eixos = [...A.normais, ...B.normais];
-  for (const ea of A.arestas) for (const eb of B.arestas) eixos.push(cross(ea, eb));
+  /* Entre sólidos de muitas faces (esfera, cone) os produtos vetoriais das arestas passam de dezenas de milhares
+     de eixos: aí só as normais das faces valem, o que nunca subestima a penetração (só a superestima, e só
+     quando o GJK já disse que as peças se cruzam). */
+  if (!((A.limitaArestas || B.limitaArestas) && A.arestas.length * B.arestas.length > LIMITE_DE_ARESTAS)) {
+    for (const ea of A.arestas) for (const eb of B.arestas) eixos.push(cross(ea, eb));
+  }
   let menor = Infinity; let dirA = null;
   for (const e of unicas(eixos)) {
     let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;

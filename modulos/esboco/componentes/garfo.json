@@ -1,0 +1,27 @@
+{
+  "componente": "garfo",
+  "descricao": "Perna de garfo entre dois pontos: tronco de cone embaixo (a perna), bengala no meio e coroa em cima, todos no mesmo eixo, de `de` (a roda) a `para` (o cabeçote). O ângulo e o comprimento saem dos dois pontos; `desloca` afasta a perna para o lado.",
+  "principal": "bengala",
+  "parametros": {
+    "diametro": 46,
+    "diametroPerna": 54,
+    "alturaPerna": 200,
+    "diametroCoroa": 56,
+    "alturaCoroa": 50
+  },
+  "entradas": { "de": null, "para": null, "desloca": null },
+  "formas": [
+    { "id": "perna", "tipo": "cone", "diametro": "diametroPerna", "diametroTopo": "=(diametroPerna+diametro)/2", "de": "@de", "para": { "entre": ["@de", "@para"], "mm": "alturaPerna" }, "desloca": "@desloca", "cor": "laranja" },
+    { "id": "bengala", "tipo": "cilindro", "diametro": "diametro", "de": { "entre": ["@de", "@para"], "mm": "alturaPerna" }, "para": { "entre": ["@de", "@para"], "mmAntes": "alturaCoroa" }, "desloca": "@desloca", "cor": "laranja" },
+    { "id": "coroa", "tipo": "cilindro", "diametro": "diametroCoroa", "de": { "entre": ["@de", "@para"], "mmAntes": "alturaCoroa" }, "para": "@para", "desloca": "@desloca", "cor": "laranja" }
+  ],
+  "ancoras": {
+    "centro": "bengala.centro",
+    "eixo": "perna.inicio",
+    "topo": "coroa.fim"
+  },
+  "pares": [
+    { "a": "perna", "b": "bengala", "tipo": "encosta" },
+    { "a": "bengala", "b": "coroa", "tipo": "encosta" }
+  ]
+}

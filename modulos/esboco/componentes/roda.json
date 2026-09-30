@@ -1,0 +1,34 @@
+{
+  "componente": "roda",
+  "descricao": "Roda de moto com o eixo em x: pneu (anel), disco que preenche o aro e um cubo de cada lado do disco. A origem é o centro do pneu.",
+  "principal": "pneu",
+  "parametros": {
+    "diametro": 610,
+    "aro": 420,
+    "largura": 125,
+    "espessuraDisco": "=largura/3",
+    "diametroCubo": 90,
+    "salienciaCubo": 30
+  },
+  "entradas": { "centro": null, "sobre": null, "alinha": null, "encosta": null, "desloca": null },
+  "formas": [
+    { "id": "pneu", "tipo": "anel", "diametroExterno": "diametro", "diametroInterno": "aro", "espessura": "largura", "eixo": "x", "centro": "@centro", "sobre": "@sobre", "alinha": "@alinha", "encosta": "@encosta", "desloca": "@desloca", "cor": "preto" },
+    { "id": "disco", "tipo": "cilindro", "diametro": "aro", "comprimento": "espessuraDisco", "eixo": "x", "centro": "pneu.centro", "cor": "cinza" },
+    { "id": "cuboE", "tipo": "cilindro", "diametro": "diametroCubo", "comprimento": "salienciaCubo", "eixo": "x", "ponta": { "id": "disco", "lado": "-x" }, "cor": "cinza" },
+    { "id": "cuboD", "tipo": "cilindro", "diametro": "diametroCubo", "comprimento": "salienciaCubo", "eixo": "x", "ponta": { "id": "disco", "lado": "+x" }, "cor": "cinza" }
+  ],
+  "ancoras": {
+    "eixo": "pneu.centro",
+    "topo": "pneu.+y",
+    "fundo": "pneu.-y",
+    "frente": "pneu.+z",
+    "tras": "pneu.-z",
+    "lateralE": "cuboE.-x",
+    "lateralD": "cuboD.+x"
+  },
+  "pares": [
+    { "a": "pneu", "b": "disco", "tipo": "encosta" },
+    { "a": "disco", "b": "cuboE", "tipo": "encosta" },
+    { "a": "disco", "b": "cuboD", "tipo": "encosta" }
+  ]
+}

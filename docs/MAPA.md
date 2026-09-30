@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-836 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+840 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -60,7 +60,7 @@
 
 ## .claude/skills/esbocar-opcoes/
 
-- `SKILL.md` — Mostrar à pessoa, em imagem, as opções de forma em disputa durante o alinhamento — cilindros, anéis e caixas desenhados lado a lado na mesma escala a partir …
+- `SKILL.md` — Mostrar à pessoa, em imagem, as opções de forma em disputa durante o alinhamento — cilindros, anéis, caixas, cones, esferas, extrusões, tubos e componentes p…
 
 ## .claude/skills/laco-de-modelagem/
 
@@ -352,9 +352,14 @@
 - `PLANO-ESTADO-DA-ARTE.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
 - `README.md` — @mecanifica/esboco
 
+## modulos/esboco/componentes/
+
+- `index.js` — Biblioteca de componentes do esboço: cada `<nome>.json` desta pasta descreve um componente parametrizado (parâmetros, entradas, formas, âncoras e pares do ga…
+
 ## modulos/esboco/src/
 
 - `ajustar.js` — `--ajustar`: aplica no JSON declarado as sugestões de contato do gate e reexecuta o gate, até aprovar, até uma rodada não reduzir os achados ou até o limite …
+- `componentes.js` — Componentes parametrizados: `{ "id": "rodaFrente", "usa": "roda", "parametros": {...}, "centro": [...] }` numa lista de formas vira as formas do componente, …
 - `conserto.js` — Conserto proposto pelo gate: para cada achado de contato, qual forma mover, em que vetor e por quê. Trabalha sobre o esboço já expandido (números, sem expres…
 - `contato.js` — Contato do esboço: gate opt-in de colisão, folga e conjunto conectado entre as formas de cada opção. A geometria é a que o desenho já monta (`resolverOpcao`:…
 - `descrever.js` — Leitura do esboço em texto: cada forma resolvida, as âncoras, o grafo de contatos 3D, as formas soltas e as sobreposições (3D e por vista), sem desenhar nada…
@@ -364,10 +369,12 @@
 
 ## modulos/esboco/tests/
 
+- `componentes.test.js` — Componentes parametrizados (`usa`): expansão com ids prefixados, parâmetros no escopo do componente, entradas, âncoras expostas, pares do gate, espelho de in…
 - `conserto.test.js` — Conserto proposto pelo gate e `--ajustar`: qual forma se move, quanto, e o gate aprovando depois.
 - `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
 - `descrever.test.js` — Leitura do esboço em texto (`--descrever`, `--descrever --mudou`) e âncoras nomeadas.
 - `esboco.test.js` — Contrato do esboço: posição relativa por sobre/ponta, recusa de referência inexistente e PNG no tamanho que o desenho declara.
+- `formas.test.js` — Formas novas: esfera, cone e tronco, extrusão de polígono, chanfro em caixa e tubo por pontos, em desenho, âncoras, gate de contato, espelho e arranjo, leitu…
 - `parametros.test.js` — Parâmetros e expressões, formas herdadas da raiz, `espelha` e `arranja`, e o legado byte a byte.
 - `posicao.test.js` — Posicionar sem calcular coordenada: haste `de`/`para`, `encosta`, `alinha` e pontos nomeados.
 - `projecao.test.js` — Sobreposição na projeção: silhuetas que se cobrem sem penetração 3D, explosão e opacidade.

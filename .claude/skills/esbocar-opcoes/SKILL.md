@@ -1,6 +1,6 @@
 ---
 name: esbocar-opcoes
-description: Mostrar à pessoa, em imagem, as opções de forma em disputa durante o alinhamento — cilindros, anéis e caixas desenhados lado a lado na mesma escala a partir de um JSON declarativo, junto da foto de referência, com uma frase por opção e a pergunta de qual se parece mais. Use no alinhamento sempre que houver escolha de forma. Não use para desenhar a peça final nem prancha cotada.
+description: Mostrar à pessoa, em imagem, as opções de forma em disputa durante o alinhamento — cilindros, anéis, caixas, cones, esferas, extrusões, tubos e componentes prontos desenhados lado a lado na mesma escala a partir de um JSON declarativo, junto da foto de referência, com uma frase por opção e a pergunta de qual se parece mais. Use no alinhamento sempre que houver escolha de forma. Não use para desenhar a peça final nem prancha cotada.
 ---
 
 # Esboçar opções de forma
@@ -14,7 +14,7 @@ diz como usá-la no alinhamento.
 
 ## Pare e planeje
 
-Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Como cada peça será detalhada com caixa, cilindro e anel, dizendo o que não dá para representar (tubo, perfil, esfera). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. E as regras de contato: o gate `contato: { usar: true }` fica ligado por padrão quando o esboço tem 4 ou mais formas por opção, e desligá-lo é uma decisão que se escreve no `plano` com o motivo (por exemplo, conceito solto de proporção com peças sem relação entre si). Com o gate ligado, decida a tolerância, a penetração e as exceções declaradas: `atravessa` com o `max` esperado e o `motivo`, `encosta`, `livre` com o `motivo`. Declare `atravessa` só onde uma peça de fato passa pela outra (eixo em furo, anel em volta de cubo) e prefira desenhar as demais peças encostadas em vez de sobrepostas. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Como cada peça será detalhada com caixa (com `raio` ou `chanfro`), cilindro, anel, cone, esfera, extrusão de polígono convexo, tubo por pontos ou um componente pronto (`roda`, `garfo`, `quadro`, `mancal`), dizendo o que não dá para representar (perfil côncavo, curva livre). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. E as regras de contato: o gate `contato: { usar: true }` fica ligado por padrão quando o esboço tem 4 ou mais formas por opção, e desligá-lo é uma decisão que se escreve no `plano` com o motivo (por exemplo, conceito solto de proporção com peças sem relação entre si). Com o gate ligado, decida a tolerância, a penetração e as exceções declaradas: `atravessa` com o `max` esperado e o `motivo`, `encosta`, `livre` com o `motivo`. Declare `atravessa` só onde uma peça de fato passa pela outra (eixo em furo, anel em volta de cubo) e prefira desenhar as demais peças encostadas em vez de sobrepostas. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
 
 ## Escrever e rodar
 
@@ -30,9 +30,13 @@ com barra de 100 mm. Cada forma tem `id`, `tipo`, `cor` e `rotulo` opcional,
 que sai fora do desenho como legenda numerada com linha de chamada. Com `legendas: "lista"` (raiz ou opção) o rótulo vira balão numerado sobre a peça e chave numerada abaixo do desenho, sem linha de chamada nem colunas laterais; a peça totalmente atrás de outra ganha balão tracejado na borda de quem a cobre e "(oculta nesta vista)" na chave.
 
 Os tipos são `caixa` (`largura` x, `altura` y, `profundidade` z, `raio` de
-canto e `furos: [{ diametro, centro: [x, z] }]`), `cilindro` (`diametro`,
-`comprimento`, `eixo`, `achatado`) e `anel` (`diametroExterno`,
-`diametroInterno`, `espessura`, `eixo`). Não há tubo, perfil nem esfera.
+canto ou `chanfro` nas doze arestas, e `furos: [{ diametro, centro: [x, z] }]`),
+`cilindro` (`diametro`, `comprimento`, `eixo`, `achatado`), `anel`
+(`diametroExterno`, `diametroInterno`, `espessura`, `eixo`), `cone`
+(`diametro` da base, `diametroTopo` para o tronco, `comprimento`, `eixo`),
+`esfera` (`diametro`), `extrusao` (`perfil: [[u, v], ...]` convexo,
+`comprimento`, `eixo`) e `tubo` (`caminho` de 2 ou mais pontos, `diametro`,
+`raioCurva`). Não há perfil côncavo nem curva livre.
 
 Posicione pela relação e não por coordenada: a primeira forma leva
 `centro: [0, 0, 0]`; as demais usam `sobre: "<id>"` (base no topo daquela) ou
@@ -40,6 +44,12 @@ Posicione pela relação e não por coordenada: a primeira forma leva
 o ajuste fino. `rotacao: [rx, ry, rz]` em graus gira pela regra da mão direita
 em torno do eixo de mundo: rx=+90 leva +y para +z, ry=+90 leva +z para +x e
 rz=+90 leva +x para +y.
+
+## Formas novas e componentes
+
+Para um garfo, uma barra dobrada ou um tubo de quadro, escreva `{ "id": "tubo", "tipo": "tubo", "diametro": 24, "raioCurva": 40, "caminho": ["tronco.+y", [-140, 300, 0], [130, 300, 0], "cunha.+y"] }`: cada ponto é um vetor, um ponto nomeado ou uma âncora, o canto vira um arco de seções retas com `raioCurva` (sem ele, uma esfera na junta) e nada de centro, comprimento ou ângulo é calculado. Um ponto ao longo de uma haste é `{ "entre": [A, B], "mm": 90 }` (a 90 mm de A), `{ "entre": [A, B], "mmAntes": 40 }` (a 40 mm de B) ou `{ "entre": [A, B], "t": 0.25 }`, em `centro`, `de`, `para`, `alinha.com` e no `caminho`. `cone` com `diametroTopo` é o tronco, `extrusao` tem o centro no centro da caixa do perfil e `chanfro` na caixa não combina com `raio` nem com `furos`. O tubo, o espelho e o arranjo se combinam (o espelho copia o tubo inteiro).
+
+Antes de modelar uma roda, um garfo, um quadro de caixas ou um mancal à mão, use o componente: `{ "id": "rodaFrente", "usa": "roda", "parametros": { "diametro": "=2*raioRoda" }, "centro": [0, "raioRoda", "=entreEixos/2"], "rotulo": "roda_frente" }` e `{ "id": "garfoE", "usa": "garfo", "de": "rodaFrente.eixo", "para": "quadro.cabecote", "desloca": [-100, 0, 0] }`. As formas saem com o id prefixado (`rodaFrente.pneu`), as âncoras do componente valem como `<instancia>.<ancora>` (`rodaFrente.eixo`, `quadro.cabecote`), o id da instância sozinho é a forma principal (`sobre: "quadro"`), os pares do gate do componente entram sozinhos e o garfo direito é `{ "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x" } }`. Os parâmetros, as entradas (`centro`, `de`, `para`, `desloca`...) e as âncoras de cada componente estão no README do módulo e em `modulos/esboco/componentes/<nome>.json`. Cite as outras partes do componente pelo id com prefixo (`quadro.coluna`, `rodaFrente.disco`) e, num par do gate, declare `atravessa` para a parte que de fato atravessa (o guidão na coroa: `garfoE.coroa`). O `--descrever` marca cada forma como "principal" ou "parte" do componente, e o `--ajustar` só move a principal (pela instância). O exemplo é `modulos/esboco/tests/fixtures/moto-componentes.esboco.json`.
 
 ## Limpar o desenho
 

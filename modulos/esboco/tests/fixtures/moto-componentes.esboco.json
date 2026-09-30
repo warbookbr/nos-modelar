@@ -1,0 +1,37 @@
+{
+  "vista": "isometrica",
+  "plano": "A moto de moto-parametros reescrita com componentes: duas rodas, um garfo e um quadro de caixas, sem nenhum centro calculado à mão. A roda dá o eixo dela (rodaFrente.eixo), o garfo vai desse eixo ao cabeçote do quadro (quadro.cabecote) com o ângulo e o comprimento saindo dos dois pontos, e o garfo direito é o espelho do esquerdo. O motor, o tanque, o banco, o balancim e o guidão são formas simples posicionadas por relação. A única exceção do gate é o guidão que atravessa a coroa do garfo.",
+  "linhasCentro": false,
+  "legendas": "lista",
+  "parametros": {
+    "entreEixos": 1400,
+    "raioRoda": 305,
+    "diametroRoda": "=2*raioRoda",
+    "alturaMotor": 380,
+    "alturaColuna": 240,
+    "larguraGuidao": 760
+  },
+  "contato": {
+    "usar": true,
+    "pares": [
+      { "a": "guidao", "b": "garfoE.coroa", "tipo": "atravessa", "max": 20, "motivo": "a presilha do guidão abraça a coroa do garfo" }
+    ]
+  },
+  "formas": [
+    { "id": "rodaTras", "usa": "roda", "parametros": { "diametro": "diametroRoda", "largura": 140 }, "centro": [0, "raioRoda", "=-entreEixos/2"], "rotulo": "1. roda_traseira" },
+    { "id": "rodaFrente", "usa": "roda", "parametros": { "diametro": "diametroRoda" }, "centro": [0, "raioRoda", "=entreEixos/2"], "rotulo": "2. roda_frente" },
+    { "id": "motor", "tipo": "caixa", "largura": 260, "altura": 300, "profundidade": 380, "raio": 40, "centro": [0, "alturaMotor", 0], "cor": "cinza", "rotulo": "3. motor" },
+    { "id": "quadro", "usa": "quadro", "parametros": { "alturaColuna": "alturaColuna" }, "sobre": "motor", "rotulo": "4. quadro" },
+    { "id": "tanque", "tipo": "caixa", "largura": 300, "altura": 200, "profundidade": 420, "raio": 80, "sobre": "quadro", "encosta": { "referencia": "quadro.coluna", "direcao": "+z" }, "cor": "vermelho", "rotulo": "5. tanque" },
+    { "id": "banco", "tipo": "caixa", "largura": 240, "altura": 90, "profundidade": 520, "raio": 40, "sobre": "rodaTras", "encosta": { "referencia": "tanque", "direcao": "+z" }, "cor": "preto", "rotulo": "6. banco" },
+    { "id": "balancimE", "tipo": "caixa", "largura": 40, "altura": 70, "profundidade": 520, "centro": "rodaTras.eixo", "alinha": { "com": "motor.-x", "eixos": ["x"] }, "encosta": { "referencia": "motor", "direcao": "+z" }, "cor": "azul", "rotulo": "7. balancim" },
+    { "id": "balancimD", "espelha": { "forma": "balancimE", "eixo": "x" } },
+    { "id": "garfoE", "usa": "garfo", "de": "rodaFrente.eixo", "para": "quadro.cabecote", "desloca": [-100, 0, 0], "rotulo": "8. garfo" },
+    { "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x" } },
+    { "id": "guidao", "tipo": "cilindro", "diametro": 26, "comprimento": "larguraGuidao", "eixo": "x", "sobre": "quadro.coluna", "cor": "cinza", "rotulo": "9. guidao" }
+  ],
+  "opcoes": [
+    { "id": "naked", "titulo": "A. Naked", "nota": "Coluna alta e guidão largo" },
+    { "id": "cafe", "titulo": "B. Café racer", "nota": "Coluna baixa e guidão estreito, o cabeçote desce", "parametros": { "alturaColuna": 180, "larguraGuidao": 540 } }
+  ]
+}

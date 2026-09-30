@@ -59,7 +59,7 @@ describe('haste entre dois pontos (de/para)', () => {
     expect(() => resolver([{ ...garfo, para: garfo.de }])).toThrow(/mesmo ponto/);
     expect(() => resolver([{ ...garfo, para: undefined }])).toThrow(/vêm juntos/);
     expect(() => resolver([{ ...garfo, para: 'nada' }])).toThrow(/ponto nomeado \(pontos: nenhum\)/);
-    expect(() => resolver([{ id: 'a', tipo: 'anel', diametroExterno: 9, diametroInterno: 1, espessura: 2, de: [0, 0, 0], para: [0, 1, 0] }])).toThrow(/só em cilindro e caixa/);
+    expect(() => resolver([{ id: 'a', tipo: 'anel', diametroExterno: 9, diametroInterno: 1, espessura: 2, de: [0, 0, 0], para: [0, 1, 0] }])).toThrow(/só em cilindro, caixa e cone/);
   });
 });
 

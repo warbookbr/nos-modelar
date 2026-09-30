@@ -8,6 +8,12 @@ const mm1 = (x) => arred1(x).toString().replace('.', ',');
 const vetorTexto = (v) => `[${v.map(mm1).join(' ')}]`;
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 
+/* Um ponto pode ser texto ("<id>.<ancora>"), vetor ou { "entre": [A, B] }, que cita os dois pontos. */
+function citaPonto(v, cita) {
+  if (typeof v === 'string') cita(v);
+  else if (objeto(v) && Array.isArray(v.entre)) for (const q of v.entre) citaPonto(q, cita);
+}
+
 /* Ids de formas que a forma cita para se posicionar (encosta, alinha, sobre, ponta, de/para, centro por
    âncora "<id>.<ancora>", espelho e arranjo). Pontos nomeados não são forma e ficam de fora. */
 export function alvosDaForma(f, ids) {
@@ -22,16 +28,17 @@ export function alvosDaForma(f, ids) {
   else if (objeto(f.ponta)) cita(f.ponta.id);
   else cita(f.ponta);
   if (objeto(f.encosta)) cita(f.encosta.referencia);
-  if (objeto(f.alinha)) cita(f.alinha.com);
+  if (objeto(f.alinha)) citaPonto(f.alinha.com, cita);
   if (objeto(f.espelha)) cita(f.espelha.forma);
   if (objeto(f.arranjoDe)) { cita(f.arranjoDe.fonte); cita(f.arranjoDe.centro); }
-  for (const k of ['centro', 'de', 'para']) cita(f[k]);
+  for (const k of ['centro', 'de', 'para']) citaPonto(f[k], cita);
+  if (Array.isArray(f.caminho)) for (const q of f.caminho) citaPonto(q, cita);
   return alvos;
 }
 
 /* A posição da forma sai de outra forma (a menos de `centro` numérico simples). */
 export function temRelacaoDePosicao(f) {
-  return ['sobre', 'ponta', 'encosta', 'alinha', 'espelha', 'arranjoDe', 'de', 'para'].some((k) => f[k] !== undefined)
+  return ['sobre', 'ponta', 'encosta', 'alinha', 'espelha', 'arranjoDe', 'de', 'para', 'caminho'].some((k) => f[k] !== undefined)
     || (f.centro !== undefined && !(Array.isArray(f.centro) && f.centro.every((x) => typeof x === 'number')));
 }
 
@@ -82,6 +89,13 @@ export function criarConserto(formas, resolvidas) {
     return { fonte: atual, delta: v, cadeia };
   };
 
+  /* Forma de um componente que não é a principal: a edição da instância a moveria junto com as outras partes, e por
+     isso ela não é movida sozinha (só a principal, que a instância posiciona). */
+  const parteDeComponente = (id) => {
+    const d = porId.get(id)?.daInstancia;
+    return Boolean(d && !d.principal);
+  };
+
   const descricaoDaRelacao = (f, alvo) => {
     const partes = [];
     if (f.sobre === alvo) partes.push('sobre');
@@ -97,7 +111,7 @@ export function criarConserto(formas, resolvidas) {
      desfaria o conserto, pois a dependente acompanha). Se as duas servem, a de menor volume; se
      nenhuma serve, nenhuma. */
   const escolher = (a, b) => {
-    const serve = (x, y) => !arrasta(fonteDe(x, [0, 0, 0]).fonte).has(y) && fonteDe(x, [0, 0, 0]).fonte !== fonteDe(y, [0, 0, 0]).fonte;
+    const serve = (x, y) => !parteDeComponente(fonteDe(x, [0, 0, 0]).fonte) && !arrasta(fonteDe(x, [0, 0, 0]).fonte).has(y) && fonteDe(x, [0, 0, 0]).fonte !== fonteDe(y, [0, 0, 0]).fonte;
     const sa = serve(a, b); const sb = serve(b, a);
     if (sa && sb) {
       const va = volumes.get(a) ?? 0; const vb = volumes.get(b) ?? 0;
@@ -117,8 +131,9 @@ export function criarConserto(formas, resolvidas) {
     const { fonte, delta: dFonte, cadeia } = fonteDe(mover, delta);
     const d = dFonte.map(arred1);
     const alvoTexto = fonte === mover ? mover : `${fonte} (fonte de ${mover}: ${cadeia.join(', ')})`;
-    const texto = `mova ${alvoTexto} em ${vetorTexto(d)} mm (${motivo})`;
-    return { forma: mover, fonte, delta: d, mm: arred1(Math.hypot(...d)), texto, motivo, aplicavel: d.some((c) => c !== 0), arrasta: [...arrasta(fonte)].sort(), ...extra };
+    const parte = parteDeComponente(fonte);
+    const texto = `mova ${alvoTexto} em ${vetorTexto(d)} mm (${motivo})${parte ? `; ${fonte} é parte do componente ${porId.get(fonte).daInstancia.id} e não se move sozinha: ajuste a instância` : ''}`;
+    return { forma: mover, fonte, delta: d, mm: arred1(Math.hypot(...d)), texto, motivo, aplicavel: !parte && d.some((c) => c !== 0), arrasta: [...arrasta(fonte)].sort(), ...extra };
   };
 
   return {

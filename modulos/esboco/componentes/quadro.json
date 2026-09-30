@@ -1,0 +1,27 @@
+{
+  "componente": "quadro",
+  "descricao": "Quadro de caixas: uma viga longa no eixo z e a coluna da direção, uma caixa vertical pousada sobre a viga na ponta da frente (+z). A âncora `cabecote` é o topo da coluna.",
+  "principal": "viga",
+  "parametros": {
+    "comprimento": 560,
+    "largura": 80,
+    "altura": 60,
+    "larguraColuna": 140,
+    "alturaColuna": 240,
+    "profundidadeColuna": 240
+  },
+  "entradas": { "centro": null, "sobre": null, "ponta": null, "alinha": null, "encosta": null, "desloca": null },
+  "formas": [
+    { "id": "viga", "tipo": "caixa", "largura": "largura", "altura": "altura", "profundidade": "comprimento", "centro": "@centro", "sobre": "@sobre", "ponta": "@ponta", "alinha": "@alinha", "encosta": "@encosta", "desloca": "@desloca", "cor": "cinza" },
+    { "id": "coluna", "tipo": "caixa", "largura": "larguraColuna", "altura": "alturaColuna", "profundidade": "profundidadeColuna", "ponta": { "id": "viga", "lado": "+z" }, "encosta": { "referencia": "viga", "direcao": "-y" }, "cor": "cinza" }
+  ],
+  "ancoras": {
+    "cabecote": "coluna.+y",
+    "frente": "coluna.+z",
+    "tras": "viga.-z",
+    "topo": "viga.+y"
+  },
+  "pares": [
+    { "a": "viga", "b": "coluna", "tipo": "encosta" }
+  ]
+}

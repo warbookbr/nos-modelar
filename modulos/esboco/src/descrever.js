@@ -17,7 +17,7 @@ export const RUIDO_MM = 0.05;
 
 function eixoDe(r) {
   const t = r.forma.tipo;
-  if (t === 'caixa') return null;
+  if (t === 'caixa' || t === 'esfera' || t === 'tubo') return null;
   return r.forma.eixo ?? 'y';
 }
 

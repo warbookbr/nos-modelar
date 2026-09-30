@@ -1,0 +1,34 @@
+{
+  "componente": "mancal",
+  "descricao": "Mancal com o eixo em z: base com dois furos de fixação, alojamento em anel sobre a base e um eixo que passa pelo furo do alojamento.",
+  "principal": "base",
+  "parametros": {
+    "larguraBase": 140,
+    "alturaBase": 20,
+    "profundidadeBase": 80,
+    "raioBase": 8,
+    "distanciaDosFuros": 104,
+    "diametroDosFuros": 12,
+    "diametroAlojamento": 70,
+    "diametroFuro": 40,
+    "espessuraAlojamento": 40,
+    "diametroEixo": 36,
+    "comprimentoEixo": 120
+  },
+  "entradas": { "centro": null, "sobre": null, "ponta": null, "alinha": null, "encosta": null, "desloca": null },
+  "formas": [
+    { "id": "base", "tipo": "caixa", "largura": "larguraBase", "altura": "alturaBase", "profundidade": "profundidadeBase", "raio": "raioBase", "furos": [{ "diametro": "diametroDosFuros", "centro": ["=-distanciaDosFuros/2", 0] }, { "diametro": "diametroDosFuros", "centro": ["=distanciaDosFuros/2", 0] }], "centro": "@centro", "sobre": "@sobre", "ponta": "@ponta", "alinha": "@alinha", "encosta": "@encosta", "desloca": "@desloca", "cor": "cinza" },
+    { "id": "alojamento", "tipo": "anel", "diametroExterno": "diametroAlojamento", "diametroInterno": "diametroFuro", "espessura": "espessuraAlojamento", "eixo": "z", "sobre": "base", "cor": "azul" },
+    { "id": "eixo", "tipo": "cilindro", "diametro": "diametroEixo", "comprimento": "comprimentoEixo", "eixo": "z", "centro": "alojamento.centro", "cor": "laranja" }
+  ],
+  "ancoras": {
+    "eixo": "alojamento.centro",
+    "pontaTras": "eixo.inicio",
+    "pontaFrente": "eixo.fim",
+    "topo": "alojamento.+y"
+  },
+  "pares": [
+    { "a": "base", "b": "alojamento", "tipo": "encosta" },
+    { "a": "alojamento", "b": "eixo", "tipo": "atravessa", "max": 4, "motivo": "o eixo passa pelo furo do alojamento" }
+  ]
+}
