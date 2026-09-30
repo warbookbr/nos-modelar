@@ -42,14 +42,12 @@ gerando o mesmo desenho, byte a byte.
 
 ## Estado de partida
 
-O módulo `modulos/esboco/` tinha numeração automática, `linhasCentro`, `ocultar`,
-legendas em lista, o campo `plano`, o "Pare e planeje" e o "Pare e analise" e o
-gate de contato opt-in. Esta seção é o que este plano não refaz.
+O módulo `modulos/esboco/` tinha numeração, `linhasCentro`, `ocultar`, legendas
+em lista, o campo `plano`, o "Pare e planeje" e o gate de contato opt-in.
 
 ## O que o estudo do Mecanifica decidiu
 
-Um estudo de leitura, feito em 2026-09-29, mediu cada mecanismo contra o esboço.
-Só dois arquivos entram como estão: `procedural/nucleo/expressoes.js`, que
+Um estudo de leitura de 2026-09-29 mediu cada mecanismo contra o esboço. Só dois arquivos entram como estão: `procedural/nucleo/expressoes.js`, que
 aceita número, nome de parâmetro e `"=a+b*c"`, tem 92 linhas, nenhum import e
 teste, e a função `poseQueEncaixa` de `src/autoria/posicao-por-porta.js`, pura,
 que já calcula o centro e o ângulo de uma haste entre dois pontos (o garfo da
@@ -65,14 +63,10 @@ e `auditar-intersecoes-montagem`, que devolve estado sem milímetros e roda sete
 vezes mais devagar. O gate do esboço fica no módulo, porque mede distância e
 penetração em mm.
 
-O que o esboço deve herdar é o contrato de declaração do Mecanifica: toda
-exceção declara `motivo` de pelo menos 15 caracteres, `atravessa` exige `max`, e
-`livre`, que hoje cala o par por completo, deixa de existir como saída livre.
-Hoje a moto tem cinco pares `atravessa` sem `max`, que nunca reprovam, e a
-coluna e o tanque se atravessam 20 mm sem alarme. Em `modulos/esboco/` já existe
-uma proposta, `PLANO-ESTADO-DA-ARTE.md`, fora de `planos/` e aguardando
-aprovação, que propõe `de` e `para` e espelho; este plano a absorve, e ela é
-apagada ou marcada como substituída na fatia 1.
+O esboço herda o contrato de declaração do Mecanifica: toda exceção declara
+`motivo` de pelo menos 15 caracteres, `atravessa` exige `max`, e `livre`, que
+cala o par por completo, deixa de ser saída livre. O `PLANO-ESTADO-DA-ARTE.md`
+do módulo, que propunha `de`, `para` e espelho, foi absorvido por este plano.
 
 ## Filtro Agent-First
 
@@ -115,11 +109,8 @@ módulo, que é a referência do formato.
   montagem v5 com o resolvedor, os `vinculos`, as `etapas` e o `PLANO`
   estruturado do Mecanifica, e a chamada a `auditar-intersecoes-montagem`;
 - uma linguagem de comandos incrementais (`adiciona`, `encosta`, `espelha`),
-  ADIADA: ela seria uma camada fina sobre as relações e as âncoras das fatias 2,
-  4 e 5, e o `--descrever --mudou` já dá a leitura passo a passo. Volta se, depois
-  dessas fatias, a IA ainda errar por escrever o esboço todo de uma vez; nesse
-  caso os comandos gravam a relação no JSON (não as coordenadas), o gate só roda
-  no comando `verificar`, e o vocabulário sai do mesmo esquema do JSON;
+  REABERTA na fatia 10 só como `--editar <forma>.<campo>=<valor>`, porque a moto
+  nova gastou 20 remendos em Python; o resto da linguagem segue adiado;
 - importar a malha de uma peça real dentro do esboço;
 - render tridimensional com sombreamento e cotas dimensionais na imagem, que
   são o fluxo da prancha;
@@ -212,7 +203,10 @@ módulo, que é a referência do formato.
     manda o crítico cego), e cada unidade guarda caixa e portas (na moto curva,
     11 unidades e 13 portas). `--envelope <unidade> <detalhado>` confere caixa
     e portas, e com `plano.envelope` o Portão do Detalhe o exige.
-20. `npm run gates --completo` passa.
+20. A moto nova refeita pelo fluxo da fatia 10 escreve menos de metade do código
+    auxiliar (Python ou JSON avulso) da rodada de 2026-09-30, sem nenhum script
+    fora da ferramenta, medido no transcript.
+21. `npm run gates --completo` passa.
 
 ## Fatias
 
@@ -244,24 +238,30 @@ módulo, que é a referência do formato.
    (`--achado`), o `plano` estruturado (`nivel`, `medidas`, `contrato`), o esquema
    do JSON com "quis dizer" e o Condutor (estágios, Portão, Plano de detalhe,
    Marco), descritos no README do módulo. Nomes: Condutor (a máquina de estados
-   do fluxo), Maquete (formas primitivas com dimensões e posições corretas),
-   Plano de detalhe (o algoritmo que agrupa e ordena), Unidade de detalhe (uma
-   peça, ou as peças de acoplamento apertado), Envelope (o volume da maquete que
-   a peça detalhada não ultrapassa, com as portas nos mesmos lugares), Portão de
-   estágio e Marco (o crítico visual a cada 25%). Mapeamento para o Mecanifica: a
-   Unidade de detalhe é a etapa da montagem, o Envelope é o gate de encaixe da
-   ponte, o Portão é o aceite por etapa e o Condutor generaliza o `objeto`. Fora
-   desta fatia: o Envelope e o despacho do crítico pelo Condutor. O módulo
-   passou de 299 para 367 testes, e `npm run gates` fecha com 32/32 verdes.
+   do fluxo), Maquete, Plano de detalhe, Unidade de detalhe, Envelope, Portão
+   de estágio e Marco, todos descritos no README do módulo e mapeados ao
+   Mecanifica (a Unidade é a etapa da montagem, o Envelope é o gate de encaixe da
+   ponte, o Portão é o aceite por etapa). Fora desta fatia: o Envelope e o
+   despacho do crítico pelo Condutor. O módulo passou de 299 para 367 testes, e `npm run gates` fecha com 32/32 verdes.
 9. A referência e o fluxo. Feito em 2026-09-30: o fluxo na skill e no
-   `PARE-E-ANALISE.md`, a proibição de auditar por legenda numerada, o Pare e
-   planeje produzindo `plano.nivel`, `plano.medidas` e `plano.contrato`; e, nesta
-   parte, a conferência contra a foto (`plano.referencia`, `--referencia`, com a
-   sobreposição em imagem), `--medidas-da-referencia` (origem `referencia`), o
-   Envelope e o `--envelope`, as fixtures com `.esperado.json` (moto curva com o
-   Condutor completo, mancal e casa) e o SVG e PNG regenerados de `mancal-eixo` e
-   `teste-cubo`. O módulo passou de 367 para 419 testes. Falta o fechamento: o
-   aceite da pessoa (item 8), o Fechamento e mover o plano para encerrados.
+   `PARE-E-ANALISE.md`, a proibição de auditar por legenda, o Pare e planeje com
+   `plano.nivel`, `plano.medidas` e `plano.contrato`, a conferência contra a foto
+   (`plano.referencia`, `--referencia`), `--medidas-da-referencia`, o Envelope e
+   `--envelope`, e as fixtures com `.esperado.json`. O módulo passou de 367 para
+   419 testes. Falta o fechamento: o aceite da pessoa (item 8), o Fechamento e
+   mover o plano para encerrados.
+10. A análise do transcript da moto nova (47 min, 138 chamadas, 106 KB dos 146
+   KB escritos em Python que gera ou remenda o JSON, 14 recusas, 108 juntas em 29%
+   do arquivo, 2/3 delas dentro da mesma unidade) pediu: `unidade` declarada na
+   forma ou instância, com o algoritmo só como sugestão, `--mover` em lote e por
+   instância, e `--replanejar` que preserva o agrupamento; junta dentro da mesma
+   unidade sem declaração, com `motivo` e `max` só entre unidades; `--detalhar
+   <unidade>` (arquivo isolado, as outras ocultas) e `--integrar <unidade>
+   <arquivo>` sem zerar o Condutor, com o gate aceitando instância oculta e junta
+   com peça oculta; `--editar`; `estilos` e cor herdada por unidade, simetria
+   implícita e perfis gerados por função (estrela, arco); caminhos relativos
+   pelo diretório do chamador (`INIT_CWD`), saída resumida do Condutor, `--forma`
+   sem desenho e Envelope por forma.
 
 ## Riscos e desvios
 
