@@ -270,3 +270,13 @@ A preencher.
 
 O candidato principal é [as partes do braço](congelados/2026-09-26-as-partes-do-braco.md),
 congelado em 2026-09-29 para dar lugar a este.
+
+A ponte entre o esboço e o Mecanifica também fica para depois. O esboço
+exportaria um esqueleto de montagem com uma parte por forma, com posição,
+medidas, portas nas âncoras e as relações do contrato. O Mecanifica abriria cada
+parte como um rascunho com o volume do esboço, a IA trocaria o rascunho pela
+forma real, e o gate conferiria que a peça real cabe no volume do esboço e
+mantém as portas nos mesmos lugares. O esboço passaria a ser o lugar onde se
+acerta a composição e a proporção, e o núcleo cuidaria só da forma de cada peça.
+Isso exige decidir antes como o módulo, hoje independente do núcleo, entrega o
+esqueleto sem importá-lo.
