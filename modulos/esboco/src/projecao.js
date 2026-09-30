@@ -176,6 +176,29 @@ function achadosDaOpcao(ctx, formas) {
   return saida;
 }
 
+/* Menor deslocamento, em mm, de uma das duas formas ao longo de um eixo do mundo (x, y ou z, nos dois sentidos)
+   que zera a cobertura entre elas NA VISTA dada. Só informação: afastar peças contraria a montagem.
+   Um deslocamento na direção do olho não muda a silhueta, e por isso o eixo é escolhido pela medida.
+   Devolve null se nenhum eixo até a soma das diagonais das duas formas separa o par. */
+export function deslocamentoQueZera(ra, rb, vista) {
+  const diag = (r) => Math.hypot(r.max[0] - r.min[0], r.max[1] - r.min[1], r.max[2] - r.min[2]);
+  const limite = diag(ra) + diag(rb);
+  const mover = (r, k, t) => ({ ...r, centro: r.centro.map((x, i) => (i === k ? x + t : x)), min: r.min.map((x, i) => (i === k ? x + t : x)), max: r.max.map((x, i) => (i === k ? x + t : x)) });
+  const livre = (quem, k, t) => medirProjecaoDaOpcao(quem === 'a' ? [mover(ra, k, t), rb] : [ra, mover(rb, k, t)], vista).pares.length === 0;
+  let melhor = null;
+  for (const quem of ['a', 'b']) for (let k = 0; k < 3; k++) for (const sinal of [1, -1]) {
+    if (!livre(quem, k, sinal * limite)) continue;
+    let lo = 0; let hi = limite;
+    while (hi - lo > 0.25) { const m = (lo + hi) / 2; if (livre(quem, k, sinal * m)) hi = m; else lo = m; }
+    let t = Math.ceil(hi * 10) / 10;
+    while (!livre(quem, k, sinal * t) && t < limite) t = Math.round((t + 0.1) * 10) / 10;
+    if (!melhor || t < melhor.mm - 1e-9) melhor = { forma: quem === 'a' ? ra.id : rb.id, eixo: EIXOS[k], mm: t, delta: [0, 1, 2].map((i) => (i === k ? sinal * t : 0)) };
+  }
+  if (!melhor) return null;
+  const v = melhor.delta.map((c) => String(c).replace('.', ',')).join(' ');
+  return { ...melhor, vista, aplicavel: false, texto: `mova ${melhor.forma} em [${v}] mm (zera a cobertura na vista ${vista}; só informação, afastar peças contraria a montagem)` };
+}
+
 /* Fatores que a sugestão experimenta, do mais discreto ao teto: de 1,2 em passos de 0,2 até 2,4, e 2,5. */
 export const FATORES_DA_SUGESTAO = [1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.5];
 
@@ -210,7 +233,7 @@ function sugerirExplosao(ctx) {
    contrário devolve `resultado: 'desligado'` sem medir. `contato.projecao` ({ limiar, reprova })
    pode ser declarado na raiz e na opção, que sobrepõe a raiz. Com `sugerir`, cada opção com
    achado e sem `explosao` declarada ganha em `explosao` o eixo que mais separa o que se cobre. */
-export function verificarProjecao(bruto, { forcar = false, sugerir = false, resolvidas: prontas } = {}) {
+export function verificarProjecao(bruto, { forcar = false, sugerir = false, deslocar = sugerir, resolvidas: prontas } = {}) {
   const esboco = expandirEsboco(bruto);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -252,6 +275,7 @@ export function verificarProjecao(bruto, { forcar = false, sugerir = false, reso
     const doOpcao = achadosDaOpcao(ctx, rs).map(({ p, folga, alternativa }) => ({
       opcao: titulo, tipo: TIPO_DO_ACHADO, vista: p.vista, pecas: [p.a, p.b], cobre: p.cobre, coberta: p.coberta,
       fracao: arred3(p.fracao), area_mm2: arred(p.area_mm2), folga_mm: arred(folga), alternativa,
+      ...(deslocar ? { sugestao: deslocamentoQueZera(rs.find((r) => r.id === p.a), rs.find((r) => r.id === p.b), p.vista) } : {}),
     }));
     const ordemDeVista = Object.keys(VISTAS);
     doOpcao.sort((x, y) => ordemDeVista.indexOf(x.vista) - ordemDeVista.indexOf(y.vista) || y.fracao - x.fracao);

@@ -366,8 +366,9 @@ describe('legado byte a byte', () => {
     const j = lerFixture(`${nome}.esboco.json`);
     const [svg, texto, contato] = HASHES_DE_ANTES[nome];
     expect(sha(desenharEsboco(j).svg)).toBe(svg);
-    expect(sha(formatarDescricao(descreverEsboco(j)))).toBe(texto);
-    expect(sha(JSON.stringify(verificarContato(j)))).toBe(contato);
+    /* a fatia 6 acrescentou a `sugestao` aos achados de contato; o resto da leitura e do relato é o de antes */
+    expect(sha(formatarDescricao(descreverEsboco(j)).replace(/; sugestão: .*$/gm, ''))).toBe(texto);
+    expect(sha(JSON.stringify(verificarContato(j), (k, v) => (k === 'sugestao' ? undefined : v)))).toBe(contato);
   }, 60000);
 });
 

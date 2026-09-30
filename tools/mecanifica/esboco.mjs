@@ -11,6 +11,7 @@ import { descreverAchado, descreverAtravessamento, descreverSilenciado, verifica
 import { descreverProjecao, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
 import { descreverEsboco, diferenca, formatarDescricao } from '../../modulos/esboco/src/descrever.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
+import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
@@ -84,6 +85,7 @@ export function lerZoomDoEsboco(texto) {
   return { vista, caixa: [x0, y0, x1, y1] };
 }
 
+const semArrasto = ({ arrasta, ...resto }) => resto;
 const declaraExplosao = (esboco) => esboco.explosao !== undefined || (esboco.opcoes ?? []).some((o) => o.explosao !== undefined);
 
 export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros = false } = {}) {
@@ -94,6 +96,10 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
   const esboco = expandirEsboco(bruto);
   const contato = verificarContato(esboco);
   const projecao = verificarProjecao(esboco, { forcar: true, sugerir: true });
+  const sugestoes = [
+    ...contato.achados.filter((a) => a.sugestao).map((a) => ({ origem: 'contato', opcao: a.opcao, achado: a.tipo, pecas: a.pecas, ...semArrasto(a.sugestao) })),
+    ...projecao.achados.filter((a) => a.sugestao).map((a) => ({ origem: 'projecao', opcao: a.opcao, achado: a.tipo, vista: a.vista, pecas: a.pecas, ...semArrasto(a.sugestao) })),
+  ];
   const parametros = Object.fromEntries((esboco.opcoes ?? []).flatMap((o, i) => (o?.parametros ? [[o.titulo ?? `Opção ${i + 1}`, o.parametros]] : [])));
   const pedidoDeZoom = zoom ? lerZoomDoEsboco(zoom) : null;
   const pasta = caminho.replace(/(\.esboco)?\.json$/i, '') + '-analise';
@@ -189,6 +195,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     plano: typeof esboco.plano === 'string' ? esboco.plano : null,
     ...(Object.keys(parametros).length > 0 ? { parametros } : {}),
     contato,
+    sugestoes,
     projecao: { usar: projecao.usar, limiar: projecao.limiar, reprova: projecao.reprova, resultado: projecao.resultado, porVista: projecao.porVista, explosao: projecao.explosao, variantes },
     escalaPxPorMm: escalas,
     arquivos,
@@ -211,7 +218,7 @@ export async function gerarEsboco(arquivo) {
 
 function relatarContato(c) {
   if (!c.usar) return '';
-  const linhas = c.achados.map((a) => `  ${descreverAchado(a)}`);
+  const linhas = c.achados.map((a) => `  ${descreverAchado(a)}${a.sugestao ? `\n    sugestão: ${a.sugestao.texto}` : ''}`);
   const atravessa = c.atravessamentos.map((t) => `  ${descreverAtravessamento(t)}`);
   const silenciados = c.silenciados.map((t) => `  ${descreverSilenciado(t)}`);
   const v = (x) => String(x).replace('.', ',');
@@ -221,7 +228,7 @@ function relatarContato(c) {
 /* Achados de projeção junto do relato do contato: informativos, a menos que `contato.projecao.reprova` seja true. */
 function relatarProjecao(p) {
   if (!p.usar) return '';
-  const linhas = Object.values(p.porVista).flat().map((a) => `  ${descreverProjecao(a)}`);
+  const linhas = Object.values(p.porVista).flat().map((a) => `  ${descreverProjecao(a)}${a.sugestao ? `\n    sugestão (só informação): ${a.sugestao.texto}` : ''}`);
   const explosao = p.explosao.map((e) => `  explosão ${e.origem} [${e.opcao}]: eixo ${e.eixo}, fator ${String(e.fator).replace('.', ',')}; com ela os ${e.achados_antes} achados de projeção viram ${e.achados_depois}${e.achados_depois > 0 ? ' (resíduo)' : ''}${e.escala_relativa ? `; escala ${Math.round(Math.min(...Object.values(e.escala_relativa)) * 100)}% da normal no mínimo${e.fator_sugerido !== e.fator ? `, fator reduzido de ${String(e.fator_sugerido).replace('.', ',')} para caber` : ''}` : ''}${e.aviso ? `; AVISO: ${e.aviso}` : ''}${e.origem === 'sugerida' ? ' (imagens *-explodida-legendas.png; declare "explosao" no JSON para desenhar assim)' : ''}`);
   return `sobreposição na projeção (limiar ${Math.round(p.limiar * 100)}%${p.reprova ? ', reprova' : ', informativo'}): ${p.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${explosao.length ? `${explosao.join('\n')}\n` : ''}`;
 }
@@ -244,12 +251,29 @@ export function descreverArquivo(arquivo, { mudou = false, json = false } = {}) 
   return { texto, descricao: atual, diferenca: d };
 }
 
+/* `--ajustar`: grava `<nome>.ajustado.esboco.json` ao lado, com as sugestões de contato aplicadas, e nunca
+   toca o original. Sem nenhuma forma movida, não grava nada. */
+export function ajustarArquivo(arquivo) {
+  const caminho = resolve(arquivo);
+  const texto = readFileSync(caminho, 'utf8');
+  const resultado = ajustarEsboco(JSON.parse(texto));
+  const destino = `${caminho.replace(/(\.esboco)?\.json$/i, '')}.ajustado.esboco.json`;
+  const moveu = resultado.rodadas.some((r) => !r.descartada && r.movidos.length > 0);
+  if (moveu) writeFileSync(destino, serializarComoOriginal(resultado.esboco, texto));
+  return { resultado, destino: moveu ? destino : null };
+}
+
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--mudou] [--json]] [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--mudou] [--json]] [--ajustar] [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
   const estrito = argv.includes('--estrito');
   try {
     if (argv.includes('--mudou') && !argv.includes('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
+    if (argv.includes('--ajustar')) {
+      const { resultado, destino } = ajustarArquivo(alvo);
+      process.stdout.write(`${formatarAjuste(resultado, descreverAchado)}\n${destino ? `gravado em ${destino} (o original não foi alterado)` : 'nenhum arquivo gravado'}\n${relatarContato(resultado.final)}`);
+      return resultado.aprovado ? 0 : 1;
+    }
     if (argv.includes('--descrever')) {
       process.stdout.write(descreverArquivo(alvo, { mudou: argv.includes('--mudou'), json: argv.includes('--json') }).texto);
       return 0;

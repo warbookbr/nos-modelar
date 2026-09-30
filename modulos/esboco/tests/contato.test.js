@@ -204,7 +204,7 @@ describe('contato do esboço', () => {
     const par = (max) => ({ pares: [atravessa('a', 'b', max)] });
     const estoura = verificarContato(esboco(f, par(8)));
     expect(estoura.resultado).toBe('reprovado');
-    expect(estoura.achados).toEqual([{ opcao: 'T', tipo: 'atravessa-excedido', pecas: ['a', 'b'], mm: 10, max: 8 }]);
+    expect(estoura.achados).toMatchObject([{ opcao: 'T', tipo: 'atravessa-excedido', pecas: ['a', 'b'], mm: 10, max: 8 }]);
     expect(descreverAchado(estoura.achados[0])).toBe('[T] atravessa excedido: a e b se atravessam 10,0 mm, acima do máximo declarado de 8,0 mm');
     expect(estoura.atravessamentos).toEqual([{ opcao: 'T', a: 'a', b: 'b', penetracao_mm: 10, max_mm: 8 }]);
     const cabe = verificarContato(esboco(f, par(10)));

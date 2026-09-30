@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-833 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+836 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -354,6 +354,8 @@
 
 ## modulos/esboco/src/
 
+- `ajustar.js` — `--ajustar`: aplica no JSON declarado as sugestões de contato do gate e reexecuta o gate, até aprovar, até uma rodada não reduzir os achados ou até o limite …
+- `conserto.js` — Conserto proposto pelo gate: para cada achado de contato, qual forma mover, em que vetor e por quê. Trabalha sobre o esboço já expandido (números, sem expres…
 - `contato.js` — Contato do esboço: gate opt-in de colisão, folga e conjunto conectado entre as formas de cada opção. A geometria é a que o desenho já monta (`resolverOpcao`:…
 - `descrever.js` — Leitura do esboço em texto: cada forma resolvida, as âncoras, o grafo de contatos 3D, as formas soltas e as sobreposições (3D e por vista), sem desenhar nada…
 - `expandir.js` — Parâmetros, expressões, formas herdadas da raiz e arranjos: a etapa que transforma o JSON declarado num JSON simples, só com números, antes de qualquer outra…
@@ -362,6 +364,7 @@
 
 ## modulos/esboco/tests/
 
+- `conserto.test.js` — Conserto proposto pelo gate e `--ajustar`: qual forma se move, quanto, e o gate aprovando depois.
 - `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
 - `descrever.test.js` — Leitura do esboço em texto (`--descrever`, `--descrever --mudou`) e âncoras nomeadas.
 - `esboco.test.js` — Contrato do esboço: posição relativa por sobre/ponta, recusa de referência inexistente e PNG no tamanho que o desenho declara.

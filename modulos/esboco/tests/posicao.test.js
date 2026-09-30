@@ -221,7 +221,8 @@ describe('compatibilidade', () => {
     for (const [nome, [svg, texto]] of Object.entries(esperado)) {
       const j = fixture(nome);
       expect(sha(desenharEsboco(j).svg), nome).toBe(svg);
-      expect(sha(formatarDescricao(descreverEsboco(j))), nome).toBe(texto);
+      /* a fatia 6 acrescentou a sugestão ao achado da moto; o resto da leitura é o de antes */
+      expect(sha(formatarDescricao(descreverEsboco(j)).replace(/; sugestão: .*$/gm, '')), nome).toBe(texto);
     }
   });
 

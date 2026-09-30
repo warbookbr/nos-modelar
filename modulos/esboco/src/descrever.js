@@ -97,6 +97,7 @@ export function descreverEsboco(bruto) {
       sobreposicoes3d,
       projecao: projecaoDaOpcao,
       achadosDeContato: (gate?.achados ?? []).filter((a) => a.opcao === titulo).map(descreverAchado),
+      sugestoesDeContato: (gate?.achados ?? []).filter((a) => a.opcao === titulo).map((a) => a.sugestao?.texto ?? null),
     };
   });
   return { opcoes: resultado };
@@ -123,7 +124,7 @@ export function formatarDescricao(d) {
     for (const s of o.soltas) L.push(`solta: ${s} fora do maior grupo conectado`);
     for (const s of o.sobreposicoes3d) L.push(`sobreposição 3D: ${s.a} e ${s.b} se atravessam ${mm1(s.penetracao_mm)} mm${s.declarado ? ' (atravessa declarado)' : ''}`);
     for (const p of o.projecao) L.push(`sobreposição na vista ${p.vista}: ${p.cobre} cobre ${p.cobre === p.a ? p.b : p.a} em ${Math.round(p.fracao * 100)}% (par ${p.a} e ${p.b}, folga real ${mm1(p.folga_mm)} mm)`);
-    for (const a of o.achadosDeContato) L.push(`achado de contato: ${a}`);
+    for (const [k, a] of o.achadosDeContato.entries()) L.push(`achado de contato: ${a}${o.sugestoesDeContato?.[k] ? `; sugestão: ${o.sugestoesDeContato[k]}` : ''}`);
     if (o.contatos.length === 0 && o.formas.length > 1) L.push('nenhum contato entre as formas');
   }
   return `${L.join('\n')}\n`;

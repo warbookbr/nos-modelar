@@ -15,6 +15,7 @@
 import earcut from 'earcut';
 import { ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
+import { criarConserto } from './conserto.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
 /* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
@@ -167,8 +168,9 @@ function subconjuntos(pts) {
   return melhor;
 }
 
-/* Distância entre duas peças convexas (0 se se tocam ou se cruzam). GJK. */
-function distanciaConvexa(A, B) {
+/* GJK entre duas peças convexas: { d, v }, com d a distância (0 se se tocam ou se cruzam) e v o vetor
+   `pontoDeA - pontoDeB` entre os pontos mais próximos (nulo quando d é 0). */
+function gjk(A, B) {
   let d = sub(A.verts[0], B.verts[0]);
   let simplex = [sub(apoio(A.verts, d), apoio(B.verts, escala(d, -1)))];
   let v = simplex[0];
@@ -176,29 +178,39 @@ function distanciaConvexa(A, B) {
     const r = subconjuntos(simplex);
     v = r.p; simplex = r.sel.map((i) => simplex[i]);
     const v2 = norma2(v);
-    if (v2 < 1e-18 || simplex.length === 4) return 0;
+    if (v2 < 1e-18 || simplex.length === 4) return { d: 0, v: [0, 0, 0] };
     const w = sub(apoio(A.verts, escala(v, -1)), apoio(B.verts, v));
-    if (v2 - dot(v, w) <= 1e-10 * v2) return Math.sqrt(v2);
-    if (simplex.some((s) => norma2(sub(s, w)) < 1e-20)) return Math.sqrt(v2);
+    if (v2 - dot(v, w) <= 1e-10 * v2) return { d: Math.sqrt(v2), v };
+    if (simplex.some((s) => norma2(sub(s, w)) < 1e-20)) return { d: Math.sqrt(v2), v };
     simplex.push(w);
   }
-  return Math.sqrt(norma2(v));
+  return { d: Math.sqrt(norma2(v)), v };
 }
 
-/* Menor sobreposição entre eixos de separação (peças que se cruzam). SAT. */
-function penetracaoConvexa(A, B) {
+/* Distância entre duas peças convexas (0 se se tocam ou se cruzam). */
+function distanciaConvexa(A, B) {
+  return gjk(A, B).d;
+}
+
+/* Menor sobreposição entre eixos de separação (peças que se cruzam). SAT. Devolve também `dirA`, o
+   vetor unitário em que A se afasta de B com o menor deslocamento. */
+function sobreposicaoConvexa(A, B) {
   const eixos = [...A.normais, ...B.normais];
   for (const ea of A.arestas) for (const eb of B.arestas) eixos.push(cross(ea, eb));
-  let menor = Infinity;
+  let menor = Infinity; let dirA = null;
   for (const e of unicas(eixos)) {
     let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
     for (const p of A.verts) { const t = dot(p, e); if (t < a0) a0 = t; if (t > a1) a1 = t; }
     for (const p of B.verts) { const t = dot(p, e); if (t < b0) b0 = t; if (t > b1) b1 = t; }
     const s = Math.min(a1 - b0, b1 - a0);
-    if (s < 0) return 0;
-    if (s < menor) menor = s;
+    if (s < 0) return { p: 0, dirA: null };
+    if (s < menor) { menor = s; dirA = a1 - b0 <= b1 - a0 ? escala(e, -1) : e; }
   }
-  return menor === Infinity ? 0 : menor;
+  return menor === Infinity ? { p: 0, dirA: null } : { p: menor, dirA };
+}
+
+function penetracaoConvexa(A, B) {
+  return sobreposicaoConvexa(A, B).p;
 }
 
 function folgaAABB(a, b) {
@@ -226,6 +238,25 @@ function medirParSemMemoria(pecasA, pecasB) {
     if (p > penetracao) penetracao = p;
   }
   return { folga, penetracao };
+}
+
+/* O par em detalhe, para o conserto: { folga, penetracao, separa, aproxima }. `separa` é a direção unitária
+   em que a forma A se afasta de B com o menor deslocamento (o eixo de separação mínima do SAT, na peça de
+   maior penetração) e `aproxima` a direção em que A se aproxima de B pelo segmento entre os pontos mais
+   próximos. Só se pede para quem tem achado, e por isso não usa memória. */
+export function detalharPar(pecasA, pecasB) {
+  let folga = Infinity; let penetracao = 0; let separa = null; let aproxima = null;
+  for (const a of pecasA) for (const b of pecasB) {
+    const { d, v } = gjk(a, b);
+    if (d > 1e-7) {
+      if (d < folga) { folga = d; aproxima = escala(v, -1 / d); }
+      continue;
+    }
+    folga = 0; aproxima = null;
+    const s = sobreposicaoConvexa(a, b);
+    if (s.p > penetracao) { penetracao = s.p; separa = s.dirA; }
+  }
+  return { folga, penetracao, separa, aproxima };
 }
 
 const numMm = (v, onde) => {
@@ -306,6 +337,7 @@ export function herdarDoEspelho(pares, opcao) {
 }
 
 const arred = (x) => Math.round(x * 10) / 10;
+const mmTxt = (x) => arred(x).toString().replace('.', ',');
 
 /* Contrato de declaração: `atravessa` e `livre` são exceções e exigem `motivo` de
    pelo menos MINIMO_DO_MOTIVO caracteres; `atravessa` exige também `max` (mm), pois
@@ -394,12 +426,22 @@ export function verificarContato(bruto, { resolvidas: prontas } = {}) {
     const rs = resolvidas[i];
     const pecas = rs.map(pecasDe);
     const n = rs.length;
+    const conserto = criarConserto(o.formas ?? [], rs);
+    /* margem da colisão: metade da penetração aceita, no mínimo 1 mm, sem passar de 90% da tolerância
+       (uma folga maior que a tolerância desligaria as duas formas e trocaria a colisão por `voando`) */
+    const margem = Math.min(Math.max(1, penMax / 2), tol * 0.9);
     const achadosDaOpcao = [];
     const atravessamentosDaOpcao = [];
     const silenciadosDaOpcao = [];
     const ligados = Array.from({ length: n }, () => []);
     const menorFolga = Array(n).fill(Infinity);
     const folgas = Array.from({ length: n }, () => Array(n).fill(Infinity));
+    /* forma `a` (índice) até a metade da tolerância da forma `b` (índice), pelo segmento dos pontos mais próximos */
+    const sugerirAproximacao = (a, b, motivo) => {
+      if (b < 0 || !Number.isFinite(folgas[a][b]) || folgas[a][b] - tol / 2 <= 0) return null;
+      const d = detalharPar(pecas[a], pecas[b]);
+      return d.aproxima ? conserto.forma(rs[a].id, d.aproxima, folgas[a][b] - tol / 2, motivo) : null;
+    };
     for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) {
       const tipo = tipos.get(chave(rs[a].id, rs[b].id));
       if (tipo === 'livre') {
@@ -413,21 +455,31 @@ export function verificarContato(bruto, { resolvidas: prontas } = {}) {
       if (tipo === 'atravessa' || folga <= tol) { ligados[a].push(b); ligados[b].push(a); }
       const par = [rs[a].id, rs[b].id];
       if (tipo === 'encosta') {
-        if (folga > tol) achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(folga), detalhe: 'folga' });
-        else if (penetracao > penMax) achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(penetracao), detalhe: 'penetracao' });
+        if (folga > tol) {
+          const d = detalharPar(pecas[a], pecas[b]);
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(folga), detalhe: 'folga', sugestao: d.aproxima ? conserto.par(par[0], par[1], d.aproxima, folga, `o par devia encostar e há ${mmTxt(folga)} mm de folga`) : null });
+        } else if (penetracao > penMax) {
+          const d = detalharPar(pecas[a], pecas[b]);
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(penetracao), detalhe: 'penetracao', sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao, `o par devia encostar e se penetra ${mmTxt(penetracao)} mm`) : null });
+        }
       } else if (tipo === 'atravessa') {
         const max = maximos.get(chave(rs[a].id, rs[b].id));
         if (arred(penetracao) > 0) {
           atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), ...(max === undefined ? {} : { max_mm: arred(max) }) });
         }
-        if (max !== undefined && penetracao > max) achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(max) });
+        if (max !== undefined && penetracao > max) {
+          const d = detalharPar(pecas[a], pecas[b]);
+          const sobra = penetracao - max + 0.1;
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(max), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, sobra, `a travessia de ${mmTxt(penetracao)} mm passa ${mmTxt(penetracao - max)} mm do máximo de ${mmTxt(max)} mm; mais 0,1 mm de folga de arredondamento`) : null });
+        }
       } else if (penetracao > penMax) {
-        achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao) });
+        const d = detalharPar(pecas[a], pecas[b]);
+        achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao + margem, `penetração de ${mmTxt(penetracao)} mm mais margem de ${mmTxt(margem)} mm`) : null });
       }
     }
     for (let a = 0; a < n; a++) {
       if (n > 1 && menorFolga[a] !== Infinity && menorFolga[a] > folgaMax) {
-        achadosDaOpcao.push({ opcao: titulo, tipo: 'longe', pecas: [rs[a].id], mm: arred(menorFolga[a]) });
+        achadosDaOpcao.push({ opcao: titulo, tipo: 'longe', pecas: [rs[a].id], mm: arred(menorFolga[a]), sugestao: sugerirAproximacao(a, folgas[a].indexOf(menorFolga[a]), `a peça mais próxima está a ${mmTxt(menorFolga[a])} mm; a folga vai a metade da tolerância (${mmTxt(tol / 2)} mm)`) });
       }
     }
     /* grupos conectados; o maior (empate: o que contém a primeira forma) é o principal */
@@ -446,7 +498,8 @@ export function verificarContato(bruto, { resolvidas: prontas } = {}) {
         if (tipos.get(chave(rs[a].id, rs[b].id)) === 'livre') continue;
         ate = Math.min(ate, folgas[a][b]);
       }
-      achadosDaOpcao.push({ opcao: titulo, tipo: 'voando', pecas: [rs[a].id], mm: Number.isFinite(ate) ? arred(ate) : null });
+      const vizinho = principal.filter((b) => tipos.get(chave(rs[a].id, rs[b].id)) !== 'livre' && folgas[a][b] === ate)[0];
+      achadosDaOpcao.push({ opcao: titulo, tipo: 'voando', pecas: [rs[a].id], mm: Number.isFinite(ate) ? arred(ate) : null, sugestao: vizinho === undefined ? null : sugerirAproximacao(a, vizinho, `a peça fica a ${mmTxt(ate)} mm de ${rs[vizinho].id}, do grupo conectado; a folga vai a metade da tolerância (${mmTxt(tol / 2)} mm)`) });
     }
     achados.push(...achadosDaOpcao);
     atravessamentos.push(...atravessamentosDaOpcao);
