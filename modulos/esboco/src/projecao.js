@@ -219,7 +219,7 @@ export function verificarProjecao(esboco, { forcar = false, sugerir = false, res
   const desligado = { usar: false, limiar: null, reprova: false, resultado: 'desligado', achados: [], porVista: {}, explosao: [], opcoes: [] };
   if (!opcoes.some((_, i) => ativa(i))) return desligado;
 
-  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`).filter((r) => r.forma.oculto !== true));
+  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos).filter((r) => r.forma.oculto !== true));
   const { padraoPen, padraoTol } = padroesDoContato(resolvidas);
   const limiarRaiz = projRaiz.limiar ?? LIMIAR_PADRAO;
   const reprovaRaiz = projRaiz.reprova === true;

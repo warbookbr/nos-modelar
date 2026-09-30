@@ -1,0 +1,34 @@
+{
+  "vista": "isometrica",
+  "plano": "A moto naked da fixture moto.esboco.json reescrita por relações: garfos por de/para entre o eixo da roda e o cabeçote, guidão no cabeçote, quadro sobre o motor, coluna na frente do quadro e apoiada nele, tanque sobre o quadro e encostado na coluna, banco sobre a roda de trás e encostado no tanque, balancins encostados no motor e alinhados na altura da roda de trás. Só as duas rodas, o motor, o cabeçote e as medidas das caixas ficam com número escrito à mão.",
+  "linhasCentro": false,
+  "pontos": { "cabecote": [0, 898, 421.5] },
+  "contato": {
+    "usar": true,
+    "pares": [
+      { "a": "guidao", "b": "garfoE", "tipo": "atravessa", "max": 15, "motivo": "a presilha do guidão abraça a bengala do garfo" },
+      { "a": "guidao", "b": "garfoD", "tipo": "atravessa", "max": 15, "motivo": "a presilha do guidão abraça a bengala do garfo" }
+    ]
+  },
+  "opcoes": [
+    {
+      "id": "naked",
+      "titulo": "A. Naked",
+      "nota": "Guidão alto e banco reto",
+      "formas": [
+        { "id": "rodaTras", "tipo": "anel", "diametroExterno": 620, "diametroInterno": 420, "espessura": 140, "eixo": "x", "centro": [0, 310, -700], "cor": "preto", "rotulo": "1. roda_traseira" },
+        { "id": "rodaFrente", "tipo": "anel", "diametroExterno": 600, "diametroInterno": 420, "espessura": 110, "eixo": "x", "centro": [0, 300, 700], "cor": "preto", "rotulo": "2. roda_frente" },
+        { "id": "motor", "tipo": "caixa", "largura": 260, "altura": 300, "profundidade": 380, "raio": 30, "centro": [0, 380, 0], "cor": "cinza", "rotulo": "3. motor" },
+        { "id": "quadro", "tipo": "caixa", "largura": 80, "altura": 60, "profundidade": 560, "sobre": "motor", "cor": "cinza", "rotulo": "4. quadro" },
+        { "id": "coluna", "tipo": "caixa", "largura": 140, "altura": 240, "profundidade": 240, "ponta": { "id": "quadro", "lado": "+z" }, "encosta": { "referencia": "quadro", "direcao": "-y" }, "cor": "cinza", "rotulo": "5. coluna" },
+        { "id": "tanque", "tipo": "caixa", "largura": 300, "altura": 200, "profundidade": 420, "raio": 80, "sobre": "quadro", "encosta": { "referencia": "coluna", "direcao": "+z" }, "cor": "vermelho", "rotulo": "6. tanque" },
+        { "id": "banco", "tipo": "caixa", "largura": 240, "altura": 90, "profundidade": 520, "raio": 40, "sobre": "rodaTras", "encosta": { "referencia": "tanque", "direcao": "+z" }, "cor": "preto", "rotulo": "7. banco" },
+        { "id": "balancimE", "tipo": "caixa", "largura": 40, "altura": 70, "profundidade": 520, "desloca": [-105, 0, 0], "alinha": { "com": "rodaTras", "eixos": ["y"] }, "encosta": { "referencia": "motor", "direcao": "+z" }, "cor": "azul", "rotulo": "8. balancim" },
+        { "id": "balancimD", "tipo": "caixa", "largura": 40, "altura": 70, "profundidade": 520, "desloca": [105, 0, 0], "alinha": { "com": "rodaTras", "eixos": ["y"] }, "encosta": { "referencia": "motor", "direcao": "+z" }, "cor": "azul" },
+        { "id": "garfoE", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "cabecote", "desloca": [-90, 0, 0], "cor": "laranja", "rotulo": "9. garfo" },
+        { "id": "garfoD", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "cabecote", "desloca": [90, 0, 0], "cor": "laranja" },
+        { "id": "guidao", "tipo": "cilindro", "diametro": 26, "comprimento": 760, "eixo": "x", "centro": "cabecote", "cor": "cinza", "rotulo": "10. guidao" }
+      ]
+    }
+  ]
+}

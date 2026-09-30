@@ -229,22 +229,83 @@ export function ancorasDe(r) {
   return a;
 }
 
-/* Resolve `"<id>.<ancora>"` no lugar do vetor de `centro`. */
-function ancoraDe(ref, onde, porId, resolver, visitando) {
+/* Resolve `"<id>.<ancora>"` no lugar de um vetor (`centro`, `de`, `para`, `alinha.com`). */
+function ancoraDe(ref, onde, porId, resolver, visitando, campo = 'centro') {
   const ponto = ref.lastIndexOf('.');
   const id = ponto > 0 ? ref.slice(0, ponto) : ref;
   const nome = ponto > 0 ? ref.slice(ponto + 1) : '';
-  exigir(ponto > 0, `${onde}: "centro" como referência "${ref}" deve ter a forma "<id>.<ancora>", por exemplo "${id}.centro"`);
-  exigir(porId.has(id), `${onde}: "centro" aponta para "${ref}", mas a forma "${id}" não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
+  exigir(ponto > 0, `${onde}: "${campo}" como referência "${ref}" deve ter a forma "<id>.<ancora>", por exemplo "${id}.centro"`);
+  exigir(porId.has(id), `${onde}: "${campo}" aponta para "${ref}", mas a forma "${id}" não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
   const validas = nomesDeAncoras(porId.get(id).tipo);
-  exigir(validas.includes(nome), `${onde}: "centro" aponta para "${ref}", mas a forma "${id}" (${porId.get(id).tipo}) não tem a âncora "${nome}" (válidas: ${validas.join(', ')})`);
-  exigir(!visitando.has(id), `${onde}: referência circular em "centro": "${ref}" volta a depender desta forma (âncoras válidas de "${id}": ${validas.join(', ')})`);
+  exigir(validas.includes(nome), `${onde}: "${campo}" aponta para "${ref}", mas a forma "${id}" (${porId.get(id).tipo}) não tem a âncora "${nome}" (válidas: ${validas.join(', ')})`);
+  exigir(!visitando.has(id), `${onde}: referência circular em "${campo}": "${ref}" volta a depender desta forma (âncoras válidas de "${id}": ${validas.join(', ')})`);
   return ancorasDe(resolver(id))[nome];
 }
 
-/* Resolve a posição de cada forma. Devolve formas com centro e caixa no mundo. */
-export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
+const unit = (v) => { const n = Math.hypot(...v); return v.map((c) => c / n); };
+const escalarV = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+/* Rotação de Rodrigues que leva o unitário `a` ao unitário `b` pelo menor ângulo (a mesma
+   regra de `poseQueEncaixa`, copiada: o arquivo dela importa outros módulos do Mecanifica).
+   Devolve null quando já coincidem, como `matrizRotacao` sem rotação. */
+function rotacaoEntre(a, b) {
+  const c = escalarV(a, b);
+  if (c > 1 - 1e-12) return null;
+  if (c < -1 + 1e-12) {
+    const apoio = Math.abs(a[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+    const k = unit([a[1] * apoio[2] - a[2] * apoio[1], a[2] * apoio[0] - a[0] * apoio[2], a[0] * apoio[1] - a[1] * apoio[0]]);
+    return [0, 1, 2].map((i) => [0, 1, 2].map((j) => 2 * k[i] * k[j] - (i === j ? 1 : 0)));
+  }
+  const v = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const x = [[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]];
+  const x2 = [0, 1, 2].map((i) => [0, 1, 2].map((j) => x[i][0] * x[0][j] + x[i][1] * x[1][j] + x[i][2] * x[2][j]));
+  const f = 1 / (1 + c);
+  return [0, 1, 2].map((i) => [0, 1, 2].map((j) => (i === j ? 1 : 0) + x[i][j] + x2[i][j] * f));
+}
+
+/* Vértices do prisma girado, relativos ao centro (o anel entra como o disco externo). */
+function verticesLocais(pr, m) {
+  const h = pr.comprimento / 2;
+  const saida = [];
+  for (const w of [-h, h]) for (const [u, v] of pr.perfil) saida.push(aplicarMatriz(ponto3(pr.b, u, v, w), m));
+  return saida;
+}
+
+const EIXOS_ALINHA = ['x', 'y', 'z'];
+const CHAVES_ENCOSTA = ['referencia', 'direcao', 'folga'];
+const CHAVES_ALINHA = ['com', 'eixos'];
+
+/* Relações de posição de uma forma, em texto, para a leitura `--descrever`. */
+export function relacaoDe(f) {
+  const partes = [];
+  const v = (x) => (Array.isArray(x) ? `[${x.join(' ')}]` : x);
+  if (f.de !== undefined) partes.push(`de ${v(f.de)} para ${v(f.para)}`);
+  if (f.alinha) partes.push(`alinha com ${f.alinha.com} nos eixos ${(f.alinha.eixos ?? []).join(' ')}`);
+  if (f.encosta) partes.push(`encosta em ${f.encosta.referencia} na direção ${v(f.encosta.direcao)}${f.encosta.folga ? ` com folga ${f.encosta.folga} mm` : ''}`);
+  if ((f.de !== undefined || f.alinha || f.encosta) && f.desloca) partes.push(`desloca ${v(f.desloca)}`);
+  return partes.join('; ');
+}
+
+/* Pontos nomeados: `pontos` na raiz do esboço e na opção (a opção sobrepõe a raiz). */
+function lerPontos(raiz, opcao, rotuloOpcao) {
+  const saida = {};
+  for (const [origem, lista] of [['raiz', raiz], ['opção', opcao?.pontos]]) {
+    if (lista === undefined) continue;
+    exigir(lista && typeof lista === 'object' && !Array.isArray(lista), `${rotuloOpcao}: "pontos" (${origem}) deve ser um objeto { nome: [x, y, z] }`);
+    for (const [nome, v] of Object.entries(lista)) {
+      exigir(Array.isArray(v) && v.length === 3 && v.every(Number.isFinite), `${rotuloOpcao}: o ponto "${nome}" deve ser [x, y, z] em mm`);
+      saida[nome] = v;
+    }
+  }
+  return saida;
+}
+
+/* Resolve a posição de cada forma. Devolve formas com centro e caixa no mundo. `pontosDaRaiz` é o
+   `pontos` da raiz do esboço. Ordem de aplicação: centro, sobre, ponta ou haste (`de`/`para`);
+   depois `alinha`, `encosta` e `desloca`. */
+export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = undefined) {
   exigir(Array.isArray(opcao.formas) && opcao.formas.length > 0, `${rotuloOpcao}: "formas" precisa ser uma lista não vazia`);
+  const pontos = lerPontos(pontosDaRaiz, opcao, rotuloOpcao);
   const porId = new Map();
   for (const [i, f] of opcao.formas.entries()) {
     exigir(typeof f.id === 'string' && f.id, `${rotuloOpcao}, forma ${i + 1}: falta "id"`);
@@ -259,14 +320,54 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
     const onde = `${rotuloOpcao}, forma "${id}"`;
     exigir(!visitando.has(id), `${onde}: referência circular em sobre/ponta`);
     visitando.add(id);
-    const pr = prisma(f, onde);
-    const m = matrizRotacao(f.rotacao);
+    /* ponto: vetor, ponto nomeado ou "<id>.<ancora>" */
+    const pontoDe = (v, campo) => {
+      if (Array.isArray(v)) {
+        exigir(v.length === 3 && v.every(Number.isFinite), `${onde}: "${campo}" deve ser [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
+        return [...v];
+      }
+      exigir(typeof v === 'string', `${onde}: "${campo}" deve ser [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
+      if (Object.hasOwn(pontos, v)) return [...pontos[v]];
+      exigir(v.includes('.') || campo === 'centro', `${onde}: "${campo}" aponta para "${v}", que não é um ponto nomeado (pontos: ${Object.keys(pontos).join(', ') || 'nenhum'}) nem "<id>.<ancora>"`);
+      return [...ancoraDe(v, onde, porId, resolver, visitando, campo)];
+    };
+    const referencia = (campo, refId) => {
+      exigir(typeof refId === 'string' && porId.has(refId), `${onde}: "${campo}" aponta para "${refId}", que não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
+      exigir(!visitando.has(refId), `${onde}: referência circular em "${campo}": "${refId}" volta a depender desta forma`);
+      return resolver(refId);
+    };
+    const haste = f.de !== undefined || f.para !== undefined;
+    let fPrisma = f;
+    let m;
+    let centro = [0, 0, 0];
+    if (haste) {
+      exigir(f.de !== undefined && f.para !== undefined, `${onde}: "de" e "para" vêm juntos`);
+      exigir(f.tipo === 'cilindro' || f.tipo === 'caixa', `${onde}: "de"/"para" valem só em cilindro e caixa (a forma vira uma haste entre dois pontos)`);
+      const proibidos = ['centro', 'sobre', 'ponta', 'rotacao', 'encosta', 'alinha'].filter((k) => f[k] !== undefined);
+      exigir(proibidos.length === 0, `${onde}: "de"/"para" já definem o centro e a rotação; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca" para afastar a haste)`);
+      const campoLongo = f.tipo === 'cilindro' ? 'comprimento' : 'altura';
+      exigir(f[campoLongo] === undefined, `${onde}: "${campoLongo}" não pode vir junto de "de"/"para": o comprimento sai da distância entre os dois pontos`);
+      const p0 = pontoDe(f.de, 'de');
+      const p1 = pontoDe(f.para, 'para');
+      const d = p1.map((c, i) => c - p0[i]);
+      const comprimento = Math.hypot(...d);
+      exigir(comprimento > 1e-9, `${onde}: "de" e "para" são o mesmo ponto`);
+      const eixoLocal = f.tipo === 'caixa' ? 'y' : (f.eixo ?? 'y');
+      exigir(EIXOS.includes(eixoLocal), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
+      fPrisma = { ...f, [campoLongo]: comprimento };
+      m = rotacaoEntre(EIXOS.map((e) => (e === eixoLocal ? 1 : 0)), unit(d));
+      centro = p0.map((c, i) => (c + p1[i]) / 2);
+    } else {
+      m = matrizRotacao(f.rotacao);
+    }
+    const pr = prisma(fPrisma, onde);
     const local = caixaLocal(pr, m);
     const modos = ['centro', 'sobre', 'ponta'].filter((k) => f[k] !== undefined);
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
-    let centro = [0, 0, 0];
-    if (typeof f.centro === 'string') {
-      centro = [...ancoraDe(f.centro, onde, porId, resolver, visitando)];
+    if (haste) {
+      /* o centro já saiu dos dois pontos */
+    } else if (typeof f.centro === 'string') {
+      centro = pontoDe(f.centro, 'centro');
     } else if (f.centro !== undefined) {
       exigir(Array.isArray(f.centro) && f.centro.length === 3 && f.centro.every(Number.isFinite), `${onde}: "centro" deve ser [x, y, z] em mm`);
       centro = [...f.centro];
@@ -282,6 +383,37 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
       const k = EIXOS.indexOf(lado[1]);
       centro = [...alvo.centro];
       centro[k] = lado[0] === '+' ? alvo.max[k] - local.min[k] : alvo.min[k] - local.max[k];
+    }
+    if (f.alinha !== undefined) {
+      const al = f.alinha;
+      exigir(al && typeof al === 'object' && !Array.isArray(al), `${onde}: "alinha" deve ser { "com": "<id>", "eixos": ["x", "z"] }`);
+      const extras = Object.keys(al).filter((k) => !CHAVES_ALINHA.includes(k));
+      exigir(extras.length === 0, `${onde}: "alinha" não tem o campo "${extras[0]}" (campos: ${CHAVES_ALINHA.join(', ')})`);
+      exigir(Array.isArray(al.eixos) && al.eixos.length > 0 && al.eixos.every((e) => EIXOS_ALINHA.includes(e)) && new Set(al.eixos).size === al.eixos.length,
+        `${onde}: "alinha.eixos" deve listar eixos distintos entre "x", "y" e "z"`);
+      exigir(typeof al.com === 'string' && al.com, `${onde}: "alinha.com" deve ser o id de uma forma, "<id>.<ancora>" ou um ponto nomeado`);
+      const alvo = porId.has(al.com) ? referencia('alinha.com', al.com).centro : pontoDe(al.com, 'alinha.com');
+      for (const e of al.eixos) centro[EIXOS.indexOf(e)] = alvo[EIXOS.indexOf(e)];
+    }
+    if (f.encosta !== undefined) {
+      const en = f.encosta;
+      exigir(en && typeof en === 'object' && !Array.isArray(en), `${onde}: "encosta" deve ser { "referencia": "<id>", "direcao": [dx, dy, dz], "folga": mm }`);
+      const extras = Object.keys(en).filter((k) => !CHAVES_ENCOSTA.includes(k));
+      exigir(extras.length === 0, `${onde}: "encosta" não tem o campo "${extras[0]}" (campos: ${CHAVES_ENCOSTA.join(', ')})`);
+      const direcao = typeof en.direcao === 'string' && LADOS.includes(en.direcao)
+        ? EIXOS.map((e) => (e === en.direcao[1] ? (en.direcao[0] === '+' ? 1 : -1) : 0))
+        : en.direcao;
+      exigir(Array.isArray(direcao) && direcao.length === 3 && direcao.every(Number.isFinite) && Math.hypot(...direcao) > 0,
+        `${onde}: "encosta.direcao" deve ser um vetor [dx, dy, dz] não nulo ou um lado (${LADOS.join(', ')})`);
+      const folga = en.folga ?? 0;
+      exigir(Number.isFinite(folga), `${onde}: "encosta.folga" deve ser um número em mm`);
+      exigir(en.referencia !== id, `${onde}: "encosta" não pode ter a própria forma como referência`);
+      const alvo = referencia('encosta', en.referencia);
+      const dn = unit(direcao);
+      const maxMovel = Math.max(...verticesLocais(pr, m).map((v) => escalarV(dn, v))) + escalarV(dn, centro);
+      const minRef = Math.min(...verticesLocais(alvo.prisma, alvo.matriz).map((v) => escalarV(dn, v))) + escalarV(dn, alvo.centro);
+      const t = minRef - maxMovel - folga;
+      centro = centro.map((c, i) => c + dn[i] * t);
     }
     if (f.desloca !== undefined) {
       exigir(Array.isArray(f.desloca) && f.desloca.length === 3 && f.desloca.every(Number.isFinite), `${onde}: "desloca" deve ser [dx, dy, dz] em mm`);
@@ -628,7 +760,7 @@ export function validarEsboco(esboco) {
     opcoes: esboco.opcoes.map((o, i) => {
       const onde = `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`;
       const daOpcao = lerOcultar(o.ocultar, onde);
-      const todas = resolverOpcao(o, onde);
+      const todas = resolverOpcao(o, onde, esboco.pontos);
       for (const r of todas) {
         r.ocultar = lerOcultar(r.forma.ocultar, `${onde}, forma "${r.id}"`);
         r.opacidade = lerOpacidade(r.forma.opacidade, `${onde}, forma "${r.id}"`);

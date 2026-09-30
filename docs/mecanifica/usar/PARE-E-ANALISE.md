@@ -32,7 +32,7 @@ O nível de detalhe pedido: conceito de proporção, peça reconhecível ou deta
 
 ### Análise
 
-Antes de qualquer imagem, rode `npm run esboco -- <arquivo.esboco.json> --descrever`, que imprime em texto, sem desenhar, cada forma resolvida com as âncoras, o grafo de contatos, as formas soltas e as sobreposições 3D e por vista, e a cada edição do JSON rode `--descrever --mudou`, que grava `<arquivo>.descrever.json` e mostra só a diferença (formas movidas, pares que passaram a tocar ou a se afastar, achados novos ou resolvidos). No "Pare e planeje" prefira posicionar por âncora (`centro: "<id>.<ancora>"`) a calcular coordenadas à mão.
+Antes de qualquer imagem, rode `npm run esboco -- <arquivo.esboco.json> --descrever`, que imprime em texto, sem desenhar, cada forma resolvida com as âncoras, o grafo de contatos, as formas soltas e as sobreposições 3D e por vista, e a cada edição do JSON rode `--descrever --mudou`, que grava `<arquivo>.descrever.json` e mostra só a diferença (formas movidas, pares que passaram a tocar ou a se afastar, achados novos ou resolvidos). No "Pare e planeje" prefira posicionar por relação a calcular coordenadas à mão: âncora (`centro: "<id>.<ancora>"`), haste entre dois pontos (`de`/`para`, com `pontos` nomeados na raiz), `encosta` com direção e folga e `alinha` de eixos; a `--descrever` mostra a relação usada ao lado do centro resolvido.
 
 O mesmo passo vale para o esboço de opções antes de mostrá-lo à pessoa. Um esboço com legenda que cruza a peça, balão no elemento errado, escala pequena demais, peça na frente de outra que deveria estar atrás ou rotação no sentido oposto induz a escolha errada, e a imagem parece boa à primeira vista.
 

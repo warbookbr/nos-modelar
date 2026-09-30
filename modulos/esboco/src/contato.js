@@ -257,6 +257,14 @@ export function lerContato(c, onde) {
   };
 }
 
+/* Pares que a própria geometria declara: uma forma com `encosta` e folga dentro da tolerância
+   forma um par `encosta` com a referência, sem `motivo` (não é exceção). Os pares declarados
+   à mão vêm depois e prevalecem. `de`/`para` não declara nada. */
+export function paresImplicitos(opcao, tolerancia) {
+  return (opcao.formas ?? []).filter((f) => f.encosta && typeof f.encosta.referencia === 'string' && (f.encosta.folga ?? 0) <= tolerancia)
+    .map((f) => ({ a: f.id, b: f.encosta.referencia, tipo: 'encosta', implicito: true }));
+}
+
 const arred = (x) => Math.round(x * 10) / 10;
 
 /* Contrato de declaração: `atravessa` e `livre` são exceções e exigem `motivo` de
@@ -307,7 +315,7 @@ export function verificarContato(esboco, { resolvidas: prontas } = {}) {
   const desligado = { usar: false, tolerancia: null, folga: null, achados: [], resultado: 'desligado', opcoes: [] };
   if (!opcoes.some((_, i) => ativa(i))) return desligado;
 
-  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`).filter((r) => r.forma.oculto !== true));
+  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos).filter((r) => r.forma.oculto !== true));
   const todosIds = new Set(resolvidas.flat().map((r) => r.id));
   for (const [c, onde] of [[raiz, 'esboço'], ...lidas.map((l, i) => [l, `opção ${i + 1}`])]) {
     for (const p of c?.pares ?? []) for (const id of [p.a, p.b]) {
@@ -337,7 +345,7 @@ export function verificarContato(esboco, { resolvidas: prontas } = {}) {
     const chave = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
     const maximos = new Map();
     const motivos = new Map();
-    for (const p of [...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) {
+    for (const p of [...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) {
       tipos.set(chave(p.a, p.b), p.tipo);
       maximos.set(chave(p.a, p.b), p.max);
       motivos.set(chave(p.a, p.b), p.motivo?.trim());

@@ -1,8 +1,8 @@
 /* Leitura do esboço em texto: cada forma resolvida, as âncoras, o grafo de contatos 3D,
    as formas soltas e as sobreposições (3D e por vista), sem desenhar nada. Também calcula a
    diferença entre duas leituras (`--descrever --mudou`). Puro: não lê nem grava arquivo. */
-import { ancorasDe, resolverOpcao } from './index.js';
-import { lerContato, medirPar, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
+import { ancorasDe, relacaoDe, resolverOpcao } from './index.js';
+import { lerContato, medirPar, paresImplicitos, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
 import { verificarProjecao } from './projecao.js';
 
 const EIXOS = ['x', 'y', 'z'];
@@ -29,6 +29,7 @@ function descreverForma(r) {
     extensao: vec(extensao),
     ...(eixoDe(r) ? { eixo: eixoDe(r) } : {}),
     ...(r.forma.rotacao !== undefined ? { rotacao: r.forma.rotacao } : {}),
+    ...(relacaoDe(r.forma) ? { relacao: relacaoDe(r.forma) } : {}),
     caixa: { x: [r2(r.min[0]), r2(r.max[0])], y: [r2(r.min[1]), r2(r.max[1])], z: [r2(r.min[2]), r2(r.max[2])] },
     ancoras: Object.fromEntries(Object.entries(ancorasDe(r)).map(([k, v]) => [k, vec(v)])),
   };
@@ -40,7 +41,7 @@ export function descreverEsboco(esboco) {
   const raiz = lerContato(esboco?.contato, 'esboço');
   const lidas = opcoes.map((o, i) => lerContato(o.contato, `opção ${i + 1}`));
   const ativa = (i) => (lidas[i]?.usar ?? raiz?.usar) === true;
-  const todas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`));
+  const todas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
   const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis }) : null;
   const projecao = verificarProjecao(esboco, { forcar: true, resolvidas: visiveis });
@@ -52,7 +53,7 @@ export function descreverEsboco(esboco) {
     const tol = lidas[i]?.tolerancia ?? raiz?.tolerancia ?? padrao.padraoTol;
     const penMax = lidas[i]?.penetracao ?? raiz?.penetracao ?? padrao.padraoPen;
     const tipos = new Map();
-    for (const p of [...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) tipos.set(chaveSimetrica(p.a, p.b), p.tipo);
+    for (const p of [...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) tipos.set(chaveSimetrica(p.a, p.b), p.tipo);
     const pecas = rs.map(pecasDe);
     const n = rs.length;
     const contatos = [];
@@ -111,7 +112,7 @@ export function formatarDescricao(d) {
       ? `gate de contato declarado: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm`
       : `sem gate declarado (padrões do gate: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm)`);
     for (const f of o.formas) {
-      L.push(`forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`);
+      L.push(`forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`);
       L.push(`âncoras ${f.id}: ${Object.entries(f.ancoras).map(([k, v]) => `${k} ${vetor(v)}`).join('; ')}`);
     }
     for (const c of o.contatos) L.push(`contato: ${c.a} toca ${c.b} (${c.folga_mm !== undefined ? `folga ${mm1(c.folga_mm)} mm` : `penetração ${mm1(c.penetracao_mm)} mm`})`);
