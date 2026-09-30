@@ -5,6 +5,7 @@
 import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js';
 import { ErroDeEsboco } from './index.js';
 import { expandirComponentes } from './componentes.js';
+import { validarEsquema } from './esquema.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -55,6 +56,14 @@ function ponto(v, num, campo, contexto) {
     for (const k of ['t', 'mm', 'mmAntes']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
     return g;
   }
+  /* âncora com deslocamento: { "ancora": "<id>.<ancora>", "mm": [dx, dy, dz] } */
+  if (objeto(v) && v.ancora !== undefined) {
+    const g = { ...v, ancora: ponto(v.ancora, num, `${campo}.ancora`, contexto) };
+    if (Array.isArray(v.mm)) g.mm = vetor(v.mm, num, `${campo}.mm`, contexto);
+    return g;
+  }
+  /* ponto-guia nomeado do caminho de um tubo: { "nome": "joelho", "ponto": <ponto> } */
+  if (objeto(v) && v.nome !== undefined && v.ponto !== undefined) return { ...v, ponto: ponto(v.ponto, num, `${campo}.ponto`, contexto) };
   return v;
 }
 
@@ -113,6 +122,7 @@ function numerosDoContato(c, num, onde) {
   for (const k of ['tolerancia', 'penetracao', 'folga']) if (g[k] !== undefined) g[k] = num(g[k], `contato.${k}`, onde);
   if (Array.isArray(g.pares)) g.pares = g.pares.map((p, i) => (objeto(p) && p.max !== undefined ? { ...p, max: num(p.max, `contato.pares[${i}].max`, onde) } : p));
   if (objeto(g.projecao) && g.projecao.limiar !== undefined) g.projecao = { ...g.projecao, limiar: num(g.projecao.limiar, 'contato.projecao.limiar', onde) };
+  if (Array.isArray(g.juntas)) g.juntas = g.juntas.map((j, i) => (objeto(j) && j.max !== undefined ? { ...j, max: num(j.max, `contato.juntas[${i}].max`, onde) } : j));
   return g;
 }
 
@@ -179,6 +189,7 @@ export function expandirArranjos(formas, onde = 'opção') {
    resolvidos), sem expressões e com os arranjos já em formas virtuais. */
 export function expandirEsboco(esboco) {
   if (!objeto(esboco) || !Array.isArray(esboco.opcoes)) return esboco;
+  validarEsquema(esboco);
   const declaradosRaiz = esboco.parametros;
   exigir(declaradosRaiz === undefined || objeto(declaradosRaiz), 'esboço: "parametros" deve ser um objeto { nome: número | "outroNome" | "=expressão" }');
   const raiz = resolvedor(declaradosRaiz ?? {}, 'esboço');
@@ -207,6 +218,10 @@ export function expandirEsboco(esboco) {
       g.formas = expandirArranjos(componentes.formas.map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
     }
     expansoes.push(componentes);
+    /* medidas do plano: os pontos "<instancia>.<ancora>" viram a forma e a âncora reais desta opção */
+    if (objeto(esboco.plano) && Array.isArray(esboco.plano.medidas)) {
+      g.medidas = esboco.plano.medidas.map((m) => (objeto(m) && objeto(m.mede) && Array.isArray(m.mede.distancia) ? { ...m, mede: { ...m.mede, distancia: m.mede.distancia.map((q) => componentes.ponto(q)) } } : m));
+    }
     if (o.contato !== undefined) g.contato = numerosDoContato(o.contato, num, onde);
     if (o.explosao !== undefined) g.explosao = numerosDaExplosao(o.explosao, num, onde);
     if (objeto(o.pontos) || raizTemExpressao) {
@@ -215,10 +230,10 @@ export function expandirEsboco(esboco) {
     }
     return g;
   });
+  const aliasDaRaiz = (id) => expansoes.map((x) => x.aliasDeId(id)).find((a) => a !== undefined);
   /* componentes: o id da instância nos pares do gate é a forma principal dela, e os pares do próprio
      componente entram em cada opção que o usa, a menos que o esboço já declare o mesmo par */
   if (expansoes.some((x) => x.instancias > 0)) {
-    const aliasDaRaiz = (id) => expansoes.map((x) => x.aliasDeId(id)).find((a) => a !== undefined);
     const comAlias = (c, alias) => (objeto(c) && Array.isArray(c.pares) ? { ...c, pares: c.pares.map((p) => (objeto(p) ? { ...p, a: alias(p.a) ?? p.a, b: alias(p.b) ?? p.b } : p)) } : c);
     if (saida.contato !== undefined) saida.contato = comAlias(saida.contato, aliasDaRaiz);
     const chave = (p) => (p.a < p.b ? `${p.a}\u0000${p.b}` : `${p.b}\u0000${p.a}`);
@@ -231,7 +246,72 @@ export function expandirEsboco(esboco) {
       return h;
     });
   }
+  aplicarJuntas(saida, expansoes, aliasDaRaiz);
   return saida;
+}
+
+const CHAVES_DA_JUNTA = ['pecas', 'max', 'motivo'];
+const chaveDoPar = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
+
+/* `contato.juntas: [{ pecas: [ids ou padrões], max, motivo }]` (na raiz e na opção): cada junta vira um par `atravessa`
+   com o `max` e o `motivo` dela para todo par de peças que ela lista, no lugar de dezenas de pares escritos à mão. Um
+   padrão (`garfoE.*`) casa os ids da opção; o id de uma instância de componente é a forma principal dela. Um par
+   declarado à mão (ou do componente) prevalece sobre o da junta, e a primeira junta que cita o par prevalece sobre as
+   outras. O gate os trata como qualquer `atravessa`, e o espelho os herda pelo mecanismo de sempre. */
+function aplicarJuntas(saida, expansoes, aliasDaRaiz) {
+  const tem = (c) => objeto(c) && c.juntas !== undefined;
+  if (!tem(saida.contato) && !saida.opcoes.some((o) => objeto(o) && tem(o.contato))) return;
+  const semJuntas = (c) => { const { juntas, ...resto } = c; return resto; };
+  const daRaiz = saida.contato?.juntas;
+  if (tem(saida.contato)) saida.contato = semJuntas(saida.contato);
+  saida.opcoes = saida.opcoes.map((g, i) => {
+    if (!objeto(g)) return g;
+    const daOpcao = g.contato?.juntas;
+    if (daRaiz === undefined && daOpcao === undefined) return g;
+    const onde = `opção ${i + 1}${g.titulo ? ` (${g.titulo})` : ''}`;
+    const ids = (g.formas ?? []).filter((f) => objeto(f) && f.oculto !== true).map((f) => f.id);
+    const alias = (id) => expansoes[i]?.aliasDeId(id) ?? aliasDaRaiz(id) ?? id;
+    const lista = [];
+    for (const [origem, juntas] of [['contato.juntas', daRaiz], [`contato.juntas (${onde})`, daOpcao]]) {
+      if (juntas === undefined) continue;
+      exigir(Array.isArray(juntas), `${onde}: "contato.juntas" deve ser uma lista de { "pecas": ["garfoE.*", "guidao"], "max": 15, "motivo": "a presilha do guidão abraça a coroa" }`);
+      juntas.forEach((j, k) => lista.push({ j, nome: `${origem}[${k}]` }));
+    }
+    const existentes = new Set([...(saida.contato?.pares ?? []), ...(g.contato?.pares ?? [])].filter(objeto).map((p) => chaveDoPar(p.a, p.b)));
+    const novos = [];
+    for (const { j, nome } of lista) {
+      const exemplo = '{ "pecas": ["garfoE.*", "guidao"], "max": 15, "motivo": "a presilha do guidão abraça a coroa" }';
+      exigir(objeto(j), `${onde}: ${nome} deve ser ${exemplo}`);
+      const fora = Object.keys(j).filter((k) => !CHAVES_DA_JUNTA.includes(k));
+      exigir(fora.length === 0, `${onde}: ${nome} não tem o campo "${fora[0]}" (campos: ${CHAVES_DA_JUNTA.join(', ')}). Exemplo: ${exemplo}`);
+      exigir(Array.isArray(j.pecas) && j.pecas.length >= 1 && j.pecas.every((x) => typeof x === 'string' && x), `${onde}: ${nome}.pecas deve ser uma lista de ids ou padrões de forma (por exemplo "garfoE.*"). Exemplo: ${exemplo}`);
+      exigir(j.max === undefined || (typeof j.max === 'number' && Number.isFinite(j.max) && j.max >= 0), `${onde}: ${nome}.max deve ser um número em mm, finito e maior ou igual a zero`);
+      exigir(j.motivo === undefined || typeof j.motivo === 'string', `${onde}: ${nome}.motivo deve ser um texto`);
+      const membros = [];
+      for (const q of j.pecas) {
+        if (q.includes('*')) {
+          const re = new RegExp(`^${q.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
+          const casadas = ids.filter((id) => re.test(id));
+          exigir(casadas.length > 0, `${onde}: ${nome}.pecas: o padrão "${q}" não casa com nenhuma forma visível (ids: ${ids.join(', ')})`);
+          membros.push(...casadas);
+        } else {
+          const id = alias(q);
+          exigir(ids.includes(id), `${onde}: ${nome}.pecas cita "${q}", que não é uma forma visível (ids: ${ids.join(', ')})`);
+          membros.push(id);
+        }
+      }
+      const unicos = [...new Set(membros)];
+      exigir(unicos.length >= 2, `${onde}: ${nome} precisa de pelo menos duas peças distintas depois de expandir os padrões (veio ${unicos.length}: ${unicos.join(', ') || 'nenhuma'})`);
+      for (let a = 0; a < unicos.length; a++) for (let b = a + 1; b < unicos.length; b++) {
+        const chave = chaveDoPar(unicos[a], unicos[b]);
+        if (existentes.has(chave)) continue;
+        existentes.add(chave);
+        novos.push({ a: unicos[a], b: unicos[b], tipo: 'atravessa', ...(j.max === undefined ? {} : { max: j.max }), ...(j.motivo === undefined ? {} : { motivo: j.motivo }), junta: `${nome} (${j.pecas.join(', ')})` });
+      }
+    }
+    const resto = tem(g.contato) ? semJuntas(g.contato) : (g.contato ?? {});
+    return { ...g, contato: { ...resto, pares: [...(resto.pares ?? []), ...novos] } };
+  });
 }
 
 /* Os parâmetros resolvidos de cada opção, na ordem das opções (objeto vazio quando não há). */

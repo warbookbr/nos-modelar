@@ -379,7 +379,7 @@ export function lerContato(c, onde) {
       if (!TIPOS_DE_PAR.includes(p.tipo)) throw new ErroDeEsboco(`${onde}: contato.pares[${i}].tipo deve ser um de ${TIPOS_DE_PAR.join(', ')}`);
       if (p.max !== undefined && p.tipo !== 'atravessa') throw new ErroDeEsboco(`${onde}: contato.pares[${i}].max só vale para o tipo atravessa`);
       if (p.motivo !== undefined && typeof p.motivo !== 'string') throw new ErroDeEsboco(`${onde}: contato.pares[${i}].motivo deve ser um texto`);
-      pares.push({ a: p.a, b: p.b, tipo: p.tipo, max: numMm(p.max, `${onde}: contato.pares[${i}].max`), motivo: p.motivo });
+      pares.push({ a: p.a, b: p.b, tipo: p.tipo, max: numMm(p.max, `${onde}: contato.pares[${i}].max`), motivo: p.motivo, ...(typeof p.junta === 'string' ? { junta: p.junta } : {}) });
     }
   }
   return {
@@ -447,8 +447,8 @@ const mmTxt = (x) => arred(x).toString().replace('.', ',');
    chamada com o contato ligado. A mensagem diz o par, o campo e um exemplo. */
 function exigirDeclaracao(p, onde) {
   if (p.tipo === 'encosta') return;
-  const par = `${p.a} ↔ ${p.b}`;
-  const exemplo = `{ "a": "${p.a}", "b": "${p.b}", "tipo": "${p.tipo}"${p.tipo === 'atravessa' ? ', "max": 15' : ''}, "motivo": "a presilha do guidão abraça a bengala" }`;
+  const par = p.junta ? `${p.a} ↔ ${p.b} (da ${p.junta})` : `${p.a} ↔ ${p.b}`;
+  const exemplo = p.junta ? `{ "pecas": ["garfoE.*", "guidao"], "max": 15, "motivo": "a presilha do guidão abraça a coroa" }` : `{ "a": "${p.a}", "b": "${p.b}", "tipo": "${p.tipo}"${p.tipo === 'atravessa' ? ', "max": 15' : ''}, "motivo": "a presilha do guidão abraça a bengala" }`;
   const motivo = typeof p.motivo === 'string' ? p.motivo.trim() : '';
   if (motivo.length < MINIMO_DO_MOTIVO) {
     const falta = p.motivo === undefined ? 'falta o campo "motivo"' : `o "motivo" tem ${motivo.length} caractere${motivo.length === 1 ? '' : 's'} e o mínimo é ${MINIMO_DO_MOTIVO}`;

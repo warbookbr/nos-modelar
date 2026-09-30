@@ -109,25 +109,9 @@ README dele.
 
 ## Formato proposto
 
-O trecho abaixo é a proposta do estudo para a moto, e não está implementado. A
-haste sai de `de` e `para`, o lado direito do espelho, e o café racer diferiria
-do naked por `parametros` na opção.
-
-```json
-{
-  "parametros": { "entreEixos": 1400, "raioFrente": 300, "raioTras": 310 },
-  "pontos": { "cabecote": [0, 898, 421.5] },
-  "opcoes": [{ "titulo": "A. Naked", "formas": [
-    { "id": "rodaFrente", "tipo": "anel", "diametroExterno": "=2*raioFrente", "diametroInterno": 420, "espessura": 110, "eixo": "x", "centro": [0, "raioFrente", "=entreEixos/2"] },
-    { "id": "garfoE", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "cabecote", "desloca": [-90, 0, 0] },
-    { "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x", "pos": 0 } },
-    { "id": "tanque", "tipo": "caixa", "largura": 300, "altura": 200, "profundidade": 420, "encosta": { "referencia": "motor", "direcao": [0, -1, 0] }, "desloca": [0, 0, 110] }
-  ] }],
-  "contato": { "usar": true, "pares": [
-    { "a": "garfoE", "b": "guidao", "tipo": "atravessa", "max": 15, "motivo": "a presilha do guidão abraça a bengala" }
-  ] }
-}
-```
+A proposta do estudo (haste por `de` e `para`, lado direito por espelho, café
+racer por `parametros` na opção) está implementada e descrita no README do
+módulo, que é a referência do formato.
 
 ## Excluído
 
@@ -165,26 +149,38 @@ do naked por `parametros` na opção.
 9. A leitura padrão do `--descrever` mostra só o total de formas, os parâmetros
    e as divergências em ordem de gravidade, e a moto detalhada cabe em menos de
    40 linhas quando o gate aprova; âncoras, caixas e vizinhos só saem sob
-   pedido, por exemplo `--forma garfoE.perna`.
+   pedido, por exemplo `--forma garfoE.perna`. Atendido em 2026-09-30: a moto
+   de prova (24 formas, 2 opções) sai em 9 linhas, a versão com um defeito em
+   11, e `--completo` é a leitura antiga byte a byte (`tests/leitura.test.js`).
 10. Todo achado do gate vem com uma imagem própria: o par envolvido colorido, o
-    resto em cinza, sem legenda numerada e com zoom no ponto.
+    resto em cinza, sem legenda numerada e com zoom no ponto. Atendido em
+    2026-09-30 por `--achado <n>` e pela `--analise` (`achados` no manifesto);
+    o teste mede a cor nos pixels do PNG.
 11. O contrato de relações (o que deve tocar, o que deve ficar livre, o que deve
     ser simétrico) é declarado no JSON e conferido pelo gate contra o medido.
+    Atendido em 2026-09-30 por `plano.contrato` (`tests/plano.test.js`).
 12. A conferência contra a foto mede, por vista e por parte, o desvio da
     silhueta em milímetros e a razão entre interseção e união, e reprova acima
     da tolerância declarada.
 13. A skill proíbe a IA de auditar por imagem com legenda numerada e descreve o
     fluxo contrato, medidas da referência, construção por subsistema, montagem,
-    conferência numérica, crítico sem contexto e pessoa.
+    conferência numérica, crítico sem contexto e pessoa. O fluxo e a proibição
+    estão escritos na skill e no `PARE-E-ANALISE.md` (`tests/skill.test.js`); a
+    conferência numérica contra a foto é o item 12, ainda aberto.
 14. O `plano` do JSON ganha um campo estruturado e genérico de medidas nomeadas,
     cada uma com valor, unidade e origem (ficha técnica, foto ou conhecimento da
     IA), e o gate confere o esboço contra elas, sem conhecer o assunto: uma
-    medida fora da tolerância vira achado com o desvio em milímetros.
+    medida fora da tolerância vira achado com o desvio em milímetros. Atendido
+    em 2026-09-30 por `plano.medidas` (`mede`: caixa total, caixa de formas ou
+    distância entre âncoras; `tests/plano.test.js`).
 15. O Pare e planeje fixa o nível de detalhe a partir do pedido (esquemático,
     médio ou detalhado), e o nível decide quanto se planeja e quanto se confere:
     um esboço rápido pede poucas medidas, e um objeto detalhado pede medidas por
     subsistema, contrato de relações e conferência contra a referência. A skill
-    não cita nenhum objeto específico.
+    não cita nenhum objeto específico. Atendido em 2026-09-30 por `plano.nivel`
+    e pelo Portão, que pede 1, 3 ou 5 medidas conforme o nível
+    (`tests/condutor.test.js`); o teste da skill confere que as passagens do
+    nível, das medidas e do fluxo não citam objeto.
 16. Tanque, banco e carenagem da moto de prova saem com forma curva (perfil
     côncavo, afunilamento ou loft), e não como caixa ou extrusão convexa.
     Atendido em 2026-09-30 por `moto-curvas.esboco.json`: as imagens nas quatro
@@ -194,13 +190,19 @@ do naked por `parametros` na opção.
     de detalhe, Detalhe por unidade, Montagem), grava o estado em arquivo legível
     por máquina e só libera o estágio seguinte quando o Portão de estágio do
     atual passa, provado por teste: pular estágio é recusado com a mensagem do
-    que falta.
+    que falta. Atendido em 2026-09-30 por `--condutor` (`src/condutor.js`), com
+    o estado em `<arquivo>.condutor.json` e o nível ligando os estágios; o fluxo
+    percorre os cinco estágios na moto de formas curvas.
 18. O Plano de detalhe agrupa em Unidades de detalhe as formas de acoplamento
     apertado do grafo de relações e ordena por dependência, e a mudança do
-    agrupamento pela IA exige `motivo` de pelo menos 15 caracteres.
+    agrupamento pela IA exige `motivo` de pelo menos 15 caracteres. Atendido em
+    2026-09-30: a moto de formas curvas dá 11 unidades e 24 formas, o guidão une
+    os dois garfos numa unidade só, e `--mover` sem motivo é recusado.
 19. O Envelope de cada unidade (o volume da maquete e as portas) é conferido
     contra a versão detalhada, e o Marco chama o crítico visual sem contexto a
-    cada 25% do custo estimado das unidades feitas, com imagens limpas.
+    cada 25% do custo estimado das unidades feitas, com imagens limpas. Parcial:
+    o Marco registra "chamar crítico" no estado a cada 25% do custo (o despacho
+    do crítico é da skill); o Envelope não foi feito.
 20. `npm run gates --completo` passa.
 
 ## Fatias
@@ -224,45 +226,35 @@ do naked por `parametros` na opção.
    `chanfro` na caixa, com gate, espelho, arranjo e `--ajustar`. A moto de prova
    `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números
    escritos à mão.
-8. A validação da moto detalhada (2026-09-30) mostrou o que falta, na ordem em
-   que entra: primeiro as formas curvas, porque tanque, banco e carenagem saíram
-   como caixas e extrusões convexas e a moto ficou sem cara de moto (feita em
-   2026-09-30: `extrusao` de perfil côncavo, `loft` por seções e `revolucao`,
-   com gate por partes convexas e a moto de prova sem centro à mão; a forma
-   sai facetada e o banco tem largura constante); depois o desempenho (feito
-   em 2026-09-30, na moto de 66 formas e 2 opções: `--analise` com as 12 imagens
-   de 11 min para 36 s (18 s por opção), 4,7 s com `--rapido`, teste da moto em
-   `projecao.test.js` de 47 s para 3,3 s; `--sugerir`, fora do padrão, de 531 s
-   para 65 s, acima dos 20 s por opção); depois o contrato de relações no JSON,
-   com `junta {pecas, max, motivo}` no lugar de dezenas de pares `atravessa` (a
-   moto teve 26), pontos-guia nomeados no `caminho` do tubo e âncora com
-   deslocamento; a leitura padrão do `--descrever` reduzida às divergências, com
-   o detalhe por forma só sob pedido; a projeção agrupada por componente (feita
-   em 2026-09-30: sem espelhos nem folgas abaixo de 10 mm, 10 grupos por opção e
-   aviso de explosão sem convergência; a moto teve 107 achados); a imagem por
-   achado, com o par colorido e sem legenda; e o esquema do JSON com mensagem
-   que diz o campo e o valor válido, junto dos bugs (`r.pneu` visível na leitura
-   e recusado em `alinha` segue aberto; `arranja.nomes` e "volume" corrigidos).
-   O Condutor entra nesta fatia: a leitura padrão só com divergências vira a saída do Portão de
-   estágio, e o nível de detalhe do pedido (esquemático, médio, detalhado) liga
-   ou desliga estágios. Os nomes: Condutor (a máquina de estados do fluxo),
-   Maquete (formas primitivas com dimensões e posições corretas), Plano de
-   detalhe (o algoritmo que agrupa e ordena), Unidade de detalhe (uma peça, ou
-   as peças de acoplamento apertado), Envelope (o volume da maquete que a peça
-   detalhada não ultrapassa, com as portas nos mesmos lugares), Portão de estágio
-   e Marco (o crítico visual a cada 25%). Mapeamento para o Mecanifica: a
+8. A validação da moto detalhada (2026-09-30) mostrou o que faltava, e tudo foi
+   feito no mesmo dia. Formas curvas: `extrusao` de perfil côncavo, `loft` e
+   `revolucao`, com gate por partes convexas. Desempenho, na moto de 66 formas:
+   `--analise` de 11 min para 36 s, 4,7 s com `--rapido`, e o teste da moto de 47
+   s para 3,3 s. A projeção agrupada por componente (10 grupos por opção, contra
+   107 achados). O contrato de relações: `contato.juntas` no lugar de dezenas de
+   pares `atravessa`, pontos-guia nomeados no `caminho` do tubo, `{ ancora, mm }`,
+   e o bug de `<instancia>.<parte>` corrigido. A leitura padrão do `--descrever`
+   só com divergências (`--forma`, `--completo`), a imagem por achado
+   (`--achado`), o `plano` estruturado (`nivel`, `medidas`, `contrato`), o esquema
+   do JSON com "quis dizer" e o Condutor (estágios, Portão, Plano de detalhe,
+   Marco), descritos no README do módulo. Nomes: Condutor (a máquina de estados
+   do fluxo), Maquete (formas primitivas com dimensões e posições corretas),
+   Plano de detalhe (o algoritmo que agrupa e ordena), Unidade de detalhe (uma
+   peça, ou as peças de acoplamento apertado), Envelope (o volume da maquete que
+   a peça detalhada não ultrapassa, com as portas nos mesmos lugares), Portão de
+   estágio e Marco (o crítico visual a cada 25%). Mapeamento para o Mecanifica: a
    Unidade de detalhe é a etapa da montagem, o Envelope é o gate de encaixe da
-   ponte, o Portão é o aceite por etapa e o Condutor generaliza o `objeto`.
-9. A referência e o fluxo. A conferência numérica contra a foto, reaproveitando
-   `conferir:referencia`, com o desvio por parte e por vista; a extração das
-   medidas da foto para parâmetros, com a origem de cada número; o fluxo na
-   skill, com o construtor por subsistema, o montador, o leitor de referência e o
-   crítico visual sem contexto recebendo só imagens limpas; e a proibição de
-   auditar por legenda numerada. O Pare e planeje passa a produzir o campo de
-   medidas nomeadas (genérico, com origem) e a escolher o nível de detalhe pelo
-   pedido, e o gate lê esse campo. Depois, a moto detalhada de prova sem centro
-   calculado à mão, as fixtures com resultado esperado (moto, mancal e casa) e o
-   fechamento do plano.
+   ponte, o Portão é o aceite por etapa e o Condutor generaliza o `objeto`. Fora
+   desta fatia: o Envelope e o despacho do crítico pelo Condutor. O módulo
+   passou de 299 para 367 testes, e `npm run gates` fecha com 32/32 verdes.
+9. A referência e o fluxo. Feito em 2026-09-30: o fluxo na skill e no
+   `PARE-E-ANALISE.md`, a proibição de auditar por legenda numerada, e o Pare e
+   planeje produzindo `plano.nivel`, `plano.medidas` (com origem) e
+   `plano.contrato`, lidos pelo gate. Falta a conferência numérica contra a foto,
+   reaproveitando `conferir:referencia`, com o desvio por parte e por vista, a
+   extração das medidas da foto para parâmetros, a moto detalhada de prova sem
+   centro calculado à mão, as fixtures com resultado esperado (moto, mancal e
+   casa) e o fechamento do plano.
 
 ## Riscos e desvios
 

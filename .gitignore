@@ -57,3 +57,5 @@ public/sessao-ativa.json
 
 # Memória do `esboco --descrever --mudou` (artefato gerado ao lado do esboço)
 *.descrever.json
+# Estado do Condutor do esboço (`esboco --condutor`, artefato gerado ao lado do esboço)
+*.condutor.json

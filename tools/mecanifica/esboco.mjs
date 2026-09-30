@@ -3,13 +3,16 @@
    Uso: npm run esboco -- <arquivo.esboco.json> */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/index.js';
 import { descreverAchado, descreverAtravessamento, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverGrupoDaProjecao, FATORES_DA_SUGESTAO, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
-import { descreverEsboco, diferenca, formatarDescricao } from '../../modulos/esboco/src/descrever.js';
+import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboco } from '../../modulos/esboco/src/descrever.js';
+import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
+import { textoDoPlano } from '../../modulos/esboco/src/plano.js';
+import { avancar, criarEstado, formatarSituacao, marcarFeito, moverForma, nomeDoEstagio, portaoDoEstagio, replanejar } from '../../modulos/esboco/src/condutor.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
@@ -34,6 +37,8 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
    nomes `legendas` e `linhasCentro` são impostos em todos os níveis. */
 export const VISTAS_DA_ANALISE = Object.keys(VISTAS);
 export const AMPLIACAO_DO_ZOOM = 3;
+/* A análise gera a imagem de cada divergência até este número; as outras saem com `--achado <n>`. */
+export const MAXIMO_DE_IMAGENS_DE_ACHADO = 12;
 
 /* Escala mínima da explodida em relação à normal da mesma vista. */
 export const ESCALA_RELATIVA_MINIMA = 0.6;
@@ -104,6 +109,10 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     ...projecao.achados.filter((a) => a.sugestao).map((a) => ({ origem: 'projecao', opcao: a.opcao, achado: a.tipo, vista: a.vista, pecas: a.pecas, ...semArrasto(a.sugestao) })),
   ];
   const parametros = Object.fromEntries((esboco.opcoes ?? []).flatMap((o, i) => (o?.parametros ? [[o.titulo ?? `Opção ${i + 1}`, o.parametros]] : [])));
+  /* medidas e contrato do plano estruturado, e a imagem de cada divergência (uma por achado, sem legenda numerada) */
+  const { descricao: leitura, divergencias, plano: conferido } = medirEsboco(bruto, { projecao: false });
+  const planoConferido = typeof esboco.plano === 'object' && esboco.plano !== null ? { nivel: conferido.nivel ?? null, resumo: conferido.resumo, opcoes: conferido.opcoes } : null;
+  void leitura;
   const pedidoDeZoom = zoom ? lerZoomDoEsboco(zoom) : null;
   if (rapido && pedidoDeZoom) throw new ErroDeEsboco('--zoom recorta uma imagem, e --rapido não gera imagem: tire um dos dois.');
   const desenho = { ...esboco, ladosPorEscala: esboco.ladosPorEscala ?? true };
@@ -111,14 +120,24 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
   mkdirSync(pasta, { recursive: true });
   const anterior = join(pasta, 'manifesto.json');
   if (existsSync(anterior)) {
-    try { for (const a of JSON.parse(readFileSync(anterior, 'utf8')).arquivos ?? []) rmSync(join(pasta, a), { force: true }); } catch { /* manifesto ilegível */ }
+    try {
+      const velho = JSON.parse(readFileSync(anterior, 'utf8'));
+      for (const a of [...(velho.arquivos ?? []), ...(velho.achados ?? []).map((x) => x.arquivo)]) rmSync(join(pasta, a), { force: true });
+    } catch { /* manifesto ilegível */ }
     rmSync(anterior, { force: true });
   }
   const navegador = rapido ? null : await (await import('playwright')).default.chromium.launch();
   const arquivos = [];
   const escalas = {};
   const variantes = [];
+  const achados = [];
   try {
+    if (!rapido) for (const d of divergencias.slice(0, MAXIMO_DE_IMAGENS_DE_ACHADO)) {
+      const im = imagemDoAchado(bruto, d);
+      const nome = `achado-${d.n}.png`;
+      await svgParaPng(im.svg, im.largura, im.altura, join(pasta, nome), navegador);
+      achados.push({ n: d.n, opcao: d.opcao, classe: d.classe, texto: d.texto, pecas: d.pecas, arquivo: nome, vista: im.vista, janela_mm: im.janela_mm });
+    }
     if (!rapido) for (const vista of VISTAS_DA_ANALISE) {
       for (const legendas of [true, false]) {
         for (const centros of (comCentros ? [true, false] : [false])) {
@@ -197,7 +216,9 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     zoom: pedidoDeZoom,
     centros: comCentros,
     forcado: { ...(comCentros ? {} : { linhasCentro: false }), ...(declaraExplosao(esboco) ? { explosao: false } : {}), ...(variantes.length > 0 ? { legendasExplodidaTransparente: 'lista' } : {}) },
-    plano: typeof esboco.plano === 'string' ? esboco.plano : null,
+    plano: textoDoPlano(esboco.plano),
+    ...(planoConferido ? { planoConferido } : {}),
+    ...(achados.length > 0 ? { achados } : {}),
     ...(Object.keys(parametros).length > 0 ? { parametros } : {}),
     contato,
     sugestoes,
@@ -254,12 +275,15 @@ function relatarProjecao(p) {
   return `sobreposição na projeção (limiar ${Math.round(p.limiar * 100)}%${p.reprova ? ', reprova' : ', informativo'}): ${p.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${explosao.length ? `${explosao.join('\n')}\n` : ''}`;
 }
 
-/* `--descrever`: leitura em texto (ou JSON), sem imagem. Com `mudou`, compara com a leitura gravada em
-   `<arquivo>.descrever.json` ao lado do esboço, imprime só a diferença e regrava o arquivo. */
-export function descreverArquivo(arquivo, { mudou = false, json = false } = {}) {
+/* `--descrever`: leitura em texto (ou JSON), sem imagem. A leitura padrão traz só o total de formas, os parâmetros e as
+   divergências em ordem de gravidade; `forma` (um id ou padrão) traz o detalhe de uma forma, e `completo` a leitura de
+   todas. Com `mudou`, compara com a leitura completa gravada em `<arquivo>.descrever.json` ao lado do esboço, imprime só a
+   diferença e regrava o arquivo. */
+export function descreverArquivo(arquivo, { mudou = false, json = false, completo = false, forma = null } = {}) {
   const caminho = resolve(arquivo);
-  const atual = descreverEsboco(JSON.parse(readFileSync(caminho, 'utf8')));
-  if (!mudou) return { texto: json ? `${JSON.stringify(atual, null, 2)}\n` : formatarDescricao(atual), descricao: atual };
+  const { descricao: atual, divergencias } = medirEsboco(JSON.parse(readFileSync(caminho, 'utf8')), { projecao: completo || json || mudou || forma !== null });
+  const leitura = () => (forma !== null ? formatarForma(atual, divergencias, forma) : completo ? formatarDescricao(atual) : formatarResumo(atual, divergencias));
+  if (!mudou) return { texto: json ? `${JSON.stringify(atual, null, 2)}\n` : leitura(), descricao: atual, divergencias };
   const memoria = `${caminho}.descrever.json`;
   let anterior = null;
   try { anterior = JSON.parse(readFileSync(memoria, 'utf8')); } catch { /* sem execução anterior, ou ilegível */ }
@@ -272,6 +296,55 @@ export function descreverArquivo(arquivo, { mudou = false, json = false } = {}) 
   return { texto, descricao: atual, diferenca: d };
 }
 
+/* `--achado <n>`: grava `<nome>-achado-<n>.png` ao lado do esboço, com a divergência de número `n` da leitura padrão:
+   o par envolvido colorido, o resto em cinza, sem legenda numerada e com zoom no ponto. */
+export async function achadoArquivo(arquivo, n, { vista = 'isometrica' } = {}) {
+  const caminho = resolve(arquivo);
+  const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  const { divergencias } = medirEsboco(bruto, { projecao: false });
+  const d = divergencias.find((x) => x.n === n);
+  if (!d) throw new ErroDeEsboco(divergencias.length === 0 ? `--achado ${n}: o esboço não tem divergência para desenhar (a leitura padrão diz "divergências: nenhuma")` : `--achado ${n}: não há a divergência ${n} (a leitura padrão numera de 1 a ${divergencias.length})`);
+  const im = imagemDoAchado(bruto, d, { vista });
+  const destino = `${caminho.replace(/(\.esboco)?\.json$/i, '')}-achado-${n}.png`;
+  await svgParaPng(im.svg, im.largura, im.altura, destino);
+  return { destino, divergencia: d, imagem: im };
+}
+
+/* `--condutor <arquivo>`: mantém `<arquivo>.condutor.json` (o repositório o ignora) com o estágio atual, as Unidades de
+   detalhe, os Marcos e o histórico. Sem ação mostra a situação; `proximo` só avança se o Portão do estágio passa;
+   `feito` marca uma unidade; `mover` (com `para` e `motivo`) e `replanejar` (com `motivo`) mudam o agrupamento. Devolve
+   { texto, codigo }. */
+export function condutorArquivo(arquivo, acao = {}) {
+  const caminho = resolve(arquivo);
+  const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  const memoria = `${caminho}.condutor.json`;
+  let estado = null;
+  try { estado = JSON.parse(readFileSync(memoria, 'utf8')); } catch { /* primeira execução, ou ilegível */ }
+  const novo = estado === null;
+  if (novo) estado = criarEstado(bruto, basename(caminho));
+  let extra = '';
+  let codigo = 0;
+  if (acao.proximo) {
+    const r = avancar(bruto, estado);
+    estado = r.estado;
+    if (r.concluido) extra = 'o fluxo já terminou; não há estágio seguinte\n';
+    else if (!r.ok) { codigo = 1; extra = `avanço recusado: o Portão de ${nomeDoEstagio(estado.atual)} não passa; falta:\n${r.portao.falta.map((f) => `  - ${f}`).join('\n')}\n`; }
+    else extra = `avançou de ${nomeDoEstagio(estado.historico[estado.historico.length - 1].de)} para ${nomeDoEstagio(estado.atual)}\n`;
+  } else if (acao.feito !== undefined) {
+    const r = marcarFeito(bruto, estado, acao.feito);
+    estado = r.estado;
+    extra = `unidade ${acao.feito} marcada como feita\n${r.novosMarcos.map((m) => `marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado no estado; o despacho é da skill)\n`).join('')}`;
+  } else if (acao.mover !== undefined) {
+    estado = moverForma(bruto, estado, { forma: acao.mover, para: acao.para, motivo: acao.motivo });
+    extra = `${acao.mover} foi para a unidade ${acao.para}\n`;
+  } else if (acao.replanejar) {
+    estado = replanejar(bruto, estado, { motivo: acao.motivo });
+    extra = 'Plano de detalhe refeito\n';
+  }
+  writeFileSync(memoria, `${JSON.stringify(estado, null, 2)}\n`);
+  const portao = portaoDoEstagio(bruto, estado);
+  return { texto: `${extra}${novo ? `estado criado em ${memoria}\n` : ''}${formatarSituacao(estado, portao)}`, codigo, estado, portao };
+}
 /* `--ajustar`: grava `<nome>.ajustado.esboco.json` ao lado, com as sugestões de contato aplicadas, e nunca
    toca o original. Sem nenhuma forma movida, não grava nada. */
 export function ajustarArquivo(arquivo) {
@@ -284,32 +357,68 @@ export function ajustarArquivo(arquivo) {
   return { resultado, destino: moveu ? destino : null };
 }
 
+/* Flags que levam um valor (`--forma garfoE` ou `--forma=garfoE`); o resto é booleano. `--condutor` leva o arquivo. */
+const FLAGS_COM_VALOR = ['--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista'];
+
+/* { alvo, tem(flag), valor(flag) }: separa o arquivo dos valores das flags, para `--forma <id>` poder vir antes do arquivo. */
+export function lerArgumentos(argv) {
+  const valores = new Map();
+  const flags = new Set();
+  const posicionais = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (!a.startsWith('--')) { posicionais.push(a); continue; }
+    const [nome, ...resto] = a.split('=');
+    flags.add(nome);
+    if (FLAGS_COM_VALOR.includes(nome)) {
+      if (resto.length > 0) valores.set(nome, resto.join('='));
+      else if (i + 1 < argv.length && !argv[i + 1].startsWith('--')) valores.set(nome, argv[++i]);
+      else valores.set(nome, undefined);
+    }
+  }
+  const alvo = valores.get('--condutor') ?? posicionais[0];
+  return { alvo, tem: (f) => flags.has(f), valor: (f) => valores.get(f), zoom: argv.find((a) => a.startsWith('--zoom=')) };
+}
+
 async function principal(argv) {
-  const alvo = argv.find((a) => !a.startsWith('--'));
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--mudou] [--json]] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
-  const estrito = argv.includes('--estrito');
+  const args = lerArgumentos(argv);
+  const alvo = args.alvo;
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--proximo | --feito <unidade> | --mover <forma> --para <unidade> --motivo <texto> | --replanejar --motivo <texto>]]\n'); return 2; }
+  const estrito = args.tem('--estrito');
   try {
-    if (argv.includes('--mudou') && !argv.includes('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
-    if (argv.includes('--ajustar')) {
+    if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
+    for (const f of ['--forma', '--achado', '--feito', '--mover', '--para', '--motivo', '--vista']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    if (args.tem('--condutor')) {
+      const r = condutorArquivo(alvo, { proximo: args.tem('--proximo'), feito: args.valor('--feito'), mover: args.valor('--mover'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar') });
+      process.stdout.write(r.texto);
+      return r.codigo;
+    }
+    if (args.tem('--achado')) {
+      const n = Number(args.valor('--achado'));
+      if (!Number.isInteger(n) || n < 1) throw new ErroDeEsboco(`--achado precisa do número da divergência (um inteiro a partir de 1, como aparece na leitura padrão), e veio "${args.valor('--achado')}".`);
+      const r = await achadoArquivo(alvo, n, { vista: args.valor('--vista') ?? 'isometrica' });
+      process.stdout.write(`achado ${n} (${r.divergencia.classe}): ${r.divergencia.texto}\n  ${r.destino}\n  vista ${r.imagem.vista}, zoom de ${r.imagem.janela_mm} mm em torno de [${r.imagem.ponto.join(' ')}], peças: ${r.divergencia.pecas.join(', ') || 'o conjunto'}\n`);
+      return 0;
+    }
+    if (args.tem('--ajustar')) {
       const { resultado, destino } = ajustarArquivo(alvo);
       process.stdout.write(`${formatarAjuste(resultado, descreverAchado)}\n${destino ? `gravado em ${destino} (o original não foi alterado)` : 'nenhum arquivo gravado'}\n${relatarContato(resultado.final)}`);
       return resultado.aprovado ? 0 : 1;
     }
-    if (argv.includes('--descrever')) {
-      process.stdout.write(descreverArquivo(alvo, { mudou: argv.includes('--mudou'), json: argv.includes('--json') }).texto);
+    if (args.tem('--descrever')) {
+      process.stdout.write(descreverArquivo(alvo, { mudou: args.tem('--mudou'), json: args.tem('--json'), completo: args.tem('--completo'), forma: args.valor('--forma') ?? null }).texto);
       return 0;
     }
-    if (argv.includes('--analise')) {
-      const z = argv.find((a) => a.startsWith('--zoom='));
-      const rapido = argv.includes('--rapido');
-      const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: z ? z.slice(7) : null, centros: argv.includes('--centros'), sugerir: argv.includes('--sugerir'), rapido });
+    if (args.tem('--analise')) {
+      const rapido = args.tem('--rapido');
+      const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: args.zoom ? args.zoom.slice(7) : null, centros: args.tem('--centros'), sugerir: args.tem('--sugerir'), rapido });
       const cabecalho = rapido
         ? `análise rápida do esboço: sem imagem (contato e projeção em texto; manifesto em ${pasta})\nRode sem --rapido para gerar as imagens antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n`
-        : `análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\nAbra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n`;
+        : `análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\n${(manifesto.achados ?? []).length ? `imagens dos achados (o par colorido, o resto em cinza, com zoom no ponto):\n${manifesto.achados.map((a) => `  ${a.arquivo}: [${a.n}] ${a.classe}: ${a.texto}`).join('\n')}\n` : ''}Abra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n`;
       process.stdout.write(`${cabecalho}${relatarContato(manifesto.contato)}${relatarProjecao(manifesto.projecao)}${!manifesto.sugerir && Object.values(manifesto.projecao.porVista).some((l) => l.length > 0) && manifesto.projecao.explosao.length === 0 ? 'explosão e deslocamento sugeridos: rode com --sugerir (leva minutos numa moto densa).\n' : ''}`);
       return estrito && (manifesto.contato.resultado === 'reprovado' || manifesto.projecao.resultado === 'reprovado') ? 1 : 0;
     }
-    const r = await gerarEsboco(alvo, { rapido: argv.includes('--rapido') });
+    const r = await gerarEsboco(alvo, { rapido: args.tem('--rapido') });
     process.stdout.write(`esboço ${r.largura}x${r.altura} px, ${r.escala.toFixed(3)} px/mm${r.png ? '' : ' (modo rápido: só o SVG, com menos lados nos círculos)'}\n${r.png ? `  ${r.png}\n` : ''}  ${r.svg}\n${relatarContato(r.contato)}${relatarProjecao(r.projecao)}`);
     return estrito && (r.contato.resultado === 'reprovado' || r.projecao.resultado === 'reprovado') ? 1 : 0;
   } catch (e) {

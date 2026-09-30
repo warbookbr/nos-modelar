@@ -1,10 +1,12 @@
 /* Leitura do esboço em texto: cada forma resolvida, as âncoras, o grafo de contatos 3D,
    as formas soltas e as sobreposições (3D e por vista), sem desenhar nada. Também calcula a
    diferença entre duas leituras (`--descrever --mudou`). Puro: não lê nem grava arquivo. */
-import { ancorasDe, relacaoDe, resolverOpcao } from './index.js';
+import { ancorasDe, ErroDeEsboco, relacaoDe, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { herdarDoEspelho, lerContato, medirPar, paresImplicitos, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
 import { verificarProjecao } from './projecao.js';
+import { conferirPlano } from './plano.js';
+import { quisDizer } from './parecido.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const r2 = (x) => Math.round(x * 100) / 100;
@@ -36,8 +38,22 @@ function descreverForma(r) {
   };
 }
 
+/* Gravidade das divergências, da mais grave para a menos: forma solta, atravessamento além do declarado, relação
+   declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho e medida do plano
+   fora da tolerância. */
+export const GRAVIDADES = { solto: 1, atravessa: 2, contrato: 3, assimetria: 4, medida: 5 };
+const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato' };
+const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', assimetria: 'assimetria' };
+
 /* { opcoes, ... } a partir do JSON já lido. */
 export function descreverEsboco(bruto) {
+  return medirEsboco(bruto).descricao;
+}
+
+/* A leitura e, junto dela, a lista numerada de divergências (`n` global, na ordem em que a leitura padrão as imprime:
+   por opção, da mais grave para a menos). `projecao: false` pula a medida de sobreposição na vista, que não entra nas
+   divergências (só a leitura completa a mostra). Devolve { descricao, divergencias, plano }. */
+export function medirEsboco(bruto, { projecao: comProjecao = true } = {}) {
   const esboco = expandirEsboco(bruto);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -46,8 +62,10 @@ export function descreverEsboco(bruto) {
   const todas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
   const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis }) : null;
-  const projecao = verificarProjecao(esboco, { forcar: true, resolvidas: visiveis });
+  const projecao = comProjecao ? verificarProjecao(esboco, { forcar: true, resolvidas: visiveis }) : { achados: [] };
+  const plano = conferirPlano(esboco, visiveis);
   const padrao = padroesDoContato(visiveis);
+  const divergencias = [];
   const resultado = opcoes.map((o, i) => {
     const titulo = o.titulo ?? `Opção ${i + 1}`;
     const rs = visiveis[i];
@@ -84,6 +102,22 @@ export function descreverEsboco(bruto) {
     const projecaoDaOpcao = projecao.achados.filter((a) => a.opcao === titulo).map((a) => ({
       vista: a.vista, a: a.pecas[0], b: a.pecas[1], fracao: a.fracao, cobre: a.cobre, folga_mm: a.folga_mm,
     }));
+    /* divergências: com o gate declarado vêm dos achados dele, e sem ele das soltas e das sobreposições não declaradas */
+    const divs = [];
+    const somar = (classe, texto, pecas, sugestao, extra = {}) => divs.push({ opcao: titulo, classe, gravidade: GRAVIDADES[classe], texto, pecas, ...(sugestao ? { sugestao } : {}), ...extra });
+    if (declarado) {
+      const doGate = (gate?.achados ?? []).filter((x) => x.opcao === titulo);
+      const voando = new Set(doGate.filter((x) => x.tipo === 'voando').map((x) => x.pecas[0]));
+      /* a peça que está fora do grupo conectado e também longe de tudo é uma divergência só */
+      for (const a of doGate.filter((x) => !(x.tipo === 'longe' && voando.has(x.pecas[0])))) somar(CLASSE_DO_ACHADO[a.tipo], descreverAchado(a).slice(`[${a.opcao}] `.length).replace(/^[^:]+: /, ''), a.pecas, a.sugestao?.texto ?? null, { tipo: a.tipo, mm: a.mm });
+    } else {
+      for (const id of soltas) somar('solto', `${id} fora do maior grupo conectado`, [id], null, { tipo: 'solta' });
+      for (const t of sobreposicoes3d) if (!t.declarado) somar('atravessa', `${t.a} e ${t.b} se atravessam ${mm1(t.penetracao_mm)} mm`, [t.a, t.b], null, { tipo: 'sobreposicao-3d', mm: t.penetracao_mm });
+    }
+    for (const a of plano.achados.filter((x) => x.opcao === titulo)) somar(CLASSE_DO_PLANO[a.tipo], a.texto, a.pecas, null, { tipo: a.tipo, mm: a.mm });
+    divs.sort((x, y) => x.gravidade - y.gravidade);
+    divergencias.push(...divs);
+    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'assimetria');
     return {
       titulo,
       ...(o.parametros && Object.keys(o.parametros).length ? { parametros: o.parametros } : {}),
@@ -98,14 +132,22 @@ export function descreverEsboco(bruto) {
       projecao: projecaoDaOpcao,
       achadosDeContato: (gate?.achados ?? []).filter((a) => a.opcao === titulo).map(descreverAchado),
       sugestoesDeContato: (gate?.achados ?? []).filter((a) => a.opcao === titulo).map((a) => a.sugestao?.texto ?? null),
+      ...(doPlano.length ? { divergenciasDoPlano: doPlano.map((x) => x.texto) } : {}),
     };
   });
-  return { opcoes: resultado };
+  divergencias.forEach((d, k) => { d.n = k + 1; });
+  return { descricao: { opcoes: resultado }, divergencias, plano };
 }
 
 const mm1 = (x) => (Math.round(x * 10) / 10).toString().replace('.', ',');
 const vetor = (v) => `[${v.map(mm1).join(' ')}]`;
 const faixa = (p) => `${mm1(p[0])}..${mm1(p[1])}`;
+
+const linhaDaForma = (f) => `forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`;
+const linhaDeAncoras = (f) => `âncoras ${f.id}: ${Object.entries(f.ancoras).map(([k, v]) => `${k} ${vetor(v)}`).join('; ')}`;
+const linhaDeContato = (c) => `contato: ${c.a} toca ${c.b} (${c.folga_mm !== undefined ? `folga ${mm1(c.folga_mm)} mm` : `penetração ${mm1(c.penetracao_mm)} mm`})`;
+const linhaDeSobreposicao3d = (s) => `sobreposição 3D: ${s.a} e ${s.b} se atravessam ${mm1(s.penetracao_mm)} mm${s.declarado ? ' (atravessa declarado)' : ''}`;
+const linhaDeProjecao = (p) => `sobreposição na vista ${p.vista}: ${p.cobre} cobre ${p.cobre === p.a ? p.b : p.a} em ${Math.round(p.fracao * 100)}% (par ${p.a} e ${p.b}, folga real ${mm1(p.folga_mm)} mm)`;
 
 /* Texto compacto: uma linha por fato, na ordem de declaração. */
 export function formatarDescricao(d) {
@@ -113,22 +155,70 @@ export function formatarDescricao(d) {
   for (const [i, o] of d.opcoes.entries()) {
     L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
     if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
-    L.push(o.gate.declarado
-      ? `gate de contato declarado: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm`
-      : `sem gate declarado (padrões do gate: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm)`);
+    L.push(linhaDoGate(o));
     for (const f of o.formas) {
-      L.push(`forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`);
-      L.push(`âncoras ${f.id}: ${Object.entries(f.ancoras).map(([k, v]) => `${k} ${vetor(v)}`).join('; ')}`);
+      L.push(linhaDaForma(f));
+      L.push(linhaDeAncoras(f));
     }
-    for (const c of o.contatos) L.push(`contato: ${c.a} toca ${c.b} (${c.folga_mm !== undefined ? `folga ${mm1(c.folga_mm)} mm` : `penetração ${mm1(c.penetracao_mm)} mm`})`);
+    for (const c of o.contatos) L.push(linhaDeContato(c));
     for (const s of o.soltas) L.push(`solta: ${s} fora do maior grupo conectado`);
-    for (const s of o.sobreposicoes3d) L.push(`sobreposição 3D: ${s.a} e ${s.b} se atravessam ${mm1(s.penetracao_mm)} mm${s.declarado ? ' (atravessa declarado)' : ''}`);
-    for (const p of o.projecao) L.push(`sobreposição na vista ${p.vista}: ${p.cobre} cobre ${p.cobre === p.a ? p.b : p.a} em ${Math.round(p.fracao * 100)}% (par ${p.a} e ${p.b}, folga real ${mm1(p.folga_mm)} mm)`);
+    for (const s of o.sobreposicoes3d) L.push(linhaDeSobreposicao3d(s));
+    for (const p of o.projecao) L.push(linhaDeProjecao(p));
     for (const [k, a] of o.achadosDeContato.entries()) L.push(`achado de contato: ${a}${o.sugestoesDeContato?.[k] ? `; sugestão: ${o.sugestoesDeContato[k]}` : ''}`);
+    for (const t of o.divergenciasDoPlano ?? []) L.push(`divergência do plano: ${t}`);
     if (o.contatos.length === 0 && o.formas.length > 1) L.push('nenhum contato entre as formas');
   }
   return `${L.join('\n')}\n`;
 }
+
+const linhaDoGate = (o) => (o.gate.declarado
+  ? `gate de contato declarado: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm`
+  : `sem gate declarado (padrões do gate: tolerância ${mm1(o.gate.tolerancia_mm)} mm, penetração ${mm1(o.gate.penetracao_mm)} mm)`);
+
+/* Leitura padrão: por opção só o total de formas, os parâmetros e as divergências em ordem de gravidade, cada uma com o
+   número que `--achado <n>` desenha. O detalhe de cada forma (âncoras, caixas, vizinhos) sai com `--forma <id>` e a
+   leitura completa com `--completo`. */
+export function formatarResumo(d, divergencias) {
+  const L = [];
+  for (const [i, o] of d.opcoes.entries()) {
+    L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
+    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
+    L.push(linhaDoGate(o));
+    const meus = divergencias.filter((x) => x.opcao === o.titulo);
+    if (meus.length === 0) { L.push('divergências: nenhuma'); continue; }
+    L.push(`divergências (${meus.length}, da mais grave para a menos):`);
+    for (const x of meus) L.push(`  [${x.n}] ${x.classe}: ${x.texto}${x.sugestao ? `; sugestão: ${x.sugestao}` : ''}`);
+  }
+  L.push('detalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo');
+  return `${L.join('\n')}\n`;
+}
+
+const casaPadrao = (padrao, id) => new RegExp(`^${padrao.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`).test(id);
+
+/* Leitura de uma forma (ou de um padrão como `garfoE.*`) em cada opção: a linha dela, as âncoras, a caixa, os vizinhos
+   (contatos), as sobreposições e as divergências que a citam. Um id que não existe é recusado com os ids válidos. */
+export function formatarForma(d, divergencias, id) {
+  const ids = [...new Set(d.opcoes.flatMap((o) => o.formas.map((f) => f.id)))];
+  const alvo = (x) => (id.includes('*') ? casaPadrao(id, x) : x === id);
+  if (!ids.some(alvo)) throw new ErroDeEsboco(`--forma: "${id}" não é uma forma do esboço${quisDizer(id, ids)} (ids: ${ids.join(', ')})`);
+  const L = [];
+  for (const [i, o] of d.opcoes.entries()) {
+    const achadas = o.formas.filter((f) => alvo(f.id));
+    if (achadas.length === 0) continue;
+    L.push(`opção ${i + 1} (${o.titulo}):`);
+    for (const f of achadas) {
+      L.push(linhaDaForma(f));
+      L.push(linhaDeAncoras(f));
+      for (const c of o.contatos) if (c.a === f.id || c.b === f.id) L.push(linhaDeContato(c));
+      if (o.soltas.includes(f.id)) L.push(`solta: ${f.id} fora do maior grupo conectado`);
+      for (const s of o.sobreposicoes3d) if (s.a === f.id || s.b === f.id) L.push(linhaDeSobreposicao3d(s));
+      for (const p of o.projecao) if (p.a === f.id || p.b === f.id) L.push(linhaDeProjecao(p));
+      for (const x of divergencias.filter((q) => q.opcao === o.titulo && q.pecas.includes(f.id))) L.push(`divergência [${x.n}] ${x.classe}: ${x.texto}`);
+    }
+  }
+  return `${L.join('\n')}\n`;
+}
+
 
 const deltaDe = (a, b) => b.map((v, i) => r2(v - a[i]));
 const dist = (v) => Math.hypot(...v);

@@ -1,6 +1,24 @@
 {
   "vista": "isometrica",
-  "plano": "A moto de moto-componentes com as formas curvas da fatia 8: o tanque é um loft de seis seções elípticas (estreito atrás, cheio no meio, afunilando para a coluna), o banco é uma extrusão de perfil côncavo (a sela afundada entre o rabeta e o tanque), a carenagem é um loft de retângulos arredondados que afunila para a frente e o farol é uma revolução de um perfil de cinco pontos. Nenhum centro é calculado à mão: o tanque pousa no quadro e encosta na coluna, o banco pousa na roda traseira e encosta no tanque, a carenagem parte da face da frente da coluna e o farol encosta na ponta dela e se alinha ao centro da seção `nariz`, que é uma âncora nomeada da carenagem. O gate aprova as duas opções e a única exceção é o guidão que atravessa a coroa do garfo.",
+  "plano": {
+    "texto": "A moto de moto-componentes com as formas curvas da fatia 8: o tanque é um loft de seis seções elípticas (estreito atrás, cheio no meio, afunilando para a coluna), o banco é uma extrusão de perfil côncavo (a sela afundada entre o rabeta e o tanque), a carenagem é um loft de retângulos arredondados que afunila para a frente e o farol é uma revolução de um perfil de cinco pontos. Nenhum centro é calculado à mão: o tanque pousa no quadro e encosta na coluna, o banco pousa na roda traseira e encosta no tanque, a carenagem parte da face da frente da coluna e o farol encosta na ponta dela e se alinha ao centro da seção `nariz`, que é uma âncora nomeada da carenagem. O gate aprova as duas opções e a única exceção é o guidão que atravessa a coroa do garfo.",
+    "nivel": "detalhado",
+    "medidas": [
+      {"nome": "distanciaEntreEixos", "valor": 1400, "unidade": "mm", "origem": "ficha", "tolerancia": 5, "mede": {"distancia": ["rodaFrente.eixo", "rodaTras.eixo"], "eixo": "z"}},
+      {"nome": "comprimentoTotal", "valor": 2.01, "unidade": "m", "origem": "foto", "tolerancia": 30, "mede": "profundidadeTotal"},
+      {"nome": "alturaNaked", "valor": 85, "unidade": "cm", "origem": "foto", "tolerancia": 20, "mede": "alturaTotal", "opcoes": ["A. Naked"]},
+      {"nome": "alturaCafe", "valor": 80, "unidade": "cm", "origem": "foto", "tolerancia": 20, "mede": "alturaTotal", "opcoes": ["B. Café racer"]},
+      {"nome": "larguraGuidaoNaked", "valor": 76, "unidade": "cm", "origem": "ficha", "tolerancia": 10, "mede": {"caixa": "x", "formas": ["guidao"]}, "opcoes": ["A. Naked"]},
+      {"nome": "larguraGuidaoCafe", "valor": 54, "unidade": "cm", "origem": "ficha", "tolerancia": 10, "mede": {"caixa": "x", "formas": ["guidao"]}, "opcoes": ["B. Café racer"]},
+      {"nome": "comprimentoDoTanque", "valor": 42, "unidade": "cm", "origem": "ia", "tolerancia": 5, "mede": {"caixa": "z", "formas": ["tanque"]}},
+      {"nome": "comprimentoDoBanco", "valor": 56, "unidade": "cm", "origem": "ia", "tolerancia": 5, "mede": {"caixa": "z", "formas": ["banco"]}}
+    ],
+    "contrato": {
+      "tocam": [["tanque", "quadro"], ["banco", "tanque"], ["carenagem", "quadro.coluna"]],
+      "livres": [["rodaFrente", "rodaTras"]],
+      "simetricas": [["garfoE", "garfoD"], ["balancimE", "balancimD"]]
+    }
+  },
   "linhasCentro": false,
   "legendas": "lista",
   "parametros": {

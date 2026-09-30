@@ -11,7 +11,8 @@
      instância as escreve no mesmo nível de `usa`; uma entrada com padrão `null` que a instância não escreve some da
      forma que a usa, e se estiver dentro de uma lista ou de um `entre` a instância é obrigada a escrevê-la.
    - As `ancoras` do componente ficam expostas como `<instancia>.<ancora>` em toda referência de fora (`centro`, `de`,
-     `para`, `alinha.com`, `caminho`, `entre`), e o id da instância sozinho (em `sobre`, `ponta`, `encosta`,
+     `para`, `alinha.com`, `caminho`, `entre`, `ancora`), e também `<instancia>.<parte>` (o centro de qualquer forma do
+     componente, inclusive a principal, como `rodaFrente.pneu`); o id da instância sozinho (em `sobre`, `ponta`, `encosta`,
      `alinha` e nos pares do gate) é a forma principal dela. Qualquer âncora da forma principal também vale.
    - Os `pares` do componente (`encosta`, `atravessa` com `max` e `motivo`) entram no `contato.pares` da opção com os ids
      prefixados, a menos que o esboço já declare o mesmo par.
@@ -45,6 +46,8 @@ function reescreverForma(f, { ponto, id }) {
   const pt = (v) => {
     if (typeof v === 'string') return ponto(v);
     if (objeto(v) && Array.isArray(v.entre)) return { ...v, entre: v.entre.map(pt) };
+    if (objeto(v) && typeof v.ancora === 'string') return { ...v, ancora: ponto(v.ancora) };
+    if (objeto(v) && v.nome !== undefined && v.ponto !== undefined) return { ...v, ponto: pt(v.ponto) };
     return v;
   };
   if (typeof g.sobre === 'string') g.sobre = id(g.sobre);
@@ -90,11 +93,11 @@ function substituir(v, entradas, onde, nome) {
    como vieram. */
 export function expandirComponentes(formas, ctx) {
   const { onde } = ctx;
-  if (!Array.isArray(formas)) return { formas, pares: [], aliasDeId: () => undefined, instancias: 0 };
+  if (!Array.isArray(formas)) return { formas, pares: [], aliasDeId: () => undefined, instancias: 0, ponto: (v) => v };
   const ehInstancia = (f) => objeto(f) && f.usa !== undefined;
   const ehEspelhoDeInstancia = (f, ids) => objeto(f) && f.usa === undefined && objeto(f.espelha) && typeof f.espelha.forma === 'string' && ids.has(f.espelha.forma);
   const instancias = formas.filter(ehInstancia);
-  if (instancias.length === 0) return { formas, pares: [], aliasDeId: () => undefined, instancias: 0 };
+  if (instancias.length === 0) return { formas, pares: [], aliasDeId: () => undefined, instancias: 0, ponto: (v) => v };
 
   const dadosDe = new Map();
   for (const f of instancias) {
@@ -121,7 +124,10 @@ export function expandirComponentes(formas, ctx) {
     const declaradas = comp.ancoras ?? {};
     if (Object.hasOwn(declaradas, nome)) return `${inst}.${declaradas[nome]}`;
     if (ANCORAS_DA_FORMA.includes(nome)) return `${principalDe(inst)}.${nome}`;
-    throw new ErroDeEsboco(`${contexto}: o componente "${dadosDe.get(inst).nome}" (instância "${inst}") não tem a âncora "${nome}" (âncoras: ${[...Object.keys(declaradas), ...ANCORAS_DA_FORMA].join(', ')})`);
+    /* `<instancia>.<parte>` (inclusive a principal): o centro daquela forma do componente */
+    if (comp.formas.some((g) => g.id === nome)) return `${inst}.${nome}.centro`;
+    const partes = comp.formas.map((g) => g.id);
+    throw new ErroDeEsboco(`${contexto}: o componente "${dadosDe.get(inst).nome}" (instância "${inst}") não tem a âncora "${nome}" (âncoras: ${[...Object.keys(declaradas), ...ANCORAS_DA_FORMA].join(', ')}; partes, que valem como "${inst}.<parte>": ${partes.join(', ')})`);
   };
   /* referência de fora: "inst.ancora" -> forma e âncora reais; "inst" sozinho (só onde vale um id) -> forma principal */
   const referenciaDeFora = (contexto) => ({
@@ -217,5 +223,5 @@ export function expandirComponentes(formas, ctx) {
       saida.push(objeto(f) ? reescreverForma(f, fora) : f);
     }
   }
-  return { formas: saida, pares, aliasDeId: (id) => (dadosDe.has(id) ? principalDe(id) : undefined), instancias: dadosDe.size };
+  return { formas: saida, pares, aliasDeId: (id) => (dadosDe.has(id) ? principalDe(id) : undefined), instancias: dadosDe.size, ponto: (v) => (typeof v === 'string' ? fora.ponto(v, true) : v) };
 }

@@ -491,7 +491,7 @@ const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao', 'loft', 'revoluc
 
 /* O loft e a revolução ainda têm as âncoras nomeadas: `nome` de cada seção ou de cada ponto do perfil. */
 export function nomesDeAncoras(tipo, forma) {
-  const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : [];
+  const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : tipo === 'tubo' ? nomesDasPartes(forma?.caminho) : [];
   return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' ? ['inicio', 'fim'] : []), ...nomeadas, ...LADOS];
 }
 
@@ -506,6 +506,7 @@ export function ancorasDe(r) {
   if (r.partes) {
     a.inicio = r.centro.map((c, i) => c + r.extremos.inicio[i]);
     a.fim = r.centro.map((c, i) => c + r.extremos.fim[i]);
+    for (const [nome, d] of Object.entries(r.nomeadas ?? {})) a[nome] = r.centro.map((c, i) => c + d[i]);
   } else if (r.prisma.ancorasLocais) {
     /* loft e revolução: as pontas do eixo e as seções ou pontos nomeados, em coordenadas locais já centradas */
     for (const [nome, [u, v, w]] of Object.entries(r.prisma.ancorasLocais)) {
@@ -719,7 +720,8 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     /* tubo: o sólido inteiro sofre a mesma transformação (`m`, que ainda pode ser nula) e as partes seguem o centro */
     const partes = fonte.partes.map((pt) => ({ semTampa: pt.semTampa, prisma: pt.prisma, matriz: m ? multiplicar(m, pt.matriz ?? IDENTIDADE) : pt.matriz, dc: m ? aplicarMatriz(pt.dc, m) : pt.dc }));
     const extremos = { inicio: m ? aplicarMatriz(fonte.extremos.inicio, m) : fonte.extremos.inicio, fim: m ? aplicarMatriz(fonte.extremos.fim, m) : fonte.extremos.fim };
-    const r = { id, forma, prisma: null, partes, extremos, centro, matriz: null };
+    const nomeadas = fonte.nomeadas ? Object.fromEntries(Object.entries(fonte.nomeadas).map(([nome, d]) => [nome, m ? aplicarMatriz(d, m) : d])) : undefined;
+    const r = { id, forma, prisma: null, partes, extremos, ...(nomeadas ? { nomeadas } : {}), centro, matriz: null };
     return { ...r, ...caixaDeTubo(r) };
   }
   const local = caixaLocal(fonte.prisma, m);
@@ -829,6 +831,14 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
         exigir(v.length === 3 && v.every(Number.isFinite), `${onde}: "${campo}" deve ser [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
         return [...v];
       }
+      if (v && typeof v === 'object' && !Array.isArray(v) && v.ancora !== undefined) {
+        /* âncora com deslocamento: { "ancora": "<id>.<ancora>", "mm": [dx, dy, dz] } (o ponto nomeado também vale) */
+        const dica = `${onde}: "${campo}" como objeto com "ancora" deve ser { "ancora": "<id>.<ancora>", "mm": [dx, dy, dz] } ("mm" é opcional, em mm, e "ancora" pode ser também um ponto nomeado)`;
+        exigir(typeof v.ancora === 'string' && v.ancora && Object.keys(v).every((k) => k === 'ancora' || k === 'mm'), dica);
+        exigir(v.mm === undefined || (Array.isArray(v.mm) && v.mm.length === 3 && v.mm.every(Number.isFinite)), `${dica}; o "mm" recebido é ${JSON.stringify(v.mm)}`);
+        const base = pontoDe(v.ancora, `${campo}.ancora`);
+        return v.mm === undefined ? base : base.map((x, i) => x + v.mm[i]);
+      }
       if (v && typeof v === 'object') {
         /* ponto entre dois pontos: { "entre": [A, B], "t": fração de A a B } ou { "entre": [A, B], "mm": distância a partir de A } */
         const chaves = Object.keys(v);
@@ -870,8 +880,8 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
         exigir(extras.length === 0, `${onde}: "alinha" não tem o campo "${extras[0]}" (campos: ${CHAVES_ALINHA.join(', ')})`);
         exigir(Array.isArray(al.eixos) && al.eixos.length > 0 && al.eixos.every((e) => EIXOS_ALINHA.includes(e)) && new Set(al.eixos).size === al.eixos.length,
           `${onde}: "alinha.eixos" deve listar eixos distintos entre "x", "y" e "z"`);
-        exigir(typeof al.com === 'string' && al.com, `${onde}: "alinha.com" deve ser o id de uma forma, "<id>.<ancora>" ou um ponto nomeado`);
-        const alvo = porId.has(al.com) ? referencia('alinha.com', al.com).centro : pontoDe(al.com, 'alinha.com');
+        exigir((typeof al.com === 'string' && al.com) || (al.com && typeof al.com === 'object' && !Array.isArray(al.com)), `${onde}: "alinha.com" deve ser o id de uma forma, "<id>.<ancora>", um ponto nomeado ou um ponto composto ({ "entre": ... } ou { "ancora": ..., "mm": ... })`);
+        const alvo = typeof al.com === 'string' && porId.has(al.com) ? referencia('alinha.com', al.com).centro : pontoDe(al.com, 'alinha.com');
         for (const e of al.eixos) centro[EIXOS.indexOf(e)] = alvo[EIXOS.indexOf(e)];
       }
       if (f.encosta !== undefined) {
@@ -904,9 +914,23 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       const proibidos = ['centro', 'sobre', 'ponta', 'de', 'para', 'rotacao'].filter((k) => f[k] !== undefined);
       exigir(proibidos.length === 0, `${onde}: o tubo se posiciona pelos pontos do "caminho"; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca", "alinha" ou "encosta" para afastá-lo)`);
       exigir(Array.isArray(f.caminho) && f.caminho.length >= 2, `${onde}: tubo precisa de "caminho": lista de 2 ou mais pontos, cada um [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
-      const t = construirTubo(f, f.caminho.map((q, i) => pontoDe(q, `caminho[${i}]`)), onde);
+      /* ponto-guia nomeado: { "nome": "joelho", "ponto": <qualquer ponto> } vira a âncora `<id>.joelho` */
+      const guias = {};
+      const pts = f.caminho.map((q, i) => {
+        if (q && typeof q === 'object' && !Array.isArray(q) && q.nome !== undefined) {
+          exigir(Object.keys(q).every((k) => k === 'nome' || k === 'ponto') && q.ponto !== undefined && typeof q.nome === 'string' && q.nome, `${onde}: "caminho[${i}]" com "nome" deve ser { "nome": "joelho", "ponto": [x, y, z] } (o ponto é qualquer ponto: vetor, nomeado, "<id>.<ancora>", { "entre": ... } ou { "ancora": ..., "mm": [dx, dy, dz] })`);
+          exigirNomes([q.nome], `${onde}, "caminho[${i}]"`);
+          exigir(!Object.hasOwn(guias, q.nome), `${onde}: o ponto-guia "${q.nome}" está repetido no "caminho"`);
+          const p = pontoDe(q.ponto, `caminho[${i}].ponto`);
+          guias[q.nome] = p;
+          return p;
+        }
+        return pontoDe(q, `caminho[${i}]`);
+      });
+      const t = construirTubo(f, pts, onde);
       const centro = relacionar(t.centro, () => verticesDe({ partes: t.partes }));
-      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, centro, matriz: null };
+      const nomeadas = Object.fromEntries(Object.entries(guias).map(([nome, p]) => [nome, p.map((c, k) => c - t.centro[k])]));
+      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, ...(Object.keys(nomeadas).length ? { nomeadas } : {}), centro, matriz: null };
       Object.assign(r, caixaDeTubo(r));
       visitando.delete(id);
       prontas.set(id, r);
@@ -1321,7 +1345,7 @@ function cor(hex, fator) {
   return `#${[16, 8, 0].map((k) => canal(k).toString(16).padStart(2, '0')).join('')}`;
 }
 
-const CORES_NOMEADAS = { roxo: '#7b4fb0', verde: '#3f9b52', azul: '#3d6fb5', vermelho: '#c24a3a', laranja: '#e0892b', amarelo: '#e3c23a', cinza: '#9aa3ad', preto: '#333333', branco: '#eeeeee' };
+export const CORES_NOMEADAS = { roxo: '#7b4fb0', verde: '#3f9b52', azul: '#3d6fb5', vermelho: '#c24a3a', laranja: '#e0892b', amarelo: '#e3c23a', cinza: '#9aa3ad', preto: '#333333', branco: '#eeeeee' };
 const hexDe = (c) => CORES_NOMEADAS[c] ?? c;
 
 /* Casco convexo 2D (cadeia monótona) para o contorno da silhueta. */
@@ -2268,5 +2292,7 @@ export function desenharEsboco(esboco) {
   partes.push('</svg>');
   const saida = { svg: partes.join('\n'), largura, altura, escala };
   if (temLista) saida.baloes = baloes;
+  /* `geometria: true` (uso interno da imagem por achado): a correspondência entre o plano da vista e os pixels de cada painel */
+  if (esboco.geometria === true) saida.geometria = { vista, escala, paineis: projetadas.map((p, k) => { const { cx, cy } = geometria(p, k, escala); return { cx, cy }; }) };
   return saida;
 }
