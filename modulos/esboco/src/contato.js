@@ -13,7 +13,7 @@
    a folga é a menor entre elas e a penetração é a maior entre as peças, o que
    subestima um cruzamento que atravesse várias fatias do aro. */
 import earcut from 'earcut';
-import { ErroDeEsboco, normaisDasFaixas, resolverOpcao, subforma } from './index.js';
+import { ErroDeEsboco, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 
@@ -393,6 +393,48 @@ function medirParSemMemoria(pecasA, pecasB) {
   return { folga, penetracao };
 }
 
+/* Os pontos de contato entre duas formas (listas de peças convexas), um por par de peças a menos de `tol` uma da outra: o centro da
+   região em que as caixas das duas peças, cada uma engordada de `tol / 2`, se encontram (no encosto de topo, a meio caminho entre as
+   faces; na penetração, o meio da sobreposição). Devolve [{ ponto: [x, y, z] }]. Determinístico, sem memória. */
+export function pontosDeContato(pecasA, pecasB, tol) {
+  const saida = [];
+  for (const a of pecasA) for (const b of pecasB) {
+    if (folgaAABB(a, b) > tol) continue;
+    if (distanciaConvexa(a, b) > tol) continue;
+    saida.push({ ponto: [0, 1, 2].map((i) => {
+      const lo = Math.max(a.min[i], b.min[i]);
+      const hi = Math.min(a.max[i], b.max[i]);
+      return lo <= hi ? (lo + hi) / 2 : (a.max[i] < b.min[i] ? (a.max[i] + b.min[i]) / 2 : (b.max[i] + a.min[i]) / 2);
+    }) });
+  }
+  return saida;
+}
+
+/* Agrupa pontos a menos de `tol` uns dos outros (encadeado: o vizinho do vizinho é do mesmo grupo), na ordem em que chegam.
+   Devolve [{ ponto, itens }] com o ponto médio do grupo e os índices dos pontos de entrada. */
+export function agruparPontos(pontos, tol) {
+  const pai = pontos.map((_, i) => i);
+  const raiz = (i) => { while (pai[i] !== i) { pai[i] = pai[pai[i]]; i = pai[i]; } return i; };
+  for (let i = 0; i < pontos.length; i++) for (let j = i + 1; j < pontos.length; j++) {
+    if (Math.hypot(...pontos[i].map((x, k) => x - pontos[j][k])) <= tol) pai[raiz(j)] = raiz(i);
+  }
+  const grupos = new Map();
+  pontos.forEach((p, i) => { const r = raiz(i); if (!grupos.has(r)) grupos.set(r, []); grupos.get(r).push(i); });
+  return [...grupos.values()].map((itens) => ({ itens, ponto: [0, 1, 2].map((k) => itens.reduce((s, i) => s + pontos[i][k], 0) / itens.length) }));
+}
+
+/* A menor distância de um ponto às peças de uma forma (0 se está dentro ou encostado). */
+export function distanciaDoPonto(p, pecas) {
+  const ponto = { verts: [p], min: p, max: p };
+  let menor = Infinity;
+  for (const b of pecas) {
+    if (folgaAABB(ponto, b) >= menor) continue;
+    menor = Math.min(menor, gjk(ponto, b).d);
+    if (menor <= 1e-7) return 0;
+  }
+  return menor;
+}
+
 /* O par em detalhe, para o conserto: { folga, penetracao, separa, aproxima }. `separa` é a direção unitária
    em que a forma A se afasta de B com o menor deslocamento (o eixo de separação mínima do SAT, na peça de
    maior penetração) e `aproxima` a direção em que A se aproxima de B pelo segmento entre os pontos mais
@@ -530,6 +572,62 @@ function exigirDeclaracao(p, onde, mesmaUnidade = false) {
   if (p.tipo === 'atravessa' && p.max === undefined) {
     throw new ErroDeEsboco(`${onde}: o par ${par} (tipo atravessa) precisa de "max", a penetração máxima em mm que a passagem justifica; sem ele o par nunca reprova. Exemplo: ${exemplo}`);
   }
+}
+
+
+/* Pontos de amostra de uma ponta: o centro e oito pontos na borda da seção (a 90% do raio), no plano perpendicular ao eixo. */
+function amostrasDaPonta({ ponto, direcao, raio }) {
+  const apoioDoEixo = Math.abs(direcao[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const u0 = cross(direcao, apoioDoEixo);
+  const u = escala(u0, 1 / Math.sqrt(norma2(u0)));
+  const v = cross(direcao, u);
+  const saida = [ponto];
+  for (let k = 0; k < 8; k++) {
+    const a = (Math.PI * 2 * k) / 8;
+    saida.push(somar(ponto, somar(escala(u, raio * 0.9 * Math.cos(a)), escala(v, raio * 0.9 * Math.sin(a)))));
+  }
+  return saida;
+}
+
+/* Pontas livres de uma opção: a ponta de tubo ou de haste (cilindro ou caixa com `de`/`para`) que não encosta em nenhuma outra
+   forma (visível ou oculta, a menos da tolerância), e as pontas de três ou mais formas que terminam no mesmo ponto sem nenhuma
+   outra forma que as una (um coletor). `ponta: true` na forma, ou `ponta: { inicio: true }` / `{ fim: true }`, declara a ponta
+   livre de propósito. Duas pontas no mesmo ponto são uma emenda, e não pedem coletor. */
+function achadosDePonta({ titulo, rs, pecas, ocultas, tol }) {
+  const todas = [...pecas, ...ocultas.map(pecasDe)];
+  if (todas.length < 2) return [];
+  const pontas = [];
+  rs.forEach((r, i) => { for (const p of pontasDe(r)) pontas.push({ ...p, i, livre: pontaDeclaradaLivre(r.forma, p.nome) }); });
+  if (pontas.length === 0) return [];
+  const caixas = todas.map(caixaDasPecas);
+  const ids = [...rs.map((r) => r.id), ...ocultas.map((r) => r.id)];
+  const doPonto = (p, j) => {
+    const c = caixas[j];
+    const fora = [0, 1, 2].reduce((acc, e) => acc + Math.max(c.min[e] - p[e], p[e] - c.max[e], 0) ** 2, 0);
+    return Math.sqrt(fora) > tol ? Infinity : distanciaDoPonto(p, todas[j]);
+  };
+  for (const p of pontas) {
+    p.toca = new Set();
+    const pontosDeAmostra = amostrasDaPonta(p);
+    for (let j = 0; j < todas.length; j++) {
+      if (j !== p.i && pontosDeAmostra.some((q) => doPonto(q, j) <= tol)) p.toca.add(j);
+    }
+  }
+  const achados = [];
+  for (const p of pontas) {
+    if (p.livre || p.toca.size > 0) continue;
+    const mais = Math.min(...todas.map((_, j) => (j === p.i ? Infinity : distanciaDoPonto(p.ponto, todas[j]))));
+    achados.push({ opcao: titulo, tipo: 'ponta-livre', pecas: [ids[p.i]], ponta: p.nome, ponto: p.ponto.map((x) => arred(x)), mm: arred(mais), sugestao: null });
+  }
+  for (const g of agruparPontos(pontas.map((p) => p.ponto), tol)) {
+    const membros = g.itens.map((k) => pontas[k]);
+    const donos = [...new Set(membros.map((p) => p.i))];
+    if (donos.length < 3 || membros.some((p) => p.livre)) continue;
+    const dono = new Set(donos);
+    if ([...new Set(membros.flatMap((p) => [...p.toca]))].some((j) => !dono.has(j))) continue;
+    achados.push({ opcao: titulo, tipo: 'pontas-sem-coletor', pecas: donos.map((i) => ids[i]), ponta: undefined, ponto: g.ponto.map((x) => arred(x)), mm: 0, sugestao: null });
+  }
+  return achados;
 }
 
 /* Limiares padrão, proporcionais à dimensão do conjunto: a maior aresta da caixa que
@@ -714,6 +812,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
       const vizinho = principal.filter((b) => tipos.get(chave(rs[a].id, rs[b].id)) !== 'livre' && folgas[a][b] === ate)[0];
       achadosDaOpcao.push({ opcao: titulo, tipo: 'voando', pecas: [rs[a].id], mm: Number.isFinite(ate) ? arred(ate) : null, sugestao: vizinho === undefined ? null : sugerirAproximacao(a, vizinho, `a peça fica a ${mmTxt(ate)} mm de ${rs[vizinho].id}, do grupo conectado; a folga vai a metade da tolerância (${mmTxt(tol / 2)} mm)`) });
     }
+    achadosDaOpcao.push(...achadosDePonta({ titulo, rs, pecas, ocultas: ocultasDaOpcao, tol }));
     achados.push(...achadosDaOpcao);
     atravessamentos.push(...atravessamentosDaOpcao);
     silenciados.push(...silenciadosDaOpcao);
@@ -725,7 +824,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
   };
 }
 
-const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido' };
+const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido', 'ponta-livre': 'ponta livre', 'pontas-sem-coletor': 'pontas sem coletor' };
 const mm = (x) => x.toFixed(1).replace('.', ',');
 
 /* Linha legível de um achado. */
@@ -733,6 +832,8 @@ export function descreverAchado(a) {
   const p = a.pecas;
   const base = `[${a.opcao}] ${NOMES[a.tipo]}: `;
   if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} se penetram ${mm(a.mm)} mm`;
+  if (a.tipo === 'ponta-livre') return `${base}${p[0]} tem a ponta ${a.ponta} em [${a.ponto.map(mmTxt).join(' ')}] sem encostar em nada (a forma mais próxima fica a ${mm(a.mm)} mm); encoste-a em outra forma ou declare "ponta": true${a.ponta === 'inicio' || a.ponta === 'fim' ? ` (ou "ponta": { "${a.ponta}": true })` : ''} se ela termina no ar de propósito`;
+  if (a.tipo === 'pontas-sem-coletor') return `${base}${p.length} pontas (${p.join(', ')}) terminam no mesmo ponto [${a.ponto.map(mmTxt).join(' ')}] e nenhuma forma as une; ponha ali uma forma que as una (um coletor, com o atravessamento declarado) ou declare "ponta": true em uma delas se o encontro é de propósito`;
   if (a.tipo === 'atravessa-excedido') return `${base}${p[0]} e ${p[1]} se atravessam ${mm(a.mm)} mm, acima do máximo ${a.implicita ? `implícito (mesma unidade: a menor dimensão da menor das duas formas)` : 'declarado'} de ${mm(a.max)} mm${a.implicita ? `; se a travessia é intencional basta declarar "max" (sugestão: ${a.maxSugerido ?? Math.floor(a.mm) + 1}) em contato.juntas ou em contato.pares para este par, por exemplo { "a": "${p[0]}", "b": "${p[1]}", "tipo": "atravessa", "max": ${a.maxSugerido ?? Math.floor(a.mm) + 1} } (dentro da unidade não pede "motivo")` : ''}`;
   if (a.tipo === 'longe') return `${base}${p[0]} fica a ${mm(a.mm)} mm da peça mais próxima`;
   if (a.tipo === 'voando') return `${base}${p[0]} fora do grupo conectado${a.mm === null ? '' : `, a ${mm(a.mm)} mm dele`}`;

@@ -165,11 +165,11 @@ describe('esquema do JSON: campo e valor válido, com "quis dizer"', () => {
 
   it('campo de forma que não existe, com o nome parecido e os campos do tipo', () => {
     recusa(forma({ diametr: 5 }), /opção 1 \(T\), forma "f": o campo "diametr" não existe em cilindro \(quis dizer "diametro"\?\); campos válidos: id, tipo, .*diametro, comprimento, eixo, achatado, lados/);
-    recusa(forma({ largura: 5 }), /o campo "largura" não existe em cilindro; o campo "largura" vale em caixa; campos válidos/);
+    recusa(forma({ largura: 5 }), /o campo "largura" não existe em cilindro; o campo "largura" vale em caixa, envolve; campos válidos/);
   });
 
   it('tipo de forma, eixo, cor e tipo de par que não existem dizem o valor válido', () => {
-    recusa(forma({ tipo: 'cilindo' }), /"tipo" com o valor "cilindo" deve ser um de caixa, cilindro, anel, cone, esfera, extrusao, loft, revolucao, tubo \(quis dizer "cilindro"\?\)/);
+    recusa(forma({ tipo: 'cilindo' }), /"tipo" com o valor "cilindo" deve ser um de caixa, cilindro, anel, cone, esfera, extrusao, loft, revolucao, tubo, envolve \(quis dizer "cilindro"\?\)/);
     recusa(forma({ eixo: 'w' }), /"eixo" com o valor "w" deve ser um de x, y, z/);
     recusa(forma({ cor: 'azull' }), /"cor" com o valor "azull" deve ser um nome \(roxo, verde, azul, .*\) ou um hexadecimal de 6 dígitos como "#3d6fb5" \(quis dizer "azul"\?\)/);
     recusa({ ...forma({}), contato: { usar: true, pares: [{ a: 'f', b: 'g', tipo: 'atravesa', max: 1, motivo: 'x' }] } }, /contato\.pares\[0\]: "tipo" com o valor "atravesa" deve ser um de atravessa, encosta, livre \(quis dizer "atravessa"\?\)/);

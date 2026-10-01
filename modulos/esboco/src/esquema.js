@@ -16,10 +16,11 @@ export const CAMPOS_POR_TIPO = {
   anel: ['diametroExterno', 'diametroInterno', 'espessura', 'eixo', 'lados'],
   cone: ['diametro', 'diametroTopo', 'comprimento', 'eixo', 'lados'],
   esfera: ['diametro'],
-  extrusao: ['perfil', 'comprimento', 'eixo'],
+  extrusao: ['perfil', 'comprimento', 'eixo', 'origem'],
   loft: ['secoes', 'eixo'],
   revolucao: ['perfil', 'eixo', 'lados'],
   tubo: ['caminho', 'diametro', 'raioCurva'],
+  envolve: ['circulos', 'largura', 'espessura', 'fechado', 'sentido', 'eixo'],
 };
 export const TIPOS_DE_FORMA = Object.keys(CAMPOS_POR_TIPO);
 const NUMERICOS = ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'diametroTopo', 'raioCurva', 'opacidade'];

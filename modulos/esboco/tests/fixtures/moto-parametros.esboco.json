@@ -29,7 +29,7 @@
     { "id": "banco", "tipo": "caixa", "largura": 240, "altura": 90, "profundidade": 520, "raio": "raioCanto", "sobre": "rodaTras", "encosta": { "referencia": "tanque", "direcao": "+z" }, "cor": "preto", "rotulo": "7. banco" },
     { "id": "balancimE", "tipo": "caixa", "largura": 40, "altura": 70, "profundidade": 520, "centro": "rodaTras.centro", "alinha": { "com": "motor.-x", "eixos": ["x"] }, "encosta": { "referencia": "motor", "direcao": "+z" }, "cor": "azul", "rotulo": "8. balancim" },
     { "id": "balancimD", "espelha": { "forma": "balancimE", "eixo": "x" } },
-    { "id": "garfoE", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "coluna.+y", "desloca": [-90, 0, 0], "cor": "laranja", "rotulo": "9. garfo" },
+    { "id": "garfoE", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "coluna.+y", "desloca": [-90, 0, 0], "ponta": { "inicio": true }, "cor": "laranja", "rotulo": "9. garfo" },
     { "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x" } },
     { "id": "guidao", "tipo": "cilindro", "diametro": 26, "comprimento": "larguraGuidao", "eixo": "x", "sobre": "coluna", "cor": "cinza", "rotulo": "10. guidao" }
   ],

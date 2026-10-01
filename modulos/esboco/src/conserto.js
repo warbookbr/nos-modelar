@@ -30,7 +30,8 @@ export function alvosDaForma(f, ids) {
   if (objeto(f.encosta)) cita(f.encosta.referencia);
   if (objeto(f.alinha)) citaPonto(f.alinha.com, cita);
   if (objeto(f.espelha)) cita(f.espelha.forma);
-  if (objeto(f.arranjoDe)) { cita(f.arranjoDe.fonte); cita(f.arranjoDe.centro); }
+  if (objeto(f.arranjoDe)) { cita(f.arranjoDe.fonte); cita(f.arranjoDe.centro); cita(f.arranjoDe.caminho); }
+  if (Array.isArray(f.circulos)) for (const c of f.circulos) if (objeto(c)) citaPonto(c.centro, cita);
   for (const k of ['centro', 'de', 'para']) citaPonto(f[k], cita);
   if (Array.isArray(f.caminho)) for (const q of f.caminho) citaPonto(q, cita);
   return alvos;

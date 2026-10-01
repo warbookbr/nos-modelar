@@ -5,7 +5,7 @@
    que o mede (a caixa que envolve as formas em um eixo, ou a distância entre dois pontos), e o contrato fala de ids.
    Puro: não lê nem grava arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
-import { lerContato, medirPar, padroesDoContato, pecasDe } from './contato.js';
+import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeContato, unidadesDeclaradas } from './contato.js';
 import { quisDizer } from './parecido.js';
 import { conferirReferencia, exigirVista } from './referencia.js';
 
@@ -19,7 +19,10 @@ const CHAVES_DA_PECA = ['nome', 'formas', 'obrigatoria', 'opcoes'];
 const EXEMPLO_DA_PECA = '{ "nome": "para-lama traseiro", "formas": ["paralamaT*"], "obrigatoria": true }';
 const CHAVES_DA_REFERENCIA = ['arquivo', 'vista', 'tolerancia', 'iou_min', 'partes', 'opcoes', 'ancoras', 'recorte', 'limiar'];
 const CHAVES_DA_MEDIDA = ['nome', 'valor', 'unidade', 'origem', 'tolerancia', 'mede', 'opcoes'];
-const CHAVES_DO_CONTRATO = ['tocam', 'livres', 'simetricas'];
+const CHAVES_DO_CONTRATO = ['tocam', 'livres', 'simetricas', 'fixa'];
+const CHAVES_DA_FIXA = ['a', 'b', 'pontos', 'peca', 'em'];
+const EXEMPLO_DA_FIXA = '{ "a": "motor", "b": "quadro*", "pontos": 2 }';
+export const PONTOS_PADRAO_DA_FIXA = 2;
 const CHAVES_DA_SIMETRIA = ['a', 'b', 'eixo', 'pos', 'tolerancia'];
 /* Abaixo disto a cópia de um espelho já não conta como deslocada (mm). */
 export const RUIDO_DA_SIMETRIA = 0.05;
@@ -100,9 +103,9 @@ export function lerPlano(plano) {
   }
   let contrato = null;
   if (plano.contrato !== undefined) {
-    exigir(objeto(plano.contrato), 'esboço: "plano.contrato" deve ser { tocam: [[a, b]], livres: [[a, b]], simetricas: [[a, b]] }');
+    exigir(objeto(plano.contrato), 'esboço: "plano.contrato" deve ser { tocam: [[a, b]], livres: [[a, b]], simetricas: [[a, b]], fixa: [{ a, b, pontos }] }');
     campos(plano.contrato, CHAVES_DO_CONTRATO, 'esboço: plano.contrato');
-    contrato = { tocam: [], livres: [], simetricas: [] };
+    contrato = { tocam: [], livres: [], simetricas: [], fixa: [] };
     for (const chave of ['tocam', 'livres']) {
       const lista = plano.contrato[chave] ?? [];
       exigir(Array.isArray(lista), `esboço: "plano.contrato.${chave}" deve ser uma lista de pares [idA, idB]`);
@@ -120,6 +123,22 @@ export function lerPlano(plano) {
       exigir(p.pos === undefined || Number.isFinite(p.pos), `${onde}: "pos" deve ser um número em mm`);
       exigir(p.tolerancia === undefined || (Number.isFinite(p.tolerancia) && p.tolerancia >= 0), `${onde}: "tolerancia" deve ser um número em mm, maior ou igual a zero`);
       contrato.simetricas.push({ a: p.a, b: p.b, ...(p.eixo ? { eixo: p.eixo } : {}), ...(p.pos !== undefined ? { pos: p.pos } : {}), ...(p.tolerancia !== undefined ? { tolerancia: p.tolerancia } : {}) });
+    });
+    const fixa = plano.contrato.fixa ?? [];
+    exigir(Array.isArray(fixa), `esboço: "plano.contrato.fixa" deve ser uma lista de { "a", "b", "pontos" } (a peça, a peça em que ela é presa e o mínimo de pontos de contato distintos). Exemplo: ${EXEMPLO_DA_FIXA}`);
+    fixa.forEach((p, i) => {
+      const onde = `esboço: plano.contrato.fixa[${i}]`;
+      const q = Array.isArray(p) ? { a: p[0], b: p[1], ...(p[2] === undefined ? {} : { pontos: p[2] }) } : p;
+      exigir(objeto(q), `${onde} deve ser { "a", "b", "pontos" } ou [a, b, pontos]. Exemplo: ${EXEMPLO_DA_FIXA}`);
+      campos(q, CHAVES_DA_FIXA, onde);
+      exigir(q.a === undefined || q.peca === undefined, `${onde}: use "a" ou "peca" (são o mesmo campo), não os dois`);
+      exigir(q.b === undefined || q.em === undefined, `${onde}: use "b" ou "em" (são o mesmo campo), não os dois`);
+      const a = q.a ?? q.peca;
+      const b = q.b ?? q.em;
+      exigir(typeof a === 'string' && a && typeof b === 'string' && b && a !== b, `${onde}: "a" e "b" devem ser dois ids diferentes (uma forma, uma instância, um padrão como "quadro*" ou o nome de uma unidade). Exemplo: ${EXEMPLO_DA_FIXA}`);
+      const pontos = q.pontos ?? PONTOS_PADRAO_DA_FIXA;
+      exigir(Number.isInteger(pontos) && pontos >= 1, `${onde}: "pontos" deve ser um inteiro de 1 ou mais, o mínimo de pontos de contato distintos entre as duas peças (veio ${JSON.stringify(q.pontos)}; padrão ${PONTOS_PADRAO_DA_FIXA})`);
+      contrato.fixa.push({ a, b, pontos });
     });
   }
   const referencia = plano.referencia === undefined ? [] : (Array.isArray(plano.referencia) ? plano.referencia : [plano.referencia]).map((r, i) => lerReferencia(r, `esboço: plano.referencia${Array.isArray(plano.referencia) ? `[${i}]` : ''}`));
@@ -192,6 +211,15 @@ function selecionar(entrada, rs, onde, brutos) {
   return achadas;
 }
 
+/* As formas que um lado do `contrato.fixa` designa: um id, um padrão (`quadro*`), uma instância de componente ou o nome de uma unidade. */
+function selecionarPeca(entrada, rs, onde, brutos, unidadeDe) {
+  const formas = rs.filter((r) => (entrada.includes('*') ? casa(entrada, r.id) : (r.id === entrada || brutos.get(r.id)?.daInstancia?.id === entrada)));
+  if (formas.length > 0) return formas;
+  const daUnidade = rs.filter((r) => unidadeDe.get(r.id) === entrada);
+  exigir(daUnidade.length > 0, `${onde}.fixa: "${entrada}" não é uma forma nem uma unidade visível da opção${quisDizer(entrada, [...rs.map((r) => r.id), ...new Set(unidadeDe.values())])} (ids: ${rs.map((r) => r.id).join(', ')}; unidades: ${[...new Set(unidadeDe.values())].join(', ') || 'nenhuma'})`);
+  return daUnidade;
+}
+
 /* O id de uma forma visível: o id exato, ou o da forma principal de uma instância de componente. */
 function idDaForma(entrada, rs, onde, brutos) {
   const exata = rs.find((r) => r.id === entrada);
@@ -244,7 +272,7 @@ export function assimetriaDoPar(a, b, eixo, pos) {
    { nivel, opcoes: [{ titulo, medidas, contrato }], achados, resumo }. Cada achado traz `tipo` (`medida-fora`,
    `contrato-toca`, `contrato-livre`, `assimetria`), `opcao`, `pecas` e `texto`. Sem plano estruturado só confere os espelhos
    deslocados. */
-export function conferirPlano(esboco, visiveis, { referencias } = {}) {
+export function conferirPlano(esboco, visiveis, { referencias, unidades } = {}) {
   const lido = lerPlano(esboco?.plano);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -259,6 +287,8 @@ export function conferirPlano(esboco, visiveis, { referencias } = {}) {
     const pontos = { ...(esboco.pontos ?? {}), ...(o.pontos ?? {}) };
     /* a forma resolvida de uma cópia de espelho não guarda `daInstancia` nem `desloca`: vêm do JSON da opção */
     const brutos = new Map((o.formas ?? []).filter((f) => f && typeof f.id === 'string').map((f) => [f.id, f]));
+    /* a unidade de cada forma: a planejada (o Condutor) e, por cima, a declarada na forma, na instância ou herdada do espelho */
+    const unidadeDe = new Map([...(unidades instanceof Map ? unidades : Object.entries(unidades ?? {})), ...unidadesDeclaradas(o.formas)]);
     const medidas = [];
     const contrato = [];
     const novo = (a) => { achados.push({ opcao: titulo, ...a }); };
@@ -299,6 +329,25 @@ export function conferirPlano(esboco, visiveis, { referencias } = {}) {
         contrato.push({ relacao: 'livre', a: a.id, b: b.id, ok, folga_mm: r1(folga) });
         if (!ok) novo({ tipo: 'contrato-livre', pecas: [a.id, b.id], mm: r1(folga), texto: `${a.id} e ${b.id} deviam ficar livres (contrato) e se tocam (folga de ${mm1(folga)} mm, tolerância de ${mm1(tol)} mm)` });
       }
+      for (const p of c.fixa) {
+        const A = selecionarPeca(p.a, rs, ondeC, brutos, unidadeDe);
+        const B = selecionarPeca(p.b, rs, ondeC, brutos, unidadeDe);
+        const achados = [];
+        for (const a of A) for (const b of B) {
+          if (a.id === b.id) continue;
+          for (const { ponto } of pontosDeContato(pecasDe(a), pecasDe(b), tol)) achados.push({ ponto, a: a.id, b: b.id });
+        }
+        const grupos = agruparPontos(achados.map((x) => x.ponto), tol);
+        const ok = grupos.length >= p.pontos;
+        const dosGrupos = grupos.map((g) => ({ ponto: g.ponto.map(r1), a: achados[g.itens[0]].a, b: achados[g.itens[0]].b }));
+        contrato.push({ relacao: 'fixa', a: p.a, b: p.b, ok, pontos: grupos.length, pedidos: p.pontos, locais: dosGrupos.map((g) => ({ ponto: g.ponto, pecas: [g.a, g.b] })) });
+        if (!ok) {
+          const quais = dosGrupos.slice(0, 6).map((g) => `[${g.ponto.map(mm1).join(' ')}] (${g.a} e ${g.b})`).join('; ');
+          const envolvidas = [...new Set(dosGrupos.flatMap((g) => [g.a, g.b]))];
+          const pecas = (envolvidas.length > 0 ? envolvidas : [...A.slice(0, 4), ...B.slice(0, 4)].map((r) => r.id)).slice(0, 8);
+          novo({ tipo: 'contrato-fixa', pecas, mm: p.pontos - grupos.length, texto: `${p.a} e ${p.b} deviam estar presos por pelo menos ${p.pontos} ${p.pontos === 1 ? 'ponto' : 'pontos'} de contato distintos (contrato; distintos são os separados por mais de ${mm1(tol)} mm) e o esboço achou ${grupos.length} ${grupos.length === 1 ? 'ponto' : 'pontos'}${grupos.length === 0 ? ': as duas peças não se tocam' : `: ${quais}`}; apoie a peça em mais ${p.pontos - grupos.length === 1 ? 'um lugar' : `${p.pontos - grupos.length} lugares`} da outra, ou baixe "pontos" se a ligação é de um ponto só` });
+        }
+      }
       for (const p of c.simetricas) {
         const a = idDaForma(p.a, rs, ondeC, brutos); const b = idDaForma(p.b, rs, ondeC, brutos);
         const s = assimetriaDoPar(a, b, p.eixo, p.pos);
@@ -334,7 +383,7 @@ export function conferirPlano(esboco, visiveis, { referencias } = {}) {
     porOpcao.push({ titulo, medidas, contrato, ...(conferencias.length ? { referencia: conferencias } : {}) });
   });
   const totalMedidas = lido?.medidas?.length ?? 0;
-  const relacoes = lido?.contrato ? lido.contrato.tocam.length + lido.contrato.livres.length + lido.contrato.simetricas.length : 0;
+  const relacoes = lido?.contrato ? lido.contrato.tocam.length + lido.contrato.livres.length + lido.contrato.simetricas.length + lido.contrato.fixa.length : 0;
   return { nivel: lido?.nivel, opcoes: porOpcao, achados, resumo: { medidas: totalMedidas, relacoes, ...((lido?.referencia?.length ?? 0) > 0 ? { referencias: lido.referencia.length } : {}), ...((lido?.pecas?.length ?? 0) > 0 ? { pecas: lido.pecas.length } : {}) } };
 }
 

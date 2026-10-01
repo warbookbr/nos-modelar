@@ -31,7 +31,9 @@ describe('a biblioteca', () => {
       expect(c.componente).toBe(nome);
       const ids = c.formas.map((f) => f.id);
       expect(ids).toContain(c.principal);
-      expect(new Set(ids).size).toBe(ids.length);
+      /* o mesmo id só se repete entre formas que `quando`/`exceto` ligam e desligam (a roda troca o disco pelos raios) */
+      const repetidos = ids.filter((id, i) => ids.indexOf(id) !== i);
+      for (const id of repetidos) expect(c.formas.filter((f) => f.id === id).every((f) => f.quando !== undefined || f.exceto !== undefined)).toBe(true);
       for (const alvo of Object.values(c.ancoras ?? {})) expect(ids).toContain(alvo.slice(0, alvo.indexOf('.')));
       for (const p of c.pares ?? []) { expect(ids).toContain(p.a); expect(ids).toContain(p.b); }
     }
@@ -39,7 +41,7 @@ describe('a biblioteca', () => {
 
   it.each([
     ['roda', { centro: [0, 300, 0] }],
-    ['garfo', { de: [0, 0, 0], para: [0, 500, 200] }],
+    ['garfo', { de: [0, 0, 0], para: [0, 500, 200], ponta: true }],
     ['quadro', { centro: [0, 300, 0] }],
     ['mancal', { centro: [0, 10, 0] }],
   ])('%s sozinho expande com ids prefixados, resolve e passa no gate com os próprios pares', (nome, entradas) => {
@@ -226,8 +228,8 @@ describe('recusas', () => {
   });
 
   it('parâmetro, campo, escolha e âncora inexistentes dizem o que é válido', () => {
-    recusa([{ id: 'r', usa: 'roda', parametros: { raio: 3 } }], /o parâmetro "raio" não é do componente \(parâmetros: diametro, aro, largura, espessuraDisco, diametroCubo, salienciaCubo\)/);
-    recusa([{ id: 'r', usa: 'roda', tipo: 'anel' }], /o campo "tipo" não é do componente \(campos: id, usa, parametros, cor, rotulo, oculto, opacidade, unidade, centro, sobre, alinha, encosta, desloca\)/);
+    recusa([{ id: 'r', usa: 'roda', parametros: { raio: 3 } }], /o parâmetro "raio" não é do componente \(parâmetros: diametro, aro, largura, espessuraDisco, diametroCubo, salienciaCubo, raios, raioCubo, larguraRaio, espessuraAro, larguraAro, flanges, diametroFlange, espessuraFlange, ombro\)/);
+    recusa([{ id: 'r', usa: 'roda', tipo: 'anel' }], /o campo "tipo" não é do componente \(campos: id, usa, parametros, cor, rotulo, oculto, opacidade, unidade, ponta, centro, sobre, alinha, encosta, desloca\)/);
     recusa([{ id: 'r', usa: 'roda' }, caixa('a', 'r.hélice')], /o componente "roda" \(instância "r"\) não tem a âncora "hélice" \(âncoras: eixo, topo, fundo, frente, tras, lateralE, lateralD, centro, inicio, fim,/);
     recusa([{ id: 'r', usa: 'roda', parametros: { diametro: '=2*naoExiste' } }], /o campo "parametros.diametro" com o valor "=2\*naoExiste" usa o parâmetro "naoExiste", que não existe/);
   });

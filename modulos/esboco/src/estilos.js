@@ -13,7 +13,7 @@ const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const EIXOS = ['x', 'y', 'z'];
 export const CAMPOS_DO_ESTILO = ['cor', 'opacidade', 'linhaCentro'];
-const CAMPOS_DA_UNIDADE = ['cor', 'estilo', 'simetrico'];
+const CAMPOS_DA_UNIDADE = ['cor', 'estilo', 'simetrico', 'funcao'];
 const CAMPOS_DA_SIMETRIA = ['eixo', 'pos'];
 const OUTRA_LADO = { E: 'D', D: 'E' };
 
@@ -40,6 +40,7 @@ export function lerEstilos(esboco) {
     const onde = `esboço: unidades.${nome}`;
     exigir(objeto(u), `${onde} deve ser um objeto { cor, estilo, simetrico }`);
     for (const k of Object.keys(u)) exigir(CAMPOS_DA_UNIDADE.includes(k), `${onde}: o campo "${k}" não existe${quisDizer(k, CAMPOS_DA_UNIDADE)}; campos válidos: ${CAMPOS_DA_UNIDADE.join(', ')}`);
+    exigir(u.funcao === undefined || (typeof u.funcao === 'string' && u.funcao.trim()), `${onde}: "funcao" deve ser uma frase que diz para que a unidade serve (veio ${JSON.stringify(u.funcao)})`);
     if (u.cor !== undefined) corValida(u.cor, onde);
     if (u.estilo !== undefined) exigir(Object.hasOwn(estilos, u.estilo), `${onde}: "estilo" com o valor ${JSON.stringify(u.estilo)} não é um estilo declarado${quisDizer(String(u.estilo), Object.keys(estilos))} (estilos: ${Object.keys(estilos).join(', ') || 'nenhum'})`);
     if (u.simetrico !== undefined && u.simetrico !== false) lerSimetria(u.simetrico, onde);

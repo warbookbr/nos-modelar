@@ -18,6 +18,11 @@
      prefixados, a menos que o esboço já declare o mesmo par.
    - `{ "id": "garfoD", "usa": ... }` não existe para a cópia: `{ "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x" } }`
      com uma instância em `forma` espelha todas as formas dela.
+   - `quando` e `exceto` numa forma ou num par do componente (um parâmetro, "!parametro" ou uma lista deles) ligam a forma ao
+     valor dos parâmetros: `quando` exige que todos valham ("nome" é parâmetro diferente de zero, "!nome" é zero) e `exceto` tira a
+     forma quando todos valem. Duas formas podem ter o mesmo id se só uma entra (a `roda` troca o disco pelos raios assim).
+   - `ponta: true` na instância (ou `{ inicio: true, fim: true }`) declara livres de propósito as pontas das hastes e dos tubos
+     dela (o achado de ponta livre do gate); o espelho a herda da fonte.
    - `unidade` na instância (ou no espelho dela) declara a Unidade de detalhe de todas as formas dela; o espelho sem
      `unidade` herda a da fonte.
    - Cada forma sai marcada com `daInstancia: { id, principal }`, que o conserto e o `--ajustar` usam para saber que só a
@@ -30,7 +35,7 @@ import { COMPONENTES } from '../componentes/index.js';
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const clone = (v) => JSON.parse(JSON.stringify(v));
-const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade'];
+const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta'];
 const ANCORAS_DA_FORMA = ['centro', 'inicio', 'fim', '+x', '-x', '+y', '-y', '+z', '-z'];
 
 export const NOMES_DOS_COMPONENTES = Object.keys(COMPONENTES);
@@ -54,7 +59,7 @@ function reescreverForma(f, { ponto, id }) {
   };
   if (typeof g.sobre === 'string') g.sobre = id(g.sobre);
   if (Array.isArray(g.ponta)) g.ponta = [id(g.ponta[0]), ...g.ponta.slice(1)];
-  else if (objeto(g.ponta)) g.ponta = { ...g.ponta, id: id(g.ponta.id) };
+  else if (objeto(g.ponta) && g.ponta.id !== undefined) g.ponta = { ...g.ponta, id: id(g.ponta.id) };
   else if (typeof g.ponta === 'string') g.ponta = id(g.ponta);
   if (objeto(g.encosta) && typeof g.encosta.referencia === 'string') g.encosta = { ...g.encosta, referencia: id(g.encosta.referencia) };
   if (objeto(g.alinha) && g.alinha.com !== undefined) g.alinha = { ...g.alinha, com: typeof g.alinha.com === 'string' ? ponto(g.alinha.com, true) : pt(g.alinha.com) };
@@ -128,7 +133,7 @@ export function expandirComponentes(formas, ctx) {
     if (ANCORAS_DA_FORMA.includes(nome)) return `${principalDe(inst)}.${nome}`;
     /* `<instancia>.<parte>` (inclusive a principal): o centro daquela forma do componente */
     if (comp.formas.some((g) => g.id === nome)) return `${inst}.${nome}.centro`;
-    const partes = comp.formas.map((g) => g.id);
+    const partes = [...new Set(comp.formas.map((g) => g.id))];
     throw new ErroDeEsboco(`${contexto}: o componente "${dadosDe.get(inst).nome}" (instância "${inst}") não tem a âncora "${nome}" (âncoras: ${[...Object.keys(declaradas), ...ANCORAS_DA_FORMA].join(', ')}; partes, que valem como "${inst}.<parte>": ${partes.join(', ')})`);
   };
   /* referência de fora: "inst.ancora" -> forma e âncora reais; "inst" sozinho (só onde vale um id) -> forma principal */
@@ -173,7 +178,13 @@ export function expandirComponentes(formas, ctx) {
       const i = v.indexOf('.');
       return locais.has(v) ? `${f.id}.${v}` : (i > 0 && locais.has(v.slice(0, i)) ? `${f.id}.${v}` : v);
     };
-    const formas = comp.formas.map((g) => {
+    /* `quando` (um parâmetro, "!parametro" ou uma lista deles, todos valendo) e `exceto` (o mesmo, a forma sai se todos valem):
+       a forma ou o par só entra na instância conforme os parâmetros do componente; "nome" vale quando o parâmetro é diferente
+       de zero e "!nome" quando é zero */
+    const valem = (c) => (c === undefined ? null : (Array.isArray(c) ? c : [c]).every((q) => (typeof q === 'string' && q.startsWith('!') ? escopo.num(q.slice(1), `quando`, contexto) === 0 : escopo.num(q, 'quando', contexto) !== 0)));
+    const entra = (g) => valem(g.quando) !== false && valem(g.exceto) !== true;
+    const formas = comp.formas.filter(entra).map(({ quando, exceto, ...g }) => {
+      void quando; void exceto;
       /* referências internas ganham o prefixo antes de as entradas entrarem (as entradas já são de fora) */
       let h = reescreverForma(clone(g), { ponto: prefixaPonto, id: prefixa });
       h = substituir(h, entradas, contexto, nome);
@@ -185,10 +196,12 @@ export function expandirComponentes(formas, ctx) {
       if (f.oculto !== undefined) h.oculto = f.oculto;
       if (f.opacidade !== undefined) h.opacidade = f.opacidade;
       if (f.unidade !== undefined) h.unidade = f.unidade;
+      /* `ponta: true` na instância declara livres de propósito as pontas das hastes e dos tubos dela */
+      if (f.ponta !== undefined && (h.tipo === 'tubo' || (['cilindro', 'caixa'].includes(h.tipo) && h.de !== undefined))) h.ponta = f.ponta;
       if (principal && f.rotulo !== undefined) h.rotulo = f.rotulo;
       return h;
     });
-    for (const p of comp.pares ?? []) pares.push({ ...p, a: `${f.id}.${p.a}`, b: `${f.id}.${p.b}` });
+    for (const { quando, exceto, ...p } of (comp.pares ?? []).filter(entra)) { void quando; void exceto; pares.push({ ...p, a: `${f.id}.${p.a}`, b: `${f.id}.${p.b}` }); }
     return formas;
   };
 

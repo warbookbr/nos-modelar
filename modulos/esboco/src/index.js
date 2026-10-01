@@ -385,8 +385,10 @@ function prisma(f, onde) {
     const convexo = ehConvexo(f.perfil);
     const area = f.perfil.reduce((acc, q, i) => acc + q[0] * f.perfil[(i + 1) % f.perfil.length][1] - f.perfil[(i + 1) % f.perfil.length][0] * q[1], 0);
     /* o centro da forma é o centro da caixa do perfil, qualquer que seja a origem em que ele foi declarado */
-    const cu = (Math.min(...f.perfil.map((q) => q[0])) + Math.max(...f.perfil.map((q) => q[0]))) / 2;
-    const cv = (Math.min(...f.perfil.map((q) => q[1])) + Math.max(...f.perfil.map((q) => q[1]))) / 2;
+    exigir(f.origem === undefined || f.origem === 'caixa' || f.origem === 'perfil', `${onde}: "origem" da extrusao deve ser "caixa" (o centro da forma é o da caixa do perfil, o padrão) ou "perfil" (o centro da forma é a origem [0, 0] do perfil, como num cubo com raios de um número ímpar de braços); veio ${JSON.stringify(f.origem)}`);
+    const doPerfil = f.origem === 'perfil';
+    const cu = doPerfil ? 0 : (Math.min(...f.perfil.map((q) => q[0])) + Math.max(...f.perfil.map((q) => q[0]))) / 2;
+    const cv = doPerfil ? 0 : (Math.min(...f.perfil.map((q) => q[1])) + Math.max(...f.perfil.map((q) => q[1]))) / 2;
     const centrado = f.perfil.map((q) => [q[0] - cu, q[1] - cv]);
     return { b: base(eixo), perfil: area >= 0 ? centrado : [...centrado].reverse(), furos: [], furo: null, comprimento: f.comprimento, ...(convexo ? {} : { naoConvexo: true }) };
   }
@@ -443,7 +445,7 @@ function prisma(f, onde) {
     pts.forEach((q) => { if (q.nome) ancoras[q.nome] = [0, 0, q.altura]; });
     return solidoEmSecoes(base(eixo), secoes, ancoras);
   }
-  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao, loft, revolucao ou tubo`);
+  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao, loft, revolucao, tubo ou envolve`);
 }
 
 function caixaLocal(pr, m) {
@@ -479,6 +481,26 @@ function caixaLocal(pr, m) {
   return { min, max };
 }
 
+/* `ponta: true` (ou `ponta: { inicio: true, fim: true }`) numa haste ou num tubo declara que a ponta termina no ar de propósito e
+   silencia o achado de ponta livre do gate; não posiciona a forma (a `ponta` que posiciona é `[id, lado]` ou `{ id, lado }`). */
+export function pontaSilenciosa(p) {
+  return p === true || (!!p && typeof p === 'object' && !Array.isArray(p) && p.id === undefined && (p.inicio !== undefined || p.fim !== undefined));
+}
+const posicionaPorPonta = (f) => f.ponta !== undefined && !pontaSilenciosa(f.ponta);
+/* A ponta `nome` ("inicio" ou "fim") da forma foi declarada livre? */
+export function pontaDeclaradaLivre(forma, nome) {
+  const p = forma?.ponta;
+  return p === true || (!!p && typeof p === 'object' && !Array.isArray(p) && p[nome] === true);
+}
+
+function validarPontaSilenciosa(f, onde, valeAqui) {
+  if (!pontaSilenciosa(f.ponta)) return;
+  exigir(valeAqui, `${onde}: "ponta": true (ponta que termina no ar de propósito) vale só em tubo e em cilindro ou caixa com "de"/"para"; a "ponta" que posiciona é [id, lado] ou { id, lado }`);
+  if (f.ponta === true) return;
+  const fora = Object.keys(f.ponta).filter((k) => k !== 'inicio' && k !== 'fim');
+  exigir(fora.length === 0 && ['inicio', 'fim'].every((k) => f.ponta[k] === undefined || typeof f.ponta[k] === 'boolean'), `${onde}: "ponta" como objeto deve ser { "inicio": true, "fim": true } (cada um true ou false; veio ${JSON.stringify(f.ponta)}) ou só true para as duas pontas`);
+}
+
 function lerPonta(f) {
   if (Array.isArray(f.ponta)) return { id: f.ponta[0], lado: f.ponta[1] };
   if (typeof f.ponta === 'object') return { id: f.ponta.id, lado: f.ponta.lado };
@@ -492,7 +514,7 @@ const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao', 'loft', 'revoluc
 /* O loft e a revolução ainda têm as âncoras nomeadas: `nome` de cada seção ou de cada ponto do perfil. */
 export function nomesDeAncoras(tipo, forma) {
   const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : tipo === 'tubo' ? nomesDasPartes(forma?.caminho) : [];
-  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' ? ['inicio', 'fim'] : []), ...nomeadas, ...LADOS];
+  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' || tipo === 'envolve' ? ['inicio', 'fim'] : []), ...nomeadas, ...LADOS];
 }
 
 /* A parte de um tubo como forma resolvida própria: as partes guardam o centro relativo ao do tubo, e por
@@ -526,6 +548,33 @@ export function ancorasDe(r) {
     a[lado] = meio.map((v, i) => (i === k ? (lado[0] === '+' ? r.max[k] : r.min[k]) : v));
   }
   return a;
+}
+
+/* As pontas que o gate confere: as duas do caminho de um tubo e as duas de uma haste de cilindro ou de caixa (`de`/`para`). Cada
+   uma é { nome: "inicio" | "fim", ponto, direcao (unitário para fora da forma), raio (metade da menor medida da seção, em mm) },
+   no mundo, e a lista é vazia para as outras formas. */
+export function pontasDe(r) {
+  const tubo = r.partes && r.forma.tipo === 'tubo';
+  if (!tubo && !r.haste) return [];
+  const mais = (c, d, k) => c.map((x, i) => x + d[i] * k);
+  if (tubo) {
+    const cilindros = r.partes.filter((pt) => !pt.prisma.secoes);
+    if (cilindros.length === 0) return [];
+    const eixo = (pt) => unit(aplicarMatriz([0, 1, 0], pt.matriz));
+    const raio = r.forma.diametro / 2;
+    const a = ancorasDe(r);
+    return [
+      { nome: 'inicio', ponto: a.inicio, direcao: eixo(cilindros[0]).map((x) => -x), raio },
+      { nome: 'fim', ponto: a.fim, direcao: eixo(cilindros[cilindros.length - 1]), raio },
+    ];
+  }
+  const h = r.prisma.comprimento / 2;
+  const eixo = unit(aplicarMatriz(ponto3(r.prisma.b, 0, 0, 1), r.matriz));
+  const raio = r.forma.tipo === 'caixa' ? Math.min(r.forma.largura, r.forma.profundidade) / 2 : r.forma.diametro / 2;
+  return [
+    { nome: 'inicio', ponto: mais(r.centro, eixo, -h), direcao: eixo.map((x) => -x), raio },
+    { nome: 'fim', ponto: mais(r.centro, eixo, h), direcao: eixo, raio },
+  ];
 }
 
 /* Resolve `"<id>.<ancora>"` no lugar de um vetor (`centro`, `de`, `para`, `alinha.com`). */
@@ -612,11 +661,12 @@ export function relacaoDe(f) {
   if (f.espelha) partes.push(`espelho de ${f.espelha.forma} no eixo ${f.espelha.eixo} em ${f.espelha.pos ?? 0} mm`);
   if (f.arranjoDe) {
     const a = f.arranjoDe;
-    partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
+    partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'caminho' ? `ao longo do caminho de ${a.caminho}${a.passo !== undefined ? `, passo ${a.passo} mm` : ''}` : a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
   }
   if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções`);
   if (f.tipo === 'revolucao' && Array.isArray(f.perfil)) partes.push(`revolução de um perfil de ${f.perfil.length} pontos`);
   if (f.tipo === 'tubo' && Array.isArray(f.caminho)) partes.push(`caminho de ${f.caminho.length} pontos${f.raioCurva ? `, raio de curva ${f.raioCurva} mm` : ''}`);
+  if (f.tipo === 'envolve' && Array.isArray(f.circulos)) partes.push(`faixa ${f.fechado === false ? 'aberta' : 'fechada'} de ${f.largura} mm por ${f.espessura} mm em torno de ${f.circulos.length} círculos (raios ${f.circulos.map((c) => c.raio).join(', ')})`);
   if (f.daInstancia) partes.push(`${f.daInstancia.principal ? 'principal' : 'parte'} do componente ${f.daInstancia.id}`);
   if (f.de !== undefined) partes.push(`de ${v(f.de)} para ${v(f.para)}`);
   if (f.alinha) partes.push(`alinha com ${f.alinha.com} nos eixos ${(f.alinha.eixos ?? []).join(' ')}`);
@@ -655,6 +705,44 @@ function rotacaoEmTorno(eixo, graus) {
   return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
 }
 
+const somarVetor = (a, b) => a.map((x, i) => x + b[i]);
+
+/* As poses das cópias de um `arranja` em modo `caminho`: a posição sobre a linha de centro de `alvo` (tubo ou faixa) a cada
+   `passo` mm de arco a partir de `desde`, e a rotação `Q` que leva a direção do começo do caminho à direção ali (transporte
+   paralelo, trecho a trecho). A fonte vale como posta no começo do caminho. Devolve a pose de cada cópia (índice 1 a total - 1). */
+function posesNoCaminho(alvo, a, onde) {
+  const pts = alvo.trilha.pontos.map((q) => somarVetor(alvo.centro, q));
+  const trechos = [];
+  let acumulado = 0;
+  let Q = null;
+  let anterior = null;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const d = pts[i + 1].map((x, j) => x - pts[i][j]);
+    const len = Math.hypot(...d);
+    if (len < 1e-9) continue;
+    const t = d.map((x) => x / len);
+    if (anterior) { const R = rotacaoEntre(anterior, t); if (R) Q = Q ? multiplicar(R, Q) : R; }
+    trechos.push({ de: pts[i], t, len, s0: acumulado, Q });
+    acumulado += len;
+    anterior = t;
+  }
+  exigir(acumulado > 1e-9, `${onde}: o caminho de "${a.caminho}" não tem comprimento`);
+  const fechado = alvo.trilha.fechado;
+  const passo = a.passo ?? (fechado ? acumulado / a.total : acumulado / (a.total - 1));
+  const desde = a.desde ?? 0;
+  exigir(Number.isFinite(passo) && passo > 0, `${onde}: "arranja.passo" deve ser um número positivo em mm`);
+  const saida = [];
+  for (let k = 1; k < a.total; k++) {
+    let s = desde + k * passo;
+    if (fechado) s = ((s % acumulado) + acumulado) % acumulado;
+    exigir(s <= acumulado + 1e-6, `${onde}: a cópia ${k} cai a ${Math.round(s)} mm do começo do caminho de "${a.caminho}", que tem ${Math.round(acumulado)} mm; use menos cópias ou um "passo" menor`);
+    const tr = trechos.find((x) => s <= x.s0 + x.len + 1e-9) ?? trechos[trechos.length - 1];
+    const u = Math.min(Math.max(s - tr.s0, 0), tr.len);
+    saida.push({ ponto: tr.de.map((x, j) => x + tr.t[j] * u), Q: tr.Q });
+  }
+  return saida;
+}
+
 const CHAVES_ESPELHA = ['forma', 'eixo', 'pos'];
 /* Campos de posição e de aparência que a cópia não herda da forma-fonte (a cópia refaz a posição
    a partir da fonte já resolvida; `rotulo`, `oculto` e `opacidade` são só dela). */
@@ -690,7 +778,15 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
   } else {
     const a = f.arranjoDe;
     fonte = referencia('arranja.forma', a.fonte);
-    if (a.modo === 'linear') {
+    if (a.modo === 'caminho') {
+      const alvo = referencia('arranja.caminho', a.caminho);
+      exigir(alvo.trilha, `${onde}: "arranja.caminho" aponta para "${a.caminho}", que não é um tubo nem uma faixa "envolve" (a cópia segue a linha de centro de um deles)`);
+      const poses = posesNoCaminho(alvo, a, onde);
+      const pose = poses[a.indice - 1];
+      const inicio = somarVetor(alvo.centro, alvo.trilha.pontos[0]);
+      centro = somarVetor(pose.ponto, aplicarMatriz(fonte.centro.map((c, i) => c - inicio[i]), pose.Q));
+      m = pose.Q ? multiplicar(pose.Q, fonte.matriz ?? IDENTIDADE) : fonte.matriz;
+    } else if (a.modo === 'linear') {
       m = fonte.matriz;
       centro = fonte.centro.map((c, i) => c + a.indice * a.passo[i]);
     } else {
@@ -718,12 +814,15 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     ...(f.unidade !== undefined ? { unidade: f.unidade } : {}),
   };
   if (forma.cor === undefined) delete forma.cor;
+  /* a ponta declarada livre é da forma, e a cópia a herda */
+  if (pontaSilenciosa(fonte.forma.ponta)) forma.ponta = fonte.forma.ponta;
   if (fonte.partes) {
     /* tubo: o sólido inteiro sofre a mesma transformação (`m`, que ainda pode ser nula) e as partes seguem o centro */
     const partes = fonte.partes.map((pt) => ({ semTampa: pt.semTampa, prisma: pt.prisma, matriz: m ? multiplicar(m, pt.matriz ?? IDENTIDADE) : pt.matriz, dc: m ? aplicarMatriz(pt.dc, m) : pt.dc }));
     const extremos = { inicio: m ? aplicarMatriz(fonte.extremos.inicio, m) : fonte.extremos.inicio, fim: m ? aplicarMatriz(fonte.extremos.fim, m) : fonte.extremos.fim };
     const nomeadas = fonte.nomeadas ? Object.fromEntries(Object.entries(fonte.nomeadas).map(([nome, d]) => [nome, m ? aplicarMatriz(d, m) : d])) : undefined;
-    const r = { id, forma, prisma: null, partes, extremos, ...(nomeadas ? { nomeadas } : {}), centro, matriz: null };
+    const trilha = fonte.trilha ? { ...fonte.trilha, pontos: fonte.trilha.pontos.map((q) => (m ? aplicarMatriz(q, m) : q)) } : undefined;
+    const r = { id, forma, prisma: null, partes, extremos, ...(trilha ? { trilha } : {}), ...(nomeadas ? { nomeadas } : {}), centro, matriz: null };
     return { ...r, ...caixaDeTubo(r) };
   }
   const local = caixaLocal(fonte.prisma, m);
@@ -731,6 +830,7 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     id, forma, prisma: fonte.prisma, centro, matriz: m,
     min: local.min.map((val, i) => val + centro[i]),
     max: local.max.map((val, i) => val + centro[i]),
+    ...(fonte.haste ? { haste: true } : {}),
   };
 }
 
@@ -791,7 +891,121 @@ function construirTubo(f, pts, onde) {
   const max = [0, 1, 2].map((i) => Math.max(...caixas.map((c) => c.max[i])));
   const centro = min.map((v, i) => (v + max[i]) / 2);
   for (const q of brutas) partes.push({ prisma: q.prisma, matriz: q.matriz, dc: sub(q.centro, centro), semTampa: q.semTampa });
-  return { partes, centro, extremos: { inicio: sub(pts[0], centro), fim: sub(pts[pts.length - 1], centro) } };
+  return { partes, centro, extremos: { inicio: sub(pts[0], centro), fim: sub(pts[pts.length - 1], centro) }, trilha: { pontos: linha.map((q) => sub(q, centro)), fechado: false } };
+}
+
+/* Faixa que contorna uma lista ordenada de círculos (`envolve`): cada círculo tem centro, raio e eixo (o da normal do plano
+   da faixa) e um sentido de volta; entre dois círculos seguidos a faixa segue a tangente (externa se os dois giram no mesmo
+   sentido, cruzada se giram em sentidos opostos) e em cada círculo ela dá a volta num arco. O laço fechado dá a volta em todos
+   os círculos e volta ao primeiro; o aberto começa na tangente que sai do primeiro e acaba na que chega ao último, sem arco
+   neles. A linha de centro da faixa fica a `raio + espessura / 2` do centro de cada círculo (a face interna toca o círculo), e
+   a seção é `largura` ao longo do eixo por `espessura` no plano. Cada trecho reto e cada passo de PASSO_DA_CURVA graus de arco
+   é uma parte em caixa, como no tubo. `circulos` já têm centro [x, y, z] e raio em mm. */
+function construirEnvolve(f, circulos, onde) {
+  exigir(numPos(f.largura), `${onde}: a faixa "envolve" precisa de "largura" positiva em mm (a medida ao longo do eixo)`);
+  exigir(numPos(f.espessura), `${onde}: a faixa "envolve" precisa de "espessura" positiva em mm (a medida no plano, para fora dos círculos)`);
+  exigir(Array.isArray(circulos) && circulos.length >= 2, `${onde}: "circulos" precisa de 2 ou mais círculos { "centro": ponto, "raio": mm, "eixo": "x" | "y" | "z", "lado": "fora" | "dentro" }`);
+  const fechado = f.fechado ?? true;
+  exigir(typeof fechado === 'boolean', `${onde}: "fechado" deve ser true (laço fechado, o padrão) ou false (faixa aberta)`);
+  const eixos = new Set(circulos.map((c) => c.eixo));
+  exigir(eixos.size === 1 && EIXOS.includes([...eixos][0]), `${onde}: todos os círculos da faixa precisam do mesmo "eixo" ("x", "y" ou "z"; ele vale como o eixo da faixa, e "eixo" também pode vir uma vez só na forma); veio ${[...eixos].map((e) => JSON.stringify(e)).join(', ')}`);
+  const eixo = [...eixos][0];
+  const k = EIXOS.indexOf(eixo);
+  const kU = (k + 1) % 3; const kV = (k + 2) % 3;
+  const w = circulos.reduce((acc, c) => acc + c.centro[k], 0) / circulos.length;
+  circulos.forEach((c, i) => exigir(Math.abs(c.centro[k] - w) <= 0.5, `${onde}: o círculo ${i + 1} fica em ${eixo} = ${Math.round(c.centro[k] * 10) / 10} mm e os outros em torno de ${Math.round(w * 10) / 10} mm: os centros da faixa precisam estar no mesmo plano (perpendicular ao eixo ${eixo}), com no máximo 0,5 mm de diferença`));
+  const e = f.espessura;
+  const C = circulos.map((c) => [c.centro[kU], c.centro[kV]]);
+  const R = circulos.map((c, i) => { exigir(numPos(c.raio), `${onde}, circulos[${i}]: "raio" deve ser positivo em mm`); return c.raio + e / 2; });
+  /* sentido geral: o da área dos centros (laço fechado de 3 ou mais) ou o das curvas (aberto); a `sentido` da forma manda */
+  let geral = 1;
+  if (f.sentido !== undefined) {
+    exigir(f.sentido === 'horario' || f.sentido === 'antihorario', `${onde}: "sentido" deve ser "horario" ou "antihorario" (visto do lado +${eixo} do eixo)`);
+    geral = f.sentido === 'horario' ? -1 : 1;
+  } else if (C.length >= 3) {
+    let soma = 0;
+    const n = C.length;
+    for (let i = 0; i < (fechado ? n : n - 2); i++) {
+      if (fechado) soma += C[i][0] * C[(i + 1) % n][1] - C[(i + 1) % n][0] * C[i][1];
+      else soma += (C[i + 1][0] - C[i][0]) * (C[i + 2][1] - C[i + 1][1]) - (C[i + 1][1] - C[i][1]) * (C[i + 2][0] - C[i + 1][0]);
+    }
+    geral = soma < 0 ? -1 : 1;
+  }
+  const giro = circulos.map((c, i) => {
+    exigir(c.lado === undefined || c.lado === 'fora' || c.lado === 'dentro', `${onde}, circulos[${i}]: "lado" deve ser "fora" (o círculo fica dentro do laço, o padrão) ou "dentro" (a faixa dá a volta em sentido contrário, como num tensor por fora ou numa correia cruzada); veio ${JSON.stringify(c.lado)}`);
+    return c.lado === 'dentro' ? -geral : geral;
+  });
+  const n = C.length;
+  const ligacoes = fechado ? n : n - 1;
+  /* tangente de i para j=i+1: pontos de saída e de chegada, e o ângulo da direção */
+  const tangentes = [];
+  for (let i = 0; i < ligacoes; i++) {
+    const j = (i + 1) % n;
+    const d = [C[j][0] - C[i][0], C[j][1] - C[i][1]];
+    const L = Math.hypot(...d);
+    const rhoI = giro[i] * R[i]; const rhoJ = giro[j] * R[j];
+    exigir(L > Math.abs(rhoJ - rhoI) + 1e-6, `${onde}: os círculos ${i + 1} e ${j + 1} da faixa ${giro[i] === giro[j] ? 'estão um dentro do outro' : 'se tocam ou se cruzam'} (distância ${Math.round(L * 10) / 10} mm entre os centros, raios de faixa ${Math.round(R[i] * 10) / 10} e ${Math.round(R[j] * 10) / 10} mm); afaste-os${giro[i] === giro[j] ? '' : ' ou ponha os dois no mesmo "lado"'}`);
+    const th = Math.atan2(d[1], d[0]) - Math.asin((rhoJ - rhoI) / L);
+    const t = [Math.cos(th), Math.sin(th)];
+    const nl = [-t[1], t[0]];
+    tangentes.push({ de: [C[i][0] - rhoI * nl[0], C[i][1] - rhoI * nl[1]], para: [C[j][0] - rhoJ * nl[0], C[j][1] - rhoJ * nl[1]], t });
+  }
+  const para3 = (q) => { const p = [0, 0, 0]; p[kU] = q[0]; p[kV] = q[1]; p[k] = w; return p; };
+  const dir3 = (t) => { const p = [0, 0, 0]; p[kU] = t[0]; p[kV] = t[1]; return p; };
+  const a3 = [0, 0, 0]; a3[k] = 1;
+  const brutas = [];
+  const linha = [];
+  const cruz = (x, y) => [x[1] * y[2] - x[2] * y[1], x[2] * y[0] - x[0] * y[2], x[0] * y[1] - x[1] * y[0]];
+  const caixa = (centro2, t, comprimento) => {
+    const t3 = dir3(t);
+    const nn = cruz(a3, t3);
+    const matriz = [0, 1, 2].map((r) => [a3[r], t3[r], nn[r]]);
+    brutas.push({ prisma: prisma({ tipo: 'caixa', largura: f.largura, altura: comprimento, profundidade: e }, onde), matriz, centro: para3(centro2) });
+  };
+  const trecho = (g) => { caixa([(g.de[0] + g.para[0]) / 2, (g.de[1] + g.para[1]) / 2], g.t, Math.hypot(g.para[0] - g.de[0], g.para[1] - g.de[1])); };
+  const arco = (i, de, ate) => {
+    const a0 = Math.atan2(de[1] - C[i][1], de[0] - C[i][0]);
+    const a1 = Math.atan2(ate[1] - C[i][1], ate[0] - C[i][0]);
+    let varre = ((((a1 - a0) * giro[i]) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    if (varre > 2 * Math.PI - 1e-9) varre = 0;
+    if (varre < 1e-9) return;
+    const passos = Math.max(1, Math.ceil((varre * 180) / Math.PI / PASSO_DA_CURVA));
+    const delta = varre / passos;
+    for (let m = 0; m < passos; m++) {
+      const beta = a0 + giro[i] * (m + 0.5) * delta;
+      caixa([C[i][0] + R[i] * Math.cos(beta), C[i][1] + R[i] * Math.sin(beta)], [-giro[i] * Math.sin(beta), giro[i] * Math.cos(beta)], 2 * (R[i] + e / 2) * Math.tan(delta / 2));
+      const b1 = a0 + giro[i] * (m + 1) * delta;
+      linha.push(para3([C[i][0] + R[i] * Math.cos(b1), C[i][1] + R[i] * Math.sin(b1)]));
+    }
+  };
+  linha.push(para3(tangentes[0].de));
+  for (let i = 0; i < ligacoes; i++) {
+    trecho(tangentes[i]);
+    linha.push(para3(tangentes[i].para));
+    const j = (i + 1) % n;
+    if (fechado) arco(j, tangentes[i].para, tangentes[(i + 1) % ligacoes].de);
+    else if (j < n - 1) arco(j, tangentes[i].para, tangentes[i + 1].de);
+  }
+  const caixas = brutas.map((q) => { const l = caixaLocal(q.prisma, q.matriz); return { min: l.min.map((v, i) => v + q.centro[i]), max: l.max.map((v, i) => v + q.centro[i]) }; });
+  const min = [0, 1, 2].map((i) => Math.min(...caixas.map((c) => c.min[i])));
+  const max = [0, 1, 2].map((i) => Math.max(...caixas.map((c) => c.max[i])));
+  const centro = min.map((v, i) => (v + max[i]) / 2);
+  const rel = (q) => q.map((x, i) => x - centro[i]);
+  const partes = brutas.map((q) => ({ prisma: q.prisma, matriz: q.matriz, dc: rel(q.centro) }));
+  return { partes, centro, extremos: { inicio: rel(linha[0]), fim: rel(linha[linha.length - 1]) }, trilha: { pontos: linha.map(rel), fechado } };
+}
+
+/* Os círculos de uma forma `envolve`, com o centro resolvido (`pontoDe`) e o eixo da forma como padrão. */
+function lerCirculos(f, onde, pontoDe) {
+  exigir(Array.isArray(f.circulos) && f.circulos.length >= 2, `${onde}: a faixa "envolve" precisa de "circulos": lista ordenada de 2 ou mais { "centro": ponto, "raio": mm, "eixo": "x" | "y" | "z", "lado": "fora" | "dentro" }`);
+  return f.circulos.map((c, i) => {
+    exigir(c && typeof c === 'object' && !Array.isArray(c), `${onde}: circulos[${i}] deve ser { "centro": ponto, "raio": mm, "eixo": "x" | "y" | "z", "lado": "fora" | "dentro" }`);
+    const fora = Object.keys(c).filter((q) => !['centro', 'raio', 'eixo', 'lado'].includes(q));
+    exigir(fora.length === 0, `${onde}: circulos[${i}] não tem o campo "${fora[0]}" (campos: centro, raio, eixo, lado)`);
+    exigir(c.centro !== undefined, `${onde}: circulos[${i}] precisa de "centro" ([x, y, z], ponto nomeado ou "<id>.<ancora>", por exemplo "rodaFrente.eixo")`);
+    exigir(c.eixo !== undefined || f.eixo !== undefined, `${onde}: circulos[${i}] precisa de "eixo" ("x", "y" ou "z", o eixo da normal do círculo)`);
+    return { centro: pontoDe(c.centro, `circulos[${i}].centro`), raio: c.raio, eixo: c.eixo ?? f.eixo, lado: c.lado };
+  });
 }
 
 /* Vértices de uma forma resolvida relativos ao centro dela (o anel entra como o disco externo). */
@@ -912,9 +1126,21 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       }
       return centro;
     };
-    if (f.tipo === 'tubo') {
+    if (f.tipo === 'envolve') {
       const proibidos = ['centro', 'sobre', 'ponta', 'de', 'para', 'rotacao'].filter((k) => f[k] !== undefined);
+      exigir(proibidos.length === 0, `${onde}: a faixa "envolve" se posiciona pelos centros dos "circulos"; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca", "alinha" ou "encosta" para afastá-la)`);
+      const t = construirEnvolve(f, lerCirculos(f, onde, pontoDe), onde);
+      const centro = relacionar(t.centro, () => verticesDe({ partes: t.partes }));
+      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, trilha: t.trilha, centro, matriz: null };
+      Object.assign(r, caixaDeTubo(r));
+      visitando.delete(id);
+      prontas.set(id, r);
+      return r;
+    }
+    if (f.tipo === 'tubo') {
+      const proibidos = ['centro', 'sobre', 'ponta', 'de', 'para', 'rotacao'].filter((k) => (k === 'ponta' ? posicionaPorPonta(f) : f[k] !== undefined));
       exigir(proibidos.length === 0, `${onde}: o tubo se posiciona pelos pontos do "caminho"; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca", "alinha" ou "encosta" para afastá-lo)`);
+      validarPontaSilenciosa(f, onde, true);
       exigir(Array.isArray(f.caminho) && f.caminho.length >= 2, `${onde}: tubo precisa de "caminho": lista de 2 ou mais pontos, cada um [x, y, z] em mm, um ponto nomeado ou "<id>.<ancora>"`);
       /* ponto-guia nomeado: { "nome": "joelho", "ponto": <qualquer ponto> } vira a âncora `<id>.joelho` */
       const guias = {};
@@ -932,20 +1158,21 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       const t = construirTubo(f, pts, onde);
       const centro = relacionar(t.centro, () => verticesDe({ partes: t.partes }));
       const nomeadas = Object.fromEntries(Object.entries(guias).map(([nome, p]) => [nome, p.map((c, k) => c - t.centro[k])]));
-      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, ...(Object.keys(nomeadas).length ? { nomeadas } : {}), centro, matriz: null };
+      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, trilha: t.trilha, ...(Object.keys(nomeadas).length ? { nomeadas } : {}), centro, matriz: null };
       Object.assign(r, caixaDeTubo(r));
       visitando.delete(id);
       prontas.set(id, r);
       return r;
     }
     const haste = f.de !== undefined || f.para !== undefined;
+    validarPontaSilenciosa(f, onde, haste && (f.tipo === 'cilindro' || f.tipo === 'caixa'));
     let fPrisma = f;
     let m;
     let centro = [0, 0, 0];
     if (haste) {
       exigir(f.de !== undefined && f.para !== undefined, `${onde}: "de" e "para" vêm juntos`);
       exigir(f.tipo === 'cilindro' || f.tipo === 'caixa' || f.tipo === 'cone', `${onde}: "de"/"para" valem só em cilindro, caixa e cone (a forma vira uma haste entre dois pontos; para um caminho com várias pernas use "tubo")`);
-      const proibidos = ['centro', 'sobre', 'ponta', 'rotacao', 'encosta', 'alinha'].filter((k) => f[k] !== undefined);
+      const proibidos = ['centro', 'sobre', 'ponta', 'rotacao', 'encosta', 'alinha'].filter((k) => (k === 'ponta' ? posicionaPorPonta(f) : f[k] !== undefined));
       exigir(proibidos.length === 0, `${onde}: "de"/"para" já definem o centro e a rotação; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca" para afastar a haste)`);
       const campoLongo = f.tipo === 'caixa' ? 'altura' : 'comprimento';
       exigir(f[campoLongo] === undefined, `${onde}: "${campoLongo}" não pode vir junto de "de"/"para": o comprimento sai da distância entre os dois pontos`);
@@ -964,7 +1191,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
     }
     const pr = prisma(fPrisma, onde);
     const local = caixaLocal(pr, m);
-    const modos = ['centro', 'sobre', 'ponta'].filter((k) => f[k] !== undefined);
+    const modos = ['centro', 'sobre', 'ponta'].filter((k) => (k === 'ponta' ? posicionaPorPonta(f) : f[k] !== undefined));
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
     if (haste) {
       /* o centro já saiu dos dois pontos */
@@ -977,7 +1204,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       exigir(porId.has(f.sobre), `${onde}: "sobre" aponta para "${f.sobre}", que não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
       const alvo = resolver(f.sobre);
       centro = [alvo.centro[0], alvo.max[1] - local.min[1], alvo.centro[2]];
-    } else if (f.ponta !== undefined) {
+    } else if (posicionaPorPonta(f)) {
       const { id: idAlvo, lado } = lerPonta(f);
       exigir(porId.has(idAlvo), `${onde}: "ponta" aponta para "${idAlvo}", que não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
       exigir(LADOS.includes(lado), `${onde}: o lado da ponta deve ser um de ${LADOS.join(', ')}`);
@@ -991,6 +1218,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       id, forma: f, prisma: pr, centro, matriz: m,
       min: local.min.map((val, i) => val + centro[i]),
       max: local.max.map((val, i) => val + centro[i]),
+      ...(haste && (f.tipo === 'cilindro' || f.tipo === 'caixa') ? { haste: true } : {}),
     };
     visitando.delete(id);
     prontas.set(id, r);

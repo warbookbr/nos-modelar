@@ -266,7 +266,7 @@ describe('tubo por pontos', () => {
   });
 
   it('o gate vê o tubo como o conjunto das partes: uma caixa junto do trecho toca e uma longe fica voando', () => {
-    const formas = [L, caixa('b', [-20, 50, 0], 20, 20, 20), caixa('longe', [400, 400, 0])];
+    const formas = [{ ...L, ponta: true }, caixa('b', [-20, 50, 0], 20, 20, 20), caixa('longe', [400, 400, 0])];
     const g = verificarContato(esboco(formas, { folga: 5000 }));
     expect(g.achados.map((a) => `${a.tipo}:${a.pecas.join(',')}`)).toEqual(['voando:longe']);
     expect(medir(formas, 't', 'b').folga).toBeCloseTo(0, 6);
@@ -340,7 +340,7 @@ describe('tubo por pontos', () => {
   });
 
   it('a leitura em texto diz o caminho e as âncoras, e o `--ajustar` move o tubo pelo `desloca`', () => {
-    const e = esboco([caixa('a', [0, 0, 0], 100, 10, 100), { ...L, caminho: [[0, 0, 0], [0, 100, 0]], diametro: 20 }], { tolerancia: 2, penetracao: 1 });
+    const e = esboco([caixa('a', [0, 0, 0], 100, 10, 100), { ...L, caminho: [[0, 0, 0], [0, 100, 0]], diametro: 20, ponta: true }], { tolerancia: 2, penetracao: 1 });
     const texto = formatarDescricao(descreverEsboco(e));
     expect(texto).toContain('forma t: tubo');
     expect(texto).toContain('relação: caminho de 2 pontos');
@@ -366,7 +366,7 @@ describe('formas novas juntas', () => {
         { id: 'bola', tipo: 'esfera', diametro: 120, sobre: 'base', cor: 'vermelho' },
         { id: 'tronco', tipo: 'cone', diametro: 100, diametroTopo: 40, comprimento: 150, ponta: { id: 'base', lado: '+y' }, desloca: [-140, 0, 0], cor: 'azul' },
         { id: 'cunha', tipo: 'extrusao', perfil: [[0, 0], [120, 0], [0, 80]], comprimento: 40, eixo: 'z', sobre: 'base', desloca: [130, 0, 0], cor: 'verde' },
-        { id: 'tubo', tipo: 'tubo', diametro: 24, raioCurva: 40, caminho: ['tronco.+y', [-140, 300, 0], [130, 300, 0], 'cunha.+y'], cor: 'roxo' },
+        { id: 'tubo', tipo: 'tubo', diametro: 24, raioCurva: 40, caminho: ['tronco.+y', [-140, 300, 0], [130, 300, 0], 'cunha.+y'], ponta: { fim: true }, cor: 'roxo' },
       ] }],
     };
     const g = verificarContato(e);

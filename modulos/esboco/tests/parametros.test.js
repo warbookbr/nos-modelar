@@ -338,7 +338,7 @@ describe('arranja', () => {
 
   it('erros de arranjo dizem o campo', () => {
     const tenta = (a, formas = [parafuso]) => () => resolver([...formas, { arranja: a }]);
-    expect(tenta({ forma: 'p', modo: 'espiral', total: 3 })).toThrow(/"arranja.modo" deve ser "linear" ou "radial"/);
+    expect(tenta({ forma: 'p', modo: 'espiral', total: 3 })).toThrow(/"arranja.modo" deve ser "linear", "radial" ou "caminho"/);
     expect(tenta({ forma: 'p', modo: 'linear', total: 1, passo: [0, 0, 1] })).toThrow(/"arranja.total" deve ser um inteiro de 2 ou mais/);
     expect(tenta({ forma: 'p', modo: 'linear', total: 3 })).toThrow(/precisa de "passo"/);
     expect(tenta({ forma: 'p', modo: 'radial', total: 3, centro: [0, 0, 0] })).toThrow(/precisa de "eixo"/);

@@ -38,6 +38,14 @@ export const EXIGENCIAS_POR_NIVEL = {
 export const LIMIARES_DO_MARCO = [25, 50, 75, 100];
 export const MINIMO_DO_MOTIVO = 15;
 export const CONCLUIDO = 'concluido';
+/* A unidade com mais formas que isto precisa de `funcao` (e passa pelo crítico por unidade) para virar feita. */
+export const LIMITE_DA_FUNCAO = 8;
+
+/* A `funcao` declarada da unidade em `unidades.<id>.funcao` do esboço (ou undefined). */
+export function funcaoDaUnidade(bruto, id) {
+  const f = bruto?.unidades?.[id]?.funcao;
+  return typeof f === 'string' && f.trim() ? f.trim() : undefined;
+}
 
 export const nomeDoEstagio = (id) => (id === CONCLUIDO ? 'Concluído' : ESTAGIOS[id]);
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -53,7 +61,7 @@ function referenciasDaForma(f, ids) {
     else if (v && typeof v === 'object' && v.ponto !== undefined && v.nome !== undefined) ponto(v.ponto);
   };
   if (typeof f.sobre === 'string') brutas.push(f.sobre);
-  if (Array.isArray(f.ponta)) brutas.push(f.ponta[0]); else if (f.ponta && typeof f.ponta === 'object') brutas.push(f.ponta.id); else if (typeof f.ponta === 'string') brutas.push(f.ponta);
+  if (Array.isArray(f.ponta)) brutas.push(f.ponta[0]); else if (f.ponta && typeof f.ponta === 'object' && typeof f.ponta.id === 'string') brutas.push(f.ponta.id); else if (typeof f.ponta === 'string') brutas.push(f.ponta);
   if (f.encosta && typeof f.encosta.referencia === 'string') brutas.push(f.encosta.referencia);
   if (f.alinha) ponto(f.alinha.com);
   for (const k of ['centro', 'de', 'para']) if (f[k] !== undefined) ponto(f[k]);
@@ -61,6 +69,8 @@ function referenciasDaForma(f, ids) {
   if (f.espelha && typeof f.espelha.forma === 'string') brutas.push(f.espelha.forma);
   if (f.arranjoDe && typeof f.arranjoDe.fonte === 'string') brutas.push(f.arranjoDe.fonte);
   if (f.arranjoDe && typeof f.arranjoDe.centro === 'string') brutas.push(f.arranjoDe.centro);
+  if (f.arranjoDe && typeof f.arranjoDe.caminho === 'string') brutas.push(f.arranjoDe.caminho);
+  if (Array.isArray(f.circulos)) for (const c of f.circulos) if (c) ponto(c.centro);
   const saida = [];
   for (const b of brutas) {
     if (ids.has(b)) { saida.push(b); continue; }
@@ -149,6 +159,7 @@ function ancorasCitadas(f, ids) {
   if (f.alinha) ponto(f.alinha.com);
   for (const k of ['centro', 'de', 'para']) if (f[k] !== undefined) ponto(f[k]);
   if (Array.isArray(f.caminho)) f.caminho.forEach(ponto);
+  if (Array.isArray(f.circulos)) for (const c of f.circulos) if (c) ponto(c.centro);
   return saida;
 }
 
@@ -515,7 +526,11 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
     const conferida = estado.unidades.find((x) => x.id === unidade).envelopeConferido;
     exigir(conferida?.ok === true, `condutor: a unidade "${unidade}" só vira feita depois de o Envelope conferir a versão detalhada dela (plano.envelope está declarado): rode --envelope ${unidade} <arquivo-detalhado.esboco.json>${conferida ? `; a última conferência falhou: ${conferida.falta.join('; ')}` : ''}`);
   }
-  if (!estado.unidades.find((x) => x.id === unidade).feito) {
+  const daUnidade = estado.unidades.find((x) => x.id === unidade);
+  if (!daUnidade.feito && daUnidade.membros.length > LIMITE_DA_FUNCAO && funcaoDaUnidade(bruto, unidade) === undefined) {
+    throw new ErroDeEsboco(`condutor: a unidade "${abreviar(unidade)}" tem ${daUnidade.membros.length} formas (mais de ${LIMITE_DA_FUNCAO}) e não declara "funcao": escreva uma frase que diga para que ela serve em unidades["${unidade}"].funcao na raiz do esboço (por exemplo { "funcao": "laço fechado que contorna duas rodas" }); o crítico por unidade e quem lê o esboço dependem dela`);
+  }
+  if (!daUnidade.feito) {
     const abertos = achadosDaUnidade(bruto, estado, unidade);
     exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map((a) => descreverAchado(a)).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
   }
@@ -534,6 +549,22 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
     }
   }
   return { estado: novo, novosMarcos };
+}
+
+/* Registra o veredito do crítico visual cego de uma unidade no histórico do estado (`vereditos`, campo que a versão 2 do estado
+   acrescenta; o estado de versão 1 continua válido e sobe para 2 no primeiro veredito). `nota` de 0 a 10 e `motivo` com o que o
+   crítico apontou (pelo menos 15 caracteres). Devolve o estado novo. */
+export function registrarVeredito(estadoBruto, { unidade, nota, motivo }) {
+  const ids = (estadoBruto.unidades ?? []).map((u) => u.id);
+  const id = unidadePorNome(estadoBruto.unidades ?? [], unidade);
+  exigir(ids.includes(id), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(String(unidade), ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
+  const n = Number(nota);
+  exigir(Number.isFinite(n) && n >= 0 && n <= 10, `condutor: --veredito precisa de --nota entre 0 e 10 (a nota do crítico), e veio ${JSON.stringify(nota)}`);
+  const m = validarMotivo(motivo, 'registrar o veredito do crítico (--motivo: o que ele apontou)');
+  const novo = clone(estadoBruto);
+  novo.versao = Math.max(2, novo.versao ?? 1);
+  novo.vereditos = [...(novo.vereditos ?? []), { ordem: (novo.vereditos ?? []).length + 1, unidade: id, nota: n, motivo: m }];
+  return novo;
 }
 
 /* Texto da situação: estágio, Portão e o que falta, unidades e custo. */
@@ -559,6 +590,7 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
     });
   }
   if (marcos) for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
+  if (historico) for (const v of estado.vereditos ?? []) L.push(`veredito do crítico ${v.ordem}: ${abreviar(v.unidade)} nota ${String(v.nota).replace('.', ',')} (${v.motivo})`);
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;

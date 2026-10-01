@@ -171,6 +171,6 @@ describe('<instancia>.<parte> em todo campo que aceita âncora', () => {
   });
 
   it('a parte que não existe é recusada com as âncoras e as partes válidas', () => {
-    expect(() => resolvidas([roda, caixa('c', [0, 0, 0], 4, 4, 4, { centro: 'r.helice' })])).toThrow(/não tem a âncora "helice" \(âncoras: eixo, .*; partes, que valem como "r\.<parte>": pneu, disco, cuboE, cuboD\)/);
+    expect(() => resolvidas([roda, caixa('c', [0, 0, 0], 4, 4, 4, { centro: 'r.helice' })])).toThrow(/não tem a âncora "helice" \(âncoras: eixo, .*; partes, que valem como "r\.<parte>": pneu, disco, aro, cuboE, cuboD, flangeE, flangeD\)/);
   });
 });

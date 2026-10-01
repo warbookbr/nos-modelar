@@ -260,7 +260,7 @@ describe('perfis por função', () => {
     expect(() => expandirEsboco(f({ gerar: 'estrela', n: 5, rin: 30, rout: 20, semi: 10 }))).toThrow(/0 < rin < rout/);
     expect(() => expandirEsboco(f({ gerar: 'arco', raioExterno: 20 }))).toThrow(/precisa do campo "raioInterno"/);
     expect(() => expandirEsboco(f({ gerar: 'estrela', n: 5, rin: 'semNome', rout: 20, semi: 10 }))).toThrow(/parâmetro/);
-    expect(Object.keys(GERADORES)).toEqual(['estrela', 'arco', 'circulo', 'polar']);
+    expect(Object.keys(GERADORES)).toEqual(['estrela', 'arco', 'circulo', 'polar', 'raios', 'pneu', 'disco']);
   });
 });
 

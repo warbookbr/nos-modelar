@@ -19,7 +19,7 @@ export const RUIDO_MM = 0.05;
 
 function eixoDe(r) {
   const t = r.forma.tipo;
-  if (t === 'caixa' || t === 'esfera' || t === 'tubo') return null;
+  if (t === 'caixa' || t === 'esfera' || t === 'tubo' || t === 'envolve') return null;
   return r.forma.eixo ?? 'y';
 }
 
@@ -40,10 +40,10 @@ function descreverForma(r) {
 
 /* Gravidade das divergências, da mais grave para a menos: forma solta, atravessamento além do declarado, relação
    declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho, medida do plano
-   fora da tolerância e silhueta fora da referência. */
-export const GRAVIDADES = { peca: 0, solto: 1, atravessa: 2, contrato: 3, assimetria: 4, medida: 5, referencia: 6 };
-const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato' };
-const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', assimetria: 'assimetria' };
+   fora da tolerância e silhueta fora da referência. A ponta livre (ponta de tubo ou de haste que não encosta em nada, ou várias pontas no mesmo ponto sem coletor) vem logo depois do contrato. */
+export const GRAVIDADES = { peca: 0, solto: 1, atravessa: 2, contrato: 3, ponta: 4, assimetria: 5, medida: 6, referencia: 7 };
+const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta' };
+const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', 'contrato-fixa': 'contrato', assimetria: 'assimetria' };
 
 /* { opcoes, ... } a partir do JSON já lido. */
 export function descreverEsboco(bruto) {
@@ -64,7 +64,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
   const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis, ocultas: todas.map((rs) => rs.filter((r) => r.forma.oculto === true)), unidades }) : null;
   const projecao = comProjecao ? verificarProjecao(esboco, { forcar: true, resolvidas: visiveis }) : { achados: [] };
-  const plano = conferirPlano(esboco, visiveis, { referencias });
+  const plano = conferirPlano(esboco, visiveis, { referencias, unidades });
   const padrao = padroesDoContato(visiveis);
   const divergencias = [];
   const resultado = opcoes.map((o, i) => {
@@ -123,7 +123,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
     for (const a of plano.achados.filter((x) => x.opcao === titulo)) somar(CLASSE_DO_PLANO[a.tipo], a.texto, a.pecas, null, { tipo: a.tipo, mm: a.mm });
     divs.sort((x, y) => x.gravidade - y.gravidade);
     divergencias.push(...divs);
-    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'assimetria' || x.tipo === 'referencia-fora' || x.tipo === 'peca-ausente');
+    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'contrato-fixa' || x.tipo === 'assimetria' || x.tipo === 'referencia-fora' || x.tipo === 'peca-ausente');
     return {
       titulo,
       ...(o.parametros && Object.keys(o.parametros).length ? { parametros: o.parametros } : {}),

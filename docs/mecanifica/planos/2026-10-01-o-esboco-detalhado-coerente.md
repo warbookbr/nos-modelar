@@ -85,7 +85,7 @@ peças sem função antes de a imagem chegar à pessoa.
 ## Fatias
 
 1. Os seis bugs e os ajustes de comando, com teste (feita; `correcoes-do-fluxo.test.js`).
-2. `plano.contrato.fixa`, a `roda` com raios, os perfis de pneu e de disco, o `envolve`, a ponta livre, a `funcao` por unidade e o crítico por unidade no `--feito`.
+2. (feita) `plano.contrato.fixa`, a `roda` com raios, os perfis de pneu e de disco, o `envolve`, a ponta livre, a `funcao` por unidade e o crítico por unidade no `--feito`.
 3. O crítico por unidade também no Marco, `--medidas` e o Marco incremental.
 4. A moto e a escavadeira refeitas, medidas no transcript, e o fechamento.
 

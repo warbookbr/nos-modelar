@@ -95,6 +95,9 @@ export function numerosDaForma(f, num, contexto) {
   if (Array.isArray(g.caminho)) g.caminho = g.caminho.map((q, i) => ponto(q, num, `caminho[${i}]`, contexto));
   if (ehGerador(g.perfil)) g.perfil = gerarPerfil(g.perfil, num, 'perfil', contexto);
   if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((q, i) => (objeto(q) ? numerosDoPontoDePerfil(q, num, `perfil[${i}]`, contexto) : vetor(q, num, `perfil[${i}]`, contexto)));
+  if (Array.isArray(g.circulos)) {
+    g.circulos = g.circulos.map((c, i) => (objeto(c) ? { ...c, ...(c.raio !== undefined ? { raio: num(c.raio, `circulos[${i}].raio`, contexto) } : {}), ...(c.centro !== undefined ? { centro: ponto(c.centro, num, `circulos[${i}].centro`, contexto) } : {}) } : c));
+  }
   if (Array.isArray(g.secoes)) g.secoes = g.secoes.map((q, i) => numerosDaSecao(q, num, `secoes[${i}]`, contexto));
   if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
   const r = g.rotacao;
@@ -115,7 +118,8 @@ export function numerosDaForma(f, num, contexto) {
   if (objeto(g.arranja)) {
     g.arranja = { ...g.arranja };
     for (const k of ['total', 'graus']) if (g.arranja[k] !== undefined) g.arranja[k] = num(g.arranja[k], `arranja.${k}`, contexto);
-    for (const k of ['passo', 'centro']) if (g.arranja[k] !== undefined) g.arranja[k] = vetor(g.arranja[k], num, `arranja.${k}`, contexto);
+    for (const k of ['passo', 'centro']) if (g.arranja[k] !== undefined) g.arranja[k] = Array.isArray(g.arranja[k]) ? vetor(g.arranja[k], num, `arranja.${k}`, contexto) : (k === 'passo' ? num(g.arranja[k], 'arranja.passo', contexto) : g.arranja[k]);
+    if (g.arranja.desde !== undefined) g.arranja.desde = num(g.arranja.desde, 'arranja.desde', contexto);
   }
   return g;
 }
@@ -139,8 +143,8 @@ function numerosDosPontos(p, num, onde) {
   return Object.fromEntries(Object.entries(p).map(([nome, v]) => [nome, vetor(v, num, `pontos.${nome}`, onde)]));
 }
 
-const CHAVES_ARRANJA = ['forma', 'modo', 'total', 'passo', 'eixo', 'centro', 'graus', 'nomes'];
-const MODOS_DO_ARRANJO = ['linear', 'radial'];
+const CHAVES_ARRANJA = ['forma', 'modo', 'total', 'passo', 'eixo', 'centro', 'graus', 'nomes', 'caminho', 'desde'];
+const MODOS_DO_ARRANJO = ['linear', 'radial', 'caminho'];
 
 /* Troca cada entrada `{ "arranja": {...} }` pelas cópias da forma-fonte: formas virtuais
    `{ id, arranjoDe }` que `resolverOpcao` posiciona a partir da fonte já resolvida. `total` conta
@@ -159,11 +163,17 @@ export function expandirArranjos(formas, onde = 'opção') {
     const fora = Object.keys(a).filter((k) => !CHAVES_ARRANJA.includes(k));
     exigir(fora.length === 0, `${contexto}: "arranja" não tem o campo "${fora[0]}" (campos: ${CHAVES_ARRANJA.join(', ')})`);
     exigir(typeof a.forma === 'string' && a.forma, `${contexto}: "arranja.forma" deve ser o id da forma-fonte`);
-    exigir(MODOS_DO_ARRANJO.includes(a.modo), `${contexto}: "arranja.modo" deve ser "linear" ou "radial"`);
+    exigir(MODOS_DO_ARRANJO.includes(a.modo), `${contexto}: "arranja.modo" deve ser "linear", "radial" ou "caminho"`);
     exigir(Number.isInteger(a.total) && a.total >= 2, `${contexto}: "arranja.total" deve ser um inteiro de 2 ou mais (conta a fonte; as cópias são ${a.forma}1 a ${a.forma}<total-1>)`);
     const vec3 = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
     let dados;
-    if (a.modo === 'linear') {
+    if (a.modo === 'caminho') {
+      exigir(typeof a.caminho === 'string' && a.caminho, `${contexto}: o modo caminho precisa de "caminho": o id de um tubo ou de uma faixa "envolve" que as cópias seguem`);
+      exigir(a.eixo === undefined && a.centro === undefined && a.graus === undefined, `${contexto}: "eixo", "centro" e "graus" valem só no modo radial`);
+      exigir(a.passo === undefined || (Number.isFinite(a.passo) && a.passo > 0), `${contexto}: no modo caminho "passo" é a distância em mm, ao longo do caminho, entre duas cópias (número positivo; sem ele as cópias se espaçam por igual no comprimento todo)`);
+      exigir(a.desde === undefined || Number.isFinite(a.desde), `${contexto}: "arranja.desde" deve ser um número em mm, a distância do começo do caminho à fonte (padrão 0)`);
+      dados = { caminho: a.caminho, ...(a.passo === undefined ? {} : { passo: a.passo }), ...(a.desde === undefined ? {} : { desde: a.desde }) };
+    } else if (a.modo === 'linear') {
       exigir(vec3(a.passo) && Math.hypot(...a.passo) > 0, `${contexto}: o modo linear precisa de "passo": [dx, dy, dz] em mm, não nulo`);
       exigir(a.eixo === undefined && a.centro === undefined && a.graus === undefined, `${contexto}: "eixo", "centro" e "graus" valem só no modo radial`);
       dados = { passo: a.passo };
