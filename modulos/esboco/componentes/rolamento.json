@@ -1,0 +1,85 @@
+{
+  "componente": "rolamento",
+  "descricao": "Rolamento de esferas com o eixo em z: anel externo, anel interno e `esferas` esferas entre eles (arranjo radial), cada fiada com um terço da folga radial `(diametro-furo)/6`. `diametro` é o externo e `furo` o do furo. A origem é o centro do anel externo.",
+  "principal": "anelExterno",
+  "parametros": {
+    "diametro": 52,
+    "furo": 25,
+    "largura": 15,
+    "esferas": 8,
+    "terco": "=(diametro-furo)/6"
+  },
+  "entradas": {
+    "centro": null,
+    "sobre": null,
+    "alinha": null,
+    "encosta": null,
+    "desloca": null
+  },
+  "formas": [
+    {
+      "id": "anelExterno",
+      "tipo": "anel",
+      "diametroExterno": "diametro",
+      "diametroInterno": "=diametro-2*terco",
+      "espessura": "largura",
+      "eixo": "z",
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "cinza"
+    },
+    {
+      "id": "anelInterno",
+      "tipo": "anel",
+      "diametroExterno": "=furo+2*terco",
+      "diametroInterno": "furo",
+      "espessura": "largura",
+      "eixo": "z",
+      "centro": "anelExterno.centro",
+      "cor": "cinza"
+    },
+    {
+      "id": "esfera",
+      "tipo": "esfera",
+      "diametro": "terco",
+      "centro": {
+        "ancora": "anelExterno.centro",
+        "mm": [
+          "=furo/2+1.5*terco",
+          0,
+          0
+        ]
+      },
+      "cor": "laranja"
+    },
+    {
+      "arranja": {
+        "forma": "esfera",
+        "modo": "radial",
+        "total": "esferas",
+        "eixo": "z",
+        "centro": "anelExterno.centro"
+      }
+    }
+  ],
+  "ancoras": {
+    "eixo": "anelExterno.centro",
+    "frente": "anelExterno.+z",
+    "tras": "anelExterno.-z"
+  },
+  "pares": [
+    {
+      "a": "anelExterno",
+      "b": "esfera",
+      "tipo": "encosta"
+    },
+    {
+      "a": "anelInterno",
+      "b": "esfera",
+      "tipo": "encosta"
+    }
+  ]
+}

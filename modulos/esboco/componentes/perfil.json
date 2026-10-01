@@ -1,0 +1,182 @@
+{
+  "componente": "perfil",
+  "descricao": "Perfil estrutural em extrusão ao longo de z, de `comprimento`: cantoneira em L por padrão, canal em U com `u: 1` e tubo retangular com `tubo: 1` (parede `espessura`; o tubo tem uma fenda de `fenda` mm numa parede, como o disco do gerador, porque a extrusão não tem furo). `largura` é em x e `altura` em y; a origem é o centro da caixa do perfil.",
+  "principal": "corpo",
+  "parametros": {
+    "largura": 40,
+    "altura": 40,
+    "espessura": 4,
+    "comprimento": 300,
+    "u": 0,
+    "tubo": 0,
+    "fenda": 0.4
+  },
+  "entradas": {
+    "centro": null,
+    "sobre": null,
+    "alinha": null,
+    "encosta": null,
+    "desloca": null
+  },
+  "formas": [
+    {
+      "id": "corpo",
+      "tipo": "extrusao",
+      "eixo": "z",
+      "comprimento": "comprimento",
+      "perfil": [
+        [
+          0,
+          0
+        ],
+        [
+          "largura",
+          0
+        ],
+        [
+          "largura",
+          "espessura"
+        ],
+        [
+          "espessura",
+          "espessura"
+        ],
+        [
+          "espessura",
+          "altura"
+        ],
+        [
+          0,
+          "altura"
+        ]
+      ],
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "cinza",
+      "quando": [
+        "!u",
+        "!tubo"
+      ]
+    },
+    {
+      "id": "corpo",
+      "tipo": "extrusao",
+      "eixo": "z",
+      "comprimento": "comprimento",
+      "perfil": [
+        [
+          0,
+          0
+        ],
+        [
+          "largura",
+          0
+        ],
+        [
+          "largura",
+          "altura"
+        ],
+        [
+          "=largura-espessura",
+          "altura"
+        ],
+        [
+          "=largura-espessura",
+          "espessura"
+        ],
+        [
+          "espessura",
+          "espessura"
+        ],
+        [
+          "espessura",
+          "altura"
+        ],
+        [
+          0,
+          "altura"
+        ]
+      ],
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "cinza",
+      "quando": "u",
+      "exceto": "tubo"
+    },
+    {
+      "id": "corpo",
+      "tipo": "extrusao",
+      "eixo": "z",
+      "comprimento": "comprimento",
+      "perfil": [
+        [
+          0,
+          0
+        ],
+        [
+          "largura",
+          0
+        ],
+        [
+          "largura",
+          "altura"
+        ],
+        [
+          0,
+          "altura"
+        ],
+        [
+          0,
+          "=altura/2+fenda/2"
+        ],
+        [
+          "espessura",
+          "=altura/2+fenda/2"
+        ],
+        [
+          "espessura",
+          "=altura-espessura"
+        ],
+        [
+          "=largura-espessura",
+          "=altura-espessura"
+        ],
+        [
+          "=largura-espessura",
+          "espessura"
+        ],
+        [
+          "espessura",
+          "espessura"
+        ],
+        [
+          "espessura",
+          "=altura/2-fenda/2"
+        ],
+        [
+          0,
+          "=altura/2-fenda/2"
+        ]
+      ],
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "cinza",
+      "quando": "tubo"
+    }
+  ],
+  "ancoras": {
+    "eixo": "corpo.centro",
+    "frente": "corpo.+z",
+    "tras": "corpo.-z",
+    "topo": "corpo.+y"
+  }
+}

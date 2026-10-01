@@ -4,8 +4,9 @@
    do núcleo do Mecanifica (92 linhas, nenhum import). Não lê nem grava arquivo. */
 import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js';
 import { ErroDeEsboco } from './index.js';
-import { expandirComponentes } from './componentes.js';
+import { catalogoDe, expandirComponentes } from './componentes.js';
 import { validarEsquema } from './esquema.js';
+import { traduzirLigacoes, validarLigacoes } from './ligar.js';
 import { ehGerador, gerarPerfil } from './perfis.js';
 import { lerEstilos, prepararFormas } from './estilos.js';
 
@@ -113,6 +114,11 @@ export function numerosDaForma(f, num, contexto) {
     if (g.encosta.folga !== undefined) g.encosta.folga = num(g.encosta.folga, 'encosta.folga', contexto);
     if (Array.isArray(g.encosta.direcao)) g.encosta.direcao = vetor(g.encosta.direcao, num, 'encosta.direcao', contexto);
   }
+  if (objeto(g.encaixa)) {
+    g.encaixa = { ...g.encaixa };
+    if (g.encaixa.em !== undefined) g.encaixa.em = ponto(g.encaixa.em, num, 'encaixa.em', contexto);
+    if (objeto(g.encaixa.gira) && g.encaixa.gira.graus !== undefined) g.encaixa.gira = { ...g.encaixa.gira, graus: num(g.encaixa.gira.graus, 'encaixa.gira.graus', contexto) };
+  }
   if (objeto(g.linhaCentro) && g.linhaCentro.extensao !== undefined) g.linhaCentro = { ...g.linhaCentro, extensao: num(g.linhaCentro.extensao, 'linhaCentro.extensao', contexto) };
   if (objeto(g.espelha) && g.espelha.pos !== undefined) g.espelha = { ...g.espelha, pos: num(g.espelha.pos, 'espelha.pos', contexto) };
   if (objeto(g.arranja)) {
@@ -156,7 +162,7 @@ export function expandirArranjos(formas, onde = 'opção') {
   for (const [i, f] of formas.entries()) {
     if (!objeto(f) || f.arranja === undefined || f.id !== undefined) { saida.push(f); continue; }
     const contexto = `${onde}, forma ${i + 1} (arranja)`;
-    const extras = Object.keys(f).filter((k) => k !== 'arranja');
+    const extras = Object.keys(f).filter((k) => k !== 'arranja' && k !== 'daInstancia');
     exigir(extras.length === 0, `${contexto}: a entrada de arranjo só tem o campo "arranja"; retire "${extras[0]}"`);
     const a = f.arranja;
     exigir(objeto(a), `${contexto}: "arranja" deve ser { "forma": "<id>", "modo": "linear" | "radial", "total": n, ... }`);
@@ -192,7 +198,7 @@ export function expandirArranjos(formas, onde = 'opção') {
         `${contexto}: "arranja.nomes" deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(a.nomes) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${a.forma}" já tem o nome dela`);
     }
     for (let k = 1; k < a.total; k++) {
-      saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados } });
+      saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: f.daInstancia } : {}) });
     }
   }
   return saida;
@@ -207,8 +213,10 @@ export function expandirEsboco(esboco) {
   const declaradosRaiz = esboco.parametros;
   exigir(declaradosRaiz === undefined || objeto(declaradosRaiz), 'esboço: "parametros" deve ser um objeto { nome: número | "outroNome" | "=expressão" }');
   const raiz = resolvedor(declaradosRaiz ?? {}, 'esboço');
+  const catalogo = catalogoDe(esboco.modulos);
   const saida = { ...esboco };
   delete saida.parametros;
+  delete saida.modulos;
   delete saida.formas;
   const estilos = lerEstilos(esboco);
   delete saida.estilos;
@@ -229,11 +237,12 @@ export function expandirEsboco(esboco) {
     const g = { ...o };
     delete g.parametros;
     if (Object.keys(valores).length > 0) g.parametros = valores;
-    const fonte = prepararFormas(o.formas ?? esboco.formas, estilos, num, onde);
+    const fonte = prepararFormas(traduzirLigacoes(o.formas ?? esboco.formas, onde), estilos, num, onde);
     let componentes = { pares: [], aliasDeId: () => undefined, instancias: 0 };
     if (Array.isArray(fonte)) {
-      componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde });
+      componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde, catalogo });
       g.formas = expandirArranjos(componentes.formas.map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
+      validarLigacoes(g.formas, onde, Object.keys({ ...(esboco.pontos ?? {}), ...(o.pontos ?? {}) }));
     }
     expansoes.push(componentes);
     /* medidas do plano: os pontos "<instancia>.<ancora>" viram a forma e a âncora reais desta opção */

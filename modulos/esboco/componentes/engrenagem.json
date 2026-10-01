@@ -1,0 +1,64 @@
+{
+  "componente": "engrenagem",
+  "descricao": "Engrenagem com o eixo em z: corpo de `dentes` dentes (extrusão do perfil `gerar: engrenagem`, de raio externo `modulo*(dentes+2)/2` e raiz `modulo*(dentes-2.5)/2`) e um cubo cilíndrico encostado na face de cima. A origem é o centro do corpo.",
+  "principal": "corpo",
+  "parametros": {
+    "dentes": 20,
+    "modulo": 4,
+    "espessura": 16,
+    "diametroCubo": "=modulo*(dentes-2.5)*0.5",
+    "salienciaCubo": 10
+  },
+  "entradas": {
+    "centro": null,
+    "sobre": null,
+    "alinha": null,
+    "encosta": null,
+    "desloca": null
+  },
+  "formas": [
+    {
+      "id": "corpo",
+      "tipo": "extrusao",
+      "origem": "perfil",
+      "eixo": "z",
+      "comprimento": "espessura",
+      "perfil": {
+        "gerar": "engrenagem",
+        "dentes": "dentes",
+        "raioExterno": "=modulo*(dentes+2)/2",
+        "raioRaiz": "=modulo*(dentes-2.5)/2"
+      },
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "azul"
+    },
+    {
+      "id": "cubo",
+      "tipo": "cilindro",
+      "diametro": "diametroCubo",
+      "comprimento": "salienciaCubo",
+      "eixo": "z",
+      "ponta": {
+        "id": "corpo",
+        "lado": "+z"
+      },
+      "cor": "cinza"
+    }
+  ],
+  "ancoras": {
+    "eixo": "corpo.centro",
+    "frente": "cubo.fim",
+    "tras": "corpo.-z"
+  },
+  "pares": [
+    {
+      "a": "corpo",
+      "b": "cubo",
+      "tipo": "encosta"
+    }
+  ]
+}

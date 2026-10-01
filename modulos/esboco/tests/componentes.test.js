@@ -25,8 +25,8 @@ const recusa = (formas, trecho, extra = {}) => {
 const extensao = (r) => r.max.map((v, i) => v - r.min[i]);
 
 describe('a biblioteca', () => {
-  it('tem roda, garfo, quadro e mancal, cada um com principal, parâmetros e formas que existem', () => {
-    expect(NOMES_DOS_COMPONENTES).toEqual(['roda', 'garfo', 'quadro', 'mancal']);
+  it('tem roda, garfo, quadro e mancal (e os da biblioteca ampliada), cada um com principal, parâmetros e formas que existem', () => {
+    expect(NOMES_DOS_COMPONENTES.slice(0, 4)).toEqual(['roda', 'garfo', 'quadro', 'mancal']);
     for (const [nome, c] of Object.entries(COMPONENTES)) {
       expect(c.componente).toBe(nome);
       const ids = c.formas.map((f) => f.id);
@@ -221,7 +221,7 @@ describe('espelho de instância', () => {
 
 describe('recusas', () => {
   it('componente inexistente lista os nomes, e id repetido ou misturado é recusado', () => {
-    recusa([{ id: 'x', usa: 'helice' }], /o componente "helice" não existe \(componentes: roda, garfo, quadro, mancal\)/);
+    recusa([{ id: 'x', usa: 'helice' }], /o componente "helice" não existe.*\(componentes: roda, garfo, quadro, mancal, parafuso, mola, engrenagem, rolamento, perfil, dobradica\)/);
     recusa([{ id: 'x', usa: 'roda' }, { id: 'x', usa: 'roda' }], /o id "x" está repetido entre as instâncias/);
     recusa([{ id: 'x', usa: 'roda' }, caixa('x', [0, 0, 0])], /o id "x" é de uma instância de componente e de outra forma/);
     recusa([{ usa: 'roda' }], /uma instância de componente \("usa": "roda"\) precisa de "id"/);

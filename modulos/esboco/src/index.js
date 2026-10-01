@@ -4,6 +4,7 @@
    a conversão para PNG fica na ferramenta de linha de comando. */
 
 import { expandirArranjos, expandirEsboco } from './expandir.js';
+import { quisDizer } from './parecido.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -746,7 +747,7 @@ function posesNoCaminho(alvo, a, onde) {
 const CHAVES_ESPELHA = ['forma', 'eixo', 'pos'];
 /* Campos de posição e de aparência que a cópia não herda da forma-fonte (a cópia refaz a posição
    a partir da fonte já resolvida; `rotulo`, `oculto` e `opacidade` são só dela). */
-const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia', 'substitui'];
+const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia', 'daLigacao', 'encaixa', 'substitui'];
 const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha', 'daInstancia', 'substitui', 'unidade'];
 
 /* Cópia refletida (`espelha`) ou repetida (`arranjoDe`, vinda de `arranja`) de uma forma já resolvida:
@@ -1020,6 +1021,27 @@ function caixaDeTubo(r) {
   return { min: [0, 1, 2].map((i) => Math.min(...cs.map((c) => c.min[i]))), max: [0, 1, 2].map((i) => Math.max(...cs.map((c) => c.max[i]))) };
 }
 
+const objeto2 = (v) => v && typeof v === 'object' && !Array.isArray(v);
+const CHAVES_ENCAIXA = ['ancora', 'em', 'gira'];
+
+/* `encaixa: { "ancora": "<nome>" ou "<id>.<nome>", "em": "<id>.<ancora>" | ponto, "gira": { "eixo", "graus" } }`: o centro que
+   leva a âncora da própria forma (com a rotação já aplicada) ao ponto `em`. A âncora de uma forma não muda com a translação, por
+   isso ela é lida com a forma centrada na origem. */
+function centroDoEncaixe(f, id, onde, { pr, m, local }, pontoDe) {
+  const en = f.encaixa;
+  exigir(objeto2(en), `${onde}: "encaixa" deve ser { "ancora": "<ancora da peça>", "em": "<id>.<ancora>" }`);
+  const extras = Object.keys(en).filter((k) => !CHAVES_ENCAIXA.includes(k));
+  exigir(extras.length === 0, `${onde}: "encaixa" não tem o campo "${extras[0]}" (campos: ${CHAVES_ENCAIXA.join(', ')})`);
+  exigir(typeof en.ancora === 'string' && en.ancora && en.em !== undefined, `${onde}: "encaixa" precisa de "ancora" (uma âncora da própria peça) e "em" (o ponto "<id>.<ancora>" em que ela vai)`);
+  const nome = en.ancora.startsWith(`${id}.`) ? en.ancora.slice(id.length + 1) : en.ancora;
+  const validas = nomesDeAncoras(f.tipo, f);
+  exigir(validas.includes(nome), `${onde}: "encaixa.ancora" com o valor ${JSON.stringify(en.ancora)} deve ser uma âncora da própria forma${en.ancora.includes('.') && !en.ancora.startsWith(`${id}.`) ? ` ("${id}", e não "${en.ancora.slice(0, en.ancora.lastIndexOf('.'))}")` : ''}${quisDizer(nome, validas)} (âncoras de "${id}": ${validas.join(', ')})`);
+  const trial = { id, forma: f, prisma: pr, centro: [0, 0, 0], matriz: m, min: local.min, max: local.max };
+  const propria = ancorasDe(trial)[nome];
+  const alvo = pontoDe(en.em, 'encaixa.em');
+  return alvo.map((c, i) => c - propria[i]);
+}
+
 /* Resolve a posição de cada forma. Devolve formas com centro e caixa no mundo. `pontosDaRaiz` é o
    `pontos` da raiz do esboço. Ordem de aplicação: centro, sobre, ponta ou haste (`de`/`para`);
    depois `alinha`, `encosta` e `desloca`. */
@@ -1126,6 +1148,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       }
       return centro;
     };
+    exigir(f.encaixa === undefined || !(f.tipo === 'envolve' || f.tipo === 'tubo' || f.de !== undefined || f.para !== undefined), `${onde}: "encaixa" posiciona a peça por uma âncora dela e não vale na faixa "envolve", no tubo nem na haste "de"/"para" (que já se posicionam pelos pontos); retire "encaixa" ou use "desloca"`);
     if (f.tipo === 'envolve') {
       const proibidos = ['centro', 'sobre', 'ponta', 'de', 'para', 'rotacao'].filter((k) => f[k] !== undefined);
       exigir(proibidos.length === 0, `${onde}: a faixa "envolve" se posiciona pelos centros dos "circulos"; retire ${proibidos.map((k) => `"${k}"`).join(', ')} (use "desloca", "alinha" ou "encosta" para afastá-la)`);
@@ -1188,13 +1211,23 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       centro = p0.map((c, i) => (c + p1[i]) / 2);
     } else {
       m = matrizRotacao(f.rotacao);
+      if (f.encaixa !== undefined) {
+        const g = f.encaixa.gira;
+        if (g !== undefined) {
+          exigir(objeto2(g) && EIXOS.includes(g.eixo) && Number.isFinite(g.graus), `${onde}: "encaixa.gira" deve ser { "eixo": "x" | "y" | "z", "graus": 90 }, a rotação em torno do eixo de mundo antes de a âncora ir ao ponto`);
+          const R = rotacaoEmTorno(g.eixo, g.graus);
+          m = m ? multiplicar(R, m) : R;
+        }
+      }
     }
     const pr = prisma(fPrisma, onde);
     const local = caixaLocal(pr, m);
-    const modos = ['centro', 'sobre', 'ponta'].filter((k) => (k === 'ponta' ? posicionaPorPonta(f) : f[k] !== undefined));
+    const modos = ['centro', 'sobre', 'ponta', 'encaixa'].filter((k) => (k === 'ponta' ? posicionaPorPonta(f) : f[k] !== undefined));
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
     if (haste) {
       /* o centro já saiu dos dois pontos */
+    } else if (f.encaixa !== undefined) {
+      centro = centroDoEncaixe(f, id, onde, { pr, m, local }, pontoDe);
     } else if (typeof f.centro === 'string' || (f.centro && typeof f.centro === 'object' && !Array.isArray(f.centro))) {
       centro = pontoDe(f.centro, 'centro');
     } else if (f.centro !== undefined) {

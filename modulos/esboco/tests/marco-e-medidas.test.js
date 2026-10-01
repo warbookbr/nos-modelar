@@ -54,6 +54,9 @@ describe('entrega 1: o crítico cego no Marco', () => {
     expect(b.texto).not.toContain('-unidade-a-');
     expect(b.texto).toContain('marco de 75%');
     expect(b.texto).toMatch(/Unidade c.*Função da unidade: \(não declarada\)/s);
+    /* cada unidade nova leva o texto do --ligacoes (a c toca a b e a d num ponto cada), e o brief fecha com as unidades presas a nada */
+    expect(b.texto).toMatch(/Unidade c[\s\S]*Ligações da unidade em texto \(o --ligacoes\):\n\s+unidade c \(1 forma\):\n\s+toca b: 1 ponto[^\n]*\n\s+toca d: 1 ponto[^\n]*\n\s+pontas livres: nenhuma/);
+    expect(b.texto).toMatch(/unidades presas a nada: nenhuma\nResponda, olhando só as imagens/);
     expect(b.texto).toMatch(/--veredito marco-75 --nota <0-10> --motivo/);
     expect(PERGUNTAS_DO_MARCO.join(' ')).toMatch(/sem função/);
     expect(PERGUNTAS_DO_MARCO.join(' ')).toMatch(/sem ligação/);

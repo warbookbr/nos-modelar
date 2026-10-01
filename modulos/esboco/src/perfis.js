@@ -47,6 +47,22 @@ export const GERADORES = {
       return pontos;
     },
   },
+  /* engrenagem de `dentes` dentes: cada dente é um trapézio de `raioRaiz` a `raioExterno` (topo de 24% e base de 50% do passo angular) e o vão entre dois dentes é um arco da raiz; o primeiro dente aponta para +v */
+  engrenagem: {
+    campos: ['dentes', 'raioExterno', 'raioRaiz'],
+    exemplo: '{ "gerar": "engrenagem", "dentes": 20, "raioExterno": 44, "raioRaiz": 37.5 }',
+    gerar({ dentes, raioExterno, raioRaiz }, onde) {
+      exigir(Number.isInteger(dentes) && dentes >= 6, `${onde}: "dentes" deve ser um inteiro de 6 ou mais (veio ${JSON.stringify(dentes)})`);
+      exigir(finito(raioRaiz) && raioRaiz > 0 && finito(raioExterno) && raioExterno > raioRaiz, `${onde}: "raioRaiz" e "raioExterno" devem ser números em mm com 0 < raioRaiz < raioExterno (vieram ${JSON.stringify(raioRaiz)} e ${JSON.stringify(raioExterno)})`);
+      const passo = 360 / dentes;
+      const pontos = [];
+      for (let k = 0; k < dentes; k++) {
+        const a = 90 + passo * k;
+        pontos.push(polar(a - 0.25 * passo, raioRaiz), polar(a - 0.12 * passo, raioExterno), polar(a + 0.12 * passo, raioExterno), polar(a + 0.25 * passo, raioRaiz), polar(a + 0.5 * passo, raioRaiz));
+      }
+      return pontos;
+    },
+  },
   /* polígono regular de `lados` lados (24 por padrão) com o vértice em +u */
   circulo: {
     campos: ['raio', 'lados'],

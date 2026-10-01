@@ -5,7 +5,7 @@
 import { ErroDeEsboco } from './index.js';
 import { verificarContato } from './contato.js';
 import { temRelacaoDePosicao } from './conserto.js';
-import { componente } from './componentes.js';
+import { catalogoDe, componente } from './componentes.js';
 
 export const MAXIMO_DE_RODADAS = 5;
 const arred1 = (x) => Math.round(x * 10) / 10;
@@ -32,16 +32,18 @@ function formaDeclarada(bruto, indice, id) {
 /* Soma `delta` à posição da forma declarada. Devolve { campo, antes, depois } ou null se a forma não existe. */
 export function aplicarDeslocamento(bruto, indice, id, delta) {
   let f = formaDeclarada(bruto, indice, id);
+  /* a ligação (`ligar`) é derivada das duas âncoras: não leva `centro` nem `desloca` */
+  if (f?.ligar !== undefined) return null;
   if (!f) {
     /* forma principal de um componente: quem se move é a instância, pelo `desloca` que o componente declara */
     const i = id.indexOf('.');
     const instancia = i > 0 ? formaDeclarada(bruto, indice, id.slice(0, i)) : null;
     if (instancia?.usa === undefined) return null;
-    const comp = componente(instancia.usa, `instância "${instancia.id}"`);
+    const comp = componente(instancia.usa, `instância "${instancia.id}"`, catalogoDe(bruto.modulos));
     if (comp.principal !== id.slice(i + 1) || !Object.hasOwn(comp.entradas ?? {}, 'desloca')) return null;
     f = instancia;
   }
-  const editaCentro = f.usa === undefined ? !temRelacaoDePosicao(f) : (Array.isArray(f.centro) && f.centro.every((x) => typeof x === 'number') && Object.keys(f).every((k) => !['sobre', 'ponta', 'encosta', 'alinha', 'de', 'para'].includes(k)));
+  const editaCentro = f.usa === undefined ? !temRelacaoDePosicao(f) : (Array.isArray(f.centro) && f.centro.every((x) => typeof x === 'number') && Object.keys(f).every((k) => !['sobre', 'ponta', 'encosta', 'alinha', 'de', 'para', 'encaixa'].includes(k)));
   const campo = editaCentro ? 'centro' : 'desloca';
   const antes = f[campo] === undefined ? null : clone(f[campo]);
   const base = f[campo] ?? [0, 0, 0];

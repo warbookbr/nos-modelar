@@ -74,6 +74,10 @@ describe('o brief do crítico no --feito', () => {
     expect(b.destinos).toHaveLength(4);
     for (const d of b.destinos) { expect(existsSync(d)).toBe(true); expect(d.startsWith(join(pasta, 'critico'))).toBe(true); expect(PNG.sync.read(readFileSync(d)).width).toBe(1100); }
     expect(b.texto).toContain('Função da unidade: fileira de caixas encostadas que faz o corpo do objeto');
+    /* o texto do --ligacoes da unidade entra no brief: a fila toca a ponta num ponto e não tem ponta livre */
+    expect(b.texto).toContain('Ligações da unidade em texto');
+    expect(b.texto).toMatch(/unidade fila \(9 formas; função: fileira de caixas encostadas que faz o corpo do objeto\):\n\s+toca ponta: 1 ponto \(c8 em p \[180 10 0\]\)\n\s+pontas livres: nenhuma/);
+    expect(b.texto.indexOf('Ligações da unidade em texto')).toBeLessThan(b.texto.indexOf('Responda, olhando só as imagens'));
     for (const v of ['isometrica', 'frontal', 'lateral', 'superior']) expect(b.texto).toContain(`-unidade-fila-${v}.png`);
     expect(PERGUNTAS_DO_CRITICO).toHaveLength(5);
     PERGUNTAS_DO_CRITICO.forEach((p, i) => expect(b.texto).toContain(`${i + 1}. ${p}`));

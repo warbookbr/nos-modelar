@@ -31,6 +31,9 @@
    Puro: não lê arquivo (a biblioteca é importada como dados). */
 import { ErroDeEsboco } from './index.js';
 import { COMPONENTES } from '../componentes/index.js';
+import { validarForma } from './esquema.js';
+import { quisDizer } from './parecido.js';
+import { traduzirLigacoes } from './ligar.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -40,10 +43,83 @@ const ANCORAS_DA_FORMA = ['centro', 'inicio', 'fim', '+x', '-x', '+y', '-y', '+z
 
 export const NOMES_DOS_COMPONENTES = Object.keys(COMPONENTES);
 
-/* Componente pelo nome, ou ErroDeEsboco com os nomes válidos. */
-export function componente(nome, onde) {
-  exigir(typeof nome === 'string' && Object.hasOwn(COMPONENTES, nome), `${onde}: o componente "${nome}" não existe (componentes: ${NOMES_DOS_COMPONENTES.join(', ')})`);
-  return COMPONENTES[nome];
+/* Componente pelo nome no catálogo (os de arquivo, mais os módulos do esboço quando `catalogo` vem de `catalogoDe`), ou
+   ErroDeEsboco com os nomes válidos. */
+export function componente(nome, onde, catalogo = COMPONENTES) {
+  if (typeof nome === 'string' && Object.hasOwn(catalogo, nome)) return catalogo[nome];
+  const modulos = Object.keys(catalogo).filter((n) => !NOMES_DOS_COMPONENTES.includes(n) || catalogo[n].origem === 'modulo');
+  const arquivos = NOMES_DOS_COMPONENTES.filter((n) => catalogo[n]?.origem !== 'modulo');
+  throw new ErroDeEsboco(`${onde}: o componente "${nome}" não existe${typeof nome === 'string' ? quisDizer(nome, Object.keys(catalogo)) : ''} (componentes: ${arquivos.join(', ')}${modulos.length ? `; módulos: ${modulos.join(', ')}` : ''})`);
+}
+
+const CAMPOS_DO_MODULO = ['descricao', 'principal', 'parametros', 'entradas', 'formas', 'ancoras', 'pares', 'substitui'];
+const entradasCitadas = (v, achadas = new Set()) => {
+  if (typeof v === 'string' && v.startsWith('@')) achadas.add(v.slice(1));
+  else if (Array.isArray(v)) v.forEach((x) => entradasCitadas(x, achadas));
+  else if (objeto(v)) Object.values(v).forEach((x) => entradasCitadas(x, achadas));
+  return achadas;
+};
+
+/* O bloco `modulos` da raiz do esboço: cada módulo tem o formato de um componente de arquivo (parametros, entradas,
+   formas, ancoras, pares e principal), sem o campo `componente`. As `entradas` que o módulo não declara saem das
+   referências "@nome" das formas (todas com padrão nulo) e a `principal` padrão é a primeira forma com id. Devolve o
+   catálogo `{ nome: componente }` com os componentes de arquivo e, por cima, os módulos: um módulo com o nome de um
+   componente de arquivo só entra com `"substitui": true`. Recusa módulo mal formado, colisão de nome e ciclo. */
+export function catalogoDe(modulos) {
+  if (modulos === undefined) return COMPONENTES;
+  exigir(objeto(modulos), 'esboço: "modulos" deve ser um objeto { nome: { parametros, formas, ancoras } }');
+  const catalogo = { ...COMPONENTES };
+  const usos = new Map();
+  /* módulo dentro de módulo: o ciclo tem a mensagem dele, e o aninhamento sem ciclo fica para depois */
+  for (const [nome, m] of Object.entries(modulos)) {
+    if (objeto(m) && Array.isArray(m.formas)) for (const f of m.formas) if (objeto(f) && typeof f.usa === 'string') usos.set(nome, [...(usos.get(nome) ?? []), f.usa]);
+  }
+  const visitar = (nome, trilha) => {
+    for (const alvo of usos.get(nome) ?? []) {
+      if (trilha.includes(alvo)) throw new ErroDeEsboco(`esboço: ciclo de módulos: ${[...trilha.slice(trilha.indexOf(alvo)), alvo].join(' -> ')}; um módulo não pode usar a si mesmo, direta ou indiretamente`);
+      if (usos.has(alvo)) visitar(alvo, [...trilha, alvo]);
+    }
+  };
+  for (const nome of usos.keys()) visitar(nome, [nome]);
+  for (const [nome, alvos] of usos) {
+    const alvo = alvos[0];
+    exigir(false, `esboço: o módulo "${nome}" usa ${Object.hasOwn(modulos, alvo) ? 'o módulo' : 'o componente'} "${alvo}" dentro de si, e isso ainda não é suportado: o módulo é só formas e âncoras; use as duas instâncias lado a lado no esboço, posicionadas por âncora`);
+  }
+
+  for (const [nome, m] of Object.entries(modulos)) {
+    const onde = `esboço: o módulo "${nome}"`;
+    exigir(nome && !nome.includes('.') && !nome.includes('@'), `${onde}: o nome não pode ter ponto nem arroba, e deve ser um texto não vazio (ele é o prefixo das âncoras "<instancia>.<ancora>")`);
+    exigir(objeto(m), `${onde} deve ser { "parametros": {...}, "formas": [...], "ancoras": {...} }`);
+    for (const k of Object.keys(m)) exigir(CAMPOS_DO_MODULO.includes(k), `${onde}: o campo "${k}" não existe${quisDizer(k, CAMPOS_DO_MODULO)}; campos válidos: ${CAMPOS_DO_MODULO.join(', ')}`);
+    exigir(Array.isArray(m.formas) && m.formas.length > 0 && m.formas.every(objeto), `${onde}: "formas" deve ser uma lista não vazia de formas`);
+    const formasDoModulo = traduzirLigacoes(m.formas, `esboço: módulo "${nome}"`);
+    exigir(m.parametros === undefined || objeto(m.parametros), `${onde}: "parametros" deve ser um objeto { nome: número | "=expressão" }`);
+    exigir(m.substitui === undefined || typeof m.substitui === 'boolean', `${onde}: "substitui" deve ser true ou false`);
+    const colide = Object.hasOwn(COMPONENTES, nome);
+    exigir(!colide || m.substitui === true, `${onde} tem o nome de um componente de arquivo; declare "substitui": true no módulo para usá-lo no lugar do componente, ou renomeie o módulo`);
+    exigir(colide || m.substitui !== true, `${onde} declara "substitui": true, mas não existe componente de arquivo com esse nome (componentes: ${NOMES_DOS_COMPONENTES.join(', ')}); tire o "substitui"`);
+    const ids = formasDoModulo.filter((f) => typeof f.id === 'string' && f.usa === undefined).map((f) => f.id);
+    for (const [i, f] of formasDoModulo.entries()) {
+      exigir(typeof f.id === 'string' && f.id ? !f.id.includes('.') : objeto(f.arranja), `${onde}, forma ${i + 1}: falta o "id" (sem ponto), que só uma entrada "arranja" dispensa`);
+    }
+    for (const f of formasDoModulo) {
+      if (f.usa !== undefined) continue;
+      if (objeto(f.arranja)) exigir(ids.includes(f.arranja.forma), `${onde}: o arranja cita a forma "${f.arranja.forma}", que não é forma do módulo (formas: ${ids.join(', ')})`);
+      const { quando, exceto, ...limpa } = f;
+      void quando; void exceto;
+      validarForma(limpa, `módulo "${nome}", forma "${f.id ?? 'arranja'}"`);
+    }
+    const principal = m.principal ?? ids[0];
+    exigir(ids.includes(principal), `${onde}: a forma principal "${principal}" não é forma do módulo (formas: ${ids.join(', ') || 'nenhuma'})`);
+    for (const [a, alvo] of Object.entries(m.ancoras ?? {})) {
+      const forma = typeof alvo === 'string' ? alvo.slice(0, Math.max(alvo.lastIndexOf('.'), 0)) : '';
+      exigir(ids.includes(forma), `${onde}: a âncora "${a}" aponta para ${JSON.stringify(alvo)}, e "${forma}" não é forma do módulo; escreva "<forma>.<ancora>" (formas: ${ids.join(', ')})`);
+    }
+    for (const p of m.pares ?? []) exigir(objeto(p) && ids.includes(p.a) && ids.includes(p.b), `${onde}: o par ${JSON.stringify([p?.a, p?.b])} cita forma que não é do módulo (formas: ${ids.join(', ')})`);
+    const entradas = m.entradas ?? Object.fromEntries([...entradasCitadas(formasDoModulo)].map((k) => [k, null]));
+    catalogo[nome] = { componente: nome, origem: 'modulo', principal, parametros: m.parametros ?? {}, entradas, formas: formasDoModulo, ancoras: m.ancoras ?? {}, pares: m.pares ?? [] };
+  }
+  return catalogo;
 }
 
 /* Percorre os campos de referência de uma forma: chama `ponto(valor)` para cada ponto ("<id>.<ancora>", ponto nomeado,
@@ -65,7 +141,13 @@ function reescreverForma(f, { ponto, id }) {
   if (objeto(g.alinha) && g.alinha.com !== undefined) g.alinha = { ...g.alinha, com: typeof g.alinha.com === 'string' ? ponto(g.alinha.com, true) : pt(g.alinha.com) };
   for (const k of ['centro', 'de', 'para']) if (g[k] !== undefined) g[k] = pt(g[k]);
   if (Array.isArray(g.caminho)) g.caminho = g.caminho.map(pt);
-  if (objeto(g.arranja) && g.arranja.centro !== undefined) g.arranja = { ...g.arranja, centro: pt(g.arranja.centro) };
+  if (objeto(g.encaixa)) g.encaixa = { ...g.encaixa, ...(g.encaixa.em === undefined ? {} : { em: pt(g.encaixa.em) }), ...(typeof g.encaixa.ancora === 'string' ? { ancora: ponto(g.encaixa.ancora) } : {}) };
+  if (objeto(g.arranja)) {
+    g.arranja = { ...g.arranja };
+    if (typeof g.arranja.forma === 'string') g.arranja.forma = id(g.arranja.forma);
+    if (typeof g.arranja.caminho === 'string') g.arranja.caminho = id(g.arranja.caminho);
+    if (g.arranja.centro !== undefined) g.arranja.centro = pt(g.arranja.centro);
+  }
   return g;
 }
 
@@ -110,7 +192,7 @@ export function expandirComponentes(formas, ctx) {
   for (const f of instancias) {
     exigir(typeof f.id === 'string' && f.id, `${onde}: uma instância de componente ("usa": "${f.usa}") precisa de "id"`);
     exigir(!dadosDe.has(f.id), `${onde}: o id "${f.id}" está repetido entre as instâncias de componente`);
-    dadosDe.set(f.id, { comp: componente(f.usa, `${onde}, instância "${f.id}"`), nome: f.usa, espelho: false });
+    dadosDe.set(f.id, { comp: componente(f.usa, `${onde}, instância "${f.id}"`, ctx.catalogo), nome: f.usa, espelho: false });
   }
   const idsDasInstancias = new Set(dadosDe.keys());
   for (const f of formas) if (ehEspelhoDeInstancia(f, idsDasInstancias)) {
@@ -188,7 +270,14 @@ export function expandirComponentes(formas, ctx) {
       /* referências internas ganham o prefixo antes de as entradas entrarem (as entradas já são de fora) */
       let h = reescreverForma(clone(g), { ponto: prefixaPonto, id: prefixa });
       h = substituir(h, entradas, contexto, nome);
-      h = ctx.numerosDaForma(h, escopo.num, `${contexto}, forma "${g.id}"`);
+      h = ctx.numerosDaForma(h, escopo.num, `${contexto}, forma ${g.id === undefined ? 'de arranja' : `"${g.id}"`}`);
+      /* a entrada `arranja` do componente não tem id: as cópias dela nascem na expansão dos arranjos, com a fonte prefixada */
+      if (g.id === undefined && objeto(h.arranja)) {
+        if (Array.isArray(h.arranja.nomes)) h.arranja = { ...h.arranja, nomes: h.arranja.nomes.map((n) => `${f.id}.${n}`) };
+        /* as cópias são da instância (unidade do Condutor, mapa de ligações), mas não são a forma principal dela */
+        h.daInstancia = { id: f.id, principal: false };
+        return h;
+      }
       h.id = `${f.id}.${g.id}`;
       const principal = g.id === comp.principal;
       h.daInstancia = { id: f.id, principal };

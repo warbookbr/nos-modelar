@@ -1,0 +1,334 @@
+{
+  "componente": "mola",
+  "descricao": "Mola de compressão com o eixo em y, entre duas sapatas: por padrão um tubo helicoidal de 3 voltas (8 pontos por volta, `raio` da linha de centro, `fio` de diâmetro e `passo` por volta); com `aneis: 1` vira uma pilha de `espiras` anéis de seção `fio` encostados (mola comprimida). A origem é o centro da sapata de baixo.",
+  "principal": "base",
+  "parametros": {
+    "raio": 20,
+    "fio": 3,
+    "passo": 8,
+    "aneis": 0,
+    "espiras": 6,
+    "espessuraSapata": 3
+  },
+  "entradas": {
+    "centro": null,
+    "sobre": null,
+    "alinha": null,
+    "encosta": null,
+    "desloca": null
+  },
+  "formas": [
+    {
+      "id": "base",
+      "tipo": "cilindro",
+      "diametro": "=2*raio+2*fio",
+      "comprimento": "espessuraSapata",
+      "eixo": "y",
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "cinza"
+    },
+    {
+      "id": "fio",
+      "tipo": "tubo",
+      "diametro": "fio",
+      "caminho": [
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio",
+            "=espessuraSapata/2+fio/2",
+            0
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*1/8",
+            "=raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            0,
+            "=espessuraSapata/2+fio/2+passo*2/8",
+            "=raio"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*3/8",
+            "=raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio",
+            "=espessuraSapata/2+fio/2+passo*4/8",
+            0
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*5/8",
+            "=-raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            0,
+            "=espessuraSapata/2+fio/2+passo*6/8",
+            "=-raio"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*7/8",
+            "=-raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio",
+            "=espessuraSapata/2+fio/2+passo*8/8",
+            0
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*9/8",
+            "=raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            0,
+            "=espessuraSapata/2+fio/2+passo*10/8",
+            "=raio"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*11/8",
+            "=raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio",
+            "=espessuraSapata/2+fio/2+passo*12/8",
+            0
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*13/8",
+            "=-raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            0,
+            "=espessuraSapata/2+fio/2+passo*14/8",
+            "=-raio"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*15/8",
+            "=-raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio",
+            "=espessuraSapata/2+fio/2+passo*16/8",
+            0
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*17/8",
+            "=raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            0,
+            "=espessuraSapata/2+fio/2+passo*18/8",
+            "=raio"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*19/8",
+            "=raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio",
+            "=espessuraSapata/2+fio/2+passo*20/8",
+            0
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=-raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*21/8",
+            "=-raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            0,
+            "=espessuraSapata/2+fio/2+passo*22/8",
+            "=-raio"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio*0.70711",
+            "=espessuraSapata/2+fio/2+passo*23/8",
+            "=-raio*0.70711"
+          ]
+        },
+        {
+          "ancora": "base.centro",
+          "mm": [
+            "=raio",
+            "=espessuraSapata/2+fio/2+passo*24/8",
+            0
+          ]
+        }
+      ],
+      "cor": "laranja",
+      "exceto": "aneis"
+    },
+    {
+      "id": "topo",
+      "tipo": "cilindro",
+      "diametro": "=2*raio+2*fio",
+      "comprimento": "espessuraSapata",
+      "eixo": "y",
+      "centro": {
+        "ancora": "base.centro",
+        "mm": [
+          0,
+          "=espessuraSapata+fio+3*passo",
+          0
+        ]
+      },
+      "cor": "cinza",
+      "exceto": "aneis"
+    },
+    {
+      "id": "anel",
+      "tipo": "anel",
+      "diametroExterno": "=2*raio+fio",
+      "diametroInterno": "=2*raio-fio",
+      "espessura": "fio",
+      "eixo": "y",
+      "centro": {
+        "ancora": "base.centro",
+        "mm": [
+          0,
+          "=espessuraSapata/2+fio/2",
+          0
+        ]
+      },
+      "cor": "laranja",
+      "quando": "aneis"
+    },
+    {
+      "arranja": {
+        "forma": "anel",
+        "modo": "linear",
+        "total": "espiras",
+        "passo": [
+          0,
+          "=fio",
+          0
+        ]
+      },
+      "quando": "aneis"
+    },
+    {
+      "id": "topo",
+      "tipo": "cilindro",
+      "diametro": "=2*raio+2*fio",
+      "comprimento": "espessuraSapata",
+      "eixo": "y",
+      "centro": {
+        "ancora": "base.centro",
+        "mm": [
+          0,
+          "=espessuraSapata+espiras*fio",
+          0
+        ]
+      },
+      "cor": "cinza",
+      "quando": "aneis"
+    }
+  ],
+  "ancoras": {
+    "base": "base.centro",
+    "topo": "topo.centro",
+    "eixo": "base.centro"
+  },
+  "pares": [
+    {
+      "a": "base",
+      "b": "fio",
+      "tipo": "encosta",
+      "exceto": "aneis"
+    },
+    {
+      "a": "fio",
+      "b": "topo",
+      "tipo": "encosta",
+      "exceto": "aneis"
+    },
+    {
+      "a": "base",
+      "b": "anel",
+      "tipo": "encosta",
+      "quando": "aneis"
+    }
+  ]
+}

@@ -593,7 +593,7 @@ function amostrasDaPonta({ ponto, direcao, raio }) {
    forma (visível ou oculta, a menos da tolerância), e as pontas de três ou mais formas que terminam no mesmo ponto sem nenhuma
    outra forma que as una (um coletor). `ponta: true` na forma, ou `ponta: { inicio: true }` / `{ fim: true }`, declara a ponta
    livre de propósito. Duas pontas no mesmo ponto são uma emenda, e não pedem coletor. */
-function achadosDePonta({ titulo, rs, pecas, ocultas, tol }) {
+export function achadosDePonta({ titulo, rs, pecas, ocultas, tol }) {
   const todas = [...pecas, ...ocultas.map(pecasDe)];
   if (todas.length < 2) return [];
   const pontas = [];

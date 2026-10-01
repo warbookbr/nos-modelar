@@ -30,6 +30,7 @@ export function alvosDaForma(f, ids) {
   if (objeto(f.encosta)) cita(f.encosta.referencia);
   if (objeto(f.alinha)) citaPonto(f.alinha.com, cita);
   if (objeto(f.espelha)) cita(f.espelha.forma);
+  if (objeto(f.encaixa)) citaPonto(f.encaixa.em, cita);
   if (objeto(f.arranjoDe)) { cita(f.arranjoDe.fonte); cita(f.arranjoDe.centro); cita(f.arranjoDe.caminho); }
   if (Array.isArray(f.circulos)) for (const c of f.circulos) if (objeto(c)) citaPonto(c.centro, cita);
   for (const k of ['centro', 'de', 'para']) citaPonto(f[k], cita);
@@ -39,7 +40,7 @@ export function alvosDaForma(f, ids) {
 
 /* A posição da forma sai de outra forma (a menos de `centro` numérico simples). */
 export function temRelacaoDePosicao(f) {
-  return ['sobre', 'ponta', 'encosta', 'alinha', 'espelha', 'arranjoDe', 'de', 'para', 'caminho'].some((k) => f[k] !== undefined)
+  return ['sobre', 'ponta', 'encosta', 'alinha', 'espelha', 'arranjoDe', 'de', 'para', 'caminho', 'encaixa', 'ligar'].some((k) => f[k] !== undefined)
     || (f.centro !== undefined && !(Array.isArray(f.centro) && f.centro.every((x) => typeof x === 'number')));
 }
 
@@ -96,6 +97,8 @@ export function criarConserto(formas, resolvidas) {
     const d = porId.get(id)?.daInstancia;
     return Boolean(d && !d.principal);
   };
+  /* A ligação criada por `ligar` se estende entre duas âncoras: movê-la sozinha a soltaria delas, e quem se move é uma das pontas. */
+  const ligacao = (id) => porId.get(id)?.daLigacao !== undefined;
 
   const descricaoDaRelacao = (f, alvo) => {
     const partes = [];
@@ -103,6 +106,7 @@ export function criarConserto(formas, resolvidas) {
     if (f.encosta?.referencia === alvo) partes.push('encosta');
     if (f.alinha?.com === alvo || String(f.alinha?.com).startsWith(`${alvo}.`)) partes.push('alinha');
     if (f.espelha?.forma === alvo) partes.push('espelha');
+    if (String(f.encaixa?.em).startsWith(`${alvo}.`)) partes.push('encaixa');
     if (f.arranjoDe?.fonte === alvo) partes.push('arranja');
     if (partes.length === 0) partes.push('posição');
     return partes.join('/');
@@ -112,7 +116,7 @@ export function criarConserto(formas, resolvidas) {
      desfaria o conserto, pois a dependente acompanha). Se as duas servem, a de menor caixa envolvente; se
      nenhuma serve, nenhuma. */
   const escolher = (a, b) => {
-    const serve = (x, y) => !parteDeComponente(fonteDe(x, [0, 0, 0]).fonte) && !arrasta(fonteDe(x, [0, 0, 0]).fonte).has(y) && fonteDe(x, [0, 0, 0]).fonte !== fonteDe(y, [0, 0, 0]).fonte;
+    const serve = (x, y) => !parteDeComponente(fonteDe(x, [0, 0, 0]).fonte) && !ligacao(fonteDe(x, [0, 0, 0]).fonte) && !arrasta(fonteDe(x, [0, 0, 0]).fonte).has(y) && fonteDe(x, [0, 0, 0]).fonte !== fonteDe(y, [0, 0, 0]).fonte;
     const sa = serve(a, b); const sb = serve(b, a);
     if (sa && sb) {
       const va = volumes.get(a) ?? 0; const vb = volumes.get(b) ?? 0;
@@ -133,8 +137,9 @@ export function criarConserto(formas, resolvidas) {
     const d = dFonte.map(arred1);
     const alvoTexto = fonte === mover ? mover : `${fonte} (fonte de ${mover}: ${cadeia.join(', ')})`;
     const parte = parteDeComponente(fonte);
-    const texto = `mova ${alvoTexto} em ${vetorTexto(d)} mm (${motivo})${parte ? `; ${fonte} é parte do componente ${porId.get(fonte).daInstancia.id} e não se move sozinha: ajuste a instância` : ''}`;
-    return { forma: mover, fonte, delta: d, mm: arred1(Math.hypot(...d)), texto, motivo, aplicavel: !parte && d.some((c) => c !== 0), arrasta: [...arrasta(fonte)].sort(), ...extra };
+    const liga = ligacao(fonte);
+    const texto = `mova ${alvoTexto} em ${vetorTexto(d)} mm (${motivo})${parte ? `; ${fonte} é parte do componente ${porId.get(fonte).daInstancia.id} e não se move sozinha: ajuste a instância` : ''}${liga ? `; ${fonte} é uma ligação entre duas âncoras e não se move sozinha: mova uma das duas formas que ela liga` : ''}`;
+    return { forma: mover, fonte, delta: d, mm: arred1(Math.hypot(...d)), texto, motivo, aplicavel: !parte && !liga && d.some((c) => c !== 0), arrasta: [...arrasta(fonte)].sort(), ...extra };
   };
 
   return {

@@ -1,0 +1,89 @@
+{
+  "componente": "dobradica",
+  "descricao": "Dobradiça aberta (as abas no mesmo plano) com o pino em y: pino cilindro de `diametroPino` e `altura`, e duas abas de `larguraAba` por `espessura` encostadas nos lados do pino, esquerda (`abaE`, -x) e direita (`abaD`, +x). A origem é o centro do pino.",
+  "principal": "pino",
+  "parametros": {
+    "altura": 60,
+    "diametroPino": 8,
+    "larguraAba": 30,
+    "espessura": 3
+  },
+  "entradas": {
+    "centro": null,
+    "sobre": null,
+    "alinha": null,
+    "encosta": null,
+    "desloca": null
+  },
+  "formas": [
+    {
+      "id": "pino",
+      "tipo": "cilindro",
+      "diametro": "diametroPino",
+      "comprimento": "altura",
+      "eixo": "y",
+      "centro": "@centro",
+      "sobre": "@sobre",
+      "alinha": "@alinha",
+      "encosta": "@encosta",
+      "desloca": "@desloca",
+      "cor": "cinza"
+    },
+    {
+      "id": "abaE",
+      "tipo": "caixa",
+      "largura": "larguraAba",
+      "altura": "altura",
+      "profundidade": "espessura",
+      "ponta": {
+        "id": "pino",
+        "lado": "-x"
+      },
+      "alinha": {
+        "com": "pino",
+        "eixos": [
+          "y",
+          "z"
+        ]
+      },
+      "cor": "azul"
+    },
+    {
+      "id": "abaD",
+      "tipo": "caixa",
+      "largura": "larguraAba",
+      "altura": "altura",
+      "profundidade": "espessura",
+      "ponta": {
+        "id": "pino",
+        "lado": "+x"
+      },
+      "alinha": {
+        "com": "pino",
+        "eixos": [
+          "y",
+          "z"
+        ]
+      },
+      "cor": "azul"
+    }
+  ],
+  "ancoras": {
+    "eixo": "pino.centro",
+    "bordaE": "abaE.-x",
+    "bordaD": "abaD.+x",
+    "topo": "pino.+y"
+  },
+  "pares": [
+    {
+      "a": "pino",
+      "b": "abaE",
+      "tipo": "encosta"
+    },
+    {
+      "a": "pino",
+      "b": "abaD",
+      "tipo": "encosta"
+    }
+  ]
+}

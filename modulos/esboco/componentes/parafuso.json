@@ -1,0 +1,79 @@
+{
+  "componente": "parafuso",
+  "descricao": "Parafuso entre dois pontos: cabeça (sextavada por padrão, redonda com `sextavada: 0`) em `de` e haste até `para`; o eixo e o comprimento saem dos dois pontos. `diametro` é o da haste e `diametroCabeca` o da cabeça (circunscrito, no sextavado).",
+  "principal": "haste",
+  "parametros": {
+    "diametro": 10,
+    "diametroCabeca": "=diametro*1.8",
+    "alturaCabeca": "=diametro*0.7",
+    "sextavada": 1
+  },
+  "entradas": {
+    "de": null,
+    "para": null,
+    "desloca": null
+  },
+  "formas": [
+    {
+      "id": "cabeca",
+      "tipo": "cilindro",
+      "diametro": "diametroCabeca",
+      "lados": 6,
+      "de": "@de",
+      "para": {
+        "entre": [
+          "@de",
+          "@para"
+        ],
+        "mm": "alturaCabeca"
+      },
+      "desloca": "@desloca",
+      "cor": "cinza",
+      "quando": "sextavada"
+    },
+    {
+      "id": "cabeca",
+      "tipo": "cilindro",
+      "diametro": "diametroCabeca",
+      "de": "@de",
+      "para": {
+        "entre": [
+          "@de",
+          "@para"
+        ],
+        "mm": "alturaCabeca"
+      },
+      "desloca": "@desloca",
+      "cor": "cinza",
+      "exceto": "sextavada"
+    },
+    {
+      "id": "haste",
+      "tipo": "cilindro",
+      "diametro": "diametro",
+      "de": {
+        "entre": [
+          "@de",
+          "@para"
+        ],
+        "mm": "alturaCabeca"
+      },
+      "para": "@para",
+      "desloca": "@desloca",
+      "cor": "cinza"
+    }
+  ],
+  "ancoras": {
+    "cabeca": "cabeca.centro",
+    "topo": "cabeca.inicio",
+    "ponta": "haste.fim",
+    "eixo": "haste.centro"
+  },
+  "pares": [
+    {
+      "a": "cabeca",
+      "b": "haste",
+      "tipo": "encosta"
+    }
+  ]
+}

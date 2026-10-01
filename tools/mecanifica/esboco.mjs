@@ -16,6 +16,7 @@ import { formatarConferencia, formatarMedidasDaReferencia, medidasDaReferencia, 
 import { avancar, conferirEnvelope, criarEstado, formatarEnvelope, formatarSituacao, funcaoDaUnidade, LIMITE_DA_FUNCAO, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
 import { detalharUnidade, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
 import { editarEsboco, formatarMudancas } from '../../modulos/esboco/src/editar.js';
+import { formatarLigacoes, mapaDeLigacoes } from '../../modulos/esboco/src/mapa-de-ligacoes.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
@@ -509,6 +510,8 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
   L.push(`Função da unidade: ${funcao ?? '(não declarada)'}`);
   L.push('Imagens (as quatro vistas da unidade isolada, sem legenda):');
   for (const d of r.destinos) L.push(`  ${d}`);
+  L.push('Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:');
+  for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`  ${linha}`);
   L.push('Responda, olhando só as imagens:');
   PERGUNTAS_DO_CRITICO.forEach((p, i) => L.push(`  ${i + 1}. ${p}`));
   L.push('--- fim do brief ---');
@@ -561,7 +564,10 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
     unidades.push({ id: r.unidade.id, destinos: r.destinos, funcao });
     L.push(`Unidade ${r.unidade.id} (${r.unidade.membros.length} ${r.unidade.membros.length === 1 ? 'forma' : 'formas'}). Função da unidade: ${funcao ?? '(não declarada)'}`);
     for (const d of r.destinos) L.push(`  ${d}`);
+    L.push('  Ligações da unidade em texto (o --ligacoes):');
+    for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`    ${linha}`);
   }
+  L.push(...ligacoesArquivo(arquivo).texto.trimEnd().split('\n').slice(-1));
   L.push('Responda, olhando só as imagens:');
   PERGUNTAS_DO_MARCO.forEach((p, i) => L.push(`  ${i + 1}. ${p}`));
   L.push('--- fim do brief ---');
@@ -583,6 +589,21 @@ export function medidasArquivo(arquivo) {
   }
   if (L.length === 0) L.push('sem plano.medidas: nada a medir');
   return { texto: `${L.join('\n')}\n`, codigo: 0, medidas: plano.opcoes };
+}
+
+/* `--ligacoes [--unidade <nome>] [--forma <id>]`: o mapa de ligações em texto (quem toca quem, em quantos pontos distintos, as
+   pontas livres e as unidades presas a nada), por unidade ou, com `--forma`, por forma (ou por instância de componente). As
+   unidades são as do estado do Condutor gravado ao lado, ou o Plano de detalhe do esboço. Sem imagem, sem gravar nada, sai com 0. */
+export function ligacoesArquivo(arquivo, { unidade = null, forma = null } = {}) {
+  const caminho = resolverCaminho(arquivo);
+  const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  let estado = null;
+  try { estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
+  const todas = estado?.unidades?.length ? estado.unidades : planoDeDetalhe(bruto).unidades;
+  const funcoes = Object.fromEntries(todas.map((u) => [u.id, funcaoDaUnidade(bruto, u.id)]).filter(([, f]) => f));
+  const mapa = mapaDeLigacoes(bruto, { unidades: todas, funcoes });
+  const nome = unidade === null ? null : unidadePorNome(todas, unidade);
+  return { texto: formatarLigacoes(mapa, { unidade: nome, forma }), codigo: 0, mapa };
 }
 
 /* `--editar <arquivo> <forma>.<campo>=<valor> ...`, `--remover <forma>` e `--adicionar <json-da-forma>`: muda o JSON declarado
@@ -728,7 +749,7 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --veredito <unidade> --nota <0-10> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--unidade <unidade> [--vista <vista>] [--largura <px>] [--saida <pasta>]] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja>]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --veredito <unidade> --nota <0-10> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade> [--vista <vista>] [--largura <px>] [--saida <pasta>]] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja>]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
@@ -743,6 +764,10 @@ async function principal(argv) {
     if (args.tem('--editar') || args.tem('--remover') || args.tem('--adicionar')) {
       const r = editarArquivo(alvo, args.edicao);
       process.stdout.write(r.texto);
+      return 0;
+    }
+    if (args.tem('--ligacoes')) {
+      process.stdout.write(ligacoesArquivo(alvo, { unidade: args.valor('--unidade') ?? null, forma: args.valor('--forma') ?? null }).texto);
       return 0;
     }
     if (args.tem('--medidas')) {
