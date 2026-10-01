@@ -5,6 +5,7 @@
 
 import { expandirArranjos, expandirEsboco } from './expandir.js';
 import { quisDizer } from './parecido.js';
+import { frenteDoCorte, ladoDoCorte, lacosDoPlano, lerCorte, recortarBloco } from './corte.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -1311,7 +1312,7 @@ function extrairArcosBorda(anel, normais, olho, mundo, w) {
    planas, fatiada no eixo como o prisma reto para a ordem de sobreposição. O sólido é convexo, então as faces
    voltadas para o observador não se cobrem entre si. Além das silhuetas e dos vincos ao longo das faixas (como no
    prisma), desenha o contorno dos anéis onde a face visível encontra uma face de trás ou um vinco. */
-function fatiarSecoes(r, olho) {
+function fatiarSecoes(r, olho, maxFatias = 36) {
   const { b, secoes } = r.prisma;
   const c = r.centro;
   const m = r.matriz;
@@ -1343,7 +1344,7 @@ function fatiarSecoes(r, olho) {
     const s0 = secoes[k];
     const s1 = secoes[k + 1];
     /* uma fatia por faixa no loft e na revolução: a faixa é convexa, e as linhas de cada face saem coladas a ela */
-    const fatias = r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(Math.ceil(comprimentos[k] / 5), Math.round((36 * comprimentos[k]) / total)));
+    const fatias = r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(Math.ceil(comprimentos[k] / 5), Math.round((maxFatias * comprimentos[k]) / total)));
     const noPasso = (t) => ({ w: s0.w + t * (s1.w - s0.w), perfil: s0.perfil.map((q, i) => [q[0] + t * (s1.perfil[i][0] - q[0]), q[1] + t * (s1.perfil[i][1] - q[1])]) });
     for (let j = 0; j < fatias; j++) {
       const a = noPasso(j / fatias);
@@ -1444,12 +1445,12 @@ function ordemDasFaces(lados, olho) {
 /* `semFatias`: uma face lateral por lado do perfil em vez de uma por fatia. A ordem de profundidade do desenho
    precisa das fatias, mas a silhueta e a profundidade de cada célula da projeção não (as faces de uma mesma faixa
    são coplanares), e a projeção passa de 36 fatias por forma a uma. */
-export function fatiarForma(r, olho, { semFatias = false } = {}) {
+export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36 } = {}) {
   if (r.partes) {
     /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
-    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
+    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias, maxFatias }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
   }
-  if (r.prisma.secoes) return fatiarSecoes(r, olho);
+  if (r.prisma.secoes) return fatiarSecoes(r, olho, maxFatias);
   const { b, perfil, furos, furo, comprimento } = r.prisma;
   const furosLista = furos ?? (furo ? [furo] : []);
   const c = r.centro;
@@ -1468,7 +1469,7 @@ export function fatiarForma(r, olho, { semFatias = false } = {}) {
   const fus = furosLista.map((fu) => anti(fu));
 
   /* o perfil côncavo vai numa fatia só: o prisma é exato e as faces se ordenam pelo perfil */
-  const fatias = semFatias || comprimento <= 10 || r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
+  const fatias = semFatias || comprimento <= 10 || r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(maxFatias, Math.ceil(comprimento / 5)));
   const chunks = [];
 
   for (let j = 0; j < fatias; j++) {
@@ -1654,6 +1655,7 @@ function distPoligono(p, poly) {
 }
 
 const f1 = (x) => Math.round(x * 10) / 10;
+const arredMm = (x) => Math.round(x * 100) / 100;
 const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`;
 const caminhoAberto = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}`;
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1701,11 +1703,20 @@ function lerModoLegendas(v, onde) {
    `{ eixo: "x" | "y" | "z", fator }`, com fator >= 1 (padrão 1,6). */
 export const FATOR_DA_EXPLOSAO = 1.6;
 
+/* Explosão em camadas (`--explodir`): `{ eixo?, distancia: mm | "auto", ligacoes? }`. Cada forma, ou cada instância de componente,
+   sai do centro do conjunto pelo número da camada dela vezes o passo `distancia`, e uma linha fina a liga à posição original
+   (`ligacoes`, padrão true). Sem `eixo` vale o da vista (`eixoDaExplosao`). */
 export function lerExplosao(v, onde) {
   if (v === undefined) return undefined;
-  const dica = '"explosao" deve ser { "eixo": "x" | "y" | "z", "fator": número maior ou igual a 1, por exemplo 1.6 }';
+  const dica = '"explosao" deve ser { "eixo": "x" | "y" | "z", "fator": número maior ou igual a 1, por exemplo 1.6 } ou, em camadas, { "eixo": "x" | "y" | "z" (opcional), "distancia": mm ou "auto", "ligacoes": true | false }';
   exigir(v && typeof v === 'object' && !Array.isArray(v), `${onde}: ${dica}`);
-  exigir(EIXOS.includes(v.eixo), `${onde}: ${dica}; o eixo "${v.eixo}" não existe`);
+  const camadas = v.distancia !== undefined;
+  exigir(EIXOS.includes(v.eixo) || (camadas && v.eixo === undefined), `${onde}: ${dica}; o eixo "${v.eixo}" não existe`);
+  if (camadas) {
+    exigir(v.distancia === 'auto' || (typeof v.distancia === 'number' && Number.isFinite(v.distancia) && v.distancia > 0), `${onde}: ${dica}; a distancia ${JSON.stringify(v.distancia)} não serve (mm positivos ou "auto")`);
+    exigir(v.ligacoes === undefined || typeof v.ligacoes === 'boolean', `${onde}: ${dica}; "ligacoes" é true ou false`);
+    return { ...(v.eixo !== undefined ? { eixo: v.eixo } : {}), distancia: v.distancia, ligacoes: v.ligacoes !== false };
+  }
   const fator = v.fator ?? FATOR_DA_EXPLOSAO;
   exigir(typeof fator === 'number' && Number.isFinite(fator) && fator >= 1, `${onde}: ${dica}; o fator ${JSON.stringify(v.fator)} não serve`);
   return { eixo: v.eixo, fator };
@@ -1730,8 +1741,9 @@ export function origemDoDeslocamento(r) {
 
 /* Formas resolvidas com o centro afastado do centro do conjunto (a caixa que envolve todas
    elas) ao longo do eixo. Devolve cópias; as originais, e a geometria do gate, não mudam. */
-export function explodir(formas, explosao) {
+export function explodir(formas, explosao, { vista = 'isometrica' } = {}) {
   if (!explosao || formas.length === 0) return formas;
+  if (explosao.distancia !== undefined) return planoDeCamadas(formas, explosao, vista).formas;
   const k = EIXOS.indexOf(explosao.eixo);
   const c = (Math.min(...formas.map((r) => r.min[k])) + Math.max(...formas.map((r) => r.max[k]))) / 2;
   return formas.map((r) => {
@@ -1739,6 +1751,77 @@ export function explodir(formas, explosao) {
     if (delta === 0) return r;
     return deslocarForma(r, [0, 1, 2].map((i) => (i === k ? delta : 0)));
   });
+}
+
+/* Os grupos que andam juntos na explosão em camadas: cada instância de componente, ou a forma sozinha. */
+function gruposDaExplosao(formas) {
+  const porChave = new Map();
+  for (const r of formas) {
+    const chave = r.forma.daInstancia?.id ?? r.id;
+    if (!porChave.has(chave)) porChave.set(chave, []);
+    porChave.get(chave).push(r);
+  }
+  /* uma unidade que é uma instância só (uma roda) se explode forma a forma: por instância ela não se moveria */
+  return porChave.size === 1 ? formas.map((r) => [r]) : [...porChave.values()];
+}
+
+/* As camadas dos grupos num eixo: o centro do grupo nesse eixo (meio da caixa dele) e o posto da camada, com o conjunto de
+   centros que diferem menos que a tolerância contado como uma camada só. O posto é 0 na camada do meio do conjunto, e cresce
+   de 1 em 1 para cada lado, da camada mais perto do centro para a mais longe. */
+function camadasNoEixo(grupos, k) {
+  const caixa = grupos.map((g) => [Math.min(...g.map((r) => r.min[k])), Math.max(...g.map((r) => r.max[k]))]);
+  const menor = Math.min(...caixa.map((c) => c[0]));
+  const maior = Math.max(...caixa.map((c) => c[1]));
+  const centro = (menor + maior) / 2;
+  const tolerancia = Math.max(0.5, 0.01 * (maior - menor));
+  const coordenadas = caixa.map((c) => (c[0] + c[1]) / 2);
+  const camadas = [];
+  for (const c of [...coordenadas].sort((a, b) => a - b)) {
+    const ultima = camadas[camadas.length - 1];
+    if (ultima !== undefined && c - ultima <= tolerancia) continue;
+    camadas.push(c);
+  }
+  const doMeio = camadas.filter((c) => Math.abs(c - centro) <= tolerancia);
+  const posto = new Map(doMeio.map((c) => [c, 0]));
+  for (const lado of [1, -1]) {
+    camadas.filter((c) => lado * (c - centro) > tolerancia).sort((a, b) => lado * (a - b)).forEach((c, i) => posto.set(c, lado * (i + 1)));
+  }
+  const postoDe = (coord) => posto.get(camadas.reduce((m, c) => (Math.abs(c - coord) < Math.abs(m - coord) ? c : m)));
+  return { postos: coordenadas.map(postoDe), camadas: camadas.length, extensao: maior - menor, maximo: Math.max(1, ...[...posto.values()].map(Math.abs)) };
+}
+
+/* Eixo da explosão quando não é pedido: entre os que aparecem na tela da vista (explodir ao longo do eixo do olho só muda a
+   profundidade, e nada se move na imagem), o de mais camadas, e no empate o de maior extensão. */
+export function eixoDaExplosao(formas, vista = 'isometrica') {
+  const V = VISTAS[vista] ?? VISTAS.isometrica;
+  const grupos = gruposDaExplosao(formas);
+  const visiveis = [0, 1, 2].filter((k) => { const e = [0, 0, 0]; e[k] = 1; return Math.hypot(...V.p(e)) > 1e-9; });
+  let melhor = visiveis[0];
+  let medidas = null;
+  for (const k of visiveis) {
+    const m = camadasNoEixo(grupos, k);
+    if (medidas === null || m.camadas > medidas.camadas || (m.camadas === medidas.camadas && m.extensao > medidas.extensao + 1e-9)) { melhor = k; medidas = m; }
+  }
+  return EIXOS[melhor];
+}
+
+/* A explosão em camadas: { formas, eixo, passo, movidas } com as formas deslocadas e quantas saíram do lugar. */
+export function planoDeCamadas(formas, explosao, vista = 'isometrica') {
+  const eixo = explosao.eixo ?? eixoDaExplosao(formas, vista);
+  const k = EIXOS.indexOf(eixo);
+  const grupos = gruposDaExplosao(formas);
+  const { postos, extensao, maximo } = camadasNoEixo(grupos, k);
+  const passo = explosao.distancia === 'auto' ? Math.max(1, 0.35 * extensao / maximo) : explosao.distancia;
+  const delta = new Map();
+  grupos.forEach((g, i) => { for (const r of g) delta.set(r, postos[i] * passo); });
+  let movidas = 0;
+  const saida = formas.map((r) => {
+    const d = delta.get(r);
+    if (d === 0) return r;
+    movidas++;
+    return deslocarForma(r, [0, 1, 2].map((i) => (i === k ? d : 0)));
+  });
+  return { formas: saida, eixo, passo, movidas };
 }
 
 /* Opacidade da forma, de 0 a 1 (padrão 1, que não muda o desenho). */
@@ -1757,16 +1840,29 @@ export const FLECHA_PX = 0.35;
 const PX_DO_CONJUNTO = 500;
 const LADOS_MINIMOS = { cilindro: 16, anel: 32 };
 
-export function ladosPorEscala(rpx, minimo = 16) {
-  const passo = Math.acos(Math.max(-1, 1 - FLECHA_PX / Math.max(rpx, FLECHA_PX)));
+export function ladosPorEscala(rpx, minimo = 16, flecha = FLECHA_PX) {
+  const passo = Math.acos(Math.max(-1, 1 - flecha / Math.max(rpx, flecha)));
   return Math.max(minimo, Math.min(SEGMENTOS, Math.ceil(Math.PI / Math.max(passo, 1e-6))));
 }
 
-function comLadosPorEscala(esboco) {
+/* Prévia (`"previa": true`, o `--previa` da linha de comando): flecha de 2,5 px em vez de 0,35, cilindros e cones a partir de
+   10 lados (o anel não passa de 32, o mínimo que o esquema aceita), revolução com 16, e no máximo 6 fatias por forma. */
+export const FLECHA_DA_PREVIA_PX = 2.5;
+const LADOS_MINIMOS_DA_PREVIA = { cilindro: 10, anel: 32, cone: 10 };
+export const FATIAS_DA_PREVIA = 6;
+
+function comLadosPorEscala(esboco, previa = false) {
   let dimensao = 1;
+  const enquadre = esboco.enquadrar === undefined ? undefined : lerEnquadrar(esboco.enquadrar);
   for (const [i, o] of esboco.opcoes.entries()) {
-    const rs = resolverOpcao(o, `opção ${i + 1}`, esboco.pontos);
-    for (let e = 0; e < 3; e++) dimensao = Math.max(dimensao, Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e])));
+    const todas = resolverOpcao(o, `opção ${i + 1}`, esboco.pontos);
+    /* com o zoom, as curvas se medem pela janela e não pelo conjunto: é nela que a flecha de 0,35 px precisa valer */
+    const alvo = enquadre ? formasDoEnquadre(todas.filter((r) => r.forma.oculto !== true), enquadre.formas) : [];
+    const rs = alvo.length > 0 ? alvo : todas;
+    for (let e = 0; e < 3; e++) {
+      const lado = Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e]));
+      dimensao = Math.max(dimensao, alvo.length > 0 ? lado + 2 * (enquadre.margem ?? Math.max(5, 0.15 * lado)) : lado);
+    }
   }
   const pxPorMm = PX_DO_CONJUNTO / dimensao;
   return {
@@ -1774,19 +1870,72 @@ function comLadosPorEscala(esboco) {
     opcoes: esboco.opcoes.map((o) => ({
       ...o,
       formas: (o.formas ?? []).map((f) => {
-        if (f.lados !== undefined || !Object.hasOwn(LADOS_MINIMOS, f.tipo)) return f;
+        if (f.lados !== undefined) return f;
+        if (previa && f.tipo === 'revolucao') return { ...f, lados: 16 };
+        const minimos = previa ? LADOS_MINIMOS_DA_PREVIA : LADOS_MINIMOS;
+        if (!Object.hasOwn(minimos, f.tipo)) return f;
         const raio = (f.tipo === 'anel' ? f.diametroExterno : f.diametro) / 2;
-        return raio > 0 ? { ...f, lados: ladosPorEscala(raio * pxPorMm, LADOS_MINIMOS[f.tipo]) } : f;
+        return raio > 0 ? { ...f, lados: ladosPorEscala(raio * pxPorMm, minimos[f.tipo], previa ? FLECHA_DA_PREVIA_PX : FLECHA_PX) } : f;
       }),
     })),
   };
+}
+
+/* Enquadramento (`enquadrar: { formas, margem }`, o `--zoom-forma`): a vista é reenquadrada na caixa projetada de uma forma, de
+   uma instância de componente ou das formas de um padrão (`garfoE.*`), com `margem` mm em volta (padrão 15% do maior lado, no
+   mínimo 5 mm), e re-renderizada nessa escala. */
+export function lerEnquadrar(v, onde = 'esboço') {
+  if (v === undefined) return undefined;
+  const dica = '"enquadrar" deve ser { "formas": "<id | instância | padrão>", "margem": mm (opcional, 0 ou mais) }';
+  exigir(v && typeof v === 'object' && !Array.isArray(v), `${onde}: ${dica}`);
+  for (const k of Object.keys(v)) exigir(['formas', 'margem'].includes(k), `${onde}: o campo "${k}" não existe em "enquadrar"; ${dica}`);
+  exigir(typeof v.formas === 'string' && v.formas.trim(), `${onde}: ${dica}`);
+  exigir(v.margem === undefined || (typeof v.margem === 'number' && Number.isFinite(v.margem) && v.margem >= 0), `${onde}: ${dica}; a margem ${JSON.stringify(v.margem)} não serve`);
+  return { formas: v.formas.trim(), ...(v.margem !== undefined ? { margem: v.margem } : {}) };
+}
+
+const casaPadraoDeForma = (padrao, id) => new RegExp(`^${padrao.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`).test(id);
+
+/* As formas resolvidas que um id, o id de uma instância ou um padrão designam. */
+export function formasDoEnquadre(rs, entrada) {
+  return rs.filter((r) => (entrada.includes('*') ? casaPadraoDeForma(entrada, r.id) : r.id === entrada || r.forma.daInstancia?.id === entrada));
+}
+
+/* O corte desta opção, com o valor em mm: número, parâmetro (já resolvido na expansão) ou "<forma>.<âncora>" de uma forma da
+   opção (a coordenada da âncora no eixo do corte). */
+function corteDaOpcao(bruto, formas, onde) {
+  if (bruto === undefined) return undefined;
+  let c = bruto;
+  if (c && typeof c === 'object' && typeof c.valor === 'string') {
+    const m = /^(.+)\.([^.]+)$/.exec(c.valor);
+    const r = m ? formas.find((x) => x.id === m[1]) : undefined;
+    const ponto = r ? ancorasDe(r)[m[2]] : undefined;
+    exigir(ponto, `${onde}: o "valor" do corte, ${JSON.stringify(c.valor)}, não é número, parâmetro nem "<forma>.<âncora>" de uma forma desta opção`);
+    c = { ...c, valor: ponto[EIXOS.indexOf(c.eixo)] };
+  }
+  return lerCorte(c, onde);
+}
+
+/* A seção do sólido pelo plano do corte, em laços 3D fechados (par-ímpar: um laço dentro de outro é furo). Usa as faces
+   inteiras do sólido, vistas por dois olhos opostos e oblíquos para que nenhuma fique de fora por estar de perfil. O tubo e
+   o envolve são sólidos de partes que se sobrepõem nas juntas, e cada parte tem a sua seção. */
+const OLHO_DA_SECAO = normalizar([0.5412, 0.3377, 0.7697]);
+export function secaoDaForma(r, corte) {
+  const solidos = r.partes ? r.partes.map((pt) => subforma(r, pt)) : [r];
+  const contra = OLHO_DA_SECAO.map((x) => -x);
+  return solidos.map((s) => {
+    const fs = [...fatiarForma(s, OLHO_DA_SECAO, { semFatias: true }), ...fatiarForma(s, contra, { semFatias: true })].flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
+    return lacosDoPlano(fs, corte);
+  }).filter((l) => l.length > 0);
 }
 
 export function validarEsboco(bruto) {
   exigir(bruto && typeof bruto === 'object', 'o esboço precisa ser um objeto JSON');
   let esboco = expandirEsboco(bruto);
   exigir(esboco.ladosPorEscala === undefined || typeof esboco.ladosPorEscala === 'boolean', '"ladosPorEscala" deve ser true ou false');
-  if (esboco.ladosPorEscala === true && Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0) esboco = comLadosPorEscala(esboco);
+  exigir(esboco.previa === undefined || typeof esboco.previa === 'boolean', '"previa" deve ser true ou false');
+  const enquadrar = lerEnquadrar(esboco.enquadrar);
+  if ((esboco.ladosPorEscala === true || esboco.previa === true) && Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0) esboco = comLadosPorEscala(esboco, esboco.previa === true);
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
   const vista = esboco.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
@@ -1795,6 +1944,8 @@ export function validarEsboco(bruto) {
   const explosaoTopo = lerExplosao(esboco.explosao, 'esboço');
   return {
     vista,
+    previa: esboco.previa === true,
+    enquadrar,
     opcoes: esboco.opcoes.map((o, i) => {
       const onde = `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`;
       const daOpcao = lerOcultar(o.ocultar, onde);
@@ -1806,8 +1957,10 @@ export function validarEsboco(bruto) {
       const visiveis = todas.filter((r) => r.forma.oculto !== true);
       exigir(visiveis.length > 0, `${onde}: todas as formas estão com "oculto": true`);
       const modo = lerModoLegendas(o.legendas, onde) ?? modoTopo ?? 'colunas';
-      const formas = explodir(visiveis, lerExplosao(o.explosao, onde) ?? explosaoTopo);
-      return { opcao: o, formas, ocultosOpcao: ocultosDe(daOpcao, topo), modo };
+      const explosao = lerExplosao(o.explosao, onde) ?? explosaoTopo;
+      const camadas = explosao?.distancia !== undefined ? planoDeCamadas(visiveis, explosao, vista) : null;
+      const formas = camadas ? camadas.formas : explodir(visiveis, explosao, { vista });
+      return { opcao: o, formas, ocultosOpcao: ocultosDe(daOpcao, topo), modo, corte: corteDaOpcao(esboco.corte, formas, onde), ...(camadas ? { camadas: { eixo: camadas.eixo, passo: camadas.passo, movidas: camadas.movidas, total: camadas.formas.length, ligacoes: explosao.ligacoes } } : {}) };
     }),
   };
 }
@@ -2130,21 +2283,49 @@ function desenharLegendasLista(partes, chave, plano, x0) {
 
 /* Desenha o esboço inteiro; devolve { svg, largura, altura, escala }. */
 export function desenharEsboco(esboco) {
-  const { vista, opcoes } = validarEsboco(esboco);
+  const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);
   const V = VISTAS[vista];
+  let enquadreAchou = false;
   const olho = normalizar(V.olho);
-  const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao, modo }) => {
-    const itens = formas.map((r) => {
-      const chunks = fatiarForma(r, olho);
+  const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao, modo, corte, camadas }) => {
+    /* corte: o lado que fica, e se a superfície de corte está voltada para o observador (senão ela fica atrás do sólido) */
+    const lado = corte ? ladoDoCorte(corte, olho) : null;
+    const k = corte ? EIXOS.indexOf(corte.eixo) : -1;
+    exigir(!corte || formas.some((r) => r.min[k] < corte.valor && r.max[k] > corte.valor), `${opcao.titulo ?? 'opção'}: o plano ${corte?.eixo}=${corte?.valor} não atravessa nenhuma forma (elas vão de ${arredMm(Math.min(...formas.map((r) => r.min[k])))} a ${arredMm(Math.max(...formas.map((r) => r.max[k])))} mm em ${corte?.eixo})`);
+    const secaoVisivel = corte && frenteDoCorte(corte, lado, olho) > 1e-6;
+    let itens = formas.map((r) => {
+      let chunks = fatiarForma(r, olho, previa ? { maxFatias: FATIAS_DA_PREVIA } : {});
+      let secao = null;
+      if (corte) {
+        chunks = chunks.map((ch) => recortarBloco(ch, corte, lado === '+' ? 1 : -1)).filter(Boolean);
+        if (secaoVisivel) { const solidos = secaoDaForma(r, corte); if (solidos.length > 0) secao = { solidos, partes: Boolean(r.partes) }; }
+        if (chunks.length === 0 && !secao) return null;
+        /* só a superfície de corte aparece (o sólido todo estava de costas): um bloco vazio mantém a forma na ordem do desenho */
+        if (chunks.length === 0) chunks = [{ r, prof: dot(r.centro, olho), lados: [], dentro: [], linhas: [], arcos: [], tampas: [] }];
+      }
       const fs = chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
-      const todos = fs.flatMap((f) => f.pts).map(V.p);
-      return { r, chunks, fs, casco: casco(todos), prof: dot(r.centro, olho) };
-    });
+      const todos = [...fs.flatMap((f) => f.pts), ...(secao ? secao.solidos.flat(2) : [])].map(V.p);
+      return { r, chunks, fs, casco: casco(todos), prof: dot(r.centro, olho), secao };
+    }).filter(Boolean);
+    /* zoom: a janela é a caixa projetada das formas escolhidas mais a margem; o que não a cruza não é desenhado */
+    let janela = null;
+    if (enquadrar) {
+      const alvo = new Set(formasDoEnquadre(itens.map((i) => i.r), enquadrar.formas));
+      if (alvo.size > 0) {
+        enquadreAchou = true;
+        const q = itens.filter((i) => alvo.has(i.r)).flatMap((i) => i.casco);
+        const caixa = [Math.min(...q.map((a) => a[0])), Math.min(...q.map((a) => a[1])), Math.max(...q.map((a) => a[0])), Math.max(...q.map((a) => a[1]))];
+        const margem = enquadrar.margem ?? Math.max(5, 0.15 * Math.max(caixa[2] - caixa[0], caixa[3] - caixa[1]));
+        janela = { min: [caixa[0] - margem, caixa[1] - margem], max: [caixa[2] + margem, caixa[3] + margem], margem, formas: [...alvo].length };
+        itens = itens.filter((i) => { const c = i.casco; return Math.max(...c.map((a) => a[0])) >= janela.min[0] && Math.min(...c.map((a) => a[0])) <= janela.max[0] && Math.max(...c.map((a) => a[1])) >= janela.min[1] && Math.min(...c.map((a) => a[1])) <= janela.max[1]; });
+      }
+    }
     const pts = itens.flatMap((i) => i.casco);
-    const min = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))];
-    const max = [Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
-    return { opcao, itens, min, max, ocultosOpcao, modo };
+    const min = janela ? janela.min : [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))];
+    const max = janela ? janela.max : [Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
+    return { opcao, itens, min, max, ocultosOpcao, modo, corte, lado, camadas, janela };
   });
+  exigir(!enquadrar || enquadreAchou, `"enquadrar": "${enquadrar?.formas}" não é uma forma visível do esboço${quisDizer(enquadrar?.formas ?? '', opcoes.flatMap((o) => o.formas.map((r) => r.id)))} (ids: ${opcoes.flatMap((o) => o.formas.map((r) => r.id)).slice(0, 30).join(', ')})`);
   /* Mesma escala para todas: a maior opção cabe no painel, com folga para rótulos. */
   const larg = Math.max(...projetadas.map((p) => p.max[0] - p.min[0]));
   const alt = Math.max(...projetadas.map((p) => p.max[1] - p.min[1]));
@@ -2179,11 +2360,26 @@ export function desenharEsboco(esboco) {
   const altura = TOPO + PAINEL_A + extra + RODAPE;
   const partes = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${largura} ${altura}" width="${largura}" height="${altura}" font-family="Helvetica, Arial, sans-serif">`,
     `<rect width="${largura}" height="${altura}" fill="#ffffff"/>`];
+  /* zoom: cada painel recorta o desenho na janela */
+  for (const [k, p] of projetadas.entries()) {
+    if (!p.janela) continue;
+    const { tela } = geometria(p, k, escala);
+    const [x1, y1] = tela(p.janela.min);
+    const [x2, y2] = tela(p.janela.max);
+    partes.push(`<defs><clipPath id="janela-${k}"><rect x="${f1(x1)}" y="${f1(y1)}" width="${f1(x2 - x1)}" height="${f1(y2 - y1)}"/></clipPath></defs>`);
+  }
+  if (projetadas.some((p) => p.corte)) partes.push('<defs><pattern id="hachura" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#000000" stroke-opacity="0.35" stroke-width="1.4"/></pattern></defs>');
   projetadas.forEach((p, k) => {
     const ehLista = p.modo === 'lista';
     const { x0, tela } = geometria(p, k, escala);
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
-    if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
+    if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(`${p.opcao.titulo ?? `Opção ${k + 1}`}${previa ? ' (prévia)' : ''}`)}</text>`);
+    const sub = [];
+    if (previa) sub.push('prévia: facetas reduzidas e sem arestas finas');
+    if (p.corte) sub.push(`corte ${p.corte.eixo}=${arredMm(p.corte.valor)}, fica o lado ${p.lado === '+' ? 'maior' : 'menor'} (${p.corte.eixo} ${p.lado === '+' ? '>=' : '<='} ${arredMm(p.corte.valor)})${p.itens.some((i) => i.secao) ? ', hachura: superfície de corte' : ', superfície de corte de perfil'}`);
+    if (p.janela) sub.push(`zoom em ${enquadrar.formas} (margem ${arredMm(p.janela.margem)} mm)`);
+    if (p.camadas) sub.push(`explodida em ${p.camadas.eixo}, passo ${arredMm(p.camadas.passo)} mm${p.camadas.ligacoes ? ', linhas finas até a posição original' : ''}`);
+    sub.forEach((t, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${62 + i * 14}" font-size="13" text-anchor="middle" fill="#444444">${esc(t)}</text>`));
 
     const gruposChunks = gruposDeFormas(p);
 
@@ -2280,6 +2476,9 @@ export function desenharEsboco(esboco) {
     }
 
     gruposChunks.sort((a, b) => a.profMedia - b.profMedia);
+    /* a superfície de corte de uma forma vai logo depois do último grupo dela */
+    const ultimoDaForma = new Set();
+    for (const g of gruposChunks) if (g.tipo === 'forma') { for (const o of ultimoDaForma) if (o.r === g.r) ultimoDaForma.delete(o); ultimoDaForma.add(g); }
 
     function encadearLinhas(linhas2d) {
       const segs = linhas2d.map(([p1, p2]) => [p1, p2]);
@@ -2324,6 +2523,7 @@ export function desenharEsboco(esboco) {
       return cadeias;
     }
 
+    if (p.janela) partes.push(`<g clip-path="url(#janela-${k})">`);
     for (const g of gruposChunks) {
       if (g.tipo === 'linhaCentro') {
         /* Contorno claro sob o traço: mantém a linha legível sobre peças escuras. */
@@ -2387,21 +2587,51 @@ export function desenharEsboco(esboco) {
         for (const ch of g.chunks) {
           for (const f of [...ch.dentro, ...ch.lados]) {
             pintarFaces([{ dentro: [], lados: [f] }]);
-            for (const l of f.linhas ?? []) {
+            for (const l of previa ? [] : f.linhas ?? []) {
               const [a, b] = l.map(V.p).map(tela);
               partes.push(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
             }
           }
           pintarTampas([ch]);
-          pintarArcos([ch]);
+          if (!previa) pintarArcos([ch]);
         }
       } else {
         pintarFaces(g.chunks);
         pintarTampas(g.chunks);
-        pintarArcos(g.chunks);
-        pintarSilhuetas(g.chunks);
+        if (!previa) {
+          pintarArcos(g.chunks);
+          pintarSilhuetas(g.chunks);
+        }
+      }
+      const itemDoCorte = p.corte && ultimoDaForma.has(g) ? p.itens.find((i) => i.r === g.r) : null;
+      if (itemDoCorte?.secao) {
+        const preenchimento = cor(base, 1.12);
+        for (const lacos of itemDoCorte.secao.solidos) {
+          const d = lacos.map((l) => caminho(l.map(V.p).map(tela))).join(' ');
+          partes.push(`<path class="corte" data-forma="${esc(g.r.id)}" d="${d}" fill="${preenchimento}" fill-rule="evenodd" stroke="${itemDoCorte.secao.partes ? preenchimento : '#111111'}" stroke-width="${itemDoCorte.secao.partes ? 0.8 : 2}" stroke-linejoin="round"/>`);
+          partes.push(`<path class="corte-hachura" d="${d}" fill="url(#hachura)" fill-rule="evenodd" stroke="none"/>`);
+        }
       }
       if (translucida) partes.push('</g>');
+    }
+
+    if (p.janela) {
+      partes.push('</g>');
+      const [x1, y1] = tela(p.janela.min);
+      const [x2, y2] = tela(p.janela.max);
+      partes.push(`<rect x="${f1(x1)}" y="${f1(y1)}" width="${f1(x2 - x1)}" height="${f1(y2 - y1)}" fill="none" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="4,3"/>`);
+    }
+    /* explosão em camadas: da posição original ao centro deslocado, em linha fina por cima do desenho */
+    if (p.camadas?.ligacoes) {
+      for (const it of p.itens) {
+        const o = origemDoDeslocamento(it.r);
+        if (!o || o.delta.every((x) => x === 0)) continue;
+        const a = tela(V.p(it.r.centro.map((x, i) => x - o.delta[i])));
+        const b = tela(V.p(it.r.centro));
+        if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 0.5) continue;
+        partes.push(`<line class="explosao-liga" data-forma="${esc(it.r.id)}" x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#222222" stroke-width="1.2" stroke-dasharray="5,3"/>`);
+        partes.push(`<circle class="explosao-origem" cx="${f1(a[0])}" cy="${f1(a[1])}" r="3" fill="#ffffff" stroke="#222222" stroke-width="1.2"/>`);
+      }
     }
 
     if (ehLista) {
@@ -2554,6 +2784,7 @@ export function desenharEsboco(esboco) {
   if (!projetadas.every((p) => p.ocultosOpcao.has('escala'))) partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
   partes.push('</svg>');
   const saida = { svg: partes.join('\n'), largura, altura, escala };
+  if (projetadas.some((p) => p.camadas)) saida.explosao = projetadas.map((p) => p.camadas ?? null);
   if (temLista) saida.baloes = baloes;
   /* `geometria: true` (uso interno da imagem por achado): a correspondência entre o plano da vista e os pixels de cada painel */
   if (esboco.geometria === true) saida.geometria = { vista, escala, paineis: projetadas.map((p, k) => { const { cx, cy } = geometria(p, k, escala); return { cx, cy }; }) };

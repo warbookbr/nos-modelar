@@ -95,8 +95,8 @@ peças sem função antes de a imagem chegar à pessoa.
 1. Os seis bugs e os ajustes de comando, com teste (feita; `correcoes-do-fluxo.test.js`).
 2. (feita) `plano.contrato.fixa`, a `roda` com raios, os perfis de pneu e de disco, o `envolve`, a ponta livre, a `funcao` por unidade e o crítico por unidade no `--feito`.
 3. (feita) O crítico por unidade também no Marco, `--medidas` e o Marco incremental (este já vinha da fatia 1).
-4. As ferramentas para a IA: `modulos` e biblioteca, `--corte` e `--explodir`,
-   `ligar` e `encaixa`, `--ligacoes`, prévia rápida e `--zoom-forma`.
+4. (feita) As ferramentas para a IA: `modulos` e biblioteca, `--corte` e `--explodir`,
+   `ligar` e `encaixa`, `--ligacoes`, prévia rápida, `--unidade` incremental e `--zoom-forma`.
 5. A moto e a escavadeira refeitas com elas, medidas no transcript, anatomia
    prévia opcional (lista de partes e relações pelo conhecimento do modelo, e
    medidas da ficha técnica na web quando houver, com `origem`), e o fechamento.

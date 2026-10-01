@@ -141,7 +141,11 @@ function numerosDoContato(c, num, onde) {
 }
 
 function numerosDaExplosao(e, num, onde) {
-  return objeto(e) && e.fator !== undefined ? { ...e, fator: num(e.fator, 'explosao.fator', onde) } : e;
+  if (!objeto(e)) return e;
+  const g = { ...e };
+  if (g.fator !== undefined) g.fator = num(g.fator, 'explosao.fator', onde);
+  if (g.distancia !== undefined && g.distancia !== 'auto') g.distancia = num(g.distancia, 'explosao.distancia', onde);
+  return g;
 }
 
 function numerosDosPontos(p, num, onde) {
@@ -224,6 +228,8 @@ export function expandirEsboco(esboco) {
   delete saida.simetrico;
   if (esboco.contato !== undefined) saida.contato = numerosDoContato(esboco.contato, raiz.num, 'esboço');
   if (esboco.explosao !== undefined) saida.explosao = numerosDaExplosao(esboco.explosao, raiz.num, 'esboço');
+  if (objeto(esboco.enquadrar) && typeof esboco.enquadrar.margem === 'string') saida.enquadrar = { ...esboco.enquadrar, margem: raiz.num(esboco.enquadrar.margem, 'enquadrar.margem', 'esboço') };
+  if (objeto(esboco.corte) && typeof esboco.corte.valor === 'string' && !esboco.corte.valor.includes('.')) saida.corte = { ...esboco.corte, valor: raiz.num(esboco.corte.valor, 'corte.valor', 'esboço') };
   const pontosDaRaiz = objeto(esboco.pontos) ? esboco.pontos : undefined;
   const raizTemExpressao = pontosDaRaiz && Object.values(pontosDaRaiz).some((v) => Array.isArray(v) && v.some((x) => typeof x === 'string'));
   if (pontosDaRaiz && !raizTemExpressao) saida.pontos = pontosDaRaiz;
