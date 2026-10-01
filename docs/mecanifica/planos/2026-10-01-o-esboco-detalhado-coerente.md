@@ -43,9 +43,21 @@ peças sem função antes de a imagem chegar à pessoa.
   pino;
 - o componente `roda` com raios, e perfis de pneu e de disco de freio por
   função (`gerar`);
-- o crítico visual por unidade no Marco: a skill despacha o crítico cego com as
-  imagens `--unidade` da unidade, em resolução suficiente, e o relato lista
-  peças sem função e sem ligação por unidade;
+- a forma `envolve`: faixa de largura e espessura dadas que contorna uma lista
+  ordenada de círculos (centro, raio, eixo) por tangentes e arcos, para correia,
+  corrente, esteira e cabo em polia; os elos saem pelo `arranja` sobre o caminho;
+- o achado de ponta livre no gate: ponta de tubo, haste ou cilindro que não
+  encosta em nada, ou várias pontas que terminam no mesmo ponto sem forma que as
+  una, sem declaração de `ponta`;
+- o crítico visual por unidade já no `--feito` de unidade com mais de 8 formas
+  (e também no Marco): a skill despacha o crítico cego com as quatro imagens
+  `--unidade`, em resolução suficiente (`--largura <px>`), e a `funcao` da
+  unidade, sem a história da construção; ele responde que pontas ficam no ar, o
+  que atravessa o quê, o que está fora do lugar em relação à parte a que deveria
+  estar preso e o que a vista mostra que o nome não explica;
+- o campo `funcao` por unidade no plano, uma frase (por exemplo "laço fechado
+  que contorna coroa e pinhão"); unidade com mais de 8 formas sem `funcao` não
+  passa no `--feito`;
 - `--medidas` em texto, com o valor medido ao lado de cada medida do plano, e
   `--feito` que imprime só os Marcos novos.
 
@@ -61,7 +73,7 @@ peças sem função antes de a imagem chegar à pessoa.
 1. Os seis bugs e os quatro ajustes de comando têm teste que falhava antes.
 2. `plano.contrato.fixa` reprova uma peça presa por um só ponto e aprova a presa
    por dois, com teste.
-3. A `roda` com raios e o perfil de pneu e de disco saem sem Python.
+3. A `roda` com raios, o perfil de pneu e de disco e o `envolve` saem sem Python.
 4. A moto refeita pelo fluxo, sem os defeitos que o crítico apontou (motor preso,
    escapamento com terminação, rabeta com suporte), tem nota 8 ou mais do crítico
    cego por unidade.
@@ -73,8 +85,8 @@ peças sem função antes de a imagem chegar à pessoa.
 ## Fatias
 
 1. Os seis bugs e os ajustes de comando, com teste (feita; `correcoes-do-fluxo.test.js`).
-2. `plano.contrato.fixa`, a `roda` com raios e os perfis de pneu e de disco.
-3. O crítico por unidade no Marco, `--medidas` e o Marco incremental.
+2. `plano.contrato.fixa`, a `roda` com raios, os perfis de pneu e de disco, o `envolve`, a ponta livre, a `funcao` por unidade e o crítico por unidade no `--feito`.
+3. O crítico por unidade também no Marco, `--medidas` e o Marco incremental.
 4. A moto e a escavadeira refeitas, medidas no transcript, e o fechamento.
 
 ## Riscos e desvios
