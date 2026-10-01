@@ -67,7 +67,15 @@ peças sem função antes de a imagem chegar à pessoa.
   que contorna coroa e pinhão"); unidade com mais de 8 formas sem `funcao` não
   passa no `--feito`;
 - `--medidas` em texto, com o valor medido ao lado de cada medida do plano, e
-  `--feito` que imprime só os Marcos novos.
+  `--feito` que imprime só os Marcos novos;
+- resolvedor de posição (fatia 5): a forma declara relações com outra forma
+  (encosta em, concêntrico com, alinhado a, apoiado sobre, espelhado de) e a
+  ferramenta calcula as coordenadas, generalizando `ligar` e `encaixa`; relação
+  impossível ou em conflito dá erro com as formas envolvidas;
+- conserto proposto (fatia 5): cada achado de contato traz a alteração exata
+  que o resolve (deslocar ou encurtar quanto, em qual forma), e `--aplicar
+  <achado>` faz a mudança no JSON preservando a formatação; a IA decide se
+  aceita.
 
 ## Excluído
 
@@ -82,6 +90,8 @@ peças sem função antes de a imagem chegar à pessoa.
 2. `plano.contrato.fixa` reprova uma peça presa por um só ponto e aprova a presa
    por dois, com teste.
 3. A `roda` com raios, o perfil de pneu e de disco e o `envolve` saem sem Python.
+3a. O resolvedor posiciona por relação sem coordenada escrita e acusa conflito,
+   e `--aplicar` resolve um achado de contato, com teste que falhava antes.
 4. A moto refeita pelo fluxo, sem os defeitos que o crítico apontou (motor preso,
    escapamento com terminação, rabeta com suporte), tem nota 8 ou mais do crítico
    cego por unidade.
@@ -97,7 +107,8 @@ peças sem função antes de a imagem chegar à pessoa.
 3. (feita) O crítico por unidade também no Marco, `--medidas` e o Marco incremental (este já vinha da fatia 1).
 4. (feita) As ferramentas para a IA: `modulos` e biblioteca, `--corte` e `--explodir`,
    `ligar` e `encaixa`, `--ligacoes`, prévia rápida, `--unidade` incremental e `--zoom-forma`.
-5. A moto e a escavadeira refeitas com elas, medidas no transcript, anatomia
+5. O resolvedor de posição e o conserto proposto, com teste.
+6. A moto e a escavadeira refeitas com elas, medidas no transcript, anatomia
    prévia opcional (lista de partes e relações pelo conhecimento do modelo, e
    medidas da ficha técnica na web quando houver, com `origem`), e o fechamento.
 
