@@ -102,7 +102,9 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
     }
     mudancas.push({ acao: 'editar', forma: s.id, campo: s.campo, antes: antes ?? null, depois: valor });
   }
-  for (const id of remover) {
+  /* `--remover a,b`: uma lista separada por vírgula vale como duas chamadas */
+  const aRemover = (Array.isArray(remover) ? remover : [remover]).flatMap((x) => String(x).split(',').map((id) => id.trim()).filter(Boolean));
+  for (const id of aRemover) {
     const todos = [...new Set(listas.flatMap((l) => idsDe(l.lista)))];
     exigir(todos.includes(id), `editar: --remover "${id}": não há forma com esse id${quisDizer(id, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
     for (const { lista } of listas) {
@@ -118,7 +120,17 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
     }
     for (const f of Array.isArray(nova) ? nova : [nova]) {
       exigir(objeto(f), 'editar: --adicionar recebe um objeto de forma (ou uma lista deles)');
-      exigir(typeof f.id === 'string' && f.id, 'editar: a forma de --adicionar precisa de "id"');
+      if (f.id === undefined && f.arranja !== undefined) {
+        /* a entrada de arranjo (`{ "arranja": { "forma": "<id>", "modo": ... } }`) não tem id: as cópias herdam o da fonte */
+        exigir(objeto(f.arranja) && typeof f.arranja.forma === 'string' && f.arranja.forma, 'editar: o arranjo de --adicionar precisa de "arranja": { "forma": "<id>", "modo": "linear" | "radial", "total": n, ... }');
+        exigir(Object.keys(f).length === 1, `editar: a entrada de arranjo só tem o campo "arranja"; retire "${Object.keys(f).find((k) => k !== 'arranja')}"`);
+        const todos = [...new Set(listas.flatMap((l) => idsDe(l.lista)))];
+        exigir(todos.includes(f.arranja.forma), `editar: --adicionar o arranjo de "${f.arranja.forma}": não há forma com esse id${quisDizer(f.arranja.forma, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
+        for (const { lista } of listas) lista.push(clone(f));
+        mudancas.push({ acao: 'adicionar', forma: `arranja de ${f.arranja.forma}`, arranjo: true });
+        continue;
+      }
+      exigir(typeof f.id === 'string' && f.id, 'editar: a forma de --adicionar precisa de "id" (ou, num arranjo, só de "arranja")');
       const todos = new Set(listas.flatMap((l) => idsDe(l.lista)));
       exigir(!todos.has(f.id), `editar: --adicionar "${f.id}": já existe uma forma com esse id (use <forma>.<campo>=<valor> para mudar a que existe)`);
       for (const { lista } of listas) lista.push(clone(f));
@@ -132,7 +144,7 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
 export function formatarMudancas(mudancas) {
   return mudancas.map((m) => {
     if (m.acao === 'remover') return `removida a forma ${m.forma}`;
-    if (m.acao === 'adicionar') return `adicionada a forma ${m.forma}`;
+    if (m.acao === 'adicionar') return m.arranjo ? `adicionado o ${m.forma}` : `adicionada a forma ${m.forma}`;
     return `${m.forma}.${m.campo}: ${m.antes === null ? '(sem valor)' : texto(m.antes)} -> ${m.depois === null ? '(retirado)' : texto(m.depois)}`;
   });
 }

@@ -357,7 +357,7 @@ export function condutorArquivo(arquivo, acao = {}) {
   } else if (acao.feito !== undefined) {
     const r = marcarFeito(bruto, estado, acao.feito);
     estado = r.estado;
-    extra = `unidade ${acao.feito} marcada como feita\n${r.novosMarcos.map((m) => `marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado no estado; o despacho é da skill)\n`).join('')}`;
+    extra = `unidade ${acao.feito} marcada como feita\n${r.novosMarcos.map((m) => `marco de ${m.limiar}%${m.saltou?.length ? ` (cruzou também ${m.saltou.map((l) => `${l}%`).join(', ')})` : ''}: chamar o crítico visual sem contexto, com imagens limpas (registrado no estado; o despacho é da skill)\n`).join('')}`;
   } else if (acao.mover !== undefined) {
     /* uma forma, uma instância de componente, um padrão (garfoE.*) ou várias separadas por vírgula */
     const antes = estado.alteracoes.length;
@@ -381,7 +381,7 @@ export function condutorArquivo(arquivo, acao = {}) {
   }
   writeFileSync(memoria, `${JSON.stringify(estado, null, 2)}\n`);
   const portao = portaoDoEstagio(bruto, estado, { referencias });
-  return { texto: `${extra}${novo ? `estado criado em ${memoria}\n` : ''}${formatarSituacao(estado, portao, { historico: acao.historico === true })}`, codigo, estado, portao };
+  return { texto: `${extra}${novo ? `estado criado em ${memoria}\n` : ''}${formatarSituacao(estado, portao, { historico: acao.historico === true, marcos: acao.feito === undefined })}`, codigo, estado, portao };
 }
 
 /* Uma linha com o que o `--mover` fez. */
@@ -598,7 +598,7 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--unidade <unidade> [--vista <vista>]] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma>] [--adicionar <json-da-forma>]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--unidade <unidade> [--vista <vista>]] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja>]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');

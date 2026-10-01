@@ -4,8 +4,9 @@
    O mestre e o detalhado são JSON bruto (com instâncias, espelhos, arranjos e parâmetros, como a pessoa os escreveu). Puro:
    não lê nem grava arquivo, e não muda o que recebe. */
 import { ErroDeEsboco, resolverOpcao } from './index.js';
-import { expandirArranjos, expandirEsboco } from './expandir.js';
-import { conferirEnvelope, montarUnidadesDoEstado, planoDeDetalhe, registrarEnvelope, unidadePorNome, abreviar } from './condutor.js';
+import { expandirArranjos, expandirEsboco, numerosDaForma, resolvedor } from './expandir.js';
+import { lerContato, padroesDoContato } from './contato.js';
+import { conferirEnvelope, montarUnidadesDoEstado, planoDeDetalhe, registrarEnvelope, sincronizarAvisoDeCiclo, unidadePorNome, abreviar } from './condutor.js';
 import { quisDizer } from './parecido.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
@@ -21,11 +22,18 @@ function listaDoMestre(bruto) {
   return { lista: bruto.formas, onde: 'raiz' };
 }
 
+/* As cópias que uma entrada `{ arranja }` bruta gera, com os números (parâmetros e "=expressão" do `total`, do `passo`, do
+   `centro` e dos `graus`) resolvidos no escopo da primeira opção, como a expansão do esboço faz. */
+function copiasDoArranjo(f, esboco) {
+  const { num } = resolvedor(esboco.opcoes[0].parametros ?? {}, 'opção 1');
+  return expandirArranjos([numerosDaForma(f, num, 'opção 1, arranjo')], 'opção 1');
+}
+
 /* Os ids das formas expandidas que cada entrada da lista bruta gera (uma forma, as de uma instância, as cópias de um arranjo). */
-function idsPorEntrada(lista, expandidas) {
+function idsPorEntrada(lista, expandidas, esboco) {
   return lista.map((f) => {
     if (!objeto(f)) return [];
-    if (f.arranja !== undefined && f.id === undefined) return expandirArranjos([f]).map((v) => v.id);
+    if (f.arranja !== undefined && f.id === undefined) return copiasDoArranjo(f, esboco).map((v) => v.id);
     if (typeof f.id !== 'string') return [];
     return expandidas.filter((x) => x.id === f.id || x.daInstancia?.id === f.id).map((x) => x.id);
   });
@@ -53,6 +61,16 @@ function classificar(lista, ids, unidades, u) {
   });
 }
 
+/* A tolerância, a penetração e a folga que o gate usa no mestre (a opção, a raiz ou o padrão da caixa do conjunto visível). */
+function limiaresDoMestre(esboco) {
+  const o = esboco.opcoes[0];
+  const raiz = lerContato(esboco.contato, 'esboço');
+  const daOpcao = lerContato(o.contato, 'opção 1');
+  const visiveis = resolverOpcao(o, 'opção 1', esboco.pontos).filter((r) => r.forma.oculto !== true);
+  const p = padroesDoContato([visiveis]);
+  return { tolerancia: daOpcao?.tolerancia ?? raiz?.tolerancia ?? p.padraoTol, penetracao: daOpcao?.penetracao ?? raiz?.penetracao ?? p.padraoPen, folga: daOpcao?.folga ?? raiz?.folga ?? p.padraoFolga };
+}
+
 /* O esboço isolado da unidade: as entradas dela como estão, as outras com `oculto: true` (só servem de referência de posição),
    só a primeira opção e o plano mínimo. Parâmetros, pontos e contato do mestre ficam; as juntas e os pares que citam formas
    ocultas não reprovam (o gate as ignora). */
@@ -61,17 +79,22 @@ export function detalharUnidade(bruto, estado, nome) {
   const unidade = u.id;
   const esboco = expandirEsboco(bruto);
   const { lista, onde } = listaDoMestre(bruto);
-  const ids = idsPorEntrada(lista, esboco.opcoes[0].formas);
+  const ids = idsPorEntrada(lista, esboco.opcoes[0].formas, esboco);
   const tipo = classificar(lista, ids, unidades, u);
   const formas = [];
   lista.forEach((f, k) => {
     if (tipo[k] === 'dentro' || !objeto(f)) { formas.push(clone(f)); return; }
-    if (f.arranja !== undefined && f.id === undefined) { formas.push(...expandirArranjos([f]).map((v) => ({ ...v, oculto: true }))); return; }
+    if (f.arranja !== undefined && f.id === undefined) { formas.push(...copiasDoArranjo(f, esboco).map((v) => ({ ...v, oculto: true }))); return; }
     formas.push({ ...clone(f), oculto: true });
   });
   const d = clone(bruto);
   d.plano = PLANO_MINIMO(unidade);
   d.opcoes = [clone(bruto.opcoes[0])];
+  /* a tolerância, a penetração e a folga do gate são as do mestre inteiro: sem declará-las o isolado calcularia o padrão de 1%
+     da caixa da unidade, bem menor, e inventaria peças soltas e longe que o mestre não tem */
+  const l = limiaresDoMestre(esboco);
+  d.contato = { ...(objeto(d.contato) ? d.contato : {}) };
+  for (const k of ['tolerancia', 'penetracao', 'folga']) if (d.contato[k] === undefined) d.contato[k] = l[k];
   if (onde === 'opcao') { d.opcoes[0].formas = formas; delete d.formas; } else d.formas = formas;
   return d;
 }
@@ -159,7 +182,7 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
   exigir(objeto(detalhado), 'integrar: o arquivo detalhado deve ser um esboço (objeto JSON)');
   const esboco = expandirEsboco(bruto);
   const { lista, onde } = listaDoMestre(bruto);
-  const ids = idsPorEntrada(lista, esboco.opcoes[0].formas);
+  const ids = idsPorEntrada(lista, esboco.opcoes[0].formas, esboco);
   const tipo = classificar(lista, ids, unidades, u);
   const doDetalhe = detalhado.opcoes?.[0]?.formas ?? detalhado.formas;
   exigir(Array.isArray(doDetalhe), 'integrar: o detalhado não tem lista de formas (nem na raiz nem na primeira opção)');
@@ -203,13 +226,14 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
   let novoEstado = null;
   if (estado?.unidades?.length) {
     novoEstado = clone(estado);
-    const brutas = unidades.map((x) => ({ id: x.id, membros: x.id === unidade ? formas : x.membros, feito: x.feito, declarada: x.declarada }));
+    const brutas = unidades.map((x) => ({ id: x.id, membros: x.id === unidade ? formas : x.membros, feito: x.feito, declarada: x.declarada, custo: x.custo }));
     const refeitas = montarUnidadesDoEstado(mestre, brutas);
     novoEstado.unidades = refeitas.map((x) => {
       const antiga = unidades.find((y) => y.id === x.id);
       return { ...x, ...(antiga?.envelope ? { envelope: antiga.envelope } : {}), ...(antiga?.envelopeConferido ? { envelopeConferido: antiga.envelopeConferido } : {}) };
     });
     if (envelope) novoEstado = registrarEnvelope(novoEstado, envelope, arquivo);
+    sincronizarAvisoDeCiclo(novoEstado);
   }
   return { mestre, estado: novoEstado, envelope, removidos, formas };
 }

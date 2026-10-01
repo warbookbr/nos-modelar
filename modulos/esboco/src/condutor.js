@@ -8,7 +8,7 @@
    crítico é da skill. Puro e determinístico: sem data nem sorteio, e sem ler nem gravar arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
-import { herdarDoEspelho, lerContato, unidadesDeclaradas } from './contato.js';
+import { descreverAchado, herdarDoEspelho, lerContato, unidadesDeclaradas, verificarContato } from './contato.js';
 import { medirEsboco } from './descrever.js';
 import { lerPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
@@ -84,6 +84,15 @@ function ordenar(unidades, dependeDe) {
     ordem.push(u);
   }
   return ordem;
+}
+
+/* O aviso de dependência circular segue o estado das unidades: some quando um `--mover` desfaz o ciclo e volta se ele existe. */
+const PREFIXO_DO_CICLO = 'dependência circular entre unidades';
+export function sincronizarAvisoDeCiclo(estado) {
+  const ciclos = (estado.unidades ?? []).filter((u) => u.ciclo).map((u) => u.id);
+  estado.avisos = (estado.avisos ?? []).filter((a) => !a.startsWith(PREFIXO_DO_CICLO));
+  if (ciclos.length) estado.avisos.push(`${PREFIXO_DO_CICLO} (${ciclos.map(abreviar).join(', ')}): a ordem segue a declaração`);
+  return estado;
 }
 
 function dependenciasDasUnidades(unidades, formas) {
@@ -184,7 +193,7 @@ function montarUnidades(unidades, formas, resolvidas) {
   const dependeDe = dependenciasDasUnidades(unidades, formas);
   const ordenadas = ordenar(unidades.map((u) => ({ ...u })), dependeDe);
   const envelopes = envelopesDasUnidades(ordenadas, formas, resolvidas);
-  return ordenadas.map((u) => ({ id: u.id, membros: u.membros, depende: [...dependeDe.get(u.id)], custo: u.membros.length, feito: u.feito === true, ...(u.declarada ? { declarada: true } : {}), ...(u.ciclo ? { ciclo: true } : {}), envelope: envelopes.get(u.id) }));
+  return ordenadas.map((u) => ({ id: u.id, membros: u.membros, depende: [...dependeDe.get(u.id)], custo: u.custo ?? u.membros.length, feito: u.feito === true, ...(u.declarada ? { declarada: true } : {}), ...(u.ciclo ? { ciclo: true } : {}), envelope: envelopes.get(u.id) }));
 }
 
 /* As unidades `{ id, membros, feito, declarada }` montadas de novo contra o esboço (dependências, ordem, custo e Envelope). */
@@ -354,8 +363,7 @@ export function avancar(bruto, estadoBruto, { referencias } = {}) {
     novo.unidades = p.unidades;
     novo.alteracoes = [];
     novo.marcos = [];
-    const ciclos = p.unidades.filter((u) => u.ciclo).map((u) => u.id);
-    if (ciclos.length) novo.avisos.push(`dependência circular entre unidades (${ciclos.map(abreviar).join(', ')}): a ordem segue a declaração`);
+    sincronizarAvisoDeCiclo(novo);
   }
   return { ok: true, estado: novo, portao };
 }
@@ -407,7 +415,7 @@ export function moverFormas(bruto, estadoBruto, { forma, formas, padrao, para, m
   const novo = clone(estado);
   novo.unidades = montarUnidades(brutas.filter((u) => u.membros.length > 0), visiveis, resolvidas);
   for (const x of a_mover) novo.alteracoes.push({ forma: x, de: de.get(x), para, motivo: m });
-  return novo;
+  return sincronizarAvisoDeCiclo(novo);
 }
 
 /* `moverFormas` para uma forma só (a chamada de antes). */
@@ -453,6 +461,9 @@ export function replanejar(bruto, estadoBruto, { motivo }) {
     }
     if (!grupo.has(unidade)) grupo.set(unidade, { id: unidade, membros: [], declarada: false, feito: estado.unidades.find((u) => u.id === unidade)?.feito === true });
     grupo.get(unidade).membros.push(id);
+    /* o custo é o da maquete: a forma que o detalhe trouxe não o aumenta, e a forma nova do esboço acrescenta uma unidade de custo */
+    const antigaDaUnidade = estado.unidades.find((u) => u.id === unidade);
+    if (antigaDaUnidade) { const g = grupo.get(unidade); g.custo = (g.custo ?? antigaDaUnidade.custo) + (novas.some((n) => n.forma === id) ? 1 : 0); }
     if (auto.declarada) grupo.get(unidade).declarada = true;
   }
   const expandido = expandirEsboco(bruto);
@@ -467,7 +478,7 @@ export function replanejar(bruto, estadoBruto, { motivo }) {
     return { ...u, ...(igual ? { envelopeConferido: antiga.envelopeConferido } : {}) };
   });
   novo.alteracoes.push({ replanejado: true, motivo: m, ...(novas.length ? { novas } : {}) });
-  return novo;
+  return sincronizarAvisoDeCiclo(novo);
 }
 
 /* A unidade que um nome designa: o id exato; o nome de uma forma ou de uma instância que só uma unidade contém (`rodaFrente`
@@ -482,7 +493,18 @@ export function unidadePorNome(unidades, nome) {
   return nome;
 }
 
-/* Marca uma unidade como detalhada e registra os Marcos (25%, 50%, 75%, 100% do custo estimado) que ela cruzou. */
+/* As divergências do gate de contato do mestre que citam formas da unidade: a unidade só vira feita quando o mestre, com a
+   versão dela, não tem colisão, travessia acima do máximo, par que não encosta nem peça solta que a envolva. Sem o gate
+   ligado não há o que conferir. */
+function achadosDaUnidade(bruto, estado, unidade) {
+  const membros = new Set(estado.unidades.find((x) => x.id === unidade).membros);
+  const gate = verificarContato(bruto, { unidades: unidadesDoEstado(estado) });
+  return gate.usar ? gate.achados.filter((a) => a.pecas.some((p) => membros.has(p))) : [];
+}
+
+/* Marca uma unidade como detalhada e registra o Marco (25%, 50%, 75%, 100% do custo estimado) que ela cruzou. O custo é o da
+   maquete (`--integrar` não o aumenta), e um salto por vários limiares registra só o mais alto, com os pulados em `saltou`:
+   o crítico é chamado uma vez com as imagens de agora. A unidade com achado aberto do gate no mestre é recusada, com o achado. */
 export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   const unidade = unidadePorNome(estado.unidades ?? [], nomeDaUnidade);
@@ -493,17 +515,22 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
     const conferida = estado.unidades.find((x) => x.id === unidade).envelopeConferido;
     exigir(conferida?.ok === true, `condutor: a unidade "${unidade}" só vira feita depois de o Envelope conferir a versão detalhada dela (plano.envelope está declarado): rode --envelope ${unidade} <arquivo-detalhado.esboco.json>${conferida ? `; a última conferência falhou: ${conferida.falta.join('; ')}` : ''}`);
   }
+  if (!estado.unidades.find((x) => x.id === unidade).feito) {
+    const abertos = achadosDaUnidade(bruto, estado, unidade);
+    exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map((a) => descreverAchado(a)).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
+  }
   const novo = clone(estado);
   const u = novo.unidades.find((x) => x.id === unidade);
   const novosMarcos = [];
   if (!u.feito) {
     u.feito = true;
-    const { total, feito, percentual } = custoDe(novo);
-    for (const limiar of LIMIARES_DO_MARCO) {
-      if (percentual >= limiar - 1e-9 && !novo.marcos.some((m) => m.limiar === limiar)) {
-        const marco = { limiar, custoFeito: feito, custoTotal: total, unidades: novo.unidades.filter((x) => x.feito).map((x) => x.id), chamar: 'critico', imagens: 'limpas' };
-        novo.marcos.push(marco); novosMarcos.push(marco);
-      }
+    const { total, feito } = custoDe(novo);
+    const fracao = total === 0 ? 0 : (feito / total) * 100;
+    const cruzados = LIMIARES_DO_MARCO.filter((limiar) => fracao >= limiar - 1e-9 && !novo.marcos.some((m) => m.limiar >= limiar));
+    if (cruzados.length > 0) {
+      const limiar = Math.max(...cruzados);
+      const marco = { limiar, custoFeito: feito, custoTotal: total, unidades: novo.unidades.filter((x) => x.feito).map((x) => x.id), chamar: 'critico', imagens: 'limpas', ...(cruzados.length > 1 ? { saltou: cruzados.filter((l) => l !== limiar) } : {}) };
+      novo.marcos.push(marco); novosMarcos.push(marco);
     }
   }
   return { estado: novo, novosMarcos };
@@ -515,7 +542,7 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
 export const LIMITE_DO_NOME = 48;
 export const abreviar = (nome) => (typeof nome === 'string' && nome.length > LIMITE_DO_NOME ? `${nome.slice(0, LIMITE_DO_NOME - 1)}…` : nome);
 
-export function formatarSituacao(estado, portao, { historico = false } = {}) {
+export function formatarSituacao(estado, portao, { historico = false, marcos = true } = {}) {
   const n = (x) => String(x).replace('.', ',');
   const L = [];
   L.push(`condutor de ${estado.esboco}: nível ${estado.nivel}${estado.nivelDoPlano ? '' : ' (padrão; declare plano.nivel)'}`);
@@ -531,7 +558,7 @@ export function formatarSituacao(estado, portao, { historico = false } = {}) {
       if (portao?.envelopeDeclarado && u.envelope) L.push(`     ${textoDoEnvelope(u.envelope, { curto: true })}${u.envelopeConferido ? (u.envelopeConferido.ok ? ` [envelope conferido com ${u.envelopeConferido.arquivo}]` : ` [envelope reprovado com ${u.envelopeConferido.arquivo}]`) : ' [envelope a conferir]'}`);
     });
   }
-  for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
+  if (marcos) for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;

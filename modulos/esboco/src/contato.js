@@ -321,6 +321,57 @@ function folgaAABB(a, b) {
   return Math.sqrt(q);
 }
 
+const caixaDasPecas = (pecas) => ({ min: [0, 1, 2].map((i) => Math.min(...pecas.map((p) => p.min[i]))), max: [0, 1, 2].map((i) => Math.max(...pecas.map((p) => p.max[i]))) });
+
+/* Um esboço com formas `oculto` (a unidade isolada por --detalhar esconde as outras, que só servem de referência) julga a
+   conectividade das visíveis com o mestre inteiro: uma forma ligada a uma oculta (a menos de `tol`, ou por `atravessa`
+   declarado) está ligada ao que a oculta toca, e a folga até a oculta mais próxima vale para o "longe". A oculta nunca é
+   achado nem entra no grupo principal. Muda `ligados` (índices das visíveis) e `menorFolga` no lugar; devolve se mudou algo.
+   `visiveis` e `ocultas` são listas de peças convexas por forma; `declarado(i, h)` diz se o par visível i e oculta h é um
+   `atravessa` declarado. */
+export function completarPelasOcultas({ visiveis, ocultas, ligados, menorFolga, tol, alcance, declarado = () => false }) {
+  const m = ocultas.length;
+  if (m === 0 || visiveis.length === 0) return false;
+  const cv = visiveis.map(caixaDasPecas); const co = ocultas.map(caixaDasPecas);
+  const toca = Array.from({ length: m }, () => []);
+  const vizinhasDeOculta = Array.from({ length: m }, () => []);
+  for (let a = 0; a < visiveis.length; a++) {
+    for (let h = 0; h < m; h++) {
+      const forcado = declarado(a, h);
+      if (folgaAABB(cv[a], co[h]) > alcance && !forcado) continue;
+      const { folga } = medirPar(visiveis[a], ocultas[h]);
+      if (folga < menorFolga[a]) menorFolga[a] = folga;
+      if (folga <= tol || forcado) toca[h].push(a);
+    }
+  }
+  for (let h = 0; h < m; h++) for (let k = h + 1; k < m; k++) {
+    if (folgaAABB(co[h], co[k]) > tol) continue;
+    if (medirPar(ocultas[h], ocultas[k]).folga <= tol) { vizinhasDeOculta[h].push(k); vizinhasDeOculta[k].push(h); }
+  }
+  const visto = Array(m).fill(false);
+  let mudou = false;
+  for (let h0 = 0; h0 < m; h0++) {
+    if (visto[h0]) continue;
+    const fila = [h0]; visto[h0] = true; const adjacentes = new Set();
+    while (fila.length) { const h = fila.pop(); for (const a of toca[h]) adjacentes.add(a); for (const k of vizinhasDeOculta[h]) if (!visto[k]) { visto[k] = true; fila.push(k); } }
+    const lista = [...adjacentes];
+    for (let i = 1; i < lista.length; i++) if (!ligados[lista[0]].includes(lista[i])) { ligados[lista[0]].push(lista[i]); ligados[lista[i]].push(lista[0]); mudou = true; }
+  }
+  return mudou;
+}
+
+/* O número de grupos conectados de uma lista de adjacências. */
+export function contarGrupos(ligados) {
+  const g = Array(ligados.length).fill(-1); let k = 0;
+  for (let a = 0; a < ligados.length; a++) {
+    if (g[a] >= 0) continue;
+    const f = [a]; g[a] = k;
+    while (f.length) { const x = f.pop(); for (const y of ligados[x]) if (g[y] < 0) { g[y] = k; f.push(y); } }
+    k++;
+  }
+  return k;
+}
+
 /* { folga, penetracao } entre duas formas (listas de peças convexas). */
 export function medirPar(pecasA, pecasB) {
   let doA = memoPares.get(pecasA);
@@ -503,7 +554,7 @@ export function padroesDoContato(resolvidas) {
    sem `motivo` (mínimo MINIMO_DO_MOTIVO caracteres) e `atravessa` sem `max` são
    recusados com ErroDeEsboco. Sem `contato` no JSON (ou com `usar` falso em
    todas as opções) devolve `resultado: 'desligado'` sem medir. */
-export function verificarContato(bruto, { resolvidas: prontas, unidades: planejadas } = {}) {
+export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasOcultas, unidades: planejadas } = {}) {
   const esboco = expandirEsboco(bruto);
   const raiz = lerContato(esboco?.contato, 'esboço');
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
@@ -512,7 +563,9 @@ export function verificarContato(bruto, { resolvidas: prontas, unidades: planeja
   const desligado = { usar: false, tolerancia: null, folga: null, achados: [], resultado: 'desligado', opcoes: [] };
   if (!opcoes.some((_, i) => ativa(i))) return desligado;
 
-  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos).filter((r) => r.forma.oculto !== true));
+  const todasAsFormas = prontas ? null : opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
+  const resolvidas = prontas ?? todasAsFormas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
+  const ocultasResolvidas = prontasOcultas ?? (todasAsFormas ? todasAsFormas.map((rs) => rs.filter((r) => r.forma.oculto === true)) : opcoes.map(() => []));
   const todosIds = new Set(resolvidas.flat().map((r) => r.id));
   /* uma forma oculta (a unidade isolada por --detalhar esconde as outras, e a instância pode vir com `oculto`) sai dos
      pares em silêncio; só o id que não existe em forma nenhuma é erro */
@@ -564,7 +617,9 @@ export function verificarContato(bruto, { resolvidas: prontas, unidades: planeja
     const maximos = new Map();
     const motivos = new Map();
     const daUnidade = new Map();
-    for (const p of herdarDoEspelho([...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])], o).filter(vale)) {
+    const paresDaOpcao = herdarDoEspelho([...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])], o);
+    const atravessaComOculta = new Set(paresDaOpcao.filter((p) => p.tipo === 'atravessa' && !vale(p)).map((p) => chave(p.a, p.b)));
+    for (const p of paresDaOpcao.filter(vale)) {
       tipos.set(chave(p.a, p.b), p.tipo);
       maximos.set(chave(p.a, p.b), p.max);
       motivos.set(chave(p.a, p.b), p.motivo?.trim());
@@ -623,12 +678,17 @@ export function verificarContato(bruto, { resolvidas: prontas, unidades: planeja
         if (max !== undefined && penetracao > max) {
           const d = detalharPar(pecas[a], pecas[b]);
           const sobra = penetracao - max + 0.1;
-          achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(max), ...(implicito ? { implicita: true } : {}), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, sobra, `a travessia de ${mmTxt(penetracao)} mm passa ${mmTxt(penetracao - max)} mm do máximo de ${mmTxt(max)} mm; mais 0,1 mm de folga de arredondamento`) : null });
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(max), ...(implicito ? { implicita: true, maxSugerido: Math.floor(penetracao) + 1 } : {}), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, sobra, `a travessia de ${mmTxt(penetracao)} mm passa ${mmTxt(penetracao - max)} mm do máximo de ${mmTxt(max)} mm; mais 0,1 mm de folga de arredondamento`) : null });
         }
       } else if (penetracao > penMax) {
         const d = detalharPar(pecas[a], pecas[b]);
         achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao + margem, `penetração de ${mmTxt(penetracao)} mm mais margem de ${mmTxt(margem)} mm`) : null });
       }
+    }
+    /* a forma ligada só por uma oculta (a unidade isolada) não é solta nem longe: o mestre a liga */
+    const ocultasDaOpcao = ocultasResolvidas[i] ?? [];
+    if (ocultasDaOpcao.length > 0 && n > 1 && (contarGrupos(ligados) > 1 || menorFolga.some((f) => f !== Infinity && f > folgaMax))) {
+      completarPelasOcultas({ visiveis: pecas, ocultas: ocultasDaOpcao.map(pecasDe), ligados, menorFolga, tol, alcance: Math.max(tol, folgaMax), declarado: (a, h) => atravessaComOculta.has(chave(rs[a].id, ocultasDaOpcao[h].id)) });
     }
     for (let a = 0; a < n; a++) {
       if (n > 1 && menorFolga[a] !== Infinity && menorFolga[a] > folgaMax) {
@@ -673,7 +733,7 @@ export function descreverAchado(a) {
   const p = a.pecas;
   const base = `[${a.opcao}] ${NOMES[a.tipo]}: `;
   if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} se penetram ${mm(a.mm)} mm`;
-  if (a.tipo === 'atravessa-excedido') return `${base}${p[0]} e ${p[1]} se atravessam ${mm(a.mm)} mm, acima do máximo ${a.implicita ? 'implícito (mesma unidade)' : 'declarado'} de ${mm(a.max)} mm`;
+  if (a.tipo === 'atravessa-excedido') return `${base}${p[0]} e ${p[1]} se atravessam ${mm(a.mm)} mm, acima do máximo ${a.implicita ? `implícito (mesma unidade: a menor dimensão da menor das duas formas)` : 'declarado'} de ${mm(a.max)} mm${a.implicita ? `; se a travessia é intencional basta declarar "max" (sugestão: ${a.maxSugerido ?? Math.floor(a.mm) + 1}) em contato.juntas ou em contato.pares para este par, por exemplo { "a": "${p[0]}", "b": "${p[1]}", "tipo": "atravessa", "max": ${a.maxSugerido ?? Math.floor(a.mm) + 1} } (dentro da unidade não pede "motivo")` : ''}`;
   if (a.tipo === 'longe') return `${base}${p[0]} fica a ${mm(a.mm)} mm da peça mais próxima`;
   if (a.tipo === 'voando') return `${base}${p[0]} fora do grupo conectado${a.mm === null ? '' : `, a ${mm(a.mm)} mm dele`}`;
   return `${base}${p[0]} e ${p[1]} deviam encostar, ${a.detalhe === 'penetracao' ? `mas se penetram ${mm(a.mm)} mm` : `mas há ${mm(a.mm)} mm de folga`}`;

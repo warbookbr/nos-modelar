@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-863 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+864 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -384,6 +384,7 @@
 - `condutor.test.js` — O Condutor: estágios, Portão de estágio, nível de detalhe, Plano de detalhe (unidades e ordem), agrupamento com motivo e Marcos.
 - `conserto.test.js` — Conserto proposto pelo gate e `--ajustar`: qual forma se move, quanto, e o gate aprovando depois.
 - `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
+- `correcoes-do-fluxo.test.js` — Os seis bugs do fluxo por unidades que as duas rodadas de medição acharam (plano "O esboço detalhado coerente", fatia 1), cada um em reprodução mínima, e os …
 - `curvas.test.js` — Formas curvas: extrusão de perfil côncavo, loft por seções e revolução por perfil, em desenho (ordem das faces medida por lançamento de raios), âncoras, gate…
 - `descrever.test.js` — Leitura do esboço em texto (`--descrever`, `--descrever --mudou`) e âncoras nomeadas.
 - `desempenho.test.js` — Desempenho do esboço: a projeção reaproveita as faces de cada forma, só mede os pares cujas caixas na tela se cruzam, o desenho tem a opção de menos lados no…

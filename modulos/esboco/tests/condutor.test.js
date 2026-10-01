@@ -176,13 +176,13 @@ describe('Marco a cada 25% do custo estimado', () => {
     expect(marcarFeito(e, s, 'a').novosMarcos).toEqual([]);
   });
 
-  it('o custo é o número de formas: uma unidade grande cruza vários marcos de uma vez', () => {
+  it('o custo é o número de formas: uma unidade grande cruza vários limiares e registra só o mais alto', () => {
     const e = { ...fila(), contato: { usar: true, tolerancia: 1, penetracao: 1, folga: 100 } };
     e.opcoes[0].formas = [caixa('a', [10, 10, 0]), caixa('b', [30, 10, 0], 20, 20, 20, { daInstancia: { id: 'g', principal: true } }), caixa('c', [50, 10, 0], 20, 20, 20, { daInstancia: { id: 'g', principal: false } }), caixa('d', [70, 10, 0], 20, 20, 20, { daInstancia: { id: 'g', principal: false } })];
     let s = passar(e, estadoNaMaquete(e), 3);
     expect(s.unidades.map((u) => `${u.id}:${u.custo}`)).toEqual(['a:1', 'g:3']);
     const r = marcarFeito(e, s, 'g');
-    expect(r.novosMarcos.map((m) => m.limiar)).toEqual([25, 50, 75]);
+    expect(r.novosMarcos.map((m) => [m.limiar, m.saltou])).toEqual([[75, [25, 50]]]);
     s = r.estado;
     expect(marcarFeito(e, s, 'a').novosMarcos.map((m) => m.limiar)).toEqual([100]);
   });

@@ -105,10 +105,59 @@ export function ajustarEsboco(bruto, { maxRodadas = MAXIMO_DE_RODADAS, unidades 
   return { esboco: atual, aprovado: gate.resultado === 'aprovado', parou, rodadas, inicial, final: gate };
 }
 
-/* JSON com o mesmo recuo do original (2 espaços se não der para saber) e a mesma quebra final. */
+const LARGURA_DA_LISTA = 100;
+const LARGURA_MINIMA_DO_OBJETO = 100;
+const ehPrimitivo = (x) => x === null || typeof x !== 'object';
+const ehObjeto = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+
+/* O estilo do texto original: se as listas de números ficam numa linha (o padrão, e o único que o JSON.stringify não dá), se
+   as formas ficam num objeto por linha e os separadores. Um original com as listas numéricas quebradas em várias linhas e
+   nenhuma numa linha só mantém o estilo expandido do JSON.stringify. */
+function estiloDoOriginal(texto) {
+  const emLinha = /\[\s*-?\d[^\][\n]*\]/.test(texto);
+  const quebradas = /\[[ \t]*\n[ \t]*-?\d/.test(texto);
+  const virgula = /\[-?[\d.]+,[^ \n]/.test(texto) ? ',' : ', ';
+  const doisPontos = /"[^"\n]+":[^ \n]/.test(texto) ? ':' : ': ';
+  const linhasDeObjeto = texto.split('\n').filter((l) => /^[ \t]*(?:"[^"\n]+":[ \t]*)?\{[^\n]*\},?[ \t]*$/.test(l));
+  const objetosEmLinha = linhasDeObjeto.length > 0;
+  return { compacto: emLinha || !quebradas, objetosEmLinha, propriedadesEmLinha: /^[ \t]*"[^"\n]+":[ \t]*\{[^\n]*\},?[ \t]*$/m.test(texto), larguraDoObjeto: Math.max(LARGURA_MINIMA_DO_OBJETO, ...linhasDeObjeto.map((l) => l.trimEnd().length)), formasEmLinha: /^[ \t]*\{[ \t]*"id"[^\n]*\},?[ \t]*$/m.test(texto), miolo: /\{ "/.test(texto) ? ' ' : '', virgula, doisPontos };
+}
+
+/* JSON com o recuo do original (2 espaços se não der para saber), a mesma quebra final e as listas curtas de números e textos
+   numa linha só (`[0, 10, 0]`); com o original de uma forma por linha, cada forma de uma lista também fica numa linha quando
+   cabe. Sem isso o JSON.stringify põe um número por linha e um esboço de 200 linhas vira 1800. */
 export function serializarComoOriginal(esboco, textoOriginal) {
   const recuo = /^([ \t]+)"/m.exec(textoOriginal)?.[1] ?? '  ';
-  return `${JSON.stringify(esboco, null, recuo)}${/\n$/.test(textoOriginal) ? '\n' : ''}`;
+  const fim = /\n$/.test(textoOriginal) ? '\n' : '';
+  const estilo = estiloDoOriginal(textoOriginal);
+  if (!estilo.compacto) return `${JSON.stringify(esboco, null, recuo)}${fim}`;
+  const { virgula, doisPontos, miolo } = estilo;
+  const linha = (x) => (Array.isArray(x) ? `[${x.map(linha).join(virgula)}]` : ehObjeto(x) ? `{${miolo}${Object.entries(x).filter(([, y]) => y !== undefined).map(([k, y]) => `${JSON.stringify(k)}${doisPontos}${linha(y)}`).join(virgula)}${miolo}}` : JSON.stringify(x));
+  const plana = (a) => a.every((i) => ehPrimitivo(i) || (Array.isArray(i) && i.every(ehPrimitivo)));
+  const escrever = (x, nivel, deLista) => {
+    const margem = recuo.repeat(nivel);
+    if (Array.isArray(x)) {
+      if (x.length === 0) return '[]';
+      if (plana(x)) { const l = linha(x); if (margem.length + l.length <= LARGURA_DA_LISTA) return l; }
+      return `[\n${x.map((i) => `${margem}${recuo}${escrever(i, nivel + 1, true)}`).join(',\n')}\n${margem}]`;
+    }
+    if (ehObjeto(x)) {
+      const chaves = Object.keys(x).filter((k) => x[k] !== undefined);
+      if (chaves.length === 0) return '{}';
+      if (deLista && estilo.objetosEmLinha) {
+        /* a forma (objeto com "id") só fica numa linha se o original assim as escreve; o objeto curto de uma lista, como um furo, sempre */
+        const l = linha(x);
+        if ((x.id === undefined || estilo.formasEmLinha) && margem.length + l.length <= estilo.larguraDoObjeto) return l;
+      } else if (nivel > 0 && estilo.propriedadesEmLinha && x.id === undefined && Object.values(x).every((y) => ehPrimitivo(y) || (Array.isArray(y) && y.every(ehPrimitivo)))) {
+        /* o objeto plano de uma propriedade (`"parametros": { "a": 1 }`, `"pontos"`, um estilo) também, se o original os escreve assim */
+        const l = linha(x);
+        if (margem.length + l.length <= estilo.larguraDoObjeto) return l;
+      }
+      return `{\n${chaves.map((k) => `${margem}${recuo}${JSON.stringify(k)}: ${escrever(x[k], nivel + 1, false)}`).join(',\n')}\n${margem}}`;
+    }
+    return JSON.stringify(x);
+  };
+  return `${escrever(esboco, 0, false)}${fim}`;
 }
 
 const FRASE_DA_PARADA = {

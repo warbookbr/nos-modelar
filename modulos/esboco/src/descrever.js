@@ -3,7 +3,7 @@
    diferença entre duas leituras (`--descrever --mudou`). Puro: não lê nem grava arquivo. */
 import { ancorasDe, ErroDeEsboco, relacaoDe, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
-import { herdarDoEspelho, lerContato, medirPar, paresImplicitos, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
+import { completarPelasOcultas, contarGrupos, herdarDoEspelho, lerContato, medirPar, paresImplicitos, padroesDoContato, pecasDe, verificarContato, descreverAchado } from './contato.js';
 import { verificarProjecao } from './projecao.js';
 import { conferirPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
@@ -62,7 +62,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
   const ativa = (i) => (lidas[i]?.usar ?? raiz?.usar) === true;
   const todas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
-  const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis, unidades }) : null;
+  const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis, ocultas: todas.map((rs) => rs.filter((r) => r.forma.oculto === true)), unidades }) : null;
   const projecao = comProjecao ? verificarProjecao(esboco, { forcar: true, resolvidas: visiveis }) : { achados: [] };
   const plano = conferirPlano(esboco, visiveis, { referencias });
   const padrao = padroesDoContato(visiveis);
@@ -89,6 +89,11 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
         contatos.push({ a: rs[a].id, b: rs[b].id, ...(folga > 0 || penetracao < 0.05 ? { folga_mm: r2(folga) } : { penetracao_mm: r2(penetracao) }) });
       }
       if (penetracao > penMax) sobreposicoes3d.push({ a: rs[a].id, b: rs[b].id, penetracao_mm: r2(penetracao), ...(tipo === 'atravessa' ? { declarado: true } : {}) });
+    }
+    /* a unidade isolada (as outras formas ocultas) julga a conectividade com o mestre inteiro, como o gate */
+    const ocultasDaOpcao = todas[i].filter((r) => r.forma.oculto === true);
+    if (ocultasDaOpcao.length > 0 && n > 1 && contarGrupos(ligados) > 1) {
+      completarPelasOcultas({ visiveis: pecas, ocultas: ocultasDaOpcao.map(pecasDe), ligados, menorFolga: Array(n).fill(Infinity), tol, alcance: tol, declarado: (a, h) => tipos.get(chaveSimetrica(rs[a].id, ocultasDaOpcao[h].id)) === 'atravessa' });
     }
     /* grupo principal: o maior, e no empate o que contém a primeira forma (a mesma regra do gate) */
     const grupo = Array(n).fill(-1); const grupos = [];
