@@ -14,7 +14,9 @@ export const ORIGENS = ['ficha', 'foto', 'ia', 'referencia'];
 export const UNIDADES = { mm: 1, cm: 10, m: 1000 };
 export const MEDIDAS_TOTAIS = { alturaTotal: 'y', larguraTotal: 'x', profundidadeTotal: 'z' };
 const EIXOS = ['x', 'y', 'z'];
-const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope'];
+const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope', 'pecas'];
+const CHAVES_DA_PECA = ['nome', 'formas', 'obrigatoria', 'opcoes'];
+const EXEMPLO_DA_PECA = '{ "nome": "para-lama traseiro", "formas": ["paralamaT*"], "obrigatoria": true }';
 const CHAVES_DA_REFERENCIA = ['arquivo', 'vista', 'tolerancia', 'iou_min', 'partes', 'opcoes', 'ancoras', 'recorte', 'limiar'];
 const CHAVES_DA_MEDIDA = ['nome', 'valor', 'unidade', 'origem', 'tolerancia', 'mede', 'opcoes'];
 const CHAVES_DO_CONTRATO = ['tocam', 'livres', 'simetricas'];
@@ -121,6 +123,23 @@ export function lerPlano(plano) {
     });
   }
   const referencia = plano.referencia === undefined ? [] : (Array.isArray(plano.referencia) ? plano.referencia : [plano.referencia]).map((r, i) => lerReferencia(r, `esboço: plano.referencia${Array.isArray(plano.referencia) ? `[${i}]` : ''}`));
+  const pecas = [];
+  if (plano.pecas !== undefined) {
+    exigir(Array.isArray(plano.pecas), `esboço: "plano.pecas" deve ser a lista das partes que o objeto precisa ter. Exemplo: ${EXEMPLO_DA_PECA}`);
+    const nomes = new Set();
+    for (const [i, p] of plano.pecas.entries()) {
+      const onde = `esboço: plano.pecas[${i}]${objeto(p) && typeof p.nome === 'string' ? ` ("${p.nome}")` : ''}`;
+      exigir(objeto(p), `${onde} deve ser um objeto. Exemplo: ${EXEMPLO_DA_PECA}`);
+      campos(p, CHAVES_DA_PECA, onde);
+      exigir(typeof p.nome === 'string' && p.nome, `${onde}: falta o "nome" da parte. Exemplo: ${EXEMPLO_DA_PECA}`);
+      exigir(!nomes.has(p.nome), `${onde}: o nome "${p.nome}" está repetido`);
+      nomes.add(p.nome);
+      exigir(Array.isArray(p.formas) && p.formas.length > 0 && p.formas.every((q) => typeof q === 'string' && q), `${onde}: "formas" deve listar os ids, padrões ("paralamaT*") ou instâncias que fazem a parte. Exemplo: ${EXEMPLO_DA_PECA}`);
+      exigir(p.obrigatoria === undefined || typeof p.obrigatoria === 'boolean', `${onde}: "obrigatoria" deve ser true ou false (veio ${JSON.stringify(p.obrigatoria)})`);
+      exigir(p.opcoes === undefined || (Array.isArray(p.opcoes) && p.opcoes.length > 0 && p.opcoes.every((q) => typeof q === 'string' || Number.isInteger(q))), `${onde}: "opcoes" deve listar títulos ou números (a partir de 1) das opções a que a parte vale`);
+      pecas.push({ nome: p.nome, formas: p.formas, obrigatoria: p.obrigatoria === true, ...(p.opcoes ? { opcoes: p.opcoes } : {}) });
+    }
+  }
   let envelope;
   if (plano.envelope !== undefined) {
     exigir(objeto(plano.envelope), 'esboço: "plano.envelope" deve ser um objeto { tolerancia } (o objeto vazio liga a conferência com a tolerância padrão)');
@@ -128,7 +147,7 @@ export function lerPlano(plano) {
     exigir(plano.envelope.tolerancia === undefined || (Number.isFinite(plano.envelope.tolerancia) && plano.envelope.tolerancia >= 0), 'esboço: "plano.envelope.tolerancia" deve ser um número em mm, maior ou igual a zero');
     envelope = { ...(plano.envelope.tolerancia === undefined ? {} : { tolerancia: plano.envelope.tolerancia }) };
   }
-  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), estruturado: true };
+  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), ...(pecas.length ? { pecas } : {}), estruturado: true };
 }
 
 const EXEMPLO_DA_REFERENCIA = '{ "arquivo": "referencias/lateral.contornos.json", "vista": "lateral", "tolerancia": 25, "iou_min": 0.85 }';
@@ -257,6 +276,12 @@ export function conferirPlano(esboco, visiveis, { referencias } = {}) {
       medidas.push({ nome: m.nome, origem: m.origem, esperado_mm: r1(esperado), medido_mm: r1(mm), desvio_mm: r1(desvio), tolerancia_mm: r1(tolerancia), ok });
       if (!ok) novo({ tipo: 'medida-fora', nome: m.nome, pecas, mm: r1(Math.abs(desvio)), desvio_mm: r1(desvio), texto: `medida "${m.nome}" fora da tolerância: o esboço mede ${mm1(mm)} mm e o plano declara ${mm1(esperado)} mm (origem: ${m.origem}), desvio de ${sinal(desvio)} mm com tolerância de ${mm1(tolerancia)} mm` });
     }
+    /* o inventário de partes: a obrigatória sem nenhuma forma correspondente (id, padrão ou instância) */
+    for (const p of lido?.pecas ?? []) {
+      if (!p.obrigatoria || !valeParaOpcao(p, titulo, i)) continue;
+      const casam = rs.some((r) => p.formas.some((q) => (q.includes('*') ? casa(q, r.id) : (r.id === q || brutos.get(r.id)?.daInstancia?.id === q))));
+      if (!casam) novo({ tipo: 'peca-ausente', nome: p.nome, pecas: [], mm: 0, texto: `a peça obrigatória "${p.nome}" não tem nenhuma forma no esboço (esperava ${p.formas.map((q) => `"${q}"`).join(' ou ')}): modele a parte ou tire-a de plano.pecas se o objeto não a tem` });
+    }
     if (lido?.contrato) {
       const c = lido.contrato;
       const ondeC = `opção ${i + 1} (${titulo}): plano.contrato`;
@@ -310,7 +335,7 @@ export function conferirPlano(esboco, visiveis, { referencias } = {}) {
   });
   const totalMedidas = lido?.medidas?.length ?? 0;
   const relacoes = lido?.contrato ? lido.contrato.tocam.length + lido.contrato.livres.length + lido.contrato.simetricas.length : 0;
-  return { nivel: lido?.nivel, opcoes: porOpcao, achados, resumo: { medidas: totalMedidas, relacoes, ...((lido?.referencia?.length ?? 0) > 0 ? { referencias: lido.referencia.length } : {}) } };
+  return { nivel: lido?.nivel, opcoes: porOpcao, achados, resumo: { medidas: totalMedidas, relacoes, ...((lido?.referencia?.length ?? 0) > 0 ? { referencias: lido.referencia.length } : {}), ...((lido?.pecas?.length ?? 0) > 0 ? { pecas: lido.pecas.length } : {}) } };
 }
 
 /* Confere uma entrada de `plano.referencia` contra a opção `i` do esboço já expandido (`visiveis` são as formas resolvidas e

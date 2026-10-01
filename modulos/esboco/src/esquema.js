@@ -9,7 +9,7 @@ const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const EIXOS = ['x', 'y', 'z'];
 
 /* Campos de toda forma (posição, aparência e relações) e os internos que a expansão deixa nas formas já expandidas. */
-const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'unidade'];
+const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'unidade', 'estilo', 'substitui'];
 export const CAMPOS_POR_TIPO = {
   caixa: ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'furos', 'furo'],
   cilindro: ['diametro', 'comprimento', 'eixo', 'achatado', 'lados'],
@@ -23,7 +23,7 @@ export const CAMPOS_POR_TIPO = {
 };
 export const TIPOS_DE_FORMA = Object.keys(CAMPOS_POR_TIPO);
 const NUMERICOS = ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'diametroTopo', 'raioCurva', 'opacidade'];
-export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria'];
+export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico'];
 export const CAMPOS_DA_OPCAO = ['id', 'titulo', 'nota', 'formas', 'legendas', 'explosao', 'parametros', 'pontos', 'contato', 'ocultar', 'linhasCentro', 'medidas'];
 export const CAMPOS_DO_CONTATO = ['usar', 'tolerancia', 'penetracao', 'folga', 'pares', 'juntas', 'projecao'];
 const CAMPOS_DA_PROJECAO = ['limiar', 'reprova', 'folgaMinima', 'maximo'];
@@ -47,6 +47,13 @@ function conjunto(valor, validos, onde, campo) {
   if (!validos.includes(valor)) throw new ErroDeEsboco(`${onde}: "${campo}" com o valor ${JSON.stringify(valor)} deve ser um de ${lista(validos)}${quisDizer(valor, validos)}`);
 }
 
+/* A cor de uma forma, de um estilo ou de uma unidade: um nome conhecido ou um hexadecimal de 6 dígitos. */
+export function corValida(cor, onde) {
+  if (!(typeof cor === 'string' && (Object.hasOwn(CORES_NOMEADAS, cor) || /^#?[0-9a-f]{6}$/i.test(cor)))) {
+    throw new ErroDeEsboco(`${onde}: "cor" com o valor ${JSON.stringify(cor)} deve ser um nome (${lista(Object.keys(CORES_NOMEADAS))}) ou um hexadecimal de 6 dígitos como "#3d6fb5"${quisDizer(cor, Object.keys(CORES_NOMEADAS))}`);
+  }
+}
+
 function validarForma(f, onde) {
   if (!objeto(f)) throw new ErroDeEsboco(`${onde}: cada forma deve ser um objeto { id, tipo, ... }`);
   if (f.unidade !== undefined && !(typeof f.unidade === 'string' && f.unidade.trim())) throw new ErroDeEsboco(`${onde}: "unidade" deve ser um texto não vazio, o nome da Unidade de detalhe da forma (veio ${JSON.stringify(f.unidade)})`);
@@ -60,9 +67,9 @@ function validarForma(f, onde) {
     if (v !== undefined && typeof v !== 'number' && typeof v !== 'string') throw new ErroDeEsboco(`${rotuloDaForma}: o campo "${k}" com o valor ${JSON.stringify(v)} deve ser um número em mm, o nome de um parâmetro ou "=expressão"`);
   }
   if (f.eixo !== undefined) conjunto(f.eixo, EIXOS, rotuloDaForma, 'eixo');
-  if (f.cor !== undefined && !(typeof f.cor === 'string' && (Object.hasOwn(CORES_NOMEADAS, f.cor) || /^#?[0-9a-f]{6}$/i.test(f.cor)))) {
-    throw new ErroDeEsboco(`${rotuloDaForma}: "cor" com o valor ${JSON.stringify(f.cor)} deve ser um nome (${lista(Object.keys(CORES_NOMEADAS))}) ou um hexadecimal de 6 dígitos como "#3d6fb5"${quisDizer(f.cor, Object.keys(CORES_NOMEADAS))}`);
-  }
+  if (f.cor !== undefined) corValida(f.cor, rotuloDaForma);
+  if (f.substitui !== undefined && !(typeof f.substitui === 'string' && f.substitui)) throw new ErroDeEsboco(`${rotuloDaForma}: "substitui" deve ser o id da forma da maquete que esta forma substitui no detalhado (veio ${JSON.stringify(f.substitui)})`);
+  if (f.estilo !== undefined && !(typeof f.estilo === 'string' && f.estilo)) throw new ErroDeEsboco(`${rotuloDaForma}: "estilo" deve ser o nome de um estilo declarado em "estilos" na raiz (veio ${JSON.stringify(f.estilo)})`);
   if (f.oculto !== undefined && typeof f.oculto !== 'boolean') throw new ErroDeEsboco(`${rotuloDaForma}: "oculto" deve ser true ou false (veio ${JSON.stringify(f.oculto)})`);
 }
 

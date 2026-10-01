@@ -226,23 +226,15 @@ módulo, que é a referência do formato.
    `src/componentes.js`), o ponto `entre` e as formas `tubo`, `esfera`, `cone`,
    `extrusao` e `chanfro`, com gate, espelho, arranjo e `--ajustar`. A moto
    `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números.
-8. A validação da moto detalhada (2026-09-30) mostrou o que faltava, e tudo foi
-   feito no mesmo dia. Formas curvas: `extrusao` de perfil côncavo, `loft` e
-   `revolucao`, com gate por partes convexas. Desempenho, na moto de 66 formas:
-   `--analise` de 11 min para 36 s, 4,7 s com `--rapido`, e o teste da moto de 47
-   s para 3,3 s. A projeção agrupada por componente (10 grupos por opção, contra
-   107 achados). O contrato de relações: `contato.juntas` no lugar de dezenas de
-   pares `atravessa`, pontos-guia nomeados no `caminho` do tubo, `{ ancora, mm }`,
-   e o bug de `<instancia>.<parte>` corrigido. A leitura padrão do `--descrever`
-   só com divergências (`--forma`, `--completo`), a imagem por achado
-   (`--achado`), o `plano` estruturado (`nivel`, `medidas`, `contrato`), o esquema
-   do JSON com "quis dizer" e o Condutor (estágios, Portão, Plano de detalhe,
-   Marco), descritos no README do módulo. Nomes: Condutor (a máquina de estados
-   do fluxo), Maquete, Plano de detalhe, Unidade de detalhe, Envelope, Portão
-   de estágio e Marco, todos descritos no README do módulo e mapeados ao
-   Mecanifica (a Unidade é a etapa da montagem, o Envelope é o gate de encaixe da
-   ponte, o Portão é o aceite por etapa). Fora desta fatia: o Envelope e o
-   despacho do crítico pelo Condutor. O módulo passou de 299 para 367 testes, e `npm run gates` fecha com 32/32 verdes.
+8. A validação da moto detalhada (2026-09-30) foi feita no mesmo dia: formas
+   curvas (`extrusao` côncava, `loft`, `revolucao`, gate por partes convexas);
+   desempenho na moto de 66 formas (`--analise` de 11 min para 36 s, 4,7 s com
+   `--rapido`); projeção agrupada por componente (10 grupos contra 107 achados);
+   `contato.juntas`, pontos-guia do `caminho` e `{ ancora, mm }`; leitura padrão só
+   com divergências, `--achado`, `plano` estruturado, esquema com "quis dizer" e o
+   Condutor (Maquete, Plano de detalhe, Unidade, Envelope, Portão e Marco, mapeados
+   no README ao Mecanifica). O módulo passou de 299 para 367 testes e `npm run gates`
+   fechou com 32/32 verdes.
 9. A referência e o fluxo. Feito em 2026-09-30: o fluxo na skill e no
    `PARE-E-ANALISE.md`, a proibição de auditar por legenda, o Pare e planeje com
    `plano.nivel`, `plano.medidas` e `plano.contrato`, a conferência contra a foto
@@ -252,17 +244,22 @@ módulo, que é a referência do formato.
    mover o plano para encerrados.
 10. A análise do transcript da moto nova (47 min, 138 chamadas, 106 KB dos 146
    KB escritos em Python que gera ou remenda o JSON, 14 recusas, 108 juntas em 29%
-   do arquivo, 2/3 delas dentro da mesma unidade) pediu duas partes. A parte 10a
-   foi feita em 2026-09-30 em `modulos/esboco`: `unidade` declarada na forma,
-   instância e espelho (o agrupamento automático só agrupa as sem `unidade` e não
-   junta mais de metade das formas); `--mover` por instância, padrão e lista,
-   `--mover-lote` e `--replanejar` que preserva o agrupamento; `atravessa` dentro da
-   mesma unidade sem `motivo` nem `max` (max implícito, em `implicitas`), com o gate
-   ignorando forma oculta; `--detalhar` e `--integrar` sem zerar o Condutor; caminhos
-   por `INIT_CWD`, Condutor sem histórico, `--forma` sem desenho. Medido: a moto curva com `unidade` declarada dá 7 unidades com 0 `--mover`, contra 4
-   formas a mover no automático; 419 para 444 testes; SVG e leitura antigos iguais.
-   Parte 10b, a fazer: `--editar`, `estilos` e cor por unidade, simetria implícita,
-   perfis por função e Envelope por forma; o item 20 só se mede depois dela.
+   do arquivo, 2/3 delas dentro da mesma unidade) pediu duas partes, ambas em
+   `modulos/esboco`. A parte 10a (2026-09-30) trouxe `unidade` declarada na forma,
+   instância e espelho, `--mover` por instância, padrão e lista, `--mover-lote`,
+   `--replanejar` que preserva o agrupamento, o `atravessa` da mesma unidade sem
+   `motivo` nem `max`, `--detalhar` e `--integrar`: a moto curva dá 7 unidades com 0
+   `--mover`; 419 para 444 testes. A parte 10b foi feita em 2026-10-01: `--editar`
+   (campos, `sub`, `centro[1]`, `--remover`, `--adicionar`, recusa sem gravar e
+   leitura padrão depois), `estilos` e cor por unidade, `simetrico` implícito,
+   perfis `estrela`, `arco`, `circulo` e `polar`, Envelope por forma
+   (`substitui`), `--unidade` com quatro vistas limpas e `plano.pecas` (classe
+   `peca`, a mais grave, no Portão da Conferência). Medido: 444 para 482 testes
+   (`tests/edicao.test.js`, fixture `estilos-perfis.esboco.json` com 8 formas e 3
+   geradores); SVG e leitura de 8 fixtures antigas iguais byte a byte contra a
+   versão anterior. No JSON da moto nova, 27 entradas `espelha` e 66 pontos de
+   perfil (4 formas) viram declarações curtas. O item 20 ainda não foi medido: pede
+   refazer a moto pelo fluxo novo e contar o transcript.
 
 ## Riscos e desvios
 

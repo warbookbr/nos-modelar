@@ -174,7 +174,9 @@ function envelopesDasUnidades(unidades, formas, resolvidas) {
     const rs = u.membros.map((m) => resolvida.get(m)).filter(Boolean);
     const caixa = Object.fromEntries(EIXOS.map((e, k) => [e, rs.length ? [r1(Math.min(...rs.map((r) => r.min[k]))), r1(Math.max(...rs.map((r) => r.max[k])))] : [0, 0]]));
     const lista = [...portas.get(u.id).values()].sort((a, b) => ordem.get(a.forma) - ordem.get(b.forma) || (a.ancora < b.ancora ? -1 : a.ancora > b.ancora ? 1 : 0));
-    return [u.id, { caixa, portas: lista }];
+    /* a caixa de cada forma da unidade, para o Envelope por forma (o detalhado que declara `substitui`) */
+    const formasDaUnidade = Object.fromEntries(u.membros.filter((m) => resolvida.has(m)).map((m) => { const r = resolvida.get(m); return [m, Object.fromEntries(EIXOS.map((e, k) => [e, [r1(r.min[k]), r1(r.max[k])]]))]; }));
+    return [u.id, { caixa, portas: lista, formas: formasDaUnidade }];
   }));
 }
 
@@ -267,7 +269,7 @@ function medirParaOPortao(bruto, estado, referencias) {
   /* a silhueta contra a referência é coisa da Conferência da maquete: na Maquete ainda se constrói, a menos que o nível
      não tenha Conferência (o esquemático) */
   const cobraReferencia = estado.atual !== 'maquete' || !estado.estagios.includes('conferencia-da-maquete');
-  const divergencias = cobraReferencia ? medido.divergencias : medido.divergencias.filter((d) => d.classe !== 'referencia');
+  const divergencias = cobraReferencia ? medido.divergencias : medido.divergencias.filter((d) => d.classe !== 'referencia' && d.classe !== 'peca');
   const falta = [];
   for (const o of descricao.opcoes) if (!o.gate.declarado && o.formas.length >= 4) falta.push(`o gate de contato não está ligado na opção "${o.titulo}" (contato.usar: true; a política liga a partir de 4 formas)`);
   for (const d of divergencias) falta.push(`[${d.n}] ${d.classe}: ${d.texto}`);
@@ -561,7 +563,9 @@ export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
   const maior = Math.max(...EIXOS.map((e) => u.envelope.caixa[e][1] - u.envelope.caixa[e][0]), 0);
   const declarada = plano?.envelope?.tolerancia;
   const tolerancia = declarada ?? Math.max(1, 0.01 * maior);
-  const expandido = expandirEsboco(detalhado);
+  /* o Envelope mede geometria: o contato do detalhado (juntas e pares que citam formas trocadas) não entra na conta */
+  const semContato = { ...detalhado, contato: undefined, opcoes: Array.isArray(detalhado?.opcoes) ? detalhado.opcoes.map((o) => (o && typeof o === 'object' ? { ...o, contato: undefined } : o)) : detalhado?.opcoes };
+  const expandido = expandirEsboco(semContato);
   const opcoes = Array.isArray(expandido.opcoes) ? expandido.opcoes : [];
   exigir(opcoes.length > 0, 'condutor: a versão detalhada não tem opção');
   const titulo = estadoBruto?.opcao;
@@ -570,10 +574,37 @@ export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
   exigir(rs.length > 0, 'condutor: a versão detalhada não tem forma visível');
   const falta = [];
   const caixa = {};
+  /* o Envelope por forma: o detalhado que declara `substitui: "<forma-da-maquete>"` em uma forma é conferido contra a caixa
+     daquela forma da maquete; as formas sem `substitui` continuam conferidas pela caixa da unidade */
+  const trocas = rs.filter((r) => typeof r.forma.substitui === 'string');
+  const resto = trocas.length > 0 ? rs.filter((r) => typeof r.forma.substitui !== 'string') : rs;
+  const formasDaMaquete = u.envelope.formas ?? {};
+  const porForma = [];
+  for (const alvo of [...new Set(trocas.map((r) => r.forma.substitui))]) {
+    const doAlvo = trocas.filter((r) => r.forma.substitui === alvo);
+    const env = formasDaMaquete[alvo];
+    if (!env) {
+      const nomes = Object.keys(formasDaMaquete);
+      falta.push(`a forma "${alvo}", que ${doAlvo.map((r) => r.id).join(', ')} diz substituir, não é uma forma da unidade "${unidade}" na maquete${quisDizer(alvo, nomes)} (formas da unidade: ${nomes.join(', ') || 'nenhuma gravada'})`);
+      porForma.push({ forma: alvo, por: doAlvo.map((r) => r.id), ok: false, ausente: true });
+      continue;
+    }
+    const caixaDaForma = {};
+    const toleranciaDaForma = declarada ?? Math.max(1, 0.01 * Math.max(...EIXOS.map((e) => env[e][1] - env[e][0]), 0));
+    for (const [i, e] of EIXOS.entries()) {
+      const d = [Math.min(...doAlvo.map((r) => r.min[i])), Math.max(...doAlvo.map((r) => r.max[i]))];
+      const excesso = Math.max(env[e][0] - d[0], d[1] - env[e][1], 0);
+      caixaDaForma[e] = { envelope: env[e], detalhe: [r1(d[0]), r1(d[1])], excesso_mm: r1(excesso), ok: excesso <= toleranciaDaForma + 1e-9 };
+    }
+    const ok = EIXOS.every((e) => caixaDaForma[e].ok);
+    porForma.push({ forma: alvo, por: doAlvo.map((r) => r.id), ok, tolerancia_mm: r1(toleranciaDaForma), caixa: caixaDaForma });
+    for (const e of EIXOS.filter((x) => !caixaDaForma[x].ok)) falta.push(`a forma "${alvo}" da maquete foi excedida: ${doAlvo.map((r) => r.id).join(', ')} passa${doAlvo.length === 1 ? '' : 'm'} ${n1(caixaDaForma[e].excesso_mm)} mm em ${e} (detalhe ${faixa(caixaDaForma[e].detalhe)}, forma da maquete ${faixa(caixaDaForma[e].envelope)}, tolerância ${n1(toleranciaDaForma)} mm)`);
+  }
+  const base = resto.length > 0 ? resto : rs;
   EIXOS.forEach((e, i) => {
-    const d = [Math.min(...rs.map((r) => r.min[i])), Math.max(...rs.map((r) => r.max[i]))];
+    const d = [Math.min(...base.map((r) => r.min[i])), Math.max(...base.map((r) => r.max[i]))];
     const env = u.envelope.caixa[e];
-    const excesso = Math.max(env[0] - d[0], d[1] - env[1], 0);
+    const excesso = resto.length === 0 && trocas.length > 0 ? 0 : Math.max(env[0] - d[0], d[1] - env[1], 0);
     caixa[e] = { envelope: env, detalhe: [r1(d[0]), r1(d[1])], excesso_mm: r1(excesso), ok: excesso <= tolerancia + 1e-9 };
     if (!caixa[e].ok) falta.push(`a versão detalhada passa ${n1(excesso)} mm do Envelope em ${e} (detalhe ${faixa(caixa[e].detalhe)}, envelope ${faixa(env)}, tolerância ${n1(tolerancia)} mm)`);
   });
@@ -590,13 +621,14 @@ export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
     if (!ok) falta.push(`a porta ${p.forma}.${p.ancora} (usada por ${p.usadaPor.join(', ')}) saiu do lugar: [${medido.map(n1).join(' ')}] na versão detalhada e [${p.ponto.map(n1).join(' ')}] na maquete, ${n1(desvio)} mm de diferença, com tolerância de ${n1(tolerancia)} mm`);
     return { forma: p.forma, ancora: p.ancora, esperado: p.ponto, medido, desvio_mm: r1(desvio), ok };
   });
-  return { unidade, ok: falta.length === 0, tolerancia_mm: r1(tolerancia), tolerancia_declarada: declarada !== undefined, caixa, portas, falta };
+  return { unidade, ok: falta.length === 0, tolerancia_mm: r1(tolerancia), tolerancia_declarada: declarada !== undefined, caixa, portas, ...(porForma.length > 0 ? { formas: porForma } : {}), falta };
 }
 
 /* Texto do resultado de `conferirEnvelope`. */
 export function formatarEnvelope(r, arquivo) {
   const L = [`envelope da unidade ${r.unidade} contra ${arquivo}: ${r.ok ? 'cabe' : 'não cabe'} (tolerância ${n1(r.tolerancia_mm)} mm${r.tolerancia_declarada ? '' : ', padrão de 1% da maior dimensão'})`];
   L.push(`  caixa: ${EIXOS.map((e) => (r.caixa[e].ok ? `${e} cabe` : `${e} passa ${n1(r.caixa[e].excesso_mm)} mm`)).join('; ')}`);
+  if (r.formas?.length) L.push(`  formas da maquete: ${r.formas.map((f) => (f.ausente ? `${f.forma} ausente` : f.ok ? `${f.forma} cabe` : `${f.forma} excedida`)).join('; ')}`);
   L.push(r.portas.length === 0 ? '  portas: nenhuma (nenhuma outra unidade usa uma âncora desta)' : `  portas: ${r.portas.map((p) => `${p.forma}.${p.ancora} ${p.ok ? `no lugar (${n1(p.desvio_mm)} mm)` : p.medido === null ? 'ausente' : `fora do lugar (${n1(p.desvio_mm)} mm)`}`).join('; ')}`);
   for (const f of r.falta) L.push(`  - ${f}`);
   return `${L.join('\n')}\n`;

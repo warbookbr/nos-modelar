@@ -658,8 +658,8 @@ function rotacaoEmTorno(eixo, graus) {
 const CHAVES_ESPELHA = ['forma', 'eixo', 'pos'];
 /* Campos de posição e de aparência que a cópia não herda da forma-fonte (a cópia refaz a posição
    a partir da fonte já resolvida; `rotulo`, `oculto` e `opacidade` são só dela). */
-const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia'];
-const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha', 'daInstancia'];
+const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia', 'substitui'];
+const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha', 'daInstancia', 'substitui'];
 
 /* Cópia refletida (`espelha`) ou repetida (`arranjoDe`, vinda de `arranja`) de uma forma já resolvida:
    a geometria sai da fonte resolvida, e não de uma regravação das relações dela. */
@@ -714,6 +714,7 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     ...(f.rotulo !== undefined ? { rotulo: f.rotulo } : {}),
     ...(f.oculto !== undefined ? { oculto: f.oculto } : {}),
     ...(f.opacidade !== undefined ? { opacidade: f.opacidade } : {}),
+    ...(f.substitui !== undefined ? { substitui: f.substitui } : {}),
   };
   if (forma.cor === undefined) delete forma.cor;
   if (fonte.partes) {

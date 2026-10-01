@@ -62,4 +62,16 @@ describe('a skill esbocar-opcoes', () => {
     for (const t of ['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo']) expect(r).toContain(`\`${t}\``);
     for (const c of ['juntas', 'plano', 'nivel', 'medidas', 'contrato', 'quis dizer']) expect(r).toContain(c);
   });
+
+  it('manda listar as partes que o objeto precisa ter antes de modelar, sem citar objeto, e ensina estilos, simetria, perfis e --editar', () => {
+    const p = skill.slice(skill.indexOf('plano.pecas'), skill.indexOf('Havendo foto, o arquivo dela'));
+    for (const termo of ['plano.pecas', 'conhecimento que você tem do objeto', 'obrigatoria', 'classe `peca`']) expect(p, termo).toContain(termo);
+    expect(p).not.toMatch(OBJETOS);
+    expect(pare).toContain('plano.pecas');
+    expect(pare).toContain('a partir do conhecimento do objeto');
+    const e = secao(skill, 'Escrever menos JSON');
+    for (const termo of ['estilos', 'unidades', 'simetrico', '`lado: "E"`', '"gerar": "estrela"', '"gerar": "arco"', '"gerar": "circulo"', '"gerar": "polar"', '--editar', '--remover', '--adicionar']) expect(e, termo).toContain(termo);
+    expect(skill).toContain('--unidade <unidade>');
+    expect(skill).toContain('substitui');
+  });
 });

@@ -1,0 +1,44 @@
+{
+  "vista": "lateral",
+  "plano": {
+    "texto": "Roda de cinco raios entre dois suportes, com paralama em arco: prova de estilos, cor por unidade, simetria implícita e perfis gerados.",
+    "nivel": "esquematico",
+    "pecas": [
+      { "nome": "roda", "formas": ["aro", "estrela", "cubo"], "obrigatoria": true },
+      { "nome": "suporte", "formas": ["suporte*"], "obrigatoria": true },
+      { "nome": "paralama", "formas": ["paralama"], "obrigatoria": true }
+    ]
+  },
+  "parametros": { "raioRoda": 200, "vao": 200 },
+  "estilos": {
+    "metal": { "cor": "cinza" },
+    "pintura": { "cor": "vermelho" }
+  },
+  "unidades": {
+    "roda": { "estilo": "metal" },
+    "estrutura": { "cor": "azul" }
+  },
+  "simetrico": { "eixo": "x", "pos": 0 },
+  "contato": {
+    "usar": true,
+    "juntas": [
+      { "pecas": ["aro", "estrela", "cubo", "eixo", "tampa"], "max": 60, "motivo": "os raios, o cubo, o eixo e a tampa se encaixam uns nos outros" },
+      { "pecas": ["eixo", "suporteE"], "max": 30, "motivo": "o eixo entra no furo do suporte" },
+      { "pecas": ["eixo", "suporteD"], "max": 30, "motivo": "o eixo entra no furo do suporte" }
+    ]
+  },
+  "opcoes": [
+    {
+      "titulo": "Roda",
+      "formas": [
+        { "id": "aro", "tipo": "anel", "diametroExterno": "=raioRoda*2", "diametroInterno": "=raioRoda*2-40", "espessura": 60, "eixo": "x", "centro": [0, 200, 0], "unidade": "roda" },
+        { "id": "estrela", "tipo": "extrusao", "eixo": "x", "comprimento": 20, "perfil": { "gerar": "estrela", "n": 5, "rin": 30, "rout": "=raioRoda-10", "semi": 12 }, "centro": [0, 217, 0], "unidade": "roda" },
+        { "id": "cubo", "tipo": "cilindro", "diametro": 60, "comprimento": 80, "eixo": "x", "centro": [0, 200, 0], "unidade": "roda", "cor": "amarelo" },
+        { "id": "tampa", "tipo": "extrusao", "eixo": "x", "comprimento": 10, "perfil": { "gerar": "circulo", "raio": 36, "lados": 16 }, "ponta": ["cubo", "+x"], "alinha": { "com": "cubo", "eixos": ["y", "z"] }, "unidade": "roda" },
+        { "id": "eixo", "tipo": "cilindro", "diametro": 24, "comprimento": "=vao", "eixo": "x", "centro": [0, 200, 0], "unidade": "roda" },
+        { "id": "suporteE", "tipo": "caixa", "largura": 20, "altura": 460, "profundidade": 60, "centro": ["=-vao/2-10", 230, 0], "lado": "E", "unidade": "estrutura" },
+        { "id": "paralama", "tipo": "extrusao", "eixo": "x", "comprimento": "=vao", "perfil": { "gerar": "arco", "raioExterno": "=raioRoda+15", "raioInterno": "=raioRoda+5", "angulo": 40, "passos": 6 }, "centro": [0, 386, 0], "unidade": "estrutura", "estilo": "pintura" }
+      ]
+    }
+  ]
+}

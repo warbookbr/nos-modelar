@@ -6,6 +6,8 @@ import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js'
 import { ErroDeEsboco } from './index.js';
 import { expandirComponentes } from './componentes.js';
 import { validarEsquema } from './esquema.js';
+import { ehGerador, gerarPerfil } from './perfis.js';
+import { lerEstilos, prepararFormas } from './estilos.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -80,6 +82,7 @@ function numerosDaSecao(q, num, campo, contexto) {
   const g = { ...q };
   for (const k of ['pos', 'raio']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
   for (const k of ['tamanho', 'centro']) if (g[k] !== undefined) g[k] = vetor(g[k], num, `${campo}.${k}`, contexto);
+  if (ehGerador(g.perfil)) g.perfil = gerarPerfil(g.perfil, num, `${campo}.perfil`, contexto);
   if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((p, i) => vetor(p, num, `${campo}.perfil[${i}]`, contexto));
   return g;
 }
@@ -90,6 +93,7 @@ export function numerosDaForma(f, num, contexto) {
   for (const k of VETORES) if (g[k] !== undefined) g[k] = vetor(g[k], num, k, contexto);
   for (const k of VETORES_OU_REFERENCIA) if (g[k] !== undefined) g[k] = ponto(g[k], num, k, contexto);
   if (Array.isArray(g.caminho)) g.caminho = g.caminho.map((q, i) => ponto(q, num, `caminho[${i}]`, contexto));
+  if (ehGerador(g.perfil)) g.perfil = gerarPerfil(g.perfil, num, 'perfil', contexto);
   if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((q, i) => (objeto(q) ? numerosDoPontoDePerfil(q, num, `perfil[${i}]`, contexto) : vetor(q, num, `perfil[${i}]`, contexto)));
   if (Array.isArray(g.secoes)) g.secoes = g.secoes.map((q, i) => numerosDaSecao(q, num, `secoes[${i}]`, contexto));
   if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
@@ -196,6 +200,10 @@ export function expandirEsboco(esboco) {
   const saida = { ...esboco };
   delete saida.parametros;
   delete saida.formas;
+  const estilos = lerEstilos(esboco);
+  delete saida.estilos;
+  delete saida.unidades;
+  delete saida.simetrico;
   if (esboco.contato !== undefined) saida.contato = numerosDoContato(esboco.contato, raiz.num, 'esboço');
   if (esboco.explosao !== undefined) saida.explosao = numerosDaExplosao(esboco.explosao, raiz.num, 'esboço');
   const pontosDaRaiz = objeto(esboco.pontos) ? esboco.pontos : undefined;
@@ -211,7 +219,7 @@ export function expandirEsboco(esboco) {
     const g = { ...o };
     delete g.parametros;
     if (Object.keys(valores).length > 0) g.parametros = valores;
-    const fonte = o.formas ?? esboco.formas;
+    const fonte = prepararFormas(o.formas ?? esboco.formas, estilos, num, onde);
     let componentes = { pares: [], aliasDeId: () => undefined, instancias: 0 };
     if (Array.isArray(fonte)) {
       componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde });
