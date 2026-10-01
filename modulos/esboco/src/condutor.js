@@ -551,13 +551,24 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   return { estado: novo, novosMarcos };
 }
 
+/* As unidades que o Marco de `limiar`% fechou: as feitas até ele menos as dos Marcos de limiar menor. */
+export function unidadesNovasDoMarco(estado, limiar) {
+  const marco = (estado.marcos ?? []).find((m) => m.limiar === limiar);
+  if (!marco) return [];
+  const antes = new Set((estado.marcos ?? []).filter((m) => m.limiar < limiar).flatMap((m) => m.unidades));
+  return marco.unidades.filter((u) => !antes.has(u));
+}
+
 /* Registra o veredito do crítico visual cego de uma unidade no histórico do estado (`vereditos`, campo que a versão 2 do estado
    acrescenta; o estado de versão 1 continua válido e sobe para 2 no primeiro veredito). `nota` de 0 a 10 e `motivo` com o que o
    crítico apontou (pelo menos 15 caracteres). Devolve o estado novo. */
 export function registrarVeredito(estadoBruto, { unidade, nota, motivo }) {
   const ids = (estadoBruto.unidades ?? []).map((u) => u.id);
-  const id = unidadePorNome(estadoBruto.unidades ?? [], unidade);
-  exigir(ids.includes(id), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(String(unidade), ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
+  /* `marco-50` é o veredito do crítico do Marco de 50%, que precisa estar registrado */
+  const doMarco = /^marco-(\d+)$/.exec(String(unidade));
+  const id = doMarco ? `marco-${doMarco[1]}` : unidadePorNome(estadoBruto.unidades ?? [], unidade);
+  if (doMarco) exigir((estadoBruto.marcos ?? []).some((m) => m.limiar === Number(doMarco[1])), `condutor: o Marco ${doMarco[1]}% não foi registrado (marcos registrados: ${(estadoBruto.marcos ?? []).map((m) => `marco-${m.limiar}`).join(', ') || 'nenhum'})`);
+  else exigir(ids.includes(id), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(String(unidade), ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
   const n = Number(nota);
   exigir(Number.isFinite(n) && n >= 0 && n <= 10, `condutor: --veredito precisa de --nota entre 0 e 10 (a nota do crítico), e veio ${JSON.stringify(nota)}`);
   const m = validarMotivo(motivo, 'registrar o veredito do crítico (--motivo: o que ele apontou)');
