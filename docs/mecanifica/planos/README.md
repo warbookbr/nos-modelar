@@ -2,12 +2,19 @@
 
 ## Estado
 
-**Plano ativo:** [O esboço sem conta à mão](2026-09-29-o-esboco-sem-conta-a-mao.md).
+**Plano ativo:** [O esboço detalhado coerente](2026-10-01-o-esboco-detalhado-coerente.md).
 
-O esboço passa a ser descrito por relações e parâmetros, e não por coordenadas
-calculadas à mão, com a sobreposição na projeção medida por vista e o gate
-propondo o conserto. [As partes do braço](congelados/2026-09-26-as-partes-do-braco.md)
-foram congeladas em 2026-09-29 para dar lugar a ele, e voltam depois.
+O esboço detalhado passa a ser conferido também por ligação e função, com
+os bugs do fluxo por unidades corrigidos e o crítico por unidade no Marco.
+[As partes do braço](congelados/2026-09-26-as-partes-do-braco.md) seguem
+congeladas e voltam depois dele.
+
+[O esboço sem conta à mão](encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md)
+fechou em 2026-10-01 com o esboço descrito por relações, parâmetros e unidades:
+componentes, formas curvas, o gate que propõe o conserto, o Condutor com Envelope
+e Marcos, a conferência contra a foto e `--detalhar`, `--integrar` e `--editar`.
+Duas rodadas independentes (uma moto de 219 formas e uma mini escavadeira) gastaram
+cerca de 10 KB de código auxiliar contra 106 KB, e a pessoa aceitou o resultado.
 
 [União de sólidos](encerrados/2026-09-28-uniao-de-solidos.md) fechou em
 2026-09-29 com `unir`, `subtrair` e `intersectar` no núcleo, o arredondamento

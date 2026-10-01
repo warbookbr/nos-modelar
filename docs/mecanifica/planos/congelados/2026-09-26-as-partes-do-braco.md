@@ -4,15 +4,16 @@
 **Congelado em:** 2026-09-29, por decisão da pessoa · **Base:** branch `claude/revisar-plano-ativo-cyj8c3`
 
 **Por que foi congelado:** a pessoa abriu o plano [o esboço sem conta à
-mão](../2026-09-29-o-esboco-sem-conta-a-mao.md), que melhora a ferramenta de
+mão](../encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md), que melhora a ferramenta de
 esboço, para o esboço deixar de custar coordenadas calculadas à mão antes de a
 modelagem do braço seguir. O plano das partes do braço tinha sido descongelado
 no mesmo dia, depois de o plano [união de sólidos](../encerrados/2026-09-28-uniao-de-solidos.md)
 fechar com `unir`, `subtrair`, `intersectar`, o arredondamento da costura e o
 ombro refeito e fixado.
 
-**Condição de descongelamento:** o plano do esboço fechar, ou a pessoa decidir
-antes. Este plano é o candidato principal para vir em seguida.
+**Condição de descongelamento:** o plano [o esboço detalhado coerente](../2026-10-01-o-esboco-detalhado-coerente.md)
+fechar, ou a pessoa decidir antes. O plano do esboço sem conta à mão fechou em
+2026-10-01, e este plano é o candidato principal para vir depois do novo.
 
 **O que a união deixou para este plano:** o ombro de coluna unida ao braço está
 fixo na montagem. O inventário do que cada parte restante pede ao núcleo está no

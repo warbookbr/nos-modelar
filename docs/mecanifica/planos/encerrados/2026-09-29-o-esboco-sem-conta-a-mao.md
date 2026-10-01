@@ -1,6 +1,6 @@
 # O esboço sem conta à mão
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite da pessoa
 
@@ -24,11 +24,10 @@ uma leitura em texto do que foi montado, formas para o que uma moto ou um braço
 pedem (tubo entre dois pontos, esfera, cone), uma forma de a mesma moto virar
 duas variantes por dois números, e um SVG que hoje passa de 2,6 MB em 11 s.
 
-O Mecanifica já resolve várias dessas dores para peças e montagens: a operação
-`encostar`, `espelha` e `arranja`, `TABELA` com `derivar`, portas publicadas com
-relações por porta na montagem e a auditoria de interseções. O esboço é um
-módulo independente do núcleo, e o custo de reaproveitar cada um deles é a
-primeira decisão do plano.
+O Mecanifica já resolve várias dessas dores para peças e montagens (`encostar`,
+`espelha`, `arranja`, `TABELA` com `derivar`, portas e auditoria de
+interseções), e o custo de reaproveitar cada uma, com o esboço independente do
+núcleo, foi a primeira decisão do plano.
 
 ## Resultado
 
@@ -40,28 +39,18 @@ sobreposto em cada vista, com o que cobre o quê, e propõe o conserto em milím
 verifica o esboço por texto antes de gerar a imagem, e o arquivo antigo continua
 gerando o mesmo desenho, byte a byte.
 
-## Estado de partida
-
-O módulo `modulos/esboco/` tinha numeração, `linhasCentro`, `ocultar`, legendas
-em lista, o campo `plano`, o "Pare e planeje" e o gate de contato opt-in.
-
 ## O que o estudo do Mecanifica decidiu
 
-Um estudo de leitura de 2026-09-29 mediu cada mecanismo contra o esboço. Só dois arquivos entram como estão: `procedural/nucleo/expressoes.js`, que
-aceita número, nome de parâmetro e `"=a+b*c"`, tem 92 linhas, nenhum import e
-teste, e a função `poseQueEncaixa` de `src/autoria/posicao-por-porta.js`, pura,
-que já calcula o centro e o ângulo de uma haste entre dois pontos (o garfo da
-moto saiu em 24,97°, contra os −25° digitados à mão). O resto se reimplementa
-dentro do módulo, sobre os prismas do esboço: `encostar` com direção e folga
-(cerca de 10 linhas sobre o `apoio()` do gate), `espelha` (cerca de 30, com a
-regra de nome explícito da cópia que o núcleo já usa) e o ponto nomeado (cerca
-de 8). Não servem, e ficam fora do plano: as interfaces de porta e as relações
-`assentaAnular` e `encaixaCilindrico`, que são validadores coaxiais em metro;
-o resolvedor e a montagem v5, que exigem peças com malha e portas resolvidas;
-os `vinculos` e as `etapas`; o `PLANO` estruturado com `criteriosDeReprovacao`;
-e `auditar-intersecoes-montagem`, que devolve estado sem milímetros e roda sete
-vezes mais devagar. O gate do esboço fica no módulo, porque mede distância e
-penetração em mm.
+Um estudo de leitura de 2026-09-29 mediu cada mecanismo contra o esboço. Só
+dois arquivos entram como estão: `procedural/nucleo/expressoes.js` (número, nome
+de parâmetro e `"=a+b*c"`, 92 linhas, sem import) e `poseQueEncaixa` de
+`src/autoria/posicao-por-porta.js`, que calcula o centro e o ângulo de uma haste
+entre dois pontos (o garfo saiu em 24,97°, contra os −25° digitados à mão). O
+resto se reimplementa sobre os prismas do esboço: `encostar`, `espelha` e o
+ponto nomeado. Não servem, e ficam fora: as interfaces de porta, as relações
+`assentaAnular` e `encaixaCilindrico`, o resolvedor e a montagem v5, os
+`vinculos`, as `etapas`, o `PLANO` do Mecanifica e `auditar-intersecoes-montagem`
+(sem milímetros e sete vezes mais lento). O gate do esboço fica no módulo.
 
 O esboço herda o contrato de declaração do Mecanifica: toda exceção declara
 `motivo` de pelo menos 15 caracteres, `atravessa` exige `max`, e `livre`, que
@@ -222,44 +211,25 @@ módulo, que é a referência do formato.
 5. `espelho`, `arranja`, `params` e expressões.
 6. O gate propondo o conserto e `--ajustar`.
 7. Componentes e as formas novas. Feita em 2026-09-30: `usa` com `roda`, `garfo`,
-   `quadro` e `mancal` (`modulos/esboco/componentes/`, expandidos em
-   `src/componentes.js`), o ponto `entre` e as formas `tubo`, `esfera`, `cone`,
-   `extrusao` e `chanfro`, com gate, espelho, arranjo e `--ajustar`. A moto
-   `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números.
-8. A validação da moto detalhada (2026-09-30) foi feita no mesmo dia: formas
-   curvas (`extrusao` côncava, `loft`, `revolucao`, gate por partes convexas);
-   desempenho na moto de 66 formas (`--analise` de 11 min para 36 s, 4,7 s com
-   `--rapido`); projeção agrupada por componente (10 grupos contra 107 achados);
-   `contato.juntas`, pontos-guia do `caminho` e `{ ancora, mm }`; leitura padrão só
-   com divergências, `--achado`, `plano` estruturado, esquema com "quis dizer" e o
-   Condutor (Maquete, Plano de detalhe, Unidade, Envelope, Portão e Marco, mapeados
-   no README ao Mecanifica). O módulo passou de 299 para 367 testes e `npm run gates`
-   fechou com 32/32 verdes.
-9. A referência e o fluxo. Feito em 2026-09-30: o fluxo na skill e no
-   `PARE-E-ANALISE.md`, a proibição de auditar por legenda, o Pare e planeje com
-   `plano.nivel`, `plano.medidas` e `plano.contrato`, a conferência contra a foto
-   (`plano.referencia`, `--referencia`), `--medidas-da-referencia`, o Envelope e
-   `--envelope`, e as fixtures com `.esperado.json`. O módulo passou de 367 para
-   419 testes. Falta o fechamento: o aceite da pessoa (item 8), o Fechamento e
-   mover o plano para encerrados.
-10. A análise do transcript da moto nova (47 min, 138 chamadas, 106 KB dos 146
-   KB escritos em Python que gera ou remenda o JSON, 14 recusas, 108 juntas em 29%
-   do arquivo, 2/3 delas dentro da mesma unidade) pediu duas partes, ambas em
-   `modulos/esboco`. A parte 10a (2026-09-30) trouxe `unidade` declarada na forma,
-   instância e espelho, `--mover` por instância, padrão e lista, `--mover-lote`,
-   `--replanejar` que preserva o agrupamento, o `atravessa` da mesma unidade sem
-   `motivo` nem `max`, `--detalhar` e `--integrar`: a moto curva dá 7 unidades com 0
-   `--mover`; 419 para 444 testes. A parte 10b foi feita em 2026-10-01: `--editar`
-   (campos, `sub`, `centro[1]`, `--remover`, `--adicionar`, recusa sem gravar e
-   leitura padrão depois), `estilos` e cor por unidade, `simetrico` implícito,
-   perfis `estrela`, `arco`, `circulo` e `polar`, Envelope por forma
-   (`substitui`), `--unidade` com quatro vistas limpas e `plano.pecas` (classe
-   `peca`, a mais grave, no Portão da Conferência). Medido: 444 para 482 testes
-   (`tests/edicao.test.js`, fixture `estilos-perfis.esboco.json` com 8 formas e 3
-   geradores); SVG e leitura de 8 fixtures antigas iguais byte a byte contra a
-   versão anterior. No JSON da moto nova, 27 entradas `espelha` e 66 pontos de
-   perfil (4 formas) viram declarações curtas. O item 20 ainda não foi medido: pede
-   refazer a moto pelo fluxo novo e contar o transcript.
+   `quadro` e `mancal`, o ponto `entre`, e `tubo`, `esfera`, `cone`,
+   `extrusao` e `chanfro`; a moto de prova com componentes ficou com 35 números
+   escritos à mão.
+8. A validação da moto detalhada (2026-09-30), feita no mesmo dia: formas
+   curvas (`extrusao` côncava, `loft`, `revolucao`), desempenho (`--analise` de
+   11 min para 36 s, teste da moto de 47 s para 3,3 s), `contato.juntas`,
+   pontos-guia, `{ ancora, mm }`, leitura padrão só com divergências, imagem
+   por achado, `plano` estruturado, esquema do JSON e o Condutor com Plano de
+   detalhe, Envelope e Marco, descritos no README do módulo.
+9. A referência e o fluxo (2026-09-30): o fluxo na skill e no `PARE-E-ANALISE.md`,
+   a conferência contra a foto, `--medidas-da-referencia`, o `--envelope` e as
+   fixtures com `.esperado.json`.
+10. A análise do transcript da moto nova (47 min, 138 chamadas, 106 KB de
+    código auxiliar) pediu e entregou, em 2026-10-01: `unidade` declarada,
+    junta dentro da mesma unidade sem declaração, `--detalhar` e `--integrar`,
+    `--mover-lote`, caminhos pelo `INIT_CWD`, `--editar`, `estilos`, simetria
+    implícita, perfis por função, Envelope por forma, `--unidade` e
+    `plano.pecas`. Duas rodadas de medição (moto e mini escavadeira)
+    confirmaram o ganho e acharam os seis bugs que seguem para o plano novo.
 
 ## Riscos e desvios
 
@@ -279,19 +249,50 @@ entra no relato como aviso e não como reprovação.
 
 ## Fechamento
 
-A preencher.
+Fechado em 2026-10-01. O módulo `modulos/esboco/` passou a descrever o esboço por
+relações, parâmetros e unidades, e não por coordenadas calculadas à mão. Em dez
+fatias entraram as âncoras nomeadas e `--descrever` com `--mudou`; a
+sobreposição na projeção com vista explodida; `tubo`, `encosta` e `alinha`;
+`espelha`, `arranja`, parâmetros e expressões; o gate que propõe o conserto em
+milímetros e o `--ajustar`; os componentes `roda`, `garfo`, `quadro` e
+`mancal` e as formas `esfera`, `cone`, `extrusao`, `chanfro`, `loft` e
+`revolucao`; o desempenho (`--analise` de 11 min para 36 s na moto de 66
+formas); o contrato de relações com `juntas`, `plano.medidas`, `plano.contrato`
+e `plano.pecas`; a leitura padrão só com divergências e a imagem por achado; o
+Condutor com unidades, Envelope e Marcos; a conferência contra a foto; e, na
+décima fatia, `unidade` declarada, junta dentro da mesma unidade sem declaração,
+`--detalhar` e `--integrar`, `--editar`, `estilos`, simetria implícita, perfis
+por função, Envelope por forma e `--unidade`. O módulo foi de 29 para 482
+testes e `npm run gates` fecha com 32/32 verdes.
+
+O gate de saída ficou provado assim. A moto de doze formas sai sem centro
+calculado à mão em `moto-parametros` (41 números escritos contra 83) e em
+`moto-componentes` (35); a moto de formas curvas tem 98 números, 71 deles dos
+perfis de tanque, banco, carenagem e farol, que a primeira não tinha. A
+conferência contra a foto foi provada com silhueta sintética, e ainda não com
+foto real. O item 20 foi medido no transcript de duas rodadas independentes: a
+moto de 165 formas escrita à mão gastou 138 chamadas e 106 KB de código que
+gera ou remenda o JSON, e a moto nova de 219 formas e a mini escavadeira de 173
+formas gastaram cerca de 10 KB, sem Python, com mais JSON escrito direto (47 KB
+na moto). O crítico cego deu 7 de 10 à moto nova, contra 6,5 à primeira. Em
+2026-10-01 a pessoa viu a moto e a mini escavadeira, as reconheceu como o que
+deviam ser e aceitou a qualidade para fechar o plano, com os defeitos
+restantes indo para o plano seguinte.
+
+Ficou fora, e vai para [o esboço detalhado coerente](../2026-10-01-o-esboco-detalhado-coerente.md):
+seis bugs achados nas duas rodadas (espelho de instância com `unidade`,
+`--feito` com colisão aberta, tolerância do `--detalhar`, formato do JSON no
+`--editar` e `--integrar`, Marcos pelo custo congelado, mensagem do máximo
+implícito), a coerência funcional que o gate de contato não vê (motor preso ao
+quadro, escapamento ligado, rabeta) e a `roda` com raios. A ponte entre o
+esboço e o Mecanifica continua para depois, e `--sugerir` ainda leva 32 s por
+opção.
 
 ## Depois deste plano
 
-O candidato principal é [as partes do braço](congelados/2026-09-26-as-partes-do-braco.md),
-congelado em 2026-09-29 para dar lugar a este.
-
-A ponte entre o esboço e o Mecanifica também fica para depois. O esboço
-exportaria um esqueleto de montagem com uma parte por forma, com posição,
-medidas, portas nas âncoras e as relações do contrato. O Mecanifica abriria cada
-parte como um rascunho com o volume do esboço, a IA trocaria o rascunho pela
-forma real, e o gate conferiria que a peça real cabe no volume do esboço e
-mantém as portas nos mesmos lugares. O esboço passaria a ser o lugar onde se
-acerta a composição e a proporção, e o núcleo cuidaria só da forma de cada peça.
-Isso exige decidir antes como o módulo, hoje independente do núcleo, entrega o
-esqueleto sem importá-lo.
+O plano seguinte é [o esboço detalhado coerente](../2026-10-01-o-esboco-detalhado-coerente.md),
+e depois dele [as partes do braço](../congelados/2026-09-26-as-partes-do-braco.md),
+congeladas em 2026-09-29 para dar lugar a este. A ponte entre o esboço e o
+Mecanifica (um esqueleto de montagem por forma, com o gate de encaixe da peça
+real no volume do esboço) também fica para depois, e exige decidir antes como o
+módulo, independente do núcleo, entrega o esqueleto sem importá-lo.

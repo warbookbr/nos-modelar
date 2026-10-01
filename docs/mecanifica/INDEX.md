@@ -178,7 +178,7 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [o esboço sem conta à mão](planos/2026-09-29-o-esboco-sem-conta-a-mao.md), aberto em 2026-09-29; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) ficou congelado como candidato principal para vir em seguida. Rascunho aberto: [o que o
+- Plano ativo: [o esboço detalhado coerente](planos/2026-10-01-o-esboco-detalhado-coerente.md), aberto em 2026-10-01 depois de [o esboço sem conta à mão](planos/encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md) fechar; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas como candidato principal para vir depois. Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting
