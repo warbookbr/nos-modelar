@@ -50,7 +50,7 @@ peças sem função antes de a imagem chegar à pessoa.
   encosta em nada, ou várias pontas que terminam no mesmo ponto sem forma que as
   una, sem declaração de `ponta`;
 - o crítico visual por unidade já no `--feito` de unidade com mais de 8 formas
-  (e também no Marco): a skill despacha o crítico cego com as quatro imagens
+  (e também no Marco): o orquestrador despacha o crítico cego com as quatro imagens
   `--unidade`, em resolução suficiente (`--largura <px>`), e a `funcao` da
   unidade, sem a história da construção; ele responde que pontas ficam no ar, o
   que atravessa o quê, o que está fora do lugar em relação à parte a que deveria
@@ -67,7 +67,16 @@ peças sem função antes de a imagem chegar à pessoa.
   que contorna coroa e pinhão"); unidade com mais de 8 formas sem `funcao` não
   passa no `--feito`;
 - `--medidas` em texto, com o valor medido ao lado de cada medida do plano, e
-  `--feito` que imprime só os Marcos novos.
+  `--feito` que imprime só os Marcos novos;
+- a orquestração (fatia 6): a skill `esbocar-opcoes` volta a ser só a escolha
+  de forma no alinhamento e o fluxo do esboço detalhado vai para a skill nova
+  `esboco-detalhado`; a skill `laco-do-esboco` conduz a sessão principal
+  (despacha um `esbocista` por objeto, espera cada `--feito`, despacha o crítico
+  cego, devolve nota e motivo, registra o veredito, decide refazer ou parar e
+  mede no fim); o agente `esbocista` modela um objeto pela `esboco-detalhado`,
+  para a cada `--feito` com brief e não mexe no código do módulo; o
+  `critico-visual` passa a cobrir o julgamento de unidade pela `funcao`, sem
+  desenho alvo.
 
 ## Excluído
 
@@ -82,22 +91,24 @@ peças sem função antes de a imagem chegar à pessoa.
 2. `plano.contrato.fixa` reprova uma peça presa por um só ponto e aprova a presa
    por dois, com teste.
 3. A `roda` com raios, o perfil de pneu e de disco e o `envolve` saem sem Python.
-4. A moto refeita pelo fluxo, sem os defeitos que o crítico apontou (motor preso,
-   escapamento com terminação, rabeta com suporte), tem nota 8 ou mais do crítico
-   cego por unidade.
-5. A mini escavadeira refeita não precisa contornar nenhum comando.
+4. A moto e a escavadeira refeitas pelo `laco-do-esboco` têm nota 8 ou mais do
+   crítico cego em cada unidade com brief, dada antes da unidade seguinte (o
+   `--condutor --historico` mostra o veredito de cada uma), e a moto sai sem os
+   defeitos já apontados (motor preso, escapamento com terminação, rabeta com
+   suporte).
+5. Nenhuma das duas precisa contornar um comando.
 6. A pessoa confirma, olhando a moto e a escavadeira, que as ligações faltantes
    sumiram.
 7. `npm run gates --completo` passa.
 
 ## Fatias
 
-1. Os seis bugs e os ajustes de comando, com teste (feita; `correcoes-do-fluxo.test.js`).
+1. (feita) Os seis bugs e os ajustes de comando, com teste (`correcoes-do-fluxo.test.js`).
 2. (feita) `plano.contrato.fixa`, a `roda` com raios, os perfis de pneu e de disco, o `envolve`, a ponta livre, a `funcao` por unidade e o crítico por unidade no `--feito`.
 3. (feita) O crítico por unidade também no Marco, `--medidas` e o Marco incremental (este já vinha da fatia 1).
 4. (feita) As ferramentas para a IA: `modulos` e biblioteca, `--corte` e `--explodir`,
    `ligar` e `encaixa`, `--ligacoes`, prévia rápida, `--unidade` incremental e `--zoom-forma`.
-5. Os treze atritos da primeira refeita (`fatia5/ATRITOS.md` no scratchpad da
+5. (feita) Os treze atritos da primeira refeita (`fatia5/ATRITOS.md` no scratchpad da
    sessão), cada um com teste que falhava antes: referências de módulo dentro
    de `envolve`, `estilo` e `arranja`; `arranja` em instância espelhada ou
    oculta; `--integrar` devolvendo `modulos` e `simetrico`; `--editar` em
@@ -108,12 +119,16 @@ peças sem função antes de a imagem chegar à pessoa.
    passa a dizer que quem modela sem poder despachar agente para em cada
    `--feito` e devolve o brief a quem o chamou, que despacha o crítico e devolve
    a nota antes da unidade seguinte.
-6. A moto e a escavadeira refeitas outra vez, uma por agente, com o crítico
-   entre unidades, medidas no transcript (quantas formas usam relação em vez de
-   coordenada absoluta, imagens abertas, contornos), anatomia prévia opcional, e
-   o fechamento. A primeira refeita fica como medição: 11 e 10 formas absolutas
-   em 196 e 204, 18 imagens abertas em 338 chamadas, nenhum crítico entre
-   unidades.
+6. A orquestração: separar a `esboco-detalhado` da `esbocar-opcoes`, criar a
+   `laco-do-esboco` e o agente `esbocista`, ajustar o `critico-visual` e
+   atualizar quem aponta para a skill antiga (README do módulo,
+   `PARE-E-ANALISE.md`, `docs/mecanifica/usar/README.md`, mapa).
+7. A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
+   `esbocista` por objeto, com o crítico entre unidades, medidas no transcript
+   (formas por relação contra coordenada absoluta, imagens abertas, contornos),
+   anatomia prévia opcional, e o fechamento. A primeira refeita fica como
+   medição: 11 e 10 formas absolutas em 196 e 204, 18 imagens abertas em 338
+   chamadas, nenhum crítico entre unidades e treze contornos.
 
 ## Riscos e desvios
 
@@ -121,7 +136,9 @@ O risco maior é a coerência funcional ser o que nenhuma medida pega, e o plano
 virar uma lista infinita de regras por objeto. O desvio é manter a conectividade
 genérica (pontos de contato distintos, sem citar objeto) e deixar o resto ao
 crítico por unidade. Se o crítico e a pessoa divergirem de forma sistemática, o
-plano para e volta à pessoa.
+plano para e volta à pessoa. A ponte do crítico pela sessão principal custa uma
+volta por unidade; se ela tornar a refeita lenta demais, a alternativa é o
+crítico só nas unidades com mais formas e no Marco, decidida com a pessoa.
 
 ## Fechamento
 
