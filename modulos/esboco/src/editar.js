@@ -73,11 +73,49 @@ function gravar(forma, caminho, valor, onde) {
   return antes;
 }
 
+/* Põe a forma no fim da lista, ou, com `unidade`, logo depois da última entrada que declara essa unidade (sem nenhuma, no fim). */
+function acrescentar(lista, forma, unidade) {
+  if (unidade === undefined) { lista.push(forma); return; }
+  let k = -1;
+  lista.forEach((x, i) => { if (objeto(x) && x.unidade === unidade) k = i; });
+  lista.splice(k < 0 ? lista.length : k + 1, 0, forma);
+}
+
+/* Tira do contato (raiz e opções) os pares e as peças de junta que citam a forma removida (ou, numa instância, as formas
+   dela), e a junta que fica com menos de duas peças. Devolve quantos saíram: { pares, juntas, pecas }. */
+function limparContatoDe(esboco, id) {
+  const cita = (q) => q === id || (typeof q === 'string' && q.startsWith(`${id}.`) && !q.includes('*'));
+  const removidos = { pares: 0, juntas: 0, pecas: 0 };
+  for (const c of [esboco.contato, ...(esboco.opcoes ?? []).map((o) => (objeto(o) ? o.contato : undefined))]) {
+    if (!objeto(c)) continue;
+    if (Array.isArray(c.pares)) {
+      const fica = c.pares.filter((p) => !(objeto(p) && (cita(p.a) || cita(p.b))));
+      removidos.pares += c.pares.length - fica.length;
+      c.pares = fica;
+      if (fica.length === 0) delete c.pares;
+    }
+    if (Array.isArray(c.juntas)) {
+      const fica = [];
+      for (const j of c.juntas) {
+        if (!objeto(j) || !Array.isArray(j.pecas) || !j.pecas.some(cita)) { fica.push(j); continue; }
+        const pecas = j.pecas.filter((q) => !cita(q));
+        removidos.pecas += j.pecas.length - pecas.length;
+        if (pecas.length < 2) removidos.juntas += 1; else fica.push({ ...j, pecas });
+      }
+      c.juntas = fica;
+      if (fica.length === 0) delete c.juntas;
+    }
+  }
+  return removidos;
+}
+
 /* Aplica as edições em ordem (atribuições, remoções, acréscimos) numa cópia do esboço bruto. `atribuicoes` são textos
    "<forma>.<campo>=<valor>", `remover` uma lista de ids, `adicionar` uma lista de formas (objetos ou JSON em texto).
    Devolve { esboco, mudancas: [{ acao, forma, campo?, antes?, depois?, listas }] }. */
-export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar = [] } = {}) {
+export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar = [], unidade } = {}) {
   exigir(objeto(bruto), 'editar: o esboço deve ser um objeto JSON');
+  exigir(unidade === undefined || (typeof unidade === 'string' && unidade.trim()), 'editar: --unidade precisa do nome da unidade em que as formas de --adicionar entram');
+  exigir(unidade === undefined || adicionar.length > 0, 'editar: --unidade vale junto de --adicionar (as formas acrescentadas entram nessa unidade)');
   const esboco = clone(bruto);
   const listas = listasDeFormas(esboco);
   const mudancas = [];
@@ -88,6 +126,24 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
     const valor = lerValor(a.slice(i + 1));
     const todos = [...new Set(listas.flatMap((l) => idsDe(l.lista)))];
     const s = separar(chave, todos);
+    /* `pontos.<nome>` e `parametros.<nome>`: o ponto nomeado ou o parâmetro, onde ele está declarado (na raiz e/ou nas opções) */
+    const bloco = s ? null : ['pontos', 'parametros'].find((b) => chave.startsWith(`${b}.`));
+    if (bloco) {
+      const caminho = passos(chave, `editar: "${chave}"`);
+      const nome = caminho[1];
+      exigir(typeof nome === 'string' && caminho.length > 1, `editar: "${chave}" cita só "${bloco}": diga o nome (${bloco}.<nome>=<valor>)`);
+      const donos = [esboco, ...(esboco.opcoes ?? [])].filter((c) => objeto(c) && objeto(c[bloco]) && Object.hasOwn(c[bloco], nome));
+      if (donos.length === 0) {
+        exigir(valor !== null, `editar: "${chave}": ${bloco === 'pontos' ? 'o ponto' : 'o parâmetro'} "${nome}" não existe (nomes: ${[...new Set([esboco, ...(esboco.opcoes ?? [])].flatMap((c) => (objeto(c) && objeto(c[bloco]) ? Object.keys(c[bloco]) : [])))].join(', ') || 'nenhum'})`);
+        exigir(caminho.length === 2, `editar: "${chave}": ${bloco === 'pontos' ? 'o ponto' : 'o parâmetro'} "${nome}" não existe, e um índice ou sub-campo só edita um que já existe; declare-o inteiro primeiro (${bloco}.${nome}=<valor>)`);
+        esboco[bloco] = objeto(esboco[bloco]) ? esboco[bloco] : {};
+        donos.push(esboco);
+      }
+      let antes;
+      for (const c of donos) antes = gravar(c, caminho, clone(valor), `editar: "${chave}"`);
+      mudancas.push({ acao: 'editar', forma: bloco, campo: chave.slice(bloco.length + 1), antes: antes ?? null, depois: valor });
+      continue;
+    }
     if (!s) {
       const id = chave.split('.')[0];
       exigir(false, `editar: "${chave}" não começa por uma forma declarada${quisDizer(id, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''}); uma peça de componente (instância.parte) se muda pela instância`);
@@ -111,7 +167,7 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
       const k = lista.findIndex((x) => objeto(x) && x.id === id);
       if (k >= 0) lista.splice(k, 1);
     }
-    mudancas.push({ acao: 'remover', forma: id });
+    mudancas.push({ acao: 'remover', forma: id, contato: limparContatoDe(esboco, id) });
   }
   for (const entrada of adicionar) {
     let nova = entrada;
@@ -126,15 +182,17 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
         exigir(Object.keys(f).length === 1, `editar: a entrada de arranjo só tem o campo "arranja"; retire "${Object.keys(f).find((k) => k !== 'arranja')}"`);
         const todos = [...new Set(listas.flatMap((l) => idsDe(l.lista)))];
         exigir(todos.includes(f.arranja.forma), `editar: --adicionar o arranjo de "${f.arranja.forma}": não há forma com esse id${quisDizer(f.arranja.forma, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
-        for (const { lista } of listas) lista.push(clone(f));
-        mudancas.push({ acao: 'adicionar', forma: `arranja de ${f.arranja.forma}`, arranjo: true });
+        for (const { lista } of listas) acrescentar(lista, clone(f), unidade);
+        mudancas.push({ acao: 'adicionar', forma: `arranja de ${f.arranja.forma}`, arranjo: true, ...(unidade === undefined ? {} : { unidade }) });
         continue;
       }
       exigir(typeof f.id === 'string' && f.id, 'editar: a forma de --adicionar precisa de "id" (ou, num arranjo, só de "arranja")');
       const todos = new Set(listas.flatMap((l) => idsDe(l.lista)));
       exigir(!todos.has(f.id), `editar: --adicionar "${f.id}": já existe uma forma com esse id (use <forma>.<campo>=<valor> para mudar a que existe)`);
-      for (const { lista } of listas) lista.push(clone(f));
-      mudancas.push({ acao: 'adicionar', forma: f.id });
+      const nova = clone(f);
+      if (unidade !== undefined && nova.unidade === undefined) nova.unidade = unidade;
+      for (const { lista } of listas) acrescentar(lista, clone(nova), unidade);
+      mudancas.push({ acao: 'adicionar', forma: f.id, ...(unidade === undefined ? {} : { unidade: nova.unidade }) });
     }
   }
   return { esboco, mudancas };
@@ -143,8 +201,12 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
 /* O relato das mudanças, uma linha cada. */
 export function formatarMudancas(mudancas) {
   return mudancas.map((m) => {
-    if (m.acao === 'remover') return `removida a forma ${m.forma}`;
-    if (m.acao === 'adicionar') return m.arranjo ? `adicionado o ${m.forma}` : `adicionada a forma ${m.forma}`;
+    if (m.acao === 'remover') {
+      const { pares = 0, juntas = 0, pecas = 0 } = m.contato ?? {};
+      const do_contato = [pares > 0 ? `${pares} ${pares === 1 ? 'par' : 'pares'}` : null, pecas > 0 ? `${pecas} ${pecas === 1 ? 'peça' : 'peças'} de junta` : null, juntas > 0 ? `${juntas} ${juntas === 1 ? 'junta que ficou' : 'juntas que ficaram'} com menos de duas peças` : null].filter(Boolean);
+      return `removida a forma ${m.forma}${do_contato.length ? `; removido do contato por citá-la: ${do_contato.join(', ')}` : ''}`;
+    }
+    if (m.acao === 'adicionar') return `${m.arranjo ? `adicionado o ${m.forma}` : `adicionada a forma ${m.forma}`}${m.unidade ? ` (unidade ${m.unidade})` : ''}`;
     return `${m.forma}.${m.campo}: ${m.antes === null ? '(sem valor)' : texto(m.antes)} -> ${m.depois === null ? '(retirado)' : texto(m.depois)}`;
   });
 }

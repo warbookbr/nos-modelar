@@ -8,7 +8,7 @@ import { quisDizer } from './parecido.js';
 
 export const TIPOS_DE_LIGACAO = ['haste', 'tubo', 'cinta'];
 const CHAVES_DA_LIGACAO = ['de', 'para', 'tipo', 'diametro', 'largura', 'espessura'];
-const CAMPOS_DA_FORMA = ['id', 'ligar', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta', 'estilo', 'desloca', 'substitui', 'linhaCentro', 'ocultar'];
+const CAMPOS_DA_FORMA = ['id', 'ligar', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta', 'estilo', 'desloca', 'substitui', 'linhaCentro', 'ocultar', 'lado'];
 const EXEMPLO = '{ "id": "haste1", "ligar": { "de": "A.topo", "para": "B.base", "tipo": "haste", "diametro": 8 } }';
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };

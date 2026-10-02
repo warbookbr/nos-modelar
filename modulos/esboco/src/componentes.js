@@ -38,7 +38,7 @@ import { traduzirLigacoes } from './ligar.js';
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const clone = (v) => JSON.parse(JSON.stringify(v));
-const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta'];
+const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta', 'lado'];
 const ANCORAS_DA_FORMA = ['centro', 'inicio', 'fim', '+x', '-x', '+y', '-y', '+z', '-z'];
 
 export const NOMES_DOS_COMPONENTES = Object.keys(COMPONENTES);
@@ -141,6 +141,8 @@ function reescreverForma(f, { ponto, id }) {
   if (objeto(g.alinha) && g.alinha.com !== undefined) g.alinha = { ...g.alinha, com: typeof g.alinha.com === 'string' ? ponto(g.alinha.com, true) : pt(g.alinha.com) };
   for (const k of ['centro', 'de', 'para']) if (g[k] !== undefined) g[k] = pt(g[k]);
   if (Array.isArray(g.caminho)) g.caminho = g.caminho.map(pt);
+  if (Array.isArray(g.circulos)) g.circulos = g.circulos.map((c) => (objeto(c) && c.centro !== undefined ? { ...c, centro: pt(c.centro) } : c));
+  if (objeto(g.espelha) && typeof g.espelha.forma === 'string') g.espelha = { ...g.espelha, forma: id(g.espelha.forma) };
   if (objeto(g.encaixa)) g.encaixa = { ...g.encaixa, ...(g.encaixa.em === undefined ? {} : { em: pt(g.encaixa.em) }), ...(typeof g.encaixa.ancora === 'string' ? { ancora: ponto(g.encaixa.ancora) } : {}) };
   if (objeto(g.arranja)) {
     g.arranja = { ...g.arranja };
@@ -275,7 +277,8 @@ export function expandirComponentes(formas, ctx) {
       if (g.id === undefined && objeto(h.arranja)) {
         if (Array.isArray(h.arranja.nomes)) h.arranja = { ...h.arranja, nomes: h.arranja.nomes.map((n) => `${f.id}.${n}`) };
         /* as cópias são da instância (unidade do Condutor, mapa de ligações), mas não são a forma principal dela */
-        h.daInstancia = { id: f.id, principal: false };
+        /* o `oculto` e a `opacidade` da instância vão junto: a entrada de arranjo não os aceita no campo próprio */
+        h.daInstancia = { id: f.id, principal: false, ...(f.oculto === undefined ? {} : { oculto: f.oculto }), ...(f.opacidade === undefined ? {} : { opacidade: f.opacidade }) };
         return h;
       }
       h.id = `${f.id}.${g.id}`;
@@ -300,7 +303,23 @@ export function expandirComponentes(formas, ctx) {
     const contexto = `${onde}, espelho "${f.id}"`;
     const extras = Object.keys(f).filter((k) => !['id', 'espelha', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade'].includes(k));
     exigir(extras.length === 0, `${contexto}: o espelho de um componente só aceita "id", "espelha", "cor", "rotulo", "oculto", "opacidade" e "unidade"; retire "${extras[0]}"`);
-    return expandidas.get(fonte).map((g) => {
+    return expandidas.get(fonte).flatMap((g) => {
+      /* a entrada `arranja` do módulo não tem id: o espelho dela é o espelho de cada cópia que ela vai gerar */
+      if (g.id === undefined && objeto(g.arranja)) {
+        const a = g.arranja;
+        if (!Number.isInteger(a.total) || a.total < 2) return [];
+        const nomes = Array.isArray(a.nomes) ? a.nomes : Array.from({ length: a.total - 1 }, (_, k) => `${a.forma}${k + 1}`);
+        return nomes.map((nome) => {
+          const h = { id: `${f.id}.${nome.slice(fonte.length + 1)}`, espelha: { ...e, forma: nome }, daInstancia: { id: f.id, principal: false } };
+          const oculto = f.oculto ?? g.daInstancia?.oculto;
+          const opacidade = f.opacidade ?? g.daInstancia?.opacidade;
+          if (oculto !== undefined) h.oculto = oculto;
+          if (opacidade !== undefined) h.opacidade = opacidade;
+          if (f.cor !== undefined) h.cor = f.cor;
+          if (f.unidade !== undefined) h.unidade = f.unidade;
+          return h;
+        });
+      }
       const local = g.id.slice(fonte.length + 1);
       const principal = local === comp.principal;
       const h = { id: `${f.id}.${local}`, espelha: { ...e, forma: g.id }, daInstancia: { id: f.id, principal } };
@@ -310,7 +329,7 @@ export function expandirComponentes(formas, ctx) {
       if (f.opacidade !== undefined) h.opacidade = f.opacidade; else if (g.opacidade !== undefined) h.opacidade = g.opacidade;
       if (f.unidade !== undefined) h.unidade = f.unidade; else if (g.unidade !== undefined) h.unidade = g.unidade;
       if (principal && f.rotulo !== undefined) h.rotulo = f.rotulo;
-      return h;
+      return [h];
     });
   };
 

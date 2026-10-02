@@ -98,7 +98,6 @@ describe('--editar', () => {
     expect(() => editarArquivo(arquivo, { atribuicoes: ['cubo.diametroo=70'] })).toThrow(/o campo "diametroo" não existe.*quis dizer "diametro".*o arquivo não foi alterado/s);
     expect(() => editarArquivo(arquivo, { atribuicoes: ['cubo.cor=roxoclaro'] })).toThrow(/"cor" com o valor "roxoclaro" deve ser um nome/);
     expect(() => editarArquivo(arquivo, { atribuicoes: ['cubo.eixo="w"'] })).toThrow(/"eixo" com o valor "w" deve ser um de x, y, z/);
-    expect(() => editarArquivo(arquivo, { remover: ['suporteE'] })).toThrow(/contato.juntas\[1\].pecas cita "suporteE", que não é uma forma visível.*o arquivo não foi alterado/s);
     expect(() => editarArquivo(arquivo, { remover: ['cubo'] })).toThrow(/o arquivo não foi alterado/);
     expect(readFileSync(arquivo, 'utf8')).toBe(antes);
   });

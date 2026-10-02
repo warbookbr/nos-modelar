@@ -435,8 +435,8 @@ export function detalharArquivo(arquivo, unidade, destino) {
 }
 
 /* `--integrar <unidade> <arquivo-detalhado>`: troca no mestre as formas da unidade pelas do detalhado, regrava o mestre e
-   mantém o estado do Condutor (a unidade continua, e o Envelope é conferido contra o detalhado). Não grava nada se a troca
-   não resolve. */
+   mantém o estado do Condutor (a unidade continua, e o Envelope é conferido contra o detalhado) e devolve ao mestre o `modulos` e
+   o `simetrico` que o detalhado mudou. Não grava nada se a troca não resolve nem se o detalhe não cabe no Envelope. */
 export function integrarArquivo(arquivo, unidade, detalhado) {
   const caminho = resolverCaminho(arquivo);
   const texto = readFileSync(caminho, 'utf8');
@@ -445,13 +445,18 @@ export function integrarArquivo(arquivo, unidade, detalhado) {
   let estado = null;
   try { estado = JSON.parse(readFileSync(memoria, 'utf8')); } catch { /* sem estado */ }
   const r = integrarUnidade(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')), { arquivo: basename(detalhado) });
+  /* o detalhe que não cabe no Envelope não é gravado: o mestre e o estado ficam como estavam */
+  if (r.envelope && !r.envelope.ok) {
+    return { texto: `unidade ${unidade} NÃO integrada em ${basename(caminho)}: o detalhe não cabe no Envelope, e nada foi gravado (o esboço e o estado do Condutor ficaram como estavam)\n${formatarEnvelope(r.envelope, basename(detalhado))}caminhos: ajuste o detalhe para caber no Envelope e integre de novo; ou, se o Envelope da maquete é que precisa mudar, rode --condutor --replanejar --motivo <texto> antes (o Envelope é recalculado a partir das formas do mestre) e integre depois\n`, resultado: r, gravado: false };
+  }
   writeFileSync(caminho, serializarComoOriginal(r.mestre, texto));
   if (r.estado) writeFileSync(memoria, `${JSON.stringify(r.estado, null, 2)}\n`);
   const L = [`unidade ${unidade} integrada em ${basename(caminho)}: ${r.formas.length} ${r.formas.length === 1 ? 'forma' : 'formas'} (${r.formas.slice(0, 8).join(', ')}${r.formas.length > 8 ? ', ...' : ''})`];
+  if (r.devolvidos.length > 0) L.push(`devolvido ao mestre (editado no detalhado): ${r.devolvidos.join('; ')}`);
   const { pares, juntas, pecas } = r.removidos;
   if (pares + juntas + pecas > 0) L.push(`removido do contato por citar formas que saíram: ${pares} ${pares === 1 ? 'par' : 'pares'}, ${juntas} ${juntas === 1 ? 'junta' : 'juntas'}, ${pecas} ${pecas === 1 ? 'peça' : 'peças'} de junta`);
   L.push(r.estado ? 'o estado do Condutor foi mantido (a unidade continua onde estava)' : `sem estado do Condutor (${basename(memoria)}): só o esboço foi regravado`);
-  return { texto: `${L.join('\n')}\n${r.envelope ? formatarEnvelope(r.envelope, basename(detalhado)) : ''}`, resultado: r };
+  return { texto: `${L.join('\n')}\n${r.envelope ? formatarEnvelope(r.envelope, basename(detalhado)) : ''}`, resultado: r, gravado: true };
 }
 
 /* `--corte <eixo>=<valor> [--lado +|-]`: o `corte` do esboço. O valor é número em mm, nome de parâmetro ou "<forma>.<âncora>". */
@@ -704,14 +709,14 @@ export function ligacoesArquivo(arquivo, { unidade = null, forma = null } = {}) 
 /* `--editar <arquivo> <forma>.<campo>=<valor> ...`, `--remover <forma>` e `--adicionar <json-da-forma>`: muda o JSON declarado
    sem regravá-lo à mão. Só grava se o esboço editado passa pelo esquema e resolve; sem isso diz o campo e o válido e não
    toca o arquivo. Imprime as mudanças e a leitura padrão das divergências depois delas. */
-export function editarArquivo(arquivo, { atribuicoes = [], remover = [], adicionar = [] } = {}) {
+export function editarArquivo(arquivo, { atribuicoes = [], remover = [], adicionar = [], unidade } = {}) {
   const caminho = resolverCaminho(arquivo);
   const texto = readFileSync(caminho, 'utf8');
   if (atribuicoes.length + remover.length + adicionar.length === 0) throw new ErroDeEsboco('--editar precisa de pelo menos uma edição: <forma>.<campo>=<valor>, --remover <forma> ou --adicionar <json-da-forma>');
   let medido;
   let editado;
   try {
-    editado = editarEsboco(JSON.parse(texto), { atribuicoes, remover, adicionar });
+    editado = editarEsboco(JSON.parse(texto), { atribuicoes, remover, adicionar, unidade });
     medido = medirEsboco(editado.esboco, { projecao: false, referencias: referenciasDoEsboco(editado.esboco, dirname(caminho)), unidades: unidadesGravadas(caminho) });
   } catch (e) {
     if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`${e.message} (o arquivo não foi alterado)`);
@@ -828,7 +833,7 @@ export function lerArgumentos(argv) {
   const arquivoDoEditar = editar.length > 0 && !editar[0].includes('=') ? editar[0] : undefined;
   const atribuicoes = arquivoDoEditar === undefined ? editar : editar.slice(1);
   const alvo = valores.get('--condutor') ?? arquivoDoEditar ?? posicionais[0];
-  return { alvo, edicao: { atribuicoes, remover: remover.filter((x) => x !== undefined), adicionar: adicionar.filter((x) => x !== undefined) }, tem: (f) => flags.has(f), valor: (f, k = 0) => valores.get(k === 0 ? f : `${f}#${k + 1}`), zoom: argv.find((a) => a.startsWith('--zoom=')) };
+  return { alvo, edicao: { atribuicoes, remover: remover.filter((x) => x !== undefined), adicionar: adicionar.filter((x) => x !== undefined), ...(valores.get('--unidade') === undefined ? {} : { unidade: valores.get('--unidade') }) }, tem: (f) => flags.has(f), valor: (f, k = 0) => valores.get(k === 0 ? f : `${f}#${k + 1}`), zoom: argv.find((a) => a.startsWith('--zoom=')) };
 }
 
 async function principal(argv) {
@@ -844,7 +849,7 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --veredito <unidade> --nota <0-10> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade>] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja>]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --veredito <unidade> --nota <0-10> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade>] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');

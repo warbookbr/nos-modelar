@@ -114,6 +114,39 @@ function juntarNomes(mestre, detalhado, campo) {
   }
 }
 
+const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/* Devolve ao mestre o que o detalhado muda fora da lista de formas: os `modulos` (módulo novo entra, módulo que o detalhado
+   alterou passa a ser o do detalhado) e o `simetrico` da raiz e de cada unidade (o do mestre só muda se ele não tinha). Um
+   `simetrico` que o mestre já tem com outro valor é conflito e a integração é recusada, dizendo qual. O que o detalhado
+   apagou não volta (o mestre mantém). Devolve a lista, em texto, do que voltou. */
+function devolverAoMestre(mestre, detalhado) {
+  const voltou = [];
+  if (objeto(detalhado?.modulos)) {
+    for (const [nome, m] of Object.entries(detalhado.modulos)) {
+      const atual = objeto(mestre.modulos) ? mestre.modulos[nome] : undefined;
+      if (atual !== undefined && igual(atual, m)) continue;
+      mestre.modulos = { ...(objeto(mestre.modulos) ? mestre.modulos : {}), [nome]: clone(m) };
+      voltou.push(atual === undefined ? `módulo "${nome}" (novo, ${m?.formas?.length ?? 0} formas)` : `módulo "${nome}" (alterado: ${atual?.formas?.length ?? 0} -> ${m?.formas?.length ?? 0} formas, a versão do detalhado substituiu a do mestre)`);
+    }
+  }
+  const simetria = (onde, atual, nova, grava) => {
+    if (nova === undefined || igual(atual, nova)) return;
+    exigir(atual === undefined, `integrar: o detalhado e o mestre discordam do "simetrico" ${onde}: o mestre tem ${JSON.stringify(atual)} e o detalhado ${JSON.stringify(nova)}; deixe os dois iguais (edite o mestre com --editar ou volte o detalhado ao valor do mestre) e integre de novo`);
+    grava(clone(nova));
+    voltou.push(`"simetrico" ${onde} (${JSON.stringify(nova)})`);
+  };
+  simetria('da raiz', mestre.simetrico, detalhado?.simetrico, (v) => { mestre.simetrico = v; });
+  if (objeto(detalhado?.unidades)) {
+    for (const [nome, u] of Object.entries(detalhado.unidades)) {
+      if (!objeto(u) || u.simetrico === undefined) continue;
+      const atual = objeto(mestre.unidades?.[nome]) ? mestre.unidades[nome].simetrico : undefined;
+      simetria(`da unidade "${nome}"`, atual, u.simetrico, (v) => { mestre.unidades = { ...(objeto(mestre.unidades) ? mestre.unidades : {}), [nome]: { ...(objeto(mestre.unidades?.[nome]) ? mestre.unidades[nome] : {}), simetrico: v } }; });
+    }
+  }
+  return voltou;
+}
+
 /* Junta os pares e as juntas do contato do detalhado (na raiz e na opção) ao do mestre, sem repetir. */
 function juntarContato(mestre, detalhado) {
   const alvo = (m) => { m.contato = objeto(m.contato) ? m.contato : {}; return m.contato; };
@@ -174,7 +207,7 @@ function comContatoSaneado(doc) {
    { mestre, estado, envelope, removidos, formas }: o mestre novo, o estado do Condutor com a unidade no mesmo lugar (os
    membros dela passam a ser as formas novas, o Envelope da maquete continua e ganha o resultado da conferência contra o
    detalhado, e o resto fica como estava), o resultado de `conferirEnvelope` (ou null sem Envelope), o que saiu do contato
-   e os ids novos da unidade. Sem estado, as unidades vêm do Plano de detalhe do próprio mestre e `estado` volta null. O mestre
+   e os ids novos da unidade, e `devolvidos`, o que voltou ao mestre fora da lista de formas (`modulos`, `simetrico`). Sem estado, as unidades vêm do Plano de detalhe do próprio mestre e `estado` volta null. O mestre
    novo precisa resolver (todas as referências das outras unidades às formas trocadas), ou a troca é recusada. */
 export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'detalhado' } = {}) {
   const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
@@ -201,6 +234,7 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
   juntarNomes(mestre, detalhado, 'parametros');
   juntarNomes(mestre, detalhado, 'pontos');
   juntarContato(mestre, detalhado);
+  const devolvidos = devolverAoMestre(mestre, detalhado);
   /* as referências: o que resta do contato vale só para formas que existem */
   const provisorio = clone(mestre);
   for (const c of [provisorio.contato, provisorio.opcoes[0].contato]) if (objeto(c)) { delete c.pares; delete c.juntas; }
@@ -235,5 +269,5 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
     if (envelope) novoEstado = registrarEnvelope(novoEstado, envelope, arquivo);
     sincronizarAvisoDeCiclo(novoEstado);
   }
-  return { mestre, estado: novoEstado, envelope, removidos, formas };
+  return { mestre, estado: novoEstado, envelope, removidos, formas, devolvidos };
 }

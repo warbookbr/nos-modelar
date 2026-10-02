@@ -516,7 +516,10 @@ const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao', 'loft', 'revoluc
 /* O loft e a revolução ainda têm as âncoras nomeadas: `nome` de cada seção ou de cada ponto do perfil. */
 export function nomesDeAncoras(tipo, forma) {
   const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : tipo === 'tubo' ? nomesDasPartes(forma?.caminho) : [];
-  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' || tipo === 'envolve' ? ['inicio', 'fim'] : []), ...nomeadas, ...LADOS];
+  /* a caixa só tem `inicio` e `fim` quando é uma haste entre dois pontos (`de`/`para`): as faces `+x`...`-z` são as da caixa mínima
+     alinhada aos eixos, e não as do corpo inclinado, então a ponta da haste só se endereça por estes dois nomes */
+  const hasteDeCaixa = tipo === 'caixa' && forma?.de !== undefined && forma?.para !== undefined;
+  return ['centro', ...(TIPOS_COM_EIXO.includes(tipo) || tipo === 'tubo' || tipo === 'envolve' || hasteDeCaixa ? ['inicio', 'fim'] : []), ...nomeadas, ...LADOS];
 }
 
 /* A parte de um tubo como forma resolvida própria: as partes guardam o centro relativo ao do tubo, e por
@@ -543,6 +546,8 @@ export function ancorasDe(r) {
       const d = aplicarMatriz(ponto3(r.prisma.b, 0, 0, w), r.matriz);
       a[nome] = [r.centro[0] + d[0], r.centro[1] + d[1], r.centro[2] + d[2]];
     }
+  } else if (r.haste && r.forma.tipo === 'caixa') {
+    for (const p of pontasDe(r)) a[p.nome] = p.ponto;
   }
   const meio = r.min.map((v, i) => (v + r.max[i]) / 2);
   for (const lado of LADOS) {

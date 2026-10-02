@@ -49,6 +49,20 @@ export function lerEstilos(esboco) {
   return { estilos, unidades, simetrico: esboco.simetrico };
 }
 
+/* O `estilo` das formas que vieram de um módulo (ou componente): a instância já foi expandida, então o estilo da raiz entra
+   agora, com a forma mandando sobre ele, e o campo `estilo` sai (a segunda expansão de um esboço já expandido não o relê). */
+export function estilosDasFormasDeModulo(formas, { estilos }, onde) {
+  if (!Array.isArray(formas) || !formas.some((f) => objeto(f) && f.estilo !== undefined)) return formas;
+  const nomes = Object.keys(estilos);
+  return formas.map((f) => {
+    if (!objeto(f) || f.estilo === undefined) return f;
+    const { estilo, ...resto } = f;
+    exigir(typeof estilo === 'string' && Object.hasOwn(estilos, estilo), `${onde}, forma "${f.id}": "estilo" com o valor ${JSON.stringify(estilo)} não é um estilo declarado${quisDizer(String(estilo), nomes)} (estilos: ${nomes.join(', ') || 'nenhum declarado em "estilos" na raiz'})`);
+    const doEstilo = estilos[estilo];
+    return { ...resto, ...Object.fromEntries(Object.entries(doEstilo).filter(([k]) => !(k in resto))) };
+  });
+}
+
 /* Aplica estilo, unidade e simetria à lista de formas declarada. Devolve a mesma lista, sem copiar, quando nada se aplica.
    `num` resolve o `pos` da simetria (número, parâmetro ou "=expressão") com os parâmetros da opção. */
 export function prepararFormas(lista, { estilos, unidades, simetrico }, num, onde) {
@@ -58,6 +72,29 @@ export function prepararFormas(lista, { estilos, unidades, simetrico }, num, ond
   if (!usaEstilo && Object.keys(unidades).length === 0 && simetrico === undefined) return lista;
   const ids = new Set(lista.filter((f) => objeto(f) && typeof f.id === 'string').map((f) => f.id));
   const saida = [];
+  /* o espelho implícito de `g` (uma forma, ou uma instância de componente, com `lado`), se a simetria da raiz ou da unidade o pede */
+  const espelhar = (g, rotulo, destino) => {
+    if (typeof g.id !== 'string') return;
+    const configUnidade = typeof g.unidade === 'string' ? unidades[g.unidade]?.simetrico : undefined;
+    const config = configUnidade === undefined ? simetrico : (configUnidade === false ? undefined : configUnidade);
+    if (!config) return;
+    const lado = g.lado;
+    if (!Object.hasOwn(OUTRA_LADO, lado) || !g.id.endsWith(lado) || g.id.length < 2) return;
+    const idEspelho = `${g.id.slice(0, -1)}${OUTRA_LADO[lado]}`;
+    if (ids.has(idEspelho)) return;
+    ids.add(idEspelho);
+    const pos = num(config.pos ?? 0, 'simetrico.pos', rotulo);
+    exigir(Number.isFinite(pos), `${rotulo}: "simetrico.pos" deve ser um número em mm`);
+    const substitui = g.usa === undefined && typeof g.substitui === 'string' && g.substitui.endsWith(lado) ? `${g.substitui.slice(0, -1)}${OUTRA_LADO[lado]}` : undefined;
+    destino.push({
+      id: idEspelho,
+      espelha: { forma: g.id, eixo: config.eixo, pos },
+      ...(g.cor !== undefined ? { cor: g.cor } : {}),
+      ...(g.opacidade !== undefined ? { opacidade: g.opacidade } : {}),
+      ...(g.oculto !== undefined ? { oculto: g.oculto } : {}),
+      ...(substitui !== undefined ? { substitui } : {}),
+    });
+  };
   for (const [i, f] of lista.entries()) {
     if (!objeto(f)) { saida.push(f); continue; }
     const rotulo = `${onde}, forma ${typeof f.id === 'string' ? `"${f.id}"` : i + 1}`;
@@ -65,7 +102,13 @@ export function prepararFormas(lista, { estilos, unidades, simetrico }, num, ond
       exigir(typeof nome === 'string' && Object.hasOwn(estilos, nome), `${rotulo}: "estilo" com o valor ${JSON.stringify(nome)} não é um estilo declarado${quisDizer(String(nome), nomes)} (estilos: ${nomes.join(', ') || 'nenhum declarado em "estilos" na raiz'})`);
       return estilos[nome];
     };
-    if (f.usa !== undefined) { exigir(f.estilo === undefined, `${rotulo}: "estilo" não vale numa instância de componente; o componente tem a cor dele`); saida.push(f); continue; }
+    if (f.usa !== undefined) {
+      exigir(f.estilo === undefined, `${rotulo}: "estilo" não vale numa instância de componente; o componente tem a cor dele`);
+      saida.push(f);
+      /* a instância com `lado` também ganha o espelho de id com a outra letra (o espelho de instância espelha todas as formas dela) */
+      espelhar(f, rotulo, saida);
+      continue;
+    }
     if (f.arranja !== undefined && f.id === undefined) { saida.push(f); continue; }
     const { estilo, ...resto } = f;
     let g = resto;
@@ -85,26 +128,7 @@ export function prepararFormas(lista, { estilos, unidades, simetrico }, num, ond
     }
     saida.push(g);
     /* simetria implícita */
-    if (typeof g.id !== 'string' || !g.tipo || g.espelha !== undefined || g.arranjoDe !== undefined) continue;
-    const configUnidade = typeof g.unidade === 'string' ? unidades[g.unidade]?.simetrico : undefined;
-    const config = configUnidade === undefined ? simetrico : (configUnidade === false ? undefined : configUnidade);
-    if (!config) continue;
-    const lado = g.lado;
-    if (!Object.hasOwn(OUTRA_LADO, lado) || !g.id.endsWith(lado) || g.id.length < 2) continue;
-    const idEspelho = `${g.id.slice(0, -1)}${OUTRA_LADO[lado]}`;
-    if (ids.has(idEspelho)) continue;
-    ids.add(idEspelho);
-    const pos = num(config.pos ?? 0, 'simetrico.pos', rotulo);
-    exigir(Number.isFinite(pos), `${rotulo}: "simetrico.pos" deve ser um número em mm`);
-    const substitui = typeof g.substitui === 'string' && g.substitui.endsWith(lado) ? `${g.substitui.slice(0, -1)}${OUTRA_LADO[lado]}` : undefined;
-    saida.push({
-      id: idEspelho,
-      espelha: { forma: g.id, eixo: config.eixo, pos },
-      ...(g.cor !== undefined ? { cor: g.cor } : {}),
-      ...(g.opacidade !== undefined ? { opacidade: g.opacidade } : {}),
-      ...(g.oculto !== undefined ? { oculto: g.oculto } : {}),
-      ...(substitui !== undefined ? { substitui } : {}),
-    });
+    if (typeof g.id === 'string' && g.tipo && g.espelha === undefined && g.arranjoDe === undefined) espelhar(g, rotulo, saida);
   }
   return saida;
 }

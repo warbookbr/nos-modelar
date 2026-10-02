@@ -299,7 +299,7 @@ describe('--detalhar e --integrar', () => {
     const d = detalharArquivo(arq, 'farol');
     const detalhe = JSON.parse(readFileSync(d.destino, 'utf8'));
     const k = detalhe.formas.findIndex((f) => f.id === 'farol');
-    detalhe.formas.splice(k + 1, 0, { id: 'farolAro', tipo: 'anel', eixo: 'z', diametroExterno: 100, diametroInterno: 84, espessura: 6, centro: 'farol.centro', cor: 'cinza' });
+    detalhe.formas.splice(k + 1, 0, { id: 'farolAro', tipo: 'anel', eixo: 'z', diametroExterno: 90, diametroInterno: 76, espessura: 6, centro: 'farol.centro', cor: 'cinza' });
     detalhe.parametros = { ...(detalhe.parametros ?? {}), parametroNovo: 7 };
     detalhe.contato = { ...detalhe.contato, pares: [...(detalhe.contato.pares ?? []), { a: 'farolAro', b: 'farol', tipo: 'livre', motivo: 'o aro envolve a lente do farol' }] };
     writeFileSync(d.destino, JSON.stringify(detalhe));

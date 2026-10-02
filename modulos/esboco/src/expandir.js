@@ -8,7 +8,7 @@ import { catalogoDe, expandirComponentes } from './componentes.js';
 import { validarEsquema } from './esquema.js';
 import { traduzirLigacoes, validarLigacoes } from './ligar.js';
 import { ehGerador, gerarPerfil } from './perfis.js';
-import { lerEstilos, prepararFormas } from './estilos.js';
+import { estilosDasFormasDeModulo, lerEstilos, prepararFormas } from './estilos.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -202,7 +202,7 @@ export function expandirArranjos(formas, onde = 'opção') {
         `${contexto}: "arranja.nomes" deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(a.nomes) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${a.forma}" já tem o nome dela`);
     }
     for (let k = 1; k < a.total; k++) {
-      saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: f.daInstancia } : {}) });
+      saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: { id: f.daInstancia.id, principal: f.daInstancia.principal }, ...(f.daInstancia.oculto === undefined ? {} : { oculto: f.daInstancia.oculto }), ...(f.daInstancia.opacidade === undefined ? {} : { opacidade: f.daInstancia.opacidade }) } : {}) });
     }
   }
   return saida;
@@ -247,7 +247,7 @@ export function expandirEsboco(esboco) {
     let componentes = { pares: [], aliasDeId: () => undefined, instancias: 0 };
     if (Array.isArray(fonte)) {
       componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde, catalogo });
-      g.formas = expandirArranjos(componentes.formas.map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
+      g.formas = expandirArranjos(estilosDasFormasDeModulo(componentes.formas, estilos, onde).map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
       validarLigacoes(g.formas, onde, Object.keys({ ...(esboco.pontos ?? {}), ...(o.pontos ?? {}) }));
     }
     expansoes.push(componentes);

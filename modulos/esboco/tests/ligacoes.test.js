@@ -51,9 +51,9 @@ describe('plano.contrato.fixa', () => {
 
   it('vale também para unidades: o conjunto inteiro de cada lado conta', () => {
     const formas = [motor({ unidade: 'motor' }), caixa('tampa', [0, 70, 0], 100, 20, 60, { unidade: 'motor' }), apoio('quadroA', -40, { unidade: 'quadro' }), apoio('quadroB', 40, { unidade: 'quadro' })];
-    const ok = conferir(com(formas, { contrato: { fixa: [{ a: 'motor', b: 'quadro', pontos: 2 }] } }));
+    const ok = conferir(com(formas, { contrato: { fixa: [{ a: 'unidade:motor', b: 'quadro', pontos: 2 }] } }));
     expect(ok.achados).toEqual([]);
-    const pedeTres = conferir(com(formas, { contrato: { fixa: [['motor', 'quadro', 3]] } }));
+    const pedeTres = conferir(com(formas, { contrato: { fixa: [['unidade:motor', 'quadro', 3]] } }));
     expect(pedeTres.achados).toHaveLength(1);
     expect(pedeTres.achados[0].texto).toMatch(/achou 2 pontos/);
   });

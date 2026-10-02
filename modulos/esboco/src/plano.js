@@ -211,12 +211,27 @@ function selecionar(entrada, rs, onde, brutos) {
   return achadas;
 }
 
-/* As formas que um lado do `contrato.fixa` designa: um id, um padrão (`quadro*`), uma instância de componente ou o nome de uma unidade. */
+/* As formas que um lado do `contrato.fixa` designa: um id, um padrão (`quadro*`), uma instância de componente ou o nome de uma unidade.
+   Um nome que é ao mesmo tempo o id de uma forma e o nome de uma unidade com outras formas é recusado, com as duas leituras:
+   `unidade:<nome>` designa a unidade e `forma:<id>` designa só a forma. */
 function selecionarPeca(entrada, rs, onde, brutos, unidadeDe) {
-  const formas = rs.filter((r) => (entrada.includes('*') ? casa(entrada, r.id) : (r.id === entrada || brutos.get(r.id)?.daInstancia?.id === entrada)));
+  const porUnidade = (nome) => rs.filter((r) => unidadeDe.get(r.id) === nome);
+  const porForma = (q) => rs.filter((r) => (q.includes('*') ? casa(q, r.id) : (r.id === q || brutos.get(r.id)?.daInstancia?.id === q)));
+  const nomes = [...new Set(unidadeDe.values())];
+  if (entrada.startsWith('unidade:')) {
+    const nome = entrada.slice('unidade:'.length);
+    const formas = porUnidade(nome);
+    exigir(formas.length > 0, `${onde}.fixa: "${entrada}" não é uma unidade visível da opção${quisDizer(nome, nomes)} (unidades: ${nomes.join(', ') || 'nenhuma'})`);
+    return formas;
+  }
+  if (entrada.startsWith('forma:')) return selecionar(entrada.slice('forma:'.length), rs, `${onde}.fixa`, brutos);
+  const formas = porForma(entrada);
+  const daUnidade = entrada.includes('*') ? [] : porUnidade(entrada);
+  if (formas.length > 0 && daUnidade.length > 0 && (formas.length !== daUnidade.length || formas.some((r) => !daUnidade.includes(r)))) {
+    throw new ErroDeEsboco(`${onde}.fixa: "${entrada}" é o id de uma forma (${formas.map((r) => r.id).join(', ')}) e também o nome de uma unidade (${daUnidade.length} ${daUnidade.length === 1 ? 'forma' : 'formas'}: ${daUnidade.map((r) => r.id).join(', ')}), e as duas leituras dão peças diferentes; escreva "unidade:${entrada}" para a unidade inteira ou "forma:${entrada}" para só a forma`);
+  }
   if (formas.length > 0) return formas;
-  const daUnidade = rs.filter((r) => unidadeDe.get(r.id) === entrada);
-  exigir(daUnidade.length > 0, `${onde}.fixa: "${entrada}" não é uma forma nem uma unidade visível da opção${quisDizer(entrada, [...rs.map((r) => r.id), ...new Set(unidadeDe.values())])} (ids: ${rs.map((r) => r.id).join(', ')}; unidades: ${[...new Set(unidadeDe.values())].join(', ') || 'nenhuma'})`);
+  exigir(daUnidade.length > 0, `${onde}.fixa: "${entrada}" não é uma forma nem uma unidade visível da opção${quisDizer(entrada, [...rs.map((r) => r.id), ...nomes])} (ids: ${rs.map((r) => r.id).join(', ')}; unidades: ${nomes.join(', ') || 'nenhuma'})`);
   return daUnidade;
 }
 
