@@ -104,7 +104,7 @@ peças sem função antes de a imagem chegar à pessoa.
    `pontos` e `parametros` e acrescentando forma a uma unidade; `fixa` com nome
    ambíguo entre unidade e forma; `lado` em componente e em `ligar`; `--remover`
    limpando juntas; âncoras `inicio`/`fim` da caixa por `de`/`para`; e
-   `--replanejar` sem reescrever o Envelope de unidade não conferida. A skill
+   `--integrar` sem gravar o detalhe que não cabe no Envelope. A skill
    passa a dizer que quem modela sem poder despachar agente para em cada
    `--feito` e devolve o brief a quem o chamou, que despacha o crítico e devolve
    a nota antes da unidade seguinte.
