@@ -90,6 +90,8 @@ peças sem função antes de a imagem chegar à pessoa.
 1. Os seis bugs e os quatro ajustes de comando têm teste que falhava antes.
 2. `plano.contrato.fixa` reprova uma peça presa por um só ponto e aprova a presa
    por dois, com teste.
+2a. O Condutor recusa seguir com veredito abaixo de 8 antes de três rodadas e,
+   depois delas, só segue com `--liberar` e motivo, com teste.
 3. A `roda` com raios, o perfil de pneu e de disco e o `envolve` saem sem Python.
 4. A moto e a escavadeira refeitas pelo `laco-do-esboco` têm nota 8 ou mais do
    crítico cego em cada unidade com brief, dada antes da unidade seguinte (o
@@ -123,7 +125,16 @@ peças sem função antes de a imagem chegar à pessoa.
    `laco-do-esboco` e o agente `esbocista`, ajustar o `critico-visual` e
    atualizar quem aponta para a skill antiga (README do módulo,
    `PARE-E-ANALISE.md`, `docs/mecanifica/usar/README.md`, mapa).
-7. A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
+7. A regra da nota no Condutor e a inspeção antes do `--feito`, achadas na
+   empilhadeira que outra IA esboçou (cabine fechada com notas 3, 5 e 6, Marco
+   50 com 6, 5 e 3, e o fluxo seguiu). O Condutor recusa a unidade seguinte
+   enquanto o último veredito da unidade estiver abaixo de 8 e houver menos de
+   três rodadas; na terceira sem 8, trava e só segue com
+   `--liberar <unidade> --motivo <texto>`, que exige a autorização explícita da
+   pessoa (a skill manda pedir antes) e fica no histórico. O `esbocista` e a
+   `esboco-detalhado` mandam abrir as quatro imagens da unidade antes do
+   `--feito`.
+8. A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
    `esbocista` por objeto, com o crítico entre unidades, medidas no transcript
    (formas por relação contra coordenada absoluta, imagens abertas, contornos),
    anatomia prévia opcional, e o fechamento. A primeira refeita fica como
