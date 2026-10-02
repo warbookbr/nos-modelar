@@ -35,9 +35,12 @@ e devolve o caminho do brief e das imagens. Então:
    com o contexto que tem; não crie outro esbocista para a mesma unidade.
 4. Registre com `npm run esboco -- --condutor <arquivo> --veredito <unidade> --nota <0-10> --motivo <texto do crítico>`.
 5. Nota abaixo de 8 volta ao esbocista para refazer a unidade, e a nova versão
-   passa por `--feito` e por crítico de novo. Depois de três rodadas na mesma
-   unidade sem chegar a 8, pare e leve o registro (`--condutor --historico`) à
-   pessoa; não estenda o limite.
+   passa por `--feito` e por crítico de novo. O Condutor recusa o `--feito` de
+   outra unidade e o `--proximo` enquanto o último veredito for menor que 8.
+   Depois de três rodadas na mesma unidade sem chegar a 8, pare, leve o registro
+   (`--condutor --historico`) à pessoa e pergunte explicitamente se prossegue.
+   Só com o sim dela rode `npm run esboco -- --condutor <arquivo> --liberar <unidade|marco-N> --motivo <o motivo que ela deu>`;
+   a liberação fica no histórico, e rodá-la sem a autorização é burlar o limite.
 
 O Marco (25, 50, 75 e 100% do custo) segue do mesmo jeito, com o brief do Marco
 e o veredito `marco-<N>`, e a mesma regra de três rodadas.

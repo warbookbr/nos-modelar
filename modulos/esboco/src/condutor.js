@@ -38,6 +38,9 @@ export const EXIGENCIAS_POR_NIVEL = {
 export const LIMIARES_DO_MARCO = [25, 50, 75, 100];
 export const MINIMO_DO_MOTIVO = 15;
 export const CONCLUIDO = 'concluido';
+/* A nota que libera uma unidade (ou Marco) e as rodadas do crítico antes de o bloqueio só sair com a autorização da pessoa. */
+export const NOTA_MINIMA = 8;
+export const RODADAS_DO_CRITICO = 3;
 /* A unidade com mais formas que isto precisa de `funcao` (e passa pelo crítico por unidade) para virar feita. */
 export const LIMITE_DA_FUNCAO = 8;
 
@@ -362,6 +365,8 @@ export function avancar(bruto, estadoBruto, { referencias } = {}) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   const portao = portaoDoEstagio(bruto, estado, { referencias });
   if (estado.atual === CONCLUIDO) return { ok: false, estado, portao, concluido: true };
+  const barrado = bloqueiosDaNota(estado);
+  if (barrado.length > 0) return { ok: false, estado, portao, bloqueio: `condutor: ${barrado.map(textoDoBloqueio).join('; ')}` };
   if (!portao.passa) return { ok: false, estado, portao };
   const novo = clone(estado);
   const i = novo.estagios.indexOf(novo.atual);
@@ -513,6 +518,53 @@ function achadosDaUnidade(bruto, estado, unidade) {
   return gate.usar ? gate.achados.filter((a) => a.pecas.some((p) => membros.has(p))) : [];
 }
 
+/* Os bloqueios pela nota do crítico: cada unidade com brief (mais de 8 formas) e cada Marco cujo último veredito, depois da última
+   liberação, está abaixo de 8. `rodada` conta os vereditos desde a última liberação; com `RODADAS_DO_CRITICO` rodadas o bloqueio é
+   `travado` e só sai com `liberar`. Estado sem `vereditos` (versão 1) não bloqueia nada. Ordem determinística: a dos vereditos. */
+export function bloqueiosDaNota(estado) {
+  const comBrief = new Set((estado.unidades ?? []).filter((u) => u.membros.length > LIMITE_DA_FUNCAO).map((u) => u.id));
+  const ids = [...new Set((estado.vereditos ?? []).map((v) => v.unidade))].filter((id) => /^marco-\d+$/.test(id) || comBrief.has(id));
+  const saida = [];
+  for (const id of ids) {
+    const lib = (estado.liberacoes ?? []).filter((l) => l.unidade === id).reduce((m, l) => Math.max(m, l.aposVeredito), 0);
+    const vs = estado.vereditos.filter((v) => v.unidade === id && v.ordem > lib);
+    if (vs.length === 0 || vs[vs.length - 1].nota >= NOTA_MINIMA) continue;
+    saida.push({ unidade: id, nota: vs[vs.length - 1].nota, rodada: vs.length, travado: vs.length >= RODADAS_DO_CRITICO });
+  }
+  return saida;
+}
+
+const nota1 = (n) => String(n).replace('.', ',');
+export function textoDoBloqueio(b) {
+  const marco = /^marco-/.test(b.unidade);
+  const o = `a unidade "${abreviar(b.unidade)}"`.replace(/a unidade "(marco-\d+)"/, 'o $1');
+  const rodada = `${Math.min(b.rodada, RODADAS_DO_CRITICO)} de ${RODADAS_DO_CRITICO}`;
+  if (b.travado) return `${o} tirou nota ${nota1(b.nota)} (abaixo de ${NOTA_MINIMA}) na rodada ${rodada} e está travada: o fluxo só segue com --condutor <arquivo> --liberar ${b.unidade} --motivo <texto>, e a liberação exige pedir autorização explícita à pessoa antes (o motivo é o que ela disser)`;
+  return `${o} tirou nota ${nota1(b.nota)} (abaixo de ${NOTA_MINIMA}) na rodada ${rodada}: ${marco ? 'corrija as unidades apontadas pelo crítico e chame o crítico do Marco de novo (--veredito)' : `refaça a unidade, rode --feito ${b.unidade} de novo e registre o novo veredito do crítico`}`;
+}
+
+function exigirNotaLivre(estado, { exceto } = {}) {
+  const b = bloqueiosDaNota(estado).filter((x) => x.unidade !== exceto || x.travado);
+  exigir(b.length === 0, `condutor: ${b.map(textoDoBloqueio).join('; ')}`);
+}
+
+/* Libera uma unidade ou Marco travado (três vereditos abaixo de 8 desde a última liberação). Grava em `liberacoes` (versão 3 do
+   estado) o motivo, que é o que a pessoa autorizou, e o veredito até onde ela vale. */
+export function liberar(estadoBruto, { unidade, motivo }) {
+  const doMarco = /^marco-(\d+)$/.test(String(unidade));
+  const id = doMarco ? String(unidade) : unidadePorNome(estadoBruto.unidades ?? [], unidade);
+  const b = bloqueiosDaNota(estadoBruto).find((x) => x.unidade === id);
+  exigir(b !== undefined, `condutor: "${abreviar(String(unidade))}" não está bloqueada pela nota do crítico; não há o que liberar${bloqueiosDaNota(estadoBruto).length ? ` (bloqueadas: ${bloqueiosDaNota(estadoBruto).map((x) => x.unidade).join(', ')})` : ''}`);
+  exigir(b.travado, `condutor: --liberar só vale depois de ${RODADAS_DO_CRITICO} vereditos abaixo de ${NOTA_MINIMA} na mesma unidade, e "${abreviar(id)}" está na rodada ${b.rodada} de ${RODADAS_DO_CRITICO}: ${textoDoBloqueio(b)}`);
+  const m = typeof motivo === 'string' ? motivo.trim() : '';
+  exigir(m.length >= MINIMO_DO_MOTIVO, `condutor: --liberar exige --motivo de pelo menos ${MINIMO_DO_MOTIVO} caracteres com a autorização que a pessoa deu${motivo === undefined ? ' (falta o campo)' : ` (veio ${m.length})`}`);
+  const novo = clone(estadoBruto);
+  novo.versao = Math.max(3, novo.versao ?? 1);
+  const ultimo = novo.vereditos[novo.vereditos.length - 1].ordem;
+  novo.liberacoes = [...(novo.liberacoes ?? []), { ordem: (novo.liberacoes ?? []).length + 1, unidade: id, nota: b.nota, rodadas: b.rodada, aposVeredito: ultimo, motivo: m }];
+  return novo;
+}
+
 /* Marca uma unidade como detalhada e registra o Marco (25%, 50%, 75%, 100% do custo estimado) que ela cruzou. O custo é o da
    maquete (`--integrar` não o aumenta), e um salto por vários limiares registra só o mais alto, com os pulados em `saltou`:
    o crítico é chamado uma vez com as imagens de agora. A unidade com achado aberto do gate no mestre é recusada, com o achado. */
@@ -522,6 +574,7 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   exigir(estado.atual === 'detalhe-por-unidade', `condutor: --feito vale no estágio Detalhe por unidade (o estágio atual é ${nomeDoEstagio(estado.atual)})`);
   const ids = estado.unidades.map((u) => u.id);
   exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
+  exigirNotaLivre(estado, { exceto: unidade });
   if (lerPlano(bruto?.plano)?.envelope !== undefined) {
     const conferida = estado.unidades.find((x) => x.id === unidade).envelopeConferido;
     exigir(conferida?.ok === true, `condutor: a unidade "${unidade}" só vira feita depois de o Envelope conferir a versão detalhada dela (plano.envelope está declarado): rode --envelope ${unidade} <arquivo-detalhado.esboco.json>${conferida ? `; a última conferência falhou: ${conferida.falta.join('; ')}` : ''}`);
@@ -560,7 +613,7 @@ export function unidadesNovasDoMarco(estado, limiar) {
 }
 
 /* Registra o veredito do crítico visual cego de uma unidade no histórico do estado (`vereditos`, campo que a versão 2 do estado
-   acrescenta; o estado de versão 1 continua válido e sobe para 2 no primeiro veredito). `nota` de 0 a 10 e `motivo` com o que o
+   acrescenta; `liberacoes` é da versão 3. Estado de versão 1 ou 2 continua válido: os campos novos são opcionais, e a regra da nota vale também sobre vereditos antigos). `nota` de 0 a 10 e `motivo` com o que o
    crítico apontou (pelo menos 15 caracteres). Devolve o estado novo. */
 export function registrarVeredito(estadoBruto, { unidade, nota, motivo }) {
   const ids = (estadoBruto.unidades ?? []).map((u) => u.id);
@@ -602,6 +655,7 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
   }
   if (marcos) for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
   if (historico) for (const v of estado.vereditos ?? []) L.push(`veredito do crítico ${v.ordem}: ${abreviar(v.unidade)} nota ${String(v.nota).replace('.', ',')} (${v.motivo})`);
+  if (historico) for (const l of estado.liberacoes ?? []) L.push(`liberação ${l.ordem}: ${abreviar(l.unidade)} (nota ${nota1(l.nota)} em ${l.rodadas} rodadas) liberada com o motivo: ${l.motivo}`);
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;

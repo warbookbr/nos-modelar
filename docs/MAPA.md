@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-885 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+886 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -417,6 +417,7 @@
 - `mapa-de-ligacoes.test.js` — `--ligacoes`: o mapa de ligações em texto (quem toca quem, em quantos pontos distintos, pontas livres e unidades presas a nada), por unidade e por forma, sem…
 - `marco-e-medidas.test.js` — O crítico cego também no Marco, o `--medidas` em texto e o Marco incremental (plano "O esboço detalhado coerente", fatia 3).
 - `modulos.test.js` — Bloco `modulos` do esboço: a IA define no próprio JSON um módulo reutilizável (parâmetros, formas e âncoras) e o usa por `usa`, pelo mesmo caminho de expansã…
+- `nota-do-critico.test.js` — A regra da nota no Condutor (plano "O esboço detalhado coerente", fatia 7): a unidade com brief (ou o Marco) cujo último veredito é menor que 8 bloqueia o --…
 - `parametros.test.js` — Parâmetros e expressões, formas herdadas da raiz, `espelha` e `arranja`, e o legado byte a byte.
 - `plano.test.js` — O `plano` estruturado: medidas nomeadas conferidas contra o esboço, contrato de relações e o esquema do JSON.
 - `posicao.test.js` — Posicionar sem calcular coordenada: haste `de`/`para`, `encosta`, `alinha` e pontos nomeados.

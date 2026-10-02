@@ -13,7 +13,7 @@ import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboc
 import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
 import { conferirReferenciaNaOpcao, lerPlano, textoDoPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { formatarConferencia, formatarMedidasDaReferencia, medidasDaReferencia, sobreposicaoDaReferencia } from '../../modulos/esboco/src/referencia.js';
-import { avancar, conferirEnvelope, criarEstado, formatarEnvelope, formatarSituacao, funcaoDaUnidade, LIMITE_DA_FUNCAO, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
+import { avancar, conferirEnvelope, criarEstado, formatarEnvelope, formatarSituacao, funcaoDaUnidade, LIMITE_DA_FUNCAO, liberar, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
 import { detalharUnidade, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
 import { editarEsboco, formatarMudancas } from '../../modulos/esboco/src/editar.js';
 import { formatarLigacoes, mapaDeLigacoes } from '../../modulos/esboco/src/mapa-de-ligacoes.js';
@@ -373,11 +373,15 @@ export function condutorArquivo(arquivo, acao = {}) {
     const r = avancar(bruto, estado, { referencias });
     estado = r.estado;
     if (r.concluido) extra = 'o fluxo já terminou; não há estágio seguinte\n';
+    else if (r.bloqueio) { codigo = 1; extra = `avanço recusado: ${r.bloqueio}\n`; }
     else if (!r.ok) { codigo = 1; extra = `avanço recusado: o Portão de ${nomeDoEstagio(estado.atual)} não passa; falta:\n${r.portao.falta.map((f) => `  - ${f}`).join('\n')}\n`; }
     else extra = `avançou de ${nomeDoEstagio(estado.historico[estado.historico.length - 1].de)} para ${nomeDoEstagio(estado.atual)}\n`;
   } else if (acao.veredito !== undefined) {
     estado = registrarVeredito(estado, { unidade: acao.veredito, nota: acao.nota, motivo: acao.motivo });
     extra = `veredito do crítico registrado para a unidade ${acao.veredito}: nota ${acao.nota}\n`;
+  } else if (acao.liberar !== undefined) {
+    estado = liberar(estado, { unidade: acao.liberar, motivo: acao.motivo });
+    extra = `liberação de ${acao.liberar} gravada no histórico, com o motivo dado\n`;
   } else if (acao.feito !== undefined) {
     const jaFeita = estado.unidades?.find((x) => x.id === unidadePorNome(estado.unidades, acao.feito))?.feito === true;
     const r = marcarFeito(bruto, estado, acao.feito);
@@ -798,7 +802,7 @@ export function ajustarArquivo(arquivo) {
 }
 
 /* Flags que levam um valor (`--forma garfoE` ou `--forma=garfoE`); o resto é booleano. `--condutor` leva o arquivo. */
-const FLAGS_COM_VALOR = ['--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--nota', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem'];
+const FLAGS_COM_VALOR = ['--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem'];
 /* `--envelope <unidade> <arquivo-detalhado.esboco.json>` e `--integrar <unidade> <arquivo-detalhado>` levam dois valores, e `--detalhar <unidade> [arquivo]` leva o segundo se vier. */
 const FLAGS_COM_DOIS = ['--envelope', '--detalhar', '--integrar'];
 
@@ -849,11 +853,11 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --veredito <unidade> --nota <0-10> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade>] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--condutor [--historico] [--proximo | --feito <unidade> | --veredito <unidade> --nota <0-10> --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade>] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
-    for (const f of ['--largura', '--saida', '--veredito', '--nota', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    for (const f of ['--largura', '--saida', '--veredito', '--liberar', '--nota', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
     if (args.tem('--integrar') && (args.valor('--integrar') === undefined || args.valor('--integrar', 1) === undefined)) throw new ErroDeEsboco('--integrar precisa da unidade e do arquivo detalhado (--integrar <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--envelope') && (args.valor('--envelope') === undefined || args.valor('--envelope', 1) === undefined)) throw new ErroDeEsboco('--envelope precisa da unidade e do arquivo detalhado (--envelope <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--referencia')) {
@@ -892,8 +896,8 @@ async function principal(argv) {
       process.stdout.write(r.texto);
       return r.resultado.envelope && !r.resultado.envelope.ok ? 1 : 0;
     }
-    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--mover', '--mover-lote', '--replanejar'].some((f) => args.tem(f))) {
-      const r = condutorArquivo(alvo, { envelope: args.tem('--envelope') ? { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) } : undefined, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), nota: args.valor('--nota'), mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar') });
+    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar'].some((f) => args.tem(f))) {
+      const r = condutorArquivo(alvo, { envelope: args.tem('--envelope') ? { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) } : undefined, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar') });
       process.stdout.write(r.texto);
       if (r.criticoDe) process.stdout.write((await briefDoCritico(alvo, r.criticoDe, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null })).texto);
       if (r.marcoDe) process.stdout.write((await briefDoMarco(alvo, r.marcoDe.limiar, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null })).texto);

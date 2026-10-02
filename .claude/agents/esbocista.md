@@ -21,7 +21,9 @@ Você não despacha agente. A cada `--feito` que imprime brief do crítico, pare
 devolva a quem o chamou o caminho do brief e o das imagens e espere a nota e o
 motivo. Quem o chamou registra o veredito; você não o registra. Se a nota for
 menor que 8, refaça a unidade pelo motivo e chame `--feito` de novo. Seguir para a unidade
-seguinte sem a nota deixa a unidade sem crítico.
+seguinte sem a nota deixa a unidade sem crítico, e o Condutor recusa o `--feito` de outra unidade e o `--proximo` enquanto o último veredito de uma unidade ou Marco estiver abaixo de 8.
+
+Antes de cada `--feito`, abra você mesmo as quatro imagens da unidade (`--unidade <unidade>`) e confira nelas o que o brief pergunta; o `--feito` sem ter olhado as imagens entrega ao crítico uma unidade que ninguém inspecionou.
 
 ## Atritos
 
