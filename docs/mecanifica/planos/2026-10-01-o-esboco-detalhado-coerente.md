@@ -97,11 +97,23 @@ peças sem função antes de a imagem chegar à pessoa.
 3. (feita) O crítico por unidade também no Marco, `--medidas` e o Marco incremental (este já vinha da fatia 1).
 4. (feita) As ferramentas para a IA: `modulos` e biblioteca, `--corte` e `--explodir`,
    `ligar` e `encaixa`, `--ligacoes`, prévia rápida, `--unidade` incremental e `--zoom-forma`.
-5. A moto e a escavadeira refeitas com elas, medidas no transcript (inclusive
-   quantas formas usam relação em vez de coordenada absoluta; se a maioria
-   seguir absoluta, o que falta é instrução na skill), anatomia
-   prévia opcional (lista de partes e relações pelo conhecimento do modelo, e
-   medidas da ficha técnica na web quando houver, com `origem`), e o fechamento.
+5. Os treze atritos da primeira refeita (`fatia5/ATRITOS.md` no scratchpad da
+   sessão), cada um com teste que falhava antes: referências de módulo dentro
+   de `envolve`, `estilo` e `arranja`; `arranja` em instância espelhada ou
+   oculta; `--integrar` devolvendo `modulos` e `simetrico`; `--editar` em
+   `pontos` e `parametros` e acrescentando forma a uma unidade; `fixa` com nome
+   ambíguo entre unidade e forma; `lado` em componente e em `ligar`; `--remover`
+   limpando juntas; âncoras `inicio`/`fim` da caixa por `de`/`para`; e
+   `--replanejar` sem reescrever o Envelope de unidade não conferida. A skill
+   passa a dizer que quem modela sem poder despachar agente para em cada
+   `--feito` e devolve o brief a quem o chamou, que despacha o crítico e devolve
+   a nota antes da unidade seguinte.
+6. A moto e a escavadeira refeitas outra vez, uma por agente, com o crítico
+   entre unidades, medidas no transcript (quantas formas usam relação em vez de
+   coordenada absoluta, imagens abertas, contornos), anatomia prévia opcional, e
+   o fechamento. A primeira refeita fica como medição: 11 e 10 formas absolutas
+   em 196 e 204, 18 imagens abertas em 338 chamadas, nenhum crítico entre
+   unidades.
 
 ## Riscos e desvios
 
