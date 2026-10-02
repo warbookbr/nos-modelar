@@ -123,7 +123,9 @@ for (const arquivo of rastreados) {
 
    A zona histórica de topo fica de fora pelo mesmo motivo de sempre: é registro
    imutável, e reescrever caminho ali seria editar histórico. */
-const PADRAO_RELATIVO = /\]\(([^)#\s]+\.md)(?:#[^)]*)?\)/g;
+/* Link para pasta (terminado em `/`) também conta: o README da raiz lista os
+   módulos assim, e um módulo removido deixaria o link quebrado sem aviso. */
+const PADRAO_RELATIVO = /\]\(([^)#\s]+(?:\.md|\/))(?:#[^)]*)?\)/g;
 
 for (const arquivo of rastreados.filter((f) => f.endsWith('.md') && !ehZonaHistorica(f))) {
   const texto = readFileSync(path.join(REPO, arquivo), 'utf8');

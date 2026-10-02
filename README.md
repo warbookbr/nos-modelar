@@ -64,6 +64,29 @@ resto:
   [`docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`](docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md)
   para o fluxo completo.
 
+## Módulos
+
+`modulos/` guarda ferramentas isoladas, cada uma com `package.json`, `src/` e
+`tests/` próprios. Um módulo não importa o núcleo procedural; a única exceção
+hoje é o esboço, que lê o avaliador de expressões do núcleo, como explica o
+README dele. O nome não tem relação com o bloco `modulos` do JSON do esboço, que
+guarda partes reutilizáveis dentro de um esboço.
+
+- [`contorno-da-imagem`](modulos/contorno-da-imagem/) mapeia as partes de uma
+  imagem de referência e tira o contorno de cada uma em milímetro;
+- [`esboco`](modulos/esboco/README.md) desenha um objeto em formas primitivas a
+  partir de um JSON declarativo, com gate de contato e condutor por unidades;
+- [`exportador-cad`](modulos/exportador-cad/) converte a malha neutra para
+  formatos CAD;
+- [`exportador-obj`](modulos/exportador-obj/) exporta Wavefront OBJ com partes
+  nomeadas para Unreal Engine e Blender;
+- [`otimizador-malha`](modulos/otimizador-malha/) reduz a malha de saída sem
+  mudar a silhueta;
+- [`preparo-micropoligono`](modulos/preparo-micropoligono/) deixa a malha densa
+  pronta para motores de micropolígono;
+- [`topologia`](modulos/topologia/) diz o que há de errado no traçado de uma
+  malha, sem reescrevê-la.
+
 ## Estado
 
 Cada afirmação aqui tem endereço. Se uma delas não puder ser conferida pelo
