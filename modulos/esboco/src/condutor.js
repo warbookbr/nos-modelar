@@ -43,6 +43,9 @@ export const NOTA_MINIMA = 8;
 export const RODADAS_DO_CRITICO = 3;
 /* A unidade com mais formas que isto precisa de `funcao` (e passa pelo crítico por unidade) para virar feita. */
 export const LIMITE_DA_FUNCAO = 8;
+export const MODOS = ['objeto', 'por-unidade'];
+export const MODO_PADRAO = 'objeto';
+export const LIMITE_DA_NOTA_DE_PASSAGEM = 240;
 
 /* A `funcao` declarada da unidade em `unidades.<id>.funcao` do esboço (ou undefined). */
 export function funcaoDaUnidade(bruto, id) {
@@ -316,7 +319,7 @@ function estagiosDoNivel(nivel) { return [...ESTAGIOS_POR_NIVEL[nivel]]; }
 export function criarEstado(bruto, arquivo) {
   const plano = lerPlano(bruto?.plano);
   const nivel = plano?.nivel ?? NIVEL_PADRAO;
-  return { versao: 1, esboco: arquivo, nivel, nivelDoPlano: plano?.nivel !== undefined, estagios: estagiosDoNivel(nivel), atual: estagiosDoNivel(nivel)[0], historico: [], unidades: [], alteracoes: [], marcos: [], avisos: [] };
+  return { versao: 1, esboco: arquivo, nivel, nivelDoPlano: plano?.nivel !== undefined, modo: MODO_PADRAO, estagios: estagiosDoNivel(nivel), atual: estagiosDoNivel(nivel)[0], historico: [], unidades: [], alteracoes: [], marcos: [], avisos: [] };
 }
 
 /* O nível declarado no plano pode mudar entre uma chamada e outra: os estágios seguem o nível, e se o estágio atual saiu
@@ -583,6 +586,10 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   if (!daUnidade.feito && daUnidade.membros.length > LIMITE_DA_FUNCAO && funcaoDaUnidade(bruto, unidade) === undefined) {
     throw new ErroDeEsboco(`condutor: a unidade "${abreviar(unidade)}" tem ${daUnidade.membros.length} formas (mais de ${LIMITE_DA_FUNCAO}) e não declara "funcao": escreva uma frase que diga para que ela serve em unidades["${unidade}"].funcao na raiz do esboço (por exemplo { "funcao": "laço fechado que contorna duas rodas" }); o crítico por unidade e quem lê o esboço dependem dela`);
   }
+  if (!daUnidade.feito && (estado.modo ?? MODO_PADRAO) === 'por-unidade' && daUnidade.membros.length > LIMITE_DA_FUNCAO) {
+    const notaGravada = estado.notasDePassagem?.[unidade];
+    exigir(typeof notaGravada === 'string' && notaGravada.trim().length > 0, `condutor: no modo por-unidade, a unidade "${abreviar(unidade)}" (${daUnidade.membros.length} formas) só vira feita depois de gravar a nota de passagem (--condutor <arquivo> --nota-de-passagem ${unidade} --texto <texto>): o esbocista da próxima unidade precisa dela para entender as escolhas feitas`);
+  }
   if (!daUnidade.feito) {
     const abertos = achadosDaUnidade(bruto, estado, unidade);
     exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map((a) => descreverAchado(a)).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
@@ -631,6 +638,36 @@ export function registrarVeredito(estadoBruto, { unidade, nota, motivo }) {
   return novo;
 }
 
+/* Define o modo de execução do Condutor (`objeto`, o padrão, ou `por-unidade`). Grava na versão 4 do estado. */
+export function definirModo(estadoBruto, modoOuOpcoes) {
+  const modo = typeof modoOuOpcoes === 'object' && modoOuOpcoes !== null ? modoOuOpcoes.modo : modoOuOpcoes;
+  const m = typeof modo === 'string' ? modo.trim() : '';
+  exigir(MODOS.includes(m), `condutor: --modo precisa ser ${MODOS.map((x) => `"${x}"`).join(' ou ')}, e veio ${JSON.stringify(modo)}`);
+  const novo = clone(estadoBruto);
+  novo.versao = Math.max(4, novo.versao ?? 1);
+  novo.modo = m;
+  return novo;
+}
+
+/* Grava a nota de passagem de uma unidade de detalhe (`notasDePassagem`, versão 4 do estado). Texto não vazio de até
+   240 caracteres com o porquê das escolhas da unidade. Devolve o estado novo. */
+export function gravarNotaDePassagem(estadoBruto, unidadeOuOpcoes, textoParam, bruto = null) {
+  const { unidade, texto } = typeof unidadeOuOpcoes === 'object' && unidadeOuOpcoes !== null && !Array.isArray(unidadeOuOpcoes)
+    ? unidadeOuOpcoes
+    : { unidade: unidadeOuOpcoes, texto: textoParam };
+  const unidades = (estadoBruto.unidades?.length) ? estadoBruto.unidades : (bruto ? planoDeDetalhe(bruto).unidades : []);
+  const ids = unidades.map((u) => u.id);
+  const id = unidadePorNome(unidades, unidade);
+  exigir(ids.includes(id), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(String(unidade), ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
+  const t = typeof texto === 'string' ? texto.trim() : '';
+  exigir(t.length > 0, `condutor: --nota-de-passagem exige --texto não vazio com o porquê das escolhas da unidade${texto === undefined ? ' (falta o campo)' : ''}`);
+  exigir(t.length <= LIMITE_DA_NOTA_DE_PASSAGEM, `condutor: a nota de passagem tem ${t.length} caracteres e não pode passar de ${LIMITE_DA_NOTA_DE_PASSAGEM}`);
+  const novo = clone(estadoBruto);
+  novo.versao = Math.max(4, novo.versao ?? 1);
+  novo.notasDePassagem = { ...(novo.notasDePassagem ?? {}), [id]: t };
+  return novo;
+}
+
 /* Texto da situação: estágio, Portão e o que falta, unidades e custo. */
 /* `historico` mostra também as linhas de "agrupamento alterado" (uma por forma movida), que a leitura padrão omite. */
 /* Nome de unidade com no máximo 48 caracteres: o agrupamento automático de um conjunto grande junta dezenas de nomes. */
@@ -640,7 +677,7 @@ export const abreviar = (nome) => (typeof nome === 'string' && nome.length > LIM
 export function formatarSituacao(estado, portao, { historico = false, marcos = true } = {}) {
   const n = (x) => String(x).replace('.', ',');
   const L = [];
-  L.push(`condutor de ${estado.esboco}: nível ${estado.nivel}${estado.nivelDoPlano ? '' : ' (padrão; declare plano.nivel)'}`);
+  L.push(`condutor de ${estado.esboco}: nível ${estado.nivel}${estado.nivelDoPlano ? '' : ' (padrão; declare plano.nivel)'}, modo ${estado.modo ?? MODO_PADRAO}`);
   L.push(`estágios: ${estado.estagios.map((e) => (e === estado.atual ? `[${nomeDoEstagio(e)}]` : nomeDoEstagio(e))).join(' > ')}${estado.atual === CONCLUIDO ? ' > [Concluído]' : ''}`);
   if (estado.atual === CONCLUIDO) L.push('o fluxo terminou: todos os Portões dos estágios ligados passaram');
   else L.push(`Portão de ${nomeDoEstagio(estado.atual)}: ${portao.passa ? 'passa (--proximo avança)' : 'não passa, falta:'}`);
@@ -656,6 +693,7 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
   if (marcos) for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
   if (historico) for (const v of estado.vereditos ?? []) L.push(`veredito do crítico ${v.ordem}: ${abreviar(v.unidade)} nota ${String(v.nota).replace('.', ',')} (${v.motivo})`);
   if (historico) for (const l of estado.liberacoes ?? []) L.push(`liberação ${l.ordem}: ${abreviar(l.unidade)} (nota ${nota1(l.nota)} em ${l.rodadas} rodadas) liberada com o motivo: ${l.motivo}`);
+  if (historico) for (const [unidade, texto] of Object.entries(estado.notasDePassagem ?? {})) L.push(`nota de passagem de ${abreviar(unidade)}: ${texto}`);
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;

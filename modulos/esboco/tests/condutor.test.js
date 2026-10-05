@@ -4,7 +4,7 @@ import { copyFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } fr
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ErroDeEsboco } from '../src/index.js';
-import { avancar, conferirEnvelope, criarEstado, custoDe, ESTAGIOS_POR_NIVEL, formatarEnvelope, formatarSituacao, marcarFeito, moverForma, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, textoDoEnvelope } from '../src/condutor.js';
+import { avancar, conferirEnvelope, criarEstado, custoDe, definirModo, ESTAGIOS_POR_NIVEL, formatarEnvelope, formatarSituacao, gravarNotaDePassagem, LIMITE_DA_FUNCAO, LIMITE_DA_NOTA_DE_PASSAGEM, marcarFeito, MODOS, MODO_PADRAO, moverForma, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, textoDoEnvelope } from '../src/condutor.js';
 import { condutorArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
@@ -200,7 +200,7 @@ describe('o Condutor na linha de comando, na moto de formas curvas', () => {
   it('roda o fluxo de ponta a ponta, grava o estado ao lado do arquivo e recusa pular estágio', () => {
     const dir = mkdtempSync(join(tmpdir(), 'condutor-'));
     const arq = join(dir, 'moto-curvas.esboco.json');
-    copyFileSync(new URL('moto-curvas.esboco.json', pasta).pathname, arq);
+    copyFileSync(new URL('moto-curvas.esboco.json', pasta), arq);
     const memoria = `${arq}.condutor.json`;
     let r = condutorArquivo(arq);
     expect(existsSync(memoria)).toBe(true);
@@ -385,4 +385,166 @@ describe('o Envelope de cada Unidade de detalhe', () => {
     expect(condutorArquivo(arq, { feito: 'tanque' }).texto).toContain('unidade tanque marcada como feita');
     expect(condutorArquivo(arq).texto).toContain('envelope: x -155..155 y 590..791,5 z -140..280; portas tanque.-z [0 690,8 -140] (usada por banco) [envelope conferido com tanque.esboco.json]');
   }, 120000);
+
+  describe('modo de execução e nota de passagem no Condutor', () => {
+    /* Cria um esboço com 9 formas na mesma unidade 'bloco' (mais que LIMITE_DA_FUNCAO = 8), com funcao declarada */
+    const formasBloco = Array.from({ length: 9 }, (_, k) => caixa(`f${k + 1}`, [10 + 20 * k, 10, 0], 20, 20, 20, { unidade: 'bloco' }));
+    const medidasBloco = [
+      medida(),
+      medida({ nome: 'largura', valor: 180, mede: 'larguraTotal' }),
+      medida({ nome: 'l2', valor: 180, mede: 'larguraTotal' }),
+      medida({ nome: 'l3', valor: 180, mede: 'larguraTotal' }),
+      medida({ nome: 'l4', valor: 180, mede: 'larguraTotal' }),
+    ];
+    const esbocoComBloco = () => ({
+      ...fila({ medidas: medidasBloco, contrato: { tocam: [['f1', 'f2']] } }, { opcoes: [{ titulo: 'T', formas: formasBloco }] }),
+      unidades: { bloco: { funcao: 'conjunto de nove caixas para teste de brief' } },
+    });
+
+    it('permite escolher o modo objeto ou por-unidade e recusa modo inválido', () => {
+      const e = fila();
+      const s0 = estadoNaMaquete(e);
+      expect(s0.modo).toBe('objeto');
+      const s1 = definirModo(s0, 'por-unidade');
+      expect(s1.modo).toBe('por-unidade');
+      expect(s1.versao).toBe(4);
+      const s2 = definirModo(s1, 'objeto');
+      expect(s2.modo).toBe('objeto');
+      expect(s2.versao).toBe(4);
+      expect(() => definirModo(s0, 'invalido')).toThrow(/--modo precisa ser/);
+    });
+
+    it('grava a nota de passagem de uma unidade de detalhe existente e eleva versão para 4', () => {
+      const e = fila();
+      const s = passar(e, estadoNaMaquete(e), 3);
+      const s2 = gravarNotaDePassagem(s, { unidade: 'a', texto: 'escolha do ponto de fixação da unidade a' });
+      expect(s2.notasDePassagem).toEqual({ a: 'escolha do ponto de fixação da unidade a' });
+      expect(s2.versao).toBe(4);
+    });
+
+    it('recusa texto vazio ou com apenas espaços em branco', () => {
+      const e = fila();
+      const s = passar(e, estadoNaMaquete(e), 3);
+      expect(() => gravarNotaDePassagem(s, { unidade: 'a', texto: '' })).toThrow(/--texto não vazio/);
+      expect(() => gravarNotaDePassagem(s, { unidade: 'a', texto: '   ' })).toThrow(/--texto não vazio/);
+      expect(() => gravarNotaDePassagem(s, { unidade: 'a' })).toThrow(/--texto não vazio/);
+    });
+
+    it('recusa nota de passagem com mais de 240 caracteres e aceita com até 240', () => {
+      const e = fila();
+      const s = passar(e, estadoNaMaquete(e), 3);
+      const longo = 'a'.repeat(LIMITE_DA_NOTA_DE_PASSAGEM + 1);
+      expect(() => gravarNotaDePassagem(s, { unidade: 'a', texto: longo })).toThrow(/não pode passar de 240/);
+      const noLimite = 'b'.repeat(LIMITE_DA_NOTA_DE_PASSAGEM);
+      const s2 = gravarNotaDePassagem(s, { unidade: 'a', texto: noLimite });
+      expect(s2.notasDePassagem.a).toBe(noLimite);
+    });
+
+    it('recusa unidade que não existe no esboço / plano de detalhe', () => {
+      const e = fila();
+      const s = passar(e, estadoNaMaquete(e), 3);
+      expect(() => gravarNotaDePassagem(s, { unidade: 'fantasma', texto: 'alguma nota' })).toThrow(/não é uma unidade de detalhe/);
+    });
+
+    it('no modo por-unidade, unidade com brief (> 8 formas) recusa --feito sem nota de passagem', () => {
+      const e = esbocoComBloco();
+      const s = definirModo(passar(e, estadoNaMaquete(e), 3), 'por-unidade');
+      expect(() => marcarFeito(e, s, 'bloco')).toThrow(/só vira feita depois de gravar a nota de passagem/);
+    });
+
+    it('no modo por-unidade, unidade com brief é aceita após gravar a nota de passagem', () => {
+      const e = esbocoComBloco();
+      let s = definirModo(passar(e, estadoNaMaquete(e), 3), 'por-unidade');
+      s = gravarNotaDePassagem(s, { unidade: 'bloco', texto: 'estruturas alinhadas em x' });
+      const r = marcarFeito(e, s, 'bloco');
+      expect(r.estado.unidades.find((u) => u.id === 'bloco').feito).toBe(true);
+    });
+
+    it('no modo por-unidade, unidade sem brief (<= 8 formas) não exige nota de passagem', () => {
+      const e = fila();
+      const s = definirModo(passar(e, estadoNaMaquete(e), 3), 'por-unidade');
+      const r = marcarFeito(e, s, 'a');
+      expect(r.estado.unidades.find((u) => u.id === 'a').feito).toBe(true);
+    });
+
+    it('no modo objeto (padrão), unidade com brief é aceita sem exigir nota de passagem', () => {
+      const e = esbocoComBloco();
+      const s = passar(e, estadoNaMaquete(e), 3);
+      expect(s.modo).toBe('objeto');
+      const r = marcarFeito(e, s, 'bloco');
+      expect(r.estado.unidades.find((u) => u.id === 'bloco').feito).toBe(true);
+    });
+
+    it('migra versão do estado antigo preservando compatibilidade', () => {
+      const estadoLegado = {
+        versao: 1,
+        esboco: 'legado.esboco.json',
+        nivel: 'detalhado',
+        estagios: ['detalhe-por-unidade'],
+        atual: 'detalhe-por-unidade',
+        historico: [],
+        unidades: [{ id: 'u1', membros: ['f1'], formas: 1, custo: 1, depende: [], feito: false }],
+        alteracoes: [],
+        marcos: [],
+        avisos: [],
+      };
+      const sModo = definirModo(estadoLegado, 'por-unidade');
+      expect(sModo.versao).toBe(4);
+      expect(sModo.modo).toBe('por-unidade');
+
+      const sNota = gravarNotaDePassagem(estadoLegado, { unidade: 'u1', texto: 'nota migrada' });
+      expect(sNota.versao).toBe(4);
+      expect(sNota.notasDePassagem).toEqual({ u1: 'nota migrada' });
+
+      /* marcarFeito no estado legado sem modo funciona no modo objeto */
+      const e = fila({}, { opcoes: [{ titulo: 'T', formas: [caixa('f1', [0, 0, 0], 20, 20, 20, { unidade: 'u1' })] }] });
+      const r = marcarFeito(e, estadoLegado, 'u1');
+      expect(r.estado.unidades[0].feito).toBe(true);
+    });
+
+    it('--historico exibe as notas de passagem gravadas e a situação exibe o modo', () => {
+      const e = fila();
+      let s = passar(e, estadoNaMaquete(e), 3);
+      s = definirModo(s, 'por-unidade');
+      s = gravarNotaDePassagem(s, { unidade: 'a', texto: 'escolha de fixacao em trilho' });
+      const portao = portaoDoEstagio(e, s);
+      const semHist = formatarSituacao(s, portao);
+      expect(semHist).toContain('modo por-unidade');
+      expect(semHist).not.toContain('nota de passagem de a');
+
+      const comHist = formatarSituacao(s, portao, { historico: true });
+      expect(comHist).toContain('modo por-unidade');
+      expect(comHist).toContain('nota de passagem de a: escolha de fixacao em trilho');
+    });
+
+    it('linha de comando: --modo, --nota-de-passagem e --historico via condutorArquivo', () => {
+      const dir = mkdtempSync(join(tmpdir(), 'condutor-modo-'));
+      const arq = join(dir, 'bloco.esboco.json');
+      const e = esbocoComBloco();
+      writeFileSync(arq, JSON.stringify(e));
+
+      /* cria o estado e avança até detalhe-por-unidade */
+      for (let i = 0; i < 4; i++) condutorArquivo(arq, { proximo: true });
+
+      /* altera modo */
+      let r = condutorArquivo(arq, { modo: 'por-unidade' });
+      expect(r.texto).toContain('modo do Condutor alterado para "por-unidade"');
+      expect(r.texto).toContain('modo por-unidade');
+
+      /* recusa --feito da unidade bloco (9 formas) antes de ter nota */
+      expect(() => condutorArquivo(arq, { feito: 'bloco' })).toThrow(/só vira feita depois de gravar a nota de passagem/);
+
+      /* grava nota de passagem */
+      r = condutorArquivo(arq, { notaDePassagem: 'bloco', texto: 'justificativa das escolhas do bloco' });
+      expect(r.texto).toContain('nota de passagem registrada para a unidade bloco');
+
+      /* agora --feito passa */
+      r = condutorArquivo(arq, { feito: 'bloco' });
+      expect(r.texto).toContain('unidade bloco marcada como feita');
+
+      /* --historico exibe a nota de passagem */
+      r = condutorArquivo(arq, { historico: true });
+      expect(r.texto).toContain('nota de passagem de bloco: justificativa das escolhas do bloco');
+    });
+  });
 });
