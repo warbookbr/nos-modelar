@@ -167,7 +167,22 @@ A preencher.
 
 ## Depois deste plano
 
-O candidato principal é [as partes do braço](congelados/2026-09-26-as-partes-do-braco.md),
-congeladas em 2026-09-29 e que voltam quando este plano fechar. A ponte entre o
-esboço e o Mecanifica também fica para depois, e exige decidir antes como o
-módulo, independente do núcleo, entrega o esqueleto de montagem sem importá-lo.
+O usuário do Mecanifica é a IA, e o ganho se mede pelo que uma IA consegue
+fazer com ele. O candidato principal passa a ser o banco de provas: um conjunto
+fixo de uns dez objetos, do simples ao complexo, cada um levado pelo fluxo
+inteiro com um modelo fixo, que registra se fechou com nota 8 ou mais do
+crítico, os contornos, os tokens, o tempo e as rodadas, e uma linha de base da
+mesma IA escrevendo código 3D sem o Mecanifica. Toda mudança seguinte é medida
+contra esse placar. A fatia 9 deste plano é a primeira versão pequena dele.
+
+O segundo candidato é a ponte entre o esboço e o Mecanifica, para que o que o
+esboço já resolveu não seja refeito na modelagem: as unidades e a ordem de
+dependência viram as etapas da montagem, as caixas de cada unidade viram o
+envelope de cada parte, as ligações e âncoras viram as portas e as juntas, as
+medidas do plano viram as medidas da peça, e a `funcao` e os vereditos do
+crítico viram os critérios de reprovação. Ela exige decidir antes como o
+módulo, independente do núcleo, entrega esse esqueleto sem importá-lo, e o
+banco de provas mede quanto ela poupa.
+
+[As partes do braço](congelados/2026-09-26-as-partes-do-braco.md), congeladas
+em 2026-09-29, voltam como um dos objetos do banco de provas.
