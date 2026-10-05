@@ -87,3 +87,6 @@ encerrado.
 [`PLANO-ESTADO-DA-ARTE-ESBOCO.md`](PLANO-ESTADO-DA-ARTE-ESBOCO.md) é o plano de
 2026-09-28 para `de`/`para`, âncoras, polígono e espelho no módulo do esboço,
 absorvido por "o esboço sem conta à mão" e movido de `modulos/esboco/`.
+
+[`LEVANTAMENTO-IA-3D-2026-10.md`](LEVANTAMENTO-IA-3D-2026-10.md) reúne o que se
+confirmou nas fontes sobre IAs que geram 3D e abordagens de texto para CAD.

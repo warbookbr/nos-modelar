@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-896 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+897 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -157,6 +157,7 @@
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
+- `LEVANTAMENTO-IA-3D-2026-10.md` — Levantamento: IAs que geram 3D e o lugar do Mecanifica (2026-10-05)
 - `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
