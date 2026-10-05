@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { copyFileSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { avancar, criarEstado, formatarSituacao, marcarFeito, moverFormas, planoDeDetalhe, portaoDoEstagio } from '../src/condutor.js';
 import { detalharUnidade, integrarUnidade } from '../src/detalhe.js';
 import { descreverAchado, verificarContato } from '../src/contato.js';
@@ -140,7 +141,7 @@ describe('bug 3: --detalhar com a tolerância e as ligações do mestre', () => 
 });
 
 describe('bug 4: --editar e --integrar mantêm o formato compacto do arquivo', () => {
-  const copia = (nome) => { const dir = dirTemp('formato-'); const arq = join(dir, nome); copyFileSync(new URL(nome, pasta).pathname, arq); return arq; };
+  const copia = (nome) => { const dir = dirTemp('formato-'); const arq = join(dir, nome); copyFileSync(fileURLToPath(new URL(nome, pasta)), arq); return arq; };
 
   it('a regravação devolve o texto das fixtures byte a byte e não passa a um número por linha', () => {
     for (const nome of readdirSync(new URL('.', pasta)).filter((n) => n.endsWith('.esboco.json'))) {

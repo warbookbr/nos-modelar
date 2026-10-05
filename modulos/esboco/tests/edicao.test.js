@@ -6,6 +6,7 @@ import { copyFileSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import { createHash } from 'node:crypto';
 import { desenharEsboco, ErroDeEsboco, resolverOpcao } from '../src/index.js';
@@ -19,9 +20,9 @@ import { conferirPlano, lerPlano } from '../src/plano.js';
 import { descreverArquivo, editarArquivo, lerArgumentos, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
-const caminho = (nome) => new URL(nome, pasta).pathname;
+const caminho = (nome) => fileURLToPath(new URL(nome, pasta));
 const fixture = (nome) => JSON.parse(readFileSync(caminho(nome), 'utf8'));
-const cli = new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url).pathname;
+const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
 const sha = (t) => createHash('sha256').update(t).digest('hex');
 const formasDe = (e, i = 0) => expandirEsboco(e).opcoes[i].formas;
 const formaDe = (e, id) => formasDe(e).find((f) => f.id === id);

@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import { ErroDeEsboco, resolverOpcao } from '../src/index.js';
 import { expandirEsboco } from '../src/expandir.js';
@@ -12,7 +13,7 @@ import { imagemDoAchado, pontoDoAchado } from '../src/achado.js';
 import { achadoArquivo, analisarEsboco, descreverArquivo, lerArgumentos } from '../../../tools/mecanifica/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
-const caminho = (nome) => new URL(nome, pasta).pathname;
+const caminho = (nome) => fileURLToPath(new URL(nome, pasta));
 const fixture = (nome) => JSON.parse(readFileSync(caminho(nome), 'utf8'));
 const sha = (t) => createHash('sha256').update(t).digest('hex');
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });

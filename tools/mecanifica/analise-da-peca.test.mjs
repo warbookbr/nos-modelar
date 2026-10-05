@@ -2,11 +2,12 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { analisarPeca, estadoDaAnalise, lerZoom } from './analise-da-peca.mjs';
 
-const REPO = new URL('../..', import.meta.url).pathname;
+const REPO = fileURLToPath(new URL('../..', import.meta.url));
 const PECA = 'peca-teste-analise';
 const PASTA = `tools/bancadas/out/analise-${PECA}`;
 afterEach(() => rmSync(join(REPO, PASTA), { recursive: true, force: true }));

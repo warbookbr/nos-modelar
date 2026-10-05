@@ -8,6 +8,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ancorasDe, resolverOpcao } from '../src/index.js';
 import { expandirEsboco } from '../src/expandir.js';
 import { medirEsboco } from '../src/descrever.js';
@@ -16,7 +17,7 @@ import { detalharUnidade } from '../src/detalhe.js';
 import { visiveisDoEsboco } from '../src/plano.js';
 import { detalharArquivo, editarArquivo, integrarArquivo, lerArgumentos } from '../../../tools/mecanifica/esboco.mjs';
 
-const cli = new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url).pathname;
+const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const dirTemp = () => mkdtempSync(join(tmpdir(), 'esboco-atritos-'));
 const gravar = (dir, nome, obj) => { const caminho = join(dir, nome); writeFileSync(caminho, `${JSON.stringify(obj, null, 2)}\n`); return caminho; };

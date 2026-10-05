@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { copyFileSync, existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { avancar, criarEstado, formatarSituacao, moverEmLote, moverFormas, planoDeDetalhe, portaoDoEstagio, replanejar } from '../src/condutor.js';
 import { detalharUnidade, integrarUnidade } from '../src/detalhe.js';
 import { verificarContato } from '../src/contato.js';
@@ -16,7 +17,7 @@ import { condutorArquivo, detalharArquivo, integrarArquivo, resolverCaminho } fr
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const fixture = (nome) => JSON.parse(readFileSync(new URL(nome, pasta), 'utf8'));
-const cli = new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url).pathname;
+const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 const motivo = 'as formas se separam por outra razão neste teste';
 const esboco = (formas, contato = {}) => ({ contato: { usar: true, ...contato }, opcoes: [{ titulo: 'T', formas }] });
@@ -253,7 +254,7 @@ describe('--detalhar e --integrar', () => {
   const copiaDaMoto = () => {
     const dir = mkdtempSync(join(tmpdir(), 'detalhe-'));
     const arq = join(dir, 'moto.esboco.json');
-    copyFileSync(new URL('moto-curvas.esboco.json', pasta).pathname, arq);
+    copyFileSync(fileURLToPath(new URL('moto-curvas.esboco.json', pasta)), arq);
     for (let i = 0; i < 4; i++) condutorArquivo(arq, { proximo: true });
     return { dir, arq };
   };
@@ -347,9 +348,9 @@ describe('arrumação da linha de comando', () => {
   it('um caminho relativo vale a partir de INIT_CWD, e o absoluto fica como está', () => {
     const antes = process.env.INIT_CWD;
     try {
-      process.env.INIT_CWD = '/tmp/de-quem-chamou';
-      expect(resolverCaminho('a/b.esboco.json')).toBe('/tmp/de-quem-chamou/a/b.esboco.json');
-      expect(resolverCaminho('/x/y.json')).toBe('/x/y.json');
+      process.env.INIT_CWD = resolve('/tmp/de-quem-chamou');
+      expect(resolverCaminho('a/b.esboco.json')).toBe(resolve('/tmp/de-quem-chamou', 'a/b.esboco.json'));
+      expect(resolverCaminho(resolve('/x/y.json'))).toBe(resolve('/x/y.json'));
       delete process.env.INIT_CWD;
       expect(resolverCaminho('a.json')).toBe(join(process.cwd(), 'a.json'));
     } finally { if (antes === undefined) delete process.env.INIT_CWD; else process.env.INIT_CWD = antes; }
@@ -358,7 +359,7 @@ describe('arrumação da linha de comando', () => {
   it('a linha de comando lê o arquivo relativo a INIT_CWD, e --forma sozinha descreve sem desenhar nem gravar imagem', () => {
     const dir = mkdtempSync(join(tmpdir(), 'chamador-'));
     writeFileSync(join(dir, 'f.esboco.json'), JSON.stringify(esboco([caixa('a', [0, 10, 0]), caixa('b', [0, 40, 0])])));
-    const r = spawnSync('node', [cli, 'f.esboco.json', '--forma', 'a'], { cwd: new URL('../../..', import.meta.url).pathname, env: { ...process.env, INIT_CWD: dir }, encoding: 'utf8' });
+    const r = spawnSync('node', [cli, 'f.esboco.json', '--forma', 'a'], { cwd: fileURLToPath(new URL('../../..', import.meta.url)), env: { ...process.env, INIT_CWD: dir }, encoding: 'utf8' });
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/\ba\b/);
     expect(r.stdout).not.toMatch(/px\/mm/);

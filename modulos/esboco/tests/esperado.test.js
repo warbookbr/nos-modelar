@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import { desenharEsboco } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
 import { medirEsboco } from '../src/descrever.js';
@@ -13,7 +14,7 @@ import { avancar, conferirEnvelope, criarEstado, marcarFeito, portaoDoEstagio, r
 import { descreverArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
-const caminho = (nome) => new URL(nome, pasta).pathname;
+const caminho = (nome) => fileURLToPath(new URL(nome, pasta));
 const lerJson = (nome) => JSON.parse(readFileSync(caminho(nome), 'utf8'));
 const gravar = process.env.ESBOCO_GRAVAR_ESPERADO === '1';
 const sha = (t) => createHash('sha256').update(t).digest('hex');
