@@ -134,7 +134,7 @@ peças sem função antes de a imagem chegar à pessoa.
    pessoa (a skill manda pedir antes) e fica no histórico. O `esbocista` e a
    `esboco-detalhado` mandam abrir as quatro imagens da unidade antes do
    `--feito`.
-8. O custo de contexto. A skill `esboco-detalhado` (33 KB, lida inteira por
+8. (em andamento; a divisão da skill está feita) O custo de contexto. A skill `esboco-detalhado` (33 KB, lida inteira por
    todo esbocista) se divide num núcleo curto com o fluxo e as regras e numa
    referência por ferramenta, lida só quando a ferramenta é usada, sem perder
    instrução (conferido frase a frase). A `laco-do-esboco` ganha o modo de um

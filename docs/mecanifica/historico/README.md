@@ -83,3 +83,7 @@ Ficaram na raiz os contratos vivos, incluindo as quatro versões de montagem
 persistida — a v1 ainda é citada como contrato por uma skill — e o dossiê do
 modelador inverso, que é vinculante para um plano congelado e não para um
 encerrado.
+
+[`PLANO-ESTADO-DA-ARTE-ESBOCO.md`](PLANO-ESTADO-DA-ARTE-ESBOCO.md) é o plano de
+2026-09-28 para `de`/`para`, âncoras, polígono e espelho no módulo do esboço,
+absorvido por "o esboço sem conta à mão" e movido de `modulos/esboco/`.

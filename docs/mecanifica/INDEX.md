@@ -24,7 +24,8 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: nenhum. [Topologia, mover a peça, e ler o
+- Plano **ativo**: [o esboço detalhado coerente](planos/2026-10-01-o-esboco-detalhado-coerente.md).
+  Antes dele, [topologia, mover a peça, e ler o
   gesto](planos/encerrados/2026-09-16-topologia-e-leitura-do-gesto.md) foi
   **concluído** em 2026-09-17: extrudar, duplicar, apagar, criar face, girar e
   escalar vivem no núcleo sem Three.js, `G` move a parte como corpo, e

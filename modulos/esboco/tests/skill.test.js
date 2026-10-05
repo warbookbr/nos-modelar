@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs';
 
 const ler = (caminho) => readFileSync(new URL(`../../../${caminho}`, import.meta.url), 'utf8');
 const skill = ler('.claude/skills/esboco-detalhado/SKILL.md');
+const formato = ler('.claude/skills/esboco-detalhado/resumo-do-formato.md');
+const menosJson = ler('.claude/skills/esboco-detalhado/escrever-menos-json.md');
 const opcoes = ler('.claude/skills/esbocar-opcoes/SKILL.md');
 const pare = ler('docs/mecanifica/usar/PARE-E-ANALISE.md');
 
@@ -60,9 +62,9 @@ describe('a skill esboco-detalhado', () => {
   });
 
   it('traz o resumo compacto do formato com os campos e os tipos', () => {
-    const r = secao(skill, 'Resumo do formato');
-    for (const t of ['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo']) expect(r).toContain(`\`${t}\``);
-    for (const c of ['juntas', 'plano', 'nivel', 'medidas', 'contrato', 'quis dizer']) expect(r).toContain(c);
+    expect(skill).toContain('resumo-do-formato.md');
+    for (const t of ['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo']) expect(formato).toContain(`\`${t}\``);
+    for (const c of ['juntas', 'plano', 'nivel', 'medidas', 'contrato', 'quis dizer']) expect(formato).toContain(c);
   });
 
   it('manda listar as partes que o objeto precisa ter antes de modelar, sem citar objeto, e ensina estilos, simetria, perfis e --editar', () => {
@@ -71,8 +73,8 @@ describe('a skill esboco-detalhado', () => {
     expect(p).not.toMatch(OBJETOS);
     expect(pare).toContain('plano.pecas');
     expect(pare).toContain('a partir do conhecimento do objeto');
-    const e = secao(skill, 'Escrever menos JSON');
-    for (const termo of ['estilos', 'unidades', 'simetrico', '`lado: "E"`', '"gerar": "estrela"', '"gerar": "arco"', '"gerar": "circulo"', '"gerar": "polar"', '--editar', '--remover', '--adicionar']) expect(e, termo).toContain(termo);
+    expect(skill).toContain('escrever-menos-json.md');
+    for (const termo of ['estilos', 'unidades', 'simetrico', '`lado: "E"`', '"gerar": "estrela"', '"gerar": "arco"', '"gerar": "circulo"', '"gerar": "polar"', '--editar', '--remover', '--adicionar']) expect(menosJson, termo).toContain(termo);
     expect(skill).toContain('--unidade <unidade>');
     expect(skill).toContain('substitui');
   });

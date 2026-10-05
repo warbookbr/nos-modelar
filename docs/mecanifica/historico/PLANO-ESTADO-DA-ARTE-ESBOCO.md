@@ -1,10 +1,10 @@
 # Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
 
-> **Status:** Substituído por [docs/mecanifica/planos/encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md](../../docs/mecanifica/planos/encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md) em 2026-09-29. O plano ativo absorve `de`/`para` (`tubo`), âncoras, espelho e o polígono; o texto abaixo fica como histórico e não governa trabalho novo.  
+> **Status:** Substituído por [docs/mecanifica/planos/encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md](../planos/encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md) em 2026-09-29. O plano ativo absorve `de`/`para` (`tubo`), âncoras, espelho e o polígono; o texto abaixo fica como histórico e não governa trabalho novo.  
 > **Estado anterior:** Proposta de Planejamento / Aguardando Aprovação  
 > **Objetivo:** Tornar o motor de esboço declarativo capaz de modelar equipamentos complexos (ex: motocicletas, veículos e maquinários industriais) de forma rápida, robusta e ergonômica para agentes de IA, eliminando o cálculo manual de trigonometria 3D.  
 > **Stack:** Node.js (ESM), SVG vetorial, Playwright (rasterização PNG), Vitest.  
-> **Arquivo Alvo:** [`modulos/esboco/src/index.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/src/index.js)
+> **Arquivo Alvo:** [`modulos/esboco/src/index.js`](../../../modulos/esboco/src/index.js)
 
 ---
 
@@ -94,7 +94,7 @@ Cada peça resolvida expõe âncoras automáticas no seu Bounding Box e no seu e
 ## 3. Tarefas de Implementação
 
 ### Tarefa 1: Suporte a Vetor Direto (`de` / `para`)
-- **Arquivo:** [`modulos/esboco/src/index.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/src/index.js)
+- **Arquivo:** [`modulos/esboco/src/index.js`](../../../modulos/esboco/src/index.js)
 - **Teste:** [`modulos/esboco/tests/esboco.test.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/tests/esboco.test.js)
 - **Implementação:**
   1. Detectar se `f.de` e `f.para` estão presentes em cilindro/caixa.
@@ -102,13 +102,13 @@ Cada peça resolvida expõe âncoras automáticas no seu Bounding Box e no seu e
   3. Validar se o comprimento é $> 0$.
 
 ### Tarefa 2: Âncoras Semânticas de Montagem (`conectar`)
-- **Arquivo:** [`modulos/esboco/src/index.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/src/index.js)
+- **Arquivo:** [`modulos/esboco/src/index.js`](../../../modulos/esboco/src/index.js)
 - **Implementação:**
   1. No resolver de formas, após calcular o Bounding Box 3D orientado de cada forma, registrar dicionário de âncoras (`ancoras.set(id, { topo, base, ... })`).
   2. Ao resolver uma forma que declare `"conectar": "alvo.ancora"`, posicionar a âncora oposta da peça filha diretamente sobre a âncora declarada.
 
 ### Tarefa 3: Primitiva `poligono` com Extrusão Livre
-- **Arquivo:** [`modulos/esboco/src/index.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/src/index.js)
+- **Arquivo:** [`modulos/esboco/src/index.js`](../../../modulos/esboco/src/index.js)
 - **Implementação:**
   1. Adicionar caso `tipo === 'poligono'` na função `prisma()`.
   2. Validar que o perfil possui pelo menos 3 pontos não-colineares e calcular a normal.
@@ -116,7 +116,7 @@ Cada peça resolvida expõe âncoras automáticas no seu Bounding Box e no seu e
   4. Suportar extrusão nos eixos `x`, `y` ou `z`.
 
 ### Tarefa 4: Espelhamento Automático (`espelho`)
-- **Arquivo:** [`modulos/esboco/src/index.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/src/index.js)
+- **Arquivo:** [`modulos/esboco/src/index.js`](../../../modulos/esboco/src/index.js)
 - **Implementação:**
   1. Pré-processar a lista `formas` da opção.
   2. Para cada forma com `espelho: "x"`, clonar a geometria invertendo coordenadas `x`, eixos e invertendo a ordem dos vértices das tampas para preservar normais externas.

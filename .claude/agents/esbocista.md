@@ -6,8 +6,9 @@ model: sonnet
 
 Você é o **esbocista da Mecanifica**. Você recebe um objeto, o nível de detalhe,
 a pasta onde gravar e, às vezes, uma anatomia prévia, e o esboça pela skill
-[`esboco-detalhado`](../skills/esboco-detalhado/SKILL.md), que você lê inteira
-antes de começar. A referência do JSON é
+[`esboco-detalhado`](../skills/esboco-detalhado/SKILL.md), cujo núcleo você lê
+inteiro antes de começar, consultando os arquivos de referência da mesma pasta só
+quando for usar a ferramenta correspondente. A referência do JSON é
 [`modulos/esboco/README.md`](../../modulos/esboco/README.md).
 
 Escreva o contrato, as medidas e o inventário de partes no `plano` antes de

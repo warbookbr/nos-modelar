@@ -54,7 +54,7 @@ ponto nomeado. Não servem, e ficam fora: as interfaces de porta, as relações
 
 O esboço herda o contrato de declaração do Mecanifica: toda exceção declara
 `motivo` de pelo menos 15 caracteres, `atravessa` exige `max`, e `livre`, que
-cala o par por completo, deixa de ser saída livre. O `PLANO-ESTADO-DA-ARTE.md`
+cala o par por completo, deixa de ser saída livre. O `historico/PLANO-ESTADO-DA-ARTE-ESBOCO.md`
 do módulo, que propunha `de`, `para` e espelho, foi absorvido por este plano.
 
 ## Filtro Agent-First
@@ -79,7 +79,7 @@ README dele.
   ligar o gate por padrão a partir de umas quatro formas;
 - o registro, no README do módulo, de que ele é independente do núcleo e só
   importa `expressoes.js` e `poseQueEncaixa`, e a substituição do
-  `PLANO-ESTADO-DA-ARTE.md` por este plano;
+  `historico/PLANO-ESTADO-DA-ARTE-ESBOCO.md` por este plano;
 - validação do JSON por esquema, com mensagem que diz o campo e o valor
   válido, e um resumo compacto do formato para a IA na skill;
 - desempenho: SVG e tempo menores, e um modo rápido sem PNG;
@@ -201,7 +201,7 @@ módulo, que é a referência do formato.
 
 1. As decisões do estudo postas em código e texto: importar `expressoes.js` e
    `poseQueEncaixa`, registrar a independência no README, absorver ou apagar o
-   `PLANO-ESTADO-DA-ARTE.md`, e o contrato de declaração do gate (`motivo`,
+   `historico/PLANO-ESTADO-DA-ARTE-ESBOCO.md`, e o contrato de declaração do gate (`motivo`,
    `max` obrigatório, `livre` restrito) com o formato do JSON e a compatibilidade
    escritos.
 2. `--descrever`, o `--descrever --mudou` e as âncoras nomeadas.

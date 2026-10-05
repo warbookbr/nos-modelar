@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-886 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+896 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -13,6 +13,7 @@
 - `CLAUDE.md` — Mecanifica — acordo de trabalho
 - `README.md` — Mecanifica
 - `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
+- `comunicacao.md` — Comunicação entre IAs
 - `vite.config.js` — vite.config.js — build estático da BANCADA de autoria, publicada em warbookbr/nos-mecanifica no GitHub Pages. O produto que o cliente abre vive em warbookbr/…
 - `vitest.config.ts` — Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**.
 
@@ -65,7 +66,16 @@
 
 ## .claude/skills/esboco-detalhado/
 
+- `CONFERENCIA.md` — Conferência da divisão da skill esboco-detalhado
 - `SKILL.md` — Esboçar um objeto inteiro em formas primitivas e componentes, com contrato, medidas nomeadas, unidades de detalhe, gate de contato, crítico cego e Marcos, co…
+- `escrever-menos-json.md` — Escrever menos JSON
+- `faixas-rodas-discos.md` — Faixas, rodas e discos
+- `formas-e-componentes.md` — Formas novas e componentes
+- `leitura-em-texto.md` — Ler em texto antes da imagem
+- `regras-de-contato.md` — Regras de contato
+- `resumo-do-formato.md` — Resumo do formato
+- `sobreposicao-na-projecao.md` — Sobreposição na projeção
+- `variantes-simetria-repeticao.md` — Variantes, simetria e repetição
 
 ## .claude/skills/laco-de-modelagem/
 
@@ -150,6 +160,7 @@
 - `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `PLANO-ESTADO-DA-ARTE-ESBOCO.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `README.md` — Histórico da Mecanifica
@@ -359,7 +370,6 @@
 
 ## modulos/esboco/
 
-- `PLANO-ESTADO-DA-ARTE.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
 - `README.md` — @mecanifica/esboco
 
 ## modulos/esboco/componentes/
