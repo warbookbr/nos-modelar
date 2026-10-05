@@ -43,37 +43,45 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T009 — Levantamento: IAs que geram 3D e o lugar do Mecanifica (só leitura)
+### T010 — Conferir as fontes do levantamento da T009 (só leitura)
 
 - **Status:** aberta
-- **Objetivo:** reunir informação pública concreta para a pessoa decidir se o
-  Mecanifica continua promissor. A pergunta é: as IAs que geram 3D (Tripo,
-  Meshy, Rodin/Hyper3D, Luma, modelos abertos como TRELLIS e Hunyuan3D, e
-  abordagens de CAD por código) já entregam precisão mecânica, edição
-  localizada e partes com relações? Ou essa lacuna continua aberta?
+- **Objetivo:** dizer, fonte por fonte, o que existe e o que o relatório da T009
+  afirmou sem base. A Planejadora não conseguiu conferir (a busca na web dela
+  está bloqueada) e desconfia de parte dos dados.
 - **Ler antes:**
-  - `README.md` — o que o Mecanifica faz (raiz do repositório)
-  - `docs/mecanifica/AUTORIA-IA.md` — o ciclo de autoria do projeto
+  - `comunicacao.md` — o relatório da T009 já foi retirado deste arquivo; use o
+    quadro "Fontes a conferir" abaixo
 - **Mexer em:** nada do repositório. Escreva só em "Relatório".
 - **Não mexer em:** qualquer arquivo.
-- **Antes de tudo:** se você não tem acesso à web, escreva isso no Relatório,
-  marque `Status: bloqueada` e pare. Não responda de memória.
-- **Passos:**
-  1. Para cada ferramenta ou abordagem, procure: o que ela gera (malha, CAD
-     paramétrico, código), o que diz sobre precisão dimensional, se permite
-     editar uma parte sem refazer tudo, se separa o objeto em partes, preço e
-     limites de uso, e a data da informação.
-  2. Procure avaliações independentes: artigos científicos, benchmarks,
-     relatos de quem usou para peças mecânicas ou impressão 3D. Separe do que é
-     texto de marketing das próprias empresas.
-  3. Procure abordagens de "texto para CAD" ou "LLM gera código de CAD"
-     (CadQuery, OpenSCAD, scripts de Blender e similares), com resultados
-     medidos.
-  4. Diga, com base só no que achou, onde cada abordagem supera ou perde para o
-     que o Mecanifica se propõe a fazer.
-- **Verificação:** cada afirmação tem link e data. Separe no texto o que foi
-  medido por terceiros, o que é promessa do fabricante e o que você não
-  encontrou ("não encontrei evidência de X"). Não preencha lacuna com palavras
-  plausíveis.
-- **Relatório:** (Executora preenche. Tabelas e listas, sem resumo longo. No
-  fim, 5 linhas: o que está comprovado, o que é promessa, o que falta saber.)
+- **Antes de tudo:** se você não tem acesso à web, escreva isso, marque
+  `Status: bloqueada` e pare. Não responda de memória.
+- **Fontes a conferir** (abra cada uma, não resuma de memória):
+  1. arXiv 2607.05123 — "AssemCAD" / AssemBench: título, autores, data, e se o
+     resumo traz SR e APR para LLMs gerais. Confirme ou negue os números
+     citados: Claude-4.8 SR 85,00% e APR 0,83%; Claude Opus 4.8 SR 65,83% e APR
+     0,00%; Gemini 3.5 Flash SR 30,83% e APR 0,00%; GPT-5.5 SR 79,17% e APR
+     66,67%; AssemCAD SR 89,17% e APR 87,50%. Diga se esses nomes de modelo
+     aparecem no artigo.
+  2. arXiv 2609.13146 — "SNAP3D": título, autores, data, e se as estabilidades
+     citadas (0 a 2% dos geradores de partes contra 95% do método) estão lá.
+  3. arXiv 2505.14646 — CAD-Coder: VSR 100% e IoU 0,675 contra GPT-4.5 (0,524),
+     o1 (0,494) e Gemini 2.0 Pro (0,445).
+  4. arXiv 2412.14042 — CAD-Recode: taxas de código inválido de 7,9% (DeepCAD)
+     e 21,0% (MCB).
+  5. arXiv 2410.15684 — o artigo que a T009 chamou de CADPrompt/CADCodeVerify:
+     confira se o número de arXiv corresponde a esse título e as taxas de
+     compilação (GPT-4 96,5%, Gemini 1.5 Pro 85,0%, CodeLlama 73,5%).
+  6. arXiv 2501.12211 — a T009 o citou como Hunyuan3D 2.0; confira título e
+     número.
+  7. As "avaliações de terceiros" sobre furos ovalados, roscas e cotas ignoradas
+     em Tripo/Meshy/Luma: para cada afirmação, ache a página específica (não a
+     página inicial do site). Se não achar, escreva "não encontrei".
+  8. Preços e créditos de Tripo, Meshy e Rodin: confirme na página oficial de
+     preços e anote a data da consulta.
+- **Verificação:** para cada item, uma linha: `confirmado`, `diferente` (diga o
+  que o artigo realmente traz) ou `não encontrei`, com o link exato e a data da
+  consulta. Cite o trecho do resumo que sustenta. Não complete lacuna com
+  valor plausível.
+- **Relatório:** (Executora preenche. Uma tabela, sem opinião sobre o
+  Mecanifica.)
