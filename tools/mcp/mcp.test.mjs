@@ -103,13 +103,17 @@ function clienteStdio() {
     for (const { reject } of respostas.values()) reject(new Error('servidor encerrou antes da resposta.'));
     respostas.clear();
   });
+  /* 30 s para requisições e encerramento do cliente de teste, não os 5 s
+     iniciais. Em execuções paralelas com disputa de CPU e disco no Windows, o
+     servidor pode demorar mais para inicializar e responder; falha por
+     contenção é falso vermelho. Um servidor travado ainda falha em 30 s. */
   function enviar(method, params = {}) {
     const id = proximoId++;
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         respostas.delete(id);
         reject(new Error(`tempo esgotado para ${method}`));
-      }, 5_000);
+      }, 30_000);
       respostas.set(id, {
         resolve: (mensagem) => { clearTimeout(timer); resolve(mensagem); },
         reject: (erro) => { clearTimeout(timer); reject(erro); },
@@ -123,7 +127,7 @@ function clienteStdio() {
   async function fechar() {
     processo.stdin.end();
     await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('servidor não encerrou')), 5_000);
+      const timer = setTimeout(() => reject(new Error('servidor não encerrou')), 30_000);
       processo.once('close', (codigo, sinal) => {
         clearTimeout(timer);
         if (codigo !== 0 && sinal === null) reject(new Error(`servidor encerrou com código ${codigo}`));
@@ -149,7 +153,7 @@ async function conectado() {
 describe('servidor MCP local — perfil revisao', () => {
   it('importa sem iniciar stdio nem escrever', () => {
     const resultado = spawnSync(process.execPath, ['--input-type=module', '-e', `import(${JSON.stringify(pathToFileURL(SERVIDOR).href)})`], {
-      cwd: RAIZ, encoding: 'utf8', timeout: 5_000,
+      cwd: RAIZ, encoding: 'utf8', timeout: 30_000,
     });
     expect(resultado.status).toBe(0);
     expect(resultado.stdout).toBe('');

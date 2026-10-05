@@ -43,39 +43,37 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T008 — Timeout do cliente MCP do teste estoura por carga
+### T009 — Levantamento: IAs que geram 3D e o lugar do Mecanifica (só leitura)
 
 - **Status:** aberta
-- **Objetivo:** `tools/mcp/mcp.test.mjs` deixa de falhar com `tempo esgotado para
-  initialize` quando roda junto de outros testes e gates. Num `npm run gates`
-  completo no Windows, 2 testes do perfil `revisao` falharam assim; o mesmo
-  arquivo passou (39 testes) quando rodou sozinho. É falha por contenção de CPU,
-  não defeito do servidor.
+- **Objetivo:** reunir informação pública concreta para a pessoa decidir se o
+  Mecanifica continua promissor. A pergunta é: as IAs que geram 3D (Tripo,
+  Meshy, Rodin/Hyper3D, Luma, modelos abertos como TRELLIS e Hunyuan3D, e
+  abordagens de CAD por código) já entregam precisão mecânica, edição
+  localizada e partes com relações? Ou essa lacuna continua aberta?
 - **Ler antes:**
-  - `CLAUDE.md` — regras do repositório
-  - `vitest.config.ts` — o comentário em `testTimeout: 180_000` e `maxWorkers`
-    explica a política do repositório: falha por contenção é falso vermelho, e o
-    orçamento tem de caber no trabalho real
-  - `tools/mcp/mcp.test.mjs` — linhas 105 a 130 (o cliente de teste) e 150 a 155
-    (outro `timeout: 5_000`)
-- **Mexer em:** só `tools/mcp/mcp.test.mjs`.
-- **Não mexer em:** o servidor MCP, `vitest.config.ts`, os outros testes.
+  - `README.md` — o que o Mecanifica faz (raiz do repositório)
+  - `docs/mecanifica/AUTORIA-IA.md` — o ciclo de autoria do projeto
+- **Mexer em:** nada do repositório. Escreva só em "Relatório".
+- **Não mexer em:** qualquer arquivo.
+- **Antes de tudo:** se você não tem acesso à web, escreva isso no Relatório,
+  marque `Status: bloqueada` e pare. Não responda de memória.
 - **Passos:**
-  1. No cliente de teste, o `setTimeout` de `enviar` (5_000, linha 112) e o de
-     `fechar` (5_000, linha 126) são limites curtos que a política acima
-     dispensa. Suba para um valor alinhado ao resto da suíte (sugestão: 30_000) e
-     escreva um comentário curto dizendo por quê, no estilo do
-     `vitest.config.ts`.
-  2. Olhe o `timeout: 5_000` da linha 152 e diga no relatório se é o mesmo caso.
-     Mude só se for.
-  3. Confirme que o limite maior não esconde travamento: um servidor que nunca
-     responde ainda deve falhar, só mais tarde. Diga como você verificou.
-- **Verificação:**
-  - `npx vitest run tools/mcp/mcp.test.mjs` passa; cole o resumo real.
-  - Rode também junto de outro arquivo pesado, por exemplo
-    `npx vitest run tools/mcp/mcp.test.mjs modulos/esboco/tests/projecao.test.js`,
-    e cole o resumo real.
-  - Cole saídas reais, inclusive falhas. Não resuma gates que você não rodou: na
-    T007 o relatório trouxe uma lista de gates que não existe neste repositório.
-  - Não afirme que passa no Linux se não rodou lá.
-- **Relatório:** (Executora preenche.)
+  1. Para cada ferramenta ou abordagem, procure: o que ela gera (malha, CAD
+     paramétrico, código), o que diz sobre precisão dimensional, se permite
+     editar uma parte sem refazer tudo, se separa o objeto em partes, preço e
+     limites de uso, e a data da informação.
+  2. Procure avaliações independentes: artigos científicos, benchmarks,
+     relatos de quem usou para peças mecânicas ou impressão 3D. Separe do que é
+     texto de marketing das próprias empresas.
+  3. Procure abordagens de "texto para CAD" ou "LLM gera código de CAD"
+     (CadQuery, OpenSCAD, scripts de Blender e similares), com resultados
+     medidos.
+  4. Diga, com base só no que achou, onde cada abordagem supera ou perde para o
+     que o Mecanifica se propõe a fazer.
+- **Verificação:** cada afirmação tem link e data. Separe no texto o que foi
+  medido por terceiros, o que é promessa do fabricante e o que você não
+  encontrou ("não encontrei evidência de X"). Não preencha lacuna com palavras
+  plausíveis.
+- **Relatório:** (Executora preenche. Tabelas e listas, sem resumo longo. No
+  fim, 5 linhas: o que está comprovado, o que é promessa, o que falta saber.)
