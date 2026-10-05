@@ -6,7 +6,7 @@
  * CLI apenas traduz argumentos para a entrada explícita e imprime o resultado.
  * A medição continua usando o mesmo núcleo neutro que alimenta a bancada.
  */
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
@@ -31,6 +31,32 @@ const DISPONIVEIS = Object.freeze(readdirSync(PECAS)
   .sort());
 
 export const PECAS_DISPONIVEIS = DISPONIVEIS;
+
+function listarPartesDeObjetos(raizPecas = PECAS) {
+  const partes = [];
+  try {
+    const objetos = readdirSync(raizPecas, { withFileTypes: true });
+    for (const obj of objetos) {
+      if (!obj.isDirectory()) continue;
+      const pastaPartes = join(raizPecas, obj.name, 'partes');
+      try {
+        const subdiretorios = readdirSync(pastaPartes, { withFileTypes: true });
+        for (const parte of subdiretorios) {
+          if (!parte.isDirectory()) continue;
+          const receita = join(pastaPartes, parte.name, 'receita.js');
+          if (existsSync(receita) && statSync(receita).isFile()) {
+            partes.push(`${obj.name}/${parte.name}`);
+          }
+        }
+      } catch {
+        // pasta partes não existe ou não pôde ser lida
+      }
+    }
+  } catch {
+    // raiz de peças inacessível
+  }
+  return Object.freeze(partes.sort());
+}
 
 function resultadoDeErro({ codigo, categoria, mensagem, stderr }) {
   return {
@@ -101,12 +127,23 @@ export async function descreverPecaReutilizavel({
   orcamentoComposicoes = null,
 } = {}) {
   if (listar) {
+    const partesDeObjeto = listarPartesDeObjetos();
+    const textoSoltas = DISPONIVEIS.length
+      ? `  ${DISPONIVEIS.join('\n  ')}\n`
+      : '';
+    const textoPartes = partesDeObjeto.length
+      ? `  ${partesDeObjeto.join('\n  ')}\n`
+      : '';
     return {
       ok: true,
       codigo: 0,
-      stdout: `peças disponíveis (${DISPONIVEIS.length}):\n  ${DISPONIVEIS.join('\n  ')}\n`,
+      stdout: `peças soltas (${DISPONIVEIS.length}):\n${textoSoltas}`
+        + `\npartes de objeto (${partesDeObjeto.length}):\n${textoPartes}`,
       stderr: '',
-      resultado: { disponiveis: [...DISPONIVEIS] },
+      resultado: {
+        disponiveis: [...DISPONIVEIS],
+        partes: [...partesDeObjeto],
+      },
     };
   }
   if (!peca) {

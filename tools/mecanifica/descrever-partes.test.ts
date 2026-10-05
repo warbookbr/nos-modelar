@@ -178,4 +178,19 @@ describe('descrever-partes — régua headless', () => {
     expect(resultado).toMatchObject({ ok: true, codigo: 0, stderr: '' });
     expect(resultado.stdout).toContain('corpo-composto');
   });
+
+  it('listar exibe peças soltas e partes de objeto preservando disponiveis', async () => {
+    const resultado = await descreverPecaReutilizavel({ listar: true });
+    expect(resultado).toMatchObject({ ok: true, codigo: 0, stderr: '' });
+    expect(Array.isArray(resultado.resultado.disponiveis)).toBe(true);
+    expect(resultado.resultado.partes).toEqual(expect.arrayContaining([
+      'braco-robotico/anel-cintura',
+      'braco-robotico/base',
+      'braco-robotico/ombro',
+      'braco-robotico/ombro-tambor',
+    ]));
+    expect(resultado.stdout).toContain(`peças soltas (${resultado.resultado.disponiveis.length}):`);
+    expect(resultado.stdout).toContain(`partes de objeto (${resultado.resultado.partes.length}):`);
+    expect(resultado.stdout).toContain('braco-robotico/base');
+  });
 });
