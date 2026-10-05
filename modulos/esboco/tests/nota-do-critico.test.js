@@ -62,6 +62,27 @@ describe('a nota abaixo de 8 bloqueia o resto do fluxo', () => {
   });
 });
 
+describe('o Marco abaixo de 8 deixa refazer as unidades que ele cobre', () => {
+  const comMarco = (...notas) => {
+    const e = grande();
+    let s = marcarFeito(e, naDetalhe(e), 'ponta').estado;
+    s.marcos.push({ limiar: 50, custoFeito: 1, custoTotal: 10, unidades: ['ponta'], chamar: 'critico', imagens: 'limpas' });
+    return { e, s: vered(s, 'marco-50', ...notas) };
+  };
+
+  it('o --feito de unidade fechada no Marco passa (é a correção); o de unidade nova e o --proximo seguem recusados', () => {
+    const { e, s } = comMarco(5);
+    expect(marcarFeito(e, s, 'ponta').estado.unidades.find((u) => u.id === 'ponta').feito).toBe(true);
+    expect(() => marcarFeito(e, s, 'fila')).toThrow(/marco-50.*nota 5.*rodada 1 de 3/);
+    expect(avancar(e, s).ok).toBe(false);
+  });
+
+  it('o Marco travado (3 rodadas) bloqueia até a unidade que ele cobre', () => {
+    const { e, s } = comMarco(5, 5, 6);
+    expect(() => marcarFeito(e, s, 'ponta')).toThrow(/marco-50.*rodada 3 de 3/);
+  });
+});
+
 describe('três rodadas abaixo de 8 travam, e só --liberar destrava', () => {
   it('na terceira rodada a mensagem manda pedir autorização explícita e citar --liberar', () => {
     const e = grande();

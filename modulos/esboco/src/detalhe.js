@@ -8,10 +8,13 @@ import { expandirArranjos, expandirEsboco, numerosDaForma, resolvedor } from './
 import { lerContato, padroesDoContato } from './contato.js';
 import { conferirEnvelope, montarUnidadesDoEstado, planoDeDetalhe, registrarEnvelope, sincronizarAvisoDeCiclo, unidadePorNome, abreviar } from './condutor.js';
 import { quisDizer } from './parecido.js';
+import { mapaDeLigacoes } from './mapa-de-ligacoes.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
+export const COR_DO_VIZINHO = '#c9ced6';
+export const OPACIDADE_DO_VIZINHO = 0.4;
 const PLANO_MINIMO = (unidade) => ({ texto: `detalhe da unidade ${unidade}`, nivel: 'esquematico' });
 
 /* A lista de formas do mestre que vale para a primeira opção: a da opção, ou a da raiz. */
@@ -97,6 +100,32 @@ export function detalharUnidade(bruto, estado, nome) {
   for (const k of ['tolerancia', 'penetracao', 'folga']) if (d.contato[k] === undefined) d.contato[k] = l[k];
   if (onde === 'opcao') { d.opcoes[0].formas = formas; delete d.formas; } else d.formas = formas;
   return d;
+}
+
+/* Os ids das formas de outras unidades que tocam a unidade (as mesmas que o `--ligacoes` lista como contato, no mestre), em
+   ordem. Só elas, e não a unidade vizinha inteira: o que mostra onde a unidade se prende. */
+export function formasVizinhas(bruto, estado, nome) {
+  const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
+  const mapa = mapaDeLigacoes(bruto, { unidades });
+  const da = mapa.unidades.find((x) => x.id === u.id);
+  return [...new Set((da?.vizinhas ?? []).flatMap((v) => v.locais.map((l) => l.daOutra)))].sort();
+}
+
+/* O esboço isolado e já expandido (`expandirEsboco(detalharUnidade(...))`) com as formas `ids` à vista em contorno claro e
+   translúcido, sem rótulo, sem linha de centro e sem a cor própria: só mostram onde a unidade se prende. Não muda o que recebe. */
+export function comFormasVizinhas(isolado, ids) {
+  if (ids.length === 0) return isolado;
+  const quais = new Set(ids);
+  const e = clone(isolado);
+  for (const o of e.opcoes) {
+    o.formas = o.formas.map((f) => {
+      if (!quais.has(f.id)) return f;
+      const { oculto, rotulo, ocultar, linhaCentro, daInstancia, ...resto } = f;
+      void oculto; void rotulo; void ocultar; void linhaCentro; void daInstancia;
+      return { ...resto, cor: COR_DO_VIZINHO, opacidade: OPACIDADE_DO_VIZINHO };
+    });
+  }
+  return e;
 }
 
 const chaveDoPar = (p) => `${p.a}\u0000${p.b}\u0000${p.tipo}`;

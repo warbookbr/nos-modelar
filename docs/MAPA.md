@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-897 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+898 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -439,6 +439,7 @@
 - `roda-e-perfis.test.js` — A `roda` com raios, flanges e pneu de seção arredondada, e os perfis `gerar` de pneu, de raios e de disco de freio (plano "O esboço detalhado coerente", fati…
 - `skill.test.js` — As skills `esboco-detalhado`, `laco-do-esboco` e `esbocar-opcoes` e o `PARE-E-ANALISE.md` dizem o fluxo, o nível de detalhe e a proibição de auditar por imag…
 - `unidades.test.js` — A unidade declarada (`unidade` na forma, na instância e no espelho), a junta dentro da mesma unidade sem declaração, o gate que ignora forma oculta, `--mover…
+- `vizinhos.test.js` — A vista `--unidade` desenha também as formas de outras unidades que a tocam (as do `--ligacoes`), em contorno claro e translúcido, sem rótulo; `--sem-vizinho…
 - `zoom-forma.test.js` — `--zoom-forma <id|padrão>`: o desenho é reenquadrado na forma (ou nas formas do padrão) com uma margem em mm e rasterizado na resolução cheia, em vez de ampl…
 
 ## modulos/exportador-cad/src/

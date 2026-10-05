@@ -547,7 +547,9 @@ export function textoDoBloqueio(b) {
 }
 
 function exigirNotaLivre(estado, { exceto } = {}) {
-  const b = bloqueiosDaNota(estado).filter((x) => x.unidade !== exceto || x.travado);
+  /* o Marco abaixo de 8 (ainda não travado) deixa refazer as unidades que ele fechou: é a correção que o faz ser rejulgado */
+  const cobre = (x) => { const m = /^marco-(\d+)$/.exec(x.unidade); return m !== null && (estado.marcos ?? []).some((k) => k.limiar === Number(m[1]) && (k.unidades ?? []).includes(exceto)); };
+  const b = bloqueiosDaNota(estado).filter((x) => (x.unidade !== exceto && !cobre(x)) || x.travado);
   exigir(b.length === 0, `condutor: ${b.map(textoDoBloqueio).join('; ')}`);
 }
 

@@ -85,6 +85,19 @@ describe('o brief do crítico no --feito', () => {
     expect(b.texto).toMatch(/--veredito <unidade> --nota <0-10> --motivo/);
   }, 120000);
 
+  it('o --feito de unidade já feita (refeita depois de nota baixa) pede o brief e as imagens de novo', async () => {
+    const { pasta, arquivo } = gravar(grande());
+    expect(condutorArquivo(arquivo, { feito: 'fila' }).criticoDe).toBe('fila');
+    const r = condutorArquivo(arquivo, { feito: 'fila' });
+    expect(r.criticoDe).toBe('fila');
+    expect(r.texto).toContain('refeita');
+    const b = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'critico') });
+    expect(b.destinos).toHaveLength(4);
+    /* sem brief (até 8 formas) segue sem crítico */
+    condutorArquivo(arquivo, { feito: 'ponta' });
+    expect(condutorArquivo(arquivo, { feito: 'ponta' }).criticoDe).toBeNull();
+  }, 120000);
+
   it('a unidade de 8 formas ou menos não pede o crítico', () => {
     const { arquivo } = gravar(grande());
     expect(condutorArquivo(arquivo, { feito: 'ponta' }).criticoDe).toBeNull();

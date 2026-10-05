@@ -41,7 +41,7 @@ npm run esboco -- <arquivo.esboco.json> --mover <forma|instância|padrão|a,b> -
 npm run esboco -- <arquivo.esboco.json> --mover-lote <arquivo.json>
 npm run esboco -- <arquivo.esboco.json> --detalhar <unidade> [arquivo]
 npm run esboco -- <arquivo.esboco.json> --integrar <unidade> <arquivo-detalhado.esboco.json>
-npm run esboco -- <arquivo.esboco.json> --unidade <unidade> [--vista <vista>] [--largura <px>] [--saida <pasta>] [--forçar]
+npm run esboco -- <arquivo.esboco.json> --unidade <unidade> [--sem-vizinhos] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--forçar]
 npm run esboco -- <arquivo.esboco.json> [--unidade <unidade>] --corte <x|y|z>=<mm> [--lado +|-] [--vista <vista>] [--largura <px>] [--saida <pasta>]
 npm run esboco -- <arquivo.esboco.json> [--unidade <unidade>] --explodir [--eixo <x|y|z>] [--distancia <mm>] [--vista <vista>]
 npm run esboco -- <arquivo.esboco.json> [--unidade <unidade>] --zoom-forma <id|instância|padrão> [--margem <mm>] [--vista <vista>]
@@ -61,9 +61,15 @@ Um caminho relativo vale a partir do diretório de quem chamou: o `npm run` roda
 
 A `--analise` não propõe mais a explosão nem o deslocamento que zeram a cobertura, porque a busca do fator custa minutos numa moto densa: `--sugerir` liga essa busca, e o padrão só mede, agrupa e relata. As imagens da análise saem com `ladosPorEscala` (menos lados nos círculos; ver Desempenho), a menos que o esboço declare `"ladosPorEscala": false`, e o manifesto anota `desenho`. `--rapido` gera só texto: com `--analise` não abre navegador, não desenha e não grava imagem (o manifesto anota `rapido: true` e `--zoom` é recusado), e sem `--analise` grava o SVG da prévia, com menos lados, sem o PNG.
 
+## Vizinhos na vista da unidade
+
+A vista `--unidade` (e as quatro imagens que o `--feito` grava para o crítico) desenha, além das formas da unidade, as formas de outras unidades que a tocam, as mesmas que o `--ligacoes` lista como contato no mestre, em cinza claro com 40% de opacidade, sem rótulo, sem linha de centro e sem a cor própria. Entra só a forma que toca, e não a unidade vizinha inteira, de modo que o enquadramento continua em torno da unidade (na escavadeira, as esteiras mostram só a barriga do chassi). O texto do comando lista as formas vizinhas, o brief do crítico avisa que as peças em contorno claro são de outras unidades e só mostram onde a unidade se prende, e `--sem-vizinhos` volta ao desenho só da unidade. As formas vizinhas entram no hash da imagem, então ligar ou desligar a opção redesenha.
+
+O `--feito` de uma unidade que já estava feita e tem brief (refeita depois de nota baixa) regrava as quatro imagens, mesmo que o conteúdo não tenha mudado, e imprime o brief de novo.
+
 ## A nota do crítico no Condutor
 
-A unidade com brief (mais de 8 formas) ou o Marco cujo último veredito é menor que 8 bloqueia o `--feito` de outra unidade e o `--proximo`; a mensagem diz a unidade, a nota, a rodada (n de 3) e o que fazer (refazer a unidade e rodar `--feito` de novo). Nota de 8 ou mais libera, e a unidade sem brief não é afetada. Depois de três vereditos abaixo de 8 na mesma unidade ou Marco o bloqueio só sai com `--condutor --liberar <unidade|marco-N> --motivo <texto>`, que grava a liberação no histórico (`liberacoes`, versão 3 do estado) e é recusado antes da terceira rodada; o orquestrador só o roda depois de perguntar à pessoa e com o motivo que ela deu. Estado de versão 1 ou 2 continua válido: os campos são opcionais, e vereditos antigos já contam nas rodadas. Uma nova nota baixa depois de uma liberação recomeça na rodada 1.
+A unidade com brief (mais de 8 formas) ou o Marco cujo último veredito é menor que 8 bloqueia o `--feito` de outra unidade e o `--proximo`, mas o Marco ainda não travado deixa passar o `--feito` das unidades que ele fechou (a lista `unidades` do Marco), que são a correção que o faz ser rejulgado; a mensagem diz a unidade, a nota, a rodada (n de 3) e o que fazer (refazer a unidade e rodar `--feito` de novo). Nota de 8 ou mais libera, e a unidade sem brief não é afetada. Depois de três vereditos abaixo de 8 na mesma unidade ou Marco o bloqueio só sai com `--condutor --liberar <unidade|marco-N> --motivo <texto>`, que grava a liberação no histórico (`liberacoes`, versão 3 do estado) e é recusado antes da terceira rodada; o orquestrador só o roda depois de perguntar à pessoa e com o motivo que ela deu. Estado de versão 1 ou 2 continua válido: os campos são opcionais, e vereditos antigos já contam nas rodadas. Uma nova nota baixa depois de uma liberação recomeça na rodada 1.
 
 ## Formas
 
