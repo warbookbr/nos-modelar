@@ -43,56 +43,9 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T002 — Nota de passagem no Condutor
-
-- **Status:** aberta
-- **Objetivo:** o Condutor passa a guardar, por unidade, uma nota de passagem (o
-  porquê das escolhas feitas na unidade), para que o esbocista seguinte, que
-  começa do zero, a leia. Vale só no modo "um esbocista novo por unidade"; o modo
-  atual (um esbocista por objeto) segue sem exigir a nota. É o item 8 do plano,
-  segunda parte, e a T003 depende dela.
-- **Ler antes:**
-  - `CLAUDE.md` — regras do repositório
-  - `docs/mecanifica/planos/2026-10-01-o-esboco-detalhado-coerente.md` — fatia 8
-  - `modulos/esboco/README.md` — seções "O Condutor" e "A nota do crítico no
-    Condutor" (o veredito, as rodadas e a `--liberar` são o modelo a imitar)
-  - `modulos/esboco/src/condutor.js` — o estado (`vereditos`, `liberacoes`,
-    `historico`, versão do estado) e como o `--veredito` grava e bloqueia
-  - `modulos/esboco/tests/condutor.test.js` — como o Condutor é testado
-  - `tools/mecanifica/esboco.mjs` — a linha de comando que recebe as opções
-  - `.claude/skills/laco-de-modelagem/SKILL.md` — como `notaDePassagem` é
-    exigida e limitada ali (procure "notaDePassagem"; o limite de 240 caracteres
-    é da `observacao`, use o mesmo para a nota)
-- **Mexer em:** `modulos/esboco/src/condutor.js`, `tools/mecanifica/esboco.mjs`,
-  `modulos/esboco/tests/condutor.test.js`, a seção "O Condutor" do
-  `modulos/esboco/README.md`.
-- **Não mexer em:** as skills e os agentes (a T003 cuida deles),
-  `descrever-peca.mjs`, o plano.
-- **Passos:**
-  1. Acrescente ao estado do Condutor `modo` (`objeto`, o padrão, ou
-     `por-unidade`) e `notasDePassagem`. Campos novos são opcionais; estado
-     antigo continua válido e sobe de versão como as `liberacoes` fizeram.
-  2. Comando para escolher o modo: `--condutor <arquivo> --modo por-unidade`.
-  3. Comando para gravar a nota:
-     `--condutor <arquivo> --nota-de-passagem <unidade> --texto <texto>`. Recusar
-     texto vazio ou com mais de 240 caracteres, e unidade que não existe.
-  4. No modo `por-unidade`, o `--feito` de uma unidade com brief recusa, com
-     código 1 e mensagem clara, enquanto a nota dela não tiver sido gravada.
-     No modo `objeto` nada muda.
-  5. `--condutor <arquivo> --historico` mostra as notas de passagem.
-  6. Testes que falhavam antes: nota gravada, nota vazia ou longa recusada,
-     `--feito` recusado sem nota no modo novo, aceito com nota, e modo `objeto`
-     intocado.
-- **Verificação:**
-  - `npx vitest run modulos/esboco` passa.
-  - `npm run gates` passa, ou cole a falha real e diga se já existia.
-  - Cole a saída real dos comandos novos numa rodada de exemplo.
-- **Relatório:** (Executora preenche: o que fez, o que rodou, o que falhou,
-  dúvidas, decisões de desenho que tomou.)
-
 ### T003 — Modo "um esbocista novo por unidade" na `laco-do-esboco`
 
-- **Status:** aberta (só depois da T002 feita e revisada)
+- **Status:** aberta
 - **Objetivo:** a skill `laco-do-esboco` ganha um segundo modo, em que cada
   unidade é feita por um `esbocista` NOVO que lê o estado do disco, em vez de um
   esbocista único por objeto retomado por `SendMessage`. É o item 8 do plano,
@@ -138,3 +91,42 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   - Cole a saída real de cada um, inclusive falhas.
 - **Relatório:** (Executora preenche: o que fez, o que rodou, o que falhou,
   dúvidas.)
+
+### T004 — Auditoria dos testes (só relatório, nada é alterado)
+
+- **Status:** aberta (pode começar em paralelo com a T002, sem mexer nos mesmos arquivos)
+- **Objetivo:** dizer quais dos ~239 arquivos de teste protegem comportamento de
+  verdade e quais são caros de manter e pouco úteis. A Planejadora decide o que
+  cortar depois; esta tarefa só mede e relata.
+- **Ler antes:**
+  - `CLAUDE.md` — regras do repositório
+  - `tools/gates.mjs` — a lista de gates e por que cada um nasceu
+  - `.github/workflows/ci.yml` — o que o CI roda
+  - `package.json` e `vitest.config.ts` — como os testes são rodados
+- **Mexer em:** nada do repositório. Grave o relatório só em "Relatório" abaixo.
+- **Não mexer em:** qualquer arquivo de teste, código ou documento. Não apague
+  nem conserte teste, mesmo que ache o erro.
+- **Passos:**
+  1. Liste todos os `*.test.*` (exceto `node_modules`), por pasta, com o número de
+     testes (`it`/`test`) de cada arquivo.
+  2. Classifique cada arquivo em uma de quatro classes, pelo que ele afirma:
+     **comportamento** (roda código e confere o resultado), **contrato**
+     (confere formato de dado ou API), **texto** (lê documento ou skill e procura
+     palavras), **ambiente** (depende de navegador, rede ou sistema). Em caso de
+     dúvida, abra o arquivo; não classifique só pelo nome.
+  3. Separe os arquivos de classe **texto**: para cada um, diga o que ele
+     protege e se o risco que ele cobre já é coberto por outro teste ou gate.
+  4. Rode `npx vitest run` e registre: tempo total, os 10 arquivos mais lentos e
+     cada falha, com a mensagem real. Contexto: numa execução de `npm run gates` o
+     gate `test` levou 694 s e falhou (`mcp:check` 110 s, `mcp:visual:check`
+     112 s), e o comentário de `tools/gates.mjs` registra 77 s para a suíte em
+     2026-09-22. Rode a suíte sozinha (sem os outros gates em paralelo) e diga se
+     o tempo cai, para separar lentidão da suíte de lentidão por concorrência. Diga se a falha é de ambiente (por exemplo
+     caminho do Windows) ou de código.
+  5. Procure testes duplicados ou que afirmam quase o mesmo (mesmo alvo, mesmas
+     entradas), e liste os pares.
+- **Verificação:** o relatório tem os números pedidos (contagem por classe, tempo
+  total, lentos, falhas, pares) e cada afirmação cita o arquivo. Não invente:
+  escreva "não consegui verificar" onde for o caso.
+- **Relatório:** (Executora preenche. Seja objetiva: tabelas e listas, sem
+  resumo longo.)
