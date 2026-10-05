@@ -43,90 +43,43 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T003 — Modo "um esbocista novo por unidade" na `laco-do-esboco`
+### T005 — Testes que falham no Windows por caminho
 
 - **Status:** aberta
-- **Objetivo:** a skill `laco-do-esboco` ganha um segundo modo, em que cada
-  unidade é feita por um `esbocista` NOVO que lê o estado do disco, em vez de um
-  esbocista único por objeto retomado por `SendMessage`. É o item 8 do plano,
-  segunda parte. O modo atual continua existindo.
+- **Objetivo:** os testes que hoje falham na máquina Windows passam, sem deixar
+  de passar em Linux (o CI roda em Linux). A causa, medida na T004, é
+  `new URL(...).pathname`, que no Windows vira `/C:/...` e depois `C:\C:\...`.
 - **Ler antes:**
   - `CLAUDE.md` — regras do repositório
-  - `docs/mecanifica/planos/2026-10-01-o-esboco-detalhado-coerente.md` — fatia 8
-    (segunda frase) e fatia 9, que vai comparar os dois modos
-  - `.claude/skills/laco-do-esboco/SKILL.md` — a skill a alterar
-  - `.claude/skills/laco-de-modelagem/SKILL.md` — o modelo a seguir: cada etapa
-    despacha um `modelador` novo que lê o disco, com `notaDePassagem` (veja a
-    seção que a descreve, por volta das linhas 29 e 128-135)
-  - `.claude/agents/modelador.md` — como o agente novo recebe o estado
-  - `.claude/agents/esbocista.md` — o agente que será despachado por unidade
-  - `.claude/skills/esboco-detalhado/SKILL.md` — o núcleo que o esbocista lê
-  - `modulos/esboco/README.md` — seção "O Condutor" e o que a T002 acrescentou:
-    a nota de passagem gravada pelo Condutor
-  - `modulos/esboco/tests/skill.test.js` — testa as skills; pode ser preciso
-    cobrir o modo novo
-- **Mexer em:** `.claude/skills/laco-do-esboco/SKILL.md`,
-  `.claude/agents/esbocista.md` (só o necessário para aceitar a unidade e a nota
-  de passagem no brief), `modulos/esboco/tests/skill.test.js`.
-- **Não mexer em:** código do módulo (`modulos/esboco/src/`), que a T002 já
-  mudou; `laco-de-modelagem`; a skill `esboco-detalhado`; o plano.
+  - `.github/workflows/ci.yml` — o CI roda em que sistema
+  - `modulos/esboco/tests/leitura.test.js` (linha 15 define `caminho`) — o
+    padrão a corrigir
+  - os outros arquivos com `.pathname` nos testes: `correcoes-do-fluxo.test.js`,
+    `atritos-da-refeita.test.js`, `esperado.test.js`, `edicao.test.js`,
+    `unidades.test.js` (todos em `modulos/esboco/tests/`) e
+    `tools/mecanifica/analise-da-peca.test.mjs`
+  - `tools/modelagem/revisor-limitado.test.mjs` — falha por
+    `node: bad option: --permission`
+- **Mexer em:** só os arquivos de teste citados acima.
+- **Não mexer em:** código de produção (`src/`, `tools/` que não seja teste), a
+  config do Vitest, os outros testes.
 - **Passos:**
-  1. Leia o `laco-de-modelagem` e veja como ele passa o estado entre etapas.
-  2. Em `laco-do-esboco`, descreva os dois modos: objeto inteiro com um
-     esbocista (o atual) e um esbocista novo por unidade. Diga quando usar cada
-     um e que o segundo é o que a fatia 9 vai medir contra o primeiro.
-  3. No modo novo, descreva o brief de cada esbocista: objeto, nível, pasta, a
-     unidade a fazer, e o que ele lê do disco (plano, Condutor com
-     `--historico`, vereditos e a nota de passagem da unidade anterior). O
-     esbocista anterior não é retomado por `SendMessage`.
-  4. Use a nota de passagem da T002: o esbocista a grava pelo comando novo e o
-     seguinte a lê do Condutor. Descreva o que ela contém (o porquê das
-     escolhas, não o que foi feito).
-  5. Diga como fica a regra da nota abaixo de 8 no modo novo: refazer a mesma
-     unidade com um esbocista novo que lê o motivo do crítico no disco.
-  6. Ajuste o `esbocista.md` para aceitar esse brief.
+  1. Troque `new URL(x, base).pathname` por `fileURLToPath(new URL(x, base))`
+     (`import { fileURLToPath } from 'node:url'`) em cada arquivo. É a mesma
+     mudança em todos.
+  2. Em `unidades.test.js`, a asserção de `INIT_CWD` compara com caminho POSIX
+     (`/tmp/...`); torne-a independente do sistema (por exemplo com
+     `path.resolve`), sem enfraquecer o que ela prova.
+  3. Em `correcoes-do-fluxo.test.js`, se houver falha por quebra de linha CRLF,
+     diga qual asserção e corrija só ela.
+  4. `revisor-limitado.test.mjs`: não conserte. Diga se o teste poderia detectar
+     que o Node não suporta `--permission` e ser pulado com motivo, ou se isso
+     esconderia um problema real. Deixe a decisão no relatório.
 - **Verificação:**
-  - `npx vitest run modulos/esboco` passa.
-  - `npm run mapa:check` e `npm run docs:links:check` passam.
-  - Cole a saída real de cada um, inclusive falhas.
-- **Relatório:** (Executora preenche: o que fez, o que rodou, o que falhou,
-  dúvidas.)
-
-### T004 — Auditoria dos testes (só relatório, nada é alterado)
-
-- **Status:** aberta (pode começar em paralelo com a T002, sem mexer nos mesmos arquivos)
-- **Objetivo:** dizer quais dos ~239 arquivos de teste protegem comportamento de
-  verdade e quais são caros de manter e pouco úteis. A Planejadora decide o que
-  cortar depois; esta tarefa só mede e relata.
-- **Ler antes:**
-  - `CLAUDE.md` — regras do repositório
-  - `tools/gates.mjs` — a lista de gates e por que cada um nasceu
-  - `.github/workflows/ci.yml` — o que o CI roda
-  - `package.json` e `vitest.config.ts` — como os testes são rodados
-- **Mexer em:** nada do repositório. Grave o relatório só em "Relatório" abaixo.
-- **Não mexer em:** qualquer arquivo de teste, código ou documento. Não apague
-  nem conserte teste, mesmo que ache o erro.
-- **Passos:**
-  1. Liste todos os `*.test.*` (exceto `node_modules`), por pasta, com o número de
-     testes (`it`/`test`) de cada arquivo.
-  2. Classifique cada arquivo em uma de quatro classes, pelo que ele afirma:
-     **comportamento** (roda código e confere o resultado), **contrato**
-     (confere formato de dado ou API), **texto** (lê documento ou skill e procura
-     palavras), **ambiente** (depende de navegador, rede ou sistema). Em caso de
-     dúvida, abra o arquivo; não classifique só pelo nome.
-  3. Separe os arquivos de classe **texto**: para cada um, diga o que ele
-     protege e se o risco que ele cobre já é coberto por outro teste ou gate.
-  4. Rode `npx vitest run` e registre: tempo total, os 10 arquivos mais lentos e
-     cada falha, com a mensagem real. Contexto: numa execução de `npm run gates` o
-     gate `test` levou 694 s e falhou (`mcp:check` 110 s, `mcp:visual:check`
-     112 s), e o comentário de `tools/gates.mjs` registra 77 s para a suíte em
-     2026-09-22. Rode a suíte sozinha (sem os outros gates em paralelo) e diga se
-     o tempo cai, para separar lentidão da suíte de lentidão por concorrência. Diga se a falha é de ambiente (por exemplo
-     caminho do Windows) ou de código.
-  5. Procure testes duplicados ou que afirmam quase o mesmo (mesmo alvo, mesmas
-     entradas), e liste os pares.
-- **Verificação:** o relatório tem os números pedidos (contagem por classe, tempo
-  total, lentos, falhas, pares) e cada afirmação cita o arquivo. Não invente:
-  escreva "não consegui verificar" onde for o caso.
-- **Relatório:** (Executora preenche. Seja objetiva: tabelas e listas, sem
-  resumo longo.)
+  - Rode cada arquivo alterado sozinho (`npx vitest run <arquivo>`) e cole o
+    resultado.
+  - Rode `npx vitest run modulos/esboco tools/mecanifica/analise-da-peca.test.mjs`
+    e cole o resumo.
+  - Diga quais falhas sobraram e por quê. Não afirme que passa no Linux se não
+    rodou lá: escreva "não verifiquei no Linux".
+- **Relatório:** (Executora preenche.)
