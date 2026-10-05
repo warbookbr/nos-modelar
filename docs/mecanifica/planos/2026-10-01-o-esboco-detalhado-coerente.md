@@ -121,11 +121,11 @@ peças sem função antes de a imagem chegar à pessoa.
    passa a dizer que quem modela sem poder despachar agente para em cada
    `--feito` e devolve o brief a quem o chamou, que despacha o crítico e devolve
    a nota antes da unidade seguinte.
-6. A orquestração: separar a `esboco-detalhado` da `esbocar-opcoes`, criar a
+6. (feita) A orquestração: separar a `esboco-detalhado` da `esbocar-opcoes`, criar a
    `laco-do-esboco` e o agente `esbocista`, ajustar o `critico-visual` e
    atualizar quem aponta para a skill antiga (README do módulo,
    `PARE-E-ANALISE.md`, `docs/mecanifica/usar/README.md`, mapa).
-7. A regra da nota no Condutor e a inspeção antes do `--feito`, achadas na
+7. (feita) A regra da nota no Condutor e a inspeção antes do `--feito`, achadas na
    empilhadeira que outra IA esboçou (cabine fechada com notas 3, 5 e 6, Marco
    50 com 6, 5 e 3, e o fluxo seguiu). O Condutor recusa a unidade seguinte
    enquanto o último veredito da unidade estiver abaixo de 8 e houver menos de
@@ -134,10 +134,20 @@ peças sem função antes de a imagem chegar à pessoa.
    pessoa (a skill manda pedir antes) e fica no histórico. O `esbocista` e a
    `esboco-detalhado` mandam abrir as quatro imagens da unidade antes do
    `--feito`.
-8. A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
+8. O custo de contexto. A skill `esboco-detalhado` (33 KB, lida inteira por
+   todo esbocista) se divide num núcleo curto com o fluxo e as regras e numa
+   referência por ferramenta, lida só quando a ferramenta é usada, sem perder
+   instrução (conferido frase a frase). A `laco-do-esboco` ganha o modo de um
+   `esbocista` novo por unidade, que lê o estado do disco (plano, Condutor,
+   vereditos e a nota de passagem da unidade anterior), como o laço de
+   modelagem já faz. O `descrever --listar` passa a achar as partes em
+   subpastas de `procedural/pecas/`.
+9. A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
    `esbocista` por objeto, com o crítico entre unidades, medidas no transcript
    (formas por relação contra coordenada absoluta, imagens abertas, contornos),
-   anatomia prévia opcional, e o fechamento. A primeira refeita fica como
+   anatomia prévia opcional, e o fechamento. A moto vai com um esbocista novo
+   por unidade e a escavadeira com um esbocista só, e o transcript compara os
+   tokens dos dois modos. A primeira refeita fica como
    medição: 11 e 10 formas absolutas em 196 e 204, 18 imagens abertas em 338
    chamadas, nenhum crítico entre unidades e treze contornos.
 
