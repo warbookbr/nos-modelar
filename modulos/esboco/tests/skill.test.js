@@ -1,4 +1,4 @@
-/* As skills `esboco-detalhado` e `esbocar-opcoes` e o `PARE-E-ANALISE.md` dizem o fluxo, o nível de detalhe e a proibição de auditar por imagem
+/* As skills `esboco-detalhado`, `laco-do-esboco` e `esbocar-opcoes` e o `PARE-E-ANALISE.md` dizem o fluxo, o nível de detalhe e a proibição de auditar por imagem
    com legenda numerada, sem citar objeto nenhum nas passagens do plano e do fluxo. */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -7,6 +7,8 @@ const ler = (caminho) => readFileSync(new URL(`../../../${caminho}`, import.meta
 const skill = ler('.claude/skills/esboco-detalhado/SKILL.md');
 const formato = ler('.claude/skills/esboco-detalhado/resumo-do-formato.md');
 const menosJson = ler('.claude/skills/esboco-detalhado/escrever-menos-json.md');
+const laco = ler('.claude/skills/laco-do-esboco/SKILL.md');
+const esbocista = ler('.claude/agents/esbocista.md');
 const opcoes = ler('.claude/skills/esbocar-opcoes/SKILL.md');
 const pare = ler('docs/mecanifica/usar/PARE-E-ANALISE.md');
 
@@ -79,3 +81,32 @@ describe('a skill esboco-detalhado', () => {
     expect(skill).toContain('substitui');
   });
 });
+
+describe('a skill laco-do-esboco e o agente esbocista', () => {
+  it('descreve os dois modos de condução, sem citar objeto', () => {
+    const s = secao(laco, 'Os dois modos de condução');
+    expect(s).not.toMatch(OBJETOS);
+    expect(s).toContain('--modo <objeto|por-unidade>');
+    expect(s).toContain('modo `objeto`');
+    expect(s).toContain('modo `por-unidade`');
+    expect(s).toContain('fatia 9');
+  });
+
+  it('descreve o brief por unidade, a nota de passagem e a reprovação no modo novo, sem citar objeto', () => {
+    expect(laco).not.toMatch(OBJETOS);
+    expect(laco).toContain('--condutor <arquivo> --historico');
+    expect(laco).toMatch(/--nota-de-passagem <unidade>\s+--texto <texto>/);
+    expect(laco).toContain('o porquê das escolhas');
+    expect(laco).toContain('não descreve o que foi feito');
+    expect(laco).toMatch(/refaça a mesma unidade com um\s+esbocista novo/);
+  });
+
+  it('o agente esbocista aceita brief de objeto ou unidade e grava nota de passagem, sem citar objeto', () => {
+    expect(esbocista).not.toMatch(OBJETOS);
+    expect(esbocista).toContain('--condutor <arquivo> --historico');
+    expect(esbocista).toMatch(/--nota-de-passagem <unidade>\s+--texto <texto>/);
+    expect(esbocista).toContain('porquê das escolhas');
+    expect(esbocista).toContain('sem relatar o que foi feito');
+  });
+});
+
