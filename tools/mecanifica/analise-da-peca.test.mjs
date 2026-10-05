@@ -40,7 +40,7 @@ describe('analisarPeca', () => {
     expect(manifesto.arquivos).toHaveLength(24);
     expect(manifesto.arquivos.every((a) => existsSync(join(REPO, a)))).toBe(true);
     expect(manifesto.data).toMatch(/^\d{4}-\d\d-\d\dT/);
-    expect(r.arquivos.at(-1)).toBe(`${PASTA}/manifesto.json`);
+    expect(r.arquivos.at(-1).replaceAll('\\', '/')).toBe(`${PASTA}/manifesto.json`);
   });
 
   it('recorta o zoom 3x e compõe o par antes/depois; repetir a rodada não colide', async () => {
@@ -54,7 +54,7 @@ describe('analisarPeca', () => {
     const r = await analisarPeca(opcoes);
     const par = PNG.sync.read(readFileSync(join(REPO, PASTA, 'zoom-frontal-antes-depois.png')));
     expect([par.width, par.height]).toEqual([30 + 8 + 30, 30]);
-    expect(r.arquivos).toContain(`${PASTA}/zoom-frontal-arame.png`);
+    expect(r.arquivos.map((a) => a.replaceAll('\\', '/'))).toContain(`${PASTA}/zoom-frontal-arame.png`);
     rmSync(area, { recursive: true, force: true });
   });
 
