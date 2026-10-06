@@ -1,6 +1,7 @@
 # Elementos Mecânicos de Objetos — Análise de Padrões e Fontes (T015)
 
 Documento canônico derivado por script a partir de [`elementos-de-objetos.json`](elementos-de-objetos.json).
+A mesma análise organizada por técnica de forma, com o que o projeto já faz e o que falta, está em [`TECNICAS-DE-FORMA.md`](TECNICAS-DE-FORMA.md).
 Consolida a decomposição mecânica de **364 objetos únicos** distribuídos nas **28 famílias** de [`FAMILIAS-DE-OBJETOS.md`](FAMILIAS-DE-OBJETOS.md), mapeando as técnicas de modelagem geométrica, as operações do núcleo procedural, as características funcionais implementadas vs faltantes e as fontes abertas auditadas com verificação de paywall.
 
 ## Metodologia e Decisões Técnicas (T015)

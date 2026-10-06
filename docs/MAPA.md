@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-901 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+902 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -130,6 +130,7 @@
 - `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `TECNICAS-DE-FORMA.md` — Técnicas de forma: o que gera os elementos dos objetos
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
