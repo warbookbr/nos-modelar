@@ -43,77 +43,76 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T011 — Levantamento: modificadores, addons e bibliotecas de forma úteis ao catálogo (só leitura)
+### T013 — Análise de padrões: dos objetos aos elementos e às ferramentas
 
 - **Status:** aberta
-- **Aviso:** esta T011 substitui a anterior (formato do catálogo), que foi
-  retirada antes de alinharmos como as capacidades chegam ao esboço e ao
-  Mecanifica. Se você já começou a anterior, pare, não apague nada e liste no
-  relatório os arquivos que criou ou mudou.
-- **Objetivo:** saber o que já existe de melhor para gerar formas mecânicas
-  difíceis e operar sobre formas, para decidirmos quais ferramentas o catálogo
-  de famílias implementa primeiro no esboço e depois no Mecanifica. A pesquisa
-  começa pelo Blender (modificadores, Geometry Nodes e addons, inclusive os que
-  não conhecemos) e inclui qualquer outra fonte útil: bibliotecas paramétricas
-  de CAD por código, workbenches do FreeCAD, scripts de recursos do Onshape e o
-  que mais você achar. Ideia se reimplementa; código de terceiro não entra no
-  repositório.
+- **Aviso:** esta tarefa absorve a T011 (modificadores, addons e bibliotecas),
+  que foi retirada; a pesquisa de fontes da T011 é a etapa 4 daqui.
+- **Objetivo:** a partir de todos os objetos de
+  `docs/mecanifica/FAMILIAS-DE-OBJETOS.md` (fase atual; ignore a fase
+  posterior), achar os elementos que se repetem, as técnicas de forma que os
+  geram e o que já existe para cada um, dentro e fora do projeto, para decidirmos
+  o que usar de fora, o que converter e o que criar como primitiva ou receita.
+  O critério é cobrir o que vai ser modelado, não o problema da vez: não descarte
+  um elemento por ele não aparecer nos planos atuais.
+- **Use subagentes.** A tarefa é grande: divida as famílias entre subagentes na
+  etapa 1, as fontes entre subagentes na etapa 4, e use um subagente separado,
+  que não participou da pesquisa, para conferir as fontes na etapa 5.
 - **Ler antes:**
   - `CLAUDE.md`
+  - `docs/mecanifica/FAMILIAS-DE-OBJETOS.md`
   - `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md` — o que é
-    ferramenta e família, e as famílias escolhidas (`pneu`, `roda`,
-    `cilindroHidraulico`; depois mola com amortecedor, esteira e fixadores)
-  - `modulos/esboco/README.md` — seções "Formas", "Espelho e arranjo", "A faixa
-    `envolve`", "Estilos, simetria implícita e perfis por função" e
-    "Componentes": o que o esboço já faz
-  - `docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md` — as operações que o núcleo
-    do Mecanifica já tem
-  - `LICENSE` — o repositório é MIT
-- **Ponto de partida conferido** (do inventário que foi apagado, já corrigido):
-  o esboço já tem revolução por perfil com os perfis `pneu`, `raios`, `disco` e
-  `engrenagem`, `arranja` linear, radial e ao longo de caminho, `envolve`,
-  `tubo` por pontos com `raioCurva` e os componentes `roda`, `mola` e
-  `parafuso`; o núcleo tem `lathe`, `loft`, `arranja` linear e radial,
-  `espelha`, `encostar`, `furo`, as booleanas e o arredondamento. O núcleo é de
-  malha poligonal, e o Manifold só calcula as booleanas; não há B-Rep nem
-  hélice em nenhum dos dois.
-- **Mexer em:** nada do repositório. Escreva só em "Relatório".
-- **Não mexer em:** qualquer arquivo.
-- **Antes de tudo:** sem acesso à web, escreva isso, marque `Status: bloqueada`
-  e pare. Não responda de memória.
+    ferramenta, família e objeto homologado
+  - `docs/mecanifica/INDEX.md`, entrada "O que já existe" em "Leitura por
+    tarefa", e os três destinos dela: o catálogo gerado do núcleo, o
+    `modulos/esboco/README.md` e o `docs/MAPA.md`
+  - `LICENSE` — o repositório é MIT; ideia de terceiro se reimplementa, código de
+    terceiro não entra
+- **Mexer em:** só dois arquivos novos na pasta `docs/mecanifica/`: o
+  relatório `ELEMENTOS-DE-OBJETOS.md` e os mesmos dados para máquina em
+  `elementos-de-objetos.json`. Sem commit.
+- **Não mexer em:** qualquer outro arquivo.
 - **Passos:**
-  1. Blender: percorra a lista oficial de modificadores da versão atual (todas
-     as categorias) e os nós de Geometry Nodes que geram ou operam forma
-     (curva para malha, instanciar em pontos, arredondar curva, e os outros).
-     Fique com os que servem a peça mecânica.
-  2. Addons do Blender: os que vêm na plataforma oficial de extensões e os de
-     terceiros conhecidos por gerar peça mecânica (parafuso e porca,
-     engrenagem, conexão de tubo, mola, cabo e mangueira, corrente, esteira,
-     esboço com restrições, booleana, chanfro e arredondamento). Procure além
-     desses exemplos; o objetivo é achar o que não conhecemos.
-  3. Fora do Blender: bibliotecas paramétricas de CAD por código e de
-     modelagem (por exemplo as de OpenSCAD e CadQuery), workbenches do FreeCAD
-     e recursos do Onshape que gerem famílias mecânicas. Confira cada nome que
-     citar: se não achar a fonte, não cite.
-  4. Para cada item, uma linha de tabela: nome; fonte com link, versão e data da
-     consulta; licença; o que faz em uma frase; parâmetros principais; se é
-     determinístico (mesmos parâmetros, mesmo resultado); se empilha sobre
-     qualquer forma ou gera forma do zero; que família do plano usaria; e se o
-     esboço ou o núcleo já tem algo equivalente, citando o nome da forma ou da
-     operação nos arquivos lidos acima.
-  5. No fim, as 10 ferramentas que você implementaria primeiro, em ordem, cada
-     uma com uma frase de motivo, dizendo quais famílias ela destrava e se já
-     existe meio pronta no esboço ou no núcleo. Separe as que valem para o
-     esboço (formas primitivas, rápidas) das que só fazem sentido no
-     Mecanifica (malha detalhada).
-- **Verificação:** cada item tem link e data. Separe o que você viu na
-  documentação ou no código-fonte do que é descrição de loja ou propaganda. Não
-  preencha lacuna com valor plausível; escreva "não encontrei".
-- **Relatório:** (Executora preenche. Tabelas por fonte, e a lista dos 10 no fim.)
+  1. Decomposição: para cada objeto da lista, os elementos que ele tem. Comece
+     por este vocabulário e acrescente o que faltar, com nome e definição em uma
+     frase: casca, chapa dobrada, perfil estrutural, chassi ou quadro, eixo,
+     articulação, trilho ou guia, roda, pneu, engrenagem, polia e correia,
+     corrente, mola, fixador, tubo, mangueira ou cabo, conexão, vedação,
+     botão ou manopla, tampa, grade ou furação em padrão, superfície de pega,
+     tecido ou estofado, vidro ou painel.
+  2. Frequência: em quantos objetos e em quantas famílias cada elemento aparece.
+  3. Técnica: para cada elemento, as técnicas de forma que o geram (revolução,
+     extrusão, varredura ao longo de caminho, hélice, chapa com dobra, repetição
+     em série, espelho, casca com espessura, booleana, arredondamento, deformação,
+     loft, e o que mais aparecer) e as operações empilháveis que ele usa.
+  4. Fontes: para cada técnica e elemento, o que já existe fora (modificadores e
+     Geometry Nodes do Blender, addons da plataforma oficial e de terceiros,
+     bibliotecas como as de OpenSCAD e CadQuery, workbenches do FreeCAD,
+     recursos do Onshape, normas técnicas com tabelas de medida) e dentro do
+     projeto (nome da forma do esboço ou da operação do núcleo). Para cada fonte
+     externa: link, versão, data da consulta, licença e se é determinística.
+  5. Conferência: um subagente que não pesquisou abre cada fonte citada e marca
+     `confirmado`, `diferente` ou `não encontrei`. Fonte não confirmada sai do
+     relatório ou fica marcada.
+  6. Decisão por elemento: `usar` (ligar ferramenta externa), `converter`
+     (reimplementar a ideia de uma fonte), `criar` (não há fonte boa) ou `já
+     temos`, com uma frase de motivo.
+  7. No fim, os 15 elementos ou técnicas de maior retorno, ordenados por
+     frequência e por lacuna (o que mais aparece e menos temos), cada um com as
+     famílias que destrava.
+- **Formato do relatório:** tabelas por etapa, sem texto longo. O JSON tem as
+  mesmas informações: `objetos` (objeto, família, elementos), `elementos`
+  (nome, definição, frequência, técnicas, fontes, decisão).
+- **Verificação:** todo dado externo tem link e data e passou pela conferência
+  da etapa 5. Escreva "não encontrei" onde for o caso; não preencha lacuna com
+  valor plausível. Rode `npm run mapa` e `npm run docs:links:check` e cole a
+  saída real.
+- **Relatório:** (Executora preenche aqui só o resumo: quantos objetos,
+  elementos e fontes, quantas fontes confirmadas, e onde ficaram os arquivos.)
 
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
-- **Status:** aberta (pode correr junto da T011)
+- **Status:** aberta (pode correr junto da T013)
 - **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
   medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
   defeitos apontados na rodada anterior da mesma unidade, e o nome das peças

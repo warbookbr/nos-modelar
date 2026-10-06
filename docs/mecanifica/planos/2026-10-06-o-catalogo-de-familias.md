@@ -57,6 +57,9 @@ família não alcança, ela ganha um parâmetro, e ninguém recria a peça do ze
   superfície não desce a nota abaixo de 8), com os defeitos da rodada anterior
   e com nome nas peças vizinhas, porque a homologação depende dele e a medição
   anterior mostrou que sem isso a nota não sai de 6 ou 7;
+- a cobertura: a [lista das famílias de objetos](../FAMILIAS-DE-OBJETOS.md) que o
+  Mecanifica deve modelar e a análise dos elementos que se repetem nela, de onde
+  saem as ferramentas a usar de fora, a converter ou a criar;
 - as primeiras ferramentas e famílias, construídas juntas: cada família
   homologada é o teste das ferramentas que ela usa, e uma ferramenta que não dá
   conta de fazer bem a família ainda não está pronta.
