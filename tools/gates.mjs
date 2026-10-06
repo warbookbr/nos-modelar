@@ -44,6 +44,7 @@ export const GATES = [
      intenção no código para o catálogo descrever um motor que não existe mais,
      e quem consulta não tem como saber. */
   'catalogo:check',
+  'ferramentas:check',
 ];
 
 /* OS GATES RODAM EM PARALELO, E O RELATÓRIO CONTINUA EM ORDEM.
@@ -126,7 +127,7 @@ export const GATES_CURTOS = [
   'guarda:acervo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
-  'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check',
+  'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check',
 ];
 
 export function escolherBateria(alterados) {

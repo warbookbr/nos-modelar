@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-903 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+905 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -116,6 +116,7 @@
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Mecanifica deve cobrir
+- `FERRAMENTAS-POR-OBJETO.md` — Ferramentas por objeto
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
@@ -1064,6 +1065,7 @@
 - `exportar-step.mjs` — exportar-step.mjs — CLI para exportação atômica e segura de receitas procedurais em formato STEP.
 - `exportar-step.test.mjs` — exportar-step.test.js — suíte de testes da CLI de exportação STEP e escrita segura.
 - `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
+- `ferramentas-por-objeto.mjs` — Gera docs/mecanifica/FERRAMENTAS-POR-OBJETO.md a partir de docs/mecanifica/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.

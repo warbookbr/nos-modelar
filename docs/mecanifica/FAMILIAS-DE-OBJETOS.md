@@ -2,10 +2,10 @@
 
 O Mecanifica é para modelagem geral, e a IA é sempre a usuária. Esta lista diz o
 que vai ser modelado, para que as capacidades saiam da cobertura do que existe e
-não só do problema da vez. Ela é a entrada da análise de padrões: dos objetos se
-tiram os [elementos que se repetem](ELEMENTOS-DE-OBJETOS.md) (casca, chassi, eixo, articulação, roda,
-fixador, tubo e outros), e dos elementos, as ferramentas, os addons e os
-modificadores que já existem ou que precisam ser criados.
+não só do problema da vez. Cada objeto dela recebe, em
+[ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md), as ferramentas que deixariam
+a IA modelá-lo sem reconstruir a forma a partir de primitivas, e a conferência
+`ferramentas:check` reprova quando um objeto daqui fica sem ferramentas lá.
 
 A lista é de tipos de objeto, sem ordem de prioridade. As três últimas famílias,
 orgânicas, ficam para uma fase posterior, com a ideia de ligar ferramentas que

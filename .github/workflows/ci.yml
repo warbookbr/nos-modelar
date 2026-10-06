@@ -206,3 +206,8 @@ jobs:
       # ninguém percebesse.
       - name: Catálogo de capacidades em dia com o motor
         run: npm run catalogo:check
+
+      # A tabela de ferramentas por objeto é gerada do JSON e cobre a lista de
+      # famílias objeto por objeto; sem conferência, documento e dados divergem.
+      - name: Ferramentas por objeto em dia com o JSON e a lista de famílias
+        run: npm run ferramentas:check
