@@ -69,6 +69,14 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   - `docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md` — as operações que o núcleo
     do Mecanifica já tem
   - `LICENSE` — o repositório é MIT
+- **Ponto de partida conferido** (do inventário que foi apagado, já corrigido):
+  o esboço já tem revolução por perfil com os perfis `pneu`, `raios`, `disco` e
+  `engrenagem`, `arranja` linear, radial e ao longo de caminho, `envolve`,
+  `tubo` por pontos com `raioCurva` e os componentes `roda`, `mola` e
+  `parafuso`; o núcleo tem `lathe`, `loft`, `arranja` linear e radial,
+  `espelha`, `encostar`, `furo`, as booleanas e o arredondamento. O núcleo é de
+  malha poligonal, e o Manifold só calcula as booleanas; não há B-Rep nem
+  hélice em nenhum dos dois.
 - **Mexer em:** nada do repositório. Escreva só em "Relatório".
 - **Não mexer em:** qualquer arquivo.
 - **Antes de tudo:** sem acesso à web, escreva isso, marque `Status: bloqueada`
