@@ -43,6 +43,59 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
+### T016 — Revisão de rumo do Mecanifica (só leitura e escrita do relatório)
+
+- **Status:** aberta
+- **Objetivo:** uma revisão de rumo de uma página, para a pessoa decidir para
+  onde o projeto vai. Ela compara a abordagem atual com alternativas, e não só
+  sugere como melhorar a atual.
+- **O que a pessoa quer** (não está escrito em nenhum arquivo, por isso vai
+  aqui): um sistema potente o bastante para que modelar qualquer coisa fique
+  simples, rápido e barato. A IA é sempre a usuária. O projeto é dela e pode
+  mudar no que for preciso. Ela não quer avançar em migalhas, consertando um
+  problema de cada vez; quer não recriar a roda, aproveitando o que já existe no
+  mundo e criando só o que falta; e quer cobrir modelagem geral (as famílias de
+  `FAMILIAS-DE-OBJETOS.md`), com os orgânicos para depois.
+- **Ler antes:**
+  - `CLAUDE.md`, `docs/mecanifica/INDEX.md`, `docs/mecanifica/VISAO.md`
+  - `docs/mecanifica/planos/README.md` e o plano ativo
+    `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md`
+  - `docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`
+    — "Fechamento": a medição de custo e de notas do crítico
+  - `docs/mecanifica/AUTORIA-IA.md` e `docs/mecanifica/ARQUITETURA.md`
+  - `docs/mecanifica/FAMILIAS-DE-OBJETOS.md`, `ELEMENTOS-DE-OBJETOS.md` e
+    `TECNICAS-DE-FORMA.md` — o que vai ser modelado, os elementos e o que falta
+  - `docs/mecanifica/historico/LEVANTAMENTO-IA-3D-2026-10.md` — o que existe
+    fora, conferido
+  - `docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md` e
+    `modulos/esboco/README.md` (seções "Formas" e "O Condutor") — o que o
+    núcleo e o esboço fazem
+- **Mexer em:** nada do repositório. Escreva só em "Relatório", abaixo.
+- **Não mexer em:** qualquer arquivo.
+- **O que escrever, nesta ordem:**
+  1. Objetivo em uma frase: o que o sistema deve permitir, e para quem.
+  2. Critérios de sucesso: 3 a 5 medidas objetivas que dizem se chegamos lá
+     (por exemplo custo em tokens por objeto, rodadas até aceite, cobertura das
+     famílias, taxa de objetos que funcionam).
+  3. Estado atual: o que existe e funciona, o que foi medido e o que falhou.
+  4. Plano atual: o que está planejado e as suposições que ele faz sem dizer.
+  5. Alternativas: 3 abordagens diferentes da atual. Uma tem de mudar a base
+     técnica (por exemplo trocar o núcleo próprio de malha por um kernel de CAD
+     maduro ou por ferramentas existentes orquestradas pela IA), e uma tem de ser
+     uma ideia que não aparece em nenhum dos arquivos lidos. Para cada uma:
+     ganho, custo, risco, tempo e se a decisão é reversível. Inclua a atual na
+     mesma tabela, para comparar.
+  6. Recomendação: qual seguir, por quê, e o que faria mudar de ideia.
+  7. Primeiro passo: o menor experimento que prova ou derruba a recomendação,
+     com o resultado esperado e quanto custa.
+  8. O que você não sabe e precisaria pesquisar.
+- **Regras:** separe fato de opinião. Todo fato cita a evidência: o caminho de
+  um arquivo que existe (com a seção) ou o hash de um commit. Fato sem
+  evidência vira opinião ou sai. Onde não houver evidência, escreva "não sei".
+  A Planejadora vai conferir por script se cada caminho citado existe. Uma
+  página, sem rodeio.
+- **Relatório:** (Executora preenche com a revisão.)
+
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
 - **Status:** aberta
