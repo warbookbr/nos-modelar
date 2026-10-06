@@ -43,136 +43,84 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T013 — Análise de padrões: dos objetos aos elementos e às ferramentas
+### T014 — Correção da análise de padrões (T013)
 
 - **Status:** aberta
-- **Aviso:** esta tarefa absorve a T011 (modificadores, addons e bibliotecas),
-  que foi retirada; a pesquisa de fontes da T011 é a etapa 4 daqui.
-- **Objetivo:** a partir de todos os objetos de
-  `docs/mecanifica/FAMILIAS-DE-OBJETOS.md` (fase atual; ignore a fase
-  posterior), achar os elementos que se repetem, as técnicas de forma que os
-  geram e o que já existe para cada um, dentro e fora do projeto, para decidirmos
-  o que usar de fora, o que converter e o que criar como primitiva ou receita.
-  O critério é cobrir o que vai ser modelado, não o problema da vez: não descarte
-  um elemento por ele não aparecer nos planos atuais.
-- **Use subagentes, pelo roteiro de orquestração abaixo.** A orquestradora não
-  faz o trabalho dos subagentes: ela distribui, junta, unifica o vocabulário,
-  roda as contas por script e decide. Arquivos intermediários ficam numa pasta
-  temporária fora do repositório (por exemplo `%TEMP%\t013\`).
-
+- **Objetivo:** tornar `docs/mecanifica/elementos-de-objetos.json` e
+  `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md` consistentes e confiáveis. A
+  revisão da T013 achou, recalculando a partir do próprio JSON:
+  - dos 53 elementos, 24 têm a frequência que os objetos mostram e 29 não. Os 29
+    são os que entraram no vocabulário v2 e não estão marcados em nenhum objeto,
+    embora o relatório lhes dê frequência alta ("trava ou fecho" 226 objetos,
+    "placa de circuito" 180, com 0 nos dados). Nove do top 15 são desses;
+  - marcação inflada: "fixador" em 340 de 364 objetos, "vidro ou painel" em
+    palete, "fixador" em garrafa;
+  - "já temos" frouxo: fixador conta como existente por causa de um cilindro
+    liso chamado parafuso, sem cabeça nem rosca;
+  - fontes que não correspondem ao elemento (modificador Screw para fixador,
+    restrição Child Of para articulação, Array para pneu) e normas com 100% de
+    confirmação;
+  - o relatório diz 27 famílias, mas são 28; a coluna de técnicas das tabelas
+    saiu vazia.
+  A cópia do JSON na raiz já foi apagada.
 - **Ler antes:**
   - `CLAUDE.md`
   - `docs/mecanifica/FAMILIAS-DE-OBJETOS.md`
-  - `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md` — o que é
-    ferramenta, família e objeto homologado
-  - `docs/mecanifica/INDEX.md`, entrada "O que já existe" em "Leitura por
-    tarefa", e os três destinos dela: o catálogo gerado do núcleo, o
-    `modulos/esboco/README.md` e o `docs/MAPA.md`
-  - `LICENSE` — o repositório é MIT; ideia de terceiro se reimplementa, código de
-    terceiro não entra
-- **Mexer em:** só dois arquivos novos na pasta `docs/mecanifica/`: o
-  relatório `ELEMENTOS-DE-OBJETOS.md` e os mesmos dados para máquina em
-  `elementos-de-objetos.json`. Sem commit.
+  - `docs/mecanifica/elementos-de-objetos.json` e
+    `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md` (o que vai ser corrigido)
+  - `docs/mecanifica/INDEX.md`, entrada "O que já existe", e os três destinos
+- **Mexer em:** só os dois arquivos acima. Intermediários e scripts numa pasta
+  temporária fora do repositório. Sem commit.
 - **Não mexer em:** qualquer outro arquivo.
-- **Passos:**
-  1. Decomposição: para cada objeto da lista, os elementos que ele tem. Comece
-     por este vocabulário e acrescente o que faltar, com nome e definição em uma
-     frase: casca, chapa dobrada, perfil estrutural, chassi ou quadro, eixo,
-     articulação, trilho ou guia, roda, pneu, engrenagem, polia e correia,
-     corrente, mola, fixador, tubo, mangueira ou cabo, conexão, vedação,
-     botão ou manopla, tampa, grade ou furação em padrão, superfície de pega,
-     tecido ou estofado, vidro ou painel.
-  2. Frequência: em quantos objetos e em quantas famílias cada elemento aparece.
-  3. Técnica: para cada elemento, as técnicas de forma que o geram (revolução,
-     extrusão, varredura ao longo de caminho, hélice, chapa com dobra, repetição
-     em série, espelho, casca com espessura, booleana, arredondamento, deformação,
-     loft, e o que mais aparecer) e as operações empilháveis que ele usa.
-  4. Fontes: para cada técnica e elemento, o que já existe fora (modificadores e
-     Geometry Nodes do Blender, addons da plataforma oficial e de terceiros,
-     bibliotecas como as de OpenSCAD e CadQuery, workbenches do FreeCAD,
-     recursos do Onshape, normas técnicas com tabelas de medida) e dentro do
-     projeto (nome da forma do esboço ou da operação do núcleo). Para cada fonte
-     externa: link, versão, data da consulta, licença e se é determinística.
-  5. Conferência: um subagente que não pesquisou abre cada fonte citada e marca
-     `confirmado`, `diferente` ou `não encontrei`. Fonte não confirmada sai do
-     relatório ou fica marcada.
-  6. Decisão por elemento: `usar` (ligar ferramenta externa), `converter`
-     (reimplementar a ideia de uma fonte), `criar` (não há fonte boa) ou `já
-     temos`, com uma frase de motivo.
-  7. No fim, os 15 elementos ou técnicas de maior retorno, ordenados por
-     frequência e por lacuna (o que mais aparece e menos temos), cada um com as
-     famílias que destrava.
-- **Roteiro de orquestração:**
-  - Fase 0, orquestradora: grave o vocabulário v1 (a lista do passo 1, cada
-    elemento com uma definição de uma frase) num arquivo JSON intermediário. É a
-    única lista de nomes que os subagentes podem usar.
-  - Fase 1, decomposição, 6 subagentes em paralelo, cada um com um grupo de
-    famílias de `FAMILIAS-DE-OBJETOS.md`:
-    - A: veículos terrestres; veículos aéreos e espaciais; embarcações;
-      transporte vertical.
-    - B: máquinas pesadas, de construção e agrícolas; máquinas industriais;
-      máquinas têxteis e de embalagem; energia.
-    - C: robôs; motores, transmissões e mecanismos; elementos de máquina e
-      fixação; relógios e mecanismos de precisão.
-    - D: ferramentas; eletrodomésticos; eletrônicos e gabinetes; climatização e
-      ventilação; instalações.
-    - E: móveis; construção e estruturas; mobiliário urbano e infraestrutura;
-      embalagens e recipientes.
-    - F: equipamentos médicos e de laboratório; esporte e lazer; armas e defesa;
-      instrumentos musicais; utensílios e objetos do dia a dia; moda e
-      acessórios; peças funcionais para impressão 3D.
-    Cada um recebe só os objetos do grupo e o vocabulário v1, e devolve só JSON:
-    `[{ "objeto", "familia", "elementos": [nomes do vocabulário], "novos": [{ "nome", "definicao", "exemplo" }] }]`.
-    Regra para o subagente: elemento que não está no vocabulário vai em `novos`,
-    nunca como sinônimo inventado dentro de `elementos`.
-  - Fase 1b, orquestradora: junte os `novos` dos seis, una os sinônimos e grave o
-    vocabulário v2. Depois, rodada curta com os mesmos seis grupos (podem ser
-    subagentes novos): cada um recebe só os elementos acrescentados no v2 e diz
-    em quais objetos do grupo eles aparecem. Sem essa rodada, o elemento que um
-    grupo descobriu fica com frequência zero nos outros.
-  - Fase 2, orquestradora, sem subagente: a frequência por elemento (objetos e
-    famílias) sai de um script sobre o JSON, não de contagem feita por IA.
-  - Fase 3, técnicas, 1 subagente: recebe o vocabulário v2 com as definições e
-    devolve, por elemento, as técnicas da lista do passo 3 (e as que
-    acrescentar, com definição) e as operações empilháveis.
-  - Fase 4, fontes, 6 subagentes em paralelo, todos com o vocabulário v2 e as
-    técnicas: (a) modificadores e Geometry Nodes do Blender; (b) addons do
-    Blender, da plataforma oficial e de terceiros; (c) bibliotecas de CAD por
-    código (OpenSCAD, CadQuery e outras); (d) workbenches do FreeCAD, recursos
-    do Onshape e outros CAD; (e) normas técnicas com tabelas de medida; (f) o
-    próprio projeto, lendo só os três destinos da entrada "O que já existe" do
-    INDEX. Cada um devolve só JSON:
-    `[{ "fonte", "link", "versao", "dataConsulta", "licenca", "deterministica", "cobre": [elementos ou técnicas], "oQueFaz" }]`.
-    Fonte sem link não entra. O (f) usa o caminho do arquivo e o nome da forma ou
-    da operação no lugar do link.
-  - Fase 5, conferência, 2 subagentes novos, que não participaram das fases
-    anteriores, cada um com metade das fontes de (a) a (e): abrem cada link e
-    devolvem `confirmado`, `diferente` (com o que a página realmente diz) ou
-    `nao_encontrei`, com o trecho que sustenta. A orquestradora tira as
-    `nao_encontrei` e corrige as `diferente`.
-  - Fase 6, orquestradora: a decisão por elemento, com estas regras: `já temos`
-    se (f) cobre; `usar` se há fonte confirmada, determinística e que se pode
-    chamar sem copiar código; `converter` se a ideia é boa mas a licença ou o
-    formato impedem chamar; `criar` se não há fonte confirmada.
-  - Fase 7, orquestradora, por script: entre os elementos que não são `já
-    temos`, ordenar por número de famílias e depois por número de objetos, e
-    tirar os 15 primeiros.
-  - Falhas: saída fora do formato volta ao mesmo subagente uma vez, com o erro.
-    Na segunda falha, a orquestradora registra a lacuna no relatório e não
-    completa de cabeça.
-- **Formato do relatório:** tabelas por etapa, sem texto longo. O JSON tem as
-  mesmas informações: `objetos` (objeto, família, elementos), `elementos`
-  (nome, definição, frequência, técnicas, fontes, decisão).
-- **Verificação:** todo dado externo tem link e data e passou pela conferência
-  da etapa 5. Escreva "não encontrei" onde for o caso; não preencha lacuna com
-  valor plausível. Rode `npm run mapa` e `npm run docs:links:check` e cole a
-  saída real.
-- **Relatório:** (Executora preenche aqui só o resumo: quantos objetos,
-  elementos e fontes, quantas fontes confirmadas, e onde ficaram os arquivos.)
+- **Passos (use subagentes nos passos 1, 2, 4 e 5, com os seis grupos de
+  famílias da T013):**
+  1. Marcação dos 29 elementos do v2: cada grupo recebe a lista dos 29 com as
+     definições e marca em quais objetos do grupo cada um aparece. O resultado
+     vai para `objetos[].elementos`.
+  2. Revisão da marcação inteira, com esta regra: marque um elemento só se o
+     objeto tem uma peça desse tipo que precisaria ser modelada num esboço de
+     nível médio, visível ou necessária para a função. Não marque por
+     possibilidade ("toda máquina tem algum parafuso"). Cada grupo devolve as
+     marcações que tirou e as que pôs, com o motivo em poucas palavras.
+  3. Por script: a `frequencia` de cada elemento (objetos e famílias) passa a
+     ser calculada a partir de `objetos`, e as tabelas do `.md` também saem do
+     JSON por script, não à mão. O ranking passa a ser por número de objetos,
+     entre os que não são `já temos`, e mostra os 15 primeiros.
+  4. "Já temos" estrito: para cada elemento hoje `já temos`, liste as
+     características que o definem (por exemplo, fixador: cabeça com forma,
+     haste, rosca; pneu: seção, banda com desenho, flancos) e diga, citando a
+     forma do esboço ou a operação do núcleo, se o projeto gera cada uma. Se
+     falta alguma característica que define o elemento, a decisão passa a
+     `converter` ou `criar`.
+  5. Fontes: uma fonte só conta para um elemento se ela gera ou opera a forma
+     característica dele; o resto sai do elemento. Para cada norma técnica,
+     diga o que foi verificado de fato (página do órgão com título e escopo) e
+     se a tabela de medidas está acessível de graça; se não está, marque
+     `existe, tabela paga` em vez de `confirmado`.
+  6. Corrija o total de famílias para 28 e preencha a coluna de técnicas a
+     partir do JSON.
+- **Verificação:** rode este conferidor (Python) sobre o JSON final e cole a
+  saída real; ele precisa imprimir `divergem 0`:
+  ```python
+  import json, collections
+  d = json.load(open('docs/mecanifica/elementos-de-objetos.json', encoding='utf-8'))
+  f = collections.Counter(); fam = collections.defaultdict(set)
+  for o in d['objetos']:
+      for e in set(o['elementos']): f[e] += 1; fam[e].add(o['familia'])
+  div = [e['elemento'] for e in d['elementos']
+         if e['frequencia']['total_objetos'] != f[e['elemento']]
+         or e['frequencia']['total_familias'] != len(fam[e['elemento']])]
+  fora = set(f) - {e['elemento'] for e in d['elementos']}
+  print('divergem', len(div), div); print('fora do vocabulario', fora)
+  print('familias', len({o['familia'] for o in d['objetos']}))
+  ```
+  Cole também as 10 maiores e as 10 menores frequências, a lista de mudanças
+  de decisão do passo 4 e a saída de `npm run mapa` e `npm run docs:links:check`.
+- **Relatório:** (Executora preenche só o resumo e a saída do conferidor.)
 
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
-- **Status:** aberta (pode correr junto da T013)
+- **Status:** aberta (pode correr junto da T014)
 - **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
   medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
   defeitos apontados na rodada anterior da mesma unidade, e o nome das peças
