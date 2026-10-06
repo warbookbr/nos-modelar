@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-900 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+901 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -112,6 +112,7 @@
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
+- `ELEMENTOS-DE-OBJETOS.md` — Elementos Mecânicos de Objetos — Análise de Padrões e Fontes (T015)
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Mecanifica deve cobrir

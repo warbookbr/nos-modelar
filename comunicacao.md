@@ -43,78 +43,9 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T015 — Fontes e decisões da análise de padrões
-
-- **Status:** aberta
-- **Objetivo:** deixar confiáveis as `fontes` e a `decisao` de cada elemento em
-  `docs/mecanifica/elementos-de-objetos.json` e no `ELEMENTOS-DE-OBJETOS.md`.
-  A decomposição e as frequências da T014 estão certas e não mudam.
-- **O que a revisão da T014 achou:**
-  - dos 118 links marcados `confirmado`, 28 dão 404. A maior parte é BOSL2 com a
-    organização errada (`Belfast-OpenSCAD-Library`; a certa é `BelfrySCAD`, e
-    com ela as páginas existem), páginas do build123d e repositórios que não
-    existem (`FreeCAD/FreeCAD-curves`, `vslot-poland/cadquery-sheetmetal` e
-    outros);
-  - 49 links do Onshape têm nome legível (`cad.onshape.com/documents/hinge-featurescript`).
-    Documento do Onshape tem identificador hexadecimal de 24 caracteres; esse
-    formato não existe, e o site devolve 200 para qualquer endereço;
-  - a decisão ficou 50 `converter`, 3 `criar` e 0 `já temos`, e não distingue
-    mais nada; as características de cada elemento (passo 4 da T014) não foram
-    gravadas no JSON.
-- **Ler antes:**
-  - `CLAUDE.md`
-  - `docs/mecanifica/elementos-de-objetos.json` e `ELEMENTOS-DE-OBJETOS.md`
-  - `docs/mecanifica/INDEX.md`, entrada "O que já existe", e os três destinos
-- **Mexer em:** só os dois arquivos acima. Intermediários numa pasta temporária
-  fora do repositório. Sem commit.
-- **Não mexer em:** `objetos` e `frequencia` no JSON, e qualquer outro arquivo.
-- **Passos:**
-  1. Conserte o que for só endereço errado (por exemplo trocar a organização do
-     BOSL2) e procure o endereço certo do que mudou de lugar. O que não tiver
-     endereço que funcione sai.
-  2. Link do Onshape só vale se for documento com identificador hexadecimal de
-     24 caracteres ou página da documentação oficial (`cad.onshape.com/FsDoc/...`)
-     que exista. Os de nome legível saem, a menos que você ache o documento real.
-  3. Rode o conferidor de links abaixo sobre o JSON final. Toda fonte com status
-     `confirmado` tem de ter link que responde 200 e não pode ser Onshape de nome
-     legível. Ele precisa imprimir `quebrados 0` e `onshape_invalidos 0`.
-  4. Para cada elemento, grave no JSON o campo `caracteristicas`: a lista do que
-     define o elemento (por exemplo, fixador: cabeça com forma, haste, rosca) e,
-     para cada característica, se o projeto gera, citando a forma do esboço ou a
-     operação do núcleo, ou `não`.
-  5. A decisão passa a ter quatro valores: `já temos` (gera todas as
-     características), `temos parcial` (gera parte; o campo `falta` lista o
-     resto), `converter` (não gera nenhuma, e há fonte confirmada com a ideia) e
-     `criar` (não gera nenhuma, e não há fonte confirmada).
-  6. Regere as tabelas do `.md` a partir do JSON, por script, com a coluna
-     `falta` nos elementos `temos parcial`.
-- **Conferidor de links** (Python, rode no fim e cole a saída real):
-  ```python
-  import json, re, urllib.request
-  d = json.load(open('docs/mecanifica/elementos-de-objetos.json', encoding='utf-8'))
-  urls = set()
-  for e in d['elementos']:
-      for f in e['fontes']:
-          if f.get('status') == 'confirmado':
-              urls |= {u.rstrip('.').rstrip('"') for u in re.findall(r'https?://[^\s,;)"]+', json.dumps(f, ensure_ascii=False))}
-  quebrados, onshape = [], []
-  for u in sorted(urls):
-      if 'onshape.com/documents/' in u and not re.search(r'/documents/[0-9a-f]{24}', u):
-          onshape.append(u); continue
-      try:
-          r = urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0'}), timeout=20)
-          if r.status != 200: quebrados.append((r.status, u))
-      except Exception as x:
-          quebrados.append((str(x)[:40], u))
-  print('links', len(urls)); print('quebrados', len(quebrados), quebrados); print('onshape_invalidos', len(onshape), onshape)
-  ```
-  Cole também a contagem de decisões e o conferidor de frequência da T014, que
-  tem de continuar com `divergem 0`.
-- **Relatório:** (Executora preenche só o resumo e as saídas dos conferidores.)
-
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
-- **Status:** aberta (pode correr junto da T015)
+- **Status:** aberta
 - **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
   medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
   defeitos apontados na rodada anterior da mesma unidade, e o nome das peças

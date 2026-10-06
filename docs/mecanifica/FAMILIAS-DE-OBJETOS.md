@@ -3,7 +3,7 @@
 O Mecanifica é para modelagem geral, e a IA é sempre a usuária. Esta lista diz o
 que vai ser modelado, para que as capacidades saiam da cobertura do que existe e
 não só do problema da vez. Ela é a entrada da análise de padrões: dos objetos se
-tiram os elementos que se repetem (casca, chassi, eixo, articulação, roda,
+tiram os [elementos que se repetem](ELEMENTOS-DE-OBJETOS.md) (casca, chassi, eixo, articulação, roda,
 fixador, tubo e outros), e dos elementos, as ferramentas, os addons e os
 modificadores que já existem ou que precisam ser criados.
 
