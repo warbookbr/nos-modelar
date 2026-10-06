@@ -55,9 +55,11 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   o que usar de fora, o que converter e o que criar como primitiva ou receita.
   O critério é cobrir o que vai ser modelado, não o problema da vez: não descarte
   um elemento por ele não aparecer nos planos atuais.
-- **Use subagentes.** A tarefa é grande: divida as famílias entre subagentes na
-  etapa 1, as fontes entre subagentes na etapa 4, e use um subagente separado,
-  que não participou da pesquisa, para conferir as fontes na etapa 5.
+- **Use subagentes, pelo roteiro de orquestração abaixo.** A orquestradora não
+  faz o trabalho dos subagentes: ela distribui, junta, unifica o vocabulário,
+  roda as contas por script e decide. Arquivos intermediários ficam numa pasta
+  temporária fora do repositório (por exemplo `%TEMP%\t013\`).
+
 - **Ler antes:**
   - `CLAUDE.md`
   - `docs/mecanifica/FAMILIAS-DE-OBJETOS.md`
@@ -100,6 +102,64 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   7. No fim, os 15 elementos ou técnicas de maior retorno, ordenados por
      frequência e por lacuna (o que mais aparece e menos temos), cada um com as
      famílias que destrava.
+- **Roteiro de orquestração:**
+  - Fase 0, orquestradora: grave o vocabulário v1 (a lista do passo 1, cada
+    elemento com uma definição de uma frase) num arquivo JSON intermediário. É a
+    única lista de nomes que os subagentes podem usar.
+  - Fase 1, decomposição, 6 subagentes em paralelo, cada um com um grupo de
+    famílias de `FAMILIAS-DE-OBJETOS.md`:
+    - A: veículos terrestres; veículos aéreos e espaciais; embarcações;
+      transporte vertical.
+    - B: máquinas pesadas, de construção e agrícolas; máquinas industriais;
+      máquinas têxteis e de embalagem; energia.
+    - C: robôs; motores, transmissões e mecanismos; elementos de máquina e
+      fixação; relógios e mecanismos de precisão.
+    - D: ferramentas; eletrodomésticos; eletrônicos e gabinetes; climatização e
+      ventilação; instalações.
+    - E: móveis; construção e estruturas; mobiliário urbano e infraestrutura;
+      embalagens e recipientes.
+    - F: equipamentos médicos e de laboratório; esporte e lazer; armas e defesa;
+      instrumentos musicais; utensílios e objetos do dia a dia; moda e
+      acessórios; peças funcionais para impressão 3D.
+    Cada um recebe só os objetos do grupo e o vocabulário v1, e devolve só JSON:
+    `[{ "objeto", "familia", "elementos": [nomes do vocabulário], "novos": [{ "nome", "definicao", "exemplo" }] }]`.
+    Regra para o subagente: elemento que não está no vocabulário vai em `novos`,
+    nunca como sinônimo inventado dentro de `elementos`.
+  - Fase 1b, orquestradora: junte os `novos` dos seis, una os sinônimos e grave o
+    vocabulário v2. Depois, rodada curta com os mesmos seis grupos (podem ser
+    subagentes novos): cada um recebe só os elementos acrescentados no v2 e diz
+    em quais objetos do grupo eles aparecem. Sem essa rodada, o elemento que um
+    grupo descobriu fica com frequência zero nos outros.
+  - Fase 2, orquestradora, sem subagente: a frequência por elemento (objetos e
+    famílias) sai de um script sobre o JSON, não de contagem feita por IA.
+  - Fase 3, técnicas, 1 subagente: recebe o vocabulário v2 com as definições e
+    devolve, por elemento, as técnicas da lista do passo 3 (e as que
+    acrescentar, com definição) e as operações empilháveis.
+  - Fase 4, fontes, 6 subagentes em paralelo, todos com o vocabulário v2 e as
+    técnicas: (a) modificadores e Geometry Nodes do Blender; (b) addons do
+    Blender, da plataforma oficial e de terceiros; (c) bibliotecas de CAD por
+    código (OpenSCAD, CadQuery e outras); (d) workbenches do FreeCAD, recursos
+    do Onshape e outros CAD; (e) normas técnicas com tabelas de medida; (f) o
+    próprio projeto, lendo só os três destinos da entrada "O que já existe" do
+    INDEX. Cada um devolve só JSON:
+    `[{ "fonte", "link", "versao", "dataConsulta", "licenca", "deterministica", "cobre": [elementos ou técnicas], "oQueFaz" }]`.
+    Fonte sem link não entra. O (f) usa o caminho do arquivo e o nome da forma ou
+    da operação no lugar do link.
+  - Fase 5, conferência, 2 subagentes novos, que não participaram das fases
+    anteriores, cada um com metade das fontes de (a) a (e): abrem cada link e
+    devolvem `confirmado`, `diferente` (com o que a página realmente diz) ou
+    `nao_encontrei`, com o trecho que sustenta. A orquestradora tira as
+    `nao_encontrei` e corrige as `diferente`.
+  - Fase 6, orquestradora: a decisão por elemento, com estas regras: `já temos`
+    se (f) cobre; `usar` se há fonte confirmada, determinística e que se pode
+    chamar sem copiar código; `converter` se a ideia é boa mas a licença ou o
+    formato impedem chamar; `criar` se não há fonte confirmada.
+  - Fase 7, orquestradora, por script: entre os elementos que não são `já
+    temos`, ordenar por número de famílias e depois por número de objetos, e
+    tirar os 15 primeiros.
+  - Falhas: saída fora do formato volta ao mesmo subagente uma vez, com o erro.
+    Na segunda falha, a orquestradora registra a lacuna no relatório e não
+    completa de cabeça.
 - **Formato do relatório:** tabelas por etapa, sem texto longo. O JSON tem as
   mesmas informações: `objetos` (objeto, família, elementos), `elementos`
   (nome, definição, frequência, técnicas, fontes, decisão).
