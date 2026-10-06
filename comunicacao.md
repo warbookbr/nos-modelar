@@ -89,6 +89,28 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   7. Primeiro passo: o menor experimento que prova ou derruba a recomendação,
      com o resultado esperado e quanto custa.
   8. O que você não sabe e precisaria pesquisar.
+- **Roteiro de subagentes:** a revisão é escrita por você, do começo ao fim;
+  os subagentes só servem a ela.
+  - Leitura, 2 subagentes em paralelo. O primeiro lê `CLAUDE.md`, `INDEX.md`,
+    `VISAO.md`, `planos/README.md`, o plano ativo e o plano encerrado; o segundo
+    lê `AUTORIA-IA.md`, `ARQUITETURA.md`, `FAMILIAS-DE-OBJETOS.md`,
+    `ELEMENTOS-DE-OBJETOS.md`, `TECNICAS-DE-FORMA.md`, o levantamento do
+    histórico, o catálogo gerado e as seções do README do esboço. Cada um
+    devolve só uma lista de fatos, cada fato com o caminho do arquivo e a
+    seção, sem opinião. Você escreve os pontos 1 a 4 a partir dessas listas.
+  - Alternativas, 1 subagente novo, que não leu nenhum arquivo do projeto.
+    Ele recebe só o bloco "O que a pessoa quer" acima, os critérios de sucesso
+    que você escreveu no ponto 2 e uma frase dizendo que hoje o projeto tem um
+    núcleo geométrico próprio de malha, um módulo de esboço em formas simples e
+    um plano de catálogo de famílias paramétricas. Ele devolve 5 abordagens
+    diferentes, cada uma com o mecanismo em 3 frases. Você escolhe 3 delas
+    para o ponto 5, respeitando as duas exigências do ponto 5, e diz por que
+    escolheu essas.
+  - Revisão, 1 subagente novo, adversarial, quando o texto estiver pronto. Ele
+    confere se cada caminho citado existe e se a seção diz o que o texto
+    afirma, e procura o que derrubaria a recomendação. Você corrige o que ele
+    apontar e cola no fim do relatório a lista do que ele achou e do que você
+    mudou.
 - **Regras:** separe fato de opinião. Todo fato cita a evidência: o caminho de
   um arquivo que existe (com a seção) ou o hash de um commit. Fato sem
   evidência vira opinião ou sai. Onde não houver evidência, escreva "não sei".
