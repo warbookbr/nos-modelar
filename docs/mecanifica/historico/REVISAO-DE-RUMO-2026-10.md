@@ -34,7 +34,7 @@ fabricação ou tolerância dimensional de peça mecânica; nesse caso, B-rep en
 como backend de peças mecânicas". Hoje o escopo é modelagem mecânica geral, a
 exportação STEP existe com `occt-wasm`, e sete técnicas que faltam (casca com
 espessura, hélice, nervura, chapa dobrada, flange, dobra ao longo de caminho e
-torção, em [`../TECNICAS-DE-FORMA.md`](../TECNICAS-DE-FORMA.md)) são o forte de um
+torção, na análise de técnicas de forma, removida em 2026-10-06 e substituída por [`../FERRAMENTAS-POR-OBJETO.md`](../FERRAMENTAS-POR-OBJETO.md)) são o forte de um
 kernel B-Rep. A condição de reabertura está cumprida.
 
 O caminho proposto é usar um kernel maduro como motor e pôr o valor do projeto na
@@ -56,7 +56,7 @@ Permitir que uma IA modele, inspecione, componha e mantenha objetos e máquinas 
 1. **Custo de inferência:** < 50k tokens para gerar, validar e aprovar uma máquina funcional completa (contra 260k a 700k tokens medidos no modelo atual).
 2. **Convergência de aceitação:** Aceite pelo crítico (nota >= 8/10) em <= 2 rodadas por unidade ou montagem (contra estagnação em notas 6–7 após 9 rodadas).
 3. **Taxa de montagem funcional (APR):** >= 90% de montagens válidas sem colisão espúria, sem peças no ar e com juntas alinhadas (contra 0,00% a 0,83% em LLMs gerais medidos no AssemBench).
-4. **Cobertura de famílias mecânicas:** 100% das 28 famílias gerais (364 objetos consolidados em `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md`) com peças geráveis deterministicamente.
+4. **Cobertura de famílias mecânicas:** 100% das 28 famílias gerais (364 objetos consolidados em a análise de elementos (removida em 2026-10-06)) com peças geráveis deterministicamente.
 5. **Exportação industrial:** 100% dos modelos gerados com exportação analítica válida em STEP e malhas neutras com tolerâncias <= 0,1 mm.
 
 #### 3. Estado atual
@@ -68,13 +68,13 @@ Permitir que uma IA modele, inspecione, componha e mantenha objetos e máquinas 
   - Formato persistido de montagem recursiva v1/v2/v3 e mapa canônico de relações (`docs/mecanifica/AUTORIA-IA.md`, seções `Estado atual` e `Síntese canônica`).
   - Exportação CAD/STEP funcional via pacote `occt-wasm@4.3.2` (`docs/mecanifica/INDEX.md`, seção `Estado atual`).
   - 32 de 32 gates aprovados no CI em `npm run gates --completo` (`docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
-  - Mapeamento de 28 famílias em `docs/mecanifica/FAMILIAS-DE-OBJETOS.md` e auditoria de 53 elementos canônicos em `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md`.
+  - Mapeamento de 28 famílias em `docs/mecanifica/FAMILIAS-DE-OBJETOS.md` e auditoria de 53 elementos canônicos em a análise de elementos (removida em 2026-10-06).
 - **O que foi medido e o que falhou:**
   - *Consumo desproporcional de tokens:* A moto demandou ~700k tokens para apenas 4 de 18 unidades (71k a 95k/unidade), e a escavadeira consumiu ~260k tokens em 6 rodadas para concluir apenas 1 de 8 unidades (`docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`; `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md`, seção `Problema observado`).
   - *Estagnação do crítico visual:* Notas permaneceram entre 6 e 7 ao longo de 9 rodadas consecutivas; a cada correção estrutural, surgia novo detalhe de superfície (`docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
   - *Causa raiz identificada:* A maior parcela do custo decorreu de a IA reconstruir mecanismos comuns a partir de primitivas elementares (`docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
-  - *Déficit geométrico estrutural:* Das 22 técnicas de forma, apenas 6 são plenamente suportadas; 9 são parciais e 7 inexistem (incluindo casca com espessura, hélice, nervuras e chapa dobrada) (`docs/mecanifica/TECNICAS-DE-FORMA.md`, seções `Visão geral` e `O que falta, por peso`).
-  - *Zero elementos completos:* Dos 53 elementos mecânicos, 0 têm suporte completo (`já temos: 0`); 22 são parciais, 15 dependem de conversão e 16 de criação do zero (`docs/mecanifica/ELEMENTOS-DE-OBJETOS.md`, seção `Metodologia e Decisões Técnicas (T015)`).
+  - *Déficit geométrico estrutural:* Das 22 técnicas de forma, apenas 6 são plenamente suportadas; 9 são parciais e 7 inexistem (incluindo casca com espessura, hélice, nervuras e chapa dobrada) (a análise de técnicas de forma (removida em 2026-10-06), seções `Visão geral` e `O que falta, por peso`).
+  - *Zero elementos completos:* Dos 53 elementos mecânicos, 0 têm suporte completo (`já temos: 0`); 22 são parciais, 15 dependem de conversão e 16 de criação do zero (a análise de elementos (removida em 2026-10-06), seção `Metodologia e Decisões Técnicas (T015)`).
   - *Limites formais:* Inexistência de solver geral de encaixe, validação de movimento/espaço varrido e modelo de materiais (`docs/mecanifica/VISAO.md`, seção `Limites atuais`; `docs/mecanifica/ARQUITETURA.md`, seção `Limites que permanecem`).
 
 #### 4. Plano atual e suposições implícitas
@@ -128,8 +128,8 @@ Permitir que uma IA modele, inspecione, componha e mantenha objetos e máquinas 
 
 #### Apêndice: Relatório da Revisão Adversarial (o que foi achado e o que foi mudado)
 - **Achados Fatuais e Correções Realizadas:**
-  1. *Contagem de objetos:* Corrigida citação de "364 objetos em FAMILIAS-DE-OBJETOS.md" para explicitar que o número 364 é fruto da consolidação em `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md` (no arquivo de famílias há 369 menções com termos repetidos).
-  2. *Seções de documentos:* Corrigida citação de "Tabela de Operações" para `# Catálogo de capacidades procedural` em `CATALOGO-CAPACIDADES.md`; corrigida citação de `envolve` para seção `A faixa \`envolve\`` em `modulos/esboco/README.md`; e corrigida seção de técnicas para `Visão geral` em `TECNICAS-DE-FORMA.md`.
+  1. *Contagem de objetos:* Corrigida citação de "364 objetos em FAMILIAS-DE-OBJETOS.md" para explicitar que o número 364 é fruto da consolidação em a análise de elementos (removida em 2026-10-06) (no arquivo de famílias há 369 menções com termos repetidos).
+  2. *Seções de documentos:* Corrigida citação de "Tabela de Operações" para `# Catálogo de capacidades procedural` em `CATALOGO-CAPACIDADES.md`; corrigida citação de `envolve` para seção `A faixa \`envolve\`` em `modulos/esboco/README.md`; e corrigida seção de técnicas para `Visão geral` em a análise de técnicas de forma.
   3. *Medição da escavadeira:* Corrigida atribuição das "6 rodadas" para `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md` (seção `Problema observado`), mantendo a citação do consumo de 260k tokens no fechamento do plano encerrado.
 - **Contra-argumentos Técnicos Incorporados à Recomendação:**
   1. *Risco Python vs Node.js:* O revisor apontou que `build123d` exigiria ambiente Python com wheels C++, quebrando o repositório Node.js puro. **Mudança:** A recomendação foi refinada para manter o runtime Node.js/WASM, utilizando `occt-wasm` (já aprovado no repo) e `manifold-3d`.
