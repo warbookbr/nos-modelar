@@ -2,12 +2,20 @@
 
 ## Estado
 
-**Plano ativo:** [O esboço detalhado coerente](2026-10-01-o-esboco-detalhado-coerente.md).
+**Plano ativo:** [O catálogo de famílias](2026-10-06-o-catalogo-de-familias.md).
 
-O esboço detalhado passa a ser conferido também por ligação e função, com
-os bugs do fluxo por unidades corrigidos e o crítico por unidade no Marco.
-[As partes do braço](congelados/2026-09-26-as-partes-do-braco.md) seguem
-congeladas e voltam depois dele.
+Um catálogo consultável pela IA, com ferramentas para as formas difíceis e
+famílias paramétricas homologadas, cada uma com um gerador para o esboço e
+outro para o Mecanifica. [As partes do braço](congelados/2026-09-26-as-partes-do-braco.md)
+seguem congeladas.
+
+[O esboço detalhado coerente](encerrados/2026-10-01-o-esboco-detalhado-coerente.md)
+fechou em 2026-10-06 com as fatias 1 a 8 entregues (bugs do fluxo, `fixa`,
+`envolve`, roda com raios, crítico por unidade e no Marco, módulos e
+biblioteca, `--corte`, `--explodir`, `--ligacoes`, regra da nota no Condutor,
+skills `esboco-detalhado` e `laco-do-esboco`) e o gate cumprido em parte: a
+refeita da moto e da escavadeira ficou como medição, com as notas paradas
+entre 6 e 7 e o custo concentrado em reconstruir mecanismos comuns.
 
 [O esboço sem conta à mão](encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md)
 fechou em 2026-10-01 com o esboço descrito por relações, parâmetros e unidades:

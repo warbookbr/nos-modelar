@@ -11,9 +11,10 @@ no mesmo dia, depois de o plano [união de sólidos](../encerrados/2026-09-28-un
 fechar com `unir`, `subtrair`, `intersectar`, o arredondamento da costura e o
 ombro refeito e fixado.
 
-**Condição de descongelamento:** o plano [o esboço detalhado coerente](../2026-10-01-o-esboco-detalhado-coerente.md)
-fechar, ou a pessoa decidir antes. O plano do esboço sem conta à mão fechou em
-2026-10-01, e este plano é o candidato principal para vir depois do novo.
+**Condição de descongelamento:** a pessoa decidir. O plano
+[o esboço detalhado coerente](../encerrados/2026-10-01-o-esboco-detalhado-coerente.md)
+fechou em 2026-10-06 e o plano ativo passou a ser
+[o catálogo de famílias](../2026-10-06-o-catalogo-de-familias.md).
 
 **O que a união deixou para este plano:** o ombro de coluna unida ao braço está
 fixo na montagem. O inventário do que cada parte restante pede ao núcleo está no

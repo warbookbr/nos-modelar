@@ -1,6 +1,6 @@
 # O esboço detalhado coerente
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite da pessoa
 
@@ -8,7 +8,7 @@
 
 ## Problema observado
 
-O plano [o esboço sem conta à mão](encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md)
+O plano [o esboço sem conta à mão](2026-09-29-o-esboco-sem-conta-a-mao.md)
 fechou em 2026-10-01 com o fluxo por unidades funcionando: duas rodadas de
 medição independentes, uma moto naked de 219 formas em 19 unidades e uma mini
 escavadeira de 173 formas em 13, gastaram cerca de 10 KB de código auxiliar
@@ -142,7 +142,7 @@ peças sem função antes de a imagem chegar à pessoa.
    vereditos e a nota de passagem da unidade anterior), como o laço de
    modelagem já faz. O `descrever --listar` passa a achar as partes em
    subpastas de `procedural/pecas/`.
-9. A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
+9. (feita como medição, interrompida com o aceite da pessoa) A moto e a escavadeira refeitas outra vez pelo `laco-do-esboco`, um
    `esbocista` por objeto, com o crítico entre unidades, medidas no transcript
    (formas por relação contra coordenada absoluta, imagens abertas, contornos),
    anatomia prévia opcional, e o fechamento. A moto vai com um esbocista novo
@@ -163,26 +163,34 @@ crítico só nas unidades com mais formas e no Marco, decidida com a pessoa.
 
 ## Fechamento
 
-A preencher.
+Fechado em 2026-10-06. As fatias 1 a 8 entregaram o que prometiam, com teste,
+e os itens 1, 2, 3 e 7 do gate de saída estão cumpridos (`npm run gates
+--completo` com 32 de 32). Os itens 4, 5 e 6 não estão: a refeita da fatia 9
+foi interrompida com o aceite da pessoa e ficou como medição.
+
+A medição: a moto no modo de um esbocista novo por unidade fechou 4 de 18
+unidades com cerca de 700 mil tokens (de 71 a 95 mil por unidade pequena) e a
+escavadeira no modo objeto fechou 1 de 8 com cerca de 260 mil. As notas do
+crítico pararam entre 6 e 7 em nove rodadas, porque cada rodada resolve o
+apontado e o crítico acha outro detalhe. Na mesma rodada entraram a vista de
+unidade com as peças vizinhas, o `--feito` que regrava o brief de unidade
+refeita e o Marco que deixa refazer as unidades que ele cobre (commit
+`1b1f0ad5`).
+
+Ficam em aberto, com o comando que reproduz nos `ATRITOS.md` da medição: as
+peças vizinhas em cinza não têm nome e o crítico leu a longarina do quadro
+como guidão; o `--integrar` e o `--feito` não rodam o gate do mestre, e uma
+colisão com forma oculta só apareceu depois; o crítico não tem escala
+ancorada nem recebe os defeitos da rodada anterior; o esbocista tirou o rolete
+de cima e mudou a `funcao` para o defeito sumir; uma junta por padrão com `max`
+de 170 mm deixava qualquer par do grupo se atravessar; o `--editar` não muda
+campos do `plano`; o brief não é gravado em arquivo. A medição também mostrou
+que a maior parte do custo foi reconstruir mecanismos comuns (esteira, garfo)
+a partir de primitivas, e é isso que o plano seguinte ataca.
 
 ## Depois deste plano
 
-O usuário do Mecanifica é a IA, e o ganho se mede pelo que uma IA consegue
-fazer com ele. O candidato principal passa a ser o banco de provas: um conjunto
-fixo de uns dez objetos, do simples ao complexo, cada um levado pelo fluxo
-inteiro com um modelo fixo, que registra se fechou com nota 8 ou mais do
-crítico, os contornos, os tokens, o tempo e as rodadas, e uma linha de base da
-mesma IA escrevendo código 3D sem o Mecanifica. Toda mudança seguinte é medida
-contra esse placar. A fatia 9 deste plano é a primeira versão pequena dele.
-
-O segundo candidato é a ponte entre o esboço e o Mecanifica, para que o que o
-esboço já resolveu não seja refeito na modelagem: as unidades e a ordem de
-dependência viram as etapas da montagem, as caixas de cada unidade viram o
-envelope de cada parte, as ligações e âncoras viram as portas e as juntas, as
-medidas do plano viram as medidas da peça, e a `funcao` e os vereditos do
-crítico viram os critérios de reprovação. Ela exige decidir antes como o
-módulo, independente do núcleo, entrega esse esqueleto sem importá-lo, e o
-banco de provas mede quanto ela poupa.
-
-[As partes do braço](congelados/2026-09-26-as-partes-do-braco.md), congeladas
-em 2026-09-29, voltam como um dos objetos do banco de provas.
+O plano seguinte é [o catálogo de famílias](../2026-10-06-o-catalogo-de-familias.md),
+que absorve a ponte entre o esboço e o Mecanifica. O banco de provas segue como
+candidato, e [as partes do braço](../congelados/2026-09-26-as-partes-do-braco.md)
+continuam congeladas.

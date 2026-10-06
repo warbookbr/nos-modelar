@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [o esboço detalhado coerente](planos/2026-10-01-o-esboco-detalhado-coerente.md).
+- Plano **ativo**: [o catálogo de famílias](planos/2026-10-06-o-catalogo-de-familias.md).
   Antes dele, [topologia, mover a peça, e ler o
   gesto](planos/encerrados/2026-09-16-topologia-e-leitura-do-gesto.md) foi
   **concluído** em 2026-09-17: extrudar, duplicar, apagar, criar face, girar e
@@ -179,7 +179,7 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [o esboço detalhado coerente](planos/2026-10-01-o-esboco-detalhado-coerente.md), aberto em 2026-10-01 depois de [o esboço sem conta à mão](planos/encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md) fechar; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas como candidato principal para vir depois. Rascunho aberto: [o que o
+- Plano ativo: [o catálogo de famílias](planos/2026-10-06-o-catalogo-de-familias.md), aberto em 2026-10-06 depois de [o esboço detalhado coerente](planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md) fechar; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas. Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting

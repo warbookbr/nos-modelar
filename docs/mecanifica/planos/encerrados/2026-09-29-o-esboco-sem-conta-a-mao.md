@@ -279,7 +279,7 @@ na moto). O crítico cego deu 7 de 10 à moto nova, contra 6,5 à primeira. Em
 deviam ser e aceitou a qualidade para fechar o plano, com os defeitos
 restantes indo para o plano seguinte.
 
-Ficou fora, e vai para [o esboço detalhado coerente](../2026-10-01-o-esboco-detalhado-coerente.md):
+Ficou fora, e vai para [o esboço detalhado coerente](2026-10-01-o-esboco-detalhado-coerente.md):
 seis bugs achados nas duas rodadas (espelho de instância com `unidade`,
 `--feito` com colisão aberta, tolerância do `--detalhar`, formato do JSON no
 `--editar` e `--integrar`, Marcos pelo custo congelado, mensagem do máximo
@@ -290,7 +290,7 @@ opção.
 
 ## Depois deste plano
 
-O plano seguinte é [o esboço detalhado coerente](../2026-10-01-o-esboco-detalhado-coerente.md),
+O plano seguinte é [o esboço detalhado coerente](2026-10-01-o-esboco-detalhado-coerente.md),
 e depois dele [as partes do braço](../congelados/2026-09-26-as-partes-do-braco.md),
 congeladas em 2026-09-29 para dar lugar a este. A ponte entre o esboço e o
 Mecanifica (um esqueleto de montagem por forma, com o gate de encaixe da peça
