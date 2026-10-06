@@ -43,84 +43,78 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T014 — Correção da análise de padrões (T013)
+### T015 — Fontes e decisões da análise de padrões
 
 - **Status:** aberta
-- **Objetivo:** tornar `docs/mecanifica/elementos-de-objetos.json` e
-  `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md` consistentes e confiáveis. A
-  revisão da T013 achou, recalculando a partir do próprio JSON:
-  - dos 53 elementos, 24 têm a frequência que os objetos mostram e 29 não. Os 29
-    são os que entraram no vocabulário v2 e não estão marcados em nenhum objeto,
-    embora o relatório lhes dê frequência alta ("trava ou fecho" 226 objetos,
-    "placa de circuito" 180, com 0 nos dados). Nove do top 15 são desses;
-  - marcação inflada: "fixador" em 340 de 364 objetos, "vidro ou painel" em
-    palete, "fixador" em garrafa;
-  - "já temos" frouxo: fixador conta como existente por causa de um cilindro
-    liso chamado parafuso, sem cabeça nem rosca;
-  - fontes que não correspondem ao elemento (modificador Screw para fixador,
-    restrição Child Of para articulação, Array para pneu) e normas com 100% de
-    confirmação;
-  - o relatório diz 27 famílias, mas são 28; a coluna de técnicas das tabelas
-    saiu vazia.
-  A cópia do JSON na raiz já foi apagada.
+- **Objetivo:** deixar confiáveis as `fontes` e a `decisao` de cada elemento em
+  `docs/mecanifica/elementos-de-objetos.json` e no `ELEMENTOS-DE-OBJETOS.md`.
+  A decomposição e as frequências da T014 estão certas e não mudam.
+- **O que a revisão da T014 achou:**
+  - dos 118 links marcados `confirmado`, 28 dão 404. A maior parte é BOSL2 com a
+    organização errada (`Belfast-OpenSCAD-Library`; a certa é `BelfrySCAD`, e
+    com ela as páginas existem), páginas do build123d e repositórios que não
+    existem (`FreeCAD/FreeCAD-curves`, `vslot-poland/cadquery-sheetmetal` e
+    outros);
+  - 49 links do Onshape têm nome legível (`cad.onshape.com/documents/hinge-featurescript`).
+    Documento do Onshape tem identificador hexadecimal de 24 caracteres; esse
+    formato não existe, e o site devolve 200 para qualquer endereço;
+  - a decisão ficou 50 `converter`, 3 `criar` e 0 `já temos`, e não distingue
+    mais nada; as características de cada elemento (passo 4 da T014) não foram
+    gravadas no JSON.
 - **Ler antes:**
   - `CLAUDE.md`
-  - `docs/mecanifica/FAMILIAS-DE-OBJETOS.md`
-  - `docs/mecanifica/elementos-de-objetos.json` e
-    `docs/mecanifica/ELEMENTOS-DE-OBJETOS.md` (o que vai ser corrigido)
+  - `docs/mecanifica/elementos-de-objetos.json` e `ELEMENTOS-DE-OBJETOS.md`
   - `docs/mecanifica/INDEX.md`, entrada "O que já existe", e os três destinos
-- **Mexer em:** só os dois arquivos acima. Intermediários e scripts numa pasta
-  temporária fora do repositório. Sem commit.
-- **Não mexer em:** qualquer outro arquivo.
-- **Passos (use subagentes nos passos 1, 2, 4 e 5, com os seis grupos de
-  famílias da T013):**
-  1. Marcação dos 29 elementos do v2: cada grupo recebe a lista dos 29 com as
-     definições e marca em quais objetos do grupo cada um aparece. O resultado
-     vai para `objetos[].elementos`.
-  2. Revisão da marcação inteira, com esta regra: marque um elemento só se o
-     objeto tem uma peça desse tipo que precisaria ser modelada num esboço de
-     nível médio, visível ou necessária para a função. Não marque por
-     possibilidade ("toda máquina tem algum parafuso"). Cada grupo devolve as
-     marcações que tirou e as que pôs, com o motivo em poucas palavras.
-  3. Por script: a `frequencia` de cada elemento (objetos e famílias) passa a
-     ser calculada a partir de `objetos`, e as tabelas do `.md` também saem do
-     JSON por script, não à mão. O ranking passa a ser por número de objetos,
-     entre os que não são `já temos`, e mostra os 15 primeiros.
-  4. "Já temos" estrito: para cada elemento hoje `já temos`, liste as
-     características que o definem (por exemplo, fixador: cabeça com forma,
-     haste, rosca; pneu: seção, banda com desenho, flancos) e diga, citando a
-     forma do esboço ou a operação do núcleo, se o projeto gera cada uma. Se
-     falta alguma característica que define o elemento, a decisão passa a
-     `converter` ou `criar`.
-  5. Fontes: uma fonte só conta para um elemento se ela gera ou opera a forma
-     característica dele; o resto sai do elemento. Para cada norma técnica,
-     diga o que foi verificado de fato (página do órgão com título e escopo) e
-     se a tabela de medidas está acessível de graça; se não está, marque
-     `existe, tabela paga` em vez de `confirmado`.
-  6. Corrija o total de famílias para 28 e preencha a coluna de técnicas a
-     partir do JSON.
-- **Verificação:** rode este conferidor (Python) sobre o JSON final e cole a
-  saída real; ele precisa imprimir `divergem 0`:
+- **Mexer em:** só os dois arquivos acima. Intermediários numa pasta temporária
+  fora do repositório. Sem commit.
+- **Não mexer em:** `objetos` e `frequencia` no JSON, e qualquer outro arquivo.
+- **Passos:**
+  1. Conserte o que for só endereço errado (por exemplo trocar a organização do
+     BOSL2) e procure o endereço certo do que mudou de lugar. O que não tiver
+     endereço que funcione sai.
+  2. Link do Onshape só vale se for documento com identificador hexadecimal de
+     24 caracteres ou página da documentação oficial (`cad.onshape.com/FsDoc/...`)
+     que exista. Os de nome legível saem, a menos que você ache o documento real.
+  3. Rode o conferidor de links abaixo sobre o JSON final. Toda fonte com status
+     `confirmado` tem de ter link que responde 200 e não pode ser Onshape de nome
+     legível. Ele precisa imprimir `quebrados 0` e `onshape_invalidos 0`.
+  4. Para cada elemento, grave no JSON o campo `caracteristicas`: a lista do que
+     define o elemento (por exemplo, fixador: cabeça com forma, haste, rosca) e,
+     para cada característica, se o projeto gera, citando a forma do esboço ou a
+     operação do núcleo, ou `não`.
+  5. A decisão passa a ter quatro valores: `já temos` (gera todas as
+     características), `temos parcial` (gera parte; o campo `falta` lista o
+     resto), `converter` (não gera nenhuma, e há fonte confirmada com a ideia) e
+     `criar` (não gera nenhuma, e não há fonte confirmada).
+  6. Regere as tabelas do `.md` a partir do JSON, por script, com a coluna
+     `falta` nos elementos `temos parcial`.
+- **Conferidor de links** (Python, rode no fim e cole a saída real):
   ```python
-  import json, collections
+  import json, re, urllib.request
   d = json.load(open('docs/mecanifica/elementos-de-objetos.json', encoding='utf-8'))
-  f = collections.Counter(); fam = collections.defaultdict(set)
-  for o in d['objetos']:
-      for e in set(o['elementos']): f[e] += 1; fam[e].add(o['familia'])
-  div = [e['elemento'] for e in d['elementos']
-         if e['frequencia']['total_objetos'] != f[e['elemento']]
-         or e['frequencia']['total_familias'] != len(fam[e['elemento']])]
-  fora = set(f) - {e['elemento'] for e in d['elementos']}
-  print('divergem', len(div), div); print('fora do vocabulario', fora)
-  print('familias', len({o['familia'] for o in d['objetos']}))
+  urls = set()
+  for e in d['elementos']:
+      for f in e['fontes']:
+          if f.get('status') == 'confirmado':
+              urls |= {u.rstrip('.').rstrip('"') for u in re.findall(r'https?://[^\s,;)"]+', json.dumps(f, ensure_ascii=False))}
+  quebrados, onshape = [], []
+  for u in sorted(urls):
+      if 'onshape.com/documents/' in u and not re.search(r'/documents/[0-9a-f]{24}', u):
+          onshape.append(u); continue
+      try:
+          r = urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0'}), timeout=20)
+          if r.status != 200: quebrados.append((r.status, u))
+      except Exception as x:
+          quebrados.append((str(x)[:40], u))
+  print('links', len(urls)); print('quebrados', len(quebrados), quebrados); print('onshape_invalidos', len(onshape), onshape)
   ```
-  Cole também as 10 maiores e as 10 menores frequências, a lista de mudanças
-  de decisão do passo 4 e a saída de `npm run mapa` e `npm run docs:links:check`.
-- **Relatório:** (Executora preenche só o resumo e a saída do conferidor.)
+  Cole também a contagem de decisões e o conferidor de frequência da T014, que
+  tem de continuar com `divergem 0`.
+- **Relatório:** (Executora preenche só o resumo e as saídas dos conferidores.)
 
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
-- **Status:** aberta (pode correr junto da T014)
+- **Status:** aberta (pode correr junto da T015)
 - **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
   medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
   defeitos apontados na rodada anterior da mesma unidade, e o nome das peças
