@@ -43,108 +43,69 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T011 — Catálogo de famílias: formato da entrada, validação e consulta (fatia 1, parte A)
+### T011 — Levantamento: modificadores, addons e bibliotecas de forma úteis ao catálogo (só leitura)
 
 - **Status:** aberta
-- **Objetivo:** existe um módulo novo, `modulos/catalogo-de-familias/`, com o
-  formato versionado de uma entrada do catálogo, o validador e a consulta, e um
-  comando `npm run familias` para a IA consultar sem ler arquivo. O catálogo
-  real começa vazio: nesta fatia ninguém homologa nada, e as entradas de exemplo
-  vivem só nas fixtures dos testes. É a primeira metade da fatia 1 do plano; a
-  T012 faz a outra metade (o crítico).
+- **Aviso:** esta T011 substitui a anterior (formato do catálogo), que foi
+  retirada antes de alinharmos como as capacidades chegam ao esboço e ao
+  Mecanifica. Se você já começou a anterior, pare, não apague nada e liste no
+  relatório os arquivos que criou ou mudou.
+- **Objetivo:** saber o que já existe de melhor para gerar formas mecânicas
+  difíceis e operar sobre formas, para decidirmos quais ferramentas o catálogo
+  de famílias implementa primeiro no esboço e depois no Mecanifica. A pesquisa
+  começa pelo Blender (modificadores, Geometry Nodes e addons, inclusive os que
+  não conhecemos) e inclui qualquer outra fonte útil: bibliotecas paramétricas
+  de CAD por código, workbenches do FreeCAD, scripts de recursos do Onshape e o
+  que mais você achar. Ideia se reimplementa; código de terceiro não entra no
+  repositório.
 - **Ler antes:**
   - `CLAUDE.md`
-  - `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md` — inteiro;
-    "Incluído" e o gate de saída 1 e 4 são o contrato desta tarefa
-  - `README.md` da raiz, seção "Módulos" — a regra dos módulos isolados
-  - `modulos/esboco/README.md`, seção "Independência do núcleo do Mecanifica" —
-    o precedente de importar só `procedural/nucleo/expressoes.js`
-  - `procedural/nucleo/expressoes.js` — avaliador de `"=a+b*c"`; não tem
-    comparação, por isso a regra de recusa abaixo compara duas expressões
-  - `modulos/esboco/componentes/roda.json` e `componentes/index.js` — a
-    biblioteca de componentes que já existe; o formato novo precisa conseguir
-    descrevê-la
-  - `procedural/nucleo/catalogo.js` e `tools/catalogo/` — o "catálogo de
-    capacidades", que já existe e é outra coisa; não reaproveite o nome
-    `catalogo` em script, comando ou arquivo para não confundir os dois
-  - `tools/gates.mjs` (listas `GATES` e `GATES_CURTOS`) e
-    `.github/workflows/ci.yml` — se o gate novo entrar, entra nos dois
-- **Mexer em:** `modulos/catalogo-de-familias/` (novo: `package.json`, `README.md`,
-  `src/`, `tests/`, `entradas/` vazio com `.gitkeep`), `tools/mecanifica/familias.mjs`
-  (CLI nova), `package.json` (scripts `familias` e `familias:check`),
-  `tools/gates.mjs` e `.github/workflows/ci.yml` (só para o `familias:check`),
-  a seção "Módulos" do `README.md` da raiz, e `docs/MAPA.md` por `npm run mapa`.
-- **Não mexer em:** `modulos/esboco/` (nem componentes, nem código), o núcleo, o
-  catálogo de capacidades, o plano.
-- **O formato** (um arquivo JSON por entrada em `entradas/`, nome igual ao `id`):
-  - `formato: "mecanifica.familia@1"`, `id` (texto estável, é a identidade;
-    nunca índice), `versao` (inteiro, sobe a cada mudança), `tipo`
-    (`ferramenta`, `familia` ou `objeto`), `descricao` (uma frase);
-  - `parametros`: por nome, `{ min, max, padrao, unidade }` para os livres, ou
-    uma expressão `"=..."` para os derivados (avaliada pelo `expressoes.js`);
-  - `recusas`: lista de `{ a, op, b, motivo }`, com `a` e `b` número, nome de
-    parâmetro ou expressão, e `op` em `<`, `<=`, `>`, `>=`, `==`, `!=`. A
-    combinação é recusada quando a comparação é verdadeira, e o erro traz o
-    `motivo`. Nada de avaliar JS;
-  - `interfaces`: lista de `{ nome, tipo, papel, valor }`, com `papel` em
-    `prove` ou `requer` e `valor` igual a um parâmetro. Encaixam duas interfaces
-    do mesmo `tipo`, papéis opostos e mesmo valor (com a tolerância que você
-    definir e documentar). O código não conhece nenhum tipo de interface pelo
-    nome: "aro" é dado da entrada;
-  - `usa`: lista de `{ id, versao }` das entradas de que esta depende
-    (família usa ferramentas; objeto usa uma família);
-  - `objeto` tem também `familia` (`{ id, versao }`) e `valores` (os parâmetros
-    fixados), validados contra as faixas e as recusas da família;
-  - `homologacao`: `{ estado, teste, pontos }`, com `estado` em `rascunho` ou
-    `homologada`, `teste` o caminho do teste e `pontos` a lista de
-    `{ valores, nota, veredito }`. Para `homologada`, o validador exige: o
-    arquivo de teste existe, há um ponto com o mínimo e um com o máximo de cada
-    parâmetro livre, um ponto com todos os livres no interior da faixa, e nota
-    8 ou mais em todos.
-  Se precisar de outro campo, acrescente e justifique no relatório; não tire
-  nenhum dos acima.
+  - `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md` — o que é
+    ferramenta e família, e as famílias escolhidas (`pneu`, `roda`,
+    `cilindroHidraulico`; depois mola com amortecedor, esteira e fixadores)
+  - `modulos/esboco/README.md` — seções "Formas", "Espelho e arranjo", "A faixa
+    `envolve`", "Estilos, simetria implícita e perfis por função" e
+    "Componentes": o que o esboço já faz
+  - `docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md` — as operações que o núcleo
+    do Mecanifica já tem
+  - `LICENSE` — o repositório é MIT
+- **Mexer em:** nada do repositório. Escreva só em "Relatório".
+- **Não mexer em:** qualquer arquivo.
+- **Antes de tudo:** sem acesso à web, escreva isso, marque `Status: bloqueada`
+  e pare. Não responda de memória.
 - **Passos:**
-  1. `src/`: o validador de uma entrada e do conjunto (ids únicos, `usa` aponta
-     para entrada e versão que existem, sem ciclo em `usa`, objeto bate com a
-     família) e a consulta, ambos puros, sem ler arquivo. Mensagem de erro diz o
-     campo e a entrada.
-  2. Consulta, com saída em texto curto e em JSON: por texto (`id` ou
-     `descricao`), por tipo, por interface (`--encaixa <id>`: quem tem interface
-     que encaixa em alguma da entrada dada, para os valores dados), por
-     dependência inversa (`--quem-usa <id>`, transitivo, com a versão de que
-     cada um depende) e por valores (`--conferir <id> --valores <json>`: aceita
-     ou recusa com o motivo). Por padrão só mostra `homologada`; `--todas`
-     inclui `rascunho`.
-  3. `tools/mecanifica/familias.mjs` lê `entradas/`, valida e responde. Sem
-     argumento, mostra o uso. Código de saída 1 em recusa ou entrada inválida.
-  4. `npm run familias:check` valida todas as entradas. Com o catálogo vazio,
-     passa. Entra em `GATES`, `GATES_CURTOS` e no `ci.yml`, e o teste
-     `tools/mapa/gates-espelham-ci.test.mjs` tem de continuar passando.
-  5. Testes em `modulos/catalogo-de-familias/tests/`, com fixtures de nomes
-     neutros (sem pneu, roda nem qualquer objeto real no código ou nos nomes de
-     teste): entrada válida; cada campo obrigatório ausente; faixa com `min` maior
-     que `max`; recusa disparada com o motivo; encaixe por tipo, papel e valor, e
-     não encaixe por valor diferente; `--quem-usa` transitivo; ciclo em `usa`
-     recusado; objeto fora da faixa recusado; `homologada` sem ponto no extremo,
-     com nota 7 ou com teste inexistente recusada.
-  6. Uma fixture que descreve `modulos/esboco/componentes/roda.json` no formato
-     novo, como `rascunho`, só para provar que o formato cabe. Ela fica em
-     `tests/fixtures/`, não em `entradas/`. No relatório, diga o que do
-     componente o formato não conseguiu expressar.
-  7. `README.md` do módulo curto: o formato, os comandos, a regra de
-     homologação e a diferença para o catálogo de capacidades.
-- **Verificação:** cole a saída real de:
-  - `npx vitest run modulos/catalogo-de-familias`
-  - `npm run familias` sem argumento, e uma consulta qualquer
-  - `npm run familias:check`
-  - `npx vitest run tools/mapa`
-  - `npm run mapa:check` e `npm run docs:links:check`
-  Não cole resumo de gates que você não rodou.
-- **Relatório:** (Executora preenche.)
+  1. Blender: percorra a lista oficial de modificadores da versão atual (todas
+     as categorias) e os nós de Geometry Nodes que geram ou operam forma
+     (curva para malha, instanciar em pontos, arredondar curva, e os outros).
+     Fique com os que servem a peça mecânica.
+  2. Addons do Blender: os que vêm na plataforma oficial de extensões e os de
+     terceiros conhecidos por gerar peça mecânica (parafuso e porca,
+     engrenagem, conexão de tubo, mola, cabo e mangueira, corrente, esteira,
+     esboço com restrições, booleana, chanfro e arredondamento). Procure além
+     desses exemplos; o objetivo é achar o que não conhecemos.
+  3. Fora do Blender: bibliotecas paramétricas de CAD por código e de
+     modelagem (por exemplo as de OpenSCAD e CadQuery), workbenches do FreeCAD
+     e recursos do Onshape que gerem famílias mecânicas. Confira cada nome que
+     citar: se não achar a fonte, não cite.
+  4. Para cada item, uma linha de tabela: nome; fonte com link, versão e data da
+     consulta; licença; o que faz em uma frase; parâmetros principais; se é
+     determinístico (mesmos parâmetros, mesmo resultado); se empilha sobre
+     qualquer forma ou gera forma do zero; que família do plano usaria; e se o
+     esboço ou o núcleo já tem algo equivalente, citando o nome da forma ou da
+     operação nos arquivos lidos acima.
+  5. No fim, as 10 ferramentas que você implementaria primeiro, em ordem, cada
+     uma com uma frase de motivo, dizendo quais famílias ela destrava e se já
+     existe meio pronta no esboço ou no núcleo. Separe as que valem para o
+     esboço (formas primitivas, rápidas) das que só fazem sentido no
+     Mecanifica (malha detalhada).
+- **Verificação:** cada item tem link e data. Separe o que você viu na
+  documentação ou no código-fonte do que é descrição de loja ou propaganda. Não
+  preencha lacuna com valor plausível; escreva "não encontrei".
+- **Relatório:** (Executora preenche. Tabelas por fonte, e a lista dos 10 no fim.)
 
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
-- **Status:** aberta (pode correr junto da T011; os arquivos não se cruzam)
+- **Status:** aberta (pode correr junto da T011)
 - **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
   medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
   defeitos apontados na rodada anterior da mesma unidade, e o nome das peças
