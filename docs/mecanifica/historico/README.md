@@ -90,3 +90,7 @@ absorvido por "o esboço sem conta à mão" e movido de `modulos/esboco/`.
 
 [`LEVANTAMENTO-IA-3D-2026-10.md`](LEVANTAMENTO-IA-3D-2026-10.md) reúne o que se
 confirmou nas fontes sobre IAs que geram 3D e abordagens de texto para CAD.
+
+[`REVISAO-DE-RUMO-2026-10.md`](REVISAO-DE-RUMO-2026-10.md) é a revisão de rumo de
+2026-10-06, com a conferência que mostra a condição de reabertura do B-Rep
+cumprida e o experimento que decide.
