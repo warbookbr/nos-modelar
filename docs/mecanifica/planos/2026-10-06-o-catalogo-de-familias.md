@@ -90,8 +90,17 @@ família não alcança, ela ganha um parâmetro, e ninguém recria a peça do ze
 
 1. O formato da entrada, o comando de consulta e o crítico com escala
    ancorada, defeitos anteriores e nome nas vizinhas.
-2. As primeiras ferramentas e famílias, escolhidas com a pessoa, homologadas
-   juntas.
+2. As primeiras ferramentas e famílias, escolhidas com a pessoa em 2026-10-06
+   e homologadas juntas. Famílias: `pneu` (objetos homologados de carro, moto e
+   caminhão), `roda` (o aro forma par com o pneu e prova o encaixe entre
+   famílias) e `cilindroHidraulico` (camisa, haste e olhais, com curso e
+   diâmetro variáveis). Ferramentas: revolução com perfil (seção do pneu, aro,
+   camisa), repetição em série em círculo ou ao longo de um caminho (blocos da
+   banda, raios, parafusos da roda) e cabo ou mangueira entre dois pontos, com
+   caimento e conexões nas pontas (as mangueiras do cilindro são o primeiro
+   teste). Cada ferramenta é usada por pelo menos uma família e cada família
+   usa mais de uma ferramenta. Ficam para uma segunda leva a mola com
+   amortecedor, a esteira e os fixadores.
 3. O gerador detalhado de uma família no Mecanifica e a conferência entre os
    dois geradores.
 4. Um esboço de máquina feito com o catálogo, medido como na refeita anterior,
