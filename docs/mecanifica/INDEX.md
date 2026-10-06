@@ -25,24 +25,7 @@ plano. O que está encerrado vive em
 ## Estado atual
 
 - Plano **ativo**: [o catálogo de famílias](planos/2026-10-06-o-catalogo-de-familias.md).
-  Antes dele, [topologia, mover a peça, e ler o
-  gesto](planos/encerrados/2026-09-16-topologia-e-leitura-do-gesto.md) foi
-  **concluído** em 2026-09-17: extrudar, duplicar, apagar, criar face, girar e
-  escalar vivem no núcleo sem Three.js, `G` move a parte como corpo, e
-  `npm run descrever:gesto` diz que movimento foi feito e onde mexer na receita.
-  Antes dele fecharam o [modo de
-  edição](planos/encerrados/2026-09-15-modo-de-edicao-de-malha.md) e o [ajuste da
-  bancada](planos/encerrados/2026-09-14-ajuste-da-bancada-volta-como-receita.md),
-  que separaram desenhar de traduzir: a pessoa edita, salva um alvo, e a rodada
-  de absorção reescreve a receita. O laboratório computacional saiu para
-  [`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia) em
-  2026-09-03; o piloto de peça que usou seus números continua aqui, em
-  [`DOSSIE-CABO-DE-PA.md`](historico/DOSSIE-CABO-DE-PA.md).
-- A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
-  separou o acervo por quem o lê e deixou cinco gates; relato em
-  [`REORGANIZACAO-POR-USO-PROGRESSO.md`](historico/REORGANIZACAO-POR-USO-PROGRESSO.md).
-  O modelador inverso está
-  [congelado](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md).
+  O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
   `npm run exportar:step` e `npm run exportar:obj`. O STEP sai por
@@ -84,6 +67,7 @@ o núcleo nem define o modelo de autoria.
 |---|---|
 | `procedural/nucleo/` | núcleo procedural e adaptadores compatíveis |
 | `procedural/pecas/` | uma pasta por peça: receita, referências, plano e rodadas |
+| `modulos/` | ferramentas isoladas (esboço, contorno da imagem, exportadores), cada uma com o próprio README |
 | `bancada.html`, `src/bancada/` | bancada: inspeção para a IA, edição para a pessoa |
 | `src/autoria/` | núcleo headless: topologia, alvo, descrição do gesto, adaptadores |
 | `tools/bancadas/` | porteiro, criação, exportação e gabaritos |
@@ -104,6 +88,12 @@ fontes é inventário, não porta de entrada.
 ## Leitura por tarefa
 
 - Estado, objetivo e horizonte: `VISAO.md`, este índice e `planos/README.md`.
+- **O que já existe, antes de propor ferramenta ou capacidade:** as operações do
+  núcleo no catálogo gerado, [`gerado/CATALOGO-CAPACIDADES.md`](gerado/CATALOGO-CAPACIDADES.md);
+  as formas, o posicionamento, os componentes e os comandos do esboço em
+  [`modulos/esboco/README.md`](../../modulos/esboco/README.md), e os outros
+  módulos no README de cada um; o que faz cada arquivo de `tools/` e `src/`
+  em [`../MAPA.md`](../MAPA.md).
 - Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões em `AUTORIA-IA.md`.
 - **Investigar defeito ou entender por que uma abordagem falha:**
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
