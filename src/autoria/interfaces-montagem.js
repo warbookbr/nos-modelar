@@ -94,21 +94,55 @@ export const ESTADOS_DE_ENCAIXE_CILINDRICO = [
   'impossivel', 'divergente', 'subdeterminada', 'satisfeita',
 ];
 
-/** Tabela compacta e versionada de ajustes baseada em ISO 286 (dimensões em mm). */
+/**
+ * Tabela de ajustes normalizados baseada em ISO 286-1 e ISO 286-2 (dimensões em mm).
+ * Sistema furo-base (H7) com desvios fundamentais:
+ *   - EI = 0 (afastamento inferior do furo é nulo)
+ *   - ES = +IT7 (afastamento superior do furo dado pelo grau de tolerância IT7)
+ *
+ * Classes padronizadas:
+ *   - 'folgado'       -> Ajuste H7/g6 (ajuste móvel com folga livre para deslizamento/giro)
+ *                        Eixo g6: es < 0, ei = es - IT6
+ *                        Folga mínima: F_min = EI - es = -es (mm)
+ *                        Folga máxima: F_max = ES - ei = IT7 - (es - IT6) (mm)
+ *
+ *   - 'transicao'     -> Ajuste H7/k6 (ajuste de transição para centragem de precisão)
+ *                        Eixo k6: desvios es e ei pequenos positivos
+ *                        Folga mínima: F_min = EI - es = -es (mm, geralmente negativo: leve interferência)
+ *                        Folga máxima: F_max = ES - ei = IT7 - ei (mm, positivo: leve folga)
+ *
+ *   - 'interferencia' -> Ajuste H7/p6 (ajuste forçado sob pressão para fixação rígida)
+ *                        Eixo p6: ei > 0, es = ei + IT6
+ *                        Folga mínima: F_min = EI - es = -es (mm, interferência máxima = es)
+ *                        Folga máxima: F_max = ES - ei = IT7 - ei (mm, interferência mínima)
+ */
 export const TABELA_CLASSES_AJUSTE_V1 = Object.freeze([
-  { ateMm: 3,   folgado: { min: 0.006, max: 0.020 }, transicao: { min: -0.004, max: 0.006 }, interferencia: { min: -0.018, max: -0.006 } },
-  { ateMm: 6,   folgado: { min: 0.010, max: 0.028 }, transicao: { min: -0.005, max: 0.009 }, interferencia: { min: -0.023, max: -0.009 } },
-  { ateMm: 10,  folgado: { min: 0.013, max: 0.035 }, transicao: { min: -0.006, max: 0.010 }, interferencia: { min: -0.028, max: -0.012 } },
-  { ateMm: 18,  folgado: { min: 0.016, max: 0.043 }, transicao: { min: -0.008, max: 0.012 }, interferencia: { min: -0.035, max: -0.015 } },
-  { ateMm: 30,  folgado: { min: 0.020, max: 0.053 }, transicao: { min: -0.009, max: 0.015 }, interferencia: { min: -0.042, max: -0.018 } },
-  { ateMm: 50,  folgado: { min: 0.025, max: 0.064 }, transicao: { min: -0.011, max: 0.018 }, interferencia: { min: -0.050, max: -0.022 } },
-  { ateMm: 80,  folgado: { min: 0.030, max: 0.076 }, transicao: { min: -0.013, max: 0.022 }, interferencia: { min: -0.062, max: -0.026 } },
-  { ateMm: 120, folgado: { min: 0.036, max: 0.090 }, transicao: { min: -0.015, max: 0.026 }, interferencia: { min: -0.073, max: -0.032 } },
-  { ateMm: 180, folgado: { min: 0.043, max: 0.106 }, transicao: { min: -0.018, max: 0.031 }, interferencia: { min: -0.085, max: -0.037 } },
-  { ateMm: 250, folgado: { min: 0.050, max: 0.122 }, transicao: { min: -0.021, max: 0.036 }, interferencia: { min: -0.098, max: -0.043 } },
-  { ateMm: 315, folgado: { min: 0.056, max: 0.137 }, transicao: { min: -0.023, max: 0.040 }, interferencia: { min: -0.110, max: -0.048 } },
-  { ateMm: 400, folgado: { min: 0.062, max: 0.151 }, transicao: { min: -0.025, max: 0.044 }, interferencia: { min: -0.122, max: -0.054 } },
-  { ateMm: 500, folgado: { min: 0.068, max: 0.165 }, transicao: { min: -0.027, max: 0.048 }, interferencia: { min: -0.135, max: -0.060 } },
+  // <= 3 mm: H7(+10, 0), g6(-2, -8), k6(+6, 0), p6(+12, +6) um
+  { ateMm: 3,   folgado: { min: 0.002, max: 0.018 }, transicao: { min: -0.006, max: 0.010 }, interferencia: { min: -0.012, max: 0.004 } },
+  // > 3 até 6 mm: H7(+12, 0), g6(-4, -12), k6(+9, +1), p6(+20, +12) um
+  { ateMm: 6,   folgado: { min: 0.004, max: 0.024 }, transicao: { min: -0.009, max: 0.011 }, interferencia: { min: -0.020, max: 0.000 } },
+  // > 6 até 10 mm: H7(+15, 0), g6(-5, -14), k6(+10, +1), p6(+24, +15) um
+  { ateMm: 10,  folgado: { min: 0.005, max: 0.029 }, transicao: { min: -0.010, max: 0.014 }, interferencia: { min: -0.024, max: 0.000 } },
+  // > 10 até 18 mm: H7(+18, 0), g6(-6, -17), k6(+12, +1), p6(+29, +18) um
+  { ateMm: 18,  folgado: { min: 0.006, max: 0.035 }, transicao: { min: -0.012, max: 0.017 }, interferencia: { min: -0.029, max: 0.000 } },
+  // > 18 até 30 mm: H7(+21, 0), g6(-7, -20), k6(+15, +2), p6(+35, +22) um
+  { ateMm: 30,  folgado: { min: 0.007, max: 0.041 }, transicao: { min: -0.015, max: 0.019 }, interferencia: { min: -0.035, max: -0.001 } },
+  // > 30 até 50 mm: H7(+25, 0), g6(-9, -25), k6(+18, +2), p6(+42, +26) um
+  { ateMm: 50,  folgado: { min: 0.009, max: 0.050 }, transicao: { min: -0.018, max: 0.023 }, interferencia: { min: -0.042, max: -0.001 } },
+  // > 50 até 80 mm: H7(+30, 0), g6(-10, -29), k6(+21, +2), p6(+51, +32) um
+  { ateMm: 80,  folgado: { min: 0.010, max: 0.059 }, transicao: { min: -0.021, max: 0.028 }, interferencia: { min: -0.051, max: -0.002 } },
+  // > 80 até 120 mm: H7(+35, 0), g6(-12, -34), k6(+25, +3), p6(+59, +37) um
+  { ateMm: 120, folgado: { min: 0.012, max: 0.069 }, transicao: { min: -0.025, max: 0.032 }, interferencia: { min: -0.059, max: -0.002 } },
+  // > 120 até 180 mm: H7(+40, 0), g6(-14, -39), k6(+28, +3), p6(+68, +43) um
+  { ateMm: 180, folgado: { min: 0.014, max: 0.079 }, transicao: { min: -0.028, max: 0.037 }, interferencia: { min: -0.068, max: -0.003 } },
+  // > 180 até 250 mm: H7(+46, 0), g6(-15, -44), k6(+33, +4), p6(+79, +50) um
+  { ateMm: 250, folgado: { min: 0.015, max: 0.090 }, transicao: { min: -0.033, max: 0.042 }, interferencia: { min: -0.079, max: -0.004 } },
+  // > 250 até 315 mm: H7(+52, 0), g6(-17, -49), k6(+36, +4), p6(+88, +56) um
+  { ateMm: 315, folgado: { min: 0.017, max: 0.101 }, transicao: { min: -0.036, max: 0.048 }, interferencia: { min: -0.088, max: -0.004 } },
+  // > 315 até 400 mm: H7(+57, 0), g6(-18, -54), k6(+40, +4), p6(+98, +62) um
+  { ateMm: 400, folgado: { min: 0.018, max: 0.111 }, transicao: { min: -0.040, max: 0.053 }, interferencia: { min: -0.098, max: -0.005 } },
+  // > 400 até 500 mm: H7(+63, 0), g6(-20, -60), k6(+45, +5), p6(+108, +68) um
+  { ateMm: 500, folgado: { min: 0.020, max: 0.123 }, transicao: { min: -0.045, max: 0.058 }, interferencia: { min: -0.108, max: -0.005 } },
 ]);
 
 export const CLASSES_DE_AJUSTE = Object.freeze(['folgado', 'transicao', 'interferencia']);
@@ -291,41 +325,10 @@ function interfacePadraoFuros(porta, quem) {
   const normal = multiplicar(normalBruta, 1 / tamanhoNormal);
   const ponto = vetor(planoObj.ponto ?? planoObj.centro, `${quem}.plano.ponto`);
   const diametro = escalar(i.diametro ?? (i.raio !== undefined ? i.raio * 2 : undefined), `${quem}.diametro`, { positivo: true });
-  let centros = [];
-  if (Array.isArray(i.centros)) {
-    if (i.centros.length === 0) falhar(quem, 'centros precisa ser lista não vazia de pontos [x,y,z].');
-    centros = i.centros.map((c, idx) => vetor(c, `${quem}.centros[${idx}]`));
-  } else if (i.padrao && typeof i.padrao === 'object') {
-    if (i.padrao.tipo === 'linear') {
-      const qtd = escalar(i.padrao.quantidade, `${quem}.padrao.quantidade`, { positivo: true });
-      const passo = escalar(i.padrao.passo, `${quem}.padrao.passo`);
-      const dirBruta = vetor(i.padrao.direcao, `${quem}.padrao.direcao`);
-      const dirTam = comprimento(dirBruta);
-      if (!(dirTam > 0)) falhar(`${quem}.padrao.direcao`, 'não pode ser nulo.');
-      const dir = multiplicar(dirBruta, 1 / dirTam);
-      const origem = i.padrao.origem ? vetor(i.padrao.origem, `${quem}.padrao.origem`) : ponto;
-      for (let k = 0; k < qtd; k++) {
-        centros.push(somar(origem, multiplicar(dir, k * passo)));
-      }
-    } else if (i.padrao.tipo === 'circular') {
-      const qtd = escalar(i.padrao.quantidade, `${quem}.padrao.quantidade`, { positivo: true });
-      const raioPadrao = escalar(i.padrao.raio, `${quem}.padrao.raio`, { positivo: true });
-      const centroPadrao = i.padrao.centro ? vetor(i.padrao.centro, `${quem}.padrao.centro`) : ponto;
-      const anguloInicial = i.padrao.anguloInicial ? escalar(i.padrao.anguloInicial, `${quem}.padrao.anguloInicial`) : 0;
-      const refApoio = Math.abs(normal[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
-      const u = multiplicar(vetorProduto(normal, refApoio), 1 / comprimento(vetorProduto(normal, refApoio)));
-      const v = vetorProduto(normal, u);
-      for (let k = 0; k < qtd; k++) {
-        const theta = anguloInicial + (2 * Math.PI * k) / qtd;
-        const offset = somar(multiplicar(u, raioPadrao * Math.cos(theta)), multiplicar(v, raioPadrao * Math.sin(theta)));
-        centros.push(somar(centroPadrao, offset));
-      }
-    } else {
-      falhar(quem, "padrao.tipo precisa ser 'linear' ou 'circular'.");
-    }
-  } else {
-    falhar(quem, 'exige centros (lista) ou padrao ({tipo: linear|circular}).');
+  if (!Array.isArray(i.centros) || i.centros.length === 0) {
+    falhar(quem, 'centros precisa ser lista não vazia de pontos [x,y,z] resolvida pelo núcleo.');
   }
+  const centros = i.centros.map((c, idx) => vetor(c, `${quem}.centros[${idx}]`));
   let referencia;
   if (i.referencia !== undefined) {
     const ref = vetor(i.referencia, `${quem}.referencia`);
@@ -339,6 +342,7 @@ function interfacePadraoFuros(porta, quem) {
   return {
     forma: 'padraoFuros', papel: i.papel, plano: { ponto, normal }, ponto, centro: ponto,
     normal, eixo: normal, centros, diametro, raio: diametro / 2, quantidade: centros.length,
+    ...(i.passo !== undefined ? { passo: escalar(i.passo, `${quem}.passo`, { positivo: true }) } : {}),
     ...(i.profundidade !== undefined ? { profundidade: escalar(i.profundidade, `${quem}.profundidade`, { positivo: true }) } : {}),
     ...(i.classeAjuste !== undefined ? { classeAjuste: i.classeAjuste } : {}),
     ...(referencia === undefined ? {} : { referencia }),
@@ -1056,11 +1060,49 @@ export function validarAssentamentoPlano(declaracao, portas) {
   const lateral = subtrair(entrePontos, multiplicar(referencia.normal, separacao));
   const descentro = comprimento(lateral);
 
+  let extrapolacaoApoio = 0;
+  if (Array.isArray(referencia.extensao) && Array.isArray(movel.extensao)) {
+    const meiaRefX = referencia.extensao[0] / 2;
+    const meiaRefY = referencia.extensao[1] / 2;
+    const meiaMovX = movel.extensao[0] / 2;
+    const meiaMovY = movel.extensao[1] / 2;
+
+    let extrapolacaoX = 0;
+    let extrapolacaoY = 0;
+    if (referencia.referencia) {
+      const projRef = subtrair(referencia.referencia, multiplicar(referencia.normal, produto(referencia.referencia, referencia.normal)));
+      const compProj = comprimento(projRef);
+      if (compProj > 1e-9) {
+        const uRef = multiplicar(projRef, 1 / compProj);
+        const vRef = vetorProduto(referencia.normal, uRef);
+        const dx = Math.abs(produto(lateral, uRef));
+        const dy = Math.abs(produto(lateral, vRef));
+        extrapolacaoX = dx + meiaMovX - meiaRefX;
+        extrapolacaoY = dy + meiaMovY - meiaRefY;
+      }
+    }
+    if (extrapolacaoX === 0 && extrapolacaoY === 0) {
+      const menorMeiaRef = Math.min(meiaRefX, meiaRefY);
+      const maiorMeiaMov = Math.max(meiaMovX, meiaMovY);
+      extrapolacaoX = descentro + maiorMeiaMov - menorMeiaRef;
+    }
+
+    extrapolacaoApoio = Math.max(extrapolacaoX, extrapolacaoY);
+    if (extrapolacaoApoio > tolerancia) {
+      diagnosticos.push({
+        codigo: 'extrapolacao-de-apoio',
+        descentro,
+        extrapolacao: extrapolacaoApoio,
+        tolerancia,
+      });
+    }
+  }
+
   return {
     id, tipo: 'assentaPlano', satisfeita: diagnosticos.length === 0,
     referencia: referencia.id, movel: movel.id,
     medidas: {
-      disponiveis: true, alinhamento, separacao, descentro,
+      disponiveis: true, alinhamento, separacao, descentro, extrapolacaoApoio,
       tolerancia, toleranciaNumerica: tolerancia, frestaEsperada,
     },
     diagnosticos,
@@ -1112,8 +1154,17 @@ export function validarEncaixePadraoFuros(declaracao, portas) {
   if (referencia.forma !== 'padraoFuros' || movel.forma !== 'padraoFuros') {
     diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'padraoFuros' });
   }
-  if (referencia.papel !== 'recebe' || movel.papel !== 'ocupa') {
-    diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia recebe e movel ocupa', observado: `${referencia.papel}->${movel.papel}` });
+  let casoEncaixe;
+  if (referencia.papel === 'recebe' && movel.papel === 'recebe') {
+    casoEncaixe = 'furosComFuros';
+  } else if (referencia.papel === 'recebe' && movel.papel === 'ocupa') {
+    casoEncaixe = 'pinoEmFuro';
+  } else {
+    diagnosticos.push({
+      codigo: 'direcao-incompativel',
+      esperado: "referencia 'recebe' e movel 'recebe' (furos com furos) ou referencia 'recebe' e movel 'ocupa' (pino em furos)",
+      observado: `${referencia.papel}->${movel.papel}`,
+    });
   }
   const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
   if (maoEspelhada) diagnosticos.push(maoEspelhada);
@@ -1134,6 +1185,10 @@ export function validarEncaixePadraoFuros(declaracao, portas) {
     diagnosticos.push({ codigo: 'planos-divergentes', observado: alinhamentoNormais, limite: 1 - EPSILON_ANGULAR });
   }
 
+  if (referencia.centros === undefined || movel.centros === undefined) {
+    falhar(quem, 'centros precisa ser lista não vazia de pontos [x,y,z] resolvida pelo núcleo.');
+  }
+
   const contagemRef = referencia.centros.length;
   const contagemMov = movel.centros.length;
   if (contagemRef !== contagemMov) {
@@ -1150,31 +1205,50 @@ export function validarEncaixePadraoFuros(declaracao, portas) {
     }
   }
 
-  const folgaDiametral = referencia.diametro - movel.diametro;
-  const classeAjuste = declaracao.classeAjuste ?? movel.classeAjuste ?? referencia.classeAjuste;
+  let folgaDiametral;
+  let classeAjuste;
   let especificacaoFolga;
-  if (classeAjuste) {
-    especificacaoFolga = obterFolgaPorClasseAjusteEmMetros(classeAjuste, referencia.diametro);
-    if (folgaDiametral < especificacaoFolga.minimo - tolerancia || folgaDiametral > especificacaoFolga.maximo + tolerancia) {
+
+  if (casoEncaixe === 'furosComFuros') {
+    // Caso A: furos com furos (ambos 'recebe', ex: flanges unidas por fixadores externos).
+    // Coincidência métrica dos furos e compatibilidade de diâmetros nominais sem folga de pino.
+    const diferencaDiametros = Math.abs(referencia.diametro - movel.diametro);
+    if (diferencaDiametros > tolerancia) {
       diagnosticos.push({
-        codigo: 'folga-fora-da-classe',
-        classe: classeAjuste,
-        observado: folgaDiametral,
-        minimo: especificacaoFolga.minimo,
-        maximo: especificacaoFolga.maximo,
+        codigo: 'diametros-divergentes',
+        referencia: referencia.diametro,
+        movel: movel.diametro,
+        diferenca: diferencaDiametros,
         tolerancia,
       });
     }
-  } else if (declaracao.folga !== undefined || declaracao.folgaDiametral !== undefined) {
-    especificacaoFolga = faixaDeEspecificacao(declaracao, declaracao.folga !== undefined ? 'folga' : 'folgaDiametral', `${quem}.${id}`);
-    if (folgaDiametral < especificacaoFolga.minimo - tolerancia || folgaDiametral > especificacaoFolga.maximo + tolerancia) {
-      diagnosticos.push({
-        codigo: 'folga-diametral-fora',
-        observado: folgaDiametral,
-        minimo: especificacaoFolga.minimo,
-        maximo: especificacaoFolga.maximo,
-        tolerancia,
-      });
+  } else if (casoEncaixe === 'pinoEmFuro') {
+    // Caso B: pino em furo ('recebe' com 'ocupa', ex: pinos de centragem ou parafusos penetrando furos).
+    folgaDiametral = referencia.diametro - movel.diametro;
+    classeAjuste = declaracao.classeAjuste ?? movel.classeAjuste ?? referencia.classeAjuste;
+    if (classeAjuste) {
+      especificacaoFolga = obterFolgaPorClasseAjusteEmMetros(classeAjuste, referencia.diametro);
+      if (folgaDiametral < especificacaoFolga.minimo - tolerancia || folgaDiametral > especificacaoFolga.maximo + tolerancia) {
+        diagnosticos.push({
+          codigo: 'folga-fora-da-classe',
+          classe: classeAjuste,
+          observado: folgaDiametral,
+          minimo: especificacaoFolga.minimo,
+          maximo: especificacaoFolga.maximo,
+          tolerancia,
+        });
+      }
+    } else if (declaracao.folga !== undefined || declaracao.folgaDiametral !== undefined) {
+      especificacaoFolga = faixaDeEspecificacao(declaracao, declaracao.folga !== undefined ? 'folga' : 'folgaDiametral', `${quem}.${id}`);
+      if (folgaDiametral < especificacaoFolga.minimo - tolerancia || folgaDiametral > especificacaoFolga.maximo + tolerancia) {
+        diagnosticos.push({
+          codigo: 'folga-diametral-fora',
+          observado: folgaDiametral,
+          minimo: especificacaoFolga.minimo,
+          maximo: especificacaoFolga.maximo,
+          tolerancia,
+        });
+      }
     }
   }
 
@@ -1183,14 +1257,15 @@ export function validarEncaixePadraoFuros(declaracao, portas) {
     referencia: referencia.id, movel: movel.id,
     medidas: {
       disponiveis: true,
+      caso: casoEncaixe,
       alinhamentoNormais,
       contagemFuros: contagemRef,
       maiorDesvioCentros,
       diametroReferencia: referencia.diametro,
       diametroMovel: movel.diametro,
-      folgaDiametral,
-      especificacaoFolga,
-      classeAjuste,
+      ...(folgaDiametral !== undefined ? { folgaDiametral } : {}),
+      ...(especificacaoFolga !== undefined ? { especificacaoFolga } : {}),
+      ...(classeAjuste !== undefined ? { classeAjuste } : {}),
       tolerancia,
       toleranciaNumerica: tolerancia,
     },
@@ -1219,7 +1294,9 @@ export function formatarDiagnosticoDePadraoFuros(resultado, casas = 6) {
     `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
     `medição: ${resultado.satisfeita ? 'aprovada' : 'reprovada'}`,
     `furos: quantidade ${m.contagemFuros}, desvio máximo de centros ${n(m.maiorDesvioCentros)} m`,
-    `diâmetros: referência ${n(m.diametroReferencia)} m, móvel ${n(m.diametroMovel)} m, folga ${n(m.folgaDiametral)} m`,
+    m.caso === 'furosComFuros'
+      ? `diâmetros: referência ${n(m.diametroReferencia)} m, móvel ${n(m.diametroMovel)} m (furos com furos)`
+      : `diâmetros: referência ${n(m.diametroReferencia)} m, móvel ${n(m.diametroMovel)} m, folga ${n(m.folgaDiametral)} m`,
   ];
   if (m.classeAjuste) linhas.push(`classe de ajuste: ${m.classeAjuste} (esperada ${n(m.especificacaoFolga?.minimo)}…${n(m.especificacaoFolga?.maximo)} m)`);
   if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);

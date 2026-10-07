@@ -2765,7 +2765,7 @@ function resolverInterfacePlanoDaPorta(st, interfaceDeclarada) {
 
 function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
   const obrigatorias = ['forma', 'papel', 'plano', 'diametro'];
-  const aceitas = new Set([...obrigatorias, 'centros', 'padrao', 'profundidade', 'classeAjuste', 'referencia', 'parte']);
+  const aceitas = new Set([...obrigatorias, 'centros', 'padrao', 'passo', 'profundidade', 'classeAjuste', 'referencia', 'parte']);
   const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
   if (extras.length) return { erro: `interface padraoFuros tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
   for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface padraoFuros exige '${chave}'` };
@@ -2805,6 +2805,7 @@ function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
   }
 
   let centros = [];
+  let passoLinear;
   if (Array.isArray(interfaceDeclarada.centros)) {
     if (!interfaceDeclarada.centros.length) return { erro: 'interface padraoFuros.centros precisa ser lista não vazia de pontos [x,y,z]' };
     try {
@@ -2821,6 +2822,8 @@ function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
         const direcao = st.vec(padrao.direcao);
         const origem = padrao.origem ? st.vec(padrao.origem) : ponto;
         if (!Number.isInteger(quantidade) || quantidade <= 0) return { erro: 'interface padraoFuros.padrao.quantidade precisa ser inteiro > 0' };
+        if (!Number.isFinite(passo) || passo <= 0) return { erro: 'interface padraoFuros.padrao.passo precisa ser finito > 0' };
+        passoLinear = passo;
         const tamDir = Math.hypot(...direcao);
         if (!(tamDir > 0) || !Number.isFinite(tamDir)) return { erro: 'interface padraoFuros.padrao.direcao precisa ter comprimento finito > 0' };
         const dirUnitaria = direcao.map((n) => n / tamDir);
@@ -2835,9 +2838,12 @@ function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
         const quantidade = st.num(padrao.quantidade);
         const raio = st.num(padrao.raio);
         const centroPadrao = padrao.centro ? st.vec(padrao.centro) : ponto;
-        const anguloInicial = padrao.anguloInicial !== undefined ? st.num(padrao.anguloInicial) : 0;
+        /* anguloInicial declarado em graus na interface técnica, convertido internamente para radianos */
+        const anguloInicialGraus = padrao.anguloInicial !== undefined ? st.num(padrao.anguloInicial) : 0;
         if (!Number.isInteger(quantidade) || quantidade <= 0) return { erro: 'interface padraoFuros.padrao.quantidade precisa ser inteiro > 0' };
         if (!(raio > 0) || !Number.isFinite(raio)) return { erro: 'interface padraoFuros.padrao.raio precisa ser finito > 0' };
+        if (!Number.isFinite(anguloInicialGraus)) return { erro: 'interface padraoFuros.padrao.anguloInicial precisa ser número finito em graus' };
+        const anguloInicialRad = (anguloInicialGraus * Math.PI) / 180;
         const refApoio = Math.abs(normalUnitaria[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
         const vProd = [
           normalUnitaria[1] * refApoio[2] - normalUnitaria[2] * refApoio[1],
@@ -2852,7 +2858,7 @@ function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
           normalUnitaria[0] * u[1] - normalUnitaria[1] * u[0],
         ];
         for (let k = 0; k < quantidade; k++) {
-          const theta = anguloInicial + (2 * Math.PI * k) / quantidade;
+          const theta = anguloInicialRad + (2 * Math.PI * k) / quantidade;
           const cosT = Math.cos(theta);
           const sinT = Math.sin(theta);
           centros.push(centroPadrao.map((coord, idx) => coord + (u[idx] * cosT + v[idx] * sinT) * raio));
@@ -2867,6 +2873,10 @@ function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
     return { erro: "interface padraoFuros exige 'centros' ou 'padrao'" };
   }
 
+  const passoFinal = passoLinear !== undefined
+    ? passoLinear
+    : (interfaceDeclarada.passo !== undefined ? st.num(interfaceDeclarada.passo) : undefined);
+
   return {
     interface: {
       forma: 'padraoFuros',
@@ -2880,6 +2890,7 @@ function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
       diametro,
       raio: diametro / 2,
       quantidade: centros.length,
+      ...(passoFinal !== undefined ? { passo: passoFinal } : {}),
       ...(profundidade === undefined ? {} : { profundidade }),
       ...(referencia === undefined ? {} : { referencia }),
       ...(interfaceDeclarada.classeAjuste === undefined ? {} : { classeAjuste: interfaceDeclarada.classeAjuste }),

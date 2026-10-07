@@ -14,7 +14,7 @@
       "nome": "carrinho de mão",
       "familia": "Veículos terrestres",
       "nivel": "esboço",
-      "referencia": "https://grabcad.com/library/wheelbarrow-12",
+      "referencia": null,
       "ferramentas": [
         "casca",
         "barras",
@@ -26,7 +26,7 @@
       "nome": "picape",
       "familia": "Veículos terrestres",
       "nivel": "detalhado",
-      "referencia": "https://grabcad.com/library/pickup-truck-1",
+      "referencia": null,
       "ferramentas": [
         "casca",
         "chapa",
@@ -41,7 +41,7 @@
       "nome": "cilindro hidráulico",
       "familia": "Motores, transmissões e mecanismos",
       "nivel": "detalhado",
-      "referencia": "ISO 6020-2 / https://grabcad.com/library/hydraulic-cylinder-iso-6020-2-1",
+      "referencia": "ISO 6020-2",
       "ferramentas": [
         "atuador",
         "articula",
@@ -55,7 +55,7 @@
       "nome": "suspensão",
       "familia": "Motores, transmissões e mecanismos",
       "nivel": "detalhado",
-      "referencia": "https://grabcad.com/library/double-wishbone-suspension-1",
+      "referencia": null,
       "ferramentas": [
         "mola",
         "atuador",
@@ -68,7 +68,7 @@
       "nome": "cadeira de rodas",
       "familia": "Veículos terrestres",
       "nivel": "esboço",
-      "referencia": "ISO 7176 / https://grabcad.com/library/wheelchair-model-1",
+      "referencia": "ISO 7176",
       "ferramentas": [
         "barras",
         "rodaPneu",
@@ -82,7 +82,7 @@
       "nome": "guarda-roupa",
       "familia": "Móveis",
       "nivel": "esboço",
-      "referencia": "https://grabcad.com/library/wardrobe-closet-1",
+      "referencia": null,
       "ferramentas": [
         "movel",
         "articula",
@@ -94,7 +94,7 @@
       "nome": "cadeira",
       "familia": "Móveis",
       "nivel": "esboço",
-      "referencia": "https://grabcad.com/library/modern-chair-137",
+      "referencia": null,
       "ferramentas": [
         "movel",
         "barras",

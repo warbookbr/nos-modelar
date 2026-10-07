@@ -142,6 +142,27 @@ export function poseQueEncaixa(propria, vizinha, afastamento) {
   const ehPlanoOuFuros = propria.forma === 'plano' || propria.forma === 'padraoFuros';
   const eixoProprio = unitario(propria.normal ?? propria.eixo);
   const eixoVizinho = unitario(vizinha.normal ?? vizinha.eixo);
+
+  // Recusa pose indeterminada quando a orientação em torno da normal importa:
+  if (propria.forma === 'padraoFuros') {
+    if (!propria.referencia || !vizinha.referencia) {
+      falhar('orientacao-indeterminada', 'poseQueEncaixa', "encaixe de padrão de furos exige vetor 'referencia' em ambas as portas para definir a rotação em torno da normal.");
+    }
+  } else if (propria.forma === 'plano') {
+    const temRefPropria = Boolean(propria.referencia);
+    const temRefVizinha = Boolean(vizinha.referencia);
+    if (temRefPropria !== temRefVizinha) {
+      falhar('orientacao-indeterminada', 'poseQueEncaixa', "encaixe de planos com orientação exige vetor 'referencia' em ambas as portas.");
+    }
+    if (!temRefPropria && !temRefVizinha) {
+      const assimetricaPropria = Array.isArray(propria.extensao) && Math.abs(propria.extensao[0] - propria.extensao[1]) > 1e-6;
+      const assimetricaVizinha = Array.isArray(vizinha.extensao) && Math.abs(vizinha.extensao[0] - vizinha.extensao[1]) > 1e-6;
+      if (assimetricaPropria || assimetricaVizinha) {
+        falhar('orientacao-indeterminada', 'poseQueEncaixa', "encaixe de plano retangular assimétrico exige vetor 'referencia' em ambas as portas para definir a orientação.");
+      }
+    }
+  }
+
   // Para planos e padrões de furos que se apoiam face a face, a normal da peça própria aponta no sentido oposto à da vizinha
   const direcaoAlvo = ehPlanoOuFuros ? eixoVizinho.map((x) => -x) : eixoVizinho;
   let rotacao = rotacaoEntre(eixoProprio, direcaoAlvo);

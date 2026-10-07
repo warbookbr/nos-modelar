@@ -271,10 +271,15 @@ As portas declaram a interface geométrica e técnica de acoplamento da peça vi
 
 4. **Padrão de furos (`padraoFuros`)**:
    - Campos: `forma: 'padraoFuros'`, `papel: 'recebe'|'ocupa'`, `plano: { ponto, normal }`,
-     `diametro` (ou `raio`), `centros: [[x,y,z], ...]` ou gerador `padrao: { tipo: 'linear'|'circular', ... }`,
+     `diametro` (ou `raio`), `centros: [[x,y,z], ...]` ou gerador no núcleo `padrao: { tipo: 'linear'|'circular', ... }` (com `passo` guardado na porta),
      `profundidade` opcional, `referencia` opcional, `classeAjuste` opcional.
-   - Encaixes: `encaixaPadraoFuros` — valida correspondência quantidade-a-quantidade,
-     coincidência métrica entre centros emparelhados e folgas diametrais.
+   - Encaixes: `encaixaPadraoFuros` — suporta dois casos técnicos fundamentais:
+     - **Caso A — Furos com furos (`recebe` com `recebe`)**: união flange-flange onde os furos
+       se alinham para passagem de fixadores externos. Valida paralelismo das normais, coincidência métrica
+       dos centros e compatibilidade dos diâmetros nominais dos furos (sem folga de contato macho-fêmea).
+     - **Caso B — Pino em furos (`recebe` com `ocupa`)**: união macho-fêmea onde pinos, prisioneiros
+       ou eixos penetram os furos da peça de apoio. Valida paralelismo das normais, coincidência métrica
+       dos centros e folga diametral conferida por `classeAjuste` (ISO 286) ou especificação explícita de folga.
 
 5. **Trilho / Guia linear (`trilho`)**:
    - Campos: `forma: 'trilho'`, `papel: 'guia'|'deslizador'`, `eixo`, `centro`,

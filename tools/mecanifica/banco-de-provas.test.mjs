@@ -107,4 +107,18 @@ describe('Banco de provas e registro de custo', () => {
     expect(nomesEObjetos.some((n) => n.includes('mola') || n.includes('suspensão'))).toBe(true);
     expect(nomesEObjetos.some((n) => n.includes('roupa') || n.includes('roupeiro') || n.includes('cadeira'))).toBe(true);
   });
+
+  it('referências dos objetos de prova não contêm links ou slugs fictícios do GrabCAD', () => {
+    const caminhoJson = join(process.cwd(), 'docs/mecanifica/banco-de-provas/banco-de-provas.json');
+    const dados = JSON.parse(readFileSync(caminhoJson, 'utf8'));
+    for (const obj of dados.objetos) {
+      if (obj.nome === 'cilindro hidráulico') {
+        expect(obj.referencia).toBe('ISO 6020-2');
+      } else if (obj.nome === 'cadeira de rodas') {
+        expect(obj.referencia).toBe('ISO 7176');
+      } else {
+        expect(obj.referencia).toBeNull();
+      }
+    }
+  });
 });

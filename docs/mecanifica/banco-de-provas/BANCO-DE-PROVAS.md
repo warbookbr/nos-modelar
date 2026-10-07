@@ -13,13 +13,13 @@ pois envolve consumo significativo de recursos.
 
 | # | Objeto | Família | Nível | Ferramentas exercitadas | Referência | Justificativa |
 | - | ------ | ------- | ----- | ----------------------- | ---------- | ------------- |
-| 1 | **carrinho de mão** | Veículos terrestres | esboço | `casca`, `barras`, `rodaPneu` | [Link](https://grabcad.com/library/wheelbarrow-12) | Exercita casca com espessura e estrutura de barras tubulares com roda e pneu num objeto compacto. |
-| 2 | **picape** | Veículos terrestres | detalhado | `casca`, `chapa`, `rodaPneu`, `mola`, `articula`, `loftSuave` | [Link](https://grabcad.com/library/pickup-truck-1) | Exercita casca, chapa dobrada na caçamba e articulações integradas a suspensão com molas e rodas. |
-| 3 | **cilindro hidráulico** | Motores, transmissões e mecanismos | detalhado | `atuador`, `articula`, `tubulacao`, `cabo`, `vedacao` | [Link](ISO 6020-2 / https://grabcad.com/library/hydraulic-cylinder-iso-6020-2-1) | Exercita a família especializada de atuador e cilindro hidráulico com terminais articulados e conexões. |
-| 4 | **suspensão** | Motores, transmissões e mecanismos | detalhado | `mola`, `atuador`, `articula`, `barras` | [Link](https://grabcad.com/library/double-wishbone-suspension-1) | Exercita a família de molas combinada com braços articulados e barras estruturais. |
-| 5 | **cadeira de rodas** | Veículos terrestres | esboço | `barras`, `rodaPneu`, `tecido`, `articula`, `manopla` | [Link](ISO 7176 / https://grabcad.com/library/wheelchair-model-1) | Exercita cadeira com estrutura de barras tubulares, articulações e rodas raiadas. |
-| 6 | **guarda-roupa** | Móveis | esboço | `movel`, `articula`, `guia` | [Link](https://grabcad.com/library/wardrobe-closet-1) | Exercita a família de roupeiro modular com caixaria, portas articuladas e trilhos. |
-| 7 | **cadeira** | Móveis | esboço | `movel`, `barras`, `tecido`, `deforma` | [Link](https://grabcad.com/library/modern-chair-137) | Exercita a família prevista de cadeira com estrutura de barras e assento anatômico. |
+| 1 | **carrinho de mão** | Veículos terrestres | esboço | `casca`, `barras`, `rodaPneu` | — | Exercita casca com espessura e estrutura de barras tubulares com roda e pneu num objeto compacto. |
+| 2 | **picape** | Veículos terrestres | detalhado | `casca`, `chapa`, `rodaPneu`, `mola`, `articula`, `loftSuave` | — | Exercita casca, chapa dobrada na caçamba e articulações integradas a suspensão com molas e rodas. |
+| 3 | **cilindro hidráulico** | Motores, transmissões e mecanismos | detalhado | `atuador`, `articula`, `tubulacao`, `cabo`, `vedacao` | [Link](ISO 6020-2) | Exercita a família especializada de atuador e cilindro hidráulico com terminais articulados e conexões. |
+| 4 | **suspensão** | Motores, transmissões e mecanismos | detalhado | `mola`, `atuador`, `articula`, `barras` | — | Exercita a família de molas combinada com braços articulados e barras estruturais. |
+| 5 | **cadeira de rodas** | Veículos terrestres | esboço | `barras`, `rodaPneu`, `tecido`, `articula`, `manopla` | [Link](ISO 7176) | Exercita cadeira com estrutura de barras tubulares, articulações e rodas raiadas. |
+| 6 | **guarda-roupa** | Móveis | esboço | `movel`, `articula`, `guia` | — | Exercita a família de roupeiro modular com caixaria, portas articuladas e trilhos. |
+| 7 | **cadeira** | Móveis | esboço | `movel`, `barras`, `tecido`, `deforma` | — | Exercita a família prevista de cadeira com estrutura de barras e assento anatômico. |
 
 ## Resumo de custo por objeto
 
