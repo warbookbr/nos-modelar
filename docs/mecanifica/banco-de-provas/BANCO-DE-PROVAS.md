@@ -30,7 +30,7 @@ pois envolve consumo significativo de recursos.
 | **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
 | **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
 | **cadeira de rodas** | esboço | Veículos terrestres | 1 | 1 | 193819 | 9 | medido |
-| **guarda-roupa** | esboço | Móveis | 2 | 2 | 221433 | 5 | medido |
+| **guarda-roupa** | esboço | Móveis | 3 | 3 | 247352 | 8 | medido |
 | **cadeira** | esboço | Móveis | 2 | 2 | 136343 | 9 | medido |
 
 ## Histórico de medições
@@ -44,4 +44,5 @@ pois envolve consumo significativo de recursos.
 | 2026-10-07T17:52:53.476Z | `3af072d9` | **guarda-roupa** | objeto | 1 | 137569 | api | 5 | cabideiro por cima do tampo e gaveta esquerda sumida na isométrica; as duas vêm da ordem de desenho das vistas, o JSON está certo |
 | 2026-10-07T17:57:25.994Z | `252d86d4` | **cadeira de rodas** | objeto | 1 | 193819 | api | 9 | sem defeito estrutural; folga curta rodízio-aro |
 | 2026-10-07T17:59:47.858Z | `5d81ae51` | **guarda-roupa** | objeto | 2 | 83864 | api | 5 | contorno do erro de desenho piorou o móvel (porta partida, gaveta recuada na isométrica); ferragens soltas na vista do interior |
+| 2026-10-07T19:03:22.591Z | `6845851a` | **guarda-roupa** | objeto | 3 | 25919 | api | 8 | com o desenho por pixel (6845851a) os contornos da rodada 2 foram desfeitos; sem defeito estrutural |
 

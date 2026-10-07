@@ -188,6 +188,18 @@
       "origemTokens": "api",
       "nota": 5,
       "motivo": "contorno do erro de desenho piorou o móvel (porta partida, gaveta recuada na isométrica); ferragens soltas na vista do interior"
+    },
+    {
+      "objeto": "guarda-roupa",
+      "unidade": "objeto",
+      "rodadas": 3,
+      "rodada": 3,
+      "data": "2026-10-07T19:03:22.591Z",
+      "commit": "6845851a",
+      "tokens": 25919,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "com o desenho por pixel (6845851a) os contornos da rodada 2 foram desfeitos; sem defeito estrutural"
     }
   ]
 }
