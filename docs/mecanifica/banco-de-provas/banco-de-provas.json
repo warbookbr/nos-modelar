@@ -164,6 +164,18 @@
       "origemTokens": "api",
       "nota": 5,
       "motivo": "cabideiro por cima do tampo e gaveta esquerda sumida na isométrica; as duas vêm da ordem de desenho das vistas, o JSON está certo"
+    },
+    {
+      "objeto": "cadeira de rodas",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-07T17:57:25.994Z",
+      "commit": "252d86d4",
+      "tokens": 193819,
+      "origemTokens": "api",
+      "nota": 9,
+      "motivo": "sem defeito estrutural; folga curta rodízio-aro"
     }
   ]
 }

@@ -29,7 +29,7 @@ pois envolve consumo significativo de recursos.
 | **picape** | detalhado | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
 | **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
 | **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
-| **cadeira de rodas** | esboço | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
+| **cadeira de rodas** | esboço | Veículos terrestres | 1 | 1 | 193819 | 9 | medido |
 | **guarda-roupa** | esboço | Móveis | 1 | 1 | 137569 | 5 | medido |
 | **cadeira** | esboço | Móveis | 2 | 2 | 136343 | 9 | medido |
 
@@ -42,4 +42,5 @@ pois envolve consumo significativo de recursos.
 | 2026-10-07T17:51:09.992Z | `6574a7ae` | **cadeira** | objeto | 1 | 117775 | api | 7 | assento ultrapassa o aro e se sobrepõe aos montantes traseiros |
 | 2026-10-07T17:52:26.325Z | `0a796fc3` | **cadeira** | objeto | 2 | 18568 | api | 9 | defeito anterior resolvido; sem defeito estrutural |
 | 2026-10-07T17:52:53.476Z | `3af072d9` | **guarda-roupa** | objeto | 1 | 137569 | api | 5 | cabideiro por cima do tampo e gaveta esquerda sumida na isométrica; as duas vêm da ordem de desenho das vistas, o JSON está certo |
+| 2026-10-07T17:57:25.994Z | `252d86d4` | **cadeira de rodas** | objeto | 1 | 193819 | api | 9 | sem defeito estrutural; folga curta rodízio-aro |
 
