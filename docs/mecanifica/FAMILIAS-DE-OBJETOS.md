@@ -5,7 +5,9 @@ que vai ser modelado, para que as capacidades saiam da cobertura do que existe e
 não só do problema da vez. Cada objeto dela recebe, em
 [ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md), as ferramentas que deixariam
 a IA modelá-lo sem reconstruir a forma a partir de primitivas, e a conferência
-`ferramentas:check` reprova quando um objeto daqui fica sem ferramentas lá.
+`ferramentas:check` reprova quando um objeto daqui fica sem ferramentas lá. A
+[pesquisa aberta](PESQUISA-ABERTA-2026-10.md) reúne projetos e técnicas de fora
+de onde essas ferramentas podem vir.
 
 A lista é de tipos de objeto, sem ordem de prioridade. As três últimas famílias,
 orgânicas, ficam para uma fase posterior, com a ideia de ligar ferramentas que

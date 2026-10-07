@@ -1,0 +1,250 @@
+# Pesquisa aberta de 2026-10
+
+Quatro pesquisas abertas, feitas em 2026-10-07 sem contexto do projeto e sem filtro de aplicabilidade, para achar ferramentas, técnicas e ideias que uma pesquisa específica não traria. Os temas foram modelagem por código e paramétrica, geração procedural em jogos e VFX, IA e 3D, e áreas vizinhas (fabricação, robótica, arquitetura, dobradura, simulação). A pesquisa de addons do Blender foi feita à parte e entra aqui quando chegar.
+
+A busca na web devolveu pouco em três das quatro pesquisas. Só os itens marcados como vistos na busca, (V) ou (web), e a seção de IA e 3D vieram de resultado de busca; o resto vem do conhecimento prévio do modelo, com links canônicos que não foram abertos. Confira o link antes de citar ou de basear trabalho num item. Este documento é material de partida para escolher o que trazer ao Mecanifica e não autoriza implementação; o que for escolhido entra pela [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e por plano.
+
+
+## Modelagem 3D por código e paramétrica: achados
+
+Nota de método: duas buscas na web confirmaram os itens marcados com (web); os demais vêm de conhecimento prévio, com links canônicos conhecidos, e não foram reabertos nesta sessão.
+
+### Kernels B-Rep e bibliotecas Python
+1. CadQuery (web) — https://github.com/CadQuery/cadquery — Biblioteca Python sobre OpenCascade com API encadeada por seleção de faces e arestas. Interessante pelo seletor de topologia em string, que descreve geometria sem índices.
+2. build123d — https://github.com/gumyr/build123d — Sucessor em modo builder e em modo algébrico (operadores entre formas), com localização por Plane e Location. Interessante pela expressividade sem estado global no modo algébrico.
+3. cq-editor / cq-cli (web) — https://github.com/CadQuery/CQ-editor — Editor com visualização viva e CLI para exportar scripts. Útil como modelo de laço edita-e-vê.
+4. awesome-cadquery (web) — https://github.com/CadQuery/awesome-cadquery — Lista curada de scripts CadQuery. Fonte de receitas reais.
+5. SolidPython2 — https://github.com/jeff-dh/SolidPython — Gera OpenSCAD a partir de Python. Interessante para reaproveitar o ecossistema SCAD com linguagem completa.
+6. pythonOCC — https://github.com/tpaviot/pythonocc-core — Binding completo do OpenCascade em Python. Serve quando CadQuery fica estreito.
+7. Build123d-based text-to-cad skills (web, skills.sh implicit-cad) — https://www.skills.sh/earthtojake/text-to-cad/implicit-cad — Skill de agente que escreve módulos .implicit.js com SDF em GLSL. Interessante por já ser CAD pensado para LLM.
+
+### Linguagens e DSLs próprias
+8. OpenSCAD — https://openscad.org — CSG funcional declarativo, o clássico. Interessante pela comunidade e pelo vasto acervo de bibliotecas (BOSL2).
+9. BOSL2 — https://github.com/BelfrySCAD/BOSL2 — Biblioteca grande para OpenSCAD com anexos (attachments) que posicionam partes por âncoras nomeadas. Boa ideia de encaixe semântico.
+10. ImplicitCAD (web) — https://github.com/Haskell-Things/ImplicitCAD — Linguagem estilo OpenSCAD em Haskell com arredondamento implícito suave. Interessante pelo arredondamento de união nativo.
+11. Curv — https://github.com/curv3d/curv — Linguagem funcional para SDF com GPU e relevo de arte generativa. Interessante pela cadeia de modelagem puramente matemática.
+12. libfive / Studio — https://libfive.com — Kernel de modelagem implícita com Scheme e Python, malha por dual contouring. Interessante pela fidelidade de arestas vivas em implícitos.
+13. Fidget — https://github.com/mkeeter/fidget — Kernel implícito em Rust com JIT, mesmo autor do libfive. Interessante pela velocidade de avaliação.
+14. sdfx (web) — https://github.com/deadsy/sdfx — CAD em Go com SDF 2D e 3D, filete e chanfro triviais. Interessante por compilar para binário único.
+15. Implicit.js / skills de GLSL (web) — https://www.skills.sh/earthtojake/text-to-cad/implicit-cad — Modelos como função GLSL renderizados no navegador. Interessante pela pré-visualização instantânea.
+16. GCL Omega (web) — https://breakingthebottleneck.substack.com/p/friday-5-blake-courter-co-founder — SDK de geometria implícita pura como código, defendida como melhor casamento com LLMs. Interessante pela tese.
+17. nTop codereps (web) — https://www.ntop.com/resources/product-updates/codereps-a-better-way-to-communicate/ — Fluxo de nTop vira código legível. Interessante por serializar um grafo visual em texto.
+18. ShapeScript — https://shapescript.info — Linguagem declarativa para macOS e iOS com bom retorno visual. Nicho Apple.
+19. Tinkercad Codeblocks — https://www.tinkercad.com/codeblocks — Blocos visuais que geram sólidos. Interessante como porta de entrada pedagógica.
+20. AngelCAD (web) — https://github.com/arnholm/angelcad — Modelador sólido por script com AngelScript. Nicho de C++.
+
+### JS, web e Rust
+21. Cascade Studio (web) — https://github.com/zalo/CascadeStudio — IDE de CAD com OpenCascade.js no navegador. Interessante por rodar tudo no cliente.
+22. replicad — https://github.com/sgenoud/replicad — Biblioteca JS sobre OpenCascade.js com API amigável e estúdio online. Interessante para integrar a apps web.
+23. JSCAD (OpenJSCAD) — https://github.com/jscad/OpenJSCAD.org — CSG em JavaScript, módulos npm. Interessante pelo ecossistema npm.
+24. Manifold — https://github.com/elalish/manifold — Biblioteca CSG robusta e rápida em C++ com bindings JS, usada pelo OpenSCAD novo. Interessante pela garantia de malha válida.
+25. Truck — https://github.com/ricosjp/truck — Kernel B-Rep em Rust puro com WebGPU. Interessante por fugir do OpenCascade.
+26. Fornjot — https://github.com/hannobraun/fornjot — Kernel B-Rep em Rust, experimental e ambicioso. Interessante pela arquitetura de código-primeiro.
+27. Buerli (web) — https://buerli.io — CAD programático não-variedade para a web. Interessante pelo kernel orientado a histórico em JS.
+28. three.js CSG / three-bvh-csg — https://github.com/gkjohnson/three-bvh-csg — Booleanas em malhas Three.js. Interessante por rodar no mesmo grafo de cena.
+
+### Ferramentas CAD com script ou paramétrica visual
+29. FreeCAD (Python, Part Design, Assembly) — https://www.freecad.org — CAD completo com API Python e macros. Interessante pelo modelo de documento com dependências.
+30. Onshape FeatureScript — https://cad.onshape.com/FsDoc/ — Linguagem que define features do CAD nativo na nuvem. Interessante porque as features do usuário valem como as nativas.
+31. Grasshopper — https://www.grasshopper3d.com — Programação visual paramétrica para Rhino. Interessante pelo ecossistema de plugins.
+32. Houdini (VEX, procedural) — https://www.sidefx.com/products/houdini/ — Redes de nós procedurais com reexecução total. Interessante como modelo de pipeline determinístico.
+33. Blender Geometry Nodes — https://docs.blender.org/manual/en/latest/modeling/geometry_nodes/ — Nós procedurais para malhas dentro do Blender. Interessante pelos campos (fields) avaliados por ponto.
+34. Dynamo — https://dynamobim.org — Visual para Revit e Civil 3D. Nicho BIM paramétrico.
+35. SolveSpace — https://solvespace.com — CAD paramétrico leve com solver de restrições próprio e biblioteca embutível. Interessante pelo solver reutilizável.
+36. Fusion 360 API / Autodesk Forge — https://aps.autodesk.com — Automação por Python e JS de um CAD comercial. Interessante para geração em lote.
+
+### Ideias estranhas ou de nicho
+37. Shadertoy e raymarching de SDF — https://www.shadertoy.com — Cenas inteiras como uma função GLSL por pixel. Interessante pelo vocabulário de operadores de SDF de Inigo Quilez (https://iquilezles.org/articles/distfunctions/).
+38. Dual contouring / Marching cubes lib (Mikola Lysenko) — https://github.com/mikolalysenko/isosurface — Extração de malha de campos escalares em JS. Interessante como etapa final de qualquer SDF.
+39. CadQuery + LLM (Text2CAD, CADCodeVerify) — https://arxiv.org/abs/2410.05340 — Pesquisa que gera CadQuery com LLM e verifica por renderização. Interessante pelo laço de verificação visual.
+40. Sverchok — https://github.com/nortikin/sverchok — Nós paramétricos para Blender, grande acervo matemático. Interessante pelas superfícies matemáticas.
+41. OpenSCAD playground/WASM — https://ochafik.com/openscad2/ — OpenSCAD compilado para WebAssembly no navegador. Interessante por rodar sem servidor.
+42. Bitbybit — https://bitbybit.dev — CAD paramétrico no navegador com blocos, Rete e TypeScript sobre OpenCascade. Interessante pelas três interfaces para o mesmo kernel.
+
+## Geração procedural de geometria em jogos, VFX e arte digital
+
+Nota de método: os achados 1 a 12 apareceram nas buscas desta sessão (URLs vistas nos resultados). Os achados 13 a 34 vêm de conhecimento prévio, com URLs canônicas que não foram abertas nesta sessão; confirme os links antes de citar.
+
+### Confirmados nas buscas
+
+1. Wave Function Collapse (Maxim Gumin) — https://github.com/mxgmn/WaveFunctionCollapse — Algoritmo de satisfação de restrições que gera bitmaps e tilemaps a partir de uma amostra ou de regras de adjacência. Interessa por ser a referência de quase toda implementação posterior e por ter virado vocabulário comum de PCG.
+2. Model Synthesis (Paul Merrell) — https://paulmerrell.org/model-synthesis/ — Técnica de 2007 que gera modelos 3D grandes a partir de um exemplo pequeno, anterior ao WFC e quase idêntica a ele. Interessa pela tese e pelas variantes que modificam o modelo em blocos, que tratam escala melhor que o WFC.
+3. Model Synthesis and Modifying in Blocks (Boris the Brave) — https://www.boristhebrave.com/2021/10/26/model-synthesis-and-modifying-in-blocks/ — Explica como regerar só uma região do resultado mantendo a vizinhança. Interessa para edição local e regeneração incremental de conteúdo procedural.
+4. Tessera (Boris the Brave) — https://www.boristhebrave.com/ (projeto Tessera) — Addon de Unity para geração 3D por tiles com WFC, com restrições e controle de repetição. Interessa pelo artigo sobre tornar o WFC menos monótono em escalas grandes.
+5. Driven WaveFunctionCollapse — https://www.boristhebrave.com/2021/06/06/driven-wavefunctioncollapse — WFC guiado por um mapa externo que dirige quais tiles aparecem onde. Interessa como ponte entre geração por regra e controle artístico.
+6. Wave Function Collapse tips and tricks — https://www.boristhebrave.com/2020/02/08/wave-function-collapse-tips-and-tricks/ — Compilação de armadilhas práticas: contradições, backtracking, pesos, simetrias. Interessa como guia de implementação mais útil que o repositório original.
+7. Infinite procedural city (Marian42) — https://github.com/marian42/wavefunctioncollapse — Cidade infinita montada com WFC em blocos 3D, navegável em primeira pessoa. Interessa pelo tratamento de geração infinita por chunks e pela estética coerente com poucos tiles.
+8. Townscaper e "Organic Towns from Square Tiles" (Oskar Stålberg) — https://www.gamedeveloper.com/blogs/how-townscaper-works-a-story-four-games-in-the-making — Grade irregular subdividida em quadriláteros com WFC sobre ela para gerar edifícios a partir de cliques. Interessa por mostrar tiles em grade deformada, sem grade ortogonal.
+9. DeBroglie (Boris the Brave) — https://github.com/BorisTheBrave/DeBroglie — Biblioteca C# de WFC com restrições, caminhos e topologias além da grade. Interessa por separar o solver do domínio.
+10. Unreal Engine PCG Framework — https://dev.epicgames.com/documentation/en-us/unreal-engine/procedural-content-generation-overview — Sistema de grafos de pontos e atributos em tempo de edição e de execução. Interessa pela geração em runtime com hierarquia de grades e pelo Electric Dreams como amostra.
+11. Houdini Engine em jogos (GDC 2017, Robert Magee) — https://80.lv/articles/gdc-2017-procedural-assets-for-ue4/ — Ativos procedurais do Houdini carregados no Unreal com parâmetros expostos. Interessa como origem do fluxo de ativos digitais parametrizáveis.
+12. ProcGenMod — https://github.com/spaceribs/ProcGenMod — Editor de nós inspirado no Houdini feito sobre a API Python do Blender. Interessa como experimento de camada de nós própria sobre um host existente.
+
+### De conhecimento prévio (URLs a confirmar)
+
+13. Sverchok — https://github.com/nortikin/sverchok — Addon de nós paramétricos do Blender com foco em matemática e arquitetura. Interessa por ter existido antes dos Geometry Nodes e ter nós de superfícies, campos e solvers.
+14. Geometry Nodes Fields (Blender) — https://docs.blender.org/manual/en/latest/modeling/geometry_nodes/fields.html — Avaliação preguiçosa de campos por elemento da geometria. Interessa como modelo de dados alternativo ao fluxo de listas.
+15. Molecular Nodes — https://github.com/BradyAJohnston/MolecularNodes — Importa estruturas moleculares e as anima com Geometry Nodes. Interessa como uso científico de geometria procedural.
+16. CityEngine e CGA (Müller, Wonka) — https://www.esri.com/en-us/arcgis/products/arcgis-cityengine/overview — Gramática de formas contextual para edifícios e cidades. Interessa pelo artigo "Procedural Modeling of Buildings" e pela linguagem de regras como arquivo versionável.
+17. Split Grammars (Wonka et al., 2003) — https://dl.acm.org/doi/10.1145/882262.883001 — Gramática de fachadas por divisão de retângulos com atributos. Interessa como base teórica de layouts de fachada.
+18. L-systems e "The Algorithmic Beauty of Plants" — http://algorithmicbotany.org/papers/#abop — Livro gratuito sobre gramáticas paralelas para plantas. Interessa pela ligação entre regra, crescimento e ramificação.
+19. Dual Contouring e Surface Nets (Boris the Brave) — https://www.boristhebrave.com/2018/04/15/dual-contouring-tutorial/ — Extração de malha de campos de distância preservando quinas. Interessa para terreno voxel e escultura com arestas vivas.
+20. libfive — https://libfive.com — Kernel de modelagem sólida funcional por funções implícitas com malhas que preservam arestas. Interessa como CAD programável por SDF.
+21. Womp — https://womp3d.com — Modelador 3D em navegador baseado em SDF e operações booleanas suaves. Interessa pela escultura sem malha explícita.
+22. Shadertoy e SDF raymarching (Inigo Quilez) — https://iquilezles.org/articles/distfunctions/ — Catálogo de primitivas e operadores de distância assinada. Interessa como biblioteca de formas matematicamente curtas.
+23. Wang tiles e Wang cubes — https://en.wikipedia.org/wiki/Wang_tile — Ladrilhos com bordas coloridas que impõem adjacência e geram padrões aperiódicos. Interessa como precursor teórico do WFC.
+24. Quadtree/Octree adaptativo e Voronoi em jogos (Amit Patel, Red Blob Games) — https://www.redblobgames.com/ — Artigos interativos sobre mapas de polígonos, grades hexagonais e ruído. Interessa pela clareza e pela cobertura de ruído, rios e distribuições.
+25. Poisson disk e distribuição por blue noise — https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf — Amostragem rápida de pontos espaçados uniformemente. Interessa para espalhar objetos sem aglomeração, base de scatter em PCG.
+26. Wave Function Collapse em Caves of Qud — https://www.gamedeveloper.com/design/the-procedural-generation-of-caves-of-qud — Palestras de Brian Bucklew sobre geração de ruínas e história. Interessa por misturar geometria, texto e simulação histórica.
+27. Dwarf Fortress e geração de mundo — https://www.bay12games.com/dwarves/ — Geração de terreno por erosão, clima e história encadeados. Interessa como exemplo extremo de camadas de simulação.
+28. Spelunky, geração por trilha de salas (Derek Yu) — https://spelunkyworld.com/ — Níveis por trilha garantida de salas com blocos pré-feitos. Interessa como PCG por template que garante solucionabilidade.
+29. Substance 3D Designer — https://www.adobe.com/products/substance3d/apps/designer.html — Grafos procedurais de texturas e materiais com parâmetros expostos. Interessa por ser o equivalente do Houdini para superfícies.
+30. Tyflow — https://www.tyflow.com — Sistema de partículas e geometria procedural para 3ds Max. Interessa pela simulação de multidões e fragmentação sem sair do host.
+31. Geometry Script (Unreal) — https://dev.epicgames.com/documentation/en-us/unreal-engine/geometry-scripting-users-guide-in-unreal-engine — Operações de malha por Blueprint e Python no editor e em runtime. Interessa como API de modelagem sem nós.
+32. Open CASCADE e CadQuery — https://github.com/CadQuery/cadquery — CAD paramétrico em Python sobre kernel B-rep. Interessa como alternativa de código para peças mecânicas exatas.
+33. OpenSCAD — https://openscad.org — Modelagem sólida construtiva puramente textual e determinística. Interessa pela reprodutibilidade total e por décadas de bibliotecas.
+34. Inigo Quilez, "Painting a Landscape with Maths" e pesquisas de ruído — https://iquilezles.org/articles/ — Terrenos, árvores e nuvens gerados por funções curtas. Interessa pelo equilíbrio entre qualidade visual e custo.
+35. Wave Function Collapse infinito em Bad North — https://www.badnorth.com — Ilhas geradas por modelo sintético com camadas de regras. Interessa pelo resultado legível em jogo comercial.
+36. Procedural Content Generation in Games (livro) — http://pcgbook.com — Livro aberto com capítulos sobre gramáticas, restrições, busca e avaliação. Interessa como mapa acadêmico do campo.
+37. Marching Cubes e Marching Tetrahedra — https://paulbourke.net/geometry/polygonise/ — Referência clássica de tabelas e código para isosuperfícies. Interessa como ponto de partida de terrenos volumétricos.
+38. Gaea e World Machine — https://quadspinner.com — Geração de terreno por erosão e nós. Interessa pela erosão hidráulica realista em tempo curto.
+
+## IA e 3D: achados de pesquisa aberta (2026-10-07)
+
+Os dados vêm de resultados de busca e de resumos dos próprios resultados; nenhum artigo foi lido por inteiro. Números citados são os que o resumo da busca informava.
+
+### CAD e código paramétrico
+
+1. Text-to-CadQuery. https://arxiv.org/pdf/2505.06507. Gera código CadQuery direto do texto, depois de ajustar seis LLMs abertos em 170 mil anotações CadQuery sobre o Text2CAD. Interessa por dispensar representação intermediária e ter dataset reaproveitável.
+2. CAD-Coder. https://neurips.cc/virtual/2025/poster/118098. Ajusta o modelo em scripts CadQuery e depois aplica RL (GRPO) com recompensa geométrica, usando 110 mil trincas texto, código e sólido e cadeia de pensamento de planejamento. Interessa pela recompensa medida na geometria resultante, que é verificável.
+3. CADmium. https://arxiv.org/pdf/2507.09792. Trata CAD como texto para texto: o GPT-4.1 descreveu 176 mil objetos e o Qwen2.5-Coder foi ajustado com LoRA para voltar à sequência CAD. Interessa pelo método de gerar descrições sintéticas a partir de geometria existente.
+4. CADFusion. https://github.com/microsoft/CADFusion (artigo https://arxiv.org/abs/2501.19054v3). Alterna treino em sequências paramétricas com treino de feedback visual que premia objetos renderizados preferidos. Interessa por usar a imagem renderizada como sinal de correção do código.
+5. ReCAD. https://arxiv.org/html/2512.06328v1. Modelo visão-linguagem com RL para gerar CAD paramétrico. Interessa como exemplo de RLVR aplicado a CAD.
+6. cadrille. https://www.alphaxiv.org/overview/2505.22914. Reconstrução CAD multimodal (nuvem de pontos, imagem, texto) para script Python, com segunda etapa de RL online. Interessa por unir três entradas num mesmo modelo.
+7. CADENA, engenharia reversa passo a passo. https://arxiv.org/pdf/2608.00799. Reconstrói CAD em etapas sucessivas, e não de uma vez. Interessa pela decomposição incremental, parecida com receita de passos.
+8. ReACT. https://ojs.aaai.org/index.php/AAAI/article/view/37360. Formula a reconstrução de sequência CAD a partir de nuvem de pontos como processo de decisão de Markov com recompensa de forma. Interessa pela ideia de recompensa de longo prazo sobre a forma.
+9. Point2CAD. https://arxiv.org/pdf/2312.04962. Segmenta a nuvem e ajusta primitivas por otimização, sem aprendizado, incluindo superfícies livres. Interessa como linha de base sem modelo treinado.
+10. CADReasoner-PC. https://huggingface.co/kulibinai/cadreasoner-pc. Variante de nuvem de pontos de um modelo de raciocínio CAD publicado no Hugging Face. Interessa por ser um peso aberto utilizável direto.
+11. BrepGen. https://arxiv.org/pdf/2401.15563 (código https://github.com/samxuxiang/BrepGen). Difusão que gera B-rep direto como árvore de faces, arestas e vértices, com topologia dada por nós duplicados. Interessa por incluir superfícies livres e permitir autocompletar CAD.
+12. OpenSCAD Pantheon, benchmark prático. https://modelrift.com/blog/openscad-llm-benchmark. Compara ferramentas de código (Codex, Claude, Cursor, Antigravity) transformando referência arquitetônica em OpenSCAD paramétrico. Interessa por ser comparação informal e reproduzível entre agentes.
+13. P3D-Bench. https://arxiv.org/pdf/2606.11152. Mede MLLMs em geração 3D paramétrica e raciocínio estrutural, com saída OpenSCAD e métricas geométricas e estéticas. Interessa como benchmark de código de forma, e não de malha.
+14. Human-in-the-Loop, avaliação quantitativa de modelos 3D por LLM. https://arxiv.org/pdf/2509.07010. Mede a qualidade de modelos 3D gerados por LLM com humano no laço. Interessa pela metodologia de medida.
+
+### Agentes que modelam e procedurais
+
+15. Procedura. https://arxiv.org/pdf/2608.26238. Agente que escreve objetos como montagens procedurais, parte por parte, com encaixes tipados verificáveis por máquina e verificação de compilação, encaixe e conectividade a cada passo. Interessa por ser quase o mesmo desenho de partes nomeadas e contatos checáveis.
+16. ShapeLib. https://arxiv.org/abs/2502.08884 (versão 2: https://arxiv.org/html/2502.08884v2). Pede ao LLM que projete uma biblioteca de funções de abstração de forma, com interfaces semanticamente alinhadas, e edite formas editando programas. Interessa por tratar a biblioteca como saída do modelo.
+17. ShapeCraft. https://arxiv.org/abs/2510.17603v1. Multiagente que representa o ativo como programa de forma, com grafo procedural de subtarefas. Interessa pela decomposição de linguagem em grafo.
+18. ShapeAssembly. https://ar5iv.labs.arxiv.org/html/2009.08026. Linguagem de montagem de formas com cuboides ligados hierarquicamente e por simetria. Interessa como DSL pequena e antiga que continua servindo de base.
+19. 3D-GPT. https://arxiv.org/pdf/2310.12945. Três agentes (concepção, modelagem, despacho) que comandam um gerador procedural no Blender. Interessa pela divisão de papéis.
+20. WorldCraft. https://arxiv.org/html/2502.15601v1. Agentes LLM sobre geração procedural para cenas internas e externas, com controle por linguagem de atributos e layout. Interessa pela edição por comando.
+21. InfiniBench. https://arxiv.org/pdf/2511.18200. Traduz descrição de cena em restrições procedurais e resolve com motor de layout por clusters, para benchmark de raciocínio espacial com complexidade ajustável. Interessa por gerar o teste sob medida.
+22. Blender MCP, mcp-3d-modeling-agent. https://glama.ai/mcp/servers/l4w3j954v2. Servidor MCP com 218 ferramentas e laço planejar, executar, observar, revisar e replanejar sobre o Blender. Interessa pelo catálogo de ferramentas e pelo laço fechado.
+23. Blender MCP com geração, busca e animação. https://blenderartists.org/t/open-source-blender-mcp-with-fast-3d-generation-search-and-instant-text-to-animation-auto-rigging/1589568. Versão aberta que acrescenta geração 3D, busca de ativos e rigging automático. Interessa por juntar modelagem e animação num agente.
+24. VideoCAD. https://arxiv.org/pdf/2505.24838. Dataset e modelo de interações de interface CAD em vídeo de longo horizonte, com VQA para MLLMs. Interessa porque o GPT-4.1 acertou só 47% na contagem de extrusões.
+
+### Malhas e LLMs
+
+25. LLaMA-Mesh. https://arxiv.org/html/2411.09595v1. Escreve vértices e faces como texto simples, sem ampliar o vocabulário. Interessa pela simplicidade da representação.
+26. MeshLLM. https://arxiv.org/html/2508.01242v2. Treina com inferência de conectividade a partir dos vértices e montagem local de malha, superando o LLaMA-Mesh. Interessa pelo foco em topologia.
+27. ShapeLLM-Omni. https://arxiv.org/pdf/2506.01853. LLM multimodal nativo que gera e entende 3D com tokenizador de forma. Interessa por unir texto, imagem e 3D no mesmo modelo.
+28. Omni123. https://arxiv.org/pdf/2604.02289. Modelo nativo 3D que compensa pouco dado 3D unificando geração de texto para 2D e 3D. Interessa pela estratégia contra a escassez de dados.
+29. TRELLIS.2, latentes nativos e compactos. https://www.microsoft.com/en-us/research/publication/native-and-compact-structured-latents-for-3d-generation/. Representação de voxel esparso O-Voxel que cobre topologia aberta, não variedade e PBR, com VAE de compressão esparsa. Interessa por modelar superfícies abertas e materiais.
+30. LATO. https://arxiv.org/pdf/2512.14692. Voxel esparso que preserva topologia, com malha como campo de deslocamento de vértices e síntese por flow matching. Interessa por gerar malha explícita sem passar por campo implícito.
+
+### Montagem, articulação e física
+
+31. MUSE. https://www.alphaxiv.org/abs/2605.28579. Benchmark de texto para CAD de montagens B-rep, com checagem de código, geometria (estanque, sem interpenetração) e alinhamento de intenção por juiz VLM com rubrica. Interessa por medir montabilidade, e não só similaridade.
+32. AssemCAD. https://djaym7-arxivmedia.hf.space/post/246269. Geração de montagem pronta para produção a partir de linguagem, com fábricas paramétricas de componentes reutilizáveis e o dataset AssemBench. Interessa pela síntese sob demanda de componentes.
+33. Foundation Models for Automatic CAD Generation (LLMForge). https://arxiv.org/pdf/2607.05573. Estudo empírico com 97 problemas de engenharia, validação JSON schema e refino iterativo com crítica geométrica ou por VLM. Interessa por comparar os dois regimes de crítica.
+34. Manual-PA. https://arxiv.org/pdf/2411.18011. Prevê ordem e pose 6DoF das peças de móveis a partir dos diagramas do manual. Interessa por usar manual ilustrado como entrada de montagem.
+35. Manual2Skill. https://arxiv.org/pdf/2502.10090. Lê manuais com VLM para extrair habilidades de montagem de móveis por robô. Interessa por ligar documento a ação.
+36. URDF-Anything. https://proceedings.neurips.cc/paper_files/paper/2025/hash/88445acb45c922bdb06952e31f8a60ec-Abstract-Conference.html. LLM 3D que segmenta partes e prevê parâmetros cinemáticos em uma passada, com token [SEG]. Interessa por gerar articulação executável.
+37. ArtiWorld. https://arxiv.org/pdf/2511.12977. Converte objetos rígidos em cena para URDF articulado com um módulo LLM de inferência estrutural. Interessa pelo uso do conhecimento prévio do LLM sobre mecanismos.
+38. Optimize Any Topology. https://arxiv.org/pdf/2510.23667. Modelo de fundação para otimização topológica, treinado em 2,2 milhões de estruturas (OpenTO), com inferência abaixo de 1 s. Interessa por substituir solver por difusão condicional.
+39. PhysiOpt. https://csail-dev-2025.csail.mit.edu/node/13895. Otimizador diferenciável que melhora o comportamento físico de saídas de modelos generativos 3D no espaço latente. Interessa por tornar peças geradas fisicamente plausíveis.
+
+### Avaliação e datasets
+
+40. DB-3DME. https://arxiv.org/pdf/2606.10142. 2.619 malhas sintéticas com notas humanas de geometria e aderência ao prompt; um Qwen-2.5-VL-7B ajustado superou VLMs gerais. Interessa como juiz barato e alinhado a humanos.
+41. 3D-DefectBench. https://arxiv.org/pdf/2607.10826. Nove defeitos binários finos (geometria, textura, prompt) para pipelines de VLM; seis vistas RGB funcionaram quase tão bem quanto vistas densas. Interessa pelo achado prático sobre quantas vistas renderizar.
+42. Revisiting 3D LLM Benchmarks. https://arxiv.org/html/2502.08503v3. Questiona se os benchmarks de LLM 3D realmente exigem capacidade 3D. Interessa como alerta de validade de teste.
+43. NoReGeo. https://arxiv.org/pdf/2601.10254. 2.500 problemas geométricos triviais; o melhor modelo proprietário chegou a cerca de 65%, contra 74,5% humano. Interessa por mostrar que falta intuição geométrica básica.
+44. DeepCAD. https://arxiv.org/pdf/2105.09492. 178 mil designs como sequências de comandos CAD, com comprimento máximo de 60. Interessa como dataset de referência e pelo seu limite.
+45. HistCAD. https://www.emergentmind.com/topics/histcad. Dataset com sequências de modelagem com restrições, renders, STEP, arquivos nativos e anotações. Interessa por alinhar cinco modalidades.
+46. Fusion 360 Gallery e ABC. https://www.ijcai.org/proceedings/2023/0200.pdf. Contexto de datasets: 8.625 sequências humanas de esboço e extrusão, e cerca de 1 milhão de B-reps do Onshape sem histórico. Interessa pela diferença entre ter ou não o histórico de operações.
+
+## Áreas vizinhas à modelagem 3D: achados
+
+Nota de método: a busca web devolveu pouco além de origami computacional, DFM comercial e MuJoCo. Os demais achados vêm do conhecimento prévio, com URLs canônicas dos projetos, e não foram abertos nesta rodada. Os marcados com (V) apareceram nos resultados de busca desta sessão.
+
+### Origami e dobradura
+
+1. Origamizer (V) — https://origami.c.u-tokyo.ac.jp/~tachi/software/ — Gera um padrão de vincos que, dobrado, reproduz uma superfície triangulada qualquer. Interessante como exemplo de "forma-alvo para receita de operações" com prova de que a receita reproduz o alvo.
+2. Freeform Origami (V) — https://origami.c.u-tokyo.ac.jp/~tachi/software/ — Arrastar um vértice 3D atualiza o padrão de vincos em tempo real e mostra se continua dobrável como corpo rígido. Útil como modelo de edição direta que preserva uma restrição cinemática.
+3. Rigid Origami Simulator (V) — https://origamisimulator.org/ — Simula dobras rígidas e dobras com deformação no navegador, com padrão carregável. Mostra um validador de mobilidade rodando em JS puro.
+4. Oriedita / ORIPA — https://github.com/oriedita/oriedita — Editores de padrão de vincos com regras de Huzita-Justin e checagem de planificabilidade (teoremas de Kawasaki e Maekawa). Regras locais simples que decidem validade global.
+5. TreeMaker (Robert Lang) (V) — https://langorigami.com/article/treemaker/ — Converte uma árvore de comprimentos de membros num padrão de vincos por empacotamento de círculos. Exemplo de projeto declarativo: descreve-se a estrutura e o algoritmo acha a geometria.
+
+### Fabricação, CNC e chapa
+
+6. FreeCAD Sheet Metal Workbench — https://wiki.freecad.org/SheetMetal_Workbench — Dobra e planifica chapa com fator K e relevos de canto. Interessante porque toda peça de chapa tem duas representações, dobrada e plana, que precisam concordar.
+7. Fusion/Onshape "DFM check" e HCL DFMPro (V) — https://www.hcltechsw.com/dfmpro — Checam espessura mínima de parede, ângulo de saída, acesso de ferramenta e furo cego contra regras por processo. Modelo de gates por processo de fabricação, separados da geometria.
+8. Toolpath Design Advisor (V) — https://toolpath.com/platform/design-advisor — Simula a usinagem 3 eixos e devolve custo e alertas ao projetista. Mostra "simular o processo para criticar o desenho".
+9. OpenCAMLib / FreeCAD CAM (Path) — https://github.com/aewallin/opencamlib — Biblioteca de cálculo de trajetória de ferramenta (drop cutter, waterline). A geometria de varredura de ferramenta é uma medida de acessibilidade reutilizável.
+10. Kiri:Moto — https://grid.space/kiri/ — Fatiador e gerador de CAM no navegador, FDM, laser e CNC. Prova de que um pipeline completo de fabricação cabe em uma página estática.
+11. LightBurn / Inkscape + Boxes.py — https://github.com/florianfesti/boxes — Gera caixas para corte a laser com juntas de dedo parametrizadas, centenas de tipos. Catálogo de peças definidas só por parâmetros e tolerância de corte (kerf).
+12. Tolerâncias e ajustes ISO 286 / tabelas de ajuste — https://www.iso.org/standard/45975.html — Define classes de ajuste folgado, de transição e de interferência por diâmetro nominal. Fonte de valores de folga normalizados para encaixes entre peças.
+
+### Impressão 3D
+
+13. PrusaSlicer/OrcaSlicer: análise de overhang e suportes de árvore — https://github.com/SoftFever/OrcaSlicer — Detectam balanço, ponte e necessidade de suporte por ângulo e comprimento. Uma medida de "imprimível" derivada só da malha.
+14. Print-in-place e juntas de dobradiça (Thingiverse/Printables) — https://www.printables.com/ — Mecanismos impressos já montados dependem de folga fixa entre superfícies. Fonte de exemplos reais de folga mínima e de falhas.
+15. Cura/Slic3r "Mesh Fix" e Meshmixer — https://github.com/meshmixer — Reparo de malha: furos, normais, auto-interseções, variedade (manifold). Lista de defeitos de malha que um gate de integridade poderia checar.
+16. Manifold (biblioteca CSG robusta) — https://github.com/elalish/manifold — Operações booleanas em malha com garantia de saída variedade, usada em OpenSCAD e Blender. Alternativa de CSG com robustez provada.
+17. Compliant mechanisms e flexuras impressas — https://compliantmechanisms.byu.edu/ — Mecanismos que se movem por flexão do material, sem juntas. Descreve movimento sem peças separadas.
+
+### Robótica e cinemática
+
+18. URDF/SDF e MJCF (V) — https://mujoco.readthedocs.io/en/stable/XMLreference.html — Formatos declarativos de corpos, juntas, limites e geometria de colisão. Referência madura de montagem como grafo de corpos e juntas com identidade nomeada.
+19. Pinocchio / Drake — https://github.com/stack-of-tasks/pinocchio — Cinemática e dinâmica de corpos articulados com cálculo rápido de colisão e jacobianos. Serve para provar alcance e folga de um mecanismo por cálculo.
+20. FCL / Coal (detecção de colisão) — https://github.com/coal-library/coal — Distância mínima e penetração entre geometrias convexas e malhas. Fornece a medida de contato e interferência entre peças.
+21. Modular robots e kits (Dynamixel brackets, MoveIt) — https://moveit.ros.org/ — Planejamento de movimento sobre descrição URDF. Mostra que um mesmo modelo declarativo alimenta visão, colisão e planejamento.
+
+### Arquitetura computacional
+
+22. Grasshopper / Rhino.Inside — https://www.grasshopper3d.com/ — Programação visual por grafo de dados paramétricos, padrão em arquitetura. Referência para dependência explícita entre parâmetros e geometria.
+23. Speckle — https://speckle.systems/ — Transporte de objetos de modelo entre ferramentas com versão e diferença por objeto. Modelo de identidade e histórico de componentes entre sistemas.
+24. IFC / buildingSMART — https://technical.buildingsmart.org/standards/ifc/ — Esquema aberto de elementos, relações (contém, conecta, preenche) e classificação. Vocabulário de relações entre partes reaproveitável em montagem.
+25. Karamba3D e análise estrutural paramétrica — https://karamba3d.com/ — Análise de elementos finitos de barras dentro do fluxo paramétrico. Exemplo de feedback estrutural em tempo de projeto.
+26. Shape grammars / gramáticas de forma (CGA Shape, CityEngine) — https://doc.arcgis.com/en/cityengine/latest/cga/cga-introduction.htm — Fachadas e edifícios por regras de divisão e substituição. Receita hierárquica determinística com variação controlada por semente.
+
+### Simulação física
+
+27. FEniCS / scikit-fem / CalculiX — https://calculix.de/ — Elementos finitos de código aberto para tensão e deformação. Permite checar espessura e rigidez de uma peça com número em vez de impressão visual.
+28. Taichi / Warp (NVIDIA) — https://github.com/NVIDIA/warp — Linguagens de GPU para simulação diferenciável de corpos rígidos, tecido e MPM. Simulação diferenciável pode ajustar parâmetros da peça por gradiente.
+29. Bullet/PyBullet e Rapier (Rust/WASM) — https://rapier.rs/ — Motor de física rígida com versão WebAssembly. Teste de montagem por "deixar cair e ver se se mantém".
+
+### Design generativo e otimização
+
+30. Topologia: ToPy / TopOpt / Fusion Generative Design — https://github.com/williamhunter/topy — Otimização topológica SIMP: dado carga e apoio, remove material onde não trabalha. Fonte de formas orgânicas justificadas por carga.
+31. nTop (implicit modeling) / libfive / OpenVCAD — https://libfive.com/ — Modelagem por campos implícitos (SDF), com mesclagem suave, treliças e gradação de material. Representação em que booleana, filete e treliça são aritmética de funções.
+32. Evolução e busca de qualidade-diversidade (MAP-Elites) — https://arxiv.org/abs/1504.04909 — Mantém um mapa de soluções boas em cada região de um espaço de características. Boa ideia para gerar variantes de uma peça cobrindo o espaço e não só o ótimo.
+33. Wave Function Collapse — https://github.com/mxgmn/WaveFunctionCollapse — Preenche uma grade com módulos respeitando regras de vizinhança por compatibilidade de arestas. Montagem por restrição de encaixe entre módulos.
+
+### Catálogos e padrões
+
+34. McMaster-Carr (CAD por parte) e TraceParts — https://www.mcmaster.com/ — Catálogos com modelo 3D de cada parafuso, rolamento e perfil, com atributos filtráveis. Referência de nomenclatura e parâmetros de peças comerciais.
+35. FreeCAD Fasteners / CadQuery cq_warehouse — https://github.com/gumyr/cq_warehouse — Parafusos, roscas, engrenagens e rolamentos paramétricos em código. Receitas de peças padrão com normas (ISO, DIN) como entrada.
+36. Gridfinity — https://gridfinity.xyz/ — Sistema modular de caixas e bases em grade de 42 mm com encaixe padronizado. Prova de que um módulo único de interface cria um ecossistema de peças compatíveis.
+37. Perfis e engrenagens: gearGenerator e involute — https://geargenerator.com/ — Gera perfis de engrenagem que engrenam por construção. Exemplo de relação entre peças (módulo, passo) garantida por fórmula.
+
+### Outras áreas
+
+38. CadQuery / build123d — https://github.com/gumyr/build123d — CAD B-rep em Python com seletores de face e aresta por propriedade geométrica. Seleção de topologia por consulta geométrica estável, sem índices.
+39. Topological naming problem (FreeCAD) — https://wiki.freecad.org/Topological_naming_problem — Descreve por que referências a faces quebram quando o modelo é recalculado. Estudo direto do problema de identidade persistida.
+40. Onshape FeatureScript e histórico por feature — https://cad.onshape.com/FsDoc/ — Linguagem de features com consulta por entidade e regeneração determinística. Modelo de peça como programa reexecutável.
+41. Spirograph/gears e mecanismos de Theo Jansen, Linkage — https://mechanisms.shapespeare.com/ — Síntese e animação de mecanismos planos de barras. Fonte de mecanismos mínimos e verificáveis.
+42. Kinematic Models for Design Digital Library (Cornell KMODDL) — https://kmoddl.library.cornell.edu/ — Acervo de modelos mecânicos históricos de Reuleaux com fotos e descrição. Repertório visual de mecanismos elementares.
+43. SolveSpace (restrições geométricas) — https://solvespace.com/ — CAD paramétrico com solver de restrições 2D e 3D e arquivo de texto legível. Montagem por restrições em vez de coordenadas.
+44. Metrologia por escaneamento (CloudCompare, desvio entre malha e CAD) — https://www.cloudcompare.org/ — Mede distância ponto a superfície e mostra mapa de erro colorido. Técnica para medir quanto a peça gerada se afasta de uma referência.
