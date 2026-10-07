@@ -176,6 +176,18 @@
       "origemTokens": "api",
       "nota": 9,
       "motivo": "sem defeito estrutural; folga curta rodízio-aro"
+    },
+    {
+      "objeto": "guarda-roupa",
+      "unidade": "objeto",
+      "rodadas": 2,
+      "rodada": 2,
+      "data": "2026-10-07T17:59:47.858Z",
+      "commit": "5d81ae51",
+      "tokens": 83864,
+      "origemTokens": "api",
+      "nota": 5,
+      "motivo": "contorno do erro de desenho piorou o móvel (porta partida, gaveta recuada na isométrica); ferragens soltas na vista do interior"
     }
   ]
 }
