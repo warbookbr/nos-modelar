@@ -31,7 +31,7 @@ pois envolve consumo significativo de recursos.
 | **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
 | **cadeira de rodas** | esboço | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
 | **guarda-roupa** | esboço | Móveis | 0 | 0 | 0 | — | aguardando medição |
-| **cadeira** | esboço | Móveis | 0 | 0 | 0 | — | aguardando medição |
+| **cadeira** | esboço | Móveis | 1 | 1 | 117775 | 7 | medido |
 
 ## Histórico de medições
 
@@ -39,4 +39,5 @@ pois envolve consumo significativo de recursos.
 | ---- | ------ | ------ | ------- | ------ | ------ | ------ | ---- | ------ |
 | 2026-10-07T17:46:01.030Z | `b29eb325` | **carrinho de mão** | objeto | 1 | 151252 | api | 7 | longarinas do quadro aparecem dentro da caçamba na vista superior (possível travessia do piso) |
 | 2026-10-07T17:48:54.769Z | `bdef49f5` | **carrinho de mão** | objeto | 2 | 43272 | api | 8 | defeito anterior resolvido; restam folga mínima roda-caçamba e um bloco sem função clara |
+| 2026-10-07T17:51:09.992Z | `6574a7ae` | **cadeira** | objeto | 1 | 117775 | api | 7 | assento ultrapassa o aro e se sobrepõe aos montantes traseiros |
 

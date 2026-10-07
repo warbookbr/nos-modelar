@@ -128,6 +128,18 @@
       "origemTokens": "api",
       "nota": 8,
       "motivo": "defeito anterior resolvido; restam folga mínima roda-caçamba e um bloco sem função clara"
+    },
+    {
+      "objeto": "cadeira",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-07T17:51:09.992Z",
+      "commit": "6574a7ae",
+      "tokens": 117775,
+      "origemTokens": "api",
+      "nota": 7,
+      "motivo": "assento ultrapassa o aro e se sobrepõe aos montantes traseiros"
     }
   ]
 }
