@@ -1,6 +1,6 @@
 # Pesquisa aberta de 2026-10
 
-Quatro pesquisas abertas, feitas em 2026-10-07 sem contexto do projeto e sem filtro de aplicabilidade, para achar ferramentas, técnicas e ideias que uma pesquisa específica não traria. Os temas foram modelagem por código e paramétrica, geração procedural em jogos e VFX, IA e 3D, e áreas vizinhas (fabricação, robótica, arquitetura, dobradura, simulação). A pesquisa de addons do Blender foi feita à parte e entra aqui quando chegar.
+Quatro pesquisas abertas, feitas em 2026-10-07 sem contexto do projeto e sem filtro de aplicabilidade, para achar ferramentas, técnicas e ideias que uma pesquisa específica não traria. Os temas foram modelagem por código e paramétrica, geração procedural em jogos e VFX, IA e 3D, e áreas vizinhas (fabricação, robótica, arquitetura, dobradura, simulação). A quinta, de addons do Blender, foi feita por outra IA e está no fim, sem links.
 
 A busca na web devolveu pouco em três das quatro pesquisas. Só os itens marcados como vistos na busca, (V) ou (web), e a seção de IA e 3D vieram de resultado de busca; o resto vem do conhecimento prévio do modelo, com links canônicos que não foram abertos. Confira o link antes de citar ou de basear trabalho num item. Este documento é material de partida para escolher o que trazer ao Mecanifica e não autoriza implementação; o que for escolhido entra pela [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e por plano.
 
@@ -248,3 +248,111 @@ Nota de método: a busca web devolveu pouco além de origami computacional, DFM 
 42. Kinematic Models for Design Digital Library (Cornell KMODDL) — https://kmoddl.library.cornell.edu/ — Acervo de modelos mecânicos históricos de Reuleaux com fotos e descrição. Repertório visual de mecanismos elementares.
 43. SolveSpace (restrições geométricas) — https://solvespace.com/ — CAD paramétrico com solver de restrições 2D e 3D e arquivo de texto legível. Montagem por restrições em vez de coordenadas.
 44. Metrologia por escaneamento (CloudCompare, desvio entre malha e CAD) — https://www.cloudcompare.org/ — Mede distância ponto a superfície e mostra mapa de erro colorido. Técnica para medir quanto a peça gerada se afasta de uma referência.
+
+## Addons do Blender
+
+Documento consolidado a partir de pesquisa técnica exploratória, cobrindo tanto ferramentas de modelagem 3D com foco em precisão, lógica procedural e produtividade adaptável, quanto o panorama geral do ecossistema do Blender.
+
+---
+
+### Parte 1: Modelagem 3D, Precisão CAD e Ferramentas Não-Óbvias
+
+#### 1. Hard Surface, Precisão CAD e Operações Booleanas
+* **CAD Sketcher (SolveSpace Solver)**: Modelagem paramétrica baseada em restrições 2D (distâncias, paralelismo, tangência) via solver do SolveSpace. Permite criar perfis paramétricos dinâmicos conversíveis em malhas/curvas 3D.
+  * *Potencial de adaptação:* Base para peças técnicas, gabaritos e encaixes que exigem ajuste paramétrico contínuo sem reconstrução de malha.
+* **CAD Transform**: Ferramenta de transformação interativa com lógica "Snap From / Snap To" precisa (ancoragem em vértice/aresta/centro e alinhamento direto a alvos sem manipular o 3D Cursor).
+  * *Potencial de adaptação:* Montagem de conjuntos modulares mecânicos ou arquitetônicos.
+* **keKit**: Suíte de operadores contextuais que alternam função conforme o modo de seleção (vértice, aresta, face). Inclui alinhamento por bounding box e V-Snap.
+  * *Potencial de adaptação:* Padronização de atalhos e unificação de operadores dispersos da API do Blender.
+* **MESHmachine**: Modelagem hard-surface não-destrutiva/híbrida. Destaque para `Unbevel`/`Unchamfer` (reversão de chanfros aplicados), `Fuse` (recriação de transições pós-booleanas) e sistema de `Stash` (armazenamento de estados de malha para projeção posterior de normais).
+  * *Potencial de adaptação:* Reversibilidade em fluxos destrutivos e limpeza de sombreamento em superfícies curvas.
+* **Quick Shape**: Prototipagem gestual de volumes e silhuetas diretamente na viewport com operações booleanas automáticas em tempo real.
+  * *Potencial de adaptação:* Bloqueio rápido de silhuetas e formas conceituais pré-retopologia.
+
+#### 2. Proceduralidade, Deformação e Padrões Baseados em Nós
+* **Sverchok**: Programação visual orientada a dados matemáticos (equivalente ao Grasshopper do Rhino). Opera na geração de topologia analítica pura, matrizes e NURBS, diferenciando-se dos Geometry Nodes nativos.
+  * *Potencial de adaptação:* Geração de superfícies paramétricas matemáticas, treliças e engrenagens com perfis analíticos precisos.
+* **Tissue**: Design computacional e tesselação. Mapeia componentes pela curvatura de faces (`Tessellate`) e inverte matematicamente faces e vértices (`Dual Mesh`) para estruturas celulares/Voronoi.
+  * *Potencial de adaptação:* Malhas biomiméticas, painéis solares/estruturais curvos e materiais de absorção de impacto parametrizados por mapas de peso.
+* **BagaPie**: Empacotamento de nós de Geometry Nodes em interface simplificada via pie menus (escadas, vigas, fiação, booleanas contextuais).
+  * *Potencial de adaptação:* Modelo de abstração para encapsular grafos complexos de nós em ferramentas simples para produção.
+* **GeoCables**: Cálculo automático de catenária física (gravidade), conectores e diâmetros para cabos e tubulações sobre superfícies com clique direto.
+  * *Potencial de adaptação:* Roteamento automático de chicotes, mangueiras e condutores industriais.
+
+#### 3. Topologia, Retopologia e Limpeza de Malha
+* **PolyQuilt**: Retopologia rápida com o botão esquerdo do mouse (LMB). Identifica o contexto sob o cursor para extrudar quads, soldar vértices, cortar e preencher sem alternar ferramentas.
+  * *Potencial de adaptação:* Retopologia manual leve de superfícies críticas em peças CAD/scans.
+* **EdgeFlow**: Ajuste de curvatura e espaçamento de edge loops (`Set Flow` para interpolação cúbica baseada em faces vizinhas e `Set Linear` para alinhamento uniforme).
+  * *Potencial de adaptação:* Correção de deformações causadas por cortes de suporte em Subdivision Surface.
+* **Mesh Fairing**: Suavização matemática de patches de malha via SciPy, respeitando restrições de posição, curvatura global contínua ou tangência.
+  * *Potencial de adaptação:* Limpeza cirúrgica de furos e artefatos de scans sem perder a geometria circundante.
+* **Quad Remesher**: Remalhamento automático em quads que respeita guias de borda (hard edges) e anéis de fluxo contínuo.
+  * *Potencial de adaptação:* Conversão em lote de topologia de arquivos CAD brutos em malhas poligonais funcionais.
+
+#### 4. Automação, Scripting e Controle de Seleção
+* **Pie Menu Editor (PME)**: Construtor visual de menus radiais, popups e macros com suporte a scripts condicionais em Python.
+  * *Potencial de adaptação:* Automação de sequências repetitivas (ex.: aplicar escalas -> marcar bevel weights -> ativar auto-smooth -> transferir normais).
+* **Zen Sets**: Sistema de grupos de seleção com visualização colorida em viewport, similar aos Polygroups do ZBrush.
+  * *Potencial de adaptação:* Isolamento rápido de subconjuntos de montagens complexas para modelagem ou mascaramento de modificadores.
+* **MeshCheck HUD & 3D Print Toolbox**: Diagnóstico em tempo real de não-conformidades (arestas non-manifold, N-gons, faces coplanares e espessuras mínimas).
+  * *Potencial de adaptação:* Etapa de linter de malha pré-exportação ou pré-fabricação.
+
+#### 5. Utilitários Específicos ("Hidden Gems")
+* **Conform Object**: Envelopamento não-destrutivo de sólidos sobre superfícies curvas arbitrárias preservando volume e espessura (superando o achatamento do Shrinkwrap padrão).
+* **Curves to Mesh**: Modelagem por gaiola de curvas cruzadas (estilo curve patching automotivo/Rhino) gerando superfícies quads contínuas.
+* **Bezier Mesh Shaper**: Deformação direta de malhas por curvas Bézier interativas sem necessidade de modificadores de Lattice/Curve prévios.
+* **Plating Generator**: Criação paramétrica de painéis, ranhuras e juntas de montagem sobre malhas quads.
+* **Face Inset Fillet**: Operador de Inset com chanfro arredondado simultâneo dos cantos gerados.
+
+---
+
+### Parte 2: Panorama do Ecossistema Geral do Blender
+
+#### 1. Materiais, Shading, Texturização e UV
+* **UVPackmaster 3** *(Pago - Indispensável)*: Empacotamento de UV acelerado por CPU/GPU multithread, otimização de texel density e empacotamento com suporte a UDIMs.
+* **Zen UV** *(Pago)*: Unwrapping orientado a quads, empilhamento automático de ilhas idênticas e corte/costura interativo na viewport 3D.
+* **TexTools & Texel Density Checker** *(Gratuitos)*: Padronização de densidade de pixels por unidade e alinhamento de ilhas UV para pipelines de tempo real.
+* **Decal Machine** *(Pago - Inovação)*: Detalhamento hard-surface sem bake pesado de normais via mesh decals e trim sheets não-destrutivos.
+* **Sanctus Library** *(Pago)*: Biblioteca de materiais 100% procedurais baseados em nós (desgaste de borda e danos gerados pela geometria sem texturas raster estáticas).
+* **Bake Wrangler** *(Freemium)*: Sistema nodal para geração não-destrutiva de bakes em lote (Normals, Curvature, Cavity, PBR).
+
+#### 2. Animação, Rigging e Simulação
+* **Auto-Rig Pro (ARP)** *(Pago - Indispensável)*: Solução padrão para rigs bípedes/quadrúpedes com retargeting (Mixamo/MoCap) e exportador FBX estrito para Unreal Engine e Unity.
+* **Rigify & CloudRig** *(Gratuito/Open-Source)*: Framework nativo de rigs e extensão mantida pelo Blender Studio para animação de longa-metragem.
+* **Faceit** *(Pago)*: Rigging e animação facial automatizados baseados nas 52 shape keys do Apple ARKit, com suporte a Live Link Face e NVIDIA Audio2Face.
+* **AnimAide & Animation Layers**: Ferramentas de tweening/interpolação e fluxo de animação não-linear em camadas (padrão Maya/MotionBuilder).
+* **FLIP Fluids** *(Pago)*: Motor de simulação líquida robusto (método FLIP/APIC), superior ao Mantaflow nativo em estabilidade, viscosidade e controle de spray.
+* **Simply Cloth Pro** *(Pago)*: Simulação e escultura interativa de tecidos em tempo real.
+
+#### 3. Iluminação, Câmeras e Renderização
+* **Photographer** *(Pago - Indispensável)*: Controle físico de câmeras (ISO, shutter speed, f-stop, Kelvin, raycast autofocus e render queues multissessão).
+* **Physical Starlight and Atmosphere** *(Pago)*: Simulação fotométrica de atmosfera e céu para iluminação fisicamente coerente em grandes escalas.
+* **Turbo Tools / Turbo Render** *(Pago)*: Reamostragem e denoise multicamada para Cycles com estabilidade temporal em animações, reduzindo tempos de render consideravelmente.
+* **Motores Externos (Octane & LuxCore)**: Octane Prime (espectral fisicamente preciso) e LuxCoreRender (foco em cáusticas e precisão óptica pura).
+
+#### 4. Pipeline, CAD/BIM e Asset Management
+* **Bonsai BIM (antigo BlenderBIM)** *(Gratuito/Open-Source)*: Suíte completa com suporte a padrões IFC e OpenBIM para edição de dados de engenharia e arquitetura sem triangulação destrutiva.
+* **STEPper** *(Pago)*: Importação direta de arquivos CAD (STEP/IGES) com tesselação controlada via kernel OpenCASCADE.
+* **Better FBX Importer & Exporter** *(Pago)*: Substituição ao exportador padrão, eliminando erros de rotação em ossos e problemas de coordenadas entre Blender, Maya, 3ds Max e Unreal Engine.
+* **Geo-Scatter (Scatter 5)** *(Pago - Indispensável)*: Dispersão massiva de assets com frustum culling dinâmico, biomas pré-configurados e simulação de vento via Geometry Nodes.
+* **Nova Plataforma de Extensões (Blender 4.2 LTS+)**: Gerenciador nativo centralizado (`extensions.blender.org`) com sandbox de permissões e atualizações integradas sem necessidade de instalação manual de arquivos `.zip`.
+
+---
+
+### Síntese de Fluxo Integrado Recomendado
+
+```
+[Perfís Paramétricos / CAD]  -->  CAD Sketcher / Sverchok / Curves to Mesh
+            |
+            v
+[Modelagem e Detalhamento]    -->  keKit + CAD Transform + MESHmachine + PolyQuilt
+            |
+            v
+[Auditoria e Otimização]      -->  EdgeFlow + Mesh Fairing + 3D Print Toolbox
+            |
+            v
+[UV & Detalhamento Shading]   -->  UVPackmaster 3 + Zen UV + Decal Machine
+            |
+            v
+[Pipeline / Export / Engine]  -->  Pie Menu Editor (Automação) + Better FBX / Bonsai BIM
+```
