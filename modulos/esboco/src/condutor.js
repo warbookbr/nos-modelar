@@ -624,7 +624,7 @@ export function unidadesNovasDoMarco(estado, limiar) {
 /* Registra o veredito do crítico visual cego de uma unidade no histórico do estado (`vereditos`, campo que a versão 2 do estado
    acrescenta; `liberacoes` é da versão 3. Estado de versão 1 ou 2 continua válido: os campos novos são opcionais, e a regra da nota vale também sobre vereditos antigos). `nota` de 0 a 10 e `motivo` com o que o
    crítico apontou (pelo menos 15 caracteres). Devolve o estado novo. */
-export function registrarVeredito(estadoBruto, { unidade, nota, motivo }) {
+export function registrarVeredito(estadoBruto, { unidade, nota, motivo, tokens }) {
   const ids = (estadoBruto.unidades ?? []).map((u) => u.id);
   /* `marco-50` é o veredito do crítico do Marco de 50%, que precisa estar registrado */
   const doMarco = /^marco-(\d+)$/.exec(String(unidade));
@@ -636,7 +636,13 @@ export function registrarVeredito(estadoBruto, { unidade, nota, motivo }) {
   const m = validarMotivo(motivo, 'registrar o veredito do crítico (--motivo: o que ele apontou)');
   const novo = clone(estadoBruto);
   novo.versao = Math.max(2, novo.versao ?? 1);
-  novo.vereditos = [...(novo.vereditos ?? []), { ordem: (novo.vereditos ?? []).length + 1, unidade: id, nota: n, motivo: m }];
+  const entrada = { ordem: (novo.vereditos ?? []).length + 1, unidade: id, nota: n, motivo: m };
+  if (tokens !== undefined && tokens !== null) {
+    const t = Number(tokens);
+    exigir(Number.isFinite(t) && Number.isInteger(t) && t >= 0, `condutor: --tokens precisa ser um número inteiro maior ou igual a zero, e veio ${JSON.stringify(tokens)}`);
+    entrada.tokens = t;
+  }
+  novo.vereditos = [...(novo.vereditos ?? []), entrada];
   return novo;
 }
 
@@ -693,7 +699,7 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
     });
   }
   if (marcos) for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
-  if (historico) for (const v of estado.vereditos ?? []) L.push(`veredito do crítico ${v.ordem}: ${abreviar(v.unidade)} nota ${String(v.nota).replace('.', ',')} (${v.motivo})`);
+  if (historico) for (const v of estado.vereditos ?? []) L.push(`veredito do crítico ${v.ordem}: ${abreviar(v.unidade)} nota ${String(v.nota).replace('.', ',')} (${v.motivo})${v.tokens !== undefined ? ` [${v.tokens} tokens]` : ''}`);
   if (historico) for (const l of estado.liberacoes ?? []) L.push(`liberação ${l.ordem}: ${abreviar(l.unidade)} (nota ${nota1(l.nota)} em ${l.rodadas} rodadas) liberada com o motivo: ${l.motivo}`);
   if (historico) for (const [unidade, texto] of Object.entries(estado.notasDePassagem ?? {})) L.push(`nota de passagem de ${abreviar(unidade)}: ${texto}`);
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);

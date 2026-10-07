@@ -136,9 +136,15 @@ const projetarNoPlano = (v, k) => { const d = escalar(v, k); return [v[0] - d * 
    `vizinha` é a interface da porta vizinha JÁ no mundo;
    `afastamento` está em metro, ao longo do eixo da vizinha. */
 export function poseQueEncaixa(propria, vizinha, afastamento) {
-  const eixoProprio = unitario(propria.eixo);
-  const eixoVizinho = unitario(vizinha.eixo);
-  let rotacao = rotacaoEntre(eixoProprio, eixoVizinho);
+  if (propria.forma && vizinha.forma && propria.forma !== vizinha.forma) {
+    falhar('portas-incompativeis', 'poseQueEncaixa', `não é possível encaixar porta '${propria.forma}' em porta '${vizinha.forma}'.`);
+  }
+  const ehPlanoOuFuros = propria.forma === 'plano' || propria.forma === 'padraoFuros';
+  const eixoProprio = unitario(propria.normal ?? propria.eixo);
+  const eixoVizinho = unitario(vizinha.normal ?? vizinha.eixo);
+  // Para planos e padrões de furos que se apoiam face a face, a normal da peça própria aponta no sentido oposto à da vizinha
+  const direcaoAlvo = ehPlanoOuFuros ? eixoVizinho.map((x) => -x) : eixoVizinho;
+  let rotacao = rotacaoEntre(eixoProprio, direcaoAlvo);
   let giroDefinido = false;
   if (propria.referencia && vizinha.referencia) {
     const refPropria = unitario(projetarNoPlano(aplicar(rotacao, propria.referencia), eixoVizinho));
@@ -147,8 +153,10 @@ export function poseQueEncaixa(propria, vizinha, afastamento) {
     rotacao = multiplicar(rotacaoEmTorno(eixoVizinho, angulo), rotacao);
     giroDefinido = true;
   }
-  const alvo = vizinha.centro.map((c, i) => c + eixoVizinho[i] * afastamento);
-  const centroGirado = aplicar(rotacao, propria.centro);
+  const centroVizinho = vizinha.centro ?? vizinha.ponto;
+  const centroProprio = propria.centro ?? propria.ponto;
+  const alvo = centroVizinho.map((c, i) => c + eixoVizinho[i] * afastamento);
+  const centroGirado = aplicar(rotacao, centroProprio);
   return {
     pose: { escala: 1, rotacao, deslocamento: alvo.map((c, i) => c - centroGirado[i]) },
     giroDefinido,
@@ -157,10 +165,27 @@ export function poseQueEncaixa(propria, vizinha, afastamento) {
 
 /* A interface de uma porta levada ao mundo por uma pose rígida sem escala. */
 export function interfaceNoMundo(interfaceLocal, pose) {
+  const centroTransformado = aplicar(pose.rotacao, interfaceLocal.centro ?? interfaceLocal.ponto ?? [0, 0, 0]).map((c, i) => c + pose.deslocamento[i]);
+  const eixoTransformado = interfaceLocal.eixo ? aplicar(pose.rotacao, interfaceLocal.eixo) : undefined;
+  const normalTransformada = interfaceLocal.normal ? aplicar(pose.rotacao, interfaceLocal.normal) : undefined;
   const saida = {
-    eixo: aplicar(pose.rotacao, interfaceLocal.eixo),
-    centro: aplicar(pose.rotacao, interfaceLocal.centro).map((c, i) => c + pose.deslocamento[i]),
+    ...interfaceLocal,
+    centro: centroTransformado,
+    ...(interfaceLocal.ponto ? { ponto: centroTransformado } : {}),
+    ...(eixoTransformado ? { eixo: eixoTransformado } : {}),
+    ...(normalTransformada ? { normal: normalTransformada } : {}),
   };
   if (interfaceLocal.referencia) saida.referencia = aplicar(pose.rotacao, interfaceLocal.referencia);
+  if (interfaceLocal.plano) {
+    saida.plano = {
+      ponto: centroTransformado,
+      normal: normalTransformada ?? eixoTransformado,
+    };
+  }
+  if (Array.isArray(interfaceLocal.centros)) {
+    saida.centros = interfaceLocal.centros.map((c) =>
+      aplicar(pose.rotacao, c).map((coord, i) => coord + pose.deslocamento[i])
+    );
+  }
   return saida;
 }

@@ -246,6 +246,54 @@ e reprova qualquer fresta entre as faces; fresta só é aceita quando a
 especificação traz `separacaoAxial`, com a mesma forma de faixa das outras
 medidas.
 
+### Formatos e interfaces de portas publicadas
+
+As portas declaram a interface geométrica e técnica de acoplamento da peça via
+`publicarPorta`. O núcleo e a montagem cobrem cinco formas estruturadas:
+
+1. **Cilindro (`cilindro`)**:
+   - Campos: `forma: 'cilindro'`, `papel: 'macho'|'femea'`, `eixo`, `centro`,
+     `raio` (ou `diametro`), `inicio`, `fim`, `referencia` opcional,
+     `classeAjuste` opcional.
+   - Encaixes: `encaixaCilindrico`.
+
+2. **Anel (`anel`)**:
+   - Campos: `forma: 'anel'`, `papel: 'face'|'borda'|'macho'|'femea'`, `eixo`,
+     `centro`, `raioInterno`, `raioExterno`, `inicio`, `fim`, `referencia`
+     opcional, `classeAjuste` opcional.
+   - Encaixes: `assentaAnular`.
+
+3. **Plano de apoio (`plano`)**:
+   - Campos: `forma: 'plano'`, `papel: 'recebe'|'apoia'`, `ponto`, `normal`,
+     `extensao: [largura, comprimento]`, `referencia` opcional, `classeAjuste` opcional.
+   - Encaixes: `assentaPlano` — valida contato planar face a face (normais opostas),
+     afastamento nulo ou conforme `separacao`, e limites de extensão de apoio.
+
+4. **Padrão de furos (`padraoFuros`)**:
+   - Campos: `forma: 'padraoFuros'`, `papel: 'recebe'|'ocupa'`, `plano: { ponto, normal }`,
+     `diametro` (ou `raio`), `centros: [[x,y,z], ...]` ou gerador `padrao: { tipo: 'linear'|'circular', ... }`,
+     `profundidade` opcional, `referencia` opcional, `classeAjuste` opcional.
+   - Encaixes: `encaixaPadraoFuros` — valida correspondência quantidade-a-quantidade,
+     coincidência métrica entre centros emparelhados e folgas diametrais.
+
+5. **Trilho / Guia linear (`trilho`)**:
+   - Campos: `forma: 'trilho'`, `papel: 'guia'|'deslizador'`, `eixo`, `centro`,
+     `perfil: { largura, altura }`, `curso`, `referencia` opcional, `classeAjuste` opcional.
+   - Encaixes: `encaixaTrilho` — valida alinhamento colinear dos eixos, compatibilidade dos
+     perfis de seção transversal e curso útil.
+
+### Classes de ajuste padronizadas (ISO 286)
+
+Portas cilíndricas, furos e guias podem declarar a classe de tolerância e ajuste
+através do campo `classeAjuste`:
+
+- `folgado` (ex: H7/g6, H8/f7): garante jogo positivo livre para deslizamento ou rotação.
+- `transicao` (ex: H7/k6, H7/js6): ajuste com leve aperto ou pequena folga para centragem precisa.
+- `interferencia` (ex: H7/p6, H7/s6): ajuste forçado por prensa ou expansão térmica para união rígida.
+
+As tabelas de folga nominal mínima e máxima são versionadas em milímetros
+(`TABELA_CLASSES_AJUSTE_V1` em `src/autoria/interfaces-montagem.js`) e cobrem faixas nominais de até 500 mm.
+
 Parte de objeto de várias partes mora em `procedural/pecas/<objeto>/partes/<parte>/`,
 com a montagem em `procedural/pecas/<objeto>/montagem.json`, e é citada por
 `<objeto>/<parte>`. Enquanto a etapa dela não está fixa, a receita pode ter o

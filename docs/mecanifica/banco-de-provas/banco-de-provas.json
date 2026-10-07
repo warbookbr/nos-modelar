@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "versao": 1,
+  "titulo": "Banco de provas e registro de custo de modelagem",
+  "descricao": "Conjunto versionado de objetos de prova para comparar o desempenho e o custo do modelo no início e no fim do plano de ferramentas.",
+  "origensTokensValidas": [
+    "condutor",
+    "antigravity-transcript",
+    "manual",
+    "api"
+  ],
+  "objetos": [
+    {
+      "nome": "carrinho de mão",
+      "familia": "Veículos terrestres",
+      "nivel": "esboço",
+      "referencia": "https://grabcad.com/library/wheelbarrow-12",
+      "ferramentas": [
+        "casca",
+        "barras",
+        "rodaPneu"
+      ],
+      "justificativa": "Exercita casca com espessura e estrutura de barras tubulares com roda e pneu num objeto compacto."
+    },
+    {
+      "nome": "picape",
+      "familia": "Veículos terrestres",
+      "nivel": "detalhado",
+      "referencia": "https://grabcad.com/library/pickup-truck-1",
+      "ferramentas": [
+        "casca",
+        "chapa",
+        "rodaPneu",
+        "mola",
+        "articula",
+        "loftSuave"
+      ],
+      "justificativa": "Exercita casca, chapa dobrada na caçamba e articulações integradas a suspensão com molas e rodas."
+    },
+    {
+      "nome": "cilindro hidráulico",
+      "familia": "Motores, transmissões e mecanismos",
+      "nivel": "detalhado",
+      "referencia": "ISO 6020-2 / https://grabcad.com/library/hydraulic-cylinder-iso-6020-2-1",
+      "ferramentas": [
+        "atuador",
+        "articula",
+        "tubulacao",
+        "cabo",
+        "vedacao"
+      ],
+      "justificativa": "Exercita a família especializada de atuador e cilindro hidráulico com terminais articulados e conexões."
+    },
+    {
+      "nome": "suspensão",
+      "familia": "Motores, transmissões e mecanismos",
+      "nivel": "detalhado",
+      "referencia": "https://grabcad.com/library/double-wishbone-suspension-1",
+      "ferramentas": [
+        "mola",
+        "atuador",
+        "articula",
+        "barras"
+      ],
+      "justificativa": "Exercita a família de molas combinada com braços articulados e barras estruturais."
+    },
+    {
+      "nome": "cadeira de rodas",
+      "familia": "Veículos terrestres",
+      "nivel": "esboço",
+      "referencia": "ISO 7176 / https://grabcad.com/library/wheelchair-model-1",
+      "ferramentas": [
+        "barras",
+        "rodaPneu",
+        "tecido",
+        "articula",
+        "manopla"
+      ],
+      "justificativa": "Exercita cadeira com estrutura de barras tubulares, articulações e rodas raiadas."
+    },
+    {
+      "nome": "guarda-roupa",
+      "familia": "Móveis",
+      "nivel": "esboço",
+      "referencia": "https://grabcad.com/library/wardrobe-closet-1",
+      "ferramentas": [
+        "movel",
+        "articula",
+        "guia"
+      ],
+      "justificativa": "Exercita a família de roupeiro modular com caixaria, portas articuladas e trilhos."
+    },
+    {
+      "nome": "cadeira",
+      "familia": "Móveis",
+      "nivel": "esboço",
+      "referencia": "https://grabcad.com/library/modern-chair-137",
+      "ferramentas": [
+        "movel",
+        "barras",
+        "tecido",
+        "deforma"
+      ],
+      "justificativa": "Exercita a família prevista de cadeira com estrutura de barras e assento anatômico."
+    }
+  ],
+  "medicoes": []
+}

@@ -165,7 +165,7 @@ const definicoes = {
   },
   publicarPorta: {
     intencao: 'Publicar interface semântica endereçável de uma origem existente.',
-    campos: { nome: ['texto', 'ID legado da porta.'], id: ['texto', 'ID semântico atual.'], rotulo: ['texto', 'Rótulo obrigatório quando id é usado.'], de: ['origem', 'Origem geométrica publicada.'], interface: ['objeto', 'Interface cilíndrica ou anular mensurável.'] },
+    campos: { nome: ['texto', 'ID legado da porta.'], id: ['texto', 'ID semântico atual.'], rotulo: ['texto', 'Rótulo obrigatório quando id é usado.'], de: ['origem', 'Origem geométrica publicada.'], interface: ['objeto', 'Interface mensurável de porta: cilíndrica, anular, plano de apoio, padrão de furos ou trilho.'] },
     obrigatorios: ['de'], passos: cuboBase([['publicarPorta', { id: 'topo', rotulo: 'Topo', de: origemTopo }]]),
     precondicoes: ['Use nome ou o par id+rotulo, nunca ambos.'],
   },

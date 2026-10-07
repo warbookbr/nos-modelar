@@ -14,10 +14,23 @@
    do resolvedor, que tem a peça em mãos. */
 
 /* As medidas escalares que as interfaces de porta publicam, em
-   `interfaces-montagem.js`: cilindro tem raio, início e fim; anel tem raio
-   interno, raio externo, início e fim. Vetores (eixo, centro) ficam de fora:
-   um parâmetro de receita vinculado é um número. */
-export const MEDIDAS_DE_PORTA = Object.freeze(['fim', 'inicio', 'raio', 'raioExterno', 'raioInterno']);
+   `interfaces-montagem.js`: cilindro, anel, plano (largura, comprimento),
+   padrão de furos (diâmetro, raio, quantidade, passo) e trilho (largura, altura, curso, início, fim).
+   Vetores (eixo, centro, normal) ficam de fora: um parâmetro de receita vinculado é um número. */
+export const MEDIDAS_DE_PORTA = Object.freeze([
+  'altura',
+  'comprimento',
+  'curso',
+  'diametro',
+  'fim',
+  'inicio',
+  'largura',
+  'passo',
+  'quantidade',
+  'raio',
+  'raioExterno',
+  'raioInterno',
+]);
 
 /* A unidade do parâmetro que recebe o valor. A medida da porta vem sempre em
    metro, porque sai da malha; o parâmetro pode estar em milímetro, que é o

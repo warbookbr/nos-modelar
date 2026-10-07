@@ -1,8 +1,88 @@
 /* interfaces-montagem.js — resolve portas declaradas por peças, mede relações
-   cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia
-   ou solver. É o contrato mínimo e deliberadamente read-only do AUT-05: a
-   montagem informa a escala/translação que JÁ usa; este módulo apenas confere,
-   explica e propõe uma pose não persistida quando o contrato a determina. */
+   mecânicas e deriva poses sem Three.js, hierarquia ou solver. É o contrato
+   mínimo e read-only do AUT-05 / T014.
+
+   FORMATO DAS PORTAS DO NÚCLEO (AUT-05 & T014):
+
+   1. Cilindro:
+      {
+        forma: 'cilindro',
+        papel: 'externa' | 'interna',
+        eixo: [x, y, z],
+        centro: [x, y, z],
+        raio: number (> 0),
+        inicio: number,
+        fim: number (> inicio),
+        referencia?: [x, y, z], // perpendicular ao eixo
+        mao?: 'espelhada'
+      }
+
+   2. Anel:
+      {
+        forma: 'anel',
+        papel: 'recebe' | 'ocupa',
+        eixo: [x, y, z],
+        centro: [x, y, z],
+        raioInterno: number (>= 0),
+        raioExterno: number (> raioInterno),
+        inicio: number,
+        fim: number (> inicio),
+        parte?: string,
+        mao?: 'espelhada'
+      }
+
+   3. Plano de Apoio:
+      {
+        forma: 'plano',
+        papel: 'recebe' | 'apoia',
+        ponto: [x, y, z],         // ponto de ancoragem no plano
+        normal: [nx, ny, nz],     // vetor normal unitário apontando para fora da peça
+        extensao: [largura, comprimento] | { largura, comprimento }, // dimensões finitas > 0
+        referencia?: [x, y, z],   // vetor de orientação contido no plano (perpendicular à normal)
+        parte?: string,
+        mao?: 'espelhada'
+      }
+
+   4. Padrão de Furos:
+      {
+        forma: 'padraoFuros',
+        papel: 'recebe' | 'ocupa',
+        plano: { ponto: [x, y, z], normal: [nx, ny, nz] },
+        diametro: number (> 0),   // diâmetro nominal dos furos
+        centros?: Array<[x, y, z]>, // lista de centros no plano
+        padrao?: {                // gerador alternativo de furos
+          tipo: 'linear', direcao: [x, y, z], passo: number, quantidade: number, origem?: [x, y, z]
+        } | {
+          tipo: 'circular', centro: [x, y, z], raio: number, quantidade: number, anguloInicial?: number
+        },
+        profundidade?: number (> 0),
+        classeAjuste?: 'folgado' | 'transicao' | 'interferencia',
+        referencia?: [x, y, z],
+        parte?: string,
+        mao?: 'espelhada'
+      }
+
+   5. Trilho:
+      {
+        forma: 'trilho',
+        papel: 'guia' | 'deslizador',
+        eixo: [x, y, z],          // vetor unitário ao longo do caminho de translação
+        centro: [x, y, z],        // ponto de referência
+        perfil: { largura: number (> 0), altura: number (> 0), tipo?: string },
+        curso: number (> 0),      // curso útil do movimento linear [0, curso]
+        classeAjuste?: 'folgado' | 'transicao' | 'interferencia',
+        referencia?: [x, y, z],   // vetor unitário perpendicular ao eixo (topo/orientação da seção)
+        parte?: string,
+        mao?: 'espelhada'
+      }
+
+   CLASSES DE AJUSTE (ISO 286 COMPACTA - V1):
+   Tabela versionada (TABELA_CLASSES_AJUSTE_V1) que define folga em milímetros
+   para faixas de dimensão nominal (d <= 500 mm):
+   - 'folgado' (ex.: H7/g6, H8/f7): folga positiva garantida para movimento livre.
+   - 'transicao' (ex.: H7/k6, H7/js6): ajuste com folga mínima ou leve aperto.
+   - 'interferencia' (ex.: H7/p6, H7/s6): montagem sob pressão / interferência negativa.
+*/
 
 import { relacaoEntreCaixas } from './descrever-partes.js';
 import { validarTransformacaoRigida, comporTransformacoesRigidas, localDaTransformacaoRigida } from './transformacao-rigida.js';
@@ -13,6 +93,59 @@ const EPSILON_ANGULAR = 1e-9;
 export const ESTADOS_DE_ENCAIXE_CILINDRICO = [
   'impossivel', 'divergente', 'subdeterminada', 'satisfeita',
 ];
+
+/** Tabela compacta e versionada de ajustes baseada em ISO 286 (dimensões em mm). */
+export const TABELA_CLASSES_AJUSTE_V1 = Object.freeze([
+  { ateMm: 3,   folgado: { min: 0.006, max: 0.020 }, transicao: { min: -0.004, max: 0.006 }, interferencia: { min: -0.018, max: -0.006 } },
+  { ateMm: 6,   folgado: { min: 0.010, max: 0.028 }, transicao: { min: -0.005, max: 0.009 }, interferencia: { min: -0.023, max: -0.009 } },
+  { ateMm: 10,  folgado: { min: 0.013, max: 0.035 }, transicao: { min: -0.006, max: 0.010 }, interferencia: { min: -0.028, max: -0.012 } },
+  { ateMm: 18,  folgado: { min: 0.016, max: 0.043 }, transicao: { min: -0.008, max: 0.012 }, interferencia: { min: -0.035, max: -0.015 } },
+  { ateMm: 30,  folgado: { min: 0.020, max: 0.053 }, transicao: { min: -0.009, max: 0.015 }, interferencia: { min: -0.042, max: -0.018 } },
+  { ateMm: 50,  folgado: { min: 0.025, max: 0.064 }, transicao: { min: -0.011, max: 0.018 }, interferencia: { min: -0.050, max: -0.022 } },
+  { ateMm: 80,  folgado: { min: 0.030, max: 0.076 }, transicao: { min: -0.013, max: 0.022 }, interferencia: { min: -0.062, max: -0.026 } },
+  { ateMm: 120, folgado: { min: 0.036, max: 0.090 }, transicao: { min: -0.015, max: 0.026 }, interferencia: { min: -0.073, max: -0.032 } },
+  { ateMm: 180, folgado: { min: 0.043, max: 0.106 }, transicao: { min: -0.018, max: 0.031 }, interferencia: { min: -0.085, max: -0.037 } },
+  { ateMm: 250, folgado: { min: 0.050, max: 0.122 }, transicao: { min: -0.021, max: 0.036 }, interferencia: { min: -0.098, max: -0.043 } },
+  { ateMm: 315, folgado: { min: 0.056, max: 0.137 }, transicao: { min: -0.023, max: 0.040 }, interferencia: { min: -0.110, max: -0.048 } },
+  { ateMm: 400, folgado: { min: 0.062, max: 0.151 }, transicao: { min: -0.025, max: 0.044 }, interferencia: { min: -0.122, max: -0.054 } },
+  { ateMm: 500, folgado: { min: 0.068, max: 0.165 }, transicao: { min: -0.027, max: 0.048 }, interferencia: { min: -0.135, max: -0.060 } },
+]);
+
+export const CLASSES_DE_AJUSTE = Object.freeze(['folgado', 'transicao', 'interferencia']);
+
+export function obterFolgaPorClasseAjuste(classe, dimensaoNominalMm) {
+  if (!CLASSES_DE_AJUSTE.includes(classe)) {
+    throw new Error(`obterFolgaPorClasseAjuste: classe '${classe}' desconhecida (aceitas: ${CLASSES_DE_AJUSTE.join(', ')}).`);
+  }
+  if (!Number.isFinite(dimensaoNominalMm) || dimensaoNominalMm <= 0) {
+    throw new Error(`obterFolgaPorClasseAjuste: dimensaoNominalMm precisa ser número finito > 0 (recebido ${dimensaoNominalMm}).`);
+  }
+  const entrada = TABELA_CLASSES_AJUSTE_V1.find((e) => dimensaoNominalMm <= e.ateMm) ?? TABELA_CLASSES_AJUSTE_V1[TABELA_CLASSES_AJUSTE_V1.length - 1];
+  const faixa = entrada[classe];
+  return {
+    classe,
+    nominalMm: dimensaoNominalMm,
+    min: faixa.min,
+    max: faixa.max,
+    folgaMinMm: faixa.min,
+    folgaMaxMm: faixa.max,
+    interferenciaMaxMm: Math.max(0, -faixa.min),
+    unidade: 'mm',
+  };
+}
+
+export function obterFolgaPorClasseAjusteEmMetros(classe, dimensaoNominalMetros) {
+  const folgaMm = obterFolgaPorClasseAjuste(classe, dimensaoNominalMetros * 1000);
+  return {
+    classe,
+    nominal: dimensaoNominalMetros,
+    minimo: folgaMm.min / 1000,
+    maximo: folgaMm.max / 1000,
+    folgaMinM: folgaMm.min / 1000,
+    folgaMaxM: folgaMm.max / 1000,
+    unidade: 'm',
+  };
+}
 
 function falhar(quem, mensagem) {
   throw new Error(`${quem}: ${mensagem}`);
@@ -100,9 +233,166 @@ function interfaceAnular(porta, quem) {
   };
 }
 
+function interfacePlano(porta, quem) {
+  const i = porta?.interface;
+  if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
+  if (i.forma !== 'plano' || (i.papel !== 'recebe' && i.papel !== 'apoia')) {
+    falhar(quem, "interface precisa ser plano que 'recebe' ou 'apoia'.");
+  }
+  const normalBruta = vetor(i.normal ?? i.eixo, `${quem}.normal`);
+  const tamanho = comprimento(normalBruta);
+  if (!(tamanho > 0)) falhar(`${quem}.normal`, 'não pode ser nulo.');
+  const normal = multiplicar(normalBruta, 1 / tamanho);
+  const ponto = vetor(i.ponto ?? i.centro, `${quem}.ponto`);
+  let extensao;
+  if (Array.isArray(i.extensao) && i.extensao.length === 2) {
+    extensao = [
+      escalar(i.extensao[0], `${quem}.extensao[0]`, { positivo: true }),
+      escalar(i.extensao[1], `${quem}.extensao[1]`, { positivo: true }),
+    ];
+  } else if (i.extensao && typeof i.extensao === 'object' && !Array.isArray(i.extensao)) {
+    extensao = [
+      escalar(i.extensao.largura, `${quem}.extensao.largura`, { positivo: true }),
+      escalar(i.extensao.comprimento, `${quem}.extensao.comprimento`, { positivo: true }),
+    ];
+  } else {
+    falhar(quem, 'extensao precisa ser [largura, comprimento] ou {largura, comprimento} com valores finitos > 0.');
+  }
+  if (i.mao !== undefined && i.mao !== 'espelhada') falhar(quem, "mao só aceita 'espelhada' quando declarada.");
+  let referencia;
+  if (i.referencia !== undefined) {
+    const ref = vetor(i.referencia, `${quem}.referencia`);
+    const tamRef = comprimento(ref);
+    if (!(tamRef > 0)) falhar(`${quem}.referencia`, 'não pode ser nulo.');
+    referencia = multiplicar(ref, 1 / tamRef);
+    if (Math.abs(produto(normal, referencia)) > 1e-4) falhar(quem, 'referencia precisa ser perpendicular à normal.');
+  }
+  return {
+    forma: 'plano', papel: i.papel, normal, eixo: normal,
+    ponto, centro: ponto, extensao, largura: extensao[0], comprimento: extensao[1],
+    ...(referencia === undefined ? {} : { referencia }),
+    ...(i.parte === undefined ? {} : { parte: i.parte }),
+    ...(i.mao === undefined ? {} : { mao: i.mao }),
+  };
+}
+
+function interfacePadraoFuros(porta, quem) {
+  const i = porta?.interface;
+  if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
+  const formaValida = i.forma === 'padraoFuros' || i.forma === 'padrao-furos' || i.forma === 'furos';
+  if (!formaValida || (i.papel !== 'recebe' && i.papel !== 'ocupa')) {
+    falhar(quem, "interface precisa ser padrão de furos que 'recebe' ou 'ocupa'.");
+  }
+  const planoObj = i.plano ?? { ponto: i.ponto ?? i.centro, normal: i.normal ?? i.eixo };
+  if (!planoObj || typeof planoObj !== 'object') falhar(quem, 'exige plano {ponto, normal}.');
+  const normalBruta = vetor(planoObj.normal ?? planoObj.eixo, `${quem}.plano.normal`);
+  const tamanhoNormal = comprimento(normalBruta);
+  if (!(tamanhoNormal > 0)) falhar(`${quem}.plano.normal`, 'não pode ser nulo.');
+  const normal = multiplicar(normalBruta, 1 / tamanhoNormal);
+  const ponto = vetor(planoObj.ponto ?? planoObj.centro, `${quem}.plano.ponto`);
+  const diametro = escalar(i.diametro ?? (i.raio !== undefined ? i.raio * 2 : undefined), `${quem}.diametro`, { positivo: true });
+  let centros = [];
+  if (Array.isArray(i.centros)) {
+    if (i.centros.length === 0) falhar(quem, 'centros precisa ser lista não vazia de pontos [x,y,z].');
+    centros = i.centros.map((c, idx) => vetor(c, `${quem}.centros[${idx}]`));
+  } else if (i.padrao && typeof i.padrao === 'object') {
+    if (i.padrao.tipo === 'linear') {
+      const qtd = escalar(i.padrao.quantidade, `${quem}.padrao.quantidade`, { positivo: true });
+      const passo = escalar(i.padrao.passo, `${quem}.padrao.passo`);
+      const dirBruta = vetor(i.padrao.direcao, `${quem}.padrao.direcao`);
+      const dirTam = comprimento(dirBruta);
+      if (!(dirTam > 0)) falhar(`${quem}.padrao.direcao`, 'não pode ser nulo.');
+      const dir = multiplicar(dirBruta, 1 / dirTam);
+      const origem = i.padrao.origem ? vetor(i.padrao.origem, `${quem}.padrao.origem`) : ponto;
+      for (let k = 0; k < qtd; k++) {
+        centros.push(somar(origem, multiplicar(dir, k * passo)));
+      }
+    } else if (i.padrao.tipo === 'circular') {
+      const qtd = escalar(i.padrao.quantidade, `${quem}.padrao.quantidade`, { positivo: true });
+      const raioPadrao = escalar(i.padrao.raio, `${quem}.padrao.raio`, { positivo: true });
+      const centroPadrao = i.padrao.centro ? vetor(i.padrao.centro, `${quem}.padrao.centro`) : ponto;
+      const anguloInicial = i.padrao.anguloInicial ? escalar(i.padrao.anguloInicial, `${quem}.padrao.anguloInicial`) : 0;
+      const refApoio = Math.abs(normal[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+      const u = multiplicar(vetorProduto(normal, refApoio), 1 / comprimento(vetorProduto(normal, refApoio)));
+      const v = vetorProduto(normal, u);
+      for (let k = 0; k < qtd; k++) {
+        const theta = anguloInicial + (2 * Math.PI * k) / qtd;
+        const offset = somar(multiplicar(u, raioPadrao * Math.cos(theta)), multiplicar(v, raioPadrao * Math.sin(theta)));
+        centros.push(somar(centroPadrao, offset));
+      }
+    } else {
+      falhar(quem, "padrao.tipo precisa ser 'linear' ou 'circular'.");
+    }
+  } else {
+    falhar(quem, 'exige centros (lista) ou padrao ({tipo: linear|circular}).');
+  }
+  let referencia;
+  if (i.referencia !== undefined) {
+    const ref = vetor(i.referencia, `${quem}.referencia`);
+    const tamRef = comprimento(ref);
+    if (!(tamRef > 0)) falhar(`${quem}.referencia`, 'não pode ser nulo.');
+    referencia = multiplicar(ref, 1 / tamRef);
+  }
+  if (i.classeAjuste !== undefined && !CLASSES_DE_AJUSTE.includes(i.classeAjuste)) {
+    falhar(quem, `classeAjuste desconhecida: '${i.classeAjuste}' (aceitas: ${CLASSES_DE_AJUSTE.join(', ')}).`);
+  }
+  return {
+    forma: 'padraoFuros', papel: i.papel, plano: { ponto, normal }, ponto, centro: ponto,
+    normal, eixo: normal, centros, diametro, raio: diametro / 2, quantidade: centros.length,
+    ...(i.profundidade !== undefined ? { profundidade: escalar(i.profundidade, `${quem}.profundidade`, { positivo: true }) } : {}),
+    ...(i.classeAjuste !== undefined ? { classeAjuste: i.classeAjuste } : {}),
+    ...(referencia === undefined ? {} : { referencia }),
+    ...(i.parte === undefined ? {} : { parte: i.parte }),
+    ...(i.mao === undefined ? {} : { mao: i.mao }),
+  };
+}
+
+function interfaceTrilho(porta, quem) {
+  const i = porta?.interface;
+  if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
+  const papelValido = i.papel === 'guia' || i.papel === 'deslizador' || i.papel === 'recebe' || i.papel === 'ocupa';
+  if (i.forma !== 'trilho' || !papelValido) {
+    falhar(quem, "interface precisa ser trilho ('guia' ou 'deslizador').");
+  }
+  const eixoBruto = vetor(i.eixo, `${quem}.eixo`);
+  const tamanhoEixo = comprimento(eixoBruto);
+  if (!(tamanhoEixo > 0)) falhar(`${quem}.eixo`, 'não pode ser nulo.');
+  const eixo = multiplicar(eixoBruto, 1 / tamanhoEixo);
+  const centro = vetor(i.centro ?? i.ponto, `${quem}.centro`);
+  if (!i.perfil || typeof i.perfil !== 'object') falhar(quem, 'exige perfil {largura, altura}.');
+  const largura = escalar(i.perfil.largura, `${quem}.perfil.largura`, { positivo: true });
+  const altura = escalar(i.perfil.altura, `${quem}.perfil.altura`, { positivo: true });
+  const curso = escalar(i.curso, `${quem}.curso`, { positivo: true });
+  let referencia;
+  if (i.referencia !== undefined) {
+    const ref = vetor(i.referencia, `${quem}.referencia`);
+    const tamRef = comprimento(ref);
+    if (!(tamRef > 0)) falhar(`${quem}.referencia`, 'não pode ser nulo.');
+    referencia = multiplicar(ref, 1 / tamRef);
+    if (Math.abs(produto(eixo, referencia)) > 1e-4) falhar(quem, 'referencia precisa ser perpendicular ao eixo.');
+  }
+  if (i.classeAjuste !== undefined && !CLASSES_DE_AJUSTE.includes(i.classeAjuste)) {
+    falhar(quem, `classeAjuste desconhecida: '${i.classeAjuste}' (aceitas: ${CLASSES_DE_AJUSTE.join(', ')}).`);
+  }
+  return {
+    forma: 'trilho', papel: i.papel, eixo, centro, ponto: centro,
+    perfil: { largura, altura, ...(i.perfil.tipo ? { tipo: i.perfil.tipo } : {}) },
+    largura, altura, curso, inicio: 0, fim: curso,
+    ...(i.classeAjuste !== undefined ? { classeAjuste: i.classeAjuste } : {}),
+    ...(referencia === undefined ? {} : { referencia }),
+    ...(i.parte === undefined ? {} : { parte: i.parte }),
+    ...(i.mao === undefined ? {} : { mao: i.mao }),
+  };
+}
+
 function interfaceDeMontagem(porta, quem) {
-  if (porta?.interface?.forma === 'anel') return interfaceAnular(porta, quem);
-  return interfaceCilindrica(porta, quem);
+  const forma = porta?.interface?.forma;
+  if (forma === 'anel') return interfaceAnular(porta, quem);
+  if (forma === 'plano') return interfacePlano(porta, quem);
+  if (forma === 'padraoFuros' || forma === 'padrao-furos' || forma === 'furos') return interfacePadraoFuros(porta, quem);
+  if (forma === 'trilho') return interfaceTrilho(porta, quem);
+  if (forma === 'cilindro') return interfaceCilindrica(porta, quem);
+  falhar(quem, `forma de interface desconhecida: '${forma}'`);
 }
 
 /**
@@ -137,18 +427,46 @@ export function resolverPortasDeMontagem(instancias) {
           referencia: multiplicar(aplicarMatriz(mundo.rotacao, base.referencia), 1 / comprimento(aplicarMatriz(mundo.rotacao, base.referencia))),
         }),
         centro: somar(multiplicar(aplicarMatriz(mundo.rotacao, base.centro), mundo.escala), mundo.deslocamento),
-        inicio: base.inicio * mundo.escala,
-        fim: base.fim * mundo.escala,
         transformacao: {
           mundo: { escala: mundo.escala, rotacao: mundo.rotacao.map((linha) => linha.slice()), deslocamento: mundo.deslocamento.slice() },
           local: { escala: local.escala, rotacao: local.rotacao.map((linha) => linha.slice()), deslocamento: local.deslocamento.slice() },
           referencial: { escala: referencial.escala, rotacao: referencial.rotacao.map((linha) => linha.slice()), deslocamento: referencial.deslocamento.slice() },
         },
       };
-      if (base.forma === 'cilindro') resolvida.raio = base.raio * mundo.escala;
-      else {
+      if (base.inicio !== undefined) resolvida.inicio = base.inicio * mundo.escala;
+      if (base.fim !== undefined) resolvida.fim = base.fim * mundo.escala;
+
+      if (base.forma === 'cilindro') {
+        resolvida.raio = base.raio * mundo.escala;
+      } else if (base.forma === 'anel') {
         resolvida.raioInterno = base.raioInterno * mundo.escala;
         resolvida.raioExterno = base.raioExterno * mundo.escala;
+      } else if (base.forma === 'plano') {
+        resolvida.normal = resolvida.eixo;
+        resolvida.ponto = resolvida.centro;
+        resolvida.extensao = [base.extensao[0] * mundo.escala, base.extensao[1] * mundo.escala];
+        resolvida.largura = resolvida.extensao[0];
+        resolvida.comprimento = resolvida.extensao[1];
+      } else if (base.forma === 'padraoFuros') {
+        resolvida.normal = resolvida.eixo;
+        resolvida.ponto = resolvida.centro;
+        resolvida.plano = { ponto: resolvida.centro, normal: resolvida.eixo };
+        resolvida.diametro = base.diametro * mundo.escala;
+        resolvida.raio = resolvida.diametro / 2;
+        resolvida.centros = base.centros.map((c) =>
+          somar(multiplicar(aplicarMatriz(mundo.rotacao, c), mundo.escala), mundo.deslocamento)
+        );
+        resolvida.quantidade = resolvida.centros.length;
+      } else if (base.forma === 'trilho') {
+        resolvida.curso = base.curso * mundo.escala;
+        resolvida.fim = resolvida.curso;
+        resolvida.perfil = {
+          ...base.perfil,
+          largura: base.perfil.largura * mundo.escala,
+          altura: base.perfil.altura * mundo.escala,
+        };
+        resolvida.largura = resolvida.perfil.largura;
+        resolvida.altura = resolvida.perfil.altura;
       }
       resultado.set(chave, resolvida);
     }
@@ -689,11 +1007,371 @@ export function avaliarEstadoDeEncaixeCilindrico(declaracao, portas) {
   return { ...resultado, estado: 'satisfeita', grausDeLiberdade: [], diagnosticos };
 }
 
+/** Mede um assentamento plano a plano; confere normais opostas e contato sem fresta. */
+export function validarAssentamentoPlano(declaracao, portas) {
+  const quem = 'validarAssentamentoPlano';
+  if (!declaracao || typeof declaracao !== 'object' || Array.isArray(declaracao)) {
+    falhar(quem, 'declaração precisa ser objeto.');
+  }
+  const id = declaracao.id;
+  if (typeof id !== 'string' || !id) falhar(quem, 'declaração precisa de id não vazio.');
+  if (declaracao.tipo !== 'assentaPlano') falhar(quem, "tipo precisa ser 'assentaPlano'.");
+  const tolerancia = toleranciaNumericaDe(declaracao, `${quem}.${id}`);
+  const frestaEsperada = declaracao.separacao === undefined && declaracao.fresta === undefined
+    ? { minimo: 0, maximo: 0, nominal: 0, toleranciaFabricacao: null, formato: 'sem-fresta' }
+    : faixaDeEspecificacao(declaracao, declaracao.separacao !== undefined ? 'separacao' : 'fresta', `${quem}.${id}`);
+
+  const referencia = portaDo(portas, declaracao.referencia, quem);
+  const movel = portaDo(portas, declaracao.movel, quem);
+  const diagnosticos = [];
+  if (referencia.forma !== 'plano' || movel.forma !== 'plano') {
+    diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'plano' });
+  }
+  if (referencia.papel !== 'recebe' || movel.papel !== 'apoia') {
+    diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia recebe e movel apoia', observado: `${referencia.papel}->${movel.papel}` });
+  }
+  const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
+  if (maoEspelhada) diagnosticos.push(maoEspelhada);
+
+  if (diagnosticos.length) {
+    return {
+      id, tipo: 'assentaPlano', satisfeita: false,
+      referencia: referencia.id, movel: movel.id,
+      medidas: { disponiveis: false, tolerancia, frestaEsperada },
+      diagnosticos,
+    };
+  }
+
+  const alinhamento = produto(referencia.normal, movel.normal);
+  if (Math.abs(alinhamento + 1) > EPSILON_ANGULAR) {
+    diagnosticos.push({ codigo: 'normais-nao-opostas', observado: alinhamento, esperado: -1 });
+  }
+
+  const entrePontos = subtrair(movel.ponto, referencia.ponto);
+  const separacao = produto(entrePontos, referencia.normal);
+  if (separacao < frestaEsperada.minimo - tolerancia || separacao > frestaEsperada.maximo + tolerancia) {
+    diagnosticos.push({ codigo: 'contato-fora', observado: separacao, ...frestaEsperada, tolerancia });
+  }
+
+  const lateral = subtrair(entrePontos, multiplicar(referencia.normal, separacao));
+  const descentro = comprimento(lateral);
+
+  return {
+    id, tipo: 'assentaPlano', satisfeita: diagnosticos.length === 0,
+    referencia: referencia.id, movel: movel.id,
+    medidas: {
+      disponiveis: true, alinhamento, separacao, descentro,
+      tolerancia, toleranciaNumerica: tolerancia, frestaEsperada,
+    },
+    diagnosticos,
+  };
+}
+
+export function formatarDiagnosticoDeAssentamentoPlano(resultado, casas = 6) {
+  if (!resultado || typeof resultado !== 'object' || !Array.isArray(resultado.diagnosticos)) {
+    falhar('formatarDiagnosticoDeAssentamentoPlano', 'esperava resultado de validarAssentamentoPlano().');
+  }
+  const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
+  const m = resultado.medidas;
+  if (m?.disponiveis === false) {
+    const linhas = [
+      `relação: ${resultado.id} (${resultado.tipo})`,
+      `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+      'medição: reprovada',
+      'medidas: indisponíveis (interfaces estruturalmente incompatíveis)',
+    ];
+    if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+    return `${linhas.join('\n')}\n`;
+  }
+  const linhas = [
+    `relação: ${resultado.id} (${resultado.tipo})`,
+    `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+    `medição: ${resultado.satisfeita ? 'aprovada' : 'reprovada'}`,
+    `contato: separação ${n(m.separacao)} m (esperada ${n(m.frestaEsperada.minimo)}…${n(m.frestaEsperada.maximo)})`,
+    `normais: alinhamento ${n(m.alinhamento)} (esperado -1.000000)`,
+    `apoio: descentro lateral ${n(m.descentro)} m`,
+  ];
+  if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+  return `${linhas.join('\n')}\n`;
+}
+
+/** Mede um padrão de furos; confere paralelismo, contagem, coincidência dos centros e folga/ajuste. */
+export function validarEncaixePadraoFuros(declaracao, portas) {
+  const quem = 'validarEncaixePadraoFuros';
+  if (!declaracao || typeof declaracao !== 'object' || Array.isArray(declaracao)) {
+    falhar(quem, 'declaração precisa ser objeto.');
+  }
+  const id = declaracao.id;
+  if (typeof id !== 'string' || !id) falhar(quem, 'declaração precisa de id não vazio.');
+  if (declaracao.tipo !== 'encaixaPadraoFuros') falhar(quem, "tipo precisa ser 'encaixaPadraoFuros'.");
+  const tolerancia = toleranciaNumericaDe(declaracao, `${quem}.${id}`);
+
+  const referencia = portaDo(portas, declaracao.referencia, quem);
+  const movel = portaDo(portas, declaracao.movel, quem);
+  const diagnosticos = [];
+  if (referencia.forma !== 'padraoFuros' || movel.forma !== 'padraoFuros') {
+    diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'padraoFuros' });
+  }
+  if (referencia.papel !== 'recebe' || movel.papel !== 'ocupa') {
+    diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia recebe e movel ocupa', observado: `${referencia.papel}->${movel.papel}` });
+  }
+  const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
+  if (maoEspelhada) diagnosticos.push(maoEspelhada);
+
+  if (diagnosticos.length) {
+    return {
+      id, tipo: 'encaixaPadraoFuros', satisfeita: false,
+      referencia: referencia.id, movel: movel.id,
+      medidas: { disponiveis: false, tolerancia },
+      diagnosticos,
+    };
+  }
+
+  const normalRef = referencia.normal ?? referencia.plano?.normal ?? [0, 1, 0];
+  const normalMov = movel.normal ?? movel.plano?.normal ?? [0, 1, 0];
+  const alinhamentoNormais = Math.abs(produto(normalRef, normalMov));
+  if (1 - alinhamentoNormais > EPSILON_ANGULAR) {
+    diagnosticos.push({ codigo: 'planos-divergentes', observado: alinhamentoNormais, limite: 1 - EPSILON_ANGULAR });
+  }
+
+  const contagemRef = referencia.centros.length;
+  const contagemMov = movel.centros.length;
+  if (contagemRef !== contagemMov) {
+    diagnosticos.push({ codigo: 'contagem-furos-divergente', referencia: contagemRef, movel: contagemMov });
+  }
+
+  let maiorDesvioCentros = 0;
+  for (const cr of referencia.centros) {
+    const menor = Math.min(...movel.centros.map((cm) => comprimento(subtrair(cm, cr))));
+    if (menor > maiorDesvioCentros) maiorDesvioCentros = menor;
+    if (menor > tolerancia) {
+      diagnosticos.push({ codigo: 'centros-nao-coincidentes', menorDistancia: menor, tolerancia });
+      break;
+    }
+  }
+
+  const folgaDiametral = referencia.diametro - movel.diametro;
+  const classeAjuste = declaracao.classeAjuste ?? movel.classeAjuste ?? referencia.classeAjuste;
+  let especificacaoFolga;
+  if (classeAjuste) {
+    especificacaoFolga = obterFolgaPorClasseAjusteEmMetros(classeAjuste, referencia.diametro);
+    if (folgaDiametral < especificacaoFolga.minimo - tolerancia || folgaDiametral > especificacaoFolga.maximo + tolerancia) {
+      diagnosticos.push({
+        codigo: 'folga-fora-da-classe',
+        classe: classeAjuste,
+        observado: folgaDiametral,
+        minimo: especificacaoFolga.minimo,
+        maximo: especificacaoFolga.maximo,
+        tolerancia,
+      });
+    }
+  } else if (declaracao.folga !== undefined || declaracao.folgaDiametral !== undefined) {
+    especificacaoFolga = faixaDeEspecificacao(declaracao, declaracao.folga !== undefined ? 'folga' : 'folgaDiametral', `${quem}.${id}`);
+    if (folgaDiametral < especificacaoFolga.minimo - tolerancia || folgaDiametral > especificacaoFolga.maximo + tolerancia) {
+      diagnosticos.push({
+        codigo: 'folga-diametral-fora',
+        observado: folgaDiametral,
+        minimo: especificacaoFolga.minimo,
+        maximo: especificacaoFolga.maximo,
+        tolerancia,
+      });
+    }
+  }
+
+  return {
+    id, tipo: 'encaixaPadraoFuros', satisfeita: diagnosticos.length === 0,
+    referencia: referencia.id, movel: movel.id,
+    medidas: {
+      disponiveis: true,
+      alinhamentoNormais,
+      contagemFuros: contagemRef,
+      maiorDesvioCentros,
+      diametroReferencia: referencia.diametro,
+      diametroMovel: movel.diametro,
+      folgaDiametral,
+      especificacaoFolga,
+      classeAjuste,
+      tolerancia,
+      toleranciaNumerica: tolerancia,
+    },
+    diagnosticos,
+  };
+}
+
+export function formatarDiagnosticoDePadraoFuros(resultado, casas = 6) {
+  if (!resultado || typeof resultado !== 'object' || !Array.isArray(resultado.diagnosticos)) {
+    falhar('formatarDiagnosticoDePadraoFuros', 'esperava resultado de validarEncaixePadraoFuros().');
+  }
+  const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
+  const m = resultado.medidas;
+  if (m?.disponiveis === false) {
+    const linhas = [
+      `relação: ${resultado.id} (${resultado.tipo})`,
+      `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+      'medição: reprovada',
+      'medidas: indisponíveis (interfaces estruturalmente incompatíveis)',
+    ];
+    if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+    return `${linhas.join('\n')}\n`;
+  }
+  const linhas = [
+    `relação: ${resultado.id} (${resultado.tipo})`,
+    `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+    `medição: ${resultado.satisfeita ? 'aprovada' : 'reprovada'}`,
+    `furos: quantidade ${m.contagemFuros}, desvio máximo de centros ${n(m.maiorDesvioCentros)} m`,
+    `diâmetros: referência ${n(m.diametroReferencia)} m, móvel ${n(m.diametroMovel)} m, folga ${n(m.folgaDiametral)} m`,
+  ];
+  if (m.classeAjuste) linhas.push(`classe de ajuste: ${m.classeAjuste} (esperada ${n(m.especificacaoFolga?.minimo)}…${n(m.especificacaoFolga?.maximo)} m)`);
+  if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+  return `${linhas.join('\n')}\n`;
+}
+
+/** Mede um encaixe de guia e deslizador (trilho); confere colinearidade, descentro, curso e perfil. */
+export function validarEncaixeTrilho(declaracao, portas) {
+  const quem = 'validarEncaixeTrilho';
+  if (!declaracao || typeof declaracao !== 'object' || Array.isArray(declaracao)) {
+    falhar(quem, 'declaração precisa ser objeto.');
+  }
+  const id = declaracao.id;
+  if (typeof id !== 'string' || !id) falhar(quem, 'declaração precisa de id não vazio.');
+  if (declaracao.tipo !== 'encaixaTrilho') falhar(quem, "tipo precisa ser 'encaixaTrilho'.");
+  const tolerancia = toleranciaNumericaDe(declaracao, `${quem}.${id}`);
+
+  const referencia = portaDo(portas, declaracao.referencia, quem);
+  const movel = portaDo(portas, declaracao.movel, quem);
+  const diagnosticos = [];
+  if (referencia.forma !== 'trilho' || movel.forma !== 'trilho') {
+    diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'trilho' });
+  }
+  const papelValido = (referencia.papel === 'guia' && movel.papel === 'deslizador')
+    || (referencia.papel === 'recebe' && movel.papel === 'ocupa');
+  if (!papelValido) {
+    diagnosticos.push({
+      codigo: 'direcao-incompativel',
+      esperado: 'referencia guia e movel deslizador',
+      observado: `${referencia.papel}->${movel.papel}`,
+    });
+  }
+  const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
+  if (maoEspelhada) diagnosticos.push(maoEspelhada);
+
+  if (diagnosticos.length) {
+    return {
+      id, tipo: 'encaixaTrilho', satisfeita: false,
+      referencia: referencia.id, movel: movel.id,
+      medidas: { disponiveis: false, tolerancia },
+      diagnosticos,
+    };
+  }
+
+  const alinhamento = Math.abs(produto(referencia.eixo, movel.eixo));
+  if (1 - alinhamento > EPSILON_ANGULAR) {
+    diagnosticos.push({ codigo: 'eixos-divergentes', observado: alinhamento, limite: 1 - EPSILON_ANGULAR });
+  }
+
+  const entreCentros = subtrair(movel.centro, referencia.centro);
+  const posicaoAoLongo = produto(entreCentros, referencia.eixo);
+  const lateral = subtrair(entreCentros, multiplicar(referencia.eixo, posicaoAoLongo));
+  const descentro = comprimento(lateral);
+  if (descentro > tolerancia) {
+    diagnosticos.push({ codigo: 'eixos-descentrados', observado: descentro, limite: tolerancia });
+  }
+
+  if (posicaoAoLongo < -tolerancia || posicaoAoLongo > referencia.curso + tolerancia) {
+    diagnosticos.push({
+      codigo: 'curso-excedido',
+      posicao: posicaoAoLongo,
+      curso: referencia.curso,
+      tolerancia,
+    });
+  }
+
+  const classeAjuste = declaracao.classeAjuste ?? movel.classeAjuste ?? referencia.classeAjuste;
+  const folgaLargura = movel.perfil.largura - referencia.perfil.largura;
+  const folgaAltura = movel.perfil.altura - referencia.perfil.altura;
+  let especificacaoFolga;
+  if (classeAjuste) {
+    especificacaoFolga = obterFolgaPorClasseAjusteEmMetros(classeAjuste, referencia.perfil.largura);
+    if (folgaLargura < especificacaoFolga.minimo - tolerancia || folgaLargura > especificacaoFolga.maximo + tolerancia) {
+      diagnosticos.push({
+        codigo: 'folga-fora-da-classe',
+        classe: classeAjuste,
+        observado: folgaLargura,
+        minimo: especificacaoFolga.minimo,
+        maximo: especificacaoFolga.maximo,
+        tolerancia,
+      });
+    }
+  } else {
+    if (Math.abs(folgaLargura) > tolerancia || Math.abs(folgaAltura) > tolerancia) {
+      diagnosticos.push({
+        codigo: 'perfil-incompativel',
+        folgaLargura,
+        folgaAltura,
+        tolerancia,
+      });
+    }
+  }
+
+  return {
+    id, tipo: 'encaixaTrilho', satisfeita: diagnosticos.length === 0,
+    referencia: referencia.id, movel: movel.id,
+    medidas: {
+      disponiveis: true,
+      alinhamento,
+      descentro,
+      posicaoAoLongo,
+      curso: referencia.curso,
+      folgaLargura,
+      folgaAltura,
+      classeAjuste,
+      especificacaoFolga,
+      tolerancia,
+      toleranciaNumerica: tolerancia,
+    },
+    diagnosticos,
+  };
+}
+
+export function formatarDiagnosticoDeTrilho(resultado, casas = 6) {
+  if (!resultado || typeof resultado !== 'object' || !Array.isArray(resultado.diagnosticos)) {
+    falhar('formatarDiagnosticoDeTrilho', 'esperava resultado de validarEncaixeTrilho().');
+  }
+  const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
+  const m = resultado.medidas;
+  if (m?.disponiveis === false) {
+    const linhas = [
+      `relação: ${resultado.id} (${resultado.tipo})`,
+      `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+      'medição: reprovada',
+      'medidas: indisponíveis (interfaces estruturalmente incompatíveis)',
+    ];
+    if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+    return `${linhas.join('\n')}\n`;
+  }
+  const linhas = [
+    `relação: ${resultado.id} (${resultado.tipo})`,
+    `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+    `medição: ${resultado.satisfeita ? 'aprovada' : 'reprovada'}`,
+    `guia: alinhamento ${n(m.alinhamento)}, descentro ${n(m.descentro)} m`,
+    `curso: posição ${n(m.posicaoAoLongo)} m de ${n(m.curso)} m`,
+    `perfil: folga largura ${n(m.folgaLargura)} m, folga altura ${n(m.folgaAltura)} m`,
+  ];
+  if (m.classeAjuste) linhas.push(`classe de ajuste: ${m.classeAjuste} (esperada ${n(m.especificacaoFolga?.minimo)}…${n(m.especificacaoFolga?.maximo)} m)`);
+  if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+  return `${linhas.join('\n')}\n`;
+}
+
 /** Texto curto, estável e utilizável por agente/CLI; não omite a causa numérica. */
 export function formatarDiagnosticoDeEncaixe(resultado, casas = 6) {
   if (!resultado || typeof resultado !== 'object' || !Array.isArray(resultado.diagnosticos)) {
-    falhar('formatarDiagnosticoDeEncaixe', 'esperava resultado de validarEncaixeCilindrico().');
+    falhar('formatarDiagnosticoDeEncaixe', 'esperava resultado de relação.');
   }
+  if (resultado.tipo === 'assentaAnular') return formatarDiagnosticoDeAssentamentoAnular(resultado, casas);
+  if (resultado.tipo === 'assentaPlano') return formatarDiagnosticoDeAssentamentoPlano(resultado, casas);
+  if (resultado.tipo === 'encaixaPadraoFuros') return formatarDiagnosticoDePadraoFuros(resultado, casas);
+  if (resultado.tipo === 'encaixaTrilho') return formatarDiagnosticoDeTrilho(resultado, casas);
+
   if (!Number.isInteger(casas) || casas < 0 || casas > 12) falhar('formatarDiagnosticoDeEncaixe', 'casas precisa ser inteiro entre 0 e 12.');
   const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
   const m = resultado.medidas;

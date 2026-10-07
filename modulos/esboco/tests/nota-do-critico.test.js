@@ -142,4 +142,38 @@ describe('estado antigo e linha de comando', () => {
     expect(gravado.liberacoes.map((l) => l.unidade)).toEqual(['fila', 'marco-50']);
     expect(condutorArquivo(arquivo, { historico: true }).texto).toContain('liberação 1: fila (nota 6 em 3 rodadas) liberada com o motivo: a pessoa autorizou seguir com a cabine');
   });
+
+  describe('registro de tokens no veredito', () => {
+    it('grava tokens quando recebe e não grava quando não recebe', () => {
+      const e = grande();
+      const s = naDetalhe(e);
+      const comTokens = registrarVeredito(s, { unidade: 'fila', nota: 8, motivo: 'motivo valido de teste com mais de 15 caracteres', tokens: 4500 });
+      expect(comTokens.vereditos[0].tokens).toBe(4500);
+
+      const semTokens = registrarVeredito(s, { unidade: 'fila', nota: 8, motivo: 'motivo valido de teste com mais de 15 caracteres' });
+      expect('tokens' in semTokens.vereditos[0]).toBe(false);
+    });
+
+    it('recusa tokens negativo ou não inteiro', () => {
+      const e = grande();
+      const s = naDetalhe(e);
+      expect(() => registrarVeredito(s, { unidade: 'fila', nota: 8, motivo: 'motivo valido de teste com mais de 15 caracteres', tokens: -10 })).toThrow(/tokens/);
+      expect(() => registrarVeredito(s, { unidade: 'fila', nota: 8, motivo: 'motivo valido de teste com mais de 15 caracteres', tokens: 10.5 })).toThrow(/tokens/);
+    });
+
+    it('grava tokens através do condutorArquivo quando informado', () => {
+      const e = grande();
+      const s = naDetalhe(e);
+      const arquivo = gravar(e, s);
+      condutorArquivo(arquivo, { veredito: 'fila', nota: 8, motivo: 'motivo valido de teste com mais de 15 caracteres', tokens: 1200 });
+      const gravado = JSON.parse(readFileSync(`${arquivo}.condutor.json`, 'utf8'));
+      expect(gravado.vereditos[0].tokens).toBe(1200);
+
+      const arquivo2 = gravar(e, s);
+      condutorArquivo(arquivo2, { veredito: 'fila', nota: 8, motivo: 'motivo valido de teste com mais de 15 caracteres' });
+      const gravado2 = JSON.parse(readFileSync(`${arquivo2}.condutor.json`, 'utf8'));
+      expect('tokens' in gravado2.vereditos[0]).toBe(false);
+    });
+  });
 });
+

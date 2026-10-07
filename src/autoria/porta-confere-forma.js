@@ -35,10 +35,7 @@ export function conferirPortasNaForma(neutro) {
   const facesDasPortas = neutro.facesDasPortas ?? new Map();
   for (const [id, porta] of neutro.portas ?? new Map()) {
     const I = porta.interface;
-    if (!I || (I.forma !== 'anel' && I.forma !== 'cilindro')) continue;
-    const n = Math.hypot(...I.eixo);
-    const eixo = I.eixo.map((x) => x / n);
-    const raio = I.forma === 'anel' ? I.raioExterno : I.raio;
+    if (!I) continue;
     const faces = facesDasPortas.get(id) ?? [];
     const daOrigem = new Set();
     const partes = new Set();
@@ -52,21 +49,83 @@ export function conferirPortasNaForma(neutro) {
       achados.push({ porta: id, codigo: 'porta-sem-face', mensagem: `a porta '${id}' não resolve para nenhuma face da peça.` });
       continue;
     }
-    let distancia = Infinity;
-    for (const v of daOrigem) distancia = Math.min(distancia, Math.abs(medir(neutro.V.get(v), I.centro, eixo).t));
-    if (distancia > TOLERANCIA) {
-      achados.push({ porta: id, codigo: 'porta-fora-do-plano', mensagem: `a porta '${id}' declara o plano no centro ${JSON.stringify(I.centro)}, e a face mais perto da origem dela está a ${mm(distancia)} dele.`, desvio: distancia });
-      continue;
-    }
-    const daParte = new Set();
-    for (const face of neutro.F.values()) if (partes.has(face.parte)) for (const v of face.vs) daParte.add(v);
-    let maior = 0;
-    for (const v of daParte) {
-      const { t, r } = medir(neutro.V.get(v), I.centro, eixo);
-      if (Math.abs(t) <= FAIXA_DO_RAIO && r > maior) maior = r;
-    }
-    if (Math.abs(maior - raio) > TOLERANCIA) {
-      achados.push({ porta: id, codigo: 'porta-com-raio-errado', mensagem: `a porta '${id}' declara raio ${mm(raio)}, e a peça junto do plano dela chega a ${mm(maior)} do eixo.`, desvio: maior - raio });
+
+    if (I.forma === 'anel' || I.forma === 'cilindro') {
+      const n = Math.hypot(...I.eixo);
+      const eixo = I.eixo.map((x) => x / n);
+      const raio = I.forma === 'anel' ? I.raioExterno : I.raio;
+      let distancia = Infinity;
+      for (const v of daOrigem) distancia = Math.min(distancia, Math.abs(medir(neutro.V.get(v), I.centro, eixo).t));
+      if (distancia > TOLERANCIA) {
+        achados.push({ porta: id, codigo: 'porta-fora-do-plano', mensagem: `a porta '${id}' declara o plano no centro ${JSON.stringify(I.centro)}, e a face mais perto da origem dela está a ${mm(distancia)} dele.`, desvio: distancia });
+        continue;
+      }
+      const daParte = new Set();
+      for (const face of neutro.F.values()) if (partes.has(face.parte)) for (const v of face.vs) daParte.add(v);
+      let maior = 0;
+      for (const v of daParte) {
+        const { t, r } = medir(neutro.V.get(v), I.centro, eixo);
+        if (Math.abs(t) <= FAIXA_DO_RAIO && r > maior) maior = r;
+      }
+      if (Math.abs(maior - raio) > TOLERANCIA) {
+        achados.push({ porta: id, codigo: 'porta-com-raio-errado', mensagem: `a porta '${id}' declara raio ${mm(raio)}, e a peça junto do plano dela chega a ${mm(maior)} do eixo.`, desvio: maior - raio });
+      }
+    } else if (I.forma === 'plano') {
+      const normal = I.normal ?? I.eixo;
+      const n = Math.hypot(...normal);
+      const eixo = normal.map((x) => x / n);
+      const ponto = I.ponto ?? I.centro;
+      let distancia = Infinity;
+      for (const v of daOrigem) distancia = Math.min(distancia, Math.abs(medir(neutro.V.get(v), ponto, eixo).t));
+      if (distancia > TOLERANCIA) {
+        achados.push({ porta: id, codigo: 'porta-fora-do-plano', mensagem: `a porta '${id}' declara o plano no ponto ${JSON.stringify(ponto)}, e a face mais perto da origem dela está a ${mm(distancia)} dele.`, desvio: distancia });
+      }
+    } else if (I.forma === 'padraoFuros') {
+      const normal = I.normal ?? I.plano?.normal ?? I.eixo;
+      const n = Math.hypot(...normal);
+      const eixo = normal.map((x) => x / n);
+      const ponto = I.ponto ?? I.plano?.ponto ?? I.centro;
+      let distancia = Infinity;
+      for (const v of daOrigem) distancia = Math.min(distancia, Math.abs(medir(neutro.V.get(v), ponto, eixo).t));
+      if (distancia > TOLERANCIA) {
+        achados.push({ porta: id, codigo: 'porta-fora-do-plano', mensagem: `a porta '${id}' declara o plano dos furos em ${JSON.stringify(ponto)}, e a face mais perto da origem dela está a ${mm(distancia)} dele.`, desvio: distancia });
+        continue;
+      }
+      const raio = I.raio ?? (I.diametro / 2);
+      const daParte = new Set();
+      for (const face of neutro.F.values()) if (partes.has(face.parte)) for (const v of face.vs) daParte.add(v);
+      for (let k = 0; k < I.centros.length; k++) {
+        const c = I.centros[k];
+        let maisPertoDoRaio = Infinity;
+        let menorRaioObservado = Infinity;
+        for (const v of daParte) {
+          const { t, r } = medir(neutro.V.get(v), c, eixo);
+          if (Math.abs(t) <= FAIXA_DO_RAIO) {
+            const desvio = Math.abs(r - raio);
+            if (desvio < maisPertoDoRaio) {
+              maisPertoDoRaio = desvio;
+              menorRaioObservado = r;
+            }
+          }
+        }
+        if (maisPertoDoRaio > TOLERANCIA) {
+          achados.push({ porta: id, codigo: 'porta-com-raio-errado', mensagem: `a porta '${id}' declara furo ${k} com raio ${mm(raio)}, e a peça junto dele chega a ${mm(menorRaioObservado)}.`, desvio: menorRaioObservado - raio });
+          break;
+        }
+      }
+    } else if (I.forma === 'trilho') {
+      const n = Math.hypot(...I.eixo);
+      const eixo = I.eixo.map((x) => x / n);
+      const centro = I.centro ?? I.ponto;
+      let distanciaAoEixo = Infinity;
+      for (const v of daOrigem) {
+        const { r } = medir(neutro.V.get(v), centro, eixo);
+        distanciaAoEixo = Math.min(distanciaAoEixo, r);
+      }
+      const raioEsperado = Math.max(I.largura ?? I.perfil.largura, I.altura ?? I.perfil.altura) / 2;
+      if (distanciaAoEixo > raioEsperado + TOLERANCIA) {
+        achados.push({ porta: id, codigo: 'porta-fora-do-eixo', mensagem: `a porta '${id}' declara trilho com eixo em ${JSON.stringify(centro)}, e a face da origem está a ${mm(distanciaAoEixo)} dele.`, desvio: distanciaAoEixo });
+      }
     }
   }
   return achados;

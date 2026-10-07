@@ -38,6 +38,9 @@ plano. O que está encerrado vive em
   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md);
   hospedagem estática e isolamento de rede em
   [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md).
+- O banco de provas versionado e o registro de custo do plano de modelagem vivem em
+  [`banco-de-provas/BANCO-DE-PROVAS.md`](banco-de-provas/BANCO-DE-PROVAS.md)
+  (`docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md`).
 
 A crônica dos planos concluídos e cancelados está em
 [`planos/encerrados/README.md`](planos/encerrados/README.md)

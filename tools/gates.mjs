@@ -45,6 +45,7 @@ export const GATES = [
      e quem consulta não tem como saber. */
   'catalogo:check',
   'ferramentas:check',
+  'banco-de-provas:check',
 ];
 
 /* OS GATES RODAM EM PARALELO, E O RELATÓRIO CONTINUA EM ORDEM.

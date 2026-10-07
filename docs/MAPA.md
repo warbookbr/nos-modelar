@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-906 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+910 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -134,6 +134,10 @@
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
+
+## docs/mecanifica/banco-de-provas/
+
+- `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 
 ## docs/mecanifica/gerado/
 
@@ -704,7 +708,7 @@
 - `fresta-e-porta-ocupada.test.js` — fresta-e-porta-ocupada.test.js — duas coisas que a montagem deixava passar em silêncio: fresta entre faces apoiadas e duas partes na mesma porta.
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
-- `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
+- `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações mecânicas e deriva poses sem Three.js, hierarquia ou solver. É o contrato mínimo …
 - `laco-de-modelagem.js` — laco-de-modelagem.js — quem decide se a modelagem continua, e por quê.
 - `laco-de-modelagem.test.js` — laco-de-modelagem.test.js — a decisão de parar sai dos números, não de quem modelou.
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1 a v5.
@@ -723,6 +727,7 @@
 - `plano-de-modelagem.test.js` — plano-de-modelagem.test.js — o contrato do que a peça promete ser.
 - `porta-confere-forma.js` — porta-confere-forma.js — a porta que a receita declara está na forma da peça.
 - `porta-confere-forma.test.js` — porta-confere-forma.test.js — a porta no lugar passa, a porta deslocada do plano e a de raio errado reprovam, e as portas das partes fixas do braço passam.
+- `portas-estendidas.test.js` — portas-estendidas.test.js — suíte de testes completa para portas estendidas do núcleo: plano de apoio, padrão de furos, trilho e classes de ajuste.
 - `posicao-por-porta.js` — posicao-por-porta.js — a pose de uma instância derivada do encaixe de uma porta dela numa porta de outra instância já construída.
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
@@ -1019,6 +1024,8 @@
 - `autoria-montagem.test.ts` — Provas R02: planejar, confirmar, validar e materializar montagem persistida.
 - `autoria-receita.mjs` — autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript.
 - `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
+- `banco-de-provas.mjs` — Catálogo e registro de custo do banco de provas de modelagem. Compara autonomia, rodadas, notas e tokens consumidos entre o início e o fim do plano de ferram…
+- `banco-de-provas.test.mjs` — Testes do catálogo do banco de provas e registro de custo de modelagem. Valida esquema de medições, agregação de custo por objeto e cobertura de ferramentas …
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz procedural é neutra: não volta a `fps`, que era o nome do jogo removido, nem a `prototipos`, que dizia experimento sobre …

@@ -867,9 +867,17 @@ export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = 
     porta.origem,
     porta.passo,
     porta.interface
-      ? `${porta.interface.forma} ${porta.interface.papel} ${porta.interface.forma === 'anel'
-        ? `r=${n(porta.interface.raioInterno)}…${n(porta.interface.raioExterno)}`
-        : `r=${n(porta.interface.raio)}`} axial=${n(porta.interface.inicio)}…${n(porta.interface.fim)}`
+      ? porta.interface.forma === 'anel'
+        ? `${porta.interface.forma} ${porta.interface.papel} r=${n(porta.interface.raioInterno)}…${n(porta.interface.raioExterno)} axial=${n(porta.interface.inicio)}…${n(porta.interface.fim)}`
+        : porta.interface.forma === 'cilindro'
+          ? `${porta.interface.forma} ${porta.interface.papel} r=${n(porta.interface.raio)} axial=${n(porta.interface.inicio)}…${n(porta.interface.fim)}`
+          : porta.interface.forma === 'plano'
+            ? `${porta.interface.forma} ${porta.interface.papel} ext=${Array.isArray(porta.interface.extensao) ? `${n(porta.interface.extensao[0])}×${n(porta.interface.extensao[1])}` : `${n(porta.interface.largura)}×${n(porta.interface.comprimento)}`}${porta.interface.classeAjuste ? ` aj=${porta.interface.classeAjuste}` : ''}`
+            : porta.interface.forma === 'padraoFuros'
+              ? `${porta.interface.forma} ${porta.interface.papel} n=${porta.interface.centros?.length ?? porta.interface.quantidade} d=${n(porta.interface.diametro)}${porta.interface.classeAjuste ? ` aj=${porta.interface.classeAjuste}` : ''}`
+              : porta.interface.forma === 'trilho'
+                ? `${porta.interface.forma} ${porta.interface.papel} ${n(porta.interface.perfil?.largura ?? porta.interface.largura)}×${n(porta.interface.perfil?.altura ?? porta.interface.altura)} curso=${n(porta.interface.curso)}${porta.interface.classeAjuste ? ` aj=${porta.interface.classeAjuste}` : ''}`
+                : `${porta.interface.forma} ${porta.interface.papel}`
       : '—',
   ]);
   linhas.push(...(linhasPorta.length ? tabela(colunasPorta, linhasPorta) : ['(nenhuma porta publicada)']));

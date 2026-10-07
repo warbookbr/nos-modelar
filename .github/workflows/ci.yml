@@ -211,3 +211,9 @@ jobs:
       # famílias objeto por objeto; sem conferência, documento e dados divergem.
       - name: Ferramentas por objeto em dia com o JSON e a lista de famílias
         run: npm run ferramentas:check
+
+      # O banco de provas e registro de custo mantém o documento de custo sincronizado
+      # com o JSON de medições e objetos selecionados.
+      - name: Banco de provas e registro de custo em dia com o JSON
+        run: npm run banco-de-provas:check
+

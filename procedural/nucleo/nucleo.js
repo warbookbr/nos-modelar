@@ -259,33 +259,65 @@ function normalizarVetorDaInterface(v) {
 
 function transformarInterfaceDaPorta(interfaceResolvida, transformacoes) {
   if (interfaceResolvida === undefined || !transformacoes.length) return interfaceResolvida;
-  let centro = interfaceResolvida.centro.slice();
-  let eixo = interfaceResolvida.eixo.slice();
+  let centro = interfaceResolvida.centro?.slice();
+  let eixo = interfaceResolvida.eixo?.slice();
+  let ponto = interfaceResolvida.ponto?.slice();
+  let normal = interfaceResolvida.normal?.slice();
   let referencia = interfaceResolvida.referencia?.slice();
+  let centros = Array.isArray(interfaceResolvida.centros)
+    ? interfaceResolvida.centros.map((c) => c.slice())
+    : undefined;
   let mao = 'direta';
+
   for (const transformacao of transformacoes) {
     if (transformacao.tipo === 'espelho') {
-      centro[transformacao.eixo] = 2 * transformacao.pos - centro[transformacao.eixo];
-      eixo[transformacao.eixo] = -eixo[transformacao.eixo];
+      if (centro) centro[transformacao.eixo] = 2 * transformacao.pos - centro[transformacao.eixo];
+      if (ponto) ponto[transformacao.eixo] = 2 * transformacao.pos - ponto[transformacao.eixo];
+      if (eixo) eixo[transformacao.eixo] = -eixo[transformacao.eixo];
+      if (normal) normal[transformacao.eixo] = -normal[transformacao.eixo];
       if (referencia) referencia[transformacao.eixo] = -referencia[transformacao.eixo];
+      if (centros) {
+        for (const c of centros) {
+          c[transformacao.eixo] = 2 * transformacao.pos - c[transformacao.eixo];
+        }
+      }
       mao = mao === 'direta' ? 'espelhada' : 'direta';
     } else if (transformacao.modo === 'radial') {
-      const rad = transformacao.graus * Math.PI / 180;
+      const rad = (transformacao.graus * Math.PI) / 180;
       const c = Math.cos(rad), s = Math.sin(rad);
-      centro = giraPonto(centro, transformacao.pivo, transformacao.eixo, c, s);
-      eixo = giraPonto(eixo, [0, 0, 0], transformacao.eixo, c, s);
+      if (centro) centro = giraPonto(centro, transformacao.pivo, transformacao.eixo, c, s);
+      if (ponto) ponto = giraPonto(ponto, transformacao.pivo, transformacao.eixo, c, s);
+      if (eixo) eixo = giraPonto(eixo, [0, 0, 0], transformacao.eixo, c, s);
+      if (normal) normal = giraPonto(normal, [0, 0, 0], transformacao.eixo, c, s);
       if (referencia) referencia = giraPonto(referencia, [0, 0, 0], transformacao.eixo, c, s);
+      if (centros) {
+        centros = centros.map((pt) => giraPonto(pt, transformacao.pivo, transformacao.eixo, c, s));
+      }
     } else {
-      centro = centro.map((n, indice) => n + transformacao.d[indice]);
+      if (centro) centro = centro.map((n, indice) => n + transformacao.d[indice]);
+      if (ponto) ponto = ponto.map((n, indice) => n + transformacao.d[indice]);
+      if (centros) {
+        centros = centros.map((pt) => pt.map((n, indice) => n + transformacao.d[indice]));
+      }
     }
   }
-  return {
-    ...interfaceResolvida,
-    centro: centro.map((n) => Math.abs(n) < 1e-15 ? 0 : n),
-    eixo: normalizarVetorDaInterface(eixo),
-    ...(referencia === undefined ? {} : { referencia: normalizarVetorDaInterface(referencia) }),
-    ...(mao === 'direta' ? {} : { mao }),
-  };
+
+  const limpa = (v) => v.map((n) => (Math.abs(n) < 1e-15 ? 0 : n));
+  const saida = { ...interfaceResolvida };
+  if (centro) saida.centro = limpa(centro);
+  if (ponto) saida.ponto = limpa(ponto);
+  if (eixo) saida.eixo = normalizarVetorDaInterface(eixo);
+  if (normal) saida.normal = normalizarVetorDaInterface(normal);
+  if (referencia !== undefined) saida.referencia = normalizarVetorDaInterface(referencia);
+  if (centros) saida.centros = centros.map(limpa);
+  if (saida.plano) {
+    saida.plano = {
+      ponto: saida.ponto ?? saida.centro,
+      normal: saida.normal ?? saida.eixo,
+    };
+  }
+  if (mao !== 'direta') saida.mao = mao;
+  return saida;
 }
 
 function registroDaOrigem(st, origem) {
@@ -2668,18 +2700,280 @@ function resolverInterfaceAnularDaPorta(st, interfaceDeclarada) {
   };
 }
 
+const CLASSES_DE_AJUSTE_PORTA = new Set(['folgado', 'transicao', 'interferencia']);
+
+function resolverInterfacePlanoDaPorta(st, interfaceDeclarada) {
+  const obrigatorias = ['forma', 'papel', 'ponto', 'normal', 'extensao'];
+  const aceitas = new Set([...obrigatorias, 'referencia', 'parte', 'classeAjuste']);
+  const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
+  if (extras.length) return { erro: `interface plano tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
+  for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface plano exige '${chave}'` };
+  if (interfaceDeclarada.papel !== 'recebe' && interfaceDeclarada.papel !== 'apoia') {
+    return { erro: "interface plano.papel precisa ser 'recebe' ou 'apoia'" };
+  }
+  let ponto, normal, extensao, referencia;
+  try {
+    ponto = st.vec(interfaceDeclarada.ponto);
+    normal = st.vec(interfaceDeclarada.normal);
+    if (Array.isArray(interfaceDeclarada.extensao) && interfaceDeclarada.extensao.length === 2) {
+      extensao = [st.num(interfaceDeclarada.extensao[0]), st.num(interfaceDeclarada.extensao[1])];
+    } else if (interfaceDeclarada.extensao && typeof interfaceDeclarada.extensao === 'object' && !Array.isArray(interfaceDeclarada.extensao)) {
+      extensao = [st.num(interfaceDeclarada.extensao.largura), st.num(interfaceDeclarada.extensao.comprimento)];
+    } else {
+      return { erro: 'interface plano.extensao precisa ser [largura, comprimento] ou {largura, comprimento}' };
+    }
+    if (interfaceDeclarada.referencia !== undefined) referencia = st.vec(interfaceDeclarada.referencia);
+  } catch (erro) {
+    return { erro: `interface plano inválida: ${erro.message}` };
+  }
+  const tamanhoNormal = Math.hypot(...normal);
+  if (!(tamanhoNormal > 0) || !Number.isFinite(tamanhoNormal)) return { erro: 'interface plano.normal precisa ter comprimento finito > 0' };
+  if (!(extensao[0] > 0) || !Number.isFinite(extensao[0]) || !(extensao[1] > 0) || !Number.isFinite(extensao[1])) {
+    return { erro: 'interface plano.extensao exige dimensões finitas > 0' };
+  }
+  const normalUnitaria = normal.map((n) => n / tamanhoNormal);
+  if (referencia !== undefined) {
+    const tamanhoReferencia = Math.hypot(...referencia);
+    if (!(tamanhoReferencia > 0) || !Number.isFinite(tamanhoReferencia)) {
+      return { erro: 'interface plano.referencia precisa ter comprimento finito > 0' };
+    }
+    const referenciaUnitaria = referencia.map((n) => n / tamanhoReferencia);
+    const projecao = normalUnitaria.reduce((soma, n, indice) => soma + n * referenciaUnitaria[indice], 0);
+    if (Math.abs(projecao) > 1e-6) return { erro: 'interface plano.referencia precisa ser perpendicular à normal' };
+    referencia = referenciaUnitaria;
+  }
+  if (interfaceDeclarada.classeAjuste !== undefined && !CLASSES_DE_AJUSTE_PORTA.has(interfaceDeclarada.classeAjuste)) {
+    return { erro: `interface plano.classeAjuste '${interfaceDeclarada.classeAjuste}' desconhecida (aceitas: folgado, transicao, interferencia)` };
+  }
+  return {
+    interface: {
+      forma: 'plano',
+      papel: interfaceDeclarada.papel,
+      ponto,
+      centro: ponto,
+      normal: normalUnitaria,
+      eixo: normalUnitaria,
+      extensao,
+      largura: extensao[0],
+      comprimento: extensao[1],
+      ...(referencia === undefined ? {} : { referencia }),
+      ...(interfaceDeclarada.classeAjuste === undefined ? {} : { classeAjuste: interfaceDeclarada.classeAjuste }),
+      ...(interfaceDeclarada.parte === undefined ? {} : { parte: interfaceDeclarada.parte }),
+    },
+  };
+}
+
+function resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada) {
+  const obrigatorias = ['forma', 'papel', 'plano', 'diametro'];
+  const aceitas = new Set([...obrigatorias, 'centros', 'padrao', 'profundidade', 'classeAjuste', 'referencia', 'parte']);
+  const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
+  if (extras.length) return { erro: `interface padraoFuros tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
+  for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface padraoFuros exige '${chave}'` };
+  if (interfaceDeclarada.papel !== 'recebe' && interfaceDeclarada.papel !== 'ocupa') {
+    return { erro: "interface padraoFuros.papel precisa ser 'recebe' ou 'ocupa'" };
+  }
+  let ponto, normal, diametro, profundidade, referencia;
+  const planoObj = interfaceDeclarada.plano;
+  if (!planoObj || typeof planoObj !== 'object' || Array.isArray(planoObj)) {
+    return { erro: 'interface padraoFuros exige plano {ponto, normal}' };
+  }
+  try {
+    ponto = st.vec(planoObj.ponto ?? planoObj.centro);
+    normal = st.vec(planoObj.normal ?? planoObj.eixo);
+    diametro = st.num(interfaceDeclarada.diametro);
+    if (interfaceDeclarada.profundidade !== undefined) profundidade = st.num(interfaceDeclarada.profundidade);
+    if (interfaceDeclarada.referencia !== undefined) referencia = st.vec(interfaceDeclarada.referencia);
+  } catch (erro) {
+    return { erro: `interface padraoFuros inválida: ${erro.message}` };
+  }
+  const tamanhoNormal = Math.hypot(...normal);
+  if (!(tamanhoNormal > 0) || !Number.isFinite(tamanhoNormal)) return { erro: 'interface padraoFuros.plano.normal precisa ter comprimento finito > 0' };
+  if (!(diametro > 0) || !Number.isFinite(diametro)) return { erro: 'interface padraoFuros.diametro precisa ser finito e > 0' };
+  if (profundidade !== undefined && (!(profundidade > 0) || !Number.isFinite(profundidade))) {
+    return { erro: 'interface padraoFuros.profundidade precisa ser finita e > 0' };
+  }
+  const normalUnitaria = normal.map((n) => n / tamanhoNormal);
+  if (referencia !== undefined) {
+    const tamanhoReferencia = Math.hypot(...referencia);
+    if (!(tamanhoReferencia > 0) || !Number.isFinite(tamanhoReferencia)) {
+      return { erro: 'interface padraoFuros.referencia precisa ter comprimento finito > 0' };
+    }
+    referencia = referencia.map((n) => n / tamanhoReferencia);
+  }
+  if (interfaceDeclarada.classeAjuste !== undefined && !CLASSES_DE_AJUSTE_PORTA.has(interfaceDeclarada.classeAjuste)) {
+    return { erro: `interface padraoFuros.classeAjuste '${interfaceDeclarada.classeAjuste}' desconhecida (aceitas: folgado, transicao, interferencia)` };
+  }
+
+  let centros = [];
+  if (Array.isArray(interfaceDeclarada.centros)) {
+    if (!interfaceDeclarada.centros.length) return { erro: 'interface padraoFuros.centros precisa ser lista não vazia de pontos [x,y,z]' };
+    try {
+      centros = interfaceDeclarada.centros.map((c) => st.vec(c));
+    } catch (erro) {
+      return { erro: `interface padraoFuros.centros inválida: ${erro.message}` };
+    }
+  } else if (interfaceDeclarada.padrao && typeof interfaceDeclarada.padrao === 'object' && !Array.isArray(interfaceDeclarada.padrao)) {
+    const padrao = interfaceDeclarada.padrao;
+    if (padrao.tipo === 'linear') {
+      try {
+        const quantidade = st.num(padrao.quantidade);
+        const passo = st.num(padrao.passo);
+        const direcao = st.vec(padrao.direcao);
+        const origem = padrao.origem ? st.vec(padrao.origem) : ponto;
+        if (!Number.isInteger(quantidade) || quantidade <= 0) return { erro: 'interface padraoFuros.padrao.quantidade precisa ser inteiro > 0' };
+        const tamDir = Math.hypot(...direcao);
+        if (!(tamDir > 0) || !Number.isFinite(tamDir)) return { erro: 'interface padraoFuros.padrao.direcao precisa ter comprimento finito > 0' };
+        const dirUnitaria = direcao.map((n) => n / tamDir);
+        for (let k = 0; k < quantidade; k++) {
+          centros.push(origem.map((coord, idx) => coord + dirUnitaria[idx] * k * passo));
+        }
+      } catch (erro) {
+        return { erro: `interface padraoFuros.padrao linear inválido: ${erro.message}` };
+      }
+    } else if (padrao.tipo === 'circular') {
+      try {
+        const quantidade = st.num(padrao.quantidade);
+        const raio = st.num(padrao.raio);
+        const centroPadrao = padrao.centro ? st.vec(padrao.centro) : ponto;
+        const anguloInicial = padrao.anguloInicial !== undefined ? st.num(padrao.anguloInicial) : 0;
+        if (!Number.isInteger(quantidade) || quantidade <= 0) return { erro: 'interface padraoFuros.padrao.quantidade precisa ser inteiro > 0' };
+        if (!(raio > 0) || !Number.isFinite(raio)) return { erro: 'interface padraoFuros.padrao.raio precisa ser finito > 0' };
+        const refApoio = Math.abs(normalUnitaria[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+        const vProd = [
+          normalUnitaria[1] * refApoio[2] - normalUnitaria[2] * refApoio[1],
+          normalUnitaria[2] * refApoio[0] - normalUnitaria[0] * refApoio[2],
+          normalUnitaria[0] * refApoio[1] - normalUnitaria[1] * refApoio[0],
+        ];
+        const tamU = Math.hypot(...vProd);
+        const u = vProd.map((n) => n / tamU);
+        const v = [
+          normalUnitaria[1] * u[2] - normalUnitaria[2] * u[1],
+          normalUnitaria[2] * u[0] - normalUnitaria[0] * u[2],
+          normalUnitaria[0] * u[1] - normalUnitaria[1] * u[0],
+        ];
+        for (let k = 0; k < quantidade; k++) {
+          const theta = anguloInicial + (2 * Math.PI * k) / quantidade;
+          const cosT = Math.cos(theta);
+          const sinT = Math.sin(theta);
+          centros.push(centroPadrao.map((coord, idx) => coord + (u[idx] * cosT + v[idx] * sinT) * raio));
+        }
+      } catch (erro) {
+        return { erro: `interface padraoFuros.padrao circular inválido: ${erro.message}` };
+      }
+    } else {
+      return { erro: "interface padraoFuros.padrao.tipo precisa ser 'linear' ou 'circular'" };
+    }
+  } else {
+    return { erro: "interface padraoFuros exige 'centros' ou 'padrao'" };
+  }
+
+  return {
+    interface: {
+      forma: 'padraoFuros',
+      papel: interfaceDeclarada.papel,
+      plano: { ponto, normal: normalUnitaria },
+      ponto,
+      centro: ponto,
+      normal: normalUnitaria,
+      eixo: normalUnitaria,
+      centros,
+      diametro,
+      raio: diametro / 2,
+      quantidade: centros.length,
+      ...(profundidade === undefined ? {} : { profundidade }),
+      ...(referencia === undefined ? {} : { referencia }),
+      ...(interfaceDeclarada.classeAjuste === undefined ? {} : { classeAjuste: interfaceDeclarada.classeAjuste }),
+      ...(interfaceDeclarada.parte === undefined ? {} : { parte: interfaceDeclarada.parte }),
+    },
+  };
+}
+
+function resolverInterfaceTrilhoDaPorta(st, interfaceDeclarada) {
+  const obrigatorias = ['forma', 'papel', 'eixo', 'centro', 'perfil', 'curso'];
+  const aceitas = new Set([...obrigatorias, 'classeAjuste', 'referencia', 'parte']);
+  const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
+  if (extras.length) return { erro: `interface trilho tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
+  for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface trilho exige '${chave}'` };
+  const papelValido = interfaceDeclarada.papel === 'guia' || interfaceDeclarada.papel === 'deslizador'
+    || interfaceDeclarada.papel === 'recebe' || interfaceDeclarada.papel === 'ocupa';
+  if (!papelValido) {
+    return { erro: "interface trilho.papel precisa ser 'guia' ou 'deslizador'" };
+  }
+  let eixo, centro, perfil, curso, referencia;
+  try {
+    eixo = st.vec(interfaceDeclarada.eixo);
+    centro = st.vec(interfaceDeclarada.centro ?? interfaceDeclarada.ponto);
+    if (!interfaceDeclarada.perfil || typeof interfaceDeclarada.perfil !== 'object' || Array.isArray(interfaceDeclarada.perfil)) {
+      return { erro: 'interface trilho.perfil precisa ser {largura, altura}' };
+    }
+    perfil = {
+      largura: st.num(interfaceDeclarada.perfil.largura),
+      altura: st.num(interfaceDeclarada.perfil.altura),
+      ...(interfaceDeclarada.perfil.tipo ? { tipo: String(interfaceDeclarada.perfil.tipo) } : {}),
+    };
+    curso = st.num(interfaceDeclarada.curso);
+    if (interfaceDeclarada.referencia !== undefined) referencia = st.vec(interfaceDeclarada.referencia);
+  } catch (erro) {
+    return { erro: `interface trilho inválida: ${erro.message}` };
+  }
+  const tamanhoEixo = Math.hypot(...eixo);
+  if (!(tamanhoEixo > 0) || !Number.isFinite(tamanhoEixo)) return { erro: 'interface trilho.eixo precisa ter comprimento finito > 0' };
+  if (!(perfil.largura > 0) || !Number.isFinite(perfil.largura) || !(perfil.altura > 0) || !Number.isFinite(perfil.altura)) {
+    return { erro: 'interface trilho.perfil exige largura e altura finitas > 0' };
+  }
+  if (!(curso > 0) || !Number.isFinite(curso)) return { erro: 'interface trilho.curso precisa ser finito e > 0' };
+  const eixoUnitario = eixo.map((n) => n / tamanhoEixo);
+  if (referencia !== undefined) {
+    const tamanhoReferencia = Math.hypot(...referencia);
+    if (!(tamanhoReferencia > 0) || !Number.isFinite(tamanhoReferencia)) {
+      return { erro: 'interface trilho.referencia precisa ter comprimento finito > 0' };
+    }
+    const referenciaUnitaria = referencia.map((n) => n / tamanhoReferencia);
+    const projecao = eixoUnitario.reduce((soma, n, indice) => soma + n * referenciaUnitaria[indice], 0);
+    if (Math.abs(projecao) > 1e-6) return { erro: 'interface trilho.referencia precisa ser perpendicular ao eixo' };
+    referencia = referenciaUnitaria;
+  }
+  if (interfaceDeclarada.classeAjuste !== undefined && !CLASSES_DE_AJUSTE_PORTA.has(interfaceDeclarada.classeAjuste)) {
+    return { erro: `interface trilho.classeAjuste '${interfaceDeclarada.classeAjuste}' desconhecida (aceitas: folgado, transicao, interferencia)` };
+  }
+  return {
+    interface: {
+      forma: 'trilho',
+      papel: interfaceDeclarada.papel,
+      eixo: eixoUnitario,
+      centro,
+      ponto: centro,
+      perfil,
+      largura: perfil.largura,
+      altura: perfil.altura,
+      curso,
+      inicio: 0,
+      fim: curso,
+      ...(referencia === undefined ? {} : { referencia }),
+      ...(interfaceDeclarada.classeAjuste === undefined ? {} : { classeAjuste: interfaceDeclarada.classeAjuste }),
+      ...(interfaceDeclarada.parte === undefined ? {} : { parte: interfaceDeclarada.parte }),
+    },
+  };
+}
+
 function resolverInterfaceCilindricaDaPorta(st, interfaceDeclarada) {
   if (interfaceDeclarada === undefined) return { interface: undefined };
   if (!interfaceDeclarada || typeof interfaceDeclarada !== 'object' || Array.isArray(interfaceDeclarada)) {
-    return { erro: 'interface precisa ser objeto {forma, papel, eixo, centro, raio, inicio, fim, referencia?}' };
+    return { erro: 'interface precisa ser objeto {forma, papel, ...}' };
   }
   if (interfaceDeclarada.forma === 'anel') return resolverInterfaceAnularDaPorta(st, interfaceDeclarada);
+  if (interfaceDeclarada.forma === 'plano') return resolverInterfacePlanoDaPorta(st, interfaceDeclarada);
+  if (interfaceDeclarada.forma === 'padraoFuros' || interfaceDeclarada.forma === 'padrao-furos' || interfaceDeclarada.forma === 'furos') {
+    return resolverInterfacePadraoFurosDaPorta(st, interfaceDeclarada);
+  }
+  if (interfaceDeclarada.forma === 'trilho') return resolverInterfaceTrilhoDaPorta(st, interfaceDeclarada);
+
   const obrigatorias = ['forma', 'papel', 'eixo', 'centro', 'raio', 'inicio', 'fim'];
   const aceitas = new Set([...obrigatorias, 'referencia']);
   const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
   if (extras.length) return { erro: `interface tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
   for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface exige '${chave}'` };
-  if (interfaceDeclarada.forma !== 'cilindro') return { erro: "interface.forma só aceita 'cilindro' neste recorte" };
+  if (interfaceDeclarada.forma !== 'cilindro') return { erro: "interface.forma só aceita 'cilindro', 'anel', 'plano', 'padraoFuros' ou 'trilho'" };
   if (interfaceDeclarada.papel !== 'externa' && interfaceDeclarada.papel !== 'interna') {
     return { erro: "interface.papel precisa ser 'externa' ou 'interna'" };
   }

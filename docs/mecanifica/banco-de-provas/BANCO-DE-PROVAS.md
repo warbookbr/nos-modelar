@@ -1,0 +1,40 @@
+<!-- Gerado por tools/mecanifica/banco-de-provas.mjs. Não edite à mão; rode npm run banco-de-provas:gerar. -->
+# Banco de provas e registro de custo
+
+Este banco de provas define os objetos de referência que serão modelados no
+começo e no fim do plano de ferramentas de modelagem. O objetivo é comparar
+objetivamente a autonomia do agente, a conformidade geométrica e o custo de
+inferência (tokens, rodadas e nota final do crítico visual).
+
+A medição experimental completa fica para execução sob demanda com aval humano,
+pois envolve consumo significativo de recursos.
+
+## Objetos do banco de provas
+
+| # | Objeto | Família | Nível | Ferramentas exercitadas | Referência | Justificativa |
+| - | ------ | ------- | ----- | ----------------------- | ---------- | ------------- |
+| 1 | **carrinho de mão** | Veículos terrestres | esboço | `casca`, `barras`, `rodaPneu` | [Link](https://grabcad.com/library/wheelbarrow-12) | Exercita casca com espessura e estrutura de barras tubulares com roda e pneu num objeto compacto. |
+| 2 | **picape** | Veículos terrestres | detalhado | `casca`, `chapa`, `rodaPneu`, `mola`, `articula`, `loftSuave` | [Link](https://grabcad.com/library/pickup-truck-1) | Exercita casca, chapa dobrada na caçamba e articulações integradas a suspensão com molas e rodas. |
+| 3 | **cilindro hidráulico** | Motores, transmissões e mecanismos | detalhado | `atuador`, `articula`, `tubulacao`, `cabo`, `vedacao` | [Link](ISO 6020-2 / https://grabcad.com/library/hydraulic-cylinder-iso-6020-2-1) | Exercita a família especializada de atuador e cilindro hidráulico com terminais articulados e conexões. |
+| 4 | **suspensão** | Motores, transmissões e mecanismos | detalhado | `mola`, `atuador`, `articula`, `barras` | [Link](https://grabcad.com/library/double-wishbone-suspension-1) | Exercita a família de molas combinada com braços articulados e barras estruturais. |
+| 5 | **cadeira de rodas** | Veículos terrestres | esboço | `barras`, `rodaPneu`, `tecido`, `articula`, `manopla` | [Link](ISO 7176 / https://grabcad.com/library/wheelchair-model-1) | Exercita cadeira com estrutura de barras tubulares, articulações e rodas raiadas. |
+| 6 | **guarda-roupa** | Móveis | esboço | `movel`, `articula`, `guia` | [Link](https://grabcad.com/library/wardrobe-closet-1) | Exercita a família de roupeiro modular com caixaria, portas articuladas e trilhos. |
+| 7 | **cadeira** | Móveis | esboço | `movel`, `barras`, `tecido`, `deforma` | [Link](https://grabcad.com/library/modern-chair-137) | Exercita a família prevista de cadeira com estrutura de barras e assento anatômico. |
+
+## Resumo de custo por objeto
+
+| Objeto | Nível | Família | Medições | Rodadas | Tokens | Nota final | Status |
+| ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |
+| **carrinho de mão** | esboço | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
+| **picape** | detalhado | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
+| **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
+| **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
+| **cadeira de rodas** | esboço | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
+| **guarda-roupa** | esboço | Móveis | 0 | 0 | 0 | — | aguardando medição |
+| **cadeira** | esboço | Móveis | 0 | 0 | 0 | — | aguardando medição |
+
+## Histórico de medições
+
+Nenhuma medição registrada até o momento. As medições serão gravadas via
+`npm run banco-de-provas:registrar` quando a rodada de avaliação for autorizada.
+
