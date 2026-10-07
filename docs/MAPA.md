@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-904 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+905 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -97,6 +97,7 @@
 ## docs/mecanifica/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
+- `ANALISES-DE-2026-10.md` — Análises de 2026-10
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual

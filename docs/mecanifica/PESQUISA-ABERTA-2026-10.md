@@ -2,7 +2,7 @@
 
 Quatro pesquisas abertas, feitas em 2026-10-07 sem contexto do projeto e sem filtro de aplicabilidade, para achar ferramentas, técnicas e ideias que uma pesquisa específica não traria. Os temas foram modelagem por código e paramétrica, geração procedural em jogos e VFX, IA e 3D, e áreas vizinhas (fabricação, robótica, arquitetura, dobradura, simulação). A quinta, de addons do Blender, foi feita por outra IA e está no fim, com os links que ela listou à parte, também não conferidos.
 
-A busca na web devolveu pouco em três das quatro pesquisas. Só os itens marcados como vistos na busca, (V) ou (web), e a seção de IA e 3D vieram de resultado de busca; o resto vem do conhecimento prévio do modelo, com links canônicos que não foram abertos. Confira o link antes de citar ou de basear trabalho num item. Este documento é material de partida para escolher o que trazer ao Mecanifica e não autoriza implementação; o que for escolhido entra pela [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e por plano.
+A busca na web devolveu pouco em três das quatro pesquisas. Só os itens marcados como vistos na busca, (V) ou (web), e a seção de IA e 3D vieram de resultado de busca; o resto vem do conhecimento prévio do modelo, com links canônicos que não foram abertos. Confira o link antes de citar ou de basear trabalho num item. Este documento é material de partida para escolher o que trazer ao Mecanifica e não autoriza implementação; o que for escolhido entra pela [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e por plano. As [análises de 2026-10](ANALISES-DE-2026-10.md) cruzam esta pesquisa com o Mecanifica.
 
 
 ## Modelagem 3D por código e paramétrica: achados
