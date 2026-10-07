@@ -92,6 +92,12 @@ e devolve o caminho do brief e das imagens. Então:
    --motivo <o motivo que ela deu>`; a liberação fica no histórico, e rodá-la sem
    a autorização é burlar o limite.
 
+No nível sem Detalhe por unidade (médio e esquemático) não há unidade nem Marco,
+e o `--proximo` que sai do último estágio para e imprime o brief do crítico do
+objeto inteiro: despache o crítico com ele, registre `--veredito objeto` e rode
+`--proximo` de novo; abaixo de 8 o esbocista corrige e o `--proximo` reimprime o
+brief, com a mesma regra de três rodadas.
+
 O Marco (25, 50, 75 e 100% do custo) segue do mesmo jeito, com o brief do Marco
 e o veredito `marco-<N>`, e a mesma regra de três rodadas.
 

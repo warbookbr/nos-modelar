@@ -10,7 +10,7 @@ import { expandirEsboco } from '../src/expandir.js';
 import { conferirReferenciaNaOpcao, lerPlano, visiveisDoEsboco } from '../src/plano.js';
 import { formatarConferencia, formatarMedidasDaReferencia, lerContornos, medidasDaReferencia } from '../src/referencia.js';
 import { formatarResumo, medirEsboco } from '../src/descrever.js';
-import { avancar, criarEstado, portaoDoEstagio } from '../src/condutor.js';
+import { avancar, criarEstado, portaoDoEstagio, registrarVeredito } from '../src/condutor.js';
 import { lerArgumentos, medidasDaReferenciaArquivo, referenciaArquivo } from '../../../tools/mecanifica/esboco.mjs';
 import { referenciasDoEsboco } from '../../../tools/mecanifica/esboco-referencia.mjs';
 
@@ -195,6 +195,7 @@ describe('a divergência da referência na leitura padrão e no Condutor', () =>
     expect(conferencia.passa).toBe(false);
     expect(conferencia.falta.some((f) => /referencia: na vista lateral, a silhueta do esboço desvia/.test(f))).toBe(true);
     expect(avancar(e, s, { referencias }).ok).toBe(false);
+    s = registrarVeredito(s, { unidade: 'objeto', nota: 9, motivo: 'sem defeito estrutural visível' });
     const limpo = avancar(e, s, { referencias: mapa('lateral') });
     expect(limpo.ok).toBe(true);
     expect(limpo.estado.atual).toBe('concluido');

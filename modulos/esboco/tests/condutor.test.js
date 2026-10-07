@@ -4,7 +4,7 @@ import { copyFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } fr
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ErroDeEsboco } from '../src/index.js';
-import { avancar, conferirEnvelope, criarEstado, custoDe, definirModo, ESTAGIOS_POR_NIVEL, formatarEnvelope, formatarSituacao, gravarNotaDePassagem, LIMITE_DA_FUNCAO, LIMITE_DA_NOTA_DE_PASSAGEM, marcarFeito, MODOS, MODO_PADRAO, moverForma, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, textoDoEnvelope } from '../src/condutor.js';
+import { avancar, conferirEnvelope, criarEstado, liberar, registrarVeredito, UNIDADE_DO_OBJETO, custoDe, definirModo, ESTAGIOS_POR_NIVEL, formatarEnvelope, formatarSituacao, gravarNotaDePassagem, LIMITE_DA_FUNCAO, LIMITE_DA_NOTA_DE_PASSAGEM, marcarFeito, MODOS, MODO_PADRAO, moverForma, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, textoDoEnvelope } from '../src/condutor.js';
 import { condutorArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
@@ -64,12 +64,14 @@ describe('estágios e Portão', () => {
   it('o nível de detalhe liga e desliga estágios: o esquemático termina na Maquete e o médio na Conferência', () => {
     const rapido = fila({ nivel: 'esquematico', medidas: [medida()], contrato: undefined });
     let r = avancar(rapido, estadoNaMaquete(rapido));
+    expect(r).toMatchObject({ ok: false, pedeCritico: true });
+    r = avancar(rapido, registrarVeredito(r.estado, { unidade: 'objeto', nota: 9, motivo: 'sem defeito estrutural visível' }));
     expect(r.estado.atual).toBe('concluido');
     expect(avancar(rapido, r.estado)).toMatchObject({ ok: false, concluido: true });
     const medio = fila({ nivel: 'medio', medidas: [medida(), medida({ nome: 'l', valor: 80, mede: 'larguraTotal' }), medida({ nome: 'l2', valor: 80, mede: 'larguraTotal' })] });
     r = avancar(medio, estadoNaMaquete(medio));
     expect(r.estado.atual).toBe('conferencia-da-maquete');
-    r = avancar(medio, r.estado);
+    r = avancar(medio, registrarVeredito(r.estado, { unidade: 'objeto', nota: 8, motivo: 'só detalhe de acabamento' }));
     expect(r.estado.atual).toBe('concluido');
     expect(r.estado.unidades).toEqual([]);
     /* mudar o nível no plano muda os estágios ligados na chamada seguinte */
@@ -77,6 +79,24 @@ describe('estágios e Portão', () => {
     const depois = avancar(mudado, criarEstado(medio, 'x')).estado;
     expect(depois.estagios).toHaveLength(5);
     expect(depois.avisos[0]).toContain('o nível mudou de medio para detalhado');
+  });
+
+  it('o nível sem Detalhe por unidade só conclui com o veredito do crítico sobre o objeto inteiro, com a regra da nota', () => {
+    const medio = fila({ nivel: 'medio', medidas: [medida(), medida({ nome: 'l', valor: 80, mede: 'larguraTotal' }), medida({ nome: 'l2', valor: 80, mede: 'larguraTotal' })] });
+    let s = avancar(medio, estadoNaMaquete(medio)).estado;
+    expect(s.atual).toBe('conferencia-da-maquete');
+    expect(avancar(medio, s)).toMatchObject({ ok: false, pedeCritico: true, rodada: 1 });
+    s = registrarVeredito(s, { unidade: UNIDADE_DO_OBJETO, nota: 6, motivo: 'tubo atravessa o piso sem explicação' });
+    expect(avancar(medio, s)).toMatchObject({ ok: false, pedeCritico: true, rodada: 2 });
+    s = registrarVeredito(s, { unidade: UNIDADE_DO_OBJETO, nota: 6, motivo: 'tubo atravessa o piso sem explicação' });
+    s = registrarVeredito(s, { unidade: UNIDADE_DO_OBJETO, nota: 7, motivo: 'tubo atravessa o piso sem explicação' });
+    const travado = avancar(medio, s);
+    expect(travado.ok).toBe(false);
+    expect(travado.bloqueio).toContain('--liberar objeto');
+    const liberado = avancar(medio, liberar(s, { unidade: UNIDADE_DO_OBJETO, motivo: 'a pessoa autorizou seguir assim' }));
+    expect(liberado.estado.atual).toBe('concluido');
+    /* no detalhado o crítico julga unidades e Marcos, e o veredito do objeto é recusado */
+    expect(() => registrarVeredito(estadoNaMaquete(fila()), { unidade: UNIDADE_DO_OBJETO, nota: 9, motivo: 'sem defeito estrutural visível' })).toThrow(ErroDeEsboco);
   });
 
   it('percorre os cinco estágios do nível detalhado e termina concluído', () => {

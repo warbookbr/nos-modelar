@@ -46,6 +46,10 @@ export const LIMITE_DA_FUNCAO = 8;
 export const MODOS = ['objeto', 'por-unidade'];
 export const MODO_PADRAO = 'objeto';
 export const LIMITE_DA_NOTA_DE_PASSAGEM = 240;
+/* O nível sem Detalhe por unidade (médio e esquemático) não tem unidade nem Marco, e sem isto concluía sem nenhum crítico de fora
+   olhar o objeto: o veredito do objeto inteiro é registrado com este nome e vale a mesma regra da nota. */
+export const UNIDADE_DO_OBJETO = 'objeto';
+const semDetalhe = (estado) => !(estado.estagios ?? []).includes('detalhe-por-unidade');
 
 /* A `funcao` declarada da unidade em `unidades.<id>.funcao` do esboço (ou undefined). */
 export function funcaoDaUnidade(bruto, id) {
@@ -368,12 +372,19 @@ export function avancar(bruto, estadoBruto, { referencias } = {}) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   const portao = portaoDoEstagio(bruto, estado, { referencias });
   if (estado.atual === CONCLUIDO) return { ok: false, estado, portao, concluido: true };
-  const barrado = bloqueiosDaNota(estado);
+  /* o veredito do objeto abaixo de 8 e ainda não travado não barra: o --proximo é o que reimprime o brief depois da correção */
+  const barrado = bloqueiosDaNota(estado).filter((b) => b.unidade !== UNIDADE_DO_OBJETO || b.travado);
   if (barrado.length > 0) return { ok: false, estado, portao, bloqueio: `condutor: ${barrado.map(textoDoBloqueio).join('; ')}` };
   if (!portao.passa) return { ok: false, estado, portao };
+  const i = estado.estagios.indexOf(estado.atual);
+  const proximo = estado.estagios[i + 1] ?? CONCLUIDO;
+  if (proximo === CONCLUIDO && semDetalhe(estado)) {
+    const lib = (estado.liberacoes ?? []).filter((l) => l.unidade === UNIDADE_DO_OBJETO).reduce((m, l) => Math.max(m, l.aposVeredito), 0);
+    const vs = (estado.vereditos ?? []).filter((v) => v.unidade === UNIDADE_DO_OBJETO && v.ordem > lib);
+    const liberado = lib > 0 && vs.length === 0;
+    if (!liberado && (vs.length === 0 || vs[vs.length - 1].nota < NOTA_MINIMA)) return { ok: false, estado, portao, pedeCritico: true, rodada: vs.length + 1 };
+  }
   const novo = clone(estado);
-  const i = novo.estagios.indexOf(novo.atual);
-  const proximo = novo.estagios[i + 1] ?? CONCLUIDO;
   novo.historico.push({ passo: novo.historico.length + 1, de: novo.atual, para: proximo });
   novo.atual = proximo;
   if (proximo === 'plano-de-detalhe') {
@@ -526,7 +537,7 @@ function achadosDaUnidade(bruto, estado, unidade) {
    `travado` e só sai com `liberar`. Estado sem `vereditos` (versão 1) não bloqueia nada. Ordem determinística: a dos vereditos. */
 export function bloqueiosDaNota(estado) {
   const comBrief = new Set((estado.unidades ?? []).filter((u) => u.membros.length > LIMITE_DA_FUNCAO).map((u) => u.id));
-  const ids = [...new Set((estado.vereditos ?? []).map((v) => v.unidade))].filter((id) => /^marco-\d+$/.test(id) || comBrief.has(id));
+  const ids = [...new Set((estado.vereditos ?? []).map((v) => v.unidade))].filter((id) => /^marco-\d+$/.test(id) || comBrief.has(id) || id === UNIDADE_DO_OBJETO);
   const saida = [];
   for (const id of ids) {
     const lib = (estado.liberacoes ?? []).filter((l) => l.unidade === id).reduce((m, l) => Math.max(m, l.aposVeredito), 0);
@@ -540,8 +551,9 @@ export function bloqueiosDaNota(estado) {
 const nota1 = (n) => String(n).replace('.', ',');
 export function textoDoBloqueio(b) {
   const marco = /^marco-/.test(b.unidade);
-  const o = `a unidade "${abreviar(b.unidade)}"`.replace(/a unidade "(marco-\d+)"/, 'o $1');
+  const o = b.unidade === UNIDADE_DO_OBJETO ? 'o objeto' : `a unidade "${abreviar(b.unidade)}"`.replace(/a unidade "(marco-\d+)"/, 'o $1');
   const rodada = `${Math.min(b.rodada, RODADAS_DO_CRITICO)} de ${RODADAS_DO_CRITICO}`;
+  if (b.unidade === UNIDADE_DO_OBJETO && !b.travado) return `o objeto tirou nota ${nota1(b.nota)} (abaixo de ${NOTA_MINIMA}) na rodada ${rodada}: corrija o esboço pelo motivo e rode --proximo, que imprime o brief do crítico de novo`;
   if (b.travado) return `${o} tirou nota ${nota1(b.nota)} (abaixo de ${NOTA_MINIMA}) na rodada ${rodada} e está travada: o fluxo só segue com --condutor <arquivo> --liberar ${b.unidade} --motivo <texto>, e a liberação exige pedir autorização explícita à pessoa antes (o motivo é o que ela disser)`;
   return `${o} tirou nota ${nota1(b.nota)} (abaixo de ${NOTA_MINIMA}) na rodada ${rodada}: ${marco ? 'corrija as unidades apontadas pelo crítico e chame o crítico do Marco de novo (--veredito)' : `refaça a unidade, rode --feito ${b.unidade} de novo e registre o novo veredito do crítico`}`;
 }
@@ -556,7 +568,7 @@ function exigirNotaLivre(estado, { exceto } = {}) {
 /* Libera uma unidade ou Marco travado (três vereditos abaixo de 8 desde a última liberação). Grava em `liberacoes` (versão 3 do
    estado) o motivo, que é o que a pessoa autorizou, e o veredito até onde ela vale. */
 export function liberar(estadoBruto, { unidade, motivo }) {
-  const doMarco = /^marco-(\d+)$/.test(String(unidade));
+  const doMarco = /^marco-(\d+)$/.test(String(unidade)) || unidade === UNIDADE_DO_OBJETO;
   const id = doMarco ? String(unidade) : unidadePorNome(estadoBruto.unidades ?? [], unidade);
   const b = bloqueiosDaNota(estadoBruto).find((x) => x.unidade === id);
   exigir(b !== undefined, `condutor: "${abreviar(String(unidade))}" não está bloqueada pela nota do crítico; não há o que liberar${bloqueiosDaNota(estadoBruto).length ? ` (bloqueadas: ${bloqueiosDaNota(estadoBruto).map((x) => x.unidade).join(', ')})` : ''}`);
@@ -628,8 +640,10 @@ export function registrarVeredito(estadoBruto, { unidade, nota, motivo, tokens }
   const ids = (estadoBruto.unidades ?? []).map((u) => u.id);
   /* `marco-50` é o veredito do crítico do Marco de 50%, que precisa estar registrado */
   const doMarco = /^marco-(\d+)$/.exec(String(unidade));
-  const id = doMarco ? `marco-${doMarco[1]}` : unidadePorNome(estadoBruto.unidades ?? [], unidade);
-  if (doMarco) exigir((estadoBruto.marcos ?? []).some((m) => m.limiar === Number(doMarco[1])), `condutor: o Marco ${doMarco[1]}% não foi registrado (marcos registrados: ${(estadoBruto.marcos ?? []).map((m) => `marco-${m.limiar}`).join(', ') || 'nenhum'})`);
+  const doObjeto = unidade === UNIDADE_DO_OBJETO;
+  if (doObjeto) exigir(semDetalhe(estadoBruto), `condutor: o veredito "${UNIDADE_DO_OBJETO}" é do nível sem Detalhe por unidade; no nível ${estadoBruto.nivel} o crítico julga as unidades e os Marcos`);
+  const id = doObjeto ? UNIDADE_DO_OBJETO : doMarco ? `marco-${doMarco[1]}` : unidadePorNome(estadoBruto.unidades ?? [], unidade);
+  if (doObjeto) { /* sem unidade a conferir */ } else if (doMarco) exigir((estadoBruto.marcos ?? []).some((m) => m.limiar === Number(doMarco[1])), `condutor: o Marco ${doMarco[1]}% não foi registrado (marcos registrados: ${(estadoBruto.marcos ?? []).map((m) => `marco-${m.limiar}`).join(', ') || 'nenhum'})`);
   else exigir(ids.includes(id), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(String(unidade), ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
   const n = Number(nota);
   exigir(Number.isFinite(n) && n >= 0 && n <= 10, `condutor: --veredito precisa de --nota entre 0 e 10 (a nota do crítico), e veio ${JSON.stringify(nota)}`);
