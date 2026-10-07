@@ -23,7 +23,7 @@ pois envolve consumo significativo de recursos.
 
 ## Resumo de custo por objeto
 
-| Objeto | Nível | Família | Medições | Rodadas | Tokens | Nota final | Status |
+| Objeto | Nível | Família | Medições | Rodadas | Tokens | Menor nota final entre as unidades | Status |
 | ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |
 | **carrinho de mão** | esboço | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
 | **picape** | detalhado | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |

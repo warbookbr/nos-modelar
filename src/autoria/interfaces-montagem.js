@@ -350,7 +350,7 @@ function interfacePadraoFuros(porta, quem) {
 function interfaceTrilho(porta, quem) {
   const i = porta?.interface;
   if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
-  const papelValido = i.papel === 'guia' || i.papel === 'deslizador' || i.papel === 'recebe' || i.papel === 'ocupa';
+  const papelValido = i.papel === 'guia' || i.papel === 'deslizador';
   if (i.forma !== 'trilho' || !papelValido) {
     falhar(quem, "interface precisa ser trilho ('guia' ou 'deslizador').");
   }
@@ -1243,8 +1243,7 @@ export function validarEncaixeTrilho(declaracao, portas) {
   if (referencia.forma !== 'trilho' || movel.forma !== 'trilho') {
     diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'trilho' });
   }
-  const papelValido = (referencia.papel === 'guia' && movel.papel === 'deslizador')
-    || (referencia.papel === 'recebe' && movel.papel === 'ocupa');
+  const papelValido = referencia.papel === 'guia' && movel.papel === 'deslizador';
   if (!papelValido) {
     diagnosticos.push({
       codigo: 'direcao-incompativel',

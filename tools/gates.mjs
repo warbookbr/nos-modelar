@@ -129,6 +129,7 @@ export const GATES_CURTOS = [
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check',
+  'banco-de-provas:check',
 ];
 
 export function escolherBateria(alterados) {

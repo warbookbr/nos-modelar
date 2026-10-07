@@ -109,7 +109,7 @@ Intenção que o catálogo não resolve vira registro de lacuna pelo formato de
 [`LACUNAS-DE-CAPACIDADE-V1.md`](docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md);
 ela não autoriza inventar operação dentro da receita.
 
-**O que segura a qualidade.** Trinta e três gates, listados em `tools/gates.mjs`
+**O que segura a qualidade.** Trinta e quatro gates, listados em `tools/gates.mjs`
 e repetidos em `.github/workflows/ci.yml`, rodados de uma vez por `npm run
 gates`. `reguas:check` reprova quando os dois não batem, então gate que existe
 só no script local não existe. Eles vão de tipo e teste a nove guardas de

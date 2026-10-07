@@ -71,6 +71,23 @@ describe('Banco de provas e registro de custo', () => {
     expect(resumo['picape'].notaFinal).toBe(9);
   });
 
+  it('a nota do objeto é a menor nota final entre as unidades', () => {
+    const dados = {
+      objetos: [{ nome: 'picape', familia: 'Veículos terrestres', nivel: 'detalhado' }],
+      medicoes: [
+        { objeto: 'picape', unidade: 'cabine', rodada: 1, tokens: 10, nota: 6 },
+        { objeto: 'picape', unidade: 'cabine', rodada: 2, tokens: 10, nota: 9 },
+        { objeto: 'picape', unidade: 'cacamba', rodada: 1, tokens: 10, nota: 7 },
+        { objeto: 'picape', unidade: 'chassi', rodada: 1, tokens: 10, nota: 9.5 },
+      ],
+    };
+    expect(resumoPorObjeto(dados)['picape'].notaFinal).toBe(7);
+  });
+
+  it('recusa origem de tokens fora da lista', () => {
+    expect(() => validarRegistro({ objeto: 'picape', unidade: 'cabine', tokens: 1, nota: 8, origemTokens: 'chute' }, { origensValidas: ['condutor', 'api'] })).toThrow(/origem dos tokens/);
+  });
+
   it('banco cobre de 5 a 8 objetos com ferramentas e famílias requeridas', () => {
     const caminhoJson = join(process.cwd(), 'docs/mecanifica/banco-de-provas/banco-de-provas.json');
     if (!existsSync(caminhoJson)) return; // conferido após criação

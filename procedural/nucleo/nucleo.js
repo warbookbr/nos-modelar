@@ -2894,8 +2894,7 @@ function resolverInterfaceTrilhoDaPorta(st, interfaceDeclarada) {
   const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
   if (extras.length) return { erro: `interface trilho tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
   for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface trilho exige '${chave}'` };
-  const papelValido = interfaceDeclarada.papel === 'guia' || interfaceDeclarada.papel === 'deslizador'
-    || interfaceDeclarada.papel === 'recebe' || interfaceDeclarada.papel === 'ocupa';
+  const papelValido = interfaceDeclarada.papel === 'guia' || interfaceDeclarada.papel === 'deslizador';
   if (!papelValido) {
     return { erro: "interface trilho.papel precisa ser 'guia' ou 'deslizador'" };
   }

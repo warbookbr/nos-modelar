@@ -213,6 +213,20 @@ describe('Publicação no núcleo de portas estendidas', () => {
     expect(porta.interface.altura).toBe(0.010);
     expect(porta.interface.curso).toBe(0.200);
   });
+
+  it('recusa trilho com papel que não seja guia ou deslizador', () => {
+    const passos = [
+      ...cuboBase,
+      ['publicarPorta', {
+        id: 'guia-linear',
+        rotulo: 'Guia Linear',
+        de: { op: 'cubo', id: 1 },
+        interface: { forma: 'trilho', papel: 'recebe', eixo: [0, 0, 1], centro: [0, 0.05, 0], perfil: { largura: 0.015, altura: 0.010 }, curso: 0.200 },
+      }],
+    ];
+    const n = nucleo(passos, {}, {}, {}, null, []);
+    expect(n.orfaos[0].motivo).toContain("'guia' ou 'deslizador'");
+  });
 });
 
 describe('Conferência de portas na malha (porta-confere-forma)', () => {

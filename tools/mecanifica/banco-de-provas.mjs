@@ -59,8 +59,8 @@ export function validarRegistro(registro, { objetosValidos = null, origensValida
   }
 
   const sOrigem = typeof origemTokens === 'string' && origemTokens.trim() ? origemTokens.trim() : 'condutor';
-  if (origensValidas && !origensValidas.includes(sOrigem)) {
-    // aviso ou permissão flexível
+  if (origensValidas && origensValidas.length && !origensValidas.includes(sOrigem)) {
+    throw new Error(`Registro recusado: origem dos tokens "${sOrigem}" desconhecida (válidas: ${origensValidas.join(', ')}).`);
   }
 
   const sData = typeof data === 'string' && data.trim() ? data.trim() : new Date().toISOString();
@@ -115,24 +115,28 @@ export function resumoPorObjeto(dados) {
     const r = resumo[m.objeto];
     r.totalTokens += m.tokens;
     r.medicoes += 1;
-    r.notaFinal = m.nota; // último registrado
 
     if (!rodadasPorUnidade.has(m.objeto)) {
       rodadasPorUnidade.set(m.objeto, new Map());
     }
     const unidades = rodadasPorUnidade.get(m.objeto);
-    const rAtual = unidades.get(m.unidade) ?? 0;
+    const atual = unidades.get(m.unidade) ?? { rodada: 0, nota: null };
     const rVal = m.rodada ?? m.rodadas ?? 1;
-    unidades.set(m.unidade, Math.max(rAtual, rVal));
+    /* A nota de uma unidade é a da rodada mais recente dela. */
+    unidades.set(m.unidade, rVal >= atual.rodada ? { rodada: rVal, nota: m.nota } : atual);
   }
 
   for (const [nomeObjeto, unidades] of rodadasPorUnidade.entries()) {
     if (resumo[nomeObjeto]) {
       let somaRodadas = 0;
-      for (const maxR of unidades.values()) {
-        somaRodadas += maxR;
+      let menorNota = null;
+      for (const u of unidades.values()) {
+        somaRodadas += u.rodada;
+        if (menorNota === null || u.nota < menorNota) menorNota = u.nota;
       }
       resumo[nomeObjeto].totalRodadas = somaRodadas;
+      /* A nota do objeto é a pior nota final entre as unidades: o objeto só passa quando todas passam. */
+      resumo[nomeObjeto].notaFinal = menorNota;
     }
   }
 
@@ -166,7 +170,7 @@ export function gerarMarkdown(dados) {
   L.push('');
   L.push('## Resumo de custo por objeto');
   L.push('');
-  L.push('| Objeto | Nível | Família | Medições | Rodadas | Tokens | Nota final | Status |');
+  L.push('| Objeto | Nível | Família | Medições | Rodadas | Tokens | Menor nota final entre as unidades | Status |');
   L.push('| ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |');
 
   const resumo = resumoPorObjeto(dados);
