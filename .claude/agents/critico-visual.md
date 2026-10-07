@@ -132,6 +132,19 @@ está fora do lugar em relação à parte a que deveria estar preso, o que a vis
 mostra que o nome da peça não explica, e a nota de 0 a 10), cite a vista em cada
 achado e feche com o mesmo veredito JSON, com `alvo` igual ao caminho do brief.
 No brief do Marco, acrescente as peças sem função e as sem ligação por unidade.
+
+A nota segue sempre esta escala, igual à da pergunta do brief: 10, nenhum
+achado; 8 e 9, só detalhe de superfície, acabamento ou proporção fina; 5 a 7,
+pelo menos um defeito estrutural (ponta no ar, travessia sem explicação, peça
+fora de onde deveria estar presa, peça sem função); 0 a 4, a unidade não cumpre
+a `funcao`. Nota abaixo de 8 tem de citar o defeito estrutural que a puxou, e
+detalhe de superfície sozinho não desce a nota abaixo de 8.
+
+Quando o brief trouxer o veredito anterior (nota e motivo da rodada passada da
+mesma unidade ou do Marco), diga para cada defeito dele se foi resolvido, e não
+conte como novo o que já foi apontado. Quando listar as peças em cinza com `id`,
+nome, unidade e função, use essa lista para identificar o que a imagem mostra,
+sem julgá-las: elas só mostram onde a unidade se prende.
 A regra de não aprovar vale igual: a nota é achado, e quem decide é quem
 orquestra.
 

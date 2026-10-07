@@ -111,6 +111,21 @@ export function formasVizinhas(bruto, estado, nome) {
   return [...new Set((da?.vizinhas ?? []).flatMap((v) => v.locais.map((l) => l.daOutra)))].sort();
 }
 
+/* As mesmas formas vizinhas de `formasVizinhas`, descritas para o brief do crítico: `{ id, rotulo, unidade, funcao }` (rotulo e
+   funcao só quando existem). A imagem continua sem legenda; o nome só vai no texto. */
+export function descricaoDasVizinhas(bruto, estado, nome) {
+  const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
+  const mapa = mapaDeLigacoes(bruto, { unidades });
+  const da = mapa.unidades.find((x) => x.id === u.id);
+  const rotulos = new Map(expandirEsboco(bruto).opcoes[0].formas.filter((f) => typeof f.rotulo === 'string' && f.rotulo.trim()).map((f) => [f.id, f.rotulo.trim()]));
+  const achadas = new Map();
+  for (const v of da?.vizinhas ?? []) {
+    const funcao = mapa.unidades.find((x) => x.id === v.unidade)?.funcao;
+    for (const l of v.locais) if (!achadas.has(l.daOutra)) achadas.set(l.daOutra, { id: l.daOutra, ...(rotulos.has(l.daOutra) ? { rotulo: rotulos.get(l.daOutra) } : {}), unidade: v.unidade, ...(funcao ? { funcao } : {}) });
+  }
+  return [...achadas.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
 /* O esboço isolado e já expandido (`expandirEsboco(detalharUnidade(...))`) com as formas `ids` à vista em contorno claro e
    translúcido, sem rótulo, sem linha de centro e sem a cor própria: só mostram onde a unidade se prende. Não muda o que recebe. */
 export function comFormasVizinhas(isolado, ids) {

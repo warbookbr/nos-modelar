@@ -45,7 +45,7 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
 
-- **Status:** aberta
+- **Status:** feita
 - **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
   medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
   defeitos apontados na rodada anterior da mesma unidade, e o nome das peças
@@ -98,4 +98,37 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   - um brief real impresso por `--feito` numa fixture com veredito anterior e
     vizinhas, para se ver o texto que o crítico recebe
   - `npm run mapa:check` e `npm run docs:links:check`
-- **Relatório:** (Executora preenche.)
+- **Relatório:** Feito. `ESCALA_DA_NOTA` (esboco.mjs) é a mesma frase na pergunta da nota da unidade e do Marco e no agente `critico-visual.md`; `vereditoAnterior` lê `estado.vereditos` e o brief da unidade e do Marco traz nota e motivo da última rodada só quando existe; `descricaoDasVizinhas` (detalhe.js) devolve `{ id, rotulo, unidade, funcao }` das formas em cinza e entra no brief da unidade e, por unidade nova, no do Marco. As imagens seguem sem legenda; proposta, sem fazer: pôr o `id` também na imagem só se o crítico ainda errar a peça mesmo com a lista em texto. README do esboço atualizado.
+
+  Testes novos (critico.test.js): escala nas perguntas e no agente, brief da unidade e do Marco com e sem veredito anterior, vizinha com id, rótulo, unidade e função. Desvio: o "Não mexer em" citava `modulos/catalogo-de-familias/`, que não existe, e foi ignorado conforme a correção da Planejadora. O `vizinhos.test.js` e o `nota-do-critico.test.js` não precisaram de mudança.
+
+  `npx vitest run modulos/esboco/tests/critico.test.js modulos/esboco/tests/nota-do-critico.test.js modulos/esboco/tests/vizinhos.test.js`: 3 arquivos, 30 testes passados.
+  `npx vitest run modulos/esboco`: 38 arquivos, 752 testes passados.
+  `npm run gates`: 33/33 verdes (inclui mapa:check e docs:links:check).
+
+  Brief real do `--feito fila` numa fixture com veredito anterior (nota 6) e a vizinha `p` da unidade `ponta`:
+
+```
+--- brief para o crítico cego ---
+Função da unidade: fileira de caixas encostadas que faz o corpo do objeto
+Veredito anterior (rodada passada): nota 6, motivo: a ponta da direita fica no ar
+Diga, para cada defeito desse motivo, se foi resolvido ou não, e não conte como novo o que já foi apontado.
+Imagens (as quatro vistas da unidade isolada, sem legenda; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue):
+  f/g-critico-fila/g-unidade-fila-isometrica.png
+  f/g-critico-fila/g-unidade-fila-frontal.png
+  f/g-critico-fila/g-unidade-fila-lateral.png
+  f/g-critico-fila/g-unidade-fila-superior.png
+Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens seguem sem legenda):
+  p (tampa): unidade ponta, função: tampa que fecha a fila
+Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:
+  unidade fila (9 formas; função: fileira de caixas encostadas que faz o corpo do objeto):
+    toca ponta: 1 ponto (c8 em p [180 10 0])
+    pontas livres: nenhuma
+Responda, olhando só as imagens:
+  1. Que pontas ficam no ar, sem encostar em nada?
+  2. O que atravessa o quê, sem que a forma explique a travessia?
+  3. O que está fora do lugar em relação à parte a que deveria estar preso?
+  4. O que a vista mostra que o nome da peça não explica?
+  5. Nota de 0 a 10 para a unidade como parte do objeto, com a razão em uma frase. Escala: 10: nenhum achado. 8 e 9: só detalhe de superfície, acabamento ou proporção fina. 5 a 7: pelo menos um defeito estrutural (ponta no ar, travessia sem explicação, peça fora de onde deveria estar presa, peça sem função). 0 a 4: a unidade não cumpre a funcao. Nota abaixo de 8 tem de citar o defeito estrutural que a puxou; detalhe de superfície sozinho não desce a nota abaixo de 8.
+--- fim do brief ---
+```

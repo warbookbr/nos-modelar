@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { avancar, criarEstado, marcarFeito, registrarVeredito } from '../src/condutor.js';
-import { briefDoCritico, condutorArquivo, escalarSvg, lerArgumentos, lerLargura, PERGUNTAS_DO_CRITICO, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { briefDoCritico, briefDoMarco, condutorArquivo, escalarSvg, lerArgumentos, lerLargura, ESCALA_DA_NOTA, PERGUNTAS_DO_CRITICO, PERGUNTAS_DO_MARCO, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });
 const medida = (nome, valor, mede) => ({ nome, valor, unidade: 'mm', origem: 'ficha', tolerancia: 1, mede });
@@ -102,6 +102,51 @@ describe('o brief do crítico no --feito', () => {
     const { arquivo } = gravar(grande());
     expect(condutorArquivo(arquivo, { feito: 'ponta' }).criticoDe).toBeNull();
   });
+});
+
+describe('a escala, os defeitos anteriores e as vizinhas no brief', () => {
+  it('a escala ancorada aparece nas perguntas da unidade e do Marco e no agente', () => {
+    expect(ESCALA_DA_NOTA).toContain('8 e 9: só detalhe de superfície');
+    expect(ESCALA_DA_NOTA).toContain('5 a 7: pelo menos um defeito estrutural');
+    expect(PERGUNTAS_DO_CRITICO.at(-1)).toContain(ESCALA_DA_NOTA);
+    expect(PERGUNTAS_DO_MARCO.at(-1)).toContain(ESCALA_DA_NOTA);
+    const agente = readFileSync(new URL('../../../.claude/agents/critico-visual.md', import.meta.url), 'utf8');
+    expect(agente).toContain('detalhe de superfície sozinho não desce a nota abaixo de 8');
+  });
+
+  it('com veredito anterior o brief traz nota e motivo; sem veredito não traz', async () => {
+    const { pasta, arquivo } = gravar(grande());
+    const sem = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'c1') });
+    expect(sem.texto).not.toContain('Veredito anterior');
+    condutorArquivo(arquivo, { veredito: 'fila', nota: '6', motivo: 'a ponta da direita fica no ar' });
+    const com = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'c2') });
+    expect(com.texto).toContain('Veredito anterior (rodada passada): nota 6, motivo: a ponta da direita fica no ar');
+    expect(com.texto).toContain('se foi resolvido');
+  }, 120000);
+
+  it('o brief do Marco traz a escala e, com veredito anterior do Marco, nota e motivo', async () => {
+    const e = grande();
+    const { pasta, arquivo } = gravar(e);
+    const estado = JSON.parse(readFileSync(`${arquivo}.condutor.json`, 'utf8'));
+    estado.unidades.find((u) => u.id === 'ponta').feito = true;
+    estado.marcos = [{ limiar: 50, custoFeito: 1, custoTotal: 10, unidades: ['ponta'], chamar: 'critico', imagens: 'limpas' }];
+    writeFileSync(`${arquivo}.condutor.json`, JSON.stringify(estado));
+    const sem = await briefDoMarco(arquivo, 50, { saida: join(pasta, 'm1') });
+    expect(sem.texto).toContain(ESCALA_DA_NOTA);
+    expect(sem.texto).not.toContain('Veredito anterior');
+    condutorArquivo(arquivo, { veredito: 'marco-50', nota: '7', motivo: 'a tampa fica solta do corpo' });
+    const com = await briefDoMarco(arquivo, 50, { saida: join(pasta, 'm2') });
+    expect(com.texto).toContain('Veredito anterior (rodada passada): nota 7, motivo: a tampa fica solta do corpo');
+  }, 120000);
+
+  it('o brief lista a vizinha em cinza com id, unidade e função', async () => {
+    const e = grande();
+    e.unidades.ponta = { funcao: 'tampa que fecha a fila' };
+    e.opcoes[0].formas.find((f) => f.id === 'p').rotulo = 'tampa';
+    const { pasta, arquivo } = gravar(e);
+    const b = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'c') });
+    expect(b.texto).toContain('p (tampa): unidade ponta, função: tampa que fecha a fila');
+  }, 120000);
 });
 
 describe('o veredito no histórico do condutor', () => {

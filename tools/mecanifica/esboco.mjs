@@ -14,7 +14,7 @@ import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
 import { conferirReferenciaNaOpcao, lerPlano, textoDoPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { formatarConferencia, formatarMedidasDaReferencia, medidasDaReferencia, sobreposicaoDaReferencia } from '../../modulos/esboco/src/referencia.js';
 import { avancar, conferirEnvelope, criarEstado, definirModo, formatarEnvelope, formatarSituacao, funcaoDaUnidade, gravarNotaDePassagem, LIMITE_DA_FUNCAO, liberar, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
-import { comFormasVizinhas, detalharUnidade, formasVizinhas, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
+import { comFormasVizinhas, descricaoDasVizinhas, detalharUnidade, formasVizinhas, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
 import { editarEsboco, formatarMudancas } from '../../modulos/esboco/src/editar.js';
 import { formatarLigacoes, mapaDeLigacoes } from '../../modulos/esboco/src/mapa-de-ligacoes.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
@@ -590,7 +590,7 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, lar
   }
   const vistasTexto = `${destinos.length} ${destinos.length === 1 ? 'vista' : 'vistas'}`;
   const cabecalho = u === null ? `esboço inteiro, sem legenda, em ${vistasTexto}` : `unidade ${u.id} (${u.membros.length} ${u.membros.length === 1 ? 'forma' : 'formas'}) isolada, sem legenda, em ${vistasTexto}`;
-  return { destinos, svgs, reaproveitadas, unidade: u, vizinhos: idsVizinhos, texto: `${cabecalho}${idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro: ${idsVizinhos.slice(0, 8).join(', ')}${idsVizinhos.length > 8 ? ', ...' : ''} (--sem-vizinhos desliga)` : ''}${previa ? ' (prévia: facetas reduzidas e sem arestas finas, rotulada no título; confirme com a imagem completa antes de dar por bom)' : ''}:\n${destinos.map((d, i) => `  ${d}${reaproveitadas[i] ? ' (reaproveitada: o conteúdo não mudou desde a última gravação; --forçar redesenha)' : ''}`).join('\n')}\n${notas.length > 0 ? `${notas.join('\n')}\n` : ''}` };
+  return { destinos, svgs, reaproveitadas, unidade: u, vizinhos: idsVizinhos, vizinhosDescritos: idsVizinhos.length > 0 ? descricaoDasVizinhas(bruto, estado, unidade) : [], texto: `${cabecalho}${idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro: ${idsVizinhos.slice(0, 8).join(', ')}${idsVizinhos.length > 8 ? ', ...' : ''} (--sem-vizinhos desliga)` : ''}${previa ? ' (prévia: facetas reduzidas e sem arestas finas, rotulada no título; confirme com a imagem completa antes de dar por bom)' : ''}:\n${destinos.map((d, i) => `  ${d}${reaproveitadas[i] ? ' (reaproveitada: o conteúdo não mudou desde a última gravação; --forçar redesenha)' : ''}`).join('\n')}\n${notas.length > 0 ? `${notas.join('\n')}\n` : ''}` };
 }
 
 /* `--unidade <nome> [--vista <vista>]`: o mesmo para uma unidade, é a imagem limpa para o crítico visual cego por unidade. */
@@ -598,13 +598,26 @@ export function unidadeArquivo(arquivo, unidade, opcoes = {}) {
   return vistasArquivo(arquivo, { ...opcoes, unidade });
 }
 
+/* A escala ancorada da nota, igual no agente `critico-visual` e nas perguntas da nota da unidade e do Marco. */
+export const ESCALA_DA_NOTA = '10: nenhum achado. 8 e 9: só detalhe de superfície, acabamento ou proporção fina. 5 a 7: pelo menos um defeito estrutural (ponta no ar, travessia sem explicação, peça fora de onde deveria estar presa, peça sem função). 0 a 4: a unidade não cumpre a funcao. Nota abaixo de 8 tem de citar o defeito estrutural que a puxou; detalhe de superfície sozinho não desce a nota abaixo de 8.';
+const PERGUNTA_DA_NOTA = (para) => `Nota de 0 a 10 para ${para}, com a razão em uma frase. Escala: ${ESCALA_DA_NOTA}`;
+
+/* O último veredito de `chave` (unidade ou `marco-<N>`) no estado do condutor, ou null. */
+function vereditoAnterior(arquivo, chave) {
+  try {
+    const estado = JSON.parse(readFileSync(`${resolverCaminho(arquivo)}.condutor.json`, 'utf8'));
+    return [...(estado.vereditos ?? [])].reverse().find((v) => v.unidade === chave) ?? null;
+  } catch { return null; }
+}
+const linhasDoAnterior = (v, recuo) => v === null ? [] : [`${recuo}Veredito anterior (rodada passada): nota ${String(v.nota).replace('.', ',')}, motivo: ${v.motivo}`, `${recuo}Diga, para cada defeito desse motivo, se foi resolvido ou não, e não conte como novo o que já foi apontado.`];
+
 /* As cinco perguntas fixas do crítico visual cego por unidade. */
 export const PERGUNTAS_DO_CRITICO = [
   'Que pontas ficam no ar, sem encostar em nada?',
   'O que atravessa o quê, sem que a forma explique a travessia?',
   'O que está fora do lugar em relação à parte a que deveria estar preso?',
   'O que a vista mostra que o nome da peça não explica?',
-  'Nota de 0 a 10 para a unidade como parte do objeto, com a razão da nota em uma frase.',
+  PERGUNTA_DA_NOTA('a unidade como parte do objeto'),
 ];
 export const LARGURA_DO_CRITICO = 1100;
 
@@ -621,8 +634,13 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
   L.push('Despache o agente critico-visual (Sonnet) com o brief abaixo e as quatro imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito <unidade> --nota <0-10> --motivo <o que ele apontou>.');
   L.push('--- brief para o crítico cego ---');
   L.push(`Função da unidade: ${funcao ?? '(não declarada)'}`);
+  L.push(...linhasDoAnterior(vereditoAnterior(arquivo, r.unidade.id), ''));
   L.push(`Imagens (as quatro vistas da unidade isolada, sem legenda${r.vizinhos.length > 0 ? '; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue' : ''}):`);
   for (const d of r.destinos) L.push(`  ${d}`);
+  if (r.vizinhosDescritos.length > 0) {
+    L.push('Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens seguem sem legenda):');
+    for (const v of r.vizinhosDescritos) L.push(`  ${v.id}${v.rotulo ? ` (${v.rotulo})` : ''}: unidade ${v.unidade}${v.funcao ? `, função: ${v.funcao}` : ''}`);
+  }
   L.push('Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:');
   for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`  ${linha}`);
   L.push('Responda, olhando só as imagens:');
@@ -636,7 +654,7 @@ export const PERGUNTAS_DO_MARCO = [
   'O que, no objeto inteiro, parece ficar no ar, atravessar outra coisa ou estar fora do lugar?',
   'Por unidade nova (listada acima), liste as peças sem função: as que a vista não explica nem pela forma nem pela posição.',
   'Por unidade nova (listada acima), liste as peças sem ligação: as que não estão presas a nenhuma outra nem têm a ponta explicada.',
-  'Nota de 0 a 10 para o objeto até aqui, com a razão da nota em uma frase.',
+  PERGUNTA_DA_NOTA('o objeto até aqui'),
 ];
 
 /* O brief do crítico cego de um Marco: as quatro vistas gerais sem legenda (`<nome>-marco-<limiar>-<vista>.png`), e, para cada
@@ -668,6 +686,7 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   const L = [`crítico do Marco: marco de ${limiar}% do custo estimado, com ${novas.length} ${novas.length === 1 ? 'unidade nova' : 'unidades novas'} desde o Marco anterior.`];
   L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito marco-${limiar} --nota <0-10> --motivo <o que ele apontou>.`);
   L.push('--- brief para o crítico cego ---');
+  L.push(...linhasDoAnterior(vereditoAnterior(arquivo, `marco-${limiar}`), ''));
   L.push('Imagens gerais do objeto (as quatro vistas, sem legenda):');
   for (const d of gerais) L.push(`  ${d}`);
   const unidades = [];
@@ -677,6 +696,11 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
     unidades.push({ id: r.unidade.id, destinos: r.destinos, funcao });
     L.push(`Unidade ${r.unidade.id} (${r.unidade.membros.length} ${r.unidade.membros.length === 1 ? 'forma' : 'formas'}). Função da unidade: ${funcao ?? '(não declarada)'}`);
     for (const d of r.destinos) L.push(`  ${d}`);
+    L.push(...linhasDoAnterior(vereditoAnterior(arquivo, r.unidade.id), '  '));
+    if (r.vizinhosDescritos.length > 0) {
+      L.push('  Peças em cinza (de outras unidades, só mostram onde esta se prende):');
+      for (const v of r.vizinhosDescritos) L.push(`    ${v.id}${v.rotulo ? ` (${v.rotulo})` : ''}: unidade ${v.unidade}${v.funcao ? `, função: ${v.funcao}` : ''}`);
+    }
     L.push('  Ligações da unidade em texto (o --ligacoes):');
     for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`    ${linha}`);
   }
