@@ -152,6 +152,18 @@
       "origemTokens": "api",
       "nota": 9,
       "motivo": "defeito anterior resolvido; sem defeito estrutural"
+    },
+    {
+      "objeto": "guarda-roupa",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-07T17:52:53.476Z",
+      "commit": "3af072d9",
+      "tokens": 137569,
+      "origemTokens": "api",
+      "nota": 5,
+      "motivo": "cabideiro por cima do tampo e gaveta esquerda sumida na isométrica; as duas vêm da ordem de desenho das vistas, o JSON está certo"
     }
   ]
 }
