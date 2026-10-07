@@ -62,6 +62,10 @@ contorno da referência antes de o crítico olhar, e o custo de cada objeto
   objeto (montagens de componentes, como roupeiro e cadeira), escolhidas entre
   as que mais se repetem na lista de objetos; cada uma é aprovada pelo crítico
   nos extremos das faixas e num ponto médio, com as interfaces conferidas;
+- regra que vira código: quando uma ferramenta ou feature nova torna uma regra
+  verificável, a regra sai da leitura obrigatória e passa a ser gate, recusa do
+  executor ou aviso com mensagem que explica, e o documento guarda só o que é
+  julgamento;
 - o custo como medida: tokens, rodadas e nota por unidade gravados em cada
   rodada, e um banco de provas com os mesmos objetos refeitos para comparar.
 
@@ -109,6 +113,31 @@ contorno da referência antes de o crítico olhar, e o custo de cada objeto
 8. As primeiras famílias de componente e de objeto.
 9. O banco de provas refeito e o fechamento.
 
+## Referências por fatia
+
+Cada fatia parte do que a [pesquisa aberta](../PESQUISA-ABERTA-2026-10.md) e as
+[análises](../ANALISES-DE-2026-10.md) trouxeram, e confere o link de cada
+referência antes de usá-la, porque a maior parte não foi aberta na pesquisa. O
+contrato de interface parte dos pontos de encaixe com nome do BOSL2, da descrição
+de corpos e juntas do URDF e do MJCF, das folgas da ISO 286 e do Gridfinity como
+interface padrão que cria um ecossistema de peças. Os níveis de detalhe e o
+esboço partem da Procedura, que monta parte por parte com encaixes tipados
+conferidos a cada passo, e do ShapeAssembly e do ShapeLib como formatos pequenos
+de montagem e de biblioteca de formas. A camada de features parte dos seletores
+de face e aresta do CadQuery e do build123d, do problema de nome topológico do
+FreeCAD como erro a evitar, e do CAD Sketcher e do SolveSpace para perfil por
+restrição. A casca e a chapa partem do Solidify do Blender, da bancada SheetMetal
+do FreeCAD, que mantém coerentes a peça dobrada e a planificada, e do Boxes.py
+para junta de dedo. As articulações e as barras partem das dobradiças do BOSL2,
+do Skin e do Wireframe do Blender e das treliças do Sverchok. A verificação parte
+do desvio contra referência do CloudCompare, do achado do 3D-DefectBench de que
+seis vistas bastam, do Coal e do FCL para interferência, e do MeshCheck e do 3D
+Print Toolbox para defeito de malha. As famílias partem do cq_warehouse, das
+bancadas Fasteners e Gears do FreeCAD e do Bolt Factory para fixador, rosca e
+engrenagem por norma, e do AssemCAD como fábrica paramétrica de componentes. A
+parte do relatório do Blender sobre UV, rigging e render e os modelos de IA
+treinados para gerar malha ficam de fora.
+
 ## Riscos e desvios
 
 O risco maior é o escopo: trocar a base do esboço, criar a camada de features e
@@ -133,5 +162,9 @@ parâmetros contra o contorno da referência, que junta o catálogo de famílias
 numa camada só. As ferramentas seguintes da contagem por objeto, as quatro
 lacunas dos modificadores do Blender (deformação por gaiola, projeção sobre
 superfície, Cast e controle de normais), a tabela única de normas e as medidas
-de movimento, massa e fabricação das análises. [As partes do
+de movimento, massa e fabricação das análises, com a física do Rapier para testar
+movimento. Os geradores novos das análises e da pesquisa: a divisão por regras
+do CityEngine, a distribuição com espaçamento mínimo, o Wave Function Collapse,
+os campos implícitos do libfive, o Tissue, o Plating Generator e o MAP-Elites
+para gerar variantes de uma família. [As partes do
 braço](congelados/2026-09-26-as-partes-do-braco.md) continuam congeladas.
