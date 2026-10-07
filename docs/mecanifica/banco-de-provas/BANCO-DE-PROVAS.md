@@ -25,7 +25,7 @@ pois envolve consumo significativo de recursos.
 
 | Objeto | Nível | Família | Medições | Rodadas | Tokens | Menor nota final entre as unidades | Status |
 | ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |
-| **carrinho de mão** | esboço | Veículos terrestres | 1 | 1 | 151252 | 7 | medido |
+| **carrinho de mão** | esboço | Veículos terrestres | 2 | 2 | 194524 | 8 | medido |
 | **picape** | detalhado | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
 | **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
 | **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
@@ -38,4 +38,5 @@ pois envolve consumo significativo de recursos.
 | Data | Commit | Objeto | Unidade | Rodada | Tokens | Origem | Nota | Motivo |
 | ---- | ------ | ------ | ------- | ------ | ------ | ------ | ---- | ------ |
 | 2026-10-07T17:46:01.030Z | `b29eb325` | **carrinho de mão** | objeto | 1 | 151252 | api | 7 | longarinas do quadro aparecem dentro da caçamba na vista superior (possível travessia do piso) |
+| 2026-10-07T17:48:54.769Z | `bdef49f5` | **carrinho de mão** | objeto | 2 | 43272 | api | 8 | defeito anterior resolvido; restam folga mínima roda-caçamba e um bloco sem função clara |
 

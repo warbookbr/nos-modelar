@@ -116,6 +116,18 @@
       "origemTokens": "api",
       "nota": 7,
       "motivo": "longarinas do quadro aparecem dentro da caçamba na vista superior (possível travessia do piso)"
+    },
+    {
+      "objeto": "carrinho de mão",
+      "unidade": "objeto",
+      "rodadas": 2,
+      "rodada": 2,
+      "data": "2026-10-07T17:48:54.769Z",
+      "commit": "bdef49f5",
+      "tokens": 43272,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "defeito anterior resolvido; restam folga mínima roda-caçamba e um bloco sem função clara"
     }
   ]
 }
