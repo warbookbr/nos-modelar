@@ -2,13 +2,19 @@
 
 ## Estado
 
-**Plano ativo:** [As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md).
+**Plano ativo:** [O caminho curto da IA](2026-10-07-o-caminho-curto-da-ia.md).
 
-Um núcleo só com níveis de detalhe, em que o esboço é o nível zero, um contrato
-único de interface, a camada de features, as primeiras ferramentas da contagem
-por objeto (casca, chapa dobrada, articulações e estrutura de barras), a
-verificação ancorada no contorno da referência e o custo medido. [As partes do
-braço](congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas.
+A entrada da IA por intenção, com os roteiros sob demanda, o passo seguinte lido
+do estado do trabalho, a página de invariantes sempre lida e as regras
+verificáveis convertidas em gate, e o esboço mais barato pelo que a medição de
+onde vão os tokens mostrar.
+
+[As ferramentas de modelagem](congelados/2026-10-07-as-ferramentas-de-modelagem.md)
+foi congelado em 2026-10-07 com a fatia 1 entregue (portas estendidas, banco de
+provas com os quatro esboços medidos, desenho do esboço com oclusão por pixel e
+crítico do objeto no nível médio) e volta a partir da fatia 2 quando o caminho
+curto fechar. [As partes do braço](congelados/2026-09-26-as-partes-do-braco.md)
+seguem congeladas.
 
 [O catálogo de famílias](encerrados/2026-10-06-o-catalogo-de-familias.md) foi
 cancelado em 2026-10-07 e substituído pelo plano ativo, com o crítico da T012, a

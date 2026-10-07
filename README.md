@@ -114,7 +114,7 @@ proporcional estão num plano
 [congelado](docs/mecanifica/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md)
 por decisão de fila, e não por terem sido refutados; ele volta quando uma peça
 precisar, com medida, de uma dessas formas, e o
-[plano ativo](docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md)
+[plano das ferramentas de modelagem](docs/mecanifica/planos/congelados/2026-10-07-as-ferramentas-de-modelagem.md)
 deve reabri-lo quando chegar ao arredondamento de arestas escolhidas e à
 superfície suave. Intenção que o catálogo não resolve vira registro de lacuna
 pelo formato de
@@ -148,8 +148,8 @@ atravessando peça, ponta solta ou plano de modelagem faltando. A peça de prova
 `tools/fixtures/acervo/` existe para as guardas de navegador terem o que abrir e
 não é exemplo de forma.
 
-**O plano ativo** é [as ferramentas de
-modelagem](docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md), e
+**O plano ativo** é [o caminho curto da
+IA](docs/mecanifica/planos/2026-10-07-o-caminho-curto-da-ia.md), e
 `planos:check` confere o estado dos planos contra
 `docs/mecanifica/planos/README.md`.
 
