@@ -104,5 +104,18 @@
       "justificativa": "Exercita a família prevista de cadeira com estrutura de barras e assento anatômico."
     }
   ],
-  "medicoes": []
+  "medicoes": [
+    {
+      "objeto": "carrinho de mão",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-07T17:46:01.030Z",
+      "commit": "b29eb325",
+      "tokens": 151252,
+      "origemTokens": "api",
+      "nota": 7,
+      "motivo": "longarinas do quadro aparecem dentro da caçamba na vista superior (possível travessia do piso)"
+    }
+  ]
 }

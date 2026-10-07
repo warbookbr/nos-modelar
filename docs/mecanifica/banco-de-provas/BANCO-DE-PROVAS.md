@@ -25,7 +25,7 @@ pois envolve consumo significativo de recursos.
 
 | Objeto | Nível | Família | Medições | Rodadas | Tokens | Menor nota final entre as unidades | Status |
 | ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |
-| **carrinho de mão** | esboço | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
+| **carrinho de mão** | esboço | Veículos terrestres | 1 | 1 | 151252 | 7 | medido |
 | **picape** | detalhado | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
 | **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
 | **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
@@ -35,6 +35,7 @@ pois envolve consumo significativo de recursos.
 
 ## Histórico de medições
 
-Nenhuma medição registrada até o momento. As medições serão gravadas via
-`npm run banco-de-provas:registrar` quando a rodada de avaliação for autorizada.
+| Data | Commit | Objeto | Unidade | Rodada | Tokens | Origem | Nota | Motivo |
+| ---- | ------ | ------ | ------- | ------ | ------ | ------ | ---- | ------ |
+| 2026-10-07T17:46:01.030Z | `b29eb325` | **carrinho de mão** | objeto | 1 | 151252 | api | 7 | longarinas do quadro aparecem dentro da caçamba na vista superior (possível travessia do piso) |
 
