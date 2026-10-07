@@ -43,92 +43,106 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### T012 — Crítico com escala ancorada, defeitos anteriores e nome nas vizinhas (fatia 1, parte B)
+### T013 — Banco de provas e registro de custo (fatia 1, parte A)
 
-- **Status:** feita
-- **Objetivo:** o crítico por unidade e o do Marco recebem três coisas que a
-  medição do plano anterior mostrou faltar: uma escala fixa para a nota, os
-  defeitos apontados na rodada anterior da mesma unidade, e o nome das peças
-  vizinhas que aparecem em cinza. Sem isso a nota parou entre 6 e 7 e o
-  crítico leu a longarina do quadro como guidão.
+- **Status:** aberta
+- **Objetivo:** existir um banco de provas versionado com os objetos que serão
+  refeitos no começo e no fim do plano, e um registro de custo por rodada
+  (tokens, rodadas e nota do crítico) gravado como dado, com um comando que
+  registra e outro que resume. Esta tarefa monta o banco e o registro; rodar a
+  medição de verdade fica para depois, com o aval da pessoa, porque custa caro.
 - **Ler antes:**
   - `CLAUDE.md`
-  - `docs/mecanifica/planos/encerrados/2026-10-06-o-catalogo-de-familias.md` — o item do
-    crítico em "Incluído"
+  - `docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md` — o plano
+    inteiro, em especial "o custo como medida" e as fatias 1 e 9
   - `docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`
-    — "Fechamento", os achados do crítico
-  - `.claude/agents/critico-visual.md` — seção "Unidade de esboço"
-  - `tools/mecanifica/esboco.mjs` — `PERGUNTAS_DO_CRITICO` (linha ~602),
-    `briefDoCritico` (~614), `PERGUNTAS_DO_MARCO` e `briefDoMarco` (~635 a 690),
-    `vistasArquivo` (~549, onde entram os vizinhos)
-  - `modulos/esboco/src/detalhe.js` — `formasVizinhas` e `comFormasVizinhas`
-    (hoje tiram o rótulo das vizinhas)
-  - `modulos/esboco/src/condutor.js` — `registrarVeredito` (os vereditos ficam
-    em `estado.vereditos` com `unidade`, `nota`, `motivo`)
-  - `modulos/esboco/tests/critico.test.js`, `nota-do-critico.test.js`,
-    `vizinhos.test.js`
-- **Mexer em:** `tools/mecanifica/esboco.mjs`, `modulos/esboco/src/detalhe.js`,
-  os três testes acima, `.claude/agents/critico-visual.md`, a seção do crítico
-  no `modulos/esboco/README.md`.
-- **Não mexer em:** `modulos/catalogo-de-familias/` (é da T011), o Condutor além
-  de ler o estado, as skills.
+    — "Fechamento": como a medição anterior foi feita e registrada à mão
+  - `docs/mecanifica/FERRAMENTAS-POR-OBJETO.md` — a lista de onde saem os objetos
+  - `modulos/esboco/src/condutor.js` — `registrarVeredito` e o estado
+    `.condutor.json`, que já guarda nota e motivo por unidade
+  - `src/autoria/laco-de-modelagem.js` — o registro de rodadas que já existe
+  - `tools/mecanifica/ferramentas-por-objeto.mjs` — modelo de dado em JSON com
+    documento gerado e `--check`
+- **Mexer em:** uma pasta nova `docs/mecanifica/banco-de-provas/` (o JSON dos
+  objetos e o documento gerado), um script novo em `tools/mecanifica/`, o
+  `package.json` (scripts novos), e o registro de veredito do Condutor só para
+  aceitar `tokens` e `rodada` opcionais ao lado de `nota` e `motivo`.
+- **Não mexer em:** núcleo, montagem, portas, skills, agentes, o plano.
 - **Passos:**
-  1. Escala ancorada, escrita igual no agente e na pergunta da nota do brief da
-     unidade e do Marco: 10, nenhum achado; 8 e 9, só detalhe de superfície,
-     acabamento ou proporção fina; 5 a 7, pelo menos um defeito estrutural
-     (ponta no ar, travessia sem explicação, peça fora de onde deveria estar
-     presa, peça sem função); 0 a 4, a unidade não cumpre a `funcao`. Nota abaixo
-     de 8 tem de citar o defeito estrutural que a puxou; detalhe de superfície
-     sozinho não desce a nota abaixo de 8.
-  2. Defeitos anteriores: quando a unidade (ou o Marco) já tem veredito no
-     `<arquivo>.condutor.json`, o brief traz a última nota e o `motivo`, com a
-     instrução de dizer para cada um se foi resolvido e de não contar como novo o
-     que já foi apontado. Sem veredito anterior, o brief não muda.
-  3. Nome nas vizinhas: o brief lista cada forma vizinha em cinza com o `id`, o
-     `rotulo` se houver e a unidade a que pertence, com a `funcao` dessa unidade
-     se houver. As imagens continuam sem legenda; se você achar que o nome
-     também precisa entrar na imagem, proponha no relatório e não faça.
-  4. Testes que falhavam antes: a escala aparece no brief da unidade e do Marco;
-     com veredito anterior o brief traz nota e motivo, sem veredito não traz; o
-     brief lista a vizinha com id, unidade e função. Use as fixtures que os
-     testes já usam.
+  1. Escolher de cinco a oito objetos da lista de famílias que juntos exercitem
+     as ferramentas do plano (casca, chapa dobrada, articulações, estrutura de
+     barras) e as famílias previstas (roda e pneu, cilindro hidráulico, mola,
+     roupeiro ou cadeira). Para cada um, gravar no JSON o nome, a família da
+     lista, o nível pedido (esboço ou detalhado), uma referência pública quando
+     houver e as ferramentas que ele exercita. Justificar a escolha em uma frase
+     por objeto.
+  2. Definir o formato do registro de custo: por objeto e por unidade, a data, o
+     commit do repositório, tokens, rodadas e nota. Os tokens vêm do uso que o
+     orquestrador recebe de cada subagente; registre de onde o número veio.
+  3. Um comando registra uma rodada e outro gera o resumo por objeto (total de
+     tokens, rodadas, nota final) num documento gerado, com `--check` como em
+     `ferramentas-por-objeto.mjs`.
+  4. O Condutor passa a aceitar `--tokens` no `--veredito` e grava o número no
+     estado, sem mudar o comportamento de quem não passa o campo.
+  5. Testes que falham antes: o formato recusa registro sem objeto ou com nota
+     fora de 0 a 10; o resumo soma certo; o Condutor grava `tokens` quando
+     recebe e não grava quando não recebe.
 - **Verificação:** cole a saída real de:
-  - `npx vitest run modulos/esboco/tests/critico.test.js modulos/esboco/tests/nota-do-critico.test.js modulos/esboco/tests/vizinhos.test.js`
-  - `npx vitest run modulos/esboco`
-  - um brief real impresso por `--feito` numa fixture com veredito anterior e
-    vizinhas, para se ver o texto que o crítico recebe
-  - `npm run mapa:check` e `npm run docs:links:check`
-- **Relatório:** Feito. `ESCALA_DA_NOTA` (esboco.mjs) é a mesma frase na pergunta da nota da unidade e do Marco e no agente `critico-visual.md`; `vereditoAnterior` lê `estado.vereditos` e o brief da unidade e do Marco traz nota e motivo da última rodada só quando existe; `descricaoDasVizinhas` (detalhe.js) devolve `{ id, rotulo, unidade, funcao }` das formas em cinza e entra no brief da unidade e, por unidade nova, no do Marco. As imagens seguem sem legenda; proposta, sem fazer: pôr o `id` também na imagem só se o crítico ainda errar a peça mesmo com a lista em texto. README do esboço atualizado.
+  - os testes novos e `npx vitest run modulos/esboco`
+  - um registro de exemplo e o resumo gerado
+  - `npm run mapa:check`, `npm run docs:links:check` e `npm run gates`
+- **Relatório:** (Executora preenche.)
 
-  Testes novos (critico.test.js): escala nas perguntas e no agente, brief da unidade e do Marco com e sem veredito anterior, vizinha com id, rótulo, unidade e função. Desvio: o "Não mexer em" citava `modulos/catalogo-de-familias/`, que não existe, e foi ignorado conforme a correção da Planejadora. O `vizinhos.test.js` e o `nota-do-critico.test.js` não precisaram de mudança.
+### T014 — Portas estendidas como contrato único de encaixe (fatia 1, parte B)
 
-  `npx vitest run modulos/esboco/tests/critico.test.js modulos/esboco/tests/nota-do-critico.test.js modulos/esboco/tests/vizinhos.test.js`: 3 arquivos, 30 testes passados.
-  `npx vitest run modulos/esboco`: 38 arquivos, 752 testes passados.
-  `npm run gates`: 33/33 verdes (inclui mapa:check e docs:links:check).
-
-  Brief real do `--feito fila` numa fixture com veredito anterior (nota 6) e a vizinha `p` da unidade `ponta`:
-
-```
---- brief para o crítico cego ---
-Função da unidade: fileira de caixas encostadas que faz o corpo do objeto
-Veredito anterior (rodada passada): nota 6, motivo: a ponta da direita fica no ar
-Diga, para cada defeito desse motivo, se foi resolvido ou não, e não conte como novo o que já foi apontado.
-Imagens (as quatro vistas da unidade isolada, sem legenda; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue):
-  f/g-critico-fila/g-unidade-fila-isometrica.png
-  f/g-critico-fila/g-unidade-fila-frontal.png
-  f/g-critico-fila/g-unidade-fila-lateral.png
-  f/g-critico-fila/g-unidade-fila-superior.png
-Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens seguem sem legenda):
-  p (tampa): unidade ponta, função: tampa que fecha a fila
-Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:
-  unidade fila (9 formas; função: fileira de caixas encostadas que faz o corpo do objeto):
-    toca ponta: 1 ponto (c8 em p [180 10 0])
-    pontas livres: nenhuma
-Responda, olhando só as imagens:
-  1. Que pontas ficam no ar, sem encostar em nada?
-  2. O que atravessa o quê, sem que a forma explique a travessia?
-  3. O que está fora do lugar em relação à parte a que deveria estar preso?
-  4. O que a vista mostra que o nome da peça não explica?
-  5. Nota de 0 a 10 para a unidade como parte do objeto, com a razão em uma frase. Escala: 10: nenhum achado. 8 e 9: só detalhe de superfície, acabamento ou proporção fina. 5 a 7: pelo menos um defeito estrutural (ponta no ar, travessia sem explicação, peça fora de onde deveria estar presa, peça sem função). 0 a 4: a unidade não cumpre a funcao. Nota abaixo de 8 tem de citar o defeito estrutural que a puxou; detalhe de superfície sozinho não desce a nota abaixo de 8.
---- fim do brief ---
-```
+- **Status:** aberta
+- **Objetivo:** as portas do núcleo, que hoje só conhecem cilindro e anel,
+  passam a cobrir plano de apoio, padrão de furos e trilho, com folga por classe
+  de ajuste, conferidas contra a forma e usáveis nos vínculos de medida e na
+  posição por porta da montagem. O esboço só passa a ler portas na fatia 3,
+  quando for refeito; nesta tarefa ele não muda.
+- **Ler antes:**
+  - `CLAUDE.md`
+  - `docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md` — "O que
+    já existe", o primeiro item de "Incluído" e as referências da fatia 1
+  - `src/autoria/interfaces-montagem.js` — as interfaces cilíndrica e anular e
+    os diagnósticos de encaixe
+  - `src/autoria/porta-confere-forma.js` e o teste — como a porta é conferida
+    contra a malha
+  - `src/autoria/vinculos-de-medida.js` — `MEDIDAS_DE_PORTA`
+  - `src/autoria/posicao-por-porta.js` — `poseQueEncaixa`
+  - `procedural/nucleo/nucleo.js` — a operação `publicarPorta` e o formato
+    `mecanifica.porta@1`
+  - `docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md` e `npm run catalogo:gerar`
+  - `docs/mecanifica/PESQUISA-ABERTA-2026-10.md` — BOSL2 (pontos de encaixe com
+    nome), URDF e MJCF, ISO 286, Gridfinity; confira o link antes de usar
+- **Mexer em:** os quatro arquivos de `src/autoria/` acima e seus testes,
+  `publicarPorta` no núcleo e o schema de argumentos dela, o catálogo gerado
+  (pelo comando), e a seção de portas da documentação de montagem.
+- **Não mexer em:** `modulos/esboco/`, o formato de montagem além de aceitar os
+  tipos novos de porta, as receitas existentes, skills, agentes, o plano.
+- **Passos:**
+  1. Desenhar, num comentário no topo de `interfaces-montagem.js` e na
+     documentação, o formato de cada tipo novo: plano de apoio (ponto, normal,
+     extensão), padrão de furos (plano, lista de centros ou padrão linear e
+     circular, diâmetro), trilho (eixo, perfil, curso). Folga por classe de
+     ajuste (folgado, transição, interferência) com o valor em milímetro saindo
+     de uma tabela pequena e versionada, sem copiar a norma inteira.
+  2. `publicarPorta` aceita os tipos novos com recusa e mensagem clara para
+     argumento incompleto; as portas cilíndrica e anular continuam iguais, e as
+     receitas que as usam não mudam.
+  3. A conferência contra a forma cobre os tipos novos: o plano de apoio precisa
+     estar sobre faces da peça, os furos do padrão precisam existir na malha.
+  4. Encaixe entre portas do mesmo tipo: plano contra plano (normais opostas e
+     contato), padrão contra padrão (centros coincidentes depois da pose), trilho
+     contra trilho; com diagnóstico no mesmo estilo dos atuais.
+  5. `MEDIDAS_DE_PORTA` e `poseQueEncaixa` passam a aceitar os tipos novos onde
+     fizer sentido, e o que não fizer sentido é recusado com motivo.
+  6. Testes que falham antes, numa fixture neutra, para cada tipo: publicar,
+     conferir contra a forma, encaixar certo, encaixar errado e recusar
+     argumento ruim. Os testes atuais de porta continuam passando sem alteração.
+- **Verificação:** cole a saída real de:
+  - os testes novos e os de `src/autoria/` que tocam portas
+  - `npm run catalogo:check` depois de `npm run catalogo:gerar`
+  - `npm run gates --completo`
+- **Relatório:** (Executora preenche.)
