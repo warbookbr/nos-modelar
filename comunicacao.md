@@ -53,7 +53,7 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   crítico leu a longarina do quadro como guidão.
 - **Ler antes:**
   - `CLAUDE.md`
-  - `docs/mecanifica/planos/2026-10-06-o-catalogo-de-familias.md` — o item do
+  - `docs/mecanifica/planos/encerrados/2026-10-06-o-catalogo-de-familias.md` — o item do
     crítico em "Incluído"
   - `docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`
     — "Fechamento", os achados do crítico

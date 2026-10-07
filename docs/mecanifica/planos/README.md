@@ -2,12 +2,17 @@
 
 ## Estado
 
-**Plano ativo:** [O catálogo de famílias](2026-10-06-o-catalogo-de-familias.md).
+**Plano ativo:** [As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md).
 
-Um catálogo consultável pela IA, com ferramentas para as formas difíceis e
-famílias paramétricas homologadas, cada uma com um gerador para o esboço e
-outro para o Mecanifica. [As partes do braço](congelados/2026-09-26-as-partes-do-braco.md)
-seguem congeladas.
+Um núcleo só com níveis de detalhe, em que o esboço é o nível zero, um contrato
+único de interface, a camada de features, as primeiras ferramentas da contagem
+por objeto (casca, chapa dobrada, articulações e estrutura de barras), a
+verificação ancorada no contorno da referência e o custo medido. [As partes do
+braço](congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas.
+
+[O catálogo de famílias](encerrados/2026-10-06-o-catalogo-de-familias.md) foi
+cancelado em 2026-10-07 e substituído pelo plano ativo, com o crítico da T012, a
+lista de ferramentas por objeto e a pesquisa aberta entregues.
 
 [O esboço detalhado coerente](encerrados/2026-10-01-o-esboco-detalhado-coerente.md)
 fechou em 2026-10-06 com as fatias 1 a 8 entregues (bugs do fluxo, `fixa`,

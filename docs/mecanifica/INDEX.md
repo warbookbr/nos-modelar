@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [o catálogo de famílias](planos/2026-10-06-o-catalogo-de-familias.md).
+- Plano **ativo**: [as ferramentas de modelagem](planos/2026-10-07-as-ferramentas-de-modelagem.md).
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
@@ -169,7 +169,7 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [o catálogo de famílias](planos/2026-10-06-o-catalogo-de-familias.md), aberto em 2026-10-06 depois de [o esboço detalhado coerente](planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md) fechar; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas. Rascunho aberto: [o que o
+- Plano ativo: [as ferramentas de modelagem](planos/2026-10-07-as-ferramentas-de-modelagem.md), aberto em 2026-10-07 no lugar de [o catálogo de famílias](planos/encerrados/2026-10-06-o-catalogo-de-familias.md), cancelado; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas. Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting
