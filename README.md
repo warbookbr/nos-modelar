@@ -92,31 +92,44 @@ guarda partes reutilizáveis dentro de um esboço.
 Cada afirmação aqui tem endereço. Se uma delas não puder ser conferida pelo
 comando ou arquivo citado, ela está desatualizada e vale o que o comando diz.
 
-**O que o motor sabe fazer.** Trinta e duas operações, listadas com intenção,
+**O que o motor sabe fazer.** As operações estão listadas com intenção,
 schema de argumentos e custo em
 [`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
 que é gerado do registro do motor por `npm run catalogo:gerar` e conferido por
-`catalogo:check`. O catálogo é a fonte da convenção de cada operação; receita de
+`catalogo:check`; o número delas é o que o catálogo diz, e por isso não é
+repetido aqui. O catálogo é a fonte da convenção de cada operação; receita de
 exemplo não é. Para autoria de peça isso inclui rasgo passante (`furo` com
 `ate`), perfil de revolução e caminho fechado (`lathe` e `loft`), posição e eixo
 na criação (`em`/`eixo`), contato derivado em vez de coordenada digitada
-(`encostar`), ponto nomeado e nome de cópia no `arranja`.
+(`encostar`), união e corte de sólidos, ponto nomeado e nome de cópia no
+`arranja`, e portas de encaixe cilíndricas, anulares, de plano de apoio, de
+padrão de furos e de trilho, com folga por classe de ajuste da ISO 286.
 
-**O que nunca entra numa receita.** Solver geral de encaixe, colisão geral e
-contrato genérico de materiais não existem, e o vocabulário poligonal está
-congelado, o que quer dizer sem subdivisão e sem bisel em aresta arbitrária.
-Intenção que o catálogo não resolve vira registro de lacuna pelo formato de
-[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md);
-ela não autoriza inventar operação dentro da receita.
+**O que ainda não existe.** Não há solver geral de encaixe: a montagem deriva a
+pose de uma peça a partir de uma porta da vizinha, sem resolver um conjunto de
+restrições. Não há verificação geral de colisão nem de movimento: a montagem
+audita interseções e contato entre sólidos parados. Não há contrato genérico de
+materiais. A subdivisão, o bisel em aresta escolhida, o corte em anel e a edição
+proporcional estão num plano
+[congelado](docs/mecanifica/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md)
+por decisão de fila, e não por terem sido refutados; ele volta quando uma peça
+precisar, com medida, de uma dessas formas, e o
+[plano ativo](docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md)
+deve reabri-lo quando chegar ao arredondamento de arestas escolhidas e à
+superfície suave. Intenção que o catálogo não resolve vira registro de lacuna
+pelo formato de
+[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md); ela
+não autoriza inventar operação dentro da receita.
 
-**O que segura a qualidade.** Trinta e quatro gates, listados em `tools/gates.mjs`
-e repetidos em `.github/workflows/ci.yml`, rodados de uma vez por `npm run
-gates`. `reguas:check` reprova quando os dois não batem, então gate que existe
-só no script local não existe. Eles vão de tipo e teste a nove guardas de
-navegador que dirigem a bancada de verdade, mais a varredura do acervo, os
-limites de documentação e o teto de leitura obrigatória. Gate que passa aqui e
-falha no CI, ou o contrário, está medindo a máquina e não o repositório, e isso
-é defeito do gate.
+**O que segura a qualidade.** Os gates estão listados em `tools/gates.mjs` e
+repetidos em `.github/workflows/ci.yml`, e rodam de uma vez por `npm run gates`.
+`reguas:check` reprova quando os dois não batem, então gate que existe só no
+script local não existe. Eles vão de tipo e teste às guardas de navegador que
+dirigem a bancada de verdade, mais a varredura do acervo, os limites de
+documentação, o teto de leitura obrigatória e os documentos gerados (catálogo,
+ferramentas por objeto e banco de provas). Gate que passa aqui e falha no CI, ou
+o contrário, está medindo a máquina e não o repositório, e isso é defeito do
+gate.
 
 **O que existe além da peça.** Montagem persistida com contexto consultável em
 JSON, mapa canônico de dependências e revalidação em cascata; a direção e os
@@ -126,12 +139,18 @@ host, em `tools/mcp/perfis/`, com transação, revalidação condicionante,
 alteração por campo semântico, histórico e restauração. Nenhum perfil de escrita
 é ligado por padrão.
 
-**O que o acervo tem agora.** Nenhuma peça. O estado é declarado em
-`procedural/pecas/ACERVO-SEM-PECA.md`, e `guarda:acervo` reprova
-tanto varredura vazia sem essa declaração quanto a declaração com peça na pasta.
-A receita executável que resta é a peça de prova em `tools/fixtures/acervo/`,
-que existe para as guardas de navegador terem o que abrir e não é exemplo de
-forma. Não há plano ativo; `planos:check` confere isso contra
+**O que o acervo tem agora.** O braço robótico, em
+`procedural/pecas/braco-robotico/`, com base, anel da cintura, ombro e tambor do
+ombro; o resto das partes está no plano
+[congelado](docs/mecanifica/planos/congelados/2026-09-26-as-partes-do-braco.md).
+`guarda:acervo` varre o acervo, mede cada peça e reprova a que tiver peça
+atravessando peça, ponta solta ou plano de modelagem faltando. A peça de prova em
+`tools/fixtures/acervo/` existe para as guardas de navegador terem o que abrir e
+não é exemplo de forma.
+
+**O plano ativo** é [as ferramentas de
+modelagem](docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md), e
+`planos:check` confere o estado dos planos contra
 `docs/mecanifica/planos/README.md`.
 
 O que já foi decidido, aprovado ou interrompido em rodadas anteriores está em
