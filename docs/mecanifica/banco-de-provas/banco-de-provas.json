@@ -140,6 +140,18 @@
       "origemTokens": "api",
       "nota": 7,
       "motivo": "assento ultrapassa o aro e se sobrepõe aos montantes traseiros"
+    },
+    {
+      "objeto": "cadeira",
+      "unidade": "objeto",
+      "rodadas": 2,
+      "rodada": 2,
+      "data": "2026-10-07T17:52:26.325Z",
+      "commit": "0a796fc3",
+      "tokens": 18568,
+      "origemTokens": "api",
+      "nota": 9,
+      "motivo": "defeito anterior resolvido; sem defeito estrutural"
     }
   ]
 }
