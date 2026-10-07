@@ -53,11 +53,14 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   medição de verdade fica para depois, com o aval da pessoa, porque custa caro.
 - **Ler antes:**
   - `CLAUDE.md`
+  - `docs/mecanifica/INDEX.md` — mapa do repositório, comandos e gates
   - `docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md` — o plano
     inteiro, em especial "o custo como medida" e as fatias 1 e 9
   - `docs/mecanifica/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`
     — "Fechamento": como a medição anterior foi feita e registrada à mão
   - `docs/mecanifica/FERRAMENTAS-POR-OBJETO.md` — a lista de onde saem os objetos
+  - `modulos/esboco/README.md` — seções "O Condutor" e "A nota do crítico no
+    Condutor"
   - `modulos/esboco/src/condutor.js` — `registrarVeredito` e o estado
     `.condutor.json`, que já guarda nota e motivo por unidade
   - `src/autoria/laco-de-modelagem.js` — o registro de rodadas que já existe
@@ -103,6 +106,11 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
   quando for refeito; nesta tarefa ele não muda.
 - **Ler antes:**
   - `CLAUDE.md`
+  - `docs/mecanifica/INDEX.md` — mapa do repositório, comandos e gates
+  - `docs/mecanifica/ARQUITETURA.md` — seção "Invariantes": identidade semântica,
+    determinismo e falha com diagnóstico valem para a porta nova
+  - `docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md` — como portas e relações
+    aparecem na montagem
   - `docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md` — "O que
     já existe", o primeiro item de "Incluído" e as referências da fatia 1
   - `src/autoria/interfaces-montagem.js` — as interfaces cilíndrica e anular e
