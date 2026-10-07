@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-913 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+914 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -138,6 +138,7 @@
 ## docs/mecanifica/banco-de-provas/
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
+- `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
 
 ## docs/mecanifica/gerado/
 

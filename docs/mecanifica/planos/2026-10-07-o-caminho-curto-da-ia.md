@@ -79,7 +79,8 @@ esboço fica mais barato pelo que a medição mostrar.
 
 ## Fatias
 
-1. Medir onde vão os tokens nas transcrições dos quatro esbocistas.
+1. Medir onde vão os tokens nas transcrições dos quatro esbocistas. Feita em
+   2026-10-07: [a medição](../banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md).
 2. A página de invariantes e os roteiros por intenção como dados, com gate.
 3. O comando de entrada e a ferramenta MCP, com o passo seguinte pelo estado.
 4. O `CLAUDE.md` como roteador e as regras verificáveis convertidas em gate.
