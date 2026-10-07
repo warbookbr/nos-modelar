@@ -56,6 +56,12 @@ contorno da referência antes de o crítico olhar, e o custo de cada objeto
   tira da referência confere silhueta e medidas de cada parte antes do crítico,
   que julga só o que a medida não decide; e o crítico calibrado por um conjunto
   fixo de imagens com defeitos conhecidos e nota esperada;
+- as primeiras famílias, as primitivas 2.0: peças paramétricas aprovadas que a
+  IA chama com poucos parâmetros em vez de reconstruir, em dois níveis, de
+  componente (roda e pneu, cilindro hidráulico, mola, fixador, articulação) e de
+  objeto (montagens de componentes, como roupeiro e cadeira), escolhidas entre
+  as que mais se repetem na lista de objetos; cada uma é aprovada pelo crítico
+  nos extremos das faixas e num ponto médio, com as interfaces conferidas;
 - o custo como medida: tokens, rodadas e nota por unidade gravados em cada
   rodada, e um banco de provas com os mesmos objetos refeitos para comparar.
 
@@ -64,8 +70,6 @@ contorno da referência antes de o crítico olhar, e o custo de cada objeto
 - o OCCT como kernel de autoria; ele continua só na exportação STEP, e a
   hipótese volta se a camada de features sobre a malha não der arredondamento ou
   casca aceitáveis;
-- as famílias homologadas do plano anterior, que voltam depois, montadas sobre
-  as ferramentas deste;
 - versões novas de montagem persistida: a composição fica como está até haver
   objetos que a exercitem;
 - as famílias orgânicas da fase posterior;
@@ -85,9 +89,11 @@ contorno da referência antes de o crítico olhar, e o custo de cada objeto
 5. Uma parte que diverge da referência é reprovada pela medida de contorno antes
    de chegar ao crítico, e o crítico acerta a nota esperada no conjunto de
    calibração.
-6. O banco de provas mostra tokens, rodadas e nota dos mesmos objetos antes e
+6. Pelo menos três famílias de componente e uma de objeto estão aprovadas em
+   toda a faixa e usáveis por parâmetro.
+7. O banco de provas mostra tokens, rodadas e nota dos mesmos objetos antes e
    depois.
-7. `npm run gates --completo` passa.
+8. `npm run gates --completo` passa.
 
 ## Fatias
 
@@ -100,7 +106,8 @@ contorno da referência antes de o crítico olhar, e o custo de cada objeto
 5. Casca com espessura e chapa dobrada.
 6. Articulações e estrutura de barras.
 7. A verificação ancorada no contorno e o crítico calibrado.
-8. O banco de provas refeito e o fechamento.
+8. As primeiras famílias de componente e de objeto.
+9. O banco de provas refeito e o fechamento.
 
 ## Riscos e desvios
 
@@ -120,7 +127,7 @@ A preencher.
 
 ## Depois deste plano
 
-As famílias homologadas sobre as ferramentas, com o ajuste numérico dos
+A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos
 parâmetros contra o contorno da referência, que junta o catálogo de famílias e o
 [modelador inverso](congelados/2026-08-25-modelador-inverso-priors-familia.md)
 numa camada só. As ferramentas seguintes da contagem por objeto, as quatro
