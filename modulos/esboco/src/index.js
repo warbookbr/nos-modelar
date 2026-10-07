@@ -5,6 +5,7 @@
 
 import { expandirArranjos, expandirEsboco } from './expandir.js';
 import { quisDizer } from './parecido.js';
+import { formasDoPainel, montarCamada } from './camada.js';
 import { frenteDoCorte, ladoDoCorte, lacosDoPlano, lerCorte, recortarBloco } from './corte.js';
 
 const EIXOS = ['x', 'y', 'z'];
@@ -2287,7 +2288,11 @@ function desenharLegendasLista(partes, chave, plano, x0) {
 }
 
 /* Desenha o esboço inteiro; devolve { svg, largura, altura, escala }. */
-export function desenharEsboco(esboco) {
+/* `camada: true` (a ferramenta de imagem usa): além do SVG de sempre em `svg`, devolve `camada` (as faces e os traços das
+   formas com a profundidade de cada vértice, para o teste de profundidade por pixel; ver camada.js) e `svgSobreCamada`, o
+   mesmo SVG sem as formas e com um `<image href="__CAMADA__">` no lugar delas, onde a ferramenta cola a imagem da camada. Título, nota,
+   escala, legendas, linhas de centro, superfícies de corte e linhas de explosão ficam no SVG, por cima da camada. */
+export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
   const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);
   const V = VISTAS[vista];
   let enquadreAchou = false;
@@ -2361,6 +2366,9 @@ export function desenharEsboco(esboco) {
     if (alturaChave > 0) extra = alturaChave + RESERVA_FOLGA;
   }
   const baloes = [];
+  const formasDaCamada = [];
+  /* o que pertence às formas (a camada as substitui) vai marcado; o SVG puro junta tudo */
+  const emForma = (t) => partes.push(querCamada ? { forma: t } : t);
   const largura = PAINEL_L * opcoes.length;
   const altura = TOPO + PAINEL_A + extra + RODAPE;
   const partes = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${largura} ${altura}" width="${largura}" height="${altura}" font-family="Helvetica, Arial, sans-serif">`,
@@ -2373,10 +2381,16 @@ export function desenharEsboco(esboco) {
     const [x2, y2] = tela(p.janela.max);
     partes.push(`<defs><clipPath id="janela-${k}"><rect x="${f1(x1)}" y="${f1(y1)}" width="${f1(x2 - x1)}" height="${f1(y2 - y1)}"/></clipPath></defs>`);
   }
+  if (querCamada) {
+    const cortes = projetadas.map((p, k) => { if (!p.janela) return `<rect x="${k * PAINEL_L}" y="0" width="${PAINEL_L}" height="${altura}"/>`; const [x1, y1] = geometria(p, k, escala).tela(p.janela.min); const [x2, y2] = geometria(p, k, escala).tela(p.janela.max); return `<rect x="${f1(x1)}" y="${f1(y1)}" width="${f1(x2 - x1)}" height="${f1(y2 - y1)}"/>`; });
+    if (projetadas.some((p) => p.janela)) partes.push(`<defs><clipPath id="camada-corte">${cortes.join('')}</clipPath></defs>`);
+    partes.push({ camada: projetadas.some((p) => p.janela) });
+  }
   if (projetadas.some((p) => p.corte)) partes.push('<defs><pattern id="hachura" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#000000" stroke-opacity="0.35" stroke-width="1.4"/></pattern></defs>');
   projetadas.forEach((p, k) => {
     const ehLista = p.modo === 'lista';
     const { x0, tela } = geometria(p, k, escala);
+    if (querCamada) formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa, tinta: (r, n) => cor(hexDe(r.forma.cor), 0.55 + 0.5 * Math.max(0, dot(n, LUZ))) }));
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(`${p.opcao.titulo ?? `Opção ${k + 1}`}${previa ? ' (prévia)' : ''}`)}</text>`);
     const sub = [];
@@ -2541,13 +2555,13 @@ export function desenharEsboco(esboco) {
       const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
       /* opacidade: o grupo inteiro da forma é composto de uma vez, sem escurecer onde suas faces se tocam */
       const translucida = g.r.opacidade !== undefined && g.r.opacidade < 1;
-      if (translucida) partes.push(`<g opacity="${g.r.opacidade}">`);
+      if (translucida) emForma(`<g opacity="${g.r.opacidade}">`);
 
       const pintarFaces = (chunks) => {
         for (const ch of chunks) {
           for (const f of [...ch.dentro, ...ch.lados]) {
             const c = tint(f.n);
-            partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
+            emForma(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
           }
         }
       };
@@ -2562,7 +2576,7 @@ export function desenharEsboco(esboco) {
             } else if (t.furo) {
               d += ' ' + caminho(t.furo.map(V.p).map(tela));
             }
-            partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+            emForma(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
           }
         }
       };
@@ -2570,7 +2584,7 @@ export function desenharEsboco(esboco) {
         for (const ch of chunks) {
           for (const arc of ch.arcos ?? []) {
             if (arc.length < 2) continue;
-            partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+            emForma(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
           }
         }
       };
@@ -2580,9 +2594,9 @@ export function desenharEsboco(esboco) {
         for (const cadeia of cadeias) {
           if (cadeia.length < 2) continue;
           if (cadeia.length === 2) {
-            partes.push(`<line x1="${f1(cadeia[0][0])}" y1="${f1(cadeia[0][1])}" x2="${f1(cadeia[1][0])}" y2="${f1(cadeia[1][1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+            emForma(`<line x1="${f1(cadeia[0][0])}" y1="${f1(cadeia[0][1])}" x2="${f1(cadeia[1][0])}" y2="${f1(cadeia[1][1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
           } else {
-            partes.push(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+            emForma(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
           }
         }
       };
@@ -2594,7 +2608,7 @@ export function desenharEsboco(esboco) {
             pintarFaces([{ dentro: [], lados: [f] }]);
             for (const l of previa ? [] : f.linhas ?? []) {
               const [a, b] = l.map(V.p).map(tela);
-              partes.push(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+              emForma(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
             }
           }
           pintarTampas([ch]);
@@ -2617,7 +2631,7 @@ export function desenharEsboco(esboco) {
           partes.push(`<path class="corte-hachura" d="${d}" fill="url(#hachura)" fill-rule="evenodd" stroke="none"/>`);
         }
       }
-      if (translucida) partes.push('</g>');
+      if (translucida) emForma('</g>');
     }
 
     if (p.janela) {
@@ -2788,7 +2802,12 @@ export function desenharEsboco(esboco) {
   const barra = 100 * escala;
   if (!projetadas.every((p) => p.ocultosOpcao.has('escala'))) partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
   partes.push('</svg>');
-  const saida = { svg: partes.join('\n'), largura, altura, escala };
+  const saida = { svg: partes.filter((x) => typeof x === 'string' || x.forma !== undefined).map((x) => (typeof x === 'string' ? x : x.forma)).join('\n'), largura, altura, escala };
+  if (querCamada) {
+    saida.camada = montarCamada(formasDaCamada, largura, altura);
+    const imagem = (recorte) => `<image x="0" y="0" width="${largura}" height="${altura}" href="__CAMADA__"${recorte ? ' clip-path="url(#camada-corte)"' : ''}/>`;
+    saida.svgSobreCamada = partes.filter((x) => typeof x === 'string' || x.camada !== undefined).map((x) => (typeof x === 'string' ? x : imagem(x.camada))).join('\n');
+  }
   if (projetadas.some((p) => p.camadas)) saida.explosao = projetadas.map((p) => p.camadas ?? null);
   if (temLista) saida.baloes = baloes;
   /* `geometria: true` (uso interno da imagem por achado): a correspondência entre o plano da vista e os pixels de cada painel */

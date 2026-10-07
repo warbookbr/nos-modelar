@@ -4,7 +4,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, resolverOpcao, VISTAS } from '../../modulos/esboco/src/index.js';
 import { descreverAchado, descreverAtravessamento, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
@@ -44,6 +44,151 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
   } finally {
     if (proprio) await navegador.close();
   }
+}
+
+/* O motor das imagens PNG do esboço. `webgl` (padrão) desenha a camada das formas com Three.js num WebGL do Chromium, com
+   teste de profundidade por pixel, e o resto (título, legendas, escala, linhas de centro, superfícies de corte) vem do SVG
+   por cima; `svg` rasteriza só o SVG, com o algoritmo do pintor por forma (ESBOCO_PNG=svg). O `.svg` gravado é sempre o puro. */
+export const MOTOR_DO_PNG = process.env.ESBOCO_PNG === 'svg' ? 'svg' : 'webgl';
+const OPCOES_DA_CAMADA = { camada: MOTOR_DO_PNG === 'webgl' };
+
+/* Roda dentro do Chromium: desenha a camada das formas com câmera ortográfica em pixels do quadro (x, y) e profundidade z
+   ao longo do olho. Cores sem gestão de cor (o pixel é o hexadecimal da face), traços como fitas de 2 px com viés para a
+   frente, faces com `polygonOffset` para o traço não ser comido pela face vizinha de inclinação forte, e formas com
+   opacidade em dois passes (profundidade, depois cor só onde a profundidade é a mais próxima da própria forma, de modo que
+   as faces da forma não escurecem onde se sobrepõem). Devolve o PNG em data URL, com fundo transparente. */
+/* o argumento vai como texto JSON: o Playwright serializa cada número de um objeto grande e leva segundos */
+const DESENHAR_CAMADA = async (texto) => {
+  const { camada, fator } = JSON.parse(texto);
+  /* o Three.js e o contexto WebGL ficam na página entre uma imagem e outra */
+  if (!window.camadaDoEsboco) {
+    /* por `new Function`: o vitest reescreve um `import()` escrito aqui, e a página precisa do dela */
+    const T0 = await new Function('u', 'return import(u)')('/three.module.js');
+    T0.ColorManagement.enabled = false;
+    const canvas0 = document.createElement('canvas');
+    document.body.append(canvas0);
+    const renderer0 = new T0.WebGLRenderer({ canvas: canvas0, antialias: true, alpha: true, premultipliedAlpha: true, preserveDrawingBuffer: true });
+    renderer0.setPixelRatio(1);
+    renderer0.outputColorSpace = T0.LinearSRGBColorSpace;
+    renderer0.setClearColor(0x000000, 0);
+    window.camadaDoEsboco = { T: T0, canvas: canvas0, renderer: renderer0 };
+  }
+  const { T, canvas, renderer } = window.camadaDoEsboco;
+  const W = Math.round(camada.largura * fator);
+  const H = Math.round(camada.altura * fator);
+  renderer.setSize(W, H, false);
+  const z0 = camada.zMin - 10;
+  const topo = camada.zMax - z0 + 10;
+  const cam = new T.OrthographicCamera(0, camada.largura, 0, camada.altura, 1, topo + 10);
+  cam.position.z = topo;
+  const cena = new T.Scene();
+  const VIES_DO_TRACO = 0.1;
+  const meia = camada.larguraDoTraco / 2;
+  const rgb = (k) => [1, 3, 5].map((i) => parseInt(k.slice(i, i + 2), 16) / 255);
+  const preto = new T.Color(camada.corDoTraco);
+  const compensacao = { polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 };
+  const faces = (lista, pos, col) => {
+    for (const f of lista) {
+      const c = f.c.slice();
+      if (c.length > 1 && c[0][0] === c[c.length - 1][0] && c[0][1] === c[c.length - 1][1]) c.pop();
+      const furos = (f.h ?? []).map((h) => { const q = h.slice(); if (q.length > 1 && q[0][0] === q[q.length - 1][0] && q[0][1] === q[q.length - 1][1]) q.pop(); return q; });
+      const todos = [...c, ...furos.flat()];
+      const v2 = (q) => new T.Vector2(q[0], q[1]);
+      const idx = furos.length === 0 && c.length === 3 ? [0, 1, 2] : furos.length === 0 && c.length === 4 ? [0, 1, 2, 0, 2, 3] : T.ShapeUtils.triangulateShape(c.map(v2), furos.map((h) => h.map(v2))).flat();
+      const k = rgb(f.k);
+      for (const i of idx) { const q = todos[i]; pos.push(q[0], q[1], q[2] - z0); col.push(k[0], k[1], k[2]); }
+    }
+  };
+  const fitas = (tracos, pos, ponta) => {
+    for (const t of tracos) {
+      for (let i = 0; i + 1 < t.length; i++) {
+        const a = t[i]; const b = t[i + 1];
+        const dx = b[0] - a[0]; const dy = b[1] - a[1];
+        const n = Math.hypot(dx, dy);
+        if (n < 1e-6) continue;
+        const ux = (dx / n) * meia; const uy = (dy / n) * meia;
+        const e = ponta ? 1 : 0;
+        const A = [a[0] - ux * e, a[1] - uy * e, a[2] - z0 + VIES_DO_TRACO];
+        const B = [b[0] + ux * e, b[1] + uy * e, b[2] - z0 + VIES_DO_TRACO];
+        const p = [[A[0] - uy, A[1] + ux, A[2]], [A[0] + uy, A[1] - ux, A[2]], [B[0] - uy, B[1] + ux, B[2]], [B[0] + uy, B[1] - ux, B[2]]];
+        for (const j of [0, 1, 2, 1, 3, 2]) pos.push(...p[j]);
+      }
+    }
+  };
+  const malha = (pos, col, material, ordem) => {
+    const g = new T.BufferGeometry();
+    g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    if (col) g.setAttribute('color', new T.Float32BufferAttribute(col, 3));
+    const m = new T.Mesh(g, material);
+    m.frustumCulled = false;
+    m.renderOrder = ordem;
+    cena.add(m);
+  };
+  const opacas = camada.formas.filter((f) => f.opacidade >= 1);
+  const translucidas = camada.formas.filter((f) => f.opacidade < 1).sort((a, b) => a.prof - b.prof || a.rank - b.rank);
+  const pos = []; const col = []; const fita = [];
+  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, fita, true); }
+  malha(pos, col, new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide, ...compensacao }), 0);
+  malha(fita, null, new T.MeshBasicMaterial({ color: preto, side: T.DoubleSide, depthWrite: false }), 1);
+  translucidas.forEach((f, i) => {
+    const p = []; const c = []; const t = [];
+    faces(f.faces, p, c);
+    fitas(f.tracos, t, false);
+    malha(p, c, new T.MeshBasicMaterial({ colorWrite: false, transparent: true, side: T.DoubleSide, ...compensacao }), 10 + 3 * i);
+    malha(p, c, new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: f.opacidade, depthWrite: false, depthFunc: T.EqualDepth, side: T.DoubleSide, ...compensacao }), 11 + 3 * i);
+    malha(t, null, new T.MeshBasicMaterial({ color: preto, transparent: true, opacity: f.opacidade, depthWrite: false, side: T.DoubleSide }), 12 + 3 * i);
+  });
+  renderer.render(cena, cam);
+  const png = canvas.toDataURL('image/png');
+  cena.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); });
+  return png;
+};
+
+/* A camada das formas (`desenharEsboco(..., { camada: true }).camada`) como PNG em data URL, `fator` vezes maior que o quadro. */
+export async function renderizarCamada(camada, fator = 1, navegador = null) {
+  const proprio = !navegador;
+  if (proprio) navegador = await (await import('playwright')).default.chromium.launch();
+  try {
+    const pagina = await paginaDaCamada(navegador);
+    return await pagina.evaluate(DESENHAR_CAMADA, JSON.stringify({ camada, fator }));
+  } finally {
+    if (proprio) await navegador.close();
+  }
+}
+
+/* Uma página por navegador, com o Three.js servido de node_modules, reaproveitada pelas imagens seguintes. */
+const PAGINAS_DA_CAMADA = new WeakMap();
+async function paginaDaCamada(navegador) {
+  if (!PAGINAS_DA_CAMADA.has(navegador)) {
+    const pagina = await navegador.newPage();
+    const raiz = dirname(fileURLToPath(import.meta.resolve('three')));
+    await pagina.route('http://camada.local/**', async (rota) => {
+      const nome = new URL(rota.request().url()).pathname.slice(1);
+      if (nome === '') return rota.fulfill({ contentType: 'text/html', body: '<!doctype html><body style="margin:0"></body>' });
+      if (!/^three(\.core|\.module)\.js$/.test(nome)) return rota.abort();
+      return rota.fulfill({ contentType: 'text/javascript', body: readFileSync(join(raiz, nome)) });
+    });
+    await pagina.goto('http://camada.local/');
+    PAGINAS_DA_CAMADA.set(navegador, pagina);
+  }
+  return PAGINAS_DA_CAMADA.get(navegador);
+}
+
+/* O resultado de `desenharEsboco(esboco, { camada: true })` como PNG na largura pedida: a camada das formas vem do WebGL e
+   o resto do SVG. Com `ESBOCO_PNG=svg`, ou sem camada no resultado, rasteriza o SVG puro. Devolve o SVG puro (na mesma largura). */
+export async function desenhoParaPng(r, larguraPedida, destino, navegador = null) {
+  const puro = escalarSvg(r.svg, r.largura, r.altura, larguraPedida);
+  if (MOTOR_DO_PNG === 'svg' || !r.camada) { await svgParaPng(puro.svg, puro.largura, puro.altura, destino, navegador); return puro; }
+  const sobre = escalarSvg(r.svgSobreCamada, r.largura, r.altura, larguraPedida);
+  const proprio = !navegador;
+  if (proprio) navegador = await (await import('playwright')).default.chromium.launch();
+  try {
+    const png = await renderizarCamada(r.camada, sobre.largura / r.largura, navegador);
+    await svgParaPng(sobre.svg.replace('__CAMADA__', () => png), sobre.largura, sobre.altura, destino, navegador);
+  } finally {
+    if (proprio) await navegador.close();
+  }
+  return puro;
 }
 
 /* O SVG na largura pedida em pixels (a proporção e o `viewBox` ficam): { svg, largura, altura }. Sem `largura` devolve o desenho como está. */
@@ -173,10 +318,10 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     if (!rapido) for (const vista of VISTAS_DA_ANALISE) {
       for (const legendas of [true, false]) {
         for (const centros of (comCentros ? [true, false] : [false])) {
-          const { svg: svg0, largura: l0, altura: a0, escala } = desenharEsboco(variante(desenho, { vista, legendas, centros }));
-          const { svg, largura, altura } = escalarSvg(svg0, l0, a0, larguraPedida);
+          const r = desenharEsboco(variante(desenho, { vista, legendas, centros }), OPCOES_DA_CAMADA);
+          const escala = r.escala;
           const nome = `${vista}-${legendas ? 'legendas' : 'sem-legendas'}-${centros ? 'centros' : 'sem-centros'}.png`;
-          await svgParaPng(svg, largura, altura, join(pasta, nome), navegador);
+          await desenhoParaPng(r, larguraPedida, join(pasta, nome), navegador);
           arquivos.push(nome);
           escalas[vista] = escala;
         }
@@ -223,10 +368,9 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     if (!rapido && (projecao.explosao.length > 0 || projecao.achados.length > 0)) modos.push(['transparente', { transparente: true }]);
     for (const [modo, extra] of modos) {
       for (const vista of VISTAS_DA_ANALISE) {
-        const { svg: svg0, largura: l0, altura: a0 } = desenharEsboco(variante(desenho, { vista, legendas: true, centros: false, lista: true, ...extra }));
-        const { svg, largura, altura } = escalarSvg(svg0, l0, a0, larguraPedida);
+        const r = desenharEsboco(variante(desenho, { vista, legendas: true, centros: false, lista: true, ...extra }), OPCOES_DA_CAMADA);
         const nome = `${vista}-${modo}-legendas.png`;
-        await svgParaPng(svg, largura, altura, join(pasta, nome), navegador);
+        await desenhoParaPng(r, larguraPedida, join(pasta, nome), navegador);
         arquivos.push(nome);
         variantes.push(nome);
       }
@@ -272,11 +416,12 @@ export async function gerarEsboco(arquivo, { rapido = false } = {}) {
   const caminho = resolverCaminho(arquivo);
   const base = caminho.replace(/(\.esboco)?\.json$/i, '');
   const esboco = JSON.parse(readFileSync(caminho, 'utf8'));
-  const { svg, largura, altura, escala } = desenharEsboco(rapido ? { ...esboco, ladosPorEscala: esboco.ladosPorEscala ?? true } : esboco);
+  const r = desenharEsboco(rapido ? { ...esboco, ladosPorEscala: esboco.ladosPorEscala ?? true } : esboco, rapido ? {} : OPCOES_DA_CAMADA);
+  const { svg, largura, altura, escala } = r;
   const contato = verificarContato(esboco, { unidades: unidadesGravadas(caminho) });
   const projecao = verificarProjecao(esboco);
   writeFileSync(`${base}.svg`, svg);
-  if (!rapido) await svgParaPng(svg, largura, altura, `${base}.png`);
+  if (!rapido) await desenhoParaPng(r, null, `${base}.png`);
   return { png: rapido ? null : `${base}.png`, svg: `${base}.svg`, largura, altura, escala, contato, projecao };
 }
 
@@ -540,7 +685,7 @@ function hashDaVista(esboco, vista, extras) {
   const visiveis = esboco.opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}`, esboco.pontos).filter((r) => r.forma.oculto !== true));
   const meta = { ...resto, opcoes: esboco.opcoes.map(({ formas, contato: c, medidas, ...o }) => { void formas; void c; void medidas; return o; }) };
   codigoEmCache ??= codigoDoDesenhista();
-  return createHash('sha256').update(JSON.stringify({ vista, extras, meta, visiveis, desenhista: codigoEmCache })).digest('hex');
+  return createHash('sha256').update(JSON.stringify({ vista, extras, meta, visiveis, motor: MOTOR_DO_PNG, desenhista: codigoEmCache })).digest('hex');
 }
 
 /* As vistas isoladas de uma unidade (`unidade`) ou do esboço inteiro (`unidade` nulo): grava `<nome-do-arquivo>[-unidade-<nome>]
@@ -577,9 +722,8 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, lar
       if (!forcar && gravado === hash && existsSync(destino)) { reaproveitadas.push(true); svgs.push(null); continue; }
       reaproveitadas.push(false);
       navegador ??= await (await import('playwright')).default.chromium.launch();
-      const r = desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes }));
-      const { svg, largura, altura } = escalarSvg(r.svg, r.largura, r.altura, larguraPedida);
-      await svgParaPng(svg, largura, altura, destino, navegador);
+      const r = desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes }), OPCOES_DA_CAMADA);
+      const { svg } = await desenhoParaPng(r, larguraPedida, destino, navegador);
       writeFileSync(`${destino}.hash`, `${hash}\n`);
       svgs.push(svg);
       const e = r.explosao?.find(Boolean);
@@ -674,10 +818,9 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
     for (const v of VISTAS_DA_ANALISE) {
-      const { svg: svg0, largura: l0, altura: a0 } = desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }));
-      const { svg, largura: l, altura } = escalarSvg(svg0, l0, a0, largura ?? LARGURA_DO_CRITICO);
+      const r = desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
       const destino = `${base}-marco-${limiar}-${v}.png`;
-      await svgParaPng(svg, l, altura, destino, navegador);
+      await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
       gerais.push(destino);
     }
   } finally {
