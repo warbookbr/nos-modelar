@@ -1,6 +1,6 @@
 # Pesquisa aberta de 2026-10
 
-Quatro pesquisas abertas, feitas em 2026-10-07 sem contexto do projeto e sem filtro de aplicabilidade, para achar ferramentas, técnicas e ideias que uma pesquisa específica não traria. Os temas foram modelagem por código e paramétrica, geração procedural em jogos e VFX, IA e 3D, e áreas vizinhas (fabricação, robótica, arquitetura, dobradura, simulação). A quinta, de addons do Blender, foi feita por outra IA e está no fim, sem links.
+Quatro pesquisas abertas, feitas em 2026-10-07 sem contexto do projeto e sem filtro de aplicabilidade, para achar ferramentas, técnicas e ideias que uma pesquisa específica não traria. Os temas foram modelagem por código e paramétrica, geração procedural em jogos e VFX, IA e 3D, e áreas vizinhas (fabricação, robótica, arquitetura, dobradura, simulação). A quinta, de addons do Blender, foi feita por outra IA e está no fim, com os links que ela listou à parte, também não conferidos.
 
 A busca na web devolveu pouco em três das quatro pesquisas. Só os itens marcados como vistos na busca, (V) ou (web), e a seção de IA e 3D vieram de resultado de busca; o resto vem do conhecimento prévio do modelo, com links canônicos que não foram abertos. Confira o link antes de citar ou de basear trabalho num item. Este documento é material de partida para escolher o que trazer ao Mecanifica e não autoriza implementação; o que for escolhido entra pela [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e por plano.
 
@@ -250,6 +250,11 @@ Nota de método: a busca web devolveu pouco além de origami computacional, DFM 
 44. Metrologia por escaneamento (CloudCompare, desvio entre malha e CAD) — https://www.cloudcompare.org/ — Mede distância ponto a superfície e mostra mapa de erro colorido. Técnica para medir quanto a peça gerada se afasta de uma referência.
 
 ## Addons do Blender
+
+Links de referência listados pela IA que fez a pesquisa:
+
+- Modelagem e CAD: [CAD Sketcher](https://github.com/hlorus/cad-sketcher) e [site](https://www.blendercad.org/); [CAD Transform](https://github.com/stephenleger/blender-cad-transform); [keKit](https://knekke.gumroad.com/l/kekit) e [documentação](https://ke-post.com/kekit-blender/); [MESHmachine](https://blendermarket.com/products/meshmachine); [Sverchok](https://github.com/nortikin/sverchok); [Tissue](https://github.com/alessandro-zomparelli/tissue); [PolyQuilt](https://github.com/sakana3/PolyQuilt); [EdgeFlow](https://github.com/BenjaminSauder/EdgeFlow); [Mesh Fairing](https://github.com/fedackb/mesh-fairing); [Quad Remesher](https://exoside.com/quadremesher/); [Conform Object](https://blendermarket.com/products/conform-object).
+- Pipeline e ecossistema: [Bonsai BIM](https://bonsaibim.org/) e [IfcOpenShell](https://github.com/IfcOpenShell/IfcOpenShell); [UVPackmaster 3](https://uvpackmaster.com/); [TexTools](https://github.com/franMarz/TexTools-Blender); [Auto-Rig Pro](https://blendermarket.com/products/auto-rig-pro); [FLIP Fluids](https://github.com/rlguy/Blender-FLIP-Fluids); [Pie Menu Editor](https://blendermarket.com/products/pie-menu-editor); [extensões oficiais do Blender](https://extensions.blender.org/).
 
 Documento consolidado a partir de pesquisa técnica exploratória, cobrindo tanto ferramentas de modelagem 3D com foco em precisão, lógica procedural e produtividade adaptável, quanto o panorama geral do ecossistema do Blender.
 
