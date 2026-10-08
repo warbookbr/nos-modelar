@@ -91,6 +91,7 @@
     "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs",
     "roteiros:gerar": "node tools/mapa/roteiros.mjs --gerar",
     "comecar": "node tools/mecanifica/comecar.mjs",
+    "medir:transcricao": "node tools/mecanifica/medir-transcricao.mjs",
     "diario": "node tools/mecanifica/ler-diario.mjs",
     "conferir:referencia": "node tools/mecanifica/conferir-contra-referencia.mjs",
     "guarda:junta": "node tools/mecanifica/guardas/guarda-junta-da-bancada.mjs",

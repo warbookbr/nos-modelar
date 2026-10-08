@@ -3,7 +3,7 @@
 Medição da fatia 1 de [o caminho curto da IA](../planos/2026-10-07-o-caminho-curto-da-ia.md),
 feita sobre as transcrições dos quatro esbocistas do [banco de provas](BANCO-DE-PROVAS.md)
 (carrinho de mão, cadeira de rodas, guarda-roupa e cadeira, nível médio, modo
-objeto, Sonnet). O script lê cada transcrição, soma o uso que a API informa por
+objeto, Sonnet). O script, hoje `npm run medir:transcricao -- <transcrição.jsonl>...`, lê cada transcrição, soma o uso que a API informa por
 turno e atribui o conteúdo de cada resultado de ferramenta à ferramenta e ao
 comando que o produziu, a cerca de 3,5 caracteres por token e 1.600 tokens por
 imagem; as parcelas são estimativa, e os totais por turno são os da API.
