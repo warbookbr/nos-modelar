@@ -5,6 +5,10 @@ import { readFileSync } from 'node:fs';
 
 const ler = (caminho) => readFileSync(new URL(`../../../${caminho}`, import.meta.url), 'utf8');
 const skill = ler('.claude/skills/esboco-detalhado/SKILL.md');
+/* O fluxo de unidades, Envelope, Marcos e crítico por unidade saiu do SKILL.md para `nivel-detalhado.md`, que só o nível
+   detalhado lê; as passagens do fluxo valem pela soma dos dois. */
+const detalhado = ler('.claude/skills/esboco-detalhado/nivel-detalhado.md');
+const fluxo = () => `${secao(skill, 'O fluxo de um esboço grande')}\n${detalhado}`;
 const formato = ler('.claude/skills/esboco-detalhado/resumo-do-formato.md');
 const menosJson = ler('.claude/skills/esboco-detalhado/escrever-menos-json.md');
 const laco = ler('.claude/skills/laco-do-esboco/SKILL.md');
@@ -32,7 +36,7 @@ describe('a skill esboco-detalhado', () => {
   });
 
   it('descreve o fluxo na ordem e o Condutor, sem citar objeto', () => {
-    const f = secao(skill, 'O fluxo de um esboço grande');
+    const f = fluxo();
     expect(f).not.toMatch(OBJETOS);
     const ordem = ['Primeiro o contrato', 'medidas da referência', 'por subsistema', 'a montagem do conjunto', 'Conferência da maquete', 'crítico sem contexto', 'à pessoa'];
     let ultimo = -1;
@@ -48,7 +52,7 @@ describe('a skill esboco-detalhado', () => {
   });
 
   it('manda conferir contra a referência quando há foto e despachar o crítico visual cego no Marco, sem citar objeto', () => {
-    const f = secao(skill, 'O fluxo de um esboço grande');
+    const f = fluxo();
     for (const termo of ['--medidas-da-referencia', 'origem: "referencia"', '--referencia', 'plano.referencia', '--envelope', 'plano.envelope', 'agente `critico-visual` cego', 'sem o JSON, o plano nem o histórico']) expect(f, termo).toContain(termo);
     expect(f).toMatch(/nesse Marco a skill .{0,60}laco-do-esboco.{0,60} despacha/);
     for (const termo of ['--referencia', '--medidas-da-referencia', '--envelope', 'crítico visual cego']) expect(pare, termo).toContain(termo);
@@ -78,7 +82,7 @@ describe('a skill esboco-detalhado', () => {
     expect(skill).toContain('escrever-menos-json.md');
     for (const termo of ['estilos', 'unidades', 'simetrico', '`lado: "E"`', '"gerar": "estrela"', '"gerar": "arco"', '"gerar": "circulo"', '"gerar": "polar"', '--editar', '--remover', '--adicionar']) expect(menosJson, termo).toContain(termo);
     expect(skill).toContain('--unidade <unidade>');
-    expect(skill).toContain('substitui');
+    expect(detalhado).toContain('substitui');
   });
 });
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-938 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+932 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -341,8 +341,6 @@
 
 ## docs/mecanifica/roteiros/
 
-- `ROTEIROS.md` — Roteiros de leitura por intenção
-- `ROTEIROS.md` — Roteiros de leitura por intenção
 - `ROTEIROS.md` — Roteiros de leitura por intenção
 
 ## docs/mecanifica/usar/
@@ -958,8 +956,6 @@
 - `gates-bateria-curta.test.mjs` — gates-bateria-curta.test.mjs — a bateria curta só roda quando tudo o que mudou é peça ou documento; qualquer outro arquivo, ou não saber o que mudou, roda to…
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
 - `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
-- `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
-- `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.
@@ -967,8 +963,6 @@
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
-- `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
-- `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 

@@ -112,7 +112,13 @@ esboço fica mais barato pelo que a medição mostrar.
    aberta, porque ela tinha sido entregue sem ser marcada aqui.
 5. O `CLAUDE.md` como roteador, as regras verificáveis convertidas em gate, as
    recusas apontando o tópico, o registro de uso e as descrições das skills
-   enxutas.
+   enxutas. Feita em 2026-10-08: o `CLAUDE.md` traz a lista dos roteiros e as
+   regras gerados do `roteiros.json`, a regra do núcleo sem Three.js virou
+   teste, as recusas do esboço terminam com o tópico do `--ajuda`, o uso fica em
+   `.diario/uso.jsonl` (`npm run uso`), as descrições têm teto de 250
+   caracteres, o `--ajuda` de um `##` lista os subtópicos em vez de trazê-los, a
+   parte do nível detalhado saiu da skill do esboço e a leitura de cada roteiro
+   ficou abaixo da linha de base, com o gate conferindo.
 6. Os quatro objetos refeitos e o fechamento.
 
 ## Riscos e desvios
