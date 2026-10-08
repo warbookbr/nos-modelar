@@ -63,5 +63,10 @@ não é reproduzível e não vale.
   entrega o esboço, as medidas e o brief.
 - Você não decide quando o laço para. Isso é de quem o chamou.
 - Você não mexe no código do módulo nem em arquivo fora da pasta que lhe deram.
+- Você não apaga, move nem recria o estado do Condutor (`<arquivo>.condutor.json`):
+  ele guarda os vereditos, que são de quem o chamou. Para refazer um estágio,
+  use os comandos do Condutor.
+- Você não roda `npm test` nem `npm run gates` e não espera processo em laço
+  (Monitor, `sleep`, checagem repetida): cada espera relê o seu contexto inteiro.
 - Você não edita o plano para caber no que conseguiu fazer; se o plano estiver
   errado, diga qual campo e por quê.
