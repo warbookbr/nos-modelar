@@ -2,15 +2,14 @@
 
 ## Estado
 
-**Plano ativo:** [O caminho curto da IA](2026-10-07-o-caminho-curto-da-ia.md).
+**Plano ativo:** [As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md).
 
-A entrada da IA por intenção, com os roteiros sob demanda, o passo seguinte lido
-do estado do trabalho, a página de invariantes sempre lida e as regras
-verificáveis convertidas em gate, e o esboço mais barato pelo que a medição de
-onde vão os tokens mostrar.
-
-Em rascunho, para depois dele: [perguntas do crítico por componente e por família
-de objeto](2026-10-08-perguntas-do-critico-por-objeto.md).
+Um núcleo só com níveis de detalhe, o esboço como nível zero, a camada de
+features, casca, chapa, articulações e barras, a verificação ancorada e o crítico
+calibrado. Voltou em
+2026-10-08, quando [o caminho curto da IA](encerrados/2026-10-07-o-caminho-curto-da-ia.md)
+fechou, com a casca na fatia 2 para a caçamba do carrinho de mão. Em rascunho:
+[o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 

@@ -8,7 +8,8 @@
  * (`docs/mecanifica/banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md`), e a fatia 6 do caminho curto a repete para comparar.
  *
  * As partes são estimadas: texto vale um token a cada 3,5 caracteres e cada imagem vale TOKENS_POR_IMAGEM. Os turnos e a
- * entrada somada vêm do `usage` da API e são exatos. */
+ * entrada somada vêm do `usage` da API e são exatos, e a entrada vem também dividida em nova, gravada no cache e lida do
+ * cache, porque a leitura de cache custa uma fração da entrada nova e a mesma soma de tokens pode custar bem diferente. */
 import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -42,8 +43,8 @@ export function etapaDaChamada(nome, entrada = {}) {
 
 const tokensDeTexto = (texto) => String(texto ?? '').length / CARACTERES_POR_TOKEN;
 
-/* A medição de uma transcrição, dada como texto JSONL: { turnos, entradaSomada, saida, contextoFinal, etapas: { etapa: {
-   tokens, chamadas } } }. Uma mensagem da API que aparece em várias linhas (uma por bloco) conta uma vez. */
+/* A medição de uma transcrição, dada como texto JSONL: { turnos, entradaSomada, entradaNova, cacheGravado, cacheLido,
+   saida, contextoFinal, etapas: { etapa: { tokens, chamadas } } }. Uma mensagem da API que aparece em várias linhas (uma por bloco) conta uma vez. */
 export function medirTranscricao(jsonl) {
   const vistos = new Set();
   const etapaPorChamada = new Map();
@@ -54,6 +55,7 @@ export function medirTranscricao(jsonl) {
     etapas.set(etapa, e);
   };
   let turnos = 0; let entradaSomada = 0; let saida = 0; let contextoFinal = 0;
+  let entradaNova = 0; let cacheGravado = 0; let cacheLido = 0;
   for (const linha of jsonl.split('\n')) {
     if (!linha.trim()) continue;
     const d = JSON.parse(linha);
@@ -65,6 +67,7 @@ export function medirTranscricao(jsonl) {
         const u = m.usage ?? {};
         const total = (u.input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0);
         turnos += 1; entradaSomada += total; saida += u.output_tokens ?? 0; contextoFinal = total;
+        entradaNova += u.input_tokens ?? 0; cacheGravado += u.cache_creation_input_tokens ?? 0; cacheLido += u.cache_read_input_tokens ?? 0;
       }
       for (const b of Array.isArray(m.content) ? m.content : []) {
         if (b?.type === 'tool_use') {
@@ -88,7 +91,7 @@ export function medirTranscricao(jsonl) {
       }
     }
   }
-  return { turnos, entradaSomada, saida, contextoFinal, etapas: Object.fromEntries([...etapas].sort((a, b) => b[1].tokens - a[1].tokens)) };
+  return { turnos, entradaSomada, entradaNova, cacheGravado, cacheLido, saida, contextoFinal, etapas: Object.fromEntries([...etapas].sort((a, b) => b[1].tokens - a[1].tokens)) };
 }
 
 const inteiro = (n) => Math.round(n).toLocaleString('pt-BR');
@@ -98,6 +101,7 @@ export function textoDaMedicao(medicoes) {
   const soma = new Map();
   for (const { nome, medicao: m } of medicoes) {
     linhas.push(`== ${nome}: ${m.turnos} turnos, contexto final ${inteiro(m.contextoFinal)}, entrada somada ${inteiro(m.entradaSomada)}, saída ${inteiro(m.saida)}`);
+    linhas.push(`   entrada: nova ${inteiro(m.entradaNova ?? 0)}, gravada no cache ${inteiro(m.cacheGravado ?? 0)}, lida do cache ${inteiro(m.cacheLido ?? 0)}`);
     for (const [etapa, { tokens, chamadas }] of Object.entries(m.etapas)) {
       linhas.push(`   ${etapa.padEnd(40)} ${inteiro(tokens).padStart(9)} tok  (${chamadas} chamadas)`);
       soma.set(etapa, (soma.get(etapa) ?? 0) + tokens);

@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [o caminho curto da IA](planos/2026-10-07-o-caminho-curto-da-ia.md).
+- Plano **ativo**: [as ferramentas de modelagem](planos/2026-10-07-as-ferramentas-de-modelagem.md).
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
@@ -135,11 +135,9 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [o caminho curto da IA](planos/2026-10-07-o-caminho-curto-da-ia.md), aberto em 2026-10-07; [as ferramentas de modelagem](planos/congelados/2026-10-07-as-ferramentas-de-modelagem.md) ficou congelado com a fatia 1 entregue, e [o catálogo de famílias](planos/encerrados/2026-10-06-o-catalogo-de-familias.md) foi cancelado; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) seguem congeladas. Rascunho aberto: [o que o
-  braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
-  resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
-  o modelador inverso, de que dependem nova geometria, corpus de priors, fitting
-  e MCP de edição, e o vocabulário poligonal da bancada.
+- O plano ativo, o rascunho aberto e os congelados estão em
+  [`planos/README.md`](planos/README.md) e na pasta
+  [`congelados/`](planos/congelados/README.md).
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
   Medida e critérios em `planos/BACKLOG.md`.
 

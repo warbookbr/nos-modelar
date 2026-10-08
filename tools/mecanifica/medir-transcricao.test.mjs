@@ -21,6 +21,7 @@ describe('medirTranscricao', () => {
   it('conta turnos e entrada pelo usage, uma vez por mensagem, e reparte o resto por etapa', () => {
     const m = medirTranscricao(TRANSCRICAO);
     expect(m).toMatchObject({ turnos: 2, entradaSomada: 1000 + 1150, saida: 30, contextoFinal: 1150 });
+    expect(m).toMatchObject({ entradaNova: 150, cacheGravado: 0, cacheLido: 2000 });
     expect(m.etapas['comando esboco --ajuda']).toEqual({ tokens: 70 / CARACTERES_POR_TOKEN, chamadas: 1 });
     expect(m.etapas['imagem aberta']).toEqual({ tokens: TOKENS_POR_IMAGEM, chamadas: 1 });
     expect(m.etapas['texto da IA'].tokens).toBe(7 / CARACTERES_POR_TOKEN);
@@ -40,6 +41,7 @@ describe('medirTranscricao', () => {
     const m = medirTranscricao(TRANSCRICAO);
     const texto = textoDaMedicao([{ nome: 'a', medicao: m }, { nome: 'b', medicao: m }]);
     expect(texto).toContain('== a: 2 turnos, contexto final 1.150, entrada somada 2.150, saída 30');
+    expect(texto).toContain('   entrada: nova 150, gravada no cache 0, lida do cache 2.000');
     expect(texto).toContain('== soma das 2 transcrições');
     expect(texto).toMatch(/imagem aberta +3\.200 tok +[\d.]+%/);
   });

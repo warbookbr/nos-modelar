@@ -1,0 +1,6 @@
+{"vista":"isometrica","plano":{"nivel":"esquematico"},"contato":{"usar":false},
+"opcoes":[{"titulo":"loft vazado","formas":[
+{"id":"bacia","tipo":"loft","eixo":"y","secoes":[
+ {"pos":0,"forma":"poligono","perfil":[[-100,-100],[100,-100],[100,100],[-100,100],[-100,60],[60,60],[60,-60],[-100,-60]]},
+ {"pos":100,"forma":"poligono","perfil":[[-150,-150],[150,-150],[150,150],[-150,150],[-150,110],[110,110],[110,-110],[-150,-110]]}]}
+]}]}

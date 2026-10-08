@@ -13,8 +13,9 @@ ombro refeito e fixado.
 
 **Condição de descongelamento:** a pessoa decidir. O plano
 [o esboço detalhado coerente](../encerrados/2026-10-01-o-esboco-detalhado-coerente.md)
-fechou em 2026-10-06 e o plano ativo passou a ser
-[o caminho curto da IA](../2026-10-07-o-caminho-curto-da-ia.md).
+fechou em 2026-10-06; depois dele vieram [o caminho curto da
+IA](../encerrados/2026-10-07-o-caminho-curto-da-ia.md) e [as ferramentas de
+modelagem](../2026-10-07-as-ferramentas-de-modelagem.md).
 
 **O que a união deixou para este plano:** o ombro de coluna unida ao braço está
 fixo na montagem. O inventário do que cada parte restante pede ao núcleo está no

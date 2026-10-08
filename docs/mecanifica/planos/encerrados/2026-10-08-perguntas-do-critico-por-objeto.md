@@ -1,11 +1,15 @@
 # Perguntas do crítico por componente e por família de objeto
 
-**Estado:** rascunho
+**Estado:** cancelado
+
+**Por que foi cancelado:** absorvido, em 2026-10-08, pela fatia do crítico calibrado
+de [as ferramentas de modelagem](../2026-10-07-as-ferramentas-de-modelagem.md),
+que já previa calibrar o crítico e criar famílias de objeto. A linha de base e o
+rascunho das perguntas abaixo são a entrada daquela fatia.
 
 **Responsável:** Claude, com o aceite da pessoa
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, a `main` depois do fechamento de
-[o caminho curto da IA](2026-10-07-o-caminho-curto-da-ia.md)
+**Repositório e base:** `warbookbr/nos-mecanifica`, sobre a `main`
 
 ## Problema observado
 
@@ -143,4 +147,4 @@ seguir. O controle da linha de base não mostrou isso, mas foi um caso só.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Cancelado sem código, por absorção; ver o motivo no topo.

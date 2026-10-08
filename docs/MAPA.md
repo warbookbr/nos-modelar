@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-933 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+935 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -105,6 +105,7 @@
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
+- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
@@ -140,6 +141,10 @@
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 - `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
+
+## docs/mecanifica/banco-de-provas/carrinho-refeito-2026-10-08/
+
+- `ATRITOS.md` — Atritos
 
 ## docs/mecanifica/gerado/
 
@@ -214,8 +219,7 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-10-07-o-caminho-curto-da-ia.md` — O caminho curto da IA
-- `2026-10-08-perguntas-do-critico-por-objeto.md` — Perguntas do crítico por componente e por família de objeto
+- `2026-10-07-as-ferramentas-de-modelagem.md` — As ferramentas de modelagem
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -250,7 +254,6 @@
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
-- `2026-10-07-as-ferramentas-de-modelagem.md` — As ferramentas de modelagem
 - `README.md` — Planos congelados
 
 ## docs/mecanifica/planos/encerrados/
@@ -324,6 +327,8 @@
 - `2026-09-29-o-esboco-sem-conta-a-mao.md` — O esboço sem conta à mão
 - `2026-10-01-o-esboco-detalhado-coerente.md` — O esboço detalhado coerente
 - `2026-10-06-o-catalogo-de-familias.md` — O catálogo de famílias
+- `2026-10-07-o-caminho-curto-da-ia.md` — O caminho curto da IA
+- `2026-10-08-perguntas-do-critico-por-objeto.md` — Perguntas do crítico por componente e por família de objeto
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

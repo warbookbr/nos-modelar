@@ -62,7 +62,7 @@ revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo 
 o braço robótico, em `procedural/pecas/braco-robotico/`. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem. O plano ativo é
-[o caminho curto da IA](docs/mecanifica/planos/2026-10-07-o-caminho-curto-da-ia.md).
+[as ferramentas de modelagem](docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md).
 
 ## Peças são exemplos
 

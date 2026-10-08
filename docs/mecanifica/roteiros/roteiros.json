@@ -104,9 +104,13 @@
         "CLAUDE.md",
         "docs/mecanifica/INDEX.md",
         "docs/mecanifica/planos/README.md",
-        "docs/mecanifica/planos/2026-10-07-o-caminho-curto-da-ia.md"
+        "docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md"
       ],
       "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md",
+          "quando": "a fatia do plano ativo pede o que já existe, as referências ou o que vem depois"
+        },
         {
           "arquivo": "comunicacao.md",
           "quando": "há tarefa aberta com a outra IA"

@@ -70,3 +70,7 @@ não é reproduzível e não vale.
   (Monitor, `sleep`, checagem repetida): cada espera relê o seu contexto inteiro.
 - Você não edita o plano para caber no que conseguiu fazer; se o plano estiver
   errado, diga qual campo e por quê.
+- Você não gera o JSON por script (Python, Node ou outro): o script grava
+  números que não acompanham os parâmetros e fica fora do que o gate confere.
+  Quando o esboço não tiver a forma que o objeto pede, anote o atrito com o
+  comando da recusa e faça a aproximação mais simples que o módulo aceita.
