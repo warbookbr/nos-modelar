@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-914 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+917 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1062,6 +1062,9 @@
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
+- `esboco-ajuda.mjs` — A referência do JSON do esboço por tópico: `npm run esboco -- --ajuda [tópico]`. A fonte é o README do módulo. Os tópicos saem dos títulos `##` e `###` dele …
+- `esboco-ajuda.test.mjs` — esboco-ajuda.test.mjs — o `--ajuda [tópico]` do esboço: o índice cobre todos os títulos do README, cada tópico devolve só a sua seção, o tópico desconhecido …
+- `esboco-composta.test.mjs` — esboco-composta.test.mjs — o `--composta` do esboço: uma imagem só com as quatro vistas sem legenda em grade 2x2, 1100 px de largura no total, cada quadrante…
 - `esboco-referencia.mjs` — Lê as referências do esboço para o módulo `modulos/esboco`, que não lê arquivo: um JSON de contornos da imagem (`mecanifica.contornos@1`, o que `npm run cont…
 - `esboco.mjs` — Linha de comando do esboço: lê `<nome>.esboco.json`, desenha as opções lado a lado com modulos/esboco e grava `<nome>.svg` e `<nome>.png` ao lado. Uso: npm r…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.

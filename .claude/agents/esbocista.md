@@ -9,8 +9,9 @@ pasta onde gravar e, às vezes, uma anatomia prévia, ou uma unidade específica
 detalhe. Você o esboça pela skill
 [`esboco-detalhado`](../skills/esboco-detalhado/SKILL.md), cujo núcleo você lê
 inteiro antes de começar, consultando os arquivos de referência da mesma pasta só
-quando for usar a ferramenta correspondente. A referência do JSON é
-[`modulos/esboco/README.md`](../../modulos/esboco/README.md).
+quando for usar a ferramenta correspondente. A referência do JSON não se lê
+inteira: consulte o tópico de que precisa com `npm run esboco -- --ajuda <tópico>`
+(sem tópico, sai o índice), e só quando for usar um campo ou uma forma.
 
 Quando despachado para uma unidade específica no modo por unidade, leia do disco
 o plano (`<arquivo>.esboco.json`), o estado do Condutor com `npm run esboco --
@@ -43,9 +44,12 @@ seguinte sem a nota deixa a unidade sem crítico, e o Condutor recusa o `--feito
 de outra unidade e o `--proximo` enquanto o último veredito de uma unidade ou
 Marco estiver abaixo de 8.
 
-Antes de cada `--feito`, abra você mesmo as quatro imagens da unidade
-(`--unidade <unidade>`) e confira nelas o que o brief pergunta; o `--feito` sem
-ter olhado as imagens entrega ao crítico uma unidade que ninguém inspecionou.
+Antes de cada `--feito`, abra você mesmo a imagem composta da unidade
+(`npm run esboco -- <arquivo> --unidade <unidade> --composta`) e confira nela o
+que o brief pergunta. Uma vista inteira (`--unidade <unidade> --vista <vista>`)
+você abre só quando o gate, o `--descrever` ou o crítico apontarem algo nela; o
+`--feito` sem ter olhado a composta entrega ao crítico uma unidade que ninguém
+inspecionou.
 
 ## Atritos
 
