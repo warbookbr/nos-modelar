@@ -71,8 +71,8 @@ dessa pasta e recusa pasta chamada `motor`.
 
 [Nada depende da
 bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md) fechou em
-2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado em
-`procedural/pecas/ACERVO-SEM-PECA.md`.
+2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado num
+`ACERVO-SEM-PECA.md` que saiu quando o braço repovoou o acervo.
 
 O [que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) é
 **rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como

@@ -32,7 +32,7 @@ foram apagados. O único teste condicional restante é a rodada visual real do
 MCP, que depende de navegador/ambiente externo e não é um gate de catálogo.
 
 Em 2026-09-22 a última peça de acervo saiu e o acervo ficou sem peça, declarado
-em `procedural/pecas/ACERVO-SEM-PECA.md`. A remoção acusou oito
+num `ACERVO-SEM-PECA.md` que saiu quando o braço repovoou o acervo. A remoção acusou oito
 arquivos que ainda dependiam de conteúdo: quatro travavam censo do acervo por
 número, três pediam a peça pelo nome e a régua da própria fixture usava a peça
 de acervo como calibrador. Todos passaram a LER o acervo em vez de nomear peça,

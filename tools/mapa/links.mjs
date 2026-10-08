@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* links.mjs — o gate de referência: varre todo arquivo rastreado por menções a
-   `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o
+   `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho
+   com barra, não prosa solta) e reprova quando o
    caminho citado não resolve. Duas zonas, dois rigores: ZONA VIVA (todo
    arquivo fora de `docs/nos-herdado/`) exige resolução EXATA; ZONA HISTÓRICA
    (arquivos sob `docs/nos-herdado/`) aceita resolução por NOME de arquivo em
@@ -26,9 +27,12 @@ const EXTS = new Set(['.md', '.js', '.mjs', '.ts', '.html', '.json']);
 // o próprio verificador cita, em comentário, os caminhos da allowlist — não se auto-varre.
 const IGNORAR = new Set(['tools/mapa/links.mjs']);
 
-/* Caminho no formato docs/<...>.md — exige barra depois de "docs" pra não
-   capturar menção solta a nome de arquivo em prosa (ex.: "veja o LORE.md"). */
-const PADRAO = /\bdocs\/[A-Za-z0-9_.\-\/]+\.md\b/g;
+/* Caminho no formato <pasta>/<...>.md — exige barra depois da pasta pra não
+   capturar menção solta a nome de arquivo em prosa (ex.: "veja o LORE.md").
+   Até 2026-10-08 só `docs/` era conferido, e o README da raiz citou por semanas
+   `procedural/pecas/ACERVO-SEM-PECA.md`, que tinha saído quando o braço
+   repovoou o acervo; as outras pastas do repositório entraram nessa data. */
+const PADRAO = /\b(?:docs|procedural|modulos|tools|src)\/[A-Za-z0-9_.\-\/]+\.md\b/g;
 
 /* Allowlist fechada por par arquivo→referência, com o motivo. As entradas da
    limpeza são históricas e específicas: o arquivo citado existiu no histórico

@@ -49,10 +49,14 @@ para a direção de composição.
 
 ## Ferramentas centrais
 
-Duas ferramentas que vale nomear aqui porque não são óbvias pelo nome do
+Três ferramentas que vale nomear aqui porque não são óbvias pelo nome do
 arquivo, e `docs/mecanifica/INDEX.md` (ver "Desenvolvimento" abaixo) tem o
 resto:
 
+- **esboço** (`npm run esboco`, skills `esboco-detalhado` e `laco-do-esboco`)
+  — desenha o objeto inteiro em formas primitivas a partir de um JSON, com gate
+  de contato, Condutor por estágios e crítico cego, antes da peça procedural; a
+  referência do JSON se consulta por tópico com `npm run esboco -- --ajuda`;
 - **motor de prancha** (`tools/mecanifica/prancha/prancha.mjs`, skill
   `desenhar-prancha`) — desenha o CONTORNO de referência de um invólucro em 2D
   (vistas lateral, frontal, traseira, superior), antes de existir geometria 3D,
@@ -169,9 +173,8 @@ Os nomes enganam de propósito pouco: um nome como `roda-dianteira` soa
 definitivo, e não é. Medidas e proporções são escolhidas para fazer uma
 capacidade passar ou falhar, e não para descrever um componente real. O acervo
 já teve cinquenta peças com nomes assim, e todas foram apagadas quando deixaram
-de provar alguma coisa. Hoje ele está sem peça, declarado em
-`procedural/pecas/ACERVO-SEM-PECA.md`, e as ferramentas se provam
-contra a peça de prova em `tools/fixtures/acervo/`.
+de provar alguma coisa. Hoje ele tem o braço robótico, e as guardas de
+navegador se provam contra a peça de prova em `tools/fixtures/acervo/`.
 
 O que este repositório sustenta é **o núcleo e as capacidades provadas**. A
 geometria das peças pode mudar ou ser removida a qualquer momento, sem aviso e
