@@ -34,7 +34,6 @@ Ler antes de começar, num orçamento de 67.000 bytes (linha de base de 59.061 b
 Abrir só quando a condição aparecer:
 
 - `comunicacao.md`, quando há tarefa aberta com a outra IA.
-- `docs/mecanifica/COORDENACAO-LOCAL.md`, quando o trabalho em paralelo toca núcleo, plano, atrito ou identidade.
 - `docs/mecanifica/ARQUITETURA.md`, quando a mudança atravessa camadas.
 - `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS.
 

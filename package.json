@@ -35,7 +35,6 @@
     "mcp:check": "vitest run tools/mcp/mcp.test.mjs tools/mcp/procedural.test.mjs tools/mcp/perfis/autoria-execucao.test.mjs tools/mcp/perfis/parametros.test.mjs",
     "mcp:ensaio": "vitest run tools/mcp/ensaio-ponta-a-ponta.test.mjs",
     "test:watch": "vitest",
-    "coord": "node tools/coordenacao/coord.mjs",
     "bancada": "node tools/mecanifica/olhar-bancada.mjs",
     "bancada:tela": "node tools/mecanifica/olhar-bancada.mjs --tela",
     "etapas": "node tools/mecanifica/etapas-da-montagem.mjs",

@@ -77,10 +77,6 @@
           "quando": "há tarefa aberta com a outra IA"
         },
         {
-          "arquivo": "docs/mecanifica/COORDENACAO-LOCAL.md",
-          "quando": "o trabalho em paralelo toca núcleo, plano, atrito ou identidade"
-        },
-        {
           "arquivo": "docs/mecanifica/ARQUITETURA.md",
           "quando": "a mudança atravessa camadas"
         },

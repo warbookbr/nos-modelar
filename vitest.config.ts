@@ -10,7 +10,7 @@ export default defineConfig({
 
        Aquele arquivo mudou de casa para warbookbr/mecanica junto com o produto,
        mas a regra continua servindo a seis outros, entre eles
-       `tools/bancadas/criar-aliases.test.mjs` e `tools/coordenacao/coord.test.mjs`. */
+       `tools/bancadas/criar-aliases.test.mjs`. */
     include: [
       'src/**/*.test.js', 'src/**/*.test.mjs',
       /* `.test.ts` entrou aqui em 2026-09-22, quando os testes do núcleo vieram

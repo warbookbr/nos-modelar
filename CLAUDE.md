@@ -14,9 +14,8 @@ da tarefa. Não é preciso ler o INDEX nem os planos para isso.
 
 **Vai mudar o Mecanifica** (núcleo, gates, arquitetura, ferramenta, plano):
 leia `docs/mecanifica/INDEX.md` e `docs/mecanifica/planos/README.md`. Sem plano
-ativo, o backlog não autoriza implementação. Se tocar núcleo, plano, atrito ou
-identidade em trabalho paralelo, leia a coordenação local, consulte a inbox e
-reserve arquivos.
+ativo, o backlog não autoriza implementação. O trabalho dividido com outra IA
+neste repositório passa por `comunicacao.md`, com uma tarefa por seção.
 
 **Procurando o que já foi feito:** `docs/mecanifica/historico/README.md` e
 `docs/mecanifica/planos/encerrados/`. Serve de evidência e não governa trabalho

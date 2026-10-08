@@ -4,10 +4,9 @@ Comece por [`docs/mecanifica/INDEX.md`](docs/mecanifica/INDEX.md). Ele define o
 estado atual, as fontes de verdade e a leitura necessária. Não leia todo o
 histórico por padrão.
 
-Antes de alterar núcleo procedural, planos, atritos ou identidades enquanto
-`brigsd/nos-mecanifica` estiver ativo, leia `docs/mecanifica/COORDENACAO-LOCAL.md`,
-consulte a inbox e reserve arquivos antes de editar. Use
-`docs/mecanifica/COORDENACAO-REPOS.md` para decisões duráveis.
+O trabalho dividido entre duas IAs neste repositório passa por
+`comunicacao.md`. Decisões duráveis com `brigsd/nos-mecanifica` seguem
+`docs/mecanifica/COORDENACAO-REPOS.md`.
 
 ## Fonte de verdade
 

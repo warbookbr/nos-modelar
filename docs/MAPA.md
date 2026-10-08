@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-921 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+918 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -109,7 +109,6 @@
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
-- `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
@@ -862,11 +861,6 @@
 ## tools/catalogo/
 
 - `gerar-catalogo-capacidades.mjs` — Gera projeções publicáveis. O motor permanece puro; somente esta borda lê e escreve disco.
-
-## tools/coordenacao/
-
-- `coord.mjs` — coord.mjs — caixa postal local, econômica e sem dependências para coordenar agentes em repositórios diferentes sem carregar histórico ou diffs inteiros.
-- `coord.test.mjs` — coord.test.mjs — prova mensagens imutáveis, leitura econômica, confirmações independentes e bloqueio de reservas sobrepostas do canal entre agentes.
 
 ## tools/fixtures/
 
