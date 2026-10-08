@@ -26,10 +26,9 @@ hora certa. Os documentos abaixo são o contrato que as skills aplicam.
 
 ## Leitura obrigatória antes de gerar forma
 
-São onze arquivos. A lista que vale mora em `tools/mapa/leitura-obrigatoria.mjs`
-e o gate de mesmo nome a confere; `npm run leitura:obrigatoria` imprime os onze
-com tamanho e total. Aqui ficam só os que precisam de contexto para serem
-usados, porque lista repetida em dois lugares envelhece em duas velocidades.
+A lista que vale é a do roteiro `modelar/peca`, em `docs/mecanifica/roteiros/`,
+e o gate `leitura:obrigatoria` a confere contra o orçamento. Aqui ficam só os
+que precisam de contexto, porque lista repetida envelhece em duas velocidades.
 
 [`LACO-VISUAL.md`](LACO-VISUAL.md) reúne as quatro regras que valem em qualquer
 tarefa que produza forma: olhar o PNG, sobrepor ao alvo, despachar o crítico sem

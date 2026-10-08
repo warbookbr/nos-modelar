@@ -1,0 +1,396 @@
+{
+  "versao": 1,
+  "descricao": "Os invariantes, que valem para toda intenção, e os roteiros de leitura por intenção. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que INVARIANTES.md e ROTEIROS.md estão gerados deste arquivo (npm run roteiros:gerar). A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento começou nessa leitura mais a página de invariantes, com uns 10% de folga para a edição do dia a dia (o de modelar/peca ficou no teto de 70 mil já acordado), e só desce.",
+  "invariantes": [
+    {
+      "id": "idioma",
+      "texto": "Escreva em pt-BR, em parágrafos corridos e literais, e responda curto, dizendo cada fato uma vez.",
+      "gate": null
+    },
+    {
+      "id": "nucleo-independente",
+      "texto": "O núcleo de autoria é independente de Three.js e do domínio automotivo.",
+      "gate": null
+    },
+    {
+      "id": "identidade",
+      "texto": "IDs internos, índices de arrays e posições de passos nunca são identidade persistida.",
+      "gate": null
+    },
+    {
+      "id": "conteudo-salvo",
+      "texto": "Conteúdo salvo é determinístico, versionado, reexecutável e validável.",
+      "gate": null
+    },
+    {
+      "id": "forma",
+      "texto": "Nenhuma métrica aprova forma sozinha: a peça se modela e se revisa na bancada neutra antes de ir ao produto, e quem aprova forma é a pessoa.",
+      "gate": null
+    },
+    {
+      "id": "plano",
+      "texto": "Sem plano ativo, o backlog não autoriza implementação, e histórico ou plano encerrado não governa trabalho novo, nem por citação nem por analogia.",
+      "gate": null
+    },
+    {
+      "id": "escopo",
+      "texto": "Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de produto.",
+      "gate": null
+    },
+    {
+      "id": "upstream",
+      "texto": "Mudança geral que possa voltar ao NÓS fica isolada e registrada em docs/mecanifica/UPSTREAM-NOS.md.",
+      "gate": null
+    },
+    {
+      "id": "mapa",
+      "texto": "docs/MAPA.md não se edita à mão: depois de mexer em documentação, rode npm run mapa.",
+      "gate": "mapa:check"
+    },
+    {
+      "id": "gates",
+      "texto": "Antes de enviar, rode npm run gates, que escolhe a bateria curta quando só mudou peça ou documento e a completa nos outros casos.",
+      "gate": null
+    },
+    {
+      "id": "achado",
+      "texto": "Todo achado responde se o processo o teria pego sozinho, e quando não, o que falta vira gate, campo ou instrução antes de a correção ser dada por pronta.",
+      "gate": null
+    }
+  ],
+  "roteiros": [
+    {
+      "id": "mudar",
+      "intencao": "trabalhar no projeto",
+      "titulo": "Mudar o Mecanifica",
+      "quando": "Mudar núcleo, gate, arquitetura, ferramenta ou plano.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/INDEX.md",
+        "docs/mecanifica/planos/README.md",
+        "docs/mecanifica/planos/2026-10-07-o-caminho-curto-da-ia.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "comunicacao.md",
+          "quando": "há tarefa aberta com a outra IA"
+        },
+        {
+          "arquivo": "docs/mecanifica/COORDENACAO-LOCAL.md",
+          "quando": "o trabalho em paralelo toca núcleo, plano, atrito ou identidade"
+        },
+        {
+          "arquivo": "docs/mecanifica/ARQUITETURA.md",
+          "quando": "a mudança atravessa camadas"
+        },
+        {
+          "arquivo": "docs/mecanifica/UPSTREAM-NOS.md",
+          "quando": "a mudança é geral e pode voltar ao NÓS"
+        }
+      ],
+      "skill": null,
+      "comandos": [
+        "npm run gates",
+        "npm run mapa"
+      ],
+      "conferido": "npm run gates, com a bateria completa quando muda código.",
+      "orcamentoBytes": 67000,
+      "linhaDeBase": {
+        "bytes": 59061,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "documentar",
+      "intencao": "trabalhar na documentação",
+      "titulo": "Escrever ou reorganizar documentação",
+      "quando": "Escrever, mover ou cortar documento, fora de um plano.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/INDEX.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/planos/README.md",
+          "quando": "o documento é um plano"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "o documento é de uso, em docs/mecanifica/usar/"
+        },
+        {
+          "arquivo": "docs/mecanifica/historico/README.md",
+          "quando": "o documento vai para o histórico"
+        }
+      ],
+      "skill": null,
+      "comandos": [
+        "npm run mapa",
+        "npm run gates"
+      ],
+      "conferido": "npm run gates, que roda os gates de documentação (links, sumário, estrutura, citações e mapa).",
+      "orcamentoBytes": 17000,
+      "linhaDeBase": {
+        "bytes": 13635,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "pesquisar",
+      "intencao": "pesquisar",
+      "titulo": "Procurar o que já foi feito ou pesquisado",
+      "quando": "Saber o que já se tentou, mediu ou pesquisou antes de propor algo.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/historico/README.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/planos/encerrados/README.md",
+          "quando": "a pergunta é sobre um plano concluído ou cancelado"
+        },
+        {
+          "arquivo": "docs/mecanifica/PESQUISA-ABERTA-2026-10.md",
+          "quando": "a pergunta é sobre ferramentas de outros projetos"
+        },
+        {
+          "arquivo": "docs/mecanifica/FERRAMENTAS-POR-OBJETO.md",
+          "quando": "a pergunta é que ferramenta cada objeto pede"
+        },
+        {
+          "arquivo": "docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md",
+          "quando": "a pergunta é quanto custou modelar um objeto"
+        },
+        {
+          "arquivo": "docs/mecanifica/ANALISES-DE-2026-10.md",
+          "quando": "a pergunta é sobre a avaliação da estrutura do projeto"
+        }
+      ],
+      "skill": null,
+      "comandos": [],
+      "conferido": "Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.",
+      "orcamentoBytes": 12000,
+      "linhaDeBase": {
+        "bytes": 8948,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/peca",
+      "intencao": "modelar",
+      "titulo": "Criar ou refinar uma peça procedural",
+      "quando": "Escrever ou corrigir a receita de uma peça e prová-la na bancada.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/usar/README.md",
+        "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
+        "docs/mecanifica/usar/LACO-VISUAL.md",
+        ".claude/skills/criar-peca/SKILL.md",
+        "docs/mecanifica/usar/AUTORIA-DE-PECA.md",
+        "docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md",
+        "docs/mecanifica/usar/INTENCAO-PECA-V1.md",
+        "docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md",
+        "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": ".claude/skills/criar-peca/references/operacoes-procedurais.md",
+          "quando": "for escolher uma operação"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md",
+          "quando": "os achados encolhem e a qualidade não sobe"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md",
+          "quando": "for montar o pedido ao crítico ou ler o formato do achado"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md",
+          "quando": "a peça entra numa montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md",
+          "quando": "for carregar a peça na bancada da sessão"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md",
+          "quando": "a peça parte de uma prancha"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARAMETROS-VIVOS.md",
+          "quando": "for alterar um número da receita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
+          "quando": "for declarar a forma pronta"
+        }
+      ],
+      "skill": "criar-peca",
+      "comandos": [
+        "node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>",
+        "npm run parametros",
+        "npm run conferir:referencia"
+      ],
+      "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
+      "orcamentoBytes": 70000,
+      "linhaDeBase": {
+        "bytes": 62482,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/esboco",
+      "intencao": "modelar",
+      "titulo": "Esboçar um objeto em formas primitivas",
+      "quando": "Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        ".claude/agents/esbocista.md",
+        ".claude/skills/esboco-detalhado/SKILL.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": ".claude/skills/esboco-detalhado/formas-e-componentes.md",
+          "quando": "for usar forma curva, tubo, âncora relativa ou componente pronto"
+        },
+        {
+          "arquivo": ".claude/skills/esboco-detalhado/leitura-em-texto.md",
+          "quando": "for ler o modelo em texto antes da imagem"
+        },
+        {
+          "arquivo": ".claude/skills/esboco-detalhado/regras-de-contato.md",
+          "quando": "o gate de contato reprovar"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
+          "quando": "for conferir o esboço em imagem"
+        }
+      ],
+      "skill": "esboco-detalhado",
+      "comandos": [
+        "npm run esboco -- --ajuda [tópico]",
+        "npm run esboco -- --condutor <arquivo>",
+        "npm run esboco -- <arquivo> --descrever",
+        "npm run esboco -- <arquivo> --composta"
+      ],
+      "conferido": "O Portão de cada estágio do Condutor e a nota 8 ou mais do crítico visual cego.",
+      "orcamentoBytes": 28000,
+      "linhaDeBase": {
+        "bytes": 23789,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/laco-do-esboco",
+      "intencao": "modelar",
+      "titulo": "Conduzir o laço do esboço",
+      "quando": "Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/usar/README.md",
+        ".claude/skills/laco-do-esboco/SKILL.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
+          "quando": "for conferir o esboço em imagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md",
+          "quando": "o objeto é do banco de provas e o custo vai ser registrado"
+        }
+      ],
+      "skill": "laco-do-esboco",
+      "comandos": [
+        "npm run esboco -- --condutor <arquivo> --veredito <unidade|marco-N|objeto> --nota <0-10> --motivo <texto>",
+        "npm run banco-de-provas:registrar"
+      ],
+      "conferido": "O fluxo do Condutor em Concluído, com cada nota do crítico em 8 ou mais.",
+      "orcamentoBytes": 17000,
+      "linhaDeBase": {
+        "bytes": 13878,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/auditar-peca",
+      "intencao": "modelar",
+      "titulo": "Auditar uma peça pronta",
+      "quando": "Obter evidência objetiva de uma peça antes de publicar ou homologar.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/usar/README.md",
+        ".claude/skills/auditar-peca/SKILL.md",
+        "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
+          "quando": "a silhueta, um encontro ou um corte mudou"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md",
+          "quando": "for carregar a peça na bancada da sessão"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARAMETROS-VIVOS.md",
+          "quando": "o achado leva a alterar um número da receita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md",
+          "quando": "for ler o formato do achado do crítico"
+        }
+      ],
+      "skill": "auditar-peca",
+      "comandos": [
+        "npm run descrever",
+        "npm run malha:conferir",
+        "npm run revisar:modelagem"
+      ],
+      "conferido": "O relato com os defeitos por vista e região e o que não foi conferido, com o motivo.",
+      "orcamentoBytes": 29000,
+      "linhaDeBase": {
+        "bytes": 24773,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/auditar-montagem",
+      "intencao": "modelar",
+      "titulo": "Auditar uma montagem",
+      "quando": "Conferir composição, relações, encaixes e impacto de um conjunto montado.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/roteiros/INVARIANTES.md",
+        "docs/mecanifica/usar/README.md",
+        ".claude/skills/auditar-montagem/SKILL.md",
+        "docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md",
+          "quando": "for julgar as vistas do conjunto"
+        }
+      ],
+      "skill": "auditar-montagem",
+      "comandos": [
+        "npm run descrever:montagem:persistida",
+        "npm run olhar:montagem"
+      ],
+      "conferido": "O relato por relação, impacto de revalidação e vistas.",
+      "orcamentoBytes": 33000,
+      "linhaDeBase": {
+        "bytes": 27936,
+        "data": "2026-10-08"
+      }
+    }
+  ]
+}

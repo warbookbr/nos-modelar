@@ -100,6 +100,10 @@ esboço fica mais barato pelo que a medição mostrar.
    por tópico. Vem antes das outras por ser o maior ganho medido e não depender
    delas.
 3. A página de invariantes e os roteiros por intenção como dados, com gate.
+   Feita em 2026-10-08: [os roteiros](../roteiros/ROTEIROS.md), com a linha de
+   base de cada intenção, e o gate `leitura:obrigatoria` passou a conferir
+   todos os roteiros. Dos onze invariantes, só o do mapa tem gate; os outros
+   ficam para a fatia 5.
 4. O comando de entrada e a ferramenta MCP, com o passo seguinte pelo estado.
 5. O `CLAUDE.md` como roteador, as regras verificáveis convertidas em gate, as
    recusas apontando o tópico, o registro de uso e as descrições das skills

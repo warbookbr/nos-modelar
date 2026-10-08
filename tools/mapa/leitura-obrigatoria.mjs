@@ -1,92 +1,50 @@
-/* leitura-obrigatoria.mjs — quanto uma sessão precisa LER antes de escrever a
- * primeira linha de receita.
+/* leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
  *
  * O número existe porque a intuição erra para os dois lados. Documento é barato
  * de escrever e caro de ler, e o custo não aparece em lugar nenhum: cada
  * sessão nova paga o acervo inteiro de novo, em silêncio, antes de produzir
- * qualquer coisa. Medido na abertura do plano de 2026-09-07: 119.826 bytes.
+ * qualquer coisa. Medido na abertura do plano de 2026-09-07: 119.826 bytes para
+ * criar uma peça.
  *
- * O que conta é o caminho que as PORTAS mandam percorrer para criar uma peça:
- * o acordo de trabalho, a porta de uso, a skill da tarefa e os contratos que ela
- * declara obrigatórios. Não conta o que é consultável sob demanda — a referência
- * de operações diz de si mesma "leia-a quando precisar escolher uma operação;
- * não carregue a tabela inteira para uma tarefa simples" —, e não conta a zona
- * histórica, que é consulta, não caminho.
+ * As listas moram nos roteiros por intenção, em
+ * `docs/mecanifica/roteiros/roteiros.json`: cada roteiro diz o que se lê antes
+ * de começar (soma no orçamento) e o que se abre só quando a condição aparece
+ * (não soma). A lista é explícita de propósito. Derivá-la de links
+ * transformaria o número no tamanho do grafo inteiro, que é justamente a
+ * métrica que não queremos: o que pesa é o que se lê, não o que se poderia
+ * alcançar.
  *
- * A lista é explícita de propósito. Derivá-la de links transformaria o número no
- * tamanho do grafo inteiro, que é justamente a métrica que não queremos: o que
- * pesa é o que se lê, não o que se poderia alcançar.
+ * O gate confere, para cada roteiro, que todo arquivo e todo comando citado
+ * existe e que a leitura cabe no orçamento, e confere que INVARIANTES.md e
+ * ROTEIROS.md estão gerados do JSON. O orçamento começou no tamanho de
+ * 2026-10-08 mais a página de invariantes, e só desce.
  */
-import { readFileSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pathToFileURL } from 'node:url';
+import { carregarRoteiros, CAMINHO_JSON, medirRoteiro, paginasDesatualizadas, RAIZ, validarRoteiros } from './roteiros.mjs';
 
-const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-
-/* Teto acordado no plano `2026-09-07-esteira-confiavel-para-ia.md`. */
-export const TETO_BYTES = 70_000;
-
-export const CAMINHO_OBRIGATORIO = [
-  'CLAUDE.md',
-  'AGENTS.md',
-  'docs/mecanifica/usar/README.md',
-  'docs/mecanifica/usar/GUIA-AUTORIA-IA.md',
-  'docs/mecanifica/usar/LACO-VISUAL.md',
-  '.claude/skills/criar-peca/SKILL.md',
-  'docs/mecanifica/usar/AUTORIA-DE-PECA.md',
-  'docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md',
-  'docs/mecanifica/usar/INTENCAO-PECA-V1.md',
-  'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md',
-  'docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md',
-];
-
-/* Consultável: entra quando a tarefa pede, e por isso não soma no teto. Fica
-   listado para o número não virar mágica — quem quiser o total real de uma
-   tarefa que escolha uma operação soma esta linha. */
-export const SOB_DEMANDA = [
-  '.claude/skills/criar-peca/references/operacoes-procedurais.md',
-  /* A própria porta o descreve como condicional: "vale ler quando os achados
-     encolhem e a qualidade não sobe". Documento que se lê no meio de uma
-     investigação travada não é leitura de partida. */
-  'docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md',
-  'docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md',
-  'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md',
-  'docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md',
-  'docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md',
-  /* Só interessa a quem vai ALTERAR um número de receita, e a resposta que ele
-     dá cabe na saída do próprio comando. Ler antes de começar seria pagar por
-     um diagnóstico que ainda não se pediu. */
-  'docs/mecanifica/usar/PARAMETROS-VIVOS.md',
-];
-
-function medir(lista) {
-  return lista.map((relativo) => {
-    const bytes = statSync(join(RAIZ, relativo)).size;
-    return { relativo, bytes };
-  }).sort((a, b) => b.bytes - a.bytes);
-}
-
-export function conferirLeituraObrigatoria() {
-  const obrigatorio = medir(CAMINHO_OBRIGATORIO);
-  const demanda = medir(SOB_DEMANDA);
-  const total = obrigatorio.reduce((soma, d) => soma + d.bytes, 0);
-  return { obrigatorio, demanda, total, dentroDoTeto: total <= TETO_BYTES };
+export function conferirLeituraObrigatoria(raiz = RAIZ) {
+  const dados = carregarRoteiros(raiz);
+  const problemas = validarRoteiros(dados, raiz);
+  const roteiros = dados.roteiros.map((r) => {
+    const { arquivos, total } = medirRoteiro(r, raiz);
+    return { id: r.id, arquivos, total, orcamento: r.orcamentoBytes, linhaDeBase: r.linhaDeBase?.bytes, dentro: total <= r.orcamentoBytes };
+  });
+  for (const r of roteiros.filter((x) => !x.dentro)) {
+    problemas.push(`roteiro ${r.id}: a leitura tem ${r.total} bytes, ${r.total - r.orcamento} acima do orçamento de ${r.orcamento}. Cortar significa mover para "sobDemanda" ou para zona consultável com ponteiro, nunca apagar lição.`);
+  }
+  const desatualizadas = paginasDesatualizadas(dados, raiz).map((p) => p.relativo);
+  if (desatualizadas.length > 0) problemas.push(`${desatualizadas.join(' e ')} não batem com ${CAMINHO_JSON}: rode npm run roteiros:gerar.`);
+  return { roteiros, problemas };
 }
 
 function executar() {
-  const { obrigatorio, demanda, total, dentroDoTeto } = conferirLeituraObrigatoria();
-  for (const { relativo, bytes } of obrigatorio) {
-    console.log(`${String(bytes).padStart(7)}  ${relativo}`);
+  const { roteiros, problemas } = conferirLeituraObrigatoria();
+  for (const r of roteiros) {
+    const base = r.linhaDeBase ? `, linha de base ${r.linhaDeBase}` : '';
+    console.log(`${String(r.total).padStart(7)}  ${r.id} (orçamento ${r.orcamento}${base}, ${r.arquivos.length} arquivos)`);
   }
-  console.log(`${String(total).padStart(7)}  TOTAL obrigatório (teto ${TETO_BYTES})`);
-  const totalDemanda = demanda.reduce((soma, d) => soma + d.bytes, 0);
-  console.log(`${String(totalDemanda).padStart(7)}  sob demanda, fora do teto (${demanda.length} documentos)`);
-
-  if (!dentroDoTeto) {
-    console.error(
-      `\nleitura:obrigatoria FALHOU — ${total} bytes, ${total - TETO_BYTES} acima do teto.`
-      + '\nCortar significa mover para zona consultável com ponteiro, nunca apagar lição.',
-    );
+  if (problemas.length > 0) {
+    console.error(`\nleitura:obrigatoria FALHOU\n${problemas.map((p) => `- ${p}`).join('\n')}`);
     process.exitCode = 1;
     return;
   }
