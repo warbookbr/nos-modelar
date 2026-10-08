@@ -1,6 +1,6 @@
 ---
 name: critico-visual
-description: Crítico visual sem contexto da Mecanifica. Recebe o DESENHO ALVO e as vistas do MODELO e responde se o segundo bate com o primeiro, ou julga uma unidade de esboço pela função e pelas cinco perguntas do brief. Use antes de fechar qualquer rodada de forma e a cada brief do esboço. Não use para julgar código nem para revisar medida — ele só olha.
+description: Crítico visual sem contexto: compara as vistas do MODELO com o DESENHO ALVO ou julga uma unidade de esboço pelas cinco perguntas do brief. Use antes de fechar rodada de forma e a cada brief do esboço. Não use para código nem medida; ele só olha.
 tools: Read
 model: sonnet
 ---

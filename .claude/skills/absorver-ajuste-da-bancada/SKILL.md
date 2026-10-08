@@ -1,6 +1,6 @@
 ---
 name: absorver-ajuste-da-bancada
-description: Transformar um ajuste que a pessoa fez na bancada em receita organizada — ler o alvo salvo, reescrever TABELA, derivar e gerarPassos, e provar por medida que a receita reexecutada chega onde a peça ficou. Use quando receber um arquivo `ajuste-*.json` ou quando a pessoa disser que mexeu na bancada e salvou. Não use para modelar peça nova nem para ajuste que ela pediu por escrito sem tocar na bancada.
+description: Transforma ajuste da bancada em receita: reescreve TABELA e mede se a receita chega onde a peça ficou. Use ao receber `ajuste-*.json` ou quando a pessoa salvar um ajuste na bancada. Não use para peça nova nem para ajuste só escrito.
 ---
 
 # Absorver o ajuste da bancada

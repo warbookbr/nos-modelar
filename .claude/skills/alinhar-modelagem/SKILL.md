@@ -1,6 +1,6 @@
 ---
 name: alinhar-modelagem
-description: Conduzir a rodada de alinhamento antes de modelar — levantar objeto, referências, escala, partes, contatos e critérios de reprovação com a pessoa, e sintetizar tudo no PLANO da receita. Use ANTES de escrever qualquer passo de uma peça nova. Não use para ajustar peça já modelada.
+description: Conduz o alinhamento antes de modelar: levanta com a pessoa objeto, referências, escala, partes, contatos e critérios de reprovação, e fecha no PLANO da receita. Use ANTES de qualquer passo de peça nova. Não use para ajustar peça já modelada.
 ---
 
 # Alinhar a modelagem antes de modelar

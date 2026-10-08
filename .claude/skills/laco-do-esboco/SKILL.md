@@ -1,6 +1,6 @@
 ---
 name: laco-do-esboco
-description: Conduzir o laço do esboço detalhado de um ou mais objetos — despachar no modo objeto inteiro ou com um esbocista novo por unidade, despachar o crítico visual cego a cada parada num --feito com brief, registrar o veredito, refazer a unidade abaixo de 8 até três rodadas e medir no fim. Use quando a sessão principal orquestra o esboço detalhado. Não use para esboçar à mão nem para mostrar opções de forma à pessoa.
+description: Conduz o laço do esboço detalhado: despacha o esbocista por objeto ou unidade, o crítico cego a cada parada, refaz a unidade abaixo de 8 e mede no fim. Use quando a sessão principal orquestra. Não use para esboçar à mão nem para opções de forma.
 ---
 
 # Conduzir o laço do esboço

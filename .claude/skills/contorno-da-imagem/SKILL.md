@@ -1,6 +1,6 @@
 ---
 name: contorno-da-imagem
-description: Mapear as partes de uma imagem de referência por watershed com sementes nomeadas, gerar o mapa de partes e tirar o contorno de cada uma em milímetro, com um desenhador que põe as sementes e um crítico que dá nota, até três rodadas. Use quando uma referência precisar de contorno por parte para prancha ou conferência. Não use para modelar a peça.
+description: Mapeia as partes de uma referência por watershed com sementes nomeadas e tira o contorno de cada uma em milímetro, com desenhador e crítico. Use quando a referência pedir contorno por parte para prancha ou conferência. Não use para modelar a peça.
 ---
 
 # Contorno da imagem

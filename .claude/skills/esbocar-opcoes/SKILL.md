@@ -1,6 +1,6 @@
 ---
 name: esbocar-opcoes
-description: Mostrar à pessoa, em imagem, as opções de forma em disputa durante o alinhamento — cilindros, anéis, caixas, cones, esferas, extrusões, tubos e componentes prontos desenhados lado a lado na mesma escala a partir de um JSON declarativo, junto da foto de referência, com uma frase por opção e a pergunta de qual se parece mais. Use no alinhamento sempre que houver escolha de forma. Não use para desenhar a peça final nem prancha cotada.
+description: Mostra à pessoa, em imagem, as opções de forma em disputa, lado a lado na mesma escala e com a referência, e pergunta qual se parece mais. Use no alinhamento sempre que houver escolha de forma. Não use para a peça final nem para prancha cotada.
 ---
 
 # Esboçar opções de forma

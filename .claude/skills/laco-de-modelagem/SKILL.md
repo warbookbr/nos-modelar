@@ -1,6 +1,6 @@
 ---
 name: laco-de-modelagem
-description: Conduzir o laço de modelagem de uma peça — despachar o modelador com o plano, rodar as medidas, despachar o crítico sem a história da construção, levar o veredito de volta e registrar cada rodada até fechar ou parar. Use depois da rodada de alinhamento. Não use para ajuste pontual de peça pronta.
+description: Conduzir o laço de modelagem de uma peça: despachar o modelador com o plano, medir, despachar o crítico sem a história da construção e registrar cada rodada até fechar ou parar. Use depois do alinhamento. Não use para ajuste pontual de peça pronta.
 ---
 
 # Conduzir o laço de modelagem

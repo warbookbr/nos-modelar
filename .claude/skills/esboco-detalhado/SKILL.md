@@ -1,6 +1,6 @@
 ---
 name: esboco-detalhado
-description: Esboçar um objeto inteiro em formas primitivas e componentes, com contrato, medidas nomeadas, unidades de detalhe, gate de contato, crítico cego e Marcos, conduzido por `npm run esboco -- --condutor`. Use ao modelar o esboço detalhado de qualquer objeto. Não use para mostrar opções de forma à pessoa no alinhamento (é a esbocar-opcoes) nem para a peça procedural final.
+description: Esboça um objeto inteiro em primitivas e componentes, com contrato, gate de contato, crítico cego e Marcos, por `npm run esboco -- --condutor`. Use para o esboço detalhado. Não use para opções de forma (é a esbocar-opcoes) nem peça final.
 ---
 
 # Esboço detalhado

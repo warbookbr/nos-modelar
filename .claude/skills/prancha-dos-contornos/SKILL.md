@@ -1,6 +1,6 @@
 ---
 name: prancha-dos-contornos
-description: Fazer a prancha lateral de um objeto a partir dos contornos que o mapa de partes tirou da imagem, com o desenhista de prancha escolhendo as cotas e um crítico dando nota, até três rodadas. Use depois de mapear as partes da imagem, antes da modelagem. Não use para prancha de carroceria desenhada por medida declarada; essa é a skill desenhar-prancha.
+description: Faz a prancha lateral a partir dos contornos do mapa de partes, com o desenhista escolhendo as cotas e um crítico dando nota. Use depois do mapa, antes da modelagem. Não use para carroceria por medida declarada; essa é a desenhar-prancha.
 ---
 
 # Prancha dos contornos

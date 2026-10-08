@@ -1,6 +1,6 @@
 ---
 name: revisor-adversarial
-description: Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quando a mudança tem risco estrutural; dispense para alterações triviais já cobertas por prova objetiva.
+description: Revisor adversarial da Mecanifica: tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quando a mudança tem risco estrutural; dispense as triviais já cobertas por prova objetiva.
 model: opus
 ---
 

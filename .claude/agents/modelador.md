@@ -1,6 +1,6 @@
 ---
 name: modelador
-description: Escreve e corrige a receita procedural de UMA peça a partir de um plano de modelagem e, nas rodadas seguintes, de um veredito de defeitos. Não julga o próprio resultado e não decide quando parar. Use dentro do laço de modelagem; para mudanças no repositório fora de receita, use o implementador.
+description: Escreve e corrige a receita procedural de UMA peça a partir do plano e, depois, do veredito de defeitos. Não julga o próprio resultado nem decide quando parar. Use dentro do laço de modelagem; para mudança fora de receita, use o implementador.
 model: sonnet
 ---
 

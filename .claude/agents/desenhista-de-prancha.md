@@ -1,6 +1,6 @@
 ---
 name: desenhista-de-prancha
-description: Decide o que a prancha feita pelos contornos da imagem não sabe decidir sozinha — as cotas de cada parte, a conferência da calibração e o que a imagem esconde — editando `<imagem>.prancha.json` e gerando a prancha com `npm run contorno:prancha`. Nas rodadas seguintes corrige só o que o crítico apontou. Não julga o próprio resultado. Use dentro da skill prancha-dos-contornos.
+description: Decide cotas, calibração e o que a imagem esconde no `<imagem>.prancha.json` e gera com `npm run contorno:prancha`. Depois corrige só o que o crítico apontou. Não julga o próprio resultado. Use dentro da skill prancha-dos-contornos.
 model: opus
 ---
 

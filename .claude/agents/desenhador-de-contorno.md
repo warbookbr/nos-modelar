@@ -1,6 +1,6 @@
 ---
 name: desenhador-de-contorno
-description: Põe as sementes que mapeiam as partes de uma imagem de referência no arquivo de regiões e gera o pacote do crítico com `npm run contorno`. Nas rodadas seguintes recebe os defeitos do crítico e corrige só as sementes. Não julga o próprio resultado. Use dentro da skill contorno-da-imagem.
+description: Põe as sementes que mapeiam as partes da imagem de referência e gera o pacote do crítico com `npm run contorno`. Depois corrige só as sementes que o crítico apontou. Não julga o próprio resultado. Use dentro da skill contorno-da-imagem.
 model: opus
 ---
 

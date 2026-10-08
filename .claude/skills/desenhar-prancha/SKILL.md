@@ -1,6 +1,6 @@
 ---
 name: desenhar-prancha
-description: Desenhar uma prancha ortográfica alvo da Mecanifica com o motor de prancha — silhueta, aberturas, painéis e cotas em vistas lateral, frontal, traseira e superior. Use quando a tarefa for produzir ou corrigir o desenho de referência de uma carroceria, carenagem ou invólucro antes de existir geometria 3D.
+description: Desenha a prancha ortográfica alvo (silhueta, aberturas, painéis e cotas nas vistas lateral, frontal, traseira e superior). Use para produzir ou corrigir o desenho de referência de carroceria, carenagem ou invólucro antes da geometria 3D.
 ---
 
 # Desenhar prancha ortográfica
