@@ -25,7 +25,7 @@ function repositorio(ajustar = (d) => d) {
     roteiros: [{
       id: 'modelar/peca', intencao: 'modelar', titulo: 'Criar peça', quando: 'Criar uma peça.',
       ler: ['CLAUDE.md', CAMINHO_INVARIANTES], sobDemanda: [{ arquivo: 'notas/extra.txt', quando: 'precisar' }],
-      skill: 'criar-peca', comandos: ['npm run gates'], conferido: 'npm run gates.',
+      skill: 'criar-peca', comandos: ['npm run gates'], passo: 'Rode npm run gates.', conferido: 'npm run gates.',
       orcamentoBytes: 10000, linhaDeBase: { bytes: 100, data: '2026-10-08' },
     }],
   });

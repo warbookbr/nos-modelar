@@ -72,7 +72,7 @@ export function validarRoteiros(dados, raiz = RAIZ) {
     if (!textoCheio(r?.id)) problemas.push(`${onde}: falta o "id".`);
     else if (ids.has(r.id)) problemas.push(`${onde}: "id" repetido.`);
     else ids.add(r.id);
-    for (const campo of ['intencao', 'titulo', 'quando', 'conferido']) {
+    for (const campo of ['intencao', 'titulo', 'quando', 'passo', 'conferido']) {
       if (!textoCheio(r?.[campo])) problemas.push(`${onde}: falta "${campo}".`);
     }
     if (textoCheio(r?.quando) && r.quando.length > TETO_DA_FRASE) {
@@ -139,7 +139,8 @@ export function gerarRoteirosMd(dados) {
     AVISO_GERADO,
     '',
     'Cada roteiro diz o que ler antes de começar, o que abrir só quando a condição aparecer, a',
-    'skill, os comandos e o que se confere no fim. Todo roteiro começa pelos',
+    'skill, os comandos e o que se confere no fim, e `npm run comecar -- <roteiro>` (ou a ferramenta',
+    'MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelos',
     '[invariantes](INVARIANTES.md). `npm run leitura:obrigatoria` imprime o tamanho da leitura de',
     'cada roteiro contra o orçamento, e o gate recusa o roteiro que passa dele. O `AGENTS.md` faz',
     'para outros agentes o papel do `CLAUDE.md` e não entra na soma.',
@@ -159,7 +160,7 @@ export function gerarRoteirosMd(dados) {
     partes.push('');
     if (r.skill) partes.push(`Skill: ${codigo(r.skill)}.`, '');
     if ((r.comandos ?? []).length > 0) partes.push(`Comandos: ${r.comandos.map(codigo).join(', ')}.`, '');
-    partes.push(`Conferido no fim: ${r.conferido}`);
+    partes.push(`Passo seguinte, sem estado lido: ${r.passo}`, '', `Conferido no fim: ${r.conferido}`);
   }
   return `${partes.join('\n')}\n`;
 }

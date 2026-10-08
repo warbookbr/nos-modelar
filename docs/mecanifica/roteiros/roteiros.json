@@ -90,6 +90,7 @@
         "npm run gates",
         "npm run mapa"
       ],
+      "passo": "Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.",
       "conferido": "npm run gates, com a bateria completa quando muda código.",
       "orcamentoBytes": 67000,
       "linhaDeBase": {
@@ -126,6 +127,7 @@
         "npm run mapa",
         "npm run gates"
       ],
+      "passo": "Edite o documento, rode npm run mapa e confira com npm run gates.",
       "conferido": "npm run gates, que roda os gates de documentação (links, sumário, estrutura, citações e mapa).",
       "orcamentoBytes": 17000,
       "linhaDeBase": {
@@ -167,6 +169,7 @@
       ],
       "skill": null,
       "comandos": [],
+      "passo": "Abra docs/mecanifica/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.",
       "conferido": "Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.",
       "orcamentoBytes": 12000,
       "linhaDeBase": {
@@ -232,6 +235,7 @@
         "npm run parametros",
         "npm run conferir:referencia"
       ],
+      "passo": "Com peça nova, combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.",
       "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
       "orcamentoBytes": 70000,
       "linhaDeBase": {
@@ -275,6 +279,7 @@
         "npm run esboco -- <arquivo> --descrever",
         "npm run esboco -- <arquivo> --composta"
       ],
+      "passo": "Rode npm run esboco -- --condutor <arquivo> e siga o Portão do estágio.",
       "conferido": "O Portão de cada estágio do Condutor e a nota 8 ou mais do crítico visual cego.",
       "orcamentoBytes": 28000,
       "linhaDeBase": {
@@ -308,6 +313,7 @@
         "npm run esboco -- --condutor <arquivo> --veredito <unidade|marco-N|objeto> --nota <0-10> --motivo <texto>",
         "npm run banco-de-provas:registrar"
       ],
+      "passo": "Siga a skill laco-do-esboco: despache o esbocista e registre cada veredito do crítico.",
       "conferido": "O fluxo do Condutor em Concluído, com cada nota do crítico em 8 ou mais.",
       "orcamentoBytes": 17000,
       "linhaDeBase": {
@@ -351,6 +357,7 @@
         "npm run malha:conferir",
         "npm run revisar:modelagem"
       ],
+      "passo": "Descreva a peça com npm run descrever e siga a skill auditar-peca.",
       "conferido": "O relato com os defeitos por vista e região e o que não foi conferido, com o motivo.",
       "orcamentoBytes": 29000,
       "linhaDeBase": {
@@ -381,6 +388,7 @@
         "npm run descrever:montagem:persistida",
         "npm run olhar:montagem"
       ],
+      "passo": "Descreva a árvore com npm run descrever:montagem:persistida e siga a skill auditar-montagem.",
       "conferido": "O relato por relação, impacto de revalidação e vistas.",
       "orcamentoBytes": 33000,
       "linhaDeBase": {

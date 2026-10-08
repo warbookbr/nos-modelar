@@ -98,13 +98,18 @@ esboço fica mais barato pelo que a medição mostrar.
 2. O esboço mais barato: a referência do JSON por tópico no lugar do README e a
    imagem composta na conferência, com a frase de cada tópico e o teto de tamanho
    por tópico. Vem antes das outras por ser o maior ganho medido e não depender
-   delas.
+   delas. Feita em 2026-10-08: `npm run esboco -- --ajuda <tópico>` com teto
+   de 6 mil caracteres por tópico e `--composta` na conferência.
 3. A página de invariantes e os roteiros por intenção como dados, com gate.
    Feita em 2026-10-08: [os roteiros](../roteiros/ROTEIROS.md), com a linha de
    base de cada intenção, e o gate `leitura:obrigatoria` passou a conferir
    todos os roteiros. Dos onze invariantes, só o do mapa tem gate; os outros
    ficam para a fatia 5.
 4. O comando de entrada e a ferramenta MCP, com o passo seguinte pelo estado.
+   Feita em 2026-10-08: `npm run comecar -- [roteiro] [--arquivo <esboço>]` e
+   a ferramenta MCP `comecar`, que leem o plano ativo, `comunicacao.md` e o
+   Condutor do esboço. Na primeira execução o comando apontou a fatia 2 como
+   aberta, porque ela tinha sido entregue sem ser marcada aqui.
 5. O `CLAUDE.md` como roteador, as regras verificáveis convertidas em gate, as
    recusas apontando o tópico, o registro de uso e as descrições das skills
    enxutas.

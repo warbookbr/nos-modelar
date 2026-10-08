@@ -13,6 +13,7 @@ import { criarFerramentasRevalidacao } from './perfis/revalidacao.mjs';
 import { criarFerramentasProcedurais } from './perfis/procedural.mjs';
 import { criarFerramentasAutoriaExecucao } from './perfis/autoria-execucao.mjs';
 import { criarFerramentasParametros } from './perfis/parametros.mjs';
+import { criarFerramentasComecar } from './perfis/comecar.mjs';
 import { catalogoMontagensDoAmbiente, REGRA_ESCOPO_CATALOGO } from './catalogo-montagens.mjs';
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
@@ -335,6 +336,7 @@ export function criarServidor({
     ? criarFerramentasRevalidacao({ raizRepositorio: autoria.raizRepositorio, podeEscrever: perfil === 'autoria' })
     : [];
   const leitura = [
+    ...criarFerramentasComecar(),
     ...criarFerramentasProcedurais(servicoProcedural),
     ...criarFerramentasAutoriaExecucao(),
     ...criarFerramentasParametros(),

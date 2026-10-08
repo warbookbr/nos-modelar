@@ -42,7 +42,9 @@ plano. O que está encerrado vive em
   são dados em [`roteiros/roteiros.json`](roteiros/roteiros.json), com as
   páginas [`roteiros/INVARIANTES.md`](roteiros/INVARIANTES.md) e
   [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) geradas por
-  `npm run roteiros:gerar` e conferidas pelo gate `leitura:obrigatoria`.
+  `npm run roteiros:gerar` e conferidas pelo gate `leitura:obrigatoria`;
+  `npm run comecar -- <roteiro>` e a ferramenta MCP `comecar` devolvem o
+  roteiro com o passo seguinte lido do estado.
 - O banco de provas versionado e o registro de custo do plano de modelagem vivem em
   [`banco-de-provas/BANCO-DE-PROVAS.md`](banco-de-provas/BANCO-DE-PROVAS.md)
   (`docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md`).

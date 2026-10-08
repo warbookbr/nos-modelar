@@ -196,6 +196,7 @@ describe('servidor MCP local — perfil revisao', () => {
       );
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
+        'comecar',
         'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'ativar_bancada', 'exportar_step',
       'exportar_obj',
@@ -203,7 +204,7 @@ describe('servidor MCP local — perfil revisao', () => {
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(21);
+      expect(ferramentas.result.tools).toHaveLength(22);
       expect(ferramentas.result.tools.find(({ name }) => name === 'revisar_montagem')?.description)
         .toContain('A listagem não é aprovação nem homologação.');
       for (const tool of ferramentas.result.tools) {
@@ -338,6 +339,7 @@ describe('servidor MCP local — perfil revisao', () => {
         catalogoMontagensConfigurado: true, universoDependenciasConfigurado: true,
       });
       expect(estadoValor.ferramentas).toEqual([
+        'comecar',
         'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'ativar_bancada', 'exportar_step',
       'exportar_obj',
@@ -669,6 +671,7 @@ describe('servidor MCP local — perfil revisao', () => {
       const publico = JSON.parse(estado.contents[0].text);
       expect(publico).toMatchObject({ perfil: 'autoria' });
       expect(publico.ferramentas).toEqual([
+        'comecar',
         'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'ativar_bancada', 'exportar_step',
       'exportar_obj',

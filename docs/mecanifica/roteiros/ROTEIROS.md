@@ -3,7 +3,8 @@
 <!-- Gerado de roteiros.json por `npm run roteiros:gerar`. Não edite à mão. -->
 
 Cada roteiro diz o que ler antes de começar, o que abrir só quando a condição aparecer, a
-skill, os comandos e o que se confere no fim. Todo roteiro começa pelos
+skill, os comandos e o que se confere no fim, e `npm run comecar -- <roteiro>` (ou a ferramenta
+MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelos
 [invariantes](INVARIANTES.md). `npm run leitura:obrigatoria` imprime o tamanho da leitura de
 cada roteiro contra o orçamento, e o gate recusa o roteiro que passa dele. O `AGENTS.md` faz
 para outros agentes o papel do `CLAUDE.md` e não entra na soma.
@@ -39,6 +40,8 @@ Abrir só quando a condição aparecer:
 
 Comandos: `npm run gates`, `npm run mapa`.
 
+Passo seguinte, sem estado lido: Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.
+
 Conferido no fim: npm run gates, com a bateria completa quando muda código.
 
 ## documentar: Escrever ou reorganizar documentação
@@ -59,6 +62,8 @@ Abrir só quando a condição aparecer:
 
 Comandos: `npm run mapa`, `npm run gates`.
 
+Passo seguinte, sem estado lido: Edite o documento, rode npm run mapa e confira com npm run gates.
+
 Conferido no fim: npm run gates, que roda os gates de documentação (links, sumário, estrutura, citações e mapa).
 
 ## pesquisar: Procurar o que já foi feito ou pesquisado
@@ -78,6 +83,8 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
 - `docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md`, quando a pergunta é quanto custou modelar um objeto.
 - `docs/mecanifica/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
+
+Passo seguinte, sem estado lido: Abra docs/mecanifica/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.
 
 Conferido no fim: Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.
 
@@ -114,6 +121,8 @@ Skill: `criar-peca`.
 
 Comandos: `node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
 
+Passo seguinte, sem estado lido: Com peça nova, combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.
+
 Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.
 
 ## modelar/esboco: Esboçar um objeto em formas primitivas
@@ -138,6 +147,8 @@ Skill: `esboco-detalhado`.
 
 Comandos: `npm run esboco -- --ajuda [tópico]`, `npm run esboco -- --condutor <arquivo>`, `npm run esboco -- <arquivo> --descrever`, `npm run esboco -- <arquivo> --composta`.
 
+Passo seguinte, sem estado lido: Rode npm run esboco -- --condutor <arquivo> e siga o Portão do estágio.
+
 Conferido no fim: O Portão de cada estágio do Condutor e a nota 8 ou mais do crítico visual cego.
 
 ## modelar/laco-do-esboco: Conduzir o laço do esboço
@@ -159,6 +170,8 @@ Abrir só quando a condição aparecer:
 Skill: `laco-do-esboco`.
 
 Comandos: `npm run esboco -- --condutor <arquivo> --veredito <unidade|marco-N|objeto> --nota <0-10> --motivo <texto>`, `npm run banco-de-provas:registrar`.
+
+Passo seguinte, sem estado lido: Siga a skill laco-do-esboco: despache o esbocista e registre cada veredito do crítico.
 
 Conferido no fim: O fluxo do Condutor em Concluído, com cada nota do crítico em 8 ou mais.
 
@@ -185,6 +198,8 @@ Skill: `auditar-peca`.
 
 Comandos: `npm run descrever`, `npm run malha:conferir`, `npm run revisar:modelagem`.
 
+Passo seguinte, sem estado lido: Descreva a peça com npm run descrever e siga a skill auditar-peca.
+
 Conferido no fim: O relato com os defeitos por vista e região e o que não foi conferido, com o motivo.
 
 ## modelar/auditar-montagem: Auditar uma montagem
@@ -206,5 +221,7 @@ Abrir só quando a condição aparecer:
 Skill: `auditar-montagem`.
 
 Comandos: `npm run descrever:montagem:persistida`, `npm run olhar:montagem`.
+
+Passo seguinte, sem estado lido: Descreva a árvore com npm run descrever:montagem:persistida e siga a skill auditar-montagem.
 
 Conferido no fim: O relato por relação, impacto de revalidação e vistas.
