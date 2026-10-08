@@ -1,0 +1,138 @@
+{
+  "vista": "isometrica",
+  "plano": {
+    "texto": "Carrinho de mão de obra, nível medio. Caçamba metálica de chapa (fundo, duas paredes verticais, painel traseiro vertical e painel dianteiro inclinado para a frente), quadro de dois tubos longarina que saem dos cabos, descem atrás da caçamba, correm sob o fundo e descem à frente até o eixo da roda; duas travessas fecham o quadro, duas pernas de apoio saem das longarinas e terminam em sapatas no chão. A roda dianteira (pneu de ombro arredondado, cubos) gira num eixo que atravessa os cubos e termina dentro do tubo das longarinas. Representável com caixa, extrusão de perfil, tubo com raio de curva, cilindro e o componente roda; não representa: o amassado e a curvatura da chapa, a borda dobrada da caçamba, o parafuso e a solda, a estria do pneu. Gate de contato ligado: o fundo repousa nas longarinas, as paredes e os painéis encostam no fundo e entre si; atravessam só o eixo nos cubos e nas pontas das longarinas e as travessas, pernas e cabos nos tubos que soldam, cada um declarado com motivo. A roda fica livre da caçamba por folga declarada no contrato. Eixos: x lateral, y para cima, z para a frente (roda em +z).",
+    "nivel": "medio",
+    "medidas": [
+      { "nome": "altura total", "valor": 777, "unidade": "mm", "origem": "ia", "tolerancia": 10, "mede": "alturaTotal" },
+      { "nome": "largura total nos cabos", "valor": 654, "unidade": "mm", "origem": "ia", "tolerancia": 10, "mede": "larguraTotal" },
+      { "nome": "comprimento total", "valor": 1640, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": "profundidadeTotal" },
+      { "nome": "diametro do pneu", "valor": 400, "unidade": "mm", "origem": "ia", "tolerancia": 4, "mede": { "caixa": "y", "formas": ["rodaFrente.pneu"] } },
+      { "nome": "largura da cacamba", "valor": 580, "unidade": "mm", "origem": "ia", "tolerancia": 6, "mede": { "caixa": "x", "formas": ["fundo", "paredeD", "paredeE"] } },
+      { "nome": "altura da parede da cacamba", "valor": 260, "unidade": "mm", "origem": "ia", "tolerancia": 4, "mede": { "caixa": "y", "formas": ["paredeD"] } },
+      { "nome": "altura do fundo ao chao", "valor": 460, "unidade": "mm", "origem": "ia", "tolerancia": 6, "mede": { "distancia": ["sapataD.-y", "fundo.-y"], "eixo": "y" } }
+    ],
+    "pecas": [
+      { "nome": "fundo da cacamba", "formas": ["fundo"], "obrigatoria": true },
+      { "nome": "paredes laterais", "formas": ["parede*"], "obrigatoria": true },
+      { "nome": "painel traseiro", "formas": ["painelTras"], "obrigatoria": true },
+      { "nome": "painel dianteiro", "formas": ["painelFrente"], "obrigatoria": true },
+      { "nome": "longarinas", "formas": ["longarina*"], "obrigatoria": true },
+      { "nome": "travessas", "formas": ["travessa*"], "obrigatoria": true },
+      { "nome": "cabos", "formas": ["cabo*"], "obrigatoria": true },
+      { "nome": "roda", "formas": ["rodaFrente"], "obrigatoria": true },
+      { "nome": "eixo da roda", "formas": ["eixoRoda"], "obrigatoria": true },
+      { "nome": "pernas", "formas": ["perna*"], "obrigatoria": true },
+      { "nome": "sapatas", "formas": ["sapata*"], "obrigatoria": true }
+    ],
+    "contrato": {
+      "tocam": [
+        ["fundo", "longarinaD"], ["fundo", "longarinaE"],
+        ["fundo", "paredeD"], ["fundo", "paredeE"],
+        ["fundo", "painelTras"], ["fundo", "painelFrente"],
+        ["longarinaD", "travessaTras"], ["longarinaE", "travessaTras"],
+        ["longarinaD", "travessaFrente"], ["longarinaE", "travessaFrente"],
+        ["longarinaD", "pernaD"], ["longarinaE", "pernaE"],
+        ["pernaD", "sapataD"], ["pernaE", "sapataE"],
+        ["longarinaD", "caboD"], ["longarinaE", "caboE"],
+        ["eixoRoda", "longarinaD"], ["eixoRoda", "longarinaE"]
+      ],
+      "livres": [
+        ["rodaFrente.pneu", "fundo"],
+        ["rodaFrente.pneu", "painelFrente"],
+        ["rodaFrente.pneu", "longarinaD"],
+        ["rodaFrente.pneu", "longarinaE"],
+        ["pernaD", "paredeD"]
+      ],
+      "simetricas": [
+        ["longarinaD", "longarinaE"], ["paredeD", "paredeE"], ["pernaD", "pernaE"],
+        ["sapataD", "sapataE"], ["caboD", "caboE"]
+      ],
+      "fixa": [
+        { "a": "fundo", "b": "longarina*", "pontos": 2 },
+        { "a": "eixoRoda", "b": "longarina*", "pontos": 2 },
+        { "a": "sapataD", "b": "pernaD", "pontos": 1 },
+        { "a": "sapataE", "b": "pernaE", "pontos": 1 }
+      ]
+    }
+  },
+  "parametros": {
+    "yFundo": 460,
+    "espFundo": 6,
+    "larguraFundo": 570,
+    "compFundo": 900,
+    "zTras": -390,
+    "alturaParede": 260,
+    "espParede": 5,
+    "recuoFrente": 120,
+    "compParede": "=compFundo+recuoFrente",
+    "xCabo": 310,
+    "yCabo": 760,
+    "xLonga": 210,
+    "yLonga": 445,
+    "xEixo": 95,
+    "yEixo": 200,
+    "zEixo": 560
+  },
+  "pontos": {
+    "pontoBaseFrente": [0, "yFundo", "=zTras+compFundo"],
+    "pontoTopoFrente": [0, "=yFundo+alturaParede", "=zTras+compParede"]
+  },
+  "contato": {
+    "usar": true,
+    "tolerancia": 3,
+    "penetracao": 4,
+    "folga": 120,
+    "pares": [
+      { "a": "fundo", "b": "longarinaD", "tipo": "encosta" },
+      { "a": "fundo", "b": "longarinaE", "tipo": "encosta" }
+    ],
+    "juntas": [
+      { "pecas": ["eixoRoda", "rodaFrente.pneu"], "max": 120, "motivo": "o eixo passa pelo centro do pneu maciço, em toda a largura dele" },
+      { "pecas": ["eixoRoda", "rodaFrente.cuboE", "rodaFrente.cuboD"], "max": 40, "motivo": "o eixo passa pelo furo dos cubos da roda" },
+      { "pecas": ["eixoRoda", "longarinaD", "longarinaE"], "max": 20, "motivo": "o eixo termina dentro do tubo da longarina, que faz o garfo da roda" },
+      { "pecas": ["travessaTras", "longarinaD", "longarinaE"], "max": 20, "motivo": "a travessa é soldada ao tubo da longarina" },
+      { "pecas": ["travessaFrente", "longarinaD", "longarinaE"], "max": 20, "motivo": "a travessa é soldada ao tubo da longarina" },
+      { "pecas": ["perna*", "longarina*"], "max": 25, "motivo": "a perna de apoio é soldada na longarina" },
+      { "pecas": ["cabo*", "longarina*"], "max": 20, "motivo": "o cabo de borracha cobre a ponta do tubo da longarina" }
+    ]
+  },
+  "opcoes": [
+    {
+      "titulo": "Carrinho de mão",
+      "nota": "Caçamba de chapa sobre quadro tubular com duas pernas e roda dianteira",
+      "formas": [
+        { "id": "fundo", "tipo": "caixa", "largura": "larguraFundo", "altura": "espFundo", "profundidade": "compFundo", "centro": [0, "=yFundo+espFundo/2", "=zTras+compFundo/2"], "cor": "cinza", "rotulo": "fundo_cacamba" },
+        { "id": "paredeD", "tipo": "extrusao", "eixo": "x", "comprimento": "espParede", "perfil": [[0, 0], ["compFundo", 0], ["compParede", "alturaParede"], [0, "alturaParede"]], "ponta": { "id": "fundo", "lado": "+x" }, "alinha": { "com": "fundo", "eixos": ["y", "z"] }, "desloca": [0, "=(alturaParede-espFundo)/2", "=(compParede-compFundo)/2"], "cor": "cinza", "rotulo": "parede_cacamba" },
+        { "id": "paredeE", "espelha": { "forma": "paredeD", "eixo": "x" } },
+        { "id": "painelTras", "tipo": "caixa", "largura": "=larguraFundo+2*espParede", "altura": "alturaParede", "profundidade": "espParede", "ponta": { "id": "fundo", "lado": "-z" }, "alinha": { "com": "fundo", "eixos": ["x", "y"] }, "desloca": [0, "=(alturaParede-espFundo)/2", 0], "cor": "cinza", "rotulo": "painel_traseiro" },
+        { "id": "painelFrente", "tipo": "caixa", "largura": "=larguraFundo+2*espParede", "profundidade": "espParede", "de": "pontoBaseFrente", "para": "pontoTopoFrente", "ponta": { "fim": true }, "cor": "cinza", "rotulo": "painel_dianteiro" },
+
+        { "id": "longarinaD", "tipo": "tubo", "diametro": 30, "raioCurva": 50, "caminho": [
+            ["xCabo", "yCabo", -720],
+            { "nome": "cotovelo", "ponto": ["xCabo", "yCabo", -600] },
+            { "nome": "joelhoTras", "ponto": ["xLonga", "yLonga", -450] },
+            { "nome": "joelhoFrente", "ponto": ["xLonga", "yLonga", 420] },
+            { "nome": "garfo", "ponto": ["xEixo", "yEixo", "zEixo"] }
+          ], "cor": "laranja", "rotulo": "longarina" },
+        { "id": "longarinaE", "espelha": { "forma": "longarinaD", "eixo": "x" } },
+        { "id": "caboD", "tipo": "cilindro", "diametro": 34, "comprimento": 160, "eixo": "z", "centro": { "ancora": "longarinaD.inicio", "mm": [0, 0, -80] }, "cor": "preto", "rotulo": "cabo" },
+        { "id": "caboE", "espelha": { "forma": "caboD", "eixo": "x" } },
+
+        { "id": "travessaTras", "tipo": "tubo", "diametro": 25, "caminho": [{ "ancora": "longarinaE.joelhoTras", "mm": [15, 0, 0] }, { "ancora": "longarinaD.joelhoTras", "mm": [-15, 0, 0] }], "cor": "laranja", "rotulo": "travessa" },
+        { "id": "travessaFrente", "tipo": "tubo", "diametro": 25, "caminho": [{ "ancora": "longarinaE.joelhoFrente", "mm": [15, 0, 0] }, { "ancora": "longarinaD.joelhoFrente", "mm": [-15, 0, 0] }], "cor": "laranja", "rotulo": "travessa" },
+
+        { "id": "pernaD", "tipo": "tubo", "diametro": 28, "caminho": [
+            { "entre": ["longarinaD.joelhoTras", "longarinaD.joelhoFrente"], "mm": 60 },
+            { "ancora": "longarinaD.joelhoTras", "mm": [50, -410, -70] }
+          ], "cor": "laranja", "rotulo": "perna_apoio" },
+        { "id": "pernaE", "espelha": { "forma": "pernaD", "eixo": "x" } },
+        { "id": "sapataD", "tipo": "caixa", "largura": 60, "altura": 30, "profundidade": 220, "centro": "pernaD.fim", "desloca": [0, -20, 0], "cor": "preto", "rotulo": "sapata" },
+        { "id": "sapataE", "espelha": { "forma": "sapataD", "eixo": "x" } },
+
+        { "id": "rodaFrente", "usa": "roda", "parametros": { "diametro": 400, "aro": 260, "largura": 90, "diametroCubo": 50, "salienciaCubo": 25, "ombro": 25 }, "centro": [0, "yEixo", "zEixo"], "rotulo": "roda_dianteira" },
+        { "id": "eixoRoda", "tipo": "cilindro", "diametro": 16, "comprimento": "=2*xEixo", "eixo": "x", "centro": "rodaFrente.eixo", "cor": "cinza", "rotulo": "eixo_roda" }
+      ]
+    }
+  ]
+}

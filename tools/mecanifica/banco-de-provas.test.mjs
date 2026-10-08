@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import {
   validarRegistro,
   resumoPorObjeto,
+  campanhas,
   gerarMarkdown,
   conferir,
 } from './banco-de-provas.mjs';
@@ -69,6 +70,27 @@ describe('Banco de provas e registro de custo', () => {
     expect(resumo['picape'].totalTokens).toBe(4000);
     expect(resumo['picape'].totalRodadas).toBe(1);
     expect(resumo['picape'].notaFinal).toBe(9);
+  });
+
+  it('medições de dias diferentes não se somam: cada dia é uma linha do resumo', () => {
+    const dados = {
+      objetos: [
+        { nome: 'cadeira', familia: 'Móveis', nivel: 'esboço' },
+        { nome: 'picape', familia: 'Veículos terrestres', nivel: 'detalhado' },
+      ],
+      medicoes: [
+        { objeto: 'cadeira', unidade: 'objeto', rodada: 1, tokens: 1000, nota: 7, data: '2026-10-07T10:00:00Z' },
+        { objeto: 'cadeira', unidade: 'objeto', rodada: 2, tokens: 300, nota: 9, data: '2026-10-07T11:00:00Z' },
+        { objeto: 'cadeira', unidade: 'objeto', rodada: 1, tokens: 800, nota: 8, data: '2026-10-08T10:00:00Z' },
+      ],
+    };
+    expect(campanhas(dados)).toEqual(['2026-10-07', '2026-10-08']);
+    expect(resumoPorObjeto(dados, { campanha: '2026-10-07' }).cadeira).toMatchObject({ totalTokens: 1300, totalRodadas: 2, notaFinal: 9 });
+    expect(resumoPorObjeto(dados, { campanha: '2026-10-08' }).cadeira).toMatchObject({ totalTokens: 800, totalRodadas: 1, notaFinal: 8 });
+    const md = gerarMarkdown(dados);
+    expect(md).toContain('| **cadeira** | esboço | Móveis | 2026-10-07 | 2 | 2 | 1300 | 9 |');
+    expect(md).toContain('| **cadeira** | esboço | Móveis | 2026-10-08 | 1 | 1 | 800 | 8 |');
+    expect(md).toContain('| **picape** | detalhado | Veículos terrestres | aguardando medição | 0 | 0 | 0 | — |');
   });
 
   it('a nota do objeto é a menor nota final entre as unidades', () => {

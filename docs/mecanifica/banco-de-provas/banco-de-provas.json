@@ -200,6 +200,54 @@
       "origemTokens": "api",
       "nota": 8,
       "motivo": "com o desenho por pixel (6845851a) os contornos da rodada 2 foram desfeitos; sem defeito estrutural"
+    },
+    {
+      "objeto": "carrinho de mão",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-08T17:59:54.384Z",
+      "commit": "7e449634",
+      "tokens": 126849,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "caminho curto: sem defeito estrutural; curvas dos tubos segmentadas na frontal e linha residual no piso da caçamba"
+    },
+    {
+      "objeto": "cadeira de rodas",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-08T17:59:54.580Z",
+      "commit": "7e449634",
+      "tokens": 159687,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "caminho curto: fresta entre assento e encosto, apoio de pé fora do centro da placa e placa do eixo grande demais"
+    },
+    {
+      "objeto": "guarda-roupa",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-08T17:59:54.779Z",
+      "commit": "7e449634",
+      "tokens": 143669,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "caminho curto: sem defeito estrutural nas vistas externas; dobradiças aparentes por fora e interior não verificável"
+    },
+    {
+      "objeto": "cadeira",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-08T17:59:54.960Z",
+      "commit": "7e449634",
+      "tokens": 101631,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "caminho curto: sem defeito estrutural; emenda ambígua no poste traseiro e estofado em laje reta"
     }
   ]
 }

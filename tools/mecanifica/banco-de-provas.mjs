@@ -81,10 +81,20 @@ export function validarRegistro(registro, { objetosValidos = null, origensValida
   };
 }
 
-export function resumoPorObjeto(dados) {
+/* O dia de uma medição. Cada dia é uma campanha: o resumo não soma medições de dias diferentes, que repetem os mesmos
+   objetos por outro caminho e existem para ser comparadas lado a lado. */
+export const diaDaMedicao = (m) => String(m.data ?? '').slice(0, 10);
+
+/* Os dias com medição, do mais antigo ao mais recente. */
+export function campanhas(dados) {
+  return [...new Set((dados.medicoes ?? []).map(diaDaMedicao))].sort();
+}
+
+/* O resumo por objeto das medições de um dia (`campanha`), ou de todas quando não se dá o dia. */
+export function resumoPorObjeto(dados, { campanha = null } = {}) {
   const resumo = {};
   const objetos = dados.objetos ?? [];
-  const medicoes = dados.medicoes ?? [];
+  const medicoes = (dados.medicoes ?? []).filter((m) => campanha === null || diaDaMedicao(m) === campanha);
 
   for (const obj of objetos) {
     resumo[obj.nome] = {
@@ -143,6 +153,18 @@ export function resumoPorObjeto(dados) {
   return resumo;
 }
 
+/* As linhas do resumo: cada objeto em cada dia em que foi medido, ou uma linha sem dia se nunca foi. */
+function linhasDoResumo(dados) {
+  const porDia = campanhas(dados).map((dia) => ({ dia, resumo: resumoPorObjeto(dados, { campanha: dia }) }));
+  const linhas = [];
+  for (const obj of dados.objetos ?? []) {
+    const medidos = porDia.filter(({ resumo }) => resumo[obj.nome]?.medicoes > 0);
+    if (medidos.length === 0) linhas.push({ obj, dia: null, r: null });
+    for (const { dia, resumo } of medidos) linhas.push({ obj, dia, r: resumo[obj.nome] });
+  }
+  return linhas;
+}
+
 export function gerarMarkdown(dados) {
   const L = [];
   L.push('<!-- Gerado por tools/mecanifica/banco-de-provas.mjs. Não edite à mão; rode npm run banco-de-provas:gerar. -->');
@@ -170,15 +192,16 @@ export function gerarMarkdown(dados) {
   L.push('');
   L.push('## Resumo de custo por objeto');
   L.push('');
-  L.push('| Objeto | Nível | Família | Medições | Rodadas | Tokens | Menor nota final entre as unidades | Status |');
-  L.push('| ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |');
+  L.push('Uma linha por objeto e dia de medição; dias diferentes não se somam.');
+  L.push('');
+  L.push('| Objeto | Nível | Família | Dia | Medições | Rodadas | Tokens | Menor nota final entre as unidades |');
+  L.push('| ------ | ----- | ------- | --- | -------- | ------- | ------ | ---------- |');
 
-  const resumo = resumoPorObjeto(dados);
-  for (const obj of dados.objetos ?? []) {
-    const r = resumo[obj.nome];
-    const notaStr = r.notaFinal !== null ? String(r.notaFinal).replace('.', ',') : '—';
-    const status = r.medicoes > 0 ? 'medido' : 'aguardando medição';
-    L.push(`| **${obj.nome}** | ${obj.nivel} | ${obj.familia} | ${r.medicoes} | ${r.totalRodadas} | ${r.totalTokens} | ${notaStr} | ${status} |`);
+  for (const { obj, dia, r } of linhasDoResumo(dados)) {
+    const notaStr = r && r.notaFinal !== null ? String(r.notaFinal).replace('.', ',') : '—';
+    L.push(r
+      ? `| **${obj.nome}** | ${obj.nivel} | ${obj.familia} | ${dia} | ${r.medicoes} | ${r.totalRodadas} | ${r.totalTokens} | ${notaStr} |`
+      : `| **${obj.nome}** | ${obj.nivel} | ${obj.familia} | aguardando medição | 0 | 0 | 0 | — |`);
   }
 
   L.push('');
@@ -292,18 +315,16 @@ async function main() {
   }
 
   if (args.tem('--resumo')) {
-    const resumo = resumoPorObjeto(dados);
-    process.stdout.write('\nResumo de Custo do Banco de Provas por Objeto:\n');
-    process.stdout.write('------------------------------------------------------------------------------------\n');
-    process.stdout.write(`${'Objeto'.padEnd(22)} | ${'Nível'.padEnd(10)} | ${'Medições'.padStart(8)} | ${'Rodadas'.padStart(7)} | ${'Tokens'.padStart(8)} | ${'Nota'.padStart(6)} | Status\n`);
-    process.stdout.write('------------------------------------------------------------------------------------\n');
-    for (const obj of dados.objetos ?? []) {
-      const r = resumo[obj.nome];
-      const notaStr = r.notaFinal !== null ? String(r.notaFinal).replace('.', ',') : '—';
-      const status = r.medicoes > 0 ? 'medido' : 'aguardando';
-      process.stdout.write(`${obj.nome.padEnd(22)} | ${obj.nivel.padEnd(10)} | ${String(r.medicoes).padStart(8)} | ${String(r.totalRodadas).padStart(7)} | ${String(r.totalTokens).padStart(8)} | ${notaStr.padStart(6)} | ${status}\n`);
+    const traco = `${'-'.repeat(96)}\n`;
+    process.stdout.write('\nResumo de Custo do Banco de Provas por Objeto e dia de medição:\n');
+    process.stdout.write(traco);
+    process.stdout.write(`${'Objeto'.padEnd(22)} | ${'Nível'.padEnd(10)} | ${'Dia'.padEnd(10)} | ${'Medições'.padStart(8)} | ${'Rodadas'.padStart(7)} | ${'Tokens'.padStart(8)} | ${'Nota'.padStart(6)}\n`);
+    process.stdout.write(traco);
+    for (const { obj, dia, r } of linhasDoResumo(dados)) {
+      const notaStr = r && r.notaFinal !== null ? String(r.notaFinal).replace('.', ',') : '—';
+      process.stdout.write(`${obj.nome.padEnd(22)} | ${obj.nivel.padEnd(10)} | ${(dia ?? 'aguardando').padEnd(10)} | ${String(r?.medicoes ?? 0).padStart(8)} | ${String(r?.totalRodadas ?? 0).padStart(7)} | ${String(r?.totalTokens ?? 0).padStart(8)} | ${notaStr.padStart(6)}\n`);
     }
-    process.stdout.write('------------------------------------------------------------------------------------\n\n');
+    process.stdout.write(`${traco}\n`);
     process.exit(0);
   }
 

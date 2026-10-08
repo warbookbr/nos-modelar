@@ -1,0 +1,344 @@
+{
+  "vista": "isometrica",
+  "linhasCentro": false,
+  "plano": {
+    "texto": "Nivel medio: peca reconhecivel com medidas e contrato, Maquete e Conferencia. Objeto: cadeira de rodas manual dobravel adulta, aberta, de frente para +z, eixo traseiro em z=0, piso em y=0. Medidas: largura total cerca de 660 mm com os aros, altura total cerca de 920 mm nas manoplas, profundidade cerca de 950 mm com os apoios de pe, assento de 440 mm de largura a 490 mm do piso, rodas traseiras de 24 polegadas (610 mm), rodizios de 6 polegadas (150 mm), cotovelo a 720 mm; os numeros vem da ficha tipica de cadeira de rodas adulta e do conhecimento do objeto (origem ia), sem foto. Partes: quadro tubular em um tubo curvo por lado (manopla, montante traseiro, trilho do assento e poste dianteiro), trilho inferior, placa do eixo, duas travessas em X com pino central (o mecanismo de dobrar), lona do assento e lona do encosto, rodas traseiras raiadas com aro de propulsao preso por quatro suportes, rodizios dianteiros com carcaca, coroa e garfo de duas pernas, apoios de pe (haste e plataforma), bracos (almofada e poste) e manoplas. Formas: tubo com raio de curva, cilindro, caixa, anel, componente roda com raios; nao representa o tecido caido da lona (caixa plana), nem o aro de propulsao redondo (anel plano) nem a trava dos freios. O lado E fica em x negativo e o D nasce por simetria. Contato: gate ligado com tolerancia e penetracao de 3 mm; as unicas penetracoes declaradas sao a manopla que reveste a ponta do tubo, a haste do apoio de pe que nasce no poste e as travessas que se cruzam no pino. Tudo o mais encosta, sem calcular centro a mao: as pecas se posicionam por ancora (pontos-guia do tubo, faces das caixas, centro da roda).",
+    "nivel": "medio",
+    "medidas": [
+      { "nome": "larguraTotal", "valor": 660, "unidade": "mm", "origem": "ia", "tolerancia": 25, "mede": "larguraTotal" },
+      { "nome": "alturaTotal", "valor": 920, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": "alturaTotal" },
+      { "nome": "profundidadeTotal", "valor": 950, "unidade": "mm", "origem": "ia", "tolerancia": 40, "mede": "profundidadeTotal" },
+      { "nome": "larguraAssento", "valor": 440, "unidade": "mm", "origem": "ia", "tolerancia": 10, "mede": { "caixa": "x", "formas": ["assento"] } },
+      { "nome": "alturaAssento", "valor": 490, "unidade": "mm", "origem": "ia", "tolerancia": 15, "mede": { "distancia": ["assento.+y", [0, 0, 0]], "eixo": "y" } },
+      { "nome": "diametroRodaTraseira", "valor": 610, "unidade": "mm", "origem": "ficha", "tolerancia": 5, "mede": { "caixa": "y", "formas": ["rodaTrasE"] } },
+      { "nome": "diametroRodizio", "valor": 150, "unidade": "mm", "origem": "ficha", "tolerancia": 3, "mede": { "caixa": "y", "formas": ["rodizioE"] } },
+      { "nome": "alturaDoBraco", "valor": 720, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": { "distancia": ["bracoE.+y", [0, 0, 0]], "eixo": "y" } },
+      { "nome": "distanciaEntreEixos", "valor": 340, "unidade": "mm", "origem": "ia", "tolerancia": 30, "mede": { "distancia": ["rodaTrasE.eixo", "rodizioE.eixo"], "eixo": "z" } }
+    ],
+    "contrato": {
+      "tocam": [
+        ["assento", "quadroE"],
+        ["assento", "quadroD"],
+        ["encosto", "quadroE"],
+        ["encosto", "quadroD"],
+        ["bracoE", "quadroE"],
+        ["bracoD", "quadroD"],
+        ["placaEixoE", "quadroE"],
+        ["placaEixoD", "quadroD"],
+        ["rodaTrasE.cuboD", "placaEixoE"],
+        ["rodaTrasD.cuboD", "placaEixoD"],
+        ["carcacaE", "quadroE"],
+        ["carcacaD", "quadroD"],
+        ["coroaRodizioE", "carcacaE"],
+        ["coroaRodizioD", "carcacaD"],
+        ["plataformaPeE", "hasteApoioE"],
+        ["plataformaPeD", "hasteApoioD"],
+        ["travessaA", "pinoTravessa"],
+        ["travessaB", "pinoTravessa"],
+        ["travessaA", "quadroE"],
+        ["travessaB", "quadroD"]
+      ],
+      "livres": [
+        ["rodaTrasE", "rodaTrasD"],
+        ["rodaTrasE", "rodizioE"],
+        ["rodaTrasD", "rodizioD"],
+        ["bracoE", "rodaTrasE"],
+        ["bracoD", "rodaTrasD"],
+        ["assento", "rodaTrasE"]
+      ],
+      "simetricas": [
+        ["quadroE", "quadroD"],
+        ["rodaTrasE", "rodaTrasD"],
+        ["rodizioE", "rodizioD"],
+        ["bracoE", "bracoD"],
+        ["aroPropulsaoE", "aroPropulsaoD"],
+        ["plataformaPeE", "plataformaPeD"],
+        ["manoplaE", "manoplaD"]
+      ],
+      "fixa": [
+        { "a": "aroPropulsaoE", "b": "suporteAroE*", "pontos": 4 },
+        { "a": "suporteAroE*", "b": "rodaTrasE", "pontos": 4 },
+        { "a": "bracoE", "b": "quadroE", "pontos": 1 },
+        { "a": "postBracoE", "b": "quadroE", "pontos": 1 },
+        { "a": "rodizioE", "b": "pernaForaRodizioE", "pontos": 1 }
+      ]
+    },
+    "pecas": [
+      { "nome": "quadro tubular", "formas": ["quadroE", "quadroD", "trilhoInferiorE", "trilhoInferiorD", "placaEixoE", "placaEixoD"], "obrigatoria": true },
+      { "nome": "travessas em X", "formas": ["travessaA", "travessaB", "pinoTravessa"], "obrigatoria": true },
+      { "nome": "assento de lona", "formas": ["assento"], "obrigatoria": true },
+      { "nome": "encosto de lona", "formas": ["encosto"], "obrigatoria": true },
+      { "nome": "rodas traseiras", "formas": ["rodaTrasE", "rodaTrasD"], "obrigatoria": true },
+      { "nome": "aros de propulsao", "formas": ["aroPropulsaoE", "aroPropulsaoD", "suporteAroE*", "suporteAroD*"], "obrigatoria": true },
+      { "nome": "rodizios dianteiros", "formas": ["rodizioE", "rodizioD", "carcacaE", "carcacaD", "coroaRodizioE", "coroaRodizioD"], "obrigatoria": true },
+      { "nome": "apoios de pe", "formas": ["hasteApoioE", "hasteApoioD", "plataformaPeE", "plataformaPeD"], "obrigatoria": true },
+      { "nome": "bracos", "formas": ["bracoE", "bracoD", "postBracoE", "postBracoD"], "obrigatoria": true },
+      { "nome": "manoplas de empurrar", "formas": ["manoplaE", "manoplaD"], "obrigatoria": true }
+    ]
+  },
+  "parametros": {
+    "xq": 220,
+    "rTubo": 11,
+    "ySeat": 470,
+    "yTopo": 905,
+    "zManopla": -300,
+    "zTopo": -170,
+    "zAssentoTras": -110,
+    "zAssentoFrente": 360,
+    "yRodizio": 300,
+    "zRodizio": 370,
+    "yTrilho": 270,
+    "zLonaTras": -80,
+    "zLonaFrente": 330,
+    "eixoTras": 305,
+    "yPlacaCentro": 380,
+    "compBraco": 250,
+    "zTravessa": 100
+  },
+  "simetrico": { "eixo": "x", "pos": 0 },
+  "contato": {
+    "usar": true,
+    "tolerancia": 3,
+    "penetracao": 3,
+    "juntas": [
+      { "pecas": ["quadroE", "manoplaE"], "max": 32, "motivo": "a manopla de borracha reveste a ponta do tubo do quadro" },
+      { "pecas": ["quadroE", "hasteApoioE"], "max": 26, "motivo": "o tubo do apoio de pe nasce no poste dianteiro do quadro" },
+      { "pecas": ["travessaA", "travessaB", "pinoTravessa"], "max": 22, "motivo": "as duas travessas se cruzam e giram no pino central" }
+    ]
+  },
+  "formas": [
+    {
+      "id": "quadroE",
+      "lado": "E",
+      "tipo": "tubo",
+      "diametro": 22,
+      "raioCurva": 30,
+      "cor": "cinza",
+      "rotulo": "quadro",
+      "caminho": [
+        { "nome": "manoplaFim", "ponto": ["=-xq", "yTopo", "zManopla"] },
+        { "nome": "topoMontante", "ponto": ["=-xq", "yTopo", "zTopo"] },
+        { "nome": "cantoAssentoTras", "ponto": ["=-xq", "ySeat", "zAssentoTras"] },
+        { "nome": "cantoAssentoFrente", "ponto": ["=-xq", "ySeat", "zAssentoFrente"] },
+        { "nome": "cantoRodizio", "ponto": ["=-xq", "yRodizio", "zRodizio"] }
+      ]
+    },
+    {
+      "id": "manoplaE",
+      "lado": "E",
+      "tipo": "cilindro",
+      "diametro": 32,
+      "eixo": "z",
+      "cor": "preto",
+      "rotulo": "manopla",
+      "de": { "ancora": "quadroE.manoplaFim", "mm": [0, 0, -12] },
+      "para": { "ancora": "quadroE.topoMontante", "mm": [0, 0, -35] },
+      "ponta": { "inicio": true }
+    },
+    {
+      "id": "carcacaE",
+      "lado": "E",
+      "tipo": "cilindro",
+      "diametro": 30,
+      "comprimento": 130,
+      "eixo": "y",
+      "cor": "cinza",
+      "rotulo": "carcaca_rodizio",
+      "centro": { "ancora": "quadroE.cantoRodizio", "mm": [0, -65, 0] }
+    },
+    {
+      "id": "trilhoInferiorE",
+      "lado": "E",
+      "tipo": "cilindro",
+      "diametro": 22,
+      "cor": "cinza",
+      "rotulo": "trilho_inferior",
+      "de": { "ancora": "carcacaE.-z", "mm": [0, 35, 0] },
+      "para": { "ancora": "carcacaE.-z", "mm": [0, 35, -340] }
+    },
+    {
+      "id": "placaEixoE",
+      "lado": "E",
+      "tipo": "caixa",
+      "largura": 12,
+      "altura": 250,
+      "profundidade": 90,
+      "cor": "cinza",
+      "rotulo": "placa_eixo",
+      "centro": ["=-(xq+rTubo+6)", "yPlacaCentro", 0]
+    },
+    {
+      "id": "rodaTrasE",
+      "lado": "E",
+      "usa": "roda",
+      "rotulo": "roda_traseira",
+      "parametros": { "diametro": 610, "aro": 560, "largura": 30, "raios": 12, "larguraRaio": 5, "espessuraDisco": 6, "diametroCubo": 36, "salienciaCubo": 30, "espessuraAro": 8, "larguraAro": 24 },
+      "centro": { "ancora": "placaEixoE.-x", "mm": [-33, "=eixoTras-yPlacaCentro", 0] }
+    },
+    {
+      "id": "suporteAroE",
+      "lado": "E",
+      "tipo": "cilindro",
+      "diametro": 8,
+      "comprimento": 30,
+      "eixo": "x",
+      "cor": "cinza",
+      "centro": { "ancora": "rodaTrasE.aro", "mm": [-27, 276, 0] }
+    },
+    { "arranja": { "forma": "suporteAroE", "modo": "radial", "total": 4, "eixo": "x", "centro": "rodaTrasE.eixo" } },
+    { "arranja": { "forma": "suporteAroD", "modo": "radial", "total": 4, "eixo": "x", "centro": "rodaTrasD.eixo" } },
+    {
+      "id": "aroPropulsaoE",
+      "lado": "E",
+      "tipo": "anel",
+      "diametroExterno": 560,
+      "diametroInterno": 536,
+      "espessura": 14,
+      "eixo": "x",
+      "cor": "cinza",
+      "rotulo": "aro_propulsao",
+      "centro": { "ancora": "rodaTrasE.aro", "mm": [-49, 0, 0] }
+    },
+    {
+      "id": "rodizioE",
+      "lado": "E",
+      "usa": "roda",
+      "rotulo": "rodizio",
+      "parametros": { "diametro": 150, "aro": 110, "largura": 32, "espessuraDisco": 12, "diametroCubo": 28, "salienciaCubo": 14 },
+      "centro": { "ancora": "carcacaE.centro", "mm": [0, -160, -30] }
+    },
+    {
+      "id": "coroaRodizioE",
+      "lado": "E",
+      "tipo": "caixa",
+      "largura": 56,
+      "altura": 10,
+      "profundidade": 70,
+      "cor": "cinza",
+      "rotulo": "coroa_rodizio",
+      "centro": { "ancora": "carcacaE.-y", "mm": [0, -5, -20] }
+    },
+    {
+      "id": "pernaForaRodizioE",
+      "lado": "E",
+      "tipo": "caixa",
+      "largura": 8,
+      "altura": 97,
+      "profundidade": 26,
+      "cor": "cinza",
+      "rotulo": "garfo_rodizio",
+      "centro": { "ancora": "coroaRodizioE.-y", "mm": [-24, -48.5, -10] }
+    },
+    {
+      "id": "pernaDentroRodizioE",
+      "lado": "E",
+      "tipo": "caixa",
+      "largura": 8,
+      "altura": 97,
+      "profundidade": 26,
+      "cor": "cinza",
+      "centro": { "ancora": "coroaRodizioE.-y", "mm": [24, -48.5, -10] }
+    },
+    {
+      "id": "hasteApoioE",
+      "lado": "E",
+      "tipo": "cilindro",
+      "diametro": 20,
+      "cor": "cinza",
+      "rotulo": "haste_apoio_pe",
+      "de": { "entre": ["quadroE.cantoAssentoFrente", "quadroE.cantoRodizio"], "mm": 60 },
+      "para": { "ancora": "quadroE.cantoRodizio", "mm": [0, -190, 150] }
+    },
+    {
+      "id": "plataformaPeE",
+      "lado": "E",
+      "tipo": "caixa",
+      "largura": 110,
+      "altura": 6,
+      "profundidade": 170,
+      "cor": "preto",
+      "rotulo": "plataforma_pe",
+      "encaixa": {
+        "ancora": "+y",
+        "em": { "ancora": "hasteApoioE.fim", "mm": [0, -4, 0] }
+      },
+      "desloca": [15, 0, 40]
+    },
+    {
+      "id": "bracoE",
+      "lado": "E",
+      "tipo": "caixa",
+      "largura": 40,
+      "altura": 30,
+      "profundidade": "compBraco",
+      "cor": "preto",
+      "rotulo": "braco",
+      "centro": { "entre": ["quadroE.cantoAssentoTras", "quadroE.topoMontante"], "t": 0.54 },
+      "desloca": ["=-rTubo", 0, "=compBraco/2+rTubo"]
+    },
+    {
+      "id": "postBracoE",
+      "lado": "E",
+      "tipo": "cilindro",
+      "diametro": 18,
+      "comprimento": 209,
+      "eixo": "y",
+      "cor": "cinza",
+      "rotulo": "poste_braco",
+      "centro": { "ancora": "bracoE.-y", "mm": [0, -104.5, 85] }
+    },
+    {
+      "id": "assento",
+      "tipo": "caixa",
+      "largura": 436,
+      "altura": 6,
+      "profundidade": "=zLonaFrente-zLonaTras",
+      "cor": "azul",
+      "rotulo": "assento_lona",
+      "centro": [0, "=ySeat+rTubo+3", "=(zLonaTras+zLonaFrente)/2"]
+    },
+    {
+      "id": "encosto",
+      "tipo": "caixa",
+      "largura": 444,
+      "altura": 380,
+      "profundidade": 6,
+      "rotacao": [-7.85, 0, 0],
+      "cor": "azul",
+      "rotulo": "encosto_lona",
+      "centro": { "entre": ["quadroE.cantoAssentoTras", "quadroE.topoMontante"], "t": 0.5 },
+      "alinha": { "com": "assento", "eixos": ["x"] },
+      "desloca": [0, -1.9, -13.9]
+    },
+    {
+      "id": "travessaA",
+      "tipo": "cilindro",
+      "diametro": 18,
+      "cor": "cinza",
+      "rotulo": "travessa_x",
+      "de": ["=-(xq-10)", "=ySeat-8", "zTravessa"],
+      "para": ["=xq-10", "=yTrilho+8", "zTravessa"]
+    },
+    {
+      "id": "travessaB",
+      "tipo": "cilindro",
+      "diametro": 18,
+      "cor": "cinza",
+      "de": ["=xq-10", "=ySeat-8", "zTravessa"],
+      "para": ["=-(xq-10)", "=yTrilho+8", "zTravessa"]
+    },
+    {
+      "id": "pinoTravessa",
+      "tipo": "cilindro",
+      "diametro": 12,
+      "comprimento": 50,
+      "eixo": "z",
+      "cor": "preto",
+      "rotulo": "pino_travessa",
+      "centro": [0, "=(ySeat+yTrilho)/2", "zTravessa"]
+    }
+  ],
+  "opcoes": [
+    { "titulo": "Cadeira de rodas manual", "nota": "Dobravel, aberta, com aros de propulsao e rodizios" }
+  ]
+}

@@ -23,15 +23,21 @@ pois envolve consumo significativo de recursos.
 
 ## Resumo de custo por objeto
 
-| Objeto | Nível | Família | Medições | Rodadas | Tokens | Menor nota final entre as unidades | Status |
-| ------ | ----- | ------- | -------- | ------- | ------ | ---------- | ------ |
-| **carrinho de mão** | esboço | Veículos terrestres | 2 | 2 | 194524 | 8 | medido |
-| **picape** | detalhado | Veículos terrestres | 0 | 0 | 0 | — | aguardando medição |
-| **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
-| **suspensão** | detalhado | Motores, transmissões e mecanismos | 0 | 0 | 0 | — | aguardando medição |
-| **cadeira de rodas** | esboço | Veículos terrestres | 1 | 1 | 193819 | 9 | medido |
-| **guarda-roupa** | esboço | Móveis | 3 | 3 | 247352 | 8 | medido |
-| **cadeira** | esboço | Móveis | 2 | 2 | 136343 | 9 | medido |
+Uma linha por objeto e dia de medição; dias diferentes não se somam.
+
+| Objeto | Nível | Família | Dia | Medições | Rodadas | Tokens | Menor nota final entre as unidades |
+| ------ | ----- | ------- | --- | -------- | ------- | ------ | ---------- |
+| **carrinho de mão** | esboço | Veículos terrestres | 2026-10-07 | 2 | 2 | 194524 | 8 |
+| **carrinho de mão** | esboço | Veículos terrestres | 2026-10-08 | 1 | 1 | 126849 | 8 |
+| **picape** | detalhado | Veículos terrestres | aguardando medição | 0 | 0 | 0 | — |
+| **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | aguardando medição | 0 | 0 | 0 | — |
+| **suspensão** | detalhado | Motores, transmissões e mecanismos | aguardando medição | 0 | 0 | 0 | — |
+| **cadeira de rodas** | esboço | Veículos terrestres | 2026-10-07 | 1 | 1 | 193819 | 9 |
+| **cadeira de rodas** | esboço | Veículos terrestres | 2026-10-08 | 1 | 1 | 159687 | 8 |
+| **guarda-roupa** | esboço | Móveis | 2026-10-07 | 3 | 3 | 247352 | 8 |
+| **guarda-roupa** | esboço | Móveis | 2026-10-08 | 1 | 1 | 143669 | 8 |
+| **cadeira** | esboço | Móveis | 2026-10-07 | 2 | 2 | 136343 | 9 |
+| **cadeira** | esboço | Móveis | 2026-10-08 | 1 | 1 | 101631 | 8 |
 
 ## Histórico de medições
 
@@ -45,4 +51,8 @@ pois envolve consumo significativo de recursos.
 | 2026-10-07T17:57:25.994Z | `252d86d4` | **cadeira de rodas** | objeto | 1 | 193819 | api | 9 | sem defeito estrutural; folga curta rodízio-aro |
 | 2026-10-07T17:59:47.858Z | `5d81ae51` | **guarda-roupa** | objeto | 2 | 83864 | api | 5 | contorno do erro de desenho piorou o móvel (porta partida, gaveta recuada na isométrica); ferragens soltas na vista do interior |
 | 2026-10-07T19:03:22.591Z | `6845851a` | **guarda-roupa** | objeto | 3 | 25919 | api | 8 | com o desenho por pixel (6845851a) os contornos da rodada 2 foram desfeitos; sem defeito estrutural |
+| 2026-10-08T17:59:54.384Z | `7e449634` | **carrinho de mão** | objeto | 1 | 126849 | api | 8 | caminho curto: sem defeito estrutural; curvas dos tubos segmentadas na frontal e linha residual no piso da caçamba |
+| 2026-10-08T17:59:54.580Z | `7e449634` | **cadeira de rodas** | objeto | 1 | 159687 | api | 8 | caminho curto: fresta entre assento e encosto, apoio de pé fora do centro da placa e placa do eixo grande demais |
+| 2026-10-08T17:59:54.779Z | `7e449634` | **guarda-roupa** | objeto | 1 | 143669 | api | 8 | caminho curto: sem defeito estrutural nas vistas externas; dobradiças aparentes por fora e interior não verificável |
+| 2026-10-08T17:59:54.960Z | `7e449634` | **cadeira** | objeto | 1 | 101631 | api | 8 | caminho curto: sem defeito estrutural; emenda ambígua no poste traseiro e estofado em laje reta |
 
