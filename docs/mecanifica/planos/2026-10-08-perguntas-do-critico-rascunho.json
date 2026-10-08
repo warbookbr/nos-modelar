@@ -1,0 +1,623 @@
+{
+ "nota": "Rascunho escrito em 2026-10-08 por seis agentes Haiku, ainda não revisado pergunta a pergunta; as faixas das medidas são estimativas salvo onde a fonte diz outra coisa.",
+ "componentes": [
+  {
+   "componente": "dobradica",
+   "perguntas": [
+    {
+     "texto": "Em relação à espessura da porta e à da caixa, vistas de cima, em que ponto fica o pino da dobradiça?",
+     "observar": "Vista superior, ampliando a quina onde a porta encontra a caixa, com confirmação na vista isométrica. Olhar onde o círculo do pino cai em relação às duas faces.",
+     "defeito": "O pino fica do lado de fora da face da porta ou do vão da caixa. A porta então gira em torno de um eixo que não passa pela sua borda, não fecha sobre a caixa e a dobradiça aparece exposta na face externa do móvel."
+    },
+    {
+     "texto": "Qual peça segura cada uma das duas abas da dobradiça?",
+     "observar": "Vista isométrica e vista superior. Seguir cada aba a partir do pino até a face que ela toca e ver a qual peça essa face pertence.",
+     "defeito": "As duas abas estão presas à mesma peça, a porta ou a caixa. A dobradiça então não une duas partes que giram uma em relação à outra, e a porta fica presa ou solta sem articulação."
+    },
+    {
+     "texto": "Em que direção corre o pino em relação à borda vertical da porta que ele articula?",
+     "observar": "Vista frontal e vista lateral. Comparar a linha do pino com a linha da borda da porta.",
+     "defeito": "O pino aparece inclinado, deitado ou em outra direção. A porta não gira em torno dele de forma limpa, a folga entre porta e caixa muda com a altura e a porta abre de lado ou trava."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "diametroPino",
+     "mede": "diâmetro do pino cilíndrico, na vista superior",
+     "faixa": "aprox. 4 a 8 mm em dobradiça de móvel",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "altura",
+     "mede": "comprimento do pino na vertical, igual à altura das abas",
+     "faixa": "aprox. 40 a 100 mm em dobradiça de porta de móvel",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "espessura",
+     "mede": "espessura de cada aba, perpendicular ao plano da aba",
+     "faixa": "aprox. 1 a 3 mm em chapa de aço",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  },
+  {
+   "componente": "roda",
+   "perguntas": [
+    {
+     "texto": "Onde fica a base do pneu em relação ao plano em que o objeto se apoia?",
+     "observar": "Vista frontal e vista lateral. Olhar a linha mais baixa do pneu contra a linha de apoio do corpo ou do chão.",
+     "defeito": "O pneu fica acima do plano de apoio sem outra peça que o sustente, ou fica enterrado nele. No primeiro caso o objeto que deveria rodar não toca o chão, e no segundo o pneu atravessa a superfície em que o objeto se apoia."
+    },
+    {
+     "texto": "Em qual plano está o círculo da roda, e em que direção aponta o eixo do cubo?",
+     "observar": "Vista lateral e vista frontal. Na vista em que o objeto anda da esquerda para a direita, a roda aparece como círculo com o cubo no centro; na vista de frente, como faixa estreita, com o cubo saindo para os lados.",
+     "defeito": "O círculo está deitado ou em pé em relação à direção em que o objeto anda, e o eixo do cubo aponta para frente ou para trás. A roda então rola para o lado errado ou não rola no sentido do movimento do objeto."
+    },
+    {
+     "texto": "Em vista frontal, onde fica o cubo em relação ao centro do círculo do pneu?",
+     "observar": "Vista frontal. Comparar o centro do círculo do cubo com o centro do círculo externo do pneu.",
+     "defeito": "O cubo sai do centro, para cima, para baixo ou para um lado. A roda então parece excêntrica e não gira em torno do eixo que a prende."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "diametro",
+     "mede": "diâmetro externo do pneu, na vista frontal",
+     "faixa": "aprox. 550 a 700 mm em roda de carro de passeio",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "aro",
+     "mede": "diâmetro do aro, onde o pneu assenta",
+     "faixa": "aprox. 330 a 560 mm (13 a 22 polegadas) em carro de passeio",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "largura",
+     "mede": "largura do pneu ao longo do eixo",
+     "faixa": "aprox. 145 a 275 mm em carro de passeio",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "raios",
+     "mede": "número de raios, contados numa vista frontal",
+     "faixa": "aprox. 5 a 10 em roda de carro",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  },
+  {
+   "componente": "garfo",
+   "perguntas": [
+    {
+     "texto": "Como se alinham umas sobre as outras, vistas de frente, a perna, a bengala e a coroa?",
+     "observar": "Vista frontal. Comparar o eixo central de cada uma das três peças e ver se todas caem na mesma linha vertical.",
+     "defeito": "Uma das peças sai do centro das outras, e o garfo aparece torto ou dobrado no meio. A roda então fica deslocada da linha do cabeçote e o garfo não guia a roda em linha reta."
+    },
+    {
+     "texto": "Onde fica a base da perna em relação ao centro da roda?",
+     "observar": "Vista lateral, com o centro do pneu e o ponto mais baixo da perna. Confirmar na vista isométrica se a base encosta no eixo da roda.",
+     "defeito": "A base da perna para acima ou à frente do centro da roda, ou atravessa a roda. A roda então não está presa pelo ponto em que deveria girar, e a perna chega a ela de lado."
+    },
+    {
+     "texto": "Como a coroa se compara em largura com a bengala que ela sustenta?",
+     "observar": "Vista frontal e vista lateral. Comparar a largura da peça de cima com a largura logo abaixo dela.",
+     "defeito": "A coroa aparece mais estreita que a bengala. Em garfo real a coroa é mais larga que a bengala, porque é ela que prende o garfo ao cabeçote, e uma coroa mais fina deixa esse ponto de fixação frágil."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "diametro",
+     "mede": "diâmetro da bengala, a peça do meio, na vista frontal",
+     "faixa": "aprox. 30 a 50 mm em garfo de bicicleta ou moto",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "diametroPerna",
+     "mede": "diâmetro da perna na base, onde ela encontra a roda",
+     "faixa": "aprox. 35 a 60 mm",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "alturaPerna",
+     "mede": "comprimento da perna, da base até o começo da bengala",
+     "faixa": "sem faixa típica no componente, depende da família do objeto",
+     "fonte": "não se aplica"
+    }
+   ]
+  },
+  {
+   "componente": "quadro",
+   "perguntas": [
+    {
+     "texto": "Em que ponto do comprimento da viga está apoiada a coluna?",
+     "observar": "Vista lateral e vista superior. Comparar a distância da coluna até cada ponta da viga.",
+     "defeito": "A coluna fica recuada da ponta da frente ou no meio da viga, e a viga sobra para a frente ou para trás. O cabeçote então não fica na ponta do quadro onde a direção se prende, e o conjunto fica desbalanceado."
+    },
+    {
+     "texto": "Onde a coluna se encosta na viga, em relação à altura dela?",
+     "observar": "Vista frontal e vista lateral. Olhar a face de contato entre as duas peças.",
+     "defeito": "A coluna fica abaixo da viga ou apoiada na lateral dela, em vez de sobre a face de cima. A coluna então pende ou se encaixa de lado, e o cabeçote perde a base vertical que o quadro deveria ter."
+    },
+    {
+     "texto": "Em vista superior, onde fica a coluna em relação ao eixo central da viga?",
+     "observar": "Vista superior. Comparar o centro da coluna com a linha central da viga, que segue o seu comprimento.",
+     "defeito": "A coluna fica deslocada para um dos lados da viga. O quadro então fica torto e a direção sai do plano de simetria, o que se percebe logo numa vista de cima."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "comprimento",
+     "mede": "comprimento da viga, de uma ponta à outra",
+     "faixa": "sem faixa típica no componente, depende da família do objeto",
+     "fonte": "não se aplica"
+    },
+    {
+     "nome": "alturaColuna",
+     "mede": "altura da coluna acima da face de cima da viga",
+     "faixa": "sem faixa típica no componente, depende da família do objeto",
+     "fonte": "não se aplica"
+    },
+    {
+     "nome": "larguraColuna",
+     "mede": "largura da coluna, transversal ao comprimento da viga",
+     "faixa": "sem faixa típica no componente, depende da família do objeto",
+     "fonte": "não se aplica"
+    }
+   ]
+  },
+  {
+   "componente": "mancal",
+   "perguntas": [
+    {
+     "texto": "Na vista frontal, como o anel do alojamento se apoia na base, e onde está a linha de contato entre eles?",
+     "observar": "Vista frontal, a linha em que o anel azul encontra a base cinza. Na isométrica, conferir se o anel assenta sobre a base por inteiro.",
+     "defeito": "Anel suspenso acima da base com vão visível, ou afundado nela: o alojamento não se apoia na peça de baixo e não há como fixá-lo ao objeto."
+    },
+    {
+     "texto": "Em quais faces do alojamento o eixo aparece, e até onde ele se estende para cada lado?",
+     "observar": "Vista lateral e isométrica: as duas pontas do eixo laranja fora do anel azul.",
+     "defeito": "Eixo que aparece de um lado só, ou que termina dentro do anel: o eixo não atravessa o furo do alojamento, e um mancal de eixo passante precisa deixar o eixo sair pelas duas faces."
+    },
+    {
+     "texto": "Onde, na base, aparecem os dois furos de fixação, e a que distância da borda eles ficam?",
+     "observar": "Vista superior e isométrica: os dois círculos escuros na face de cima da base cinza e a borda em volta deles.",
+     "defeito": "Furo que não aparece na face de cima, ou que corta a borda da base e deixa a parede fina demais: o parafuso não encontra material para prender a base. Os dois furos devem ficar inteiros dentro do contorno e abertos na face de cima."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "folga diametral entre o eixo e o furo",
+     "mede": "diâmetro do furo do alojamento menos o diâmetro do eixo",
+     "faixa": "décimos de milímetro num assento de rolamento ou bucha; alguns milímetros só numa passagem livre",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "distância entre os furos de fixação",
+     "mede": "centro a centro dos dois furos da base",
+     "faixa": null,
+     "fonte": null
+    }
+   ]
+  },
+  {
+   "componente": "rolamento",
+   "perguntas": [
+    {
+     "texto": "Visto de frente pela face do rolamento, o que aparece no vão entre o anel externo e o anel interno?",
+     "observar": "Vista frontal ou isométrica, na face do rolamento: a faixa entre o anel de fora e o de dentro, onde ficam as esferas laranja.",
+     "defeito": "Vão vazio, sem esferas, ou esfera que aparece fora do vão cruzando um dos anéis: um rolamento sem esferas no canal não gira, e a esfera que atravessa o anel mostra que o canal está em posição errada."
+    },
+    {
+     "texto": "Visto de frente pela face, como a largura do vão entre os dois anéis se distribui em volta do eixo?",
+     "observar": "Vista frontal ou isométrica: a espessura do vão entre o anel externo e o interno ao longo de toda a volta.",
+     "defeito": "Vão mais largo de um lado e mais estreito do outro: os anéis não são concêntricos, a pista de esferas fica descentrada e o giro trava num ponto."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "número de esferas por fiada",
+     "mede": "esferas no vão, contadas numa volta completa",
+     "faixa": "cerca de 6 a 12 em rolamento radial de esferas de porte pequeno",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "folga radial interna",
+     "mede": "espaço radial livre entre a pista do anel externo e a do interno, com as esferas no lugar",
+     "faixa": "da ordem de centésimos de milímetro na classe normal",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  },
+  {
+   "componente": "parafuso",
+   "perguntas": [
+    {
+     "texto": "Em qual face da peça a cabeça se apoia, e para que lado a haste segue a partir dela?",
+     "observar": "Vista frontal e isométrica: a cabeça, a face da peça onde ela assenta e a direção em que a haste entra no material.",
+     "defeito": "Cabeça afundada dentro da peça, ou apoiada numa face que não é a de fora, com a haste seguindo para o lado errado: a cabeça tem de assentar na face externa e a haste atravessar a peça, senão o parafuso não aperta nada."
+    },
+    {
+     "texto": "Visto de lado, como a cabeça se liga à haste na linha em que as duas se encontram?",
+     "observar": "Vista lateral e isométrica: a emenda entre a base da cabeça e o começo da haste.",
+     "defeito": "Vão ou degrau visível entre a cabeça e a haste, ou haste fora do centro da cabeça: as duas partes não formam um parafuso só, e a cabeça não assenta reta sobre a peça."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "relação entre o diâmetro da cabeça e o da haste",
+     "mede": "diâmetro da cabeça dividido pelo diâmetro da haste; no sextavado, medido entre vértices",
+     "faixa": "cerca de 1,6 entre faces e 1,8 a 1,9 entre vértices, em cabeça sextavada de rosca métrica",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "relação entre a altura da cabeça e o diâmetro da haste",
+     "mede": "altura da cabeça dividida pelo diâmetro da haste",
+     "faixa": "cerca de 0,6 a 0,7 em cabeça sextavada de rosca métrica",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  },
+  {
+   "componente": "mola",
+   "perguntas": [
+    {
+     "texto": "Como as duas pontas da hélice encontram a sapata de baixo e a de cima?",
+     "observar": "Vista frontal e lateral: a primeira e a última volta junto aos discos.",
+     "defeito": "Volta que atravessa o disco, ou que para acima dele com vão: a mola não apoia na sapata, e a carga cai sobre um ponto do fio em vez de cair sobre o disco."
+    },
+    {
+     "texto": "Vista de cima, onde a hélice está em relação aos dois discos?",
+     "observar": "Vista superior: o círculo que o fio forma em relação ao disco de cima e ao de baixo, e a folga que sobra em volta.",
+     "defeito": "Hélice fora do centro dos discos ou maior que eles: a mola não trabalha no eixo e encosta numa sapata só de um lado, o que a faz tombar ao ser comprimida."
+    },
+    {
+     "texto": "De lado, como o espaçamento entre as voltas se distribui do disco de baixo ao de cima?",
+     "observar": "Vista lateral, a sequência de voltas entre os dois discos.",
+     "defeito": "Voltas amontoadas num trecho e abertas em outro: o passo não é o mesmo ao longo da mola, e ela se comprime torta, com um lado fechando antes do outro."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "razão entre o diâmetro médio e o fio",
+     "mede": "diâmetro médio da hélice, que é o dobro do raio da linha de centro, dividido pelo diâmetro do fio",
+     "faixa": "cerca de 4 a 12, a maior parte entre 6 e 10",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  },
+  {
+   "componente": "engrenagem",
+   "perguntas": [
+    {
+     "texto": "Como os dentes se distribuem em volta do contorno externo do disco?",
+     "observar": "Vista frontal, contorno externo inteiro. Percorrer o círculo e comparar o tamanho de cada dente e o vão entre dois dentes seguidos.",
+     "defeito": "Um trecho sem dentes, ou um vão visivelmente maior que os outros, indica dente faltando. Naquele arco a roda não engrena com a vizinha."
+    },
+    {
+     "texto": "Onde o cubo aparece em relação ao disco, e de que lado do disco ele sai?",
+     "observar": "Vista isométrica, para ver em quais faces do disco há cubo, e vista frontal, para ver se o cubo está centrado no mesmo centro dos dentes.",
+     "defeito": "Cubo que sai pelas duas faces, ou que aparece deslocado do centro dos dentes na vista frontal, indica que o eixo não passa pelo centro da roda. O disco gira excêntrico."
+    },
+    {
+     "texto": "Que forma o disco de dentes tem na vista frontal e na vista lateral?",
+     "observar": "Vista frontal e vista lateral. Comparar a silhueta do disco nas duas e a direção em que ela se estreita, se estreitar.",
+     "defeito": "Disco que não é perpendicular ao eixo de giro que a função pede: a silhueta aparece elíptica nas duas vistas, ou mais estreita numa delas do que o eixo permite. A roda não gira no plano em que deveria engrenar."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "numero de dentes",
+     "mede": "contagem dos dentes do contorno externo do disco",
+     "faixa": "cerca de 12 a 100 em dente reto de uso comum",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "distancia entre centros de um par",
+     "mede": "distância entre as origens de duas engrenagens que engrenam",
+     "faixa": "modulo vezes a soma dos dentes dos dois, dividida por 2; exata para dentes do mesmo modulo",
+     "fonte": "conhecimento geral (equação de engrenamento de dentes retos)"
+    },
+    {
+     "nome": "altura do dente",
+     "mede": "raio externo menos raio da raiz",
+     "faixa": "2,25 vezes o modulo (1 de cabeça e 1,25 de pé)",
+     "fonte": "conhecimento geral (dente de profundidade total)"
+    },
+    {
+     "nome": "largura do disco em modulos",
+     "mede": "espessura do disco dividida pelo modulo",
+     "faixa": "cerca de 6 a 12 modulos em projeto usual",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "diametro do cubo em relacao ao eixo",
+     "mede": "diâmetro do cubo dividido pelo diâmetro do eixo que o atravessa",
+     "faixa": "cerca de 1,5 a 2 vezes",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  },
+  {
+   "componente": "perfil",
+   "perguntas": [
+    {
+     "texto": "Para que lado a abertura da seção aponta, em relação às outras peças que tocam o perfil?",
+     "observar": "Vista isométrica e a vista em que a seção aparece na ponta da barra. Seguir a aba da L ou a parede aberta do U até o lado para onde ela se volta, e localizar as peças que encostam no perfil.",
+     "defeito": "Abertura do U ou aba da L voltada para o lado onde a peça fixada precisa de apoio contínuo, ou para dentro de um volume que deveria ficar fechado. A peça encostada fica sem apoio, ou o parafuso não tem onde entrar."
+    },
+    {
+     "texto": "A seção da barra é uma caixa fechada ou aberta ao longo de todo o comprimento?",
+     "observar": "Vista em que a seção aparece na ponta e vista isométrica. Uma fenda estreita numa parede não se vê e conta como fechada.",
+     "defeito": "Seção aberta (L ou U) onde a função pede caixa fechada, para resistir à torção ou para receber fixação por dentro. Ou tubo onde a função pede uma aba para apoiar outra peça."
+    },
+    {
+     "texto": "Qual lado da seção fica para cima no objeto?",
+     "observar": "Vista frontal e vista lateral. Localizar a seção na barra e ver qual de suas faces aponta para cima, e se a parede maior fica na vertical ou na horizontal.",
+     "defeito": "Perfil deitado onde a função pede a parede na vertical, como uma viga que recebe carga por cima, ou de pé onde a função pede a aba de apoio na horizontal, como uma prateleira. Ele dobra no eixo errado e a aba não sustenta a carga."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "espessura da parede pela largura",
+     "mede": "espessura da parede dividida pela largura da seção",
+     "faixa": "cerca de 0,05 a 0,10 em perfil estrutural de parede fina",
+     "fonte": "conhecimento geral"
+    },
+    {
+     "nome": "abas da cantoneira",
+     "mede": "largura da L dividida pela altura da L",
+     "faixa": "1 para cantoneira de abas iguais, a mais comum",
+     "fonte": "conhecimento geral"
+    }
+   ]
+  }
+ ],
+ "familias": [
+  {
+   "familia": "assento",
+   "cobre": [
+    "cadeira de jantar",
+    "banqueta",
+    "poltrona",
+    "sofá",
+    "cadeira de escritório",
+    "cadeira de rodas"
+   ],
+   "perguntas": [
+    {
+     "texto": "Como o tamanho do assento se compara ao do encosto e ao das pernas?",
+     "observar": "Vista lateral e frontal. Comparar a profundidade e a largura do assento com a altura do encosto e com o comprimento das pernas que o sustentam.",
+     "defeito": "Assento que parece pequeno ou grande demais para o encosto, ou pernas que parecem curtas ou longas demais para a altura do assento. Indica erro de escala entre as partes, porque com essas proporções a pessoa não sentaria no objeto como a figura mostra."
+    },
+    {
+     "texto": "Onde fica o espaço em que a pessoa se sentaria, em relação ao encosto e aos braços, se houver?",
+     "observar": "Vista superior e lateral. Verificar se o assento fica entre os braços, se o encosto fica atrás dele e se a frente do assento está livre.",
+     "defeito": "Encosto na frente do assento, ou assento deslocado para fora da área entre encosto e braços. Indica que a peça está montada de costas para o uso, porque quem sentasse ficaria voltado para o encosto ou sem apoio para as costas."
+    },
+    {
+     "texto": "Que partes tocam o chão, e como o objeto se apoia nele quando fica de pé?",
+     "observar": "Vista frontal e lateral. Ver quais pés, rodízios ou bordas encostam no plano do chão e se o objeto repousa sem bascular para um lado.",
+     "defeito": "Objeto inclinado, ou que toca o chão em menos de três pontos não alinhados, ou que tem um apoio no ar sem motivo aparente. Indica falha de apoio, porque o objeto não ficaria de pé sozinho."
+    },
+    {
+     "texto": "Qual parte recebe o peso de quem senta, e de que modo ela se prende ao resto do objeto?",
+     "observar": "Vista isométrica e lateral. Localizar a superfície horizontal na altura do assento e seguir até a base, as pernas ou a estrutura que a sustentam.",
+     "defeito": "Superfície do assento sem ligação visível com pernas, base ou estrutura, ou assento preso só a uma peça fina que não aguentaria carga. Indica que o assento não sustentaria quem senta, porque não há caminho de carga até o chão."
+    },
+    {
+     "texto": "Olhando o conjunto, que parte faria uma pessoa hesitar antes de sentar nele?",
+     "observar": "As quatro vistas, começando pela isométrica. Considerar altura, inclinação e tamanho de cada parte que encontraria o corpo de quem senta.",
+     "defeito": "Qualquer parte apontada, com o motivo da hesitação. Indica uso fora da convenção do tipo de objeto, porque a parte apontada contraria o que uma pessoa espera ao sentar no relance."
+    },
+    {
+     "texto": "Como a altura do braço se compara às do assento e do encosto?",
+     "observar": "Vista lateral. Comparar o topo do braço com o topo do assento e com o topo do encosto, na ordem em que aparecem de baixo para cima. Se o objeto não tiver braço, a resposta deve dizer que não há.",
+     "defeito": "Braço que fica abaixo do topo do assento ou acima do topo do encosto. Indica que o braço não serve para apoiar o antebraço de quem senta, porque fica fora da altura em que ele repousaria."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "altura do assento de cadeira de jantar e de escritório",
+     "mede": "altura do topo do assento ao chão",
+     "faixa": "400 a 480 mm",
+     "fonte": "Fato com fonte secundária: NBR 13962:2018, tabela 3, citada em esclarecimento de licitação do Senac-SP para a cadeira de diálogo. Não conferido no texto da norma. A aplicação à cadeira de jantar é minha."
+    },
+    {
+     "nome": "altura do assento de banqueta",
+     "mede": "altura do topo do assento ao chão, em banqueta de balcão ou de bar",
+     "faixa": "600 a 800 mm",
+     "fonte": "Estimativa minha, sem fonte conferida."
+    },
+    {
+     "nome": "profundidade do assento",
+     "mede": "profundidade do topo do assento, da borda da frente até a base do encosto",
+     "faixa": "380 a 470 mm",
+     "fonte": "Fato com fonte secundária: esclarecimento do Senac-SC que cita a NBR 13962 para certificação ABNT, com a faixa de 380 a 470 mm. Um edital do TRF1 pede 455 a 460 mm, o que diverge. Não conferido no texto da norma."
+    },
+    {
+     "nome": "razão entre altura do assento e altura total, cadeira de jantar",
+     "mede": "razão entre a altura do topo do assento ao chão e a altura total do objeto, do chão ao topo do encosto (razão adimensional, sem unidade)",
+     "faixa": "0,4 a 0,6",
+     "fonte": "Estimativa minha, derivada de cadeiras de jantar comuns, com assento perto de 450 mm e altura total perto de 900 mm. Sem fonte conferida."
+    },
+    {
+     "nome": "altura do braço de poltrona e sofá",
+     "mede": "altura do topo do braço ao chão",
+     "faixa": "600 a 700 mm",
+     "fonte": "Estimativa minha, conhecimento geral. Sem fonte conferida."
+    },
+    {
+     "nome": "altura do assento de cadeira de rodas",
+     "mede": "altura do topo do assento ao chão, em cadeira de rodas",
+     "faixa": "460 a 520 mm",
+     "fonte": "Estimativa minha, conhecimento geral. A norma de dimensões de cadeira de rodas é a ISO 7176-5, não consultada."
+    }
+   ]
+  },
+  {
+   "familia": "veiculo",
+   "cobre": [
+    "carro de passeio",
+    "picape",
+    "caminhão",
+    "moto",
+    "bicicleta",
+    "carrinho de mão",
+    "carrinho de bebê"
+   ],
+   "perguntas": [
+    {
+     "texto": "Na vista lateral, como a altura do corpo principal se compara ao comprimento total do veículo, e na vista frontal, como a largura se compara a essa altura?",
+     "observar": "Vista lateral: a altura do corpo principal (carroceria, caixa, quadro ou bloco que carrega o conjunto) contra o comprimento de ponta a ponta, na mesma escala. Vista frontal: a largura contra a altura. Em picape e caminhão, o corpo principal é a caixa atrás da cabine, não a cabine. Em moto e bicicleta, é o quadro ou o bloco do motor.",
+     "defeito": "Resposta que descreve o corpo principal como visivelmente baixo ou alto demais para o comprimento indica erro de escala no eixo vertical, porque a altura foi fixada sem relação com o comprimento. Largura que destoa da altura na vista frontal indica o mesmo no eixo transversal."
+    },
+    {
+     "texto": "Na vista lateral, em que posição fica cada roda em relação à carroceria, ao quadro ou à estrutura que a sustenta?",
+     "observar": "Vista lateral: o centro de cada roda contra o contorno do corpo principal, se fica por baixo dele, na borda ou por dentro. Vista isométrica: confirma se a roda está no plano da estrutura. Em bicicleta e moto, a referência é o quadro ou a forquilha.",
+     "defeito": "Roda cortada pelo volume do corpo, ou suspensa acima do ponto em que a estrutura deveria prendê-la, indica erro de encaixe, porque a roda não tem onde se apoiar. Roda que sai do contorno sem nenhum suporte visível indica o mesmo, porque o suporte falta ou ficou em outro lugar."
+    },
+    {
+     "texto": "Na vista lateral, em que nível cada roda ou apoio encosta no chão?",
+     "observar": "Vista lateral e frontal: a base de cada roda comparada à base das outras rodas. Se houver apoio de pé, cavalete ou pé de descanso, compare-o também com as rodas. Num carrinho de mão, a referência são a roda e as pernas da base.",
+     "defeito": "Roda que flutua ou afunda em relação às outras, ou apoio que fica acima do nível das rodas, indica erro de posição vertical, porque o veículo não repousaria no chão. Diferença de nível só é correta quando o próprio desenho a explica, como um cavalete de descanso."
+    },
+    {
+     "texto": "Na vista frontal e na superior, como as duas rodas de um mesmo eixo se posicionam uma em relação à outra?",
+     "observar": "Vista frontal: se as duas rodas do eixo ficam na mesma altura e à mesma distância do centro do objeto. Vista superior: se estão no mesmo plano longitudinal ou uma sai para fora. Em moto, bicicleta e carrinho de mão a roda é única ou está em linha com o quadro, e então a pergunta não se aplica ao eixo.",
+     "defeito": "Rodas de um mesmo eixo desalinhadas em altura, distância ao centro ou plano indicam erro de posição, porque um eixo é uma reta entre as duas. Em moto e bicicleta, roda traseira fora do plano do quadro indica o mesmo."
+    },
+    {
+     "texto": "Onde fica o lugar de quem dirige, pedala ou empurra, e para que lado as partes indicam que o veículo anda?",
+     "observar": "Vista lateral e superior: a posição do assento, do banco, da selim, da alça ou do guidão em relação ao corpo, e qual extremidade tem o farol, a roda que guia ou a alça de empurrar. Confira se a frente indicada pelas partes e o lugar de quem conduz concordam.",
+     "defeito": "Lugar de condução do lado oposto à frente indicada pelo farol, pelo guidão ou pelas rodas que guiam indica erro de orientação. Lugar de condução no meio do corpo, sem assento, apoio ou alça para ele, também indica erro, porque o objeto não teria onde alguém se pôr."
+    },
+    {
+     "texto": "Olhando as quatro vistas, como uma pessoa usaria as partes de contato do veículo, como assento, guidão, alça, degrau ou caçamba?",
+     "observar": "Vista lateral e isométrica: cada parte de uso comparada à escala de um adulto. Procure degrau ou alça fora do alcance da mão, assento alto demais para o chão e guidão ou alça que não chega à posição de quem usa.",
+     "defeito": "Parte de uso fora do alcance natural, como degrau alto demais para subir ou alça na altura do joelho, indica erro de escala ou de posição, porque o uso que o nome promete fica impraticável."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "altura_sobre_comprimento",
+     "mede": "Altura total dividida pelo comprimento total, na vista lateral.",
+     "faixa": "Carro de passeio ~0,28 a 0,36. Picape ~0,30 a 0,38. Caminhão leve ~0,40 a 0,50; caminhão pesado ~0,30 a 0,45. Moto ~0,50 a 0,65. Bicicleta ~0,55 a 0,65. Carrinho de mão ~0,55 a 0,70. Carrinho de bebê ~0,90 a 1,20.",
+     "fonte": "conhecimento geral (estimativa de ordem de grandeza, sem ficha consultada)"
+    },
+    {
+     "nome": "diametro_roda_sobre_altura",
+     "mede": "Diâmetro externo da roda dividido pela altura total do veículo.",
+     "faixa": "Carro de passeio ~0,40 a 0,50. Picape ~0,40 a 0,46. Caminhão ~0,25 a 0,40. Moto ~0,42 a 0,60. Bicicleta ~0,55 a 0,70. Carrinho de mão ~0,35 a 0,50. Carrinho de bebê ~0,20 a 0,30.",
+     "fonte": "conhecimento geral (estimativa de ordem de grandeza, sem ficha consultada)"
+    },
+    {
+     "nome": "entre_eixos_sobre_comprimento",
+     "mede": "Distância entre os centros do eixo dianteiro e do traseiro, dividida pelo comprimento total. Não se aplica a carrinho de mão, que tem roda única.",
+     "faixa": "Carro de passeio ~0,55 a 0,62. Picape ~0,55 a 0,65. Caminhão ~0,40 a 0,60, muito variável com o número de eixos. Moto ~0,60 a 0,70. Bicicleta ~0,55 a 0,65. Carrinho de bebê ~0,60 a 0,75.",
+     "fonte": "conhecimento geral (estimativa de ordem de grandeza, sem ficha consultada)"
+    },
+    {
+     "nome": "bitola_sobre_largura",
+     "mede": "Distância entre os centros das duas rodas de um mesmo eixo, dividida pela largura total. Não se aplica a moto, bicicleta e carrinho de mão, em que as rodas estão em linha.",
+     "faixa": "Carro de passeio ~0,80 a 0,90. Picape ~0,80 a 0,90. Caminhão com rodas duplas ~0,70 a 0,85. Carrinho de bebê ~0,75 a 0,90.",
+     "fonte": "conhecimento geral (estimativa de ordem de grandeza, sem ficha consultada)"
+    },
+    {
+     "nome": "largura_sobre_comprimento",
+     "mede": "Largura total dividida pelo comprimento total, na vista superior.",
+     "faixa": "Carro de passeio ~0,35 a 0,43. Picape ~0,31 a 0,38. Caminhão ~0,20 a 0,40. Moto com guidão ~0,33 a 0,45. Bicicleta com guidão ~0,30 a 0,40. Carrinho de mão ~0,37 a 0,50. Carrinho de bebê ~0,45 a 0,70.",
+     "fonte": "conhecimento geral (estimativa de ordem de grandeza, sem ficha consultada)"
+    },
+    {
+     "nome": "altura_do_ponto_de_uso",
+     "mede": "Altura sobre o chão, em metros, do ponto em que a pessoa senta, pega ou se apoia (assento, selim, banco, alça ou guidão), na vista lateral.",
+     "faixa": "Carro de passeio ~0,40 a 0,60 (assento). Picape ~0,50 a 0,75 (assento). Caminhão ~0,90 a 1,30 (cabine). Moto ~0,70 a 0,90 (assento). Bicicleta ~0,70 a 1,00 (selim). Carrinho de mão ~0,80 a 1,00 (alças). Carrinho de bebê ~0,90 a 1,10 (alça).",
+     "fonte": "conhecimento geral (estimativa de ordem de grandeza, sem ficha consultada)"
+    }
+   ]
+  },
+  {
+   "familia": "movel-de-caixa",
+   "cobre": [
+    "guarda-roupa",
+    "armario de cozinha",
+    "comoda",
+    "criado-mudo",
+    "estante com portas",
+    "gaveteiro"
+   ],
+   "perguntas": [
+    {
+     "texto": "De que lado de cada porta e de cada gaveta ficam as ferragens, por dentro ou por fora da caixa?",
+     "observar": "Vista superior, para ver a porta e a face da caixa em corte, e isometrica, para ver se o copo da dobradica e a corredica ficam na face interna. Na frontal, confira se alguma ferragem aparece alem da silhueta da caixa.",
+     "defeito": "Ferragem visivel fora da caixa ou presa na face externa da porta ou da lateral, porque dobradica e corredica precisam ficar do lado de dentro para a porta fechar sobre o vao. Tambem e erro quando a ferragem nao aparece em lugar nenhum."
+    },
+    {
+     "texto": "Que parte da frente da caixa fica descoberta, e para que lado cada porta abre?",
+     "observar": "Vista frontal, para medir o que sobra do vao sem porta, e vista superior, para ver o eixo de giro de cada porta em relacao a caixa.",
+     "defeito": "Faixa do vao exposta sem razao de projeto, ou porta cujo giro nao corresponde ao lado onde esta a dobradica. Porta que parece presa no centro do vao em vez de na lateral tambem indica erro."
+    },
+    {
+     "texto": "Por onde cada gaveta entra e sai, e o que sobra ao redor dela dentro do vao?",
+     "observar": "Vista lateral, para ver a gaveta dentro da caixa, e vista superior, para ver a folga dos lados e o que atravessa a frente. Na frontal, veja se a gaveta fica alinhada com a porta ou a frente de cima.",
+     "defeito": "Gaveta que atravessa a caixa, encosta em prateleira ou lateral, ou sai pelo fundo em vez de pela frente. Gaveta mais larga que o vao, que nao entraria, tambem indica erro."
+    },
+    {
+     "texto": "O que segura cada prateleira, e onde ela encosta?",
+     "observar": "Vista lateral, para ver a prateleira na altura em que as laterais ou a traseira a prendem, e isometrica, para ver se ela aparece solta entre as laterais.",
+     "defeito": "Prateleira sem apoio nas laterais, pendurada na porta ou flutuando, ou que atravessa a lateral. Prateleira encostada em um lado so, sem apoio no lado oposto, tambem e erro."
+    },
+    {
+     "texto": "O que toca o chao, e como a caixa fica apoiada sobre ele?",
+     "observar": "Vista lateral, para ver a base da caixa e o que fica entre ela e o chao, e vista frontal, para ver se a base aparece em toda a largura. Procure pes ou rodape presentes ao longo da largura inteira.",
+     "defeito": "Caixa que apoia so nas laterais, ou que fica suspensa sem pes e sem rodape tocando o chao. Base que nao encontra o chao em ponto nenhum indica erro."
+    },
+    {
+     "texto": "O que, num relance, parece estranho para quem usaria este movel?",
+     "observar": "As quatro vistas juntas. Olhe primeiro a isometrica e depois a frontal, procurando o que uma pessoa notaria antes de ler qualquer detalhe.",
+     "defeito": "Qualquer item concreto apontado aqui e defeito, porque o movel deveria passar sem estranheza num relance, como puxador do lado errado ou gaveta que abre para a parede. Resposta generica, sem parte nomeada, nao serve."
+    }
+   ],
+   "medidas": [
+    {
+     "nome": "Profundidade da caixa",
+     "mede": "Distancia entre a face frontal e a face traseira da caixa, sem a porta",
+     "faixa": "500 a 600 mm",
+     "fonte": "estimativa minha, em conhecimento geral; uma referencia de cozinha cita 560 a 600 mm, sem norma por tras"
+    },
+    {
+     "nome": "Altura do rodape",
+     "mede": "Altura do recuo entre o chao e a base da caixa",
+     "faixa": "80 a 150 mm",
+     "fonte": "estimativa minha; uma referencia de cozinha cita 100 a 200 mm, sem norma por tras"
+    },
+    {
+     "nome": "Espessura do painel",
+     "mede": "Espessura das laterais, base, topo, prateleiras e portas",
+     "faixa": "15 a 18 mm",
+     "fonte": "conhecimento geral (MDP e MDF comuns em moveis de caixa)"
+    },
+    {
+     "nome": "Folga entre portas",
+     "mede": "Folga entre portas vizinhas e entre porta e caixa",
+     "faixa": "2 a 4 mm",
+     "fonte": "conhecimento geral; um instalador citado em forum usa portas 3 a 4 mm mais estreitas que o vao, o que da folga total parecida (forum, nao e fabricante)"
+    },
+    {
+     "nome": "Distancia do eixo do copo a borda da porta",
+     "mede": "Distancia do centro do furo de 35 mm do copo da dobradica ate a borda da porta",
+     "faixa": "20 a 24 mm, conforme dobradica e recobrimento",
+     "fonte": "forum (Festool Owners Group, Sawmill Creek, Wood Designer) citando o manual Blum, p. 79, para 17 mm de recobrimento (23,5 mm); o valor de 22,5 mm nao foi confirmado no catalogo oficial"
+    },
+    {
+     "nome": "Reducao do vao para a gaveta",
+     "mede": "Quanto tirar da largura interna do vao para obter a largura da gaveta com corredica lateral",
+     "faixa": "LW menos 75 a 87 mm, com LW a largura interna do vao",
+     "fonte": "catalogo Blum, Tandembox, tabela de dimensao de corte para chapa de 16 mm (publications.blum.com), lido em trecho extraido e a conferir na pagina original; forum traz a regra de vao menos 42 mm, so como cruzamento"
+    }
+   ]
+  }
+ ]
+}
