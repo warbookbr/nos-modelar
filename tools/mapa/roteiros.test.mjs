@@ -1,36 +1,43 @@
-/* roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, as páginas estão
-   geradas dele, e cada defeito que o gate deve pegar (arquivo, comando ou skill que não existe, invariantes fora da leitura,
-   frase longa, orçamento estourado, página desatualizada) é recusado com o que corrigir. */
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+/* roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os
+   blocos do CLAUDE.md estão gerados dele, e cada defeito que o gate deve pegar (arquivo, comando ou skill que não existe,
+   CLAUDE.md fora da leitura, frase longa, orçamento estourado, página ou bloco desatualizado, marcador perdido, invariante
+   com teste que não existe) é recusado com o que corrigir. */
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { conferirLeituraObrigatoria } from './leitura-obrigatoria.mjs';
 import {
-  CAMINHO_INVARIANTES, CAMINHO_JSON, CAMINHO_ROTEIROS, carregarRoteiros, gerarInvariantes, gerarRoteirosMd,
-  paginasDesatualizadas, TETO_DA_FRASE, validarRoteiros,
+  CAMINHO_CLAUDE, CAMINHO_JSON, CAMINHO_ROTEIROS, carregarRoteiros, gerarBlocoInvariantes, gerarClaude, gerarRoteirosMd,
+  MARCADORES, paginasDesatualizadas, RAIZ, TETO_DA_FRASE, validarRoteiros,
 } from './roteiros.mjs';
 
-/* Um repositório mínimo numa pasta temporária: package.json com um script, uma skill, dois documentos e o JSON. */
+const CLAUDE_MODELO = `# Teste\n\n${MARCADORES.roteiros.join('\n')}\n\n${MARCADORES.invariantes.join('\n')}\n`;
+
+/* Um repositório mínimo numa pasta temporária: package.json com scripts, uma skill, um teste, dois documentos e o JSON. */
 function repositorio(ajustar = (d) => d) {
   const raiz = mkdtempSync(join(tmpdir(), 'roteiros-'));
   const gravar = (relativo, texto) => { mkdirSync(dirname(join(raiz, relativo)), { recursive: true }); writeFileSync(join(raiz, relativo), texto); };
-  gravar('package.json', JSON.stringify({ scripts: { gates: 'x', 'mapa:check': 'x' } }));
+  gravar('package.json', JSON.stringify({ scripts: { gates: 'x', 'mapa:check': 'x', test: 'x' } }));
   gravar('.claude/skills/criar-peca/SKILL.md', 'skill\n');
-  gravar('CLAUDE.md', 'a'.repeat(100));
+  gravar('tests/nucleo.test.mjs', 'teste\n');
   gravar('notas/extra.txt', 'b'.repeat(50));
   const dados = ajustar({
     versao: 1,
-    invariantes: [{ id: 'mapa', texto: 'Rode npm run mapa.', gate: 'mapa:check' }],
+    invariantes: [
+      { id: 'nucleo', secao: 'regras', texto: 'O núcleo não importa Three.js.', gate: 'test', teste: 'tests/nucleo.test.mjs' },
+      { id: 'mapa', secao: 'qualidade', texto: 'Rode npm run mapa.', gate: 'mapa:check' },
+      { id: 'idioma', secao: 'qualidade', texto: 'Use pt-BR.', gate: null },
+    ],
     roteiros: [{
       id: 'modelar/peca', intencao: 'modelar', titulo: 'Criar peça', quando: 'Criar uma peça.',
-      ler: ['CLAUDE.md', CAMINHO_INVARIANTES], sobDemanda: [{ arquivo: 'notas/extra.txt', quando: 'precisar' }],
+      ler: [CAMINHO_CLAUDE], sobDemanda: [{ arquivo: 'notas/extra.txt', quando: 'precisar' }],
       skill: 'criar-peca', comandos: ['npm run gates'], passo: 'Rode npm run gates.', conferido: 'npm run gates.',
-      orcamentoBytes: 10000, linhaDeBase: { bytes: 100, data: '2026-10-08' },
+      orcamentoBytes: 10000, linhaDeBase: { bytes: 5000, data: '2026-10-08' },
     }],
   });
   gravar(CAMINHO_JSON, JSON.stringify(dados));
-  gravar(CAMINHO_INVARIANTES, gerarInvariantes(dados));
+  gravar(CAMINHO_CLAUDE, gerarClaude(CLAUDE_MODELO, dados));
   gravar(CAMINHO_ROTEIROS, gerarRoteirosMd(dados));
   return { raiz, dados, gravar };
 }
@@ -42,6 +49,14 @@ describe('os roteiros do repositório', () => {
     const { roteiros, problemas } = conferirLeituraObrigatoria();
     expect(problemas).toEqual([]);
     expect(roteiros.length).toBeGreaterThan(0);
+  });
+
+  it('trazem no CLAUDE.md cada invariante inteiro e uma linha por roteiro, e o teste que confere o gate "test"', () => {
+    const dados = carregarRoteiros();
+    const claude = readFileSync(join(RAIZ, CAMINHO_CLAUDE), 'utf8').replace(/\n {2}/g, ' ');
+    for (const inv of dados.invariantes) expect(claude, inv.id).toContain(inv.texto);
+    for (const r of dados.roteiros) expect(claude).toContain(`- \`${r.id}\`: ${r.quando}`);
+    for (const inv of dados.invariantes.filter((i) => i.gate === 'test')) expect(claude).toContain(inv.teste);
   });
 
   it('têm as quatro intenções do plano e uma frase de índice por roteiro', () => {
@@ -57,15 +72,28 @@ describe('o gate leitura:obrigatoria recusa', () => {
   });
 
   it('o arquivo de "ler" ou de "sobDemanda" que não existe', () => {
-    const { raiz } = repositorio((d) => roteiro(d, { ler: ['CLAUDE.md', CAMINHO_INVARIANTES, 'notas/sumiu.txt'], sobDemanda: [{ arquivo: 'notas/tambem.txt', quando: 'x' }] }));
+    const { raiz } = repositorio((d) => roteiro(d, { ler: [CAMINHO_CLAUDE, 'notas/sumiu.txt'], sobDemanda: [{ arquivo: 'notas/tambem.txt', quando: 'x' }] }));
     const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
     expect(problemas).toContain('notas/sumiu.txt não existe');
     expect(problemas).toContain('notas/tambem.txt de "sobDemanda" não existe');
   });
 
-  it('o roteiro que não lê os invariantes', () => {
-    const { raiz } = repositorio((d) => roteiro(d, { ler: ['CLAUDE.md'] }));
-    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain(`"ler" precisa incluir ${CAMINHO_INVARIANTES}`);
+  it('o roteiro que não lê o CLAUDE.md, onde estão os invariantes', () => {
+    const { raiz } = repositorio((d) => roteiro(d, { ler: ['notas/extra.txt'], sobDemanda: [] }));
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain(`"ler" precisa incluir ${CAMINHO_CLAUDE}`);
+  });
+
+  it('o invariante com gate "test" sem o arquivo do teste, com "teste" sem o gate "test" e com seção que não existe', () => {
+    const { raiz } = repositorio((d) => {
+      d.invariantes[0].teste = 'tests/sumiu.test.mjs';
+      d.invariantes[1].teste = 'tests/nucleo.test.mjs';
+      d.invariantes[2].secao = 'outra';
+      return d;
+    });
+    const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
+    expect(problemas).toContain('o gate "test" precisa de "teste"');
+    expect(problemas).toContain('"teste" só vale com o gate "test"');
+    expect(problemas).toContain('"secao" deve ser uma de regras, qualidade');
   });
 
   it('o comando, a skill e o gate de invariante que não existem', () => {
@@ -100,6 +128,33 @@ describe('o gate leitura:obrigatoria recusa', () => {
     gravar(CAMINHO_ROTEIROS, '# editada à mão\n');
     expect(paginasDesatualizadas(carregarRoteiros(raiz), raiz).map((p) => p.relativo)).toEqual([CAMINHO_ROTEIROS]);
     expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain('rode npm run roteiros:gerar');
+  });
+
+  it('o bloco de regras do CLAUDE.md editado à mão ou atrás do JSON, apontando o comando que regrava', () => {
+    const { raiz, dados, gravar } = repositorio();
+    gravar(CAMINHO_CLAUDE, readFileSync(join(raiz, CAMINHO_CLAUDE), 'utf8').replace('Use pt-BR.', 'Use inglês.'));
+    expect(paginasDesatualizadas(dados, raiz).map((p) => p.relativo)).toEqual([CAMINHO_CLAUDE]);
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain(`${CAMINHO_CLAUDE} não bate com ${CAMINHO_JSON}: rode npm run roteiros:gerar.`);
+    dados.invariantes.push({ id: 'novo', secao: 'regras', texto: 'Uma regra nova.', gate: null });
+    gravar(CAMINHO_JSON, JSON.stringify(dados));
+    gravar(CAMINHO_CLAUDE, gerarClaude(CLAUDE_MODELO, { ...dados, invariantes: dados.invariantes.slice(0, -1) }));
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain('não bate');
+  });
+
+  it('o CLAUDE.md que perdeu um marcador, dizendo qual', () => {
+    const { raiz, gravar } = repositorio();
+    gravar(CAMINHO_CLAUDE, `# Teste\n\n${MARCADORES.roteiros.join('\n')}\n`);
+    expect(gerarClaude(`# Teste\n${MARCADORES.roteiros.join('\n')}\n`, carregarRoteiros(raiz))).toBeNull();
+    const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
+    expect(problemas).toContain(`${CAMINHO_CLAUDE} perdeu um marcador de bloco gerado`);
+    expect(problemas).toContain(MARCADORES.invariantes[0]);
+  });
+
+  it('gera as seções com o gate dito em cada regra', () => {
+    const bloco = gerarBlocoInvariantes(repositorio().dados).replace(/\n {2}/g, ' ');
+    expect(bloco).toMatch(/^## Regras\n\n- O núcleo não importa Three\.js\. O teste `tests\/nucleo\.test\.mjs`, do gate `test`, confere\./);
+    expect(bloco).toContain('## Coordenação e qualidade');
+    expect(bloco).toContain('- Rode npm run mapa. O gate `mapa:check` confere.');
   });
 
   it('o JSON sem linha de base ou com id repetido', () => {

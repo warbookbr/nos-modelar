@@ -38,10 +38,10 @@ plano. O que está encerrado vive em
   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md);
   hospedagem estática e isolamento de rede em
   [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md).
-- Os invariantes, que toda intenção lê, e os roteiros de leitura por intenção
-  são dados em [`roteiros/roteiros.json`](roteiros/roteiros.json), com as
-  páginas [`roteiros/INVARIANTES.md`](roteiros/INVARIANTES.md) e
-  [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) geradas por
+- Os invariantes e os roteiros de leitura por intenção são dados em
+  [`roteiros/roteiros.json`](roteiros/roteiros.json). Dele saem as regras e a
+  lista de roteiros do `CLAUDE.md` (entre marcadores) e a página
+  [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md), geradas por
   `npm run roteiros:gerar` e conferidas pelo gate `leitura:obrigatoria`;
   `npm run comecar -- <roteiro>` e a ferramenta MCP `comecar` devolvem o
   roteiro com o passo seguinte lido do estado.

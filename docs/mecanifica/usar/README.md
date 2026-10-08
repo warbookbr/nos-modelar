@@ -3,6 +3,8 @@
 Esta pasta é para quem vai **usar** o Mecanifica: criar, inspecionar, corrigir
 ou auditar uma peça. Não é preciso ler nada fora daqui para isso.
 
+As regras que valem em qualquer tarefa estão no `CLAUDE.md`.
+
 Quem vai **mudar** o Mecanifica — núcleo, gates, arquitetura, plano — entra por
 [`../INDEX.md`](../INDEX.md) (`docs/mecanifica/INDEX.md`), não por aqui.
 
@@ -48,12 +50,3 @@ de inclinação de erro de altura.
 
 [`PARAMETROS-VIVOS.md`](PARAMETROS-VIVOS.md): antes de alterar um número, saber
 se aquele parâmetro está ligado em algo. `npm run parametros`.
-
-## Regras que valem em qualquer tarefa daqui
-
-- O núcleo de autoria é independente de Three.js e do domínio automotivo.
-- ID interno, índice de array e posição de passo nunca são identidade
-  persistida.
-- Conteúdo salvo é determinístico, versionado, reexecutável e validável.
-- Modele e revise na bancada neutra antes de levar ao produto.
-- Nenhuma métrica aprova forma sozinha. Quem aprova forma é o usuário.

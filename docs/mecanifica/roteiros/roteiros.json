@@ -1,60 +1,96 @@
 {
   "versao": 1,
-  "descricao": "Os invariantes, que valem para toda intenção, e os roteiros de leitura por intenção. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que INVARIANTES.md e ROTEIROS.md estão gerados deste arquivo (npm run roteiros:gerar). A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento começou nessa leitura mais a página de invariantes, com uns 10% de folga para a edição do dia a dia (o de modelar/peca ficou no teto de 70 mil já acordado), e só desce.",
+  "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes são a fonte das regras do CLAUDE.md, que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro, e valem para toda intenção porque o CLAUDE.md entra em todo contexto. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
   "invariantes": [
     {
-      "id": "idioma",
-      "texto": "Escreva em pt-BR, em parágrafos corridos e literais, e responda curto, dizendo cada fato uma vez.",
-      "gate": null
-    },
-    {
       "id": "nucleo-independente",
+      "secao": "regras",
       "texto": "O núcleo de autoria é independente de Three.js e do domínio automotivo.",
-      "gate": null
+      "gate": "test",
+      "teste": "tools/arquitetura/nucleo-sem-three.test.mjs"
     },
     {
       "id": "identidade",
+      "secao": "regras",
       "texto": "IDs internos, índices de arrays e posições de passos nunca são identidade persistida.",
       "gate": null
     },
     {
       "id": "conteudo-salvo",
+      "secao": "regras",
       "texto": "Conteúdo salvo é determinístico, versionado, reexecutável e validável.",
       "gate": null
     },
     {
       "id": "forma",
-      "texto": "Nenhuma métrica aprova forma sozinha: a peça se modela e se revisa na bancada neutra antes de ir ao produto, e quem aprova forma é a pessoa.",
-      "gate": null
-    },
-    {
-      "id": "plano",
-      "texto": "Sem plano ativo, o backlog não autoriza implementação, e histórico ou plano encerrado não governa trabalho novo, nem por citação nem por analogia.",
-      "gate": null
-    },
-    {
-      "id": "escopo",
-      "texto": "Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de produto.",
+      "secao": "regras",
+      "texto": "Modele e revise peças na bancada neutra antes de levá-las ao produto. Nenhuma métrica aprova forma sozinha, e quem aprova forma é a pessoa.",
       "gate": null
     },
     {
       "id": "upstream",
-      "texto": "Mudança geral que possa voltar ao NÓS fica isolada e registrada em docs/mecanifica/UPSTREAM-NOS.md.",
+      "secao": "regras",
+      "texto": "Mudanças gerais que possam voltar ao NÓS ficam isoladas e registradas em `docs/mecanifica/UPSTREAM-NOS.md`.",
+      "gate": null
+    },
+    {
+      "id": "escopo",
+      "secao": "regras",
+      "texto": "Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de produto nesta documentação.",
+      "gate": null
+    },
+    {
+      "id": "plano",
+      "secao": "regras",
+      "texto": "Sem plano ativo, o backlog não autoriza implementação.",
+      "gate": null
+    },
+    {
+      "id": "coordenacao",
+      "secao": "regras",
+      "texto": "O trabalho dividido com outra IA neste repositório passa por `comunicacao.md`, com uma tarefa por seção.",
+      "gate": null
+    },
+    {
+      "id": "idioma",
+      "secao": "qualidade",
+      "texto": "Use pt-BR.",
+      "gate": null
+    },
+    {
+      "id": "escrita",
+      "secao": "qualidade",
+      "texto": "Escreva em parágrafos corridos e literais, aqui e nas respostas ao usuário. Sem frases picotadas, listas de fragmentos, oposições \"não X, e sim Y\" nem negrito no meio do texto. Descreva o fato, não a analogia: diga \"o valor fixo deixa de corresponder ao parâmetro e as partes se atravessam\", não \"o número envelhece mal\".",
+      "gate": null
+    },
+    {
+      "id": "resposta-curta",
+      "secao": "qualidade",
+      "texto": "Responda curto. Diga cada fato uma vez, sem repetir com outras palavras, sem recapitular o que o usuário já sabe e sem justificar além do que a decisão pede. Um erro se reconhece em uma frase.",
+      "gate": null
+    },
+    {
+      "id": "gates",
+      "secao": "qualidade",
+      "texto": "Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe sozinho a bateria curta quando só mudou peça ou documento e a completa em qualquer outro caso; durante o trabalho bastam os testes do que foi tocado. `--completo` força todos.",
       "gate": null
     },
     {
       "id": "mapa",
-      "texto": "docs/MAPA.md não se edita à mão: depois de mexer em documentação, rode npm run mapa.",
+      "secao": "qualidade",
+      "texto": "Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode `npm run mapa`.",
       "gate": "mapa:check"
     },
     {
-      "id": "gates",
-      "texto": "Antes de enviar, rode npm run gates, que escolhe a bateria curta quando só mudou peça ou documento e a completa nos outros casos.",
+      "id": "achado",
+      "secao": "qualidade",
+      "texto": "Todo achado responde se o processo o teria pego sozinho. Quando não, o que falta vira gate, campo ou instrução antes de a correção ser dada por pronta.",
       "gate": null
     },
     {
-      "id": "achado",
-      "texto": "Todo achado responde se o processo o teria pego sozinho, e quando não, o que falta vira gate, campo ou instrução antes de a correção ser dada por pronta.",
+      "id": "historico",
+      "secao": "qualidade",
+      "texto": "Histórico e evidências encerradas não governam trabalho novo, nem por citação nem por analogia.",
       "gate": null
     }
   ],
@@ -66,7 +102,6 @@
       "quando": "Mudar núcleo, gate, arquitetura, ferramenta ou plano.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/INDEX.md",
         "docs/mecanifica/planos/README.md",
         "docs/mecanifica/planos/2026-10-07-o-caminho-curto-da-ia.md"
@@ -105,7 +140,6 @@
       "quando": "Escrever, mover ou cortar documento, fora de um plano.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/INDEX.md"
       ],
       "sobDemanda": [
@@ -142,7 +176,6 @@
       "quando": "Saber o que já se tentou, mediu ou pesquisou antes de propor algo.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/historico/README.md"
       ],
       "sobDemanda": [
@@ -184,7 +217,6 @@
       "quando": "Escrever ou corrigir a receita de uma peça e prová-la na bancada.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/usar/README.md",
         "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
         "docs/mecanifica/usar/LACO-VISUAL.md",
@@ -250,7 +282,6 @@
       "quando": "Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         ".claude/agents/esbocista.md",
         ".claude/skills/esboco-detalhado/SKILL.md"
       ],
@@ -294,7 +325,6 @@
       "quando": "Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/usar/README.md",
         ".claude/skills/laco-do-esboco/SKILL.md"
       ],
@@ -328,7 +358,6 @@
       "quando": "Obter evidência objetiva de uma peça antes de publicar ou homologar.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/usar/README.md",
         ".claude/skills/auditar-peca/SKILL.md",
         "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md"
@@ -372,7 +401,6 @@
       "quando": "Conferir composição, relações, encaixes e impacto de um conjunto montado.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/roteiros/INVARIANTES.md",
         "docs/mecanifica/usar/README.md",
         ".claude/skills/auditar-montagem/SKILL.md",
         "docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md"

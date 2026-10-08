@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-923 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+924 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -338,7 +338,6 @@
 
 ## docs/mecanifica/roteiros/
 
-- `INVARIANTES.md` — Invariantes
 - `ROTEIROS.md` — Roteiros de leitura por intenção
 
 ## docs/mecanifica/usar/
@@ -826,6 +825,8 @@
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.
 - `mapear-motor-procedural.test.mjs` — Guarda que o mapa R00 continue descrevendo a fachada procedural real.
+- `nucleo-sem-three.mjs` — nucleo-sem-three.mjs — o núcleo de autoria é independente de Three.js.
+- `nucleo-sem-three.test.mjs` — nucleo-sem-three.test.mjs — o invariante "o núcleo de autoria é independente de Three.js", conferido por máquina: o núcleo real não importa Three.js, e um ar…
 
 ## tools/bancadas/
 
@@ -958,7 +959,7 @@
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
-- `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, as páginas estão geradas dele, e cada defeito que o g…
+- `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 
 ## tools/mcp/

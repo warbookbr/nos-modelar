@@ -4,10 +4,11 @@
 
 Cada roteiro diz o que ler antes de começar, o que abrir só quando a condição aparecer, a
 skill, os comandos e o que se confere no fim, e `npm run comecar -- <roteiro>` (ou a ferramenta
-MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelos
-[invariantes](INVARIANTES.md). `npm run leitura:obrigatoria` imprime o tamanho da leitura de
-cada roteiro contra o orçamento, e o gate recusa o roteiro que passa dele. O `AGENTS.md` faz
-para outros agentes o papel do `CLAUDE.md` e não entra na soma.
+MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelo
+`CLAUDE.md`, que traz os invariantes e a lista destes roteiros. `npm run leitura:obrigatoria` imprime
+o tamanho da leitura de cada roteiro contra o orçamento e a linha de base, e o gate recusa o
+roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o papel do
+`CLAUDE.md` e não entra na soma.
 
 | roteiro | intenção | quando |
 | --- | --- | --- |
@@ -27,7 +28,6 @@ Mudar núcleo, gate, arquitetura, ferramenta ou plano.
 Ler antes de começar, num orçamento de 67.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/INDEX.md`
 - `docs/mecanifica/planos/README.md`
 - `docs/mecanifica/planos/2026-10-07-o-caminho-curto-da-ia.md`
@@ -51,7 +51,6 @@ Escrever, mover ou cortar documento, fora de um plano.
 Ler antes de começar, num orçamento de 17.000 bytes (linha de base de 13.635 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/INDEX.md`
 
 Abrir só quando a condição aparecer:
@@ -73,7 +72,6 @@ Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
 Ler antes de começar, num orçamento de 12.000 bytes (linha de base de 8.948 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/historico/README.md`
 
 Abrir só quando a condição aparecer:
@@ -95,7 +93,6 @@ Escrever ou corrigir a receita de uma peça e prová-la na bancada.
 Ler antes de começar, num orçamento de 70.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/usar/README.md`
 - `docs/mecanifica/usar/GUIA-AUTORIA-IA.md`
 - `docs/mecanifica/usar/LACO-VISUAL.md`
@@ -132,7 +129,6 @@ Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.
 Ler antes de começar, num orçamento de 28.000 bytes (linha de base de 23.789 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `.claude/agents/esbocista.md`
 - `.claude/skills/esboco-detalhado/SKILL.md`
 
@@ -158,7 +154,6 @@ Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mai
 Ler antes de começar, num orçamento de 17.000 bytes (linha de base de 13.878 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/usar/README.md`
 - `.claude/skills/laco-do-esboco/SKILL.md`
 
@@ -182,7 +177,6 @@ Obter evidência objetiva de uma peça antes de publicar ou homologar.
 Ler antes de começar, num orçamento de 29.000 bytes (linha de base de 24.773 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/usar/README.md`
 - `.claude/skills/auditar-peca/SKILL.md`
 - `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`
@@ -209,7 +203,6 @@ Conferir composição, relações, encaixes e impacto de um conjunto montado.
 Ler antes de começar, num orçamento de 33.000 bytes (linha de base de 27.936 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/roteiros/INVARIANTES.md`
 - `docs/mecanifica/usar/README.md`
 - `.claude/skills/auditar-montagem/SKILL.md`
 - `docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md`

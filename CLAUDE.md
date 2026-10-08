@@ -1,37 +1,42 @@
 # Mecanifica — acordo de trabalho
 
-Este repositório mantém o núcleo procedural, as receitas, o visor compatível,
-a bancada e as ferramentas que sustentam a autoria da Mecanifica. A aplicação
-jogável, a Oficina humana e o som foram removidos; sobraram o visor simples de
-peça e a ferramenta que o fotografa, que servem à inspeção da IA.
-`bancada.html` é a única aplicação publicada aqui.
+Núcleo procedural, receitas, bancada e ferramentas com que a IA cria, inspeciona e
+audita peças e montagens. `bancada.html` é a única aplicação publicada aqui.
 
-## Entrada de contexto — escolha pela tarefa, não leia tudo
+## Entrada de contexto
 
-**Vai usar o Mecanifica** (criar, inspecionar, corrigir ou auditar uma peça,
-montagem ou máquina): entre por `docs/mecanifica/usar/README.md` e use a skill
-da tarefa. Não é preciso ler o INDEX nem os planos para isso.
+Rode `npm run comecar` (ou a ferramenta MCP `comecar`) e escolha o roteiro da
+tarefa; `npm run comecar -- <roteiro>` devolve o que ler, a skill, os comandos e o
+passo seguinte.
 
-**Vai mudar o Mecanifica** (núcleo, gates, arquitetura, ferramenta, plano):
-leia `docs/mecanifica/INDEX.md` e `docs/mecanifica/planos/README.md`. Sem plano
-ativo, o backlog não autoriza implementação. O trabalho dividido com outra IA
-neste repositório passa por `comunicacao.md`, com uma tarefa por seção.
+<!-- roteiros:inicio -->
+- `mudar`: Mudar núcleo, gate, arquitetura, ferramenta ou plano.
+- `documentar`: Escrever, mover ou cortar documento, fora de um plano.
+- `pesquisar`: Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
+- `modelar/peca`: Escrever ou corrigir a receita de uma peça e prová-la na bancada.
+- `modelar/esboco`: Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.
+- `modelar/laco-do-esboco`: Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.
+- `modelar/auditar-peca`: Obter evidência objetiva de uma peça antes de publicar ou homologar.
+- `modelar/auditar-montagem`: Conferir composição, relações, encaixes e impacto de um conjunto montado.
+<!-- roteiros:fim -->
 
-**Procurando o que já foi feito:** `docs/mecanifica/historico/README.md` e
-`docs/mecanifica/planos/encerrados/`. Serve de evidência e não governa trabalho
-novo — nem por citação, nem por analogia.
-
+<!-- invariantes:inicio -->
 ## Regras
 
-- O núcleo de autoria é independente de Three.js e do domínio automotivo.
+- O núcleo de autoria é independente de Three.js e do domínio automotivo. O
+  teste `tools/arquitetura/nucleo-sem-three.test.mjs`, do gate `test`, confere.
 - IDs internos, índices de arrays e posições de passos nunca são identidade
   persistida.
 - Conteúdo salvo é determinístico, versionado, reexecutável e validável.
-- Modele e revise peças na bancada neutra antes de levá-las ao produto.
+- Modele e revise peças na bancada neutra antes de levá-las ao produto. Nenhuma
+  métrica aprova forma sozinha, e quem aprova forma é a pessoa.
 - Mudanças gerais que possam voltar ao NÓS ficam isoladas e registradas em
   `docs/mecanifica/UPSTREAM-NOS.md`.
 - Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de
   produto nesta documentação.
+- Sem plano ativo, o backlog não autoriza implementação.
+- O trabalho dividido com outra IA neste repositório passa por `comunicacao.md`,
+  com uma tarefa por seção.
 
 ## Coordenação e qualidade
 
@@ -41,11 +46,17 @@ novo — nem por citação, nem por analogia.
   negrito no meio do texto. Descreva o fato, não a analogia: diga "o valor fixo
   deixa de corresponder ao parâmetro e as partes se atravessam", não "o número
   envelhece mal".
-- Responda curto. Diga cada fato uma vez, sem repetir com outras palavras,
-  sem recapitular o que o usuário já sabe e sem justificar além do que a
-  decisão pede. Um erro se reconhece em uma frase.
-- Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe sozinho a bateria curta quando só mudou peça ou documento e a completa em qualquer outro caso; durante o trabalho bastam os testes do que foi tocado. `--completo` força todos.
-- Não edite `docs/MAPA.md` à mão; rode `npm run mapa`.
+- Responda curto. Diga cada fato uma vez, sem repetir com outras palavras, sem
+  recapitular o que o usuário já sabe e sem justificar além do que a decisão
+  pede. Um erro se reconhece em uma frase.
+- Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe
+  sozinho a bateria curta quando só mudou peça ou documento e a completa em
+  qualquer outro caso; durante o trabalho bastam os testes do que foi tocado.
+  `--completo` força todos.
+- Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode
+  `npm run mapa`. O gate `mapa:check` confere.
 - Todo achado responde se o processo o teria pego sozinho. Quando não, o que
   falta vira gate, campo ou instrução antes de a correção ser dada por pronta.
-- Histórico e evidências encerradas não governam trabalho novo.
+- Histórico e evidências encerradas não governam trabalho novo, nem por citação
+  nem por analogia.
+<!-- invariantes:fim -->

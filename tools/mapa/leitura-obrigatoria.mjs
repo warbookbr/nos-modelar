@@ -15,12 +15,12 @@
  * alcançar.
  *
  * O gate confere, para cada roteiro, que todo arquivo e todo comando citado
- * existe e que a leitura cabe no orçamento, e confere que INVARIANTES.md e
- * ROTEIROS.md estão gerados do JSON. O orçamento começou no tamanho de
- * 2026-10-08 mais a página de invariantes, e só desce.
+ * existe e que a leitura cabe no orçamento, e confere que o ROTEIROS.md e os
+ * blocos do CLAUDE.md (os invariantes e a lista de roteiros) estão gerados do
+ * JSON. O orçamento só desce.
  */
 import { pathToFileURL } from 'node:url';
-import { carregarRoteiros, CAMINHO_JSON, medirRoteiro, paginasDesatualizadas, RAIZ, validarRoteiros } from './roteiros.mjs';
+import { carregarRoteiros, CAMINHO_JSON, MARCADORES, medirRoteiro, paginasDesatualizadas, RAIZ, validarRoteiros } from './roteiros.mjs';
 
 export function conferirLeituraObrigatoria(raiz = RAIZ) {
   const dados = carregarRoteiros(raiz);
@@ -32,8 +32,11 @@ export function conferirLeituraObrigatoria(raiz = RAIZ) {
   for (const r of roteiros.filter((x) => !x.dentro)) {
     problemas.push(`roteiro ${r.id}: a leitura tem ${r.total} bytes, ${r.total - r.orcamento} acima do orçamento de ${r.orcamento}. Cortar significa mover para "sobDemanda" ou para zona consultável com ponteiro, nunca apagar lição.`);
   }
-  const desatualizadas = paginasDesatualizadas(dados, raiz).map((p) => p.relativo);
-  if (desatualizadas.length > 0) problemas.push(`${desatualizadas.join(' e ')} não batem com ${CAMINHO_JSON}: rode npm run roteiros:gerar.`);
+  const desatualizadas = paginasDesatualizadas(dados, raiz);
+  const semMarcador = desatualizadas.filter((p) => p.esperado === null).map((p) => p.relativo);
+  if (semMarcador.length > 0) problemas.push(`${semMarcador.join(' e ')} perdeu um marcador de bloco gerado (${Object.values(MARCADORES).flat().join(', ')}): ponha de volta onde o bloco deve ficar e rode npm run roteiros:gerar.`);
+  const divergentes = desatualizadas.filter((p) => p.esperado !== null).map((p) => p.relativo);
+  if (divergentes.length > 0) problemas.push(`${divergentes.join(' e ')} ${divergentes.length === 1 ? 'não bate' : 'não batem'} com ${CAMINHO_JSON}: rode npm run roteiros:gerar.`);
   return { roteiros, problemas };
 }
 
