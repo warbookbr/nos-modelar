@@ -47,10 +47,15 @@ esboço fica mais barato pelo que a medição mostrar.
 - o `CLAUDE.md` reduzido a roteador e invariantes, a leitura obrigatória
   medida antes e depois, e as regras verificáveis da leitura obrigatória
   convertidas em gate ou recusa com o comando que resolve;
-- o esboço mais barato pelo que a medição mostrar; os candidatos são o Condutor
-  entregar só o trecho da skill do estágio atual, a edição por campo
-  (`--editar`) como caminho padrão e uma imagem composta das quatro vistas na
-  conferência;
+- o esboço mais barato pelo que a [medição](../banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md)
+  mostrou: o `modulos/esboco/README.md`, lido quase inteiro em todo objeto, foi
+  44% do que entrou no contexto, e as imagens abertas foram 27%, enquanto a skill
+  pesou 6% e a escrita do JSON 3%. Por isso a referência do JSON passa a ser
+  consultada por tópico (`npm run esboco -- --ajuda <tópico>`, também no MCP),
+  com o agente e a skill apontando para ela em vez do README, e a conferência
+  passa a usar uma imagem composta e menor das quatro vistas, abrindo a vista
+  inteira só quando o gate ou o crítico pedir. Como o custo é o contexto vezes os
+  turnos (de 15 a 44 por objeto), o passo seguinte do Condutor também conta;
 - os quatro objetos de esboço do banco refeitos pelo caminho curto, comparados
   com a medição de 2026-10-07.
 
@@ -74,17 +79,20 @@ esboço fica mais barato pelo que a medição mostrar.
 4. A leitura obrigatória de cada intenção é menor que a de hoje, medida pelo
    gate `leitura:obrigatoria`.
 5. Os quatro objetos de esboço refeitos custam menos tokens que na medição de
-   2026-10-07, com nota final igual ou maior.
+   2026-10-07, com nota final igual ou maior, e o esbocista não lê o README do
+   módulo para escrever o JSON.
 6. `npm run gates --completo` passa.
 
 ## Fatias
 
 1. Medir onde vão os tokens nas transcrições dos quatro esbocistas. Feita em
    2026-10-07: [a medição](../banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md).
-2. A página de invariantes e os roteiros por intenção como dados, com gate.
-3. O comando de entrada e a ferramenta MCP, com o passo seguinte pelo estado.
-4. O `CLAUDE.md` como roteador e as regras verificáveis convertidas em gate.
-5. O esboço mais barato pelo que a fatia 1 mostrar.
+2. O esboço mais barato: a referência do JSON por tópico no lugar do README e a
+   imagem composta na conferência. Vem antes das outras por ser o maior ganho
+   medido e não depender delas.
+3. A página de invariantes e os roteiros por intenção como dados, com gate.
+4. O comando de entrada e a ferramenta MCP, com o passo seguinte pelo estado.
+5. O `CLAUDE.md` como roteador e as regras verificáveis convertidas em gate.
 6. Os quatro objetos refeitos e o fechamento.
 
 ## Riscos e desvios
