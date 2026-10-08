@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-932 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+938 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -123,6 +123,7 @@
 - `INDEX.md` — Mecanifica — entrada atual
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
+- `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
@@ -154,6 +155,7 @@
 - `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
 - `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
 - `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
+- `CHEGADA-2026-09-11.md` — O que chegou aqui em 2026-09-11
 - `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
 - `DOSSIE-CABO-DE-PA.md` — Cabo de pá: alternativas ao eucalipto — dossiê técnico
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
@@ -339,6 +341,8 @@
 
 ## docs/mecanifica/roteiros/
 
+- `ROTEIROS.md` — Roteiros de leitura por intenção
+- `ROTEIROS.md` — Roteiros de leitura por intenção
 - `ROTEIROS.md` — Roteiros de leitura por intenção
 
 ## docs/mecanifica/usar/
@@ -954,6 +958,8 @@
 - `gates-bateria-curta.test.mjs` — gates-bateria-curta.test.mjs — a bateria curta só roda quando tudo o que mudou é peça ou documento; qualquer outro arquivo, ou não saber o que mudou, roda to…
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
 - `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
+- `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
+- `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.
@@ -961,6 +967,8 @@
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
+- `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
+- `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 
@@ -1075,8 +1083,6 @@
 - `esboco-recusa.mjs` — Para onde cada recusa do esboço aponta: a mensagem "esboço recusado: ...", o gate de contato que reprova e o Portão do Condutor que não passa ganham no fim `…
 - `esboco-recusa.test.mjs` — esboco-recusa.test.mjs — toda recusa do esboço aponta o tópico que resolve, e o tópico existe no índice real de `npm run esboco -- --ajuda`: a forma e o camp…
 - `esboco-referencia.mjs` — Lê as referências do esboço para o módulo `modulos/esboco`, que não lê arquivo: um JSON de contornos da imagem (`mecanifica.contornos@1`, o que `npm run cont…
-- `esboco.mjs` — Linha de comando do esboço: lê `<nome>.esboco.json`, desenha as opções lado a lado com modulos/esboco e grava `<nome>.svg` e `<nome>.png` ao lado. Uso: npm r…
-- `esboco.mjs` — Linha de comando do esboço: lê `<nome>.esboco.json`, desenha as opções lado a lado com modulos/esboco e grava `<nome>.svg` e `<nome>.png` ao lado. Uso: npm r…
 - `esboco.mjs` — Linha de comando do esboço: lê `<nome>.esboco.json`, desenha as opções lado a lado com modulos/esboco e grava `<nome>.svg` e `<nome>.png` ao lado. Uso: npm r…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.

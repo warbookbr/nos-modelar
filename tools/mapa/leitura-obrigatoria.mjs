@@ -17,7 +17,9 @@
  * O gate confere, para cada roteiro, que todo arquivo e todo comando citado
  * existe e que a leitura cabe no orçamento, e confere que o ROTEIROS.md e os
  * blocos do CLAUDE.md (os invariantes e a lista de roteiros) estão gerados do
- * JSON. O orçamento só desce.
+ * JSON. O orçamento só desce. A linha de base é a leitura de 2026-10-08: a
+ * leitura de cada roteiro precisa ficar abaixo dela, o que o gate de saída do
+ * plano o caminho curto da IA pede.
  */
 import { pathToFileURL } from 'node:url';
 import { carregarRoteiros, CAMINHO_JSON, MARCADORES, medirRoteiro, paginasDesatualizadas, RAIZ, validarRoteiros } from './roteiros.mjs';
@@ -27,10 +29,15 @@ export function conferirLeituraObrigatoria(raiz = RAIZ) {
   const problemas = validarRoteiros(dados, raiz);
   const roteiros = dados.roteiros.map((r) => {
     const { arquivos, total } = medirRoteiro(r, raiz);
-    return { id: r.id, arquivos, total, orcamento: r.orcamentoBytes, linhaDeBase: r.linhaDeBase?.bytes, dentro: total <= r.orcamentoBytes };
+    const linhaDeBase = r.linhaDeBase?.bytes;
+    return { id: r.id, arquivos, total, orcamento: r.orcamentoBytes, linhaDeBase, dentro: total <= r.orcamentoBytes, abaixoDaBase: total < linhaDeBase };
   });
   for (const r of roteiros.filter((x) => !x.dentro)) {
     problemas.push(`roteiro ${r.id}: a leitura tem ${r.total} bytes, ${r.total - r.orcamento} acima do orçamento de ${r.orcamento}. Cortar significa mover para "sobDemanda" ou para zona consultável com ponteiro, nunca apagar lição.`);
+  }
+  for (const r of roteiros.filter((x) => Number.isInteger(x.linhaDeBase) && !x.abaixoDaBase)) {
+    const corte = r.total - r.linhaDeBase + 1;
+    problemas.push(`roteiro ${r.id}: a leitura tem ${r.total} bytes e precisa ficar abaixo da linha de base de ${r.linhaDeBase}; corte pelo menos ${corte} ${corte === 1 ? 'byte' : 'bytes'}. Cortar significa mover para "sobDemanda" ou para zona consultável com ponteiro, nunca apagar lição.`);
   }
   const desatualizadas = paginasDesatualizadas(dados, raiz);
   const semMarcador = desatualizadas.filter((p) => p.esperado === null).map((p) => p.relativo);

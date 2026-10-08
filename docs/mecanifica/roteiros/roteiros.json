@@ -118,6 +118,10 @@
         {
           "arquivo": "docs/mecanifica/UPSTREAM-NOS.md",
           "quando": "a mudança é geral e pode voltar ao NÓS"
+        },
+        {
+          "arquivo": "docs/mecanifica/LEITURA-POR-TAREFA.md",
+          "quando": "a pergunta é por assunto e nenhum roteiro a responde"
         }
       ],
       "skill": null,
@@ -128,7 +132,7 @@
       ],
       "passo": "Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.",
       "conferido": "npm run gates, com a bateria completa quando muda código.",
-      "orcamentoBytes": 67000,
+      "orcamentoBytes": 25000,
       "linhaDeBase": {
         "bytes": 59061,
         "data": "2026-10-08"
@@ -155,6 +159,10 @@
         {
           "arquivo": "docs/mecanifica/historico/README.md",
           "quando": "o documento vai para o histórico"
+        },
+        {
+          "arquivo": "docs/mecanifica/LEITURA-POR-TAREFA.md",
+          "quando": "a pergunta é por assunto e nenhum roteiro a responde"
         }
       ],
       "skill": null,
@@ -164,7 +172,7 @@
       ],
       "passo": "Edite o documento, rode npm run mapa e confira com npm run gates.",
       "conferido": "npm run gates, que roda os gates de documentação (links, sumário, estrutura, citações e mapa).",
-      "orcamentoBytes": 17000,
+      "orcamentoBytes": 13000,
       "linhaDeBase": {
         "bytes": 13635,
         "data": "2026-10-08"
@@ -199,13 +207,17 @@
         {
           "arquivo": "docs/mecanifica/ANALISES-DE-2026-10.md",
           "quando": "a pergunta é sobre a avaliação da estrutura do projeto"
+        },
+        {
+          "arquivo": "docs/mecanifica/historico/CHEGADA-2026-09-11.md",
+          "quando": "a pergunta é por que um documento saiu da raiz de docs/mecanifica/ ou onde foi parar"
         }
       ],
       "skill": null,
       "comandos": [],
       "passo": "Abra docs/mecanifica/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.",
       "conferido": "Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.",
-      "orcamentoBytes": 12000,
+      "orcamentoBytes": 6000,
       "linhaDeBase": {
         "bytes": 8948,
         "data": "2026-10-08"
@@ -218,7 +230,6 @@
       "quando": "Escrever ou corrigir a receita de uma peça e prová-la na bancada.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/usar/README.md",
         "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
         "docs/mecanifica/usar/LACO-VISUAL.md",
         ".claude/skills/criar-peca/SKILL.md",
@@ -260,6 +271,14 @@
         {
           "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
           "quando": "for declarar a forma pronta"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md",
+          "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         }
       ],
       "skill": "criar-peca",
@@ -270,7 +289,7 @@
       ],
       "passo": "Com peça nova, combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.",
       "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
-      "orcamentoBytes": 70000,
+      "orcamentoBytes": 65000,
       "linhaDeBase": {
         "bytes": 62482,
         "data": "2026-10-08"
@@ -283,7 +302,6 @@
       "quando": "Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.",
       "ler": [
         "CLAUDE.md",
-        ".claude/agents/esbocista.md",
         ".claude/skills/esboco-detalhado/SKILL.md"
       ],
       "sobDemanda": [
@@ -313,7 +331,7 @@
       ],
       "passo": "Rode npm run esboco -- --condutor <arquivo> e siga o Portão do estágio.",
       "conferido": "O Portão de cada estágio do Condutor e a nota 8 ou mais do crítico visual cego.",
-      "orcamentoBytes": 28000,
+      "orcamentoBytes": 14000,
       "linhaDeBase": {
         "bytes": 23789,
         "data": "2026-10-08"
@@ -326,7 +344,6 @@
       "quando": "Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/usar/README.md",
         ".claude/skills/laco-do-esboco/SKILL.md"
       ],
       "sobDemanda": [
@@ -337,6 +354,10 @@
         {
           "arquivo": "docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md",
           "quando": "o objeto é do banco de provas e o custo vai ser registrado"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
         }
       ],
       "skill": "laco-do-esboco",
@@ -346,7 +367,7 @@
       ],
       "passo": "Siga a skill laco-do-esboco: despache o esbocista e registre cada veredito do crítico.",
       "conferido": "O fluxo do Condutor em Concluído, com cada nota do crítico em 8 ou mais.",
-      "orcamentoBytes": 17000,
+      "orcamentoBytes": 12000,
       "linhaDeBase": {
         "bytes": 13878,
         "data": "2026-10-08"
@@ -359,7 +380,6 @@
       "quando": "Obter evidência objetiva de uma peça antes de publicar ou homologar.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/usar/README.md",
         ".claude/skills/auditar-peca/SKILL.md",
         "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md"
       ],
@@ -379,6 +399,10 @@
         {
           "arquivo": "docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md",
           "quando": "for ler o formato do achado do crítico"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
         }
       ],
       "skill": "auditar-peca",
@@ -389,7 +413,7 @@
       ],
       "passo": "Descreva a peça com npm run descrever e siga a skill auditar-peca.",
       "conferido": "O relato com os defeitos por vista e região e o que não foi conferido, com o motivo.",
-      "orcamentoBytes": 29000,
+      "orcamentoBytes": 24000,
       "linhaDeBase": {
         "bytes": 24773,
         "data": "2026-10-08"
@@ -402,7 +426,6 @@
       "quando": "Conferir composição, relações, encaixes e impacto de um conjunto montado.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/usar/README.md",
         ".claude/skills/auditar-montagem/SKILL.md",
         "docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md"
       ],
@@ -410,6 +433,10 @@
         {
           "arquivo": "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md",
           "quando": "for julgar as vistas do conjunto"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
         }
       ],
       "skill": "auditar-montagem",
@@ -419,7 +446,7 @@
       ],
       "passo": "Descreva a árvore com npm run descrever:montagem:persistida e siga a skill auditar-montagem.",
       "conferido": "O relato por relação, impacto de revalidação e vistas.",
-      "orcamentoBytes": 33000,
+      "orcamentoBytes": 27000,
       "linhaDeBase": {
         "bytes": 27936,
         "data": "2026-10-08"

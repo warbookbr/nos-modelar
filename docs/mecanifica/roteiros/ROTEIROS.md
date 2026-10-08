@@ -25,7 +25,7 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 
 Mudar núcleo, gate, arquitetura, ferramenta ou plano.
 
-Ler antes de começar, num orçamento de 67.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 25.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/mecanifica/INDEX.md`
@@ -37,6 +37,7 @@ Abrir só quando a condição aparecer:
 - `comunicacao.md`, quando há tarefa aberta com a outra IA.
 - `docs/mecanifica/ARQUITETURA.md`, quando a mudança atravessa camadas.
 - `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS.
+- `docs/mecanifica/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
 
@@ -48,7 +49,7 @@ Conferido no fim: npm run gates, com a bateria completa quando muda código.
 
 Escrever, mover ou cortar documento, fora de um plano.
 
-Ler antes de começar, num orçamento de 17.000 bytes (linha de base de 13.635 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 13.000 bytes (linha de base de 13.635 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/mecanifica/INDEX.md`
@@ -58,6 +59,7 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/planos/README.md`, quando o documento é um plano.
 - `docs/mecanifica/usar/README.md`, quando o documento é de uso, em docs/mecanifica/usar/.
 - `docs/mecanifica/historico/README.md`, quando o documento vai para o histórico.
+- `docs/mecanifica/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run mapa`, `npm run gates`.
 
@@ -69,7 +71,7 @@ Conferido no fim: npm run gates, que roda os gates de documentação (links, sum
 
 Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
 
-Ler antes de começar, num orçamento de 12.000 bytes (linha de base de 8.948 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 6.000 bytes (linha de base de 8.948 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/mecanifica/historico/README.md`
@@ -81,6 +83,7 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
 - `docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md`, quando a pergunta é quanto custou modelar um objeto.
 - `docs/mecanifica/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
+- `docs/mecanifica/historico/CHEGADA-2026-09-11.md`, quando a pergunta é por que um documento saiu da raiz de docs/mecanifica/ ou onde foi parar.
 
 Passo seguinte, sem estado lido: Abra docs/mecanifica/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.
 
@@ -90,10 +93,9 @@ Conferido no fim: Nada a conferir: pesquisa não muda o repositório, e o que de
 
 Escrever ou corrigir a receita de uma peça e prová-la na bancada.
 
-Ler antes de começar, num orçamento de 70.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 65.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/usar/README.md`
 - `docs/mecanifica/usar/GUIA-AUTORIA-IA.md`
 - `docs/mecanifica/usar/LACO-VISUAL.md`
 - `.claude/skills/criar-peca/SKILL.md`
@@ -113,6 +115,8 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md`, quando a peça parte de uma prancha.
 - `docs/mecanifica/usar/PARAMETROS-VIVOS.md`, quando for alterar um número da receita.
 - `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
+- `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 
 Skill: `criar-peca`.
 
@@ -126,10 +130,9 @@ Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem con
 
 Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.
 
-Ler antes de começar, num orçamento de 28.000 bytes (linha de base de 23.789 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 14.000 bytes (linha de base de 23.789 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `.claude/agents/esbocista.md`
 - `.claude/skills/esboco-detalhado/SKILL.md`
 
 Abrir só quando a condição aparecer:
@@ -151,16 +154,16 @@ Conferido no fim: O Portão de cada estágio do Condutor e a nota 8 ou mais do c
 
 Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.
 
-Ler antes de começar, num orçamento de 17.000 bytes (linha de base de 13.878 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 12.000 bytes (linha de base de 13.878 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/usar/README.md`
 - `.claude/skills/laco-do-esboco/SKILL.md`
 
 Abrir só quando a condição aparecer:
 
 - `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for conferir o esboço em imagem.
 - `docs/mecanifica/banco-de-provas/BANCO-DE-PROVAS.md`, quando o objeto é do banco de provas e o custo vai ser registrado.
+- `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 
 Skill: `laco-do-esboco`.
 
@@ -174,10 +177,9 @@ Conferido no fim: O fluxo do Condutor em Concluído, com cada nota do crítico e
 
 Obter evidência objetiva de uma peça antes de publicar ou homologar.
 
-Ler antes de começar, num orçamento de 29.000 bytes (linha de base de 24.773 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 24.000 bytes (linha de base de 24.773 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/usar/README.md`
 - `.claude/skills/auditar-peca/SKILL.md`
 - `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`
 
@@ -187,6 +189,7 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md`, quando for carregar a peça na bancada da sessão.
 - `docs/mecanifica/usar/PARAMETROS-VIVOS.md`, quando o achado leva a alterar um número da receita.
 - `docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md`, quando for ler o formato do achado do crítico.
+- `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 
 Skill: `auditar-peca`.
 
@@ -200,16 +203,16 @@ Conferido no fim: O relato com os defeitos por vista e região e o que não foi 
 
 Conferir composição, relações, encaixes e impacto de um conjunto montado.
 
-Ler antes de começar, num orçamento de 33.000 bytes (linha de base de 27.936 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 27.936 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/usar/README.md`
 - `.claude/skills/auditar-montagem/SKILL.md`
 - `docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md`
 
 Abrir só quando a condição aparecer:
 
 - `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for julgar as vistas do conjunto.
+- `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 
 Skill: `auditar-montagem`.
 

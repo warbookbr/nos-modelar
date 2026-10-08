@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { conferirLeituraObrigatoria } from './leitura-obrigatoria.mjs';
 import {
   CAMINHO_CLAUDE, CAMINHO_JSON, CAMINHO_ROTEIROS, carregarRoteiros, gerarBlocoInvariantes, gerarClaude, gerarRoteirosMd,
-  MARCADORES, paginasDesatualizadas, RAIZ, TETO_DA_FRASE, validarRoteiros,
+  MARCADORES, medirRoteiro, paginasDesatualizadas, RAIZ, TETO_DA_FRASE, validarRoteiros,
 } from './roteiros.mjs';
 
 const CLAUDE_MODELO = `# Teste\n\n${MARCADORES.roteiros.join('\n')}\n\n${MARCADORES.invariantes.join('\n')}\n`;
@@ -114,6 +114,16 @@ describe('o gate leitura:obrigatoria recusa', () => {
     const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
     expect(problemas).toContain(`a frase do índice cabe em ${TETO_DA_FRASE}`);
     expect(problemas).toContain('CLAUDE.md está em "ler" e em "sobDemanda"');
+  });
+
+  it('a leitura que não fica abaixo da linha de base, dizendo quanto cortar (igual já reprova)', () => {
+    const { raiz, dados, gravar } = repositorio();
+    const total = medirRoteiro(dados.roteiros[0], raiz).total;
+    const regravar = (d) => { gravar(CAMINHO_JSON, JSON.stringify(d)); gravar(CAMINHO_ROTEIROS, gerarRoteirosMd(d)); gravar(CAMINHO_CLAUDE, gerarClaude(CLAUDE_MODELO, d)); };
+    regravar(roteiro(dados, { linhaDeBase: { bytes: total, data: '2026-10-08' } }));
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain(`precisa ficar abaixo da linha de base de ${total}; corte pelo menos 1 byte.`);
+    regravar(roteiro(dados, { linhaDeBase: { bytes: total + 1, data: '2026-10-08' } }));
+    expect(conferirLeituraObrigatoria(raiz).problemas).toEqual([]);
   });
 
   it('a leitura acima do orçamento, dizendo quanto passa e como cortar', () => {
