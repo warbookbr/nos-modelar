@@ -14,6 +14,7 @@ export const FRASES = {
   independencia: 'Por que o módulo não importa o núcleo do Mecanifica, e as duas exceções de leitura.',
   'como-escrever': 'O arquivo, a raiz do JSON, as opções e um exemplo mínimo.',
   'como-rodar': 'Todos os comandos da linha de comando, com as flags.',
+  ajuda: 'O `--ajuda` por tópico e a imagem composta das quatro vistas (`--composta`).',
   vizinhos: 'As formas de outra unidade que tocam a unidade, em contorno claro na vista.',
   nota: 'A nota do crítico, como o Condutor a registra e a lê.',
   formas: 'Os tipos de forma (caixa, cilindro, anel, cone, esfera, extrusão, loft, revolução, tubo) e o que cada campo faz.',
@@ -33,7 +34,8 @@ export const FRASES = {
   estilos: 'Estilos, simetria implícita por lado e perfis por função.',
   modulos: 'Módulos próprios do JSON, e as ligações `ligar` e `encaixa`.',
   editar: 'Edição por linha de comando, sem reescrever o JSON.',
-  componentes: 'Componentes prontos (roda, garfo, quadro, mancal...) e as âncoras de cada um.',
+  componentes: 'Componentes prontos: a instância, os parâmetros, as entradas, as âncoras e os pares.',
+  catalogo: 'Cada componente de arquivo (roda, garfo, quadro, mancal, parafuso, mola...) com parâmetros e âncoras.',
   vistas: 'As vistas isométrica, frontal, lateral e superior, e o que cada uma mostra.',
   desenhos: 'O SVG é o desenho puro, e o PNG acrescenta a camada das formas.',
   legendas: 'Legendas numeradas por colunas ou em lista.',
@@ -53,7 +55,12 @@ export const FRASES = {
   plano: 'O plano estruturado: nível, medidas, contrato, peças e referência.',
   conferencia: 'Conferência contra a referência, por silhueta e razão de sobreposição.',
   imagem: 'A imagem por achado (`--achado`), com o par em cor e o resto em cinza.',
-  condutor: 'O Condutor: estágios, portões, unidades, vereditos e marcos.',
+  condutor: 'O Condutor: os estágios, o nível do plano e o Portão de cada estágio.',
+  unidades: 'Unidades de detalhe: o agrupamento, `--mover`, `--replanejar`, `--feito` e os Marcos.',
+  envelope: 'O Envelope da maquete, a conferência com `--envelope` e as imagens `--unidade`.',
+  detalhar: 'O esboço isolado de uma unidade (`--detalhar`) e a volta ao mestre (`--integrar`).',
+  critico: 'A função da unidade, o brief do crítico, o veredito, a escala da nota e o crítico do objeto.',
+  execucao: 'O modo `por-unidade` e a nota de passagem entre unidades.',
   'vistas-ia': 'Vistas para a IA: corte, explosão, zoom e prévia, sob demanda.',
   corte: 'Corte por um plano, para ver o que há por dentro.',
   'vistas-ia/explosao': 'Explosão das peças em um eixo, com a linha até a posição original.',
@@ -67,6 +74,10 @@ export const FRASES = {
   pontas: 'Pontas livres: as formas que não tocam nada.',
   limites: 'O que o módulo ainda não faz.',
 };
+
+/* O teto de cada tópico, em caracteres do texto próprio dele (sem os `###` de dentro): a seção maior que isso se divide em `###`,
+   para que a consulta de um tópico continue barata. */
+export const TETO_DO_TOPICO = 6000;
 
 const semAcento = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 const palavrasDoTitulo = (titulo) => semAcento(titulo).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter((p) => p && !PALAVRAS_VAZIAS.has(p));
@@ -112,6 +123,16 @@ export function lerTopicos(texto) {
     const texto = linhas.slice(c.linha, fim).join('\n').replace(/\s+$/, '');
     return { id: c.id, nivel: c.nivel, titulo: c.titulo, texto: `${texto}\n` };
   });
+}
+
+/* O texto próprio do tópico de índice `k`: o de um `###`, ou o de um `##` sem os `###` que estão dentro dele. */
+export function textoProprio(topicos, k) {
+  const t = topicos[k];
+  if (t.nivel === 3) return t.texto;
+  let fim = k + 1;
+  while (fim < topicos.length && topicos[fim].nivel === 3) fim++;
+  const corpo = topicos.slice(k + 1, fim).reduce((resto, sub) => resto.replace(sub.texto.trimEnd(), ''), t.texto);
+  return corpo.replace(/\s+$/, '') + '\n';
 }
 
 /* A frase de um tópico: a tabela `FRASES`, e o título do README quando ela não tem a linha (o teste recusa isso). */

@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ajuda, buscarTopico, FRASES, indice, lerTopicos, README_DO_ESBOCO } from './esboco-ajuda.mjs';
+import { ajuda, buscarTopico, FRASES, indice, lerTopicos, README_DO_ESBOCO, TETO_DO_TOPICO, textoProprio } from './esboco-ajuda.mjs';
 
 const texto = readFileSync(README_DO_ESBOCO, 'utf8');
 const topicos = lerTopicos(texto);
@@ -29,6 +29,22 @@ describe('--ajuda: o índice', () => {
     const ids = new Set(topicos.map((t) => t.id));
     for (const t of topicos) expect(FRASES[t.id], `falta a frase de ${t.id}`).toBeTruthy();
     expect(Object.keys(FRASES).filter((k) => !ids.has(k))).toEqual([]);
+  });
+
+  it(`nenhum tópico passa de ${TETO_DO_TOPICO} caracteres de texto próprio (a seção maior se divide em ###)`, () => {
+    const grandes = topicos
+      .map((t, k) => ({ id: t.id, tamanho: textoProprio(topicos, k).length }))
+      .filter((t) => t.tamanho > TETO_DO_TOPICO)
+      .map((t) => `${t.id} tem ${t.tamanho}`);
+    expect(grandes, 'divida a seção do README em ### até caber no teto').toEqual([]);
+  });
+
+  it('o texto próprio de um ## tira os ### de dentro, e o de um ### é a seção inteira', () => {
+    const k = topicos.findIndex((t) => t.id === 'formas');
+    expect(textoProprio(topicos, k)).not.toContain('### Tubo');
+    expect(textoProprio(topicos, k).startsWith('## Formas\n')).toBe(true);
+    const tubo = topicos.findIndex((t) => t.id === 'tubo');
+    expect(textoProprio(topicos, tubo)).toBe(topicos[tubo].texto);
   });
 
   it('sai com uma linha por tópico, o nome e a frase', () => {
