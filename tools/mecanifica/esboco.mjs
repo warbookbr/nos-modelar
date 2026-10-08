@@ -23,6 +23,7 @@ import { recortarAmpliado } from './analise-da-peca.mjs';
 import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
 import { ajuda } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
+import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
 
 /* Um caminho relativo vale a partir do diretório de quem chamou: `npm run` roda no repositório e deixa esse diretório em
    `INIT_CWD`. Um caminho absoluto fica como está. */
@@ -442,7 +443,37 @@ function relatarContato(c) {
   const atravessa = c.atravessamentos.map((t) => `  ${descreverAtravessamento(t)}`);
   const silenciados = c.silenciados.map((t) => `  ${descreverSilenciado(t)}`);
   const v = (x) => String(x).replace('.', ',');
-  return `contato (tolerância ${v(c.tolerancia)} mm, penetração ${v(c.penetracao)} mm, folga ${v(c.folga)} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${atravessa.length ? `atravessamentos declarados:\n${atravessa.join('\n')}\n` : ''}${silenciados.length ? `pares silenciados:\n${silenciados.join('\n')}\n` : ''}`;
+  return `contato (tolerância ${v(c.tolerancia)} mm, penetração ${v(c.penetracao)} mm, folga ${v(c.folga)} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${atravessa.length ? `atravessamentos declarados:\n${atravessa.join('\n')}\n` : ''}${silenciados.length ? `pares silenciados:\n${silenciados.join('\n')}\n` : ''}${dicaDoContato(c)}`;
+}
+
+/* O gate de contato que reprova aponta o tópico que resolve: `conserto` quando ele propôs um conserto, `contato` quando só
+   relata. */
+function dicaDoContato(c) {
+  if (c.resultado !== 'reprovado') return '';
+  const topico = topicoDoContato(c);
+  registrarUso({ evento: 'recusa', origem: 'contato', topico, mensagem: `contato reprovado: ${[...new Set(c.achados.map((a) => a.tipo))].sort().join(', ')}` });
+  return `${dica(topico)}\n`;
+}
+
+/* A recusa do esboço na saída de erro, com a dica do tópico que resolve na linha seguinte. */
+function recusar(mensagem, erro = null) {
+  const r = textoDaRecusa(mensagem, erro);
+  registrarUso({ evento: 'recusa', origem: 'esboco', topico: r.topico, mensagem });
+  process.stderr.write(r.texto);
+}
+
+/* A dica do Condutor, no fim do texto dele: o Portão do estágio atual quando não passa (a consulta do estado também o
+   mostra), o bloqueio do avanço pela sua própria mensagem, a conclusão que espera o crítico e o Envelope recusado. */
+function dicaDoCondutor(r, args) {
+  let topico = null;
+  const bloqueio = /avanço recusado: ([^\n]*)/.exec(r.texto)?.[1];
+  if (r.portao && r.portao.estagio !== 'concluido' && !r.portao.passa) topico = topicoDoPortao(r.portao.falta);
+  else if (bloqueio) topico = topicoDaRecusa(bloqueio) ?? 'condutor';
+  else if (/a conclusão espera o veredito/.test(r.texto)) topico = 'critico';
+  else if (args.tem('--envelope') && r.codigo !== 0) topico = 'envelope';
+  if (!topico) return '';
+  if (args.tem('--proximo') && r.codigo !== 0) registrarUso({ evento: 'recusa', origem: 'portao', topico, mensagem: `Portão: ${(r.portao?.falta ?? []).join('; ') || r.texto.split('\n')[0]}` });
+  return `${dica(topico)}\n`;
 }
 
 const virgula = (x) => String(x).replace('.', ',');
@@ -1149,12 +1180,12 @@ async function principal(argv) {
     return r.codigo;
   }
   if (args.tem('--medidas-da-referencia')) {
-    if (args.valor('--medidas-da-referencia') === undefined) { process.stderr.write('esboço recusado: --medidas-da-referencia precisa do JSON de contornos (--medidas-da-referencia <contorno.json>).\n'); return 1; }
+    if (args.valor('--medidas-da-referencia') === undefined) { recusar('--medidas-da-referencia precisa do JSON de contornos (--medidas-da-referencia <contorno.json>).'); return 1; }
     try {
       process.stdout.write(medidasDaReferenciaArquivo(args.valor('--medidas-da-referencia'), { vista: args.valor('--vista') ?? null, esboco: alvo ?? null }).texto);
       return 0;
     } catch (e) {
-      if (e.code === 'ENOENT' || e instanceof ErroDeEsboco || e instanceof SyntaxError) { process.stderr.write(`esboço recusado: ${e.code === 'ENOENT' ? `arquivo não encontrado (${e.path ?? args.valor('--medidas-da-referencia')})` : e.message}\n`); return 1; }
+      if (e.code === 'ENOENT' || e instanceof ErroDeEsboco || e instanceof SyntaxError) { recusar(e.code === 'ENOENT' ? `arquivo não encontrado (${e.path ?? args.valor('--medidas-da-referencia')})` : e.message, e); return 1; }
       throw e;
     }
   }
@@ -1205,11 +1236,14 @@ async function principal(argv) {
     if (args.tem('--integrar')) {
       const r = integrarArquivo(alvo, args.valor('--integrar'), args.valor('--integrar', 1));
       process.stdout.write(r.texto);
-      return r.resultado.envelope && !r.resultado.envelope.ok ? 1 : 0;
+      const foraDoEnvelope = r.resultado.envelope && !r.resultado.envelope.ok;
+      if (foraDoEnvelope) process.stdout.write(`${dica('envelope')}\n`);
+      return foraDoEnvelope ? 1 : 0;
     }
     if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar', '--modo', '--nota-de-passagem'].some((f) => args.tem(f))) {
       const r = condutorArquivo(alvo, { envelope: args.tem('--envelope') ? { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) } : undefined, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
       process.stdout.write(r.texto);
+      process.stdout.write(dicaDoCondutor(r, args));
       if (r.criticoDe) process.stdout.write((await briefDoCritico(alvo, r.criticoDe, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, forcar: r.refeita, vizinhos: !args.tem('--sem-vizinhos') })).texto);
       if (r.marcoDe) process.stdout.write((await briefDoMarco(alvo, r.marcoDe.limiar, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null })).texto);
       if (r.objetoDe) process.stdout.write((await briefDoObjeto(alvo, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null })).texto);
@@ -1245,8 +1279,8 @@ async function principal(argv) {
     process.stdout.write(`esboço ${r.largura}x${r.altura} px, ${r.escala.toFixed(3)} px/mm${r.png ? '' : ' (modo rápido: só o SVG, com menos lados nos círculos)'}\n${r.png ? `  ${r.png}\n` : ''}  ${r.svg}\n${relatarContato(r.contato)}${relatarProjecao(r.projecao)}`);
     return estrito && (r.contato.resultado === 'reprovado' || r.projecao.resultado === 'reprovado') ? 1 : 0;
   } catch (e) {
-    if (e.code === 'ENOENT') { process.stderr.write(`esboço recusado: arquivo não encontrado (${alvo})\n`); return 1; }
-    if (e instanceof ErroDeEsboco || e instanceof SyntaxError) { process.stderr.write(`esboço recusado: ${e.message}\n`); return 1; }
+    if (e.code === 'ENOENT') { recusar(`arquivo não encontrado (${alvo})`, e); return 1; }
+    if (e instanceof ErroDeEsboco || e instanceof SyntaxError) { recusar(e.message, e); return 1; }
     throw e;
   }
 }
