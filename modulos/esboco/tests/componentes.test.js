@@ -353,3 +353,66 @@ describe('a moto de prova com componentes', () => {
     expect(um).toBe(desenharEsboco(moto).svg);
   }, 60000);
 });
+
+describe('dobradiça com ângulo', () => {
+  const dobradica = (angulo, centro = [0, 30, 0]) => [{ id: 'd', usa: 'dobradica', centro, parametros: { angulo } }];
+  const formasDe = (angulo, centro) => expandir(dobradica(angulo, centro)).formas;
+  const resolvidasDe = (angulo, centro) => resolvidas(dobradica(angulo, centro));
+  const aprovaGate = (formas) => verificarContato(esboco(formas)).resultado === 'aprovado';
+
+  it('com ângulo 0 (padrão) as formas são as de antes: pino, abaE em -x e abaD em +x no mesmo plano', () => {
+    const padrao = formasDe(0, [0, 30, 0]);
+    expect(padrao.map((f) => f.id)).toEqual(['d.pino', 'd.abaE', 'd.abaD']);
+    expect(expandir([{ id: 'd', usa: 'dobradica', centro: [0, 30, 0] }]).formas).toEqual(padrao);
+    const r = resolvidasDe(0);
+    perto(r['d.abaE'].min, [-34, 0, -1.5]);
+    perto(r['d.abaE'].max, [-4, 60, 1.5]);
+    perto(r['d.abaD'].min, [4, 0, -1.5]);
+    perto(r['d.abaD'].max, [34, 60, 1.5]);
+  });
+
+  it('com 90 a abaE se estende em -z a partir do pino, com a borda interna a 4 mm do eixo, e a abaD fica em +x', () => {
+    const r = resolvidasDe(90);
+    perto(r['d.abaE'].min, [-1.5, 0, -34]);
+    perto(r['d.abaE'].max, [1.5, 60, -4]);
+    perto(extensao(r['d.abaE']), [3, 60, 30]);
+    perto(r['d.abaD'].min, [4, 0, -1.5]);
+    perto(r['d.abaD'].max, [34, 60, 1.5]);
+    perto(r['d.pino'].centro, [0, 30, 0]);
+  });
+
+  it('com 45 a abaE fica na diagonal -x, -z: o centro está a 19 mm do eixo nos dois eixos iguais, e a borda interna a 4 mm', () => {
+    const c = resolvidasDe(45)['d.abaE'].centro;
+    const k = 19 * Math.SQRT1_2;
+    perto(c, [-k, 30, -k]);
+    perto([Math.hypot(c[0], c[2])], [19]);
+  });
+
+  it('a abaE é uma só para cada ângulo, e a abaD não muda com o ângulo', () => {
+    for (const angulo of [0, 45, 90, 180]) {
+      expect(formasDe(angulo).filter((f) => f.id === 'd.abaE')).toHaveLength(1);
+      perto(resolvidasDe(angulo)['d.abaD'].min, [4, 0, -1.5]);
+    }
+  });
+
+  it('com 180 a abaE cai sobre a abaD, na mesma posição (as abas dobradas coincidem no modelo)', () => {
+    const r = resolvidasDe(180);
+    perto(r['d.abaE'].min, r['d.abaD'].min);
+    perto(r['d.abaE'].max, r['d.abaD'].max);
+  });
+
+  it('o gate aprova 0, 45 e 90 graus com a dobradiça sozinha', () => {
+    for (const angulo of [0, 45, 90]) expect(aprovaGate(dobradica(angulo))).toBe(true);
+  });
+
+  it('o espelho de uma instância com ângulo espelha o L para o outro lado do eixo x', () => {
+    const formas = [...dobradica(90, [-100, 30, 0]), { id: 'dd', espelha: { forma: 'd', eixo: 'x', pos: 0 } }];
+    const r = resolvidas(formas);
+    perto(r['d.abaE'].min, [-101.5, 0, -34]);
+    perto(r['d.abaE'].max, [-98.5, 60, -4]);
+    perto(r['dd.abaE'].min, [98.5, 0, -34]);
+    perto(r['dd.abaE'].max, [101.5, 60, -4]);
+    perto(r['dd.abaD'].min, [66, 0, -1.5]);
+    perto(r['dd.abaD'].max, [96, 60, 1.5]);
+  });
+});
