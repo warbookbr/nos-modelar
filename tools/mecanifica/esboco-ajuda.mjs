@@ -1,6 +1,7 @@
 /* A referência do JSON do esboço por tópico: `npm run esboco -- --ajuda [tópico]`. A fonte é o README do módulo. Os tópicos
-   saem dos títulos `##` e `###` dele (fora dos blocos de código), e cada um devolve só a sua seção: um `##` traz os `###` que
-   estão dentro dele, e um `###` traz só o seu trecho. O nome é a primeira palavra de conteúdo do título (sem acento, sem
+   saem dos títulos `##` e `###` dele (fora dos blocos de código), e cada um devolve só o seu texto próprio: um `##` traz o
+   que está antes do primeiro `###` dele, seguido da lista dos seus subtópicos (nome e frase, e a linha que pede cada um com
+   `--ajuda <nome>`), e um `###` traz só o seu trecho. O nome é a primeira palavra de conteúdo do título (sem acento, sem
    artigo), e um nome repetido vira `<pai>/<nome>` (ou as duas primeiras palavras, quando o título é `##`). A frase do índice
    fica na tabela `FRASES`, uma por tópico; o teste confere que todo tópico tem a sua. */
 import { readFileSync } from 'node:fs';
@@ -138,6 +139,22 @@ export function textoProprio(topicos, k) {
 /* A frase de um tópico: a tabela `FRASES`, e o título do README quando ela não tem a linha (o teste recusa isso). */
 const fraseDo = (t) => FRASES[t.id] ?? t.titulo;
 
+/* A lista dos subtópicos de um `##`: um por linha, com o nome e a frase, e antes dela a linha que diz como pedir um deles. Um
+   `###` não tem lista, e um `##` sem `###` também não. */
+export function listaDosSubtopicos(topicos, k) {
+  if (topicos[k].nivel !== 2) return '';
+  const subs = [];
+  for (let j = k + 1; j < topicos.length && topicos[j].nivel === 3; j++) subs.push(topicos[j]);
+  if (subs.length === 0) return '';
+  const largura = Math.max(...subs.map((s) => s.id.length)) + 2;
+  return `\nSubtópicos (peça um com --ajuda <nome>):\n${subs.map((s) => `${s.id.padEnd(largura)}${fraseDo(s)}`).join('\n')}\n`;
+}
+
+/* O que `--ajuda` devolve para o tópico de índice `k`: o texto próprio, e a lista dos subtópicos quando ele é um `##`. */
+export function textoDoTopico(topicos, k) {
+  return textoProprio(topicos, k) + listaDosSubtopicos(topicos, k);
+}
+
 /* O índice: um tópico por linha, com o nome e a frase. */
 export function indice(topicos) {
   const largura = Math.max(...topicos.map((t) => t.id.length)) + 2;
@@ -170,13 +187,13 @@ export function buscarTopico(topicos, consulta) {
   return { sugestoes };
 }
 
-/* O texto de `--ajuda [tópico]`: sem tópico, o índice (código 0); com um tópico, a sua seção (código 0); com um tópico que não
-   existe, a sugestão e o índice (código 1, para sair pela saída de erro). */
+/* O texto de `--ajuda [tópico]`: sem tópico, o índice (código 0); com um tópico, o seu texto próprio e, num `##`, a lista dos
+   subtópicos (código 0); com um tópico que não existe, a sugestão e o índice (código 1, para sair pela saída de erro). */
 export function ajuda(consulta = null, texto = readFileSync(README_DO_ESBOCO, 'utf8')) {
   const topicos = lerTopicos(texto);
   if (consulta === null || consulta === undefined || String(consulta).trim() === '') return { codigo: 0, texto: indice(topicos) };
   const r = buscarTopico(topicos, String(consulta));
-  if (r.topico) return { codigo: 0, texto: r.topico.texto };
+  if (r.topico) return { codigo: 0, texto: textoDoTopico(topicos, topicos.indexOf(r.topico)) };
   if (r.ambiguo) return { codigo: 1, texto: `tópico '${consulta}' existe em mais de um lugar: use ${r.ambiguo.join(' ou ')}.\n` };
   const quis = r.sugestoes.length > 0 ? ` Quis dizer: ${r.sugestoes.join(', ')}.` : '';
   return { codigo: 1, texto: `tópico '${consulta}' não existe.${quis}\n\nÍndice dos tópicos:\n${indice(topicos)}` };

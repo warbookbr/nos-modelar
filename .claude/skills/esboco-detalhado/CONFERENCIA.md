@@ -29,34 +29,34 @@ Mapeamento de cada frase e instrução do `SKILL.md` original (`git show HEAD:.c
 | 23 | Depois as medidas da referência viram parâmetros: havendo foto, o contorno de cada parte sai da s... | `SKILL.md` | 24 |
 | 23 | Com os subsistemas prontos vem a montagem do conjunto, e a Conferência da maquete a confere por n... | `SKILL.md` | 24 |
 | 23 | Depois vêm imagens limpas, sem legenda numerada, que vão a um crítico sem contexto (só as imagens... | `SKILL.md` | 24 |
-| 23 | Só o nível `detalhado` segue: o Plano de detalhe agrupa em unidades as formas de acoplamento aper... | `SKILL.md` | 24 |
-| 23 | Quando falta ajustar, `--mover <forma\|instância\|padrão\|a,b,c> --para <unidade> --motivo <texto>` ... | `SKILL.md` | 24 |
-| 23 | Cada unidade recebe o Envelope da maquete (a caixa e as portas, que são as âncoras que outras uni... | `SKILL.md` | 24 |
-| 23 | Um `atravessa` entre formas da mesma unidade, declarada ou planejada, passa sem `motivo` nem `max... | `SKILL.md` | 24 |
-| 23 | O Detalhe por unidade troca cada unidade pela versão detalhada: `--detalhar <unidade> [arquivo]` ... | `SKILL.md` | 24 |
-| 23 | Quando o detalhado declara `substitui: "<forma-da-maquete>"` em cada forma que troca uma da maque... | `SKILL.md` | 24 |
-| 23 | Para o crítico cego de uma unidade, `npm run esboco -- <arquivo> --unidade <unidade> [--vista <vi... | `SKILL.md` | 24 |
-| 23 | A cada 25% do custo estimado (o número de formas das unidades na maquete, que o `--integrar` não ... | `SKILL.md` | 24 |
-| 25 | Antes de fechar uma unidade com mais de 8 formas, escreva a `funcao` dela na raiz do esboço (`uni... | `SKILL.md` | 26 |
-| 25 | Ao fechar uma unidade assim, o `--feito` grava as quatro vistas `--unidade` numa pasta (`<arquivo... | `SKILL.md` | 26 |
-| 25 | O comando não despacha agente: a skill [`laco-do-esboco`](../laco-do-esboco/SKILL.md) despacha o ... | `SKILL.md` | 26 |
-| 25 | Nota baixa ou ponta no ar vira correção do JSON e nova leitura em texto antes da unidade seguinte. | `SKILL.md` | 26 |
-| 25 | No Marco (25, 50, 75, 100%) o `--feito` imprime também o brief do crítico cego do Marco, com as q... | `SKILL.md` | 26 |
-| 1 | `npm run esboco -- <arquivo> --medidas` mostra em texto o declarado, o medido e o desvio de cada ... | `SKILL.md` | 2 |
-| 1 | `npm run esboco -- <arquivo> --ligacoes [--unidade <unidade>] [--forma <id>]` mostra em texto, se... | `SKILL.md` | 2 |
-| 27 | Quem modela sem poder despachar agente (um subagente, que não tem a ferramenta de despacho) para ... | `SKILL.md` | 28 |
-| 27 | Antes de cada `--feito`, abra as quatro imagens da unidade (`--unidade <unidade>`) e confira nela... | `SKILL.md` | 28 |
-| 27 | O Condutor recusa o `--feito` de outra unidade e o `--proximo` enquanto o último veredito de uma ... | `SKILL.md` | 28 |
-| 27 | Quem o chamou (o `laco-do-esboco`) despacha o `critico-visual` cego com esse brief e devolve a no... | `SKILL.md` | 28 |
-| 29 | Quando as quatro vistas de uma unidade não bastam, o crítico (ou você, antes de despachá-lo) pede... | `SKILL.md` | 30 |
-| 29 | `--corte <x\|y\|z>=<mm>` quando a pergunta é o que há por dentro: um eixo que atravessa o cubo, um ... | `SKILL.md` | 30 |
-| 29 | `--explodir` (na isométrica, ou com `--eixo`) quando as peças se cobrem e o crítico não separa um... | `SKILL.md` | 30 |
-| 29 | `--zoom-forma <id\|padrão> [--margem <mm>]` quando um detalhe pequeno (um encaixe, uma ponta, um p... | `SKILL.md` | 30 |
-| 29 | `--previa` só para iterar rápido na própria edição: a imagem sai rotulada "prévia", sem arestas f... | `SKILL.md` | 30 |
-| 29 | Pedir a mesma unidade de novo só redesenha as vistas cujo conteúdo mudou (o comando diz "reaprove... | `SKILL.md` | 30 |
-| 31 | Não audite um esboço por imagem com legenda numerada: o balão e a chave escondem a peça, e a lege... | `SKILL.md` | 32 |
-| 31 | A auditoria é numérica (a leitura padrão do `--descrever`, o gate, as medidas e o contrato) e, qu... | `SKILL.md` | 32 |
-| 31 | Imagem com legenda é para a pessoa escolher forma, e não para conferir posição. | `SKILL.md` | 32 |
+| 23 | Só o nível `detalhado` segue: o Plano de detalhe agrupa em unidades as formas de acoplamento aper... | `nivel-detalhado.md` | 5 |
+| 23 | Quando falta ajustar, `--mover <forma\|instância\|padrão\|a,b,c> --para <unidade> --motivo <texto>` ... | `nivel-detalhado.md` | 5 |
+| 23 | Cada unidade recebe o Envelope da maquete (a caixa e as portas, que são as âncoras que outras uni... | `nivel-detalhado.md` | 5 |
+| 23 | Um `atravessa` entre formas da mesma unidade, declarada ou planejada, passa sem `motivo` nem `max... | `nivel-detalhado.md` | 5 |
+| 23 | O Detalhe por unidade troca cada unidade pela versão detalhada: `--detalhar <unidade> [arquivo]` ... | `nivel-detalhado.md` | 5 |
+| 23 | Quando o detalhado declara `substitui: "<forma-da-maquete>"` em cada forma que troca uma da maque... | `nivel-detalhado.md` | 5 |
+| 23 | Para o crítico cego de uma unidade, `npm run esboco -- <arquivo> --unidade <unidade> [--vista <vi... | `nivel-detalhado.md` | 5 |
+| 23 | A cada 25% do custo estimado (o número de formas das unidades na maquete, que o `--integrar` não ... | `nivel-detalhado.md` | 5 |
+| 25 | Antes de fechar uma unidade com mais de 8 formas, escreva a `funcao` dela na raiz do esboço (`uni... | `nivel-detalhado.md` | 7 |
+| 25 | Ao fechar uma unidade assim, o `--feito` grava as quatro vistas `--unidade` numa pasta (`<arquivo... | `nivel-detalhado.md` | 7 |
+| 25 | O comando não despacha agente: a skill [`laco-do-esboco`](../laco-do-esboco/SKILL.md) despacha o ... | `nivel-detalhado.md` | 7 |
+| 25 | Nota baixa ou ponta no ar vira correção do JSON e nova leitura em texto antes da unidade seguinte. | `nivel-detalhado.md` | 7 |
+| 25 | No Marco (25, 50, 75, 100%) o `--feito` imprime também o brief do crítico cego do Marco, com as q... | `nivel-detalhado.md` | 7 |
+| 1 | `npm run esboco -- <arquivo> --medidas` mostra em texto o declarado, o medido e o desvio de cada ... | `SKILL.md` | 27 |
+| 1 | `npm run esboco -- <arquivo> --ligacoes [--unidade <unidade>] [--forma <id>]` mostra em texto, se... | `SKILL.md` | 27 |
+| 27 | Quem modela sem poder despachar agente (um subagente, que não tem a ferramenta de despacho) para ... | `nivel-detalhado.md` | 9 |
+| 27 | Antes de cada `--feito`, abra as quatro imagens da unidade (`--unidade <unidade>`) e confira nela... | `nivel-detalhado.md` | 9 |
+| 27 | O Condutor recusa o `--feito` de outra unidade e o `--proximo` enquanto o último veredito de uma ... | `nivel-detalhado.md` | 9 |
+| 27 | Quem o chamou (o `laco-do-esboco`) despacha o `critico-visual` cego com esse brief e devolve a no... | `nivel-detalhado.md` | 9 |
+| 29 | Quando as quatro vistas de uma unidade não bastam, o crítico (ou você, antes de despachá-lo) pede... | `nivel-detalhado.md` | 11 |
+| 29 | `--corte <x\|y\|z>=<mm>` quando a pergunta é o que há por dentro: um eixo que atravessa o cubo, um ... | `nivel-detalhado.md` | 11 |
+| 29 | `--explodir` (na isométrica, ou com `--eixo`) quando as peças se cobrem e o crítico não separa um... | `nivel-detalhado.md` | 11 |
+| 29 | `--zoom-forma <id\|padrão> [--margem <mm>]` quando um detalhe pequeno (um encaixe, uma ponta, um p... | `nivel-detalhado.md` | 11 |
+| 29 | `--previa` só para iterar rápido na própria edição: a imagem sai rotulada "prévia", sem arestas f... | `nivel-detalhado.md` | 11 |
+| 29 | Pedir a mesma unidade de novo só redesenha as vistas cujo conteúdo mudou (o comando diz "reaprove... | `nivel-detalhado.md` | 11 |
+| 31 | Não audite um esboço por imagem com legenda numerada: o balão e a chave escondem a peça, e a lege... | `SKILL.md` | 29 |
+| 31 | A auditoria é numérica (a leitura padrão do `--descrever`, o gate, as medidas e o contrato) e, qu... | `SKILL.md` | 29 |
+| 31 | Imagem com legenda é para a pessoa escolher forma, e não para conferir posição. | `SKILL.md` | 29 |
 | 33 | ## Formas novas e componentes | `formas-e-componentes.md` | 1 |
 | 35 | Para um garfo, uma barra dobrada ou um tubo de quadro, escreva `{ "id": "tubo", "tipo": "tubo", "... | `formas-e-componentes.md` | 2 |
 | 35 | Um ponto ao longo de uma haste é `{ "entre": [A, B], "mm": 90 }` (a 90 mm de A), `{ "entre": [A, ... | `formas-e-componentes.md` | 2 |

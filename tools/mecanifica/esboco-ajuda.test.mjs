@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ajuda, buscarTopico, FRASES, indice, lerTopicos, README_DO_ESBOCO, TETO_DO_TOPICO, textoProprio } from './esboco-ajuda.mjs';
+import { ajuda, buscarTopico, FRASES, indice, listaDosSubtopicos, lerTopicos, README_DO_ESBOCO, TETO_DO_TOPICO, textoProprio } from './esboco-ajuda.mjs';
 
 const texto = readFileSync(README_DO_ESBOCO, 'utf8');
 const topicos = lerTopicos(texto);
@@ -73,11 +73,32 @@ describe('--ajuda <tópico>: só a sua seção', () => {
     expect(r.texto.length).toBeLessThan(texto.length / 20);
   });
 
-  it('um ## devolve o capítulo, com os ### que estão dentro dele', () => {
+  it('um ## devolve o seu texto próprio e a lista dos subtópicos, sem o trecho de cada um', () => {
     const r = ajuda('formas', texto);
+    expect(r.codigo).toBe(0);
     expect(r.texto.startsWith('## Formas\n')).toBe(true);
-    expect(r.texto).toContain('### Tubo');
+    expect(r.texto).not.toContain('### Tubo');
     expect(r.texto).not.toContain('## Posicionamento');
+    expect(r.texto).toContain('Subtópicos (peça um com --ajuda <nome>):');
+    expect(r.texto).toMatch(/\ntubo +Tubo por pontos/);
+    expect(r.texto).toMatch(/\ncaixa +Caixa: medidas/);
+    expect(r.texto.trimEnd().split('\n').at(-1)).toMatch(/^tubo +Tubo por pontos/);
+  });
+
+  it('a lista do ## tem uma linha por ### e a linha que pede cada um', () => {
+    const k = topicos.findIndex((t) => t.id === 'formas');
+    const linhas = listaDosSubtopicos(topicos, k).trim().split('\n');
+    expect(linhas[0]).toBe('Subtópicos (peça um com --ajuda <nome>):');
+    expect(linhas.slice(1).map((l) => l.split(' ')[0])).toEqual(['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo']);
+    expect(listaDosSubtopicos(topicos, topicos.findIndex((t) => t.id === 'tubo'))).toBe('');
+  });
+
+  it(`nenhuma resposta de --ajuda passa de ${TETO_DO_TOPICO} caracteres mais o tamanho da lista dos subtópicos`, () => {
+    topicos.forEach((t, k) => {
+      const resposta = ajuda(t.id, texto).texto;
+      const lista = listaDosSubtopicos(topicos, k);
+      expect(resposta.length, `--ajuda ${t.id}`).toBeLessThanOrEqual(TETO_DO_TOPICO + lista.length);
+    });
   });
 
   it('um nome que cabe em dois tópicos pede o caminho completo', () => {
