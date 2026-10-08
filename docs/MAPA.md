@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-924 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+926 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1143,6 +1143,8 @@
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
+- `uso.mjs` — uso.mjs — registro local do que a IA pede às ferramentas de entrada, e o resumo dele: `npm run uso`.
+- `uso.test.mjs` — uso.test.mjs — o registro de uso: grava uma linha por pedido de ajuda, de roteiro e por recusa; resume o que a IA mais pede e o que não encontra; nunca quebr…
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…

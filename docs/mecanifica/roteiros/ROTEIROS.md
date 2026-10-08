@@ -38,7 +38,7 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/ARQUITETURA.md`, quando a mudança atravessa camadas.
 - `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS.
 
-Comandos: `npm run gates`, `npm run mapa`.
+Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
 
 Passo seguinte, sem estado lido: Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.
 

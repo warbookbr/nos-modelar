@@ -22,6 +22,7 @@ import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../mod
 import { recortarAmpliado } from './analise-da-peca.mjs';
 import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
 import { ajuda } from './esboco-ajuda.mjs';
+import { registrarUso } from './uso.mjs';
 
 /* Um caminho relativo vale a partir do diretório de quem chamou: `npm run` roda no repositório e deixa esse diretório em
    `INIT_CWD`. Um caminho absoluto fica como está. */
@@ -1143,6 +1144,7 @@ async function principal(argv) {
   const alvo = args.alvo;
   if (args.tem('--ajuda')) {
     const r = ajuda(args.valor('--ajuda') ?? null);
+    if (args.valor('--ajuda')) registrarUso({ evento: 'ajuda', topico: String(args.valor('--ajuda')).trim().toLowerCase(), achado: r.codigo === 0 });
     (r.codigo === 0 ? process.stdout : process.stderr).write(r.texto);
     return r.codigo;
   }

@@ -123,7 +123,8 @@
       "skill": null,
       "comandos": [
         "npm run gates",
-        "npm run mapa"
+        "npm run mapa",
+        "npm run uso"
       ],
       "passo": "Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.",
       "conferido": "npm run gates, com a bateria completa quando muda código.",

@@ -16,6 +16,7 @@ import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { carregarRoteiros, medirRoteiro, RAIZ } from '../mapa/roteiros.mjs';
 import { lerTopicos, README_DO_ESBOCO } from './esboco-ajuda.mjs';
+import { registrarUso } from './uso.mjs';
 import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
 
 const milhar = (n) => n.toLocaleString('pt-BR');
@@ -145,6 +146,7 @@ export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ 
     return { ok: true, codigo: 0, texto: `${texto}\n`, resultado: { roteiros: dados.roteiros.map(({ id, intencao, quando }) => ({ id, intencao, quando })), estado: estado.linhas, passo } };
   }
   const achado = resolverRoteiro(dados.roteiros, consulta);
+  registrarUso({ evento: 'comecar', roteiro: String(consulta).trim().toLowerCase(), achado: achado.desconhecido !== true });
   if (achado.grupo) {
     const passo = 'Escolha um destes roteiros e rode npm run comecar -- <roteiro>.';
     return {

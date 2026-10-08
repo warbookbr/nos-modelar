@@ -54,6 +54,7 @@ public/sessao-ativa.json
 .agent/
 .mcp.json
 .diario/
+# Registro de uso das ferramentas de entrada (`npm run uso`): .diario/uso.jsonl, coberto pela linha acima
 
 # Memória do `esboco --descrever --mudou` (artefato gerado ao lado do esboço)
 *.descrever.json
