@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-932 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+933 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -215,6 +215,7 @@
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-07-o-caminho-curto-da-ia.md` — O caminho curto da IA
+- `2026-10-08-perguntas-do-critico-por-objeto.md` — Perguntas do crítico por componente e por família de objeto
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica

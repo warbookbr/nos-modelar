@@ -9,6 +9,9 @@ do estado do trabalho, a página de invariantes sempre lida e as regras
 verificáveis convertidas em gate, e o esboço mais barato pelo que a medição de
 onde vão os tokens mostrar.
 
+Em rascunho, para depois dele: [perguntas do crítico por componente e por família
+de objeto](2026-10-08-perguntas-do-critico-por-objeto.md).
+
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 
 ## Programas
