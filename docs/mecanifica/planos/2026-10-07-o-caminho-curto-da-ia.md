@@ -56,6 +56,14 @@ esboço fica mais barato pelo que a medição mostrar.
   passa a usar uma imagem composta e menor das quatro vistas, abrindo a vista
   inteira só quando o gate ou o crítico pedir. Como o custo é o contexto vezes os
   turnos (de 15 a 44 por objeto), o passo seguinte do Condutor também conta;
+- os reforços que fazem a divulgação progressiva funcionar: cada item do índice
+  (tópico ou roteiro) diz em uma frase o que contém e quando usar; um gate limita
+  o tamanho de cada tópico, para que seção grande seja dividida; toda recusa do
+  gate ou do comando aponta o tópico que resolve (`veja --ajuda tubo`), para a
+  leitura acontecer quando a IA precisa e não antes por precaução; o uso fica
+  registrado (tópicos pedidos e recusas repetidas), para mostrar onde o índice
+  falha; e as descrições das skills, carregadas em toda sessão no piso de 42,5 mil
+  tokens de cada agente, ficam curtas;
 - os quatro objetos de esboço do banco refeitos pelo caminho curto, comparados
   com a medição de 2026-10-07.
 
@@ -88,11 +96,14 @@ esboço fica mais barato pelo que a medição mostrar.
 1. Medir onde vão os tokens nas transcrições dos quatro esbocistas. Feita em
    2026-10-07: [a medição](../banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md).
 2. O esboço mais barato: a referência do JSON por tópico no lugar do README e a
-   imagem composta na conferência. Vem antes das outras por ser o maior ganho
-   medido e não depender delas.
+   imagem composta na conferência, com a frase de cada tópico e o teto de tamanho
+   por tópico. Vem antes das outras por ser o maior ganho medido e não depender
+   delas.
 3. A página de invariantes e os roteiros por intenção como dados, com gate.
 4. O comando de entrada e a ferramenta MCP, com o passo seguinte pelo estado.
-5. O `CLAUDE.md` como roteador e as regras verificáveis convertidas em gate.
+5. O `CLAUDE.md` como roteador, as regras verificáveis convertidas em gate, as
+   recusas apontando o tópico, o registro de uso e as descrições das skills
+   enxutas.
 6. Os quatro objetos refeitos e o fechamento.
 
 ## Riscos e desvios
