@@ -145,7 +145,10 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    2026-10-09, com a caçamba de
    [`carrinho-casca.esboco.json`](../banco-de-provas/carrinho-refeito-2026-10-08/carrinho-casca.esboco.json)
    aprovada pela pessoa, o que cumpre o item 2 do gate de saída.
-3. O nível zero: a forma global N2 estendida e ligada ao nível detalhado.
+3. O nível zero: a forma global N2 estendida e ligada ao nível detalhado. Feita
+   em 2026-10-09: o andaime aceita as primitivas do esboço, e a receita declara
+   em `REFINA` o volume que cada parte refina, com o verificador no veredito da
+   peça recusando parte fora do envelope e porta movida.
 4. O esboço refeito sobre o nível zero, com o processo do módulo atual.
 5. O resto da camada de features sobre os seletores existentes.
 6. Casca com espessura e chapa dobrada como extensões nativas do núcleo, sobre
