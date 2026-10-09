@@ -1,10 +1,19 @@
 /* expressoes.js — aritmética determinística e fechada para parâmetros da Oficina.
    A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceita
-   números, nomes próprios de PARAMS/TOPO, parênteses e + - * /. Não avalia JS,
-   não acessa propriedades e não chama funções. */
+   números, nomes próprios de PARAMS/TOPO, parênteses, + - * / e as funções da
+   lista fechada FUNCOES. Não avalia JS, não acessa propriedades e não chama outra
+   função. */
 
 const INICIO_NOME = /[A-Za-z_]/;
 const CORPO_NOME = /[A-Za-z0-9_]/;
+
+/* A lista fechada de funções: o nome, quantos argumentos e o cálculo. Os ângulos saem em graus, como `graus` das
+   operações e `rotacao` do esboço; `atan2(y, x)` dá o ângulo do vetor (x, y) entre -180 e 180. */
+const GRAUS = 180 / Math.PI;
+const FUNCOES = {
+  atan: { aridade: 1, calcular: (x) => Math.atan(x) * GRAUS },
+  atan2: { aridade: 2, calcular: (y, x) => Math.atan2(y, x) * GRAUS },
+};
 
 function erro(texto) { throw new Error(`oficina: expressão inválida: ${texto}`); }
 
@@ -56,7 +65,17 @@ export function criarResolverNumerico(dict) {
         const inicio = i;
         i += 1;
         while (CORPO_NOME.test(fonte[i] ?? '')) i += 1;
-        return nome(fonte.slice(inicio, i));
+        const lido = fonte.slice(inicio, i);
+        pular();
+        if (fonte[i] !== '(') return nome(lido);
+        if (!Object.hasOwn(FUNCOES, lido)) erro(`função '${lido}' não existe em '${texto}' (há ${Object.keys(FUNCOES).join(', ')})`);
+        i += 1;
+        const argumentos = [soma()];
+        while (consumir(',')) argumentos.push(soma());
+        if (!consumir(')')) erro(`faltou ')' em '${texto}'`);
+        const { aridade, calcular } = FUNCOES[lido];
+        if (argumentos.length !== aridade) erro(`'${lido}' recebe ${aridade} argumento(s), não ${argumentos.length}, em '${texto}'`);
+        return finito(calcular(...argumentos));
       }
       erro(`esperava número, nome ou '(' em '${texto}' na posição ${i + 1}`);
     };

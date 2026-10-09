@@ -13,6 +13,23 @@ describe('expressões da Oficina', () => {
     expect(num('=-(metade + folga)')).toBeCloseTo(-0.072, 12);
   });
 
+  it('atan e atan2 dão o ângulo em graus, e o nome de parâmetro igual ao da função continua valendo sem parênteses', () => {
+    const { num } = criarResolverNumerico({ dy: 1, dx: -1, atan: 3, inclinacao: '=atan(dy / 1)' });
+    expect(num('=atan(1)')).toBeCloseTo(45, 12);
+    expect(num('=atan2(dy, dx)')).toBeCloseTo(135, 12);
+    expect(num('=atan2(-1, -1)')).toBeCloseTo(-135, 12);
+    expect(num('=2 * atan2(0, 1) + atan')).toBe(3);
+    expect(num('inclinacao')).toBeCloseTo(45, 12);
+  });
+
+  it('recusa função fora da lista e número errado de argumentos', () => {
+    const { num } = criarResolverNumerico({ a: 1 });
+    expect(() => num('=sin(a)')).toThrow(/função 'sin' não existe.*atan, atan2/);
+    expect(() => num('=atan2(a)')).toThrow(/'atan2' recebe 2 argumento/);
+    expect(() => num('=atan(a, a)')).toThrow(/'atan' recebe 1 argumento/);
+    expect(() => num('=atan(a')).toThrow(/faltou '\)'/);
+  });
+
   it('recusa símbolo, nome ausente, ciclo e resultado não-finito', () => {
     expect(() => criarResolverNumerico({ raio: 1 }).num('=raio.constructor')).toThrow(/símbolo/);
     expect(() => criarResolverNumerico({}).num('=ausente + 1')).toThrow(/não existe/);
