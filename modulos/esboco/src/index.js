@@ -3,7 +3,7 @@
    lado a lado na mesma escala, em SVG. Não depende de Three.js nem de domínio;
    a conversão para PNG fica na ferramenta de linha de comando. */
 
-import { deslocarContorno, ehConvexo, retanguloArredondado as retanguloDeCantos } from '../../../procedural/nucleo/contorno.js';
+import { deslocarContorno, ehConvexo, ehSimples, retanguloArredondado as retanguloDeCantos } from '../../../procedural/nucleo/contorno.js';
 import { expandirArranjos, expandirEsboco } from './expandir.js';
 import { quisDizer } from './parecido.js';
 import { formasDoPainel, montarCamada } from './camada.js';
@@ -78,30 +78,6 @@ function cortar(perfil, n, limite) {
 function retanguloChanfrado(l, p, c) {
   return [[-l / 2 + c, -p / 2], [l / 2 - c, -p / 2], [l / 2, -p / 2 + c], [l / 2, p / 2 - c],
     [l / 2 - c, p / 2], [-l / 2 + c, p / 2], [-l / 2, p / 2 - c], [-l / 2, -p / 2 + c]];
-}
-
-/* Polígono simples? (3 pontos ou mais, sem ponto repetido, sem área nula e sem arestas que se cruzem ou se toquem
-   fora dos extremos comuns) */
-function ehSimples(perfil) {
-  const n = perfil.length;
-  const area = perfil.reduce((acc, q, i) => acc + q[0] * perfil[(i + 1) % n][1] - perfil[(i + 1) % n][0] * q[1], 0);
-  if (Math.abs(area) < 1e-9) return false;
-  const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
-  const noSegmento = (a, b, c) => Math.min(a[0], b[0]) <= c[0] && c[0] <= Math.max(a[0], b[0]) && Math.min(a[1], b[1]) <= c[1] && c[1] <= Math.max(a[1], b[1]);
-  const cruza = (a, b, c, d) => {
-    const o1 = orient(a, b, c); const o2 = orient(a, b, d); const o3 = orient(c, d, a); const o4 = orient(c, d, b);
-    if (o1 !== o2 && o3 !== o4) return true;
-    return (o1 === 0 && noSegmento(a, b, c)) || (o2 === 0 && noSegmento(a, b, d)) || (o3 === 0 && noSegmento(c, d, a)) || (o4 === 0 && noSegmento(c, d, b));
-  };
-  for (let i = 0; i < n; i++) {
-    const a = perfil[i]; const b = perfil[(i + 1) % n];
-    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return false;
-    for (let j = i + 1; j < n; j++) {
-      if (j === i + 1 || (i === 0 && j === n - 1)) continue;
-      if (cruza(a, b, perfil[j], perfil[(j + 1) % n])) return false;
-    }
-  }
-  return true;
 }
 
 /* Amostra um polígono convexo em `n` raios igualmente espaçados em ângulo, a partir da média dos vértices

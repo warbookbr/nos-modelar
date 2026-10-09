@@ -12,9 +12,10 @@ A forma global N2 (`src/autoria/forma-global.js`,
 [contrato](CONTRATO-FORMA-GLOBAL-N2.md)) já é um nível de blocagem: a IA
 declara um alvo e um andaime de volumes com nome, o andaime vira uma blocagem
 neutra, e o gate G01 compara envelope, pontos de referência e silhueta em três
-vistas contra o alvo. Ela está parada desde 2026-08-24 e aceita só caixa,
-cilindro e prisma convexo. O encaixe já tem contrato no núcleo e na montagem:
-portas publicadas, a porta conferida contra a forma (`porta-confere-forma.js`),
+vistas contra o alvo. Ela aceita caixa, cilindro, prisma convexo, casco por
+seções e as primitivas do esboço (cone, esfera, anel, revolução, extrusão
+côncava e tubo); falta a ligação com a receita detalhada. O encaixe já tem
+contrato no núcleo e na montagem: portas publicadas, a porta conferida contra a forma (`porta-confere-forma.js`),
 vínculos de medida e posição derivada da porta na montagem v5; as portas só
 conhecem cilindro e anel. Ferramenta nova já tem formato de entrada, a [extensão
 nativa](EXTENSOES-NATIVAS-V1.md), com manifesto, teste e registro, e o exemplo

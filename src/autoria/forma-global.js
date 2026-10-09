@@ -3,6 +3,10 @@
    Este módulo não conhece Three.js, DOM, disco, MCP ou domínio automotivo. */
 
 import { FAMILIAS_AUTORIA } from './contrato-autoria-3d.js';
+import { ErroFormaGlobal, chavesExatas, falhar, objeto } from './base-forma-global.js';
+import { TIPOS_PRIMITIVA_FORMA_GLOBAL, malhaPrimitiva, normalizarPrimitiva } from './primitivas-forma-global.js';
+
+export { ErroFormaGlobal };
 
 export const FORMATO_ALVO_FORMA_GLOBAL = 'mecanifica.alvo-forma-global@2';
 export const FORMATO_ANDAIME_GLOBAL = 'mecanifica.andaime-global@2';
@@ -15,7 +19,7 @@ export const FORMATO_CRITICA_FORMA_GLOBAL = 'mecanifica.critica-forma-global@1';
 
 export const VISTAS_ORTOGRAFICAS_FORMA_GLOBAL = Object.freeze(['frontal', 'direita', 'superior']);
 export const VISTAS_EVIDENCIA_FORMA_GLOBAL = Object.freeze(['isometrica', ...VISTAS_ORTOGRAFICAS_FORMA_GLOBAL]);
-export const TIPOS_VOLUME_FORMA_GLOBAL = Object.freeze(['caixa', 'cilindro', 'prisma', 'casco-secoes']);
+export const TIPOS_VOLUME_FORMA_GLOBAL = Object.freeze(['caixa', 'cilindro', 'prisma', 'casco-secoes', ...TIPOS_PRIMITIVA_FORMA_GLOBAL]);
 
 export const CRITERIOS_VISUAIS_FORMA_GLOBAL = Object.freeze([
   'categoria-identificavel', 'frente-traseira-distinguiveis', 'leitura-sem-apoios',
@@ -30,20 +34,7 @@ const DIRECOES = new Set(['+x', '-x', '+y', '-y', '+z', '-z']);
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const EPS = 1e-9;
 
-export class ErroFormaGlobal extends Error {
-  constructor(codigo, caminho, mensagem) {
-    super(`${caminho}: ${mensagem}`);
-    this.name = 'ErroFormaGlobal';
-    this.codigo = codigo;
-    this.caminho = caminho;
-  }
-}
-
 const comparar = (a, b) => a < b ? -1 : a > b ? 1 : 0;
-const simples = (valor) => valor !== null && typeof valor === 'object' && !Array.isArray(valor)
-  && (Object.getPrototypeOf(valor) === Object.prototype || Object.getPrototypeOf(valor) === null);
-
-function falhar(codigo, caminho, mensagem) { throw new ErroFormaGlobal(codigo, caminho, mensagem); }
 function congelar(valor) {
   if (valor && typeof valor === 'object' && !Object.isFrozen(valor)) {
     Object.values(valor).forEach(congelar); Object.freeze(valor);
@@ -51,19 +42,6 @@ function congelar(valor) {
   return valor;
 }
 function copia(valor) { return JSON.parse(JSON.stringify(valor)); }
-function objeto(valor, caminho) {
-  if (!simples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
-  return valor;
-}
-function chavesExatas(valor, campos, caminho) {
-  objeto(valor, caminho);
-  const extras = Object.keys(valor).filter((campo) => !campos.includes(campo));
-  const ausentes = campos.filter((campo) => !Object.hasOwn(valor, campo));
-  if (extras.length || ausentes.length) falhar(
-    'campos-invalidos', caminho,
-    `campos ausentes: ${ausentes.sort(comparar).join(', ') || '(nenhum)'}; extras: ${extras.sort(comparar).join(', ') || '(nenhum)'}.`,
-  );
-}
 function texto(valor, caminho, maximo = 500) {
   if (typeof valor !== 'string' || !valor.trim()) falhar('texto-invalido', caminho, 'precisa ser texto não vazio.');
   const resultado = valor.trim();
@@ -240,7 +218,7 @@ function normalizarVolume(valor, caminho) {
   objeto(valor, caminho);
   const comuns = ['id', 'regioes', 'tipo', 'centro'];
   const tipo = valor.tipo;
-  if (!TIPOS_VOLUME_FORMA_GLOBAL.includes(tipo)) falhar('tipo-volume-invalido', `${caminho}.tipo`, 'tipo de volume desconhecido.');
+  if (!TIPOS_VOLUME_FORMA_GLOBAL.includes(tipo)) falhar('tipo-volume-invalido', `${caminho}.tipo`, `recebeu ${JSON.stringify(tipo)}; aceita ${TIPOS_VOLUME_FORMA_GLOBAL.join(', ')}.`);
   const base = {
     id: slug(valor.id, `${caminho}.id`), regioes: listaSlugs(valor.regioes, `${caminho}.regioes`, { vazia: false }), tipo,
     centro: vetor3(valor.centro, `${caminho}.centro`),
@@ -278,6 +256,7 @@ function normalizarVolume(valor, caminho) {
     if (secoes.some(({ perfil }) => perfil.length !== pontosPorSecao)) falhar('topologia-secao-divergente', `${caminho}.secoes`, 'todas as seções precisam ter a mesma quantidade de pontos.');
     return { ...base, eixoPercurso: valor.eixoPercurso, eixosSecao: [...valor.eixosSecao], secoes };
   }
+  if (TIPOS_PRIMITIVA_FORMA_GLOBAL.includes(tipo)) return normalizarPrimitiva(valor, caminho, base);
   chavesExatas(valor, [...comuns, 'eixoExtrusao', 'eixosPerfil', 'comprimento', 'perfil'], caminho);
   if (!EIXOS.has(valor.eixoExtrusao)) falhar('eixo-invalido', `${caminho}.eixoExtrusao`, 'precisa ser x, y ou z.');
   if (!Array.isArray(valor.eixosPerfil) || valor.eixosPerfil.length !== 2 || valor.eixosPerfil.some((eixo) => !EIXOS.has(eixo))) {
@@ -380,6 +359,7 @@ function malhaDoVolume(volume) {
   if (volume.tipo === 'caixa') return malhaCaixa(volume);
   if (volume.tipo === 'cilindro') return malhaCilindro(volume);
   if (volume.tipo === 'casco-secoes') return malhaCascoSecoes(volume);
+  if (TIPOS_PRIMITIVA_FORMA_GLOBAL.includes(volume.tipo)) return malhaPrimitiva(volume);
   return malhaPrisma(volume);
 }
 function envelopeDosVertices(vertices) {

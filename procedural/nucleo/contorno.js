@@ -8,7 +8,8 @@
    `segmentosPorCanto` segmentos, uniformes em ângulo. Raio igual à meia-medida nos dois cantos de um lado dá um arco
    inteiro naquele lado (a frente em D). Pontos coincidentes (raio 0, ou arcos que se encontram no meio do lado) saem uma vez.
    deslocarContorno: recua (distância > 0) ou expande (< 0) um polígono convexo pela bissetriz de cada vértice; cada aresta
-   fica paralela à original e o número de vértices não muda. */
+   fica paralela à original e o número de vértices não muda.
+   ehSimples: polígono simples (convexo ou côncavo), sem ponto repetido, área nula nem arestas que se cruzem ou se toquem. */
 
 const EPS = 1e-9;
 const SEGMENTOS_PADRAO = 4;
@@ -164,4 +165,28 @@ export function deslocarContorno(poligono, distancia) {
     throw new Error(`deslocarContorno: o recuo ${distancia} inverte o polígono (área ${areaDoContorno(saida)}); o recuo máximo é aproximadamente ${Number.isFinite(maximo) ? maximo.toFixed(3) : 'ilimitado'}`);
   }
   return saida;
+}
+
+/* Polígono simples? (3 pontos ou mais, sem ponto repetido, sem área nula e sem arestas que se cruzem ou se toquem
+   fora dos extremos comuns) */
+export function ehSimples(perfil) {
+  const n = perfil.length;
+  const area = perfil.reduce((acc, q, i) => acc + q[0] * perfil[(i + 1) % n][1] - perfil[(i + 1) % n][0] * q[1], 0);
+  if (Math.abs(area) < 1e-9) return false;
+  const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+  const noSegmento = (a, b, c) => Math.min(a[0], b[0]) <= c[0] && c[0] <= Math.max(a[0], b[0]) && Math.min(a[1], b[1]) <= c[1] && c[1] <= Math.max(a[1], b[1]);
+  const cruza = (a, b, c, d) => {
+    const o1 = orient(a, b, c); const o2 = orient(a, b, d); const o3 = orient(c, d, a); const o4 = orient(c, d, b);
+    if (o1 !== o2 && o3 !== o4) return true;
+    return (o1 === 0 && noSegmento(a, b, c)) || (o2 === 0 && noSegmento(a, b, d)) || (o3 === 0 && noSegmento(c, d, a)) || (o4 === 0 && noSegmento(c, d, b));
+  };
+  for (let i = 0; i < n; i++) {
+    const a = perfil[i]; const b = perfil[(i + 1) % n];
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return false;
+    for (let j = i + 1; j < n; j++) {
+      if (j === i + 1 || (i === 0 && j === n - 1)) continue;
+      if (cruza(a, b, perfil[j], perfil[(j + 1) % n])) return false;
+    }
+  }
+  return true;
 }

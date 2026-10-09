@@ -277,6 +277,36 @@ const SCHEMA_VOLUME_FORMA_GLOBAL = {
         items: objeto({ posicao: { type: 'number' }, perfil: { type: 'array', minItems: 3, items: vetor(2) } }),
       },
     }),
+    objeto({
+      ...volumeBase, tipo: { const: 'cone' }, eixo: { enum: ['x', 'y', 'z'] },
+      raioBase: { type: 'number', minimum: 0 }, raioTopo: { type: 'number', minimum: 0 },
+      comprimento: { type: 'number', exclusiveMinimum: 0 }, segmentos: { type: 'integer', minimum: 8, maximum: 128 },
+    }),
+    objeto({
+      ...volumeBase, tipo: { const: 'esfera' }, raio: { type: 'number', exclusiveMinimum: 0 },
+      segmentos: { type: 'integer', minimum: 8, maximum: 128, multipleOf: 4 },
+    }),
+    objeto({
+      ...volumeBase, tipo: { const: 'anel' }, eixo: { enum: ['x', 'y', 'z'] },
+      raioExterno: { type: 'number', exclusiveMinimum: 0 }, raioInterno: { type: 'number', exclusiveMinimum: 0 },
+      espessura: { type: 'number', exclusiveMinimum: 0 }, segmentos: { type: 'integer', minimum: 8, maximum: 128 },
+    }),
+    objeto({
+      ...volumeBase, tipo: { const: 'revolucao' }, eixo: { enum: ['x', 'y', 'z'] },
+      perfil: { type: 'array', minItems: 2, maxItems: 256, items: vetor(2) },
+      segmentos: { type: 'integer', minimum: 8, maximum: 128 },
+    }),
+    objeto({
+      ...volumeBase, tipo: { const: 'extrusao' }, eixoExtrusao: { enum: ['x', 'y', 'z'] },
+      eixosPerfil: { type: 'array', minItems: 2, maxItems: 2, uniqueItems: true, items: { enum: ['x', 'y', 'z'] } },
+      comprimento: { type: 'number', exclusiveMinimum: 0 },
+      perfil: { type: 'array', minItems: 3, maxItems: 512, items: vetor(2) },
+    }),
+    objeto({
+      ...volumeBase, tipo: { const: 'tubo' }, caminho: { type: 'array', minItems: 2, maxItems: 64, items: vetor(3) },
+      raio: { type: 'number', exclusiveMinimum: 0 }, raioCurva: { type: 'number', minimum: 0 },
+      segmentos: { type: 'integer', minimum: 8, maximum: 128 },
+    }),
   ],
 };
 

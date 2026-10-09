@@ -1,6 +1,6 @@
 /* contorno.test.mjs — retângulo arredondado, recuo por meia-esquadria, área e convexidade do contorno 2D. */
 import { describe, expect, it } from 'vitest';
-import { areaDoContorno, deslocarContorno, ehConvexo, retanguloArredondado } from './contorno.js';
+import { areaDoContorno, deslocarContorno, ehConvexo, ehSimples, retanguloArredondado } from './contorno.js';
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 /* distância (com sinal, positiva para dentro de um polígono anti-horário) de p à reta da aresta a->b */
@@ -259,5 +259,23 @@ describe('deslocarContorno', () => {
     expect(maximo).toBeGreaterThan(0);
     expect(() => deslocarContorno(p, maximo - 0.01)).not.toThrow();
     expect(() => deslocarContorno(p, maximo + 0.01)).toThrow(/inverte/);
+  });
+});
+
+describe('ehSimples', () => {
+  const L = [[0, 0], [60, 0], [60, 10], [10, 10], [10, 40], [0, 40]];
+
+  it('aceita o polígono convexo e o côncavo, em qualquer sentido', () => {
+    expect(ehSimples([[0, 0], [10, 0], [10, 10], [0, 10]])).toBe(true);
+    expect(ehSimples(L)).toBe(true);
+    expect(ehSimples([...L].reverse())).toBe(true);
+    expect(ehConvexo(L)).toBe(false);
+  });
+
+  it('recusa arestas que se cruzam, que se tocam fora dos extremos, ponto repetido e área nula', () => {
+    expect(ehSimples([[0, 0], [10, 10], [10, 0], [0, 10]])).toBe(false);
+    expect(ehSimples([[0, 0], [20, 0], [20, 10], [10, 0], [0, 10]])).toBe(false);
+    expect(ehSimples([[0, 0], [10, 0], [10, 0], [10, 10], [0, 10]])).toBe(false);
+    expect(ehSimples([[0, 0], [10, 0], [20, 0]])).toBe(false);
   });
 });

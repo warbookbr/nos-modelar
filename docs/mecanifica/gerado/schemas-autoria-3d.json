@@ -2503,6 +2503,403 @@
                     }
                   }
                 }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regioes",
+                  "tipo",
+                  "centro",
+                  "eixo",
+                  "raioBase",
+                  "raioTopo",
+                  "comprimento",
+                  "segmentos"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regioes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 120
+                    }
+                  },
+                  "tipo": {
+                    "const": "cone"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "eixo": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "raioBase": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "raioTopo": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "comprimento": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "segmentos": {
+                    "type": "integer",
+                    "minimum": 8,
+                    "maximum": 128
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regioes",
+                  "tipo",
+                  "centro",
+                  "raio",
+                  "segmentos"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regioes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 120
+                    }
+                  },
+                  "tipo": {
+                    "const": "esfera"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "raio": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "segmentos": {
+                    "type": "integer",
+                    "minimum": 8,
+                    "maximum": 128,
+                    "multipleOf": 4
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regioes",
+                  "tipo",
+                  "centro",
+                  "eixo",
+                  "raioExterno",
+                  "raioInterno",
+                  "espessura",
+                  "segmentos"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regioes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 120
+                    }
+                  },
+                  "tipo": {
+                    "const": "anel"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "eixo": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "raioExterno": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "raioInterno": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "espessura": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "segmentos": {
+                    "type": "integer",
+                    "minimum": 8,
+                    "maximum": 128
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regioes",
+                  "tipo",
+                  "centro",
+                  "eixo",
+                  "perfil",
+                  "segmentos"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regioes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 120
+                    }
+                  },
+                  "tipo": {
+                    "const": "revolucao"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "eixo": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "perfil": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 256,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "segmentos": {
+                    "type": "integer",
+                    "minimum": 8,
+                    "maximum": 128
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regioes",
+                  "tipo",
+                  "centro",
+                  "eixoExtrusao",
+                  "eixosPerfil",
+                  "comprimento",
+                  "perfil"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regioes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 120
+                    }
+                  },
+                  "tipo": {
+                    "const": "extrusao"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "eixoExtrusao": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "eixosPerfil": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "x",
+                        "y",
+                        "z"
+                      ]
+                    }
+                  },
+                  "comprimento": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "perfil": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 512,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regioes",
+                  "tipo",
+                  "centro",
+                  "caminho",
+                  "raio",
+                  "raioCurva",
+                  "segmentos"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regioes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 120
+                    }
+                  },
+                  "tipo": {
+                    "const": "tubo"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "caminho": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 64,
+                    "items": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "raio": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "raioCurva": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "segmentos": {
+                    "type": "integer",
+                    "minimum": 8,
+                    "maximum": 128
+                  }
+                }
               }
             ]
           }
@@ -2720,7 +3117,13 @@
                   "caixa",
                   "cilindro",
                   "prisma",
-                  "casco-secoes"
+                  "casco-secoes",
+                  "cone",
+                  "esfera",
+                  "anel",
+                  "revolucao",
+                  "extrusao",
+                  "tubo"
                 ]
               },
               "inicioVertice": {
