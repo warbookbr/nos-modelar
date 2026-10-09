@@ -127,13 +127,30 @@ function amostrarRadial(poli, n) {
   return saida;
 }
 
-const CHAVES_DA_SECAO = ['pos', 'forma', 'tamanho', 'perfil', 'raio', 'centro', 'nome', 'cantos', 'segmentosPorCanto'];
+const CHAVES_DA_SECAO = ['pos', 'forma', 'tamanho', 'perfil', 'raio', 'centro', 'nome', 'cantos', 'segmentosPorCanto', 'inclinacao'];
 const FORMAS_DA_SECAO = ['retangulo', 'elipse', 'poligono', 'arredondado'];
 const NOMES_RESERVADOS = ['centro', 'inicio', 'fim', ...LADOS];
 
+/* A rotação de uma seção inclinada, em torno do centro dela, no referencial (u, v, w) do loft: `au` gira em torno de u (o lado +v
+   avança em +w) e `av` em torno de v (o lado +u avança em +w). `ponto(u, v)` devolve o deslocamento [du, dv, dw] do ponto (u, v, 0) da
+   seção e `n` é a normal da seção, a que apontava em +w. */
+function rotacaoDaSecao([au, av]) {
+  const a = (au * Math.PI) / 180;
+  const b = (av * Math.PI) / 180;
+  const [ca, sa, cb, sb] = [Math.cos(a), Math.sin(a), Math.cos(b), Math.sin(b)];
+  return {
+    au, av,
+    n: [-ca * sb, -sa, ca * cb],
+    ponto: (u, v) => [u * cb - v * sa * sb, v * ca, u * sb + v * sa * cb],
+  };
+}
+
+/* O w de um ponto do perfil de uma seção: o terceiro valor quando a seção está inclinada, e a posição `w` dela nas outras. */
+export const wDoPonto = (sc, q) => (q.length > 2 ? q[2] : sc.w);
+
 /* Lê uma seção do loft: o polígono convexo dela (relativo ao centro da seção, anti-horário) ou null para um ponto. */
 function lerSecao(s, onde, extremo) {
-  exigir(s && typeof s === 'object' && !Array.isArray(s), `${onde}: a seção deve ser { "pos": mm, "forma": "retangulo" | "elipse" | "poligono" | "arredondado", "tamanho": [u, v], "centro": [u, v], "nome": "..." }`);
+  exigir(s && typeof s === 'object' && !Array.isArray(s), `${onde}: a seção deve ser { "pos": mm, "forma": "retangulo" | "elipse" | "poligono" | "arredondado", "tamanho": [u, v], "centro": [u, v], "nome": "...", "inclinacao": [au, av] }`);
   const fora = Object.keys(s).filter((k) => !CHAVES_DA_SECAO.includes(k));
   exigir(fora.length === 0, `${onde}: a seção não tem o campo "${fora[0]}" (campos: ${CHAVES_DA_SECAO.join(', ')})`);
   exigir(typeof s.pos === 'number' && Number.isFinite(s.pos), `${onde}: falta "pos", a posição da seção ao longo do eixo em mm`);
@@ -176,7 +193,41 @@ function lerSecao(s, onde, extremo) {
       }
     }
   }
-  return { pos: s.pos, centro, nome: s.nome, pts, forma };
+  let rot;
+  if (s.inclinacao !== undefined) {
+    exigir(Array.isArray(s.inclinacao) && s.inclinacao.length === 2 && s.inclinacao.every((x) => typeof x === 'number' && Number.isFinite(x)), `${onde}: "inclinacao" deve ser [au, av] em graus (dois números, ou "=expressão"): a seção gira em torno do centro, au em torno do eixo u e av em torno do eixo v (veio ${JSON.stringify(s.inclinacao)})`);
+    exigir(pts, `${onde}: a seção ponto ([0, 0]) não aceita "inclinacao": um ponto não tem plano para girar; incline a seção vizinha`);
+    exigir(s.inclinacao.every((x) => Math.abs(x) < 90), `${onde}: "inclinacao" ${JSON.stringify(s.inclinacao)} passa de 90 graus; a seção girada vira de costas para o eixo (use ângulos de poucos graus)`);
+    if (s.inclinacao.some((x) => x !== 0)) rot = rotacaoDaSecao(s.inclinacao);
+  }
+  return { pos: s.pos, centro, nome: s.nome, pts, forma, rot };
+}
+
+/* Os pontos de uma seção do loft no lugar dela: o contorno `pts` (relativo ao centro) mais o centro, e, na seção inclinada, girado em
+   torno do centro (então cada ponto leva o seu w, como terceiro valor). */
+function colocarNaSecao(sc, pts) {
+  if (!sc.rot) return pts.map(([u, v]) => [u + sc.centro[0], v + sc.centro[1]]);
+  return pts.map(([u, v]) => { const [du, dv, dw] = sc.rot.ponto(u, v); return [du + sc.centro[0], dv + sc.centro[1], sc.pos + dw]; });
+}
+
+/* Duas seções vizinhas, com alguma inclinada, não podem se cruzar: todos os pontos da seguinte ficam adiante do plano da anterior
+   (do lado da normal dela) e todos os da anterior ficam atrás do plano da seguinte. É a condição para a faixa entre elas ser um
+   sólido e não uma dobra. */
+function exigirSecoesSemCruzar(secoes, lidas, onde) {
+  const normalDe = (sc) => sc.n ?? [0, 0, 1];
+  const adiante = (de, ate) => {
+    const n = normalDe(de);
+    const c = [de.cu, de.cv, de.w];
+    const d = ate.perfil.map((q) => (q[0] - c[0]) * n[0] + (q[1] - c[1]) * n[1] + (wDoPonto(ate, q) - c[2]) * n[2]);
+    return { min: Math.min(...d), max: Math.max(...d) };
+  };
+  secoes.forEach((sc, k) => {
+    if (k === 0 || !(sc.n || secoes[k - 1].n)) return;
+    const [a, b] = [{ ...secoes[k - 1], cu: lidas[k - 1].centro[0], cv: lidas[k - 1].centro[1] }, { ...sc, cu: lidas[k].centro[0], cv: lidas[k].centro[1] }];
+    const frente = adiante(a, b).min;
+    const tras = -adiante(b, a).max;
+    exigir(frente > 1e-9 && tras > 1e-9, `${onde}, secoes[${k - 1}] e secoes[${k}]: a "inclinacao" faz as duas seções vizinhas se cruzarem (um canto de uma passa do plano da outra, folga ${(Math.min(frente, tras)).toFixed(3)} mm); reduza o ângulo, afaste as duas em "pos" ou reduza o tamanho delas`);
+  });
 }
 
 /* Nomes das âncoras de seção (loft) ou de ponto do perfil (revolução), na ordem em que foram declarados. */
@@ -198,16 +249,17 @@ function exigirNomes(nomes, onde) {
    "casca") traz { espessura, aberta, fechadaNoInicio, wc, cavidade }: a superfície interna em seções, com a primeira (ou a
    última) no plano `wc` em que o fundo termina; a caixa e as âncoras seguem a superfície externa. */
 function solidoEmSecoes(b, secoes, ancoras, casca = null) {
-  const vs = secoes.flatMap((sc) => sc.perfil.map(([u, v]) => [u, v, sc.w]));
+  const vs = secoes.flatMap((sc) => sc.perfil.map((q) => [q[0], q[1], wDoPonto(sc, q)]));
   const lo = [0, 1, 2].map((i) => Math.min(...vs.map((p) => p[i])));
   const hi = [0, 1, 2].map((i) => Math.max(...vs.map((p) => p[i])));
   const c = lo.map((v, i) => (v + hi[i]) / 2);
-  const centra = (sc) => ({ w: sc.w - c[2], perfil: sc.perfil.map(([u, v]) => [u - c[0], v - c[1]]) });
+  const centra = (sc) => ({ w: sc.w - c[2], ...(sc.n ? { n: sc.n } : {}), perfil: sc.perfil.map((q) => (q.length > 2 ? [q[0] - c[0], q[1] - c[1], q[2] - c[2]] : [q[0] - c[0], q[1] - c[1]])) });
   const centradas = secoes.map(centra);
   const ancorasLocais = Object.fromEntries(Object.entries(ancoras).map(([nome, p]) => [nome, [p[0] - c[0], p[1] - c[1], p[2] - c[2]]]));
+  const { listas, ...cascaBase } = casca ?? {};
   return {
     b, perfil: centradas[0].perfil, furos: [], furo: null, comprimento: hi[2] - lo[2], secoes: centradas, porFaixas: true, naoConvexo: true, ancorasLocais,
-    ...(casca ? { casca: { ...casca, wc: casca.wc - c[2], cavidade: casca.cavidade.map(centra) } } : {}),
+    ...(casca ? { casca: { ...cascaBase, wc: casca.wc - c[2], cavidade: casca.cavidade.map(centra), ...(listas ? { listas: { fundo: listas.fundo.map(centra), parede: listas.parede.map(centra), cavidade: listas.cavidade.map(centra) } } : {}) } } : {}),
   };
 }
 
@@ -227,6 +279,7 @@ function secaoEm(lista, w) {
    da ponta fechada até o plano em que o fundo termina), `parede` (a superfície externa daí até a ponta aberta) e `cavidade`
    (a superfície interna, com as mesmas posições da `parede`, seção a seção). */
 export function listasDaCasca({ secoes, casca }) {
+  if (casca.listas) return casca.listas;
   const corte = secaoEm(secoes, casca.wc);
   const antes = secoes.filter((sc) => sc.w < casca.wc - 1e-9);
   const depois = secoes.filter((sc) => sc.w > casca.wc + 1e-9);
@@ -248,7 +301,8 @@ function lerCasca(c, onde) {
 }
 
 /* A superfície interna do loft com casca: cada seção recuada de `espessura` no próprio plano (`deslocarContorno`), as mesmas
-   posições e centros; a ponta fechada leva o fundo, e a cavidade começa (ou termina) `espessura` adiante dela. */
+   posições e centros; a ponta fechada leva o fundo, e a cavidade começa (ou termina) `espessura` adiante dela. Com seção inclinada
+   o fundo acompanha a seção da ponta fechada (ver `fundoDaCascaInclinada`). */
 function cascaDoLoft({ espessura, aberta }, lidas, secoes, { horario, n, misturado }, onde) {
   const recuadas = lidas.map((sc, i) => {
     const ccw = horario ? [...sc.pts].reverse() : sc.pts;
@@ -262,16 +316,69 @@ function cascaDoLoft({ espessura, aberta }, lidas, secoes, { horario, n, mistura
         : `${onde}, secoes[${i}]: a "casca" de ${espessura} mm não cabe nesta seção (${e.message.replace(/^deslocarContorno: /, '')})`);
     }
     if (misturado) recuado = amostrarRadial(recuado, n);
-    return { w: sc.pos, perfil: recuado.map(([u, v]) => [u + sc.centro[0], v + sc.centro[1]]) };
+    return { w: sc.pos, ...(sc.rot ? { n: sc.rot.n } : {}), perfil: colocarNaSecao(sc, recuado) };
   });
   const inicio = secoes[0].w;
   const fim = secoes[secoes.length - 1].w;
   exigir(espessura < fim - inicio - 1e-9, `${onde}: a "casca" de ${espessura} mm não cabe no loft de ${fim - inicio} mm de comprimento: o fundo ocupa a espessura toda e não sobra cavidade`);
   const fechadaNoInicio = aberta === 'fim';
+  if (secoes.some((sc) => sc.n)) return fundoDaCascaInclinada({ espessura, aberta, fechadaNoInicio }, lidas, secoes, recuadas, onde);
   const wc = fechadaNoInicio ? inicio + espessura : fim - espessura;
   const corte = secaoEm(recuadas, wc);
   const cavidade = fechadaNoInicio ? [corte, ...recuadas.filter((sc) => sc.w > wc + 1e-9)] : [...recuadas.filter((sc) => sc.w < wc - 1e-9), corte];
   return { espessura, aberta, fechadaNoInicio, wc, cavidade };
+}
+
+/* O fundo da casca de um loft com seção inclinada. O plano em que o fundo termina é o da seção da ponta fechada, deslocado da
+   `espessura` ao longo da normal dela (para dentro do sólido): a boca horizontal e o fundo inclinado dão um fundo de espessura
+   constante, medida perpendicular a ele. O plano corta cada aresta longitudinal (a poligonal que liga o mesmo ponto das seções) da
+   superfície de fora e da de dentro; as seções antes do plano ficam no fundo, as depois ficam na parede, e o plano não pode passar
+   por dentro de uma seção. Devolve as três listas (`fundo`, `parede`, `cavidade`) como `listasDaCasca`. */
+function fundoDaCascaInclinada({ espessura, aberta, fechadaNoInicio }, lidas, secoes, recuadas, onde) {
+  const k0 = fechadaNoInicio ? 0 : secoes.length - 1;
+  const normal = lidas[k0].rot ? lidas[k0].rot.n : [0, 0, 1];
+  const nDentro = fechadaNoInicio ? normal : normal.map((x) => -x);
+  const c0 = [...lidas[k0].centro, lidas[k0].pos];
+  const dist = (sc, q) => (q[0] - c0[0]) * nDentro[0] + (q[1] - c0[1]) * nDentro[1] + (wDoPonto(sc, q) - c0[2]) * nDentro[2] - espessura;
+  const ordem = secoes.map((_, i) => (fechadaNoInicio ? i : secoes.length - 1 - i));
+  const tipo = (sc) => {
+    const d = sc.perfil.map((q) => dist(sc, q));
+    if (Math.max(...d) < -1e-9) return 'antes';
+    if (Math.min(...d) > 1e-9) return 'depois';
+    return d.every((x) => Math.abs(x) <= 1e-9) ? 'sobre' : 'cruza';
+  };
+  const tipos = ordem.map((i) => tipo(secoes[i]));
+  const primeira = tipos.findIndex((t) => t !== 'antes');
+  const nao = `${onde}: a "casca" de ${espessura} mm`;
+  const sobre = tipos[primeira] === 'sobre';
+  const base = primeira + (sobre ? 1 : 0);
+  exigir(primeira >= 0 && base < tipos.length, `${nao} não cabe no loft inclinado: o plano do fundo (a ${espessura} mm da seção da ponta fechada, perpendicular a ela) não deixa cavidade antes da outra ponta`);
+  const ruim = tipos.slice(base).findIndex((t) => t !== 'depois');
+  exigir(ruim < 0, `${nao} tem o plano do fundo (a ${espessura} mm da seção da ponta fechada, perpendicular a ela) cruzando a seção secoes[${ordem[base + ruim]}]; afaste essa seção da ponta, reduza a inclinação ou use uma espessura menor`);
+  const antes = ordem.slice(0, primeira);
+  const depois = ordem.slice(base);
+  /* o ponto i da poligonal em que o plano passa: o próprio ponto se uma seção está sobre o plano, senão a interpolação entre a última antes e a primeira depois */
+  const cortar = (lista) => {
+    const a = lista[ordem[primeira - 1]];
+    const m = lista[ordem[primeira]];
+    const perfil = m.perfil.map((q, i) => {
+      if (sobre) return [q[0], q[1], wDoPonto(m, q)];
+      const p = a.perfil[i];
+      const da = dist(a, p);
+      const t = da / (da - dist(m, q));
+      return [p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1]), wDoPonto(a, p) + t * (wDoPonto(m, q) - wDoPonto(a, p))];
+    });
+    return { w: perfil.reduce((acc, q) => acc + q[2], 0) / perfil.length, n: normal, perfil };
+  };
+  const corteFora = cortar(secoes);
+  const corteDentro = cortar(recuadas);
+  const doGlobal = (lista, ids) => ids.map((i) => lista[i]).sort((x, y) => x.w - y.w);
+  const [fora0, dentro0] = [doGlobal(secoes, antes), doGlobal(recuadas, depois)];
+  const cavidade = fechadaNoInicio ? [corteDentro, ...dentro0] : [...dentro0, corteDentro];
+  const listas = fechadaNoInicio
+    ? { fundo: [...fora0, corteFora], parede: [corteFora, ...doGlobal(secoes, depois)], cavidade }
+    : { fundo: [corteFora, ...fora0], parede: [...doGlobal(secoes, depois), corteFora], cavidade };
+  return { espessura, aberta, fechadaNoInicio, wc: corteFora.w, cavidade, listas };
 }
 
 /* Pontos consecutivos repetidos (o contorno que fecha sobre si mesmo) saem, para o recuo não ter aresta de comprimento zero. */
@@ -474,8 +581,9 @@ function prisma(f, onde) {
       let pts = sc.pts && (horario ? [...sc.pts].reverse() : sc.pts);
       if (pts && contagens.size > 1) pts = amostrarRadial(pts, n);
       if (!pts) pts = Array.from({ length: n }, () => [0, 0]);
-      return { w: sc.pos, perfil: pts.map(([u, v]) => [u + sc.centro[0], v + sc.centro[1]]) };
+      return { w: sc.pos, ...(sc.rot ? { n: sc.rot.n } : {}), perfil: colocarNaSecao(sc, pts) };
     });
+    exigirSecoesSemCruzar(secoes, lidas, onde);
     const ancoras = { inicio: [...lidas[0].centro, lidas[0].pos], fim: [...lidas[lidas.length - 1].centro, lidas[lidas.length - 1].pos] };
     lidas.forEach((sc) => { if (sc.nome) ancoras[sc.nome] = [...sc.centro, sc.pos]; });
     return solidoEmSecoes(base(eixo), secoes, ancoras, declaradaCasca ? cascaDoLoft(declaradaCasca, lidas, secoes, { horario, n, misturado: contagens.size > 1 }, onde) : null);
@@ -685,7 +793,7 @@ function rotacaoEntre(a, b) {
 
 /* Vértices do prisma girado, relativos ao centro (o anel entra como o disco externo). */
 function verticesLocais(pr, m) {
-  if (pr.secoes) return pr.secoes.flatMap((sc) => sc.perfil.map(([u, v]) => aplicarMatriz(ponto3(pr.b, u, v, sc.w), m)));
+  if (pr.secoes) return pr.secoes.flatMap((sc) => sc.perfil.map((q) => aplicarMatriz(ponto3(pr.b, q[0], q[1], wDoPonto(sc, q)), m)));
   const h = pr.comprimento / 2;
   const saida = [];
   for (const w of [-h, h]) for (const [u, v] of pr.perfil) saida.push(aplicarMatriz(ponto3(pr.b, u, v, w), m));
@@ -694,14 +802,15 @@ function verticesLocais(pr, m) {
 
 /* Normal (unitária, no referencial local x, y, z) de cada face lateral de um sólido em seções: [faixa][aresta].
    A face entre duas seções é o quadrilátero (planar, pois as seções são paralelas entre si) cujas arestas vêm
-   do mesmo lado do perfil; num prisma reto dá a normal (dv, -du) do perfil. */
+   do mesmo lado do perfil; num prisma reto dá a normal (dv, -du) do perfil. Entre seções inclinadas o quadrilátero não é plano, e a
+   normal é a das duas diagonais de tangente (a média das duas arestas ao longo do perfil contra a média das duas que ligam as seções). */
 export function normaisDasFaixas({ b, secoes }) {
   const N = secoes[0].perfil.length;
   return secoes.slice(0, -1).map((s0, k) => {
     const s1 = secoes[k + 1];
     return Array.from({ length: N }, (_, i) => {
       const j = (i + 1) % N;
-      const P = (sc, q) => [sc.perfil[q][0], sc.perfil[q][1], sc.w];
+      const P = (sc, q) => [sc.perfil[q][0], sc.perfil[q][1], wDoPonto(sc, sc.perfil[q])];
       const A0 = P(s0, i); const D0 = P(s0, j); const A1 = P(s1, i); const D1 = P(s1, j);
       const tA = [0, 1, 2].map((e) => D0[e] - A0[e] + D1[e] - A1[e]);
       const tW = [0, 1, 2].map((e) => A1[e] - A0[e] + D1[e] - D0[e]);
@@ -732,7 +841,7 @@ export function relacaoDe(f) {
     const a = f.arranjoDe;
     partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'caminho' ? `ao longo do caminho de ${a.caminho}${a.passo !== undefined ? `, passo ${a.passo} mm` : ''}` : a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
   }
-  if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções${f.casca && typeof f.casca === 'object' ? `, casca de ${f.casca.espessura} mm aberta no ${f.casca.aberta}` : ''}`);
+  if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções${f.casca && typeof f.casca === 'object' ? `, casca de ${f.casca.espessura} mm aberta no ${f.casca.aberta}` : ''}${f.secoes.filter((q) => q && Array.isArray(q.inclinacao) && q.inclinacao.some((x) => x !== 0)).map((q) => `, seção ${q.nome ?? `em ${q.pos} mm`} inclinada [${q.inclinacao.join(' ')}] graus`).join('')}`);
   if (f.tipo === 'revolucao' && Array.isArray(f.perfil)) partes.push(`revolução de um perfil de ${f.perfil.length} pontos`);
   if (f.tipo === 'tubo' && Array.isArray(f.caminho)) partes.push(`caminho de ${f.caminho.length} pontos${f.raioCurva ? `, raio de curva ${f.raioCurva} mm` : ''}`);
   if (f.tipo === 'envolve' && Array.isArray(f.circulos)) partes.push(`faixa ${f.fechado === false ? 'aberta' : 'fechada'} de ${f.largura} mm por ${f.espessura} mm em torno de ${f.circulos.length} círculos (raios ${f.circulos.map((c) => c.raio).join(', ')})`);
@@ -1409,7 +1518,8 @@ function fatiarSecoes(r, olho, maxFatias = 36) {
     return [pr[0] + c[0], pr[1] + c[1], pr[2] + c[2]];
   };
   const rotNormal = (nl) => normalizar(aplicarMatriz(nl, m));
-  const eixoN = (s) => rotNormal(ponto3(b, 0, 0, s));
+  /* a normal de uma ponta: a do eixo, ou a da seção da ponta quando ela está inclinada */
+  const eixoN = (s) => { const sc = secoes[s < 0 ? 0 : secoes.length - 1]; return rotNormal(sc.n ? ponto3(b, ...sc.n.map((x) => x * s)) : ponto3(b, 0, 0, s)); };
   const N = secoes[0].perfil.length;
   const nb = secoes.length - 1;
   const nm = normaisDasFaixas(r.prisma).map((fk) => fk.map((n) => rotNormal(n)));
@@ -1425,7 +1535,7 @@ function fatiarSecoes(r, olho, maxFatias = 36) {
   const chunks = [];
   const tampa = (sc, n, ponta) => ({
     r, ponta, prof: dot(mundo(0, 0, sc.w), olho), lados: [], dentro: [], linhas: [], arcos: [],
-    tampas: [{ papel: 'tampa', n, pts: sc.perfil.map((q) => mundo(q[0], q[1], sc.w)), furos: [], furo: null }],
+    tampas: [{ papel: 'tampa', n, pts: sc.perfil.map((q) => mundo(q[0], q[1], wDoPonto(sc, q))), furos: [], furo: null }],
   });
   if (tampaVisivel[0]) chunks.push(tampa(secoes[0], eixoN(-1), 'inicio'));
   for (let k = 0; k < nb; k++) {
@@ -1433,12 +1543,13 @@ function fatiarSecoes(r, olho, maxFatias = 36) {
     const s1 = secoes[k + 1];
     /* uma fatia por faixa no loft e na revolução: a faixa é convexa, e as linhas de cada face saem coladas a ela */
     const fatias = r.prisma.naoConvexo ? 1 : Math.max(1, Math.min(Math.ceil(comprimentos[k] / 5), Math.round((maxFatias * comprimentos[k]) / total)));
-    const noPasso = (t) => ({ w: s0.w + t * (s1.w - s0.w), perfil: s0.perfil.map((q, i) => [q[0] + t * (s1.perfil[i][0] - q[0]), q[1] + t * (s1.perfil[i][1] - q[1])]) });
+    const inclinada = Boolean(s0.n || s1.n);
+    const noPasso = (t) => ({ w: s0.w + t * (s1.w - s0.w), perfil: s0.perfil.map((q, i) => [q[0] + t * (s1.perfil[i][0] - q[0]), q[1] + t * (s1.perfil[i][1] - q[1]), ...(inclinada ? [wDoPonto(s0, q) + t * (wDoPonto(s1, s1.perfil[i]) - wDoPonto(s0, q))] : [])]) });
     for (let j = 0; j < fatias; j++) {
       const a = noPasso(j / fatias);
       const d = noPasso((j + 1) / fatias);
-      const P0 = (i) => mundo(a.perfil[i][0], a.perfil[i][1], a.w);
-      const P1 = (i) => mundo(d.perfil[i][0], d.perfil[i][1], d.w);
+      const P0 = (i) => mundo(a.perfil[i][0], a.perfil[i][1], wDoPonto(a, a.perfil[i]));
+      const P1 = (i) => mundo(d.perfil[i][0], d.perfil[i][1], wDoPonto(d, d.perfil[i]));
       const lados = [];
       const linhas = [];
       const diferentes = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) > 1e-9;
@@ -1492,12 +1603,13 @@ function fatiarCasca(r, olho, maxFatias) {
   const m = r.matriz;
   const c = r.centro;
   const mundo = (u, v, w) => { const pr = aplicarMatriz(ponto3(b, u, v, w), m); return [pr[0] + c[0], pr[1] + c[1], pr[2] + c[2]]; };
-  const n = normalizar(aplicarMatriz(ponto3(b, 0, 0, casca.fechadaNoInicio ? 1 : -1), m));
+  const fora = r.prisma.secoes[casca.fechadaNoInicio ? r.prisma.secoes.length - 1 : 0];
+  const sinal = casca.fechadaNoInicio ? 1 : -1;
+  const n = normalizar(aplicarMatriz(fora.n ? ponto3(b, ...fora.n.map((x) => x * sinal)) : ponto3(b, 0, 0, sinal), m));
   if (dot(n, olho) > 1e-6) {
-    const fora = r.prisma.secoes[casca.fechadaNoInicio ? r.prisma.secoes.length - 1 : 0];
     const dentro = cavidade[casca.fechadaNoInicio ? cavidade.length - 1 : 0];
-    const anel = dentro.perfil.map((q) => mundo(q[0], q[1], dentro.w));
-    chunks.push({ r, ponta: aberta, prof: 0, lados: [], dentro: [], linhas: [], arcos: [], tampas: [{ papel: 'tampa', n, pts: fora.perfil.map((q) => mundo(q[0], q[1], fora.w)), furos: [anel], furo: anel }] });
+    const anel = dentro.perfil.map((q) => mundo(q[0], q[1], wDoPonto(dentro, q)));
+    chunks.push({ r, ponta: aberta, prof: 0, lados: [], dentro: [], linhas: [], arcos: [], tampas: [{ papel: 'tampa', n, pts: fora.perfil.map((q) => mundo(q[0], q[1], wDoPonto(fora, q))), furos: [anel], furo: anel }] });
   }
   for (const ch of chunks) {
     const pts = [...ch.lados, ...ch.dentro, ...ch.tampas].flatMap((f) => f.pts);

@@ -13,7 +13,7 @@
    a folga é a menor entre elas e a penetração é a maior entre as peças, o que
    subestima um cruzamento que atravesse várias fatias do aro. */
 import earcut from 'earcut';
-import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma } from './index.js';
+import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma, wDoPonto } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 
@@ -123,9 +123,26 @@ function pecasPorFaixas(r) {
   const saida = [];
   for (let k = 0; k + 1 < secoes.length; k++) {
     if (secoes[k + 1].w - secoes[k].w <= 1e-9) continue;
-    saida.push(prismaDeSecoes({ ...r, prisma: { ...r.prisma, secoes: [secoes[k], secoes[k + 1]] } }));
+    saida.push(prismaDaFaixa(r, secoes[k], secoes[k + 1]));
   }
   return saida;
+}
+
+/* O tronco entre duas seções. Com alguma seção inclinada as faces laterais deixam de ser planas, e a peça é o casco dos pontos das
+   duas (sem os repetidos, como o ponto de uma ponta); sem inclinação é o prisma de sempre. */
+function prismaDaFaixa(r, s0, s1) {
+  if (!s0.n && !s1.n) return prismaDeSecoes({ ...r, prisma: { ...r.prisma, secoes: [s0, s1] } });
+  const mundo = (u, v, w) => somar(r.centro, girar(r.matriz, localParaMundo(r.prisma.b, u, v, w)));
+  const vistos = new Set();
+  const verts = [];
+  for (const sc of [s0, s1]) {
+    for (const q of sc.perfil) {
+      const p = mundo(q[0], q[1], wDoPonto(sc, q));
+      const chave = p.map((x) => Math.round(x * 1e7)).join(',');
+      if (!vistos.has(chave)) { vistos.add(chave); verts.push(p); }
+    }
+  }
+  return prismaDePontos(verts);
 }
 
 /* Peça convexa de uma lista de pontos em qualquer posição: o casco deles. As normais são as dos planos que deixam todos os
@@ -173,7 +190,7 @@ function pecasDaCasca(r) {
   const saida = [];
   for (let k = 0; k + 1 < fundo.length; k++) {
     if (fundo[k + 1].w - fundo[k].w <= 1e-9) continue;
-    saida.push(prismaDeSecoes({ ...r, prisma: { ...r.prisma, secoes: [fundo[k], fundo[k + 1]] } }));
+    saida.push(prismaDaFaixa(r, fundo[k], fundo[k + 1]));
   }
   for (let k = 0; k + 1 < parede.length; k++) {
     if (parede[k + 1].w - parede[k].w <= 1e-9) continue;
@@ -181,7 +198,7 @@ function pecasDaCasca(r) {
     for (let i = 0; i < N; i++) {
       const j = (i + 1) % N;
       const cantos = [];
-      for (const lista of [parede, cavidade]) for (const sc of [lista[k], lista[k + 1]]) for (const q of [sc.perfil[i], sc.perfil[j]]) cantos.push(mundo(q[0], q[1], sc.w));
+      for (const lista of [parede, cavidade]) for (const sc of [lista[k], lista[k + 1]]) for (const q of [sc.perfil[i], sc.perfil[j]]) cantos.push(mundo(q[0], q[1], wDoPonto(sc, q)));
       saida.push(prismaDePontos(cantos));
     }
   }

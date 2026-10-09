@@ -77,7 +77,7 @@ function numerosDoPontoDePerfil(q, num, campo, contexto) {
   return g;
 }
 
-/* Seção de loft: posição, tamanho, centro, raio, cantos e polígono aceitam número, parâmetro ou expressão. Os `cantos` da
+/* Seção de loft: posição, tamanho, centro, inclinação, raio, cantos e polígono aceitam número, parâmetro ou expressão. Os `cantos` da
    seção "arredondado" são um número ou uma lista de 4 cantos, cada um um número ou [ru, rv]. */
 function cantosDaSecao(c, num, campo, contexto) {
   if (!Array.isArray(c)) return num(c, campo, contexto);
@@ -89,7 +89,7 @@ function numerosDaSecao(q, num, campo, contexto) {
   const g = { ...q };
   for (const k of ['pos', 'raio', 'segmentosPorCanto']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
   if (g.cantos !== undefined) g.cantos = cantosDaSecao(g.cantos, num, `${campo}.cantos`, contexto);
-  for (const k of ['tamanho', 'centro']) if (g[k] !== undefined) g[k] = vetor(g[k], num, `${campo}.${k}`, contexto);
+  for (const k of ['tamanho', 'centro', 'inclinacao']) if (g[k] !== undefined) g[k] = vetor(g[k], num, `${campo}.${k}`, contexto);
   if (ehGerador(g.perfil)) g.perfil = gerarPerfil(g.perfil, num, `${campo}.perfil`, contexto);
   if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((p, i) => vetor(p, num, `${campo}.perfil[${i}]`, contexto));
   return g;

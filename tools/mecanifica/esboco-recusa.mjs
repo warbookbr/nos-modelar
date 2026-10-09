@@ -45,7 +45,7 @@ const REGRAS = [
   { re: /ciclo de módulos|"modulos"|módulo|"ligar"|ligação|"encaixa"/, topico: 'modulos' },
   { re: /componente|instância|"usa"|"espelha"/, topico: 'componentes' },
   { re: /parâmetro|expressão válida|ciclo de parâmetros/, topico: 'parametros' },
-  { re: /"casca"|"arredondado"|"cantos"|"segmentosPorCanto"/, topico: 'loft' },
+  { re: /"casca"|"arredondado"|"cantos"|"segmentosPorCanto"|"inclinacao"/, topico: 'loft' },
   { re: /plano\.|"mede"|"plano"/, topico: 'plano' },
   { re: /estilo|"simetrico"|"funcao"/, topico: 'estilos' },
   { re: /âncora|"sobre"|"encosta"|"ponta"|"alinha"|"lado"/, topico: 'posicionamento' },
