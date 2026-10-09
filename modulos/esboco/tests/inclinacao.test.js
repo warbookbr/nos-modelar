@@ -247,6 +247,19 @@ describe('as recusas da inclinação, com o tópico loft', () => {
     });
   }
 
+  it('a recusa do fundo da casca diz quanto afastar a seção, e afastar isso basta', () => {
+    const comSegunda = (pos) => bacia([
+      { pos: 0, forma: 'arredondado', tamanho: [100, 100], cantos: 10, inclinacao: [10, 0] },
+      { pos, forma: 'arredondado', tamanho: [100, 100], cantos: 10 },
+      { pos: 80, forma: 'arredondado', tamanho: [100, 100], cantos: 10 },
+    ], { casca: { espessura: 6, aberta: 'fim' } });
+    const mensagem = recusa([comSegunda(12)], /afaste essa seção da ponta pelo menos mais [\d.]+ mm ao longo do eixo do loft/);
+    const minimo = Number(mensagem.match(/pelo menos mais ([\d.]+) mm/)[1]);
+    expect(minimo).toBeGreaterThan(0);
+    expect(() => desenharEsboco(esboco([comSegunda(12 + minimo)]))).not.toThrow();
+    expect(() => desenharEsboco(esboco([comSegunda(12 + minimo - 0.5)]))).toThrow(/cruzando a seção secoes\[1\]/);
+  });
+
   it('o campo vale na seção e não na forma, e o tópico loft do --ajuda traz a inclinação e cabe no teto', () => {
     expect(() => desenharEsboco(esboco([{ id: 'b', tipo: 'loft', eixo: 'z', inclinacao: [3, 0], secoes: [{ pos: 0, tamanho: [10, 10] }, { pos: 5, tamanho: [10, 10] }] }]))).toThrow(/o campo "inclinacao" não existe em loft/);
     const r = ajuda('loft');

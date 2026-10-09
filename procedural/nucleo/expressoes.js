@@ -7,12 +7,17 @@
 const INICIO_NOME = /[A-Za-z_]/;
 const CORPO_NOME = /[A-Za-z0-9_]/;
 
-/* A lista fechada de funções: o nome, quantos argumentos e o cálculo. Os ângulos saem em graus, como `graus` das
-   operações e `rotacao` do esboço; `atan2(y, x)` dá o ângulo do vetor (x, y) entre -180 e 180. */
+/* A lista fechada de funções: o nome, quantos argumentos e o cálculo. Os ângulos entram e saem em graus, como `graus`
+   das operações e `rotacao` do esboço; `atan2(y, x)` dá o ângulo do vetor (x, y) entre -180 e 180, e `sqrt` recusa
+   número negativo em vez de devolver NaN. */
 const GRAUS = 180 / Math.PI;
 const FUNCOES = {
   atan: { aridade: 1, calcular: (x) => Math.atan(x) * GRAUS },
   atan2: { aridade: 2, calcular: (y, x) => Math.atan2(y, x) * GRAUS },
+  sin: { aridade: 1, calcular: (a) => Math.sin(a / GRAUS) },
+  cos: { aridade: 1, calcular: (a) => Math.cos(a / GRAUS) },
+  tan: { aridade: 1, calcular: (a) => Math.tan(a / GRAUS) },
+  sqrt: { aridade: 1, calcular: (x) => { if (x < 0) erro(`sqrt de ${x}, que é negativo`); return Math.sqrt(x); } },
 };
 
 function erro(texto) { throw new Error(`oficina: expressão inválida: ${texto}`); }

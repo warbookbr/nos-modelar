@@ -22,9 +22,19 @@ describe('expressões da Oficina', () => {
     expect(num('inclinacao')).toBeCloseTo(45, 12);
   });
 
+  it('sin, cos e tan recebem o ângulo em graus, e sqrt dá a raiz', () => {
+    const { num } = criarResolverNumerico({ ang: 30, r: 110 });
+    expect(num('=sin(ang)')).toBeCloseTo(0.5, 12);
+    expect(num('=cos(60)')).toBeCloseTo(0.5, 12);
+    expect(num('=tan(45)')).toBeCloseTo(1, 12);
+    expect(num('=sqrt(r * r - 66 * 66)')).toBeCloseTo(88, 12);
+    expect(num('=atan2(sin(ang), cos(ang))')).toBeCloseTo(30, 12);
+  });
+
   it('recusa função fora da lista e número errado de argumentos', () => {
     const { num } = criarResolverNumerico({ a: 1 });
-    expect(() => num('=sin(a)')).toThrow(/função 'sin' não existe.*atan, atan2/);
+    expect(() => num('=asin(a)')).toThrow(/função 'asin' não existe.*atan, atan2, sin, cos, tan, sqrt/);
+    expect(() => num('=sqrt(0 - a)')).toThrow(/sqrt de -1, que é negativo/);
     expect(() => num('=atan2(a)')).toThrow(/'atan2' recebe 2 argumento/);
     expect(() => num('=atan(a, a)')).toThrow(/'atan' recebe 1 argumento/);
     expect(() => num('=atan(a')).toThrow(/faltou '\)'/);

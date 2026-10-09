@@ -354,7 +354,14 @@ function fundoDaCascaInclinada({ espessura, aberta, fechadaNoInicio }, lidas, se
   const base = primeira + (sobre ? 1 : 0);
   exigir(primeira >= 0 && base < tipos.length, `${nao} não cabe no loft inclinado: o plano do fundo (a ${espessura} mm da seção da ponta fechada, perpendicular a ela) não deixa cavidade antes da outra ponta`);
   const ruim = tipos.slice(base).findIndex((t) => t !== 'depois');
-  exigir(ruim < 0, `${nao} tem o plano do fundo (a ${espessura} mm da seção da ponta fechada, perpendicular a ela) cruzando a seção secoes[${ordem[base + ruim]}]; afaste essa seção da ponta, reduza a inclinação ou use uma espessura menor`);
+  if (ruim >= 0) {
+    /* quanto a seção precisa andar ao longo do eixo para ficar toda além do plano: o ponto mais aquém dele, dividido pela
+       componente axial da normal (mover a seção de Δw desloca cada ponto de Δw·n_w em relação ao plano) */
+    const sc = secoes[ordem[base + ruim]];
+    const falta = -Math.min(...sc.perfil.map((q) => dist(sc, q)));
+    const minimo = Math.ceil((falta / Math.abs(nDentro[2])) * 10) / 10;
+    exigir(false, `${nao} tem o plano do fundo (a ${espessura} mm da seção da ponta fechada, perpendicular a ela) cruzando a seção secoes[${ordem[base + ruim]}]; afaste essa seção da ponta pelo menos mais ${minimo} mm ao longo do eixo do loft, reduza a inclinação ou use uma espessura menor`);
+  }
   const antes = ordem.slice(0, primeira);
   const depois = ordem.slice(base);
   /* o ponto i da poligonal em que o plano passa: o próprio ponto se uma seção está sobre o plano, senão a interpolação entre a última antes e a primeira depois */
