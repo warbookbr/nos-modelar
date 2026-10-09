@@ -14,7 +14,8 @@ São fontes editáveis:
 - `mecanifica.alvo-forma-global@2`: envelope, landmarks, silhuetas, regiões
   obrigatórias, rejeições, limiares e orçamento;
 - `mecanifica.andaime-global@2`: envelope pretendido, landmarks e volumes
-  semânticos do objeto inteiro.
+  semânticos do objeto inteiro, e, quando declaradas, as portas que a receita
+  detalhada precisa manter.
 
 São derivados descartáveis:
 
@@ -109,6 +110,47 @@ Ausência de crítica ou de decisão mantém G02 `bloqueado`. Crítica ou usuár
 reprovando torna a decisão `reprovado`. O autor não pode preencher o papel de
 crítico independente e G01 verde não é convertido em reconhecimento implícito.
 
+## Ligação ao nível detalhado
+
+A receita de uma peça refina o andaime em vez de refazer posição, medida e encaixe. Dois campos opcionais ligam os
+dois níveis, e nenhum deles muda uma receita ou um andaime que não os declare.
+
+No andaime, `portas` é uma lista opcional de `{ id, interface }`. A `interface` repete a do passo `publicarPorta`
+do núcleo (`anel`, `cilindro`, `plano`, `padraoFuros` ou `trilho`, com `papel`, `eixo`, `centro` e as medidas da
+forma), em milímetro, já expandida: `centros` no lugar de `padrao` e `extensao` como `[largura, comprimento]`. O
+`id` é o nome que a receita publica. Um andaime sem `portas` mantém o mesmo conteúdo canônico e a mesma blocagem, e
+a blocagem não carrega as portas. O campo entra em `mecanifica.andaime-global@2` como adição compatível.
+
+Na receita, `REFINA` (formato `mecanifica.refinamento-global`, versão 1, escrito ao lado de `PLANO`) declara:
+
+```js
+REFINA: {
+  andaime: 'andaime.json',                      // caminho relativo à pasta da peça, confinado ao repositório
+  partes: { coluna: 'coluna-central' },         // parte da receita -> volume do andaime que ela refina
+  tolerancia: { envelope: 2, porta: 0.5 },      // milímetro; teto de 50 para o envelope e de 5 para a porta
+}
+```
+
+`src/autoria/refinamento-global.js` confere a peça executada e `tools/mecanifica/refinamento-global.mjs` lê o
+andaime do disco. O veredito de `descrever-peca` roda a conferência sempre que a receita declara `REFINA`, e a
+`guarda:acervo` passa por ele. Cada achado diz a parte, o volume ou a porta, e o desvio:
+
+- `parte-fora-do-envelope`: a malha da parte passa, em algum lado, do envelope do volume (a caixa alinhada aos
+  eixos da malha que a blocagem compilaria para ele) por mais que `tolerancia.envelope`;
+- `parte-sem-volume`: a peça entrega uma parte que `REFINA.partes` não cita, e sem volume não há envelope;
+- `parte-ausente` e `volume-desconhecido`: o vínculo cita uma parte que a peça não tem ou um volume que o andaime
+  não tem;
+- `porta-ausente`: o andaime declara uma porta que a peça não publica;
+- `porta-fora-do-lugar`: a interface que o núcleo resolveu difere da do andaime em algum campo que o andaime
+  declara, por mais que `tolerancia.porta` nos comprimentos e 0,001 nas direções (cerca de 0,06 grau);
+- `porta-fora-do-plano`, `porta-com-raio-errado` e `porta-sem-face`: a porta publicada não confere com a malha da
+  peça, pela régua de `porta-confere-forma.js`, que continua sendo a única que olha a geometria da porta.
+
+O andaime está em milímetro e o núcleo em metro, no mesmo quadro de coordenadas, com a mesma origem e os mesmos
+eixos. O envelope é um limite superior: uma parte pequena dentro de um volume grande passa, e quem decide se a
+parte preenche o volume é o G01 da blocagem e a pessoa. A conferência também não exige que todo volume do
+andaime tenha uma parte.
+
 ## Porta operacional
 
 `criarServicoAutoria3DNativa().formaGlobal` expõe uma única fachada pura para
@@ -123,6 +165,13 @@ continuam lacunas explícitas.
 npx vitest run tools/mecanifica/forma-global-n2-caixa-preta.test.mjs tools/mecanifica/forma-global-n2-primitivas.test.mjs tools/mecanifica/forma-global-n2-g01-primitivas.test.mjs
 npm run autoria:n2:evidencias
 npm run autoria:n2:evidencias:check
+```
+
+A ligação ao nível detalhado tem teste próprio, com o suporte de prova de
+`tools/fixtures/refina-forma-global/`:
+
+```text
+npx vitest run src/autoria/refinamento-global.test.js tools/mecanifica/refinamento-global.test.mjs
 ```
 
 `forma-global-n2-primitivas.test.mjs` prova cada primitiva (envelope medido, malha

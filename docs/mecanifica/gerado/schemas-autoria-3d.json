@@ -2903,6 +2903,49 @@
               }
             ]
           }
+        },
+        "portas": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "interface"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
+                "maxLength": 120
+              },
+              "interface": {
+                "type": "object",
+                "required": [
+                  "forma",
+                  "papel"
+                ],
+                "properties": {
+                  "forma": {
+                    "enum": [
+                      "anel",
+                      "cilindro",
+                      "plano",
+                      "padraoFuros",
+                      "trilho"
+                    ]
+                  },
+                  "papel": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },

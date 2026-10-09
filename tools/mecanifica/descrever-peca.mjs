@@ -21,6 +21,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
+import { conferirRefinamentoDaReceita } from './refinamento-global.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -266,6 +267,7 @@ export async function descreverPecaReutilizavel({
   let contatos = null;
   let formas = null;
   let plano = null;
+  let refinamento = null;
   if (comVeredito) {
     /* PARTE PROMETIDA E NÃO ENTREGUE É INVISÍVEL PARA O RESTO DA RÉGUA. Quando
        o pneu saiu maciço, aro, cubo e raios nunca chegaram a existir; sem a
@@ -295,6 +297,23 @@ export async function descreverPecaReutilizavel({
           + '\n  Ou o plano está desatualizado, ou a peça ganhou parte que ninguém pediu.\n';
         falhou = true;
       }
+    }
+    /* REFINAMENTO DA FORMA GLOBAL. Receita sem `REFINA` passa direto. A que declara refinar um andaime
+       responde por cada parte dentro do envelope do volume dela e pelas portas que o andaime declara. */
+    try {
+      /* Com o módulo entregue pronto não há caminho resolvido; o nome da peça, se existir em disco, ainda diz a pasta. */
+      let caminho = caminhoReceita;
+      if (!caminho) { try { caminho = resolverCaminhoReceita(peca, { raiz: REPO }); } catch { caminho = null; } }
+      refinamento = conferirRefinamentoDaReceita({ receita, neutro, caminhoDaReceita: caminho });
+    } catch (erro) {
+      return falha(`REFINAMENTO DA FORMA GLOBAL INVÁLIDO\n  ${erro.message}`);
+    }
+    if (refinamento && !refinamento.ok) {
+      stderr += `\n${refinamento.achados.length} ACHADO(S) NO REFINAMENTO DO ANDAIME '${refinamento.andaime}'\n`
+        + refinamento.achados.map((a) => `    ${a.mensagem}`).join('\n')
+        + '\n  A receita refina o andaime; ela não refaz o que o nível zero decidiu. Ou a peça saiu do envelope'
+        + '\n  e da porta do andaime, ou o andaime precisa mudar antes e o G01 ser refeito.\n';
+      falhou = true;
     }
     try {
       contatos = contatosDaPeca(neutro, receita);
@@ -373,6 +392,7 @@ export async function descreverPecaReutilizavel({
       contatos,
       formas,
       plano,
+      refinamento,
       neutro,
       expansao,
     },

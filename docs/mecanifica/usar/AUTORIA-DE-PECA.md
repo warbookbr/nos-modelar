@@ -115,6 +115,13 @@ padrão de receita nova. Quando uma montagem v5 deriva um parâmetro da porta de
 uma vizinha, o vínculo declara a unidade do parâmetro, porque a medida da porta
 vem sempre em metro. Hoje nenhum gate confere esta cadeia.
 
+A receita que parte de um andaime da forma global N2 declara isso em `REFINA`, ao
+lado de `PLANO`: o caminho do andaime, o volume que cada parte refina e a
+tolerância em milímetro. O veredito de `npm run descrever` e a `guarda:acervo`
+recusam a parte que sai do envelope do volume e a porta do andaime que a peça
+moveu ou não publicou. O formato e o que ele confere estão na seção "Ligação ao
+nível detalhado" do contrato da forma global N2 (`CONTRATO-FORMA-GLOBAL-N2`).
+
 ## Identidade estável
 
 Toda peça, montagem, instância, parte relevante, porta e relação precisa de

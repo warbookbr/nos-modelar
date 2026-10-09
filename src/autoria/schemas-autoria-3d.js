@@ -14,7 +14,7 @@ import {
   CRITERIOS_VISUAIS_FORMA_GLOBAL, FORMATO_ALVO_FORMA_GLOBAL, FORMATO_ANDAIME_GLOBAL,
   FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL, FORMATO_AVALIACAO_FORMA_GLOBAL,
   FORMATO_BLOCAGEM_GLOBAL, FORMATO_CRITICA_ALVO_FORMA_GLOBAL, FORMATO_CRITICA_FORMA_GLOBAL,
-  FORMATO_DECISAO_FORMA_GLOBAL, TIPOS_VOLUME_FORMA_GLOBAL, VISTAS_ORTOGRAFICAS_FORMA_GLOBAL,
+  FORMATO_DECISAO_FORMA_GLOBAL, FORMAS_DE_PORTA_DO_ANDAIME, TIPOS_VOLUME_FORMA_GLOBAL, VISTAS_ORTOGRAFICAS_FORMA_GLOBAL,
 } from './forma-global.js';
 import { SCHEMA_QUALIFICACAO_ALVO } from './qualificacao-alvo.js';
 
@@ -344,7 +344,17 @@ const SCHEMA_ANDAIME_GLOBAL = {
     familia: { enum: FAMILIAS_AUTORIA }, intencao: texto(), unidade: { const: 'mm' }, eixos: eixos(),
     envelope: envelope(), landmarks: { type: 'array', minItems: 1, items: landmark(false) },
     volumes: { type: 'array', minItems: 1, items: SCHEMA_VOLUME_FORMA_GLOBAL },
-  }),
+    portas: {
+      type: 'array', minItems: 1, maxItems: 64,
+      items: objeto({
+        id: { type: 'string', pattern: '^[A-Za-z][A-Za-z0-9_-]*$', maxLength: 120 },
+        interface: {
+          type: 'object', required: ['forma', 'papel'],
+          properties: { forma: { enum: FORMAS_DE_PORTA_DO_ANDAIME }, papel: texto(60) },
+        },
+      }),
+    },
+  }, ['formato', 'id', 'objetivo', 'alvo', 'familia', 'intencao', 'unidade', 'eixos', 'envelope', 'landmarks', 'volumes']),
 };
 
 const SCHEMA_ITEM_CRITERIO_VISUAL = objeto({

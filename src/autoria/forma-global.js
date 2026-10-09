@@ -272,10 +272,46 @@ function normalizarVolume(valor, caminho) {
   };
 }
 
+/* Portas do andaime. O campo `portas` é opcional: um andaime sem ele mantém o mesmo conteúdo canônico e a mesma
+   blocagem de antes. Cada porta repete a interface do passo `publicarPorta` do núcleo, em milímetro, para que a
+   receita detalhada a publique de novo e o verificador do refinamento compare as duas sem um segundo contrato. */
+export const FORMAS_DE_PORTA_DO_ANDAIME = Object.freeze(['anel', 'cilindro', 'plano', 'padraoFuros', 'trilho']);
+const IDENTIFICADOR_DE_PORTA = /^[A-Za-z][A-Za-z0-9_-]*$/;
+function valorDeInterface(valor, caminho, profundidade = 0) {
+  if (typeof valor === 'number') return numero(valor, caminho);
+  if (typeof valor === 'string') return texto(valor, caminho, 60);
+  if (profundidade >= 3) falhar('porta-interface-funda', caminho, 'a interface da porta aceita no máximo três níveis de aninhamento.');
+  if (Array.isArray(valor)) {
+    if (!valor.length || valor.length > 64) falhar('porta-interface-lista', caminho, 'lista precisa ter de 1 a 64 itens.');
+    return valor.map((item, indice) => valorDeInterface(item, `${caminho}[${indice}]`, profundidade + 1));
+  }
+  objeto(valor, caminho);
+  return Object.fromEntries(Object.keys(valor).sort(comparar).map((chave) => [chave, valorDeInterface(valor[chave], `${caminho}.${chave}`, profundidade + 1)]));
+}
+function normalizarPortaDoAndaime(valor, caminho) {
+  chavesExatas(valor, ['id', 'interface'], caminho);
+  const id = texto(valor.id, `${caminho}.id`, 120);
+  if (!IDENTIFICADOR_DE_PORTA.test(id)) falhar('identidade-invalida', `${caminho}.id`, 'precisa ser o mesmo identificador que a receita publica: letras, dígitos, hífen e sublinhado, começando por letra.');
+  const declarada = objeto(valor.interface, `${caminho}.interface`);
+  if (!FORMAS_DE_PORTA_DO_ANDAIME.includes(declarada.forma)) {
+    falhar('porta-forma-invalida', `${caminho}.interface.forma`, `recebeu ${JSON.stringify(declarada.forma)}; aceita ${FORMAS_DE_PORTA_DO_ANDAIME.join(', ')}.`);
+  }
+  if (typeof declarada.papel !== 'string' || !declarada.papel) falhar('porta-sem-papel', `${caminho}.interface.papel`, 'precisa declarar o papel da porta, como o passo publicarPorta.');
+  if (Object.hasOwn(declarada, 'padrao')) falhar('porta-sem-forma-canonica', `${caminho}.interface.padrao`, 'o andaime declara a interface já expandida: escreva `centros` no lugar de `padrao`.');
+  if (Object.hasOwn(declarada, 'extensao') && !Array.isArray(declarada.extensao)) falhar('porta-sem-forma-canonica', `${caminho}.interface.extensao`, 'escreva `extensao` como [largura, comprimento].');
+  return { id, interface: valorDeInterface(declarada, `${caminho}.interface`) };
+}
+function normalizarPortasDoAndaime(valor, caminho) {
+  if (!Array.isArray(valor) || !valor.length || valor.length > 64) falhar('lista-invalida', caminho, 'precisa ser lista de 1 a 64 portas.');
+  const portas = valor.map((item, indice) => normalizarPortaDoAndaime(item, `${caminho}[${indice}]`)).sort((a, b) => comparar(a.id, b.id));
+  if (new Set(portas.map(({ id }) => id)).size !== portas.length) falhar('item-duplicado', caminho, 'não pode repetir ID de porta.');
+  return portas;
+}
+
 export function normalizarAndaimeGlobal(valor) {
   chavesExatas(valor, [
     'formato', 'id', 'objetivo', 'alvo', 'familia', 'intencao', 'unidade', 'eixos',
-    'envelope', 'landmarks', 'volumes',
+    'envelope', 'landmarks', 'volumes', ...(declaraPortas(valor) ? ['portas'] : []),
   ], '$');
   if (valor.formato !== FORMATO_ANDAIME_GLOBAL) falhar('formato-invalido', 'formato', `esperado '${FORMATO_ANDAIME_GLOBAL}'.`);
   if (!FAMILIAS.has(valor.familia)) falhar('familia-invalida', 'familia', 'família de autoria desconhecida.');
@@ -288,8 +324,10 @@ export function normalizarAndaimeGlobal(valor) {
     alvo: slug(valor.alvo, 'alvo'), familia: valor.familia, intencao: texto(valor.intencao, 'intencao'),
     unidade: 'mm', eixos: normalizarEixos(valor.eixos, 'eixos'), envelope: normalizarEnvelope(valor.envelope, 'envelope'),
     landmarks: normalizarLandmarks(valor.landmarks, 'landmarks'), volumes,
+    ...(valor.portas === undefined ? {} : { portas: normalizarPortasDoAndaime(valor.portas, 'portas') }),
   });
 }
+function declaraPortas(valor) { return valor !== null && typeof valor === 'object' && Object.hasOwn(valor, 'portas'); }
 
 const indiceEixo = { x: 0, y: 1, z: 2 };
 function adicionarVertice(lista, ponto) { lista.push(ponto); return lista.length - 1; }
@@ -368,6 +406,13 @@ function envelopeDosVertices(vertices) {
   return { min, max };
 }
 function eixosIguais(a, b) { return ['direita', 'cima', 'frente'].every((campo) => a[campo] === b[campo]); }
+
+/* O envelope de cada volume do andaime, em milímetro, medido na malha que a blocagem compilaria para ele. É o
+   limite que o refinamento confere: a receita detalhada fica dentro dele, com a tolerância que declarar. */
+export function envelopesDosVolumes(andaimeBruto) {
+  const andaime = normalizarAndaimeGlobal(andaimeBruto);
+  return Object.fromEntries(andaime.volumes.map((volume) => [volume.id, envelopeDosVertices(malhaDoVolume(volume).vertices)]));
+}
 
 export function compilarBlocagemGlobal(entrada) {
   chavesExatas(entrada, ['alvo', 'andaime'], '$');

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-946 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+955 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -761,6 +761,8 @@
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
 - `provedor-forma-global.js` — Provedor N2: cobre planejamento de alvo, andaime e blocagem porque há um serviço puro correspondente. Crítica e aceite continuam fora deste manifesto.
 - `qualificacao-alvo.js` — qualificacao-alvo.js — declara o que uma referência permite inferir.
+- `refinamento-global.js` — refinamento-global.js — a receita detalhada refina um andaime da forma global N2.
+- `refinamento-global.test.js` — refinamento-global.test.js — a declaração REFINA, as portas do andaime e a conferência contra a peça executada.
 - `renderizar-forma-global-svg.js` — Adaptador SVG puro da N2. Consome somente alvo e blocagem neutros; não usa DOM, Three.js, câmera de runtime ou caminhos de arquivo.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
 - `schemas-autoria-3d.js` — JSON Schemas descobríveis de N1/N2. A validação semântica final continua nos normalizadores e na máquina de estados; schemas são a fronteira estrutural.
@@ -945,6 +947,26 @@
 - `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
 - `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
 - `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
+
+## tools/fixtures/refina-forma-global/
+
+- `suporte.js` — suporte.js — a receita de prova do refinamento da forma global.
+
+## tools/fixtures/refina-forma-global/ok/
+
+- `receita.js` — A receita inteira do suporte: a sapata e a coluna dentro dos volumes do andaime e o assento onde ele o declarou.
+
+## tools/fixtures/refina-forma-global/parte-fora/
+
+- `receita.js` — A sapata deslocada 30 mm em +x: sai do envelope do volume `sapata` por 30 mm.
+
+## tools/fixtures/refina-forma-global/parte-sem-volume/
+
+- `receita.js` — A coluna entregue sem dizer que volume do andaime ela refina.
+
+## tools/fixtures/refina-forma-global/porta-movida/
+
+- `receita.js` — A porta `assento` publicada 5 mm acima do topo da coluna: a geometria é a do andaime e a porta não.
 
 ## tools/fixtures/tres-blocos-vinculados/
 
@@ -1152,6 +1174,8 @@
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
+- `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
+- `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
 - `repositorio-revalidacao.mjs` — repositorio-revalidacao.mjs — persistência R01 sobre o repositório transacional existente.

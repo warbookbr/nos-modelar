@@ -14,7 +14,8 @@ declara um alvo e um andaime de volumes com nome, o andaime vira uma blocagem
 neutra, e o gate G01 compara envelope, pontos de referência e silhueta em três
 vistas contra o alvo. Ela aceita caixa, cilindro, prisma convexo, casco por
 seções e as primitivas do esboço (cone, esfera, anel, revolução, extrusão
-côncava e tubo); falta a ligação com a receita detalhada. O encaixe já tem
+côncava e tubo), e a receita detalhada a refina por `REFINA`, que confere as
+partes dentro do envelope dos volumes e as portas do andaime. O encaixe já tem
 contrato no núcleo e na montagem: portas publicadas, a porta conferida contra a forma (`porta-confere-forma.js`),
 vínculos de medida e posição derivada da porta na montagem v5; as portas só
 conhecem cilindro e anel. Ferramenta nova já tem formato de entrada, a [extensão
