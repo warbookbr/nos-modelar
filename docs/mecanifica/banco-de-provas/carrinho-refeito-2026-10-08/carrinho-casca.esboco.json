@@ -1,0 +1,998 @@
+{
+  "vista": "isometrica",
+  "parametros": {
+    "tuboD": 26,
+    "xMeio": 215,
+    "yFrente": 190,
+    "espTrav": 14,
+    "profTrav": 60,
+    "zTravTras": -170,
+    "xGrip": 275,
+    "yGrip": 576,
+    "zGrip": -783,
+    "xPunho": 262,
+    "yPunho": 533,
+    "zPunho": -628,
+    "zDobraTras": -256,
+    "zDegrau": 270,
+    "zFimDegrau": 365,
+    "xLaco": 100,
+    "zFrente": 760,
+    "curvaQuadro": 90,
+    "zPeFrenteTopo": 190,
+    "zPeFrenteBase": 15,
+    "zPeTras": -105,
+    "curvaPe": 45,
+    "xDegrau": "=xMeio-(xMeio-xLaco)*((zDegrau)-zDobraTras)/(zFrente-zDobraTras)",
+    "xFimDegrau": "=xMeio-(xMeio-xLaco)*((zFimDegrau)-zDobraTras)/(zFrente-zDobraTras)",
+    "zBarra": -230,
+    "espBarra": 10,
+    "profBarra": 40,
+    "xPeFrente": "=xMeio-(xMeio-xLaco)*((zPeFrenteTopo)-zDobraTras)/(zFrente-zDobraTras)",
+    "xPeTras": "=xMeio-(xMeio-xLaco)*((zPeTras)-zDobraTras)/(zFrente-zDobraTras)",
+    "xBarra": "=xMeio-(xMeio-xLaco)*((zBarra)-zDobraTras)/(zFrente-zDobraTras)",
+    "compManopla": 110,
+    "diamManopla": 34,
+    "yDegrau": 290,
+    "yDobra": 333,
+    "yTravTras": "=yDegrau+(yDobra-yDegrau)*(zDegrau-(zTravTras))/(zDegrau-zDobraTras)",
+    "yPeFrente": "=yDegrau+(yDobra-yDegrau)*(zDegrau-(zPeFrenteTopo))/(zDegrau-zDobraTras)",
+    "yPeTras": "=yDegrau+(yDobra-yDegrau)*(zDegrau-(zPeTras))/(zDegrau-zDobraTras)",
+    "yBarra": "=yDegrau+(yDobra-yDegrau)*(zDegrau-(zBarra))/(zDegrau-zDobraTras)",
+    "zEscBase": 505,
+    "xTuboEscBase": "=xMeio-(xMeio-xLaco)*((zEscBase)-zDobraTras)/(zFrente-zDobraTras)",
+    "alturaEscF": 215,
+    "recuoEscF": 65,
+    "diamEscF": 16,
+    "espChap": 6,
+    "altChap": 100,
+    "profChap": 40,
+    "altCaca": 140,
+    "largCaca": 740,
+    "profCaca": 880,
+    "recLargCaca": 240,
+    "recProfCaca": 240,
+    "espCaca": 4,
+    "raioTrasCaca": 90,
+    "avancoFundoCaca": 17,
+    "labioAltCaca": 8,
+    "labioSaiCaca": 14,
+    "folgaEscCaca": 3,
+    "yFundoCaca": "=yTravTras+tuboD/2+espTrav",
+    "xEscCaca": "=xTuboEscBase-19",
+    "yPontaEscCaca": "=yFrente+alturaEscF",
+    "zPontaEscCaca": "=zEscBase-recuoEscF",
+    "tgCaca": "=(yDobra-yDegrau)/(zDegrau-zDobraTras)",
+    "anguloCaca": "=atan2(yDobra-yDegrau,zDegrau-zDobraTras)",
+    "semiCaca": "=(profCaca-recProfCaca)/2",
+    "inclCaca": "=semiCaca*tgCaca",
+    "arcoFrenteCaca": 60,
+    "arcoTrasCaca": 16,
+    "k1Caca": 0.85,
+    "k2Caca": 0.6,
+    "k3Caca": 0.3,
+    "folgaSecCaca": 2,
+    "p1Caca": "=inclCaca*(1-k1Caca)+folgaSecCaca+espCaca",
+    "p2Caca": "=p1Caca+inclCaca*(k1Caca-k2Caca)+folgaSecCaca",
+    "p3Caca": "=p2Caca+inclCaca*(k2Caca-k3Caca)+folgaSecCaca",
+    "declFrenteCaca": "=(recProfCaca/2-avancoFundoCaca)/(altCaca+inclCaca)",
+    "declTrasCaca": "=(recProfCaca/2+avancoFundoCaca)/(altCaca-inclCaca)",
+    "f1FrenteCaca": 0.27,
+    "f2FrenteCaca": 0.075,
+    "f3FrenteCaca": 0,
+    "f1TrasCaca": 0.07,
+    "f2TrasCaca": 0.02,
+    "f3TrasCaca": 0,
+    "frente0Caca": "=avancoFundoCaca+semiCaca-arcoFrenteCaca",
+    "frente1Caca": "=avancoFundoCaca+semiCaca+declFrenteCaca*(p1Caca+inclCaca*(1-k1Caca))-f1FrenteCaca*arcoFrenteCaca",
+    "frente2Caca": "=avancoFundoCaca+semiCaca+declFrenteCaca*(p2Caca+inclCaca*(1-k2Caca))-f2FrenteCaca*arcoFrenteCaca",
+    "frente3Caca": "=avancoFundoCaca+semiCaca+declFrenteCaca*(p3Caca+inclCaca*(1-k3Caca))-f3FrenteCaca*arcoFrenteCaca",
+    "tras0Caca": "=avancoFundoCaca-semiCaca+arcoTrasCaca",
+    "tras1Caca": "=avancoFundoCaca-semiCaca-declTrasCaca*(p1Caca-inclCaca*(1-k1Caca))+f1TrasCaca*arcoTrasCaca",
+    "tras2Caca": "=avancoFundoCaca-semiCaca-declTrasCaca*(p2Caca-inclCaca*(1-k2Caca))+f2TrasCaca*arcoTrasCaca",
+    "tras3Caca": "=avancoFundoCaca-semiCaca-declTrasCaca*(p3Caca-inclCaca*(1-k3Caca))+f3TrasCaca*arcoTrasCaca",
+    "larg0Caca": "=largCaca-recLargCaca",
+    "larg1Caca": "=larg0Caca+recLargCaca*p1Caca/altCaca",
+    "larg2Caca": "=larg0Caca+recLargCaca*p2Caca/altCaca",
+    "larg3Caca": "=larg0Caca+recLargCaca*p3Caca/altCaca",
+    "prof0Caca": "=frente0Caca-tras0Caca",
+    "prof1Caca": "=frente1Caca-tras1Caca",
+    "prof2Caca": "=frente2Caca-tras2Caca",
+    "prof3Caca": "=frente3Caca-tras3Caca",
+    "c0Caca": "=(frente0Caca+tras0Caca)/2",
+    "zAlvoEscCaca": "=zPontaEscCaca-folgaEscCaca-zTravTras",
+    "e0EscCaca": "=yPontaEscCaca-yFundoCaca",
+    "eta3Caca": "=p3Caca-inclCaca*k3Caca",
+    "bParedeCaca": "=(profCaca/2-frente3Caca)/(altCaca-eta3Caca)",
+    "aParedeCaca": "=frente3Caca-bParedeCaca*eta3Caca",
+    "dz0Caca": "=(zAlvoEscCaca-aParedeCaca-bParedeCaca*e0EscCaca+c0Caca)/(1+bParedeCaca*tgCaca)",
+    "fEscCaca": "=(e0EscCaca+tgCaca*dz0Caca-eta3Caca)/(altCaca-eta3Caca)",
+    "largEscCaca": "=larg3Caca+(largCaca-larg3Caca)*fEscCaca",
+    "profEscCaca": "=prof3Caca+(profCaca-prof3Caca)*fEscCaca",
+    "quedaEscCaca": "=0.5*(0.4*profEscCaca)*(xEscCaca/(largEscCaca/2))*(xEscCaca/(largEscCaca/2))",
+    "dzCaca": "=(zAlvoEscCaca-aParedeCaca-bParedeCaca*e0EscCaca+c0Caca+quedaEscCaca)/(1+bParedeCaca*tgCaca)"
+  },
+  "pontos": {
+    "graD": [
+      "xGrip",
+      "yGrip",
+      "zGrip"
+    ],
+    "graE": [
+      "=0-xGrip",
+      "yGrip",
+      "zGrip"
+    ],
+    "dobraTrasD": [
+      "xMeio",
+      "yDobra",
+      "zDobraTras"
+    ],
+    "dobraTrasE": [
+      "=0-xMeio",
+      "yDobra",
+      "zDobraTras"
+    ],
+    "punhoD": [
+      "xPunho",
+      "yPunho",
+      "zPunho"
+    ],
+    "punhoE": [
+      "=0-xPunho",
+      "yPunho",
+      "zPunho"
+    ],
+    "degrauD": [
+      "xDegrau",
+      "yDegrau",
+      "zDegrau"
+    ],
+    "degrauE": [
+      "=0-xDegrau",
+      "yDegrau",
+      "zDegrau"
+    ],
+    "fimDegrauD": [
+      "xFimDegrau",
+      "yFrente",
+      "zFimDegrau"
+    ],
+    "fimDegrauE": [
+      "=0-xFimDegrau",
+      "yFrente",
+      "zFimDegrau"
+    ],
+    "cantoD": [
+      "xLaco",
+      "yFrente",
+      "zFrente"
+    ],
+    "cantoE": [
+      "=0-xLaco",
+      "yFrente",
+      "zFrente"
+    ],
+    "peTopoFrenteD": [
+      "xPeFrente",
+      "=yPeFrente-tuboD/2-3",
+      "zPeFrenteTopo"
+    ],
+    "peBaseFrenteD": [
+      "xPeFrente",
+      "=tuboD/2",
+      "zPeFrenteBase"
+    ],
+    "peBaseTrasD": [
+      "xPeTras",
+      "=tuboD/2",
+      "zPeTras"
+    ],
+    "peTopoTrasD": [
+      "xPeTras",
+      "=yPeTras-tuboD/2-3",
+      "zPeTras"
+    ]
+  },
+  "estilos": {
+    "tubo": {
+      "cor": "azul"
+    }
+  },
+  "plano": {
+    "texto": "Nível médio. Chassi de carrinho de mão sem caçamba e sem roda, refeito contra as três referências (conjunto em perspectiva, só o quadro e a lateral montada, de onde saem as cotas da vista lateral, na escala de uma roda de cerca de 360 mm). O quadro é um único tubo redondo (d 26 mm), de ponta a ponta das manoplas. Na lateral: o laço da frente é baixo, na altura do eixo da roda (tubo a 190 mm do chão), longo e estreito (200 mm de largura na ponta, 395 mm de trecho reto) e passa à frente da roda; atrás dele o tubo sobe num degrau diagonal de 100 mm até uns 290 mm de altura, segue num trecho longo e quase reto que sobe pouco (cerca de 5 graus, até 333 mm) sob a travessa, e dali cada braço sobe suave (cerca de 27 graus, em S) até uma dobra curta que deixa a pega quase horizontal, coberta por uma manopla de borracha preta. Vistos de cima os dois lados convergem aos poucos, em linha reta, desde a subida das manoplas até o laço: de 430 mm entre eixos atrás a 200 mm no laço, sem dobra brusca no degrau. Cada pé de apoio é um aro em U no plano lateral, sob o tubo: largo em cima (cerca de 295 mm entre os braços) e estreito embaixo (cerca de 120 mm), com o braço da frente bem inclinado (descendo para trás a partir de perto do meio da caçamba), o fundo curto e arredondado no chão (y 0) e o braço de trás quase vertical, preso ao tubo por uma chapinha. A travessa de cima é uma barra chata sobre os dois tubos, sobre o braço de trás do pé; a travessa da frente foi retirada a pedido da pessoa. A barra chata inferior liga os dois tubos por baixo, no começo da subida das manoplas. As escoras da caçamba são duas hastes finas que sobem do tubo do laço, perto da roda, inclinadas para trás, até a altura da frente da caçamba, e terminam na parede da frente da caçamba. As escoras que ligavam o pé à travessa foram retiradas porque não aparecem em nenhuma referência. Frente em +z, manoplas em -z. As referências não têm escala única na perspectiva, e a lateral foi escalada pela roda (suposição), então não há plano.referencia e as medidas têm origem ia. O tubo não representa o achatamento das pontas das pegas. A manopla é um cilindro que envolve a ponta do tubo, travessia declarada no contato. Caçamba: um único loft com casca (cacamba), bacia de chapa de 4 mm de seção arredondada em seis seções (fundo, três de transição, boca e lábio), fundo plano, boca e lábio fino virado para fora (14 mm para fora em 8 mm de altura). A boca é um D, com a frente em arco largo do lado da roda (cantos de frente com raio igual à meia-largura e 40% do comprimento) e a traseira mais reta (cantos de 90 mm). Boca de 740 x 880 mm, fundo de 500 x 640 mm entre os cantos vivos das paredes (recuo de 240 mm em cada medida), dos quais o trecho plano mede 500 x 564 mm, profundidade da bacia de 140 mm, medidas por estimativa (origem ia) pelas proporções da referência lateral escalada pela roda de 360 mm e da vista de cima (comprimento 1,1 vez a largura, fundo cerca de 0,6 da boca em largura). O fundo está avançado 17 mm em relação à boca, o que deixa a parede da frente mais em pé e a de trás mais deitada, como na lateral. Todas as dimensões, a altura do fundo (topo da travessa) e a posição em z saem de parâmetros do chassi: o fundo pousa na face de cima da travessa (sobre) e a posição ao longo do fundo sai de uma expressão sobre a ponta das escoras.A caçamba não é girada: a seção do fundo leva `inclinacao` de menos anguloCaca em torno de x, o ângulo do trecho reto do quadro (cerca de 4,7 graus, atan2 de yDobra menos yDegrau sobre zDegrau menos zDobraTras), com a frente para baixo, e a boca e o lábio ficam sem inclinação, horizontais de trás até a frente como na referência. Entre o fundo e a boca há três seções de transição, a 10, 18 e 28 mm do fundo, que inclinam 85%, 60% e 30% do ângulo do fundo; a posição de cada uma sai da inclinação da anterior (meia profundidade vezes a diferença das tangentes, mais 2 mm de folga, e a primeira ainda mais a espessura da chapa, porque o plano interno do fundo não pode cruzá-la). A passagem do fundo para a parede da frente é uma curva larga (arco de 60 mm do fim do fundo plano até o canto da parede, raio de uns 110 mm) e a de trás é menor (16 mm, raio de uns 45 mm): em cada seção de transição a frente e a traseira recuam do canto vivo da parede por uma fração do arco (frações f1, f2 e f3 de frente e de trás, formas medidas por estimativa na altura de cada seção, de origem ia, que valem para os parâmetros atuais e pedem revisão se a inclinação mudar). Por isso o fundo plano mede 500 x 564 mm e a parede da frente é mais alta (166 mm) que a de trás (114 mm), já que o fundo desce para a frente. O fundo passa pelo topo da travessa e segue paralelo ao tubo, com folga de 13 mm (a espessura da travessa). A caçamba é posta por encaixe do centro do fundo no topo da travessa e deslocada ao longo do plano do fundo até a parede da frente passar 3 mm atrás da ponta das escoras, que a tocam; a posição da parede nessa altura sai da reta entre a terceira transição e a boca, e a queda da frente em arco na posição lateral da escora sai da mesma expressão de antes. A caçamba não tem furos nem rebites, e a curva lateral entre fundo e parede não foi feita. A largura entre manoplas passou a medir a caixa de x do quadro e das manoplas, e não a largura total, porque a boca da caçamba é mais larga que o chassi; o valor e a tolerância são os mesmos.",
+    "nivel": "medio",
+    "medidas": [
+      {
+        "nome": "comprimentoTotal",
+        "valor": 1561,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 30,
+        "mede": "profundidadeTotal"
+      },
+      {
+        "nome": "larguraEntreManoplas",
+        "valor": 584,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 20,
+        "mede": {
+          "caixa": "x",
+          "formas": [
+            "quadro",
+            "manoplaD",
+            "manoplaE"
+          ]
+        }
+      },
+      {
+        "nome": "alturaDasManoplas",
+        "valor": 592,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 20,
+        "mede": "alturaTotal"
+      },
+      {
+        "nome": "bitolaDoQuadroNaSecaoReta",
+        "valor": 430,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 5,
+        "mede": {
+          "distancia": [
+            "dobraTrasD",
+            "dobraTrasE"
+          ],
+          "eixo": "x"
+        }
+      },
+      {
+        "nome": "larguraDoLaco",
+        "valor": 200,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 5,
+        "mede": {
+          "distancia": [
+            "cantoD",
+            "cantoE"
+          ],
+          "eixo": "x"
+        }
+      },
+      {
+        "nome": "alturaDoPe",
+        "valor": 308,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 6,
+        "mede": {
+          "caixa": "y",
+          "formas": [
+            "peD",
+            "peE"
+          ]
+        }
+      },
+      {
+        "nome": "larguraEntrePes",
+        "valor": 422,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 8,
+        "mede": {
+          "caixa": "x",
+          "formas": [
+            "peD",
+            "peE"
+          ]
+        }
+      },
+      {
+        "nome": "comprimentoDoPe",
+        "valor": 319,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 10,
+        "mede": {
+          "caixa": "z",
+          "formas": [
+            "peD"
+          ]
+        }
+      },
+      {
+        "nome": "comprimentoDoLaco",
+        "valor": 395,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 5,
+        "mede": {
+          "distancia": [
+            "fimDegrauD",
+            "cantoD"
+          ],
+          "eixo": "z"
+        }
+      },
+      {
+        "nome": "degrauDoQuadro",
+        "valor": 100,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 5,
+        "mede": {
+          "distancia": [
+            "degrauD",
+            "fimDegrauD"
+          ],
+          "eixo": "y"
+        }
+      },
+      {
+        "nome": "larguraDaBocaDaCacamba",
+        "valor": 768,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 10,
+        "mede": {
+          "caixa": "x",
+          "formas": [
+            "cacamba"
+          ]
+        }
+      },
+      {
+        "nome": "comprimentoDaCacamba",
+        "valor": 908,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 10,
+        "mede": {
+          "caixa": "z",
+          "formas": [
+            "cacamba"
+          ]
+        }
+      },
+      {
+        "nome": "alturaDaCacamba",
+        "valor": 171,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 8,
+        "mede": {
+          "caixa": "y",
+          "formas": [
+            "cacamba"
+          ]
+        }
+      },
+      {
+        "nome": "profundidadeDaBacia",
+        "valor": 140,
+        "unidade": "mm",
+        "origem": "ia",
+        "tolerancia": 4,
+        "mede": {
+          "distancia": [
+            "cacamba.fundo",
+            "cacamba.boca"
+          ],
+          "eixo": "y"
+        }
+      }
+    ],
+    "pecas": [
+      {
+        "nome": "quadro",
+        "formas": [
+          "quadro"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "pés de apoio",
+        "formas": [
+          "peD",
+          "peE"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "travessa",
+        "formas": [
+          "travessaTras"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "barra chata inferior",
+        "formas": [
+          "barraMeio"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "manoplas de borracha",
+        "formas": [
+          "manoplaD",
+          "manoplaE"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "escoras da caçamba",
+        "formas": [
+          "escoraFrenteD",
+          "escoraFrenteE"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "chapinhas dos pés",
+        "formas": [
+          "chapinhaD",
+          "chapinhaE"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "caçamba",
+        "formas": [
+          "cacamba"
+        ],
+        "obrigatoria": true
+      }
+    ],
+    "contrato": {
+      "tocam": [
+        [
+          "travessaTras",
+          "quadro"
+        ],
+        [
+          "peD",
+          "quadro"
+        ],
+        [
+          "peE",
+          "quadro"
+        ],
+        [
+          "barraMeio",
+          "quadro"
+        ],
+        [
+          "manoplaD",
+          "quadro"
+        ],
+        [
+          "manoplaE",
+          "quadro"
+        ],
+        [
+          "escoraFrenteD",
+          "quadro"
+        ],
+        [
+          "escoraFrenteE",
+          "quadro"
+        ],
+        [
+          "chapinhaD",
+          "peD"
+        ],
+        [
+          "chapinhaE",
+          "peE"
+        ],
+        [
+          "chapinhaD",
+          "quadro"
+        ],
+        [
+          "chapinhaE",
+          "quadro"
+        ],
+        [
+          "cacamba",
+          "travessaTras"
+        ],
+        [
+          "cacamba",
+          "quadro"
+        ],
+        [
+          "cacamba",
+          "escoraFrenteD"
+        ],
+        [
+          "cacamba",
+          "escoraFrenteE"
+        ]
+      ],
+      "livres": [
+        [
+          "peD",
+          "peE"
+        ],
+        [
+          "barraMeio",
+          "travessaTras"
+        ],
+        [
+          "barraMeio",
+          "peD"
+        ],
+        [
+          "travessaTras",
+          "peD"
+        ],
+        [
+          "cacamba",
+          "barraMeio"
+        ],
+        [
+          "cacamba",
+          "peD"
+        ],
+        [
+          "cacamba",
+          "manoplaD"
+        ]
+      ],
+      "simetricas": [
+        [
+          "peD",
+          "peE"
+        ],
+        [
+          "manoplaD",
+          "manoplaE"
+        ],
+        [
+          "escoraFrenteD",
+          "escoraFrenteE"
+        ],
+        [
+          "chapinhaD",
+          "chapinhaE"
+        ]
+      ],
+      "fixa": [
+        {
+          "a": "travessaTras",
+          "b": "quadro",
+          "pontos": 2
+        },
+        {
+          "a": "peD",
+          "b": "quadro",
+          "pontos": 2
+        },
+        {
+          "a": "peE",
+          "b": "quadro",
+          "pontos": 2
+        },
+        {
+          "a": "barraMeio",
+          "b": "quadro",
+          "pontos": 2
+        },
+        {
+          "a": "manoplaD",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "manoplaE",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "escoraFrenteD",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "escoraFrenteE",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "chapinhaD",
+          "b": "peD",
+          "pontos": 1
+        },
+        {
+          "a": "chapinhaD",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "chapinhaE",
+          "b": "peE",
+          "pontos": 1
+        },
+        {
+          "a": "chapinhaE",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "cacamba",
+          "b": "travessaTras",
+          "pontos": 1
+        },
+        {
+          "a": "cacamba",
+          "b": "quadro",
+          "pontos": 1
+        },
+        {
+          "a": "cacamba",
+          "b": "escoraFrenteD",
+          "pontos": 1
+        },
+        {
+          "a": "cacamba",
+          "b": "escoraFrenteE",
+          "pontos": 1
+        }
+      ]
+    }
+  },
+  "contato": {
+    "usar": true,
+    "pares": [
+      {
+        "a": "manoplaD",
+        "b": "quadro",
+        "tipo": "atravessa",
+        "max": 36,
+        "motivo": "a manopla de borracha é uma luva que envolve a ponta do tubo"
+      }
+    ]
+  },
+  "opcoes": [
+    {
+      "titulo": "Carrinho de mão com caçamba, sem roda",
+      "nota": "Chassi de tubo dobrado com laço em U, dois pés em U, travessa, barra chata e escoras, e caçamba de chapa apoiada na travessa e presa às escoras",
+      "formas": [
+        {
+          "id": "quadro",
+          "tipo": "tubo",
+          "estilo": "tubo",
+          "rotulo": "quadro_tubo_dobrado",
+          "ponta": true,
+          "diametro": "tuboD",
+          "raioCurva": "curvaQuadro",
+          "caminho": [
+            "graD",
+            "punhoD",
+            "dobraTrasD",
+            "degrauD",
+            "fimDegrauD",
+            "cantoD",
+            "cantoE",
+            "fimDegrauE",
+            "degrauE",
+            "dobraTrasE",
+            "punhoE",
+            "graE"
+          ]
+        },
+        {
+          "id": "peD",
+          "tipo": "tubo",
+          "estilo": "tubo",
+          "rotulo": "pe_de_apoio_direito",
+          "diametro": "tuboD",
+          "raioCurva": "curvaPe",
+          "caminho": [
+            "peTopoFrenteD",
+            "peBaseFrenteD",
+            "peBaseTrasD",
+            "peTopoTrasD"
+          ]
+        },
+        {
+          "id": "peE",
+          "espelha": {
+            "forma": "peD",
+            "eixo": "x"
+          },
+          "rotulo": "pe_de_apoio_esquerdo"
+        },
+        {
+          "id": "travessaTras",
+          "tipo": "caixa",
+          "estilo": "tubo",
+          "rotulo": "travessa_traseira",
+          "largura": "=2*xMeio+2*tuboD",
+          "altura": "espTrav",
+          "profundidade": "profTrav",
+          "centro": [
+            0,
+            "=yTravTras+tuboD/2+espTrav/2",
+            "zTravTras"
+          ]
+        },
+        {
+          "id": "barraMeio",
+          "tipo": "caixa",
+          "estilo": "tubo",
+          "rotulo": "barra_chata_inferior",
+          "largura": "=2*xBarra",
+          "altura": "espBarra",
+          "profundidade": "profBarra",
+          "centro": [
+            0,
+            "=yBarra-tuboD/2-espBarra/2",
+            "zBarra"
+          ]
+        },
+        {
+          "id": "manoplaD",
+          "tipo": "cilindro",
+          "cor": "preto",
+          "rotulo": "manopla_borracha_direita",
+          "diametro": "diamManopla",
+          "de": {
+            "entre": [
+              "graD",
+              "punhoD"
+            ],
+            "mm": "compManopla"
+          },
+          "para": "graD"
+        },
+        {
+          "id": "manoplaE",
+          "espelha": {
+            "forma": "manoplaD",
+            "eixo": "x"
+          },
+          "rotulo": "manopla_borracha_esquerda"
+        },
+        {
+          "id": "escoraFrenteD",
+          "ligar": {
+            "de": [
+              "=xTuboEscBase-19",
+              "yFrente",
+              "zEscBase"
+            ],
+            "para": [
+              "=xTuboEscBase-19",
+              "=yFrente+alturaEscF",
+              "=zEscBase-recuoEscF"
+            ],
+            "tipo": "haste",
+            "diametro": "diamEscF"
+          },
+          "ponta": true,
+          "estilo": "tubo",
+          "rotulo": "escora_da_cacamba_direita"
+        },
+        {
+          "id": "escoraFrenteE",
+          "espelha": {
+            "forma": "escoraFrenteD",
+            "eixo": "x"
+          },
+          "rotulo": "escora_da_cacamba_esquerda"
+        },
+        {
+          "id": "chapinhaD",
+          "tipo": "caixa",
+          "estilo": "tubo",
+          "rotulo": "chapinha_do_pe_direita",
+          "largura": "espChap",
+          "altura": "altChap",
+          "profundidade": "profChap",
+          "centro": [
+            "=xPeTras+tuboD/2+espChap/2",
+            "=yPeTras-altChap/2",
+            "zPeTras"
+          ]
+        },
+        {
+          "id": "chapinhaE",
+          "espelha": {
+            "forma": "chapinhaD",
+            "eixo": "x"
+          },
+          "rotulo": "chapinha_do_pe_esquerda"
+        },
+        {
+          "id": "cacamba",
+          "tipo": "loft",
+          "eixo": "y",
+          "cor": "azul",
+          "rotulo": "cacamba_de_chapa",
+          "casca": {
+            "espessura": "espCaca",
+            "aberta": "fim"
+          },
+          "secoes": [
+            {
+              "pos": 0,
+              "forma": "arredondado",
+              "tamanho": [
+                "larg0Caca",
+                "prof0Caca"
+              ],
+              "cantos": [
+                [
+                  "=larg0Caca/2",
+                  "=prof0Caca*0.4"
+                ],
+                [
+                  "=larg0Caca/2",
+                  "=prof0Caca*0.4"
+                ],
+                "raioTrasCaca",
+                "raioTrasCaca"
+              ],
+              "segmentosPorCanto": 8,
+              "centro": [
+                0,
+                "c0Caca"
+              ],
+              "inclinacao": [
+                "=0-anguloCaca",
+                0
+              ],
+              "nome": "fundo"
+            },
+            {
+              "pos": "p1Caca",
+              "forma": "arredondado",
+              "tamanho": [
+                "larg1Caca",
+                "prof1Caca"
+              ],
+              "cantos": [
+                [
+                  "=larg1Caca/2",
+                  "=prof1Caca*0.4"
+                ],
+                [
+                  "=larg1Caca/2",
+                  "=prof1Caca*0.4"
+                ],
+                "raioTrasCaca",
+                "raioTrasCaca"
+              ],
+              "segmentosPorCanto": 8,
+              "centro": [
+                0,
+                "=(frente1Caca+tras1Caca)/2"
+              ],
+              "inclinacao": [
+                "=0-anguloCaca*k1Caca",
+                0
+              ]
+            },
+            {
+              "pos": "p2Caca",
+              "forma": "arredondado",
+              "tamanho": [
+                "larg2Caca",
+                "prof2Caca"
+              ],
+              "cantos": [
+                [
+                  "=larg2Caca/2",
+                  "=prof2Caca*0.4"
+                ],
+                [
+                  "=larg2Caca/2",
+                  "=prof2Caca*0.4"
+                ],
+                "raioTrasCaca",
+                "raioTrasCaca"
+              ],
+              "segmentosPorCanto": 8,
+              "centro": [
+                0,
+                "=(frente2Caca+tras2Caca)/2"
+              ],
+              "inclinacao": [
+                "=0-anguloCaca*k2Caca",
+                0
+              ]
+            },
+            {
+              "pos": "p3Caca",
+              "forma": "arredondado",
+              "tamanho": [
+                "larg3Caca",
+                "prof3Caca"
+              ],
+              "cantos": [
+                [
+                  "=larg3Caca/2",
+                  "=prof3Caca*0.4"
+                ],
+                [
+                  "=larg3Caca/2",
+                  "=prof3Caca*0.4"
+                ],
+                "raioTrasCaca",
+                "raioTrasCaca"
+              ],
+              "segmentosPorCanto": 8,
+              "centro": [
+                0,
+                "=(frente3Caca+tras3Caca)/2"
+              ],
+              "inclinacao": [
+                "=0-anguloCaca*k3Caca",
+                0
+              ]
+            },
+            {
+              "pos": "altCaca",
+              "forma": "arredondado",
+              "tamanho": [
+                "largCaca",
+                "profCaca"
+              ],
+              "cantos": [
+                [
+                  "=largCaca/2",
+                  "=profCaca*0.4"
+                ],
+                [
+                  "=largCaca/2",
+                  "=profCaca*0.4"
+                ],
+                "raioTrasCaca",
+                "raioTrasCaca"
+              ],
+              "segmentosPorCanto": 8,
+              "nome": "boca"
+            },
+            {
+              "pos": "=altCaca+labioAltCaca",
+              "forma": "arredondado",
+              "tamanho": [
+                "=largCaca+2*labioSaiCaca",
+                "=profCaca+2*labioSaiCaca"
+              ],
+              "cantos": [
+                [
+                  "=(largCaca+2*labioSaiCaca)/2",
+                  "=(profCaca+2*labioSaiCaca)*0.4"
+                ],
+                [
+                  "=(largCaca+2*labioSaiCaca)/2",
+                  "=(profCaca+2*labioSaiCaca)*0.4"
+                ],
+                "raioTrasCaca",
+                "raioTrasCaca"
+              ],
+              "segmentosPorCanto": 8,
+              "nome": "labio"
+            }
+          ],
+          "encaixa": {
+            "ancora": "fundo",
+            "em": "travessaTras.+y"
+          },
+          "desloca": [
+            0,
+            "=0-tgCaca*dzCaca",
+            "dzCaca"
+          ]
+        }
+      ]
+    }
+  ]
+}
