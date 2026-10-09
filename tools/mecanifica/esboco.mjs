@@ -1222,7 +1222,9 @@ async function principal(argv) {
     }
     if (args.tem('--analise') && ['--corte', '--explodir', '--previa', '--zoom-forma'].some((f) => args.tem(f))) throw new ErroDeEsboco('--corte, --explodir, --previa e --zoom-forma geram as vistas isoladas (com --unidade ou do esboço inteiro) e não valem junto de --analise.');
     if (args.tem('--lado') && !args.tem('--corte')) throw new ErroDeEsboco('--lado só vale junto de --corte.');
-    if (args.tem('--unidade') || args.tem('--corte') || args.tem('--explodir') || args.tem('--previa') || args.tem('--zoom-forma')) {
+    /* `--vista <vista>` sozinho grava a vista isolada do esboço inteiro; antes caía na leitura padrão e não gravava nada. */
+    const vistaIsolada = args.tem('--vista') && !['--achado', '--analise', '--descrever', '--forma'].some((f) => args.tem(f));
+    if (args.tem('--unidade') || args.tem('--corte') || args.tem('--explodir') || args.tem('--previa') || args.tem('--zoom-forma') || vistaIsolada) {
       const opcoes = { vista: args.valor('--vista') ?? null, largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, corte: args.tem('--corte') ? lerCorteDaLinha(args.valor('--corte'), args.valor('--lado')) : null, explosao: lerExplosaoDaLinha({ explodir: args.tem('--explodir'), eixo: args.valor('--eixo'), distancia: args.valor('--distancia') }), previa: args.tem('--previa'), zoomForma: lerZoomFormaDaLinha({ zoomForma: args.valor('--zoom-forma'), margem: args.valor('--margem') }), forcar: args.tem('--forçar') || args.tem('--forcar'), vizinhos: !args.tem('--sem-vizinhos') };
       const r = args.tem('--unidade') ? await unidadeArquivo(alvo, args.valor('--unidade'), opcoes) : await vistasArquivo(alvo, opcoes);
       process.stdout.write(r.texto);

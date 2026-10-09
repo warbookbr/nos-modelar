@@ -421,7 +421,7 @@ O modo de execução do Condutor é `objeto` (o padrão) ou `por-unidade`, escol
 
 ## Vistas para a IA: corte, explosão, zoom e prévia
 
-`--corte`, `--explodir`, `--zoom-forma` e `--previa` geram as vistas isoladas (sem legenda nem linha de centro, em `ladosPorEscala`) de uma unidade, com `--unidade`, ou do esboço inteiro, sem ela, nas quatro vistas ou só na de `--vista`, com `--largura` e `--saida`. Valem juntas (`--corte x=0 --zoom-forma roda.pneu`) e não valem com `--analise`. Cada combinação grava um arquivo com o nome das opções (`<nome>[-unidade-<u>][-corte-x0][-zoom-<forma>][-explodida][-previa]-<vista>.png`), e por isso nunca substitui a imagem normal. O mesmo desenho existe no JSON, para o esboço que quer o corte fixo: `corte`, `enquadrar`, `previa` na raiz e `explosao` com `distancia`.
+`--corte`, `--explodir`, `--zoom-forma` e `--previa` geram as vistas isoladas (sem legenda nem linha de centro, em `ladosPorEscala`) de uma unidade, com `--unidade`, ou do esboço inteiro, sem ela, nas quatro vistas ou só na de `--vista`, com `--largura` e `--saida`. Valem juntas (`--corte x=0 --zoom-forma roda.pneu`) e não valem com `--analise`. `--vista <vista>` sozinho, sem nenhuma delas, grava a vista isolada simples do esboço inteiro (`<nome>-<vista>.png`). Cada combinação grava um arquivo com o nome das opções (`<nome>[-unidade-<u>][-corte-x0][-zoom-<forma>][-explodida][-previa]-<vista>.png`), e por isso nunca substitui a imagem normal. O mesmo desenho existe no JSON, para o esboço que quer o corte fixo: `corte`, `enquadrar`, `previa` na raiz e `explosao` com `distancia`.
 
 ### Corte
 
