@@ -1,0 +1,332 @@
+{
+  "estilos": {
+    "chassi": {
+      "cor": "#2b2f35"
+    },
+    "carenagem": {
+      "cor": "#e66a1f"
+    },
+    "contrapeso": {
+      "cor": "#3d434a"
+    },
+    "assoalho": {
+      "cor": "#1e2124"
+    }
+  },
+  "plano": {
+    "pecas": [
+      {
+        "nome": "chassi_base",
+        "formas": [
+          "chassi_base*"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "assoalho_cabine",
+        "formas": [
+          "assoalho_cabine*"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "paralamas_dianteiros",
+        "formas": [
+          "paralama_*"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "capo_motor",
+        "formas": [
+          "capo_motor*"
+        ],
+        "obrigatoria": true
+      },
+      {
+        "nome": "contrapeso_traseiro",
+        "formas": [
+          "contrapeso_traseiro*"
+        ],
+        "obrigatoria": true
+      }
+    ],
+    "contrato": {
+      "tocam": [
+        [
+          "chassi_base",
+          "assoalho_cabine"
+        ],
+        [
+          "chassi_base",
+          "contrapeso_traseiro"
+        ],
+        [
+          "chassi_base",
+          "capo_motor"
+        ],
+        [
+          "capo_motor",
+          "contrapeso_traseiro"
+        ],
+        [
+          "assoalho_cabine",
+          "capo_motor"
+        ]
+      ],
+      "simetricas": [
+        [
+          "paralama_D",
+          "paralama_E"
+        ]
+      ]
+    },
+    "medidas": [
+      {
+        "nome": "comprimentoTotal",
+        "valor": 2635,
+        "unidade": "mm",
+        "origem": "ficha",
+        "tolerancia": 25,
+        "mede": "profundidadeTotal"
+      },
+      {
+        "nome": "larguraTotal",
+        "valor": 1150,
+        "unidade": "mm",
+        "origem": "ficha",
+        "tolerancia": 15,
+        "mede": "larguraTotal"
+      },
+      {
+        "nome": "alturaCorpo",
+        "valor": 850,
+        "unidade": "mm",
+        "origem": "ficha",
+        "tolerancia": 20,
+        "mede": "alturaTotal"
+      },
+      {
+        "nome": "alturaTopoContrapeso",
+        "valor": 1000,
+        "unidade": "mm",
+        "origem": "ficha",
+        "tolerancia": 20,
+        "mede": {
+          "distancia": [
+            [
+              0,
+              0,
+              0
+            ],
+            "contrapeso_traseiro.+y"
+          ],
+          "eixo": "y"
+        }
+      },
+      {
+        "nome": "alturaCapoAoSolo",
+        "valor": 950,
+        "unidade": "mm",
+        "origem": "ficha",
+        "tolerancia": 20,
+        "mede": {
+          "distancia": [
+            [
+              0,
+              0,
+              0
+            ],
+            "capo_motor.+y"
+          ],
+          "eixo": "y"
+        }
+      },
+      {
+        "nome": "vaoLivreSolo",
+        "valor": 150,
+        "unidade": "mm",
+        "origem": "ficha",
+        "tolerancia": 15,
+        "mede": {
+          "distancia": [
+            [
+              0,
+              0,
+              0
+            ],
+            "chassi_base.-y"
+          ],
+          "eixo": "y"
+        }
+      }
+    ]
+  },
+  "opcoes": [
+    {
+      "titulo": "Carcaça e chassi da empilhadeira",
+      "nota": "Estrutura curva e silhueta lateral refinada com perfis, extrusões e lofts fiéis às referências visuais",
+      "formas": [
+        {
+          "id": "chassi_base",
+          "estilo": "carenagem",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 780,
+          "origem": "perfil",
+          "centro": [0, 0, 0],
+          "perfil": [
+            [-350, 150],
+            [650, 150],
+            [750, 200],
+            [900, 360],
+            [1050, 380],
+            [1200, 320],
+            [1320, 360],
+            [1350, 520],
+            [1150, 520],
+            [950, 450],
+            [750, 220],
+            [250, 220],
+            [-450, 620],
+            [-725, 680],
+            [-725, 450],
+            [-600, 420],
+            [-450, 280]
+          ]
+        },
+        {
+          "id": "paralama_D",
+          "estilo": "carenagem",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 185,
+          "origem": "perfil",
+          "centro": [482.5, 0, 0],
+          "perfil": [
+            [1390, 530],
+            [1250, 550],
+            [950, 580],
+            [650, 560],
+            [650, 240],
+            [720, 360],
+            [820, 460],
+            [950, 500],
+            [1080, 460],
+            [1180, 360],
+            [1250, 240],
+            [1390, 470]
+          ]
+        },
+        {
+          "id": "paralama_E",
+          "estilo": "carenagem",
+          "espelha": {
+            "forma": "paralama_D",
+            "eixo": "x",
+            "pos": 0
+          }
+        },
+        {
+          "id": "assoalho_cabine",
+          "estilo": "assoalho",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 780,
+          "origem": "perfil",
+          "centro": [0, 0, 0],
+          "perfil": [
+            [250, 220],
+            [750, 220],
+            [950, 450],
+            [950, 620],
+            [880, 620],
+            [720, 290],
+            [250, 290]
+          ]
+        },
+        {
+          "id": "capo_motor",
+          "estilo": "carenagem",
+          "tipo": "loft",
+          "eixo": "z",
+          "centro": [0, 620, -237.5],
+          "secoes": [
+            {
+              "pos": -725,
+              "forma": "arredondado",
+              "tamanho": [780, 270],
+              "centro": [0, 815],
+              "cantos": 40
+            },
+            {
+              "pos": -450,
+              "forma": "arredondado",
+              "tamanho": [780, 320],
+              "centro": [0, 780],
+              "cantos": 40
+            },
+            {
+              "pos": -100,
+              "forma": "arredondado",
+              "tamanho": [760, 420],
+              "centro": [0, 660],
+              "cantos": 50
+            },
+            {
+              "pos": 250,
+              "forma": "arredondado",
+              "tamanho": [740, 410],
+              "centro": [0, 495],
+              "cantos": 60
+            }
+          ]
+        },
+        {
+          "id": "contrapeso_traseiro",
+          "estilo": "contrapeso",
+          "tipo": "loft",
+          "eixo": "y",
+          "centro": [0, 575, -985],
+          "secoes": [
+            {
+              "pos": 150,
+              "forma": "arredondado",
+              "tamanho": [820, 460],
+              "centro": [0, -955],
+              "cantos": [30, 30, 160, 160]
+            },
+            {
+              "pos": 450,
+              "forma": "arredondado",
+              "tamanho": [840, 480],
+              "centro": [0, -965],
+              "cantos": [30, 30, 180, 180]
+            },
+            {
+              "pos": 700,
+              "forma": "arredondado",
+              "tamanho": [1020, 520],
+              "centro": [0, -985],
+              "cantos": [30, 30, 200, 200]
+            },
+            {
+              "pos": 880,
+              "forma": "arredondado",
+              "tamanho": [1050, 500],
+              "centro": [0, -975],
+              "cantos": [30, 30, 200, 200]
+            },
+            {
+              "pos": 1000,
+              "forma": "arredondado",
+              "tamanho": [1000, 420],
+              "centro": [0, -935],
+              "cantos": [40, 40, 180, 180]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

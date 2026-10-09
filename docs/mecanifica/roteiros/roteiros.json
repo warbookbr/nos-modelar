@@ -34,6 +34,12 @@
       "gate": null
     },
     {
+      "id": "marca",
+      "secao": "regras",
+      "texto": "Imagem de referência com marca, logotipo ou nome de fabricante não entra no repositório.",
+      "gate": null
+    },
+    {
       "id": "escopo",
       "secao": "regras",
       "texto": "Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de produto nesta documentação.",

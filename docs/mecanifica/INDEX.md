@@ -138,6 +138,9 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 - O plano ativo, o rascunho aberto e os congelados estão em
   [`planos/README.md`](planos/README.md) e na pasta
   [`congelados/`](planos/congelados/README.md).
+- A carcaça da empilhadeira está sendo esboçada pelo laço, com o
+  [alinhamento](banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) e as
+  referências na mesma pasta.
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
   Medida e critérios em `planos/BACKLOG.md`.
 

@@ -32,6 +32,8 @@ passo seguinte.
   métrica aprova forma sozinha, e quem aprova forma é a pessoa.
 - Mudanças gerais que possam voltar ao NÓS ficam isoladas e registradas em
   `docs/mecanifica/UPSTREAM-NOS.md`.
+- Imagem de referência com marca, logotipo ou nome de fabricante não entra no
+  repositório.
 - Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de
   produto nesta documentação.
 - Sem plano ativo, o backlog não autoriza implementação.
