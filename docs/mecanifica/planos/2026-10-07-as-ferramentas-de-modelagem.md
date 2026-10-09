@@ -141,7 +141,8 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
 1. O banco de provas com a medida de custo, para ter o antes, e as portas
    estendidas como contrato único de encaixe. Feita em 2026-10-07.
 2. O contorno e a casca: perfil paramétrico e deslocamento de contorno no
-   núcleo, a casca no `loft` do esboço e a caçamba do carrinho de mão.
+   núcleo, a casca no `loft` do esboço e a caçamba do carrinho de mão. Falta só a
+   caçamba (2026-10-09).
 3. O nível zero: a forma global N2 estendida e ligada ao nível detalhado.
 4. O esboço refeito sobre o nível zero, com o processo do módulo atual.
 5. O resto da camada de features sobre os seletores existentes.

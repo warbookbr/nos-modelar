@@ -25,7 +25,7 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 
 Mudar núcleo, gate, arquitetura, ferramenta ou plano.
 
-Ler antes de começar, num orçamento de 25.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/mecanifica/INDEX.md`

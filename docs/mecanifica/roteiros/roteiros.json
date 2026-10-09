@@ -136,7 +136,7 @@
       ],
       "passo": "Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.",
       "conferido": "npm run gates, com a bateria completa quando muda código.",
-      "orcamentoBytes": 25000,
+      "orcamentoBytes": 27000,
       "linhaDeBase": {
         "bytes": 59061,
         "data": "2026-10-08"
