@@ -53,6 +53,17 @@ laterais presas aos dois, o capô sobre o contrapeso entre as laterais, o painel
 na frente do piso e os paralamas e o degrau presos nas laterais; os pares que se
 tocam e por quê; e o que reprova o esboço.
 
+## Como retomar
+
+Primeiro fecham-se com a pessoa as três perguntas acima. Depois a skill
+`contorno-da-imagem` tira da lateral e da vista de cima o contorno de cada parte
+em milímetro, na escala de 1.150 mm de largura, e esse contorno é a entrada do
+esbocista no lugar das proporções lidas a olho e das medidas da ficha. O esboço
+é feito sobre o nível zero da fatia 4, com a casca nativa da fatia 6 para o
+capô, as laterais e os forros, e conferido contra o contorno antes de qualquer
+olhar. A forma é julgada pela pessoa, que pediu para ver a composta no lugar do
+crítico.
+
 ## As tentativas
 
 A [da IA local](tentativa-ia-local/) e a [do esbocista Haiku](tentativa-haiku/)
