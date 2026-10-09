@@ -77,11 +77,18 @@ function numerosDoPontoDePerfil(q, num, campo, contexto) {
   return g;
 }
 
-/* Seção de loft: posição, tamanho, centro, raio e polígono aceitam número, parâmetro ou expressão. */
+/* Seção de loft: posição, tamanho, centro, raio, cantos e polígono aceitam número, parâmetro ou expressão. Os `cantos` da
+   seção "arredondado" são um número ou uma lista de 4 cantos, cada um um número ou [ru, rv]. */
+function cantosDaSecao(c, num, campo, contexto) {
+  if (!Array.isArray(c)) return num(c, campo, contexto);
+  return c.map((x, i) => (Array.isArray(x) ? vetor(x, num, `${campo}[${i}]`, contexto) : num(x, `${campo}[${i}]`, contexto)));
+}
+
 function numerosDaSecao(q, num, campo, contexto) {
   if (!objeto(q)) return q;
   const g = { ...q };
-  for (const k of ['pos', 'raio']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
+  for (const k of ['pos', 'raio', 'segmentosPorCanto']) if (g[k] !== undefined) g[k] = num(g[k], `${campo}.${k}`, contexto);
+  if (g.cantos !== undefined) g.cantos = cantosDaSecao(g.cantos, num, `${campo}.cantos`, contexto);
   for (const k of ['tamanho', 'centro']) if (g[k] !== undefined) g[k] = vetor(g[k], num, `${campo}.${k}`, contexto);
   if (ehGerador(g.perfil)) g.perfil = gerarPerfil(g.perfil, num, `${campo}.perfil`, contexto);
   if (Array.isArray(g.perfil)) g.perfil = g.perfil.map((p, i) => vetor(p, num, `${campo}.perfil[${i}]`, contexto));
@@ -100,6 +107,7 @@ export function numerosDaForma(f, num, contexto) {
     g.circulos = g.circulos.map((c, i) => (objeto(c) ? { ...c, ...(c.raio !== undefined ? { raio: num(c.raio, `circulos[${i}].raio`, contexto) } : {}), ...(c.centro !== undefined ? { centro: ponto(c.centro, num, `circulos[${i}].centro`, contexto) } : {}) } : c));
   }
   if (Array.isArray(g.secoes)) g.secoes = g.secoes.map((q, i) => numerosDaSecao(q, num, `secoes[${i}]`, contexto));
+  if (objeto(g.casca) && g.casca.espessura !== undefined) g.casca = { ...g.casca, espessura: num(g.casca.espessura, 'casca.espessura', contexto) };
   if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
   const r = g.rotacao;
   if (Array.isArray(r)) g.rotacao = vetor(r, num, 'rotacao', contexto);

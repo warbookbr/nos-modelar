@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-937 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+938 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -431,6 +431,7 @@
 
 - `atritos-da-refeita.test.js` — Os treze atritos da primeira refeita (plano "O esboço detalhado coerente", fatia 5), cada um em reprodução mínima: referências internas de módulo, `--editar`…
 - `biblioteca.test.js` — Biblioteca genérica de componentes de arquivo: parafuso, mola, engrenagem, rolamento, perfil estrutural e dobradiça. Cada um tem teste de expansão (ids, parâ…
+- `casca.test.js` — O loft com seção "arredondado" e com "casca": a caçamba de um carrinho de mão (bacia oca de parede inclinada, boca em D com cantos arredondados, fundo menor …
 - `componentes.test.js` — Componentes parametrizados (`usa`): expansão com ids prefixados, parâmetros no escopo do componente, entradas, âncoras expostas, pares do gate, espelho de in…
 - `condutor.test.js` — O Condutor: estágios, Portão de estágio, nível de detalhe, Plano de detalhe (unidades e ordem), agrupamento com motivo e Marcos.
 - `conserto.test.js` — Conserto proposto pelo gate e `--ajustar`: qual forma se move, quanto, e o gate aprovando depois.

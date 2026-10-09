@@ -17,7 +17,7 @@ export const CAMPOS_POR_TIPO = {
   cone: ['diametro', 'diametroTopo', 'comprimento', 'eixo', 'lados'],
   esfera: ['diametro'],
   extrusao: ['perfil', 'comprimento', 'eixo', 'origem'],
-  loft: ['secoes', 'eixo'],
+  loft: ['secoes', 'eixo', 'casca'],
   revolucao: ['perfil', 'eixo', 'lados'],
   tubo: ['caminho', 'diametro', 'raioCurva'],
   envolve: ['circulos', 'largura', 'espessura', 'fechado', 'sentido', 'eixo'],

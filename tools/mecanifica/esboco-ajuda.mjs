@@ -25,7 +25,7 @@ export const FRASES = {
   cone: 'Cone e tronco: diâmetro da base, diâmetro do topo e comprimento.',
   esfera: 'Esfera: pilha de faixas, com a caixa do diâmetro.',
   extrusao: 'Extrusão de perfil simples, convexo ou côncavo, ao longo de um eixo.',
-  loft: 'Sólido por seções paralelas, para tanque, banco e carenagem.',
+  loft: 'Sólido por seções paralelas, com seção arredondada e casca oca: tanque, banco, carenagem e caçamba.',
   revolucao: 'Sólido de revolução por perfil de raio e altura.',
   tubo: 'Tubo por pontos: caminho, diâmetro e raio de curva.',
   posicionamento: 'Posicionar por relação (sobre, encosta, ponta, alinha), não por coordenada.',

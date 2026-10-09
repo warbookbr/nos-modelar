@@ -39,8 +39,9 @@ canto ou `chanfro` nas doze arestas, e `furos: [{ diametro, centro: [x, z] }]`),
 (`diametro` da base, `diametroTopo` para o tronco, `comprimento`, `eixo`),
 `esfera` (`diametro`), `extrusao` (`perfil: [[u, v], ...]` polígono simples,
 convexo ou côncavo, `comprimento`, `eixo`), `loft` (`secoes: [{ pos, forma:
-"retangulo" | "elipse" | "poligono", tamanho: [u, v], centro: [u, v], raio,
-nome }, ...]` em ordem crescente de `pos`, `eixo`), `revolucao` (`perfil:
+"retangulo" | "elipse" | "poligono" | "arredondado", tamanho: [u, v], centro:
+[u, v], raio, cantos, nome }, ...]` em ordem crescente de `pos`, `eixo`, e
+`casca: { espessura, aberta: "fim" | "inicio" }` para a bacia oca), `revolucao` (`perfil:
 [[raio, altura], ...]` do começo ao fim do eixo, `eixo`, `lados`) e `tubo`
 (`caminho` de 2 ou mais pontos, `diametro`, `raioCurva`). Para tanque, banco e
 carenagem use `loft` (a seção muda de tamanho e de centro ao longo do eixo, e

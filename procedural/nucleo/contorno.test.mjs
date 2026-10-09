@@ -6,8 +6,8 @@ const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 /* distância (com sinal, positiva para dentro de um polígono anti-horário) de p à reta da aresta a->b */
 const paraDentro = (p, a, b) => ((b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])) / dist(a, b);
 
-/* Cópia literal de recuarPerfil e ehConvexo de modulos/esboco/src/index.js (que não os exporta), só para provar que o
-   resultado do núcleo bate com o do esboço no caso convexo. */
+/* Cópia literal de recuarPerfil e ehConvexo que modulos/esboco/src/index.js tinha antes de importar este núcleo, só para
+   provar que o resultado do núcleo é o que o esboço calculava no caso convexo. */
 function recuarPerfilDoEsboco(perfil, d) {
   const n = perfil.length;
   const dir = (a, b) => { const x = b[0] - a[0]; const y = b[1] - a[1]; const t = Math.hypot(x, y); return [x / t, y / t]; };

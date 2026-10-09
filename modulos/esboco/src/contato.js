@@ -13,7 +13,7 @@
    a folga é a menor entre elas e a penetração é a maior entre as peças, o que
    subestima um cruzamento que atravesse várias fatias do aro. */
 import earcut from 'earcut';
-import { ErroDeEsboco, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma } from './index.js';
+import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 
@@ -128,6 +128,66 @@ function pecasPorFaixas(r) {
   return saida;
 }
 
+/* Peça convexa de uma lista de pontos em qualquer posição: o casco deles. As normais são as dos planos que deixam todos os
+   pontos de um lado só (as faces do casco, também as de um quadrilátero torcido, que o casco divide em dois triângulos) e as
+   arestas são as direções entre os pares de pontos, o que inclui as do casco. Eixos a mais nunca atrapalham o SAT: a menor
+   sobreposição está sempre numa face ou numa aresta do casco, e qualquer outro eixo dá sobreposição maior ou igual. */
+function prismaDePontos(verts) {
+  const normais = [];
+  const arestas = [];
+  const n = verts.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const ab = sub(verts[j], verts[i]);
+      if (norma2(ab) > 1e-18) arestas.push(ab);
+      for (let k = j + 1; k < n; k++) {
+        const nn = cross(ab, sub(verts[k], verts[i]));
+        const t = Math.sqrt(norma2(nn));
+        if (t < 1e-9) continue;
+        let lado = 0;
+        let face = true;
+        for (let q = 0; q < n && face; q++) {
+          const d = dot(nn, sub(verts[q], verts[i])) / t;
+          if (Math.abs(d) <= 1e-9) continue;
+          if (lado === 0) lado = Math.sign(d);
+          else if (Math.sign(d) !== lado) face = false;
+        }
+        if (face) normais.push(nn);
+      }
+    }
+  }
+  const min = [0, 1, 2].map((i) => Math.min(...verts.map((p) => p[i])));
+  const max = [0, 1, 2].map((i) => Math.max(...verts.map((p) => p[i])));
+  return { verts, normais: unicas(normais), arestas: unicas(arestas), min, max, limitaArestas: true };
+}
+
+/* Um loft com casca vira peças convexas: o fundo (as faixas da superfície externa até o plano em que ele termina, cada uma o
+   tronco entre duas seções) e a parede (uma peça por faixa e por lado do contorno: o casco dos oito cantos entre a superfície
+   externa e a interna, que contém a parede daquele trecho). A cavidade não tem peça, e por isso o que está dentro da bacia
+   não atravessa a parede. */
+function pecasDaCasca(r) {
+  const { b } = r.prisma;
+  const M = r.matriz;
+  const mundo = (u, v, w) => somar(r.centro, girar(M, localParaMundo(b, u, v, w)));
+  const { fundo, parede, cavidade } = listasDaCasca(r.prisma);
+  const saida = [];
+  for (let k = 0; k + 1 < fundo.length; k++) {
+    if (fundo[k + 1].w - fundo[k].w <= 1e-9) continue;
+    saida.push(prismaDeSecoes({ ...r, prisma: { ...r.prisma, secoes: [fundo[k], fundo[k + 1]] } }));
+  }
+  for (let k = 0; k + 1 < parede.length; k++) {
+    if (parede[k + 1].w - parede[k].w <= 1e-9) continue;
+    const N = parede[k].perfil.length;
+    for (let i = 0; i < N; i++) {
+      const j = (i + 1) % N;
+      const cantos = [];
+      for (const lista of [parede, cavidade]) for (const sc of [lista[k], lista[k + 1]]) for (const q of [sc.perfil[i], sc.perfil[j]]) cantos.push(mundo(q[0], q[1], sc.w));
+      saida.push(prismaDePontos(cantos));
+    }
+  }
+  return saida;
+}
+
 const areaDe = (poli) => poli.reduce((acc, q, i) => acc + q[0] * poli[(i + 1) % poli.length][1] - poli[(i + 1) % poli.length][0] * q[1], 0);
 
 /* Decomposição de um polígono simples em polígonos convexos anti-horários: earcut em triângulos e, depois, a fusão
@@ -190,6 +250,7 @@ const memoPares = new WeakMap();
 
 function pecasSemMemoria(r) {
   if (r.partes) return r.partes.flatMap((pt) => pecasDe(subforma(r, pt)));
+  if (r.prisma.casca) return pecasDaCasca(r);
   if (r.prisma.secoes) return r.prisma.porFaixas ? pecasPorFaixas(r) : [prismaDeSecoes(r)];
   const { perfil, furos } = r.prisma;
   if (furos.length === 0) return r.prisma.naoConvexo ? decomporConvexo(perfil).map((poli) => prismaConvexo(r, poli)) : [prismaConvexo(r, perfil)];
