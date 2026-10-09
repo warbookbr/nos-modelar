@@ -51,3 +51,7 @@ do CityEngine, a distribuição com espaçamento mínimo, o Wave Function Collap
 os campos implícitos do libfive, o Tissue, o Plating Generator e o MAP-Elites
 para gerar variantes de uma família. [As partes do
 braço](planos/congelados/2026-09-26-as-partes-do-braco.md) continuam congeladas.
+
+A carcaça da empilhadeira volta com a casca nativa da fatia 6, pelo
+[alinhamento](banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
+começado com a pessoa, que parou na ordem de montagem.

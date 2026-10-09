@@ -1,0 +1,113 @@
+{
+  "vista": "isometrica",
+  "plano": {
+    "texto": "Nível médio, um objeto só (a carcaça), sem unidades de detalhe. Origem na base da carcaça, que fica 150 mm acima do solo: y = 0 na base, z = 0 na face traseira do contrapeso, z crescendo para a frente, x = 0 no plano de simetria. As alturas da ficha foram reduzidas dos 150 mm do solo: o topo do contrapeso fica a 850 mm da base (1.000 - 150). A medida de altura é o contrapeso, que é a forma mais alta. O comprimento de 2.635 mm vai da face traseira do contrapeso à ponta do paralama dianteiro, e a largura de 1.150 mm sai das abas dos paralamas. Os balanços (465 e 520 mm) e o entre-eixos (1.650 mm) não viram medida, porque a carcaça não tem eixo nem roda: os cortes dos arcos das rodas ficam centrados em z = 520 (traseira) e z = 2.170 (dianteira), a partir dessas cotas, e não são conferidos pelo gate. As seis partes do alinhamento viram o inventário. O anteparo dos pedais é a subida frontal do painel frontal, e não uma peça separada. Os cortes dos arcos são polilinhas de 7 a 8 pontos calculadas à mão (raio 260 mm na frente, 330 mm atrás). O arco do contrapeso visto de cima fica reto no modelo, e o arco em planta não é representado. Não há contorno de referência neste esboço: a conferência contra a foto não foi pedida, e as proporções das vistas foram lidas a olho.",
+    "nivel": "medio",
+    "medidas": [
+      { "nome": "comprimento total da carcaça", "valor": 2635, "unidade": "mm", "origem": "ficha", "tolerancia": 2, "mede": "profundidadeTotal" },
+      { "nome": "largura externa nos paralamas", "valor": 1150, "unidade": "mm", "origem": "ficha", "tolerancia": 2, "mede": "larguraTotal" },
+      { "nome": "topo do contrapeso acima da base (1.000 - 150)", "valor": 850, "unidade": "mm", "origem": "ficha", "tolerancia": 2, "mede": "alturaTotal" }
+    ],
+    "contrato": {
+      "tocam": [
+        ["contrapeso", "capo"],
+        ["contrapeso", "laterais_E"],
+        ["contrapeso", "laterais_D"],
+        ["capo", "piso"],
+        ["capo", "laterais_E"],
+        ["capo", "laterais_D"],
+        ["piso", "laterais_E"],
+        ["piso", "laterais_D"],
+        ["piso", "painel_frontal"],
+        ["paralama_E", "laterais_E"],
+        ["paralama_D", "laterais_D"]
+      ],
+      "livres": [
+        ["paralama_E", "contrapeso"],
+        ["painel_frontal", "contrapeso"]
+      ],
+      "simetricas": [
+        ["laterais_E", "laterais_D"],
+        ["paralama_E", "paralama_D"]
+      ]
+    },
+    "pecas": [
+      { "nome": "contrapeso", "formas": ["contrapeso"], "obrigatoria": true },
+      { "nome": "capo do motor", "formas": ["capo"], "obrigatoria": true },
+      { "nome": "piso do operador", "formas": ["piso"], "obrigatoria": true },
+      { "nome": "laterais", "formas": ["laterais_*"], "obrigatoria": true },
+      { "nome": "paralamas dianteiros", "formas": ["paralama_*"], "obrigatoria": true },
+      { "nome": "painel frontal", "formas": ["painel_frontal"], "obrigatoria": true }
+    ]
+  },
+  "contato": {
+    "usar": true,
+    "tolerancia": 2,
+    "penetracao": 2,
+    "folga": 30
+  },
+  "opcoes": [
+    {
+      "titulo": "Carcaça 2,5 t",
+      "nota": "Carcaça sem torre, garfos, rodas, assento, volante e coluna de direção.",
+      "formas": [
+        {
+          "id": "contrapeso",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 860,
+          "perfil": [[0, 850], [620, 850], [620, 444], [520, 460], [287, 363], [190, 130], [217, 0], [0, 0]],
+          "centro": [0, 425, 310],
+          "cor": "#2b2d31"
+        },
+        {
+          "id": "capo",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 800,
+          "perfil": [[620, 290], [1284, 290], [1284, 569], [1000, 781], [620, 800]],
+          "centro": [0, 545, 952],
+          "cor": "#e0701e"
+        },
+        {
+          "id": "piso",
+          "tipo": "caixa",
+          "largura": 800,
+          "altura": 40,
+          "profundidade": 1370,
+          "centro": [0, 270, 1305],
+          "cor": "#1f1f22"
+        },
+        {
+          "id": "laterais_E",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 30,
+          "perfil": [[620, 800], [1000, 781], [1284, 569], [1946, 291], [2470, 640], [2470, 0], [2395, 0], [2430, 130], [2354, 314], [2170, 390], [1986, 314], [1910, 130], [1945, 0], [823, 0], [850, 130], [806, 295], [685, 416], [620, 444]],
+          "centro": [415, 400, 1545],
+          "cor": "#e0701e"
+        },
+        { "id": "laterais_D", "espelha": { "forma": "laterais_E", "eixo": "x", "pos": 0 } },
+        {
+          "id": "paralama_E",
+          "tipo": "caixa",
+          "largura": 145,
+          "altura": 20,
+          "profundidade": 385,
+          "centro": [502.5, 570, 2442.5],
+          "cor": "#7a7f87"
+        },
+        { "id": "paralama_D", "espelha": { "forma": "paralama_E", "eixo": "x", "pos": 0 } },
+        {
+          "id": "painel_frontal",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "comprimento": 800,
+          "perfil": [[1946, 290], [1990, 290], [2383, 740], [2383, 755], [1946, 569]],
+          "centro": [0, 522.5, 2164.5],
+          "cor": "#2b2d31"
+        }
+      ]
+    }
+  ]
+}
