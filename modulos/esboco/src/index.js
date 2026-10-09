@@ -587,7 +587,7 @@ export function nomesDeAncoras(tipo, forma) {
 /* A parte de um tubo como forma resolvida própria: as partes guardam o centro relativo ao do tubo, e por
    isso o tubo inteiro anda (explosão, cópia, deslocamento) mudando só o `centro` dele. */
 export function subforma(r, parte) {
-  return { id: r.id, forma: r.forma, prisma: parte.prisma, matriz: parte.matriz, centro: r.centro.map((c, i) => c + parte.dc[i]) };
+  return { id: r.id, forma: r.forma, prisma: parte.prisma, matriz: parte.matriz, centro: r.centro.map((c, i) => c + parte.dc[i]), ...(parte.esquadro ? { esquadro: parte.esquadro } : {}) };
 }
 
 export function ancorasDe(r) {
@@ -887,7 +887,7 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
   if (pontaSilenciosa(fonte.forma.ponta)) forma.ponta = fonte.forma.ponta;
   if (fonte.partes) {
     /* tubo: o sólido inteiro sofre a mesma transformação (`m`, que ainda pode ser nula) e as partes seguem o centro */
-    const partes = fonte.partes.map((pt) => ({ semTampa: pt.semTampa, prisma: pt.prisma, matriz: m ? multiplicar(m, pt.matriz ?? IDENTIDADE) : pt.matriz, dc: m ? aplicarMatriz(pt.dc, m) : pt.dc }));
+    const partes = fonte.partes.map((pt) => ({ semTampa: pt.semTampa, ...(pt.esquadro ? { esquadro: pt.esquadro } : {}), prisma: pt.prisma, matriz: m ? multiplicar(m, pt.matriz ?? IDENTIDADE) : pt.matriz, dc: m ? aplicarMatriz(pt.dc, m) : pt.dc }));
     const extremos = { inicio: m ? aplicarMatriz(fonte.extremos.inicio, m) : fonte.extremos.inicio, fim: m ? aplicarMatriz(fonte.extremos.fim, m) : fonte.extremos.fim };
     const nomeadas = fonte.nomeadas ? Object.fromEntries(Object.entries(fonte.nomeadas).map(([nome, d]) => [nome, m ? aplicarMatriz(d, m) : d])) : undefined;
     const trilha = fonte.trilha ? { ...fonte.trilha, pontos: fonte.trilha.pontos.map((q) => (m ? aplicarMatriz(q, m) : q)) } : undefined;
@@ -930,9 +930,11 @@ function construirTubo(f, pts, onde) {
     `${onde}: "raioCurva" de ${curva} mm não cabe no trecho ${i + 1} do "caminho" (${Math.round(t * 10) / 10} mm): as duas curvas pedem ${Math.round((tang[i] + tang[i + 1]) * 10) / 10} mm; reduza o raio ou afaste os pontos`));
   const linha = [pts[0]];
   const juntas = [];
+  /* índices de `linha` onde o canto vira esfera (sem raio de curva): a esfera já fecha a junta */
+  const esfericas = new Set();
   for (let i = 1; i < pts.length - 1; i++) {
     if (!(giro[i] > 0)) continue;
-    if (!(tang[i] > 0)) { linha.push(pts[i]); juntas.push(pts[i]); continue; }
+    if (!(tang[i] > 0)) { linha.push(pts[i]); juntas.push(pts[i]); esfericas.add(linha.length - 1); continue; }
     const d1 = unit(sub(pts[i], pts[i - 1]));
     const d2 = unit(sub(pts[i + 1], pts[i]));
     const A = sub(pts[i], mul(d1, tang[i]));
@@ -952,14 +954,33 @@ function construirTubo(f, pts, onde) {
     const len = Math.hypot(...d);
     if (len < 1e-9) continue;
     const pr = prisma({ tipo: 'cilindro', diametro: f.diametro, comprimento: len, eixo: 'y', lados: LADOS_DO_TUBO }, onde);
-    brutas.push({ prisma: pr, matriz: rotacaoEntre([0, 1, 0], unit(d)), centro: mul(soma(linha[i], linha[i + 1]), 0.5), semTampa: { inicio: i > 0, fim: i < linha.length - 2 } });
+    brutas.push({ prisma: pr, matriz: rotacaoEntre([0, 1, 0], unit(d)), centro: mul(soma(linha[i], linha[i + 1]), 0.5), semTampa: { inicio: i > 0, fim: i < linha.length - 2 }, dir: unit(d), iLinha: i });
+  }
+  /* Esquadro das juntas de curva, só para o desenho: dois cilindros seguidos giram um em relação ao outro, e as pontas
+     perpendiculares ao eixo de cada um se abrem em cunha do lado de fora da curva (e se atravessam do lado de dentro). Cada
+     ponta aberta é cortada no plano que divide o ângulo entre os dois eixos, e as duas pontas da junta passam a ser o mesmo
+     anel. O corte é dado no referencial local do cilindro (o vetor `e`, para fora da curva e perpendicular ao eixo, e a
+     tangente da metade do giro): um ponto a `q` do eixo, no lado de `e`, anda `t * (q · e)` ao longo do eixo, para trás no
+     início e para a frente no fim. A geometria das partes (caixas, contato, medidas) não muda. */
+  const paraLocal = (m, v) => (m ? [0, 1, 2].map((j) => m[0][j] * v[0] + m[1][j] * v[1] + m[2][j] * v[2]) : v);
+  for (let k = 1; k < brutas.length; k++) {
+    const ant = brutas[k - 1];
+    const cur = brutas[k];
+    if (cur.iLinha !== ant.iLinha + 1 || esfericas.has(cur.iLinha)) continue;
+    const c = Math.max(-1, Math.min(1, escalarV(ant.dir, cur.dir)));
+    if (c > 1 - 1e-12) continue;
+    const t = Math.sqrt((1 - c) / (1 + c));
+    const eCur = unit(sub(ant.dir, mul(cur.dir, c)));
+    const eAnt = unit(sub(mul(ant.dir, c), cur.dir));
+    cur.esquadro = { ...cur.esquadro, inicio: { e: paraLocal(cur.matriz, eCur), t } };
+    ant.esquadro = { ...ant.esquadro, fim: { e: paraLocal(ant.matriz, eAnt), t } };
   }
   for (const p of juntas) brutas.push({ prisma: prisma({ tipo: 'esfera', diametro: f.diametro }, onde), matriz: null, centro: p, semTampa: { inicio: true, fim: true } });
   const caixas = brutas.map((q) => { const l = caixaLocal(q.prisma, q.matriz); return { min: l.min.map((v, i) => v + q.centro[i]), max: l.max.map((v, i) => v + q.centro[i]) }; });
   const min = [0, 1, 2].map((i) => Math.min(...caixas.map((c) => c.min[i])));
   const max = [0, 1, 2].map((i) => Math.max(...caixas.map((c) => c.max[i])));
   const centro = min.map((v, i) => (v + max[i]) / 2);
-  for (const q of brutas) partes.push({ prisma: q.prisma, matriz: q.matriz, dc: sub(q.centro, centro), semTampa: q.semTampa });
+  for (const q of brutas) partes.push({ prisma: q.prisma, matriz: q.matriz, dc: sub(q.centro, centro), semTampa: q.semTampa, ...(q.esquadro ? { esquadro: q.esquadro } : {}) });
   return { partes, centro, extremos: { inicio: sub(pts[0], centro), fim: sub(pts[pts.length - 1], centro) }, trilha: { pontos: linha.map((q) => sub(q, centro)), fechado: false } };
 }
 
@@ -1547,10 +1568,10 @@ function ordemDasFaces(lados, olho) {
 /* `semFatias`: uma face lateral por lado do perfil em vez de uma por fatia. A ordem de profundidade do desenho
    precisa das fatias, mas a silhueta e a profundidade de cada célula da projeção não (as faces de uma mesma faixa
    são coplanares), e a projeção passa de 36 fatias por forma a uma. */
-export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36 } = {}) {
+export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquadrar = false } = {}) {
   if (r.partes) {
     /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
-    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias, maxFatias }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
+    return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias, maxFatias, esquadrar }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
   }
   if (r.prisma.casca) return fatiarCasca(r, olho, maxFatias);
   if (r.prisma.secoes) return fatiarSecoes(r, olho, maxFatias);
@@ -1558,8 +1579,16 @@ export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36 } = {})
   const furosLista = furos ?? (furo ? [furo] : []);
   const c = r.centro;
   const m = r.matriz;
+  /* `esquadrar` (só o desenho): as pontas abertas das juntas de curva do tubo viram o plano que divide o ângulo entre os dois
+     eixos, e o corte se interpola ao longo do cilindro (ver `construirTubo`); as fatias do cilindro seguem em linha reta */
+  const esq = esquadrar ? r.esquadro : undefined;
   const mundo = (u, v, w) => {
     const pl = ponto3(b, u, v, w);
+    if (esq) {
+      const f = (w + comprimento / 2) / comprimento;
+      const lateral = (e) => pl[b.u] * e[b.u] + pl[b.v] * e[b.v];
+      pl[b.e] += (esq.inicio ? -(1 - f) * esq.inicio.t * lateral(esq.inicio.e) : 0) + (esq.fim ? f * esq.fim.t * lateral(esq.fim.e) : 0);
+    }
     const pr = aplicarMatriz(pl, m);
     return [pr[0] + c[0], pr[1] + c[1], pr[2] + c[2]];
   };
@@ -2401,7 +2430,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     exigir(!corte || formas.some((r) => r.min[k] < corte.valor && r.max[k] > corte.valor), `${opcao.titulo ?? 'opção'}: o plano ${corte?.eixo}=${corte?.valor} não atravessa nenhuma forma (elas vão de ${arredMm(Math.min(...formas.map((r) => r.min[k])))} a ${arredMm(Math.max(...formas.map((r) => r.max[k])))} mm em ${corte?.eixo})`);
     const secaoVisivel = corte && frenteDoCorte(corte, lado, olho) > 1e-6;
     let itens = formas.map((r) => {
-      let chunks = fatiarForma(r, olho, previa ? { maxFatias: FATIAS_DA_PREVIA } : {});
+      let chunks = fatiarForma(r, olho, { esquadrar: true, ...(previa ? { maxFatias: FATIAS_DA_PREVIA } : {}) });
       let secao = null;
       if (corte) {
         chunks = chunks.map((ch) => recortarBloco(ch, corte, lado === '+' ? 1 : -1)).filter(Boolean);

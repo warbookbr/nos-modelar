@@ -59,7 +59,8 @@ const OPCOES_DA_CAMADA = { camada: MOTOR_DO_PNG === 'webgl' };
 
 /* Roda dentro do Chromium: desenha a camada das formas com câmera ortográfica em pixels do quadro (x, y) e profundidade z
    ao longo do olho. Cores sem gestão de cor (o pixel é o hexadecimal da face), traços como fitas de 2 px com viés para a
-   frente, faces com `polygonOffset` para o traço não ser comido pela face vizinha de inclinação forte, e formas com
+   frente, deitadas na superfície da forma sob elas (o `perfil` de cada segmento, de `camada.js`: a fita não é comida pela
+   própria face, por mais inclinada que seja, e não passa à frente de uma face de outra forma que a cobre), e formas com
    opacidade em dois passes (profundidade, depois cor só onde a profundidade é a mais próxima da própria forma, de modo que
    as faces da forma não escurecem onde se sobrepõem). Devolve o PNG em data URL, com fundo transparente. */
 /* o argumento vai como texto JSON: o Playwright serializa cada número de um objeto grande e leva segundos */
@@ -87,11 +88,13 @@ const DESENHAR_CAMADA = async (texto) => {
   const cam = new T.OrthographicCamera(0, camada.largura, 0, camada.altura, 1, topo + 10);
   cam.position.z = topo;
   const cena = new T.Scene();
-  const VIES_DO_TRACO = 0.1;
+  /* folga do traço à frente da superfície sob ele, em mm: cobre a diferença de profundidade entre a fita e a face nas bordas
+     dos triângulos inclinados (o raster calcula a profundidade no centro do pixel e extrapola), que sem ela salta o traço de
+     uma superfície curva; fica abaixo da espessura de uma chapa vista pelo olho */
+  const VIES_DO_TRACO = 0.5;
   const meia = camada.larguraDoTraco / 2;
   const rgb = (k) => [1, 3, 5].map((i) => parseInt(k.slice(i, i + 2), 16) / 255);
   const preto = new T.Color(camada.corDoTraco);
-  const compensacao = { polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 };
   const faces = (lista, pos, col) => {
     for (const f of lista) {
       const c = f.c.slice();
@@ -104,8 +107,9 @@ const DESENHAR_CAMADA = async (texto) => {
       for (const i of idx) { const q = todos[i]; pos.push(q[0], q[1], q[2] - z0); col.push(k[0], k[1], k[2]); }
     }
   };
-  const fitas = (tracos, pos, ponta) => {
-    for (const t of tracos) {
+  const colunas = camada.colunasDoTraco ?? [-1, 0, 1];
+  const fitas = (tracos, inclinacoes, pos, ponta) => {
+    tracos.forEach((t, ti) => {
       for (let i = 0; i + 1 < t.length; i++) {
         const a = t[i]; const b = t[i + 1];
         const dx = b[0] - a[0]; const dy = b[1] - a[1];
@@ -113,12 +117,33 @@ const DESENHAR_CAMADA = async (texto) => {
         if (n < 1e-6) continue;
         const ux = (dx / n) * meia; const uy = (dy / n) * meia;
         const e = ponta ? 1 : 0;
-        const A = [a[0] - ux * e, a[1] - uy * e, a[2] - z0 + VIES_DO_TRACO];
-        const B = [b[0] + ux * e, b[1] + uy * e, b[2] - z0 + VIES_DO_TRACO];
-        const p = [[A[0] - uy, A[1] + ux, A[2]], [A[0] + uy, A[1] - ux, A[2]], [B[0] - uy, B[1] + ux, B[2]], [B[0] + uy, B[1] - ux, B[2]]];
-        for (const j of [0, 1, 2, 1, 3, 2]) pos.push(...p[j]);
+        /* A fita é uma tira de 2 px com o eixo no próprio segmento, nas colunas de `colunasDoTraco`, em frações da meia largura (o
+           sinal positivo é o do lado de (-dy, dx)); cada coluna leva a profundidade da superfície sob ela (`perfil`, em relação
+           ao eixo), de modo que a fita não fica atrás da própria face, por mais inclinada que seja, nem na frente do que está
+           atrás dela. Sem face, a fita é plana. */
+        const [perfil, fundoA, fundoB] = inclinacoes?.[ti]?.[i] ?? [Array(2 * (colunas.length - 1)).fill(0), 0, 0];
+        const corte = (q, desvios) => {
+          const z = q[2] - z0 + VIES_DO_TRACO;
+          let k = 0;
+          return colunas.map((s) => [q[0] + s * -uy, q[1] + s * ux, z + (s === 0 ? 0 : desvios[k++])]);
+        };
+        /* a ponta que passa do vértice em meia largura, só para preencher a quina entre dois segmentos: um retângulo plano na
+           profundidade, afundado atrás do vértice o bastante para nunca ficar à frente de uma face inclinada que passa atrás
+           dele (plano porque o raster calcula a profundidade no centro do pixel e extrapola nas bordas do triângulo, e um
+           triângulo inclinado em profundidade a adianta nas amostras de borda) */
+        const ponta0 = (q, sinal, fundo) => {
+          const z = q[2] - fundo - z0 + VIES_DO_TRACO;
+          const x = q[0] + sinal * ux; const y = q[1] + sinal * uy;
+          return [[[q[0], q[1], z], [q[0] - uy, q[1] + ux, z], [q[0] + uy, q[1] - ux, z]], [[x, y, z], [x - uy, y + ux, z], [x + uy, y - ux, z]]];
+        };
+        const A = corte(a, perfil.slice(0, perfil.length / 2));
+        const B = corte(b, perfil.slice(perfil.length / 2));
+        for (let c = 0; c + 1 < colunas.length; c++) for (const m of [A[c], A[c + 1], B[c], A[c + 1], B[c + 1], B[c]]) pos.push(...m);
+        if (e) {
+          for (const [P, Q] of [ponta0(a, -1, fundoA), ponta0(b, 1, fundoB)]) for (const k of [1, 2]) for (const m of [P[0], P[k], Q[0], P[k], Q[k], Q[0]]) pos.push(...m);
+        }
       }
-    }
+    });
   };
   const malha = (pos, col, material, ordem) => {
     const g = new T.BufferGeometry();
@@ -132,15 +157,15 @@ const DESENHAR_CAMADA = async (texto) => {
   const opacas = camada.formas.filter((f) => f.opacidade >= 1);
   const translucidas = camada.formas.filter((f) => f.opacidade < 1).sort((a, b) => a.prof - b.prof || a.rank - b.rank);
   const pos = []; const col = []; const fita = [];
-  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, fita, true); }
-  malha(pos, col, new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide, ...compensacao }), 0);
+  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, f.inclinacoes, fita, true); }
+  malha(pos, col, new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide }), 0);
   malha(fita, null, new T.MeshBasicMaterial({ color: preto, side: T.DoubleSide, depthWrite: false }), 1);
   translucidas.forEach((f, i) => {
     const p = []; const c = []; const t = [];
     faces(f.faces, p, c);
-    fitas(f.tracos, t, false);
-    malha(p, c, new T.MeshBasicMaterial({ colorWrite: false, transparent: true, side: T.DoubleSide, ...compensacao }), 10 + 3 * i);
-    malha(p, c, new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: f.opacidade, depthWrite: false, depthFunc: T.EqualDepth, side: T.DoubleSide, ...compensacao }), 11 + 3 * i);
+    fitas(f.tracos, f.inclinacoes, t, false);
+    malha(p, c, new T.MeshBasicMaterial({ colorWrite: false, transparent: true, side: T.DoubleSide }), 10 + 3 * i);
+    malha(p, c, new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: f.opacidade, depthWrite: false, depthFunc: T.EqualDepth, side: T.DoubleSide }), 11 + 3 * i);
     malha(t, null, new T.MeshBasicMaterial({ color: preto, transparent: true, opacity: f.opacidade, depthWrite: false, side: T.DoubleSide }), 12 + 3 * i);
   });
   renderer.render(cena, cam);
