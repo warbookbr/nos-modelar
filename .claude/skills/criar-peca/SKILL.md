@@ -51,11 +51,14 @@ As operações que publicam `origem` aceitam endereçamento estrutural conforme
 [`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
 que é consulta, e não leitura de partida.
 
-**ID LITERAL:** `moveV`, `moveF`, `moveA`, `vira`, `extruda`, `mescla` e
-`pesar` não aceitam `sel`; `sel` não é atalho e deve falhar de forma explícita.
+**ID LITERAL:** `moveV`, `moveF`, `moveA`, `vira`, `mescla` e `pesar` não
+aceitam `sel`; `sel` não é atalho e deve falhar de forma explícita.
 Escolher uma delas é assumir dívida posicional, e ela é relatada. Para
 identidade estável, prefira uma primitiva com `origemId` seguida de
 `transladar`, `rotaciona` ou `espelha`.
+
+`extruda` também aceita `sel` que resolva para uma face só, inclusive por
+propriedade geométrica (`sel: {onde: ...}`).
 
 `apagaFace` é a exceção importante: aceita `sel: {...}`, exige exatamente uma
 face e é a forma semântica de abrir um vão.

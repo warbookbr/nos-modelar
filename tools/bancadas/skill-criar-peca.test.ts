@@ -83,7 +83,7 @@ describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
     // se esta expectativa cair, é o NÚCLEO que mudou — reveja a skill de novo.
     expect(medido).toEqual({
       moveV: false, moveF: false, moveA: false, vira: false,
-      apagaFace: true, extruda: false, mescla: false, pesar: false,
+      apagaFace: true, extruda: true, mescla: false, pesar: false,
     });
   });
 
