@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-972 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+982 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -116,6 +116,8 @@
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
+- `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
+- `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Mecanifica deve cobrir
 - `FERRAMENTAS-POR-OBJETO.md` — Ferramentas por objeto
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
@@ -134,6 +136,8 @@
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
@@ -548,6 +552,15 @@
 - `fixture.js` — fixture.js — articulação sintética da extensão: a folha de uma porta que gira noventa graus no eixo da porta publicada pelo batente. As peças e as portas vêm…
 - `implementacao.js` — implementacao.js — a articulação não emite vértice nem face. Recebe somente a resolução numérica do contexto e lê a declaração; declaração inválida descarta …
 - `manifesto.js` — manifesto.js — contrato versionado da extensão de articulação.
+
+## procedural/extensoes/chapa-dobrada/
+
+- `chapa-dobrada.test.mjs` — chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta, determinismo e recusas que dizem camp…
+- `chapa.js` — chapa.js — a conta da chapa dobrada: contorno da seção com as dobras no raio pedido e as medidas de chapa.
+- `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça: um L de chapa de 2 mm, raio interno 2 mm, 30 mm de largura.
+- `implementacao.js` — implementacao.js — extrusa o contorno da chapa dobrada numa largura; recebe somente emissor transacional e resolução numérica.
+- `index.js` — index.js — o pacote registrável da extensão chapa dobrada: manifesto, implementação e a conta das medidas.
+- `manifesto.js` — manifesto.js — contrato versionado da extensão chapa dobrada: espessura, raio interno e abas, com as medidas de chapa.
 
 ## procedural/extensoes/prisma-triangular/
 
