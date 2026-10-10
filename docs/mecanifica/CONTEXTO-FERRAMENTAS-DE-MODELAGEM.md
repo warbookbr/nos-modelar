@@ -94,6 +94,15 @@ nos esboços do banco; (8) um objeto refeito no caminho novo e medido em tokens,
 rodadas e nota contra a medição gravada, e só então a troca da skill
 `esboco-detalhado`.
 
+## Pendências da camada de features
+
+O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
+item 4 do gate de saída e mostrou duas limitações do `arredondarAresta`, que a
+pessoa mandou corrigir antes de qualquer peça de chapa com furo: o vértice onde
+três arestas arredondadas se encontram fica vivo, e a aresta da tampa de um
+perfil com furo é recusada, porque a tampa sai em leque de triângulos. Depois
+da correção, o suporte é refeito e entra no acervo com a aprovação da pessoa.
+
 ## Depois do plano
 
 A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos

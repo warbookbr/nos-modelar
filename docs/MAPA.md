@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1019 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1022 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -149,6 +149,12 @@
 ## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/
 
 - `ALINHAMENTO.md` — Carcaça da empilhadeira: alinhamento
+
+## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
+
+- `README.md` — Suporte de tubo sem identificador numérico
+- `alvo.md` — Alvo do suporte-tubo
+- `receita.js` — suporte-tubo — suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede.
 
 ## docs/mecanifica/gerado/
 
