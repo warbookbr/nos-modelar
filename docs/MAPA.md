@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-995 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+989 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -116,8 +116,6 @@
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
-- `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
-- `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Mecanifica deve cobrir
 - `FERRAMENTAS-POR-OBJETO.md` — Ferramentas por objeto
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
@@ -136,8 +134,6 @@
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
-- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
-- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
@@ -618,8 +614,6 @@
 - `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
 - `mat4.js` — mat4 mínimo do motor v3 (D-55) — colunas-major, como o WebGL espera
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
-- `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
-- `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).

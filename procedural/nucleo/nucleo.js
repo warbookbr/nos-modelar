@@ -529,19 +529,15 @@ function argumentoDesconhecido(st, i, op, args, registrada = null) {
    e o vértice que nenhuma face usa mais sai); `declararOrigem` publica a origem estrutural do resultado. Face emitida
    pode herdar cor, material, parte, liso e sólido de uma face lida (`herda`). */
 function contextoNativo(st, i, { leitura = false, op = null } = {}) {
-  const vertices = new Map(), faces = new Map(), base = baseDoPasso(i);
+  const vertices = new Map(), faces = new Map();
   const lidosV = new Map(), lidasF = new Map(), herancas = new Map(), consumir = new Set();
   let origem = null;
-  const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO - 1}`); return id; };
+  /* ids do bloco do passo e, dali em diante, a faixa estendida (`idDoPasso`): extensão que emite mais de BLOCO vértices ou faces continua posicional */
+  const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO + FAIXA_ESTENDIDA) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO + FAIXA_ESTENDIDA - 1}`); return id; };
   const refExistente = (v) => v !== null && typeof v === 'object' && Object.hasOwn(v, 'existente');
   const chaveV = (v) => (refExistente(v) ? `e${v.existente}` : `l${v}`);
   const ok = (v) => (refExistente(v) ? lidosV.has(v.existente) : vertices.has(v));
   const contexto = {
-function contextoNativo(st, i) {
-  const vertices = new Map(), faces = new Map();
-  /* ids do bloco do passo e, dali em diante, a faixa estendida (`idDoPasso`): extensão que emite mais de BLOCO vértices ou faces continua posicional */
-  const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO + FAIXA_ESTENDIDA) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO + FAIXA_ESTENDIDA - 1}`); return id; };
-  return Object.freeze({
     numero: (valor) => st.num(valor), vetor: (valor) => st.vec(valor),
     limiteDeIds: BLOCO,
     emitirVertice(id, ponto) { id = local(id, 'vértice'); if (vertices.has(id)) throw new Error(`vértice local ${id} duplicado`); vertices.set(id, st.vec(ponto)); },
@@ -553,15 +549,15 @@ function contextoNativo(st, i) {
       if (opcoes.herda != null) herancas.set(id, opcoes.herda);
     },
     publicar() {
-      const gv = (v) => (refExistente(v) ? v.existente : base + v);
-      for (const [id, ponto] of vertices) addV(st, base + id, ponto);
+      const gv = (v) => (refExistente(v) ? v.existente : idDoPasso(i, v));
+      for (const [id, ponto] of vertices) addV(st, idDoPasso(i, id), ponto);
       for (const [id, vs] of faces) {
-        addF(st, base + id, vs.map(gv));
+        addF(st, idDoPasso(i, id), vs.map(gv));
         const de = herancas.get(id);
         if (de != null && st.F.has(de)) {
-          const f = st.F.get(base + id), o = st.F.get(de);
+          const f = st.F.get(idDoPasso(i, id)), o = st.F.get(de);
           f.cor = o.cor; f.material = o.material; f.parte = o.parte; f.liso = o.liso; f.solido = o.solido;
-          if (st.parteAtribuidaEm?.has(de)) st.parteAtribuidaEm.set(base + id, st.parteAtribuidaEm.get(de));
+          if (st.parteAtribuidaEm?.has(de)) st.parteAtribuidaEm.set(idDoPasso(i, id), st.parteAtribuidaEm.get(de));
         }
       }
       if (consumir.size) {
@@ -572,7 +568,7 @@ function contextoNativo(st, i) {
         for (const v of afetados) if (!usados.has(v)) st.V.delete(v);
       }
       if (origem) {
-        const global = (f) => (refExistente(f) ? f.existente : base + f);
+        const global = (f) => (refExistente(f) ? f.existente : idDoPasso(i, f));
         const grupos = Object.fromEntries(Object.entries(origem.grupos).map(([nome, lista]) => [nome, lista.map(global).filter((f) => st.F.has(f)).sort((a, b) => a - b)]));
         registraOrigem(st, i, op, origem.id, { ...grupos, passo: i });
       }
@@ -609,9 +605,6 @@ function contextoNativo(st, i) {
     });
   }
   return Object.freeze(contexto);
-    emitirFace(id, vs) { id = local(id, 'face'); if (faces.has(id) || !Array.isArray(vs) || vs.length < 3 || new Set(vs).size !== vs.length || vs.some((v) => !vertices.has(v))) throw new Error(`face local ${id} inválida`); faces.set(id, vs.slice()); },
-    publicar() { for (const [id, ponto] of vertices) addV(st, idDoPasso(i, id), ponto); for (const [id, vs] of faces) addF(st, idDoPasso(i, id), vs.map((v) => idDoPasso(i, v))); },
-  });
 }
 
 /* CONTRATO DE IDENTIDADE DE PARTE — a ÚNICA definição de "esta face tem nome".

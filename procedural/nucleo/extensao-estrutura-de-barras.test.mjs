@@ -1,12 +1,12 @@
 /* estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta,
    comprimentos de corte, peso por metro, determinismo e recusas. */
 import { describe, expect, it } from 'vitest';
-import { BASE_ESTENDIDA, REGISTRO_OPERACOES, criarRegistroComExtensoes, nucleo } from '../../nucleo/entrada.js';
-import { descreverEstrutura, construirEstrutura } from './estrutura.js';
-import { secao, normalizarPerfil } from './perfis.js';
-import { MANIFESTO } from './manifesto.js';
-import { implementar } from './implementacao.js';
-import { PASSOS } from './fixture.js';
+import { BASE_ESTENDIDA, REGISTRO_OPERACOES, criarRegistroComExtensoes, nucleo } from './entrada.js';
+import { descreverEstrutura, construirEstrutura } from '../extensoes/estrutura-de-barras/estrutura.js';
+import { secao, normalizarPerfil } from '../extensoes/estrutura-de-barras/perfis.js';
+import { MANIFESTO } from '../extensoes/estrutura-de-barras/manifesto.js';
+import { implementar } from '../extensoes/estrutura-de-barras/implementacao.js';
+import { PASSOS } from '../extensoes/estrutura-de-barras/fixture.js';
 
 const registro = criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto: MANIFESTO, implementacao: implementar }] });
 const N = (nome, x, y, z) => ({ nome, posicao: [x, y, z] });
@@ -348,9 +348,9 @@ describe('nós por nome e posições por parâmetro', () => {
 
   it('o contrato publicado recusa campo desconhecido com a lista do que aceita', () => {
     const neutro = nucleo([['estruturaDeBarras', { ...quadro(), tubos: 1 }]], {}, {}, {}, null, [], { registroOperacoes: registro });
-    /* a extensão nativa não passa pela guarda do núcleo (ela só vê operações do registro base); a recusa é da própria extensão */
-    expect(neutro.orfaos[0].motivo).toContain('tubos = 1 não é aceito');
-    expect(neutro.orfaos[0].motivo).toContain('campo da chamada: nos, barras, perfil, densidade, unidade');
+    /* a guarda de argumento desconhecido do núcleo vale também para a operação de extensão registrada */
+    expect(neutro.orfaos[0].motivo).toContain("argumento desconhecido 'tubos'");
+    expect(neutro.orfaos[0].motivo).toContain("'estruturaDeBarras' aceita: nos, barras, perfil, densidade, unidade");
   });
 });
 

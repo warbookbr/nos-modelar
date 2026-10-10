@@ -1,8 +1,8 @@
 /* chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta,
    determinismo e recusas que dizem campo, valor e o que é aceito. */
 import { describe, expect, it } from 'vitest';
-import { REGISTRO_OPERACOES, criarRegistroComExtensoes, nucleo } from '../../nucleo/entrada.js';
-import { EXTENSAO, MANIFESTO, PASSOS, medidasDaChapa } from './index.js';
+import { REGISTRO_OPERACOES, criarRegistroComExtensoes, nucleo } from './entrada.js';
+import { EXTENSAO, MANIFESTO, PASSOS, medidasDaChapa } from '../extensoes/chapa-dobrada/index.js';
 
 const registro = criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [EXTENSAO] });
 const executar = (argumentos) => nucleo([['chapaDobrada', argumentos]], {}, {}, {}, null, [], { registroOperacoes: registro });
@@ -227,7 +227,7 @@ describe('chapa dobrada — recusas', () => {
     ['uma aba só', { ...L, abas: [{ comprimento: 40 }] }, /abas: veio .*aceito uma lista de 2 a 32 abas/],
     ['abas e perfil juntos', { ...L, perfil: [[0, 0], [10, 0], [10, 10]] }, /exatamente um entre abas .* e perfil/],
     ['nem abas nem perfil', { espessura: 2, raioInterno: 2, largura: 5 }, /exatamente um entre abas/],
-    ['campo desconhecido', { ...L, folga: 1 }, /folga: veio 1; aceito um destes campos: espessura, raioInterno/],
+    ['campo desconhecido', { ...L, folga: 1 }, /folga: veio 1; aceito um destes campos: espessura, raioInterno|argumento desconhecido 'folga'\..*'chapaDobrada' aceita: .*espessura.*raioInterno/],
     ['raioInterno ausente', { espessura: 2, largura: 5, abas: L.abas }, /raioInterno: veio undefined; aceito um número \(campo obrigatório\)/],
     ['perfil com segmento mais curto que a dobra', { espessura: 2, raioInterno: 2, largura: 10, perfil: [[0, 0], [20, 0], [20, 3]] }, /perfil\[1\]\.\.perfil\[2\]: veio .*aceito um trecho de mais de .*mais curto que a dobra/],
     ['perfil com ponto colinear', { espessura: 2, raioInterno: 2, largura: 10, perfil: [[0, 0], [10, 0], [20, 0]] }, /perfil\[1\]: veio \[10,0\]; aceito um ponto onde a linha dobra/],

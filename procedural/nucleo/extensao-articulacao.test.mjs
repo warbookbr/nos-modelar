@@ -3,11 +3,11 @@
    declaração inválida descarta o passo inteiro. A conferência do curso contra
    a montagem é provada em `src/autoria/conferir-articulacao.test.mjs`. */
 import { describe, expect, it } from 'vitest';
-import { REGISTRO_OPERACOES, buscarCapacidades, catalogoDeCapacidades, criarRegistroComExtensoes, diagnosticarExtensaoAusente, nucleo } from '../../nucleo/entrada.js';
-import { MANIFESTO } from './manifesto.js';
-import { implementar } from './implementacao.js';
-import { ARTICULACAO, PASSOS } from './fixture.js';
-import { ErroArticulacao, lerArticulacao } from './declaracao.js';
+import { REGISTRO_OPERACOES, buscarCapacidades, catalogoDeCapacidades, criarRegistroComExtensoes, diagnosticarExtensaoAusente, nucleo } from './entrada.js';
+import { MANIFESTO } from '../extensoes/articulacao/manifesto.js';
+import { implementar } from '../extensoes/articulacao/implementacao.js';
+import { ARTICULACAO, PASSOS } from '../extensoes/articulacao/fixture.js';
+import { ErroArticulacao, lerArticulacao } from '../extensoes/articulacao/declaracao.js';
 
 const registro = () => criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto: MANIFESTO, implementacao: implementar }] });
 
