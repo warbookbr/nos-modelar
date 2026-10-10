@@ -364,13 +364,17 @@ function malhaPrisma(volume) {
   for (const sinal of [-1, 1]) for (const [a, b] of volume.perfil) {
     const ponto = [...volume.centro]; ponto[e] += sinal * volume.comprimento / 2; ponto[pa] += a; ponto[pb] += b; vertices.push(ponto);
   }
-  const inverso = areaAssinada(volume.perfil) < 0;
+  /* A normal sai para fora quando o perfil anti-horário gira em torno de +extrusão. Isso depende da área do contorno e de
+     (perfil a, perfil b, extrusão) formar o ciclo x→y→z: com uma permutação ímpar o giro se inverte, e só a área não basta.
+     Os dois fatos juntos decidem o sentido de todas as faces, tampas e laterais. */
+  const cicloPositivo = pb === (pa + 1) % 3;
+  const inverter = (areaAssinada(volume.perfil) > 0) !== cicloPositivo;
+  const face = (a, b, c) => (inverter ? [a, c, b] : [a, b, c]);
   for (let i = 1; i < n - 1; i++) {
-    faces.push(inverso ? [0, i, i + 1] : [0, i + 1, i]);
-    faces.push(inverso ? [n, n + i + 1, n + i] : [n, n + i, n + i + 1]);
+    faces.push(face(0, i + 1, i), face(n, n + i, n + i + 1));
   }
   for (let i = 0; i < n; i++) {
-    const j = (i + 1) % n; faces.push([i, j, n + j], [i, n + j, n + i]);
+    const j = (i + 1) % n; faces.push(face(i, j, n + j), face(i, n + j, n + i));
   }
   return { vertices, faces };
 }

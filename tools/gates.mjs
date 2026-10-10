@@ -18,8 +18,42 @@
  * laço curto enquanto conserta um gate específico.
  */
 import { spawn, spawnSync } from 'node:child_process';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
-import { pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+/* A SAÍDA INTEIRA DE UM GATE QUE FALHA VAI PARA UM ARQUIVO.
+ *
+ * Quem roda `npm run gates` lê o fim do relatório, e um gate que falha com
+ * centenas de linhas de teste perde o começo: a falha que interessa costuma
+ * estar lá. Uma falha do gate `test` ficou sem investigação porque a saída se
+ * perdeu no terminal.
+ *
+ * Por isso a saída de cada gate que falha é gravada inteira em `tmp/gates/`,
+ * que é ignorado pelo git, e a linha de falha, tanto a do bloco do gate quanto
+ * a do resumo final, traz o caminho. Gate que passa não deixa arquivo; o
+ * arquivo de uma falha anterior é apagado quando o mesmo gate passa. Cada gate
+ * tem um arquivo só, sobrescrito a cada execução, então o caminho é o mesmo
+ * entre rodadas. */
+export const DIRETORIO_DAS_SAIDAS = join('tmp', 'gates');
+
+export function guardarSaidaDoGate(gate, saida, codigo, raiz = RAIZ) {
+  const caminho = join(raiz, DIRETORIO_DAS_SAIDAS, `${gate.replace(/:/g, '-')}.log`);
+  if (codigo === 0) {
+    rmSync(caminho, { force: true });
+    return null;
+  }
+  mkdirSync(dirname(caminho), { recursive: true });
+  writeFileSync(caminho, saida, 'utf8');
+  return caminho;
+}
+
+export function linhaDeFalha(gate, arquivo) {
+  return `▶ ${gate} — FALHOU; saída inteira em ${arquivo}`;
+}
 
 /* Exportada porque `tools/mapa/gates-espelham-ci.test.mjs` compara esta lista
    com os passos do `ci.yml`, nos dois sentidos. A lista morava na corrente de
@@ -183,11 +217,13 @@ function rodarGate(gate, { silencioso }) {
     processo.on('close', (status) => {
       const duracao = Date.now() - inicio;
       const codigo = status ?? 1;
+      const saida = Buffer.concat(pedacos).toString();
+      const arquivo = guardarSaidaDoGate(gate, saida, codigo);
       if (!silencioso || codigo !== 0) {
-        process.stdout.write(`▶ ${gate} — ${codigo === 0 ? 'ok' : 'FALHOU'}\n`);
-        process.stdout.write(Buffer.concat(pedacos).toString());
+        process.stdout.write(codigo === 0 ? `▶ ${gate} — ok\n` : `${linhaDeFalha(gate, arquivo)}\n`);
+        process.stdout.write(saida);
       }
-      resolver({ gate, codigo, duracao });
+      resolver({ gate, codigo, duracao, arquivo });
     });
   });
 }
@@ -248,9 +284,9 @@ async function executar() {
   const total = resultados.reduce((soma, r) => soma + r.duracao, 0);
 
   console.log(`\n${'─'.repeat(52)}`);
-  for (const { gate, codigo, duracao } of resultados) {
+  for (const { gate, codigo, duracao, arquivo } of resultados) {
     const marca = codigo === 0 ? '✓' : '✗';
-    console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s`);
+    console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);
   }
   const naoRodados = bateria.length - resultados.length;
   console.log('─'.repeat(52));
