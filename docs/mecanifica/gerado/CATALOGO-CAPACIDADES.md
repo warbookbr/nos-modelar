@@ -2,7 +2,7 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:91b8215f1ddc9196704f5751b1632d9320b6fc7be4e2e7ca9d668a746ff68d10`.
+Assinatura do registro: `sha256:20085ba6934d81ffb7d425e875c7609385c58a2f3defb8bf12742a44c9f94476`.
 
 Há 37 operações em 1 módulo(s).
 
@@ -30,12 +30,12 @@ Há 37 operações em 1 módulo(s).
 | `liso` | Marcar faces para sombreamento liso. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.liso@1` |
 | `loft` | Conectar seções ao longo de um caminho 3D. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.loft@1` |
 | `material` | Associar faces a um material declarado em MATERIAIS. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.material@1` |
-| `mescla` | Fundir vértices posicionais em um vértice-alvo. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.mescla@1` |
-| `moveA` | Mover os dois vértices de uma aresta posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.moveA@1` |
-| `moveF` | Mover todos os vértices de uma face posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.moveF@1` |
-| `moveV` | Mover um vértice por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.moveV@1` |
+| `mescla` | Fundir vértices em um vértice-alvo, por seleção ou por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.mescla@1` |
+| `moveA` | Mover os dois vértices de uma aresta, escolhida por seleção que resolva para uma só ou por IDs posicionais. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.moveA@1` |
+| `moveF` | Mover todos os vértices de uma face, escolhida por seleção que resolva para uma só ou por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.moveF@1` |
+| `moveV` | Mover um vértice, por seleção que resolva para um só ou por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.moveV@1` |
 | `parte` | Nomear faces como parte semântica e declarar hierarquia opcional. | `mecanifica.malha-poligonal@1` → `mecanifica.parte@1` | — → — | 1 | `mecanifica.argumentos.parte@1` |
-| `pesar` | Atribuir peso de osso a vértices ou faces posicionais. | `mecanifica.malha-poligonal@1` → `mecanifica.pesos@1` | — → — | 1 | `mecanifica.argumentos.pesar@1` |
+| `pesar` | Atribuir peso de osso a vértices, escolhidos por seleção ou por IDs posicionais. | `mecanifica.malha-poligonal@1` → `mecanifica.pesos@1` | — → — | 1 | `mecanifica.argumentos.pesar@1` |
 | `pincel` | Atribuir cor de face ou dabs locais determinísticos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.pincel@1` |
 | `plano` | Criar grade plana no plano xz. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.plano@1` |
 | `publicarPorta` | Publicar interface semântica endereçável de uma origem existente. | `mecanifica.malha-poligonal@1` → `mecanifica.porta@1` | — → — | 1 | `mecanifica.argumentos.publicarPorta@1` |
@@ -44,7 +44,7 @@ Há 37 operações em 1 módulo(s).
 | `subtrair` | Tirar do primeiro sólido o volume dos demais. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.subtrair@1` |
 | `transladar` | Transladar malha inteira ou seleção semântica. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.transladar@1` |
 | `unir` | Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.unir@1` |
-| `vira` | Inverter o winding de uma face posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.vira@1` |
+| `vira` | Inverter o winding de uma ou mais faces, por seleção ou por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.vira@1` |
 
 ## Como usar
 

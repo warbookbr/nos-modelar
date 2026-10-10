@@ -1,7 +1,7 @@
 /* atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 import { valorDoLiso } from '../liso-por-angulo.js';
 export function criarOperacoesAtributos(servicos) {
-  const { FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico } = servicos;
+  const { FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, resolverSelecao, neutroCanonico } = servicos;
   return {
   pincel(st, a, i) {
     const modo = a.modo ?? 'face';
@@ -148,6 +148,13 @@ export function criarOperacoesAtributos(servicos) {
     if (!st.ossoSet || !st.ossoSet.has(osso)) return grita(st, i, 'pesar', osso, st.ossoSet ? `osso '${osso}' não existe em ESQUELETO` : 'peça sem ESQUELETO (nenhum osso pra pesar)');
     const peso = st.num(a.peso ?? 0);
     const alvos = new Set();
+    if (a.sel != null) {
+      if (a.vs != null || a.faces != null) return grita(st, i, 'pesar', a.vs != null ? 'vs+sel' : 'faces+sel', 'seleção ambígua: use vs/faces (ids legados) OU sel:{...}, nunca os dois');
+      const antes = st.orfaos.length;
+      const r = resolverSelecao(st, a.sel, 'pesar', i, { soVertices: true });
+      if (st.orfaos.length !== antes) return;
+      for (const v of [...r.vertices].sort((x, y) => x - y)) alvos.add(v);
+    }
     for (const v of a.vs ?? []) { if (!st.V.has(v)) { grita(st, i, 'pesar', v, 'vértice inexistente'); continue; } alvos.add(v); }
     for (const fid of a.faces ?? []) { const f = st.F.get(fid); if (!f) { grita(st, i, 'pesar', fid, 'face inexistente'); continue; } for (const v of f.vs) if (st.V.has(v)) alvos.add(v); }
     for (const v of alvos) { let m = st.pesos.get(v); if (!m) { m = new Map(); st.pesos.set(v, m); } m.set(osso, (m.get(osso) || 0) + peso); }   // ACUMULA por (vértice, osso)

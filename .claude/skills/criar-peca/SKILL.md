@@ -51,17 +51,18 @@ As operações que publicam `origem` aceitam endereçamento estrutural conforme
 [`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
 que é consulta, e não leitura de partida.
 
-**ID LITERAL:** `moveV`, `moveF`, `moveA`, `vira`, `mescla` e `pesar` não
-aceitam `sel`; `sel` não é atalho e deve falhar de forma explícita.
-Escolher uma delas é assumir dívida posicional, e ela é relatada. Para
-identidade estável, prefira uma primitiva com `origemId` seguida de
-`transladar`, `rotaciona` ou `espelha`.
-
-`extruda` também aceita `sel` que resolva para uma face só, inclusive por
-propriedade geométrica (`sel: {onde: ...}`).
-
-`apagaFace` é a exceção importante: aceita `sel: {...}`, exige exatamente uma
-face e é a forma semântica de abrir um vão.
+**ID LITERAL:** nenhuma operação de edição exige id numérico, e `sel` ocupa o
+lugar dele em cada uma, com a cardinalidade da forma por id: `moveV` pede
+exatamente um vértice (uma `regiao` em volta do canto), `moveF`, `extruda` e
+`apagaFace` pedem exatamente uma face, `moveA`, `filete` e `arredondarAresta`
+pedem exatamente uma aresta (só `sel: {onde: {alvo: 'aresta', ...}}` produz
+aresta), `vira` e `pesar` aceitam uma ou mais faces ou vértices, e `mescla`
+usa `sel` para os vértices que somem (um ou mais) e `selPara` para o que fica
+(exatamente um). A seleção de tamanho errado falha com `sel` e a contagem que
+resolveu, id junto com `sel` na mesma operação também falha, e `sel: {onde:
+...}` escolhe por propriedade (normal, posição extrema, tipo) sem citar id. O
+id literal continua aceito, mas é dívida posicional e é relatada. `apagaFace`
+é a forma semântica de abrir um vão.
 
 ## Orientação
 

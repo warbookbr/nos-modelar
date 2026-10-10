@@ -40,33 +40,39 @@ const PACKAGE = JSON.parse(readFileSync(join(import.meta.dirname, '../../package
    Bloco 1 — quem aceita `sel`, medido op por op.
 --------------------------------------------------------------------------- */
 
-/* As ops de edição/skinning que o manual trata como "endereçadas por id". Cada
-   uma recebe a MESMA seleção semântica válida (uma face nominal de um cubo com
-   `origemId`) e NENHUM id literal. Se a op resolver `sel`, o neutro muda e não
-   sobra órfão; se não resolver, o argumento de id vem `undefined` e ela grita. */
+/* As ops de edição/skinning/aresta que o manual trata como "endereçadas por id". Cada uma recebe a seleção semântica
+   que a sua forma por id pede (o vértice, a face ou a aresta certa para a cardinalidade dela) e NENHUM id literal. Se
+   a op resolver `sel`, o neutro muda e não sobra órfão; se não resolver, o argumento de id vem `undefined` e ela grita.
+   O cubo de lado 1 tem o canto (0,5; 1; 0,5) no topo à frente; `regiao` pega só ele. */
+const CANTO = (x: number, y: number, z: number) => ({ regiao: { min: [x - 0.1, y - 0.1, z - 0.1], max: [x + 0.1, y + 0.1, z + 0.1] } });
+const FACE = { origem: { op: 'cubo', id: 1, face: 'topo' } };
+const ARESTA = { origem: { op: 'cubo', id: 1, face: 'topo' }, onde: { alvo: 'aresta', extremo: { eixo: 'z', lado: 'max' } } };
 const SONDAS: Record<string, Record<string, unknown>> = {
-  moveV: { d: [0, 0.1, 0] },
-  moveF: { d: [0, 0.1, 0] },
-  moveA: { d: [0, 0.1, 0] },
-  vira: {},
-  apagaFace: {},
-  extruda: { dist: 0.3 },
-  mescla: { para: 0 },
-  pesar: { peso: 1 },
+  moveV: { d: [0, 0.1, 0], sel: CANTO(0.5, 1, 0.5) },
+  moveF: { d: [0, 0.1, 0], sel: FACE },
+  moveA: { d: [0, 0.1, 0], sel: ARESTA },
+  vira: { sel: FACE },
+  apagaFace: { sel: FACE },
+  extruda: { dist: 0.3, sel: FACE },
+  mescla: { sel: CANTO(0.5, 1, -0.5), selPara: CANTO(0.5, 1, 0.5) },
+  pesar: { peso: 1, osso: 'raiz', sel: FACE },
+  filete: { origemId: 9, raio: 0.1, sel: ARESTA },
+  arredondarAresta: { origemId: 9, raio: 0.1, paineis: 2, sel: ARESTA },
 };
-const SEL = { origem: { op: 'cubo', id: 1, face: 'topo' } };
+const ESQUELETO = { ossos: [{ nome: 'raiz' }] };
 
 function foto(neutro: any) {
   return JSON.stringify({
     V: [...neutro.V].sort((a: any, b: any) => a[0] - b[0]),
     F: [...neutro.F].map(([id, f]: any) => [id, f.vs]).sort((a: any, b: any) => a[0] - b[0]),
+    P: [...neutro.pesos].map(([v, m]: any) => [v, [...m]]).sort((a: any, b: any) => a[0] - b[0]),
   });
 }
-/* Uma op ACEITA `sel` quando, citada SÓ com `sel`, ela muda a malha sem gritar. */
+/* Uma op ACEITA `sel` quando, citada SÓ com `sel`, ela muda a malha (ou os pesos) sem gritar. */
 function aceitaSel(op: string) {
   const base = [['cubo', { origemId: 1, lado: 1 }]];
-  const semOp = nucleo(base, {}, {});
-  const comOp = nucleo([...base, [op, { ...SONDAS[op], sel: SEL }]], {}, {});
+  const semOp = nucleo(base, {}, {}, {}, ESQUELETO);
+  const comOp = nucleo([...base, [op, SONDAS[op]]], {}, {}, {}, ESQUELETO);
   return comOp.orfaos.length === 0 && foto(semOp) !== foto(comOp);
 }
 
@@ -82,17 +88,40 @@ describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
   it('a medição bate com o núcleo lido à mão (âncora da própria sonda)', () => {
     // se esta expectativa cair, é o NÚCLEO que mudou — reveja a skill de novo.
     expect(medido).toEqual({
-      moveV: false, moveF: false, moveA: false, vira: false,
-      apagaFace: true, extruda: true, mescla: false, pesar: false,
+      moveV: true, moveF: true, moveA: true, vira: true,
+      apagaFace: true, extruda: true, mescla: true, pesar: true,
+      filete: true, arredondarAresta: true,
     });
   });
 
-  it('o parágrafo do "só ID LITERAL" lista EXATAMENTE as ops que não aceitam `sel`', () => {
+  it('o parágrafo do "ID LITERAL" cita EXATAMENTE as ops que aceitam `sel`, nenhuma que não aceite', () => {
     const paragrafo = paragrafoCom('ID LITERAL');
     const citadas = new Set([...paragrafo.matchAll(/`([a-zA-Z]+)`/g)].map((m) => m[1])
       .filter((n) => Object.hasOwn(SONDAS, n)));
-    const esperado = new Set(Object.keys(SONDAS).filter((op) => !medido[op]));
+    const esperado = new Set(Object.keys(SONDAS).filter((op) => medido[op]));
     expect([...citadas].sort()).toEqual([...esperado].sort());
+    expect(paragrafo).not.toMatch(/não\s+aceitam\s+`sel`/);
+  });
+
+  it('a cardinalidade que o parágrafo promete é a que o núcleo cobra: seleção de tamanho errado grita em `sel`', () => {
+    const base = [['cubo', { origemId: 1, lado: 1 }]];
+    const ARESTAS = { origem: { op: 'cubo', id: 1 }, onde: { alvo: 'aresta', normal: { dir: [0, 1, 0], ate: 5 } } };
+    const TODAS = { tudo: true };
+    const errada: Record<string, Record<string, unknown>> = {
+      moveV: { d: [0, 0.1, 0], sel: FACE },
+      moveF: { d: [0, 0.1, 0], sel: TODAS },
+      moveA: { d: [0, 0.1, 0], sel: ARESTAS },
+      extruda: { dist: 0.3, sel: TODAS },
+      apagaFace: { sel: TODAS },
+      mescla: { sel: CANTO(0.5, 1, -0.5), selPara: FACE },
+      filete: { origemId: 9, raio: 0.1, sel: ARESTAS },
+      arredondarAresta: { origemId: 9, raio: 0.1, paineis: 2, sel: ARESTAS },
+    };
+    for (const [op, args] of Object.entries(errada)) {
+      const n = nucleo([...base, [op, args]], {}, {}, {}, ESQUELETO);
+      expect(n.orfaos.length, `${op} devia gritar`).toBeGreaterThan(0);
+      expect(foto(n), `${op} não pode mexer na malha ao gritar`).toBe(foto(nucleo(base, {}, {}, {}, ESQUELETO)));
+    }
   });
 
   it('`apagaFace` documenta a forma SEMÂNTICA, não só o id posicional', () => {

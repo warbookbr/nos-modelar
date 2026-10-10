@@ -2062,6 +2062,20 @@ function resolverAlvosF(st, a, op, i, { todasQuandoAusente = false } = {}) {
   return new Set();
 }
 
+/* `sel` que precisa resolver para EXATAMENTE uma aresta: só `onde:{alvo:'aresta',…}` produz arestas. Devolve o par de
+   vértices [p, q] (p < q) ou null depois de gritar em `sel`, com a contagem do que resolveu. Quem a usa
+   (arredondarAresta, filete, moveA) escolhe o que fazer com o par. */
+function resolverAresta(st, sel, op, i) {
+  const antes = st.orfaos.length;
+  const r = resolverSelecao(st, sel, op, i);
+  if (st.orfaos.length !== antes) return null;
+  if (r.arestas.length !== 1) {
+    grita(st, i, op, 'sel', `sel precisa resolver para EXATAMENTE uma aresta (use onde:{alvo:'aresta',…}); resolveu ${r.arestas.length}${r.arestas.length ? `: ${r.arestas.slice(0, 6).map(([p, q]) => `${p}-${q}`).join(', ')}${r.arestas.length > 6 ? ', …' : ''}` : ''}`);
+    return null;
+  }
+  return r.arestas[0];
+}
+
 /* ----------------------------------------------------------------------------
    Frame de TRANSPORTE PARALELO — usado só pela op `loft` abaixo. Reimplementado
    AQUI, byte-equivalente ao `quadro`/`transporta` de motor/arvore-cartoon.js (a
@@ -2759,14 +2773,14 @@ const operacoesPrimitivasBasicas = criarOperacoesPrimitivasBasicas({ BLOCO, FAIX
 
 const operacoesPrimitivasSuperficie = criarOperacoesPrimitivasSuperficie({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem, norm3, normalDaFace });
 
-const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, normalDaFace, addV, addF, colapsaCiclo, distintos, resolverSelecao });
+const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, normalDaFace, addV, addF, colapsaCiclo, distintos, resolverSelecao, resolverAresta });
 
 const operacoesGeradoresAvancados = criarOperacoesGeradoresAvancados({ BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias });
 const operacoesPerfis = criarOperacoesPerfis({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, grita, registraOrigem, confereId, addV, addF });
 const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
-const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
+const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
-const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico });
+const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, resolverSelecao, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {
   ...operacoesPrimitivasBasicas,

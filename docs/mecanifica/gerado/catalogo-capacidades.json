@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:91b8215f1ddc9196704f5751b1632d9320b6fc7be4e2e7ca9d668a746ff68d10",
+  "assinatura": "sha256:20085ba6934d81ffb7d425e875c7609385c58a2f3defb8bf12742a44c9f94476",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -447,9 +447,7 @@
             "intencao": "Criar chanfro plano compatível com o filete v1.",
             "schema": "mecanifica.argumentos.filete@1",
             "obrigatorios": [
-              "origemId",
-              "de",
-              "aresta"
+              "origemId"
             ]
           }
         },
@@ -689,12 +687,9 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Fundir vértices posicionais em um vértice-alvo.",
+            "intencao": "Fundir vértices em um vértice-alvo, por seleção ou por ID posicional.",
             "schema": "mecanifica.argumentos.mescla@1",
-            "obrigatorios": [
-              "de",
-              "para"
-            ]
+            "obrigatorios": []
           }
         },
         {
@@ -721,12 +716,9 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Mover os dois vértices de uma aresta posicional.",
+            "intencao": "Mover os dois vértices de uma aresta, escolhida por seleção que resolva para uma só ou por IDs posicionais.",
             "schema": "mecanifica.argumentos.moveA@1",
-            "obrigatorios": [
-              "a",
-              "b"
-            ]
+            "obrigatorios": []
           }
         },
         {
@@ -753,11 +745,9 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Mover todos os vértices de uma face posicional.",
+            "intencao": "Mover todos os vértices de uma face, escolhida por seleção que resolva para uma só ou por ID posicional.",
             "schema": "mecanifica.argumentos.moveF@1",
-            "obrigatorios": [
-              "face"
-            ]
+            "obrigatorios": []
           }
         },
         {
@@ -784,11 +774,9 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Mover um vértice por ID posicional.",
+            "intencao": "Mover um vértice, por seleção que resolva para um só ou por ID posicional.",
             "schema": "mecanifica.argumentos.moveV@1",
-            "obrigatorios": [
-              "v"
-            ]
+            "obrigatorios": []
           }
         },
         {
@@ -846,7 +834,7 @@
           ],
           "identidade": "por-vertice",
           "uso": {
-            "intencao": "Atribuir peso de osso a vértices ou faces posicionais.",
+            "intencao": "Atribuir peso de osso a vértices, escolhidos por seleção ou por IDs posicionais.",
             "schema": "mecanifica.argumentos.pesar@1",
             "obrigatorios": [
               "osso"
@@ -1117,11 +1105,9 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Inverter o winding de uma face posicional.",
+            "intencao": "Inverter o winding de uma ou mais faces, por seleção ou por ID posicional.",
             "schema": "mecanifica.argumentos.vira@1",
-            "obrigatorios": [
-              "face"
-            ]
+            "obrigatorios": []
           }
         }
       ]
@@ -1568,9 +1554,7 @@
         "intencao": "Criar chanfro plano compatível com o filete v1.",
         "schema": "mecanifica.argumentos.filete@1",
         "obrigatorios": [
-          "origemId",
-          "de",
-          "aresta"
+          "origemId"
         ]
       }
     },
@@ -1810,12 +1794,9 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Fundir vértices posicionais em um vértice-alvo.",
+        "intencao": "Fundir vértices em um vértice-alvo, por seleção ou por ID posicional.",
         "schema": "mecanifica.argumentos.mescla@1",
-        "obrigatorios": [
-          "de",
-          "para"
-        ]
+        "obrigatorios": []
       }
     },
     {
@@ -1842,12 +1823,9 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Mover os dois vértices de uma aresta posicional.",
+        "intencao": "Mover os dois vértices de uma aresta, escolhida por seleção que resolva para uma só ou por IDs posicionais.",
         "schema": "mecanifica.argumentos.moveA@1",
-        "obrigatorios": [
-          "a",
-          "b"
-        ]
+        "obrigatorios": []
       }
     },
     {
@@ -1874,11 +1852,9 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Mover todos os vértices de uma face posicional.",
+        "intencao": "Mover todos os vértices de uma face, escolhida por seleção que resolva para uma só ou por ID posicional.",
         "schema": "mecanifica.argumentos.moveF@1",
-        "obrigatorios": [
-          "face"
-        ]
+        "obrigatorios": []
       }
     },
     {
@@ -1905,11 +1881,9 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Mover um vértice por ID posicional.",
+        "intencao": "Mover um vértice, por seleção que resolva para um só ou por ID posicional.",
         "schema": "mecanifica.argumentos.moveV@1",
-        "obrigatorios": [
-          "v"
-        ]
+        "obrigatorios": []
       }
     },
     {
@@ -1967,7 +1941,7 @@
       ],
       "identidade": "por-vertice",
       "uso": {
-        "intencao": "Atribuir peso de osso a vértices ou faces posicionais.",
+        "intencao": "Atribuir peso de osso a vértices, escolhidos por seleção ou por IDs posicionais.",
         "schema": "mecanifica.argumentos.pesar@1",
         "obrigatorios": [
           "osso"
@@ -2238,11 +2212,9 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Inverter o winding de uma face posicional.",
+        "intencao": "Inverter o winding de uma ou mais faces, por seleção ou por ID posicional.",
         "schema": "mecanifica.argumentos.vira@1",
-        "obrigatorios": [
-          "face"
-        ]
+        "obrigatorios": []
       }
     }
   ]

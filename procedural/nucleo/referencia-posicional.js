@@ -21,13 +21,13 @@
    ler id de uma chave nova, ela entra aqui — e entra para os três de uma vez:
 
      forma                  ops que leem                                   caminho semântico?
-     faces:[ids]            pincel/solido/liso/material/parte/espelha      SIM (resolverAlvosF -> sel:{...})
-                            pesar                                          NÃO (pesar lê a.faces cru)
+     faces:[ids]            pincel/solido/liso/material/parte/espelha/     SIM (resolverAlvosF -> sel:{...})
+                            pesar
      sel:{v:[ids]}          displace/transladar/rotaciona                  SIM
      sel:{f:[ids]}          qualquer op com sel                            SIM
-     vs:[ids]               pesar                                          NÃO
+     vs:[ids]               pesar                                          SIM (sel:{...})
      pontos:[{f:id}]        pincel modo:'livre'                            NÃO
-     de:[ids]               mescla                                         NÃO
+     de:[ids]               mescla                                         SIM (sel:{...})
 
    `de` tem DOIS contratos desde o O-12, e só um deles é id cru: `mescla` lê
    `de:[ids]` (coleção de VÉRTICE) e `publicarPorta` lê `de:{op,id,...}` —
@@ -44,9 +44,10 @@
    FORA DE ESCOPO, de propósito, declarado e COMPLETO — as formas SINGULARES,
    as únicas quatro que existem no núcleo: `face:<id>` (vira/moveF/extruda/
    apagaFace), `v:<id>` (moveV), `a:<id>`/`b:<id>` (moveA) e `para:<id>`
-   (mescla). Metade dessas ops não tem caminho semântico nenhum no núcleo
-   atual, então gatear isso hoje proibiria usar a op em vez de proibir o
-   atalho.
+   (mescla). Todas as ops dessas formas aceitam `sel` desde a fatia 5 do plano
+   das ferramentas de modelagem (moveV, moveF, moveA, vira, mescla, pesar e
+   filete); a contagem das formas singulares continua fora do gate porque ela
+   nunca foi medida, não porque falte caminho.
 
    A CONTAGEM É DE ID, NÃO DE PASSO, e chave presente NUNCA conta 0:
    `faces: []` e `faces: 'nada'` são a forma legada sendo usada (o núcleo grita
@@ -69,7 +70,7 @@ export const ROTULO = {
 /* Quais formas têm para onde ir HOJE. O conselho de conserto precisa ser
    verdadeiro por forma: mandar trocar `vs:[ids]` por `sel:{alias}` seria mandar
    fazer o que o núcleo não aceita. */
-export const TEM_CAMINHO_SEMANTICO = { faces: true, selV: true, selF: true, vs: false, pontos: false, mesclaDe: false };
+export const TEM_CAMINHO_SEMANTICO = { faces: true, selV: true, selF: true, vs: true, pontos: false, mesclaDe: true };
 
 export const objetoPlano = (x) => typeof x === 'object' && x !== null && !Array.isArray(x);
 

@@ -74,9 +74,9 @@ que sobraram dos anteriores:
 
 Seleção de aresta devolve as pontas dela como vértices: `transladar` e `rotaciona`
 movem essas pontas, e as operações de face (`pincel`, `parte`, `material`) a
-recusam por não ter face. `arredondarAresta` aceita `sel` no lugar de `de` +
-`aresta`, desde que ela resolva para exatamente uma aresta (a face de apoio é a
-de menor id entre as que a usam). Resultado vazio grita em `sel.onde` com o
+recusam por não ter face. `arredondarAresta`, `filete` e `moveA` aceitam `sel` no
+lugar de `de` + `aresta` (ou `a` + `b`), desde que ela resolva para exatamente
+uma aresta (a face de apoio é a de menor id entre as que a usam). Resultado vazio grita em `sel.onde` com o
 critério pedido e o número de candidatos que sobrou a cada passo; chave, valor
 ou combinação inválidos gritam com o campo. O resultado é ordenado (faces por id,
 arestas por par de vértices) e não depende da execução.
@@ -301,25 +301,38 @@ encaminhe-os a todas as chamadas do núcleo que recebem aliases.
 
 ## Detalhes de seleção, aliases e proveniência
 
-**CINCO ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
-`moveF`, `moveA`, `vira` e `mescla` (a sexta é `pesar`, mesma restrição, mas de
-skinning). `extruda` saiu da lista: aceita `face:id` ou `sel` que resolva para
-exatamente uma face, por exemplo `['extruda', { sel: { origem: CAIXA, onde:
-{ extremo: { eixo: 'y', lado: 'max' } } }, dist: 0.5 }]`. Escolher uma das cinco é
-escolher escrever id posicional — a referência que o `CLAUDE.md` proíbe
-persistir. Escrever `sel` nelas não é atalho e não vira silêncio: o argumento de
-id chega `undefined` e a op GRITA face/vértice inexistente (medido: 1 órfão em
-`moveV`/`moveF`/`vira`, 2 em `moveA` — uma por ponta). **A exceção que morde é o
-`mescla`:** com `para` válido e `de` ausente ele volta CALADO, 0 órfão e 0
-mudança, então ali nem o grito te salva — confira o efeito, não a ausência de
-erro. Quem precisa de identidade estável compõe por primitiva +
-`transladar`/`rotaciona`/`espelha` endereçados por `origem`/`alias`: a peça de
-referência sem id cru, um disco de freio com dezessete aliases, não usava
-nenhuma das cinco (peça removida do acervo; a medida permanece). Se o assunto
-exigir uma delas (correção de normal, solda), use — e REPORTE, porque é lacuna
-de contrato, não estilo.
+**Nenhuma op de edição exige ID LITERAL: `sel` ocupa o lugar do id em todas.**
+`moveV`, `moveF`, `moveA`, `vira`, `mescla`, `pesar` e `filete` aceitam `sel`,
+como `extruda`, `apagaFace` e `arredondarAresta` já aceitavam, e cada uma cobra
+a cardinalidade que a forma por id já tinha:
 
-**`apagaFace` NÃO está nessa lista, e é a que mais importa.** Ela é a única op
+| op | `sel` precisa resolver para | exemplo |
+|---|---|---|
+| `moveV` | exatamente um vértice | `['moveV', { sel: { regiao: { min: [0.4, 0.9, 0.4], max: [0.6, 1.1, 0.6] } }, d: [0, 0.1, 0] }]` |
+| `moveF` | exatamente uma face | `['moveF', { sel: { origem: CAIXA, onde: { extremo: { eixo: 'y', lado: 'max' } } }, d: [0, 0.1, 0] }]` |
+| `moveA` | exatamente uma aresta | `['moveA', { sel: { origem: CAIXA, onde: { alvo: 'aresta', extremo: { eixo: 'z', lado: 'max' } } }, d: [0, 0.1, 0] }]` |
+| `vira` | uma ou mais faces, cada uma virada por si | `['vira', { sel: { origem: CAIXA, onde: { normal: { dir: [0, 1, 0], ate: 90 } } } }]` |
+| `mescla` | `sel`: um ou mais vértices que somem; `selPara`: exatamente o vértice que fica | `['mescla', { sel: CANTO_A, selPara: CANTO_B }]` |
+| `pesar` | um ou mais vértices (os cantos de uma face ou aresta entram) | `['pesar', { osso: 'raiz', sel: { origem: CAIXA }, peso: 1 }]` |
+| `filete` | exatamente uma aresta | `['filete', { origemId: 9, sel: ARESTA, raio: 0.1 }]` |
+
+Só `onde: { alvo: 'aresta', ... }` produz aresta; as demais chaves de `sel`
+resolvem faces e vértices. Vértice sem `id` tem a `regiao` (uma caixa em volta
+dele, que aceita expressão nos limites), e a seleção de face ou aresta entrega
+os cantos dela às ops de vértice. A seleção que não bate com a cardinalidade
+GRITA em `sel` com o que a op pedia e quantos alvos resolveu (`moveV exige
+exatamente um vértice em sel, e resolveu 4`) e a malha fica como estava; `id`
+junto com `sel` na mesma op grita `face+sel`, `v+sel`, `a+sel`, `de+sel` ou
+`para+selPara`, porque duas fontes concorrentes não se unem por acidente. Seleção
+vazia grita em `mescla` e `pesar`, que por id aceitavam lista vazia calada. `mescla` com `sel` e `selPara` resolve as duas antes de mudar a malha, e
+as duas se misturam com `de` e `para` por id (`sel` com `para`, `de` com
+`selPara`). Em `filete` e `arredondarAresta` a face de apoio é a de menor id
+entre as duas da aresta, e o painel nasce com o sentido dela: apontar a mesma
+aresta pela outra face dá outro canon. O id literal continua aceito, mas é
+dívida posicional (`CLAUDE.md`) e é relatada; use `sel` por `origem`, `alias`,
+`porta` ou `onde`, que não persistem id algum.
+
+**`apagaFace` é a que mais importa.** Ela é a única op
 que remove face — logo a única forma de abrir um furo, uma porta, um vão — e o
 núcleo já lhe deu o ramo semântico: `sel:{...}` resolvido pelos mesmos
 campos, exigindo **exatamente uma face**, gritando em ambiguidade e em seleção
@@ -332,10 +345,9 @@ exercício hoje removida do acervo, é citar a face pela origem:
 ['apagaFace', { sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } } }],
 ```
 
-Cuidado com a assimetria: `vira` (a op irmã, que conserta normal invertida)
-continua sem caminho semântico — provar `vira` custa exatamente uma referência
-posicional, e quem precisar dela declara essa dívida no cabeçalho da peça, em
-vez de escondê-la.
+`vira`, a op irmã que conserta normal invertida, aceita a mesma forma
+(`['vira', { sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }]`), então
+corrigir uma normal também não custa id posicional.
 
 **O SENTIDO da rotação — DESTRO nos três eixos.** A fórmula `p' = pivo +
 R_eixo(graus)·(p−pivo)` não diz para que LADO, e este é o erro que nenhuma
@@ -395,8 +407,7 @@ momento do PASSO**: geometria criada depois não é atingida, e geometria
 inserida antes passa a ser — sem gritar. Se o alcance precisa sobreviver à
 reordenação da lista, use `grupo`, `origem` ou `alias` — **nunca id de vértice
 ou de face**: id é posicional, e referência posicional persistida é proibida
-(`CLAUDE.md`). A op `pesar` ainda não aceita `sel` (só `vs:`/`faces:`), então
-não dá pra dizer `tudo` nela.
+(`CLAUDE.md`). `pesar` aceita `sel` como as demais, inclusive `tudo:true`.
 
 **QUEM publica `origem`.** Não memorize uma contagem: consulte a marca
 `operacoes-com-origem` desta skill, derivada de `OPERACOES_COM_ORIGEM` no

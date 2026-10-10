@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:91b8215f1ddc9196704f5751b1632d9320b6fc7be4e2e7ca9d668a746ff68d10",
+  "assinatura": "sha256:20085ba6934d81ffb7d425e875c7609385c58a2f3defb8bf12742a44c9f94476",
   "total": 37,
   "operacoes": [
     {
@@ -1688,9 +1688,7 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "origemId",
-            "de",
-            "aresta"
+            "origemId"
           ],
           "properties": {
             "origemId": {
@@ -1700,7 +1698,7 @@
             },
             "de": {
               "type": "object",
-              "description": "Face que contém a aresta."
+              "description": "Face que contém a aresta (com aresta); não misture com sel."
             },
             "aresta": {
               "anyOf": [
@@ -1714,7 +1712,11 @@
                   "type": "array"
                 }
               ],
-              "description": "Índice local da aresta."
+              "description": "Índice local da aresta na face de."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Em vez de de + aresta: seleção que resolva para EXATAMENTE uma aresta, por exemplo {origem:{op:'cubo',id:1}, onde:{alvo:'aresta', normal:{dir:[0,1,0],ate:5}, extremo:{eixo:'z',lado:'max'}}}."
             },
             "raio": {
               "anyOf": [
@@ -1748,12 +1750,27 @@
               "filete",
               {
                 "origemId": 9,
-                "de": {
-                  "op": "cubo",
-                  "id": 1,
-                  "face": "topo"
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1
+                  },
+                  "onde": {
+                    "alvo": "aresta",
+                    "normal": {
+                      "dir": [
+                        0,
+                        1,
+                        0
+                      ],
+                      "ate": 5
+                    },
+                    "extremo": {
+                      "eixo": "z",
+                      "lado": "max"
+                    }
+                  }
                 },
-                "aresta": 0,
                 "raio": 0.1
               }
             ]
@@ -1764,9 +1781,12 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare de + aresta ou sel, nunca os dois."
+        ],
         "limites": [
-          "Não é arredondamento multi-painel e não cobre encontro de três arestas."
+          "Não é arredondamento multi-painel e não cobre encontro de três arestas.",
+          "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
         ],
         "diagnosticos": []
       }
@@ -2613,23 +2633,24 @@
       "nome": "mescla",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Fundir vértices posicionais em um vértice-alvo.",
+        "intencao": "Fundir vértices em um vértice-alvo, por seleção ou por ID posicional.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.mescla@1",
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "de",
-            "para"
-          ],
+          "required": [],
           "properties": {
             "de": {
               "type": "array",
               "items": {
                 "type": "integer"
               },
-              "description": "Vértices removidos."
+              "description": "Vértices removidos (legado); não misture com sel."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção dos vértices que somem: um ou mais. Seleção vazia grita."
             },
             "para": {
               "anyOf": [
@@ -2643,7 +2664,11 @@
                   "type": "array"
                 }
               ],
-              "description": "Vértice preservado."
+              "description": "Vértice preservado (legado); não misture com selPara."
+            },
+            "selPara": {
+              "type": "object",
+              "description": "Seleção que resolva para EXATAMENTE o vértice preservado."
             }
           }
         },
@@ -2662,10 +2687,34 @@
             [
               "mescla",
               {
-                "de": [
-                  1
-                ],
-                "para": 0
+                "sel": {
+                  "regiao": {
+                    "min": [
+                      0.4,
+                      -0.1,
+                      -0.6
+                    ],
+                    "max": [
+                      0.6,
+                      0.1,
+                      -0.4
+                    ]
+                  }
+                },
+                "selPara": {
+                  "regiao": {
+                    "min": [
+                      -0.6,
+                      -0.1,
+                      -0.6
+                    ],
+                    "max": [
+                      -0.4,
+                      0.1,
+                      -0.4
+                    ]
+                  }
+                }
               }
             ]
           ],
@@ -2675,9 +2724,12 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare de ou sel, e para ou selPara; nunca os dois do mesmo par."
+        ],
         "limites": [
-          "Operação posicional; conferir efeito porque entrada vazia pode ser no-op."
+          "Com id, de vazio volta calado; com sel a seleção vazia grita.",
+          "Cantos fundidos que deixam a face com menos de 3 cantos distintos a removem."
         ],
         "diagnosticos": []
       }
@@ -2687,16 +2739,13 @@
       "nome": "moveA",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Mover os dois vértices de uma aresta posicional.",
+        "intencao": "Mover os dois vértices de uma aresta, escolhida por seleção que resolva para uma só ou por IDs posicionais.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.moveA@1",
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "a",
-            "b"
-          ],
+          "required": [],
           "properties": {
             "a": {
               "anyOf": [
@@ -2710,7 +2759,7 @@
                   "type": "array"
                 }
               ],
-              "description": "Primeiro vértice."
+              "description": "Primeiro vértice (legado); não misture com sel."
             },
             "b": {
               "anyOf": [
@@ -2724,7 +2773,11 @@
                   "type": "array"
                 }
               ],
-              "description": "Segundo vértice."
+              "description": "Segundo vértice (legado)."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção que resolva para EXATAMENTE uma aresta, por exemplo {origem:{op:'cubo',id:1,face:'topo'}, onde:{alvo:'aresta', extremo:{eixo:'z',lado:'max'}}}."
             },
             "d": {
               "anyOf": [
@@ -2756,8 +2809,20 @@
             [
               "moveA",
               {
-                "a": 0,
-                "b": 1,
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1,
+                    "face": "fundo"
+                  },
+                  "onde": {
+                    "alvo": "aresta",
+                    "extremo": {
+                      "eixo": "z",
+                      "lado": "min"
+                    }
+                  }
+                },
                 "d": [
                   0,
                   0.1,
@@ -2772,9 +2837,11 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare a + b ou sel, nunca os dois."
+        ],
         "limites": [
-          "Operação posicional."
+          "Só onde:{alvo:'aresta',…} produz aresta; sel que resolve para zero ou várias grita com a contagem."
         ],
         "diagnosticos": []
       }
@@ -2784,15 +2851,13 @@
       "nome": "moveF",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Mover todos os vértices de uma face posicional.",
+        "intencao": "Mover todos os vértices de uma face, escolhida por seleção que resolva para uma só ou por ID posicional.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.moveF@1",
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "face"
-          ],
+          "required": [],
           "properties": {
             "face": {
               "anyOf": [
@@ -2806,7 +2871,11 @@
                   "type": "array"
                 }
               ],
-              "description": "ID da face."
+              "description": "ID da face (legado); não misture com sel."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção que resolva para EXATAMENTE uma face, por exemplo {origem:{op:'cubo',id:1,face:'topo'}} ou {onde:{extremo:{eixo:'y',lado:'max'}}}."
             },
             "d": {
               "anyOf": [
@@ -2838,7 +2907,13 @@
             [
               "moveF",
               {
-                "face": 1,
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1,
+                    "face": "topo"
+                  }
+                },
                 "d": [
                   0,
                   0.1,
@@ -2853,9 +2928,11 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare face ou sel, nunca os dois."
+        ],
         "limites": [
-          "Operação posicional."
+          "Os cantos compartilhados com outras faces vão junto. Para mover várias faces use transladar com sel."
         ],
         "diagnosticos": []
       }
@@ -2865,15 +2942,13 @@
       "nome": "moveV",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Mover um vértice por ID posicional.",
+        "intencao": "Mover um vértice, por seleção que resolva para um só ou por ID posicional.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.moveV@1",
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "v"
-          ],
+          "required": [],
           "properties": {
             "v": {
               "anyOf": [
@@ -2887,7 +2962,11 @@
                   "type": "array"
                 }
               ],
-              "description": "ID do vértice."
+              "description": "ID do vértice (legado); não misture com sel."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção que resolva para EXATAMENTE um vértice, por exemplo {regiao:{min:[0.4,0.9,0.4],max:[0.6,1.1,0.6]}} em torno do canto. Para vários vértices use transladar."
             },
             "d": {
               "anyOf": [
@@ -2919,7 +2998,20 @@
             [
               "moveV",
               {
-                "v": 0,
+                "sel": {
+                  "regiao": {
+                    "min": [
+                      -0.6,
+                      -0.1,
+                      -0.6
+                    ],
+                    "max": [
+                      -0.4,
+                      0.1,
+                      -0.4
+                    ]
+                  }
+                },
                 "d": [
                   0,
                   0.1,
@@ -2934,9 +3026,11 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare v ou sel, nunca os dois."
+        ],
         "limites": [
-          "Operação posicional; prefira transformações com seleção semântica."
+          "sel que resolve para zero ou vários vértices grita com a contagem; uma face ou aresta resolve para os seus cantos e por isso não serve aqui."
         ],
         "diagnosticos": []
       }
@@ -3036,7 +3130,7 @@
       "nome": "pesar",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Atribuir peso de osso a vértices ou faces posicionais.",
+        "intencao": "Atribuir peso de osso a vértices, escolhidos por seleção ou por IDs posicionais.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.pesar@1",
@@ -3065,19 +3159,23 @@
               ],
               "description": "Peso acumulado."
             },
+            "sel": {
+              "type": "object",
+              "description": "Seleção de um ou mais vértices (os cantos de uma face ou aresta entram). Seleção vazia grita."
+            },
             "vs": {
               "type": "array",
               "items": {
                 "type": "integer"
               },
-              "description": "Vértices afetados."
+              "description": "Vértices afetados (legado); não misture com sel."
             },
             "faces": {
               "type": "array",
               "items": {
                 "type": "integer"
               },
-              "description": "Faces cujos vértices são afetados."
+              "description": "Faces cujos vértices são afetados (legado); não misture com sel."
             }
           }
         },
@@ -3097,9 +3195,20 @@
               "pesar",
               {
                 "osso": "raiz",
-                "vs": [
-                  0
-                ],
+                "sel": {
+                  "regiao": {
+                    "min": [
+                      -0.6,
+                      -0.1,
+                      -0.6
+                    ],
+                    "max": [
+                      -0.4,
+                      0.1,
+                      -0.4
+                    ]
+                  }
+                },
                 "peso": 1
               }
             ]
@@ -3116,10 +3225,10 @@
           },
           "ALIASES": []
         },
-        "precondicoes": [],
-        "limites": [
-          "Ainda é posicional; não aceita sel."
+        "precondicoes": [
+          "Declare vs/faces ou sel, nunca os dois."
         ],
+        "limites": [],
         "diagnosticos": []
       }
     },
@@ -3816,15 +3925,13 @@
       "nome": "vira",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Inverter o winding de uma face posicional.",
+        "intencao": "Inverter o winding de uma ou mais faces, por seleção ou por ID posicional.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.vira@1",
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "face"
-          ],
+          "required": [],
           "properties": {
             "face": {
               "anyOf": [
@@ -3838,7 +3945,11 @@
                   "type": "array"
                 }
               ],
-              "description": "ID da face."
+              "description": "ID da face (legado); não misture com sel."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção de uma ou mais faces; cada uma vira por si. Seleção vazia grita."
             }
           }
         },
@@ -3857,7 +3968,13 @@
             [
               "vira",
               {
-                "face": 1
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1,
+                    "face": "topo"
+                  }
+                }
               }
             ]
           ],
@@ -3867,9 +3984,11 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare face ou sel, nunca os dois."
+        ],
         "limites": [
-          "Operação posicional; use somente para corrigir orientação comprovada."
+          "Use somente para corrigir orientação comprovada: virar uma face já consistente quebra o pareamento de arestas."
         ],
         "diagnosticos": []
       }

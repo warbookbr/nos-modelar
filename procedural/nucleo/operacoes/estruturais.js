@@ -1,6 +1,26 @@
 /* estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 export function criarOperacoesEstruturais(servicos) {
-  const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
+  const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
+  /* A aresta chega de duas formas: `de` + `aresta` (face e índice local, o endereço de sempre) ou `sel` com
+     `onde:{alvo:'aresta',…}`, que escolhe por propriedade geométrica e precisa resolver para UMA aresta. No segundo
+     caso a face de apoio é a de menor id entre as que a usam, e o índice é o dela nessa face. Serve a
+     `arredondarAresta` e a `filete`; devolve { faceAId, arestaLocal } ou null depois de gritar. */
+  function enderecoDaAresta(st, a, op, i) {
+    if (a.sel != null && (a.de != null || a.aresta != null)) { grita(st, i, op, 'sel+de', "aresta ambígua: use de + aresta (face e índice local) OU sel:{onde:{alvo:'aresta',…}}, nunca os dois"); return null; }
+    if (a.sel == null) {
+      const faceAId = faceUnicaEstrutural(st, a.de, op, 'de', i);
+      return faceAId == null ? null : { faceAId, arestaLocal: a.aresta };
+    }
+    const par = resolverAresta(st, a.sel, op, i);
+    if (!par) return null;
+    const [p, q] = par;
+    for (const [fid, f] of [...st.F].sort((x, y) => x[0] - y[0])) {
+      const k = f.vs.findIndex((v, n) => (v === p && f.vs[(n + 1) % f.vs.length] === q) || (v === q && f.vs[(n + 1) % f.vs.length] === p));
+      if (k >= 0) return { faceAId: fid, arestaLocal: k };
+    }
+    grita(st, i, op, 'sel', `a aresta ${p}-${q} não pertence a nenhuma face`);
+    return null;
+  }
   return {
   publicarPorta(st, a, i) {
     const usaNomeLegado = a.nome !== undefined;
@@ -788,27 +808,9 @@ export function criarOperacoesEstruturais(servicos) {
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
     if (declaracoes.length > 1) return grita(st, i, 'arredondarAresta', 'origemId', textoDeclaracoes(a.origemId, declaracoes));
 
-    /* A aresta chega de duas formas: `de` + `aresta` (face e índice local, o endereço de sempre) ou `sel` com
-       `onde:{alvo:'aresta',…}`, que escolhe por propriedade geométrica e precisa resolver para UMA aresta. No segundo
-       caso a face de apoio é a de menor id entre as que a usam, e o índice é o dela nessa face. */
-    if (a.sel != null && (a.de != null || a.aresta != null)) return grita(st, i, 'arredondarAresta', 'sel+de', 'aresta ambígua: use de + aresta (face e índice local) OU sel:{onde:{alvo:\'aresta\',…}}, nunca os dois');
-    let faceAId, arestaLocal;
-    if (a.sel != null) {
-      const antes = st.orfaos.length;
-      const r = resolverSelecao(st, a.sel, 'arredondarAresta', i);
-      if (st.orfaos.length !== antes) return;
-      if (r.arestas.length !== 1) return grita(st, i, 'arredondarAresta', 'sel', `sel precisa resolver para EXATAMENTE uma aresta (use onde:{alvo:'aresta',…}); resolveu ${r.arestas.length}${r.arestas.length ? `: ${r.arestas.slice(0, 6).map(([p, q]) => `${p}-${q}`).join(', ')}${r.arestas.length > 6 ? ', …' : ''}` : ''}`);
-      const [p, q] = r.arestas[0];
-      for (const [fid, f] of [...st.F].sort((x, y) => x[0] - y[0])) {
-        const k = f.vs.findIndex((v, n) => (v === p && f.vs[(n + 1) % f.vs.length] === q) || (v === q && f.vs[(n + 1) % f.vs.length] === p));
-        if (k >= 0) { faceAId = fid; arestaLocal = k; break; }
-      }
-      if (faceAId == null) return grita(st, i, 'arredondarAresta', 'sel', `a aresta ${p}-${q} não pertence a nenhuma face`);
-    } else {
-      faceAId = faceUnicaEstrutural(st, a.de, 'arredondarAresta', 'de', i);
-      if (faceAId == null) return;
-      arestaLocal = a.aresta;
-    }
+    const endereco = enderecoDaAresta(st, a, 'arredondarAresta', i);
+    if (!endereco) return;
+    const { faceAId, arestaLocal } = endereco;
     const faceA = st.F.get(faceAId);
     const L = faceA.vs.length;
     if (!Number.isSafeInteger(arestaLocal) || arestaLocal < 0 || arestaLocal >= L) return grita(st, i, 'arredondarAresta', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos)`);
@@ -1087,12 +1089,13 @@ export function criarOperacoesEstruturais(servicos) {
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
     if (declaracoes.length > 1) return grita(st, i, 'filete', 'origemId', textoDeclaracoes(a.origemId, declaracoes));
 
-    const faceAId = faceUnicaEstrutural(st, a.de, 'filete', 'de', i);
-    if (faceAId == null) return;
+    const endereco = enderecoDaAresta(st, a, 'filete', i);
+    if (!endereco) return;
+    const { faceAId, arestaLocal } = endereco;
     const faceA = st.F.get(faceAId);
     const L = faceA.vs.length;
-    if (!Number.isSafeInteger(a.aresta) || a.aresta < 0 || a.aresta >= L) return grita(st, i, 'filete', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos); recebido ${JSON.stringify(a.aresta ?? null)}`);
-    const v0 = faceA.vs[a.aresta], v1 = faceA.vs[(a.aresta + 1) % L];
+    if (!Number.isSafeInteger(arestaLocal) || arestaLocal < 0 || arestaLocal >= L) return grita(st, i, 'filete', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos); recebido ${JSON.stringify(arestaLocal ?? null)}`);
+    const v0 = faceA.vs[arestaLocal], v1 = faceA.vs[(arestaLocal + 1) % L];
 
     // ---- a OUTRA face que compartilha esta aresta (manifold: exatamente 2) ----
     let faceBId = null, reversa = true;
@@ -1107,14 +1110,14 @@ export function criarOperacoesEstruturais(servicos) {
       }
       if (faceBId === -2) break;
     }
-    if (faceBId == null) return grita(st, i, 'filete', 'de', `a aresta ${a.aresta} da face ${faceAId} não é compartilhada por nenhuma outra face (não é uma aresta de MANIFOLD)`);
-    if (faceBId === -2) return grita(st, i, 'filete', 'de', `a aresta ${a.aresta} da face ${faceAId} é compartilhada por mais de duas faces — não é manifold, filete exige exatamente 2`);
+    if (faceBId == null) return grita(st, i, 'filete', 'de', `a aresta ${arestaLocal} da face ${faceAId} não é compartilhada por nenhuma outra face (não é uma aresta de MANIFOLD)`);
+    if (faceBId === -2) return grita(st, i, 'filete', 'de', `a aresta ${arestaLocal} da face ${faceAId} é compartilhada por mais de duas faces — não é manifold, filete exige exatamente 2`);
     const faceB = st.F.get(faceBId);
 
     const P = st.V.get(v0), Q = st.V.get(v1);
     const ex = Q[0] - P[0], ey = Q[1] - P[1], ez = Q[2] - P[2];
     const elen = Math.hypot(ex, ey, ez);
-    if (!(elen > 1e-9)) return grita(st, i, 'filete', 'aresta', `a aresta ${a.aresta} da face ${faceAId} tem comprimento ~0 (v0 e v1 coincidem)`);
+    if (!(elen > 1e-9)) return grita(st, i, 'filete', 'aresta', `a aresta ${arestaLocal} da face ${faceAId} tem comprimento ~0 (v0 e v1 coincidem)`);
     const e = [ex / elen, ey / elen, ez / elen];
 
     const centroide = (f) => { const c = [0, 0, 0]; for (const v of f.vs) { const p = st.V.get(v); c[0] += p[0] / f.vs.length; c[1] += p[1] / f.vs.length; c[2] += p[2] / f.vs.length; } return c; };
@@ -1141,7 +1144,7 @@ export function criarOperacoesEstruturais(servicos) {
        normal virada — provavelmente uma face que passou por `vira`. Consertar
        esse caso pediria uma segunda derivação de winding; fica de fora,
        GRITANDO em vez de fechar a malha torta. */
-    if (!reversa) return grita(st, i, 'filete', 'de', `a face do outro lado da aresta ${a.aresta} tem o sentido de percurso invertido em relação a ${faceAId} (normal provavelmente virada) — filete exige as duas no sentido padrão de malha fechada`);
+    if (!reversa) return grita(st, i, 'filete', 'de', `a face do outro lado da aresta ${arestaLocal} tem o sentido de percurso invertido em relação a ${faceAId} (normal provavelmente virada) — filete exige as duas no sentido padrão de malha fechada`);
 
     const raio = st.num(a.raio ?? 0);
     if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'filete', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
@@ -1167,7 +1170,7 @@ export function criarOperacoesEstruturais(servicos) {
         if (f.vs.includes(v)) achadas.push(fid);
       }
       if (achadas.length !== 1) {
-        grita(st, i, 'filete', 'aresta', `a ponta ${ponta} da aresta ${a.aresta} da face ${faceAId} tem ${achadas.length} face(s) além das duas da aresta; o filete precisa de exatamente 1 (canto de três arestas está fora de escopo neste ciclo)`);
+        grita(st, i, 'filete', 'aresta', `a ponta ${ponta} da aresta ${arestaLocal} da face ${faceAId} tem ${achadas.length} face(s) além das duas da aresta; o filete precisa de exatamente 1 (canto de três arestas está fora de escopo neste ciclo)`);
         return null;
       }
       return achadas[0];
