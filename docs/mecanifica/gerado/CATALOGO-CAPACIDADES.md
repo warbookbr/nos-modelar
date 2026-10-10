@@ -2,7 +2,7 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:a848b0fb8d43b5909b7a7c5210997daa0a648fa62a1711cd02d0baec9f80c3d7`.
+Assinatura do registro: `sha256:2ce16b3d979536b72b693fd1580bcaf19858305f952cb003e1743c6eb5404688`.
 
 Há 37 operações em 1 módulo(s).
 
@@ -20,7 +20,7 @@ Há 37 operações em 1 módulo(s).
 | `encostar` | Posicionar uma seleção em contato direcional com uma referência. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.encostar@1` |
 | `esfera` | Criar esfera UV apoiada no chão. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.esfera@1` |
 | `espelha` | Duplicar faces refletidas, com modo estrutural opcional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.espelha@1` |
-| `extruda` | Extrudar uma face por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.extruda@1` |
+| `extruda` | Extrudar uma face, por ID posicional ou por seleção que resolva para uma face só. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.extruda@1` |
 | `extrusao` | Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.extrusao@1` |
 | `filete` | Criar chanfro plano compatível com o filete v1. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.filete@1` |
 | `furo` | Abrir um ou vários furos estruturais passantes ou cegos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.furo@1` |

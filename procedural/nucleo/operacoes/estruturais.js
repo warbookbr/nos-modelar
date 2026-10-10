@@ -1,6 +1,6 @@
 /* estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 export function criarOperacoesEstruturais(servicos) {
-  const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
+  const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
   return {
   publicarPorta(st, a, i) {
     const usaNomeLegado = a.nome !== undefined;
@@ -788,18 +788,37 @@ export function criarOperacoesEstruturais(servicos) {
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
     if (declaracoes.length > 1) return grita(st, i, 'arredondarAresta', 'origemId', textoDeclaracoes(a.origemId, declaracoes));
 
-    const faceAId = faceUnicaEstrutural(st, a.de, 'arredondarAresta', 'de', i);
-    if (faceAId == null) return;
+    /* A aresta chega de duas formas: `de` + `aresta` (face e índice local, o endereço de sempre) ou `sel` com
+       `onde:{alvo:'aresta',…}`, que escolhe por propriedade geométrica e precisa resolver para UMA aresta. No segundo
+       caso a face de apoio é a de menor id entre as que a usam, e o índice é o dela nessa face. */
+    if (a.sel != null && (a.de != null || a.aresta != null)) return grita(st, i, 'arredondarAresta', 'sel+de', 'aresta ambígua: use de + aresta (face e índice local) OU sel:{onde:{alvo:\'aresta\',…}}, nunca os dois');
+    let faceAId, arestaLocal;
+    if (a.sel != null) {
+      const antes = st.orfaos.length;
+      const r = resolverSelecao(st, a.sel, 'arredondarAresta', i);
+      if (st.orfaos.length !== antes) return;
+      if (r.arestas.length !== 1) return grita(st, i, 'arredondarAresta', 'sel', `sel precisa resolver para EXATAMENTE uma aresta (use onde:{alvo:'aresta',…}); resolveu ${r.arestas.length}${r.arestas.length ? `: ${r.arestas.slice(0, 6).map(([p, q]) => `${p}-${q}`).join(', ')}${r.arestas.length > 6 ? ', …' : ''}` : ''}`);
+      const [p, q] = r.arestas[0];
+      for (const [fid, f] of [...st.F].sort((x, y) => x[0] - y[0])) {
+        const k = f.vs.findIndex((v, n) => (v === p && f.vs[(n + 1) % f.vs.length] === q) || (v === q && f.vs[(n + 1) % f.vs.length] === p));
+        if (k >= 0) { faceAId = fid; arestaLocal = k; break; }
+      }
+      if (faceAId == null) return grita(st, i, 'arredondarAresta', 'sel', `a aresta ${p}-${q} não pertence a nenhuma face`);
+    } else {
+      faceAId = faceUnicaEstrutural(st, a.de, 'arredondarAresta', 'de', i);
+      if (faceAId == null) return;
+      arestaLocal = a.aresta;
+    }
     const faceA = st.F.get(faceAId);
     const L = faceA.vs.length;
-    if (!Number.isSafeInteger(a.aresta) || a.aresta < 0 || a.aresta >= L) return grita(st, i, 'arredondarAresta', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos)`);
+    if (!Number.isSafeInteger(arestaLocal) || arestaLocal < 0 || arestaLocal >= L) return grita(st, i, 'arredondarAresta', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos)`);
     const paineis = st.num(a.paineis ?? 0);
     if (!Number.isSafeInteger(paineis) || paineis < 2) return grita(st, i, 'arredondarAresta', 'paineis', 'paineis precisa ser inteiro >= 2 (um painel é o chanfro filete v1)');
     if (paineis > Math.floor(BLOCO / 2)) return grita(st, i, 'arredondarAresta', 'paineis', `paineis ${paineis} estoura o bloco de ids (${BLOCO})`);
     const raio = st.num(a.raio ?? 0);
     if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'arredondarAresta', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
 
-    const v0 = faceA.vs[a.aresta], v1 = faceA.vs[(a.aresta + 1) % L];
+    const v0 = faceA.vs[arestaLocal], v1 = faceA.vs[(arestaLocal + 1) % L];
     let faceBId = null; let reversa = true;
     for (const [fid, f] of st.F) {
       if (fid === faceAId) continue;
@@ -812,9 +831,9 @@ export function criarOperacoesEstruturais(servicos) {
       }
       if (faceBId === -2) break;
     }
-    if (faceBId == null) return grita(st, i, 'arredondarAresta', 'de', `a aresta ${a.aresta} da face ${faceAId} não é compartilhada por nenhuma outra face`);
-    if (faceBId === -2) return grita(st, i, 'arredondarAresta', 'de', `a aresta ${a.aresta} da face ${faceAId} é compartilhada por mais de duas faces — não é manifold`);
-    if (!reversa) return grita(st, i, 'arredondarAresta', 'de', `a face ${faceBId} percorre a aresta ${a.aresta} no mesmo sentido de ${faceAId} — winding inválido para malha fechada`);
+    if (faceBId == null) return grita(st, i, 'arredondarAresta', 'de', `a aresta ${arestaLocal} da face ${faceAId} não é compartilhada por nenhuma outra face`);
+    if (faceBId === -2) return grita(st, i, 'arredondarAresta', 'de', `a aresta ${arestaLocal} da face ${faceAId} é compartilhada por mais de duas faces — não é manifold`);
+    if (!reversa) return grita(st, i, 'arredondarAresta', 'de', `a face ${faceBId} percorre a aresta ${arestaLocal} no mesmo sentido de ${faceAId} — winding inválido para malha fechada`);
     const faceB = st.F.get(faceBId);
 
     const planoA = poligonoPlano(st, faceAId);

@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:a848b0fb8d43b5909b7a7c5210997daa0a648fa62a1711cd02d0baec9f80c3d7",
+  "assinatura": "sha256:2ce16b3d979536b72b693fd1580bcaf19858305f952cb003e1743c6eb5404688",
   "total": 37,
   "operacoes": [
     {
@@ -268,8 +268,6 @@
           "additionalProperties": false,
           "required": [
             "origemId",
-            "de",
-            "aresta",
             "raio",
             "paineis"
           ],
@@ -281,7 +279,7 @@
             },
             "de": {
               "type": "object",
-              "description": "Face que contém a aresta."
+              "description": "Face que contém a aresta (com aresta); não misture com sel."
             },
             "aresta": {
               "anyOf": [
@@ -295,7 +293,11 @@
                   "type": "array"
                 }
               ],
-              "description": "Índice local da aresta na face."
+              "description": "Índice local da aresta na face de."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Em vez de de + aresta: seleção que resolva para EXATAMENTE uma aresta, por exemplo {origem:{op:'cubo',id:1}, onde:{alvo:'aresta', normal:{dir:[0,1,0],ate:5}, extremo:{eixo:'z',lado:'max'}}}."
             },
             "raio": {
               "anyOf": [
@@ -360,9 +362,12 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare de + aresta ou sel, nunca os dois."
+        ],
         "limites": [
-          "Escopo atual exige duas faces convexas manifold."
+          "Escopo atual exige duas faces convexas manifold.",
+          "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
         ],
         "diagnosticos": []
       }
@@ -1423,15 +1428,13 @@
       "nome": "extruda",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Extrudar uma face por ID posicional.",
+        "intencao": "Extrudar uma face, por ID posicional ou por seleção que resolva para uma face só.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.extruda@1",
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "face"
-          ],
+          "required": [],
           "properties": {
             "face": {
               "anyOf": [
@@ -1445,7 +1448,11 @@
                   "type": "array"
                 }
               ],
-              "description": "ID da face."
+              "description": "ID da face (legado); não misture com sel."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção que resolva para EXATAMENTE uma face, por exemplo {onde:{normal:{dir:[0,1,0],ate:5}}} dentro de uma origem."
             },
             "dist": {
               "anyOf": [
@@ -1478,7 +1485,18 @@
             [
               "extruda",
               {
-                "face": 1,
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1
+                  },
+                  "onde": {
+                    "extremo": {
+                      "eixo": "y",
+                      "lado": "max"
+                    }
+                  }
+                },
                 "dist": 0.1
               }
             ]
@@ -1489,9 +1507,11 @@
           "ESQUELETO": null,
           "ALIASES": []
         },
-        "precondicoes": [],
+        "precondicoes": [
+          "Declare face ou sel, nunca os dois."
+        ],
         "limites": [
-          "Operação posicional e local."
+          "Local: só a face escolhida sobe; a seleção que resolve para zero ou várias faces grita."
         ],
         "diagnosticos": []
       }
