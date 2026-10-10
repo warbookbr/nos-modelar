@@ -209,13 +209,40 @@ ambos o hash do id original, de modo que a tabela não depende da ordem das form
 parte da forma, ou `sem-regiao` sem as duas. O envelope é a união das caixas do esboço, e os landmarks são o centro do
 conjunto e os pontos nomeados do esboço que caem dentro dele.
 
+As medidas do `plano.medidas` do esboço são lidas na blocagem do andaime (`src/autoria/medidas-na-blocagem.js`,
+`lerMedidasNaBlocagem`; o adaptador `medidasDoAndaime` junta as duas pontas). A mesma expressão que o esboço mede sobre as
+próprias formas (`alturaTotal`, `larguraTotal`, `profundidadeTotal`, `{ caixa, formas }` e `{ distancia, eixo }`) é medida nos
+vértices da malha compilada, achando as formas citadas pela `tabela` do tradutor, e devolve por medida o que o esboço devolve
+(`esperado_mm`, `medido_mm`, `desvio_mm`, `tolerancia_mm`, `ok`), com o valor exato, os volumes lidos e as perdas que tocam esses
+volumes. A blocagem mede de verdade o envelope: a caixa de um eixo e as seis faces (`<id>.+y`). As âncoras que a malha não revela
+(`centro`, `inicio`, `fim`, seções e pontos-guia) valem a posição do esboço e só são aceitas dentro do envelope medido do volume;
+os pontos nomeados e os vetores valem o que declaram. Uma medida volta com `lida: false` e o motivo, sem derrubar as outras,
+quando cita forma que não existe ou âncora que a forma não tem, uma âncora fora do envelope medido, uma forma sem tradução cuja
+caixa passa do que as outras formas medem no eixo (se cabe dentro, ela não pode mudar o resultado e a medida é lida, com a forma
+em `foraDoAndaime`), ou a forma de um componente recolhido ao envelope da principal, que só tem o envelope da principal.
+`compararLeituras` compara a blocagem com a mesma conta sobre o dado do esboço e diz, por medida, a diferença e se ela cabe no
+`erroEnvelope.mm` das perdas dos volumes lidos mais a tolerância de concordância de 0,05 mm, que cobre o polígono inscrito do
+tubo e do cilindro fora dos eixos. O tradutor preserva o envelope das aproximações (a caçamba cheia, a inclinação ignorada e a
+casca não o mudam), e por isso nas fixtures nenhuma medida precisa da perda para ser explicada: a diferença máxima é 0,0089 mm.
+A seção ponto de um loft perto da borda é o caso em que a perda explica a diferença.
+
+O G01 completo roda sobre o andaime derivado por `avaliarG01DoAndaime` (`src/autoria/g01-do-andaime.js`) e, a partir do esboço,
+por `g01DoEsboco` no adaptador: o alvo N2 entra de fora, o tradutor recebe o `alvo`, o `objetivo`, a `familia` e os `eixos` dele, e
+o resultado traz o G01 (`mecanifica.avaliacao-forma-global@1`), o G00 do alvo e `medidasAprovadas`, que diz se envelope,
+landmarks, regiões, orçamento e as três silhuetas passam sem depender de a crítica do alvo estar registrada (o G01 fica
+`bloqueado` enquanto o G00 está). Nenhum esboço do repositório declara `plano.referencia`, e por isso a chamada está provada com um
+alvo sintético (um cubo, em três silhuetas retangulares); sem `alvo` ela devolve `rodou: false` dizendo se falta o contorno ou só o
+alvo. Transformar o contorno de referência de uma vista (`mecanifica.contornos@1`) nas três silhuetas do alvo não está feito.
+
 A prova está em `src/autoria/tradutor-nivel-zero.test.js` (cada tipo com formas escritas à mão, a rotação, as aproximações com
 valores analíticos, o recolhimento, as recusas, os ids e o determinismo) e em `tools/mecanifica/esboco-para-andaime.test.mjs`
 (as fixtures do módulo e do banco de provas): nas formas exatas o volume coincide com o do esboço dentro de 1e-6 relativo e o
 envelope dentro de 1e-5 mm, e dentro de r (1 - cos(pi / n)) no cilindro e no tubo fora dos eixos, em cada forma, unidade, parte e
 no conjunto; as formas aproximadas sem perda de volume (caixa com raio, cilindro achatado, loft sem casca nem inclinação) têm o
 mesmo erro, e a caçamba do carrinho (casca e seção inclinada) é provada à parte, com o envelope externo dentro de 1%, a perda
-de cavidade declarada e o volume do esboço calculado por fora, pelo casco convexo de cada faixa.
+de cavidade declarada e o volume do esboço calculado por fora, pelo casco convexo de cada faixa. As medidas do plano e o G01 têm
+`src/autoria/medidas-na-blocagem.test.js` (formas escritas à mão) e `tools/mecanifica/esboco-medidas-no-andaime.test.mjs` (as dez
+fixtures com `plano.medidas`, a medida alterada para reprovar, a forma sem tradução, o componente recolhido e o G01).
 
 ## Porta operacional
 
@@ -245,10 +272,10 @@ fechada, volume conhecido, determinismo e recusa) e
 `forma-global-n2-g01-primitivas.test.mjs` aprova no G01 um andaime que usa as seis,
 com três casos vermelhos (envelope, região e silhueta).
 
-O tradutor do nível zero tem teste próprio:
+O tradutor do nível zero e a leitura das medidas na blocagem têm teste próprio:
 
 ```text
-npx vitest run src/autoria/tradutor-nivel-zero.test.js tools/mecanifica/esboco-para-andaime.test.mjs
+npx vitest run src/autoria/tradutor-nivel-zero.test.js tools/mecanifica/esboco-para-andaime.test.mjs src/autoria/medidas-na-blocagem.test.js tools/mecanifica/esboco-medidas-no-andaime.test.mjs
 ```
 
 Os PNGs são conveniência de inspeção. Os SVGs, JSONs e hashes do manifesto são
