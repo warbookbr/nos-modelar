@@ -50,7 +50,7 @@ export function descreverTraducao({ andaime, naoTraduzidas, perdas = [], ocultas
 
 /* As medidas do `plano.medidas` que valem para a opção `dados.opcao`, no formato de `lerPlano`, com os pontos
    `<instancia>.<ancora>` já trocados pelos da forma real (o que `expandirEsboco` guarda em `opcoes[i].medidas`). */
-function medidasDaOpcao(expandido, dados) {
+export function medidasDaOpcao(expandido, dados) {
   const indice = dados.opcao.numero - 1;
   const o = expandido.opcoes[indice];
   const titulo = o.titulo ?? `Opção ${indice + 1}`;

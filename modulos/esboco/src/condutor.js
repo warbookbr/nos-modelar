@@ -5,7 +5,12 @@
    estágio seguinte abre: o gate de contato aprovado, as medidas do plano dentro da tolerância e o contrato de relações
    cumprido (mais o que o estágio pede). O nível de detalhe do plano (`plano.nivel`) liga ou desliga estágios. A cada 25%
    do custo estimado (o número de formas das unidades) o Marco registra "chamar o crítico" no estado; o despacho do
-   crítico é da skill. Puro e determinístico: sem data nem sorteio, e sem ler nem gravar arquivo. */
+   crítico é da skill. Puro e determinístico: sem data nem sorteio, e sem ler nem gravar arquivo.
+
+   O nível zero entra por uma porta de injeção, porque o módulo não importa o núcleo: `nivelZero(bruto)` é uma função que quem
+   chama passa a `portaoDoEstagio` e a `avancar`, e que devolve, por opção do esboço, o que a blocagem do andaime compilado leu
+   (ver `lerNivelZero`). Nos estágios Maquete e Conferência da maquete o Portão lê o `plano.medidas` por essa leitura, recusa a
+   opção cujo andaime não compila e mostra as perdas do tradutor; nos demais, e sem a porta, tudo é lido no esboço como antes. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { descreverAchado, herdarDoEspelho, lerContato, unidadesDeclaradas, verificarContato } from './contato.js';
@@ -291,10 +296,30 @@ export function unidadesDoEstado(estado) {
   return Object.fromEntries((estado?.unidades ?? []).flatMap((u) => u.membros.map((m) => [m, u.id])));
 }
 
-/* Mede o esboço para o Portão: divergências (gate, soltas, atravessamentos, medidas, contrato) e o que o nível pede do plano. */
-function medirParaOPortao(bruto, estado, referencias) {
+/* Os estágios em que a Maquete responde ao andaime compilado do nível zero. */
+export const ESTAGIOS_DO_NIVEL_ZERO = ['maquete', 'conferencia-da-maquete'];
+/* O máximo de linhas de perda por opção que o Portão mostra; o resto vira uma linha de contagem. */
+export const LINHAS_DE_PERDA_POR_OPCAO = 8;
+
+/* O que a porta `nivelZero` devolveu, organizado para o Portão: as medidas lidas na blocagem por opção e por nome (só as lidas;
+   a que a blocagem não leu fica no esboço), o que impede o andaime de uma opção de compilar e o texto das perdas. A porta
+   devolve `{ opcoes: [{ titulo, volumes, aproximadas, semEquivalente, linhas, medidas, erro? }] }`, com `medidas` na forma de
+   `lerMedidasNaBlocagem` (`nome`, `lida`, `exato_mm`, `formas`, `motivo`). */
+function lerNivelZero(leitura) {
+  const opcoes = Array.isArray(leitura?.opcoes) ? leitura.opcoes : [];
+  const medidasLidas = opcoes.map((o) => Object.fromEntries((o.medidas ?? []).filter((m) => m.lida).map((m) => [m.nome, m])));
+  const naoLidas = opcoes.flatMap((o) => (o.medidas ?? []).filter((m) => !m.lida).map((m) => ({ opcao: o.titulo, nome: m.nome, motivo: m.motivo })));
+  const falhas = opcoes.flatMap((o) => (o.erro ? [{ opcao: o.titulo, erro: o.erro }] : []));
+  return { medidasLidas, naoLidas, falhas, opcoes: opcoes.map((o) => ({ titulo: o.titulo, volumes: o.volumes, aproximadas: o.aproximadas, semEquivalente: o.semEquivalente, linhas: o.linhas ?? [], ...(o.erro ? { erro: o.erro } : {}) })) };
+}
+
+/* Mede o esboço para o Portão: divergências (gate, soltas, atravessamentos, medidas, contrato) e o que o nível pede do plano.
+   Com a porta `nivelZero` e num estágio do nível zero, as medidas do plano vêm da blocagem do andaime. */
+function medirParaOPortao(bruto, estado, referencias, nivelZero) {
   const nivel = estado.nivel;
-  const medido = medirEsboco(bruto, { projecao: false, referencias, unidades: unidadesDoEstado(estado) });
+  const doNivelZero = typeof nivelZero === 'function' && ESTAGIOS_DO_NIVEL_ZERO.includes(estado.atual);
+  const lido = doNivelZero ? lerNivelZero(nivelZero(bruto)) : null;
+  const medido = medirEsboco(bruto, { projecao: false, referencias, unidades: unidadesDoEstado(estado), ...(lido ? { medidasLidas: lido.medidasLidas } : {}) });
   const { descricao, plano } = medido;
   /* a silhueta contra a referência é coisa da Conferência da maquete: na Maquete ainda se constrói, a menos que o nível
      não tenha Conferência (o esquemático) */
@@ -303,10 +328,11 @@ function medirParaOPortao(bruto, estado, referencias) {
   const falta = [];
   for (const o of descricao.opcoes) if (!o.gate.declarado && o.formas.length >= 4) falta.push(`o gate de contato não está ligado na opção "${o.titulo}" (contato.usar: true; a política liga a partir de 4 formas)`);
   for (const d of divergencias) falta.push(`[${d.n}] ${d.classe}: ${d.texto}`);
+  if (lido) for (const f of lido.falhas) falta.push(`o andaime do nível zero da opção "${f.opcao}" não compila, e a Maquete responde por ele: ${f.erro}`);
   const exige = EXIGENCIAS_POR_NIVEL[nivel];
   if (plano.resumo.medidas < exige.medidas) falta.push(`o plano declara ${plano.resumo.medidas} medida${plano.resumo.medidas === 1 ? '' : 's'} nomeada${plano.resumo.medidas === 1 ? '' : 's'} e o nível ${nivel} pede pelo menos ${exige.medidas} (plano.medidas: nome, valor, unidade, origem e mede)`);
   if (plano.resumo.relacoes < exige.relacoes) falta.push(`o nível ${nivel} pede o contrato de relações declarado (plano.contrato: tocam, livres, simetricas) e ele está vazio`);
-  return { falta, divergencias, resumo: plano.resumo };
+  return { falta, divergencias, resumo: plano.resumo, ...(lido ? { nivelZero: { opcoes: lido.opcoes, naoLidas: lido.naoLidas } } : {}) };
 }
 
 /* Custo estimado: o número de formas das unidades (feito e total). */
@@ -343,10 +369,10 @@ function sincronizarNivel(estado, bruto) {
 }
 
 /* O Portão do estágio atual: { estagio, passa, falta }. `falta` diz, em frases, o que impede o próximo estágio. */
-export function portaoDoEstagio(bruto, estadoBruto, { referencias } = {}) {
+export function portaoDoEstagio(bruto, estadoBruto, { referencias, nivelZero } = {}) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   if (estado.atual === CONCLUIDO) return { estagio: CONCLUIDO, passa: true, falta: [] };
-  const { falta, divergencias, resumo } = medirParaOPortao(bruto, estado, referencias);
+  const { falta, divergencias, resumo, nivelZero: doNivelZero } = medirParaOPortao(bruto, estado, referencias, nivelZero);
   if (['plano-de-detalhe', 'detalhe-por-unidade', 'montagem'].includes(estado.atual)) {
     const atuais = planoDeDetalhe(bruto).formas;
     const nas = new Set(estado.unidades.flatMap((u) => u.membros));
@@ -364,13 +390,13 @@ export function portaoDoEstagio(bruto, estadoBruto, { referencias } = {}) {
       if (sem.length) falta.push(`${sem.length} ${sem.length === 1 ? 'unidade' : 'unidades'} sem o Envelope conferido (--envelope <unidade> <arquivo-detalhado.esboco.json>): ${sem.join(', ')}`);
     }
   }
-  return { estagio: estado.atual, passa: falta.length === 0, falta, divergencias, resumo, ...(envelopeDeclarado ? { envelopeDeclarado: true } : {}) };
+  return { estagio: estado.atual, passa: falta.length === 0, falta, divergencias, resumo, ...(doNivelZero ? { nivelZero: doNivelZero } : {}), ...(envelopeDeclarado ? { envelopeDeclarado: true } : {}) };
 }
 
 /* Avança se o Portão passa. Devolve { ok, estado, portao }; sem passar o estado não muda e `portao.falta` diz o que falta. */
-export function avancar(bruto, estadoBruto, { referencias } = {}) {
+export function avancar(bruto, estadoBruto, { referencias, nivelZero } = {}) {
   const estado = sincronizarNivel(estadoBruto, bruto);
-  const portao = portaoDoEstagio(bruto, estado, { referencias });
+  const portao = portaoDoEstagio(bruto, estado, { referencias, nivelZero });
   if (estado.atual === CONCLUIDO) return { ok: false, estado, portao, concluido: true };
   /* o veredito do objeto abaixo de 8 e ainda não travado não barra: o --proximo é o que reimprime o brief depois da correção */
   const barrado = bloqueiosDaNota(estado).filter((b) => b.unidade !== UNIDADE_DO_OBJETO || b.travado);
@@ -704,6 +730,7 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
   if (estado.atual === CONCLUIDO) L.push('o fluxo terminou: todos os Portões dos estágios ligados passaram');
   else L.push(`Portão de ${nomeDoEstagio(estado.atual)}: ${portao.passa ? 'passa (--proximo avança)' : 'não passa, falta:'}`);
   if (estado.atual !== CONCLUIDO && !portao.passa) for (const f of portao.falta) L.push(`  - ${f}`);
+  if (portao?.nivelZero) L.push(...textoDoNivelZero(portao.nivelZero));
   if (estado.unidades.length > 0) {
     const c = custoDe(estado);
     L.push(`unidades de detalhe (${estado.unidades.length}, custo estimado ${c.total} formas, feito ${c.feito}, ${n(c.percentual)}%), na ordem de dependência:`);
@@ -719,6 +746,20 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;
+}
+
+/* O que o Portão mostra do nível zero: por opção o andaime compilado e, quando há, as perdas do tradutor (até
+   `LINHAS_DE_PERDA_POR_OPCAO` linhas), e as medidas que a blocagem não leu e que o esboço mediu no lugar. */
+export function textoDoNivelZero(nz) {
+  const L = [];
+  for (const o of nz.opcoes) {
+    if (o.erro) { L.push(`nível zero, opção ${o.titulo}: o andaime não compila (${o.erro})`); continue; }
+    L.push(`nível zero, opção ${o.titulo}: ${o.volumes} ${o.volumes === 1 ? 'volume' : 'volumes'} no andaime compilado, ${o.aproximadas} aproximado${o.aproximadas === 1 ? '' : 's'}, ${o.semEquivalente} sem equivalente${o.linhas.length ? ' (o que a blocagem perde em relação ao esboço):' : ''}`);
+    for (const l of o.linhas.slice(0, LINHAS_DE_PERDA_POR_OPCAO)) L.push(`  ${l}`);
+    if (o.linhas.length > LINHAS_DE_PERDA_POR_OPCAO) L.push(`  e mais ${o.linhas.length - LINHAS_DE_PERDA_POR_OPCAO} linhas de perda`);
+  }
+  for (const m of nz.naoLidas) L.push(`medida "${m.nome}" da opção ${m.opcao} não lida na blocagem (${m.motivo}); o esboço a mediu no lugar`);
+  return L;
 }
 
 const faixa = (f) => `${n1(f[0])}..${n1(f[1])}`;
@@ -810,10 +851,22 @@ export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
 
 /* Texto do resultado de `conferirEnvelope`. */
 export function formatarEnvelope(r, arquivo) {
+  if (r.refina) return formatarRefina(r, arquivo);
   const L = [`envelope da unidade ${r.unidade} contra ${arquivo}: ${r.ok ? 'cabe' : 'não cabe'} (tolerância ${n1(r.tolerancia_mm)} mm${r.tolerancia_declarada ? '' : ', padrão de 1% da maior dimensão'})`];
   L.push(`  caixa: ${EIXOS.map((e) => (r.caixa[e].ok ? `${e} cabe` : `${e} passa ${n1(r.caixa[e].excesso_mm)} mm`)).join('; ')}`);
   if (r.formas?.length) L.push(`  formas da maquete: ${r.formas.map((f) => (f.ausente ? `${f.forma} ausente` : f.ok ? `${f.forma} cabe` : `${f.forma} excedida`)).join('; ')}`);
   L.push(r.portas.length === 0 ? '  portas: nenhuma (nenhuma outra unidade usa uma âncora desta)' : `  portas: ${r.portas.map((p) => `${p.forma}.${p.ancora} ${p.ok ? `no lugar (${n1(p.desvio_mm)} mm)` : p.medido === null ? 'ausente' : `fora do lugar (${n1(p.desvio_mm)} mm)`}`).join('; ')}`);
+  for (const f of r.falta) L.push(`  - ${f}`);
+  return `${L.join('\n')}\n`;
+}
+
+/* O resultado do Envelope quando o detalhe é uma receita que refina (`r.refina`, montado fora do módulo): as partes da receita
+   contra os volumes da unidade no andaime, e o que o verificador do `REFINA` achou. */
+function formatarRefina(r, arquivo) {
+  const re = r.refina;
+  const L = [`envelope da unidade ${r.unidade} contra ${arquivo}: ${r.ok ? 'cabe' : 'não cabe'} (verificador do REFINA da receita, andaime ${re.andaime}, tolerância ${n1(r.tolerancia_mm)} mm)`];
+  L.push(re.partes.length === 0 ? '  partes: nenhuma' : `  partes: ${re.partes.map((p) => `${p.parte} -> ${p.volume} (excesso ${n1(p.excessoMm)} mm)`).join('; ')}`);
+  L.push(re.portas.length === 0 ? '  portas: nenhuma declarada pelo andaime' : `  portas: ${re.portas.map((p) => `${p.id} ${p.estado}`).join('; ')}`);
   for (const f of r.falta) L.push(`  - ${f}`);
   return `${L.join('\n')}\n`;
 }

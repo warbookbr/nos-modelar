@@ -60,6 +60,7 @@ export const FRASES = {
   condutor: 'O Condutor: os estágios, o nível do plano e o Portão de cada estágio.',
   unidades: 'Unidades de detalhe: o agrupamento, `--mover`, `--replanejar`, `--feito` e os Marcos.',
   envelope: 'O Envelope da maquete, a conferência com `--envelope` e as imagens `--unidade`.',
+  andaime: 'O Condutor lendo o andaime compilado: medidas na blocagem, perdas do tradutor e o Envelope por receita com REFINA.',
   detalhar: 'O esboço isolado de uma unidade (`--detalhar`) e a volta ao mestre (`--integrar`).',
   critico: 'A função da unidade, o brief do crítico, o veredito, a escala da nota e o crítico do objeto.',
   execucao: 'O modo `por-unidade` e a nota de passagem entre unidades.',

@@ -23,6 +23,7 @@ import { recortarAmpliado } from './analise-da-peca.mjs';
 import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
 import { ajuda } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
+import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
 
 /* Um caminho relativo vale a partir do diretório de quem chamou: `npm run` roda no repositório e deixa esse diretório em
@@ -580,12 +581,13 @@ export function condutorArquivo(arquivo, acao = {}) {
   if (acao.envelope !== undefined) {
     /* confere a versão detalhada de uma unidade contra o Envelope dela; só grava o resultado num estado que já existe */
     const { unidade, arquivo: detalhado } = acao.envelope;
-    const r = conferirEnvelope(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')));
+    /* a receita que refina chega com o resultado do verificador do REFINA já calculado (`resultado`) */
+    const r = acao.envelope.resultado ?? conferirEnvelope(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')));
     if (!novo) writeFileSync(memoria, `${JSON.stringify(registrarEnvelope(estado, r, basename(detalhado)), null, 2)}\n`);
     return { texto: `${formatarEnvelope(r, basename(detalhado))}${novo ? `o estado do Condutor não existe (${basename(memoria)}): a conferência não foi gravada\n` : ''}`, codigo: r.ok ? 0 : 1, resultado: r };
   }
   if (acao.proximo) {
-    const r = avancar(bruto, estado, { referencias });
+    const r = avancar(bruto, estado, { referencias, nivelZero: nivelZeroDoEsboco });
     estado = r.estado;
     if (r.concluido) extra = 'o fluxo já terminou; não há estágio seguinte\n';
     else if (r.bloqueio) { codigo = 1; extra = `avanço recusado: ${r.bloqueio}\n`; }
@@ -635,7 +637,7 @@ export function condutorArquivo(arquivo, acao = {}) {
     extra = `Plano de detalhe refeito; as formas que continuam existindo ficaram nas unidades em que estavam\n${novas.length ? `formas novas sem unidade declarada (${novas.length}): ${novas.slice(0, 12).map((n) => `${n.forma} em ${n.unidade}`).join(', ')}${novas.length > 12 ? `, e mais ${novas.length - 12}` : ''}; declare "unidade" nelas ou mude com --mover\n` : ''}`;
   }
   writeFileSync(memoria, `${JSON.stringify(estado, null, 2)}\n`);
-  const portao = portaoDoEstagio(bruto, estado, { referencias });
+  const portao = portaoDoEstagio(bruto, estado, { referencias, nivelZero: nivelZeroDoEsboco });
   return { texto: `${extra}${novo ? `estado criado em ${memoria}\n` : ''}${formatarSituacao(estado, portao, { historico: acao.historico === true, marcos: acao.feito === undefined })}`, codigo, estado, portao, criticoDe, refeita, marcoDe, objetoDe };
 }
 
@@ -1269,7 +1271,18 @@ async function principal(argv) {
       return foraDoEnvelope ? 1 : 0;
     }
     if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar', '--modo', '--nota-de-passagem'].some((f) => args.tem(f))) {
-      const r = condutorArquivo(alvo, { envelope: args.tem('--envelope') ? { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) } : undefined, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
+      /* o detalhe que é uma receita (.js ou .mjs) é conferido pelo verificador do REFINA em vez do Envelope do esboço */
+      let envelope;
+      if (args.tem('--envelope')) {
+        envelope = { unidade: args.valor('--envelope'), arquivo: args.valor('--envelope', 1) };
+        if (/\.m?js$/i.test(envelope.arquivo ?? '')) {
+          const caminho = resolverCaminho(alvo);
+          let estadoGravado = null;
+          try { estadoGravado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
+          envelope.resultado = await envelopeDaReceitaArquivo({ bruto: JSON.parse(readFileSync(caminho, 'utf8')), estado: estadoGravado, unidade: envelope.unidade, caminhoDaReceita: resolverCaminho(envelope.arquivo) });
+        }
+      }
+      const r = condutorArquivo(alvo, { envelope, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
       process.stdout.write(r.texto);
       process.stdout.write(dicaDoCondutor(r, args));
       if (r.criticoDe) process.stdout.write((await briefDoCritico(alvo, r.criticoDe, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, forcar: r.refeita, vizinhos: !args.tem('--sem-vizinhos') })).texto);

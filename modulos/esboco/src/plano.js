@@ -286,8 +286,11 @@ export function assimetriaDoPar(a, b, eixo, pos) {
 /* Confere o plano contra o esboço já expandido. `visiveis` são as formas resolvidas e visíveis de cada opção. Devolve
    { nivel, opcoes: [{ titulo, medidas, contrato }], achados, resumo }. Cada achado traz `tipo` (`medida-fora`,
    `contrato-toca`, `contrato-livre`, `assimetria`), `opcao`, `pecas` e `texto`. Sem plano estruturado só confere os espelhos
-   deslocados. */
-export function conferirPlano(esboco, visiveis, { referencias, unidades } = {}) {
+   deslocados. `medidasLidas` (opcional) traz, por opção (na ordem) e por nome de medida, o valor que outra leitura deu
+   (`{ exato_mm, formas }`, o da blocagem do nível zero, que o Condutor recebe de fora): a medida lida assim usa esse valor no
+   lugar da conta sobre as formas do esboço, com a mesma tolerância e o mesmo arredondamento; a que ficou sem leitura é medida
+   no esboço como antes. */
+export function conferirPlano(esboco, visiveis, { referencias, unidades, medidasLidas } = {}) {
   const lido = lerPlano(esboco?.plano);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -313,13 +316,14 @@ export function conferirPlano(esboco, visiveis, { referencias, unidades } = {}) 
       const m = reescrita && m0.mede.distancia ? { ...m0, mede: { ...m0.mede, distancia: reescrita } } : m0;
       if (!valeParaOpcao(m, titulo, i)) continue;
       const onde = `opção ${i + 1} (${titulo}): plano.medidas "${m.nome}"`;
-      const { mm, pecas } = medir(m.mede, rs, pontos, onde, brutos);
+      const lida = medidasLidas?.[i]?.[m.nome];
+      const { mm, pecas } = lida ? { mm: lida.exato_mm, pecas: lida.formas ?? [] } : medir(m.mede, rs, pontos, onde, brutos);
       const esperado = m.valor * UNIDADES[m.unidade];
       const tolerancia = m.tolerancia ?? Math.max(1, esperado * 0.02);
       const desvio = mm - esperado;
       const ok = Math.abs(desvio) <= tolerancia + 1e-9;
-      medidas.push({ nome: m.nome, origem: m.origem, esperado_mm: r1(esperado), medido_mm: r1(mm), desvio_mm: r1(desvio), tolerancia_mm: r1(tolerancia), ok });
-      if (!ok) novo({ tipo: 'medida-fora', nome: m.nome, pecas, mm: r1(Math.abs(desvio)), desvio_mm: r1(desvio), texto: `medida "${m.nome}" fora da tolerância: o esboço mede ${mm1(mm)} mm e o plano declara ${mm1(esperado)} mm (origem: ${m.origem}), desvio de ${sinal(desvio)} mm com tolerância de ${mm1(tolerancia)} mm` });
+      medidas.push({ nome: m.nome, origem: m.origem, esperado_mm: r1(esperado), medido_mm: r1(mm), desvio_mm: r1(desvio), tolerancia_mm: r1(tolerancia), ok, ...(lida ? { fonte: 'blocagem' } : {}) });
+      if (!ok) novo({ tipo: 'medida-fora', nome: m.nome, pecas, mm: r1(Math.abs(desvio)), desvio_mm: r1(desvio), texto: `medida "${m.nome}" fora da tolerância: ${lida ? 'a blocagem do andaime mede' : 'o esboço mede'} ${mm1(mm)} mm e o plano declara ${mm1(esperado)} mm (origem: ${m.origem}), desvio de ${sinal(desvio)} mm com tolerância de ${mm1(tolerancia)} mm` });
     }
     /* o inventário de partes: a obrigatória sem nenhuma forma correspondente (id, padrão ou instância) */
     for (const p of lido?.pecas ?? []) {
