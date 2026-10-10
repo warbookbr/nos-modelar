@@ -55,6 +55,7 @@ npm run esboco -- <arquivo.esboco.json> --envelope <unidade> <arquivo-detalhado.
 npm run esboco -- <arquivo.esboco.json> --referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]
 npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]
 npm run esboco -- <arquivo.esboco.json> --composta [--unidade <unidade>] [--sem-vizinhos] [--largura <px>] [--saida <pasta>]
+npm run esboco -- <arquivo.esboco.json> --nivel-zero [--composta | --unidade <unidade> | --vista <vista>] [--sem-vizinhos] [--largura <px>] [--saida <pasta>]
 npm run esboco -- --ajuda [tópico]
 npx vitest run modulos/esboco
 ```
@@ -460,6 +461,16 @@ Medido na `moto-componentes.esboco.json` (22 formas por opção, duas opções),
 ### Unidade incremental
 
 Cada imagem gravada por `--unidade` (e pelas outras vistas isoladas) leva ao lado `<imagem>.hash`, o SHA-256 do conteúdo desenhado: as formas visíveis já resolvidas (posição, geometria, cor e rótulo), o que o desenho lê do esboço (títulos, notas, `ocultar`, `legendas`, `linhasCentro`), a vista, a `--largura`, o corte, a explosão, o zoom, a prévia e o código do módulo (um hash dos arquivos de `src/`). Ao pedir a mesma unidade de novo, a vista cujo hash não mudou não é redesenhada, o navegador nem abre se nenhuma mudou, e o comando imprime "reaproveitada" na linha dela. Mudar uma forma de outra unidade, que as ocultas não deixam entrar no hash, também reaproveita; mudar a posição de uma forma da unidade, a cor, o rótulo ou o código do desenhista redesenha. Sem a imagem ou sem o hash o desenho sai de novo, e `--forçar` (ou `--forcar`) redesenha tudo.
+
+### Blocagem do nível zero
+
+`--nivel-zero`, junto de `--composta`, de `--unidade` ou de `--vista` (ou sozinho, para as quatro vistas do esboço inteiro), desenha as imagens pela blocagem do nível zero em vez de pelas formas do esboço, e é o caminho para comparar os dois: o `--unidade` e o `--composta` sem a opção seguem desenhando as formas. Cada opção é traduzida para o andaime da forma global N2 (ver "Formas resolvidas"), a blocagem compilada vira uma malha de triângulos, e o desenhista dela (`src/desenho-da-blocagem.js`) a desenha nas quatro vistas com a mesma oclusão por pixel, o mesmo quadro (painel, título, nota e barra de escala de 100 mm), a mesma luz e a cor de cada forma, que vem do estilo do esboço (`cor`, `estilos` e `unidades`, já resolvidos). O desenhista recebe a malha e a lista de volumes como dado e não importa o núcleo; a ligação entre o esboço, o tradutor e o desenhista está em `tools/mecanifica/esboco-blocagem.mjs`. Os traços são as arestas com vinco de mais de 30 graus ou de silhueta, sem as que o próprio volume esconde (a parede do furo de um anel, vista de lado). Não há legenda, linha de centro, corte, explosão, zoom nem prévia, e `--nivel-zero` junto de `--corte`, `--explodir`, `--zoom-forma` ou `--previa` é recusado: esses ficam no desenho das formas.
+
+O isolamento por unidade usa a procedência de cada volume. A tabela de nomes do tradutor leva cada forma do esboço ao volume dela, e a unidade (a do estado do Condutor gravado ao lado ou, sem ele, a do Plano de detalhe) escolhe os volumes de que alguma forma é dela. As formas de outra unidade que a tocam, as mesmas do `--unidade` de sempre, saem em contorno claro e translúcido (`--sem-vizinhos` as tira). A mesma blocagem da opção serve a todas as unidades, e com `--unidade` só a primeira opção é desenhada, como no isolamento de sempre.
+
+O que o tradutor não traduz (furo de caixa, faixa, rotação em dois eixos, medida que a N2 recusa) não existe na blocagem e não aparece na imagem: a resposta do comando lista as formas que ficaram de fora e as que entraram aproximadas, e a imagem do mancal sai sem a base. As imagens levam `-nivel-zero` no nome (`<arquivo>-nivel-zero-composta.png`, `<arquivo>-nivel-zero-<vista>.png`) e não substituem as de sempre.
+
+A prova é a silhueta, em `tools/mecanifica/esboco-blocagem.test.mjs`. Em todo esboço das fixtures e do banco de provas, a união das faces de cada vista coincide com a do desenho das formas (só das formas que a blocagem tem), medida por IoU: pelo menos 0,998 contra o desenho com os lados do esboço, pelo menos 0,98 contra o desenho que a ferramenta grava (`ladosPorEscala`, cuja flecha de 0,35 px deixa o polígono inscrito um pouco para dentro), e 1,0000 nos esboços só de formas exatas. A escala do quadro difere em menos de 0,1% e de 0,5% nos dois casos, de modo que a composta sai com as mesmas proporções e a mesma escala. A exceção é a caçamba do carrinho, de seção inclinada, em que o tradutor declara a perda de inclinação e o mínimo cai a 0,95 (0,9554 na lateral); a cavidade da casca, que a blocagem enche, não aparece na silhueta. `ESBOCO_TABELA=1 npx vitest run tools/mecanifica/esboco-blocagem.test.mjs` imprime a tabela de IoU por esboço, opção e vista.
 
 ## `--ligacoes`
 
