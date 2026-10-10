@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1002 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1003 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -802,6 +802,7 @@
 - `mapa-parte-passo.js` — mapa-parte-passo.js — qual passo da receita constrói qual parte.
 - `mapa-parte-passo.test.js` — mapa-parte-passo.test.js — o mapa acha o passo que constrói cada parte.
 - `material-da-peca.js` — material-da-peca.js — tudo que pertence a uma peça, e onde está hoje.
+- `medir-blocagem-nivel-zero.js` — Medida sobre a blocagem N2 de um andaime: compila com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por volume, o volum…
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
 - `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
 - `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
@@ -1010,7 +1011,7 @@
 
 ## tools/fixtures/nivel-zero/
 
-- `medir-blocagem.js` — Suporte de prova do tradutor do nível zero: compila um andaime com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por vo…
+- `medir-blocagem.js` — Suporte de prova do tradutor do nível zero. A medida da blocagem mora em `src/autoria/medir-blocagem-nivel-zero.js`, porque o próprio tradutor a usa para o r…
 
 ## tools/fixtures/refina-forma-global/
 

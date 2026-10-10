@@ -3,13 +3,14 @@
  * Lê o esboço (JSON escrito ou já expandido, ou um arquivo `.esboco.json`), pede ao módulo as formas resolvidas da opção
  * (`formasResolvidas`) e entrega o dado ao tradutor de `src/autoria/tradutor-nivel-zero.js`, que não conhece o módulo. É o único
  * lugar que importa os dois lados, e pode virar comando depois: a função devolve o resultado do tradutor com a opção lida, e
- * `descreverTraducao` dá o texto de uma linha por forma que ficou de fora. */
+ * `descreverTraducao` dá o texto de uma linha por forma aproximada (com o erro de volume e de envelope medido na blocagem) e
+ * uma por forma que ficou sem equivalente. */
 import { readFileSync } from 'node:fs';
 import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
 import { traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 
 /** O andaime da opção `opcao` (número a partir de 1, ou título) de um esboço já lido. As opções do tradutor (`id`, `objetivo`,
- *  `alvo`, `familia`, `intencao`, `eixos`, `estrito`) passam como estão. */
+ *  `alvo`, `familia`, `intencao`, `eixos`, `volumesMaximos`, `estrito`) passam como estão. */
 export function andaimeDoEsboco(esboco, { opcao = 1, ...opcoes } = {}) {
   const dados = formasResolvidas(esboco, opcao);
   return { ...traduzirFormasParaAndaime(dados, opcoes), opcao: dados.opcao };
@@ -26,11 +27,18 @@ export function andaimeDoArquivo(caminho, opcoes = {}) {
   return andaimeDoEsboco(esboco, opcoes);
 }
 
-/** O resumo em texto: quantos volumes entraram e, por forma que ficou de fora, o motivo. */
-export function descreverTraducao({ andaime, naoTraduzidas, ocultas, opcao }) {
+const porcento = (x) => `${(x * 100).toFixed(3)}%`;
+
+/** O resumo em texto: quantos volumes entraram, por forma aproximada o que se perdeu e o erro medido, e por forma que ficou de
+ *  fora o motivo. */
+export function descreverTraducao({ andaime, naoTraduzidas, perdas = [], ocultas, opcao }) {
   const linhas = [
-    `opção ${opcao.numero}${opcao.titulo ? ` (${opcao.titulo})` : ''}: ${andaime.volumes.length} volumes no andaime ${andaime.id}, ${naoTraduzidas.length} forma(s) sem correspondência exata, ${ocultas.length} oculta(s) fora do andaime`,
-    ...naoTraduzidas.map((n) => `  ${n.id} (${n.tipo}): ${n.motivo}`),
+    `opção ${opcao.numero}${opcao.titulo ? ` (${opcao.titulo})` : ''}: ${andaime.volumes.length} volumes no andaime ${andaime.id}, ${perdas.length} aproximado(s), ${naoTraduzidas.length} forma(s) sem equivalente, ${ocultas.length} oculta(s) fora do andaime`,
+    ...perdas.flatMap((p) => [
+      `  aproximado ${p.id} (${p.tipo}, ${p.aproximacao}): volume ${p.erroVolume.relativo >= 0 ? '+' : ''}${porcento(p.erroVolume.relativo)} (${p.erroVolume.mm3} mm3), envelope até ${p.erroEnvelope.mm} mm (${porcento(p.erroEnvelope.relativo)})`,
+      ...p.perdido.map((d) => `    perdido (${d.codigo}): ${d.descricao}`),
+    ]),
+    ...naoTraduzidas.map((n) => `  sem equivalente ${n.id} (${n.tipo}): ${n.motivo}`),
   ];
   return linhas.join('\n');
 }

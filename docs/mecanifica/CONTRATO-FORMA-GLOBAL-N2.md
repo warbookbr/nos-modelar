@@ -157,9 +157,10 @@ O esboço continua sendo onde a IA escreve, e o andaime do nível zero sai dele.
 (`traduzirFormasParaAndaime`) lê as formas já resolvidas pelo módulo (`formasResolvidas`, formato
 `mecanifica.formas-resolvidas@1`, descrito no README do esboço) e devolve o andaime, sem importar o módulo; o adaptador
 `tools/mecanifica/esboco-para-andaime.mjs` (`andaimeDoEsboco`, `andaimeDoArquivo`) lê o esboço, chama as duas pontas e
-`descreverTraducao` imprime o resultado em texto. O resultado é `{ andaime, tabela, naoTraduzidas, ocultas }`: o andaime já
-aceito por `normalizarAndaimeGlobal`, a tabela do id do esboço para o id do andaime, as formas visíveis que ficaram de fora
-com o motivo (`{ id, tipo, motivo }`) e os ids das formas `oculto: true`, que são referência do esboço e não entram.
+`descreverTraducao` imprime o resultado em texto. O resultado é `{ andaime, tabela, naoTraduzidas, perdas, ocultas }`: o andaime
+já aceito por `normalizarAndaimeGlobal`, a tabela do id do esboço para o id do andaime, as formas visíveis que ficaram de fora
+com o motivo (`{ id, tipo, motivo }`), o relatório de perdas das formas aproximadas e os ids das formas `oculto: true`, que são
+referência do esboço e não entram.
 
 Têm correspondência exata a caixa sem raio, chanfro nem furo, o cilindro, o anel (sem furo é um cilindro), o cone, a esfera,
 a revolução, a extrusão convexa ou côncava e o tubo; a haste `de`/`para` e a ligação `ligar` chegam como cilindro, e como
@@ -167,24 +168,54 @@ tubo de dois pontos quando o eixo dela não coincide com um eixo do mundo. O esb
 cilindro, no anel e no cone, 48 no tubo, 40 por 20 na esfera, e o `lados` que a forma declarar), de modo que o polígono e a área
 são os mesmos. A rotação sai da matriz da forma. Uma matriz que leva os três eixos a eixos do mundo só reordena as medidas. Uma
 que deixa um eixo no lugar e gira os outros dois no plano dele gira o perfil: a caixa vira a extrusão desse eixo do retângulo
-girado e a extrusão gira o contorno. Cone, anel e revolução só entram com o eixo sobre um eixo do mundo, e a esfera não
-depende da matriz.
+girado e a extrusão gira o contorno. Cone, anel, revolução, loft, caixa com raio ou chanfro e cilindro achatado só entram com o
+eixo sobre um eixo do mundo, e a esfera não depende da matriz.
 
-Fica de fora, e volta em `naoTraduzidas`, o que a N2 não faz igual: loft, faixa (`envolve`), raio, chanfro e furo da caixa, face
-plana do cilindro, rotação em mais de um eixo de um sólido que a N2 não inclina, tubo com canto sem raio de curva (o esboço
-põe uma esfera na junta e a N2 uma meia-esquadria) e qualquer volume que a própria N2 recusa, com a mensagem dela. Nada entra
-aproximado: `estrito: true` recusa o conjunto inteiro quando alguma forma visível fica de fora. As aproximações, o loft e a
-casca ficam para o tradutor ampliado, que devolverá o erro de volume e de envelope por forma.
+Entram com aproximação declarada o que a N2 não tem com o mesmo tipo. O loft vira `casco-secoes`: o esboço já reamostra as
+seções para o mesmo número de pontos, o centro de cada seção já está deslocando o contorno, a posição `w` da seção vira a
+posição do casco, e a seção ponto vira o polígono do vizinho a 1%, porque o casco recusa área nula. A casca do loft vira o
+sólido externo cheio (a cavidade some). A inclinação de seção é ignorada: o contorno é projetado no plano perpendicular ao eixo,
+e a seção de cada ponta vai ao ponto mais extremo dela ao longo do eixo, para o envelope nesse eixo não encolher. A caixa com raio
+vira a extrusão do mesmo retângulo arredondado do esboço (36 pontos, oito segmentos por canto, o raio recortado à metade da menor
+medida e os pontos repetidos tirados), a caixa com chanfro vira o casco das quatro seções que o esboço desenha (topo, corpo,
+corpo, topo), e o cilindro achatado vira a extrusão do círculo cortado pelo plano do lado achatado; nesses três a geometria é a
+mesma do esboço, e só o tipo muda. O componente com detalhe interno que faz o andaime passar do orçamento de volumes do alvo
+(`volumesMaximos`, 1000 por padrão) é recolhido a uma caixa do envelope da forma principal (ou do conjunto de suas formas, se
+ele não declara principal), começando pelo componente de mais volumes e só entre os que têm dois ou mais; as formas dele
+apontam na tabela para o volume da caixa, e se ainda assim não couber a tradução recusa.
+
+Cada forma aproximada, e cada componente recolhido, entra em `perdas` (em ordem de id), com `id`, `tipo`, `aproximacao`
+(`loft-como-casco`, `caixa-com-raio-como-extrusao`, `caixa-com-chanfro-como-casco`, `cilindro-achatado-como-extrusao` ou
+`componente-recolhido-ao-envelope`), `volumeId`, `perdido` (lista de `{ codigo, descricao }`: `tipo`, `inclinacao`, `casca`,
+`secao-ponto` ou `detalhe-interno`), `volumeEsboco`, `volumeAndaime`, `erroVolume` (`mm3` e `relativo`, o do andaime menos o
+do esboço sobre o do esboço), `envelopeEsboco`, `envelopeAndaime` e `erroEnvelope` (`mm`, o maior desvio de uma face, e
+`relativo`, esse desvio sobre a extensão do esboço no eixo). O volume e o envelope do andaime são medidos na blocagem N2 do
+volume, compilada pelo próprio tradutor com um alvo largo (`src/autoria/medir-blocagem-nivel-zero.js`), e não estimados. O
+volume do esboço vem da conta sobre os dados da forma: a área do contorno vezes o comprimento na caixa e no cilindro, a fórmula
+do prismatoide no loft sem inclinação e, com seção inclinada, o sólido convexo de cada par de seções (o que o esboço desenha),
+menos a cavidade quando há casca; no componente recolhido é a soma dos volumes das formas dele que se traduzem, medidos na
+blocagem delas. No loft com casca o relatório traz ainda `volumeExternoEsboco` e `erroVolumeExterno`, que separam o que a
+inclinação ignorada custa (na caçamba do carrinho, cerca de 10% sobre o externo) do que a cavidade custa (a casca de 4 mm faz o
+andaime ter 29 vezes o volume do esboço).
+
+Fica de fora, e volta em `naoTraduzidas`, o que não tem equivalente: faixa (`envolve`), furo de caixa (com ou sem raio), rotação em
+mais de um eixo de um sólido que a N2 não inclina, tubo com canto sem raio de curva (o esboço põe uma esfera na junta e a N2 uma
+meia-esquadria), loft sem seções ou com contornos de números de pontos diferentes, e qualquer volume que a própria N2 recusa, com
+a mensagem dela. `estrito: true` recusa o conjunto inteiro quando alguma forma visível fica de fora, e as aproximações sozinhas
+não o reprovam: elas estão em `perdas`, nunca em silêncio.
 
 O id do volume é o slug do id da forma (sem acento, `camelCase` e pontos viram hífen), e dois ids que dão o mesmo slug levam
 ambos o hash do id original, de modo que a tabela não depende da ordem das formas. As regiões de um volume são a unidade e a
 parte da forma, ou `sem-regiao` sem as duas. O envelope é a união das caixas do esboço, e os landmarks são o centro do
 conjunto e os pontos nomeados do esboço que caem dentro dele.
 
-A prova está em `src/autoria/tradutor-nivel-zero.test.js` (cada tipo com formas escritas à mão, a rotação, as recusas, os ids e o
-determinismo) e em `tools/mecanifica/esboco-para-andaime.test.mjs` (as fixtures do módulo e do banco de provas): o volume
-coincide com o do esboço dentro de 1e-6 relativo e o envelope dentro de 1e-5 mm, e dentro de r (1 - cos(pi / n)) no cilindro e
-no tubo fora dos eixos, em cada forma, unidade, parte e no conjunto.
+A prova está em `src/autoria/tradutor-nivel-zero.test.js` (cada tipo com formas escritas à mão, a rotação, as aproximações com
+valores analíticos, o recolhimento, as recusas, os ids e o determinismo) e em `tools/mecanifica/esboco-para-andaime.test.mjs`
+(as fixtures do módulo e do banco de provas): nas formas exatas o volume coincide com o do esboço dentro de 1e-6 relativo e o
+envelope dentro de 1e-5 mm, e dentro de r (1 - cos(pi / n)) no cilindro e no tubo fora dos eixos, em cada forma, unidade, parte e
+no conjunto; as formas aproximadas sem perda de volume (caixa com raio, cilindro achatado, loft sem casca nem inclinação) têm o
+mesmo erro, e a caçamba do carrinho (casca e seção inclinada) é provada à parte, com o envelope externo dentro de 1%, a perda
+de cavidade declarada e o volume do esboço calculado por fora, pelo casco convexo de cada faixa.
 
 ## Porta operacional
 

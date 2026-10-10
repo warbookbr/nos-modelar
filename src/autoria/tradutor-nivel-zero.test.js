@@ -1,6 +1,7 @@
 /* O tradutor do nível zero sobre formas resolvidas escritas à mão (sem o módulo do esboço): cada tipo exato com a geometria
-   que o andaime tem de dar, a rotação que gira o perfil, o que fica de fora com o motivo, os ids em slug, as regiões, a recusa
-   do conjunto no modo estrito e a determinação. A prova sobre as fixtures do esboço está em
+   que o andaime tem de dar, a rotação que gira o perfil, as aproximações com o relatório de perdas (loft, casca, inclinação,
+   caixa com raio ou chanfro, cilindro achatado e o componente recolhido), o que fica de fora com o motivo, os ids em slug, as
+   regiões, a recusa do conjunto no modo estrito e a determinação. A prova sobre as fixtures do esboço está em
    `tools/mecanifica/esboco-para-andaime.test.mjs`. */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -17,10 +18,10 @@ const produto = (a, b) => a.map((l) => [0, 1, 2].map((j) => l[0] * b[0][j] + l[1
 const limpa = (m) => m.map((l) => l.map((x) => (Math.abs(x) < 1e-12 ? 0 : x)));
 
 /* Uma forma resolvida como `formasResolvidas` a entrega: só os campos que o tradutor lê, com a caixa de mundo de `semi`. */
-function forma(id, tipo, geometria, { centro = [0, 0, 0], matriz = I, semi = [50, 50, 50], unidade = null, parte = null, oculto = false } = {}) {
+function forma(id, tipo, geometria, { centro = [0, 0, 0], matriz = I, semi = [50, 50, 50], unidade = null, parte = null, oculto = false, origem = null, caixa = null } = {}) {
   return {
-    id, tipo, oculto, unidade, parte, origem: null,
-    geometria: { centro, caixa: { min: centro.map((c, i) => c - semi[i]), max: centro.map((c, i) => c + semi[i]) }, matriz: limpa(matriz), ancoras: {}, ...geometria },
+    id, tipo, oculto, unidade, parte, origem,
+    geometria: { centro, caixa: caixa ?? { min: centro.map((c, i) => c - semi[i]), max: centro.map((c, i) => c + semi[i]) }, matriz: limpa(matriz), ancoras: {}, ...geometria },
   };
 }
 const dados = (formas, extra = {}) => ({ formato: FORMATO_FORMAS_RESOLVIDAS, opcao: { numero: 1 }, parametros: {}, pontos: {}, formas, ...extra });
@@ -73,18 +74,15 @@ describe('tradutor do nível zero: tipos com correspondência exata', () => {
     expect(r.tabela).toEqual({ boa: 'boa' });
   });
 
-  it('caixa com raio, chanfro ou furo fica fora; raio zero é caixa', () => {
+  it('caixa com furo fica fora, com o motivo; raio zero é caixa', () => {
     const base = { eixo: 'y', largura: 10, altura: 20, profundidade: 30 };
     const r = traduzir([
-      forma('redonda', 'caixa', { ...base, raio: 4 }),
-      forma('chanfrada', 'caixa', { ...base, chanfro: 2 }),
       forma('furada', 'caixa', { ...base, furos: [{ diametro: 4, centro: [0, 0] }] }),
       forma('seca', 'caixa', { ...base, raio: 0 }),
     ]);
-    expect(r.naoTraduzidas.map((n) => [n.id, n.motivo.split(' ').slice(0, 3).join(' ')])).toEqual([
-      ['redonda', 'caixa com raio'], ['chanfrada', 'caixa com chanfro'], ['furada', 'caixa com furo:'],
-    ]);
+    expect(r.naoTraduzidas.map((n) => [n.id, n.motivo.split(' ').slice(0, 3).join(' ')])).toEqual([['furada', 'caixa com furo:']]);
     expect(r.andaime.volumes.map((v) => v.id)).toEqual(['seca']);
+    expect(r.perdas).toEqual([]);
   });
 
   it('cilindro alinhado a um eixo: eixo, raio, comprimento e os lados do esboço; sem lados são 128', () => {
@@ -112,15 +110,13 @@ describe('tradutor do nível zero: tipos com correspondência exata', () => {
     expect(m.arestasSemPar).toBe(0);
   });
 
-  it('cilindro com face plana e cilindro com poucos lados ficam fora; a recusa da N2 vira motivo', () => {
+  it('cilindro com poucos lados fica fora: a recusa da N2 vira motivo', () => {
     const r = traduzir([
-      forma('chato', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 100, achatado: { lado: '+x', profundidade: 2 } }),
       forma('poucos', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 100, lados: 6 }),
       forma('ok', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 100 }),
     ]);
-    expect(r.naoTraduzidas.map((n) => n.id)).toEqual(['chato', 'poucos']);
-    expect(r.naoTraduzidas[0].motivo).toContain('face plana');
-    expect(r.naoTraduzidas[1].motivo).toContain('a N2 recusa o volume');
+    expect(r.naoTraduzidas.map((n) => n.id)).toEqual(['poucos']);
+    expect(r.naoTraduzidas[0].motivo).toContain('a N2 recusa o volume');
     expect(r.andaime.volumes.map((v) => v.id)).toEqual(['ok']);
   });
 
@@ -214,14 +210,270 @@ describe('tradutor do nível zero: tipos com correspondência exata', () => {
     expect(r.andaime.volumes.map((v) => v.id)).toEqual(['reto']);
   });
 
-  it('loft e faixa ficam fora, com o motivo; nunca viram outra forma', () => {
+  it('faixa e loft sem seções ficam fora, com o motivo; nunca viram outra forma', () => {
     const r = traduzir([
-      forma('tanque', 'loft', { eixo: 'y', comprimento: 10, secoes: [] }),
+      forma('vazio', 'loft', { eixo: 'y', comprimento: 10, secoes: [] }),
       forma('correia', 'envolve', { largura: 10, espessura: 2, fechado: true }),
       forma('ok', 'esfera', { diametro: 4 }),
     ]);
-    expect(r.naoTraduzidas.map((n) => [n.id, n.tipo])).toEqual([['tanque', 'loft'], ['correia', 'envolve']]);
+    expect(r.naoTraduzidas.map((n) => [n.id, n.tipo])).toEqual([['vazio', 'loft'], ['correia', 'envolve']]);
     expect(r.andaime.volumes).toHaveLength(1);
+  });
+});
+
+describe('tradutor do nível zero: aproximações e relatório de perdas', () => {
+  const quadrado = (m) => [[-m / 2, -m / 2], [m / 2, -m / 2], [m / 2, m / 2], [-m / 2, m / 2]];
+  /* o loft do esboço: eixo y, o contorno em (x, z) e a posição `w` de cada seção */
+  const loft = (secoes, extra = {}) => ({ eixo: 'y', eixosDoPerfil: ['x', 'z'], comprimento: secoes.at(-1).w - secoes[0].w, secoes, ...extra });
+  const medida = (r, id) => medirVolumes(compilarAndaime(r.andaime)).get(id);
+
+  it('o loft sem inclinação nem casca vira o casco por seções, com o volume do tronco e sem perda de forma', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: quadrado(60) }];
+    const r = traduzir([forma('tronco', 'loft', loft(secoes), { semi: [50, 50, 50] })]);
+    const v = volumeUnico(r);
+    expect(v).toMatchObject({ tipo: 'casco-secoes', eixoPercurso: 'y', eixosSecao: ['x', 'z'], centro: [0, 0, 0] });
+    expect(v.secoes.map((q) => q.posicao)).toEqual([-50, 50]);
+    expect(r.naoTraduzidas).toEqual([]);
+    const [p] = r.perdas;
+    expect(p).toMatchObject({ id: 'tronco', tipo: 'loft', aproximacao: 'loft-como-casco', volumeId: 'tronco', perdido: [] });
+    /* o tronco de pirâmide de bases 100 e 60 e altura 100: h/3 (A + raiz(A a) + a) */
+    perto(p.volumeEsboco, 100 / 3 * (10000 + 6000 + 3600), 1e-2);
+    perto(p.volumeAndaime, medida(r, 'tronco').volume, 1e-2);
+    expect(Math.abs(p.erroVolume.relativo)).toBeLessThan(1e-9);
+    expect(p.erroEnvelope).toEqual({ mm: 0, relativo: 0 });
+  });
+
+  it('o loft girado em um eixo ou virado para o negativo do eixo dá o mesmo sólido no lugar certo', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: quadrado(60) }];
+    const reto = traduzir([forma('a', 'loft', loft(secoes))]);
+    const virado = traduzir([forma('a', 'loft', loft(secoes), { matriz: rotX(180) })]);
+    const lateral = traduzir([forma('a', 'loft', { eixo: 'x', eixosDoPerfil: ['z', 'y'], comprimento: 100, secoes })]);
+    expect(volumeUnico(virado).secoes.map((q) => q.posicao)).toEqual([-50, 50]);
+    expect(volumeUnico(virado).secoes[0].perfil).toHaveLength(4);
+    perto(medida(virado, 'a').volume, medida(reto, 'a').volume, 1e-6);
+    /* com o eixo virado a seção de 100 fica em +50: o envelope mostra o lado largo em cima */
+    expect(medida(virado, 'a').max[1]).toBe(50);
+    expect(volumeUnico(lateral)).toMatchObject({ eixoPercurso: 'x', eixosSecao: ['y', 'z'] });
+    expect(reto.perdas[0].erroEnvelope.mm).toBe(0);
+    expect(virado.perdas[0].erroEnvelope.mm).toBe(0);
+    expect(lateral.perdas[0].erroEnvelope.mm).toBe(0);
+  });
+
+  it('o loft em dois eixos, sem seções suficientes ou com números de pontos diferentes fica fora', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: quadrado(60) }];
+    const r = traduzir([
+      forma('torto', 'loft', loft(secoes), { matriz: produto(rotZ(30), rotX(20)) }),
+      forma('desigual', 'loft', loft([{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: [[-30, -30], [30, -30], [0, 30]] }])),
+      forma('ok', 'loft', loft(secoes)),
+    ]);
+    expect(r.naoTraduzidas.map((n) => n.id)).toEqual(['torto', 'desigual']);
+    expect(r.naoTraduzidas[0].motivo).toContain('gira em dois eixos');
+    expect(r.naoTraduzidas[1].motivo).toContain('números de pontos diferentes');
+    expect(r.perdas.map((p) => p.id)).toEqual(['ok']);
+  });
+
+  it('a seção ponto vira o polígono do vizinho a 1%, declarado, e o volume a mais é o do tronco medido', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: [[0, 0], [0, 0], [0, 0], [0, 0]] }];
+    const r = traduzir([forma('piramide', 'loft', loft(secoes))]);
+    expect(r.naoTraduzidas).toEqual([]);
+    const [p] = r.perdas;
+    expect(p.perdido.map((d) => d.codigo)).toEqual(['secao-ponto']);
+    perto(p.volumeEsboco, 10000 * 100 / 3, 1e-2);
+    /* o tronco de bases 100 e 1 de altura 100 */
+    perto(p.volumeAndaime, 100 / 3 * (10000 + 100 + 1), 1e-2);
+    perto(p.erroVolume.relativo, (10101 - 10000) / 10000, 1e-6);
+    expect(p.erroEnvelope).toEqual({ mm: 0, relativo: 0 });
+  });
+
+  it('a seção inclinada é ignorada: o prisma oblíquo vira o prisma reto com o envelope do esboço, e o erro de volume é medido', () => {
+    /* duas seções de 100 por 100 inclinadas 30 graus em torno de u e deslocadas 100 mm uma da outra: prisma oblíquo cujo
+       volume é a área da base (100 por 100) vezes a altura perpendicular (100 cos 30). O envelope do esboço vai de -75 a 75 em w. */
+    const a = Math.cos(Math.PI / 6);
+    const sen = Math.sin(Math.PI / 6);
+    const anel = (w) => [[-50, -50], [50, -50], [50, 50], [-50, 50]].map(([u, v]) => [u, v * a, w + v * sen]);
+    const n = [0, -sen, a];
+    const secoes = [{ w: -50, n, perfil: anel(-50) }, { w: 50, n, perfil: anel(50) }];
+    const r = traduzir([forma('obliquo', 'loft', loft(secoes), { semi: [50, 75, 50 * a] })]);
+    const [p] = r.perdas;
+    expect(p.perdido.map((d) => d.codigo)).toEqual(['inclinacao']);
+    expect(volumeUnico(r).secoes.map((q) => q.posicao)).toEqual([-75, 75]);
+    perto(p.volumeEsboco, 10000 * 100 * a, 1e-2);
+    perto(p.volumeAndaime, 100 * 100 * a * 150, 1e-2);
+    perto(p.erroVolume.relativo, 150 / 100 - 1, 1e-6);
+    expect(p.erroEnvelope.mm).toBeLessThan(1e-5);
+    perto(p.volumeAndaime, medida(r, 'obliquo').volume, 1e-2);
+    /* sem mover as pontas, o envelope em w seria o nominal (-50 a 50) e o erro, de 25 mm de cada lado */
+    expect(p.envelopeAndaime.min[1]).toBe(-75);
+    expect(p.envelopeAndaime.max[1]).toBe(75);
+  });
+
+  it('a casca vira o sólido externo cheio: a perda de cavidade é declarada e o volume a mais é o da cavidade', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: quadrado(100) }];
+    const cavidade = [{ w: -40, perfil: quadrado(92) }, { w: 50, perfil: quadrado(92) }];
+    const r = traduzir([forma('bacia', 'loft', loft(secoes, { casca: { espessura: 4, aberta: 'fim', fundoAte: -46, cavidade } }))]);
+    const [p] = r.perdas;
+    expect(p.perdido.map((d) => d.codigo)).toEqual(['casca']);
+    perto(p.volumeEsboco, 1e6 - 92 * 92 * 90, 1e-2);
+    perto(p.volumeAndaime, 1e6, 1e-2);
+    perto(p.erroVolume.mm3, 92 * 92 * 90, 1e-2);
+    perto(p.volumeExternoEsboco, 1e6, 1e-2);
+    expect(Math.abs(p.erroVolumeExterno.relativo)).toBeLessThan(1e-9);
+    expect(p.erroEnvelope).toEqual({ mm: 0, relativo: 0 });
+  });
+
+  it('a caixa com raio vira a extrusão do contorno arredondado do esboço, com o mesmo volume, também girada em um eixo', () => {
+    const geo = { eixo: 'y', largura: 100, altura: 40, profundidade: 60, raio: 10 };
+    for (const [nome, matriz, semi, eixo] of [['parada', I, [50, 20, 30], 'y'], ['em y', rotY(90), [30, 20, 50], 'y'], ['em x (o y do esboço vira z)', rotX(90), [50, 30, 20], 'z']]) {
+      const r = traduzir([forma('redonda', 'caixa', geo, { matriz, semi })]);
+      expect(volumeUnico(r), nome).toMatchObject({ tipo: 'extrusao', eixoExtrusao: eixo, comprimento: 40 });
+      expect(volumeUnico(r).perfil, nome).toHaveLength(36);
+      const [p] = r.perdas;
+      expect(p).toMatchObject({ id: 'redonda', aproximacao: 'caixa-com-raio-como-extrusao' });
+      expect(Math.abs(p.erroVolume.relativo), nome).toBeLessThan(1e-6);
+      expect(p.erroEnvelope.mm, nome).toBeLessThan(1e-5);
+      /* o contínuo: o retângulo menos os quatro cantos, a menos de 0,2% pelo polígono de oito lados por canto */
+      perto(p.volumeAndaime / ((100 * 60 - (4 - Math.PI) * 100) * 40), 1, 2e-3);
+    }
+    /* um raio maior que a metade da menor medida é recortado, como no esboço */
+    const grande = traduzir([forma('pilula', 'caixa', { ...geo, raio: 500 })]);
+    perto(grande.perdas[0].volumeAndaime / (Math.PI * 30 * 30 + 40 * 60) / 40, 1, 1e-2);
+  });
+
+  it('a caixa com raio ou chanfro com o eixo y fora de um eixo do mundo fica fora', () => {
+    const base = { eixo: 'y', largura: 10, altura: 20, profundidade: 30 };
+    const r = traduzir([
+      forma('redonda', 'caixa', { ...base, raio: 3 }, { matriz: rotX(30) }),
+      forma('chanfrada', 'caixa', { ...base, chanfro: 2 }, { matriz: produto(rotZ(30), rotX(20)) }),
+      forma('ok', 'esfera', { diametro: 4 }),
+    ]);
+    expect(r.naoTraduzidas.map((n) => n.id)).toEqual(['redonda', 'chanfrada']);
+    expect(r.naoTraduzidas[0].motivo).toContain('caixa com raio de canto (3 mm)');
+    expect(r.naoTraduzidas[1].motivo).toContain('caixa com chanfro (2 mm)');
+  });
+
+  it('a caixa com chanfro vira o casco das quatro seções do esboço, com o envelope e o volume dele', () => {
+    const geo = { eixo: 'y', largura: 100, altura: 60, profundidade: 80, chanfro: 10 };
+    for (const [nome, matriz, semi] of [['parada', I, [50, 30, 40]], ['em y', rotY(90), [40, 30, 50]]]) {
+      const r = traduzir([forma('chanfrada', 'caixa', geo, { matriz, semi })]);
+      const v = volumeUnico(r);
+      expect(v, nome).toMatchObject({ tipo: 'casco-secoes', eixoPercurso: 'y' });
+      expect(v.secoes.map((q) => q.posicao), nome).toEqual([-30, -20, 20, 30]);
+      expect(v.secoes.map((q) => q.perfil.length), nome).toEqual([8, 8, 8, 8]);
+      const [p] = r.perdas;
+      expect(p.aproximacao, nome).toBe('caixa-com-chanfro-como-casco');
+      expect(Math.abs(p.erroVolume.relativo), nome).toBeLessThan(1e-9);
+      expect(p.erroEnvelope.mm, nome).toBeLessThan(1e-5);
+      /* menos que a caixa cheia e mais que a caixa sem as doze arestas inteiras */
+      expect(p.volumeAndaime, nome).toBeLessThan(100 * 60 * 80);
+      expect(p.volumeAndaime, nome).toBeGreaterThan(100 * 60 * 80 - 12 * 50 * 80);
+    }
+  });
+
+  it('o cilindro com face plana vira a extrusão do círculo cortado, no eixo que ele tem', () => {
+    const r = traduzir([
+      forma('chato', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 100, achatado: { lado: '+x', profundidade: 2 } }, { caixa: { min: [-10, -50, -10], max: [8, 50, 10] } }),
+      forma('chatoZ', 'cilindro', { eixo: 'x', diametro: 20, comprimento: 100, achatado: { lado: '-z', profundidade: 2 } }, { matriz: rotZ(90), caixa: { min: [-10, -50, -8], max: [10, 50, 10] } }),
+    ]);
+    expect(r.naoTraduzidas).toEqual([]);
+    const [a, b] = r.perdas;
+    expect(a).toMatchObject({ id: 'chato', aproximacao: 'cilindro-achatado-como-extrusao' });
+    expect(volumeUnico(r)).toMatchObject({ tipo: 'extrusao' });
+    expect(Math.abs(a.erroVolume.relativo)).toBeLessThan(1e-6);
+    /* a corda do círculo de raio 10 a 8 do centro: o segmento tirado tem 16,35 mm2 (contínuo) */
+    perto(a.volumeAndaime / 100, Math.PI * 100 - (100 * Math.acos(0.8) - 8 * 6), 0.5);
+    expect(a.erroEnvelope.mm).toBeLessThan(1e-5);
+    expect(b.id).toBe('chatoZ');
+    expect(Math.abs(b.erroVolume.relativo)).toBeLessThan(1e-6);
+    /* achatado girado em dois eixos não tem equivalente */
+    const torto = traduzir([forma('torto', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 100, achatado: { lado: '+x', profundidade: 2 } }, { matriz: produto(rotZ(30), rotX(20)) }), forma('ok', 'esfera', { diametro: 4 })]);
+    expect(torto.naoTraduzidas[0].motivo).toContain('cilindro com face plana (achatado)');
+  });
+
+  const componente = (id, tipo, geo, instancia, principal, extra = {}) => forma(id, tipo, geo, { origem: { componente: { instancia, principal, usa: 'roda' } }, ...extra });
+  const roda = () => [
+    componente('roda.aro', 'caixa', { eixo: 'y', largura: 100, altura: 100, profundidade: 100 }, 'roda', true),
+    componente('roda.cubo', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 40 }, 'roda', false, { centro: [60, 0, 0], semi: [10, 20, 10] }),
+    componente('roda.tampa', 'esfera', { diametro: 20 }, 'roda', false, { centro: [0, 60, 0], semi: [10, 10, 10] }),
+  ];
+
+  it('o componente com detalhe interno que passa do orçamento é recolhido à caixa do envelope da forma principal, e a perda é declarada', () => {
+    const solta = forma('solta', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 }, { centro: [300, 0, 0], semi: [5, 5, 5] });
+    const cheio = traduzir([...roda(), solta]);
+    expect(cheio.andaime.volumes).toHaveLength(4);
+    expect(cheio.perdas).toEqual([]);
+    const r = traduzir([...roda(), solta], { volumesMaximos: 2 });
+    expect(r.andaime.volumes.map((v) => [v.id, v.tipo]).sort()).toEqual([['roda-aro', 'caixa'], ['solta', 'caixa']]);
+    expect(r.tabela).toEqual({ 'roda.aro': 'roda-aro', 'roda.cubo': 'roda-aro', 'roda.tampa': 'roda-aro', solta: 'solta' });
+    const [p] = r.perdas;
+    expect(p).toMatchObject({ id: 'roda', tipo: 'componente', aproximacao: 'componente-recolhido-ao-envelope', volumeId: 'roda-aro', formas: ['roda.aro', 'roda.cubo', 'roda.tampa'] });
+    expect(p.perdido).toEqual([{ codigo: 'detalhe-interno', descricao: expect.stringContaining('forma principal roda.aro') }]);
+    /* o volume do esboço é a soma dos volumes das formas traduzidas, medidos antes de recolher */
+    const antes = medirVolumes(compilarAndaime(cheio.andaime));
+    const soma = ['roda-aro', 'roda-cubo', 'roda-tampa'].reduce((s, id) => s + antes.get(id).volume, 0);
+    perto(p.volumeEsboco, soma, 1e-2);
+    perto(p.volumeAndaime, 1e6, 1e-2);
+    /* a união dos três passa de 50 em x (o cubo vai a 70) e em y (a tampa vai a 70): o desvio é de 20 mm */
+    expect(p.erroEnvelope.mm).toBeCloseTo(20, 6);
+    expect(p.envelopeAndaime).toEqual({ min: [-50, -50, -50], max: [50, 50, 50] });
+    expect(r.andaime.envelope.max[0]).toBe(305);
+    expect(() => normalizarAndaimeGlobal(r.andaime)).not.toThrow();
+  });
+
+  it('o recolhimento começa pelo componente de mais volumes, só toca quem tem pelo menos dois e recusa quando não basta', () => {
+    const outra = [
+      componente('par.a', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 }, 'par', true, { centro: [500, 0, 0], semi: [5, 5, 5] }),
+      componente('par.b', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 }, 'par', false, { centro: [520, 0, 0], semi: [5, 5, 5] }),
+    ];
+    const r = traduzir([...roda(), ...outra], { volumesMaximos: 3 });
+    expect(r.perdas.map((p) => p.id)).toEqual(['roda']);
+    expect(r.andaime.volumes).toHaveLength(3);
+    const dois = traduzir([...roda(), ...outra], { volumesMaximos: 2 });
+    expect(dois.perdas.map((p) => p.id)).toEqual(['par', 'roda']);
+    expect(() => traduzir([...roda(), ...outra], { volumesMaximos: 1 })).toThrow(/orçamento do alvo é 1/);
+    expect(() => traduzir([forma('a', 'esfera', { diametro: 4 }), forma('b', 'esfera', { diametro: 4 })], { volumesMaximos: 1 })).toThrow(ErroDoTradutor);
+    expect(() => traduzir(roda(), { volumesMaximos: 0 })).toThrow(/volumesMaximos/);
+  });
+
+  it('sem forma principal declarada, o recolhimento usa o envelope de todas as formas do componente, e o que não tem equivalente sai da lista', () => {
+    const formas = [
+      componente('p.a', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 }, 'p', false, { semi: [5, 5, 5] }),
+      componente('p.b', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 }, 'p', false, { centro: [30, 0, 0], semi: [5, 5, 5] }),
+      componente('p.furo', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10, furos: [{ diametro: 2, centro: [0, 0] }] }, 'p', false, { centro: [60, 0, 0], semi: [5, 5, 5] }),
+      forma('fora', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10, furos: [{ diametro: 2, centro: [0, 0] }] }, { centro: [90, 0, 0], semi: [5, 5, 5] }),
+    ];
+    const antes = traduzir(formas);
+    expect(antes.naoTraduzidas.map((n) => n.id)).toEqual(['p.furo', 'fora']);
+    const r = traduzir(formas, { volumesMaximos: 1 });
+    expect(r.naoTraduzidas.map((n) => n.id)).toEqual(['fora']);
+    expect(r.andaime.volumes).toHaveLength(1);
+    expect(r.andaime.volumes[0]).toMatchObject({ id: 'p-a', tipo: 'caixa', centro: [30, 0, 0], dimensoes: [70, 10, 10] });
+    expect(r.perdas[0].perdido[0].descricao).toContain('o componente não declara forma principal');
+    expect(r.perdas[0].erroEnvelope.mm).toBe(0);
+    expect(r.tabela['p.furo']).toBe('p-a');
+  });
+
+  it('o resultado com perdas é determinístico, JSON puro, e não depende da ordem das formas', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: quadrado(60) }];
+    const formas = () => [
+      forma('tronco', 'loft', loft(secoes)),
+      forma('redonda', 'caixa', { eixo: 'y', largura: 100, altura: 40, profundidade: 60, raio: 10 }, { centro: [200, 0, 0] }),
+      forma('chato', 'cilindro', { eixo: 'y', diametro: 20, comprimento: 100, achatado: { lado: '+x', profundidade: 2 } }, { centro: [400, 0, 0] }),
+      ...roda().map((f) => ({ ...f, geometria: { ...f.geometria, centro: f.geometria.centro.map((c, i) => c + [0, 0, 300][i]) } })),
+    ];
+    const opcoes = { volumesMaximos: 5 };
+    const a = JSON.stringify(traduzirFormasParaAndaime(dados(formas()), opcoes));
+    const b = JSON.stringify(traduzirFormasParaAndaime(JSON.parse(JSON.stringify(dados(formas()))), opcoes));
+    const invertido = traduzirFormasParaAndaime(dados([...formas()].reverse()), opcoes);
+    expect(b).toBe(a);
+    expect(JSON.stringify(JSON.parse(a))).toBe(a);
+    expect(JSON.stringify(invertido.perdas)).toBe(JSON.stringify(JSON.parse(a).perdas));
+    expect(JSON.parse(a).perdas.map((p) => p.id)).toEqual(['chato', 'redonda', 'roda', 'tronco']);
+  });
+
+  it('o modo estrito aceita o conjunto só com aproximações e continua recusando o que não tem equivalente', () => {
+    const secoes = [{ w: -50, perfil: quadrado(100) }, { w: 50, perfil: quadrado(60) }];
+    expect(traduzir([forma('tronco', 'loft', loft(secoes))], { estrito: true }).perdas).toHaveLength(1);
+    expect(() => traduzir([forma('tronco', 'loft', loft(secoes)), forma('correia', 'envolve', { largura: 10, espessura: 2, fechado: true })], { estrito: true })).toThrow(/correia \(faixa/);
   });
 });
 
@@ -298,7 +550,7 @@ describe('tradutor do nível zero: ids, regiões, andaime e modo estrito', () =>
       throw new Error('devia recusar');
     } catch (e) {
       expect(e).toBeInstanceOf(ErroDoTradutor);
-      expect(e.message).toContain('2 forma(s) sem correspondência exata');
+      expect(e.message).toContain('2 forma(s) sem correspondência na N2');
       expect(e.message).toContain('t (loft');
       expect(e.message).toContain('c (caixa');
       expect(e.naoTraduzidas.map((n) => n.id)).toEqual(['t', 'c']);
@@ -324,7 +576,9 @@ describe('tradutor do nível zero: determinismo e fronteira', () => {
     forma('haste', 'cilindro', { eixo: 'y', diametro: 12, comprimento: 80 }, { matriz: produto(rotZ(35), rotX(50)), parte: 'hastes' }),
     forma('caixa', 'caixa', { eixo: 'y', largura: 10, altura: 20, profundidade: 30 }, { matriz: rotZ(30) }),
     forma('bola', 'esfera', { diametro: 30 }),
-    forma('tanque', 'loft', { eixo: 'y', comprimento: 10, secoes: [] }),
+    forma('tanque', 'loft', { eixo: 'y', eixosDoPerfil: ['x', 'z'], comprimento: 100, secoes: [{ w: -50, perfil: [[-50, -50], [50, -50], [50, 50], [-50, 50]] }, { w: 50, perfil: [[-30, -30], [30, -30], [30, 30], [-30, 30]] }] }),
+    forma('redonda', 'caixa', { eixo: 'y', largura: 10, altura: 20, profundidade: 30, raio: 3 }),
+    forma('correia', 'envolve', { largura: 10, espessura: 2, fechado: true }),
   ];
 
   it('a mesma entrada dá o mesmo resultado, byte a byte, sem alterar a entrada, e o resultado é JSON puro', () => {
