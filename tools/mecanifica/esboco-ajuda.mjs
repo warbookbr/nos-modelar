@@ -12,7 +12,7 @@ export const README_DO_ESBOCO = fileURLToPath(new URL('../../modulos/esboco/READ
 const PALAVRAS_VAZIAS = new Set(['o', 'a', 'os', 'as', 'um', 'uma', 'de', 'do', 'da', 'dos', 'das', 'e', 'em', 'para', 'por', 'com', 'no', 'na', 'nos', 'nas', 'ao', 'aos', 'sem', 'contra', 'ou', 'sobre', 'que', 'cada', 'isso', 'isto']);
 
 export const FRASES = {
-  independencia: 'Por que o módulo não importa o núcleo do Mecanifica, e as duas exceções de leitura.',
+  independencia: 'Por que o módulo não importa o núcleo do Mecanifica, e as exceções de leitura.',
   'como-escrever': 'O arquivo, a raiz do JSON, as opções e um exemplo mínimo.',
   'como-rodar': 'Todos os comandos da linha de comando, com as flags.',
   ajuda: 'O `--ajuda` por tópico e a imagem composta das quatro vistas (`--composta`).',
@@ -46,6 +46,7 @@ export const FRASES = {
   contato: 'O gate de contato: o que toca, o que atravessa e o que fica livre.',
   contrato: 'Como declarar uma exceção de contato, com o motivo e o máximo.',
   juntas: 'Juntas declaradas, com o tipo de encaixe e a penetração esperada.',
+  portas: 'O campo `porta` (recebe, ocupa, apoia): eixo em furo pela classe de ajuste e encosto de planos, sem motivo nem max.',
   tipo: 'Cada tipo de exceção (atravessa, encosta, livre, ponta) e o que o gate faz com ele.',
   conserto: 'O conserto proposto pelo gate e a aplicação com `--ajustar`.',
   sobreposicao: 'Sobreposição de silhuetas na projeção, a leitura que o gate faz.',

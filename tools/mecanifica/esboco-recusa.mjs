@@ -30,6 +30,7 @@ const REGRAS = [
   { re: /: (caixa|cilindro|anel|cone|esfera|extrusao|loft|revolucao|tubo|envolve) (?:precisa|deve|não)/, topico: (m) => TOPICO_DO_TIPO[m[1]], valores: Object.values(TOPICO_DO_TIPO) },
   { re: /"tipo" com o valor "[^"]*" deve ser um de|tipo "[^"]*" desconhecido/, topico: 'formas' },
   { re: /^([^"]*?): o campo "[^"]*" (?:não existe|não é do componente)/, topico: (m) => TOPICO_DO_LUGAR.find(([re]) => re.test(m[1]))?.[1] ?? TOPICO_DO_CAMPO_NA_RAIZ, valores: [TOPICO_DO_CAMPO_NA_RAIZ, ...TOPICO_DO_LUGAR.map(([, t]) => t)] },
+  { re: /: porta: |A porta não o justifica|"porta" deve ser|a porta não tem o campo|o papel da porta|a classe de ajuste da porta|a face da porta|declaram classes de ajuste diferentes/, topico: 'portas' },
   { re: /↔|contato\.pares|contato\.usar|"contato"|precisa dizer por que a exceção/, topico: 'contrato' },
   { re: /\bjuntas?\b/, topico: 'juntas' },
   { re: /^editar:|--editar|--remover|--adicionar/, topico: 'editar' },
@@ -65,9 +66,12 @@ export function topicoDaRecusa(mensagem, erro = null) {
   return null;
 }
 
-/* O gate de contato reprovado: `conserto` quando ele propôs um conserto, `contato` quando só relata. */
+/* O gate de contato reprovado: `conserto` quando ele propôs um conserto, `portas` quando só reprovou pares lidos pelas portas,
+   `contato` quando só relata. */
 export function topicoDoContato(contato) {
-  return (contato?.achados ?? []).some((a) => a.sugestao) ? 'conserto' : 'contato';
+  const achados = contato?.achados ?? [];
+  if (achados.some((a) => a.sugestao)) return 'conserto';
+  return achados.length > 0 && achados.every((a) => a.tipo === 'porta-fora') ? 'portas' : 'contato';
 }
 
 /* O Portão que não passa, pelo que falta: o Envelope, as unidades, o crítico, o gate de contato (quando o que falta é peça
@@ -83,7 +87,7 @@ export function topicoDoPortao(falta = [], texto = '') {
 
 /* Todos os tópicos que as regras e os dois gates podem citar, para o teste conferir contra o índice. */
 export const TOPICOS_DAS_RECUSAS = new Set([
-  'como-escrever', 'contato', 'conserto', 'condutor', 'unidades', 'envelope', 'critico',
+  'como-escrever', 'contato', 'portas', 'conserto', 'condutor', 'unidades', 'envelope', 'critico',
   ...REGRAS.flatMap((r) => (typeof r.topico === 'string' ? [r.topico] : r.valores)),
 ]);
 

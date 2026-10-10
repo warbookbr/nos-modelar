@@ -4,12 +4,13 @@
    na skill `esbocar-opcoes`. Puro. */
 import { CORES_NOMEADAS, ErroDeEsboco } from './index.js';
 import { quisDizer } from './parecido.js';
+import { lerPorta } from './portas.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const EIXOS = ['x', 'y', 'z'];
 
 /* Campos de toda forma (posição, aparência e relações) e os internos que a expansão deixa nas formas já expandidas. */
-const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'daLigacao', 'encaixa', 'unidade', 'estilo', 'substitui'];
+const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'daLigacao', 'encaixa', 'unidade', 'estilo', 'substitui', 'porta'];
 export const CAMPOS_POR_TIPO = {
   caixa: ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'furos', 'furo'],
   cilindro: ['diametro', 'comprimento', 'eixo', 'achatado', 'lados'],
@@ -71,6 +72,7 @@ export function validarForma(f, onde) {
   if (f.cor !== undefined) corValida(f.cor, rotuloDaForma);
   if (f.substitui !== undefined && !(typeof f.substitui === 'string' && f.substitui)) throw new ErroDeEsboco(`${rotuloDaForma}: "substitui" deve ser o id da forma da maquete que esta forma substitui no detalhado (veio ${JSON.stringify(f.substitui)})`);
   if (f.estilo !== undefined && !(typeof f.estilo === 'string' && f.estilo)) throw new ErroDeEsboco(`${rotuloDaForma}: "estilo" deve ser o nome de um estilo declarado em "estilos" na raiz (veio ${JSON.stringify(f.estilo)})`);
+  if (f.porta !== undefined) lerPorta(f.porta, `${rotuloDaForma}: porta`, f.tipo);
   if (f.oculto !== undefined && typeof f.oculto !== 'boolean') throw new ErroDeEsboco(`${rotuloDaForma}: "oculto" deve ser true ou false (veio ${JSON.stringify(f.oculto)})`);
 }
 

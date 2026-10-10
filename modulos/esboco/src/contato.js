@@ -16,6 +16,7 @@ import earcut from 'earcut';
 import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma, wDoPonto } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
+import { avaliarPortas, girar, localParaMundo, mmFino } from './portas.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
 /* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
@@ -34,16 +35,6 @@ const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a
 const escala = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
 const somar = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const norma2 = (a) => dot(a, a);
-
-function girar(m, v) {
-  return m ? [dot(m[0], v), dot(m[1], v), dot(m[2], v)] : v;
-}
-
-function localParaMundo(b, u, v, w) {
-  const p = [0, 0, 0];
-  p[b.u] = u; p[b.v] = v; p[b.e] = w;
-  return p;
-}
 
 function direcaoUnica(d) {
   const n = Math.sqrt(norma2(d));
@@ -637,15 +628,17 @@ const mmTxt = (x) => arred(x).toString().replace('.', ',');
 /* Contrato de declaração: `atravessa` e `livre` são exceções e exigem `motivo` de
    pelo menos MINIMO_DO_MOTIVO caracteres; `atravessa` exige também `max` (mm), pois
    sem ele o par nunca reprova. `encosta` não é exceção e não exige nada. Só é
-   chamada com o contato ligado. A mensagem diz o par, o campo e um exemplo. */
-function exigirDeclaracao(p, onde, mesmaUnidade = false) {
-  if (p.tipo === 'encosta' || mesmaUnidade) return;
+   chamada com o contato ligado. A mensagem diz o par, o campo e um exemplo. O `atravessa` entre um anel que `recebe` e um
+   cilindro que `ocupa` (campo `porta` das duas formas) é justificado pela porta e dispensa `motivo` e `max`: o máximo sai da
+   classe de ajuste. `semPorta` é a razão por que as portas declaradas não valem (dita na mensagem), quando há. */
+function exigirDeclaracao(p, onde, dispensada = false, semPorta = null) {
+  if (p.tipo === 'encosta' || dispensada) return;
   const par = p.junta ? `${p.a} ↔ ${p.b} (da ${p.junta})` : `${p.a} ↔ ${p.b}`;
   const exemplo = p.junta ? `{ "pecas": ["garfoE.*", "guidao"], "max": 15, "motivo": "a presilha do guidão abraça a coroa" }` : `{ "a": "${p.a}", "b": "${p.b}", "tipo": "${p.tipo}"${p.tipo === 'atravessa' ? ', "max": 15' : ''}, "motivo": "a presilha do guidão abraça a bengala" }`;
   const motivo = typeof p.motivo === 'string' ? p.motivo.trim() : '';
   if (motivo.length < MINIMO_DO_MOTIVO) {
     const falta = p.motivo === undefined ? 'falta o campo "motivo"' : `o "motivo" tem ${motivo.length} caractere${motivo.length === 1 ? '' : 's'} e o mínimo é ${MINIMO_DO_MOTIVO}`;
-    throw new ErroDeEsboco(`${onde}: o par ${par} (tipo ${p.tipo}) precisa dizer por que a exceção existe: ${falta}. Exemplo: ${exemplo}`);
+    throw new ErroDeEsboco(`${onde}: o par ${par} (tipo ${p.tipo}) precisa dizer por que a exceção existe: ${falta}. Exemplo: ${exemplo}${semPorta ? `. A porta não o justifica: ${semPorta}` : ''}`);
   }
   if (p.tipo === 'atravessa' && p.max === undefined) {
     throw new ErroDeEsboco(`${onde}: o par ${par} (tipo atravessa) precisa de "max", a penetração máxima em mm que a passagem justifica; sem ele o par nunca reprova. Exemplo: ${exemplo}`);
@@ -719,6 +712,15 @@ export function padroesDoContato(resolvidas) {
   return { padraoTol: Math.max(1, dimensao * 0.01), padraoPen: Math.max(1, dimensao * 0.003), padraoFolga: dimensao * 0.1 };
 }
 
+/* O registro de um par lido pelas portas, para o bloco `portas` do resultado e do manifesto: o que a porta mediu, em mm. */
+function registroDaPorta(opcao, par, lida, penetracao) {
+  const fino = (x) => Math.round(x * 1000) / 1000;
+  if (lida.tipo === 'ajuste') {
+    return { opcao, a: par[0], b: par[1], tipo: 'ajuste', recebe: lida.recebe, ocupa: lida.ocupa, classe: lida.classe, folga_diametral_mm: fino(lida.folgaDiametral), faixa_mm: lida.faixa.map(fino), nominal_mm: fino(lida.nominal), descentro_mm: fino(lida.descentro), penetracao_mm: fino(penetracao), max_mm: fino(lida.maximo), satisfeita: lida.satisfeita };
+  }
+  return { opcao, a: par[0], b: par[1], tipo: 'assentamento', recebe: lida.recebe, apoia: lida.apoia, separacao_mm: fino(lida.separacao), extrapolacao_mm: fino(lida.extrapolacao), satisfeita: lida.satisfeita };
+}
+
 /* Verifica o contato de todas as opções. Devolve
    { usar, tolerancia, penetracao, folga, achados, atravessamentos, silenciados, resultado, opcoes }.
    `tolerancia` é a folga máxima para ligar duas peças (e para `encosta`);
@@ -768,10 +770,38 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
     return visto;
   };
   const ativas = opcoes.map((_, i) => i).filter((i) => ativa(i));
+  /* as portas de um par (`porta` nas duas formas): lidas uma vez por opção e par. Um par que as portas formam como encaixe é
+     julgado por elas (ajuste de eixo em furo pela classe, ou assentamento de plano) e, no `atravessa`, dispensa `motivo` e `max`. */
+  const resolvidaPorId = resolvidas.map((rs) => new Map(rs.map((r) => [r.id, r])));
+  const portasLidas = new Map();
+  const portasDoPar = (i, a, b, tipo) => {
+    const chaveDaLeitura = `${i}\u0000${a}\u0000${b}\u0000${tipo}`;
+    if (!portasLidas.has(chaveDaLeitura)) {
+      const ra = resolvidaPorId[i].get(a); const rb = resolvidaPorId[i].get(b);
+      portasLidas.set(chaveDaLeitura, ra && rb ? avaliarPortas(ra, rb, tipo) : null);
+    }
+    return portasLidas.get(chaveDaLeitura);
+  };
+  /* { justificado, razao }: o par é justificado quando as portas valem em toda opção em que as duas formas existem */
+  const justificadoPorPorta = (p, indices) => {
+    let visto = false; let razao = null;
+    for (const i of indices) {
+      if (!presentes[i]?.has(p.a) || !presentes[i]?.has(p.b)) continue;
+      const lida = portasDoPar(i, p.a, p.b, p.tipo);
+      if (!lida?.aplica) return { justificado: false, razao: lida?.razao ?? null };
+      visto = true;
+    }
+    return { justificado: visto, razao };
+  };
   /* declaração das exceções: só vale com o contato ligado. Os pares da raiz valem em toda
      opção ativa; os da opção, só nela. */
-  for (const p of (raiz?.pares ?? []).filter(vale)) exigirDeclaracao(p, 'esboço', p.tipo === 'atravessa' && mesmaUnidade(p, ativas));
-  opcoes.forEach((_, i) => { if (ativa(i)) for (const p of (lidas[i]?.pares ?? []).filter(vale)) exigirDeclaracao(p, `opção ${i + 1}`, p.tipo === 'atravessa' && mesmaUnidade(p, [i])); });
+  const declarar = (p, onde, indices) => {
+    if (p.tipo !== 'atravessa') { exigirDeclaracao(p, onde); return; }
+    const porta = justificadoPorPorta(p, indices);
+    exigirDeclaracao(p, onde, mesmaUnidade(p, indices) || porta.justificado, porta.razao);
+  };
+  for (const p of (raiz?.pares ?? []).filter(vale)) declarar(p, 'esboço', ativas);
+  opcoes.forEach((_, i) => { if (ativa(i)) for (const p of (lidas[i]?.pares ?? []).filter(vale)) declarar(p, `opção ${i + 1}`, [i]); });
   const { padraoTol, padraoPen, padraoFolga } = padroesDoContato(resolvidas);
   const tolRaiz = raiz?.tolerancia ?? padraoTol;
   const penRaiz = raiz?.penetracao ?? padraoPen;
@@ -781,6 +811,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
   const atravessamentos = [];
   const silenciados = [];
   const implicitas = [];
+  const portas = [];
   const resumo = [];
   opcoes.forEach((o, i) => {
     const titulo = o.titulo ?? `Opção ${i + 1}`;
@@ -793,14 +824,20 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
     const maximos = new Map();
     const motivos = new Map();
     const daUnidade = new Map();
+    const daPorta = new Map();
     const paresDaOpcao = herdarDoEspelho([...paresImplicitos(o, tol), ...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])], o);
     const atravessaComOculta = new Set(paresDaOpcao.filter((p) => p.tipo === 'atravessa' && !vale(p)).map((p) => chave(p.a, p.b)));
     for (const p of paresDaOpcao.filter(vale)) {
       tipos.set(chave(p.a, p.b), p.tipo);
       maximos.set(chave(p.a, p.b), p.max);
       motivos.set(chave(p.a, p.b), p.motivo?.trim());
+      /* par de portas que formam um encaixe: o julgamento é o da porta */
+      if (p.tipo === 'atravessa' || p.tipo === 'encosta') {
+        const lida = portasDoPar(i, p.a, p.b, p.tipo);
+        if (lida?.aplica) daPorta.set(chave(p.a, p.b), lida);
+      }
       /* `atravessa` dentro da unidade, sem motivo ou sem max: o motivo é "mesma unidade" e o max é implícito */
-      if (p.tipo === 'atravessa' && mesmaUnidade(p, [i])) {
+      if (p.tipo === 'atravessa' && !daPorta.has(chave(p.a, p.b)) && mesmaUnidade(p, [i])) {
         const semMotivo = (p.motivo?.trim().length ?? 0) < MINIMO_DO_MOTIVO;
         if (semMotivo || p.max === undefined) daUnidade.set(chave(p.a, p.b), { unidade: unidadeDe[i].get(p.a), maxImplicito: p.max === undefined });
       }
@@ -815,6 +852,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
     const achadosDaOpcao = [];
     const atravessamentosDaOpcao = [];
     const silenciadosDaOpcao = [];
+    const portasDaOpcao = [];
     const ligados = Array.from({ length: n }, () => []);
     const menorFolga = Array(n).fill(Infinity);
     const folgas = Array.from({ length: n }, () => Array(n).fill(Infinity));
@@ -836,7 +874,15 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
       if (folga < menorFolga[b]) menorFolga[b] = folga;
       if (tipo === 'atravessa' || folga <= tol) { ligados[a].push(b); ligados[b].push(a); }
       const par = [rs[a].id, rs[b].id];
-      if (tipo === 'encosta') {
+      const viaPorta = daPorta.get(chave(rs[a].id, rs[b].id));
+      if (viaPorta) portasDaOpcao.push(registroDaPorta(titulo, par, viaPorta, penetracao));
+      if (viaPorta && !viaPorta.satisfeita) {
+        /* a porta reprova o par pelo que mediu (folga e classe, ou apoio), e a penetração não é julgada de novo */
+        achadosDaOpcao.push({ opcao: titulo, tipo: 'porta-fora', pecas: par, mm: Math.round(viaPorta.desvio * 1000) / 1000, porta: viaPorta.tipo, texto: viaPorta.texto, sugestao: null });
+        if (tipo === 'atravessa' && arred(penetracao) > 0) atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), porta: true });
+      } else if (tipo === 'encosta' && viaPorta) {
+        /* encosto dentro do contrato da porta: nada mais a medir */
+      } else if (tipo === 'encosta') {
         if (folga > tol) {
           const d = detalharPar(pecas[a], pecas[b]);
           achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(folga), detalhe: 'folga', sugestao: d.aproxima ? conserto.par(par[0], par[1], d.aproxima, folga, `o par devia encostar e há ${mmTxt(folga)} mm de folga`) : null });
@@ -846,10 +892,10 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
         }
       } else if (tipo === 'atravessa') {
         const implicito = daUnidade.get(chave(rs[a].id, rs[b].id));
-        const max = maximos.get(chave(rs[a].id, rs[b].id)) ?? (implicito ? Math.min(menorDimensao(rs[a]), menorDimensao(rs[b])) : undefined);
+        const max = maximos.get(chave(rs[a].id, rs[b].id)) ?? (viaPorta ? viaPorta.maximo : undefined) ?? (implicito ? Math.min(menorDimensao(rs[a]), menorDimensao(rs[b])) : undefined);
         if (implicito) implicitas.push({ opcao: titulo, a: par[0], b: par[1], unidade: implicito.unidade, motivo: MOTIVO_DA_MESMA_UNIDADE, penetracao_mm: arred(penetracao), max_mm: arred(max), maxImplicito: implicito.maxImplicito });
         if (arred(penetracao) > 0) {
-          atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), ...(max === undefined ? {} : { max_mm: arred(max) }), ...(implicito ? { implicita: true } : {}) });
+          atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), ...(max === undefined ? {} : { max_mm: arred(max) }), ...(implicito ? { implicita: true } : {}), ...(viaPorta ? { porta: true } : {}) });
         }
         if (max !== undefined && penetracao > max) {
           const d = detalharPar(pecas[a], pecas[b]);
@@ -894,15 +940,16 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
     achados.push(...achadosDaOpcao);
     atravessamentos.push(...atravessamentosDaOpcao);
     silenciados.push(...silenciadosDaOpcao);
+    portas.push(...portasDaOpcao);
     resumo.push({ opcao: titulo, usar: true, tolerancia: arred(tol), penetracao: arred(penMax), folga: arred(folgaMax), resultado: achadosDaOpcao.length ? 'reprovado' : 'aprovado' });
   });
   atravessamentos.sort((x, y) => y.penetracao_mm - x.penetracao_mm);
   return {
-    usar: true, tolerancia: arred(tolRaiz), penetracao: arred(penRaiz), folga: arred(folgaRaiz), achados, atravessamentos, silenciados, ...(implicitas.length ? { implicitas } : {}), resultado: achados.length ? 'reprovado' : 'aprovado', opcoes: resumo,
+    usar: true, tolerancia: arred(tolRaiz), penetracao: arred(penRaiz), folga: arred(folgaRaiz), achados, atravessamentos, silenciados, ...(implicitas.length ? { implicitas } : {}), ...(portas.length ? { portas } : {}), resultado: achados.length ? 'reprovado' : 'aprovado', opcoes: resumo,
   };
 }
 
-const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido', 'ponta-livre': 'ponta livre', 'pontas-sem-coletor': 'pontas sem coletor' };
+const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido', 'ponta-livre': 'ponta livre', 'pontas-sem-coletor': 'pontas sem coletor', 'porta-fora': 'porta fora do contrato' };
 const mm = (x) => x.toFixed(1).replace('.', ',');
 
 /* Linha legível de um achado. */
@@ -910,6 +957,7 @@ export function descreverAchado(a) {
   const p = a.pecas;
   const base = `[${a.opcao}] ${NOMES[a.tipo]}: `;
   if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} se penetram ${mm(a.mm)} mm`;
+  if (a.tipo === 'porta-fora') return `${base}${a.texto}`;
   if (a.tipo === 'ponta-livre') return `${base}${p[0]} tem a ponta ${a.ponta} em [${a.ponto.map(mmTxt).join(' ')}] sem encostar em nada (a forma mais próxima fica a ${mm(a.mm)} mm); encoste-a em outra forma ou declare "ponta": true${a.ponta === 'inicio' || a.ponta === 'fim' ? ` (ou "ponta": { "${a.ponta}": true })` : ''} se ela termina no ar de propósito`;
   if (a.tipo === 'pontas-sem-coletor') return `${base}${p.length} pontas (${p.join(', ')}) terminam no mesmo ponto [${a.ponto.map(mmTxt).join(' ')}] e nenhuma forma as une; ponha ali uma forma que as una (um coletor, com o atravessamento declarado) ou declare "ponta": true em uma delas se o encontro é de propósito`;
   if (a.tipo === 'atravessa-excedido') return `${base}${p[0]} e ${p[1]} se atravessam ${mm(a.mm)} mm, acima do máximo ${a.implicita ? `implícito (mesma unidade: a menor dimensão da menor das duas formas)` : 'declarado'} de ${mm(a.max)} mm${a.implicita ? `; se a travessia é intencional basta declarar "max" (sugestão: ${a.maxSugerido ?? Math.floor(a.mm) + 1}) em contato.juntas ou em contato.pares para este par, por exemplo { "a": "${p[0]}", "b": "${p[1]}", "tipo": "atravessa", "max": ${a.maxSugerido ?? Math.floor(a.mm) + 1} } (dentro da unidade não pede "motivo")` : ''}`;
@@ -920,7 +968,13 @@ export function descreverAchado(a) {
 
 /* Linha legível de um atravessamento declarado. */
 export function descreverAtravessamento(t) {
-  return `[${t.opcao}] ${t.a} e ${t.b} se atravessam ${mm(t.penetracao_mm)} mm${t.max_mm === undefined ? '' : ` (máximo ${t.implicita ? 'implícito, mesma unidade,' : 'declarado'} ${mm(t.max_mm)} mm)`}`;
+  return `[${t.opcao}] ${t.a} e ${t.b} se atravessam ${mm(t.penetracao_mm)} mm${t.max_mm === undefined ? '' : ` (máximo ${t.implicita ? 'implícito, mesma unidade,' : t.porta ? 'da porta,' : 'declarado'} ${mm(t.max_mm)} mm)`}`;
+}
+
+/* Linha legível de um par lido pelas portas (`portas` do resultado). */
+export function descreverPorta(t) {
+  if (t.tipo === 'ajuste') return `[${t.opcao}] ${t.recebe} recebe ${t.ocupa}: folga diametral ${mmFino(t.folga_diametral_mm)} mm, classe ${t.classe} de ${mmFino(t.faixa_mm[0])} a ${mmFino(t.faixa_mm[1])} mm (nominal ${mmFino(t.nominal_mm)} mm), ${t.satisfeita ? 'dentro' : 'fora'}`;
+  return `[${t.opcao}] ${t.apoia} apoia em ${t.recebe}: separação ${mmFino(t.separacao_mm)} mm, apoio ${t.extrapolacao_mm > 0 ? `passa ${mmFino(t.extrapolacao_mm)} mm da face` : 'dentro da face'}, ${t.satisfeita ? 'dentro' : 'fora'}`;
 }
 
 /* Linha legível de um par silenciado (`livre`). */
