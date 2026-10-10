@@ -315,3 +315,60 @@ export function auditarParDeSolidos(a, b, tolerancia) {
     ? { estado: 'interpenetram', metodo: 'intersecao-de-superficies' }
     : { estado: 'inconclusivo', diagnosticos: ['intersecao-em-malha-aberta'] };
 }
+
+/* DISTÂNCIA DE UM PONTO A UM TRIÂNGULO — o ponto mais próximo do triângulo
+   fechado, pelas regiões de Voronoi do triângulo. Só a profundidade de
+   interpenetração precisa dela; o estado do par segue vindo de
+   `auditarParDeSolidos`. */
+function distancia2PontoTriangulo(p, [a, b, c]) {
+  const ab = sub(b, a); const ac = sub(c, a); const ap = sub(p, a);
+  const d1 = dot(ab, ap); const d2 = dot(ac, ap);
+  if (d1 <= 0 && d2 <= 0) return comprimento2(ap);
+  const bp = sub(p, b); const d3 = dot(ab, bp); const d4 = dot(ac, bp);
+  if (d3 >= 0 && d4 <= d3) return comprimento2(bp);
+  const vc = d1 * d4 - d3 * d2;
+  if (vc <= 0 && d1 >= 0 && d3 <= 0) return comprimento2(sub(p, add(a, mult(ab, d1 / (d1 - d3)))));
+  const cp = sub(p, c); const d5 = dot(ab, cp); const d6 = dot(ac, cp);
+  if (d6 >= 0 && d5 <= d6) return comprimento2(cp);
+  const vb = d5 * d2 - d1 * d6;
+  if (vb <= 0 && d2 >= 0 && d6 <= 0) return comprimento2(sub(p, add(a, mult(ac, d2 / (d2 - d6)))));
+  const va = d3 * d6 - d5 * d4;
+  if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) {
+    return comprimento2(sub(p, add(b, mult(sub(c, b), (d4 - d3) / ((d4 - d3) + (d5 - d6))))));
+  }
+  const soma = 1 / (va + vb + vc);
+  return comprimento2(sub(p, add(a, add(mult(ab, vb * soma), mult(ac, vc * soma)))));
+}
+
+/**
+ * Profundidade de interpenetração entre dois sólidos preparados, em unidade de
+ * mundo: o maior afundamento, na superfície do outro sólido, de um dos pontos
+ * de amostragem do contato (vértices e centroides) que a contenção acusa
+ * estritamente dentro. Mesma amostragem e mesmo teste de contenção que
+ * `auditarParDeSolidos`, de modo que as duas medidas não discordam sobre o que
+ * está dentro. É um piso da penetração real, porque só amostra pontos.
+ *
+ * Devolve `null` quando nenhum ponto amostrado fica dentro (o par se cruza só
+ * por arestas, ou não se invade) ou quando algum sólido é inconclusivo; quem
+ * consome trata `null` num par `interpenetram` como penetração indeterminada,
+ * nunca como zero.
+ */
+export function profundidadeDeInterpenetracao(a, b, tolerancia) {
+  if (a.inconclusivo || b.inconclusivo || !a.fechada || !b.fechada) return null;
+  if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return null;
+  const maiorDentro = (de, em) => {
+    let maior = null;
+    for (const ponto of pontosDeAmostragem(de)) {
+      if (pontoDentroMalha(ponto, em, tolerancia) !== true) continue;
+      let menor = Infinity;
+      for (const triangulo of em.triangulos) menor = Math.min(menor, distancia2PontoTriangulo(ponto, triangulo));
+      const profundidade = Math.sqrt(menor);
+      if (maior === null || profundidade > maior) maior = profundidade;
+    }
+    return maior;
+  };
+  const deAemB = maiorDentro(a, b); const deBemA = maiorDentro(b, a);
+  if (deAemB === null) return deBemA;
+  if (deBemA === null) return deAemB;
+  return Math.max(deAemB, deBemA);
+}

@@ -196,7 +196,7 @@ vizinhas.
 | 4 | contratos locais de pose, contato e interface | capacidades e provas específicas já existem, mas não formam uma montagem persistida geral |
 | 5 | montagem persistida recursiva v1 | `mecanifica.montagem` v1, pose rígida persistida e resolução recursiva já implementadas |
 | 6 | mapa de dependências e contexto derivado | implementado para universo explícito: composição, ocorrências, relações, usos reversos, impacto e contexto consultável |
-| 7 | validação integrada de montagem e movimento | relações estáticas e revalidação em cascata persistida implementadas; movimento e espaço varrido continuam fora |
+| 7 | validação integrada de montagem e movimento | relações estáticas e revalidação em cascata persistida implementadas; o curso de uma articulação declarada é amostrado e conferido contra as peças que ficam (extensão de articulação), mas o espaço varrido contínuo e a dinâmica continuam fora |
 | 8 | autoria transacional de sistemas compostos pela IA | implementada em perfil MCP opt-in para catálogo/repositório autorizados; não é escrita irrestrita nem promoção automática |
 
 Os níveis 0 a 3 são operacionais. O nível 4 possui vocabulário e provas locais,
@@ -316,7 +316,7 @@ Ainda não há:
 - descoberta de dependências fora de universo explícito;
 - resolução automática de contato;
 - solver geral de encaixe;
-- validação de espaço varrido;
+- validação de espaço varrido contínuo (a articulação confere posições amostradas do curso);
 - escrita irrestrita de montagem por MCP, CLI ou outra porta.
 
 Não simule essas capacidades com índices internos, posições de câmera, cópia de
