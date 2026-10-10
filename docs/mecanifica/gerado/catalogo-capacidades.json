@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:a848b0fb8d43b5909b7a7c5210997daa0a648fa62a1711cd02d0baec9f80c3d7",
+  "assinatura": "sha256:2ce16b3d979536b72b693fd1580bcaf19858305f952cb003e1743c6eb5404688",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -96,8 +96,6 @@
             "schema": "mecanifica.argumentos.arredondarAresta@1",
             "obrigatorios": [
               "origemId",
-              "de",
-              "aresta",
               "raio",
               "paineis"
             ]
@@ -388,11 +386,9 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Extrudar uma face por ID posicional.",
+            "intencao": "Extrudar uma face, por ID posicional ou por seleção que resolva para uma face só.",
             "schema": "mecanifica.argumentos.extruda@1",
-            "obrigatorios": [
-              "face"
-            ]
+            "obrigatorios": []
           }
         },
         {
@@ -1221,8 +1217,6 @@
         "schema": "mecanifica.argumentos.arredondarAresta@1",
         "obrigatorios": [
           "origemId",
-          "de",
-          "aresta",
           "raio",
           "paineis"
         ]
@@ -1513,11 +1507,9 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Extrudar uma face por ID posicional.",
+        "intencao": "Extrudar uma face, por ID posicional ou por seleção que resolva para uma face só.",
         "schema": "mecanifica.argumentos.extruda@1",
-        "obrigatorios": [
-          "face"
-        ]
+        "obrigatorios": []
       }
     },
     {

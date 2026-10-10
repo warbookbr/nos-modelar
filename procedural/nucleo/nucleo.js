@@ -24,6 +24,7 @@ import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
 import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
+import { lerOnde, resolverOnde } from './selecao-geometrica.js';
 import earcut from 'earcut';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
@@ -1846,13 +1847,13 @@ function confereId(st, i, op, args) {
    sem corromper o neutro. Só as ops que JÁ documentavam seleção vazia como
    no-op (vértice) passam `vazioNoop`.
 
-   Os SETE seletores vivem numa LISTA SÓ (`SELETORES`, logo abaixo). Eram três
+   Os seletores (os sete históricos mais `onde`, que filtra) vivem numa LISTA SÓ (`SELETORES`, logo abaixo). Eram três
    listas escritas à mão e uma delas — a de seleção vazia — ensinava SEIS,
    omitindo justamente `alias`: o núcleo imprimindo a mesma omissão que o O-0
    tinha acabado de corrigir na skill, na hora em que o autor mais precisa da
    lista certa. Com lista única, um oitavo seletor entra nas três mensagens de
    uma vez e nenhuma pode envelhecer sozinha. */
-const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'porta', 'alias'];
+const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'porta', 'alias', 'onde'];
 const SELETOR = new Set(SELETORES);
 
 function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
@@ -1995,12 +1996,35 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false
       }
     }
   }
+  /* `onde` (seleção por propriedade geométrica, selecao-geometrica.js) é o único campo que FILTRA em vez de unir: com
+     outras chaves na mesma seleção escolhe dentro do que elas juntaram, sozinho escolhe na malha viva inteira. O
+     resultado SUBSTITUI faces e vértices; alvo:'aresta' devolve também `arestas` (pares de vértices) e nenhuma face.
+     Seleção vazia grita aqui mesmo nas ops que aceitam seleção de vértice vazia: pedir um critério e não achar nada
+     é engano de intenção, não um no-op documentado. */
+  let arestas = null;
+  if (sel.onde != null) {
+    const outras = teveChave;
+    teveChave = true;
+    const lido = lerOnde(st, sel.onde);
+    if (lido.erro) grita(st, i, op, 'sel.onde', `seleção onde inválida: ${lido.erro}`);
+    else {
+      const r = resolverOnde(st, lido.onde, outras ? { faces } : null, normalDaFace);
+      if (r.erro) grita(st, i, op, 'sel.onde', r.erro);
+      else {
+        faces.clear(); vertices.clear();
+        for (const f of r.faces) faces.add(f);
+        for (const v of r.vertices) vertices.add(v);
+        arestas = r.arestas;
+      }
+    }
+    if (!faces.size && !vertices.size) return { vertices, faces, arestas: [] };
+  }
   /* a lista dos SETE, igual à da chave desconhecida logo acima: o núcleo estava
      ensinando seis e escondendo justamente `alias` — a mesma omissão que o O-0
      acabou de corrigir na skill, impressa pela própria ferramenta. */
   if (!teveChave) grita(st, i, op, 'sel', `seleção vazia: informe ${SELETORES.join(', ')}`);
   if (!vertices.size && !faces.size && !vazioNoop) grita(st, i, op, 'sel', 'seleção vazia: nenhum alvo válido foi encontrado');
-  return { vertices, faces };
+  return { vertices, faces, arestas: arestas ?? [] };
 }
 
 /* `soVertices`: quem entra por aqui (displace/transladar/rotaciona) descarta as
@@ -2740,7 +2764,7 @@ const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, n
 const operacoesGeradoresAvancados = criarOperacoesGeradoresAvancados({ BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias });
 const operacoesPerfis = criarOperacoesPerfis({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, grita, registraOrigem, confereId, addV, addF });
 const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
-const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
+const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico });
 

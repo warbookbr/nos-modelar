@@ -33,13 +33,53 @@ ser inferidas de um contrato curto: seleção, orientação, proveniência e lim
 ## Seleção semântica
 
 Onde a operação aceitar `sel`, os campos disponíveis são `tudo`, `v`, `f`,
-`grupo`, `regiao`, `origem`, `alias` e, quando publicado, `porta`. Operações de
+`grupo`, `regiao`, `origem`, `alias`, `onde` (filtro geométrico, abaixo) e, quando
+publicado, `porta`. Operações de
 face podem usar `regiao.modo` (`contem` ou `toca`); rotação, translação e
 deslocamento tratam região como seleção de vértices e recusam esse modo.
 
 `faces:[ids]` existe para arquivos legados. Não o misture com `sel`. Nome
 errado, região incompleta, alvo ausente ou seleção ambígua devem gritar e não
 produzir alteração parcial.
+
+### Seleção por propriedade geométrica: `onde`
+
+`sel:{onde:{...}}` escolhe face ou aresta pelo que ela é, sem id. É a única chave
+de `sel` que filtra em vez de unir: com `origem`, `grupo`, `regiao`, `alias` ou
+`porta` na mesma seleção, escolhe dentro do que elas juntaram; sozinha, escolhe
+em toda a malha. Os critérios se aplicam nesta ordem, e `extremo` mede entre os
+que sobraram dos anteriores:
+
+- `alvo`: `'face'` (padrão) ou `'aresta'`. Se `tipo` só existe para um alvo, ele
+  decide; `alvo` contrário ao `tipo` grita.
+- `tipo`: de face, `'plana'` ou `'empenada'`; de aresta, `'viva'`, `'lisa'` ou
+  `'borda'`. `viva` e `lisa` pedem `angulo` (graus entre as normais das duas
+  faces: 0 é liso, 90 é a quina de uma caixa); viva é estritamente acima dele,
+  lisa é até ele. `borda` é a aresta de uma face só (malha aberta). Aresta com
+  uma face ou com três ou mais não tem ângulo e não é viva nem lisa.
+- `normal:{dir:[x,y,z], ate:graus}`: a normal da face a até `ate` graus de `dir`
+  (`dir` não precisa de comprimento 1, e vale nome de PARAM). Numa aresta vale se
+  alguma das faces vizinhas passa: `normal` para cima com `alvo:'aresta'` são as
+  arestas da face de cima.
+- `extremo:{eixo:'x'|'y'|'z', lado:'max'|'min', tol?}`: o elemento cujo centro
+  (média dos cantos da face, ponto médio da aresta) está no maior ou menor valor
+  do eixo, e os que ficam a até `tol` dele (padrão 1e-6, em unidades do mundo).
+
+```js
+// a face de cima da caixa 1, e só dela (a caixa 2 tem outra face de cima)
+{ origem: { op: 'cubo', id: 1 }, onde: { normal: { dir: [0, 1, 0], ate: 5 } } }
+// as 8 arestas da tampa de cima de um cilindro: vivas acima de 60° e em y máximo
+{ onde: { tipo: 'viva', angulo: 60, extremo: { eixo: 'y', lado: 'max' } } }
+```
+
+Seleção de aresta devolve as pontas dela como vértices: `transladar` e `rotaciona`
+movem essas pontas, e as operações de face (`pincel`, `parte`, `material`) a
+recusam por não ter face. `arredondarAresta` aceita `sel` no lugar de `de` +
+`aresta`, desde que ela resolva para exatamente uma aresta (a face de apoio é a
+de menor id entre as que a usam). Resultado vazio grita em `sel.onde` com o
+critério pedido e o número de candidatos que sobrou a cada passo; chave, valor
+ou combinação inválidos gritam com o campo. O resultado é ordenado (faces por id,
+arestas por par de vértices) e não depende da execução.
 
 ## Pose de criação: `em` e `eixo`
 
@@ -203,25 +243,27 @@ encaminhe-os a todas as chamadas do núcleo que recebem aliases.
 
 ## Detalhes de seleção, aliases e proveniência
 
-**SEIS ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
-`moveF`, `moveA`, `vira`, `extruda` e `mescla` (a sétima é `pesar`, mesma
-restrição, mas de skinning). Escolher uma delas é escolher escrever id
-posicional — a referência que o `CLAUDE.md` proíbe persistir. Escrever `sel`
-nelas não é atalho e não vira silêncio: o argumento de id chega `undefined` e a
-op GRITA face/vértice inexistente (medido: 1 órfão em `moveV`/`moveF`/`vira`/
-`extruda`, 2 em `moveA` — uma por ponta). **A exceção que morde é o `mescla`:**
-com `para` válido e `de` ausente ele volta CALADO, 0 órfão e 0 mudança, então
-ali nem o grito te salva — confira o efeito, não a ausência de erro. Quem
-precisa de identidade estável compõe por primitiva +
+**CINCO ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
+`moveF`, `moveA`, `vira` e `mescla` (a sexta é `pesar`, mesma restrição, mas de
+skinning). `extruda` saiu da lista: aceita `face:id` ou `sel` que resolva para
+exatamente uma face, por exemplo `['extruda', { sel: { origem: CAIXA, onde:
+{ extremo: { eixo: 'y', lado: 'max' } } }, dist: 0.5 }]`. Escolher uma das cinco é
+escolher escrever id posicional — a referência que o `CLAUDE.md` proíbe
+persistir. Escrever `sel` nelas não é atalho e não vira silêncio: o argumento de
+id chega `undefined` e a op GRITA face/vértice inexistente (medido: 1 órfão em
+`moveV`/`moveF`/`vira`, 2 em `moveA` — uma por ponta). **A exceção que morde é o
+`mescla`:** com `para` válido e `de` ausente ele volta CALADO, 0 órfão e 0
+mudança, então ali nem o grito te salva — confira o efeito, não a ausência de
+erro. Quem precisa de identidade estável compõe por primitiva +
 `transladar`/`rotaciona`/`espelha` endereçados por `origem`/`alias`: a peça de
 referência sem id cru, um disco de freio com dezessete aliases, não usava
-nenhuma das seis (peça removida do acervo; a medida permanece). Se o assunto
+nenhuma das cinco (peça removida do acervo; a medida permanece). Se o assunto
 exigir uma delas (correção de normal, solda), use — e REPORTE, porque é lacuna
 de contrato, não estilo.
 
 **`apagaFace` NÃO está nessa lista, e é a que mais importa.** Ela é a única op
 que remove face — logo a única forma de abrir um furo, uma porta, um vão — e o
-núcleo já lhe deu o ramo semântico: `sel:{...}` resolvido pelos mesmos sete
+núcleo já lhe deu o ramo semântico: `sel:{...}` resolvido pelos mesmos
 campos, exigindo **exatamente uma face**, gritando em ambiguidade e em seleção
 vazia. Abrir um vão **não custa id posicional**; escrever `['apagaFace',
 { face: 4003 }]` é dívida escolhida, não imposta. A forma certa, medida numa peça de
@@ -281,9 +323,10 @@ da rotação, o que era `tampa:'fundo'` (y=0) fica no **menor x** e `tampa:'topo
 no **maior x** — é assim que um disco de freio nomeia `pistaInterna`/`pistaExterna`
 por alias, sendo `+X` o lado de FORA do carro.
 
-**Seleção semântica (`sel`, D-129/D-130/D-131):** os SETE campos são `tudo`,
-`v`, `f`, `grupo`, `regiao`, `origem` e `alias` — podem coexistir e se unem
-(chave desconhecida GRITA nomeando os sete). `sel:{tudo:true}` é a
+**Seleção semântica (`sel`, D-129/D-130/D-131):** os campos são `tudo`, `v`, `f`,
+`grupo`, `regiao`, `origem`, `porta`, `alias` e `onde` — podem coexistir e se
+unem, com a exceção de `onde`, que filtra o que os outros juntaram (chave
+desconhecida GRITA nomeando todos). `sel:{tudo:true}` é a
 ÚNICA forma explícita de "a peça inteira" — todos os vértices e todas as
 faces vivos (Rodada B da Fase 3.5). Só aceita o literal `true`
 (`false`/`1`/`'sim'` GRITAM). **Deliberadamente diferente de `sel` ausente,

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-990 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+992 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -625,6 +625,8 @@
 - `registro.js` — registro.js — configuração explícita, determinística e sem estado global de operações.
 - `registro.test.mjs` — registro-operacoes.test.mjs — prova configuração explícita e despacho determinístico da R02.
 - `render.js` — O VISOR do motor v3 (D-55) — o ambiente PADRÃO onde toda peça é criada e auditada: framebuffer fixo (?res) com upscale NEAREST (pixel art, custo independente…
+- `selecao-geometrica.js` — selecao-geometrica.js — o seletor `onde` de `sel`: face ou aresta por propriedade geométrica.
+- `selecao-geometrica.test.mjs` — selecao-geometrica.test.mjs — `sel.onde`: face e aresta por propriedade geométrica, sem identificador numérico. As expectativas vêm de contas sobre as coorde…
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `tex.js` — helpers de TEXTURA do motor v3 (D-55) — paleta Resurrect64, ruído, dither e o gerador de canvas. Uma peça pode devolver índice da paleta OU [r,g,b] direto (m…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …

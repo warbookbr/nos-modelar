@@ -9,11 +9,19 @@ export function criarOperacoesEdicaoDireta({ baseDoPasso, grita, normalDaFace, a
     st.V.set(v, [p[0] + d[0], p[1] + d[1], p[2] + d[2]]);   // SEMPRE por deslocamento (acompanha a base)
   },
 
-  /* extruda (modo face): a prova da numeração de meio-de-caminho. Cria um anel
+  /* extruda (modo face): aceita `face:id` (legado) ou `sel` que resolva para UMA face. A prova da numeração de meio-de-caminho. Cria um anel
      NOVO de vértices (base = POSIÇÃO do passo), levanta a face por `dist` na
      normal, e ergue as paredes laterais. */
   extruda(st, a, i) {
-    const fid = a.face;
+    if (a.face != null && a.sel != null) return grita(st, i, 'extruda', 'face+sel', 'seleção ambígua: use face:id (legado) OU sel:{...}, nunca os dois');
+    let fid = a.face;
+    if (a.sel != null) {
+      const antes = st.orfaos.length;
+      const faces = resolverSelecao(st, a.sel, 'extruda', i).faces;
+      if (st.orfaos.length !== antes) return;
+      if (faces.size !== 1) return grita(st, i, 'extruda', 'sel', `seleção ${faces.size ? 'ambígua' : 'vazia'}: extruda exige exatamente uma face, e sel resolveu ${faces.size}`);
+      fid = faces.values().next().value;
+    }
     const f = st.F.get(fid);
     if (!f) return grita(st, i, 'extruda', fid, 'face inexistente');
     const anel = f.vs.slice();
