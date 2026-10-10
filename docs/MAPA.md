@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-987 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+995 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -49,8 +49,6 @@
 
 ## .claude/skills/criar-peca/
 
-- `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
-- `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
 - `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
 
 ## .claude/skills/criar-peca/references/
@@ -138,6 +136,8 @@
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
@@ -568,6 +568,15 @@
 - `index.js` — index.js — o pacote registrável da extensão chapa dobrada: manifesto, implementação e a conta das medidas.
 - `manifesto.js` — manifesto.js — contrato versionado da extensão chapa dobrada: espessura, raio interno e abas, com as medidas de chapa.
 
+## procedural/extensoes/estrutura-de-barras/
+
+- `estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
+- `estrutura.js` — estrutura.js — valida e constrói a estrutura de barras: barras entre nós nomeados, cortadas ou encaixadas em cada nó, unidas num sólido só.
+- `fixture.js` — fixture.js — receita sintética da extensão: um quadro plano de tubos quadrados, sem publicação de peça.
+- `implementacao.js` — implementacao.js — emite a malha unida da estrutura de barras pelo contexto limitado da extensão nativa.
+- `manifesto.js` — manifesto.js — contrato versionado da extensão nativa estruturaDeBarras: nós nomeados, barras com perfil, juntas cortadas e unidas.
+- `perfis.js` — perfis.js — seções transversais da estrutura de barras: tubo redondo, quadrado, retangular e cantoneira, em geometria pura.
+
 ## procedural/extensoes/prisma-triangular/
 
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça.
@@ -609,6 +618,8 @@
 - `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
 - `mat4.js` — mat4 mínimo do motor v3 (D-55) — colunas-major, como o WebGL espera
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
+- `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
+- `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
