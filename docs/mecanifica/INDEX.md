@@ -141,6 +141,8 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 - A carcaça da empilhadeira espera o fim do plano ativo, com o
   [alinhamento](banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) parado
   na ordem de montagem.
+- O que foi pesquisado e ainda não entra no código fica no
+  [módulo de pesquisa](../../modulos/pesquisa/README.md).
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
   Medida e critérios em `planos/BACKLOG.md`.
 

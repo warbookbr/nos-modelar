@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-955 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+957 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -511,6 +511,14 @@
 ## modulos/otimizador-malha/tests/
 
 - `otimizar.test.js` — otimizar.test.js — o invariante é a coisa a provar, não o ganho.
+
+## modulos/pesquisa/
+
+- `README.md` — Pesquisa
+
+## modulos/pesquisa/bibliotecas/
+
+- `BIBLIOTECAS.md` — Bibliotecas avaliadas e ainda fora
 
 ## modulos/preparo-micropoligono/src/
 

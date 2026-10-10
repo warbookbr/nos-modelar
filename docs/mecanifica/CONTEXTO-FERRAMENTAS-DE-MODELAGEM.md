@@ -39,6 +39,20 @@ a casca, o Solidify do Blender e o deslocamento de contorno do CAD Sketcher e do
 SolveSpace; para a verificação, o desvio contra referência do CloudCompare e o
 achado do 3D-DefectBench de que seis vistas bastam.
 
+O Manifold, que já é dependência, tem duas partes que o núcleo ainda não usa e
+que cada fatia confere antes de escrever à mão. A `CrossSection`, sobre o
+Clipper2, faz booleanas de perfil, perfil com furo, deslocamento de contorno com
+canto redondo, reto ou em esquadria, fecho convexo e extrusão ou revolução direto
+para sólido, e é o ponto de partida da fatia 5. O `Manifold.levelSet(sdf, caixa,
+tamanhoDaAresta)` gera o sólido de uma função de distância, o que dá casca com
+espessura em qualquer forma, e é o ponto de partida da fatia 6, com o tamanho da
+aresta fixado no formato salvo para a malha sair igual em toda execução. Se a
+casca e o arredondamento sobre malha não ficarem aceitáveis, o plano B da fatia 6
+é o [replicad](https://github.com/sgenoud/replicad) (MIT), arredondamento e
+casca exatos sobre o OpenCASCADE que o repositório já empacota, o que reabre a
+decisão do OCCT só na autoria. As outras bibliotecas avaliadas estão no [módulo
+de pesquisa](../../modulos/pesquisa/bibliotecas/BIBLIOTECAS.md).
+
 ## Depois do plano
 
 A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos
