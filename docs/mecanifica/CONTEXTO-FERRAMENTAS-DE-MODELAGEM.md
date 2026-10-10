@@ -54,6 +54,46 @@ casca exatos sobre o OpenCASCADE que o repositório já empacota, o que reabre a
 decisão do OCCT só na autoria. As outras bibliotecas avaliadas estão no [módulo
 de pesquisa](../../modulos/pesquisa/bibliotecas/BIBLIOTECAS.md).
 
+## Desenho da fatia 4
+
+A pessoa decidiu em 2026-10-10 as três escolhas da fatia: o JSON do esboço
+continua como fonte de autoria, com o andaime derivado; o contrato N2 não cresce
+nesta fatia, e a perda de cavidade e de rotação só vira emenda se o banco de
+provas mostrar que custa nota; e o detalhe por unidade e a montagem continuam no
+esboço até as famílias, com o item 3 do gate de saída provado por um objeto
+refinado depois.
+
+O esboço continua sendo onde a IA escreve, e um tradutor em `src/autoria` lê as
+formas já resolvidas pelo módulo (parâmetros, componentes, simetria, arranjo e
+relações viram centro e medida) e gera o andaime da forma global N2, que a
+receita refina por `REFINA`. Caixa, cilindro, anel, cone, esfera, revolução,
+extrusão e tubo têm correspondência exata; `de`/`para` vira tubo. O loft vira
+casco por seções, a casca vira o sólido cheio, a inclinação de seção é ignorada,
+raio e chanfro da caixa viram extrusão, e o tradutor devolve com o andaime um
+relatório de perdas por forma, com o erro de volume e de envelope medido. Rotação
+em dois eixos, furos de caixa, faixas e correntes ficam sem equivalente e são
+declarados; o componente com detalhe interno é recolhido ao envelope quando passa
+do orçamento. Unidades, funções, medidas do plano e contrato ficam num arquivo
+derivado ao lado (`mecanifica.processo-nivel-zero@1`), com o hash da fonte. O
+gate de contato continua medindo no módulo, mas a exceção de atravessar ou
+encostar passa a ser justificada por porta derivada da geometria, e o Envelope
+do Condutor passa a ser o verificador do `REFINA`. O Condutor lê a fonte para
+unidades, Marcos e crítico, e as medidas passam a vir da blocagem.
+
+As tarefas, cada uma de um problema e com a sua prova: (1) o módulo exporta as
+formas resolvidas como dado puro, sem mudar hash nenhum; (2) o tradutor dos tipos
+exatos, com volume e envelope por unidade batendo com o esboço nas fixtures da
+moto, casa, mancal, cadeira e guarda-roupa; (3) as aproximações e o relatório de
+perdas, com a caçamba do carrinho dentro de 1% no envelope externo; (4) as
+medidas do plano lidas na blocagem, concordando com `--medidas`, e o G01 quando
+houver contorno; (5) as portas no esboço e no gate de contato, com a moto ainda
+aprovada e o desalinhamento de raio reprovado; (6) o Condutor lendo o nível zero,
+com o percurso da moto idêntico ao esperado; (7) as vistas `--unidade` e
+`--composta` pela blocagem, com a silhueta coincidindo com a do desenhista atual
+nos esboços do banco; (8) um objeto refeito no caminho novo e medido em tokens,
+rodadas e nota contra a medição gravada, e só então a troca da skill
+`esboco-detalhado`.
+
 ## Depois do plano
 
 A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos
