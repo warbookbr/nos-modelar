@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-997 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1002 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -831,6 +831,8 @@
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `topologia-da-malha.js` — topologia-da-malha.js — extrudar, duplicar, apagar e criar face.
 - `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na peça de prova: quantas faces e vértices nascem, quem some, e o que fica no lugar. A p…
+- `tradutor-nivel-zero.js` — Tradutor do nível zero: lê as formas resolvidas do esboço (`mecanifica.formas-resolvidas@1`, dado puro) e gera o andaime da forma global N2 (`mecanifica.anda…
+- `tradutor-nivel-zero.test.js` — O tradutor do nível zero sobre formas resolvidas escritas à mão (sem o módulo do esboço): cada tipo exato com a geometria que o andaime tem de dar, a rotação…
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
 - `veredito-de-forma.js` — veredito-de-forma.js — a saída do revisor, em vocabulário fechado.
@@ -1006,6 +1008,10 @@
 - `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
 - `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
 
+## tools/fixtures/nivel-zero/
+
+- `medir-blocagem.js` — Suporte de prova do tradutor do nível zero: compila um andaime com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por vo…
+
 ## tools/fixtures/refina-forma-global/
 
 - `suporte.js` — suporte.js — a receita de prova do refinamento da forma global.
@@ -1174,6 +1180,8 @@
 - `esboco-ajuda.mjs` — A referência do JSON do esboço por tópico: `npm run esboco -- --ajuda [tópico]`. A fonte é o README do módulo. Os tópicos saem dos títulos `##` e `###` dele …
 - `esboco-ajuda.test.mjs` — esboco-ajuda.test.mjs — o `--ajuda [tópico]` do esboço: o índice cobre todos os títulos do README, cada tópico devolve só a sua seção, o tópico desconhecido …
 - `esboco-composta.test.mjs` — esboco-composta.test.mjs — o `--composta` do esboço: uma imagem só com as quatro vistas sem legenda em grade 2x2, 1100 px de largura no total, cada quadrante…
+- `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
+- `esboco-para-andaime.test.mjs` — A prova do tradutor do nível zero sobre os esboços do módulo e do banco de provas: o andaime é aceito por `normalizarAndaimeGlobal`, a blocagem compila e fec…
 - `esboco-recusa.mjs` — Para onde cada recusa do esboço aponta: a mensagem "esboço recusado: ...", o gate de contato que reprova e o Portão do Condutor que não passa ganham no fim `…
 - `esboco-recusa.test.mjs` — esboco-recusa.test.mjs — toda recusa do esboço aponta o tópico que resolve, e o tópico existe no índice real de `npm run esboco -- --ajuda`: a forma e o camp…
 - `esboco-referencia.mjs` — Lê as referências do esboço para o módulo `modulos/esboco`, que não lê arquivo: um JSON de contornos da imagem (`mecanifica.contornos@1`, o que `npm run cont…

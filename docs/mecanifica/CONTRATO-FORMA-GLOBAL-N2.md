@@ -151,6 +151,41 @@ eixos. O envelope é um limite superior: uma parte pequena dentro de um volume g
 parte preenche o volume é o G01 da blocagem e a pessoa. A conferência também não exige que todo volume do
 andaime tenha uma parte.
 
+## Andaime derivado do esboço
+
+O esboço continua sendo onde a IA escreve, e o andaime do nível zero sai dele. `src/autoria/tradutor-nivel-zero.js`
+(`traduzirFormasParaAndaime`) lê as formas já resolvidas pelo módulo (`formasResolvidas`, formato
+`mecanifica.formas-resolvidas@1`, descrito no README do esboço) e devolve o andaime, sem importar o módulo; o adaptador
+`tools/mecanifica/esboco-para-andaime.mjs` (`andaimeDoEsboco`, `andaimeDoArquivo`) lê o esboço, chama as duas pontas e
+`descreverTraducao` imprime o resultado em texto. O resultado é `{ andaime, tabela, naoTraduzidas, ocultas }`: o andaime já
+aceito por `normalizarAndaimeGlobal`, a tabela do id do esboço para o id do andaime, as formas visíveis que ficaram de fora
+com o motivo (`{ id, tipo, motivo }`) e os ids das formas `oculto: true`, que são referência do esboço e não entram.
+
+Têm correspondência exata a caixa sem raio, chanfro nem furo, o cilindro, o anel (sem furo é um cilindro), o cone, a esfera,
+a revolução, a extrusão convexa ou côncava e o tubo; a haste `de`/`para` e a ligação `ligar` chegam como cilindro, e como
+tubo de dois pontos quando o eixo dela não coincide com um eixo do mundo. O esboço e a N2 usam os mesmos lados (128 no
+cilindro, no anel e no cone, 48 no tubo, 40 por 20 na esfera, e o `lados` que a forma declarar), de modo que o polígono e a área
+são os mesmos. A rotação sai da matriz da forma. Uma matriz que leva os três eixos a eixos do mundo só reordena as medidas. Uma
+que deixa um eixo no lugar e gira os outros dois no plano dele gira o perfil: a caixa vira a extrusão desse eixo do retângulo
+girado e a extrusão gira o contorno. Cone, anel e revolução só entram com o eixo sobre um eixo do mundo, e a esfera não
+depende da matriz.
+
+Fica de fora, e volta em `naoTraduzidas`, o que a N2 não faz igual: loft, faixa (`envolve`), raio, chanfro e furo da caixa, face
+plana do cilindro, rotação em mais de um eixo de um sólido que a N2 não inclina, tubo com canto sem raio de curva (o esboço
+põe uma esfera na junta e a N2 uma meia-esquadria) e qualquer volume que a própria N2 recusa, com a mensagem dela. Nada entra
+aproximado: `estrito: true` recusa o conjunto inteiro quando alguma forma visível fica de fora. As aproximações, o loft e a
+casca ficam para o tradutor ampliado, que devolverá o erro de volume e de envelope por forma.
+
+O id do volume é o slug do id da forma (sem acento, `camelCase` e pontos viram hífen), e dois ids que dão o mesmo slug levam
+ambos o hash do id original, de modo que a tabela não depende da ordem das formas. As regiões de um volume são a unidade e a
+parte da forma, ou `sem-regiao` sem as duas. O envelope é a união das caixas do esboço, e os landmarks são o centro do
+conjunto e os pontos nomeados do esboço que caem dentro dele.
+
+A prova está em `src/autoria/tradutor-nivel-zero.test.js` (cada tipo com formas escritas à mão, a rotação, as recusas, os ids e o
+determinismo) e em `tools/mecanifica/esboco-para-andaime.test.mjs` (as fixtures do módulo e do banco de provas): o volume
+coincide com o do esboço dentro de 1e-6 relativo e o envelope dentro de 1e-5 mm, e dentro de r (1 - cos(pi / n)) no cilindro e
+no tubo fora dos eixos, em cada forma, unidade, parte e no conjunto.
+
 ## Porta operacional
 
 `criarServicoAutoria3DNativa().formaGlobal` expõe uma única fachada pura para
@@ -178,6 +213,12 @@ npx vitest run src/autoria/refinamento-global.test.js tools/mecanifica/refinamen
 fechada, volume conhecido, determinismo e recusa) e
 `forma-global-n2-g01-primitivas.test.mjs` aprova no G01 um andaime que usa as seis,
 com três casos vermelhos (envelope, região e silhueta).
+
+O tradutor do nível zero tem teste próprio:
+
+```text
+npx vitest run src/autoria/tradutor-nivel-zero.test.js tools/mecanifica/esboco-para-andaime.test.mjs
+```
 
 Os PNGs são conveniência de inspeção. Os SVGs, JSONs e hashes do manifesto são
 os derivados textuais reexecutáveis. O alvo e o andaime versionados continuam
