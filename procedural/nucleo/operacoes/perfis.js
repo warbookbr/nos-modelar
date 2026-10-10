@@ -6,10 +6,12 @@
 
    ARGUMENTOS
      `perfil`         o contorno externo: lista de pontos [u, v], {retangulo: {largura, profundidade, centro?, cantos?}}
-                      ou {circulo: {raio, centro?}};
-     `furos`          lista de formas, nas mesmas três escritas, todas inteiras dentro do externo;
+                      {circulo: {raio, centro?}} ou {contorno: {inicio, trechos}} (reto, arco, arcoTangente, concordancia e
+                      spline, de curva2d.js);
+     `furos`          lista de formas, nas mesmas quatro escritas, todas inteiras dentro do externo;
      `deslocar`       {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?};
-     `segmentosArco`  segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4);
+     `segmentosArco`  segmentos por quarto de volta nos círculos, nos cantos redondos e nos arcos do contorno (padrão 4);
+     `segmentosSpline` segmentos por vão de spline do contorno (padrão 8);
      `altura`         extensão em y, maior que zero (padrão 1);
      `em`, `eixo`     a pose de criação dos outros geradores (o eixo da extrusão é y).
    O ponto [u, v] vai para x = u e z = v (o plano xz, como o `plano`); a base fica em y = 0 e o topo em y = altura.
@@ -48,7 +50,7 @@ export function criarOperacoesPerfis({ grita, registraOrigem, confereId, addV, a
     let perfil;
     try {
       perfil = montarPerfil(
-        { externo: a.perfil, furos: a.furos, deslocar: a.deslocar, segmentosArco: a.segmentosArco == null ? undefined : st.num(a.segmentosArco) },
+        { externo: a.perfil, furos: a.furos, deslocar: a.deslocar, segmentosArco: a.segmentosArco == null ? undefined : st.num(a.segmentosArco), segmentosSpline: a.segmentosSpline == null ? undefined : st.num(a.segmentosSpline) },
         { num: (x) => st.num(x), nomes: { externo: 'perfil' } },
       );
     } catch (e) {

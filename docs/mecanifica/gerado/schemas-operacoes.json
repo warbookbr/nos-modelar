@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:2ce16b3d979536b72b693fd1580bcaf19858305f952cb003e1743c6eb5404688",
+  "assinatura": "sha256:91b8215f1ddc9196704f5751b1632d9320b6fc7be4e2e7ca9d668a746ff68d10",
   "total": 37,
   "operacoes": [
     {
@@ -1550,11 +1550,11 @@
                   "type": "object"
                 }
               ],
-              "description": "Contorno externo: lista de pontos [u,v], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}. O ponto [u,v] vai para x=u, z=v."
+              "description": "Contorno externo: lista de pontos [u,v], {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno: {inicio: [u,v], trechos: [...]}}, com trechos {reto: [u,v]}, {arco: {por, ate}} ou {arco: {centro, angulo}}, {arcoTangente: [u,v]}, {concordancia: raio} e {spline: [[u,v], ...]}; fecha sozinho de volta ao inicio. O ponto [u,v] vai para x=u, z=v."
             },
             "furos": {
               "type": "array",
-              "description": "Furos: lista de formas nas mesmas três escritas, todas inteiras dentro do perfil, a mais de 1e-6 da diagonal da borda e dos outros furos."
+              "description": "Furos: lista de formas nas mesmas quatro escritas, todas inteiras dentro do perfil, a mais de 1e-6 da diagonal da borda e dos outros furos."
             },
             "deslocar": {
               "type": "object",
@@ -1572,7 +1572,21 @@
                   "type": "array"
                 }
               ],
-              "description": "Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4)."
+              "description": "Segmentos por quarto de volta nos círculos, nos cantos redondos e nos arcos do contorno por trechos (padrão 4)."
+            },
+            "segmentosSpline": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por vão de spline do contorno por trechos (padrão 8)."
             },
             "altura": {
               "anyOf": [
@@ -2260,6 +2274,20 @@
                 }
               ],
               "description": "Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4)."
+            },
+            "segmentosSpline": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por vão de spline de um furo escrito como {contorno} (padrão 8)."
             },
             "em": {
               "anyOf": [
