@@ -137,7 +137,7 @@ const definicoes = {
   },
   lathe: {
     intencao: 'Revolucionar perfil [raio,y] em torno de um eixo.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), perfil: ['lista', 'Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção.'], lados: ['inteiro', 'Resolução da revolução.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'], furos: ['lista', 'Furos da seção: cada um é uma lista de pontos [raio,y], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}, com o centro em [raio,y]. Inteiros dentro da seção.'], deslocar: ['objeto', "Desloca o contorno da seção: {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos."], segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'], [em[0]]: em.slice(1), [eixoCriacao[0]]: eixoCriacao.slice(1) },
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), perfil: ['lista', 'Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção.'], lados: ['inteiro', 'Resolução da revolução.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'], furos: ['lista', 'Furos da seção: cada um é uma lista de pontos [raio,y], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}, com o centro em [raio,y]. Inteiros dentro da seção.'], deslocar: ['objeto', "Desloca o contorno da seção: {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos."], segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'], segmentosSpline: ['inteiro', 'Segmentos por vão de spline de um furo escrito como {contorno} (padrão 8).'], [em[0]]: em.slice(1), [eixoCriacao[0]]: eixoCriacao.slice(1) },
     obrigatorios: ['perfil'], passos: [['lathe', { perfil: [[0.3, 0], [0.3, 1]], lados: 8 }]],
     precondicoes: ['Perfil precisa ter ao menos dois pontos e raios não negativos.'],
     limites: ['Com furos ou deslocar o perfil é o contorno externo de uma SEÇÃO fechada (o fecho pelo eixo é implícito) e cada contorno do resultado vira um laço; as faixas se enfileiram: o externo e depois os furos, na ordem canônica de perfil2d.js. Raio negativo, furo que encosta na borda e deslocamento que apaga a seção são recusados com campo e valor.'],
@@ -146,10 +146,11 @@ const definicoes = {
     intencao: 'Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão.',
     campos: {
       [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1),
-      perfil: ['forma2d', 'Contorno externo: lista de pontos [u,v], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}. O ponto [u,v] vai para x=u, z=v.'],
-      furos: ['lista', 'Furos: lista de formas nas mesmas três escritas, todas inteiras dentro do perfil, a mais de 1e-6 da diagonal da borda e dos outros furos.'],
+      perfil: ['forma2d', 'Contorno externo: lista de pontos [u,v], {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno: {inicio: [u,v], trechos: [...]}}, com trechos {reto: [u,v]}, {arco: {por, ate}} ou {arco: {centro, angulo}}, {arcoTangente: [u,v]}, {concordancia: raio} e {spline: [[u,v], ...]}; fecha sozinho de volta ao inicio. O ponto [u,v] vai para x=u, z=v.'],
+      furos: ['lista', 'Furos: lista de formas nas mesmas quatro escritas, todas inteiras dentro do perfil, a mais de 1e-6 da diagonal da borda e dos outros furos.'],
       deslocar: ['objeto', "{para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos; fora faz o contrário. Limite da esquadria em múltiplos da distância (padrão 4)."],
-      segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'],
+      segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos, nos cantos redondos e nos arcos do contorno por trechos (padrão 4).'],
+      segmentosSpline: ['inteiro', 'Segmentos por vão de spline do contorno por trechos (padrão 8).'],
       altura: ['escalar', 'Extensão em y, maior que zero (padrão 1).'],
       [em[0]]: em.slice(1), [eixoCriacao[0]]: ['eixo', 'Direção da extrusão; o padrão é y.'],
     },

@@ -9,7 +9,9 @@
        o externo recua e cada furo cresce; para fora, o contrário. `redondo` põe arcos nos cantos que abrem; `reto` corta
        o canto com uma aresta tangente ao círculo de raio `distancia` centrado no vértice; `esquadria` prolonga as arestas até se encontrarem, e `limite` (padrão 4, em múltiplos da
        distância) é até onde a ponta pode ir antes de ser cortada reta;
-     - `segmentosArco`: segmentos por quarto de volta, no círculo e nos cantos redondos (inteiro >= 1, padrão 4).
+     - `segmentosArco`: segmentos por quarto de volta, no círculo, nos cantos redondos e nos arcos do contorno por trechos
+       (inteiro >= 1, padrão 4);
+     - `segmentosSpline`: segmentos por vão de spline do contorno por trechos (inteiro >= 1, padrão 8).
 
    A saída é {componentes: [{externo, furos}], area}. Um recuo pode partir o perfil em pedaços, e cada pedaço é um
    componente. O externo sai anti-horário e os furos horários, em [u, v].
@@ -31,10 +33,12 @@
    O núcleo continua sem Three.js. A Manifold vem de manifold.js, a mesma instância das booleanas. */
 import { manifoldCarregada, erroDaCargaDaManifold } from './manifold.js';
 import { areaDoContorno, ehSimples, retanguloArredondado } from './contorno.js';
+import { ErroDeCurva, contornoPorTrechos } from './curva2d.js';
 
 export const CANTOS_DO_DESLOCAMENTO = Object.freeze(['redondo', 'reto', 'esquadria']);
 export const SENTIDOS_DO_DESLOCAMENTO = Object.freeze(['dentro', 'fora']);
 export const SEGMENTOS_ARCO_PADRAO = 4;
+export const SEGMENTOS_SPLINE_PADRAO = 8;
 export const LIMITE_DA_ESQUADRIA_PADRAO = 4;
 const JUNTAS = { redondo: 'Round', reto: 'Square', esquadria: 'Miter' };
 const GRADE = 1e8;
@@ -77,7 +81,7 @@ function resolverCantos(cantos, campo, num) {
 }
 
 /* Uma forma (lista de pontos, retângulo ou círculo) vira lista de pontos [u, v] com números. */
-export function formaParaContorno(forma, campo, { num = (x) => x, segmentosArco = SEGMENTOS_ARCO_PADRAO } = {}) {
+export function formaParaContorno(forma, campo, { num = (x) => x, segmentosArco = SEGMENTOS_ARCO_PADRAO, segmentosSpline } = {}) {
   if (Array.isArray(forma)) {
     if (forma.length < 3) throw new ErroDePerfil(campo, `a lista precisa de 3 pontos [u, v] ou mais (veio ${forma.length})`);
     return forma.map((p, k) => {
@@ -85,14 +89,22 @@ export function formaParaContorno(forma, campo, { num = (x) => x, segmentosArco 
       return [numeroDe(num, p[0], `${campo}[${k}][0]`), numeroDe(num, p[1], `${campo}[${k}][1]`)];
     });
   }
-  const aceito = `lista de pontos [u, v], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}`;
+  const aceito = `lista de pontos [u, v], {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno: {inicio, trechos}}`;
   if (!forma || typeof forma !== 'object') throw new ErroDePerfil(campo, `não é uma forma aceita (veio ${texto(forma)}); aceito: ${aceito}`);
   const chaves = Object.keys(forma);
-  if (chaves.length !== 1 || !['retangulo', 'circulo'].includes(chaves[0]) || !forma[chaves[0]] || typeof forma[chaves[0]] !== 'object') {
+  if (chaves.length !== 1 || !['retangulo', 'circulo', 'contorno'].includes(chaves[0]) || !forma[chaves[0]] || typeof forma[chaves[0]] !== 'object') {
     throw new ErroDePerfil(campo, `forma desconhecida (veio ${texto(forma)}); aceito: ${aceito}`);
   }
   const tipo = chaves[0];
   const corpo = forma[tipo];
+  if (tipo === 'contorno') {
+    try {
+      return contornoPorTrechos(corpo, { campo: `${campo}.contorno`, num, segmentosArco, segmentosSpline });
+    } catch (e) {
+      if (e instanceof ErroDeCurva) throw new ErroDePerfil(e.campo, e.detalhe);
+      throw e;
+    }
+  }
   const permitidas = tipo === 'retangulo' ? ['largura', 'profundidade', 'centro', 'cantos'] : ['raio', 'centro'];
   for (const k of Object.keys(corpo)) if (!permitidas.includes(k)) throw new ErroDePerfil(`${campo}.${tipo}.${k}`, `campo desconhecido; aceito em ${tipo}: ${permitidas.join(', ')}`);
   const [cu, cv] = centroDe(corpo, `${campo}.${tipo}`, num);
@@ -229,12 +241,13 @@ export function montarPerfil(entrada, { num = (x) => x, nomes = {}, semiPlano = 
   const n = { externo: 'externo', furos: 'furos', deslocar: 'deslocar', segmentosArco: 'segmentosArco', ...nomes };
   if (!entrada || typeof entrada !== 'object') throw new ErroDePerfil('perfil', `precisa ser {externo, furos?, deslocar?, segmentosArco?} (veio ${texto(entrada)})`);
   const segmentosArco = inteiroDe(entrada.segmentosArco, n.segmentosArco, 1, SEGMENTOS_ARCO_PADRAO);
+  const segmentosSpline = inteiroDe(entrada.segmentosSpline, 'segmentosSpline', 1, SEGMENTOS_SPLINE_PADRAO);
   if (entrada.externo == null) throw new ErroDePerfil(n.externo, 'é obrigatório: lista de pontos [u, v], {retangulo} ou {circulo}');
-  const externoCru = formaParaContorno(entrada.externo, n.externo, { num, segmentosArco });
+  const externoCru = formaParaContorno(entrada.externo, n.externo, { num, segmentosArco, segmentosSpline });
   if (!ehSimples(externoCru)) throw new ErroDePerfil(n.externo, 'o contorno não é um polígono simples (área nula, ponto repetido ou arestas que se cruzam)');
   if (entrada.furos != null && !Array.isArray(entrada.furos)) throw new ErroDePerfil(n.furos, `precisa ser uma lista de formas (veio ${texto(entrada.furos)})`);
   const furosCrus = (entrada.furos ?? []).map((f, k) => {
-    const pontos = formaParaContorno(f, `${n.furos}[${k}]`, { num, segmentosArco });
+    const pontos = formaParaContorno(f, `${n.furos}[${k}]`, { num, segmentosArco, segmentosSpline });
     if (!ehSimples(pontos)) throw new ErroDePerfil(`${n.furos}[${k}]`, 'o contorno do furo não é um polígono simples (área nula, ponto repetido ou arestas que se cruzam)');
     return pontos;
   });

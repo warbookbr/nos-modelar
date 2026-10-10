@@ -105,6 +105,64 @@ o perfil em pedaços, e cada pedaço sai como contorno próprio. A saída é a m
 em toda execução: cada contorno começa pelo menor ponto, furos e pedaços saem
 ordenados e a grade é de 1e-8, a precisão do Clipper2.
 
+### Contorno por trechos: reto, arco, tangente, concordância e spline
+
+Onde o perfil precisava de arco ou de curva suave, a receita calculava os pontos à
+mão. O contorno externo de `extrusao` (e cada forma de `furos`, também no `lathe`)
+aceita uma quarta escrita, `{contorno: {inicio: [u, v], trechos: [...]}}`. Cada
+trecho é um objeto de uma chave só e começa onde o anterior terminou; o contorno
+fecha sozinho com um reto de volta ao `inicio`.
+
+- `{reto: [u, v]}`: segmento reto até o ponto.
+- `{arco: {por: [u, v], ate: [u, v]}}`: arco por três pontos (o atual, `por` e `ate`).
+- `{arco: {centro: [u, v], angulo}}`: arco em volta de `centro`, `angulo` em graus
+  (positivo é anti-horário, entre 0 e 360 exclusive).
+- `{arcoTangente: [u, v]}`: arco que sai tangente ao fim do trecho anterior (reto,
+  arco ou spline) e termina no ponto.
+- `{concordancia: raio}`: filete de `raio` no canto atual, entre o reto que chegou e
+  o reto que vem. Escrita antes do primeiro trecho vale para o canto do `inicio`, e
+  depois do último, para o canto antes do reto de fechamento.
+- `{spline: [[u, v], ...]}`: curva suave que passa por todos os pontos, em ordem,
+  depois do ponto atual. Em `{spline: {pontos, tangente}}`, `tangente: 'anterior'`
+  (padrão quando há trecho anterior) parte tangente ao trecho anterior e `'livre'`
+  parte na direção da primeira corda.
+
+```js
+// gancho: reto, arco tangente de raio 2, coluna, e a volta pela face interna (raio 1)
+['extrusao', { origemId: GANCHO, altura: 'espessura', segmentosArco: 8, perfil: { contorno: {
+  inicio: [0, 0],
+  trechos: [{ reto: [4, 0] }, { arcoTangente: [6, 2] }, { reto: [6, 5] }, { reto: [5, 5] },
+            { reto: [5, 2] }, { arcoTangente: [4, 1] }, { reto: [0, 1] }] } } }]
+// retângulo 4 × 3 de cantos 0,5: os mesmos números de {retangulo: {..., cantos: 0.5}}
+{ contorno: { inicio: [2, 1.5], trechos: [{ concordancia: 0.5 }, { reto: [-2, 1.5] }, { concordancia: 0.5 },
+  { reto: [-2, -1.5] }, { concordancia: 0.5 }, { reto: [2, -1.5] }, { concordancia: 0.5 }] } }
+```
+
+A discretização é argumento da receita, nunca tolerância calculada. Um arco ou
+filete de varredura S usa `ceil(S / 90° × segmentosArco)` segmentos iguais em
+ângulo (`segmentosArco` do passo, padrão 4), e cada vão da spline usa
+`segmentosSpline` segmentos (do passo ou do próprio contorno, padrão 8). Os pontos
+de passagem e as pontas dos arcos saem exatamente onde foram escritos, os números
+saem na grade de 1e-9 e a mesma receita dá os mesmos números, byte a byte. A
+spline é Catmull-Rom centrípeta: passa pelos pontos (a B-spline só se aproxima
+deles), é local (mexer num ponto altera no máximo os quatro vãos vizinhos, que é o
+que o parâmetro da peça precisa) e não faz laço nem ponta dentro de um vão. A
+tangente é contínua em cada ponto, e a curvatura não.
+
+A concordância liga dois retos; entre reto e arco, use `arcoTangente` ou a spline
+tangente. O filete de raio `r` num canto de giro φ come `r·tan(φ/2)` de cada reto
+vizinho, e dois filetes no mesmo reto dividem o comprimento dele. São recusados,
+com o campo (`perfil.contorno.trechos[3].arco`), o valor e o que se aceita: arco
+por três pontos colineares ou repetidos, raio de concordância maior que o reto
+(a mensagem dá o raio máximo que cabe), retos colineares ou que voltam sobre si,
+`arcoTangente` com o ponto sobre a reta da tangente ou sem trecho anterior, arco
+por centro com ângulo 0 ou de 360 ou mais, spline com um ponto só ou com pontos
+consecutivos repetidos, trecho desconhecido e `segmentosArco` ou `segmentosSpline`
+que não é inteiro >= 1. Um contorno que se cruza é recusado pelo `montarPerfil`
+como polígono não simples. O lathe ainda lê `perfil` como lista de pontos
+`[raio, y]` (com a concordância própria do terceiro número); o `{contorno}` vale
+nos `furos` dele.
+
 Na origem, `sel:{origem:{op:'extrusao',id,...}}` sem eixo é o sólido inteiro
 (laterais e as duas tampas), ao contrário do `cilindro`, e as booleanas o aceitam
 assim. `lado` escolhe uma lateral pela ordem dos pontos, `tampa` (`'fundo'` ou

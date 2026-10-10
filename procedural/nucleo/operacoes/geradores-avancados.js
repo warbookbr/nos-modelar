@@ -61,7 +61,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       let secao;
       try {
         secao = montarPerfil(
-          { externo: contorno, furos: a.furos, deslocar: a.deslocar, segmentosArco: a.segmentosArco == null ? undefined : st.num(a.segmentosArco) },
+          { externo: contorno, furos: a.furos, deslocar: a.deslocar, segmentosArco: a.segmentosArco == null ? undefined : st.num(a.segmentosArco), segmentosSpline: a.segmentosSpline == null ? undefined : st.num(a.segmentosSpline) },
           { num: (x) => st.num(x), nomes: { externo: 'perfil' }, semiPlano: true },
         );
       } catch (e) {

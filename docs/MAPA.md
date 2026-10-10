@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-989 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+991 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -592,6 +592,8 @@
 - `concordancia-por-ponto.test.ts` — concordancia-por-ponto.test.ts — A-35: cada curva de um mesmo passo pode declarar seu próprio custo sem obrigar todas as outras a usarem o maior.
 - `contorno.js` — contorno.js — contorno 2D puro: retângulo de cantos arredondados, recuo por meia-esquadria, área com sinal e convexidade.
 - `contorno.test.mjs` — contorno.test.mjs — retângulo arredondado, recuo por meia-esquadria, área e convexidade do contorno 2D.
+- `curva2d.js` — curva2d.js — contorno 2D escrito por trechos (reto, arco, arco tangente, concordância e spline), puro.
+- `curva2d.test.mjs` — curva2d.test.mjs — contorno 2D por trechos (reto, arco, arco tangente, concordância e spline).
 - `entrada.js` — oficina.js — fachada pública compatível do motor procedural. A implementação é separada por responsabilidade; esta entrada preserva o contrato usado por rece…
 - `executor.js` — executor.js — orquestra núcleo, adaptador e animação sem duplicar execução.
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
