@@ -10,8 +10,8 @@
       "automatiza": "transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete)",
       "parametros": "espessura, faces abertas, lado (dentro ou fora)",
       "referencias": ["Blender: modificador Solidify", "CadQuery e build123d: shell", "Onshape e FreeCAD: Shell/Thickness"],
-      "aqui": "não",
-      "onde": "o esboço só tem o anel (cilindro oco); o núcleo não tem"
+      "aqui": "parcial",
+      "onde": "a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem"
     },
     "arredonda": {
       "nome": "arredondar e chanfrar arestas escolhidas",

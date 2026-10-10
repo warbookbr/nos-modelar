@@ -492,10 +492,11 @@ function distanciaDeEdicao(a, b) {
  * O passo é abortado, não corrigido: pedir o que a operação não entende deixa
  * a intenção ambígua, e adivinhar seria a segunda-verdade silenciosa de novo.
  */
-function argumentoDesconhecido(st, i, op, args) {
+function argumentoDesconhecido(st, i, op, args, registrada = null) {
   if (!args || typeof args !== 'object' || Array.isArray(args)) return false;
-  const propriedades = usoDaOperacao(op)?.schemaArgumentos?.properties;
-  /* Operação sem contrato publicado (extensão registrada em tempo de execução)
+  /* O contrato é o do registro: extensão nativa com `uso` no manifesto responde pelo schema dela. */
+  const propriedades = (registrada?.uso ?? usoDaOperacao(op))?.schemaArgumentos?.properties;
+  /* Operação sem contrato publicado (extensão registrada em tempo de execução sem `uso`)
      continua aceitando o que quiser: recusar ali seria inventar um contrato. */
   if (!propriedades) return false;
   const aceitos = Object.keys(propriedades);
@@ -518,15 +519,90 @@ function argumentoDesconhecido(st, i, op, args) {
   }
   return gritou;
 }
-function contextoNativo(st, i) {
+/* Contexto da extensão nativa. Toda extensão escreve só no que emite (vértices e faces locais do bloco do passo,
+   publicados juntos no fim). A extensão cujo manifesto declara malha em `artefatos.entra` recebe também a LEITURA de um
+   sólido: `selecionar` copia vértices e faces de uma seleção (a mesma gramática de `sel` das operações do núcleo, nunca
+   id numérico) e nada além disso é visível. Com ela vêm três pedidos, todos conferidos antes de qualquer escrita:
+   `vertice` e `face` devolvem uma referência a vértice ou face JÁ lida, para a nova face citá-la sem copiá-la;
+   `consumirFace` tira da malha, na publicação, uma face lida (ela entra em `consumidas`, como no `furo` e nas booleanas,
+   e o vértice que nenhuma face usa mais sai); `declararOrigem` publica a origem estrutural do resultado. Face emitida
+   pode herdar cor, material, parte, liso e sólido de uma face lida (`herda`). */
+function contextoNativo(st, i, { leitura = false, op = null } = {}) {
   const vertices = new Map(), faces = new Map(), base = baseDoPasso(i);
+  const lidosV = new Map(), lidasF = new Map(), herancas = new Map(), consumir = new Set();
+  let origem = null;
   const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO - 1}`); return id; };
-  return Object.freeze({
+  const refExistente = (v) => v !== null && typeof v === 'object' && Object.hasOwn(v, 'existente');
+  const chaveV = (v) => (refExistente(v) ? `e${v.existente}` : `l${v}`);
+  const ok = (v) => (refExistente(v) ? lidosV.has(v.existente) : vertices.has(v));
+  const contexto = {
     numero: (valor) => st.num(valor), vetor: (valor) => st.vec(valor),
+    limiteDeIds: BLOCO,
     emitirVertice(id, ponto) { id = local(id, 'vértice'); if (vertices.has(id)) throw new Error(`vértice local ${id} duplicado`); vertices.set(id, st.vec(ponto)); },
-    emitirFace(id, vs) { id = local(id, 'face'); if (faces.has(id) || !Array.isArray(vs) || vs.length < 3 || new Set(vs).size !== vs.length || vs.some((v) => !vertices.has(v))) throw new Error(`face local ${id} inválida`); faces.set(id, vs.slice()); },
-    publicar() { for (const [id, ponto] of vertices) addV(st, base + id, ponto); for (const [id, vs] of faces) addF(st, base + id, vs.map((v) => base + v)); },
-  });
+    emitirFace(id, vs, opcoes = {}) {
+      id = local(id, 'face');
+      if (faces.has(id) || !Array.isArray(vs) || vs.length < 3 || new Set(vs.map(chaveV)).size !== vs.length || vs.some((v) => !ok(v))) throw new Error(`face local ${id} inválida`);
+      if (opcoes.herda != null && !lidasF.has(opcoes.herda)) throw new Error(`face local ${id} herda de uma face que a extensão não leu`);
+      faces.set(id, vs.slice());
+      if (opcoes.herda != null) herancas.set(id, opcoes.herda);
+    },
+    publicar() {
+      const gv = (v) => (refExistente(v) ? v.existente : base + v);
+      for (const [id, ponto] of vertices) addV(st, base + id, ponto);
+      for (const [id, vs] of faces) {
+        addF(st, base + id, vs.map(gv));
+        const de = herancas.get(id);
+        if (de != null && st.F.has(de)) {
+          const f = st.F.get(base + id), o = st.F.get(de);
+          f.cor = o.cor; f.material = o.material; f.parte = o.parte; f.liso = o.liso; f.solido = o.solido;
+          if (st.parteAtribuidaEm?.has(de)) st.parteAtribuidaEm.set(base + id, st.parteAtribuidaEm.get(de));
+        }
+      }
+      if (consumir.size) {
+        const afetados = new Set();
+        for (const fid of [...consumir].sort((a, b) => a - b)) { for (const v of st.F.get(fid).vs) afetados.add(v); st.F.delete(fid); st.consumidas.set(fid, { passo: i, op }); }
+        const usados = new Set();
+        for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
+        for (const v of afetados) if (!usados.has(v)) st.V.delete(v);
+      }
+      if (origem) {
+        const global = (f) => (refExistente(f) ? f.existente : base + f);
+        const grupos = Object.fromEntries(Object.entries(origem.grupos).map(([nome, lista]) => [nome, lista.map(global).filter((f) => st.F.has(f)).sort((a, b) => a - b)]));
+        registraOrigem(st, i, op, origem.id, { ...grupos, passo: i });
+      }
+    },
+  };
+  if (leitura) {
+    Object.assign(contexto, {
+      selecionar(sel, campo = 'sel') {
+        const antes = st.orfaos.length;
+        const r = resolverSelecao(st, sel, op, i);
+        if (st.orfaos.length > antes) throw new Error(`${campo}: ${st.orfaos.splice(antes).map((o) => o.motivo).join('; ')}`);
+        const fs = [...r.faces].sort((a, b) => a - b);
+        if (!fs.length) throw new Error(`${campo}: a seleção não tem face nenhuma`);
+        const vs = [...new Set(fs.flatMap((f) => st.F.get(f).vs))].sort((a, b) => a - b);
+        for (const v of vs) lidosV.set(v, true);
+        for (const f of fs) lidasF.set(f, true);
+        return Object.freeze({
+          vertices: vs.map((v) => [v, [...st.V.get(v)]]),
+          faces: fs.map((f) => [f, [...st.F.get(f).vs]]),
+        });
+      },
+      vertice(id) { if (!lidosV.has(id)) throw new Error(`vértice ${id} não foi lido pela extensão`); return Object.freeze({ existente: id }); },
+      face(id) { if (!lidasF.has(id)) throw new Error(`face ${id} não foi lida pela extensão`); return Object.freeze({ existente: id }); },
+      consumirFace(id) { if (!lidasF.has(id)) throw new Error(`face ${id} não foi lida pela extensão`); consumir.add(id); },
+      declararOrigem(origemId, grupos) {
+        if (origem) throw new Error('a origem do passo já foi declarada');
+        if (!Number.isSafeInteger(origemId) || origemId < 0) throw new Error('origemId precisa ser inteiro não-negativo');
+        const declaracoes = st.declaracoesOrigem.get(origemId) ?? [];
+        if (declaracoes.length > 1) throw new Error(textoDeclaracoes(origemId, declaracoes));
+        if (!grupos || typeof grupos !== 'object' || !Array.isArray(grupos.faces)) throw new Error('a origem exige o grupo `faces`');
+        for (const lista of Object.values(grupos)) for (const f of lista) if (!(refExistente(f) ? lidasF.has(f.existente) : faces.has(f))) throw new Error(`a origem cita a face ${refExistente(f) ? f.existente : f}, que não é desta extensão`);
+        origem = { id: origemId, grupos };
+      },
+    });
+  }
+  return Object.freeze(contexto);
 }
 
 /* CONTRATO DE IDENTIDADE DE PARTE — a ÚNICA definição de "esta face tem nome".
@@ -1526,6 +1602,27 @@ CONTRATOS_ORIGEM.intersectar = contratoBooleana('intersectar');
    elas saem de uma bola poliédrica, e um índice pela ordem da saída seria
    identidade posicional. */
 CONTRATOS_ORIGEM.arredondarCostura = contratoFaces('arredondarCostura');
+/* casca — extensão nativa `procedural/extensoes/casca`: o resultado publica três grupos, citáveis por `parte`:
+   `externa` (as faces fechadas do sólido, que continuam com id e vértices), `interna` (a parede de dentro, uma por face
+   externa) e `borda` (a borda das faces abertas, uma por aresta). Sem `parte`, são todas. Os grupos são de significado
+   fixo, não de posição: nenhum índice da malha é identidade. */
+CONTRATOS_ORIGEM.casca = {
+  validar(origem) {
+    const msg = "casca usa op, id e parte opcional ('externa', 'interna' ou 'borda')";
+    if (!Object.keys(origem).every((k) => k === 'op' || k === 'id' || k === 'parte')) return msg;
+    if (origem.parte != null && !['externa', 'interna', 'borda'].includes(origem.parte)) return msg;
+    return null;
+  },
+  resolver(st, registro, origem) {
+    const lista = origem.parte ? registro[origem.parte] : registro.faces;
+    for (const f of lista) {
+      const consumo = conferirConsumo(st, f, `a face ${f} da origem casca:${origem.id}`);
+      if (consumo) return { erro: consumo };
+    }
+    const faces = lista.filter((f) => st.F.has(f));
+    return faces.length ? { faces } : { erro: `origem casca:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
+  },
+};
 
 /* Fonte canônica curta para ferramentas e documentação de autoria. A lista é
    derivada dos contratos que `sel:{origem}` realmente resolve; não é uma
@@ -3130,7 +3227,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
     const registrada = registro.resolver(op);
     if (!registrada) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
-    if (argumentoDesconhecido(st, i, op, args)) return;
+    if (argumentoDesconhecido(st, i, op, args, registrada)) return;
     const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
        não dentro de cada gerador. Oito geradores implementando a mesma
@@ -3143,7 +3240,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const pose = lerPoseDeCriacao(st, i, op, args);
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
-    if (fn.nativaMecanifica) { try { const contexto = contextoNativo(st, i); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
+    if (fn.nativaMecanifica) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
     else fn(st, args, i);
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
     const mudou = (antes, depois) => [...depois].filter(([id, valor]) => antes.get(id) !== JSON.stringify(valor)).map(([id]) => id).sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
