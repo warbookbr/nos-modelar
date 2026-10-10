@@ -385,15 +385,19 @@ function malhaCascoSecoes(volume) {
   for (const secao of volume.secoes) for (const [pa, pb] of secao.perfil) {
     const ponto = [...volume.centro]; ponto[percurso] += secao.posicao; ponto[a] += pa; ponto[b] += pb; vertices.push(ponto);
   }
-  const inverso = areaAssinada(volume.secoes[0].perfil) < 0;
+  /* Mesma regra do prisma: a normal sai para fora quando o contorno anti-horário gira em torno de +percurso, o que depende
+     da área da primeira seção e de (seção a, seção b, percurso) formar o ciclo x→y→z. As seções crescem em posição, então a
+     primeira é a tampa de trás e a última a da frente. */
+  const cicloPositivo = b === (a + 1) % 3;
+  const inverter = (areaAssinada(volume.secoes[0].perfil) > 0) !== cicloPositivo;
+  const face = (p, q, r) => (inverter ? [p, r, q] : [p, q, r]);
+  const base = (quantidadeSecoes - 1) * pontosPorSecao;
   for (let i = 1; i < pontosPorSecao - 1; i++) {
-    faces.push(inverso ? [0, i, i + 1] : [0, i + 1, i]);
-    const base = (quantidadeSecoes - 1) * pontosPorSecao;
-    faces.push(inverso ? [base, base + i + 1, base + i] : [base, base + i, base + i + 1]);
+    faces.push(face(0, i + 1, i), face(base, base + i, base + i + 1));
   }
   for (let secao = 0; secao < quantidadeSecoes - 1; secao++) for (let i = 0; i < pontosPorSecao; i++) {
     const j = (i + 1) % pontosPorSecao, atual = secao * pontosPorSecao, proxima = (secao + 1) * pontosPorSecao;
-    faces.push([atual + i, atual + j, proxima + j], [atual + i, proxima + j, proxima + i]);
+    faces.push(face(atual + i, atual + j, proxima + j), face(atual + i, proxima + j, proxima + i));
   }
   return { vertices, faces };
 }
