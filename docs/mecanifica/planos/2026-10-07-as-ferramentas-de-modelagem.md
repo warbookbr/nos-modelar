@@ -156,8 +156,8 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    entrou o perfil com furo e deslocamento de contorno sobre a `CrossSection`
    (operação `extrusao` e `lathe` com `furos`), a seleção de face e aresta por
    propriedade geométrica (`sel.onde`, aceita em `extruda` e `arredondarAresta`) e
-   o contorno por trechos com reto, arco, arco tangente, concordância e spline;
-   falta levar a seleção às operações que ainda pedem identificador.
+   o contorno por trechos com reto, arco, arco tangente, concordância e spline,
+   e nenhuma operação de edição exige mais identificador. Feita em 2026-10-10.
 6. Casca com espessura e chapa dobrada como extensões nativas do núcleo, sobre
    as funções da fatia 2. As duas extensões entraram em 2026-10-10 (a casca
    recua cada face pelo plano, porque o `levelSet` medido gerava milhares de
