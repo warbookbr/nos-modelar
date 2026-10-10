@@ -352,9 +352,13 @@ function malhaCilindro(volume) {
   const centroA = adicionarVertice(vertices, volume.centro.map((item, i) => item + (i === eixo ? -metade : 0)));
   const centroB = adicionarVertice(vertices, volume.centro.map((item, i) => item + (i === eixo ? metade : 0)));
   const n = volume.segmentos;
+  /* O círculo usa os outros dois eixos em ordem crescente, que só forma o ciclo x→y→z com o eixo; no eixo y a ordem é
+     (x, z, y), o giro se inverte e as faces saem viradas para manter a normal para fora. */
+  const inverter = outros[1] !== (outros[0] + 1) % 3;
+  const face = (p, q, r) => (inverter ? [p, r, q] : [p, q, r]);
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
-    faces.push([centroA, j, i], [centroB, n + i, n + j], [i, j, n + j], [i, n + j, n + i]);
+    faces.push(face(centroA, j, i), face(centroB, n + i, n + j), face(i, j, n + j), face(i, n + j, n + i));
   }
   return { vertices, faces };
 }

@@ -105,3 +105,15 @@ describe('malha do casco por seções: normais para fora em toda combinação de
     for (const volume of volumes) expect(volume).toBeCloseTo(volumes[0], 6);
   });
 });
+
+describe('malha do cilindro: normais para fora nos três eixos', () => {
+  for (const eixo of ['x', 'y', 'z']) {
+    it(`eixo ${eixo}: volume positivo, fechada e normais para fora`, () => {
+      const volume = { id: 'cilindro', regioes: ['corpo'], tipo: 'cilindro', centro: CENTRO, eixo, raio: 12, comprimento: 30, segmentos: 16 };
+      const malha = compilarBlocagemGlobal({ alvo: alvoLargo(), andaime: andaimeCom(volume) }).malha;
+      expect(volumeComSinal(malha)).toBeGreaterThan(0);
+      expect(arestasFechadas(malha)).toBe(true);
+      expect(facesParaFora(malha)).toBe(true);
+    });
+  }
+});
