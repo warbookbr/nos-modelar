@@ -43,6 +43,9 @@ describe('o tópico de cada mensagem', () => {
     ['opção 1, forma "a": tipo "cubo" desconhecido; use cilindro, anel, caixa', 'formas'],
     ['opção 1 (T), forma "a": "tipo" com o valor "cubo" deve ser um de caixa, cilindro, anel, cone, esfera, extrusao, loft, revolucao, tubo, envolve (quis dizer "tubo"?)', 'formas'],
     ['esboço: o campo "formaz" não existe; campos válidos: nota, opcoes', 'esquema'],
+    ['opção 1 (A), forma "x": porta: o papel da porta "recebee" deve ser um de recebe, ocupa, apoia (quis dizer "recebe"?)', 'portas'],
+    ['esboço: o par presilha ↔ guidao (tipo atravessa) precisa dizer por que a exceção existe: falta o campo "motivo". A porta não o justifica: "a" (apoia) e "b" (apoia): as duas portas não se encaixam', 'portas'],
+    ['as portas de "a" e "b" declaram classes de ajuste diferentes (folgado, transicao)', 'portas'],
     ['esboço: contato: o campo "tol" não existe; campos válidos: usar', 'contrato'],
     ['opção 1: o par a ↔ b (tipo atravessa) precisa dizer por que a exceção existe: falta o campo "motivo". Exemplo: {}', 'contrato'],
     ['esboço: plano: o campo "niveel" não existe', 'plano'],
@@ -68,6 +71,8 @@ describe('o tópico de cada mensagem', () => {
   it('o gate de contato aponta o conserto quando ele propôs um, e o contato quando só relata', () => {
     expect(topicoDoContato({ achados: [{ tipo: 'voando' }, { tipo: 'colisao', sugestao: { texto: 'x' } }] })).toBe('conserto');
     expect(topicoDoContato({ achados: [{ tipo: 'voando' }] })).toBe('contato');
+    expect(topicoDoContato({ achados: [{ tipo: 'porta-fora' }] })).toBe('portas');
+    expect(topicoDoContato({ achados: [{ tipo: 'porta-fora' }, { tipo: 'voando' }] })).toBe('contato');
   });
 
   it('o Portão aponta o envelope, as unidades, o crítico ou, no resto, o Condutor', () => {

@@ -7,7 +7,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, resolverOpcao, VISTAS } from '../../modulos/esboco/src/index.js';
-import { descreverAchado, descreverAtravessamento, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
+import { descreverAchado, descreverAtravessamento, descreverPorta, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverGrupoDaProjecao, FATORES_DA_SUGESTAO, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
 import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboco } from '../../modulos/esboco/src/descrever.js';
 import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
@@ -467,8 +467,9 @@ function relatarContato(c) {
   const linhas = c.achados.map((a) => `  ${descreverAchado(a)}${a.sugestao ? `\n    sugestão: ${a.sugestao.texto}` : ''}`);
   const atravessa = c.atravessamentos.map((t) => `  ${descreverAtravessamento(t)}`);
   const silenciados = c.silenciados.map((t) => `  ${descreverSilenciado(t)}`);
+  const portas = (c.portas ?? []).map((t) => `  ${descreverPorta(t)}`);
   const v = (x) => String(x).replace('.', ',');
-  return `contato (tolerância ${v(c.tolerancia)} mm, penetração ${v(c.penetracao)} mm, folga ${v(c.folga)} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${atravessa.length ? `atravessamentos declarados:\n${atravessa.join('\n')}\n` : ''}${silenciados.length ? `pares silenciados:\n${silenciados.join('\n')}\n` : ''}${dicaDoContato(c)}`;
+  return `contato (tolerância ${v(c.tolerancia)} mm, penetração ${v(c.penetracao)} mm, folga ${v(c.folga)} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${atravessa.length ? `atravessamentos declarados:\n${atravessa.join('\n')}\n` : ''}${silenciados.length ? `pares silenciados:\n${silenciados.join('\n')}\n` : ''}${portas.length ? `pares lidos pelas portas:\n${portas.join('\n')}\n` : ''}${dicaDoContato(c)}`;
 }
 
 /* O gate de contato que reprova aponta o tópico que resolve: `conserto` quando ele propôs um conserto, `contato` quando só

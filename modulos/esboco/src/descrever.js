@@ -42,7 +42,7 @@ function descreverForma(r) {
    declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho, medida do plano
    fora da tolerância e silhueta fora da referência. A ponta livre (ponta de tubo ou de haste que não encosta em nada, ou várias pontas no mesmo ponto sem coletor) vem logo depois do contrato. */
 export const GRAVIDADES = { peca: 0, solto: 1, atravessa: 2, contrato: 3, ponta: 4, assimetria: 5, medida: 6, referencia: 7 };
-const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta' };
+const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta', 'porta-fora': 'contrato' };
 const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', 'contrato-fixa': 'contrato', assimetria: 'assimetria' };
 
 /* { opcoes, ... } a partir do JSON já lido. */

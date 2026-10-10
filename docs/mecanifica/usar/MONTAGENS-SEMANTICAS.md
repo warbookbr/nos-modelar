@@ -297,7 +297,19 @@ através do campo `classeAjuste`:
 - `interferencia` (ex: H7/p6, H7/s6): ajuste forçado por prensa ou expansão térmica para união rígida.
 
 As tabelas de folga nominal mínima e máxima são versionadas em milímetros
-(`TABELA_CLASSES_AJUSTE_V1` em `src/autoria/interfaces-montagem.js`) e cobrem faixas nominais de até 500 mm.
+(`TABELA_CLASSES_AJUSTE_V1` em `src/autoria/regua-de-portas.js`, reexportada por
+`src/autoria/interfaces-montagem.js`) e cobrem faixas nominais de até 500 mm.
+
+O arquivo `src/autoria/regua-de-portas.js` é puro e não importa nada: guarda a
+tabela, a coaxialidade de duas portas, a folga de eixo em furo pela classe e o
+assentamento de plano sobre plano, e `src/autoria/interfaces-montagem.js` mede os encaixes
+`encaixaCilindrico`, `assentaAnular`, `assentaPlano` e `encaixaPadraoFuros` com
+essas funções. O gate de contato do esboço (`modulos/esboco/src/portas.js`) usa
+as mesmas, sem importar o núcleo: um anel que `recebe` e um cilindro que `ocupa`
+passam pela classe de ajuste, e uma face que `apoia` sobre outra que `recebe`
+passa pelo assentamento de plano, ambos declarados pelo campo `porta` da forma
+do esboço (ver a seção Portas do README do módulo). A interface sai da geometria
+da forma e as medidas ficam em milímetro, com a tolerância numérica de 0,001 mm.
 
 Parte de objeto de várias partes mora em `procedural/pecas/<objeto>/partes/<parte>/`,
 com a montagem em `procedural/pecas/<objeto>/montagem.json`, e é citada por
