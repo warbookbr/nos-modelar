@@ -519,13 +519,14 @@ function argumentoDesconhecido(st, i, op, args) {
   return gritou;
 }
 function contextoNativo(st, i) {
-  const vertices = new Map(), faces = new Map(), base = baseDoPasso(i);
-  const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO - 1}`); return id; };
+  const vertices = new Map(), faces = new Map();
+  /* ids do bloco do passo e, dali em diante, a faixa estendida (`idDoPasso`): extensão que emite mais de BLOCO vértices ou faces continua posicional */
+  const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO + FAIXA_ESTENDIDA) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO + FAIXA_ESTENDIDA - 1}`); return id; };
   return Object.freeze({
     numero: (valor) => st.num(valor), vetor: (valor) => st.vec(valor),
     emitirVertice(id, ponto) { id = local(id, 'vértice'); if (vertices.has(id)) throw new Error(`vértice local ${id} duplicado`); vertices.set(id, st.vec(ponto)); },
     emitirFace(id, vs) { id = local(id, 'face'); if (faces.has(id) || !Array.isArray(vs) || vs.length < 3 || new Set(vs).size !== vs.length || vs.some((v) => !vertices.has(v))) throw new Error(`face local ${id} inválida`); faces.set(id, vs.slice()); },
-    publicar() { for (const [id, ponto] of vertices) addV(st, base + id, ponto); for (const [id, vs] of faces) addF(st, base + id, vs.map((v) => base + v)); },
+    publicar() { for (const [id, ponto] of vertices) addV(st, idDoPasso(i, id), ponto); for (const [id, vs] of faces) addF(st, idDoPasso(i, id), vs.map((v) => idDoPasso(i, v))); },
   });
 }
 

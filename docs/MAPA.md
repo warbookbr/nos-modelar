@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-957 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+963 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -540,6 +540,15 @@
 
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
+
+## procedural/extensoes/estrutura-de-barras/
+
+- `estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
+- `estrutura.js` — estrutura.js — valida e constrói a estrutura de barras: barras entre nós nomeados, cortadas ou encaixadas em cada nó, unidas num sólido só.
+- `fixture.js` — fixture.js — receita sintética da extensão: um quadro plano de tubos quadrados, sem publicação de peça.
+- `implementacao.js` — implementacao.js — emite a malha unida da estrutura de barras pelo contexto limitado da extensão nativa.
+- `manifesto.js` — manifesto.js — contrato versionado da extensão nativa estruturaDeBarras: nós nomeados, barras com perfil, juntas cortadas e unidas.
+- `perfis.js` — perfis.js — seções transversais da estrutura de barras: tubo redondo, quadrado, retangular e cantoneira, em geometria pura.
 
 ## procedural/extensoes/prisma-triangular/
 
