@@ -69,6 +69,8 @@ export const FRASES = {
   previa: 'Prévia rápida, rotulada, para iterar sem valer como veredito.',
   unidade: 'Unidade incremental: detalhar uma unidade sem refazer o esboço inteiro.',
   ligacoes: 'Mapa de ligações em texto: quem toca quem, pontas livres e unidades soltas.',
+  'formas-resolvidas': 'As formas de uma opção exportadas como dado puro, para o tradutor do nível zero.',
+  resolvidas: 'O que cada tipo de forma resolvida leva na geometria.',
   esquema: 'Esquema do JSON, a lista dos campos aceitos.',
   formato: 'Formato v2 e a compatibilidade com o formato anterior.',
   fixtures: 'Exemplos com o resultado esperado, para conferir o desenho.',
