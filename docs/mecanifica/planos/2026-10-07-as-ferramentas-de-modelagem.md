@@ -151,7 +151,8 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    peça recusando parte fora do envelope e porta movida.
 4. O esboço refeito sobre o nível zero, com o processo do módulo atual, pelo
    [desenho](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-4) que a
-   pessoa aprovou em 2026-10-10.
+   pessoa aprovou em 2026-10-10. As tarefas 1 a 7 entraram em 2026-10-10; falta
+   medir o custo de um objeto refeito.
 5. O resto da camada de features sobre os seletores existentes. Em 2026-10-10
    entrou o perfil com furo e deslocamento de contorno sobre a `CrossSection`
    (operação `extrusao` e `lathe` com `furos`), a seleção de face e aresta por
@@ -162,11 +163,10 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    as funções da fatia 2. As duas extensões entraram em 2026-10-10 (a casca
    recua cada face pelo plano, porque o `levelSet` medido gerava milhares de
    triângulos e errava a parede; sólido côncavo com quina de quatro faces ou mais
-   é recusado); falta a aceitação pelo crítico nos objetos escolhidos.
+   é recusado); a aceitação nas faixas vem com as famílias da fatia 9.
 7. Articulações e estrutura de barras, como extensões nativas. As duas
    entraram em 2026-10-10 (a articulação confere o curso contra as peças que
-   ficam, por amostragem); falta a aceitação pelo crítico nos objetos
-   escolhidos.
+   ficam, por amostragem); a aceitação nas faixas vem com a fatia 9.
 8. A verificação ancorada no caminho de toda peça e o crítico calibrado, com as
    perguntas por componente e por família.
 9. As primeiras famílias de componente e de objeto, como composições.
