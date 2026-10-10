@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-957 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+963 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -540,6 +540,15 @@
 
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
+
+## procedural/extensoes/chapa-dobrada/
+
+- `chapa-dobrada.test.mjs` — chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta, determinismo e recusas que dizem camp…
+- `chapa.js` — chapa.js — a conta da chapa dobrada: contorno da seção com as dobras no raio pedido e as medidas de chapa.
+- `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça: um L de chapa de 2 mm, raio interno 2 mm, 30 mm de largura.
+- `implementacao.js` — implementacao.js — extrusa o contorno da chapa dobrada numa largura; recebe somente emissor transacional e resolução numérica.
+- `index.js` — index.js — o pacote registrável da extensão chapa dobrada: manifesto, implementação e a conta das medidas.
+- `manifesto.js` — manifesto.js — contrato versionado da extensão chapa dobrada: espessura, raio interno e abas, com as medidas de chapa.
 
 ## procedural/extensoes/prisma-triangular/
 
