@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-957 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+965 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -541,6 +541,14 @@
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
 
+## procedural/extensoes/articulacao/
+
+- `articulacao.test.mjs` — articulacao.test.mjs — a articulação como extensão nativa: o manifesto cabe no SDK, o contrato de uso é descobrível, o passo não emite geometria e a declaraç…
+- `declaracao.js` — declaracao.js — leitura da articulação declarada entre duas peças.
+- `fixture.js` — fixture.js — articulação sintética da extensão: a folha de uma porta que gira noventa graus no eixo da porta publicada pelo batente. As peças e as portas vêm…
+- `implementacao.js` — implementacao.js — a articulação não emite vértice nem face. Recebe somente a resolução numérica do contexto e lê a declaração; declaração inválida descarta …
+- `manifesto.js` — manifesto.js — contrato versionado da extensão de articulação.
+
 ## procedural/extensoes/prisma-triangular/
 
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça.
@@ -718,6 +726,8 @@
 - `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural da Mecanifica.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
+- `conferir-articulacao.js` — conferir-articulacao — o curso de uma articulação declarada, conferido contra as malhas de uma montagem resolvida. Serviço neutro, sem Three.js.
+- `conferir-articulacao.test.mjs` — conferir-articulacao.test.mjs — o curso de uma articulação declarada é amostrado e medido contra as peças que ficam. Montagem sintética de caixas e cilindros…
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
 - `contato-de-solidos.js` — contato-de-solidos — o núcleo geométrico que decide se dois sólidos se separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
@@ -1074,6 +1084,7 @@
 - `analise-da-peca.test.mjs` — analise-da-peca.test.mjs — a matriz do "Pare e analise", o manifesto e o zoom.
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
+- `articulacao-na-montagem.test.mjs` — articulacao-na-montagem.test.mjs — a articulação sobre uma montagem v5 real: a folha da porta não declara pose, a posição sai do encaixe da porta `eixo-da-do…
 - `ativar-bancada.mjs` — ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D.
 - `ativar-bancada.test.mjs` — ativar-bancada.test.mjs — grito do motor é RECUSA, e não decoração no rodapé.
 - `auditar-intersecoes-montagem.test.ts` — @ts-expect-error — serviço neutro JavaScript exercitado pelo contrato público.
