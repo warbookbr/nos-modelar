@@ -983,7 +983,8 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     const extremos = { inicio: m ? aplicarMatriz(fonte.extremos.inicio, m) : fonte.extremos.inicio, fim: m ? aplicarMatriz(fonte.extremos.fim, m) : fonte.extremos.fim };
     const nomeadas = fonte.nomeadas ? Object.fromEntries(Object.entries(fonte.nomeadas).map(([nome, d]) => [nome, m ? aplicarMatriz(d, m) : d])) : undefined;
     const trilha = fonte.trilha ? { ...fonte.trilha, pontos: fonte.trilha.pontos.map((q) => (m ? aplicarMatriz(q, m) : q)) } : undefined;
-    const r = { id, forma, prisma: null, partes, extremos, ...(trilha ? { trilha } : {}), ...(nomeadas ? { nomeadas } : {}), centro, matriz: null };
+    const caminho = fonte.caminho ? fonte.caminho.map((q) => (m ? aplicarMatriz(q, m) : q)) : undefined;
+    const r = { id, forma, prisma: null, partes, extremos, ...(trilha ? { trilha } : {}), ...(caminho ? { caminho } : {}), ...(nomeadas ? { nomeadas } : {}), centro, matriz: null };
     return { ...r, ...caixaDeTubo(r) };
   }
   const local = caixaLocal(fonte.prisma, m);
@@ -1362,7 +1363,9 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
       const t = construirTubo(f, pts, onde);
       const centro = relacionar(t.centro, () => verticesDe({ partes: t.partes }));
       const nomeadas = Object.fromEntries(Object.entries(guias).map(([nome, p]) => [nome, p.map((c, k) => c - t.centro[k])]));
-      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, trilha: t.trilha, ...(Object.keys(nomeadas).length ? { nomeadas } : {}), centro, matriz: null };
+      /* `caminho`: os pontos do caminho declarado, relativos ao centro como as partes (só a exportação `formasResolvidas` o lê) */
+      const caminho = pts.map((q) => q.map((c, k) => c - t.centro[k]));
+      const r = { id, forma: f, prisma: null, partes: t.partes, extremos: t.extremos, trilha: t.trilha, caminho, ...(Object.keys(nomeadas).length ? { nomeadas } : {}), centro, matriz: null };
       Object.assign(r, caixaDeTubo(r));
       visitando.delete(id);
       prontas.set(id, r);
