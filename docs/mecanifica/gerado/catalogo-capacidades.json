@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:547dec51a7222ba8e7c6625bda15ccf91d51e7dbca01f5c9a71f37c4e81a65a3",
+  "assinatura": "sha256:a848b0fb8d43b5909b7a7c5210997daa0a648fa62a1711cd02d0baec9f80c3d7",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -392,6 +392,35 @@
             "schema": "mecanifica.argumentos.extruda@1",
             "obrigatorios": [
               "face"
+            ]
+          }
+        },
+        {
+          "id": "mecanifica.operacao.extrusao",
+          "nome": "extrusao",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "cria-geometria"
+          ],
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão.",
+            "schema": "mecanifica.argumentos.extrusao@1",
+            "obrigatorios": [
+              "perfil"
             ]
           }
         },
@@ -1488,6 +1517,35 @@
         "schema": "mecanifica.argumentos.extruda@1",
         "obrigatorios": [
           "face"
+        ]
+      }
+    },
+    {
+      "id": "mecanifica.operacao.extrusao",
+      "nome": "extrusao",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "cria-geometria"
+      ],
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão.",
+        "schema": "mecanifica.argumentos.extrusao@1",
+        "obrigatorios": [
+          "perfil"
         ]
       }
     },

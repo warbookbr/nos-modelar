@@ -52,10 +52,10 @@ espalha a posição para longe da forma.
 ```
 
 - `em: [x,y,z]` translada a forma recém-criada. Vale em `cubo`, `cilindro`,
-  `esfera`, `cone`, `plano`, `chamferBox` e `lathe`.
+  `esfera`, `cone`, `plano`, `chamferBox`, `lathe` e `extrusao`.
 - `eixo: 'x' | 'y' | 'z'` escolhe a direção do eixo de revolução. Vale só em
-  `cilindro`, `cone` e `lathe`, que são os gerados por revolução. `'y'` é como
-  a forma já nasce.
+  `cilindro`, `cone`, `lathe` e `extrusao`, que têm um eixo (o da revolução ou o
+  da extrusão). `'y'` é como a forma já nasce.
 - A ordem é **gira e depois move**, e o giro é em torno da origem.
 
 O resultado é idêntico, vértice por vértice, a escrever os passos separados —
@@ -68,6 +68,51 @@ também: `cubo` não tem eixo para escolher.
 
 Isto não encosta uma peça na outra nem mede vizinho — não existe `alinhar`
 relacional no núcleo.
+
+## Perfil com furo e deslocamento de contorno
+
+`extrusao` levanta em y um perfil 2D, e o `lathe` revoluciona o mesmo perfil como
+seção; os dois montam o perfil pela `CrossSection` da Manifold (Clipper2), então
+a receita descreve o perfil e não calcula ponto. O contorno externo é uma lista
+de pontos `[u, v]` (em `extrusao` o ponto vai para `x = u`, `z = v`; no `lathe` é
+`[raio, y]`) ou uma forma pronta: `{retangulo: {largura, profundidade, centro?,
+cantos?}}` (os `cantos` são os de `retanguloArredondado`) e `{circulo: {raio,
+centro?}}`. Os `furos` são formas nas mesmas três escritas. O `deslocar` é
+`{para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}`:
+`dentro` recua o externo e aumenta cada furo, `fora` faz o contrário. O canto
+`esquadria` prolonga as arestas até se encontrarem (e corta reto além de `limite`
+vezes a distância, padrão 4), o `reto` corta o canto por uma aresta tangente ao
+círculo de raio `distancia` no vértice, e o `redondo` põe arco com
+`segmentosArco` segmentos por quarto de volta (padrão 4, também no círculo).
+Para dentro, um contorno só com cantos convexos recua igual nos três cantos; a
+diferença aparece para fora e nos cantos côncavos.
+
+```js
+['extrusao', { origemId: PLACA, perfil: { retangulo: { largura: 'L', profundidade: 'P', cantos: 0.01 } },
+  furos: [{ circulo: { raio: 0.004, centro: [0.03, 0] } }, { circulo: { raio: 0.004, centro: [-0.03, 0] } }],
+  deslocar: { para: 'fora', distancia: 0.002, canto: 'redondo' }, altura: 'espessura' }]
+['lathe', { origemId: ARO, lados: 24, perfil: [[0.05, 0], [0.07, 0], [0.07, 0.02], [0.05, 0.02]],
+  furos: [{ circulo: { raio: 0.003, centro: [0.06, 0.01] } }] }]   // com furos ou deslocar o perfil é a seção, fechada pelo eixo
+```
+
+O furo precisa ficar inteiro dentro do externo, a mais de 1e-6 da diagonal da
+borda e dos outros furos, e um furo não contém outro. Furo que encosta, cruza ou
+sai é recusado com o índice, a distância medida e o conserto, e o mesmo vale para
+campo desconhecido, `distancia` que não é positiva, `canto` fora da lista e
+deslocamento que apaga o perfil (a mensagem diz o recuo máximo aproximado). Para
+abrir o furo na borda, escreva o recorte no contorno externo. Um recuo pode partir
+o perfil em pedaços, e cada pedaço sai como contorno próprio. A saída é a mesma
+em toda execução: cada contorno começa pelo menor ponto, furos e pedaços saem
+ordenados e a grade é de 1e-8, a precisão do Clipper2.
+
+Na origem, `sel:{origem:{op:'extrusao',id,...}}` sem eixo é o sólido inteiro
+(laterais e as duas tampas), ao contrário do `cilindro`, e as booleanas o aceitam
+assim. `lado` escolhe uma lateral pela ordem dos pontos, `tampa` (`'fundo'` ou
+`'topo'`) todas as peças convexas da tampa, e `parede` (`'externo'`, `'furos'`,
+`'todas'` ou o número do furo) as laterais de um contorno. No `lathe` com furos,
+as faixas se enfileiram: o externo e depois os furos. O `deslocarContorno` de
+`procedural/nucleo/contorno.js` não delega a esta montagem: ele preserva o número de vértices que o
+`loft` com casca exige.
 
 ## Ponto nomeado
 

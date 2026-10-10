@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:547dec51a7222ba8e7c6625bda15ccf91d51e7dbca01f5c9a71f37c4e81a65a3",
-  "total": 36,
+  "assinatura": "sha256:a848b0fb8d43b5909b7a7c5210997daa0a648fa62a1711cd02d0baec9f80c3d7",
+  "total": 37,
   "operacoes": [
     {
       "id": "mecanifica.operacao.apagaFace",
@@ -1497,6 +1497,152 @@
       }
     },
     {
+      "id": "mecanifica.operacao.extrusao",
+      "nome": "extrusao",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.extrusao@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perfil"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "perfil": {
+              "anyOf": [
+                {
+                  "type": "array"
+                },
+                {
+                  "type": "object"
+                }
+              ],
+              "description": "Contorno externo: lista de pontos [u,v], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}. O ponto [u,v] vai para x=u, z=v."
+            },
+            "furos": {
+              "type": "array",
+              "description": "Furos: lista de formas nas mesmas três escritas, todas inteiras dentro do perfil, a mais de 1e-6 da diagonal da borda e dos outros furos."
+            },
+            "deslocar": {
+              "type": "object",
+              "description": "{para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos; fora faz o contrário. Limite da esquadria em múltiplos da distância (padrão 4)."
+            },
+            "segmentosArco": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4)."
+            },
+            "altura": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Extensão em y, maior que zero (padrão 1)."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            },
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Direção da extrusão; o padrão é y."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "extrusao",
+              {
+                "origemId": 1,
+                "perfil": {
+                  "retangulo": {
+                    "largura": 1,
+                    "profundidade": 0.6,
+                    "cantos": 0.1
+                  }
+                },
+                "furos": [
+                  {
+                    "circulo": {
+                      "raio": 0.1,
+                      "centro": [
+                        0.2,
+                        0
+                      ]
+                    }
+                  }
+                ],
+                "deslocar": {
+                  "para": "dentro",
+                  "distancia": 0.02,
+                  "canto": "redondo"
+                },
+                "altura": 0.2
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Perfil simples, furos inteiros dentro dele, sem encostar na borda nem entre si, e deslocamento que não apague o perfil."
+        ],
+        "limites": [
+          "A origem publica lado (laterais), tampa (fundo ou topo, todas as peças convexas) e parede (externo, furos ou o número do furo).",
+          "Um recuo pode partir o perfil em pedaços; cada pedaço sai como contorno próprio, na ordem canônica (menor ponto primeiro).",
+          "Furo que encosta na borda é recusado com a distância medida; para abrir o furo na borda, escreva o recorte no contorno externo."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
       "id": "mecanifica.operacao.filete",
       "nome": "filete",
       "uso": {
@@ -2043,7 +2189,7 @@
             },
             "perfil": {
               "type": "array",
-              "description": "Ao menos dois pontos [raio,y] ou [raio,y,concordancia]."
+              "description": "Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção."
             },
             "lados": {
               "anyOf": [
@@ -2072,6 +2218,28 @@
                 }
               ],
               "description": "Discretização das concordâncias."
+            },
+            "furos": {
+              "type": "array",
+              "description": "Furos da seção: cada um é uma lista de pontos [raio,y], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}, com o centro em [raio,y]. Inteiros dentro da seção."
+            },
+            "deslocar": {
+              "type": "object",
+              "description": "Desloca o contorno da seção: {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos."
+            },
+            "segmentosArco": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4)."
             },
             "em": {
               "anyOf": [
@@ -2125,7 +2293,9 @@
         "precondicoes": [
           "Perfil precisa ter ao menos dois pontos e raios não negativos."
         ],
-        "limites": [],
+        "limites": [
+          "Com furos ou deslocar o perfil é o contorno externo de uma SEÇÃO fechada (o fecho pelo eixo é implícito) e cada contorno do resultado vira um laço; as faixas se enfileiram: o externo e depois os furos, na ordem canônica de perfil2d.js. Raio negativo, furo que encosta na borda e deslocamento que apaga a seção são recusados com campo e valor."
+        ],
         "diagnosticos": []
       }
     },

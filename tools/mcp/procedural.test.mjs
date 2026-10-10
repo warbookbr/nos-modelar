@@ -40,7 +40,7 @@ describe('serviço procedural e MCP — R09', () => {
       const catalogo = JSON.parse((await client.readResource({ uri: 'mecanifica://procedural/catalogo' })).contents[0].text);
       expect(catalogo.operacoes.some(({ nome }) => nome === 'cubo')).toBe(true);
       const schemas = JSON.parse((await client.readResource({ uri: 'mecanifica://procedural/schemas' })).contents[0].text);
-      expect(schemas).toMatchObject({ formato: 'mecanifica.schemas-descoberta@1', operacoes: { total: 36 } });
+      expect(schemas).toMatchObject({ formato: 'mecanifica.schemas-descoberta@1', operacoes: { total: 37 } });
       const busca = await client.callTool({ name: 'buscar_capacidades', arguments: { produz: MALHA, detalhe: 'completo', limite: 64 } });
       expect(busca.isError).not.toBe(true);
       expect(busca.structuredContent.resultado).toMatchObject(servico.buscar({ produz: MALHA, limite: 64 }));
@@ -95,7 +95,7 @@ describe('serviço procedural e MCP — R09', () => {
         pagina = proxima.structuredContent.resultado;
         vistos.push(...pagina.operacoes.map(({ id }) => id));
       }
-      expect(new Set(vistos).size).toBe(36);
+      expect(new Set(vistos).size).toBe(37);
       expect(pagina.controle.truncado).toBe(false);
     } finally { await client.close(); }
   }, 30_000);
