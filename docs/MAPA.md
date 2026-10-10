@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-982 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+987 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -49,6 +49,8 @@
 
 ## .claude/skills/criar-peca/
 
+- `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
+- `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
 - `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
 
 ## .claude/skills/criar-peca/references/
@@ -136,8 +138,6 @@
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
-- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
-- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
@@ -553,6 +553,12 @@
 - `implementacao.js` — implementacao.js — a articulação não emite vértice nem face. Recebe somente a resolução numérica do contexto e lê a declaração; declaração inválida descarta …
 - `manifesto.js` — manifesto.js — contrato versionado da extensão de articulação.
 
+## procedural/extensoes/casca/
+
+- `fixture.js` — fixture.js — receita sintética da extensão: caixa oca aberta em cima.
+- `implementacao.js` — implementacao.js — lê o sólido pela seleção, calcula a parede e emite só o que se soma a ele.
+- `manifesto.js` — manifesto.js — contrato versionado da extensão `casca`: sólido oco de parede com espessura constante.
+
 ## procedural/extensoes/chapa-dobrada/
 
 - `chapa-dobrada.test.mjs` — chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta, determinismo e recusas que dizem camp…
@@ -575,6 +581,8 @@
 - `arrumacao.test.mjs` — arrumacao.test.mjs — segura a arrumação do plano "o núcleo mora num lugar só" (2026-09-22). Antes dele, os testes do núcleo moravam espalhados por `tools/` e…
 - `artefatos.js` — artefatos.js — contrato neutro e procedência determinística da execução procedural.
 - `artefatos.test.mjs` — artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais.
+- `casca.js` — casca.js — casca com espessura constante de um sólido facetado: função pura sobre posições e listas de vértices.
+- `casca.test.mjs` — casca.test.mjs — a extensão `casca` medida sobre a malha que ela devolve, não sobre a conta que a produz. A espessura é conferida por uma medida independente…
 - `catalogo.js` — catálogo.js — projeções puras e determinísticas do registro de operações. Não executa receita, não lê arquivos e não conhece visor, MCP ou domínio.
 - `catalogo.test.mjs` — catálogo-capacidades.test.mjs — R05: descoberta deriva do registro, sem tabela paralela.
 - `composicoes.js` — composicoes.js — subgrafos procedurais declarativos, sem estado global ou I/O.

@@ -12,7 +12,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 
 | # | Ferramenta | Tipo | Objetos | Famílias | Aqui | O que automatiza |
 |---|---|---|---|---|---|---|
-| 1 | casca com espessura (`casca`) | modificador | 125 (34%) | 25 | não | transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete) |
+| 1 | casca com espessura (`casca`) | modificador | 125 (34%) | 25 | parcial | transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete) |
 | 2 | articulações (`articula`) | especializado | 93 (25%) | 25 | parcial | gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta |
 | 3 | estrutura de barras (`barras`) | gerador | 72 (20%) | 19 | parcial | faz uma rede de nós e barras com perfil, juntas nos nós e padrões de treliça prontos (quadro tubular, treliça, andaime, torre, grade de arame) |
 | 4 | repetição em série (`repete`) | modificador | 69 (19%) | 24 | parcial | copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, com contagem e passo |
@@ -59,7 +59,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 
 As ferramentas que não existem ou existem em parte, na mesma ordem, com o que já há.
 
-- casca com espessura (`não`, 125 objetos): o esboço só tem o anel (cilindro oco); o núcleo não tem.
+- casca com espessura (`parcial`, 125 objetos): a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem.
 - articulações (`parcial`, 93 objetos): componentes dobradica e garfo do esboço; rótula e olhal não.
 - estrutura de barras (`parcial`, 72 objetos): tubo do esboço liga pontos com seção circular; juntas e padrões não.
 - repetição em série (`parcial`, 69 objetos): arranja linear e radial no esboço e no núcleo, e ao longo de tubo no esboço; grade 2D não.
@@ -103,10 +103,6 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - ressalto para parafuso (`não`, 1 objetos): nem esboço nem núcleo.
 
 ## Cada ferramenta
-
-### casca com espessura (`casca`)
-
-Transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete). Parâmetros: espessura, faces abertas, lado (dentro ou fora). Referências: Blender: modificador Solidify; CadQuery e build123d: shell; Onshape e FreeCAD: Shell/Thickness. Aqui: não, o esboço só tem o anel (cilindro oco); o núcleo não tem. Atende 125 objetos em 25 famílias.
 
 ### chapa dobrada (`chapa`)
 
@@ -199,6 +195,10 @@ Gera enrolamento sobre carretel e núcleo de lâminas para motor, transformador 
 ### ressalto para parafuso (`ressalto`)
 
 Cria o pino oco de fixação dentro de um gabinete, com furo, rebaixo e raiz arredondada. Parâmetros: diâmetro, altura, furo, rosca. Referências: Fusion: Boss. Aqui: não, nem esboço nem núcleo. Atende 1 objetos em 1 famílias.
+
+### casca com espessura (`casca`)
+
+Transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete). Parâmetros: espessura, faces abertas, lado (dentro ou fora). Referências: Blender: modificador Solidify; CadQuery e build123d: shell; Onshape e FreeCAD: Shell/Thickness. Aqui: parcial, a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem. Atende 125 objetos em 25 famílias.
 
 ### articulações (`articula`)
 
