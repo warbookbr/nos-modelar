@@ -10,6 +10,7 @@
     "chamferBox",
     "lathe",
     "loft",
+    "extrusao",
     "inflate",
     "publicarPorta",
     "moveV",
@@ -118,6 +119,16 @@
       "hashCanonico": "0dd27ac65917f9c05cc14953f4f089eca459a885eadd2e3acd3c107e9eedd0b1",
       "vertices": 16,
       "faces": 8,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/extrusao",
+      "operacoes": [
+        "extrusao"
+      ],
+      "hashCanonico": "fcb3eef60d262dcd64c7d7ff62dc1255a25a56719519ebe12b7ca878b8571df3",
+      "vertices": 104,
+      "faces": 116,
       "diagnosticos": 0
     },
     {

@@ -9,6 +9,10 @@
    inteiro naquele lado (a frente em D). Pontos coincidentes (raio 0, ou arcos que se encontram no meio do lado) saem uma vez.
    deslocarContorno: recua (distância > 0) ou expande (< 0) um polígono convexo pela bissetriz de cada vértice; cada aresta
    fica paralela à original e o número de vértices não muda.
+   Perfil com furo, contorno côncavo e canto redondo ou reto são de perfil2d.js, sobre a CrossSection da Manifold.
+   `deslocarContorno` NÃO delega a ela de propósito: ele devolve um ponto por vértice, na mesma ordem (o `loft` com casca
+   precisa dessa correspondência entre as seções) e é puro, sem WebAssembly. O teste de perfil2d.test.mjs confere que os
+   dois dão os mesmos vértices na esquadria de um polígono convexo.
    ehSimples: polígono simples (convexo ou côncavo), sem ponto repetido, área nula nem arestas que se cruzem ou se toquem. */
 
 const EPS = 1e-9;

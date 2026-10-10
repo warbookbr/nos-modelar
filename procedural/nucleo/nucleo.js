@@ -18,6 +18,7 @@ import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.
 import { criarOperacoesPrimitivasSuperficie } from './operacoes/primitivas-superficie.js';
 import { criarOperacoesEdicaoDireta } from './operacoes/edicao-direta.js';
 import { criarOperacoesGeradoresAvancados } from './operacoes/geradores-avancados.js';
+import { criarOperacoesPerfis } from './operacoes/perfis.js';
 import { criarOperacoesTransformacoes } from './operacoes/transformacoes.js';
 import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
@@ -186,11 +187,11 @@ function giraPonto(p, pivo, ax, c, s) {
    Isto NÃO é um `alinhar` relacional (O-8): não encosta, não mede vizinho e não
    resolve pivô por seleção. É o atalho barato do caso comum, e continua sendo
    possível escrever os passos separados quando o pivô não é a origem. */
-const GERADORES_COLOCAVEIS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe']);
+const GERADORES_COLOCAVEIS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'extrusao']);
 /* Só faz sentido escolher eixo onde existe eixo: `cubo`, `plano`, `esfera` e
    `chamferBox` não são gerados por revolução, e aceitar `eixo` neles seria
    prometer uma orientação que a forma não tem. */
-const GERADORES_COM_EIXO = new Set(['cilindro', 'cone', 'lathe']);
+const GERADORES_COM_EIXO = new Set(['cilindro', 'cone', 'lathe', 'extrusao']);
 const GIRO_DO_EIXO = { x: { ax: 2, graus: -90 }, y: null, z: { ax: 0, graus: 90 } };
 
 /* devolve null (nada a fazer), undefined (inválida, já gritou) ou a pose. */
@@ -991,17 +992,28 @@ function contratoLadoTampa(op, tampasValidas, padraoSemEixo) {
         }
       }
       if (tampaPresente) {
+        /* a tampa é uma face (cilindro, cone) ou uma LISTA de peças convexas (extrusao, tampa com furo) */
         const f = registro.tampas[origem.tampa];
-        if (f == null || !st.F.has(f)) return { erro: `tampa '${origem.tampa}' da origem ${op}:${origem.id} foi removida${f == null ? '' : consumoDe(st, f)}` };
-        faces.push(f);
+        if (Array.isArray(f)) {
+          for (const peca of f) {
+            const consumo = conferirConsumo(st, peca, `tampa '${origem.tampa}' da origem ${op}:${origem.id}`);
+            if (consumo) return { erro: consumo };
+            if (st.F.has(peca)) faces.push(peca);
+          }
+          if (!f.length || !f.some((peca) => st.F.has(peca))) return { erro: `tampa '${origem.tampa}' da origem ${op}:${origem.id} foi removida` };
+        } else {
+          if (f == null || !st.F.has(f)) return { erro: `tampa '${origem.tampa}' da origem ${op}:${origem.id} foi removida${f == null ? '' : consumoDe(st, f)}` };
+          faces.push(f);
+        }
       } else if (semEixo && padraoSemEixo === 'tudo') {
         // a primitiva inteira: laterais acima + as tampas VIVAS, na ordem nominal declarada
         for (const nome of tampasValidas) {
-          const f = registro.tampas[nome];
-          if (f == null) continue;
-          const consumo = conferirConsumo(st, f, `tampa '${nome}' da origem ${op}:${origem.id}`);
-          if (consumo) return { erro: consumo };
-          if (st.F.has(f)) faces.push(f);
+          for (const f of [registro.tampas[nome]].flat()) {
+            if (f == null) continue;
+            const consumo = conferirConsumo(st, f, `tampa '${nome}' da origem ${op}:${origem.id}`);
+            if (consumo) return { erro: consumo };
+            if (st.F.has(f)) faces.push(f);
+          }
         }
       }
       if (!faces.length) return { erro: `origem ${op}:${origem.id} não tem nenhuma face correspondente` };
@@ -1080,6 +1092,39 @@ function contratoCaixa(op, familias) {
   };
 }
 
+/* extrusao: ver o comentário em CONTRATOS_ORIGEM. A parte de `lado` e `tampa` é a do cilindro (contratoLadoTampa). */
+function contratoExtrusao() {
+  const base = contratoLadoTampa('extrusao', ['fundo', 'topo'], 'tudo');
+  const paredeValida = (p) => p === 'externo' || p === 'furos' || p === 'todas' || (Number.isInteger(p) && p >= 0);
+  const msgParede = "extrusao usa op, id e, no máximo, um de: lado (eixo numérico sobre as laterais), tampa ('fundo' ou 'topo') com lado opcional, ou parede ('externo', 'furos', 'todas' ou o número do furo, inteiro >= 0); sem eixo nenhum a citação é o sólido inteiro";
+  return {
+    validar(origem) {
+      if (origem.parede == null) return base.validar(origem);
+      const { parede, ...resto } = origem;
+      if (!paredeValida(parede) || Object.keys(resto).some((k) => !['op', 'id'].includes(k))) return msgParede;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      if (origem.parede == null) return base.resolver(st, registro, origem);
+      const { externo, furos } = registro.paredes;
+      let ids;
+      if (origem.parede === 'externo') ids = externo;
+      else if (origem.parede === 'furos') ids = furos.flat();
+      else if (origem.parede === 'todas') ids = registro.laterais;
+      else if (origem.parede < furos.length) ids = furos[origem.parede];
+      else return { erro: `parede ${origem.parede} da origem extrusao:${origem.id} não existe; o perfil tem ${furos.length} furo(s) (0..${Math.max(0, furos.length - 1)})` };
+      const faces = [];
+      for (const f of ids) {
+        const consumo = conferirConsumo(st, f, `parede '${origem.parede}' da origem extrusao:${origem.id}`);
+        if (consumo) return { erro: consumo };
+        if (st.F.has(f)) faces.push(f);
+      }
+      if (!faces.length) return { erro: `parede '${origem.parede}' da origem extrusao:${origem.id} não tem nenhuma face viva` };
+      return { faces };
+    },
+  };
+}
+
 const CONTRATOS_ORIGEM = {
   loft: contratoFaixaLado('loft'),
   /* lathe — MESMA estrutura de faixas × lados que o loft (o `lathe` é o TEMPLATE
@@ -1095,6 +1140,12 @@ const CONTRATOS_ORIGEM = {
      sem tampa nenhuma (a convenção `{}` do loft/lathe, e o que resolve o
      BLOQUEADO 2 da lanterna — "só a lateral, não as tampas"). */
   cilindro: contratoLadoTampa('cilindro', ['fundo', 'topo'], 'laterais'),
+  /* extrusao — o contrato do cilindro (`lado` sobre as laterais, `tampa` nominal) mais `parede`: 'externo', 'furos',
+     'todas' ou o número do furo, as laterais daquele contorno. Sem eixo nenhum a citação é o SÓLIDO inteiro (laterais e
+     as duas tampas), ao contrário do cilindro, que por história devolve só as laterais: a extrusão nasce depois da união
+     de sólidos, e um sólido que a booleana não aceitaria citado sem as tampas só atrapalharia. `parede` não anda com
+     `lado` nem `tampa`. */
+  extrusao: contratoExtrusao(),
   cubo: contratoCaixa('cubo', {}),
   esfera: contratoFaixaLado('esfera'),
   /* cone — A-18: a MESMA estrutura do cilindro (lado + tampa), porque a
@@ -2589,6 +2640,7 @@ const operacoesPrimitivasSuperficie = criarOperacoesPrimitivasSuperficie({ BLOCO
 const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, normalDaFace, addV, addF, colapsaCiclo, distintos, resolverSelecao });
 
 const operacoesGeradoresAvancados = criarOperacoesGeradoresAvancados({ BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias });
+const operacoesPerfis = criarOperacoesPerfis({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, grita, registraOrigem, confereId, addV, addF });
 const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
 const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
@@ -2599,6 +2651,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesPrimitivasSuperficie,
   /* ---- primitivas: criam vértices únicos + faces a partir da base do passo ---- */
   ...operacoesGeradoresAvancados,
+  ...operacoesPerfis,
   ...operacoesEstruturais,
   ...operacoesTransformacoes,
   ...operacoesAtributos,
@@ -2610,7 +2663,7 @@ const OPS_IMPLEMENTADAS = {
    A lista é contrato do registro; o teste exige cobertura exata de `OPS`. */
 const NOMES_DAS_OPERACOES = [
   'cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft',
-  'inflate', 'publicarPorta', 'moveV', 'extruda', 'mescla', 'moveF', 'moveA',
+  'extrusao', 'inflate', 'publicarPorta', 'moveV', 'extruda', 'mescla', 'moveF', 'moveA',
   'vira', 'apagaFace', 'displace', 'encostar', 'transladar', 'rotaciona',
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
@@ -2618,7 +2671,7 @@ const NOMES_DAS_OPERACOES = [
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
-const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'inflate']);
+const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'extrusao', 'inflate']);
 const ATRIBUTOS = new Set(['pincel', 'solido', 'liso', 'material']);
 function contratoDaOperacao(nome) {
   if (nome === 'publicarPorta') return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: ['mecanifica.porta@1'] }, efeitos: ['publica-porta'], identidade: 'declara-semantica' };

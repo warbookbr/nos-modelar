@@ -8,7 +8,7 @@ import { sha256Hex } from './sha256.js';
 describe('catálogo de capacidades — R05', () => {
   const catalogo = catalogoDeCapacidades(REGISTRO_OPERACOES);
 
-  it('deriva as 36 operações do registro, em ordem e com assinatura reproduzível', () => {
+  it('deriva as 37 operações do registro, em ordem e com assinatura reproduzível', () => {
     expect(sha256Hex('abc')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
     expect(catalogo.operacoes.map(({ nome }) => nome).sort()).toEqual(Object.keys(OPS).sort());
     expect(catalogo.assinatura).toBe(REGISTRO_OPERACOES.assinatura);
@@ -44,7 +44,7 @@ describe('catálogo de capacidades — R05', () => {
       nome: 'publicarPorta', uso: { schema: 'mecanifica.argumentos.publicarPorta@1', obrigatorios: ['de'] },
     }]);
     expect(buscarCapacidades(catalogo, { produz: 'mecanifica.parte@1' }).operacoes.map(({ nome }) => nome)).toEqual(['parte']);
-    expect(buscarCapacidades(catalogo, { identidade: 'cria-por-passo' }).total).toBe(9);
+    expect(buscarCapacidades(catalogo, { identidade: 'cria-por-passo' }).total).toBe(10);
   });
 
   it('explica ausência com candidatas e não inventa capacidade', () => {
@@ -60,7 +60,7 @@ describe('catálogo de capacidades — R05', () => {
     expect(buscarCapacidades(catalogo, { texto: 'revolucionar' }).operacoes.map(({ nome }) => nome)).toContain('lathe');
     const primeira = buscarCapacidades(catalogo, { limite: 3 });
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
-    expect(primeira).toMatchObject({ total: 36, retornadas: 3, truncado: true, omitidas: 33 });
+    expect(primeira).toMatchObject({ total: 37, retornadas: 3, truncado: true, omitidas: 34 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
   });
 

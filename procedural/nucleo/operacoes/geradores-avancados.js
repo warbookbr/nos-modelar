@@ -1,4 +1,6 @@
 /* geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
+import { ErroDePerfil, montarPerfil } from '../perfil2d.js';
+
 export function criarOperacoesGeradoresAvancados(servicos) {
   const { BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias } = servicos;
   return {
@@ -34,14 +36,50 @@ export function criarOperacoesGeradoresAvancados(servicos) {
     const exp = expandirConcordancias(st, i, 'lathe', brutos, { fechado: false, segmentosCurva });
     if (exp.erro) return;   // concordância inválida -> nada construído neste passo (grita já registrado)
 
-    // classifica polo/anel SOBRE O EXPANDIDO (um arco pode expor raio<0 se a concordância vaza o eixo)
-    let pontoInvalido2 = false;
-    const pontos = exp.pontos.map((p, j) => {
-      const raio = p[0], y = p[1];
-      if (raio < 0) { grita(st, i, 'lathe', j, `raio negativo (${raio}) no ponto ${j} do perfil expandido — não dá pra classificar polo/anel`); pontoInvalido2 = true; }
-      return { raio, y, polo: raio === 0 };
-    });
-    if (pontoInvalido2) return;
+    /* SEÇÃO COM FUROS OU DESLOCAMENTO. Com `furos` ou `deslocar` o `perfil` deixa de ser uma polilinha e passa a ser o
+       contorno externo de uma SEÇÃO fechada (o fecho pelo eixo é implícito), e a seção, menos os furos e deslocada, é montada
+       por `montarPerfil` (perfil2d.js). Cada contorno do resultado vira um laço revolucionado: o externo anti-horário e os
+       furos horários em [raio, y], o que dá a normal para fora do material nos dois. O laço que encosta no eixo perde a
+       aresta sobre o eixo e termina em dois polos; os outros fecham sobre si. Os laços saem na ordem canônica de
+       `montarPerfil` e suas faixas se enfileiram nessa ordem. Sem `furos` nem `deslocar`, o caminho é o de sempre. */
+    const modoSecao = a.furos != null || a.deslocar != null;
+    let lacos;
+    if (!modoSecao) {
+      // classifica polo/anel SOBRE O EXPANDIDO (um arco pode expor raio<0 se a concordância vaza o eixo)
+      let pontoInvalido2 = false;
+      const pontos = exp.pontos.map((p, j) => {
+        const raio = p[0], y = p[1];
+        if (raio < 0) { grita(st, i, 'lathe', j, `raio negativo (${raio}) no ponto ${j} do perfil expandido — não dá pra classificar polo/anel`); pontoInvalido2 = true; }
+        return { raio, y, polo: raio === 0 };
+      });
+      if (pontoInvalido2) return;
+      lacos = [pontos];
+    } else {
+      const contorno = exp.pontos.map((p) => [p[0], p[1]]);
+      const ini = contorno[0], fim = contorno[contorno.length - 1];
+      if (contorno.length > 3 && ini[0] === fim[0] && ini[1] === fim[1]) contorno.pop();   // escrito fechado: o ponto repetido sai
+      let secao;
+      try {
+        secao = montarPerfil(
+          { externo: contorno, furos: a.furos, deslocar: a.deslocar, segmentosArco: a.segmentosArco == null ? undefined : st.num(a.segmentosArco) },
+          { num: (x) => st.num(x), nomes: { externo: 'perfil' }, semiPlano: true },
+        );
+      } catch (e) {
+        if (e instanceof ErroDePerfil) return grita(st, i, 'lathe', e.campo, e.message);
+        throw e;
+      }
+      lacos = [];
+      for (const comp of secao.componentes) {
+        for (const anel of [comp.externo, ...comp.furos]) {
+          const n = anel.length;
+          const noEixo = [];
+          for (let k = 0; k < n; k++) if (anel[k][0] === 0 && anel[(k + 1) % n][0] === 0) noEixo.push(k);
+          if (noEixo.length > 1) return grita(st, i, 'lathe', 'perfil', `${noEixo.length} trechos do contorno ficam sobre o eixo (raio 0); a revolução aceita um só por contorno, separe a seção em duas`);
+          const aberto = noEixo.length === 1 ? [...anel.slice(noEixo[0] + 1), ...anel.slice(0, noEixo[0] + 1)] : [...anel, anel[0]];
+          lacos.push(aberto.map(([raio, y]) => ({ raio, y, polo: raio === 0 })));
+        }
+      }
+    }
 
     /* PERFIL FECHADO — o último ponto no MESMO lugar do primeiro.
        Uma receita que escreve isso está dizendo "a seção dá a volta e fecha":
@@ -59,51 +97,58 @@ export function criarOperacoesGeradoresAvancados(servicos) {
        quase iguais fecharem o laço em silêncio, mudando a topologia de uma peça
        cujo autor não pediu isso — e o autor que quer fechar consegue escrever a
        mesma coordenada, porque ela vem do mesmo PARAM. */
-    const ultimo = pontos.length - 1;
-    const fechado = pontos.length >= 3
-      && pontos[0].raio === pontos[ultimo].raio
-      && pontos[0].y === pontos[ultimo].y;
+    const fechadoDe = (pontos) => pontos.length >= 3 && pontos[0].raio === pontos[pontos.length - 1].raio && pontos[0].y === pontos[pontos.length - 1].y;
 
     // guarda de overflow (D3): soma EXATA — segmento polo<->polo não soma face — ANTES de inserir
-    let nV = 0; for (const p of pontos) nV += p.polo ? 1 : L;
-    if (fechado) nV -= pontos[ultimo].polo ? 1 : L;   // o último ponto não aloca: ele reusa o primeiro
-    let nF = 0; for (let idx = 0; idx < pontos.length - 1; idx++) if (!(pontos[idx].polo && pontos[idx + 1].polo)) nF += L;
+    let nV = 0, nF = 0;
+    for (const pontos of lacos) {
+      const ultimo = pontos.length - 1;
+      for (const p of pontos) nV += p.polo ? 1 : L;
+      if (fechadoDe(pontos)) nV -= pontos[ultimo].polo ? 1 : L;   // o último ponto não aloca: ele reusa o primeiro
+      for (let idx = 0; idx < pontos.length - 1; idx++) if (!(pontos[idx].polo && pontos[idx + 1].polo)) nF += L;
+    }
     if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: lathe com ${perfil.length} pontos × lados=${L} estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
 
-    // VÉRTICES — anda o cursor (a fórmula documentada acima)
-    let cursor = 0;
-    const info = [];
-    for (let idx = 0; idx < pontos.length; idx++) {
-      if (fechado && idx === ultimo) { info.push(info[0]); continue; }   // solda: nenhum id novo
-      const p = pontos[idx];
-      if (p.polo) {
-        const id = b + cursor;
-        addV(st, id, [0, p.y, 0]);
-        cursor += 1;
-        info.push({ polo: true, id });
-        continue;
-      }
-      const ids = [];
-      for (let j = 0; j < L; j++) { const t = (j / L) * Math.PI * 2; const id = b + cursor + j; addV(st, id, [Math.cos(t) * p.raio, p.y, Math.sin(t) * p.raio]); ids.push(id); }
-      cursor += L;
-      info.push({ polo: false, ids });
-    }
-
-    // FACES — cursor de face análogo, por segmento consecutivo (i,i+1)
-    let fCursor = 0;
+    let cursor = 0, fCursor = 0;
     // origemId (Fase 4): faixas[idx] = ids de face do segmento idx (vazia se polo↔polo) — a MESMA forma que o loft já monta, ver `contratoFaixaLado`.
-    const faixas = Array.from({ length: info.length - 1 }, () => []);
-    for (let idx = 0; idx < info.length - 1; idx++) {
-      const A = info[idx], B = info[idx + 1];
-      if (A.polo && B.polo) { grita(st, i, 'lathe', idx, 'polo↔polo adjacente — perfil degenerado, sem face neste segmento'); continue; }   // 0 faces, cursor não avança
-      if (!A.polo && !B.polo) {
-        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); faixas[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
-      } else if (A.polo) {
-        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.id, B.ids[j], B.ids[n]]); faixas[idx].push(fid); }   // polo embaixo -> anel em cima: leque SUL
-      } else {
-        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [B.id, A.ids[n], A.ids[j]]); faixas[idx].push(fid); }   // anel embaixo -> polo em cima: leque NORTE (invertido)
+    const faixas = [];
+    for (const pontos of lacos) {
+      const ultimo = pontos.length - 1;
+      const fechado = fechadoDe(pontos);
+
+      // VÉRTICES — anda o cursor (a fórmula documentada acima)
+      const info = [];
+      for (let idx = 0; idx < pontos.length; idx++) {
+        if (fechado && idx === ultimo) { info.push(info[0]); continue; }   // solda: nenhum id novo
+        const p = pontos[idx];
+        if (p.polo) {
+          const id = b + cursor;
+          addV(st, id, [0, p.y, 0]);
+          cursor += 1;
+          info.push({ polo: true, id });
+          continue;
+        }
+        const ids = [];
+        for (let j = 0; j < L; j++) { const t = (j / L) * Math.PI * 2; const id = b + cursor + j; addV(st, id, [Math.cos(t) * p.raio, p.y, Math.sin(t) * p.raio]); ids.push(id); }
+        cursor += L;
+        info.push({ polo: false, ids });
       }
-      fCursor += L;
+
+      // FACES — cursor de face análogo, por segmento consecutivo (i,i+1)
+      const doLaco = Array.from({ length: info.length - 1 }, () => []);
+      for (let idx = 0; idx < info.length - 1; idx++) {
+        const A = info[idx], B = info[idx + 1];
+        if (A.polo && B.polo) { grita(st, i, 'lathe', idx, 'polo↔polo adjacente — perfil degenerado, sem face neste segmento'); continue; }   // 0 faces, cursor não avança
+        if (!A.polo && !B.polo) {
+          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); doLaco[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
+        } else if (A.polo) {
+          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.id, B.ids[j], B.ids[n]]); doLaco[idx].push(fid); }   // polo embaixo -> anel em cima: leque SUL
+        } else {
+          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [B.id, A.ids[n], A.ids[j]]); doLaco[idx].push(fid); }   // anel embaixo -> polo em cima: leque NORTE (invertido)
+        }
+        fCursor += L;
+      }
+      faixas.push(...doLaco);
     }
     if (a.origemId != null) registraOrigem(st, i, 'lathe', a.origemId, { faixas });
   },

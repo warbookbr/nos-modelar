@@ -21,6 +21,7 @@ const tipos = Object.freeze({
   listaInteiros: { type: 'array', items: { type: 'integer' } },
   listaTextos: { type: 'array', items: { type: 'string', minLength: 1 } },
   lista: { type: 'array' },
+  forma2d: { anyOf: [{ type: 'array' }, { type: 'object' }], description: 'Lista de pontos [u,v] ou forma pronta ({retangulo} ou {circulo}).' },
   objeto: { type: 'object' },
 });
 
@@ -136,9 +137,30 @@ const definicoes = {
   },
   lathe: {
     intencao: 'Revolucionar perfil [raio,y] em torno de um eixo.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), perfil: ['lista', 'Ao menos dois pontos [raio,y] ou [raio,y,concordancia].'], lados: ['inteiro', 'Resolução da revolução.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'], [em[0]]: em.slice(1), [eixoCriacao[0]]: eixoCriacao.slice(1) },
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), perfil: ['lista', 'Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção.'], lados: ['inteiro', 'Resolução da revolução.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'], furos: ['lista', 'Furos da seção: cada um é uma lista de pontos [raio,y], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}, com o centro em [raio,y]. Inteiros dentro da seção.'], deslocar: ['objeto', "Desloca o contorno da seção: {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos."], segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'], [em[0]]: em.slice(1), [eixoCriacao[0]]: eixoCriacao.slice(1) },
     obrigatorios: ['perfil'], passos: [['lathe', { perfil: [[0.3, 0], [0.3, 1]], lados: 8 }]],
     precondicoes: ['Perfil precisa ter ao menos dois pontos e raios não negativos.'],
+    limites: ['Com furos ou deslocar o perfil é o contorno externo de uma SEÇÃO fechada (o fecho pelo eixo é implícito) e cada contorno do resultado vira um laço; as faixas se enfileiram: o externo e depois os furos, na ordem canônica de perfil2d.js. Raio negativo, furo que encosta na borda e deslocamento que apaga a seção são recusados com campo e valor.'],
+  },
+  extrusao: {
+    intencao: 'Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão.',
+    campos: {
+      [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1),
+      perfil: ['forma2d', 'Contorno externo: lista de pontos [u,v], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}. O ponto [u,v] vai para x=u, z=v.'],
+      furos: ['lista', 'Furos: lista de formas nas mesmas três escritas, todas inteiras dentro do perfil, a mais de 1e-6 da diagonal da borda e dos outros furos.'],
+      deslocar: ['objeto', "{para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos; fora faz o contrário. Limite da esquadria em múltiplos da distância (padrão 4)."],
+      segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'],
+      altura: ['escalar', 'Extensão em y, maior que zero (padrão 1).'],
+      [em[0]]: em.slice(1), [eixoCriacao[0]]: ['eixo', 'Direção da extrusão; o padrão é y.'],
+    },
+    obrigatorios: ['perfil'],
+    passos: [['extrusao', { origemId: 1, perfil: { retangulo: { largura: 1, profundidade: 0.6, cantos: 0.1 } }, furos: [{ circulo: { raio: 0.1, centro: [0.2, 0] } }], deslocar: { para: 'dentro', distancia: 0.02, canto: 'redondo' }, altura: 0.2 }]],
+    precondicoes: ['Perfil simples, furos inteiros dentro dele, sem encostar na borda nem entre si, e deslocamento que não apague o perfil.'],
+    limites: [
+      'A origem publica lado (laterais), tampa (fundo ou topo, todas as peças convexas) e parede (externo, furos ou o número do furo).',
+      'Um recuo pode partir o perfil em pedaços; cada pedaço sai como contorno próprio, na ordem canônica (menor ponto primeiro).',
+      'Furo que encosta na borda é recusado com a distância medida; para abrir o furo na borda, escreva o recorte no contorno externo.',
+    ],
   },
   loft: {
     intencao: 'Conectar seções ao longo de um caminho 3D.',

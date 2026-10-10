@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.hipergrafo-capacidades@1",
-  "assinatura": "sha256:547dec51a7222ba8e7c6625bda15ccf91d51e7dbca01f5c9a71f37c4e81a65a3",
+  "assinatura": "sha256:a848b0fb8d43b5909b7a7c5210997daa0a648fa62a1711cd02d0baec9f80c3d7",
   "nos": [
     {
       "id": "artefato:mecanifica.malha-poligonal@1",
@@ -86,6 +86,11 @@
       "id": "mecanifica.operacao.extruda",
       "tipo": "operacao",
       "nome": "extruda"
+    },
+    {
+      "id": "mecanifica.operacao.extrusao",
+      "tipo": "operacao",
+      "nome": "extrusao"
     },
     {
       "id": "mecanifica.operacao.filete",
@@ -320,6 +325,14 @@
       "entra": [
         "artefato:mecanifica.malha-poligonal@1"
       ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.extrusao",
+      "operacao": "mecanifica.operacao.extrusao",
+      "entra": [],
       "sai": [
         "artefato:mecanifica.malha-poligonal@1"
       ]
