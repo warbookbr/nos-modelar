@@ -543,7 +543,6 @@
 
 ## procedural/extensoes/articulacao/
 
-- `articulacao.test.mjs` — articulacao.test.mjs — a articulação como extensão nativa: o manifesto cabe no SDK, o contrato de uso é descobrível, o passo não emite geometria e a declaraç…
 - `declaracao.js` — declaracao.js — leitura da articulação declarada entre duas peças.
 - `fixture.js` — fixture.js — articulação sintética da extensão: a folha de uma porta que gira noventa graus no eixo da porta publicada pelo batente. As peças e as portas vêm…
 - `implementacao.js` — implementacao.js — a articulação não emite vértice nem face. Recebe somente a resolução numérica do contexto e lê a declaração; declaração inválida descarta …
@@ -557,7 +556,6 @@
 
 ## procedural/extensoes/chapa-dobrada/
 
-- `chapa-dobrada.test.mjs` — chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta, determinismo e recusas que dizem camp…
 - `chapa.js` — chapa.js — a conta da chapa dobrada: contorno da seção com as dobras no raio pedido e as medidas de chapa.
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça: um L de chapa de 2 mm, raio interno 2 mm, 30 mm de largura.
 - `implementacao.js` — implementacao.js — extrusa o contorno da chapa dobrada numa largura; recebe somente emissor transacional e resolução numérica.
@@ -566,7 +564,6 @@
 
 ## procedural/extensoes/estrutura-de-barras/
 
-- `estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `estrutura.js` — estrutura.js — valida e constrói a estrutura de barras: barras entre nós nomeados, cortadas ou encaixadas em cada nó, unidas num sólido só.
 - `fixture.js` — fixture.js — receita sintética da extensão: um quadro plano de tubos quadrados, sem publicação de peça.
 - `implementacao.js` — implementacao.js — emite a malha unida da estrutura de barras pelo contexto limitado da extensão nativa.
@@ -599,6 +596,9 @@
 - `executor.js` — executor.js — orquestra núcleo, adaptador e animação sem duplicar execução.
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
+- `extensao-articulacao.test.mjs` — articulacao.test.mjs — a articulação como extensão nativa: o manifesto cabe no SDK, o contrato de uso é descobrível, o passo não emite geometria e a declaraç…
+- `extensao-chapa-dobrada.test.mjs` — chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta, determinismo e recusas que dizem camp…
+- `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `extensoes.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
