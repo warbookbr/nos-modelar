@@ -25,6 +25,7 @@ import { ajuda } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
 import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
+import { blocagemDoEsboco, desenharVistaDaBlocagem } from './esboco-blocagem.mjs';
 
 /* Um caminho relativo vale a partir do diretório de quem chamou: `npm run` roda no repositório e deixa esse diretório em
    `INIT_CWD`. Um caminho absoluto fica como está. */
@@ -736,8 +737,9 @@ function comOpcoesDeDesenho(esboco, { corte = null, previa = false, zoomForma = 
 }
 
 /* O pedaço do nome do arquivo que diz as opções de desenho, para a imagem do corte ou da explosão não substituir a normal. */
-function sufixoDasOpcoes({ corte = null, explosao = null, previa = false, zoomForma = null } = {}) {
+function sufixoDasOpcoes({ corte = null, explosao = null, previa = false, zoomForma = null, nivelZero = false } = {}) {
   const partes = [];
+  if (nivelZero) partes.push('nivel-zero');
   if (corte) partes.push(`corte-${corte.eixo}${String(corte.valor).replace(/[^A-Za-z0-9_.-]+/g, '-')}${corte.lado === undefined ? '' : corte.lado === '+' ? '-mais' : '-menos'}`);
   if (zoomForma) partes.push(`zoom-${zoomForma.formas.replace(/\*/g, 'todas').replace(/[^A-Za-z0-9_.-]+/g, '-')}`);
   if (explosao) partes.push(`explodida${explosao.eixo ? `-${explosao.eixo}` : ''}${typeof explosao.distancia === 'number' ? `-${explosao.distancia}mm` : ''}`);
@@ -760,6 +762,20 @@ function hashDaVista(esboco, vista, extras) {
   return createHash('sha256').update(JSON.stringify({ vista, extras, meta, visiveis, motor: MOTOR_DO_PNG, desenhista: codigoEmCache })).digest('hex');
 }
 
+/* O hash do conteúdo de uma vista desenhada pela blocagem: a malha, os volumes e as cores de cada painel (já com a unidade e os
+   vizinhos escolhidos), o que mais o desenho lê (título, nota, ocultar, lista), a vista, a largura, o motor e o código do
+   desenhista. */
+function hashDaBlocagem(blocagem, vista, extras) {
+  codigoEmCache ??= codigoDoDesenhista();
+  return createHash('sha256').update(JSON.stringify({ vista, extras, nivelZero: blocagem.hash, motor: MOTOR_DO_PNG, desenhista: codigoEmCache })).digest('hex');
+}
+
+/* `--nivel-zero` desenha a blocagem inteira da opção; corte, explosão, zoom e prévia ficam no desenho das formas. */
+function exigirSemOpcoesDeDesenho({ corte = null, explosao = null, previa = false, zoomForma = null } = {}) {
+  const pedidas = [corte && '--corte', explosao && '--explodir', previa && '--previa', zoomForma && '--zoom-forma'].filter(Boolean);
+  if (pedidas.length > 0) throw new ErroDeEsboco(`--nivel-zero desenha a blocagem inteira em quatro vistas; ${pedidas.join(', ')} ficam no desenho das formas (tire --nivel-zero).`);
+}
+
 /* O esboço de uma unidade (ou o inteiro, com `unidade` nulo) pronto para desenhar: as formas da unidade, as de outra unidade em
    contorno claro (os vizinhos, sem `vizinhos`) e as opções de desenho. Devolve { isolado, idsVizinhos }. */
 export function esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes = {}) {
@@ -771,14 +787,16 @@ export function esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes = {}) {
 /* As vistas isoladas de uma unidade (`unidade`) ou do esboço inteiro (`unidade` nulo): grava `<nome-do-arquivo>[-unidade-<nome>]
    [-<opções>]-<vista>.png` ao lado do esboço (ou em `saida`), nas quatro vistas ou só na pedida, sem legenda nem linha de
    centro. As opções de desenho são `corte`. Devolve { destinos, unidade, texto }. */
-export async function vistasArquivo(arquivo, { unidade = null, vista = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true } = {}) {
+export async function vistasArquivo(arquivo, { unidade = null, vista = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true, nivelZero = false } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   let estado = null;
   try { estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
   if (vista !== null && !VISTAS_DA_ANALISE.includes(vista)) throw new ErroDeEsboco(`${unidade === null ? '--vista' : '--unidade'}: vista '${vista}' desconhecida (${VISTAS_DA_ANALISE.join(', ')}).`);
-  const opcoes = { corte, explosao, previa, zoomForma };
-  const { isolado, idsVizinhos } = esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes);
+  const opcoes = { corte, explosao, previa, zoomForma, nivelZero };
+  if (nivelZero) exigirSemOpcoesDeDesenho(opcoes);
+  const pelaBlocagem = nivelZero ? blocagemDoEsboco(bruto, estado, { unidade, vizinhos }) : null;
+  const { isolado, idsVizinhos } = pelaBlocagem ? { isolado: null, idsVizinhos: pelaBlocagem.vizinhos } : esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes);
   const todas = estado?.unidades?.length ? estado.unidades : planoDeDetalhe(bruto).unidades;
   const u = unidade === null ? null : todas.find((x) => x.id === unidadePorNome(todas, unidade));
   let base = caminho.replace(/(\.esboco)?\.json$/i, '');
@@ -788,20 +806,20 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, lar
   const svgs = [];
   const notas = [];
   const reaproveitadas = [];
-  const explosoes = explosao ? isolado.opcoes.map(() => explosao) : undefined;
+  const explosoes = explosao && isolado ? isolado.opcoes.map(() => explosao) : undefined;
   let navegador = null;
   try {
     for (const v of vista === null ? VISTAS_DA_ANALISE : [vista]) {
       const destino = `${base}${nome === null ? '' : `-unidade-${nome}`}${sufixoDasOpcoes(opcoes)}-${v}.png`;
       destinos.push(destino);
       /* a vista cujo conteúdo não mudou desde a última gravação fica como está */
-      const hash = hashDaVista(isolado, v, { largura: larguraPedida, corte, explosao, previa, zoomForma });
+      const hash = pelaBlocagem ? hashDaBlocagem(pelaBlocagem, v, { largura: larguraPedida }) : hashDaVista(isolado, v, { largura: larguraPedida, corte, explosao, previa, zoomForma });
       let gravado = null;
       try { gravado = readFileSync(`${destino}.hash`, 'utf8').trim(); } catch { /* sem hash gravado */ }
       if (!forcar && gravado === hash && existsSync(destino)) { reaproveitadas.push(true); svgs.push(null); continue; }
       reaproveitadas.push(false);
       navegador ??= await (await import('playwright')).default.chromium.launch();
-      const r = desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes }), OPCOES_DA_CAMADA);
+      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, OPCOES_DA_CAMADA) : desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes }), OPCOES_DA_CAMADA);
       const { svg } = await desenhoParaPng(r, larguraPedida, destino, navegador);
       writeFileSync(`${destino}.hash`, `${hash}\n`);
       svgs.push(svg);
@@ -812,7 +830,7 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, lar
     if (navegador) await navegador.close();
   }
   const vistasTexto = `${destinos.length} ${destinos.length === 1 ? 'vista' : 'vistas'}`;
-  const cabecalho = u === null ? `esboço inteiro, sem legenda, em ${vistasTexto}` : `unidade ${u.id} (${u.membros.length} ${u.membros.length === 1 ? 'forma' : 'formas'}) isolada, sem legenda, em ${vistasTexto}`;
+  const cabecalho = `${u === null ? `esboço inteiro, sem legenda, em ${vistasTexto}` : `unidade ${u.id} (${u.membros.length} ${u.membros.length === 1 ? 'forma' : 'formas'}) isolada, sem legenda, em ${vistasTexto}`}${pelaBlocagem ? `, ${pelaBlocagem.texto}` : ''}`;
   return { destinos, svgs, reaproveitadas, unidade: u, vizinhos: idsVizinhos, vizinhosDescritos: idsVizinhos.length > 0 ? descricaoDasVizinhas(bruto, estado, unidade) : [], texto: `${cabecalho}${idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro: ${idsVizinhos.slice(0, 8).join(', ')}${idsVizinhos.length > 8 ? ', ...' : ''} (--sem-vizinhos desliga)` : ''}${previa ? ' (prévia: facetas reduzidas e sem arestas finas, rotulada no título; confirme com a imagem completa antes de dar por bom)' : ''}:\n${destinos.map((d, i) => `  ${d}${reaproveitadas[i] ? ' (reaproveitada: o conteúdo não mudou desde a última gravação; --forçar redesenha)' : ''}`).join('\n')}\n${notas.length > 0 ? `${notas.join('\n')}\n` : ''}` };
 }
 
@@ -827,18 +845,19 @@ export function unidadeArquivo(arquivo, unidade, opcoes = {}) {
    isolada com os vizinhos em contorno claro, como em `--unidade`. Grava `<nome>[-unidade-<nome>]-composta.png` ao lado do
    esboço (ou em `saida`) e devolve { destino, largura, altura, celula, texto }. */
 export const LARGURA_DA_COMPOSTA = 1100;
-export async function compostaArquivo(arquivo, { unidade = null, largura = null, saida = null, vizinhos = true } = {}) {
+export async function compostaArquivo(arquivo, { unidade = null, largura = null, saida = null, vizinhos = true, nivelZero = false } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   let estado = null;
   try { estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
   const celula = Math.floor((largura ?? LARGURA_DA_COMPOSTA) / 2);
-  const { isolado, idsVizinhos } = esbocoIsolado(bruto, estado, unidade, vizinhos);
+  const pelaBlocagem = nivelZero ? blocagemDoEsboco(bruto, estado, { unidade, vizinhos }) : null;
+  const { isolado, idsVizinhos } = pelaBlocagem ? { isolado: null, idsVizinhos: pelaBlocagem.vizinhos } : esbocoIsolado(bruto, estado, unidade, vizinhos);
   const navegador = await (await import('playwright')).default.chromium.launch();
   const imagens = [];
   try {
     for (const v of VISTAS_DA_ANALISE) {
-      const r = desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
+      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, OPCOES_DA_CAMADA) : desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
       imagens.push(PNG.sync.read((await desenhoParaBuffer(r, celula, navegador)).png));
     }
   } finally {
@@ -847,11 +866,11 @@ export async function compostaArquivo(arquivo, { unidade = null, largura = null,
   const grade = comporGrade(imagens, celula);
   let base = caminho.replace(/(\.esboco)?\.json$/i, '');
   if (saida) { mkdirSync(resolverCaminho(saida), { recursive: true }); base = join(resolverCaminho(saida), basename(base)); }
-  const destino = `${base}${unidade === null ? '' : `-unidade-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}`}-composta.png`;
+  const destino = `${base}${unidade === null ? '' : `-unidade-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}`}${nivelZero ? '-nivel-zero' : ''}-composta.png`;
   writeFileSync(destino, PNG.sync.write(grade));
   const alvo = unidade === null ? 'esboço inteiro' : `unidade ${unidade} isolada`;
   const notaVizinhos = idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro (--sem-vizinhos desliga)` : '';
-  return { destino, largura: grade.width, altura: grade.height, celula, texto: `composta de ${alvo}, sem legenda, ${grade.width}x${grade.height} px (${celula} px cada vista; isométrica e frontal em cima, lateral e superior embaixo)${notaVizinhos}\n  ${destino}\n` };
+  return { destino, largura: grade.width, altura: grade.height, celula, texto: `composta de ${alvo}, sem legenda, ${grade.width}x${grade.height} px (${celula} px cada vista; isométrica e frontal em cima, lateral e superior embaixo)${pelaBlocagem ? `, ${pelaBlocagem.texto}` : ''}${notaVizinhos}\n  ${destino}\n` };
 }
 
 /* A grade 2x2 das vistas (na ordem de `VISTAS_DA_ANALISE`), cada uma centrada na sua linha e composta sobre branco. */
@@ -1217,7 +1236,7 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade> [--sem-vizinhos]] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json>] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
@@ -1244,16 +1263,17 @@ async function principal(argv) {
     }
     if (args.tem('--composta')) {
       if (args.tem('--vista')) throw new ErroDeEsboco('--composta junta as quatro vistas numa imagem; --vista não vale junto (use --unidade <unidade> --vista <vista> para uma vista só).');
-      const r = await compostaArquivo(alvo, { unidade: args.valor('--unidade') ?? null, largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, vizinhos: !args.tem('--sem-vizinhos') });
+      const r = await compostaArquivo(alvo, { unidade: args.valor('--unidade') ?? null, largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, vizinhos: !args.tem('--sem-vizinhos'), nivelZero: args.tem('--nivel-zero') });
       process.stdout.write(r.texto);
       return 0;
     }
+    if (args.tem('--nivel-zero') && args.tem('--analise')) throw new ErroDeEsboco('--nivel-zero vale com --composta, --unidade ou --vista, e não com --analise.');
     if (args.tem('--analise') && ['--corte', '--explodir', '--previa', '--zoom-forma'].some((f) => args.tem(f))) throw new ErroDeEsboco('--corte, --explodir, --previa e --zoom-forma geram as vistas isoladas (com --unidade ou do esboço inteiro) e não valem junto de --analise.');
     if (args.tem('--lado') && !args.tem('--corte')) throw new ErroDeEsboco('--lado só vale junto de --corte.');
     /* `--vista <vista>` sozinho grava a vista isolada do esboço inteiro; antes caía na leitura padrão e não gravava nada. */
     const vistaIsolada = args.tem('--vista') && !['--achado', '--analise', '--descrever', '--forma'].some((f) => args.tem(f));
-    if (args.tem('--unidade') || args.tem('--corte') || args.tem('--explodir') || args.tem('--previa') || args.tem('--zoom-forma') || vistaIsolada) {
-      const opcoes = { vista: args.valor('--vista') ?? null, largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, corte: args.tem('--corte') ? lerCorteDaLinha(args.valor('--corte'), args.valor('--lado')) : null, explosao: lerExplosaoDaLinha({ explodir: args.tem('--explodir'), eixo: args.valor('--eixo'), distancia: args.valor('--distancia') }), previa: args.tem('--previa'), zoomForma: lerZoomFormaDaLinha({ zoomForma: args.valor('--zoom-forma'), margem: args.valor('--margem') }), forcar: args.tem('--forçar') || args.tem('--forcar'), vizinhos: !args.tem('--sem-vizinhos') };
+    if (args.tem('--unidade') || args.tem('--corte') || args.tem('--explodir') || args.tem('--previa') || args.tem('--zoom-forma') || args.tem('--nivel-zero') || vistaIsolada) {
+      const opcoes = { vista: args.valor('--vista') ?? null, largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, corte: args.tem('--corte') ? lerCorteDaLinha(args.valor('--corte'), args.valor('--lado')) : null, explosao: lerExplosaoDaLinha({ explodir: args.tem('--explodir'), eixo: args.valor('--eixo'), distancia: args.valor('--distancia') }), previa: args.tem('--previa'), zoomForma: lerZoomFormaDaLinha({ zoomForma: args.valor('--zoom-forma'), margem: args.valor('--margem') }), forcar: args.tem('--forçar') || args.tem('--forcar'), vizinhos: !args.tem('--sem-vizinhos'), nivelZero: args.tem('--nivel-zero') };
       const r = args.tem('--unidade') ? await unidadeArquivo(alvo, args.valor('--unidade'), opcoes) : await vistasArquivo(alvo, opcoes);
       process.stdout.write(r.texto);
       return 0;

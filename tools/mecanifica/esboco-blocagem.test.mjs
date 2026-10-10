@@ -1,0 +1,217 @@
+/* O `--nivel-zero` do esboço: as vistas `--unidade` e `--composta` desenhadas pela blocagem do nível zero, comparadas com o
+   desenho das formas (`desenharEsboco`) que as imagens usam por padrão.
+   A prova é a silhueta. Para cada esboço da pasta de fixtures do módulo e do banco de provas, opção e vista, a camada do desenho
+   pela blocagem é pintada numa grade de um pixel (`esboco-silhueta.mjs`: a união das faces, sem navegador) e comparada com a do
+   desenho atual da mesma opção, desenhado só com as formas que a blocagem tem (o que o tradutor declara sem equivalente sai do
+   desenho atual, porque não existe na blocagem). A medida é a interseção sobre a união (IoU) e a razão das escalas.
+
+   Três mínimos, cada um com o que o explica:
+   - 0,998, contra o desenho atual com os lados do esboço (128 no cilindro, no anel e no cone, 48 no tubo): as duas silhuetas são o
+     mesmo polígono, e sobra o arredondamento das coordenadas da blocagem (1e-6 mm) e o polígono de 48 lados do tubo, girado em
+     relação ao do desenho atual (a mesma razão da tolerância de envelope do tradutor): todo esboço abaixo de 0,9999 tem tubo, e o
+     pior caso medido é a isométrica do chassi de tubos curvos do carrinho, 0,9988. Os esboços só de formas exatas (casa,
+     guarda-roupa, cubo, moto sem tubo) dão 1,0000. É a prova do desenhista da blocagem, sem a escolha de facetas do outro.
+   - 0,98, contra o desenho que a ferramenta grava (`ladosPorEscala`, que escolhe o menor número de lados cuja flecha fica abaixo de
+     0,35 px): o polígono inscrito do desenho atual sai até 0,35 px para dentro do círculo da blocagem, em toda a volta das curvas,
+     e a razão disso sobre a área é maior nas formas pequenas na tela. O pior caso medido é a lateral do mancal, 0,9862, com uma
+     roda vista de frente; 0,98 fica 0,6 ponto abaixo disso, e a comparação com os lados do esboço (acima) é a que pega um desvio
+     de forma.
+   - 0,95, só nos esboços em que o tradutor declara a perda `inclinacao` (a caçamba do carrinho, de seção inclinada): a blocagem
+     leva o contorno de cada seção ao plano perpendicular ao eixo, e a bacia muda de forma na vista de lado (0,9554 medido,
+     igual com os dois tipos de faceta, porque a perda é de forma e não de faceta). O limite só afrouxa quando o relatório de
+     perdas traz a causa.
+   A escala é conferida junto: a razão entre as escalas do quadro fica em 0,1% (mesmas facetas) e 0,5% (facetas da ferramenta),
+   o que mantém a composta com as mesmas proporções e a mesma escala. Com `ESBOCO_TABELA=1` o teste imprime a tabela de IoU. */
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { PNG } from 'pngjs';
+import { afterAll, describe, expect, it } from 'vitest';
+import { desenharEsboco, ErroDeEsboco } from '../../modulos/esboco/src/index.js';
+import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
+import { planoDeDetalhe } from '../../modulos/esboco/src/condutor.js';
+import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, formasVizinhas } from '../../modulos/esboco/src/detalhe.js';
+import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
+import { blocagemDoEsboco } from './esboco-blocagem.mjs';
+import { compostaArquivo, esbocoIsolado, variante, vistasArquivo, VISTAS_DA_ANALISE } from './esboco.mjs';
+import { iou, mascaraDaCamada } from './esboco-silhueta.mjs';
+
+const MINIMO_COM_AS_MESMAS_FACETAS = 0.998;
+const MINIMO_COM_AS_FACETAS_DA_FERRAMENTA = 0.98;
+const MINIMO_COM_INCLINACAO_DECLARADA = 0.95;
+const ESCALA_COM_AS_MESMAS_FACETAS = 1e-3;
+const ESCALA_COM_AS_FACETAS_DA_FERRAMENTA = 5e-3;
+
+const varrer = (pasta) => readdirSync(pasta, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? varrer(join(pasta, e.name)) : e.name.endsWith('.esboco.json') ? [join(pasta, e.name)] : []));
+const raiz = new URL('../../', import.meta.url).pathname;
+const arquivos = [...varrer(join(raiz, 'modulos/esboco/tests/fixtures')), ...varrer(join(raiz, 'docs/mecanifica/banco-de-provas'))].sort((a, b) => a.split('/').pop().localeCompare(b.split('/').pop()));
+const nomeDe = (caminho) => caminho.split('/').pop();
+const lerJson = (caminho) => JSON.parse(readFileSync(caminho, 'utf8'));
+
+/* O esboço que o próprio desenho recusa (loft vazado com seção côncava, um atrito registrado): a blocagem recusa com a mesma causa. */
+const RECUSADOS = ['atrito-loft-vazado.esboco.json'];
+
+const PASTA = mkdtempSync(join(tmpdir(), 'esboco-blocagem-'));
+afterAll(() => rmSync(PASTA, { recursive: true, force: true }));
+
+const tabela = [];
+afterAll(() => { if (process.env.ESBOCO_TABELA) console.log(tabela.join('\n')); });
+
+/* O desenho atual da opção `numero` (só ela, num painel) com as formas `ocultas` escondidas, na vista, com os lados do esboço
+   (`lados: false`) ou os da ferramenta (`lados: true`, o `ladosPorEscala` do `--composta`). */
+function desenhoAtual(bruto, numero, vista, ocultas, lados) {
+  const e = expandirEsboco(bruto);
+  const o = { ...e.opcoes[numero - 1], formas: e.opcoes[numero - 1].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) };
+  return desenharEsboco(variante({ ...e, opcoes: [o], ladosPorEscala: lados }, { vista, legendas: false, centros: false }), { camada: true });
+}
+
+describe('a silhueta pela blocagem coincide com a do desenho atual', () => {
+  for (const caminho of arquivos.filter((a) => !RECUSADOS.includes(nomeDe(a)))) {
+    it(`${nomeDe(caminho)}: as quatro vistas de cada opção`, () => {
+      const bruto = lerJson(caminho);
+      const b = blocagemDoEsboco(bruto);
+      expect(b.paineis).toHaveLength(expandirEsboco(bruto).opcoes.length);
+      b.paineis.forEach((painel, i) => {
+        const opcao = b.opcoes[i];
+        const ocultas = opcao.semEquivalente.map((x) => x.id);
+        const inclinada = opcao.perdas.some((p) => p.perdido.some((d) => d.codigo === 'inclinacao'));
+        const linha = [];
+        for (const vista of VISTAS_DA_ANALISE) {
+          const novo = desenharBlocagem({ vista, paineis: [painel] }, { camada: true });
+          const mascara = mascaraDaCamada(novo.camada);
+          expect(mascara.area, `${nomeDe(caminho)} opção ${i + 1} ${vista}: a blocagem não pintou nada`).toBeGreaterThan(0);
+          const medidas = [];
+          for (const [lados, minimo, tolEscala] of [[false, inclinada ? MINIMO_COM_INCLINACAO_DECLARADA : MINIMO_COM_AS_MESMAS_FACETAS, ESCALA_COM_AS_MESMAS_FACETAS], [true, inclinada ? MINIMO_COM_INCLINACAO_DECLARADA : MINIMO_COM_AS_FACETAS_DA_FERRAMENTA, ESCALA_COM_AS_FACETAS_DA_FERRAMENTA]]) {
+            const atual = desenhoAtual(bruto, i + 1, vista, ocultas, lados);
+            const r = iou(mascara, mascaraDaCamada(atual.camada));
+            medidas.push(r.iou.toFixed(4));
+            expect(r.iou, `${nomeDe(caminho)} opção ${i + 1} ${vista} (${lados ? 'facetas da ferramenta' : 'lados do esboço'})`).toBeGreaterThanOrEqual(minimo);
+            expect(Math.abs(novo.escala / atual.escala - 1), `${nomeDe(caminho)} opção ${i + 1} ${vista}: razão das escalas`).toBeLessThanOrEqual(tolEscala);
+            expect(novo.largura).toBe(atual.largura);
+            expect(novo.altura).toBe(atual.altura);
+          }
+          linha.push(`${vista.slice(0, 4)} ${medidas[0]} / ${medidas[1]}`);
+        }
+        tabela.push(`${nomeDe(caminho)} opção ${i + 1}${inclinada ? ' (inclinação declarada)' : ''}: ${linha.join(' | ')}`);
+      });
+    }, 240_000);
+  }
+
+  it('recusa o esboço que o desenho atual também recusa, com a mesma causa', () => {
+    for (const nome of RECUSADOS) {
+      const bruto = lerJson(arquivos.find((a) => nomeDe(a) === nome));
+      let causaAtual;
+      try { desenharEsboco(bruto); } catch (e) { causaAtual = e.message; }
+      expect(causaAtual).toBeTruthy();
+      expect(() => blocagemDoEsboco(bruto)).toThrow(ErroDeEsboco);
+      expect(() => blocagemDoEsboco(bruto)).toThrow(causaAtual);
+    }
+  });
+});
+
+describe('o isolamento por unidade pela procedência dos volumes', () => {
+  const casos = [
+    ['moto-parametros.esboco.json', null],
+    ['chassi-e-cacamba.esboco.json', ['quadro+manoplaD+manoplaE', 'escoraFrenteD+escoraFrenteE+paFrente', 'pisoCac']],
+  ];
+  for (const [nome, unidades] of casos) {
+    it(`${nome}: cada unidade desenha só as formas dela e as vizinhas, na mesma silhueta do desenho atual`, () => {
+      const bruto = lerJson(arquivos.find((a) => nomeDe(a) === nome));
+      const todas = planoDeDetalhe(bruto).unidades.filter((u) => unidades === null || unidades.includes(u.id));
+      expect(todas.length).toBeGreaterThan(0);
+      for (const u of todas) {
+        const b = blocagemDoEsboco(bruto, null, { unidade: u.id });
+        expect(b.paineis, 'o isolamento de unidade desenha só a primeira opção').toHaveLength(1);
+        const vizinhas = formasVizinhas(bruto, null, u.id);
+        const { tabela: tab, dados, semEquivalente } = b.opcoes[0];
+        const ocultas = semEquivalente.map((x) => x.id);
+        /* a procedência: um volume é da unidade ou vizinho conforme as formas de que veio */
+        const desenhados = new Map(b.paineis[0].volumes.map((v) => [v.id, v]));
+        for (const f of dados.formas) {
+          const volume = tab[f.id];
+          if (volume === undefined) continue;
+          if (u.membros.includes(f.id)) expect(desenhados.has(volume), `${u.id}: o volume de ${f.id} falta`).toBe(true);
+        }
+        for (const [volume, v] of desenhados) {
+          const donas = dados.formas.filter((f) => tab[f.id] === volume).map((f) => f.id);
+          const daUnidade = donas.some((id) => u.membros.includes(id));
+          expect(daUnidade || donas.some((id) => vizinhas.includes(id)), `${u.id}: o volume ${volume} não é da unidade nem vizinho`).toBe(true);
+          if (!daUnidade) expect(v).toMatchObject({ cor: COR_DO_VIZINHO, opacidade: OPACIDADE_DO_VIZINHO });
+        }
+        const semVizinhos = blocagemDoEsboco(bruto, null, { unidade: u.id, vizinhos: false });
+        expect(semVizinhos.vizinhos).toEqual([]);
+        expect(semVizinhos.paineis[0].volumes.length).toBeLessThanOrEqual(desenhados.size);
+        expect(semVizinhos.paineis[0].volumes.every((v) => v.cor !== COR_DO_VIZINHO)).toBe(true);
+        /* a silhueta contra o desenho atual da unidade isolada, com os vizinhos */
+        const { isolado } = esbocoIsolado(bruto, null, u.id, true);
+        const escondido = { ...isolado, opcoes: [{ ...isolado.opcoes[0], formas: isolado.opcoes[0].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) }], ladosPorEscala: false };
+        for (const vista of VISTAS_DA_ANALISE) {
+          const novo = desenharBlocagem({ vista, paineis: b.paineis }, { camada: true });
+          const atual = desenharEsboco(variante(escondido, { vista, legendas: false, centros: false }), { camada: true });
+          const r = iou(mascaraDaCamada(novo.camada), mascaraDaCamada(atual.camada));
+          expect(r.iou, `${nome} unidade ${u.id} ${vista}`).toBeGreaterThanOrEqual(MINIMO_COM_AS_MESMAS_FACETAS);
+          expect(Math.abs(novo.escala / atual.escala - 1)).toBeLessThanOrEqual(ESCALA_COM_AS_MESMAS_FACETAS);
+        }
+      }
+    }, 240_000);
+  }
+
+  it('recusa a unidade que não existe com a mesma mensagem do desenho atual', () => {
+    const bruto = lerJson(arquivos.find((a) => nomeDe(a) === 'moto-parametros.esboco.json'));
+    expect(() => blocagemDoEsboco(bruto, null, { unidade: 'rodaTrazeira' })).toThrow(/não é uma unidade de detalhe/);
+  });
+});
+
+const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+
+describe('--nivel-zero na composta e nas vistas', () => {
+  const ARQUIVO = join(PASTA, 'mancal.esboco.json');
+  writeFileSync(ARQUIVO, readFileSync(arquivos.find((a) => nomeDe(a) === 'mancal-eixo.esboco.json')));
+  const CASA = join(PASTA, 'casa.esboco.json');
+  writeFileSync(CASA, readFileSync(arquivos.find((a) => nomeDe(a) === 'casa.esboco.json')));
+
+  it('a composta sai com o mesmo tamanho e a mesma disposição do desenho atual, e quase os mesmos pixels (casa, sem perda)', async () => {
+    mkdirSync(join(PASTA, 'a'));
+    mkdirSync(join(PASTA, 'b'));
+    const atual = await compostaArquivo(CASA, { saida: join(PASTA, 'a') });
+    const novo = await compostaArquivo(CASA, { saida: join(PASTA, 'b'), nivelZero: true });
+    expect(novo.destino).toBe(join(PASTA, 'b', 'casa-nivel-zero-composta.png'));
+    expect([novo.largura, novo.altura, novo.celula]).toEqual([atual.largura, atual.altura, atual.celula]);
+    expect(novo.texto).toContain('pela blocagem do nível zero (11 de 11 volumes)');
+    const A = PNG.sync.read(readFileSync(atual.destino));
+    const B = PNG.sync.read(readFileSync(novo.destino));
+    let diferem = 0;
+    for (let i = 0; i < A.data.length; i += 4) {
+      if (Math.max(Math.abs(A.data[i] - B.data[i]), Math.abs(A.data[i + 1] - B.data[i + 1]), Math.abs(A.data[i + 2] - B.data[i + 2])) > 40) diferem++;
+    }
+    /* medido: 0,17% dos pixels (a sombra das faces e a ponta dos traços); 1% deixa folga sem aceitar uma peça fora do lugar */
+    expect(diferem / (A.width * A.height)).toBeLessThan(0.01);
+  }, 120_000);
+
+  it('a mesma entrada dá a mesma imagem, byte a byte, e a composta diz o que ficou sem equivalente', async () => {
+    mkdirSync(join(PASTA, 'c'));
+    mkdirSync(join(PASTA, 'd'));
+    const a = await compostaArquivo(ARQUIVO, { saida: join(PASTA, 'c'), nivelZero: true });
+    const b = await compostaArquivo(ARQUIVO, { saida: join(PASTA, 'd'), nivelZero: true });
+    expect(sha(readFileSync(a.destino))).toBe(sha(readFileSync(b.destino)));
+    expect(a.texto).toContain('3 de 3 volumes');
+    expect(a.texto).toContain('aproximado: ponta_chaveta');
+    expect(a.texto).toContain('sem equivalente e fora da imagem: base');
+  }, 120_000);
+
+  it('as vistas isoladas levam -nivel-zero no nome, reaproveitam a imagem que não mudou e recusam corte, explosão, zoom e prévia', async () => {
+    const pasta = join(PASTA, 'e');
+    mkdirSync(pasta);
+    const primeira = await vistasArquivo(ARQUIVO, { vista: 'frontal', saida: pasta, nivelZero: true });
+    expect(primeira.destinos).toEqual([join(pasta, 'mancal-nivel-zero-frontal.png')]);
+    expect(primeira.reaproveitadas).toEqual([false]);
+    const segunda = await vistasArquivo(ARQUIVO, { vista: 'frontal', saida: pasta, nivelZero: true });
+    expect(segunda.reaproveitadas).toEqual([true]);
+    const lado = await vistasArquivo(ARQUIVO, { vista: 'frontal', saida: pasta });
+    expect(lado.destinos).toEqual([join(pasta, 'mancal-frontal.png')]);
+    for (const opcao of [{ corte: { eixo: 'x', valor: 0 } }, { explosao: { eixo: 'x', distancia: 10 } }, { previa: true }, { zoomForma: { formas: 'eixo' } }]) {
+      await expect(vistasArquivo(ARQUIVO, { vista: 'frontal', saida: pasta, nivelZero: true, ...opcao })).rejects.toThrow(/ficam no desenho das formas/);
+    }
+  }, 120_000);
+});

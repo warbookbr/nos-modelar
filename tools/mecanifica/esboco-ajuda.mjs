@@ -70,6 +70,7 @@ export const FRASES = {
   zoom: 'Zoom em uma forma, redesenhado na resolução cheia.',
   previa: 'Prévia rápida, rotulada, para iterar sem valer como veredito.',
   unidade: 'Unidade incremental: detalhar uma unidade sem refazer o esboço inteiro.',
+  blocagem: 'As vistas e a composta desenhadas pela blocagem do nível zero (`--nivel-zero`), com a silhueta conferida contra o desenho das formas.',
   ligacoes: 'Mapa de ligações em texto: quem toca quem, pontas livres e unidades soltas.',
   'formas-resolvidas': 'As formas de uma opção exportadas como dado puro, para o tradutor do nível zero.',
   resolvidas: 'O que cada tipo de forma resolvida leva na geometria.',

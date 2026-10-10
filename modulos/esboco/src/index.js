@@ -1901,6 +1901,12 @@ function quebrar(texto, n) {
   return linhas;
 }
 
+/* O quadro e a tinta do desenho das formas, para o desenhista da blocagem (`desenho-da-blocagem.js`) ter o mesmo quadro (painel,
+   topo, rodapé), a mesma luz e o mesmo sombreamento sem repetir a conta. */
+export const QUADRO = { painelL: PAINEL_L, painelA: PAINEL_A, topo: TOPO, rodape: RODAPE, margemDaLista: 48 };
+export const tintaDaFace = (corDaForma, normal) => cor(hexDe(corDaForma), 0.55 + 0.5 * Math.max(0, dot(normal, LUZ)));
+export const textoDoDesenho = { f1, esc, quebrar };
+
 /* Elementos do desenho que "ocultar" pode desligar. */
 export const OCULTAVEIS = ['linhasCentro', 'legendas', 'numeracao', 'marcadores', 'escala', 'titulo', 'nota'];
 
@@ -2260,7 +2266,7 @@ function gruposDeFormas(p) {
 const CELULA = 2;
 const RAIO_BALAO = 9;
 const SEPARACAO_BALAO = 2 * RAIO_BALAO + 3;
-const MARGEM_LISTA = 48;
+const MARGEM_LISTA = QUADRO.margemDaLista;
 const RESERVA_FOLGA = 16;
 const NUMERO_PROPRIO = /^\s*\d+\s*[.\-–)]/;
 
