@@ -38,6 +38,7 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | **guarda-roupa** | esboço | Móveis | 2026-10-08 | 1 | 1 | 143669 | 8 |
 | **cadeira** | esboço | Móveis | 2026-10-07 | 2 | 2 | 136343 | 9 |
 | **cadeira** | esboço | Móveis | 2026-10-08 | 1 | 1 | 101631 | 8 |
+| **cadeira** | esboço | Móveis | 2026-10-10 | 1 | 1 | 94093 | 9 |
 
 ## Histórico de medições
 
@@ -55,4 +56,5 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | 2026-10-08T17:59:54.580Z | `7e449634` | **cadeira de rodas** | objeto | 1 | 159687 | api | 8 | caminho curto: fresta entre assento e encosto, apoio de pé fora do centro da placa e placa do eixo grande demais |
 | 2026-10-08T17:59:54.779Z | `7e449634` | **guarda-roupa** | objeto | 1 | 143669 | api | 8 | caminho curto: sem defeito estrutural nas vistas externas; dobradiças aparentes por fora e interior não verificável |
 | 2026-10-08T17:59:54.960Z | `7e449634` | **cadeira** | objeto | 1 | 101631 | api | 8 | caminho curto: sem defeito estrutural; emenda ambígua no poste traseiro e estofado em laje reta |
+| 2026-10-10T20:47:00.360Z | `a4f013e1` | **cadeira** | objeto | 1 | 94093 | api | 9 | nível zero: maquete e conferência pela blocagem; sem defeito estrutural, só acabamento e proporção fina das ripas |
 

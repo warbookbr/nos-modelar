@@ -248,6 +248,18 @@
       "origemTokens": "api",
       "nota": 8,
       "motivo": "caminho curto: sem defeito estrutural; emenda ambígua no poste traseiro e estofado em laje reta"
+    },
+    {
+      "objeto": "cadeira",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-10T20:47:00.360Z",
+      "commit": "a4f013e1",
+      "tokens": 94093,
+      "origemTokens": "api",
+      "nota": 9,
+      "motivo": "nível zero: maquete e conferência pela blocagem; sem defeito estrutural, só acabamento e proporção fina das ripas"
     }
   ]
 }

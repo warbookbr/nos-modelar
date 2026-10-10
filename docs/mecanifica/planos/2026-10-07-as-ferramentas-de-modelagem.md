@@ -151,8 +151,9 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    peça recusando parte fora do envelope e porta movida.
 4. O esboço refeito sobre o nível zero, com o processo do módulo atual, pelo
    [desenho](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-4) que a
-   pessoa aprovou em 2026-10-10. As tarefas 1 a 7 entraram em 2026-10-10; falta
-   medir o custo de um objeto refeito.
+   pessoa aprovou em 2026-10-10. Feita em 2026-10-10: a cadeira refeita pelo
+   nível zero custou 94.093 tokens com nota 9, contra 101.631 e nota 8; as vistas
+   do crítico seguem no desenhista atual, que mostra a cavidade.
 5. O resto da camada de features sobre os seletores existentes. Em 2026-10-10
    entrou o perfil com furo e deslocamento de contorno sobre a `CrossSection`
    (operação `extrusao` e `lathe` com `furos`), a seleção de face e aresta por

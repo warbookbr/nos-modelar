@@ -1,0 +1,123 @@
+{
+  "vista": "isometrica",
+  "plano": {
+    "texto": "Nível: medio (cadeira de jantar reconhecível, medidas e contrato de relações, Maquete e Conferência). Medidas: altura do assento 450 mm, assento 440 x 420 x 40 mm, altura total 900 mm e pernas de seção 40 mm, todas do conhecimento corrente de cadeira de jantar (origem ia), sem ficha nem foto. Partes: assento, quatro pernas, quatro travessas sob o assento, dois montantes traseiros, travessa superior e inferior do encosto, ripas verticais entre as travessas e duas barras laterais de pé. Representação: tudo em caixas (com raio no assento), sem curva livre; o que não se representa é a inclinação do encosto e o conforto côncavo do assento, e as pernas traseiras terminam no assento e os montantes continuam sobre ele no mesmo prumo. Contato: gate ligado, tolerância 1 mm e penetração 1 mm, sem exceção atravessa nem livre, porque todas as peças são desenhadas encostadas por âncora ou espelho.",
+    "nivel": "medio",
+    "medidas": [
+      { "nome": "alturaTotal", "valor": 900, "unidade": "mm", "origem": "ia", "mede": "alturaTotal" },
+      { "nome": "larguraTotal", "valor": 440, "unidade": "mm", "origem": "ia", "mede": "larguraTotal" },
+      { "nome": "profundidadeTotal", "valor": 420, "unidade": "mm", "origem": "ia", "mede": "profundidadeTotal" },
+      { "nome": "alturaAssento", "valor": 450, "unidade": "mm", "origem": "ia", "mede": { "caixa": "y", "formas": ["assento", "perna*"] } },
+      { "nome": "larguraAssento", "valor": 440, "unidade": "mm", "origem": "ia", "mede": { "caixa": "x", "formas": ["assento"] } },
+      { "nome": "profundidadeAssento", "valor": 420, "unidade": "mm", "origem": "ia", "mede": { "caixa": "z", "formas": ["assento"] } },
+      { "nome": "alturaEncosto", "valor": 450, "unidade": "mm", "origem": "ia", "mede": { "caixa": "y", "formas": ["montante*"] } },
+      { "nome": "secaoPerna", "valor": 40, "unidade": "mm", "origem": "ia", "mede": { "caixa": "x", "formas": ["pernaFE"] } }
+    ],
+    "pecas": [
+      { "nome": "assento", "formas": ["assento"], "obrigatoria": true },
+      { "nome": "pernas", "formas": ["perna*"], "obrigatoria": true },
+      { "nome": "travessas sob o assento", "formas": ["avental*"], "obrigatoria": true },
+      { "nome": "montantes do encosto", "formas": ["montante*"], "obrigatoria": true },
+      { "nome": "travessas do encosto", "formas": ["trilho*"], "obrigatoria": true },
+      { "nome": "ripas do encosto", "formas": ["ripa*"], "obrigatoria": true },
+      { "nome": "barras de pe", "formas": ["barraPe*"], "obrigatoria": true }
+    ],
+    "contrato": {
+      "tocam": [
+        ["assento", "pernaFE"],
+        ["assento", "pernaTD"],
+        ["assento", "montanteE"],
+        ["assento", "montanteD"],
+        ["aventalFrente", "pernaFE"],
+        ["aventalFrente", "pernaFD"],
+        ["aventalTras", "pernaTE"],
+        ["aventalLatE", "pernaFE"],
+        ["aventalLatE", "pernaTE"],
+        ["aventalLatD", "pernaFD"],
+        ["aventalFrente", "assento"],
+        ["barraPeE", "pernaFE"],
+        ["barraPeE", "pernaTE"],
+        ["barraPeD", "pernaFD"],
+        ["montanteE", "trilhoSuperior"],
+        ["montanteD", "trilhoSuperior"],
+        ["montanteE", "trilhoInferior"],
+        ["ripa", "trilhoInferior"],
+        ["ripa", "trilhoSuperior"],
+        ["ripa2", "trilhoSuperior"]
+      ],
+      "livres": [
+        ["pernaFE", "pernaFD"],
+        ["pernaFE", "pernaTE"],
+        ["ripa", "ripa1"],
+        ["assento", "trilhoInferior"]
+      ],
+      "simetricas": [
+        ["pernaFE", "pernaFD"],
+        ["pernaFE", "pernaTE"],
+        ["pernaTE", "pernaTD"],
+        ["montanteE", "montanteD"],
+        ["aventalLatE", "aventalLatD"],
+        ["barraPeE", "barraPeD"]
+      ],
+      "fixa": [
+        { "a": "perna*", "b": "avental*", "pontos": 2 },
+        { "a": "montante*", "b": "trilho*", "pontos": 2 }
+      ]
+    }
+  },
+  "parametros": {
+    "larguraAssento": 440,
+    "profundidadeAssento": 420,
+    "espAssento": 40,
+    "alturaPerna": 410,
+    "secaoPerna": 40,
+    "recuo": 10,
+    "alturaTotal": 900,
+    "xPerna": "=larguraAssento/2-recuo-secaoPerna/2",
+    "zPerna": "=profundidadeAssento/2-recuo-secaoPerna/2",
+    "espAvental": 20,
+    "alturaAvental": 60,
+    "alturaMontante": "=alturaTotal-alturaPerna-espAssento",
+    "alturaTrilhoSup": 80,
+    "alturaTrilhoInf": 50,
+    "espTrilho": 25,
+    "vaoTrilho": 70,
+    "passoRipa": 90,
+    "larguraRipa": 30,
+    "alturaRipa": "=alturaMontante-vaoTrilho-alturaTrilhoInf-alturaTrilhoSup",
+    "secaoBarraPe": 25,
+    "alturaBarraPe": 120
+  },
+  "contato": { "usar": true, "tolerancia": 1, "penetracao": 1 },
+  "opcoes": [
+    {
+      "titulo": "Cadeira de jantar",
+      "nota": "Quatro pernas, travessas, assento e encosto de ripas",
+      "formas": [
+        { "id": "pernaFE", "tipo": "caixa", "largura": "secaoPerna", "altura": "alturaPerna", "profundidade": "secaoPerna", "centro": ["=0-xPerna", "=alturaPerna/2", "zPerna"], "cor": "#a0724a", "rotulo": "perna_frente_esquerda" },
+        { "id": "pernaFD", "espelha": { "forma": "pernaFE", "eixo": "x", "pos": 0 } },
+        { "id": "pernaTE", "espelha": { "forma": "pernaFE", "eixo": "z", "pos": 0 } },
+        { "id": "pernaTD", "espelha": { "forma": "pernaTE", "eixo": "x", "pos": 0 } },
+
+        { "id": "assento", "tipo": "caixa", "largura": "larguraAssento", "altura": "espAssento", "profundidade": "profundidadeAssento", "raio": 8, "centro": "pernaFE.+y", "desloca": ["xPerna", "=espAssento/2", "=0-zPerna"], "cor": "#c89b6d", "rotulo": "assento" },
+
+        { "id": "aventalFrente", "tipo": "caixa", "largura": "=2*xPerna-secaoPerna", "altura": "alturaAvental", "profundidade": "espAvental", "centro": "pernaFE.+y", "desloca": ["xPerna", "=0-alturaAvental/2", "=secaoPerna/2-espAvental/2"], "cor": "#8a5f3b", "rotulo": "travessa_frente" },
+        { "id": "aventalTras", "espelha": { "forma": "aventalFrente", "eixo": "z", "pos": 0 } },
+        { "id": "aventalLatE", "tipo": "caixa", "largura": "espAvental", "altura": "alturaAvental", "profundidade": "=2*zPerna-secaoPerna", "centro": "pernaFE.+y", "desloca": ["=0-(secaoPerna/2-espAvental/2)", "=0-alturaAvental/2", "=0-zPerna"], "cor": "#8a5f3b", "rotulo": "travessa_lateral" },
+        { "id": "aventalLatD", "espelha": { "forma": "aventalLatE", "eixo": "x", "pos": 0 } },
+
+        { "id": "barraPeE", "tipo": "caixa", "largura": "secaoBarraPe", "altura": "secaoBarraPe", "profundidade": "=2*zPerna-secaoPerna", "centro": "pernaFE.-y", "desloca": [0, "=alturaBarraPe+secaoBarraPe/2", "=0-zPerna"], "cor": "#8a5f3b", "rotulo": "barra_de_pe" },
+        { "id": "barraPeD", "espelha": { "forma": "barraPeE", "eixo": "x", "pos": 0 } },
+
+        { "id": "montanteE", "tipo": "caixa", "largura": "secaoPerna", "altura": "alturaMontante", "profundidade": "secaoPerna", "centro": "pernaTE.+y", "desloca": [0, "=espAssento+alturaMontante/2", 0], "cor": "#a0724a", "rotulo": "montante_traseiro" },
+        { "id": "montanteD", "espelha": { "forma": "montanteE", "eixo": "x", "pos": 0 } },
+
+        { "id": "trilhoSuperior", "tipo": "caixa", "largura": "=2*xPerna-secaoPerna", "altura": "alturaTrilhoSup", "profundidade": "espTrilho", "centro": "montanteE.+y", "desloca": ["xPerna", "=0-alturaTrilhoSup/2", 0], "cor": "#8a5f3b", "rotulo": "travessa_superior_encosto" },
+        { "id": "trilhoInferior", "tipo": "caixa", "largura": "=2*xPerna-secaoPerna", "altura": "alturaTrilhoInf", "profundidade": "espTrilho", "centro": "montanteE.-y", "desloca": ["xPerna", "=vaoTrilho+alturaTrilhoInf/2", 0], "cor": "#8a5f3b", "rotulo": "travessa_inferior_encosto" },
+
+        { "id": "ripa", "tipo": "caixa", "largura": "larguraRipa", "altura": "alturaRipa", "profundidade": 15, "centro": "trilhoInferior.+y", "desloca": ["=0-passoRipa", "=alturaRipa/2", 0], "cor": "#c89b6d", "rotulo": "ripa_encosto" },
+        { "arranja": { "forma": "ripa", "modo": "linear", "total": 3, "passo": ["passoRipa", 0, 0], "nomes": ["ripa1", "ripa2"] } }
+      ]
+    }
+  ]
+}
