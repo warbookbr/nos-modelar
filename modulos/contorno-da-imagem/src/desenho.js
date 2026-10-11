@@ -11,13 +11,51 @@ import { PNG } from 'pngjs';
 import { carregarOpenCV } from './opencv.js';
 import { empilharColuna } from './colunas.js';
 
-/* Matiz pelo ângulo de ouro: dois índices seguidos caem longe um do outro no
-   círculo de cores. Com a divisão igual do círculo, partes vizinhas na ordem
-   alfabética, como garfoPunho e flange, saíam no mesmo tom. */
-function corDe(i) {
-  const h = (i * 137.508) % 360;
+function corDoMatiz(h) {
   const f = (n) => { const k = (n + h / 60) % 6; return Math.round(255 * (1 - Math.max(0, Math.min(k, 4 - k, 1)))); };
   return [f(5), f(3), f(1)];
+}
+
+/* O matiz de cada parte é escolhido contra as vizinhas na imagem, e não pela
+   posição do nome na lista. Pelo ângulo de ouro sobre a ordem dos nomes,
+   estabilizadorEsq e profundorEsq, vizinhos na vista de topo do avião, caíram
+   a 20° um do outro, e a 20% de opacidade o crítico não viu a divisa entre
+   eles. Aqui as partes com mais vizinhas escolhem primeiro, entre os matizes
+   do ângulo de ouro, o mais distante das vizinhas já pintadas; no empate fica
+   o matiz menos usado e, depois, o de menor índice, então o resultado é
+   determinístico. Acima de 90° a distância já basta e não pesa mais que o
+   uso, para as partes não ficarem todas no mesmo tom oposto. Duas partes que não se tocam podem repetir o matiz, porque a
+   etiqueta numerada as distingue; exigir matiz único deixou, no mesmo topo,
+   os pares a 33° um do outro. */
+const BASTA = 90;
+
+export function matizesPorVizinhanca(rotulos, largura, ordem) {
+  const vizinhas = new Map(ordem.map((r) => [r, new Set()]));
+  const ligar = (a, b) => { if (a !== b && vizinhas.has(a) && vizinhas.has(b)) { vizinhas.get(a).add(b); vizinhas.get(b).add(a); } };
+  /* O watershed deixa a divisa como linha de 1 px com rótulo próprio, então
+     as vizinhas se encontram a até 2 px uma da outra. */
+  for (let p = 0; p < rotulos.length; p += 1) {
+    const x = p % largura;
+    for (const d of [1, 2]) {
+      if (x + d < largura) ligar(rotulos[p], rotulos[p + d]);
+      if (p + d * largura < rotulos.length) ligar(rotulos[p], rotulos[p + d * largura]);
+    }
+  }
+  const candidatos = Array.from({ length: 12 }, (_, k) => (k * 137.508) % 360);
+  const distancia = (a, b) => { const d = Math.abs(a - b) % 360; return Math.min(d, 360 - d); };
+  const fila = ordem.map((r, i) => ({ r, i })).sort((a, b) => vizinhas.get(b.r).size - vizinhas.get(a.r).size || a.i - b.i);
+  const matiz = new Map();
+  const usos = candidatos.map(() => 0);
+  for (const { r } of fila) {
+    const pintadas = [...vizinhas.get(r)].filter((v) => matiz.has(v));
+    let melhor = -1; let folga = -1;
+    for (let k = 0; k < candidatos.length; k += 1) {
+      const f = Math.min(BASTA, ...pintadas.map((v) => distancia(candidatos[k], candidatos[matiz.get(v)])));
+      if (f > folga || (f === folga && usos[k] < usos[melhor])) { folga = f; melhor = k; }
+    }
+    matiz.set(r, melhor); usos[melhor] += 1;
+  }
+  return new Map([...matiz].map(([r, k]) => [r, candidatos[k]]));
 }
 
 /* A pintura vai pela máscara de cada região, pixel a pixel, e não pelo
@@ -27,7 +65,8 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
   const png = PNG.sync.read(pngBuffer);
   const { rotulos, silhueta, regioes } = segmentacao;
   const nomes = Object.keys(regioes);
-  const corPor = new Map(nomes.map((nome, i) => [regioes[nome].rotulo, corDe(i)]));
+  const matizes = matizesPorVizinhanca(rotulos, png.width, nomes.map((nome) => regioes[nome].rotulo));
+  const corPor = new Map([...matizes].map(([rotulo, h]) => [rotulo, corDoMatiz(h)]));
   const saida = new PNG({ width: png.width, height: png.height });
   for (let p = 0; p < rotulos.length; p += 1) {
     const o = p * 4;

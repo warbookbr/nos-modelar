@@ -20,3 +20,21 @@ python3 -c "from PIL import Image; import numpy as np; a=np.asarray(Image.open('
 
 O processo pegou o defeito (o crítico o viu), mas a ferramenta não oferece
 saída: falta o contorno fechar buracos pequenos cercados pela silhueta.
+
+## 2. Partes vizinhas no mesmo tom no mapa de partes
+
+Na vista de topo, o crítico não achou a divisa entre estabilizador e profundor
+e os apontou como defeito, embora a semente já seguisse o degrau. A cor de cada
+parte saía da posição do nome na lista, pelo ângulo de ouro, e os pares caíram
+a 20° um do outro; a 20% de opacidade não se vê a fronteira. O desenhador
+achou a causa e não tinha como corrigi-la mexendo só nas sementes.
+
+Corrigido em 2026-10-11 em `modulos/contorno-da-imagem/src/desenho.js`: o
+matiz passa a ser escolhido contra as partes vizinhas na imagem
+(`matizesPorVizinhanca`), com teste no módulo. A menor distância entre
+vizinhas ficou em 85° no topo e 65° na lateral e na frontal. O processo pegou o
+sintoma pelo crítico, e o teste novo passa a pegar a causa.
+
+```bash
+npx vitest run modulos/contorno-da-imagem
+```

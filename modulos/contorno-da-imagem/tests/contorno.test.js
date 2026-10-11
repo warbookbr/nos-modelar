@@ -21,6 +21,20 @@ function imagem() {
 const config = { limiar: 225, regioes: { esquerda: [30, 30], direita: [90, 30] } };
 
 describe('contorno da imagem', () => {
+  it('pinta partes vizinhas em matizes distantes, mesmo quando os nomes caem em índices de tom parecido', async () => {
+    const { matizesPorVizinhanca } = await import('../src/index.js');
+    /* Faixa de quatro partes lado a lado, 2-3-4-5, e uma sexta isolada. Na
+       ordem dada, os rótulos 2 e 3 recebiam pelo ângulo de ouro os índices 0 e
+       5, que ficam a 47° um do outro. */
+    const largura = 10;
+    const rotulos = Int32Array.from({ length: 30 }, (_, p) => { const x = p % largura; return x < 2 ? 2 : x < 4 ? 3 : x < 6 ? 4 : x < 8 ? 5 : 6; });
+    const ordem = [2, 6, 7, 8, 9, 3, 4, 5];
+    const matiz = matizesPorVizinhanca(rotulos, largura, ordem);
+    const d = (a, b) => { const x = Math.abs(matiz.get(a) - matiz.get(b)) % 360; return Math.min(x, 360 - x); };
+    for (const [a, b] of [[2, 3], [3, 4], [4, 5], [5, 6]]) expect(d(a, b)).toBeGreaterThanOrEqual(90);
+    expect(matizesPorVizinhanca(rotulos, largura, ordem)).toEqual(matiz);
+  });
+
   it('aceita pontos soltos misturados com linhas na mesma semente', async () => {
     const { tracosDaSemente } = await import('../src/index.js');
     expect(tracosDaSemente([[1, 2], [[3, 4], [5, 6]]])).toEqual([[[1, 2]], [[3, 4], [5, 6]]]);
