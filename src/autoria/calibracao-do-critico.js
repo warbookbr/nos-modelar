@@ -12,7 +12,7 @@
  * O validador é puro: lê o JSON e recusa o que o formato não aceita, com o campo, o valor e o que era aceito. Os hashes, as
  * imagens e as medidas são conferidos por `tools/mecanifica/calibracao-do-critico.mjs`, que é o gate `calibracao:check`. O campo
  * `resultados` fica vazio até a primeira rodada de julgamentos, e vazio o conjunto diz "calibração não medida". Cada julgamento
- * guarda a nota, os defeitos que o crítico apontou, a impressão do brief exato e a data; `extrairVeredito` lê a resposta do crítico
+ * guarda a nota, os defeitos que o crítico apontou, a impressão do brief exato, a impressão das quatro vistas que ele viu e a data; `extrairVeredito` lê a resposta do crítico
  * e `pontuarImagem` e `pontuarConjunto` dizem se a imagem e o conjunto acertam, pela regra da tarefa 6 do desenho da fatia 8. */
 import { normalizarRazoesDaPeca } from './razoes-da-peca.js';
 import { TIPOS_DE_DEFEITO, TIPOS_ESTRUTURAIS } from './veredito-de-forma.js';
@@ -329,7 +329,7 @@ export function lerConjunto(bruto, { exigirGerados = true } = {}) {
     if (!ids.has(res.imagem)) recusar(`${onde}.imagem`, res.imagem, `id de uma imagem do conjunto: ${[...ids].join(', ')}`);
     exigirSha(res.agenteSha256, `${onde}.agenteSha256`, true);
     exigirSha(res.briefSha256, `${onde}.briefSha256`, true);
-    if (!(Array.isArray(res.julgamentos) && res.julgamentos.length > 0)) recusar(`${onde}.julgamentos`, res.julgamentos, 'lista de julgamentos, cada um com `nota`, `defeitos`, `briefSha256` e `data`');
+    if (!(Array.isArray(res.julgamentos) && res.julgamentos.length > 0)) recusar(`${onde}.julgamentos`, res.julgamentos, 'lista de julgamentos, cada um com `nota`, `defeitos`, `briefSha256`, `imagemSha256` e `data`');
     res.julgamentos.forEach((j, k) => lerJulgamento(j, `${onde}.julgamentos[${k}]`));
     const total = (recebidos.get(res.imagem) ?? 0) + res.julgamentos.length;
     recebidos.set(res.imagem, total);
@@ -350,13 +350,14 @@ function lerDefeitoJulgado(d, onde) {
   return { parte: d.parte.trim(), tipo: d.tipo.trim(), onde: d.onde.trim(), sentido: d.sentido.trim(), evidencia: d.evidencia.trim() };
 }
 
-/** Um julgamento gravado: a nota, os defeitos, a impressão do brief exato que o crítico leu e a data. */
+/** Um julgamento gravado: a nota, os defeitos, a impressão do brief exato que o crítico leu, a impressão das quatro vistas que ele viu e a data. */
 export function lerJulgamento(j, onde = 'julgamento') {
-  if (!plano(j)) recusar(onde, j, 'objeto { nota, defeitos, briefSha256, data }');
+  if (!plano(j)) recusar(onde, j, 'objeto { nota, defeitos, briefSha256, imagemSha256, data }');
   if (!(finito(j.nota) && j.nota >= 0 && j.nota <= 10)) recusar(`${onde}.nota`, j.nota, 'número de 0 a 10');
   if (!Array.isArray(j.defeitos)) recusar(`${onde}.defeitos`, j.defeitos, 'lista de defeitos, vazia quando o crítico não achou nenhum');
   j.defeitos.forEach((d, i) => lerDefeitoJulgado(d, `${onde}.defeitos[${i}]`));
   exigirSha(j.briefSha256, `${onde}.briefSha256`, true);
+  exigirSha(j.imagemSha256, `${onde}.imagemSha256`, true);
   if (!(texto(j.data) && !Number.isNaN(Date.parse(j.data)))) recusar(`${onde}.data`, j.data, 'data e hora em ISO 8601');
   return j;
 }

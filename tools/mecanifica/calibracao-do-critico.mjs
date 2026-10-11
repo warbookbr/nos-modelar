@@ -25,10 +25,11 @@
  *   npm run calibracao -- brief <id>                                       o brief exato que o crítico cego recebe para a imagem
  *   npm run calibracao -- registrar <id> --arquivo <saida-do-critico.txt>  grava o julgamento (a resposta termina com o JSON do veredito)
  *   npm run calibracao -- resumo                                           a pontuação por imagem e a do conjunto
+ *   npm run calibracao -- migrar-imagem                                    migração única: grava `imagemSha256` nos julgamentos que ainda não o têm
  *
  * A pontuação (`pontuarConjunto`, em `src/autoria/calibracao-do-critico.js`) entra no gate: enquanto faltam julgamentos o gate diz
  * quantos faltam por imagem e passa; com todos, reprova se o conjunto não acerta. O gate também reprova o brief que conta o defeito
- * ou a mutação e o julgamento dado a um brief que já não é o da imagem. */
+ * ou a mutação e o julgamento dado a um brief ou a vistas que já não são os da imagem (`imagemSha256`, a impressão das quatro vistas). */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -69,6 +70,7 @@ const USO = [
   '  npm run calibracao -- brief <id>',
   '  npm run calibracao -- registrar <id> --arquivo <saida-do-critico.txt>',
   '  npm run calibracao -- resumo',
+  '  npm run calibracao -- migrar-imagem',
 ].join('\n');
 
 export class ErroDeUso extends Error {}
@@ -111,6 +113,12 @@ export function modeloDoBrief() {
   };
 }
 export const hashDoBrief = () => sha256(JSON.stringify(modeloDoBrief()));
+
+/**
+ * A impressão das quatro vistas que o crítico vê de uma imagem, na ordem do brief: o `sha256` gravado de cada PNG. Um julgamento
+ * guarda essa impressão em `imagemSha256`; trocar a fonte de uma imagem sem mudar o texto do brief muda esta e não a do brief.
+ */
+export const hashDaImagem = (imagem) => sha256(VISTAS_DO_CONJUNTO.map((vista) => imagem.vistas[vista].sha256).join('\n'));
 
 /* ---------- o brief exato de uma imagem ---------- */
 
@@ -472,6 +480,9 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
       const brief = briefDaImagem(imagem, { raiz });
       const vazou = vazamentosDoBrief(imagem, brief.variavel);
       if (vazou.length) reprovar(quem, 'brief-vaza', `o brief que o crítico cego recebe conta o defeito: ${vazou.join('; ')}`);
+      const hashAtual = hashDaImagem(imagem);
+      const deOutraImagem = conj.resultados.filter((r) => r.imagem === imagem.id).flatMap((r) => r.julgamentos).filter((j) => j.imagemSha256 !== hashAtual).length;
+      if (deOutraImagem) reprovar(quem, 'julgamento-de-outra-imagem', `${deOutraImagem} julgamento(s) foram dados a outra imagem que a de hoje (as vistas mudaram desde que o crítico as viu): julgue de novo`);
       for (const res of conj.resultados.filter((r) => r.imagem === imagem.id)) {
         const outros = res.julgamentos.filter((j) => j.briefSha256 !== brief.sha256).length;
         if (outros) reprovar(quem, 'julgamento-de-outro-brief', `${outros} julgamento(s) foram dados a outro brief que o desta imagem hoje (perguntas, caminhos ou objeto mudaram): refaça-os`);
@@ -509,7 +520,7 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
 export function conferir(opcoes = {}, saida = console) {
   let resultado;
   try {
-    resultado = conferirConjunto({ so: opcoes.so ?? null, raiz: opcoes.raiz ?? RAIZ });
+    resultado = conferirConjunto({ so: opcoes.so ?? null, raiz: opcoes.raiz ?? RAIZ, conjunto: opcoes.conjunto ?? null });
   } catch (erro) {
     if (!(erro instanceof ErroDeUso)) throw erro;
     saida.error(`calibracao: ${erro.message}\n${USO}`);
@@ -560,8 +571,9 @@ export function brief({ id, raiz = RAIZ }, saida = console) {
 
 /**
  * `registrar <id> --arquivo <saida>`: lê a resposta do crítico, que termina com o JSON do veredito, e grava um julgamento em
- * `resultados` com a nota, os defeitos, a impressão do brief exato, a data e as impressões do agente e do brief fixo. Recusa
- * resposta sem JSON válido, o crítico que mudou desde a calibração e a imagem que já tem todos os julgamentos.
+ * `resultados` com a nota, os defeitos, a impressão do brief exato, a das quatro vistas, a data e as impressões do agente e do brief
+ * fixo. Recusa resposta sem JSON válido, o crítico que mudou desde a calibração, a imagem que já tem julgamentos dados a outras vistas
+ * e a imagem que já tem todos os julgamentos.
  */
 export function registrar({ id, arquivo, raiz = RAIZ, agora = () => new Date() }, saida = console) {
   const conj = copia(lerConjuntoDoDisco({ raiz }));
@@ -579,14 +591,45 @@ export function registrar({ id, arquivo, raiz = RAIZ, agora = () => new Date() }
   const entradas = conj.resultados.filter((r) => r.imagem === id);
   const outra = entradas.find((r) => r.agenteSha256 !== agente || r.briefSha256 !== conj.critico.brief.sha256);
   if (outra) throw new ErroDaFonte(`${id} tem julgamentos de outro agente ou de outro brief fixo; apague-os de \`resultados\` e refaça`);
+  const hashDasVistas = hashDaImagem(imagem);
+  if (entradas.some((r) => r.julgamentos.some((j) => j.imagemSha256 !== hashDasVistas))) {
+    throw new ErroDaFonte(`${id} tem julgamentos dados a outra imagem que a de hoje (as vistas mudaram desde que o crítico as viu); apague-os de \`resultados\` e julgue de novo`);
+  }
   const recebidos = entradas.reduce((s, r) => s + r.julgamentos.length, 0);
   if (recebidos >= imagem.julgamentos) throw new ErroDaFonte(`${id} já tem ${recebidos} de ${imagem.julgamentos} julgamentos; não há mais o que registrar`);
-  const julgamento = { nota: veredito.nota, defeitos: veredito.defeitos, briefSha256: exato.sha256, data: agora().toISOString() };
+  const julgamento = { nota: veredito.nota, defeitos: veredito.defeitos, briefSha256: exato.sha256, imagemSha256: hashDasVistas, data: agora().toISOString() };
   if (entradas.length) entradas[0].julgamentos.push(julgamento);
   else conj.resultados.push({ imagem: id, agenteSha256: agente, briefSha256: conj.critico.brief.sha256, julgamentos: [julgamento] });
   lerConjunto(conj);
   writeFileSync(caminhoDoConjunto(raiz), `${JSON.stringify(conj, null, 2)}\n`, 'utf8');
   saida.log(`${id} ${imagem.nome}: julgamento ${recebidos + 1} de ${imagem.julgamentos} registrado, nota ${veredito.nota}, ${veredito.defeitos.length} defeito(s); brief ${exato.sha256.slice(0, 19)}.`);
+  return 0;
+}
+
+/**
+ * `migrar-imagem`: migração única dos julgamentos gravados antes de `imagemSha256`. Preenche, em cada julgamento que não tem o campo, a
+ * impressão das vistas atuais da imagem (todos foram dados às vistas gravadas hoje) e não muda nenhum outro campo nem sobrescreve o que
+ * já tem. Roda sobre o JSON bruto, porque o conjunto sem o campo já não é válido. Sai com 0 e diz quantos preencheu.
+ */
+export function migrarImagemDosJulgamentos({ raiz = RAIZ } = {}, saida = console) {
+  const arquivo = caminhoDoConjunto(raiz);
+  if (!existsSync(arquivo)) throw new ErroDaFonte(`o conjunto não existe: ${arquivo}`);
+  const conj = JSON.parse(readFileSync(arquivo, 'utf8'));
+  let preenchidos = 0;
+  for (const res of conj.resultados) {
+    const imagem = conj.imagens.find((i) => i.id === res.imagem);
+    if (!imagem) throw new ErroDaFonte(`o resultado cita a imagem ${res.imagem}, que não está no conjunto`);
+    const hash = hashDaImagem(imagem);
+    res.julgamentos = res.julgamentos.map((j) => {
+      if (j.imagemSha256 !== undefined) return j;
+      preenchidos += 1;
+      const { data, ...resto } = j;
+      return { ...resto, imagemSha256: hash, data };
+    });
+  }
+  lerConjunto(conj);
+  if (preenchidos > 0) writeFileSync(arquivo, `${JSON.stringify(conj, null, 2)}\n`, 'utf8');
+  saida.log(`migrar-imagem: ${preenchidos} julgamento(s) receberam a impressão das vistas atuais da imagem.`);
   return 0;
 }
 
@@ -732,6 +775,7 @@ export async function principal(argv, saida = console) {
     if (comando === 'brief') return brief({ id: argumentos[0] }, saida);
     if (comando === 'registrar') return registrar({ id: argumentos[0], arquivo: opcoes.arquivo === true ? undefined : opcoes.arquivo }, saida);
     if (comando === 'resumo') return resumo({}, saida);
+    if (comando === 'migrar-imagem') return migrarImagemDosJulgamentos({}, saida);
     if (comando === 'gerar') return await gerar({ so: opcoes.so, prancha: !opcoes['sem-prancha'] }, saida);
     if (comando === 'listar') return listar({}, saida);
     throw new ErroDeUso(comando ? `comando '${comando}' desconhecido.` : 'falta o comando.');

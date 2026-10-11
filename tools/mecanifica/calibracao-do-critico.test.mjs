@@ -10,26 +10,36 @@ import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { medidasEsperadas } from '../../src/autoria/calibracao-do-critico.js';
 import {
   RAIZ, ErroDaFonte, brief, briefDaImagem, caminhoDoConjunto, chamadaDaFonte, conferir, conferirConjunto, descreverFonte, esbocoDaFonte, executarChamada,
-  faltaNoAgente, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, modeloDoBrief, principal, registrar,
+  faltaNoAgente, hashDaImagem, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, migrarImagemDosJulgamentos, modeloDoBrief, principal, registrar,
   resumo, vazamentosDoBrief, vocabularioDoAgente,
 } from './calibracao-do-critico.mjs';
 import { hashDe } from './aprovacao-da-familia.mjs';
 import { linhasDoBriefDoObjeto } from './esboco.mjs';
 
-const conjuntoNovo = () => JSON.parse(JSON.stringify(lerConjuntoDoDisco()));
+/* uma cópia do conjunto versionado com `resultados` esvaziado: nenhum teste depende do que já foi julgado */
+const conjuntoNovo = () => ({ ...JSON.parse(JSON.stringify(lerConjuntoDoDisco())), resultados: [] });
+const conjuntoVazio = conjuntoNovo;
 const imagem = (c, nome) => c.imagens.find((i) => i.nome === nome);
 const saidaFalsa = () => { const linhas = { log: [], error: [] }; return { linhas, log: (t) => linhas.log.push(t), error: (t) => linhas.error.push(t) }; };
+const SHA_FALSO = `sha256:${'b'.repeat(64)}`;
 const codigos = (r) => r.problemas.map((p) => p.codigo);
 
 describe('o gate sobre o conjunto versionado', () => {
   it('passa, diz quantos defeitos da medida reprovou sem o crítico e que a calibração não foi medida', () => {
     const saida = saidaFalsa();
-    expect(conferir({}, saida)).toBe(0);
+    expect(conferir({ conjunto: conjuntoVazio() }, saida)).toBe(0);
     expect(saida.linhas.error).toEqual([]);
-    expect(saida.linhas.log[0]).toMatch(/^calibracao:check ok — 12 de 12 imagens \(3 controles, 1 de superfície, 8 estruturais\).*4 defeito\(s\) da medida reprovado\(s\) por ela sem chegar ao crítico/);
+    expect(saida.linhas.log[0]).toMatch(/^calibracao:check ok — 12 de 12 imagens \(3 controles, 1 de superfície, 6 estruturais\).*4 defeito\(s\) da medida reprovado\(s\) por ela sem chegar ao crítico/);
     expect(saida.linhas.log[1]).toBe('calibração não medida: nenhuma das 12 imagens tem julgamento do crítico (resultados vazio)');
     expect(saida.linhas.log[2]).toMatch(/^pontuação pendente: faltam 44 julgamentos \(c01 3, c02 5, .*\); o gate passa até que estejam todos\.$/);
   }, 120_000);
+
+  it('o conjunto versionado passa o gate com os julgamentos que tem, qualquer que seja o número deles', () => {
+    const saida = saidaFalsa();
+    expect(conferir({ so: 'c05' }, saida)).toBe(0);
+    expect(saida.linhas.error).toEqual([]);
+    expect(saida.linhas.log[0]).toMatch(/^calibracao:check ok — 1 de 12 imagens/);
+  });
 
   it('o script chama o gate e sai com 0', async () => {
     const saida = saidaFalsa();
@@ -65,6 +75,20 @@ describe('cada conferência reprova quando o que ela guarda muda', () => {
     const c = conjuntoNovo();
     c.resultados = [{ imagem: 'c05', agenteSha256: `sha256:${'2'.repeat(64)}`, briefSha256: c.critico.brief.sha256, julgamentos: [{ nota: 9 }] }];
     expect(codigos(conferirConjunto({ conjunto: c, so: 'c05' }))).toContain('resultado-de-outro-critico');
+  });
+
+  it('o julgamento dado a outra imagem reprova, mesmo com o brief igual, e diz para julgar de novo', () => {
+    const c = conjuntoVazio();
+    const img = imagem(c, 'controle-cilindro');
+    const julgamento = (imagemSha256) => ({ nota: 9, defeitos: [], briefSha256: briefDaImagem(img).sha256, imagemSha256, data: '2026-10-11T15:30:00.000Z' });
+    c.resultados = [{ imagem: img.id, agenteSha256: c.critico.agente.sha256, briefSha256: c.critico.brief.sha256, julgamentos: [julgamento(hashDaImagem(img)), julgamento(SHA_FALSO)] }];
+    const r = conferirConjunto({ conjunto: c, so: img.id });
+    expect(codigos(r)).toEqual(['julgamento-de-outra-imagem']);
+    expect(r.problemas[0].mensagem).toMatch(/^1 julgamento\(s\) foram dados a outra imagem.*julgue de novo$/);
+    /* a imagem muda quando um PNG gravado muda, e o hash dos julgamentos antigos deixa de ser o dela */
+    const trocada = JSON.parse(JSON.stringify(img));
+    trocada.vistas.lateral.sha256 = SHA_FALSO;
+    expect(hashDaImagem(trocada)).not.toBe(hashDaImagem(img));
   });
 
   it('o desenho da fonte mudou: a mutação de uma imagem muda a impressão e a geometria', () => {
@@ -231,7 +255,6 @@ describe('a descrição das fontes e a impressão do desenho', () => {
 /* ---------- o brief exato, o registro e a pontuação ---------- */
 
 const PASTA = 'docs/mecanifica/banco-de-provas/calibracao-do-critico';
-const SHA_FALSO = `sha256:${'b'.repeat(64)}`;
 const veredito = (nota, defeitos = []) => `Análise: olhei as quatro vistas.\n${JSON.stringify({ alvo: 'brief', nota, defeitos, observacao: 'registro sintético da prova' })}\n`;
 const defeitoDito = (parte, tipo) => ({ parte, tipo, onde: 'extremidade da peça', sentido: tipo === 'uniao' ? 'afastado' : 'maior', evidencia: 'visto na vista lateral, na extremidade' });
 
@@ -307,7 +330,7 @@ describe('registrar o julgamento do crítico', () => {
     raiz = mkdtempSync(join(tmpdir(), 'calibracao-'));
     mkdirSync(join(raiz, PASTA), { recursive: true });
     mkdirSync(join(raiz, '.claude/agents'), { recursive: true });
-    copyFileSync(caminhoDoConjunto(), caminhoDoConjunto(raiz));
+    writeFileSync(caminhoDoConjunto(raiz), `${JSON.stringify(conjuntoVazio(), null, 2)}\n`);
     copyFileSync(`${RAIZ}/.claude/agents/critico-visual.md`, join(raiz, '.claude/agents/critico-visual.md'));
   });
   afterEach(() => rmSync(raiz, { recursive: true, force: true }));
@@ -323,7 +346,7 @@ describe('registrar o julgamento do crítico', () => {
     expect(c.resultados[0]).toMatchObject({ imagem: 'c05', agenteSha256: c.critico.agente.sha256, briefSha256: c.critico.brief.sha256 });
     expect(c.resultados[0].julgamentos).toHaveLength(2);
     expect(c.resultados[0].julgamentos[0]).toEqual({
-      nota: 9, defeitos: [defeitoDito('haste', 'uniao')], briefSha256: briefDaImagem(img).sha256, data: '2026-10-11T15:30:00.000Z',
+      nota: 9, defeitos: [defeitoDito('haste', 'uniao')], briefSha256: briefDaImagem(img).sha256, imagemSha256: hashDaImagem(img), data: '2026-10-11T15:30:00.000Z',
     });
     expect(c.resultados[0].julgamentos[0].defeitos[0]).not.toHaveProperty('alvo');
     expect(Object.keys(c)).toEqual(Object.keys(lerConjuntoDoDisco()));
@@ -340,6 +363,36 @@ describe('registrar o julgamento do crítico', () => {
     expect(readFileSync(caminhoDoConjunto(raiz), 'utf8')).toBe(antes);
     for (let i = 0; i < 5; i += 1) registrar({ id: 'c05', arquivo: arquivoDe(veredito(9)), raiz, agora }, saidaFalsa());
     expect(() => registrar({ id: 'c05', arquivo: arquivoDe(veredito(9)), raiz }, saidaFalsa())).toThrow(/já tem 5 de 5/);
+  });
+
+  it('recusa registrar a imagem que já tem julgamento dado a outra imagem, e o conjunto fica como estava', () => {
+    expect(registrar({ id: 'c05', arquivo: arquivoDe(veredito(9)), raiz, agora }, saidaFalsa())).toBe(0);
+    const c = gravado();
+    c.resultados[0].julgamentos[0].imagemSha256 = SHA_FALSO;
+    writeFileSync(caminhoDoConjunto(raiz), `${JSON.stringify(c, null, 2)}\n`);
+    const antes = readFileSync(caminhoDoConjunto(raiz), 'utf8');
+    expect(() => registrar({ id: 'c05', arquivo: arquivoDe(veredito(9)), raiz, agora }, saidaFalsa())).toThrow(/outra imagem.*julgue de novo/);
+    expect(readFileSync(caminhoDoConjunto(raiz), 'utf8')).toBe(antes);
+  });
+
+  it('a migração preenche só o campo que falta, com a impressão das vistas atuais, e uma segunda vez não muda nada', () => {
+    registrar({ id: 'c05', arquivo: arquivoDe(veredito(9, [defeitoDito('haste', 'uniao')])), raiz, agora }, saidaFalsa());
+    registrar({ id: 'c01', arquivo: arquivoDe(veredito(6)), raiz, agora }, saidaFalsa());
+    const c = gravado();
+    const esperado = JSON.parse(JSON.stringify(c));
+    delete c.resultados[0].julgamentos[0].imagemSha256;
+    c.resultados[1].julgamentos[0].imagemSha256 = SHA_FALSO;
+    writeFileSync(caminhoDoConjunto(raiz), `${JSON.stringify(c, null, 2)}\n`);
+    const saida = saidaFalsa();
+    expect(migrarImagemDosJulgamentos({ raiz }, saida)).toBe(0);
+    expect(saida.linhas.log[0]).toMatch(/^migrar-imagem: 1 julgamento/);
+    const depois = gravado();
+    esperado.resultados[1].julgamentos[0].imagemSha256 = SHA_FALSO;
+    expect(depois).toEqual(esperado);
+    expect(Object.keys(depois.resultados[0].julgamentos[0])).toEqual(['nota', 'defeitos', 'briefSha256', 'imagemSha256', 'data']);
+    const texto = readFileSync(caminhoDoConjunto(raiz), 'utf8');
+    migrarImagemDosJulgamentos({ raiz }, saidaFalsa());
+    expect(readFileSync(caminhoDoConjunto(raiz), 'utf8')).toBe(texto);
   });
 
   it('recusa registrar quando o agente do crítico mudou desde a calibração', () => {
@@ -359,7 +412,7 @@ describe('registrar o julgamento do crítico', () => {
 
   it('o resumo da imagem que acerta, a que erra e a que ainda falta; o gate reflete o conjunto', () => {
     const c = gravado();
-    const jg = (nome, nota, defeitos = []) => ({ nota, defeitos, briefSha256: SHA_FALSO, data: '2026-10-11T15:30:00.000Z' });
+    const jg = (nome, nota, defeitos = []) => ({ nota, defeitos, briefSha256: SHA_FALSO, imagemSha256: SHA_FALSO, data: '2026-10-11T15:30:00.000Z' });
     const entrada = (nome, julgamentos) => ({ imagem: imagem(c, nome).id, agenteSha256: c.critico.agente.sha256, briefSha256: c.critico.brief.sha256, julgamentos });
     const cita = defeitoDito('dobradicas', 'posicao');
     c.resultados = [
@@ -389,7 +442,7 @@ describe('a pontuação no gate', () => {
         const acerta = criterio(img);
         const nota = acerta ? Math.floor((img.faixaDaNota[0] + img.faixaDaNota[1]) / 2) : (img.classe === 'controle' ? 2 : 10);
         const defeitos = acerta ? img.defeitos.filter((d) => d.decide === 'critico').map((d) => defeitoDito(d.parte, d.tipo)) : [];
-        return { nota, defeitos, briefSha256: brief, data: '2026-10-11T15:30:00.000Z' };
+        return { nota, defeitos, briefSha256: brief, imagemSha256: hashDaImagem(img), data: '2026-10-11T15:30:00.000Z' };
       });
       return { imagem: img.id, agenteSha256: c.critico.agente.sha256, briefSha256: c.critico.brief.sha256, julgamentos };
     });
@@ -397,7 +450,7 @@ describe('a pontuação no gate', () => {
   };
 
   it('sem julgamentos, e com os que faltam, o gate passa e diz quantos faltam por imagem', () => {
-    const vazio = conferirConjunto({ so: null });
+    const vazio = conferirConjunto({ conjunto: conjuntoVazio(), so: null });
     expect(vazio.ok).toBe(true);
     expect(vazio.pontuacao).toMatchObject({ estado: 'nao-medido', faltamNoTotal: 44 });
     expect(linhaDoEstado(vazio.pontuacao)).toBe('pontuação pendente: faltam 44 julgamentos (c01 3, c02 5, c03 5, c04 3, c05 5, c06 3, c07 5, c08 3, c09 3, c10 3, c11 3, c12 3); o gate passa até que estejam todos.');
