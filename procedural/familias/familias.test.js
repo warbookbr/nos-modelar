@@ -42,7 +42,7 @@ describe('o registro de famílias', () => {
     expect(registro.familias).toEqual(['tubo-de-prova']);
     expect(registro.obter('tubo-de-prova')).toBe(TUBO_DE_PROVA);
     expect(new Set(FAMILIAS.map(({ contrato }) => contrato.id)).size).toBe(FAMILIAS.length);
-    expect(FAMILIAS.map(({ contrato }) => contrato.id)).toEqual(expect.arrayContaining(['roda-pneu', 'dobradica']));
+    expect(FAMILIAS.map(({ contrato }) => contrato.id)).toEqual(expect.arrayContaining(['roda-pneu', 'dobradica', 'cilindro-hidraulico']));
   });
 
   it('recusa lista vazia, família repetida e família que não existe, dizendo o que é aceito', () => {

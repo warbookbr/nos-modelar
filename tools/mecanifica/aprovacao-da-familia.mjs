@@ -238,10 +238,16 @@ function conferirMedidas(medidas) {
   return achados;
 }
 
-/** O que se guarda de uma medida: a articulação só registra a declaração, porque o curso se confere contra a montagem. */
-function medidaGuardada(m) {
+/**
+ * O que se guarda de uma medida: a articulação registra a declaração, porque o curso se confere contra a montagem. Se a
+ * família gera a montagem e o curso dessa articulação foi conferido (`conferidas`, as de `montagem.articulacoes`), a medida
+ * diz que foi, e o resultado está no `montagem` do ponto.
+ */
+function medidaGuardada(m, conferidas = []) {
   const arredondada = Object.fromEntries(Object.entries(m).map(([chave, valor]) => [chave, arredondar(valor)]));
   if (m.ferramenta !== 'articulacao') return arredondada;
+  const feita = conferidas.find((articulacao) => articulacao.id === m.id);
+  if (feita) return { ...arredondada, conferido: feita.conferido };
   return { ...arredondada, conferido: false, motivo: 'o curso se confere contra as malhas das duas peças numa montagem resolvida (conferirArticulacao); esta família é um componente' };
 }
 
@@ -303,7 +309,7 @@ export function medirPonto(familia, parametros, rotulo = 'ponto', { montagem = '
     estado: problemas.length ? 'reprovado' : 'ok',
     hash,
     problemas,
-    medidas: medido.medidas.map(medidaGuardada),
+    medidas: medido.medidas.map((m) => medidaGuardada(m, daMontagem?.resumo?.articulacoes)),
     portas: ordenar(familia.contrato.portas.map(({ id }) => id)),
     portasNaoDeclaradas: portas.naoDeclaradas,
     ...(daMontagem?.resumo ? { montagem: daMontagem.resumo } : {}),
@@ -433,8 +439,14 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
     } else if (atual.hash !== null && atual.hash !== aprovado.hash) {
       reprovar('geometria-mudou', `a geometria do ponto '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, nome);
     }
-    if (atual.montagem && atual.montagem.hash !== aprovado.montagem?.hash) {
-      reprovar('montagem-mudou', `a montagem que a família gera no ponto '${nome}' mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, nome);
+    if (atual.montagem) {
+      const gravada = aprovado.montagem;
+      if (!gravada?.conferido || gravada.articulacoes.some((articulacao) => !articulacao.conferido || articulacao.colisoes)) {
+        reprovar('curso-nao-conferido', `o ponto '${nome}' não traz o curso da articulação conferido contra as malhas e sem colisão; reaprove com npm run familia -- aprovar ${id}`, nome);
+      }
+      if (atual.montagem.hash !== gravada?.hash) {
+        reprovar('montagem-mudou', `a montagem que a família gera no ponto '${nome}' mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, nome);
+      }
     }
     for (const p of atual.problemas) reprovar(p.codigo, `no ponto '${nome}': ${p.mensagem}`, nome);
   }

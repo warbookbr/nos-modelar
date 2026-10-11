@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1068 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1075 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -594,6 +594,15 @@
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+
+## procedural/familias/cilindro-hidraulico/
+
+- `cilindro-hidraulico.test.js` — cilindro-hidraulico.test.js — a família `cilindro-hidraulico` medida contra contas feitas à mão: a camisa de casca nativa com a parede pedida, o êmbolo que p…
+- `composicoes.js` — composicoes.js — as composições procedurais do cilindro hidráulico: a camisa, a haste e o conjunto dos dois.
+- `derivar.js` — derivar.js — dos parâmetros da família (milímetro) aos argumentos das composições (metro).
+- `geometria.js` — geometria.js — as medidas do cilindro hidráulico a partir dos parâmetros da família, puras e em milímetro.
+- `index.js` — index.js — a família `cilindro-hidraulico`: atuador linear de dupla ação, camisa de casca nativa e haste ligada a ela por uma articulação prismática, com a m…
+- `montagem.js` — montagem.js — a montagem v5 que a família gera: a camisa e a haste, peças distintas, ligadas por uma articulação prismática com o curso declarado.
 
 ## procedural/familias/dobradica/
 
@@ -1233,6 +1242,7 @@
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
+- `cilindro-hidraulico-aprovacao.test.mjs` — cilindro-hidraulico-aprovacao.test.mjs — a aprovação mecânica de uma família que gera montagem: o curso da articulação é conferido contra as malhas da camisa…
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
 - `comecar.test.mjs` — comecar.test.mjs — a entrada por intenção: a lista dos roteiros com o estado, cada roteiro com a sua leitura e o passo seguinte, o grupo de uma intenção, o n…
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
