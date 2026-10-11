@@ -1190,59 +1190,6 @@
       ]
     },
     {
-      "imagem": "c07",
-      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
-      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
-      "julgamentos": [
-        {
-          "nota": 8,
-          "defeitos": [],
-          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
-          "data": "2026-10-11T18:19:43.609Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
-          "data": "2026-10-11T18:19:44.396Z"
-        },
-        {
-          "nota": 7,
-          "defeitos": [
-            {
-              "parte": "dobradicas",
-              "tipo": "uniao",
-              "onde": "as seis dobradiças das bordas externas das portas, na quina dianteira dos painéis laterais",
-              "sentido": "afastado",
-              "evidencia": "Lateral: retângulos escuros em x 441–463 sobre a face externa do painel (y≈222, 536, 850). Frontal: saem da silhueta em x 300–304 e 796–800. Isométrica: aparecem na face lateral junto à quina (x≈675). Nenhuma vista mostra a outra aba presa a uma peça interna do corpo."
-            }
-          ],
-          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
-          "data": "2026-10-11T18:19:49.787Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
-          "data": "2026-10-11T18:19:50.474Z"
-        },
-        {
-          "nota": 7,
-          "defeitos": [
-            {
-              "parte": "dobradicas",
-              "tipo": "posicao",
-              "onde": "aba presa ao painel lateral, nos três pontos de cada lado, junto à borda frontal",
-              "sentido": "adiantada",
-              "evidencia": "Isométrica: três peças pretas na face externa lateral direita junto à frente, e marcas na borda esquerda. Frontal: pontas 3 a 4 px fora da largura do corpo (x 300 e 800). Lateral: abas sobre a face externa do painel (x 447–463, y 207–238, 521–552, 836–866). Superior: pontas fora do retângulo (x 301 e 798). As dobradiças ficam por fora do envelope do corpo. O sentido é o mais próximo do vocabulário, que não tem deslocamento lateral para fora."
-            }
-          ],
-          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
-          "data": "2026-10-11T18:19:51.183Z"
-        }
-      ]
-    },
-    {
       "imagem": "c05",
       "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
       "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",

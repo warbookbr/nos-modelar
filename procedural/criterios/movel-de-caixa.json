@@ -4,7 +4,7 @@
   "cobre": ["guarda-roupa", "armário de cozinha", "cômoda", "criado-mudo", "estante com portas", "gaveteiro"],
   "perguntas": [
     {
-      "texto": "De que lado de cada porta fica cada dobradiça, na frente do móvel ou atrás da porta, e a que peça do corpo a outra aba dela está presa?",
+      "texto": "Onde fica cada dobradiça com a porta fechada: escondida atrás da porta e presa por dentro do corpo, como pede o móvel de porta sobreposta, ou à vista na face externa da lateral ou da porta?",
       "condicao": { "componente": ["dobradica"], "forma": ["*dobradica*", "*pino*"] }
     },
     {
