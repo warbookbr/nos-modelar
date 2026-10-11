@@ -1880,6 +1880,100 @@
       ]
     }
   },
-  "critico": null,
-  "pessoa": null
+  "critico": {
+    "data": "2026-10-11",
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
+    "julgamentos": 2,
+    "regra": "menor nota de dois críticos cegos independentes, por perfil; família com perfis, julgada pelos perfis",
+    "rodadas": [
+      {
+        "rodada": 1,
+        "motivo": "dobradiça da porta sobreposta à vista na face externa da lateral, que a pessoa decidiu ser defeito; a família passou à dobradiça de pino oculta, com curso de 90 graus"
+      },
+      {
+        "rodada": 2,
+        "perfil": "roupeiro",
+        "nota": 7,
+        "motivo": "puxador lido como ausente na prancha reduzida; o recorte na resolução original o mostrou, e o crítico reviu para 9"
+      }
+    ],
+    "perfis": {
+      "armario-de-cozinha-aereo": {
+        "nota": 8,
+        "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a"
+      },
+      "armario-de-cozinha-de-chao": {
+        "nota": 8,
+        "hash": "sha256:0609893f11c1bd0098373eac65380ad4a8e2f9b3454c15ac9268ab07a47ab3e6"
+      },
+      "comoda": {
+        "nota": 8,
+        "hash": "sha256:9b1f9fc27ba1ca2fb08be1ab3a0f577f29f947d57223cf69b0b967c04541681d"
+      },
+      "criado-mudo": {
+        "nota": 8,
+        "hash": "sha256:f96876e75f05e97d75cbd6f8807f66356ec96938fb1b6b61b88d00ac33f4b650"
+      },
+      "estante-com-portas": {
+        "nota": 8,
+        "hash": "sha256:2682dc41920737231910a3795419ffd56e54bd5ff85e5600c6cacf269f3307a6"
+      },
+      "gaveteiro": {
+        "nota": 8,
+        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
+      },
+      "guarda-roupa": {
+        "nota": 8,
+        "hash": "sha256:c174367e5c8f6e6685146302ada9e5258e86046f04117abba8d35b385eb26427"
+      },
+      "guarda-roupa-de-correr": {
+        "nota": 8,
+        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
+      },
+      "roupeiro": {
+        "nota": 8,
+        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
+      }
+    },
+    "achados": [
+      "pela fresta de 4 mm entre a porta sobreposta e o corpo, a aba da dobradiça aparece quando se olha exatamente de lado",
+      "dobradiça da porta embutida visível na folga lateral, como o contrato declara",
+      "puxadores das folhas de correr e traseira das gavetas pouco legíveis na prancha reduzida"
+    ]
+  },
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
+    "perfis": {
+      "armario-de-cozinha-aereo": {
+        "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a"
+      },
+      "armario-de-cozinha-de-chao": {
+        "hash": "sha256:0609893f11c1bd0098373eac65380ad4a8e2f9b3454c15ac9268ab07a47ab3e6"
+      },
+      "comoda": {
+        "hash": "sha256:9b1f9fc27ba1ca2fb08be1ab3a0f577f29f947d57223cf69b0b967c04541681d"
+      },
+      "criado-mudo": {
+        "hash": "sha256:f96876e75f05e97d75cbd6f8807f66356ec96938fb1b6b61b88d00ac33f4b650"
+      },
+      "estante-com-portas": {
+        "hash": "sha256:2682dc41920737231910a3795419ffd56e54bd5ff85e5600c6cacf269f3307a6"
+      },
+      "gaveteiro": {
+        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
+      },
+      "guarda-roupa": {
+        "hash": "sha256:c174367e5c8f6e6685146302ada9e5258e86046f04117abba8d35b385eb26427"
+      },
+      "guarda-roupa-de-correr": {
+        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
+      },
+      "roupeiro": {
+        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
+      }
+    },
+    "observacao": "assinada por Claude por delegação da pessoa, depois da correção que ela pediu (dobradiça da porta sobreposta escondida); a dobradiça de caneco, que daria 110 graus, ficou de fora"
+  }
 }
