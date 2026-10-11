@@ -108,6 +108,30 @@
       "furos-de-fixacao"
     ]
   },
-  "critico": null,
+  "critico": {
+    "data": "2026-10-11",
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-prancha.png",
+    "julgamentos": 2,
+    "regra": "menor nota de dois críticos cegos independentes, por ponto",
+    "pontos": {
+      "minimo": {
+        "nota": 8,
+        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739"
+      },
+      "medio": {
+        "nota": 8,
+        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
+      },
+      "maximo": {
+        "nota": 8,
+        "hash": "sha256:d4abcbf084d7d361a7f8f8e806fbb4d606752118c90081bfcc784c000b9eb770"
+      }
+    },
+    "achados": [
+      "aro facetado na isométrica (revolução com poucos lados), de superfície",
+      "o cubo não se distingue da chapa na prancha e não foi verificável",
+      "largura do pneu no perfil 12 a 17% acima do parâmetro, pelo abaulamento do flanco"
+    ]
+  },
   "pessoa": null
 }
