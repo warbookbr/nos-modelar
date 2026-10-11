@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1080 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1078 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -105,8 +105,6 @@
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
-- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
-- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
