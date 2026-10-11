@@ -592,6 +592,57 @@
       "base-do-rodape"
     ]
   },
-  "critico": null,
-  "pessoa": null
+  "critico": {
+    "data": "2026-10-11",
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roupeiro-prancha.png",
+    "julgamentos": 2,
+    "regra": "menor nota de dois críticos cegos independentes, por ponto",
+    "rodadas": [
+      {
+        "rodada": 1,
+        "pontos": {
+          "minimo": 8,
+          "medio": 7,
+          "maximo": 7
+        },
+        "motivo": "folhas da dobradiça 4,4 mm fora do centro dos rasgos, que seguiam o eixo do pino e não a chapa tangente ao rolo"
+      }
+    ],
+    "pontos": {
+      "minimo": {
+        "nota": 9,
+        "hash": "sha256:2e33d5b90016192b2e64f98b20120ea1ddb870bdb17706f6ad775d5b09b72ca7"
+      },
+      "medio": {
+        "nota": 8,
+        "hash": "sha256:394de6215c9ceb0cd508b6a95ac951662634e671d76cb5fa684861635909d157"
+      },
+      "maximo": {
+        "nota": 8,
+        "hash": "sha256:f48bc43f27acfed7ac9ec0d44d3986e1f3a62d6d73f7d872b86fd8f139eba88c"
+      }
+    },
+    "achados": [
+      "rodapé recuado também nas laterais, além da frente e do fundo",
+      "cabideiro só visível na frontal aberta, escondido pelo tampo nas isométricas",
+      "frente da divisória e alternância das dobradiças da divisória pouco legíveis no máximo"
+    ]
+  },
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roupeiro-prancha.png",
+    "pontos": {
+      "minimo": {
+        "hash": "sha256:2e33d5b90016192b2e64f98b20120ea1ddb870bdb17706f6ad775d5b09b72ca7"
+      },
+      "medio": {
+        "hash": "sha256:394de6215c9ceb0cd508b6a95ac951662634e671d76cb5fa684861635909d157"
+      },
+      "maximo": {
+        "hash": "sha256:f48bc43f27acfed7ac9ec0d44d3986e1f3a62d6d73f7d872b86fd8f139eba88c"
+      }
+    },
+    "observacao": "aprovou a prancha com o defeito dos rasgos apontado e delegou o julgamento da correção; a correção foi conferida no detalhe da dobradiça, com cada folha dentro do seu rasgo"
+  }
 }
