@@ -217,3 +217,7 @@ jobs:
       - name: Banco de provas e registro de custo em dia com o JSON
         run: npm run banco-de-provas:check
 
+      # A geometria dos três pontos de cada família registrada tem de continuar igual à da aprovação mecânica; sem
+      # este passo uma família poderia mudar de forma depois de aprovada sem que ninguém reaprovasse.
+      - name: Famílias registradas com a geometria igual à aprovada
+        run: npm run familias:check

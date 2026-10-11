@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1048 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1058 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -110,6 +110,8 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
@@ -1032,11 +1034,24 @@
 - `derivar.js` — Fixture de teste: o `derivar` da família `tubo-de-prova`. Puro: recebe os parâmetros em milímetro, já completados com os padrões, e devolve a composição e os…
 - `familia.js` — Fixture de teste: a família `tubo-de-prova` carregada (contrato, composições e `derivar`) e a receita que a chama. A receita é um objeto com `get CHAMADAS_CO…
 
+## tools/fixtures/familia-com-casca/
+
+- `familia.js` — Fixture de teste: a família `caixa-oca-de-prova`, uma caixa feita pela casca nativa. Com `comEntalhe: false` (a família que a aprovação mecânica aprova) só h…
+
+## tools/fixtures/familia-com-chapa-e-barras/
+
+- `familia.js` — Fixture de teste: a família `suporte-de-prova`. O parâmetro `estrutura` escolhe a composição: 0 é uma chapa dobrada em L (a extensão `chapaDobrada`), 1 é um …
+
 ## tools/fixtures/familia-com-esboco/
 
 - `composicoes.js` — Fixture de teste: a composição da família `roda-com-esboco`, uma roda de eixo em x com pneu, disco e dois cubos, cada um uma revolução, e duas portas (o asse…
 - `derivar.js` — Fixture de teste: o `derivar` da família `roda-com-esboco`. Puro: recebe os parâmetros em milímetro, já completados com os padrões, e devolve a composição e …
 - `familia.js` — Fixture de teste: a família `roda-com-esboco` carregada (contrato, composição e `derivar`). `criarRodaDeProva` a monta com o contrato escrito em `familia.jso…
+
+## tools/fixtures/familia-com-porta/
+
+- `familia.js` — Fixture de teste: a família `bucha-de-prova`, um anel de revolução que publica a porta `assento` (anel que ocupa) na parede externa. `criarBucha({ erroDoRaio…
+- `familias.mjs` — Fixture de teste: a lista de famílias que `npm run familia -- aprovar bucha-de-prova --familias=<este módulo>` lê.
 
 ## tools/fixtures/montagem-com-instancias-repetidas/
 
@@ -1180,6 +1195,8 @@
 - `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `analise-da-peca.mjs` — analise-da-peca.mjs — o passo "Pare e analise": a matriz de vistas que a IA precisa olhar antes de declarar uma forma pronta, o manifesto que prova que ela f…
 - `analise-da-peca.test.mjs` — analise-da-peca.test.mjs — a matriz do "Pare e analise", o manifesto e o zoom.
+- `aprovacao-da-familia.mjs` — aprovacao-da-familia.mjs — a camada mecânica da aprovação de uma família, sem gastar token.
+- `aprovacao-da-familia.test.mjs` — aprovacao-da-familia.test.mjs — a camada mecânica da aprovação de uma família e o hash preso ao `aprovacao.json`. A prova: a família de fixture aprovada; a b…
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
 - `articulacao-na-montagem.test.mjs` — articulacao-na-montagem.test.mjs — a articulação sobre uma montagem v5 real: a folha da porta não declara pose, a posição sai do encaixe da porta `eixo-da-do…
@@ -1260,6 +1277,8 @@
 - `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
 - `familia-com-esboco.mjs` — familia-com-esboco.mjs — o adaptador da conferência entre a família e o componente do esboço de mesmo nome.
 - `familia-com-esboco.test.mjs` — familia-com-esboco.test.mjs — a conferência da família com o componente do esboço de mesmo nome, ponta a ponta: o componente `roda` do esboço expandido nos p…
+- `familia.mjs` — familia.mjs — a aprovação mecânica das famílias e o gate que a confere.
+- `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
 - `ferramentas-por-objeto.mjs` — Gera docs/mecanifica/FERRAMENTAS-POR-OBJETO.md a partir de docs/mecanifica/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.

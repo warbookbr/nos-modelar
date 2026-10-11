@@ -1,0 +1,25 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "suporte-de-prova",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "aba": { "tipo": "numero", "unidade": "mm", "padrao": 50, "minimo": 30, "maximo": 120, "medio": 60 },
+    "espessura": { "tipo": "numero", "unidade": "mm", "padrao": 2, "minimo": 1, "maximo": 4, "medio": 2 },
+    "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 600, "minimo": 300, "maximo": 1000, "medio": 500 },
+    "estrutura": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 }
+  },
+  "restricoes": [
+    {
+      "id": "aba-maior-que-a-chapa",
+      "expressao": "aba > espessura * 10",
+      "motivo": "uma aba com menos de dez espessuras de comprimento reto não dobra sem cortar o raio da dobra vizinha"
+    }
+  ],
+  "portas": [],
+  "ferramentas": ["chapa", "barras"],
+  "perguntas": {
+    "suporte": ["A dobra da chapa tem o mesmo raio dos dois lados?"],
+    "quadro": ["Os cortes das barras fecham os nós sem fresta?"]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "caixa-oca-de-prova",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 120, "minimo": 60, "maximo": 300, "medio": 180 },
+    "altura": { "tipo": "numero", "unidade": "mm", "padrao": 80, "minimo": 40, "maximo": 200, "medio": 120 },
+    "profundidade": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 60, "maximo": 300, "medio": 150 },
+    "parede": { "tipo": "numero", "unidade": "mm", "padrao": 3, "minimo": 1, "maximo": 10, "medio": 5 },
+    "entalhe": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 }
+  },
+  "restricoes": [
+    {
+      "id": "parede-cabe-na-altura",
+      "expressao": "parede * 4 <= altura",
+      "motivo": "a parede passa de um quarto da altura e a casca fica sem cavidade útil"
+    },
+    {
+      "id": "entalhe-cabe-na-largura",
+      "expressao": "altura * 0.7 < largura",
+      "motivo": "o entalhe em V, de 60 graus e 60% da altura, passaria da largura da caixa"
+    }
+  ],
+  "portas": [],
+  "ferramentas": ["casca"],
+  "perguntas": {
+    "caixa": ["A parede tem a mesma espessura em toda a volta?"]
+  }
+}

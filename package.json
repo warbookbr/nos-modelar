@@ -21,6 +21,8 @@
     "catalogo:check": "node tools/catalogo/gerar-catalogo-capacidades.mjs --check",
     "ferramentas:gerar": "node tools/mecanifica/ferramentas-por-objeto.mjs",
     "ferramentas:check": "node tools/mecanifica/ferramentas-por-objeto.mjs --check",
+    "familia": "node tools/mecanifica/familia.mjs",
+    "familias:check": "node tools/mecanifica/familia.mjs conferir",
     "banco-de-provas": "node tools/mecanifica/banco-de-provas.mjs",
     "banco-de-provas:gerar": "node tools/mecanifica/banco-de-provas.mjs --gerar",
     "banco-de-provas:check": "node tools/mecanifica/banco-de-provas.mjs --check",
