@@ -97,7 +97,9 @@ rodadas e nota contra a medição gravada, e só então a troca da skill
 ## Desenho da fatia 8
 
 Aprovado pela pessoa em 2026-10-11, com a picape reescrita e cinco julgamentos
-nas quatro imagens-chave e três nas outras. Hoje o veredito do `descrever`
+nas quatro imagens-chave e três nas outras; depois, a pessoa cortou a rodada de
+comparação com o brief atual, que a linha de base de 2026-10-08 já cobre, e a
+tarefa 6 roda só o brief novo. Hoje o veredito do `descrever`
 confere plano de partes, `REFINA`, contatos e referencial; o G01 roda só sobre o
 andaime do esboço; o `conferir:referencia` é um comando solto; o comparador de
 contorno por parte (IoU 0,85 e desvio de até o maior entre 5 mm e 3% da maior
