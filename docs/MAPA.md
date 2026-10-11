@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1074 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1068 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -110,8 +110,6 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
-- `CONTRATO-DA-FAMILIA.md` — Contrato da família
-- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
@@ -595,10 +593,6 @@
 ## procedural/familias/
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
-- `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
-- `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
-- `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
-- `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
 
 ## procedural/familias/dobradica/
