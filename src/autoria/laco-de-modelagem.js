@@ -41,6 +41,14 @@ export function registrarRodada({ peca, numero, veredito, medidas, partes, atrit
   if (!Number.isInteger(numero) || numero < 1) falhar('o número da rodada começa em 1.');
   if (!medidas || typeof medidas !== 'object') falhar("a rodada precisa trazer 'medidas'.");
   if (typeof medidas.passou !== 'boolean') falhar("'medidas.passou' precisa ser booleano.");
+  /* O CRÍTICO NÃO JULGA O QUE A MEDIDA JÁ REPROVOU. A instrução de medir antes do crítico estava na skill do laço, e um veredito
+     gravado sobre medida reprovada passava sem que nada reclamasse: a rodada guardava as duas coisas, e a seguinte lia os
+     defeitos do crítico como se a receita medida fosse a que ele viu. A recusa é daqui, de quem registra, e vale para todo
+     chamador. */
+  if (veredito && !medidas.passou) {
+    falhar(`as medidas reprovaram (${String(medidas.relatorio ?? '').trim() || 'sem relatório'}) e a rodada traz o veredito do crítico: `
+      + 'o crítico só julga receita que passa nas medidas. Grave a rodada sem veredito, com o relatório da falha, e conserte a receita.');
+  }
 
   return {
     formato: FORMATO_RODADA,
@@ -184,6 +192,52 @@ export function proximaAcao(rodadas, { limite = LIMITE_DE_RODADAS, notaMinima = 
   }
 
   return { acao: 'modelar', motivo: `${defeitos} defeito(s) apontado(s) na rodada ${ultima.numero}.` };
+}
+
+const curto = (sha) => String(sha ?? '').replace(/^sha256:/, '').slice(0, 8);
+
+/**
+ * A ação dada a receita que existe agora. `proximaAcao` lê só as rodadas, e a medida dela é a que a sessão escreveu na última
+ * rodada, sobre uma receita que pode já ter mudado. Aqui a medição é a da receita atual, identificada pelo hash do texto:
+ * `receitaAtual` é `{ sha256, medicao: { passou, relatorio } }`, e a medição é a que a ferramenta fez agora, não a que alguém
+ * declarou.
+ *
+ * - medição da receita atual reprovada: `modelar`, qualquer que seja o histórico, porque nada se revisa antes de passar;
+ * - nenhuma rodada ainda e a medição passa: `revisar`, porque a receita existe e ninguém a julgou;
+ * - receita igual à da última rodada: vale a decisão das rodadas (`proximaAcao`), e a medição que passou agora vale no lugar da
+ *   que a rodada registrou reprovada, porque a receita é a mesma;
+ * - receita diferente da última rodada (ou rodada sem hash gravado, de antes disto): o julgamento da rodada não é desta versão.
+ *   Os limites do laço continuam valendo, mas `parar-fechou` e a correção que a rodada pediu não: a versão nova passa nas medidas
+ *   e falta o crítico julgá-la, `revisar`.
+ */
+export function acaoDaReceita(rodadas, receitaAtual, opcoes = {}) {
+  if (!Array.isArray(rodadas)) falhar('a história da peça é uma lista de rodadas.');
+  const { sha256, medicao } = receitaAtual ?? {};
+  if (!medicao || typeof medicao.passou !== 'boolean') falhar("a receita atual precisa trazer a medição ({ passou, relatorio }).");
+  if (!medicao.passou) {
+    return {
+      acao: 'modelar',
+      motivo: `a medição da receita atual (sha256:${curto(sha256)}) reprovou: ${String(medicao.relatorio ?? '').trim() || 'sem relatório'}; `
+        + 'revisar antes de a medição passar é gastar o crítico.',
+      medicaoReprovada: true,
+    };
+  }
+  const ultima = rodadas[rodadas.length - 1];
+  if (!ultima) return { acao: 'revisar', motivo: `a receita existe (sha256:${curto(sha256)}), a medição dela passa e nenhuma rodada a julgou.` };
+  if (!ultima.receita?.sha256) return proximaAcao(rodadas, opcoes);
+  if (ultima.receita.sha256 === sha256) {
+    if (!ultima.medidas.passou) {
+      return { acao: 'revisar', motivo: `a medição da receita atual (sha256:${curto(sha256)}) passa e ainda não foi julgada.` };
+    }
+    return proximaAcao(rodadas, opcoes);
+  }
+  const decisao = proximaAcao(rodadas, opcoes);
+  if (decisao.acao === 'parar-limite' || decisao.acao === 'parar-sem-convergencia') return decisao;
+  return {
+    acao: 'revisar',
+    motivo: `a receita mudou depois da rodada ${ultima.numero} (sha256:${curto(ultima.receita.sha256)} para sha256:${curto(sha256)}) e a medição `
+      + 'da versão nova passa; o julgamento da rodada é da versão anterior e falta o crítico julgar esta.',
+  };
 }
 
 /** Os defeitos que a rodada seguinte precisa corrigir, e nada além disso. */

@@ -94,6 +94,8 @@ export function preencher(prof, I0, J0, W, H, u0, v0, cel, aneis, plano) {
    aos pontos. */
 const facesEmCache = new WeakMap();
 export function facesDaVista(r, vista, olho) {
+  /* uma forma de malha (a parte de uma peça pronta) já traz as faces dela, `[{ pts }]` em mm: não há o que fatiar */
+  if (Array.isArray(r.facesDaMalha)) return r.facesDaMalha;
   const origem = origemDoDeslocamento(r);
   const base = origem ? origem.base : r;
   let porVista = facesEmCache.get(base);

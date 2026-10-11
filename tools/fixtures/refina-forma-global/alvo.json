@@ -1,0 +1,47 @@
+{
+  "formato": "mecanifica.alvo-forma-global@2",
+  "id": "alvo-suporte",
+  "objetivo": "suporte-n2",
+  "familia": "peca-mecanica",
+  "intencao": "suporte com sapata quadrada e coluna central redonda, com um assento no topo da coluna",
+  "unidade": "mm",
+  "eixos": { "direita": "+x", "cima": "+y", "frente": "+z" },
+  "envelope": { "min": [-100, 0, -100], "max": [100, 200, 100] },
+  "procedencia": {
+    "tipo": "fixture-de-teste",
+    "referencias": ["repo://tools/fixtures/refina-forma-global/andaime.json"]
+  },
+  "rubrica": {
+    "id": "suporte-forma-global-n2",
+    "categoriaEsperada": "suporte-sapata-e-coluna",
+    "criterios": ["categoria-identificavel", "proporcoes-plausiveis"],
+    "papeisAuxiliares": []
+  },
+  "landmarks": [
+    { "id": "topo", "posicao": [0, 200, 0], "tolerancia": 10 },
+    { "id": "pe", "posicao": [0, 0, 0], "tolerancia": 10 }
+  ],
+  "regioesObrigatorias": ["base", "coluna"],
+  "vistas": {
+    "frontal": {
+      "contornos": [
+        { "id": "sapata", "papel": "massa-primaria", "pontos": [[-100, 0], [100, 0], [100, 20], [-100, 20]] },
+        { "id": "coluna", "papel": "massa-primaria", "pontos": [[-40, 20], [40, 20], [40, 200], [-40, 200]] }
+      ]
+    },
+    "direita": {
+      "contornos": [
+        { "id": "sapata", "papel": "massa-primaria", "pontos": [[-100, 0], [100, 0], [100, 20], [-100, 20]] },
+        { "id": "coluna", "papel": "massa-primaria", "pontos": [[-40, 20], [40, 20], [40, 200], [-40, 200]] }
+      ]
+    },
+    "superior": {
+      "contornos": [
+        { "id": "sapata", "papel": "massa-primaria", "pontos": [[-100, -100], [100, -100], [100, 100], [-100, 100]] }
+      ]
+    }
+  },
+  "limiares": { "iouMinimo": 0.95, "desvioMaximo": 0.1, "erroEnvelopeRelativoMaximo": 0.02, "erroLandmarkNormalizadoMaximo": 1 },
+  "orcamento": { "volumesMaximos": 8, "triangulosMaximos": 20000, "resolucaoGrade": 96 },
+  "rejeicoes": ["forma-parcial"]
+}

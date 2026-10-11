@@ -9,9 +9,14 @@
 
 const m = (mm) => mm / 1000;
 
-export function receitaDoSuporte({ sapataEmX = 0, portaY = 200, vinculo = { sapata: 'sapata', coluna: 'coluna-central' }, tolerancia = { envelope: 2, porta: 0.5 } } = {}) {
+export function receitaDoSuporte({
+  sapataEmX = 0, portaY = 200, vinculo = { sapata: 'sapata', coluna: 'coluna-central' }, tolerancia = { envelope: 2, porta: 0.5 },
+  /* `alvo: true` liga o G01 sobre a malha (REFINA.alvo) e `razoes` declara RAZOES, as duas para o veredito conferir a forma */
+  alvo = false, razoes = null,
+} = {}) {
   return {
     meta: { nome: 'refina-forma-global/suporte', desc: 'suporte de prova do refinamento da forma global' },
+    TOPO: { origem: 'centro do fundo da sapata, no chão; y para cima' },
     PLANO: {
       objeto: 'suporte com sapata quadrada e coluna central redonda, para provar o refinamento do andaime',
       referencias: ['../andaime.json'],
@@ -25,7 +30,8 @@ export function receitaDoSuporte({ sapataEmX = 0, portaY = 200, vinculo = { sapa
         'o assento do topo da coluna fora do lugar que o andaime declarou',
       ],
     },
-    REFINA: { andaime: '../andaime.json', partes: vinculo, tolerancia },
+    REFINA: { andaime: '../andaime.json', ...(alvo ? { alvo: '../alvo.json' } : {}), partes: vinculo, tolerancia },
+    ...(razoes ? { RAZOES: razoes } : {}),
     contatos: [{ par: ['coluna', 'sapata'], motivo: 'a coluna nasce sobre o centro da sapata, apoiada no topo dela' }],
     PASSOS: [
       ['cubo', { origemId: 1, larg: m(200), alt: m(20), prof: m(200), em: [m(sapataEmX), 0, 0] }],

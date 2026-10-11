@@ -27,7 +27,9 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
-import { conferirRefinamentoDaReceita } from './refinamento-global.mjs';
+import { conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
+import { conferirContornosDaPeca, contornosDaPeca } from './contorno-da-peca.mjs';
+import { conferirRazoesDaPeca, normalizarRazoesDaPeca, textoDaRazao } from '../../src/autoria/razoes-da-peca.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -285,6 +287,10 @@ export async function descreverPecaReutilizavel({
   let formas = null;
   let plano = null;
   let refinamento = null;
+  let g01 = null;
+  let contornos = null;
+  let razoes = null;
+  const linhasDeReferencia = [];
   if (comVeredito) {
     /* PARTE PROMETIDA E NÃO ENTREGUE É INVISÍVEL PARA O RESTO DA RÉGUA. Quando
        o pneu saiu maciço, aro, cubo e raios nunca chegaram a existir; sem a
@@ -395,6 +401,85 @@ export async function descreverPecaReutilizavel({
       stderr += `\n${contatos.cobertura.inconclusivos.length} par(es) que a medida NÃO conseguiu decidir`
         + ' — malha aberta ou não-manifold; não são pares livres.\n';
     }
+
+    /* A FORMA CONTRA A REFERÊNCIA, DEPOIS DE TUDO O QUE JÁ RODA. Contato, plano e refinamento dizem que as partes existem e se
+       encaixam; nenhum diz que a forma é a pedida. Cada item abaixo mede a malha contra uma referência que existe no
+       repositório (o alvo N2, o contorno por parte, a razão declarada) com os limiares que cada um já tem, e um item sem
+       referência diz "não conferido: sem referência" em vez de passar calado: não aprova e não barra. */
+    let caminhoDaPeca = caminhoReceita;
+    if (!caminhoDaPeca) { try { caminhoDaPeca = resolverCaminhoReceita(peca, { raiz: REPO }); } catch { caminhoDaPeca = null; } }
+
+    try {
+      g01 = conferirG01DaReceita({ receita, neutro, caminhoDaReceita: caminhoDaPeca });
+    } catch (erro) {
+      return falha(`G01 DA PEÇA INVÁLIDO\n  ${erro.message}`);
+    }
+    if (g01 === null) {
+      linhasDeReferencia.push('G01 sobre a malha: não conferido: sem referência (REFINA não declara alvo N2)');
+    } else if (!g01.rodou) {
+      linhasDeReferencia.push(`G01 sobre a malha (alvo ${g01.alvo}): não conferido: ${g01.motivo}`);
+    } else {
+      const a = g01.avaliacao;
+      linhasDeReferencia.push(`G01 sobre a malha (alvo ${g01.alvo}): ${g01.medidasAprovadas ? 'medidas aprovadas' : 'medidas REPROVADAS'}`
+        + ` — silhuetas ${a.vistas.map((v) => `${v.id} ${String(Math.round(v.metricas.iou * 1000) / 1000).replace('.', ',')}`).join(', ')} (razão interseção/união)`
+        + `, envelope ${a.envelope.estado}, regiões ${a.regioes.estado}; G00 do alvo ${g01.avaliacaoAlvo.estado} (${g01.avaliacaoAlvo.motivo})`);
+      if (!g01.medidasAprovadas) {
+        stderr += `\n${a.diagnosticos.filter((d) => d.codigo !== 'alvo-nao-aprovado').length} ACHADO(S) NO G01 DA MALHA CONTRA O ALVO '${g01.alvo}'\n`
+          + a.diagnosticos.filter((d) => d.codigo !== 'alvo-nao-aprovado')
+            .map((d) => `    ${d.campo}: ${d.codigo} — ${d.causa} ${d.impacto}`).join('\n')
+          + '\n  A malha da peça diverge do alvo N2 em silhueta, envelope ou regiões: ajuste a receita, ou o alvo, se foi ele que errou.\n';
+        falhou = true;
+      }
+    }
+
+    if (caminhoDaPeca === null) {
+      contornos = null;
+      linhasDeReferencia.push('contorno por parte: não conferido: sem referência (a peça foi entregue sem arquivo, e a pasta dela não existe)');
+    } else {
+      const achados = contornosDaPeca({ caminhoDaReceita: caminhoDaPeca, raiz: REPO });
+      if (achados.length === 0) {
+        linhasDeReferencia.push('contorno por parte: não conferido: sem referência (nenhum *.contornos.json na pasta da peça)');
+      } else {
+        try {
+          contornos = conferirContornosDaPeca({ neutro, contornos: achados });
+        } catch (erro) {
+          return falha(`CONTORNO POR PARTE INVÁLIDO\n  ${erro.message}`);
+        }
+        for (const c of contornos.conferencias) {
+          linhasDeReferencia.push(`contorno por parte (${c.arquivo}, vista ${c.vista}): ${c.ok ? 'aprovado' : 'REPROVADO'}`
+            + ` — ${c.resultados.map((r) => `${r.parte ?? 'silhueta'} ${String(r.iou).replace('.', ',')}`).join(', ')} (razão interseção/união)`);
+        }
+        for (const n of contornos.naoConferidos) linhasDeReferencia.push(`contorno por parte (${n.arquivo}): não conferido: ${n.motivo}`);
+        const fora = contornos.conferencias.flatMap((c) => c.resultados.filter((r) => !r.ok).map((r) => ({ arquivo: c.arquivo, r })));
+        if (fora.length) {
+          stderr += `\n${fora.length} CONTORNO(S) FORA DA REFERÊNCIA (silhueta ou parte)\n`
+            + fora.map(({ arquivo, r }) => `    ${arquivo}: ${r.texto}`).join('\n')
+            + '\n  A malha da parte diverge do contorno da referência além do limite (razão interseção/união e desvio em milímetro):'
+            + '\n  ou a forma está errada, ou a referência não é desta peça.\n';
+          falhou = true;
+        }
+      }
+    }
+
+    try {
+      const declaradas = normalizarRazoesDaPeca(receita.RAZOES);
+      if (declaradas) razoes = conferirRazoesDaPeca({ razoes: declaradas, neutro });
+    } catch (erro) {
+      return falha(`RAZÕES DECLARADAS INVÁLIDAS\n  ${erro.message}`);
+    }
+    if (razoes === null) {
+      linhasDeReferencia.push('razões: não conferido: sem referência (a receita não exporta RAZOES)');
+    } else {
+      linhasDeReferencia.push(`razões: ${razoes.ok ? 'todas dentro da faixa' : 'REPROVADAS'} (${razoes.resumo.total} declarada${razoes.resumo.total === 1 ? '' : 's'}, ${razoes.resumo.lidas} lida${razoes.resumo.lidas === 1 ? '' : 's'}, ${razoes.resumo.reprovadas} fora da faixa)`);
+      if (!razoes.ok) {
+        const ruins = razoes.medidas.filter((m) => !m.lida || !m.ok);
+        stderr += `\n${ruins.length} RAZÃO(ÕES) FORA DA FAIXA OU SEM LEITURA\n`
+          + ruins.map((m) => `    ${textoDaRazao(m)}`).join('\n')
+          + '\n  A proporção declarada não é a da malha: a forma está fora da faixa da referência, ou a declaração está errada.\n';
+        falhou = true;
+      }
+    }
+    stdout += `\nREFERÊNCIA DA FORMA\n${linhasDeReferencia.map((l) => `  ${l}`).join('\n')}\n`;
   }
 
   return {
@@ -410,6 +495,9 @@ export async function descreverPecaReutilizavel({
       formas,
       plano,
       refinamento,
+      g01,
+      contornos,
+      razoes,
       neutro,
       expansao,
     },

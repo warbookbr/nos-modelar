@@ -209,6 +209,82 @@ describe('medidas na blocagem: forma sem tradução e componente recolhido', () 
   });
 });
 
+describe('medidas na blocagem: a razão entre duas medidas', () => {
+  /* a picape é um corpo (5000 mm em z) com uma cabine em cima; a altura total é a do corpo mais a da cabine */
+  const picape = (alturaDoCorpo) => [
+    caixa('corpo', [1800, alturaDoCorpo, 5000], [0, alturaDoCorpo / 2, 0]),
+    caixa('cabine', [1700, 500, 1500], [0, alturaDoCorpo + 250, -800]),
+  ];
+  const razao = (nome, razaoDe, faixa, extra = {}) => ({ nome, origem: 'ficha', mede: { razao: razaoDe, faixa }, ...extra });
+  const alturaPeloComprimento = (faixa = [0.3, 0.4]) => razao('alturaPeloComprimento', ['alturaTotal', 'profundidadeTotal'], faixa);
+
+  it('a picape com altura de 0,29 do comprimento fica fora da faixa [0,30, 0,40], e a de 0,33 dentro, nas duas leituras', () => {
+    /* corpo 950 + cabine 500 = 1450 sobre 5000 = 0,29; corpo 1150 + 500 = 1650 sobre 5000 = 0,33 */
+    const baixa = ler(picape(950), [alturaPeloComprimento()]);
+    for (const leitura of [baixa.naBlocagem, baixa.noDado]) {
+      expect(leitura.medidas[0]).toMatchObject({ lida: true, tipo: 'razao', faixa: [0.3, 0.4], medido: 0.29, desvio: -0.01, ok: false, a_mm: 1450, b_mm: 5000 });
+      expect(leitura.resumo).toEqual({ total: 1, lidas: 1, naoLidas: 0, reprovadas: 1 });
+    }
+    const boa = ler(picape(1150), [alturaPeloComprimento()]);
+    for (const leitura of [boa.naBlocagem, boa.noDado]) {
+      expect(leitura.medidas[0]).toMatchObject({ lida: true, medido: 0.33, desvio: 0, ok: true });
+      expect(leitura.resumo.reprovadas).toBe(0);
+    }
+  });
+
+  it('o veredito é o da razão exata: dentro da faixa pelo valor, fora pelo arredondamento, e o contrário', () => {
+    /* 1499 sobre 5000 = 0,2998, que arredonda para 0,3 mas está fora de [0,3, 0,4] */
+    const r = ler(picape(999), [alturaPeloComprimento()]);
+    expect(r.naBlocagem.medidas[0]).toMatchObject({ medido: 0.2998, ok: false });
+    expect(r.naBlocagem.medidas[0].exato).toBeLessThan(0.3);
+  });
+
+  it('os operandos são caixa de formas e distância entre faces, âncoras ou pontos, como nas outras medidas', () => {
+    const r = ler(picape(1150), [
+      razao('cabinePeloCorpo', [{ caixa: 'z', formas: ['cabine'] }, { caixa: 'z', formas: ['corpo'] }], [0.29, 0.31]),
+      razao('alturaPelasFaces', [{ distancia: ['corpo.-y', 'cabine.+y'], eixo: 'y' }, { distancia: ['corpo.-z', 'corpo.+z'], eixo: 'z' }], [0.32, 0.34]),
+      razao('doPonto', [{ distancia: ['chao', 'cabine.+y'], eixo: 'y' }, 'profundidadeTotal'], [0.32, 0.34]),
+    ], { pontos: { chao: [0, 0, 0] } });
+    expect(r.naBlocagem.resumo).toEqual({ total: 3, lidas: 3, naoLidas: 0, reprovadas: 0 });
+    expect(r.naBlocagem.medidas.map((m) => m.medido)).toEqual([0.3, 0.33, 0.33]);
+    expect(r.naBlocagem.medidas[0].volumes).toEqual(['cabine', 'corpo']);
+  });
+
+  it('a blocagem e o dado concordam, e a comparação da razão explica a diferença pelas perdas', () => {
+    const r = ler(picape(1150), [alturaPeloComprimento(), razao('cabinePeloCorpo', [{ caixa: 'z', formas: ['cabine'] }, { caixa: 'z', formas: ['corpo'] }], [0.29, 0.31])]);
+    for (const c of compararLeituras(r.naBlocagem, r.noDado)) {
+      expect(c.tipo).toBe('razao');
+      expect(c.concordam, c.nome).toBe(true);
+      expect(c.explicada, c.nome).toBe(true);
+      expect(c.diferenca, c.nome).toBeLessThanOrEqual(1e-6);
+    }
+  });
+
+  it('a razão com um operando que a blocagem não lê volta não lida com o motivo, sem derrubar as outras', () => {
+    const r = ler(picape(1150), [
+      razao('semForma', [{ caixa: 'y', formas: ['nada'] }, 'profundidadeTotal'], [0.3, 0.4]),
+      razao('dentroDeRazao', [{ razao: ['alturaTotal', 'larguraTotal'], faixa: [1, 2] }, 'profundidadeTotal'], [0.3, 0.4]),
+      razao('denominadorZero', ['alturaTotal', { distancia: ['corpo.centro', 'corpo.centro'] }], [0.3, 0.4]),
+      alturaPeloComprimento(),
+    ]);
+    expect(r.naBlocagem.resumo).toEqual({ total: 4, lidas: 1, naoLidas: 3, reprovadas: 0 });
+    expect(r.naBlocagem.medidas.slice(0, 3).map((m) => m.motivo)).toEqual([
+      '"nada" não é uma forma visível da opção',
+      'uma razão não entra em outra razão; A e B são medidas em milímetro',
+      'o denominador da razão mede 0 mm',
+    ]);
+    expect(compararLeituras(r.naBlocagem, r.noDado)[0]).toMatchObject({ concordam: false, lidaNaBlocagem: false });
+  });
+
+  it('o texto da razão diz o valor, os operandos e a faixa, e a medida em milímetro continua igual', () => {
+    const { naBlocagem } = ler(picape(950), [alturaPeloComprimento(), medida('larguraTotal', 'larguraTotal', 1800)]);
+    const texto = descreverMedidasNaBlocagem(naBlocagem);
+    expect(texto).toContain('2 lida(s), 0 não lida(s), 1 fora da tolerância');
+    expect(texto).toContain('alturaPeloComprimento: razão 0,29 (1450 mm sobre 5000 mm), faixa 0,3 a 0,4, fora');
+    expect(texto).toContain('larguraTotal: declarado 1800 mm, medido 1800 mm, desvio 0 mm (tolerância 36 mm), dentro');
+  });
+});
+
 describe('G01 do andaime derivado, com um alvo sintético', () => {
   const formas = [caixa('base', [200, 20, 100], [0, 10, 0]), caixa('torre', [60, 100, 60], [0, 70, 0])];
   const traducao = () => traduzirFormasParaAndaime(dados(formas), { alvo: 'alvo-sintetico', objetivo: 'objeto-sintetico', familia: 'peca-mecanica' });

@@ -234,6 +234,16 @@ landmarks, regiões, orçamento e as três silhuetas passam sem depender de a cr
 alvo sintético (um cubo, em três silhuetas retangulares); sem `alvo` ela devolve `rodou: false` dizendo se falta o contorno ou só o
 alvo. Transformar o contorno de referência de uma vista (`mecanifica.contornos@1`) nas três silhuetas do alvo não está feito.
 
+O mesmo G01 roda sobre a malha da peça executada (`avaliarG01DaPeca`, no mesmo `g01-do-andaime.js`), quando a receita declara o alvo
+em `REFINA.alvo` ao lado de `REFINA.andaime`. A blocagem é a do andaime com os vértices e as faces trocados pelos triângulos da peça
+(as faces do núcleo triangulam como o contato de sólidos, em milímetro), cada triângulo no volume que `REFINA.partes` diz que a
+parte dele refina, e `avaliarFormaGlobal` roda sem mudança. O envelope derivado sai da malha; os landmarks e o envelope declarado
+vêm do andaime, porque uma malha não os revela, e as regiões obrigatórias valem pelas partes entregues. O orçamento do alvo limita a
+blocagem do andaime e não a peça detalhada, e por isso não entra em `medidasAprovadas`. O veredito de `descrever` imprime o G01
+em `REFERÊNCIA DA FORMA` e reprova quando as medidas não passam, sem esperar a crítica do alvo (o G00 fica bloqueado até ela existir).
+A prova está em `tools/mecanifica/forma-da-peca-no-veredito.test.mjs`, sobre o suporte de `tools/fixtures/refina-forma-global/`
+(`alvo.json`): a malha que confere passa, e a sapata deslocada 30 mm reprova em duas silhuetas e no envelope.
+
 A prova está em `src/autoria/tradutor-nivel-zero.test.js` (cada tipo com formas escritas à mão, a rotação, as aproximações com
 valores analíticos, o recolhimento, as recusas, os ids e o determinismo) e em `tools/mecanifica/esboco-para-andaime.test.mjs`
 (as fixtures do módulo e do banco de provas): nas formas exatas o volume coincide com o do esboço dentro de 1e-6 relativo e o

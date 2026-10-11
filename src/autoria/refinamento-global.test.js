@@ -35,8 +35,19 @@ describe('REFINA', () => {
     expect(normalizarRefinamentoGlobal({ ...REFINA, versao: 1 }).versao).toBe(1);
   });
 
+  it('o alvo N2 é opcional: sem ele a forma canônica não ganha o campo, e com ele o caminho entra e a normalização continua idempotente', () => {
+    expect(normalizarRefinamentoGlobal(REFINA)).not.toHaveProperty('alvo');
+    const comAlvo = normalizarRefinamentoGlobal({ ...REFINA, alvo: ' alvo.json ' });
+    expect(comAlvo.alvo).toBe('alvo.json');
+    expect(normalizarRefinamentoGlobal(comAlvo)).toEqual(comAlvo);
+  });
+
   it.each([
     [{ ...REFINA, versao: 2 }, /versão 1/],
+    [{ ...REFINA, alvo: '/etc/alvo.json' }, /'alvo' precisa ser o caminho relativo/],
+    [{ ...REFINA, alvo: 'https://exemplo/alvo.json' }, /'alvo' precisa ser o caminho relativo/],
+    [{ ...REFINA, alvo: 'alvo.txt' }, /'alvo' precisa ser o caminho relativo/],
+    [{ ...REFINA, alvo: 7 }, /'alvo' precisa ser o caminho relativo/],
     [{ ...REFINA, formato: 'outro' }, /formato/],
     [{ ...REFINA, extra: 1 }, /'REFINA.extra' não é permitido/],
     [{ andaime: 'a.json', partes: { sapata: 'sapata' } }, /precisa declarar: tolerancia/],

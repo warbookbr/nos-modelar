@@ -76,3 +76,26 @@ largura, não vê profundidade e não julga a região que o recorte não cobre. 
 a foto tem um cabo, um guidão ou uma legenda por cima da borda, a extração pega
 o obstáculo: o recorte é declaração de onde a medida vale, e escolhê-lo mal
 produz número confiante e errado.
+
+## No veredito da peça
+
+`npm run descrever -- <peça>` confere a forma contra a referência que a peça tem, depois do que já roda (plano de partes,
+refinamento, contatos e formas), e cada item sem referência diz `não conferido: sem referência`, sem aprovar nem barrar. O
+`conferir:referencia` acima continua sendo a conferência da borda contra uma foto; estes três itens não precisam de foto.
+
+- **G01 sobre a malha.** A receita que refina um andaime declara também o alvo N2 em `REFINA.alvo` (caminho relativo à pasta da
+  peça, como `andaime`). O G01 roda com os triângulos da peça no lugar dos do andaime e confere envelope, regiões e as silhuetas
+  frontal, direita e superior com os limiares do próprio alvo. Os landmarks e o envelope declarado vêm do andaime, e o orçamento do
+  alvo (que limita o andaime) não conta. O G00 do alvo fica bloqueado enquanto a crítica dele não existe, e o veredito olha só as medidas.
+- **Contorno por parte.** Todo `*.contornos.json` na pasta da peça (ou numa subpasta, como `referencias/`) é comparado com a malha
+  pelo comparador do esboço: razão interseção/união de 0,85 e desvio de até o maior entre 5 mm e 3% da maior dimensão do contorno.
+  A vista sai do nome do arquivo (`frontal`, `lateral` ou `superior` no começo), a silhueta inteira é comparada e cada região casa
+  com a parte de mesmo nome. A mensagem nomeia a parte, o desvio e a diferença de tamanho e de posição. O contorno de um objeto
+  mora na pasta do objeto, fora da de cada parte, e por isso não entra na parte.
+- **Razões.** `RAZOES` na receita, ao lado de `PLANO`: `[{ nome, origem, mede: { razao: [A, B], faixa: [min, max] } }]`, com A e B
+  as medidas do `--medidas` do esboço (`alturaTotal`, `larguraTotal`, `profundidadeTotal`, `{ caixa, formas }`, `{ distancia,
+  eixo }`), em que as formas são as partes da peça. A razão fora da faixa, ou que não se lê, reprova com o valor medido.
+
+O laço lê o mesmo veredito: `rodada-de-modelagem.mjs <peça> --acao` mede a receita atual (veredito, `guarda:acervo`,
+`guarda:referencial` e `conferir-pontos` quando há `PONTOS`) e devolve `modelar` enquanto a medição não passar; `--registrar` mede
+de novo e recusa o veredito do crítico quando ela reprovou.

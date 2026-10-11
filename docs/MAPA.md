@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1091 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1106 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -105,6 +105,8 @@
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
+- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
+- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
@@ -861,7 +863,7 @@
 - `forma-global-prisma.test.mjs` — Orientação da malha do prisma na forma global N2. Para cada combinação de eixo de extrusão, ordem dos eixos do perfil e sentido do contorno (doze no total), …
 - `forma-global.js` — Contrato e executor neutros da N2. A fonte é um andaime de volumes semânticos; a malha e as projeções são produtos derivados sem identidade. Este módulo não …
 - `fresta-e-porta-ocupada.test.js` — fresta-e-porta-ocupada.test.js — duas coisas que a montagem deixava passar em silêncio: fresta entre faces apoiadas e duas partes na mesma porta.
-- `g01-do-andaime.js` — G01 sobre o andaime derivado do esboço. O gate (`avaliarFormaGlobal`) compara um alvo N2 com a blocagem compilada do andaime: envelope, landmarks, regiões ob…
+- `g01-do-andaime.js` — G01 sobre o andaime derivado do esboço e sobre a malha da peça. O gate (`avaliarFormaGlobal`) compara um alvo N2 com uma blocagem: envelope, landmarks, regiõ…
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações mecânicas e deriva poses sem Three.js, hierarquia ou solver. É o contrato mínimo …
@@ -896,6 +898,8 @@
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
 - `provedor-forma-global.js` — Provedor N2: cobre planejamento de alvo, andaime e blocagem porque há um serviço puro correspondente. Crítica e aceite continuam fora deste manifesto.
 - `qualificacao-alvo.js` — qualificacao-alvo.js — declara o que uma referência permite inferir.
+- `razoes-da-peca.js` — razoes-da-peca.js — as razões que a receita declara, medidas na malha da peça executada.
+- `razoes-da-peca.test.js` — razoes-da-peca.test.js — as razões que a receita declara, medidas na malha da peça executada: a picape de altura 0,29 do comprimento fora da faixa [0,30, 0,4…
 - `refinamento-global.js` — refinamento-global.js — a receita detalhada refina um andaime da forma global N2.
 - `refinamento-global.test.js` — refinamento-global.test.js — a declaração REFINA, as portas do andaime e a conferência contra a peça executada.
 - `regua-de-portas.js` — regua-de-portas.js — a conta das portas, pura e sem nenhum import.
@@ -1126,6 +1130,22 @@
 
 - `suporte.js` — suporte.js — a receita de prova do refinamento da forma global.
 
+## tools/fixtures/refina-forma-global/contorno-ok/
+
+- `receita.js` — O suporte inteiro com o contorno frontal ao lado (referencias/frontal.contornos.json): a sapata e a coluna casam com as regiões de mesmo nome.
+
+## tools/fixtures/refina-forma-global/contorno-parte-fora/
+
+- `receita.js` — A sapata deslocada 30 mm em +x, com a tolerância de envelope no teto (50 mm) para o refinamento deixá-la passar: quem reprova é o contorno por parte, e nomei…
+
+## tools/fixtures/refina-forma-global/g01-ok/
+
+- `receita.js` — O suporte inteiro, com REFINA.alvo: a malha confere com o alvo N2 nas três silhuetas.
+
+## tools/fixtures/refina-forma-global/g01-parte-fora/
+
+- `receita.js` — A sapata deslocada 30 mm em +x, com a tolerância de envelope no teto (50 mm) para o refinamento deixá-la passar: quem reprova é o G01 da malha.
+
 ## tools/fixtures/refina-forma-global/ok/
 
 - `receita.js` — A receita inteira do suporte: a sapata e a coluna dentro dos volumes do andaime e o assento onde ele o declarou.
@@ -1141,6 +1161,14 @@
 ## tools/fixtures/refina-forma-global/porta-movida/
 
 - `receita.js` — A porta `assento` publicada 5 mm acima do topo da coluna: a geometria é a do andaime e a porta não.
+
+## tools/fixtures/refina-forma-global/razao-fora/
+
+- `receita.js` — O suporte declarando que a altura é de 0,30 a 0,40 da largura, quando é igual a ela.
+
+## tools/fixtures/refina-forma-global/razao-ok/
+
+- `receita.js` — O suporte com duas razões na faixa: a coluna é de 0,90 da largura da sapata e a altura total é igual à largura total.
 
 ## tools/fixtures/tres-blocos-vinculados/
 
@@ -1277,6 +1305,7 @@
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
+- `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
@@ -1302,6 +1331,7 @@
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
 - `esboco-para-andaime.test.mjs` — A prova do tradutor do nível zero sobre os esboços do módulo e do banco de provas: o andaime é aceito por `normalizarAndaimeGlobal`, a blocagem compila e fec…
+- `esboco-proximo-mede-antes.test.mjs` — O --proximo do esboço só gera o brief do crítico depois das medidas do plano aprovadas, as em milímetro e as razões. O brief do objeto inteiro sai quando o P…
 - `esboco-recusa.mjs` — Para onde cada recusa do esboço aponta: a mensagem "esboço recusado: ...", o gate de contato que reprova e o Portão do Condutor que não passa ganham no fim `…
 - `esboco-recusa.test.mjs` — esboco-recusa.test.mjs — toda recusa do esboço aponta o tópico que resolve, e o tópico existe no índice real de `npm run esboco -- --ajuda`: a forma e o camp…
 - `esboco-referencia.mjs` — Lê as referências do esboço para o módulo `modulos/esboco`, que não lê arquivo: um JSON de contornos da imagem (`mecanifica.contornos@1`, o que `npm run cont…
@@ -1328,6 +1358,7 @@
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
+- `forma-da-peca-no-veredito.test.mjs` — forma-da-peca-no-veredito.test.mjs — o veredito da peça confere a forma contra a referência, depois do que já roda. Sobre o suporte de `tools/fixtures/refina…
 - `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
 - `forma-global-n2-g01-primitivas.test.mjs` — G01 com um andaime que usa as seis primitivas do nível zero (cone, esfera, anel, revolução, extrusão côncava e tubo): um reservatório com base em anel, corpo…
 - `forma-global-n2-primitivas.test.mjs` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução, extrusão côncava e tubo. Cada uma é provada por envelope medido, mal…
@@ -1380,6 +1411,8 @@
 - `resolver-caminho-receita.test.mjs` — resolver-caminho-receita.test.mjs — testes unitários para resolução flexível e segura de receitas procedurais.
 - `revalidacao-cascata-r00.test.ts` — Provas executáveis da R00: identidade, estados, obsolescência e concorrência.
 - `revalidacao-resultados.test.ts` — Provas R03: resultado vinculado, histórico, obsolescência e CAS persistidos.
+- `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
+- `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
 - `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
 - `rodada-de-modelagem.test.mjs` — rodada-de-modelagem.test.mjs — o registro do laço, de ponta a ponta.
 - `rodadas-com-critico.mjs` — rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo volta,…

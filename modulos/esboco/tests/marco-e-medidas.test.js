@@ -92,6 +92,19 @@ describe('entrega 2: --medidas em texto', () => {
     expect(existsSync(`${arq}.condutor.json`)).toBe(false);
   });
 
+  it('a razão sai em texto com os dois operandos e a faixa, e a picape baixa fica fora da faixa', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'razao-'));
+    const arq = join(dir, 'p.esboco.json');
+    const picape = (altura) => ({
+      plano: { medidas: [{ nome: 'alturaPeloComprimento', origem: 'ficha', mede: { razao: ['alturaTotal', 'profundidadeTotal'], faixa: [0.3, 0.4] } }] },
+      opcoes: [{ titulo: 'T', formas: [{ id: 'corpo', tipo: 'caixa', largura: 1800, altura, profundidade: 5000, centro: [0, altura / 2, 0] }] }],
+    });
+    writeFileSync(arq, JSON.stringify(picape(1450)));
+    expect(medidasArquivo(arq).texto).toContain('alturaPeloComprimento: razão 0,29 (1450 mm sobre 5000 mm), faixa 0,3 a 0,4, fora (abaixo da faixa por 0,01)');
+    writeFileSync(arq, JSON.stringify(picape(1650)));
+    expect(medidasArquivo(arq).texto).toContain('alturaPeloComprimento: razão 0,33 (1650 mm sobre 5000 mm), faixa 0,3 a 0,4, dentro');
+  });
+
   it('sem medidas no plano diz isso e sai com 0', () => {
     const dir = mkdtempSync(join(tmpdir(), 'medidas-'));
     const arq = join(dir, 'm.esboco.json');
