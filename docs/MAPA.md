@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1034 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1039 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -985,6 +985,12 @@
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
 
+## tools/fixtures/composicao-parametrica/
+
+- `composicoes.js` — Fixture de teste: uma composição procedural mínima (um bloco identificado) e o registro que a executa. Quem a usa é `tools/mecanifica/composicao-na-varredura…
+- `configuracao.mjs` — Configuração explícita do registro de composições da fixture: é o que `--composicoes=tools/fixtures/composicao-parametrica/configuracao.mjs` aponta.
+- `receita.js` — Fixture de teste: receita que compõe por `CHAMADAS_COMPOSICOES` e deriva as chamadas de `PARAMS`. Uma base e um pilar com `folga` entre eles; `largura` e `al…
+
 ## tools/fixtures/conjunto-com-submontagens/
 
 - `executar-estudo.mjs` — Fixture de teste: um conjunto de seis peças em duas submontagens, com relações diretas e indiretas. Quem a usa é `tools/mecanifica/contexto-montagem-estudo.t…
@@ -1188,12 +1194,14 @@
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
 - `comecar.test.mjs` — comecar.test.mjs — a entrada por intenção: a lista dos roteiros com o estado, cada roteiro com a sua leitura e o passo seguinte, o grupo de uma intenção, o n…
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
+- `composicao-na-varredura.test.mjs` — A varredura de parâmetros, o `descrever` e o Envelope do Condutor enxergam o registro de composições.
 - `conferir-contra-referencia.mjs` — conferir-contra-referencia.mjs — desvio em MILÍMETRO entre a silhueta lateral de partes de uma peça e a borda correspondente de uma foto de referência.
 - `conferir-contra-referencia.test.mjs` — A REFERÊNCIA É A SILHUETA DA PRÓPRIA PEÇA DE PROVA, desenhada a partir da malha dela e guardada ao lado da receita. Uma foto de conteúdo faria este teste dep…
 - `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
+- `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.

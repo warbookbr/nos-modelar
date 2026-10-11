@@ -141,12 +141,28 @@ export function invariantesDe(descricao) {
 }
 
 /**
+ * O que a execução de uma receita recebe de fora do módulo dela: os registros
+ * explícitos. Receita com `CHAMADAS_COMPOSICOES` só executa com
+ * `registroComposicoes`, e as operações de extensão que as composições usam
+ * vêm em `registroOperacoes`. Sem nenhum dos três a execução é a de sempre, e
+ * o objeto vazio mantém a mesma saída das receitas que usam `PASSOS`. Nada é
+ * descoberto por varredura de pasta: quem varre entrega o registro.
+ */
+export function execucaoDe({ registroComposicoes, registroOperacoes, orcamentoComposicoes } = {}) {
+  const execucao = {};
+  if (registroComposicoes) execucao.registroComposicoes = registroComposicoes;
+  if (registroOperacoes) execucao.registroOperacoes = registroOperacoes;
+  if (orcamentoComposicoes) execucao.orcamentoComposicoes = orcamentoComposicoes;
+  return execucao;
+}
+
+/**
  * Mede uma variante. Devolve o valor do critério, os invariantes e, quando o
  * motor recusa, o motivo — recusa é resultado, não exceção a engolir.
  */
-export function avaliarVariante(receita, params, criterio) {
+export function avaliarVariante(receita, params, criterio, execucao = {}) {
   try {
-    const { neutro } = executarReceita(receitaComParametros(receita, params));
+    const { neutro } = executarReceita(receitaComParametros(receita, params), execucao);
     const descricao = descreverPeca(neutro);
     return {
       ok: true,
@@ -216,7 +232,9 @@ export function varrerSensibilidade(receita, {
   criterio: criterioDeclarado = 'menor-folga',
   delta = 0.1,
   orcamento = ORCAMENTO_PADRAO,
+  ...opcoesDeExecucao
 } = {}) {
+  const execucao = execucaoDe(opcoesDeExecucao);
   const criterio = lerCriterio(criterioDeclarado);
   const params = receita.PARAMS ?? {};
   const caminhos = caminhosNumericos(params);
@@ -228,7 +246,7 @@ export function varrerSensibilidade(receita, {
     );
   }
 
-  const base = avaliarVariante(receita, params, criterio);
+  const base = avaliarVariante(receita, params, criterio, execucao);
   if (!base.ok) throw new Error(`a receita não mede na base: ${base.recusa}`);
   if (base.invariantes.partes === 0) {
     throw new Error('a receita não publica nenhuma parte; não há o que medir. Veja `npm run parametros`.');
@@ -241,7 +259,7 @@ export function varrerSensibilidade(receita, {
     const sondas = [];
     for (const fator of [1 - delta, 1 + delta]) {
       const novo = valor === 0 ? (fator - 1) : valor * fator;
-      const r = avaliarVariante(receita, comCaminho(params, caminho, novo), criterio);
+      const r = avaliarVariante(receita, comCaminho(params, caminho, novo), criterio, execucao);
       variantes += 1;
       sondas.push({
         fator,
@@ -275,7 +293,7 @@ export function varrerSensibilidade(receita, {
     }
   }
   const olhar = melhor
-    ? partesMovidas(receita, comCaminho(params, melhor.caminho.split('.'), melhor.valor))
+    ? partesMovidas(receita, comCaminho(params, melhor.caminho.split('.'), melhor.valor), execucao)
     : { partes: [], proporcao: null };
 
   return {
@@ -345,7 +363,9 @@ export function varrerLote(receita, {
   criterio: criterioDeclarado = 'menor-folga',
   objetivo = null,
   orcamento = ORCAMENTO_PADRAO,
+  ...opcoesDeExecucao
 } = {}) {
+  const execucao = execucaoDe(opcoesDeExecucao);
   if (!declaradas.length) throw new Error('o lote precisa de pelo menos uma liberdade: caminho:min..max:passos');
   const criterio = lerCriterio(criterioDeclarado);
   const liberdades = declaradas.map(lerLiberdade);
@@ -358,14 +378,14 @@ export function varrerLote(receita, {
   }
 
   const params = receita.PARAMS ?? {};
-  const base = avaliarVariante(receita, params, criterio);
+  const base = avaliarVariante(receita, params, criterio, execucao);
   if (!base.ok) throw new Error(`a receita não mede na base: ${base.recusa}`);
 
   const candidatos = [];
   for (const combinacao of grade) {
     let novos = params;
     for (const { caminho, valor } of combinacao) novos = comCaminho(novos, caminho, valor);
-    const r = avaliarVariante(receita, novos, criterio);
+    const r = avaliarVariante(receita, novos, criterio, execucao);
     const valores = Object.fromEntries(combinacao.map((c) => [c.rotulo, c.valor]));
     if (!r.ok) {
       candidatos.push({ valores, estado: 'recusado', motivo: r.recusa, valor: null, custo: null });
@@ -407,7 +427,7 @@ export function varrerLote(receita, {
     for (const [rotulo, valor] of Object.entries(viaveis[0].valores)) {
       escolhido = comCaminho(escolhido, rotulo.split('.'), valor);
     }
-    olhar = partesMovidas(receita, escolhido);
+    olhar = partesMovidas(receita, escolhido, execucao);
   }
 
   return {
@@ -432,9 +452,10 @@ export function varrerLote(receita, {
  * medida. Nomes semânticos, nunca índice: é a mesma identidade que a bancada
  * usa em `--selecionadas`.
  */
-export function partesMovidas(receita, paramsCandidato, { minimo = EPSILON_EFEITO } = {}) {
+export function partesMovidas(receita, paramsCandidato, { minimo = EPSILON_EFEITO, ...opcoesDeExecucao } = {}) {
+  const execucao = execucaoDe(opcoesDeExecucao);
   const medir = (params) => {
-    const { neutro } = executarReceita(receitaComParametros(receita, params));
+    const { neutro } = executarReceita(receitaComParametros(receita, params), execucao);
     return new Map(descreverPeca(neutro).partes.map((p) => [p.nome, p]));
   };
   const base = medir(receita.PARAMS ?? {});

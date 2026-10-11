@@ -111,6 +111,24 @@ pelo objetivo — `--maximizar`, `--minimizar` ou `--alvo=<valor>`. Sem objetivo
 declarado a lista sai na ordem da grade, porque ordenar sem critério é escolher
 no lugar de quem perguntou.
 
+### Receita que compõe por `CHAMADAS_COMPOSICOES`
+
+A receita que compõe por `CHAMADAS_COMPOSICOES` só executa com um registro de
+composições explícito, e a varredura o recebe como o `descrever`:
+
+```bash
+npm run varrer -- <receita> --livres=folga:0.005..0.02:4 --composicoes=<modulo>
+```
+
+O módulo exporta, em `default` ou em `configuracao`, um objeto ou uma função que
+devolve `{ registroComposicoes, registroOperacoes?, orcamentoComposicoes? }`
+(por exemplo `tools/fixtures/composicao-parametrica/configuracao.mjs`). Na API,
+`varrerLote`, `varrerSensibilidade` e `partesMovidas` aceitam essas três opções
+diretamente, e `varrerReutilizavel` aceita também `composicoes`, o caminho do
+módulo. Nenhum registro é descoberto por varredura de pastas, e a receita que
+compõe sem registro é recusada com o que falta. A receita de `PASSOS` não muda.
+O diagnóstico de `npm run parametros` ainda não recebe o registro.
+
 ### Critérios aceitos
 
 `menor-folga`, `interpenetracoes`, `contatos`, `folga:<a>,<b>`,

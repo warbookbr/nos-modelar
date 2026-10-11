@@ -73,6 +73,10 @@ npm run descrever -- <nome-da-peca>
 nenhum contato fora do que a receita declarou em `contatos` e nenhuma parte com
 forma diferente da prometida.
 
+Receita que compõe por `CHAMADAS_COMPOSICOES` precisa do registro de composições:
+`npm run descrever -- <nome-da-peca> --composicoes=<módulo>` (o mesmo argumento
+vale em `npm run varrer`). Sem ele o comando recusa dizendo o que falta.
+
 ### Passo 2: Verificação de Encaixes e Juntas
 ```bash
 npm run conferir:juntas -- <nome-da-peca>

@@ -10,6 +10,12 @@ import { existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
+import {
+  ErroDeConfiguracao,
+  OPCAO_COMPOSICOES,
+  carregarConfiguracaoDeComposicoes,
+  faltaRegistroDeComposicoes,
+} from './configuracao-composicoes.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 import {
@@ -126,6 +132,9 @@ export async function descreverPecaReutilizavel({
   registroOperacoes = null,
   registroComposicoes = null,
   orcamentoComposicoes = null,
+  /* Módulo que exporta o registro de composições (`--composicoes=<módulo>`);
+     vale quando `registroComposicoes` não vem pronto. */
+  composicoes = null,
 } = {}) {
   if (listar) {
     const partesDeObjeto = listarPartesDeObjetos();
@@ -198,15 +207,23 @@ export async function descreverPecaReutilizavel({
     );
   }
 
+  let execucao = { registroOperacoes, registroComposicoes, orcamentoComposicoes };
+  if (composicoes !== null) {
+    try {
+      execucao = { ...execucao, ...await carregarConfiguracaoDeComposicoes(composicoes) };
+    } catch (erro) {
+      if (erro instanceof ErroDeConfiguracao) return erroDeUso(erro.message);
+      throw erro;
+    }
+  }
+  const falta = faltaRegistroDeComposicoes(receita, execucao.registroComposicoes, `'${peca}'`);
+  if (falta) return erroDeUso(falta);
+
   let entrada;
   let neutro;
   let expansao = null;
   try {
-    ({ entrada, neutro, expansao } = executarReceita(receita, {
-      registroOperacoes,
-      registroComposicoes,
-      orcamentoComposicoes,
-    }));
+    ({ entrada, neutro, expansao } = executarReceita(receita, execucao));
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }
@@ -403,7 +420,7 @@ function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['partes', 'subarvore', 'casas'],
+      opcoes: ['partes', 'subarvore', 'casas', OPCAO_COMPOSICOES],
       bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
@@ -431,6 +448,7 @@ function comoCLI(argv) {
     semVeredito: lido.bandeira('sem-veredito'),
     resumo: !lido.bandeira('completo'),
     listar: lido.bandeira('listar'),
+    composicoes: lido.opcao(OPCAO_COMPOSICOES),
   });
 }
 

@@ -19,6 +19,7 @@ import { conferirRefinamentoGlobal, normalizarRefinamentoGlobal } from '../../sr
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { descreverTraducao, medidasDaOpcao } from './esboco-para-andaime.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
+import { ErroDeConfiguracao, carregarConfiguracaoDeComposicoes, faltaRegistroDeComposicoes } from './configuracao-composicoes.mjs';
 
 /* A porta do Condutor: `{ opcoes: [{ titulo, volumes, aproximadas, semEquivalente, linhas, medidas, erro? }] }`, na ordem das
    opções do esboço. `medidas` é a leitura na blocagem (`lerMedidasNaBlocagem`); `linhas` são as linhas de perda do tradutor
@@ -76,9 +77,11 @@ export function conferirEnvelopeDaReceita({ bruto, estado, unidade: nomeDaUnidad
   };
 }
 
-/* O mesmo, carregando a receita do disco: executa os PASSOS dela e confere. A receita que compõe por `CHAMADAS_COMPOSICOES`
-   precisa de um registro de composições que o Condutor não tem, e é recusada com o motivo. */
-export async function envelopeDaReceitaArquivo({ bruto, estado, unidade, caminhoDaReceita }) {
+/* O mesmo, carregando a receita do disco: executa a receita e confere. A receita que compõe por `CHAMADAS_COMPOSICOES` precisa
+   de um registro de composições explícito, entregue por `registroComposicoes` (com `registroOperacoes` e `orcamentoComposicoes`,
+   se as composições os usam) ou por `composicoes`, o módulo de configuração que `--composicoes=<módulo>` aponta; sem ele é
+   recusada dizendo o que falta. */
+export async function envelopeDaReceitaArquivo({ bruto, estado, unidade, caminhoDaReceita, composicoes = null, registroComposicoes = null, registroOperacoes = null, orcamentoComposicoes = null }) {
   const caminho = resolve(caminhoDaReceita);
   let receita;
   try {
@@ -86,10 +89,21 @@ export async function envelopeDaReceitaArquivo({ bruto, estado, unidade, caminho
   } catch (e) {
     throw new ErroDeEsboco(`a receita ${caminhoDaReceita} não carregou: ${e.message}`);
   }
-  if (!Array.isArray(receita?.PASSOS)) throw new ErroDeEsboco(`a receita ${caminhoDaReceita} não exporta PASSOS (a que compõe por CHAMADAS_COMPOSICOES não passa por aqui)`);
+  if (!Array.isArray(receita?.PASSOS) && !Array.isArray(receita?.CHAMADAS_COMPOSICOES)) throw new ErroDeEsboco(`a receita ${caminhoDaReceita} não exporta PASSOS nem CHAMADAS_COMPOSICOES`);
+  let execucao = { registroComposicoes, registroOperacoes, orcamentoComposicoes };
+  if (composicoes !== null) {
+    try {
+      execucao = { ...execucao, ...await carregarConfiguracaoDeComposicoes(composicoes) };
+    } catch (e) {
+      if (e instanceof ErroDeConfiguracao) throw new ErroDeEsboco(e.message);
+      throw e;
+    }
+  }
+  const falta = faltaRegistroDeComposicoes(receita, execucao.registroComposicoes, `a receita ${caminhoDaReceita}`);
+  if (falta) throw new ErroDeEsboco(falta);
   let neutro;
   try {
-    ({ neutro } = executarReceita(receita));
+    ({ neutro } = executarReceita(receita, execucao));
   } catch (e) {
     throw new ErroDeEsboco(`o núcleo recusou a receita ${caminhoDaReceita}: ${e.message}`);
   }
