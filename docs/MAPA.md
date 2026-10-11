@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1056 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1060 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -594,6 +594,13 @@
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+
+## procedural/familias/roda-pneu/
+
+- `composicoes.js` — composicoes.js — a composição da família `roda-pneu` na variante de disco.
+- `derivar.js` — derivar.js — dos parâmetros da família `roda-pneu` (milímetro, contagem) aos argumentos da composição (metro).
+- `index.js` — index.js — a família `roda-pneu` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/index.js`) i…
+- `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` (variante de disco) medida na malha: as três partes, o volume contra a fórmula, os furos de fixação (contagem, posi…
 
 ## procedural/nucleo/
 

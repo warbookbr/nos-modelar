@@ -1,0 +1,101 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "roda-pneu",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "diametroPneu": { "tipo": "numero", "unidade": "mm", "padrao": 610, "minimo": 400, "maximo": 900, "medio": 650 },
+    "larguraPneu": { "tipo": "numero", "unidade": "mm", "padrao": 125, "minimo": 100, "maximo": 300, "medio": 200 },
+    "diametroAro": { "tipo": "numero", "unidade": "mm", "padrao": 420, "minimo": 250, "maximo": 560, "medio": 405 },
+    "larguraAro": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 80, "maximo": 240, "medio": 160 },
+    "espessuraDisco": { "tipo": "numero", "unidade": "mm", "padrao": 8, "minimo": 5, "maximo": 12, "medio": 8 },
+    "diametroCubo": { "tipo": "numero", "unidade": "mm", "padrao": 140, "minimo": 100, "maximo": 260, "medio": 180 },
+    "diametroFuroCentral": { "tipo": "numero", "unidade": "mm", "padrao": 60, "minimo": 40, "maximo": 120, "medio": 80 },
+    "furosDeFixacao": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 3, "maximo": 10, "medio": 6 },
+    "diametroCirculoFuros": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 70, "maximo": 200, "medio": 135 },
+    "diametroFuro": { "tipo": "numero", "unidade": "mm", "padrao": 14, "minimo": 10, "maximo": 20, "medio": 15 },
+    "desvio": { "tipo": "numero", "unidade": "mm", "padrao": 35, "minimo": -25, "maximo": 70, "medio": 25 }
+  },
+  "restricoes": [
+    {
+      "id": "flanco-minimo-do-pneu",
+      "expressao": "diametroAro + 100 <= diametroPneu",
+      "motivo": "o flanco do pneu (metade da diferença entre o diâmetro do pneu e o do aro) fica abaixo de 50 mm, e o abaulamento e o ombro chanfrado não cabem nele"
+    },
+    {
+      "id": "aro-mais-estreito-que-o-pneu",
+      "expressao": "larguraAro * 1.1 <= larguraPneu",
+      "motivo": "o aro passa de 91% da largura do pneu e o talão não deixa o flanco abaular"
+    },
+    {
+      "id": "pneu-ate-o-dobro-do-aro",
+      "expressao": "larguraPneu <= larguraAro * 2",
+      "motivo": "o pneu passa do dobro da largura do aro e o talão não prende o flanco"
+    },
+    {
+      "id": "chapa-dentro-do-aro-por-fora",
+      "expressao": "desvio + espessuraDisco / 2 <= larguraAro / 2",
+      "motivo": "com este desvio a chapa do disco sai do barril do aro pelo lado de fora"
+    },
+    {
+      "id": "cubo-dentro-do-aro-por-dentro",
+      "expressao": "desvio + larguraAro / 2 >= espessuraDisco / 2 + 12",
+      "motivo": "com este desvio o cubo, que avança 12 mm para dentro da chapa, sai do barril do aro pelo lado de dentro"
+    },
+    {
+      "id": "cubo-cabe-no-aro",
+      "expressao": "diametroCubo * 1.4 <= diametroAro",
+      "motivo": "o cubo passa de 71% do diâmetro do aro e a chapa fica sem corpo entre o cubo e o barril"
+    },
+    {
+      "id": "furos-dentro-do-cubo",
+      "expressao": "diametroCirculoFuros + diametroFuro + 12 <= diametroCubo",
+      "motivo": "o furo de fixação chega a menos de 6 mm da borda do cubo"
+    },
+    {
+      "id": "furo-central-afastado-dos-furos",
+      "expressao": "diametroFuroCentral + diametroFuro + 10 <= diametroCirculoFuros",
+      "motivo": "o furo central chega a menos de 5 mm de um furo de fixação"
+    },
+    {
+      "id": "furos-vizinhos-separados",
+      "expressao": "diametroCirculoFuros * sin(180 / furosDeFixacao) >= diametroFuro + 6",
+      "motivo": "dois furos de fixação vizinhos ficam a menos de 6 mm um do outro"
+    }
+  ],
+  "portas": [
+    { "id": "assento-do-pneu", "tipo": "anel", "papel": "ocupa" },
+    { "id": "eixo", "tipo": "anel", "papel": "recebe" },
+    { "id": "furos-de-fixacao", "tipo": "padraoFuros", "papel": "recebe" }
+  ],
+  "ferramentas": ["rodaPneu", "furos", "repete", "booleana"],
+  "perguntas": {
+    "pneu": [
+      "O pneu tem a mesma altura de flanco e a mesma largura de banda em toda a volta?",
+      "O flanco abaula, e os ombros chanfrados, de modo que a seção lê como a de um pneu e não como a de um anel reto?",
+      "O talão assenta no aro, sem folga nem atravessamento visível?"
+    ],
+    "aro": [
+      "O barril do aro é concêntrico com o pneu e tem a largura do talão?",
+      "A parede do barril é fina como a de um aro, sem virar uma folha nem um tubo grosso?"
+    ],
+    "disco": [
+      "Os furos de fixação têm o mesmo diâmetro e o mesmo espaçamento no círculo, com um deles no topo?",
+      "O furo central é concêntrico com o cubo e com o aro?",
+      "O cubo avança para dentro da chapa, e a chapa está do lado do aro que o desvio pede?",
+      "O disco fica inteiro dentro do barril do aro, sem sair por nenhum dos lados?"
+    ]
+  },
+  "esboco": {
+    "componente": "roda",
+    "mapa": { "diametro": "diametroPneu", "aro": "diametroAro", "largura": "larguraPneu" },
+    "conferencia": {
+      "versao": 1,
+      "partes": { "pneu": "pneu", "aro": "pneu", "disco": "pneu" },
+      "portas": [
+        { "porta": "assento-do-pneu", "volume": "pneu", "lado": "+x" }
+      ],
+      "tolerancia": { "envelope": 1, "porta": 0.5 }
+    }
+  }
+}

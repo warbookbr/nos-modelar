@@ -1,0 +1,113 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "roda-pneu",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-10-11",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "desvio": -25,
+          "diametroAro": 250,
+          "diametroCirculoFuros": 70,
+          "diametroCubo": 100,
+          "diametroFuro": 10,
+          "diametroFuroCentral": 40,
+          "diametroPneu": 400,
+          "espessuraDisco": 5,
+          "furosDeFixacao": 3,
+          "larguraAro": 80,
+          "larguraPneu": 100
+        },
+        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "desvio": 25,
+          "diametroAro": 405,
+          "diametroCirculoFuros": 135,
+          "diametroCubo": 180,
+          "diametroFuro": 15,
+          "diametroFuroCentral": 80,
+          "diametroPneu": 650,
+          "espessuraDisco": 8,
+          "furosDeFixacao": 6,
+          "larguraAro": 160,
+          "larguraPneu": 200
+        },
+        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "desvio": 70,
+          "diametroAro": 560,
+          "diametroCirculoFuros": 200,
+          "diametroCubo": 260,
+          "diametroFuro": 20,
+          "diametroFuroCentral": 120,
+          "diametroPneu": 900,
+          "espessuraDisco": 12,
+          "furosDeFixacao": 10,
+          "larguraAro": 240,
+          "larguraPneu": 300
+        },
+        "hash": "sha256:d4abcbf084d7d361a7f8f8e806fbb4d606752118c90081bfcc784c000b9eb770",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 22,
+      "recusasDeclaradas": [
+        {
+          "ponto": "desvio=70",
+          "restricao": "chapa-dentro-do-aro-por-fora"
+        },
+        {
+          "ponto": "diametroAro=560",
+          "restricao": "flanco-minimo-do-pneu"
+        },
+        {
+          "ponto": "diametroCirculoFuros=70",
+          "restricao": "furo-central-afastado-dos-furos"
+        },
+        {
+          "ponto": "diametroCirculoFuros=200",
+          "restricao": "furos-dentro-do-cubo"
+        },
+        {
+          "ponto": "diametroCubo=100",
+          "restricao": "furos-dentro-do-cubo"
+        },
+        {
+          "ponto": "diametroFuroCentral=120",
+          "restricao": "furo-central-afastado-dos-furos"
+        },
+        {
+          "ponto": "diametroPneu=400",
+          "restricao": "flanco-minimo-do-pneu"
+        },
+        {
+          "ponto": "larguraAro=240",
+          "restricao": "aro-mais-estreito-que-o-pneu"
+        },
+        {
+          "ponto": "larguraPneu=100",
+          "restricao": "aro-mais-estreito-que-o-pneu"
+        },
+        {
+          "ponto": "larguraPneu=300",
+          "restricao": "pneu-ate-o-dobro-do-aro"
+        }
+      ]
+    },
+    "portas": [
+      "assento-do-pneu",
+      "eixo",
+      "furos-de-fixacao"
+    ]
+  },
+  "critico": null,
+  "pessoa": null
+}
