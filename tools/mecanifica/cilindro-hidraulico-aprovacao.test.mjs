@@ -37,8 +37,8 @@ describe('o cilindro hidráulico aprovado na camada mecânica', () => {
     expect(gate(PASTA)).toEqual({ ok: true, familia: 'cilindro-hidraulico', problemas: [] });
     const aprovacao = JSON.parse(readFileSync(join(PASTA, ARQUIVO_APROVACAO), 'utf8'));
     expect(aprovacao.formato).toBe('mecanifica.aprovacao-da-familia@1');
-    expect(aprovacao.critico).toBeNull();
-    expect(aprovacao.pessoa).toBeNull();
+    /* a camada do crítico, quando gravada, julgou a mesma geometria que a mecânica aprovou */
+    for (const [nome, ponto] of Object.entries(aprovacao.critico?.pontos ?? {})) expect(ponto.hash).toBe(aprovacao.mecanica.pontos[nome].hash);
     expect(aprovacao.mecanica.portas).toEqual(['eixo-da-haste', 'guia-da-haste', 'olhal-dianteiro', 'olhal-traseiro']);
     for (const [nome, passos, curso] of [['minimo', 8, 50], ['medio', 20, 500], ['maximo', 60, 1500]]) {
       const { medidas } = aprovacao.mecanica.pontos[nome];
