@@ -20,6 +20,11 @@ export default defineConfig({
   /* Só no servidor de desenvolvimento: a página publicada não escreve arquivo
      nenhum, e quem a abre não tem o repositório para escrever nele. */
   plugins: [semSessaoNoPacote({ saida: resolve(import.meta.dirname, 'dist') })],
+  /* As cópias de trabalho dos agentes moram em `.claude/worktrees/`, cada uma com
+     o repositório inteiro e às vezes com as dependências; sem isto o servidor que
+     as capturas sobem varre e observa todas elas, e a partida passa de um minuto. */
+  server: { watch: { ignored: ['**/.claude/**', '**/dist/**'] } },
+  optimizeDeps: { entries: ['**/*.html', '!.claude/**', '!dist/**', '!node_modules/**'] },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
