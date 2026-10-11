@@ -1,86 +1,307 @@
 {
   "formato": "mecanifica.familia@1",
   "id": "roda-pneu",
-  "versao": "1.0.0",
+  "versao": "2.0.0",
   "nivel": "componente",
   "parametros": {
-    "diametroPneu": { "tipo": "numero", "unidade": "mm", "padrao": 610, "minimo": 400, "maximo": 900, "medio": 650 },
-    "larguraPneu": { "tipo": "numero", "unidade": "mm", "padrao": 125, "minimo": 100, "maximo": 300, "medio": 200 },
-    "diametroAro": { "tipo": "numero", "unidade": "mm", "padrao": 420, "minimo": 250, "maximo": 560, "medio": 405 },
-    "larguraAro": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 80, "maximo": 240, "medio": 160 },
-    "espessuraDisco": { "tipo": "numero", "unidade": "mm", "padrao": 8, "minimo": 5, "maximo": 12, "medio": 8 },
-    "diametroCubo": { "tipo": "numero", "unidade": "mm", "padrao": 140, "minimo": 100, "maximo": 260, "medio": 180 },
-    "diametroFuroCentral": { "tipo": "numero", "unidade": "mm", "padrao": 60, "minimo": 40, "maximo": 120, "medio": 80 },
-    "furosDeFixacao": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 3, "maximo": 10, "medio": 6 },
-    "diametroCirculoFuros": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 70, "maximo": 200, "medio": 135 },
-    "diametroFuro": { "tipo": "numero", "unidade": "mm", "padrao": 14, "minimo": 10, "maximo": 20, "medio": 15 },
-    "desvio": { "tipo": "numero", "unidade": "mm", "padrao": 35, "minimo": -25, "maximo": 70, "medio": 25 },
-    "tipo": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 },
-    "raios": { "tipo": "inteiro", "unidade": "contagem", "padrao": 12, "minimo": 3, "maximo": 32, "medio": 16 },
-    "diametroRaio": { "tipo": "numero", "unidade": "mm", "padrao": 7, "minimo": 4, "maximo": 11, "medio": 7 },
-    "paredeDoRaio": { "tipo": "numero", "unidade": "mm", "padrao": 1.5, "minimo": 0, "maximo": 3, "medio": 1.5 },
-    "cruzamento": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 3, "medio": 1 }
+    "diametroPneu": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 632,
+      "minimo": 50,
+      "maximo": 2000,
+      "medio": 500
+    },
+    "larguraPneu": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.324,
+      "minimo": 0.03,
+      "maximo": 0.8,
+      "medio": 0.2
+    },
+    "diametroAro": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.642,
+      "minimo": 0.3,
+      "maximo": 0.93,
+      "medio": 0.6
+    },
+    "larguraAro": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.8,
+      "minimo": 0.4,
+      "maximo": 1,
+      "medio": 0.7
+    },
+    "paredeDoAro": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.006,
+      "minimo": 0.004,
+      "maximo": 0.1,
+      "medio": 0.02
+    },
+    "banda": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 3,
+      "medio": 2
+    },
+    "tipo": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 2,
+      "medio": 1
+    },
+    "espessuraDisco": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.016,
+      "minimo": 0.004,
+      "maximo": 0.1,
+      "medio": 0.03
+    },
+    "larguraCubo": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.05,
+      "minimo": 0.02,
+      "maximo": 0.3,
+      "medio": 0.1
+    },
+    "diametroCubo": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.26,
+      "minimo": 0.035,
+      "maximo": 0.3,
+      "medio": 0.2
+    },
+    "diametroFlange": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.34,
+      "minimo": 0.1,
+      "maximo": 0.5,
+      "medio": 0.3
+    },
+    "diametroFuroCentral": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.106,
+      "minimo": 0.01,
+      "maximo": 0.2,
+      "medio": 0.06
+    },
+    "furosDeFixacao": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 5,
+      "minimo": 3,
+      "maximo": 12,
+      "medio": 6
+    },
+    "diametroCirculoFuros": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.181,
+      "minimo": 0.025,
+      "maximo": 0.4,
+      "medio": 0.13
+    },
+    "diametroFuro": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.022,
+      "minimo": 0.005,
+      "maximo": 0.04,
+      "medio": 0.02
+    },
+    "desvio": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.52,
+      "minimo": -0.6,
+      "maximo": 0.6,
+      "medio": 0
+    },
+    "raios": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 12,
+      "minimo": 3,
+      "maximo": 32,
+      "medio": 16
+    },
+    "diametroRaio": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.012,
+      "minimo": 0.002,
+      "maximo": 0.05,
+      "medio": 0.02
+    },
+    "paredeDoRaio": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.45,
+      "medio": 0.3
+    },
+    "cruzamento": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 3,
+      "medio": 1
+    },
+    "alturaDoFriso": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.03,
+      "medio": 0.015
+    },
+    "sulcos": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 60,
+      "medio": 24
+    },
+    "profundidadeDoSulco": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.2,
+      "minimo": 0.15,
+      "maximo": 0.5,
+      "medio": 0.3
+    },
+    "larguraDoSulco": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.45,
+      "minimo": 0.15,
+      "maximo": 0.7,
+      "medio": 0.4
+    }
   },
   "restricoes": [
     {
-      "id": "flanco-minimo-do-pneu",
-      "expressao": "diametroAro + 100 <= diametroPneu",
-      "motivo": "o flanco do pneu (metade da diferença entre o diâmetro do pneu e o do aro) fica abaixo de 50 mm, e o abaulamento e o ombro chanfrado não cabem nele"
+      "id": "friso-cabe-na-banda",
+      "expressao": "alturaDoFriso * 2.6 <= larguraPneu",
+      "motivo": "o friso, com a espessura e o talude que a família lhe dá, ocupa mais de 70% da largura da banda e encosta no ombro do outro lado"
     },
     {
-      "id": "aro-mais-estreito-que-o-pneu",
-      "expressao": "larguraAro * 1.1 <= larguraPneu",
-      "motivo": "o aro passa de 91% da largura do pneu e o talão não deixa o flanco abaular"
-    },
-    {
-      "id": "pneu-ate-o-dobro-do-aro",
-      "expressao": "larguraPneu <= larguraAro * 2",
-      "motivo": "o pneu passa do dobro da largura do aro e o talão não prende o flanco"
-    },
-    {
-      "id": "chapa-dentro-do-aro-por-fora",
-      "expressao": "desvio + espessuraDisco / 2 <= larguraAro / 2",
-      "motivo": "com este desvio a chapa do disco sai do barril do aro pelo lado de fora"
-    },
-    {
-      "id": "cubo-dentro-do-aro-por-dentro",
-      "expressao": "desvio + larguraAro / 2 >= espessuraDisco / 2 + 12",
-      "motivo": "com este desvio o cubo, que avança 12 mm para dentro da chapa, sai do barril do aro pelo lado de dentro"
+      "id": "cubo-dentro-da-tolerancia-do-esboco",
+      "expressao": "(abs(desvio) * larguraPneu / 2 + larguraCubo / 2 - larguraPneu / 2) * diametroPneu <= 45",
+      "motivo": "o cubo passa da largura do pneu por mais de 45 mm de um dos lados, e a conferência com o esboço, que dá 50 mm de tolerância ao envelope, não o aceita"
     },
     {
       "id": "cubo-cabe-no-aro",
-      "expressao": "diametroCubo * 1.4 <= diametroAro",
-      "motivo": "o cubo passa de 71% do diâmetro do aro e a chapa fica sem corpo entre o cubo e o barril"
+      "expressao": "diametroCubo * 1.4 <= diametroAro - 2 * paredeDoAro",
+      "motivo": "o cubo passa de 71% do diâmetro interno do aro e a chapa ou os raios ficam sem corpo entre o cubo e o barril"
+    },
+    {
+      "id": "flange-cabe-no-aro",
+      "expressao": "max(0, tipo - 1) * diametroFlange * 1.4 <= max(0, tipo - 1) * (diametroAro - 2 * paredeDoAro)",
+      "motivo": "a flange do cubo passa de 71% do diâmetro interno do aro e os raios ficam sem comprimento entre a flange e o barril"
+    },
+    {
+      "id": "furo-central-dentro-do-cubo",
+      "expressao": "diametroFuroCentral * 1.25 <= diametroCubo",
+      "motivo": "o furo central passa de 80% do diâmetro do cubo e a parede do cubo fica fina demais para os raios e para os furos"
+    },
+    {
+      "id": "flange-maior-que-o-cubo",
+      "expressao": "max(0, tipo - 1) * diametroCubo * 1.25 <= max(0, tipo - 1) * diametroFlange",
+      "motivo": "a flange não passa do tubo do cubo em 25% do diâmetro e deixa de ser uma flange"
     },
     {
       "id": "furos-dentro-do-cubo",
-      "expressao": "diametroCirculoFuros + diametroFuro + 12 <= diametroCubo",
-      "motivo": "o furo de fixação chega a menos de 6 mm da borda do cubo"
+      "expressao": "diametroCirculoFuros + diametroFuro * 1.5 <= diametroCubo + max(0, tipo - 1) * (diametroFlange - diametroCubo)",
+      "motivo": "o furo de fixação chega a menos de um quarto do seu diâmetro da borda do cubo (da flange, na raiada de flanges)"
     },
     {
       "id": "furo-central-afastado-dos-furos",
-      "expressao": "diametroFuroCentral + diametroFuro + 10 <= diametroCirculoFuros",
-      "motivo": "o furo central chega a menos de 5 mm de um furo de fixação"
+      "expressao": "diametroFuroCentral + diametroFuro * 1.5 <= diametroCirculoFuros",
+      "motivo": "o furo central chega a menos de um quarto do diâmetro de um furo de fixação"
     },
     {
       "id": "furos-vizinhos-separados",
-      "expressao": "diametroCirculoFuros * sin(180 / furosDeFixacao) >= diametroFuro + 6",
-      "motivo": "dois furos de fixação vizinhos ficam a menos de 6 mm um do outro"
+      "expressao": "diametroCirculoFuros * sin(180 / furosDeFixacao) >= diametroFuro * 1.5",
+      "motivo": "dois furos de fixação vizinhos ficam a menos de meio diâmetro de furo um do outro"
     },
     {
-      "id": "raios-cabem-no-cubo",
-      "expressao": "tipo * raios * diametroRaio * 1.25 <= tipo * 3.1416 * diametroCubo",
-      "motivo": "os raios, com um quarto de folga entre vizinhos, passam da circunferência do cubo e os nós se atravessam"
+      "id": "chapa-cabe-no-aro",
+      "expressao": "max(0, 1 - tipo) * espessuraDisco <= max(0, 1 - tipo) * larguraAro * larguraPneu",
+      "motivo": "a chapa do disco é mais grossa que o barril do aro é largo e sai dele por um dos lados"
+    },
+    {
+      "id": "cubo-mais-longo-que-a-chapa",
+      "expressao": "max(0, 1 - tipo) * espessuraDisco * 1.2 <= max(0, 1 - tipo) * larguraCubo",
+      "motivo": "a chapa do disco passa de 83% do comprimento do cubo e deixa de ter o cubo saliente dos dois lados"
+    },
+    {
+      "id": "flanges-cabem-no-cubo",
+      "expressao": "max(0, tipo - 1) * espessuraDisco * 2.2 <= max(0, tipo - 1) * larguraCubo",
+      "motivo": "as duas flanges, com a espessura pedida, ocupam mais de 90% do comprimento do cubo e não deixam o tubo entre elas"
+    },
+    {
+      "id": "raio-cabe-no-aro",
+      "expressao": "tipo * (2 - tipo) * diametroRaio <= tipo * (2 - tipo) * larguraAro * larguraPneu * 0.9",
+      "motivo": "o raio passa de 90% da largura do barril do aro e a ponta dele sai do aro pelos lados"
+    },
+    {
+      "id": "raio-mais-fino-que-o-cubo",
+      "expressao": "tipo * (2 - tipo) * 0.3 <= tipo * (2 - tipo) * (larguraCubo - diametroRaio) * diametroPneu",
+      "motivo": "o raio deixa menos de 0,3 mm de cada lado até as faces do cubo e passa a tangenciar o plano delas"
     },
     {
       "id": "raio-cabe-na-flange",
-      "expressao": "tipo * (diametroRaio + 0.5) <= tipo * espessuraDisco",
-      "motivo": "o raio deixa menos de 0,25 mm de cada lado até as faces da flange do cubo, que tem a espessura do disco, e passa a tangenciar o plano delas"
+      "expressao": "max(0, tipo - 1) * (diametroRaio * 1.2 * diametroPneu + 0.5) <= max(0, tipo - 1) * espessuraDisco * diametroPneu",
+      "motivo": "o raio inclinado deixa menos de 0,25 mm de cada lado até as faces da flange e passa a tangenciar o plano delas"
     },
     {
-      "id": "parede-do-raio-abaixo-do-raio",
-      "expressao": "tipo * (paredeDoRaio * 2 + 1) <= tipo * diametroRaio",
-      "motivo": "a parede do tubo deixa menos de 1 mm de furo no raio; use parede 0 para a barra redonda maciça"
+      "id": "raio-cabe-na-parede-da-flange",
+      "expressao": "max(0, tipo - 1) * diametroRaio * 2.5 <= max(0, tipo - 1) * (diametroFlange - diametroCubo)",
+      "motivo": "o raio passa de 40% da altura da flange acima do tubo do cubo e a ponta dele sai da flange"
+    },
+    {
+      "id": "raio-cabe-na-parede-do-cubo",
+      "expressao": "tipo * (2 - tipo) * diametroRaio * 2.5 <= tipo * (2 - tipo) * diametroCubo",
+      "motivo": "o raio passa de 40% do diâmetro do cubo e a ponta dele sai do cubo"
+    },
+    {
+      "id": "raios-cabem-no-cubo",
+      "expressao": "tipo * (2 - tipo) * raios * diametroRaio * 1.25 <= tipo * (2 - tipo) * 3.1416 * (0.75 * diametroCubo + 0.25 * diametroFuroCentral)",
+      "motivo": "os raios, com um quarto de folga entre vizinhos, passam da circunferência em que os nós ficam no cubo e os nós se atravessam"
+    },
+    {
+      "id": "raios-cabem-nas-flanges",
+      "expressao": "max(0, tipo - 1) * raios * diametroRaio * 1.25 <= max(0, tipo - 1) * 3.1416 * (diametroCubo + diametroFlange)",
+      "motivo": "os raios de cada flange, com um quarto de folga entre vizinhos, passam da circunferência em que os nós ficam na flange e os nós se atravessam"
+    },
+    {
+      "id": "raio-minimo",
+      "expressao": "min(tipo, 1) * 0.8 <= min(tipo, 1) * diametroRaio * diametroPneu",
+      "motivo": "o raio tem menos de 0,8 mm de diâmetro e a malha dele não se mede"
+    },
+    {
+      "id": "aro-segura-o-raio",
+      "expressao": "min(tipo, 1) * diametroRaio <= min(tipo, 1) * paredeDoAro",
+      "motivo": "o raio é mais grosso que a parede do aro e a ponta dele atravessa o barril"
     },
     {
       "id": "cruzamento-com-numero-par",
@@ -88,49 +309,264 @@
       "motivo": "com cruzamento os raios pares e ímpares se inclinam em sentidos opostos, e com número ímpar de raios dois vizinhos se inclinariam para o mesmo lado"
     },
     {
+      "id": "raios-pares-nas-duas-flanges",
+      "expressao": "max(0, tipo - 1) * abs(sin(raios * 90)) <= 0.001",
+      "motivo": "os raios saem alternados de uma flange e da outra, e com número ímpar de raios dois vizinhos sairiam da mesma flange"
+    },
+    {
       "id": "raio-sai-do-cubo-para-fora",
-      "expressao": "tipo * 0.3 * sqrt((diametroAro / 2 - 5) * (diametroAro / 2 - 5) + (diametroCubo / 2 - 6) * (diametroCubo / 2 - 6) - 2 * (diametroAro / 2 - 5) * (diametroCubo / 2 - 6) * cos(cruzamento * 360 / raios)) <= tipo * ((diametroAro / 2 - 5) * cos(cruzamento * 360 / raios) - (diametroCubo / 2 - 6))",
+      "expressao": "tipo * (2 - tipo) * 0.3 * sqrt((diametroAro - paredeDoAro) / 2 * (diametroAro - paredeDoAro) / 2 + (0.75 * diametroCubo + 0.25 * diametroFuroCentral) / 2 * (0.75 * diametroCubo + 0.25 * diametroFuroCentral) / 2 - 2 * (diametroAro - paredeDoAro) / 2 * (0.75 * diametroCubo + 0.25 * diametroFuroCentral) / 2 * cos(cruzamento * 360 / raios)) <= tipo * (2 - tipo) * ((diametroAro - paredeDoAro) / 2 * cos(cruzamento * 360 / raios) - (0.75 * diametroCubo + 0.25 * diametroFuroCentral) / 2)",
       "motivo": "com este cruzamento o raio sai do cubo quase tangente a ele, a mais de 72 graus da radial, e corre rente à superfície do cubo"
+    },
+    {
+      "id": "raio-sai-da-flange-para-fora",
+      "expressao": "max(0, tipo - 1) * 0.3 * sqrt((diametroAro - paredeDoAro) / 2 * (diametroAro - paredeDoAro) / 2 + (diametroCubo + diametroFlange) / 4 * (diametroCubo + diametroFlange) / 4 - 2 * (diametroAro - paredeDoAro) / 2 * (diametroCubo + diametroFlange) / 4 * cos(cruzamento * 360 / raios) + ((larguraCubo - espessuraDisco) / 2 + abs(desvio) * larguraPneu / 2) * ((larguraCubo - espessuraDisco) / 2 + abs(desvio) * larguraPneu / 2)) <= max(0, tipo - 1) * ((diametroAro - paredeDoAro) / 2 * cos(cruzamento * 360 / raios) - (diametroCubo + diametroFlange) / 4)",
+      "motivo": "com este cruzamento o raio sai da flange quase tangente a ela, a mais de 72 graus da direção do raio, e corre rente à flange"
+    },
+    {
+      "id": "sulcos-so-com-relevo",
+      "expressao": "max(0, 1 - abs(banda - 3)) * 3 <= max(0, 1 - abs(banda - 3)) * sulcos",
+      "motivo": "a banda com relevo pede ao menos 3 garras ou sulcos, e com menos a repetição em volta do eixo não fecha"
+    },
+    {
+      "id": "sulco-minimo",
+      "expressao": "max(0, 1 - abs(banda - 3)) * 0.5 * sulcos <= max(0, 1 - abs(banda - 3)) * larguraDoSulco * 3.1416 * diametroPneu",
+      "motivo": "o sulco tem menos de 0,5 mm de largura e o corte dele na banda não se mede"
     }
   ],
   "portas": [
-    { "id": "assento-do-pneu", "tipo": "anel", "papel": "ocupa" },
-    { "id": "eixo", "tipo": "anel", "papel": "recebe" },
-    { "id": "furos-de-fixacao", "tipo": "padraoFuros", "papel": "recebe" }
+    {
+      "id": "assento-do-pneu",
+      "tipo": "anel",
+      "papel": "ocupa"
+    },
+    {
+      "id": "eixo",
+      "tipo": "anel",
+      "papel": "recebe"
+    },
+    {
+      "id": "furos-de-fixacao",
+      "tipo": "padraoFuros",
+      "papel": "recebe"
+    }
   ],
-  "ferramentas": ["rodaPneu", "furos", "repete", "booleana", "barras"],
+  "ferramentas": [
+    "rodaPneu",
+    "furos",
+    "repete",
+    "booleana",
+    "barras"
+  ],
   "perguntas": {
     "pneu": [
       "O pneu tem a mesma altura de flanco e a mesma largura de banda em toda a volta?",
-      "O flanco abaula, e os ombros chanfrados, de modo que a seção lê como a de um pneu e não como a de um anel reto?",
+      "A seção lê como a banda que o parâmetro pede: bojo e ombro chanfrado no pneumático, lados retos no maciço e na roda sem pneu, e o friso só do lado de dentro?",
+      "Com relevo, as garras ou os sulcos têm o mesmo espaçamento, a mesma largura e a mesma profundidade em volta, e cortam a banda de lado a lado sem chegar ao talão?",
       "O talão assenta no aro, sem folga nem atravessamento visível?"
     ],
     "aro": [
       "O barril do aro é concêntrico com o pneu e tem a largura do talão?",
-      "A parede do barril é fina como a de um aro, sem virar uma folha nem um tubo grosso?"
+      "A parede do barril tem a espessura que a proporção pede para esta roda, sem virar uma folha nem um tubo grosso demais?"
+    ],
+    "cubo": [
+      "O cubo é concêntrico com o aro, com o furo central aberto de ponta a ponta?",
+      "Os furos de fixação têm o mesmo diâmetro e o mesmo espaçamento no círculo, com um deles no topo?",
+      "Na raiada de flanges, as duas flanges têm o mesmo diâmetro e a mesma espessura, uma em cada ponta do tubo do cubo?"
     ],
     "raios": [
       "Os raios têm o mesmo perfil e o mesmo comprimento, e estão espaçados por igual em volta do cubo?",
       "Cada raio nasce no cubo e termina na parede interna do aro, sem ficar solto e sem atravessar o aro por fora?",
-      "Com cruzamento, os raios pares e os ímpares se inclinam em sentidos opostos e se cruzam de modo simétrico?"
+      "Com cruzamento, os raios pares e os ímpares se inclinam em sentidos opostos e se cruzam de modo simétrico?",
+      "Na raiada de flanges, os raios saem alternados de uma flange e da outra e chegam ao plano do meio do aro?"
     ],
     "disco": [
-      "Os furos de fixação têm o mesmo diâmetro e o mesmo espaçamento no círculo, com um deles no topo?",
-      "O furo central é concêntrico com o cubo e com o aro?",
-      "O cubo avança para dentro da chapa, e a chapa está do lado do aro que o desvio pede?",
-      "O disco fica inteiro dentro do barril do aro, sem sair por nenhum dos lados?"
+      "A chapa fica inteira dentro do barril do aro, sem sair por nenhum dos lados, e presa ao cubo?",
+      "O desvio leva a chapa para o lado do aro que o parâmetro pede?"
     ]
   },
   "esboco": {
     "componente": "roda",
-    "mapa": { "diametro": "diametroPneu", "aro": "diametroAro", "largura": "larguraPneu" },
+    "mapa": {
+      "diametro": "diametroPneu",
+      "aro": "diametroAro * diametroPneu",
+      "largura": "larguraPneu * diametroPneu"
+    },
     "conferencia": {
       "versao": 1,
-      "partes": { "pneu": "pneu", "aro": "pneu", "disco": "pneu" },
+      "partes": {
+        "pneu": "pneu",
+        "aro": "pneu",
+        "cubo": "pneu",
+        "disco": "pneu"
+      },
       "portas": [
-        { "porta": "assento-do-pneu", "volume": "pneu", "lado": "+x" }
+        {
+          "porta": "assento-do-pneu",
+          "volume": "pneu",
+          "lado": "-x"
+        }
       ],
-      "tolerancia": { "envelope": 1, "porta": 0.5 }
+      "tolerancia": {
+        "envelope": 50,
+        "porta": 0.5
+      }
+    }
+  },
+  "perfis": {
+    "bicicleta": {
+      "descricao": "roda de bicicleta 700C com pneu de 32 mm: aro fino de 622 mm, 32 raios de arame cruzados em três, cubo estreito de duas flanges",
+      "parametros": {
+        "diametroPneu": 686,
+        "larguraPneu": 0.0466,
+        "diametroAro": 0.9067,
+        "larguraAro": 0.75,
+        "paredeDoAro": 0.025,
+        "banda": 0,
+        "tipo": 2,
+        "espessuraDisco": 0.0061,
+        "larguraCubo": 0.1,
+        "diametroCubo": 0.04,
+        "diametroFlange": 0.1,
+        "diametroFuroCentral": 0.0146,
+        "furosDeFixacao": 6,
+        "diametroCirculoFuros": 0.054,
+        "diametroFuro": 0.008,
+        "desvio": 0,
+        "raios": 32,
+        "diametroRaio": 0.0029,
+        "paredeDoRaio": 0,
+        "cruzamento": 3
+      }
+    },
+    "carro": {
+      "descricao": "roda de carro de passeio 205/55 R16: pneumático de 632 mm, aro de 16 polegadas, disco de cinco furos com desvio positivo",
+      "parametros": {
+        "diametroPneu": 632,
+        "larguraPneu": 0.324,
+        "diametroAro": 0.642,
+        "larguraAro": 0.8,
+        "paredeDoAro": 0.006,
+        "banda": 0,
+        "tipo": 0,
+        "espessuraDisco": 0.016,
+        "larguraCubo": 0.05,
+        "diametroCubo": 0.26,
+        "diametroFuroCentral": 0.106,
+        "furosDeFixacao": 5,
+        "diametroCirculoFuros": 0.181,
+        "diametroFuro": 0.022,
+        "desvio": 0.52
+      }
+    },
+    "carrinho-de-mao": {
+      "descricao": "roda de carrinho de mão 4.00-8: pneumático de 400 mm com aro de oito polegadas e disco estreito de quatro furos",
+      "parametros": {
+        "diametroPneu": 400,
+        "larguraPneu": 0.25,
+        "diametroAro": 0.51,
+        "larguraAro": 0.75,
+        "paredeDoAro": 0.012,
+        "banda": 0,
+        "tipo": 0,
+        "espessuraDisco": 0.01,
+        "larguraCubo": 0.12,
+        "diametroCubo": 0.14,
+        "diametroFuroCentral": 0.05,
+        "furosDeFixacao": 4,
+        "diametroCirculoFuros": 0.095,
+        "diametroFuro": 0.02,
+        "desvio": 0
+      }
+    },
+    "carroca": {
+      "descricao": "roda de carroça de 1200 mm: aro de madeira com banda de ferro sem pneu e friso, doze raios grossos maciços num só plano, cubo comprido",
+      "parametros": {
+        "diametroPneu": 1200,
+        "larguraPneu": 0.058,
+        "diametroAro": 0.93,
+        "larguraAro": 1,
+        "paredeDoAro": 0.05,
+        "banda": 2,
+        "tipo": 1,
+        "espessuraDisco": 0.03,
+        "larguraCubo": 0.1,
+        "diametroCubo": 0.2,
+        "diametroFuroCentral": 0.05,
+        "furosDeFixacao": 4,
+        "diametroCirculoFuros": 0.12,
+        "diametroFuro": 0.02,
+        "desvio": 0,
+        "raios": 12,
+        "diametroRaio": 0.03,
+        "paredeDoRaio": 0,
+        "cruzamento": 0,
+        "alturaDoFriso": 0
+      }
+    },
+    "rodizio": {
+      "descricao": "rodízio de 100 mm: banda maciça de poliuretano sobre um núcleo de aço, disco com furos de alívio e cubo de eixo de 8 mm",
+      "parametros": {
+        "diametroPneu": 100,
+        "larguraPneu": 0.3,
+        "diametroAro": 0.6,
+        "larguraAro": 1,
+        "paredeDoAro": 0.04,
+        "banda": 1,
+        "tipo": 0,
+        "espessuraDisco": 0.1,
+        "larguraCubo": 0.28,
+        "diametroCubo": 0.2,
+        "diametroFuroCentral": 0.08,
+        "furosDeFixacao": 4,
+        "diametroCirculoFuros": 0.14,
+        "diametroFuro": 0.03,
+        "desvio": 0
+      }
+    },
+    "trator": {
+      "descricao": "roda traseira de trator 18.4R38: pneumático de 1730 mm com 24 garras cortadas na banda e disco de oito furos com desvio",
+      "parametros": {
+        "diametroPneu": 1730,
+        "larguraPneu": 0.27,
+        "diametroAro": 0.558,
+        "larguraAro": 0.85,
+        "paredeDoAro": 0.008,
+        "banda": 3,
+        "tipo": 0,
+        "espessuraDisco": 0.014,
+        "larguraCubo": 0.09,
+        "diametroCubo": 0.22,
+        "diametroFuroCentral": 0.1,
+        "furosDeFixacao": 8,
+        "diametroCirculoFuros": 0.16,
+        "diametroFuro": 0.022,
+        "desvio": 0.37,
+        "sulcos": 24,
+        "profundidadeDoSulco": 0.15,
+        "larguraDoSulco": 0.45
+      }
+    },
+    "trem": {
+      "descricao": "roda de trem de 960 mm com o friso: banda de aço sem pneu, friso do lado de dentro, alma de disco e cubo comprido",
+      "parametros": {
+        "diametroPneu": 960,
+        "larguraPneu": 0.14,
+        "diametroAro": 0.815,
+        "larguraAro": 1,
+        "paredeDoAro": 0.03,
+        "banda": 2,
+        "tipo": 0,
+        "espessuraDisco": 0.03,
+        "larguraCubo": 0.2,
+        "diametroCubo": 0.28,
+        "diametroFuroCentral": 0.17,
+        "furosDeFixacao": 6,
+        "diametroCirculoFuros": 0.225,
+        "diametroFuro": 0.02,
+        "desvio": 0,
+        "alturaDoFriso": 0.025
+      }
     }
   }
 }

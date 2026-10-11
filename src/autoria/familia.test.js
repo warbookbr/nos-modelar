@@ -26,6 +26,61 @@ function recusa(familia, opcoes) {
   throw new Error('a família devia ser recusada');
 }
 
+const comPerfis = () => variar((f) => {
+  f.perfis = { carro: { descricao: 'roda de carro de passeio', parametros: { diametro: 650, aro: 440, largura: 200 } } };
+});
+
+describe('familia — perfis, razão e mapa com produto', () => {
+  it('lê o perfil canônico, em ordem de parâmetro, e a leitura da leitura devolve o mesmo texto', () => {
+    const f = comPerfis();
+    f.perfis.carro.parametros = { largura: 200, diametro: 650, aro: 440 };
+    f.perfis.bicicleta = { descricao: 'roda de bicicleta', parametros: { diametro: 700 } };
+    const lida = lerFamilia(f);
+    expect(Object.keys(lida.perfis)).toEqual(['bicicleta', 'carro']);
+    expect(Object.keys(lida.perfis.carro.parametros)).toEqual(['aro', 'diametro', 'largura']);
+    expect(JSON.stringify(lerFamilia(lida))).toBe(JSON.stringify(lida));
+    expect(lerFamilia(fixture()).perfis).toBeUndefined();
+  });
+
+  it('recusa o perfil de parâmetro desconhecido, fora da faixa, não inteiro, sem descrição ou que viola uma restrição', () => {
+    const com = (mudar) => recusa(variar((f) => { f.perfis = comPerfis().perfis; mudar(f.perfis.carro); }));
+    expect(com((p) => { p.parametros.cor = 1; }).message).toMatch(/perfis\.carro\.parametros\.cor recebeu 1; aceito: parâmetro da família/);
+    expect(com((p) => { p.parametros.diametro = 5000; }).message).toMatch(/perfis\.carro\.parametros\.diametro recebeu 5000; aceito: número em mm dentro da faixa \[300, 900\]/);
+    expect(com((p) => { p.parametros.raios = 2.5; }).message).toMatch(/perfis\.carro\.parametros\.raios recebeu 2.5; aceito: número inteiro/);
+    expect(com((p) => { p.descricao = ''; }).message).toMatch(/perfis\.carro\.descricao/);
+    expect(com((p) => { p.parametros = {}; }).message).toMatch(/perfis\.carro\.parametros/);
+    expect(com((p) => { p.parametros = { diametro: 450, aro: 440 }; }).message).toMatch(/restrição 'parede-do-pneu'/);
+    expect(recusa(variar((f) => { f.perfis = {}; })).message).toMatch(/perfis recebeu \{\}/);
+    expect(recusa(variar((f) => { f.perfis = { 'Carro': { descricao: 'x', parametros: { aro: 300 } } }; })).message).toMatch(/perfis\.Carro/);
+  });
+
+  it("'perfil' é o nome reservado da chamada e não serve de parâmetro", () => {
+    expect(recusa(variar((f) => { f.parametros.perfil = { ...f.parametros.aro }; })).message).toMatch(/parametros\.perfil.*nem 'perfil'/);
+  });
+
+  it('a unidade razao é uma proporção em número (tipo numero), e a contagem continua inteira', () => {
+    const f = variar((g) => { g.parametros.aro = { tipo: 'numero', unidade: 'razao', padrao: 0.6, minimo: 0.3, maximo: 0.9, medio: 0.6 }; g.restricoes = []; g.esboco = undefined; delete g.esboco; });
+    expect(lerFamilia(f).parametros.aro.unidade).toBe('razao');
+    expect(recusa(variar((g) => { g.parametros.aro = { tipo: 'inteiro', unidade: 'razao', padrao: 1, minimo: 0, maximo: 3, medio: 1 }; })).message).toMatch(/aro\.tipo recebeu "inteiro"; aceito: 'numero'/);
+  });
+
+  it('o mapa do esboço aceita o produto de dois parâmetros e recusa o resto', () => {
+    const lida = lerFamilia(variar((f) => { f.esboco.mapa.aro = 'aro*diametro'; }));
+    expect(lida.esboco.mapa.aro).toBe('aro * diametro');
+    expect(recusa(variar((f) => { f.esboco.mapa.aro = 'aro * ghost'; })).message).toMatch(/esboco\.mapa\.aro recebeu "aro \* ghost"/);
+    expect(recusa(variar((f) => { f.esboco.mapa.aro = 'aro + diametro'; })).message).toMatch(/esboco\.mapa\.aro/);
+  });
+
+  it('o schema aceita o perfil e a razão, e recusa o perfil sem descrição', () => {
+    const ajv = new Ajv2020({ strict: false });
+    const validar = ajv.compile(SCHEMA_FAMILIA);
+    expect(validar(comPerfis()), JSON.stringify(validar.errors)).toBe(true);
+    const sem = comPerfis();
+    delete sem.perfis.carro.descricao;
+    expect(validar(sem)).toBe(false);
+  });
+});
+
 describe('familia — a fixture válida', () => {
   it('passa e devolve a leitura normalizada, congelada', () => {
     const lida = lerFamilia(fixture());
@@ -104,7 +159,7 @@ describe('familia — cada defeito é recusado com campo, valor e o que é aceit
   });
 
   it('unidade e tipo desconhecidos, número não finito', () => {
-    expect(recusa(variar((f) => { f.parametros.aro.unidade = 'polegadas'; })).message).toMatch(/aro\.unidade recebeu "polegadas"; aceito: um de mm, graus, contagem/);
+    expect(recusa(variar((f) => { f.parametros.aro.unidade = 'polegadas'; })).message).toMatch(/aro\.unidade recebeu "polegadas"; aceito: um de mm, graus, contagem, razao/);
     expect(recusa(variar((f) => { f.parametros.aro.tipo = 'texto'; })).message).toMatch(/aro\.tipo recebeu "texto"; aceito: um de numero, inteiro/);
     expect(recusa(variar((f) => { f.parametros.aro.maximo = '600'; })).message).toMatch(/aro\.maximo recebeu "600"; aceito: número finito/);
   });
@@ -195,7 +250,7 @@ describe('familia — cada defeito é recusado com campo, valor e o que é aceit
   });
 
   it('vínculo com o esboço: parâmetro da família inexistente, componente e parâmetro de componente desconhecidos', () => {
-    expect(recusa(variar((f) => { f.esboco.mapa.diametro = 'diametroExterno'; })).message).toMatch(/esboco\.mapa\.diametro recebeu "diametroExterno"; aceito: um parâmetro da família: aro, diametro/);
+    expect(recusa(variar((f) => { f.esboco.mapa.diametro = 'diametroExterno'; })).message).toMatch(/esboco\.mapa\.diametro recebeu "diametroExterno"; aceito: um parâmetro da família, ou o produto de dois \('a \* b'\), entre: aro, diametro/);
     expect(recusa(variar((f) => { f.esboco.mapa = {}; })).campo).toBe('esboco.mapa');
     const componentes = Object.fromEntries(Object.entries(COMPONENTES).map(([nome, c]) => [nome, Object.keys(c.parametros)]));
     expect(recusa(variar((f) => { f.esboco.componente = 'pneu'; }), { componentes }).message).toMatch(/esboco\.componente recebeu "pneu"; aceito: um componente do esboço: dobradica, engrenagem/);

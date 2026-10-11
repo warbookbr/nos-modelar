@@ -14,11 +14,13 @@ import { definirFamilia } from '../../src/autoria/chamar-familia.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { TUBO_DE_PROVA } from '../fixtures/familia-chamavel/familia.js';
 import { ID_BARRA, ID_TUBO, COMPOSICOES as COMPOSICOES_DO_TUBO } from '../fixtures/familia-chamavel/composicoes.js';
+import { derivar as derivarDoTubo } from '../fixtures/familia-chamavel/derivar.js';
 import { criarSuporte } from '../fixtures/familia-com-chapa-e-barras/familia.js';
 import { criarCaixaOca } from '../fixtures/familia-com-casca/familia.js';
 import { COMPOSICOES as COMPOSICOES_DA_BUCHA, criarBucha } from '../fixtures/familia-com-porta/familia.js';
 import {
-  FORMATO_APROVACAO, LIMITE_DA_PAREDE_MAXIMA, aprovarFamilia, conferirAprovacao, extensoesMedidas, medirPonto, pontosDaFamilia, varreduraDaFamilia,
+  FORMATO_APROVACAO, LIMITE_DA_PAREDE_MAXIMA, aprovarFamilia, conferirAprovacao, escalasDosPerfis, extensoesMedidas, medirPonto, pontosDaFamilia,
+  pontosDosPerfis, varreduraDaFamilia,
 } from './aprovacao-da-familia.mjs';
 
 const raizes = [];
@@ -51,6 +53,66 @@ describe('os pontos e a varredura saem do contrato', () => {
     const sondas = varreduraDaFamilia(TUBO_DE_PROVA.contrato);
     expect(sondas.map(({ rotulo }) => rotulo)).toEqual(['comprimento=20', 'comprimento=500', 'diametro=10', 'diametro=200', 'lados=8', 'lados=64', 'parede=0', 'parede=40']);
     expect(sondas[3].parametros).toEqual({ comprimento: 120, diametro: 200, lados: 24, parede: 3 });
+  });
+});
+
+describe('os perfis da família: um ponto por perfil e a escala varrida', () => {
+  const contrato = structuredClone(TUBO_DE_PROVA.contrato);
+  contrato.perfis = {
+    barra: { descricao: 'barra maciça curta', parametros: { diametro: 30, comprimento: 90, parede: 0 } },
+    cano: { descricao: 'cano de parede fina', parametros: { diametro: 60, comprimento: 300, parede: 2 } },
+  };
+  const COM_PERFIS = definirFamilia({ contrato, composicoes: COMPOSICOES_DO_TUBO, derivar: derivarDoTubo });
+
+  it('o ponto do perfil é o perfil completado com o padrão, e a escala leva cada parâmetro em milímetro aos dois extremos', () => {
+    expect(pontosDosPerfis(COM_PERFIS.contrato)).toEqual({
+      barra: { comprimento: 90, diametro: 30, lados: 24, parede: 0 },
+      cano: { comprimento: 300, diametro: 60, lados: 24, parede: 2 },
+    });
+    expect(pontosDosPerfis(TUBO_DE_PROVA.contrato)).toEqual({});
+    expect(escalasDosPerfis(TUBO_DE_PROVA.contrato)).toEqual([]);
+    const escalas = escalasDosPerfis(COM_PERFIS.contrato);
+    expect(escalas.map(({ rotulo }) => rotulo)).toEqual([
+      'barra: comprimento=20', 'barra: comprimento=500', 'barra: diametro=10', 'barra: diametro=200', 'barra: parede=0', 'barra: parede=40',
+      'cano: comprimento=20', 'cano: comprimento=500', 'cano: diametro=10', 'cano: diametro=200', 'cano: parede=0', 'cano: parede=40',
+    ]);
+    expect(escalas[3].parametros).toEqual({ comprimento: 90, diametro: 200, lados: 24, parede: 0 });
+  });
+
+  it('aprova os perfis e a escala, grava o hash de cada perfil, e o conferir passa e acusa o perfil que mudou, saiu ou não foi aprovado', () => {
+    const pasta = pastaDa(COM_PERFIS);
+    const resultado = aprovarFamilia(COM_PERFIS, { pasta, data: '2026-10-11' });
+    expect(resultado.problemas).toEqual([]);
+    expect(Object.keys(resultado.perfis)).toEqual(['barra', 'cano']);
+    expect(resultado.escalas).toHaveLength(12);
+    /* a escala é varrida e a recusa por restrição declarada vira resposta: o perfil de 90 mm de comprimento recusa o diâmetro 200 */
+    expect(resultado.escalas.filter(({ estado }) => estado === 'recusa-declarada').map(({ rotulo, restricao }) => `${rotulo}:${restricao}`)).toContain('barra: diametro=200:mais-comprido-que-largo');
+    const gravada = lerAprovacao(pasta).mecanica;
+    expect(Object.keys(gravada.perfis)).toEqual(['barra', 'cano']);
+    expect(gravada.perfis.cano.hash).toBe(resultado.perfis.cano.hash);
+    expect(gravada.perfis.cano.parametros).toEqual({ comprimento: 300, diametro: 60, lados: 24, parede: 2 });
+    expect(gravada.escalasDosPerfis.sondas).toBe(12);
+    expect(conferirAprovacao(COM_PERFIS, { pasta }).problemas).toEqual([]);
+
+    /* o derivar que muda só o perfil cano: o ponto dele muda de hash e os três pontos não */
+    const mudou = comOutroDerivar(COM_PERFIS, (derivado, parametros) => (parametros.comprimento === 300 && parametros.diametro === 60 ? { ...derivado, argumentos: { ...derivado.argumentos, raio: derivado.argumentos.raio * 1.5 } } : derivado));
+    const conferido = conferirAprovacao(mudou, { pasta });
+    expect(conferido.problemas.map(({ codigo, ponto }) => `${codigo}:${ponto}`)).toEqual(['geometria-mudou:perfil cano']);
+
+    const semBarra = structuredClone(contrato);
+    delete semBarra.perfis.barra;
+    /* o contrato da pasta é o aprovado, então o contrato carregado diferente também é acusado, e aqui só importa o perfil */
+    const dosPerfis = (familia) => conferirAprovacao(familia, { pasta }).problemas.filter(({ codigo }) => codigo !== 'contrato-diferente-do-carregado');
+    expect(dosPerfis(definirFamilia({ contrato: semBarra, composicoes: COMPOSICOES_DO_TUBO, derivar: derivarDoTubo })).map(({ codigo }) => codigo)).toEqual(['perfil-removido']);
+    const comOutro = structuredClone(contrato);
+    comOutro.perfis.curto = { descricao: 'barra de 40 mm', parametros: { diametro: 20, comprimento: 40, parede: 0 } };
+    expect(dosPerfis(definirFamilia({ contrato: comOutro, composicoes: COMPOSICOES_DO_TUBO, derivar: derivarDoTubo })).map(({ codigo, ponto }) => `${codigo}:${ponto}`)).toEqual(['perfil-nao-aprovado:perfil curto']);
+  }, 60_000);
+
+  it('o perfil cujo ponto a família recusa não existe: o contrato recusa na leitura', () => {
+    const quebrado = structuredClone(contrato);
+    quebrado.perfis.barra.parametros.comprimento = 20;
+    expect(() => definirFamilia({ contrato: quebrado, composicoes: COMPOSICOES_DO_TUBO, derivar: derivarDoTubo })).toThrow(/perfis\.barra\.parametros.*mais-comprido-que-largo/);
   });
 });
 

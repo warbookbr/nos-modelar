@@ -79,3 +79,35 @@ describe('chamar', () => {
     expect(chamada.argumentos).not.toHaveProperty('lados');
   });
 });
+
+describe('chamar com perfil', () => {
+  const comPerfis = () => {
+    const c = contrato();
+    c.perfis = {
+      barra: { descricao: 'barra maciça curta', parametros: { diametro: 30, comprimento: 90, parede: 0 } },
+      cano: { descricao: 'cano de parede fina', parametros: { diametro: 60, comprimento: 300, parede: 2, lados: 32 } },
+    };
+    return definirFamilia({ contrato: c, composicoes: COMPOSICOES, derivar });
+  };
+
+  it('parte dos valores do perfil, completa com o padrão e deixa o chamador sobrescrever só o que quiser', () => {
+    const familia = comPerfis();
+    const doPerfil = chamar(familia, 'corpo', { perfil: 'cano' });
+    expect(doPerfil).toEqual(chamar(familia, 'corpo', { diametro: 60, comprimento: 300, parede: 2, lados: 32 }));
+    const ajustado = chamar(familia, 'corpo', { perfil: 'cano', comprimento: 400 });
+    expect(ajustado).toEqual(chamar(familia, 'corpo', { diametro: 60, comprimento: 400, parede: 2, lados: 32 }));
+    expect(chamar(familia, 'corpo', { perfil: 'barra' }).composicao).toBe(ID_BARRA);
+    expect(chamar(familia, 'corpo', { perfil: 'barra', parede: 3 }).composicao).toBe(ID_TUBO);
+  });
+
+  it('recusa o perfil que a família não tem, e o perfil em família que não declara nenhum', () => {
+    expect(recusa(comPerfis(), 'corpo', { perfil: 'roda' })).toMatch(/parametros\.perfil recebeu "roda"; aceito: um perfil da família: barra, cano/);
+    expect(recusa(comPerfis(), 'corpo', { perfil: 7 })).toMatch(/parametros\.perfil recebeu 7/);
+    expect(recusa(TUBO_DE_PROVA, 'corpo', { perfil: 'cano' })).toMatch(/parametros\.perfil recebeu "cano"; aceito: nada: a família não declara perfis/);
+  });
+
+  it('a chamada com perfil confere as restrições sobre os valores completos', () => {
+    expect(recusa(comPerfis(), 'corpo', { perfil: 'cano', diametro: 400 })).toMatch(/parametros\.diametro recebeu 400/);
+    expect(recusa(comPerfis(), 'corpo', { perfil: 'cano', comprimento: 40 })).toMatch(/restricao 'mais-comprido-que-largo'/);
+  });
+});

@@ -217,6 +217,12 @@ mudou de hash, e a aprovação do crítico e da pessoa, que julgaram o disco nos
 médio mantêm o hash e o disco do máximo antigo também, preso no teste, mas a prancha tem de ser refeita com o máximo raiado
 e julgada de novo. Falta o roupeiro.
 
+A `roda-pneu` ganhou a versão 2 (2026-10-11): de 50 a 2000 mm de diâmetro, com as medidas em proporção do diâmetro, quatro bandas
+(pneumática, maciça, sem pneu com friso e com relevo), a raiada de duas flanges e sete perfis prontos (carro, bicicleta, carrinho de
+mão, rodízio, trator, trem e carroça). O contrato da família ganhou o campo `perfis`, a chamada `{ perfil }`, a unidade `razao` e o
+produto de dois parâmetros no mapa do esboço, e a aprovação mecânica passou a medir cada perfil e a varrer a escala dele. O crítico e
+a pessoa precisam julgar de novo, e a descrição está em [CONTRATO-DA-FAMILIA.md](CONTRATO-DA-FAMILIA.md#a-família-roda-pneu).
+
 ## Pendências da camada de features
 
 O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o

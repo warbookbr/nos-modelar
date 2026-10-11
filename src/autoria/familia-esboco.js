@@ -46,7 +46,9 @@ export function pontosDaFamilia(contrato) {
 
 /** Os parâmetros do componente a partir dos da família, pelo mapa do contrato. */
 export function parametrosDoComponente(contrato, parametros) {
-  return Object.fromEntries(Object.entries(contrato.esboco.mapa).map(([doComponente, daFamilia]) => [doComponente, parametros[daFamilia]]));
+  /* o valor do mapa é um parâmetro da família ou o produto de dois (a proporção vezes o diâmetro, em milímetro) */
+  const valorDe = (expressao) => Number(expressao.split('*').reduce((produto, nome) => produto * parametros[nome.trim()], 1).toPrecision(12));
+  return Object.fromEntries(Object.entries(contrato.esboco.mapa).map(([doComponente, daFamilia]) => [doComponente, valorDe(daFamilia)]));
 }
 
 /** O esboço mínimo: uma opção com uma só forma, a instância do componente com os parâmetros mapeados. A instância tem o

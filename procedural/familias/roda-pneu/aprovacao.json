@@ -1,239 +1,351 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "roda-pneu",
-  "versao": "1.0.0",
+  "versao": "2.0.0",
   "mecanica": {
     "data": "2026-10-11",
     "pontos": {
       "minimo": {
         "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 0,
           "cruzamento": 0,
-          "desvio": -25,
-          "diametroAro": 250,
-          "diametroCirculoFuros": 70,
-          "diametroCubo": 100,
-          "diametroFuro": 10,
-          "diametroFuroCentral": 40,
-          "diametroPneu": 400,
-          "diametroRaio": 4,
-          "espessuraDisco": 5,
+          "desvio": -0.6,
+          "diametroAro": 0.3,
+          "diametroCirculoFuros": 0.025,
+          "diametroCubo": 0.035,
+          "diametroFlange": 0.1,
+          "diametroFuro": 0.005,
+          "diametroFuroCentral": 0.01,
+          "diametroPneu": 50,
+          "diametroRaio": 0.002,
+          "espessuraDisco": 0.004,
           "furosDeFixacao": 3,
-          "larguraAro": 80,
-          "larguraPneu": 100,
+          "larguraAro": 0.4,
+          "larguraCubo": 0.02,
+          "larguraDoSulco": 0.15,
+          "larguraPneu": 0.03,
+          "paredeDoAro": 0.004,
           "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.15,
           "raios": 3,
+          "sulcos": 0,
           "tipo": 0
         },
-        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739",
+        "hash": "sha256:c5aea7081ee1ac9d26cbe9176e4d58a8947ca65a226400e59c8ee894a8e0c6ca",
         "medidas": []
       },
       "medio": {
         "parametros": {
+          "alturaDoFriso": 0.015,
+          "banda": 2,
           "cruzamento": 1,
-          "desvio": 25,
-          "diametroAro": 405,
-          "diametroCirculoFuros": 135,
-          "diametroCubo": 180,
-          "diametroFuro": 15,
-          "diametroFuroCentral": 80,
-          "diametroPneu": 650,
-          "diametroRaio": 7,
-          "espessuraDisco": 8,
+          "desvio": 0,
+          "diametroAro": 0.6,
+          "diametroCirculoFuros": 0.13,
+          "diametroCubo": 0.2,
+          "diametroFlange": 0.3,
+          "diametroFuro": 0.02,
+          "diametroFuroCentral": 0.06,
+          "diametroPneu": 500,
+          "diametroRaio": 0.02,
+          "espessuraDisco": 0.03,
           "furosDeFixacao": 6,
-          "larguraAro": 160,
-          "larguraPneu": 200,
-          "paredeDoRaio": 1.5,
+          "larguraAro": 0.7,
+          "larguraCubo": 0.1,
+          "larguraDoSulco": 0.4,
+          "larguraPneu": 0.2,
+          "paredeDoAro": 0.02,
+          "paredeDoRaio": 0.3,
+          "profundidadeDoSulco": 0.3,
           "raios": 16,
-          "tipo": 0
-        },
-        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653",
-        "medidas": []
-      },
-      "maximo": {
-        "parametros": {
-          "cruzamento": 3,
-          "desvio": 70,
-          "diametroAro": 560,
-          "diametroCirculoFuros": 200,
-          "diametroCubo": 260,
-          "diametroFuro": 20,
-          "diametroFuroCentral": 120,
-          "diametroPneu": 900,
-          "diametroRaio": 11,
-          "espessuraDisco": 12,
-          "furosDeFixacao": 10,
-          "larguraAro": 240,
-          "larguraPneu": 300,
-          "paredeDoRaio": 3,
-          "raios": 32,
+          "sulcos": 24,
           "tipo": 1
         },
-        "hash": "sha256:eb6b1a3d55a4d73b17f73fae9ec4028b5d85f21034e5d1f19d38971a0665c036",
+        "hash": "sha256:935ccc377fcb3795f669fc2e2db5c5993b85b7a41f73975860c4ac51dfee6859",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
             "unidade": "m",
-            "componentes": 1,
+            "componentes": 8,
             "cortes": [
               {
                 "barra": "raio-0",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.108049310921,
+                "comprimentoDeCorte": 0.108049310921
               },
               {
                 "barra": "raio-1",
-                "comprimentoEntreNos": 0.185188478082,
-                "comprimentoDeCorte": 0.185188478082
+                "comprimentoEntreNos": 0.108049310948,
+                "comprimentoDeCorte": 0.108049310948
               },
               {
                 "barra": "raio-2",
-                "comprimentoEntreNos": 0.185188478194,
-                "comprimentoDeCorte": 0.185188478194
+                "comprimentoEntreNos": 0.108049310947,
+                "comprimentoDeCorte": 0.108049310947
               },
               {
                 "barra": "raio-3",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.108049310966,
+                "comprimentoDeCorte": 0.108049310966
               },
               {
                 "barra": "raio-4",
-                "comprimentoEntreNos": 0.185188478109,
-                "comprimentoDeCorte": 0.185188478109
+                "comprimentoEntreNos": 0.108049310921,
+                "comprimentoDeCorte": 0.108049310921
               },
               {
                 "barra": "raio-5",
-                "comprimentoEntreNos": 0.185188478108,
-                "comprimentoDeCorte": 0.185188478108
+                "comprimentoEntreNos": 0.108049310948,
+                "comprimentoDeCorte": 0.108049310948
               },
               {
                 "barra": "raio-6",
-                "comprimentoEntreNos": 0.185188478189,
-                "comprimentoDeCorte": 0.185188478189
+                "comprimentoEntreNos": 0.108049310947,
+                "comprimentoDeCorte": 0.108049310947
               },
               {
                 "barra": "raio-7",
-                "comprimentoEntreNos": 0.185188478135,
-                "comprimentoDeCorte": 0.185188478135
+                "comprimentoEntreNos": 0.108049310966,
+                "comprimentoDeCorte": 0.108049310966
               },
               {
                 "barra": "raio-8",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.108049310921,
+                "comprimentoDeCorte": 0.108049310921
               },
               {
                 "barra": "raio-9",
-                "comprimentoEntreNos": 0.185188478082,
-                "comprimentoDeCorte": 0.185188478082
+                "comprimentoEntreNos": 0.108049310948,
+                "comprimentoDeCorte": 0.108049310948
               },
               {
                 "barra": "raio-10",
-                "comprimentoEntreNos": 0.185188478194,
-                "comprimentoDeCorte": 0.185188478194
+                "comprimentoEntreNos": 0.108049310947,
+                "comprimentoDeCorte": 0.108049310947
               },
               {
                 "barra": "raio-11",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.108049310966,
+                "comprimentoDeCorte": 0.108049310966
               },
               {
                 "barra": "raio-12",
-                "comprimentoEntreNos": 0.185188478109,
-                "comprimentoDeCorte": 0.185188478109
+                "comprimentoEntreNos": 0.108049310921,
+                "comprimentoDeCorte": 0.108049310921
               },
               {
                 "barra": "raio-13",
-                "comprimentoEntreNos": 0.185188478108,
-                "comprimentoDeCorte": 0.185188478108
+                "comprimentoEntreNos": 0.108049310948,
+                "comprimentoDeCorte": 0.108049310948
               },
               {
                 "barra": "raio-14",
-                "comprimentoEntreNos": 0.185188478189,
-                "comprimentoDeCorte": 0.185188478189
+                "comprimentoEntreNos": 0.108049310947,
+                "comprimentoDeCorte": 0.108049310947
               },
               {
                 "barra": "raio-15",
-                "comprimentoEntreNos": 0.185188478135,
-                "comprimentoDeCorte": 0.185188478135
+                "comprimentoEntreNos": 0.108049310966,
+                "comprimentoDeCorte": 0.108049310966
+              }
+            ]
+          }
+        ]
+      },
+      "maximo": {
+        "parametros": {
+          "alturaDoFriso": 0.03,
+          "banda": 3,
+          "cruzamento": 3,
+          "desvio": 0.6,
+          "diametroAro": 0.93,
+          "diametroCirculoFuros": 0.4,
+          "diametroCubo": 0.3,
+          "diametroFlange": 0.5,
+          "diametroFuro": 0.04,
+          "diametroFuroCentral": 0.2,
+          "diametroPneu": 2000,
+          "diametroRaio": 0.05,
+          "espessuraDisco": 0.1,
+          "furosDeFixacao": 12,
+          "larguraAro": 1,
+          "larguraCubo": 0.3,
+          "larguraDoSulco": 0.7,
+          "larguraPneu": 0.8,
+          "paredeDoAro": 0.1,
+          "paredeDoRaio": 0.45,
+          "profundidadeDoSulco": 0.5,
+          "raios": 32,
+          "sulcos": 60,
+          "tipo": 2
+        },
+        "hash": "sha256:fa63ff799f972941c4baef5a531cd2495fbef6e45d78af018e341c4ff4c56de6",
+        "medidas": [
+          {
+            "ferramenta": "estruturaDeBarras",
+            "unidade": "m",
+            "componentes": 16,
+            "cortes": [
+              {
+                "barra": "raio-0",
+                "comprimentoEntreNos": 0.871323233604,
+                "comprimentoDeCorte": 0.871323233604
+              },
+              {
+                "barra": "raio-1",
+                "comprimentoEntreNos": 0.61253912319,
+                "comprimentoDeCorte": 0.61253912319
+              },
+              {
+                "barra": "raio-2",
+                "comprimentoEntreNos": 0.871323233633,
+                "comprimentoDeCorte": 0.871323233633
+              },
+              {
+                "barra": "raio-3",
+                "comprimentoEntreNos": 0.612539123198,
+                "comprimentoDeCorte": 0.612539123198
+              },
+              {
+                "barra": "raio-4",
+                "comprimentoEntreNos": 0.871323233575,
+                "comprimentoDeCorte": 0.871323233575
+              },
+              {
+                "barra": "raio-5",
+                "comprimentoEntreNos": 0.612539123204,
+                "comprimentoDeCorte": 0.612539123204
+              },
+              {
+                "barra": "raio-6",
+                "comprimentoEntreNos": 0.871323233589,
+                "comprimentoDeCorte": 0.871323233589
+              },
+              {
+                "barra": "raio-7",
+                "comprimentoEntreNos": 0.612539123195,
+                "comprimentoDeCorte": 0.612539123195
+              },
+              {
+                "barra": "raio-8",
+                "comprimentoEntreNos": 0.871323233604,
+                "comprimentoDeCorte": 0.871323233604
+              },
+              {
+                "barra": "raio-9",
+                "comprimentoEntreNos": 0.61253912319,
+                "comprimentoDeCorte": 0.61253912319
+              },
+              {
+                "barra": "raio-10",
+                "comprimentoEntreNos": 0.871323233633,
+                "comprimentoDeCorte": 0.871323233633
+              },
+              {
+                "barra": "raio-11",
+                "comprimentoEntreNos": 0.612539123198,
+                "comprimentoDeCorte": 0.612539123198
+              },
+              {
+                "barra": "raio-12",
+                "comprimentoEntreNos": 0.871323233575,
+                "comprimentoDeCorte": 0.871323233575
+              },
+              {
+                "barra": "raio-13",
+                "comprimentoEntreNos": 0.612539123204,
+                "comprimentoDeCorte": 0.612539123204
+              },
+              {
+                "barra": "raio-14",
+                "comprimentoEntreNos": 0.871323233589,
+                "comprimentoDeCorte": 0.871323233589
+              },
+              {
+                "barra": "raio-15",
+                "comprimentoEntreNos": 0.612539123195,
+                "comprimentoDeCorte": 0.612539123195
               },
               {
                 "barra": "raio-16",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.871323233604,
+                "comprimentoDeCorte": 0.871323233604
               },
               {
                 "barra": "raio-17",
-                "comprimentoEntreNos": 0.185188478082,
-                "comprimentoDeCorte": 0.185188478082
+                "comprimentoEntreNos": 0.61253912319,
+                "comprimentoDeCorte": 0.61253912319
               },
               {
                 "barra": "raio-18",
-                "comprimentoEntreNos": 0.185188478194,
-                "comprimentoDeCorte": 0.185188478194
+                "comprimentoEntreNos": 0.871323233633,
+                "comprimentoDeCorte": 0.871323233633
               },
               {
                 "barra": "raio-19",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.612539123198,
+                "comprimentoDeCorte": 0.612539123198
               },
               {
                 "barra": "raio-20",
-                "comprimentoEntreNos": 0.185188478109,
-                "comprimentoDeCorte": 0.185188478109
+                "comprimentoEntreNos": 0.871323233575,
+                "comprimentoDeCorte": 0.871323233575
               },
               {
                 "barra": "raio-21",
-                "comprimentoEntreNos": 0.185188478108,
-                "comprimentoDeCorte": 0.185188478108
+                "comprimentoEntreNos": 0.612539123204,
+                "comprimentoDeCorte": 0.612539123204
               },
               {
                 "barra": "raio-22",
-                "comprimentoEntreNos": 0.185188478189,
-                "comprimentoDeCorte": 0.185188478189
+                "comprimentoEntreNos": 0.871323233589,
+                "comprimentoDeCorte": 0.871323233589
               },
               {
                 "barra": "raio-23",
-                "comprimentoEntreNos": 0.185188478135,
-                "comprimentoDeCorte": 0.185188478135
+                "comprimentoEntreNos": 0.612539123195,
+                "comprimentoDeCorte": 0.612539123195
               },
               {
                 "barra": "raio-24",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.871323233604,
+                "comprimentoDeCorte": 0.871323233604
               },
               {
                 "barra": "raio-25",
-                "comprimentoEntreNos": 0.185188478082,
-                "comprimentoDeCorte": 0.185188478082
+                "comprimentoEntreNos": 0.61253912319,
+                "comprimentoDeCorte": 0.61253912319
               },
               {
                 "barra": "raio-26",
-                "comprimentoEntreNos": 0.185188478194,
-                "comprimentoDeCorte": 0.185188478194
+                "comprimentoEntreNos": 0.871323233633,
+                "comprimentoDeCorte": 0.871323233633
               },
               {
                 "barra": "raio-27",
-                "comprimentoEntreNos": 0.18518847818,
-                "comprimentoDeCorte": 0.18518847818
+                "comprimentoEntreNos": 0.612539123198,
+                "comprimentoDeCorte": 0.612539123198
               },
               {
                 "barra": "raio-28",
-                "comprimentoEntreNos": 0.185188478109,
-                "comprimentoDeCorte": 0.185188478109
+                "comprimentoEntreNos": 0.871323233575,
+                "comprimentoDeCorte": 0.871323233575
               },
               {
                 "barra": "raio-29",
-                "comprimentoEntreNos": 0.185188478108,
-                "comprimentoDeCorte": 0.185188478108
+                "comprimentoEntreNos": 0.612539123204,
+                "comprimentoDeCorte": 0.612539123204
               },
               {
                 "barra": "raio-30",
-                "comprimentoEntreNos": 0.185188478189,
-                "comprimentoDeCorte": 0.185188478189
+                "comprimentoEntreNos": 0.871323233589,
+                "comprimentoDeCorte": 0.871323233589
               },
               {
                 "barra": "raio-31",
-                "comprimentoEntreNos": 0.185188478135,
-                "comprimentoDeCorte": 0.185188478135
+                "comprimentoEntreNos": 0.612539123195,
+                "comprimentoDeCorte": 0.612539123195
               }
             ]
           }
@@ -241,47 +353,43 @@
       }
     },
     "varredura": {
-      "sondas": 32,
+      "sondas": 48,
       "recusasDeclaradas": [
         {
-          "ponto": "desvio=70",
-          "restricao": "chapa-dentro-do-aro-por-fora"
+          "ponto": "banda=3",
+          "restricao": "sulcos-so-com-relevo"
         },
         {
-          "ponto": "diametroAro=560",
-          "restricao": "flanco-minimo-do-pneu"
+          "ponto": "diametroAro=0.3",
+          "restricao": "cubo-cabe-no-aro"
         },
         {
-          "ponto": "diametroCirculoFuros=70",
+          "ponto": "diametroCirculoFuros=0.025",
           "restricao": "furo-central-afastado-dos-furos"
         },
         {
-          "ponto": "diametroCirculoFuros=200",
+          "ponto": "diametroCirculoFuros=0.4",
           "restricao": "furos-dentro-do-cubo"
         },
         {
-          "ponto": "diametroCubo=100",
-          "restricao": "furos-dentro-do-cubo"
+          "ponto": "diametroCubo=0.035",
+          "restricao": "furo-central-dentro-do-cubo"
         },
         {
-          "ponto": "diametroFuroCentral=120",
+          "ponto": "diametroFuroCentral=0.2",
           "restricao": "furo-central-afastado-dos-furos"
         },
         {
-          "ponto": "diametroPneu=400",
-          "restricao": "flanco-minimo-do-pneu"
+          "ponto": "espessuraDisco=0.1",
+          "restricao": "cubo-mais-longo-que-a-chapa"
         },
         {
-          "ponto": "larguraAro=240",
-          "restricao": "aro-mais-estreito-que-o-pneu"
+          "ponto": "larguraCubo=0.3",
+          "restricao": "cubo-dentro-da-tolerancia-do-esboco"
         },
         {
-          "ponto": "larguraPneu=100",
-          "restricao": "aro-mais-estreito-que-o-pneu"
-        },
-        {
-          "ponto": "larguraPneu=300",
-          "restricao": "pneu-ate-o-dobro-do-aro"
+          "ponto": "tipo=2",
+          "restricao": "aro-segura-o-raio"
         }
       ]
     },
@@ -289,44 +397,473 @@
       "assento-do-pneu",
       "eixo",
       "furos-de-fixacao"
-    ]
-  },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-raiada-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por ponto",
-    "rodadas": [
-      {
-        "rodada": 1,
-        "pontos": {
-          "minimo": 8,
-          "medio": 8,
-          "maximo": 6
-        },
-        "motivo": "na isométrica com o pneu, raios pareciam curtos ou passando do aro; a medida mostrou cada ponta entre 0 e 2 mm dentro da parede de 5 mm do aro, e a prancha ganhou a isométrica sem o pneu"
-      }
     ],
-    "pontos": {
-      "minimo": {
-        "nota": 8,
-        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739"
+    "perfis": {
+      "bicicleta": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 0,
+          "cruzamento": 3,
+          "desvio": 0,
+          "diametroAro": 0.9067,
+          "diametroCirculoFuros": 0.054,
+          "diametroCubo": 0.04,
+          "diametroFlange": 0.1,
+          "diametroFuro": 0.008,
+          "diametroFuroCentral": 0.0146,
+          "diametroPneu": 686,
+          "diametroRaio": 0.0029,
+          "espessuraDisco": 0.0061,
+          "furosDeFixacao": 6,
+          "larguraAro": 0.75,
+          "larguraCubo": 0.1,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.0466,
+          "paredeDoAro": 0.025,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "raios": 32,
+          "sulcos": 0,
+          "tipo": 2
+        },
+        "hash": "sha256:ffbbcfc5dc126e938e49a9ba750284ce4d1a6c621184a0f87d42551f313a38b4",
+        "medidas": [
+          {
+            "ferramenta": "estruturaDeBarras",
+            "unidade": "m",
+            "componentes": 32,
+            "cortes": [
+              {
+                "barra": "raio-0",
+                "comprimentoEntreNos": 0.284602615368,
+                "comprimentoDeCorte": 0.284602615368
+              },
+              {
+                "barra": "raio-1",
+                "comprimentoEntreNos": 0.284602615309,
+                "comprimentoDeCorte": 0.284602615309
+              },
+              {
+                "barra": "raio-2",
+                "comprimentoEntreNos": 0.284602615367,
+                "comprimentoDeCorte": 0.284602615367
+              },
+              {
+                "barra": "raio-3",
+                "comprimentoEntreNos": 0.284602615388,
+                "comprimentoDeCorte": 0.284602615388
+              },
+              {
+                "barra": "raio-4",
+                "comprimentoEntreNos": 0.284602615387,
+                "comprimentoDeCorte": 0.284602615387
+              },
+              {
+                "barra": "raio-5",
+                "comprimentoEntreNos": 0.284602615332,
+                "comprimentoDeCorte": 0.284602615332
+              },
+              {
+                "barra": "raio-6",
+                "comprimentoEntreNos": 0.284602615346,
+                "comprimentoDeCorte": 0.284602615346
+              },
+              {
+                "barra": "raio-7",
+                "comprimentoEntreNos": 0.284602615412,
+                "comprimentoDeCorte": 0.284602615412
+              },
+              {
+                "barra": "raio-8",
+                "comprimentoEntreNos": 0.284602615368,
+                "comprimentoDeCorte": 0.284602615368
+              },
+              {
+                "barra": "raio-9",
+                "comprimentoEntreNos": 0.284602615309,
+                "comprimentoDeCorte": 0.284602615309
+              },
+              {
+                "barra": "raio-10",
+                "comprimentoEntreNos": 0.284602615367,
+                "comprimentoDeCorte": 0.284602615367
+              },
+              {
+                "barra": "raio-11",
+                "comprimentoEntreNos": 0.284602615388,
+                "comprimentoDeCorte": 0.284602615388
+              },
+              {
+                "barra": "raio-12",
+                "comprimentoEntreNos": 0.284602615387,
+                "comprimentoDeCorte": 0.284602615387
+              },
+              {
+                "barra": "raio-13",
+                "comprimentoEntreNos": 0.284602615332,
+                "comprimentoDeCorte": 0.284602615332
+              },
+              {
+                "barra": "raio-14",
+                "comprimentoEntreNos": 0.284602615346,
+                "comprimentoDeCorte": 0.284602615346
+              },
+              {
+                "barra": "raio-15",
+                "comprimentoEntreNos": 0.284602615412,
+                "comprimentoDeCorte": 0.284602615412
+              },
+              {
+                "barra": "raio-16",
+                "comprimentoEntreNos": 0.284602615368,
+                "comprimentoDeCorte": 0.284602615368
+              },
+              {
+                "barra": "raio-17",
+                "comprimentoEntreNos": 0.284602615309,
+                "comprimentoDeCorte": 0.284602615309
+              },
+              {
+                "barra": "raio-18",
+                "comprimentoEntreNos": 0.284602615367,
+                "comprimentoDeCorte": 0.284602615367
+              },
+              {
+                "barra": "raio-19",
+                "comprimentoEntreNos": 0.284602615388,
+                "comprimentoDeCorte": 0.284602615388
+              },
+              {
+                "barra": "raio-20",
+                "comprimentoEntreNos": 0.284602615387,
+                "comprimentoDeCorte": 0.284602615387
+              },
+              {
+                "barra": "raio-21",
+                "comprimentoEntreNos": 0.284602615332,
+                "comprimentoDeCorte": 0.284602615332
+              },
+              {
+                "barra": "raio-22",
+                "comprimentoEntreNos": 0.284602615346,
+                "comprimentoDeCorte": 0.284602615346
+              },
+              {
+                "barra": "raio-23",
+                "comprimentoEntreNos": 0.284602615412,
+                "comprimentoDeCorte": 0.284602615412
+              },
+              {
+                "barra": "raio-24",
+                "comprimentoEntreNos": 0.284602615368,
+                "comprimentoDeCorte": 0.284602615368
+              },
+              {
+                "barra": "raio-25",
+                "comprimentoEntreNos": 0.284602615309,
+                "comprimentoDeCorte": 0.284602615309
+              },
+              {
+                "barra": "raio-26",
+                "comprimentoEntreNos": 0.284602615367,
+                "comprimentoDeCorte": 0.284602615367
+              },
+              {
+                "barra": "raio-27",
+                "comprimentoEntreNos": 0.284602615388,
+                "comprimentoDeCorte": 0.284602615388
+              },
+              {
+                "barra": "raio-28",
+                "comprimentoEntreNos": 0.284602615387,
+                "comprimentoDeCorte": 0.284602615387
+              },
+              {
+                "barra": "raio-29",
+                "comprimentoEntreNos": 0.284602615332,
+                "comprimentoDeCorte": 0.284602615332
+              },
+              {
+                "barra": "raio-30",
+                "comprimentoEntreNos": 0.284602615346,
+                "comprimentoDeCorte": 0.284602615346
+              },
+              {
+                "barra": "raio-31",
+                "comprimentoEntreNos": 0.284602615412,
+                "comprimentoDeCorte": 0.284602615412
+              }
+            ]
+          }
+        ]
       },
-      "medio": {
-        "nota": 8,
-        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
+      "carrinho-de-mao": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 0,
+          "cruzamento": 0,
+          "desvio": 0,
+          "diametroAro": 0.51,
+          "diametroCirculoFuros": 0.095,
+          "diametroCubo": 0.14,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.02,
+          "diametroFuroCentral": 0.05,
+          "diametroPneu": 400,
+          "diametroRaio": 0.012,
+          "espessuraDisco": 0.01,
+          "furosDeFixacao": 4,
+          "larguraAro": 0.75,
+          "larguraCubo": 0.12,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.25,
+          "paredeDoAro": 0.012,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "raios": 12,
+          "sulcos": 0,
+          "tipo": 0
+        },
+        "hash": "sha256:f0614bc505d166662aef498e04197d2f7faa27c23baf05fcd8682b605027dccf",
+        "medidas": []
       },
-      "maximo": {
-        "nota": 8,
-        "hash": "sha256:eb6b1a3d55a4d73b17f73fae9ec4028b5d85f21034e5d1f19d38971a0665c036"
+      "carro": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 0,
+          "cruzamento": 0,
+          "desvio": 0.52,
+          "diametroAro": 0.642,
+          "diametroCirculoFuros": 0.181,
+          "diametroCubo": 0.26,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.022,
+          "diametroFuroCentral": 0.106,
+          "diametroPneu": 632,
+          "diametroRaio": 0.012,
+          "espessuraDisco": 0.016,
+          "furosDeFixacao": 5,
+          "larguraAro": 0.8,
+          "larguraCubo": 0.05,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.324,
+          "paredeDoAro": 0.006,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "raios": 12,
+          "sulcos": 0,
+          "tipo": 0
+        },
+        "hash": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5",
+        "medidas": []
+      },
+      "carroca": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 2,
+          "cruzamento": 0,
+          "desvio": 0,
+          "diametroAro": 0.93,
+          "diametroCirculoFuros": 0.12,
+          "diametroCubo": 0.2,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.02,
+          "diametroFuroCentral": 0.05,
+          "diametroPneu": 1200,
+          "diametroRaio": 0.03,
+          "espessuraDisco": 0.03,
+          "furosDeFixacao": 4,
+          "larguraAro": 1,
+          "larguraCubo": 0.1,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.058,
+          "paredeDoAro": 0.05,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "raios": 12,
+          "sulcos": 0,
+          "tipo": 1
+        },
+        "hash": "sha256:6e084d1fde70af3790c9f31752056f3f8a27aea043ed2bedc2d15d1b0d8c66c6",
+        "medidas": [
+          {
+            "ferramenta": "estruturaDeBarras",
+            "unidade": "m",
+            "componentes": 12,
+            "cortes": [
+              {
+                "barra": "raio-0",
+                "comprimentoEntreNos": 0.4305,
+                "comprimentoDeCorte": 0.4305
+              },
+              {
+                "barra": "raio-1",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-2",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-3",
+                "comprimentoEntreNos": 0.4305,
+                "comprimentoDeCorte": 0.4305
+              },
+              {
+                "barra": "raio-4",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-5",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-6",
+                "comprimentoEntreNos": 0.4305,
+                "comprimentoDeCorte": 0.4305
+              },
+              {
+                "barra": "raio-7",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-8",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-9",
+                "comprimentoEntreNos": 0.4305,
+                "comprimentoDeCorte": 0.4305
+              },
+              {
+                "barra": "raio-10",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              },
+              {
+                "barra": "raio-11",
+                "comprimentoEntreNos": 0.430499999975,
+                "comprimentoDeCorte": 0.430499999975
+              }
+            ]
+          }
+        ]
+      },
+      "rodizio": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 1,
+          "cruzamento": 0,
+          "desvio": 0,
+          "diametroAro": 0.6,
+          "diametroCirculoFuros": 0.14,
+          "diametroCubo": 0.2,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.03,
+          "diametroFuroCentral": 0.08,
+          "diametroPneu": 100,
+          "diametroRaio": 0.012,
+          "espessuraDisco": 0.1,
+          "furosDeFixacao": 4,
+          "larguraAro": 1,
+          "larguraCubo": 0.28,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.3,
+          "paredeDoAro": 0.04,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "raios": 12,
+          "sulcos": 0,
+          "tipo": 0
+        },
+        "hash": "sha256:72886f63a067260085e30f723f22d6bf5e7f7a1cc4e0b542e8d2acdeef881114",
+        "medidas": []
+      },
+      "trator": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 3,
+          "cruzamento": 0,
+          "desvio": 0.37,
+          "diametroAro": 0.558,
+          "diametroCirculoFuros": 0.16,
+          "diametroCubo": 0.22,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.022,
+          "diametroFuroCentral": 0.1,
+          "diametroPneu": 1730,
+          "diametroRaio": 0.012,
+          "espessuraDisco": 0.014,
+          "furosDeFixacao": 8,
+          "larguraAro": 0.85,
+          "larguraCubo": 0.09,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.27,
+          "paredeDoAro": 0.008,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.15,
+          "raios": 12,
+          "sulcos": 24,
+          "tipo": 0
+        },
+        "hash": "sha256:e3d092ef43eefbe8731185bf27f9e8f1f17782073e736965ebed5d4014764415",
+        "medidas": []
+      },
+      "trem": {
+        "parametros": {
+          "alturaDoFriso": 0.025,
+          "banda": 2,
+          "cruzamento": 0,
+          "desvio": 0,
+          "diametroAro": 0.815,
+          "diametroCirculoFuros": 0.225,
+          "diametroCubo": 0.28,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.02,
+          "diametroFuroCentral": 0.17,
+          "diametroPneu": 960,
+          "diametroRaio": 0.012,
+          "espessuraDisco": 0.03,
+          "furosDeFixacao": 6,
+          "larguraAro": 1,
+          "larguraCubo": 0.2,
+          "larguraDoSulco": 0.45,
+          "larguraPneu": 0.14,
+          "paredeDoAro": 0.03,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "raios": 12,
+          "sulcos": 0,
+          "tipo": 0
+        },
+        "hash": "sha256:f0e41f1919403a8ba5b9f8af29540d50ce7002953e076245c6f3921ce6a59b73",
+        "medidas": []
       }
     },
-    "achados": [
-      "mínimo e médio são a roda de disco e mantêm as notas e os hashes da aprovação de disco, com a prancha roda-pneu-prancha.png",
-      "pneu com ombro quase vivo no perfil, de superfície",
-      "parede oca dos raios e contagem dos furos pequenos não verificáveis na escala da prancha",
-      "o perfil de borda mostra só o pneu e não confirma o assento nem o desvio"
-    ]
+    "escalasDosPerfis": {
+      "sondas": 14,
+      "recusasDeclaradas": [
+        {
+          "ponto": "bicicleta: diametroPneu=50",
+          "restricao": "raio-cabe-na-flange"
+        },
+        {
+          "ponto": "bicicleta: diametroPneu=2000",
+          "restricao": "cubo-dentro-da-tolerancia-do-esboco"
+        },
+        {
+          "ponto": "trem: diametroPneu=2000",
+          "restricao": "cubo-dentro-da-tolerancia-do-esboco"
+        }
+      ]
+    }
   },
+  "critico": null,
   "pessoa": null
 }
