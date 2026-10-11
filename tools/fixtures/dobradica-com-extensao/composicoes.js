@@ -5,21 +5,32 @@ const MALHA = 'mecanifica.malha-poligonal@1';
 const PARTE = 'mecanifica.parte@1';
 const PORTA = 'mecanifica.porta@1';
 
-export const ID_CHAPA = 'mecanifica.composicao.chapa-identificada';
+export const ID_CHAPA_RECORTADA = 'mecanifica.composicao.chapa-recortada';
 export const ID_OLHAL = 'mecanifica.composicao.olhal-cilindrico';
 export const ID_PINO = 'mecanifica.composicao.pino-passante-segmentado';
 
 const parametro = (nome) => ({ parametro: nome });
 
 export const COMPOSICOES = Object.freeze([
+  /* CHAPA COM A FAIXA DOS NÓS DA OUTRA FOLHA RECORTADA. A chapa inteira de cada folha atravessava os olhais da outra
+     (cerca de 2400 mm³ de sobreposição medida entre as duas folhas), e o contato de sólidos acusava a interpenetração
+     que o ensaio chamava de encosto. O perfil é um polígono de oito pontos no plano de y e x: a chapa vai de `xFora` até
+     `xBorda` nas pontas e só até `xMeio` na faixa entre `vA` e `vB`, que é a faixa que o nó da outra folha ocupa mais a
+     folga. Na folha da porta `xMeio` fica além de `xBorda` (aba que sobra entre os nós do batente) e na do batente
+     fica aquém (recorte onde passa o nó da porta). A extrusão sai em z (eixo 'z'), e nesse eixo o ponto [u, v] vai
+     para x = u e y = -v; por isso `vTopo`, `vA` e `vB` são as alturas com o sinal trocado. */
   Object.freeze({
     formato: FORMATO_COMPOSICAO_PROCEDURAL,
-    id: ID_CHAPA,
+    id: ID_CHAPA_RECORTADA,
     versao: '1.0.0',
     parametros: {
       origem: { tipo: 'inteiro' },
-      largura: { tipo: 'numero' },
-      altura: { tipo: 'numero' },
+      xFora: { tipo: 'numero' },
+      xBorda: { tipo: 'numero' },
+      xMeio: { tipo: 'numero' },
+      vTopo: { tipo: 'numero' },
+      vA: { tipo: 'numero' },
+      vB: { tipo: 'numero' },
       profundidade: { tipo: 'numero' },
       centro: { tipo: 'vetor3' },
       parte: { tipo: 'texto' },
@@ -29,12 +40,21 @@ export const COMPOSICOES = Object.freeze([
     nos: [
       {
         id: 'volume',
-        operacao: 'cubo',
+        operacao: 'extrusao',
         argumentos: {
           origemId: parametro('origem'),
-          larg: parametro('largura'),
-          alt: parametro('altura'),
-          prof: parametro('profundidade'),
+          perfil: [
+            [parametro('xFora'), 0],
+            [parametro('xFora'), parametro('vTopo')],
+            [parametro('xBorda'), parametro('vTopo')],
+            [parametro('xBorda'), parametro('vB')],
+            [parametro('xMeio'), parametro('vB')],
+            [parametro('xMeio'), parametro('vA')],
+            [parametro('xBorda'), parametro('vA')],
+            [parametro('xBorda'), 0],
+          ],
+          altura: parametro('profundidade'),
+          eixo: 'z',
           em: parametro('centro'),
         },
       },
@@ -43,7 +63,7 @@ export const COMPOSICOES = Object.freeze([
         operacao: 'parte',
         argumentos: {
           nome: parametro('parte'),
-          sel: { origem: { op: 'cubo', id: parametro('origem') } },
+          sel: { origem: { op: 'extrusao', id: parametro('origem') } },
         },
       },
       {
@@ -51,13 +71,13 @@ export const COMPOSICOES = Object.freeze([
         operacao: 'material',
         argumentos: {
           usa: parametro('material'),
-          sel: { origem: { op: 'cubo', id: parametro('origem') } },
+          sel: { origem: { op: 'extrusao', id: parametro('origem') } },
         },
       },
       {
         id: 'casca-solida',
         operacao: 'solido',
-        argumentos: { sel: { origem: { op: 'cubo', id: parametro('origem') } } },
+        argumentos: { sel: { origem: { op: 'extrusao', id: parametro('origem') } } },
       },
     ],
   }),
