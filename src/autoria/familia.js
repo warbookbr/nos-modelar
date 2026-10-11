@@ -25,6 +25,15 @@ export const PAPEIS_POR_TIPO_DE_PORTA = Object.freeze({
 });
 export const TIPOS_DE_PORTA = Object.freeze(Object.keys(PAPEIS_POR_TIPO_DE_PORTA));
 
+/* A conferência com o esboço (`esboco.conferencia`): versão da declaração, os tipos de porta que o esboço sabe dar (anel e
+   cilindro: a interface sai do volume), os lados da face do volume onde a porta fica e os tetos de tolerância, que são os do
+   `REFINA` (`refinamento-global.js`; o teste confere). */
+export const VERSAO_CONFERENCIA_ESBOCO = 1;
+export const TIPOS_DE_PORTA_COM_VOLUME = Object.freeze(['anel', 'cilindro']);
+export const LADOS_DA_PORTA_NO_VOLUME = Object.freeze(['+x', '-x', '+y', '-y', '+z', '-z']);
+export const LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM = 50;
+export const LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM = 5;
+
 export const FERRAMENTAS_DE_FAMILIA = Object.freeze([
   'aerofolio', 'arquitetura', 'arredonda', 'articula', 'atuador', 'barras', 'bobina', 'booleana', 'cabo', 'came',
   'casca', 'chapa', 'deforma', 'elos', 'encaixe', 'engrenagem', 'eixo', 'fixador', 'furos', 'gabinete', 'guia',
@@ -37,13 +46,17 @@ const CAMPOS_OBRIGATORIOS = CAMPOS_DA_FAMILIA.filter((campo) => campo !== 'esboc
 const CAMPOS_DO_PARAMETRO = ['tipo', 'unidade', 'padrao', 'minimo', 'maximo', 'medio'];
 const CAMPOS_DA_RESTRICAO = ['id', 'expressao', 'motivo'];
 const CAMPOS_DA_PORTA = ['id', 'tipo', 'papel'];
-const CAMPOS_DO_ESBOCO = ['componente', 'mapa'];
+const CAMPOS_DO_ESBOCO = ['componente', 'mapa', 'conferencia'];
+const CAMPOS_DA_CONFERENCIA = ['versao', 'partes', 'portas', 'tolerancia'];
+const CAMPOS_DA_PORTA_DO_ESBOCO = ['porta', 'volume', 'lado'];
+const CAMPOS_DA_TOLERANCIA = ['envelope', 'porta'];
 
 const ID_DA_FAMILIA = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const VERSAO = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const NOME_DE_PARAMETRO = /^[a-z][A-Za-z0-9]*$/;
 const ID_DA_RESTRICAO = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const IDENTIFICADOR = /^[A-Za-z][A-Za-z0-9_-]*$/;
+const NOME_DA_PARTE = /^[a-zA-Z][a-zA-Z0-9]*$/;
 const NOME_DO_COMPONENTE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const NOME_NO_COMPONENTE = /^[A-Za-z][A-Za-z0-9_]*$/;
 
@@ -325,10 +338,54 @@ export function lerFamilia(bruta, opcoes = {}) {
     });
   }
 
+  /* A declaração dos pares que o esboço confere (`esboco.conferencia`): parte da família e volume do componente, porta da
+     família e volume do componente com o lado da face onde ela fica, e a tolerância do `REFINA`. */
+  function lerConferencia(c) {
+    const base = 'esboco.conferencia';
+    objetoCom(c, base, CAMPOS_DA_CONFERENCIA, ['partes', 'tolerancia']);
+    if (Object.hasOwn(c, 'versao') && c.versao !== VERSAO_CONFERENCIA_ESBOCO) recusar(`${base}.versao`, c.versao, `${VERSAO_CONFERENCIA_ESBOCO}, a única versão que esta leitura conhece`);
+    if (!plano(c.partes) || !Object.keys(c.partes).length) recusar(`${base}.partes`, c.partes, 'objeto { parte da família: volume do componente } com ao menos um par');
+    const partes = {};
+    for (const parte of Object.keys(c.partes).sort(comparar)) {
+      const campo = `${base}.partes.${parte}`;
+      if (!NOME_DA_PARTE.test(parte)) recusar(campo, parte, "nome de parte como o do passo 'parte': letras e dígitos, sem espaço");
+      partes[parte] = texto(c.partes[parte], campo, IDENTIFICADOR, 'id de uma forma do componente do esboço (o volume), com letras, dígitos, hífen e sublinhado');
+    }
+    let ligadas = [];
+    if (Object.hasOwn(c, 'portas')) {
+      if (!Array.isArray(c.portas) || !c.portas.length) recusar(`${base}.portas`, c.portas, 'lista com ao menos uma porta ligada a volume; omita o campo se nenhuma porta é conferida');
+      const vistas = new Set();
+      ligadas = c.portas.map((item, indice) => {
+        const campo = `${base}.portas[${indice}]`;
+        objetoCom(item, campo, CAMPOS_DA_PORTA_DO_ESBOCO);
+        const daFamilia = portas.find((p) => p.id === item.porta);
+        if (!daFamilia) recusar(`${campo}.porta`, item.porta, `uma porta da família: ${portas.length ? lista(portas.map((p) => p.id)) : 'a família não declara porta'}`);
+        if (!TIPOS_DE_PORTA_COM_VOLUME.includes(daFamilia.tipo)) recusar(`${campo}.porta`, item.porta, `porta de tipo ${lista(TIPOS_DE_PORTA_COM_VOLUME)}, os que o volume do esboço dá; '${item.porta}' é ${daFamilia.tipo}`);
+        if (vistas.has(item.porta)) recusar(`${campo}.porta`, item.porta, 'porta ligada a um só volume');
+        vistas.add(item.porta);
+        return {
+          porta: item.porta,
+          volume: texto(item.volume, `${campo}.volume`, IDENTIFICADOR, 'id de uma forma do componente do esboço (o volume), com letras, dígitos, hífen e sublinhado'),
+          lado: uma(item.lado, `${campo}.lado`, LADOS_DA_PORTA_NO_VOLUME),
+        };
+      }).sort((a, b) => comparar(a.porta, b.porta));
+    }
+    objetoCom(c.tolerancia, `${base}.tolerancia`, CAMPOS_DA_TOLERANCIA);
+    const tolerancia = (chave, limite) => {
+      const valor = c.tolerancia[chave];
+      if (!Number.isFinite(valor) || valor < 0 || valor > limite) recusar(`${base}.tolerancia.${chave}`, valor, `número de 0 a ${limite} mm`);
+      return semZeroNegativo(valor);
+    };
+    return {
+      versao: VERSAO_CONFERENCIA_ESBOCO, partes, ...(ligadas.length ? { portas: ligadas } : {}),
+      tolerancia: { envelope: tolerancia('envelope', LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM), porta: tolerancia('porta', LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM) },
+    };
+  }
+
   /* Vínculo opcional com o componente do esboço */
   let esboco;
   if (Object.hasOwn(bruta, 'esboco')) {
-    objetoCom(bruta.esboco, 'esboco', CAMPOS_DO_ESBOCO);
+    objetoCom(bruta.esboco, 'esboco', CAMPOS_DO_ESBOCO, ['componente', 'mapa']);
     const componente = texto(bruta.esboco.componente, 'esboco.componente', NOME_DO_COMPONENTE, 'nome do componente do esboço, em minúsculas com hífen');
     const doEsboco = opcoes.componentes ? opcoes.componentes[componente] : undefined;
     if (opcoes.componentes && !doEsboco) recusar('esboco.componente', componente, `um componente do esboço: ${lista(Object.keys(opcoes.componentes).sort(comparar))}`);
@@ -343,6 +400,7 @@ export function lerFamilia(bruta, opcoes = {}) {
       mapa[doComponente] = daFamilia;
     }
     esboco = { componente, mapa };
+    if (Object.hasOwn(bruta.esboco, 'conferencia')) esboco.conferencia = lerConferencia(bruta.esboco.conferencia);
   }
 
   return congelar({
@@ -402,6 +460,23 @@ export const SCHEMA_FAMILIA = congelar({
         type: 'object', minProperties: 1, propertyNames: { pattern: NOME_NO_COMPONENTE.source },
         additionalProperties: { type: 'string', pattern: NOME_DE_PARAMETRO.source },
       },
-    }),
+      conferencia: objetoFechado({
+        versao: { const: VERSAO_CONFERENCIA_ESBOCO },
+        partes: {
+          type: 'object', minProperties: 1, propertyNames: { pattern: NOME_DA_PARTE.source },
+          additionalProperties: { type: 'string', pattern: IDENTIFICADOR.source },
+        },
+        portas: {
+          type: 'array', minItems: 1,
+          items: objetoFechado({
+            porta: { type: 'string', pattern: IDENTIFICADOR.source }, volume: { type: 'string', pattern: IDENTIFICADOR.source }, lado: { enum: [...LADOS_DA_PORTA_NO_VOLUME] },
+          }),
+        },
+        tolerancia: objetoFechado({
+          envelope: { type: 'number', minimum: 0, maximum: LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM },
+          porta: { type: 'number', minimum: 0, maximum: LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM },
+        }),
+      }, ['partes', 'tolerancia']),
+    }, ['componente', 'mapa']),
   }, CAMPOS_OBRIGATORIOS),
 });
