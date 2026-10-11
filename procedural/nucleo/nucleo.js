@@ -541,6 +541,15 @@ function contextoNativo(st, i, { leitura = false, op = null } = {}) {
   const contexto = {
     numero: (valor) => st.num(valor), vetor: (valor) => st.vec(valor),
     limiteDeIds: BLOCO,
+    declararOrigem(origemId, grupos) {
+      if (origem) throw new Error('a origem do passo já foi declarada');
+      if (!Number.isSafeInteger(origemId) || origemId < 0) throw new Error('origemId precisa ser inteiro não-negativo');
+      const declaracoes = st.declaracoesOrigem.get(origemId) ?? [];
+      if (declaracoes.length > 1) throw new Error(textoDeclaracoes(origemId, declaracoes));
+      if (!grupos || typeof grupos !== 'object' || !Array.isArray(grupos.faces)) throw new Error('a origem exige o grupo `faces`');
+      for (const lista of Object.values(grupos)) for (const f of lista) if (!(refExistente(f) ? lidasF.has(f.existente) : faces.has(f))) throw new Error(`a origem cita a face ${refExistente(f) ? f.existente : f}, que não é desta extensão`);
+      origem = { id: origemId, grupos };
+    },
     emitirVertice(id, ponto) { id = local(id, 'vértice'); if (vertices.has(id)) throw new Error(`vértice local ${id} duplicado`); vertices.set(id, st.vec(ponto)); },
     emitirFace(id, vs, opcoes = {}) {
       id = local(id, 'face');
@@ -594,15 +603,6 @@ function contextoNativo(st, i, { leitura = false, op = null } = {}) {
       vertice(id) { if (!lidosV.has(id)) throw new Error(`vértice ${id} não foi lido pela extensão`); return Object.freeze({ existente: id }); },
       face(id) { if (!lidasF.has(id)) throw new Error(`face ${id} não foi lida pela extensão`); return Object.freeze({ existente: id }); },
       consumirFace(id) { if (!lidasF.has(id)) throw new Error(`face ${id} não foi lida pela extensão`); consumir.add(id); },
-      declararOrigem(origemId, grupos) {
-        if (origem) throw new Error('a origem do passo já foi declarada');
-        if (!Number.isSafeInteger(origemId) || origemId < 0) throw new Error('origemId precisa ser inteiro não-negativo');
-        const declaracoes = st.declaracoesOrigem.get(origemId) ?? [];
-        if (declaracoes.length > 1) throw new Error(textoDeclaracoes(origemId, declaracoes));
-        if (!grupos || typeof grupos !== 'object' || !Array.isArray(grupos.faces)) throw new Error('a origem exige o grupo `faces`');
-        for (const lista of Object.values(grupos)) for (const f of lista) if (!(refExistente(f) ? lidasF.has(f.existente) : faces.has(f))) throw new Error(`a origem cita a face ${refExistente(f) ? f.existente : f}, que não é desta extensão`);
-        origem = { id: origemId, grupos };
-      },
     });
   }
   return Object.freeze(contexto);
@@ -1678,6 +1678,67 @@ CONTRATOS_ORIGEM.casca = {
     }
     const faces = lista.filter((f) => st.F.has(f));
     return faces.length ? { faces } : { erro: `origem casca:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
+  },
+};
+
+/* chapaDobrada — extensão nativa `procedural/extensoes/chapa-dobrada`, com `origemId`. A chapa publica os grupos que a
+   implementação monta (ver `gruposDaOrigem`) e a citação os combina por eixos, todos opcionais:
+     `aba`   uma aba (ou várias, pelo eixo: inteiro, nome de parâmetro, 'primeira'/'ultima', {passo,fase}), as faces que
+             correm ao longo dela, uma por lado;
+     `dobra` uma dobra, os pedaços do arco dela, nos dois lados;
+     `lado`  'esquerda' ou 'direita' no sentido da linha média, ou 'dentro' e 'fora' da dobra (só com `dobra` ou sozinho,
+             quando vale para todas as dobras: numa aba, dentro e fora dependem da dobra que se olha e a citação é recusada);
+     `borda` 'inicio' ou 'fim', a espessura cortada na ponta da primeira e da última aba;
+     `tampa` 'menos' ou 'mais', a face de z = -largura/2 ou +largura/2.
+   `borda` e `tampa` não combinam com os outros eixos, e `aba` não combina com `dobra`. Sem eixo nenhum são todas as faces.
+   O significado de cada grupo é fixo: nenhuma posição na malha é identidade. */
+const LADOS_DA_CHAPA = ['esquerda', 'direita', 'dentro', 'fora'];
+CONTRATOS_ORIGEM.chapaDobrada = {
+  validar(origem) {
+    const chaves = ['op', 'id', 'aba', 'dobra', 'lado', 'borda', 'tampa'];
+    const msg = "chapaDobrada usa op, id e, opcionais, aba ou dobra (eixo: inteiro, nome de parâmetro, 'primeira'/'ultima', {passo,fase}), lado ('esquerda', 'direita', 'dentro' ou 'fora'), borda ('inicio' ou 'fim') e tampa ('menos' ou 'mais')";
+    if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
+    if (!validarEixo(origem.aba) || !validarEixo(origem.dobra)) return msg;
+    if (origem.lado != null && !LADOS_DA_CHAPA.includes(origem.lado)) return msg;
+    if (origem.borda != null && !['inicio', 'fim'].includes(origem.borda)) return msg;
+    if (origem.tampa != null && !['menos', 'mais'].includes(origem.tampa)) return msg;
+    if (origem.aba != null && origem.dobra != null) return 'chapaDobrada: aba e dobra são faces diferentes; cite uma ou a outra';
+    if ((origem.borda != null || origem.tampa != null) && (origem.aba != null || origem.dobra != null || origem.lado != null || (origem.borda != null && origem.tampa != null))) return 'chapaDobrada: borda e tampa não combinam com aba, dobra, lado nem entre si';
+    if (origem.aba != null && (origem.lado === 'dentro' || origem.lado === 'fora')) return "chapaDobrada: 'dentro' e 'fora' são do lado de uma dobra; numa aba use 'esquerda' ou 'direita'";
+    return null;
+  },
+  resolver(st, registro, origem) {
+    const nome = `origem chapaDobrada:${origem.id}`;
+    const contar = (prefixo) => Object.keys(registro).filter((k) => k.startsWith(`${prefixo}.`)).reduce((maior, k) => Math.max(maior, Number(k.split('.')[1]) + 1), 0);
+    const eixo = (valor, prefixo, rotulo) => {
+      const total = contar(prefixo);
+      if (!total) return { erro: `${nome} não tem ${rotulo}` };
+      if (eixoDeIndiceUnico(valor)) {
+        const r = indiceDeEixo(st, valor, total);
+        if (r.erro) return { erro: `${prefixo} '${valor}' da ${nome} ${r.erro}` };
+        if (r.idx >= total) return { erro: `${prefixo} ${textoDeEixo(valor, r.idx)} fora do limite da ${nome} (0..${total - 1})` };
+        return { indices: [r.idx] };
+      }
+      const indices = indicesEixo(valor, total);
+      if (!indices.length) return { erro: `filtro de ${prefixo} {passo:${valor.passo},fase:${valor.fase}} não casa nenhum índice em 0..${total - 1} na ${nome}` };
+      return { indices };
+    };
+    let ids;
+    if (origem.borda != null) ids = registro[`borda.${origem.borda}`];
+    else if (origem.tampa != null) ids = registro[`tampa.${origem.tampa}`];
+    else if (origem.aba != null || origem.dobra != null) {
+      const prefixo = origem.aba != null ? 'aba' : 'dobra';
+      const r = eixo(origem[prefixo], prefixo, prefixo === 'aba' ? 'abas' : 'dobras (a chapa tem uma aba só)');
+      if (r.erro) return r;
+      const lados = origem.lado != null ? [origem.lado] : ['esquerda', 'direita'];
+      ids = r.indices.flatMap((k) => lados.flatMap((l) => registro[`${prefixo}.${k}.${l}`] ?? []));
+    } else ids = registro[origem.lado ?? 'faces'];
+    for (const f of ids) {
+      const consumo = conferirConsumo(st, f, `a face ${f} da ${nome}`);
+      if (consumo) return { erro: consumo };
+    }
+    const faces = [...new Set(ids)].filter((f) => st.F.has(f)).sort((a, b) => a - b);
+    return faces.length ? { faces } : { erro: `${nome} não tem nenhuma face viva nessa citação` };
   },
 };
 

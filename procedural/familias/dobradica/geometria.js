@@ -17,7 +17,8 @@ const MM = 0.001;
 export const FOLGA_RADIAL = 0.15; // mm entre o pino e o furo do nó
 export const FOLGA_AXIAL = 0.5; // mm entre dois nós vizinhos
 export const FOLGA_DO_CORTE = 0.5; // mm entre o nó da outra folha e a borda do corte da chapa
-export const LADOS_DO_NO = 16;
+export const SEGMENTOS_DO_ROLO = 4; // segmentos do arco do rolo por 90 graus (os 16 lados do tubo de antes)
+export const TRECHO_DO_ROLO = 0.02; // mm: o trecho reto entre as três dobras de 90 graus do rolo e em cada ponta da chapa do nó
 export const LADOS_DO_FURO = 12;
 export const LADOS_DO_PINO = 24;
 const DIAMETRO_MAXIMO_DO_FURO = 8; // mm
@@ -100,7 +101,8 @@ export function argumentosDaFolha(geo, lado) {
     emDaChapa: [metro(sinal * (mm.xInterno + mm.xExterno) / 2), metro(-mm.altura / 2), 0],
     raioInternoDoNo: metro(mm.raioDoFuroDoNo),
     raioExternoDoNo: metro(mm.raioDoNo),
-    ladosDoNo: LADOS_DO_NO,
+    trechoDoRolo: metro(TRECHO_DO_ROLO),
+    segmentosDoRolo: SEGMENTOS_DO_ROLO,
     alturaDoCorte: metro(mm.comprimentoDoNo + FOLGA_AXIAL),
     larguraDoCorte: metro(mm.raioDoCorte - (mm.xInterno - MARGEM_DO_CORTE_NA_CHAPA)),
     profundidadeDoCorte: metro(mm.espessura + 2 * MARGEM_DO_CORTE_NA_CHAPA),
@@ -116,9 +118,14 @@ export function argumentosDaFolha(geo, lado) {
     extensaoAltura: metro(mm.altura),
   };
   const xDoCorte = sinal * (mm.raioDoCorte + (mm.xInterno - MARGEM_DO_CORTE_NA_CHAPA)) / 2;
+  /* O nó é uma chapa dobrada de largura igual ao comprimento do nó, feita no plano x-y com a largura em z (a primeira aba
+     segue +x e as três dobras de -90 graus levam a linha média em volta de um centro 1 raio médio abaixo dela). Duas
+     rotações põem a largura em y e a dobra em z, com a ponta do rolo no plano das folhas e a abertura de 90 graus virada
+     para fora; a translação leva o centro médio dos três arcos (os trechos retos de 0,02 mm os deslocam entre si) para o
+     eixo do pino e a largura para a altura do nó. */
+  const meioDoDeslocamento = (2 * TRECHO_DO_ROLO) / 3;
   proprios.forEach((k, i) => {
-    argumentos[`noInicio${i}`] = metro(mm.noK[k].inicio);
-    argumentos[`noFim${i}`] = metro(mm.noK[k].fim);
+    argumentos[`emNo${i}`] = [metro(sinal * meioDoDeslocamento), metro(mm.noK[k].centro), metro(mm.raioMedioDoNo + meioDoDeslocamento)];
   });
   outros.forEach((k, j) => { argumentos[`emCorte${j}`] = [metro(xDoCorte), metro(mm.noK[k].inicio - FOLGA_AXIAL / 2), 0]; });
   mm.furosK.forEach((y, k) => { argumentos[`emFuro${k}`] = [metro(sinal * mm.xDoFuro), metro(y), 0]; });

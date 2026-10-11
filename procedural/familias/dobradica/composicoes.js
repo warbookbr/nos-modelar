@@ -94,26 +94,33 @@ function nosDaFolha(lado, nos, furos) {
       solidos: [origem('cubo', idPlaca), ...outros.map((_, j) => origem('cubo', idCorte(j))), ...Array.from({ length: furos }, (_, k) => origem('lathe', idFuro(k)))],
     },
   });
-  proprios.forEach((_, i) => lista.push({
-    id: `no-${i}`, operacao: 'lathe',
-    argumentos: {
-      origemId: idNo(i),
-      perfil: [[p('raioInternoDoNo'), p(`noInicio${i}`)], [p('raioExternoDoNo'), p(`noInicio${i}`)], [p('raioExternoDoNo'), p(`noFim${i}`)], [p('raioInternoDoNo'), p(`noFim${i}`)], [p('raioInternoDoNo'), p(`noInicio${i}`)]],
-      lados: p('ladosDoNo'),
-    },
-  }));
+  proprios.forEach((_, i) => {
+    const dele = { origem: { op: 'chapaDobrada', id: idNo(i) } };
+    const trecho = () => ({ comprimento: p('trechoDoRolo') });
+    lista.push({
+      id: `no-${i}`, operacao: 'chapaDobrada',
+      argumentos: {
+        origemId: idNo(i), espessura: p('espessura'), raioInterno: p('raioInternoDoNo'), largura: p('comprimentoDoNo'), segmentosPorQuarto: p('segmentosDoRolo'), tampas: 'em-tiras',
+        abas: [{ ...trecho(), angulo: -90 }, { ...trecho(), angulo: -90 }, { ...trecho(), angulo: -90 }, trecho()],
+      },
+    });
+    lista.push({ id: `no-${i}-em-pe`, operacao: 'rotaciona', argumentos: { eixo: 'x', graus: 90, pivo: [0, 0, 0], sel: dele } });
+    if (lado === 'd') lista.push({ id: `no-${i}-para-a-direita`, operacao: 'rotaciona', argumentos: { eixo: 'z', graus: 180, pivo: [0, 0, 0], sel: dele } });
+    lista.push({ id: `no-${i}-no-eixo`, operacao: 'transladar', argumentos: { d: p(`emNo${i}`), sel: dele } });
+  });
   lista.push({ id: 'parte-da-chapa', operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: origem('subtrair', idSubtracao) } });
-  proprios.forEach((_, i) => lista.push({ id: `parte-do-no-${i}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: origem('lathe', idNo(i)) } }));
+  // a chapa inteira de cada nó é parte do nó (rolo, trechos de 0,02 mm, bordas e tampas): todos os vértices dela estão no anel do rolo
+  proprios.forEach((_, i) => lista.push({ id: `parte-do-no-${i}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: origem('chapaDobrada', idNo(i)) } }));
   lista.push({
     id: 'uniao', operacao: 'unir',
-    argumentos: { origemId: idUniao, solidos: [origem('subtrair', idSubtracao), ...proprios.map((_, i) => origem('lathe', idNo(i)))] },
+    argumentos: { origemId: idUniao, solidos: [origem('subtrair', idSubtracao), ...proprios.map((_, i) => origem('chapaDobrada', idNo(i)))] },
   });
   lista.push({ id: 'material-da-folha', operacao: 'material', argumentos: { usa: 'chapa', sel: origem('unir', idUniao) } });
   lista.push({ id: 'solido-da-folha', operacao: 'solido', argumentos: { sel: origem('unir', idUniao) } });
   lista.push({
     id: 'porta-dos-nos', operacao: 'publicarPorta',
     argumentos: {
-      id: `nos-da-folha-${lado}`, de: { op: 'lathe', id: idNo(0) },
+      id: `nos-da-folha-${lado}`, de: { op: 'chapaDobrada', id: idNo(0), dobra: { passo: 1, fase: 0 } },
       interface: {
         forma: 'anel', papel: 'recebe', eixo: EIXO_DAS_PORTAS, centro: p('centroDaPorta'),
         raioInterno: p('raioInternoDoNo'), raioExterno: p('raioExternoDoNo'), inicio: p('comprimentoDoNoNegativo'), fim: 0,
