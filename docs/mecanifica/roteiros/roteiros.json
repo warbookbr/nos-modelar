@@ -76,6 +76,12 @@
       "gate": null
     },
     {
+      "id": "relato-a-pessoa",
+      "secao": "qualidade",
+      "texto": "Ao reportar à pessoa, traga um sumário breve do que foi feito, sem termos internos, e diga se algo depende da decisão dela, sempre com a recomendação.",
+      "gate": null
+    },
+    {
       "id": "gates",
       "secao": "qualidade",
       "texto": "Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe sozinho a bateria curta quando só mudou peça ou documento e a completa em qualquer outro caso; durante o trabalho bastam os testes do que foi tocado. `--completo` força todos.",
