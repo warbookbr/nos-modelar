@@ -911,5 +911,33 @@
       "desvio do disco pouco visível nas vistas da prancha"
     ]
   },
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
+    "perfis": {
+      "bicicleta": {
+        "hash": "sha256:ffbbcfc5dc126e938e49a9ba750284ce4d1a6c621184a0f87d42551f313a38b4"
+      },
+      "carrinho-de-mao": {
+        "hash": "sha256:f0614bc505d166662aef498e04197d2f7faa27c23baf05fcd8682b605027dccf"
+      },
+      "carro": {
+        "hash": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5"
+      },
+      "carroca": {
+        "hash": "sha256:6e084d1fde70af3790c9f31752056f3f8a27aea043ed2bedc2d15d1b0d8c66c6"
+      },
+      "rodizio": {
+        "hash": "sha256:72886f63a067260085e30f723f22d6bf5e7f7a1cc4e0b542e8d2acdeef881114"
+      },
+      "trator": {
+        "hash": "sha256:e3d092ef43eefbe8731185bf27f9e8f1f17782073e736965ebed5d4014764415"
+      },
+      "trem": {
+        "hash": "sha256:f0e41f1919403a8ba5b9f8af29540d50ce7002953e076245c6f3921ce6a59b73"
+      }
+    },
+    "observacao": "a pessoa delegou a assinatura a Claude se os perfis cumprissem o propósito; os sete se leem como as rodas dos seus objetos, com as garras retas do trator como limite conhecido"
+  }
 }
