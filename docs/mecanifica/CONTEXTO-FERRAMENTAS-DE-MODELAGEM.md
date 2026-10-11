@@ -242,8 +242,7 @@ de painel) e a chapa com furo com as quatro bordas do topo (volume retirado igua
 com a causa: raio ou número de painéis diferentes entre as arestas do canto,
 arestas que não se cruzam a 90°, faixa editada depois de arredondada e número
 ímpar de painéis onde três arestas se encontram (o chanfro de `filete`, de um
-painel, fecha o canto de duas e recusa o de três). Falta refazer o suporte de
-tubo com essa correção, e ele entra no acervo com a aprovação da pessoa.
+painel, fecha o canto de duas e recusa o de três).
 
 As três recusas que o suporte de tubo ainda trazia na aba de parede e na aba do
 tubo foram corrigidas no núcleo (`operacoes/arestas-em-grupos.js`), cada uma com
@@ -264,10 +263,35 @@ vezes 10 mm, e esse modo só entra quando o comum recusa. Um limite novo ficou
 medido: com os quatro cantos já arredondados, as arestas da tampa da frente
 (laterais e topo) recusam no remate do canto, que pede uma face só onde a tampa
 é um leque; na ordem inversa (tampa antes, cantos depois) as sete arestas da aba
-de parede arredondam com 4, 10, 16 e 24 segmentos. A receita do suporte precisa
-dessa ordem para voltar a conter as arestas que hoje ficam fora da tabela
-`ARESTAS_*`. O que continua recusado: o contorno que volta sobre a faixa (a
+de parede arredondam com 4, 10, 16 e 24 segmentos. O que continua recusado: o contorno que volta sobre a faixa (a
 mordida semicircular com raio de 3 mm numa faceta de 1,5 mm).
+
+O suporte de tubo foi refeito em `procedural/pecas/suporte-tubo/`, sem a
+interseção com caixas, com as 13 arestas externas do plano arredondadas em 3 mm
+por `sel.onde`, nenhuma recusada: na aba de parede a tampa da frente (a borda de
+cima e as duas laterais) entra antes dos quatro cantos, e na aba do tubo as duas
+bordas livres de cima terminam na seção perpendicular, com o degrau plano que o
+núcleo escreve quando a borda termina numa concordância. A peça passou em
+`guarda:acervo` e entra no acervo com a aprovação da pessoa.
+
+O degrau do suporte, que a pessoa viu na imagem, não era acusado por gate nem por
+aviso: `orfaos` ficava em 0 e a face a mais só aparecia na origem do
+arredondamento. Duas correções entraram no núcleo. O degrau passou a deixar um
+aviso em `neutro.avisos` (`ref: 'degrau'`, com a aresta, a ponta, o motivo e a
+sugestão), que `descrever` mostra na descrição e na saída de erro sem reprovar a
+peça; na receita do suporte ele aparece nos passos das duas bordas livres. E
+`arredondarAresta` ganhou `cadeia` (`true` ou `{ ate: graus }`): a aresta
+escolhida e as que continuam em tangência saem numa varredura só, do canto vivo de
+um lado ao do outro ou no laço inteiro, sem degrau, com o raio medido em cada
+vértice (desvio abaixo de 1e-9 contra o eixo do cilindro da aresta) e o volume
+retirado igual à seção do arco ao longo da cadeia com a esquadria de cada junção.
+O caminho escolhido foi a esquadria sobre a malha da extrusão, que dá o mesmo
+contorno interno que o deslocamento da `CrossSection` (conferido na malha a 0,1 µm,
+a quantização do Clipper) e, ao contrário de derivar a borda da extrusão pelos
+contornos deslocados, serve também a uma tampa que já existe na peça, a um furo e
+às arestas que as outras operações deixaram. A cadeia entra antes das arestas do
+canto; a receita do suporte ainda usa uma chamada por borda livre e passa a usar
+a cadeia quando a pessoa pedir a refeitura.
 
 ## Depois do plano
 

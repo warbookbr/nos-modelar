@@ -360,6 +360,43 @@ canto cuja tampa é um leque recusa com `é uma tampa partida: o remate do canto
 pede uma face só ali`. A prova está em
 `procedural/nucleo/operacoes/arredondar-chapa-furada.test.ts`.
 
+O degrau não passa calado. Quando um arredondamento (ou chanfro) termina em
+degrau, o resultado da execução traz um aviso em `neutro.avisos` (o canal que já
+carregava o raio reduzido por `raioMinimo`, fora da forma canônica) com `ref:
+'degrau'`, a aresta (vértices e extremos), a ponta, o ângulo que a face vizinha
+faz com ela, o motivo e a sugestão. `npm run descrever` o mostra na seção AVISOS
+DO NÚCLEO da descrição e numa linha da saída de erro, e `resultado.avisos` o leva
+a quem chama; o aviso não reprova a peça, porque a malha fecha. Quem lê o aviso
+troca a chamada por `cadeia`.
+
+`cadeia` arredonda numa chamada só a aresta escolhida e as que continuam em
+tangência a partir dela, até um canto vivo ou até fechar o laço: `cadeia: true`
+(ângulo máximo de 30° entre arestas consecutivas) ou `cadeia: { ate: graus }`,
+com `ate` entre 0 e 90, o mesmo nome e a mesma unidade de `normal.ate` do
+`onde`. A cadeia é uma varredura só: não há tampa nem degrau nas junções, e o
+raio pode passar do comprimento das facetas. Serve à borda da tampa de uma
+`extrusao` por trechos (reto, arco tangente, concordância), à borda de um furo ou
+recorte e ao laço inteiro de um contorno tangente, e exige a tampa plana (o grupo
+de faces coplanares) e as paredes perpendiculares a ela. Em cada vértice o anel é
+a seção no plano bissetor das duas arestas vizinhas, de modo que o contorno que
+sobra na tampa é o original deslocado do raio para dentro com junta em esquadria,
+o mesmo que a `CrossSection` dá em `deslocar` com `canto: 'esquadria'`. Os
+painéis saem aresta por aresta, na ordem da cadeia, e `{op:'arredondarAresta',
+id}` os cita todos. Numa cadeia aberta a ponta termina em canto vivo e o anel
+escorrega até a face de ponta, como na aresta simples; arredonde a cadeia antes
+das arestas do canto, que a cadeia recusa uma ponta que já encontra um
+arredondamento. O passo recusa sem escrever, com a causa, o diedro diferente de
+90°, o raio que passa da altura da parede, o raio que passa do raio de curvatura
+de um trecho convexo (`o raio não cabe: a faceta … some antes de o arredondamento
+terminar`; o arco côncavo de um recorte não limita nada), o canto agudo da ponta
+que o raio não comporta, o vértice da tampa mais perto que o raio e a cadeia que
+dá a volta e volta ao próprio vértice num canto vivo. A cadeia de uma aresta só
+segue o caminho da aresta simples. A prova está em
+`procedural/nucleo/operacoes/arredondar-cadeia.test.ts` (a borda livre de cima da
+aba do tubo com 3 mm, o laço de um estádio, o aro de um furo oblongo e as pontas
+oblíquas, com o desvio de cada vértice ao raio abaixo de 1e-9 e o volume
+retirado conferido) e em `aviso-de-degrau.test.ts`.
+
 O canto onde duas ou três arestas arredondadas (ou chanfradas por `filete`)
 chegam ao mesmo vértice se fecha em esquadria, e cada aresta continua sendo uma
 chamada de `sel.onde` que resolve para uma aresta só, em qualquer ordem. Quando a

@@ -41,8 +41,16 @@ export function painelRegistrado(st, fid) {
 export function descreverFaixa(st, fid, v) {
   const reg = painelRegistrado(st, fid);
   if (!reg) return { erro: `a face ${fid} não é painel de um arredondamento` };
-  const n = reg.paineis.length;
-  const faces = reg.paineis.map((id) => st.F.get(id));
+  /* a faixa de uma cadeia (arestas-em-cadeia.js) lista os painéis de todas as arestas, aresta por aresta: o canto vê só a
+     faixa da aresta a que o painel pertence */
+  let lista = reg.paineis;
+  if (reg.cadeia) {
+    const por = reg.cadeia.paineisPorAresta;
+    const de = Math.floor(reg.paineis.indexOf(fid) / por) * por;
+    lista = reg.paineis.slice(de, de + por);
+  }
+  const n = lista.length;
+  const faces = lista.map((id) => st.F.get(id));
   if (faces.some((f) => !f || f.vs.length !== 4)) return { erro: 'a faixa vizinha foi editada depois de arredondada: um painel deixou de ser um quadrilátero' };
   const P = [faces[0].vs[3], ...faces.map((f) => f.vs[0])];
   const Q = [faces[0].vs[2], ...faces.map((f) => f.vs[1])];
@@ -51,8 +59,8 @@ export function descreverFaixa(st, fid, v) {
   }
   if (new Set([...P, ...Q]).size !== 2 * (n + 1)) return { erro: 'a faixa vizinha foi editada depois de arredondada: os anéis repetem vértice' };
   for (const [anel, par] of [[P, Q], [Q, P]]) {
-    if (anel[0] === v) return { n, reg, anel, par, paineis: [...reg.paineis] };
-    if (anel[n] === v) return { n, reg, anel: [...anel].reverse(), par: [...par].reverse(), paineis: [...reg.paineis].reverse() };
+    if (anel[0] === v) return { n, reg, anel, par, paineis: [...lista] };
+    if (anel[n] === v) return { n, reg, anel: [...anel].reverse(), par: [...par].reverse(), paineis: [...lista].reverse() };
   }
   if (P.includes(v) || Q.includes(v)) return { erro: `o vértice ${v} fica no meio do anel de pontas da faixa vizinha, não numa ponta dela` };
   return { erro: `o vértice ${v} não pertence à faixa vizinha` };

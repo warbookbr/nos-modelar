@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1106 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1107 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -105,8 +105,6 @@
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
-- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
-- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
@@ -699,15 +697,18 @@
 
 ## procedural/nucleo/operacoes/
 
+- `arestas-em-cadeia.js` — arestas-em-cadeia.js — arredondar de uma vez a cadeia de arestas que continua em tangência a partir da escolhida.
 - `arestas-em-grupos.js` — arestas-em-grupos.js — arredondar ou chanfrar uma aresta cujo lado é uma face PARTIDA em várias coplanares.
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
 - `arredondar-aresta.test.ts` — arredondar-aresta.test.ts — contrato de aceitação do Escopo A do filete v2. Escrito antes da op: uma aresta simples de cubo ganha uma faixa de arco com vário…
+- `arredondar-cadeia.test.ts` — arredondar-cadeia.test.ts — `arredondarAresta` com `cadeia`: a aresta escolhida e as que continuam em tangência a partir dela, arredondadas como uma varredur…
 - `arredondar-canto.test.ts` — arredondar-canto.test.ts — o vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+- `aviso-de-degrau.test.ts` — aviso-de-degrau.test.ts — o arredondamento que termina em degrau não passa mais calado.
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
@@ -803,6 +804,14 @@
 ## procedural/pecas/braco-robotico/referencias/lateral.prancha.pacote/
 
 - `roteiro.md` — Roteiro da crítica da prancha
+
+## procedural/pecas/suporte-tubo/
+
+- `receita.js` — suporte-tubo — suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede.
+
+## procedural/pecas/suporte-tubo/referencias/
+
+- `alvo.md` — Alvo do suporte-tubo
 
 ## procedural/servicos/
 
@@ -1389,7 +1398,7 @@
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
-- `parametros-peca.test.mjs` — Prova de R00: liberdade declarada não é liberdade real, e a diferença é conferível. O número do acervo fica travado aqui de propósito — se alguém ligar uma r…
+- `parametros-peca.test.mjs` — Prova de R00: liberdade declarada não é liberdade real, e a diferença é conferível. O total do acervo é conferido contra a soma dos alvos que o acervo lista,…
 - `partes-de-objeto.test.mjs` — partes-de-objeto.test.mjs — um objeto de várias partes é uma pasta com as partes dentro de `partes/`, e cada ferramenta acha a parte pelo nome curto `objeto/…
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
@@ -1411,8 +1420,6 @@
 - `resolver-caminho-receita.test.mjs` — resolver-caminho-receita.test.mjs — testes unitários para resolução flexível e segura de receitas procedurais.
 - `revalidacao-cascata-r00.test.ts` — Provas executáveis da R00: identidade, estados, obsolescência e concorrência.
 - `revalidacao-resultados.test.ts` — Provas R03: resultado vinculado, histórico, obsolescência e CAS persistidos.
-- `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
-- `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
 - `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
 - `rodada-de-modelagem.test.mjs` — rodada-de-modelagem.test.mjs — o registro do laço, de ponta a ponta.
 - `rodadas-com-critico.mjs` — rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo volta,…
