@@ -260,6 +260,42 @@
       "origemTokens": "api",
       "nota": 9,
       "motivo": "nível zero: maquete e conferência pela blocagem; sem defeito estrutural, só acabamento e proporção fina das ripas"
+    },
+    {
+      "objeto": "carrinho de mão",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-11T16:24:17.457Z",
+      "commit": "2529aa08",
+      "tokens": 124539,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "depois do plano: sem defeito estrutural; casco facetado, pneu de cantos vivos e travessa com pontas sobrando"
+    },
+    {
+      "objeto": "guarda-roupa",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-11T16:24:17.835Z",
+      "commit": "2529aa08",
+      "tokens": 134033,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "depois do plano: sem defeito estrutural; dobradiças com o nó na quina da frente, visíveis de fora, e vão sem função acima das gavetas"
+    },
+    {
+      "objeto": "cadeira de rodas",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-11T16:28:55.193Z",
+      "commit": "41d5b921",
+      "tokens": 185321,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "depois do plano: sem defeito estrutural; barra grossa na altura do cubo, folga apertada da rodinha e raios que parecem atravessar o cubo; o esbocista inseriu um campo de texto por script"
     }
   ]
 }

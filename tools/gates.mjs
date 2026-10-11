@@ -83,6 +83,10 @@ export const GATES = [
   /* O hash da geometria dos três pontos de cada família registrada em `procedural/familias`, preso ao `aprovacao.json`.
      Geometria que muda sem reaprovação reprova dizendo o ponto; sem família registrada, passa dizendo isso. */
   'familias:check',
+  /* O conjunto de calibração do crítico: as doze imagens com a fonte que as reproduz, o hash do agente e do brief gravados
+     e a medida reprovando, sem o crítico, o que o conjunto diz ser dela. Mudar o crítico, o desenhista ou a geometria de uma
+     fonte exige gerar e medir de novo. */
+  'calibracao:check',
 ];
 
 /* OS GATES RODAM EM PARALELO, E O RELATÓRIO CONTINUA EM ORDEM.
@@ -166,7 +170,7 @@ export const GATES_CURTOS = [
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check',
-  'banco-de-provas:check',
+  'banco-de-provas:check', 'calibracao:check',
 ];
 
 export function escolherBateria(alterados) {

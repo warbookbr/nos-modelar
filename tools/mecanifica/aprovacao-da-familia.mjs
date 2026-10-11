@@ -57,11 +57,13 @@ export const LIMITE_DA_PAREDE_MAXIMA = 1.5;
 const IDENTIDADE_DA_CHAMADA = 'corpo';
 /* A família não traz a aparência: a receita que a chama escolhe os materiais. O que se aprova é a geometria, que não
    depende da aparência, então cada material que a composição cita recebe esta aparência neutra. */
-const MATERIAL_NEUTRO = Object.freeze({ cor: '#808080', aspereza: 0.5, metalicidade: 0 });
+export const MATERIAL_NEUTRO = Object.freeze({ cor: '#808080', aspereza: 0.5, metalicidade: 0 });
 const TOLERANCIA_DE_SOMA = 1e-9;
 const CODIGOS_DE_MALHA_ABERTA = Object.freeze(['casca-aberta', 'aresta-nao-manifold', 'orientacao-incoerente']);
 
-const hashDe = (neutro) => `sha256:${sha256Hex(JSON.stringify(neutroCanonico(neutro)))}`;
+/* a impressão da geometria de uma peça executada, a que o `aprovacao.json` guarda por ponto (o conjunto de calibração do
+   crítico a usa para conferir que o controle é a geometria aprovada) */
+export const hashDe = (neutro) => `sha256:${sha256Hex(JSON.stringify(neutroCanonico(neutro)))}`;
 const numero = (valor) => (typeof valor === 'number' && Number.isFinite(valor) ? valor : null);
 const problema = (codigo, mensagem, extra = {}) => ({ codigo, mensagem, ...extra });
 /* doze algarismos significativos: tira o ruído de ponto flutuante do que vai para o arquivo, sem mexer em medida real */
@@ -187,7 +189,7 @@ export function extensoesMedidas(coletor) {
 
 /* Os registros de uma execução. Sem `medir`, as extensões são as nativas, sem embrulho. Cada execução recebe registros
    novos: nada é guardado entre pontos. */
-function ambienteDaExecucao(familia, { medir }) {
+export function ambienteDaExecucao(familia, { medir }) {
   const coletor = [];
   const registroOperacoes = criarRegistroComExtensoes({
     registroBase: REGISTRO_OPERACOES, extensoes: medir ? extensoesMedidas(coletor) : [...EXTENSOES_NATIVAS],

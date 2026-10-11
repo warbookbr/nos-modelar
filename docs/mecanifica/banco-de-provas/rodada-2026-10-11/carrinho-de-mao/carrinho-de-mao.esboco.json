@@ -1,0 +1,189 @@
+{
+  "vista": "isometrica",
+  "plano": {
+    "nivel": "medio",
+    "texto": "Nível medio: peça reconhecível, medidas e contrato de relações, Maquete e Conferência. Objeto: carrinho de mão de obra com uma roda, caçamba de chapa, duas longarinas tubulares que seguem do punho até o garfo da roda, duas pernas com barra de apoio no chão. Eixos: y para cima, z para a frente (roda), x para o lado, o lado E é o de x negativo; o chão é y 0. As medidas vêm do conhecimento da IA sobre carrinhos de obra de roda única (roda de 400 mm, caçamba de uns 240 mm de fundo, altura de punho de uns 770 mm, comprimento de uns 1600 mm), todas com origem ia. Representação: as longarinas e o garfo são tubos por pontos (o garfo é um segundo tubo que sai da curva da longarina e desce até o eixo, ligado a ela por uma solda declarada como atravessa); a caçamba é um loft de seções arredondadas com casca aberta em cima, mais larga e mais comprida na boca do que no fundo; a roda é o componente roda; as empunhaduras são cilindros que continuam o tubo da longarina na direção da rampa; as travessas são cilindros em x entre as longarinas e a caçamba pousa sobre elas por encosta. Não dá para representar a borda dobrada da caçamba, o nervuramento do fundo, a válvula do pneu nem a curvatura livre da chapa. Contato: gate ligado, com tolerância padrão; atravessa só onde há encaixe de verdade (eixo no cubo, no disco e na ponta do garfo; solda entre longarina e garfo); as demais peças foram desenhadas encostadas.",
+    "medidas": [
+      { "nome": "alturaPunho", "valor": 770, "unidade": "mm", "origem": "ia", "tolerancia": 25, "mede": "alturaTotal" },
+      { "nome": "comprimentoTotal", "valor": 1590, "unidade": "mm", "origem": "ia", "tolerancia": 40, "mede": "profundidadeTotal" },
+      { "nome": "larguraBoca", "valor": 720, "unidade": "mm", "origem": "ia", "tolerancia": 10, "mede": "larguraTotal" },
+      { "nome": "diametroRoda", "valor": 400, "unidade": "mm", "origem": "ia", "tolerancia": 2, "mede": { "caixa": "y", "formas": ["roda"] } },
+      { "nome": "fundoCacamba", "valor": 240, "unidade": "mm", "origem": "ia", "tolerancia": 3, "mede": { "caixa": "y", "formas": ["cacamba"] } },
+      { "nome": "alturaBorda", "valor": 675, "unidade": "mm", "origem": "ia", "tolerancia": 15, "mede": { "caixa": "y", "formas": ["cacamba", "barraPe", "pernaE", "pernaD"] } },
+      { "nome": "rodaAoApoio", "valor": 1020, "unidade": "mm", "origem": "ia", "tolerancia": 10, "mede": { "distancia": ["eixo.centro", "barraPe.centro"], "eixo": "z" } },
+      { "nome": "larguraEntrePunhos", "valor": 610, "unidade": "mm", "origem": "ia", "tolerancia": 15, "mede": { "caixa": "x", "formas": ["empunhaduraE", "empunhaduraD"] } }
+    ],
+    "contrato": {
+      "tocam": [
+        ["cacamba", "travessaFrente"],
+        ["cacamba", "travessaTras"],
+        ["travessaFrente", "longarinaE"],
+        ["travessaFrente", "longarinaD"],
+        ["travessaTras", "longarinaE"],
+        ["travessaTras", "longarinaD"],
+        ["empunhaduraE", "longarinaE"],
+        ["empunhaduraD", "longarinaD"],
+        ["pernaE", "longarinaE"],
+        ["pernaD", "longarinaD"],
+        ["pernaE", "barraPe"],
+        ["pernaD", "barraPe"],
+        ["garfoE", "longarinaE"],
+        ["garfoD", "longarinaD"],
+        ["roda.cuboE", "garfoE"],
+        ["roda.cuboD", "garfoD"]
+      ],
+      "livres": [
+        ["roda.pneu", "cacamba"],
+        ["roda.pneu", "garfoE"],
+        ["roda.pneu", "garfoD"],
+        ["pernaE", "cacamba"],
+        ["pernaD", "cacamba"]
+      ],
+      "simetricas": [
+        ["longarinaE", "longarinaD"],
+        ["garfoE", "garfoD"],
+        ["pernaE", "pernaD"],
+        ["empunhaduraE", "empunhaduraD"]
+      ],
+      "fixa": [
+        { "a": "cacamba", "b": "longarina*", "pontos": 2 },
+        { "a": "roda", "b": "garfo*", "pontos": 2 },
+        { "a": "pernaE", "b": "longarinaE", "pontos": 1 },
+        { "a": "pernaD", "b": "longarinaD", "pontos": 1 },
+        { "a": "barraPe", "b": "perna*", "pontos": 2 },
+        { "a": "garfo*", "b": "longarina*", "pontos": 2 }
+      ]
+    },
+    "pecas": [
+      { "nome": "roda", "formas": ["roda"], "obrigatoria": true },
+      { "nome": "eixo da roda", "formas": ["eixo"], "obrigatoria": true },
+      { "nome": "garfo", "formas": ["garfoE", "garfoD"], "obrigatoria": true },
+      { "nome": "caçamba", "formas": ["cacamba"], "obrigatoria": true },
+      { "nome": "longarinas", "formas": ["longarinaE", "longarinaD"], "obrigatoria": true },
+      { "nome": "empunhaduras", "formas": ["empunhaduraE", "empunhaduraD"], "obrigatoria": true },
+      { "nome": "travessas da caçamba", "formas": ["travessaFrente", "travessaTras"], "obrigatoria": true },
+      { "nome": "pernas", "formas": ["pernaE", "pernaD"], "obrigatoria": true },
+      { "nome": "barra de apoio", "formas": ["barraPe"], "obrigatoria": true }
+    ]
+  },
+  "parametros": {
+    "yLong": 420,
+    "xLong": 150,
+    "dTubo": 28,
+    "zB1": -170,
+    "zB2": 240,
+    "zRoda": 620,
+    "diametroRoda": 400,
+    "larguraRoda": 90,
+    "aroRoda": 250,
+    "xGarfo": 79,
+    "xGrip": 260,
+    "yGrip": 690,
+    "zGrip": -640,
+    "compGrip": 140,
+    "dGrip": 34,
+    "dxR": "=xGrip-xLong",
+    "dyR": "=yGrip-yLong",
+    "dzR": "=zGrip-zB1",
+    "compRampa": "=sqrt(dxR*dxR+dyR*dyR+dzR*dzR)",
+    "zPerna": -400,
+    "xPernaBase": 205,
+    "dPe": 28,
+    "larguraFundo": 440,
+    "profFundo": 480,
+    "larguraBoca": 720,
+    "profBoca": 840,
+    "fundoCacamba": 240,
+    "espCacamba": 3,
+    "zCacamba": 80
+  },
+  "contato": {
+    "usar": true,
+    "pares": [
+      { "a": "eixo", "b": "roda.cuboE", "tipo": "atravessa", "max": 45, "motivo": "o eixo passa pelo furo do cubo da roda" },
+      { "a": "eixo", "b": "roda.cuboD", "tipo": "atravessa", "max": 45, "motivo": "o eixo passa pelo furo do cubo da roda" },
+      { "a": "eixo", "b": "roda.disco", "tipo": "atravessa", "max": 110, "motivo": "o eixo passa pelo furo do disco da roda, que o gate mede pelo deslocamento mínimo ao longo de x" },
+      { "a": "eixo", "b": "garfoE", "tipo": "atravessa", "max": 16, "motivo": "o eixo atravessa o furo na ponta do garfo" },
+      { "a": "eixo", "b": "garfoD", "tipo": "atravessa", "max": 16, "motivo": "o eixo atravessa o furo na ponta do garfo" },
+      { "a": "garfoE", "b": "longarinaE", "tipo": "atravessa", "max": 40, "motivo": "a solda une o garfo à longarina na curva da frente" },
+      { "a": "garfoD", "b": "longarinaD", "tipo": "atravessa", "max": 40, "motivo": "a solda une o garfo à longarina na curva da frente" }
+    ]
+  },
+  "opcoes": [
+    {
+      "titulo": "Carrinho de mão",
+      "nota": "Carrinho de obra de roda única com caçamba de chapa, longarinas tubulares e pernas",
+      "formas": [
+        {
+          "id": "longarinaE", "tipo": "tubo", "diametro": "dTubo", "raioCurva": 120, "cor": "cinza", "rotulo": "longarina_E",
+          "caminho": [
+            { "nome": "empIn", "ponto": ["=0-xGrip", "yGrip", "zGrip"] },
+            { "nome": "b1", "ponto": ["=0-xLong", "yLong", "zB1"] },
+            { "nome": "b2", "ponto": ["=0-xLong", "yLong", "zB2"] }
+          ]
+        },
+        { "id": "longarinaD", "espelha": { "forma": "longarinaE", "eixo": "x", "pos": 0 } },
+        {
+          "id": "garfoE", "tipo": "tubo", "diametro": "dTubo", "raioCurva": 50, "cor": "cinza", "rotulo": "garfo_E",
+          "caminho": [
+            "longarinaE.b2",
+            { "nome": "joelho", "ponto": ["=0-xGarfo", "=diametroRoda/2+130", "zRoda"] },
+            { "nome": "pe", "ponto": ["=0-xGarfo", "=diametroRoda/2", "zRoda"] }
+          ]
+        },
+        { "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x", "pos": 0 } },
+        {
+          "id": "empunhaduraE", "tipo": "cilindro", "diametro": "dGrip", "cor": "preto", "rotulo": "empunhadura_E", "ponta": true,
+          "de": "longarinaE.empIn",
+          "para": { "entre": ["longarinaE.b1", "longarinaE.empIn"], "mm": "=compRampa+compGrip" }
+        },
+        { "id": "empunhaduraD", "espelha": { "forma": "empunhaduraE", "eixo": "x", "pos": 0 } },
+        {
+          "id": "roda", "usa": "roda", "rotulo": "roda",
+          "parametros": { "diametro": "diametroRoda", "aro": "aroRoda", "largura": "larguraRoda", "espessuraDisco": 30, "diametroCubo": 50, "salienciaCubo": 50 },
+          "centro": [0, "=diametroRoda/2", "zRoda"]
+        },
+        {
+          "id": "eixo", "tipo": "cilindro", "diametro": 14, "comprimento": "=2*xGarfo+dTubo", "eixo": "x", "cor": "cinza", "rotulo": "eixo_roda",
+          "centro": "roda.eixo"
+        },
+        {
+          "id": "travessaFrente", "tipo": "cilindro", "diametro": "dTubo", "comprimento": "=2*xLong-dTubo", "eixo": "x", "cor": "cinza", "rotulo": "travessa_frente",
+          "centro": [0, "yLong", 140]
+        },
+        {
+          "id": "travessaTras", "tipo": "cilindro", "diametro": "dTubo", "comprimento": "=2*xLong-dTubo", "eixo": "x", "cor": "cinza", "rotulo": "travessa_tras",
+          "centro": [0, "yLong", -110]
+        },
+        {
+          "id": "cacamba", "tipo": "loft", "eixo": "y", "cor": "azul", "rotulo": "cacamba",
+          "casca": { "espessura": "espCacamba", "aberta": "fim" },
+          "secoes": [
+            {
+              "pos": 0, "forma": "arredondado", "tamanho": ["larguraFundo", "profFundo"], "nome": "fundo",
+              "cantos": [["=larguraFundo*0.34", "=profFundo*0.42"], ["=larguraFundo*0.34", "=profFundo*0.42"], 40, 40]
+            },
+            {
+              "pos": "fundoCacamba", "forma": "arredondado", "tamanho": ["larguraBoca", "profBoca"], "nome": "boca",
+              "cantos": [["=larguraBoca*0.34", "=profBoca*0.42"], ["=larguraBoca*0.34", "=profBoca*0.42"], 40, 40]
+            }
+          ],
+          "centro": [0, 700, "zCacamba"],
+          "encosta": { "referencia": "travessaFrente", "direcao": "-y" }
+        },
+        {
+          "id": "pernaE", "tipo": "tubo", "diametro": "dTubo", "raioCurva": 60, "cor": "cinza", "rotulo": "perna_E",
+          "caminho": [
+            { "entre": [{ "ancora": "longarinaE.b1", "mm": [0, -23, 0] }, { "ancora": "longarinaE.empIn", "mm": [0, -23, 0] }], "t": 0.34 },
+            ["=0-xPernaBase", "dPe", "zPerna"]
+          ]
+        },
+        { "id": "pernaD", "espelha": { "forma": "pernaE", "eixo": "x", "pos": 0 } },
+        {
+          "id": "barraPe", "tipo": "cilindro", "diametro": "dPe", "comprimento": "=2*xPernaBase+60", "eixo": "x", "cor": "cinza", "rotulo": "barra_apoio",
+          "centro": [0, "=dPe/2", "zPerna"]
+        }
+      ]
+    }
+  ]
+}

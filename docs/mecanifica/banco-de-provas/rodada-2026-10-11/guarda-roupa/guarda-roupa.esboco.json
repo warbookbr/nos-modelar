@@ -1,0 +1,172 @@
+{
+  "vista": "isometrica",
+  "plano": {
+    "texto": "Nivel: medio (guarda-roupa reconhecivel, medidas e contrato de relacoes, Maquete e Conferencia). Objeto: guarda-roupa de duas portas de abrir, 1200 mm de largura, 2100 mm de altura e 550 mm de profundidade no corpo, painel de 18 mm e fundo de 6 mm, medidas do conhecimento corrente de movel de quarto (origem ia), sem ficha nem foto. Estado desenhado: as duas portas abertas a 90 graus, para que o interior apareca nas quatro vistas; a porta aberta gira em torno da aresta de tras do lado da lateral e as dobradicas sao blocos entre a quina da lateral e a quina da porta. Partes: duas laterais que vao ate o chao, base, topo, fundo encaixado entre as laterais, rodape recuado, divisoria central, barra de cabide e prateleira de maleiro no vao esquerdo, tres prateleiras e duas gavetas no vao direito, duas portas com tres dobradicas e um puxador cada. Representacao: tudo em caixas e um cilindro (a barra); nao se representa a curva do puxador, o rebaixo do fundo, os trilhos das gavetas nem a folga das portas fechadas. Posicao por relacao: todas as pecas do corpo saem das ancoras da lateral esquerda, a porta aberta da ancora da face externa da lateral e o puxador da ancora da face da porta. Contato: gate ligado, tolerancia 1 mm e penetracao 1 mm, sem excecao atravessa nem livre declarada no gate, porque todas as pecas sao desenhadas encostadas por face; as gavetas ficam 12 mm afastadas das laterais e apoiadas na base.",
+    "nivel": "medio",
+    "familia": "movel-de-caixa",
+    "medidas": [
+      { "nome": "alturaTotal", "valor": 2100, "unidade": "mm", "origem": "ia", "mede": "alturaTotal" },
+      { "nome": "larguraTotal", "valor": 1276, "unidade": "mm", "origem": "ia", "mede": "larguraTotal" },
+      { "nome": "profundidadeTotal", "valor": 1148.5, "unidade": "mm", "origem": "ia", "mede": "profundidadeTotal" },
+      { "nome": "larguraCorpo", "valor": 1200, "unidade": "mm", "origem": "ia", "mede": { "caixa": "x", "formas": ["lateralE", "lateralD"] } },
+      { "nome": "profundidadeCorpo", "valor": 550, "unidade": "mm", "origem": "ia", "mede": { "caixa": "z", "formas": ["lateralE", "lateralD"] } },
+      { "nome": "espessuraPainel", "valor": 18, "unidade": "mm", "origem": "ia", "mede": { "caixa": "x", "formas": ["lateralE"] } },
+      { "nome": "alturaRodape", "valor": 80, "unidade": "mm", "origem": "ia", "mede": { "caixa": "y", "formas": ["rodape"] } },
+      { "nome": "alturaPorta", "valor": 2016, "unidade": "mm", "origem": "ia", "mede": { "caixa": "y", "formas": ["portaE"] } },
+      { "nome": "larguraPorta", "valor": 598.5, "unidade": "mm", "origem": "ia", "mede": { "caixa": "z", "formas": ["portaE"] } },
+      { "nome": "alturaBarra", "valor": 1720, "unidade": "mm", "origem": "ia", "mede": { "distancia": ["barraCabide.centro", "lateralE.-y"], "eixo": "y" } },
+      { "nome": "vaoBarraMaleiro", "valor": 80, "unidade": "mm", "origem": "ia", "mede": { "distancia": ["barraCabide.centro", "prateleiraMaleiro.-y"], "eixo": "y" } }
+    ],
+    "pecas": [
+      { "nome": "laterais", "formas": ["lateral*"], "obrigatoria": true },
+      { "nome": "base", "formas": ["base"], "obrigatoria": true },
+      { "nome": "topo", "formas": ["topo"], "obrigatoria": true },
+      { "nome": "fundo", "formas": ["fundo"], "obrigatoria": true },
+      { "nome": "rodape", "formas": ["rodape"], "obrigatoria": true },
+      { "nome": "divisoria central", "formas": ["divisoria"], "obrigatoria": true },
+      { "nome": "barra de cabide", "formas": ["barraCabide"], "obrigatoria": true },
+      { "nome": "prateleiras", "formas": ["prateleira*"], "obrigatoria": true },
+      { "nome": "gavetas", "formas": ["gavetaCorpo*", "gavetaFrente*"], "obrigatoria": true },
+      { "nome": "puxadores de gaveta", "formas": ["puxadorGaveta*"], "obrigatoria": true },
+      { "nome": "portas", "formas": ["porta*"], "obrigatoria": true },
+      { "nome": "dobradicas", "formas": ["dobradica*"], "obrigatoria": true },
+      { "nome": "puxadores de porta", "formas": ["puxadorPorta*"], "obrigatoria": true }
+    ],
+    "contrato": {
+      "tocam": [
+        ["lateralE", "base"],
+        ["lateralE", "topo"],
+        ["lateralE", "fundo"],
+        ["lateralE", "rodape"],
+        ["lateralD", "base"],
+        ["lateralD", "topo"],
+        ["lateralD", "fundo"],
+        ["lateralD", "rodape"],
+        ["base", "rodape"],
+        ["base", "fundo"],
+        ["base", "divisoria"],
+        ["topo", "divisoria"],
+        ["fundo", "divisoria"],
+        ["barraCabide", "lateralE"],
+        ["barraCabide", "divisoria"],
+        ["prateleiraMaleiro", "lateralE"],
+        ["prateleiraMaleiro", "divisoria"],
+        ["prateleiraMaleiro", "fundo"],
+        ["prateleiraD", "lateralD"],
+        ["prateleiraD", "divisoria"],
+        ["prateleiraD2", "lateralD"],
+        ["gavetaCorpo", "base"],
+        ["gavetaCorpo1", "gavetaCorpo"],
+        ["gavetaFrente", "gavetaCorpo"],
+        ["gavetaFrente1", "gavetaCorpo1"],
+        ["puxadorGaveta", "gavetaFrente"],
+        ["puxadorGaveta1", "gavetaFrente1"],
+        ["dobradicaE", "lateralE"],
+        ["dobradicaE2", "lateralE"],
+        ["dobradicaD", "lateralD"],
+        ["dobradicaD2", "lateralD"],
+        ["dobradicaE", "portaE"],
+        ["dobradicaE1", "portaE"],
+        ["dobradicaE2", "portaE"],
+        ["dobradicaD", "portaD"],
+        ["dobradicaD1", "portaD"],
+        ["dobradicaD2", "portaD"],
+        ["puxadorPortaE", "portaE"],
+        ["puxadorPortaD", "portaD"]
+      ],
+      "livres": [
+        ["portaE", "portaD"],
+        ["lateralE", "lateralD"],
+        ["barraCabide", "prateleiraMaleiro"],
+        ["gavetaFrente", "gavetaFrente1"],
+        ["gavetaCorpo", "lateralD"]
+      ],
+      "simetricas": [
+        ["lateralE", "lateralD"],
+        ["portaE", "portaD"],
+        ["dobradicaE", "dobradicaD"],
+        ["dobradicaE1", "dobradicaD1"],
+        ["dobradicaE2", "dobradicaD2"],
+        ["puxadorPortaE", "puxadorPortaD"]
+      ],
+      "fixa": [
+        { "a": "portaE", "b": "dobradicaE*", "pontos": 3 },
+        { "a": "portaD", "b": "dobradicaD*", "pontos": 3 },
+        { "a": "gavetaCorpo", "b": "base", "pontos": 1 }
+      ]
+    }
+  },
+  "parametros": {
+    "L": 1200,
+    "H": 2100,
+    "P": 550,
+    "e": 18,
+    "eFundo": 6,
+    "hRodape": 80,
+    "recuoRodape": 30,
+    "eP": 18,
+    "folgaPorta": 3,
+    "wP": "=L/2-folgaPorta/2",
+    "hP": "=H-hRodape-4",
+    "yP": "=hRodape+2+hP/2",
+    "Wc": "=(L-3*e)/2",
+    "xcD": "=(e/2+L/2-e)/2",
+    "profInt": "=P-eFundo",
+    "zIntC": "=0-P/2+eFundo+profInt/2",
+    "hInt": "=H-2*e-hRodape",
+    "profPrat": "=profInt-20",
+    "zPrat": "=0-P/2+eFundo+profPrat/2",
+    "yBarra": 1720,
+    "yMaleiro": 1800,
+    "yPrat": 700,
+    "passoPrat": 400,
+    "hGav": 200,
+    "profGav": 430,
+    "eFrente": 18,
+    "yDobr": 250,
+    "passoDobr": 840,
+    "yPux": 1050
+  },
+  "contato": { "usar": true, "tolerancia": 1, "penetracao": 1 },
+  "opcoes": [
+    {
+      "titulo": "Guarda-roupa de duas portas",
+      "nota": "Corpo com divisoria, barra e maleiro, prateleiras e gavetas, portas abertas a 90 graus",
+      "formas": [
+        { "id": "lateralE", "tipo": "caixa", "largura": "e", "altura": "H", "profundidade": "P", "centro": ["=0-(L-e)/2", "=H/2", 0], "cor": "#c9a46c", "rotulo": "lateral_esquerda" },
+        { "id": "lateralD", "espelha": { "forma": "lateralE", "eixo": "x", "pos": 0 }, "rotulo": "lateral_direita" },
+
+        { "id": "base", "tipo": "caixa", "largura": "=L-2*e", "altura": "e", "profundidade": "profInt", "centro": "lateralE.+x", "desloca": ["=(L-2*e)/2", "=hRodape+e/2-H/2", "=zIntC"], "cor": "#d8b883", "rotulo": "base" },
+        { "id": "topo", "tipo": "caixa", "largura": "=L-2*e", "altura": "e", "profundidade": "profInt", "centro": "lateralE.+x", "desloca": ["=(L-2*e)/2", "=H/2-e/2", "=zIntC"], "cor": "#d8b883", "rotulo": "topo" },
+        { "id": "fundo", "tipo": "caixa", "largura": "=L-2*e", "altura": "=H-hRodape", "profundidade": "eFundo", "centro": "lateralE.+x", "desloca": ["=(L-2*e)/2", "=hRodape/2", "=0-P/2+eFundo/2"], "cor": "#b58f5a", "rotulo": "fundo" },
+        { "id": "rodape", "tipo": "caixa", "largura": "=L-2*e", "altura": "hRodape", "profundidade": "=P-recuoRodape", "centro": "lateralE.+x", "desloca": ["=(L-2*e)/2", "=hRodape/2-H/2", "=0-recuoRodape/2"], "cor": "#6b5a47", "rotulo": "rodape" },
+        { "id": "divisoria", "tipo": "caixa", "largura": "e", "altura": "hInt", "profundidade": "profInt", "centro": "base.+y", "desloca": [0, "=hInt/2", 0], "cor": "#c9a46c", "rotulo": "divisoria" },
+
+        { "id": "barraCabide", "tipo": "cilindro", "diametro": 25, "comprimento": "Wc", "eixo": "x", "centro": "lateralE.+x", "desloca": ["=Wc/2", "=yBarra-H/2", "=zIntC"], "cor": "cinza", "rotulo": "barra_cabide" },
+        { "id": "prateleiraMaleiro", "tipo": "caixa", "largura": "Wc", "altura": "e", "profundidade": "profPrat", "centro": "lateralE.+x", "desloca": ["=Wc/2", "=yMaleiro+e/2-H/2", "=zPrat"], "cor": "#d8b883", "rotulo": "prateleira_maleiro" },
+
+        { "id": "prateleiraD", "tipo": "caixa", "largura": "Wc", "altura": "e", "profundidade": "profPrat", "centro": "lateralD.-x", "desloca": ["=0-Wc/2", "=yPrat+e/2-H/2", "=zPrat"], "cor": "#d8b883", "rotulo": "prateleira_direita" },
+        { "arranja": { "forma": "prateleiraD", "modo": "linear", "total": 3, "passo": [0, "passoPrat", 0] } },
+
+        { "id": "gavetaCorpo", "tipo": "caixa", "largura": "=Wc-24", "altura": "hGav", "profundidade": "profGav", "centro": "base.+y", "desloca": ["xcD", "=hGav/2", "=P/2-eFrente-profGav/2-zIntC"], "cor": "#a98456", "rotulo": "corpo_gaveta" },
+        { "arranja": { "forma": "gavetaCorpo", "modo": "linear", "total": 2, "passo": [0, "hGav", 0] } },
+        { "id": "gavetaFrente", "tipo": "caixa", "largura": "=Wc-4", "altura": "=hGav-4", "profundidade": "eFrente", "centro": "gavetaCorpo.+z", "desloca": [0, 0, "=eFrente/2"], "cor": "#e0c9a0", "rotulo": "frente_gaveta" },
+        { "arranja": { "forma": "gavetaFrente", "modo": "linear", "total": 2, "passo": [0, "hGav", 0] } },
+        { "id": "puxadorGaveta", "tipo": "caixa", "largura": 160, "altura": 16, "profundidade": 16, "raio": 4, "centro": "gavetaFrente.+z", "desloca": [0, 0, 8], "cor": "#4a4a4a", "rotulo": "puxador_gaveta" },
+        { "arranja": { "forma": "puxadorGaveta", "modo": "linear", "total": 2, "passo": [0, "hGav", 0] } },
+
+        { "id": "portaE", "tipo": "caixa", "largura": "wP", "altura": "hP", "profundidade": "eP", "rotacao": [0, -90, 0], "centro": "lateralE.-x", "desloca": ["=0-eP/2", "=yP-H/2", "=P/2+wP/2"], "cor": "#e0c9a0", "rotulo": "porta_esquerda" },
+        { "id": "portaD", "espelha": { "forma": "portaE", "eixo": "x", "pos": 0 }, "rotulo": "porta_direita" },
+
+        { "id": "dobradicaE", "tipo": "caixa", "largura": "eP", "altura": 80, "profundidade": 20, "centro": "lateralE.-x", "desloca": ["=0-eP/2", "=yDobr-H/2", "=P/2-10"], "cor": "cinza", "rotulo": "dobradica_esquerda" },
+        { "arranja": { "forma": "dobradicaE", "modo": "linear", "total": 3, "passo": [0, "passoDobr", 0] } },
+        { "id": "dobradicaD", "espelha": { "forma": "dobradicaE", "eixo": "x", "pos": 0 } },
+        { "id": "dobradicaD1", "espelha": { "forma": "dobradicaE1", "eixo": "x", "pos": 0 } },
+        { "id": "dobradicaD2", "espelha": { "forma": "dobradicaE2", "eixo": "x", "pos": 0 } },
+
+        { "id": "puxadorPortaE", "tipo": "caixa", "largura": 20, "altura": 240, "profundidade": 25, "raio": 5, "centro": "portaE.-x", "desloca": [-10, "=yPux-yP", "=wP/2-55"], "cor": "#4a4a4a", "rotulo": "puxador_porta_esquerda" },
+        { "id": "puxadorPortaD", "espelha": { "forma": "puxadorPortaE", "eixo": "x", "pos": 0 } }
+      ]
+    }
+  ]
+}

@@ -29,13 +29,16 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | ------ | ----- | ------- | --- | -------- | ------- | ------ | ---------- |
 | **carrinho de mão** | esboço | Veículos terrestres | 2026-10-07 | 2 | 2 | 194524 | 8 |
 | **carrinho de mão** | esboço | Veículos terrestres | 2026-10-08 | 1 | 1 | 126849 | 8 |
+| **carrinho de mão** | esboço | Veículos terrestres | 2026-10-11 | 1 | 1 | 124539 | 8 |
 | **picape** | detalhado | Veículos terrestres | aguardando medição | 0 | 0 | 0 | — |
 | **cilindro hidráulico** | detalhado | Motores, transmissões e mecanismos | aguardando medição | 0 | 0 | 0 | — |
 | **suspensão** | detalhado | Motores, transmissões e mecanismos | aguardando medição | 0 | 0 | 0 | — |
 | **cadeira de rodas** | esboço | Veículos terrestres | 2026-10-07 | 1 | 1 | 193819 | 9 |
 | **cadeira de rodas** | esboço | Veículos terrestres | 2026-10-08 | 1 | 1 | 159687 | 8 |
+| **cadeira de rodas** | esboço | Veículos terrestres | 2026-10-11 | 1 | 1 | 185321 | 8 |
 | **guarda-roupa** | esboço | Móveis | 2026-10-07 | 3 | 3 | 247352 | 8 |
 | **guarda-roupa** | esboço | Móveis | 2026-10-08 | 1 | 1 | 143669 | 8 |
+| **guarda-roupa** | esboço | Móveis | 2026-10-11 | 1 | 1 | 134033 | 8 |
 | **cadeira** | esboço | Móveis | 2026-10-07 | 2 | 2 | 136343 | 9 |
 | **cadeira** | esboço | Móveis | 2026-10-08 | 1 | 1 | 101631 | 8 |
 | **cadeira** | esboço | Móveis | 2026-10-10 | 1 | 1 | 94093 | 9 |
@@ -57,4 +60,7 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | 2026-10-08T17:59:54.779Z | `7e449634` | **guarda-roupa** | objeto | 1 | 143669 | api | 8 | caminho curto: sem defeito estrutural nas vistas externas; dobradiças aparentes por fora e interior não verificável |
 | 2026-10-08T17:59:54.960Z | `7e449634` | **cadeira** | objeto | 1 | 101631 | api | 8 | caminho curto: sem defeito estrutural; emenda ambígua no poste traseiro e estofado em laje reta |
 | 2026-10-10T20:47:00.360Z | `a4f013e1` | **cadeira** | objeto | 1 | 94093 | api | 9 | nível zero: maquete e conferência pela blocagem; sem defeito estrutural, só acabamento e proporção fina das ripas |
+| 2026-10-11T16:24:17.457Z | `2529aa08` | **carrinho de mão** | objeto | 1 | 124539 | api | 8 | depois do plano: sem defeito estrutural; casco facetado, pneu de cantos vivos e travessa com pontas sobrando |
+| 2026-10-11T16:24:17.835Z | `2529aa08` | **guarda-roupa** | objeto | 1 | 134033 | api | 8 | depois do plano: sem defeito estrutural; dobradiças com o nó na quina da frente, visíveis de fora, e vão sem função acima das gavetas |
+| 2026-10-11T16:28:55.193Z | `41d5b921` | **cadeira de rodas** | objeto | 1 | 185321 | api | 8 | depois do plano: sem defeito estrutural; barra grossa na altura do cubo, folga apertada da rodinha e raios que parecem atravessar o cubo; o esbocista inseriu um campo de texto por script |
 
