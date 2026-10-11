@@ -18,6 +18,7 @@ import { EXTENSAO as EXTENSAO_CHAPA_DOBRADA } from '../extensoes/chapa-dobrada/i
 import { MANIFESTO as MANIFESTO_BARRAS } from '../extensoes/estrutura-de-barras/manifesto.js';
 import { implementar as implementarBarras } from '../extensoes/estrutura-de-barras/implementacao.js';
 import { ErroFamilia } from '../../src/autoria/familia.js';
+import { CILINDRO_HIDRAULICO } from './cilindro-hidraulico/index.js';
 
 export { ErroChamadaDeFamilia, chamar, definirFamilia } from '../../src/autoria/chamar-familia.js';
 
@@ -30,7 +31,7 @@ export const EXTENSOES_NATIVAS = Object.freeze([
 ]);
 
 /* As famílias do produto. Cada família real (tarefas 6 a 10 da fatia 9) entra aqui por import explícito. */
-export const FAMILIAS = Object.freeze([]);
+export const FAMILIAS = Object.freeze([CILINDRO_HIDRAULICO]);
 
 /**
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,

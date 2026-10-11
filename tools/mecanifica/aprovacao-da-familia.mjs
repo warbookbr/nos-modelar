@@ -37,6 +37,7 @@ import { resolverPortasDeMontagem } from '../../src/autoria/interfaces-montagem.
 import { receitaComParametros } from '../../src/autoria/parametros-vivos.js';
 import { conferirPortasNaForma } from '../../src/autoria/porta-confere-forma.js';
 import { execucaoDe, invariantesDe } from '../../src/autoria/varrer-parametros.js';
+import { assinaturaDaMontagem, geraMontagem } from './curso-da-familia.mjs';
 
 export const FORMATO_APROVACAO = 'mecanifica.aprovacao-da-familia@1';
 export const ARQUIVO_APROVACAO = 'aprovacao.json';
@@ -299,6 +300,31 @@ export function medirPonto(familia, parametros, rotulo = 'ponto') {
   };
 }
 
+/* ---------- o curso da articulação ---------- */
+
+/** A medida da articulação com o curso conferido contra as malhas da montagem (`conferirCursoDaFamilia`). */
+function medidaDoCurso(medidas, curso) {
+  const declarada = medidas.find((m) => m.ferramenta === 'articulacao') ?? {};
+  const semMotivo = { ...declarada };
+  delete semMotivo.motivo;
+  const conferida = { ...semMotivo, ferramenta: 'articulacao', ...arredondar(curso) };
+  return [...medidas.filter((m) => m.ferramenta !== 'articulacao'), conferida];
+}
+
+/** Põe o curso conferido em cada ponto e acusa o ponto cujo curso colide ou nem foi conferido: uma família que gera montagem não fica sem a conta. */
+export function integrarOCurso(pontos, cursos, problemas) {
+  for (const nome of NOMES_DOS_PONTOS) {
+    const ponto = pontos[nome];
+    const curso = cursos?.[nome];
+    if (!curso) {
+      problemas.push({ ponto: nome, ...problema('curso-nao-conferido', 'a família gera montagem e o curso da articulação não foi conferido contra as malhas das peças; rode npm run familia -- aprovar, que o confere') });
+      continue;
+    }
+    if (!curso.ok) problemas.push({ ponto: nome, ...problema('curso-colide', `o curso da articulação '${curso.articulacao}' não passa: ${curso.recusa.join(' ')}`) });
+    if (ponto.estado !== 'recusa-declarada') ponto.medidas = medidaDoCurso(ponto.medidas, curso);
+  }
+}
+
 /* ---------- a aprovação ---------- */
 
 function lerAprovacaoGravada(pasta) {
@@ -316,7 +342,7 @@ function pontoGravado(ponto) {
  * falso). Devolve `{ aprovada, familia, pontos, varredura, problemas, gravada, esvaziou }`. `data` é o dia da aprovação
  * (padrão: hoje). Quem chama escolhe a pasta; o gate usa `procedural/familias/<id>`.
  */
-export function aprovarFamilia(familia, { pasta = null, data = null, gravar = true } = {}) {
+export function aprovarFamilia(familia, { pasta = null, data = null, gravar = true, cursos = null } = {}) {
   const problemas = [];
   const id = familia?.contrato?.id;
   try {
@@ -332,6 +358,7 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
     }
     for (const p of ponto.problemas) problemas.push({ ponto: ponto.rotulo, ...p });
   }
+  if (geraMontagem(familia)) integrarOCurso(pontos, cursos, problemas);
   const varredura = varreduraDaFamilia(familia.contrato).map((sonda) => ({ ...medirPonto(familia, sonda.parametros, sonda.rotulo), parametro: sonda.parametro, extremo: sonda.extremo }));
   for (const ponto of varredura) {
     for (const p of ponto.problemas) problemas.push({ ponto: `varredura ${ponto.rotulo}`, ...p });
@@ -360,6 +387,30 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
   };
   writeFileSync(join(pasta, ARQUIVO_APROVACAO), `${JSON.stringify(aprovacao, null, 2)}\n`, 'utf8');
   return { ...resultado, gravada: true, esvaziou: Boolean(anterior) && !mesmaGeometria && Boolean(anterior.critico || anterior.pessoa) };
+}
+
+/* O gate não repete a conta do curso (são dezenas de posições sobre malhas inteiras): confere que ela foi feita, que passou, e
+   que a montagem que a família gera hoje, as duas peças e a declaração, é a que foi conferida. */
+export function conferirOCursoGravado(familia, nome, parametros, aprovado, reprovar) {
+  const gravado = aprovado.medidas?.find((m) => m.ferramenta === 'articulacao');
+  const id = familia.contrato.id;
+  if (!gravado?.conferido) {
+    reprovar('curso-nao-conferido', `o ponto '${nome}' não traz o curso da articulação conferido contra as malhas; reaprove com npm run familia -- aprovar ${id}`, nome);
+    return;
+  }
+  if (!gravado.ok) reprovar('curso-colide', `o curso da articulação '${gravado.articulacao}' no ponto '${nome}' foi aprovado com colisão`, nome);
+  let atual;
+  try {
+    atual = assinaturaDaMontagem(familia.montar(parametros));
+  } catch (erro) {
+    reprovar('montagem-nao-gerada', `no ponto '${nome}' a família não gera a montagem: ${erro.message}`, nome);
+    return;
+  }
+  if (JSON.stringify(gravado.hashDasPecas) !== JSON.stringify(atual.hashDasPecas)) {
+    reprovar('montagem-mudou', `as peças da montagem do ponto '${nome}' mudaram desde que o curso foi conferido; reaprove com npm run familia -- aprovar ${id}`, nome);
+  } else if (JSON.stringify(gravado.declaracao) !== JSON.stringify(atual.declaracao)) {
+    reprovar('articulacao-mudou', `a declaração da articulação do ponto '${nome}' mudou desde que o curso foi conferido; reaprove com npm run familia -- aprovar ${id}`, nome);
+  }
 }
 
 /**
@@ -423,6 +474,7 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
       reprovar('geometria-mudou', `a geometria do ponto '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, nome);
     }
     for (const p of atual.problemas) reprovar(p.codigo, `no ponto '${nome}': ${p.mensagem}`, nome);
+    if (geraMontagem(familia)) conferirOCursoGravado(familia, nome, definidos[nome], aprovado, reprovar);
   }
   return { ok: problemas.length === 0, familia: id, problemas };
 }

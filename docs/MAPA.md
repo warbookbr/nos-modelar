@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1056 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1064 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -594,6 +594,15 @@
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+
+## procedural/familias/cilindro-hidraulico/
+
+- `cilindro-hidraulico.test.js` — cilindro-hidraulico.test.js — a família `cilindro-hidraulico` medida contra contas feitas à mão: a camisa de casca nativa com a parede pedida, o êmbolo que p…
+- `composicoes.js` — composicoes.js — as composições procedurais do cilindro hidráulico: a camisa, a haste e o conjunto dos dois.
+- `derivar.js` — derivar.js — dos parâmetros da família (milímetro) aos argumentos das composições (metro).
+- `geometria.js` — geometria.js — as medidas do cilindro hidráulico a partir dos parâmetros da família, puras e em milímetro.
+- `index.js` — index.js — a família `cilindro-hidraulico`: atuador linear de dupla ação, camisa de casca nativa e haste ligada a ela por uma articulação prismática, com a m…
+- `montagem.js` — montagem.js — a montagem v5 que a família gera: a camisa e a haste, peças distintas, ligadas por uma articulação prismática com o curso declarado.
 
 ## procedural/nucleo/
 
@@ -1216,6 +1225,7 @@
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
+- `cilindro-hidraulico-aprovacao.test.mjs` — cilindro-hidraulico-aprovacao.test.mjs — a aprovação mecânica de uma família que gera montagem: o curso da articulação é conferido contra as malhas da camisa…
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
 - `comecar.test.mjs` — comecar.test.mjs — a entrada por intenção: a lista dos roteiros com o estado, cada roteiro com a sua leitura e o passo seguinte, o grupo de uma intenção, o n…
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
@@ -1231,6 +1241,7 @@
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
+- `curso-da-familia.mjs` — curso-da-familia.mjs — o curso da articulação de uma família que gera montagem, conferido contra as malhas das duas peças.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.

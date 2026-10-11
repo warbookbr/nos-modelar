@@ -1,0 +1,321 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "cilindro-hidraulico",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-10-11",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "comprimentoRecolhido": 120,
+          "curso": 50,
+          "embolo": 32,
+          "fixacaoDianteira": 0,
+          "fixacaoTraseira": 0,
+          "haste": 18,
+          "parede": 3
+        },
+        "hash": "sha256:18fa042efaf5e7527323c1a86b2dd08101988aada2d2b88c84fd93b1b2297a7c",
+        "medidas": [
+          {
+            "ferramenta": "casca",
+            "origemId": 2,
+            "espessura": 0.003,
+            "espessuraMinima": 0.003,
+            "espessuraMaxima": 0.003
+          },
+          {
+            "ferramenta": "articulacao",
+            "id": "haste-na-camisa",
+            "tipo": "prismatica",
+            "unidade": "mm",
+            "curso": {
+              "minimo": 0,
+              "maximo": 50,
+              "unidade": "mm"
+            },
+            "passos": 8,
+            "conferido": true,
+            "ok": true,
+            "articulacao": "haste-na-camisa",
+            "posicoes": 9,
+            "posicoesLivres": 9,
+            "folga": 0,
+            "colisoes": 0,
+            "inconclusivos": 0,
+            "moveis": [
+              "haste"
+            ],
+            "fixos": [
+              "camisa"
+            ],
+            "pares": [
+              {
+                "movel": "haste",
+                "fixo": "camisa",
+                "estadoMaisGrave": "encostam",
+                "colisoes": 0
+              }
+            ],
+            "recusa": [],
+            "hashDasPecas": {
+              "cilindro-hidraulico.camisa": "sha256:4cb66ac8e42245c523b222307dd48ba013152acc8ca3441cd483695e862daadb",
+              "cilindro-hidraulico.haste": "sha256:ebdac1bd13952da083f0c87e8eb375d5238aad87db41f92bc11eb2e1fac5eaff"
+            },
+            "declaracao": {
+              "id": "haste-na-camisa",
+              "tipo": "prismatica",
+              "fixo": {
+                "caminho": [
+                  "camisa"
+                ],
+                "porta": "guia-da-haste"
+              },
+              "movel": {
+                "caminho": [
+                  "haste"
+                ],
+                "porta": "eixo-da-haste"
+              },
+              "unidade": "mm",
+              "curso": {
+                "minimo": 0,
+                "maximo": 50
+              },
+              "passos": 8,
+              "folga": {
+                "valor": 0,
+                "unidade": "mm"
+              }
+            }
+          }
+        ]
+      },
+      "medio": {
+        "parametros": {
+          "comprimentoRecolhido": 700,
+          "curso": 500,
+          "embolo": 80,
+          "fixacaoDianteira": 0,
+          "fixacaoTraseira": 1,
+          "haste": 45,
+          "parede": 8
+        },
+        "hash": "sha256:db04048f1bbd8dbcd99032f401ca40cc1a4607778806934829383057c311aaad",
+        "medidas": [
+          {
+            "ferramenta": "casca",
+            "origemId": 2,
+            "espessura": 0.008,
+            "espessuraMinima": 0.00799999999999,
+            "espessuraMaxima": 0.008
+          },
+          {
+            "ferramenta": "articulacao",
+            "id": "haste-na-camisa",
+            "tipo": "prismatica",
+            "unidade": "mm",
+            "curso": {
+              "minimo": 0,
+              "maximo": 500,
+              "unidade": "mm"
+            },
+            "passos": 20,
+            "conferido": true,
+            "ok": true,
+            "articulacao": "haste-na-camisa",
+            "posicoes": 21,
+            "posicoesLivres": 21,
+            "folga": 0,
+            "colisoes": 0,
+            "inconclusivos": 0,
+            "moveis": [
+              "haste"
+            ],
+            "fixos": [
+              "camisa"
+            ],
+            "pares": [
+              {
+                "movel": "haste",
+                "fixo": "camisa",
+                "estadoMaisGrave": "encostam",
+                "colisoes": 0
+              }
+            ],
+            "recusa": [],
+            "hashDasPecas": {
+              "cilindro-hidraulico.camisa": "sha256:9124749fb2c169a9a2c3709001321515f1bc0232f22e9b97c006e8c619f8cbcf",
+              "cilindro-hidraulico.haste": "sha256:1eeb8d3d9443d0afbb362a28d9f3af5c175e1cc6d7632610f16f69b9be2eb287"
+            },
+            "declaracao": {
+              "id": "haste-na-camisa",
+              "tipo": "prismatica",
+              "fixo": {
+                "caminho": [
+                  "camisa"
+                ],
+                "porta": "guia-da-haste"
+              },
+              "movel": {
+                "caminho": [
+                  "haste"
+                ],
+                "porta": "eixo-da-haste"
+              },
+              "unidade": "mm",
+              "curso": {
+                "minimo": 0,
+                "maximo": 500
+              },
+              "passos": 20,
+              "folga": {
+                "valor": 0,
+                "unidade": "mm"
+              }
+            }
+          }
+        ]
+      },
+      "maximo": {
+        "parametros": {
+          "comprimentoRecolhido": 2300,
+          "curso": 1500,
+          "embolo": 200,
+          "fixacaoDianteira": 1,
+          "fixacaoTraseira": 1,
+          "haste": 140,
+          "parede": 25
+        },
+        "hash": "sha256:0baed6a541659d8d2ba029850580b3497e8d5c4c553e71f73a7ca9813e32cc38",
+        "medidas": [
+          {
+            "ferramenta": "casca",
+            "origemId": 2,
+            "espessura": 0.025,
+            "espessuraMinima": 0.025,
+            "espessuraMaxima": 0.025
+          },
+          {
+            "ferramenta": "articulacao",
+            "id": "haste-na-camisa",
+            "tipo": "prismatica",
+            "unidade": "mm",
+            "curso": {
+              "minimo": 0,
+              "maximo": 1500,
+              "unidade": "mm"
+            },
+            "passos": 60,
+            "conferido": true,
+            "ok": true,
+            "articulacao": "haste-na-camisa",
+            "posicoes": 61,
+            "posicoesLivres": 61,
+            "folga": 0,
+            "colisoes": 0,
+            "inconclusivos": 0,
+            "moveis": [
+              "haste"
+            ],
+            "fixos": [
+              "camisa"
+            ],
+            "pares": [
+              {
+                "movel": "haste",
+                "fixo": "camisa",
+                "estadoMaisGrave": "encostam",
+                "colisoes": 0
+              }
+            ],
+            "recusa": [],
+            "hashDasPecas": {
+              "cilindro-hidraulico.camisa": "sha256:99184c91ff11194da571c53e16513297060f2613644dc5b8d2967f89fdd2a135",
+              "cilindro-hidraulico.haste": "sha256:e14d2544eee4af5cf1ffdabe2a818028e0cd003d151b0576df6ec771e39d0367"
+            },
+            "declaracao": {
+              "id": "haste-na-camisa",
+              "tipo": "prismatica",
+              "fixo": {
+                "caminho": [
+                  "camisa"
+                ],
+                "porta": "guia-da-haste"
+              },
+              "movel": {
+                "caminho": [
+                  "haste"
+                ],
+                "porta": "eixo-da-haste"
+              },
+              "unidade": "mm",
+              "curso": {
+                "minimo": 0,
+                "maximo": 1500
+              },
+              "passos": 60,
+              "folga": {
+                "valor": 0,
+                "unidade": "mm"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "varredura": {
+      "sondas": 14,
+      "recusasDeclaradas": [
+        {
+          "ponto": "comprimentoRecolhido=120",
+          "restricao": "curso-cabe-no-comprimento"
+        },
+        {
+          "ponto": "comprimentoRecolhido=2300",
+          "restricao": "comprimento-longo-demais"
+        },
+        {
+          "ponto": "curso=50",
+          "restricao": "comprimento-longo-demais"
+        },
+        {
+          "ponto": "curso=1500",
+          "restricao": "curso-cabe-no-comprimento"
+        },
+        {
+          "ponto": "embolo=32",
+          "restricao": "haste-abaixo-do-embolo"
+        },
+        {
+          "ponto": "embolo=200",
+          "restricao": "curso-cabe-no-comprimento"
+        },
+        {
+          "ponto": "haste=18",
+          "restricao": "haste-fina-demais"
+        },
+        {
+          "ponto": "haste=140",
+          "restricao": "haste-abaixo-do-embolo"
+        },
+        {
+          "ponto": "parede=3",
+          "restricao": "parede-fina-demais"
+        },
+        {
+          "ponto": "parede=25",
+          "restricao": "parede-grossa-demais"
+        }
+      ]
+    },
+    "portas": [
+      "eixo-da-haste",
+      "guia-da-haste",
+      "olhal-dianteiro",
+      "olhal-traseiro"
+    ]
+  },
+  "critico": null,
+  "pessoa": null
+}

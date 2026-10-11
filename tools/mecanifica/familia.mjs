@@ -16,7 +16,8 @@
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ARQUIVO_CONTRATO, aprovarFamilia, conferirAprovacao } from './aprovacao-da-familia.mjs';
+import { ARQUIVO_CONTRATO, aprovarFamilia, conferirAprovacao, pontosDaFamilia } from './aprovacao-da-familia.mjs';
+import { conferirCursoDaFamilia } from './curso-da-familia.mjs';
 import { importarReceita } from './importar-receita.mjs';
 import { REPO, resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -75,7 +76,9 @@ export async function aprovar(id, opcoes, saida = console) {
   if (!entrada) {
     throw new ErroDeUso(`a família '${id}' não está registrada. Registradas: ${entradas.map(({ familia }) => familia.contrato.id).sort().join(', ') || '(nenhuma)'}.`);
   }
-  const resultado = aprovarFamilia(entrada.familia, { pasta: entrada.pasta, gravar: !opcoes['sem-gravar'] });
+  /* a família que gera montagem tem o curso da articulação conferido nos três pontos antes de a aprovação decidir */
+  const cursos = await conferirCursoDaFamilia(entrada.familia, pontosDaFamilia(entrada.familia.contrato));
+  const resultado = aprovarFamilia(entrada.familia, { pasta: entrada.pasta, gravar: !opcoes['sem-gravar'], cursos });
   if (opcoes.json) {
     saida.log(JSON.stringify(resultado, null, 2));
   } else if (resultado.aprovada) {
