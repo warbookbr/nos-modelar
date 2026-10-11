@@ -198,6 +198,25 @@ bordas livres de cima terminam na seção perpendicular, com o degrau plano que 
 núcleo escreve quando a borda termina numa concordância. A peça passou em
 `guarda:acervo` e entra no acervo com a aprovação da pessoa.
 
+O degrau do suporte, que a pessoa viu na imagem, não era acusado por gate nem por
+aviso: `orfaos` ficava em 0 e a face a mais só aparecia na origem do
+arredondamento. Duas correções entraram no núcleo. O degrau passou a deixar um
+aviso em `neutro.avisos` (`ref: 'degrau'`, com a aresta, a ponta, o motivo e a
+sugestão), que `descrever` mostra na descrição e na saída de erro sem reprovar a
+peça; na receita do suporte ele aparece nos passos das duas bordas livres. E
+`arredondarAresta` ganhou `cadeia` (`true` ou `{ ate: graus }`): a aresta
+escolhida e as que continuam em tangência saem numa varredura só, do canto vivo de
+um lado ao do outro ou no laço inteiro, sem degrau, com o raio medido em cada
+vértice (desvio abaixo de 1e-9 contra o eixo do cilindro da aresta) e o volume
+retirado igual à seção do arco ao longo da cadeia com a esquadria de cada junção.
+O caminho escolhido foi a esquadria sobre a malha da extrusão, que dá o mesmo
+contorno interno que o deslocamento da `CrossSection` (conferido na malha a 0,1 µm,
+a quantização do Clipper) e, ao contrário de derivar a borda da extrusão pelos
+contornos deslocados, serve também a uma tampa que já existe na peça, a um furo e
+às arestas que as outras operações deixaram. A cadeia entra antes das arestas do
+canto; a receita do suporte ainda usa uma chamada por borda livre e passa a usar
+a cadeia quando a pessoa pedir a refeitura.
+
 ## Depois do plano
 
 A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos

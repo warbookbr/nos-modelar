@@ -1,9 +1,11 @@
 /* estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 import { criarArestasEmGrupos, grupoCoplanar, indiceDeArestas } from './arestas-em-grupos.js';
+import { criarArestasEmCadeia, lerCadeia } from './arestas-em-cadeia.js';
 
 export function criarOperacoesEstruturais(servicos) {
   const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
   const arestasEmGrupos = criarArestasEmGrupos({ addV, addF, registraOrigem, grita });
+  const arestasEmCadeia = criarArestasEmCadeia({ addV, addF, registraOrigem, grita, idDoPasso });
   /* Os grupos de faces coplanares que se tocam por aresta dos dois lados da aresta. Um grupo de mais de uma face é uma
      tampa partida (perfil com furo, contorno por trechos); a costura em grupos cuida dela e a costura simples, de uma
      face por lado, segue como estava. */
@@ -831,6 +833,16 @@ export function criarOperacoesEstruturais(servicos) {
     if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'arredondarAresta', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
 
     const v0 = faceA.vs[arestaLocal], v1 = faceA.vs[(arestaLocal + 1) % L];
+    /* `cadeia`: a aresta escolhida e as que continuam em tangência a partir dela, até o canto vivo ou até fechar o laço, numa
+       varredura só (arestas-em-cadeia.js). Uma cadeia de uma aresta só segue pelo caminho comum, logo abaixo. */
+    if (a.cadeia != null) {
+      const lida = lerCadeia(st, a.cadeia);
+      if (lida.erro) return grita(st, i, 'arredondarAresta', 'cadeia', lida.erro);
+      if (lida.ate != null) {
+        const feito = arestasEmCadeia.arredondar(st, i, 'arredondarAresta', { origemId: a.origemId, v0, v1, faceAId, raio, paineis, ate: lida.ate });
+        if (feito !== 'unica') return;
+      }
+    }
     let faceBId = null; let reversa = true;
     for (const [fid, f] of st.F) {
       if (fid === faceAId) continue;

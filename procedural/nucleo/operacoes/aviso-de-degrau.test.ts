@@ -34,7 +34,8 @@ const bordaLivreDaDireita = {
   regiao: { min: [mm(19.5), -mm(0.5), mm(49.5)], max: [mm(30.5), mm(6.5), mm(50.5)] },
   onde: { alvo: 'aresta', normal: { dir: [0, 1, 0], ate: 5 }, extremo: { eixo: 'z', lado: 'max' } },
 };
-const arredonda = (sel: unknown, raio = mm(3)): Passo => ['arredondarAresta', { origemId: 2, raio, paineis: 6, sel }];
+const PAINEIS = 6;
+const arredonda = (sel: unknown, raio = mm(3)): Passo => ['arredondarAresta', { origemId: 2, raio, paineis: PAINEIS, sel }];
 const comParte = (passos: Passo[]): Passo[] => [...passos, ['parte', { nome: 'aba', sel: { tudo: true } }]];
 
 describe('o aviso do degrau, na peça do suporte', () => {
@@ -43,7 +44,7 @@ describe('o aviso do degrau, na peça do suporte', () => {
   it('o caso reproduz o degrau: nenhum órfão, e a faixa da origem leva mais faces que os painéis do arco', () => {
     expect(n.orfaos).toEqual([]);
     const faixa = nucleo([abaDoTubo(), arredonda(bordaLivreDaDireita), ['parte', { nome: 'faixa', sel: { origem: { op: 'arredondarAresta', id: 2 } } }]], {}, {});
-    expect([...faixa.F.values()].filter((f: any) => f.parte === 'faixa').length).toBe(6 + n.avisos[0].degraus.length);
+    expect([...faixa.F.values()].filter((f: any) => f.parte === 'faixa').length).toBe(PAINEIS + n.avisos[0].degraus.length);
   });
 
   it('o resultado da execução traz um aviso com a aresta, o motivo e a sugestão', () => {

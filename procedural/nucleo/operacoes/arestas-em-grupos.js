@@ -47,7 +47,7 @@ const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[
 const tam = (a) => Math.hypot(a[0], a[1], a[2]);
 
 /* normal bruta (módulo = 2 × área) pela soma de Newell, no sentido anti-horário */
-function newell(pos, ids) {
+export function newell(pos, ids) {
   let nx = 0, ny = 0, nz = 0;
   for (let k = 0; k < ids.length; k++) {
     const c = pos(ids[k]), n = pos(ids[(k + 1) % ids.length]);
@@ -98,9 +98,9 @@ function lugarDaTampa(st, fid) {
   }
   return null;
 }
-const naTampa = (st, fid) => lugarDaTampa(st, fid) != null;
+export const naTampa = (st, fid) => lugarDaTampa(st, fid) != null;
 /* Peça nova que nasce de uma peça de tampa entra na tampa da extrusão, para continuar nela e na parte que a cita. */
-function registraNaTampa(st, pai, nova) {
+export function registraNaTampa(st, pai, nova) {
   const lugar = lugarDaTampa(st, pai);
   if (!lugar) return;
   const { tampas, nome } = lugar;
@@ -111,7 +111,7 @@ function registraNaTampa(st, pai, nova) {
    triângulos pelas orelhas (só as de área positiva, para o canto de uma quina quase reta continuar com os dois lados) e os
    triângulos se fundem de novo enquanto o resultado é convexo (pedacos-convexos.js). `un` é a normal unitária do sentido
    de percurso e `pos(id)` a posição do canto. Devolve a lista de listas de ids, ou null se o polígono não é simples. */
-function partirEmConvexas(pos, vs, un) {
+export function partirEmConvexas(pos, vs, un) {
   const P = vs.map(pos);
   let escala = 0;
   for (const q of P) escala = Math.max(escala, tam(sub(q, P[0])));

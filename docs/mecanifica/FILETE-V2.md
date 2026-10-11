@@ -79,6 +79,45 @@ das seis faces nominais de `chamferBox` prova casca fechada e painéis citáveis
 O alvo de produto continua deliberadamente fora: `_bloco-arredondado-composto`
 é a prova geral, e pinça/suporte só mudam quando houver necessidade de produto.
 
+### Cadeia tangente — IMPLEMENTADO
+
+Uma aresta por chamada deixa de bastar quando a borda continua em tangência: a
+faceta seguinte de uma concordância é quase paralela à aresta, o arco não cabe no
+plano dela e termina na seção perpendicular, com um degrau plano. Esse modo existe
+em `operacoes/arestas-em-grupos.js` e passou a deixar um aviso em
+`neutro.avisos` (`ref: 'degrau'`: a aresta, a ponta, o ângulo da vizinha, o
+motivo e a sugestão), que `descrever` mostra sem reprovar a peça.
+
+`cadeia: true` ou `cadeia: { ate: graus }` (padrão 30, o mesmo nome de
+`normal.ate` de `selecao-geometrica.js`) arredonda numa varredura só a aresta
+escolhida e as que continuam em tangência, até um canto vivo ou até fechar o laço
+(`operacoes/arestas-em-cadeia.js`). A tampa é um grupo de faces coplanares e as
+paredes são perpendiculares a ela. O cilindro de raio `r` de cada aresta tem o eixo
+a `r` da tampa e a `r` da parede, e o anel de `paineis + 1` pontos de um vértice
+interior é a seção do cilindro pelo plano bissetor das duas arestas vizinhas:
+
+    anel_k = v + r·(u·(1 − cos ψ_k) + m·(1 − sen ψ_k)),   ψ_k = k/paineis · 90°
+
+com `u` a direção que desce pela parede, `m = (d1 + d2)/(1 + d1·d2)` o vetor que
+anda `r` para dentro da tampa em cada uma das duas arestas e `k = 0` na tampa. Num
+trecho reto `m` é a normal da aresta e o anel é o da aresta simples. Cada painel
+liga o anel de um vértice ao do seguinte e fica plano, porque os dois pontos de
+mesmo `k` estão na mesma geratriz. Nenhuma face nasce nas junções, o vértice da
+tampa anda para a tangência (o mesmo id) e a parede troca o vértice pelo da
+tangência na parede, o mesmo para as duas paredes que se encontram nele; a ponta
+de uma cadeia aberta escorrega ao longo da aresta até a face de ponta, como na
+aresta simples. A numeração segue a posição na cadeia (`j·paineis + k − 1`), e a
+cadeia de uma aresta só segue o caminho da aresta simples.
+
+Antes de escrever, o passo confere o diedro de 90° de cada aresta, a altura da
+parede, o comprimento restante de cada faceta (o recuo das duas pontas não pode
+chegar a ele, o que acontece com o raio acima do raio de curvatura de um trecho
+convexo; o trecho côncavo não limita), a faixa retirada contra os vértices da
+tampa, a área que a tampa perde contra a da faixa, a convexidade das peças da tampa
+(a que deixa de ser convexa é partida) e cada painel, plano e virado para fora.
+`operacoes/arredondar-cadeia.test.ts` mede a malha contra o cilindro de cada
+aresta e contra o volume retirado, com desvio declarado abaixo de 1e-9.
+
 ## Aceite do Escopo B
 
 `node tools/oficina/filete-v2-aceitacao.mjs` passa com uma aresta de
