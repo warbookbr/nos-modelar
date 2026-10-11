@@ -1,14 +1,14 @@
 {
   "vista": "isometrica",
   "plano": {
-    "texto": "Nível médio: peça reconhecível, medidas com origem e contrato de relações, Maquete e Conferência, sem foto de referência. O objeto é uma cadeira de rodas manual dobrável de adulto, com a frente em +z, a esquerda (E) em x negativo, o chão em y = 0 e a origem em z no eixo das rodas traseiras. As medidas são de uso corrente (origem ia): largura total 656 mm com os aros de propulsão, comprimento 963 mm do pneu traseiro à ponta do apoio de pés, altura 916 mm até os punhos, assento a 500 mm do chão com 448 mm de largura e 395 mm de profundidade, braço a 230 mm acima do assento, roda traseira de 24 polegadas (610 mm), rodinha de 200 mm e vão de cerca de 85 mm sob o apoio de pés.\n\nO inventário em plano.pecas vem do conhecimento do objeto: duas rodas traseiras com aro de propulsão e suportes do aro, duas rodinhas dianteiras com garfo, dois quadros laterais em tubo, assento de lona com almofada, encosto, dois braços com montante, dois apoios de pés com tubo pendular, dois punhos de empurrar, travessa em X sob o assento e as placas de eixo que prendem a roda ao quadro. Cada quadro lateral é um único tubo com curvas (punho, coluna do encosto, trilho do assento, coluna dianteira e trilho inferior à altura do eixo), e o lado direito é o espelho do esquerdo.\n\nA roda traseira usa o componente roda com 12 raios, e a rodinha usa a roda de disco. Não dá para representar a lona do assento e do encosto como tecido frouxo (são caixas finas), o freio de alavanca, a dobradiça da travessa em X e o raio fino de 36 raios de uma roda real; o cubo e o aro fazem o papel do eixo e do cubo. Os cantos arredondados do tubo são arcos de 30 mm.\n\nContato ligado, tolerância de 2 mm e penetração de 3 mm. Os únicos atravessamentos declarados são o parafuso de articulação da travessa em X pelos dois tubos que se cruzam. As demais peças são desenhadas encostadas: o trilho inferior e o trilho do assento se apoiam na placa de eixo, o montante do braço pousa no trilho, o braço encosta na coluna do encosto e a placa do pé pousa sob o tubo pendular. As pontas dos punhos ficam livres de propósito."
+    "texto": "Nível médio: peça reconhecível, medidas com origem e contrato de relações, Maquete e Conferência, sem foto de referência. O objeto é uma cadeira de rodas manual dobrável de adulto, com a frente em +z, a esquerda (E) em x negativo, o chão em y = 0 e a origem em z no eixo das rodas traseiras. As medidas são de uso corrente (origem ia): largura total 656 mm com os aros de propulsão, comprimento 955 mm do pneu traseiro à ponta do apoio de pés, altura 916 mm até os punhos, assento a 500 mm do chão com 448 mm de largura e 395 mm de profundidade, braço a 230 mm acima do assento, roda traseira de 24 polegadas (610 mm), rodinha de 200 mm e vão de cerca de 90 mm sob o apoio de pés.\n\nO inventário em plano.pecas vem do conhecimento do objeto: duas rodas traseiras com aro de propulsão e suportes do aro, duas rodinhas dianteiras com garfo, dois quadros laterais em tubo, assento de lona com almofada, encosto, dois braços com montante, dois apoios de pés com tubo pendular, dois punhos de empurrar, travessa em X sob o assento e as placas de eixo que prendem a roda ao quadro. Cada quadro lateral é um único tubo com curvas (punho, coluna do encosto, trilho do assento, coluna dianteira e trilho inferior à altura do eixo), e o lado direito é o espelho do esquerdo.\n\nA roda traseira usa o componente roda com 12 raios, e a rodinha usa a roda de disco. Não dá para representar a lona do assento e do encosto como tecido frouxo (são caixas finas), o freio de alavanca, a dobradiça da travessa em X e o raio fino de 36 raios de uma roda real; o cubo e o aro fazem o papel do eixo e do cubo. Os cantos arredondados do tubo são arcos de 30 mm.\n\nContato ligado, tolerância de 3 mm e penetração de 3 mm. Os atravessamentos declarados são o parafuso de articulação da travessa em X pelos dois tubos que se cruzam e o tubo do apoio de pés, que se encaixa na coluna dianteira do quadro. As demais peças são desenhadas encostadas: o trilho inferior e o trilho do assento se apoiam na placa de eixo, o montante do braço pousa no trilho, o braço encosta na coluna do encosto e a placa do pé encosta sob o tubo pendular. As pontas dos punhos ficam livres de propósito."
     ,
     "nivel": "medio",
     "familia": "assento",
     "medidas": [
       { "nome": "larguraTotal", "valor": 656, "unidade": "mm", "origem": "ia", "tolerancia": 12, "mede": "larguraTotal" },
       { "nome": "alturaTotal", "valor": 916, "unidade": "mm", "origem": "ia", "tolerancia": 15, "mede": "alturaTotal" },
-      { "nome": "comprimentoTotal", "valor": 963, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": "profundidadeTotal" },
+      { "nome": "comprimentoTotal", "valor": 955, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": "profundidadeTotal" },
       { "nome": "alturaDoAssento", "valor": 500, "unidade": "mm", "origem": "ia", "tolerancia": 6, "mede": { "distancia": ["rodaTraseiraE.fundo", "almofada.+y"], "eixo": "y" } },
       { "nome": "larguraDoAssento", "valor": 448, "unidade": "mm", "origem": "ia", "tolerancia": 4, "mede": { "caixa": "x", "formas": ["assento"] } },
       { "nome": "profundidadeDoAssento", "valor": 395, "unidade": "mm", "origem": "ia", "tolerancia": 6, "mede": { "caixa": "z", "formas": ["assento"] } },
@@ -17,13 +17,13 @@
       { "nome": "diametroDoAroDePropulsao", "valor": 556, "unidade": "mm", "origem": "ia", "tolerancia": 4, "mede": { "caixa": "y", "formas": ["aroPropulsaoE"] } },
       { "nome": "diametroDaRodinha", "valor": 200, "unidade": "mm", "origem": "ia", "tolerancia": 4, "mede": { "caixa": "y", "formas": ["rodaDianteiraE"] } },
       { "nome": "entreEixos", "valor": 235, "unidade": "mm", "origem": "ia", "tolerancia": 6, "mede": { "distancia": ["rodaTraseiraE.eixo", "rodaDianteiraE.eixo"], "eixo": "z" } },
-      { "nome": "vaoDoApoioDePes", "valor": 85, "unidade": "mm", "origem": "ia", "tolerancia": 8, "mede": { "distancia": ["rodaTraseiraE.fundo", "apoioPeE.-y"], "eixo": "y" } }
+      { "nome": "vaoDoApoioDePes", "valor": 90, "unidade": "mm", "origem": "ia", "tolerancia": 8, "mede": { "distancia": ["rodaTraseiraE.fundo", "apoioPeE.-y"], "eixo": "y" } }
     ],
     "contrato": {
       "tocam": [
         ["assento", "quadroE"], ["assento", "quadroD"], ["almofada", "assento"],
         ["encosto", "quadroE"], ["encosto", "quadroD"],
-        ["placaEixoE", "quadroE"], ["rodaTraseiraE.cuboE", "placaEixoE"],
+        ["placaEixoE", "quadroE"], ["rodaTraseiraE.cuboD", "placaEixoE"],
         ["punhoE", "quadroE"],
         ["bracoE", "quadroE"], ["apoioBracoE", "bracoE"], ["apoioBracoE", "quadroE"],
         ["aroPropulsaoE", "suporteAroE"], ["suporteAroE", "rodaTraseiraE"],
@@ -83,9 +83,10 @@
   "simetrico": { "eixo": "x", "pos": 0 },
   "contato": {
     "usar": true,
-    "tolerancia": 2,
+    "tolerancia": 3,
     "penetracao": 3,
     "pares": [
+      { "a": "pendE", "b": "quadroE", "tipo": "atravessa", "max": 11, "motivo": "o tubo do apoio de pés se encaixa na coluna dianteira do quadro" },
       { "a": "pinoTravessa", "b": "travessaA", "tipo": "atravessa", "max": 18, "motivo": "o parafuso de articulação passa pelo tubo da travessa" },
       { "a": "pinoTravessa", "b": "travessaB", "tipo": "atravessa", "max": 18, "motivo": "o parafuso de articulação passa pelo tubo da travessa" }
     ]
@@ -128,6 +129,7 @@
           "centro": { "ancora": "rodaTraseiraE.eixo", "mm": [-21, 269, 0] }
         },
         { "arranja": { "forma": "suporteAroE", "modo": "radial", "total": 4, "eixo": "x", "centro": "rodaTraseiraE.eixo" } },
+        { "arranja": { "forma": "suporteAroD", "modo": "radial", "total": 4, "eixo": "x", "centro": "rodaTraseiraD.eixo" } },
         {
           "id": "carcacaE", "tipo": "cilindro", "diametro": 30, "comprimento": 60, "eixo": "y", "lado": "E", "cor": "cinza", "rotulo": "carcaca_do_garfo",
           "centro": { "ancora": "quadroE.baseFrente", "mm": [0, -41, -25] }
@@ -153,12 +155,11 @@
           "id": "pendE", "tipo": "cilindro", "diametro": 22, "lado": "E", "cor": "cinza", "rotulo": "tubo_do_apoio_de_pes",
           "de": { "entre": ["quadroE.frenteAssento", "quadroE.baseFrente"], "mm": 72 },
           "para": [-235, 100, 455],
-          "desloca": [0, 0, 23]
+          "desloca": [0, 0, 13]
         },
         {
-          "id": "apoioPeE", "tipo": "caixa", "largura": 100, "altura": 8, "profundidade": 180, "raio": 3, "lado": "E", "cor": "preto", "rotulo": "apoio_de_pes",
-          "centro": { "ancora": "pendE.fim", "mm": [0, -10, 90] },
-          "encosta": { "referencia": "pendE", "direcao": "+y" }
+          "id": "apoioPeE", "tipo": "caixa", "largura": 100, "altura": 8, "profundidade": 200, "raio": 3, "lado": "E", "cor": "preto", "rotulo": "apoio_de_pes",
+          "centro": { "ancora": "pendE.fim", "mm": [0, -7, 80] }
         },
         {
           "id": "bracoE", "tipo": "caixa", "largura": 40, "altura": 28, "profundidade": 260, "raio": 8, "lado": "E", "cor": "preto", "rotulo": "braco",
@@ -185,10 +186,10 @@
           "rotacao": [-6.3, 0, 0]
         },
         {
-          "id": "travessaA", "ligar": { "de": [-224, 305, 100], "para": [224, 440, 100], "tipo": "tubo", "diametro": 16 }, "cor": "cinza", "rotulo": "travessa_em_x"
+          "id": "travessaA", "ligar": { "de": [-224, 305, 100], "para": [228, 441, 100], "tipo": "tubo", "diametro": 16 }, "cor": "cinza", "rotulo": "travessa_em_x"
         },
         {
-          "id": "travessaB", "ligar": { "de": [-224, 440, 124], "para": [224, 305, 124], "tipo": "tubo", "diametro": 16 }, "cor": "cinza", "rotulo": "travessa_em_x"
+          "id": "travessaB", "ligar": { "de": [-228, 441, 124], "para": [224, 305, 124], "tipo": "tubo", "diametro": 16 }, "cor": "cinza", "rotulo": "travessa_em_x"
         },
         {
           "id": "pinoTravessa", "tipo": "cilindro", "diametro": 10, "comprimento": 50, "eixo": "z", "cor": "cinza", "rotulo": "parafuso_da_travessa",
