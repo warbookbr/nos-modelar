@@ -279,6 +279,30 @@
       "plano-da-folha-e"
     ]
   },
-  "critico": null,
+  "critico": {
+    "data": "2026-10-11",
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
+    "julgamentos": 2,
+    "regra": "menor nota de dois críticos cegos independentes, por ponto",
+    "pontos": {
+      "minimo": {
+        "nota": 8,
+        "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33"
+      },
+      "medio": {
+        "nota": 8,
+        "hash": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9"
+      },
+      "maximo": {
+        "nota": 8,
+        "hash": "sha256:d27baa257a01244c12626960b6b8b4a29dd5782a7c1d28cd1aa283de0df2f4ae"
+      }
+    },
+    "achados": [
+      "isométricas mostram a folha móvel de fora e não deixam ler pino, nós nem folha fixa",
+      "junção da folha em pé com o nó no mínimo pequena demais para confirmar na resolução",
+      "furo grande para a folha de 15 mm no mínimo e pequeno para a de 80 mm no máximo, de proporção"
+    ]
+  },
   "pessoa": null
 }
