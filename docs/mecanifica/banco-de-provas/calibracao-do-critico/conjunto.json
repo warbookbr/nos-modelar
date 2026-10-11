@@ -38,7 +38,7 @@
   "regra": {
     "julgamentosDaChave": 5,
     "julgamentosDasOutras": 3,
-    "acerto": "A imagem acerta quando a mediana das notas cai na faixa da nota, no máximo um julgamento sai da faixa e cada defeito que o crítico decide é citado: o veredito traz um defeito de tipo entre os aceitos e com alguma das palavras do defeito na parte, no onde ou na evidência. Os defeitos que a medida decide não são cobrados do crítico, porque a medida os reprova antes de ele olhar.",
+    "acerto": "A imagem acerta quando a mediana das notas cai na faixa da nota, no máximo um julgamento sai da faixa, cada defeito que o crítico decide é citado por pelo menos 4 de 5 julgamentos (2 de 3 nas imagens de três) e, no controle, no máximo um julgamento cita defeito estrutural. Um julgamento cita o defeito quando traz um defeito com tipo entre os aceitos (o próprio tipo, sem a lista) ou com alguma das palavras do defeito na parte ou no onde. Os defeitos que a medida decide não são cobrados do crítico, porque a medida os reprova antes de ele olhar. O conjunto passa com 11 de 12 imagens e as obrigatórias certas; enquanto faltam julgamentos o gate diz quantos faltam por imagem e passa.",
     "passa": {
       "minimo": 11,
       "de": 12,
@@ -239,6 +239,11 @@
       "fonte": {
         "tipo": "esboco",
         "arquivo": "docs/mecanifica/banco-de-provas/calibracao-do-critico/fontes/picape-baixa.esboco.json",
+        "remendo": {
+          "plano": {
+            "familia": "veiculo"
+          }
+        },
         "arquivoSha256": "sha256:1fc151a6080eb4329201e6b7b5ae7a66b4ed7b156646074a0f020a7175c2a07f"
       },
       "defeitos": [

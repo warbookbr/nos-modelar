@@ -2,7 +2,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  CLASSES, ErroDeCalibracao, FAIXAS_DA_NOTA, TIPOS_DO_CONJUNTO, defeitosDaMedida, defeitosDoCritico, lerConjunto, medidasEsperadas, resumoDoConjunto,
+  CLASSES, ErroDeCalibracao, FAIXAS_DA_NOTA, TIPOS_DO_CONJUNTO, citaDefeito, defeitosDaMedida, defeitosDoCritico, extrairVeredito, lerConjunto, medidasEsperadas,
+  pontuarConjunto, pontuarImagem, resumoDoConjunto,
 } from './calibracao-do-critico.js';
 import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
 
@@ -15,6 +16,9 @@ const recusa = (mutar, trecho, opcoes) => {
   expect(() => lerConjunto(c, opcoes)).toThrow(trecho);
 };
 const imagem = (c, nome) => c.imagens.find((i) => i.nome === nome);
+const SHA = `sha256:${'a'.repeat(64)}`;
+const defeito = (parte, tipo, onde = 'extremidade da peça') => ({ parte, tipo, onde, sentido: TIPOS_DE_DEFEITO[tipo][0], evidencia: 'visto na vista lateral, junto à extremidade' });
+const jg = (nota, defeitos = []) => ({ nota, defeitos, briefSha256: SHA, data: '2026-10-11T12:00:00.000Z' });
 
 describe('o conjunto versionado', () => {
   const conjunto = lerConjunto(lido());
@@ -149,15 +153,178 @@ describe('o que o formato recusa', () => {
     recusa((c) => { c.critico.agente.sha256 = 'sha256:curto'; }, /sha256/);
   });
 
-  it('resultado de julgamento: imagem existente, impressão do crítico e notas de 0 a 10', () => {
+  it('resultado de julgamento: imagem existente, impressão do crítico, nota de 0 a 10, defeitos, brief e data', () => {
     const c = lido();
     const sha = c.critico.agente.sha256;
-    const ok = { imagem: 'c01', agenteSha256: sha, briefSha256: c.critico.brief.sha256, julgamentos: [{ nota: 6 }, { nota: 7 }, { nota: 5 }] };
+    const ok = { imagem: 'c01', agenteSha256: sha, briefSha256: c.critico.brief.sha256, julgamentos: [jg(6), jg(7), jg(5)] };
     c.resultados = [ok];
     expect(resumoDoConjunto(lerConjunto(c))).toMatchObject({ medida: true, julgadas: 1, frase: 'calibração medida em 1 de 12 imagens' });
-    for (const [res, trecho] of [[{ ...ok, imagem: 'c99' }, /id de uma imagem/], [{ ...ok, julgamentos: [{ nota: 11 }] }, /nota/], [{ ...ok, agenteSha256: 'x' }, /sha256/]]) {
+    for (const [res, trecho] of [
+      [{ ...ok, imagem: 'c99' }, /id de uma imagem/],
+      [{ ...ok, julgamentos: [jg(11)] }, /nota/],
+      [{ ...ok, agenteSha256: 'x' }, /sha256/],
+      [{ ...ok, julgamentos: [{ ...jg(6), defeitos: undefined }] }, /defeitos/],
+      [{ ...ok, julgamentos: [{ ...jg(6), briefSha256: 'x' }] }, /briefSha256/],
+      [{ ...ok, julgamentos: [{ ...jg(6), data: 'ontem' }] }, /ISO 8601/],
+      [{ ...ok, julgamentos: [jg(6, [{ parte: 'haste', tipo: 'uniao' }])] }, /defeitos\[0\]/],
+      [{ ...ok, julgamentos: [jg(5), jg(5), jg(5), jg(5)] }, /no máximo 3/],
+    ]) {
       c.resultados = [res];
       expect(() => lerConjunto(c)).toThrow(trecho);
     }
+  });
+});
+
+/* ---------- a pontuação, com respostas sintéticas de crítico ---------- */
+
+describe('a resposta do crítico', () => {
+  const veredito = { alvo: 'x', nota: 6, defeitos: [{ parte: 'haste', tipo: 'uniao', onde: 'ponta traseira', sentido: 'atravessando', evidencia: 'a haste sai pelo fundo na lateral' }], observacao: 'a haste atravessa o fundo' };
+
+  it('lê o JSON final, com ou sem cerca, e ignora a análise e as chaves que vêm antes', () => {
+    const analise = 'Vista lateral: a peça {haste} aparece cortada.\nNota: 6.\n';
+    for (const resposta of [`${analise}${JSON.stringify(veredito)}`, `${analise}\n\`\`\`json\n${JSON.stringify(veredito, null, 2)}\n\`\`\`\n`]) {
+      const lida = extrairVeredito(resposta);
+      expect(lida.nota).toBe(6);
+      expect(lida.defeitos).toEqual([veredito.defeitos[0]]);
+    }
+  });
+
+  it('recusa a resposta sem JSON válido no fim, sem nota, sem lista de defeitos ou com defeito incompleto', () => {
+    const recusar = (resposta, trecho) => { expect(() => extrairVeredito(resposta)).toThrow(ErroDeCalibracao); expect(() => extrairVeredito(resposta)).toThrow(trecho); };
+    recusar('A nota é 6 e há uma haste atravessando.', /JSON válido/);
+    recusar('', /termina com o JSON/);
+    recusar(`${JSON.stringify(veredito)}\ne depois mais prosa`, /JSON válido/);
+    recusar('{ "nota": 6, "defeitos": [ ', /JSON válido/);
+    recusar(JSON.stringify({ ...veredito, nota: 11 }), /veredito\.nota/);
+    recusar(JSON.stringify({ defeitos: [] }), /veredito\.nota/);
+    recusar(JSON.stringify({ nota: 6 }), /veredito\.defeitos/);
+    recusar(JSON.stringify({ nota: 6, defeitos: [{ parte: 'haste', tipo: 'uniao' }] }), /defeitos\[0\]/);
+  });
+});
+
+describe('a pontuação de uma imagem', () => {
+  const conjunto = lerConjunto(lido());
+  const por = (nome) => conjunto.imagens.find((i) => i.nome === nome);
+
+  it('citar é ter um defeito de tipo aceito ou uma palavra na parte ou no onde, sem distinguir maiúscula nem acento', () => {
+    const d = por('dobradicas-por-fora').defeitos[0];
+    expect(citaDefeito(jg(6, [defeito('porta', 'uniao')]), d)).toBe(true);
+    expect(citaDefeito(jg(6, [defeito('porta', 'espessura')]), d)).toBe(false);
+    expect(citaDefeito(jg(6, [defeito('ferragemDaPorta', 'espessura')]), d)).toBe(true);
+    expect(citaDefeito(jg(6, [defeito('porta', 'espessura', 'DOBRADIÇA solta')]), d)).toBe(true);
+    expect(citaDefeito(jg(6, []), d)).toBe(false);
+    /* sem `tiposAceitos`, o tipo aceito é o próprio tipo do defeito */
+    const rodas = por('picape-baixa').defeitos[0];
+    expect(citaDefeito(jg(6, [defeito('x', 'ausencia')]), rodas)).toBe(true);
+    expect(citaDefeito(jg(6, [defeito('x', 'posicao')]), rodas)).toBe(false);
+  });
+
+  it('acerta: mediana na faixa, no máximo um fora e o defeito citado em 4 de 5', () => {
+    const img = por('dobradicas-por-fora');
+    const p = pontuarImagem(img, [jg(6, [defeito('dobradicas', 'posicao')]), jg(6, [defeito('porta', 'uniao')]), jg(7, [defeito('pinos', 'posicao')]), jg(5, [defeito('dobradicaE', 'posicao')]), jg(8, [defeito('porta', 'espessura')])]);
+    expect(p).toMatchObject({ completa: true, mediana: 6, amplitude: 3, acerta: true, motivos: [] });
+    expect(p.criterios.foraDaFaixa).toMatchObject({ n: 1, ok: true });
+    expect(p.criterios.citacoes[0]).toMatchObject({ n: 4, minimo: 4, ok: true });
+  });
+
+  it('erra pela mediana: a nota alta de quem não viu o defeito estrutural', () => {
+    const img = por('dobradicas-por-fora');
+    const p = pontuarImagem(img, [8, 8, 9, 6, 8].map((n) => jg(n, [defeito('dobradicas', 'posicao')])));
+    expect(p.acerta).toBe(false);
+    expect(p.criterios.mediana).toMatchObject({ valor: 8, ok: false });
+    expect(p.motivos[0]).toBe('mediana 8 fora da faixa 5 a 7');
+    expect(p.criterios.citacoes[0].ok).toBe(true);
+  });
+
+  it('erra por sair da faixa mais de uma vez, mesmo com a mediana dentro', () => {
+    const img = por('dobradicas-por-fora');
+    const p = pontuarImagem(img, [6, 6, 7, 9, 4].map((n) => jg(n, [defeito('dobradicas', 'posicao')])));
+    expect(p.criterios.mediana.ok).toBe(true);
+    expect(p).toMatchObject({ acerta: false, amplitude: 5 });
+    expect(p.motivos).toEqual(['2 julgamentos fora da faixa (no máximo 1)']);
+  });
+
+  it('erra por não citar: nota certa e o defeito esperado só em 3 de 5 (2 de 3 nas imagens comuns)', () => {
+    const img = por('dobradicas-por-fora');
+    const cita = jg(6, [defeito('dobradicas', 'posicao')]);
+    const naoCita = jg(6, [defeito('tampo', 'espessura')]);
+    const p = pontuarImagem(img, [cita, cita, cita, naoCita, naoCita]);
+    expect(p.criterios.mediana.ok).toBe(true);
+    expect(p.acerta).toBe(false);
+    expect(p.motivos).toEqual(["o defeito de 'dobradicas' foi citado em 3 de 5 julgamentos (mínimo 4)"]);
+    const comum = por('travessia-sem-explicacao');
+    const c3 = jg(6, [defeito('haste', 'uniao')]);
+    expect(pontuarImagem(comum, [c3, c3, naoCita]).acerta).toBe(true);
+    expect(pontuarImagem(comum, [c3, naoCita, naoCita])).toMatchObject({ acerta: false, motivos: ["o defeito de 'haste' foi citado em 1 de 3 julgamentos (mínimo 2)"] });
+  });
+
+  it('cada defeito do crítico é contado à parte: a picape cita as rodas e não o piso da caçamba', () => {
+    const img = por('picape-baixa');
+    const soRodas = jg(6, [defeito('rodas', 'ausencia')]);
+    const p = pontuarImagem(img, Array(5).fill(soRodas));
+    expect(p.acerta).toBe(false);
+    expect(p.motivos).toEqual(["o defeito de 'pisoCacamba' foi citado em 0 de 5 julgamentos (mínimo 4)"]);
+    const ambos = jg(6, [defeito('rodas', 'ausencia'), defeito('piso', 'uniao')]);
+    expect(pontuarImagem(img, Array(5).fill(ambos)).acerta).toBe(true);
+  });
+
+  it('o controle erra com defeito estrutural em mais de um julgamento; o de superfície não conta', () => {
+    const img = por('controle-cilindro');
+    const limpo = jg(9, []);
+    const estrutural = jg(9, [defeito('haste', 'uniao')]);
+    expect(pontuarImagem(img, [limpo, limpo, limpo, estrutural, limpo]).acerta).toBe(true);
+    const p = pontuarImagem(img, [limpo, estrutural, limpo, estrutural, limpo]);
+    expect(p.acerta).toBe(false);
+    expect(p.criterios.estruturais).toMatchObject({ n: 2, maximo: 1, ok: false });
+    expect(p.motivos).toEqual(['2 julgamentos do controle citam defeito estrutural (no máximo 1)']);
+    const faceta = jg(9, [defeito('tubo', 'superficie')]);
+    expect(pontuarImagem(img, Array(5).fill(faceta)).acerta).toBe(true);
+    expect(pontuarImagem(por('facetado'), [8, 8, 9].map((n) => jg(n, [defeito('tubo', 'superficie')]))).acerta).toBe(true);
+  });
+
+  it('com julgamentos a menos a imagem não acerta nem erra: diz quantos faltam', () => {
+    const img = por('controle-roda');
+    expect(pontuarImagem(img, [])).toMatchObject({ recebidos: 0, faltam: 5, acerta: null, mediana: null, amplitude: null });
+    expect(pontuarImagem(img, [jg(9), jg(9)])).toMatchObject({ recebidos: 2, faltam: 3, acerta: null, mediana: 9, amplitude: 0 });
+  });
+});
+
+describe('a pontuação do conjunto', () => {
+  const comResultados = (fazer) => {
+    const c = lido();
+    c.resultados = c.imagens.map((img) => ({ imagem: img.id, agenteSha256: c.critico.agente.sha256, briefSha256: c.critico.brief.sha256, julgamentos: fazer(img) })).filter((r) => r.julgamentos.length);
+    return lerConjunto(c);
+  };
+  /* o crítico que acerta: nota no meio da faixa e todo defeito do crítico citado pelo tipo */
+  const certo = (img) => Array.from({ length: img.julgamentos }, () => jg(Math.floor((img.faixaDaNota[0] + img.faixaDaNota[1]) / 2), defeitosDoCritico(img).map((d) => defeito(d.parte, d.tipo))));
+  const errado = (img) => Array.from({ length: img.julgamentos }, () => jg(img.classe === 'controle' ? 3 : 10, []));
+
+  it('sem julgamento, o estado é "não medido" e faltam 44 (20 nas quatro chaves e 24 nas oito outras)', () => {
+    const p = pontuarConjunto(lerConjunto(lido()));
+    expect(p).toMatchObject({ estado: 'nao-medido', completo: false, faltamNoTotal: 44, acertos: 0 });
+    expect(p.faltam).toMatchObject({ c01: 3, c02: 5, c03: 5, c07: 5 });
+  });
+
+  it('com julgamentos a menos o estado é pendente e diz quantos faltam por imagem', () => {
+    const p = pontuarConjunto(comResultados((img) => (img.id === 'c05' ? certo(img).slice(0, 2) : certo(img))));
+    expect(p).toMatchObject({ estado: 'pendente', completo: false, faltam: { c05: 3 }, faltamNoTotal: 3 });
+  });
+
+  it('o crítico que acerta tudo passa, com a amplitude de cada imagem registrada', () => {
+    const p = pontuarConjunto(comResultados(certo));
+    expect(p).toMatchObject({ estado: 'passa', acertos: 12, minimo: 11, de: 12, faltamNoTotal: 0, obrigatoriasErradas: [] });
+    expect(p.imagens.every((i) => i.amplitude === 0)).toBe(true);
+  });
+
+  it('passa com 11 de 12, e reprova com 10 de 12', () => {
+    const um = pontuarConjunto(comResultados((img) => (img.nome === 'raios-curtos' ? errado(img) : certo(img))));
+    expect(um).toMatchObject({ estado: 'passa', acertos: 11 });
+    const dois = pontuarConjunto(comResultados((img) => (['raios-curtos', 'facetado'].includes(img.nome) ? errado(img) : certo(img))));
+    expect(dois).toMatchObject({ estado: 'reprova', acertos: 10 });
+  });
+
+  it('reprova com 11 de 12 se a imagem errada é uma das duas obrigatórias', () => {
+    const p = pontuarConjunto(comResultados((img) => (img.nome === 'picape-baixa' ? errado(img) : certo(img))));
+    expect(p).toMatchObject({ estado: 'reprova', acertos: 11, obrigatoriasErradas: ['picape-baixa'] });
   });
 });
