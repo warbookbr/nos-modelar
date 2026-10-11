@@ -1,5 +1,5 @@
 /* Receita privada: folha do batente com dois olhais. */
-import { ID_CHAPA, ID_OLHAL } from '../composicoes.js';
+import { ID_CHAPA_RECORTADA, ID_OLHAL } from '../composicoes.js';
 
 export const PERFIL_AUTORIA = {
   visual: 'tecnicoDidatico', fidelidade: 'F2', precisao: 'mecanica', interacao: 'montagem',
@@ -14,8 +14,13 @@ export const MATERIAIS = {
 };
 export const CHAMADAS_COMPOSICOES = [
   {
-    id: 'chapa-batente', composicao: ID_CHAPA,
-    argumentos: { origem: 1101, largura: 0.07, altura: 0.12, profundidade: 0.006, centro: [-0.035, 0, 0], parte: 'chapaBatente', material: 'chapa' },
+    /* chapa de x = -70 a 0 mm, 120 mm de altura, 6 mm de espessura, com o recorte de x = -9,5 a 0 entre y = 39,5 e
+       80,5: o nó da porta tem raio 9 mm e ocupa y de 40 a 80, então sobram 0,5 mm de folga em volta dele. */
+    id: 'chapa-batente', composicao: ID_CHAPA_RECORTADA,
+    argumentos: {
+      origem: 1101, xFora: -0.07, xBorda: 0, xMeio: -0.0095, vTopo: -0.12, vA: -0.0395, vB: -0.0805,
+      profundidade: 0.006, centro: [0, 0, -0.003], parte: 'chapaBatente', material: 'chapa',
+    },
   },
   {
     id: 'olhal-inferior', composicao: ID_OLHAL,

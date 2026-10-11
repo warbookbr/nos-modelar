@@ -1,5 +1,5 @@
 /* Receita privada: folha da porta com olhal central. */
-import { ID_CHAPA, ID_OLHAL } from '../composicoes.js';
+import { ID_CHAPA_RECORTADA, ID_OLHAL } from '../composicoes.js';
 
 export const PERFIL_AUTORIA = {
   visual: 'tecnicoDidatico', fidelidade: 'F2', precisao: 'mecanica', interacao: 'montagem',
@@ -14,8 +14,14 @@ export const MATERIAIS = {
 };
 export const CHAMADAS_COMPOSICOES = [
   {
-    id: 'chapa-porta', composicao: ID_CHAPA,
-    argumentos: { origem: 1201, largura: 0.07, altura: 0.12, profundidade: 0.006, centro: [0.035, 0, 0], parte: 'chapaPorta', material: 'chapa' },
+    /* chapa de x = 0 a 70 mm, 120 mm de altura, 6 mm de espessura, com os trechos de y = 0 a 40,5 e de 79,5 a 120
+       recuados até x = 9,5 mm: o nó do batente tem raio 9 mm e ocupa y de 0 a 40 e de 80 a 120, então sobram 0,5 mm de
+       folga em volta dele. A aba de x = 0 a 9,5 fica só entre y = 40,5 e 79,5, junto do olhal da porta. */
+    id: 'chapa-porta', composicao: ID_CHAPA_RECORTADA,
+    argumentos: {
+      origem: 1201, xFora: 0.07, xBorda: 0.0095, xMeio: 0, vTopo: -0.12, vA: -0.0405, vB: -0.0795,
+      profundidade: 0.006, centro: [0, 0, -0.003], parte: 'chapaPorta', material: 'chapa',
+    },
   },
   {
     id: 'olhal-central', composicao: ID_OLHAL,
