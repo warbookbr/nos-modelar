@@ -142,9 +142,7 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    estendidas como contrato único de encaixe. Feita em 2026-10-07.
 2. O contorno e a casca: perfil paramétrico e deslocamento de contorno no
    núcleo, a casca no `loft` do esboço e a caçamba do carrinho de mão. Feita em
-   2026-10-09, com a caçamba de
-   [`carrinho-casca.esboco.json`](../banco-de-provas/carrinho-refeito-2026-10-08/carrinho-casca.esboco.json)
-   aprovada pela pessoa, o que cumpre o item 2 do gate de saída.
+   2026-10-09, com a caçamba aprovada pela pessoa (item 2 do gate).
 3. O nível zero: a forma global N2 estendida e ligada ao nível detalhado. Feita
    em 2026-10-09: o andaime aceita as primitivas do esboço, e a receita declara
    em `REFINA` o volume que cada parte refina, com o verificador no veredito da
@@ -170,7 +168,7 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    ficam, por amostragem); a aceitação nas faixas vem com a fatia 9.
 8. A verificação ancorada no caminho de toda peça e o crítico calibrado, com as
    perguntas por componente e por família.
-9. As primeiras famílias de componente e de objeto, como composições.
+9. As primeiras famílias, pelo [desenho](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9) aprovado em 2026-10-11.
 10. O banco de provas refeito e o fechamento.
 
 ## Riscos e desvios

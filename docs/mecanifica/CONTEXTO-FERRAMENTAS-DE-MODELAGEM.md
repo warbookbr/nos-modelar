@@ -94,6 +94,39 @@ nos esboços do banco; (8) um objeto refeito no caminho novo e medido em tokens,
 rodadas e nota contra a medição gravada, e só então a troca da skill
 `esboco-detalhado`.
 
+## Desenho da fatia 9
+
+A pessoa decidiu em 2026-10-11: a família e o componente do esboço de mesmo nome
+convivem, com uma conferência pelo `REFINA` de que o componente expandido cabe no
+envelope e nas portas da família; a família de várias peças e o objeto são
+montagens v5 geradas pela família, para a articulação ser conferida de verdade; e
+as primeiras famílias são dobradiça, roda e pneu e cilindro hidráulico, com o
+roupeiro de objeto, porque mola e fixador pedem hélice e rosca, que não existem,
+e não exercitam casca, chapa nem barras.
+
+Cada família é uma pasta em `procedural/familias/<id>/` com o contrato
+`mecanifica.familia@1` (`familia.json`: nível, parâmetros com unidade, padrão,
+mínimo, máximo e ponto médio, restrições com motivo, portas, ferramentas,
+perguntas do crítico e o vínculo com o esboço), a composição procedural, um
+`derivar.js` puro que transforma os parâmetros em milímetro nos argumentos da
+composição (a composição v1 só substitui valores) e o `aprovacao.json` com os
+pontos aprovados presos ao hash da geometria. Quem chama usa `chamar(familia,
+id, parametros)`, que confere faixa e restrição. A aprovação tem três camadas: a
+mecânica, sem token, varre os parâmetros e confere portas, parede da casca,
+planificado da chapa, corte das barras e curso da articulação; o crítico julga
+mínimo, máximo e ponto médio, com dois julgamentos nos pontos de borda e o menor
+valendo, enquanto a fatia 8 não calibra o crítico; e a pessoa assina a prancha
+dos três pontos.
+
+As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
+com faixa, restrição, `derivar` e registro explícito; (3) a varredura e o
+`descrever` enxergando o registro de composições; (4) a aprovação mecânica e o
+`familias:check`; (5) a conferência com o esboço pelo `REFINA`; (6) roda e pneu
+de disco; (7) a roda raiada, que aceita as barras; (8) a dobradiça, com chapa e
+articulação; (9) o cilindro hidráulico, com casca e articulação prismática; (10)
+o roupeiro, depois de conferir que a montagem v5 aceita parâmetro por instância;
+(11) o fechamento do item 7 do gate.
+
 ## Pendências da camada de features
 
 O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
