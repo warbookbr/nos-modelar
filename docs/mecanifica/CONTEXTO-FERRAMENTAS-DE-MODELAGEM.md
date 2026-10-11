@@ -161,6 +161,27 @@ responde com sim ou não e a de proporção; a regra de só tratar de parte que 
 vistas mostram fica com quem escreve a pergunta, porque nenhuma checagem sabe o
 que uma vista mostra.
 
+A tarefa 4 entrou em 2026-10-11. O conjunto mora em
+[`banco-de-provas/calibracao-do-critico/`](banco-de-provas/calibracao-do-critico/conjunto.json),
+no formato `mecanifica.calibracao-do-critico@1` (validador em
+`src/autoria/calibracao-do-critico.js`, gate em `tools/mecanifica/calibracao-do-critico.mjs`). Cada
+uma das doze imagens tem um id neutro (`c01` a `c12`, para o nome do arquivo que o crítico lê não
+contar o defeito), a fonte que a reproduz sem navegador (um esboço com o remendo declarado, ou uma
+chamada de família com os parâmetros que violam restrições nomeadas e as substituições de argumento
+derivado), as quatro vistas do brief do objeto (as do esboço pelo desenhista de `briefDoObjeto`, as
+das famílias pelo desenhista da blocagem sobre a malha da peça executada), os defeitos esperados no
+vocabulário do crítico, a faixa de nota da classe e, por defeito, `decide`: `medida` ou `critico`.
+Os controles são a geometria aprovada do ponto médio de cada família, e a picape baixa é o esboço
+`fontes/picape-baixa.esboco.json`, escrito à mão. O gate `calibracao:check` (no `GATES`, na bateria
+curta e no `ci.yml`, sem navegador, cerca de 10 s) confere o formato; a impressão do que a fonte
+desenha hoje (o SVG e a camada de cada vista) contra a gravada; o sha256 de cada PNG; que o controle
+é o hash do `aprovacao.json`; que a mutação muda a geometria; o hash do agente `critico-visual.md`
+e o do texto fixo do brief, para que mudar o crítico obrigue a medir de novo; e que a medida reprova
+cada defeito `decide: medida` e nenhum outro (`esboco-medida:<nome>` do `--medidas`, `razao:<nome>` e
+`forma:<parte>` das mesmas funções do veredito da peça), de modo que `decide` vale dos dois lados.
+`npm run calibracao -- gerar` regrava as vistas, as impressões e a prancha. Os julgamentos ficam em
+`resultados`, vazio até a tarefa 6, e vazio o gate diz "calibração não medida".
+
 ## Desenho da fatia 9
 
 A pessoa decidiu em 2026-10-11: a família e o componente do esboço de mesmo nome

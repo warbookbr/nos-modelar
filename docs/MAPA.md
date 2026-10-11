@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1107 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1111 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -835,6 +835,8 @@
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
 - `base-forma-global.js` — Base comum da forma global N2: o erro com código e caminho, e as duas verificações de estrutura que todo normalizador usa. Fica à parte para que o contrato (…
+- `calibracao-do-critico.js` — calibracao-do-critico.js — o formato `mecanifica.calibracao-do-critico@1`: o conjunto de imagens com defeito conhecido em que o crítico visual é medido.
+- `calibracao-do-critico.test.js` — calibracao-do-critico.test.js — o formato do conjunto de calibração do crítico: o que ele aceita e o que recusa.
 - `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural da Mecanifica.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
@@ -1292,6 +1294,8 @@
 - `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
 - `banco-de-provas.mjs` — Catálogo e registro de custo do banco de provas de modelagem. Compara autonomia, rodadas, notas e tokens consumidos entre o início e o fim do plano de ferram…
 - `banco-de-provas.test.mjs` — Testes do catálogo do banco de provas e registro de custo de modelagem. Valida esquema de medições, agregação de custo por objeto e cobertura de ferramentas …
+- `calibracao-do-critico.mjs` — calibracao-do-critico.mjs — o conjunto de calibração do crítico visual e o gate `calibracao:check`.
+- `calibracao-do-critico.test.mjs` — calibracao-do-critico.test.mjs — o gate `calibracao:check`: o conjunto versionado passa, e cada coisa que ele confere reprova quando muda.
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz procedural é neutra: não volta a `fps`, que era o nome do jogo removido, nem a `prototipos`, que dizia experimento sobre …

@@ -1,0 +1,900 @@
+{
+  "formato": "mecanifica.calibracao-do-critico@1",
+  "versao": "1.0.0",
+  "descricao": "Doze imagens da geometria do repositório, com defeito conhecido ou sem defeito, em que o crítico visual é medido: três controles, as dobradiças por fora do guarda-roupa de 2026-10-08, a picape baixa reescrita à mão e sete defeitos de família. Cada imagem tem a fonte que a reproduz, as quatro vistas do brief, os defeitos esperados no vocabulário do crítico, a faixa de nota e quem decide cada defeito.",
+  "critico": {
+    "agente": {
+      "arquivo": ".claude/agents/critico-visual.md",
+      "sha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d"
+    },
+    "brief": {
+      "fonte": "o texto fixo do brief do crítico do objeto (`linhasDoBriefDoObjeto`, `PERGUNTAS_DO_OBJETO` e a escala da nota, em tools/mecanifica/esboco.mjs) e o bloco de perguntas de forma (`blocoDasPerguntas`, em tools/mecanifica/perguntas-da-peca.mjs)",
+      "sha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f"
+    }
+  },
+  "vistas": {
+    "ordem": [
+      "isometrica",
+      "frontal",
+      "lateral",
+      "superior"
+    ],
+    "largura": 1100
+  },
+  "faixasDaNota": {
+    "controle": [
+      8,
+      10
+    ],
+    "superficie": [
+      8,
+      9
+    ],
+    "estrutural": [
+      5,
+      7
+    ]
+  },
+  "regra": {
+    "julgamentosDaChave": 5,
+    "julgamentosDasOutras": 3,
+    "acerto": "A imagem acerta quando a mediana das notas cai na faixa da nota, no máximo um julgamento sai da faixa e cada defeito que o crítico decide é citado: o veredito traz um defeito de tipo entre os aceitos e com alguma das palavras do defeito na parte, no onde ou na evidência. Os defeitos que a medida decide não são cobrados do crítico, porque a medida os reprova antes de ele olhar.",
+    "passa": {
+      "minimo": 11,
+      "de": 12,
+      "obrigatorias": [
+        "dobradicas-por-fora",
+        "picape-baixa"
+      ]
+    }
+  },
+  "medidas": {
+    "familias": {
+      "cilindro-hidraulico": {
+        "nota": "A razão entre o diâmetro da haste e o da camisa fica na faixa que as restrições do contrato derivam da ISO 6020-2: a haste de 0,45 a 0,75 do êmbolo e a camisa de 1,13 a 1,67 vezes o êmbolo dão de 0,27 a 0,66. A medida não declara contato nem forma: ponta no ar, travessia, peça fora do lugar e faceta ficam com o crítico.",
+        "razoes": [
+          {
+            "nome": "hastePelaCamisa",
+            "origem": "ficha",
+            "mede": {
+              "razao": [
+                {
+                  "caixa": "y",
+                  "formas": [
+                    "haste"
+                  ]
+                },
+                {
+                  "caixa": "y",
+                  "formas": [
+                    "tubo"
+                  ]
+                }
+              ],
+              "faixa": [
+                0.27,
+                0.67
+              ]
+            }
+          }
+        ]
+      },
+      "roda-pneu": {
+        "nota": "O pneu é um anel (um furo passante), e o disco, com a chapa ou os raios, chega ao barril do aro: a razão entre a altura do disco e a do aro é a que o `derivar` dá, de 0,975, e a faixa deixa folga para o corte do raio. A medida não declara contato: o crítico decide o que ela não alcança.",
+        "formas": {
+          "pneu": "anel"
+        },
+        "razoes": [
+          {
+            "nome": "discoAlcancaOAro",
+            "origem": "ia",
+            "mede": {
+              "razao": [
+                {
+                  "caixa": "y",
+                  "formas": [
+                    "disco"
+                  ]
+                },
+                {
+                  "caixa": "y",
+                  "formas": [
+                    "aro"
+                  ]
+                }
+              ],
+              "faixa": [
+                0.9,
+                1.02
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "imagens": [
+    {
+      "id": "c01",
+      "nome": "haste-grossa",
+      "classe": "estrutural",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "objeto": {
+        "titulo": "Cilindro hidráulico",
+        "nota": "Cilindro hidráulico de duplo efeito, com camisa, haste e um olhal em cada ponta."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "cilindro-hidraulico",
+        "base": "medio",
+        "parametros": {
+          "haste": 110
+        },
+        "viola": [
+          "haste-abaixo-do-embolo",
+          "haste-grossa-demais"
+        ],
+        "geometria": "sha256:660a19e6b6afbf3183384de50fcf007b445d0a808cf7c47a5e7f06edc9e6c554"
+      },
+      "defeitos": [
+        {
+          "parte": "haste",
+          "tipo": "espessura",
+          "sentido": "maior",
+          "onde": "corpo da haste, mais largo que a camisa que ele devia atravessar",
+          "decide": "medida",
+          "medida": [
+            "razao:hastePelaCamisa"
+          ],
+          "tiposAceitos": [
+            "espessura",
+            "uniao"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:6adbe0951d3fd5a1460993963b7dd8dca68c9d495674c3b594b7b97471a74401"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c01/isometrica.png",
+          "sha256": "sha256:2e2bf6551bddfd277072649335813b4a131ba0433cfc4761a758c5ccf01dc983"
+        },
+        "frontal": {
+          "arquivo": "imagens/c01/frontal.png",
+          "sha256": "sha256:8b0632ce938172d7fc262a615127d24249c38faeb8ce3f3abbd3b3ff37887214"
+        },
+        "lateral": {
+          "arquivo": "imagens/c01/lateral.png",
+          "sha256": "sha256:8c58802cc61ebaebacbff0f2e620f208c5404a8f5ad3eaeb7cb71e824e61cd10"
+        },
+        "superior": {
+          "arquivo": "imagens/c01/superior.png",
+          "sha256": "sha256:5004e58d8bf2b8227e40169512f784c5145216208266ca95fbe859e0b957d140"
+        }
+      }
+    },
+    {
+      "id": "c02",
+      "nome": "controle-roda",
+      "classe": "controle",
+      "chave": true,
+      "obrigatoria": false,
+      "julgamentos": 5,
+      "faixaDaNota": [
+        8,
+        10
+      ],
+      "objeto": {
+        "titulo": "Roda com pneu",
+        "nota": "Roda de veículo, com pneu, aro e cubo."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "roda-pneu",
+        "base": "medio",
+        "aprovacao": "medio",
+        "geometria": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
+      },
+      "defeitos": [],
+      "desenho": {
+        "hash": "sha256:d0ed9e779399ef9590fffa13ccd50fcde99d41f1bb4405bc76ebf993d7169885"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c02/isometrica.png",
+          "sha256": "sha256:3623f87aa5830d79568e14a85643ff5b08811b7d630dc28b04624bbc516ccecb"
+        },
+        "frontal": {
+          "arquivo": "imagens/c02/frontal.png",
+          "sha256": "sha256:cccde61853a8b5e5ec10bc11c5998675ad94fe723d12b186db5771308b5e38c1"
+        },
+        "lateral": {
+          "arquivo": "imagens/c02/lateral.png",
+          "sha256": "sha256:7e34524e425d5fb5a808ce3ee31019dd4d93be6ff349ce7099759dc639ed6bae"
+        },
+        "superior": {
+          "arquivo": "imagens/c02/superior.png",
+          "sha256": "sha256:028763d6ac8fd2e3c010042a3f107db3d94ecbba75d21a396e473a2504885635"
+        }
+      }
+    },
+    {
+      "id": "c03",
+      "nome": "picape-baixa",
+      "classe": "estrutural",
+      "chave": true,
+      "obrigatoria": true,
+      "julgamentos": 5,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "fonte": {
+        "tipo": "esboco",
+        "arquivo": "docs/mecanifica/banco-de-provas/calibracao-do-critico/fontes/picape-baixa.esboco.json",
+        "arquivoSha256": "sha256:1fc151a6080eb4329201e6b7b5ae7a66b4ed7b156646074a0f020a7175c2a07f"
+      },
+      "defeitos": [
+        {
+          "parte": "rodas",
+          "tipo": "ausencia",
+          "sentido": "faltando",
+          "onde": "os quatro arcos de roda, que ficam vazios",
+          "decide": "critico",
+          "tiposAceitos": [
+            "ausencia"
+          ],
+          "palavras": [
+            "roda",
+            "rodas",
+            "pneu",
+            "pneus"
+          ]
+        },
+        {
+          "parte": "pisoCacamba",
+          "tipo": "uniao",
+          "sentido": "atravessando",
+          "onde": "arco da roda traseira, que o piso da caçamba atravessa",
+          "decide": "critico",
+          "tiposAceitos": [
+            "uniao",
+            "posicao"
+          ],
+          "palavras": [
+            "piso",
+            "arco",
+            "arcos"
+          ]
+        },
+        {
+          "parte": "carroceria",
+          "tipo": "espessura",
+          "sentido": "menor",
+          "onde": "altura do conjunto, de 0,28 do comprimento onde a ficha pede de 0,30 a 0,40",
+          "decide": "medida",
+          "medida": [
+            "esboco-medida:alturaPeloComprimento"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:cbedd2a222d7154ef73939f8fe5bfba3fbf63c7115fd81b5c02e981ba686dc63"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c03/isometrica.png",
+          "sha256": "sha256:2ad5eb37bc1c28c6d2341cec84cddac529c69c39f1abbe5d5e7621d85838a10b"
+        },
+        "frontal": {
+          "arquivo": "imagens/c03/frontal.png",
+          "sha256": "sha256:356f9692bcaf5ff242cb87816967ae473c30b0dc733bb3164b82eea25986ef45"
+        },
+        "lateral": {
+          "arquivo": "imagens/c03/lateral.png",
+          "sha256": "sha256:bc98c10e34cfd135fda9ded52226164eae8ac3512e134baf1d7c6eb205ce9f54"
+        },
+        "superior": {
+          "arquivo": "imagens/c03/superior.png",
+          "sha256": "sha256:781fd2c63cafae5779be013241dee9d6782627b803fd66e30bc17e0a3c2c57c8"
+        }
+      }
+    },
+    {
+      "id": "c04",
+      "nome": "ponta-no-ar",
+      "classe": "estrutural",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "objeto": {
+        "titulo": "Dobradiça",
+        "nota": "Dobradiça de abas, com duas folhas, os nós e o pino."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "dobradica",
+        "base": "medio",
+        "argumentos": [
+          {
+            "nome": "folhaEEmDaChapa",
+            "valor": [
+              -0.044325,
+              -0.06,
+              0.00441333333333
+            ]
+          }
+        ],
+        "geometria": "sha256:0a5cc956aea9e842a3db0eb530b7d7f808dac79bf5661a6cfac31b1884e514ee"
+      },
+      "defeitos": [
+        {
+          "parte": "folhaE",
+          "tipo": "uniao",
+          "sentido": "afastado",
+          "onde": "folha da esquerda, solta dos nós do pino",
+          "decide": "critico",
+          "tiposAceitos": [
+            "uniao",
+            "posicao"
+          ],
+          "palavras": [
+            "folha",
+            "aba",
+            "chapa",
+            "solta",
+            "solto",
+            "afastad",
+            "separad"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:fd003e48b392b8a778136e38d3ede69cecc379124fd1a4ad6beff35a8328a09f"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c04/isometrica.png",
+          "sha256": "sha256:bb92123da53d17a9cc04f3c7998dbe97adfcfb4e1721794ea31fe144927a2ce6"
+        },
+        "frontal": {
+          "arquivo": "imagens/c04/frontal.png",
+          "sha256": "sha256:fb3235043821ce5fc70d0df39b02a5c6bca0da0e02e6c56f2e382769ba081e1a"
+        },
+        "lateral": {
+          "arquivo": "imagens/c04/lateral.png",
+          "sha256": "sha256:8f6725a571c4128ab53b9f473b9d432b587990df231f4411b9428d191b5cb7af"
+        },
+        "superior": {
+          "arquivo": "imagens/c04/superior.png",
+          "sha256": "sha256:129dc3e48b2c69d5d4b17f99b42bd4c1cda7071303b05354a57173572a3aa5c5"
+        }
+      }
+    },
+    {
+      "id": "c05",
+      "nome": "controle-cilindro",
+      "classe": "controle",
+      "chave": true,
+      "obrigatoria": false,
+      "julgamentos": 5,
+      "faixaDaNota": [
+        8,
+        10
+      ],
+      "objeto": {
+        "titulo": "Cilindro hidráulico",
+        "nota": "Cilindro hidráulico de duplo efeito, com camisa, haste e um olhal em cada ponta."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "cilindro-hidraulico",
+        "base": "medio",
+        "aprovacao": "medio",
+        "geometria": "sha256:3759c714e46b941dff051ac7c13d94f151a21a06ab08f600df4883fcf132bfdb"
+      },
+      "defeitos": [],
+      "desenho": {
+        "hash": "sha256:8f07a840075c9f01b82dea9dfd2f95ea126eecdcac9dc470620afb20e264357f"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c05/isometrica.png",
+          "sha256": "sha256:2d3d50e8a5f639ac422b6554c9164bfcddcfe217143da0925b8d8bbe197cb650"
+        },
+        "frontal": {
+          "arquivo": "imagens/c05/frontal.png",
+          "sha256": "sha256:26094e707459947c4acb5d0d94e62c29c2df98a3d227d96216b59681f46f1ffe"
+        },
+        "lateral": {
+          "arquivo": "imagens/c05/lateral.png",
+          "sha256": "sha256:49c4b03df2b0d5f5905f3e19bd8706727f029d86af240b1414c94d11ad7ededb"
+        },
+        "superior": {
+          "arquivo": "imagens/c05/superior.png",
+          "sha256": "sha256:96e6fcf33bd6d6b07621a3e737a09b7553bebbd75f4fe6ecaeaaf8e02d75dcd4"
+        }
+      }
+    },
+    {
+      "id": "c06",
+      "nome": "facetado",
+      "classe": "superficie",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        8,
+        9
+      ],
+      "objeto": {
+        "titulo": "Cilindro hidráulico",
+        "nota": "Cilindro hidráulico de duplo efeito, com camisa, haste e um olhal em cada ponta."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "cilindro-hidraulico",
+        "base": "medio",
+        "argumentos": [
+          {
+            "nome": "lados",
+            "valor": 12
+          },
+          {
+            "nome": "segmentosDoArco",
+            "valor": 3
+          }
+        ],
+        "geometria": "sha256:ae3b3d21ad1976cd80ec8790cbd27eec8f5a4836e8e926e345ac8f0002d56017"
+      },
+      "defeitos": [
+        {
+          "parte": "tubo",
+          "tipo": "superficie",
+          "sentido": "facetado",
+          "onde": "camisa, olhais e haste, de doze lados, que leem como prisma",
+          "decide": "critico",
+          "palavras": [
+            "faceta",
+            "lados",
+            "prisma",
+            "poligon",
+            "octog",
+            "dodec",
+            "hexag",
+            "angulos"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:0cdce2d19d0a4e6b5cc81d98a03ea07731562d833bc5555fcb81535b43234866"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c06/isometrica.png",
+          "sha256": "sha256:8aa79b0dff6b360a7896d13de1f4598a92cf8165db60ac6e6743883e1c375460"
+        },
+        "frontal": {
+          "arquivo": "imagens/c06/frontal.png",
+          "sha256": "sha256:7caee7be4b3cf8bab119d906b90a329ab443c8e691e9cc7f1ed202de6b3f472c"
+        },
+        "lateral": {
+          "arquivo": "imagens/c06/lateral.png",
+          "sha256": "sha256:d98b467653e1484ac8d12f208d52a71cd59181818bd136e9e52aa36de8b92b03"
+        },
+        "superior": {
+          "arquivo": "imagens/c06/superior.png",
+          "sha256": "sha256:b8743b086c79794f316ce830a16fc39271059ca548e45515089ff277c77a24e9"
+        }
+      }
+    },
+    {
+      "id": "c07",
+      "nome": "dobradicas-por-fora",
+      "classe": "estrutural",
+      "chave": true,
+      "obrigatoria": true,
+      "julgamentos": 5,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "fonte": {
+        "tipo": "esboco",
+        "arquivo": "docs/mecanifica/banco-de-provas/rodada-2026-10-08/guarda-roupa/guarda-roupa.esboco.json",
+        "remendo": {
+          "plano": {
+            "familia": "movel-de-caixa"
+          }
+        },
+        "arquivoSha256": "sha256:89ed882a7a306afc5cea30e2970d24ee15cf13d6380b4b9571e16be02df3494e"
+      },
+      "defeitos": [
+        {
+          "parte": "dobradicas",
+          "tipo": "posicao",
+          "sentido": "adiantada",
+          "onde": "borda lateral externa de cada porta, fora da face lateral do corpo",
+          "decide": "critico",
+          "tiposAceitos": [
+            "posicao",
+            "uniao"
+          ],
+          "palavras": [
+            "dobradica",
+            "dobradicas",
+            "pino",
+            "pinos",
+            "ferragem",
+            "ferragens"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:9d9b76ed504f1e508660b90d38951caf8704ebfa7c20246a9572993520f10fd3"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c07/isometrica.png",
+          "sha256": "sha256:f659df49f9d12c2b5e9b7b7a1cf41ad195f3516772e6cb547e05ae6f2d926ac8"
+        },
+        "frontal": {
+          "arquivo": "imagens/c07/frontal.png",
+          "sha256": "sha256:ae9aec72a096301c5d8cab284918dc2f75edec3cf9e922cf7e2b9ba2a8b1d256"
+        },
+        "lateral": {
+          "arquivo": "imagens/c07/lateral.png",
+          "sha256": "sha256:a1cd810a27a35754e4bb6388f55241ef3c323541234c65adb4626fe323cda90b"
+        },
+        "superior": {
+          "arquivo": "imagens/c07/superior.png",
+          "sha256": "sha256:63ac600f4a6a405fbbfa539d259f4866cee517d153d63690aab6ae417e566633"
+        }
+      }
+    },
+    {
+      "id": "c08",
+      "nome": "pneu-macico",
+      "classe": "estrutural",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "objeto": {
+        "titulo": "Roda com pneu",
+        "nota": "Roda de veículo, com pneu, aro e cubo."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "roda-pneu",
+        "base": "medio",
+        "argumentos": [
+          {
+            "nome": "raioDoAssento",
+            "valor": 0
+          }
+        ],
+        "geometria": "sha256:01cd3cf86bda22112cb8b91b98d428dd01eb58915f8d7a665523be79483a1c08"
+      },
+      "defeitos": [
+        {
+          "parte": "pneu",
+          "tipo": "espessura",
+          "sentido": "maior",
+          "onde": "seção inteira do pneu, do talão ao eixo, sem aro, cubo nem furos à vista",
+          "decide": "medida",
+          "medida": [
+            "forma:pneu"
+          ],
+          "tiposAceitos": [
+            "espessura",
+            "ausencia"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:831ab98539a16b3a65632442e91c33ddd1e380ce131189638a410de136ef42a3"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c08/isometrica.png",
+          "sha256": "sha256:eb7d4b3b8f1e187c43a018c7245d73a9624458517e266945fcb8d50ef7d9788f"
+        },
+        "frontal": {
+          "arquivo": "imagens/c08/frontal.png",
+          "sha256": "sha256:cccde61853a8b5e5ec10bc11c5998675ad94fe723d12b186db5771308b5e38c1"
+        },
+        "lateral": {
+          "arquivo": "imagens/c08/lateral.png",
+          "sha256": "sha256:f8c465e4335ec96585c600511df48957f5934412b7103969abb5f2eabf1629c2"
+        },
+        "superior": {
+          "arquivo": "imagens/c08/superior.png",
+          "sha256": "sha256:028763d6ac8fd2e3c010042a3f107db3d94ecbba75d21a396e473a2504885635"
+        }
+      }
+    },
+    {
+      "id": "c09",
+      "nome": "controle-dobradica",
+      "classe": "controle",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        8,
+        10
+      ],
+      "objeto": {
+        "titulo": "Dobradiça",
+        "nota": "Dobradiça de abas, com duas folhas, os nós e o pino."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "dobradica",
+        "base": "medio",
+        "aprovacao": "medio",
+        "geometria": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9"
+      },
+      "defeitos": [],
+      "desenho": {
+        "hash": "sha256:158f1df03b570655090cdb1238c776c09b2791ac5e3a42c50f49ee895ab680e8"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c09/isometrica.png",
+          "sha256": "sha256:c071cce05f6603f2346bdb50ef86aa19ad8efa0a45f8053c077661e9aac03329"
+        },
+        "frontal": {
+          "arquivo": "imagens/c09/frontal.png",
+          "sha256": "sha256:3024895e62273f689685831707d063f410e0701307f5a486c9713059949b3d5d"
+        },
+        "lateral": {
+          "arquivo": "imagens/c09/lateral.png",
+          "sha256": "sha256:8f6725a571c4128ab53b9f473b9d432b587990df231f4411b9428d191b5cb7af"
+        },
+        "superior": {
+          "arquivo": "imagens/c09/superior.png",
+          "sha256": "sha256:24184525e10e811e5e8e36a4ec14ff8d27de8660998d1fca4454f51cb87889f4"
+        }
+      }
+    },
+    {
+      "id": "c10",
+      "nome": "raios-curtos",
+      "classe": "estrutural",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "objeto": {
+        "titulo": "Roda com pneu",
+        "nota": "Roda de veículo, com pneu, aro e cubo."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "roda-pneu",
+        "base": "padrao",
+        "parametros": {
+          "tipo": 1
+        },
+        "argumentos": [
+          {
+            "prefixo": "noDoAro",
+            "componentes": [
+              1,
+              2
+            ],
+            "fator": 0.75
+          }
+        ],
+        "geometria": "sha256:ddfed6c865f410772f669916400619cc9c1c486fa3565d6362e50200a86c56cc"
+      },
+      "defeitos": [
+        {
+          "parte": "raios",
+          "tipo": "comprimento",
+          "sentido": "menor",
+          "onde": "ponta externa de cada raio, que termina antes do aro",
+          "decide": "medida",
+          "medida": [
+            "razao:discoAlcancaOAro"
+          ],
+          "tiposAceitos": [
+            "comprimento",
+            "uniao"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:b796cbd0f3e9ef3bb58ebc447577bc3cb053c2d7b9e2879c3ad60ba7d4f4e57e"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c10/isometrica.png",
+          "sha256": "sha256:ff4cd391a79c20749b53d58cf54709a90527baf050988c38807bbbd3bcfbe4d8"
+        },
+        "frontal": {
+          "arquivo": "imagens/c10/frontal.png",
+          "sha256": "sha256:d92d77c9b70e77e9413c42666aef33694f97c37a21dc48b8e053891992184b20"
+        },
+        "lateral": {
+          "arquivo": "imagens/c10/lateral.png",
+          "sha256": "sha256:3139e6037640a3ca16e9db83b73dc6cd48c97dec427c7eb027244243146c4198"
+        },
+        "superior": {
+          "arquivo": "imagens/c10/superior.png",
+          "sha256": "sha256:346f35db4f6c878006528d4bc58ff82be73c2859bc7f748f5a46e88835929446"
+        }
+      }
+    },
+    {
+      "id": "c11",
+      "nome": "travessia-sem-explicacao",
+      "classe": "estrutural",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "objeto": {
+        "titulo": "Cilindro hidráulico",
+        "nota": "Cilindro hidráulico de duplo efeito, com camisa, haste e um olhal em cada ponta."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "cilindro-hidraulico",
+        "base": "medio",
+        "argumentos": [
+          {
+            "nome": "inicioDoCorpo",
+            "valor": -0.1
+          },
+          {
+            "nome": "comprimentoDoCorpo",
+            "valor": 0.7322
+          }
+        ],
+        "geometria": "sha256:38b4b1d163877b928cdea2d9dbbc43ec98e493d5207caea75e7c8c1f0218d9c9"
+      },
+      "defeitos": [
+        {
+          "parte": "haste",
+          "tipo": "uniao",
+          "sentido": "atravessando",
+          "onde": "fundo da camisa e olhal traseiro, que a haste atravessa e deixa uma ponta para fora",
+          "decide": "critico",
+          "tiposAceitos": [
+            "uniao",
+            "comprimento"
+          ],
+          "palavras": [
+            "haste",
+            "atravess",
+            "traseir",
+            "fundo",
+            "ponta"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:4a70603dd4eb4471acb3d68d563174704c2448d34530e40dd7bb1f5bd1fae460"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c11/isometrica.png",
+          "sha256": "sha256:a05ef973ce91d10e8cb8c380e1c34fb33518ae515cb9d5a2a8384d109c7f519b"
+        },
+        "frontal": {
+          "arquivo": "imagens/c11/frontal.png",
+          "sha256": "sha256:f7795405f935365565fd59512f42f3bd22cccadb4300cc33124493b280aba9dc"
+        },
+        "lateral": {
+          "arquivo": "imagens/c11/lateral.png",
+          "sha256": "sha256:49c4b03df2b0d5f5905f3e19bd8706727f029d86af240b1414c94d11ad7ededb"
+        },
+        "superior": {
+          "arquivo": "imagens/c11/superior.png",
+          "sha256": "sha256:b97b495c5c2e8a79d2bb8b50aca8190819a79e43f9357b2cfe5da85573548a06"
+        }
+      }
+    },
+    {
+      "id": "c12",
+      "nome": "peca-fora-do-lugar",
+      "classe": "estrutural",
+      "chave": false,
+      "obrigatoria": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        7
+      ],
+      "objeto": {
+        "titulo": "Cilindro hidráulico",
+        "nota": "Cilindro hidráulico de duplo efeito, com camisa, haste e um olhal em cada ponta."
+      },
+      "fonte": {
+        "tipo": "familia",
+        "familia": "cilindro-hidraulico",
+        "base": "medio",
+        "argumentos": [
+          {
+            "nome": "traseiroInicioDoOlhal",
+            "valor": 0.02
+          },
+          {
+            "nome": "traseiroInicioDaBucha",
+            "valor": 0.0096
+          }
+        ],
+        "geometria": "sha256:bf3f38ec43d8b138b14214ec3dfa410711119d0328e445731111e327f20275e9"
+      },
+      "defeitos": [
+        {
+          "parte": "olhal-traseiro",
+          "tipo": "posicao",
+          "sentido": "adiantada",
+          "onde": "olhal traseiro, deslocado para um lado do eixo da camisa",
+          "decide": "critico",
+          "tiposAceitos": [
+            "posicao",
+            "uniao"
+          ],
+          "palavras": [
+            "olhal",
+            "traseir",
+            "deslocad",
+            "descentr",
+            "fora do eixo"
+          ]
+        }
+      ],
+      "desenho": {
+        "hash": "sha256:eed70b0944d9788540fb5b91102e2f8b610c73f717079f03eb6175561c01a5a4"
+      },
+      "vistas": {
+        "isometrica": {
+          "arquivo": "imagens/c12/isometrica.png",
+          "sha256": "sha256:8fdbf6fc4be31f76886ad45f507bf42643b164db15f4934ac4fc29cd1b34fbeb"
+        },
+        "frontal": {
+          "arquivo": "imagens/c12/frontal.png",
+          "sha256": "sha256:236ba7923d8f5fe6ce943a2eb610c18bd93fd8444067ceb829a0045a22925d43"
+        },
+        "lateral": {
+          "arquivo": "imagens/c12/lateral.png",
+          "sha256": "sha256:2b37d83143fa9ffc9bb06ab45316015878fd5db445dd0d2157620db5b0b0609b"
+        },
+        "superior": {
+          "arquivo": "imagens/c12/superior.png",
+          "sha256": "sha256:63a8cb3622e3a5859cd89cb962f2c9a5b3df667b393c4bd033617eb3f3368cda"
+        }
+      }
+    }
+  ],
+  "resultados": [],
+  "prancha": {
+    "arquivo": "prancha.png",
+    "sha256": "sha256:6b0100f06aa461ee4184bba81a5395b2945af6b53f90645914a5244a67cbe52b"
+  }
+}

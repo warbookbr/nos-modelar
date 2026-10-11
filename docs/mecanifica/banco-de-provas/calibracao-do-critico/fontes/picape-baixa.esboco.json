@@ -1,0 +1,67 @@
+{
+  "vista": "isometrica",
+  "plano": {
+    "texto": "Nível médio: uma picape de cabine simples e caçamba aberta, de 5000 mm de comprimento, 1800 mm de largura e 1400 mm de altura total, com a frente em +z. O corpo é um chassi baixo com o capô na frente, a cabine no meio (corpo e teto) e a caçamba atrás, com piso, duas laterais, frente e tampa traseira. Os quatro arcos de roda são anéis de eixo transversal: os da frente fazem o papel de caixa de roda por fora do capô, e os de trás ficam dentro da caçamba, junto das laterais. Escrito à mão em 2026-10-11 para o conjunto de calibração do crítico, porque o esboço da picape baixa da rodada de 2026-10-08 não foi guardado. A proporção entre a altura total e o comprimento vem da ficha de picape: de 0,30 a 0,40.",
+    "nivel": "medio",
+    "medidas": [
+      { "nome": "alturaTotal", "valor": 1400, "unidade": "mm", "origem": "ia", "mede": "alturaTotal" },
+      { "nome": "larguraTotal", "valor": 1900, "unidade": "mm", "origem": "ia", "mede": "larguraTotal" },
+      { "nome": "comprimentoTotal", "valor": 5000, "unidade": "mm", "origem": "ia", "mede": "profundidadeTotal" },
+      { "nome": "alturaPeloComprimento", "origem": "ficha", "mede": { "razao": ["alturaTotal", "profundidadeTotal"], "faixa": [0.3, 0.4] } }
+    ],
+    "contrato": {
+      "tocam": [
+        ["chassi", "capo"],
+        ["chassi", "cabineCorpo"],
+        ["chassi", "pisoCacamba"],
+        ["cabineCorpo", "capo"],
+        ["cabineCorpo", "cabineTeto"],
+        ["cabineCorpo", "frenteCacamba"],
+        ["pisoCacamba", "lateralCacambaD"],
+        ["pisoCacamba", "lateralCacambaE"],
+        ["pisoCacamba", "frenteCacamba"],
+        ["pisoCacamba", "tampaTraseira"],
+        ["capo", "arcoDianteiroD"],
+        ["capo", "arcoDianteiroE"]
+      ]
+    }
+  },
+  "contato": {
+    "usar": true,
+    "tolerancia": 2,
+    "penetracao": 2,
+    "juntas": [
+      {
+        "pecas": ["arcoTraseiroD", "chassi", "pisoCacamba", "lateralCacambaD"],
+        "max": 120,
+        "motivo": "o arco da roda traseira é um anel só, e a caçamba e o chassi passam por dentro dele"
+      },
+      {
+        "pecas": ["arcoTraseiroE", "chassi", "pisoCacamba", "lateralCacambaE"],
+        "max": 120,
+        "motivo": "o arco da roda traseira é um anel só, e a caçamba e o chassi passam por dentro dele"
+      }
+    ]
+  },
+  "opcoes": [
+    {
+      "titulo": "Picape",
+      "nota": "Picape de cabine simples com caçamba aberta.",
+      "formas": [
+        { "id": "chassi", "tipo": "caixa", "largura": 1500, "altura": 100, "profundidade": 4800, "centro": [0, 350, 0], "cor": "#6b6f75" },
+        { "id": "pisoCacamba", "tipo": "caixa", "largura": 1620, "altura": 40, "profundidade": 2200, "centro": [0, 420, -1400], "cor": "#8a8d92" },
+        { "id": "lateralCacambaD", "tipo": "caixa", "largura": 50, "altura": 430, "profundidade": 2200, "centro": [785, 655, -1400], "cor": "#c0392b" },
+        { "id": "lateralCacambaE", "espelha": { "forma": "lateralCacambaD", "eixo": "x" } },
+        { "id": "frenteCacamba", "tipo": "caixa", "largura": 1520, "altura": 430, "profundidade": 50, "centro": [0, 655, -325], "cor": "#c0392b" },
+        { "id": "tampaTraseira", "tipo": "caixa", "largura": 1520, "altura": 430, "profundidade": 50, "centro": [0, 655, -2475], "cor": "#c0392b" },
+        { "id": "cabineCorpo", "tipo": "caixa", "largura": 1700, "altura": 420, "profundidade": 1300, "centro": [0, 610, 350], "cor": "#c0392b" },
+        { "id": "cabineTeto", "tipo": "caixa", "largura": 1600, "altura": 580, "profundidade": 1000, "centro": [0, 1110, 250], "cor": "#d9dde2" },
+        { "id": "capo", "tipo": "caixa", "largura": 1700, "altura": 260, "profundidade": 1500, "centro": [0, 530, 1750], "cor": "#c0392b" },
+        { "id": "arcoDianteiroD", "tipo": "anel", "diametroExterno": 760, "diametroInterno": 640, "espessura": 100, "eixo": "x", "centro": [900, 380, 1800], "cor": "#3c3f44" },
+        { "id": "arcoDianteiroE", "espelha": { "forma": "arcoDianteiroD", "eixo": "x" } },
+        { "id": "arcoTraseiroD", "tipo": "anel", "diametroExterno": 760, "diametroInterno": 640, "espessura": 100, "eixo": "x", "centro": [750, 380, -1700], "cor": "#3c3f44" },
+        { "id": "arcoTraseiroE", "espelha": { "forma": "arcoTraseiroD", "eixo": "x" } }
+      ]
+    }
+  ]
+}

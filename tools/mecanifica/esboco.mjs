@@ -1025,6 +1025,39 @@ export const PERGUNTAS_DO_OBJETO = [
   PERGUNTA_DA_NOTA('o objeto'),
 ];
 
+/* As quatro vistas do objeto inteiro como o brief do objeto as desenha (sem legenda nem linha de centro, com a camada quando o
+   motor é o `webgl`), ainda sem navegador: [{ vista, r }], `r` o resultado de `desenharEsboco`. O conjunto de calibração do
+   crítico confere o desenho por aqui. */
+export function desenhosDoObjeto(bruto) {
+  const geral = expandirEsboco(bruto);
+  return VISTAS_DA_ANALISE.map((vista) => ({
+    vista,
+    r: desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista, legendas: false, centros: false }), OPCOES_DA_CAMADA),
+  }));
+}
+
+/* O objeto do brief: o título e a nota da primeira opção do esboço. */
+export function objetoDoEsboco(bruto) {
+  const primeira = Array.isArray(bruto.opcoes) ? bruto.opcoes[0] ?? {} : {};
+  return [primeira.titulo ?? bruto.titulo, primeira.nota ?? bruto.nota].filter((x) => typeof x === 'string' && x.trim()).join(': ');
+}
+
+/* O texto do brief do crítico do objeto, sem desenhar nada: `objeto` (título e nota), `anterior` (as linhas do veredito
+   anterior), `imagens` (os caminhos das quatro vistas) e `perguntas` de forma além das cinco fixas. */
+export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, perguntas = [] }) {
+  const L = ['crítico do objeto: o nível deste esboço não tem Detalhe por unidade, e a conclusão espera o veredito do crítico sobre o objeto inteiro.'];
+  L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito ${UNIDADE_DO_OBJETO} --nota <0-10> --motivo <o que ele apontou> e rode --proximo de novo.`);
+  L.push('--- brief para o crítico cego ---');
+  L.push(`Objeto: ${objeto || '(sem título no esboço)'}`);
+  L.push(...anterior);
+  L.push('Imagens do objeto (as quatro vistas, sem legenda):');
+  for (const d of imagens) L.push(`  ${d}`);
+  L.push('Responda, olhando só as imagens:');
+  L.push(...linhasDasPerguntas(PERGUNTAS_DO_OBJETO, perguntas));
+  L.push('--- fim do brief ---');
+  return L;
+}
+
 /* O brief do crítico cego do objeto inteiro, que o nível sem Detalhe por unidade pede antes de concluir: as quatro vistas
    gerais sem legenda (`<nome>-objeto-<vista>.png`), o objeto pelo título e pela nota do esboço, o veredito anterior quando
    houver e as ligações em texto. */
@@ -1034,31 +1067,20 @@ export async function briefDoObjeto(arquivo, { largura = null, saida = null } = 
   const pasta = resolverCaminho(saida ?? `${caminho.replace(/(\.esboco)?\.json$/i, '')}-critico-objeto`);
   mkdirSync(pasta, { recursive: true });
   const base = join(pasta, basename(caminho.replace(/(\.esboco)?\.json$/i, '')));
-  const geral = expandirEsboco(bruto);
   const gerais = [];
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
-    for (const v of VISTAS_DA_ANALISE) {
-      const r = desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
-      const destino = `${base}-objeto-${v}.png`;
+    for (const { vista, r } of desenhosDoObjeto(bruto)) {
+      const destino = `${base}-objeto-${vista}.png`;
       await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
       gerais.push(destino);
     }
   } finally {
     await navegador.close();
   }
-  const primeira = Array.isArray(bruto.opcoes) ? bruto.opcoes[0] ?? {} : {};
-  const objeto = [primeira.titulo ?? bruto.titulo, primeira.nota ?? bruto.nota].filter((x) => typeof x === 'string' && x.trim()).join(': ');
-  const L = ['crítico do objeto: o nível deste esboço não tem Detalhe por unidade, e a conclusão espera o veredito do crítico sobre o objeto inteiro.'];
-  L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito ${UNIDADE_DO_OBJETO} --nota <0-10> --motivo <o que ele apontou> e rode --proximo de novo.`);
-  L.push('--- brief para o crítico cego ---');
-  L.push(`Objeto: ${objeto || '(sem título no esboço)'}`);
-  L.push(...linhasDoAnterior(vereditoAnterior(arquivo, UNIDADE_DO_OBJETO), ''));
-  L.push('Imagens do objeto (as quatro vistas, sem legenda):');
-  for (const d of gerais) L.push(`  ${d}`);
-  L.push('Responda, olhando só as imagens:');
-  L.push(...linhasDasPerguntas(PERGUNTAS_DO_OBJETO, perguntasDoEsboco(bruto).todas));
-  L.push('--- fim do brief ---');
+  const L = linhasDoBriefDoObjeto({
+    objeto: objetoDoEsboco(bruto), anterior: linhasDoAnterior(vereditoAnterior(arquivo, UNIDADE_DO_OBJETO), ''), imagens: gerais, perguntas: perguntasDoEsboco(bruto).todas,
+  });
   return { texto: `${L.join('\n')}\n`, gerais, pasta };
 }
 

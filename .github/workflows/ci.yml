@@ -221,3 +221,8 @@ jobs:
       # este passo uma família poderia mudar de forma depois de aprovada sem que ninguém reaprovasse.
       - name: Famílias registradas com a geometria igual à aprovada
         run: npm run familias:check
+
+      # O conjunto de calibração do crítico: o desenho de cada fonte, o agente e o brief têm de ser os gravados, e a medida
+      # tem de reprovar sem o crítico o que o conjunto diz ser dela. Sem este passo o crítico poderia mudar sem remedir.
+      - name: Conjunto de calibração do crítico em dia com o crítico e com as fontes
+        run: npm run calibracao:check
