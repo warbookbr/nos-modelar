@@ -299,5 +299,21 @@
       "rótula dianteira do máximo não confirmada na resolução"
     ]
   },
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
+    "pontos": {
+      "minimo": {
+        "hash": "sha256:72650b64fe9e4d75fdbeccc2ff09722102f8ebbd439cfc863234890a6eac42ec"
+      },
+      "medio": {
+        "hash": "sha256:3759c714e46b941dff051ac7c13d94f151a21a06ab08f600df4883fcf132bfdb"
+      },
+      "maximo": {
+        "hash": "sha256:411cf8637171391051f79f9c453e1e8b2936b497bb31f4f3dc13ff1980b365af"
+      }
+    },
+    "observacao": "aprovada como está, com os olhais do mínimo e a camisa do médio e do máximo nas proporções atuais"
+  }
 }

@@ -187,5 +187,21 @@
       "dúvida de contagem dos furos no máximo, pela resolução"
     ]
   },
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
+    "pontos": {
+      "minimo": {
+        "hash": "sha256:ff36d04e2e82d217112d8f65578a7b32595831446f14d66cbdf46a2860ab454f"
+      },
+      "medio": {
+        "hash": "sha256:0af494421a63e7ec281e4a4686f4a4993828c3698901a8be76489037a56ea6df"
+      },
+      "maximo": {
+        "hash": "sha256:0de9b0a0ea6214cf21f62a47f27ba242a858d2897978b4635106b427acd16d06"
+      }
+    },
+    "observacao": "aprovada como está"
+  }
 }

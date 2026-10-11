@@ -133,6 +133,14 @@ As tarefas 1 a 5 entraram em 2026-10-11, com o contrato em
 aprovação mecânica limita a parede da casca a 1,5 vez a espessura pedida e deixa
 o curso da articulação para as famílias que geram montagem.
 
+As famílias roda e pneu de disco, dobradiça e cilindro hidráulico (tarefas 6, 8
+e 9) foram aprovadas em 2026-10-11 nas três camadas: a mecânica, o crítico com
+dois julgamentos cegos (8 nos três pontos da roda e da dobradiça; 8, 9 e 8 no
+cilindro, depois de uma rodada que prendeu os olhais por pescoço) e a pessoa, com
+as [pranchas](banco-de-provas/familias-2026-10-11/) guardadas no banco de provas.
+A dobradiça não usa a chapa dobrada, que não tem `origemId` para publicar a porta
+do nó; isso fica como lacuna da extensão. Faltam a roda raiada e o roupeiro.
+
 ## Pendências da camada de features
 
 O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
