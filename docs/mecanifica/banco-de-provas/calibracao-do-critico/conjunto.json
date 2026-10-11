@@ -80,7 +80,7 @@
         ]
       },
       "roda-pneu": {
-        "nota": "O pneu é um anel (um furo passante), e o disco, com a chapa ou os raios, chega ao barril do aro: a razão entre a altura do disco e a do aro é a que o `derivar` dá, de 0,975, e a faixa deixa folga para o corte do raio. A medida não declara contato: o crítico decide o que ela não alcança.",
+        "nota": "O pneu é um anel (um furo passante), e o disco, com a chapa ou os raios, chega ao barril do aro: a razão entre a altura do disco e a do aro é a que o `derivar` dá, de um menos a meia parede do aro sobre o raio do assento, e a faixa vai a 1,05 porque, sem o furo do assento (o aro do pneu maciço), o aro perde a altura do assento e o disco passa dele pela meia parede. A medida não declara contato: o crítico decide o que ela não alcança.",
         "formas": {
           "pneu": "anel"
         },
@@ -105,7 +105,7 @@
               ],
               "faixa": [
                 0.9,
-                1.02
+                1.05
               ]
             }
           }
@@ -200,28 +200,28 @@
         "familia": "roda-pneu",
         "base": "medio",
         "aprovacao": "medio",
-        "geometria": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
+        "geometria": "sha256:935ccc377fcb3795f669fc2e2db5c5993b85b7a41f73975860c4ac51dfee6859"
       },
       "defeitos": [],
       "desenho": {
-        "hash": "sha256:d0ed9e779399ef9590fffa13ccd50fcde99d41f1bb4405bc76ebf993d7169885"
+        "hash": "sha256:8f76c0a884e7494722ce401441f4564ee3e61533bb9382c42738beaf3f055116"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c02/isometrica.png",
-          "sha256": "sha256:3623f87aa5830d79568e14a85643ff5b08811b7d630dc28b04624bbc516ccecb"
+          "sha256": "sha256:020e83780a59bc13b291fbb9d9fb2326fe178fad7c9ecab06a9a47eefaf6fc45"
         },
         "frontal": {
           "arquivo": "imagens/c02/frontal.png",
-          "sha256": "sha256:cccde61853a8b5e5ec10bc11c5998675ad94fe723d12b186db5771308b5e38c1"
+          "sha256": "sha256:b30804b3456e6a4c3cd49d12354df488dffb94e6486d6860a00344b927f970ae"
         },
         "lateral": {
           "arquivo": "imagens/c02/lateral.png",
-          "sha256": "sha256:7e34524e425d5fb5a808ce3ee31019dd4d93be6ff349ce7099759dc639ed6bae"
+          "sha256": "sha256:496fc9afe0fe642ddfc825b4e1d182e4ffa97fa246387e8a4e304bb77daf4423"
         },
         "superior": {
           "arquivo": "imagens/c02/superior.png",
-          "sha256": "sha256:028763d6ac8fd2e3c010042a3f107db3d94ecbba75d21a396e473a2504885635"
+          "sha256": "sha256:d937f6d711708047234ebd7aa0fb6837d2cb7c05028be9ae481176751a85f6cb"
         }
       }
     },
@@ -588,7 +588,7 @@
             "valor": 0
           }
         ],
-        "geometria": "sha256:01cd3cf86bda22112cb8b91b98d428dd01eb58915f8d7a665523be79483a1c08"
+        "geometria": "sha256:feb569288243aa2054b4854b96f6253c1c1cb1f4255b132bf0184e0598f89c21"
       },
       "defeitos": [
         {
@@ -607,24 +607,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:831ab98539a16b3a65632442e91c33ddd1e380ce131189638a410de136ef42a3"
+        "hash": "sha256:6c07da81d1613c049ec56b06e50b7529d62d72ba5ad8fd940896a76266c15184"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c08/isometrica.png",
-          "sha256": "sha256:eb7d4b3b8f1e187c43a018c7245d73a9624458517e266945fcb8d50ef7d9788f"
+          "sha256": "sha256:0da9f96dd663f6dd45ec450bd5b84c2c8d95e8452252de65e29581cd2ddcb05b"
         },
         "frontal": {
           "arquivo": "imagens/c08/frontal.png",
-          "sha256": "sha256:cccde61853a8b5e5ec10bc11c5998675ad94fe723d12b186db5771308b5e38c1"
+          "sha256": "sha256:b30804b3456e6a4c3cd49d12354df488dffb94e6486d6860a00344b927f970ae"
         },
         "lateral": {
           "arquivo": "imagens/c08/lateral.png",
-          "sha256": "sha256:f8c465e4335ec96585c600511df48957f5934412b7103969abb5f2eabf1629c2"
+          "sha256": "sha256:a685b2a25bfe35774e334c3729233c280f6b454e294c85d5fb929f68e80ed2cf"
         },
         "superior": {
           "arquivo": "imagens/c08/superior.png",
-          "sha256": "sha256:028763d6ac8fd2e3c010042a3f107db3d94ecbba75d21a396e473a2504885635"
+          "sha256": "sha256:d937f6d711708047234ebd7aa0fb6837d2cb7c05028be9ae481176751a85f6cb"
         }
       }
     },
@@ -705,7 +705,7 @@
             "fator": 0.75
           }
         ],
-        "geometria": "sha256:ddfed6c865f410772f669916400619cc9c1c486fa3565d6362e50200a86c56cc"
+        "geometria": "sha256:13c566f8e4146a821b0addf48991fb96c3dc0b6c8d3aee35434ec753e9099d24"
       },
       "defeitos": [
         {
@@ -724,24 +724,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:b796cbd0f3e9ef3bb58ebc447577bc3cb053c2d7b9e2879c3ad60ba7d4f4e57e"
+        "hash": "sha256:6746512db6cc76d6f434583b07a01680f833a9d78920abffdf2df0b19be38bf6"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c10/isometrica.png",
-          "sha256": "sha256:ff4cd391a79c20749b53d58cf54709a90527baf050988c38807bbbd3bcfbe4d8"
+          "sha256": "sha256:b4c4f25a93dbf235c4a4d79595023afff501867cee47250178ae643214eeb767"
         },
         "frontal": {
           "arquivo": "imagens/c10/frontal.png",
-          "sha256": "sha256:d92d77c9b70e77e9413c42666aef33694f97c37a21dc48b8e053891992184b20"
+          "sha256": "sha256:38b2298955068be890b24022ab57cdae40c10a2cff523c83a13fe85de90b6b17"
         },
         "lateral": {
           "arquivo": "imagens/c10/lateral.png",
-          "sha256": "sha256:3139e6037640a3ca16e9db83b73dc6cd48c97dec427c7eb027244243146c4198"
+          "sha256": "sha256:daa12323b02525eb84637d38a7278a87fbd9f8bb2d2a2ad14a102ba017448d65"
         },
         "superior": {
           "arquivo": "imagens/c10/superior.png",
-          "sha256": "sha256:346f35db4f6c878006528d4bc58ff82be73c2859bc7f748f5a46e88835929446"
+          "sha256": "sha256:169970f0e5577762d7adfb802b6ad78acb556b67ec5cc7ce7a1e65a392571fcd"
         }
       }
     },
@@ -895,6 +895,6 @@
   "resultados": [],
   "prancha": {
     "arquivo": "prancha.png",
-    "sha256": "sha256:6b0100f06aa461ee4184bba81a5395b2945af6b53f90645914a5244a67cbe52b"
+    "sha256": "sha256:dfd8fa2a78a952e6b3d50a266910e04d7447b3077f39cb77ddd2258c9c61e352"
   }
 }

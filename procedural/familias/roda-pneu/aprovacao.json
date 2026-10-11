@@ -386,10 +386,6 @@
         {
           "ponto": "larguraCubo=0.3",
           "restricao": "cubo-dentro-da-tolerancia-do-esboco"
-        },
-        {
-          "ponto": "tipo=2",
-          "restricao": "aro-segura-o-raio"
         }
       ]
     },
@@ -610,7 +606,7 @@
           "diametroFuro": 0.02,
           "diametroFuroCentral": 0.05,
           "diametroPneu": 400,
-          "diametroRaio": 0.012,
+          "diametroRaio": 0.005,
           "espessuraDisco": 0.01,
           "furosDeFixacao": 4,
           "larguraAro": 0.75,
@@ -640,7 +636,7 @@
           "diametroFuro": 0.022,
           "diametroFuroCentral": 0.106,
           "diametroPneu": 632,
-          "diametroRaio": 0.012,
+          "diametroRaio": 0.005,
           "espessuraDisco": 0.016,
           "furosDeFixacao": 5,
           "larguraAro": 0.8,
@@ -768,7 +764,7 @@
           "diametroFuro": 0.03,
           "diametroFuroCentral": 0.08,
           "diametroPneu": 100,
-          "diametroRaio": 0.012,
+          "diametroRaio": 0.005,
           "espessuraDisco": 0.1,
           "furosDeFixacao": 4,
           "larguraAro": 1,
@@ -798,7 +794,7 @@
           "diametroFuro": 0.022,
           "diametroFuroCentral": 0.1,
           "diametroPneu": 1730,
-          "diametroRaio": 0.012,
+          "diametroRaio": 0.005,
           "espessuraDisco": 0.014,
           "furosDeFixacao": 8,
           "larguraAro": 0.85,
@@ -828,7 +824,7 @@
           "diametroFuro": 0.02,
           "diametroFuroCentral": 0.17,
           "diametroPneu": 960,
-          "diametroRaio": 0.012,
+          "diametroRaio": 0.005,
           "espessuraDisco": 0.03,
           "furosDeFixacao": 6,
           "larguraAro": 1,

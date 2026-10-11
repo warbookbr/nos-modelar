@@ -143,7 +143,7 @@
     "diametroRaio": {
       "tipo": "numero",
       "unidade": "razao",
-      "padrao": 0.012,
+      "padrao": 0.005,
       "minimo": 0.002,
       "maximo": 0.05,
       "medio": 0.02

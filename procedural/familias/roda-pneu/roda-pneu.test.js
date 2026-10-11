@@ -139,6 +139,19 @@ describe('a família roda-pneu no registro do produto', () => {
   });
 });
 
+describe('o padrão aceita as três formas de cubo e as quatro bandas', () => {
+  for (const [rotulo, parametros] of [
+    ['a raiada de um plano', { tipo: 1 }], ['a raiada de duas flanges', { tipo: 2 }], ['o pneu maciço', { banda: 1 }],
+    ['a roda sem pneu', { banda: 2 }], ['o pneu com relevo', { banda: 3, sulcos: 16 }],
+  ]) {
+    it(`${rotulo}: só o parâmetro que a escolhe basta, e a malha sai sem passo perdido`, () => {
+      const { neutro } = rodar(parametros);
+      expect(neutro.orfaos ?? []).toEqual([]);
+      expect(caixasPorParte(neutro).facesSemParte).toEqual([]);
+    });
+  }
+});
+
 describe('a geometria medida na malha: a roda de disco e a banda', () => {
   for (const nome of ['carro', 'carrinho-de-mao', 'rodizio', 'trem', 'trator']) {
     it(`o perfil ${nome}: o diâmetro, a largura e o aro pedidos, e o volume do pneu, do aro, do cubo e da chapa contra a fórmula`, () => {
