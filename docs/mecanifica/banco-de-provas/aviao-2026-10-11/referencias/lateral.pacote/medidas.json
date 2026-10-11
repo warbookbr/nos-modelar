@@ -1,0 +1,311 @@
+{
+ "naBorda": {
+  "antenaTopo": 1,
+  "antenaVentral": 1,
+  "asa": 1,
+  "barbatana": 1,
+  "capo": 1,
+  "chao": 1,
+  "cone": 1,
+  "deriva": 1,
+  "escape": 1,
+  "estabilizador": 1,
+  "fuselagem": 1,
+  "helice": 1,
+  "janelas": 1,
+  "leme": 1,
+  "luzAsa": 1,
+  "parabrisa": 1,
+  "porta": 1,
+  "saliencia1": 1,
+  "saliencia2": 1,
+  "saliencia3": 1,
+  "tremNariz": 1,
+  "tremPrincipal": 1
+ },
+ "minimo": 0.8,
+ "abaixo": [],
+ "semDonoPx": 821,
+ "divisas": [
+  {
+   "a": "deriva",
+   "b": "leme",
+   "caixa": [
+    389,
+    3,
+    453,
+    109
+   ]
+  },
+  {
+   "a": "estabilizador",
+   "b": "leme",
+   "caixa": [
+    401,
+    74,
+    444,
+    113
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "saliencia1",
+   "caixa": [
+    192,
+    73,
+    231,
+    112
+   ]
+  },
+  {
+   "a": "deriva",
+   "b": "fuselagem",
+   "caixa": [
+    295,
+    76,
+    423,
+    115
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "saliencia2",
+   "caixa": [
+    221,
+    75,
+    289,
+    114
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "porta",
+   "caixa": [
+    234,
+    85,
+    300,
+    157
+   ]
+  },
+  {
+   "a": "deriva",
+   "b": "estabilizador",
+   "caixa": [
+    392,
+    78,
+    431,
+    117
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "parabrisa",
+   "caixa": [
+    125,
+    86,
+    182,
+    128
+   ]
+  },
+  {
+   "a": "estabilizador",
+   "b": "fuselagem",
+   "caixa": [
+    396,
+    84,
+    465,
+    123
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "janelas",
+   "caixa": [
+    145,
+    92,
+    250,
+    134
+   ]
+  },
+  {
+   "a": "janelas",
+   "b": "porta",
+   "caixa": [
+    245,
+    91,
+    284,
+    130
+   ]
+  },
+  {
+   "a": "asa",
+   "b": "fuselagem",
+   "caixa": [
+    146,
+    97,
+    296,
+    171
+   ]
+  },
+  {
+   "a": "asa",
+   "b": "janelas",
+   "caixa": [
+    208,
+    93,
+    247,
+    132
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "fuselagem",
+   "caixa": [
+    95,
+    104,
+    134,
+    170
+   ]
+  },
+  {
+   "a": "cone",
+   "b": "helice",
+   "caixa": [
+    15,
+    114,
+    54,
+    157
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "cone",
+   "caixa": [
+    20,
+    114,
+    59,
+    157
+   ]
+  },
+  {
+   "a": "barbatana",
+   "b": "fuselagem",
+   "caixa": [
+    319,
+    115,
+    401,
+    157
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "luzAsa",
+   "caixa": [
+    166,
+    110,
+    205,
+    149
+   ]
+  },
+  {
+   "a": "asa",
+   "b": "luzAsa",
+   "caixa": [
+    166,
+    112,
+    205,
+    151
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "escape",
+   "caixa": [
+    38,
+    115,
+    85,
+    154
+   ]
+  },
+  {
+   "a": "asa",
+   "b": "porta",
+   "caixa": [
+    234,
+    123,
+    296,
+    162
+   ]
+  },
+  {
+   "a": "asa",
+   "b": "tremPrincipal",
+   "caixa": [
+    182,
+    136,
+    227,
+    175
+   ]
+  },
+  {
+   "a": "antenaVentral",
+   "b": "fuselagem",
+   "caixa": [
+    267,
+    135,
+    306,
+    174
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "tremNariz",
+   "caixa": [
+    73,
+    139,
+    127,
+    178
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "tremNariz",
+   "caixa": [
+    103,
+    139,
+    144,
+    178
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "saliencia3",
+   "caixa": [
+    133,
+    140,
+    172,
+    179
+   ]
+  },
+  {
+   "a": "chao",
+   "b": "tremNariz",
+   "caixa": [
+    68,
+    170,
+    107,
+    204
+   ]
+  },
+  {
+   "a": "chao",
+   "b": "tremPrincipal",
+   "caixa": [
+    189,
+    171,
+    228,
+    204
+   ]
+  }
+ ]
+}
