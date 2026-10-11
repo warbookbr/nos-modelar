@@ -1,0 +1,42 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "roda-de-prova",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 610, "minimo": 300, "maximo": 900, "medio": 600 },
+    "aro": { "tipo": "numero", "unidade": "mm", "padrao": 420, "minimo": 200, "maximo": 600, "medio": 400 },
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 125, "minimo": 60, "maximo": 400, "medio": 200 },
+    "inclinacaoDoFlange": { "tipo": "numero", "unidade": "graus", "padrao": 0, "minimo": 0, "maximo": 15, "medio": 5 },
+    "raios": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 36, "medio": 18 }
+  },
+  "restricoes": [
+    {
+      "id": "parede-do-pneu",
+      "expressao": "aro + 40 <= diametro",
+      "motivo": "o pneu precisa de ao menos 20 mm de parede de cada lado do aro, senão o aro atravessa a banda"
+    },
+    {
+      "id": "largura-do-aro",
+      "expressao": "largura <= aro",
+      "motivo": "um pneu mais largo que o aro vira uma roda de rolo, fora do que a família desenha"
+    }
+  ],
+  "portas": [
+    { "id": "assento-do-pneu", "tipo": "anel", "papel": "ocupa" },
+    { "id": "furo-do-cubo", "tipo": "anel", "papel": "recebe" },
+    { "id": "furacao-do-flange", "tipo": "padraoFuros", "papel": "recebe" }
+  ],
+  "ferramentas": ["rodaPneu", "repete"],
+  "perguntas": {
+    "pneu": [
+      "A banda tem a mesma espessura em toda a volta?",
+      "O flanco liga a banda ao aro sem degrau?"
+    ],
+    "aro": ["O aro é concêntrico com o pneu e com o furo do cubo?"]
+  },
+  "esboco": {
+    "componente": "roda",
+    "mapa": { "diametro": "diametro", "aro": "aro", "largura": "largura", "raios": "raios" }
+  }
+}

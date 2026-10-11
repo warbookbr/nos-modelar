@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1024 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1027 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -110,6 +110,7 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
@@ -798,6 +799,8 @@
 - `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
+- `familia.js` — familia.js — o contrato `mecanifica.familia@1` e o validador, puros e sem nenhum import.
+- `familia.test.js` — familia.test.js — o contrato `mecanifica.familia@1`: a fixture válida passa, cada defeito é recusado com o campo, o valor e o que é aceito, e a leitura norma…
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
 - `forma-da-parte.test.mjs` — forma-da-parte.test.mjs — a promessa de forma só vale se ela reprovar.
 - `forma-global-casco.test.mjs` — Orientação da malha do casco por seções na forma global N2. Para cada combinação de eixo de percurso, ordem dos eixos da seção e sentido do contorno (doze no…

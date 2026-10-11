@@ -118,7 +118,8 @@ mínimo, máximo e ponto médio, com dois julgamentos nos pontos de borda e o me
 valendo, enquanto a fatia 8 não calibra o crítico; e a pessoa assina a prancha
 dos três pontos.
 
-As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
+O contrato e o validador (tarefa 1) estão descritos em [contrato da
+família](CONTRATO-DA-FAMILIA.md). As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
 com faixa, restrição, `derivar` e registro explícito; (3) a varredura e o
 `descrever` enxergando o registro de composições; (4) a aprovação mecânica e o
 `familias:check`; (5) a conferência com o esboço pelo `REFINA`; (6) roda e pneu
