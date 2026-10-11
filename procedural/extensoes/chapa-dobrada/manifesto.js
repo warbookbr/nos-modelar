@@ -13,6 +13,7 @@ export const MANIFESTO = Object.freeze({
     uso: criarContratoUsoOperacao('chapaDobrada', {
       intencao: 'Criar uma chapa dobrada de espessura constante: uma sequência de abas retas unidas por dobras de raio interno declarado, extrudada numa largura.',
       campos: {
+        origemId: ['origemId', 'Identidade opcional da chapa; com ela a chapa publica a origem estrutural, citável por sel:{origem:{op:"chapaDobrada", id, aba|dobra, lado, borda, tampa}}. Sem ela a peça sai como antes e não publica origem.'],
         espessura: ['escalar', 'Espessura da chapa, maior que 0.'],
         raioInterno: ['escalar', 'Raio da face de dentro de toda dobra, maior ou igual a 0; a face de fora dobra em raioInterno + espessura.'],
         largura: ['escalar', 'Largura da chapa em z (o comprimento da dobra), maior que 0; a peça fica centrada em z = 0.'],
@@ -26,6 +27,7 @@ export const MANIFESTO = Object.freeze({
       precondicoes: ['Passe abas ou perfil, nunca os dois. As abas não podem se cruzar nem se encostar: a distância entre as linhas médias de duas abas que não são vizinhas precisa passar da espessura.'],
       limites: [
         'O comprimento planificado, o fator K e as demais medidas de chapa saem de medidasDaChapa(argumentos), em procedural/extensoes/chapa-dobrada/chapa.js, com a mesma conta da malha; a extensão em si só emite vértices e faces.',
+        'Com origemId, a citação combina eixos opcionais: aba (uma aba, as faces que correm ao longo dela) ou dobra (os pedaços do arco), lado (esquerda ou direita no sentido da linha média, ou dentro e fora de uma dobra), borda (inicio ou fim, a espessura cortada na ponta) e tampa (menos ou mais, as faces de z = -largura/2 e +largura/2). Aba e dobra aceitam inteiro, nome de parâmetro, primeira, ultima e {passo,fase}; dentro e fora não valem numa aba. Os grupos têm significado fixo, não posição na malha.',
         'Planificado = soma dos trechos retos + soma de |ângulo em radianos| · (raioInterno + fatorK · espessura) de cada dobra. A malha sai do raio pedido por arcos de ângulo igual: os vértices dos arcos estão exatamente em raioInterno e raioInterno + espessura do centro da dobra.',
         `Ids locais: vértices 0..n-1 no anel de z = -largura/2 e n..2n-1 no de z = +largura/2; face 0 é a tampa em -z, face 1 a tampa em +z e 2 + i o lado da aresta i do contorno. O contorno tem no máximo ${MAXIMO_DE_VERTICES_NO_CONTORNO} vértices.`,
         'Não há furo, recorte, aba com largura própria nem dobra em raio variável nesta versão; chapa que se fecha sobre si mesma (caixa fechada) é recusada.',

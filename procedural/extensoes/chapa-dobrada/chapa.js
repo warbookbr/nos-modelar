@@ -26,7 +26,7 @@ export const FATOR_K_PADRAO = 0.44;
 export const SEGMENTOS_POR_QUARTO_PADRAO = 6;
 export const MAXIMO_DE_VERTICES_NO_CONTORNO = 500;
 
-const CAMPOS = ['espessura', 'raioInterno', 'fatorK', 'largura', 'abas', 'perfil', 'segmentosPorQuarto'];
+const CAMPOS = ['espessura', 'raioInterno', 'fatorK', 'largura', 'abas', 'perfil', 'segmentosPorQuarto', 'origemId'];
 const MAXIMO_DE_ABAS = 32;
 const EPS = 1e-9;
 const RAD = Math.PI / 180;
@@ -73,6 +73,7 @@ function lerParametros(argumentos, resolver) {
   if (raioInterno < 0) recusar('raioInterno', argumentos.raioInterno, 'um número maior ou igual a 0 (raio 0 dá canto vivo por dentro)');
   const fatorK = argumentos.fatorK === undefined ? FATOR_K_PADRAO : numero(resolver, 'fatorK', argumentos.fatorK, `um número de 0 a 1 (padrão ${FATOR_K_PADRAO})`);
   if (fatorK < 0 || fatorK > 1) recusar('fatorK', argumentos.fatorK, `um número de 0 a 1 (padrão ${FATOR_K_PADRAO}); 0 é a face de dentro da dobra e 1 a de fora`);
+  if (argumentos.origemId !== undefined && !(Number.isSafeInteger(argumentos.origemId) && argumentos.origemId >= 0)) recusar('origemId', argumentos.origemId, 'um inteiro não negativo (a identidade da chapa; sem ele a chapa não publica origem)');
   const largura = numero(resolver, 'largura', argumentos.largura, 'um número maior que 0');
   if (!(largura > 0)) recusar('largura', argumentos.largura, 'um número maior que 0');
   const segmentosPorQuarto = argumentos.segmentosPorQuarto === undefined ? SEGMENTOS_POR_QUARTO_PADRAO : numero(resolver, 'segmentosPorQuarto', argumentos.segmentosPorQuarto, 'um inteiro de 1 a 64');
@@ -153,10 +154,11 @@ export function construirChapa(argumentos, resolver = (v) => v) {
   const { pontos, giros, recuos, retos, nome } = linha;
   const direcoes = pontos.slice(0, -1).map((p, i) => { const q = pontos[i + 1], t = Math.hypot(q[0] - p[0], q[1] - p[1]); return [(q[0] - p[0]) / t, (q[1] - p[1]) / t]; });
 
-  // contorno: a face da direita indo, a da esquerda voltando (anti-horário); os arcos são cortados em segmentos de ângulo igual
-  const esq = [], dir = [];
-  const empurrar = (p, d) => { const n = esquerda(d); esq.push([p[0] + n[0] * h, p[1] + n[1] * h]); dir.push([p[0] - n[0] * h, p[1] - n[1] * h]); };
-  empurrar(pontos[0], direcoes[0]);
+  // contorno: a face da direita indo, a da esquerda voltando (anti-horário); os arcos são cortados em segmentos de ângulo igual.
+  // `trecho` leva, junto de cada estação, o que é o segmento que sai dela: uma aba reta ou um pedaço do arco de uma dobra.
+  const esq = [], dir = [], trecho = [];
+  const empurrar = (p, d, seguinte) => { const n = esquerda(d); esq.push([p[0] + n[0] * h, p[1] + n[1] * h]); dir.push([p[0] - n[0] * h, p[1] - n[1] * h]); trecho.push(seguinte); };
+  empurrar(pontos[0], direcoes[0], { aba: 0 });
   const divisoes = [];
   giros.forEach((giro, k) => {
     const entra = direcoes[k], recuo = recuos[k], v = pontos[k + 1], sinal = Math.sign(giro);
@@ -166,13 +168,19 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     divisoes.push(partes);
     for (let s = 0; s <= partes; s++) {
       const a = giro * s / partes, r = rotacionar(raio, a);
-      empurrar([centro[0] + r[0], centro[1] + r[1]], rotacionar(entra, a));
+      empurrar([centro[0] + r[0], centro[1] + r[1]], rotacionar(entra, a), s < partes ? { dobra: k } : { aba: k + 1 });
     }
   });
-  empurrar(pontos[pontos.length - 1], direcoes[direcoes.length - 1]);
+  empurrar(pontos[pontos.length - 1], direcoes[direcoes.length - 1], null);
 
-  let contorno = [...dir, ...esq.slice().reverse()].map(([x, y]) => [arredondar(x), arredondar(y)]);
-  contorno = contorno.filter((p, i) => { const q = contorno[(i + 1) % contorno.length]; return Math.hypot(q[0] - p[0], q[1] - p[1]) > EPS; });
+  // as arestas do contorno, na ordem dele: a aresta i sai do vértice i e dá o lado i da peça; cada uma diz de que é
+  const m = dir.length, bruto = [], rotulos = [];
+  for (let j = 0; j < m; j++) { bruto.push(dir[j]); rotulos.push(j < m - 1 ? { ...trecho[j], lado: 'direita' } : { borda: 'fim' }); }
+  for (let j = m - 1; j >= 0; j--) { bruto.push(esq[j]); rotulos.push(j > 0 ? { ...trecho[j - 1], lado: 'esquerda' } : { borda: 'inicio' }); }
+  let contorno = bruto.map(([x, y]) => [arredondar(x), arredondar(y)]);
+  const mantidos = contorno.map((p, i) => { const q = contorno[(i + 1) % contorno.length]; return Math.hypot(q[0] - p[0], q[1] - p[1]) > EPS; });
+  let arestas = rotulos.filter((_, i) => mantidos[i]);
+  contorno = contorno.filter((_, i) => mantidos[i]);
   if (contorno.length > MAXIMO_DE_VERTICES_NO_CONTORNO) {
     recusar('segmentosPorQuarto', segmentosPorQuarto, `um valor que mantenha o contorno em ${MAXIMO_DE_VERTICES_NO_CONTORNO} vértices ou menos (este dá ${contorno.length}); reduza segmentosPorQuarto ou o número de dobras`);
   }
@@ -181,7 +189,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     if (par) recusar(`${nome(par[0])} e ${nome(par[1])}`, 'abas que se cruzam ou se encostam', `abas separadas por folga positiva (a espessura é ${espessura}); mude comprimentos ou ângulos`);
     recusar('abas', 'contorno que se cruza ou se toca', 'abas e dobras que não se cruzem nem se encostem (as dobras vizinhas ou uma aba e uma dobra de outra se atravessam); mude comprimentos, ângulos, raioInterno ou espessura');
   }
-  if (areaDoContorno(contorno) < 0) contorno.reverse();
+  if (areaDoContorno(contorno) < 0) { contorno.reverse(); arestas = arestas.map((_, j) => arestas[(arestas.length * 2 - 2 - j) % arestas.length]); }
 
   const dobras = giros.map((giro, k) => ({
     angulo: arredondar(giro / RAD), raioInterno, raioExterno: arredondar(raioInterno + espessura),
@@ -196,7 +204,12 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     comprimentoReto: arredondar(comprimentoReto), desenvolvimentoDasDobras: arredondar(comprimentoDasDobras),
     comprimentoPlanificado, areaPlanificada: arredondar(comprimentoPlanificado * largura),
   });
-  return Object.freeze({ contorno, largura, espessura, medidas, divisoesPorDobra: Object.freeze(divisoes) });
+  // quais lados das dobras são de dentro: o lado para onde a dobra gira (esquerda quando o ângulo é positivo)
+  const arestasDaChapa = arestas.map((a) => {
+    if (a.dobra === undefined) return Object.freeze({ ...a });
+    return Object.freeze({ ...a, dentro: (giros[a.dobra] > 0) === (a.lado === 'esquerda') });
+  });
+  return Object.freeze({ contorno, largura, espessura, medidas, divisoesPorDobra: Object.freeze(divisoes), arestas: Object.freeze(arestasDaChapa), abas: retos.length, dobras: giros.length });
 }
 
 /* As medidas de chapa dos argumentos de `chapaDobrada`, sem montar malha: espessura, raios, fator K, trechos retos, ângulo,
