@@ -12,6 +12,10 @@
  *     mesmo hash da geometria em duas execuções, portas declaradas presentes e conferidas contra a malha, e as medidas
  *     das ferramentas que a receita usou (parede da casca, planificado da chapa, corte das barras, curso da articulação).
  *
+ * A família que declara `perfis` (`familia.json`) tem também uma chamada por perfil, medida como um dos três pontos, e a escala
+ * de cada perfil varrida (cada parâmetro em milímetro no mínimo e no máximo, os outros nos valores do perfil); o hash de cada
+ * perfil entra em `mecanica.perfis` e o gate o confere.
+ *
  * Recusa por restrição que a família declara é resposta, não defeito: nos extremos da varredura ela é registrada. Nos
  * três pontos ela reprova, porque ponto aprovado precisa ser chamável.
  *
@@ -91,6 +95,27 @@ export function varreduraDaFamilia(contrato) {
     extremo,
     parametros: { ...padroes, [nome]: contrato.parametros[nome][extremo] },
   })));
+}
+
+/** Os pontos dos perfis: para cada perfil do contrato, todos os parâmetros completos (o do perfil, senão o padrão). */
+export function pontosDosPerfis(contrato) {
+  const padroes = Object.fromEntries(Object.entries(contrato.parametros).map(([nome, { padrao }]) => [nome, padrao]));
+  return Object.fromEntries(Object.entries(contrato.perfis ?? {}).map(([nome, perfil]) => [nome, { ...padroes, ...perfil.parametros }]));
+}
+
+/**
+ * A varredura de escala dos perfis: cada perfil com cada parâmetro em milímetro no mínimo e no máximo da faixa, os outros nos
+ * valores do perfil. Numa família cujas medidas são proporções do diâmetro, é o perfil chamado em qualquer tamanho.
+ */
+export function escalasDosPerfis(contrato) {
+  const mm = Object.entries(contrato.parametros).filter(([, { unidade }]) => unidade === 'mm').map(([nome]) => nome);
+  return Object.entries(pontosDosPerfis(contrato)).flatMap(([perfil, base]) => mm.flatMap((nome) => ['minimo', 'maximo'].map((extremo) => ({
+    rotulo: `${perfil}: ${nome}=${contrato.parametros[nome][extremo]}`,
+    perfil,
+    parametro: nome,
+    extremo,
+    parametros: { ...base, [nome]: contrato.parametros[nome][extremo] },
+  }))));
 }
 
 /** A receita que chama a família com `parametros`; o `get` faz a recusa acontecer na leitura, antes de existir passo. */
@@ -355,12 +380,27 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
   for (const ponto of varredura) {
     for (const p of ponto.problemas) problemas.push({ ponto: `varredura ${ponto.rotulo}`, ...p });
   }
+  /* os perfis: cada um é uma chamada que a família tem de aceitar e medir como um dos três pontos, e a escala deles varre o
+     diâmetro; a recusa por restrição declarada vale nas sondas de escala, e no ponto do perfil reprova */
+  const perfis = Object.fromEntries(Object.entries(pontosDosPerfis(familia.contrato)).map(([nome, parametros]) => [nome, medirPonto(familia, parametros, `perfil ${nome}`)]));
+  for (const ponto of Object.values(perfis)) {
+    if (ponto.estado === 'recusa-declarada') {
+      problemas.push({ ponto: ponto.rotulo, ...problema('ponto-aprovado-recusado', `o ${ponto.rotulo} é recusado pela restrição '${ponto.restricao}': ${ponto.motivo}`) });
+    }
+    for (const p of ponto.problemas) problemas.push({ ponto: ponto.rotulo, ...p });
+  }
+  const escalas = escalasDosPerfis(familia.contrato).map((sonda) => ({ ...medirPonto(familia, sonda.parametros, sonda.rotulo, { montagem: 'nenhuma' }), perfil: sonda.perfil, parametro: sonda.parametro, extremo: sonda.extremo }));
+  for (const ponto of escalas) {
+    for (const p of ponto.problemas) problemas.push({ ponto: `escala ${ponto.rotulo}`, ...p });
+  }
   const aprovada = problemas.length === 0;
-  const resultado = { aprovada, familia: id, pontos, varredura, problemas, gravada: false, esvaziou: false };
+  const resultado = { aprovada, familia: id, pontos, varredura, perfis, escalas, problemas, gravada: false, esvaziou: false };
   if (!aprovada || !gravar || !pasta) return resultado;
 
   const anterior = lerAprovacaoGravada(pasta);
-  const mesmaGeometria = Boolean(anterior?.mecanica?.pontos) && NOMES_DOS_PONTOS.every((nome) => anterior.mecanica.pontos[nome]?.hash === pontos[nome].hash);
+  const mesmaGeometria = Boolean(anterior?.mecanica?.pontos) && NOMES_DOS_PONTOS.every((nome) => anterior.mecanica.pontos[nome]?.hash === pontos[nome].hash)
+    && Object.keys(perfis).every((nome) => anterior.mecanica.perfis?.[nome]?.hash === perfis[nome].hash)
+    && Object.keys(anterior.mecanica.perfis ?? {}).length === Object.keys(perfis).length;
   const aprovacao = {
     formato: FORMATO_APROVACAO,
     familia: id,
@@ -373,6 +413,13 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
         recusasDeclaradas: varredura.filter((p) => p.estado === 'recusa-declarada').map((p) => ({ ponto: p.rotulo, restricao: p.restricao })),
       },
       portas: pontos.medio.portas,
+      ...(Object.keys(perfis).length ? {
+        perfis: Object.fromEntries(Object.entries(perfis).map(([nome, ponto]) => [nome, pontoGravado(ponto)])),
+        escalasDosPerfis: {
+          sondas: escalas.length,
+          recusasDeclaradas: escalas.filter((p) => p.estado === 'recusa-declarada').map((p) => ({ ponto: p.rotulo, restricao: p.restricao })),
+        },
+      } : {}),
     },
     critico: mesmaGeometria ? (anterior.critico ?? null) : null,
     pessoa: mesmaGeometria ? (anterior.pessoa ?? null) : null,
@@ -390,6 +437,18 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
   const problemas = [];
   const id = familia?.contrato?.id;
   const reprovar = (codigo, mensagem, ponto = null) => problemas.push({ ...(ponto ? { ponto } : {}), ...problema(codigo, mensagem) });
+  /* a montagem que a família gera (portas e gavetas): o curso conferido sem colisão, sozinha e com as outras abertas, e a impressão */
+  const conferirMontagemGravada = (atual, aprovado, quem, ponto) => {
+    if (!atual.montagem) return;
+    const gravada = aprovado.montagem;
+    if (!gravada?.conferido || gravada.articulacoes.some((articulacao) => !articulacao.conferido || articulacao.colisoes)
+      || (gravada.articulacoes.length > 1 && (!gravada.simultaneas?.conferido || gravada.simultaneas.colisoes))) {
+      reprovar('curso-nao-conferido', `${quem} não traz o curso da articulação conferido contra as malhas e sem colisão, sozinha e com as outras abertas ao mesmo tempo; reaprove com npm run familia -- aprovar ${id}`, ponto);
+    }
+    if (atual.montagem.hash !== gravada?.hash) {
+      reprovar('montagem-mudou', `a montagem que a família gera em ${quem} mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, ponto);
+    }
+  };
   try {
     lerFamilia(familia.contrato);
   } catch (erro) {
@@ -441,16 +500,32 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
     } else if (atual.hash !== null && atual.hash !== aprovado.hash) {
       reprovar('geometria-mudou', `a geometria do ponto '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, nome);
     }
-    if (atual.montagem) {
-      const gravada = aprovado.montagem;
-      if (!gravada?.conferido || gravada.articulacoes.some((articulacao) => !articulacao.conferido || articulacao.colisoes)) {
-        reprovar('curso-nao-conferido', `o ponto '${nome}' não traz o curso da articulação conferido contra as malhas e sem colisão; reaprove com npm run familia -- aprovar ${id}`, nome);
-      }
-      if (atual.montagem.hash !== gravada?.hash) {
-        reprovar('montagem-mudou', `a montagem que a família gera no ponto '${nome}' mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, nome);
-      }
-    }
+    conferirMontagemGravada(atual, aprovado, `o ponto '${nome}'`, nome);
     for (const p of atual.problemas) reprovar(p.codigo, `no ponto '${nome}': ${p.mensagem}`, nome);
+  }
+  const definidosDosPerfis = pontosDosPerfis(familia.contrato);
+  for (const nome of Object.keys(aprovacao.mecanica.perfis ?? {})) {
+    if (!definidosDosPerfis[nome]) reprovar('perfil-removido', `o perfil '${nome}' está na aprovação e o contrato não o declara mais; reaprove com npm run familia -- aprovar ${id}`, `perfil ${nome}`);
+  }
+  for (const [nome, parametros] of Object.entries(definidosDosPerfis)) {
+    const rotulo = `perfil ${nome}`;
+    const aprovado = aprovacao.mecanica.perfis?.[nome];
+    if (!aprovado?.hash || !aprovado.parametros) {
+      reprovar('perfil-nao-aprovado', `o perfil '${nome}' não está na aprovação mecânica; reaprove com npm run familia -- aprovar ${id}`, rotulo);
+      continue;
+    }
+    if (JSON.stringify(aprovado.parametros) !== JSON.stringify(parametros)) {
+      reprovar('perfil-mudou-de-parametros', `o perfil '${nome}' aprovado tinha ${JSON.stringify(aprovado.parametros)} e o contrato agora o completa com ${JSON.stringify(parametros)}; reaprove com npm run familia -- aprovar ${id}`, rotulo);
+      continue;
+    }
+    const atual = medirPonto(familia, parametros, rotulo, { montagem: 'hash' });
+    if (atual.estado === 'recusa-declarada') {
+      reprovar('ponto-aprovado-recusado', `o perfil '${nome}' agora é recusado pela restrição '${atual.restricao}': ${atual.motivo}`, rotulo);
+    } else if (atual.hash !== null && atual.hash !== aprovado.hash) {
+      reprovar('geometria-mudou', `a geometria do perfil '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, rotulo);
+    }
+    conferirMontagemGravada(atual, aprovado, `o perfil '${nome}'`, rotulo);
+    for (const p of atual.problemas) reprovar(p.codigo, `no perfil '${nome}': ${p.mensagem}`, rotulo);
   }
   return { ok: problemas.length === 0, familia: id, problemas };
 }

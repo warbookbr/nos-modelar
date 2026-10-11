@@ -80,8 +80,10 @@ export async function aprovar(id, opcoes, saida = console) {
     saida.log(JSON.stringify(resultado, null, 2));
   } else if (resultado.aprovada) {
     const estados = resultado.varredura.map((p) => p.estado);
-    saida.log(`familia ${id}: aprovada na camada mecânica — 3 pontos, ${resultado.varredura.length} sondas da varredura (${estados.filter((e) => e === 'recusa-declarada').length} recusadas por restrição declarada).`);
+    const perfis = Object.entries(resultado.perfis ?? {});
+    saida.log(`familia ${id}: aprovada na camada mecânica — 3 pontos${perfis.length ? `, ${perfis.length} perfis` : ''}, ${resultado.varredura.length} sondas da varredura (${estados.filter((e) => e === 'recusa-declarada').length} recusadas por restrição declarada)${perfis.length ? ` e ${resultado.escalas.length} sondas de escala dos perfis (${resultado.escalas.filter((p) => p.estado === 'recusa-declarada').length} recusadas)` : ''}.`);
     for (const [nome, ponto] of Object.entries(resultado.pontos)) saida.log(`  ${nome}: ${ponto.hash}`);
+    for (const [nome, ponto] of perfis) saida.log(`  perfil ${nome}: ${ponto.hash}`);
     saida.log(resultado.gravada ? `  gravada em ${join(entrada.pasta, 'aprovacao.json')}${resultado.esvaziou ? ' (a geometria mudou: as camadas do crítico e da pessoa foram esvaziadas)' : ''}.` : '  nada gravado (--sem-gravar).');
   } else {
     saida.error(`familia ${id}: REPROVADA na camada mecânica — ${resultado.problemas.length} problema(s):`);

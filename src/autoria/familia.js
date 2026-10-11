@@ -44,8 +44,12 @@ export const FERRAMENTAS_DE_FAMILIA = Object.freeze([
   'ressalto', 'rodaPneu', 'rolamento', 'rosca', 'tecido', 'texto', 'textura', 'tubulacao', 'varre', 'vedacao',
 ].sort());
 
-const CAMPOS_DA_FAMILIA = ['formato', 'id', 'versao', 'nivel', 'parametros', 'restricoes', 'portas', 'ferramentas', 'perguntas', 'esboco'];
-const CAMPOS_OBRIGATORIOS = CAMPOS_DA_FAMILIA.filter((campo) => campo !== 'esboco');
+const CAMPOS_DA_FAMILIA = ['formato', 'id', 'versao', 'nivel', 'parametros', 'restricoes', 'portas', 'ferramentas', 'perguntas', 'esboco', 'perfis'];
+const CAMPOS_OPCIONAIS = ['esboco', 'perfis'];
+const CAMPOS_OBRIGATORIOS = CAMPOS_DA_FAMILIA.filter((campo) => !CAMPOS_OPCIONAIS.includes(campo));
+const CAMPOS_DO_PERFIL = ['descricao', 'parametros'];
+/* O nome reservado da chamada: `chamar(familia, id, { perfil: 'nome', ...ajustes })` parte dos valores do perfil. */
+export const PARAMETRO_DE_PERFIL = 'perfil';
 const CAMPOS_DO_PARAMETRO = ['tipo', 'unidade', 'padrao', 'minimo', 'maximo', 'medio'];
 const CAMPOS_DA_RESTRICAO = ['id', 'expressao', 'motivo'];
 const CAMPOS_DA_PORTA = ['id', 'tipo', 'papel'];
@@ -62,6 +66,7 @@ const IDENTIFICADOR = /^[A-Za-z][A-Za-z0-9_-]*$/;
 const NOME_DA_PARTE = /^[a-zA-Z][a-zA-Z0-9]*$/;
 const NOME_DO_COMPONENTE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const NOME_NO_COMPONENTE = /^[A-Za-z][A-Za-z0-9_]*$/;
+const ID_DO_PERFIL = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
 /* Funções da expressão de restrição, sobre números. Os ângulos entram em graus, como nas expressões da Oficina. */
 const GRAUS = 180 / Math.PI;
@@ -248,7 +253,7 @@ export function lerFamilia(bruta, opcoes = {}) {
   const parametros = {};
   for (const nome of Object.keys(bruta.parametros).sort(comparar)) {
     const campo = `parametros.${nome}`;
-    if (!NOME_DE_PARAMETRO.test(nome) || Object.hasOwn(FUNCOES, nome)) recusar(campo, nome, `nome começando em minúscula, só letras e dígitos, que não seja função da expressão (${lista(Object.keys(FUNCOES))})`);
+    if (!NOME_DE_PARAMETRO.test(nome) || Object.hasOwn(FUNCOES, nome) || nome === PARAMETRO_DE_PERFIL) recusar(campo, nome, `nome começando em minúscula, só letras e dígitos, que não seja função da expressão (${lista(Object.keys(FUNCOES))}) nem '${PARAMETRO_DE_PERFIL}', o nome reservado da chamada por perfil`);
     const p = objetoCom(bruta.parametros[nome], campo, CAMPOS_DO_PARAMETRO);
     const tipo = uma(p.tipo, `${campo}.tipo`, TIPOS_DE_PARAMETRO);
     const unidade = uma(p.unidade, `${campo}.unidade`, UNIDADES_DE_PARAMETRO);
@@ -407,9 +412,41 @@ export function lerFamilia(bruta, opcoes = {}) {
     if (Object.hasOwn(bruta.esboco, 'conferencia')) esboco.conferencia = lerConferencia(bruta.esboco.conferencia);
   }
 
+  /* Perfis: pontos nomeados da família. Cada um preenche parâmetros e a chamada `{ perfil }` parte deles; o que o perfil
+     não cita fica no padrão. Um perfil é uma chamada que a família tem de aceitar, então a leitura o confere inteiro. */
+  let perfis;
+  if (Object.hasOwn(bruta, 'perfis')) {
+    if (!plano(bruta.perfis) || !Object.keys(bruta.perfis).length) recusar('perfis', bruta.perfis, 'objeto { nome do perfil: { descricao, parametros } } com ao menos um perfil; omita o campo se a família não tem perfis');
+    perfis = {};
+    for (const nome of Object.keys(bruta.perfis).sort(comparar)) {
+      const campo = `perfis.${nome}`;
+      if (!ID_DO_PERFIL.test(nome)) recusar(campo, nome, 'identificador em minúsculas com hífen entre as palavras');
+      const perfil = objetoCom(bruta.perfis[nome], campo, CAMPOS_DO_PERFIL);
+      const descricao = textoLivre(perfil.descricao, `${campo}.descricao`, 'texto com o objeto que o perfil representa');
+      if (!plano(perfil.parametros) || !Object.keys(perfil.parametros).length) recusar(`${campo}.parametros`, perfil.parametros, 'objeto { parâmetro da família: valor } com ao menos um parâmetro');
+      const valores = {};
+      for (const parametro of Object.keys(perfil.parametros).sort(comparar)) {
+        const alvo = `${campo}.parametros.${parametro}`;
+        if (!Object.hasOwn(parametros, parametro)) recusar(alvo, perfil.parametros[parametro], `parâmetro da família: ${lista(nomesDosParametros)}`);
+        const { tipo, unidade, minimo, maximo } = parametros[parametro];
+        const valor = perfil.parametros[parametro];
+        if (!Number.isFinite(valor) || (tipo === 'inteiro' && !Number.isInteger(valor)) || valor < minimo || valor > maximo) {
+          recusar(alvo, valor, `${tipo === 'inteiro' ? 'número inteiro' : 'número'} em ${unidade} dentro da faixa [${minimo}, ${maximo}]`);
+        }
+        valores[parametro] = semZeroNegativo(valor);
+      }
+      const completos = Object.fromEntries(nomesDosParametros.map((parametro) => [parametro, Object.hasOwn(valores, parametro) ? valores[parametro] : parametros[parametro].padrao]));
+      for (const restricao of restricoes) {
+        const resultado = avaliarRestricao(restricao, completos);
+        if (!resultado.satisfeita) recusar(`${campo}.parametros`, valores, `parâmetros que satisfaçam a restrição '${restricao.id}' (${restricao.expressao}; o lado esquerdo vale ${resultado.esquerda} e o direito ${resultado.direita}): ${restricao.motivo}`);
+      }
+      perfis[nome] = { descricao, parametros: valores };
+    }
+  }
+
   return congelar({
     formato: FORMATO_FAMILIA, id, versao, nivel, parametros, restricoes, portas,
-    ferramentas: [...ferramentas].sort(comparar), perguntas, ...(esboco ? { esboco } : {}),
+    ferramentas: [...ferramentas].sort(comparar), perguntas, ...(esboco ? { esboco } : {}), ...(perfis ? { perfis } : {}),
   });
 }
 
@@ -482,5 +519,12 @@ export const SCHEMA_FAMILIA = congelar({
         }),
       }, ['partes', 'tolerancia']),
     }, ['componente', 'mapa']),
+    perfis: {
+      type: 'object', minProperties: 1, propertyNames: { pattern: ID_DO_PERFIL.source },
+      additionalProperties: objetoFechado({
+        descricao: textoNaoVazio(),
+        parametros: { type: 'object', minProperties: 1, propertyNames: { pattern: NOME_DE_PARAMETRO.source }, additionalProperties: { type: 'number' } },
+      }),
+    },
   }, CAMPOS_OBRIGATORIOS),
 });

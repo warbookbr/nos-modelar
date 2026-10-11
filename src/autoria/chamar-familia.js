@@ -3,13 +3,15 @@
    Uma família carregada (`definirFamilia`) junta o contrato lido por `lerFamilia`, as composições procedurais que ela
    usa e o `derivar`, uma função pura. `chamar` completa os parâmetros com os padrões, recusa parâmetro desconhecido,
    valor fora do tipo ou da faixa e restrição violada (com o motivo que a família declara), chama o `derivar` e devolve
-   a chamada de composição que a receita põe em `CHAMADAS_COMPOSICOES`: `{ id, composicao, argumentos }`.
+   a chamada de composição que a receita põe em `CHAMADAS_COMPOSICOES`: `{ id, composicao, argumentos }`. A família com
+   `perfis` aceita também `perfil: 'nome'` entre os parâmetros: o perfil preenche os parâmetros que ele cita, e o que o
+   chamador escreve vale mais que o perfil.
 
    Os parâmetros entram em milímetro, graus ou contagem, como o contrato declara. O `derivar` recebe esses valores já
    completos e devolve `{ composicao, argumentos }` com os argumentos em metro, porque a composição v1 só substitui
    valores e não converte unidade. A recusa acontece antes de qualquer passo existir, então uma chamada recusada não
    gera malha. O arquivo só depende do contrato da família. */
-import { ErroFamilia, avaliarRestricao, lerFamilia } from './familia.js';
+import { ErroFamilia, PARAMETRO_DE_PERFIL, avaliarRestricao, lerFamilia } from './familia.js';
 
 const ID_DA_CHAMADA = /^[a-z][a-z0-9-]*$/;
 const plano = (valor) => valor !== null && typeof valor === 'object' && !Array.isArray(valor);
@@ -56,13 +58,23 @@ function conferirParametros(contrato, brutos) {
   const recusar = (campo, valor, aceito, extra) => { throw new ErroChamadaDeFamilia({ familia: contrato.id, campo, valor, aceito, ...extra }); };
   if (!plano(brutos)) recusar('parametros', brutos, 'objeto { nome do parâmetro: valor }');
   const nomes = Object.keys(contrato.parametros);
+  /* o perfil é o ponto de partida: o valor vem do chamador, senão do perfil, senão do padrão do contrato */
+  const nomesDosPerfis = Object.keys(contrato.perfis ?? {});
+  let doPerfil = {};
+  if (brutos[PARAMETRO_DE_PERFIL] !== undefined) {
+    const nome = brutos[PARAMETRO_DE_PERFIL];
+    if (!nomesDosPerfis.length) recusar(`parametros.${PARAMETRO_DE_PERFIL}`, nome, 'nada: a família não declara perfis');
+    if (typeof nome !== 'string' || !Object.hasOwn(contrato.perfis, nome)) recusar(`parametros.${PARAMETRO_DE_PERFIL}`, nome, `um perfil da família: ${lista(nomesDosPerfis)}`);
+    doPerfil = contrato.perfis[nome].parametros;
+  }
   for (const nome of Object.keys(brutos).sort(comparar)) {
-    if (!Object.hasOwn(contrato.parametros, nome)) recusar(`parametros.${nome}`, brutos[nome], `parâmetro conhecido da família: ${lista(nomes)}`);
+    if (nome === PARAMETRO_DE_PERFIL) continue;
+    if (!Object.hasOwn(contrato.parametros, nome)) recusar(`parametros.${nome}`, brutos[nome], `parâmetro conhecido da família: ${lista(nomes)}${nomesDosPerfis.length ? `, ou '${PARAMETRO_DE_PERFIL}' (${lista(nomesDosPerfis)})` : ''}`);
   }
   const completos = {};
   for (const nome of nomes) {
     const { tipo, unidade, padrao, minimo, maximo } = contrato.parametros[nome];
-    const valor = brutos[nome] === undefined ? padrao : brutos[nome];
+    const valor = brutos[nome] !== undefined ? brutos[nome] : (Object.hasOwn(doPerfil, nome) ? doPerfil[nome] : padrao);
     if (typeof valor !== 'number' || !Number.isFinite(valor)) recusar(`parametros.${nome}`, valor, `número finito em ${unidade}, entre ${minimo} e ${maximo}`);
     if (tipo === 'inteiro' && !Number.isInteger(valor)) recusar(`parametros.${nome}`, valor, `número inteiro (contagem), entre ${minimo} e ${maximo}`);
     if (valor < minimo || valor > maximo) recusar(`parametros.${nome}`, valor, `valor em ${unidade} dentro da faixa [${minimo}, ${maximo}]`);
