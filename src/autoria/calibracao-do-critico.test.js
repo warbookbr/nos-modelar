@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  CLASSES, ErroDeCalibracao, FAIXAS_DA_NOTA, TIPOS_DO_CONJUNTO, citaDefeito, defeitosDaMedida, defeitosDoCritico, extrairVeredito, lerConjunto, medidasEsperadas,
+  APROVACAO_DO_PERFIL, CLASSES, ErroDeCalibracao, FAIXAS_DA_NOTA, TIPOS_DO_CONJUNTO, citaDefeito, defeitosDaMedida, defeitosDoCritico, extrairVeredito, lerConjunto, medidasEsperadas,
   pontuarConjunto, pontuarImagem, resumoDoConjunto,
 } from './calibracao-do-critico.js';
 import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
@@ -102,6 +102,19 @@ describe('o que o formato recusa', () => {
     recusa((c) => { imagem(c, 'ponta-no-ar').defeitos[0].sentido = 'maior'; }, /sentido de 'uniao'/);
     recusa((c) => { imagem(c, 'ponta-no-ar').defeitos[0].onde = 'tudo'; }, /nunca o corpo inteiro/);
     recusa((c) => { imagem(c, 'ponta-no-ar').defeitos[0].tiposAceitos = ['posicao']; }, /inclui o próprio tipo/);
+  });
+
+  it('fonte de perfil: o controle da roda parte do perfil carro e é a geometria aprovada dele', () => {
+    const c = lido();
+    const roda = imagem(c, 'controle-roda').fonte;
+    expect(roda).toMatchObject({ perfil: 'carro', aprovacao: APROVACAO_DO_PERFIL });
+    expect(roda.base).toBeUndefined();
+    expect(lerConjunto(c).imagens.find((i) => i.nome === 'controle-roda').fonte.perfil).toBe('carro');
+    recusa((x) => { imagem(x, 'controle-roda').fonte.base = 'medio'; }, /a chamada parte do perfil/);
+    recusa((x) => { imagem(x, 'controle-roda').fonte.aprovacao = 'medio'; }, /geometria aprovada do perfil/);
+    recusa((x) => { imagem(x, 'controle-roda').fonte.perfil = 'Carro Novo'; }, /nome de um perfil/);
+    recusa((x) => { imagem(x, 'controle-roda').fonte.parametros = { desvio: 30 }; }, /só o controle/);
+    recusa((x) => { imagem(x, 'controle-cilindro').fonte.aprovacao = 'perfil'; }, /ponto aprovado da família/);
   });
 
   it('decide: a medida cita medida declarada, e o crítico cita palavras em minúsculas', () => {
@@ -266,6 +279,24 @@ describe('a pontuação de uma imagem', () => {
     expect(p.motivos).toEqual(["o defeito de 'pisoCacamba' foi citado em 0 de 5 julgamentos (mínimo 4)"]);
     const ambos = jg(6, [defeito('rodas', 'ausencia'), defeito('piso', 'uniao')]);
     expect(pontuarImagem(img, Array(5).fill(ambos)).acerta).toBe(true);
+  });
+
+  it('o estrutural é o da escala do brief: comprimento, espessura, angulo e superficie não contam no controle', () => {
+    const img = lerConjunto(lido()).imagens.find((i) => i.nome === 'controle-cilindro');
+    const limpo = jg(8);
+    const proporcao = [
+      jg(8, [defeito('haste', 'comprimento'), defeito('olhal', 'espessura')]),
+      jg(8, [defeito('haste', 'comprimento'), defeito('olhal', 'espessura')]),
+      jg(8, [defeito('tubo', 'superficie'), defeito('haste', 'angulo')]),
+      limpo, limpo,
+    ];
+    const p = pontuarImagem(img, proporcao);
+    expect(p.criterios.estruturais).toMatchObject({ n: 0, ok: true });
+    expect(p.acerta).toBe(true);
+    for (const tipo of ['uniao', 'posicao', 'ausencia']) {
+      const dois = pontuarImagem(img, [jg(8, [defeito('haste', tipo)]), jg(8, [defeito('olhal', tipo)]), limpo, limpo, limpo]);
+      expect(dois.criterios.estruturais, tipo).toMatchObject({ n: 2, ok: false });
+    }
   });
 
   it('o controle erra com defeito estrutural em mais de um julgamento; o de superfície não conta', () => {

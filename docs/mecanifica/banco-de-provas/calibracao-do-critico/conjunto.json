@@ -198,30 +198,30 @@
       "fonte": {
         "tipo": "familia",
         "familia": "roda-pneu",
-        "base": "medio",
-        "aprovacao": "medio",
-        "geometria": "sha256:935ccc377fcb3795f669fc2e2db5c5993b85b7a41f73975860c4ac51dfee6859"
+        "perfil": "carro",
+        "aprovacao": "perfil",
+        "geometria": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5"
       },
       "defeitos": [],
       "desenho": {
-        "hash": "sha256:8f76c0a884e7494722ce401441f4564ee3e61533bb9382c42738beaf3f055116"
+        "hash": "sha256:5c3ea74a78338bf8144f5a76d1bff7c4ccbfc38b1bfaadcef944a2bed894bf22"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c02/isometrica.png",
-          "sha256": "sha256:020e83780a59bc13b291fbb9d9fb2326fe178fad7c9ecab06a9a47eefaf6fc45"
+          "sha256": "sha256:9ae04ab7a2a335ccafa73e90b563716c2a52231ec24aec8d58c6b5a9058adccf"
         },
         "frontal": {
           "arquivo": "imagens/c02/frontal.png",
-          "sha256": "sha256:b30804b3456e6a4c3cd49d12354df488dffb94e6486d6860a00344b927f970ae"
+          "sha256": "sha256:f28b736ad0ba3fa64ac3ee3983cc5906d2ce31c9c33c8244b020873c0d2ebad7"
         },
         "lateral": {
           "arquivo": "imagens/c02/lateral.png",
-          "sha256": "sha256:496fc9afe0fe642ddfc825b4e1d182e4ffa97fa246387e8a4e304bb77daf4423"
+          "sha256": "sha256:8ff13ed081659fba9bb9cadb351a4353a2668f539d681220c2e8ec1b9ee0828b"
         },
         "superior": {
           "arquivo": "imagens/c02/superior.png",
-          "sha256": "sha256:d937f6d711708047234ebd7aa0fb6837d2cb7c05028be9ae481176751a85f6cb"
+          "sha256": "sha256:3d9603a4f60e60fde007a40c627f424d0e69085ba37882aadb02a491e14d6f81"
         }
       }
     },
@@ -1436,6 +1436,6 @@
   ],
   "prancha": {
     "arquivo": "prancha.png",
-    "sha256": "sha256:dfd8fa2a78a952e6b3d50a266910e04d7447b3077f39cb77ddd2258c9c61e352"
+    "sha256": "sha256:d95c4a068d05ae2d23cb4f52dca1eb6edaa7f072492ba8a5166a7b06676bf2d9"
   }
 }

@@ -13,6 +13,7 @@ import {
   faltaNoAgente, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, modeloDoBrief, principal, registrar,
   resumo, vazamentosDoBrief, vocabularioDoAgente,
 } from './calibracao-do-critico.mjs';
+import { hashDe } from './aprovacao-da-familia.mjs';
 import { linhasDoBriefDoObjeto } from './esboco.mjs';
 
 const conjuntoNovo = () => JSON.parse(JSON.stringify(lerConjuntoDoDisco()));
@@ -98,6 +99,22 @@ describe('cada conferência reprova quando o que ela guarda muda', () => {
     const d = conjuntoNovo();
     imagem(d, 'facetado').fonte.argumentos = [{ nome: 'lados', valor: 32 }];
     expect(codigos(conferirConjunto({ conjunto: d, so: 'c06' }))).toContain('mutacao-sem-efeito');
+  });
+
+  it('o controle da roda é o perfil carro: a geometria é a aprovada em mecanica.perfis, e perfil inexistente ou trocado reprova', () => {
+    const aprovado = JSON.parse(readFileSync(`${RAIZ}/procedural/familias/roda-pneu/aprovacao.json`, 'utf8')).mecanica.perfis.carro.hash;
+    const c = conjuntoNovo();
+    const roda = imagem(c, 'controle-roda');
+    expect(roda.fonte).toMatchObject({ perfil: 'carro', aprovacao: 'perfil', geometria: aprovado });
+    expect(hashDe(executarChamada(...Object.values(chamadaDaFonte(roda.fonte))))).toBe(aprovado);
+    expect(descreverFonte(roda.fonte)).toBe('roda-pneu no perfil carro; geometria aprovada do perfil carro');
+    expect(conferirConjunto({ conjunto: c, so: 'c02' }).problemas).toEqual([]);
+    roda.fonte.perfil = 'bicicleta';
+    expect(codigos(conferirConjunto({ conjunto: c, so: 'c02' }))).toContain('geometria-mudou');
+    roda.fonte.perfil = 'inexistente';
+    const r = conferirConjunto({ conjunto: c, so: 'c02' });
+    expect(codigos(r)).toEqual(['fonte-nao-reproduz']);
+    expect(r.problemas[0].mensagem).toMatch(/não declara o perfil 'inexistente'; os perfis são: bicicleta, carrinho-de-mao, carro, carroca, rodizio, trator, trem/);
   });
 
   it('a fonte que viola restrição sem nomeá-la, ou nomeia a que não viola, não se reproduz', () => {
@@ -204,7 +221,8 @@ describe('a descrição das fontes e a impressão do desenho', () => {
     const c = lerConjuntoDoDisco();
     expect(descreverFonte(imagem(c, 'haste-grossa').fonte)).toBe('cilindro-hidraulico no ponto medio; haste=110; viola haste-abaixo-do-embolo, haste-grossa-demais');
     expect(descreverFonte(imagem(c, 'raios-curtos').fonte)).toContain('noDoAro* × 0.75 nas componentes 1,2');
-    expect(descreverFonte(imagem(c, 'controle-roda').fonte)).toContain('geometria aprovada do ponto medio');
+    expect(descreverFonte(imagem(c, 'controle-cilindro').fonte)).toContain('geometria aprovada do ponto medio');
+    expect(descreverFonte(imagem(c, 'controle-roda').fonte)).toBe('roda-pneu no perfil carro; geometria aprovada do perfil carro');
     expect(hashDoDesenho([{ vista: 'a', r: { largura: 1, altura: 1, svg: 'x' } }])).not.toBe(hashDoDesenho([{ vista: 'a', r: { largura: 1, altura: 1, svg: 'y' } }]));
     expect(caminhoDoConjunto()).toMatch(/calibracao-do-critico\/conjunto\.json$/);
   });

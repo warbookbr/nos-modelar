@@ -46,6 +46,22 @@ export const TIPOS_DE_DEFEITO = Object.freeze({
   cota: ['faltando', 'mal_posta', 'sobreposta'],
 });
 
+/* A natureza de cada tipo na escala da nota do brief: 5 a 7 é defeito ESTRUTURAL (ponta no ar, travessia sem explicação, peça fora
+   de onde deveria estar presa, peça sem função), que no vocabulário acima são `uniao`, `posicao` e `ausencia`; 8 e 9 é proporção
+   fina (`angulo`, `comprimento`, `espessura`) ou acabamento (`superficie`). `cota` é anotação de prancha e não entra na escala de
+   objeto. Quem pontua o crítico lê esta tabela, e não uma lista própria. */
+export const NATUREZA_DO_TIPO = Object.freeze({
+  angulo: 'proporcao',
+  comprimento: 'proporcao',
+  espessura: 'proporcao',
+  posicao: 'estrutural',
+  ausencia: 'estrutural',
+  uniao: 'estrutural',
+  superficie: 'acabamento',
+  cota: 'anotacao',
+});
+export const TIPOS_ESTRUTURAIS = Object.freeze(Object.keys(NATUREZA_DO_TIPO).filter((tipo) => NATUREZA_DO_TIPO[tipo] === 'estrutural'));
+
 export const CAMPOS_DEFEITO = Object.freeze(['parte', 'tipo', 'onde', 'sentido', 'evidencia']);
 export const CAMPOS_VEREDITO = Object.freeze(['alvo', 'nota', 'defeitos', 'observacao']);
 

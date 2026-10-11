@@ -49,7 +49,7 @@ import {
 } from '../../src/autoria/calibracao-do-critico.js';
 import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
 import { juntarPerguntas } from '../../src/autoria/perguntas-do-critico.js';
-import { ambienteDaExecucao, hashDe, MATERIAL_NEUTRO, pontosDaFamilia } from './aprovacao-da-familia.mjs';
+import { ambienteDaExecucao, hashDe, MATERIAL_NEUTRO, pontosDaFamilia, pontosDosPerfis } from './aprovacao-da-familia.mjs';
 import {
   ESCALA_DA_NOTA, MOTOR_DO_PNG, VISTAS_DA_ANALISE, desenhoParaPng, desenhosDoObjeto, linhasDoBriefDoObjeto, objetoDoEsboco,
 } from './esboco.mjs';
@@ -212,7 +212,13 @@ function familiaRegistrada(id) {
   return familia;
 }
 
-function parametrosBase(familia, base) {
+/** Os parâmetros completos do ponto de partida da fonte: o perfil da família (`perfis` do familia.json), o padrão ou um ponto da faixa. */
+function parametrosBase(familia, { base, perfil }) {
+  if (perfil !== undefined) {
+    const perfis = pontosDosPerfis(familia.contrato);
+    if (!perfis[perfil]) throw new ErroDaFonte(`a família '${familia.contrato.id}' não declara o perfil '${perfil}'; os perfis são: ${Object.keys(perfis).join(', ') || 'nenhum'}`);
+    return perfis[perfil];
+  }
   if (base === 'padrao') return Object.fromEntries(Object.entries(familia.contrato.parametros).map(([nome, p]) => [nome, p.padrao]));
   return pontosDaFamilia(familia.contrato)[base];
 }
@@ -224,7 +230,7 @@ function parametrosBase(familia, base) {
  */
 export function chamadaDaFonte(fonte, { semMutacao = false } = {}) {
   const familia = familiaRegistrada(fonte.familia);
-  const completos = { ...parametrosBase(familia, fonte.base), ...(semMutacao ? {} : fonte.parametros ?? {}) };
+  const completos = { ...parametrosBase(familia, fonte), ...(semMutacao ? {} : fonte.parametros ?? {}) };
   const declaradas = semMutacao ? [] : ordenar(fonte.viola ?? []);
   const violadas = ordenar(familia.contrato.restricoes.filter((r) => !avaliarRestricao(r, completos).satisfeita).map((r) => r.id));
   if (JSON.stringify(violadas) !== JSON.stringify(declaradas)) {
@@ -356,8 +362,8 @@ export function descreverFonte(fonte) {
   if (fonte.tipo === 'esboco') {
     return `esboço ${fonte.arquivo.split('/').pop()}${fonte.remendo ? `, remendado com ${JSON.stringify(fonte.remendo)}` : ''}`;
   }
-  const partes = [`${fonte.familia} ${fonte.base === 'padrao' ? 'no padrão' : `no ponto ${fonte.base}`}`];
-  if (fonte.aprovacao) partes.push(`geometria aprovada do ponto ${fonte.aprovacao}`);
+  const partes = [`${fonte.familia} ${fonte.perfil !== undefined ? `no perfil ${fonte.perfil}` : fonte.base === 'padrao' ? 'no padrão' : `no ponto ${fonte.base}`}`];
+  if (fonte.aprovacao) partes.push(`geometria aprovada ${fonte.perfil !== undefined ? `do perfil ${fonte.perfil}` : `do ponto ${fonte.aprovacao}`}`);
   if (fonte.parametros) partes.push(Object.entries(fonte.parametros).map(([n, v]) => `${n}=${v}`).join(', '));
   if (fonte.viola) partes.push(`viola ${fonte.viola.join(', ')}`);
   for (const op of fonte.argumentos ?? []) {
@@ -368,10 +374,12 @@ export function descreverFonte(fonte) {
 
 /* ---------- o gate ---------- */
 
-function aprovadoDoPonto(familiaId, ponto, raiz) {
+/** O hash da geometria aprovada do ponto da faixa ou, com `perfil`, do perfil (`mecanica.perfis`) da família. */
+function aprovadoDoPonto(familiaId, ponto, raiz, perfil) {
   const arquivo = join(raiz, 'procedural/familias', familiaId, 'aprovacao.json');
   if (!existsSync(arquivo)) return null;
-  return JSON.parse(readFileSync(arquivo, 'utf8')).mecanica?.pontos?.[ponto]?.hash ?? null;
+  const { mecanica } = JSON.parse(readFileSync(arquivo, 'utf8'));
+  return (perfil !== undefined ? mecanica?.perfis?.[perfil] : mecanica?.pontos?.[ponto])?.hash ?? null;
 }
 
 function lerIds(so, conjunto) {
@@ -452,9 +460,11 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
       if (atual !== esperado) reprovar(quem, 'imagem-diferente', `${arquivo} não é o arquivo gravado (gravado ${esperado.slice(0, 19)}, agora ${atual.slice(0, 19)})`);
     }
     if (imagem.fonte.aprovacao) {
-      const aprovado = aprovadoDoPonto(imagem.fonte.familia, imagem.fonte.aprovacao, raiz);
-      if (aprovado === null) reprovar(quem, 'sem-aprovacao', `a família ${imagem.fonte.familia} não tem o ponto ${imagem.fonte.aprovacao} aprovado em aprovacao.json`);
-      else if (aprovado !== p.fonteSha256) reprovar(quem, 'controle-nao-e-o-aprovado', `o controle não é a geometria aprovada do ponto ${imagem.fonte.aprovacao} (aprovada ${aprovado.slice(0, 19)}, a fonte dá ${p.fonteSha256.slice(0, 19)})`);
+      const { perfil } = imagem.fonte;
+      const aprovado = aprovadoDoPonto(imagem.fonte.familia, imagem.fonte.aprovacao, raiz, perfil);
+      const qual = perfil !== undefined ? `o perfil ${perfil}` : `o ponto ${imagem.fonte.aprovacao}`;
+      if (aprovado === null) reprovar(quem, 'sem-aprovacao', `a família ${imagem.fonte.familia} não tem ${qual} aprovado em aprovacao.json`);
+      else if (aprovado !== p.fonteSha256) reprovar(quem, 'controle-nao-e-o-aprovado', `o controle não é a geometria aprovada d${perfil !== undefined ? 'o perfil' : 'o ponto'} ${perfil ?? imagem.fonte.aprovacao} (aprovada ${aprovado.slice(0, 19)}, a fonte dá ${p.fonteSha256.slice(0, 19)})`);
     } else if (p.baseSha256 !== undefined && p.baseSha256 === p.fonteSha256) {
       reprovar(quem, 'mutacao-sem-efeito', 'a mutação declarada não muda a geometria do ponto de partida');
     }
