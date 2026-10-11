@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "movel-de-caixa",
-  "versao": "2.0.0",
+  "versao": "2.1.0",
   "mecanica": {
     "data": "2026-10-11",
     "pontos": {
@@ -58,7 +58,7 @@
           "profundidade": 500,
           "rodape": 80
         },
-        "hash": "sha256:da17e10d617ce170b0d5b64ff64ecb012e384494a50aca66fb2526e334746a1e",
+        "hash": "sha256:fc5188ce874d24452b2dc9ce0271cad2771949242ca669b332cb71778285cdff",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -69,7 +69,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:2865ae124a679d4b790adb29492b31b46f7aea8be7ba77564dd668bb37a378cb",
+          "hash": "sha256:2bf7e8a54dd5fb04390f93877655836141209c25a4e5976ba5392f4951bb8829",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -98,11 +98,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 60,
               "pares": [],
@@ -113,11 +113,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 60,
               "pares": [],
@@ -161,16 +161,16 @@
                 "id": "abre-porta-1",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
                 "id": "abre-porta-2",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
@@ -521,7 +521,7 @@
           "profundidade": 330,
           "rodape": 0
         },
-        "hash": "sha256:a656e9a37c11cf11eac0673f0ecd1f88e9e68af4e3e0fc50d3a3987e84bf3004",
+        "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -532,7 +532,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:bfc8973b9a499b7f81fd8fd107c8cabba6162d49a89c9775ac7d16cead9ec30a",
+          "hash": "sha256:9b9a1a5285b3d8eb3b30770e579b38c447170f8335fdd221b80f5a02be011475",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -553,11 +553,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 24,
               "pares": [],
@@ -568,11 +568,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 24,
               "pares": [],
@@ -586,16 +586,16 @@
                 "id": "abre-porta-1",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
                 "id": "abre-porta-2",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               }
             ],
@@ -622,7 +622,7 @@
           "profundidade": 560,
           "rodape": 100
         },
-        "hash": "sha256:2e3ee124b7ac76e9deff9850071c9a379a9845a4c1643ee481b76321692ef618",
+        "hash": "sha256:0609893f11c1bd0098373eac65380ad4a8e2f9b3454c15ac9268ab07a47ab3e6",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -633,7 +633,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:1d23d3031e66af8d622798ad761dfc07c87262190307bd13f0dffb556cc6a050",
+          "hash": "sha256:ff2366610a3c9c42b633d7f14bde2d5c7a0a4d384327f1e965b51a7d3cc9efb2",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -656,11 +656,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 30,
               "pares": [],
@@ -671,11 +671,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 30,
               "pares": [],
@@ -704,16 +704,16 @@
                 "id": "abre-porta-1",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
                 "id": "abre-porta-2",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
@@ -748,7 +748,7 @@
           "profundidade": 480,
           "rodape": 120
         },
-        "hash": "sha256:f6b0e5a9ee031e04be8e8b3516fa2bae5b8c56e406ab954535663f6744ca7bc9",
+        "hash": "sha256:9b1f9fc27ba1ca2fb08be1ab3a0f577f29f947d57223cf69b0b967c04541681d",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -759,7 +759,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:57818a8eccf5110f82a9a01f144a2803f62aaec967892dbeb757c7d8768c6873",
+          "hash": "sha256:7931c8ca40889fa71dba010e65f9d9c560e31468c02b7896fb420e28a74037bc",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-gaveta-1",
@@ -893,7 +893,7 @@
           "profundidade": 400,
           "rodape": 100
         },
-        "hash": "sha256:345e9be936b753661221a16b44982842279e165155ceaaa0c82a44ead67e161a",
+        "hash": "sha256:f96876e75f05e97d75cbd6f8807f66356ec96938fb1b6b61b88d00ac33f4b650",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -904,7 +904,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:1724930807469e63e8fcdac6fa4833bd09c58bc52984191eb1eba1849ac55aa4",
+          "hash": "sha256:fa175c8fe543cfb7ad45e2427a8bcddf82e85e502d4e185317b7fbb782e03eef",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -922,11 +922,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 15,
               "pares": [],
@@ -955,8 +955,8 @@
                 "id": "abre-porta-1",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
@@ -991,7 +991,7 @@
           "profundidade": 330,
           "rodape": 60
         },
-        "hash": "sha256:82b8fcb1e4267d9e5f74e14ee938ec6fc7d5f083982b4377579119f2dc93f10c",
+        "hash": "sha256:2682dc41920737231910a3795419ffd56e54bd5ff85e5600c6cacf269f3307a6",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1002,7 +1002,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:1933ce96f52423b6f2265b00ecb0c6b6355e1e1df1ca633f48b28b601e13c122",
+          "hash": "sha256:123f4b778b2541249993fd8a9f37bd906c81fb039ed570c3f5d9133eeab063b2",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -1023,11 +1023,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 24,
               "pares": [],
@@ -1038,11 +1038,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 24,
               "pares": [],
@@ -1056,16 +1056,16 @@
                 "id": "abre-porta-1",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
                 "id": "abre-porta-2",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               }
             ],
@@ -1262,7 +1262,7 @@
           "profundidade": 600,
           "rodape": 80
         },
-        "hash": "sha256:da277b90ff445f6bb2eccb959c1760e22caa737a0e73f6f34362a74cec65375b",
+        "hash": "sha256:c174367e5c8f6e6685146302ada9e5258e86046f04117abba8d35b385eb26427",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1273,7 +1273,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:d9b893a72de7872c6c4eaa2e5f5a7e1442c7cf9d50376f0a04be974805b7506a",
+          "hash": "sha256:2ba80f1c46c9a4c902f0e9a3012dc3c74317862ef631aec79d1941580f0985f9",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -1306,11 +1306,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 90,
               "pares": [],
@@ -1321,11 +1321,11 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 110,
+                "maximo": 90,
                 "unidade": "graus"
               },
-              "passos": 11,
-              "posicoes": 12,
+              "passos": 9,
+              "posicoes": 10,
               "colisoes": 0,
               "paresConferidos": 90,
               "pares": [],
@@ -1369,16 +1369,16 @@
                 "id": "abre-porta-1",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
                 "id": "abre-porta-2",
                 "unidade": "graus",
                 "posicoes": [
-                  55,
-                  110
+                  45,
+                  90
                 ]
               },
               {
@@ -1880,96 +1880,6 @@
       ]
     }
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por perfil; família com perfis, julgada pelos perfis",
-    "rodadas": [
-      {
-        "rodada": 1,
-        "perfil": "criado-mudo",
-        "nota": 7,
-        "motivo": "puxador lido do lado da dobradiça na prancha reduzida; o recorte na resolução original mostrou o puxador na borda livre, e o crítico reviu para 9"
-      }
-    ],
-    "perfis": {
-      "armario-de-cozinha-aereo": {
-        "nota": 9,
-        "hash": "sha256:a656e9a37c11cf11eac0673f0ecd1f88e9e68af4e3e0fc50d3a3987e84bf3004"
-      },
-      "armario-de-cozinha-de-chao": {
-        "nota": 8,
-        "hash": "sha256:2e3ee124b7ac76e9deff9850071c9a379a9845a4c1643ee481b76321692ef618"
-      },
-      "comoda": {
-        "nota": 8,
-        "hash": "sha256:f6b0e5a9ee031e04be8e8b3516fa2bae5b8c56e406ab954535663f6744ca7bc9"
-      },
-      "criado-mudo": {
-        "nota": 9,
-        "hash": "sha256:345e9be936b753661221a16b44982842279e165155ceaaa0c82a44ead67e161a"
-      },
-      "estante-com-portas": {
-        "nota": 9,
-        "hash": "sha256:82b8fcb1e4267d9e5f74e14ee938ec6fc7d5f083982b4377579119f2dc93f10c"
-      },
-      "gaveteiro": {
-        "nota": 9,
-        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
-      },
-      "guarda-roupa": {
-        "nota": 8,
-        "hash": "sha256:da277b90ff445f6bb2eccb959c1760e22caa737a0e73f6f34362a74cec65375b"
-      },
-      "guarda-roupa-de-correr": {
-        "nota": 8,
-        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
-      },
-      "roupeiro": {
-        "nota": 9,
-        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
-      }
-    },
-    "achados": [
-      "puxadores das gavetas pouco legíveis nas frontais reduzidas",
-      "cabideiro do guarda-roupa de correr escondido pelas folhas na frontal aberta",
-      "nó das dobradiças sobrepostas visível no canto da face externa da lateral, como o contrato declara"
-    ]
-  },
-  "pessoa": {
-    "data": "2026-10-11",
-    "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
-    "perfis": {
-      "armario-de-cozinha-aereo": {
-        "hash": "sha256:a656e9a37c11cf11eac0673f0ecd1f88e9e68af4e3e0fc50d3a3987e84bf3004"
-      },
-      "armario-de-cozinha-de-chao": {
-        "hash": "sha256:2e3ee124b7ac76e9deff9850071c9a379a9845a4c1643ee481b76321692ef618"
-      },
-      "comoda": {
-        "hash": "sha256:f6b0e5a9ee031e04be8e8b3516fa2bae5b8c56e406ab954535663f6744ca7bc9"
-      },
-      "criado-mudo": {
-        "hash": "sha256:345e9be936b753661221a16b44982842279e165155ceaaa0c82a44ead67e161a"
-      },
-      "estante-com-portas": {
-        "hash": "sha256:82b8fcb1e4267d9e5f74e14ee938ec6fc7d5f083982b4377579119f2dc93f10c"
-      },
-      "gaveteiro": {
-        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
-      },
-      "guarda-roupa": {
-        "hash": "sha256:da277b90ff445f6bb2eccb959c1760e22caa737a0e73f6f34362a74cec65375b"
-      },
-      "guarda-roupa-de-correr": {
-        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
-      },
-      "roupeiro": {
-        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
-      }
-    },
-    "observacao": "a pessoa delegou a assinatura a Claude se cada perfil cumprisse o propósito do móvel; os nove se leem como os seus móveis, com o nó da dobradiça sobreposta à vista e a dobradiça de caneco fora como limite conhecido"
-  }
+  "critico": null,
+  "pessoa": null
 }

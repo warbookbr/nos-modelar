@@ -6,12 +6,14 @@
    mundo, com as portas e as gavetas fechadas, porque a dobradiça fechada traz a pose na composição da metade móvel e a gaveta
    fechada está no lugar dela.
 
-   A dobradiça de cada porta vem da família `dobradica`, chamada por `chamar` com os parâmetros que `dobradicaDaPorta` deriva
+   A dobradiça da porta embutida vem da família `dobradica`, chamada por `chamar` com os parâmetros que `dobradicaDaPorta` deriva
    da altura e do peso da porta (a recusa da dobradiça seria a do `chamar` dela). Cada dobradiça tem duas peças: a fixa (a
    folha fixa e o pino, num rasgo da parede) e a móvel (a folha móvel e os nós, num rasgo da borda da porta). A articulação de
    uma porta liga a porta do tambor da fixa da primeira dobradiça à da móvel, e a porta e as outras móveis a acompanham. O
-   sentido positivo abre a porta para a frente: o eixo é -y para a porta que gira na esquerda do vão e +y para a outra. A
-   dobradiça da porta sobreposta é a mesma, com outra pose: a folha fixa na face externa da lateral, a móvel no verso da porta.
+   sentido positivo abre a porta para a frente: o eixo é -y para a porta que gira na esquerda do vão e +y para a outra.
+   A porta sobreposta não usa a família `dobradica`, porque o tambor dela ficaria à mostra: cada dobradiça é a de pino oculta
+   (`geometria.js`), a fixa presa à face interna da lateral e a móvel num sulco do verso da porta, e a articulação liga a porta
+   do pino da fixa (`eixo-do-pino`) à do aro da móvel (`aro-do-pino`), no mesmo eixo.
 
    A gaveta e o guia dela (os dois trilhos presos às laterais do corpo) são duas peças ligadas por uma articulação prismática
    cujo eixo é z, para fora da frente, com o curso da gaveta em milímetro. */
@@ -20,8 +22,8 @@ import { DOBRADICA } from '../dobradica/index.js';
 import { MATERIAIS_DA_DOBRADICA, TOLERANCIA_DO_CONTATO } from '../dobradica/montagem.js';
 import { geometriaDaDobradica } from '../dobradica/geometria.js';
 import {
-  COMPOSICOES, ID_DA_DOBRADICA, ID_DA_GAVETA, ID_DA_PORTA, ID_DA_PORTA_DE_CORRER, ID_DO_CORPO, ID_DO_GUIA, ID_DO_TRILHO, argumentosDaDobradica, corpoDe,
-  gavetaDe, guiaDe, portaDe, trilhoDe,
+  COMPOSICOES, ID_DA_DOBRADICA, ID_DA_DOBRADICA_OCULTA, ID_DA_GAVETA, ID_DA_PORTA, ID_DA_PORTA_DE_CORRER, ID_DO_CORPO, ID_DO_GUIA, ID_DO_TRILHO,
+  argumentosDaDobradica, corpoDe, fixaOcultaDe, gavetaDe, guiaDe, movelOcultaDe, portaDe, trilhoDe,
 } from './composicoes.js';
 import { cursoNaDivisoria, geometriaDoMovel } from './geometria.js';
 
@@ -83,7 +85,7 @@ export function montarMovel(familia, parametros = {}) {
   chamar(familia, 'conjunto', parametros);
   const completos = completar(familia.contrato, parametros);
   const g = geometriaDoMovel(completos);
-  if (g.dobradica) chamar(DOBRADICA, 'dobradica', g.dobradica.parametros);
+  if (g.dobradica && !g.sobreposta) chamar(DOBRADICA, 'dobradica', g.dobradica.parametros);
   const cursoDaDivisoria = cursoNaDivisoria(g, completos.painel);
   for (const porta of g.portas) if (porta.apoio?.startsWith('divisoria')) porta.curso = Math.min(porta.curso, cursoDaDivisoria);
 
@@ -121,7 +123,7 @@ export function montarMovel(familia, parametros = {}) {
 
   if (g.dobradica) {
     const { nos, furos } = g.dobradica.parametros;
-    const geo = geometriaDaDobradica(g.dobradica.parametros);
+    const geo = g.sobreposta ? null : geometriaDaDobradica(g.dobradica.parametros);
     for (const porta of g.portas) {
       const numero = porta.indice + 1;
       const peca = portaDe(g, completos, porta.indice);
@@ -133,13 +135,18 @@ export function montarMovel(familia, parametros = {}) {
       porta.dobradicas.forEach((dobradica, k) => {
         const j = k + 1;
         const posicao = [dobradica.x, dobradica.y, dobradica.z];
-        const fixa = argumentosDaDobradica(geo, 'd', { giro: 90, posicao, eixo, viraEmZ: porta.vao === 1 ? 0 : 180 });
-        /* a móvel da embutida fica atrás do pino (a porta está atrás da frente) e a da sobreposta à frente dele: a imagem espelhada */
-        const movel = g.sobreposta
-          ? argumentosDaDobradica(geo, 'e', { giro: porta.vao === 1 ? 180 : 0, posicao, eixo, viraEmX: porta.vao === 1 ? 180 : 0 })
-          : argumentosDaDobradica(geo, 'e', { giro: porta.vao === 1 ? 180 : 0, posicao, eixo, viraEmX: porta.vao === 1 ? 0 : 180 });
-        receitas[refDaDobradica(numero, j, 'd')] = receitaDe(`dobradica-${numero}-${j}-fixa`, { id: 'fixa', composicao: ID_DA_DOBRADICA('d', nos, furos), argumentos: declarados(ID_DA_DOBRADICA('d', nos, furos), fixa) }, MATERIAIS_DO_MOVEL);
-        receitas[refDaDobradica(numero, j, 'e')] = receitaDe(`dobradica-${numero}-${j}-movel`, { id: 'movel', composicao: ID_DA_DOBRADICA('e', nos, furos), argumentos: declarados(ID_DA_DOBRADICA('e', nos, furos), movel) }, MATERIAIS_DO_MOVEL);
+        if (g.sobreposta) {
+          /* a dobradiça de pino oculta: duas composições próprias, no quadro do móvel, sem a família `dobradica` */
+          const fixa = fixaOcultaDe(g, completos, porta, k);
+          const movel = movelOcultaDe(g, completos, porta, k);
+          receitas[refDaDobradica(numero, j, 'd')] = receitaDe(`dobradica-${numero}-${j}-fixa`, { id: 'fixa', composicao: ID_DA_DOBRADICA_OCULTA('fixa'), argumentos: fixa.argumentos }, MATERIAIS_DO_MOVEL);
+          receitas[refDaDobradica(numero, j, 'e')] = receitaDe(`dobradica-${numero}-${j}-movel`, { id: 'movel', composicao: ID_DA_DOBRADICA_OCULTA('movel'), argumentos: movel.argumentos }, MATERIAIS_DO_MOVEL);
+        } else {
+          const fixa = argumentosDaDobradica(geo, 'd', { giro: 90, posicao, eixo, viraEmZ: porta.vao === 1 ? 0 : 180 });
+          const movel = argumentosDaDobradica(geo, 'e', { giro: porta.vao === 1 ? 180 : 0, posicao, eixo, viraEmX: porta.vao === 1 ? 0 : 180 });
+          receitas[refDaDobradica(numero, j, 'd')] = receitaDe(`dobradica-${numero}-${j}-fixa`, { id: 'fixa', composicao: ID_DA_DOBRADICA('d', nos, furos), argumentos: declarados(ID_DA_DOBRADICA('d', nos, furos), fixa) }, MATERIAIS_DO_MOVEL);
+          receitas[refDaDobradica(numero, j, 'e')] = receitaDe(`dobradica-${numero}-${j}-movel`, { id: 'movel', composicao: ID_DA_DOBRADICA('e', nos, furos), argumentos: declarados(ID_DA_DOBRADICA('e', nos, furos), movel) }, MATERIAIS_DO_MOVEL);
+        }
         instancias.push({ id: idDaDobradica(numero, j, 'fixa'), alvo: { tipo: 'peca', ref: refDaDobradica(numero, j, 'd') } });
         instancias.push({ id: idDaDobradica(numero, j, 'movel'), alvo: { tipo: 'peca', ref: refDaDobradica(numero, j, 'e') } });
         moveis.push([idDaDobradica(numero, j, 'movel')]);
@@ -147,8 +154,8 @@ export function montarMovel(familia, parametros = {}) {
       articulacoes.push({
         id: idDaArticulacao(numero),
         tipo: 'revolucao',
-        fixo: { caminho: [idDaDobradica(numero, 1, 'fixa')], porta: 'nos-da-folha-d' },
-        movel: { caminho: moveis[0], porta: 'nos-da-folha-e' },
+        fixo: { caminho: [idDaDobradica(numero, 1, 'fixa')], porta: g.sobreposta ? 'eixo-do-pino' : 'nos-da-folha-d' },
+        movel: { caminho: moveis[0], porta: g.sobreposta ? 'aro-do-pino' : 'nos-da-folha-e' },
         acompanham: [[idDaPorta(numero)], ...moveis.slice(1)],
         unidade: 'graus',
         curso: { minimo: 0, maximo: porta.curso },
