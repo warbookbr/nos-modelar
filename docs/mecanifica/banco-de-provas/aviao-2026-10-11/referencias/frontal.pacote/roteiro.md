@@ -11,43 +11,43 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/divisas-01.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
 - deriva / helice
+- deriva / fuselagem
 - fuselagem / helice
 - fuselagem / parabrisa
-- helice / parabrisa
 
 ## Etapa 3 — divisas, folha 2 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/divisas-02.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- estabilizadorDir / parabrisa
-- estabilizadorEsq / parabrisa
+- helice / parabrisa
+- estabilizadorDir / fuselagem
+- estabilizadorEsq / fuselagem
 - capo / parabrisa
-- capo / helice
 
 ## Etapa 4 — divisas, folha 3 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/divisas-03.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- estabilizadorEsq / helice
+- capo / helice
+- capo / fuselagem
 - capo / cone
 - cone / helice
-- asaEsq / corpoEscuro
 
 ## Etapa 5 — divisas, folha 4 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/divisas-04.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
+- asaEsq / corpoEscuro
 - asaDir / capo
 - asaEsq / capo
 - asaDir / tremPrincipalDir
-- asaEsq / tremPrincipalEsq
 
 ## Etapa 6 — divisas, folha 5 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/divisas-05.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
+- asaEsq / tremPrincipalEsq
 - capo / tremNariz
-- helice / tremNariz
 - chao / tremPrincipalDir
 - chao / tremNariz
 

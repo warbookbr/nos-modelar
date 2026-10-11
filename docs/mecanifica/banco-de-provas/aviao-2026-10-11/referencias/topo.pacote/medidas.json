@@ -25,7 +25,7 @@
  },
  "minimo": 0.8,
  "abaixo": [],
- "semDonoPx": 1118,
+ "semDonoPx": 1071,
  "divisas": [
   {
    "a": "cone",
@@ -152,9 +152,9 @@
    "b": "corpoNaPontaEsq",
    "caixa": [
     68,
-    134,
+    136,
     107,
-    173
+    175
    ]
   },
   {
@@ -181,7 +181,7 @@
    "a": "aileronEsq",
    "b": "asaEsq",
    "caixa": [
-    18,
+    11,
     164,
     80,
     203
@@ -193,7 +193,7 @@
    "caixa": [
     391,
     164,
-    453,
+    456,
     203
    ]
   },
