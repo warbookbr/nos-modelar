@@ -112,9 +112,9 @@ describe('as perguntas da peça', () => {
   });
 
   it('o PLANO aceita `familia` e `familiaProcedural`, e recusa o desconhecido', () => {
-    const plano = normalizarPlanoDeModelagem({ ...PLANO, familia: 'movel-de-caixa', familiaProcedural: 'roupeiro' });
+    const plano = normalizarPlanoDeModelagem({ ...PLANO, familia: 'movel-de-caixa', familiaProcedural: 'movel-de-caixa' });
     expect(plano.familia).toBe('movel-de-caixa');
-    expect(plano.familiaProcedural).toBe('roupeiro');
+    expect(plano.familiaProcedural).toBe('movel-de-caixa');
     expect(() => normalizarPlanoDeModelagem({ ...PLANO, familia: 'movel' })).toThrow(/assento, movel-de-caixa, veiculo/);
     expect(() => normalizarPlanoDeModelagem({ ...PLANO, familiaProcedural: 'Roupeiro 2' })).toThrow(/familiaProcedural/);
   });
@@ -130,10 +130,10 @@ describe('as perguntas da peça', () => {
   });
 
   it('com `familiaProcedural` entram as `perguntas` do familia.json por componente, antes das do arquivo de critérios', () => {
-    const roupeiro = FAMILIAS.find((f) => f.contrato.id === 'roupeiro').contrato;
-    const plano = normalizarPlanoDeModelagem({ ...PLANO, familia: 'movel-de-caixa', familiaProcedural: 'roupeiro' });
-    const r = perguntasDaPeca(plano, { criterios: CRITERIOS['movel-de-caixa'], perguntasDaFamilia: roupeiro.perguntas });
-    expect(r.componente).toEqual(Object.values(roupeiro.perguntas).flat());
+    const movel = FAMILIAS.find((f) => f.contrato.id === 'movel-de-caixa').contrato;
+    const plano = normalizarPlanoDeModelagem({ ...PLANO, familia: 'movel-de-caixa', familiaProcedural: 'movel-de-caixa' });
+    const r = perguntasDaPeca(plano, { criterios: CRITERIOS['movel-de-caixa'], perguntasDaFamilia: movel.perguntas });
+    expect(r.componente).toEqual(Object.values(movel.perguntas).flat());
     expect(r.todas.slice(0, r.componente.length)).toEqual(r.componente);
     expect(TETO_POR_COMPONENTE).toBeGreaterThan(0);
   });

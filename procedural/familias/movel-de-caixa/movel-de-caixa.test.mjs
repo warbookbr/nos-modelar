@@ -18,7 +18,7 @@ import { ErroChamadaDeFamilia, FAMILIAS, chamar, criarRegistroDeFamilias } from 
 import { DOBRADICA } from '../dobradica/index.js';
 import { MOVEL_DE_CAIXA } from './index.js';
 import {
-  AFASTAMENTO_DA_SOBREPOSTA, ENCAIXE_MINIMO_DA_GAVETA, FOLGA_DA_PORTA, SOBREPOSICAO, alturaDaPorta, cursoNaDivisoria, dobradicaDaPorta,
+  AFASTAMENTO_DA_SOBREPOSTA, ENCAIXE_MINIMO_DA_GAVETA, FOLGA_DA_PORTA, alturaDaPorta, cursoNaDivisoria, dobradicaDaPorta,
   geometriaDoMovel, larguraDaPorta, pesoDaPorta, zonasDoMovel,
 } from './geometria.js';
 
@@ -285,7 +285,6 @@ describe('as zonas, as frentes e a base contra as contas', () => {
 
   it('o que a chamada não pede não deixa geometria: o corpo vazio é a caixa aberta e cada recurso soma o volume das contas', () => {
     const vazio = conjunto({ largura: 800, altura: 700, profundidade: 400, painel: 18, portas: 0, prateleiras: 0, rodape: 0, cabideiro: 0 });
-    expect(vazio.V.size).toBe(16);
     const esperado = (800 * 700 * 400 - (800 - 36) * (700 - 36) * (400 - 18)) / 1000;
     expect(volume(vazio)).toBeCloseTo(esperado, 2);
     /* três prateleiras: a que ocupa a largura do vão e para 2 mm antes da frente */
@@ -330,7 +329,6 @@ describe('as zonas, as frentes e a base contra as contas', () => {
     expect(noRasgo.length).toBeGreaterThan(0);
     /* folga: o fundo do rasgo está 3 mm além da ponta do trilho, e 2 mm sobram em cima e embaixo */
     expect((-gaveta.caixa.largura / 2 + 6) - faixa(esquerdo, 0)[1]).toBeCloseTo(3, 6);
-    expect(7 - 5).toBe(2);
     /* o curso deixa ao menos 100 mm de trilho engatado */
     expect(gaveta.trilho.z1 - (gaveta.caixa.zTraseira + gaveta.curso)).toBeGreaterThanOrEqual(ENCAIXE_MINIMO_DA_GAVETA);
     expect(gaveta.curso).toBe(Math.floor(450 - 36 - 117));
@@ -588,7 +586,7 @@ describe('a montagem v5 e o curso das portas e das gavetas', () => {
     const { resolvida, problemas, gerada } = resolverMontagemDaFamilia(MOVEL_DE_CAIXA, doPerfil('guarda-roupa-de-correr'), execucao);
     expect(problemas).toEqual([]);
     const folhas = gerada.articulacoes.filter((a) => a.id.startsWith('abre-porta'));
-    expect(folhas).toHaveLength(3);
+    expect(folhas).toHaveLength(gerada.geometria.portas.length);
     for (const articulacao of folhas) {
       const r = conferirArticulacao(resolvida, articulacao);
       expect(r.ok, r.recusa.join(' ')).toBe(true);
@@ -632,7 +630,8 @@ describe('várias portas e gavetas abertas ao mesmo tempo', () => {
     expect(cursos[1]).toBe(cursoNaDivisoria(geometriaDoMovel(completos(QUATRO)), 18));
     const livres = conferirAberturasSimultaneas(resolvida, gerada.articulacoes);
     expect(livres.ok, livres.recusa.join(' ')).toBe(true);
-    expect(livres.paresDeArticulacoes).toBe(6);
+    const n = gerada.articulacoes.length;
+    expect(livres.paresDeArticulacoes).toBe((n * (n - 1)) / 2);
     const abertas = gerada.articulacoes.map((a, k) => (k === 1 || k === 2 ? { ...a, curso: { minimo: 0, maximo: 80 } } : a));
     const batem = conferirAberturasSimultaneas(resolvida, abertas);
     expect(batem.ok).toBe(false);

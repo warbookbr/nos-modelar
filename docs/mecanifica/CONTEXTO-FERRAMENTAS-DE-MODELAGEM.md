@@ -236,7 +236,14 @@ A roda raiada (tarefa 7) entrou em 2026-10-11 como o `tipo` 1 da `roda-pneu`, co
 barra no `aprovacao.json`. Como o ponto máximo do contrato leva todos os parâmetros ao máximo, ele passou a ser raiado e
 mudou de hash, e a aprovação do crítico e da pessoa, que julgaram o disco nos três pontos, foi esvaziada: o mínimo e o
 médio mantêm o hash e o disco do máximo antigo também, preso no teste, mas a prancha tem de ser refeita com o máximo raiado
-e julgada de novo. Falta o roupeiro.
+e julgada de novo.
+
+O roupeiro (tarefa 10) entrou em 2026-10-11 e a pessoa o aprovou no mesmo dia. A pessoa decidiu então ampliá-lo para servir de primitiva
+2.0 aos móveis de caixa da lista (guarda-roupa, armário de cozinha, cômoda, criado-mudo, estante com portas e gaveteiro): a família
+passou a se chamar `movel-de-caixa`, com o roupeiro como o perfil `roupeiro`, e ganhou gavetas com trilho e articulação prismática,
+portas sobrepostas e de correr, pés, vão aberto e nove perfis prontos. A aprovação ganhou os perfis e a conferência das aberturas
+simultâneas; o contrato está em [`CONTRATO-DA-FAMILIA.md`](CONTRATO-DA-FAMILIA.md#o-móvel-de-caixa), e o crítico e a pessoa precisam
+julgar a geometria nova.
 
 ## Pendências da camada de features
 

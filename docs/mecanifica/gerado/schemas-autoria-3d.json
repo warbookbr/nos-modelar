@@ -4596,6 +4596,38 @@
               }
             }
           }
+        },
+        "perfis": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "descricao",
+              "parametros"
+            ],
+            "properties": {
+              "descricao": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "parametros": {
+                "type": "object",
+                "minProperties": 1,
+                "propertyNames": {
+                  "pattern": "^[a-z][A-Za-z0-9]*$"
+                },
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            }
+          }
         }
       }
     }
