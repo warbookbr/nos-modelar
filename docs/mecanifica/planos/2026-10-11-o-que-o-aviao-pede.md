@@ -42,10 +42,10 @@ resultado volta ao backlog.
 
 ## Incluído
 
-- as quatro vistas da referência, o contorno das partes e a prancha cotada, com a
-  envergadura dada pela pessoa como escala;
 - o alinhamento com a pessoa: nível de detalhe, partes, o que se move (proposta:
   hélice, ailerons, flaps, leme, profundor e trem recolhível) e o que reprova;
+- as quatro vistas da referência, o contorno das partes e a prancha cotada, com a
+  envergadura de 12,8 m como escala;
 - o esboço detalhado do avião inteiro só com as ferramentas e famílias atuais,
   com o laço do esboço, o crítico cego e os Marcos; o trem usa a roda 2.0 e o
   cilindro hidráulico como amortecedor;
@@ -67,8 +67,8 @@ resultado volta ao backlog.
 
 ## Gate de saída
 
-1. as quatro vistas com contorno aceito pelo crítico e a prancha cotada aprovada
-   pela pessoa;
+1. o alinhamento escrito e confirmado pela pessoa, as vistas com contorno aceito
+   pelo crítico e a prancha cotada aprovada pela pessoa;
 2. a primeira rodada do avião completa, com a nota do crítico por unidade e por
    Marco, o custo registrado e a forma aprovada pela pessoa;
 3. todo atrito reproduzido por comando e classificado, e toda candidata a
@@ -82,18 +82,20 @@ resultado volta ao backlog.
 
 ## Fatias
 
-1. **Referência.** Separar as vistas (feito na abertura), declarar os papéis em
+1. **Alinhamento.** Pela skill
+   [`alinhar-modelagem`](../../../.claude/skills/alinhar-modelagem/SKILL.md),
+   com opções de forma em imagem quando houver disputa, e fecha na anatomia do
+   avião em `ALINHAMENTO.md`: partes, ligações, o que se move e o que reprova.
+   Vem antes da referência porque a lista de partes do contorno sai dele, como
+   no [fluxo do objeto](../usar/FLUXO-DO-OBJETO.md). A escala é a envergadura de
+   12,8 m, escolhida pela pessoa em 2026-10-11.
+2. **Referência.** Separar as vistas (feito na abertura), declarar os papéis em
    `papeis.json`, tirar o contorno das partes pela skill
    [`contorno-da-imagem`](../../../.claude/skills/contorno-da-imagem/SKILL.md) e
    fazer a prancha pela
    [`prancha-dos-contornos`](../../../.claude/skills/prancha-dos-contornos/SKILL.md).
    As vistas são um desenho e podem não concordar entre si; a prancha decide a
-   medida que vale e diz de qual vista ela veio. A envergadura é da pessoa
-   (proposta: 12,8 m).
-2. **Alinhamento.** Pela skill
-   [`alinhar-modelagem`](../../../.claude/skills/alinhar-modelagem/SKILL.md),
-   com opções de forma em imagem quando houver disputa, e fecha na anatomia do
-   avião: partes, ligações, o que se move e o que reprova.
+   medida que vale e diz de qual vista ela veio.
 3. **Primeira rodada.** Esboço detalhado pelo laço do esboço, em modo por
    unidade, só com o que existe hoje. Cada vez que o esbocista contornar uma
    falta, o contorno vira atrito, e o laço não para por isso. Fecha com o custo
