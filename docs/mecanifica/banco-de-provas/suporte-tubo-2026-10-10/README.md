@@ -24,3 +24,6 @@ O suporte foi refeito em 2026-10-11, sem a interseção com caixas, em
 esta pasta fica como o registro da primeira versão.
 
 A [composta](composta.png) desta pasta foi refeita em 2026-10-11 com a peça nova (as quatro vistas: isométrica, frontal, direita e superior), em que as duas bordas livres de cima da aba do tubo, as concordâncias e o recorte saem arredondados por uma `cadeia`, sem degrau. A [receita](receita.js) desta pasta continua sendo a da primeira versão.
+
+A pessoa aprovou a forma da peça nova em 2026-10-11, pela composta, e o suporte
+fica no acervo.

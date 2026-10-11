@@ -304,5 +304,21 @@
       "furo grande para a folha de 15 mm no mínimo e pequeno para a de 80 mm no máximo, de proporção"
     ]
   },
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
+    "pontos": {
+      "minimo": {
+        "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33"
+      },
+      "medio": {
+        "hash": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9"
+      },
+      "maximo": {
+        "hash": "sha256:d27baa257a01244c12626960b6b8b4a29dd5782a7c1d28cd1aa283de0df2f4ae"
+      }
+    },
+    "observacao": "reassinada com a folha tangente ao rolo e o curso de 180 graus"
+  }
 }
