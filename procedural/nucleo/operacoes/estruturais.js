@@ -882,7 +882,7 @@ export function criarOperacoesEstruturais(servicos) {
        inteiro (arestas-em-grupos.js); a costura simples abaixo só enxerga a peça que tem a aresta. O canto onde a
        ponta é de uma faixa arredondada antes também vai por ela, que o remata pela esquadria (cantos-arredondados.js). */
     const grupos = gruposDaAresta(st, faceAId, faceBId);
-    if (grupos.GA.size > 1 || grupos.GB.size > 1 || arestasEmGrupos.temCantoArredondado(st, v0, v1, faceAId, faceBId)) {
+    if (grupos.GA.size > 1 || grupos.GB.size > 1 || arestasEmGrupos.temCantoArredondado(st, v0, v1, faceAId, faceBId) || arestasEmGrupos.temLeque(st, v0, v1, faceAId, faceBId)) {
       const recuoG = raio / Math.tan(theta / 2);
       const bissetorG = norm3(dA[0] + dB[0], dA[1] + dB[1], dA[2] + dB[2]);
       const distanciaCentroG = raio / Math.sin(theta / 2);
@@ -1197,7 +1197,7 @@ export function criarOperacoesEstruturais(servicos) {
 
     /* Tampa partida: o mesmo tratamento do arredondarAresta (arestas-em-grupos.js), com um painel e sem arco. */
     const gruposF = gruposDaAresta(st, faceAId, faceBId);
-    if (gruposF.GA.size > 1 || gruposF.GB.size > 1 || arestasEmGrupos.temCantoArredondado(st, v0, v1, faceAId, faceBId)) {
+    if (gruposF.GA.size > 1 || gruposF.GB.size > 1 || arestasEmGrupos.temCantoArredondado(st, v0, v1, faceAId, faceBId) || arestasEmGrupos.temLeque(st, v0, v1, faceAId, faceBId)) {
       const anel = (base) => [
         [base[0] + raio * dA[0], base[1] + raio * dA[1], base[2] + raio * dA[2]],
         [base[0] + raio * dB[0], base[1] + raio * dB[1], base[2] + raio * dB[2]],

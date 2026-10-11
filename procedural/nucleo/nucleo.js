@@ -1579,6 +1579,8 @@ const CONTRATOS_ORIGEM = {
         if (consumo) return { erro: consumo };
         if (st.F.has(f)) faces.push(f);
       }
+      /* o degrau que fecha o fim do arco numa ponta oblíqua (arestas-em-grupos.js) é da faixa: sem eixo de painel, entra */
+      if (origem.painel == null) for (const f of registro.degraus ?? []) if (st.F.has(f)) faces.push(f);
       if (!faces.length) return { erro: `origem filete:${origem.id} não tem nenhum painel vivo` };
       return { faces };
     },
@@ -1618,6 +1620,8 @@ const CONTRATOS_ORIGEM = {
         if (consumo) return { erro: consumo };
         if (st.F.has(f)) faces.push(f);
       }
+      /* o degrau que fecha o fim do arco numa ponta oblíqua (arestas-em-grupos.js) é da faixa: sem eixo de painel, entra */
+      if (origem.painel == null) for (const f of registro.degraus ?? []) if (st.F.has(f)) faces.push(f);
       if (!faces.length) return { erro: `origem arredondarAresta:${origem.id} não tem nenhum painel vivo` };
       return { faces };
     },

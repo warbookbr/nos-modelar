@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:ebe6e690b35d8113e2a185a3b52bf0e93041379af9d0d3ad391ed6c333a30299",
+  "assinatura": "sha256:a7e20a162ba008d85b304136b0ed4223ffbf10d233c14ebe41eb2abc170af614",
   "total": 37,
   "operacoes": [
     {
@@ -367,7 +367,7 @@
         ],
         "limites": [
           "Cada lado da aresta é uma face convexa ou um grupo de faces coplanares que se tocam por aresta, como a tampa partida de um perfil com furo ou de um contorno por trechos.",
-          "Num grupo, o raio é conferido contra todos os vértices dele e recusa com o vértice quando não cabe; o canto composto de uma tampa partida é recusado.",
+          "Num grupo, o raio é conferido contra todos os vértices dele e recusa com o vértice quando não cabe; peça de tampa que uma quina quase reta deixa côncava é partida em peças convexas, e a recusa fica para o que se atravessa ou se inverte. O canto da tampa partida em leque (a chapa com furos vista de cima, com a aresta ao longo da espessura) arredonda; o remate de uma segunda aresta sobre ele pede a tampa partida em outra ordem: arredonde antes as arestas da tampa e depois as do canto. Onde a face de ponta é quase paralela à aresta (borda livre que termina numa concordância do contorno) e o arco não cabe no plano dela, o arco termina na seção perpendicular, com um degrau plano, e a faixa volta a ser citável pela origem sem `painel`.",
           "Onde a ponta da aresta já é ponta de uma faixa arredondada ou chanfrada por outra aresta, o canto fecha em esquadria (cantos-arredondados.js): o mesmo raio e o mesmo número de painéis nas arestas do canto, arestas a 90°, e número par de painéis onde três arestas se encontram. Fora disso o passo recusa com a causa e a malha fica como estava.",
           "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
         ],
@@ -1788,7 +1788,7 @@
         ],
         "limites": [
           "Não é arredondamento multi-painel. O canto de duas arestas chanfradas fecha em esquadria; o de três é recusado, porque o vértice triplo pede um número par de painéis.",
-          "Numa tampa partida (grupo de faces coplanares) o recuo é conferido contra todos os vértices do grupo e recusa quando não cabe.",
+          "Numa tampa partida (grupo de faces coplanares) o recuo é conferido contra todos os vértices do grupo e recusa quando não cabe; o canto em leque, a peça de tampa que fica côncava e a ponta oblíqua seguem as regras do `arredondarAresta`.",
           "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
         ],
         "diagnosticos": []

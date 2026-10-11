@@ -338,8 +338,27 @@ trechos: as faces planas que se tocam contam como uma só, e a borda do topo ou 
 um furo arredonda por `sel.onde`. A tangência escorrega ao longo da aresta
 vizinha até o plano da face de ponta, para ela continuar plana numa quina que
 não é de 90°, e o raio é conferido contra todos os vértices da tampa antes de
-escrever; raio que passa de um vértice, da espessura ou da faceta vizinha de um
-arco é recusado com o vértice e a distância.
+escrever; raio que passa de um vértice ou da espessura é recusado com o vértice e
+a distância. Três casos que a tampa partida recusava hoje arredondam. A aresta ao
+longo da espessura de uma chapa com furos (o canto da aba) tem na ponta a outra
+tampa, triangulada em leque com dezenas de faces em torno do vértice: a vizinha do
+lado B recebe os pontos do arco e as demais só levam o vértice à tangência. A peça
+de tampa convexa que uma quina quase reta deixa côncava ao se mover (a recusa que
+dependia de `segmentosArco`) é partida em peças convexas, que ficam na tampa da
+extrusão, e só se recusa o que se atravessa ou se inverte. E a borda livre que
+termina numa concordância do contorno, cuja face de ponta é quase paralela à
+aresta e não comporta a conta de escorregar (o recuo passaria muito além da
+faceta), termina na seção perpendicular: o canto velho fica onde estava, a tampa
+ganha o triângulo que o fecha e um degrau plano, em leque a partir do canto, fecha
+o fim do arco. O degrau entra na faixa pela origem (`{op:'arredondarAresta',
+id}` sem `painel`) e o volume retirado é exatamente a seção do arco vezes o
+comprimento da aresta; esse modo só entra quando o comum recusa, e o contorno que
+volta sobre a faixa (a faceta seguinte passa da seção perpendicular) continua
+recusado. Numa chapa com furos, arredonde as arestas da tampa (laterais e topo)
+antes das do canto ao longo da espessura: o remate de uma segunda aresta sobre um
+canto cuja tampa é um leque recusa com `é uma tampa partida: o remate do canto
+pede uma face só ali`. A prova está em
+`procedural/nucleo/operacoes/arredondar-chapa-furada.test.ts`.
 
 O canto onde duas ou três arestas arredondadas (ou chanfradas por `filete`)
 chegam ao mesmo vértice se fecha em esquadria, e cada aresta continua sendo uma

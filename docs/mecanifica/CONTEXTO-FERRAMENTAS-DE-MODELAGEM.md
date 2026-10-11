@@ -169,6 +169,30 @@ arestas que não se cruzam a 90°, faixa editada depois de arredondada e número
 painel, fecha o canto de duas e recusa o de três). Falta refazer o suporte de
 tubo com essa correção, e ele entra no acervo com a aprovação da pessoa.
 
+As três recusas que o suporte de tubo ainda trazia na aba de parede e na aba do
+tubo foram corrigidas no núcleo (`operacoes/arestas-em-grupos.js`), cada uma com
+uma peça mínima em `operacoes/arredondar-chapa-furada.test.ts`. Os quatro cantos
+da aba com furos, ao longo da espessura, eram recusados porque a tampa triangulada
+em leque deixa o vértice com 19 a 34 faces; agora a vizinha do lado B recebe os
+pontos do arco e as outras levam o vértice à tangência, com casca fechada, faces
+planas e o volume retirado igual a quatro vezes a seção do arco vezes 6 mm. A
+borda lateral da frente recusava conforme `segmentosArco` (passava com 4, 6, 8 e
+12, recusava com 10, 16 e 24) porque uma peça de tampa com dois cantos quase
+colineares virava côncava ao mover as pontas; a peça é partida em convexas (as
+novas ficam na tampa da extrusão) e o resultado é o mesmo com 4 a 24 segmentos.
+As duas bordas livres de cima da aba do tubo, que terminam numa concordância,
+tinham a face de ponta quase paralela à aresta, e o escorregamento do anel até
+ela passava 61 mm da aresta de 10 mm; a ponta passou a terminar na seção
+perpendicular com um degrau plano, o volume retirado é exatamente a seção do arco
+vezes 10 mm, e esse modo só entra quando o comum recusa. Um limite novo ficou
+medido: com os quatro cantos já arredondados, as arestas da tampa da frente
+(laterais e topo) recusam no remate do canto, que pede uma face só onde a tampa
+é um leque; na ordem inversa (tampa antes, cantos depois) as sete arestas da aba
+de parede arredondam com 4, 10, 16 e 24 segmentos. A receita do suporte precisa
+dessa ordem para voltar a conter as arestas que hoje ficam fora da tabela
+`ARESTAS_*`. O que continua recusado: o contorno que volta sobre a faixa (a
+mordida semicircular com raio de 3 mm numa faceta de 1,5 mm).
+
 ## Depois do plano
 
 A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos
