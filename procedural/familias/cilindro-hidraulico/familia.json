@@ -8,7 +8,7 @@
     "haste": { "tipo": "numero", "unidade": "mm", "padrao": 36, "minimo": 18, "maximo": 140, "medio": 45 },
     "curso": { "tipo": "numero", "unidade": "mm", "padrao": 300, "minimo": 50, "maximo": 1500, "medio": 500 },
     "parede": { "tipo": "numero", "unidade": "mm", "padrao": 6, "minimo": 3, "maximo": 25, "medio": 8 },
-    "comprimentoRecolhido": { "tipo": "numero", "unidade": "mm", "padrao": 420, "minimo": 120, "maximo": 2300, "medio": 700 },
+    "comprimentoRecolhido": { "tipo": "numero", "unidade": "mm", "padrao": 470, "minimo": 135, "maximo": 2300, "medio": 700 },
     "fixacaoTraseira": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 1 },
     "fixacaoDianteira": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 }
   },
@@ -20,8 +20,8 @@
     },
     {
       "id": "curso-cabe-no-comprimento",
-      "expressao": "curso + 1.415 * embolo + parede <= comprimentoRecolhido",
-      "motivo": "o curso, o fundo, o êmbolo, a cabeça e os dois olhais não cabem no comprimento recolhido: a haste recolhida sairia da camisa menos de um décimo do êmbolo"
+      "expressao": "curso + 2.25 * embolo + parede <= comprimentoRecolhido",
+      "motivo": "o curso, o fundo, o êmbolo, a cabeça e os dois pescoços até os pinos não cabem no comprimento recolhido: a haste recolhida sairia da camisa menos de um décimo do êmbolo"
     },
     {
       "id": "haste-abaixo-do-embolo",
@@ -62,12 +62,13 @@
       "A cabeça fecha o furo da camisa na frente e deixa passar só a haste?"
     ],
     "haste": [
-      "O êmbolo, a haste e o olhal dianteiro se leem como uma peça só, com o êmbolo dentro da camisa e o olhal fora?",
+      "O êmbolo, a haste, o terminal e o olhal dianteiro se leem como uma peça só, com o êmbolo dentro da camisa e o olhal fora?",
       "A haste é visivelmente mais fina que a camisa e a atravessa pela cabeça?"
     ],
     "olhais": [
       "Cada olhal tem o furo do pino no eixo transversal ao da haste, e os dois pinos ficam paralelos?",
-      "O olhal com rótula se distingue do liso pelo anel mais largo no furo do pino?"
+      "Cada olhal sai de um pescoço unido à peça (o fundo da camisa prolongado atrás, o terminal na ponta da haste) e tem parede visível em volta do furo?",
+      "O olhal com rótula se distingue do liso pela bucha esférica que sai dos dois lados do anel?"
     ]
   }
 }

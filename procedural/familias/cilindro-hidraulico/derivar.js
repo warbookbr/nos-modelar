@@ -2,7 +2,7 @@
 
    Puro: os mesmos parâmetros dão os mesmos argumentos. A camisa e a haste têm cada uma os seus argumentos, para a montagem
    chamar as duas peças separadas, e o conjunto junta os dois mais a declaração do curso, para `chamar` devolver o cilindro
-   inteiro. A fixação (0 olhal liso, 1 olhal com rótula) escolhe a composição, porque a rótula é um anel a mais. */
+   inteiro. A fixação (0 olhal liso, 1 olhal com rótula) escolhe a composição, porque a rótula é uma bucha a mais. */
 import { geometriaDoCilindro } from './geometria.js';
 import { idDaCamisa, idDaHaste, idDoConjunto } from './composicoes.js';
 
@@ -14,21 +14,17 @@ const graus = (radianos) => (radianos * 180) / Math.PI;
 export const passosDoCurso = (curso) => Math.min(60, Math.max(8, Math.ceil(curso / 25)));
 
 function argumentosDoOlhal(lado, olhal) {
+  const cupula = olhal.rotula
+    ? Object.fromEntries(olhal.cupula.flatMap(({ raio, z }, k) => [[`${lado}BuchaRaio${k}`, m(raio)], [`${lado}BuchaZ${k}`, m(z)]]))
+    : {};
   return {
     [`${lado}Centro`]: m(olhal.centro),
-    [`${lado}InicioX`]: m(olhal.sentido * olhal.corte),
-    [`${lado}InicioY`]: m(olhal.sentido * olhal.semiCorda),
-    [`${lado}AnguloDoArco`]: 360 - 2 * graus(Math.acos(olhal.corte / olhal.raioDoOlhal)),
     [`${lado}RaioDoOlhal`]: m(olhal.raioDoOlhal),
     [`${lado}RaioDoFuro`]: m(olhal.raioDoFuro),
     [`${lado}RaioDoPino`]: m(olhal.raioDoPino),
     [`${lado}LarguraDoOlhal`]: m(olhal.larguraDoOlhal),
     [`${lado}InicioDoOlhal`]: m(-olhal.larguraDoOlhal / 2),
-    ...(olhal.rotula ? {
-      [`${lado}RaioDaRotula`]: m(olhal.raioDaRotula),
-      [`${lado}LarguraDaRotula`]: m(olhal.larguraDaRotula),
-      [`${lado}InicioDaRotula`]: m(-olhal.larguraDaRotula / 2),
-    } : {}),
+    ...(olhal.rotula ? { [`${lado}InicioDaBucha`]: m(-olhal.larguraDaBucha / 2), ...cupula } : {}),
   };
 }
 
@@ -49,6 +45,10 @@ export function argumentosDaCamisa(g) {
     diametroDaGuia: m(2 * camisa.cabeca.raioInterno),
     inicioDaCabeca: m(camisa.cabeca.inicio),
     comprimentoDaCabeca: m(camisa.cabeca.comprimento),
+    pescocoInicio: m(camisa.pescoco.inicio),
+    pescocoComprimento: m(camisa.pescoco.comprimento),
+    pescocoRaioMenor: m(camisa.pescoco.raioMenor),
+    pescocoRaioMaior: m(camisa.pescoco.raioMaior),
     ...argumentosDoOlhal('traseiro', camisa.olhal),
   };
 }
@@ -68,6 +68,11 @@ export function argumentosDaHaste(g) {
     raioDoCorpo: m(haste.raioDoCorpo),
     inicioDoCorpo: m(haste.inicioDoCorpo),
     comprimentoDoCorpo: m(haste.fimDoCorpo - haste.inicioDoCorpo),
+    terminalInicio: m(haste.terminal.inicio),
+    terminalComprimento: m(haste.terminal.comprimento),
+    terminalComprimentoDoColar: m(haste.terminal.comprimentoDoColar),
+    terminalRaioDoColar: m(haste.terminal.raioDoColar),
+    terminalRaioDoPescoco: m(haste.terminal.raioDoPescoco),
     ...argumentosDoOlhal('dianteiro', haste.olhal),
   };
 }
