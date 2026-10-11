@@ -1035,6 +1035,150 @@
           ],
           "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
           "data": "2026-10-11T18:19:14.404Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "topo dos anéis, no piso e nas paredes laterais da caçamba",
+              "sentido": "atravessando",
+              "evidencia": "Isométrica: dois arcos pretos sobem dentro da caçamba. Superior: tiras pretas em y 237–377, x 410–422 e 678–690. Lateral: topo do anel traseiro em y 614, piso em y 648, sem caixa de roda."
+            },
+            {
+              "parte": "rodasDianteiras",
+              "tipo": "uniao",
+              "onde": "face interna do anel, entre a roda e o chassi",
+              "sentido": "afastado",
+              "evidencia": "Frontal: roda em x 300–328, encostada só na borda do corpo em 328, a 24 px da placa de chassi (x 352–747), sem eixo. Superior: rodas fora da largura do capô."
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "laterais e frente da caixa cinza",
+              "sentido": "faltando",
+              "evidencia": "Isométrica, lateral, frontal e superior: caixa cinza lisa, sem porta, janela, para-brisa ou assento. Não há por onde entrar nem onde sentar."
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "data": "2026-10-11T18:19:30.902Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "topo dos anéis, onde cruzam o piso da caçamba",
+              "sentido": "atravessando",
+              "evidencia": "isométrica: arcos soltos sobre o piso cinza (600-650, 495-540); superior: filetes escuros em x 410-422 e 678-690, y 237-377, dentro do volume de carga; sem caixa de roda nem recorte no piso"
+            },
+            {
+              "parte": "rodas",
+              "tipo": "ausencia",
+              "onde": "ligação entre cada roda e o corpo (eixo e cubo)",
+              "sentido": "faltando",
+              "evidencia": "isométrica: anéis vazados com interior branco; frontal e superior: rodas dianteiras só tangentes à lateral do capô (superior x 374-392 contra corpo em 392); nenhum eixo visível em nenhuma vista"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "faces laterais e frontal do bloco cinza",
+              "sentido": "faltando",
+              "evidencia": "isométrica, frontal e lateral: bloco cinza maciço sem vidro, porta ou abertura; sem passagem para quem dirige"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "data": "2026-10-11T18:19:45.168Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c01",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "haste_e_terminal",
+              "tipo": "ausencia",
+              "onde": "entre o cone da cabeça e o olhal dianteiro",
+              "sentido": "faltando",
+              "evidencia": "frontal e superior, x≈740–750: o olhal dianteiro começa onde o cone termina, sem trecho cilíndrico fino. Na isométrica o olhal está colado ao disco da cabeça. Haste e terminal não aparecem em nenhuma das quatro vistas."
+            },
+            {
+              "parte": "fundo_traseiro",
+              "tipo": "espessura",
+              "onde": "colar traseiro, x≈365–385",
+              "sentido": "menor",
+              "evidencia": "frontal e superior: o colar vai de cerca de 590 a 652 e a camisa de 585 a 656. Ele é menor que a camisa e lê como tampão encostado, não como o fundo do tubo."
+            },
+            {
+              "parte": "cabeca",
+              "tipo": "superficie",
+              "onde": "disco da cabeça, silhueta circular",
+              "sentido": "facetado",
+              "evidencia": "lateral: a silhueta do disco mostra lados poligonais, cerca de 32, com uma fatia radial clara no quadrante superior esquerdo e um círculo pontilhado de 280 px no centro."
+            }
+          ],
+          "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
+          "data": "2026-10-11T18:19:31.610Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c07",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
+          "data": "2026-10-11T18:19:43.609Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
+          "data": "2026-10-11T18:19:44.396Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "uniao",
+              "onde": "as seis dobradiças das bordas externas das portas, na quina dianteira dos painéis laterais",
+              "sentido": "afastado",
+              "evidencia": "Lateral: retângulos escuros em x 441–463 sobre a face externa do painel (y≈222, 536, 850). Frontal: saem da silhueta em x 300–304 e 796–800. Isométrica: aparecem na face lateral junto à quina (x≈675). Nenhuma vista mostra a outra aba presa a uma peça interna do corpo."
+            }
+          ],
+          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
+          "data": "2026-10-11T18:19:49.787Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
+          "data": "2026-10-11T18:19:50.474Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "aba presa ao painel lateral, nos três pontos de cada lado, junto à borda frontal",
+              "sentido": "adiantada",
+              "evidencia": "Isométrica: três peças pretas na face externa lateral direita junto à frente, e marcas na borda esquerda. Frontal: pontas 3 a 4 px fora da largura do corpo (x 300 e 800). Lateral: abas sobre a face externa do painel (x 447–463, y 207–238, 521–552, 836–866). Superior: pontas fora do retângulo (x 301 e 798). As dobradiças ficam por fora do envelope do corpo. O sentido é o mais próximo do vocabulário, que não tem deslocamento lateral para fora."
+            }
+          ],
+          "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
+          "data": "2026-10-11T18:19:51.183Z"
         }
       ]
     }
