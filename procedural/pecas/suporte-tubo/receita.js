@@ -31,9 +31,11 @@
  * baixo ficam vivas, e uma chapa de 6 mm não comporta 3 mm de arredondamento nas
  * duas faces da mesma borda. Os furos e o recorte ficam com a aresta viva.
  *
- * As duas bordas livres da face de cima da aba do tubo são separadas pelo recorte e
- * têm o mesmo extremo em z; cada uma é escolhida pela `regiao` da face de ponta
- * dela, que sai da tabela.
+ * As duas bordas livres da face de cima da aba do tubo e o contorno do recorte são uma
+ * cadeia só em tangência, de um canto vivo ao outro, arredondada por `cadeia` numa
+ * chamada, sem degrau. As duas bordas têm o mesmo extremo em z; a aresta de partida é
+ * escolhida pela `regiao` da face de ponta da borda da direita, que sai da tabela, e a
+ * cadeia vem antes das laterais e dos cantos livres.
  */
 
 export const TABELA = {
@@ -130,7 +132,7 @@ export function derivar(t = TABELA) {
           { reto: [-Lt / 2, zFora] },
         ],
       },
-      pontaLivre: { direita: pontaLivre(1), esquerda: pontaLivre(-1) },
+      pontaLivre: { direita: pontaLivre(1) },
     },
   };
 }
@@ -156,12 +158,13 @@ const ARESTAS_PAREDE = [
   { nome: 'canto de baixo à esquerda', normal: 'baixo', eixo: 'x', lado: 'min' },
 ];
 const ARESTAS_TUBO = [
-  { nome: 'canto livre à direita', normal: 'direita', eixo: 'z', lado: 'max' },
-  { nome: 'canto livre à esquerda', normal: 'esquerda', eixo: 'z', lado: 'max' },
+  /* A borda livre de cima é uma cadeia só: reto, concordância, reto, semicírculo do recorte, reto, concordância e reto, de um
+     canto vivo ao outro. Uma chamada com `cadeia` a arredonda sem degrau, e ela vem antes das laterais e dos cantos livres. */
+  { nome: 'borda livre de cima', cadeia: true, dentro: 'pontaDireita', normal: 'cima', eixo: 'z', lado: 'max' },
   { nome: 'borda lateral direita de cima', normal: 'cima', eixo: 'x', lado: 'max' },
   { nome: 'borda lateral esquerda de cima', normal: 'cima', eixo: 'x', lado: 'min' },
-  { nome: 'borda livre de cima à direita', dentro: 'pontaDireita', normal: 'cima', eixo: 'z', lado: 'max' },
-  { nome: 'borda livre de cima à esquerda', dentro: 'pontaEsquerda', normal: 'cima', eixo: 'z', lado: 'max' },
+  { nome: 'canto livre à direita', normal: 'direita', eixo: 'z', lado: 'max' },
+  { nome: 'canto livre à esquerda', normal: 'esquerda', eixo: 'z', lado: 'max' },
 ];
 
 const idDoArredondamento = (base, aresta, arestas) => base + arestas.indexOf(aresta);
@@ -193,13 +196,13 @@ export function gerarPassos(t = TABELA) {
     const dentro = {
       padrao: { origem: { op: 'extrusao', id: extrusao } },
       pontaDireita: { regiao: P.abaTubo.pontaLivre.direita },
-      pontaEsquerda: { regiao: P.abaTubo.pontaLivre.esquerda },
     };
     for (const aresta of arestas) {
       passos.push(['arredondarAresta', {
         origemId: idDoArredondamento(base, aresta, arestas),
         raio: P.raioDoArredondamento,
         paineis: t.paineisDoArredondamento,
+        ...(aresta.cadeia ? { cadeia: true } : {}),
         sel: {
           ...dentro[aresta.dentro ?? 'padrao'],
           onde: { alvo: 'aresta', normal: { dir: NORMAL[aresta.normal], ate: 5 }, extremo: { eixo: aresta.eixo, lado: aresta.lado } },

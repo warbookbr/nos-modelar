@@ -22,3 +22,5 @@ de qualquer peça de chapa com furo, e o suporte é refeito depois dela.
 O suporte foi refeito em 2026-10-11, sem a interseção com caixas, em
 [`procedural/pecas/suporte-tubo/`](../../../../procedural/pecas/suporte-tubo/receita.js);
 esta pasta fica como o registro da primeira versão.
+
+A [composta](composta.png) desta pasta foi refeita em 2026-10-11 com a peça nova (as quatro vistas: isométrica, frontal, direita e superior), em que as duas bordas livres de cima da aba do tubo, as concordâncias e o recorte saem arredondados por uma `cadeia`, sem degrau. A [receita](receita.js) desta pasta continua sendo a da primeira versão.

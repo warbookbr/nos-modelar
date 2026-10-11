@@ -271,17 +271,26 @@ export async function descreverPecaReutilizavel({
       + ' descrevem uma peça incompleta.\n  ' + amostraDeOrfaos(neutro).join('\n  ') + '\n';
     falhou = true;
   }
-  /* AVISO NÃO REPROVA, MAS APARECE. O núcleo fecha a peça e diz, em `neutro.avisos`, o que um passo fez de diferente do
-     pedido: o arredondamento que terminou em degrau no meio de uma curva ficava só como uma face a mais, sem nada que o
-     expusesse, e a peça passava limpa com a quina visível. A saída de erro traz o passo, o motivo e a sugestão. */
+  const comVeredito = !semVeredito;
+  /* O DEGRAU REPROVA; O RESTO DOS AVISOS APARECE. O núcleo fecha a peça e diz, em `neutro.avisos`, o que um passo fez de
+     diferente do pedido. O arredondamento que termina em degrau no meio de uma curva ficava só como uma face a mais, sem nada
+     que o expusesse, e a peça passava limpa com a quina visível: agora o veredito reprova com a mensagem do aviso (a aresta,
+     o motivo e a sugestão). Os outros avisos (o raio que `raioMinimo` reduziu) seguem como linha informativa. */
   const avisos = descricao.avisos ?? [];
-  if (avisos.length) {
-    stderr += `\n${avisos.length} AVISO(S) DO NÚCLEO: a peça fecha, mas um passo deixou o que o pedido não previa`
-      + ' (motivo e sugestão na seção AVISOS DO NÚCLEO da descrição acima)\n'
-      + avisos.map((a) => `  passo ${a.passo} (${a.op}, ${a.ref})`).join('\n')
+  const degraus = avisos.filter((a) => a.ref === 'degrau');
+  if (comVeredito && degraus.length) {
+    stderr += `\n${degraus.length} ARREDONDAMENTO(S) TERMINADO(S) EM DEGRAU`
+      + '\n  A peça fecha, mas o fim do arco ficou numa quina plana visível:\n'
+      + degraus.map((a) => `    passo ${a.passo} (${a.op}): ${a.motivo}\n      sugestão: ${a.sugestao}`).join('\n')
+      + '\n';
+    falhou = true;
+  }
+  const outros = comVeredito ? avisos.filter((a) => a.ref !== 'degrau') : avisos;
+  if (outros.length) {
+    stderr += `\n${outros.length} AVISO(S) DO NÚCLEO (motivo na seção AVISOS DO NÚCLEO da descrição acima)\n`
+      + outros.map((a) => `  passo ${a.passo} (${a.op}, ${a.ref})`).join('\n')
       + '\n';
   }
-  const comVeredito = !semVeredito;
   if (descricao.totais.facesSemParte && comVeredito) {
     stderr += `\n${descricao.totais.facesSemParte} face(s) sem identidade semântica`
       + `\n  ids: ${descricao.facesSemParte.slice(0, 20).join(', ')}\n`;

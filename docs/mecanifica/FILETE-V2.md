@@ -86,7 +86,7 @@ faceta seguinte de uma concordância é quase paralela à aresta, o arco não ca
 plano dela e termina na seção perpendicular, com um degrau plano. Esse modo existe
 em `operacoes/arestas-em-grupos.js` e passou a deixar um aviso em
 `neutro.avisos` (`ref: 'degrau'`: a aresta, a ponta, o ângulo da vizinha, o
-motivo e a sugestão), que `descrever` mostra sem reprovar a peça.
+motivo e a sugestão), que `descrever` mostra e que reprova o veredito da peça (e o `guarda:acervo`).
 
 `cadeia: true` ou `cadeia: { ate: graus }` (padrão 30, o mesmo nome de
 `normal.ate` de `selecao-geometrica.js`) arredonda numa varredura só a aresta

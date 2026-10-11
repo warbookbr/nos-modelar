@@ -366,8 +366,9 @@ carregava o raio reduzido por `raioMinimo`, fora da forma canônica) com `ref:
 'degrau'`, a aresta (vértices e extremos), a ponta, o ângulo que a face vizinha
 faz com ela, o motivo e a sugestão. `npm run descrever` o mostra na seção AVISOS
 DO NÚCLEO da descrição e numa linha da saída de erro, e `resultado.avisos` o leva
-a quem chama; o aviso não reprova a peça, porque a malha fecha. Quem lê o aviso
-troca a chamada por `cadeia`.
+a quem chama. O degrau reprova no veredito do `descrever` (e, por ele, em
+`guarda:acervo`) com a mensagem do aviso, mesmo com a malha fechada; com
+`--sem-veredito` ele só aparece. Quem lê o aviso troca a chamada por `cadeia`.
 
 `cadeia` arredonda numa chamada só a aresta escolhida e as que continuam em
 tangência a partir dela, até um canto vivo ou até fechar o laço: `cadeia: true`
