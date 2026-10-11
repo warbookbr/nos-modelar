@@ -18,11 +18,14 @@ import { normalizarRazoesDaPeca } from './razoes-da-peca.js';
 import { TIPOS_DE_DEFEITO, TIPOS_ESTRUTURAIS } from './veredito-de-forma.js';
 
 export const FORMATO_CALIBRACAO = 'mecanifica.calibracao-do-critico@1';
-export const CLASSES = Object.freeze(['controle', 'superficie', 'estrutural']);
+export const CLASSES = Object.freeze(['controle', 'superficie', 'estrutural', 'funcao']);
 export const FAIXAS_DA_NOTA = Object.freeze({
   controle: Object.freeze([8, 10]),
   superficie: Object.freeze([8, 9]),
   estrutural: Object.freeze([5, 7]),
+  /* o defeito que tira a função da peça (a folha solta do pino, a roda fechada num tambor): a pessoa decidiu em 2026-10-11
+     que vale de 0 a 7, porque o que se cobra é que o crítico reprove e cite o defeito, e ele pode descer à faixa de 0 a 4 */
+  funcao: Object.freeze([0, 7]),
 });
 export const JULGAMENTOS_DA_CHAVE = 5;
 export const JULGAMENTOS_DAS_OUTRAS = 3;
@@ -266,7 +269,7 @@ export function lerConjunto(bruto, { exigirGerados = true } = {}) {
       if (defeitos.length === 0) recusar(`${onde}.defeitos`, defeitos, 'ao menos um defeito esperado');
       if (imagem.fonte.tipo === 'familia' && imagem.fonte.aprovacao !== undefined) recusar(`${onde}.fonte.aprovacao`, imagem.fonte.aprovacao, 'só o controle é a geometria aprovada; a imagem com defeito tem mutação');
       if (imagem.classe === 'superficie' && !defeitos.every((d) => d.tipo === 'superficie')) recusar(`${onde}.defeitos`, defeitos.map((d) => d.tipo), 'só defeito de superfície na classe superficie');
-      if (imagem.classe === 'estrutural' && !defeitos.some((d) => d.tipo !== 'superficie')) recusar(`${onde}.defeitos`, defeitos.map((d) => d.tipo), 'ao menos um defeito que não seja de superfície na classe estrutural');
+      if ((imagem.classe === 'estrutural' || imagem.classe === 'funcao') && !defeitos.some((d) => d.tipo !== 'superficie')) recusar(`${onde}.defeitos`, defeitos.map((d) => d.tipo), `ao menos um defeito que não seja de superfície na classe ${imagem.classe}`);
     }
     if (imagem.desenho !== undefined) {
       if (!plano(imagem.desenho)) recusar(`${onde}.desenho`, imagem.desenho, 'objeto { hash }');

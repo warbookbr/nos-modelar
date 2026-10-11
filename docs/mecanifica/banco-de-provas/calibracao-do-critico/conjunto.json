@@ -33,6 +33,10 @@
     "estrutural": [
       5,
       7
+    ],
+    "funcao": [
+      0,
+      7
     ]
   },
   "regra": {
@@ -315,12 +319,12 @@
     {
       "id": "c04",
       "nome": "ponta-no-ar",
-      "classe": "estrutural",
+      "classe": "funcao",
       "chave": false,
       "obrigatoria": false,
       "julgamentos": 3,
       "faixaDaNota": [
-        5,
+        0,
         7
       ],
       "objeto": {
@@ -571,12 +575,12 @@
     {
       "id": "c08",
       "nome": "pneu-macico",
-      "classe": "estrutural",
+      "classe": "funcao",
       "chave": false,
       "obrigatoria": false,
       "julgamentos": 3,
       "faixaDaNota": [
-        5,
+        0,
         7
       ],
       "objeto": {
