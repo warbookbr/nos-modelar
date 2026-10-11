@@ -38,6 +38,31 @@ describe('contato de sólidos com feições de milímetro', () => {
     expect(estado(base, caixa([2, 0, 0], [4, 2, 1]))).toBe('encostam');
   });
 
+  it('dois discos poligonais empilhados em milímetro, como olhais de dobradiça, encostam na face comum e se invadem se um desce', () => {
+    /* prisma de 12 lados (raio 9 mm, altura 40 mm) com a face de topo e de base triangulada pelo earcut: o encosto
+       entre eles é coplanar, com dezenas de triângulos de poucos mm² dos dois lados */
+    const prisma = (y0, y1) => {
+      const lados = 12; const V = new Map(); const F = new Map();
+      for (let i = 0; i < lados; i += 1) {
+        const ang = (2 * Math.PI * i) / lados;
+        V.set(i, [9 * Math.cos(ang) * MM, y0 * MM, 9 * Math.sin(ang) * MM]);
+        V.set(lados + i, [9 * Math.cos(ang) * MM, y1 * MM, 9 * Math.sin(ang) * MM]);
+      }
+      F.set('base', { id: 'base', vs: [...Array(lados).keys()] });
+      F.set('topo', { id: 'topo', vs: [...Array(lados).keys()].map((i) => lados + (lados - 1 - i)) });
+      for (let i = 0; i < lados; i += 1) {
+        const j = (i + 1) % lados;
+        F.set(`lado${i}`, { id: `lado${i}`, vs: [i, lados + i, lados + j, j] });
+      }
+      return { V, F };
+    };
+    const embaixo = prisma(0, 40);
+    expect(estado(embaixo, prisma(40, 80))).toBe('encostam');
+    expect(estado(prisma(40, 80), embaixo)).toBe('encostam');
+    expect(estado(embaixo, prisma(41, 81))).toBe('separadas');
+    expect(estado(embaixo, prisma(39, 79))).toBe('interpenetram');
+  });
+
   it('o sólido pequeno dentro de outro pequeno é achado pela contagem de cruzamentos do raio', () => {
     const fora = caixa([0, 0, 0], [0.6, 0.6, 0.6]);
     const dentro = caixa([0.2, 0.2, 0.2], [0.4, 0.4, 0.4]);
