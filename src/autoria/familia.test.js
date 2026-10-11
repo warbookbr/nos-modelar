@@ -5,10 +5,14 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
 import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
 import {
-  ErroFamilia, FERRAMENTAS_DE_FAMILIA, FORMATO_FAMILIA, PAPEIS_POR_TIPO_DE_PORTA, SCHEMA_FAMILIA, TIPOS_DE_PORTA,
-  avaliarRestricao, lerFamilia,
+  ErroFamilia, FERRAMENTAS_DE_FAMILIA, FORMATO_FAMILIA, LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM,
+  LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM, PAPEIS_POR_TIPO_DE_PORTA, SCHEMA_FAMILIA, TIPOS_DE_PORTA, TIPOS_DE_PORTA_COM_VOLUME,
+  VERSAO_CONFERENCIA_ESBOCO, avaliarRestricao, lerFamilia,
 } from './familia.js';
 import { FORMAS_DE_PORTA_DO_ANDAIME } from './forma-global.js';
+import {
+  LIMITE_DA_TOLERANCIA_DA_PORTA_MM, LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM, normalizarRefinamentoGlobal,
+} from './refinamento-global.js';
 import { resolverPortasDeMontagem } from './interfaces-montagem.js';
 import { indiceSchemasAutoria3D } from './schemas-autoria-3d.js';
 
@@ -186,6 +190,91 @@ describe('familia — cada defeito é recusado com campo, valor e o que é aceit
     const componentes = Object.fromEntries(Object.entries(COMPONENTES).map(([nome, c]) => [nome, Object.keys(c.parametros)]));
     expect(recusa(variar((f) => { f.esboco.componente = 'pneu'; }), { componentes }).message).toMatch(/esboco\.componente recebeu "pneu"; aceito: um componente do esboço: dobradica, engrenagem/);
     expect(recusa(variar((f) => { f.esboco.mapa.altura = 'largura'; }), { componentes }).message).toMatch(/esboco\.mapa\.altura recebeu "altura"; aceito: um parâmetro do componente 'roda': aro, diametro/);
+  });
+});
+
+describe('familia — a declaração dos pares que o esboço confere (esboco.conferencia)', () => {
+  const comEsboco = () => ler('../../tools/fixtures/familia-com-esboco/familia.json');
+  const variarCom = (mudar) => { const f = comEsboco(); mudar(f); return f; };
+
+  it('é opcional: a família com esboço e sem conferência continua válida e sem o campo', () => {
+    expect(Object.hasOwn(lerFamilia(fixture()).esboco, 'conferencia')).toBe(false);
+    expect(Object.hasOwn(lerFamilia(variarCom((f) => { delete f.esboco.conferencia; })).esboco, 'conferencia')).toBe(false);
+  });
+
+  it('lê a conferência canônica e versionada, em ordem de parte e de porta, sem depender da ordem escrita', () => {
+    const lida = lerFamilia(comEsboco()).esboco.conferencia;
+    expect(lida).toEqual({
+      versao: VERSAO_CONFERENCIA_ESBOCO,
+      partes: { cuboD: 'cuboD', cuboE: 'cuboE', disco: 'disco', pneu: 'pneu' },
+      portas: [{ porta: 'assento-do-pneu', volume: 'pneu', lado: '+x' }, { porta: 'cubo-externo', volume: 'cuboD', lado: '+x' }],
+      tolerancia: { envelope: 1, porta: 0.5 },
+    });
+    expect(Object.keys(lida.partes)).toEqual(['cuboD', 'cuboE', 'disco', 'pneu']);
+    const embaralhada = variarCom((f) => {
+      f.esboco.conferencia.portas.reverse();
+      f.esboco.conferencia.partes = Object.fromEntries(Object.entries(f.esboco.conferencia.partes).reverse());
+      delete f.esboco.conferencia.versao;
+    });
+    expect(JSON.stringify(lerFamilia(embaralhada))).toBe(JSON.stringify(lerFamilia(comEsboco())));
+    expect(JSON.stringify(lerFamilia(lerFamilia(comEsboco())))).toBe(JSON.stringify(lerFamilia(comEsboco())));
+  });
+
+  it('a conferência sem porta é válida, e a lista de portas não pode vir vazia', () => {
+    expect(Object.hasOwn(lerFamilia(variarCom((f) => { delete f.esboco.conferencia.portas; })).esboco.conferencia, 'portas')).toBe(false);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.portas = []; })).campo).toBe('esboco.conferencia.portas');
+  });
+
+  it('recusa cada defeito dizendo o campo, o valor e o que é aceito', () => {
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.versao = 2; })).message).toMatch(/esboco\.conferencia\.versao recebeu 2; aceito: 1/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.cor = 1; })).campo).toBe('esboco.conferencia.cor');
+    expect(recusa(variarCom((f) => { delete f.esboco.conferencia.tolerancia; })).message).toMatch(/esboco\.conferencia\.tolerancia recebeu nada/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.partes = {}; })).campo).toBe('esboco.conferencia.partes');
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.partes['meu pneu'] = 'pneu'; })).campo).toBe('esboco.conferencia.partes.meu pneu');
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.partes.pneu = ''; })).campo).toBe('esboco.conferencia.partes.pneu');
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.portas[0].porta = 'tampa'; })).message).toMatch(/portas\[0\]\.porta recebeu "tampa"; aceito: uma porta da família: assento-do-pneu, cubo-externo/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.portas[1].porta = 'assento-do-pneu'; })).message).toMatch(/portas\[1\]\.porta recebeu "assento-do-pneu"; aceito: porta ligada a um só volume/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.portas[0].lado = 'cima'; })).message).toMatch(/portas\[0\]\.lado recebeu "cima"; aceito: um de \+x, -x/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.portas[0].volume = 'a b'; })).campo).toBe('esboco.conferencia.portas[0].volume');
+    expect(recusa(variarCom((f) => { delete f.esboco.conferencia.portas[0].lado; })).campo).toBe('esboco.conferencia.portas[0].lado');
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.tolerancia.envelope = -1; })).message).toMatch(/tolerancia\.envelope recebeu -1; aceito: número de 0 a 50 mm/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.tolerancia.porta = 6; })).message).toMatch(/tolerancia\.porta recebeu 6; aceito: número de 0 a 5 mm/);
+    expect(recusa(variarCom((f) => { f.esboco.conferencia.tolerancia.folga = 1; })).campo).toBe('esboco.conferencia.tolerancia.folga');
+  });
+
+  it('só liga a volume a porta de um tipo cuja interface o volume dá, e a família sem porta não liga nenhuma', () => {
+    expect([...TIPOS_DE_PORTA_COM_VOLUME]).toEqual(['anel', 'cilindro']);
+    const erro = recusa(variarCom((f) => { f.portas.push({ id: 'face-do-disco', tipo: 'plano', papel: 'apoia' }); f.esboco.conferencia.portas[0].porta = 'face-do-disco'; }));
+    expect(erro.message).toMatch(/portas\[0\]\.porta recebeu "face-do-disco"; aceito: porta de tipo anel, cilindro, os que o volume do esboço dá; 'face-do-disco' é plano/);
+    expect(recusa(variarCom((f) => { f.portas = []; })).message).toMatch(/aceito: uma porta da família: a família não declara porta/);
+  });
+
+  it('os tetos de tolerância são os do REFINA, e o REFINA aceita a conferência como ela sai da leitura', () => {
+    expect(LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM).toBe(LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM);
+    expect(LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM).toBe(LIMITE_DA_TOLERANCIA_DA_PORTA_MM);
+    const { partes, tolerancia } = lerFamilia(comEsboco()).esboco.conferencia;
+    const volumes = Object.fromEntries(Object.entries(partes).map(([parte, volume]) => [parte, volume.replace(/([A-Z])/g, '-$1').toLowerCase()]));
+    expect(normalizarRefinamentoGlobal({ andaime: 'a.json', partes: volumes, tolerancia }).partes).toHaveLength(4);
+    expect(() => normalizarRefinamentoGlobal({ andaime: 'a.json', partes: volumes, tolerancia: { envelope: LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM + 1, porta: 0 } })).toThrow();
+  });
+
+  it('o schema JSON aceita a conferência e recusa a estrutura errada que o validador também recusa', () => {
+    const validar = new Ajv2020({ strict: false, allErrors: true }).compile(SCHEMA_FAMILIA);
+    expect(validar(comEsboco()), JSON.stringify(validar.errors)).toBe(true);
+    expect(validar(lerFamilia(comEsboco())), JSON.stringify(validar.errors)).toBe(true);
+    const casos = [
+      (f) => { f.esboco.conferencia.versao = 2; },
+      (f) => { delete f.esboco.conferencia.tolerancia; },
+      (f) => { f.esboco.conferencia.partes = {}; },
+      (f) => { f.esboco.conferencia.portas[0].lado = 'cima'; },
+      (f) => { f.esboco.conferencia.tolerancia.envelope = 51; },
+      (f) => { f.esboco.conferencia.cor = 1; },
+    ];
+    for (const mudar of casos) {
+      const f = variarCom(mudar);
+      expect(validar(f), JSON.stringify(f.esboco.conferencia)).toBe(false);
+      expect(() => lerFamilia(f)).toThrow(ErroFamilia);
+    }
   });
 });
 

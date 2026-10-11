@@ -1,0 +1,44 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "roda-com-esboco",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 610, "minimo": 300, "maximo": 900, "medio": 600 },
+    "aro": { "tipo": "numero", "unidade": "mm", "padrao": 420, "minimo": 200, "maximo": 600, "medio": 400 },
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 125, "minimo": 60, "maximo": 400, "medio": 200 }
+  },
+  "restricoes": [
+    {
+      "id": "parede-do-pneu",
+      "expressao": "aro + 40 <= diametro",
+      "motivo": "o pneu precisa de ao menos 20 mm de parede de cada lado do aro, senão o aro atravessa a banda"
+    },
+    {
+      "id": "largura-do-aro",
+      "expressao": "largura <= aro",
+      "motivo": "um pneu mais largo que o aro vira uma roda de rolo, fora do que a família desenha"
+    }
+  ],
+  "portas": [
+    { "id": "assento-do-pneu", "tipo": "anel", "papel": "ocupa" },
+    { "id": "cubo-externo", "tipo": "cilindro", "papel": "externa" }
+  ],
+  "ferramentas": ["rodaPneu"],
+  "perguntas": {
+    "pneu": ["A banda tem a mesma espessura em toda a volta?"]
+  },
+  "esboco": {
+    "componente": "roda",
+    "mapa": { "diametro": "diametro", "aro": "aro", "largura": "largura" },
+    "conferencia": {
+      "versao": 1,
+      "partes": { "pneu": "pneu", "disco": "disco", "cuboE": "cuboE", "cuboD": "cuboD" },
+      "portas": [
+        { "porta": "assento-do-pneu", "volume": "pneu", "lado": "+x" },
+        { "porta": "cubo-externo", "volume": "cuboD", "lado": "+x" }
+      ],
+      "tolerancia": { "envelope": 1, "porta": 0.5 }
+    }
+  }
+}

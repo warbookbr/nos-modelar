@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1039 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1046 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -806,6 +806,8 @@
 - `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
+- `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
+- `familia-esboco.test.js` — familia-esboco.test.js — a parte pura da conferência da família com o esboço: a dispensa, os três pontos, o esboço mínimo, o mapa de parâmetros e os achados …
 - `familia.js` — familia.js — o contrato `mecanifica.familia@1` e o validador, puros e sem nenhum import.
 - `familia.test.js` — familia.test.js — o contrato `mecanifica.familia@1`: a fixture válida passa, cada defeito é recusado com o campo, o valor e o que é aceito, e a leitura norma…
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
@@ -1028,6 +1030,12 @@
 - `derivar.js` — Fixture de teste: o `derivar` da família `tubo-de-prova`. Puro: recebe os parâmetros em milímetro, já completados com os padrões, e devolve a composição e os…
 - `familia.js` — Fixture de teste: a família `tubo-de-prova` carregada (contrato, composições e `derivar`) e a receita que a chama. A receita é um objeto com `get CHAMADAS_CO…
 
+## tools/fixtures/familia-com-esboco/
+
+- `composicoes.js` — Fixture de teste: a composição da família `roda-com-esboco`, uma roda de eixo em x com pneu, disco e dois cubos, cada um uma revolução, e duas portas (o asse…
+- `derivar.js` — Fixture de teste: o `derivar` da família `roda-com-esboco`. Puro: recebe os parâmetros em milímetro, já completados com os padrões, e devolve a composição e …
+- `familia.js` — Fixture de teste: a família `roda-com-esboco` carregada (contrato, composição e `derivar`). `criarRodaDeProva` a monta com o contrato escrito em `familia.jso…
+
 ## tools/fixtures/montagem-com-instancias-repetidas/
 
 - `carregar-estudo.mjs` — Fixture de teste: uma montagem de doze peças com uma submontagem de roda instanciada quatro vezes. Quem a usa é `tools/oficina/sonda-supercarro-1-0.test.mjs`…
@@ -1248,6 +1256,8 @@
 - `exportar-step.mjs` — exportar-step.mjs — CLI para exportação atômica e segura de receitas procedurais em formato STEP.
 - `exportar-step.test.mjs` — exportar-step.test.js — suíte de testes da CLI de exportação STEP e escrita segura.
 - `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
+- `familia-com-esboco.mjs` — familia-com-esboco.mjs — o adaptador da conferência entre a família e o componente do esboço de mesmo nome.
+- `familia-com-esboco.test.mjs` — familia-com-esboco.test.mjs — a conferência da família com o componente do esboço de mesmo nome, ponta a ponta: o componente `roda` do esboço expandido nos p…
 - `ferramentas-por-objeto.mjs` — Gera docs/mecanifica/FERRAMENTAS-POR-OBJETO.md a partir de docs/mecanifica/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
