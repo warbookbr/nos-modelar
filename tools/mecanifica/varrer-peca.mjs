@@ -18,6 +18,12 @@ import {
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { REPO, resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
+import {
+  ErroDeConfiguracao,
+  OPCAO_COMPOSICOES,
+  carregarConfiguracaoDeComposicoes,
+  faltaRegistroDeComposicoes,
+} from './configuracao-composicoes.mjs';
 
 function erroDeUso(mensagem) {
   return {
@@ -51,12 +57,20 @@ export async function varrerReutilizavel({
   objetivo = null,
   orcamento = ORCAMENTO_PADRAO,
   mostrar = 5,
+  /* Receita que compõe por `CHAMADAS_COMPOSICOES` precisa do registro de
+     composições, entregue pronto (`registroComposicoes`) ou apontado por módulo
+     (`composicoes`, o que `--composicoes=<módulo>` preenche). */
+  composicoes = null,
+  registroComposicoes = null,
+  registroOperacoes = null,
+  orcamentoComposicoes = null,
 } = {}) {
   if (!alvo) {
     return erroDeUso(
       'diga qual receita varrer.'
       + '\n  ex.: npm run varrer -- <peca> --criterio=menor-folga'
-      + '\n       npm run varrer -- <peca> --livres=entreEixos:1000..1200:5 --maximizar',
+      + '\n       npm run varrer -- <peca> --livres=entreEixos:1000..1200:5 --maximizar'
+      + '\n       npm run varrer -- <peca-composta> --composicoes=<modulo-do-registro>',
     );
   }
   let caminho;
@@ -75,13 +89,24 @@ export async function varrerReutilizavel({
   if (!Array.isArray(receita?.PASSOS) && !Array.isArray(receita?.CHAMADAS_COMPOSICOES)) {
     return falha(`RECEITA SEM ENVELOPE DA OFICINA\n  ${alvo} não exporta PASSOS nem CHAMADAS_COMPOSICOES.`);
   }
+  let execucao = { registroComposicoes, registroOperacoes, orcamentoComposicoes };
+  if (composicoes !== null) {
+    try {
+      execucao = { ...execucao, ...await carregarConfiguracaoDeComposicoes(composicoes) };
+    } catch (erro) {
+      if (erro instanceof ErroDeConfiguracao) return erroDeUso(erro.message);
+      throw erro;
+    }
+  }
+  const falta = faltaRegistroDeComposicoes(receita, execucao.registroComposicoes, alvo);
+  if (falta) return erroDeUso(falta);
 
   try {
     if (liberdades.length) {
-      const resultado = varrerLote(receita, { liberdades, criterio, objetivo, orcamento });
+      const resultado = varrerLote(receita, { liberdades, criterio, objetivo, orcamento, ...execucao });
       return { ok: true, codigo: 0, stdout: formatarLote(resultado, { alvo, mostrar }), stderr: '', resultado };
     }
-    const resultado = varrerSensibilidade(receita, { criterio, delta, orcamento });
+    const resultado = varrerSensibilidade(receita, { criterio, delta, orcamento, ...execucao });
     return { ok: true, codigo: 0, stdout: formatarSensibilidade(resultado, { alvo }), stderr: '', resultado };
   } catch (erro) {
     /* Estouro de orçamento e critério inexistente são erro de USO: a resposta
@@ -95,7 +120,7 @@ function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['criterio', 'delta', 'livres', 'alvo', 'orcamento', 'mostrar'],
+      opcoes: ['criterio', 'delta', 'livres', 'alvo', 'orcamento', 'mostrar', OPCAO_COMPOSICOES],
       bandeiras: ['maximizar', 'minimizar'],
       posicional: { nome: 'a receita', obrigatorio: false },
     });
@@ -151,6 +176,7 @@ function comoCLI(argv) {
     objetivo,
     orcamento,
     mostrar,
+    composicoes: lido.opcao(OPCAO_COMPOSICOES),
   });
 }
 
