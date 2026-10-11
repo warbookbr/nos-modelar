@@ -339,10 +339,27 @@ um furo arredonda por `sel.onde`. A tangência escorrega ao longo da aresta
 vizinha até o plano da face de ponta, para ela continuar plana numa quina que
 não é de 90°, e o raio é conferido contra todos os vértices da tampa antes de
 escrever; raio que passa de um vértice, da espessura ou da faceta vizinha de um
-arco é recusado com o vértice e a distância. O canto onde três arestas
-arredondadas se encontram ainda não é resolvido: numa tampa partida o segundo
-arredondamento no mesmo canto recusa, e numa face inteira ele passa deixando o
-painel do primeiro empenado; arredonde bordas que não dividem vértice.
+arco é recusado com o vértice e a distância.
+
+O canto onde duas ou três arestas arredondadas (ou chanfradas por `filete`)
+chegam ao mesmo vértice se fecha em esquadria, e cada aresta continua sendo uma
+chamada de `sel.onde` que resolve para uma aresta só, em qualquer ordem. Quando a
+ponta da aresta nova já é ponta de uma faixa de painéis feita por outra chamada,
+os dois prismas se cruzam pela interseção das retas de vértice: o anel de pontas
+da faixa antiga escorrega ao longo do próprio eixo até o encontro e passa a ser
+também o da nova, nenhum vértice nasce no canto, todo painel segue plano e sobre
+o cilindro do raio pedido, e a face de ponta (a que a faixa antiga margeava) perde
+os pontos do anel menos o último. No canto de três, as duas faixas antigas já
+dividem o anel, a metade dele perto da aresta nova se parte em duas cópias e o
+vértice triplo cai a 45° do arco. A condição é a mesma nas arestas do canto: raio
+igual, mesmo número de painéis e arestas a 90°, e número par de painéis onde três
+arestas se encontram (um chanfro de `filete`, com um painel, fecha o canto de
+duas arestas e recusa o de três). Quando a condição falha, o passo recusa com a
+causa (`as retas de vértice … não se cruzam`, `o canto pede o mesmo número de
+painéis`, `pede um número par de painéis`) e a malha fica como estava. A prova
+está em `procedural/nucleo/operacoes/arredondar-canto.test.ts`: a caixa com as 12
+arestas, a chapa com furo com as quatro bordas do topo, as duas ordens de
+aplicação dando os mesmos polígonos e o volume retirado conferido.
 
 **`apagaFace` é a que mais importa.** Ela é a única op
 que remove face — logo a única forma de abrir um furo, uma porta, um vão — e o

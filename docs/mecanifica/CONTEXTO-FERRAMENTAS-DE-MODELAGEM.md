@@ -136,11 +136,25 @@ pessoa mandou corrigir antes de qualquer peça de chapa com furo. A aresta da
 tampa de um perfil com furo ou de um contorno por trechos, que saía em leque de
 peças convexas, passou a arredondar: as faces coplanares que se tocam por aresta
 contam como uma só (`operacoes/arestas-em-grupos.js`), e a recusa que sobra é a de
-raio que passa de um vértice da tampa. O vértice onde três arestas arredondadas
-se encontram segue vivo: numa tampa partida o segundo arredondamento de um canto
-é recusado com o vértice que atrapalha, e numa face inteira ele ainda deforma a
-face de apoio. Depois da correção desse vértice, o suporte é refeito e entra no
-acervo com a aprovação da pessoa.
+raio que passa de um vértice da tampa. O vértice onde duas ou três arestas
+arredondadas se encontram foi o segundo defeito: numa tampa partida o segundo
+arredondamento de um canto era recusado, e numa face inteira ele passava e
+deixava o painel do primeiro empenado (9,75 mm fora do plano numa caixa de
+100 mm com raio de 10 mm). Agora o canto fecha em esquadria
+(`operacoes/cantos-arredondados.js`): as retas de vértice das duas faixas se
+cruzam, o anel de pontas da faixa antiga escorrega até o encontro e vira também o
+da nova, e no canto de três o vértice triplo cai a 45° do arco. Cada aresta segue
+sendo uma chamada de `sel.onde` para uma aresta só, em qualquer ordem, e as ordens
+testadas dão os mesmos polígonos. A prova está em
+`operacoes/arredondar-canto.test.ts`: a caixa com as 12 arestas (80 vértices, 78
+faces, 78 planos conferidos contra os calculados à mão, raio medido em cada ponto
+de painel) e a chapa com furo com as quatro bordas do topo (volume retirado igual
+à soma dos prismas menos a sobreposição dos quatro cantos). O que o remate recusa
+com a causa: raio ou número de painéis diferentes entre as arestas do canto,
+arestas que não se cruzam a 90°, faixa editada depois de arredondada e número
+ímpar de painéis onde três arestas se encontram (o chanfro de `filete`, de um
+painel, fecha o canto de duas e recusa o de três). Falta refazer o suporte de
+tubo com essa correção, e ele entra no acervo com a aprovação da pessoa.
 
 ## Depois do plano
 

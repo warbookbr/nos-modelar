@@ -237,15 +237,16 @@ describe('recusas da aresta de uma tampa partida', () => {
     expect(n.orfaos[0].motivo).toMatch(/coplanares/);
   });
 
-  it('duas bordas vizinhas da mesma tampa: a segunda recusa no canto que a primeira arredondou e a malha segue fechada e plana', () => {
+});
+
+describe('o canto de duas bordas da mesma tampa', () => {
+  it('duas bordas vizinhas da mesma tampa: a segunda fecha o canto em esquadria com a primeira, e a malha segue fechada e plana', () => {
+    /* a esquadria e as medidas do canto estão em arredondar-canto.test.ts; aqui fica a passagem da recusa que existia */
     const passos: Passo[] = [chapa(), arredonda(2, topo({ eixo: 'x', lado: 'max' })), arredonda(3, topo({ eixo: 'z', lado: 'max' }))];
     const n = nucleo(passos, {}, {});
-    expect(n.orfaos).toHaveLength(1);
-    expect(n.orfaos[0].passo).toBe(2);
-    expect(n.orfaos[0].motivo).toMatch(/canto onde as arestas se encontram, fora de escopo/);
+    expect(n.orfaos).toEqual([]);
     expect(arestasSemPar(n)).toEqual([]);
     expect(vinculosNaoManifold(n)).toEqual([]);
-    const faixa = faixaDe(passos, 'arredondarAresta', 2);
-    expect([...n.F.values()].filter((f: any) => !faixa.includes(f.id) && desvioDePlano(n, f) > 1e-6)).toEqual([]);
+    expect([...n.F.values()].filter((f: any) => desvioDePlano(n, f) > 1e-6)).toEqual([]);
   });
 });
