@@ -98,10 +98,15 @@ rodadas e nota contra a medição gravada, e só então a troca da skill
 
 O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
 item 4 do gate de saída e mostrou duas limitações do `arredondarAresta`, que a
-pessoa mandou corrigir antes de qualquer peça de chapa com furo: o vértice onde
-três arestas arredondadas se encontram fica vivo, e a aresta da tampa de um
-perfil com furo é recusada, porque a tampa sai em leque de triângulos. Depois
-da correção, o suporte é refeito e entra no acervo com a aprovação da pessoa.
+pessoa mandou corrigir antes de qualquer peça de chapa com furo. A aresta da
+tampa de um perfil com furo ou de um contorno por trechos, que saía em leque de
+peças convexas, passou a arredondar: as faces coplanares que se tocam por aresta
+contam como uma só (`operacoes/arestas-em-grupos.js`), e a recusa que sobra é a de
+raio que passa de um vértice da tampa. O vértice onde três arestas arredondadas
+se encontram segue vivo: numa tampa partida o segundo arredondamento de um canto
+é recusado com o vértice que atrapalha, e numa face inteira ele ainda deforma a
+face de apoio. Depois da correção desse vértice, o suporte é refeito e entra no
+acervo com a aprovação da pessoa.
 
 ## Depois do plano
 

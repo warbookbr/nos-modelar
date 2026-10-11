@@ -1,6 +1,16 @@
 /* estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
+import { criarArestasEmGrupos, grupoCoplanar, indiceDeArestas } from './arestas-em-grupos.js';
+
 export function criarOperacoesEstruturais(servicos) {
   const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
+  const arestasEmGrupos = criarArestasEmGrupos({ addV, addF, registraOrigem, grita });
+  /* Os grupos de faces coplanares que se tocam por aresta dos dois lados da aresta. Um grupo de mais de uma face é uma
+     tampa partida (perfil com furo, contorno por trechos); a costura em grupos cuida dela e a costura simples, de uma
+     face por lado, segue como estava. */
+  function gruposDaAresta(st, faceAId, faceBId) {
+    const indice = indiceDeArestas(st);
+    return { indice, GA: grupoCoplanar(st, indice, faceAId), GB: grupoCoplanar(st, indice, faceBId) };
+  }
   /* A aresta chega de duas formas: `de` + `aresta` (face e índice local, o endereço de sempre) ou `sel` com
      `onde:{alvo:'aresta',…}`, que escolhe por propriedade geométrica e precisa resolver para UMA aresta. No segundo
      caso a face de apoio é a de menor id entre as que a usam, e o índice é o dela nessa face. Serve a
@@ -868,6 +878,39 @@ export function criarOperacoesEstruturais(servicos) {
     const theta = Math.acos(cosT);
     if (!(theta > 1e-6) || !(theta < Math.PI - 1e-6)) return grita(st, i, 'arredondarAresta', 'aresta', 'as duas faces são coplanares ou dobram quase 180° — não há canto arredondável');
 
+    /* Tampa partida: uma das duas faces é um grupo de faces coplanares. A costura em grupos faz a conta contra o grupo
+       inteiro (arestas-em-grupos.js); a costura simples abaixo só enxerga a peça que tem a aresta. */
+    const grupos = gruposDaAresta(st, faceAId, faceBId);
+    if (grupos.GA.size > 1 || grupos.GB.size > 1) {
+      const recuoG = raio / Math.tan(theta / 2);
+      const bissetorG = norm3(dA[0] + dB[0], dA[1] + dB[1], dA[2] + dB[2]);
+      const distanciaCentroG = raio / Math.sin(theta / 2);
+      const anel = (base) => {
+        const em = (d, escala) => [base[0] + d[0] * escala, base[1] + d[1] * escala, base[2] + d[2] * escala];
+        const tangA = em(dA, recuoG), tangB = em(dB, recuoG), centro = em(bissetorG, distanciaCentroG);
+        const rad = (t) => norm3(t[0] - centro[0], t[1] - centro[1], t[2] - centro[2]);
+        const rA = rad(tangA), rB = rad(tangB);
+        const phi = Math.acos(Math.max(-1, Math.min(1, rA[0] * rB[0] + rA[1] * rB[1] + rA[2] * rB[2])));
+        const senoPhi = Math.sin(phi);
+        if (!(senoPhi > 1e-8)) return null;
+        const pts = [tangA];
+        for (let k = 1; k < paineis; k++) {
+          const t = k / paineis;
+          const a0 = Math.sin((1 - t) * phi) / senoPhi, a1 = Math.sin(t * phi) / senoPhi;
+          const r = norm3(rA[0] * a0 + rB[0] * a1, rA[1] * a0 + rB[1] * a1, rA[2] * a0 + rB[2] * a1);
+          pts.push([centro[0] + r[0] * raio, centro[1] + r[1] * raio, centro[2] + r[2] * raio]);
+        }
+        pts.push(tangB);
+        return pts;
+      };
+      if (!anel(P)) return grita(st, i, 'arredondarAresta', 'aresta', 'arco degenerado entre as duas tangências');
+      arestasEmGrupos.costurar(st, i, 'arredondarAresta', {
+        b, origemId: a.origemId, faceAId, faceBId, v0, v1, e, paineis, anel, ...grupos,
+        recuoTexto: `o recuo de ${Number(recuoG.toPrecision(4))} do raio ${raio}`,
+      });
+      return;
+    }
+
     /* Até onde cada canto pode andar na direção de tangência antes de tocar a
        próxima borda da própria face. A conta 2D também cobre o caso em que a
        direção corre exatamente SOBRE a aresta vizinha (caso do cubo). */
@@ -1148,6 +1191,20 @@ export function criarOperacoesEstruturais(servicos) {
 
     const raio = st.num(a.raio ?? 0);
     if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'filete', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
+
+    /* Tampa partida: o mesmo tratamento do arredondarAresta (arestas-em-grupos.js), com um painel e sem arco. */
+    const gruposF = gruposDaAresta(st, faceAId, faceBId);
+    if (gruposF.GA.size > 1 || gruposF.GB.size > 1) {
+      const anel = (base) => [
+        [base[0] + raio * dA[0], base[1] + raio * dA[1], base[2] + raio * dA[2]],
+        [base[0] + raio * dB[0], base[1] + raio * dB[1], base[2] + raio * dB[2]],
+      ];
+      arestasEmGrupos.costurar(st, i, 'filete', {
+        b, origemId: a.origemId, faceAId, faceBId, v0, v1, e, paineis: 1, anel, ...gruposF,
+        recuoTexto: `o recuo de ${raio} do filete`,
+      });
+      return;
+    }
 
     /* AS PONTAS DA ARESTA. Cada ponta (v0, v1) é um vértice onde chega uma
        TERCEIRA face além das duas da aresta. Ela precisa entrar na conta: se
