@@ -17,6 +17,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { criarFerramentasParametros } from './parametros.mjs';
+import { parametrosReutilizavel } from '../../mecanifica/parametros-peca.mjs';
 import { REPO } from '../../mecanifica/resolver-caminho-receita.mjs';
 
 const ferramentas = criarFerramentasParametros();
@@ -147,11 +148,14 @@ describe('porta MCP da varredura', () => {
     expect(um.conteudo[0].text).toContain(`PARÂMETROS DE ${VIVA}`);
 
     const todos = await chamar('diagnosticar_parametros', { acervo: true });
-    /* O mesmo retrato travado em `parametros-peca.test.mjs`, medido de novo
-       depois que o acervo ficou sem peça e a única receita executável que
-       sobrou passou a ser a fixture das guardas. Os dois números têm de andar
-       juntos, porque a porta MCP e a CLI leem a mesma varredura. */
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 7, vivos: 7, inertes: 0 });
+    /* A porta MCP e a CLI leem a mesma varredura, então o total do acervo que
+       uma devolve é o que a outra devolve na mesma árvore. O número não é
+       escrito aqui: cada peça nova do acervo o muda, e `parametros-peca.test.mjs`
+       prova que ele é a soma dos alvos que o acervo lista. */
+    const cli = await parametrosReutilizavel({ acervo: true });
+    expect(cli.ok).toBe(true);
+    expect(todos.estruturado.resultado.totais).toEqual(cli.resultado.totais);
+    expect(todos.estruturado.resultado.totais.declarados).toBeGreaterThan(0);
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

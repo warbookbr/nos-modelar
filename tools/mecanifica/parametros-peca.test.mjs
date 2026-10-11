@@ -1,6 +1,8 @@
 /* Prova de R00: liberdade declarada não é liberdade real, e a diferença é
-   conferível. O número do acervo fica travado aqui de propósito — se alguém
-   ligar uma receita aos seus parâmetros, ou desligar, o teste avisa.
+   conferível. O total do acervo é conferido contra a soma dos alvos que o
+   acervo lista, medidos um a um, e não contra um número fixo: peça nova no
+   acervo mudava o total e quebrava o teste sem que nenhuma ligação tivesse
+   mudado.
 
    O alvo nomeado do describe "acervo real" já não é `cadeira-de-madeira`: essa
    peça (e chapa-de-fixacao, e as três prensas) era acervo publicado que o
@@ -22,7 +24,7 @@ import {
   lerCaminho,
   receitaComParametros,
 } from '../../src/autoria/parametros-vivos.js';
-import { parametrosReutilizavel } from './parametros-peca.mjs';
+import { alvosDoAcervo, parametrosReutilizavel } from './parametros-peca.mjs';
 import { REPO } from './resolver-caminho-receita.mjs';
 
 /* Receita mínima paramétrica: os passos DERIVAM dos parâmetros. */
@@ -220,19 +222,29 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do que o repositório tem de receita executável', async () => {
-    /* `cadeira-de-madeira`, `chapa-de-fixacao` e as três prensas eram acervo
-       publicado que o commit `33fde6a6` moveu para `tools/fixtures/acervo/`
-       em vez de apagar; de lá a bancada publicada passou a listá-las como
-       acervo real. Depois disso saíram o braço robótico e a bicicleta, e o
-       acervo ficou sem peça: o que resta de receita executável é a fixture das
-       guardas, `peca-de-prova`. Este retrato é o preço de travar o estado do
-       acervo, e ele se paga quando uma peça some sem ninguém perceber. */
+  it('conta o acervo a partir dos alvos que ele lista, medidos um a um', async () => {
+    /* O total sai da soma dos alvos que `alvosDoAcervo` lista, cada um medido
+       sozinho, e não de um número escrito aqui: o acervo cresce e encolhe com as
+       peças, e o que o teste prova é que a varredura inteira e a medida de cada
+       alvo dão a mesma conta, sem alvo ausente nem a mais. */
+    const alvos = alvosDoAcervo().map((a) => a.nome);
+    expect(alvos).toContain('peca-de-prova');
+    const individuais = [];
+    for (const alvo of alvos) {
+      const um = await parametrosReutilizavel({ alvo });
+      expect(um.ok, alvo).toBe(true);
+      individuais.push([alvo, um.resultado.registro.totais]);
+    }
+    const soma = (campo) => individuais.reduce((total, [, t]) => total + t[campo], 0);
+
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 7, vivos: 7, inertes: 0 });
+    expect(r.resultado.registros.map((x) => x.alvo)).toEqual(alvos);
+    expect(r.resultado.totais).toEqual({ declarados: soma('declarados'), vivos: soma('vivos'), inertes: soma('inertes') });
+    expect(r.resultado.totais.declarados).toBeGreaterThan(0);
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
+    expect(Object.fromEntries(individuais)).toEqual(porAlvo);
     /* A PEÇA DE PROVA É O ALVO NOMEADO, e não conteúdo do acervo: os sete
        números dela existem para atender requisito de guarda, e cada um move
        geometria, então os sete são vivos e nenhum é inerte. */
@@ -240,7 +252,7 @@ describe('acervo real', () => {
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
     expect(r.resultado.registros.every((x) => x.determinismo.estavel)).toBe(true);
-  }, 90_000);
+  }, 180_000);
 
   it('recusa uso ambíguo em vez de escolher por conta própria', async () => {
     expect((await parametrosReutilizavel({})).codigo).toBe(2);

@@ -18,3 +18,7 @@ grandes no topo da aba de parede e na junção das abas. A concordância do cont
 só liga dois retos, então o recorte do tubo tem trechos retos antes do arco. As
 duas limitações do arredondamento ficam como tarefa da camada de features antes
 de qualquer peça de chapa com furo, e o suporte é refeito depois dela.
+
+O suporte foi refeito em 2026-10-11, sem a interseção com caixas, em
+[`procedural/pecas/suporte-tubo/`](../../../../procedural/pecas/suporte-tubo/receita.js);
+esta pasta fica como o registro da primeira versão.
