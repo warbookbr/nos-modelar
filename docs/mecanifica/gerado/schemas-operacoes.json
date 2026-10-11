@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:09073c2279db34f2ee1c1b863e4b362593e827c2b11f062cef09b6393755e00e",
+  "assinatura": "sha256:ebe6e690b35d8113e2a185a3b52bf0e93041379af9d0d3ad391ed6c333a30299",
   "total": 37,
   "operacoes": [
     {
@@ -367,7 +367,8 @@
         ],
         "limites": [
           "Cada lado da aresta é uma face convexa ou um grupo de faces coplanares que se tocam por aresta, como a tampa partida de um perfil com furo ou de um contorno por trechos.",
-          "Num grupo, o raio é conferido contra todos os vértices dele e recusa com o vértice quando não cabe; o canto composto de uma tampa partida e a ponta já arredondada por outra aresta (canto de três arestas) são recusados.",
+          "Num grupo, o raio é conferido contra todos os vértices dele e recusa com o vértice quando não cabe; o canto composto de uma tampa partida é recusado.",
+          "Onde a ponta da aresta já é ponta de uma faixa arredondada ou chanfrada por outra aresta, o canto fecha em esquadria (cantos-arredondados.js): o mesmo raio e o mesmo número de painéis nas arestas do canto, arestas a 90°, e número par de painéis onde três arestas se encontram. Fora disso o passo recusa com a causa e a malha fica como estava.",
           "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
         ],
         "diagnosticos": []
@@ -1786,7 +1787,7 @@
           "Declare de + aresta ou sel, nunca os dois."
         ],
         "limites": [
-          "Não é arredondamento multi-painel e não cobre encontro de três arestas.",
+          "Não é arredondamento multi-painel. O canto de duas arestas chanfradas fecha em esquadria; o de três é recusado, porque o vértice triplo pede um número par de painéis.",
           "Numa tampa partida (grupo de faces coplanares) o recuo é conferido contra todos os vértices do grupo e recusa quando não cabe.",
           "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
         ],

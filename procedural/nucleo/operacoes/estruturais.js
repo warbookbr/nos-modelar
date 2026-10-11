@@ -879,9 +879,10 @@ export function criarOperacoesEstruturais(servicos) {
     if (!(theta > 1e-6) || !(theta < Math.PI - 1e-6)) return grita(st, i, 'arredondarAresta', 'aresta', 'as duas faces são coplanares ou dobram quase 180° — não há canto arredondável');
 
     /* Tampa partida: uma das duas faces é um grupo de faces coplanares. A costura em grupos faz a conta contra o grupo
-       inteiro (arestas-em-grupos.js); a costura simples abaixo só enxerga a peça que tem a aresta. */
+       inteiro (arestas-em-grupos.js); a costura simples abaixo só enxerga a peça que tem a aresta. O canto onde a
+       ponta é de uma faixa arredondada antes também vai por ela, que o remata pela esquadria (cantos-arredondados.js). */
     const grupos = gruposDaAresta(st, faceAId, faceBId);
-    if (grupos.GA.size > 1 || grupos.GB.size > 1) {
+    if (grupos.GA.size > 1 || grupos.GB.size > 1 || arestasEmGrupos.temCantoArredondado(st, v0, v1, faceAId, faceBId)) {
       const recuoG = raio / Math.tan(theta / 2);
       const bissetorG = norm3(dA[0] + dB[0], dA[1] + dB[1], dA[2] + dB[2]);
       const distanciaCentroG = raio / Math.sin(theta / 2);
@@ -1101,7 +1102,9 @@ export function criarOperacoesEstruturais(servicos) {
      além das duas da aresta. Zero (borda aberta) ou duas ou mais (canto
      complexo) GRITAM — o canto de três arestas está declarado fora de escopo
      no gate deste ciclo, e o que está fora de escopo grita em vez de sair
-     torto. O sentido de percurso de cada terceira face também é DERIVADO da
+     torto. A exceção é a ponta que já é de um filete ou arredondamento
+     anterior: ela vai pela costura em grupos, que a remata em esquadria
+     (cantos-arredondados.js). O sentido de percurso de cada terceira face também é DERIVADO da
      lei da malha fechada, não adivinhado: se não bater, o passo grita.
 
      NUMERAÇÃO (formato salvo). Com `b` a base do passo: VÉRTICES `b+0`=P1,
@@ -1119,8 +1122,8 @@ export function criarOperacoesEstruturais(servicos) {
      op não constrói nada nesse passo.
 
      FORA DE ESCOPO (declarado, não escondido): filete de VÁRIOS segmentos
-     (ver acima), filete VARIÁVEL ao longo da aresta, filete de CANTO (três
-     arestas se encontrando num vértice) e concordância entre CORPOS
+     (ver acima), filete VARIÁVEL ao longo da aresta, filete de CANTO sem faixa
+     anterior (três arestas se encontrando num vértice) e concordância entre CORPOS
      diferentes. O raio não é conferido contra o tamanho das faces vizinhas
      (um raio grande demais pode fazer o painel novo ultrapassar a face) —
      isto é uma responsabilidade do autor, não uma guarda do núcleo;
@@ -1194,7 +1197,7 @@ export function criarOperacoesEstruturais(servicos) {
 
     /* Tampa partida: o mesmo tratamento do arredondarAresta (arestas-em-grupos.js), com um painel e sem arco. */
     const gruposF = gruposDaAresta(st, faceAId, faceBId);
-    if (gruposF.GA.size > 1 || gruposF.GB.size > 1) {
+    if (gruposF.GA.size > 1 || gruposF.GB.size > 1 || arestasEmGrupos.temCantoArredondado(st, v0, v1, faceAId, faceBId)) {
       const anel = (base) => [
         [base[0] + raio * dA[0], base[1] + raio * dA[1], base[2] + raio * dA[2]],
         [base[0] + raio * dB[0], base[1] + raio * dB[1], base[2] + raio * dB[2]],

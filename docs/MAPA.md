@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1024 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1026 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -653,6 +653,7 @@
 - `arestas-em-grupos.js` — arestas-em-grupos.js — arredondar ou chanfrar uma aresta cujo lado é uma face PARTIDA em várias coplanares.
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
 - `arredondar-aresta.test.ts` — arredondar-aresta.test.ts — contrato de aceitação do Escopo A do filete v2. Escrito antes da op: uma aresta simples de cubo ganha uma faixa de arco com vário…
+- `arredondar-canto.test.ts` — arredondar-canto.test.ts — o vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
@@ -661,6 +662,7 @@
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
 - `booleanas.test.ts` — booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos" (docs/mecanifica/planos/encerrados/2026-09-28-uniao-de-solidos.md). A fixture é neutra: dois cub…
+- `cantos-arredondados.js` — cantos-arredondados.js — o remate do vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
 - `estouro-de-bloco.test.ts` — estouro-de-bloco.test.ts — nenhum passo que passa de BLOCO ids lança erro: espelha, arranja, furo e os geradores com lados:{desvio} continuam na faixa estend…

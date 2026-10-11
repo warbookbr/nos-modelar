@@ -16,7 +16,14 @@
    O QUE É CONFERIDO ANTES DE ESCREVER (nada é escrito se uma conferência falhar): a ponta é fechada por uma única face
    além dos dois grupos; a face de ponta é plana; nenhum vértice dos grupos cai na faixa que o arredondamento retira;
    toda face tocada continua com a área do mesmo sinal, e convexa se era convexa. Raio que não cabe, canto composto e
-   ponta complexa gritam com a causa. */
+   ponta complexa gritam com a causa.
+
+   O CANTO. Quando a face de ponta é o painel de uma faixa arredondada ou chanfrada por outra chamada (ou são dois painéis,
+   um de cada faixa), a ponta não é plana e o arco novo não cabe nela: o canto é remate de dois ou de três e cantos-arredondados.js
+   devolve o plano da ponta (o anel compartilhado com a faixa antiga, escorregado até a esquadria). Este arquivo escreve esse
+   plano com a mesma conferência das pontas planas e, em canto de remate, confere também que toda face plana continua plana. */
+
+import { painelRegistrado, remateDeDois, remateDeTres } from './cantos-arredondados.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -108,14 +115,21 @@ export function criarArestasEmGrupos({ addV, addF, registraOrigem, grita }) {
     const falha = (msg) => { grita(st, i, op, campo, msg); return false; };
 
     /* as duas pontas: leque de A, leque de B e a face de ponta, que precisa ser a mesma dos dois lados. Em v0 a face A
-       sai pela aresta que chega a v0 e a B pela que sai de v0; em v1 é o contrário. */
+       sai pela aresta que chega a v0 e a B pela que sai de v0; em v1 é o contrário. Quando a face de ponta é o painel de
+       uma faixa arredondada antes, o canto é de remate (cantos-arredondados.js): com dois painéis diferentes entre os
+       leques, é o canto de três arestas. */
     const ponta = (nome, v, chaveA, chaveB) => {
       const la = andarLeque(st, GA, faceAId, (f) => indice.get(chaveA(f, v)));
       const lb = andarLeque(st, GB, faceBId, (f) => indice.get(chaveB(f, v)));
-      if (!la || !lb || la.fora !== lb.fora) {
-        return falha(`a ponta ${nome} da aresta não fecha com uma única face entre a tampa de ${GA.size} face(s) e a de ${GB.size}: o canto tem outras faces ao redor (canto composto ou de três arestas)`);
+      const msg = `a ponta ${nome} da aresta não fecha com uma única face entre a tampa de ${GA.size} face(s) e a de ${GB.size}: o canto tem outras faces ao redor (canto composto)`;
+      if (!la || !lb) return falha(msg);
+      if (la.fora === lb.fora) {
+        return { A: la.faces, B: lb.faces, fora: la.fora, tipo: painelRegistrado(st, la.fora) ? 'dois' : 'plano' };
       }
-      return { A: la.faces, B: lb.faces, fora: la.fora };
+      if (painelRegistrado(st, la.fora) && painelRegistrado(st, lb.fora)) {
+        return { A: la.faces, B: lb.faces, foraA: la.fora, foraB: lb.fora, tipo: 'tres' };
+      }
+      return falha(msg);
     };
     const p0 = ponta('v0', v0, (f, v) => chave(v, antes(f, v)), (f, v) => chave(depois(f, v), v));
     if (!p0) return false;
@@ -143,26 +157,73 @@ export function criarArestasEmGrupos({ addV, addF, registraOrigem, grita }) {
       return pontos.map((x) => soma(x, mul(e, -ponto(sub(x, base), uC) / cosE)));
     };
     const P = pos(v0), Q = pos(v1);
-    const aneis0 = noPlano(p0.fora, P, anel(P), 'v0');
-    if (!aneis0) return false;
-    const aneis1 = noPlano(p1.fora, Q, anel(Q), 'v1');
-    if (!aneis1) return false;
+    /* os ids dos vértices que nascem em cada ponta: os do lado de v0 em b + 2(k-1) e os do lado de v1 logo depois */
+    const novoId = (nome, k) => b + (k - 1) * 2 + (nome === 'v0' ? 0 : 1);
+    const idPonta = (nome, v) => {
+      const ids = [v];
+      for (let k = 1; k <= paineis; k++) ids.push(novoId(nome, k));
+      return ids;
+    };
+    const ctx = { st, pos, indice, GA, GB, e, paineis, anel, novoId };
+
+    /* o plano de cada ponta: o anel (ids e pontos, do lado A ao B), o que nasce, o que anda, as listas de cantos que
+       mudam (fase 'B': as faces do leque; fase 'fora': as de ponta) e os vértices que a conferência da faixa ignora */
+    const planejar = (nome, v, ponta, base) => {
+      if (ponta.tipo === 'dois' || ponta.tipo === 'tres') {
+        const plano = ponta.tipo === 'dois' ? remateDeDois(ctx, nome, v, ponta) : remateDeTres(ctx, nome, v, ponta);
+        if (plano.erro) return falha(`o canto da ponta ${nome} não fecha: ${plano.erro}`);
+        return plano;
+      }
+      const aneis = noPlano(ponta.fora, base, anel(base), nome);
+      if (!aneis) return null;
+      const ids = idPonta(nome, v);
+      return {
+        tipo: 'plano',
+        ring: ids,
+        pos: aneis,
+        novos: ids.slice(1).map((id, k) => [id, aneis[k + 1]]),
+        mover: [[v, aneis[0]]],
+        ignorar: new Set(),
+        validar: ponta.A,
+        edicoes: [
+          { fase: 'B', fids: ponta.B, fn: (vs) => vs.map((x) => (x === v ? ids[paineis] : x)) },
+          {
+            fase: 'fora',
+            fids: [ponta.fora],
+            fn: nome === 'v0'
+              ? (vs) => vs.flatMap((x) => (x === v ? [...ids.slice(1).reverse(), v] : [x]))
+              : (vs) => vs.flatMap((x) => (x === v ? [v, ...ids.slice(1)] : [x])),
+          },
+        ],
+      };
+    };
+    const plano0 = planejar('v0', v0, p0, P);
+    if (!plano0) return false;
+    const plano1 = planejar('v1', v1, p1, Q);
+    if (!plano1) return false;
+    const comRemate = plano0.tipo !== 'plano' || plano1.tipo !== 'plano';
 
     /* a nova lista de cantos de cada face tocada e as posições novas */
-    const idP = [v0], idQ = [v1];
-    for (let k = 1; k <= paineis; k++) { idP.push(b + (k - 1) * 2); idQ.push(b + (k - 1) * 2 + 1); }
-    const novaPos = new Map([[v0, aneis0[0]], [v1, aneis1[0]]]);
-    for (let k = 1; k <= paineis; k++) { novaPos.set(idP[k], aneis0[k]); novaPos.set(idQ[k], aneis1[k]); }
+    const idP = plano0.ring, idQ = plano1.ring;
+    const novaPos = new Map();
+    for (const plano of [plano0, plano1]) {
+      for (const [id, x] of plano.mover) novaPos.set(id, x);
+      for (const [id, x] of plano.novos) novaPos.set(id, x);
+    }
     const posNova = (v) => novaPos.get(v) ?? pos(v);
     const listas = new Map();
     const lista = (fid) => listas.get(fid) ?? F(fid).vs;
-    for (const fid of [...p0.A, ...p1.A]) listas.set(fid, F(fid).vs);
-    for (const fid of p0.B) listas.set(fid, lista(fid).map((v) => (v === v0 ? idP[paineis] : v === v1 ? idQ[paineis] : v)));
-    for (const fid of p1.B) listas.set(fid, lista(fid).map((v) => (v === v0 ? idP[paineis] : v === v1 ? idQ[paineis] : v)));
-    listas.set(p0.fora, lista(p0.fora).flatMap((v) => (v === v0 ? [...idP.slice(1).reverse(), v0] : [v])));
-    listas.set(p1.fora, lista(p1.fora).flatMap((v) => (v === v1 ? [v1, ...idQ.slice(1)] : [v])));
+    for (const fid of [...plano0.validar, ...plano1.validar]) listas.set(fid, F(fid).vs);
+    for (const fase of ['B', 'fora']) {
+      for (const plano of [plano0, plano1]) {
+        for (const ed of plano.edicoes) {
+          if (ed.fase === fase) for (const fid of ed.fids) listas.set(fid, ed.fn(lista(fid)));
+        }
+      }
+    }
 
     /* nenhum vértice dos grupos pode cair na faixa que sai: o raio não cabe nesse caso */
+    const ignorados = new Set([...plano0.ignorar, ...plano1.ignorar]);
     const faixa = (grupo, nome, extremoP, extremoQ) => {
       const poli = [P, Q, extremoQ, extremoP];
       const nT = newell((k) => poli[k], [0, 1, 2, 3]);
@@ -181,20 +242,28 @@ export function criarArestasEmGrupos({ addV, addF, registraOrigem, grita }) {
       };
       for (const fid of grupo) {
         for (const v of F(fid).vs) {
-          if (v === v0 || v === v1) continue;
+          if (v === v0 || v === v1 || ignorados.has(v)) continue;
           if (dentro(pos(v))) {
             const d = sub(pos(v), P);
             const fora = tam(sub(d, mul(e, ponto(d, e))));
-            return falha(`o raio não cabe: o vértice ${v} (face ${fid}, lado ${nome}) fica a ${Number(fora.toPrecision(3))} da aresta e ${p.recuoTexto} chega além dele. Se ${v} nasceu de outro arredondamento ou filete que divide uma ponta desta aresta, é o canto onde as arestas se encontram, fora de escopo`);
+            return falha(`o raio não cabe: o vértice ${v} (face ${fid}, lado ${nome}) fica a ${Number(fora.toPrecision(3))} da aresta e ${p.recuoTexto} chega além dele`);
           }
         }
       }
       return true;
     };
-    if (!faixa(GA, 'A', aneis0[0], aneis1[0])) return false;
-    if (!faixa(GB, 'B', aneis0[paineis], aneis1[paineis])) return false;
+    if (!faixa(GA, 'A', plano0.pos[0], plano1.pos[0])) return false;
+    if (!faixa(GB, 'B', plano0.pos[paineis], plano1.pos[paineis])) return false;
 
-    /* cada face tocada continua válida */
+    /* cada face tocada continua válida; no canto de remate, também plana se era plana */
+    const desvioDoPlano = (posFn, vs) => {
+      const nn = newell(posFn, vs);
+      const l = tam(nn);
+      if (!(l > 0)) return 0;
+      const u = mul(nn, 1 / l);
+      const p0v = posFn(vs[0]);
+      return Math.max(...vs.map((x) => Math.abs(ponto(sub(posFn(x), p0v), u))));
+    };
     for (const [fid, nova] of listas) {
       const f = F(fid);
       const antiga = newell(pos, f.vs);
@@ -218,11 +287,33 @@ export function criarArestasEmGrupos({ addV, addF, registraOrigem, grita }) {
           if (ponto(cruz(sub(c, a), sub(d, c)), un) < -t) return falha(`o raio não cabe: a face ${fid} ficaria côncava (canto ${nova[(k + 1) % nova.length]})`);
         }
       }
+      if (comRemate) {
+        let escala = 0;
+        for (const x of f.vs) escala = Math.max(escala, tam(sub(pos(x), pos(f.vs[0]))));
+        const tolPlano = 1e-7 * Math.max(1, escala);
+        const depoisDev = desvioDoPlano(posNova, nova);
+        if (desvioDoPlano(pos, f.vs) <= tolPlano && depoisDev > tolPlano) {
+          return falha(`o canto deixaria a face ${fid} fora do plano (${Number((depoisDev * 1000).toPrecision(3))} mm)`);
+        }
+      }
+    }
+    if (comRemate) {
+      /* a faixa nova: cada painel precisa ficar plano, com área e no sentido da face A */
+      for (let k = 1; k <= paineis; k++) {
+        const vs = [idP[k], idQ[k], idQ[k - 1], idP[k - 1]];
+        const nn = newell(posNova, vs);
+        const lado = Math.max(tam(sub(posNova(vs[0]), posNova(vs[1]))), tam(sub(posNova(vs[1]), posNova(vs[2]))));
+        if (!(tam(nn) > 1e-12 * Math.max(1, lado))) return falha(`o raio não cabe: o painel ${k} da faixa nova ficaria sem área`);
+        if (desvioDoPlano(posNova, vs) > 1e-7 * Math.max(1, lado)) return falha(`o raio não cabe: o painel ${k} da faixa nova ficaria fora do plano`);
+      }
     }
 
     /* tudo conferido: escreve */
-    for (let k = 1; k <= paineis; k++) { addV(st, idP[k], aneis0[k]); addV(st, idQ[k], aneis1[k]); }
-    st.V.set(v0, aneis0[0]); st.V.set(v1, aneis1[0]);
+    for (let k = 0; k < paineis; k++) {
+      if (plano0.novos[k]) addV(st, plano0.novos[k][0], plano0.novos[k][1]);
+      if (plano1.novos[k]) addV(st, plano1.novos[k][0], plano1.novos[k][1]);
+    }
+    for (const plano of [plano0, plano1]) for (const [id, x] of plano.mover) st.V.set(id, x);
     const ids = [];
     const A = F(faceAId);
     for (let k = 1; k <= paineis; k++) {
@@ -238,5 +329,14 @@ export function criarArestasEmGrupos({ addV, addF, registraOrigem, grita }) {
     return true;
   }
 
-  return { costurar };
+  /* o vértice v0 ou v1 da aresta é ponta de uma faixa arredondada antes: o caminho em grupos cuida do remate do canto */
+  function temCantoArredondado(st, v0, v1, faceAId, faceBId) {
+    for (const [fid, f] of st.F) {
+      if (fid === faceAId || fid === faceBId) continue;
+      if ((f.vs.includes(v0) || f.vs.includes(v1)) && painelRegistrado(st, fid)) return true;
+    }
+    return false;
+  }
+
+  return { costurar, temCantoArredondado };
 }
