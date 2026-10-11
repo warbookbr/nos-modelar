@@ -135,6 +135,19 @@ validador e o gate `calibracao:check`; (5) as perguntas por família no brief; (
 as rodadas com o brief atual e o novo, com até três ajustes; (7) o gate no CI sem
 aumentar a leitura obrigatória.
 
+As tarefas 1 a 3 entraram em 2026-10-11. A razão (`mede: { razao: [A, B], faixa }`) vale no módulo do esboço, na blocagem do nível
+zero, no `--medidas` e no Portão da Maquete. O veredito de `descrever` ganhou, depois do que já rodava, o G01 sobre a malha da peça
+(`REFINA.alvo`), o contorno por parte (`*.contornos.json` na pasta da peça) e as razões (`RAZOES`), e o item sem referência imprime
+"não conferido: sem referência" sem aprovar nem barrar; o uso está em [`CONFERIR-CONTRA-REFERENCIA.md`](usar/CONFERIR-CONTRA-REFERENCIA.md).
+Os contornos versionados do braço moram em `procedural/pecas/braco-robotico/referencias/`, na pasta do objeto e não na de uma
+parte, e por isso nenhuma peça os recebe: medida a base contra eles (região `base` com o corpo e o pé), a razão interseção/união dá
+0,82 na lateral, 0,79 na frontal e 0,85 na lateral sem cabo, e a caixa lateral dá 0 na lateral (a foto a mostra atrás da base, o
+`PLANO` a põe em -X). A prova do contorno é, por isso, a do suporte de `tools/fixtures/refina-forma-global/`. A trava no laço é
+`rodada-de-modelagem.mjs`: `--acao` mede a receita atual (veredito, `guarda:acervo`, `guarda:referencial` e `PONTOS`), identifica-a
+pelo hash e devolve `modelar` enquanto a medição não passa, e `--registrar` mede de novo e recusa o veredito do crítico sobre medição
+reprovada; a regra saiu da skill `laco-de-modelagem`. No esboço o `--proximo` já só pedia o brief com o Portão aprovado, e as
+medidas do plano, as razões entre elas, são parte do Portão; os testes de recusa estão em `esboco-proximo-mede-antes.test.mjs`.
+
 ## Desenho da fatia 9
 
 A pessoa decidiu em 2026-10-11: a família e o componente do esboço de mesmo nome

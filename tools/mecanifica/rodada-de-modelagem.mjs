@@ -11,6 +11,13 @@
  * assim" precisa ter resposta depois que todo mundo esqueceu, e veredito que
  * vive só no diálogo some com a janela de contexto.
  *
+ * A MEDIÇÃO É DA FERRAMENTA, NÃO DE QUEM CONDUZ. A instrução de medir antes do crítico estava na skill do laço, e
+ * `medidas.passou` era o que a sessão escrevia no JSON da rodada: dava para registrar um veredito sobre receita reprovada, e
+ * `--acao` lia a medida de uma rodada que podia ser de outra versão da receita. Agora `--acao` mede a receita atual (o veredito de
+ * `descrever`, `guarda:acervo` e `guarda:referencial` sobre a peça, e `conferir-pontos` quando ela declara `PONTOS`), identifica-a
+ * pelo hash do texto e devolve `modelar` enquanto a medição não passar; `--registrar` mede de novo, grava a medição da ferramenta
+ * e recusa o veredito do crítico quando ela reprovou, ou quando a sessão declarou `medidas` que a ferramenta não confirma.
+ *
  * Uso:
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
@@ -19,9 +26,13 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LIMITE_DE_RODADAS, defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
+import { LIMITE_DE_RODADAS, acaoDaReceita, defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { conferirAcervo } from './guardas/guarda-acervo.mjs';
+import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
+import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
+import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -135,28 +146,101 @@ export function limiteDaPeca(peca, { pasta = pastaDeRodadas(peca) } = {}) {
   return limite;
 }
 
-function comoCLI(argv) {
+const LIMITE_DO_RELATORIO = 2000;
+const cortar = (texto) => (texto.length > LIMITE_DO_RELATORIO ? `${texto.slice(0, LIMITE_DO_RELATORIO - 1)}…` : texto);
+const indentar = (texto) => texto.trim().split('\n').map((l) => `  ${l}`).join('\n');
+
+/**
+ * A medição da receita atual da peça, feita pela ferramenta: o veredito de `descrever` (partes, refinamento, contatos, formas e a
+ * forma contra a referência), a guarda do acervo e a do referencial sobre a peça, e os `PONTOS` quando ela os declara. Devolve
+ * `{ passou, relatorio, sha256, texto }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada grava) e
+ * `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois. Peça sem receita resolvível lança.
+ */
+export async function medirReceita(peca) {
+  const caminho = resolverCaminhoReceita(peca);
+  const texto = readFileSync(caminho, 'utf8');
+  const sha256 = `sha256:${createHash('sha256').update(texto).digest('hex')}`;
+  const falhas = [];
+  const feitas = ['descrever (veredito)', 'guarda:acervo', 'guarda:referencial'];
+  const acervo = await conferirAcervo([peca]);
+  for (const r of acervo.reprovadas) falhas.push(`guarda:acervo reprovou '${r.peca}':\n${indentar(r.motivo)}`);
+  for (const e of acervo.esperando) falhas.push(`'${e.peca}' está planejada sem geometria (espera a etapa '${e.instancia}' de ${e.montagem}): não há o que medir`);
+  const referencial = await conferirUmaPeca(peca);
+  if (referencial) falhas.push(`guarda:referencial reprovou '${peca}':\n${indentar(referencial.motivo)}`);
+  const receita = receitaDoModulo(await importarReceita(caminho));
+  if (Array.isArray(receita?.PONTOS) && receita.PONTOS.length > 0) {
+    feitas.push('conferir-pontos');
+    const pontos = conferirPontos(receita, { quem: peca });
+    if (!pontos.ok) falhas.push(indentar(formatarPontos(pontos)));
+  }
+  const passou = falhas.length === 0;
+  return { passou, sha256, texto, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')) };
+}
+
+const curto = (sha256) => sha256.replace(/^sha256:/, '').slice(0, 8);
+
+/**
+ * A ação seguinte do laço da peça, dada a receita que existe agora. `medir` devolve a medição (`medirReceita` por padrão); peça cuja
+ * receita ainda não existe não tem o que medir e segue a decisão das rodadas, que começa em `modelar`.
+ */
+export async function acaoDaPeca(peca, { rodadas = lerRodadas(peca), limite = limiteDaPeca(peca), medir = () => medirReceita(peca) } = {}) {
+  let medicao = null;
+  try { medicao = await medir(); } catch (erro) {
+    if (!/^Receita .* não encontrada|Informe o nome/.test(erro.message)) throw erro;
+  }
+  if (medicao === null) return { ...proximaAcao(rodadas, { limite }), medicao: null };
+  return { ...acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao }, { limite }), medicao };
+}
+
+/**
+ * Grava a rodada com a medição da ferramenta no lugar da que a sessão escreveria, e recusa o que não se sustenta nela:
+ * o veredito do crítico quando a medição da receita atual reprovou, e `medidas` declaradas que contradizem a medição. A receita
+ * gravada na rodada é a que foi medida.
+ */
+export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), ...opcoes } = {}) {
+  let medicao;
+  try { medicao = await medir(); } catch (erro) {
+    throw new Error(`não consegui medir a receita de '${peca}' (${erro.message}): sem medição a rodada não se registra, e o veredito do crítico muito menos.`);
+  }
+  const declaradas = entrada.medidas;
+  if (declaradas && typeof declaradas.passou === 'boolean' && declaradas.passou !== medicao.passou) {
+    throw new Error(`as medidas declaradas dizem ${declaradas.passou ? 'que passou' : 'que reprovou'} e a ferramenta mediu a receita atual (sha256:${curto(medicao.sha256)}) como ${medicao.passou ? 'aprovada' : 'reprovada'}`
+      + `${medicao.passou ? '' : `: ${medicao.relatorio}`}. A medição é da ferramenta: tire \`medidas\` do JSON da rodada.`);
+  }
+  if (entrada.veredito && !medicao.passou) {
+    throw new Error(`o veredito do crítico não se registra: a medição da receita atual (sha256:${curto(medicao.sha256)}) reprovou.\n${indentar(medicao.relatorio)}\n`
+      + 'O crítico só julga receita que passa nas medidas. Grave a rodada sem veredito (a ferramenta guarda o relatório da falha) e volte ao modelador.');
+  }
+  const { medidas: _declaradas, ...resto } = entrada;
+  void _declaradas;
+  const gravada = gravarRodada(peca, { ...resto, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
+  return { ...gravada, medicao };
+}
+
+async function comoCLI(argv) {
   const peca = argv.find((a) => !a.startsWith('--'));
   const registrar = argv.indexOf('--registrar');
   if (!peca) return { codigo: 1, texto: 'diga a peça: rodada-de-modelagem.mjs <peça> --acao' };
 
   if (registrar >= 0) {
     const entrada = JSON.parse(readFileSync(argv[registrar + 1], 'utf8'));
-    const { rodada, arquivo } = gravarRodada(peca, entrada);
-    const decisao = proximaAcao(lerRodadas(peca), { limite: limiteDaPeca(peca) });
+    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada);
+    const decisao = await acaoDaPeca(peca, { medir: async () => medicao });
     return {
       codigo: 0,
       texto: `rodada ${rodada.numero} gravada em ${arquivo.replace(`${REPO}/`, '')}\n`
+        + `medição da receita (sha256:${curto(medicao.sha256)}): ${medicao.passou ? 'passou' : 'reprovou'}\n`
         + `próxima ação: ${decisao.acao} — ${decisao.motivo}`,
     };
   }
 
   const rodadas = lerRodadas(peca);
-  const decisao = proximaAcao(rodadas, { limite: limiteDaPeca(peca) });
+  const decisao = await acaoDaPeca(peca, { rodadas });
   const abertos = defeitosAbertos(rodadas);
   return {
     codigo: 0,
     texto: `${rodadas.length} rodada(s) registrada(s) para '${peca}'.\n`
+      + (decisao.medicao ? `medição da receita atual (sha256:${curto(decisao.medicao.sha256)}): ${decisao.medicao.passou ? 'passou' : 'reprovou'}\n` : 'sem receita para medir ainda.\n')
       + `próxima ação: ${decisao.acao} — ${decisao.motivo}\n`
       + (abertos.length
         ? `defeitos em aberto:\n${abertos.map((d) => `  ${d.parte}: ${d.tipo} ${d.sentido} em ${d.onde}`).join('\n')}`
@@ -166,7 +250,7 @@ function comoCLI(argv) {
 
 if (process.argv[1] && process.argv[1].endsWith('rodada-de-modelagem.mjs')) {
   try {
-    const { codigo, texto } = comoCLI(process.argv.slice(2));
+    const { codigo, texto } = await comoCLI(process.argv.slice(2));
     (codigo === 0 ? console.log : console.error)(texto);
     process.exit(codigo);
   } catch (erro) {

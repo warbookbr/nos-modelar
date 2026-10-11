@@ -16,6 +16,7 @@ export function receitaDoSuporte({
 } = {}) {
   return {
     meta: { nome: 'refina-forma-global/suporte', desc: 'suporte de prova do refinamento da forma global' },
+    TOPO: { origem: 'centro do fundo da sapata, no chão; y para cima' },
     PLANO: {
       objeto: 'suporte com sapata quadrada e coluna central redonda, para provar o refinamento do andaime',
       referencias: ['../andaime.json'],

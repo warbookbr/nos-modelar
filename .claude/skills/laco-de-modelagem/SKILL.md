@@ -73,7 +73,8 @@ node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
 ```
 
 **modelar** — despache o modelador com o plano, os contatos e, da segunda
-rodada em diante, só os defeitos em aberto que o comando imprimiu. Não mande
+rodada em diante, só os defeitos em aberto que o comando imprimiu, mais o relatório
+da medição quando ela é o motivo. Não mande
 sua opinião sobre o que fazer. Nomeie as operações de superfície que o motor
 tem quando o realismo combinado pedir: `arredondarAresta` e `filete` quebram
 aresta, `liso` sombreia sem faceta (com `angulo`, em graus, deixa nítida a quina mais fechada que ele, como o smooth by angle do Blender), `lathe` faz revolução com perfil. Isso é
@@ -87,19 +88,7 @@ com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
 uma, e `docs/mecanifica/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
 crítico sem contar como a peça foi feita.
 
-**Meça antes do crítico:**
-
-```bash
-npm run descrever -- <peça>
-node tools/mecanifica/conferir-pontos.mjs <peça>
-npm run guarda:acervo
-npm run guarda:referencial
-```
-
-Peça que falha no que é contável volta direto ao modelador; gastar crítico
-nela ensina que o veredito é decorativo.
-
-**revisar** — despache o `critico-visual` com a referência, o pacote de
+**revisar** — a ferramenta mediu a receita atual e ela passou. Despache o `critico-visual` com a referência, o pacote de
 `npm run vistas:critica -- <peça>`, que inclui vistas em arame, e os critérios de reprovação, dizendo a forma
 e a técnica que o plano promete para cada parte. Nunca mande a receita, os
 passos, o histórico nem o que mudou: contar como foi feito faz revisão virar
@@ -118,7 +107,6 @@ conferência que o modelador devolveu, uma entrada por parte declarada:
 ```bash
 cat > /tmp/rodada.json <<'JSON'
 {
-  "medidas": { "passou": true, "relatorio": "guarda:acervo ok" },
   "partes": [
     { "nome": "base", "confere": true },
     { "nome": "punho", "confere": false, "observacao": "saiu macico; o plano promete rasgo passante" }
@@ -135,9 +123,11 @@ A rodada não fecha sem `partes`; `nota` é número de 0 a 10 e `observacao` nã
 passa de 240 caracteres. `notaDePassagem` é o porquê das escolhas do
 modelador, e a última rodada da etapa precisa dela. A ferramenta grava sozinha
 o que a receita mudou desde a rodada anterior, em `receita.diferenca`; é isso
-que o modelador da etapa seguinte lê para não repetir tentativa. Quando as medidas reprovarem, grave com
-`"veredito": null` e o relatório da falha. Rodada gravada não se reescreve, e o
-arquivo cai em `rodadas/` dentro da pasta da peça.
+que o modelador da etapa seguinte lê para não repetir tentativa. A medição da
+rodada é da ferramenta, que a faz sobre a receita atual e grava o resultado e o
+relatório; ela recusa o veredito do crítico quando a medição reprovou, e `medidas`
+escritas à mão que a contradigam. Rodada gravada não se reescreve, e o arquivo
+cai em `rodadas/` dentro da pasta da peça.
 
 ## Antes de corrigir, atribua o defeito
 

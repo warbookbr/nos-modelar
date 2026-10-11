@@ -592,8 +592,13 @@ export function condutorArquivo(arquivo, acao = {}) {
     estado = r.estado;
     if (r.concluido) extra = 'o fluxo já terminou; não há estágio seguinte\n';
     else if (r.bloqueio) { codigo = 1; extra = `avanço recusado: ${r.bloqueio}\n`; }
-    else if (r.pedeCritico) { codigo = 1; objetoDe = true; extra = `o Portão de ${nomeDoEstagio(estado.atual)} passa, e a conclusão espera o veredito do crítico sobre o objeto inteiro (rodada ${r.rodada}); o brief vem abaixo\n`; }
-    else if (!r.ok) { codigo = 1; extra = `avanço recusado: o Portão de ${nomeDoEstagio(estado.atual)} não passa; falta:\n${r.portao.falta.map((f) => `  - ${f}`).join('\n')}\n`; }
+    else if (r.pedeCritico) { codigo = 1; objetoDe = true; extra = `o Portão de ${nomeDoEstagio(estado.atual)} passa (${r.portao.resumo.medidas} ${r.portao.resumo.medidas === 1 ? 'medida do plano dentro da tolerância' : 'medidas do plano dentro da tolerância'}), e a conclusão espera o veredito do crítico sobre o objeto inteiro (rodada ${r.rodada}); o brief vem abaixo\n`; }
+    else if (!r.ok) {
+      codigo = 1;
+      /* o crítico só é chamado depois das medidas: com medida fora da tolerância não há brief, e a recusa diz isso */
+      const dasMedidas = (r.portao.divergencias ?? []).some((d) => d.classe === 'medida');
+      extra = `avanço recusado: o Portão de ${nomeDoEstagio(estado.atual)} não passa; falta:\n${r.portao.falta.map((f) => `  - ${f}`).join('\n')}\n${dasMedidas ? 'o brief do crítico não sai: ele só é gerado depois de as medidas do plano estarem aprovadas\n' : ''}`;
+    }
     else extra = `avançou de ${nomeDoEstagio(estado.historico[estado.historico.length - 1].de)} para ${nomeDoEstagio(estado.atual)}\n`;
   } else if (acao.modo !== undefined) {
     estado = definirModo(estado, acao.modo);
