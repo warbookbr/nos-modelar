@@ -124,14 +124,26 @@ describe('o veredito da peça e a descrição mostram o aviso', () => {
     expect(formatarDescricao(d, { peca: 'aba-do-tubo' })).not.toMatch(/AVISOS DO NÚCLEO/);
   });
 
-  it('descrever mostra o aviso na saída e na saída de erro, sem reprovar a peça', async () => {
+  it('descrever reprova o degrau com a mensagem do aviso, e a peça sem veredito só o mostra', async () => {
     const receita = { meta: { nome: 'aba-do-tubo' }, PASSOS: passos };
     const r = await descreverPecaReutilizavel({ peca: 'aba-do-tubo', modulo: receita });
-    expect(r.ok, r.stderr).toBe(true);
-    expect(r.codigo).toBe(0);
+    expect(r.ok).toBe(false);
+    expect(r.codigo).toBe(1);
     expect(r.stdout).toMatch(/AVISOS DO NÚCLEO \(1\)/);
-    expect(r.stderr).toMatch(/1 AVISO\(S\) DO NÚCLEO/);
-    expect(r.resultado.avisos).toHaveLength(1);
+    expect(r.stderr).toMatch(/1 ARREDONDAMENTO\(S\) TERMINADO\(S\) EM DEGRAU/);
+    expect(r.stderr).toContain(r.resultado.avisos[0].motivo);
+    expect(r.stderr).toMatch(/sugestão: .*cadeia/);
     expect(r.resultado.avisos[0].ref).toBe('degrau');
+    const sem = await descreverPecaReutilizavel({ peca: 'aba-do-tubo', modulo: receita, semVeredito: true });
+    expect(sem.ok, sem.stderr).toBe(true);
+    expect(sem.stderr).toMatch(/1 AVISO\(S\) DO NÚCLEO/);
+  });
+
+  it('com cadeia no mesmo passo o veredito passa sem aviso', async () => {
+    const ok = comParte([abaDoTubo(), ['arredondarAresta', { origemId: 2, raio: mm(3), paineis: PAINEIS, cadeia: true, sel: bordaLivreDaDireita }]]);
+    const r = await descreverPecaReutilizavel({ peca: 'aba-do-tubo', modulo: { meta: { nome: 'aba-do-tubo' }, PASSOS: ok } });
+    expect(r.ok, r.stderr).toBe(true);
+    expect(r.resultado.avisos).toEqual([]);
+    expect(r.stdout).not.toMatch(/AVISOS DO NÚCLEO/);
   });
 });

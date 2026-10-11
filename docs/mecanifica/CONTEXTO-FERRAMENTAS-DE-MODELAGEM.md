@@ -276,10 +276,11 @@ núcleo escreve quando a borda termina numa concordância. A peça passou em
 
 O degrau do suporte, que a pessoa viu na imagem, não era acusado por gate nem por
 aviso: `orfaos` ficava em 0 e a face a mais só aparecia na origem do
-arredondamento. Duas correções entraram no núcleo. O degrau passou a deixar um
+arredondamento. Duas correções entraram no núcleo e uma no gate. O degrau passou a deixar um
 aviso em `neutro.avisos` (`ref: 'degrau'`, com a aresta, a ponta, o motivo e a
-sugestão), que `descrever` mostra na descrição e na saída de erro sem reprovar a
-peça; na receita do suporte ele aparece nos passos das duas bordas livres. E
+sugestão), que `descrever` mostra na descrição e que reprova o veredito da peça e o
+`guarda:acervo` com a mensagem do aviso. O suporte passou a usar `cadeia` nas duas
+bordas livres e sai sem aviso; as outras quatro peças do acervo não tinham degrau. E
 `arredondarAresta` ganhou `cadeia` (`true` ou `{ ate: graus }`): a aresta
 escolhida e as que continuam em tangência saem numa varredura só, do canto vivo de
 um lado ao do outro ou no laço inteiro, sem degrau, com o raio medido em cada
@@ -290,8 +291,7 @@ contorno interno que o deslocamento da `CrossSection` (conferido na malha a 0,1 
 a quantização do Clipper) e, ao contrário de derivar a borda da extrusão pelos
 contornos deslocados, serve também a uma tampa que já existe na peça, a um furo e
 às arestas que as outras operações deixaram. A cadeia entra antes das arestas do
-canto; a receita do suporte ainda usa uma chamada por borda livre e passa a usar
-a cadeia quando a pessoa pedir a refeitura.
+canto, e a receita do suporte já segue essa ordem (cadeia, laterais, cantos livres).
 
 ## Depois do plano
 
