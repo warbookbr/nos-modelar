@@ -1,0 +1,311 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "roupeiro",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-10-11",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "altura": 1200,
+          "cabideiro": 0,
+          "largura": 400,
+          "painel": 15,
+          "portas": 1,
+          "prateleiras": 0,
+          "profundidade": 350,
+          "rodape": 40
+        },
+        "hash": "sha256:da259743ec9bd1e240e4dfc998db4bdec295b60590189d66e16befdd739c9353",
+        "medidas": [
+          {
+            "ferramenta": "casca",
+            "origemId": 102,
+            "espessura": 0.015,
+            "espessuraMinima": 0.015,
+            "espessuraMaxima": 0.015
+          }
+        ],
+        "montagem": {
+          "hash": "sha256:c2e10a1450a4e78a5addae567d3c1f884a15dd568f299f8aa1ba19f0f2097211",
+          "pecas": [
+            "roupeiro-corpo",
+            "roupeiro-dobradica-1-1-d",
+            "roupeiro-dobradica-1-1-e",
+            "roupeiro-dobradica-1-2-d",
+            "roupeiro-dobradica-1-2-e",
+            "roupeiro-dobradica-1-3-d",
+            "roupeiro-dobradica-1-3-e",
+            "roupeiro-porta-1"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "abre-porta-1",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 110,
+                "unidade": "graus"
+              },
+              "passos": 11,
+              "posicoes": 12,
+              "colisoes": 0,
+              "paresConferidos": 16,
+              "pares": [],
+              "conferido": true
+            }
+          ]
+        }
+      },
+      "medio": {
+        "parametros": {
+          "altura": 2200,
+          "cabideiro": 1,
+          "largura": 1600,
+          "painel": 18,
+          "portas": 2,
+          "prateleiras": 4,
+          "profundidade": 600,
+          "rodape": 80
+        },
+        "hash": "sha256:090729977c310402281705382946522aa841f31189d2cf840b91f24be9da3984",
+        "medidas": [
+          {
+            "ferramenta": "casca",
+            "origemId": 102,
+            "espessura": 0.018,
+            "espessuraMinima": 0.018,
+            "espessuraMaxima": 0.018
+          }
+        ],
+        "montagem": {
+          "hash": "sha256:3d6552af296ecb485a77fc3fecc4e62a31985e3a0a35d1478fd6eaf5927222ee",
+          "pecas": [
+            "roupeiro-corpo",
+            "roupeiro-dobradica-1-1-d",
+            "roupeiro-dobradica-1-1-e",
+            "roupeiro-dobradica-1-2-d",
+            "roupeiro-dobradica-1-2-e",
+            "roupeiro-dobradica-1-3-d",
+            "roupeiro-dobradica-1-3-e",
+            "roupeiro-dobradica-1-4-d",
+            "roupeiro-dobradica-1-4-e",
+            "roupeiro-dobradica-2-1-d",
+            "roupeiro-dobradica-2-1-e",
+            "roupeiro-dobradica-2-2-d",
+            "roupeiro-dobradica-2-2-e",
+            "roupeiro-dobradica-2-3-d",
+            "roupeiro-dobradica-2-3-e",
+            "roupeiro-dobradica-2-4-d",
+            "roupeiro-dobradica-2-4-e",
+            "roupeiro-porta-1",
+            "roupeiro-porta-2"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "abre-porta-1",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 110,
+                "unidade": "graus"
+              },
+              "passos": 11,
+              "posicoes": 12,
+              "colisoes": 0,
+              "paresConferidos": 70,
+              "pares": [],
+              "conferido": true
+            },
+            {
+              "id": "abre-porta-2",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 110,
+                "unidade": "graus"
+              },
+              "passos": 11,
+              "posicoes": 12,
+              "colisoes": 0,
+              "paresConferidos": 70,
+              "pares": [],
+              "conferido": true
+            }
+          ]
+        }
+      },
+      "maximo": {
+        "parametros": {
+          "altura": 2600,
+          "cabideiro": 1,
+          "largura": 3000,
+          "painel": 25,
+          "portas": 4,
+          "prateleiras": 8,
+          "profundidade": 800,
+          "rodape": 150
+        },
+        "hash": "sha256:6f62746fa13a3c3617affdf332546008b9e081cbc8f7b0f93128c5c69eaf3b5c",
+        "medidas": [
+          {
+            "ferramenta": "casca",
+            "origemId": 102,
+            "espessura": 0.025,
+            "espessuraMinima": 0.025,
+            "espessuraMaxima": 0.025
+          }
+        ],
+        "montagem": {
+          "hash": "sha256:97037cb205b64b51874dd2a59722228065a081a3200c7436c101c541085f5efb",
+          "pecas": [
+            "roupeiro-corpo",
+            "roupeiro-dobradica-1-1-d",
+            "roupeiro-dobradica-1-1-e",
+            "roupeiro-dobradica-1-2-d",
+            "roupeiro-dobradica-1-2-e",
+            "roupeiro-dobradica-1-3-d",
+            "roupeiro-dobradica-1-3-e",
+            "roupeiro-dobradica-1-4-d",
+            "roupeiro-dobradica-1-4-e",
+            "roupeiro-dobradica-1-5-d",
+            "roupeiro-dobradica-1-5-e",
+            "roupeiro-dobradica-2-1-d",
+            "roupeiro-dobradica-2-1-e",
+            "roupeiro-dobradica-2-2-d",
+            "roupeiro-dobradica-2-2-e",
+            "roupeiro-dobradica-2-3-d",
+            "roupeiro-dobradica-2-3-e",
+            "roupeiro-dobradica-2-4-d",
+            "roupeiro-dobradica-2-4-e",
+            "roupeiro-dobradica-2-5-d",
+            "roupeiro-dobradica-2-5-e",
+            "roupeiro-dobradica-3-1-d",
+            "roupeiro-dobradica-3-1-e",
+            "roupeiro-dobradica-3-2-d",
+            "roupeiro-dobradica-3-2-e",
+            "roupeiro-dobradica-3-3-d",
+            "roupeiro-dobradica-3-3-e",
+            "roupeiro-dobradica-3-4-d",
+            "roupeiro-dobradica-3-4-e",
+            "roupeiro-dobradica-3-5-d",
+            "roupeiro-dobradica-3-5-e",
+            "roupeiro-dobradica-4-1-d",
+            "roupeiro-dobradica-4-1-e",
+            "roupeiro-dobradica-4-2-d",
+            "roupeiro-dobradica-4-2-e",
+            "roupeiro-dobradica-4-3-d",
+            "roupeiro-dobradica-4-3-e",
+            "roupeiro-dobradica-4-4-d",
+            "roupeiro-dobradica-4-4-e",
+            "roupeiro-dobradica-4-5-d",
+            "roupeiro-dobradica-4-5-e",
+            "roupeiro-porta-1",
+            "roupeiro-porta-2",
+            "roupeiro-porta-3",
+            "roupeiro-porta-4"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "abre-porta-1",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 110,
+                "unidade": "graus"
+              },
+              "passos": 11,
+              "posicoes": 12,
+              "colisoes": 0,
+              "paresConferidos": 234,
+              "pares": [],
+              "conferido": true
+            },
+            {
+              "id": "abre-porta-2",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 67,
+                "unidade": "graus"
+              },
+              "passos": 8,
+              "posicoes": 9,
+              "colisoes": 0,
+              "paresConferidos": 234,
+              "pares": [],
+              "conferido": true
+            },
+            {
+              "id": "abre-porta-3",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 67,
+                "unidade": "graus"
+              },
+              "passos": 8,
+              "posicoes": 9,
+              "colisoes": 0,
+              "paresConferidos": 234,
+              "pares": [],
+              "conferido": true
+            },
+            {
+              "id": "abre-porta-4",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 110,
+                "unidade": "graus"
+              },
+              "passos": 11,
+              "posicoes": 12,
+              "colisoes": 0,
+              "paresConferidos": 234,
+              "pares": [],
+              "conferido": true
+            }
+          ]
+        }
+      }
+    },
+    "varredura": {
+      "sondas": 16,
+      "recusasDeclaradas": [
+        {
+          "ponto": "altura=1200",
+          "restricao": "prateleiras-cabem"
+        },
+        {
+          "ponto": "altura=2600",
+          "restricao": "porta-alta-demais"
+        },
+        {
+          "ponto": "largura=400",
+          "restricao": "porta-estreita-demais"
+        },
+        {
+          "ponto": "largura=3000",
+          "restricao": "porta-larga-demais"
+        },
+        {
+          "ponto": "portas=1",
+          "restricao": "porta-larga-demais"
+        },
+        {
+          "ponto": "prateleiras=8",
+          "restricao": "prateleiras-cabem"
+        }
+      ]
+    },
+    "portas": [
+      "base-do-rodape"
+    ]
+  },
+  "critico": null,
+  "pessoa": null
+}
