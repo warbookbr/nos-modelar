@@ -906,7 +906,7 @@ export function criarOperacoesEstruturais(servicos) {
       };
       if (!anel(P)) return grita(st, i, 'arredondarAresta', 'aresta', 'arco degenerado entre as duas tangências');
       arestasEmGrupos.costurar(st, i, 'arredondarAresta', {
-        b, origemId: a.origemId, faceAId, faceBId, v0, v1, e, paineis, anel, ...grupos,
+        b, origemId: a.origemId, faceAId, faceBId, v0, v1, e, paineis, anel, raio, ...grupos,
         recuoTexto: `o recuo de ${Number(recuoG.toPrecision(4))} do raio ${raio}`,
       });
       return;
@@ -1203,7 +1203,7 @@ export function criarOperacoesEstruturais(servicos) {
         [base[0] + raio * dB[0], base[1] + raio * dB[1], base[2] + raio * dB[2]],
       ];
       arestasEmGrupos.costurar(st, i, 'filete', {
-        b, origemId: a.origemId, faceAId, faceBId, v0, v1, e, paineis: 1, anel, ...gruposF,
+        b, origemId: a.origemId, faceAId, faceBId, v0, v1, e, paineis: 1, anel, raio, ...gruposF,
         recuoTexto: `o recuo de ${raio} do filete`,
       });
       return;

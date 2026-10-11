@@ -63,6 +63,28 @@ const chave = (p, q) => `${p}:${q}`;
 /* a recusa com a causa: lançada dentro de `costurar` e apanhada na própria `costurar`, que tenta o degrau antes de gritar */
 class Falha extends Error {}
 
+/* O aviso de um arredondamento (ou chanfro) que terminou em degrau. `pontasEmDegrau` traz [nome da ponta, plano, ponta]; o ângulo
+   que a face vizinha faz com a aresta vem de `cosDaPonta`. O texto vale para qualquer operação que passe pela costura. */
+function avisoDeDegrau({ i, op, origemId, v0, v1, P, Q, e, raio, pontasEmDegrau, cosDaPonta, degraus }) {
+  const arred = (x) => Number(x.toPrecision(5));
+  const nomes = pontasEmDegrau.map(([nome]) => nome);
+  const angulos = pontasEmDegrau.map(([, , ponta]) => Number((Math.asin(Math.min(1, cosDaPonta(ponta))) * 180 / Math.PI).toPrecision(3)));
+  const alvo = `${op}:${origemId}`;
+  const ondeFica = nomes.length === 2 ? 'nas duas pontas' : `na ponta ${nomes[0]}`;
+  return {
+    passo: i,
+    op,
+    ref: 'degrau',
+    origemId,
+    aresta: { vertices: [v0, v1], de: P.map(arred), ate: Q.map(arred), direcao: e.map((x) => Number(x.toFixed(6))) },
+    pontas: nomes,
+    anguloDaFaceVizinha: angulos.length === 1 ? angulos[0] : angulos,
+    degraus,
+    motivo: `o ${op} da origem ${alvo} (aresta ${v0}-${v1}, de [${P.map(arred).join(', ')}] a [${Q.map(arred).join(', ')}]) terminou em degrau ${ondeFica}: a face vizinha continua a aresta em tangência (dobra só ${angulos.join('° e ')}° em relação a ela), o arco não cabe no plano dela e termina na seção perpendicular, onde um degrau plano de ${degraus.length} face(s) fecha o fim. A peça fecha, mas o arredondamento acaba numa quina visível.`,
+    sugestao: `arredonde a cadeia que continua em tangência numa chamada só, com cadeia: { ate: 30 } no mesmo passo (a varredura segue as facetas até o canto vivo, sem degrau), ou termine a aresta num canto vivo em vez de num trecho em curva${raio != null ? ` (raio ${raio})` : ''}.`,
+  };
+}
+
 /* O lugar da tampa, no registro de origem de uma extrusão, que guarda esta peça: { tampas, nome } ou null quando a face não
    é peça de tampa registrada. A tampa é uma face só ou uma lista de peças. */
 function lugarDaTampa(st, fid) {
@@ -566,6 +588,10 @@ export function criarArestasEmGrupos({ addV, addF, registraOrigem, grita }) {
           if (nf.destino === 'degrau') degraus.push(id);
         }
         registraOrigem(st, i, op, origemId, degraus.length ? { paineis: ids, degraus } : { paineis: ids });
+        /* o degrau é o arredondamento terminando no meio de uma curva: a peça fecha, mas o fim do arco fica visível. O aviso
+           diz qual aresta, em que ponta e o que fazer (`neutro.avisos`, fora da forma canônica). */
+        const pontasEmDegrau = [['v0', plano0, p0], ['v1', plano1, p1]].filter(([, plano]) => plano.tipo === 'degrau');
+        if (pontasEmDegrau.length) st.avisos.push(avisoDeDegrau({ i, op, origemId, v0, v1, P, Q, e, raio: p.raio, pontasEmDegrau, cosDaPonta, degraus }));
       };
     };
 

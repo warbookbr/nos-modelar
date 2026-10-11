@@ -269,6 +269,16 @@ export async function descreverPecaReutilizavel({
       + ' descrevem uma peça incompleta.\n  ' + amostraDeOrfaos(neutro).join('\n  ') + '\n';
     falhou = true;
   }
+  /* AVISO NÃO REPROVA, MAS APARECE. O núcleo fecha a peça e diz, em `neutro.avisos`, o que um passo fez de diferente do
+     pedido: o arredondamento que terminou em degrau no meio de uma curva ficava só como uma face a mais, sem nada que o
+     expusesse, e a peça passava limpa com a quina visível. A saída de erro traz o passo, o motivo e a sugestão. */
+  const avisos = descricao.avisos ?? [];
+  if (avisos.length) {
+    stderr += `\n${avisos.length} AVISO(S) DO NÚCLEO: a peça fecha, mas um passo deixou o que o pedido não previa`
+      + ' (motivo e sugestão na seção AVISOS DO NÚCLEO da descrição acima)\n'
+      + avisos.map((a) => `  passo ${a.passo} (${a.op}, ${a.ref})`).join('\n')
+      + '\n';
+  }
   const comVeredito = !semVeredito;
   if (descricao.totais.facesSemParte && comVeredito) {
     stderr += `\n${descricao.totais.facesSemParte} face(s) sem identidade semântica`
@@ -406,6 +416,7 @@ export async function descreverPecaReutilizavel({
       peca,
       descricao: { ...descricao, intencao: entrada.INTENCAO ?? null },
       intencao: entrada.INTENCAO ?? null,
+      avisos,
       contatos,
       formas,
       plano,

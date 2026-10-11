@@ -667,6 +667,9 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
       .filter((material) => typeof material === 'string' && material !== ''),
   );
   const aparencia = aparenciaSemantica(neutro, nomes, quem);
+  /* O que um passo fez de diferente do pedido, ou deixou de defeito visível, sem falhar: `neutro.avisos` (o raio que o
+     `arredondarCostura` reduziu, o arredondamento que terminou em degrau). Não filtrados por `partes`: o aviso é do passo. */
+  const avisos = (Array.isArray(neutro.avisos) ? neutro.avisos : []).map((aviso) => ({ ...aviso }));
   return {
     totais: {
       partes: escolhidas.length,
@@ -686,6 +689,7 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
     portas,
     aparencia,
     geometria: geometriaSemantica(neutro, nomes),
+    avisos,
   };
 }
 
@@ -745,6 +749,17 @@ export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = 
   );
   linhas.push(`unidades do modelo, ${casas} casa(s) decimal(is)`);
   linhas.push('');
+
+  /* Só aparece quando há aviso, para a saída das peças sem ele continuar a mesma. */
+  const avisos = Array.isArray(descricao.avisos) ? descricao.avisos : [];
+  if (avisos.length) {
+    linhas.push(`AVISOS DO NÚCLEO (${avisos.length}) — a peça fecha, mas um passo fez diferente do pedido ou deixou um defeito visível`);
+    for (const aviso of avisos) {
+      linhas.push(`  passo ${aviso.passo} (${aviso.op}${aviso.ref ? `, ${aviso.ref}` : ''}): ${aviso.motivo}`);
+      if (aviso.sugestao) linhas.push(`    sugestão: ${aviso.sugestao}`);
+    }
+    linhas.push('');
+  }
 
   linhas.push('HIERARQUIA DE PARTES — pai semântico declarado, não transformação herdada');
   const hierarquia = Array.isArray(descricao.hierarquia) ? descricao.hierarquia : [];
