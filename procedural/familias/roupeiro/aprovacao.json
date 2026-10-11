@@ -27,7 +27,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:c2e10a1450a4e78a5addae567d3c1f884a15dd568f299f8aa1ba19f0f2097211",
+          "hash": "sha256:06cd1ce90738f4edeb975042a5c433dc83235699c50deab42f7c863c963d82f4",
           "pecas": [
             "roupeiro-corpo",
             "roupeiro-dobradica-1-1-d",
@@ -52,7 +52,35 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 16,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-1-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             }
           ]
@@ -80,7 +108,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:3d6552af296ecb485a77fc3fecc4e62a31985e3a0a35d1478fd6eaf5927222ee",
+          "hash": "sha256:42d38b6556438656cc098fd06ec3c81b289059b81b73d6aa60a2dd4551ca1cbb",
           "pecas": [
             "roupeiro-corpo",
             "roupeiro-dobradica-1-1-d",
@@ -116,7 +144,44 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 70,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-1-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-4-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-4-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             },
             {
@@ -131,7 +196,44 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 70,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-2-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-4-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-4-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             }
           ]
@@ -159,7 +261,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:97037cb205b64b51874dd2a59722228065a081a3200c7436c101c541085f5efb",
+          "hash": "sha256:766ec3f466d6143a153819a15eb716079e9b1852894dc3192d8feb66619219b3",
           "pecas": [
             "roupeiro-corpo",
             "roupeiro-dobradica-1-1-d",
@@ -221,7 +323,53 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 234,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-1-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-4-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-4-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-1-5-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-1-5-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             },
             {
@@ -236,7 +384,53 @@
               "posicoes": 9,
               "colisoes": 0,
               "paresConferidos": 234,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-2-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-4-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-4-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-2-5-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-2-5-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             },
             {
@@ -251,7 +445,53 @@
               "posicoes": 9,
               "colisoes": 0,
               "paresConferidos": 234,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-3-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-3-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-3-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-3-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-3-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-3-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-3-4-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-3-4-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-3-5-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-3-5-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             },
             {
@@ -266,7 +506,53 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 234,
-              "pares": [],
+              "pares": [
+                {
+                  "movel": [
+                    "dobradica-4-1-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-4-1-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-4-2-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-4-2-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-4-3-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-4-3-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-4-4-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-4-4-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                },
+                {
+                  "movel": [
+                    "dobradica-4-5-movel"
+                  ],
+                  "fixo": [
+                    "dobradica-4-5-fixa"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
               "conferido": true
             }
           ]

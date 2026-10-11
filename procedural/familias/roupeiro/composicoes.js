@@ -329,7 +329,7 @@ const tipoDoArgumento = (nome, valor) => (Array.isArray(valor) ? 'vetor3' : nome
 /** A composição de uma metade da dobradiça: a folha fixa (com o pino) ou a móvel, girada e levada ao lugar. */
 function dobradica(lado, nos, furos) {
   const geo = geometriaDaDobradicaDeExemplo(nos, furos);
-  const exemploDeArgumentos = argumentosDaDobradica(geo, lado, { giro: 0, posicao: [0, 0, 0], eixo: [0, -1, 0] });
+  const exemploDeArgumentos = argumentosDaDobradica(geo, lado, { giro: 0, posicao: [0, 0, 0], eixo: [0, -1, 0], viraEmX: 0, viraEmZ: 0 });
   const daFolha = nosDaFolha(lado, nos, furos);
   /* a porta do tambor cita o nó da folha pela mesma origem que a porta da família dobradiça cita */
   const deDosNos = daFolha.find((no) => no.id === 'porta-dos-nos').argumentos.de;
@@ -337,6 +337,8 @@ function dobradica(lado, nos, furos) {
   if (lado === 'd') lista.push(...nosDoPino().filter((no) => no.operacao !== 'publicarPorta'));
   lista.push(
     { id: 'girar-dobradica', operacao: 'rotaciona', argumentos: { eixo: 'y', graus: p('giro'), pivo: [0, 0, 0] } },
+    { id: 'virar-dobradica-em-x', operacao: 'rotaciona', argumentos: { eixo: 'x', graus: p('viraEmX'), pivo: [0, 0, 0] } },
+    { id: 'virar-dobradica-em-z', operacao: 'rotaciona', argumentos: { eixo: 'z', graus: p('viraEmZ'), pivo: [0, 0, 0] } },
     { id: 'posicionar-dobradica', operacao: 'transladar', argumentos: { d: p('posicao') } },
     {
       id: 'porta-do-tambor', operacao: 'publicarPorta',
@@ -362,7 +364,7 @@ function geometriaDaDobradicaDeExemplo(nos, furos) {
  * Os argumentos de uma metade da dobradiça, em metro: os da família `dobradica` (a folha, e o pino na fixa), o giro em graus
  * em torno do pino, a posição final do pino e a porta do tambor já no lugar (`eixo` é o eixo da articulação).
  */
-export function argumentosDaDobradica(geo, lado, { giro, posicao, eixo }) {
+export function argumentosDaDobradica(geo, lado, { giro, posicao, eixo, viraEmX = 0, viraEmZ = 0 }) {
   const folha = argumentosDaFolha(geo, lado);
   const todos = lado === 'd' ? { ...folha, ...argumentosDoPino(geo) } : folha;
   const noInicio = geo.mm.noK[geo.nos[lado][0]].inicio;
@@ -371,6 +373,8 @@ export function argumentosDaDobradica(geo, lado, { giro, posicao, eixo }) {
   return {
     ...todos,
     giro,
+    viraEmX,
+    viraEmZ,
     posicao: posicao.map(metro),
     eixoDaPorta: eixo,
     centroDaPorta: [metro(posicao[0]), Number((posicao[1] * 0.001 + noInicio * 0.001).toPrecision(12)), metro(posicao[2])],
