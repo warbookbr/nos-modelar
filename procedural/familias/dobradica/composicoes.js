@@ -40,7 +40,7 @@ const composicao = (id, argumentosExemplo, nos, saidas) => Object.freeze({
   artefatos: { entra: [], sai: saidas }, nos,
 });
 
-function nosDoPino() {
+export function nosDoPino() {
   const id = BASE.pino + 1;
   return [
     {
@@ -60,7 +60,7 @@ function nosDoPino() {
   ];
 }
 
-function nosDaFolha(lado, nos, furos) {
+export function nosDaFolha(lado, nos, furos) {
   const base = BASE[lado];
   const { d, e } = nosDasFolhas(nos);
   const proprios = lado === 'd' ? d : e;

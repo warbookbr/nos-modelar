@@ -1,0 +1,57 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "roupeiro",
+  "versao": "1.0.0",
+  "nivel": "objeto",
+  "parametros": {
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 1600, "minimo": 400, "maximo": 3000, "medio": 1600 },
+    "altura": { "tipo": "numero", "unidade": "mm", "padrao": 2200, "minimo": 1200, "maximo": 2600, "medio": 2200 },
+    "profundidade": { "tipo": "numero", "unidade": "mm", "padrao": 550, "minimo": 350, "maximo": 800, "medio": 600 },
+    "painel": { "tipo": "numero", "unidade": "mm", "padrao": 18, "minimo": 15, "maximo": 25, "medio": 18 },
+    "portas": { "tipo": "inteiro", "unidade": "contagem", "padrao": 2, "minimo": 1, "maximo": 4, "medio": 2 },
+    "prateleiras": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 0, "maximo": 8, "medio": 4 },
+    "rodape": { "tipo": "numero", "unidade": "mm", "padrao": 80, "minimo": 40, "maximo": 150, "medio": 80 },
+    "cabideiro": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 1, "medio": 1 }
+  },
+  "restricoes": [
+    {
+      "id": "porta-larga-demais",
+      "expressao": "(largura - (2 + max(0, min(1, portas - 2))) * painel - (portas + 1 + max(0, min(1, portas - 2))) * 3) / portas <= 800",
+      "motivo": "a porta de MDF mais larga que 800 mm empena e pesa sobre as dobradiças; a largura de cada porta é a largura interna menos a divisória (de três portas para cima) e as folgas de 3 mm, dividida pelas portas, e uma porta a mais divide melhor"
+    },
+    {
+      "id": "porta-estreita-demais",
+      "expressao": "(largura - (2 + max(0, min(1, portas - 2))) * painel - (portas + 1 + max(0, min(1, portas - 2))) * 3) / portas >= 250",
+      "motivo": "a porta mais estreita que 250 mm não comporta a dobradiça e o puxador com a folga de 3 mm em volta; use menos portas ou um roupeiro mais largo"
+    },
+    {
+      "id": "porta-alta-demais",
+      "expressao": "altura - rodape - 2 * painel - 6 <= 2400",
+      "motivo": "a porta de MDF mais alta que 2400 mm empena e passa do que cinco dobradiças seguram; reduza a altura ou suba o rodapé"
+    },
+    {
+      "id": "prateleiras-cabem",
+      "expressao": "(altura - rodape - 2 * painel - cabideiro * (1 - max(0, min(1, portas - 2))) * 1120 - prateleiras * painel) / (prateleiras + 1) >= 150",
+      "motivo": "o vão entre duas prateleiras (e entre a base e a primeira) fica abaixo de 150 mm, que não guarda nada; com o cabideiro no vão inteiro (até duas portas) as prateleiras ficam só abaixo da roupa pendurada, que ocupa 1120 mm sob o tampo"
+    }
+  ],
+  "portas": [
+    { "id": "base-do-rodape", "tipo": "plano", "papel": "apoia" }
+  ],
+  "ferramentas": ["articula", "booleana", "casca", "movel", "repete"],
+  "perguntas": {
+    "corpo": [
+      "O corpo se lê como uma caixa de parede uniforme, aberta na frente, com o rodapé recuado na frente e no fundo?",
+      "As prateleiras ocupam a largura do vão e param antes da frente; a divisória, quando há, vai do fundo à frente e da base ao tampo?",
+      "O cabideiro é um tubo horizontal de ponta a ponta do vão, perto do tampo?"
+    ],
+    "portas": [
+      "As portas têm a mesma largura e a mesma altura, com a mesma folga em volta e entre si, e ficam à ras da frente do corpo?",
+      "Cada porta tem um puxador vertical perto da borda livre?"
+    ],
+    "dobradicas": [
+      "Cada porta tem as suas dobradiças na borda que gira, e elas não aparecem por fora da lateral nem da divisória?",
+      "Nas portas que giram na divisória, as dobradiças de uma face e as da outra ficam em alturas diferentes?"
+    ]
+  }
+}

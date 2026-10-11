@@ -291,6 +291,42 @@
       "furos-de-fixacao"
     ]
   },
-  "critico": null,
+  "critico": {
+    "data": "2026-10-11",
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-raiada-prancha.png",
+    "julgamentos": 2,
+    "regra": "menor nota de dois críticos cegos independentes, por ponto",
+    "rodadas": [
+      {
+        "rodada": 1,
+        "pontos": {
+          "minimo": 8,
+          "medio": 8,
+          "maximo": 6
+        },
+        "motivo": "na isométrica com o pneu, raios pareciam curtos ou passando do aro; a medida mostrou cada ponta entre 0 e 2 mm dentro da parede de 5 mm do aro, e a prancha ganhou a isométrica sem o pneu"
+      }
+    ],
+    "pontos": {
+      "minimo": {
+        "nota": 8,
+        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739"
+      },
+      "medio": {
+        "nota": 8,
+        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
+      },
+      "maximo": {
+        "nota": 8,
+        "hash": "sha256:eb6b1a3d55a4d73b17f73fae9ec4028b5d85f21034e5d1f19d38971a0665c036"
+      }
+    },
+    "achados": [
+      "mínimo e médio são a roda de disco e mantêm as notas e os hashes da aprovação de disco, com a prancha roda-pneu-prancha.png",
+      "pneu com ombro quase vivo no perfil, de superfície",
+      "parede oca dos raios e contagem dos furos pequenos não verificáveis na escala da prancha",
+      "o perfil de borda mostra só o pneu e não confirma o assento nem o desvio"
+    ]
+  },
   "pessoa": null
 }

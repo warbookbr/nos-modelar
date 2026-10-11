@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1078 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1084 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -619,6 +619,15 @@
 - `derivar.js` — derivar.js — dos parâmetros da família `roda-pneu` (milímetro, contagem) aos argumentos da composição (metro).
 - `index.js` — index.js — a família `roda-pneu` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/index.js`) i…
 - `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` medida na malha. Variante de disco: as três partes, o volume contra a fórmula, os furos de fixação (contagem, posiç…
+
+## procedural/familias/roupeiro/
+
+- `composicoes.js` — composicoes.js — as composições procedurais da família `roupeiro`, geradas por função porque o número de portas, de prateleiras (nenhuma ou ao menos uma) e o…
+- `derivar.js` — derivar.js — dos parâmetros do roupeiro (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as medidas do roupeiro a partir dos parâmetros da família, em milímetro.
+- `index.js` — index.js — a família `roupeiro` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defini…
+- `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas e as duas metades de cada dobradiça como peças soltas, com uma articulação de revolução po…
+- `roupeiro.test.mjs` — roupeiro.test.mjs — a família `roupeiro`: contrato, recusas, a malha medida contra as contas, a parede da casca, as dobradiças por dentro da parede, a montag…
 
 ## procedural/nucleo/
 
