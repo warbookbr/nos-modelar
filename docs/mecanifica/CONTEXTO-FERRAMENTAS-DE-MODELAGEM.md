@@ -139,7 +139,14 @@ dois julgamentos cegos (8 nos três pontos da roda e da dobradiça; 8, 9 e 8 no
 cilindro, depois de uma rodada que prendeu os olhais por pescoço) e a pessoa, com
 as [pranchas](banco-de-provas/familias-2026-10-11/) guardadas no banco de provas.
 A dobradiça não usa a chapa dobrada, que não tem `origemId` para publicar a porta
-do nó; isso fica como lacuna da extensão. Faltam a roda raiada e o roupeiro.
+do nó; isso fica como lacuna da extensão.
+
+A roda raiada (tarefa 7) entrou em 2026-10-11 como o `tipo` 1 da `roda-pneu`, com os raios feitos pela estrutura de barras
+(de 3 a 32 raios, tubo ou barra redonda, com cruzamento ou sem ele), as cinco restrições dela e a medida de corte de cada
+barra no `aprovacao.json`. Como o ponto máximo do contrato leva todos os parâmetros ao máximo, ele passou a ser raiado e
+mudou de hash, e a aprovação do crítico e da pessoa, que julgaram o disco nos três pontos, foi esvaziada: o mínimo e o
+médio mantêm o hash e o disco do máximo antigo também, preso no teste, mas a prancha tem de ser refeita com o máximo raiado
+e julgada de novo. Falta o roupeiro.
 
 ## Pendências da camada de features
 

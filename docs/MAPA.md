@@ -615,10 +615,10 @@
 
 ## procedural/familias/roda-pneu/
 
-- `composicoes.js` — composicoes.js — a composição da família `roda-pneu` na variante de disco.
+- `composicoes.js` — composicoes.js — as composições da família `roda-pneu`: a variante de disco e a variante raiada.
 - `derivar.js` — derivar.js — dos parâmetros da família `roda-pneu` (milímetro, contagem) aos argumentos da composição (metro).
 - `index.js` — index.js — a família `roda-pneu` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/index.js`) i…
-- `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` (variante de disco) medida na malha: as três partes, o volume contra a fórmula, os furos de fixação (contagem, posi…
+- `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` medida na malha. Variante de disco: as três partes, o volume contra a fórmula, os furos de fixação (contagem, posiç…
 
 ## procedural/nucleo/
 

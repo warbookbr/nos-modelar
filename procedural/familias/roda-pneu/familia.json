@@ -14,7 +14,12 @@
     "furosDeFixacao": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 3, "maximo": 10, "medio": 6 },
     "diametroCirculoFuros": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 70, "maximo": 200, "medio": 135 },
     "diametroFuro": { "tipo": "numero", "unidade": "mm", "padrao": 14, "minimo": 10, "maximo": 20, "medio": 15 },
-    "desvio": { "tipo": "numero", "unidade": "mm", "padrao": 35, "minimo": -25, "maximo": 70, "medio": 25 }
+    "desvio": { "tipo": "numero", "unidade": "mm", "padrao": 35, "minimo": -25, "maximo": 70, "medio": 25 },
+    "tipo": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 },
+    "raios": { "tipo": "inteiro", "unidade": "contagem", "padrao": 12, "minimo": 3, "maximo": 32, "medio": 16 },
+    "diametroRaio": { "tipo": "numero", "unidade": "mm", "padrao": 7, "minimo": 4, "maximo": 11, "medio": 7 },
+    "paredeDoRaio": { "tipo": "numero", "unidade": "mm", "padrao": 1.5, "minimo": 0, "maximo": 3, "medio": 1.5 },
+    "cruzamento": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 3, "medio": 1 }
   },
   "restricoes": [
     {
@@ -61,6 +66,31 @@
       "id": "furos-vizinhos-separados",
       "expressao": "diametroCirculoFuros * sin(180 / furosDeFixacao) >= diametroFuro + 6",
       "motivo": "dois furos de fixação vizinhos ficam a menos de 6 mm um do outro"
+    },
+    {
+      "id": "raios-cabem-no-cubo",
+      "expressao": "tipo * raios * diametroRaio * 1.25 <= tipo * 3.1416 * diametroCubo",
+      "motivo": "os raios, com um quarto de folga entre vizinhos, passam da circunferência do cubo e os nós se atravessam"
+    },
+    {
+      "id": "raio-cabe-na-flange",
+      "expressao": "tipo * (diametroRaio + 0.5) <= tipo * espessuraDisco",
+      "motivo": "o raio deixa menos de 0,25 mm de cada lado até as faces da flange do cubo, que tem a espessura do disco, e passa a tangenciar o plano delas"
+    },
+    {
+      "id": "parede-do-raio-abaixo-do-raio",
+      "expressao": "tipo * (paredeDoRaio * 2 + 1) <= tipo * diametroRaio",
+      "motivo": "a parede do tubo deixa menos de 1 mm de furo no raio; use parede 0 para a barra redonda maciça"
+    },
+    {
+      "id": "cruzamento-com-numero-par",
+      "expressao": "tipo * cruzamento * abs(sin(raios * 90)) <= 0.001",
+      "motivo": "com cruzamento os raios pares e ímpares se inclinam em sentidos opostos, e com número ímpar de raios dois vizinhos se inclinariam para o mesmo lado"
+    },
+    {
+      "id": "raio-sai-do-cubo-para-fora",
+      "expressao": "tipo * 0.3 * sqrt((diametroAro / 2 - 5) * (diametroAro / 2 - 5) + (diametroCubo / 2 - 6) * (diametroCubo / 2 - 6) - 2 * (diametroAro / 2 - 5) * (diametroCubo / 2 - 6) * cos(cruzamento * 360 / raios)) <= tipo * ((diametroAro / 2 - 5) * cos(cruzamento * 360 / raios) - (diametroCubo / 2 - 6))",
+      "motivo": "com este cruzamento o raio sai do cubo quase tangente a ele, a mais de 72 graus da radial, e corre rente à superfície do cubo"
     }
   ],
   "portas": [
@@ -68,7 +98,7 @@
     { "id": "eixo", "tipo": "anel", "papel": "recebe" },
     { "id": "furos-de-fixacao", "tipo": "padraoFuros", "papel": "recebe" }
   ],
-  "ferramentas": ["rodaPneu", "furos", "repete", "booleana"],
+  "ferramentas": ["rodaPneu", "furos", "repete", "booleana", "barras"],
   "perguntas": {
     "pneu": [
       "O pneu tem a mesma altura de flanco e a mesma largura de banda em toda a volta?",
@@ -78,6 +108,11 @@
     "aro": [
       "O barril do aro é concêntrico com o pneu e tem a largura do talão?",
       "A parede do barril é fina como a de um aro, sem virar uma folha nem um tubo grosso?"
+    ],
+    "raios": [
+      "Os raios têm o mesmo perfil e o mesmo comprimento, e estão espaçados por igual em volta do cubo?",
+      "Cada raio nasce no cubo e termina na parede interna do aro, sem ficar solto e sem atravessar o aro por fora?",
+      "Com cruzamento, os raios pares e os ímpares se inclinam em sentidos opostos e se cruzam de modo simétrico?"
     ],
     "disco": [
       "Os furos de fixação têm o mesmo diâmetro e o mesmo espaçamento no círculo, com um deles no topo?",
