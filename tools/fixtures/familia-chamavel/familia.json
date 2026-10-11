@@ -1,0 +1,29 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "tubo-de-prova",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 120, "minimo": 20, "maximo": 500, "medio": 260 },
+    "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 40, "minimo": 10, "maximo": 200, "medio": 100 },
+    "parede": { "tipo": "numero", "unidade": "mm", "padrao": 3, "minimo": 0, "maximo": 40, "medio": 5 },
+    "lados": { "tipo": "inteiro", "unidade": "contagem", "padrao": 24, "minimo": 8, "maximo": 64, "medio": 36 }
+  },
+  "restricoes": [
+    {
+      "id": "parede-nao-fecha-o-furo",
+      "expressao": "parede * 2 < diametro",
+      "motivo": "a parede de cada lado somada passa do diâmetro e fecha o furo; use parede 0 para a barra maciça"
+    },
+    {
+      "id": "mais-comprido-que-largo",
+      "expressao": "diametro <= comprimento",
+      "motivo": "um corpo mais curto que o diâmetro vira disco, fora do que a família desenha"
+    }
+  ],
+  "portas": [],
+  "ferramentas": ["eixo"],
+  "perguntas": {
+    "corpo": ["A parede tem a mesma espessura em toda a volta?"]
+  }
+}

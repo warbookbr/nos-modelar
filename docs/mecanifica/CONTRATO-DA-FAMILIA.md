@@ -1,6 +1,6 @@
 # Contrato da família
 
-`mecanifica.familia@1` é o formato do `familia.json` que cada pasta `procedural/familias/<id>/` traz. Uma família é uma peça paramétrica que a IA chama por parâmetros em milímetro, graus ou contagem, e o contrato diz o que ela aceita, o que recusa e o que publica. O desenho está na seção "Desenho da fatia 9" do [contexto das ferramentas de modelagem](CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9). Este documento descreve só o contrato e o validador; `chamar`, `derivar`, a varredura e a aprovação são tarefas seguintes da mesma fatia.
+`mecanifica.familia@1` é o formato do `familia.json` que cada pasta `procedural/familias/<id>/` traz. Uma família é uma peça paramétrica que a IA chama por parâmetros em milímetro, graus ou contagem, e o contrato diz o que ela aceita, o que recusa e o que publica. O desenho está na seção "Desenho da fatia 9" do [contexto das ferramentas de modelagem](CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9). Este documento descreve o contrato, o validador e a chamada (`chamar`, `derivar` e o registro de famílias); a varredura e a aprovação são tarefas seguintes da mesma fatia.
 
 O validador é `lerFamilia` em `src/autoria/familia.js`, puro e sem nenhum import. Ele recusa com `ErroFamilia`, cuja mensagem traz o campo, o valor recebido e o que é aceito, e devolve a leitura normalizada e congelada: parâmetros, restrições, portas, ferramentas e perguntas saem em ordem alfabética, de modo que a mesma família escrita em outra ordem dá o mesmo texto. O schema JSON da estrutura é gerado do mesmo arquivo (`SCHEMA_FAMILIA`) e entra no índice de `docs/mecanifica/gerado/schemas-autoria-3d.json`, conferido por `autoria:schemas:check`. O schema confere forma e vocabulário; faixa, padrão dentro da faixa e restrição ficam no validador, como nos outros contratos. Uma família de prova está em `tools/fixtures/familia-de-prova/familia.json`.
 
@@ -22,3 +22,21 @@ Todos são obrigatórios, salvo `esboco`, e campo fora desta lista é recusado.
 ## Vocabulário conferido
 
 O arquivo do validador não importa nada, então repete a lista de ferramentas e a tabela de papéis por tipo de porta. O teste `src/autoria/familia.test.js` confere a lista contra `ferramentas-por-objeto.json`, os tipos contra `FORMAS_DE_PORTA_DO_ANDAIME` e cada par tipo e papel contra `resolverPortasDeMontagem`, que aceita o par e recusa o papel de outro tipo; assim o vocabulário não se afasta do núcleo sem o teste falhar.
+
+## Chamar a família
+
+`chamar(familia, id, parametros)` (`src/autoria/chamar-familia.js`, reexportado por `procedural/familias/index.js`) é a porta de entrada de uma família. A família chamável é a que `definirFamilia({ contrato, composicoes, derivar })` devolve: o contrato lido por `lerFamilia`, a lista de composições procedurais (formato de `procedural/nucleo/composicoes.js`) e o `derivar`. Em disco, uma família é a pasta `procedural/familias/<id>/` com `familia.json`, as composições e `derivar.js`; o carregamento é um import explícito, sem varredura de pasta.
+
+O `id` é o da chamada dentro da receita (minúsculas, dígitos e hífen). Os `parametros` trazem só o que difere dos padrões, em milímetro, graus ou contagem. O `chamar` completa os parâmetros com os padrões, confere cada restrição com `avaliarRestricao`, chama o `derivar` uma vez e devolve `{ id, composicao, argumentos }`, o item que a receita põe em `CHAMADAS_COMPOSICOES`. Como um módulo ES não exporta getter, a receita de uma família é um objeto com `get CHAMADAS_COMPOSICOES() { return [chamar(familia, 'corpo', parametros)]; }`, e a recusa acontece quando o executor lê o campo, antes de existir um passo.
+
+O `derivar` é uma função pura `(parametros) => { composicao, argumentos }`. Recebe os parâmetros completos e congelados, em milímetro, e devolve o id de uma das composições da família e os argumentos dela em metro, porque a composição v1 só substitui valores e não converte unidade. É ele que escolhe a composição pelos parâmetros quando a família tem mais de uma forma. O `chamar` recusa o `derivar` que devolve composição fora da família, argumento que a composição não declara ou argumento sem padrão que faltou.
+
+As recusas são `ErroChamadaDeFamilia`, subclasse de `ErroFamilia`, e a mensagem traz o campo, o valor recebido e o que é aceito:
+
+- parâmetro desconhecido: `parametros.<nome>`, com a lista dos parâmetros da família;
+- valor que não é número finito, não é inteiro numa contagem ou fica fora de `[minimo, maximo]`: `parametros.<nome>`, com a unidade e a faixa;
+- restrição violada: `restricao '<id>'`, com os parâmetros que a expressão cita, a expressão, os dois lados calculados e o `motivo` da família, que também fica em `erro.motivo`, com o id em `erro.restricao`.
+
+O registro de famílias é `criarRegistroDeFamilias({ familias })` em `procedural/familias/index.js`. Ele devolve o registro de operações (as do núcleo mais as quatro extensões nativas, na ordem casca, chapa dobrada, estrutura de barras e articulação, que o módulo exporta em `EXTENSOES_NATIVAS`), o registro de composições com as composições de todas as famílias, a lista de ids e `obter(id)`, que recusa família desconhecida dizendo as registradas. A receita é executada com `executarReceita(receita, registro)`. `FAMILIAS`, a lista do produto, está vazia até a primeira família real (tarefas 6 a 10); a pasta `procedural/familias` entra nas pastas do núcleo conferidas contra Three.js.
+
+A prova está em `tools/fixtures/familia-chamavel/`, a família `tubo-de-prova` com uma barra maciça e um tubo de parede, cujo `derivar` escolhe a composição pelo parâmetro `parede` (0 é a barra). Ela mora em `tools/fixtures` e não em `procedural/familias` para o registro do produto só conter famílias reais. Os testes são `procedural/familias/familias.test.js` (receita executada, mesmo hash da malha em duas chamadas, volume contra a fórmula, cada recusa sem malha) e `src/autoria/chamar-familia.test.js`.

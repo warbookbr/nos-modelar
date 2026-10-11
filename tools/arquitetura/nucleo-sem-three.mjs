@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 export const RAIZ = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
 export const PASTAS_DO_NUCLEO = [
-  'procedural/nucleo', 'procedural/pecas', 'procedural/extensoes', 'procedural/servicos', 'modulos', 'src/autoria',
+  'procedural/nucleo', 'procedural/pecas', 'procedural/extensoes', 'procedural/familias', 'procedural/servicos', 'modulos', 'src/autoria',
 ];
 
 /* Os arquivos dessas pastas que conhecem Three.js de propósito, e por quê. */

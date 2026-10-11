@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1027 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1034 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -590,6 +590,11 @@
 - `implementacao.js` — implementacao.js — recebe somente emissor transacional e resolução numérica.
 - `manifesto.js` — manifesto.js — contrato versionado da extensão neutra de prova.
 
+## procedural/familias/
+
+- `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
+- `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+
 ## procedural/nucleo/
 
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
@@ -778,6 +783,8 @@
 - `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural da Mecanifica.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
+- `chamar-familia.js` — chamar-familia.js — a porta de entrada de uma família: `chamar(familia, id, parametros)`.
+- `chamar-familia.test.js` — chamar-familia.test.js — `definirFamilia` e `chamar` sobre a família de prova: o que o `derivar` recebe e o que ele pode devolver. As recusas dos parâmetros …
 - `conferir-articulacao.js` — conferir-articulacao — o curso de uma articulação declarada, conferido contra as malhas de uma montagem resolvida. Serviço neutro, sem Three.js.
 - `conferir-articulacao.test.mjs` — conferir-articulacao.test.mjs — o curso de uma articulação declarada é amostrado e medido contra as peças que ficam. Montagem sintética de caixas e cilindros…
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
@@ -1008,6 +1015,12 @@
 - `folha-batente.js` — Receita privada: folha do batente com dois olhais.
 - `folha-porta.js` — Receita privada: folha da porta com olhal central.
 - `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
+
+## tools/fixtures/familia-chamavel/
+
+- `composicoes.js` — Fixture de teste: as duas composições da família `tubo-de-prova`, uma barra maciça e um tubo de parede. Quem a usa é `procedural/familias/familias.test.js` e…
+- `derivar.js` — Fixture de teste: o `derivar` da família `tubo-de-prova`. Puro: recebe os parâmetros em milímetro, já completados com os padrões, e devolve a composição e os…
+- `familia.js` — Fixture de teste: a família `tubo-de-prova` carregada (contrato, composições e `derivar`) e a receita que a chama. A receita é um objeto com `get CHAMADAS_CO…
 
 ## tools/fixtures/montagem-com-instancias-repetidas/
 
