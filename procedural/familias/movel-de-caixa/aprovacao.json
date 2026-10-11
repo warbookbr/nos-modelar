@@ -1937,5 +1937,39 @@
       "nó das dobradiças sobrepostas visível no canto da face externa da lateral, como o contrato declara"
     ]
   },
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-11",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
+    "perfis": {
+      "armario-de-cozinha-aereo": {
+        "hash": "sha256:a656e9a37c11cf11eac0673f0ecd1f88e9e68af4e3e0fc50d3a3987e84bf3004"
+      },
+      "armario-de-cozinha-de-chao": {
+        "hash": "sha256:2e3ee124b7ac76e9deff9850071c9a379a9845a4c1643ee481b76321692ef618"
+      },
+      "comoda": {
+        "hash": "sha256:f6b0e5a9ee031e04be8e8b3516fa2bae5b8c56e406ab954535663f6744ca7bc9"
+      },
+      "criado-mudo": {
+        "hash": "sha256:345e9be936b753661221a16b44982842279e165155ceaaa0c82a44ead67e161a"
+      },
+      "estante-com-portas": {
+        "hash": "sha256:82b8fcb1e4267d9e5f74e14ee938ec6fc7d5f083982b4377579119f2dc93f10c"
+      },
+      "gaveteiro": {
+        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
+      },
+      "guarda-roupa": {
+        "hash": "sha256:da277b90ff445f6bb2eccb959c1760e22caa737a0e73f6f34362a74cec65375b"
+      },
+      "guarda-roupa-de-correr": {
+        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
+      },
+      "roupeiro": {
+        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
+      }
+    },
+    "observacao": "a pessoa delegou a assinatura a Claude se cada perfil cumprisse o propósito do móvel; os nove se leem como os seus móveis, com o nó da dobradiça sobreposta à vista e a dobradiça de caneco fora como limite conhecido"
+  }
 }
