@@ -288,7 +288,7 @@ const maiorDimensao = (forma) => Math.max(forma.caixa[2] - forma.caixa[0], forma
    existe), e `tentar` é o mesmo sem recusar (vazio se nada casa). Devolve { vista, celula_mm, resultados, semParte, ok }; cada
    resultado traz `parte` (nulo para a silhueta inteira), `formas`, `iou`, `desvio_mm`, `desvio_medio_mm`, os limites, `ok`,
    `caixa_esboco` e `caixa_referencia` (h0, v0, h1, v1) e `texto`. */
-export function conferirReferencia(entrada, ref, rs, { selecionar, tentar }) {
+export function conferirReferencia(entrada, ref, rs, { selecionar, tentar, sujeito = 'do esboço' }) {
   const vista = entrada.vista;
   exigirVista(vista, `referência "${entrada.arquivo}"`);
   const partes = entrada.partes ?? {};
@@ -321,25 +321,25 @@ export function conferirReferencia(entrada, ref, rs, { selecionar, tentar }) {
     if (escolhidas.length === 0) { semParte.push(nome); continue; }
     comparar(nome, escolhidas.map((r) => r.id), new Set(escolhidas.map((r) => indice.get(r.id))), forma);
   }
-  for (const r of resultados) r.texto = textoDoResultado(r, vista);
+  for (const r of resultados) r.texto = textoDoResultado(r, vista, sujeito);
   return { vista, celula_mm: Math.round(g.cel * 100) / 100, resultados, semParte, ok: resultados.every((r) => r.ok) };
 }
 
 const sinal = (x) => `${x >= 0 ? '+' : '-'}${mm1(Math.abs(x))}`;
 
 /* A frase de um resultado: o desvio e a razão contra os limites, e a diferença de tamanho e de posição quando ela explica. */
-export function textoDoResultado(r, vista) {
+export function textoDoResultado(r, vista, sujeito = 'do esboço') {
   const eixos = EIXOS_DA_VISTA[vista];
-  const de = r.parte === null ? 'a silhueta do esboço' : `a parte "${r.parte}"${r.formas.length === 1 && r.formas[0] === r.parte ? '' : ` (${r.formas.join(', ')})`} do esboço`;
+  const de = r.parte === null ? `a silhueta ${sujeito}` : `a parte "${r.parte}"${r.formas.length === 1 && r.formas[0] === r.parte ? '' : ` (${r.formas.join(', ')})`} ${sujeito}`;
   const limites = `tolerância ${mm1(r.tolerancia_mm)} mm${r.tolerancia_declarada ? '' : ' (padrão)'}, razão interseção/união mínima ${num2(r.iou_min)}${r.iou_min_declarado ? '' : ' (padrão)'}`;
   if (r.desvio_mm === null) return `na vista ${vista}, ${de} e a referência não têm silhueta em comum para comparar (uma delas está vazia); ${limites}`;
   let dica = '';
   if (r.diferenca) {
     const [dh, dv] = r.diferenca.extensao_mm; const [ch, cv] = r.diferenca.centro_mm;
     const partes = [];
-    if (Math.abs(dh) >= 1 || Math.abs(dv) >= 1) partes.push(`a extensão do esboço difere ${sinal(dh)} mm em ${NOME_DO_EIXO[eixos.h]} e ${sinal(dv)} mm em ${NOME_DO_EIXO[eixos.v]}`);
+    if (Math.abs(dh) >= 1 || Math.abs(dv) >= 1) partes.push(`a extensão ${sujeito} difere ${sinal(dh)} mm em ${NOME_DO_EIXO[eixos.h]} e ${sinal(dv)} mm em ${NOME_DO_EIXO[eixos.v]}`);
     const centro = [[ch, 'na horizontal'], [cv, 'na vertical']].filter(([v]) => Math.abs(v) >= 1).map(([v, onde]) => `${sinal(v)} mm ${onde}`);
-    if (centro.length) partes.push(`o centro do esboço fica ${centro.join(' e ')} da referência (horizontal para a direita, vertical para cima)`);
+    if (centro.length) partes.push(`o centro ${sujeito} fica ${centro.join(' e ')} da referência (horizontal para a direita, vertical para cima)`);
     if (partes.length) dica = `; ${partes.join(' e ')}`;
   }
   return `na vista ${vista}, ${de} desvia ${mm1(r.desvio_mm)} mm da referência (desvio médio ${mm1(r.desvio_medio_mm)} mm) e a razão interseção/união é ${num2(r.iou)}${r.ok ? '' : ` (${limites})`}${dica}`;

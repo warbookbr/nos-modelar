@@ -12,6 +12,7 @@
  *
  *   REFINA: {
  *     andaime: 'andaime.json',                       // caminho relativo à pasta da peça
+ *     alvo: 'alvo.json',                             // opcional: o alvo N2, para o G01 sobre a malha da peça
  *     partes: { coluna: 'coluna-central', base: 'sapata' },   // parte da receita -> volume do andaime
  *     tolerancia: { envelope: 2, porta: 0.5 },       // milímetro
  *   }
@@ -68,7 +69,7 @@ function tolerancia(valor, quem, campo, limite) {
 export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
   if (valor === undefined || valor === null) return null;
   if (typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, 'precisa ser objeto ou estar ausente.');
-  const permitidas = ['formato', 'versao', 'andaime', 'partes', 'tolerancia'];
+  const permitidas = ['formato', 'versao', 'andaime', 'alvo', 'partes', 'tolerancia'];
   for (const chave of Object.keys(valor)) if (!permitidas.includes(chave)) falhar(quem, `'${quem}.${chave}' não é permitido; aceita ${permitidas.join(', ')}.`);
   const ausentes = ['andaime', 'partes', 'tolerancia'].filter((chave) => !Object.hasOwn(valor, chave));
   if (ausentes.length) falhar(quem, `precisa declarar: ${ausentes.join(', ')}.`);
@@ -80,6 +81,9 @@ export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
   }
   if (typeof valor.andaime !== 'string' || !CAMINHO_DO_ANDAIME.test(valor.andaime.trim())) {
     falhar(quem, `'andaime' precisa ser o caminho relativo de um .json, sem caminho absoluto, endereço ou barra invertida; recebeu ${exibir(valor.andaime)}.`);
+  }
+  if (valor.alvo !== undefined && (typeof valor.alvo !== 'string' || !CAMINHO_DO_ANDAIME.test(valor.alvo.trim()))) {
+    falhar(quem, `'alvo' precisa ser o caminho relativo de um .json (o alvo N2 que o G01 confere na malha da peça), sem caminho absoluto, endereço ou barra invertida; recebeu ${exibir(valor.alvo)}.`);
   }
   /* A entrada é o mapa {parte: volume}; a forma canônica é a lista [{parte, volume}], e a normalização aceita as duas
      para ser idempotente. */
@@ -103,6 +107,7 @@ export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
     formato: FORMATO_REFINAMENTO_GLOBAL,
     versao: VERSAO_REFINAMENTO_GLOBAL,
     andaime: valor.andaime.trim(),
+    ...(valor.alvo === undefined ? {} : { alvo: valor.alvo.trim() }),
     partes,
     tolerancia: {
       envelope: tolerancia(t.envelope, quem, 'envelope', LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM),
