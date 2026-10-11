@@ -9,6 +9,8 @@ import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
 
 const CONJUNTO = new URL('../../docs/mecanifica/banco-de-provas/calibracao-do-critico/conjunto.json', import.meta.url);
 const lido = () => JSON.parse(readFileSync(CONJUNTO, 'utf8'));
+/* o conjunto versionado com `resultados` esvaziado: o estado vazio não depende do que já foi julgado */
+const lidoSemResultados = () => ({ ...lido(), resultados: [] });
 const recusa = (mutar, trecho, opcoes) => {
   const c = lido();
   mutar(c);
@@ -18,14 +20,14 @@ const recusa = (mutar, trecho, opcoes) => {
 const imagem = (c, nome) => c.imagens.find((i) => i.nome === nome);
 const SHA = `sha256:${'a'.repeat(64)}`;
 const defeito = (parte, tipo, onde = 'extremidade da peça') => ({ parte, tipo, onde, sentido: TIPOS_DE_DEFEITO[tipo][0], evidencia: 'visto na vista lateral, junto à extremidade' });
-const jg = (nota, defeitos = []) => ({ nota, defeitos, briefSha256: SHA, data: '2026-10-11T12:00:00.000Z' });
+const jg = (nota, defeitos = []) => ({ nota, defeitos, briefSha256: SHA, imagemSha256: SHA, data: '2026-10-11T12:00:00.000Z' });
 
 describe('o conjunto versionado', () => {
   const conjunto = lerConjunto(lido());
 
-  it('tem doze imagens: três controles, um defeito de superfície e oito estruturais, quatro delas chaves com cinco julgamentos', () => {
+  it('tem doze imagens: três controles, um defeito de superfície, seis estruturais e duas de função, quatro delas chaves com cinco julgamentos', () => {
     expect(conjunto.imagens).toHaveLength(12);
-    expect(resumoDoConjunto(conjunto).porClasse).toEqual({ controle: 3, superficie: 1, estrutural: 8 });
+    expect(resumoDoConjunto(conjunto).porClasse).toEqual({ controle: 3, superficie: 1, estrutural: 6, funcao: 2 });
     const chaves = conjunto.imagens.filter((i) => i.chave).map((i) => i.nome).sort();
     expect(chaves).toEqual(['controle-cilindro', 'controle-roda', 'dobradicas-por-fora', 'picape-baixa']);
     expect(conjunto.imagens.filter((i) => i.julgamentos === 5)).toHaveLength(4);
@@ -33,7 +35,7 @@ describe('o conjunto versionado', () => {
   });
 
   it('as faixas são as da escala do brief e as duas imagens nomeadas são as obrigatórias', () => {
-    expect(FAIXAS_DA_NOTA).toEqual({ controle: [8, 10], superficie: [8, 9], estrutural: [5, 7] });
+    expect(FAIXAS_DA_NOTA).toEqual({ controle: [8, 10], superficie: [8, 9], estrutural: [5, 7], funcao: [0, 7] });
     for (const i of conjunto.imagens) expect(i.faixaDaNota).toEqual(FAIXAS_DA_NOTA[i.classe]);
     expect(conjunto.regra.passa).toEqual({ minimo: 11, de: 12, obrigatorias: ['dobradicas-por-fora', 'picape-baixa'] });
   });
@@ -63,15 +65,29 @@ describe('o conjunto versionado', () => {
     expect(defeitosDoCritico(imagem(conjunto, 'picape-baixa'))).toHaveLength(2);
   });
 
-  it('os resultados estão vazios e o conjunto diz que a calibração não foi medida', () => {
-    expect(conjunto.resultados).toEqual([]);
-    expect(resumoDoConjunto(conjunto)).toMatchObject({ medida: false, julgadas: 0, frase: 'calibração não medida: nenhuma das 12 imagens tem julgamento do crítico (resultados vazio)' });
+  it('o conjunto versionado é válido qualquer que seja o número de julgamentos que já tem', () => {
+    const c = lido();
+    const gravados = c.resultados.reduce((soma, r) => soma + r.julgamentos.length, 0);
+    expect(gravados).toBeLessThanOrEqual(44);
+    expect(() => lerConjunto(c)).not.toThrow();
+    for (const r of c.resultados) for (const j of r.julgamentos) expect(j.imagemSha256).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(resumoDoConjunto(lerConjunto(c))).toMatchObject({ medida: gravados > 0 });
+    const p = pontuarConjunto(lerConjunto(c));
+    expect(p.faltamNoTotal).toBe(44 - gravados);
+    expect(['nao-medido', 'pendente', 'passa', 'reprova']).toContain(p.estado);
+    expect(() => lerConjunto(lidoSemResultados())).not.toThrow();
+  });
+
+  it('sem resultados o conjunto diz que a calibração não foi medida', () => {
+    const vazio = lerConjunto(lidoSemResultados());
+    expect(vazio.resultados).toEqual([]);
+    expect(resumoDoConjunto(vazio)).toMatchObject({ medida: false, julgadas: 0, frase: 'calibração não medida: nenhuma das 12 imagens tem julgamento do crítico (resultados vazio)' });
   });
 
   it('todo tipo e sentido de defeito é do vocabulário do crítico, sem a cota da prancha', () => {
     expect(TIPOS_DO_CONJUNTO).toEqual(Object.keys(TIPOS_DE_DEFEITO).filter((t) => t !== 'cota'));
     for (const d of conjunto.imagens.flatMap((i) => i.defeitos)) expect(TIPOS_DE_DEFEITO[d.tipo]).toContain(d.sentido);
-    expect(CLASSES).toEqual(['controle', 'superficie', 'estrutural']);
+    expect(CLASSES).toEqual(['controle', 'superficie', 'estrutural', 'funcao']);
   });
 });
 
@@ -166,7 +182,7 @@ describe('o que o formato recusa', () => {
     recusa((c) => { c.critico.agente.sha256 = 'sha256:curto'; }, /sha256/);
   });
 
-  it('resultado de julgamento: imagem existente, impressão do crítico, nota de 0 a 10, defeitos, brief e data', () => {
+  it('resultado de julgamento: imagem existente, impressão do crítico, nota de 0 a 10, defeitos, brief, vistas e data', () => {
     const c = lido();
     const sha = c.critico.agente.sha256;
     const ok = { imagem: 'c01', agenteSha256: sha, briefSha256: c.critico.brief.sha256, julgamentos: [jg(6), jg(7), jg(5)] };
@@ -178,6 +194,8 @@ describe('o que o formato recusa', () => {
       [{ ...ok, agenteSha256: 'x' }, /sha256/],
       [{ ...ok, julgamentos: [{ ...jg(6), defeitos: undefined }] }, /defeitos/],
       [{ ...ok, julgamentos: [{ ...jg(6), briefSha256: 'x' }] }, /briefSha256/],
+      [{ ...ok, julgamentos: [{ ...jg(6), imagemSha256: undefined }] }, /imagemSha256/],
+      [{ ...ok, julgamentos: [{ ...jg(6), imagemSha256: 'x' }] }, /imagemSha256/],
       [{ ...ok, julgamentos: [{ ...jg(6), data: 'ontem' }] }, /ISO 8601/],
       [{ ...ok, julgamentos: [jg(6, [{ parte: 'haste', tipo: 'uniao' }])] }, /defeitos\[0\]/],
       [{ ...ok, julgamentos: [jg(5), jg(5), jg(5), jg(5)] }, /no máximo 3/],
@@ -331,7 +349,7 @@ describe('a pontuação do conjunto', () => {
   const errado = (img) => Array.from({ length: img.julgamentos }, () => jg(img.classe === 'controle' ? 3 : 10, []));
 
   it('sem julgamento, o estado é "não medido" e faltam 44 (20 nas quatro chaves e 24 nas oito outras)', () => {
-    const p = pontuarConjunto(lerConjunto(lido()));
+    const p = pontuarConjunto(lerConjunto(lidoSemResultados()));
     expect(p).toMatchObject({ estado: 'nao-medido', completo: false, faltamNoTotal: 44, acertos: 0 });
     expect(p.faltam).toMatchObject({ c01: 3, c02: 5, c03: 5, c07: 5 });
   });
