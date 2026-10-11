@@ -332,6 +332,18 @@ aresta pela outra face dá outro canon. O id literal continua aceito, mas é
 dívida posicional (`CLAUDE.md`) e é relatada; use `sel` por `origem`, `alias`,
 `porta` ou `onde`, que não persistem id algum.
 
+`arredondarAresta` e `filete` arredondam também a borda de uma tampa partida em
+faces coplanares, como o topo de uma `extrusao` com furo ou de um contorno por
+trechos: as faces planas que se tocam contam como uma só, e a borda do topo ou de
+um furo arredonda por `sel.onde`. A tangência escorrega ao longo da aresta
+vizinha até o plano da face de ponta, para ela continuar plana numa quina que
+não é de 90°, e o raio é conferido contra todos os vértices da tampa antes de
+escrever; raio que passa de um vértice, da espessura ou da faceta vizinha de um
+arco é recusado com o vértice e a distância. O canto onde três arestas
+arredondadas se encontram ainda não é resolvido: numa tampa partida o segundo
+arredondamento no mesmo canto recusa, e numa face inteira ele passa deixando o
+painel do primeiro empenado; arredonde bordas que não dividem vértice.
+
 **`apagaFace` é a que mais importa.** Ela é a única op
 que remove face — logo a única forma de abrir um furo, uma porta, um vão — e o
 núcleo já lhe deu o ramo semântico: `sel:{...}` resolvido pelos mesmos
