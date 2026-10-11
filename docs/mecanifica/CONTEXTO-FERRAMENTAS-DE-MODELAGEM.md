@@ -141,7 +141,14 @@ as [pranchas](banco-de-provas/familias-2026-10-11/) guardadas no banco de provas
 A chapa dobrada ganhou `origemId` e a origem estrutural (aba, dobra, lado, borda,
 tampa) e a dobradiça passou a fazer o nó com ela, em rolos de 270° com a chapa da
 folha tangente ao rolo, que dão a porta do nó e levam o curso a 180°; a aprovação mecânica foi repetida, e o crítico e a pessoa precisam julgar de novo
-a geometria nova. Faltam a roda raiada e o roupeiro.
+a geometria nova.
+
+A roda raiada (tarefa 7) entrou em 2026-10-11 como o `tipo` 1 da `roda-pneu`, com os raios feitos pela estrutura de barras
+(de 3 a 32 raios, tubo ou barra redonda, com cruzamento ou sem ele), as cinco restrições dela e a medida de corte de cada
+barra no `aprovacao.json`. Como o ponto máximo do contrato leva todos os parâmetros ao máximo, ele passou a ser raiado e
+mudou de hash, e a aprovação do crítico e da pessoa, que julgaram o disco nos três pontos, foi esvaziada: o mínimo e o
+médio mantêm o hash e o disco do máximo antigo também, preso no teste, mas a prancha tem de ser refeita com o máximo raiado
+e julgada de novo. Falta o roupeiro.
 
 ## Pendências da camada de features
 

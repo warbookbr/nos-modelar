@@ -7,6 +7,7 @@
     "pontos": {
       "minimo": {
         "parametros": {
+          "cruzamento": 0,
           "desvio": -25,
           "diametroAro": 250,
           "diametroCirculoFuros": 70,
@@ -14,16 +15,21 @@
           "diametroFuro": 10,
           "diametroFuroCentral": 40,
           "diametroPneu": 400,
+          "diametroRaio": 4,
           "espessuraDisco": 5,
           "furosDeFixacao": 3,
           "larguraAro": 80,
-          "larguraPneu": 100
+          "larguraPneu": 100,
+          "paredeDoRaio": 0,
+          "raios": 3,
+          "tipo": 0
         },
         "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739",
         "medidas": []
       },
       "medio": {
         "parametros": {
+          "cruzamento": 1,
           "desvio": 25,
           "diametroAro": 405,
           "diametroCirculoFuros": 135,
@@ -31,16 +37,21 @@
           "diametroFuro": 15,
           "diametroFuroCentral": 80,
           "diametroPneu": 650,
+          "diametroRaio": 7,
           "espessuraDisco": 8,
           "furosDeFixacao": 6,
           "larguraAro": 160,
-          "larguraPneu": 200
+          "larguraPneu": 200,
+          "paredeDoRaio": 1.5,
+          "raios": 16,
+          "tipo": 0
         },
         "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653",
         "medidas": []
       },
       "maximo": {
         "parametros": {
+          "cruzamento": 3,
           "desvio": 70,
           "diametroAro": 560,
           "diametroCirculoFuros": 200,
@@ -48,17 +59,189 @@
           "diametroFuro": 20,
           "diametroFuroCentral": 120,
           "diametroPneu": 900,
+          "diametroRaio": 11,
           "espessuraDisco": 12,
           "furosDeFixacao": 10,
           "larguraAro": 240,
-          "larguraPneu": 300
+          "larguraPneu": 300,
+          "paredeDoRaio": 3,
+          "raios": 32,
+          "tipo": 1
         },
-        "hash": "sha256:d4abcbf084d7d361a7f8f8e806fbb4d606752118c90081bfcc784c000b9eb770",
-        "medidas": []
+        "hash": "sha256:eb6b1a3d55a4d73b17f73fae9ec4028b5d85f21034e5d1f19d38971a0665c036",
+        "medidas": [
+          {
+            "ferramenta": "estruturaDeBarras",
+            "unidade": "m",
+            "componentes": 1,
+            "cortes": [
+              {
+                "barra": "raio-0",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-1",
+                "comprimentoEntreNos": 0.185188478082,
+                "comprimentoDeCorte": 0.185188478082
+              },
+              {
+                "barra": "raio-2",
+                "comprimentoEntreNos": 0.185188478194,
+                "comprimentoDeCorte": 0.185188478194
+              },
+              {
+                "barra": "raio-3",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-4",
+                "comprimentoEntreNos": 0.185188478109,
+                "comprimentoDeCorte": 0.185188478109
+              },
+              {
+                "barra": "raio-5",
+                "comprimentoEntreNos": 0.185188478108,
+                "comprimentoDeCorte": 0.185188478108
+              },
+              {
+                "barra": "raio-6",
+                "comprimentoEntreNos": 0.185188478189,
+                "comprimentoDeCorte": 0.185188478189
+              },
+              {
+                "barra": "raio-7",
+                "comprimentoEntreNos": 0.185188478135,
+                "comprimentoDeCorte": 0.185188478135
+              },
+              {
+                "barra": "raio-8",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-9",
+                "comprimentoEntreNos": 0.185188478082,
+                "comprimentoDeCorte": 0.185188478082
+              },
+              {
+                "barra": "raio-10",
+                "comprimentoEntreNos": 0.185188478194,
+                "comprimentoDeCorte": 0.185188478194
+              },
+              {
+                "barra": "raio-11",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-12",
+                "comprimentoEntreNos": 0.185188478109,
+                "comprimentoDeCorte": 0.185188478109
+              },
+              {
+                "barra": "raio-13",
+                "comprimentoEntreNos": 0.185188478108,
+                "comprimentoDeCorte": 0.185188478108
+              },
+              {
+                "barra": "raio-14",
+                "comprimentoEntreNos": 0.185188478189,
+                "comprimentoDeCorte": 0.185188478189
+              },
+              {
+                "barra": "raio-15",
+                "comprimentoEntreNos": 0.185188478135,
+                "comprimentoDeCorte": 0.185188478135
+              },
+              {
+                "barra": "raio-16",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-17",
+                "comprimentoEntreNos": 0.185188478082,
+                "comprimentoDeCorte": 0.185188478082
+              },
+              {
+                "barra": "raio-18",
+                "comprimentoEntreNos": 0.185188478194,
+                "comprimentoDeCorte": 0.185188478194
+              },
+              {
+                "barra": "raio-19",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-20",
+                "comprimentoEntreNos": 0.185188478109,
+                "comprimentoDeCorte": 0.185188478109
+              },
+              {
+                "barra": "raio-21",
+                "comprimentoEntreNos": 0.185188478108,
+                "comprimentoDeCorte": 0.185188478108
+              },
+              {
+                "barra": "raio-22",
+                "comprimentoEntreNos": 0.185188478189,
+                "comprimentoDeCorte": 0.185188478189
+              },
+              {
+                "barra": "raio-23",
+                "comprimentoEntreNos": 0.185188478135,
+                "comprimentoDeCorte": 0.185188478135
+              },
+              {
+                "barra": "raio-24",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-25",
+                "comprimentoEntreNos": 0.185188478082,
+                "comprimentoDeCorte": 0.185188478082
+              },
+              {
+                "barra": "raio-26",
+                "comprimentoEntreNos": 0.185188478194,
+                "comprimentoDeCorte": 0.185188478194
+              },
+              {
+                "barra": "raio-27",
+                "comprimentoEntreNos": 0.18518847818,
+                "comprimentoDeCorte": 0.18518847818
+              },
+              {
+                "barra": "raio-28",
+                "comprimentoEntreNos": 0.185188478109,
+                "comprimentoDeCorte": 0.185188478109
+              },
+              {
+                "barra": "raio-29",
+                "comprimentoEntreNos": 0.185188478108,
+                "comprimentoDeCorte": 0.185188478108
+              },
+              {
+                "barra": "raio-30",
+                "comprimentoEntreNos": 0.185188478189,
+                "comprimentoDeCorte": 0.185188478189
+              },
+              {
+                "barra": "raio-31",
+                "comprimentoEntreNos": 0.185188478135,
+                "comprimentoDeCorte": 0.185188478135
+              }
+            ]
+          }
+        ]
       }
     },
     "varredura": {
-      "sondas": 22,
+      "sondas": 32,
       "recusasDeclaradas": [
         {
           "ponto": "desvio=70",
@@ -108,46 +291,6 @@
       "furos-de-fixacao"
     ]
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por ponto",
-    "pontos": {
-      "minimo": {
-        "nota": 8,
-        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739"
-      },
-      "medio": {
-        "nota": 8,
-        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
-      },
-      "maximo": {
-        "nota": 8,
-        "hash": "sha256:d4abcbf084d7d361a7f8f8e806fbb4d606752118c90081bfcc784c000b9eb770"
-      }
-    },
-    "achados": [
-      "aro facetado na isométrica (revolução com poucos lados), de superfície",
-      "o cubo não se distingue da chapa na prancha e não foi verificável",
-      "largura do pneu no perfil 12 a 17% acima do parâmetro, pelo abaulamento do flanco"
-    ]
-  },
-  "pessoa": {
-    "data": "2026-10-11",
-    "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-prancha.png",
-    "pontos": {
-      "minimo": {
-        "hash": "sha256:e411d1c6caf238f1e0bcacd01641688284bf3c9f4d325d7bcfa95e47ee06f739"
-      },
-      "medio": {
-        "hash": "sha256:f58937d99ead0efafd897116430800827cec7fa525a8e00b86a0357408b42653"
-      },
-      "maximo": {
-        "hash": "sha256:d4abcbf084d7d361a7f8f8e806fbb4d606752118c90081bfcc784c000b9eb770"
-      }
-    },
-    "observacao": "aprovada como está; a largura do pneu vale no ombro, com o flanco abaulando além dela"
-  }
+  "critico": null,
+  "pessoa": null
 }
