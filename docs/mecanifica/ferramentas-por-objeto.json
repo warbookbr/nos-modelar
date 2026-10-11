@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "data": "2026-10-06",
+  "data": "2026-10-11",
   "fonte": "docs/mecanifica/FAMILIAS-DE-OBJETOS.md",
   "criterio": "Cada objeto da fase atual recebe as ferramentas que tirariam da IA a maior parte do trabalho de modelá-lo. Uma ferramenta entra no objeto quando sem ela a IA teria de reconstruir a forma a partir de primitivas; operações que todo objeto usa um pouco (espelho, arredondar uma aresta) só entram quando definem o objeto.",
   "ferramentas": {
@@ -127,8 +127,8 @@
       "automatiza": "faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico)",
       "parametros": "espessura, abas, ângulo e raio de cada dobra, alívio",
       "referencias": ["FreeCAD: SheetMetal", "Onshape: Sheet Metal"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não"
     },
     "perfil": {
       "nome": "perfil estrutural",
@@ -146,7 +146,7 @@
       "parametros": "nós, barras ou padrão de treliça, perfil da barra, tipo de junta",
       "referencias": ["Blender: modificador Skin e Wireframe", "Onshape: Frame", "FreeCAD: Frame"],
       "aqui": "parcial",
-      "onde": "tubo do esboço liga pontos com seção circular; juntas e padrões não"
+      "onde": "extensão nativa `estruturaDeBarras` do núcleo: barras de tubo ou perfil maciço entre nós, com corte de ponta e massa; juntas soldadas e padrões não; tubo do esboço"
     },
     "cabo": {
       "nome": "cabo ou mangueira entre pontos",
@@ -208,8 +208,8 @@
       "automatiza": "faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos",
       "parametros": "dimensões, vãos, tipo de cada vão, espessura do painel",
       "referencias": ["Blender: Archimesh (armários)"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "família `movel-de-caixa`: nove perfis (roupeiro, guarda-roupa, de correr, armário aéreo e de chão, cômoda, criado-mudo, estante, gaveteiro) com portas embutidas, sobrepostas e de correr, gavetas e curso conferido; cadeira, mesa e sofá não"
     },
     "gabinete": {
       "nome": "gabinete",
@@ -298,8 +298,8 @@
       "automatiza": "gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro",
       "parametros": "aro, largura, seção, raios ou disco, furação, banda",
       "referencias": ["Blender: modelagem por Screw e Array (técnica)"],
-      "aqui": "parcial",
-      "onde": "componente roda do esboço: anel, disco e cubo"
+      "aqui": "sim",
+      "onde": "família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos"
     },
     "articula": {
       "nome": "articulações",
@@ -308,7 +308,7 @@
       "parametros": "tipo, diâmetro do pino, abas, ângulo",
       "referencias": ["BOSL2: hinges", "Onshape e Fusion: juntas de montagem"],
       "aqui": "parcial",
-      "onde": "componentes dobradica e garfo do esboço; rótula e olhal não"
+      "onde": "extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não"
     },
     "atuador": {
       "nome": "atuador linear",
@@ -316,8 +316,8 @@
       "automatiza": "gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos",
       "parametros": "diâmetro, curso, extensão, montagem das pontas",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não"
     },
     "guia": {
       "nome": "guia linear",
@@ -325,8 +325,8 @@
       "automatiza": "gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso",
       "parametros": "tamanho, curso, tipo",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não"
     },
     "vedacao": {
       "nome": "vedação",
