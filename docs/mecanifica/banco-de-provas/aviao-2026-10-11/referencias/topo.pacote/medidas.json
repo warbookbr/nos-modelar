@@ -4,7 +4,7 @@
   "aileronEsq": 1,
   "asaDir": 1,
   "asaEsq": 1,
-  "capo": 0.946,
+  "capo": 0.986,
   "cone": 1,
   "corpoNaPontaEsq": 1,
   "deriva": 0.931,
@@ -14,7 +14,7 @@
   "estabilizadorEsq": 1,
   "flapDir": 1,
   "flapEsq": 1,
-  "fuselagem": 0.997,
+  "fuselagem": 0.998,
   "heliceDir": 1,
   "heliceEsq": 1,
   "parabrisa": 0.86,
@@ -25,7 +25,7 @@
  },
  "minimo": 0.8,
  "abaixo": [],
- "semDonoPx": 987,
+ "semDonoPx": 1013,
  "divisas": [
   {
    "a": "cone",
@@ -101,20 +101,20 @@
    "a": "capo",
    "b": "fuselagem",
    "caixa": [
-    201,
-    74,
+    200,
+    100,
     274,
-    134
+    139
    ]
   },
   {
    "a": "capo",
    "b": "parabrisa",
    "caixa": [
-    206,
-    100,
-    267,
-    139
+    203,
+    102,
+    271,
+    141
    ]
   },
   {

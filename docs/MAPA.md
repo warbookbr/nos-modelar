@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1113 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1117 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -146,6 +146,19 @@
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/
 
 - `ALINHAMENTO.md` — Avião de pequeno porte: alinhamento
+- `ATRITOS.md` — Avião de pequeno porte: atritos
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/
+
+- `roteiro.md` — Roteiro da análise
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/
+
+- `roteiro.md` — Roteiro da análise
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/
+
+- `roteiro.md` — Roteiro da análise
 
 ## docs/mecanifica/banco-de-provas/carrinho-refeito-2026-10-08/
 
