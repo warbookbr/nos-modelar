@@ -35,13 +35,14 @@ const recusa = (parametros) => {
 const areaRegular = (n, r) => 0.5 * n * r * r * Math.sin((2 * Math.PI) / n);
 
 describe('o registro de famílias', () => {
-  it('traz as quatro extensões nativas e as composições da família, e o registro do produto só traz famílias de ids distintos', () => {
+  it('traz as quatro extensões nativas e as composições da família, e o registro do produto lista as famílias reais com ids distintos', () => {
     expect(EXTENSOES_NATIVAS.map(({ manifesto }) => manifesto.operacao.nome)).toEqual(['casca', 'chapaDobrada', 'estruturaDeBarras', 'articulacao']);
     for (const { manifesto } of EXTENSOES_NATIVAS) expect(registro.registroOperacoes.resolver(manifesto.operacao.nome)).toBeTruthy();
     expect(registro.registroComposicoes.listar().map(({ id }) => id)).toEqual([ID_BARRA, ID_TUBO].sort());
     expect(registro.familias).toEqual(['tubo-de-prova']);
     expect(registro.obter('tubo-de-prova')).toBe(TUBO_DE_PROVA);
     expect(new Set(FAMILIAS.map(({ contrato }) => contrato.id)).size).toBe(FAMILIAS.length);
+    expect(FAMILIAS.map(({ contrato }) => contrato.id)).toEqual(expect.arrayContaining(['roda-pneu', 'dobradica']));
   });
 
   it('recusa lista vazia, família repetida e família que não existe, dizendo o que é aceito', () => {

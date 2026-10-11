@@ -19,6 +19,7 @@ import { MANIFESTO as MANIFESTO_BARRAS } from '../extensoes/estrutura-de-barras/
 import { implementar as implementarBarras } from '../extensoes/estrutura-de-barras/implementacao.js';
 import { ErroFamilia } from '../../src/autoria/familia.js';
 import { RODA_PNEU } from './roda-pneu/index.js';
+import { DOBRADICA } from './dobradica/index.js';
 
 export { ErroChamadaDeFamilia, chamar, definirFamilia } from '../../src/autoria/chamar-familia.js';
 
@@ -31,7 +32,7 @@ export const EXTENSOES_NATIVAS = Object.freeze([
 ]);
 
 /* As famílias do produto. Cada família real (tarefas 6 a 10 da fatia 9) entra aqui por import explícito. */
-export const FAMILIAS = Object.freeze([RODA_PNEU]);
+export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA]);
 
 /**
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,

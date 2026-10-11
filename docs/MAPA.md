@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1060 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1074 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -110,6 +110,8 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
@@ -593,7 +595,20 @@
 ## procedural/familias/
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
+- `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
+- `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+- `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+- `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+
+## procedural/familias/dobradica/
+
+- `composicoes.js` — composicoes.js — as composições procedurais da família `dobradica`, geradas por laço porque o número de nós e de furos muda a quantidade de passos e a compos…
+- `derivar.js` — derivar.js — dos parâmetros da dobradiça (milímetro) à chamada de composição (metro).
+- `dobradica.test.mjs` — dobradica.test.mjs — a família `dobradica`: contrato, recusas, geometria medida contra a conta, a montagem v5 que ela gera (resolvida pelo resolvedor real) e…
+- `geometria.js` — geometria.js — as medidas da dobradiça de abas a partir dos parâmetros da família, em metro.
+- `index.js` — index.js — a família `dobradica` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defin…
+- `montagem.js` — montagem.js — a mini-montagem v5 que a família gera: o pino e as duas folhas como peças soltas, ligadas por uma articulação de revolução com o curso declarad…
 
 ## procedural/familias/roda-pneu/
 
@@ -797,6 +812,7 @@
 - `conferir-articulacao.js` — conferir-articulacao — o curso de uma articulação declarada, conferido contra as malhas de uma montagem resolvida. Serviço neutro, sem Three.js.
 - `conferir-articulacao.test.mjs` — conferir-articulacao.test.mjs — o curso de uma articulação declarada é amostrado e medido contra as peças que ficam. Montagem sintética de caixas e cilindros…
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
+- `contato-de-solidos-em-milimetro.test.mjs` — contato-de-solidos-em-milimetro.test.mjs — o contato de sólidos numa peça de milímetros (a metro por unidade). Três tolerâncias absolutas do módulo deixavam …
 - `contato-de-solidos.js` — contato-de-solidos — o núcleo geométrico que decide se dois sólidos se separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
 - `contatos-da-peca.test.mjs` — contatos-da-peca.test.mjs — a medida só vale se ela REPROVAR alguma coisa.
@@ -1305,6 +1321,7 @@
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
+- `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.

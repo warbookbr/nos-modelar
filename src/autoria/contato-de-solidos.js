@@ -197,32 +197,54 @@ export function prepararSolido(neutro, pose, rotulo) {
 
 function sobreposicaoTriangulo(a, b, tolerancia) {
   const eixos = [];
-  const adicionar = (eixo) => { if (comprimento2(eixo) > EPS) eixos.push(eixo); };
-  const normalA = cross(sub(a[1], a[0]), sub(a[2], a[0]));
-  const normalB = cross(sub(b[1], b[0]), sub(b[2], b[0]));
-  adicionar(normalA); adicionar(normalB);
-  for (const arestaA of [sub(a[1], a[0]), sub(a[2], a[1]), sub(a[0], a[2])]) {
-    for (const arestaB of [sub(b[1], b[0]), sub(b[2], b[1]), sub(b[0], b[2])]) adicionar(cross(arestaA, arestaB));
+  /* O eixo é o produto vetorial de dois vetores e só é descartado quando é nulo diante deles (vetores paralelos): a
+     comparação é relativa ao tamanho dos dois, porque o piso absoluto de 1e-12 sobre o quadrado do eixo jogava fora os
+     eixos de qualquer triângulo de milímetros (a metro por unidade), e com eles a separação. */
+  const adicionar = (u, v) => {
+    const eixo = cross(u, v);
+    if (comprimento2(eixo) > 1e-18 * comprimento2(u) * comprimento2(v)) eixos.push(eixo);
+  };
+  const arestasA = [sub(a[1], a[0]), sub(a[2], a[1]), sub(a[0], a[2])];
+  const arestasB = [sub(b[1], b[0]), sub(b[2], b[1]), sub(b[0], b[2])];
+  const normalA = cross(arestasA[0], sub(a[2], a[0]));
+  const normalB = cross(arestasB[0], sub(b[2], b[0]));
+  adicionar(arestasA[0], sub(a[2], a[0])); adicionar(arestasB[0], sub(b[2], b[0]));
+  for (const arestaA of arestasA) {
+    for (const arestaB of arestasB) adicionar(arestaA, arestaB);
+  }
+  /* DOIS TRIÂNGULOS NO MESMO PLANO. As arestas de um e de outro são paralelas ao plano, então todos os produtos acima
+     dão a normal, e nenhum eixo enxerga a separação dentro do plano: dois triângulos coplanares e afastados saíam como
+     "se cruzam". O eixo que separa é a perpendicular de cada aresta dentro do plano do próprio triângulo. */
+  for (const [normal, arestas] of [[normalA, arestasA], [normalB, arestasB]]) {
+    if (comprimento2(normal) > 0) for (const aresta of arestas) adicionar(normal, aresta);
   }
   for (const eixo of eixos) {
-    const valoresA = a.map((ponto) => dot(eixo, ponto));
-    const valoresB = b.map((ponto) => dot(eixo, ponto));
+    /* o eixo vai normalizado para a tolerância ser uma distância, e não depender do tamanho do triângulo */
+    const norma = Math.sqrt(comprimento2(eixo));
+    const valoresA = a.map((ponto) => dot(eixo, ponto) / norma);
+    const valoresB = b.map((ponto) => dot(eixo, ponto) / norma);
     if (Math.max(...valoresA) < Math.min(...valoresB) - tolerancia
       || Math.max(...valoresB) < Math.min(...valoresA) - tolerancia) return false;
   }
   return true;
 }
 
+/* O PONTO NO TRIÂNGULO MEDE DISTÂNCIA. Os três testes de lado comparavam a tolerância com o produto de dois vetores e da
+   normal, que escala com o tamanho do triângulo ao cubo: num triângulo de milímetros (a metro por unidade) esse produto
+   fica abaixo de 1e-9 e qualquer ponto coplanar com a face passava por "dentro" dela, longe que estivesse. Aqui cada
+   lado é a distância do ponto à reta da aresta, em unidade de mundo, e a tolerância é a mesma do plano. */
 function pontoNoTriangulo(ponto, triangulo, tolerancia) {
   const [a, b, c] = triangulo;
   const normal = cross(sub(b, a), sub(c, a));
-  const distancia = Math.abs(dot(normal, sub(ponto, a))) / Math.sqrt(comprimento2(normal));
+  const tamanhoDaNormal = Math.sqrt(comprimento2(normal));
+  const distancia = Math.abs(dot(normal, sub(ponto, a))) / tamanhoDaNormal;
   if (distancia > tolerancia) return false;
-  const ab = sub(b, a); const bc = sub(c, b); const ca = sub(a, c);
-  const ap = sub(ponto, a); const bp = sub(ponto, b); const cp = sub(ponto, c);
-  return dot(cross(ab, ap), normal) >= -tolerancia
-    && dot(cross(bc, bp), normal) >= -tolerancia
-    && dot(cross(ca, cp), normal) >= -tolerancia;
+  const doLado = (de, para) => {
+    const aresta = sub(para, de);
+    const tamanho = Math.sqrt(comprimento2(aresta));
+    return tamanho > 0 ? dot(cross(aresta, sub(ponto, de)), normal) / (tamanhoDaNormal * tamanho) : 0;
+  };
+  return doLado(a, b) >= -tolerancia && doLado(b, c) >= -tolerancia && doLado(c, a) >= -tolerancia;
 }
 
 function raioAtravessaTriangulo(origem, triangulo, tolerancia) {
@@ -230,7 +252,10 @@ function raioAtravessaTriangulo(origem, triangulo, tolerancia) {
   const direcao = DIRECAO_RAIO;
   const aresta1 = sub(b, a); const aresta2 = sub(c, a);
   const h = cross(direcao, aresta2); const determinante = dot(aresta1, h);
-  if (Math.abs(determinante) <= tolerancia) return null;
+  /* raio paralelo ao plano do triângulo: o determinante é adimensional só depois de dividido pelo tamanho dos dois
+     vetores. Comparado direto com a tolerância (uma distância), ele jogava fora todo triângulo de poucos milímetros
+     quadrados como "paralelo", e a contagem de cruzamentos do raio perdia faces. */
+  if (Math.abs(determinante) <= 1e-12 * Math.sqrt(comprimento2(aresta1) * comprimento2(h))) return null;
   const inverso = 1 / determinante;
   const s = sub(origem, a); const u = inverso * dot(s, h);
   if (u < -tolerancia || u > 1 + tolerancia) return null;

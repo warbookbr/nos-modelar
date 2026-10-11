@@ -1,0 +1,63 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "dobradica",
+  "versao": "1.0.0",
+  "nivel": "objeto",
+  "parametros": {
+    "altura": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 40, "maximo": 200, "medio": 120 },
+    "larguraFolha": { "tipo": "numero", "unidade": "mm", "padrao": 35, "minimo": 15, "maximo": 80, "medio": 40 },
+    "espessura": { "tipo": "numero", "unidade": "mm", "padrao": 2, "minimo": 1, "maximo": 4, "medio": 2.5 },
+    "diametroPino": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 3, "maximo": 10, "medio": 6 },
+    "nos": { "tipo": "inteiro", "unidade": "contagem", "padrao": 5, "minimo": 3, "maximo": 9, "medio": 6 },
+    "furos": { "tipo": "inteiro", "unidade": "contagem", "padrao": 3, "minimo": 1, "maximo": 5, "medio": 3 }
+  },
+  "restricoes": [
+    {
+      "id": "no-com-comprimento",
+      "expressao": "(altura - (nos - 1) * 0.5) / nos >= 2 * espessura",
+      "motivo": "cada nó precisa ter ao menos o dobro da espessura da chapa em comprimento (a altura menos as folgas de 0,5 mm entre os nós, dividida pelo número de nós); um nó mais curto vira um anel fino que não segura o pino"
+    },
+    {
+      "id": "pino-mais-grosso-que-a-chapa",
+      "expressao": "diametroPino >= espessura + 1",
+      "motivo": "o pino precisa ser ao menos 1 mm mais grosso que a chapa, senão a parede do nó enrolado passa a ser mais grossa que o pino que ela segura"
+    },
+    {
+      "id": "folha-larga-o-bastante",
+      "expressao": "larguraFolha >= 3 * espessura + 6",
+      "motivo": "a folha precisa ter ao menos três espessuras mais 6 mm de largura, para sobrar chapa plana depois do corte dos nós da outra folha e caber o furo de fixação"
+    }
+  ],
+  "portas": [
+    { "id": "eixo-do-pino", "tipo": "cilindro", "papel": "externa" },
+    { "id": "nos-da-folha-d", "tipo": "anel", "papel": "recebe" },
+    { "id": "nos-da-folha-e", "tipo": "anel", "papel": "recebe" },
+    { "id": "plano-da-folha-d", "tipo": "plano", "papel": "apoia" },
+    { "id": "plano-da-folha-e", "tipo": "plano", "papel": "apoia" }
+  ],
+  "ferramentas": ["articula", "booleana"],
+  "perguntas": {
+    "folhas": [
+      "As duas folhas têm a mesma largura e a mesma espessura, com os furos de fixação distribuídos ao longo da altura?"
+    ],
+    "nos": [
+      "Os nós se alternam entre as duas folhas, sem dois nós seguidos da mesma folha?",
+      "Com a dobradiça aberta a 90 graus as duas folhas giram em torno do mesmo eixo, sem se atravessarem?"
+    ],
+    "pino": [
+      "O pino atravessa todos os nós de ponta a ponta, concêntrico com eles?"
+    ]
+  },
+  "esboco": {
+    "componente": "dobradica",
+    "mapa": { "altura": "altura", "diametroPino": "diametroPino", "espessura": "espessura", "larguraAba": "larguraFolha" },
+    "conferencia": {
+      "versao": 1,
+      "partes": { "pino": "pino", "nosD": "pino", "nosE": "pino", "folhaD": "abaD", "folhaE": "abaE" },
+      "portas": [
+        { "porta": "eixo-do-pino", "volume": "pino", "lado": "-y" }
+      ],
+      "tolerancia": { "envelope": 5, "porta": 0.5 }
+    }
+  }
+}

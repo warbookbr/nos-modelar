@@ -1,0 +1,167 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "dobradica",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-10-11",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "altura": 40,
+          "diametroPino": 3,
+          "espessura": 1,
+          "furos": 1,
+          "larguraFolha": 15,
+          "nos": 3
+        },
+        "hash": "sha256:ff36d04e2e82d217112d8f65578a7b32595831446f14d66cbdf46a2860ab454f",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:3904fdb093a53f55413b76f57d3c0d231ef2250271275cc51a83760bfac987af",
+          "pecas": [
+            "dobradica-folha-d",
+            "dobradica-folha-e",
+            "dobradica-pino"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "abertura",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 161.96,
+                "unidade": "graus"
+              },
+              "passos": 12,
+              "posicoes": 13,
+              "colisoes": 0,
+              "paresConferidos": 2,
+              "pares": [
+                {
+                  "movel": [
+                    "folha-e"
+                  ],
+                  "fixo": [
+                    "folha-d"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
+      },
+      "medio": {
+        "parametros": {
+          "altura": 120,
+          "diametroPino": 6,
+          "espessura": 2.5,
+          "furos": 3,
+          "larguraFolha": 40,
+          "nos": 6
+        },
+        "hash": "sha256:0af494421a63e7ec281e4a4686f4a4993828c3698901a8be76489037a56ea6df",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:0c5a4129b3ad6df04284b1f1d53e189bcd3f9a4065279877255958a3ec7e58be",
+          "pecas": [
+            "dobradica-folha-d",
+            "dobradica-folha-e",
+            "dobradica-pino"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "abertura",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 157.02,
+                "unidade": "graus"
+              },
+              "passos": 12,
+              "posicoes": 13,
+              "colisoes": 0,
+              "paresConferidos": 2,
+              "pares": [
+                {
+                  "movel": [
+                    "folha-e"
+                  ],
+                  "fixo": [
+                    "folha-d"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
+      },
+      "maximo": {
+        "parametros": {
+          "altura": 200,
+          "diametroPino": 10,
+          "espessura": 4,
+          "furos": 5,
+          "larguraFolha": 80,
+          "nos": 9
+        },
+        "hash": "sha256:0de9b0a0ea6214cf21f62a47f27ba242a858d2897978b4635106b427acd16d06",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:6232eec31c85f313194338527497e882a1598e47d069bbe1df4e527ccc4510de",
+          "pecas": [
+            "dobradica-folha-d",
+            "dobradica-folha-e",
+            "dobradica-pino"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "abertura",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": 0,
+                "maximo": 156.58,
+                "unidade": "graus"
+              },
+              "passos": 12,
+              "posicoes": 13,
+              "colisoes": 0,
+              "paresConferidos": 2,
+              "pares": [
+                {
+                  "movel": [
+                    "folha-e"
+                  ],
+                  "fixo": [
+                    "folha-d"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
+      }
+    },
+    "varredura": {
+      "sondas": 12,
+      "recusasDeclaradas": []
+    },
+    "portas": [
+      "eixo-do-pino",
+      "nos-da-folha-d",
+      "nos-da-folha-e",
+      "plano-da-folha-d",
+      "plano-da-folha-e"
+    ]
+  },
+  "critico": null,
+  "pessoa": null
+}
