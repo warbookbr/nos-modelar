@@ -11,9 +11,11 @@
 
    A PORTA é uma laje com rasgos na borda, um por dobradiça (também um `arranja`), e o puxador. A GAVETA é a frente, as duas
    laterais com o rasgo do trilho, a traseira, o fundo e o puxador; o GUIA são os dois trilhos de uma gaveta, presos às
-   laterais do corpo. A DOBRADIÇA são as composições da família `dobradica` (os nós de `dobradica/composicoes.js`) com a
-   folha fixa e o pino numa peça e a folha móvel noutra, giradas e levadas ao lugar do pino por `rotaciona` e `transladar`; as
-   portas das folhas da dobradiça (a lateral do tambor) são republicadas nas posições do móvel. O CONJUNTO reúne o corpo (com
+   laterais do corpo. A DOBRADIÇA da porta embutida são as composições da família `dobradica` (os nós de
+   `dobradica/composicoes.js`) com a folha fixa e o pino numa peça e a folha móvel noutra, giradas e levadas ao lugar do pino
+   por `rotaciona` e `transladar`; as portas das folhas da dobradiça (a lateral do tambor) são republicadas nas posições do
+   móvel. A da porta sobreposta são duas composições daqui, a fixa (placa, abas e pino com colares) e a móvel (aro e folha),
+   que já nascem no quadro do móvel, e publicam o pino (`eixo-do-pino`) e o aro (`aro-do-pino`). O CONJUNTO reúne o corpo (com
    os trilhos dentro), as portas e as gavetas fechadas numa peça só, para `chamar`; a montagem v5 usa as peças soltas.
 
    Os ids de origem são literais e distintos entre o corpo (100), cada porta (200, 300, 400, 500) e cada gaveta (1000, 1100,
@@ -26,8 +28,9 @@ import {
   ALTURA_DO_PUXADOR_DA_GAVETA, ALTURA_DO_RASGO_DA_GAVETA, COMPRIMENTO_DO_PUXADOR_DA_GAVETA,
   COMPRIMENTO_MAXIMO_DO_PUXADOR, ESPESSURA_DA_CAIXA_DA_GAVETA, ESPESSURA_DO_FUNDO_DA_GAVETA, ELEVACAO_DO_FUNDO_DA_GAVETA,
   LADOS_DO_CABIDEIRO, LADOS_DO_PE, LARGURA_DO_PUXADOR, MAXIMO_DE_GAVETAS, MAXIMO_DE_PORTAS, MAXIMO_DE_PRATELEIRAS,
-  MAXIMO_DE_TRILHOS_DE_CORRER, ORDEM_DOS_APOIOS, PROFUNDIDADE_DO_RASGO_DA_GAVETA, RAIO_DO_CABIDEIRO, RAIO_DO_PE_NA_BASE,
-  RAIO_DO_PE_NO_TOPO, RECUO_DA_DIVISORIA, SAIDA_DO_PUXADOR, SOBREPOSICAO, cortesDoApoio, geometriaDoMovel, metro,
+  LADOS_DO_PINO_OCULTO, MAXIMO_DE_TRILHOS_DE_CORRER, ORDEM_DOS_APOIOS, PROFUNDIDADE_DO_RASGO_DA_GAVETA, RAIO_DO_ARO, RAIO_DO_CABIDEIRO,
+  RAIO_DO_PE_NA_BASE, RAIO_DO_PE_NO_TOPO, RAIO_DO_PINO_OCULTO, FOLGA_DO_ARO, RECUO_DA_DIVISORIA, SAIDA_DO_PUXADOR, SOBREPOSICAO,
+  cortesDoApoio, geometriaDoMovel, metro, pecasDaDobradicaOculta,
 } from './geometria.js';
 
 const MALHA = 'mecanifica.malha-poligonal@1';
@@ -42,6 +45,7 @@ export const ID_DO_GUIA = (numero) => `movel-de-caixa.guia-${numero}`;
 export const ID_DA_PORTA_DE_CORRER = (numero) => `movel-de-caixa.correr-${numero}`;
 export const ID_DO_TRILHO = (numero) => `movel-de-caixa.trilho-${numero}`;
 export const ID_DA_DOBRADICA = (lado, nos, furos) => `movel-de-caixa.dobradica-${lado}-n${nos}-f${furos}`;
+export const ID_DA_DOBRADICA_OCULTA = (quem) => `movel-de-caixa.dobradica-oculta-${quem}`;
 export const FAIXA_DE_PORTAS = Object.freeze({ minimo: 0, maximo: MAXIMO_DE_PORTAS });
 export const FAIXA_DE_GAVETAS = Object.freeze({ minimo: 0, maximo: MAXIMO_DE_GAVETAS });
 export const NOS_DA_DOBRADICA = Object.freeze([3]);
@@ -52,6 +56,7 @@ const BASE_DA_PORTA = (indice) => 200 + 100 * indice;
 const BASE_DA_GAVETA = (indice) => 1000 + 100 * indice;
 const BASE_DO_GUIA = (indice) => 2000 + 100 * indice;
 const BASE_DO_TRILHO = (indice) => 3000 + 100 * indice;
+const BASE_DA_DOBRADICA_OCULTA = { fixa: 5000, movel: 5100 };
 const p = (nome) => ({ parametro: nome });
 const origem = (op, id, extra = {}) => ({ origem: { op, id, ...extra } });
 
@@ -235,7 +240,7 @@ function nosDoCorpo(b, g, params, { guias }) {
   const ferramentas = [];
   for (const { apoio, indice, porta } of apoiosDoCorpo(g)) {
     const id = ID.apoio + 10 * indice;
-    const cortes = porta ? cortesDoApoio(g, porta) : null;
+    const cortes = porta && !g.sobreposta ? cortesDoApoio(g, porta) : null;
     const total = cortes ? cortes.total : 2;
     const passo = cortes ? cortes.passo : 20;
     nos.push(cubo(b, `rebaixo-${apoio}`, id, cortes ? cortes.rebaixo : CORTE_ESCONDIDO));
@@ -414,6 +419,115 @@ function nosDoGuia(b, base, guia, portaId) {
   return nos;
 }
 
+/* ---------- a dobradiça oculta da porta sobreposta ---------- */
+
+const eixoDaOculta = (porta) => (porta.vao === 1 ? [0, -1, 0] : [0, 1, 0]);
+
+/* a fixa: a placa, as duas abas e o pino com um colar em cada ponta */
+function nosDaFixaOculta(b, g, porta, k, painel) {
+  const base = BASE_DA_DOBRADICA_OCULTA.fixa;
+  const ID = { pino: base + 1, placa: base + 2, abaDeBaixo: base + 3, abaDeCima: base + 4, uniao: base + 10 };
+  const m = pecasDaDobradicaOculta(g, porta, k, painel);
+  const nos = [];
+  const colar = g.oculta.comprimentoDoColar;
+  const raioDoColar = b.num('raioDoColar', metro(RAIO_DO_ARO));
+  const raioDoPino = b.num('raioDoPino', metro(RAIO_DO_PINO_OCULTO));
+  const y = (nome, valor) => b.num(nome, metro(valor));
+  const [yBaixo, yColarBaixo, yColarCima, yCima] = [y('yDoPinoEmBaixo', m.y0), y('yDoColarDeBaixo', m.y0 + colar), y('yDoColarDeCima', m.y1 - colar), y('yDoPinoEmCima', m.y1)];
+  nos.push({
+    id: b.id('pino'), operacao: 'lathe',
+    argumentos: {
+      origemId: ID.pino,
+      perfil: [[0, yBaixo], [raioDoColar, yBaixo], [raioDoColar, yColarBaixo], [raioDoPino, yColarBaixo], [raioDoPino, yColarCima], [raioDoColar, yColarCima], [raioDoColar, yCima], [0, yCima]],
+      lados: LADOS_DO_PINO_OCULTO, em: b.vetor('emDoPino', [metro(m.xDoPino), 0, metro(m.zDoPino)]),
+    },
+  });
+  nos.push(cubo(b, 'placa', ID.placa, m.fixa.placa), cubo(b, 'aba-de-baixo', ID.abaDeBaixo, m.fixa.abaDeBaixo), cubo(b, 'aba-de-cima', ID.abaDeCima, m.fixa.abaDeCima));
+  /* o pino é a faixa do meio da revolução (entre os dois colares): as abas cortam os colares e a porta cita só o que fica */
+  const faixaDoPino = origem('lathe', ID.pino, { faixa: 3 });
+  nos.push(
+    parteDe(b, 'colares', 'colar', origem('lathe', ID.pino)),
+    { id: b.id('parte-pino'), operacao: 'parte', argumentos: { nome: 'pino', sel: faixaDoPino, substituir: true } },
+    parteDe(b, 'placa', 'placa', origem('cubo', ID.placa)),
+    parteDe(b, 'aba-de-baixo', 'aba', origem('cubo', ID.abaDeBaixo)),
+    parteDe(b, 'aba-de-cima', 'aba', origem('cubo', ID.abaDeCima)),
+  );
+  nos.push({
+    id: b.id('uniao'), operacao: 'unir',
+    argumentos: { origemId: ID.uniao, solidos: [origem('lathe', ID.pino), origem('cubo', ID.placa), origem('cubo', ID.abaDeBaixo), origem('cubo', ID.abaDeCima)] },
+  });
+  const final = origem('unir', ID.uniao);
+  nos.push(materialDe(b, 'fixa', 'chapa', final), solidoDe(b, 'fixa', final));
+  const sobe = porta.vao !== 1;
+  const comprimento = metro(m.y1 - m.y0 - 2 * colar);
+  nos.push({
+    id: b.id('porta-do-pino'), operacao: 'publicarPorta',
+    argumentos: {
+      id: 'eixo-do-pino', de: faixaDoPino.origem,
+      interface: {
+        forma: 'cilindro', papel: 'externa', eixo: b.vetor('eixoDoPino', eixoDaOculta(porta)), referencia: [1, 0, 0],
+        centro: b.vetor('centroDoPino', [metro(m.xDoPino), metro(m.y0 + colar), metro(m.zDoPino)]), raio: raioDoPino,
+        inicio: b.num('inicioDoPino', sobe ? 0 : -comprimento), fim: b.num('fimDoPino', sobe ? comprimento : 0),
+      },
+    },
+  });
+  return nos;
+}
+
+/* a móvel: o aro entre os colares e a folha que entra no sulco da porta */
+function nosDaMovelOculta(b, g, porta, k, painel) {
+  const base = BASE_DA_DOBRADICA_OCULTA.movel;
+  const ID = { aro: base + 1, folha: base + 2, uniao: base + 10 };
+  const m = pecasDaDobradicaOculta(g, porta, k, painel);
+  const nos = [];
+  const raioInterno = b.num('raioInternoDoAro', metro(RAIO_DO_PINO_OCULTO + FOLGA_DO_ARO));
+  const raioExterno = b.num('raioExternoDoAro', metro(RAIO_DO_ARO));
+  const yBaixo = b.num('yDoAroEmBaixo', metro(m.yDoAro0));
+  const yCima = b.num('yDoAroEmCima', metro(m.yDoAro1));
+  nos.push({
+    id: b.id('aro'), operacao: 'lathe',
+    argumentos: {
+      origemId: ID.aro,
+      perfil: [[raioInterno, yBaixo], [raioExterno, yBaixo], [raioExterno, yCima], [raioInterno, yCima], [raioInterno, yBaixo]],
+      lados: LADOS_DO_PINO_OCULTO, em: b.vetor('emDoAro', [metro(m.xDoPino), 0, metro(m.zDoPino)]),
+    },
+  });
+  nos.push(cubo(b, 'folha', ID.folha, m.movel.folha));
+  nos.push(parteDe(b, 'aro', 'aro', origem('lathe', ID.aro)), parteDe(b, 'folha', 'folha', origem('cubo', ID.folha)));
+  nos.push({ id: b.id('uniao'), operacao: 'unir', argumentos: { origemId: ID.uniao, solidos: [origem('lathe', ID.aro), origem('cubo', ID.folha)] } });
+  const final = origem('unir', ID.uniao);
+  nos.push(materialDe(b, 'movel', 'chapa', final), solidoDe(b, 'movel', final));
+  const sobe = porta.vao !== 1;
+  const comprimento = m.yDoAro1 - m.yDoAro0;
+  nos.push({
+    id: b.id('porta-do-aro'), operacao: 'publicarPorta',
+    argumentos: {
+      id: 'aro-do-pino', de: { op: 'lathe', id: ID.aro },
+      interface: {
+        forma: 'anel', papel: 'recebe', eixo: b.vetor('eixoDoAro', eixoDaOculta(porta)),
+        centro: b.vetor('centroDoAro', [metro(m.xDoPino), metro(m.yDoAro0), metro(m.zDoPino)]),
+        raioInterno, raioExterno,
+        inicio: b.num('inicioDoAro', sobe ? 0 : metro(-comprimento)), fim: b.num('fimDoAro', sobe ? metro(comprimento) : 0),
+      },
+    },
+  });
+  return nos;
+}
+
+/** Os argumentos e os tipos da peça fixa da `k`-ésima dobradiça oculta de uma porta sobreposta. */
+export function fixaOcultaDe(g, params, porta, k) {
+  const b = construtor('fixa');
+  const nos = nosDaFixaOculta(b, g, porta, k, params.painel);
+  return { nos, argumentos: b.argumentos, tipos: b.tipos };
+}
+
+/** Os argumentos e os tipos da peça móvel da `k`-ésima dobradiça oculta de uma porta sobreposta. */
+export function movelOcultaDe(g, params, porta, k) {
+  const b = construtor('movel');
+  const nos = nosDaMovelOculta(b, g, porta, k, params.painel);
+  return { nos, argumentos: b.argumentos, tipos: b.tipos };
+}
+
 /* ---------- as composições ---------- */
 
 /* Uma configuração de exemplo para gerar a estrutura dos passos: cabe qualquer número de portas e de gavetas da família. */
@@ -514,6 +628,11 @@ function gerarComposicoes() {
     const guia = guiaDe(gCheio, exemploCheio, k);
     lista.push(composicao(ID_DO_GUIA(k + 1), guia.tipos, guia.nos));
   }
+  const exemploSobreposto = { ...exemplo(2, 0), frente: 0, cabideiro: 0 };
+  const gSobreposto = geometriaDoMovel(exemploSobreposto);
+  const fixa = fixaOcultaDe(gSobreposto, exemploSobreposto, gSobreposto.portas[0], 0);
+  const movel = movelOcultaDe(gSobreposto, exemploSobreposto, gSobreposto.portas[0], 0);
+  lista.push(composicao(ID_DA_DOBRADICA_OCULTA('fixa'), fixa.tipos, fixa.nos), composicao(ID_DA_DOBRADICA_OCULTA('movel'), movel.tipos, movel.nos));
   for (const nos of NOS_DA_DOBRADICA) for (const furos of FUROS_DA_DOBRADICA) for (const lado of ['d', 'e']) lista.push(dobradica(lado, nos, furos));
   return Object.freeze(lista);
 }

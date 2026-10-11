@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.familia@1",
   "id": "movel-de-caixa",
-  "versao": "2.0.0",
+  "versao": "2.1.0",
   "nivel": "objeto",
   "parametros": {
     "largura": { "tipo": "numero", "unidade": "mm", "padrao": 1600, "minimo": 300, "maximo": 3000, "medio": 1200 },
@@ -118,7 +118,7 @@
       "O vão aberto, quando há, está sem porta e é onde ficam as prateleiras da estante?"
     ],
     "portas": [
-      "As portas têm a mesma largura e a mesma altura, com 3 mm de folga em volta e entre si, e ficam à ras da frente do corpo (embutidas) ou cobrem a frente dele, 2 mm à frente (sobrepostas)?",
+      "As portas têm a mesma largura e a mesma altura, com 3 mm de folga em volta e entre si, e ficam à ras da frente do corpo (embutidas) ou cobrem a frente dele, 4 mm à frente (sobrepostas)?",
       "Cada porta tem um puxador vertical perto da borda livre?"
     ],
     "gavetas": [
@@ -127,7 +127,7 @@
       "Aberta no fim do curso, cada gaveta sai reta para a frente, e o trilho do corpo continua dentro do rasgo de cada lateral dela?"
     ],
     "dobradicas": [
-      "Cada porta tem as suas dobradiças na borda que gira; nas embutidas elas não aparecem por fora da lateral nem da divisória, e nas sobrepostas o tambor fica no canto da face externa da lateral?",
+      "Cada porta tem as suas dobradiças na borda que gira; nas embutidas elas não aparecem por fora da lateral nem da divisória, e nas sobrepostas a dobradiça não aparece por fora com a porta fechada?",
       "Nas portas que giram na divisória, as dobradiças de uma face e as da outra ficam em alturas diferentes?"
     ]
   },

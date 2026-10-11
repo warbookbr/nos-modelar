@@ -14,19 +14,33 @@
    toda e `alturaDaGaveta` deixa de valer; sem portas nem gavetas o vão aberto ocupa tudo.
 
    A FRENTE. `frente` 1 é a embutida (portas e frentes de gaveta entre as laterais, à ras da frente do corpo, com 3 mm de
-   folga em volta), 0 a sobreposta (as portas e as frentes cobrem a frente do corpo, 2 mm à frente dele) e 2 a de correr
+   folga em volta), 0 a sobreposta (as portas e as frentes cobrem a frente do corpo, 4 mm à frente dele) e 2 a de correr
    (as portas deslizam em x, cada uma numa camada, atrás do plano da frente). Na embutida, de três portas para cima há uma
    divisória central entre as baias: um par e uma porta, ou dois pares. Na sobreposta há uma ou duas portas, cada uma presa
    a uma lateral. Na de correr há de duas a quatro folhas, cada uma com um rasgo na borda de cima e outro na de baixo onde
    entra o trilho que o corpo leva no teto e no piso da zona das portas; as gavetas, se há, têm a frente embutida.
 
-   A DOBRADIÇA. Cada porta tem n dobradiças da família `dobradica`, com os parâmetros derivados da altura e do peso da
-   porta. Na embutida o pino fica no meio da espessura da parede em que a porta gira (lateral ou divisória), a dois
-   milímetros e meio de fundo atrás da frente, de modo que o tambor fica inteiro dentro da espessura da parede e atrás do
+   A DOBRADIÇA. Cada porta tem n dobradiças, com a quantidade e a altura derivadas da altura e do peso da porta. Na embutida
+   são as da família `dobradica`: o pino fica no meio da espessura da parede em que a porta gira (lateral ou divisória), a
+   dois milímetros e meio de fundo atrás da frente, de modo que o tambor fica inteiro dentro da espessura da parede e atrás do
    plano da frente: a folha fixa entra pelo fundo da parede, num rasgo de 2 mm, e a folha móvel entra pela borda da porta,
-   num rasgo igual. Na sobreposta o pino fica fora da lateral, no canto da frente com a face externa: a folha fixa é uma
-   chapa na face externa da lateral, a móvel é uma chapa no verso da porta, e a dobradiça fica dobrada a 90 graus com o
-   tambor no canto. Nos dois casos a parede ganha um rebaixo para o tambor girar e um rasgo para a folha fixa.
+   num rasgo igual, e a parede ganha um rebaixo para o tambor girar e um rasgo para a folha fixa.
+
+   Na sobreposta nenhuma parte da dobradiça aparece por fora com a porta fechada, e a família `dobradica` não serve, porque o
+   tambor dela ficaria no canto da face externa da lateral. A dobradiça é uma dobradiça de pino oculta, uma simplificação da
+   dobradiça de caneco, que gira por um quadrilátero articulado e tem o pivô virtual fora do corpo; aqui o pivô é um pino
+   físico de 3 mm, vertical, no plano do verso da porta, a 6,95 mm da face externa da lateral, atrás da porta fechada (a borda
+   da porta fica a 3,5 mm da face e deixa 1 mm de porta antes do sulco do pino). A peça fixa tem a placa, parafusada na face
+   interna da lateral e 24 mm de fundo, o pino com um colar em cada ponta e duas abas que passam pela fresta entre o corpo e
+   a porta, por cima da quina da frente da lateral, da placa ao colar. A peça móvel tem o aro, que gira em volta do pino entre
+   os colares, e a folha, uma chapa que sai do aro para dentro do sulco que a porta abre no verso dela. A porta fica a 4 mm do
+   corpo (`AFASTAMENTO_DA_SOBREPOSTA`) porque a borda da porta, ao girar em torno do pino, recua até a distância do pino à
+   borda (3,45 mm) e não pode entrar na quina da frente da lateral. O eixo da articulação é o do pino. A porta abre de 0 a 90
+   graus (`CURSO_NA_SOBREPOSTA`): medido contra as malhas, a borda da porta bate na quina da lateral a 94,4 graus, e nenhuma
+   peça da dobradiça colide até 100; os 110 graus da embutida pediriam o pivô virtual da dobradiça de caneco. Com a porta
+   fechada nada da dobradiça fica fora do contorno do corpo mais a porta, de frente, de lado e de cima, e de frente a porta a
+   cobre; só vista exatamente de lado ou de cima, pela fresta de 4 mm entre o corpo e a porta, a aba e o aro aparecem, a
+   partir de 4,7 mm da face externa.
 
    A GAVETA. Frente, duas laterais, traseira e fundo. Cada lateral leva um rasgo na face de fora e nele entra um trilho preso
    à lateral do corpo: a gaveta desliza em z, para fora, e o trilho continua engatado ao menos `ENCAIXE_MINIMO_DA_GAVETA` no
@@ -46,6 +60,7 @@ export const ROUPA_PENDURADA = 1000; // mm abaixo do eixo do tubo
 export const ESPACO_DO_CABIDEIRO = DISTANCIA_DO_CABIDEIRO_AO_TAMPO + ROUPA_PENDURADA;
 export const DENSIDADE_DO_MDF = 7e-7; // kg/mm3 (700 kg/m3)
 export const CURSO_NA_LATERAL = 110; // graus
+export const CURSO_NA_SOBREPOSTA = 90; // graus: a borda da porta, ao girar em torno do pino, passa a quina da lateral até 94 graus
 export const FOLGA_DO_REBAIXO = 0.5; // mm entre o tambor e a parede do rebaixo
 export const MARGEM_DO_REBAIXO = 3; // mm acima e abaixo da dobradiça
 export const FOLGA_DO_RASGO = 0.2; // mm de cada lado da folha
@@ -57,9 +72,32 @@ export const SAIDA_DO_PUXADOR = 20; // mm para fora da frente
 export const CURSO_MAXIMO_NA_DIVISORIA = 90;
 
 /* a frente sobreposta */
-export const AFASTAMENTO_DA_SOBREPOSTA = 2; // mm entre a frente do corpo e o verso da porta ou da frente de gaveta
+export const AFASTAMENTO_DA_SOBREPOSTA = 4; // mm entre a frente do corpo e o verso da porta ou da frente de gaveta
 export const RECUO_DA_SOBREPOSTA_NO_LADO = 3.5; // mm da face externa da lateral à borda da porta ou da frente de gaveta: o tambor fica a 0,5 mm da borda
 export const FOLGA_DA_SOBREPOSTA_NA_BORDA = 1.5; // mm da borda de cima e de baixo do corpo à borda da frente
+
+/* a dobradiça de pino oculta da porta sobreposta */
+export const RAIO_DO_PINO_OCULTO = 1.5; // mm (pino de 3 mm)
+export const FOLGA_DO_ARO = 0.15; // mm entre o pino e o furo do aro
+export const PAREDE_DO_ARO = 0.6; // mm
+export const RAIO_DO_ARO = RAIO_DO_PINO_OCULTO + FOLGA_DO_ARO + PAREDE_DO_ARO; // mm, também o do colar
+export const FOLGA_DO_SULCO = 0.2; // mm entre o aro e o sulco da porta
+export const RAIO_DO_SULCO = RAIO_DO_ARO + FOLGA_DO_SULCO; // mm
+export const PAREDE_DA_BORDA_DA_SOBREPOSTA = 1; // mm de porta entre a borda e o sulco do pino
+export const DISTANCIA_DO_PINO_A_FACE = RECUO_DA_SOBREPOSTA_NO_LADO + PAREDE_DA_BORDA_DA_SOBREPOSTA + RAIO_DO_SULCO; // mm da face externa da lateral ao eixo do pino
+export const COMPRIMENTO_DO_COLAR = 8; // mm de pino engrossado em cada ponta
+export const FOLGA_DO_ARO_AO_COLAR = 0.5; // mm
+export const ESPESSURA_DA_ABA = 1.8; // mm da chapa que passa pela fresta
+export const FOLGA_DA_ABA_NA_PORTA = 0.2; // mm entre a aba e o verso da porta
+export const INICIO_DA_ABA_DO_PINO = 1.5; // mm do eixo do pino ao começo da aba, para o colar a cobrir por cima
+export const ESPESSURA_DA_PLACA = 2.5; // mm
+export const COMPRIMENTO_DA_PLACA = 24; // mm de fundo, a partir da frente do corpo
+export const ESPESSURA_DA_FOLHA = 1.5; // mm
+export const ENTRADA_DA_FOLHA_NA_PORTA_OCULTA = 0.5; // mm do plano do verso da porta à face de baixo da folha
+export const INICIO_DA_FOLHA = 1.9; // mm do eixo do pino ao começo da folha, fora do furo do aro
+export const COMPRIMENTO_DA_FOLHA = 12; // mm
+export const LADOS_DO_PINO_OCULTO = 16;
+export const RECUO_DA_PRATELEIRA_COM_PLACA = 30; // mm da frente do corpo à frente da prateleira atrás de portas sobrepostas
 
 /* a porta de correr */
 export const RECUO_DA_PORTA_DE_CORRER = 20; // mm da frente do corpo à face da frente da primeira camada
@@ -105,6 +143,11 @@ export const MAXIMO_DE_PRATELEIRAS = 8;
 export const MAXIMO_DE_GAVETAS = 5;
 export const MAXIMO_DE_PORTAS = 4;
 export const MAXIMO_DE_TRILHOS_DE_CORRER = MAXIMO_DE_PORTAS;
+
+const OCULTA = Object.freeze({
+  raioDoPino: RAIO_DO_PINO_OCULTO, raioDoAro: RAIO_DO_ARO, raioDoSulco: RAIO_DO_SULCO, distanciaDoPinoAFace: DISTANCIA_DO_PINO_A_FACE,
+  comprimentoDoColar: COMPRIMENTO_DO_COLAR, folgaDoAroAoColar: FOLGA_DO_ARO_AO_COLAR,
+});
 
 const arredondar = (valor) => Number(valor.toPrecision(12));
 export const metro = (mm) => arredondar(mm * 0.001);
@@ -246,17 +289,18 @@ export function geometriaDoMovel(p) {
   const hd = portas > 0 ? alturaDaPorta(p) : 0;
   const peso = portas > 0 ? pesoDaPorta(p) : 0;
   const dobradica = portas > 0 && !correr ? dobradicaDaPorta({ peso, altura: hd, painel }) : null;
-  const dg = dobradica ? geometriaDaDobradica(dobradica.parametros) : null;
+  /* só a embutida usa a família `dobradica`; a sobreposta tem a dobradiça de pino oculta (`g.oculta`) */
+  const dg = dobradica && !sobreposta ? geometriaDaDobradica(dobradica.parametros) : null;
   const raioDoTambor = dg ? dg.mm.raioDoNo : 0;
-  const espessuraDaFolha = dobradica ? dobradica.parametros.espessura : 0;
 
-  /* o verso e a frente das portas e das frentes de gaveta: no plano da frente do corpo (embutida) ou 2 mm à frente dele */
+  /* o verso e a frente das portas e das frentes de gaveta: no plano da frente do corpo (embutida) ou 4 mm à frente dele */
   const zDoVerso = sobreposta ? frenteDoCorpo + AFASTAMENTO_DA_SOBREPOSTA : frenteDoCorpo - painel;
   const zDaFrente = zDoVerso + painel;
   const recuoDoPinoNaParede = painel / 2; // embutida: o pino no meio da espessura da parede
-  /* quanto o pino entra na parede, a partir da face em que a dobradiça se apoia (negativo: fora dela) */
-  const profundidadeDoPino = dg ? (sobreposta ? -(dg.mm.zDaChapa - espessuraDaFolha / 2) : recuoDoPinoNaParede) : 0;
-  const zDoPino = dg ? (sobreposta ? zDoVerso - dg.mm.zDaChapa + espessuraDaFolha / 2 : frenteDoCorpo - (raioDoTambor + FOLGA_DO_REBAIXO)) : 0;
+  /* quanto o pino entra na parede, a partir da face em que a dobradiça se apoia (só na embutida) */
+  const profundidadeDoPino = dg ? recuoDoPinoNaParede : 0;
+  /* o pino da embutida fica atrás da frente, o da sobreposta no plano do verso da porta */
+  const zDoPino = sobreposta ? zDoVerso : dg ? frenteDoCorpo - (raioDoTambor + FOLGA_DO_REBAIXO) : 0;
   const afastamento = recuoDoPinoNaParede + FOLGA_DA_PORTA; // embutida: do pino até a borda da porta
   const alturaDaDobradica = dobradica ? dobradica.parametros.altura : 0;
   const stagger = portas === 4 && !sobreposta ? alturaDaDobradica + 40 : 0;
@@ -308,7 +352,7 @@ export function geometriaDoMovel(p) {
       const face = vao === 1 ? -largura / 2 : largura / 2; // a face externa da lateral
       const abre = -vao; // o lado do ar, a partir da parede
       listaDePortas.push({
-        indice: j, baia: 0, apoio, vao, abre, face, profundidadeDoPino, xDoPino: face - abre * profundidadeDoPino,
+        indice: j, baia: 0, apoio, vao, abre, face, xDoPino: face + vao * DISTANCIA_DO_PINO_A_FACE,
         xMin, xMax, xDaBorda: vao === 1 ? xMin : xMax, xLivre: vao === 1 ? xMax : xMin, sinalDoPratoEmZ: 1,
         zVerso: zDoVerso, zFrente: zDaFrente, saidaDoPuxador: SAIDA_DO_PUXADOR,
       });
@@ -350,7 +394,7 @@ export function geometriaDoMovel(p) {
       const deslocamento = porta.apoio === 'divisoria-direita' ? stagger : 0;
       porta.y0 = y0DasPortas;
       porta.altura = hd;
-      porta.curso = porta.apoio.startsWith('divisoria') ? CURSO_MAXIMO_NA_DIVISORIA : CURSO_NA_LATERAL;
+      porta.curso = porta.apoio.startsWith('divisoria') ? CURSO_MAXIMO_NA_DIVISORIA : sobreposta ? CURSO_NA_SOBREPOSTA : CURSO_NA_LATERAL;
       porta.dobradicas = Array.from({ length: n }, (_, k) => ({
         indice: k, y: y0DasPortas + margemDoCentro + deslocamento + k * passo, x: porta.xDoPino, z: zDoPino,
       }));
@@ -391,8 +435,8 @@ export function geometriaDoMovel(p) {
     pratelas = {
       total: prateleiras, x: baiaDasPrateleiras.x, fim: baiaDasPrateleiras.fim, zona: zonaUtil, folga, passo: folga + painel,
       yPrimeira: zonaDasPrateleiras.y0 + folga,
-      recuoDaFrente: zonaDasPrateleiras !== zonaDasPortas || sobreposta ? RECUO_DA_PRATELEIRA
-        : correr ? recuoDaPrateleiraAtrasDasFolhas : painel + RECUO_DA_PRATELEIRA,
+      recuoDaFrente: zonaDasPrateleiras !== zonaDasPortas ? RECUO_DA_PRATELEIRA
+        : sobreposta ? RECUO_DA_PRATELEIRA_COM_PLACA : correr ? recuoDaPrateleiraAtrasDasFolhas : painel + RECUO_DA_PRATELEIRA,
     };
   }
 
@@ -435,7 +479,7 @@ export function geometriaDoMovel(p) {
   const resultado = {
     quadro: { frente: frenteDoCorpo, fundo, x0, x1, yBase, yTampo },
     zonas, sobreposta, correr, wd, hd, peso, y0DasPortas, passoDasCamadas,
-    dobradica, dobradicaGeometria: dg, raioDoTambor, zDoPino, recuoDoPino: recuoDoPinoNaParede, afastamento, zDoVerso, zDaFrente, stagger,
+    dobradica, dobradicaGeometria: dg, oculta: dobradica && sobreposta ? { ...OCULTA, altura: alturaDaDobradica } : null, raioDoTambor, zDoPino, recuoDoPino: recuoDoPinoNaParede, afastamento, zDoVerso, zDaFrente, stagger,
     baias, divisoria: xDaDivisoria, portas: listaDePortas, gavetas: listaDeGavetas, base,
     prateleiras: pratelas,
     cabideiro: cabideiro && zonaDasPortas ? {
@@ -467,7 +511,7 @@ export function geometriaDoMovel(p) {
         perfil: { largura: hd + 40, altura: hd }, curso: porta.curso,
       };
     } else {
-      porta.cortes = { total: porta.dobradicas.length, passo: porta.passoDasDobradicas, rasgo: rasgoDaPorta(resultado, porta) };
+      porta.cortes = { total: porta.dobradicas.length, passo: porta.passoDasDobradicas, rasgo: sobreposta ? rasgoDaPortaOculta(resultado, porta) : rasgoDaPorta(resultado, porta) };
     }
   }
   return resultado;
@@ -516,6 +560,61 @@ export function rasgoDaPorta(g, porta) {
   return {
     larg: Math.abs(fim - comeco), alt: folha.altura + 0.6, prof: folha.espessura + 2 * FOLGA_DO_RASGO,
     em: [(comeco + fim) / 2, y0 - 0.3, g.zDoPino + porta.sinalDoPratoEmZ * dg.zDaChapa],
+  };
+}
+
+/**
+ * O sulco do verso da porta sobreposta, em milímetro: do começo do furo do pino, a `RAIO_DO_SULCO` do eixo, até a ponta da
+ * folha, e do plano do verso (1 mm para fora, para o corte abrir) até o fundo do sulco, a `RAIO_DO_SULCO` do eixo. Fica a
+ * `PAREDE_DA_BORDA_DA_SOBREPOSTA` da borda da porta, de modo que o sulco não abre na borda.
+ */
+export function rasgoDaPortaOculta(g, porta) {
+  const folha = g.dobradica.parametros;
+  const de = DISTANCIA_DO_PINO_A_FACE - RAIO_DO_SULCO;
+  const ate = DISTANCIA_DO_PINO_A_FACE + INICIO_DA_FOLHA + COMPRIMENTO_DA_FOLHA + FOLGA_DO_SULCO;
+  const z0 = g.zDoPino - SOBREPOSICAO;
+  const z1 = g.zDoPino + RAIO_DO_SULCO;
+  const y0 = porta.dobradicas[0].y - folha.altura / 2;
+  return {
+    larg: ate - de, alt: folha.altura + 0.6, prof: z1 - z0,
+    em: [porta.face + porta.vao * (de + ate) / 2, y0 - 0.3, (z0 + z1) / 2],
+  };
+}
+
+/**
+ * As peças da dobradiça oculta de uma dobradiça (a `k`-ésima) de uma porta sobreposta, em milímetro, no quadro do móvel. A
+ * fixa é a placa na face interna da lateral, as duas abas e o pino com um colar em cada ponta; a móvel é o aro, entre os
+ * colares, e a folha que sai dele para dentro do sulco da porta. Cada caixa é `{ larg, alt, prof, em }` (a base em y).
+ */
+export function pecasDaDobradicaOculta(g, porta, k, painel) {
+  const dobradica = porta.dobradicas[k];
+  const altura = g.dobradica.parametros.altura;
+  const y0 = dobradica.y - altura / 2;
+  const y1 = dobradica.y + altura / 2;
+  const { vao, face } = porta;
+  const xDe = (u) => face + vao * u;
+  const zPino = g.zDoPino;
+  const uDoPino = DISTANCIA_DO_PINO_A_FACE;
+  const uDaPlacaFora = painel + ESPESSURA_DA_PLACA;
+  const zDaPlacaTopo = zPino - FOLGA_DA_ABA_NA_PORTA;
+  const entreU = (a, b, alt, yBase, z0, z1) => ({ larg: Math.abs(b - a), alt, prof: z1 - z0, em: [xDe((a + b) / 2), yBase, (z0 + z1) / 2] });
+  const colar = COMPRIMENTO_DO_COLAR;
+  const abaDe = uDoPino + INICIO_DA_ABA_DO_PINO;
+  const zDaAbaBaixo = zDaPlacaTopo - ESPESSURA_DA_ABA;
+  const yDoAro0 = y0 + colar + FOLGA_DO_ARO_AO_COLAR;
+  const yDoAro1 = y1 - colar - FOLGA_DO_ARO_AO_COLAR;
+  const zDaFolha0 = zPino + ENTRADA_DA_FOLHA_NA_PORTA_OCULTA;
+  const uDaFolha0 = uDoPino + INICIO_DA_FOLHA;
+  return {
+    y0, y1, yDoAro0, yDoAro1, xDoPino: xDe(uDoPino), zDoPino: zPino,
+    fixa: {
+      placa: entreU(painel, uDaPlacaFora, altura, y0, g.quadro.frente - COMPRIMENTO_DA_PLACA, zDaPlacaTopo),
+      abaDeBaixo: entreU(abaDe, uDaPlacaFora, colar, y0, zDaAbaBaixo, zDaPlacaTopo),
+      abaDeCima: entreU(abaDe, uDaPlacaFora, colar, y1 - colar, zDaAbaBaixo, zDaPlacaTopo),
+    },
+    movel: {
+      folha: entreU(uDaFolha0, uDaFolha0 + COMPRIMENTO_DA_FOLHA, yDoAro1 - yDoAro0, yDoAro0, zDaFolha0, zDaFolha0 + ESPESSURA_DA_FOLHA),
+    },
   };
 }
 

@@ -3,7 +3,7 @@
    Puro: recebe os parâmetros completos e devolve a composição do conjunto (o corpo com os trilhos, as portas e as gavetas
    fechadas numa peça só), cujo id depende só do número de portas e do número de gavetas, e os argumentos de todas as peças.
    A montagem v5 chama as composições soltas com os mesmos argumentos (`argumentosDasPecas`). As dobradiças só entram na
-   montagem: com a porta embutida fechada elas ficam dentro dos rebaixos e dos rasgos. */
+   montagem: com a porta embutida fechada elas ficam dentro dos rebaixos e dos rasgos, e as da sobreposta ficam atrás da porta. */
 import { ID_DO_CONJUNTO, corpoDe, gavetaDe, guiaDe, portaDe, trilhoDe } from './composicoes.js';
 import { geometriaDoMovel } from './geometria.js';
 

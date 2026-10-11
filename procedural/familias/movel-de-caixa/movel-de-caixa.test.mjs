@@ -1,7 +1,8 @@
 /* movel-de-caixa.test.mjs — a família `movel-de-caixa`: contrato, recusas, os perfis, o roupeiro como antes, a malha medida
    contra as contas (zonas, frentes embutida, sobreposta e de correr, gavetas, base, prateleiras, cabideiro), a parede da casca,
-   as dobradiças da porta embutida e da sobreposta, a montagem v5 resolvida pelo resolvedor real, o curso de cada porta e de
-   cada gaveta conferido contra as malhas e a abertura de várias articulações ao mesmo tempo. */
+   as dobradiças da porta embutida (da família `dobradica`) e a dobradiça de pino oculta da sobreposta, que não aparece por fora
+   com a porta fechada, a montagem v5 resolvida pelo resolvedor real, o curso de cada porta e de cada gaveta conferido contra
+   as malhas e a abertura de várias articulações ao mesmo tempo. */
 import { describe, expect, it } from 'vitest';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
@@ -9,6 +10,8 @@ import { analisarTopologia } from '../../../modulos/topologia/src/analisar.js';
 import { conferirAberturasSimultaneas, conferirArticulacao } from '../../../src/autoria/conferir-articulacao.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
+import { auditarParDeSolidos, prepararSolido } from '../../../src/autoria/contato-de-solidos.js';
+import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { execucaoDe, invariantesDe } from '../../../src/autoria/varrer-parametros.js';
 import { descreverPeca } from '../../../src/autoria/descrever-partes.js';
@@ -18,8 +21,8 @@ import { ErroChamadaDeFamilia, FAMILIAS, chamar, criarRegistroDeFamilias } from 
 import { DOBRADICA } from '../dobradica/index.js';
 import { MOVEL_DE_CAIXA } from './index.js';
 import {
-  AFASTAMENTO_DA_SOBREPOSTA, ENCAIXE_MINIMO_DA_GAVETA, FOLGA_DA_PORTA, alturaDaPorta, cursoNaDivisoria, dobradicaDaPorta,
-  geometriaDoMovel, larguraDaPorta, pesoDaPorta, zonasDoMovel,
+  AFASTAMENTO_DA_SOBREPOSTA, CURSO_NA_SOBREPOSTA, DISTANCIA_DO_PINO_A_FACE, ENCAIXE_MINIMO_DA_GAVETA, FOLGA_DA_PORTA, PAREDE_DA_BORDA_DA_SOBREPOSTA,
+  RECUO_DA_SOBREPOSTA_NO_LADO, alturaDaPorta, cursoNaDivisoria, dobradicaDaPorta, geometriaDoMovel, larguraDaPorta, pesoDaPorta, zonasDoMovel,
 } from './geometria.js';
 
 const registro = criarRegistroDeFamilias({ familias: [MOVEL_DE_CAIXA] });
@@ -396,7 +399,11 @@ describe('as portas e as dobradiças', () => {
       const g = geometriaDoMovel(p);
       expect(g.peso).toBeCloseTo(pesoDaPorta(p), 9);
       expect(g.dobradica.quantidade).toBe(g.portas[0].dobradicas.length);
-      expect(() => chamar(DOBRADICA, 'dobradica', g.dobradica.parametros)).not.toThrow();
+      /* só a embutida usa a família `dobradica`; a sobreposta tem a dobradiça de pino oculta */
+      if (g.sobreposta) {
+        expect(g.dobradicaGeometria).toBeNull();
+        expect(g.oculta).toMatchObject({ altura: g.dobradica.parametros.altura });
+      } else expect(() => chamar(DOBRADICA, 'dobradica', g.dobradica.parametros)).not.toThrow();
     }
   });
 
@@ -426,62 +433,117 @@ describe('as portas e as dobradiças', () => {
     }
   });
 
-  /* o pino da sobreposta fica fora da lateral, no canto da face externa com a frente do corpo; a folha fixa é uma chapa no rasgo
-     da face externa da lateral e a móvel uma chapa no rasgo do verso da porta, 2 mm à frente do corpo */
-  it('na sobreposta o tambor fica no canto da face externa da lateral, a folha fixa no rasgo da lateral e a móvel no rasgo do verso da porta', () => {
-    for (const parametros of [doPerfil('guarda-roupa'), doPerfil('armario-de-cozinha-aereo'), doPerfil('criado-mudo')]) {
-      const montada = MOVEL_DE_CAIXA.montar(parametros);
+  /* A dobradiça da porta sobreposta é a de pino oculta: nenhuma parte dela aparece por fora do móvel com a porta fechada. O
+     contorno do corpo mais as portas é a união de retângulos, vista de frente (x, y), de lado (z, y) e de cima (x, z); na vista de
+     lado e na de cima o contorno fecha a fresta de 4 mm entre o corpo e a porta, que é onde passam as abas da dobradiça. */
+  const PERFIS_SOBREPOSTOS = ['guarda-roupa', 'armario-de-cozinha-aereo', 'armario-de-cozinha-de-chao', 'criado-mudo', 'estante-com-portas'];
+  const IDENTIDADE = { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, 0, 0] };
+  const contornosDoMovel = (montada) => {
+    const g = montada.geometria;
+    const { largura, profundidade, altura, rodape } = montada.parametros;
+    const corpo = { x: [-largura / 2, largura / 2], y: [rodape, altura], z: [-profundidade / 2, g.quadro.frente] };
+    const portas = g.portas.map((porta) => ({ x: [porta.xMin, porta.xMax], y: [porta.y0, porta.y0 + g.hd], z: [g.quadro.frente, g.zDaFrente] }));
+    const retangulos = [corpo, ...portas];
+    const dentro = (e0, e1) => (a, b) => retangulos.some((r) => a >= r[e0][0] - 1e-6 && a <= r[e0][1] + 1e-6 && b >= r[e1][0] - 1e-6 && b <= r[e1][1] + 1e-6);
+    const [xy, zy, xz] = [dentro('x', 'y'), dentro('z', 'y'), dentro('x', 'z')];
+    return { frente: ([x, y]) => xy(x, y), lado: ([, y, z]) => zy(z, y), cima: ([x, , z]) => xz(x, z) };
+  };
+  const pecasDasDobradicas = (montada) => montada.montagem.instancias
+    .filter(({ id }) => id.startsWith('dobradica-'))
+    .map(({ id, alvo }) => ({ id, porta: Number(id.split('-')[1]) - 1, vertices: mm(pecaDe(montada, alvo.ref)) }));
+
+  it('na sobreposta nenhum vértice da dobradiça fica fora do contorno do corpo mais a porta, de frente, de lado e de cima, e a porta a esconde de frente', () => {
+    for (const nome of PERFIS_SOBREPOSTOS) {
+      const montada = MOVEL_DE_CAIXA.montar({ perfil: nome });
       const g = montada.geometria;
-      const dg = g.dobradicaGeometria.mm;
-      const raio = g.raioDoTambor;
-      const folha = g.dobradica.parametros;
-      const corpo = mm(pecaDe(montada, 'movel-de-caixa-corpo'));
-      const vistos = new Set();
-      for (const porta of g.portas) {
-        const d = porta.dobradicas[0];
-        const metade = folha.altura / 2;
-        const peca = (lado) => mm(pecaDe(montada, `movel-de-caixa-dobradica-${porta.indice + 1}-1-${lado}`));
-        /* o pino: fora da lateral por (zDaChapa menos meia espessura), 2 mm à frente da frente menos o mesmo */
-        expect(Math.abs(d.x) - Math.abs(porta.face)).toBeCloseTo(dg.zDaChapa - folha.espessura / 2, 9);
-        expect(d.z).toBeCloseTo(g.quadro.frente + AFASTAMENTO_DA_SOBREPOSTA - (dg.zDaChapa - folha.espessura / 2), 9);
-        const tambor = [...peca('d'), ...peca('e')].filter(([x, , z]) => Math.hypot(x - d.x, z - d.z) < raio + 1e-6);
-        expect(tambor.length).toBeGreaterThan(30);
-        /* o tambor sai pela face externa e entra na lateral menos que o rebaixo que o corpo abre para ele */
-        expect(Math.min(...tambor.map(([x]) => x * porta.vao))).toBeLessThan(porta.face * porta.vao);
-        const xDoRebaixo = porta.face + porta.abre * (-(porta.profundidadeDoPino + raio + 0.5));
-        expect(Math.max(...tambor.map(([x]) => x * porta.vao))).toBeLessThanOrEqual(xDoRebaixo * porta.vao + 1e-6);
-        /* a folha fixa no rasgo da lateral */
-        const fixa = peca('d').filter(([, , z]) => z < d.z - 9);
-        const xMin = Math.min(...fixa.map(([x]) => x));
-        const xMax = Math.max(...fixa.map(([x]) => x));
-        expect((xMin + xMax) / 2 - d.x).toBeCloseTo(porta.vao * dg.zDaChapa, 6);
-        const paredes = [...new Set(corpo.filter(([x, y, z]) => z < d.z - raio - 1 && Math.abs(x - (xMin + xMax) / 2) < 2.5 && Math.abs(y - d.y) <= metade + 0.31).map(([x]) => Number(x.toFixed(6))))].sort((a, b) => a - b);
-        /* o rasgo abre para fora: de um lado a parede dele fica 0,2 mm da folha, do outro a folha está à ras da face externa */
-        expect(paredes).toHaveLength(2);
-        expect([xMin - paredes[0], paredes[1] - xMax].map((v) => Number(v.toFixed(5))).sort((a, b) => a - b)).toEqual([0, 0.2]);
-        /* a folha móvel no rasgo do verso da porta: ao centro da chapa, à frente do pino */
-        const movel = peca('e').filter(([x]) => Math.abs(x - d.x) > 9);
-        const zMin = Math.min(...movel.map(([, , z]) => z));
-        const zMax = Math.max(...movel.map(([, , z]) => z));
-        expect((zMin + zMax) / 2 - d.z).toBeCloseTo(dg.zDaChapa, 6);
-        expect(zMin).toBeCloseTo(g.zDoVerso, 6);
-        const lage = mm(pecaDe(montada, `movel-de-caixa-porta-${porta.indice + 1}`));
-        const planos = [...new Set(lage.filter(([x, y, z]) => (x - porta.xDaBorda) * porta.vao > -0.01 && (x - porta.xDaBorda) * porta.vao < 20 && Math.abs(y - d.y) <= metade + 0.31 && z > zMin - 0.5 && z < zMax + 0.5).map(([, , z]) => Number(z.toFixed(6))))].sort((a, b) => a - b);
-        expect(planos).toHaveLength(2);
-        expect(zMin - planos[0]).toBeCloseTo(0, 5); // à ras do verso da porta
-        expect(planos[1] - zMax).toBeCloseTo(0.2, 5);
-        /* a borda da porta passa do tambor com folga */
-        expect((porta.xDaBorda - d.x) * porta.vao).toBeGreaterThan(raio + 0.5 - 1e-9);
-        vistos.add(porta.apoio);
+      const contorno = contornosDoMovel(montada);
+      const pecas = pecasDasDobradicas(montada);
+      expect(pecas, nome).toHaveLength(2 * g.portas.length * g.dobradica.quantidade);
+      let vertices = 0;
+      for (const { id, porta, vertices: pontos } of pecas) {
+        const { face, vao, xMin, xMax, y0 } = g.portas[porta];
+        expect(pontos.length, `${nome} ${id}`).toBeGreaterThan(50);
+        vertices += pontos.length;
+        expect(pontos.filter((p) => !contorno.frente(p)), `${nome} ${id} de frente`).toEqual([]);
+        expect(pontos.filter((p) => !contorno.lado(p)), `${nome} ${id} de lado`).toEqual([]);
+        expect(pontos.filter((p) => !contorno.cima(p)), `${nome} ${id} de cima`).toEqual([]);
+        /* de frente a porta a cobre: cada vértice está sobre a porta, a mais de 1 mm da borda dela, e a mais de 4,5 mm da face externa */
+        for (const [x, y, z] of pontos) {
+          expect(x, `${nome} ${id} x`).toBeGreaterThan(xMin + PAREDE_DA_BORDA_DA_SOBREPOSTA - 1e-6);
+          expect(x, `${nome} ${id} x`).toBeLessThan(xMax - PAREDE_DA_BORDA_DA_SOBREPOSTA + 1e-6);
+          expect(y, `${nome} ${id} y`).toBeGreaterThan(y0);
+          expect(y, `${nome} ${id} y`).toBeLessThan(y0 + g.hd);
+          expect((x - face) * vao, `${nome} ${id} distância da face`).toBeGreaterThan(RECUO_DA_SOBREPOSTA_NO_LADO + PAREDE_DA_BORDA_DA_SOBREPOSTA - 1e-6);
+          expect(z, `${nome} ${id} z`).toBeLessThan(g.zDoVerso + 2.5);
+        }
       }
-      expect([...vistos].sort()).toEqual(parametros.portas === 1 ? ['lateral-esquerda'] : ['lateral-direita', 'lateral-esquerda']);
+      expect(vertices, nome).toBeGreaterThan(50 * pecas.length);
     }
   });
 
-  /* a dobradiça é quiral, a embutida usa a folha fixa e a móvel de um jeito e a sobreposta de outro: a folha fixa e a móvel de cada
-     porta, na pose da montagem, conferem com a pose que a geometria diz */
-  it('a folha fixa e a móvel de cada porta ficam na pose que a geometria diz, nas portas da esquerda e da direita, na embutida e na sobreposta', () => {
-    for (const parametros of [doPerfil('guarda-roupa'), doPerfil('roupeiro')]) {
+  it('o teste do contorno reprova a dobradiça deslocada para fora da lateral, como era a de antes (controle)', () => {
+    const montada = MOVEL_DE_CAIXA.montar({ perfil: 'guarda-roupa' });
+    const contorno = contornosDoMovel(montada);
+    const porta = montada.geometria.portas[0];
+    const todas = pecasDasDobradicas(montada);
+    const fora = todas.filter(({ porta: n }) => n === 0).flatMap(({ vertices }) => vertices.map(([x, y, z]) => [x - porta.vao * (DISTANCIA_DO_PINO_A_FACE + 5), y, z]));
+    expect(fora.filter((p) => !contorno.frente(p)).length).toBeGreaterThan(100);
+    expect(fora.filter((p) => !contorno.cima(p)).length).toBeGreaterThan(100);
+    /* e deslocada para a frente da porta, sai do contorno de lado e de cima */
+    const adiante = todas.flatMap(({ vertices }) => vertices.map(([x, y, z]) => [x, y, z + 40]));
+    expect(adiante.filter((p) => !contorno.cima(p)).length).toBeGreaterThan(100);
+    expect(adiante.filter((p) => !contorno.lado(p)).length).toBeGreaterThan(100);
+  });
+
+  it('a fixa é presa à face interna da lateral, com o pino no plano do verso da porta, e nenhuma peça da dobradiça atravessa o corpo', () => {
+    for (const nome of PERFIS_SOBREPOSTOS) {
+      const montada = MOVEL_DE_CAIXA.montar({ perfil: nome });
+      const g = montada.geometria;
+      const painel = montada.parametros.painel;
+      const corpo = prepararSolido(pecaDe(montada, 'movel-de-caixa-corpo'), IDENTIDADE, ['corpo']);
+      for (const porta of g.portas) {
+        expect(Math.abs(porta.xDoPino), nome).toBeCloseTo(montada.parametros.largura / 2 - DISTANCIA_DO_PINO_A_FACE, 9);
+        porta.dobradicas.forEach((d, k) => {
+          const fixa = pecaDe(montada, `movel-de-caixa-dobradica-${porta.indice + 1}-${k + 1}-d`);
+          const movel = pecaDe(montada, `movel-de-caixa-dobradica-${porta.indice + 1}-${k + 1}-e`);
+          expect(d.z, nome).toBeCloseTo(g.zDoVerso, 9);
+          const placa = verticesDaParte(fixa, 'placa');
+          /* a placa encosta na face interna da lateral e tem 24 mm de fundo, atrás da frente do corpo */
+          expect(Math.min(...placa.map(([x]) => (x - porta.face) * porta.vao)), `${nome} placa`).toBeCloseTo(painel, 4);
+          expect(g.quadro.frente - Math.min(...placa.map(([, , z]) => z)), `${nome} placa`).toBeCloseTo(24, 4);
+          /* o pino é um cilindro de 1,5 mm de raio em torno do eixo da articulação */
+          const pino = verticesDaParte(fixa, 'pino');
+          expect(pino.length).toBeGreaterThan(30);
+          for (const [x, , z] of pino) expect(Math.hypot(x - d.x, z - d.z)).toBeCloseTo(1.5, 4);
+          for (const peca of [fixa, movel]) {
+            expect(peca.orfaos).toEqual([]);
+            expect(conferirPortasNaForma(peca)).toEqual([]);
+          }
+          const eixo = [0, porta.vao === 1 ? -1 : 1, 0];
+          expect(fixa.portas.get('eixo-do-pino').interface).toMatchObject({ forma: 'cilindro', papel: 'externa', eixo });
+          expect(movel.portas.get('aro-do-pino').interface).toMatchObject({ forma: 'anel', papel: 'recebe', eixo });
+          for (const [peca, esperado] of [[fixa, 'encostam'], [movel, 'separadas']]) {
+            expect(auditarParDeSolidos(prepararSolido(peca, IDENTIDADE, ['dobradica']), corpo, 1e-9).estado, `${nome} porta ${porta.indice + 1} dobradiça ${k + 1}`).toBe(esperado);
+          }
+        });
+      }
+    }
+  });
+
+  it('a porta da direita tem a dobradiça espelhada da da esquerda e gira para o mesmo lado, para a frente', () => {
+    const montada = MOVEL_DE_CAIXA.montar({ perfil: 'guarda-roupa' });
+    const [esquerda, direita] = montada.geometria.portas;
+    expect(direita.xDoPino).toBeCloseTo(-esquerda.xDoPino, 9);
+    expect(direita.dobradicas.map((d) => d.y)).toEqual(esquerda.dobradicas.map((d) => d.y));
+    expect(montada.articulacoes[0]).toMatchObject({ fixo: { porta: 'eixo-do-pino' }, movel: { porta: 'aro-do-pino' } });
+    const eixo = (n) => pecaDe(montada, `movel-de-caixa-dobradica-${n}-1-d`).portas.get('eixo-do-pino').interface.eixo;
+    expect(eixo(1)).toEqual([0, -1, 0]);
+    expect(eixo(2)).toEqual([0, 1, 0]);
+  });
+
+  /* a dobradiça é quiral: a folha fixa e a móvel de cada porta embutida, na pose da montagem, conferem com a pose que a geometria diz */
+  it('a folha fixa e a móvel de cada porta embutida ficam na pose que a geometria diz, nas portas da esquerda e da direita', () => {
+    for (const parametros of [doPerfil('roupeiro'), completos(QUATRO)]) {
       const montada = MOVEL_DE_CAIXA.montar(parametros);
       const g = montada.geometria;
       const dg = g.dobradicaGeometria.mm;
@@ -517,10 +579,11 @@ describe('a montagem v5 e o curso das portas e das gavetas', () => {
     expect(montada.articulacoes.map(({ id, tipo, unidade }) => [id, tipo, unidade])).toEqual([
       ['abre-porta-1', 'revolucao', 'graus'], ['abre-porta-2', 'revolucao', 'graus'], ['abre-gaveta-1', 'prismatica', 'mm'], ['abre-gaveta-2', 'prismatica', 'mm'],
     ]);
-    expect(montada.articulacoes[0]).toMatchObject({ curso: { minimo: 0, maximo: 110 } });
+    expect(montada.articulacoes[0]).toMatchObject({ curso: { minimo: 0, maximo: CURSO_NA_SOBREPOSTA } });
+    expect(CURSO_NA_SOBREPOSTA).toBe(90);
     expect(montada.articulacoes[0].acompanham).toHaveLength(n);
     expect(montada.articulacoes[2].curso).toEqual({ minimo: 0, maximo: montada.geometria.gavetas[0].curso });
-    expect(montada.cursoMaximo).toBe(110);
+    expect(montada.cursoMaximo).toBe(CURSO_NA_SOBREPOSTA);
     for (const peca of [pecaDe(montada, 'movel-de-caixa-guia-1'), pecaDe(montada, 'movel-de-caixa-gaveta-1')]) expect(peca.orfaos).toEqual([]);
     expect(pecaDe(montada, 'movel-de-caixa-guia-1').portas.get('guia-da-gaveta').interface).toMatchObject({ forma: 'trilho', papel: 'guia', eixo: [0, 0, 1] });
     expect(pecaDe(montada, 'movel-de-caixa-gaveta-1').portas.get('eixo-da-gaveta').interface).toMatchObject({ forma: 'trilho', papel: 'deslizador', eixo: [0, 0, 1] });
@@ -546,26 +609,35 @@ describe('a montagem v5 e o curso das portas e das gavetas', () => {
     expect(alem.posicoes.at(-1)).toMatchObject({ valor: 0, livre: true });
   }, 120_000);
 
-  it('o curso de 0 a 110 graus da porta sobreposta passa sem colisão e a porta abre para a frente', () => {
+  it('o curso de 0 a 90 graus da porta sobreposta passa sem colisão em torno do pino oculto, a porta abre para a frente e a quina da lateral a trava depois', () => {
     const montada = MOVEL_DE_CAIXA.montar(LEVE_SOBREPOSTA);
     const { resolvida, problemas } = resolverMontagemDaFamilia(MOVEL_DE_CAIXA, LEVE_SOBREPOSTA, execucao);
     expect(problemas).toEqual([]);
     const r = conferirArticulacao(resolvida, montada.articulacoes[0]);
     expect(r.ok, r.recusa.join(' ')).toBe(true);
     expect(r.colisoes).toEqual([]);
-    expect(r.posicoes.at(-1)).toMatchObject({ valor: 110, livre: true });
+    expect(r.posicoes.at(-1)).toMatchObject({ valor: 90, livre: true });
     expect(r.eixo.direcao).toEqual([0, -1, 0]);
-    /* a ponta livre da porta, em 90 graus em torno do eixo, vai para a frente do corpo */
+    /* a rotação conferida é a do pino: o eixo passa por onde a geometria põe o pino, e a porta e as móveis das três dobradiças giram */
     const g = montada.geometria;
     const porta = g.portas[0];
+    expect(r.eixo.centro[0] / MM).toBeCloseTo(porta.xDoPino, 6);
+    expect(r.eixo.centro[2] / MM).toBeCloseTo(g.zDoVerso, 6);
+    expect(r.moveis).toEqual(expect.arrayContaining([['porta-1'], ...porta.dobradicas.map((_, k) => [`dobradica-1-${k + 1}-movel`])]));
+    expect(r.moveis).toHaveLength(1 + porta.dobradicas.length);
+    /* a ponta livre da porta, em 90 graus em torno do eixo, vai para a frente do corpo */
     const a = (90 * Math.PI) / 180;
     const dx = porta.xLivre - r.eixo.centro[0] / MM;
     const dz = g.zDoVerso - r.eixo.centro[2] / MM;
     const zGirado = dx * Math.sin(a) + dz * Math.cos(a);
     expect(zGirado + r.eixo.centro[2] / MM).toBeGreaterThan(g.quadro.frente + 100);
-    /* a sobreposta passa de 110: a porta fica livre até onde a dobradiça deixa */
-    const alem = conferirArticulacao(resolvida, { ...montada.articulacoes[0], curso: { minimo: 0, maximo: 170 }, passos: 17 });
-    expect(alem.ok, alem.recusa.join(' ')).toBe(true);
+    /* o curso é o que a geometria deixa: só a porta contra o corpo, entre 90 e 100 graus, e nenhuma peça da dobradiça colide até 100 */
+    const alem = conferirArticulacao(resolvida, { ...montada.articulacoes[0], curso: { minimo: 0, maximo: 100 }, passos: 10 });
+    expect(alem.ok).toBe(false);
+    expect(alem.colisoes.every((c) => c.movel[0] === 'porta-1' && c.fixo[0] === 'corpo')).toBe(true);
+    expect(alem.primeirasColisoes).toHaveLength(1);
+    expect(alem.primeirasColisoes[0].livreAte).toBeGreaterThan(90);
+    expect(alem.primeirasColisoes[0].livreAte).toBeLessThan(100);
   }, 600_000);
 
   it('o curso de 0 a 110 graus da porta embutida passa, e passando do curso a dobradiça móvel bate no corpo', () => {
