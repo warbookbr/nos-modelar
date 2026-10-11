@@ -71,8 +71,8 @@ describe('as perguntas por família de objeto', () => {
   it('o móvel de caixa tem a pergunta que pega a dobradiça do lado de fora da porta', () => {
     const dobradica = CRITERIOS['movel-de-caixa'].perguntas.find((p) => /dobradiça/.test(p.texto));
     expect(dobradica).toBeDefined();
-    expect(dobradica.texto).toMatch(/De que lado de cada porta/);
-    expect(dobradica.texto).toMatch(/na frente do móvel ou atrás da porta/);
+    expect(dobradica.texto).toMatch(/Onde fica cada dobradiça com a porta fechada/);
+    expect(dobradica.texto).toMatch(/escondida atrás da porta .* ou à vista na face externa/);
   });
 
   it('`plano.familia` é lido, e a família desconhecida é recusada com o "quis dizer" e as que existem', () => {
@@ -163,7 +163,7 @@ describe('o brief sem perguntas específicas é o de antes, byte a byte', () => 
     const briefCom = await briefDoObjeto(com, { saida: join(pasta, 'c'), largura: 400 });
     const depois = briefCom.texto.slice(briefCom.texto.indexOf('Responda, olhando só as imagens:'));
     expect(depois.startsWith(`Responda, olhando só as imagens:\n${fixas}\n`)).toBe(true);
-    expect(depois).toMatch(/\n {2}6\. De que lado de cada porta fica cada dobradiça/);
+    expect(depois).toMatch(/\n {2}6\. Onde fica cada dobradiça com a porta fechada/);
     expect(depois.endsWith(`${PERGUNTA_ABERTA}\n--- fim do brief ---\n`)).toBe(true);
   }, 180000);
 });

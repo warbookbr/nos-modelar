@@ -35,7 +35,7 @@ describe('perguntas da peça', () => {
   it('com `familia` o bloco traz a pergunta da dobradiça e fecha com a pergunta aberta', async () => {
     const r = await perguntasDaPecaArquivo('roupeiro-de-prova', { raiz: receitaComPlano({ familia: 'movel-de-caixa' }) });
     const bloco = blocoDasPerguntas(r.todas);
-    expect(bloco).toMatch(/\n {2}1\. De que lado de cada porta fica cada dobradiça/);
+    expect(bloco).toMatch(/\n {2}1\. Onde fica cada dobradiça com a porta fechada/);
     expect(bloco.endsWith(`${PERGUNTA_ABERTA}`)).toBe(true);
     expect(bloco.split('\n')[0]).toMatch(/^Perguntas de forma deste objeto/);
   });
