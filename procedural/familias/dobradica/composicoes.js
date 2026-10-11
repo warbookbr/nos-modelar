@@ -97,11 +97,12 @@ function nosDaFolha(lado, nos, furos) {
   proprios.forEach((_, i) => {
     const dele = { origem: { op: 'chapaDobrada', id: idNo(i) } };
     const trecho = () => ({ comprimento: p('trechoDoRolo') });
+    const aba = { comprimento: p('abaDoNo') };
     lista.push({
       id: `no-${i}`, operacao: 'chapaDobrada',
       argumentos: {
         origemId: idNo(i), espessura: p('espessura'), raioInterno: p('raioInternoDoNo'), largura: p('comprimentoDoNo'), segmentosPorQuarto: p('segmentosDoRolo'), tampas: 'em-tiras',
-        abas: [{ ...trecho(), angulo: -90 }, { ...trecho(), angulo: -90 }, { ...trecho(), angulo: -90 }, trecho()],
+        abas: [{ ...aba, angulo: -90 }, { ...trecho(), angulo: -90 }, { ...trecho(), angulo: -90 }, trecho()],
       },
     });
     lista.push({ id: `no-${i}-em-pe`, operacao: 'rotaciona', argumentos: { eixo: 'x', graus: 90, pivo: [0, 0, 0], sel: dele } });
@@ -109,8 +110,14 @@ function nosDaFolha(lado, nos, furos) {
     lista.push({ id: `no-${i}-no-eixo`, operacao: 'transladar', argumentos: { d: p(`emNo${i}`), sel: dele } });
   });
   lista.push({ id: 'parte-da-chapa', operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: origem('subtrair', idSubtracao) } });
-  // a chapa inteira de cada nó é parte do nó (rolo, trechos de 0,02 mm, bordas e tampas): todos os vértices dela estão no anel do rolo
-  proprios.forEach((_, i) => lista.push({ id: `parte-do-no-${i}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: origem('chapaDobrada', idNo(i)) } }));
+  /* a chapa de cada nó é parte do nó, menos a aba que sai tangente ao rolo (a primeira, com as tampas dela e a borda do começo),
+     que é da folha: todos os vértices do que fica no nó estão no anel do rolo, e é neles que a porta mede o raio */
+  const DA_FOLHA = [['aba', { aba: 'primeira' }], ['tampa-menos', { aba: 'primeira', tampa: 'menos' }], ['tampa-mais', { aba: 'primeira', tampa: 'mais' }], ['borda', { borda: 'inicio' }]];
+  proprios.forEach((_, i) => {
+    const citar = (citacao) => ({ origem: { op: 'chapaDobrada', id: idNo(i), ...citacao } });
+    lista.push({ id: `parte-do-no-${i}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: citar({}) } });
+    for (const [nome, citacao] of DA_FOLHA) lista.push({ id: `parte-${nome}-${i}`, operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: citar(citacao), substituir: true } });
+  });
   lista.push({
     id: 'uniao', operacao: 'unir',
     argumentos: { origemId: idUniao, solidos: [origem('subtrair', idSubtracao), ...proprios.map((_, i) => origem('chapaDobrada', idNo(i)))] },

@@ -24,6 +24,7 @@ export const LADOS_DO_PINO = 24;
 const DIAMETRO_MAXIMO_DO_FURO = 8; // mm
 const MARGEM_DO_CORTE_NA_CHAPA = 1; // mm: o corte e o furo passam da chapa para não terem face coplanar com ela
 export const PASSOS_DO_CURSO = 12;
+export const CURSO_MAXIMO = 180; // graus: a folha E dobrada de volta sobre a D, com as chapas paralelas e separadas por duas vezes o raio do furo do nó
 
 const arredondar = (valor) => Number(valor.toPrecision(12));
 const metro = (mm) => arredondar(mm * MM);
@@ -37,11 +38,6 @@ export function nosDasFolhas(nos) {
   return { d: todos.filter((k) => k % 2 === 0), e: todos.filter((k) => k % 2 === 1) };
 }
 
-/** O ângulo (graus) em que a borda de uma chapa toca a da outra: duas chapas de espessura t que partem do raio r1. */
-export function anguloDoEncosto(espessura, raioDoCorte) {
-  return (2 * Math.atan(espessura / (2 * raioDoCorte)) * 180) / Math.PI;
-}
-
 /**
  * As medidas da dobradiça, em milímetro (`mm`) e em metro (`m`), a partir dos parâmetros da família.
  */
@@ -52,7 +48,8 @@ export function geometriaDaDobradica({ altura, larguraFolha, espessura, diametro
   const raioMedioDoNo = raioDoFuroDoNo + espessura / 2;
   const comprimentoDoNo = (altura - (nos - 1) * FOLGA_AXIAL) / nos;
   const raioDoCorte = raioDoNo + FOLGA_DO_CORTE;
-  const xInterno = raioMedioDoNo; // a chapa entra na parede do nó até o meio dela
+  const xInterno = raioDoNo; // a chapa plana começa na borda do rolo, dentro da aba da chapa do nó (que passa 1 mm dela)
+  const zDaChapa = raioMedioDoNo + (2 * TRECHO_DO_ROLO) / 3; // a chapa é tangente ao rolo: o plano médio dela fica um raio médio acima do eixo
   const xExterno = raioDoPino + larguraFolha;
   const larguraLivre = xExterno - raioDoCorte;
   const passoDosFuros = altura / furos;
@@ -63,13 +60,12 @@ export function geometriaDaDobradica({ altura, larguraFolha, espessura, diametro
     return { inicio, fim: inicio + comprimentoDoNo, centro: inicio + comprimentoDoNo / 2 };
   });
   const furosK = Array.from({ length: furos }, (_, k) => -altura / 2 + passoDosFuros * (k + 0.5));
-  const anguloDeEncosto = anguloDoEncosto(espessura, raioDoCorte);
-  const cursoMaximo = Math.floor((180 - anguloDeEncosto) * 100) / 100;
+  const cursoMaximo = CURSO_MAXIMO;
   const mm = {
     raioDoPino, raioDoFuroDoNo, raioDoNo, raioMedioDoNo, comprimentoDoNo, raioDoCorte, xInterno, xExterno, larguraLivre,
-    diametroDoFuro, xDoFuro, noK, furosK, espessura, altura, anguloDeEncosto, cursoMaximo,
+    diametroDoFuro, xDoFuro, noK, furosK, espessura, altura, zDaChapa, cursoMaximo,
   };
-  return { mm, nos: nosDasFolhas(nos), furos, cursoMaximo, anguloDeEncosto, passosDoCurso: PASSOS_DO_CURSO };
+  return { mm, nos: nosDasFolhas(nos), furos, cursoMaximo, passosDoCurso: PASSOS_DO_CURSO };
 }
 
 /** Os argumentos (em metro) da composição do pino. */
@@ -98,9 +94,10 @@ export function argumentosDaFolha(geo, lado) {
     altura: metro(mm.altura),
     espessura: metro(mm.espessura),
     larguraDaChapa: metro(larguraDaChapa),
-    emDaChapa: [metro(sinal * (mm.xInterno + mm.xExterno) / 2), metro(-mm.altura / 2), 0],
+    emDaChapa: [metro(sinal * (mm.xInterno + mm.xExterno) / 2), metro(-mm.altura / 2), metro(mm.zDaChapa)],
     raioInternoDoNo: metro(mm.raioDoFuroDoNo),
     raioExternoDoNo: metro(mm.raioDoNo),
+    abaDoNo: metro(mm.raioDoNo + MARGEM_DO_CORTE_NA_CHAPA),
     trechoDoRolo: metro(TRECHO_DO_ROLO),
     segmentosDoRolo: SEGMENTOS_DO_ROLO,
     alturaDoCorte: metro(mm.comprimentoDoNo + FOLGA_AXIAL),
@@ -113,21 +110,22 @@ export function argumentosDaFolha(geo, lado) {
     comprimentoDoNo: metro(mm.comprimentoDoNo),
     comprimentoDoNoNegativo: metro(-mm.comprimentoDoNo),
     centroDaPorta: [0, metro(mm.noK[proprios[0]].inicio), 0],
-    pontoDoPlano: [metro(sinal * (mm.xInterno + mm.xExterno) / 2), 0, metro(mm.espessura / 2)],
+    pontoDoPlano: [metro(sinal * (mm.xInterno + mm.xExterno) / 2), 0, metro(mm.zDaChapa + mm.espessura / 2)],
     extensaoLargura: metro(larguraDaChapa),
     extensaoAltura: metro(mm.altura),
   };
   const xDoCorte = sinal * (mm.raioDoCorte + (mm.xInterno - MARGEM_DO_CORTE_NA_CHAPA)) / 2;
-  /* O nó é uma chapa dobrada de largura igual ao comprimento do nó, feita no plano x-y com a largura em z (a primeira aba
-     segue +x e as três dobras de -90 graus levam a linha média em volta de um centro 1 raio médio abaixo dela). Duas
-     rotações põem a largura em y e a dobra em z, com a ponta do rolo no plano das folhas e a abertura de 90 graus virada
-     para fora; a translação leva o centro médio dos três arcos (os trechos retos de 0,02 mm os deslocam entre si) para o
-     eixo do pino e a largura para a altura do nó. */
-  const meioDoDeslocamento = (2 * TRECHO_DO_ROLO) / 3;
+  /* O nó é uma chapa dobrada de largura igual ao comprimento do nó, feita no plano x-y com a largura em z: a aba (a chapa da
+     folha, 1 mm além da borda do rolo, que se sobrepõe à chapa plana) segue +x e as três dobras de -90 graus levam a linha
+     média em volta de um centro um raio médio abaixo dela, de modo que a aba é tangente ao rolo. Duas rotações põem a
+     largura em y e a dobra em z; a translação leva o centro médio dos três arcos (os trechos retos de 0,02 mm os deslocam
+     entre si) para o eixo do pino e a largura para a altura do nó. */
+  const abaDoNo = mm.raioDoNo + MARGEM_DO_CORTE_NA_CHAPA;
+  const centroDoRoloEmU = abaDoNo - TRECHO_DO_ROLO / 3;
   proprios.forEach((k, i) => {
-    argumentos[`emNo${i}`] = [metro(sinal * meioDoDeslocamento), metro(mm.noK[k].centro), metro(mm.raioMedioDoNo + meioDoDeslocamento)];
+    argumentos[`emNo${i}`] = [metro(sinal * centroDoRoloEmU), metro(mm.noK[k].centro), metro(mm.zDaChapa)];
   });
-  outros.forEach((k, j) => { argumentos[`emCorte${j}`] = [metro(xDoCorte), metro(mm.noK[k].inicio - FOLGA_AXIAL / 2), 0]; });
-  mm.furosK.forEach((y, k) => { argumentos[`emFuro${k}`] = [metro(sinal * mm.xDoFuro), metro(y), 0]; });
+  outros.forEach((k, j) => { argumentos[`emCorte${j}`] = [metro(xDoCorte), metro(mm.noK[k].inicio - FOLGA_AXIAL / 2), metro(mm.zDaChapa)]; });
+  mm.furosK.forEach((y, k) => { argumentos[`emFuro${k}`] = [metro(sinal * mm.xDoFuro), metro(y), metro(mm.zDaChapa)]; });
   return argumentos;
 }

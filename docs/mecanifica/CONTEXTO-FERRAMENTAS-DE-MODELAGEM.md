@@ -139,9 +139,9 @@ dois julgamentos cegos (8 nos três pontos da roda e da dobradiça; 8, 9 e 8 no
 cilindro, depois de uma rodada que prendeu os olhais por pescoço) e a pessoa, com
 as [pranchas](banco-de-provas/familias-2026-10-11/) guardadas no banco de provas.
 A chapa dobrada ganhou `origemId` e a origem estrutural (aba, dobra, lado, borda,
-tampa) e a dobradiça passou a fazer o nó com ela, em rolos de 270° que dão a porta
-do nó; a aprovação mecânica foi repetida com o mesmo curso, e o crítico e a pessoa
-precisam julgar de novo a geometria nova. Faltam a roda raiada e o roupeiro.
+tampa) e a dobradiça passou a fazer o nó com ela, em rolos de 270° com a chapa da
+folha tangente ao rolo, que dão a porta do nó e levam o curso a 180°; a aprovação mecânica foi repetida, e o crítico e a pessoa precisam julgar de novo
+a geometria nova. Faltam a roda raiada e o roupeiro.
 
 ## Pendências da camada de features
 

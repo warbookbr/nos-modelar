@@ -14,35 +14,35 @@
           "larguraFolha": 15,
           "nos": 3
         },
-        "hash": "sha256:8c1d37cc58e0734034981e1059f2343edb3bfc846988cf806eb752cc7d4a78ed",
+        "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33",
         "medidas": [
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.001,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00371,
             "desenvolvimentoDasDobras": 0.009848892,
-            "comprimentoPlanificado": 0.009928892,
-            "areaPlanificada": 0.000129076
+            "comprimentoPlanificado": 0.013558892,
+            "areaPlanificada": 0.000176266
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.001,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00371,
             "desenvolvimentoDasDobras": 0.009848892,
-            "comprimentoPlanificado": 0.009928892,
-            "areaPlanificada": 0.000129076
+            "comprimentoPlanificado": 0.013558892,
+            "areaPlanificada": 0.000176266
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.001,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00371,
             "desenvolvimentoDasDobras": 0.009848892,
-            "comprimentoPlanificado": 0.009928892,
-            "areaPlanificada": 0.000129076
+            "comprimentoPlanificado": 0.013558892,
+            "areaPlanificada": 0.000176266
           }
         ],
         "montagem": {
-          "hash": "sha256:f8dbc91fb037cbec05cef649d939c299e1758af1a060f96ef6168b554beda7f2",
+          "hash": "sha256:7a5a7075b19e6cf226c1de61a908d4a13455ffffd747e6b41ae9374e764beb26",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -55,24 +55,14 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 161.96,
+                "maximo": 180,
                 "unidade": "graus"
               },
               "passos": 12,
               "posicoes": 13,
               "colisoes": 0,
               "paresConferidos": 2,
-              "pares": [
-                {
-                  "movel": [
-                    "folha-e"
-                  ],
-                  "fixo": [
-                    "folha-d"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                }
-              ],
+              "pares": [],
               "conferido": true
             }
           ]
@@ -87,59 +77,59 @@
           "larguraFolha": 40,
           "nos": 6
         },
-        "hash": "sha256:171db71e90031d83d0072e6ed78688797aea7bb46857902272f8ef64c47cc0fb",
+        "hash": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9",
         "medidas": [
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.0025,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00671,
             "desenvolvimentoDasDobras": 0.020027652,
-            "comprimentoPlanificado": 0.020107652,
-            "areaPlanificada": 0.000393775
+            "comprimentoPlanificado": 0.026737652,
+            "areaPlanificada": 0.000523612
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.0025,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00671,
             "desenvolvimentoDasDobras": 0.020027652,
-            "comprimentoPlanificado": 0.020107652,
-            "areaPlanificada": 0.000393775
+            "comprimentoPlanificado": 0.026737652,
+            "areaPlanificada": 0.000523612
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.0025,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00671,
             "desenvolvimentoDasDobras": 0.020027652,
-            "comprimentoPlanificado": 0.020107652,
-            "areaPlanificada": 0.000393775
+            "comprimentoPlanificado": 0.026737652,
+            "areaPlanificada": 0.000523612
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.0025,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00671,
             "desenvolvimentoDasDobras": 0.020027652,
-            "comprimentoPlanificado": 0.020107652,
-            "areaPlanificada": 0.000393775
+            "comprimentoPlanificado": 0.026737652,
+            "areaPlanificada": 0.000523612
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.0025,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00671,
             "desenvolvimentoDasDobras": 0.020027652,
-            "comprimentoPlanificado": 0.020107652,
-            "areaPlanificada": 0.000393775
+            "comprimentoPlanificado": 0.026737652,
+            "areaPlanificada": 0.000523612
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.0025,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.00671,
             "desenvolvimentoDasDobras": 0.020027652,
-            "comprimentoPlanificado": 0.020107652,
-            "areaPlanificada": 0.000393775
+            "comprimentoPlanificado": 0.026737652,
+            "areaPlanificada": 0.000523612
           }
         ],
         "montagem": {
-          "hash": "sha256:0199ca493d32724b7ea31cd1ea6c4dad04f791eb3529e8278e1debf6c0042d01",
+          "hash": "sha256:0a879565801dbd23589c277e675f501e74bee457c0a6d01fdbe8e0e8f4fdf9f0",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -152,24 +142,14 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 157.02,
+                "maximo": 180,
                 "unidade": "graus"
               },
               "passos": 12,
               "posicoes": 13,
               "colisoes": 0,
               "paresConferidos": 2,
-              "pares": [
-                {
-                  "movel": [
-                    "folha-e"
-                  ],
-                  "fixo": [
-                    "folha-d"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                }
-              ],
+              "pares": [],
               "conferido": true
             }
           ]
@@ -184,83 +164,83 @@
           "larguraFolha": 80,
           "nos": 9
         },
-        "hash": "sha256:4303fa7f7a121efae3e1be83802b35660696c396121d5b41c26c57d108382688",
+        "hash": "sha256:d27baa257a01244c12626960b6b8b4a29dd5782a7c1d28cd1aa283de0df2f4ae",
         "medidas": [
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           },
           {
             "ferramenta": "chapaDobrada",
             "espessura": 0.004,
-            "comprimentoReto": 0.00008,
+            "comprimentoReto": 0.01021,
             "desenvolvimentoDasDobras": 0.032562609,
-            "comprimentoPlanificado": 0.032642609,
-            "areaPlanificada": 0.000710883
+            "comprimentoPlanificado": 0.042772609,
+            "areaPlanificada": 0.000931492
           }
         ],
         "montagem": {
-          "hash": "sha256:48684a5d79ff4ec0409c565579ce7c8ba9abcb05bdc0fb272c3b505d4a1c9ae8",
+          "hash": "sha256:9c657059297622e90db3fe16a9bbcea07609af2d109a7ed2d0dea433a20586f1",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -273,24 +253,14 @@
               "tipo": "revolucao",
               "curso": {
                 "minimo": 0,
-                "maximo": 156.58,
+                "maximo": 180,
                 "unidade": "graus"
               },
               "passos": 12,
               "posicoes": 13,
               "colisoes": 0,
               "paresConferidos": 2,
-              "pares": [
-                {
-                  "movel": [
-                    "folha-e"
-                  ],
-                  "fixo": [
-                    "folha-d"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                }
-              ],
+              "pares": [],
               "conferido": true
             }
           ]

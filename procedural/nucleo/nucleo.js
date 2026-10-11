@@ -1689,8 +1689,9 @@ CONTRATOS_ORIGEM.casca = {
      `lado`  'esquerda' ou 'direita' no sentido da linha média, ou 'dentro' e 'fora' da dobra (só com `dobra` ou sozinho,
              quando vale para todas as dobras: numa aba, dentro e fora dependem da dobra que se olha e a citação é recusada);
      `borda` 'inicio' ou 'fim', a espessura cortada na ponta da primeira e da última aba;
-     `tampa` 'menos' ou 'mais', a face de z = -largura/2 ou +largura/2.
-   `borda` e `tampa` não combinam com os outros eixos, e `aba` não combina com `dobra`. Sem eixo nenhum são todas as faces.
+     `tampa` 'menos' ou 'mais', a face de z = -largura/2 ou +largura/2; com `aba` ou `dobra`, as tiras da tampa que
+             pertencem a ela (só com tampas:'em-tiras').
+   `borda` não combina com os outros eixos, `tampa` não combina com `lado`, e `aba` não combina com `dobra`. Sem eixo nenhum são todas as faces.
    O significado de cada grupo é fixo: nenhuma posição na malha é identidade. */
 const LADOS_DA_CHAPA = ['esquerda', 'direita', 'dentro', 'fora'];
 CONTRATOS_ORIGEM.chapaDobrada = {
@@ -1703,7 +1704,8 @@ CONTRATOS_ORIGEM.chapaDobrada = {
     if (origem.borda != null && !['inicio', 'fim'].includes(origem.borda)) return msg;
     if (origem.tampa != null && !['menos', 'mais'].includes(origem.tampa)) return msg;
     if (origem.aba != null && origem.dobra != null) return 'chapaDobrada: aba e dobra são faces diferentes; cite uma ou a outra';
-    if ((origem.borda != null || origem.tampa != null) && (origem.aba != null || origem.dobra != null || origem.lado != null || (origem.borda != null && origem.tampa != null))) return 'chapaDobrada: borda e tampa não combinam com aba, dobra, lado nem entre si';
+    if (origem.borda != null && (origem.aba != null || origem.dobra != null || origem.lado != null || origem.tampa != null)) return 'chapaDobrada: borda não combina com aba, dobra, lado nem tampa';
+    if (origem.tampa != null && origem.lado != null) return 'chapaDobrada: tampa não combina com lado; combina só com aba ou dobra (tampas em tiras)';
     if (origem.aba != null && (origem.lado === 'dentro' || origem.lado === 'fora')) return "chapaDobrada: 'dentro' e 'fora' são do lado de uma dobra; numa aba use 'esquerda' ou 'direita'";
     return null;
   },
@@ -1725,20 +1727,23 @@ CONTRATOS_ORIGEM.chapaDobrada = {
     };
     let ids;
     if (origem.borda != null) ids = registro[`borda.${origem.borda}`];
-    else if (origem.tampa != null) ids = registro[`tampa.${origem.tampa}`];
+    else if (origem.tampa != null && origem.aba == null && origem.dobra == null) ids = registro[`tampa.${origem.tampa}`];
     else if (origem.aba != null || origem.dobra != null) {
       const prefixo = origem.aba != null ? 'aba' : 'dobra';
       const r = eixo(origem[prefixo], prefixo, prefixo === 'aba' ? 'abas' : 'dobras (a chapa tem uma aba só)');
       if (r.erro) return r;
-      const lados = origem.lado != null ? [origem.lado] : ['esquerda', 'direita'];
-      ids = r.indices.flatMap((k) => lados.flatMap((l) => registro[`${prefixo}.${k}.${l}`] ?? []));
+      if (origem.tampa != null) ids = r.indices.flatMap((k) => registro[`${prefixo}.${k}.tampa.${origem.tampa}`] ?? []);
+      else {
+        const lados = origem.lado != null ? [origem.lado] : ['esquerda', 'direita'];
+        ids = r.indices.flatMap((k) => lados.flatMap((l) => registro[`${prefixo}.${k}.${l}`] ?? []));
+      }
     } else ids = registro[origem.lado ?? 'faces'];
     for (const f of ids) {
       const consumo = conferirConsumo(st, f, `a face ${f} da ${nome}`);
       if (consumo) return { erro: consumo };
     }
     const faces = [...new Set(ids)].filter((f) => st.F.has(f)).sort((a, b) => a - b);
-    return faces.length ? { faces } : { erro: `${nome} não tem nenhuma face viva nessa citação` };
+    return faces.length ? { faces } : { erro: `${nome} não tem nenhuma face viva nessa citação${origem.tampa != null && (origem.aba != null || origem.dobra != null) ? " (a tampa de uma aba ou dobra só existe com tampas:'em-tiras')" : ''}` };
   },
 };
 

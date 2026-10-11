@@ -119,7 +119,9 @@ describe('chapa dobrada com origemId — recusas que dizem o que falta', () => {
   it('combinações sem sentido são recusadas na validação', () => {
     expect(recusa({ aba: 0, dobra: 0 })).toMatch(/aba e dobra são faces diferentes/);
     expect(recusa({ aba: 0, lado: 'dentro' })).toMatch(/'dentro' e 'fora' são do lado de uma dobra/);
-    expect(recusa({ borda: 'inicio', aba: 0 })).toMatch(/borda e tampa não combinam/);
+    expect(recusa({ borda: 'inicio', aba: 0 })).toMatch(/borda não combina com aba, dobra, lado nem tampa/);
+    expect(recusa({ tampa: 'menos', lado: 'esquerda' })).toMatch(/tampa não combina com lado/);
+    expect(recusa({ tampa: 'menos', aba: 0 })).toMatch(/só existe com tampas:'em-tiras'/);
     expect(recusa({ tampa: 'topo' })).toMatch(/chapaDobrada usa op, id/);
     expect(recusa({ face: 3 })).toMatch(/chapaDobrada usa op, id/);
   });
@@ -131,6 +133,39 @@ describe('chapa dobrada com origemId — recusas que dizem o que falta', () => {
     expect(motivos(rodar([[OP, { origemId: 1, ...L }], ['cubo', { origemId: 1 }]]))).toMatch(/origemId 1 ambígua/);
     expect(motivos(rodar([[OP, { origemId: -1, ...L }]]))).toMatch(/origemId: veio -1; aceito um inteiro não negativo/);
     expect(motivos(rodar([[OP, { origemId: 1.5, ...L }]]))).toMatch(/origemId: veio 1.5/);
+  });
+});
+
+describe('chapa dobrada com origemId — tampas em tiras', () => {
+  const EM_TIRAS = { ...L, tampas: 'em-tiras' };
+  const { r, faces, pontos } = escolher(EM_TIRAS, {
+    menos: { tampa: 'menos' }, mais: { tampa: 'mais' }, aba0menos: { aba: 0, tampa: 'menos' }, aba1mais: { aba: 'ultima', tampa: 'mais' }, dobraMenos: { dobra: 0, tampa: 'menos' },
+  });
+  it('cada tampa é uma tira de quadriláteros convexos, uma por par de estações, e a peça continua fechada e do mesmo volume', () => {
+    expect(r.orfaos).toEqual([]);
+    // 1 estação de ponta + 7 do arco + 1 de ponta de cada lado da linha média = 9 estações, 8 tiras por tampa
+    expect(faces('menos')).toHaveLength(8);
+    expect(faces('mais')).toHaveLength(8);
+    const inteira = rodar([[OP, L]]), tiras = rodar([[OP, EM_TIRAS]]);
+    const volume = (n) => [...n.F.values()].reduce((v, f) => {
+      const p = f.vs.map((id) => n.V.get(id));
+      for (let i = 1; i < p.length - 1; i++) { const [a, b, c] = [p[0], p[i], p[i + 1]]; v += (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6; }
+      return v;
+    }, 0);
+    expect(perto(volume(tiras), volume(inteira), 1e-6)).toBe(true);
+    const arestas = new Map();
+    for (const f of tiras.F.values()) f.vs.forEach((a, i) => { const k = `${a}>${f.vs[(i + 1) % f.vs.length]}`; arestas.set(k, (arestas.get(k) ?? 0) + 1); });
+    expect([...arestas].every(([k, c]) => c === 1 && arestas.has(k.split('>').reverse().join('>')))).toBe(true);
+  });
+  it('as tiras de uma aba ou de uma dobra são as que ficam sob ela', () => {
+    expect(faces('aba0menos')).toHaveLength(1);
+    expect(faces('aba1mais')).toHaveLength(1);
+    expect(faces('dobraMenos')).toHaveLength(6);
+    expect(vertices(pontos('aba0menos')).every((p) => perto(p[2], -15))).toBe(true);
+    expect(vertices(pontos('dobraMenos')).every((p) => perto(raioAte(p, [40, 3]), 2) || perto(raioAte(p, [40, 3]), 4))).toBe(true);
+  });
+  it('tampas inválidas são recusadas dizendo o aceito', () => {
+    expect(motivos(rodar([[OP, { ...L, tampas: 'abertas' }]]))).toMatch(/tampas: veio "abertas"; aceito um destes: 'inteiras', 'em-tiras'/);
   });
 });
 

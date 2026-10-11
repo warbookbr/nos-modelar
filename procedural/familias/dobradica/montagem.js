@@ -77,5 +77,5 @@ export function montarDobradica(familia, parametros = {}) {
     passos: geometria.passosDoCurso,
     folga: { valor: 0, unidade: 'mm' },
   }];
-  return { parametros: completos, montagem, receitas, articulacoes, cursoMaximo: geometria.cursoMaximo, anguloDeEncosto: geometria.anguloDeEncosto };
+  return { parametros: completos, montagem, receitas, articulacoes, cursoMaximo: geometria.cursoMaximo };
 }

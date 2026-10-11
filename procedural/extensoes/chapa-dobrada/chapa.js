@@ -215,7 +215,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     if (a.dobra === undefined) return Object.freeze({ ...a });
     return Object.freeze({ ...a, dentro: (giros[a.dobra] > 0) === (a.lado === 'esquerda') });
   });
-  return Object.freeze({ contorno, largura, espessura, medidas, divisoesPorDobra: Object.freeze(divisoes), arestas: Object.freeze(arestasDaChapa), estacoes: Object.freeze(estacoes), tampas, abas: retos.length, dobras: giros.length });
+  return Object.freeze({ contorno, largura, espessura, medidas, divisoesPorDobra: Object.freeze(divisoes), arestas: Object.freeze(arestasDaChapa), estacoes: Object.freeze(estacoes), trechos: Object.freeze(trecho.slice(0, -1).map((t) => Object.freeze({ ...t }))), tampas, abas: retos.length, dobras: giros.length });
 }
 
 /* As medidas de chapa dos argumentos de `chapaDobrada`, sem montar malha: espessura, raios, fator K, trechos retos, ângulo,

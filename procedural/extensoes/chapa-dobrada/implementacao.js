@@ -6,17 +6,22 @@ import { construirChapa } from './chapa.js';
    anti-horário visto de +z. Faces: 0 é a tampa em -z, 1 a tampa em +z e 2 + i o lado que sai da aresta i do contorno (do
    vértice i ao i + 1), todos com a normal para fora. As tampas são faces côncavas inteiras. */
 export function implementar(contexto, argumentos = {}) {
-  const { contorno, largura, arestas, estacoes, tampas } = construirChapa(argumentos, contexto.numero), n = contorno.length, meia = largura / 2;
+  const { contorno, largura, arestas, estacoes, trechos, tampas } = construirChapa(argumentos, contexto.numero), n = contorno.length, meia = largura / 2;
   for (const z of [-meia, meia]) contorno.forEach(([x, y], i) => contexto.emitirVertice(i + (z > 0 ? n : 0), [x, y, z]));
   const grupos = { 'tampa.menos': [0], 'tampa.mais': [1] };
   if (tampas === 'em-tiras') {
-    const tiras = tirasDasTampas(estacoes);
-    tiras.forEach((vs, k) => {
+    const tiras = tirasDasTampas(estacoes, trechos);
+    tiras.forEach(({ vs }, k) => {
       contexto.emitirFace(2 + n + k, vs.slice().reverse());
       contexto.emitirFace(2 + n + tiras.length + k, vs.map((v) => v + n));
     });
     grupos['tampa.menos'] = tiras.map((_, k) => 2 + n + k);
     grupos['tampa.mais'] = tiras.map((_, k) => 2 + n + tiras.length + k);
+    tiras.forEach(({ trecho }, k) => {
+      const quem = trecho.aba !== undefined ? `aba.${trecho.aba}` : `dobra.${trecho.dobra}`;
+      (grupos[`${quem}.tampa.menos`] ??= []).push(2 + n + k);
+      (grupos[`${quem}.tampa.mais`] ??= []).push(2 + n + tiras.length + k);
+    });
   } else {
     contexto.emitirFace(0, contorno.map((_, i) => n - 1 - i));
     contexto.emitirFace(1, contorno.map((_, i) => n + i));
@@ -49,12 +54,12 @@ function gruposDaOrigem(arestas, tampas) {
 /* As tampas em tiras: um quadrilátero convexo por par de estações vizinhas (a da direita e a da esquerda da linha média),
    em vez de uma face côncava inteira. Estações que coincidem (raio interno 0) dão triângulo. Cada tira, do vértice do
    anel de -z, no sentido anti-horário visto de +z; quem emite inverte para -z e soma n para +z. */
-function tirasDasTampas(estacoes) {
+function tirasDasTampas(estacoes, trechos) {
   const tiras = [];
   for (let j = 0; j + 1 < estacoes.length; j++) {
     const [d0, e0] = estacoes[j], [d1, e1] = estacoes[j + 1];
     const vs = [d0, d1, e1, e0].filter((v, i, todos) => v !== todos[(i + 1) % todos.length]);
-    if (new Set(vs).size >= 3) tiras.push(vs);
+    if (new Set(vs).size >= 3) tiras.push({ vs, trecho: trechos[j] });
   }
   return tiras;
 }

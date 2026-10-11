@@ -12,7 +12,7 @@ import { conferirFamiliaNosTresPontos } from '../../../tools/mecanifica/familia-
 import { conferirMontagemDaFamilia } from '../../../tools/mecanifica/montagem-da-familia.mjs';
 import { ErroChamadaDeFamilia, FAMILIAS, chamar, criarRegistroDeFamilias } from '../index.js';
 import { DOBRADICA } from './index.js';
-import { FOLGA_AXIAL, TRECHO_DO_ROLO, anguloDoEncosto, geometriaDaDobradica } from './geometria.js';
+import { CURSO_MAXIMO, FOLGA_AXIAL, geometriaDaDobradica } from './geometria.js';
 
 const registro = criarRegistroDeFamilias({ familias: [DOBRADICA] });
 const execucao = execucaoDe({ registroComposicoes: registro.registroComposicoes, registroOperacoes: registro.registroOperacoes });
@@ -99,7 +99,7 @@ describe('a geometria contra a conta', () => {
     const raioDoFuro = geo.mm.diametroDoFuro / 2 * MM;
     for (const y of geo.mm.furosK) {
       const centro = [geo.mm.xDoFuro * MM, y * MM];
-      const nasBordas = [...d.V.values()].filter(([px, py, pz]) => Math.abs(Math.hypot(px - centro[0], py - centro[1]) - raioDoFuro) < 1e-9 && Math.abs(Math.abs(pz) - geo.mm.espessura / 2 * MM) < 1e-9);
+      const nasBordas = [...d.V.values()].filter(([px, py, pz]) => Math.abs(Math.hypot(px - centro[0], py - centro[1]) - raioDoFuro) < 1e-9 && Math.abs(Math.abs(pz - geo.mm.zDaChapa * MM) - geo.mm.espessura / 2 * MM) < 1e-9);
       expect(nasBordas).toHaveLength(24); /* o polígono de 12 lados, nas duas faces da chapa */
     }
   });
@@ -125,26 +125,25 @@ describe('a montagem v5 e o curso da articulação', () => {
     expect(r.colisoes).toEqual([]);
     expect(r.posicoes.at(-1)).toMatchObject({ valor: montada.cursoMaximo, livre: true });
     expect(r.eixo.direcao).toEqual([0, -1, 0]);
-    expect(r.pares).toEqual([expect.objectContaining({ movel: ['folha-e'], fixo: ['folha-d'], estadoMaisGrave: 'encostam' })]);
+    /* com a chapa tangente ao rolo as duas folhas nem se encostam em todo o curso */
+    expect(r.pares).toEqual([]);
     /* a conferência da aprovação, que junta as peças sem o resolvedor, dá o mesmo curso */
     const daAprovacao = conferirMontagemDaFamilia(DOBRADICA, {}, execucao);
     expect(daAprovacao.problemas).toEqual([]);
     expect(daAprovacao.resumo.articulacoes[0]).toMatchObject({ curso: r.curso, passos: r.passos, posicoes: r.posicoes.length, colisoes: 0, conferido: true });
-    expect(daAprovacao.resumo.articulacoes[0].pares).toEqual(r.pares.map(({ movel, fixo, estadoMaisGrave }) => ({ movel, fixo, estadoMaisGrave })));
+    expect(daAprovacao.resumo.articulacoes[0].pares).toEqual([]);
 
-    /* passando do encosto as chapas se atravessam, e a bisseção acha o ângulo da conta: 180 graus menos o ângulo em que as bordas se tocam */
-    const alem = conferirArticulacao(resolvida, { ...montada.articulacoes[0], curso: { minimo: 0, maximo: montada.cursoMaximo + 1.5 }, passos: 3 });
+    /* passando dos 180 graus a folha E volta a descer sobre a D: livre até pouco depois (189 graus no padrão), colide aos 200 */
+    const alem = conferirArticulacao(resolvida, { ...montada.articulacoes[0], curso: { minimo: 0, maximo: 200 }, passos: 4 });
     expect(alem.ok).toBe(false);
     expect(alem.colisoes[0]).toMatchObject({ movel: ['folha-e'], fixo: ['folha-d'], estado: 'interpenetram' });
-    const geo = geometriaDaDobradica(montada.parametros);
-    expect(alem.primeirasColisoes[0].livreAte).toBeCloseTo(180 - anguloDoEncosto(geo.mm.espessura, geo.mm.raioDoCorte), 2);
+    expect(alem.primeirasColisoes[0].livreAte).toBeGreaterThan(CURSO_MAXIMO);
+    expect(alem.primeirasColisoes[0].livreAte).toBeLessThan(200);
   });
 
-  it('o curso declarado de cada ponto nunca passa de onde as bordas se tocam e a conta cai com a chapa mais grossa', () => {
-    const fino = DOBRADICA.montar({ espessura: 1 }).cursoMaximo;
-    const grosso = DOBRADICA.montar({ espessura: 4 }).cursoMaximo;
-    expect(fino).toBeGreaterThan(grosso);
-    expect(grosso).toBeLessThan(180);
+  it('o curso declarado é o de dobrar a folha E de volta sobre a D, com folga, qualquer que seja a chapa', () => {
+    for (const espessura of [1, 2.5, 4]) expect(DOBRADICA.montar({ espessura }).cursoMaximo).toBe(CURSO_MAXIMO);
+    expect(CURSO_MAXIMO).toBe(180);
   });
 
   it('a mesma chamada dá a mesma montagem', () => {

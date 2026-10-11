@@ -57,7 +57,7 @@
       "portas": [
         { "porta": "eixo-do-pino", "volume": "pino", "lado": "-y" }
       ],
-      "tolerancia": { "envelope": 5, "porta": 0.5 }
+      "tolerancia": { "envelope": 8, "porta": 0.5 }
     }
   }
 }

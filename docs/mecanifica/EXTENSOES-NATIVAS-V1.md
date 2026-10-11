@@ -96,8 +96,9 @@ tem as faces que correm ao longo dela e uma dobra, os pedaços do arco), `lado`
 primeira aba é +y, ou `'dentro'` e `'fora'` de uma dobra, que não valem numa aba
 porque dependem da dobra que se olha), `borda` (`'inicio'` ou `'fim'`, a
 espessura cortada nas pontas) e `tampa` (`'menos'` ou `'mais'`, as faces de
-z = -largura/2 e +largura/2). `borda` e `tampa` não combinam com os outros eixos e
-`aba` não combina com `dobra`; sem eixo são todas as faces. O significado de cada
+z = -largura/2 e +largura/2; com `aba` ou `dobra` e `tampas: 'em-tiras'`, só as
+tiras que ficam sob ela). `borda` não combina com os outros eixos, `tampa` não
+combina com `lado` e `aba` não combina com `dobra`; sem eixo são todas as faces. O significado de cada
 grupo é fixo, não posição na malha. Uma porta de plano sai de uma aba, e um rolo
 de 270° (três dobras de 90° com trechos retos de 0,02 mm entre elas, porque uma
 dobra sozinha vai até 180°) dá a porta de anel ou de cilindro pela citação das
