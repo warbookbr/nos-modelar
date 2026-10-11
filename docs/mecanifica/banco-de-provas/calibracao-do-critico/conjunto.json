@@ -1965,6 +1965,88 @@
           "data": "2026-10-11T19:02:28.552Z"
         }
       ]
+    },
+    {
+      "imagem": "c07",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "as três de cada lado, na borda frontal da lateral",
+              "sentido": "adiantada",
+              "evidencia": "Lateral: blocos nas alturas 207, 520 e 835 px, x 441 a 463, sobre a face externa da lateral. Frontal: marcas em x 300 e x 797 fora do contorno do corpo. Superior: pinos além do contorno em x 300 e x 797. Isométrica: blocos visíveis em x 675 na lateral direita. O deslocamento é transversal, para fora do plano da lateral, e não existe sentido exato para ele no vocabulário."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-11T20:00:11.809Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "as três dobradiças da lateral direita, coladas na face externa da lateral",
+              "sentido": "adiantada",
+              "evidencia": "Isométrica: blocos escuros na lateral direita em x≈675, y≈510, 710 e 910. Lateral: blocos em y≈220, 535 e 850, de x 441 a 463, sobre a face externa. Frontal: marcas fora da silhueta em x≈300 e x≈798. Nenhum dos sentidos de posicao descreve o deslocamento lateral para fora; 'adiantada' é o mais próximo, e o defeito é o corpo da dobradiça estar fora do corpo do móvel e à vista, quando deveria estar escondido atrás da porta."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-11T20:00:12.664Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "as três dobradiças de cada lado, na quina frontal das laterais",
+              "sentido": "atrasada",
+              "evidencia": "Estão à vista na face externa das laterais. Frontal: abas pretas além da silhueta em x≈300 e x≈798, em y≈330, 560 e 790. Lateral: blocos em x 441–463, y≈220, 535 e 850. Isométrica: blocos na face direita em y≈510, 710 e 910. Deviam estar atrás da porta, por dentro do corpo (posicao.atrasada é a opção mais próxima de 'para trás e para dentro')."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-11T20:00:13.488Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "uniao",
+              "onde": "as seis dobradiças, borda frontal das duas laterais, três alturas por lado",
+              "sentido": "afastado",
+              "evidencia": "Lateral: três blocos escuros de cerca de 20 px sobre a face externa lisa, junto à borda frontal. Isométrica: abas na face direita e na borda esquerda. Frontal e superior: abas além da largura do corpo (x 300 e 798, contra o corpo em 304 a 797). Estão presas por fora, e não por dentro atrás da porta. Nenhum sentido do tipo cobre o deslocamento lateral para fora, e uniao/afastado é o mais próximo."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-11T20:00:14.374Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "as três de cada lado, na borda frontal da lateral",
+              "sentido": "adiantada",
+              "evidencia": "Lateral: blocos em y≈222, 536 e 850, x 443–463, sobre a face externa da lateral. Frontal: abas pretas fora da silhueta do corpo em x≈300 e 798. Isométrica: blocos na face direita. Ficam à vista com a porta fechada, deslocadas para fora em vez de escondidas por dentro."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-11T20:00:15.404Z"
+        }
+      ]
     }
   ],
   "prancha": {
