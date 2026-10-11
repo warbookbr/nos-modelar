@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1111 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1117 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -110,6 +110,8 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
@@ -619,21 +621,21 @@
 - `index.js` — index.js — a família `dobradica` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defin…
 - `montagem.js` — montagem.js — a mini-montagem v5 que a família gera: o pino e as duas folhas como peças soltas, ligadas por uma articulação de revolução com o curso declarad…
 
+## procedural/familias/movel-de-caixa/
+
+- `composicoes.js` — composicoes.js — as composições procedurais da família `movel-de-caixa`.
+- `derivar.js` — derivar.js — dos parâmetros do móvel de caixa (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as medidas do móvel de caixa a partir dos parâmetros da família, em milímetro.
+- `index.js` — index.js — a família `movel-de-caixa` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `…
+- `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas, as gavetas e os guias e as duas metades de cada dobradiça como peças soltas, com uma arti…
+- `movel-de-caixa.test.mjs` — movel-de-caixa.test.mjs — a família `movel-de-caixa`: contrato, recusas, os perfis, o roupeiro como antes, a malha medida contra as contas (zonas, frentes em…
+
 ## procedural/familias/roda-pneu/
 
 - `composicoes.js` — composicoes.js — as composições da família `roda-pneu`: a roda de disco e as duas raiadas, cada uma com a banda lisa ou com relevo.
 - `derivar.js` — derivar.js — dos parâmetros da família `roda-pneu` (o diâmetro em milímetro, as medidas em proporção do diâmetro, as contagens em contagem) aos argumentos da…
 - `index.js` — index.js — a família `roda-pneu` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/index.js`) i…
 - `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` medida na malha. As quatro partes (pneu, aro, cubo, disco) e o volume de cada uma contra a fórmula; a banda (pneumá…
-
-## procedural/familias/roupeiro/
-
-- `composicoes.js` — composicoes.js — as composições procedurais da família `roupeiro`, geradas por função porque o número de portas, de prateleiras (nenhuma ou ao menos uma) e o…
-- `derivar.js` — derivar.js — dos parâmetros do roupeiro (milímetro) à chamada de composição (metro).
-- `geometria.js` — geometria.js — as medidas do roupeiro a partir dos parâmetros da família, em milímetro.
-- `index.js` — index.js — a família `roupeiro` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defini…
-- `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas e as duas metades de cada dobradiça como peças soltas, com uma articulação de revolução po…
-- `roupeiro.test.mjs` — roupeiro.test.mjs — a família `roupeiro`: contrato, recusas, a malha medida contra as contas, a parede da casca, as dobradiças por dentro da parede, a montag…
 
 ## procedural/nucleo/
 
@@ -866,6 +868,8 @@
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
 - `familia-esboco.test.js` — familia-esboco.test.js — a parte pura da conferência da família com o esboço: a dispensa, os três pontos, o esboço mínimo, o mapa de parâmetros e os achados …
+- `familia.js` — familia.js — o contrato `mecanifica.familia@1` e o validador, puros e sem nenhum import.
+- `familia.js` — familia.js — o contrato `mecanifica.familia@1` e o validador, puros e sem nenhum import.
 - `familia.js` — familia.js — o contrato `mecanifica.familia@1` e o validador, puros e sem nenhum import.
 - `familia.test.js` — familia.test.js — o contrato `mecanifica.familia@1`: a fixture válida passa, cada defeito é recusado com o campo, o valor e o que é aceito, e a leitura norma…
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
@@ -1278,6 +1282,8 @@
 - `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `analise-da-peca.mjs` — analise-da-peca.mjs — o passo "Pare e analise": a matriz de vistas que a IA precisa olhar antes de declarar uma forma pronta, o manifesto que prova que ela f…
 - `analise-da-peca.test.mjs` — analise-da-peca.test.mjs — a matriz do "Pare e analise", o manifesto e o zoom.
+- `aprovacao-da-familia.mjs` — aprovacao-da-familia.mjs — a camada mecânica da aprovação de uma família, sem gastar token.
+- `aprovacao-da-familia.mjs` — aprovacao-da-familia.mjs — a camada mecânica da aprovação de uma família, sem gastar token.
 - `aprovacao-da-familia.mjs` — aprovacao-da-familia.mjs — a camada mecânica da aprovação de uma família, sem gastar token.
 - `aprovacao-da-familia.test.mjs` — aprovacao-da-familia.test.mjs — a camada mecânica da aprovação de uma família e o hash preso ao `aprovacao.json`. A prova: a família de fixture aprovada; a b…
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …

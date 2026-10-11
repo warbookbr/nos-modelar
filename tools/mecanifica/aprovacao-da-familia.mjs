@@ -437,6 +437,18 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
   const problemas = [];
   const id = familia?.contrato?.id;
   const reprovar = (codigo, mensagem, ponto = null) => problemas.push({ ...(ponto ? { ponto } : {}), ...problema(codigo, mensagem) });
+  /* a montagem que a família gera (portas e gavetas): o curso conferido sem colisão, sozinha e com as outras abertas, e a impressão */
+  const conferirMontagemGravada = (atual, aprovado, quem, ponto) => {
+    if (!atual.montagem) return;
+    const gravada = aprovado.montagem;
+    if (!gravada?.conferido || gravada.articulacoes.some((articulacao) => !articulacao.conferido || articulacao.colisoes)
+      || (gravada.articulacoes.length > 1 && (!gravada.simultaneas?.conferido || gravada.simultaneas.colisoes))) {
+      reprovar('curso-nao-conferido', `${quem} não traz o curso da articulação conferido contra as malhas e sem colisão, sozinha e com as outras abertas ao mesmo tempo; reaprove com npm run familia -- aprovar ${id}`, ponto);
+    }
+    if (atual.montagem.hash !== gravada?.hash) {
+      reprovar('montagem-mudou', `a montagem que a família gera em ${quem} mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, ponto);
+    }
+  };
   try {
     lerFamilia(familia.contrato);
   } catch (erro) {
@@ -488,15 +500,7 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
     } else if (atual.hash !== null && atual.hash !== aprovado.hash) {
       reprovar('geometria-mudou', `a geometria do ponto '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, nome);
     }
-    if (atual.montagem) {
-      const gravada = aprovado.montagem;
-      if (!gravada?.conferido || gravada.articulacoes.some((articulacao) => !articulacao.conferido || articulacao.colisoes)) {
-        reprovar('curso-nao-conferido', `o ponto '${nome}' não traz o curso da articulação conferido contra as malhas e sem colisão; reaprove com npm run familia -- aprovar ${id}`, nome);
-      }
-      if (atual.montagem.hash !== gravada?.hash) {
-        reprovar('montagem-mudou', `a montagem que a família gera no ponto '${nome}' mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, nome);
-      }
-    }
+    conferirMontagemGravada(atual, aprovado, `o ponto '${nome}'`, nome);
     for (const p of atual.problemas) reprovar(p.codigo, `no ponto '${nome}': ${p.mensagem}`, nome);
   }
   const definidosDosPerfis = pontosDosPerfis(familia.contrato);
@@ -520,6 +524,7 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
     } else if (atual.hash !== null && atual.hash !== aprovado.hash) {
       reprovar('geometria-mudou', `a geometria do perfil '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, rotulo);
     }
+    conferirMontagemGravada(atual, aprovado, `o perfil '${nome}'`, rotulo);
     for (const p of atual.problemas) reprovar(p.codigo, `no perfil '${nome}': ${p.mensagem}`, rotulo);
   }
   return { ok: problemas.length === 0, familia: id, problemas };

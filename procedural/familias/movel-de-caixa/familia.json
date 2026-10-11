@@ -1,0 +1,173 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "movel-de-caixa",
+  "versao": "2.0.0",
+  "nivel": "objeto",
+  "parametros": {
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 1600, "minimo": 300, "maximo": 3000, "medio": 1200 },
+    "altura": { "tipo": "numero", "unidade": "mm", "padrao": 2200, "minimo": 300, "maximo": 2600, "medio": 1700 },
+    "profundidade": { "tipo": "numero", "unidade": "mm", "padrao": 550, "minimo": 250, "maximo": 800, "medio": 500 },
+    "painel": { "tipo": "numero", "unidade": "mm", "padrao": 18, "minimo": 15, "maximo": 25, "medio": 18 },
+    "portas": { "tipo": "inteiro", "unidade": "contagem", "padrao": 2, "minimo": 0, "maximo": 4, "medio": 2 },
+    "prateleiras": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 0, "maximo": 8, "medio": 2 },
+    "rodape": { "tipo": "numero", "unidade": "mm", "padrao": 80, "minimo": 0, "maximo": 150, "medio": 80 },
+    "cabideiro": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 1, "medio": 0 },
+    "pes": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 },
+    "frente": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 2, "medio": 0 },
+    "gavetas": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 5, "medio": 2 },
+    "alturaDaGaveta": { "tipo": "numero", "unidade": "mm", "padrao": 150, "minimo": 80, "maximo": 160, "medio": 150 },
+    "gavetasEmCima": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 },
+    "alturaDasPortas": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": 0, "maximo": 2400, "medio": 0 }
+  },
+  "restricoes": [
+    {
+      "id": "porta-larga-demais",
+      "expressao": "min(1, portas) * ((((min(1, frente) - max(0, frente - 1)) * (largura - (2 + max(0, min(1, portas - 2))) * painel - (portas + 1 + max(0, min(1, portas - 2))) * 3) + (1 - min(1, frente)) * (largura - 7 - (portas - 1) * 3) + max(0, frente - 1) * (largura - 2 * painel - 6 + (portas - 1) * 40)) / max(1, portas)) - 800) <= 0",
+      "motivo": "a porta de MDF mais larga que 800 mm empena e pesa sobre as dobradiças; a largura de cada porta embutida é a largura interna menos a divisória (de três portas para cima) e as folgas de 3 mm, dividida pelas portas, a da sobreposta é a largura menos 3,5 mm de cada lado e as folgas entre as portas, dividida pelas portas, a da folha de correr é a largura interna menos as folgas de 3 mm e mais 40 mm de sobreposição por folha de vizinha, dividida pelas folhas, e uma porta a mais divide melhor"
+    },
+    {
+      "id": "porta-estreita-demais",
+      "expressao": "min(1, portas) * (250 - (((min(1, frente) - max(0, frente - 1)) * (largura - (2 + max(0, min(1, portas - 2))) * painel - (portas + 1 + max(0, min(1, portas - 2))) * 3) + (1 - min(1, frente)) * (largura - 7 - (portas - 1) * 3) + max(0, frente - 1) * (largura - 2 * painel - 6 + (portas - 1) * 40)) / max(1, portas))) <= 0",
+      "motivo": "a porta mais estreita que 250 mm não comporta a dobradiça e o puxador com a folga de 3 mm em volta; use menos portas ou um móvel mais largo"
+    },
+    {
+      "id": "sobreposta-com-mais-de-duas-portas",
+      "expressao": "(1 - min(1, frente)) * (portas - 2) <= 0",
+      "motivo": "a frente sobreposta tem uma dobradiça em cada lateral e nenhuma porta no meio: de três portas para cima use a frente embutida, que tem divisória"
+    },
+    {
+      "id": "de-correr-com-menos-de-duas-portas",
+      "expressao": "max(0, frente - 1) * (2 - portas) <= 0",
+      "motivo": "a frente de correr tem de duas a quatro folhas, cada uma numa camada: com uma só não há o que deslize; use portas 2 ou mais, ou a frente embutida ou sobreposta"
+    },
+    {
+      "id": "de-correr-sem-fundo",
+      "expressao": "max(0, frente - 1) * (2 * painel + 20 + portas * (painel + 6) + 80 - profundidade) <= 0",
+      "motivo": "as folhas de correr ocupam 20 mm atrás da frente e uma camada de painel mais 6 mm de folga por folha, e ainda sobra 80 mm de fundo para as prateleiras e o cabideiro; use menos folhas ou um móvel mais fundo"
+    },
+    {
+      "id": "porta-baixa-demais",
+      "expressao": "min(1, portas) * (350 - (((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - min(1, (min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas))) * (((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - alturaDasPortas))) <= 0",
+      "motivo": "a zona das portas fica abaixo de 350 mm, que não leva duas dobradiças com a margem de 80 mm; reduza as gavetas, o vão aberto ou o rodapé, ou aumente a altura"
+    },
+    {
+      "id": "porta-alta-demais",
+      "expressao": "min(1, portas) * ((((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - min(1, (min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas))) * (((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - alturaDasPortas)) - 6 + (1 - min(1, frente)) * (2 * painel + 3) - 2400) <= 0",
+      "motivo": "a porta de MDF mais alta que 2400 mm empena e passa do que cinco dobradiças seguram; reduza a altura, suba o rodapé ou pare as portas antes do topo com alturaDasPortas"
+    },
+    {
+      "id": "prateleiras-cabem-atras-das-portas",
+      "expressao": "min(1, portas) * (1 - min(1, (min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas)))) * ((((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - cabideiro * (1 - max(0, min(1, portas - 2))) * 1120 - prateleiras * painel) / (prateleiras + 1) - 150) >= 0",
+      "motivo": "o vão entre duas prateleiras (e entre o piso da zona e a primeira) fica abaixo de 150 mm, que não guarda nada; com o cabideiro no vão inteiro (até duas portas) as prateleiras ficam só abaixo da roupa pendurada, que ocupa 1120 mm sob o teto da zona"
+    },
+    {
+      "id": "prateleiras-cabem-no-vao-aberto",
+      "expressao": "min(1, portas) * min(1, (min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas))) * (((min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas)) - prateleiras * painel) / (prateleiras + 1) - 150) >= 0",
+      "motivo": "o vão entre duas prateleiras do vão aberto (e entre o painel de baixo e a primeira) fica abaixo de 150 mm, que não guarda nada, e o vão aberto sem prateleira também pede 150 mm; use menos prateleiras, deixe o vão aberto mais alto ou use alturaDasPortas 0 para as portas irem até o topo"
+    },
+    {
+      "id": "prateleiras-cabem-no-movel-aberto",
+      "expressao": "(1 - min(1, portas)) * (1 - min(1, gavetas)) * (((altura - rodape - 2 * painel) - prateleiras * painel) / (prateleiras + 1) - 150) >= 0",
+      "motivo": "o vão entre duas prateleiras do móvel aberto (e entre a base e a primeira) fica abaixo de 150 mm, que não guarda nada; use menos prateleiras ou um móvel mais alto"
+    },
+    {
+      "id": "prateleiras-sem-lugar",
+      "expressao": "(1 - min(1, portas)) * min(1, gavetas) * prateleiras <= 0",
+      "motivo": "sem portas, as gavetas ocupam a altura toda e não sobra vão para prateleira; use prateleiras 0 ou acrescente portas"
+    },
+    {
+      "id": "cabideiro-sem-porta",
+      "expressao": "cabideiro * (1 - min(1, portas)) <= 0",
+      "motivo": "o cabideiro fica na zona das portas, que não existe sem portas; use cabideiro 0 ou acrescente portas"
+    },
+    {
+      "id": "cabideiro-cabe-sob-o-vao-aberto",
+      "expressao": "min(1, portas) * min(1, (min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas))) * cabideiro * (1 - max(0, min(1, portas - 2))) * (1270 - (((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - min(1, (min(1, alturaDasPortas) * max(0, ((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - painel - alturaDasPortas))) * (((altura - rodape - 2 * painel) - min(1, gavetas) * (gavetas * alturaDaGaveta + (gavetas + 1) * 3) - min(1, gavetas) * painel) - alturaDasPortas))) <= 0",
+      "motivo": "o cabideiro no vão inteiro da zona das portas ocupa 1120 mm sob o teto dela e deixa 150 mm de folga; a zona das portas fica abaixo de 1270 mm"
+    },
+    {
+      "id": "gaveta-baixa-demais",
+      "expressao": "(1 - min(1, portas)) * min(1, gavetas) * (80 - ((altura - rodape - 2 * painel) - (gavetas + 1) * 3) / max(1, gavetas)) <= 0",
+      "motivo": "sem portas as gavetas dividem a altura toda e cada frente fica abaixo de 80 mm; use menos gavetas ou um móvel mais alto"
+    },
+    {
+      "id": "vao-interno-baixo-demais",
+      "expressao": "(altura - rodape - 2 * painel) >= 200",
+      "motivo": "o vão interno entre a base e o tampo fica abaixo de 200 mm; aumente a altura ou reduza o rodapé"
+    },
+    {
+      "id": "pes-baixos-demais",
+      "expressao": "pes * (60 - rodape) <= 0",
+      "motivo": "o pé mais baixo que 60 mm não aparece embaixo do corpo; use rodape de 60 mm para cima ou pes 0"
+    },
+    {
+      "id": "rodape-fino-demais",
+      "expressao": "min(1, rodape) * (40 - rodape) <= 0",
+      "motivo": "o rodapé mais baixo que 40 mm não se distingue da base; use 0 (sem rodapé) ou 40 mm para cima"
+    }
+  ],
+  "portas": [
+    { "id": "base-do-corpo", "tipo": "plano", "papel": "apoia" }
+  ],
+  "ferramentas": ["articula", "booleana", "casca", "guia", "movel", "repete"],
+  "perguntas": {
+    "corpo": [
+      "O corpo se lê como uma caixa de parede uniforme, aberta na frente, sobre o rodapé recuado na frente e no fundo, sobre quatro pés cônicos ou sem base, conforme o móvel?",
+      "Os painéis horizontais que separam a coluna de gavetas, a zona das portas e o vão aberto vão de lateral a lateral, e a divisória, quando há, vai do fundo à frente e de um painel ao outro?",
+      "As prateleiras ocupam a largura do vão e param antes da frente, e o cabideiro é um tubo horizontal de ponta a ponta do vão, perto do teto da zona das portas?",
+      "O vão aberto, quando há, está sem porta e é onde ficam as prateleiras da estante?"
+    ],
+    "portas": [
+      "As portas têm a mesma largura e a mesma altura, com 3 mm de folga em volta e entre si, e ficam à ras da frente do corpo (embutidas) ou cobrem a frente dele, 2 mm à frente (sobrepostas)?",
+      "Cada porta tem um puxador vertical perto da borda livre?"
+    ],
+    "gavetas": [
+      "Cada gaveta tem frente, duas laterais, traseira e fundo, e um puxador horizontal no meio da frente?",
+      "As frentes das gavetas têm a mesma altura e 3 mm de folga entre si, e a coluna de gavetas está no mesmo plano das portas?",
+      "Aberta no fim do curso, cada gaveta sai reta para a frente, e o trilho do corpo continua dentro do rasgo de cada lateral dela?"
+    ],
+    "dobradicas": [
+      "Cada porta tem as suas dobradiças na borda que gira; nas embutidas elas não aparecem por fora da lateral nem da divisória, e nas sobrepostas o tambor fica no canto da face externa da lateral?",
+      "Nas portas que giram na divisória, as dobradiças de uma face e as da outra ficam em alturas diferentes?"
+    ]
+  },
+  "perfis": {
+    "roupeiro": {
+      "descricao": "Roupeiro de duas portas de abrir embutidas entre as laterais, com quatro prateleiras, cabideiro e rodapé: o que a família fazia antes de ganhar gavetas, portas sobrepostas, pés e vão aberto.",
+      "parametros": { "largura": 1600, "altura": 2200, "profundidade": 550, "portas": 2, "frente": 1 }
+    },
+    "guarda-roupa": {
+      "descricao": "Guarda-roupa de casal de duas portas sobrepostas, com cabideiro e duas prateleiras sobre uma coluna de duas gavetas, no rodapé.",
+      "parametros": { "largura": 1500, "altura": 2200, "profundidade": 600, "painel": 18, "portas": 2, "frente": 0, "prateleiras": 2, "cabideiro": 1, "rodape": 80, "gavetas": 2, "alturaDaGaveta": 160 }
+    },
+    "guarda-roupa-de-correr": {
+      "descricao": "Guarda-roupa de correr de três folhas em camadas, com cabideiro e duas prateleiras sobre uma coluna de duas gavetas de frente embutida, no rodapé.",
+      "parametros": { "largura": 1800, "altura": 2200, "profundidade": 600, "painel": 18, "portas": 3, "frente": 2, "prateleiras": 2, "cabideiro": 1, "rodape": 80, "gavetas": 2, "alturaDaGaveta": 160 }
+    },
+    "armario-de-cozinha-aereo": {
+      "descricao": "Armário aéreo de cozinha de duas portas sobrepostas e uma prateleira, sem rodapé nem pés.",
+      "parametros": { "largura": 800, "altura": 700, "profundidade": 330, "painel": 15, "portas": 2, "frente": 0, "prateleiras": 1, "rodape": 0, "cabideiro": 0 }
+    },
+    "armario-de-cozinha-de-chao": {
+      "descricao": "Armário de chão de cozinha: uma gaveta em cima, duas portas sobrepostas embaixo com uma prateleira, sobre o rodapé.",
+      "parametros": { "largura": 800, "altura": 880, "profundidade": 560, "painel": 18, "portas": 2, "frente": 0, "prateleiras": 1, "rodape": 100, "cabideiro": 0, "gavetas": 1, "alturaDaGaveta": 160, "gavetasEmCima": 1 }
+    },
+    "comoda": {
+      "descricao": "Cômoda de quatro gavetas de frente sobreposta, que dividem a altura toda, sobre quatro pés.",
+      "parametros": { "largura": 1000, "altura": 850, "profundidade": 480, "painel": 18, "portas": 0, "frente": 0, "prateleiras": 0, "rodape": 120, "pes": 1, "cabideiro": 0, "gavetas": 4 }
+    },
+    "criado-mudo": {
+      "descricao": "Criado-mudo com uma gaveta em cima e uma porta sobreposta embaixo, sobre quatro pés.",
+      "parametros": { "largura": 450, "altura": 650, "profundidade": 400, "painel": 15, "portas": 1, "frente": 0, "prateleiras": 0, "rodape": 100, "pes": 1, "cabideiro": 0, "gavetas": 1, "alturaDaGaveta": 120, "gavetasEmCima": 1 }
+    },
+    "estante-com-portas": {
+      "descricao": "Estante com duas portas sobrepostas embaixo e o vão aberto em cima, com três prateleiras, sobre o rodapé.",
+      "parametros": { "largura": 900, "altura": 1800, "profundidade": 330, "painel": 18, "portas": 2, "frente": 0, "prateleiras": 3, "rodape": 60, "cabideiro": 0, "alturaDasPortas": 586 }
+    },
+    "gaveteiro": {
+      "descricao": "Gaveteiro de cinco gavetas de frente embutida, que dividem a altura toda, sobre o rodapé.",
+      "parametros": { "largura": 450, "altura": 800, "profundidade": 450, "painel": 18, "portas": 0, "frente": 1, "prateleiras": 0, "rodape": 60, "cabideiro": 0, "gavetas": 5 }
+    }
+  }
+}
+

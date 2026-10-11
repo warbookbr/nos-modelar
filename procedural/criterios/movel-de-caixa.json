@@ -8,8 +8,8 @@
       "condicao": { "componente": ["dobradica"], "forma": ["*dobradica*", "*pino*"] }
     },
     {
-      "texto": "Que parte da frente do corpo fica descoberta, e a partir de qual borda cada porta gira?",
-      "condicao": { "componente": ["porta"], "forma": ["*porta*"] }
+      "texto": "Que parte da frente do corpo fica descoberta, e a partir de qual borda cada porta gira, ou em que trilho, no teto e no piso, desliza cada folha de correr?",
+      "condicao": { "componente": ["porta"], "forma": ["*porta*", "*correr*"] }
     },
     {
       "texto": "Por onde cada gaveta entra e sai, e em que peças do corpo ela se apoia?",

@@ -335,3 +335,125 @@ export function conferirArticulacoes(montagemResolvida, declaracoes, opcoes = {}
     .sort((a, b) => compararTexto(a.articulacao, b.articulacao));
   return { ok: resultados.every((r) => r.ok), resultados };
 }
+
+export const FORMATO_CONFERENCIA_SIMULTANEA = 'mecanifica.conferencia-aberturas-simultaneas';
+export const VERSAO_CONFERENCIA_SIMULTANEA = 1;
+
+/**
+ * Várias articulações abertas ao mesmo tempo. `conferirArticulacao` leva uma articulação por vez ao longo do curso com as
+ * demais peças paradas; aqui cada articulação vai ao meio do curso e ao fim dele, e para cada par de articulações e cada
+ * combinação dessas posições as peças que uma move são medidas contra as que a outra move, pela mesma régua do contato de
+ * sólidos. Uma porta aberta junto de uma gaveta aberta, ou duas portas vizinhas abertas, entram aqui; o par de uma
+ * articulação com as peças que nenhuma move já está na conferência de cada uma. Lança `ErroArticulacao` quando uma
+ * declaração é inválida ou não se prende às portas das peças, ou quando duas articulações movem a mesma peça. A colisão não
+ * lança: volta em `ok: false`, com `colisoes` e `recusa`.
+ */
+export function conferirAberturasSimultaneas(montagemResolvida, declaracoes, opcoes = {}) {
+  if (!montagemResolvida || !Array.isArray(montagemResolvida.instancias)) throw new TypeError('conferir aberturas simultâneas: montagem resolvida inválida.');
+  if (!Array.isArray(declaracoes)) throw new TypeError('conferir aberturas simultâneas: as declarações precisam ser uma lista.');
+  if (!opcoes || typeof opcoes !== 'object' || Array.isArray(opcoes)) throw new TypeError('conferir aberturas simultâneas: opções inválidas.');
+  const extras = Object.keys(opcoes).filter((c) => c !== 'toleranciaNumerica');
+  if (extras.length) throw new Error(`conferir aberturas simultâneas: opção desconhecida '${extras[0]}'.`);
+  const tolerancia = exigirToleranciaDeContato(opcoes.toleranciaNumerica
+    ?? montagemResolvida.auditoriaIntersecoes?.toleranciaNumerica
+    ?? TOLERANCIA_CONTATO_SOLIDO, 'conferir aberturas simultâneas');
+  const folhas = folhasDaMontagem(montagemResolvida);
+
+  const preparadas = declaracoes.map((declaracao) => {
+    const { articulacao, si } = lerArticulacao(declaracao);
+    const onde = `articulacao.${articulacao.id}`;
+    const folhaFixa = folhaDoCaminho(folhas, articulacao.fixo.caminho, `${onde}.fixo`);
+    folhaDoCaminho(folhas, articulacao.movel.caminho, `${onde}.movel`);
+    const prefixosMoveis = [articulacao.movel.caminho, ...articulacao.acompanham];
+    const moveis = folhas.filter((folha) => prefixosMoveis.some((prefixo) => comecaCom(folha.caminho, prefixo)));
+    const portaFixa = eixoDaPorta(folhaFixa, articulacao.fixo.porta, `${onde}.fixo.porta`);
+    const fator = UNIDADES_DO_CURSO[articulacao.tipo][articulacao.unidade];
+    const meio = si.curso.minimo + (si.curso.maximo - si.curso.minimo) / 2;
+    return {
+      articulacao, si, moveis, direcao: portaFixa.eixo, centro: portaFixa.centro,
+      posicoes: [meio, si.curso.maximo].map((valor) => ({ valor, declarado: limpo(Number((valor / fator).toPrecision(12))) })),
+    };
+  });
+  const ids = new Set();
+  for (const { articulacao } of preparadas) {
+    if (ids.has(articulacao.id)) falhar('articulacao-duplicada', `articulacao.${articulacao.id}`, `ID '${articulacao.id}' duplicado.`);
+    ids.add(articulacao.id);
+  }
+  const caminhosDeCada = preparadas.map(({ moveis }) => new Set(moveis.map((folha) => chave(folha.caminho))));
+  for (let i = 0; i < preparadas.length; i += 1) for (let j = i + 1; j < preparadas.length; j += 1) {
+    const comum = [...caminhosDeCada[i]].find((c) => caminhosDeCada[j].has(c));
+    if (comum) falhar('peca-movida-por-duas', `articulacao.${preparadas[j].articulacao.id}`, `a peça ${comum} é movida por '${preparadas[i].articulacao.id}' e por '${preparadas[j].articulacao.id}'; a conferência simultânea pede articulações que movem peças diferentes.`);
+  }
+
+  const memoria = new Map();
+  function solidoNoValor(indice, folha, valor) {
+    const k = `${indice}|${chave(folha.caminho)}|${valor}`;
+    if (!memoria.has(k)) {
+      const { articulacao, direcao, centro } = preparadas[indice];
+      const base = poseBase(folha);
+      let pose;
+      if (articulacao.tipo === 'prismatica') pose = { escala: 1, rotacao: base.rotacao, deslocamento: soma(base.deslocamento, mult(direcao, valor)) };
+      else {
+        const giro = rotacaoEmTorno(direcao, valor);
+        pose = { escala: 1, rotacao: multiplicar(giro, base.rotacao), deslocamento: soma(aplicar(giro, sub(base.deslocamento, centro)), centro) };
+      }
+      memoria.set(k, prepararSolido(folha.definicao?.neutro, pose, folha.caminho));
+    }
+    return memoria.get(k);
+  }
+
+  const colisoes = [];
+  const inconclusivos = [];
+  const resumoDosPares = [];
+  let combinacoes = 0;
+  let paresDeSolidos = 0;
+  for (let i = 0; i < preparadas.length; i += 1) for (let j = i + 1; j < preparadas.length; j += 1) {
+    const a = preparadas[i]; const b = preparadas[j];
+    const folga = Math.max(a.si.folga, b.si.folga);
+    let pior = 'separadas'; let nColisoes = 0;
+    for (const pa of a.posicoes) for (const pb of b.posicoes) {
+      combinacoes += 1;
+      for (const fa of a.moveis) for (const fb of b.moveis) {
+        paresDeSolidos += 1;
+        const sa = solidoNoValor(i, fa, pa.valor);
+        const sb = solidoNoValor(j, fb, pb.valor);
+        const resultado = auditarParDeSolidos(sa, sb, tolerancia);
+        if (resultado.estado === 'inconclusivo') {
+          inconclusivos.push({ a: a.articulacao.id, b: b.articulacao.id, pecaA: fa.caminho, pecaB: fb.caminho, diagnosticos: resultado.diagnosticos });
+          pior = 'inconclusivo';
+          continue;
+        }
+        if (resultado.estado === 'interpenetram') {
+          if (pior !== 'inconclusivo') pior = 'interpenetram';
+          const penetracao = profundidadeDeInterpenetracao(sa, sb, tolerancia);
+          if (penetracao === null || penetracao > folga) {
+            nColisoes += 1;
+            colisoes.push({
+              a: a.articulacao.id, valorA: pa.declarado, b: b.articulacao.id, valorB: pb.declarado, pecaA: fa.caminho, pecaB: fb.caminho,
+              penetracao: penetracao === null ? null : limpo(penetracao),
+            });
+          }
+        } else if (resultado.estado === 'encostam' && pior === 'separadas') pior = 'encostam';
+      }
+    }
+    if (pior !== 'separadas') resumoDosPares.push({ a: a.articulacao.id, b: b.articulacao.id, estadoMaisGrave: pior, colisoes: nColisoes });
+  }
+
+  const unidadeDe = (id) => preparadas.find((x) => x.articulacao.id === id).articulacao.unidade;
+  const recusa = colisoes.map((c) => `articulações '${c.a}' (${c.valorA} ${unidadeDe(c.a)}) e '${c.b}' (${c.valorB} ${unidadeDe(c.b)}) abertas ao mesmo tempo: ${chave(c.pecaA)} ${c.penetracao === null ? 'cruza' : `penetra ${mm(c.penetracao)}`} ${chave(c.pecaB)}.`);
+  for (const inc of inconclusivos) recusa.push(`articulações '${inc.a}' e '${inc.b}': o par ${chave(inc.pecaA)} e ${chave(inc.pecaB)} é inconclusivo (${inc.diagnosticos.join(', ')}); malha aberta não recebe veredito.`);
+  return {
+    formato: FORMATO_CONFERENCIA_SIMULTANEA,
+    versao: VERSAO_CONFERENCIA_SIMULTANEA,
+    ok: colisoes.length === 0 && inconclusivos.length === 0,
+    articulacoes: preparadas.map(({ articulacao, posicoes }) => ({ id: articulacao.id, unidade: articulacao.unidade, posicoes: posicoes.map((p) => p.declarado) })),
+    toleranciaNumerica: tolerancia,
+    paresDeArticulacoes: (preparadas.length * (preparadas.length - 1)) / 2,
+    combinacoes,
+    paresDeSolidos,
+    colisoes,
+    inconclusivos,
+    pares: resumoDosPares,
+    recusa,
+  };
+}

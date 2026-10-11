@@ -10,11 +10,14 @@
  *     resolvedor é assíncrono e a aprovação não é; a posição por porta usa as mesmas funções dele, `poseQueEncaixa` e
  *     `interfaceNoMundo`, e a prova de que as duas resoluções dão o mesmo curso está nos testes das famílias);
  *   - confere o curso de cada articulação com `conferirArticulacao`, sobre as malhas das peças;
+ *   - quando há mais de uma articulação (as portas e as gavetas de um móvel), confere também as aberturas simultâneas
+ *     (`conferirAberturasSimultaneas`): cada articulação no meio e no fim do curso, em todos os pares, as peças que uma move
+ *     contra as que a outra move;
  *   - guarda uma impressão da montagem (`hash`: a montagem, as articulações e a geometria de cada peça), que o gate
  *     `familias:check` compara sem repetir o curso, que leva dezenas de segundos por ponto. */
 import { neutroCanonico } from '../../procedural/nucleo/entrada.js';
 import { sha256Hex } from '../../procedural/nucleo/sha256.js';
-import { conferirArticulacao } from '../../src/autoria/conferir-articulacao.js';
+import { conferirAberturasSimultaneas, conferirArticulacao } from '../../src/autoria/conferir-articulacao.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { interfaceNoMundo, poseQueEncaixa } from '../../src/autoria/posicao-por-porta.js';
@@ -122,6 +125,21 @@ export function conferirMontagemDaFamilia(familia, parametros, execucao, { confe
       pares: relatorio.pares.map(({ movel, fixo, estadoMaisGrave }) => ({ movel, fixo, estadoMaisGrave })),
       conferido: relatorio.ok,
     });
+  }
+  if (gerada.articulacoes.length > 1) {
+    try {
+      const simultaneas = conferirAberturasSimultaneas(resolvida, gerada.articulacoes);
+      for (const linha of simultaneas.recusa) problemas.push(problema('abertura-simultanea-com-colisao', linha));
+      resumo.simultaneas = {
+        conferido: simultaneas.ok,
+        articulacoes: simultaneas.articulacoes,
+        combinacoes: simultaneas.combinacoes,
+        paresDeSolidos: simultaneas.paresDeSolidos,
+        colisoes: simultaneas.colisoes.length,
+      };
+    } catch (erro) {
+      problemas.push(problema('abertura-simultanea-invalida', `as articulações da montagem gerada não se conferem abertas ao mesmo tempo: ${erro.message}`));
+    }
   }
   return { problemas, resumo };
 }

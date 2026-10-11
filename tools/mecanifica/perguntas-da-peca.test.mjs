@@ -41,10 +41,10 @@ describe('perguntas da peça', () => {
   });
 
   it('com `familiaProcedural` o bloco começa pelas `perguntas` do familia.json, e a família desconhecida é recusada', async () => {
-    const r = await perguntasDaPecaArquivo('roupeiro-de-prova', { raiz: receitaComPlano({ familia: 'movel-de-caixa', familiaProcedural: 'roupeiro' }) });
+    const r = await perguntasDaPecaArquivo('roupeiro-de-prova', { raiz: receitaComPlano({ familia: 'movel-de-caixa', familiaProcedural: 'movel-de-caixa' }) });
     expect(r.componente.length).toBeGreaterThan(0);
     expect(r.todas.slice(0, r.componente.length)).toEqual(r.componente);
-    await expect(perguntasDaPecaArquivo('roupeiro-de-prova', { raiz: receitaComPlano({ familiaProcedural: 'inexistente' }) })).rejects.toThrow(/não é uma família registrada \(.*roupeiro/);
+    await expect(perguntasDaPecaArquivo('roupeiro-de-prova', { raiz: receitaComPlano({ familiaProcedural: 'inexistente' }) })).rejects.toThrow(/não é uma família registrada \(.*movel-de-caixa/);
   });
 
   it('o PLANO com `familia` desconhecida é recusado com as que existem', async () => {
