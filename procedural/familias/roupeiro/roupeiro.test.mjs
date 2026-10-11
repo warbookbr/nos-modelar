@@ -223,6 +223,40 @@ describe('a montagem v5 e o curso das portas', () => {
     expect(alem.primeirasColisoes[0].livreAte).toBeLessThan(170);
   }, 600_000);
 
+  /* a dobradiça é quiral: a porta da direita do vão usa a imagem espelhada (a móvel virada 180 graus em x e a fixa em z), e
+     abrir só a primeira porta não via a diferença; por isso cada porta abre no curso máximo e a da direita também passa de
+     110 até onde a da esquerda passa */
+  it('cada porta de duas portas abre no curso máximo, sem colisão, e a da direita é livre até o mesmo ângulo da da esquerda', () => {
+    const DUAS = { portas: 2, largura: 1000, altura: 1500, prateleiras: 2, cabideiro: 0 };
+    const montada = ROUPEIRO.montar(DUAS);
+    const { resolvida, problemas } = resolverMontagemDaFamilia(ROUPEIRO, DUAS, execucao);
+    expect(problemas).toEqual([]);
+    expect(montada.articulacoes).toHaveLength(2);
+    const livres = [];
+    for (const articulacao of montada.articulacoes) {
+      const r = conferirArticulacao(resolvida, articulacao);
+      expect(r.ok, r.recusa.join(' ')).toBe(true);
+      expect(r.posicoes.at(-1)).toMatchObject({ valor: 110, livre: true });
+      const alem = conferirArticulacao(resolvida, { ...articulacao, curso: { minimo: 0, maximo: 170 }, passos: 17 });
+      livres.push(alem.primeirasColisoes[0].livreAte);
+    }
+    expect(livres[0]).toBeGreaterThan(150);
+    expect(Math.abs(livres[0] - livres[1])).toBeLessThan(0.01);
+  }, 900_000);
+
+  it('as portas que giram na divisória abrem no curso máximo da conta, sem colisão, nas duas faces', () => {
+    const montada = ROUPEIRO.montar(QUATRO);
+    const { resolvida, problemas } = resolverMontagemDaFamilia(ROUPEIRO, QUATRO, execucao);
+    expect(problemas).toEqual([]);
+    const daDivisoria = montada.articulacoes.filter((_, k) => montada.geometria.portas[k].apoio.startsWith('divisoria'));
+    expect(daDivisoria.map(({ id }) => id)).toEqual(['abre-porta-2', 'abre-porta-3']);
+    for (const articulacao of daDivisoria) {
+      const r = conferirArticulacao(resolvida, articulacao);
+      expect(r.ok, r.recusa.join(' ')).toBe(true);
+      expect(r.posicoes.at(-1)).toMatchObject({ valor: articulacao.curso.maximo, livre: true });
+    }
+  }, 900_000);
+
   it('a mesma chamada dá a mesma montagem', () => {
     const a = resolverMontagemDaFamilia(ROUPEIRO, {}, execucao);
     const b = resolverMontagemDaFamilia(ROUPEIRO, {}, execucao);

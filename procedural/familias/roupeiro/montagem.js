@@ -91,8 +91,8 @@ export function montarRoupeiro(familia, parametros = {}) {
     porta.dobradicas.forEach((dobradica, k) => {
       const j = k + 1;
       const posicao = [dobradica.x, dobradica.y, dobradica.z];
-      const fixa = argumentosDaDobradica(geo, 'd', { giro: 90, posicao, eixo });
-      const movel = argumentosDaDobradica(geo, 'e', { giro: porta.vao === 1 ? 180 : 0, posicao, eixo });
+      const fixa = argumentosDaDobradica(geo, 'd', { giro: 90, posicao, eixo, viraEmZ: porta.vao === 1 ? 0 : 180 });
+      const movel = argumentosDaDobradica(geo, 'e', { giro: porta.vao === 1 ? 180 : 0, posicao, eixo, viraEmX: porta.vao === 1 ? 0 : 180 });
       receitas[refDaDobradica(numero, j, 'd')] = receitaDe(`dobradica-${numero}-${j}-fixa`, { id: 'fixa', composicao: ID_DA_DOBRADICA('d', nos, furos), argumentos: declarados(ID_DA_DOBRADICA('d', nos, furos), fixa) }, MATERIAIS_DO_ROUPEIRO);
       receitas[refDaDobradica(numero, j, 'e')] = receitaDe(`dobradica-${numero}-${j}-movel`, { id: 'movel', composicao: ID_DA_DOBRADICA('e', nos, furos), argumentos: declarados(ID_DA_DOBRADICA('e', nos, furos), movel) }, MATERIAIS_DO_ROUPEIRO);
       instancias.push({ id: idDaDobradica(numero, j, 'fixa'), alvo: { tipo: 'peca', ref: refDaDobradica(numero, j, 'd') } });
