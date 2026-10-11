@@ -897,7 +897,148 @@
       }
     }
   ],
-  "resultados": [],
+  "resultados": [
+    {
+      "imagem": "c03",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "rodaTraseira",
+              "tipo": "uniao",
+              "onde": "topo da roda, dentro da caçamba junto às paredes laterais",
+              "sentido": "atravessando",
+              "evidencia": "isométrica: arco preto sai do piso da caçamba perto da cabine; superior: duas barras escuras coladas às paredes internas da caçamba (y≈237–377); sem caixa de roda"
+            },
+            {
+              "parte": "rodaDianteira",
+              "tipo": "uniao",
+              "onde": "face interna da roda, entre ela e o chassi",
+              "sentido": "afastado",
+              "evidencia": "frontal: faixas externas x≈300–328 e 772–800 não encostam na placa do chassi (x≈352–746); sem eixo visível"
+            },
+            {
+              "parte": "rodaTraseira",
+              "tipo": "posicao",
+              "onde": "posição lateral do par traseiro em relação ao dianteiro",
+              "sentido": "atrasada",
+              "evidencia": "frontal: traseiras em x≈340–368 e 732–760, dentro da carroceria; dianteiras fora dela em x≈300–328 e 772–800; bitolas diferentes"
+            },
+            {
+              "parte": "roda",
+              "tipo": "superficie",
+              "onde": "as quatro rodas, vistas de lado",
+              "sentido": "segmentado",
+              "evidencia": "lateral: anéis vazados com o capô visível através do dianteiro; sem disco, cubo ou eixo"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "laterais e frente da caixa cinza",
+              "sentido": "faltando",
+              "evidencia": "isométrica, frontal e lateral: caixa maciça sem porta, janela, para-brisa, banco ou volante; não há por onde entrar"
+            },
+            {
+              "parte": "rodaDianteira",
+              "tipo": "posicao",
+              "onde": "topo do anel, acima do tampo do capô",
+              "sentido": "alta",
+              "evidencia": "lateral: topo do anel dianteiro ≈613, tampo do capô ≈625; anel invade a altura do capô sem caixa de roda"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "data": "2026-10-11T18:19:01.794Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "topo dos anéis, dentro da caçamba junto às paredes laterais",
+              "sentido": "atravessando",
+              "evidencia": "isométrica: arco escuro sobre o piso da caçamba (≈600–650, 495–540); superior: barras escuras sobre o piso cinza (x≈410–422 e 678–690, y≈237–377); sem caixa de roda"
+            },
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "posicao",
+              "onde": "bitola, deslocada para dentro em relação às dianteiras",
+              "sentido": "adiantada",
+              "evidencia": "frontal: rodas traseiras em x≈340–368 e 732–760 (420 px), dianteiras em x≈300–328 e 772–800 (500 px); lateral: roda traseira escondida pela parede da caçamba"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "faces laterais e frontal do bloco cinza",
+              "sentido": "faltando",
+              "evidencia": "isométrica, frontal e lateral: bloco cinza maciço sem para-brisa, janelas, porta nem assento; não há onde entrar nem onde sentar"
+            },
+            {
+              "parte": "rodasDianteiras",
+              "tipo": "uniao",
+              "onde": "ligação entre o anel e o corpo",
+              "sentido": "afastado",
+              "evidencia": "frontal e superior: anéis só encostam na lateral do corpo (x≈328/772 na frontal), sem eixo ou suporte visível"
+            },
+            {
+              "parte": "chassi",
+              "tipo": "uniao",
+              "onde": "bordas laterais da placa inferior",
+              "sentido": "atravessando",
+              "evidencia": "frontal: placa cinza x≈353–747, y≈700–725, invade a faixa das rodas traseiras (x≈340–368 e 732–760)"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "data": "2026-10-11T18:19:10.667Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "metade superior do anel, no piso e nas muretas laterais da caçamba",
+              "sentido": "atravessando",
+              "evidencia": "superior: tiras escuras dentro da caçamba em x 410-420 e 678-690, y 237-377; isométrica: arco preto dentro da caçamba em ~600-650, 495-540; lateral: topo do anel some atrás da mureta em x 680-760"
+            },
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "posicao",
+              "onde": "afastamento lateral em relação às rodas dianteiras",
+              "sentido": "alta",
+              "evidencia": "frontal: dianteiras por fora do corpo (x 300-328 e 772-800), traseiras por dentro da largura da caçamba (x 340-368 e 732-760)"
+            },
+            {
+              "parte": "eixos",
+              "tipo": "ausencia",
+              "onde": "entre cada roda e o chassi",
+              "sentido": "faltando",
+              "evidencia": "frontal e lateral: as rodas só encostam no corpo; a placa do chassi (frontal y 700-725) não chega às rodas dianteiras e é atravessada pelas traseiras"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "bloco cinza inteiro: porta, janela, para-brisa e posto de condução",
+              "sentido": "faltando",
+              "evidencia": "isométrica, lateral e frontal: bloco cinza liso sem nenhuma abertura; superior: teto claro sem vidro nem divisão"
+            },
+            {
+              "parte": "rodasDianteiras",
+              "tipo": "posicao",
+              "onde": "topo do anel acima da superfície do capô",
+              "sentido": "baixa",
+              "evidencia": "lateral: topo do anel em y 613 contra topo do capô em y 625, sem paralama; isométrica: anel aparece acima da borda do capô em ~330-370, 635-655"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "data": "2026-10-11T18:19:14.404Z"
+        }
+      ]
+    }
+  ],
   "prancha": {
     "arquivo": "prancha.png",
     "sha256": "sha256:dfd8fa2a78a952e6b3d50a266910e04d7447b3077f39cb77ddd2258c9c61e352"
