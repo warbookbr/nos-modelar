@@ -184,6 +184,20 @@ cada defeito `decide: medida` e nenhum outro (`esboco-medida:<nome>` do `--medid
 `npm run calibracao -- gerar` regrava as vistas, as impressões e a prancha. Os julgamentos ficam em
 `resultados`, vazio até a tarefa 6, e vazio o gate diz "calibração não medida".
 
+Para a tarefa 6 o `calibracao` ganhou três comandos, sem rodar nenhum crítico. `brief <id>` imprime o brief exato do
+crítico cego: o texto fixo do brief do objeto, as perguntas de forma do esboço (com a família de objeto do plano) ou do
+`familia.json`, os caminhos absolutos das quatro vistas pelo id `cNN` e a escala da nota; o gate reprova (`brief-vaza`)
+o objeto ou a pergunta que traga o nome da imagem, a restrição ou a razão do defeito. A picape ganhou o remendo
+`plano.familia: veiculo` para receber as perguntas de cabine e caçamba. `registrar <id> --arquivo <saida>` lê a resposta
+do crítico, que termina com o JSON do veredito, e grava em `resultados` um julgamento com a nota, os defeitos, a
+impressão do brief exato (sem o caminho do repositório) e a data, sob o agente e o brief fixo gravados; recusa resposta
+sem JSON válido, crítico que mudou e imagem que já tem todos os julgamentos. `resumo` e o gate pontuam: a imagem
+acerta quando a mediana cai na faixa, no máximo um julgamento sai dela, cada defeito `decide: critico` é citado por 4
+de 5 julgamentos (2 de 3 nas imagens comuns) e, no controle, no máximo um julgamento cita defeito estrutural; cita
+quem traz defeito de tipo em `tiposAceitos` ou palavra do defeito na `parte` ou no `onde`. O conjunto passa com 11 de 12 e as
+duas obrigatórias certas. O resumo registra a amplitude por imagem. Enquanto faltam julgamentos o gate diz quantos faltam por imagem
+e passa; com todos, reprova (`calibracao-nao-acerta`) o conjunto que não acerta.
+
 ## Desenho da fatia 9
 
 A pessoa decidiu em 2026-10-11: a família e o componente do esboço de mesmo nome

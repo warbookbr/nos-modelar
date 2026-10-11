@@ -11,7 +11,9 @@
  *
  * O validador é puro: lê o JSON e recusa o que o formato não aceita, com o campo, o valor e o que era aceito. Os hashes, as
  * imagens e as medidas são conferidos por `tools/mecanifica/calibracao-do-critico.mjs`, que é o gate `calibracao:check`. O campo
- * `resultados` fica vazio até a primeira rodada de julgamentos, e vazio o conjunto diz "calibração não medida". */
+ * `resultados` fica vazio até a primeira rodada de julgamentos, e vazio o conjunto diz "calibração não medida". Cada julgamento
+ * guarda a nota, os defeitos que o crítico apontou, a impressão do brief exato e a data; `extrairVeredito` lê a resposta do crítico
+ * e `pontuarImagem` e `pontuarConjunto` dizem se a imagem e o conjunto acertam, pela regra da tarefa 6 do desenho da fatia 8. */
 import { normalizarRazoesDaPeca } from './razoes-da-peca.js';
 import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
 
@@ -310,17 +312,65 @@ export function lerConjunto(bruto, { exigirGerados = true } = {}) {
   } else if (exigirGerados) recusar('conjunto.prancha', undefined, 'a prancha com as doze imagens, gravada pelo gerador');
 
   if (!Array.isArray(bruto.resultados)) recusar('conjunto.resultados', bruto.resultados, 'lista, vazia enquanto nenhum julgamento foi medido');
+  const recebidos = new Map();
   bruto.resultados.forEach((res, i) => {
     const onde = `conjunto.resultados[${i}]`;
     if (!plano(res)) recusar(onde, res, 'objeto { imagem, agenteSha256, briefSha256, julgamentos, ... }');
     if (!ids.has(res.imagem)) recusar(`${onde}.imagem`, res.imagem, `id de uma imagem do conjunto: ${[...ids].join(', ')}`);
     exigirSha(res.agenteSha256, `${onde}.agenteSha256`, true);
     exigirSha(res.briefSha256, `${onde}.briefSha256`, true);
-    if (!(Array.isArray(res.julgamentos) && res.julgamentos.length > 0 && res.julgamentos.every((j) => plano(j) && finito(j.nota) && j.nota >= 0 && j.nota <= 10))) {
-      recusar(`${onde}.julgamentos`, res.julgamentos, 'lista de julgamentos, cada um com `nota` de 0 a 10');
-    }
+    if (!(Array.isArray(res.julgamentos) && res.julgamentos.length > 0)) recusar(`${onde}.julgamentos`, res.julgamentos, 'lista de julgamentos, cada um com `nota`, `defeitos`, `briefSha256` e `data`');
+    res.julgamentos.forEach((j, k) => lerJulgamento(j, `${onde}.julgamentos[${k}]`));
+    const total = (recebidos.get(res.imagem) ?? 0) + res.julgamentos.length;
+    recebidos.set(res.imagem, total);
+    const esperados = imagens.find((m) => m.id === res.imagem).julgamentos;
+    if (total > esperados) recusar(`${onde}.julgamentos`, `${total} julgamentos de ${res.imagem}`, `no máximo ${esperados}, os que a regra pede para esta imagem`);
   });
   return bruto;
+}
+
+/* ---------- o julgamento do crítico ---------- */
+
+/** Um defeito como o `critico-visual` o devolve: cinco campos em texto. O vocabulário de tipo e sentido não é cobrado aqui: o que o crítico inventa fora dele é dado da calibração. */
+function lerDefeitoJulgado(d, onde) {
+  if (!plano(d)) recusar(onde, d, 'objeto { parte, tipo, onde, sentido, evidencia }');
+  for (const campo of ['parte', 'tipo', 'onde', 'sentido', 'evidencia']) {
+    if (!texto(d[campo])) recusar(`${onde}.${campo}`, d[campo], 'texto não vazio');
+  }
+  return { parte: d.parte.trim(), tipo: d.tipo.trim(), onde: d.onde.trim(), sentido: d.sentido.trim(), evidencia: d.evidencia.trim() };
+}
+
+/** Um julgamento gravado: a nota, os defeitos, a impressão do brief exato que o crítico leu e a data. */
+export function lerJulgamento(j, onde = 'julgamento') {
+  if (!plano(j)) recusar(onde, j, 'objeto { nota, defeitos, briefSha256, data }');
+  if (!(finito(j.nota) && j.nota >= 0 && j.nota <= 10)) recusar(`${onde}.nota`, j.nota, 'número de 0 a 10');
+  if (!Array.isArray(j.defeitos)) recusar(`${onde}.defeitos`, j.defeitos, 'lista de defeitos, vazia quando o crítico não achou nenhum');
+  j.defeitos.forEach((d, i) => lerDefeitoJulgado(d, `${onde}.defeitos[${i}]`));
+  exigirSha(j.briefSha256, `${onde}.briefSha256`, true);
+  if (!(texto(j.data) && !Number.isNaN(Date.parse(j.data)))) recusar(`${onde}.data`, j.data, 'data e hora em ISO 8601');
+  return j;
+}
+
+/**
+ * Lê a resposta do crítico: o texto termina com um JSON no formato do `critico-visual` (`nota` e `defeitos`, cada defeito com
+ * `parte`, `tipo`, `onde`, `sentido` e `evidencia`; `alvo` e `observacao` passam sem ser cobrados). Vale o primeiro `{` do texto a
+ * partir do qual o resto, tirada a cerca de código final, é um JSON; o que vem antes é a análise e não é lido. Devolve
+ * `{ nota, defeitos }`.
+ */
+export function extrairVeredito(resposta) {
+  if (typeof resposta !== 'string' || resposta.trim() === '') recusar('resposta do crítico', resposta, 'texto que termina com o JSON do veredito');
+  const cauda = resposta.trim().replace(/```\s*$/, '').trim();
+  let bruto = null;
+  for (let i = cauda.indexOf('{'); i !== -1 && bruto === null; i = cauda.indexOf('{', i + 1)) {
+    try {
+      const lido = JSON.parse(cauda.slice(i));
+      if (plano(lido)) bruto = lido;
+    } catch { /* este `{` não abre o JSON final */ }
+  }
+  if (bruto === null) recusar('resposta do crítico', `${cauda.slice(-60)}`, 'texto que termina com um JSON válido { nota, defeitos }');
+  if (!(finito(bruto.nota) && bruto.nota >= 0 && bruto.nota <= 10)) recusar('veredito.nota', bruto.nota, 'número de 0 a 10');
+  if (!Array.isArray(bruto.defeitos)) recusar('veredito.defeitos', bruto.defeitos, 'lista de defeitos { parte, tipo, onde, sentido, evidencia }');
+  return { nota: bruto.nota, defeitos: bruto.defeitos.map((d, i) => lerDefeitoJulgado(d, `veredito.defeitos[${i}]`)) };
 }
 
 /* ---------- leituras do conjunto lido ---------- */
@@ -351,5 +401,90 @@ export function resumoDoConjunto(conjunto) {
     frase: conjunto.resultados.length === 0
       ? `calibração não medida: nenhuma das ${conjunto.imagens.length} imagens tem julgamento do crítico (resultados vazio)`
       : `calibração medida em ${julgadas.size} de ${conjunto.imagens.length} imagens`,
+  };
+}
+
+/* ---------- a pontuação ---------- */
+
+/** Quantos julgamentos de uma imagem podem sair da faixa da nota. */
+export const FORA_DA_FAIXA_ACEITO = 1;
+/** Quantos julgamentos do controle podem citar defeito estrutural. */
+export const ESTRUTURAIS_ACEITOS_NO_CONTROLE = 1;
+/** Quantos julgamentos têm de citar cada defeito do crítico: 4 de 5 na imagem-chave e 2 de 3 nas outras. */
+export const CITACOES_MINIMAS = Object.freeze({ chave: 4, outras: 2 });
+
+/** Minúsculas e sem acento, para comparar palavras do crítico com as do conjunto. */
+export const dobrar = (t) => String(t).normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const estrutural = (julgamento) => julgamento.defeitos.some((d) => d.tipo !== 'superficie');
+
+/**
+ * O julgamento cita o defeito esperado quando traz um defeito com `tipo` entre os `tiposAceitos` (ou o próprio tipo, sem a lista)
+ * ou quando alguma das `palavras` aparece na `parte` ou no `onde` de um defeito dele, sem distinguir maiúscula nem acento.
+ */
+export function citaDefeito(julgamento, defeito) {
+  const aceitos = defeito.tiposAceitos ?? [defeito.tipo];
+  const palavras = (defeito.palavras ?? []).map(dobrar);
+  return julgamento.defeitos.some((d) => aceitos.includes(d.tipo) || palavras.some((p) => dobrar(d.parte).includes(p) || dobrar(d.onde).includes(p)));
+}
+
+const mediana = (notas) => {
+  const o = [...notas].sort((a, b) => a - b);
+  const m = o.length >> 1;
+  return o.length % 2 ? o[m] : (o[m - 1] + o[m]) / 2;
+};
+
+/**
+ * A pontuação de uma imagem sobre os julgamentos recebidos. `acerta` é nulo enquanto faltam julgamentos: os critérios já saem
+ * calculados sobre o que há, para o resumo, mas a imagem só acerta ou erra completa. Acerta quando a mediana cai na faixa, no
+ * máximo um julgamento sai dela, cada defeito de `decide: critico` é citado por pelo menos 4 de 5 julgamentos (2 de 3 nas imagens
+ * comuns) e, no controle, no máximo um julgamento cita defeito estrutural. A amplitude é a maior nota menos a menor.
+ */
+export function pontuarImagem(imagem, julgamentos) {
+  const notas = julgamentos.map((j) => j.nota);
+  const [minimo, maximo] = imagem.faixaDaNota;
+  const base = {
+    id: imagem.id, nome: imagem.nome, classe: imagem.classe, esperados: imagem.julgamentos, recebidos: julgamentos.length,
+    faltam: Math.max(0, imagem.julgamentos - julgamentos.length), completa: julgamentos.length >= imagem.julgamentos, notas,
+    faixa: [minimo, maximo],
+  };
+  if (julgamentos.length === 0) return { ...base, mediana: null, amplitude: null, criterios: null, motivos: [], acerta: null };
+  const m = mediana(notas);
+  const fora = notas.filter((n) => n < minimo || n > maximo).length;
+  const exigidas = imagem.chave ? CITACOES_MINIMAS.chave : CITACOES_MINIMAS.outras;
+  const estruturais = julgamentos.filter(estrutural).length;
+  const criterios = {
+    mediana: { valor: m, ok: m >= minimo && m <= maximo },
+    foraDaFaixa: { n: fora, maximo: FORA_DA_FAIXA_ACEITO, ok: fora <= FORA_DA_FAIXA_ACEITO },
+    citacoes: defeitosDoCritico(imagem).map((d) => {
+      const n = julgamentos.filter((j) => citaDefeito(j, d)).length;
+      return { parte: d.parte, tipo: d.tipo, n, minimo: exigidas, ok: n >= exigidas };
+    }),
+    estruturais: imagem.classe === 'controle' ? { n: estruturais, maximo: ESTRUTURAIS_ACEITOS_NO_CONTROLE, ok: estruturais <= ESTRUTURAIS_ACEITOS_NO_CONTROLE } : null,
+  };
+  const motivos = [];
+  if (!criterios.mediana.ok) motivos.push(`mediana ${m} fora da faixa ${minimo} a ${maximo}`);
+  if (!criterios.foraDaFaixa.ok) motivos.push(`${fora} julgamentos fora da faixa (no máximo ${FORA_DA_FAIXA_ACEITO})`);
+  for (const c of criterios.citacoes) if (!c.ok) motivos.push(`o defeito de '${c.parte}' foi citado em ${c.n} de ${imagem.julgamentos} julgamentos (mínimo ${c.minimo})`);
+  if (criterios.estruturais && !criterios.estruturais.ok) motivos.push(`${criterios.estruturais.n} julgamentos do controle citam defeito estrutural (no máximo ${ESTRUTURAIS_ACEITOS_NO_CONTROLE})`);
+  return { ...base, mediana: m, amplitude: Math.max(...notas) - Math.min(...notas), criterios, motivos, acerta: base.completa ? motivos.length === 0 : null };
+}
+
+/**
+ * A pontuação do conjunto. `estado`: `nao-medido` sem nenhum julgamento, `pendente` enquanto faltam julgamentos em alguma imagem
+ * (`faltam` diz quantos por imagem), e, com todos, `passa` ou `reprova`. Passa com `regra.passa.minimo` imagens acertadas e todas
+ * as obrigatórias entre elas.
+ */
+export function pontuarConjunto(conjunto) {
+  const imagens = conjunto.imagens.map((imagem) => pontuarImagem(imagem, conjunto.resultados.filter((r) => r.imagem === imagem.id).flatMap((r) => r.julgamentos)));
+  const faltam = Object.fromEntries(imagens.filter((i) => i.faltam > 0).map((i) => [i.id, i.faltam]));
+  const completo = imagens.every((i) => i.completa);
+  const acertos = imagens.filter((i) => i.acerta === true).length;
+  const { minimo, de, obrigatorias } = conjunto.regra.passa;
+  const obrigatoriasErradas = imagens.filter((i) => obrigatorias.includes(i.nome) && i.acerta !== true).map((i) => i.nome);
+  const medido = imagens.some((i) => i.recebidos > 0);
+  const passa = completo && acertos >= minimo && obrigatoriasErradas.length === 0;
+  return {
+    imagens, faltam, faltamNoTotal: Object.values(faltam).reduce((s, n) => s + n, 0), completo, acertos, minimo, de, obrigatoriasErradas,
+    estado: !medido ? 'nao-medido' : !completo ? 'pendente' : passa ? 'passa' : 'reprova',
   };
 }

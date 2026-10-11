@@ -20,7 +20,15 @@
  * os defeitos citam e por nenhuma outra, de modo que `decide` vale dos dois lados.
  *
  * `gerar` abre o navegador, grava as quatro vistas de cada imagem em `imagens/<id>/`, as impressões no conjunto e a prancha. Os
- * resultados dos julgamentos ficam em `resultados`, vazio até a primeira rodada, e vazio o gate passa dizendo "calibração não medida". */
+ * resultados dos julgamentos ficam em `resultados`, vazio até a primeira rodada, e vazio o gate passa dizendo "calibração não medida".
+ *
+ *   npm run calibracao -- brief <id>                                       o brief exato que o crítico cego recebe para a imagem
+ *   npm run calibracao -- registrar <id> --arquivo <saida-do-critico.txt>  grava o julgamento (a resposta termina com o JSON do veredito)
+ *   npm run calibracao -- resumo                                           a pontuação por imagem e a do conjunto
+ *
+ * A pontuação (`pontuarConjunto`, em `src/autoria/calibracao-do-critico.js`) entra no gate: enquanto faltam julgamentos o gate diz
+ * quantos faltam por imagem e passa; com todos, reprova se o conjunto não acerta. O gate também reprova o brief que conta o defeito
+ * ou a mutação e o julgamento dado a um brief que já não é o da imagem. */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -36,11 +44,14 @@ import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca } from '../../src/autoria/razoes-da-peca.js';
 import { TIPOS_DE_DEFEITO } from '../../src/autoria/veredito-de-forma.js';
 import {
-  ErroDeCalibracao, FORMATO_CALIBRACAO, LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO, lerConjunto, medidasEsperadas, resumoDoConjunto,
+  ErroDeCalibracao, FORMATO_CALIBRACAO, LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO, dobrar, extrairVeredito, lerConjunto, medidasEsperadas, pontuarConjunto,
+  resumoDoConjunto,
 } from '../../src/autoria/calibracao-do-critico.js';
+import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
+import { juntarPerguntas } from '../../src/autoria/perguntas-do-critico.js';
 import { ambienteDaExecucao, hashDe, MATERIAL_NEUTRO, pontosDaFamilia } from './aprovacao-da-familia.mjs';
 import {
-  ESCALA_DA_NOTA, MOTOR_DO_PNG, VISTAS_DA_ANALISE, desenhoParaPng, desenhosDoObjeto, linhasDoBriefDoObjeto,
+  ESCALA_DA_NOTA, MOTOR_DO_PNG, VISTAS_DA_ANALISE, desenhoParaPng, desenhosDoObjeto, linhasDoBriefDoObjeto, objetoDoEsboco,
 } from './esboco.mjs';
 import { blocoDasPerguntas } from './perguntas-da-peca.mjs';
 
@@ -55,6 +66,9 @@ const USO = [
   '  npm run calibracao:check',
   '  npm run calibracao -- gerar [--so=c01,c07] [--sem-prancha]',
   '  npm run calibracao -- listar',
+  '  npm run calibracao -- brief <id>',
+  '  npm run calibracao -- registrar <id> --arquivo <saida-do-critico.txt>',
+  '  npm run calibracao -- resumo',
 ].join('\n');
 
 export class ErroDeUso extends Error {}
@@ -97,6 +111,59 @@ export function modeloDoBrief() {
   };
 }
 export const hashDoBrief = () => sha256(JSON.stringify(modeloDoBrief()));
+
+/* ---------- o brief exato de uma imagem ---------- */
+
+const ABRE_O_BRIEF = '--- brief para o crítico cego ---';
+const FECHA_O_BRIEF = '--- fim do brief ---';
+
+/**
+ * O brief que o crítico cego recebe para uma imagem, o mesmo que o `--proximo` do esboço (ou o brief da peça) daria: o texto fixo do
+ * brief do objeto, as perguntas de forma (as do esboço, com a família de objeto que o plano escolhe, ou as do `familia.json` da
+ * família procedural da fonte), os caminhos absolutos das quatro vistas (pelo id neutro `cNN`) e a escala da nota, que é a última
+ * das cinco perguntas fixas. Só o trecho entre as marcas do brief: a instrução a quem despacha o crítico não é do crítico.
+ * A impressão (`sha256`) tira o caminho do repositório do texto, para valer em qualquer cópia dele.
+ * Devolve `{ texto, sha256, imagens, perguntas, objeto, variavel }`; `variavel` é o que muda de uma imagem para outra (objeto, perguntas e
+ * caminhos relativos), onde `vazamentosDoBrief` procura o defeito: o texto fixo é igual para todas e nomeia as categorias de defeito.
+ */
+export function briefDaImagem(imagem, { raiz = RAIZ } = {}) {
+  let objeto;
+  let perguntas;
+  if (imagem.fonte.tipo === 'esboco') {
+    const { bruto } = esbocoDaFonte(imagem.fonte, raiz);
+    objeto = objetoDoEsboco(bruto);
+    perguntas = perguntasDoEsboco(bruto).todas;
+  } else {
+    const familia = familiaRegistrada(imagem.fonte.familia);
+    objeto = `${imagem.objeto.titulo}: ${imagem.objeto.nota}`;
+    perguntas = juntarPerguntas(...Object.values(familia.contrato.perguntas ?? {}));
+  }
+  const imagens = VISTAS_DO_CONJUNTO.map((vista) => resolve(raiz, PASTA_DO_CONJUNTO, imagem.vistas?.[vista]?.arquivo ?? `imagens/${imagem.id}/${vista}.png`));
+  const linhas = linhasDoBriefDoObjeto({ objeto, anterior: [], imagens, perguntas });
+  const texto = `${linhas.slice(linhas.indexOf(ABRE_O_BRIEF) + 1, linhas.indexOf(FECHA_O_BRIEF)).join('\n')}\n`;
+  const caminhos = VISTAS_DO_CONJUNTO.map((vista) => `imagens/${imagem.id}/${vista}.png`);
+  return { texto, sha256: sha256(texto.replaceAll(resolve(raiz), '<raiz>')), imagens, perguntas, objeto, variavel: [objeto, ...perguntas, ...caminhos].join('\n') };
+}
+
+/* os sentidos de defeito que só se diriam ao descrever o defeito, e não a peça */
+const SENTIDOS_QUE_DENUNCIAM = ['anguloso', 'segmentado', 'facetado', 'atravessando', 'afastado', 'faltando'];
+
+/**
+ * O que, na parte variável do brief de uma imagem, conta o defeito ou a mutação: o nome descritivo da imagem (em hífen e em
+ * palavras), as restrições violadas, as razões que o defeito cita e os sentidos de defeito que só se usariam para descrevê-lo. As
+ * partes de `forma:` não entram, porque nomeiam parte da peça que o objeto cita sem culpa. Vazio quando o brief é cego.
+ */
+export function vazamentosDoBrief(imagem, variavel) {
+  const lido = dobrar(variavel);
+  const nomes = [imagem.nome, imagem.nome.replace(/-/g, ' ')];
+  const ids = [...(imagem.fonte.viola ?? []), ...imagem.defeitos.flatMap((d) => (d.medida ?? []).filter((m) => !m.startsWith('forma:')).map((m) => m.split(':').slice(1).join(':')))];
+  const sentidos = imagem.defeitos.map((d) => d.sentido).filter((s) => SENTIDOS_QUE_DENUNCIAM.includes(s));
+  const achados = [];
+  for (const [rotulo, lista] of [['o nome da imagem', nomes], ['a restrição ou a medida do defeito', ids], ['o sentido do defeito', sentidos]]) {
+    for (const palavra of new Set(lista)) if (lido.includes(dobrar(palavra))) achados.push(`${rotulo} '${palavra}'`);
+  }
+  return achados;
+}
 
 /** O vocabulário de defeito que o agente escreve (`- **tipo** — ...: `sentido`, ...`), por tipo. */
 export function vocabularioDoAgente(texto) {
@@ -391,6 +458,18 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
     } else if (p.baseSha256 !== undefined && p.baseSha256 === p.fonteSha256) {
       reprovar(quem, 'mutacao-sem-efeito', 'a mutação declarada não muda a geometria do ponto de partida');
     }
+    try {
+      const brief = briefDaImagem(imagem, { raiz });
+      const vazou = vazamentosDoBrief(imagem, brief.variavel);
+      if (vazou.length) reprovar(quem, 'brief-vaza', `o brief que o crítico cego recebe conta o defeito: ${vazou.join('; ')}`);
+      for (const res of conj.resultados.filter((r) => r.imagem === imagem.id)) {
+        const outros = res.julgamentos.filter((j) => j.briefSha256 !== brief.sha256).length;
+        if (outros) reprovar(quem, 'julgamento-de-outro-brief', `${outros} julgamento(s) foram dados a outro brief que o desta imagem hoje (perguntas, caminhos ou objeto mudaram): refaça-os`);
+      }
+    } catch (erro) {
+      if (!(erro instanceof ErroDaFonte || erro instanceof ErroDeCalibracao || (erro && erro.name === 'ErroDeEsboco'))) throw erro;
+      reprovar(quem, 'brief-nao-sai', erro.message);
+    }
     const esperadas = medidasEsperadas(imagem);
     if (JSON.stringify(p.medidas) !== JSON.stringify(esperadas)) {
       const faltam = esperadas.filter((id) => !p.medidas.includes(id));
@@ -408,7 +487,13 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
     if (!existsSync(caminho)) reprovar(null, 'prancha-ausente', `${prancha.arquivo} não existe`);
     else if (sha256(readFileSync(caminho)) !== prancha.sha256) reprovar(null, 'prancha-diferente', `${prancha.arquivo} não é o arquivo gravado; gere a prancha de novo com \`npm run calibracao -- gerar\``);
   }
-  return { ok: problemas.length === 0, problemas, conjunto: conj, resumo, medidasConferidas, conferidas: ids ?? conj.imagens.map((i) => i.id) };
+  /* a pontuação: enquanto faltam julgamentos o gate só conta o que falta; com todos, o conjunto tem de acertar */
+  const pontuacao = ids ? null : pontuarConjunto(conj);
+  if (pontuacao?.estado === 'reprova') {
+    reprovar(null, 'calibracao-nao-acerta', `o crítico acerta ${pontuacao.acertos} de ${pontuacao.de} imagens (mínimo ${pontuacao.minimo})${pontuacao.obrigatoriasErradas.length ? `, e erra a obrigatória ${pontuacao.obrigatoriasErradas.join(', ')}` : ''}: `
+      + `${pontuacao.imagens.filter((i) => i.acerta === false).map((i) => `${i.id} ${i.nome} (${i.motivos.join('; ')})`).join(' | ')}`);
+  }
+  return { ok: problemas.length === 0, problemas, conjunto: conj, resumo, pontuacao, medidasConferidas, conferidas: ids ?? conj.imagens.map((i) => i.id) };
 }
 
 export function conferir(opcoes = {}, saida = console) {
@@ -430,7 +515,93 @@ export function conferir(opcoes = {}, saida = console) {
   saida.log(`calibracao:check ok — ${resultado.conferidas.length} de ${resumo.imagens} imagens (${classes}): formato válido, o desenho de cada fonte e os arquivos batem com o gravado, `
     + `${resultado.medidasConferidas} defeito(s) da medida reprovado(s) por ela sem chegar ao crítico, agente e brief iguais aos gravados.`);
   saida.log(resumo.frase);
+  if (resultado.pontuacao) saida.log(linhaDoEstado(resultado.pontuacao));
   return 0;
+}
+
+/** O estado da pontuação em uma linha: o que falta por imagem enquanto falta, ou o veredito do conjunto quando estão todos. */
+export function linhaDoEstado(pontuacao) {
+  if (pontuacao.estado === 'nao-medido' || pontuacao.estado === 'pendente') {
+    const faltam = Object.entries(pontuacao.faltam).map(([id, n]) => `${id} ${n}`).join(', ');
+    return `pontuação pendente: faltam ${pontuacao.faltamNoTotal} julgamentos (${faltam}); o gate passa até que estejam todos.`;
+  }
+  return `pontuação: o crítico acerta ${pontuacao.acertos} de ${pontuacao.de} imagens (mínimo ${pontuacao.minimo}), com as obrigatórias ${pontuacao.obrigatoriasErradas.length ? 'erradas' : 'certas'}.`;
+}
+
+/* ---------- brief, registrar e resumo ---------- */
+
+function imagemPorId(conj, id) {
+  if (typeof id !== 'string' || id === '') throw new ErroDeUso(`diga o id da imagem (${conj.imagens.map((i) => i.id).join(', ')}).`);
+  const achada = conj.imagens.find((i) => i.id === id);
+  if (!achada) throw new ErroDeUso(`'${id}' não está no conjunto (${conj.imagens.map((i) => i.id).join(', ')}).`);
+  return achada;
+}
+
+/** `brief <id>`: imprime o brief exato que o crítico cego recebe para a imagem. */
+export function brief({ id, raiz = RAIZ }, saida = console) {
+  const conj = lerConjuntoDoDisco({ raiz });
+  const imagem = imagemPorId(conj, id);
+  const { texto, variavel } = briefDaImagem(imagem, { raiz });
+  const vazou = vazamentosDoBrief(imagem, variavel);
+  if (vazou.length) throw new ErroDaFonte(`o brief de ${id} conta o defeito (${vazou.join('; ')}); corrija o objeto ou as perguntas antes de despachar o crítico`);
+  saida.log(texto.trimEnd());
+  return 0;
+}
+
+/**
+ * `registrar <id> --arquivo <saida>`: lê a resposta do crítico, que termina com o JSON do veredito, e grava um julgamento em
+ * `resultados` com a nota, os defeitos, a impressão do brief exato, a data e as impressões do agente e do brief fixo. Recusa
+ * resposta sem JSON válido, o crítico que mudou desde a calibração e a imagem que já tem todos os julgamentos.
+ */
+export function registrar({ id, arquivo, raiz = RAIZ, agora = () => new Date() }, saida = console) {
+  const conj = copia(lerConjuntoDoDisco({ raiz }));
+  const imagem = imagemPorId(conj, id);
+  if (typeof arquivo !== 'string' || arquivo === '') throw new ErroDeUso('diga a resposta do crítico: --arquivo <saida-do-critico.txt>.');
+  if (!existsSync(resolve(arquivo))) throw new ErroDeUso(`o arquivo da resposta do crítico não existe: ${arquivo}`);
+  const veredito = extrairVeredito(readFileSync(resolve(arquivo), 'utf8'));
+  const agente = hashDoAgente(conj.critico.agente.arquivo, raiz);
+  if (agente !== conj.critico.agente.sha256 || hashDoBrief() !== conj.critico.brief.sha256) {
+    throw new ErroDaFonte('o agente ou o texto fixo do brief mudou desde a calibração: o julgamento não seria do crítico gravado; grave o crítico atual com `npm run calibracao -- gerar` e refaça os julgamentos');
+  }
+  const exato = briefDaImagem(imagem, { raiz });
+  const vazou = vazamentosDoBrief(imagem, exato.variavel);
+  if (vazou.length) throw new ErroDaFonte(`o brief de ${id} conta o defeito (${vazou.join('; ')}); não registro julgamento dele`);
+  const entradas = conj.resultados.filter((r) => r.imagem === id);
+  const outra = entradas.find((r) => r.agenteSha256 !== agente || r.briefSha256 !== conj.critico.brief.sha256);
+  if (outra) throw new ErroDaFonte(`${id} tem julgamentos de outro agente ou de outro brief fixo; apague-os de \`resultados\` e refaça`);
+  const recebidos = entradas.reduce((s, r) => s + r.julgamentos.length, 0);
+  if (recebidos >= imagem.julgamentos) throw new ErroDaFonte(`${id} já tem ${recebidos} de ${imagem.julgamentos} julgamentos; não há mais o que registrar`);
+  const julgamento = { nota: veredito.nota, defeitos: veredito.defeitos, briefSha256: exato.sha256, data: agora().toISOString() };
+  if (entradas.length) entradas[0].julgamentos.push(julgamento);
+  else conj.resultados.push({ imagem: id, agenteSha256: agente, briefSha256: conj.critico.brief.sha256, julgamentos: [julgamento] });
+  lerConjunto(conj);
+  writeFileSync(caminhoDoConjunto(raiz), `${JSON.stringify(conj, null, 2)}\n`, 'utf8');
+  saida.log(`${id} ${imagem.nome}: julgamento ${recebidos + 1} de ${imagem.julgamentos} registrado, nota ${veredito.nota}, ${veredito.defeitos.length} defeito(s); brief ${exato.sha256.slice(0, 19)}.`);
+  return 0;
+}
+
+const numero = (n) => String(n).replace('.', ',');
+
+/** `resumo`: a pontuação por imagem (notas, mediana, amplitude, critérios) e a do conjunto. Sai com 1 só quando estão todos os julgamentos e o conjunto não acerta. */
+export function resumo({ raiz = RAIZ } = {}, saida = console) {
+  const conj = lerConjuntoDoDisco({ raiz });
+  const p = pontuarConjunto(conj);
+  for (const i of p.imagens) {
+    const cabeca = `${i.id} ${i.nome} (${i.classe}, nota ${i.faixa[0]} a ${i.faixa[1]}): ${i.recebidos} de ${i.esperados} julgamentos`;
+    if (i.recebidos === 0) { saida.log(`${cabeca}; faltam ${i.faltam}`); continue; }
+    const veredito = i.acerta === null ? `faltam ${i.faltam}` : i.acerta ? 'acerta' : 'erra';
+    saida.log(`${cabeca}; notas ${i.notas.join(' ')}, mediana ${numero(i.mediana)}, amplitude ${numero(i.amplitude)}; ${veredito}`);
+    for (const c of i.criterios.citacoes) saida.log(`    defeito de '${c.parte}' (${c.tipo}): citado em ${c.n} de ${i.recebidos} (mínimo ${c.minimo} de ${i.esperados}) ${c.ok ? 'ok' : 'abaixo'}`);
+    if (i.criterios.estruturais) saida.log(`    defeito estrutural citado em ${i.criterios.estruturais.n} de ${i.recebidos} (máximo ${i.criterios.estruturais.maximo}) ${i.criterios.estruturais.ok ? 'ok' : 'acima'}`);
+    for (const m of i.motivos) saida.log(`    erra: ${m}`);
+  }
+  const amplitudes = p.imagens.filter((i) => i.amplitude !== null).map((i) => i.amplitude);
+  if (amplitudes.length) saida.log(`amplitude das notas por imagem: maior ${numero(Math.max(...amplitudes))}, média ${numero((amplitudes.reduce((s, a) => s + a, 0) / amplitudes.length).toFixed(2))}`);
+  saida.log(resumoDoConjunto(conj).frase);
+  saida.log(linhaDoEstado(p));
+  if (p.estado === 'passa') saida.log('o conjunto passa.');
+  if (p.estado === 'reprova') saida.log(`o conjunto reprova${p.obrigatoriasErradas.length ? `; obrigatória errada: ${p.obrigatoriasErradas.join(', ')}` : ''}.`);
+  return p.estado === 'reprova' ? 1 : 0;
 }
 
 /* ---------- gerar ---------- */
@@ -528,21 +699,29 @@ export function listar(opcoes = {}, saida = console) {
 
 /* ---------- a linha de comando ---------- */
 
+/* as opções que levam valor aceitam `--arquivo x` e `--arquivo=x` */
+const OPCOES_COM_VALOR = ['arquivo'];
+
 function lerArgumentos(argv) {
   const posicionais = [];
   const opcoes = {};
-  for (const arg of argv) {
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
     if (!arg.startsWith('--')) { posicionais.push(arg); continue; }
     const [nome, ...resto] = arg.slice(2).split('=');
-    opcoes[nome] = resto.length ? resto.join('=') : true;
+    if (resto.length) opcoes[nome] = resto.join('=');
+    else if (OPCOES_COM_VALOR.includes(nome) && argv[i + 1] !== undefined && !argv[i + 1].startsWith('--')) { opcoes[nome] = argv[i + 1]; i += 1; } else opcoes[nome] = true;
   }
-  return { comando: posicionais[0] ?? null, opcoes };
+  return { comando: posicionais[0] ?? null, argumentos: posicionais.slice(1), opcoes };
 }
 
 export async function principal(argv, saida = console) {
-  const { comando, opcoes } = lerArgumentos(argv);
+  const { comando, argumentos, opcoes } = lerArgumentos(argv);
   try {
     if (comando === 'conferir') return conferir({ so: opcoes.so }, saida);
+    if (comando === 'brief') return brief({ id: argumentos[0] }, saida);
+    if (comando === 'registrar') return registrar({ id: argumentos[0], arquivo: opcoes.arquivo === true ? undefined : opcoes.arquivo }, saida);
+    if (comando === 'resumo') return resumo({}, saida);
     if (comando === 'gerar') return await gerar({ so: opcoes.so, prancha: !opcoes['sem-prancha'] }, saida);
     if (comando === 'listar') return listar({}, saida);
     throw new ErroDeUso(comando ? `comando '${comando}' desconhecido.` : 'falta o comando.');
