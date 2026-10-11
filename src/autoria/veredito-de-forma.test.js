@@ -5,7 +5,7 @@
  * transladou. Enquanto o parecer for prosa, quem modela escolhe a operação — e
  * quem modela é exatamente quem não pode escolher sozinho. */
 import { describe, expect, it } from 'vitest';
-import { TIPOS_DE_DEFEITO, normalizarVeredito, rodadaFechou } from './veredito-de-forma.js';
+import { NATUREZA_DO_TIPO, TIPOS_DE_DEFEITO, TIPOS_ESTRUTURAIS, normalizarVeredito, rodadaFechou } from './veredito-de-forma.js';
 
 const DEFEITO = {
   parte: 'tuboSelim',
@@ -40,6 +40,12 @@ describe('veredito de forma', () => {
       .toThrow(/texto corrido não é veredito/);
     expect(() => normalizarVeredito({ ...VEREDITO, defeitos: ['o tubo está torto'] }))
       .toThrow(/prosa não é veredito/);
+  });
+
+  it('a natureza de cada tipo cobre o vocabulário inteiro, e só uniao, posicao e ausencia são estruturais', () => {
+    expect(Object.keys(NATUREZA_DO_TIPO).sort()).toEqual(Object.keys(TIPOS_DE_DEFEITO).sort());
+    expect([...TIPOS_ESTRUTURAIS].sort()).toEqual(['ausencia', 'posicao', 'uniao']);
+    for (const tipo of ['angulo', 'comprimento', 'espessura', 'superficie']) expect(TIPOS_ESTRUTURAIS).not.toContain(tipo);
   });
 
   it('ÂNGULO e POSIÇÃO não compartilham sentido: apontar um não permite corrigir o outro', () => {

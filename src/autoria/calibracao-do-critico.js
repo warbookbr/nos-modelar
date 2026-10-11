@@ -3,7 +3,7 @@
  *
  * O crítico dá nota e aponta defeito, e nada diz se a nota dele é a de um olho que acerta. Este conjunto responde com doze
  * imagens geradas da geometria do próprio repositório, cada uma com a fonte que a reproduz (um esboço, ou uma chamada de
- * família mais a mutação declarada), as quatro vistas que o brief do crítico recebe, os defeitos esperados no vocabulário fechado
+ * família, a partir de um ponto da faixa ou de um perfil do `familia.json`, mais a mutação declarada), as quatro vistas que o brief do crítico recebe, os defeitos esperados no vocabulário fechado
  * do crítico, a faixa de nota esperada e quem decide cada defeito: a medida, que o reprova antes de o crítico olhar, ou o crítico.
  *
  * A faixa de nota é a escala ancorada do brief: o controle (sem defeito) de 8 a 10, o defeito só de superfície de 8 a 9 e o
@@ -15,7 +15,7 @@
  * guarda a nota, os defeitos que o crítico apontou, a impressão do brief exato e a data; `extrairVeredito` lê a resposta do crítico
  * e `pontuarImagem` e `pontuarConjunto` dizem se a imagem e o conjunto acertam, pela regra da tarefa 6 do desenho da fatia 8. */
 import { normalizarRazoesDaPeca } from './razoes-da-peca.js';
-import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
+import { TIPOS_DE_DEFEITO, TIPOS_ESTRUTURAIS } from './veredito-de-forma.js';
 
 export const FORMATO_CALIBRACAO = 'mecanifica.calibracao-do-critico@1';
 export const CLASSES = Object.freeze(['controle', 'superficie', 'estrutural']);
@@ -30,6 +30,8 @@ export const DECISORES = Object.freeze(['medida', 'critico']);
 export const VISTAS_DO_CONJUNTO = Object.freeze(['isometrica', 'frontal', 'lateral', 'superior']);
 export const LARGURA_DAS_VISTAS = 1100;
 export const PONTOS_DA_FAMILIA = Object.freeze(['minimo', 'medio', 'maximo']);
+/** O valor de `aprovacao` do controle que parte de um perfil: a geometria aprovada em `mecanica.perfis.<perfil>`. */
+export const APROVACAO_DO_PERFIL = 'perfil';
 export const BASES_DA_FAMILIA = Object.freeze(['padrao', ...PONTOS_DA_FAMILIA]);
 /* `cota` é anotação de prancha: o conjunto só tem imagens de objeto */
 export const TIPOS_DO_CONJUNTO = Object.freeze(Object.keys(TIPOS_DE_DEFEITO).filter((tipo) => tipo !== 'cota'));
@@ -100,9 +102,12 @@ function lerFonte(fonte, onde, exigirGerados) {
     return { tipo: 'esboco' };
   }
   if (fonte.tipo === 'familia') {
-    chaves(fonte, ['tipo', 'familia', 'base', 'parametros', 'viola', 'argumentos', 'aprovacao', 'geometria'], onde);
+    chaves(fonte, ['tipo', 'familia', 'base', 'perfil', 'parametros', 'viola', 'argumentos', 'aprovacao', 'geometria'], onde);
     if (!(texto(fonte.familia) && SLUG.test(fonte.familia))) recusar(`${onde}.familia`, fonte.familia, 'id de uma família registrada');
-    if (!BASES_DA_FAMILIA.includes(fonte.base)) recusar(`${onde}.base`, fonte.base, `ponto de partida da chamada: ${BASES_DA_FAMILIA.join(', ')}`);
+    if (fonte.perfil !== undefined) {
+      if (fonte.base !== undefined) recusar(`${onde}.base`, fonte.base, 'nenhuma: a chamada parte do perfil, e não de um ponto da faixa');
+      if (!(texto(fonte.perfil) && SLUG.test(fonte.perfil))) recusar(`${onde}.perfil`, fonte.perfil, 'nome de um perfil declarado em `perfis` do familia.json da família');
+    } else if (!BASES_DA_FAMILIA.includes(fonte.base)) recusar(`${onde}.base`, fonte.base, `ponto de partida da chamada: ${BASES_DA_FAMILIA.join(', ')} (ou \`perfil\`, o nome de um perfil da família)`);
     if (fonte.parametros !== undefined) {
       if (!plano(fonte.parametros)) recusar(`${onde}.parametros`, fonte.parametros, 'objeto { nome do parâmetro: número }, em mm, graus ou contagem');
       for (const [nome, valor] of Object.entries(fonte.parametros)) if (!finito(valor)) recusar(`${onde}.parametros.${nome}`, valor, 'número finito');
@@ -113,8 +118,10 @@ function lerFonte(fonte, onde, exigirGerados) {
     }
     const argumentos = lerArgumentos(fonte.argumentos, `${onde}.argumentos`);
     if (fonte.aprovacao !== undefined) {
-      if (!PONTOS_DA_FAMILIA.includes(fonte.aprovacao)) recusar(`${onde}.aprovacao`, fonte.aprovacao, `ponto aprovado da família: ${PONTOS_DA_FAMILIA.join(', ')}`);
-      if (fonte.base !== fonte.aprovacao || fonte.parametros !== undefined || fonte.viola !== undefined || argumentos.length > 0) recusar(`${onde}.aprovacao`, fonte.aprovacao, 'só o controle: a base é o próprio ponto aprovado e não há parâmetro, restrição violada nem mutação');
+      const doPerfil = fonte.perfil !== undefined;
+      const aprovados = doPerfil ? [APROVACAO_DO_PERFIL] : PONTOS_DA_FAMILIA;
+      if (!aprovados.includes(fonte.aprovacao)) recusar(`${onde}.aprovacao`, fonte.aprovacao, doPerfil ? `'${APROVACAO_DO_PERFIL}', a geometria aprovada do perfil da fonte` : `ponto aprovado da família: ${PONTOS_DA_FAMILIA.join(', ')}`);
+      if ((!doPerfil && fonte.base !== fonte.aprovacao) || fonte.parametros !== undefined || fonte.viola !== undefined || argumentos.length > 0) recusar(`${onde}.aprovacao`, fonte.aprovacao, 'só o controle: a base é o próprio ponto aprovado e não há parâmetro, restrição violada nem mutação');
     }
     exigirSha(fonte.geometria, `${onde}.geometria`, exigirGerados);
     return { tipo: 'familia' };
@@ -415,7 +422,8 @@ export const CITACOES_MINIMAS = Object.freeze({ chave: 4, outras: 2 });
 
 /** Minúsculas e sem acento, para comparar palavras do crítico com as do conjunto. */
 export const dobrar = (t) => String(t).normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
-const estrutural = (julgamento) => julgamento.defeitos.some((d) => d.tipo !== 'superficie');
+/* estrutural é o que a escala da nota chama assim (uniao, posicao, ausencia): comprimento, espessura, angulo e superficie são proporção ou acabamento */
+export const estrutural = (julgamento) => julgamento.defeitos.some((d) => TIPOS_ESTRUTURAIS.includes(d.tipo));
 
 /**
  * O julgamento cita o defeito esperado quando traz um defeito com `tipo` entre os `tiposAceitos` (ou o próprio tipo, sem a lista)
