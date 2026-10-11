@@ -109,13 +109,12 @@
       "ler": [
         "CLAUDE.md",
         "docs/mecanifica/INDEX.md",
-        "docs/mecanifica/planos/README.md",
-        "docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md"
+        "docs/mecanifica/planos/README.md"
       ],
       "sobDemanda": [
         {
           "arquivo": "docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md",
-          "quando": "a fatia do plano ativo pede o que já existe, as referências ou o que vem depois"
+          "quando": "a tarefa pede o que o último plano deixou, as referências ou o que vem depois dele"
         },
         {
           "arquivo": "comunicacao.md",

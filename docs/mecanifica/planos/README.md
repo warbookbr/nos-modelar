@@ -2,14 +2,11 @@
 
 ## Estado
 
-**Plano ativo:** [As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md).
-
-Um núcleo só com níveis de detalhe, o esboço como nível zero, a camada de
-features, casca, chapa, articulações e barras, a verificação ancorada e o crítico
-calibrado. Voltou em
-2026-10-08, quando [o caminho curto da IA](encerrados/2026-10-07-o-caminho-curto-da-ia.md)
-fechou, com a casca na fatia 2 para a caçamba do carrinho de mão. Em rascunho:
-[o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
+**Sem plano ativo.** [As ferramentas de modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md)
+fechou em 2026-10-11, com as famílias dobradiça, cilindro hidráulico, roda e pneu e
+móvel de caixa, a verificação ancorada e o crítico calibrado. Os candidatos ao
+próximo plano estão no [contexto dele](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#depois-do-plano).
+Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 

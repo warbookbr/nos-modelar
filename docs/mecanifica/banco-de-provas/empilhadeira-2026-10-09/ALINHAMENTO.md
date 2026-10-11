@@ -1,7 +1,7 @@
 # Carcaça da empilhadeira: alinhamento
 
 **Estado:** em pausa até o fim do [plano das ferramentas de
-modelagem](../../planos/2026-10-07-as-ferramentas-de-modelagem.md), porque a
+modelagem](../../planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), porque a
 carenagem moldada pede a casca nativa da fatia 6. O alinhamento parou na ordem de
 montagem; o que já foi decidido com a pessoa em 2026-10-09 está abaixo.
 

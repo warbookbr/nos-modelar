@@ -3,7 +3,7 @@
 **Estado:** cancelado
 
 **Por que foi cancelado:** absorvido, em 2026-10-08, pela fatia do crítico calibrado
-de [as ferramentas de modelagem](../2026-10-07-as-ferramentas-de-modelagem.md),
+de [as ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md),
 que já previa calibrar o crítico e criar famílias de objeto. A linha de base e o
 rascunho das perguntas abaixo são a entrada daquela fatia.
 

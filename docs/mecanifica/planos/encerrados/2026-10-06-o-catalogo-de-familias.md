@@ -121,7 +121,7 @@ o catálogo registra a relação entre elas.
 ## Fechamento
 
 Cancelado em 2026-10-07 e substituído por [as ferramentas de
-modelagem](../2026-10-07-as-ferramentas-de-modelagem.md). A avaliação da estrutura
+modelagem](2026-10-07-as-ferramentas-de-modelagem.md). A avaliação da estrutura
 nas [análises de 2026-10](../../ANALISES-DE-2026-10.md) mostrou que os dois
 geradores por família fixariam a duplicação entre esboço e núcleo em vez de
 removê-la, e que as ferramentas e a verificação vêm antes das famílias. Deste

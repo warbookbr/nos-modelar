@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [as ferramentas de modelagem](planos/2026-10-07-as-ferramentas-de-modelagem.md).
+- Sem plano ativo. O último, [as ferramentas de modelagem](planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), fechou em 2026-10-11.
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs

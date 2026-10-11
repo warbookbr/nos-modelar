@@ -1,7 +1,7 @@
 # Contexto das ferramentas de modelagem
 
-Complemento do plano ativo [as ferramentas de
-modelagem](planos/2026-10-07-as-ferramentas-de-modelagem.md), aberto quando a fatia
+Complemento do plano [as ferramentas de
+modelagem](planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), aberto quando a fatia
 pede: o que já existe e ele reaproveita, as referências de cada fatia e o que vem
 depois dele. Saiu do plano para a leitura de quem vai mudar o Mecanifica caber no
 orçamento do roteiro `mudar`.
@@ -357,6 +357,12 @@ do CityEngine, a distribuição com espaçamento mínimo, o Wave Function Collap
 os campos implícitos do libfive, o Tissue, o Plating Generator e o MAP-Elites
 para gerar variantes de uma família. [As partes do
 braço](planos/congelados/2026-09-26-as-partes-do-braco.md) continuam congeladas.
+
+Candidatos ao próximo plano, apontados pela pessoa em 2026-10-11: o carrinho de
+mão como família de objeto (chassi, caçamba e a roda no perfil de carrinho de mão,
+a partir do carrinho azul aprovado), a bacia em casca como primitiva (a caçamba
+generalizada, com parede inclinada e contorno em D ou retangular), a dobradiça de
+caneco para a porta sobreposta passar de 90° e as ressalvas do fechamento.
 
 A carcaça da empilhadeira volta com a casca nativa da fatia 6, pelo
 [alinhamento](banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já

@@ -30,11 +30,10 @@ Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 b
 - `CLAUDE.md`
 - `docs/mecanifica/INDEX.md`
 - `docs/mecanifica/planos/README.md`
-- `docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md`
 
 Abrir só quando a condição aparecer:
 
-- `docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md`, quando a fatia do plano ativo pede o que já existe, as referências ou o que vem depois.
+- `docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md`, quando a tarefa pede o que o último plano deixou, as referências ou o que vem depois dele.
 - `comunicacao.md`, quando há tarefa aberta com a outra IA.
 - `docs/mecanifica/ARQUITETURA.md`, quando a mudança atravessa camadas.
 - `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS.

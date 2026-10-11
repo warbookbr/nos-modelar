@@ -1,11 +1,11 @@
 # As ferramentas de modelagem
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Descongelado em 2026-10-08,** quando [o caminho curto da
-IA](encerrados/2026-10-07-o-caminho-curto-da-ia.md) fechou, com a casca adiantada
+IA](2026-10-07-o-caminho-curto-da-ia.md) fechou, com a casca adiantada
 pela pessoa para a fatia 2 e o rascunho das [perguntas do
-crítico](encerrados/2026-10-08-perguntas-do-critico-por-objeto.md) na fatia do
+crítico](2026-10-08-perguntas-do-critico-por-objeto.md) na fatia do
 crítico calibrado.
 
 **Responsável:** Claude, com o aceite da pessoa
@@ -15,7 +15,7 @@ crítico calibrado.
 ## Problema observado
 
 O Mecanifica deve deixar uma IA modelar os objetos da [lista de
-famílias](../FAMILIAS-DE-OBJETOS.md) melhor, mais barato e com mais confiança,
+famílias](../../FAMILIAS-DE-OBJETOS.md) melhor, mais barato e com mais confiança,
 e hoje quatro coisas impedem isso. O esboço e o núcleo são dois motores, com
 unidades, formas, encaixe e gate próprios, e o que o esboço decide é refeito na
 modelagem; o esboço, que deveria ser leve e barato, saiu mais caro que o núcleo
@@ -24,19 +24,19 @@ por grupo, região, origem, porta e alias, mas várias operações ainda pedem
 identificador de vértice ou face, e não há seleção por propriedade geométrica,
 perfil 2D com furo nem curva com arco, de modo que a IA escreve contas e números
 à mão na receita. Faltam as ferramentas que cobrem a lista: a [contagem por
-objeto](../FERRAMENTAS-POR-OBJETO.md) põe casca com espessura em 125 objetos,
+objeto](../../FERRAMENTAS-POR-OBJETO.md) põe casca com espessura em 125 objetos,
 articulações em 93, estrutura de barras em 72 e chapa dobrada em 62, e a casca e
 a chapa não existem. E a verificação já tem peças que medem contra referência
 externa, mas elas não estão no caminho de toda peça: na prática a régua compara a
 peça contra a declaração dela, e o crítico visual é o único juiz da semelhança.
-As [análises de 2026-10](../ANALISES-DE-2026-10.md) detalham cada ponto.
+As [análises de 2026-10](../../ANALISES-DE-2026-10.md) detalham cada ponto.
 
 Em 2026-10-08, a caçamba do carrinho de mão pediu uma bacia oca de parede
 inclinada e contorno em D, que o `loft` do esboço (só seção convexa) e a
 `extrusao` (sem inclinação) não fazem, e o esbocista a gerou por um script em
 Python que gravava 34 facetas em número fixo. O script, guardado em
-[`carrinho-refeito-2026-10-08`](../banco-de-provas/carrinho-refeito-2026-10-08/), com o
-[atrito](../banco-de-provas/carrinho-refeito-2026-10-08/ATRITOS.md) que o reproduz, é a
+[`carrinho-refeito-2026-10-08`](../../banco-de-provas/carrinho-refeito-2026-10-08/), com o
+[atrito](../../banco-de-provas/carrinho-refeito-2026-10-08/ATRITOS.md) que o reproduz, é a
 especificação do que falta: contorno paramétrico, deslocamento de contorno e casca. E o crítico com
 as cinco perguntas genéricas tratou como detalhe dobradiças por fora da porta, que
 com perguntas do componente e da família apontou como defeito estrutural.
@@ -99,7 +99,7 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
 ## Excluído
 
 - o OCCT como kernel de autoria; ele continua só na exportação STEP. A
-  [análise de agosto](../historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md)
+  [análise de agosto](../../historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md)
   o rejeitou para ativo visual e deixou a reabertura para requisito de
   fabricação ou tolerância de peça mecânica, que este plano não tem; a hipótese
   volta se a camada de features sobre a malha não der arredondamento ou casca
@@ -148,7 +148,7 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    em `REFINA` o volume que cada parte refina, com o verificador no veredito da
    peça recusando parte fora do envelope e porta movida.
 4. O esboço refeito sobre o nível zero, com o processo do módulo atual, pelo
-   [desenho](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-4) que a
+   [desenho](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-4) que a
    pessoa aprovou em 2026-10-10. Feita em 2026-10-10: a cadeira refeita pelo
    nível zero custou 94.093 tokens com nota 9, contra 101.631 e nota 8; as vistas
    do crítico seguem no desenhista atual, que mostra a cavidade.
@@ -162,14 +162,16 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    as funções da fatia 2. As duas extensões entraram em 2026-10-10 (a casca
    recua cada face pelo plano, porque o `levelSet` medido gerava milhares de
    triângulos e errava a parede; sólido côncavo com quina de quatro faces ou mais
-   é recusado); a aceitação nas faixas vem com as famílias da fatia 9.
+   é recusado). Aceitas pelas famílias da fatia 9.
 7. Articulações e estrutura de barras, como extensões nativas. As duas
    entraram em 2026-10-10 (a articulação confere o curso contra as peças que
-   ficam, por amostragem); a aceitação nas faixas vem com a fatia 9.
+   ficam, por amostragem). Aceitas pelas famílias da fatia 9.
 8. A verificação ancorada no caminho de toda peça e o crítico calibrado, com as
-   perguntas por componente e por família.
-9. As primeiras famílias, pelo [desenho](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9) aprovado em 2026-10-11.
-10. O banco de provas refeito e o fechamento.
+   perguntas por componente e por família, pelo
+   [desenho](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-8) aprovado em
+   2026-10-11. Feita em 2026-10-11.
+9. As primeiras famílias, pelo [desenho](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9) aprovado em 2026-10-11. Feita em 2026-10-11.
+10. O banco de provas refeito e o fechamento. Feita em 2026-10-11.
 
 ## Riscos e desvios
 
@@ -186,10 +188,25 @@ como no fechamento do caminho curto; a calibração da fatia 8 mede essa variaç
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-10-11, com a aceitação da pessoa. Os itens 1 a 4 fecharam nas
+fatias 1 a 5. Casca, chapa, barras e articulação (item 5) foram aceitas pelo
+crítico nas famílias, julgadas pelos perfis onde a família tem perfis, por decisão
+da pessoa. A medida reprova antes do crítico e o crítico acerta 12 de 12 imagens
+do conjunto de calibração, com as dobradiças por fora e a picape baixa, depois de
+um ajuste de brief (item 6). Dobradiça, cilindro hidráulico, roda e pneu e móvel
+de caixa estão aprovados (item 7). O banco de provas refez carrinho de mão,
+cadeira de rodas, guarda-roupa e cadeira, todos com nota 8 ou 9 em uma rodada; o
+custo caiu pouco em três e a cadeira de rodas ficou 16% mais cara (item 8). A
+bateria completa passa (item 9).
+
+Ficam como ressalva: a norma do cilindro escrita de memória; o MCP e o comando de
+parâmetros sem o registro das famílias; a bancada sem abrir família; a dobradiça
+de caneco, que daria 110° à porta sobreposta, fora; e o ganho de custo do esboço,
+menor que o prometido. Os detalhes estão no [contexto do
+plano](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md).
 
 ## Depois deste plano
 
 O que vem depois, o que já existe e este plano reaproveita, e as referências de
-cada fatia estão no [contexto do plano](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md),
+cada fatia estão no [contexto do plano](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md),
 aberto quando a fatia pede.

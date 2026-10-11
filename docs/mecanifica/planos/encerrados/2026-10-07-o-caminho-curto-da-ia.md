@@ -70,7 +70,7 @@ esboço fica mais barato pelo que a medição mostrar.
 ## Excluído
 
 - as fatias 2 a 9 de [as ferramentas de
-  modelagem](../2026-10-07-as-ferramentas-de-modelagem.md), congelado
+  modelagem](2026-10-07-as-ferramentas-de-modelagem.md), congelado
   até este plano fechar;
 - as primitivas 2.0, que ficam naquele plano e vão baratear depois as peças que
   se repetem;
@@ -183,6 +183,6 @@ O que a rodada mostrou, e o que virou gate ou instrução:
 
 ## Depois deste plano
 
-[As ferramentas de modelagem](../2026-10-07-as-ferramentas-de-modelagem.md)
+[As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md)
 voltaram como plano ativo a partir da fatia 2, com o banco de provas refeito por
 este caminho como o novo "antes".

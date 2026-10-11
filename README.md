@@ -61,8 +61,8 @@ Além da peça existem a montagem persistida, o mapa canônico de dependências,
 revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo tem
 o braço robótico, em `procedural/pecas/braco-robotico/`. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
-divergem. O plano ativo é
-[as ferramentas de modelagem](docs/mecanifica/planos/2026-10-07-as-ferramentas-de-modelagem.md).
+divergem. Não há plano ativo: [as ferramentas de
+modelagem](docs/mecanifica/planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md) fechou em 2026-10-11.
 
 ## Peças são exemplos
 

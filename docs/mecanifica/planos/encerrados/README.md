@@ -335,10 +335,17 @@ Esta seção guarda o que o índice `planos/README.md` carregava antes de ser en
 
 ### Estado
 
+[As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md) fechou
+em 2026-10-11, concluído com a aceitação da pessoa: o esboço sobre o nível zero, a
+camada de features, casca, chapa dobrada, barras e articulação como extensões
+nativas, a medida antes do crítico e o crítico calibrado (12 de 12 imagens), e as
+famílias dobradiça, cilindro hidráulico, roda e pneu e móvel de caixa. O banco de
+provas refeito mostrou ganho de custo pequeno no esboço.
+
 [O caminho curto da IA](2026-10-07-o-caminho-curto-da-ia.md) fechou em
 2026-10-08: os quatro esboços do banco custaram 31% menos tokens, todos em uma
 rodada, com duas notas caindo de 9 para 8, aceitas pela pessoa. [As ferramentas
-de modelagem](../2026-10-07-as-ferramentas-de-modelagem.md), congelado em
+de modelagem](2026-10-07-as-ferramentas-de-modelagem.md), congelado em
 2026-10-07 com a fatia 1 entregue, voltou como ativo, com a casca adiantada para a
 fatia 2 e o rascunho das [perguntas do
 crítico](2026-10-08-perguntas-do-critico-por-objeto.md) absorvido. [As partes do braço](../congelados/2026-09-26-as-partes-do-braco.md)

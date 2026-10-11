@@ -1,7 +1,7 @@
 # Suporte de tubo sem identificador numérico
 
 Prova do item 4 do gate de saída do [plano das ferramentas de
-modelagem](../../planos/2026-10-07-as-ferramentas-de-modelagem.md): a
+modelagem](../../planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md): a
 [receita](receita.js), escrita por um modelador em 2026-10-10 a partir do
 [alvo](alvo.md), usa perfil com furo (`extrusao` com `furos` oblongos), contorno
 por trechos com arco tangente e concordância, e seleção por propriedade
