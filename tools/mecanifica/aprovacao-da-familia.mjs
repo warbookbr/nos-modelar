@@ -37,6 +37,7 @@ import { resolverPortasDeMontagem } from '../../src/autoria/interfaces-montagem.
 import { receitaComParametros } from '../../src/autoria/parametros-vivos.js';
 import { conferirPortasNaForma } from '../../src/autoria/porta-confere-forma.js';
 import { execucaoDe, invariantesDe } from '../../src/autoria/varrer-parametros.js';
+import { conferirMontagemDaFamilia } from './montagem-da-familia.mjs';
 
 export const FORMATO_APROVACAO = 'mecanifica.aprovacao-da-familia@1';
 export const ARQUIVO_APROVACAO = 'aprovacao.json';
@@ -256,8 +257,13 @@ function executar(familia, parametros, { medir }) {
 /**
  * Executa e confere um ponto da família. Devolve `{ rotulo, parametros, estado, hash, problemas, medidas, portas }`,
  * com `estado` `ok`, `recusa-declarada` (a família recusou o ponto por uma restrição que declara) ou `reprovado`.
+ *
+ * Uma família que gera montagem (`familia.montar`, a dobradiça) tem também a montagem conferida, e o resultado traz
+ * `montagem` (impressão das peças e das articulações e, quando o curso foi conferido, o resultado de cada articulação).
+ * `montagem` escolhe quanto: 'completa' confere o curso com `conferirArticulacao` (dezenas de segundos), 'hash' só gera,
+ * executa e imprime (o gate) e 'nenhuma' pula (a varredura de sensibilidade, que olha a peça).
  */
-export function medirPonto(familia, parametros, rotulo = 'ponto') {
+export function medirPonto(familia, parametros, rotulo = 'ponto', { montagem = 'completa' } = {}) {
   const base = { rotulo, parametros: { ...parametros }, hash: null, problemas: [], medidas: [], portas: [] };
   let medido;
   let repetido;
@@ -288,6 +294,10 @@ export function medirPonto(familia, parametros, rotulo = 'ponto') {
   const portas = conferirPortas(familia.contrato, neutro);
   problemas.push(...portas.achados);
   problemas.push(...conferirMedidas(medido.medidas));
+  const daMontagem = typeof familia.montar === 'function' && montagem !== 'nenhuma'
+    ? conferirMontagemDaFamilia(familia, parametros, ambienteDaExecucao(familia, { medir: false }).execucao, { conferirCurso: montagem === 'completa' })
+    : null;
+  if (daMontagem) problemas.push(...daMontagem.problemas);
   return {
     ...base,
     estado: problemas.length ? 'reprovado' : 'ok',
@@ -296,6 +306,7 @@ export function medirPonto(familia, parametros, rotulo = 'ponto') {
     medidas: medido.medidas.map(medidaGuardada),
     portas: ordenar(familia.contrato.portas.map(({ id }) => id)),
     portasNaoDeclaradas: portas.naoDeclaradas,
+    ...(daMontagem?.resumo ? { montagem: daMontagem.resumo } : {}),
   };
 }
 
@@ -308,7 +319,7 @@ function lerAprovacaoGravada(pasta) {
 }
 
 function pontoGravado(ponto) {
-  return { parametros: ponto.parametros, hash: ponto.hash, medidas: ponto.medidas };
+  return { parametros: ponto.parametros, hash: ponto.hash, medidas: ponto.medidas, ...(ponto.montagem ? { montagem: ponto.montagem } : {}) };
 }
 
 /**
@@ -332,7 +343,7 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
     }
     for (const p of ponto.problemas) problemas.push({ ponto: ponto.rotulo, ...p });
   }
-  const varredura = varreduraDaFamilia(familia.contrato).map((sonda) => ({ ...medirPonto(familia, sonda.parametros, sonda.rotulo), parametro: sonda.parametro, extremo: sonda.extremo }));
+  const varredura = varreduraDaFamilia(familia.contrato).map((sonda) => ({ ...medirPonto(familia, sonda.parametros, sonda.rotulo, { montagem: 'nenhuma' }), parametro: sonda.parametro, extremo: sonda.extremo }));
   for (const ponto of varredura) {
     for (const p of ponto.problemas) problemas.push({ ponto: `varredura ${ponto.rotulo}`, ...p });
   }
@@ -416,11 +427,14 @@ export function conferirAprovacao(familia, { pasta, exigirNomeDaPasta = true } =
       reprovar('ponto-mudou-de-parametros', `o ponto '${nome}' aprovado tinha ${JSON.stringify(aprovado.parametros)} e o contrato agora pede ${JSON.stringify(definidos[nome])}; reaprove com npm run familia -- aprovar ${id}`, nome);
       continue;
     }
-    const atual = medirPonto(familia, definidos[nome], nome);
+    const atual = medirPonto(familia, definidos[nome], nome, { montagem: 'hash' });
     if (atual.estado === 'recusa-declarada') {
       reprovar('ponto-aprovado-recusado', `o ponto '${nome}' agora é recusado pela restrição '${atual.restricao}': ${atual.motivo}`, nome);
     } else if (atual.hash !== null && atual.hash !== aprovado.hash) {
       reprovar('geometria-mudou', `a geometria do ponto '${nome}' mudou desde a aprovação (aprovado ${aprovado.hash.slice(0, 19)}, agora ${atual.hash.slice(0, 19)}); reaprove com npm run familia -- aprovar ${id}`, nome);
+    }
+    if (atual.montagem && atual.montagem.hash !== aprovado.montagem?.hash) {
+      reprovar('montagem-mudou', `a montagem que a família gera no ponto '${nome}' mudou desde a aprovação (as peças, a articulação ou o curso); reaprove com npm run familia -- aprovar ${id}`, nome);
     }
     for (const p of atual.problemas) reprovar(p.codigo, `no ponto '${nome}': ${p.mensagem}`, nome);
   }
