@@ -80,6 +80,9 @@ export const GATES = [
   'catalogo:check',
   'ferramentas:check',
   'banco-de-provas:check',
+  /* O hash da geometria dos três pontos de cada família registrada em `procedural/familias`, preso ao `aprovacao.json`.
+     Geometria que muda sem reaprovação reprova dizendo o ponto; sem família registrada, passa dizendo isso. */
+  'familias:check',
 ];
 
 /* OS GATES RODAM EM PARALELO, E O RELATÓRIO CONTINUA EM ORDEM.

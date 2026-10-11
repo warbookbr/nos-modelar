@@ -1,0 +1,26 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "bucha-de-prova",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 60, "minimo": 30, "maximo": 120, "medio": 75 },
+    "furo": { "tipo": "numero", "unidade": "mm", "padrao": 16, "minimo": 10, "maximo": 25, "medio": 18 },
+    "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 40, "minimo": 20, "maximo": 100, "medio": 50 },
+    "lados": { "tipo": "inteiro", "unidade": "contagem", "padrao": 24, "minimo": 8, "maximo": 48, "medio": 32 }
+  },
+  "restricoes": [
+    {
+      "id": "furo-cabe-no-diametro",
+      "expressao": "furo * 2 <= diametro",
+      "motivo": "o furo passa de metade do diâmetro e a parede da bucha fica mais fina que o furo"
+    }
+  ],
+  "portas": [
+    { "id": "assento", "tipo": "anel", "papel": "ocupa" }
+  ],
+  "ferramentas": ["eixo"],
+  "perguntas": {
+    "bucha": ["O furo é concêntrico com o diâmetro externo?"]
+  }
+}
