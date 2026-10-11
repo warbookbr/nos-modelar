@@ -128,6 +128,11 @@ articulação; (9) o cilindro hidráulico, com casca e articulação prismática
 o roupeiro, depois de conferir que a montagem v5 aceita parâmetro por instância;
 (11) o fechamento do item 7 do gate.
 
+As tarefas 1 a 5 entraram em 2026-10-11, com o contrato em
+[`CONTRATO-DA-FAMILIA.md`](CONTRATO-DA-FAMILIA.md) e o gate `familias:check`; a
+aprovação mecânica limita a parede da casca a 1,5 vez a espessura pedida e deixa
+o curso da articulação para as famílias que geram montagem.
+
 ## Pendências da camada de features
 
 O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
