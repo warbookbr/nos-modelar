@@ -4,7 +4,7 @@
   "aileronEsq": 1,
   "asaDir": 1,
   "asaEsq": 1,
-  "capo": 0.959,
+  "capo": 0.946,
   "cone": 1,
   "corpoNaPontaEsq": 1,
   "deriva": 0.931,
@@ -14,10 +14,10 @@
   "estabilizadorEsq": 1,
   "flapDir": 1,
   "flapEsq": 1,
-  "fuselagem": 1,
+  "fuselagem": 0.997,
   "heliceDir": 1,
   "heliceEsq": 1,
-  "parabrisa": 0.948,
+  "parabrisa": 0.86,
   "profundorDir": 1,
   "profundorEsq": 1,
   "salienciaFlapDir": 1,
@@ -25,7 +25,7 @@
  },
  "minimo": 0.8,
  "abaixo": [],
- "semDonoPx": 1071,
+ "semDonoPx": 987,
  "divisas": [
   {
    "a": "cone",
@@ -99,29 +99,29 @@
   },
   {
    "a": "capo",
-   "b": "parabrisa",
+   "b": "fuselagem",
    "caixa": [
     201,
-    82,
-    273,
-    147
+    74,
+    274,
+    134
    ]
   },
   {
    "a": "capo",
-   "b": "fuselagem",
+   "b": "parabrisa",
    "caixa": [
-    213,
-    96,
-    262,
-    135
+    206,
+    100,
+    267,
+    139
    ]
   },
   {
    "a": "fuselagem",
    "b": "parabrisa",
    "caixa": [
-    200,
+    199,
     105,
     273,
     238
@@ -129,22 +129,22 @@
   },
   {
    "a": "asaEsq",
-   "b": "parabrisa",
+   "b": "fuselagem",
    "caixa": [
-    192,
-    134,
-    231,
-    224
+    188,
+    135,
+    227,
+    219
    ]
   },
   {
    "a": "asaDir",
-   "b": "parabrisa",
+   "b": "fuselagem",
    "caixa": [
-    242,
-    134,
-    281,
-    225
+    245,
+    135,
+    284,
+    220
    ]
   },
   {
@@ -155,26 +155,6 @@
     136,
     107,
     175
-   ]
-  },
-  {
-   "a": "asaEsq",
-   "b": "fuselagem",
-   "caixa": [
-    193,
-    141,
-    232,
-    213
-   ]
-  },
-  {
-   "a": "asaDir",
-   "b": "fuselagem",
-   "caixa": [
-    240,
-    150,
-    279,
-    224
    ]
   },
   {
