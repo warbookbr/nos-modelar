@@ -2,7 +2,9 @@
 
 ## Estado
 
-**Sem plano ativo.** [As ferramentas de modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md)
+**Plano ativo:** nenhum.
+
+[As ferramentas de modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md)
 fechou em 2026-10-11, com as famílias dobradiça, cilindro hidráulico, roda e pneu e
 móvel de caixa, a verificação ancorada e o crítico calibrado. Os candidatos ao
 próximo plano estão no [contexto dele](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#depois-do-plano).
