@@ -94,6 +94,47 @@ nos esboços do banco; (8) um objeto refeito no caminho novo e medido em tokens,
 rodadas e nota contra a medição gravada, e só então a troca da skill
 `esboco-detalhado`.
 
+## Desenho da fatia 8
+
+Aprovado pela pessoa em 2026-10-11, com a picape reescrita e cinco julgamentos
+nas quatro imagens-chave e três nas outras. Hoje o veredito do `descrever`
+confere plano de partes, `REFINA`, contatos e referencial; o G01 roda só sobre o
+andaime do esboço; o `conferir:referencia` é um comando solto; o comparador de
+contorno por parte (IoU 0,85 e desvio de até o maior entre 5 mm e 3% da maior
+dimensão) só serve ao esboço; "meça antes do crítico" é instrução de skill; e as
+`perguntas` do `familia.json` são validadas, mas nenhum brief as lê.
+
+O caminho de toda peça passa a ser, no veredito: o que já roda, depois o G01
+sobre a malha da peça, depois o contorno por parte quando a pasta tem
+`*.contornos.json`, e por fim as razões do `--medidas`, que ganha `razao: [A, B]`
+com faixa. Os limiares são os que já existem, medidos dos dois lados pela
+calibração. Sem foto, a referência é o alvo N2, o andaime ou a faixa de proporção
+da família com fonte em ficha; sem nenhuma, o veredito diz "não conferido: sem
+referência", sem aprovar nem barrar. A trava fica no laço: a rodada de modelagem
+devolve `modelar` enquanto a medição da receita atual não passar, e o `--proximo`
+do esboço só gera o brief depois das medidas.
+
+O conjunto de calibração fica em `banco-de-provas/calibracao-do-critico/`, com
+doze imagens geradas da nossa geometria, cada uma com fonte reproduzível, os
+defeitos no vocabulário do crítico, a nota esperada em faixa (controle 8 a 10,
+superfície 8 a 9, estrutural 5 a 7) e quem decide o defeito, a medida ou o
+crítico: três controles, as dobradiças por fora (do esboço do guarda-roupa de
+2026-10-08), a picape baixa reescrita (a original não foi guardada) e sete
+defeitos de família. Cada imagem recebe de três a cinco julgamentos cegos; acerta
+quando a mediana cai na faixa, no máximo um sai dela e o defeito esperado é
+citado. O conjunto passa com 11 de 12, com as duas nomeadas obrigatórias, e a
+amplitude das notas por imagem é a medida do quinto risco. As perguntas de
+componente vêm das `perguntas` da família e dos componentes do esboço; as de
+família de objeto (assento, veículo, móvel de caixa) ficam num arquivo próprio,
+com condição por pergunta, e só tratam de forma, porque proporção vai para o
+`--medidas`. Sem perguntas, o brief é o de hoje byte a byte.
+
+As tarefas: (1) a razão no `--medidas`; (2) G01, contorno e razão no veredito,
+com "não conferido"; (3) a trava no laço e no `--proximo`; (4) o conjunto, o
+validador e o gate `calibracao:check`; (5) as perguntas por família no brief; (6)
+as rodadas com o brief atual e o novo, com até três ajustes; (7) o gate no CI sem
+aumentar a leitura obrigatória.
+
 ## Desenho da fatia 9
 
 A pessoa decidiu em 2026-10-11: a família e o componente do esboço de mesmo nome
