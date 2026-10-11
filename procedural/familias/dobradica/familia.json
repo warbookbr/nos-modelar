@@ -35,7 +35,7 @@
     { "id": "plano-da-folha-d", "tipo": "plano", "papel": "apoia" },
     { "id": "plano-da-folha-e", "tipo": "plano", "papel": "apoia" }
   ],
-  "ferramentas": ["articula", "booleana"],
+  "ferramentas": ["articula", "booleana", "chapa"],
   "perguntas": {
     "folhas": [
       "As duas folhas têm a mesma largura e a mesma espessura, com os furos de fixação distribuídos ao longo da altura?"

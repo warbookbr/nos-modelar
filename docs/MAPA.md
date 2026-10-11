@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1075 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1077 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -572,7 +572,7 @@
 
 - `chapa.js` — chapa.js — a conta da chapa dobrada: contorno da seção com as dobras no raio pedido e as medidas de chapa.
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça: um L de chapa de 2 mm, raio interno 2 mm, 30 mm de largura.
-- `implementacao.js` — implementacao.js — extrusa o contorno da chapa dobrada numa largura; recebe somente emissor transacional e resolução numérica.
+- `implementacao.js` — implementacao.js — extrusa o contorno da chapa dobrada numa largura e, com `origemId`, publica a origem estrutural dela; recebe somente emissor transacional …
 - `index.js` — index.js — o pacote registrável da extensão chapa dobrada: manifesto, implementação e a conta das medidas.
 - `manifesto.js` — manifesto.js — contrato versionado da extensão chapa dobrada: espessura, raio interno e abas, com as medidas de chapa.
 
@@ -643,6 +643,7 @@
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
 - `extensao-articulacao.test.mjs` — articulacao.test.mjs — a articulação como extensão nativa: o manifesto cabe no SDK, o contrato de uso é descobrível, o passo não emite geometria e a declaraç…
+- `extensao-chapa-dobrada-origem.test.mjs` — extensao-chapa-dobrada-origem.test.mjs — a origem estrutural da chapa dobrada: com `origemId` a chapa publica as abas, as dobras, os lados de dentro e de for…
 - `extensao-chapa-dobrada.test.mjs` — chapa-dobrada.test.mjs — a extensão chapa dobrada: L, U, Z e caixa aberta medidos na malha, planificado contra a conta, determinismo e recusas que dizem camp…
 - `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
@@ -869,6 +870,7 @@
 - `plano-de-modelagem.test.js` — plano-de-modelagem.test.js — o contrato do que a peça promete ser.
 - `porta-confere-forma.js` — porta-confere-forma.js — a porta que a receita declara está na forma da peça.
 - `porta-confere-forma.test.js` — porta-confere-forma.test.js — a porta no lugar passa, a porta deslocada do plano e a de raio errado reprovam, e as portas das partes fixas do braço passam.
+- `porta-na-chapa-dobrada.test.js` — porta-na-chapa-dobrada.test.js — a porta de uma peça de chapa dobrada sai da origem da chapa: o plano sobre uma aba e o anel e o cilindro sobre um rolo de 27…
 - `portas-estendidas.test.js` — portas-estendidas.test.js — suíte de testes completa para portas estendidas do núcleo: plano de apoio, padrão de furos, trilho e classes de ajuste.
 - `posicao-por-porta.js` — posicao-por-porta.js — a pose de uma instância derivada do encaixe de uma porta dela numa porta de outra instância já construída.
 - `primitivas-forma-global.js` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução de perfil, extrusão de perfil côncavo e tubo por pontos com raio de c…

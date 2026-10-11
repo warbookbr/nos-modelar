@@ -20,6 +20,7 @@ export const MANIFESTO = Object.freeze({
         abas: ['lista', 'Abas em ordem, {comprimento, angulo}: comprimento é o trecho reto da aba (sem as dobras das pontas) e angulo é a dobra depois dela, em graus, positivo anti-horário visto de +z; a última aba não leva angulo. A primeira aba começa em (0, 0) e segue +x. Exclui perfil.'],
         perfil: ['lista', 'Alternativa a abas: pontos [u, v] da linha média da chapa, nos vértices em que cada dobra se cruzaria sem raio; o trecho reto de cada segmento é o que sobra depois do recuo das dobras das pontas. Exclui abas.'],
         fatorK: ['escalar', `Posição da linha neutra na espessura, de 0 (face de dentro) a 1 (face de fora), só para as medidas; padrão ${FATOR_K_PADRAO}. A malha não depende dele.`],
+        tampas: ['texto', "'inteiras' (padrão: cada tampa é uma face côncava só) ou 'em-tiras' (cada tampa é uma tira de quadriláteros convexos, um por par de estações da linha média). Use 'em-tiras' quando a chapa vai para unir, subtrair ou intersectar: a união de uma face côncava com furo ou abertura devolve duas faces coplanares sobrepostas, que fecham o vão do rolo."],
         segmentosPorQuarto: ['inteiro', `Segmentos do arco de cada 90 graus de dobra, de 1 a 64; padrão ${SEGMENTOS_POR_QUARTO_PADRAO}.`],
       },
       obrigatorios: ['espessura', 'raioInterno', 'largura'],

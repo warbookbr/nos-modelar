@@ -26,8 +26,9 @@ export const FATOR_K_PADRAO = 0.44;
 export const SEGMENTOS_POR_QUARTO_PADRAO = 6;
 export const MAXIMO_DE_VERTICES_NO_CONTORNO = 500;
 
-const CAMPOS = ['espessura', 'raioInterno', 'fatorK', 'largura', 'abas', 'perfil', 'segmentosPorQuarto', 'origemId'];
+const CAMPOS = ['espessura', 'raioInterno', 'fatorK', 'largura', 'abas', 'perfil', 'segmentosPorQuarto', 'origemId', 'tampas'];
 const MAXIMO_DE_ABAS = 32;
+const TAMPAS = ['inteiras', 'em-tiras'];
 const EPS = 1e-9;
 const RAD = Math.PI / 180;
 
@@ -78,7 +79,8 @@ function lerParametros(argumentos, resolver) {
   if (!(largura > 0)) recusar('largura', argumentos.largura, 'um número maior que 0');
   const segmentosPorQuarto = argumentos.segmentosPorQuarto === undefined ? SEGMENTOS_POR_QUARTO_PADRAO : numero(resolver, 'segmentosPorQuarto', argumentos.segmentosPorQuarto, 'um inteiro de 1 a 64');
   if (!Number.isInteger(segmentosPorQuarto) || segmentosPorQuarto < 1 || segmentosPorQuarto > 64) recusar('segmentosPorQuarto', argumentos.segmentosPorQuarto, 'um inteiro de 1 a 64 (segmentos do arco de cada 90 graus de dobra)');
-  return { espessura, raioInterno, fatorK, largura, segmentosPorQuarto };
+  if (argumentos.tampas !== undefined && !TAMPAS.includes(argumentos.tampas)) recusar('tampas', argumentos.tampas, `um destes: ${TAMPAS.map((t) => `'${t}'`).join(', ')} (padrão 'inteiras')`);
+  return { espessura, raioInterno, fatorK, largura, segmentosPorQuarto, tampas: argumentos.tampas ?? 'inteiras' };
 }
 
 /* Linha média a partir de `abas`: trechos retos e giros (em radianos, com sinal) entre elas. */
@@ -147,7 +149,7 @@ function linhaPorPerfil(perfil, resolver, raioMedio) {
 /* Interpreta e valida os argumentos e devolve tudo o que a malha e as medidas precisam. `resolver` é o `numero` do contexto da
    extensão (PARAM, TOPO e expressão); fora do núcleo, o padrão é aceitar só número. */
 export function construirChapa(argumentos, resolver = (v) => v) {
-  const { espessura, raioInterno, fatorK, largura, segmentosPorQuarto } = lerParametros(argumentos, resolver);
+  const { espessura, raioInterno, fatorK, largura, segmentosPorQuarto, tampas } = lerParametros(argumentos, resolver);
   if ((argumentos.abas === undefined) === (argumentos.perfil === undefined)) recusar(argumentos.abas === undefined ? 'abas' : 'perfil', undefined, 'exatamente um entre abas (comprimento reto e ângulo de cada aba) e perfil (pontos da linha média); vieram os dois ou nenhum');
   const h = espessura / 2, raioMedio = raioInterno + h;
   const linha = argumentos.abas !== undefined ? linhaPorAbas(argumentos.abas, resolver, raioMedio) : linhaPorPerfil(argumentos.perfil, resolver, raioMedio);
@@ -180,6 +182,10 @@ export function construirChapa(argumentos, resolver = (v) => v) {
   let contorno = bruto.map(([x, y]) => [arredondar(x), arredondar(y)]);
   const mantidos = contorno.map((p, i) => { const q = contorno[(i + 1) % contorno.length]; return Math.hypot(q[0] - p[0], q[1] - p[1]) > EPS; });
   let arestas = rotulos.filter((_, i) => mantidos[i]);
+  // o vértice descartado (igual ao seguinte) conta como o seguinte que ficou; `estacoes` liga o lado da direita ao da esquerda
+  const nosMantidos = mantidos.reduce((a, k, i) => { a.depois[i] = a.n; if (k) a.n++; return a; }, { n: 0, depois: [] });
+  const totalMantido = nosMantidos.n, posicaoNoContorno = (i) => nosMantidos.depois[i] % totalMantido;
+  let estacoes = dir.map((_, j) => [posicaoNoContorno(j), posicaoNoContorno(2 * m - 1 - j)]);
   contorno = contorno.filter((_, i) => mantidos[i]);
   if (contorno.length > MAXIMO_DE_VERTICES_NO_CONTORNO) {
     recusar('segmentosPorQuarto', segmentosPorQuarto, `um valor que mantenha o contorno em ${MAXIMO_DE_VERTICES_NO_CONTORNO} vértices ou menos (este dá ${contorno.length}); reduza segmentosPorQuarto ou o número de dobras`);
@@ -189,7 +195,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     if (par) recusar(`${nome(par[0])} e ${nome(par[1])}`, 'abas que se cruzam ou se encostam', `abas separadas por folga positiva (a espessura é ${espessura}); mude comprimentos ou ângulos`);
     recusar('abas', 'contorno que se cruza ou se toca', 'abas e dobras que não se cruzem nem se encostem (as dobras vizinhas ou uma aba e uma dobra de outra se atravessam); mude comprimentos, ângulos, raioInterno ou espessura');
   }
-  if (areaDoContorno(contorno) < 0) { contorno.reverse(); arestas = arestas.map((_, j) => arestas[(arestas.length * 2 - 2 - j) % arestas.length]); }
+  if (areaDoContorno(contorno) < 0) { contorno.reverse(); estacoes = estacoes.map(([a, b]) => [contorno.length - 1 - a, contorno.length - 1 - b]); arestas = arestas.map((_, j) => arestas[(arestas.length * 2 - 2 - j) % arestas.length]); }
 
   const dobras = giros.map((giro, k) => ({
     angulo: arredondar(giro / RAD), raioInterno, raioExterno: arredondar(raioInterno + espessura),
@@ -209,7 +215,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     if (a.dobra === undefined) return Object.freeze({ ...a });
     return Object.freeze({ ...a, dentro: (giros[a.dobra] > 0) === (a.lado === 'esquerda') });
   });
-  return Object.freeze({ contorno, largura, espessura, medidas, divisoesPorDobra: Object.freeze(divisoes), arestas: Object.freeze(arestasDaChapa), abas: retos.length, dobras: giros.length });
+  return Object.freeze({ contorno, largura, espessura, medidas, divisoesPorDobra: Object.freeze(divisoes), arestas: Object.freeze(arestasDaChapa), estacoes: Object.freeze(estacoes), tampas, abas: retos.length, dobras: giros.length });
 }
 
 /* As medidas de chapa dos argumentos de `chapaDobrada`, sem montar malha: espessura, raios, fator K, trechos retos, ângulo,

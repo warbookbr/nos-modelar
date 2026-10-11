@@ -14,10 +14,35 @@
           "larguraFolha": 15,
           "nos": 3
         },
-        "hash": "sha256:ff36d04e2e82d217112d8f65578a7b32595831446f14d66cbdf46a2860ab454f",
-        "medidas": [],
+        "hash": "sha256:8c1d37cc58e0734034981e1059f2343edb3bfc846988cf806eb752cc7d4a78ed",
+        "medidas": [
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.001,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.009848892,
+            "comprimentoPlanificado": 0.009928892,
+            "areaPlanificada": 0.000129076
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.001,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.009848892,
+            "comprimentoPlanificado": 0.009928892,
+            "areaPlanificada": 0.000129076
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.001,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.009848892,
+            "comprimentoPlanificado": 0.009928892,
+            "areaPlanificada": 0.000129076
+          }
+        ],
         "montagem": {
-          "hash": "sha256:3904fdb093a53f55413b76f57d3c0d231ef2250271275cc51a83760bfac987af",
+          "hash": "sha256:f8dbc91fb037cbec05cef649d939c299e1758af1a060f96ef6168b554beda7f2",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -62,10 +87,59 @@
           "larguraFolha": 40,
           "nos": 6
         },
-        "hash": "sha256:0af494421a63e7ec281e4a4686f4a4993828c3698901a8be76489037a56ea6df",
-        "medidas": [],
+        "hash": "sha256:171db71e90031d83d0072e6ed78688797aea7bb46857902272f8ef64c47cc0fb",
+        "medidas": [
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.0025,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.020027652,
+            "comprimentoPlanificado": 0.020107652,
+            "areaPlanificada": 0.000393775
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.0025,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.020027652,
+            "comprimentoPlanificado": 0.020107652,
+            "areaPlanificada": 0.000393775
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.0025,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.020027652,
+            "comprimentoPlanificado": 0.020107652,
+            "areaPlanificada": 0.000393775
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.0025,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.020027652,
+            "comprimentoPlanificado": 0.020107652,
+            "areaPlanificada": 0.000393775
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.0025,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.020027652,
+            "comprimentoPlanificado": 0.020107652,
+            "areaPlanificada": 0.000393775
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.0025,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.020027652,
+            "comprimentoPlanificado": 0.020107652,
+            "areaPlanificada": 0.000393775
+          }
+        ],
         "montagem": {
-          "hash": "sha256:0c5a4129b3ad6df04284b1f1d53e189bcd3f9a4065279877255958a3ec7e58be",
+          "hash": "sha256:0199ca493d32724b7ea31cd1ea6c4dad04f791eb3529e8278e1debf6c0042d01",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -110,10 +184,83 @@
           "larguraFolha": 80,
           "nos": 9
         },
-        "hash": "sha256:0de9b0a0ea6214cf21f62a47f27ba242a858d2897978b4635106b427acd16d06",
-        "medidas": [],
+        "hash": "sha256:4303fa7f7a121efae3e1be83802b35660696c396121d5b41c26c57d108382688",
+        "medidas": [
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          },
+          {
+            "ferramenta": "chapaDobrada",
+            "espessura": 0.004,
+            "comprimentoReto": 0.00008,
+            "desenvolvimentoDasDobras": 0.032562609,
+            "comprimentoPlanificado": 0.032642609,
+            "areaPlanificada": 0.000710883
+          }
+        ],
         "montagem": {
-          "hash": "sha256:6232eec31c85f313194338527497e882a1598e47d069bbe1df4e527ccc4510de",
+          "hash": "sha256:48684a5d79ff4ec0409c565579ce7c8ba9abcb05bdc0fb272c3b505d4a1c9ae8",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -162,46 +309,6 @@
       "plano-da-folha-e"
     ]
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por ponto",
-    "pontos": {
-      "minimo": {
-        "nota": 8,
-        "hash": "sha256:ff36d04e2e82d217112d8f65578a7b32595831446f14d66cbdf46a2860ab454f"
-      },
-      "medio": {
-        "nota": 8,
-        "hash": "sha256:0af494421a63e7ec281e4a4686f4a4993828c3698901a8be76489037a56ea6df"
-      },
-      "maximo": {
-        "nota": 8,
-        "hash": "sha256:0de9b0a0ea6214cf21f62a47f27ba242a858d2897978b4635106b427acd16d06"
-      }
-    },
-    "achados": [
-      "a alternância dos nós entre as folhas não se lê na prancha",
-      "o contato das bordas no fim do curso fica escondido junto ao tambor",
-      "dúvida de contagem dos furos no máximo, pela resolução"
-    ]
-  },
-  "pessoa": {
-    "data": "2026-10-11",
-    "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
-    "pontos": {
-      "minimo": {
-        "hash": "sha256:ff36d04e2e82d217112d8f65578a7b32595831446f14d66cbdf46a2860ab454f"
-      },
-      "medio": {
-        "hash": "sha256:0af494421a63e7ec281e4a4686f4a4993828c3698901a8be76489037a56ea6df"
-      },
-      "maximo": {
-        "hash": "sha256:0de9b0a0ea6214cf21f62a47f27ba242a858d2897978b4635106b427acd16d06"
-      }
-    },
-    "observacao": "aprovada como está"
-  }
+  "critico": null,
+  "pessoa": null
 }

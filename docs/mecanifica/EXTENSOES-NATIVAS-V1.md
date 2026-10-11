@@ -88,6 +88,34 @@ comprimento, segmento de `perfil` mais curto que o recuo das dobras das pontas e
 abas que se cruzam ou se encostam. O manifesto traz os ids de vértice e de face.
 O teste está em `chapa-dobrada.test.mjs`.
 
+Com `origemId` a chapa publica a origem estrutural dela, citável por
+`sel:{origem:{op:'chapaDobrada', id, ...}}` com eixos opcionais: `aba` e `dobra`
+(inteiro, nome de parâmetro, `'primeira'`, `'ultima'` ou `{passo,fase}`; uma aba
+tem as faces que correm ao longo dela e uma dobra, os pedaços do arco), `lado`
+(`'esquerda'` ou `'direita'` no sentido da linha média, em que a esquerda da
+primeira aba é +y, ou `'dentro'` e `'fora'` de uma dobra, que não valem numa aba
+porque dependem da dobra que se olha), `borda` (`'inicio'` ou `'fim'`, a
+espessura cortada nas pontas) e `tampa` (`'menos'` ou `'mais'`, as faces de
+z = -largura/2 e +largura/2). `borda` e `tampa` não combinam com os outros eixos e
+`aba` não combina com `dobra`; sem eixo são todas as faces. O significado de cada
+grupo é fixo, não posição na malha. Uma porta de plano sai de uma aba, e um rolo
+de 270° (três dobras de 90° com trechos retos de 0,02 mm entre elas, porque uma
+dobra sozinha vai até 180°) dá a porta de anel ou de cilindro pela citação das
+dobras, com o raio medido só nas faces do rolo e não na aba plana. Sem `origemId`
+a peça sai byte a byte como antes (o hash do canônico de L, U, Z e ponta viva
+não mudou). Para isso `declararOrigem` passou a existir no contexto de toda
+extensão nativa, com ou sem leitura de malha, e o núcleo ganhou
+`CONTRATOS_ORIGEM.chapaDobrada`.
+
+`tampas: 'em-tiras'` troca cada tampa côncava inteira por uma tira de quadriláteros
+convexos, um por par de estações da linha média (triângulo onde o raio interno é
+0). O padrão `'inteiras'` mantém a malha de antes. A tira existe porque `unir`
+devolve, para uma tampa côncava com abertura, duas faces coplanares sobrepostas
+(o contorno de fora e o de dentro), que fecham o vão do rolo: o pino da dobradiça
+passava a ser acusado como dentro da folha. Chapa que vai para `unir`,
+`subtrair` ou `intersectar` pede `'em-tiras'`. A prova está em
+`extensao-chapa-dobrada-origem.test.mjs` e em `src/autoria/porta-na-chapa-dobrada.test.js`.
+
 O pacote `extensoes/casca/` é a primeira ferramenta da lista por objeto feita como
 extensão: `casca` esvazia um sólido fechado e deixa parede de espessura constante,
 com as faces abertas escolhidas por seleção (`solido`, `abertas`, `espessura`,

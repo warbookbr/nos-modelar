@@ -12,11 +12,13 @@ import { conferirFamiliaNosTresPontos } from '../../../tools/mecanifica/familia-
 import { conferirMontagemDaFamilia } from '../../../tools/mecanifica/montagem-da-familia.mjs';
 import { ErroChamadaDeFamilia, FAMILIAS, chamar, criarRegistroDeFamilias } from '../index.js';
 import { DOBRADICA } from './index.js';
-import { FOLGA_AXIAL, anguloDoEncosto, geometriaDaDobradica } from './geometria.js';
+import { FOLGA_AXIAL, TRECHO_DO_ROLO, anguloDoEncosto, geometriaDaDobradica } from './geometria.js';
 
 const registro = criarRegistroDeFamilias({ familias: [DOBRADICA] });
 const execucao = execucaoDe({ registroComposicoes: registro.registroComposicoes, registroOperacoes: registro.registroOperacoes });
 const MM = 0.001;
+/* os três arcos do rolo têm o centro deslocado pelos trechos retos de 0,02 mm entre eles: o raio medido do eixo do pino varia até 0,03 mm */
+const FOLGA_DO_ROLO = 0.04 * MM;
 const MATERIAIS = { chapa: { cor: '#808080' }, pino: { cor: '#c0c0c0' } };
 const conjunto = (parametros = {}) => executarReceita({ meta: { nome: 'dobradica' }, CHAMADAS_COMPOSICOES: [chamar(DOBRADICA, 'corpo', parametros)], MATERIAIS }, execucao).neutro;
 const hash = (neutro) => sha256Hex(JSON.stringify(neutroCanonico(neutro)));
@@ -79,14 +81,14 @@ describe('a geometria contra a conta', () => {
     expect([Math.min(...ys), Math.max(...ys)]).toEqual([-0.05, 0.05]);
   });
 
-  it('cada folha tem tubos exatamente nas alturas dos seus nós, alternados, e os furos nos centros calculados', () => {
+  it('cada folha tem rolos exatamente nas alturas dos seus nós, alternados, e os furos nos centros calculados', () => {
     const geo = geometriaDaDobradica({ altura: 100, larguraFolha: 35, espessura: 2, diametroPino: 5, nos: 5, furos: 3 });
     const { receitas } = DOBRADICA.montar({});
     const raioDoNo = geo.mm.raioDoNo * MM;
     const noRaio = (ref) => {
       const n = executarReceita(receitas[ref], execucao).neutro;
       const ys = new Set();
-      for (const [x, y, z] of n.V.values()) if (Math.abs(Math.hypot(x, z) - raioDoNo) < 1e-9) ys.add(Number(y.toFixed(7)));
+      for (const [x, y, z] of n.V.values()) if (Math.abs(Math.hypot(x, z) - raioDoNo) < FOLGA_DO_ROLO) ys.add(Number(y.toFixed(7)));
       return [...ys].sort((a, b) => a - b);
     };
     const esperado = (indices) => indices.flatMap((k) => [geo.mm.noK[k].inicio, geo.mm.noK[k].fim]).map((y) => Number((y * MM).toFixed(7))).sort((a, b) => a - b);
