@@ -2,12 +2,14 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [o que o avião pede](2026-10-11-o-que-o-aviao-pede.md).
 
-[As ferramentas de modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md)
-fechou em 2026-10-11, com as famílias dobradiça, cilindro hidráulico, roda e pneu e
-móvel de caixa, a verificação ancorada e o crítico calibrado. Os candidatos ao
-próximo plano estão no [contexto dele](../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#depois-do-plano).
+O plano modela o avião de pequeno porte só com o que existe, classifica os atritos
+e constrói as ferramentas e primitivas 2.0 que a pessoa escolher. Os candidatos de
+sucessão estão no fim dele. O anterior, [as ferramentas de
+modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md), fechou em
+2026-10-11, com as famílias dobradiça, cilindro hidráulico, roda e pneu e móvel de
+caixa, a verificação ancorada e o crítico calibrado.
 Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
