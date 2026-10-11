@@ -105,6 +105,37 @@ describe('a Conferência da maquete lê o plano.medidas na blocagem', () => {
   });
 });
 
+describe('a razão do plano.medidas no Portão da Maquete, lida na blocagem', () => {
+  const bruto = lerJson('moto-curvas.esboco.json');
+  const razaoDe = (faixa) => {
+    const e = clone(bruto);
+    e.plano.medidas.push({ nome: 'alturaPeloComprimento', origem: 'ficha', mede: { razao: ['alturaTotal', 'profundidadeTotal'], faixa } });
+    return e;
+  };
+  /* a razão que a blocagem mede na opção 1, para pôr a faixa em volta dela e longe dela sem fixar o número */
+  const medida = medidasDoAndaime(razaoDe([0.1, 5]), { opcao: 1 }).naBlocagem.medidas.find((m) => m.nome === 'alturaPeloComprimento');
+
+  it('a blocagem lê a razão e o módulo concorda com ela, na mesma conta', () => {
+    expect(medida).toMatchObject({ lida: true, tipo: 'razao', ok: true });
+    const r = medidasDoAndaime(razaoDe([0.1, 5]), { opcao: 1 });
+    const doEsboco = r.doEsboco.find((m) => m.nome === 'alturaPeloComprimento');
+    expect(doEsboco).toMatchObject({ tipo: 'razao', ok: true });
+    expect(Math.abs(doEsboco.medido - medida.medido)).toBeLessThanOrEqual(1e-3);
+    expect(r.comparacao.find((c) => c.nome === 'alturaPeloComprimento')).toMatchObject({ tipo: 'razao', concordam: true });
+  });
+
+  it('com a razão dentro da faixa o Portão passa, e com ela fora reprova dizendo que a blocagem mediu', () => {
+    const dentro = portaoDoEstagio(razaoDe([medida.exato - 0.05, medida.exato + 0.05]), criarEstado(bruto, 'x'), { nivelZero: nivelZeroDoEsboco });
+    expect(dentro.passa).toBe(true);
+    expect(dentro.nivelZero.naoLidas).toEqual([]);
+    const fora = portaoDoEstagio(razaoDe([medida.exato + 0.1, medida.exato + 0.2]), criarEstado(bruto, 'x'), { nivelZero: nivelZeroDoEsboco });
+    expect(fora.passa).toBe(false);
+    const texto = fora.falta.find((f) => f.includes('razão "alturaPeloComprimento" fora da faixa'));
+    expect(texto).toContain('a blocagem do andaime mede');
+    expect(texto).toContain('abaixo da faixa por');
+  }, 60000);
+});
+
 describe('as perdas do tradutor aparecem para o esbocista', () => {
   it('a situação da Maquete lista a forma aproximada com o erro medido e a forma sem equivalente', () => {
     const bruto = lerJson('moto-curvas.esboco.json');

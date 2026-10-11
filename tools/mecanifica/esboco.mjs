@@ -1066,7 +1066,9 @@ export function medidasArquivo(arquivo) {
   for (const [i, o] of plano.opcoes.entries()) {
     if (o.medidas.length === 0) continue;
     L.push(`opção ${i + 1} (${o.titulo}):`);
-    for (const m of o.medidas) L.push(`  ${m.nome}: declarado ${n(m.esperado_mm)} mm, medido ${n(m.medido_mm)} mm, desvio ${n(m.desvio_mm)} mm (tolerância ${n(m.tolerancia_mm)} mm), ${m.ok ? 'dentro' : 'fora'}`);
+    for (const m of o.medidas) L.push(m.tipo === 'razao'
+      ? `  ${m.nome}: razão ${n(m.medido)} (${n(m.a_mm)} mm sobre ${n(m.b_mm)} mm), faixa ${n(m.faixa[0])} a ${n(m.faixa[1])}, ${m.ok ? 'dentro' : 'fora'}${m.ok ? '' : ` (${m.desvio < 0 ? 'abaixo' : 'acima'} da faixa por ${n(Math.abs(m.desvio))})`}`
+      : `  ${m.nome}: declarado ${n(m.esperado_mm)} mm, medido ${n(m.medido_mm)} mm, desvio ${n(m.desvio_mm)} mm (tolerância ${n(m.tolerancia_mm)} mm), ${m.ok ? 'dentro' : 'fora'}`);
   }
   if (L.length === 0) L.push('sem plano.medidas: nada a medir');
   return { texto: `${L.join('\n')}\n`, codigo: 0, medidas: plano.opcoes };

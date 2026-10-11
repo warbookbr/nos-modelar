@@ -2,7 +2,9 @@
    (o que deve tocar, o que deve ficar livre, o que deve ser simétrico). O campo `plano` continua podendo ser só um texto
    (o "Pare e planeje" copiado para o manifesto, ignorado no desenho); como objeto ele tem `texto`, `nivel`, `medidas` e
    `contrato`. O módulo não conhece o assunto do esboço: uma medida é um número, uma unidade, uma origem e a expressão
-   que o mede (a caixa que envolve as formas em um eixo, ou a distância entre dois pontos), e o contrato fala de ids.
+   que o mede (a caixa que envolve as formas em um eixo, ou a distância entre dois pontos), e o contrato fala de ids. Uma medida
+   também pode ser a razão entre duas dessas expressões, com a faixa em que a razão vale (`mede: { razao: [A, B], faixa: [min,
+   max] }`), para a proporção que a ficha ou a foto dão sem dar o tamanho.
    Puro: não lê nem grava arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeContato, unidadesDeclaradas } from './contato.js';
@@ -33,6 +35,8 @@ const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const r1 = (x) => Math.round(x * 10) / 10;
 const mm1 = (x) => r1(x).toString().replace('.', ',');
 const sinal = (x) => `${x >= 0 ? '+' : '-'}${mm1(Math.abs(x))}`;
+const r4 = (x) => Math.round(x * 1e4) / 1e4;
+const num4 = (x) => r4(x).toString().replace('.', ',');
 
 const EXEMPLO_DA_MEDIDA = '{ "nome": "alturaTotal", "valor": 1100, "unidade": "mm", "origem": "ficha", "tolerancia": 20, "mede": "alturaTotal" }';
 
@@ -41,14 +45,26 @@ function campos(o, validos, onde) {
   for (const k of Object.keys(o)) exigir(validos.includes(k), `${onde}: o campo "${k}" não existe${quisDizer(k, validos)}; campos válidos: ${validos.join(', ')}`);
 }
 
-function lerMede(m, onde) {
+const EXEMPLO_DA_RAZAO = '{ "nome": "alturaPeloComprimento", "origem": "ficha", "mede": { "razao": ["alturaTotal", "profundidadeTotal"], "faixa": [0.30, 0.40] } }';
+
+/* A expressão de medida lida e validada. Uma razão é [A, B] de duas expressões em milímetro (a caixa de um eixo ou a distância),
+   com a `faixa` em que A/B vale; `dentroDeRazao` recusa uma razão dentro de outra. */
+export function lerMede(m, onde, { dentroDeRazao = false } = {}) {
   const validos = Object.keys(MEDIDAS_TOTAIS);
   if (typeof m === 'string') {
-    exigir(validos.includes(m), `${onde}: "mede" com o valor "${m}" não é uma expressão de medida${quisDizer(m, validos)}; valores válidos: ${validos.map((v) => `"${v}"`).join(', ')}, { "caixa": "y", "formas": ["id", "padrão.*"] } (a caixa que envolve as formas no eixo) ou { "distancia": [A, B], "eixo": "z" } (a distância entre dois pontos, no eixo ou em linha reta)`);
+    exigir(validos.includes(m), `${onde}: "mede" com o valor "${m}" não é uma expressão de medida${quisDizer(m, validos)}; valores válidos: ${validos.map((v) => `"${v}"`).join(', ')}, { "caixa": "y", "formas": ["id", "padrão.*"] } (a caixa que envolve as formas no eixo), { "distancia": [A, B], "eixo": "z" } (a distância entre dois pontos, no eixo ou em linha reta) ou { "razao": [A, B], "faixa": [min, max] } (a razão entre duas dessas medidas)`);
     return { caixa: MEDIDAS_TOTAIS[m] };
   }
-  exigir(objeto(m), `${onde}: "mede" deve ser ${validos.map((v) => `"${v}"`).join(', ')}, { "caixa": "y", "formas": [...] } ou { "distancia": [A, B], "eixo": "z" }`);
+  exigir(objeto(m), `${onde}: "mede" deve ser ${validos.map((v) => `"${v}"`).join(', ')}, { "caixa": "y", "formas": [...] }, { "distancia": [A, B], "eixo": "z" } ou { "razao": [A, B], "faixa": [min, max] }`);
   const chaves = Object.keys(m);
+  if (m.razao !== undefined) {
+    exigir(!dentroDeRazao, `${onde}: uma razão não entra em outra razão; A e B são medidas ("alturaTotal", { "caixa": ... } ou { "distancia": ... })`);
+    campos(m, ['razao', 'faixa'], `${onde}: mede`);
+    exigir(Array.isArray(m.razao) && m.razao.length === 2, `${onde}: "mede.razao" deve ser [A, B], duas medidas (a razão é A dividido por B). Exemplo: ${EXEMPLO_DA_RAZAO}`);
+    const operandos = m.razao.map((q, i) => lerMede(q, `${onde}: mede.razao[${i}]`, { dentroDeRazao: true }));
+    exigir(Array.isArray(m.faixa) && m.faixa.length === 2 && m.faixa.every((x) => typeof x === 'number' && Number.isFinite(x)) && m.faixa[0] >= 0 && m.faixa[0] < m.faixa[1], `${onde}: "mede.faixa" deve ser [min, max], dois números com 0 <= min < max (a razão A/B vale dentro dela). Exemplo: ${EXEMPLO_DA_RAZAO}`);
+    return { razao: operandos, faixa: [...m.faixa] };
+  }
   if (m.caixa !== undefined) {
     campos(m, ['caixa', 'formas'], `${onde}: mede`);
     exigir(EIXOS.includes(m.caixa), `${onde}: "mede.caixa" com o valor ${JSON.stringify(m.caixa)} deve ser um eixo: "x", "y" ou "z"`);
@@ -61,7 +77,7 @@ function lerMede(m, onde) {
     exigir(m.eixo === undefined || EIXOS.includes(m.eixo), `${onde}: "mede.eixo" com o valor ${JSON.stringify(m.eixo)} deve ser "x", "y" ou "z" (sem ele a distância é em linha reta)`);
     return { distancia: m.distancia, ...(m.eixo ? { eixo: m.eixo } : {}) };
   }
-  throw new ErroDeEsboco(`${onde}: "mede" com o campo "${chaves[0] ?? ''}" não é uma expressão de medida${quisDizer(chaves[0], ['caixa', 'distancia'])}; use { "caixa": "y" } ou { "distancia": [A, B] }`);
+  throw new ErroDeEsboco(`${onde}: "mede" com o campo "${chaves[0] ?? ''}" não é uma expressão de medida${quisDizer(chaves[0], ['caixa', 'distancia', 'razao'])}; use { "caixa": "y" }, { "distancia": [A, B] } ou { "razao": [A, B], "faixa": [min, max] }`);
 }
 
 function lerPar(p, onde) {
@@ -92,13 +108,18 @@ export function lerPlano(plano) {
       exigir(typeof m.nome === 'string' && m.nome, `${onde}: falta o "nome" (um texto curto que identifica a medida). Exemplo: ${EXEMPLO_DA_MEDIDA}`);
       exigir(!nomes.has(m.nome), `${onde}: o nome "${m.nome}" está repetido`);
       nomes.add(m.nome);
-      exigir(typeof m.valor === 'number' && Number.isFinite(m.valor) && m.valor > 0, `${onde}: "valor" com o valor ${JSON.stringify(m.valor)} deve ser um número positivo`);
-      exigir(Object.hasOwn(UNIDADES, m.unidade), `${onde}: "unidade" com o valor ${JSON.stringify(m.unidade)} deve ser uma de ${Object.keys(UNIDADES).join(', ')}${quisDizer(m.unidade, Object.keys(UNIDADES))}`);
+      const ehRazao = objeto(m.mede) && m.mede.razao !== undefined;
+      if (ehRazao) {
+        exigir(m.valor === undefined && m.unidade === undefined && m.tolerancia === undefined, `${onde}: uma razão não tem "valor", "unidade" nem "tolerancia": quem diz o que vale é a "faixa" de "mede". Exemplo: ${EXEMPLO_DA_RAZAO}`);
+      } else {
+        exigir(typeof m.valor === 'number' && Number.isFinite(m.valor) && m.valor > 0, `${onde}: "valor" com o valor ${JSON.stringify(m.valor)} deve ser um número positivo`);
+        exigir(Object.hasOwn(UNIDADES, m.unidade), `${onde}: "unidade" com o valor ${JSON.stringify(m.unidade)} deve ser uma de ${Object.keys(UNIDADES).join(', ')}${quisDizer(m.unidade, Object.keys(UNIDADES))}`);
+      }
       exigir(ORIGENS.includes(m.origem), `${onde}: "origem" com o valor ${JSON.stringify(m.origem)} deve ser uma de ${ORIGENS.join(', ')} (ficha técnica, foto, conhecimento da IA ou medida tirada de um contorno de referência)${quisDizer(m.origem, ORIGENS)}`);
       exigir(m.tolerancia === undefined || (typeof m.tolerancia === 'number' && Number.isFinite(m.tolerancia) && m.tolerancia >= 0), `${onde}: "tolerancia" (em mm) deve ser um número maior ou igual a zero`);
       exigir(m.mede !== undefined, `${onde}: falta "mede", a expressão que mede o esboço (por exemplo "alturaTotal"). Exemplo: ${EXEMPLO_DA_MEDIDA}`);
       exigir(m.opcoes === undefined || (Array.isArray(m.opcoes) && m.opcoes.length > 0 && m.opcoes.every((q) => typeof q === 'string' || Number.isInteger(q))), `${onde}: "opcoes" deve listar títulos ou números (a partir de 1) das opções a que a medida vale`);
-      medidas.push({ nome: m.nome, valor: m.valor, unidade: m.unidade, origem: m.origem, ...(m.tolerancia === undefined ? {} : { tolerancia: m.tolerancia }), mede: lerMede(m.mede, onde), ...(m.opcoes ? { opcoes: m.opcoes } : {}) });
+      medidas.push({ nome: m.nome, ...(ehRazao ? {} : { valor: m.valor, unidade: m.unidade }), origem: m.origem, ...(m.tolerancia === undefined ? {} : { tolerancia: m.tolerancia }), mede: lerMede(m.mede, onde), ...(m.opcoes ? { opcoes: m.opcoes } : {}) });
     }
   }
   let contrato = null;
@@ -269,6 +290,25 @@ function medir(mede, rs, pontos, onde, brutos) {
   return { mm: d, pecas: mede.distancia.map(dono).filter(Boolean) };
 }
 
+/* A medida lida do plano com os pontos "<instancia>.<ancora>" trocados pelos da forma real da opção. `bruta` é a medida que
+   `expandirEsboco` guarda em `opcoes[i].medidas[k]`; vale o ponto dela na distância e nas distâncias dentro de uma razão. */
+export function comPontosReais(m, bruta) {
+  const mede = m.mede;
+  const bruto = bruta?.mede;
+  if (mede.distancia && bruto?.distancia) return { ...m, mede: { ...mede, distancia: bruto.distancia } };
+  if (mede.razao && Array.isArray(bruto?.razao)) {
+    return { ...m, mede: { ...mede, razao: mede.razao.map((q, j) => (q.distancia && bruto.razao[j]?.distancia ? { ...q, distancia: bruto.razao[j].distancia } : q)) } };
+  }
+  return m;
+}
+
+/* Mede uma razão A/B: { razao, a, b, pecas }, com `a` e `b` como `medir` os devolve. */
+function medirRazao(mede, rs, pontos, onde, brutos) {
+  const [a, b] = mede.razao.map((q) => medir(q, rs, pontos, onde, brutos));
+  exigir(b.mm > 0, `${onde}: o denominador da razão mede 0 mm, e a razão não existe`);
+  return { razao: a.mm / b.mm, a, b, pecas: [...new Set([...a.pecas, ...b.pecas])] };
+}
+
 /* Assimetria de um par em relação a um plano de simetria: o maior entre o desvio do centro da cópia refletida e a
    diferença de extensão nos três eixos (mm). Sem `eixo`, o eixo é o de maior distância entre os centros, e sem `pos` o
    plano passa no ponto médio dos centros. */
@@ -312,11 +352,20 @@ export function conferirPlano(esboco, visiveis, { referencias, unidades, medidas
     const novo = (a) => { achados.push({ opcao: titulo, ...a }); };
     for (const [k, m0] of (lido?.medidas ?? []).entries()) {
       /* `o.medidas` traz os pontos "<instancia>.<ancora>" já reescritos para as formas reais desta opção */
-      const reescrita = o.medidas?.[k]?.mede?.distancia;
-      const m = reescrita && m0.mede.distancia ? { ...m0, mede: { ...m0.mede, distancia: reescrita } } : m0;
+      const m = comPontosReais(m0, o.medidas?.[k]);
       if (!valeParaOpcao(m, titulo, i)) continue;
       const onde = `opção ${i + 1} (${titulo}): plano.medidas "${m.nome}"`;
       const lida = medidasLidas?.[i]?.[m.nome];
+      if (m.mede.razao) {
+        const [min, max] = m.mede.faixa;
+        const lidaRazao = lida?.tipo === 'razao' ? lida : null;
+        const r = lidaRazao ? { razao: lidaRazao.exato, a: { mm: lidaRazao.a_mm }, b: { mm: lidaRazao.b_mm }, pecas: lidaRazao.formas ?? [] } : medirRazao(m.mede, rs, pontos, onde, brutos);
+        const ok = r.razao >= min - 1e-9 && r.razao <= max + 1e-9;
+        const desvio = r.razao < min ? r.razao - min : r.razao > max ? r.razao - max : 0;
+        medidas.push({ nome: m.nome, origem: m.origem, tipo: 'razao', faixa: [min, max], medido: r4(r.razao), desvio: r4(desvio), a_mm: r1(r.a.mm), b_mm: r1(r.b.mm), ok, ...(lidaRazao ? { fonte: 'blocagem' } : {}) });
+        if (!ok) novo({ tipo: 'medida-fora', nome: m.nome, pecas: r.pecas, mm: 0, desvio: r4(desvio), texto: `razão "${m.nome}" fora da faixa: ${lidaRazao ? 'a blocagem do andaime mede' : 'o esboço mede'} ${num4(r.razao)} (${mm1(r.a.mm)} mm sobre ${mm1(r.b.mm)} mm) e o plano declara de ${num4(min)} a ${num4(max)} (origem: ${m.origem}), ${r.razao < min ? 'abaixo' : 'acima'} da faixa por ${num4(Math.abs(desvio))}` });
+        continue;
+      }
       const { mm, pecas } = lida ? { mm: lida.exato_mm, pecas: lida.formas ?? [] } : medir(m.mede, rs, pontos, onde, brutos);
       const esperado = m.valor * UNIDADES[m.unidade];
       const tolerancia = m.tolerancia ?? Math.max(1, esperado * 0.02);

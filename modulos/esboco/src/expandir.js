@@ -261,7 +261,12 @@ export function expandirEsboco(esboco) {
     expansoes.push(componentes);
     /* medidas do plano: os pontos "<instancia>.<ancora>" viram a forma e a âncora reais desta opção */
     if (objeto(esboco.plano) && Array.isArray(esboco.plano.medidas)) {
-      g.medidas = esboco.plano.medidas.map((m) => (objeto(m) && objeto(m.mede) && Array.isArray(m.mede.distancia) ? { ...m, mede: { ...m.mede, distancia: m.mede.distancia.map((q) => componentes.ponto(q)) } } : m));
+      const trocar = (e) => (objeto(e) && Array.isArray(e.distancia) ? { ...e, distancia: e.distancia.map((q) => componentes.ponto(q)) } : e);
+      g.medidas = esboco.plano.medidas.map((m) => {
+        if (!objeto(m) || !objeto(m.mede)) return m;
+        if (Array.isArray(m.mede.razao)) return { ...m, mede: { ...m.mede, razao: m.mede.razao.map(trocar) } };
+        return Array.isArray(m.mede.distancia) ? { ...m, mede: trocar(m.mede) } : m;
+      });
     }
     if (o.contato !== undefined) g.contato = numerosDoContato(o.contato, num, onde);
     if (o.explosao !== undefined) g.explosao = numerosDaExplosao(o.explosao, num, onde);

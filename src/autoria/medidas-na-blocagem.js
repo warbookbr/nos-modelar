@@ -2,7 +2,8 @@
    formas (a caixa que envolve as formas escolhidas, ou a distância entre dois pontos); aqui a mesma expressão é medida sobre a
    blocagem N2 compilada do andaime traduzido, achando as formas citadas pela tabela do tradutor (`tabela`: id do esboço -> id do
    volume). Não importa o módulo do esboço: recebe as medidas já lidas (`{ nome, valor, unidade, origem, tolerancia?, mede }`, com
-   `mede` como `{ caixa, formas? }` ou `{ distancia, eixo? }`, ou o nome `alturaTotal`/`larguraTotal`/`profundidadeTotal`) e as
+   `mede` como `{ caixa, formas? }` ou `{ distancia, eixo? }`, ou o nome `alturaTotal`/`larguraTotal`/`profundidadeTotal`, ou ainda
+   `{ razao: [A, B], faixa: [min, max] }`, a razão entre duas dessas expressões, que não tem valor, unidade nem tolerância) e as
    formas resolvidas (`mecanifica.formas-resolvidas@1`), e devolve por medida o que o esboço devolve (`esperado_mm`, `medido_mm`,
    `desvio_mm`, `tolerancia_mm`, `ok`), com o valor exato, os volumes lidos e as perdas que tocam esses volumes.
 
@@ -140,6 +141,7 @@ function medirExpressao(mede, visiveis, pontos, fonte) {
     mede = { caixa: TOTAIS[mede] };
   }
   if (!objeto(mede)) throw new NaoLida('expressão de medida inválida');
+  if (mede.razao !== undefined) throw new NaoLida('uma razão não entra em outra razão; A e B são medidas em milímetro');
   if (mede.caixa !== undefined) {
     const k = EIXOS.indexOf(mede.caixa);
     if (k < 0) throw new NaoLida(`"${mede.caixa}" não é um eixo`);
@@ -163,8 +165,49 @@ function medirExpressao(mede, visiveis, pontos, fonte) {
   return { mm, formas: [...new Set(usadas.map((f) => f.id))], foraDoAndaime: [], usadas };
 }
 
+const r4 = (x) => Math.round(x * 1e4) / 1e4;
+
+/* O que a blocagem declara de perda (`erroEnvelope.mm`) nos volumes que as formas lidas ocupam, em milímetro. */
+function perdasDasFormas(usadas, fonte) {
+  const volumes = [...new Set(usadas.map((f) => fonte.volume(f)).filter(Boolean))].sort();
+  const perdas = (fonte.perdas ?? []).filter((p) => volumes.includes(p.volumeId));
+  return { volumes, perdas, limite_mm: perdas.reduce((s, p) => s + p.erroEnvelope.mm, 0) };
+}
+
+/* Uma razão `mede: { razao: [A, B], faixa: [min, max] }`: A e B são medidas que o formato já conhece, lidas pela mesma conta
+   (a caixa de um eixo ou a distância), e a razão A/B vale quando está na faixa. Devolve o que `lerMedida` devolve, com `tipo:
+   'razao'`, a `faixa`, a razão (`medido`, e `exato` sem arredondar), os dois operandos em milímetro e o desvio até a faixa (zero
+   dentro dela). A razão sem leitura de um dos lados volta `lida: false` com o motivo, como qualquer medida. */
+function lerRazao(m, visiveis, pontos, fonte) {
+  const [min, max] = m.mede.faixa;
+  const base = { nome: m.nome, origem: m.origem, tipo: 'razao', faixa: [min, max] };
+  try {
+    if (!Array.isArray(m.mede.razao) || m.mede.razao.length !== 2) throw new NaoLida('a razão precisa de dois operandos [A, B]');
+    if (!(Number.isFinite(min) && Number.isFinite(max) && min >= 0 && min < max)) throw new NaoLida('a faixa da razão precisa ser [min, max] com 0 <= min < max');
+    const [a, b] = m.mede.razao.map((q) => medirExpressao(q, visiveis, pontos, fonte));
+    if (!(b.mm > 0)) throw new NaoLida('o denominador da razão mede 0 mm', [...new Set(b.formas)]);
+    const razao = a.mm / b.mm;
+    const desvio = razao < min ? razao - min : razao > max ? razao - max : 0;
+    const usadas = [...a.usadas, ...b.usadas];
+    const { volumes, perdas } = perdasDasFormas(usadas, fonte);
+    const doA = perdasDasFormas(a.usadas, fonte).limite_mm;
+    const doB = perdasDasFormas(b.usadas, fonte).limite_mm;
+    const foraDoAndaime = [...new Set([...a.foraDoAndaime, ...b.foraDoAndaime])];
+    return {
+      ...base, lida: true, medido: r4(razao), desvio: r4(desvio), ok: razao >= min - FOLGA_NUMERICA && razao <= max + FOLGA_NUMERICA,
+      exato: r6(razao), a_mm: r1(a.mm), b_mm: r1(b.mm), aExato_mm: r6(a.mm), bExato_mm: r6(b.mm), formas: [...new Set([...a.formas, ...b.formas])].sort(),
+      ...(fonte.nome === 'blocagem' ? { volumes, perdas: perdas.map((p) => p.id).sort(), limiteDasPerdas_mm: r6(doA + doB) } : {}),
+      ...(foraDoAndaime.length ? { foraDoAndaime: foraDoAndaime.sort() } : {}),
+    };
+  } catch (e) {
+    if (!(e instanceof NaoLida)) throw e;
+    return { ...base, lida: false, motivo: e.message, formas: [...e.formas].sort() };
+  }
+}
+
 /* A medida lida na fonte: o que o esboço devolve em `conferirPlano`, mais o valor exato e o que foi lido. */
 function lerMedida(m, visiveis, pontos, fonte) {
+  if (objeto(m.mede) && m.mede.razao !== undefined) return lerRazao(m, visiveis, pontos, fonte);
   const esperado = m.valor * (UNIDADES[m.unidade] ?? NaN);
   const tolerancia = m.tolerancia ?? Math.max(1, esperado * 0.02);
   const base = { nome: m.nome, origem: m.origem, esperado_mm: r1(esperado), tolerancia_mm: r1(tolerancia) };
@@ -172,12 +215,11 @@ function lerMedida(m, visiveis, pontos, fonte) {
     if (!Number.isFinite(esperado)) throw new NaoLida(`a unidade ${JSON.stringify(m.unidade)} não é mm, cm nem m`);
     const { mm, formas, foraDoAndaime, usadas } = medirExpressao(m.mede, visiveis, pontos, fonte);
     const desvio = mm - esperado;
-    const volumes = [...new Set(usadas.map((f) => fonte.volume(f)).filter(Boolean))].sort();
-    const perdas = (fonte.perdas ?? []).filter((p) => volumes.includes(p.volumeId));
+    const { volumes, perdas, limite_mm: limite } = perdasDasFormas(usadas, fonte);
     return {
       ...base, lida: true, medido_mm: r1(mm), desvio_mm: r1(desvio), ok: Math.abs(desvio) <= tolerancia + 1e-9,
       exato_mm: r6(mm), desvioExato_mm: r6(desvio), formas: [...formas].sort(),
-      ...(fonte.nome === 'blocagem' ? { volumes, perdas: perdas.map((p) => p.id).sort(), limiteDasPerdas_mm: r6(perdas.reduce((s, p) => s + p.erroEnvelope.mm, 0)) } : {}),
+      ...(fonte.nome === 'blocagem' ? { volumes, perdas: perdas.map((p) => p.id).sort(), limiteDasPerdas_mm: r6(limite) } : {}),
       ...(foraDoAndaime.length ? { foraDoAndaime: [...foraDoAndaime].sort() } : {}),
     };
   } catch (e) {
@@ -219,6 +261,17 @@ export function compararLeituras(naBlocagem, noDado, { tolerancia_mm: tolerancia
     if (!b.lida || !d.lida) {
       return { nome: b.nome, concordam: false, lidaNaBlocagem: b.lida, lidaNoDado: d.lida, ...(b.lida ? {} : { motivo: b.motivo }) };
     }
+    if (b.tipo === 'razao') {
+      /* a tolerância em milímetro, posta nos dois operandos, vira a variação da razão: razão x (tol/A + tol/B) */
+      const emRazao = (mm) => d.exato * (mm / d.aExato_mm + mm / d.bExato_mm);
+      const dif = r6(Math.abs(b.exato - d.exato));
+      return {
+        nome: b.nome, tipo: 'razao', lidaNaBlocagem: true, lidaNoDado: true, blocagem: b.exato, esboco: d.exato, diferenca: dif,
+        mesmoVeredito: b.ok === d.ok, perdas: b.perdas, limiteDasPerdas_mm: b.limiteDasPerdas_mm,
+        concordam: dif <= emRazao(tolerancia) + FOLGA_NUMERICA && b.ok === d.ok,
+        explicada: dif <= emRazao(b.limiteDasPerdas_mm + tolerancia) + FOLGA_NUMERICA,
+      };
+    }
     const diferenca = r6(Math.abs(b.exato_mm - d.exato_mm));
     const desvioIgual = r6(Math.abs(b.desvioExato_mm - d.desvioExato_mm));
     const limite = b.limiteDasPerdas_mm + tolerancia;
@@ -238,7 +291,9 @@ const pt = (x) => String(x).replace('.', ',');
 export function descreverMedidasNaBlocagem(leitura) {
   const linhas = [`medidas na blocagem${leitura.opcao?.numero ? ` (opção ${leitura.opcao.numero}${leitura.opcao.titulo ? `, ${leitura.opcao.titulo}` : ''})` : ''}: ${leitura.resumo.lidas} lida(s), ${leitura.resumo.naoLidas} não lida(s), ${leitura.resumo.reprovadas} fora da tolerância`];
   for (const m of leitura.medidas) {
-    linhas.push(m.lida
+    linhas.push(m.lida && m.tipo === 'razao'
+      ? `  ${m.nome}: razão ${pt(m.medido)} (${pt(m.a_mm)} mm sobre ${pt(m.b_mm)} mm), faixa ${pt(m.faixa[0])} a ${pt(m.faixa[1])}, ${m.ok ? 'dentro' : 'fora'}${m.perdas.length ? `; perdas que tocam: ${m.perdas.join(', ')}` : ''}`
+      : m.lida
       ? `  ${m.nome}: declarado ${pt(m.esperado_mm)} mm, medido ${pt(m.medido_mm)} mm, desvio ${pt(m.desvio_mm)} mm (tolerância ${pt(m.tolerancia_mm)} mm), ${m.ok ? 'dentro' : 'fora'}${m.perdas.length ? `; perdas que tocam: ${m.perdas.join(', ')}` : ''}`
       : `  ${m.nome}: não lida (${m.motivo})`);
   }

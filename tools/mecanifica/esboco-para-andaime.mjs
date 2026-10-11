@@ -9,7 +9,7 @@
 import { readFileSync } from 'node:fs';
 import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
-import { conferirPlano, lerPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
+import { comPontosReais, conferirPlano, lerPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compararLeituras, lerMedidasNaBlocagem, lerMedidasNoDado } from '../../src/autoria/medidas-na-blocagem.js';
 import { avaliarG01DoAndaime } from '../../src/autoria/g01-do-andaime.js';
@@ -57,8 +57,7 @@ export function medidasDaOpcao(expandido, dados) {
   const lido = lerPlano(expandido.plano);
   return (lido?.medidas ?? []).flatMap((m, k) => {
     if (m.opcoes !== undefined && !m.opcoes.some((q) => q === titulo || q === indice + 1)) return [];
-    const reescrita = o.medidas?.[k]?.mede?.distancia;
-    return [reescrita && m.mede.distancia ? { ...m, mede: { ...m.mede, distancia: reescrita } } : m];
+    return [comPontosReais(m, o.medidas?.[k])];
   });
 }
 

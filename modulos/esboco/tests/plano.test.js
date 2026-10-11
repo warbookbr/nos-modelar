@@ -72,6 +72,78 @@ describe('plano.medidas', () => {
     expect(divergencias[0].texto).toContain('desvio de -10 mm');
   });
 
+  describe('razão entre duas medidas', () => {
+    /* a picape é um bloco só, 5000 mm de comprimento (z) por `altura` mm (y); a faixa de proporção vem da ficha */
+    const picape = (altura) => [caixa('corpo', [0, altura / 2, 0], 1800, altura, 5000)];
+    const razao = (extra = {}) => ({ nome: 'alturaPeloComprimento', origem: 'ficha', mede: { razao: ['alturaTotal', 'profundidadeTotal'], faixa: [0.3, 0.4] }, ...extra });
+
+    it('a picape com altura de 0,29 do comprimento fica fora da faixa [0,30, 0,40], e a de 0,33 dentro', () => {
+      const baixa = conferir(com(picape(1450), { medidas: [razao()] }));
+      expect(baixa.opcoes[0].medidas[0]).toMatchObject({ nome: 'alturaPeloComprimento', tipo: 'razao', faixa: [0.3, 0.4], medido: 0.29, desvio: -0.01, a_mm: 1450, b_mm: 5000, ok: false });
+      expect(baixa.achados).toHaveLength(1);
+      expect(baixa.achados[0]).toMatchObject({ tipo: 'medida-fora', nome: 'alturaPeloComprimento', desvio: -0.01 });
+      expect(baixa.achados[0].texto).toBe('razão "alturaPeloComprimento" fora da faixa: o esboço mede 0,29 (1450 mm sobre 5000 mm) e o plano declara de 0,3 a 0,4 (origem: ficha), abaixo da faixa por 0,01');
+      const boa = conferir(com(picape(1650), { medidas: [razao()] }));
+      expect(boa.achados).toEqual([]);
+      expect(boa.opcoes[0].medidas[0]).toMatchObject({ medido: 0.33, desvio: 0, ok: true });
+    });
+
+    it('a razão acima da faixa diz que está acima, e a borda da faixa vale', () => {
+      const alta = conferir(com(picape(2500), { medidas: [razao()] }));
+      expect(alta.achados[0].texto).toContain('acima da faixa por 0,1');
+      expect(conferir(com(picape(1500), { medidas: [razao()] })).opcoes[0].medidas[0]).toMatchObject({ medido: 0.3, ok: true });
+      expect(conferir(com(picape(2000), { medidas: [razao()] })).opcoes[0].medidas[0]).toMatchObject({ medido: 0.4, ok: true });
+    });
+
+    it('os operandos são medidas que o formato conhece: caixa de formas, distância entre pontos e totais', () => {
+      const formas = [caixa('cabine', [0, 700, -500], 1800, 600, 1500), caixa('caixa', [0, 400, 1000], 1800, 400, 2000)];
+      const r = conferir(com(formas, { medidas: [
+        razao({ nome: 'cabinePelaCacamba', mede: { razao: [{ caixa: 'z', formas: ['cabine'] }, { caixa: 'z', formas: ['caixa'] }], faixa: [0.7, 0.8] } }),
+        razao({ nome: 'porDistancia', mede: { razao: [{ distancia: ['cabine.centro', 'caixa.centro'], eixo: 'z' }, 'profundidadeTotal'], faixa: [0.4, 0.5] } }),
+      ] }));
+      expect(r.achados).toEqual([]);
+      expect(r.opcoes[0].medidas.map((m) => m.medido)).toEqual([0.75, 0.4615]);
+    });
+
+    it('a distância dentro da razão usa os pontos reais da instância de componente', () => {
+      const j = fixture('moto-curvas.esboco.json');
+      const e = { ...j, plano: { medidas: [razao({ nome: 'entreEixosPeloTotal', mede: { razao: [{ distancia: ['rodaFrente.eixo', 'rodaTras.eixo'], eixo: 'z' }, 'profundidadeTotal'], faixa: [0.1, 0.9] } })] } };
+      const x = expandirEsboco(e);
+      const r = conferirPlano(x, visiveisDoEsboco(x));
+      expect(r.achados).toEqual([]);
+      expect(r.opcoes[0].medidas[0]).toMatchObject({ tipo: 'razao', a_mm: 1400, ok: true });
+    });
+
+    it('a leitura padrão lista a razão fora da faixa como divergência da classe medida', () => {
+      const { divergencias } = medirEsboco(com(picape(1450), { medidas: [razao()] }), { projecao: false });
+      expect(divergencias.map((d) => `${d.n}:${d.classe}`)).toEqual(['1:medida']);
+      expect(divergencias[0].texto).toContain('razão "alturaPeloComprimento" fora da faixa');
+    });
+
+    it('uma razão não tem valor, unidade nem tolerância, e a faixa e os operandos são validados', () => {
+      const recusa = (m, trecho) => { expect(() => lerPlano({ medidas: [m] })).toThrow(ErroDeEsboco); expect(() => lerPlano({ medidas: [m] })).toThrow(trecho); };
+      recusa(razao({ valor: 1, unidade: 'mm' }), /uma razão não tem "valor", "unidade" nem "tolerancia"/);
+      recusa(razao({ mede: { razao: ['alturaTotal', 'profundidadeTotal'] } }), /"mede.faixa" deve ser \[min, max\]/);
+      recusa(razao({ mede: { razao: ['alturaTotal', 'profundidadeTotal'], faixa: [0.4, 0.3] } }), /0 <= min < max/);
+      recusa(razao({ mede: { razao: ['alturaTotal'], faixa: [0.3, 0.4] } }), /"mede.razao" deve ser \[A, B\]/);
+      recusa(razao({ mede: { razao: ['alturaTotl', 'profundidadeTotal'], faixa: [0.3, 0.4] } }), /mede.razao\[0\]: "mede" com o valor "alturaTotl" não é uma expressão de medida \(quis dizer "alturaTotal"\?\)/);
+      recusa(razao({ mede: { razao: [{ razao: ['alturaTotal', 'larguraTotal'], faixa: [1, 2] }, 'profundidadeTotal'], faixa: [0.3, 0.4] } }), /uma razão não entra em outra razão/);
+      recusa(razao({ mede: { razao: ['alturaTotal', 'profundidadeTotal'], faixa: [0.3, 0.4], fx: 1 } }), /o campo "fx" não existe/);
+    });
+
+    it('o denominador que mede zero é recusado com a razão nomeada', () => {
+      const dois = [caixa('a', [0, 10, 0]), caixa('b', [0, 30, 0])];
+      expect(() => conferir(com(dois, { medidas: [razao({ mede: { razao: ['alturaTotal', { distancia: ['a.centro', 'a.centro'] }], faixa: [0.3, 0.4] } })] }))).toThrow(/plano.medidas "alturaPeloComprimento": o denominador da razão mede 0 mm/);
+    });
+
+    it('a razão vale só para as opções que declara, como qualquer medida', () => {
+      const e = { opcoes: [{ titulo: 'A', formas: picape(1450) }, { titulo: 'B', formas: picape(1650) }], plano: { medidas: [razao({ opcoes: ['B'] })] } };
+      const r = conferir(e);
+      expect(r.achados).toEqual([]);
+      expect(r.opcoes.map((o) => o.medidas.length)).toEqual([0, 1]);
+    });
+  });
+
   it('o texto do plano continua valendo como string e como plano.texto', () => {
     expect(textoDoPlano('um texto')).toBe('um texto');
     expect(textoDoPlano({ texto: 'outro', medidas: [] })).toBe('outro');
