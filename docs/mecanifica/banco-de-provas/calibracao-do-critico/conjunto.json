@@ -1126,6 +1126,62 @@
           ],
           "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
           "data": "2026-10-11T18:19:31.610Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "haste",
+              "tipo": "ausencia",
+              "onde": "entre a face da cabeça (flange) e o olhal dianteiro",
+              "sentido": "faltando",
+              "evidencia": "frontal.png e superior.png, x≈740–800: o olhal sai direto de um cone baixo sobre a flange, sem cilindro fino visível; lateral.png não mostra haste nem folga na face da flange"
+            },
+            {
+              "parte": "olhal dianteiro",
+              "tipo": "uniao",
+              "onde": "base do olhal, junto ao cone da cabeça",
+              "sentido": "afastado",
+              "evidencia": "frontal.png e isometrica.png: o olhal toca o cone da cabeça e não um terminal na ponta de uma haste; a cadeia êmbolo, haste, terminal e olhal não se lê"
+            },
+            {
+              "parte": "cabeça",
+              "tipo": "superficie",
+              "onde": "face da flange e contorno circular",
+              "sentido": "facetado",
+              "evidencia": "lateral.png: o contorno do disco é um polígono de cerca de 32 lados, com cunha de sombreamento no quadrante superior esquerdo"
+            }
+          ],
+          "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
+          "data": "2026-10-11T18:49:01.353Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "haste",
+              "tipo": "ausencia",
+              "onde": "trecho entre a face da cabeça e o olhal dianteiro",
+              "sentido": "faltando",
+              "evidencia": "Frontal e superior, x≈740 a 750: só há um cone curto entre o disco e o olhal direito. Não existe cilindro de haste mais fino que a camisa, nem terminal."
+            },
+            {
+              "parte": "cabeca",
+              "tipo": "superficie",
+              "onde": "disco da cabeça, contorno e face",
+              "sentido": "facetado",
+              "evidencia": "Vista de topo (a 'lateral'): silhueta do disco com cerca de 30 lados retos visíveis e cunha de sombreamento no quadrante superior esquerdo. Lê como prisma, não como revolução."
+            },
+            {
+              "parte": "olhalTraseiro",
+              "tipo": "ausencia",
+              "onde": "bucha esférica nas duas faces do anel",
+              "sentido": "faltando",
+              "evidencia": "Superior, x≈300 a 352: o corpo verde tem só chanfros e nenhuma saliência esférica nos dois lados. A bucha só se distingue por cor e anel interno na frontal e na isométrica."
+            }
+          ],
+          "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
+          "data": "2026-10-11T18:49:02.069Z"
         }
       ]
     },
@@ -1179,6 +1235,201 @@
           ],
           "briefSha256": "sha256:8b87c60c0cdcab29f1ce51ad6ee537ad39c51526dcabfbbb86b9f6a1dc8105c2",
           "data": "2026-10-11T18:19:51.183Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c02",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "friso do pneu",
+              "tipo": "espessura",
+              "onde": "friso da face esquerda do perfil, x 457-483",
+              "sentido": "maior",
+              "evidencia": "Nas vistas frontal e superior (perfil), o friso esquerdo passa do diâmetro externo do pneu em cerca de 8 mm por lado (y 159-1083 contra y 173-1068) e tem chanfro. O da direita (x 633-643) é só um friso baixo. A roda tem friso nos dois lados e com tamanhos diferentes, onde a pergunta 14 pede só o de dentro."
+            },
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "encontro dos raios com o cubo, na face visível do cubo",
+              "sentido": "atravessando",
+              "evidencia": "Na isométrica, junto ao cubo (cerca de x 540,575 e x 515,615), pedaços de raio aparecem por cima do cilindro do cubo, e na vista lateral os raios dobram perto do cubo (x 500,630 e x 520,620). A travessia não é explicada por uma flange nem por uma face do cubo."
+            }
+          ],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T18:48:53.210Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "extremidade interna, junto ao tubo do cubo",
+              "sentido": "atravessando",
+              "evidencia": "isométrica, cotocos azuis sobre o tubo do cubo em torno de (545,575) e (515,615); lateral, pontas de raio desenhadas sobre a borda do cubo em (500,630) e (600,612)"
+            },
+            {
+              "parte": "pneu",
+              "tipo": "uniao",
+              "onde": "banda, na largura média",
+              "sentido": "atravessando",
+              "evidencia": "frontal e superior, riscos finos verticais na banda em x 541-558, y 600-620 e y 715-800, sugerindo algo coplanar ou furando a superfície"
+            }
+          ],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T18:48:53.975Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "uniao",
+              "onde": "banda externa, perto do meio da largura, abaixo do centro",
+              "sentido": "atravessando",
+              "evidencia": "frontal e superior: traços finos e curtos em x=540-558, y=600-730, idênticos nas duas vistas. Parece uma aresta de outra peça coincidindo com a superfície do pneu. Evidência fraca, não confirmada."
+            },
+            {
+              "parte": "pneu",
+              "tipo": "espessura",
+              "onde": "friso do lado esquerdo no perfil",
+              "sentido": "maior",
+              "evidencia": "frontal e superior: o friso esquerdo tem cerca de 10 mm e diâmetro maior que a banda, enquanto o lado direito tem só um chanfro de cerca de 5 mm. A assimetria é visível também na isométrica. Só vale como defeito se a referência pedir friso fino ou simétrico."
+            }
+          ],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T18:48:55.044Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "friso lateral esquerdo",
+              "tipo": "comprimento",
+              "onde": "borda externa do disco esquerdo, x 457 a 483 nas vistas de borda",
+              "sentido": "maior",
+              "evidencia": "Nas vistas frontal e superior (de borda), o disco esquerdo vai de y 158 a 1083 e o pneu de y 173 a 1068, então o disco sobressai cerca de 15 px por lado. A borda direita é fina e menor que o pneu. Também aparece contorno duplo na borda externa da vista lateral."
+            },
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "tocos junto ao cubo, na isométrica, cerca de 545,575 e 515,615",
+              "sentido": "afastado",
+              "evidencia": "Na isométrica, dois tocos de raio escuros ao lado e acima do cubo, sem origem clara no cubo. Não confirmado, porque as vistas de borda não mostram a profundidade."
+            },
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "banda, nas vistas de borda, cerca de x 540 a 560, y 600 a 620 e y 715 a 800",
+              "sentido": "segmentado",
+              "evidencia": "Riscos finos soltos sobre a banda nas duas vistas de borda, sem feição explicada. Pode ser resíduo de aresta; detalhe de superfície."
+            }
+          ],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T18:48:55.893Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T18:48:56.646Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c05",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "contorno circular visto de frente (anéis externo e interno)",
+              "sentido": "facetado",
+              "evidencia": "Na vista lateral os círculos da camisa e da cabeça mostram cerca de 30 lados visíveis, lendo como polígono e não como revolução lisa."
+            },
+            {
+              "parte": "haste",
+              "tipo": "comprimento",
+              "onde": "trecho visível entre a cabeça e o terminal",
+              "sentido": "menor",
+              "evidencia": "Na vista frontal só cerca de 12 px (≈19 mm) de haste rosa aparecem entre a camisa e o terminal (x≈715–727), então a haste mal se lê como haste. Achado de baixa confiança, pois o cilindro pode estar recolhido."
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "data": "2026-10-11T18:48:57.424Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "contorno circular externo, visto de topo, e corpo na isométrica",
+              "sentido": "facetado",
+              "evidencia": "lateral.png: o círculo externo da camisa é um polígono de cerca de 30 lados, com lados retos visíveis; isometrica.png: bandas de sombra ao longo do corpo da camisa"
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "data": "2026-10-11T18:48:58.237Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "perfil circular visto na lateral, anel externo e anel marrom da cabeça",
+              "sentido": "facetado",
+              "evidencia": "Na vista lateral, que olha ao longo do eixo, os círculos aparecem como polígonos com lados visíveis, o que lê como prisma."
+            },
+            {
+              "parte": "olhalTraseiro",
+              "tipo": "espessura",
+              "onde": "aro dos dois olhais",
+              "sentido": "maior",
+              "evidencia": "Na frontal, o diâmetro do aro (≈58) é quase o da camisa (≈62), e na lateral o retângulo do olhal tem ≈450 de altura contra 500 da camisa. É desproporcional para um olhal de cilindro."
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "data": "2026-10-11T18:48:59.001Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "contorno circular da boca (borda externa, anel da cabeça e círculo interno)",
+              "sentido": "facetado",
+              "evidencia": "Vista lateral: o círculo externo e os anéis internos mostram lados retos visíveis, cerca de 30 segmentos, e leem como polígono."
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "data": "2026-10-11T18:48:59.854Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "face dianteira, círculo externo e aro interno",
+              "sentido": "facetado",
+              "evidencia": "lateral.png: o contorno externo da camisa (raio ≈250 px) e o aro interno têm lados retos visíveis, cerca de 24 a 32 segmentos"
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "data": "2026-10-11T18:49:00.576Z"
         }
       ]
     }
