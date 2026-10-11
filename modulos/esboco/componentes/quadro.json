@@ -23,5 +23,10 @@
   },
   "pares": [
     { "a": "viga", "b": "coluna", "tipo": "encosta" }
+  ],
+  "perguntas": [
+    "Em que ponta da viga está apoiada a coluna?",
+    "Em que face da viga a coluna encosta, em cima, embaixo ou de lado?",
+    "Visto de cima, onde a coluna fica em relação à linha central da viga?"
   ]
 }

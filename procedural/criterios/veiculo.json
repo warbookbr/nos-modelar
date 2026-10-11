@@ -1,0 +1,31 @@
+{
+  "formato": "mecanifica.criterios-do-objeto@1",
+  "id": "veiculo",
+  "cobre": ["carro de passeio", "picape", "caminhão", "moto", "bicicleta", "carrinho de mão", "carrinho de bebê"],
+  "perguntas": [
+    {
+      "texto": "Em que posição ao longo do veículo fica cada roda, e a que peça do quadro ou da carroceria o eixo dela está preso?",
+      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+    },
+    {
+      "texto": "Em que nível cada roda toca o chão, e o que sustenta o corpo do veículo sobre ela?",
+      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+    },
+    {
+      "texto": "Em qual plano está o círculo de cada roda, e para onde aponta o eixo dela?",
+      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+    },
+    {
+      "texto": "Onde ficam as rodas de um mesmo eixo, uma em relação à outra, vistas de frente e de cima?",
+      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+    },
+    {
+      "texto": "Onde fica o lugar de quem dirige, pedala ou empurra, e para que lado as partes indicam que o veículo anda?",
+      "condicao": { "forma": ["*assento*", "*banco*", "*selim*", "*guidao*", "*volante*", "*cabine*", "*alca*"] }
+    },
+    {
+      "texto": "Por onde se entra na cabine ou se carrega a caçamba, e que parte do corpo cobre ou deixa aberta essa passagem?",
+      "condicao": { "forma": ["*cabine*", "*cacamba*", "*porta*"] }
+    }
+  ]
+}

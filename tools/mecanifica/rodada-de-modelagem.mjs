@@ -14,6 +14,7 @@
  * Uso:
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
+ *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --perguntas
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -166,7 +167,8 @@ function comoCLI(argv) {
 
 if (process.argv[1] && process.argv[1].endsWith('rodada-de-modelagem.mjs')) {
   try {
-    const { codigo, texto } = comoCLI(process.argv.slice(2));
+    /* `--perguntas`: as perguntas de forma do brief do crítico, em perguntas-da-peca.mjs */
+    const { codigo, texto } = process.argv.includes('--perguntas') ? await (await import('./perguntas-da-peca.mjs')).comoCLI(process.argv.slice(2)) : comoCLI(process.argv.slice(2));
     (codigo === 0 ? console.log : console.error)(texto);
     process.exit(codigo);
   } catch (erro) {

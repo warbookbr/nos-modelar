@@ -52,5 +52,10 @@
     { "a": "aro", "b": "disco", "tipo": "encosta", "quando": "raios" },
     { "a": "cuboE", "b": "flangeE", "tipo": "encosta", "quando": "flanges" },
     { "a": "cuboD", "b": "flangeD", "tipo": "encosta", "quando": "flanges" }
+  ],
+  "perguntas": [
+    "Em que nível a parte mais baixa do pneu fica em relação ao plano em que o objeto se apoia?",
+    "Em qual plano está o círculo da roda, e para onde aponta o eixo do cubo?",
+    "Onde o cubo fica em relação ao centro do círculo do pneu, visto de frente?"
   ]
 }

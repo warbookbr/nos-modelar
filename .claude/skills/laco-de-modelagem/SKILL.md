@@ -101,7 +101,10 @@ nela ensina que o veredito é decorativo.
 
 **revisar** — despache o `critico-visual` com a referência, o pacote de
 `npm run vistas:critica -- <peça>`, que inclui vistas em arame, e os critérios de reprovação, dizendo a forma
-e a técnica que o plano promete para cada parte. Nunca mande a receita, os
+e a técnica que o plano promete para cada parte. Se o `PLANO` declara `familia` ou `familiaProcedural`,
+rode `node tools/mecanifica/rodada-de-modelagem.mjs <peça> --perguntas` e ponha o bloco
+que ele imprime no brief, depois dos critérios de reprovação; sem os campos, ou sem
+parte que satisfaça a condição, o comando diz que não há pergunta específica. Nunca mande a receita, os
 passos, o histórico nem o que mudou: contar como foi feito faz revisão virar
 concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem
 inventar nota.

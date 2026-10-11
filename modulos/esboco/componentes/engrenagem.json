@@ -60,5 +60,9 @@
       "b": "cubo",
       "tipo": "encosta"
     }
+  ],
+  "perguntas": [
+    "Onde os dentes aparecem em volta do contorno do disco?",
+    "De que lado do disco sai o cubo, e onde ele fica em relação ao centro?"
   ]
 }

@@ -135,6 +135,19 @@ validador e o gate `calibracao:check`; (5) as perguntas por família no brief; (
 as rodadas com o brief atual e o novo, com até três ajustes; (7) o gate no CI sem
 aumentar a leitura obrigatória.
 
+A tarefa 5 entrou em 2026-10-11. O campo `perguntas` do componente do esboço (e do
+módulo) e o de `familia.json` têm teto de 4 por componente; as famílias de objeto
+(`assento`, `veiculo`, `movel-de-caixa`) moram em `procedural/criterios/`, com teto
+de 6 e uma condição `{ componente, forma }` por pergunta, e são escolhidas por
+`plano.familia` no esboço e por `PLANO.familia` na peça (`PLANO.familiaProcedural`
+liga a peça ao `familia.json` de que saem as perguntas por componente). As
+perguntas entram depois das cinco fixas, com a pergunta aberta no fim, nos briefs
+do crítico da unidade, do Marco e do objeto e, na peça, por
+`rodada-de-modelagem.mjs <peça> --perguntas`. O validador recusa a pergunta que se
+responde com sim ou não e a de proporção; a regra de só tratar de parte que as
+vistas mostram fica com quem escreve a pergunta, porque nenhuma checagem sabe o
+que uma vista mostra.
+
 ## Desenho da fatia 9
 
 A pessoa decidiu em 2026-10-11: a família e o componente do esboço de mesmo nome

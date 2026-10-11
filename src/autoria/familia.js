@@ -15,6 +15,9 @@ export const FORMATO_FAMILIA = 'mecanifica.familia@1';
 export const NIVEIS_DE_FAMILIA = Object.freeze(['componente', 'objeto']);
 export const TIPOS_DE_PARAMETRO = Object.freeze(['numero', 'inteiro']);
 export const UNIDADES_DE_PARAMETRO = Object.freeze(['mm', 'graus', 'contagem']);
+/* O teto de perguntas do crítico por componente da família. Repete `TETO_POR_COMPONENTE` de `perguntas-do-critico.js` porque o
+   arquivo não importa nada; o teste da família confere os dois. */
+export const TETO_DE_PERGUNTAS_POR_COMPONENTE = 4;
 
 export const PAPEIS_POR_TIPO_DE_PORTA = Object.freeze({
   anel: Object.freeze(['recebe', 'ocupa']),
@@ -329,6 +332,7 @@ export function lerFamilia(bruta, opcoes = {}) {
     if (!IDENTIFICADOR.test(componente)) recusar(campo, componente, 'nome de componente com letras, dígitos, hífen e sublinhado, começando por letra');
     const itens = bruta.perguntas[componente];
     if (!Array.isArray(itens) || !itens.length) recusar(campo, itens, 'lista com ao menos uma pergunta');
+    if (itens.length > TETO_DE_PERGUNTAS_POR_COMPONENTE) recusar(campo, `${itens.length} perguntas`, `no máximo ${TETO_DE_PERGUNTAS_POR_COMPONENTE} perguntas por componente; o brief do crítico cresce com cada uma, então corte as que o --medidas ou as cinco fixas já cobrem`);
     const vistas = new Set();
     perguntas[componente] = itens.map((pergunta, indice) => {
       const limpa = textoLivre(pergunta, `${campo}[${indice}]`, 'texto com a pergunta');
@@ -452,7 +456,7 @@ export const SCHEMA_FAMILIA = congelar({
     ferramentas: { type: 'array', minItems: 1, uniqueItems: true, items: { enum: [...FERRAMENTAS_DE_FAMILIA] } },
     perguntas: {
       type: 'object', minProperties: 1, propertyNames: { pattern: IDENTIFICADOR.source },
-      additionalProperties: { type: 'array', minItems: 1, uniqueItems: true, items: textoNaoVazio() },
+      additionalProperties: { type: 'array', minItems: 1, maxItems: TETO_DE_PERGUNTAS_POR_COMPONENTE, uniqueItems: true, items: textoNaoVazio() },
     },
     esboco: objetoFechado({
       componente: { type: 'string', pattern: NOME_DO_COMPONENTE.source },

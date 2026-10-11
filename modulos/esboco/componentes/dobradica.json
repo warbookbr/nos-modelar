@@ -125,5 +125,10 @@
       "b": "abaD",
       "tipo": "encosta"
     }
+  ],
+  "perguntas": [
+    "Visto de cima, de que lado da porta e do corpo fica o pino?",
+    "A que peça está presa cada uma das duas abas?",
+    "Para onde aponta o pino em relação à borda vertical da porta que ele articula?"
   ]
 }

@@ -23,18 +23,25 @@
  * campo de runtime não entram, porque plano é o que a peça pretende ser e não
  * um retrato de execução. */
 
+import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../procedural/criterios/index.js';
+
 export const FORMATO_PLANO_DE_MODELAGEM = 'mecanifica.plano-de-modelagem';
 export const VERSAO_PLANO_DE_MODELAGEM = 1;
 
 export const CAMPOS_PLANO = Object.freeze([
   'objeto', 'referencias', 'escala', 'partes', 'criteriosDeReprovacao',
 ]);
+/* Campos que o plano pode declarar ou não. `familia` escolhe o arquivo de critérios por família de objeto (assento, veículo, móvel de
+   caixa) de `procedural/criterios/`, e `familiaProcedural` é a família de `procedural/familias/` que gerou a peça, de onde o brief do
+   crítico lê as `perguntas` por componente. Plano sem eles produz a mesma forma canônica de antes. */
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 
 const UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i;
 const CAMPO_RUNTIME = /^(uuid|indice|index|passo|timestamp|createdat|updatedat|host)$/i;
 const ABSOLUTO = /^(?:[a-z]:\\|\\\\|\/|data:)/i;
+const ID_DE_FAMILIA = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const NOME_DE_PARTE = /^[a-zA-Z][a-zA-Z0-9]*$/;
 const LIMITE_TEXTO = 240;
 const LIMITE_LISTA = 64;
@@ -58,9 +65,9 @@ function texto(valor, quem, campo, minimo = 1) {
   return limpo;
 }
 
-function chavesExatas(valor, permitidas, quem, campo) {
+function chavesExatas(valor, permitidas, quem, campo, opcionais = []) {
   for (const chave of Object.keys(valor)) {
-    if (CAMPO_RUNTIME.test(chave) || !permitidas.includes(chave)) {
+    if (CAMPO_RUNTIME.test(chave) || !(permitidas.includes(chave) || opcionais.includes(chave))) {
       falhar(quem, `'${campo}.${chave}' não é permitido no plano de modelagem.`);
     }
   }
@@ -102,7 +109,13 @@ function umaParte(valor, quem, campo) {
 export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
   if (valor === undefined || valor === null) return null;
   if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, 'precisa ser objeto ou estar ausente.');
-  chavesExatas(valor, CAMPOS_PLANO, quem, quem);
+  chavesExatas(valor, CAMPOS_PLANO, quem, quem, CAMPOS_OPCIONAIS_DO_PLANO);
+  if (valor.familia !== undefined && criteriosDe(valor.familia) === undefined) {
+    falhar(quem, `'familia' precisa ser uma família de objeto com critérios (${FAMILIAS_DE_OBJETO.join(', ')}); veio ${JSON.stringify(valor.familia)}.`);
+  }
+  if (valor.familiaProcedural !== undefined && !(typeof valor.familiaProcedural === 'string' && ID_DE_FAMILIA.test(valor.familiaProcedural))) {
+    falhar(quem, `'familiaProcedural' precisa ser o id de uma família de procedural/familias (minúsculas, hífen entre as palavras); veio ${JSON.stringify(valor.familiaProcedural)}.`);
+  }
 
   const escala = valor.escala;
   if (!escala || typeof escala !== 'object' || Array.isArray(escala)) falhar(quem, "'escala' precisa ser objeto.");
@@ -128,6 +141,8 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     escala: { medida: texto(escala.medida, quem, 'escala.medida'), milimetros: escala.milimetros },
     partes,
     criteriosDeReprovacao: listaDeTextos(valor.criteriosDeReprovacao, quem, 'criteriosDeReprovacao', MINIMO_DO_CRITERIO),
+    ...(valor.familia === undefined ? {} : { familia: valor.familia }),
+    ...(valor.familiaProcedural === undefined ? {} : { familiaProcedural: valor.familiaProcedural }),
   };
 }
 

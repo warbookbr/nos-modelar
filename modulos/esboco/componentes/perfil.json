@@ -178,5 +178,10 @@
     "frente": "corpo.+z",
     "tras": "corpo.-z",
     "topo": "corpo.+y"
-  }
+  },
+  "perguntas": [
+    "Para que lado a abertura da seção aponta, em relação às peças que tocam o perfil?",
+    "Qual lado da seção fica para cima no objeto?",
+    "Ao longo do comprimento, como a seção se apresenta nas pontas e no meio, fechada ou aberta?"
+  ]
 }

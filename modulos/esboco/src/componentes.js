@@ -34,6 +34,7 @@ import { COMPONENTES } from '../componentes/index.js';
 import { validarForma } from './esquema.js';
 import { quisDizer } from './parecido.js';
 import { traduzirLigacoes } from './ligar.js';
+import { lerPerguntasDoComponente } from '../../../src/autoria/perguntas-do-critico.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -52,7 +53,7 @@ export function componente(nome, onde, catalogo = COMPONENTES) {
   throw new ErroDeEsboco(`${onde}: o componente "${nome}" não existe${typeof nome === 'string' ? quisDizer(nome, Object.keys(catalogo)) : ''} (componentes: ${arquivos.join(', ')}${modulos.length ? `; módulos: ${modulos.join(', ')}` : ''})`);
 }
 
-const CAMPOS_DO_MODULO = ['descricao', 'principal', 'parametros', 'entradas', 'formas', 'ancoras', 'pares', 'substitui'];
+const CAMPOS_DO_MODULO = ['descricao', 'principal', 'parametros', 'entradas', 'formas', 'ancoras', 'pares', 'substitui', 'perguntas'];
 const entradasCitadas = (v, achadas = new Set()) => {
   if (typeof v === 'string' && v.startsWith('@')) achadas.add(v.slice(1));
   else if (Array.isArray(v)) v.forEach((x) => entradasCitadas(x, achadas));
@@ -117,7 +118,11 @@ export function catalogoDe(modulos) {
     }
     for (const p of m.pares ?? []) exigir(objeto(p) && ids.includes(p.a) && ids.includes(p.b), `${onde}: o par ${JSON.stringify([p?.a, p?.b])} cita forma que não é do módulo (formas: ${ids.join(', ')})`);
     const entradas = m.entradas ?? Object.fromEntries([...entradasCitadas(formasDoModulo)].map((k) => [k, null]));
-    catalogo[nome] = { componente: nome, origem: 'modulo', principal, parametros: m.parametros ?? {}, entradas, formas: formasDoModulo, ancoras: m.ancoras ?? {}, pares: m.pares ?? [] };
+    let perguntas;
+    if (m.perguntas !== undefined) {
+      try { perguntas = lerPerguntasDoComponente(m.perguntas, `modulos.${nome}.perguntas`); } catch (e) { throw new ErroDeEsboco(`${onde}: ${e.message}`); }
+    }
+    catalogo[nome] = { componente: nome, origem: 'modulo', principal, parametros: m.parametros ?? {}, entradas, formas: formasDoModulo, ancoras: m.ancoras ?? {}, pares: m.pares ?? [], ...(perguntas ? { perguntas } : {}) };
   }
   return catalogo;
 }

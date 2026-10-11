@@ -81,5 +81,9 @@
       "b": "esfera",
       "tipo": "encosta"
     }
+  ],
+  "perguntas": [
+    "Visto pela face, o que aparece no vão entre o anel externo e o anel interno?",
+    "Em volta do eixo, onde ficam as esferas em relação aos dois anéis?"
   ]
 }

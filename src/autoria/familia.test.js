@@ -7,8 +7,9 @@ import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
 import {
   ErroFamilia, FERRAMENTAS_DE_FAMILIA, FORMATO_FAMILIA, LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM,
   LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM, PAPEIS_POR_TIPO_DE_PORTA, SCHEMA_FAMILIA, TIPOS_DE_PORTA, TIPOS_DE_PORTA_COM_VOLUME,
-  VERSAO_CONFERENCIA_ESBOCO, avaliarRestricao, lerFamilia,
+  TETO_DE_PERGUNTAS_POR_COMPONENTE, VERSAO_CONFERENCIA_ESBOCO, avaliarRestricao, lerFamilia,
 } from './familia.js';
+import { TETO_POR_COMPONENTE } from './perguntas-do-critico.js';
 import { FORMAS_DE_PORTA_DO_ANDAIME } from './forma-global.js';
 import {
   LIMITE_DA_TOLERANCIA_DA_PORTA_MM, LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM, normalizarRefinamentoGlobal,
@@ -182,6 +183,15 @@ describe('familia — cada defeito é recusado com campo, valor e o que é aceit
     expect(recusa(variar((f) => { f.perguntas.pneu = []; })).campo).toBe('perguntas.pneu');
     expect(recusa(variar((f) => { f.perguntas.pneu[1] = f.perguntas.pneu[0]; })).campo).toBe('perguntas.pneu[1]');
     expect(recusa(variar((f) => { f.perguntas['1pneu'] = ['x?']; })).campo).toBe('perguntas.1pneu');
+  });
+
+  it('o teto de perguntas por componente recusa o excesso, e é o mesmo do módulo das perguntas', () => {
+    expect(TETO_DE_PERGUNTAS_POR_COMPONENTE).toBe(TETO_POR_COMPONENTE);
+    const erro = recusa(variar((f) => { f.perguntas.pneu = Array.from({ length: TETO_DE_PERGUNTAS_POR_COMPONENTE + 1 }, (_, i) => `Onde fica a parte ${i}?`); }));
+    expect(erro.campo).toBe('perguntas.pneu');
+    expect(erro.message).toMatch(new RegExp(`no máximo ${TETO_DE_PERGUNTAS_POR_COMPONENTE} perguntas por componente`));
+    const noTeto = variar((f) => { f.perguntas.pneu = Array.from({ length: TETO_DE_PERGUNTAS_POR_COMPONENTE }, (_, i) => `Onde fica a parte ${i}?`); });
+    expect(() => lerFamilia(noTeto)).not.toThrow();
   });
 
   it('vínculo com o esboço: parâmetro da família inexistente, componente e parâmetro de componente desconhecidos', () => {

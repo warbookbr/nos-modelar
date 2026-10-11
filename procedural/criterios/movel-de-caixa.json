@@ -1,0 +1,31 @@
+{
+  "formato": "mecanifica.criterios-do-objeto@1",
+  "id": "movel-de-caixa",
+  "cobre": ["guarda-roupa", "armário de cozinha", "cômoda", "criado-mudo", "estante com portas", "gaveteiro"],
+  "perguntas": [
+    {
+      "texto": "De que lado de cada porta fica cada dobradiça, na frente do móvel ou atrás da porta, e a que peça do corpo a outra aba dela está presa?",
+      "condicao": { "componente": ["dobradica"], "forma": ["*dobradica*", "*pino*"] }
+    },
+    {
+      "texto": "Que parte da frente do corpo fica descoberta, e a partir de qual borda cada porta gira?",
+      "condicao": { "componente": ["porta"], "forma": ["*porta*"] }
+    },
+    {
+      "texto": "Por onde cada gaveta entra e sai, e em que peças do corpo ela se apoia?",
+      "condicao": { "componente": ["gaveta"], "forma": ["*gaveta*", "*corredica*"] }
+    },
+    {
+      "texto": "O que segura cada prateleira, e em que peças do corpo ela encosta?",
+      "condicao": { "forma": ["*prateleira*"] }
+    },
+    {
+      "texto": "Em que face de cada porta e de cada gaveta fica o puxador, e perto de qual borda?",
+      "condicao": { "forma": ["*pux*"] }
+    },
+    {
+      "texto": "O que toca o chão, e o que fica entre o chão e a base do corpo?",
+      "condicao": { "forma": ["*rodape*", "*base*", "*pes*"] }
+    }
+  ]
+}

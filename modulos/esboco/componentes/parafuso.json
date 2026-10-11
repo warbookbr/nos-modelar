@@ -75,5 +75,9 @@
       "b": "haste",
       "tipo": "encosta"
     }
+  ],
+  "perguntas": [
+    "Em qual face da peça a cabeça se apoia, e para que lado a haste segue a partir dela?",
+    "Visto de lado, em que ponto a cabeça se liga à haste?"
   ]
 }

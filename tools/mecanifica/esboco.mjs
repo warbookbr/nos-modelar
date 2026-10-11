@@ -18,6 +18,8 @@ import { comFormasVizinhas, descricaoDasVizinhas, detalharUnidade, formasVizinha
 import { editarEsboco, formatarMudancas } from '../../modulos/esboco/src/editar.js';
 import { formatarLigacoes, mapaDeLigacoes } from '../../modulos/esboco/src/mapa-de-ligacoes.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
+import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
+import { linhasDasPerguntas } from '../../src/autoria/perguntas-do-critico.js';
 import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
@@ -943,7 +945,7 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
   L.push('Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:');
   for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`  ${linha}`);
   L.push('Responda, olhando só as imagens:');
-  PERGUNTAS_DO_CRITICO.forEach((p, i) => L.push(`  ${i + 1}. ${p}`));
+  L.push(...linhasDasPerguntas(PERGUNTAS_DO_CRITICO, perguntasDoEsboco(bruto, { formas: new Set(r.unidade.membros) }).todas));
   L.push('--- fim do brief ---');
   return { texto: `${L.join('\n')}\n`, destinos: r.destinos, pasta, funcao };
 }
@@ -1004,7 +1006,7 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   }
   L.push(...ligacoesArquivo(arquivo).texto.trimEnd().split('\n').slice(-1));
   L.push('Responda, olhando só as imagens:');
-  PERGUNTAS_DO_MARCO.forEach((p, i) => L.push(`  ${i + 1}. ${p}`));
+  L.push(...linhasDasPerguntas(PERGUNTAS_DO_MARCO, perguntasDoEsboco(bruto).todas));
   L.push('--- fim do brief ---');
   return { texto: `${L.join('\n')}\n`, gerais, unidades, pasta };
 }
@@ -1050,7 +1052,7 @@ export async function briefDoObjeto(arquivo, { largura = null, saida = null } = 
   L.push('Imagens do objeto (as quatro vistas, sem legenda):');
   for (const d of gerais) L.push(`  ${d}`);
   L.push('Responda, olhando só as imagens:');
-  PERGUNTAS_DO_OBJETO.forEach((p, i) => L.push(`  ${i + 1}. ${p}`));
+  L.push(...linhasDasPerguntas(PERGUNTAS_DO_OBJETO, perguntasDoEsboco(bruto).todas));
   L.push('--- fim do brief ---');
   return { texto: `${L.join('\n')}\n`, gerais, pasta };
 }
