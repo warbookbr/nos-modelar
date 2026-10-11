@@ -181,6 +181,45 @@ describe('as dobradiças', () => {
     }
   });
 
+  /* a chapa da folha da dobradiça sai tangente ao rolo, deslocada do eixo do pino: o rasgo da parede e o da borda da porta se
+     centram nela (zDaChapa, da geometria da dobradiça), com a folga de rasgo de cada lado, nos dois lados do vão e na divisória */
+  it('a folha fixa fica centrada no rasgo da parede e a móvel no da borda da porta, com a folga de rasgo de cada lado', () => {
+    for (const parametros of [{}, QUATRO]) {
+      const montada = ROUPEIRO.montar(parametros);
+      const g = montada.geometria;
+      const corpo = [...executarReceita(montada.receitas['roupeiro-corpo'], execucao).neutro.V.values()].map(([x, y, z]) => [x / MM, y / MM, z / MM]);
+      const zDaChapa = g.dobradicaGeometria.mm.zDaChapa;
+      const vistos = new Set();
+      for (const porta of g.portas) {
+        const d = porta.dobradicas[0];
+        const metade = g.dobradica.parametros.altura / 2;
+        const peca = (lado) => [...executarReceita(montada.receitas[`roupeiro-dobradica-${porta.indice + 1}-1-${lado}`], execucao).neutro.V.values()].map(([x, y, z]) => [x / MM, y / MM, z / MM]);
+        /* a folha fixa, no rasgo da parede: as paredes do rasgo são os planos x mais próximos da folha, fundo adentro */
+        const fixa = peca('d').filter(([, , z]) => z < d.z - 9);
+        const xMin = Math.min(...fixa.map(([x]) => x));
+        const xMax = Math.max(...fixa.map(([x]) => x));
+        const centroDaFolha = (xMin + xMax) / 2;
+        expect(centroDaFolha - d.x).toBeCloseTo(porta.vao * zDaChapa, 6);
+        const paredes = [...new Set(corpo.filter(([x, y, z]) => z < d.z - g.raioDoTambor - 1 && Math.abs(x - centroDaFolha) < 2.5 && Math.abs(y - d.y) <= metade + 0.31).map(([x]) => Number(x.toFixed(6))))].sort((a, b) => a - b);
+        expect(paredes).toHaveLength(2);
+        expect(xMin - paredes[0]).toBeCloseTo(0.2, 5);
+        expect(paredes[1] - xMax).toBeCloseTo(0.2, 5);
+        /* a folha móvel, no rasgo da borda da porta */
+        const movel = peca('e').filter(([x]) => Math.abs(x - d.x) > 9);
+        const zMin = Math.min(...movel.map(([, , z]) => z));
+        const zMax = Math.max(...movel.map(([, , z]) => z));
+        expect((zMin + zMax) / 2 - d.z).toBeCloseTo(-zDaChapa, 6);
+        const lage = [...executarReceita(montada.receitas[`roupeiro-porta-${porta.indice + 1}`], execucao).neutro.V.values()].map(([x, y, z]) => [x / MM, y / MM, z / MM]);
+        const faces = [...new Set(lage.filter(([x, y, z]) => (x - porta.xDaBorda) * porta.vao > -0.01 && (x - porta.xDaBorda) * porta.vao < 20 && Math.abs(y - d.y) <= metade + 0.31 && z > zMin - 0.5 && z < zMax + 0.5).map(([, , z]) => Number(z.toFixed(6))))].sort((a, b) => a - b);
+        expect(faces).toHaveLength(2);
+        expect(zMin - faces[0]).toBeCloseTo(0.2, 5);
+        expect(faces[1] - zMax).toBeCloseTo(0.2, 5);
+        vistos.add(porta.apoio);
+      }
+      if (parametros === QUATRO) expect([...vistos].sort()).toEqual(['divisoria-direita', 'divisoria-esquerda', 'lateral-direita', 'lateral-esquerda']);
+    }
+  });
+
   it('as dobradiças das duas portas que giram nas faces da divisória ficam em alturas diferentes', () => {
     const g = geometriaDoRoupeiro(completos(QUATRO));
     const esquerda = g.portas.find((p) => p.apoio === 'divisoria-esquerda').dobradicas.map((d) => d.y);
@@ -309,10 +348,10 @@ describe('várias portas abertas ao mesmo tempo', () => {
     }
   }, 600_000);
 
-  it('as duas portas da divisória se tocam acima do curso que a conta deu (70 graus cada), e por isso o curso delas é menor', () => {
+  it('as duas portas da divisória se tocam acima do curso que a conta deu (80 graus cada), e por isso o curso delas é menor', () => {
     const { g, batem } = preparar(QUATRO);
-    expect(g.portas[1].curso).toBeLessThan(70);
-    expect(batem(1, 2, 70, 70)).toBe(true);
+    expect(g.portas[1].curso).toBeLessThan(80);
+    expect(batem(1, 2, 80, 80)).toBe(true);
   }, 600_000);
 
   it('com três portas, a porta da divisória abre a 90 graus com a vizinha em qualquer ângulo', () => {

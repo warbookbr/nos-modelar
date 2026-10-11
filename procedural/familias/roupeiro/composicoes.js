@@ -176,7 +176,7 @@ function nosDoCorpo(b, g, params) {
     const topoDoRasgo = g.zDoPino - raio - FOLGA_DO_REBAIXO + SOBREPOSICAO;
     nos.push(cubo(b, `rasgo-${nome}`, id + 2, {
       larg: folha.espessura + 2 * FOLGA_DO_RASGO, alt: hd + 0.6, prof: topoDoRasgo - fundoDoRasgo,
-      em: [porta.xDoPino, y0 - 0.3, (topoDoRasgo + fundoDoRasgo) / 2],
+      em: [porta.xDoPino + porta.vao * dg.zDaChapa, y0 - 0.3, (topoDoRasgo + fundoDoRasgo) / 2],
     }));
     nos.push({
       id: b.id(`repeticao-dos-rasgos-${nome}`), operacao: 'arranja',
@@ -224,7 +224,7 @@ function nosDaPorta(b, g, porta) {
   const y0 = porta.dobradicas[0].y - hd / 2;
   nos.push(cubo(b, 'rasgo', ID.rasgo, {
     larg: Math.abs(fim - comeco), alt: hd + 0.6, prof: folha.espessura + 2 * FOLGA_DO_RASGO,
-    em: [(comeco + fim) / 2, y0 - 0.3, g.zDoPino],
+    em: [(comeco + fim) / 2, y0 - 0.3, g.zDoPino - dg.zDaChapa],
   }));
   nos.push({
     id: b.id('repeticao-dos-rasgos'), operacao: 'arranja',

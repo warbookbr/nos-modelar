@@ -16,7 +16,7 @@
           "profundidade": 350,
           "rodape": 40
         },
-        "hash": "sha256:da259743ec9bd1e240e4dfc998db4bdec295b60590189d66e16befdd739c9353",
+        "hash": "sha256:2e33d5b90016192b2e64f98b20120ea1ddb870bdb17706f6ad775d5b09b72ca7",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -27,7 +27,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:06cd1ce90738f4edeb975042a5c433dc83235699c50deab42f7c863c963d82f4",
+          "hash": "sha256:c6e181de1cd7e12339d5c8ba08b6ce2927c68373f317d4065aade410a8146a2f",
           "pecas": [
             "roupeiro-corpo",
             "roupeiro-dobradica-1-1-d",
@@ -97,7 +97,7 @@
           "profundidade": 600,
           "rodape": 80
         },
-        "hash": "sha256:090729977c310402281705382946522aa841f31189d2cf840b91f24be9da3984",
+        "hash": "sha256:394de6215c9ceb0cd508b6a95ac951662634e671d76cb5fa684861635909d157",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -108,7 +108,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:42d38b6556438656cc098fd06ec3c81b289059b81b73d6aa60a2dd4551ca1cbb",
+          "hash": "sha256:eaa93af678c7c3c6373679c3631094e310a9e2a6d0aaa231dca9ede7085e189f",
           "pecas": [
             "roupeiro-corpo",
             "roupeiro-dobradica-1-1-d",
@@ -250,7 +250,7 @@
           "profundidade": 800,
           "rodape": 150
         },
-        "hash": "sha256:6f62746fa13a3c3617affdf332546008b9e081cbc8f7b0f93128c5c69eaf3b5c",
+        "hash": "sha256:f48bc43f27acfed7ac9ec0d44d3986e1f3a62d6d73f7d872b86fd8f139eba88c",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -261,7 +261,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:766ec3f466d6143a153819a15eb716079e9b1852894dc3192d8feb66619219b3",
+          "hash": "sha256:2334f7661bef9fe7fb318262b240573384aadfffea87b8b335dd565c191aca2b",
           "pecas": [
             "roupeiro-corpo",
             "roupeiro-dobradica-1-1-d",
