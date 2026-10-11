@@ -1923,6 +1923,58 @@
           "data": "2026-10-11T19:00:21.554Z"
         }
       ]
+    },
+    {
+      "imagem": "c02",
+      "agenteSha256": "sha256:87d5d1c0b72d6063dcb691825eef2268b81077952ba95aaf24a0a8fdb3956c2d",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T19:02:25.119Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T19:02:25.858Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "banda, de ponta a ponta",
+              "sentido": "facetado",
+              "evidencia": "frontal e superior: degraus horizontais de sombra ao longo da banda, como cilindro de poucos lados"
+            },
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "flanco, quadrante inferior direito, a cerca de 40% da altura",
+              "sentido": "segmentado",
+              "evidencia": "lateral e isométrica: faixa clara em arco sugere superfície curva, mas a silhueta da frontal e da superior é reta, sem bojo"
+            }
+          ],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T19:02:26.786Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T19:02:27.720Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "data": "2026-10-11T19:02:28.552Z"
+        }
+      ]
     }
   ],
   "prancha": {
