@@ -23,5 +23,9 @@
   "pares": [
     { "a": "perna", "b": "bengala", "tipo": "encosta" },
     { "a": "bengala", "b": "coroa", "tipo": "encosta" }
+  ],
+  "perguntas": [
+    "Vistas de frente, em que linha vertical ficam a perna, a bengala e a coroa?",
+    "Onde a base da perna fica em relação ao centro da roda?"
   ]
 }

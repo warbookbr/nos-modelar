@@ -78,7 +78,11 @@ Peça em arquivo solto reprova em `npm run guarda:acervo`.
 
 Escreva o `PLANO` na receita com `objeto`, `referencias`, `escala`, `partes` e
 `criteriosDeReprovacao`, e a lista de `contatos` ao lado, com as referências
-relativas à pasta da peça. Num objeto de várias partes, a ordem do passo 1 vai
+relativas à pasta da peça. Quando o objeto é de uma família com critérios
+(`assento`, `veiculo`, `movel-de-caixa`, em `procedural/criterios/`), declare
+`familia` no `PLANO`, e `familiaProcedural` quando ele nasce de uma família de
+`procedural/familias/`: o brief do crítico passa a trazer as perguntas de forma
+delas. Num objeto de várias partes, a ordem do passo 1 vai
 para `etapas` da montagem v5, e cada encaixe anotado vira um vínculo de medida
 ou uma posição por porta, conforme
 [`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md).

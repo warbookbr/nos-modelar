@@ -30,5 +30,10 @@
   "pares": [
     { "a": "base", "b": "alojamento", "tipo": "encosta" },
     { "a": "alojamento", "b": "eixo", "tipo": "atravessa", "max": 4, "motivo": "o eixo passa pelo furo do alojamento" }
+  ],
+  "perguntas": [
+    "Na vista frontal, sobre o que o anel do alojamento se apoia, e onde está a linha de contato entre eles?",
+    "Por quais faces do alojamento o eixo aparece, e em que ponto do furo ele passa?",
+    "Onde, na base, ficam os dois furos de fixação?"
   ]
 }

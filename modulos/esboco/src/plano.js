@@ -8,13 +8,14 @@ import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeContato, unidadesDeclaradas } from './contato.js';
 import { quisDizer } from './parecido.js';
 import { conferirReferencia, exigirVista } from './referencia.js';
+import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../../procedural/criterios/index.js';
 
 export const NIVEIS = ['esquematico', 'medio', 'detalhado'];
 export const ORIGENS = ['ficha', 'foto', 'ia', 'referencia'];
 export const UNIDADES = { mm: 1, cm: 10, m: 1000 };
 export const MEDIDAS_TOTAIS = { alturaTotal: 'y', larguraTotal: 'x', profundidadeTotal: 'z' };
 const EIXOS = ['x', 'y', 'z'];
-const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope', 'pecas'];
+const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope', 'pecas', 'familia'];
 const CHAVES_DA_PECA = ['nome', 'formas', 'obrigatoria', 'opcoes'];
 const EXEMPLO_DA_PECA = '{ "nome": "para-lama traseiro", "formas": ["paralamaT*"], "obrigatoria": true }';
 const CHAVES_DA_REFERENCIA = ['arquivo', 'vista', 'tolerancia', 'iou_min', 'partes', 'opcoes', 'ancoras', 'recorte', 'limiar'];
@@ -159,6 +160,7 @@ export function lerPlano(plano) {
       pecas.push({ nome: p.nome, formas: p.formas, obrigatoria: p.obrigatoria === true, ...(p.opcoes ? { opcoes: p.opcoes } : {}) });
     }
   }
+  exigir(plano.familia === undefined || (typeof plano.familia === 'string' && criteriosDe(plano.familia) !== undefined), `esboço: "plano.familia" com o valor ${JSON.stringify(plano.familia)} deve ser uma família de objeto com critérios (${FAMILIAS_DE_OBJETO.join(', ')}); ela escolhe as perguntas de forma que o brief do crítico acrescenta às cinco fixas${typeof plano.familia === 'string' ? quisDizer(plano.familia, FAMILIAS_DE_OBJETO) : ''}`);
   let envelope;
   if (plano.envelope !== undefined) {
     exigir(objeto(plano.envelope), 'esboço: "plano.envelope" deve ser um objeto { tolerancia } (o objeto vazio liga a conferência com a tolerância padrão)');
@@ -166,7 +168,7 @@ export function lerPlano(plano) {
     exigir(plano.envelope.tolerancia === undefined || (Number.isFinite(plano.envelope.tolerancia) && plano.envelope.tolerancia >= 0), 'esboço: "plano.envelope.tolerancia" deve ser um número em mm, maior ou igual a zero');
     envelope = { ...(plano.envelope.tolerancia === undefined ? {} : { tolerancia: plano.envelope.tolerancia }) };
   }
-  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), ...(pecas.length ? { pecas } : {}), estruturado: true };
+  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), ...(pecas.length ? { pecas } : {}), ...(plano.familia === undefined ? {} : { familia: plano.familia }), estruturado: true };
 }
 
 const EXEMPLO_DA_REFERENCIA = '{ "arquivo": "referencias/lateral.contornos.json", "vista": "lateral", "tolerancia": 25, "iou_min": 0.85 }';

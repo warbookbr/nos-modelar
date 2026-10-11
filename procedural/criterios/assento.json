@@ -1,0 +1,27 @@
+{
+  "formato": "mecanifica.criterios-do-objeto@1",
+  "id": "assento",
+  "cobre": ["cadeira de jantar", "banqueta", "poltrona", "sofá", "cadeira de escritório", "cadeira de rodas"],
+  "perguntas": [
+    {
+      "texto": "Qual parte recebe o peso de quem senta, e a que peças ela está presa?",
+      "condicao": { "forma": ["*assento*", "*banco*", "*almofada*", "*sofa*"] }
+    },
+    {
+      "texto": "Que partes tocam o chão, e a que peça do assento cada uma está presa?",
+      "condicao": { "forma": ["*perna*", "*pes*", "*base*", "*roda*"] }
+    },
+    {
+      "texto": "De que lado do assento fica o encosto, e a que peça ele está preso?",
+      "condicao": { "forma": ["*encosto*", "*costas*"] }
+    },
+    {
+      "texto": "Onde fica o espaço de quem senta em relação ao encosto e aos braços, e para que lado o assento está virado?",
+      "condicao": { "forma": ["*encosto*", "*braco*"] }
+    },
+    {
+      "texto": "Em que ponto do assento cada braço está preso, e sobre o que ele se apoia?",
+      "condicao": { "forma": ["*braco*", "*apoio*"] }
+    }
+  ]
+}

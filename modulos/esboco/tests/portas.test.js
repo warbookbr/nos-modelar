@@ -208,15 +208,19 @@ describe('o campo porta', () => {
 });
 
 describe('a independência do módulo', () => {
-  it('a única importação de fora do módulo, além de procedural/nucleo, é a régua pura das portas', () => {
+  it('as importações de fora do módulo, além de procedural/nucleo, são a régua pura das portas e as perguntas do crítico (o validador puro e os critérios por família de objeto)', () => {
     const pasta = fileURLToPath(new URL('../src/', import.meta.url));
     const fora = [];
     for (const arquivo of readdirSync(pasta).filter((n) => n.endsWith('.js'))) {
       for (const m of readFileSync(`${pasta}${arquivo}`, 'utf8').matchAll(/from '(\.\.\/\.\.\/\.\.\/[^']+)'/g)) fora.push(`${arquivo}: ${m[1]}`);
     }
     expect(fora.sort()).toEqual([
+      "componentes.js: ../../../src/autoria/perguntas-do-critico.js",
       "expandir.js: ../../../procedural/nucleo/expressoes.js",
       "index.js: ../../../procedural/nucleo/contorno.js",
+      "perguntas.js: ../../../procedural/criterios/index.js",
+      "perguntas.js: ../../../src/autoria/perguntas-do-critico.js",
+      "plano.js: ../../../procedural/criterios/index.js",
       "portas.js: ../../../src/autoria/regua-de-portas.js",
     ]);
   });

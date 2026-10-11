@@ -148,6 +148,14 @@ sem julgá-las: elas só mostram onde a unidade se prende.
 A regra de não aprovar vale igual: a nota é achado, e quem decide é quem
 orquestra.
 
+Quando o brief trouxer perguntas de forma além das cinco (no esboço, as numeradas
+depois da nota; na peça, o bloco "Perguntas de forma deste objeto"), responda a
+cada uma pelo número, citando a vista. A que as vistas não mostram recebe "não
+aparece nas vistas", sem adivinhar, e a última, aberta, recebe só o que as
+anteriores não cobrem. A nota continua a da pergunta da nota; o que uma dessas
+perguntas revelar como defeito estrutural entra na lista de defeitos e puxa a
+nota pela mesma escala.
+
 ## Limites que você não ultrapassa
 
 - Você **nunca aprova**. Sua saída é achado e nota, nunca "pode seguir".

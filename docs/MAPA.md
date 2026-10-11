@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1084 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1091 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -436,6 +436,7 @@
 - `mapa-de-ligacoes.js` — O mapa de ligações de uma opção, em texto (`--ligacoes`): quem toca quem, em quantos pontos distintos, as pontas livres e as unidades presas a nada. Os ponto…
 - `parecido.js` — "Quis dizer": o nome válido mais parecido com o que foi escrito, para as mensagens de recusa do esquema, do plano e do Condutor. Puro.
 - `perfis.js` — Perfis por função: no lugar da lista de pontos, o `perfil` de uma `extrusao`, `revolucao` ou seção de `loft` pode ser `{ "gerar": "<gerador>", ... }`, que a …
+- `perguntas.js` — As perguntas de forma que o brief do crítico do esboço traz depois das cinco fixas: as do componente (o campo `perguntas` do JSON do componente ou do módulo …
 - `plano.js` — O `plano` estruturado do esboço: nível de detalhe, medidas nomeadas conferidas contra o esboço e contrato de relações (o que deve tocar, o que deve ficar liv…
 - `portas.js` — Portas do esboço: o campo `porta` de uma forma (`recebe`, `ocupa` ou `apoia`) e a conferência do par que as duas formas formam, para o gate de contato. A int…
 - `projecao.js` — Sobreposição na projeção: o gate de contato mede colisão, folga e ligação em três dimensões, e a pessoa vê o que ele não mede: duas peças sem penetração algu…
@@ -476,6 +477,7 @@
 - `modulos.test.js` — Bloco `modulos` do esboço: a IA define no próprio JSON um módulo reutilizável (parâmetros, formas e âncoras) e o usa por `usa`, pelo mesmo caminho de expansã…
 - `nota-do-critico.test.js` — A regra da nota no Condutor (plano "O esboço detalhado coerente", fatia 7): a unidade com brief (ou o Marco) cujo último veredito é menor que 8 bloqueia o --…
 - `parametros.test.js` — Parâmetros e expressões, formas herdadas da raiz, `espelha` e `arranja`, e o legado byte a byte.
+- `perguntas-do-critico.test.js` — As perguntas de forma por componente e por família de objeto no brief do crítico do esboço: o campo `perguntas` do componente e do módulo, `plano.familia` co…
 - `plano.test.js` — O `plano` estruturado: medidas nomeadas conferidas contra o esboço, contrato de relações e o esquema do JSON.
 - `portas.test.js` — Portas no esboço: o campo `porta` (`recebe`, `ocupa`, `apoia`) das formas e o gate de contato que o lê. A prova é por medida: a moto de curvas segue aprovada…
 - `posicao.test.js` — Posicionar sem calcular coordenada: haste `de`/`para`, `encosta`, `alinha` e pontos nomeados.
@@ -554,6 +556,10 @@
 
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
+
+## procedural/criterios/
+
+- `index.js` — Critérios por família de objeto: cada `<id>.json` desta pasta (formato `mecanifica.criterios-do-objeto@1`) traz as perguntas de forma que o brief do crítico …
 
 ## procedural/extensoes/articulacao/
 
@@ -876,6 +882,8 @@
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
 - `parametros-declarados.test.js` — parametros-declarados.test.js — a pergunta única não adivinha.
 - `parametros-vivos.js` — parametros-vivos.js — separa liberdade DECLARADA de liberdade REAL.
+- `perguntas-do-critico.js` — perguntas-do-critico.js — as perguntas de forma que o brief do crítico traz depois das cinco fixas.
+- `perguntas-do-critico.test.js` — perguntas-do-critico.test.js — o validador das perguntas de forma, o arquivo de critérios por família de objeto com a condição por pergunta, o teto com recus…
 - `plano-de-modelagem.js` — plano-de-modelagem.js — o que a peça PROMETE ser, escrito antes da geometria.
 - `plano-de-modelagem.test.js` — plano-de-modelagem.test.js — o contrato do que a peça promete ser.
 - `porta-confere-forma.js` — porta-confere-forma.js — a porta que a receita declara está na forma da peça.
@@ -1356,6 +1364,8 @@
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
+- `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
+- `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.

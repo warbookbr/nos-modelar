@@ -330,5 +330,9 @@
       "tipo": "encosta",
       "quando": "aneis"
     }
+  ],
+  "perguntas": [
+    "Em que ponto as duas pontas da hélice encontram a sapata de baixo e a de cima?",
+    "Vista de cima, onde a hélice fica em relação aos dois discos?"
   ]
 }
