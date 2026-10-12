@@ -1349,6 +1349,12 @@
       "unidade": "marco-25",
       "nota": 7,
       "motivo": "Defeito estrutural na fuselagem: a porta traseira esquerda que a função exige não é legível em nenhuma vista (o trapézio com janela da lateral coincide com a projeção da asa) e marcas escuras saem além do flanco esquerdo na superior (x≈517, y≈618 a 655). A cauda afina em agulha (cerca de 10 px de largura em y≈780 na superior do objeto) exatamente onde os estabilizadores se prendem. No capô, as venezianas são blocos escuros que saem da silhueta, sem abertura, e a boca da entrada de ar não aparece nas vistas externas. Hélice e rodas sem defeito visível."
+    },
+    {
+      "ordem": 7,
+      "unidade": "helice",
+      "nota": 8,
+      "motivo": "Contato da pá com o lábio do capô resolvido (vão de 40 a 50 mm no corte x=0) e placa traseira distinta do cone. Restam só defeitos de superfície nas pás: a seção é tira fina inclinada de espessura constante e quinas vivas, com degrau no contorno (corte y=2108 com zoom), e a silhueta frontal tem cotovelos retos e pontas truncadas; não lê como perfil torcido."
     }
   ]
 }
