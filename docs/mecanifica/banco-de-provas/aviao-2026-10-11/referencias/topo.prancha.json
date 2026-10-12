@@ -180,11 +180,21 @@
   {
    "parte": "deriva",
    "medida": "largura",
-   "medivel": false,
-   "motivo": "a frontal dá 346 e o topo 145",
-   "notaEm": [
-    -6400,
-    1950
+   "de": [
+    -87,
+    -3055
+   ],
+   "ate": [
+    58,
+    -3055
+   ],
+   "afasta": [
+    0,
+    -2645
+   ],
+   "numero": [
+    380,
+    -40
    ]
   },
   {
@@ -193,7 +203,7 @@
    "em": -10,
    "numero": [
     0,
-    -2108
+    -2085
    ]
   },
   {

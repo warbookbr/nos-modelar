@@ -64,8 +64,8 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 9 — deriva
 
-- cotas esperadas: largura (não medível: a frontal dá 346 e o topo 145) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: EM FALTA: só há a nota "a frontal dá 346 e o topo 145", que não dá número. A linha atravessa a seção que o modelador precisa, dentro de deriva?
+- cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- largura: cota 145. A linha atravessa a seção que o modelador precisa, dentro de deriva?
 - comprimento: cota 3566. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "deriva" fica na coluna da esquerda. A chamada termina dentro de deriva, e não numa vizinha?
 - linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?

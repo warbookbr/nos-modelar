@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 900" width="1240" height="900" font-family="ui-sans-serif, system-ui, sans-serif">
-<rect width="1240" height="900" fill="#fbfbfa"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 905" width="1240" height="905" font-family="ui-sans-serif, system-ui, sans-serif">
+<rect width="1240" height="905" fill="#fbfbfa"/>
 <style>
   .contorno{fill:none;stroke:#12233b;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round}
   .painel{fill:none;stroke:#2f4562;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
@@ -50,8 +50,8 @@
 <path class="painel" d="M 568.67 339.24 L 566.75 373.93 L 582.17 379.71 L 593.73 389.35 L 597.59 381.64 L 595.66 377.78 L 599.51 373.93 L 597.59 372 L 601.44 368.15 L 599.51 364.29 L 603.37 360.44 L 603.37 352.73 L 591.8 343.09 L 568.67 339.24"/>
 <path class="painel" d="M 715.16 770.98 L 701.67 772.91 L 701.67 780.62 L 697.81 784.47 L 576.38 784.47 L 574.46 811.46 L 618.79 809.53 L 641.92 803.75 L 713.23 797.97 L 715.16 770.98"/>
 <path class="painel" d="M 404.84 770.98 L 404.84 788.33 L 408.7 797.97 L 545.54 811.46 L 545.54 784.47 L 424.12 784.47 L 420.26 780.62 L 418.33 770.98 L 404.84 770.98"/>
-<path class="cota" d="M 135 860.95 L 985 860.95"/>
-<text x="560" y="854.95" class="cotat" text-anchor="middle">largura 12829</text>
+<path class="cota" d="M 135 874.03 L 985 874.03"/>
+<text x="560" y="868.03" class="cotat" text-anchor="middle">largura 12829</text>
 <path class="cota" d="M 1111.16 824.95 L 1111.16 133"/>
 <text x="1105.16" y="478.98" class="cotat" text-anchor="middle" transform="rotate(-90 1105.16 478.98)">comprimento 10444</text>
 <path class="cota" d="M 551.37 156.97 L 574.41 156.97"/>
@@ -97,9 +97,12 @@
 <path class="cota" stroke-dasharray="2 2" d="M 603.37 392.71 L 634.21 381.13"/>
 <path class="cota" d="M 507.42 468.37 L 611.08 468.37"/>
 <text x="559.25" y="462.37" class="cotat" text-anchor="middle">1564</text>
+<path class="cota" d="M 555.2 846.03 L 564.81 846.03"/>
+<text x="585.18" y="848.68" class="cotat" text-anchor="middle">145</text>
+<path class="cota" stroke-dasharray="2 2" d="M 560 846.03 L 575.61 846.03"/>
 <path class="cota" d="M 560.3 819.41 L 560.3 583.15"/>
-<text x="560.3" y="840.95" class="cotat" text-anchor="middle">3566</text>
-<path class="cota" stroke-dasharray="2 2" d="M 560.3 701.28 L 560.3 832.15"/>
+<text x="560.3" y="839.42" class="cotat" text-anchor="middle">3566</text>
+<path class="cota" stroke-dasharray="2 2" d="M 560.3 701.28 L 560.3 830.62"/>
 <path class="cota" d="M 150.05 425.31 L 505.53 425.31"/>
 <text x="327.79" y="419.31" class="cotat" text-anchor="middle">5365</text>
 <path class="cota" d="M 474.83 486.86 L 474.83 399.02"/>
@@ -159,7 +162,6 @@
 <text x="136.93" y="292.8" class="cotat" font-style="italic">heliceEsq comprimento: sem corda em vista alguma</text>
 <text x="660.35" y="312.67" class="cotat" font-style="italic">heliceDir comprimento: sem corda em vista alguma</text>
 <text x="136.93" y="362.37" class="cotat" font-style="italic">fuselagem comprimento: a junta com o capô não aparece</text>
-<text x="136.93" y="339.18" class="cotat" font-style="italic">deriva largura: a frontal dá 346 e o topo 145</text>
 <circle class="lm" cx="945.78" cy="472.35" r="2.6"/>
 <text class="lmt" x="1001" y="511.13">aileronDir</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 945.78 472.35 L 1001 503.53"/>
