@@ -705,11 +705,17 @@
         "profundorE",
         "profundorD",
         "eixoProfundorE",
-        "eixoProfundorD"
+        "eixoProfundorD",
+        "ponteiraE",
+        "ponteiraD",
+        "suporteProfundor1E",
+        "suporteProfundor1D",
+        "suporteProfundor2E",
+        "suporteProfundor2D"
       ],
       "depende": [],
       "custo": 6,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -813,6 +819,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-empenagem-horizontal.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
       }
     },
     {
@@ -1318,6 +1330,20 @@
       ],
       "chamar": "critico",
       "imagens": "limpas"
+    },
+    {
+      "limiar": 50,
+      "custoFeito": 38,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice",
+        "asas",
+        "empenagem-horizontal"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
     }
   ],
   "avisos": [],
@@ -1326,7 +1352,8 @@
     "fuselagem": "Porta e batente são lofts que seguem o flanco (5 mm salientes, sem giro); o ombro da cabine tem raio 200/230 para a porta caber no trecho plano. Cauda de 580 mm em z 9250, calota até 10452; juntas estab 160 e profundor 80.",
     "motor": "Capô oco (casca 20, aberta no lábio): o cone toca o anel do lábio por tolerância (28 mm), não afinar a casca. Duto preto assenta no piso e acaba na parede de trás. Escapes em y 1325 e menores, pelo Envelope. Ventre y≈797 mantido.",
     "helice": "Plano das pás em z 485: a pá chega a z 550, 50 mm à frente do lábio (z 600), acima dos 30 mm de contato, e só o cone e a placa (r 240) tocam o capô. Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT). Ponta em r 1150.",
-    "asas": "Perfil poligonal convexo (hinge a 70% da corda, fresta 15, eixos de 30). Flap interno (-830..-3130) e aileron externo (-3170..-5800) como no topo.png, não como na maquete. Ponta levantada pela curva de cy e t, em um só loft."
+    "asas": "Perfil poligonal convexo (hinge a 70% da corda, fresta 15, eixos de 30). Flap interno (-830..-3130) e aileron externo (-3170..-5800) como no topo.png, não como na maquete. Ponta levantada pela curva de cy e t, em um só loft.",
+    "empenagem-horizontal": "Perfil NACA 0012 em polígono convexo: estab até a dobradiça (61% da corda), profundor com fresta 15; centros das seções em reta (ehZ, ehY) para o eixo sair reto. Ponteira fecha as duas pontas desde x -2285. Suportes a 450 e 1700 da raiz."
   },
   "vereditos": [
     {

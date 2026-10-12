@@ -57,6 +57,14 @@ O gate mede a penetração pelo menor eixo de separação, e um tubo de escape c
 
 Para reproduzir, tire de `contato.juntas` a junta `["capo", "escapeE"]` de uma cópia do esboço e rode `npm run esboco -- <cópia> --descrever`.
 
+Ocorrência na empenagem-horizontal: o suporte da dobradiça do profundor (caixa de 70 por 56 por 220 mm, com o topo 24 mm dentro do estabilizador) saiu do `--descrever` do detalhe com quatro divergências, "estabE e suporteProfundor1E se penetram 34,9 mm", embora as duas formas sejam da mesma unidade, porque o par não estava em `contato.juntas`. Em vez de declarar a junta, reduzi a caixa para 48 por 180 mm e baixei o centro 4 mm para a penetração cair abaixo dos 30 mm.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-horizontal.esboco.json --descrever
+```
+
+Para reproduzir, ponha em `suporteProfundor1E` `"altura": 56`, `"profundidade": 220` e, em `centro.mm[1]`, `-4` no lugar de `-8`.
+
 ## 9. As vistas da unidade enquadram o avião inteiro pequeno no quadro
 
 Nas quatro vistas que o `--feito fuselagem` gravou, com 1100 px de largura, o
@@ -78,6 +86,13 @@ A ajuda diz que o enquadramento continua em torno da unidade, mas o capô toca a
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --composta --largura 1600
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --composta --largura 1600 --sem-vizinhos
+```
+
+Ocorrência na empenagem-horizontal: na lateral da unidade com a fuselagem em cinza (1600 px de largura) a empenagem ocupa cerca de um décimo da largura, no canto da cauda, e o perfil, a fresta e os suportes não se leem. O `--feito` aceita `--largura` e `--sem-vizinhos`, mas com `--sem-vizinhos` o crítico perde o ponto onde a raiz entra na cauda, de modo que as quatro vistas do brief ficaram com a fuselagem e a lateral sem ela entrou como imagem extra.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade empenagem-horizontal --vista lateral --largura 1600 --saida <pasta>
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade empenagem-horizontal --vista lateral --largura 1600 --sem-vizinhos --saida <pasta>
 ```
 
 ## 10. Loft sem posição vai para a origem e o esboço isolado não o acusa solto
@@ -237,6 +252,12 @@ npm run esboco -- --ajuda caixa
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma portaE
 ```
 
+Ocorrência na empenagem-horizontal: a referência (`topo.png`, `lateral.png`) mostra em cada profundor um compensador recuado na borda de fuga, junto à raiz, e um degrau na linha da dobradiça perto da ponta. Sem subtração, o compensador só se escreve como uma chapa sobreposta à superfície ou como o profundor partido em três lofts, e as duas formas leem como marca sem explicação ou como emenda; ficou de fora.
+
+```bash
+npm run esboco -- --ajuda loft
+```
+
 ## 27. A caixa da forma da maquete limita a altura da porta, e o ombro da cabine teve de ser reduzido para ela caber
 
 Com a porta de 1040 mm centrada em y 1603 (a que cabe no trecho plano do flanco), o `--envelope fuselagem` reprova: "portaE passa 46 mm em y (detalhe 1083..2123, forma da maquete 1129..2209, tolerância 30 mm)". A porta teve de subir para 1099..2139, e, como o trecho plano do flanco com os cantos de 250 e 280 mm tem só 946 mm em z 6000, os cantos das seções de z 5500, 6000 e 6500 baixaram para 200 e 230 mm. É o mesmo mecanismo do atrito 14: a caixa da maquete vira restrição do detalhe.
@@ -290,10 +311,42 @@ Os suportes de dobradiça ficam sob a borda de fuga e só aparecem como traço f
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade asas --vista superior
 ```
 
+Ocorrência na empenagem-horizontal: os dois suportes de cada profundor ficam sob a linha da dobradiça e, nas quatro vistas, só aparecem como dois dentes pequenos sob o estabilizador na frontal e na lateral. A forma da seção e o suporte só se leem no corte `x=-600` ou `x=-1850` na lateral.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade empenagem-horizontal --sem-vizinhos --corte x=-600 --vista lateral --largura 1100 --saida <pasta>
+```
+
 ## 32. A divisão entre flap e aileron da maquete contraria a referência, e o Envelope não acusa
 
 A maquete põe o flap de x -830 a -4887 e o aileron de -4910 a -6000. O `topo.png` mostra a linha de painel em cerca de |x| 3130, o flap por dentro e o aileron por fora. O detalhe seguiu a referência (flap -830 a -3130, aileron -3170 a -5800), e nada no gate nem no Envelope acusou a diferença, porque a caixa da unidade é a mesma. Só a leitura da referência por parte pegaria isso.
 
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --envelope asas docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-asas.esboco.json
+```
+
+## 33. Gravar uma imagem extra da unidade com outro enquadramento sobrescreve a vista do brief
+
+A vista `--unidade <u> --vista lateral` com a fuselagem em cinza e a mesma vista com `--sem-vizinhos` gravam no mesmo arquivo, `<nome>-unidade-<u>-lateral.png`, e a segunda substitui a primeira sem aviso, de modo que a lateral que o `--feito` gravou para o crítico passou a ser a sem vizinhos quando gravei a extra na mesma pasta (`--saida`). O contorno foi copiar a extra para outro nome e regravar a lateral do brief com `--forçar`. O nome do arquivo não leva o `--sem-vizinhos`, e o `--forçar` só se descobre olhando o tamanho da imagem.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade empenagem-horizontal --vista lateral --largura 1600 --saida <pasta>
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade empenagem-horizontal --vista lateral --largura 1100 --sem-vizinhos --saida <pasta>
+```
+
+## 34. O perfil de uma seção `poligono` se reescreve inteiro em cada seção, e reduzir uma seção pede reescrever os pontos
+
+O estabilizador (15 pontos por seção, 3 seções), o profundor (8 pontos, 3 seções) e a ponteira (17 pontos, 5 seções) saíram com o mesmo desenho de perfil repetido 11 vezes, cada ponto com duas expressões como `"=-0.22*ehC1"` e `"=0.4613*ehT1"`. A ponteira que fecha a ponta é o mesmo perfil encolhido de 1 a 0,15, e para encolher foi preciso um parâmetro de escala por seção e a reescrita dos 34 números de cada uma. Um campo `escala` na seção, ou um perfil nomeado reaproveitado por `usa`, tiraria a repetição, e um erro de sinal numa linha mudaria só uma seção sem o gate acusar.
+
+```bash
+grep -c 'ehCt' docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-horizontal.esboco.json
+npm run esboco -- --ajuda loft
+```
+
+## 35. O `--descrever` arredonda os parâmetros a uma casa decimal e mostra uma inclinação como zero
+
+Na linha de parâmetros, `ehDz` (0,0188, o avanço em z do eixo por milímetro de envergadura) sai como `ehDz 0`, `ehDy` (0,136) como `ehDy 0,1` e a escala `ehS1` (0,917) como `ehS1 0,9`. Parece que o parâmetro não foi lido, e a conferência de uma inclinação ou de uma razão exige ler o JSON.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --descrever | grep -o 'ehDz [^;]*'
 ```
