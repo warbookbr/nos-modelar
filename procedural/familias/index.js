@@ -22,6 +22,7 @@ import { RODA_PNEU } from './roda-pneu/index.js';
 import { DOBRADICA } from './dobradica/index.js';
 import { CILINDRO_HIDRAULICO } from './cilindro-hidraulico/index.js';
 import { MOVEL_DE_CAIXA } from './movel-de-caixa/index.js';
+import { SUPERFICIE_AERODINAMICA } from './superficie-aerodinamica/index.js';
 
 export { ErroChamadaDeFamilia, chamar, definirFamilia } from '../../src/autoria/chamar-familia.js';
 
@@ -34,7 +35,7 @@ export const EXTENSOES_NATIVAS = Object.freeze([
 ]);
 
 /* As famílias do produto. Cada família real (tarefas 6 a 10 da fatia 9) entra aqui por import explícito. */
-export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA]);
+export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA]);
 
 /**
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,
