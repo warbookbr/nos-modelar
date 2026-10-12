@@ -76,6 +76,14 @@ padrão): a linha vai para além do texto mais largo da coluna de nomes daquele
 lado, onde nenhuma chamada passa, uma faixa de 28 px por cota. Vale só para
 altura e não se combina com `afasta`. Se a imagem tem silhueta em vários
 pedaços (a parte fora do modelo a corta), as cotas gerais medem a união deles.
+As cotas gerais também ganham as linhas de extensão, dos cantos da caixa da
+silhueta até a linha da cota; a silhueta não é parte alheia para elas, e elas
+cruzam linha de cota e extensão de outra cota (a além dos nomes que passa do
+fim da silhueta) sem colisão, mas colidem com chamada, número e parte.
+`"rotulo": "por janela"` numa cota escreve o texto depois do número, no
+desenho e no roteiro do crítico, para a parte que é um conjunto de pedaços
+(as 8 janelas) dizer que o número é de um só; conta na colisão do texto, e é
+recusado vazio ou em cota `medivel: false`.
 
 Toda parte da prancha declara as duas cotas, largura e altura, e cada uma
 fica medida nesta vista, vinda de outra vista por `origem` (com ou sem

@@ -629,6 +629,14 @@ export function examinarDesenho(desenho) {
          qualquer par de cotas de desenho técnico; entre partes diferentes, não. */
       const daCota = (l) => l.tipo === 'cota' || l.tipo === 'extensao';
       if (daCota(A) && daCota(B) && A.dono.split('.')[0] === B.dono.split('.')[0]) continue;
+      /* A extensão de uma cota geral, que não tem parte, vai da borda da
+         silhueta até a linha mais externa e atravessa as linhas das cotas que
+         chegam ao limite do objeto, como a cota além dos nomes que passa um
+         pouco do fim da silhueta (8.028 mm na planta do avião). Cruzar linha
+         de cota ou extensão alheia é do desenho técnico; chamada e número
+         continuam acusados. */
+      const geral = (l) => l.tipo === 'extensao' && !pedacosDe(l.dono).length;
+      if ((geral(A) && daCota(B)) || (geral(B) && daCota(A))) continue;
       const cruza = A.pts.some((p, k) => k > 0 && B.pts.some((q, m) => m > 0 && segmentosSeCruzam(A.pts[k - 1], p, B.pts[m - 1], q)));
       if (cruza) { colisoes.push({ tipo: A.tipo === 'chamada' && B.tipo === 'chamada' ? 'chamada sobre chamada' : 'linha sobre linha', a: `${A.tipo} de ${A.dono}`, b: `${B.tipo} de ${B.dono}` }); continue; }
       /* Chamadas que não se cruzam mas correm coladas, quase paralelas, se
@@ -648,8 +656,16 @@ export function examinarDesenho(desenho) {
      desenhada ficam de fora. */
   for (const l of anot) {
     const minhas = pedacosDe(l.dono);
-    if (!minhas.length) continue;
+    /* A extensão de uma cota geral não tem parte própria: ela sai da silhueta
+       inteira, que não é parte alheia, e só conta a parte desenhada que ela
+       atravessar. Cota geral sem extensão fica de fora, como antes. */
+    if (!minhas.length && l.tipo !== 'extensao') continue;
     const amostras = amostrarLinha(l.pts);
+    if (!minhas.length) {
+      const alheias = [...new Set(partes.filter((q) => trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono))];
+      if (alheias.length) colisoes.push({ tipo: 'extensão sobre outra parte', a: `extensão da cota de ${l.dono}`, b: alheias.join(', ') });
+      continue;
+    }
     /* O contorno de uma parte é o externo da região, sem os furos: o escape
        inteiro dentro do capô e as janelas dentro da fuselagem, na lateral do
        avião, ficam dentro do contorno de outra parte. A linha que cai dentro

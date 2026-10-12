@@ -29,7 +29,15 @@
  * direita), onde nenhuma chamada passa. Os nomes das partes vão para duas
  * colunas fora da silhueta (`nomesEmColunas`). As cotas gerais da silhueta
  * saem sempre, por fora dos nomes e delas, e medem a união dos pedaços da
- * silhueta. O comando mede a caixa de cada texto, lista
+ * silhueta; ganham as linhas de extensão das pontas da medida (as bordas da
+ * silhueta) até a linha da cota, com as regras de colisão das de parte, mas a
+ * silhueta não é parte alheia para elas e elas cruzam sem colisão linha de
+ * cota e extensão de outra cota (a cota além dos nomes que passa do fim da
+ * silhueta). `rotulo: "por janela"` numa cota sai depois do número, no
+ * desenho e no roteiro do crítico, e diz o que o número mede quando a parte
+ * é um conjunto de pedaços e a medida é a de um só; conta na caixa do texto
+ * e é recusado vazio ou em cota `medivel: false`, que não tem número. O
+ * comando mede a caixa de cada texto, lista
  * cada sobreposição, cada linha alheia que cruza um texto e cada linha de
  * anotação que cruza outra, e sai com código 3 quando houver alguma. Toda
  * parte precisa declarar largura e altura (medida, `origem` ou `medivel:
@@ -229,14 +237,21 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
     if (vert) return { vista, dono, de: [pos, inicio], ate: [pos, fim], desloca: [(afasta ?? 0) * escala, 0], texto: txt, origem: origem.imagem, ...extra };
     return { vista, dono, de: [inicio, pos], ate: [fim, pos], desloca: [0, -(afasta ?? 0) * escala], texto: txt, origem: origem.imagem, ...extra };
   };
+  /* `rotulo` é o que o número mede quando a parte tem vários pedaços ou a
+     medida não é a da parte inteira (140 "por janela" numa parte de 8
+     janelas). Sai no desenho depois do número, entra no cálculo de colisão do
+     texto e vai ao roteiro do crítico. */
+  const comRotulo = (c, rotulo) => (rotulo === undefined ? c : { ...c, texto: `${c.texto} ${rotulo.trim()}`, rotulo: rotulo.trim() });
   const cotaDaEscolha = (cota) => {
-    const { parte, medida, lado, em, de, ate, afasta, numero, medivel, motivo, notaEm, origem } = cota;
+    const { parte, medida, lado, em, de, ate, afasta, numero, medivel, motivo, notaEm, origem, rotulo } = cota;
     if (!contornos.regioes[parte]?.contornoMm) throw new Error(`a cota pede a parte '${parte}', que não está nos contornos.`);
     const aneis = pedacosDe(contornos.regioes[parte]);
     const dono = `${parte}.${medida}`;
+    if (rotulo !== undefined && (typeof rotulo !== 'string' || !rotulo.trim())) throw new Error(`a cota '${dono}' declara rotulo vazio; escreva o que o número mede (por exemplo "por janela") ou tire o campo.`);
+    if (rotulo !== undefined && medivel === false) throw new Error(`a cota '${dono}' declara rotulo e medivel: false; o rótulo acompanha o número, e esta cota não tem número. Explique em motivo.`);
     const zs = aneis.flat().map(([z]) => z); const ys = aneis.flat().map(([, y]) => y);
     const [bz0, bz1, by0, by1] = [Math.min(...zs), Math.max(...zs), Math.min(...ys), Math.max(...ys)];
-    if (origem) return [cotaDeOutraVista(cota, [bz0, bz1, by0, by1], aneis)];
+    if (origem) return [comRotulo(cotaDeOutraVista(cota, [bz0, bz1, by0, by1], aneis), rotulo)];
     if (medivel === false) {
       faltas.push({ dono, motivo: motivo ?? '' });
       if (!motivo) throw new Error(`a cota '${dono}' diz medivel: false e precisa de motivo.`);
@@ -247,7 +262,7 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
     if (de || ate) {
       if (!de || !ate) throw new Error(`a cota '${dono}' declara pontos e precisa de de e ate.`);
       const d = Math.hypot(ate[0] - de[0], ate[1] - de[1]);
-      return [{ vista, dono, de, ate, desloca: afasta ? px(afasta) : [0, 0], texto: `${mm(d)}`, ...extra }];
+      return [comRotulo({ vista, dono, de, ate, desloca: afasta ? px(afasta) : [0, 0], texto: `${mm(d)}`, ...extra }, rotulo)];
     }
     if (medida !== 'largura' && medida !== 'altura') throw new Error(`a medida da cota de '${parte}' é largura ou altura, e veio '${medida}'.`);
     if (medida === 'largura') {
@@ -255,13 +270,13 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
       const [z0, z1] = secao(aneis, 'y', yc) ?? [bz0, bz1];
       const lados = { dentro: 0, acima: -(by1 - yc) * escala - 12, abaixo: (yc - by0) * escala + 14 };
       if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da largura de '${parte}' é dentro, acima ou abaixo, e veio '${lado}'.`);
-      return [{ vista, dono, de: [z0, yc], ate: [z1, yc], desloca: [0, afasta !== undefined ? -afasta * escala : lados[lado ?? 'dentro']], texto: `${mm(z1 - z0)}`, ...extra }];
+      return [comRotulo({ vista, dono, de: [z0, yc], ate: [z1, yc], desloca: [0, afasta !== undefined ? -afasta * escala : lados[lado ?? 'dentro']], texto: `${mm(z1 - z0)}`, ...extra }, rotulo)];
     }
     const zc = em ?? bz0 + 0.75 * (bz1 - bz0);
     const [y0, y1] = secao(aneis, 'z', zc) ?? [by0, by1];
     const lados = { direita: (bz1 - zc) * escala + 12, esquerda: -(zc - bz0) * escala - 14 };
     if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da altura de '${parte}' é direita ou esquerda, e veio '${lado}'.`);
-    return [{ vista, dono, de: [zc, y0], ate: [zc, y1], desloca: [afasta !== undefined ? afasta * escala : (lado === undefined && em !== undefined ? 0 : lados[lado ?? 'direita']), 0], texto: `${mm(y1 - y0)}`, ...extra }];
+    return [comRotulo({ vista, dono, de: [zc, y0], ate: [zc, y1], desloca: [afasta !== undefined ? afasta * escala : (lado === undefined && em !== undefined ? 0 : lados[lado ?? 'direita']), 0], texto: `${mm(y1 - y0)}`, ...extra }, rotulo)];
   };
   /* `alemDosNomes: true` põe a cota de altura além da coluna de nomes do lado
      `lado` (direita por padrão), onde nenhuma chamada passa: a coluna de nomes
@@ -340,8 +355,8 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
       ...nomes.flatMap((nome) => pedacosDe(contornos.regioes[nome]).map((pts, k) => ({ vista, classe: 'painel', nome, tipo: 'poli', pts, fechado: true, ...(k ? { pedaco: k + 1 } : {}) }))),
     ],
     cotas: [
-      { vista, dono: 'geral.largura', de: [zMin, yMin], ate: [zMax, yMin], desloca: [0, dLarg], texto: `${palavras.largura} ${mm(zMax - zMin)}` },
-      { vista, dono: 'geral.altura', de: [zMax, yMin], ate: [zMax, yMax], desloca: [dAlt, 0], texto: `${palavras.altura} ${mm(yMax - yMin)}` },
+      { vista, dono: 'geral.largura', de: [zMin, yMin], ate: [zMax, yMin], desloca: [0, dLarg], texto: `${palavras.largura} ${mm(zMax - zMin)}`, extensao: true },
+      { vista, dono: 'geral.altura', de: [zMax, yMin], ate: [zMax, yMax], desloca: [dAlt, 0], texto: `${palavras.altura} ${mm(yMax - yMin)}`, extensao: true },
       ...cotasDasPartes,
     ],
     anotacoes,
@@ -488,7 +503,7 @@ export function roteiroDaPrancha({ alvo, prancha: png, spec }) {
   const w = VISTAS_DA_PRANCHA[vista].palavras;
   const cotaDe = (parte, medida) => {
     const c = spec.cotas.find((x) => x.dono === `${parte}.${medida}`);
-    if (c) return `cota ${c.texto}${c.origem ? `, tirada da vista ${c.origem}` : ''}`;
+    if (c) return `cota ${c.texto}${c.origem ? `, tirada da vista ${c.origem}` : ''}${c.rotulo ? `, com o rótulo "${c.rotulo}": o número vale só para o que o rótulo diz, e não para a parte inteira` : ''}`;
     const f = faltas.find((x) => x.dono === `${parte}.${medida}`);
     return f ? `EM FALTA: só há a nota "${f.motivo}", que não dá número` : 'sem cota';
   };

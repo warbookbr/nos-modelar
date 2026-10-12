@@ -34,6 +34,12 @@ O que você decide e grava em `<imagem>.prancha.json`:
   as linhas de extensão das pontas da medida, e elas não podem atravessar
   parte alheia. A altura que não cabe na silhueta leva `"alemDosNomes": true`
   e fica além da coluna de nomes (`"lado": "esquerda"` para o outro lado).
+  As cotas gerais saem com as extensões sozinhas, e a chamada ou o nome
+  que as cruzar sai como colisão; mude o `nivel` do nome.
+- o que o número mede, em `"rotulo": "por janela"`: quando a parte é um
+  conjunto de pedaços (as 8 janelas) e a cota mede só um, o rótulo sai depois
+  do número no desenho e no roteiro do crítico. Conta no tamanho do texto e é
+  recusado vazio ou em cota `medivel: false`.
 - de onde sai a chamada do nome de cada parte. Os nomes ficam em duas colunas
   fora da silhueta e de toda cota, uma de cada lado, na ordem da altura da
   marca, e o comando troca de lugar qualquer par de chamadas que se cruze. Em

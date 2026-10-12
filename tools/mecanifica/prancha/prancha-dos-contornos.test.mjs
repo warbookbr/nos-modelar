@@ -18,6 +18,18 @@ describe('prancha dos contornos', () => {
     expect(relatorio.alertas.filter((a) => /fora do contorno/.test(a))).toEqual([]);
   });
 
+  it('na prancha real do braço, toda cota geral sai com as duas linhas de extensão, e nenhuma atravessa parte', () => {
+    const spec = specDosContornos(contornos, { escolhas: escolhasDoBraco });
+    const gerais = spec.cotas.filter((c) => c.dono.startsWith('geral.'));
+    expect(gerais.map((c) => c.dono)).toEqual(['geral.largura', 'geral.altura']);
+    const { desenho } = prancha(spec);
+    for (const c of gerais) {
+      expect(c.extensao).toBe(true);
+      expect(desenho.linhas.filter((l) => l.tipo === 'extensao' && l.dono === c.dono)).toHaveLength(2);
+    }
+    expect(colisoesDoDesenho(desenho).filter((c) => c.tipo === 'extensão sobre outra parte' && /geral/.test(c.a))).toEqual([]);
+  });
+
   it('recusa arquivo sem silhueta', () => {
     expect(() => specDosContornos({ ...contornos, silhueta: undefined })).toThrow(/silhueta/);
   });
@@ -488,7 +500,8 @@ describe('prancha dos contornos', () => {
       const { desenho, svg } = prancha(spec);
       const ext = desenho.linhas.filter((l) => l.tipo === 'extensao' && l.dono === 'janelas.largura');
       expect(ext).toHaveLength(2);
-      expect((svg.match(/class="ext"/g) ?? []).length).toBe(2);
+      /* Duas da janela e quatro das cotas gerais. */
+      expect((svg.match(/class="ext"/g) ?? []).length).toBe(6);
       const [dx, dy] = cota.desloca; const L = Math.hypot(dx, dy);
       [cota.de, cota.ate].forEach((ponta, k) => {
         const [x, y] = projetar(spec, ponta);
@@ -505,9 +518,62 @@ describe('prancha dos contornos', () => {
       expect(alt.cotas.find((c) => c.dono === 'janelas.altura').extensao).toBe(true);
       const dentro = specDosContornos(lateral, { escolhas: { cotas: cotas({ parte: 'janelas', medida: 'largura' }) } });
       expect(dentro.cotas.find((c) => c.dono === 'janelas.largura').extensao).toBeUndefined();
-      expect(prancha(dentro).desenho.linhas.filter((l) => l.tipo === 'extensao')).toEqual([]);
+      expect(prancha(dentro).desenho.linhas.filter((l) => l.tipo === 'extensao' && !/^geral\./.test(l.dono))).toEqual([]);
       const colada = specDosContornos(lateral, { escolhas: { cotas: cotas({ parte: 'janelas', medida: 'largura', afasta: 0.5 * MINIMO_DA_EXTENSAO_PX / dentro.escala }) } });
       expect(colada.cotas.find((c) => c.dono === 'janelas.largura').extensao).toBeUndefined();
+    });
+
+    /* A cota geral é externa por construção: a linha da largura fica abaixo da
+       silhueta e a da altura à direita dela, e sem as linhas das pontas ela se
+       lia solta, sem dizer de onde a medida sai (a crítica da prancha de topo do
+       avião). */
+    it('as cotas gerais ganham as linhas de extensão das pontas, da borda da silhueta até a linha da cota e uns pixels além', () => {
+      const spec = specDosContornos(lateral, { escolhas: { cotas: cotas({ parte: 'janelas', medida: 'largura' }) } });
+      const { desenho, svg } = prancha(spec);
+      for (const dono of ['geral.largura', 'geral.altura']) {
+        const cota = spec.cotas.find((c) => c.dono === dono);
+        expect(cota.extensao).toBe(true);
+        const ext = desenho.linhas.filter((l) => l.tipo === 'extensao' && l.dono === dono);
+        expect(ext).toHaveLength(2);
+        const [dx, dy] = cota.desloca; const L = Math.hypot(dx, dy);
+        [cota.de, cota.ate].forEach((ponta, k) => {
+          const [x, y] = projetar(spec, ponta);
+          expect(ext[k].pts[0][0]).toBeCloseTo(x, 6); expect(ext[k].pts[0][1]).toBeCloseTo(y, 6);
+          expect(ext[k].pts[1][0]).toBeCloseTo(x + dx + (dx / L) * 3, 6); expect(ext[k].pts[1][1]).toBeCloseTo(y + dy + (dy / L) * 3, 6);
+        });
+      }
+      /* As pontas são as bordas da silhueta: 0 e 1000 na largura, 0 e 400 na altura. */
+      const larg = spec.cotas.find((c) => c.dono === 'geral.largura');
+      expect([larg.de[0], larg.ate[0]]).toEqual([0, 1000]);
+      const alt = spec.cotas.find((c) => c.dono === 'geral.altura');
+      expect([alt.de[1], alt.ate[1]]).toEqual([0, 400]);
+      expect((svg.match(/class="ext"/g) ?? []).length).toBe(4);
+      expect(colisoesDoDesenho(desenho).filter((c) => /geral/.test(`${c.a} ${c.b}`))).toEqual([]);
+    });
+
+    describe('o detector, nas extensões das cotas gerais', () => {
+      const quad = (dono, x0, y0, x1, y1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]] });
+      const ext = (dono, pts) => ({ dono, tipo: 'extensao', pts });
+      const base = [quad('corpo', 0, 0, 200, 100), quad('asa', 0, 110, 200, 150)];
+      const tipos = (desenho) => colisoesDoDesenho(desenho).map((c) => `${c.tipo}: ${c.a} × ${c.b}`);
+
+      it('a extensão da cota geral fora de toda parte não colide, e a silhueta (que não é parte) não a acusa', () => {
+        const silhueta = { dono: 'silhuetaTopo', tipo: 'contorno', pts: [[0, 0], [200, 0], [200, 150], [0, 150], [0, 0]] };
+        expect(tipos({ textos: [], linhas: [silhueta, ...base, ext('geral.largura', [[0, 0], [0, -40]]), ext('geral.altura', [[200, 150], [260, 150]])] })).toEqual([]);
+      });
+
+      it('a que atravessa parte desenhada colide com ela', () => {
+        expect(tipos({ textos: [], linhas: [...base, ext('geral.altura', [[100, 130], [260, 130]])] })).toEqual(['extensão sobre outra parte: extensão da cota de geral.altura × asa']);
+      });
+
+      it('cruza sem colisão a linha de cota e a extensão de outra cota, e colide com chamada e número', () => {
+        const vertical = [{ dono: 'corpo.altura', tipo: 'cota', pts: [[230, -10], [230, 100]] }, ext('corpo.altura', [[200, -5], [235, -5]])];
+        expect(tipos({ textos: [], linhas: [...base, ...vertical, ext('geral.altura', [[200, 0], [260, 0]]), ext('geral.largura', [[210, 20], [210, -40]])] })).toEqual([]);
+        const chamada = { dono: 'corpo', tipo: 'chamada', pts: [[100, 50], [230, -20]] };
+        expect(tipos({ textos: [], linhas: [...base, chamada, ext('geral.altura', [[200, -10], [260, -10]])] })).toEqual(['linha sobre linha: chamada de corpo × extensao de geral.altura']);
+        const numero = { dono: 'corpo.altura', tipo: 'cota', texto: '8', caixa: [236, -14, 244, -6] };
+        expect(tipos({ textos: [numero], linhas: [...base, ext('geral.altura', [[200, -10], [260, -10]])] })).toEqual(['linha sobre número: cota "8" (corpo.altura) × extensao de geral.altura']);
+      });
     });
 
     describe('o detector', () => {
@@ -577,6 +643,21 @@ describe('prancha dos contornos', () => {
       expect(spec.tela.largura).toBeGreaterThan(geral + 12);
     });
 
+    it('a cota geral de altura, além da de outra parte que passa um pouco do fim da silhueta, cruza a linha dela sem colidir', () => {
+      /* A linha da fuselagem vai de -120 a 1000 e a silhueta de -100 a 1000, como a
+         cota de 8.028 mm que a pessoa mandou prevalecer na planta do avião. */
+      const spec = montar([{ parte: 'fuselagem', medida: 'altura', de: [0, -120], ate: [0, 1000], alemDosNomes: true }]);
+      const { desenho } = prancha(spec);
+      const exts = desenho.linhas.filter((l) => l.tipo === 'extensao' && l.dono === 'geral.altura');
+      expect(exts).toHaveLength(2);
+      const fuselagem = desenho.linhas.find((l) => l.tipo === 'cota' && l.dono === 'fuselagem.altura');
+      expect(fuselagem.pts[0][1] - exts[0].pts[0][1]).toBeGreaterThan(1);
+      /* A de baixo corta a linha vertical da fuselagem de lado a lado. */
+      expect(Math.min(exts[0].pts[0][0], exts[0].pts[1][0])).toBeLessThan(fuselagem.pts[0][0]);
+      expect(Math.max(exts[0].pts[0][0], exts[0].pts[1][0])).toBeGreaterThan(fuselagem.pts[0][0]);
+      expect(colisoesDoDesenho(desenho).filter((c) => /geral|fuselagem\.altura/.test(`${c.a} ${c.b}`))).toEqual([]);
+    });
+
     it('sem isso, a mesma cota afastada da silhueta fica entre ela e a coluna e é cruzada pelas chamadas (o defeito)', () => {
       const spec = montar([{ parte: 'fuselagem', medida: 'altura', afasta: 700, em: 0 }]);
       const { desenho } = prancha(spec);
@@ -599,6 +680,71 @@ describe('prancha dos contornos', () => {
       expect(() => montar([{ parte: 'fuselagem', medida: 'largura', alemDosNomes: true }])).toThrow(/alemDosNomes.*altura/);
       expect(() => montar([{ parte: 'fuselagem', medida: 'altura', alemDosNomes: true, afasta: 100 }])).toThrow(/alemDosNomes e afasta/);
       expect(() => montar([{ parte: 'fuselagem', medida: 'altura', alemDosNomes: true, lado: 'abaixo' }])).toThrow(/direita ou esquerda/);
+    });
+  });
+
+  /* Na planta do avião a parte `janelas` é um conjunto de 8 pedaços, e a cota 140 × 235
+     mede só um deles; sem o rótulo o número se lia como medida do conjunto. */
+  describe('rótulo da cota', () => {
+    const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+    const lateral = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(0, 0, 1000, 400), linhaDeForaMm: ret(-1, -1, 1001, 401) },
+      regioes: { fuselagem: { contornoMm: ret(0, 0, 1000, 300) }, janelas: { contornoMm: ret(300, 200, 500, 280) } },
+    };
+    const outras = [{ parte: 'fuselagem', medida: 'largura', medivel: false, motivo: 'x' }, { parte: 'fuselagem', medida: 'altura', medivel: false, motivo: 'x' }];
+    const montar = (cotas, extra = {}) => specDosContornos(lateral, { escolhas: { cotas: [...outras, ...cotas] }, ...extra });
+    const cotaDe = (spec, dono) => spec.cotas.find((c) => c.dono === dono);
+
+    it('sai depois do número, na largura, na altura, nos dois pontos e na medida de outra vista', () => {
+      const spec = montar([
+        { parte: 'janelas', medida: 'largura', rotulo: 'por janela' },
+        { parte: 'janelas', medida: 'altura', rotulo: ' por janela ' },
+      ]);
+      expect(cotaDe(spec, 'janelas.largura')).toMatchObject({ texto: '200 por janela', rotulo: 'por janela' });
+      expect(cotaDe(spec, 'janelas.altura')).toMatchObject({ texto: '80 por janela', rotulo: 'por janela' });
+      expect(cotaDe(montar([{ parte: 'janelas', medida: 'distancia', de: [300, 240], ate: [500, 240], rotulo: 'por janela' }]), 'janelas.distancia').texto).toBe('200 por janela');
+      const frontal = { regioes: { janelas: { contornoMm: ret(0, 0, 40, 80) } } };
+      const doutra = montar([{ parte: 'janelas', medida: 'altura', em: 400, origem: { imagem: 'frontal' }, rotulo: 'por janela' }], { lerVista: (n) => (n === 'frontal' ? frontal : null) });
+      expect(cotaDe(doutra, 'janelas.altura').texto).toBe('80 (frontal) por janela');
+      /* Sem o campo, o texto é o de sempre e a cota não leva `rotulo`. */
+      const sem = montar([{ parte: 'janelas', medida: 'largura' }]);
+      expect(cotaDe(sem, 'janelas.largura').texto).toBe('200');
+      expect(cotaDe(sem, 'janelas.largura')).not.toHaveProperty('rotulo');
+    });
+
+    it('é recusado vazio, sem ser texto e numa cota que não tem número', () => {
+      for (const rotulo of ['', '   ', 8, null]) {
+        expect(() => montar([{ parte: 'janelas', medida: 'largura', rotulo }])).toThrow(/janelas\.largura.*rotulo vazio/);
+      }
+      expect(() => montar([{ parte: 'janelas', medida: 'largura', medivel: false, motivo: 'escondida', rotulo: 'por janela' }])).toThrow(/rotulo e medivel: false/);
+    });
+
+    it('entra no desenho e na caixa do texto, e a colisão com o vizinho é medida com ele', () => {
+      const largo = 'por janela do lado esquerdo da cabine';
+      const caixaDe = (spec, dono) => prancha(spec).desenho.textos.find((t) => t.tipo === 'cota' && t.dono === dono).caixa;
+      const curto = montar([{ parte: 'janelas', medida: 'largura' }, { parte: 'fuselagem', medida: 'largura', em: 240 }].slice(0, 1));
+      const comRotulo = montar([{ parte: 'janelas', medida: 'largura', rotulo: largo }]);
+      const larguraDaCaixa = (c) => c[2] - c[0];
+      expect(larguraDaCaixa(caixaDe(comRotulo, 'janelas.largura'))).toBeCloseTo(`200 ${largo}`.length * 11 * 0.58, 6);
+      expect(larguraDaCaixa(caixaDe(comRotulo, 'janelas.largura'))).toBeGreaterThan(larguraDaCaixa(caixaDe(curto, 'janelas.largura')) * 5);
+      expect(prancha(comRotulo).svg).toContain(`200 ${largo}`);
+      /* Duas cotas na mesma altura, uma ao lado da outra: com o número sozinho cabem, e com o rótulo se sobrepõem. */
+      const par = (rotulo) => montar([
+        { parte: 'janelas', medida: 'largura', em: 240, ...(rotulo ? { rotulo } : {}) },
+        { parte: 'fuselagem', medida: 'distancia', de: [520, 240], ate: [560, 240] },
+      ]);
+      const texto = (spec) => colisoesDoDesenho(prancha(spec).desenho).filter((c) => c.tipo === 'texto sobre texto' && c.a.startsWith('cota') && c.b.startsWith('cota'));
+      expect(texto(par())).toEqual([]);
+      expect(texto(par(largo))).toHaveLength(1);
+    });
+
+    it('vai ao roteiro do crítico com o número', () => {
+      const spec = montar([{ parte: 'janelas', medida: 'largura', rotulo: 'por janela' }, { parte: 'janelas', medida: 'altura' }]);
+      const r = roteiroDaPrancha({ alvo: 'a.png', prancha: 'p.png', spec });
+      expect(r).toMatch(/cota 200 por janela, com o rótulo "por janela": o número vale só para o que o rótulo diz/);
+      expect(r).toMatch(/- comprimento: cota 200 por janela/);
+      expect(r).toMatch(/- altura: cota 80\. /);
     });
   });
 
