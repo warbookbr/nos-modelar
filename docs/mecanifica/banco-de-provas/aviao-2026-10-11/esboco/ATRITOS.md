@@ -95,6 +95,13 @@ npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade empenagem-horizontal --vista lateral --largura 1600 --sem-vizinhos --saida <pasta>
 ```
 
+Ocorrência no trem-do-nariz: com a fuselagem, o capô e o duto em cinza, o trem (1 m de altura) ocupa cerca de um décimo do quadro nas quatro vistas de 550 px, e a roda, o compasso e os mancais não se leem. O `--feito` foi gravado com `--sem-vizinhos` e o ponto de fixação sob o capô entrou como imagem extra com `--zoom-forma pernaNariz --margem 700`. O brief do Marco, que não aceita `--sem-vizinhos`, grava as vistas da unidade com a fuselagem inteira.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade trem-do-nariz --composta
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --condutor --feito trem-do-nariz --sem-vizinhos
+```
+
 ## 10. Loft sem posição vai para a origem e o esboço isolado não o acusa solto
 
 Um loft sem `encaixa`, `centro` nem `sobre` é centrado na origem pelo centro da caixa dos vértices, e os `centro` das seções valem só como deslocamento relativo. No isolado de `--detalhar motor`, a entrada de ar e a boca dela, a 800 mm do capô, saíram com `divergências: nenhuma`, porque o grupo flutuante de duas formas não conta como solta enquanto as outras unidades estão ocultas. Só `--forma entradaAr` mostrou o centro `[0 0 0]`.
@@ -201,12 +208,24 @@ npm run esboco -- --condutor docs/mecanifica/banco-de-provas/aviao-2026-10-11/es
 
 Para reproduzir, rode o comando com o Marco de 25% registrado: sai o brief da hélice e nenhum do Marco.
 
+Ocorrência no trem-do-nariz: o `--feito` da unidade imprimiu o brief do Marco de 75% no mesmo comando e o comando seguinte, que regrava o brief da unidade, não o imprimiu de novo. O texto do Marco só existia na saída do primeiro `--feito`, e `aviao-critico-marco-75/brief.md` foi escrito a mão a partir dela.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --condutor --feito trem-do-nariz --sem-vizinhos
+```
+
 ## 21. Nenhuma vista fixa olha pelo lado esquerdo, e a porta que a função põe à esquerda não aparece em nenhuma
 
 `lateral` olha de +x, `superior` de +y e `isometrica` de [1,1,1], de modo que o flanco de x negativo (o esquerdo, E) não é visto de fora em vista nenhuma, e a porta traseira esquerda só aparece como marca escura além do flanco na superior. As janelas aparecem na lateral porque o `lado: "E"` gera as cópias D, e a porta, que não tem `lado`, não tem cópia. A zoom na porta na lateral mostra o flanco direito liso. O contorno da porta só se vê em corte (`--corte x=-770` e `--corte z=5940` com `--zoom-forma portaE`, em que a vista olha o plano de corte de dentro), e os cortes entraram no brief como imagens extras.
 
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade fuselagem --vista lateral --zoom-forma portaE --margem 600 --largura 1400 --saida <pasta>
+```
+
+Ocorrência no trem-do-nariz: o atuador de recolhimento fica a x -135, ao lado da roda, para a roda passar por ele ao recolher. Na lateral, que olha de +x, ele aparece atrás da perna, e na frontal, que olha de trás, a perna o cobre; o ponto onde a haste se prende à alavanca só se lê no corte `x=-128`, que olha o plano de dentro, e o corte `x=-135` deixa a ponta da haste no ar porque a alavanca fica do outro lado do plano.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade trem-do-nariz --sem-vizinhos --corte x=-128 --vista lateral --zoom-forma atuadorCorpoNariz --margem 500 --largura 1100 --saida <pasta>
 ```
 
 ## 22. O Envelope por forma conta a caixa da forma girada, e a porta inclinada para seguir a cauda deixou de caber
@@ -258,6 +277,12 @@ Ocorrência na empenagem-horizontal: a referência (`topo.png`, `lateral.png`) m
 npm run esboco -- --ajuda loft
 ```
 
+Ocorrência no trem-do-nariz: o recolhimento da perna para trás leva a roda para dentro do ventre do capô e da fuselagem, onde a função põe o alojamento, e como o módulo não subtrai forma de outra o alojamento não existe. O gate não acusa nada de 0 a 85 graus de giro (a folga da roda ao capô é de 34 mm a 80 graus e passa a penetração de 9,8 mm a 85) e acusa a travessia do capô, do duto e da fuselagem de 90 graus em diante, de modo que o fim do curso, com a roda recolhida, não se representa nem se confere.
+
+```bash
+npm run esboco -- --editar <cópia do detalhe do trem do nariz>.esboco.json capo.oculto=null fuselagem.oculto=null entradaAr.oculto=null parametros.tnCurso=95
+```
+
 ## 27. A caixa da forma da maquete limita a altura da porta, e o ombro da cabine teve de ser reduzido para ela caber
 
 Com a porta de 1040 mm centrada em y 1603 (a que cabe no trecho plano do flanco), o `--envelope fuselagem` reprova: "portaE passa 46 mm em y (detalhe 1083..2123, forma da maquete 1129..2209, tolerância 30 mm)". A porta teve de subir para 1099..2139, e, como o trecho plano do flanco com os cantos de 250 e 280 mm tem só 946 mm em z 6000, os cantos das seções de z 5500, 6000 e 6500 baixaram para 200 e 230 mm. É o mesmo mecanismo do atrito 14: a caixa da maquete vira restrição do detalhe.
@@ -277,6 +302,12 @@ npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.
 ```
 
 Para reproduzir, ponha `"max": 130` na junta `estabE`/`fuselagem` do mestre e tire a junta `profundorE`/`fuselagem`.
+
+Ocorrência no trem-do-nariz: o `--descrever` do `--detalhar trem-do-nariz` deu "divergências: nenhuma" com o trem a 20, 40 e 60 graus de giro e com a roda a 95 graus dentro do capô, porque o capô, o duto e a fuselagem ficam ocultos. A conferência do curso só saiu de uma cópia do detalhe com o `oculto` das três formas retirado por `--editar`.
+
+```bash
+npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-trem-do-nariz.esboco.json parametros.tnCurso=95
+```
 
 ## 29. O crítico do esboço julga sem a referência e afasta a forma dela
 
@@ -366,3 +397,39 @@ npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esbo
 ```
 
 Para reproduzir o `--integrar`, mude a `funcao` da unidade em `aviao-detalhe-empenagem-vertical.esboco.json` e rode `npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --integrar empenagem-vertical docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-vertical.esboco.json` e leia `unidades.empenagem-vertical.funcao` do mestre.
+
+Ocorrência no trem-do-nariz: a `funcao` da unidade (roda, perna, amortecedor e garfo, com o braço) ficou desatualizada depois que o detalhe trocou o braço por atuador, alavanca, compasso e mancais, e o `--editar` recusou `unidades.trem-do-nariz.funcao` do mesmo modo. A função nova foi escrita a mão no mestre e no detalhe, e o brief da unidade, que tem 19 formas, a imprime.
+
+```bash
+npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json 'unidades.trem-do-nariz.funcao=teste'
+```
+
+## 37. O `--integrar` não tira do mestre a junta que o detalhe apagou
+
+O detalhe do trem do nariz apagou a junta `pernaNariz`/`capo` ("a perna do trem do nariz se prende sob o capô"), porque a perna passou a ficar a 50 mm sob o piso do capô e quem toca o capô são os mancais. Depois do `--integrar` a junta continuou no mestre, já que a perna e o capô continuam existindo, e só saiu com uma edição à mão. O `--integrar` diz quantas juntas saíram por citar forma removida (1 junta, a do braço), mas não compara a lista de juntas do detalhe com a do mestre, de modo que uma junta que perdeu o sentido sem perder a forma fica declarando uma travessia que não existe, com `max` de 40 mm que esconderia uma travessia de verdade.
+
+```bash
+git show HEAD:docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json | grep -n '"pernaNariz", "capo"'
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --integrar trem-do-nariz docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-trem-do-nariz.esboco.json
+```
+
+Para reproduzir, parta do mestre do `HEAD`, rode o `--integrar` do detalhe sem a junta e procure `"pernaNariz", "capo"` no mestre.
+
+## 38. Nenhuma ferramenta varre um parâmetro de curso e junta os achados de cada posição
+
+O recolhimento do trem do nariz é um giro em torno de um eixo, escrito no detalhe como o parâmetro `tnCurso` (0 é o trem estendido) e como pontos nomeados que seguem o ângulo, de modo que a perna, o amortecedor, a roda, o compasso e o atuador acompanham sem coordenada à mão. Para saber em que ponto do curso algo atravessa o capô ou a fuselagem foi preciso copiar o detalhe, tirar o `oculto` das três formas vizinhas e rodar `--editar parametros.tnCurso=<n>` quinze vezes, lendo as divergências de cada uma. A opção do esboço serviria às posições (a ajuda de variantes fala em "aberto e fechado"), mas o mestre tem as 121 formas dentro da opção, e não na raiz, de modo que cada posição pediria uma cópia da lista inteira. O resultado foi gravado só na nota de passagem e no brief.
+
+```bash
+npm run esboco -- --editar <cópia do detalhe>.esboco.json capo.oculto=null fuselagem.oculto=null entradaAr.oculto=null
+npm run esboco -- --editar <cópia do detalhe>.esboco.json parametros.tnCurso=85
+npm run esboco -- --ajuda parametros
+```
+
+## 39. O `--descrever --completo` imprime `[object Object]` na relação de uma haste cujos pontos são âncoras com deslocamento
+
+Toda forma com `de` e `para` escritos como `{ "ancora": ..., "mm": [...] }` ou `{ "entre": ... }` sai com "relação: de [object Object] para [object Object]", e o `--forma garfoNarizE` mostra o mesmo. A posição resolvida (centro, extensão, caixa) sai certa, mas a relação, que é a parte que o `--descrever` existe para mostrar, não diz de onde a forma foi posicionada.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --descrever --completo | grep "object Object"
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma garfoNarizE
+```

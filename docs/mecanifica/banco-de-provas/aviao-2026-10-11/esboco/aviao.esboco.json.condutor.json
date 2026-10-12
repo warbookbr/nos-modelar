@@ -915,19 +915,28 @@
       "id": "trem-do-nariz",
       "membros": [
         "rodaNariz.pneu",
-        "rodaNariz.disco",
         "rodaNariz.cuboE",
         "rodaNariz.cuboD",
+        "eixoRodaNariz",
+        "mancalNarizE",
+        "mancalNarizD",
+        "eixoPivoNariz",
         "pernaNariz",
         "pistaoNariz",
-        "traveNariz",
+        "coroaNariz",
         "garfoNarizE",
         "garfoNarizD",
-        "bracoNariz"
+        "compassoSupNariz",
+        "compassoInfNariz",
+        "pinoCompassoNariz",
+        "orelhaAtuadorNariz",
+        "atuadorCorpoNariz",
+        "atuadorHasteNariz",
+        "alavancaNariz"
       ],
       "depende": [],
       "custo": 10,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -1087,6 +1096,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-trem-do-nariz.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
       }
     },
     {
@@ -1355,6 +1370,22 @@
       ],
       "chamar": "critico",
       "imagens": "limpas"
+    },
+    {
+      "limiar": 75,
+      "custoFeito": 51,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice",
+        "asas",
+        "empenagem-horizontal",
+        "empenagem-vertical",
+        "trem-do-nariz"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
     }
   ],
   "avisos": [],
@@ -1365,7 +1396,8 @@
     "helice": "Plano das pás em z 485: a pá chega a z 550, 50 mm à frente do lábio (z 600), acima dos 30 mm de contato, e só o cone e a placa (r 240) tocam o capô. Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT). Ponta em r 1150.",
     "asas": "Perfil poligonal convexo (hinge a 70% da corda, fresta 15, eixos de 30). Flap interno (-830..-3130) e aileron externo (-3170..-5800) como no topo.png, não como na maquete. Ponta levantada pela curva de cy e t, em um só loft.",
     "empenagem-horizontal": "Perfil NACA 0012 em polígono convexo: estab até a dobradiça (61% da corda), profundor com fresta 15; centros das seções em reta (ehZ, ehY) para o eixo sair reto. Ponteira fecha as duas pontas desde x -2285. Suportes a 450 e 1700 da raiz.",
-    "empenagem-vertical": "Perfil simétrico em polígono convexo, 10% de espessura sobre a corda cheia (deriva, fresta 15, leme). O centro das seções do leme é o eixo da dobradiça, reta. Bota e ponteira seguem dvC, dvT e dvZ; deriva até y 4170, ponteira até 4200."
+    "empenagem-vertical": "Perfil simétrico em polígono convexo, 10% de espessura sobre a corda cheia (deriva, fresta 15, leme). O centro das seções do leme é o eixo da dobradiça, reta. Bota e ponteira seguem dvC, dvT e dvZ; deriva até y 4170, ponteira até 4200.",
+    "trem-do-nariz": "Trem gira em torno do eixo x em tnP; tnCurso 0 é estendido. Gate limpo de 0 a 85 graus, folga mínima de 34 mm ao capô em 80; de 90 a roda entra no ventre, e falta a baia (atrito 26). Atuador em x -135 para a roda passar."
   },
   "vereditos": [
     {
