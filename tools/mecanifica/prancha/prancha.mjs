@@ -578,7 +578,15 @@ export function examinarDesenho(desenho) {
     const minhas = pedacosDe(l.dono);
     if (!minhas.length) continue;
     const amostras = amostrarLinha(l.pts);
-    const invadidas = [...new Set(partes.filter((q) => !minhas.includes(q) && trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono))];
+    /* O contorno de uma parte é o externo da região, sem os furos: o escape
+       inteiro dentro do capô e as janelas dentro da fuselagem, na lateral do
+       avião, ficam dentro do contorno de outra parte. A linha que cai dentro
+       da própria parte está no lugar certo e não invade a que a contém, então
+       para a parte que contém a própria só conta o trecho fora da própria. A
+       cota do capô que passa sobre o escape continua invadindo o escape. */
+    const contem = (q) => minhas.every((m) => m.pts.every((p) => G.dentro(p, q.pts)));
+    const fora = amostras.filter(({ p }) => !dentroDe(p, minhas));
+    const invadidas = [...new Set(partes.filter((q) => !minhas.includes(q) && trechoDentro(contem(q) ? fora : amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono))];
     if (l.tipo === 'cota') {
       /* Cota desenhada onde mede, sem afastamento, que sai da própria parte
          e corre colada ao contorno de outra ou da silhueta se confunde com a

@@ -90,3 +90,7 @@ processo pegou o sintoma pelo crítico; a causa está na regra de colisão.
 ```bash
 npm run contorno:prancha -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.contornos.json 2>&1 | grep -i escape
 ```
+
+Corrigido em 2026-10-12 em `tools/mecanifica/prancha/prancha.mjs`: o trecho da
+linha que cai dentro da própria parte contida deixa de contar como invasão da
+parte que a contém, com teste de uma parte pequena dentro de um capô.

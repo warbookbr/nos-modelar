@@ -389,4 +389,44 @@ describe('prancha dos contornos', () => {
       expect(prancha(spec).relatorio.porVista.frontal.contornoFechado).toBe(true);
     });
   });
+
+  /* O escape na lateral do avião: a região dele fica inteira dentro do contorno
+     do capô, que é o externo e não tem furo. */
+  describe('parte inteira dentro do contorno de outra', () => {
+    const quad = (dono, x0, y0, x1, y1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]] });
+    const cota = (dono, pts) => ({ dono, tipo: 'cota', pts });
+    const cotaSobre = (desenho) => colisoesDoDesenho(desenho).filter((c) => c.tipo === 'cota sobre outra parte');
+    const base = [quad('capo', 0, 0, 200, 100), quad('escape', 80, 40, 120, 60)];
+
+    it('a cota sobre a própria parte contida e o número dentro dela não invadem a parte que a contém', () => {
+      const desenho = {
+        textos: [{ dono: 'escape.altura', tipo: 'cota', texto: '20', caixa: [102, 46, 110, 55] }],
+        linhas: [...base, cota('escape.altura', [[100, 40], [100, 60]]), cota('escape.largura', [[80, 43], [120, 43]])],
+      };
+      expect(colisoesDoDesenho(desenho)).toEqual([]);
+    });
+
+    it('o trecho que sai da parte contida para dentro do capô continua invadindo o capô', () => {
+      const desenho = { textos: [], linhas: [...base, cota('escape.altura', [[100, 40], [100, 85]])] };
+      expect(cotaSobre(desenho)).toMatchObject([{ a: 'cota de escape.altura', b: 'capo' }]);
+    });
+
+    it('a cota do capô que atravessa o escape continua acusando o escape', () => {
+      const desenho = { textos: [], linhas: [...base, cota('capo.altura', [[100, 0], [100, 100]])] };
+      expect(cotaSobre(desenho)).toMatchObject([{ a: 'cota de capo.altura', b: 'escape' }]);
+    });
+
+    it('com os contornos, a cota declarada sobre o escape sai sem colisão', () => {
+      const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+      const lateral = {
+        mmPorPx: 1,
+        silhueta: { contornoMm: ret(0, 0, 400, 200), linhaDeForaMm: ret(-1, -1, 401, 201) },
+        regioes: { capo: { contornoMm: ret(0, 0, 400, 200) }, escape: { contornoMm: ret(150, 80, 250, 120) } },
+      };
+      const escolhas = { cotas: [{ parte: 'escape', medida: 'largura' }, { parte: 'escape', medida: 'altura', em: 200, afasta: 0 }] };
+      const { desenho } = prancha(specDosContornos(lateral, { escolhas }));
+      /* Fora disso o desenho tem colisões de texto do arranjo padrão, que não são deste caso. */
+      expect(colisoesDoDesenho(desenho).filter((c) => /sobre outra parte|número sobre contorno/.test(c.tipo) && /escape\.(largura|altura)/.test(`${c.a} ${c.b}`))).toEqual([]);
+    });
+  });
 });
