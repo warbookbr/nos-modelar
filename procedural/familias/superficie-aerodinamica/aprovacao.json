@@ -39,7 +39,7 @@
           "simetria": 0,
           "torcao": -60
         },
-        "hash": "sha256:3f5ca4bc80721174b2b2ea4afe9637bc4f53771d8e59ff0fb897422b349bc4b2",
+        "hash": "sha256:8fd61a0451dc9fb6f90b8d1228d9f035ccc78a3b5f7e85e99031fa11728365e9",
         "medidas": []
       },
       "medio": {
@@ -76,7 +76,7 @@
           "simetria": 1,
           "torcao": -5
         },
-        "hash": "sha256:3625e4a33b46403e6ca79068d1f25e95b5c026c1f133116b7f3354b74c0d112a",
+        "hash": "sha256:fbee9da87d186d4fb2e2d1c8439e9e7f8cab7fcb3fac63873ad28cfde9d64676",
         "medidas": []
       },
       "maximo": {
@@ -113,7 +113,7 @@
           "simetria": 1,
           "torcao": 60
         },
-        "hash": "sha256:ec2ff2e4f8534a8893e0999beaf08a0764ea18d47362e4d6d30dd56e5f1281ff",
+        "hash": "sha256:6a816e1d5bc29e1aa0c57e64c9ef909d243f955ed92c69b75d3daa2b710dc7d3",
         "medidas": []
       }
     },
@@ -169,7 +169,7 @@
           "simetria": 1,
           "torcao": -3
         },
-        "hash": "sha256:378aefb2f738b05437e9f44a66ec5f7bf4a3b1e61b74625d1f6c6a745672f89e",
+        "hash": "sha256:850d5ff186334c7c2b930911d5f09428fe9dee28475043c212214538548c4487",
         "medidas": []
       },
       "deriva": {
@@ -206,7 +206,7 @@
           "simetria": 0,
           "torcao": 0
         },
-        "hash": "sha256:635fce2092bb16eebff5fb5dba8c71d6b75d186ebe1da3a7ddcce3c173421a1e",
+        "hash": "sha256:3d3fdafbf5a327c264bdc1699234e8f0d6009fa40ecb28aa8ee101f25ad0542f",
         "medidas": []
       },
       "estabilizador": {
@@ -243,7 +243,7 @@
           "simetria": 1,
           "torcao": 0
         },
-        "hash": "sha256:805318ac3674a4aa25dea59b1bb6e974dd53bcb4191af4ecea4996dd2d222437",
+        "hash": "sha256:d7c839e5236d24586ae43a878059cbd1224b13e6e72c60f590e185994bd45d80",
         "medidas": []
       },
       "helice": {
@@ -280,7 +280,7 @@
           "simetria": 0,
           "torcao": -34
         },
-        "hash": "sha256:a0b2f8c9a804ac3105e8b27442dfc990043680b2a89eba6214ae1ce2eb312600",
+        "hash": "sha256:73be7c21971c417afcfa786e302f5ec12fe6bb524eb95189b250adfe8d1bd88d",
         "medidas": []
       },
       "pa-de-helice": {
@@ -317,7 +317,7 @@
           "simetria": 0,
           "torcao": -34
         },
-        "hash": "sha256:eb862caee9db09fde66773ad11d866e863f2ca9b7e8b76eb2a00b578b8e4da47",
+        "hash": "sha256:24eb887caea2759fc763f038f67cf3d6269071669a0d39e2c5172fddf511d39f",
         "medidas": []
       }
     },

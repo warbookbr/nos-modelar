@@ -17,8 +17,8 @@
    orientação. */
 import {
   ANGULOS_DA_TAMPA, ESPESSURA_DA_TAMPA, FAIXA_DO_RAIO, FRACAO_DO_CORTE_NA_ENVERGADURA, FRACAO_MAXIMA_DA_FRESTA_NO_COMANDO, GRAUS,
-  INTERVALOS_ATE_A_CURVA, INTERVALOS_DA_RAIZ_AO_COMANDO, INTERVALOS_DO_COMANDO_A_CURVA, INTERVALOS_NA_CURVA, INTERVALOS_NO_COMANDO,
-  INTERVALOS_NO_ENTALHE, LADOS_DA_SECAO, LADOS_DO_COMANDO, MINIMO_DO_CORTE, contornoComEntalhe, contornoDaSecao, contornoDoComando,
+  INTERVALOS_ATE_A_CURVA, INTERVALOS_DA_RAIZ_AO_COMANDO, INTERVALOS_DO_COMANDO_A_CURVA, INTERVALOS_NO_COMANDO,
+  INTERVALOS_NO_ENTALHE, LADOS_DA_SECAO, LADOS_DO_COMANDO, MINIMO_DO_CORTE, intervalosNaCurva, inverterSuave, contornoComEntalhe, contornoDaSecao, contornoDoComando,
   dot, mapear, meiaEspessura, norma, plantaDa, pontoDaSecao, primeiroDoGrupoDoEntalhe, quadrosDoLoft, transformarPonto,
 } from './geometria.js';
 
@@ -28,10 +28,15 @@ export function contagemDeSecoes({ simetria, comando }) {
   const meio = comando
     ? INTERVALOS_DA_RAIZ_AO_COMANDO + (1 + INTERVALOS_NO_ENTALHE) + 1 + INTERVALOS_DO_COMANDO_A_CURVA
     : INTERVALOS_ATE_A_CURVA;
-  return { fixa: raiz + 1 + meio + INTERVALOS_NA_CURVA + ANGULOS_DA_TAMPA.length + 1, comando: INTERVALOS_NO_COMANDO + 1 + 2 };
+  return { fixa: raiz + 1 + meio + intervalosNaCurva(comando) + ANGULOS_DA_TAMPA.length + 1, comando: INTERVALOS_NO_COMANDO + 1 + 2 };
 }
 
 const ate = (de, ao, n, tipo) => Array.from({ length: n }, (_, k) => ({ x: de + ((ao - de) * (k + 1)) / n, tipo }));
+/* as seções da curva da ponta, espaçadas para a fração `(k / n) ** expoente` do ângulo da ponta chegar em cada uma (o inverso da curva
+   de quinto grau): com o expoente 1 o giro entre seções vizinhas é o ângulo dividido por n em toda a curva, e não 1,9 vezes isso no meio;
+   com 2, a superfície sem comando, as primeiras seções ficam coladas no começo da curva, onde o bordo de ataque de uma pá de corda larga
+   e incidência alta vira de 63 para 34 graus por seção (medido no ponto máximo) */
+const naCurva = (de, ao, n, expoente) => Array.from({ length: n }, (_, k) => ({ x: de + (ao - de) * inverterSuave(((k + 1) / n) ** expoente), tipo: 'cheia' }));
 const arredondar = (v) => Math.round(v * 1e12) / 1e12;
 
 /** O índice da coordenada do mundo que o espelho em torno do plano de simetria nega: o x do avião (orientação 0) ou o y. */
@@ -84,7 +89,7 @@ export function superficieEmSecoes(p) {
   } else {
     estacoes.push(...ate(xDoDegrau, xDaCurva, INTERVALOS_ATE_A_CURVA, 'cheia'));
   }
-  estacoes.push(...ate(xDaCurva, xDoCorte, INTERVALOS_NA_CURVA, 'cheia'));
+  estacoes.push(...naCurva(xDaCurva, xDoCorte, intervalosNaCurva(p.comando), p.comando ? 1 : 2));
   for (const angulo of ANGULOS_DA_TAMPA) estacoes.push({ x: xDoCorte + comprimentoDaTampa * Math.sin(angulo * GRAUS), tipo: 'cheia', escalaDeW: Math.cos(angulo * GRAUS) });
   estacoes.push({ x: semi, tipo: 'borda' });
 
