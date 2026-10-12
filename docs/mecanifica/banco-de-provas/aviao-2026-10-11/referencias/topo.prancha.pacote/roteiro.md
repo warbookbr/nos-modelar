@@ -16,9 +16,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 3 — heliceEsq
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: sem corda em vista alguma). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (não medível: sem corda). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 846. A linha atravessa a seção que o modelador precisa, dentro de heliceEsq?
-- comprimento: EM FALTA: só há a nota "sem corda em vista alguma", que não dá número. A linha mede heliceEsq de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: EM FALTA: só há a nota "sem corda", que não dá número. A linha mede heliceEsq de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "heliceEsq" fica na coluna da esquerda. A chamada termina dentro de heliceEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceEsq não cruzam outra linha nem passam sobre número ou nome?
 
@@ -88,9 +88,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 12 — heliceDir
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: sem corda em vista alguma). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (não medível: sem corda). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 892. A linha atravessa a seção que o modelador precisa, dentro de heliceDir?
-- comprimento: EM FALTA: só há a nota "sem corda em vista alguma", que não dá número. A linha mede heliceDir de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: EM FALTA: só há a nota "sem corda", que não dá número. A linha mede heliceDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "heliceDir" fica na coluna da direita. A chamada termina dentro de heliceDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceDir não cruzam outra linha nem passam sobre número ou nome?
 
@@ -110,15 +110,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "capo" fica na coluna da direita. A chamada termina dentro de capo, e não numa vizinha?
 - linhas livres: a chamada e as cotas de capo não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 15 — janelas
-
-- cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 138. A linha atravessa a seção que o modelador precisa, dentro de janelas?
-- comprimento: cota 684. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "janelas" fica na coluna da direita. A chamada termina dentro de janelas, e não numa vizinha?
-- linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 16 — asaDir
+## Etapa 15 — asaDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 5387. A linha atravessa a seção que o modelador precisa, dentro de asaDir?
@@ -126,7 +118,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "asaDir" fica na coluna da direita. A chamada termina dentro de asaDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de asaDir não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 17 — aileronDir
+## Etapa 16 — aileronDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 1040. A linha atravessa a seção que o modelador precisa, dentro de aileronDir?
@@ -134,13 +126,21 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "aileronDir" fica na coluna da direita. A chamada termina dentro de aileronDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de aileronDir não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 18 — flapDir
+## Etapa 17 — flapDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 3953. A linha atravessa a seção que o modelador precisa, dentro de flapDir?
 - comprimento: cota 212. A linha mede flapDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "flapDir" fica na coluna da direita. A chamada termina dentro de flapDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de flapDir não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 18 — janelas
+
+- cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- largura: cota 140. A linha atravessa a seção que o modelador precisa, dentro de janelas?
+- comprimento: cota 235. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "janelas" fica na coluna da direita. A chamada termina dentro de janelas, e não numa vizinha?
+- linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
 
 ## Etapa 19 — fuselagem
 

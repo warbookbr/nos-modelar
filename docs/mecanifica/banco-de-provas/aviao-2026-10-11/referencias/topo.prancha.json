@@ -32,10 +32,10 @@
    "parte": "heliceEsq",
    "medida": "altura",
    "medivel": false,
-   "motivo": "sem corda em vista alguma",
+   "motivo": "sem corda",
    "notaEm": [
-    -6400,
-    2650
+    -4650,
+    4420
    ]
   },
   {
@@ -51,10 +51,10 @@
    "parte": "heliceDir",
    "medida": "altura",
    "medivel": false,
-   "motivo": "sem corda em vista alguma",
+   "motivo": "sem corda",
    "notaEm": [
-    1500,
-    2350
+    1650,
+    4420
    ]
   },
   {
@@ -135,31 +135,31 @@
    "medida": "largura",
    "de": [
     555,
-    -900
+    -880
    ],
    "ate": [
-    693,
-    -900
+    695,
+    -880
    ],
    "numero": [
-    676,
-    0
+    625,
+    -50
    ]
   },
   {
    "parte": "janelas",
    "medida": "altura",
    "de": [
-    640,
-    800
+    575,
+    -817
    ],
    "ate": [
-    640,
-    1484
+    575,
+    -1052
    ],
    "numero": [
-    610,
-    208
+    425,
+    -616
    ]
   },
   {
@@ -410,7 +410,7 @@
     4335
    ],
    "coluna": "esquerda",
-   "nivel": 4420
+   "nivel": 4250
   },
   "escapeEsq": {
    "marca": [
@@ -482,7 +482,7 @@
     4370
    ],
    "coluna": "direita",
-   "nivel": 4420
+   "nivel": 4250
   },
   "escapeDir": {
    "marca": [
@@ -502,11 +502,11 @@
   },
   "janelas": {
    "marca": [
-    650,
-    1077
+    625,
+    -960
    ],
    "coluna": "direita",
-   "nivel": 2400
+   "nivel": -4000
   },
   "asaDir": {
    "marca": [
@@ -538,7 +538,7 @@
     -1500
    ],
    "coluna": "direita",
-   "nivel": -4150
+   "nivel": -4250
   },
   "estabilizadorDir": {
    "marca": [

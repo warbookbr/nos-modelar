@@ -108,3 +108,23 @@ outras partes ou como cota geral. O processo pegou o sintoma pelo crítico; falt
 ```bash
 grep -n "extens" tools/mecanifica/prancha/prancha.mjs tools/mecanifica/prancha/prancha-dos-contornos.mjs
 ```
+
+## 7. Cota externa não pode passar da coluna de nomes
+
+Na prancha de topo, o comprimento da fuselagem vem da lateral (8028 mm, por
+decisão da pessoa) e não cabe dentro da silhueta do topo. Como cota externa,
+paralela à de comprimento geral, ela seria cruzada pela chamada de todos os
+nomes daquele lado, porque a coluna de nomes fica sempre além de qualquer cota.
+O desenhista deixou a linha dentro do desenho, começando sob o para-brisa e
+passando da cauda, e o crítico a reprovou.
+
+## 8. Parte numa fenda de outra não conta como contida
+
+Na prancha de topo, o contorno da fuselagem passa em volta da deriva por uma
+fenda de uns 15 px e não a contém. A regra do atrito 5 não se aplica, e
+qualquer cota da deriva colide com a fuselagem; os números ficaram abaixo da
+cauda, fora do objeto, e o crítico os reprovou.
+
+```bash
+npm run contorno:prancha -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.contornos.json 2>&1 | grep -i "deriva\|fuselagem"
+```
