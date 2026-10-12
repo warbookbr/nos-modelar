@@ -1,0 +1,16 @@
+{
+ "por": "a pessoa, 2026-10-12: Pode aceitar as duas e seguir",
+ "quando": "2026-10-12T00:05:42.968Z",
+ "rodada": 3,
+ "nota": 8,
+ "defeitos": [
+  {
+   "parte": "fuselagem",
+   "tipo": "superficie",
+   "onde": "borda superior, ao lado de saliencia1 e de saliencia2, e trecho sobre as janelas",
+   "sentido": "segmentado",
+   "evidencia": "divisas-01.png linhas fuselagem/saliencia1 e fuselagem/saliencia2, painel direito: pontinhos brancos de fundo na borda superior lilás; divisas-03.png linha fuselagem/janelas: pixels soltos de ciano e lilás no topo. Nenhum tipo descreve exatamente esse ruído de contorno; segmentado é o mais próximo."
+  }
+ ],
+ "pendencias": "pontinhos de reflexo sob a linha de cima da fuselagem ficam sem dono (atrito 1)"
+}
