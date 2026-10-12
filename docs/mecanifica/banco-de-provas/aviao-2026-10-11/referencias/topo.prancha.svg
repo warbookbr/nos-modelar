@@ -89,6 +89,9 @@
 <path class="cota" d="M 535.92 384.2 L 535.92 339.24"/>
 <text x="546.39" y="369.67" class="cotat" text-anchor="middle">679</text>
 <path class="cota" stroke-dasharray="2 2" d="M 535.92 361.72 L 536.82 361.72"/>
+<path class="cota" d="M 597.74 528 L 606.88 528"/>
+<text x="647.1" y="528" class="cotat" text-anchor="middle">138</text>
+<path class="cota" stroke-dasharray="2 2" d="M 602.31 528 L 637.53 528"/>
 <path class="cota" d="M 603.37 415.37 L 603.37 370.05"/>
 <text x="643.78" y="378.93" class="cotat" text-anchor="middle">684</text>
 <path class="cota" stroke-dasharray="2 2" d="M 603.37 392.71 L 634.21 381.13"/>
@@ -153,11 +156,10 @@
 <path class="cota" d="M 666.97 801.72 L 666.97 784.47"/>
 <text x="686.85" y="836.36" class="cotat" text-anchor="middle">260</text>
 <path class="cota" stroke-dasharray="2 2" d="M 666.97 793.1 L 677.28 827.56"/>
-<text x="136.93" y="292.8" class="cotat" font-style="italic">heliceEsq comprimento: pá vista no passo</text>
-<text x="733.23" y="312.67" class="cotat" font-style="italic">heliceDir comprimento: pá vista no passo</text>
-<text x="136.93" y="315.99" class="cotat" font-style="italic">janelas largura: a linha cruzaria a fuselagem</text>
+<text x="136.93" y="292.8" class="cotat" font-style="italic">heliceEsq comprimento: sem corda em vista alguma</text>
+<text x="660.35" y="312.67" class="cotat" font-style="italic">heliceDir comprimento: sem corda em vista alguma</text>
 <text x="136.93" y="362.37" class="cotat" font-style="italic">fuselagem comprimento: a junta com o capô não aparece</text>
-<text x="136.93" y="339.18" class="cotat" font-style="italic">deriva largura: de topo é um traço de 5 px</text>
+<text x="136.93" y="339.18" class="cotat" font-style="italic">deriva largura: a frontal dá 346 e o topo 145</text>
 <circle class="lm" cx="945.78" cy="472.35" r="2.6"/>
 <text class="lmt" x="1001" y="511.13">aileronDir</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 945.78 472.35 L 1001 503.53"/>
@@ -197,9 +199,9 @@
 <circle class="lm" cx="472.51" cy="500.18" r="2.6"/>
 <text class="lmt" x="119" y="729.77" text-anchor="end">flapEsq</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 472.51 500.18 L 119 722.17"/>
-<circle class="lm" cx="580.84" cy="534.63" r="2.6"/>
+<circle class="lm" cx="580.84" cy="567.76" r="2.6"/>
 <text class="lmt" x="1001" y="749.77">fuselagem</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 580.84 534.63 L 1001 742.17"/>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 580.84 567.76 L 1001 742.17"/>
 <circle class="lm" cx="587.2" cy="178.84" r="2.6"/>
 <text class="lmt" x="1001" y="178.52">heliceDir</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 587.2 178.84 L 1001 178.84"/>

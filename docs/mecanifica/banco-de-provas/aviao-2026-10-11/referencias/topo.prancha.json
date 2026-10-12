@@ -32,7 +32,7 @@
    "parte": "heliceEsq",
    "medida": "altura",
    "medivel": false,
-   "motivo": "pá vista no passo",
+   "motivo": "sem corda em vista alguma",
    "notaEm": [
     -6400,
     2650
@@ -51,9 +51,9 @@
    "parte": "heliceDir",
    "medida": "altura",
    "medivel": false,
-   "motivo": "pá vista no passo",
+   "motivo": "sem corda em vista alguma",
    "notaEm": [
-    2600,
+    1500,
     2350
    ]
   },
@@ -133,11 +133,17 @@
   {
    "parte": "janelas",
    "medida": "largura",
-   "medivel": false,
-   "motivo": "a linha cruzaria a fuselagem",
-   "notaEm": [
-    -6400,
-    2300
+   "de": [
+    555,
+    -900
+   ],
+   "ate": [
+    693,
+    -900
+   ],
+   "numero": [
+    676,
+    0
    ]
   },
   {
@@ -175,7 +181,7 @@
    "parte": "deriva",
    "medida": "largura",
    "medivel": false,
-   "motivo": "de topo é um traço de 5 px",
+   "motivo": "a frontal dá 346 e o topo 145",
    "notaEm": [
     -6400,
     1950
@@ -509,7 +515,7 @@
   "fuselagem": {
    "marca": [
     300,
-    -1000
+    -1500
    ],
    "coluna": "direita",
    "nivel": -4150

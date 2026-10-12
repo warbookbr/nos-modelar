@@ -16,9 +16,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 3 — heliceEsq
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: pá vista no passo). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (não medível: sem corda em vista alguma). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 846. A linha atravessa a seção que o modelador precisa, dentro de heliceEsq?
-- comprimento: EM FALTA: só há a nota "pá vista no passo", que não dá número. A linha mede heliceEsq de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: EM FALTA: só há a nota "sem corda em vista alguma", que não dá número. A linha mede heliceEsq de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "heliceEsq" fica na coluna da esquerda. A chamada termina dentro de heliceEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceEsq não cruzam outra linha nem passam sobre número ou nome?
 
@@ -64,8 +64,8 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 9 — deriva
 
-- cotas esperadas: largura (não medível: de topo é um traço de 5 px) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: EM FALTA: só há a nota "de topo é um traço de 5 px", que não dá número. A linha atravessa a seção que o modelador precisa, dentro de deriva?
+- cotas esperadas: largura (não medível: a frontal dá 346 e o topo 145) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- largura: EM FALTA: só há a nota "a frontal dá 346 e o topo 145", que não dá número. A linha atravessa a seção que o modelador precisa, dentro de deriva?
 - comprimento: cota 3566. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "deriva" fica na coluna da esquerda. A chamada termina dentro de deriva, e não numa vizinha?
 - linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?
@@ -88,9 +88,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 12 — heliceDir
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: pá vista no passo). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (não medível: sem corda em vista alguma). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 892. A linha atravessa a seção que o modelador precisa, dentro de heliceDir?
-- comprimento: EM FALTA: só há a nota "pá vista no passo", que não dá número. A linha mede heliceDir de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: EM FALTA: só há a nota "sem corda em vista alguma", que não dá número. A linha mede heliceDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "heliceDir" fica na coluna da direita. A chamada termina dentro de heliceDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceDir não cruzam outra linha nem passam sobre número ou nome?
 
@@ -112,8 +112,8 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 15 — janelas
 
-- cotas esperadas: largura (não medível: a linha cruzaria a fuselagem) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: EM FALTA: só há a nota "a linha cruzaria a fuselagem", que não dá número. A linha atravessa a seção que o modelador precisa, dentro de janelas?
+- cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- largura: cota 138. A linha atravessa a seção que o modelador precisa, dentro de janelas?
 - comprimento: cota 684. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "janelas" fica na coluna da direita. A chamada termina dentro de janelas, e não numa vizinha?
 - linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
