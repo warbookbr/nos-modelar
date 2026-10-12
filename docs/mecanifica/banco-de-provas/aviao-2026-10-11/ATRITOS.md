@@ -94,3 +94,17 @@ npm run contorno:prancha -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/ref
 Corrigido em 2026-10-12 em `tools/mecanifica/prancha/prancha.mjs`: o trecho da
 linha que cai dentro da própria parte contida deixa de contar como invasão da
 parte que a contém, com teste de uma parte pequena dentro de um capô.
+
+## 6. Cota externa sem linha de extensão até a parte
+
+Quando a cota de uma parte não cabe sobre ela (a fileira de janelas, o
+estabilizador visto de lado, o comprimento da fuselagem com o capô na frente), o
+desenhista a põe fora da silhueta, e a prancha a desenha solta, sem as linhas de
+extensão que, num desenho técnico, descem das pontas da parte até a linha da
+cota. O crítico da rodada 3 da lateral leu 2606, 989 e 8028 como medidas de
+outras partes ou como cota geral. O processo pegou o sintoma pelo crítico; falta
+à prancha desenhar a extensão das pontas da medida até a cota externa.
+
+```bash
+grep -n "extens" tools/mecanifica/prancha/prancha.mjs tools/mecanifica/prancha/prancha-dos-contornos.mjs
+```

@@ -1,0 +1,414 @@
+{
+ "numero": 3,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "helice",
+    "medida": "largura",
+    "em": 2000,
+    "numero": [
+     350,
+     0
+    ]
+   },
+   {
+    "parte": "helice",
+    "medida": "altura",
+    "em": -250
+   },
+   {
+    "parte": "cone",
+    "medida": "largura",
+    "em": 1340,
+    "numero": [
+     -430,
+     250
+    ]
+   },
+   {
+    "parte": "cone",
+    "medida": "altura",
+    "em": -500
+   },
+   {
+    "parte": "capo",
+    "medida": "largura",
+    "em": 1000
+   },
+   {
+    "parte": "capo",
+    "medida": "altura",
+    "em": 2300
+   },
+   {
+    "parte": "escape",
+    "medida": "largura",
+    "em": 1315,
+    "numero": [
+     0,
+     -180
+    ]
+   },
+   {
+    "parte": "escape",
+    "medida": "altura",
+    "em": 960,
+    "numero": [
+     545,
+     -40
+    ]
+   },
+   {
+    "parte": "parabrisa",
+    "medida": "largura",
+    "em": 2330
+   },
+   {
+    "parte": "parabrisa",
+    "medida": "altura",
+    "em": 3300,
+    "numero": [
+     -600,
+     300
+    ]
+   },
+   {
+    "parte": "janelas",
+    "medida": "largura",
+    "em": -350
+   },
+   {
+    "parte": "janelas",
+    "medida": "altura",
+    "em": 5150,
+    "numero": [
+     0,
+     240
+    ]
+   },
+   {
+    "parte": "porta",
+    "medida": "largura",
+    "em": 1400
+   },
+   {
+    "parte": "porta",
+    "medida": "altura",
+    "em": 6250
+   },
+   {
+    "parte": "fuselagem",
+    "medida": "largura",
+    "em": -900
+   },
+   {
+    "parte": "fuselagem",
+    "medida": "altura",
+    "em": 6800
+   },
+   {
+    "parte": "asa",
+    "medida": "largura",
+    "em": 1080,
+    "numero": [
+     -450,
+     60
+    ]
+   },
+   {
+    "parte": "asa",
+    "medida": "altura",
+    "de": [
+     4975,
+     777
+    ],
+    "ate": [
+     4975,
+     1922
+    ],
+    "numero": [
+     -350,
+     0
+    ]
+   },
+   {
+    "parte": "barbatana",
+    "medida": "largura",
+    "de": [
+     7500,
+     1046
+    ],
+    "ate": [
+     8745,
+     1434
+    ],
+    "numero": [
+     500,
+     -550
+    ]
+   },
+   {
+    "parte": "barbatana",
+    "medida": "altura",
+    "em": 7800,
+    "numero": [
+     0,
+     -400
+    ]
+   },
+   {
+    "parte": "estabilizador",
+    "medida": "largura",
+    "em": 2100,
+    "afasta": -650
+   },
+   {
+    "parte": "estabilizador",
+    "medida": "altura",
+    "em": 9850
+   },
+   {
+    "parte": "deriva",
+    "medida": "largura",
+    "em": 3500
+   },
+   {
+    "parte": "deriva",
+    "medida": "altura",
+    "de": [
+     9000,
+     2247
+    ],
+    "ate": [
+     9000,
+     4157
+    ],
+    "numero": [
+     -500,
+     400
+    ]
+   },
+   {
+    "parte": "leme",
+    "medida": "largura",
+    "em": 2700,
+    "numero": [
+     600,
+     0
+    ]
+   },
+   {
+    "parte": "leme",
+    "medida": "altura",
+    "em": 10750
+   },
+   {
+    "parte": "tremNariz",
+    "medida": "largura",
+    "em": 200,
+    "numero": [
+     -550,
+     0
+    ]
+   },
+   {
+    "parte": "tremNariz",
+    "medida": "altura",
+    "em": 1800,
+    "numero": [
+     450,
+     -150
+    ]
+   },
+   {
+    "parte": "tremPrincipal",
+    "medida": "largura",
+    "em": 250,
+    "numero": [
+     700,
+     0
+    ]
+   },
+   {
+    "parte": "tremPrincipal",
+    "medida": "altura",
+    "em": 4550,
+    "numero": [
+     -700,
+     -100
+    ]
+   }
+  ],
+  "nomes": {
+   "helice": {
+    "marca": [
+     480,
+     2100
+    ],
+    "coluna": "esquerda",
+    "nivel": 3400
+   },
+   "cone": {
+    "marca": [
+     250,
+     1260
+    ],
+    "coluna": "esquerda",
+    "nivel": -1300
+   },
+   "escape": {
+    "marca": [
+     920,
+     1330
+    ],
+    "coluna": "esquerda",
+    "nivel": 3100
+   },
+   "capo": {
+    "marca": [
+     1700,
+     1600
+    ],
+    "coluna": "esquerda",
+    "nivel": 3650
+   },
+   "parabrisa": {
+    "marca": [
+     3050,
+     1890
+    ],
+    "coluna": "esquerda",
+    "nivel": 3900
+   },
+   "porta": {
+    "marca": [
+     5600,
+     2150
+    ],
+    "coluna": "esquerda",
+    "nivel": 4950
+   },
+   "janelas": {
+    "marca": [
+     4530,
+     1990
+    ],
+    "coluna": "esquerda",
+    "nivel": 4600
+   },
+   "deriva": {
+    "marca": [
+     8700,
+     2700
+    ],
+    "coluna": "esquerda",
+    "nivel": 5300
+   },
+   "tremNariz": {
+    "marca": [
+     1745,
+     120
+    ],
+    "coluna": "esquerda",
+    "nivel": -1600
+   },
+   "asa": {
+    "marca": [
+     5100,
+     900
+    ],
+    "coluna": "direita",
+    "nivel": -150
+   },
+   "tremPrincipal": {
+    "marca": [
+     4550,
+     650
+    ],
+    "coluna": "direita",
+    "nivel": -550
+   },
+   "leme": {
+    "marca": [
+     10100,
+     4060
+    ],
+    "coluna": "direita",
+    "nivel": 4600
+   },
+   "estabilizador": {
+    "marca": [
+     10050,
+     2180
+    ],
+    "coluna": "direita",
+    "nivel": 2200
+   },
+   "fuselagem": {
+    "marca": [
+     7500,
+     1700
+    ],
+    "coluna": "direita",
+    "nivel": 1700
+   },
+   "barbatana": {
+    "marca": [
+     8600,
+     1377
+    ],
+    "coluna": "direita",
+    "nivel": 1350
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png",
+  "nota": 7,
+  "defeitos": [
+   {
+    "parte": "janelas",
+    "tipo": "cota",
+    "onde": "comprimento 2606",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 4. Na prancha, a linha 2606 está em y≈575, de x≈430 a 640, sob o trem principal e perto de 885 e 457. Não está sobre as janelas e não tem extensão até elas."
+   },
+   {
+    "parte": "estabilizador",
+    "tipo": "cota",
+    "onde": "comprimento 989",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 12. A linha 989 está em y≈430, de x≈908 a 988, abaixo da cauda, fora do estabilizador (y 355–388) e a cerca de 5 px da chamada da barbatana. Sem extensão que a ligue à parte."
+   },
+   {
+    "parte": "fuselagem",
+    "tipo": "cota",
+    "onde": "comprimento 8028",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 13. A linha 8028 está em y≈620, de x≈349 a 1000, empilhada sobre a 10470 e longe da fuselagem. Sem extensão, lê como cota geral."
+   },
+   {
+    "parte": "escape",
+    "tipo": "cota",
+    "onde": "chamada do nome, trecho que passa pela hélice",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 8. A chamada de 'escape' vai da coluna esquerda (80,296) ao ponto (229,438) e atravessa o contorno da hélice em x≈187–207, y≈400–415. A etapa pede linhas livres."
+   },
+   {
+    "parte": "leme",
+    "tipo": "superficie",
+    "onde": "bordo de fuga, x≈980–995, y≈245–350",
+    "sentido": "segmentado",
+    "evidencia": "Etapa 11. O contorno externo da prancha tem degraus de cerca de 8 px onde o alvo mostra reta."
+   },
+   {
+    "parte": "fuselagem",
+    "tipo": "superficie",
+    "onde": "linha superior entre x≈590 e 720, y≈350–358",
+    "sentido": "segmentado",
+    "evidencia": "Etapa 13. O contorno tem pequenos dentes onde o alvo mostra linha contínua. Peso menor que os outros defeitos."
+   }
+  ],
+  "observacao": "A silhueta e a divisão em 15 partes seguem o alvo e nenhuma cota essencial falta; o problema é que 2606, 989 e 8028 estão longe das partes que medem e uma chamada atravessa a hélice."
+ }
+}
