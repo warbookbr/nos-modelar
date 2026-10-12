@@ -11,7 +11,7 @@
     "detalhe-por-unidade",
     "montagem"
   ],
-  "atual": "detalhe-por-unidade",
+  "atual": "concluido",
   "historico": [
     {
       "passo": 1,
@@ -27,6 +27,16 @@
       "passo": 3,
       "de": "plano-de-detalhe",
       "para": "detalhe-por-unidade"
+    },
+    {
+      "passo": 4,
+      "de": "detalhe-por-unidade",
+      "para": "montagem"
+    },
+    {
+      "passo": 5,
+      "de": "montagem",
+      "para": "concluido"
     }
   ],
   "unidades": [
@@ -1557,6 +1567,12 @@
       "unidade": "trens-principais",
       "nota": 8,
       "motivo": "Trem recolhível coerente, sem pontas no ar nem travessias ao longo do curso 0, 30, 60 e 83. Folga quase nula da roda recolhida: o cubo e a base do garfo saem 2 a 3 px abaixo da borda da baia e a roda fica a cerca de 4 px da parede interna (cursos 83). A perna é curta para a roda, e a baia tem marcas que as vistas não explicam (ponto no teto, linhas tracejadas na lateral)."
+    },
+    {
+      "ordem": 19,
+      "unidade": "marco-100",
+      "nota": 8,
+      "motivo": "Sem defeito estrutural: trens principais coerentes em todo o curso de 0 a 83 graus, rodas nas três no mesmo nível de apoio, nada solto nem atravessado. Restam folgas apertadas com a roda deitada (cerca de 20 a 30 mm), a ponta do eixo rente à borda da baia, estabilizador e profundor no mesmo laranja, e os rótulos frontal e lateral das vistas da unidade parecem trocados em relação às gerais."
     }
   ],
   "liberacoes": [
