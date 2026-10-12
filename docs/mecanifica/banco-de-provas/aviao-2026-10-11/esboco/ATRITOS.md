@@ -60,7 +60,7 @@ Para reproduzir, tire de `contato.juntas` a junta `["capo", "escapeE"]` de uma c
 ## 9. As vistas da unidade enquadram o avião inteiro pequeno no quadro
 
 Nas quatro vistas que o `--feito fuselagem` gravou, com 1100 px de largura, o
-avião ocupa cerca de um terço da largura e o resto é branco; janelas, porta e
+avião ocupa 499 dos 1100 px de largura, e na altura menos de um sexto do quadro; janelas, porta e
 barbatana ficam com poucos pixels. O crítico da fuselagem disse que esses
 detalhes estavam "no limite do que dá para afirmar" e deixou a porta como
 dúvida. O brief não grava o texto em arquivo, só na saída do comando; para
