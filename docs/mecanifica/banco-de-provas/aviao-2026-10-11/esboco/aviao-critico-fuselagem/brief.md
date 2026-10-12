@@ -1,15 +1,18 @@
 --- brief para o crítico cego ---
 Função da unidade: casco da fuselagem em seções lisas, do capô à ponta da cauda, com a barbatana ventral, o para-brisa, as janelas laterais e a porta traseira esquerda, que é a estrutura a que todo o resto do avião se prende
-Veredito anterior (rodada passada): nota 8, motivo: Sem ponta no ar e contatos coerentes com o texto. Fica a porta ambígua: o lado esquerdo não se confirma entre as vistas, na lateral ela cai no meio do casco com uma janela dentro do contorno, e na superior há marcas escuras além do flanco (x≈517, y 618 a 655), como se a porta saísse da superfície; a cauda termina em agulha que a vista não explica.
+Veredito anterior (rodada passada): nota 7, motivo: Defeito estrutural: no corte x=-770 um corpo escuro (x 498 a 622, y 405 a 440, com faixa fina até x=690) sobe cerca de 12 px acima do topo da placa da porta e do topo do casco, sem explicação. A placa da porta tem só cerca de 92 mm no corte x=-770 e termina numa parede vertical do casco, sem bater com a extensão que a superior mostra (y 618 a 690); ela fica saliente uns 45 mm do flanco, e não rebaixada. A cauda termina em agulha de cerca de 10 px com fim reto, já apontada antes. As quatro vistas não mostram o lado esquerdo.
 Diga, para cada defeito desse motivo, se foi resolvido ou não, e não conte como novo o que já foi apontado.
 Imagens (as quatro vistas da unidade isolada, sem legenda; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue):
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-isometrica.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-frontal.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-lateral.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-superior.png
-Imagens extras (cortes da mesma unidade, sem legenda; nenhuma das quatro vistas olha pela proa nem pelo lado esquerdo):
-  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-x-770-zoom-portaE-lateral.png (corte por x=-770, vista lateral, com zoom na porta: o flanco esquerdo, que nenhuma das quatro vistas olha de frente)
-  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-z5940-zoom-portaE-frontal.png (corte por z=5940, vista frontal, com zoom na porta: a seção do casco na altura da porta)
+Imagens extras (cortes da mesma unidade, sem legenda; nenhuma das quatro vistas olha pela proa nem pelo lado esquerdo, e estes cortes mostram o flanco esquerdo que elas não mostram; a hachura é a superfície de corte):
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-x-770-zoom-portaE-lateral.png (corte por x=-770, vista lateral, fica o lado x<=-770, com zoom na porta: o flanco esquerdo visto de dentro, com a porta, o batente e a janela como placas rentes ao casco)
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-x-780-zoom-portaE-lateral.png (corte por x=-780, vista lateral, fica o lado x<=-780, com zoom na porta: a placa da porta em hachura clara, o batente em preto à volta dela e a janela 4 e a maçaneta salientes sobre a placa)
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-z5600-zoom-portaE-frontal.png (corte por z=5600, vista frontal, fica o lado z<=5600, com zoom na porta: a seção do casco em hachura e, no flanco esquerdo da imagem, a placa da porta, o batente e a maçaneta rentes ao flanco)
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-z5940-zoom-portaE-frontal.png (corte por z=5940, vista frontal, com zoom na porta: a mesma seção no meio da porta, com a janela 4)
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-corte-z6300-zoom-portaE-frontal.png (corte por z=6300, vista frontal, com zoom na porta: a seção perto da borda traseira da porta, em que o flanco já se estreitou)
 Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens seguem sem legenda):
   asaD: unidade asas, função: as duas metades da asa baixa, com diedro, aileron e flap em cada metade presos por eixo, presas aos flancos da fuselagem
   asaE (asa): unidade asas, função: as duas metades da asa baixa, com diedro, aileron e flap em cada metade presos por eixo, presas aos flancos da fuselagem
@@ -26,7 +29,7 @@ Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens
 Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:
   unidade fuselagem (24 formas; função: casco da fuselagem em seções lisas, do capô à ponta da cauda, com a barbatana ventral, o para-brisa, as janelas laterais e a porta traseira esquerda, que é a estrutura a que todo o resto do avião se prende):
     toca asas: 6 pontos (fuselagem em asaE [-770 973,8 3975]; fuselagem em asaD [770 973,8 3975])
-    toca empenagem-horizontal: 16 pontos (fuselagem em estabE [-225 2096 9259,8]; fuselagem em estabD [225 2096 9259,8]; fuselagem em profundorE [-185 2077,5 9879,2]; mais 3)
+    toca empenagem-horizontal: 16 pontos (fuselagem em estabE [-235 2097,5 9259,8]; fuselagem em estabD [235 2097,5 9259,8]; fuselagem em profundorE [-200 2087,5 9879,2]; mais 3)
     toca empenagem-vertical: 4 pontos (fuselagem em deriva [0 2203 7880,3])
     toca motor: 73 pontos (fuselagem em capo [0 1290 2350]; fuselagem em entradaAr [0 848,1 2340])
     toca trem-do-nariz: 1 ponto (fuselagem em bracoNariz [0 797,9 2386,2])

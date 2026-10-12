@@ -219,3 +219,55 @@ Os defeitos do Marco de 25% estão na fuselagem e no capô, e o veredito 7 da h�
 ```bash
 npm run esboco -- --condutor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --feito fuselagem
 ```
+
+## 25. A função `briefDoMarco` não se alcança por `node -e`, só por um arquivo de script
+
+O brief do Marco continua sem comando (atrito 20). Chamar a função exportada por `node --input-type=module -e` cai no último laço de `tools/mecanifica/esboco.mjs`, que faz `pathToFileURL(process.argv[1])` e recusa com "The path argument must be of type string. Received undefined", porque no modo `-e` não há `argv[1]`. O que funciona é um arquivo `.mjs` fora do repositório que importa a função e a chama.
+
+```bash
+node --input-type=module -e "import { briefDoMarco } from './tools/mecanifica/esboco.mjs'; await briefDoMarco('docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json', 25)"
+```
+
+## 26. Não há como rebaixar a porta no casco: ela só existe como placa saliente
+
+O crítico apontou a porta como "saliente, e não rebaixada". O módulo não subtrai uma forma de outra (o `furo` da caixa é passante só na direção y, o loft não tem recorte), de modo que um painel rebaixado não se escreve. A porta passou a ser um loft em z, de 16 mm de espessura, cujo centro de cada seção segue o flanco da fuselagem (790 mm até z 5500, 772,5 em z 6000, 750 em z 6500) e que sai 5 mm do casco, com o batente de 8 mm, 2 mm acima do casco, à volta dela. Como o loft corre em z, o contorno da porta em y e z tem cantos vivos, e o `raio` da seção só arredonda a aresta da espessura.
+
+```bash
+npm run esboco -- --ajuda caixa
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma portaE
+```
+
+## 27. A caixa da forma da maquete limita a altura da porta, e o ombro da cabine teve de ser reduzido para ela caber
+
+Com a porta de 1040 mm centrada em y 1603 (a que cabe no trecho plano do flanco), o `--envelope fuselagem` reprova: "portaE passa 46 mm em y (detalhe 1083..2123, forma da maquete 1129..2209, tolerância 30 mm)". A porta teve de subir para 1099..2139, e, como o trecho plano do flanco com os cantos de 250 e 280 mm tem só 946 mm em z 6000, os cantos das seções de z 5500, 6000 e 6500 baixaram para 200 e 230 mm. É o mesmo mecanismo do atrito 14: a caixa da maquete vira restrição do detalhe.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --envelope fuselagem docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-fuselagem.esboco.json
+```
+
+Para reproduzir, ponha em `portaE` do detalhe `"encaixa"` com `mm` `[-787, 36, -29.5]` (y 1603 em vez de 1619).
+
+## 28. O esboço isolado da fuselagem não acusa a travessia do cone de cauda com o estabilizador e o profundor
+
+Alargar o cone de cauda para 580 mm em z 9250 e 420 mm em z 9900 deixou `--descrever` do `--detalhar fuselagem` com "divergências: nenhuma", porque as outras unidades ficam ocultas, e o mestre, depois do `--integrar`, acusou quatro: `estabE` e `estabD` com 130,3 mm de travessia (máximo 130) e `profundorE` e `profundorD` com 59,6 mm, sem junta declarada. As juntas ficam em duas listas, a do mestre e a do detalhe, e o `--integrar` não leva a do detalhe ao mestre, de modo que a junta nova teve de ser escrita nos dois arquivos.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --descrever
+```
+
+Para reproduzir, ponha `"max": 130` na junta `estabE`/`fuselagem` do mestre e tire a junta `profundorE`/`fuselagem`.
+
+## 29. O crítico do esboço julga sem a referência e afasta a forma dela
+
+O crítico cego da unidade e do Marco recebe as vistas e a função, mas não a
+imagem de referência. Ele reprovou duas vezes o cone de cauda como "agulha"
+fina sob os estabilizadores, e o esbocista o alargou de 12% a 100% além da
+`topo.png` (580 mm contra 515 em z 9250, 420 contra 294 em z 9900). A
+conferência de silhueta não acusou o desvio, porque fica dentro da tolerância
+de área. A forma passa a seguir o crítico, e não a referência que a pessoa
+escolheu. Falta ao brief do esboço a referência, ou ao Envelope a largura da
+referência por seção.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --referencia docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/topo.conferencia.contornos.json --vista superior
+```

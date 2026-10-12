@@ -139,7 +139,8 @@
     "penetracao": 30,
     "juntas": [
       { "pecas": ["asaE", "fuselagem"], "max": 60, "motivo": "a raiz da asa entra no flanco da fuselagem" },
-      { "pecas": ["estabE", "fuselagem"], "max": 130, "motivo": "a raiz do estabilizador entra no dorso da cauda" },
+      { "pecas": ["estabE", "fuselagem"], "max": 160, "motivo": "a raiz do estabilizador entra no dorso do cone de cauda, que tem 580 mm de largura onde ele se prende" },
+      { "pecas": ["profundorE", "fuselagem"], "max": 80, "motivo": "a raiz do profundor encosta no flanco do cone de cauda, 420 mm de largura em z 9900" },
       { "pecas": ["deriva", "fuselagem"], "max": 100, "motivo": "a raiz da deriva entra no dorso da cauda" },
       { "pecas": ["fuselagem", "barbatana"], "max": 40, "motivo": "a barbatana ventral se funde ao ventre da cauda" },
       { "pecas": ["fuselagem", "portaE"], "max": 40, "motivo": "a porta fica rente ao flanco esquerdo da cabine" },
@@ -184,19 +185,24 @@
             { "pos": 3750, "forma": "arredondado", "tamanho": [1560, 1517], "centro": [0, 1543.5], "cantos": [250, 250, 280, 280], "segmentosPorCanto": 8 },
             { "pos": 4000, "nome": "cabine", "forma": "arredondado", "tamanho": [1580, 1541], "centro": [0, 1555.5], "cantos": [250, 250, 280, 280], "segmentosPorCanto": 8 },
             { "pos": 4750, "forma": "arredondado", "tamanho": [1580, 1548], "centro": [0, 1561], "cantos": [250, 250, 280, 280], "segmentosPorCanto": 8 },
-            { "pos": 5500, "nome": "asa", "forma": "arredondado", "tamanho": [1580, 1535], "centro": [0, 1567], "cantos": [250, 250, 280, 280], "segmentosPorCanto": 8 },
-            { "pos": 6000, "forma": "arredondado", "tamanho": [1545, 1476], "centro": [0, 1588], "cantos": [250, 250, 280, 280], "segmentosPorCanto": 8 },
-            { "pos": 6500, "nome": "porta", "forma": "arredondado", "tamanho": [1500, 1424], "centro": [0, 1610], "cantos": [250, 250, 280, 280], "segmentosPorCanto": 8 },
+            { "pos": 5500, "nome": "asa", "forma": "arredondado", "tamanho": [1580, 1535], "centro": [0, 1567], "cantos": [200, 200, 230, 230], "segmentosPorCanto": 8 },
+            { "pos": 6000, "forma": "arredondado", "tamanho": [1545, 1476], "centro": [0, 1588], "cantos": [200, 200, 230, 230], "segmentosPorCanto": 8 },
+            { "pos": 6500, "nome": "porta", "forma": "arredondado", "tamanho": [1500, 1424], "centro": [0, 1610], "cantos": [200, 200, 230, 230], "segmentosPorCanto": 8 },
             { "pos": 7000, "forma": "arredondado", "tamanho": [1340, 1268], "centro": [0, 1640], "cantos": [270, 270, 300, 300], "segmentosPorCanto": 8 },
             { "pos": 7500, "nome": "afina", "forma": "arredondado", "tamanho": [1180, 1104], "centro": [0, 1704], "cantos": [280, 280, 300, 300], "segmentosPorCanto": 8 },
             { "pos": 8000, "forma": "arredondado", "tamanho": [980, 920], "centro": [0, 1774], "cantos": [260, 260, 270, 270], "segmentosPorCanto": 8 },
             { "pos": 8500, "nome": "tronco", "forma": "arredondado", "tamanho": [800, 728], "centro": [0, 1839], "cantos": [220, 220, 220, 220], "segmentosPorCanto": 8 },
-            { "pos": 9000, "forma": "arredondado", "tamanho": [600, 580], "centro": [0, 1902], "cantos": [180, 180, 180, 180], "segmentosPorCanto": 8 },
-            { "pos": 9250, "nome": "cauda", "forma": "arredondado", "tamanho": [540, 510], "centro": [0, 1935], "cantos": [150, 150, 150, 150], "segmentosPorCanto": 8 },
-            { "pos": 9550, "forma": "arredondado", "tamanho": [440, 400], "centro": [0, 1955], "cantos": [120, 120, 120, 120], "segmentosPorCanto": 8 },
-            { "pos": 9900, "forma": "arredondado", "tamanho": [350, 310], "centro": [0, 1970], "cantos": [100, 100, 100, 100], "segmentosPorCanto": 8 },
-            { "pos": 10200, "forma": "arredondado", "tamanho": [290, 255], "centro": [0, 1980], "cantos": [90, 90, 90, 90], "segmentosPorCanto": 8 },
-            { "pos": 10423, "nome": "ponta", "forma": "arredondado", "tamanho": [240, 210], "centro": [0, 1986], "cantos": [80, 80, 80, 80], "segmentosPorCanto": 8 }
+            { "pos": 9000, "forma": "arredondado", "tamanho": [640, 580], "centro": [0, 1902], "cantos": [190, 190, 190, 190], "segmentosPorCanto": 8 },
+            { "pos": 9250, "nome": "cauda", "forma": "arredondado", "tamanho": [580, 520], "centro": [0, 1935], "cantos": [170, 170, 170, 170], "segmentosPorCanto": 8 },
+            { "pos": 9550, "forma": "arredondado", "tamanho": [500, 440], "centro": [0, 1955], "cantos": [150, 150, 150, 150], "segmentosPorCanto": 8 },
+            { "pos": 9900, "forma": "arredondado", "tamanho": [420, 370], "centro": [0, 1970], "cantos": [130, 130, 130, 130], "segmentosPorCanto": 8 },
+            { "pos": 10200, "forma": "arredondado", "tamanho": [350, 310], "centro": [0, 1980], "cantos": [110, 110, 110, 110], "segmentosPorCanto": 8 },
+            { "pos": 10300, "forma": "arredondado", "tamanho": [330, 292], "centro": [0, 1983], "cantos": [105, 105, 105, 105], "segmentosPorCanto": 8 },
+            { "pos": 10370, "nome": "ponta", "forma": "arredondado", "tamanho": [300, 266], "centro": [0, 1986], "cantos": [98, 98, 98, 98], "segmentosPorCanto": 8 },
+            { "pos": 10405, "forma": "arredondado", "tamanho": [255, 226], "centro": [0, 1988], "cantos": [86, 86, 86, 86], "segmentosPorCanto": 8 },
+            { "pos": 10430, "forma": "arredondado", "tamanho": [180, 160], "centro": [0, 1990], "cantos": [62, 62, 62, 62], "segmentosPorCanto": 8 },
+            { "pos": 10446, "forma": "arredondado", "tamanho": [90, 80], "centro": [0, 1991], "cantos": [32, 32, 32, 32], "segmentosPorCanto": 8 },
+            { "pos": 10452, "nome": "bico", "forma": "arredondado", "tamanho": [36, 32], "centro": [0, 1991], "cantos": [14, 14, 14, 14], "segmentosPorCanto": 8 }
           ],
           "encaixa": { "ancora": "fogo", "em": [0, 1290, 2350] }
         },
@@ -235,11 +241,46 @@
         { "id": "molduraJanela2E", "tipo": "caixa", "largura": 12, "altura": 331, "profundidade": 285, "raio": 45, "centro": [-784, 1903.5, 4530], "cor": "preto", "lado": "E", "unidade": "fuselagem", "rotulo": "moldura_janela_2" },
         { "id": "janela3E", "tipo": "caixa", "largura": 18, "altura": 281, "profundidade": 258, "raio": 30, "centro": [-791, 1903.5, 5106], "cor": "azul", "lado": "E", "unidade": "fuselagem", "rotulo": "janela_3", "substitui": "janela3E" },
         { "id": "molduraJanela3E", "tipo": "caixa", "largura": 12, "altura": 331, "profundidade": 308, "raio": 45, "centro": [-784, 1903.5, 5106], "cor": "preto", "lado": "E", "unidade": "fuselagem", "rotulo": "moldura_janela_3" },
-        { "id": "janela4E", "tipo": "caixa", "largura": 12, "altura": 258, "profundidade": 211, "raio": 25, "centro": [-780, 1915, 5880], "cor": "azul", "lado": "E", "unidade": "fuselagem", "rotulo": "janela_4", "substitui": "janela4E" },
-        { "id": "molduraJanela4E", "tipo": "caixa", "largura": 10, "altura": 308, "profundidade": 261, "raio": 40, "centro": [-777, 1915, 5880], "cor": "preto", "lado": "E", "unidade": "fuselagem", "rotulo": "moldura_janela_4" },
-        { "id": "portaE", "tipo": "caixa", "largura": 24, "altura": 1050, "profundidade": 939, "raio": 10, "rotacao": [0, 2.19, 0], "centro": [-766, 1660, 5940], "cor": "branco", "unidade": "fuselagem", "rotulo": "porta_traseira", "substitui": "portaE" },
-        { "id": "molduraPortaE", "tipo": "caixa", "largura": 12, "altura": 1110, "profundidade": 979, "raio": 35, "rotacao": [0, 2.19, 0], "centro": [-764, 1660, 5940], "cor": "preto", "unidade": "fuselagem", "rotulo": "batente_da_porta" },
-        { "id": "macanetaPortaE", "tipo": "caixa", "largura": 22, "altura": 40, "profundidade": 150, "raio": 8, "ponta": { "id": "portaE", "lado": "-x" }, "desloca": [17, -70, -380], "cor": "preto", "unidade": "fuselagem", "rotulo": "macaneta_da_porta" },
+        { "id": "janela4E", "tipo": "caixa", "largura": 8, "altura": 258, "profundidade": 211, "raio": 3, "rotacao": [0, 2, 0], "centro": [-780.7, 1915, 5880], "cor": "azul", "lado": "E", "unidade": "fuselagem", "rotulo": "janela_4", "substitui": "janela4E" },
+        { "id": "molduraJanela4E", "tipo": "caixa", "largura": 8, "altura": 308, "profundidade": 261, "raio": 3, "rotacao": [0, 2, 0], "centro": [-779.7, 1915, 5880], "cor": "preto", "lado": "E", "unidade": "fuselagem", "rotulo": "moldura_janela_4" },
+        {
+          "id": "portaE",
+          "tipo": "loft",
+          "eixo": "z",
+          "cor": "branco",
+          "unidade": "fuselagem",
+          "rotulo": "porta_traseira",
+          "substitui": "portaE",
+          "secoes": [
+            { "pos": 5470.5, "nome": "frente", "forma": "retangulo", "tamanho": [16, 1040], "centro": [0, 0], "raio": 7 },
+            { "pos": 5500, "forma": "retangulo", "tamanho": [16, 1040], "centro": [0, 0], "raio": 7 },
+            { "pos": 6000, "forma": "retangulo", "tamanho": [16, 1040], "centro": [17.5, 0], "raio": 7 },
+            { "pos": 6409.5, "forma": "retangulo", "tamanho": [16, 1040], "centro": [35.95, 0], "raio": 7 }
+          ],
+          "encaixa": {
+            "ancora": "frente",
+            "em": { "ancora": "fuselagem.asa", "mm": [-787, 52, -29.5] }
+          }
+        },
+        {
+          "id": "molduraPortaE",
+          "tipo": "loft",
+          "eixo": "z",
+          "cor": "preto",
+          "unidade": "fuselagem",
+          "rotulo": "batente_da_porta",
+          "secoes": [
+            { "pos": 5450.5, "nome": "frente", "forma": "retangulo", "tamanho": [8, 1080], "centro": [0, 0], "raio": 3 },
+            { "pos": 5500, "forma": "retangulo", "tamanho": [8, 1080], "centro": [0, 0], "raio": 3 },
+            { "pos": 6000, "forma": "retangulo", "tamanho": [8, 1080], "centro": [17.5, 0], "raio": 3 },
+            { "pos": 6429.5, "forma": "retangulo", "tamanho": [8, 1080], "centro": [36.8, 0], "raio": 3 }
+          ],
+          "encaixa": {
+            "ancora": "frente",
+            "em": { "ancora": "fuselagem.asa", "mm": [-788, 52, -49.5] }
+          }
+        },
+        { "id": "macanetaPortaE", "tipo": "caixa", "largura": 14, "altura": 40, "profundidade": 150, "raio": 5, "ponta": { "id": "portaE", "lado": "-x" }, "desloca": [4, -70, -380], "cor": "preto", "unidade": "fuselagem", "rotulo": "macaneta_da_porta" },
         {
           "id": "capo",
           "tipo": "loft",
