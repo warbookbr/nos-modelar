@@ -1343,6 +1343,12 @@
       "unidade": "helice",
       "nota": 7,
       "motivo": "Defeito estrutural: a pá pa2 encosta no lábio inferior do capô (corte x=0 e lateral, região 672-678, 735-745), e uma pá que gira não pode tocar o capô parado; o texto de ligações também dá pa2 em capo. Detalhe: o perfil das pás é chapa inclinada com quinas vivas e degrau serrilhado entre estações (corte y=2108 com zoom), silhueta poligonal com pontas cegas; a placa traseira não se distingue do cone."
+    },
+    {
+      "ordem": 6,
+      "unidade": "marco-25",
+      "nota": 7,
+      "motivo": "Defeito estrutural na fuselagem: a porta traseira esquerda que a função exige não é legível em nenhuma vista (o trapézio com janela da lateral coincide com a projeção da asa) e marcas escuras saem além do flanco esquerdo na superior (x≈517, y≈618 a 655). A cauda afina em agulha (cerca de 10 px de largura em y≈780 na superior do objeto) exatamente onde os estabilizadores se prendem. No capô, as venezianas são blocos escuros que saem da silhueta, sem abertura, e a boca da entrada de ar não aparece nas vistas externas. Hélice e rodas sem defeito visível."
     }
   ]
 }
