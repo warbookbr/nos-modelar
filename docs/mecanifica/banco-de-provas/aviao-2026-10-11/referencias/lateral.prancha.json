@@ -75,7 +75,7 @@
   {
    "parte": "janelas",
    "medida": "largura",
-   "em": 2760,
+   "em": 2950,
    "afasta": 150
   },
   {
@@ -146,7 +146,7 @@
    ],
    "numero": [
     1028,
-    -60
+    -240
    ]
   },
   {
@@ -155,7 +155,7 @@
    "em": 7800,
    "numero": [
     1350,
-    -168
+    -428
    ]
   },
   {
@@ -279,7 +279,7 @@
     1360
    ],
    "coluna": "esquerda",
-   "nivel": 4720
+   "nivel": 5560
   },
   "capo": {
    "marca": [
@@ -287,7 +287,7 @@
     1720
    ],
    "coluna": "esquerda",
-   "nivel": 4880
+   "nivel": 5720
   },
   "parabrisa": {
    "marca": [
@@ -295,7 +295,7 @@
     1890
    ],
    "coluna": "esquerda",
-   "nivel": 5170
+   "nivel": 6050
   },
   "janelas": {
    "marca": [
@@ -303,7 +303,7 @@
     2000
    ],
    "coluna": "esquerda",
-   "nivel": 5470
+   "nivel": 6350
   },
   "porta": {
    "marca": [
