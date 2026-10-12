@@ -142,9 +142,10 @@
     -880
    ],
    "numero": [
-    625,
-    -50
-   ]
+    908,
+    -442
+   ],
+   "rotulo": "por janela"
   },
   {
    "parte": "janelas",
@@ -158,9 +159,10 @@
     -1052
    ],
    "numero": [
-    425,
-    -616
-   ]
+    958,
+    -614
+   ],
+   "rotulo": "por janela"
   },
   {
    "parte": "fuselagem",
@@ -180,7 +182,7 @@
    },
    "prevalece": "a pessoa, 2026-10-12: vale a lateral, a única vista que mostra a junta entre capô e fuselagem",
    "em": 900,
-   "de": -5420,
+   "de": -5382,
    "alemDosNomes": true
   },
   {
@@ -524,11 +526,11 @@
   },
   "janelas": {
    "marca": [
-    625,
-    -960
+    -625,
+    -975
    ],
-   "coluna": "direita",
-   "nivel": -4000
+   "coluna": "esquerda",
+   "nivel": -4020
   },
   "asaDir": {
    "marca": [
