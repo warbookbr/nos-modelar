@@ -56,3 +56,16 @@ O capô se prende ao fogo por uma face, e `contrato.fixa` com `pontos: 2` reprov
 O gate mede a penetração pelo menor eixo de separação, e um tubo de escape cuja base fica dentro do capô acusa 73 mm. A passagem implícita da mesma unidade só vale para par declarado em `contato.juntas`, o que obriga a listar cada par intra-unidade.
 
 Para reproduzir, tire de `contato.juntas` a junta `["capo", "escapeE"]` de uma cópia do esboço e rode `npm run esboco -- <cópia> --descrever`.
+
+## 9. As vistas da unidade enquadram o avião inteiro pequeno no quadro
+
+Nas quatro vistas que o `--feito fuselagem` gravou, com 1100 px de largura, o
+avião ocupa cerca de um terço da largura e o resto é branco; janelas, porta e
+barbatana ficam com poucos pixels. O crítico da fuselagem disse que esses
+detalhes estavam "no limite do que dá para afirmar" e deixou a porta como
+dúvida. O brief não grava o texto em arquivo, só na saída do comando; para
+despachar o crítico, a sessão principal teve de rodar o `--feito` de novo.
+
+```bash
+python3 -c "from PIL import Image; import numpy as np; a=np.asarray(Image.open('docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-lateral.png').convert('L'))[120:1100]; xs=np.nonzero((a<200).any(0))[0]; print('largura ocupada', xs.max()-xs.min(), 'de', a.shape[1])"
+```
