@@ -42,7 +42,7 @@ function descreverForma(r) {
    declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho, medida do plano
    fora da tolerância e silhueta fora da referência. A ponta livre (ponta de tubo ou de haste que não encosta em nada, ou várias pontas no mesmo ponto sem coletor) vem logo depois do contrato. */
 export const GRAVIDADES = { peca: 0, solto: 1, atravessa: 2, contrato: 3, ponta: 4, assimetria: 5, medida: 6, referencia: 7 };
-const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta', 'porta-fora': 'contrato' };
+const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta', 'porta-fora': 'contrato', 'sem-posicao': 'solto' };
 const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', 'contrato-fixa': 'contrato', assimetria: 'assimetria' };
 
 /* { opcoes, ... } a partir do JSON já lido. */
@@ -147,8 +147,8 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
 
 const mm1 = (x) => (Math.round(x * 10) / 10).toString().replace('.', ',');
 /* Um parâmetro não é uma medida em mm: arredondado a uma casa, `ehDz` (0,0188, o avanço em z por mm de envergadura do avião) saía 0 e `ehS1`
-   (0,917, uma escala) saía 0,9. Quatro algarismos significativos mostram a inclinação e a razão como são e deixam os inteiros e os mm como estavam. */
-const parametro = (x) => (typeof x !== 'number' || !Number.isFinite(x) || Number.isInteger(x) ? String(x) : Number(x.toPrecision(4)).toString()).replace('.', ',');
+   (0,917, uma escala) saía 0,9. De 10 para cima fica a casa decimal de sempre (mm); abaixo, quatro algarismos significativos mostram a inclinação e a razão como são. */
+const parametro = (x) => (typeof x !== 'number' || !Number.isFinite(x) || Number.isInteger(x) ? String(x) : (Math.abs(x) >= 10 ? Math.round(x * 10) / 10 : Number(x.toPrecision(4))).toString()).replace('.', ',');
 const vetor = (v) => `[${v.map(mm1).join(' ')}]`;
 const faixa = (p) => `${mm1(p[0])}..${mm1(p[1])}`;
 

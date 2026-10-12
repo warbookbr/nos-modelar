@@ -147,19 +147,26 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     cv.watershed(realce ? realcar(cv, cor, novo, realce) : cor, marcas);
     const rotulos = Int32Array.from(marcas.data32S);
     /* O watershed corre pelo gradiente, e um buraco fechado é do tom do fundo:
-       parte dele chega com o rótulo do fundo (1) por um fio de pixels claros.
-       Cada pixel fechado nesse caso passa à parte vizinha, do pixel já dono ao
-       ainda sem dono, até todos terem uma. */
-    const pendentes = new Set(fechados.indices.filter((p) => rotulos[p] === 1));
+       parte dele chega com o rótulo do fundo (1) ou na divisa (-1) por um fio de
+       pixels claros, e ficaria sem cor na pintura. Cada pixel fechado nesse caso
+       passa à parte vizinha quando todas as partes ao redor dele são a mesma, do
+       pixel já dono ao ainda sem dono. Um pixel entre duas partes diferentes é
+       divisa de verdade e fica; só o que ainda leva o rótulo do fundo vai, na
+       falta de outra saída, para a parte que mais o cerca (a de menor rótulo no
+       empate), porque o fundo não pode ser dono de um pixel dentro da silhueta. */
+    const pendentes = new Set(fechados.indices.filter((p) => rotulos[p] < 2));
     const vizinhos = (p) => { const x = p % largura; const y = (p - x) / largura; return [[0, -1], [-1, 0], [1, 0], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]].map(([dx, dy]) => [x + dx, y + dy]).filter(([a, b]) => a >= 0 && b >= 0 && a < largura && b < altura).map(([a, b]) => b * largura + a); };
-    while (pendentes.size) {
-      const dados = [];
-      for (const p of [...pendentes].sort((a, b) => a - b)) {
-        const dono = vizinhos(p).map((q) => rotulos[q]).find((r) => r >= 2);
-        if (dono !== undefined) dados.push([p, dono]);
+    const votos = (p) => { const v = new Map(); for (const q of vizinhos(p)) if (rotulos[q] >= 2) v.set(rotulos[q], (v.get(rotulos[q]) ?? 0) + 1); return v; };
+    for (const aceitaMaioria of [false, true]) {
+      for (let mudou = pendentes.size > 0; mudou;) {
+        const dados = [];
+        for (const p of [...pendentes].sort((a, b) => a - b)) {
+          const v = votos(p);
+          if (v.size === 1 || (aceitaMaioria && rotulos[p] === 1 && v.size > 1)) dados.push([p, [...v].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0][0]]);
+        }
+        for (const [p, dono] of dados) { rotulos[p] = dono; pendentes.delete(p); }
+        mudou = dados.length > 0;
       }
-      if (!dados.length) break;
-      for (const [p, dono] of dados) { rotulos[p] = dono; pendentes.delete(p); }
     }
     const resultado = {};
     sementes.forEach(({ nome, tracos }, i) => {
@@ -224,13 +231,14 @@ export async function silhuetaEmPedacos(segmentacao, { folga = 1, sem = [] } = {
   const { largura, altura, silhueta } = segmentacao;
   const mats = [];
   const novo = (m) => { mats.push(m); return m; };
-  /* Contornos externos de uma máscara, do maior para o menor, sem os que são ruído. */
-  const externos = (mascara) => {
+  /* Contornos externos de uma máscara, do maior para o menor; os de área abaixo
+     do mínimo são ruído, salvo o maior. */
+  const externos = (mascara, minimo = MINIMO_DO_PEDACO_PX2) => {
     const contornos = novo(new cv.MatVector()); const hierarquia = novo(new cv.Mat());
     cv.findContours(mascara, contornos, hierarquia, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE);
     const lista = [];
     for (let k = 0; k < contornos.size(); k += 1) { const c = novo(contornos.get(k)); lista.push({ c, area: cv.contourArea(c) }); }
-    return lista.sort((p, q) => q.area - p.area).filter(({ area }, k) => k === 0 || area >= MINIMO_DO_PEDACO_PX2);
+    return lista.sort((p, q) => q.area - p.area).filter(({ area }, k) => k === 0 || area >= minimo);
   };
   const pontos = (dados) => { const lista = []; for (let k = 0; k < dados.length; k += 2) lista.push([dados[k], dados[k + 1]]); return lista; };
   try {
@@ -243,7 +251,11 @@ export async function silhuetaEmPedacos(segmentacao, { folga = 1, sem = [] } = {
       const nucleo = novo(cv.Mat.ones(3, 3, cv.CV_8U));
       cv.dilate(mascara, mascara, nucleo, new cv.Point(-1, -1), folga);
     }
-    const linhasDeFora = externos(mascara).map(({ c }) => {
+    /* Só ficam as linhas que envolvem algum pedaço guardado: um fiapo abaixo do
+       mínimo cresce até passar dele, e a linha de fora não pode ter pedaço que a
+       silhueta medida não tem. */
+    const envolve = (c) => pedacos.some(({ contornoPx: [[x, y]] }) => cv.pointPolygonTest(c, new cv.Point(x, y), false) >= 0);
+    const linhasDeFora = externos(mascara, 0).filter(({ c }, k) => k === 0 || envolve(c)).map(({ c }) => {
       if (folga <= 0) return pontos(c.data32S);
       const simples = novo(new cv.Mat()); cv.approxPolyDP(c, simples, 1, true);
       return pontos(simples.data32S);

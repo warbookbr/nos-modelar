@@ -2911,7 +2911,9 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
       partes.push('</g>');
       const [x1, y1] = tela(p.janela.min);
       const [x2, y2] = tela(p.janela.max);
-      partes.push(`<rect x="${f1(x1)}" y="${f1(y1)}" width="${f1(x2 - x1)}" height="${f1(y2 - y1)}" fill="none" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="4,3"/>`);
+      /* o quadro tracejado marca o recorte de um zoom pedido; no enquadramento da unidade (`aviso: false`) é uma marca na imagem
+         que o crítico cego leria como parte do objeto */
+      if (enquadrar.aviso !== false) partes.push(`<rect x="${f1(x1)}" y="${f1(y1)}" width="${f1(x2 - x1)}" height="${f1(y2 - y1)}" fill="none" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="4,3"/>`);
     }
     /* explosão em camadas: da posição original ao centro deslocado, em linha fina por cima do desenho */
     if (p.camadas?.ligacoes) {

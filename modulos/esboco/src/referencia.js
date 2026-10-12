@@ -69,7 +69,9 @@ export function lerContornos(json, onde = 'referência') {
   for (const [nome, r] of Object.entries(objeto(json.regioes) ? json.regioes : {})) {
     if (objeto(r) && Array.isArray(r.contornoMm) && r.contornoMm.length >= 3) regioes[nome] = formaDaRegiao(r, `${onde}: região "${nome}"`);
   }
-  return { silhueta: formaDoContorno(json.silhueta.contornoMm, `${onde}: silhueta`), regioes, mmPorPx: Number.isFinite(json.mmPorPx) ? json.mmPorPx : null };
+  /* A silhueta também vem em pedaços quando uma parte fora do modelo a corta: na frontal do avião, o corpo escuro sob a asa
+     separa a ponta direita, e só o maior pedaço deixava a envergadura em 10.778 mm em vez de 12.800. */
+  return { silhueta: formaDaRegiao(json.silhueta, `${onde}: silhueta`), regioes, mmPorPx: Number.isFinite(json.mmPorPx) ? json.mmPorPx : null };
 }
 
 /* O deslocamento declarado (`{ x, y, z }` em mm, só os eixos que a vista mede) em (h, v) da referência: h soma o eixo

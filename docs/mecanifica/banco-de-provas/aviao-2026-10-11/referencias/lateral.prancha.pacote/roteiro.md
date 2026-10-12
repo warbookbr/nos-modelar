@@ -9,7 +9,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 2 — deriva
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 720. A linha atravessa a seção que o modelador precisa, dentro de deriva?
+- comprimento: cota 703. A linha atravessa a seção que o modelador precisa, dentro de deriva?
 - altura: cota 1910. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "deriva" fica na coluna da esquerda. A chamada termina dentro de deriva, e não numa vizinha?
 - linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?
@@ -49,7 +49,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 7 — helice
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 154. A linha atravessa a seção que o modelador precisa, dentro de helice?
+- comprimento: cota 140. A linha atravessa a seção que o modelador precisa, dentro de helice?
 - altura: cota 1995. A linha mede helice de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "helice" fica na coluna da esquerda. A chamada termina dentro de helice, e não numa vizinha?
 - linhas livres: a chamada e as cotas de helice não cruzam outra linha nem passam sobre número ou nome?

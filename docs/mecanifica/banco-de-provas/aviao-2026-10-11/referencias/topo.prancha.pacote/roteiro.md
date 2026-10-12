@@ -25,8 +25,8 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 4 — escapeEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 248. A linha atravessa a seção que o modelador precisa, dentro de escapeEsq?
-- comprimento: cota 330. A linha mede escapeEsq de ponta a ponta na vertical, sem pegar parte vizinha?
+- largura: cota 260. A linha atravessa a seção que o modelador precisa, dentro de escapeEsq?
+- comprimento: cota 285. A linha mede escapeEsq de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "escapeEsq" fica na coluna da esquerda. A chamada termina dentro de escapeEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de escapeEsq não cruzam outra linha nem passam sobre número ou nome?
 
@@ -98,7 +98,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 238. A linha atravessa a seção que o modelador precisa, dentro de escapeDir?
-- comprimento: cota 313. A linha mede escapeDir de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: cota 320. A linha mede escapeDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "escapeDir" fica na coluna da direita. A chamada termina dentro de escapeDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de escapeDir não cruzam outra linha nem passam sobre número ou nome?
 
@@ -145,7 +145,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 19 — fuselagem
 
 - cotas esperadas: largura (medida aqui) e comprimento (da vista lateral, prevalece). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 1564. A linha atravessa a seção que o modelador precisa, dentro de fuselagem?
+- largura: cota 1584. A linha atravessa a seção que o modelador precisa, dentro de fuselagem?
 - comprimento: cota 8028 (lateral, prevalece), tirada da vista lateral. A linha mede fuselagem de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "fuselagem" fica na coluna da direita. A chamada termina dentro de fuselagem, e não numa vizinha?
 - linhas livres: a chamada e as cotas de fuselagem não cruzam outra linha nem passam sobre número ou nome?

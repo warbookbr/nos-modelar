@@ -347,25 +347,26 @@ function aplicarJuntas(saida, expansoes, aliasDaRaiz) {
       exigir(j.max === undefined || (typeof j.max === 'number' && Number.isFinite(j.max) && j.max >= 0), `${onde}: ${nome}.max deve ser um número em mm, finito e maior ou igual a zero`);
       exigir(j.motivo === undefined || typeof j.motivo === 'string', `${onde}: ${nome}.motivo deve ser um texto`);
       const membros = [];
-      let descartou = false;
       for (const q of j.pecas) {
         if (q.includes('*')) {
           const re = new RegExp(`^${q.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
           const casadas = ids.filter((id) => re.test(id));
-          if (casadas.length === 0 && [...ocultos].some((id) => re.test(id))) { descartou = true; continue; }
-          exigir(casadas.length > 0, `${onde}: ${nome}.pecas: o padrão "${q}" não casa com nenhuma forma visível (ids: ${ids.join(', ')})`);
-          membros.push(...casadas);
+          const casadasOcultas = [...ocultos].filter((id) => re.test(id));
+          exigir(casadas.length > 0 || casadasOcultas.length > 0, `${onde}: ${nome}.pecas: o padrão "${q}" não casa com nenhuma forma visível (ids: ${ids.join(', ')})`);
+          membros.push(...casadas, ...casadasOcultas);
         } else {
           const id = alias(q);
-          if (!ids.includes(id) && ocultos.has(id)) { descartou = true; continue; }
-          exigir(ids.includes(id), `${onde}: ${nome}.pecas cita "${q}", que não é uma forma visível (ids: ${ids.join(', ')})`);
+          exigir(ids.includes(id) || ocultos.has(id), `${onde}: ${nome}.pecas cita "${q}", que não é uma forma visível (ids: ${ids.join(', ')})`);
           membros.push(id);
         }
       }
       const unicos = [...new Set(membros)];
-      if (descartou && unicos.length < 2) continue;
+      /* a peça oculta fica na junta para o par com uma visível (a unidade isolada o confere); o par entre duas ocultas, e a junta que só tem
+         ocultas, saem em silêncio */
+      if (unicos.some((id) => ocultos.has(id)) && (unicos.length < 2 || unicos.every((id) => ocultos.has(id)))) continue;
       exigir(unicos.length >= 2, `${onde}: ${nome} precisa de pelo menos duas peças distintas depois de expandir os padrões (veio ${unicos.length}: ${unicos.join(', ') || 'nenhuma'})`);
       for (let a = 0; a < unicos.length; a++) for (let b = a + 1; b < unicos.length; b++) {
+        if (ocultos.has(unicos[a]) && ocultos.has(unicos[b])) continue;
         const chave = chaveDoPar(unicos[a], unicos[b]);
         if (existentes.has(chave)) continue;
         existentes.add(chave);

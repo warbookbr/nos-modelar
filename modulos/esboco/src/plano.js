@@ -7,7 +7,7 @@
    max] }`), para a proporção que a ficha ou a foto dão sem dar o tamanho.
    Puro: não lê nem grava arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
-import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeContato, unidadesDeclaradas } from './contato.js';
+import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeApoio, unidadesDeclaradas } from './contato.js';
 import { quisDizer } from './parecido.js';
 import { lerOrientacao } from './lados.js';
 import { conferirReferencia, EIXOS_DA_VISTA, exigirVista } from './referencia.js';
@@ -410,7 +410,7 @@ export function conferirPlano(esboco, visiveis, { referencias, unidades, medidas
         const achados = [];
         for (const a of A) for (const b of B) {
           if (a.id === b.id) continue;
-          for (const { ponto } of pontosDeContato(pecasDe(a), pecasDe(b), tol)) achados.push({ ponto, a: a.id, b: b.id });
+          for (const { ponto } of pontosDeApoio(pecasDe(a), pecasDe(b), tol)) achados.push({ ponto, a: a.id, b: b.id });
         }
         const grupos = agruparPontos(achados.map((x) => x.ponto), tol);
         const ok = grupos.length >= p.pontos;

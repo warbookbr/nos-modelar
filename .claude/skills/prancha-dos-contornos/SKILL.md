@@ -61,6 +61,22 @@ decisão; aí ela é aceita, sai externa com o número da origem e a marca
 medidas e o motivo. Motivo vazio é recusado, e sem decisão da pessoa o campo
 não entra.
 
+A cota cuja linha cai toda fora da parte, a pelo menos 6 px da medida (lado
+`acima`, `abaixo`, `direita`, `esquerda` ou `afasta`), é externa e ganha as
+linhas de extensão, que descem das duas pontas da medida até a linha da cota,
+como no desenho técnico. Elas contam como colisão quando atravessam parte
+alheia (a parte que contém a da cota não conta), quando cruzam a chamada de
+outra parte ou o número de outra cota. A extensão da largura e a da altura da
+mesma parte se cruzam sem colisão. Parte numa fenda de outra, em que o contorno
+da outra a envolve em 90% das direções ou mais, como a deriva na planta do
+avião, conta como contida para a regra de cota sobre outra parte. A cota de
+altura que não cabe na silhueta, como o comprimento da fuselagem na planta,
+leva `"alemDosNomes": true` (e `"lado": "esquerda"` se for o caso, direita por
+padrão): a linha vai para além do texto mais largo da coluna de nomes daquele
+lado, onde nenhuma chamada passa, uma faixa de 28 px por cota. Vale só para
+altura e não se combina com `afasta`. Se a imagem tem silhueta em vários
+pedaços (a parte fora do modelo a corta), as cotas gerais medem a união deles.
+
 Toda parte da prancha declara as duas cotas, largura e altura, e cada uma
 fica medida nesta vista, vinda de outra vista por `origem` (com ou sem
 `prevalece`) ou `medivel: false` com motivo. Faltando alguma, o comando para
