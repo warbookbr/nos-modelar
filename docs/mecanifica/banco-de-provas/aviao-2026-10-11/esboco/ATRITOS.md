@@ -51,6 +51,14 @@ O capô se prende ao fogo por uma face, e `contrato.fixa` com `pontos: 2` reprov
 
 `roda-pneu` e `cilindro-hidraulico` só se alcançam pelo `--envelope <unidade> <receita.js>` com `REFINA`. No JSON usei o componente `roda` e cilindros em `de`/`para` com `ligar`.
 
+Corrigido na fatia 5, onda 2: `tipo: "familia"` põe no JSON a roda 2.0, o cilindro hidráulico e qualquer outra família do registro como uma forma (`familia`, `perfil` e `parametros`), posicionada por `centro`, `sobre`, `ponta`, `encaixa`, `rotacao` e pelas portas da família, que viram âncoras (`amortecedor.olhal-dianteiro`, `roda.eixo`). Foi um tipo de forma e não um componente porque a superfície vem pronta da família e não se decompõe em primitivas: o módulo recebe a malha de um provedor injetado (`tools/mecanifica/esboco-familias.mjs` chama `chamar` e executa a receita, sem caso por família), e o desenho, o gate de contato (peças convexas por parte, com o furo do cubo e o oco da camisa livres), as medidas, o Envelope, a blocagem do nível zero (casco por seções, com a perda `familia-como-casco`) e o `--descrever` leem a mesma forma. O processo não teria pegado sozinho, porque o esboço do avião contornou a falta com o componente, e o que falta virou gate: `tools/mecanifica/esboco-familias.test.mjs` chama toda família do registro pela ponte, de modo que uma família nova que a ponte não leia reprova ali. A reprodução de hoje é uma perna do trem com as duas famílias no JSON:
+
+```bash
+npm run esboco -- tools/fixtures/esboco-com-familias/perna-do-trem.esboco.json --descrever --forma roda
+npm run esboco -- tools/fixtures/esboco-com-familias/perna-do-trem.esboco.json --medidas
+npm run esboco -- tools/fixtures/esboco-com-familias/perna-do-trem.esboco.json --nivel-zero --composta
+```
+
 ## 8. Peça inteira dentro de outra reprova mesmo sendo encaixe
 
 O gate mede a penetração pelo menor eixo de separação, e um tubo de escape cuja base fica dentro do capô acusa 73 mm. A passagem implícita da mesma unidade só vale para par declarado em `contato.juntas`, o que obriga a listar cada par intra-unidade.

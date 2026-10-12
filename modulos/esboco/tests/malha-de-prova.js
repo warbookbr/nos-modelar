@@ -22,3 +22,24 @@ export function tuboOco({ n = 32, rExt = 20, rInt = 10, comprimento = 100, centr
     ...(ancoras ? { ancoras } : {}), ...(eixo ? { eixo } : {}),
   };
 }
+
+/* Um sólido por seções planas, como a asa: `secoes` seções elípticas de `n` pontos em planos de x constante, de raio que afina e centro
+   que se desloca em y (a flecha, só depois de 40% da envergadura: a quebra torna a asa côncava), com as tampas das pontas. Cada seção tem dezenas de pontos exatamente no mesmo plano, a situação que
+   desempatava mal no casco incremental da asa de verdade (`tools/mecanifica/esboco-familias.test.mjs` a mede com a família). */
+export function asaDeSecoes({ secoes = 14, n = 60, envergadura = 12000, corda = 700, espessura = 160, afilamento = 0.5, flecha = 1800 } = {}) {
+  const vertices = [];
+  for (let k = 0; k < secoes; k++) {
+    const t = k / (secoes - 1);
+    const escala = 1 - (1 - afilamento) * t;
+    for (let i = 0; i < n; i++) {
+      const a = (2 * Math.PI * i) / n;
+      vertices.push([t * envergadura, flecha * Math.max(0, (t - 0.4) / 0.6) + (corda / 2) * escala * Math.cos(a), (espessura / 2) * escala * Math.sin(a)]);
+    }
+  }
+  const v = (k, i) => k * n + (i % n);
+  const faces = [];
+  for (let k = 0; k + 1 < secoes; k++) for (let i = 0; i < n; i++) faces.push([v(k, i), v(k, i + 1), v(k + 1, i + 1), v(k + 1, i)]);
+  faces.push(Array.from({ length: n }, (_, i) => v(secoes - 1, i)));
+  faces.push(Array.from({ length: n }, (_, i) => v(0, n - 1 - i)));
+  return { formato: 'mecanifica.malha@1', vertices, faces, partes: [{ nome: 'asa', de: 0, ate: faces.length }], eixo: 'x' };
+}

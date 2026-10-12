@@ -137,7 +137,7 @@ Ler antes de começar, num orçamento de 14.000 bytes (linha de base de 23.789 b
 
 Abrir só quando a condição aparecer:
 
-- `.claude/skills/esboco-detalhado/formas-e-componentes.md`, quando for usar forma curva, tubo, âncora relativa ou componente pronto.
+- `.claude/skills/esboco-detalhado/formas-e-componentes.md`, quando for usar forma curva, tubo, âncora relativa, componente pronto ou forma de família.
 - `.claude/skills/esboco-detalhado/leitura-em-texto.md`, quando for ler o modelo em texto antes da imagem.
 - `.claude/skills/esboco-detalhado/regras-de-contato.md`, quando o gate de contato reprovar.
 - `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for conferir o esboço em imagem.

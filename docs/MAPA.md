@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1152 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1153 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1438,6 +1438,7 @@
 - `esboco-composta.test.mjs` — esboco-composta.test.mjs — o `--composta` do esboço: uma imagem só com as quatro vistas sem legenda em grade 2x2, 1100 px de largura no total, cada quadrante…
 - `esboco-condutor-nivel-zero.test.mjs` — O Condutor lendo o nível zero, com o adaptador de verdade (`esboco-nivel-zero.mjs`) entregue como porta: - o percurso completo da moto-curvas (Portões, Marco…
 - `esboco-familias.mjs` — esboco-familias.mjs — o adaptador que entrega ao esboço as famílias procedurais.
+- `esboco-familias.test.mjs` — A ponte das famílias procedurais para o esboço (`esboco-familias.mjs` e `modulos/esboco/src/familia.js`), com a roda 2.0 e o cilindro hidráulico de verdade: …
 - `esboco-medidas-no-andaime.test.mjs` — A prova das medidas do `plano.medidas` lidas na blocagem do nível zero, sobre os esboços do módulo e do banco de provas que as declaram: a leitura na blocage…
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.

@@ -57,7 +57,7 @@
       "unidade": "razao",
       "padrao": 0,
       "minimo": 0,
-      "maximo": 1,
+      "maximo": 0.6,
       "medio": 0.2
     },
     "eixoDeTorcao": {
@@ -233,8 +233,24 @@
       "unidade": "razao",
       "padrao": 0.07,
       "minimo": 0.02,
-      "maximo": 0.2,
+      "maximo": 0.3,
       "medio": 0.07
+    },
+    "cordaDaPaNaRaiz": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.06,
+      "minimo": 0.02,
+      "maximo": 0.08,
+      "medio": 0.06
+    },
+    "cordaDaPaNaPonta": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.02,
+      "minimo": 0.01,
+      "maximo": 0.08,
+      "medio": 0.03
     }
   },
   "restricoes": [
@@ -247,6 +263,21 @@
       "id": "pas-ou-nenhuma",
       "expressao": "abs(pas - 1) >= 1",
       "motivo": "uma pá só não é uma hélice, e a repetição em volta do eixo pede ao menos duas; use pas 0 para a superfície sem hélice"
+    },
+    {
+      "id": "pas-nao-se-tocam",
+      "expressao": "pas * cordaDaPaNaRaiz * (1 + abaulamentoDaCorda) * (abs(cos(incidenciaNaRaiz)) + (espessuraNaRaiz + curvatura) * abs(sin(incidenciaNaRaiz))) <= 2.2 * cubo",
+      "motivo": "a corda da raiz da pá (a mais larga, com o abaulamento) projetada no plano de rotação, vezes o número de pás, passa de 2,2 vezes o diâmetro do cubo (o perímetro do círculo da raiz, de 0,75 do raio do cubo, é 2,36 vezes ele), e as pás vizinhas se atravessam"
+    },
+    {
+      "id": "raiz-da-pa-cabe-no-cubo",
+      "expressao": "pas * (cordaDaPaNaRaiz * (1 + 0.5 * abaulamentoDaCorda) * (max(eixoDeTorcao, 1 - eixoDeTorcao) * abs(sin(incidenciaNaRaiz)) + (espessuraNaRaiz / 2 + curvatura) * abs(cos(incidenciaNaRaiz))) + 0.125 * cubo * abs(tan(diedro))) <= pas * 0.85 * comprimentoDoCubo / 2",
+      "motivo": "a raiz da pá, na superfície do cubo, girada pela incidência e levantada pelo diedro, passa do comprimento do cubo para frente ou para trás e atravessa o cone ou sai do outro lado do cubo"
+    },
+    {
+      "id": "pa-nao-alarga-para-a-ponta",
+      "expressao": "pas * cordaDaPaNaPonta <= pas * cordaDaPaNaRaiz",
+      "motivo": "a pá mais larga na ponta que na raiz foge do limite de solidez medido na raiz, e as pás vizinhas se atravessam longe do cubo"
     }
   ],
   "portas": [
@@ -405,14 +436,14 @@
       }
     },
     "helice": {
-      "descricao": "hélice de cinco pás de 2.000 mm de diâmetro: pás como as do perfil pa-de-helice em torno de um cubo de 400 mm e 140 mm de comprimento, com um cone de 480 mm",
+      "descricao": "hélice de cinco pás de 2.000 mm de diâmetro: pás como as do perfil pa-de-helice (corda de 120 mm na raiz e 40 mm na ponta, torção de 52 a 18 graus) em torno de um cubo de 400 mm e 240 mm de comprimento, com um cone de 480 mm",
       "parametros": {
         "envergadura": 2000,
         "simetria": 0,
         "orientacao": 2,
         "pas": 5,
-        "cordaNaRaiz": 0.06,
-        "cordaNaPonta": 0.02,
+        "cordaDaPaNaRaiz": 0.06,
+        "cordaDaPaNaPonta": 0.02,
         "abaulamentoDaCorda": 0.5,
         "eixoDeTorcao": 0.35,
         "enflechamento": 0,
@@ -429,7 +460,7 @@
         "comando": 0,
         "cubo": 0.2,
         "comprimentoDoCone": 0.24,
-        "comprimentoDoCubo": 0.07
+        "comprimentoDoCubo": 0.12
       }
     }
   }

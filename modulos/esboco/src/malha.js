@@ -25,12 +25,13 @@
    convexa fica com o casco exato; só o côncavo, e só até a concavidade aceita, é coberto a mais. O erro é de projeto e
    conhecido: um corpo que toque uma parede côncava de raio grande vê a parede até `concavidade` mm mais perto do que ela está.
    O que fica de fora: o sólido sem superfície (um corpo inteiro dentro de um fechado que não toca a parede) e o detalhe menor
-   que a concavidade, que o desenho mostra e o gate não vê. A decomposição é determinística: a mesma malha dá as mesmas peças,
-   na mesma ordem.
+   que a concavidade, que o desenho mostra e o gate não vê. Cada parte tem um orçamento de peças (`PECAS_POR_PARTE`): a que passa dele,
+   como a asa de 13 m do avião, fica com o vazio dos pedaços mais rasos que sobraram, e o gate vê a parte um pouco mais gorda. A
+   decomposição é determinística: a mesma malha dá as mesmas peças, na mesma ordem.
 
    Puro: não lê arquivo e não guarda estado além da memória por malha lida. */
 import { ErroDeEsboco } from './index.js';
-import { decomporEmPecas, pecaDe, pontosDe } from './decomposicao-convexa.js';
+import { decomporEmPecas } from './decomposicao-convexa.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -39,7 +40,8 @@ export const FORMATO_DA_MALHA = 'mecanifica.malha@1';
 /* A concavidade que um pedaço pode esconder no casco: esta fração da diagonal da forma, e nunca menos que o mínimo em mm. */
 export const CONCAVIDADE_RELATIVA = 0.0025;
 export const CONCAVIDADE_MINIMA_MM = 0.2;
-/* O mais fundo que a decomposição corta uma parte, e o número de peças que ela aceita antes de afrouxar a concavidade. */
+/* O orçamento de peças convexas de cada parte: a decomposição corta o pedaço de vazio mais fundo primeiro e, passando disto, deixa os
+   pedaços que sobram como estão (a asa de 13 m do avião pediria centenas de peças pela concavidade, e sai com estas). */
 const PECAS_POR_PARTE = 160;
 /* Dois vértices a menos disto, em mm, são o mesmo vértice. */
 const SOLDA_MM = 1e-4;
@@ -279,12 +281,7 @@ export function pecasLocaisDaMalha(malha) {
   const pecas = [];
   for (const parte of malha.partes) {
     const polis = malha.faces.slice(parte.de, parte.ate).map((f) => f.map((i) => malha.vertices[i]));
-    /* o limite sobe até a parte caber no orçamento de peças: uma parte muito curva (ou aberta, em que o casco sempre cobre algum
-       vazio) fica com o casco mais folgado; passando de oito subidas ela vira um casco só */
-    let feitas = null;
-    let limite = base;
-    for (let volta = 0; volta < 8 && !feitas; volta++, limite *= 1.6) feitas = decomporEmPecas(polis, limite, { contexto, pecas: PECAS_POR_PARTE });
-    if (!feitas) feitas = [pecaDe(pontosDe(polis))];
+    const feitas = decomporEmPecas(polis, base, { contexto, pecas: PECAS_POR_PARTE });
     pecas.push(...feitas);
   }
   malha.pecas = pecas;
@@ -396,6 +393,15 @@ function raiosDoConvexo(poli, n) {
  *  de seção convexa) aceita de uma peça que o esboço desenha por superfície: a roda vira o cilindro do pneu, e o cilindro hidráulico
  *  o tronco de seções do corpo, da haste e dos olhais. Determinístico. */
 export function cascoEmSecoes(malha, { secoes: quantas = SECOES_DO_CASCO, raios = RAIOS_DO_CASCO } = {}) {
+  const memoria = `${quantas}x${raios}`;
+  malha.cascos ??= new Map();
+  if (malha.cascos.has(memoria)) return malha.cascos.get(memoria);
+  const casco = cascoPorSecoes(malha, quantas, raios);
+  malha.cascos.set(memoria, casco);
+  return casco;
+}
+
+function cascoPorSecoes(malha, quantas, raios) {
   const eixo = eixoDaMalha(malha);
   const e = EIXOS.indexOf(eixo);
   const [u, v] = PLANO_DA_SECAO[eixo];

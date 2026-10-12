@@ -13,9 +13,12 @@
    bordo de fuga para baixo (para o lado +x, na deriva) positivo, e `comandoDiferencial` 1 a inverte no comando esquerdo, como no aileron.
 
    A HÉLICE. Com `pas` maior que zero a família gera a hélice: `pas` pás em torno de um cubo, de eixo z, e a proa do cone em -z. A
-   envergadura é o diâmetro, as proporções de corda são dele, o cubo (diâmetro, comprimento) e o cone (comprimento) são
-   proporções dele também, e a pá é uma semi-superfície de orientação 2, sem comando, que começa dentro do cubo e vai ao raio. Os
-   parâmetros `simetria`, `orientacao` e os do comando não valem na hélice.
+   envergadura é o diâmetro, as cordas da pá (`cordaDaPaNaRaiz` e `cordaDaPaNaPonta`, que na hélice tomam o lugar de `cordaNaRaiz` e
+   `cordaNaPonta`, de faixa mais larga por causa da deriva) são proporções dele, o cubo (diâmetro, comprimento) e o cone (comprimento)
+   também, e a pá é uma semi-superfície de orientação 2, sem comando, que começa dentro do cubo e vai ao raio. Os parâmetros
+   `simetria`, `orientacao`, `cordaNaRaiz`, `cordaNaPonta` e os do comando não valem na hélice. Três restrições a impedem de se
+   atravessar: as pás vizinhas (`pas-nao-se-tocam`, a corda da raiz projetada no plano de rotação contra o perímetro do círculo da
+   raiz da pá), a raiz contra o comprimento do cubo (`raiz-da-pa-cabe-no-cubo`) e a ponta não mais larga que a raiz.
 
    Puro e determinístico: nenhuma leitura de relógio, de sorteio ou de arquivo. */
 import { GRAUS } from './geometria.js';
@@ -54,7 +57,7 @@ export function derivar(v) {
   const semi = helice ? raio - deslocamentoDaRaiz : simetria ? b / 2 : b;
   const entrada = {
     semi, deslocamentoDaRaiz, orientacao, simetria,
-    cordaNaRaiz: v.cordaNaRaiz * b, cordaNaPonta: v.cordaNaPonta * b, abaulamentoDaCorda: v.abaulamentoDaCorda, eixo: v.eixoDeTorcao,
+    cordaNaRaiz: (helice ? v.cordaDaPaNaRaiz : v.cordaNaRaiz) * b, cordaNaPonta: (helice ? v.cordaDaPaNaPonta : v.cordaNaPonta) * b, abaulamentoDaCorda: v.abaulamentoDaCorda, eixo: v.eixoDeTorcao,
     enflechamento: v.enflechamento, diedro: v.diedro, torcao: v.torcao, incidenciaNaRaiz: v.incidenciaNaRaiz,
     curvatura: v.curvatura, posicaoDaCurvatura: v.posicaoDaCurvatura, espessuraNaRaiz: v.espessuraNaRaiz, espessuraNaPonta: v.espessuraNaPonta,
     bordoDeFuga: v.bordoDeFuga, pontaLevantada: v.pontaLevantada, extensaoDaPonta: v.extensaoDaPonta,

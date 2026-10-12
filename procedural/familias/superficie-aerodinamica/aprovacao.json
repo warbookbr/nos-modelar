@@ -13,6 +13,8 @@
           "comandoDiferencial": 0,
           "comprimentoDoCone": 0.05,
           "comprimentoDoCubo": 0.02,
+          "cordaDaPaNaPonta": 0.01,
+          "cordaDaPaNaRaiz": 0.02,
           "cordaDoComando": 0.1,
           "cordaNaPonta": 0.01,
           "cordaNaRaiz": 0.02,
@@ -48,6 +50,8 @@
           "comandoDiferencial": 0,
           "comprimentoDoCone": 0.2,
           "comprimentoDoCubo": 0.07,
+          "cordaDaPaNaPonta": 0.03,
+          "cordaDaPaNaRaiz": 0.06,
           "cordaDoComando": 0.3,
           "cordaNaPonta": 0.06,
           "cordaNaRaiz": 0.12,
@@ -77,12 +81,14 @@
       },
       "maximo": {
         "parametros": {
-          "abaulamentoDaCorda": 1,
+          "abaulamentoDaCorda": 0.6,
           "bordoDeFuga": 0.02,
           "comando": 1,
           "comandoDiferencial": 1,
           "comprimentoDoCone": 0.5,
-          "comprimentoDoCubo": 0.2,
+          "comprimentoDoCubo": 0.3,
+          "cordaDaPaNaPonta": 0.08,
+          "cordaDaPaNaRaiz": 0.08,
           "cordaDoComando": 0.45,
           "cordaNaPonta": 0.6,
           "cordaNaRaiz": 0.8,
@@ -107,16 +113,20 @@
           "simetria": 1,
           "torcao": 60
         },
-        "hash": "sha256:ed5cbcce21cf1cf511ad3071e4ca7e228dd56211af094dba19ea7841c3bb27a4",
+        "hash": "sha256:ec2ff2e4f8534a8893e0999beaf08a0764ea18d47362e4d6d30dd56e5f1281ff",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 58,
+      "sondas": 62,
       "recusasDeclaradas": [
         {
           "ponto": "fimDoComando=0.15",
           "restricao": "comando-com-extensao"
+        },
+        {
+          "ponto": "pas=9",
+          "restricao": "pas-nao-se-tocam"
         }
       ]
     },
@@ -133,6 +143,8 @@
           "comandoDiferencial": 1,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
+          "cordaDaPaNaPonta": 0.02,
+          "cordaDaPaNaRaiz": 0.06,
           "cordaDoComando": 0.25,
           "cordaNaPonta": 0.0484,
           "cordaNaRaiz": 0.114,
@@ -168,6 +180,8 @@
           "comandoDiferencial": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
+          "cordaDaPaNaPonta": 0.02,
+          "cordaDaPaNaRaiz": 0.06,
           "cordaDoComando": 0.3,
           "cordaNaPonta": 0.3,
           "cordaNaRaiz": 0.68,
@@ -203,6 +217,8 @@
           "comandoDiferencial": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
+          "cordaDaPaNaPonta": 0.02,
+          "cordaDaPaNaRaiz": 0.06,
           "cordaDoComando": 0.3,
           "cordaNaPonta": 0.13,
           "cordaNaRaiz": 0.23,
@@ -237,10 +253,12 @@
           "comando": 0,
           "comandoDiferencial": 1,
           "comprimentoDoCone": 0.24,
-          "comprimentoDoCubo": 0.07,
+          "comprimentoDoCubo": 0.12,
+          "cordaDaPaNaPonta": 0.02,
+          "cordaDaPaNaRaiz": 0.06,
           "cordaDoComando": 0.25,
-          "cordaNaPonta": 0.02,
-          "cordaNaRaiz": 0.06,
+          "cordaNaPonta": 0.0484,
+          "cordaNaRaiz": 0.114,
           "cubo": 0.2,
           "curvatura": 0.04,
           "deflexao": 0,
@@ -262,7 +280,7 @@
           "simetria": 0,
           "torcao": -34
         },
-        "hash": "sha256:44fb621a58b653320514f5884d06c655a36ca428c732f70ca62938f97eee7ce8",
+        "hash": "sha256:a0b2f8c9a804ac3105e8b27442dfc990043680b2a89eba6214ae1ce2eb312600",
         "medidas": []
       },
       "pa-de-helice": {
@@ -273,6 +291,8 @@
           "comandoDiferencial": 1,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
+          "cordaDaPaNaPonta": 0.02,
+          "cordaDaPaNaRaiz": 0.06,
           "cordaDoComando": 0.25,
           "cordaNaPonta": 0.05,
           "cordaNaRaiz": 0.15,

@@ -88,6 +88,15 @@ describe('a forma de família resolvida', () => {
     perto(h.max, [3, 80, 3]);
   });
 
+  it('`ligar` prende uma haste entre a porta de uma família e outra âncora, e `alinha` e `encosta` leem a caixa da família', () => {
+    const e = esboco([tubo({ rotacao: [0, 0, 90] }), caixa('alvo', [0, 120, 0], 40, 10, 40), { id: 'haste', ligar: { de: 'tubo.boca', para: 'alvo.-y', tipo: 'haste', diametro: 6 } }, caixa('lado', [200, 0, 0]), caixa('colado', [0, 0, 0], 20, 20, 20, { encosta: { referencia: 'tubo', direcao: '+x' } })]);
+    const rs = resolvidas(e);
+    const h = rs.find((r) => r.id === 'haste');
+    perto(h.min, [-3, 50, -3]);
+    perto(h.max, [3, 115, 3]);
+    expect(rs.find((r) => r.id === 'colado').min[0]).toBeCloseTo(-40, 6);
+  });
+
   it('a cópia por espelho e por arranjo leva as âncoras da fonte refletidas e deslocadas', () => {
     const e = esboco([tubo({ id: 'tuboE', centro: [100, 0, 0] }), { id: 'tuboD', espelha: { forma: 'tuboE', eixo: 'x' } }, { arranja: { forma: 'tuboE', modo: 'linear', total: 2, passo: [0, 80, 0] } }]);
     const rs = resolvidas(e);

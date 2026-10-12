@@ -7,6 +7,7 @@
       { "nome": "comprimentoRecolhido", "valor": 470, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "distancia": ["amortecedor.olhal-traseiro", "amortecedor.olhal-dianteiro"], "eixo": "y" } },
       { "nome": "diametroDaRoda", "valor": 500, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "caixa": "y", "formas": ["roda"] } },
       { "nome": "larguraDaRoda", "valor": 100, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "caixa": "z", "formas": ["roda"] } },
+      { "nome": "alturaDaPerna", "valor": 825, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": "alturaTotal" },
       { "nome": "vaoDoPinoAoEixo", "valor": 470, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "distancia": ["pino.centro", "eixoDaRoda.centro"], "eixo": "y" } }
     ],
     "contrato": { "tocam": [["amortecedor", "pino"], ["eixoDaRoda", "roda"], ["longarina", "orelhaA"]] }
@@ -21,7 +22,7 @@
       { "id": "orelhaA", "tipo": "caixa", "largura": 60, "altura": 70, "profundidade": 12, "centro": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 10, -6] }, "cor": "cinza", "unidade": "suspensao" },
       { "id": "orelhaB", "tipo": "caixa", "largura": 60, "altura": 70, "profundidade": 12, "centro": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 10, 37.5] }, "cor": "cinza", "unidade": "suspensao" },
       { "id": "pino", "tipo": "cilindro", "diametro": 31, "eixo": "z", "de": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 0, 0] }, "para": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 0, 31.5] }, "cor": "laranja", "unidade": "suspensao" },
-      { "id": "eixoDaRoda", "tipo": "cilindro", "diametro": 31, "de": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, -6] }, "para": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, 148] }, "cor": "laranja", "unidade": "roda" },
+      { "id": "eixoDaRoda", "tipo": "cilindro", "diametro": 31, "de": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, -6] }, "para": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, 148] }, "ponta": true, "cor": "laranja", "unidade": "roda" },
       { "id": "roda", "tipo": "familia", "familia": "roda-pneu", "perfil": "trem", "parametros": { "diametroPneu": 500, "diametroFuroCentral": 0.0632 }, "rotacao": [0, 90, 0], "centro": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, 92] }, "cor": "preto", "unidade": "roda" }
     ]
   }]

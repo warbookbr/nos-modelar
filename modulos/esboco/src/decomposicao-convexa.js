@@ -11,13 +11,18 @@
    também tem uma face no plano de corte) não é superfície do sólido: o ponto dele conta como vazio só se cai fora da seção
    do sólido pelo plano (`secaoDoPlano`), de modo que um corte através de um aro ainda enxerga o furo.
 
-   O CORTE. Quando a parte tem um furo em torno de um eixo (o raio mínimo dos vértices ao eixo não é zero), o primeiro corte é
-   em cunhas por planos que contêm o eixo, tantas quantas a corda de uma cunha precisa para o furo ficar a menos de `limite` da
-   corda (o aro e o pneu em 24 cunhas, e não em milhares de pedaços de cortes paralelos aos eixos). Dentro de cada cunha, e nas
-   partes sem furo, o corte é por planos paralelos aos eixos, pelo meio do vazio no eixo e na posição que deixa menos vazio
-   nos dois lados. Quem desiste: o pedaço que não melhora depois de `PARADOS` cortes seguidos (a malha aberta, em que o casco
-   sempre cobre a abertura) vira peça com o vazio que sobrou, e uma parte que passa do orçamento de peças sobe o limite
-   (ver `decomporParte`). Determinístico: a mesma superfície dá as mesmas peças, na mesma ordem.
+   O CORTE. Quando a parte tem um furo em torno de um eixo (nenhum vértice a menos do dobro do limite do eixo, e o eixo fora da
+   seção da parte), o primeiro corte é em cunhas por planos que contêm o eixo, tantas quantas a corda de uma cunha precisa para o
+   furo ficar a menos de `limite` da corda (o furo de 31,6 mm do cubo da roda do trem em 7 cunhas e o pneu em 24, e não em milhares de
+   pedaços de cortes paralelos aos eixos). Dentro de cada cunha, e nas partes sem furo, o corte é por planos paralelos aos eixos, pelo
+   vértice mais perto do ponto mais fundo do vazio e no eixo que deixa menos vazio nos dois lados. Os pedaços se cortam sempre o
+   de vazio mais fundo primeiro, até todos caberem no limite ou as peças chegarem ao orçamento (`pecas`), e o que sobra vira peça
+   como está; quem desiste antes é o pedaço que não melhora depois de `PARADOS` cortes seguidos (a malha aberta, em que o casco
+   sempre cobre a abertura). Determinístico: a mesma superfície dá as mesmas peças, na mesma ordem.
+
+   A POSIÇÃO GERAL DO CASCO. O casco incremental de uma superfície de seções planas (a asa do avião) cresce sem limite se os pontos
+   coplanares não forem desempatados: ver `cascoConvexo`. Foi o que fez a decomposição da asa passar de 100 s, com o casco de 34 mil
+   triângulos para 1828 pontos, a 3 s.
 
    Puro: só aritmética sobre listas de números. */
 
@@ -36,17 +41,10 @@ const ALCANCE_DA_BUSCA = 6;
 
 /* ---------- o casco convexo ---------- */
 
-/* O casco convexo de uma nuvem de pontos (incremental, determinístico): `{ vertices, faces, planos }`, com `faces` triângulos
-   [a, b, c] de índices de `pontos` em sentido anti-horário visto de fora e `planos` { n, d } (n unitário para fora, n·p = d).
-   Devolve null quando a nuvem é plana, uma reta ou um ponto (sem volume). */
-export function cascoConvexo(pontos) {
+/* O simplex inicial do casco: os dois pontos mais distantes entre os extremos dos eixos, o mais longe da reta e o mais longe do plano
+   (índices `[i0, i1, i2, i3]`), ou null quando a nuvem é um ponto, uma reta ou um plano a menos de `eps`. */
+function simplexInicial(pontos, eps) {
   const n = pontos.length;
-  if (n < 4) return null;
-  const caixa = [0, 1, 2].map((e) => [Math.min(...pontos.map((p) => p[e])), Math.max(...pontos.map((p) => p[e]))]);
-  const escala = Math.max(...caixa.map(([lo, hi]) => hi - lo));
-  if (!(escala > 0)) return null;
-  const eps = escala * 1e-9;
-  /* o simplex inicial: os dois pontos mais distantes entre os extremos dos eixos, o mais longe da reta e o mais longe do plano */
   const extremos = new Set();
   for (let e = 0; e < 3; e++) {
     let lo = 0; let hi = 0;
@@ -66,6 +64,41 @@ export function cascoConvexo(pontos) {
   let i3 = -1; let m3 = eps;
   for (let i = 0; i < n; i++) { const d = Math.abs(dot(nor, sub(pontos[i], pontos[i0]))) / nn; if (d > m3 + 1e-15) { m3 = d; i3 = i; } }
   if (i3 < 0) return null;
+  return [i0, i1, i2, i3];
+}
+
+/* Um número em [-1, 1) que só depende de `i` e `e` (um misturador de bits de 32 bits): a perturbação do casco é a mesma em toda máquina. */
+function ruido(i, e) {
+  let h = Math.imul(3 * i + e + 1, 0x9e3779b1);
+  h ^= h >>> 15; h = Math.imul(h, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16;
+  return ((h >>> 0) / 4294967296) * 2 - 1;
+}
+
+/* O casco convexo de uma nuvem de pontos (incremental, determinístico): `{ vertices, faces, planos }`, com `faces` triângulos
+   [a, b, c] de índices de `originais` em sentido anti-horário visto de fora e `planos` { n, d } (n unitário para fora, n·p = d,
+   com os pontos como vieram). Devolve null com menos de 4 pontos, e quando a nuvem é plana, uma reta ou um ponto (sem volume).
+
+   A POSIÇÃO GERAL. O casco incremental decide por ponto e por face se a face é visível, e uma superfície de seções planas (a asa:
+   14 seções de 130 pontos, cada uma num plano) tem centenas de pontos exatamente no plano de uma face. Nesse empate o conjunto de
+   faces visíveis deixa de ser um disco, o horizonte se cruza em si mesmo e o casco passa a ter 19 triângulos por ponto (34 mil
+   para 1828 pontos, e a medida do vazio de cada um custava segundos). Cada ponto é então deslocado de um valor de até 1e-7 da maior
+   extensão (1,3 mm na asa de 13 m, 0,00005 mm na roda), mil vezes o limite de visibilidade (1e-10) e muito abaixo da concavidade que a
+   decomposição aceita (0,25% da diagonal, no mínimo 0,2 mm): nenhum empate sobra, o casco tem no máximo 2n - 4 triângulos, e o que sai
+   são índices dos pontos de entrada. Com o deslocamento perto do limite (1e-11 contra 1e-12) o casco da roda levou 4 minutos. */
+export function cascoConvexo(originais) {
+  const n = originais.length;
+  if (n < 4) return null;
+  const lo3 = [Infinity, Infinity, Infinity]; const hi3 = [-Infinity, -Infinity, -Infinity];
+  for (const p of originais) for (let e = 0; e < 3; e++) { if (p[e] < lo3[e]) lo3[e] = p[e]; if (p[e] > hi3[e]) hi3[e] = p[e]; }
+  const escala = Math.max(hi3[0] - lo3[0], hi3[1] - lo3[1], hi3[2] - lo3[2]);
+  if (!(escala > 0)) return null;
+  /* a nuvem plana (ou reta) não tem casco: o teste é o de sempre, nos pontos como vieram, a 1e-9 da extensão */
+  const simplex = simplexInicial(originais, escala * 1e-9);
+  if (!simplex) return null;
+  const [i0, i1, i2, i3] = simplex;
+  const amplitude = escala * 1e-7;
+  const pontos = originais.map((p, i) => [p[0] + amplitude * ruido(i, 0), p[1] + amplitude * ruido(i, 1), p[2] + amplitude * ruido(i, 2)]);
+  const eps = escala * 1e-10;
 
   const faces = [];
   const nova = (a, b, c) => {
@@ -105,10 +138,22 @@ export function cascoConvexo(pontos) {
     }
     const restantes = faces.filter((_, k) => !dosVisiveis.has(k));
     faces.length = 0;
-    faces.push(...restantes, ...novas);
+    for (const f of restantes) faces.push(f);
+    for (const f of novas) faces.push(f);
   }
   const usados = [...new Set(faces.flatMap((f) => f.v))].sort((a, b) => a - b);
-  return { vertices: usados, faces: faces.map((f) => f.v), planos: faces.map((f) => ({ n: f.n, d: f.d })) };
+  /* o plano de cada face volta nos pontos como vieram: a normal perturbada de uma face de milhares de milímetros erra 1e-4 rad, e as
+     normais de uma face plana inteira deixariam de coincidir. A face quase degenerada (três pontos quase colineares) fica com a normal
+     perturbada, que é a que decidiu o casco. */
+  const planos = faces.map((f) => {
+    const [a, b, c] = f.v;
+    const nrm = cross(sub(originais[b], originais[a]), sub(originais[c], originais[a]));
+    const t = norma(nrm);
+    if (!(t > 1e-12 * escala * escala)) return { n: f.n, d: f.d };
+    const un = [nrm[0] / t, nrm[1] / t, nrm[2] / t];
+    return dot(un, f.n) > 0.5 ? { n: un, d: dot(un, originais[a]) } : { n: f.n, d: f.d };
+  });
+  return { vertices: usados, faces: faces.map((f) => f.v), planos };
 }
 
 /* A peça convexa de um conjunto de pontos: o casco, ou a caixa dos pontos quando eles são planos (uma chapa sem espessura).
@@ -196,31 +241,41 @@ function distancia2ATriangulo(p, a, b, c) {
 }
 
 /* A superfície da malha inteira como triângulos numa grade de células de lado `h` (no mínimo o limite): `perto(p, limite)` diz
-   se há superfície a menos de `limite` de `p`. */
+   se há superfície a menos de `limite` de `p`. A célula é um número (o índice dela na caixa da malha, com a folga do alcance da
+   busca em volta) e o triângulo já visto numa consulta é uma marca num vetor: a asa de 13 m pedia dezenas de milhões de consultas, e
+   a chave em texto e o conjunto de vistos de cada uma custavam mais que a conta de distância. */
 function grade(polis, h, fonte) {
-  const celulas = new Map();
-  const chave = (i, j, k) => `${i},${j},${k}`;
   const tris = [];
   for (const poli of polis) for (let i = 1; i + 1 < poli.length; i++) tris.push([poli[0], poli[i], poli[i + 1]]);
+  const minimos = [Infinity, Infinity, Infinity]; const maximos = [-Infinity, -Infinity, -Infinity];
+  for (const poli of polis) for (const q of poli) for (let e = 0; e < 3; e++) { if (q[e] < minimos[e]) minimos[e] = q[e]; if (q[e] > maximos[e]) maximos[e] = q[e]; }
+  const origem = minimos.map((v) => Math.floor(v / h) - ALCANCE_DA_BUSCA - 1);
+  const dim = maximos.map((v, e) => Math.floor(v / h) + ALCANCE_DA_BUSCA + 2 - origem[e]);
+  const chave = (i, j, k) => ((i - origem[0]) * dim[1] + (j - origem[1])) * dim[2] + (k - origem[2]);
+  const dentro = (i, j, k) => i >= origem[0] && i - origem[0] < dim[0] && j >= origem[1] && j - origem[1] < dim[1] && k >= origem[2] && k - origem[2] < dim[2];
+  const celulas = new Map();
   tris.forEach((t, id) => {
     const lo = [0, 1, 2].map((e) => Math.floor(Math.min(t[0][e], t[1][e], t[2][e]) / h));
     const hi = [0, 1, 2].map((e) => Math.floor(Math.max(t[0][e], t[1][e], t[2][e]) / h));
     for (let i = lo[0]; i <= hi[0]; i++) for (let j = lo[1]; j <= hi[1]; j++) for (let k = lo[2]; k <= hi[2]; k++) {
       const c = chave(i, j, k);
-      if (!celulas.has(c)) celulas.set(c, []);
-      celulas.get(c).push(id);
+      const lista = celulas.get(c);
+      if (lista) lista.push(id); else celulas.set(c, [id]);
     }
   });
+  const marcas = new Int32Array(tris.length);
+  let consulta = 0;
   const perto = (p, limite) => {
     const i = Math.floor(p[0] / h); const j = Math.floor(p[1] / h); const k = Math.floor(p[2] / h);
     const l2 = limite * limite;
-    const vistos = new Set();
+    consulta++;
     for (let a = i - 1; a <= i + 1; a++) for (let b = j - 1; b <= j + 1; b++) for (let c = k - 1; c <= k + 1; c++) {
+      if (!dentro(a, b, c)) continue;
       const ids = celulas.get(chave(a, b, c));
       if (!ids) continue;
       for (const id of ids) {
-        if (vistos.has(id)) continue;
-        vistos.add(id);
+        if (marcas[id] === consulta) continue;
+        marcas[id] = consulta;
         const t = tris[id];
         if (distancia2ATriangulo(p, t[0], t[1], t[2]) <= l2) return true;
       }
@@ -231,19 +286,27 @@ function grade(polis, h, fonte) {
      passando de `ALCANCE_DA_BUSCA` células devolve esse alcance (o ponto está longe de tudo) */
   const distancia = (p) => {
     const i = Math.floor(p[0] / h); const j = Math.floor(p[1] / h); const k = Math.floor(p[2] / h);
-    const vistos = new Set();
+    consulta++;
     let melhor = Infinity;
+    const visitar = (a, b, c) => {
+      if (!dentro(a, b, c)) return;
+      const ids = celulas.get(chave(a, b, c));
+      if (!ids) return;
+      for (const id of ids) {
+        if (marcas[id] === consulta) continue;
+        marcas[id] = consulta;
+        const t = tris[id];
+        const d2 = distancia2ATriangulo(p, t[0], t[1], t[2]);
+        if (d2 < melhor) melhor = d2;
+      }
+    };
     for (let r = 0; r <= ALCANCE_DA_BUSCA; r++) {
-      for (let a = i - r; a <= i + r; a++) for (let b = j - r; b <= j + r; b++) for (let c = k - r; c <= k + r; c++) {
-        if (Math.max(Math.abs(a - i), Math.abs(b - j), Math.abs(c - k)) !== r) continue;
-        const ids = celulas.get(chave(a, b, c));
-        if (!ids) continue;
-        for (const id of ids) {
-          if (vistos.has(id)) continue;
-          vistos.add(id);
-          const t = tris[id];
-          const d2 = distancia2ATriangulo(p, t[0], t[1], t[2]);
-          if (d2 < melhor) melhor = d2;
+      /* só a casca de lado 2r + 1: as duas faces em `a`, e nas camadas de dentro as faces em `b` e em `c` */
+      for (let a = i - r; a <= i + r; a++) {
+        const faceA = Math.abs(a - i) === r;
+        for (let b = j - r; b <= j + r; b++) {
+          if (faceA || Math.abs(b - j) === r) { for (let c = k - r; c <= k + r; c++) visitar(a, b, c); continue; }
+          if (r > 0) { visitar(a, b, k - r); visitar(a, b, k + r); } else visitar(a, b, k);
         }
       }
       if (melhor <= (r * h) * (r * h)) break;
@@ -294,12 +357,17 @@ function secaoDoPlano(fonte, plano) {
     }
     return par;
   };
-  const distanciaAoContorno = (pt) => Math.min(Infinity, ...segmentos.map(([a, b]) => {
-    const dx = b[0] - a[0]; const dy = b[1] - a[1];
-    const l2 = dx * dx + dy * dy;
-    const t = l2 > 0 ? Math.max(0, Math.min(1, ((pt[0] - a[0]) * dx + (pt[1] - a[1]) * dy) / l2)) : 0;
-    return Math.hypot(pt[0] - (a[0] + t * dx), pt[1] - (a[1] + t * dy));
-  }));
+  const distanciaAoContorno = (pt) => {
+    let menor = Infinity;
+    for (const [a, b] of segmentos) {
+      const dx = b[0] - a[0]; const dy = b[1] - a[1];
+      const l2 = dx * dx + dy * dy;
+      const t = l2 > 0 ? Math.max(0, Math.min(1, ((pt[0] - a[0]) * dx + (pt[1] - a[1]) * dy) / l2)) : 0;
+      const d = Math.hypot(pt[0] - (a[0] + t * dx), pt[1] - (a[1] + t * dy));
+      if (d < menor) menor = d;
+    }
+    return menor;
+  };
   return { plano2, dentro, distanciaAoContorno, vazia: segmentos.length === 0 };
 }
 
@@ -346,12 +414,10 @@ function avaliar(polis, planos, superficie, limite) {
 
 const EIXOS_UNITARIOS = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
 
-/* Corta um pedaço até o casco dele não cobrir vazio além de `limite`: de cada eixo se provam os dois filhos cortados pela
-   ponto mais fundo do vazio, e fica o corte que deixa o vazio menos fundo (empate: o que deixa menos área de vazio). Devolve false quando passa de `orcamento.pecas` peças. */
-function decompor(no, limite, superficie, profundidade, saida, orcamento, parados = 0) {
-  if (no.polis.length === 0 || no.pontos.length === 0) return true;
-  const folha = () => { saida.push(pecaDe(no.pontos)); return saida.length <= orcamento.pecas; };
-  if (!no.casco || no.longe.length === 0 || profundidade >= PROFUNDIDADE_MAXIMA) return no.casco || profundidade === 0 ? folha() : true;
+/* O melhor corte de um pedaço: de cada eixo se provam os dois filhos cortados pelo vértice mais perto do ponto mais fundo do vazio, e
+   fica o corte que deixa o vazio menos fundo (empate: o que deixa menos área de vazio). Devolve `{ filhos, fundo, total, espalhado }`,
+   ou null quando nenhum eixo corta o pedaço. */
+function melhorCorte(no, limite, superficie) {
   const candidatos = [];
   for (const [e, n] of EIXOS_UNITARIOS.entries()) {
     /* o corte passa pelo vértice mais perto do ponto mais fundo do vazio: o canto côncavo de um degrau, ou, no vazio de uma
@@ -366,25 +432,62 @@ function decompor(no, limite, superficie, profundidade, saida, orcamento, parado
     const filhos = metades.map((polis, k) => avaliar(polis, [...no.planos, { n, d: pos, lado: k === 0 ? -1 : 1 }], superficie, limite));
     candidatos.push({ filhos, fundo: Math.max(filhos[0].fundo, filhos[1].fundo), total: filhos[0].vazio + filhos[1].vazio, espalhado: ordenados[ordenados.length - 1] - ordenados[0] });
   }
-  if (candidatos.length === 0) return folha();
+  if (candidatos.length === 0) return null;
   const minimo = Math.min(...candidatos.map((c) => c.fundo));
-  const melhor = candidatos.filter((c) => c.fundo <= minimo * 1.05 + 0.1 * limite).sort((a, b) => a.total - b.total || b.espalhado - a.espalhado)[0];
-  const paradosAgora = melhor.fundo > 0.9 * no.fundo ? parados + 1 : 0;
-  if (paradosAgora > PARADOS) return folha();
-  for (const filho of melhor.filhos) if (!decompor(filho, limite, superficie, profundidade + 1, saida, orcamento, paradosAgora)) return false;
-  return true;
+  return candidatos.filter((c) => c.fundo <= minimo * 1.05 + 0.1 * limite).sort((a, b) => a.total - b.total || b.espalhado - a.espalhado)[0];
+}
+
+/* Corta os pedaços de `partida` até o casco de cada um não cobrir vazio além de `limite`, sempre o pedaço de vazio mais fundo
+   primeiro (empate: o de mais área de vazio, e depois o mais antigo), até todos passarem ou as peças chegarem a `pecas`. O
+   orçamento acaba por dentro: o que ficou por cortar vira peça com o vazio que tem, os mais rasos, e a asa de 13 m, que pediria
+   centenas de peças, sai com as 160 que o orçamento dá em vez de recomeçar com um limite mais frouxo. Um pedaço sem casco (uma
+   lasca plana) some, salvo o primeiro, que vira a caixa dos pontos; o que não melhora depois de `PARADOS` cortes seguidos, ou passa
+   de `PROFUNDIDADE_MAXIMA`, fecha como está. Determinístico: a ordem das peças é a dos pedaços, do mais antigo ao mais novo. */
+function decompor(partida, limite, superficie, pecas) {
+  let serie = 0;
+  const abertos = [];
+  const folhas = [];
+  const fechar = (item) => folhas.push({ ordem: item.ordem, peca: pecaDe(item.no.pontos) });
+  const admitir = (no, profundidade, parados) => {
+    const item = { no, profundidade, parados, ordem: serie++ };
+    if (no.polis.length === 0 || no.pontos.length === 0) return;
+    if (!no.casco) { if (profundidade === 0) fechar(item); return; }
+    if (no.longe.length === 0 || profundidade >= PROFUNDIDADE_MAXIMA) fechar(item); else abertos.push(item);
+  };
+  for (const no of partida) admitir(no, 0, 0);
+  while (abertos.length > 0 && folhas.length + abertos.length < pecas) {
+    let k = 0;
+    for (let i = 1; i < abertos.length; i++) {
+      const a = abertos[i].no; const b = abertos[k].no;
+      if (a.fundo > b.fundo + 1e-9 || (Math.abs(a.fundo - b.fundo) <= 1e-9 && a.vazio > b.vazio + 1e-9)) k = i;
+    }
+    const [item] = abertos.splice(k, 1);
+    const corte = melhorCorte(item.no, limite, superficie);
+    const parados = corte && corte.fundo > 0.9 * item.no.fundo ? item.parados + 1 : 0;
+    if (!corte || parados > PARADOS) { fechar(item); continue; }
+    for (const filho of corte.filhos) admitir(filho, item.profundidade + 1, parados);
+  }
+  for (const item of abertos) fechar(item);
+  return folhas.sort((a, b) => a.ordem - b.ordem).map((f) => f.peca);
 }
 
 /* As cunhas em torno de um eixo do esboço (`e`, por um ponto da seção perpendicular): `K` pedaços por planos que contêm o
    eixo. Cada plano tem a normal no plano perpendicular ao eixo, e a cunha `k` fica entre o plano `k` e o `k + 1`. Devolve
-   null quando o eixo passa pelo material (o raio mínimo dos vértices ao eixo é menor que o dobro do limite): não há furo para
-   as cunhas separarem. */
+   null quando o eixo passa pelo material (um vértice a menos do dobro do limite do eixo, ou o eixo dentro da seção da parte a meia
+   altura): não há furo para as cunhas separarem. */
 function cunhasEmTornoDe(polis, e, limite, superficie) {
   const [a, b] = [0, 1, 2].filter((q) => q !== e);
   const pontos = pontosDe(polis);
   const centro = [(Math.min(...pontos.map((p) => p[a])) + Math.max(...pontos.map((p) => p[a]))) / 2, (Math.min(...pontos.map((p) => p[b])) + Math.max(...pontos.map((p) => p[b]))) / 2];
   const raioMinimo = Math.min(...pontos.map((p) => Math.hypot(p[a] - centro[0], p[b] - centro[1])));
   if (raioMinimo < 2 * limite) return null;
+  /* o furo de verdade: o eixo, a meia altura da parte, fica fora do material. Uma peça maciça e côncava (a viga em L) também não tem
+     vértice perto do eixo, e as cunhas só a cortariam à toa. */
+  const meio = (Math.min(...pontos.map((p) => p[e])) + Math.max(...pontos.map((p) => p[e]))) / 2;
+  const normal = [0, 0, 0]; normal[e] = 1;
+  const corte = superficie.secao({ n: normal, d: meio, lado: 1 });
+  const noEixo = [0, 0, 0]; noEixo[a] = centro[0]; noEixo[b] = centro[1]; noEixo[e] = meio;
+  if (corte.vazia || corte.dentro(corte.plano2(noEixo))) return null;
   const K = Math.min(64, Math.max(4, Math.ceil(Math.PI / Math.acos(Math.max(0, 1 - limite / raioMinimo)))));
   const planoDe = (k) => {
     const ang = (2 * Math.PI * k) / K;
@@ -403,16 +506,16 @@ function cunhasEmTornoDe(polis, e, limite, superficie) {
   return cunhas;
 }
 
-/** Decompõe uma lista de polígonos (a superfície de uma parte) em peças convexas cujo casco não cobre vazio além de `limite`
- *  (mm), ou null se passa de `pecas` peças. A distância à superfície vale para os polígonos de `contexto` (por padrão os
- *  próprios): a malha inteira fecha as costuras entre partes. */
+/** Decompõe uma lista de polígonos (a superfície de uma parte) em até `pecas` peças convexas, cada uma o casco de um pedaço da
+ *  superfície, com o vazio que o casco cobre abaixo de `limite` (mm) enquanto o orçamento de peças dá. A distância à superfície
+ *  vale para os polígonos de `contexto` (por padrão os próprios): a malha inteira fecha as costuras entre partes. */
 export function decomporEmPecas(polis, limite, { pecas = 160, contexto = polis } = {}) {
   if (polis.length === 0) return [];
-  const todos = contexto.flat();
-  const extensao = Math.max(...[0, 1, 2].map((e) => Math.max(...todos.map((q) => q[e])) - Math.min(...todos.map((q) => q[e]))));
+  /* a maior extensão da malha, em laço (uma malha de dezenas de milhares de faces passa do limite de argumentos de `Math.max(...)`) */
+  const baixo = [Infinity, Infinity, Infinity]; const alto = [-Infinity, -Infinity, -Infinity];
+  for (const poli of contexto) for (const q of poli) for (let e = 0; e < 3; e++) { if (q[e] < baixo[e]) baixo[e] = q[e]; if (q[e] > alto[e]) alto[e] = q[e]; }
+  const extensao = Math.max(alto[0] - baixo[0], alto[1] - baixo[1], alto[2] - baixo[2]);
   const superficie = grade(contexto, Math.max(limite, extensao / 40, 1e-6), polis);
-  const saida = [];
-  const orcamento = { pecas };
   const raiz = avaliar(polis, [], superficie, limite);
   /* o furo em torno de um eixo se resolve em cunhas; o eixo é o que deixa menos vazio depois delas */
   let partida = [raiz];
@@ -422,11 +525,10 @@ export function decomporEmPecas(polis, limite, { pecas = 160, contexto = polis }
       const cunhas = cunhasEmTornoDe(polis, e, limite, superficie);
       if (!cunhas) continue;
       const nos = cunhas.map((c) => avaliar(c.polis, c.planos, superficie, limite));
-      const total = nos.reduce((s, no) => s + no.vazio, 0);
+      const total = nos.reduce((soma, no) => soma + no.vazio, 0);
       if (!melhor || total < melhor.total) melhor = { nos, total };
     }
-    if (melhor && melhor.total < 0.6 * raiz.vazio) partida = melhor.nos;
+    if (melhor && melhor.total < raiz.vazio) partida = melhor.nos;
   }
-  for (const no of partida) if (!decompor(no, limite, superficie, 0, saida, orcamento)) return null;
-  return saida;
+  return decompor(partida, limite, superficie, pecas);
 }

@@ -241,7 +241,7 @@ describe('esquema do JSON: campo e valor válido, com "quis dizer"', () => {
   });
 
   it('tipo de forma, eixo, cor e tipo de par que não existem dizem o valor válido', () => {
-    recusa(forma({ tipo: 'cilindo' }), /"tipo" com o valor "cilindo" deve ser um de caixa, cilindro, anel, cone, esfera, extrusao, loft, revolucao, tubo, envolve \(quis dizer "cilindro"\?\)/);
+    recusa(forma({ tipo: 'cilindo' }), /"tipo" com o valor "cilindo" deve ser um de caixa, cilindro, anel, cone, esfera, extrusao, loft, revolucao, tubo, envolve, familia \(quis dizer "cilindro"\?\)/);
     recusa(forma({ eixo: 'w' }), /"eixo" com o valor "w" deve ser um de x, y, z/);
     recusa(forma({ cor: 'azull' }), /"cor" com o valor "azull" deve ser um nome \(roxo, verde, azul, .*\) ou um hexadecimal de 6 dígitos como "#3d6fb5" \(quis dizer "azul"\?\)/);
     recusa({ ...forma({}), contato: { usar: true, pares: [{ a: 'f', b: 'g', tipo: 'atravesa', max: 1, motivo: 'x' }] } }, /contato\.pares\[0\]: "tipo" com o valor "atravesa" deve ser um de atravessa, encosta, livre \(quis dizer "atravessa"\?\)/);

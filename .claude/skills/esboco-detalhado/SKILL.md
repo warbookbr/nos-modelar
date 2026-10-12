@@ -34,7 +34,7 @@ Não audite um esboço por imagem com legenda numerada: o balão e a chave escon
 
 Leia cada referência apenas quando for usar a respectiva ferramenta ou recurso:
 
-- Para formas curvas, tubos, âncoras relativas (`entre`, âncora deslocada) e componentes prontos (`roda`, `garfo`, `quadro`, `mancal`), leia [`formas-e-componentes.md`](formas-e-componentes.md).
+- Para formas curvas, tubos, âncoras relativas (`entre`, âncora deslocada), componentes prontos (`roda`, `garfo`, `quadro`, `mancal`) e formas de família (`tipo: "familia"`, com as portas como âncoras), leia [`formas-e-componentes.md`](formas-e-componentes.md).
 - Para ler e inspecionar o modelo em texto (`--descrever`, `--forma`, `--mudou`) antes de gerar imagem ou posicionar por relação, leia [`leitura-em-texto.md`](leitura-em-texto.md).
 - Para parâmetros, expressões, variantes por opção, espelhamento (`espelha`) e repetição (`arranja`), leia [`variantes-simetria-repeticao.md`](variantes-simetria-repeticao.md).
 - Para estilos, unidades, simetria automática por lado (`lado: "E"`/`"D"`), perfis funcionais e edição por CLI (`--editar`, `--remover`, `--adicionar`), leia [`escrever-menos-json.md`](escrever-menos-json.md).

@@ -443,37 +443,120 @@ describe('a pá de hélice e a hélice de cinco pás', () => {
     for (const p of dentro) expect(Math.abs(p[2])).toBeLessThan(comprimentoDoCubo / 2);
   });
 
-  it('o cubo é um tambor de 400 mm por 140 mm e o cone é uma ogiva de 480 mm que continua o diâmetro do cubo, concêntrica com o eixo', () => {
+  it('o cubo é um tambor de 400 mm por 240 mm e o cone é uma ogiva de 480 mm que continua o diâmetro do cubo, concêntrica com o eixo', () => {
     const cubo = caixas.get('cubo');
-    expect(cubo.dimensoes.map((d) => d / MM)).toEqual([expect.closeTo(400, 6), expect.closeTo(400, 6), expect.closeTo(140, 6)]);
+    expect(cubo.dimensoes.map((d) => d / MM)).toEqual([expect.closeTo(400, 6), expect.closeTo(400, 6), expect.closeTo(240, 6)]);
     expect(cubo.centro.map((c) => c / MM)).toEqual([expect.closeTo(0, 6), expect.closeTo(0, 6), expect.closeTo(0, 6)]);
     const cone = caixas.get('cone');
     expect(cone.dimensoes[2] / MM).toBeCloseTo(480, 6);
-    expect(cone.max[2] / MM).toBeCloseTo(-70, 6);
-    expect(cone.min[2] / MM).toBeCloseTo(-550, 6);
+    expect(cone.max[2] / MM).toBeCloseTo(-120, 6);
+    expect(cone.min[2] / MM).toBeCloseTo(-600, 6);
     expect(cone.dimensoes[0] / MM).toBeCloseTo(400, 6);
-    expect(volumeDaParte(neutro, 'cubo')).toBeCloseTo(0.5 * LADOS_DO_CUBO * 0.2 * 0.2 * Math.sin((2 * Math.PI) / LADOS_DO_CUBO) * 0.14 / MM ** 3, 3);
+    expect(volumeDaParte(neutro, 'cubo')).toBeCloseTo(0.5 * LADOS_DO_CUBO * 0.2 * 0.2 * Math.sin((2 * Math.PI) / LADOS_DO_CUBO) * 0.24 / MM ** 3, 3);
     const verticesDoCone = verticesDaParte(neutro, 'cone').map(({ p }) => p);
-    const doBordoDoCubo = verticesDoCone.filter((p) => Math.abs(p[2] + 70) < 1e-6);
-    const doCubo = verticesDaParte(neutro, 'cubo').map(({ p }) => p).filter((p) => Math.abs(p[2] + 70) < 1e-6);
+    const doBordoDoCubo = verticesDoCone.filter((p) => Math.abs(p[2] + 120) < 1e-6);
+    const doCubo = verticesDaParte(neutro, 'cubo').map(({ p }) => p).filter((p) => Math.abs(p[2] + 120) < 1e-6);
     expect(Math.max(...doBordoDoCubo.map(([x, y]) => Math.hypot(x, y)))).toBeCloseTo(Math.max(...doCubo.map(([x, y]) => Math.hypot(x, y))), 9);
   });
 
   it('de 2 a 9 pás, o espaçamento é 360 por n; o contrato recusa uma pá só; os parâmetros de superfície não valem na hélice', () => {
-    for (const pas of [2, 3, 9]) expect(caixasPorParte(rodar({ perfil: 'helice', pas }).neutro).caixas.get('pas').corpos).toBe(pas);
-    expect(hash(rodar({ perfil: 'helice', comando: 1, simetria: 1, orientacao: 0, deflexao: 20 }).neutro)).toBe(hash(neutro));
+    for (const pas of [2, 3, 9]) expect(caixasPorParte(rodar({ perfil: 'helice', pas, cordaDaPaNaRaiz: 0.03 }).neutro).caixas.get('pas').corpos).toBe(pas);
+    expect(hash(rodar({ perfil: 'helice', comando: 1, simetria: 1, orientacao: 0, deflexao: 20, cordaNaRaiz: 0.3, cordaNaPonta: 0.2 }).neutro)).toBe(hash(neutro));
     expect(recusa({ perfil: 'helice', pas: 1 }).restricao).toBe('pas-ou-nenhuma');
   });
 
   it('as portas são o plano traseiro do cubo e o eixo de giro, ao longo de z', () => {
     const raiz = porta(neutro, 'raiz');
     expect(raiz.normal).toEqual([0, 0, 1]);
-    expect(raiz.ponto[2] / MM).toBeCloseTo(70, 6);
+    expect(raiz.ponto[2] / MM).toBeCloseTo(120, 6);
     const eixo = porta(neutro, 'eixo-da-dobradica');
     expect(eixo.eixo).toEqual([0, 0, 1]);
     expect(eixo.raio / MM).toBeCloseTo(200, 6);
     expect(conferirPortasNaForma(neutro)).toEqual([]);
   });
+});
+
+describe('a solidez da hélice: nenhuma combinação das faixas faz as pás se tocarem nem a raiz sair do cubo', () => {
+  /* os corpos de uma parte como peças soltas, para auditar as pás duas a duas */
+  function pecasDaParte(neutro, nome) {
+    const pai = new Map();
+    const raiz = (v) => { while (pai.get(v) !== v) { pai.set(v, pai.get(pai.get(v))); v = pai.get(v); } return v; };
+    const faces = [...neutro.F.values()].filter((f) => f.parte === nome);
+    for (const f of faces) { for (const v of f.vs) if (!pai.has(v)) pai.set(v, v); for (const v of f.vs.slice(1)) pai.set(raiz(v), raiz(f.vs[0])); }
+    const grupos = new Map();
+    for (const f of faces) { const r = raiz(f.vs[0]); grupos.set(r, [...(grupos.get(r) ?? []), f]); }
+    return [...grupos.values()].map((fs) => ({ V: new Map([...new Set(fs.flatMap((f) => f.vs))].map((v) => [v, neutro.V.get(v)])), F: new Map(fs.map((f) => [f.id, f])) }));
+  }
+  const centroAngular = (peca) => { const vs = [...peca.V.values()]; return Math.atan2(vs.reduce((t, q) => t + q[1], 0), vs.reduce((t, q) => t + q[0], 0)); };
+  /* as pás vizinhas separadas, e a raiz dentro do raio do cubo entre as duas faces dele (o cone e o fundo) */
+  function pasSeparadas(neutro, v) {
+    const pecas = pecasDaParte(neutro, 'pas');
+    expect(pecas).toHaveLength(v.pas);
+    const ordem = pecas.map((_, i) => i).sort((a, b) => centroAngular(pecas[a]) - centroAngular(pecas[b]));
+    const solidos = pecas.map((peca, i) => prepararSolido(peca, null, `pa${i}`));
+    for (const s of solidos) expect(s.fechada).toBe(true);
+    const estados = ordem.map((_, i) => auditarParDeSolidos(solidos[ordem[i]], solidos[ordem[(i + 1) % v.pas]], 1e-9).estado);
+    const raioDoCubo = (v.cubo * v.envergadura * MM) / 2;
+    const meiaDoCubo = (v.comprimentoDoCubo * v.envergadura * MM) / 2;
+    const dentro = [...neutro.F.values()].filter((f) => f.parte === 'pas').flatMap((f) => f.vs).map((id) => neutro.V.get(id)).filter((q) => Math.hypot(q[0], q[1]) < raioDoCubo * 0.9999);
+    return { estados, foraDoCubo: Math.max(0, ...dentro.map((q) => Math.abs(q[2]) - meiaDoCubo)) / (v.envergadura * MM) };
+  }
+  /* a maior corda da raiz que as duas restrições deixam passar (a conta das restrições, escrita aqui outra vez) */
+  function cordaLimite(v) {
+    const a = v.incidenciaNaRaiz * GRAUS;
+    const larguraNoPlano = Math.abs(Math.cos(a)) + (v.espessuraNaRaiz + v.curvatura) * Math.abs(Math.sin(a));
+    const alturaNoEixo = Math.max(v.eixoDeTorcao, 1 - v.eixoDeTorcao) * Math.abs(Math.sin(a)) + (v.espessuraNaRaiz / 2 + v.curvatura) * Math.abs(Math.cos(a));
+    const folgaDoDiedro = (0.85 * v.comprimentoDoCubo) / 2 - 0.125 * v.cubo * Math.abs(Math.tan(v.diedro * GRAUS));
+    return Math.min((2.2 * v.cubo) / (v.pas * (1 + v.abaulamentoDaCorda) * larguraNoPlano), Math.max(0, folgaDoDiedro) / (alturaNoEixo * (1 + 0.5 * v.abaulamentoDaCorda)));
+  }
+
+  it('o ponto máximo da faixa é uma hélice de nove pás que se separam, com a raiz dentro do cubo', () => {
+    const v = completo(ponto('maximo'));
+    expect(v.pas).toBe(9);
+    const { neutro } = rodar(ponto('maximo'));
+    const r = pasSeparadas(neutro, v);
+    expect(r.estados).toEqual(Array(9).fill('separadas'));
+    expect(r.foraDoCubo).toBeLessThanOrEqual(0);
+    expect(neutro.orfaos ?? []).toEqual([]);
+  }, 120_000);
+
+  it('o perfil helice, de cinco pás, tem a corda da raiz abaixo de 95% do limite das duas restrições', () => {
+    const v = completo({ perfil: 'helice' });
+    expect(v.cordaDaPaNaRaiz).toBeLessThan(cordaLimite(v) * 0.95);
+    expect(pasSeparadas(rodar({ perfil: 'helice' }).neutro, v).estados).toEqual(Array(5).fill('separadas'));
+  });
+
+  it('nos cantos e em amostras da faixa (com enflechamento, diedro e ponta levantada), a corda no limite das restrições é aceita e as pás se separam; 5% acima do limite é recusada', () => {
+    let semente = 20261012;
+    const sorteio = () => { semente = (semente + 0x6D2B79F5) | 0; let t = Math.imul(semente ^ (semente >>> 15), 1 | semente); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const entre = (a, b) => a + (b - a) * sorteio();
+    const casos = [];
+    for (const pas of [2, 9]) for (const cubo of [0.05, 0.4]) for (const incidenciaNaRaiz of [0, 70]) casos.push({ pas, cubo, incidenciaNaRaiz, torcao: 60, abaulamentoDaCorda: 0.6, espessuraNaRaiz: 0.3, curvatura: 0.09, eixoDeTorcao: 1, comprimentoDoCubo: 0.3, enflechamento: 60, diedro: 15, pontaLevantada: 60 });
+    for (let k = 0; k < 8; k += 1) {
+      casos.push({
+        pas: 2 + Math.floor(sorteio() * 8), cubo: entre(0.05, 0.4), incidenciaNaRaiz: entre(-10, 70), torcao: entre(-60, 60), abaulamentoDaCorda: entre(0, 0.6),
+        espessuraNaRaiz: entre(0.04, 0.3), curvatura: entre(0, 0.09), eixoDeTorcao: entre(0, 1), comprimentoDoCubo: entre(0.02, 0.3),
+        enflechamento: entre(-30, 60), diedro: entre(-15, 15), pontaLevantada: entre(0, 60), extensaoDaPonta: entre(0.02, 0.05),
+      });
+    }
+    let aceitos = 0;
+    for (const caso of casos) {
+      const limite = cordaLimite({ ...completo(), ...caso });
+      const corda = Math.min(P.cordaDaPaNaRaiz.maximo, limite * 0.995);
+      if (corda < P.cordaDaPaNaRaiz.minimo) {
+        expect(recusa({ ...caso, cordaDaPaNaRaiz: P.cordaDaPaNaRaiz.minimo, cordaDaPaNaPonta: P.cordaDaPaNaPonta.minimo }).restricao, JSON.stringify(caso)).toMatch(/pas-nao-se-tocam|raiz-da-pa-cabe-no-cubo/);
+        continue;
+      }
+      const parametros = { ...caso, cordaDaPaNaRaiz: corda, cordaDaPaNaPonta: Math.max(P.cordaDaPaNaPonta.minimo, corda / 2) };
+      const { neutro } = rodar(parametros);
+      const r = pasSeparadas(neutro, completo(parametros));
+      expect(r.estados, JSON.stringify(parametros)).toEqual(Array(caso.pas).fill('separadas'));
+      expect(r.foraDoCubo, JSON.stringify(parametros)).toBeLessThanOrEqual(0);
+      if (limite * 1.05 <= P.cordaDaPaNaRaiz.maximo) expect(recusa({ ...caso, cordaDaPaNaRaiz: limite * 1.05, cordaDaPaNaPonta: P.cordaDaPaNaPonta.minimo }).restricao).toMatch(/pas-nao-se-tocam|raiz-da-pa-cabe-no-cubo/);
+      aceitos += 1;
+    }
+    expect(aceitos).toBeGreaterThan(8);
+  }, 600_000);
 });
 
 describe('as portas das superfícies', () => {
@@ -511,6 +594,9 @@ describe('o contrato recusa combinação impossível e valor fora da faixa', () 
   const CASOS = {
     'comando-com-extensao': { perfil: 'asa', inicioDoComando: 0.85, fimDoComando: 0.85 },
     'pas-ou-nenhuma': { perfil: 'helice', pas: 1 },
+    'pas-nao-se-tocam': { perfil: 'helice', pas: 9 },
+    'raiz-da-pa-cabe-no-cubo': { perfil: 'helice', comprimentoDoCubo: 0.08 },
+    'pa-nao-alarga-para-a-ponta': { perfil: 'helice', cordaDaPaNaPonta: 0.07 },
   };
   it('há um caso para cada restrição do contrato', () => {
     expect(Object.keys(CASOS).sort()).toEqual(F.contrato.restricoes.map(({ id }) => id).sort());

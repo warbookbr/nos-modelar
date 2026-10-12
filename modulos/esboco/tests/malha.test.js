@@ -5,7 +5,8 @@
 import { describe, expect, it } from 'vitest';
 import { ErroDeEsboco } from '../src/index.js';
 import { cascoEmSecoes, eixoDaMalha, fatiarMalha, lerMalha, pecasLocaisDaMalha } from '../src/malha.js';
-import { tuboOco } from './malha-de-prova.js';
+import { cascoConvexo } from '../src/decomposicao-convexa.js';
+import { asaDeSecoes, tuboOco } from './malha-de-prova.js';
 
 const norma = (v) => Math.hypot(...v);
 
@@ -144,4 +145,27 @@ describe('fatiarMalha', () => {
     expect(emBlocos.length).toBeGreaterThanOrEqual(1);
     expect(emBlocos.flatMap((b) => b.lados).length).toBeGreaterThan(0);
   });
+});
+
+describe('a superfície de seções planas, como a asa de 12 m do avião', () => {
+  const dado = asaDeSecoes({});
+  const m = lerMalha(dado);
+
+  it('o casco tem no máximo 2n - 4 triângulos, com cada seção de 60 pontos no mesmo plano', () => {
+    const pontos = m.vertices;
+    const casco = cascoConvexo(pontos);
+    expect(casco.faces.length).toBeLessThanOrEqual(2 * pontos.length - 4);
+    /* o casco envolve todos os vértices, a menos do deslocamento de posição geral (1e-7 da extensão, 1,2 mm nesta asa) */
+    for (const v of pontos) for (const pl of casco.planos) expect(pl.n[0] * v[0] + pl.n[1] * v[1] + pl.n[2] * v[2]).toBeLessThanOrEqual(pl.d + 3);
+  });
+
+  it('a decomposição fecha dentro do orçamento de peças, cobre cada vértice e mede o casco por seções ao longo da envergadura', () => {
+    const pecas = pecasLocaisDaMalha(m);
+    expect(pecas.length).toBeGreaterThan(1);
+    expect(pecas.length).toBeLessThanOrEqual(160);
+    for (const v of m.vertices) expect(pecas.some((p) => [0, 1, 2].every((e) => v[e] >= p.min[e] - 1e-6 && v[e] <= p.max[e] + 1e-6))).toBe(true);
+    const c = cascoEmSecoes(m);
+    expect(c.eixo).toBe('x');
+    expect(c.comprimento).toBe(12000);
+  }, 30_000);
 });

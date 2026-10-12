@@ -1,25 +1,29 @@
-/* A forma de família: um sólido que vem de uma família procedural (`procedural/familias`, contrato `mecanifica.familia@1`) e
-   entra no esboço como uma forma só, `{ "id": "roda", "tipo": "familia", "familia": "roda-pneu", "perfil": "trem",
-   "parametros": { "diametroPneu": 420 } }`, posicionada pelas mesmas relações e âncoras das outras formas (`centro`, `sobre`,
-   `ponta`, `encaixa`, `de`/`para` não, `rotacao`, `desloca`). O módulo não importa o núcleo, nem a família, nem Three.js: quem
-   conhece as famílias é um adaptador (`tools/mecanifica/esboco-familias.mjs`), que chama `chamar` e executa a receita, e que
-   entrega ao módulo o dado `mecanifica.malha@1` (ver `malha.js`): a superfície do sólido em milímetro, as partes da família e as
-   portas dela como âncoras. O módulo recebe o adaptador por `definirProvedorDeFamilias`, a mesma ideia da porta de injeção do
-   nível zero do Condutor, mas guardada aqui porque a geometria da forma é lida por quase todo o módulo (desenho, gate, medidas,
-   Envelope, blocagem, leitura em texto) e passar a função por cada uma delas não cabe.
+/* A forma de família: um sólido que vem de uma família procedural (`procedural/familias`, contrato `mecanifica.familia@1`) e entra no
+   esboço como uma forma só, `{ "id": "roda", "tipo": "familia", "familia": "roda-pneu", "perfil": "trem", "parametros": { "diametroPneu":
+   420 } }`, posicionada pelas mesmas relações e âncoras das outras formas (`centro`, `sobre`, `ponta`, `encaixa`, `alinha`, `encosta`,
+   `rotacao`, `desloca`, `espelha`, `arranja`; `de`/`para` valem só em cilindro, caixa e cone). O caso que pediu isto foi o trem do avião
+   (E7 do `ATRITOS.md`), que não alcançava a roda 2.0 nem o cilindro hidráulico pelo JSON e usou o componente `roda` e cilindros por
+   `ligar`, e a asa e a hélice de `superficie-aerodinamica` passam pela mesma porta.
 
-   POR QUE UM TIPO DE FORMA E NÃO UM COMPONENTE. O componente (`usa`) é uma lista de formas primitivas do próprio módulo, que a
-   expansão espalha no esboço com ids `<instância>.<parte>`; a família entrega a superfície pronta de peças que não são prismas
-   (o pneu com o perfil do flanco, a camisa com o olhal), e decompô-la em primitivas perderia exatamente o que a família
-   calcula. Como tipo de forma, ela é uma forma só, com um id, uma caixa, âncoras e peças convexas para o gate, e entra em
-   `sobre`, `ponta`, `encaixa`, `alinha`, `encosta`, `espelha`, `arranja` e `ligar` sem caso especial.
+   O módulo não importa o núcleo, nem a família, nem Three.js: quem conhece as famílias é um adaptador (`tools/mecanifica/
+   esboco-familias.mjs`), que chama `chamar`, executa a receita e entrega ao módulo o dado `mecanifica.malha@1` (ver `malha.js`): a
+   superfície do sólido em milímetro, as partes da família e as portas dela como âncoras. O adaptador entra por
+   `definirProvedorDeFamilias`, a mesma ideia da porta de injeção do nível zero do Condutor, mas guardada aqui porque a geometria da
+   forma é lida por quase todo o módulo (desenho, gate de contato, medidas, Envelope, blocagem, leitura em texto) e passar a função por
+   cada uma delas não cabe.
 
-   AS PORTAS COMO ÂNCORAS. Cada porta que a família publica (`publicarPorta`) é uma âncora da forma, com o nome da porta e o
-   centro da interface dela: `"amortecedor.olhal-dianteiro"`, `"roda.eixo"`. O adaptador entrega as portas, e o módulo não
-   inventa nenhuma. Uma família sem porta só tem `centro` e as seis faces.
+   POR QUE UM TIPO DE FORMA E NÃO UM COMPONENTE. O componente (`usa`) é uma lista de formas primitivas do próprio módulo, que a expansão
+   espalha no esboço com ids `<instância>.<parte>`; a família entrega a superfície pronta de peças que não são prismas (o pneu com o
+   perfil do flanco, a camisa com o olhal, a asa com a torção), e decompô-la em primitivas perderia exatamente o que a família calcula.
+   Como tipo de forma, ela é uma forma só, com um id, uma caixa, âncoras e peças convexas para o gate, e entra em `sobre`, `ponta`,
+   `encaixa`, `alinha`, `encosta`, `espelha`, `arranja` e `ligar` sem caso especial.
 
-   DETERMINISMO. A malha é função pura de (família, perfil, parâmetros): o módulo guarda a leitura por esse trio, e a mesma
-   forma dá a mesma malha, as mesmas peças convexas e o mesmo desenho. Puro: não lê arquivo. */
+   AS PORTAS COMO ÂNCORAS. Cada porta que a família publica (`publicarPorta`) é uma âncora da forma, com o nome da porta e o centro da
+   interface dela: `"amortecedor.olhal-dianteiro"`, `"roda.eixo"`. O adaptador entrega as portas, e o módulo não inventa nenhuma. Uma
+   família sem porta só tem `centro` e as seis faces.
+
+   DETERMINISMO. A malha é função pura de (família, perfil, parâmetros): o módulo guarda a leitura por esse trio, e a mesma forma dá a
+   mesma malha, as mesmas peças convexas e o mesmo desenho. Puro: não lê arquivo. */
 import { ErroDeEsboco } from './index.js';
 import { lerMalha } from './malha.js';
 
