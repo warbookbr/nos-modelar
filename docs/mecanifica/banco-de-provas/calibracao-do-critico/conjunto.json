@@ -992,6 +992,49 @@
           "briefSha256": "sha256:4142b388e940867b86f4f66a7fa630065c36ad577ee9aa0f44e90c1343514a42",
           "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
           "data": "2026-10-12T22:55:21.828Z"
+        },
+        {
+          "nota": 4,
+          "defeitos": [
+            {
+              "parte": "cubo",
+              "tipo": "ausencia",
+              "onde": "centro da face, furo central",
+              "sentido": "faltando",
+              "evidencia": "lateral.png e isometrica.png: o miolo é liso e opaco, sem abertura; nenhuma vista mostra furo de ponta a ponta"
+            },
+            {
+              "parte": "furos de fixação",
+              "tipo": "ausencia",
+              "onde": "círculo de furos em volta do cubo",
+              "sentido": "faltando",
+              "evidencia": "lateral.png e isometrica.png: nenhum furo na face, nem no topo nem em volta"
+            },
+            {
+              "parte": "raios ou chapa do aro",
+              "tipo": "ausencia",
+              "onde": "face inteira entre o cubo e o aro",
+              "sentido": "faltando",
+              "evidencia": "lateral.png: face uniforme sem raios nem chapa distinguíveis; o objeto lê como disco fechado"
+            },
+            {
+              "parte": "flanges laterais",
+              "tipo": "espessura",
+              "onde": "placa do lado esquerdo do perfil",
+              "sentido": "maior",
+              "evidencia": "frontal.png e superior.png: placa de cerca de 26 px contra friso de cerca de 10 px no lado direito, e placa mais alta que o corpo (922 px contra 896 px)"
+            },
+            {
+              "parte": "face do conjunto",
+              "tipo": "superficie",
+              "onde": "arco parcial na face visível",
+              "sentido": "segmentado",
+              "evidencia": "isometrica.png: arco aberto de cerca de (680,505) a (515,797) que não fecha círculo e não corresponde a nenhuma feição legível"
+            }
+          ],
+          "briefSha256": "sha256:4142b388e940867b86f4f66a7fa630065c36ad577ee9aa0f44e90c1343514a42",
+          "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
+          "data": "2026-10-12T22:56:32.398Z"
         }
       ]
     },
@@ -1042,6 +1085,64 @@
           "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
           "imagemSha256": "sha256:d56effa0f30f71b2c7ee13914e030d23d915af62e275747084c8f5e06aeb876b",
           "data": "2026-10-12T22:54:05.387Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "haste",
+              "tipo": "ausencia",
+              "onde": "entre a cabeça e o olhal dianteiro",
+              "sentido": "faltando",
+              "evidencia": "frontal e superior, x≈740–800: o olhal dianteiro encosta no cone da cabeça, sem haste nem terminal visível, e a cabeça não mostra furo de passagem"
+            },
+            {
+              "parte": "cabeca",
+              "tipo": "superficie",
+              "onde": "contorno da flange dianteira",
+              "sentido": "facetado",
+              "evidencia": "lateral (vista de topo ao longo do eixo): contorno circular com cerca de 30 arestas visíveis"
+            }
+          ],
+          "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
+          "imagemSha256": "sha256:d56effa0f30f71b2c7ee13914e030d23d915af62e275747084c8f5e06aeb876b",
+          "data": "2026-10-12T22:55:27.412Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "haste",
+              "tipo": "ausencia",
+              "onde": "entre a cabeça e o olhal dianteiro",
+              "sentido": "faltando",
+              "evidencia": "frontal.png x 740-755 e superior.png x 748-800: o olhal cinza começa onde o cone da cabeça termina, sem trecho de haste mais fino que a camisa; em lateral.png só há um círculo tracejado muito fraco no disco"
+            },
+            {
+              "parte": "olhalDianteiro",
+              "tipo": "uniao",
+              "onde": "base do anel, junto ao cone da cabeça",
+              "sentido": "afastado",
+              "evidencia": "frontal.png x 750 e isometrica.png canto inferior direito: o anel encosta direto na cabeça, sem pescoço ou terminal que o una a uma haste"
+            },
+            {
+              "parte": "cabeca",
+              "tipo": "superficie",
+              "onde": "borda do disco",
+              "sentido": "facetado",
+              "evidencia": "lateral.png: a silhueta do disco mostra cerca de 30 lados retos e uma cunha de sombra radial no alto à esquerda"
+            },
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "corpo cilíndrico",
+              "sentido": "facetado",
+              "evidencia": "frontal.png e superior.png: faixas horizontais de sombreamento ao longo do corpo, que leem como lados de prisma"
+            }
+          ],
+          "briefSha256": "sha256:261c7aaf205e8c862e3196c8967a788c387ac030f67988a9768351d96e519471",
+          "imagemSha256": "sha256:d56effa0f30f71b2c7ee13914e030d23d915af62e275747084c8f5e06aeb876b",
+          "data": "2026-10-12T22:56:37.806Z"
         }
       ]
     },
@@ -1085,6 +1186,28 @@
           "briefSha256": "sha256:60dfed1be452d1548157e0e5ab29a6313704fd7587db186cf9e2a0643d38c195",
           "imagemSha256": "sha256:d781377f751c0ca01554a17c30eb3d7967b5846b935b3ac3284a44b2a9b2b012",
           "data": "2026-10-12T22:54:12.415Z"
+        },
+        {
+          "nota": 4,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "extremidade externa dos 12 raios, voltada para a parede interna do aro",
+              "sentido": "afastado",
+              "evidencia": "Na lateral os raios terminam a cerca de 120 px do centro e a abertura do aro vai até cerca de 160 px, com vazio de uns 50 mm. Na isométrica as pontas ficam no meio da área creme, sem tocar a borda do aro."
+            },
+            {
+              "parte": "raios",
+              "tipo": "espessura",
+              "onde": "seção dos 12 raios, ao longo de todo o comprimento",
+              "sentido": "menor",
+              "evidencia": "Na lateral e na isométrica os raios têm uns 4 px, cerca de 5 mm numa roda de uns 640 mm, e leem como filetes de linha ao lado do cubo de 167 mm."
+            }
+          ],
+          "briefSha256": "sha256:60dfed1be452d1548157e0e5ab29a6313704fd7587db186cf9e2a0643d38c195",
+          "imagemSha256": "sha256:d781377f751c0ca01554a17c30eb3d7967b5846b935b3ac3284a44b2a9b2b012",
+          "data": "2026-10-12T22:56:07.052Z"
         }
       ]
     },
@@ -1114,6 +1237,28 @@
           "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
           "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
           "data": "2026-10-12T22:54:12.957Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "ombros e banda, vista lateral e superior",
+              "sentido": "anguloso",
+              "evidencia": "Na lateral e na superior a banda é retângulo reto com chanfro curto de cerca de 13 px nos cantos e faixa de menor diâmetro igual nas duas faces. Não há bojo nem raio de ombro, e o pneu lê como rolo. Só vale se a variante pedida for pneumática ou com friso só interno."
+            }
+          ],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
+          "data": "2026-10-12T22:55:33.761Z"
+        },
+        {
+          "nota": 9,
+          "defeitos": [],
+          "briefSha256": "sha256:536720dbb0c9e1350b98c2ffc8964e45d2b615b01b3339f92a9ec04c9ea30429",
+          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
+          "data": "2026-10-12T22:56:37.219Z"
         }
       ]
     },
@@ -1150,6 +1295,42 @@
           "briefSha256": "sha256:33c23aaaa2cf64edc747cb205669d01a633110b2e3debd0d9aa84448347ea95c",
           "imagemSha256": "sha256:a516e50cb2f2e8cf4a8d854ce952b54b65537e63f25e5cca115759efb0d684a3",
           "data": "2026-10-12T22:54:17.455Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "corpo inteiro visto de topo e de frente (contorno de 12 lados)",
+              "sentido": "facetado",
+              "evidencia": "Lateral: contorno dodecagonal. Isométrica: arestas longitudinais de prisma. A camisa lê como prisma, não como tubo redondo."
+            },
+            {
+              "parte": "olhalTraseiro",
+              "tipo": "superficie",
+              "onde": "contorno externo do anel",
+              "sentido": "facetado",
+              "evidencia": "Frontal, x≈300-358: anel de 10 a 12 lados. Isométrica: lê como porca sextavada com furo."
+            },
+            {
+              "parte": "olhalDianteiro",
+              "tipo": "superficie",
+              "onde": "contorno externo do anel",
+              "sentido": "facetado",
+              "evidencia": "Frontal, x≈745-800: anel poligonal. Isométrica: lê como porca com furo inclinado."
+            },
+            {
+              "parte": "olhalTraseiro",
+              "tipo": "superficie",
+              "onde": "bucha do furo",
+              "sentido": "facetado",
+              "evidencia": "Superior, x≈300-352: a bucha sai só uns 2 px de cada lado do anel; a bucha esférica saindo dos dois lados não se lê."
+            }
+          ],
+          "briefSha256": "sha256:33c23aaaa2cf64edc747cb205669d01a633110b2e3debd0d9aa84448347ea95c",
+          "imagemSha256": "sha256:a516e50cb2f2e8cf4a8d854ce952b54b65537e63f25e5cca115759efb0d684a3",
+          "data": "2026-10-12T22:56:08.215Z"
         }
       ]
     },
@@ -1179,6 +1360,21 @@
           "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
           "imagemSha256": "sha256:5025908aec4210bfa600a33130ab0cf2ff2474513c4c9909942441c6ed3b9e97",
           "data": "2026-10-12T22:54:18.069Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "contorno circular da camisa, da cabeça e do terminal, na vista axial",
+              "sentido": "facetado",
+              "evidencia": "Na vista lateral (axial), o contorno externo da camisa e o círculo do terminal mostram um polígono de cerca de 32 lados, com facetas visíveis, onde se esperava revolução lisa."
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "imagemSha256": "sha256:5025908aec4210bfa600a33130ab0cf2ff2474513c4c9909942441c6ed3b9e97",
+          "data": "2026-10-12T22:55:34.298Z"
         }
       ]
     },
@@ -1215,6 +1411,42 @@
           "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
           "imagemSha256": "sha256:f755005cf530a214524f1a4ce4f2aaf1f2c0fb6b543016891da74a919844be51",
           "data": "2026-10-12T22:54:21.317Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "topo dos anéis traseiros, no piso da caçamba",
+              "sentido": "atravessando",
+              "evidencia": "isométrica: dois arcos escuros sobem do piso cinza da caçamba junto às paredes; superior: faixas escuras em x 410–422 e 678–690, y 237–377, dentro da caçamba; lateral: só a metade inferior do anel aparece sob a carroceria"
+            },
+            {
+              "parte": "rodas",
+              "tipo": "uniao",
+              "onde": "ligação das quatro rodas com o bastidor",
+              "sentido": "afastado",
+              "evidencia": "frontal: retângulos escuros soltos de cada lado, sem eixo entre esquerda e direita e sem contato com a barra cinza do bastidor (y 700–725); lateral: anéis sem ligação com a barra cinza"
+            },
+            {
+              "parte": "eixos",
+              "tipo": "ausencia",
+              "onde": "entre as rodas esquerda e direita, sob o piso",
+              "sentido": "faltando",
+              "evidencia": "frontal: entre as rodas internas só aparece a barra cinza do bastidor, sem nenhum eixo"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "faces laterais e frontal da caixa cinza",
+              "sentido": "faltando",
+              "evidencia": "isométrica, frontal e lateral: caixa cinza lisa, sem porta, janela ou para-brisa; não há por onde entrar nem para onde olhar"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "imagemSha256": "sha256:f755005cf530a214524f1a4ce4f2aaf1f2c0fb6b543016891da74a919844be51",
+          "data": "2026-10-12T22:56:05.894Z"
         }
       ]
     },
@@ -1258,6 +1490,49 @@
           "briefSha256": "sha256:4f7556b30f565d4ce56eedce26b3e0910f9fb3b3fbdfbcfc00167dc640edb950",
           "imagemSha256": "sha256:de7d77d46441bf6bdee364cf10f81c3086eb5370c8512bea5738744d4ffd27fe",
           "data": "2026-10-12T22:54:48.047Z"
+        },
+        {
+          "nota": 3,
+          "defeitos": [
+            {
+              "parte": "folhaEsquerda",
+              "tipo": "uniao",
+              "onde": "borda interna, voltada para o pino",
+              "sentido": "afastado",
+              "evidencia": "Frontal: borda da folha em x≈477 e conjunto de nós em x≈565, vão de ~88 px (~19 mm). Vista superior: borda a 120 px do eixo do pino em x≈597. Nada liga a folha ao pino."
+            },
+            {
+              "parte": "folhaEsquerda",
+              "tipo": "ausencia",
+              "onde": "nós da folha esquerda ao longo da borda interna",
+              "sentido": "faltando",
+              "evidencia": "Isométrica e frontal: a folha tem só três meias-luas na borda e nenhum nó. Os três nós visíveis estão todos no conjunto da direita."
+            },
+            {
+              "parte": "folhaEsquerda",
+              "tipo": "ausencia",
+              "onde": "furos de fixação",
+              "sentido": "faltando",
+              "evidencia": "Frontal e isométrica: a folha direita tem três furos (y≈433, 620, 807) e a esquerda nenhum."
+            },
+            {
+              "parte": "nosDaSegundaFolha",
+              "tipo": "ausencia",
+              "onde": "trechos 2, 4 e 6 ao redor do eixo",
+              "sentido": "faltando",
+              "evidencia": "Isométrica: entre os cilindros roxos só há tira verde fina e a face rosa da folha, sem cilindro nem pino. A lateral mostra seis segmentos, o que contradiz a isométrica."
+            },
+            {
+              "parte": "tiraVerde",
+              "tipo": "uniao",
+              "onde": "tira vertical x≈570–597 do pé do nó 1 até a base",
+              "sentido": "afastado",
+              "evidencia": "Frontal e isométrica: peça fina de altura quase total, com chanfro na ponta inferior (x≈580, y≈955), que não é nó, folha nem pino. Não tem ligação legível com as partes vizinhas."
+            }
+          ],
+          "briefSha256": "sha256:4f7556b30f565d4ce56eedce26b3e0910f9fb3b3fbdfbcfc00167dc640edb950",
+          "imagemSha256": "sha256:de7d77d46441bf6bdee364cf10f81c3086eb5370c8512bea5738744d4ffd27fe",
+          "data": "2026-10-12T22:56:08.735Z"
         }
       ]
     },
@@ -1287,6 +1562,21 @@
           "briefSha256": "sha256:5ad3acdf907a0720bcc5c09665820010273b727503c5b3ad1d307412d731729a",
           "imagemSha256": "sha256:0dbc79e0fe1b48fa391ab11254c67028b24770c0f917b608f97400b031c0a6b3",
           "data": "2026-10-12T22:54:48.669Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "prolongamento traseiro (toco rosa atrás do olhal verde)",
+              "tipo": "comprimento",
+              "onde": "extremidade traseira, além do olhal verde",
+              "sentido": "maior",
+              "evidencia": "frontal e superior, x≈300–335: o toco sai além do olhal traseiro e termina solto, sem função; na isométrica ele aponta para fora no canto superior esquerdo. O olhal fica no meio do eixo, e não na ponta."
+            }
+          ],
+          "briefSha256": "sha256:5ad3acdf907a0720bcc5c09665820010273b727503c5b3ad1d307412d731729a",
+          "imagemSha256": "sha256:0dbc79e0fe1b48fa391ab11254c67028b24770c0f917b608f97400b031c0a6b3",
+          "data": "2026-10-12T22:56:06.467Z"
         }
       ]
     },
@@ -1309,6 +1599,21 @@
           "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
           "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
           "data": "2026-10-12T22:54:49.257Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "uniao",
+              "onde": "as três dobradiças de cada lado, junto à borda frontal da lateral",
+              "sentido": "atravessando",
+              "evidencia": "Lateral: três folhas escuras (y≈220, 535, 850) cobrem cerca de 40 mm da face externa da lateral. Isométrica: aparecem coladas na face direita. Frontal e superior: os nós passam do contorno do corpo (x≈300 e 798). Elas deveriam estar escondidas por dentro, atrás da porta. Nenhum tipo do vocabulário descreve 'dobradiça fora do corpo' com exatidão; atravessando é a aproximação mais próxima."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-12T22:56:07.624Z"
         }
       ]
     },
@@ -1331,6 +1636,21 @@
           "briefSha256": "sha256:c2745bceba3c5a2dd31174b3774b648cdcf77af0578d21f604099d127938ab51",
           "imagemSha256": "sha256:c4181865e10ceb5d00f8a95769269ae3e87c004956054093c8f3147a80c1fa37",
           "data": "2026-10-12T22:54:52.165Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "olhalTraseiro",
+              "tipo": "posicao",
+              "onde": "olhal inteiro, deslocado na direção do eixo do pino em relação ao eixo da camisa e do pescoço",
+              "sentido": "baixa",
+              "evidencia": "Vista superior: centro do olhal em y≈640 contra eixo em y≈614, olhal sobra ≈12 mm abaixo da silhueta da camisa, tocando o pescoço só em ≈15 px. Lateral: retângulo verde centrado em x≈428 contra eixo em x≈596 (≈40 mm). Isométrica: olhal ao lado da ponta da camisa. O sentido 'baixa' vale para a vista superior; o desvio é transversal, na direção do pino."
+            }
+          ],
+          "briefSha256": "sha256:c2745bceba3c5a2dd31174b3774b648cdcf77af0578d21f604099d127938ab51",
+          "imagemSha256": "sha256:c4181865e10ceb5d00f8a95769269ae3e87c004956054093c8f3147a80c1fa37",
+          "data": "2026-10-12T22:56:09.261Z"
         }
       ]
     },
@@ -1353,6 +1673,42 @@
           "briefSha256": "sha256:e1a51c9c338f1361df8739e518e3c54cc090f8bfb03d5ef1e497412fe74e0aa8",
           "imagemSha256": "sha256:f5f678f83b105717c53786e7b13fb320fdcfddddee47099fd0b851f0fac64db0",
           "data": "2026-10-12T22:55:21.246Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "nosDaFolhaEsquerda",
+              "tipo": "espessura",
+              "onde": "os três nós verdes, seção do tambor",
+              "sentido": "menor",
+              "evidencia": "Frontal: o verde ocupa x≈515–550, só metade da largura do tambor (≈517–583), e a faixa x≈550–585 nesses trechos tem a cor da folha direita. Superior: o verde é só uma cunha no canto inferior esquerdo do pino. Isométrica: lâmina de ≈15 px contra ≈30 px dos nós roxos. Os nós verdes não envolvem o pino."
+            },
+            {
+              "parte": "folhaEsquerda",
+              "tipo": "uniao",
+              "onde": "extremidade junto ao eixo, nos trechos dos nós roxos",
+              "sentido": "atravessando",
+              "evidencia": "Superior: a folha bege termina em x≈550, embaixo do pino, dentro da área do anel roxo (parede do anel em x≈535–550, y≈638–654), sem rasgo explícito no anel. Frontal: nos trechos roxos a folha esquerda vai até x=550."
+            },
+            {
+              "parte": "pino",
+              "tipo": "uniao",
+              "onde": "trechos dos nós verdes e ponta inferior",
+              "sentido": "afastado",
+              "evidencia": "Isométrica: só a ponta superior do pino aparece. Lateral: faixa cinza-azulada x≈527–550 nos trechos verdes, que indica pino sem nó em volta. A ponta inferior não é vista em nenhuma vista."
+            },
+            {
+              "parte": "nosDaFolhaDireita",
+              "tipo": "superficie",
+              "onde": "anel roxo, quadrante inferior esquerdo",
+              "sentido": "segmentado",
+              "evidencia": "Superior: o anel roxo é aberto embaixo à esquerda (cerca de três quartos de volta), e os nós verdes são só meia seção. Os nós das duas folhas ficam assimétricos. Detalhe: furos poligonais de poucos lados na frontal e na isométrica."
+            }
+          ],
+          "briefSha256": "sha256:e1a51c9c338f1361df8739e518e3c54cc090f8bfb03d5ef1e497412fe74e0aa8",
+          "imagemSha256": "sha256:f5f678f83b105717c53786e7b13fb320fdcfddddee47099fd0b851f0fac64db0",
+          "data": "2026-10-12T22:56:31.818Z"
         }
       ]
     }
