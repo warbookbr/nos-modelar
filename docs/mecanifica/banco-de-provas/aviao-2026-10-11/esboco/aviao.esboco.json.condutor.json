@@ -1495,6 +1495,12 @@
       "unidade": "trem-do-nariz",
       "nota": 8,
       "motivo": "Sem defeito estrutural: a unidade se prende, gira e recolhe sem atravessar capô nem fuselagem nos cortes de 45 e 80 graus. Detalhe de superfície: o cilindro amarelo do amortecedor é facetado na frontal e na superior. Folgas quase nulas, não confirmáveis nas vistas, entre pneu e coroa, pé do garfo e cubo, e atuador e perna do garfo; a haste do atuador não parece telescopar entre as poses."
+    },
+    {
+      "ordem": 17,
+      "unidade": "marco-75",
+      "nota": 8,
+      "motivo": "Nenhuma ponta no ar, travessia ou peça fora do lugar visível na empenagem vertical e no trem do nariz, depois de o crítico saber que a frontal olha pela cauda (o leme à frente da deriva saiu da lista). Não se distinguem nas vistas o eixo e os suportes da dobradiça do leme, a ponteira cinza e o cubo da roda do nariz; os pneus apoiam no mesmo nível."
     }
   ],
   "liberacoes": [

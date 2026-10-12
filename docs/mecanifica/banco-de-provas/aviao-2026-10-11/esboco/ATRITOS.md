@@ -452,3 +452,8 @@ detalhe, tirar o `oculto` de capô, duto e fuselagem e editar
 ```bash
 grep -n "extra-" docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trem-do-nariz/brief.md
 ```
+
+Ocorrência no Marco de 75%: o crítico deu 7 apontando o leme "à frente da
+deriva" na frontal da empenagem vertical, porque o brief não diz que a frontal
+olha de +z, que neste objeto é a cauda. Informado disso, retirou o defeito e deu
+8. O brief precisa dizer de que lado cada vista olha (atritos 12 e 21).
