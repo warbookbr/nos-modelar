@@ -1,0 +1,51 @@
+{
+ "plano": {
+  "nivel": "detalhado",
+  "contrato": {
+   "fixa": [
+    {
+     "a": "mastro",
+     "b": "base",
+     "pontos": 3
+    }
+   ]
+  }
+ },
+ "contato": {
+  "usar": true,
+  "tolerancia": 2,
+  "penetracao": 2,
+  "folga": 5000
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "base",
+     "tipo": "caixa",
+     "largura": 400,
+     "altura": 20,
+     "profundidade": 400,
+     "centro": [
+      0,
+      -10,
+      0
+     ]
+    },
+    {
+     "id": "mastro",
+     "tipo": "cilindro",
+     "diametro": 60,
+     "comprimento": 2000,
+     "eixo": "y",
+     "centro": [
+      0,
+      1000,
+      0
+     ]
+    }
+   ]
+  }
+ ]
+}

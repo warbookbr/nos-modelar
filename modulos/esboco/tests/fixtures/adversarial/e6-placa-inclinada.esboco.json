@@ -1,0 +1,56 @@
+{
+ "plano": {
+  "nivel": "detalhado",
+  "contrato": {
+   "fixa": [
+    {
+     "a": "placa",
+     "b": "base",
+     "pontos": 3
+    }
+   ]
+  }
+ },
+ "contato": {
+  "usar": true,
+  "tolerancia": 30,
+  "penetracao": 30,
+  "folga": 5000
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "base",
+     "tipo": "caixa",
+     "largura": 400,
+     "altura": 20,
+     "profundidade": 400,
+     "centro": [
+      0,
+      -10,
+      0
+     ]
+    },
+    {
+     "id": "placa",
+     "tipo": "caixa",
+     "largura": 300,
+     "altura": 10,
+     "profundidade": 300,
+     "centro": [
+      0,
+      17.5,
+      0
+     ],
+     "rotacao": [
+      0,
+      0,
+      4.763641690726178
+     ]
+    }
+   ]
+  }
+ ]
+}

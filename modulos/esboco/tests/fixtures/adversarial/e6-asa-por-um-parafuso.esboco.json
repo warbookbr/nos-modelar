@@ -1,0 +1,66 @@
+{
+ "plano": {
+  "nivel": "detalhado",
+  "contrato": {
+   "fixa": [
+    {
+     "a": "unidade:asas",
+     "b": "forma:fus",
+     "pontos": 2
+    }
+   ]
+  }
+ },
+ "contato": {
+  "usar": true,
+  "tolerancia": 5,
+  "penetracao": 5,
+  "folga": 5000
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "fus",
+     "tipo": "caixa",
+     "largura": 400,
+     "altura": 400,
+     "profundidade": 4000,
+     "centro": [
+      0,
+      0,
+      0
+     ],
+     "unidade": "fuselagem"
+    },
+    {
+     "id": "parafuso",
+     "tipo": "caixa",
+     "largura": 50,
+     "altura": 50,
+     "profundidade": 50,
+     "centro": [
+      225,
+      0,
+      0
+     ],
+     "unidade": "asas"
+    },
+    {
+     "id": "asa",
+     "tipo": "caixa",
+     "largura": 2000,
+     "altura": 60,
+     "profundidade": 600,
+     "centro": [
+      1250,
+      0,
+      0
+     ],
+     "unidade": "asas"
+    }
+   ]
+  }
+ ]
+}

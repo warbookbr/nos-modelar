@@ -1,0 +1,51 @@
+{
+ "plano": {
+  "nivel": "detalhado",
+  "contrato": {
+   "fixa": [
+    {
+     "a": "peca",
+     "b": "base",
+     "pontos": 3
+    }
+   ]
+  }
+ },
+ "contato": {
+  "usar": true,
+  "tolerancia": 2,
+  "penetracao": 2,
+  "folga": 5000
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "base",
+     "tipo": "caixa",
+     "largura": 2000,
+     "altura": 20,
+     "profundidade": 2000,
+     "centro": [
+      0,
+      -10,
+      0
+     ]
+    },
+    {
+     "id": "peca",
+     "tipo": "caixa",
+     "largura": 360,
+     "altura": 50,
+     "profundidade": 360,
+     "centro": [
+      0,
+      25,
+      0
+     ]
+    }
+   ]
+  }
+ ]
+}

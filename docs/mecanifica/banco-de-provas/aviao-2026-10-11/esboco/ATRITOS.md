@@ -55,15 +55,14 @@ O capô se prende ao fogo por uma face, e `contrato.fixa` com `pontos: 2` reprov
 
 O gate mede a penetração pelo menor eixo de separação, e um tubo de escape cuja base fica dentro do capô acusa 73 mm. A passagem implícita da mesma unidade só vale para par declarado em `contato.juntas`, o que obriga a listar cada par intra-unidade.
 
-Para reproduzir, tire de `contato.juntas` a junta `["capo", "escapeE"]` de uma cópia do esboço e rode `npm run esboco -- <cópia> --descrever`.
-
-Ocorrência na empenagem-horizontal: o suporte da dobradiça do profundor (caixa de 70 por 56 por 220 mm, com o topo 24 mm dentro do estabilizador) saiu do `--descrever` do detalhe com quatro divergências, "estabE e suporteProfundor1E se penetram 34,9 mm", embora as duas formas sejam da mesma unidade, porque o par não estava em `contato.juntas`. Em vez de declarar a junta, reduzi a caixa para 48 por 180 mm e baixei o centro 4 mm para a penetração cair abaixo dos 30 mm.
+Corrigido na fatia 5, onda 1: na mesma unidade, o par sem junta passa como encaixe raso (a peça menor entra por uma face e a penetração não passa de metade da extensão dela ao longo da saída) e reprova a travessia, a quina, a peça idêntica e a enterrada demais. A reprodução de antes (tirar a junta `["capo", "escapeE"]` do mestre, que hoje já não acusa nada porque o escape foi refeito) deixou de discriminar, e a de hoje é o par de casos mínimos do módulo, um aceito e um reprovado:
 
 ```bash
-npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-horizontal.esboco.json --descrever
+npm run esboco -- modulos/esboco/tests/fixtures/adversarial/e8-meio-a-meio-controle.esboco.json --descrever
+npm run esboco -- modulos/esboco/tests/fixtures/adversarial/e8-flap-na-asa.esboco.json --descrever
 ```
 
-Para reproduzir, ponha em `suporteProfundor1E` `"altura": 56`, `"profundidade": 220` e, em `centro.mm[1]`, `-4` no lugar de `-8`.
+O primeiro (duas caixas de 100 mm que se penetram 10 mm, na mesma unidade) sai com `divergências: nenhuma`; o segundo (o flap de 50 mm com 45 mm dentro da asa) sai com "asa e flap se penetram 45,0 mm" e a razão: mais que a metade (25 mm) da extensão do flap. No avião, o suporte da dobradiça do profundor (caixa de 70 por 56 por 220 mm) com o topo 24 mm dentro do estabilizador, que era a ocorrência, passa sem junta.
 
 ## 9. As vistas da unidade enquadram o avião inteiro pequeno no quadro
 

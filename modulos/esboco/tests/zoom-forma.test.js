@@ -101,7 +101,7 @@ describe('--zoom-forma na linha de comando', () => {
     const normal = await unidadeArquivo(arq, 'u', { largura: 700 });
     const zoom = await unidadeArquivo(arq, 'u', { largura: 700, zoomForma: { formas: 'a', margem: 10 } });
     expect(zoom.destinos).toHaveLength(4);
-    expect(zoom.destinos[0]).toMatch(/-unidade-u-zoom-a-isometrica\.png$/);
+    expect(zoom.destinos[0]).toMatch(/-unidade-u-700px-zoom-a-isometrica\.png$/);
     zoom.destinos.forEach((d, i) => {
       const a = PNG.sync.read(readFileSync(d)); const b = PNG.sync.read(readFileSync(normal.destinos[i]));
       expect([a.width, a.height]).toEqual([b.width, b.height]);

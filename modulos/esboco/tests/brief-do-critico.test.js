@@ -222,19 +222,22 @@ describe('as vistas de outros lados da unidade, sem sobrescrever as quatro', () 
     await expect(vistasArquivo(arquivo, { vista: 'de-baixo' })).rejects.toThrow(/vista 'de-baixo' desconhecida \(isometrica, frontal, lateral, superior, frontal-oposta, lateral-oposta, inferior\)/);
   }, 120000);
 
-  it('a imagem da unidade sem as vizinhas tem outro nome e não sobrescreve a vista do brief (a lateral extra da empenagem)', async () => {
+  it('uma imagem extra da unidade com outro enquadramento (largura ou sem vizinhas) não sobrescreve a vista do brief (a lateral extra da empenagem)', async () => {
     const { arquivo, pasta } = gravar(objeto());
     const saida = join(pasta, 'c');
     const b = await briefDoCritico(arquivo, 'fila', { saida });
     const lateralDoBrief = readFileSync(join(saida, 'g-unidade-fila-lateral.png'));
+    const larga = await vistasArquivo(arquivo, { unidade: 'fila', vista: 'lateral', largura: 1600, saida });
     const semVizinhos = await vistasArquivo(arquivo, { unidade: 'fila', vista: 'lateral', largura: 1100, vizinhos: false, saida });
+    expect(larga.destinos[0]).toMatch(/g-unidade-fila-1600px-lateral\.png$/);
     expect(semVizinhos.destinos[0]).toMatch(/g-unidade-fila-sem-vizinhos-lateral\.png$/);
-    expect(existsSync(semVizinhos.destinos[0])).toBe(true);
-    /* as duas imagens existem e são diferentes, e a lateral que o brief gravou continua como estava, com o nome de sempre */
+    expect(existsSync(larga.destinos[0]) && existsSync(semVizinhos.destinos[0])).toBe(true);
+    /* as imagens existem e são diferentes, e a lateral que o brief gravou continua como estava, com o nome de sempre */
     expect(readFileSync(semVizinhos.destinos[0]).equals(lateralDoBrief)).toBe(false);
+    expect(readFileSync(larga.destinos[0]).equals(lateralDoBrief)).toBe(false);
     expect(readFileSync(join(saida, 'g-unidade-fila-lateral.png')).equals(lateralDoBrief)).toBe(true);
     expect(b.texto).toContain('g-unidade-fila-lateral.png');
-    /* com vizinhas o nome é o de sempre, e o brief sem vizinhas (--feito --sem-vizinhos) lista o nome novo */
+    /* a largura do brief (1100) e o padrão com vizinhas não ganham sufixo, e o brief sem vizinhas (--feito --sem-vizinhos) lista o nome novo */
     const igual = await vistasArquivo(arquivo, { unidade: 'fila', vista: 'lateral', largura: 1100, saida });
     expect(igual.destinos[0]).toMatch(/g-unidade-fila-lateral\.png$/);
     const sem = await briefDoCritico(arquivo, 'fila', { saida, vizinhos: false });

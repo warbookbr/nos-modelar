@@ -63,7 +63,7 @@ describe('--previa na linha de comando', () => {
     writeFileSync(arq, JSON.stringify(esboco(roda.map((f) => ({ ...f, unidade: 'u' })))));
     const normal = await unidadeArquivo(arq, 'u', { vista: 'frontal', largura: 600 });
     const previa = await unidadeArquivo(arq, 'u', { vista: 'frontal', largura: 600, previa: true });
-    expect(previa.destinos[0]).toMatch(/-unidade-u-previa-frontal\.png$/);
+    expect(previa.destinos[0]).toMatch(/-unidade-u-600px-previa-frontal\.png$/);
     expect(previa.destinos[0]).not.toBe(normal.destinos[0]);
     expect(previa.svgs[0]).toContain('(prévia)');
     expect(previa.texto).toMatch(/prévia/);

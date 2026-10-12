@@ -407,11 +407,7 @@ export function conferirPlano(esboco, visiveis, { referencias, unidades, medidas
       for (const p of c.fixa) {
         const A = selecionarPeca(p.a, rs, ondeC, brutos, unidadeDe);
         const B = selecionarPeca(p.b, rs, ondeC, brutos, unidadeDe);
-        const achados = [];
-        for (const a of A) for (const b of B) {
-          if (a.id === b.id) continue;
-          for (const { ponto } of pontosDeApoio(pecasDe(a), pecasDe(b), tol)) achados.push({ ponto, a: a.id, b: b.id });
-        }
+        const achados = pontosDeApoio(A.map((r) => ({ id: r.id, pecas: pecasDe(r) })), B.map((r) => ({ id: r.id, pecas: pecasDe(r) })), tol);
         const grupos = agruparPontos(achados.map((x) => x.ponto), tol);
         const ok = grupos.length >= p.pontos;
         const dosGrupos = grupos.map((g) => ({ ponto: g.ponto.map(r1), a: achados[g.itens[0]].a, b: achados[g.itens[0]].b }));

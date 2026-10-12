@@ -479,44 +479,69 @@ export function pontosDeContato(pecasA, pecasB, tol) {
   return saida;
 }
 
-/* Fração de uma direção da peça presa que o contato precisa cobrir para valer como face. */
+/* Para valer como face, o contato precisa cobrir ao menos esta fração da peça presa em cada direção do plano (o pé de 20 mm sob o motor de 100 mm
+   cobre 0,2 e não é face; a peça apoiada inteira cobre 1) e ao menos `PISO_DA_FACE` do maior diâmetro dela (o mastro de 2 m sobre 60 mm, 0,03, não). */
 const FRACAO_DA_FACE = 0.5;
+const PISO_DA_FACE = 0.1;
 
-/* Os pontos de apoio da peça presa (`pecasA`) na outra (`pecasB`), para o `contrato.fixa`. Cada par de peças a menos de `tol` dá o ponto de
-   `pontosDeContato`, um por local, e é o que conta quando o contato é pequeno perto da peça (o pé de 20 mm sob o motor de 100 mm, um tubo no
-   quadro). Quando o contato é uma face, ele fixa a peça por plano e passa a contar como tal: a nuvem dos vértices de uma peça a menos de `tol` da
-   outra, de todos os pares da forma, cobre pelo menos metade da peça presa na direção em que ela mais se estende (entre os dois pontos mais
-   afastados, por varredura dupla, determinística) e, se também cobre metade dela na direção perpendicular a essa dentro do plano, entram três
-   pontos (os dois e o mais afastado da reta entre eles), os que definem um plano; se cobre só a primeira, entram os dois (contato de linha). O capô
-   do avião sobre o fogo, um aro de 1,2 m contra a face dele, contava um ponto e reprovava `pontos: 2`. Devolve [{ ponto: [x, y, z] }]. */
-export function pontosDeApoio(pecasA, pecasB, tol) {
+const maisLongeEm = (nuvem, de) => nuvem.reduce((m, q) => (norma2(sub(de, q)) > norma2(sub(de, m)) ? q : m), nuvem[0]);
+
+/* Os pontos de apoio da seleção presa (`presas`) na seleção em que ela é presa (`em`), para o `contrato.fixa`. Cada seleção é uma lista
+   `{ id, pecas }` de formas. Há dois jeitos de contar, e vale o que dá mais pontos distintos.
+   Por local: o ponto de `pontosDeContato` de cada par de peças a menos de `tol`, que é o que conta o pé de 20 mm sob o motor de 360 mm, o tubo no
+   quadro e o aro de 32 setores sob um tampo (32 locais).
+   Por face, que fixa por plano: o contato é de verdade quando as peças estão a no máximo `tol / 10` uma da outra (a placa 25 mm acima da base,
+   com tolerância de 30 mm, só chega perto) e a nuvem dos vértices de uma peça a esse tanto da outra, de todos os pares das duas seleções,
+   cobre `FRACAO_DA_FACE` da seleção presa inteira (não de uma forma só: o parafuso de uma asa de 2 m) e o `PISO_DA_FACE` do maior diâmetro
+   dela. Cobrindo só a direção de maior vão (a aresta da placa inclinada, a chapa em pé) são dois pontos, os mais afastados; cobrindo as duas,
+   três: os dois e o mais distante da reta entre eles, os que definem um plano. A cobertura é a extensão da nuvem de ponta a ponta contra a da
+   peça presa na mesma direção, e dá 1 para a peça apoiada inteira, de modo que nenhuma proporção (360 x 211 mm) cai num empate de ponto flutuante. O capô do avião apoia o aro no fogo, e o contato de face larga contava um ponto e reprovava `pontos: 2`.
+   Devolve [{ ponto, a, b }] com os ids das duas formas de cada ponto. */
+export function pontosDeApoio(presas, em, tol) {
+  const locais = [];
   const nuvem = [];
-  const centros = [];
-  for (const a of pecasA) for (const b of pecasB) {
-    if (folgaAABB(a, b) > tol) continue;
-    if (distanciaConvexa(a, b) > tol) continue;
-    centros.push(...pontosDeContato([a], [b], tol));
-    for (const [de, contra] of [[a, b], [b, a]]) for (const v of de.verts) {
-      if (v.some((c, i) => c < contra.min[i] - tol || c > contra.max[i] + tol)) continue;
-      if (distanciaDoPonto(v, [contra]) <= tol) nuvem.push(v);
+  const folgaDeFace = tol / 10;
+  for (const A of presas) for (const B of em) {
+    if (A.id === B.id) continue;
+    for (const a of A.pecas) for (const b of B.pecas) {
+      if (folgaAABB(a, b) > tol) continue;
+      const d = distanciaConvexa(a, b);
+      if (d > tol) continue;
+      for (const { ponto } of pontosDeContato([a], [b], tol)) locais.push({ ponto, a: A.id, b: B.id });
+      if (d > folgaDeFace) continue;
+      for (const [de, contra] of [[a, b], [b, a]]) for (const v of de.verts) {
+        if (v.some((c, i) => c < contra.min[i] - folgaDeFace || c > contra.max[i] + folgaDeFace)) continue;
+        if (distanciaDoPonto(v, [contra]) <= folgaDeFace) nuvem.push({ ponto: v, a: A.id, b: B.id });
+      }
     }
   }
-  if (nuvem.length === 0) return centros;
-  const distancia = (p, q) => Math.sqrt(norma2(sub(p, q)));
-  const maisLonge = (de) => nuvem.reduce((m, q) => (distancia(de, q) > distancia(de, m) ? q : m), nuvem[0]);
-  const p1 = maisLonge(nuvem[0]);
-  const p2 = maisLonge(p1);
-  const extensaoDe = (e) => { const t = pecasA.flatMap((pc) => pc.verts.map((v) => dot(v, e))); return Math.max(...t) - Math.min(...t); };
-  const vao1 = distancia(p1, p2);
-  if (vao1 <= tol) return centros;
-  const e1 = escala(sub(p2, p1), 1 / vao1);
-  if (vao1 < FRACAO_DA_FACE * extensaoDe(e1)) return centros;
-  const foraDaReta = (q) => { const r = sub(q, p1); return sub(r, escala(e1, dot(r, e1))); };
-  const p3 = nuvem.reduce((m, q) => (norma2(foraDaReta(q)) > norma2(foraDaReta(m)) ? q : m), nuvem[0]);
-  const vao2 = Math.sqrt(norma2(foraDaReta(p3)));
-  if (vao2 <= tol) return [p1, p2].map((ponto) => ({ ponto }));
-  const e2 = escala(foraDaReta(p3), 1 / vao2);
-  return (vao2 >= FRACAO_DA_FACE * extensaoDe(e2) ? [p1, p2, p3] : [p1, p2]).map((ponto) => ({ ponto }));
+  const face = pontosDeFace(nuvem, presas, tol);
+  return face.length > agruparPontos(locais.map((l) => l.ponto), tol).length ? face : locais;
+}
+
+/* Os pontos que a nuvem de contato `{ ponto, a, b }` fixa como face (ver `pontosDeApoio`): três, dois ou nenhum. */
+function pontosDeFace(nuvem, presas, tol) {
+  if (nuvem.length === 0) return [];
+  const pts = nuvem.map((n) => n.ponto);
+  const todos = presas.flatMap((f) => f.pecas.flatMap((pc) => pc.verts));
+  const q1 = maisLongeEm(todos, todos[0]);
+  const diametro = Math.sqrt(norma2(sub(maisLongeEm(todos, q1), q1)));
+  const p1 = maisLongeEm(pts, pts[0]);
+  const p2 = maisLongeEm(pts, p1);
+  const vao1 = Math.sqrt(norma2(sub(p1, p2)));
+  const e1 = escala(sub(p2, p1), 1 / (vao1 || 1));
+  const extensao = (e) => { const t = todos.map((v) => dot(v, e)); return Math.max(...t) - Math.min(...t); };
+  if (vao1 <= tol || vao1 < PISO_DA_FACE * diametro || vao1 < FRACAO_DA_FACE * extensao(e1)) return [];
+  const fora = (q) => { const r = sub(q, p1); return sub(r, escala(e1, dot(r, e1))); };
+  const p3 = pts.reduce((m, q) => (norma2(fora(q)) > norma2(fora(m)) ? q : m), pts[0]);
+  const oPonto = (q) => nuvem[pts.indexOf(q)];
+  const par = [p1, p2].map(oPonto);
+  const desvio = Math.sqrt(norma2(fora(p3)));
+  if (desvio <= tol) return par;
+  const e2 = escala(fora(p3), 1 / desvio);
+  const t = pts.map((q) => dot(q, e2));
+  const vao2 = Math.max(...t) - Math.min(...t);
+  return vao2 >= PISO_DA_FACE * diametro && vao2 >= FRACAO_DA_FACE * extensao(e2) ? [...par, oPonto(p3)] : par;
 }
 
 /* Agrupa pontos a menos de `tol` uns dos outros (encadeado: o vizinho do vizinho é do mesmo grupo), na ordem em que chegam.
@@ -754,39 +779,56 @@ export function padroesDoContato(resolvidas) {
 
 export const MOTIVO_DO_ENCAIXE = 'encaixe na mesma unidade';
 
-/* A mesma unidade aceita um encaixe sem a junta declarada e reprova a travessia. O par `ra`/`rb` (formas resolvidas) é travessia quando a forma menor
-   (a visita) cruza a maior (a hospedeira) de lado a lado: em algum eixo (os do mundo, a direção de saída do SAT e o eixo mais longo da visita) o
-   intervalo da visita cobre o da hospedeira com sobra nos dois lados, como o eixo que sai pelas duas faces do cubo, o tubo que atravessa a chapa ou a
-   barra deitada que passa das duas bordas. Fora isso é encaixe, se a penetração não passa da menor dimensão da visita (a ponta enterrada de um tubo no flanco
-   do capô, 73 mm de um cone de 130, ou o topo do suporte do profundor no estabilizador, 35 mm de uma caixa de 56) ou se a visita fica inteira
-   dentro. O gate reprovava os dois casos do avião por falta do par em `contato.juntas`, que obrigava a listar cada par da unidade.
-   Devolve { encaixe, razao, ... }. */
+/* Metade da extensão da peça menor ao longo da direção de saída é o mais fundo que um encaixe entra. */
+const FRACAO_DO_ENCAIXE = 0.5;
+
+/* O volume da forma: o do prisma (área do perfil sem os furos vezes o comprimento) quando ela é um, e o da caixa envolvente nas outras. Uma haste
+   diagonal tem a caixa envolvente maior que a de um cubo que ela atravessa, e escolher a peça menor por ela trocava quem atravessa quem. */
+function volumeDe(r) {
+  const caixa = (r.max[0] - r.min[0]) * (r.max[1] - r.min[1]) * (r.max[2] - r.min[2]);
+  const pr = r.prisma;
+  if (!pr || pr.secoes || !Array.isArray(pr.perfil) || !(pr.comprimento > 0)) return caixa;
+  const area = Math.abs(areaDe(pr.perfil)) / 2 - (pr.furos ?? []).reduce((acc, f) => acc + Math.abs(areaDe(f)) / 2, 0);
+  return area > 0 ? area * pr.comprimento : caixa;
+}
+
+/* A mesma unidade aceita um encaixe sem a junta declarada e reprova o resto. O par `ra`/`rb` (formas resolvidas) é encaixe quando a peça menor
+   (a visita, de menor volume) entra na maior por uma face e para dentro dela, sem passar do outro lado e sem ir fundo: (1) nenhuma peça
+   convexa da maior que a visita toca é atravessada de lado a lado, isto é, em nenhum eixo (os do mundo, a direção de saída do SAT e o eixo
+   mais longo da visita) o intervalo da visita cobre o da peça com sobra de 0,5 mm nos dois lados (o eixo que sai pelas duas faces do cubo; a
+   haste que fura a parede de uma casca, medida pela espessura da parede, e não pela extensão da casca inteira); (2) a penetração não passa de
+   metade da extensão da visita ao longo da direção de saída (o tubo com 73 mm de um comprimento de 522 mm, o suporte do profundor com 24 mm de uma
+   altura de 56 mm). A peça idêntica, a quina, o flap com 45 mm dos 50 dentro da asa e a peça enterrada inteira passam do limite e reprovam.
+   Devolve { encaixe, razao, ... } com a visita, a hospedeira e `max`, o limite em mm. */
 export function lerEncaixe(ra, rb) {
-  const volume = (r) => (r.max[0] - r.min[0]) * (r.max[1] - r.min[1]) * (r.max[2] - r.min[2]);
-  const visitaEhA = volume(ra) < volume(rb) || (volume(ra) === volume(rb) && ra.id < rb.id);
-  const [visita, hospedeira] = visitaEhA ? [ra, rb] : [rb, ra];
+  const ehA = volumeDe(ra) < volumeDe(rb) || (volumeDe(ra) === volumeDe(rb) && ra.id < rb.id);
+  const [visita, hospedeira] = ehA ? [ra, rb] : [rb, ra];
   const pv = pecasDe(visita); const ph = pecasDe(hospedeira);
   const sair = detalharPar(pv, ph);
+  if (!sair.separa) return { encaixe: false, razao: `o par não tem direção de saída` };
+  const d = sair.separa;
   const nuvem = pv.flatMap((pc) => pc.verts);
-  const maisLonge = (de) => nuvem.reduce((m, q) => (norma2(sub(de, q)) > norma2(sub(de, m)) ? q : m), nuvem[0]);
-  const ponta = maisLonge(nuvem[0]);
-  const longo = sub(maisLonge(ponta), ponta);
-  const eixos = [[1, 0, 0], [0, 1, 0], [0, 0, 1], ...(sair.separa ? [sair.separa] : []), ...(norma2(longo) > 1e-12 ? [escala(longo, 1 / Math.sqrt(norma2(longo)))] : [])];
+  const ponta = maisLongeEm(nuvem, nuvem[0]);
+  const longo = sub(maisLongeEm(nuvem, ponta), ponta);
+  const eixos = [[1, 0, 0], [0, 1, 0], [0, 0, 1], d, ...(norma2(longo) > 1e-12 ? [escala(longo, 1 / Math.sqrt(norma2(longo)))] : [])];
   const faixa = (pecas, e) => {
     let lo = Infinity; let hi = -Infinity;
     for (const pc of pecas) for (const v of pc.verts) { const t = dot(v, e); if (t < lo) lo = t; if (t > hi) hi = t; }
     return [lo, hi];
   };
   const sobra = 0.5;
-  let dentro = true;
-  for (const e of eixos) {
-    const [v0, v1] = faixa(pv, e); const [h0, h1] = faixa(ph, e);
-    if (v0 < h0 - sobra && v1 > h1 + sobra) return { encaixe: false, razao: `${visita.id} cruza ${hospedeira.id} de lado a lado (travessia, e não encaixe)` };
-    if (v0 < h0 - sobra || v1 > h1 + sobra) dentro = false;
+  const faixasDaVisita = eixos.map((e) => faixa(pv, e));
+  for (const peca of ph) {
+    if (medirPar(pv, [peca]).penetracao <= 0) continue;
+    for (const [k, e] of eixos.entries()) {
+      const [v0, v1] = faixasDaVisita[k]; const [h0, h1] = faixa([peca], e);
+      if (v0 < h0 - sobra && v1 > h1 + sobra) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} cruza ${hospedeira.id} de lado a lado (travessia, e não encaixe)` };
+    }
   }
-  const limite = menorDimensao(visita);
-  if (!dentro && sair.penetracao > limite) return { encaixe: false, razao: `${visita.id} penetra ${mmTxt(sair.penetracao)} mm em ${hospedeira.id}, mais que a menor dimensão dela (${mmTxt(limite)} mm)` };
-  return { encaixe: true, visita: visita.id, hospedeira: hospedeira.id, max: dentro ? Math.max(limite, sair.penetracao) : limite };
+  const [s0, s1] = faixa(pv, d);
+  const limite = FRACAO_DO_ENCAIXE * (s1 - s0);
+  if (sair.penetracao > limite) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} penetra ${mmTxt(sair.penetracao)} mm em ${hospedeira.id}, mais que a metade (${mmTxt(limite)} mm) da extensão de ${visita.id} ao longo da saída (${mmTxt(s1 - s0)} mm)` };
+  return { encaixe: true, visita: visita.id, hospedeira: hospedeira.id, max: limite };
 }
 
 /* Um loft sem nada que o posicione (nem `centro`, `sobre`, `ponta`, `encaixa`, `alinha`, `encosta` ou `desloca`, nem é cópia ou parte de um
@@ -1013,6 +1055,9 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
       for (let a = 0; a < n; a++) {
         const caixa = caixaDasPecas(pecas[a]);
         for (const [h, oculta] of ocultasDaOpcao.entries()) {
+          /* só a oculta de outra unidade (as duas com unidade declarada ou planejada, e diferentes): a oculta genérica, sem unidade, é guia e não é achado */
+          const ua = unidadeDe[i].get(rs[a].id); const uh = unidadeDe[i].get(oculta.id);
+          if (ua === undefined || uh === undefined || ua === uh) continue;
           if (folgaAABB(caixa, caixasOcultas[h]) > 0) continue;
           const declarada = declaradasComOculta.get(chave(rs[a].id, oculta.id));
           if (declarada?.tipo === 'livre') continue;
@@ -1032,6 +1077,10 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
         }
       }
     }
+    /* a forma visível que atravessa duas ocultas (a fuselagem entre o estabilizador esquerdo e o direito) recebe sugestões que se desfazem
+       uma à outra (+1,1 e -1,1 mm em x): com mais de um achado contra ocultas na mesma forma, nenhum leva sugestão */
+    const contraOcultas = achadosDaOpcao.filter((x) => x.oculta !== undefined);
+    for (const x of contraOcultas) if (contraOcultas.filter((y) => y.pecas[0] === x.pecas[0]).length > 1) x.sugestao = null;
     /* o loft sem posição vai para a origem, e na unidade isolada a origem costuma estar dentro de uma forma oculta que o liga ao resto: o
        isolado não o via solto (o duto da entrada de ar do motor, 800 mm do capô) */
     if (n > 1) for (const r of rs) if (loftSemPosicao(r)) achadosDaOpcao.push({ opcao: titulo, tipo: 'sem-posicao', pecas: [r.id], mm: null, sugestao: null });

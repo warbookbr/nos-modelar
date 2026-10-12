@@ -3,12 +3,14 @@
    grupo (E18), a âncora da caixa girada (E23), a travessia com a forma oculta no esboço isolado (E28), os parâmetros sem arredondar a
    zero no `--descrever` (E35) e a relação da haste com âncora deslocada (E39). Cada caso é a reprodução mínima do avião. */
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { ancorasDe, relacaoDe, resolverOpcao } from '../src/index.js';
 import { expandirEsboco } from '../src/expandir.js';
 import { conferirPlano, visiveisDoEsboco } from '../src/plano.js';
 import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboco } from '../src/descrever.js';
 import { verificarContato, descreverAchado } from '../src/contato.js';
 
+const fixture = (nome) => JSON.parse(readFileSync(new URL(`./fixtures/adversarial/${nome}.esboco.json`, import.meta.url), 'utf8'));
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 const resolvidas = (e) => { const x = expandirEsboco(e); return resolverOpcao(x.opcoes[0], 'opção 1', x.pontos); };
 const resolvida = (e, id) => resolvidas(e).find((r) => r.id === id);
@@ -34,7 +36,8 @@ describe('E6: contrato.fixa com face contra face', () => {
   it('o capô de casca aberta, que só apoia o aro no fogo, conta como face', () => {
     const capo = { id: 'peca', tipo: 'loft', eixo: 'y', casca: { espessura: 20, aberta: 'inicio' }, centro: [0, 120, 0], secoes: [{ pos: 0, forma: 'retangulo', tamanho: [360, 360], centro: [0, 0] }, { pos: 200, forma: 'retangulo', tamanho: [360, 360], centro: [0, 0] }] };
     const r = conferir(com([caixa('base', [0, 10, 0], 400, 20, 400), capo]));
-    expect(r.opcoes[0].contrato[0]).toMatchObject({ ok: true, pontos: 3 });
+    expect(r.opcoes[0].contrato[0].ok).toBe(true);
+    expect(r.opcoes[0].contrato[0].pontos).toBeGreaterThanOrEqual(3);
     expect(r.achados).toEqual([]);
   });
 
@@ -71,9 +74,9 @@ describe('E8: encaixe e travessia na mesma unidade, sem listar o par em contato.
     expect(g.implicitas[0]).toMatchObject({ a: 'capo', b: 'escape', motivo: 'encaixe na mesma unidade', encaixe: true, unidade: 'motor' });
   });
 
-  it('o suporte com o topo 35 mm dentro do estabilizador (caixa de 56) é encaixe', () => {
+  it('o suporte com o topo 24 mm dentro do estabilizador (caixa de 56) é encaixe', () => {
     const estab = unidade(caixa('estab', [0, 0, 0], 2000, 60, 600));
-    const suporte = unidade(caixa('suporte', [0, -30 - 28 + 35, 0], 70, 56, 220));
+    const suporte = unidade(caixa('suporte', [0, -30 - 28 + 24, 0], 70, 56, 220));
     const g = verificarContato(gate([estab, suporte]), {});
     expect(g.achados).toEqual([]);
   });
@@ -88,12 +91,12 @@ describe('E8: encaixe e travessia na mesma unidade, sem listar o par em contato.
     expect(descreverAchado(g.achados[0])).toMatch(/na mesma unidade passaria como encaixe, mas eixo cruza cubo de lado a lado/);
   });
 
-  it('a penetração acima da menor dimensão da peça menor reprova (a barra enterrada demais)', () => {
+  it('a penetração acima da metade da extensão da peça menor reprova (a barra enterrada demais), e abaixo dela passa', () => {
     const bloco = unidade(caixa('bloco', [0, 0, 0], 1000, 400, 1000));
-    const barra = unidade(caixa('barra', [0, 200 + 150 - 120, 0], 40, 300, 40));
-    const g = verificarContato(gate([bloco, barra]), {});
+    const g = verificarContato(gate([bloco, unidade(caixa('barra', [0, 200 + 150 - 200, 0], 40, 300, 40))]), {});
     expect(g.achados).toHaveLength(1);
-    expect(g.achados[0].naoEncaixe).toMatch(/menor dimensão/);
+    expect(g.achados[0].naoEncaixe).toMatch(/mais que a metade \(150 mm\) da extensão de barra/);
+    expect(verificarContato(gate([bloco, unidade(caixa('barra', [0, 200 + 150 - 100, 0], 40, 300, 40))]), {}).achados).toEqual([]);
   });
 
   it('entre unidades diferentes nada muda: o mesmo encaixe reprova sem a junta', () => {
@@ -325,5 +328,74 @@ describe('E39: a relação da haste com âncora deslocada', () => {
 
   it('a âncora sem deslocamento sai só com o nome', () => {
     expect(relacaoDe({ tipo: 'cilindro', de: { ancora: 'a.centro' }, para: [0, 0, 0] })).toBe('de a.centro para [0 0 0]');
+  });
+});
+
+/* Os casos mínimos do revisor, em tests/fixtures/adversarial: cada regra tem o caso que a quebrava. */
+describe('regressões: E8 só aceita o encaixe raso e que não atravessa', () => {
+  const colisoes = (nome) => verificarContato(fixture(nome), {}).achados.filter((a) => a.tipo === 'colisao');
+  it.each(['e8-duplicado', 'e8-espelho-centrado', 'e8-quina', 'e8-engolida', 'e8-flap-na-asa'])('%s reprova', (nome) => {
+    const c = colisoes(nome);
+    expect(c.length).toBeGreaterThan(0);
+    expect(c[0].naoEncaixe).toMatch(/mais que a metade/);
+  });
+  it('o encaixe raso de 10 mm entre caixas iguais (o controle) passa, e entre unidades diferentes reprova', () => {
+    expect(verificarContato(fixture('e8-meio-a-meio-controle'), {}).achados).toEqual([]);
+    expect(colisoes('e8-unidades-diferentes')).toHaveLength(1);
+  });
+  it('a haste que fura a parede de uma casca é travessia pela espessura da parede, e o pino na chapa e a haste diagonal também', () => {
+    for (const nome of ['e8-casca-parede-curta', 'e8-pino-na-chapa', 'e8-haste-diagonal']) {
+      const c = colisoes(nome);
+      expect(c.length, nome).toBeGreaterThan(0);
+      expect(c[0].naoEncaixe, nome).toMatch(/cruza .* de lado a lado/);
+    }
+  });
+  it('a travessia diz quem cruza quem pelo volume do corpo, e não pela caixa envolvente (a haste diagonal cruza o bloco)', () => {
+    expect(colisoes('e8-haste-diagonal')[0].naoEncaixe).toBe('haste cruza bloco de lado a lado (travessia, e não encaixe)');
+  });
+  it('o encaixe aceito vai para `implicitas` com o limite que ele respeita', () => {
+    const g = verificarContato(fixture('e8-meio-a-meio-controle'), {});
+    expect(g.implicitas).toEqual([expect.objectContaining({ a: 'a', b: 'b', encaixe: true, max_mm: 50, penetracao_mm: 10 })]);
+  });
+});
+
+describe('regressões: E6 decide a face por margem, soma aos locais e mede a seleção presa', () => {
+  const pontos = (nome, pedidos) => { const e = fixture(nome); if (pedidos) e.plano.contrato.fixa[0].pontos = pedidos; const r = conferir(e); return r.opcoes[0].contrato[0]; };
+  it('a peça apoiada inteira conta três pontos, qualquer que seja a proporção (nenhum empate de ponto flutuante)', () => {
+    expect(pontos('e6-face-inteira-360x211')).toMatchObject({ ok: true, pontos: 3 });
+    expect(pontos('e6-face-inteira-360x360')).toMatchObject({ ok: true, pontos: 3 });
+    for (const l of [100, 137, 200, 360, 513]) for (const p of [60, 100, 211, 360]) for (const giro of [0, 1, 7, 30, 45, 63]) {
+      const e = fixture('e6-face-inteira-360x211');
+      Object.assign(e.opcoes[0].formas[1], { largura: l, profundidade: p, rotacao: [0, giro, 0] });
+      expect(conferir(e).opcoes[0].contrato[0].pontos, `${l}x${p} a ${giro} graus`).toBe(3);
+    }
+  });
+  it('a face soma aos locais: o aro de 32 setores sob o tampo, e o tampo sobre o aro, mantêm os 32 locais', () => {
+    for (const nome of ['e6-aro-sob-tampo-4', 'e6-tampo-sobre-aro-4']) expect(pontos(nome)).toMatchObject({ ok: true, pontos: 32, pedidos: 4 });
+  });
+  it('a placa a 25 mm da base, com tolerância de 30 mm, não é face; a inclinada que só encosta por uma aresta é linha (2)', () => {
+    expect(pontos('e6-placa-flutuando')).toMatchObject({ ok: false, pontos: 1 });
+    expect(pontos('e6-placa-inclinada')).toMatchObject({ ok: false, pontos: 2 });
+  });
+  it('o mastro de 2 m sobre 60 mm e a chapa em pé não são plano', () => {
+    expect(pontos('e6-mastro')).toMatchObject({ ok: false, pontos: 1 });
+    expect(pontos('e6-chapa-em-pe')).toMatchObject({ ok: false, pontos: 2 });
+  });
+  it('a face se mede contra a seleção presa inteira: a asa com um parafuso encostado na fuselagem tem um ponto, e não plano', () => {
+    expect(pontos('e6-asa-por-um-parafuso')).toMatchObject({ ok: false, pontos: 1, pedidos: 2 });
+  });
+});
+
+describe('regressões: E28 só confere a oculta de outra unidade, e não sugere o que se desfaz', () => {
+  it('a forma oculta sem unidade (uma guia) não é achado, e não diz que é de outra unidade', () => {
+    expect(verificarContato(fixture('e28-guia-oculta'), {}).achados).toEqual([]);
+  });
+  it('a visível que atravessa duas ocultas fica sem sugestão (+1,1 e -1,1 mm em x se desfaziam)', () => {
+    const fuselagem = caixa('fuselagem', [0, 0, 0], 600, 600, 2000, { unidade: 'fuselagem' });
+    const estab = (id, x) => caixa(id, [x, 200, 0], 1200, 40, 300, { unidade: 'empenagem', oculto: true });
+    const e = { contato: { usar: true, tolerancia: 5, penetracao: 5, folga: 100, juntas: [{ pecas: ['estabE', 'estabD', 'fuselagem'], max: 100, motivo: 'a raiz do estabilizador entra no dorso do cone' }] }, opcoes: [{ titulo: 'T', formas: [fuselagem, estab('estabE', -750), estab('estabD', 750)] }] };
+    const g = verificarContato(e, {});
+    expect(g.achados).toHaveLength(2);
+    expect(g.achados.map((a) => a.sugestao)).toEqual([null, null]);
   });
 });

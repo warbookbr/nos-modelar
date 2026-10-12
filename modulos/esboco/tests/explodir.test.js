@@ -140,7 +140,7 @@ describe('--explodir na linha de comando', () => {
     writeFileSync(arq, JSON.stringify(esboco([caixa('a', [-60, 0, 0], { unidade: 'u' }), caixa('b', [0, 0, 0], { unidade: 'u' }), caixa('c', [60, 0, 0], { unidade: 'u' })])));
     const normal = await unidadeArquivo(arq, 'u', { vista: 'frontal', largura: 600 });
     const explodida = await unidadeArquivo(arq, 'u', { vista: 'frontal', largura: 600, explosao: { eixo: 'x', distancia: 30, ligacoes: true } });
-    expect(explodida.destinos[0]).toMatch(/-unidade-u-explodida-x-30mm-frontal\.png$/);
+    expect(explodida.destinos[0]).toMatch(/-unidade-u-600px-explodida-x-30mm-frontal\.png$/);
     expect(existsSync(normal.destinos[0])).toBe(true);
     expect(existsSync(explodida.destinos[0])).toBe(true);
     expect(explodida.destinos[0]).not.toBe(normal.destinos[0]);
