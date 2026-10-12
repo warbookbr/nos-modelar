@@ -167,11 +167,13 @@ describe('formas ocultas no gate', () => {
     expect(() => verificarContato(e)).toThrow(/cita "naoExiste", que não é uma forma visível/);
   });
 
-  it('a junta com peça oculta a descarta em silêncio, e a que fica com menos de duas peças some', () => {
+  it('a junta com peça oculta mantém o par com a visível (o isolado o confere) e descarta o par entre ocultas e a junta só de ocultas', () => {
     const formas = [caixa('a', [0, 10, 0]), caixa('b', [15, 10, 0]), caixa('z', [30, 10, 0], 20, 20, 20, { oculto: true }), caixa('zz', [45, 10, 0], 20, 20, 20, { oculto: true })];
     const juntas = [{ pecas: ['a', 'b', 'z'], max: 10, motivo: 'a presilha abraça as duas peças' }, { pecas: ['a', 'z'], max: 10, motivo: 'só sobra uma peça visível' }, { pecas: ['z*', 'a'], max: 10, motivo: 'o padrão só casa peças ocultas' }];
     const x = expandirEsboco(esboco(formas, { juntas }));
-    expect(x.opcoes[0].contato.pares.map((p) => `${p.a}-${p.b}`)).toEqual(['a-b']);
+    /* a-z, b-z e zz-a são visível contra oculta; z-zz (as duas ocultas) saiu */
+    expect(x.opcoes[0].contato.pares.map((p) => `${p.a}-${p.b}`)).toEqual(['a-b', 'a-z', 'b-z', 'zz-a']);
+    expect(expandirEsboco(esboco(formas, { juntas: [{ pecas: ['z*'], max: 1, motivo: 'só há peças ocultas na junta' }] })).opcoes[0].contato.pares).toEqual([]);
     expect(() => expandirEsboco(esboco(formas, { juntas: [{ pecas: ['a', 'nada'], max: 1, motivo: 'um id que não existe em lugar nenhum' }] }))).toThrow(/cita "nada", que não é uma forma visível/);
     expect(() => expandirEsboco(esboco(formas, { juntas: [{ pecas: ['a'], max: 1, motivo: 'uma peça só, sem nada oculto' }] }))).toThrow(/pelo menos duas peças distintas/);
   });

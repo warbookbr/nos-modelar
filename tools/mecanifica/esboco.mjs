@@ -746,13 +746,12 @@ function comOpcoesDeDesenho(esboco, { corte = null, previa = false, zoomForma = 
 }
 
 /* O pedaço do nome do arquivo que diz as opções de desenho, para a imagem do corte ou da explosão não substituir a normal. */
-function sufixoDasOpcoes({ corte = null, explosao = null, previa = false, zoomForma = null, nivelZero = false, semVizinhos = false, largura = null } = {}) {
+function sufixoDasOpcoes({ corte = null, explosao = null, previa = false, zoomForma = null, nivelZero = false, semVizinhos = false } = {}) {
   const partes = [];
   if (nivelZero) partes.push('nivel-zero');
-  /* a imagem da unidade sem as vizinhas, ou numa largura que não é a do brief (1100 px), tem outro nome: gravar a lateral extra
-     da empenagem com `--sem-vizinhos` substituía a lateral que o `--feito` tinha gravado para o crítico, no mesmo arquivo */
+  /* a imagem da unidade sem as vizinhas tem outro nome: gravar a lateral extra da empenagem com `--sem-vizinhos` substituía, no
+     mesmo arquivo, a lateral com a fuselagem em cinza que o `--feito` tinha gravado para o crítico */
   if (semVizinhos) partes.push('sem-vizinhos');
-  if (Number.isFinite(largura) && largura !== LARGURA_DO_CRITICO) partes.push(`${largura}px`);
   if (corte) partes.push(`corte-${corte.eixo}${String(corte.valor).replace(/[^A-Za-z0-9_.-]+/g, '-')}${corte.lado === undefined ? '' : corte.lado === '+' ? '-mais' : '-menos'}`);
   if (zoomForma) partes.push(`zoom-${zoomForma.formas.replace(/\*/g, 'todas').replace(/[^A-Za-z0-9_.-]+/g, '-')}`);
   if (explosao) partes.push(`explodida${explosao.eixo ? `-${explosao.eixo}` : ''}${typeof explosao.distancia === 'number' ? `-${explosao.distancia}mm` : ''}`);
@@ -823,7 +822,7 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, vis
   const pedidas = vistas ?? (vista === null ? VISTAS_DA_ANALISE : [vista]);
   for (const v of pedidas) if (!Object.hasOwn(VISTAS_TODAS, v)) throw new ErroDeEsboco(`${unidade === null ? '--vista' : '--unidade'}: vista '${v}' desconhecida (${Object.keys(VISTAS_TODAS).join(', ')}).`);
   if (nivelZero && pedidas.some((v) => Object.hasOwn(VISTAS_EXTRAS, v))) throw new ErroDeEsboco(`--nivel-zero desenha a blocagem nas quatro vistas de sempre; ${pedidas.filter((v) => Object.hasOwn(VISTAS_EXTRAS, v)).join(', ')} só vale no desenho das formas (tire --nivel-zero).`);
-  const opcoes = { corte, explosao, previa, zoomForma, nivelZero, semVizinhos: unidade !== null && vizinhos === false, largura: larguraPedida };
+  const opcoes = { corte, explosao, previa, zoomForma, nivelZero, semVizinhos: unidade !== null && vizinhos === false };
   if (nivelZero) exigirSemOpcoesDeDesenho(opcoes);
   const pelaBlocagem = nivelZero ? blocagemDoEsboco(bruto, estado, { unidade, vizinhos }) : null;
   const { isolado, idsVizinhos } = pelaBlocagem ? { isolado: null, idsVizinhos: pelaBlocagem.vizinhos } : esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes);

@@ -19,7 +19,7 @@ export const FRASES = {
   vizinhos: 'As formas de outra unidade que tocam a unidade, em contorno claro na vista.',
   nota: 'A nota do crítico, como o Condutor a registra e a lê.',
   formas: 'Os tipos de forma (caixa, cilindro, anel, cone, esfera, extrusão, loft, revolução, tubo) e o que cada campo faz.',
-  caixa: 'Caixa: medidas, furos passantes, raio de canto e chanfro.',
+  caixa: 'Caixa: medidas, furos passantes, raio de canto, chanfro e as âncoras das faces da caixa girada.',
   cilindro: 'Cilindro: diâmetro, comprimento, eixo e face plana.',
   anel: 'Anel: diâmetros externo e interno, espessura e eixo.',
   cone: 'Cone e tronco: diâmetro da base, diâmetro do topo e comprimento.',
