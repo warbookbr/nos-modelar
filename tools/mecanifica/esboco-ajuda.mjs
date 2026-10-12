@@ -36,6 +36,7 @@ export const FRASES = {
   estilos: 'Estilos, simetria implícita por lado e perfis por função.',
   modulos: 'Módulos próprios do JSON, e as ligações `ligar` e `encaixa`.',
   editar: 'Edição por linha de comando, sem reescrever o JSON.',
+  curso: 'O curso de um mecanismo: o parâmetro, de, até e os passos, a varredura do gate em cada posição (`--curso`) e as poses no brief do crítico.',
   componentes: 'Componentes prontos: a instância, os parâmetros, as entradas, as âncoras e os pares.',
   catalogo: 'Cada componente de arquivo (roda, garfo, quadro, mancal, parafuso, mola...) com parâmetros e âncoras.',
   vistas: 'As vistas isométrica, frontal, lateral e superior, e o que cada uma mostra.',

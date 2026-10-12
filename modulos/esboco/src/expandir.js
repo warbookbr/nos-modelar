@@ -10,6 +10,7 @@ import { fontesDoArranjo, nomesDasCopias } from './arranjo.js';
 import { traduzirLigacoes, validarLigacoes } from './ligar.js';
 import { ehGerador, gerarPerfil } from './perfis.js';
 import { estilosDasFormasDeModulo, lerEstilos, prepararFormas } from './estilos.js';
+import { girosDaOpcao } from './giro.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -245,6 +246,7 @@ export function expandirEsboco(esboco) {
   delete saida.formas;
   const estilos = lerEstilos(esboco);
   delete saida.estilos;
+  delete saida.curso;
   delete saida.unidades;
   delete saida.baseDoMestre;
   delete saida.simetrico;
@@ -271,6 +273,9 @@ export function expandirEsboco(esboco) {
       componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde, catalogo });
       g.formas = expandirArranjos(estilosDasFormasDeModulo(componentes.formas, estilos, onde).map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
       validarLigacoes(g.formas, onde, Object.keys({ ...(esboco.pontos ?? {}), ...(o.pontos ?? {}) }));
+      /* o giro rígido das instâncias com `rotacao` e das `formas` de um `curso`, na pose que o parâmetro dele tem nesta opção */
+      const giros = girosDaOpcao({ formas: g.formas, instancias: componentes.giros, curso: esboco.curso, valores, num, onde });
+      if (giros.length > 0) g.giros = giros;
     }
     expansoes.push(componentes);
     /* medidas do plano: os pontos "<instancia>.<ancora>" viram a forma e a âncora reais desta opção */

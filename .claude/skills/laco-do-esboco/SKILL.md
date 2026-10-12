@@ -76,7 +76,11 @@ e devolve o caminho do brief e das imagens. Então:
 2. Despache o `critico-visual` cego só com o brief e as imagens. Não mande o
    JSON, o plano, o histórico nem o que você viu. As imagens são as que o brief
    lista: as quatro vistas, as vistas a mais que a unidade pede em `vistas` e a
-   referência, que o brief diz ser o alvo da forma. O brief diz de que lado cada
+   referência, que o brief diz ser o alvo da forma. Quando a unidade tem um mecanismo
+   com `curso` declarado, o brief traz também as poses do curso inteiro, o fim dele
+   incluso, no mesmo enquadramento, e diz qual é o fim; as posições não são escolha do
+   esbocista nem sua, e se o brief de uma unidade que se move não as trouxer, o
+   esboço está sem `curso` e isso volta ao esbocista. O brief diz de que lado cada
    vista olha (o eixo, e as palavras do objeto quando o plano declara
    `plano.orientacao`); não acrescente isso à mão, e se o bloco faltar ou
    disser algo que as imagens contrariam, é defeito do brief, que você leva ao

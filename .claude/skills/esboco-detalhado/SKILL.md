@@ -39,7 +39,7 @@ Leia cada referência apenas quando for usar a respectiva ferramenta ou recurso:
 - Para parâmetros, expressões, variantes por opção, espelhamento (`espelha`) e repetição (`arranja`), leia [`variantes-simetria-repeticao.md`](variantes-simetria-repeticao.md).
 - Para estilos, unidades, simetria automática por lado (`lado: "E"`/`"D"`), perfis funcionais e edição por CLI (`--editar`, `--remover`, `--adicionar`), leia [`escrever-menos-json.md`](escrever-menos-json.md).
 - Para faixas que contornam círculos (`envolve`), elos por caminho, rodas raiadas e perfis de pneus e discos, leia [`faixas-rodas-discos.md`](faixas-rodas-discos.md).
-- Para o gate de contato, declaração de juntas, exceções (`atravessa`, `livre`, `encosta`, `ponta`) e conserto automático (`--ajustar`), leia [`regras-de-contato.md`](regras-de-contato.md).
+- Para o gate de contato, declaração de juntas, exceções (`atravessa`, `livre`, `encosta`, `ponta`), conserto automático (`--ajustar`) e o curso de um mecanismo que se move por parâmetro (`curso`, `--curso`), leia [`regras-de-contato.md`](regras-de-contato.md).
 - Para sobreposição de silhuetas 2D na projeção, transparência (`opacidade`) e visualização explodida (`explosao`), leia [`sobreposicao-na-projecao.md`](sobreposicao-na-projecao.md).
 - Para a especificação compacta dos campos da raiz, das opções, das formas e do contato, leia [`resumo-do-formato.md`](resumo-do-formato.md).
 - Para o nível `detalhado` (unidades de detalhe, Envelope, `--detalhar` e `--integrar`, Marcos e o crítico por unidade), leia [`nivel-detalhado.md`](nivel-detalhado.md), e só quando `plano.nivel` for `detalhado`.

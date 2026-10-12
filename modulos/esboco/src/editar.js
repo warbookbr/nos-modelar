@@ -155,6 +155,17 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
       mudancas.push({ acao: 'editar', forma: 'unidades', campo: chave.slice('unidades.'.length), antes: antes ?? null, depois: valor });
       continue;
     }
+    /* `curso.<mecanismo>.<campo>` edita o curso do mecanismo na raiz (`ate`, `passos`, `rotulo`...), e `curso.<mecanismo>=<json>` o declara
+       inteiro (ou, com `null`, o retira), como `unidades.<unidade>.<campo>` */
+    if (!s && chave.startsWith('curso.')) {
+      const caminho = passos(chave, `editar: "${chave}"`);
+      exigir(caminho.length >= 2 && typeof caminho[1] === 'string', `editar: "${chave}" cita só "curso": diga o mecanismo e o campo (curso.<mecanismo>.<campo>=<valor>, por exemplo curso.recolhe.ate=95)`);
+      exigir(caminho.length === 2 || (objeto(esboco.curso) && Object.hasOwn(esboco.curso, caminho[1])), `editar: "${chave}": o mecanismo "${caminho[1]}" não está em "curso" (mecanismos: ${Object.keys(esboco.curso ?? {}).join(', ') || 'nenhum'}); declare-o inteiro primeiro (curso.${caminho[1]}=<json do curso>)`);
+      const antes = gravar(esboco, caminho, valor, `editar: "${chave}"`);
+      if (objeto(esboco.curso) && Object.keys(esboco.curso).length === 0) delete esboco.curso;
+      mudancas.push({ acao: 'editar', forma: 'curso', campo: chave.slice('curso.'.length), antes: antes ?? null, depois: valor });
+      continue;
+    }
     if (!s) {
       const id = chave.split('.')[0];
       exigir(false, `editar: "${chave}" não começa por uma forma declarada${quisDizer(id, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''}); uma peça de componente (instância.parte) se muda pela instância`);
