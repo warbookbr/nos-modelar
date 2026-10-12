@@ -102,6 +102,13 @@ npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --condutor --feito trem-do-nariz --sem-vizinhos
 ```
 
+Ocorrência nos trens-principais: com as quatro vistas gravadas por `--feito`, a asa inteira (12,8 m) entra no quadro como vizinha e a unidade ficaria com um décimo da largura; o `--feito` foi gravado com `--sem-vizinhos`, e o ponto em que a baia encosta no ventre da asa entrou como corte com `--zoom-forma baiaPrincE`. O brief do Marco de 100% grava as vistas da unidade com a asa inteira, porque o Marco não aceita `--sem-vizinhos`.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade trens-principais --composta
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade trens-principais --composta --sem-vizinhos
+```
+
 ## 10. Loft sem posição vai para a origem e o esboço isolado não o acusa solto
 
 Um loft sem `encaixa`, `centro` nem `sobre` é centrado na origem pelo centro da caixa dos vértices, e os `centro` das seções valem só como deslocamento relativo. No isolado de `--detalhar motor`, a entrada de ar e a boca dela, a 800 mm do capô, saíram com `divergências: nenhuma`, porque o grupo flutuante de duas formas não conta como solta enquanto as outras unidades estão ocultas. Só `--forma entradaAr` mostrou o centro `[0 0 0]`.
@@ -163,6 +170,12 @@ npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.
 
 Para ver o intervalo do cone, ponha `"espessura": 12` em `capo.casca` numa cópia do mestre e rode `npm run esboco -- <cópia> --descrever`.
 
+Ocorrência nos trens-principais: a baia do trem principal (loft com `casca`, aberta embaixo) sai com o tracejado da parede de dentro nas vistas lateral e frontal, e o crítico pode lê-lo como marca na superfície.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade trens-principais --sem-vizinhos --vista lateral --largura 1100 --saida <pasta>
+```
+
 ## 16. Cada ajuste de altura do escape volta recusado duas vezes: pelo nome do parâmetro e pela caixa da maquete
 
 Baixar o escape para que o escape do outro flanco deixe de aparecer sobre o dorso na isométrica pediu mudar `escBaseY`. O `--integrar` recusou o nome ("o detalhado redefine o parâmetro escBaseY", atrito 13), e, com o nome novo `escAlturaY` em 1230, recusou de novo pela caixa da maquete (escapes passam 120 mm em y, atrito 14). O valor que cabe (1325, só 15 mm abaixo do original) obrigou a diminuir também os diâmetros do escape para o tirar do dorso.
@@ -214,6 +227,12 @@ Ocorrência no trem-do-nariz: o `--feito` da unidade imprimiu o brief do Marco d
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --condutor --feito trem-do-nariz --sem-vizinhos
 ```
 
+Ocorrência nos trens-principais: o `--feito` imprimiu o brief da unidade e o do Marco de 100% no mesmo comando e nenhum comando os reimprime; os dois textos só existiam na saída, e `brief.md` de cada pasta foi escrito a mão a partir dela.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --condutor --feito trens-principais --sem-vizinhos
+```
+
 ## 21. Nenhuma vista fixa olha pelo lado esquerdo, e a porta que a função põe à esquerda não aparece em nenhuma
 
 `lateral` olha de +x, `superior` de +y e `isometrica` de [1,1,1], de modo que o flanco de x negativo (o esquerdo, E) não é visto de fora em vista nenhuma, e a porta traseira esquerda só aparece como marca escura além do flanco na superior. As janelas aparecem na lateral porque o `lado: "E"` gera as cópias D, e a porta, que não tem `lado`, não tem cópia. A zoom na porta na lateral mostra o flanco direito liso. O contorno da porta só se vê em corte (`--corte x=-770` e `--corte z=5940` com `--zoom-forma portaE`, em que a vista olha o plano de corte de dentro), e os cortes entraram no brief como imagens extras.
@@ -226,6 +245,12 @@ Ocorrência no trem-do-nariz: o atuador de recolhimento fica a x -135, ao lado d
 
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade trem-do-nariz --sem-vizinhos --corte x=-128 --vista lateral --zoom-forma atuadorCorpoNariz --margem 500 --largura 1100 --saida <pasta>
+```
+
+Ocorrência nos trens-principais: nenhuma das quatro vistas olha de baixo, e a boca da baia, aberta para baixo, a roda deitada dentro dela e o ventre da asa só aparecem em corte (`--corte z=4520 --vista frontal`, `--corte x=-1344 --vista lateral`, `--corte y=700 --vista superior`, todos com `--zoom-forma baiaPrincE`). A frontal olha de +z, que neste objeto é a cauda.
+
+```bash
+npm run esboco -- <cópia do mestre com tpCurso=83> --unidade trens-principais --corte y=700 --vista superior --zoom-forma baiaPrincE --margem 300 --largura 1100 --saida <pasta>
 ```
 
 ## 22. O Envelope por forma conta a caixa da forma girada, e a porta inclinada para seguir a cauda deixou de caber
@@ -283,6 +308,12 @@ Ocorrência no trem-do-nariz: o recolhimento da perna para trás leva a roda par
 npm run esboco -- --editar <cópia do detalhe do trem do nariz>.esboco.json capo.oculto=null fuselagem.oculto=null entradaAr.oculto=null parametros.tnCurso=95
 ```
 
+Ocorrência nos trens-principais: o recolhimento da roda para dentro da asa não se representa, porque o módulo não subtrai forma de outra e a asa é maciça de 220 mm de espessura. Para o curso não atravessar nada, o alojamento foi desenhado como uma carenagem oca (`baiaPrincE`, loft com `casca` aberta embaixo) pendurada sob a asa, com 300 mm de profundidade, que guarda a roda deitada, e não como alojamento dentro da asa. É um desvio do alinhamento, que diz "recolhem para dentro da asa".
+
+```bash
+npm run esboco -- --ajuda loft
+```
+
 ## 27. A caixa da forma da maquete limita a altura da porta, e o ombro da cabine teve de ser reduzido para ela caber
 
 Com a porta de 1040 mm centrada em y 1603 (a que cabe no trecho plano do flanco), o `--envelope fuselagem` reprova: "portaE passa 46 mm em y (detalhe 1083..2123, forma da maquete 1129..2209, tolerância 30 mm)". A porta teve de subir para 1099..2139, e, como o trecho plano do flanco com os cantos de 250 e 280 mm tem só 946 mm em z 6000, os cantos das seções de z 5500, 6000 e 6500 baixaram para 200 e 230 mm. É o mesmo mecanismo do atrito 14: a caixa da maquete vira restrição do detalhe.
@@ -307,6 +338,12 @@ Ocorrência no trem-do-nariz: o `--descrever` do `--detalhar trem-do-nariz` deu 
 
 ```bash
 npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-trem-do-nariz.esboco.json parametros.tnCurso=95
+```
+
+Ocorrência nos trens-principais: o `--descrever` do `--detalhar trens-principais` deu "divergências: nenhuma" com a asa oculta, e o mesmo detalhe com `asaE.oculto=null` e o resto da asa visível só mostra a travessia a partir de 90 graus (roda contra asa e baia), de modo que a conferência do curso saiu de uma cópia do detalhe varrida de 0 a 90 graus.
+
+```bash
+npm run esboco -- --editar <cópia do detalhe>.esboco.json asaE.oculto=null flapE.oculto=null fuselagem.oculto=null parametros.tpCurso=90
 ```
 
 ## 29. O crítico do esboço julga sem a referência e afasta a forma dela
@@ -404,6 +441,12 @@ Ocorrência no trem-do-nariz: a `funcao` da unidade (roda, perna, amortecedor e 
 npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json 'unidades.trem-do-nariz.funcao=teste'
 ```
 
+Ocorrência nos trens-principais (atritos 36 e 37): o `--integrar` deixou no mestre as juntas `pistaoPrincE`/`rodaPrincE.*` ("o amortecedor termina no eixo do cubo da roda") e `pernaPrincE`/`asaE` ("a perna se prende na longarina da asa"), que o detalhe tinha apagado e que continuam com formas existentes, e a função da unidade (`unidades.trens-principais.funcao`) voltou com o texto antigo. As duas foram retiradas a mão no mestre.
+
+```bash
+git diff -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json | grep -n 'PrincE'
+```
+
 ## 37. O `--integrar` não tira do mestre a junta que o detalhe apagou
 
 O detalhe do trem do nariz apagou a junta `pernaNariz`/`capo` ("a perna do trem do nariz se prende sob o capô"), porque a perna passou a ficar a 50 mm sob o piso do capô e quem toca o capô são os mancais. Depois do `--integrar` a junta continuou no mestre, já que a perna e o capô continuam existindo, e só saiu com uma edição à mão. O `--integrar` diz quantas juntas saíram por citar forma removida (1 junta, a do braço), mas não compara a lista de juntas do detalhe com a do mestre, de modo que uma junta que perdeu o sentido sem perder a forma fica declarando uma travessia que não existe, com `max` de 40 mm que esconderia uma travessia de verdade.
@@ -424,6 +467,8 @@ npm run esboco -- --editar <cópia do detalhe>.esboco.json capo.oculto=null fuse
 npm run esboco -- --editar <cópia do detalhe>.esboco.json parametros.tnCurso=85
 npm run esboco -- --ajuda parametros
 ```
+
+Ocorrência nos trens-principais: o curso é o parâmetro `tpCurso` (0 estendido, 83 recolhido) e foi varrido com uma repetição de shell sobre `--editar parametros.tpCurso=<n>` em uma cópia do detalhe com a asa visível, de 0 a 90 graus. As medidas do plano (`principal.roda.diametro`, `principal.bitola`) e a silhueta da lateral só valem no curso 0, e em 83 graus o gate acusa três divergências de medida e de silhueta que não são defeito.
 
 ## 39. O `--descrever --completo` imprime `[object Object]` na relação de uma haste cujos pontos são âncoras com deslocamento
 
@@ -457,3 +502,30 @@ Ocorrência no Marco de 75%: o crítico deu 7 apontando o leme "à frente da
 deriva" na frontal da empenagem vertical, porque o brief não diz que a frontal
 olha de +z, que neste objeto é a cauda. Informado disso, retirou o defeito e deu
 8. O brief precisa dizer de que lado cada vista olha (atritos 12 e 21).
+
+## 41. O contrato `tocam` do plano cita o contato da maquete, e só se edita à mão quando o detalhe muda quem toca quem
+
+O trem principal da maquete tocava a asa pela perna (`pernaPrincE` toca `asaE`). No detalhe a perna fica dentro da baia, presa por dois mancais ao teto dela, e a baia toca a asa, de modo que o Portão acusou "pernaPrincE e asaE deviam tocar (contrato) e há 154,2 mm de folga" depois do `--integrar`. O `--integrar` não leva o `plano.contrato` do detalhe ao mestre (o detalhe tem um plano mínimo), de modo que a linha foi trocada a mão no mestre por `baiaPrincE`/`asaE` e pelos contatos dos mancais, como no trem do nariz. É uma mudança do campo `plano.contrato.tocam` (e de `plano.pecas` e `plano.medidas`), feita por quem detalha.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --descrever
+```
+
+Para reproduzir, ponha `["pernaPrincE", "asaE"]` de volta em `plano.contrato.tocam`.
+
+## 42. Uma cópia do mestre só aceita `--editar` com os contornos de referência ao lado, e as poses do curso exigem essa cópia
+
+Para gravar o trem em 0, 30, 60 e 83 graus foi preciso copiar o mestre inteiro para outra pasta (o isolado do detalhe esconde a asa, e o estado do Condutor é do nome do arquivo). `--editar parametros.tpCurso=<n>` recusa a cópia com "referência lateral.conferencia.contornos.json: o arquivo não existe" até as duas cópias dos contornos irem para a mesma pasta, e a primeira tentativa, com o resultado filtrado por `grep`, parecia ter funcionado e gravou a pose estendida com o nome de 83 graus.
+
+```bash
+cp docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json <pasta>/p83.esboco.json
+npm run esboco -- --editar <pasta>/p83.esboco.json parametros.tpCurso=83
+```
+
+## 43. A instância de componente não gira, e o trem que recolhe de lado precisou de um módulo `roda` próprio
+
+O componente `roda` tem o eixo em x e a instância não aceita `rotacao`, de modo que a roda do trem principal, que gira em torno de z ao recolher, não pôde usá-lo. Foi escrito o módulo `rodaGira` no JSON (pneu de revolução e dois cubos com `rotacao: [0, 0, "=ang"]`, e o centro dos cubos calculado com seno e cosseno de `ang`), que repete o desenho do componente. Uma entrada `rotacao` no componente, ou a âncora `lado` da roda acompanhando o giro, evitaria a cópia; hoje o `ponta` da roda (`cuboE` na face do pneu) não vale com a forma girada.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --ajuda componentes
+```

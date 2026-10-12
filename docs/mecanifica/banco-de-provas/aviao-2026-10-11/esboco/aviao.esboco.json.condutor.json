@@ -1108,23 +1108,49 @@
       "id": "trens-principais",
       "membros": [
         "rodaPrincE.pneu",
-        "rodaPrincE.disco",
         "rodaPrincE.cuboE",
         "rodaPrincE.cuboD",
         "rodaPrincD.pneu",
-        "rodaPrincD.disco",
         "rodaPrincD.cuboE",
         "rodaPrincD.cuboD",
+        "eixoRodaPrincE",
+        "eixoRodaPrincD",
         "pernaPrincE",
         "pernaPrincD",
         "pistaoPrincE",
         "pistaoPrincD",
-        "atuadorPrincE",
-        "atuadorPrincD"
+        "coroaPrincE",
+        "coroaPrincD",
+        "garfoExtPrincE",
+        "garfoExtPrincD",
+        "garfoIntPrincE",
+        "garfoIntPrincD",
+        "compassoSupPrincE",
+        "compassoSupPrincD",
+        "compassoInfPrincE",
+        "compassoInfPrincD",
+        "pinoCompassoPrincE",
+        "pinoCompassoPrincD",
+        "eixoPivoPrincE",
+        "eixoPivoPrincD",
+        "mancalPrincFrenteE",
+        "mancalPrincFrenteD",
+        "mancalPrincTrasE",
+        "mancalPrincTrasD",
+        "alavancaPrincE",
+        "alavancaPrincD",
+        "orelhaAtuadorPrincE",
+        "orelhaAtuadorPrincD",
+        "atuadorCorpoPrincE",
+        "atuadorCorpoPrincD",
+        "atuadorHastePrincE",
+        "atuadorHastePrincD",
+        "baiaPrincE",
+        "baiaPrincD"
       ],
       "depende": [],
       "custo": 14,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -1340,6 +1366,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-trens-principais.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
       }
     }
   ],
@@ -1386,6 +1418,23 @@
       ],
       "chamar": "critico",
       "imagens": "limpas"
+    },
+    {
+      "limiar": 100,
+      "custoFeito": 65,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice",
+        "asas",
+        "empenagem-horizontal",
+        "empenagem-vertical",
+        "trem-do-nariz",
+        "trens-principais"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
     }
   ],
   "avisos": [],
@@ -1397,7 +1446,8 @@
     "asas": "Perfil poligonal convexo (hinge a 70% da corda, fresta 15, eixos de 30). Flap interno (-830..-3130) e aileron externo (-3170..-5800) como no topo.png, não como na maquete. Ponta levantada pela curva de cy e t, em um só loft.",
     "empenagem-horizontal": "Perfil NACA 0012 em polígono convexo: estab até a dobradiça (61% da corda), profundor com fresta 15; centros das seções em reta (ehZ, ehY) para o eixo sair reto. Ponteira fecha as duas pontas desde x -2285. Suportes a 450 e 1700 da raiz.",
     "empenagem-vertical": "Perfil simétrico em polígono convexo, 10% de espessura sobre a corda cheia (deriva, fresta 15, leme). O centro das seções do leme é o eixo da dobradiça, reta. Bota e ponteira seguem dvC, dvT e dvZ; deriva até y 4170, ponteira até 4200.",
-    "trem-do-nariz": "Trem gira em torno do eixo x em tnP; tnCurso 0 é estendido. Gate limpo de 0 a 85 graus, folga mínima de 34 mm ao capô em 80; de 90 a roda entra no ventre, e falta a baia (atrito 26). Atuador em x -135 para a roda passar."
+    "trem-do-nariz": "Trem gira em torno do eixo x em tnP; tnCurso 0 é estendido. Gate limpo de 0 a 85 graus, folga mínima de 34 mm ao capô em 80; de 90 a roda entra no ventre, e falta a baia (atrito 26). Atuador em x -135 para a roda passar.",
+    "trens-principais": "Trem gira em z por tpCurso (0 estendido, 83 recolhido com a roda deitada, gate limpo até 87). A baia é casca sob a asa por falta de subtração (teto 900, -7,5 graus). Roda de 480 mm pela referência; pivô y 775, perna curta."
   },
   "vereditos": [
     {

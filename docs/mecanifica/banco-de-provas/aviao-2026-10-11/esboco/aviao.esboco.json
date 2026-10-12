@@ -18,7 +18,9 @@
       { "nome": "asa.largura", "valor": 5560, "unidade": "mm", "origem": "referencia", "tolerancia": 111, "mede": { "caixa": "x", "formas": ["asaE"] } },
       { "nome": "helice.largura", "valor": 2315.2, "unidade": "mm", "origem": "referencia", "tolerancia": 120, "mede": { "caixa": "x", "formas": ["pa", "pa1", "pa2", "pa3", "pa4"] } },
       { "nome": "nariz.roda.diametro", "valor": 400, "unidade": "mm", "origem": "referencia", "tolerancia": 40, "mede": { "caixa": "y", "formas": ["rodaNariz.pneu"] } },
-      { "nome": "nariz.altura", "valor": 775, "unidade": "mm", "origem": "referencia", "tolerancia": 40, "mede": { "caixa": "y", "formas": ["rodaNariz.pneu", "mancalNarizE"] } }
+      { "nome": "nariz.altura", "valor": 775, "unidade": "mm", "origem": "referencia", "tolerancia": 40, "mede": { "caixa": "y", "formas": ["rodaNariz.pneu", "mancalNarizE"] } },
+      { "nome": "principal.roda.diametro", "valor": 480, "unidade": "mm", "origem": "referencia", "tolerancia": 40, "mede": { "caixa": "y", "formas": ["rodaPrincE.pneu"] } },
+      { "nome": "principal.bitola", "valor": 3700, "unidade": "mm", "origem": "referencia", "tolerancia": 100, "mede": { "distancia": ["rodaPrincE.pneu", "rodaPrincD.pneu"], "eixo": "x" } }
     ],
     "contrato": {
       "tocam": [
@@ -31,7 +33,13 @@
         ["aileronE", "eixoAileronE"],
         ["profundorE", "eixoProfundorE"],
         ["leme", "eixoLeme"],
-        ["pernaPrincE", "asaE"],
+        ["baiaPrincE", "asaE"],
+        ["mancalPrincFrenteE", "baiaPrincE"],
+        ["mancalPrincTrasE", "baiaPrincE"],
+        ["orelhaAtuadorPrincE", "baiaPrincE"],
+        ["eixoPivoPrincE", "mancalPrincFrenteE"],
+        ["pistaoPrincE", "pernaPrincE"],
+        ["coroaPrincE", "pistaoPrincE"],
         ["mancalNarizE", "capo"],
         ["mancalNarizD", "capo"],
         ["orelhaAtuadorNariz", "fuselagem"],
@@ -46,6 +54,7 @@
         ["estabE", "estabD"],
         ["profundorE", "profundorD"],
         ["rodaPrincE.pneu", "rodaPrincD.pneu"],
+        ["baiaPrincE", "baiaPrincD"],
         ["janela1E", "janela1D"],
         ["mancalNarizE", "mancalNarizD"],
         ["garfoNarizE", "garfoNarizD"]
@@ -85,7 +94,12 @@
       { "nome": "compasso do amortecedor do nariz", "formas": ["compassoSupNariz", "compassoInfNariz", "pinoCompassoNariz"], "obrigatoria": true },
       { "nome": "pivô e mancais do trem do nariz", "formas": ["eixoPivoNariz", "mancalNarizE", "mancalNarizD"], "obrigatoria": true },
       { "nome": "atuador de recolhimento do nariz", "formas": ["alavancaNariz", "atuadorCorpoNariz", "atuadorHasteNariz", "orelhaAtuadorNariz"], "obrigatoria": true },
-      { "nome": "trens principais", "formas": ["rodaPrincE", "rodaPrincD", "pernaPrincE", "pernaPrincD", "pistaoPrincE", "pistaoPrincD"], "obrigatoria": true }
+      { "nome": "trens principais", "formas": ["rodaPrincE", "rodaPrincD", "pernaPrincE", "pernaPrincD", "pistaoPrincE", "pistaoPrincD"], "obrigatoria": true },
+      { "nome": "garfo, coroa e eixo da roda principal", "formas": ["coroaPrincE", "garfoExtPrincE", "garfoIntPrincE", "eixoRodaPrincE"], "obrigatoria": true },
+      { "nome": "compasso do amortecedor principal", "formas": ["compassoSupPrincE", "compassoInfPrincE", "pinoCompassoPrincE"], "obrigatoria": true },
+      { "nome": "pivô e mancais do trem principal", "formas": ["eixoPivoPrincE", "mancalPrincFrenteE", "mancalPrincTrasE"], "obrigatoria": true },
+      { "nome": "atuador de recolhimento principal", "formas": ["alavancaPrincE", "atuadorCorpoPrincE", "atuadorHastePrincE", "orelhaAtuadorPrincE"], "obrigatoria": true },
+      { "nome": "baia do trem principal", "formas": ["baiaPrincE", "baiaPrincD"], "obrigatoria": true }
     ],
     "referencia": [
       { "arquivo": "lateral.conferencia.contornos.json", "vista": "lateral", "tolerancia": 350, "iou_min": 0.85 },
@@ -258,7 +272,29 @@
     "tnRRoda": 200,
     "tnFolgaCoroa": 15,
     "tnCoroaE": 35,
-    "tnBarril": 170
+    "tnBarril": 170,
+    "tpX": 1850,
+    "tpY": 775,
+    "tpZ": 4520,
+    "tpR": 240,
+    "tpL": "=tpY-25-tpR",
+    "tpCurso": 0,
+    "tpSn": "=sin(tpCurso)",
+    "tpCs": "=cos(tpCurso)",
+    "tpBarril": 170,
+    "tpFolgaCoroa": 15,
+    "tpCoroaE": 35,
+    "tpAc": "=tpL-tpR-tpFolgaCoroa-tpCoroaE/2",
+    "tpGarfoB": 125,
+    "tpEsp": 18,
+    "tpBaiaXo": 1985,
+    "tpBaiaXi": 1060,
+    "tpBaiaL": "=tpBaiaXo-tpBaiaXi",
+    "tpBaiaW": 590,
+    "tpBaiaY": 585,
+    "tpInc": -7.5,
+    "tpTeto": 925,
+    "tpBaiaTopo": 900
   },
   "simetrico": { "eixo": "x", "pos": 0 },
   "unidades": {
@@ -269,7 +305,7 @@
     "empenagem-horizontal": { "cor": "laranja", "funcao": "estabilizador de perfil aerodinâmico simétrico e profundor de cada lado, com diedro, afilamento e uma ponteira cinza que fecha a ponta, o profundor separado do estabilizador por uma fresta e preso a ele por um eixo e por dois suportes sob a linha da dobradiça, a raiz de cada metade entrando no topo da cauda da fuselagem" },
     "empenagem-vertical": { "cor": "roxo", "funcao": "deriva de perfil aerodinâmico simétrico, varrida para trás e afinando para o topo, com uma bota de degelo escura no bordo de ataque e uma ponteira cinza que fecha o topo, e leme separado dela por uma fresta, preso por um eixo e por três suportes na linha da dobradiça, a raiz da deriva entrando no dorso da cauda da fuselagem" },
     "trem-do-nariz": { "cor": "amarelo", "funcao": "trem do nariz recolhível para trás: roda com garfo e coroa, amortecedor com compasso e perna que gira em torno de um eixo preso por dois mancais sob o piso do capô, com um atuador ao lado da roda, ligado por uma alavanca à perna e preso ao ventre da fuselagem" },
-    "trens-principais": { "cor": "vermelho", "funcao": "roda, perna, amortecedor e atuador de cada trem principal, presos sob a asa" }
+    "trens-principais": { "cor": "vermelho", "funcao": "trem principal recolhível para dentro, um sob cada asa: roda de pneu maciço com garfo e coroa, amortecedor com compasso e perna que gira em torno de um eixo em z preso por dois mancais ao teto de uma baia, com um atuador ligado por uma alavanca à perna; a baia é uma carenagem oca e aberta embaixo, presa ao ventre da asa, que guarda a roda deitada quando o trem recolhe" }
   },
   "contato": {
     "usar": true,
@@ -290,9 +326,6 @@
       { "pecas": ["eixoAileronE", "asaE", "aileronE"], "max": 20, "motivo": "o eixo do aileron atravessa a borda de fuga da asa e a borda de ataque do aileron" },
       { "pecas": ["eixoProfundorE", "estabE", "profundorE"], "max": 20, "motivo": "o eixo do profundor atravessa a borda de fuga do estabilizador e a de ataque do profundor" },
       { "pecas": ["eixoLeme", "deriva", "leme"], "max": 20, "motivo": "o eixo do leme atravessa a borda de fuga da deriva e a de ataque do leme" },
-      { "pecas": ["pistaoPrincE", "rodaPrincE.*"], "max": 40, "motivo": "o amortecedor termina no eixo do cubo da roda" },
-      { "pecas": ["pernaPrincE", "asaE"], "max": 50, "motivo": "a perna do trem principal se prende na longarina da asa" },
-      { "pecas": ["atuadorPrincE", "asaE"], "max": 50, "motivo": "o atuador do trem principal se prende sob a raiz da asa" },
       { "pecas": ["fuselagem", "parabrisa", "molduraParabrisa", "divisorParabrisa"], "max": 40, "motivo": "o para-brisa, a moldura e o divisor assentam sobre o dorso da proa da cabine" },
       { "pecas": ["fuselagem", "janela1E", "janela2E", "janela3E", "janela4E", "molduraJanela1E", "molduraJanela2E", "molduraJanela3E", "molduraJanela4E", "portaE", "molduraPortaE"], "max": 40, "motivo": "vidros, molduras, porta e batente ficam rentes ao flanco esquerdo da cabine" },
       { "pecas": ["capo", "escapeE"], "max": 100, "motivo": "o tubo de escape assenta no flanco do capô, com o eixo a escSai mm da superfície" },
@@ -302,7 +335,11 @@
       { "pecas": ["botaDegeloDeriva", "deriva"], "max": 220, "motivo": "a bota de degelo é a ponta do bordo de ataque da deriva, 4 mm mais grossa que o perfil" },
       { "pecas": ["fuselagem", "botaDegeloDeriva"], "max": 100, "motivo": "a raiz da bota de degelo entra no dorso da cauda junto com a raiz da deriva" },
       { "pecas": ["eixoRodaNariz", "rodaNariz.*"], "max": 150, "motivo": "o eixo atravessa os dois cubos e o pneu maciço da roda do nariz, que tem 140 mm de largura" },
-      { "pecas": ["eixoPivoNariz", "mancalNarizE"], "max": 50, "motivo": "o eixo do pivô atravessa a chapa de cada mancal, com o diâmetro de 50 mm" }
+      { "pecas": ["eixoPivoNariz", "mancalNarizE"], "max": 50, "motivo": "o eixo do pivô atravessa a chapa de cada mancal, com o diâmetro de 50 mm" },
+      { "pecas": ["eixoRodaPrincE", "rodaPrincE.*"], "max": 200, "motivo": "o eixo atravessa os dois cubos e o pneu maciço da roda principal, que tem 190 mm de largura" },
+      { "pecas": ["eixoPivoPrincE", "mancalPrincFrenteE", "mancalPrincTrasE", "pernaPrincE"], "max": 70, "motivo": "o eixo do pivô atravessa a chapa de cada mancal e a cabeça da perna, com o diâmetro de 50 mm" },
+      { "pecas": ["baiaPrincE", "asaE"], "max": 70, "motivo": "o teto da baia entra no ventre da asa, que sobe para fora e fica 90 mm mais alto na ponta que na raiz do trem" },
+      { "pecas": ["baiaPrincE", "mancalPrincFrenteE", "mancalPrincTrasE", "orelhaAtuadorPrincE"], "max": 40, "motivo": "os mancais e a orelha do atuador se prendem à face de dentro do teto da baia" }
     ]
   },
   "opcoes": [
@@ -452,30 +489,7 @@
         { "id": "venezianaE", "tipo": "caixa", "largura": 12, "altura": 150, "profundidade": 46, "raio": 4, "rotacao": [0, "=-atan(venezInc)", 0], "centro": { "ancora": "capo.veneziana", "mm": ["=-capoLargV/2+3", 0, 0] }, "cor": "preto", "lado": "E", "unidade": "motor", "rotulo": "veneziana", "substitui": "capo" },
         { "arranja": { "forma": "venezianaE", "modo": "linear", "total": 3, "passo": ["=-venezInc*100", 0, 100] } },
         { "arranja": { "forma": "venezianaD", "modo": "linear", "total": 3, "passo": ["=venezInc*100", 0, 100] } },
-        {
-          "id": "cone",
-          "tipo": "revolucao",
-          "eixo": "z",
-          "lados": 48,
-          "unidade": "helice",
-          "rotulo": "cone_da_helice",
-          "substitui": "cone",
-          "perfil": [
-            [0, 0],
-            [29, 5],
-            [57, 20],
-            [96, 60],
-            [132, 120],
-            [162, 200],
-            [185, 300],
-            [196, 400],
-            [199, 450],
-            { "raio": 199, "altura": 485, "nome": "planoPas" },
-            [199, 600]
-          ],
-          "centro": [0, "yEixo", 0],
-          "encosta": { "referencia": "capo", "direcao": "+z" }
-        },
+        { "id": "cone", "tipo": "revolucao", "eixo": "z", "lados": 48, "unidade": "helice", "rotulo": "cone_da_helice", "substitui": "cone", "perfil": [[0, 0], [29, 5], [57, 20], [96, 60], [132, 120], [162, 200], [185, 300], [196, 400], [199, 450], { "raio": 199, "altura": 485, "nome": "planoPas" }, [199, 600]], "centro": [0, "yEixo", 0], "encosta": { "referencia": "capo", "direcao": "+z" } },
         { "id": "placa", "tipo": "anel", "eixo": "z", "diametroExterno": 480, "diametroInterno": 398, "espessura": 28, "centro": "cone.+z", "desloca": [0, 0, -14], "cor": "cinza", "unidade": "helice", "rotulo": "placa_traseira_do_cone" },
         { "id": "colar", "tipo": "cilindro", "eixo": "y", "diametro": 112, "comprimento": 62, "sobre": "cone", "alinha": { "com": "cone.planoPas", "eixos": ["z"] }, "cor": "cinza", "unidade": "helice", "rotulo": "colar_da_pa" },
         { "arranja": { "forma": "colar", "modo": "radial", "total": 5, "eixo": "z", "centro": "cone.planoPas" } },
@@ -1122,32 +1136,8 @@
             "em": { "ancora": "estabE.ponta", "mm": [5, 0, "=0.5*(fresta+ehE2)"] }
           }
         },
-        {
-          "id": "suporteProfundor1E",
-          "tipo": "caixa",
-          "largura": 70,
-          "altura": 48,
-          "profundidade": 180,
-          "raio": 20,
-          "centro": { "ancora": "profundorE.fim", "mm": ["=-ehDb1", "=ehDy*ehDb1-0.3734*(ehT0+(ehT2-ehT0)*ehDb1/ehL)-8", "=ehDz*ehDb1+0.5*(ehC0+(ehC2-ehC0)*ehDb1/ehL)+0.5*fresta"] },
-          "cor": "cinza",
-          "lado": "E",
-          "unidade": "empenagem-horizontal",
-          "rotulo": "suporte_do_profundor"
-        },
-        {
-          "id": "suporteProfundor2E",
-          "tipo": "caixa",
-          "largura": 70,
-          "altura": 48,
-          "profundidade": 180,
-          "raio": 20,
-          "centro": { "ancora": "profundorE.fim", "mm": ["=-ehDb2", "=ehDy*ehDb2-0.3734*(ehT0+(ehT2-ehT0)*ehDb2/ehL)-8", "=ehDz*ehDb2+0.5*(ehC0+(ehC2-ehC0)*ehDb2/ehL)+0.5*fresta"] },
-          "cor": "cinza",
-          "lado": "E",
-          "unidade": "empenagem-horizontal",
-          "rotulo": "suporte_do_profundor"
-        },
+        { "id": "suporteProfundor1E", "tipo": "caixa", "largura": 70, "altura": 48, "profundidade": 180, "raio": 20, "centro": { "ancora": "profundorE.fim", "mm": ["=-ehDb1", "=ehDy*ehDb1-0.3734*(ehT0+(ehT2-ehT0)*ehDb1/ehL)-8", "=ehDz*ehDb1+0.5*(ehC0+(ehC2-ehC0)*ehDb1/ehL)+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "empenagem-horizontal", "rotulo": "suporte_do_profundor" },
+        { "id": "suporteProfundor2E", "tipo": "caixa", "largura": 70, "altura": 48, "profundidade": 180, "raio": 20, "centro": { "ancora": "profundorE.fim", "mm": ["=-ehDb2", "=ehDy*ehDb2-0.3734*(ehT0+(ehT2-ehT0)*ehDb2/ehL)-8", "=ehDz*ehDb2+0.5*(ehC0+(ehC2-ehC0)*ehDb2/ehL)+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "empenagem-horizontal", "rotulo": "suporte_do_profundor" },
         {
           "id": "deriva",
           "tipo": "loft",
@@ -1261,66 +1251,10 @@
           "rotulo": "leme",
           "substitui": "leme",
           "secoes": [
-            {
-              "pos": 2255,
-              "forma": "poligono",
-              "centro": [0, "lmZa"],
-              "perfil": [
-                ["=0.3663*lmTa", "=0.5*fresta"],
-                ["=0.2673*lmTa", "=0.5*fresta+0.33*lmE0"],
-                ["=0.1504*lmTa", "=0.5*fresta+0.66*lmE0"],
-                ["=0.02*lmTa", "=0.5*fresta+lmE0"],
-                ["=-0.02*lmTa", "=0.5*fresta+lmE0"],
-                ["=-0.1504*lmTa", "=0.5*fresta+0.66*lmE0"],
-                ["=-0.2673*lmTa", "=0.5*fresta+0.33*lmE0"],
-                ["=-0.3663*lmTa", "=0.5*fresta"]
-              ]
-            },
-            {
-              "pos": 3000,
-              "forma": "poligono",
-              "centro": [0, "lmZb"],
-              "perfil": [
-                ["=0.3663*dvT1", "=0.5*fresta"],
-                ["=0.2673*dvT1", "=0.5*fresta+0.33*lmE1"],
-                ["=0.1504*dvT1", "=0.5*fresta+0.66*lmE1"],
-                ["=0.02*dvT1", "=0.5*fresta+lmE1"],
-                ["=-0.02*dvT1", "=0.5*fresta+lmE1"],
-                ["=-0.1504*dvT1", "=0.5*fresta+0.66*lmE1"],
-                ["=-0.2673*dvT1", "=0.5*fresta+0.33*lmE1"],
-                ["=-0.3663*dvT1", "=0.5*fresta"]
-              ]
-            },
-            {
-              "pos": 3700,
-              "forma": "poligono",
-              "centro": [0, "lmZc"],
-              "perfil": [
-                ["=0.3663*dvT2", "=0.5*fresta"],
-                ["=0.2673*dvT2", "=0.5*fresta+0.33*lmE2"],
-                ["=0.1504*dvT2", "=0.5*fresta+0.66*lmE2"],
-                ["=0.02*dvT2", "=0.5*fresta+lmE2"],
-                ["=-0.02*dvT2", "=0.5*fresta+lmE2"],
-                ["=-0.1504*dvT2", "=0.5*fresta+0.66*lmE2"],
-                ["=-0.2673*dvT2", "=0.5*fresta+0.33*lmE2"],
-                ["=-0.3663*dvT2", "=0.5*fresta"]
-              ]
-            },
-            {
-              "pos": 4157,
-              "forma": "poligono",
-              "centro": [0, "lmZd"],
-              "perfil": [
-                ["=0.3663*lmTd", "=0.5*fresta"],
-                ["=0.2673*lmTd", "=0.5*fresta+0.33*lmE3"],
-                ["=0.1504*lmTd", "=0.5*fresta+0.66*lmE3"],
-                ["=0.02*lmTd", "=0.5*fresta+lmE3"],
-                ["=-0.02*lmTd", "=0.5*fresta+lmE3"],
-                ["=-0.1504*lmTd", "=0.5*fresta+0.66*lmE3"],
-                ["=-0.2673*lmTd", "=0.5*fresta+0.33*lmE3"],
-                ["=-0.3663*lmTd", "=0.5*fresta"]
-              ]
-            }
+            { "pos": 2255, "forma": "poligono", "centro": [0, "lmZa"], "perfil": [["=0.3663*lmTa", "=0.5*fresta"], ["=0.2673*lmTa", "=0.5*fresta+0.33*lmE0"], ["=0.1504*lmTa", "=0.5*fresta+0.66*lmE0"], ["=0.02*lmTa", "=0.5*fresta+lmE0"], ["=-0.02*lmTa", "=0.5*fresta+lmE0"], ["=-0.1504*lmTa", "=0.5*fresta+0.66*lmE0"], ["=-0.2673*lmTa", "=0.5*fresta+0.33*lmE0"], ["=-0.3663*lmTa", "=0.5*fresta"]] },
+            { "pos": 3000, "forma": "poligono", "centro": [0, "lmZb"], "perfil": [["=0.3663*dvT1", "=0.5*fresta"], ["=0.2673*dvT1", "=0.5*fresta+0.33*lmE1"], ["=0.1504*dvT1", "=0.5*fresta+0.66*lmE1"], ["=0.02*dvT1", "=0.5*fresta+lmE1"], ["=-0.02*dvT1", "=0.5*fresta+lmE1"], ["=-0.1504*dvT1", "=0.5*fresta+0.66*lmE1"], ["=-0.2673*dvT1", "=0.5*fresta+0.33*lmE1"], ["=-0.3663*dvT1", "=0.5*fresta"]] },
+            { "pos": 3700, "forma": "poligono", "centro": [0, "lmZc"], "perfil": [["=0.3663*dvT2", "=0.5*fresta"], ["=0.2673*dvT2", "=0.5*fresta+0.33*lmE2"], ["=0.1504*dvT2", "=0.5*fresta+0.66*lmE2"], ["=0.02*dvT2", "=0.5*fresta+lmE2"], ["=-0.02*dvT2", "=0.5*fresta+lmE2"], ["=-0.1504*dvT2", "=0.5*fresta+0.66*lmE2"], ["=-0.2673*dvT2", "=0.5*fresta+0.33*lmE2"], ["=-0.3663*dvT2", "=0.5*fresta"]] },
+            { "pos": 4157, "forma": "poligono", "centro": [0, "lmZd"], "perfil": [["=0.3663*lmTd", "=0.5*fresta"], ["=0.2673*lmTd", "=0.5*fresta+0.33*lmE3"], ["=0.1504*lmTd", "=0.5*fresta+0.66*lmE3"], ["=0.02*lmTd", "=0.5*fresta+lmE3"], ["=-0.02*lmTd", "=0.5*fresta+lmE3"], ["=-0.1504*lmTd", "=0.5*fresta+0.66*lmE3"], ["=-0.2673*lmTd", "=0.5*fresta+0.33*lmE3"], ["=-0.3663*lmTd", "=0.5*fresta"]] }
           ],
           "encaixa": {
             "ancora": "inicio",
@@ -1444,10 +1378,39 @@
         { "id": "atuadorCorpoNariz", "ligar": { "de": "tnAtF", "para": { "entre": ["tnAtF", "tnAtA"], "t": 0.55 }, "tipo": "haste", "diametro": 30 }, "cor": "cinza", "unidade": "trem-do-nariz", "rotulo": "atuador_de_recolhimento" },
         { "id": "atuadorHasteNariz", "ligar": { "de": { "entre": ["tnAtF", "tnAtA"], "t": 0.55 }, "para": "tnAtA", "tipo": "haste", "diametro": 20 }, "cor": "branco", "unidade": "trem-do-nariz", "rotulo": "haste_do_atuador" },
         { "id": "alavancaNariz", "ligar": { "de": "tnAlavA", "para": "tnAtA", "tipo": "haste", "diametro": 24 }, "cor": "cinza", "rotulo": "alavanca_do_atuador", "unidade": "trem-do-nariz" },
-        { "id": "rodaPrincE", "usa": "roda", "parametros": { "diametro": 550, "aro": 330, "largura": 220, "diametroCubo": 140, "salienciaCubo": 110 }, "centro": [-1850, 300, 4520], "lado": "E", "unidade": "trens-principais", "rotulo": "roda_principal" },
-        { "id": "pernaPrincE", "tipo": "cilindro", "diametro": 100, "de": [-1700, 940, 4520], "para": [-1702, 600, 4520], "cor": "vermelho", "lado": "E", "unidade": "trens-principais", "rotulo": "perna_principal" },
-        { "id": "pistaoPrincE", "tipo": "cilindro", "diametro": 65, "de": "pernaPrincE.fim", "para": "rodaPrincE.lateralD", "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "amortecedor_principal" },
-        { "id": "atuadorPrincE", "ligar": { "de": { "ancora": "pernaPrincE.centro", "mm": [55, 0, 0] }, "para": [-1000, 830, 4650], "tipo": "haste", "diametro": 50 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "atuador_principal" }
+        { "id": "rodaPrincE", "usa": "rodaGira", "parametros": { "diametro": "=2*tpR", "aro": 270, "largura": 190, "ombro": 35, "diametroCubo": 90, "salienciaCubo": 22, "ang": "tpCurso" }, "centro": "tpW", "lado": "E", "unidade": "trens-principais", "rotulo": "roda_principal" },
+        { "id": "eixoRodaPrincE", "tipo": "cilindro", "diametro": 26, "de": "tpAe", "para": "tpAi", "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "eixo_da_roda_principal" },
+        { "id": "pernaPrincE", "tipo": "cilindro", "diametro": 90, "de": "tpP", "para": { "entre": ["tpP", "tpW"], "mm": "tpBarril" }, "cor": "vermelho", "lado": "E", "unidade": "trens-principais", "rotulo": "perna_principal" },
+        { "id": "pistaoPrincE", "tipo": "cilindro", "diametro": 62, "de": { "entre": ["tpP", "tpW"], "mm": "tpBarril" }, "para": { "entre": ["tpP", "tpW"], "mmAntes": "=tpR+tpFolgaCoroa+tpCoroaE" }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "amortecedor_principal" },
+        { "id": "coroaPrincE", "tipo": "caixa", "largura": 250, "profundidade": 70, "raio": 10, "de": { "entre": ["tpP", "tpW"], "mmAntes": "=tpR+tpFolgaCoroa+tpCoroaE" }, "para": { "entre": ["tpP", "tpW"], "mmAntes": "=tpR+tpFolgaCoroa" }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "coroa_do_garfo_principal" },
+        { "id": "garfoExtPrincE", "ligar": { "de": "tpCe", "para": "tpWe", "tipo": "haste", "diametro": 24 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "garfo_externo_principal" },
+        { "id": "garfoIntPrincE", "ligar": { "de": "tpCi", "para": "tpWi", "tipo": "haste", "diametro": 24 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "garfo_interno_principal" },
+        { "id": "compassoSupPrincE", "ligar": { "de": "tpCpA", "para": "tpCpJ", "tipo": "haste", "diametro": 16 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "compasso_superior_principal" },
+        { "id": "compassoInfPrincE", "ligar": { "de": "tpCpJ", "para": "tpCpB", "tipo": "haste", "diametro": 16 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "compasso_inferior_principal" },
+        { "id": "pinoCompassoPrincE", "tipo": "cilindro", "diametro": 22, "comprimento": 40, "eixo": "x", "rotacao": [0, 0, "tpCurso"], "centro": "tpCpJ", "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "pino_do_compasso_principal" },
+        { "id": "eixoPivoPrincE", "tipo": "cilindro", "diametro": 50, "de": { "ancora": "tpP", "mm": [0, 0, -185] }, "para": { "ancora": "tpP", "mm": [0, 0, 185] }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "eixo_do_pivo_principal" },
+        { "id": "mancalPrincFrenteE", "tipo": "caixa", "largura": 110, "altura": "=tpTeto-tpY+60", "profundidade": 30, "raio": 10, "centro": ["=-tpX", "=(tpTeto+tpY-60)/2", "=tpZ-150"], "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "mancal_dianteiro_do_pivo" },
+        { "id": "mancalPrincTrasE", "tipo": "caixa", "largura": 110, "altura": "=tpTeto-tpY+60", "profundidade": 30, "raio": 10, "centro": ["=-tpX", "=(tpTeto+tpY-60)/2", "=tpZ+150"], "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "mancal_traseiro_do_pivo" },
+        { "id": "alavancaPrincE", "ligar": { "de": "tpAtB", "para": "tpAtA", "tipo": "haste", "diametro": 28 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "alavanca_do_atuador_principal" },
+        { "id": "orelhaAtuadorPrincE", "tipo": "caixa", "largura": 40, "altura": 40, "profundidade": 30, "raio": 8, "centro": { "ancora": "tpAtF", "mm": [0, 7, 0] }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "orelha_do_atuador_principal" },
+        { "id": "atuadorCorpoPrincE", "ligar": { "de": "tpAtF", "para": { "entre": ["tpAtF", "tpAtA"], "t": 0.55 }, "tipo": "haste", "diametro": 36 }, "cor": "cinza", "lado": "E", "unidade": "trens-principais", "rotulo": "atuador_de_recolhimento_principal" },
+        { "id": "atuadorHastePrincE", "ligar": { "de": { "entre": ["tpAtF", "tpAtA"], "t": 0.55 }, "para": "tpAtA", "tipo": "haste", "diametro": 24 }, "cor": "branco", "lado": "E", "unidade": "trens-principais", "rotulo": "haste_do_atuador_principal" },
+        {
+          "id": "baiaPrincE",
+          "tipo": "loft",
+          "eixo": "y",
+          "casca": { "espessura": "tpEsp", "aberta": "inicio" },
+          "secoes": [
+            { "pos": 0, "nome": "boca", "forma": "arredondado", "tamanho": ["tpBaiaL", "tpBaiaW"], "cantos": 150 },
+            { "pos": "=(tpBaiaTopo-tpBaiaY)/2", "forma": "arredondado", "tamanho": ["=tpBaiaL+10", "=tpBaiaW+10"], "cantos": 160 },
+            { "pos": "=tpBaiaTopo-tpBaiaY", "nome": "teto", "forma": "arredondado", "tamanho": ["=tpBaiaL-20", "=tpBaiaW-20"], "cantos": 160, "inclinacao": [0, "tpInc"] }
+          ],
+          "encaixa": { "ancora": "boca", "em": "tpBoca" },
+          "cor": "vermelho",
+          "lado": "E",
+          "unidade": "trens-principais",
+          "rotulo": "baia_do_trem_principal"
+        }
       ]
     }
   ],
@@ -1459,6 +1422,39 @@
     "tnCompB": [0, "=tnPy-252*cos(tnTh)+26*sin(tnTh)", "=tnPz-252*sin(tnTh)-26*cos(tnTh)"],
     "tnAtA": [-135, "=tnPy-90*cos(tnTh)-41*sin(tnTh)", "=tnPz-90*sin(tnTh)+41*cos(tnTh)"],
     "tnAtF": [-135, 765, 2400],
-    "tnAlavA": [0, "=tnPy-90*cos(tnTh)-41*sin(tnTh)", "=tnPz-90*sin(tnTh)+41*cos(tnTh)"]
+    "tnAlavA": [0, "=tnPy-90*cos(tnTh)-41*sin(tnTh)", "=tnPz-90*sin(tnTh)+41*cos(tnTh)"],
+    "tpP": ["=-tpX", "tpY", "tpZ"],
+    "tpW": ["=-tpX+tpL*tpSn", "=tpY-tpL*tpCs", "tpZ"],
+    "tpWe": ["=-tpX+tpL*tpSn-tpGarfoB*tpCs", "=tpY-tpL*tpCs-tpGarfoB*tpSn", "tpZ"],
+    "tpWi": ["=-tpX+tpL*tpSn+tpGarfoB*tpCs", "=tpY-tpL*tpCs+tpGarfoB*tpSn", "tpZ"],
+    "tpCe": ["=-tpX+tpAc*tpSn-tpGarfoB*tpCs", "=tpY-tpAc*tpCs-tpGarfoB*tpSn", "tpZ"],
+    "tpCi": ["=-tpX+tpAc*tpSn+tpGarfoB*tpCs", "=tpY-tpAc*tpCs+tpGarfoB*tpSn", "tpZ"],
+    "tpAe": ["=-tpX+tpL*tpSn-135*tpCs", "=tpY-tpL*tpCs-135*tpSn", "tpZ"],
+    "tpAi": ["=-tpX+tpL*tpSn+135*tpCs", "=tpY-tpL*tpCs+135*tpSn", "tpZ"],
+    "tpCpA": ["=-tpX+100*tpSn", "=tpY-100*tpCs", "=tpZ+45"],
+    "tpCpJ": ["=-tpX+150*tpSn", "=tpY-150*tpCs", "=tpZ+85"],
+    "tpCpB": ["=-tpX+200*tpSn", "=tpY-200*tpCs", "=tpZ+31"],
+    "tpAtB": ["=-tpX+90*tpSn", "=tpY-90*tpCs", "=tpZ-35"],
+    "tpAtA": ["=-tpX+90*tpSn+95*tpCs", "=tpY-90*tpCs+95*tpSn", "=tpZ-105"],
+    "tpAtF": [-1620, 880, "=tpZ-105"],
+    "tpBoca": ["=-(tpBaiaXo+tpBaiaXi)/2", "tpBaiaY", "tpZ"]
+  },
+  "modulos": {
+    "rodaGira": {
+      "descricao": "Roda de pneu maciço com o eixo girado em torno de z pelo ângulo ang (graus), para o trem que recolhe de lado: pneu de revolução com ombro e um cubo de cada lado, todos girados juntos em torno do centro do pneu. Com ang 0 o eixo fica em x, como o componente roda.",
+      "principal": "pneu",
+      "parametros": { "diametro": 480, "aro": 270, "largura": 190, "ombro": 35, "diametroCubo": 90, "salienciaCubo": 22, "ang": 0 },
+      "entradas": { "centro": null },
+      "formas": [
+        { "id": "pneu", "tipo": "revolucao", "eixo": "x", "rotacao": [0, 0, "=ang"], "perfil": { "gerar": "pneu", "raio": "=diametro/2", "raioAro": "=aro/2", "largura": "largura", "ombro": "ombro" }, "centro": "@centro", "cor": "preto" },
+        { "id": "cuboE", "tipo": "cilindro", "diametro": "diametroCubo", "comprimento": "salienciaCubo", "eixo": "x", "rotacao": [0, 0, "=ang"], "centro": { "ancora": "pneu.centro", "mm": ["=-(largura+salienciaCubo)/2*cos(ang)", "=-(largura+salienciaCubo)/2*sin(ang)", 0] }, "cor": "cinza" },
+        { "id": "cuboD", "tipo": "cilindro", "diametro": "diametroCubo", "comprimento": "salienciaCubo", "eixo": "x", "rotacao": [0, 0, "=ang"], "centro": { "ancora": "pneu.centro", "mm": ["=(largura+salienciaCubo)/2*cos(ang)", "=(largura+salienciaCubo)/2*sin(ang)", 0] }, "cor": "cinza" }
+      ],
+      "ancoras": { "eixo": "pneu.centro" },
+      "pares": [
+        { "a": "pneu", "b": "cuboE", "tipo": "encosta" },
+        { "a": "pneu", "b": "cuboD", "tipo": "encosta" }
+      ]
+    }
   }
 }
