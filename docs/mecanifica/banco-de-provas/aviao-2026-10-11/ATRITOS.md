@@ -52,3 +52,16 @@ mostra todos os pedaços, e o contorno guardado não aparece para ele.
 ```bash
 node -e "const d=require('./docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.contornos.json'); const y=d.regioes.helice.contornoMm.map(p=>p[1]); console.log('altura do contorno da hélice', Math.round(Math.max(...y)-Math.min(...y)), 'mm')"
 ```
+
+## 4. A prancha só sabe ser lateral
+
+A prancha de topo sai com o rótulo "LATERAL — projeção" e com o eixo do
+relatório da lateral, fixos no comando, e o comprimento ao longo do avião vira
+"altura" nas cotas. A skill `prancha-dos-contornos` também se descreve como
+prancha lateral. O desenhista contornou com `--titulo`, mas o rótulo e o eixo
+continuam errados. Num objeto que precisa da vista de cima, como o avião, a
+planta e a lateral são as duas vistas principais.
+
+```bash
+grep -n "LATERAL" tools/mecanifica/prancha/*.mjs
+```
