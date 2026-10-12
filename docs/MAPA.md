@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1165 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1161 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -74,8 +74,6 @@
 - `leitura-em-texto.md` — Ler em texto antes da imagem
 - `nivel-detalhado.md` — Nível detalhado
 - `regras-de-contato.md` — Regras de contato
-- `resumo-do-formato.md` — Resumo do formato
-- `resumo-do-formato.md` — Resumo do formato
 - `resumo-do-formato.md` — Resumo do formato
 - `sobreposicao-na-projecao.md` — Sobreposição na projeção
 - `variantes-simetria-repeticao.md` — Variantes, simetria e repetição
@@ -514,8 +512,6 @@
 - `familia.js` — A forma de família: um sólido que vem de uma família procedural (`procedural/familias`, contrato `mecanifica.familia@1`) e entra no esboço como uma forma só,…
 - `formas-resolvidas.js` — As formas de uma opção do esboço como dado puro: parâmetros, componentes, simetria, arranjo e relações já viram centro, medida e matriz em milímetro de mundo…
 - `giro.js` — Giro rígido de um grupo de formas em torno de um pivô: o que a instância de componente com `rotacao` (a roda do trem principal do avião gira em torno de z ao…
-- `index.js` — Esboço de opções de forma: lê a declaração de cilindros, anéis e caixas em milímetro, resolve as posições relativas (sobre, ponta) e desenha as opções lado a…
-- `index.js` — Esboço de opções de forma: lê a declaração de cilindros, anéis e caixas em milímetro, resolve as posições relativas (sobre, ponta) e desenha as opções lado a…
 - `index.js` — Esboço de opções de forma: lê a declaração de cilindros, anéis e caixas em milímetro, resolve as posições relativas (sobre, ponta) e desenha as opções lado a…
 - `lados.js` — De que lado cada vista olha, em texto, para o brief do crítico cego. As quatro vistas de sempre olham dos lados positivos dos eixos (frontal de +z, lateral d…
 - `ligar.js` — `ligar`: a forma criada entre duas âncoras. `{ "id": "h", "ligar": { "de": "A.topo", "para": "B.base", "tipo": "haste", "diametro": 8 } }` vira a forma comum…
