@@ -109,7 +109,23 @@ resultado volta ao backlog.
    ventoinha). A fatia termina com a pessoa escolhendo o que a fatia 5 constrói.
 5. **Implementação.** O que a pessoa escolheu, cada item com prancha na bancada
    neutra nos extremos das faixas e num ponto médio, crítico e aprovação da
-   pessoa.
+   pessoa. Em 2026-10-12 a pessoa escolheu corrigir todos os itens da
+   [classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md), para não
+   deixar pendência. A ordem vai em três ondas, cada pacote com dono de arquivos
+   próprio para os agentes trabalharem em paralelo sem se cruzar:
+   - onda 1, correções: o processo do crítico (brief em arquivo e reimpresso, o
+     lado de cada vista, vistas da proa, do lado esquerdo e de baixo, a
+     referência no brief, o enquadramento da unidade, a nota que não trava as
+     outras); contorno e prancha (R1, R6 a R8 e a silhueta em pedaços de E3);
+     referência no esboço (E1, E2, E4); gate de contato e miúdos (E6, E8, E10,
+     E18, E23, E28, E35, E39); depois, integração do detalhe e Envelope (E13,
+     E14, E16, E19, E22, E27, E32, E36, E37, E41), que toca o Condutor;
+   - onda 2, ferramentas novas: famílias no esboço (E7), a superfície
+     aerodinâmica como família, com a hélice como perfil dela (A), o recorte de
+     uma forma por outra no esboço (B), o curso de mecanismo varrido pelo gate e
+     mostrado inteiro ao crítico (C, E40, E42, E43) e a superfície suave por
+     seções (D); e a contagem por objeto corrigida onde subestimou o recorte;
+   - onda 3, a fatia 6.
 6. **Segunda rodada e fechamento.** O avião refeito com o que a fatia 5 criou,
    pelo mesmo laço, comparado à primeira rodada em tokens, chamadas, rodadas e
    nota. O fechamento conta primitivas, ferramentas e atritos resolvidos.
