@@ -377,6 +377,12 @@
       "id": "helice",
       "membros": [
         "cone",
+        "placa",
+        "colar",
+        "colar1",
+        "colar2",
+        "colar3",
+        "colar4",
         "pa",
         "pa1",
         "pa2",
@@ -387,7 +393,7 @@
         "motor"
       ],
       "custo": 6,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -491,6 +497,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-helice.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
       }
     },
     {
@@ -1280,12 +1292,26 @@
     }
   ],
   "alteracoes": [],
-  "marcos": [],
+  "marcos": [
+    {
+      "limiar": 25,
+      "custoFeito": 22,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
+    }
+  ],
   "avisos": [],
   "opcao": "Monomotor turboélice",
   "notasDePassagem": {
     "fuselagem": "Seções fogo, asa, tronco e cauda mantêm o centro da maquete: asa, estabilizador e deriva se ancoram nelas. O fogo (1450x1000, cantos 330) tem de coincidir com a traseira do capô. Cantos 250/280 deixam o flanco reto sob janelas e porta.",
-    "motor": "Capô oco (casca 20, aberta no lábio): o cone toca o anel do lábio por tolerância (28 mm), não afinar a casca. Duto preto assenta no piso e acaba na parede de trás. Escapes em y 1325 e menores, pelo Envelope. Ventre y≈797 mantido."
+    "motor": "Capô oco (casca 20, aberta no lábio): o cone toca o anel do lábio por tolerância (28 mm), não afinar a casca. Duto preto assenta no piso e acaba na parede de trás. Escapes em y 1325 e menores, pelo Envelope. Ventre y≈797 mantido.",
+    "helice": "Plano das pás em z 510, não 490: raiz e colar ficam à frente do lábio do capô (z 600). Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT); ponta em r 1150 cabe no Envelope; o cone mantém r 199 em z 600."
   },
   "vereditos": [
     {

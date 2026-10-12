@@ -102,13 +102,31 @@
     "escExAng": "=atan2(escExDx, escExDz)",
     "arDy": -402,
     "entArDy": -410,
-    "escAlturaY": 1325
+    "escAlturaY": 1325,
+    "hA0": 62,
+    "hB0": 40,
+    "hT0": 52,
+    "hA1": 84,
+    "hB1": 42,
+    "hT1": 47,
+    "hA2": 106,
+    "hB2": 38,
+    "hT2": 38,
+    "hA3": 112,
+    "hB3": 30,
+    "hT3": 29,
+    "hA4": 76,
+    "hB4": 14,
+    "hT4": 20,
+    "hA5": 38,
+    "hB5": 6,
+    "hT5": 18
   },
   "simetrico": { "eixo": "x", "pos": 0 },
   "unidades": {
     "fuselagem": { "cor": "cinza", "funcao": "casco da fuselagem em seções lisas, do capô à ponta da cauda, com a barbatana ventral, o para-brisa, as janelas laterais e a porta traseira esquerda, que é a estrutura a que todo o resto do avião se prende" },
     "motor": { "cor": "verde", "funcao": "capô oco, aberto na frente em torno do cone da hélice, com o duto da entrada de ar dentro dele sob o cone, três venezianas de arrefecimento em cada flanco e os dois escapes laterais, preso à frente da fuselagem" },
-    "helice": { "cor": "preto", "funcao": "cone e cinco pás em arranjo radial, que giram em torno do eixo do motor à frente do capô" },
+    "helice": { "cor": "preto", "funcao": "cone de ponta arredondada com placa traseira e cinco pás de perfil aerodinâmico torcido da raiz à ponta, cada uma presa ao cone por um colar, que giram em torno do eixo do motor à frente do capô" },
     "asas": { "cor": "azul", "funcao": "as duas metades da asa baixa, com diedro, aileron e flap em cada metade presos por eixo, presas aos flancos da fuselagem" },
     "empenagem-horizontal": { "cor": "laranja", "funcao": "estabilizador e profundor de cada lado, presos por eixo, montados no topo da cauda da fuselagem" },
     "empenagem-vertical": { "cor": "roxo", "funcao": "deriva e leme preso por eixo, montados no dorso da cauda da fuselagem" },
@@ -336,19 +354,124 @@
           "lados": 48,
           "unidade": "helice",
           "rotulo": "cone_da_helice",
+          "substitui": "cone",
           "perfil": [
             [0, 0],
-            [40, 100],
-            [90, 200],
-            [136, 300],
-            [175, 400],
-            { "raio": 199, "altura": 490, "nome": "planoPas" },
+            [29, 5],
+            [57, 20],
+            [96, 60],
+            [132, 120],
+            [162, 200],
+            [185, 300],
+            [196, 400],
+            [199, 480],
+            { "raio": 199, "altura": 510, "nome": "planoPas" },
             [199, 600]
           ],
           "centro": [0, "yEixo", 0],
           "encosta": { "referencia": "capo", "direcao": "+z" }
         },
-        { "id": "pa", "tipo": "caixa", "largura": 250, "altura": 960, "profundidade": 50, "rotacao": [0, 40, 0], "sobre": "cone", "alinha": { "com": "cone.planoPas", "eixos": ["z"] }, "cor": "preto", "unidade": "helice", "rotulo": "pa" },
+        { "id": "placa", "tipo": "anel", "eixo": "z", "diametroExterno": 424, "diametroInterno": 398, "espessura": 28, "centro": "cone.+z", "desloca": [0, 0, -14], "cor": "cinza", "unidade": "helice", "rotulo": "placa_traseira_do_cone" },
+        { "id": "colar", "tipo": "cilindro", "eixo": "y", "diametro": 112, "comprimento": 62, "sobre": "cone", "alinha": { "com": "cone.planoPas", "eixos": ["z"] }, "cor": "cinza", "unidade": "helice", "rotulo": "colar_da_pa" },
+        { "arranja": { "forma": "colar", "modo": "radial", "total": 5, "eixo": "z", "centro": "cone.planoPas" } },
+        {
+          "id": "pa",
+          "tipo": "loft",
+          "eixo": "y",
+          "substitui": "pa",
+          "secoes": [
+            {
+              "pos": 0,
+              "nome": "raiz",
+              "forma": "poligono",
+              "perfil": [
+                ["=hA0*cos(hT0)-0.05*hB0*sin(hT0)", "=-hA0*sin(hT0)-0.05*hB0*cos(hT0)"],
+                ["=0.62*hA0*cos(hT0)-0.8*hB0*sin(hT0)", "=-0.62*hA0*sin(hT0)-0.8*hB0*cos(hT0)"],
+                ["=0.05*hA0*cos(hT0)-hB0*sin(hT0)", "=-0.05*hA0*sin(hT0)-hB0*cos(hT0)"],
+                ["=-0.55*hA0*cos(hT0)-0.55*hB0*sin(hT0)", "=0.55*hA0*sin(hT0)-0.55*hB0*cos(hT0)"],
+                ["=-hA0*cos(hT0)", "=hA0*sin(hT0)"],
+                ["=-0.5*hA0*cos(hT0)+0.25*hB0*sin(hT0)", "=0.5*hA0*sin(hT0)+0.25*hB0*cos(hT0)"],
+                ["=0.1*hA0*cos(hT0)+0.3*hB0*sin(hT0)", "=-0.1*hA0*sin(hT0)+0.3*hB0*cos(hT0)"],
+                ["=0.7*hA0*cos(hT0)+0.2*hB0*sin(hT0)", "=-0.7*hA0*sin(hT0)+0.2*hB0*cos(hT0)"]
+              ]
+            },
+            {
+              "pos": 100,
+              "forma": "poligono",
+              "perfil": [
+                ["=hA1*cos(hT1)-0.05*hB1*sin(hT1)", "=-hA1*sin(hT1)-0.05*hB1*cos(hT1)"],
+                ["=0.62*hA1*cos(hT1)-0.8*hB1*sin(hT1)", "=-0.62*hA1*sin(hT1)-0.8*hB1*cos(hT1)"],
+                ["=0.05*hA1*cos(hT1)-hB1*sin(hT1)", "=-0.05*hA1*sin(hT1)-hB1*cos(hT1)"],
+                ["=-0.55*hA1*cos(hT1)-0.55*hB1*sin(hT1)", "=0.55*hA1*sin(hT1)-0.55*hB1*cos(hT1)"],
+                ["=-hA1*cos(hT1)", "=hA1*sin(hT1)"],
+                ["=-0.5*hA1*cos(hT1)+0.25*hB1*sin(hT1)", "=0.5*hA1*sin(hT1)+0.25*hB1*cos(hT1)"],
+                ["=0.1*hA1*cos(hT1)+0.3*hB1*sin(hT1)", "=-0.1*hA1*sin(hT1)+0.3*hB1*cos(hT1)"],
+                ["=0.7*hA1*cos(hT1)+0.2*hB1*sin(hT1)", "=-0.7*hA1*sin(hT1)+0.2*hB1*cos(hT1)"]
+              ]
+            },
+            {
+              "pos": 300,
+              "forma": "poligono",
+              "perfil": [
+                ["=hA2*cos(hT2)-0.05*hB2*sin(hT2)", "=-hA2*sin(hT2)-0.05*hB2*cos(hT2)"],
+                ["=0.62*hA2*cos(hT2)-0.8*hB2*sin(hT2)", "=-0.62*hA2*sin(hT2)-0.8*hB2*cos(hT2)"],
+                ["=0.05*hA2*cos(hT2)-hB2*sin(hT2)", "=-0.05*hA2*sin(hT2)-hB2*cos(hT2)"],
+                ["=-0.55*hA2*cos(hT2)-0.55*hB2*sin(hT2)", "=0.55*hA2*sin(hT2)-0.55*hB2*cos(hT2)"],
+                ["=-hA2*cos(hT2)", "=hA2*sin(hT2)"],
+                ["=-0.5*hA2*cos(hT2)+0.25*hB2*sin(hT2)", "=0.5*hA2*sin(hT2)+0.25*hB2*cos(hT2)"],
+                ["=0.1*hA2*cos(hT2)+0.3*hB2*sin(hT2)", "=-0.1*hA2*sin(hT2)+0.3*hB2*cos(hT2)"],
+                ["=0.7*hA2*cos(hT2)+0.2*hB2*sin(hT2)", "=-0.7*hA2*sin(hT2)+0.2*hB2*cos(hT2)"]
+              ]
+            },
+            {
+              "pos": 520,
+              "forma": "poligono",
+              "perfil": [
+                ["=hA3*cos(hT3)-0.05*hB3*sin(hT3)", "=-hA3*sin(hT3)-0.05*hB3*cos(hT3)"],
+                ["=0.62*hA3*cos(hT3)-0.8*hB3*sin(hT3)", "=-0.62*hA3*sin(hT3)-0.8*hB3*cos(hT3)"],
+                ["=0.05*hA3*cos(hT3)-hB3*sin(hT3)", "=-0.05*hA3*sin(hT3)-hB3*cos(hT3)"],
+                ["=-0.55*hA3*cos(hT3)-0.55*hB3*sin(hT3)", "=0.55*hA3*sin(hT3)-0.55*hB3*cos(hT3)"],
+                ["=-hA3*cos(hT3)", "=hA3*sin(hT3)"],
+                ["=-0.5*hA3*cos(hT3)+0.25*hB3*sin(hT3)", "=0.5*hA3*sin(hT3)+0.25*hB3*cos(hT3)"],
+                ["=0.1*hA3*cos(hT3)+0.3*hB3*sin(hT3)", "=-0.1*hA3*sin(hT3)+0.3*hB3*cos(hT3)"],
+                ["=0.7*hA3*cos(hT3)+0.2*hB3*sin(hT3)", "=-0.7*hA3*sin(hT3)+0.2*hB3*cos(hT3)"]
+              ]
+            },
+            {
+              "pos": 840,
+              "forma": "poligono",
+              "perfil": [
+                ["=hA4*cos(hT4)-0.05*hB4*sin(hT4)", "=-hA4*sin(hT4)-0.05*hB4*cos(hT4)"],
+                ["=0.62*hA4*cos(hT4)-0.8*hB4*sin(hT4)", "=-0.62*hA4*sin(hT4)-0.8*hB4*cos(hT4)"],
+                ["=0.05*hA4*cos(hT4)-hB4*sin(hT4)", "=-0.05*hA4*sin(hT4)-hB4*cos(hT4)"],
+                ["=-0.55*hA4*cos(hT4)-0.55*hB4*sin(hT4)", "=0.55*hA4*sin(hT4)-0.55*hB4*cos(hT4)"],
+                ["=-hA4*cos(hT4)", "=hA4*sin(hT4)"],
+                ["=-0.5*hA4*cos(hT4)+0.25*hB4*sin(hT4)", "=0.5*hA4*sin(hT4)+0.25*hB4*cos(hT4)"],
+                ["=0.1*hA4*cos(hT4)+0.3*hB4*sin(hT4)", "=-0.1*hA4*sin(hT4)+0.3*hB4*cos(hT4)"],
+                ["=0.7*hA4*cos(hT4)+0.2*hB4*sin(hT4)", "=-0.7*hA4*sin(hT4)+0.2*hB4*cos(hT4)"]
+              ]
+            },
+            {
+              "pos": 890,
+              "nome": "ponta",
+              "forma": "poligono",
+              "perfil": [
+                ["=hA5*cos(hT5)-0.05*hB5*sin(hT5)", "=-hA5*sin(hT5)-0.05*hB5*cos(hT5)"],
+                ["=0.62*hA5*cos(hT5)-0.8*hB5*sin(hT5)", "=-0.62*hA5*sin(hT5)-0.8*hB5*cos(hT5)"],
+                ["=0.05*hA5*cos(hT5)-hB5*sin(hT5)", "=-0.05*hA5*sin(hT5)-hB5*cos(hT5)"],
+                ["=-0.55*hA5*cos(hT5)-0.55*hB5*sin(hT5)", "=0.55*hA5*sin(hT5)-0.55*hB5*cos(hT5)"],
+                ["=-hA5*cos(hT5)", "=hA5*sin(hT5)"],
+                ["=-0.5*hA5*cos(hT5)+0.25*hB5*sin(hT5)", "=0.5*hA5*sin(hT5)+0.25*hB5*cos(hT5)"],
+                ["=0.1*hA5*cos(hT5)+0.3*hB5*sin(hT5)", "=-0.1*hA5*sin(hT5)+0.3*hB5*cos(hT5)"],
+                ["=0.7*hA5*cos(hT5)+0.2*hB5*sin(hT5)", "=-0.7*hA5*sin(hT5)+0.2*hB5*cos(hT5)"]
+              ]
+            }
+          ],
+          "encaixa": { "ancora": "raiz", "em": "colar.+y" },
+          "cor": "preto",
+          "unidade": "helice",
+          "rotulo": "pa"
+        },
         { "arranja": { "forma": "pa", "modo": "radial", "total": 5, "eixo": "z", "centro": "cone.planoPas" } },
         {
           "id": "asaE",

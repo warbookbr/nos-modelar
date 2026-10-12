@@ -150,3 +150,28 @@ npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.
 ```
 
 Para reproduzir, ponha `"escAlturaY": 1230` no detalhe e rode o comando.
+
+## 17. A torção da pá não existe: a seção do loft não gira no próprio plano
+
+`inclinacao` do loft gira a seção em torno de u ou de v, o que a tira do plano, e nenhum campo gira a seção em torno do eixo do sólido. A pá com passo que cai de 52 para 18 graus da raiz à ponta (reprova 3 do alinhamento) só se escreve com seções `poligono` em que cada ponto traz a rotação à mão: seis seções de oito pontos, 96 expressões `=a*cos(t)-b*sin(t)` repetidas em cada seção, com os parâmetros `hA0` a `hT5`. Qualquer erro de sinal inverte o sentido da torção sem o gate acusar.
+
+```bash
+npm run esboco -- --ajuda loft
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma pa --descrever
+```
+
+## 18. O `arranja` repete uma forma só, e a pá e o colar levam dois arranjos separados
+
+O colar de cada pá e a pá são formas diferentes, e o arranjo radial aceita uma `forma` por entrada, de modo que `total`, `eixo` e `centro` ficam escritos duas vezes (nos ids `colar1` a `colar4` e `pa1` a `pa4`). Mudar o número de pás pede editar as duas entradas, e o gate não acusa se uma das duas ficar com outro `total`.
+
+```bash
+grep -n '"arranja"' docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json
+```
+
+## 19. O parâmetro do detalhe só se ajusta pelo mestre, com `--editar parametros.<nome>`
+
+Para espessar a pá depois da primeira integração (atrito 13), mudei `hB0` a `hB5` no mestre com `--editar parametros.<nome>=<valor>` e depois igualei os valores no detalhe, e só então o `--integrar` aceitou. O caminho evita o parâmetro órfão, mas o `--integrar` não o oferece na mensagem de recusa, que manda dar outro nome.
+
+```bash
+npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json parametros.hB3=30
+```
