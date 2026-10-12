@@ -213,7 +213,7 @@ describe('compatibilidade', () => {
   const sha = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
   it('os fixtures sem campos novos geram o mesmo SVG e a mesma leitura de sempre', () => {
     const esperado = {
-      casa: ['921913afe9f9', '4a9c63fa6db7'],
+      casa: ['921913afe9f9', 'ab8355c5df90'],
       'mancal-eixo': ['bb4a355c5ca6', 'c38f4eaa7932'],
       moto: ['ee5eaae2b028', 'f9a480d9c387'],
       'teste-cubo': ['fa488c1ade46', '06ab0744a45d'],

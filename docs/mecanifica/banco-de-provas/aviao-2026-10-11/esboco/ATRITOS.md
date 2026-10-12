@@ -529,3 +529,13 @@ O componente `roda` tem o eixo em x e a instância não aceita `rotacao`, de mod
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --ajuda componentes
 ```
+
+## 44. A blocagem do nível zero leva o teto inclinado da baia ao ponto mais alto, e a baia sai 19% maior na vista de frente
+
+A baia do trem principal (`baiaPrincD` e `baiaPrincE`, loft em y com a seção `teto` inclinada 7,5 graus) passava pelo tradutor como `casco-secoes`: a seção da ponta vai ao plano perpendicular ao eixo, no ponto mais extremo dela (y 959, em vez de 900 na borda baixa do teto), e a casca vira o sólido cheio. A perda `inclinacao` era declarada, mas o erro de volume do sólido externo é 18,3%, contra 10,1% da caçamba do carrinho que o teste aceita com 0,95 de IoU. A silhueta pela blocagem ficou com IoU 0,934 na isométrica e 0,878 na frontal (a baia sozinha, 0,843 na frontal), abaixo do mínimo, e `esboco-blocagem.test.mjs` reprovou `aviao-detalhe-trens-principais.esboco.json`. A causa não é o módulo `rodaGira` (com `tpCurso` 0 a rotação é identidade, e o pneu sozinho tem IoU alto) e não é a rotação em dois eixos do E5. O E43 não entra: a roda girada não é recusada, só não é exercida com `tpCurso` diferente de 0 nesta medição.
+
+A correção está em `tools/mecanifica/esboco-blocagem.mjs`: a forma cuja perda `inclinacao` muda o volume externo em mais de 15% (`MUDANCA_MAXIMA_POR_INCLINACAO`) vai para `semEquivalente` com o motivo e o percentual, e o andaime é refeito sem ela, como o tradutor já faz com a forma que gira em dois eixos. O tradutor não muda, porque o contrato dele é medir e declarar a perda (o teste do prisma oblíquo a 30 graus aceita 50%). As duas baias deixam de aparecer na imagem do `--nivel-zero`, e o limite só serve a imagem: a Maquete e a Conferência da maquete do Condutor leem o tradutor direto e seguem com a baia aproximada. Uma tradução fiel pediria que a N2 recebesse a seção inclinada, ou que o tradutor repartisse a ponta em seções recortadas pelo plano.
+
+```bash
+npx vitest run tools/mecanifica/esboco-blocagem.test.mjs -t trens-principais
+```
