@@ -211,22 +211,52 @@
   {
    "parte": "asaEsq",
    "medida": "largura",
-   "em": 650
+   "de": [
+    -6371,
+    0
+   ],
+   "ate": [
+    -870,
+    0
+   ],
+   "afasta": [
+    0,
+    250
+   ]
   },
   {
    "parte": "asaEsq",
    "medida": "altura",
-   "em": -1300
+   "em": -1300,
+   "numero": [
+    -300,
+    0
+   ]
   },
   {
    "parte": "asaDir",
    "medida": "largura",
-   "em": 650
+   "de": [
+    815,
+    -145
+   ],
+   "ate": [
+    6342,
+    -145
+   ],
+   "afasta": [
+    0,
+    395
+   ]
   },
   {
    "parte": "asaDir",
    "medida": "altura",
-   "em": 1300
+   "em": 1300,
+   "numero": [
+    300,
+    0
+   ]
   },
   {
    "parte": "aileronEsq",
@@ -486,11 +516,11 @@
   },
   "capo": {
    "marca": [
-    500,
-    2100
+    -400,
+    3200
    ],
-   "coluna": "direita",
-   "nivel": 2000
+   "coluna": "esquerda",
+   "nivel": 2200
   },
   "janelas": {
    "marca": [

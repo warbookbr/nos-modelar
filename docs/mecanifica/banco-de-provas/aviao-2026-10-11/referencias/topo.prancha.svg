@@ -109,14 +109,16 @@
 <path class="cota" d="M 560.3 819.41 L 560.3 583.15"/>
 <text x="547.05" y="839.42" class="cotat" text-anchor="middle">3566</text>
 <path class="cota" stroke-dasharray="2 2" d="M 560.3 701.28 L 559.81 830.62"/>
-<path class="cota" d="M 150.05 425.31 L 505.53 425.31"/>
-<text x="327.79" y="419.31" class="cotat" text-anchor="middle">5365</text>
+<path class="cota" d="M 138.85 451.81 L 503.32 451.81"/>
+<text x="321.09" y="445.81" class="cotat" text-anchor="middle">5501</text>
 <path class="cota" d="M 474.83 486.86 L 474.83 399.02"/>
-<text x="468.83" y="442.94" class="cotat" text-anchor="middle" transform="rotate(-90 468.83 442.94)">1326</text>
-<path class="cota" d="M 614.93 425.31 L 971.82 425.31"/>
-<text x="793.38" y="419.31" class="cotat" text-anchor="middle">5387</text>
+<text x="454.95" y="442.94" class="cotat" text-anchor="middle">1326</text>
+<path class="cota" stroke-dasharray="2 2" d="M 474.83 442.94 L 467.71 442.94"/>
+<path class="cota" d="M 614.96 451.81 L 981.16 451.81"/>
+<text x="798.06" y="445.81" class="cotat" text-anchor="middle">5527</text>
 <path class="cota" d="M 647.1 485.97 L 647.1 400.39"/>
-<text x="641.1" y="443.18" class="cotat" text-anchor="middle" transform="rotate(-90 641.1 443.18)">1292</text>
+<text x="666.97" y="443.18" class="cotat" text-anchor="middle">1292</text>
+<path class="cota" stroke-dasharray="2 2" d="M 647.1 443.18 L 654.21 443.18"/>
 <path class="cota" d="M 165.84 468.37 L 234.46 468.37"/>
 <text x="200.15" y="508.13" class="cotat" text-anchor="middle">1036</text>
 <path class="cota" stroke-dasharray="2 2" d="M 200.15 468.37 L 200.15 499.33"/>
@@ -179,9 +181,9 @@
 <circle class="lm" cx="262.81" cy="441.87" r="2.6"/>
 <text class="lmt" x="119" y="444.87" text-anchor="end">asaEsq</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 262.81 441.87 L 119 441.87"/>
-<circle class="lm" cx="594.09" cy="329.24" r="2.6"/>
-<text class="lmt" x="1001" y="338.86">capo</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 594.09 329.24 L 1001 331.26"/>
+<circle class="lm" cx="534.46" cy="256.36" r="2.6"/>
+<text class="lmt" x="119" y="325.61" text-anchor="end">capo</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 534.46 256.36 L 119 318.01"/>
 <circle class="lm" cx="558.31" cy="151.67" r="2.6"/>
 <text class="lmt" x="119" y="120.22" text-anchor="end">cone</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 558.31 151.67 L 119 122.12"/>

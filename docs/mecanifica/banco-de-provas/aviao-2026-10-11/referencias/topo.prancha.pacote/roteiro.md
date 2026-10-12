@@ -30,7 +30,15 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "escapeEsq" fica na coluna da esquerda. A chamada termina dentro de escapeEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de escapeEsq não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 5 — parabrisa
+## Etapa 5 — capo
+
+- cotas esperadas: largura (medida aqui) e comprimento (da vista lateral). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- largura: cota 1384. A linha atravessa a seção que o modelador precisa, dentro de capo?
+- comprimento: cota 1737 (lateral), tirada da vista lateral. A linha mede capo de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "capo" fica na coluna da esquerda. A chamada termina dentro de capo, e não numa vizinha?
+- linhas livres: a chamada e as cotas de capo não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 6 — parabrisa
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 1211. A linha atravessa a seção que o modelador precisa, dentro de parabrisa?
@@ -38,15 +46,15 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "parabrisa" fica na coluna da esquerda. A chamada termina dentro de parabrisa, e não numa vizinha?
 - linhas livres: a chamada e as cotas de parabrisa não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 6 — asaEsq
+## Etapa 7 — asaEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 5365. A linha atravessa a seção que o modelador precisa, dentro de asaEsq?
+- largura: cota 5501. A linha atravessa a seção que o modelador precisa, dentro de asaEsq?
 - comprimento: cota 1326. A linha mede asaEsq de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "asaEsq" fica na coluna da esquerda. A chamada termina dentro de asaEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de asaEsq não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 7 — aileronEsq
+## Etapa 8 — aileronEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 1036. A linha atravessa a seção que o modelador precisa, dentro de aileronEsq?
@@ -54,7 +62,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "aileronEsq" fica na coluna da esquerda. A chamada termina dentro de aileronEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de aileronEsq não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 8 — flapEsq
+## Etapa 9 — flapEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 3745. A linha atravessa a seção que o modelador precisa, dentro de flapEsq?
@@ -62,7 +70,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "flapEsq" fica na coluna da esquerda. A chamada termina dentro de flapEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de flapEsq não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 9 — deriva
+## Etapa 10 — deriva
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 145. A linha atravessa a seção que o modelador precisa, dentro de deriva?
@@ -70,7 +78,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "deriva" fica na coluna da esquerda. A chamada termina dentro de deriva, e não numa vizinha?
 - linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 10 — estabilizadorEsq
+## Etapa 11 — estabilizadorEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 2141. A linha atravessa a seção que o modelador precisa, dentro de estabilizadorEsq?
@@ -78,7 +86,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "estabilizadorEsq" fica na coluna da esquerda. A chamada termina dentro de estabilizadorEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de estabilizadorEsq não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 11 — profundorEsq
+## Etapa 12 — profundorEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 2115. A linha atravessa a seção que o modelador precisa, dentro de profundorEsq?
@@ -86,7 +94,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "profundorEsq" fica na coluna da esquerda. A chamada termina dentro de profundorEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de profundorEsq não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 12 — heliceDir
+## Etapa 13 — heliceDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (não medível: vistas discordam: lateral 188, topo 349). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 892. A linha atravessa a seção que o modelador precisa, dentro de heliceDir?
@@ -94,7 +102,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "heliceDir" fica na coluna da direita. A chamada termina dentro de heliceDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceDir não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 13 — escapeDir
+## Etapa 14 — escapeDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 238. A linha atravessa a seção que o modelador precisa, dentro de escapeDir?
@@ -102,18 +110,10 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "escapeDir" fica na coluna da direita. A chamada termina dentro de escapeDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de escapeDir não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 14 — capo
-
-- cotas esperadas: largura (medida aqui) e comprimento (da vista lateral). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 1384. A linha atravessa a seção que o modelador precisa, dentro de capo?
-- comprimento: cota 1737 (lateral), tirada da vista lateral. A linha mede capo de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "capo" fica na coluna da direita. A chamada termina dentro de capo, e não numa vizinha?
-- linhas livres: a chamada e as cotas de capo não cruzam outra linha nem passam sobre número ou nome?
-
 ## Etapa 15 — asaDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 5387. A linha atravessa a seção que o modelador precisa, dentro de asaDir?
+- largura: cota 5527. A linha atravessa a seção que o modelador precisa, dentro de asaDir?
 - comprimento: cota 1292. A linha mede asaDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "asaDir" fica na coluna da direita. A chamada termina dentro de asaDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de asaDir não cruzam outra linha nem passam sobre número ou nome?
