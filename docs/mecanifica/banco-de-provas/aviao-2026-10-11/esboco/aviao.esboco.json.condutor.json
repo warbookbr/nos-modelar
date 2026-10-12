@@ -1489,6 +1489,12 @@
       "unidade": "marco-50",
       "nota": 8,
       "motivo": "Conjunto simétrico, preso e sem ponta no ar, sem defeito estrutural. Seguem os acabamentos já apontados: ponta levantada das asas com quina na base da subida e bordo de ataque da raiz em cunha aguda; o eixo das superfícies de comando não se lê em vista nenhuma. A perna do trem principal parece muito curta, com o pneu quase colado sob a asa."
+    },
+    {
+      "ordem": 16,
+      "unidade": "trem-do-nariz",
+      "nota": 8,
+      "motivo": "Sem defeito estrutural: a unidade se prende, gira e recolhe sem atravessar capô nem fuselagem nos cortes de 45 e 80 graus. Detalhe de superfície: o cilindro amarelo do amortecedor é facetado na frontal e na superior. Folgas quase nulas, não confirmáveis nas vistas, entre pneu e coroa, pé do garfo e cubo, e atuador e perna do garfo; a haste do atuador não parece telescopar entre as poses."
     }
   ],
   "liberacoes": [

@@ -433,3 +433,18 @@ Toda forma com `de` e `para` escritos como `{ "ancora": ..., "mm": [...] }` ou `
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --descrever --completo | grep "object Object"
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma garfoNarizE
 ```
+
+## 40. O crítico só vê as posições do curso que o esbocista escolhe mostrar
+
+O trem do nariz recolhe sem achado até 85 graus e, a partir de 90, a roda
+atravessa capô, duto e fuselagem, porque não há alojamento (atrito 26). O
+esbocista relatou isso por escrito, mas as imagens extras do brief foram as de
+45 e 80 graus, e o crítico deu 8 dizendo que a unidade "recolhe sem atravessar o
+capô nem a fuselagem". O critério 5 do alinhamento (nenhuma travessia em
+posição nenhuma do curso) ficou fora do julgamento. O processo não teria pego
+sozinho: a sessão principal só soube pelo relato. Falta o brief da unidade com
+mecanismo trazer o fim do curso declarado, ou o gate varrer o curso (atrito 38).
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma rodaNariz
+```
