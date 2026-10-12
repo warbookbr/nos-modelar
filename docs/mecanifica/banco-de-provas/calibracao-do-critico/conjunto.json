@@ -949,6 +949,49 @@
           "briefSha256": "sha256:4142b388e940867b86f4f66a7fa630065c36ad577ee9aa0f44e90c1343514a42",
           "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
           "data": "2026-10-12T22:54:04.783Z"
+        },
+        {
+          "nota": 3,
+          "defeitos": [
+            {
+              "parte": "cubo",
+              "tipo": "ausencia",
+              "onde": "centro da face, vista lateral e isométrica",
+              "sentido": "faltando",
+              "evidencia": "A face é um disco liso e fechado, sem furo central e sem nenhum cubo visível, nem em corte nem em relevo."
+            },
+            {
+              "parte": "furosDeFixacao",
+              "tipo": "ausencia",
+              "onde": "círculo de fixação em volta do centro da face, vista lateral",
+              "sentido": "faltando",
+              "evidencia": "Não há nenhum furo na face, nem um no topo nem em círculo."
+            },
+            {
+              "parte": "raiosOuChapa",
+              "tipo": "ausencia",
+              "onde": "entre o centro e a parede do aro, vista lateral",
+              "sentido": "faltando",
+              "evidencia": "Nenhum raio nem chapa visíveis. A face fechada cobre tudo, e o objeto lê como tambor maciço."
+            },
+            {
+              "parte": "aroEPneu",
+              "tipo": "ausencia",
+              "onde": "corpo cilíndrico, vistas de lado",
+              "sentido": "faltando",
+              "evidencia": "Aro e pneu não se distinguem entre si. Há um único cilindro liso, sem talão, sem barril e sem bojo ou ombro de pneu."
+            },
+            {
+              "parte": "corpoCilindrico",
+              "tipo": "superficie",
+              "onde": "casca cilíndrica, vistas de lado (frontal e superior)",
+              "sentido": "facetado",
+              "evidencia": "O sombreado mostra faixas horizontais regulares ao longo do corpo, o que sugere revolução com poucos lados. É detalhe de superfície."
+            }
+          ],
+          "briefSha256": "sha256:4142b388e940867b86f4f66a7fa630065c36ad577ee9aa0f44e90c1343514a42",
+          "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
+          "data": "2026-10-12T22:55:21.828Z"
         }
       ]
     },
@@ -1288,6 +1331,28 @@
           "briefSha256": "sha256:c2745bceba3c5a2dd31174b3774b648cdcf77af0578d21f604099d127938ab51",
           "imagemSha256": "sha256:c4181865e10ceb5d00f8a95769269ae3e87c004956054093c8f3147a80c1fa37",
           "data": "2026-10-12T22:54:52.165Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c09",
+      "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
+      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "furos de fixação",
+              "tipo": "superficie",
+              "onde": "os seis furos das duas folhas",
+              "sentido": "facetado",
+              "evidencia": "Na vista frontal (x≈408 e x≈692, y≈390, 620, 852) e na isométrica, os furos são polígonos de uns 12 lados e leem como prisma, não como cilindro."
+            }
+          ],
+          "briefSha256": "sha256:e1a51c9c338f1361df8739e518e3c54cc090f8bfb03d5ef1e497412fe74e0aa8",
+          "imagemSha256": "sha256:f5f678f83b105717c53786e7b13fb320fdcfddddee47099fd0b851f0fac64db0",
+          "data": "2026-10-12T22:55:21.246Z"
         }
       ]
     }
