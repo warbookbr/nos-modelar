@@ -13,7 +13,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | # | Ferramenta | Tipo | Objetos | Famílias | Aqui | O que automatiza |
 |---|---|---|---|---|---|---|
 | 1 | casca com espessura (`casca`) | modificador | 125 (34%) | 25 | parcial | transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete) |
-| 2 | articulações (`articula`) | especializado | 93 (25%) | 25 | parcial | gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta |
+| 2 | articulações (`articula`) | especializado | 95 (26%) | 25 | parcial | gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta |
 | 3 | estrutura de barras (`barras`) | gerador | 72 (20%) | 19 | parcial | faz uma rede de nós e barras com perfil, juntas nos nós e padrões de treliça prontos (quadro tubular, treliça, andaime, torre, grade de arame) |
 | 4 | repetição em série (`repete`) | modificador | 69 (19%) | 24 | parcial | copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, com contagem e passo |
 | 5 | chapa dobrada (`chapa`) | gerador | 62 (17%) | 16 | parcial | faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico) |
@@ -30,7 +30,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
 | 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | não | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
 | 18 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
-| 19 | atuador linear (`atuador`) | especializado | 24 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
+| 19 | atuador linear (`atuador`) | especializado | 25 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
 | 20 | móvel modular (`movel`) | gerador | 23 (6%) | 6 | parcial | faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos |
 | 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | parcial | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
@@ -39,10 +39,10 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 25 | polia e correia (`polia`) | especializado | 18 (5%) | 7 | não | gera polias em V ou dentadas e a correia fechada que as envolve na posição certa |
 | 26 | perfil aerodinâmico e pás (`aerofolio`) | gerador | 17 (5%) | 6 | não | gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás |
 | 27 | elementos de construção (`arquitetura`) | gerador | 13 (4%) | 6 | não | faz parede com aberturas, laje, telhado de águas e escada por espelho e piso |
-| 28 | dobrar, torcer e afunilar (`deforma`) | modificador | 11 (3%) | 9 | não | deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide) |
-| 29 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | parcial | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
-| 30 | lâmina e dentes de corte (`lamina`) | especializado | 10 (3%) | 6 | não | gera gume afiado, serrilha e dentes de serra ao longo de uma borda |
-| 31 | corte e união gerais (`booleana`) | modificador | 9 (2%) | 8 | parcial | subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas |
+| 28 | corte e união gerais (`booleana`) | modificador | 11 (3%) | 9 | parcial | subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas |
+| 29 | dobrar, torcer e afunilar (`deforma`) | modificador | 11 (3%) | 9 | não | deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide) |
+| 30 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | parcial | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
+| 31 | lâmina e dentes de corte (`lamina`) | especializado | 10 (3%) | 6 | não | gera gume afiado, serrilha e dentes de serra ao longo de uma borda |
 | 32 | hélice (`helice`) | gerador | 9 (2%) | 3 | parcial | gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol) |
 | 33 | encaixe por pressão (`encaixe`) | especializado | 8 (2%) | 4 | não | gera clipe, gancho elástico e engate entre duas peças, com a folga certa |
 | 34 | placa de circuito (`pcb`) | gerador | 8 (2%) | 7 | não | faz a placa com furos de fixação e componentes por encapsulamento padrão |
@@ -60,7 +60,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 As ferramentas que não existem ou existem em parte, na mesma ordem, com o que já há.
 
 - casca com espessura (`parcial`, 125 objetos): a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem.
-- articulações (`parcial`, 93 objetos): extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não.
+- articulações (`parcial`, 95 objetos): extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não.
 - estrutura de barras (`parcial`, 72 objetos): extensão nativa `estruturaDeBarras` do núcleo: barras de tubo ou perfil maciço entre nós, com corte de ponta e massa; juntas soldadas e padrões não; tubo do esboço.
 - repetição em série (`parcial`, 69 objetos): arranja linear e radial no esboço e no núcleo, e ao longo de tubo no esboço; grade 2D não.
 - chapa dobrada (`parcial`, 62 objetos): extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não.
@@ -77,7 +77,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - molas (`parcial`, 26 objetos): componente mola do esboço, só compressão e três voltas.
 - rosca (`não`, 26 objetos): nem esboço nem núcleo.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
-- atuador linear (`parcial`, 24 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
+- atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
 - móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`: nove perfis (roupeiro, guarda-roupa, de correr, armário aéreo e de chão, cômoda, criado-mudo, estante, gaveteiro) com portas embutidas, sobrepostas e de correr, gavetas e curso conferido; cadeira, mesa e sofá não.
 - fixadores normalizados (`parcial`, 21 objetos): componente parafuso do esboço, sem norma nem porca.
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
@@ -86,10 +86,10 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - polia e correia (`não`, 18 objetos): nem esboço nem núcleo.
 - perfil aerodinâmico e pás (`não`, 17 objetos): nem esboço nem núcleo.
 - elementos de construção (`não`, 13 objetos): nem esboço nem núcleo.
+- corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar; esboço: só furos na caixa.
 - dobrar, torcer e afunilar (`não`, 11 objetos): nem esboço nem núcleo.
 - rolamentos e buchas (`parcial`, 11 objetos): componentes rolamento e mancal do esboço, sem pista nem gaiola.
 - lâmina e dentes de corte (`não`, 10 objetos): nem esboço nem núcleo.
-- corte e união gerais (`parcial`, 9 objetos): núcleo: subtrair, unir, intersectar; esboço: só furos na caixa.
 - hélice (`parcial`, 9 objetos): componente mola do esboço, com três voltas fixas.
 - encaixe por pressão (`não`, 8 objetos): nem esboço nem núcleo.
 - placa de circuito (`não`, 8 objetos): nem esboço nem núcleo.
@@ -130,7 +130,7 @@ Transforma um sólido fechado numa parede de espessura constante, com faces aber
 
 ### articulações (`articula`)
 
-Gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta. Parâmetros: tipo, diâmetro do pino, abas, ângulo. Referências: BOSL2: hinges; Onshape e Fusion: juntas de montagem. Aqui: parcial, extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não. Atende 93 objetos em 25 famílias.
+Gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta. Parâmetros: tipo, diâmetro do pino, abas, ângulo. Referências: BOSL2: hinges; Onshape e Fusion: juntas de montagem. Aqui: parcial, extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não. Atende 95 objetos em 25 famílias.
 
 ### estrutura de barras (`barras`)
 
@@ -234,7 +234,7 @@ Gera mola de compressão, tração com ganchos e torção com braços, com espir
 
 ### atuador linear (`atuador`)
 
-Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não. Atende 24 objetos em 10 famílias.
+Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não. Atende 25 objetos em 10 famílias.
 
 ### móvel modular (`movel`)
 
@@ -248,13 +248,13 @@ Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: ti
 
 Aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face. Parâmetros: padrão, passo, profundidade, face. Referências: BOSL2: knurling e textures; Blender: Displace com textura de imagem. Aqui: parcial, núcleo: displace com ruído; padrão regular não existe. Atende 21 objetos em 10 famílias.
 
+### corte e união gerais (`booleana`)
+
+Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar; esboço: só furos na caixa. Atende 11 objetos em 9 famílias.
+
 ### rolamentos e buchas (`rolamento`)
 
 Gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação. Parâmetros: série e tamanho, tipo. Referências: FreeCAD: Fasteners e Parts Library; catálogos de fabricantes em STEP. Aqui: parcial, componentes rolamento e mancal do esboço, sem pista nem gaiola. Atende 11 objetos em 4 famílias.
-
-### corte e união gerais (`booleana`)
-
-Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar; esboço: só furos na caixa. Atende 9 objetos em 8 famílias.
 
 ### hélice (`helice`)
 
@@ -302,8 +302,8 @@ Gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico
 
 | Objeto | Ferramentas |
 |---|---|
-| avião comercial | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, repetição em série, atuador linear |
-| avião de pequeno porte | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu |
+| avião comercial | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, repetição em série, atuador linear, articulações, corte e união gerais |
+| avião de pequeno porte | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, articulações, atuador linear, corte e união gerais |
 | planador | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura |
 | helicóptero | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, estrutura de barras, articulações |
 | drone multirrotor | perfil aerodinâmico e pás, gabinete, perfil estrutural, repetição em série, placa de circuito |
