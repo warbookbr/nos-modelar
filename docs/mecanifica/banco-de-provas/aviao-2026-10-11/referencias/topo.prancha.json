@@ -1,0 +1,79 @@
+{
+  "cotas": [
+    { "parte": "cone", "medida": "largura", "em": 4700, "numero": [0, 600] },
+    { "parte": "cone", "medida": "altura", "em": 100, "numero": [350, 400] },
+
+    { "parte": "heliceEsq", "medida": "largura", "em": 4590, "numero": [-850, 0] },
+    { "parte": "heliceEsq", "medida": "altura", "medivel": false, "motivo": "pá vista no passo, sem a corda", "notaEm": [-6400, 3100] },
+    { "parte": "heliceDir", "medida": "largura", "em": 4590, "numero": [850, 0] },
+    { "parte": "heliceDir", "medida": "altura", "medivel": false, "motivo": "pá vista no passo, sem a corda", "notaEm": [1700, 3100] },
+
+    { "parte": "escapeEsq", "medida": "largura", "em": 3950, "numero": [-850, 0] },
+    { "parte": "escapeEsq", "medida": "altura", "em": -500, "numero": [-600, 160] },
+    { "parte": "escapeDir", "medida": "largura", "em": 3950, "numero": [850, 0] },
+    { "parte": "escapeDir", "medida": "altura", "em": 560, "numero": [540, 156] },
+
+    { "parte": "capo", "medida": "largura", "em": 2400 },
+    { "parte": "capo", "medida": "altura", "em": -300, "origem": { "imagem": "lateral", "medida": "largura" }, "de": "fim", "numero": [1750, -607] },
+
+    { "parte": "parabrisa", "medida": "largura", "em": 1650 },
+    { "parte": "parabrisa", "medida": "altura", "em": -100, "numero": [-220, -216] },
+
+    { "parte": "janelas", "medida": "largura", "medivel": false, "motivo": "só a faixa na curva do costado", "notaEm": [-6400, 2600] },
+    { "parte": "janelas", "medida": "altura", "em": 640, "numero": [610, 208] },
+
+    { "parte": "fuselagem", "medida": "largura", "em": 0, "numero": [-350, 90] },
+    { "parte": "fuselagem", "medida": "altura", "em": 100, "numero": [1200, -500] },
+
+    { "parte": "deriva", "medida": "largura", "medivel": false, "motivo": "de topo é um traço de 5 px", "notaEm": [-6400, 2100] },
+    { "parte": "deriva", "medida": "altura", "em": -10, "numero": [0, -2045] },
+
+    { "parte": "asaEsq", "medida": "largura", "em": 300 },
+    { "parte": "asaEsq", "medida": "altura", "em": -1300 },
+    { "parte": "asaDir", "medida": "largura", "em": 300 },
+    { "parte": "asaDir", "medida": "altura", "em": 1300 },
+
+    { "parte": "aileronEsq", "medida": "largura", "em": 60, "numero": [0, -510] },
+    { "parte": "aileronEsq", "medida": "altura", "em": -5050, "numero": [0, -395] },
+    { "parte": "aileronDir", "medida": "largura", "em": 60, "numero": [0, -510] },
+    { "parte": "aileronDir", "medida": "altura", "em": 5050, "numero": [0, -395] },
+
+    { "parte": "flapEsq", "medida": "largura", "de": [-4905, -184], "ate": [-1170, -461], "numero": [0, -358] },
+    { "parte": "flapEsq", "medida": "altura", "em": -2150, "numero": [0, -311] },
+    { "parte": "flapDir", "medida": "largura", "de": [945, -522], "ate": [4880, -144], "numero": [0, -347] },
+    { "parte": "flapDir", "medida": "altura", "em": 2150, "numero": [0, -292] },
+
+    { "parte": "estabilizadorEsq", "medida": "largura", "em": -4500 },
+    { "parte": "estabilizadorEsq", "medida": "altura", "em": -1700 },
+    { "parte": "estabilizadorDir", "medida": "largura", "em": -4500 },
+    { "parte": "estabilizadorDir", "medida": "altura", "em": 1800 },
+
+    { "parte": "profundorEsq", "medida": "largura", "em": -4950, "numero": [0, -610] },
+    { "parte": "profundorEsq", "medida": "altura", "em": -1600, "numero": [-300, -653] },
+    { "parte": "profundorDir", "medida": "largura", "em": -4950, "numero": [0, -610] },
+    { "parte": "profundorDir", "medida": "altura", "em": 1600, "numero": [300, -653] }
+  ],
+  "nomes": {
+    "cone": { "marca": [-40, 4780], "coluna": "esquerda", "nivel": 5300 },
+    "heliceEsq": { "marca": [-420, 4330], "coluna": "esquerda", "nivel": 4420 },
+    "escapeEsq": { "marca": [-600, 3800], "coluna": "esquerda", "nivel": 3700 },
+    "parabrisa": { "marca": [-380, 1330], "coluna": "esquerda", "nivel": 1400 },
+    "asaEsq": { "marca": [-4500, 600], "coluna": "esquerda", "nivel": 600 },
+    "aileronEsq": { "marca": [-5750, 0], "coluna": "esquerda", "nivel": -600 },
+    "flapEsq": { "marca": [-1400, -444], "coluna": "esquerda", "nivel": -3000 },
+    "deriva": { "marca": [-12, -3055], "coluna": "esquerda", "nivel": -3300 },
+    "estabilizadorEsq": { "marca": [-2150, -4300], "coluna": "esquerda", "nivel": -4300 },
+    "profundorEsq": { "marca": [-2050, -4830], "coluna": "esquerda", "nivel": -4830 },
+
+    "heliceDir": { "marca": [420, 4330], "coluna": "direita", "nivel": 4420 },
+    "escapeDir": { "marca": [700, 3800], "coluna": "direita", "nivel": 3700 },
+    "capo": { "marca": [300, 3500], "coluna": "direita", "nivel": 3500 },
+    "janelas": { "marca": [630, 950], "coluna": "direita", "nivel": 2400 },
+    "asaDir": { "marca": [4500, 600], "coluna": "direita", "nivel": 600 },
+    "aileronDir": { "marca": [5750, 0], "coluna": "direita", "nivel": -600 },
+    "flapDir": { "marca": [1300, -460], "coluna": "direita", "nivel": -3000 },
+    "fuselagem": { "marca": [300, -1000], "coluna": "direita", "nivel": -3300 },
+    "estabilizadorDir": { "marca": [2150, -4300], "coluna": "direita", "nivel": -4300 },
+    "profundorDir": { "marca": [2050, -4830], "coluna": "direita", "nivel": -4830 }
+  }
+}

@@ -38,3 +38,17 @@ sintoma pelo crítico, e o teste novo passa a pegar a causa.
 ```bash
 npx vitest run modulos/contorno-da-imagem
 ```
+
+## 3. Parte em vários pedaços fica só com o maior no contorno
+
+O contorno em milímetro guarda, de cada parte, só o maior pedaço da região
+(`regioes.js`, `findContours` com `RETR_EXTERNAL` e o de maior área). Na
+lateral, a hélice ficou só com a pá de baixo (869 mm de altura no contorno), e a cota de altura da prancha mede uma pá,
+752 mm, e não o diâmetro de cerca de 2.100 mm; as janelas ficaram só com a
+primeira atrás do para-brisa. O desenhista da prancha achou ao cotar. O
+processo não teria pego sozinho: o crítico do contorno julga a pintura, que
+mostra todos os pedaços, e o contorno guardado não aparece para ele.
+
+```bash
+node -e "const d=require('./docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.contornos.json'); const y=d.regioes.helice.contornoMm.map(p=>p[1]); console.log('altura do contorno da hélice', Math.round(Math.max(...y)-Math.min(...y)), 'mm')"
+```
