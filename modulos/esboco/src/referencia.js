@@ -49,13 +49,23 @@ function formaDoContorno(pontos, onde) {
   return { aneis: [pontos], caixa: [Math.min(...pontos.map((p) => p[0])), Math.min(...pontos.map((p) => p[1])), Math.max(...pontos.map((p) => p[0])), Math.max(...pontos.map((p) => p[1]))] };
 }
 
+/* A forma de uma região: o `contornoMm` do maior pedaço, ou, se o arquivo traz `pedacos`, todos eles como anéis disjuntos
+   (o preenchimento é par-ímpar, e anéis separados enchem cada um o seu pedaço). Uma parte que a imagem mostra em pedaços, como a
+   hélice do avião cortada pelo cone em duas pás, comparada só com o maior pedaço reprovava um esboço que tem as duas pás e
+   medida a altura de uma pá; a conferência é do que a parte mostra inteira. */
+function formaDaRegiao(r, onde) {
+  const lista = Array.isArray(r.pedacos) && r.pedacos.length ? r.pedacos.map((p, k) => formaDoContorno(p?.contornoMm, `${onde}, pedaço ${k + 1}`)) : [formaDoContorno(r.contornoMm, onde)];
+  const caixas = lista.map((f) => f.caixa);
+  return { aneis: lista.flatMap((f) => f.aneis), caixa: [Math.min(...caixas.map((c) => c[0])), Math.min(...caixas.map((c) => c[1])), Math.max(...caixas.map((c) => c[2])), Math.max(...caixas.map((c) => c[3]))] };
+}
+
 /* O JSON de contornos da imagem (`mecanifica.contornos@1`) lido: { silhueta, regioes: { nome: forma }, mmPorPx }. */
 export function lerContornos(json, onde = 'referência') {
   exigir(objeto(json) && json.formato === FORMATO_DOS_CONTORNOS, `${onde}: o arquivo de contornos deve ter "formato": "${FORMATO_DOS_CONTORNOS}" (o que o contorno da imagem grava)`);
   exigir(objeto(json.silhueta) && Array.isArray(json.silhueta.contornoMm), `${onde}: falta "silhueta.contornoMm", o contorno da silhueta inteira em milímetro`);
   const regioes = {};
   for (const [nome, r] of Object.entries(objeto(json.regioes) ? json.regioes : {})) {
-    if (objeto(r) && Array.isArray(r.contornoMm) && r.contornoMm.length >= 3) regioes[nome] = formaDoContorno(r.contornoMm, `${onde}: região "${nome}"`);
+    if (objeto(r) && Array.isArray(r.contornoMm) && r.contornoMm.length >= 3) regioes[nome] = formaDaRegiao(r, `${onde}: região "${nome}"`);
   }
   return { silhueta: formaDoContorno(json.silhueta.contornoMm, `${onde}: silhueta`), regioes, mmPorPx: Number.isFinite(json.mmPorPx) ? json.mmPorPx : null };
 }

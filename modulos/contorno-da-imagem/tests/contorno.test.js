@@ -4,7 +4,7 @@
    limite das rodadas. */
 import { describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
-import { segmentar, sobreposicao, svgDoMapa, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada } from '../src/index.js';
+import { segmentar, sobreposicao, svgDoMapa, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada, MINIMO_DO_PEDACO_PX2 } from '../src/index.js';
 
 /* Fundo branco, dois retângulos do mesmo cinza encostados, com uma linha um
    pouco mais escura entre eles, como a costura de duas partes. */
@@ -54,6 +54,32 @@ describe('contorno da imagem', () => {
     expect(dono(15, 30)).toBe(seg.regioes.lados.rotulo);
     expect(dono(105, 30)).toBe(seg.regioes.lados.rotulo);
     expect(dono(60, 30)).toBe(seg.regioes.meio.rotulo);
+  });
+
+  it('guarda todos os pedaços de uma parte, o maior primeiro, e descarta só o que é ruído', async () => {
+    /* Como a hélice do avião: a parte aparece dos dois lados da vizinha. Abaixo da faixa, duas ilhas da mesma parte, uma de
+       5 x 5 px (área de contorno 16, a menor que o avião tem) e outra de 3 x 3 (área 4, ruído do watershed). */
+    const png = new PNG({ width: 120, height: 60 });
+    for (let y = 0; y < 60; y += 1) for (let x = 0; x < 120; x += 1) {
+      const o = (y * 120 + x) * 4;
+      const faixa = x >= 10 && x < 110 && y >= 15 && y < 45;
+      const ilha = (x >= 38 && x < 43 && y >= 50 && y < 55) || (x >= 19 && x < 22 && y >= 51 && y < 54);
+      const v = !(faixa || ilha) ? 250 : (faixa && (x === 40 || x === 80) ? 110 : 150);
+      png.data[o] = v; png.data[o + 1] = v; png.data[o + 2] = v; png.data[o + 3] = 255;
+    }
+    const seg = await segmentar(PNG.sync.write(png), { limiar: 225, regioes: { lados: [[[20, 25], [20, 35]], [[100, 25], [100, 35]], [40, 52], [20, 52]], meio: [60, 30] } });
+    const { pedacos, areaPx, contornoPx } = seg.regioes.lados;
+    expect(pedacos).toHaveLength(3);
+    expect(pedacos.map((p) => p.areaPx)).toEqual([...pedacos.map((p) => p.areaPx)].sort((a, b) => b - a));
+    expect(pedacos[2].areaPx).toBe(16);
+    expect(MINIMO_DO_PEDACO_PX2).toBeGreaterThan(4);
+    expect(MINIMO_DO_PEDACO_PX2).toBeLessThanOrEqual(16);
+    /* O campo de sempre continua sendo o do maior pedaço, e uma parte inteira num pedaço só tem um. */
+    expect(areaPx).toBe(pedacos[0].areaPx);
+    expect(contornoPx).toEqual(pedacos[0].contornoPx);
+    const xs = (p) => p.contornoPx.map(([x]) => x);
+    expect(pedacos.slice(0, 2).map((p) => [Math.min(...xs(p)) < 40, Math.max(...xs(p)) > 80]).sort()).toEqual([[false, true], [true, false]]);
+    expect(seg.regioes.meio.pedacos).toHaveLength(1);
   });
 
   it('separa duas partes do mesmo cinza na costura entre elas', async () => {

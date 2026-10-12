@@ -64,6 +64,14 @@ export async function contornosDaImagem(pngBuffer, config) {
       areaMm2: Math.round(r.areaPx * mm2),
       contornoPx: r.contornoPx,
       contornoMm: r.contornoPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
+      /* Todos os pedaços da parte, do maior para o menor; o primeiro repete os
+         campos acima. É daqui que a prancha tira a medida de uma parte que a
+         imagem mostra em pedaços, como a hélice cortada pelo cone. */
+      pedacos: r.pedacos.map((p) => ({
+        areaMm2: Math.round(p.areaPx * mm2),
+        contornoPx: p.contornoPx,
+        contornoMm: p.contornoPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
+      })),
     };
   }
   const silhuetaPx = await contornoDaSilhueta(seg, { sem: foraDoModelo });

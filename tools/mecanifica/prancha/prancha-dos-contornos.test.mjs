@@ -256,4 +256,64 @@ describe('prancha dos contornos', () => {
     expect((r.match(/- cotas esperadas: largura \(.+\) e altura \(.+\)/g) ?? []).length).toBe(spec.resumo.partes.length);
     expect(r).toMatch(/— ombro\n\n- cotas esperadas: largura \([^)]*\) e altura \(não medível/);
   });
+
+  /* A hélice do avião vista de lado: o cone cobre o meio e sobram duas pás, uma
+     acima e outra abaixo dele. O maior pedaço (300 mm) mede só uma pá. */
+  describe('parte em vários pedaços', () => {
+    const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+    const pa = (z0, y0, z1, y1) => ({ areaMm2: (z1 - z0) * (y1 - y0), contornoMm: ret(z0, y0, z1, y1) });
+    const aviao = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(0, 0, 400, 1000), linhaDeForaMm: ret(-1, -1, 401, 1001) },
+      regioes: {
+        helice: { contornoMm: ret(20, 0, 60, 300), pedacos: [pa(20, 0, 60, 300), pa(20, 700, 60, 1000)] },
+        cone: { contornoMm: ret(20, 300, 60, 700), pedacos: [pa(20, 300, 60, 700)] },
+        corpo: { contornoMm: ret(60, 0, 400, 1000), pedacos: [pa(60, 0, 400, 1000)] },
+      },
+    };
+    const cotar = (extra = {}, base = aviao, lerVista) => specDosContornos(base, { escolhas: { cotas: [{ parte: 'helice', medida: 'altura', ...extra }] }, lerVista });
+
+    it('a altura e a largura medidas são as da união dos pedaços, e não as do maior', () => {
+      const alt = cotar().cotas.find((x) => x.dono === 'helice.altura');
+      expect(alt.texto).toBe('1000');
+      expect([alt.de[1], alt.ate[1]]).toEqual([0, 1000]);
+      /* Sem `pedacos`, o arquivo gravado antes do campo existir, vale o contornoMm: uma pá. */
+      const antigo = { ...aviao, regioes: { ...aviao.regioes, helice: { contornoMm: aviao.regioes.helice.contornoMm } } };
+      expect(cotar({}, antigo).cotas.find((x) => x.dono === 'helice.altura').texto).toBe('300');
+      /* A largura a um terço da altura da união cai no vão (y = 330), onde só há o cone: cai na caixa da união. */
+      const larg = specDosContornos(aviao, { escolhas: { cotas: [{ parte: 'helice', medida: 'largura' }] } }).cotas.find((x) => x.dono === 'helice.largura');
+      expect(larg.texto).toBe('40');
+      expect(larg.de[1]).toBeCloseTo(330, 6);
+    });
+
+    it('desenha todos os pedaços da parte, o segundo em diante marcados, e mede a forma uma vez', () => {
+      const spec = cotar();
+      const camadas = spec.camadas.filter((c) => c.nome === 'helice');
+      expect(camadas.map((c) => c.pts)).toEqual(aviao.regioes.helice.pedacos.map((p) => p.contornoMm));
+      expect(camadas.map((c) => c.pedaco)).toEqual([undefined, 2]);
+      const { relatorio } = prancha(spec);
+      expect(relatorio.alertas.filter((a) => /fora do contorno/.test(a))).toEqual([]);
+      /* A forma da parte é medida uma vez, no maior pedaço: o mesmo número de quando a parte só tinha esse pedaço. */
+      const so = { ...aviao, regioes: { ...aviao.regioes, helice: { contornoMm: aviao.regioes.helice.contornoMm } } };
+      expect(relatorio.porCamada.helice).toEqual(prancha(cotar({}, so)).relatorio.porCamada.helice);
+    });
+
+    it('o nome da parte fica dentro do maior pedaço, e não no centro da união, que cai no cone', () => {
+      const marca = cotar().landmarks.find((l) => l.id === 'helice').em;
+      expect(marca[1]).toBeGreaterThan(0);
+      expect(marca[1]).toBeLessThan(300);
+    });
+
+    it('a cota que passa por outro pedaço da mesma parte não o acusa como invasão, só o cone', () => {
+      const { desenho } = prancha(cotar({ em: 40, afasta: 0 }));
+      const invadidas = colisoesDoDesenho(desenho).filter((c) => c.tipo === 'cota sobre outra parte' && c.a === 'cota de helice.altura');
+      expect(invadidas.map((c) => c.b)).toEqual(['cone']);
+    });
+
+    it('a medida tirada de outra vista também é a da união dos pedaços dela', () => {
+      const frontal = { regioes: { helice: { contornoMm: ret(0, 0, 40, 300), pedacos: [pa(0, 0, 40, 300), pa(0, 700, 40, 1000)] } } };
+      const c = cotar({ em: 40, origem: { imagem: 'frontal' } }, aviao, () => frontal).cotas.find((x) => x.dono === 'helice.altura');
+      expect(c.texto).toBe('1000 (frontal)');
+    });
+  });
 });

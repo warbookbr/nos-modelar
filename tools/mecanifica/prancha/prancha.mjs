@@ -241,7 +241,10 @@ function medir(spec, camadas) {
     if (c.foraDoContorno && !c.motivoForaDoContorno) {
       alertas.push(`${c.nome ?? c.classe ?? 'camada'}: foraDoContorno exige motivoForaDoContorno para não silenciar um defeito`);
     }
-    if (!c.nome) continue;
+    /* Camada com `pedaco` é o segundo pedaço ou o seguinte de uma parte que a
+       imagem mostra separada por outra (a hélice cortada pelo cone): a forma
+       da parte é medida uma vez, no pedaço que vem sem `pedaco`. */
+    if (!c.nome || c.pedaco) continue;
     const m = {
       vista: c.vista,
       comprimento: n(G.comprimento(c.pl)),
@@ -513,7 +516,11 @@ export function examinarDesenho(desenho) {
   const T = desenho.textos;
   const D = DETECTOR;
   const partes = desenho.linhas.filter((l) => l.parte);
-  const parteDe = (dono) => partes.find((q) => q.dono === String(dono).split('.')[0]);
+  /* Uma parte pode ter vários contornos, um por pedaço; cota e chamada dela
+     podem passar por qualquer um, e só os de outras partes contam como invasão. */
+  const pedacosDe = (dono) => partes.filter((q) => q.dono === String(dono).split('.')[0]);
+  const dentroDe = (p, qs) => qs.some((q) => G.dentro(p, q.pts));
+  const distanciaA = (p, qs) => Math.min(...qs.map((q) => distPontoPoli(p, q.pts)));
   const sobrepoe = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
   for (let i = 0; i < T.length; i += 1) {
     for (let j = i + 1; j < T.length; j += 1) {
@@ -563,18 +570,18 @@ export function examinarDesenho(desenho) {
      outra parte aponta para ela no caminho. Cota geral e de dono sem parte
      desenhada ficam de fora. */
   for (const l of anot) {
-    const propria = parteDe(l.dono);
-    if (!propria) continue;
+    const minhas = pedacosDe(l.dono);
+    if (!minhas.length) continue;
     const amostras = amostrarLinha(l.pts);
-    const invadidas = partes.filter((q) => q !== propria && trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono);
+    const invadidas = [...new Set(partes.filter((q) => !minhas.includes(q) && trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono))];
     if (l.tipo === 'cota') {
       /* Cota desenhada onde mede, sem afastamento, que sai da própria parte
          e corre colada ao contorno de outra ou da silhueta se confunde com a
          borda; o trecho que só atravessa um vão da parte côncava não conta. */
       if (!l.deslocada) {
-        const outras = desenho.linhas.filter((q) => q.tipo === 'contorno' && q !== propria);
-        const sobre = amostras.reduce((s, { p, l: c }) => s + (!G.dentro(p, propria.pts) && distPontoPoli(p, propria.pts) > D.MARCA_NA_BORDA && outras.some((q) => distPontoPoli(p, q.pts) < D.CHAMADA_COLADA / 2) ? c : 0), 0);
-        if (sobre > D.TRECHO_COLADO) colisoes.push({ tipo: 'cota sai da parte sobre contorno', a: `cota de ${l.dono}`, b: `${n(sobre)} px fora de ${propria.dono}, colada a outro contorno`, px: n(sobre) });
+        const outras = desenho.linhas.filter((q) => q.tipo === 'contorno' && !minhas.includes(q));
+        const sobre = amostras.reduce((s, { p, l: c }) => s + (!dentroDe(p, minhas) && distanciaA(p, minhas) > D.MARCA_NA_BORDA && outras.some((q) => distPontoPoli(p, q.pts) < D.CHAMADA_COLADA / 2) ? c : 0), 0);
+        if (sobre > D.TRECHO_COLADO) colisoes.push({ tipo: 'cota sai da parte sobre contorno', a: `cota de ${l.dono}`, b: `${n(sobre)} px fora de ${minhas[0].dono}, colada a outro contorno`, px: n(sobre) });
       }
       if (invadidas.length) colisoes.push({ tipo: 'cota sobre outra parte', a: `cota de ${l.dono}`, b: invadidas.join(', ') });
       continue;
@@ -582,8 +589,8 @@ export function examinarDesenho(desenho) {
     const ehNome = !String(l.dono).includes('.');
     if (ehNome) {
       const marca = l.pts[0];
-      const borda = distPontoPoli(marca, propria.pts);
-      if (!G.dentro(marca, propria.pts) || borda < D.MARCA_NA_BORDA) colisoes.push({ tipo: 'marca fora da parte', a: `chamada de ${l.dono}`, b: G.dentro(marca, propria.pts) ? `a ${n(borda)} px da borda` : 'marca fora do contorno' });
+      const borda = distanciaA(marca, minhas);
+      if (!dentroDe(marca, minhas) || borda < D.MARCA_NA_BORDA) colisoes.push({ tipo: 'marca fora da parte', a: `chamada de ${l.dono}`, b: dentroDe(marca, minhas) ? `a ${n(borda)} px da borda` : 'marca fora do contorno' });
     }
     if (!invadidas.length) continue;
     /* Parte cercada por outras dos dois lados não tem saída limpa: a
@@ -592,7 +599,7 @@ export function examinarDesenho(desenho) {
     const marca = l.pts[0];
     const xs = partes.flatMap((q) => q.pts.map(([x]) => x));
     const saida = (x) => amostrarLinha([marca, [x, marca[1]]]);
-    const livre = [Math.min(...xs) - 10, Math.max(...xs) + 10].some((x) => partes.every((q) => q === propria || trechoDentro(saida(x), q.pts, 1.5) <= D.INVASAO_MIN));
+    const livre = [Math.min(...xs) - 10, Math.max(...xs) + 10].some((x) => partes.every((q) => minhas.includes(q) || trechoDentro(saida(x), q.pts, 1.5) <= D.INVASAO_MIN));
     const registro = { tipo: 'chamada atravessa parte', a: `chamada de ${l.dono}`, b: invadidas.join(', ') };
     if (livre || !ehNome) colisoes.push(registro); else avisos.push({ ...registro, motivo: `${l.dono} não tem saída horizontal livre para nenhum dos lados` });
   }

@@ -123,6 +123,27 @@ describe('a silhueta do esboço contra o contorno de referência', () => {
     expect(() => conferirReferenciaNaOpcao({ arquivo: 'r.json', vista: 'frontal', partes: { inexistente: ['base'] } }, ref, x, v, 0)).toThrow(/cita a região "inexistente", que o arquivo não tem \(regiões: base, apoio, topo, fantasma\)/);
   });
 
+  it('uma região em pedaços é conferida e medida pela união deles, e não só pelo maior', () => {
+    /* A coluna da lateral cortada em duas metades, como a hélice do avião, que a imagem mostra em duas pás separadas pelo cone:
+       o contornoMm é o do maior pedaço e `pedacos` traz todos. */
+    const metades = [retangulo(300, 100, 350, 300), retangulo(350, 100, 400, 300)];
+    const lat = SILHUETAS.lateral;
+    const ler = (extra) => lerContornos({ formato: 'mecanifica.contornos@1', mmPorPx: 1, silhueta: { contornoMm: lat.silhueta }, regioes: { base: { contornoMm: lat.base }, coluna: { contornoMm: metades[0], ...extra } } });
+    const x = expandirEsboco(esboco());
+    const conferirCom = (ref) => conferirReferenciaNaOpcao({ arquivo: 'r.json', vista: 'lateral', tolerancia: 10, iou_min: 0.9 }, ref, x, visiveisDoEsboco(x), 0);
+    const inteira = ler({ pedacos: metades.map((contornoMm) => ({ contornoMm })) });
+    expect(inteira.regioes.coluna.aneis).toHaveLength(2);
+    expect(inteira.regioes.coluna.caixa).toEqual([300, 100, 400, 300]);
+    expect(parte(conferirCom(inteira), 'coluna').ok).toBe(true);
+    expect(parte(conferirCom(inteira), 'coluna').iou).toBeGreaterThan(0.95);
+    /* Sem `pedacos`, o arquivo de antes do campo, só vale o maior pedaço e o esboço inteiro reprova. */
+    const somenteMaior = ler({});
+    expect(somenteMaior.regioes.coluna.aneis).toHaveLength(1);
+    expect(parte(conferirCom(somenteMaior), 'coluna').ok).toBe(false);
+    const tamanho = (ref, eixo) => medidasDaReferencia(ref, 'lateral').linhas.find((l) => l.parte === 'coluna').eixos.find((e) => e.eixo === eixo).tamanho;
+    expect([tamanho(inteira, 'z'), tamanho(somenteMaior, 'z')]).toEqual([100, 50]);
+  });
+
   it('é determinística', () => {
     expect(JSON.stringify(conferir('lateral', { dh: 7, dv: 3 }))).toBe(JSON.stringify(conferir('lateral', { dh: 7, dv: 3 })));
   });

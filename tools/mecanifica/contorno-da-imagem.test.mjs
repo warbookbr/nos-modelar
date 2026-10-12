@@ -21,6 +21,21 @@ describe('contorno da imagem', () => {
     await expect(contornosDaImagem(imagem, { ...regioes, regioes: { a: [380] } })).rejects.toThrow(/semente inválida/);
   }, 60000);
 
+  it('guarda em milímetro todos os pedaços de uma parte, com o maior igual ao contorno de sempre', async () => {
+    const frontal = readFileSync(new URL('frontal.png', pasta));
+    const config = JSON.parse(readFileSync(new URL('frontal.regioes.json', pasta), 'utf8'));
+    const { resultado: { regioes: r } } = await contornosDaImagem(frontal, config);
+    /* A carcaça do punho aparece de frente dos dois lados do antebraço. */
+    const carcaca = r.carcacaPunho;
+    expect(carcaca.pedacos).toHaveLength(2);
+    expect(carcaca.pedacos[0].areaMm2).toBeGreaterThanOrEqual(carcaca.pedacos[1].areaMm2);
+    expect(carcaca.pedacos[0].contornoMm).toEqual(carcaca.contornoMm);
+    expect(carcaca.pedacos[0].areaMm2).toBe(carcaca.areaMm2);
+    const xs = carcaca.pedacos.map((p) => p.contornoMm.map(([x]) => x));
+    expect(Math.max(...xs[0]) < Math.min(...xs[1]) || Math.max(...xs[1]) < Math.min(...xs[0])).toBe(true);
+    for (const parte of Object.values(r)) expect(parte.pedacos.length).toBeGreaterThanOrEqual(1);
+  }, 60000);
+
   it('separa o ombro da coluna, que têm o mesmo cinza', async () => {
     const { resultado: { regioes: r } } = await contornosDaImagem(imagem, regioes);
     expect(r.ombro.areaMm2).toBeGreaterThan(5000);

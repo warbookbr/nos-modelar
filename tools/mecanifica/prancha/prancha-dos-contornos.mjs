@@ -53,6 +53,13 @@ const TELA = { largura: 1200, altura: 900 };
 export const TOLERANCIA_ENTRE_VISTAS = { fracao: 0.03, mm: 5 };
 const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
 
+/* Os contornos de uma parte em milímetro, um por pedaço, do maior para o
+   menor. Contorno gravado antes de `pedacos` existir tem um só, o `contornoMm`.
+   A largura e a altura medidas de uma parte são as da união dos pedaços: na
+   lateral do avião a cota da hélice media uma pá (752 mm) porque a parte só
+   guardava o maior pedaço, e o diâmetro é de cerca de 2.100 mm. */
+const pedacosDe = (regiao) => (regiao.pedacos?.length ? regiao.pedacos.map((p) => p.contornoMm) : [regiao.contornoMm]);
+
 export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos contornos da imagem', fonte = 'imagem de referência', escolhas = {}, lerVista = null } = {}) {
   const silhueta = contornos.silhueta?.contornoMm;
   if (!Array.isArray(silhueta) || silhueta.length < 3) throw new Error('o arquivo de contornos não traz a silhueta; gere de novo com `npm run contorno`.');
@@ -75,13 +82,18 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
      primeira versão punha a largura na borda de baixo da caixa da parte e a
      altura na borda esquerda, e o crítico achou a largura do braço no pé do
      ombro e as alturas empilhadas umas sobre as outras. */
-  const secao = (pts, eixo, valor) => {
+  /* A seção corta todos os pedaços da parte e vai do primeiro corte ao último:
+     a altura da hélice do avião passa pelas duas pás e mede o diâmetro, e não
+     uma pá. Com um pedaço só é a conta de sempre. */
+  const secao = (aneis, eixo, valor) => {
     const cortes = [];
-    for (let i = 0; i < pts.length; i += 1) {
-      const a = pts[i]; const b = pts[(i + 1) % pts.length];
-      const [ua, va] = eixo === 'y' ? [a[1], a[0]] : [a[0], a[1]];
-      const [ub, vb] = eixo === 'y' ? [b[1], b[0]] : [b[0], b[1]];
-      if ((ua - valor) * (ub - valor) <= 0 && ua !== ub) cortes.push(va + ((valor - ua) * (vb - va)) / (ub - ua));
+    for (const pts of aneis) {
+      for (let i = 0; i < pts.length; i += 1) {
+        const a = pts[i]; const b = pts[(i + 1) % pts.length];
+        const [ua, va] = eixo === 'y' ? [a[1], a[0]] : [a[0], a[1]];
+        const [ub, vb] = eixo === 'y' ? [b[1], b[0]] : [b[0], b[1]];
+        if ((ua - valor) * (ub - valor) <= 0 && ua !== ub) cortes.push(va + ((valor - ua) * (vb - va)) / (ub - ua));
+      }
     }
     return cortes.length >= 2 ? [Math.min(...cortes), Math.max(...cortes)] : null;
   };
@@ -108,7 +120,7 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
      qualquer vista de frente ou de lado; largura é a extensão horizontal da
      parte na outra vista. A linha sai da borda de baixo (altura) ou da
      esquerda (largura) da parte visível, em `em` quando declarado. */
-  const cotaDeOutraVista = (cota, [bz0, bz1, by0, by1], pts) => {
+  const cotaDeOutraVista = (cota, [bz0, bz1, by0, by1], aneis) => {
     const { parte, medida, origem, em, afasta, numero, de, prevalece } = cota;
     const dono = `${parte}.${medida}`;
     if (prevalece !== undefined && (typeof prevalece !== 'string' || !prevalece.trim())) throw new Error(`a cota '${dono}' declara prevalece sem motivo; escreva a decisão da pessoa sobre qual vista vale para esta medida.`);
@@ -121,7 +133,8 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     const ptsLa = reg?.contornoMm ?? reg?.contorno;
     if (!ptsLa) throw new Error(`a cota '${dono}' pede a parte '${nomeLa}' na vista '${origem.imagem}', que não está nos contornos dela.`);
     const eixo = (origem.medida ?? medida) === 'altura' ? 1 : 0;
-    const vs = ptsLa.map((q) => q[eixo]);
+    /* A medida da outra vista também é a da união dos pedaços dela. */
+    const vs = pedacosDe(reg).flat().map((q) => q[eixo]);
     const valor = Math.max(...vs) - Math.min(...vs);
     const texto = `${mm(valor)} (${origem.imagem})`;
     const extra = numero ? { numero: px(numero) } : {};
@@ -145,7 +158,7 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
        mede a seção ali, e a linha só precisa caber nela. */
     const tolDe = (v) => Math.max(TOLERANCIA_ENTRE_VISTAS.fracao * v, TOLERANCIA_ENTRE_VISTAS.mm);
     const medir = (p) => {
-      const corte = secao(pts, vert ? 'z' : 'y', p);
+      const corte = secao(aneis, vert ? 'z' : 'y', p);
       const [s0, s1] = corte ?? (vert ? [by0, by1] : [bz0, bz1]);
       return { externa: !corte, s0, s1, visivel: s1 - s0 };
     };
@@ -180,12 +193,12 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
   };
   const cotasDasPartes = (escolhas.cotas ?? []).flatMap((cota) => {
     const { parte, medida, lado, em, de, ate, afasta, numero, medivel, motivo, notaEm, origem } = cota;
-    const pts = contornos.regioes[parte]?.contornoMm;
-    if (!pts) throw new Error(`a cota pede a parte '${parte}', que não está nos contornos.`);
+    if (!contornos.regioes[parte]?.contornoMm) throw new Error(`a cota pede a parte '${parte}', que não está nos contornos.`);
+    const aneis = pedacosDe(contornos.regioes[parte]);
     const dono = `${parte}.${medida}`;
-    const zs = pts.map(([z]) => z); const ys = pts.map(([, y]) => y);
+    const zs = aneis.flat().map(([z]) => z); const ys = aneis.flat().map(([, y]) => y);
     const [bz0, bz1, by0, by1] = [Math.min(...zs), Math.max(...zs), Math.min(...ys), Math.max(...ys)];
-    if (origem) return [cotaDeOutraVista(cota, [bz0, bz1, by0, by1], pts)];
+    if (origem) return [cotaDeOutraVista(cota, [bz0, bz1, by0, by1], aneis)];
     if (medivel === false) {
       faltas.push({ dono, motivo: motivo ?? '' });
       if (!motivo) throw new Error(`a cota '${dono}' diz medivel: false e precisa de motivo.`);
@@ -201,13 +214,13 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     if (medida !== 'largura' && medida !== 'altura') throw new Error(`a medida da cota de '${parte}' é largura ou altura, e veio '${medida}'.`);
     if (medida === 'largura') {
       const yc = em ?? by0 + 0.33 * (by1 - by0);
-      const [z0, z1] = secao(pts, 'y', yc) ?? [bz0, bz1];
+      const [z0, z1] = secao(aneis, 'y', yc) ?? [bz0, bz1];
       const lados = { dentro: 0, acima: -(by1 - yc) * escala - 12, abaixo: (yc - by0) * escala + 14 };
       if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da largura de '${parte}' é dentro, acima ou abaixo, e veio '${lado}'.`);
       return [{ vista: 'lateral', dono, de: [z0, yc], ate: [z1, yc], desloca: [0, afasta !== undefined ? -afasta * escala : lados[lado ?? 'dentro']], texto: `${mm(z1 - z0)}`, ...extra }];
     }
     const zc = em ?? bz0 + 0.75 * (bz1 - bz0);
-    const [y0, y1] = secao(pts, 'z', zc) ?? [by0, by1];
+    const [y0, y1] = secao(aneis, 'z', zc) ?? [by0, by1];
     const lados = { direita: (bz1 - zc) * escala + 12, esquerda: -(zc - bz0) * escala - 14 };
     if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da altura de '${parte}' é direita ou esquerda, e veio '${lado}'.`);
     return [{ vista: 'lateral', dono, de: [zc, y0], ate: [zc, y1], desloca: [afasta !== undefined ? afasta * escala : (lado === undefined && em !== undefined ? 0 : lados[lado ?? 'direita']), 0], texto: `${mm(y1 - y0)}`, ...extra }];
@@ -239,7 +252,9 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
       /* A linha de fora passa um pixel além da silhueta, para as partes, que
          tocam a borda, ficarem dentro dela; as cotas usam a silhueta medida. */
       { vista: 'lateral', contorno: true, nome: 'silhuetaLateral', tipo: 'poli', pts: contornos.silhueta.linhaDeForaMm ?? silhueta, fechado: true },
-      ...nomes.map((nome) => ({ vista: 'lateral', classe: 'painel', nome, tipo: 'poli', pts: contornos.regioes[nome].contornoMm, fechado: true })),
+      /* Cada pedaço da parte é uma camada com o nome dela; os de depois do
+         primeiro levam `pedaco`, para o motor medir a forma uma vez por parte. */
+      ...nomes.flatMap((nome) => pedacosDe(contornos.regioes[nome]).map((pts, k) => ({ vista: 'lateral', classe: 'painel', nome, tipo: 'poli', pts, fechado: true, ...(k ? { pedaco: k + 1 } : {}) }))),
     ],
     cotas: [
       { vista: 'lateral', dono: 'geral.largura', de: [zMin, yMin], ate: [zMax, yMin], desloca: [0, dLarg], texto: `largura ${mm(zMax - zMin)}` },
@@ -311,9 +326,10 @@ function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, y
      linha sobre linha, e quem desenha escolhe a coluna ou move a cota. */
   const itens = nomes.map((nome) => {
     const decl = escolhas.nomes?.[nome] ?? {};
+    /* A marca do nome fica dentro do maior pedaço: o centro da união pode cair
+       no vão entre pedaços (o da hélice cai no cone), e a chamada terminaria
+       em outra parte. */
     const pts = contornos.regioes[nome].contornoMm;
-    const zs = pts.map(([z]) => z); const ys = pts.map(([, y]) => y);
-    const [z0, z1, y0, y1] = [Math.min(...zs), Math.max(...zs), Math.min(...ys), Math.max(...ys)];
     const marca = decl.marca ?? marcaDentro(pts, centro(pts)[1]) ?? centro(pts);
     if (decl.coluna !== undefined && decl.coluna !== 'esquerda' && decl.coluna !== 'direita') throw new Error(`a coluna do nome de '${nome}' é esquerda ou direita, e veio '${decl.coluna}'.`);
     const mx = sx(marca[0]);

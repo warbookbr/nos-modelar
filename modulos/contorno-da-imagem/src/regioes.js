@@ -31,10 +31,22 @@ export function tracosDaSemente(semente) {
   return linhas;
 }
 
-/* Devolve, para cada nome, a semente, o contorno externo em pixel e a área, e
-   também o rótulo de cada pixel (`rotulos`, -1 na divisa, 1 no fundo, 2 em
-   diante nas partes na ordem de `nomes`), a máscara da silhueta e os pixels
-   dela sem dono. */
+/* Área mínima, em px², de um pedaço de parte além do maior (área do contorno
+   de `contourArea`, que já é menor que a contagem de pixels). O watershed deixa
+   ilhas de 1 a 2 px de largura onde a divisa dobra, e uma ilha dessas de até
+   uns 10 px de comprimento tem área 9 ou menos; 9 também é um quadrado de uns
+   4 x 4 px. Na lateral, na frontal e no topo do avião o menor pedaço de uma
+   janela ou de uma pá tem 16, então o corte passa abaixo de tudo que é parte. */
+export const MINIMO_DO_PEDACO_PX2 = 9;
+
+/* Devolve, para cada nome, a semente, o contorno externo do maior pedaço em
+   pixel (`contornoPx`) e a área dele (`areaPx`), e em `pedacos` todos os
+   pedaços externos da parte, do maior para o menor, cada um com `areaPx` e
+   `contornoPx`. Uma parte vista em vários pedaços separados por outra, como a
+   hélice do avião cortada pelo cone em duas pás, ou as janelas, ficava só com
+   o maior pedaço e a medida dela era a de uma pá. Devolve também o rótulo de
+   cada pixel (`rotulos`, -1 na divisa, 1 no fundo, 2 em diante nas partes na
+   ordem de `nomes`), a máscara da silhueta e os pixels dela sem dono. */
 /* Realce para o watershed, que é onde a divisa é escolhida. O contraste local
    (CLAHE na luminância) puxa a diferença pequena entre duas partes do mesmo
    cinza, e a nitidez (máscara de desfoque) afina a costura entre elas. A
@@ -96,17 +108,29 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
       for (let p = 0; p < rotulos.length; p += 1) if (rotulos[p] === i + 2 && silhueta.data[p]) so.data[p] = 255;
       const contornos = novo(new cv.MatVector()); const hierarquia = novo(new cv.Mat());
       cv.findContours(so, contornos, hierarquia, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE);
-      let maior = null; let area = -1;
+      /* Cada contorno externo é um pedaço da parte. Do maior para o menor, com
+         o primeiro na frente em caso de empate: `areaPx` e `contornoPx` seguem
+         sendo os do maior, e `pedacos` traz todos, sem os que são ruído. O maior
+         fica sempre, mesmo abaixo do mínimo, para a parte não sumir. */
+      const achados = [];
       for (let k = 0; k < contornos.size(); k += 1) {
-        const c = contornos.get(k); const a = cv.contourArea(c);
-        if (a > area) { if (maior) maior.delete(); area = a; maior = c; } else c.delete();
+        const c = contornos.get(k);
+        achados.push({ c, area: cv.contourArea(c) });
       }
-      if (!maior) throw new Error(`'${nome}' não ficou com região nenhuma; a semente foi engolida pelas vizinhas.`);
-      const simples = novo(new cv.Mat()); cv.approxPolyDP(maior, simples, 1, true);
-      const contornoPx = [];
-      for (let k = 0; k < simples.data32S.length; k += 2) contornoPx.push([simples.data32S[k], simples.data32S[k + 1]]);
-      maior.delete();
-      resultado[nome] = { semente: tracos.flat(), rotulo: i + 2, areaPx: area, contornoPx };
+      achados.sort((p, q) => q.area - p.area);
+      const pedacos = [];
+      achados.forEach(({ c, area }, k) => {
+        if (k === 0 || area >= MINIMO_DO_PEDACO_PX2) {
+          const simples = new cv.Mat(); cv.approxPolyDP(c, simples, 1, true);
+          const contornoPx = [];
+          for (let m = 0; m < simples.data32S.length; m += 2) contornoPx.push([simples.data32S[m], simples.data32S[m + 1]]);
+          simples.delete();
+          pedacos.push({ areaPx: area, contornoPx });
+        }
+        c.delete();
+      });
+      if (!pedacos.length) throw new Error(`'${nome}' não ficou com região nenhuma; a semente foi engolida pelas vizinhas.`);
+      resultado[nome] = { semente: tracos.flat(), rotulo: i + 2, areaPx: pedacos[0].areaPx, contornoPx: pedacos[0].contornoPx, pedacos };
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;
