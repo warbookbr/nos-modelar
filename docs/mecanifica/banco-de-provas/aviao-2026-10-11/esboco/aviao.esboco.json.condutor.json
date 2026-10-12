@@ -1439,6 +1439,12 @@
       "unidade": "empenagem-horizontal",
       "nota": 8,
       "motivo": "Sem defeito estrutural: diedro, afilamento, fresta, dois suportes por lado e encaixe na cauda coerentes com a função. Acabamento da ponteira: contorno externo facetado, traço vertical solto (zoom, x≈553, y≈385 a 465) e marca em gota sem função na lateral sem vizinhos. O eixo não se distingue no corte x=600, e a ponteira cobre a fresta na ponta sem mostrar se o profundor ainda gira."
+    },
+    {
+      "ordem": 15,
+      "unidade": "marco-50",
+      "nota": 8,
+      "motivo": "Conjunto simétrico, preso e sem ponta no ar, sem defeito estrutural. Seguem os acabamentos já apontados: ponta levantada das asas com quina na base da subida e bordo de ataque da raiz em cunha aguda; o eixo das superfícies de comando não se lê em vista nenhuma. A perna do trem principal parece muito curta, com o pneu quase colado sob a asa."
     }
   ],
   "liberacoes": [
