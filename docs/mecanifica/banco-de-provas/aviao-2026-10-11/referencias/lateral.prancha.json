@@ -41,23 +41,19 @@
   {
    "parte": "escape",
    "medida": "largura",
-   "em": 1340,
-   "afasta": -850
+   "em": 1300,
+   "numero": [
+    0,
+    -165
+   ]
   },
   {
    "parte": "escape",
    "medida": "altura",
-   "de": [
-    850,
-    1270
-   ],
-   "ate": [
-    850,
-    1410
-   ],
-   "afasta": [
-    0,
-    -850
+   "em": 960,
+   "numero": [
+    545,
+    -40
    ]
   },
   {
@@ -255,7 +251,7 @@
     2100
    ],
    "coluna": "esquerda",
-   "nivel": 3250
+   "nivel": 3400
   },
   "cone": {
    "marca": [
@@ -267,11 +263,11 @@
   },
   "escape": {
    "marca": [
-    1100,
-    1340
+    920,
+    1330
    ],
    "coluna": "esquerda",
-   "nivel": 3000
+   "nivel": 3100
   },
   "capo": {
    "marca": [
@@ -279,7 +275,7 @@
     1600
    ],
    "coluna": "esquerda",
-   "nivel": 3500
+   "nivel": 3650
   },
   "parabrisa": {
    "marca": [
@@ -287,7 +283,7 @@
     1890
    ],
    "coluna": "esquerda",
-   "nivel": 3800
+   "nivel": 3900
   },
   "porta": {
    "marca": [
@@ -303,7 +299,7 @@
     1960
    ],
    "coluna": "esquerda",
-   "nivel": 4100
+   "nivel": 4200
   },
   "deriva": {
    "marca": [
