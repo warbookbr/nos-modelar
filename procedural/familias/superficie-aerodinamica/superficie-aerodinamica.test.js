@@ -456,6 +456,32 @@ describe('o comando: fresta, eixo da dobradiça e curso', () => {
     }
   });
 
+  it('o bordo de fuga da deriva segue uma linha só: a fixa abaixo do leme, o leme e a fixa acima dele ficam na mesma reta em z, a menos de 0,05 mm', () => {
+    const n = rodar({ perfil: 'deriva' }).neutro;
+    /* o z mais atrás de uma parte no plano y = const, em mm */
+    const zDeFuga = (parte, y) => {
+      let maior = -Infinity;
+      for (const f of n.F.values()) {
+        if (f.parte !== parte) continue;
+        for (let k = 1; k < f.vs.length - 1; k++) {
+          const tri = [n.V.get(f.vs[0]), n.V.get(f.vs[k]), n.V.get(f.vs[k + 1])];
+          for (let i = 0; i < 3; i++) {
+            const a = tri[i]; const b = tri[(i + 1) % 3];
+            if ((a[1] - y) * (b[1] - y) < 0) maior = Math.max(maior, a[2] + ((y - a[1]) / (b[1] - a[1])) * (b[2] - a[2]));
+          }
+        }
+      }
+      return maior / MM;
+    };
+    const abaixo = [0.1, 0.3].map((y) => [y, zDeFuga('fixa', y)]);
+    const inclinacao = (abaixo[1][1] - abaixo[0][1]) / (abaixo[1][0] - abaixo[0][0]);
+    const reta = (y) => abaixo[0][1] + inclinacao * (y - abaixo[0][0]);
+    /* a altura do leme vai de 20% a 90% da envergadura (1.900 mm), e a fresta é de 10,6 mm em cada ponta */
+    for (const [parte, y] of [['fixa', 0.379], ['comando', 0.4], ['comando', 1.0], ['comando', 1.69], ['fixa', 1.711], ['fixa', 1.8]]) {
+      expect(Math.abs(zDeFuga(parte, y) - reta(y)), `${parte} em y = ${y}`).toBeLessThan(0.05);
+    }
+  });
+
   it('com comando 0 a superfície é uma parte só e a porta do eixo marca onde a dobradiça ficaria', () => {
     const { neutro } = rodar({ perfil: 'estabilizador', comando: 0 });
     expect([...caixasPorParte(neutro).caixas.keys()]).toEqual(['fixa']);
