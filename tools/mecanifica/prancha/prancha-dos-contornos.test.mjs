@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { prancha, colisoesDoDesenho, examinarDesenho } from './prancha.mjs';
-import { specDosContornos, roteiroDaPrancha, cotasDaPrancha, linhasDeCotasEmFalta, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
+import { specDosContornos, vistaDasEscolhas, VISTAS_DA_PRANCHA, roteiroDaPrancha, cotasDaPrancha, linhasDeCotasEmFalta, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
 
 const escolhasDoBraco = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.prancha.json', import.meta.url), 'utf8'));
 const contornos = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.contornos.json', import.meta.url), 'utf8'));
@@ -134,7 +134,7 @@ describe('prancha dos contornos', () => {
     const r = roteiroDaPrancha({ alvo: 'a.png', prancha: 'p.png', spec });
     expect((r.match(/^## Etapa /gm) ?? []).length).toBe(spec.resumo.partes.length + 2);
     for (const parte of spec.resumo.partes) expect(r).toContain(`— ${parte}\n`);
-    expect(r).toMatch(/- largura: cota \d+/);
+    expect(r).toMatch(/- comprimento: cota \d+/);
     expect(r).toMatch(/ombro[\s\S]*altura: EM FALTA/);
     expect(r).toMatch(/linhas livres/);
   });
@@ -253,8 +253,8 @@ describe('prancha dos contornos', () => {
   it('o roteiro lista por parte as duas cotas esperadas e o estado de cada uma', () => {
     const spec = specDosContornos(contornos, { escolhas: escolhasDoBraco });
     const r = roteiroDaPrancha({ alvo: 'a.png', prancha: 'p.png', spec });
-    expect((r.match(/- cotas esperadas: largura \(.+\) e altura \(.+\)/g) ?? []).length).toBe(spec.resumo.partes.length);
-    expect(r).toMatch(/— ombro\n\n- cotas esperadas: largura \([^)]*\) e altura \(não medível/);
+    expect((r.match(/- cotas esperadas: comprimento \(.+\) e altura \(.+\)/g) ?? []).length).toBe(spec.resumo.partes.length);
+    expect(r).toMatch(/— ombro\n\n- cotas esperadas: comprimento \([^)]*\) e altura \(não medível/);
   });
 
   /* A hélice do avião vista de lado: o cone cobre o meio e sobram duas pás, uma
@@ -314,6 +314,79 @@ describe('prancha dos contornos', () => {
       const frontal = { regioes: { helice: { contornoMm: ret(0, 0, 40, 300), pedacos: [pa(0, 0, 40, 300), pa(0, 700, 40, 1000)] } } };
       const c = cotar({ em: 40, origem: { imagem: 'frontal' } }, aviao, () => frontal).cotas.find((x) => x.dono === 'helice.altura');
       expect(c.texto).toBe('1000 (frontal)');
+    });
+  });
+
+  /* A planta do avião: a envergadura na horizontal e o comprimento na vertical. */
+  describe('vista da prancha', () => {
+    const ret = (x0, v0, x1, v1) => [[x0, v0], [x1, v0], [x1, v1], [x0, v1]];
+    const topo = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(-600, -100, 600, 1000), linhaDeForaMm: ret(-601, -101, 601, 1001) },
+      regioes: {
+        asa: { contornoMm: ret(-600, 300, 600, 500) },
+        fuselagem: { contornoMm: ret(-60, -100, 60, 1000) },
+      },
+    };
+    const escolhas = { vista: 'topo', cotas: [{ parte: 'asa', medida: 'largura' }, { parte: 'asa', medida: 'altura' }, { parte: 'fuselagem', medida: 'altura', medivel: false, motivo: 'a asa a esconde' }] };
+
+    it('a lateral é a vista de quando nada é declarado, e uma vista que não existe é recusada', () => {
+      expect(vistaDasEscolhas({})).toBe('lateral');
+      const spec = specDosContornos(contornos);
+      expect(Object.keys(spec.vistas)).toEqual(['lateral']);
+      expect(spec.vistas.lateral.rotulo).toBe('LATERAL — projeção');
+      expect(spec.titulo).toBe('Prancha lateral pelos contornos da imagem');
+      expect(spec.cotas.find((c) => c.dono === 'geral.largura').texto).toMatch(/^comprimento \d+$/);
+      expect(spec.cotas.find((c) => c.dono === 'geral.altura').texto).toMatch(/^altura \d+$/);
+      expect(() => vistaDasEscolhas({ vista: 'planta' })).toThrow(/lateral, topo, frontal.*'planta'/);
+    });
+
+    it('a prancha de topo sai com o rótulo de topo e o comprimento na vertical, e não "altura"', () => {
+      const spec = specDosContornos(topo, { escolhas });
+      expect(Object.keys(spec.vistas)).toEqual(['topo']);
+      expect(spec.vistas.topo.rotulo).toBe('TOPO — projeção');
+      expect(spec.titulo).toBe('Prancha de topo pelos contornos da imagem');
+      expect(spec.cotas.find((c) => c.dono === 'geral.largura').texto).toBe('largura 1200');
+      expect(spec.cotas.find((c) => c.dono === 'geral.altura').texto).toBe('comprimento 1100');
+      expect(spec.cotas.every((c) => c.vista === 'topo')).toBe(true);
+      expect(spec.anotacoes[0].texto).toBe('fuselagem comprimento: a asa a esconde');
+      expect(spec.camadas.map((c) => c.nome)).toEqual(['silhuetaTopo', 'asa', 'fuselagem']);
+    });
+
+    it('a prancha de topo é desenhada e medida sem alerta, e o relatório e o SVG falam de topo', () => {
+      const { svg, relatorio } = prancha(specDosContornos(topo, { escolhas }));
+      expect(relatorio.alertas).toEqual([]);
+      expect(Object.keys(relatorio.porVista)).toEqual(['topo']);
+      expect(relatorio.porVista.topo).toMatchObject({ contornoFechado: true, pontosForaDoContorno: 0 });
+      expect(Math.round(relatorio.porVista.topo.caixa.xMax - relatorio.porVista.topo.caixa.xMin)).toBe(1202);
+      expect(Math.round(relatorio.porVista.topo.caixa.yMax - relatorio.porVista.topo.caixa.yMin)).toBe(1102);
+      expect(svg).toContain('TOPO — projeção');
+      expect(svg).not.toContain('LATERAL');
+    });
+
+    it('a cota de comprimento mede na vertical e a de largura na horizontal', () => {
+      const spec = specDosContornos(topo, { escolhas: { vista: 'topo', cotas: [{ parte: 'fuselagem', medida: 'altura', em: 0 }, { parte: 'asa', medida: 'largura' }] } });
+      const comp = spec.cotas.find((c) => c.dono === 'fuselagem.altura');
+      expect([comp.de[0], comp.de[1], comp.ate[1], comp.texto]).toEqual([0, -100, 1000, '1100']);
+      const larg = spec.cotas.find((c) => c.dono === 'asa.largura');
+      expect([larg.de[0], larg.ate[0], larg.texto]).toEqual([-600, 600, '1200']);
+    });
+
+    it('o roteiro do crítico diz a vista e usa as palavras dela', () => {
+      const spec = specDosContornos(topo, { escolhas });
+      const r = roteiroDaPrancha({ alvo: 'topo.png', prancha: 'topo.prancha.png', spec });
+      expect(r).toContain('A vista é topo: na horizontal a prancha mede largura e na vertical comprimento.');
+      expect(r).toMatch(/— asa\n\n- cotas esperadas: largura \(medida aqui\) e comprimento \(medida aqui\)/);
+      expect(r).toMatch(/- comprimento: cota \d+\. A linha mede asa de ponta a ponta na vertical/);
+      expect(r).not.toMatch(/- altura:/);
+      expect(Object.keys(VISTAS_DA_PRANCHA)).toEqual(['lateral', 'topo', 'frontal']);
+    });
+
+    it('a frontal mede largura na horizontal e altura na vertical', () => {
+      const spec = specDosContornos(topo, { escolhas: { vista: 'frontal', cotas: [] } });
+      expect(spec.cotas.find((c) => c.dono === 'geral.largura').texto).toBe('largura 1200');
+      expect(spec.cotas.find((c) => c.dono === 'geral.altura').texto).toBe('altura 1100');
+      expect(prancha(spec).relatorio.porVista.frontal.contornoFechado).toBe(true);
     });
   });
 });

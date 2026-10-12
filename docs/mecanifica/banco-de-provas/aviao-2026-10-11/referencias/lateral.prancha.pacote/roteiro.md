@@ -33,7 +33,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 5 — janelas
 
 - cotas esperadas: largura (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 704. A linha atravessa a seção que o modelador precisa, dentro de janelas?
+- largura: cota 2606. A linha atravessa a seção que o modelador precisa, dentro de janelas?
 - altura: cota 352. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "janelas" fica na coluna da esquerda. A chamada termina dentro de janelas, e não numa vizinha?
 - linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
@@ -66,7 +66,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 - cotas esperadas: largura (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 164. A linha atravessa a seção que o modelador precisa, dentro de helice?
-- altura: cota 752. A linha mede helice de ponta a ponta na vertical, sem pegar parte vizinha?
+- altura: cota 1945. A linha mede helice de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "helice" fica na coluna da esquerda. A chamada termina dentro de helice, e não numa vizinha?
 - linhas livres: a chamada e as cotas de helice não cruzam outra linha nem passam sobre número ou nome?
 

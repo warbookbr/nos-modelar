@@ -1,6 +1,6 @@
 ---
 name: prancha-dos-contornos
-description: Faz a prancha lateral a partir dos contornos do mapa de partes, com o desenhista escolhendo as cotas e um crítico dando nota. Use depois do mapa, antes da modelagem. Não use para carroceria por medida declarada; essa é a desenhar-prancha.
+description: Faz a prancha de uma vista (lateral, de topo ou frontal) a partir dos contornos do mapa de partes, com o desenhista escolhendo as cotas e um crítico dando nota. Use depois do mapa, antes da modelagem. Não use para carroceria por medida declarada; essa é a desenhar-prancha.
 ---
 
 # Prancha dos contornos
@@ -15,6 +15,18 @@ comando não sabe: as cotas de cada parte, a conferência da calibração e o qu
 a imagem esconde. Sem esse trabalho o crítico aprovaria uma cópia do contorno.
 
 ## O ciclo
+
+A prancha é de uma vista só, a da imagem: `lateral` (padrão, a do braço),
+`topo` ou `frontal`. A vista vem de `"vista"` em `<imagem>.prancha.json`, que
+o desenhista escreve junto com as cotas, e dá o rótulo e o título da prancha
+e o nome do que cada sentido da imagem mede. Nas escolhas, `largura` é sempre
+o sentido horizontal da imagem e `altura` o vertical; na lateral a horizontal
+é o comprimento e a vertical a altura, no topo a horizontal é a largura e a
+vertical o comprimento, e na frontal são largura e altura. As cotas gerais e o
+roteiro do crítico falam nessas palavras, então numa prancha de topo a cota
+`altura` do arquivo sai escrita comprimento. Imagem chamada `topo` ou
+`frontal` sem `"vista"` no arquivo não gera prancha: o comando sai com código
+2 pedindo a vista, para a de topo não sair rotulada como lateral.
 
 Pergunte a ação, sempre:
 
@@ -63,7 +75,7 @@ entra.
 **Crítico.** Despache o `critico-visual` com a imagem de referência como alvo,
 `<imagem>.prancha.png` como modelo e o roteiro
 `<imagem>.prancha.pacote/roteiro.md`, que o comando grava a cada prancha e
-tem uma etapa por parte: largura, altura, nome e linhas livres. Pergunte se a silhueta e cada parte da
+tem uma etapa por parte: as duas medidas da vista (na lateral comprimento e altura, no topo largura e comprimento), nome e linhas livres. Pergunte se a silhueta e cada parte da
 prancha seguem a imagem, se as cotas estão nas partes que o modelador precisa
 e se alguma medida contradiz o alinhamento. Nunca mande as escolhas do agente
 nem o que mudou.

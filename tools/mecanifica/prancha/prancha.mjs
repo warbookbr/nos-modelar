@@ -52,17 +52,22 @@ const ESTILOS = `
 export const EIXOS_DA_VISTA = {
   lateral: ['z', 'y'],
   planta: ['z', 'x'],
+  /* Vista de cima com a largura na horizontal e o comprimento na vertical, como
+     as imagens de topo de referência (a planta acima tem o comprimento na
+     horizontal). Os pontos são [x, z], com z para cima na prancha. */
+  topo: ['x', 'z'],
   frontal: ['x', 'y'],
   traseira: ['x', 'y'],
 };
 
 function projetores(spec) {
   const s = spec.escala;
-  const { zMin, yMax, xMax } = spec.limites;
+  const { zMin, zMax, yMax, xMax } = spec.limites;
   const v = spec.vistas;
   return {
     lateral: ([z, y]) => [v.lateral.x + (z - zMin) * s, v.lateral.y + (yMax - y) * s],
     planta: ([z, x]) => [v.planta.x + (z - zMin) * s, v.planta.y + (x + xMax) * s],
+    topo: ([x, z]) => [v.topo.x + (x + xMax) * s, v.topo.y + (zMax - z) * s],
     frontal: ([x, y]) => [v.frontal.x + (x + xMax) * s, v.frontal.y + (yMax - y) * s],
     traseira: ([x, y]) => [v.traseira.x + (xMax - x) * s, v.traseira.y + (yMax - y) * s],
   };

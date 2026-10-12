@@ -1,12 +1,16 @@
 #!/usr/bin/env node
-/* prancha-dos-contornos.mjs — a prancha lateral desenhada com os contornos que
+/* prancha-dos-contornos.mjs — a prancha de uma vista desenhada com os contornos que
  * `npm run contorno` tirou da imagem de referência, em milímetro.
  *
  * A primeira prancha do braço robótico foi traçada à mão com retângulos lidos
  * a olho, e a pessoa julgou que ela não serve para medir proporção nem
  * posição. Aqui nenhuma coordenada é digitada: a silhueta e cada parte vêm do
  * arquivo de contornos, e o motor de prancha mede o que desenhou. A prancha é
- * `parcial`, só com a vista lateral, porque é a única que a referência mostra.
+ * `parcial`, só com a vista da imagem, que é a única que a referência mostra.
+ * A vista é `"vista": "lateral" | "topo" | "frontal"` no `<imagem>.prancha.json`
+ * (padrão `lateral`) e dá o rótulo, o título e o nome do que a horizontal e a
+ * vertical medem (`VISTAS_DA_PRANCHA`); as escolhas continuam dizendo `largura`
+ * para o sentido horizontal e `altura` para o vertical.
  *
  * O que o comando não sabe decidir fica em `<imagem>.prancha.json`, que o
  * agente de prancha edita: as cotas que importam em cada parte
@@ -60,7 +64,30 @@ const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
    guardava o maior pedaço, e o diâmetro é de cerca de 2.100 mm. */
 const pedacosDe = (regiao) => (regiao.pedacos?.length ? regiao.pedacos.map((p) => p.contornoMm) : [regiao.contornoMm]);
 
-export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos contornos da imagem', fonte = 'imagem de referência', escolhas = {}, lerVista = null } = {}) {
+/* O que cada vista chama de medida. Na prancha, `largura` é sempre o sentido
+   horizontal da imagem e `altura` o vertical, nas escolhas e nas cotas, e é a
+   vista que diz o que cada um mede no objeto: na lateral do avião o horizontal
+   é o comprimento, no topo o vertical é o comprimento e o horizontal é a
+   largura (a envergadura). A primeira prancha de topo saiu rotulada "LATERAL" e
+   com o comprimento do avião escrito "altura". `lateral` é a vista de quando as
+   escolhas não declaram `vista`, e é a do braço. */
+export const VISTAS_DA_PRANCHA = {
+  lateral: { titulo: 'Prancha lateral', rotulo: 'LATERAL — projeção', palavras: { largura: 'comprimento', altura: 'altura' } },
+  topo: { titulo: 'Prancha de topo', rotulo: 'TOPO — projeção', palavras: { largura: 'largura', altura: 'comprimento' } },
+  frontal: { titulo: 'Prancha frontal', rotulo: 'FRONTAL — projeção', palavras: { largura: 'largura', altura: 'altura' } },
+};
+export const VISTA_PADRAO = 'lateral';
+
+export function vistaDasEscolhas(escolhas = {}) {
+  const vista = escolhas.vista ?? VISTA_PADRAO;
+  if (!Object.hasOwn(VISTAS_DA_PRANCHA, vista)) throw new Error(`a vista da prancha é ${Object.keys(VISTAS_DA_PRANCHA).join(', ')}, e veio '${vista}'; corrija "vista" em <imagem>.prancha.json.`);
+  return vista;
+}
+
+export function specDosContornos(contornos, { titulo, fonte = 'imagem de referência', escolhas = {}, lerVista = null } = {}) {
+  const vista = vistaDasEscolhas(escolhas);
+  const { palavras, rotulo } = VISTAS_DA_PRANCHA[vista];
+  titulo ??= `${VISTAS_DA_PRANCHA[vista].titulo} pelos contornos da imagem`;
   const silhueta = contornos.silhueta?.contornoMm;
   if (!Array.isArray(silhueta) || silhueta.length < 3) throw new Error('o arquivo de contornos não traz a silhueta; gere de novo com `npm run contorno`.');
   const zs = silhueta.map(([z]) => z); const ys = silhueta.map(([, y]) => y);
@@ -188,8 +215,8 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
       if (inicio < s0 - tol || fim > s1 + tol) throw recusa(`sairia da parte: a linha iria de ${mm(inicio)} a ${mm(fim)} mm e '${parte}' vai de ${mm(s0)} a ${mm(s1)} mm ${onde}; declare de (inicio, fim ou a posição em mm) para ela caber`);
     } else prevalencias.push(prevaleceu);
     const txt = prevaleceu ? `${mm(valor)} (${origem.imagem}, prevalece)` : texto;
-    if (vert) return { vista: 'lateral', dono, de: [pos, inicio], ate: [pos, fim], desloca: [(afasta ?? 0) * escala, 0], texto: txt, origem: origem.imagem, ...extra };
-    return { vista: 'lateral', dono, de: [inicio, pos], ate: [fim, pos], desloca: [0, -(afasta ?? 0) * escala], texto: txt, origem: origem.imagem, ...extra };
+    if (vert) return { vista, dono, de: [pos, inicio], ate: [pos, fim], desloca: [(afasta ?? 0) * escala, 0], texto: txt, origem: origem.imagem, ...extra };
+    return { vista, dono, de: [inicio, pos], ate: [fim, pos], desloca: [0, -(afasta ?? 0) * escala], texto: txt, origem: origem.imagem, ...extra };
   };
   const cotasDasPartes = (escolhas.cotas ?? []).flatMap((cota) => {
     const { parte, medida, lado, em, de, ate, afasta, numero, medivel, motivo, notaEm, origem } = cota;
@@ -202,14 +229,14 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     if (medivel === false) {
       faltas.push({ dono, motivo: motivo ?? '' });
       if (!motivo) throw new Error(`a cota '${dono}' diz medivel: false e precisa de motivo.`);
-      anotacoes.push({ vista: 'lateral', dono, em: notaEm ?? [(bz0 + bz1) / 2, (by0 + by1) / 2], texto: `${parte} ${medida}: ${motivo}` });
+      anotacoes.push({ vista, dono, em: notaEm ?? [(bz0 + bz1) / 2, (by0 + by1) / 2], texto: `${parte} ${palavras[medida] ?? medida}: ${motivo}` });
       return [];
     }
     const extra = numero ? { numero: px(numero) } : {};
     if (de || ate) {
       if (!de || !ate) throw new Error(`a cota '${dono}' declara pontos e precisa de de e ate.`);
       const d = Math.hypot(ate[0] - de[0], ate[1] - de[1]);
-      return [{ vista: 'lateral', dono, de, ate, desloca: afasta ? px(afasta) : [0, 0], texto: `${mm(d)}`, ...extra }];
+      return [{ vista, dono, de, ate, desloca: afasta ? px(afasta) : [0, 0], texto: `${mm(d)}`, ...extra }];
     }
     if (medida !== 'largura' && medida !== 'altura') throw new Error(`a medida da cota de '${parte}' é largura ou altura, e veio '${medida}'.`);
     if (medida === 'largura') {
@@ -217,15 +244,15 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
       const [z0, z1] = secao(aneis, 'y', yc) ?? [bz0, bz1];
       const lados = { dentro: 0, acima: -(by1 - yc) * escala - 12, abaixo: (yc - by0) * escala + 14 };
       if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da largura de '${parte}' é dentro, acima ou abaixo, e veio '${lado}'.`);
-      return [{ vista: 'lateral', dono, de: [z0, yc], ate: [z1, yc], desloca: [0, afasta !== undefined ? -afasta * escala : lados[lado ?? 'dentro']], texto: `${mm(z1 - z0)}`, ...extra }];
+      return [{ vista, dono, de: [z0, yc], ate: [z1, yc], desloca: [0, afasta !== undefined ? -afasta * escala : lados[lado ?? 'dentro']], texto: `${mm(z1 - z0)}`, ...extra }];
     }
     const zc = em ?? bz0 + 0.75 * (bz1 - bz0);
     const [y0, y1] = secao(aneis, 'z', zc) ?? [by0, by1];
     const lados = { direita: (bz1 - zc) * escala + 12, esquerda: -(zc - bz0) * escala - 14 };
     if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da altura de '${parte}' é direita ou esquerda, e veio '${lado}'.`);
-    return [{ vista: 'lateral', dono, de: [zc, y0], ate: [zc, y1], desloca: [afasta !== undefined ? afasta * escala : (lado === undefined && em !== undefined ? 0 : lados[lado ?? 'direita']), 0], texto: `${mm(y1 - y0)}`, ...extra }];
+    return [{ vista, dono, de: [zc, y0], ate: [zc, y1], desloca: [afasta !== undefined ? afasta * escala : (lado === undefined && em !== undefined ? 0 : lados[lado ?? 'direita']), 0], texto: `${mm(y1 - y0)}`, ...extra }];
   });
-  const layout = nomesEmColunas({ contornos, nomes, escolhas, cotas: cotasDasPartes, zMin, zMax, yMin, yMax, escala, centro });
+  const layout = nomesEmColunas({ vista, contornos, nomes, escolhas, cotas: cotasDasPartes, zMin, zMax, yMin, yMax, escala, centro });
   /* Nome posto acima da silhueta desce a vista, para não cair no rótulo dela. */
   const topo = MARGEM.topo + Math.ceil(-layout.topoDosNomes);
   /* As cotas gerais ficam por fora de tudo: a largura abaixo da cota de
@@ -235,10 +262,14 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
   const dLarg = Math.max(36, baixoDasCotas - (yMax - yMin) * escala + 28);
   const dAlt = layout.direitaDosNomes + 22 - (zMax - zMin) * escala;
   const landmarks = layout.landmarks;
+  /* O motor projeta cada vista com os limites do seu próprio mundo. Aqui o
+     primeiro eixo é o horizontal da imagem e o segundo o vertical, para cima, e
+     as fórmulas de cada vista saem de `limites` deste jeito. */
+  const limites = { lateral: { zMin, zMax, xMax: 0, yMax }, frontal: { zMin, zMax, xMax: -zMin, yMax }, topo: { zMin: yMin, zMax: yMax, xMax: -zMin, yMax } }[vista];
   const spec = {
     autoria: {
       versao: 'mecanifica.prancha-autoria@1', estado: 'pronta', modo: 'parcial', confianca: 'media',
-      intencao: 'vista lateral com a silhueta e o contorno de cada parte tirados da imagem de referência',
+      intencao: `vista ${vista} com a silhueta e o contorno de cada parte tirados da imagem de referência`,
       procedencias: [{ id: 'contornos', tipo: 'referencia-raster-derivada', evidencia: `${fonte}, ${contornos.mmPorPx} mm por pixel, calibrada por duas âncoras` }],
       incertezas: [],
     },
@@ -246,26 +277,26 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     subtitulo: `Milímetros. ${nomes.length} partes pelo watershed com sementes. Parte escondida atrás de outra aparece só no pedaço visível.`,
     escala,
     tela: { largura: layout.largura, altura: Math.max(TELA.altura, Math.ceil(topo + (yMax - yMin) * escala + dLarg + 30)) },
-    limites: { zMin, zMax, xMax: 0, yMax },
-    vistas: { lateral: { x: layout.x, y: topo, rotulo: 'LATERAL — projeção', rotuloEm: [40, 76] } },
+    limites,
+    vistas: { [vista]: { x: layout.x, y: topo, rotulo, rotuloEm: [40, 76] } },
     camadas: [
       /* A linha de fora passa um pixel além da silhueta, para as partes, que
          tocam a borda, ficarem dentro dela; as cotas usam a silhueta medida. */
-      { vista: 'lateral', contorno: true, nome: 'silhuetaLateral', tipo: 'poli', pts: contornos.silhueta.linhaDeForaMm ?? silhueta, fechado: true },
+      { vista, contorno: true, nome: `silhueta${vista[0].toUpperCase()}${vista.slice(1)}`, tipo: 'poli', pts: contornos.silhueta.linhaDeForaMm ?? silhueta, fechado: true },
       /* Cada pedaço da parte é uma camada com o nome dela; os de depois do
          primeiro levam `pedaco`, para o motor medir a forma uma vez por parte. */
-      ...nomes.flatMap((nome) => pedacosDe(contornos.regioes[nome]).map((pts, k) => ({ vista: 'lateral', classe: 'painel', nome, tipo: 'poli', pts, fechado: true, ...(k ? { pedaco: k + 1 } : {}) }))),
+      ...nomes.flatMap((nome) => pedacosDe(contornos.regioes[nome]).map((pts, k) => ({ vista, classe: 'painel', nome, tipo: 'poli', pts, fechado: true, ...(k ? { pedaco: k + 1 } : {}) }))),
     ],
     cotas: [
-      { vista: 'lateral', dono: 'geral.largura', de: [zMin, yMin], ate: [zMax, yMin], desloca: [0, dLarg], texto: `largura ${mm(zMax - zMin)}` },
-      { vista: 'lateral', dono: 'geral.altura', de: [zMax, yMin], ate: [zMax, yMax], desloca: [dAlt, 0], texto: `altura ${mm(yMax - yMin)}` },
+      { vista, dono: 'geral.largura', de: [zMin, yMin], ate: [zMax, yMin], desloca: [0, dLarg], texto: `${palavras.largura} ${mm(zMax - zMin)}` },
+      { vista, dono: 'geral.altura', de: [zMax, yMin], ate: [zMax, yMax], desloca: [dAlt, 0], texto: `${palavras.altura} ${mm(yMax - yMin)}` },
       ...cotasDasPartes,
     ],
     anotacoes,
     landmarks,
   };
   /* Fora do contrato do motor: o que o roteiro do crítico e o relatório leem. */
-  Object.defineProperty(spec, 'resumo', { enumerable: false, value: { faltas, prevalencias, partes: nomes, colunas: layout.colunas, escolhas } });
+  Object.defineProperty(spec, 'resumo', { enumerable: false, value: { faltas, prevalencias, partes: nomes, colunas: layout.colunas, escolhas, vista } });
   return spec;
 }
 
@@ -305,7 +336,7 @@ function marcaDentro(pts, y) {
   return melhor ? [(melhor[0] + melhor[1]) / 2, y] : null;
 }
 
-function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, yMax, escala, centro }) {
+function nomesEmColunas({ vista, contornos, nomes, escolhas, cotas, zMin, zMax, yMin, yMax, escala, centro }) {
   const sx = (z) => (z - zMin) * escala;
   const sy = (y) => (yMax - y) * escala;
   const largSil = sx(zMax);
@@ -350,7 +381,7 @@ function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, y
   const x = Math.max(MARGEM.esquerda, Math.ceil(30 + larguraMax('esquerda') - colunaX.esquerda));
   const largura = Math.max(TELA.largura, Math.ceil(x + colunaX.direita + larguraMax('direita') + 30));
   const landmarks = itens.map((i) => ({
-    vista: 'lateral', id: i.nome, em: i.marca,
+    vista, id: i.nome, em: i.marca,
     rotuloEm: [zMin + colunaX[i.coluna] / escala, yMax - i.ty / escala],
     ...(i.coluna === 'esquerda' ? { rotuloAncora: 'end' } : {}),
   }));
@@ -387,7 +418,10 @@ export function linhasDeCotasEmFalta(faltas) {
    etapa por parte, com a largura, a altura, o nome e as linhas dela, porque
    quem olha a prancha inteira de uma vez aprova número na parte errada. */
 export function roteiroDaPrancha({ alvo, prancha: png, spec }) {
-  const { partes, faltas, colunas } = spec.resumo;
+  const { partes, faltas, colunas, vista } = spec.resumo;
+  /* As palavras da vista: na horizontal e na vertical da imagem cada vista
+     mede uma coisa diferente do objeto (`VISTAS_DA_PRANCHA`). */
+  const w = VISTAS_DA_PRANCHA[vista].palavras;
   const cotaDe = (parte, medida) => {
     const c = spec.cotas.find((x) => x.dono === `${parte}.${medida}`);
     if (c) return `cota ${c.texto}${c.origem ? `, tirada da vista ${c.origem}` : ''}`;
@@ -401,14 +435,14 @@ export function roteiroDaPrancha({ alvo, prancha: png, spec }) {
     '# Roteiro da crítica da prancha', '',
     'Siga as etapas na ordem e não pule nenhuma. Abra o alvo e a prancha em cada etapa e olhe só a parte da etapa.', '',
     '## Etapa 1 — visão geral', '',
-    `Abra o alvo (${alvo}) e a prancha (${png}). Confira se a silhueta da prancha segue a do alvo e se as cotas gerais de largura e altura estão nas bordas do objeto.`, '',
+    `Abra o alvo (${alvo}) e a prancha (${png}). A vista é ${vista}: na horizontal a prancha mede ${w.largura} e na vertical ${w.altura}. Confira se a silhueta da prancha segue a do alvo e se as cotas gerais de ${w.largura} e ${w.altura} estão nas bordas do objeto.`, '',
   ];
   ordem.forEach((parte, i) => {
     const col = colunas.esquerda.includes(parte) ? 'esquerda' : 'direita';
     L.push(`## Etapa ${i + 2} — ${parte}`, '',
-      `- cotas esperadas: largura (${estadoDe(parte, 'largura')}) e altura (${estadoDe(parte, 'altura')}). Cobre só estas duas; cota em falta é \`cota\` com sentido \`faltando\`.`,
-      `- largura: ${cotaDe(parte, 'largura')}. A linha atravessa a seção que o modelador precisa, dentro de ${parte}?`,
-      `- altura: ${cotaDe(parte, 'altura')}. A linha mede ${parte} de ponta a ponta na vertical, sem pegar parte vizinha?`,
+      `- cotas esperadas: ${w.largura} (${estadoDe(parte, 'largura')}) e ${w.altura} (${estadoDe(parte, 'altura')}). Cobre só estas duas; cota em falta é \`cota\` com sentido \`faltando\`.`,
+      `- ${w.largura}: ${cotaDe(parte, 'largura')}. A linha atravessa a seção que o modelador precisa, dentro de ${parte}?`,
+      `- ${w.altura}: ${cotaDe(parte, 'altura')}. A linha mede ${parte} de ponta a ponta na vertical, sem pegar parte vizinha?`,
       `- nome: "${parte}" fica na coluna da ${col}. A chamada termina dentro de ${parte}, e não numa vizinha?`,
       `- linhas livres: a chamada e as cotas de ${parte} não cruzam outra linha nem passam sobre número ou nome?`, '');
   });
@@ -467,6 +501,14 @@ async function principal(argv) {
   }
   const contornos = JSON.parse(readFileSync(arquivo, 'utf8'));
   const escolhas = existsSync(arquivoEscolhas) ? JSON.parse(readFileSync(arquivoEscolhas, 'utf8')) : {};
+  /* Sem `vista` a prancha é lateral. Imagem chamada de topo ou frontal sem a
+     vista declarada sairia rotulada como lateral sem ninguém ver, então para. */
+  const nomeDaImagem = basename(base);
+  if (escolhas.vista === undefined && ['topo', 'frontal'].includes(nomeDaImagem)) {
+    process.stderr.write(`contorno:prancha: a imagem '${nomeDaImagem}' não é lateral e ${basename(arquivoEscolhas)} não declara "vista"; escreva "vista": "${nomeDaImagem}" (as vistas são ${Object.keys(VISTAS_DA_PRANCHA).join(', ')}).\n`);
+    return 2;
+  }
+  vistaDasEscolhas(escolhas);
   /* Outra vista do mesmo objeto é outra imagem na mesma pasta:
      `<pasta>/<nome>.contornos.json`, ou as regiões dela quando ainda não
      houver contornos em milímetro. */

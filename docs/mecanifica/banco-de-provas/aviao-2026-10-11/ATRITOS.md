@@ -71,3 +71,8 @@ planta e a lateral são as duas vistas principais.
 ```bash
 grep -n "LATERAL" tools/mecanifica/prancha/*.mjs
 ```
+
+Corrigido em 2026-10-12: o `<imagem>.prancha.json` declara `"vista"` (lateral,
+topo ou frontal, lateral por padrão), o rótulo, as cotas gerais, o relatório e o
+roteiro do crítico usam as palavras da vista, e imagem chamada topo ou frontal
+sem o campo é recusada. A skill e o agente desenhista dizem isso.
