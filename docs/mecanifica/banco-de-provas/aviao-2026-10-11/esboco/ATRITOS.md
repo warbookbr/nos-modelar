@@ -271,3 +271,29 @@ referência por seção.
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --referencia docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/topo.conferencia.contornos.json --vista superior
 ```
+
+## 30. A seção do loft só aceita polígono convexo, e o perfil da asa saiu sem curvatura côncava no intradorso
+
+O perfil aerodinâmico da asa, do flap e do aileron foi escrito como polígono convexo (extradorso arredondado e intradorso quase plano, de 13 pontos na asa e 7 no flap e no aileron). Um perfil com curvatura positiva real tem o intradorso côncavo perto da borda de fuga e o módulo o recusa. Além disso, a recusa só cita a primeira seção que falha: a fresta de 15 mm deslocou a face da frente do aileron e o canto superior ficou côncavo só nas seções de corda menor (680 mm), e o erro apareceu em `aileronE`, `secoes[0]`, sem dizer qual ponto.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-asas.esboco.json --descrever
+```
+
+Para reproduzir, ponha em `aileronE` a face da frente em `"=0.5*asC4+fresta"` com `"=-0.362*asT4"` e `"=0.2437*asT4"`.
+
+## 31. As quatro vistas não mostram o ventre da asa, onde ficam os suportes do flap e do aileron
+
+Os suportes de dobradiça ficam sob a borda de fuga e só aparecem como traço fino na lateral. O corte `x=<valor>` na lateral os mostra em perfil, mas nenhuma vista olha de baixo, e o `--corte y=<valor> --lado -` na superior mostra o corte pela parte de cima, não o ventre. O recolhimento do trem para dentro da asa também não se representa: o módulo não subtrai forma de outra (atrito 26), então o alojamento da roda não existe.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade asas --vista superior
+```
+
+## 32. A divisão entre flap e aileron da maquete contraria a referência, e o Envelope não acusa
+
+A maquete põe o flap de x -830 a -4887 e o aileron de -4910 a -6000. O `topo.png` mostra a linha de painel em cerca de |x| 3130, o flap por dentro e o aileron por fora. O detalhe seguiu a referência (flap -830 a -3130, aileron -3170 a -5800), e nada no gate nem no Envelope acusou a diferença, porque a caixa da unidade é a mesma. Só a leitura da referência por parte pegaria isso.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --envelope asas docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-asas.esboco.json
+```

@@ -120,14 +120,63 @@
     "hT4": 20,
     "hA5": 38,
     "hB5": 6,
-    "hT5": 18
+    "hT5": 18,
+    "fresta": 15,
+    "asC0": 1218,
+    "asT0": 250,
+    "asZ0": 4559,
+    "asY0": 915,
+    "asC1": 1078,
+    "asT1": 215,
+    "asZ1": 4569,
+    "asY1": 1050,
+    "asC2": 947,
+    "asT2": 184,
+    "asZ2": 4572,
+    "asY2": 1193,
+    "asC3": 718,
+    "asT3": 130,
+    "asZ3": 4574,
+    "asY3": 1452,
+    "asC4": 680,
+    "asT4": 118,
+    "asZ4": 4573,
+    "asY4": 1500,
+    "asC5": 665,
+    "asT5": 118,
+    "asZ5": 4572,
+    "asY5": 1550,
+    "asC6": 650,
+    "asT6": 122,
+    "asZ6": 4571,
+    "asY6": 1660,
+    "asC7": 637,
+    "asT7": 126,
+    "asZ7": 4571,
+    "asY7": 1800,
+    "asC8": 628,
+    "asT8": 130,
+    "asZ8": 4571,
+    "asY8": 1910,
+    "asC9": 623,
+    "asT9": 132,
+    "asZ9": 4571,
+    "asY9": 1990,
+    "asCf": "=asC0+(asC1-asC0)*80/1150",
+    "asTf": "=asT0+(asT1-asT0)*80/1150",
+    "asZf": "=asZ0+(asZ1-asZ0)*80/1150",
+    "asYf": "=asY0+(asY1-asY0)*80/1150",
+    "asInc": "=(asY2-asY1)/1250",
+    "asDc1": "=(asC1-asC2)/1250",
+    "asInc2": "=(asY3-asY2)/2250",
+    "asDc2": "=(asC2-asC3)/2250"
   },
   "simetrico": { "eixo": "x", "pos": 0 },
   "unidades": {
     "fuselagem": { "cor": "cinza", "funcao": "casco da fuselagem em seções lisas, do capô à ponta da cauda, com a barbatana ventral, o para-brisa, as janelas laterais e a porta traseira esquerda, que é a estrutura a que todo o resto do avião se prende" },
     "motor": { "cor": "verde", "funcao": "capô oco, aberto na frente em torno do cone da hélice, com o duto da entrada de ar dentro dele sob o cone, três venezianas de arrefecimento em cada flanco e os dois escapes laterais, preso à frente da fuselagem" },
     "helice": { "cor": "preto", "funcao": "cone de ponta arredondada com placa traseira e cinco pás de perfil aerodinâmico torcido da raiz à ponta, cada uma presa ao cone por um colar, que giram em torno do eixo do motor à frente do capô" },
-    "asas": { "cor": "azul", "funcao": "as duas metades da asa baixa, com diedro, aileron e flap em cada metade presos por eixo, presas aos flancos da fuselagem" },
+    "asas": { "cor": "azul", "funcao": "as duas metades da asa baixa, de perfil aerodinâmico e diedro, com a ponta levantada, o flap na parte interna e o aileron na externa de cada metade, presos por eixo e por suportes sob a borda de fuga, e as metades presas aos flancos da fuselagem" },
     "empenagem-horizontal": { "cor": "laranja", "funcao": "estabilizador e profundor de cada lado, presos por eixo, montados no topo da cauda da fuselagem" },
     "empenagem-vertical": { "cor": "roxo", "funcao": "deriva e leme preso por eixo, montados no dorso da cauda da fuselagem" },
     "trem-do-nariz": { "cor": "amarelo", "funcao": "roda, perna, amortecedor e garfo do trem do nariz, presos sob o capô, com o braço que o liga ao ventre da fuselagem" },
@@ -524,12 +573,211 @@
           "unidade": "asas",
           "rotulo": "asa",
           "secoes": [
-            { "pos": -6400, "nome": "ponta", "forma": "elipse", "tamanho": [623, 100], "centro": [4571, 2010] },
-            { "pos": -6000, "forma": "elipse", "tamanho": [665, 120], "centro": [4572, 1523] },
-            { "pos": -5400, "forma": "elipse", "tamanho": [718, 130], "centro": [4574, 1452] },
-            { "pos": -3700, "forma": "elipse", "tamanho": [889, 170], "centro": [4574, 1256] },
-            { "pos": -1900, "forma": "elipse", "tamanho": [1078, 215], "centro": [4569, 1050] },
-            { "pos": -750, "nome": "raiz", "forma": "elipse", "tamanho": [1218, 250], "centro": [4559, 915] }
+            {
+              "pos": -6400,
+              "nome": "ponta",
+              "forma": "poligono",
+              "centro": ["asZ9", "asY9"],
+              "perfil": [
+                ["=0.5*asC9", "=0.2437*asT9"],
+                ["=0.2143*asC9", "=0.4227*asT9"],
+                ["=-0.0714*asC9", "=0.5*asT9"],
+                ["=-0.2857*asC9", "=0.4291*asT9"],
+                ["=-0.4286*asC9", "=0.2332*asT9"],
+                ["=-0.4786*asC9", "=0.0736*asT9"],
+                ["=-0.5*asC9", "=-0.15*asT9"],
+                ["=-0.4786*asC9", "=-0.2704*asT9"],
+                ["=-0.4286*asC9", "=-0.3563*asT9"],
+                ["=-0.2857*asC9", "=-0.4618*asT9"],
+                ["=-0.0714*asC9", "=-0.5*asT9"],
+                ["=0.2143*asC9", "=-0.4584*asT9"],
+                ["=0.5*asC9", "=-0.362*asT9"]
+              ]
+            },
+            {
+              "pos": -6350,
+              "forma": "poligono",
+              "centro": ["asZ8", "asY8"],
+              "perfil": [
+                ["=0.5*asC8", "=0.2437*asT8"],
+                ["=0.2143*asC8", "=0.4227*asT8"],
+                ["=-0.0714*asC8", "=0.5*asT8"],
+                ["=-0.2857*asC8", "=0.4291*asT8"],
+                ["=-0.4286*asC8", "=0.2332*asT8"],
+                ["=-0.4786*asC8", "=0.0736*asT8"],
+                ["=-0.5*asC8", "=-0.15*asT8"],
+                ["=-0.4786*asC8", "=-0.2704*asT8"],
+                ["=-0.4286*asC8", "=-0.3563*asT8"],
+                ["=-0.2857*asC8", "=-0.4618*asT8"],
+                ["=-0.0714*asC8", "=-0.5*asT8"],
+                ["=0.2143*asC8", "=-0.4584*asT8"],
+                ["=0.5*asC8", "=-0.362*asT8"]
+              ]
+            },
+            {
+              "pos": -6270,
+              "forma": "poligono",
+              "centro": ["asZ7", "asY7"],
+              "perfil": [
+                ["=0.5*asC7", "=0.2437*asT7"],
+                ["=0.2143*asC7", "=0.4227*asT7"],
+                ["=-0.0714*asC7", "=0.5*asT7"],
+                ["=-0.2857*asC7", "=0.4291*asT7"],
+                ["=-0.4286*asC7", "=0.2332*asT7"],
+                ["=-0.4786*asC7", "=0.0736*asT7"],
+                ["=-0.5*asC7", "=-0.15*asT7"],
+                ["=-0.4786*asC7", "=-0.2704*asT7"],
+                ["=-0.4286*asC7", "=-0.3563*asT7"],
+                ["=-0.2857*asC7", "=-0.4618*asT7"],
+                ["=-0.0714*asC7", "=-0.5*asT7"],
+                ["=0.2143*asC7", "=-0.4584*asT7"],
+                ["=0.5*asC7", "=-0.362*asT7"]
+              ]
+            },
+            {
+              "pos": -6150,
+              "forma": "poligono",
+              "centro": ["asZ6", "asY6"],
+              "perfil": [
+                ["=0.5*asC6", "=0.2437*asT6"],
+                ["=0.2143*asC6", "=0.4227*asT6"],
+                ["=-0.0714*asC6", "=0.5*asT6"],
+                ["=-0.2857*asC6", "=0.4291*asT6"],
+                ["=-0.4286*asC6", "=0.2332*asT6"],
+                ["=-0.4786*asC6", "=0.0736*asT6"],
+                ["=-0.5*asC6", "=-0.15*asT6"],
+                ["=-0.4786*asC6", "=-0.2704*asT6"],
+                ["=-0.4286*asC6", "=-0.3563*asT6"],
+                ["=-0.2857*asC6", "=-0.4618*asT6"],
+                ["=-0.0714*asC6", "=-0.5*asT6"],
+                ["=0.2143*asC6", "=-0.4584*asT6"],
+                ["=0.5*asC6", "=-0.362*asT6"]
+              ]
+            },
+            {
+              "pos": -6000,
+              "forma": "poligono",
+              "centro": ["asZ5", "asY5"],
+              "perfil": [
+                ["=0.5*asC5", "=0.2437*asT5"],
+                ["=0.2143*asC5", "=0.4227*asT5"],
+                ["=-0.0714*asC5", "=0.5*asT5"],
+                ["=-0.2857*asC5", "=0.4291*asT5"],
+                ["=-0.4286*asC5", "=0.2332*asT5"],
+                ["=-0.4786*asC5", "=0.0736*asT5"],
+                ["=-0.5*asC5", "=-0.15*asT5"],
+                ["=-0.4786*asC5", "=-0.2704*asT5"],
+                ["=-0.4286*asC5", "=-0.3563*asT5"],
+                ["=-0.2857*asC5", "=-0.4618*asT5"],
+                ["=-0.0714*asC5", "=-0.5*asT5"],
+                ["=0.2143*asC5", "=-0.4584*asT5"],
+                ["=0.5*asC5", "=-0.362*asT5"]
+              ]
+            },
+            {
+              "pos": -5800,
+              "forma": "poligono",
+              "centro": ["asZ4", "asY4"],
+              "perfil": [
+                ["=0.5*asC4", "=0.2437*asT4"],
+                ["=0.2143*asC4", "=0.4227*asT4"],
+                ["=-0.0714*asC4", "=0.5*asT4"],
+                ["=-0.2857*asC4", "=0.4291*asT4"],
+                ["=-0.4286*asC4", "=0.2332*asT4"],
+                ["=-0.4786*asC4", "=0.0736*asT4"],
+                ["=-0.5*asC4", "=-0.15*asT4"],
+                ["=-0.4786*asC4", "=-0.2704*asT4"],
+                ["=-0.4286*asC4", "=-0.3563*asT4"],
+                ["=-0.2857*asC4", "=-0.4618*asT4"],
+                ["=-0.0714*asC4", "=-0.5*asT4"],
+                ["=0.2143*asC4", "=-0.4584*asT4"],
+                ["=0.5*asC4", "=-0.362*asT4"]
+              ]
+            },
+            {
+              "pos": -5400,
+              "nome": "s3",
+              "forma": "poligono",
+              "centro": ["asZ3", "asY3"],
+              "perfil": [
+                ["=0.5*asC3", "=0.2437*asT3"],
+                ["=0.2143*asC3", "=0.4227*asT3"],
+                ["=-0.0714*asC3", "=0.5*asT3"],
+                ["=-0.2857*asC3", "=0.4291*asT3"],
+                ["=-0.4286*asC3", "=0.2332*asT3"],
+                ["=-0.4786*asC3", "=0.0736*asT3"],
+                ["=-0.5*asC3", "=-0.15*asT3"],
+                ["=-0.4786*asC3", "=-0.2704*asT3"],
+                ["=-0.4286*asC3", "=-0.3563*asT3"],
+                ["=-0.2857*asC3", "=-0.4618*asT3"],
+                ["=-0.0714*asC3", "=-0.5*asT3"],
+                ["=0.2143*asC3", "=-0.4584*asT3"],
+                ["=0.5*asC3", "=-0.362*asT3"]
+              ]
+            },
+            {
+              "pos": -3150,
+              "nome": "s2",
+              "forma": "poligono",
+              "centro": ["asZ2", "asY2"],
+              "perfil": [
+                ["=0.5*asC2", "=0.2437*asT2"],
+                ["=0.2143*asC2", "=0.4227*asT2"],
+                ["=-0.0714*asC2", "=0.5*asT2"],
+                ["=-0.2857*asC2", "=0.4291*asT2"],
+                ["=-0.4286*asC2", "=0.2332*asT2"],
+                ["=-0.4786*asC2", "=0.0736*asT2"],
+                ["=-0.5*asC2", "=-0.15*asT2"],
+                ["=-0.4786*asC2", "=-0.2704*asT2"],
+                ["=-0.4286*asC2", "=-0.3563*asT2"],
+                ["=-0.2857*asC2", "=-0.4618*asT2"],
+                ["=-0.0714*asC2", "=-0.5*asT2"],
+                ["=0.2143*asC2", "=-0.4584*asT2"],
+                ["=0.5*asC2", "=-0.362*asT2"]
+              ]
+            },
+            {
+              "pos": -1900,
+              "nome": "s1",
+              "forma": "poligono",
+              "centro": ["asZ1", "asY1"],
+              "perfil": [
+                ["=0.5*asC1", "=0.2437*asT1"],
+                ["=0.2143*asC1", "=0.4227*asT1"],
+                ["=-0.0714*asC1", "=0.5*asT1"],
+                ["=-0.2857*asC1", "=0.4291*asT1"],
+                ["=-0.4286*asC1", "=0.2332*asT1"],
+                ["=-0.4786*asC1", "=0.0736*asT1"],
+                ["=-0.5*asC1", "=-0.15*asT1"],
+                ["=-0.4786*asC1", "=-0.2704*asT1"],
+                ["=-0.4286*asC1", "=-0.3563*asT1"],
+                ["=-0.2857*asC1", "=-0.4618*asT1"],
+                ["=-0.0714*asC1", "=-0.5*asT1"],
+                ["=0.2143*asC1", "=-0.4584*asT1"],
+                ["=0.5*asC1", "=-0.362*asT1"]
+              ]
+            },
+            {
+              "pos": -750,
+              "nome": "raiz",
+              "forma": "poligono",
+              "centro": ["asZ0", "asY0"],
+              "perfil": [
+                ["=0.5*asC0", "=0.2437*asT0"],
+                ["=0.2143*asC0", "=0.4227*asT0"],
+                ["=-0.0714*asC0", "=0.5*asT0"],
+                ["=-0.2857*asC0", "=0.4291*asT0"],
+                ["=-0.4286*asC0", "=0.2332*asT0"],
+                ["=-0.4786*asC0", "=0.0736*asT0"],
+                ["=-0.5*asC0", "=-0.15*asT0"],
+                ["=-0.4786*asC0", "=-0.2704*asT0"],
+                ["=-0.4286*asC0", "=-0.3563*asT0"],
+                ["=-0.2857*asC0", "=-0.4618*asT0"],
+                ["=-0.0714*asC0", "=-0.5*asT0"],
+                ["=0.2143*asC0", "=-0.4584*asT0"],
+                ["=0.5*asC0", "=-0.362*asT0"]
+              ]
+            }
           ],
           "encaixa": {
             "ancora": "raiz",
@@ -545,13 +793,53 @@
           "cor": "laranja",
           "rotulo": "flap",
           "secoes": [
-            { "pos": -4887, "forma": "retangulo", "tamanho": [305, 55], "centro": [5127, 1360] },
-            { "pos": -2850, "forma": "retangulo", "tamanho": [389, 80], "centro": [5270.5, 1114] },
-            { "pos": -830, "forma": "retangulo", "tamanho": [508.5, 100], "centro": [5431, 862] }
+            {
+              "pos": -3130,
+              "forma": "poligono",
+              "centro": ["asZ2", "asY2"],
+              "perfil": [
+                ["=0.5*asC2+fresta", "=-0.35*asT2"],
+                ["=0.6429*asC2", "=-0.3*asT2"],
+                ["=0.7857*asC2", "=-0.2297*asT2"],
+                ["=0.9286*asC2", "=-0.15*asT2"],
+                ["=0.7857*asC2", "=-0.0021*asT2"],
+                ["=0.6429*asC2", "=0.1286*asT2"],
+                ["=0.5*asC2+fresta", "=0.23*asT2"]
+              ]
+            },
+            {
+              "pos": -1900,
+              "nome": "s1",
+              "forma": "poligono",
+              "centro": ["asZ1", "asY1"],
+              "perfil": [
+                ["=0.5*asC1+fresta", "=-0.35*asT1"],
+                ["=0.6429*asC1", "=-0.3*asT1"],
+                ["=0.7857*asC1", "=-0.2297*asT1"],
+                ["=0.9286*asC1", "=-0.15*asT1"],
+                ["=0.7857*asC1", "=-0.0021*asT1"],
+                ["=0.6429*asC1", "=0.1286*asT1"],
+                ["=0.5*asC1+fresta", "=0.23*asT1"]
+              ]
+            },
+            {
+              "pos": -830,
+              "forma": "poligono",
+              "centro": ["asZf", "asYf"],
+              "perfil": [
+                ["=0.5*asCf+fresta", "=-0.35*asTf"],
+                ["=0.6429*asCf", "=-0.3*asTf"],
+                ["=0.7857*asCf", "=-0.2297*asTf"],
+                ["=0.9286*asCf", "=-0.15*asTf"],
+                ["=0.7857*asCf", "=-0.0021*asTf"],
+                ["=0.6429*asCf", "=0.1286*asTf"],
+                ["=0.5*asCf+fresta", "=0.23*asTf"]
+              ]
+            }
           ],
           "encaixa": {
             "ancora": "fim",
-            "em": { "ancora": "asaE.raiz", "mm": [-80, -53, 872] }
+            "em": { "ancora": "asaE.raiz", "mm": [-80, "=asYf-asY0", "=asZf-asZ0"] }
           }
         },
         {
@@ -563,16 +851,109 @@
           "cor": "laranja",
           "rotulo": "aileron",
           "secoes": [
-            { "pos": -6000, "forma": "retangulo", "tamanho": [262, 45], "centro": [5050, 1510] },
-            { "pos": -4910, "forma": "retangulo", "tamanho": [303.4, 55], "centro": [5125.3, 1354] }
+            {
+              "pos": -5800,
+              "forma": "poligono",
+              "centro": ["asZ4", "asY4"],
+              "perfil": [
+                ["=0.5*asC4+fresta", "=-0.35*asT4"],
+                ["=0.6429*asC4", "=-0.3*asT4"],
+                ["=0.7857*asC4", "=-0.2297*asT4"],
+                ["=0.9286*asC4", "=-0.15*asT4"],
+                ["=0.7857*asC4", "=-0.0021*asT4"],
+                ["=0.6429*asC4", "=0.1286*asT4"],
+                ["=0.5*asC4+fresta", "=0.23*asT4"]
+              ]
+            },
+            {
+              "pos": -5400,
+              "nome": "s3",
+              "forma": "poligono",
+              "centro": ["asZ3", "asY3"],
+              "perfil": [
+                ["=0.5*asC3+fresta", "=-0.35*asT3"],
+                ["=0.6429*asC3", "=-0.3*asT3"],
+                ["=0.7857*asC3", "=-0.2297*asT3"],
+                ["=0.9286*asC3", "=-0.15*asT3"],
+                ["=0.7857*asC3", "=-0.0021*asT3"],
+                ["=0.6429*asC3", "=0.1286*asT3"],
+                ["=0.5*asC3+fresta", "=0.23*asT3"]
+              ]
+            },
+            {
+              "pos": -3170,
+              "forma": "poligono",
+              "centro": ["asZ2", "asY2"],
+              "perfil": [
+                ["=0.5*asC2+fresta", "=-0.35*asT2"],
+                ["=0.6429*asC2", "=-0.3*asT2"],
+                ["=0.7857*asC2", "=-0.2297*asT2"],
+                ["=0.9286*asC2", "=-0.15*asT2"],
+                ["=0.7857*asC2", "=-0.0021*asT2"],
+                ["=0.6429*asC2", "=0.1286*asT2"],
+                ["=0.5*asC2+fresta", "=0.23*asT2"]
+              ]
+            }
           ],
           "encaixa": {
             "ancora": "fim",
-            "em": { "ancora": "asaE.raiz", "mm": [-4160, 439, 566] }
+            "em": { "ancora": "asaE.raiz", "mm": [-2420, "=asY2-asY0", "=asZ2-asZ0"] }
           }
         },
-        { "id": "eixoFlapE", "ligar": { "de": { "ancora": "flapE.inicio", "mm": [0, 0, -160] }, "para": { "ancora": "flapE.fim", "mm": [0, 0, -262] }, "tipo": "haste", "diametro": 30 }, "cor": "preto", "lado": "E", "unidade": "asas", "rotulo": "eixo_do_flap" },
-        { "id": "eixoAileronE", "ligar": { "de": { "ancora": "aileronE.inicio", "mm": [0, 0, -138.5] }, "para": { "ancora": "aileronE.fim", "mm": [0, 0, -159] }, "tipo": "haste", "diametro": 30 }, "cor": "preto", "lado": "E", "unidade": "asas", "rotulo": "eixo_do_aileron" },
+        {
+          "id": "eixoFlapE",
+          "ligar": {
+            "de": { "ancora": "flapE.inicio", "mm": [0, "=-0.0592*asT2", "=0.5*asC2+0.5*fresta"] },
+            "para": { "ancora": "flapE.fim", "mm": [0, "=-0.0592*asTf", "=0.5*asCf+0.5*fresta"] },
+            "tipo": "haste",
+            "diametro": 30
+          },
+          "cor": "preto",
+          "lado": "E",
+          "unidade": "asas",
+          "rotulo": "eixo_do_flap"
+        },
+        {
+          "id": "eixoAileronE",
+          "ligar": {
+            "de": { "ancora": "aileronE.inicio", "mm": [0, "=-0.0592*asT4", "=0.5*asC4+0.5*fresta"] },
+            "para": { "ancora": "aileronE.fim", "mm": [0, "=-0.0592*asT2", "=0.5*asC2+0.5*fresta"] },
+            "tipo": "haste",
+            "diametro": 30
+          },
+          "cor": "preto",
+          "lado": "E",
+          "unidade": "asas",
+          "rotulo": "eixo_do_aileron"
+        },
+        { "id": "suporteFlap1E", "tipo": "caixa", "largura": 80, "altura": 70, "profundidade": 300, "raio": 25, "centro": { "ancora": "flapE.s1", "mm": [0, "=-0.45*asT1", "=0.5*asC1+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "asas", "rotulo": "suporte_do_flap" },
+        {
+          "id": "suporteFlap2E",
+          "tipo": "caixa",
+          "largura": 80,
+          "altura": 70,
+          "profundidade": 300,
+          "raio": 25,
+          "centro": { "ancora": "flapE.inicio", "mm": [200, "=-0.5*asT2-asInc*200", "=0.5*(asC2+asDc1*200)+0.5*fresta"] },
+          "cor": "cinza",
+          "lado": "E",
+          "unidade": "asas",
+          "rotulo": "suporte_do_flap"
+        },
+        { "id": "suporteAileron1E", "tipo": "caixa", "largura": 70, "altura": 60, "profundidade": 260, "raio": 22, "centro": { "ancora": "aileronE.s3", "mm": [0, "=-0.45*asT3", "=0.5*asC3+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "asas", "rotulo": "suporte_do_aileron" },
+        {
+          "id": "suporteAileron2E",
+          "tipo": "caixa",
+          "largura": 70,
+          "altura": 60,
+          "profundidade": 260,
+          "raio": 22,
+          "centro": { "ancora": "aileronE.fim", "mm": [-300, "=-0.45*asT2+asInc2*300", "=0.5*(asC2-asDc2*300)+0.5*fresta"] },
+          "cor": "cinza",
+          "lado": "E",
+          "unidade": "asas",
+          "rotulo": "suporte_do_aileron"
+        },
         {
           "id": "estabE",
           "tipo": "loft",
