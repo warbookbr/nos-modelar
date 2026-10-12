@@ -1373,6 +1373,12 @@
       "unidade": "motor",
       "nota": 8,
       "motivo": "Capô oco, abertura em torno do cone e duto com boca resolvidos e legíveis nos cortes. Restam detalhes de superfície já apontados: as venezianas são três marcas escuras cheias sem abertura legível (lateral x≈710-725, y≈630-636), e dois tracinhos no rodapé da frontal (x≈498 e 602, y≈808) sugerem o duto aflorando na parede de trás."
+    },
+    {
+      "ordem": 11,
+      "unidade": "fuselagem",
+      "nota": 7,
+      "motivo": "Defeito estrutural: a placa da porta é plana sobre um flanco que se estreita 2 a 3 graus; rente em z=5600, mas em z=6300 a face externa fica cerca de 50 mm fora do casco e só o batente preenche o vão. No corte x=-780 a janela 4 fica fora do retângulo da placa, sem apoio claro. A cauda fecha agora em ponta arredondada, mas segue haste fina (cerca de 15 por 12 px). Corpo escuro acima do casco e parede vertical da placa resolvidos."
     }
   ]
 }
