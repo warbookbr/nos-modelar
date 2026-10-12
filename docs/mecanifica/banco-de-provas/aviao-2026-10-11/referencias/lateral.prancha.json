@@ -3,28 +3,24 @@
   {
    "parte": "helice",
    "medida": "largura",
-   "em": 750,
+   "em": 2000,
    "numero": [
-    -650,
+    350,
     0
    ]
   },
   {
    "parte": "helice",
    "medida": "altura",
-   "em": 555,
-   "numero": [
-    400,
-    -200
-   ]
+   "em": -250
   },
   {
    "parte": "cone",
    "medida": "largura",
    "em": 1340,
    "numero": [
-    -500,
-    -90
+    -430,
+    250
    ]
   },
   {
@@ -46,57 +42,57 @@
    "parte": "escape",
    "medida": "largura",
    "em": 1340,
-   "afasta": 800
+   "afasta": -850
   },
   {
    "parte": "escape",
    "medida": "altura",
    "de": [
-    1550,
+    1560,
     1270
    ],
    "ate": [
-    1550,
+    1560,
     1410
    ],
    "afasta": [
     0,
-    600
+    -850
    ]
   },
   {
    "parte": "parabrisa",
    "medida": "largura",
-   "em": 2700
+   "em": 2330
   },
   {
    "parte": "parabrisa",
    "medida": "altura",
-   "em": 2550,
+   "em": 3300,
    "numero": [
-    -250,
-    0
+    -600,
+    300
    ]
   },
   {
    "parte": "janelas",
    "medida": "largura",
-   "em": 2400
+   "em": -350
   },
   {
    "parte": "janelas",
    "medida": "altura",
    "de": [
-    4300,
+    6100,
     1692
    ],
    "ate": [
-    4300,
+    6100,
     2044
    ],
    "afasta": [
     0,
-    950
+    720
    ]
   },
   {
@@ -172,18 +168,22 @@
   {
    "parte": "deriva",
    "medida": "largura",
-   "em": 3000
+   "em": 3500
   },
   {
    "parte": "deriva",
    "medida": "altura",
    "de": [
-    7300,
-    2256
+    9000,
+    2247
    ],
    "ate": [
-    7300,
+    9000,
     4157
+   ],
+   "numero": [
+    -500,
+    400
    ]
   },
   {
@@ -241,18 +241,18 @@
   "helice": {
    "marca": [
     480,
-    950
+    2100
    ],
    "coluna": "esquerda",
-   "nivel": 1000
+   "nivel": 3250
   },
   "cone": {
    "marca": [
     250,
-    1390
+    1260
    ],
    "coluna": "esquerda",
-   "nivel": 1700
+   "nivel": -1300
   },
   "escape": {
    "marca": [
@@ -260,7 +260,7 @@
     1340
    ],
    "coluna": "esquerda",
-   "nivel": 2000
+   "nivel": 3000
   },
   "capo": {
    "marca": [
@@ -268,15 +268,15 @@
     1600
    ],
    "coluna": "esquerda",
-   "nivel": 2300
+   "nivel": 3500
   },
   "parabrisa": {
    "marca": [
-    3500,
-    2120
+    3050,
+    1890
    ],
    "coluna": "esquerda",
-   "nivel": 3700
+   "nivel": 3800
   },
   "porta": {
    "marca": [
@@ -284,23 +284,23 @@
     2150
    ],
    "coluna": "esquerda",
-   "nivel": 4400
+   "nivel": 4500
   },
   "janelas": {
    "marca": [
-    3950,
-    1990
+    5160,
+    1960
    ],
    "coluna": "esquerda",
-   "nivel": 2900
+   "nivel": 4100
   },
   "deriva": {
    "marca": [
-    9600,
-    4000
+    8700,
+    2700
    ],
    "coluna": "esquerda",
-   "nivel": 4800
+   "nivel": 4900
   },
   "tremNariz": {
    "marca": [
@@ -308,12 +308,12 @@
     120
    ],
    "coluna": "esquerda",
-   "nivel": -100
+   "nivel": -1600
   },
   "asa": {
    "marca": [
-    6050,
-    1040
+    5000,
+    900
    ],
    "coluna": "direita",
    "nivel": -150
