@@ -27,6 +27,12 @@
      `unidade` herda a da fonte.
    - Cada forma sai marcada com `daInstancia: { id, principal }`, que o conserto e o `--ajustar` usam para saber que só a
      principal se move pela edição da instância.
+   - `rotacao` na instância (como a das formas: `[rx, ry, rz]`, `{ eixo, angulo }`, `{ x, y, z }` ou um número, que gira em y;
+     aceita parâmetro e expressão) gira o componente inteiro, como um corpo só, em torno do centro da forma principal: as
+     formas dele se posicionam como se não girasse (`ponta` e `sobre` do componente valem na pose de repouso) e o resto do
+     esboço enxerga a pose girada. Saem em `giros` (ver `giro.js`). O componente que declara uma entrada `rotacao` a recebe
+     como entrada, como antes. A roda do trem principal do avião, que recolhe girando em torno de z, precisou de um módulo
+     `rodaGira` que repetia o desenho da `roda` com seno e cosseno de `ang` (atrito 43).
 
    Puro: não lê arquivo (a biblioteca é importada como dados). */
 import { ErroDeEsboco } from './index.js';
@@ -36,11 +42,12 @@ import { quisDizer } from './parecido.js';
 import { fontesDoArranjo, nomesDasCopias } from './arranjo.js';
 import { traduzirLigacoes } from './ligar.js';
 import { lerPerguntasDoComponente } from '../../../src/autoria/perguntas-do-critico.js';
+import { angulosDaRotacao } from './giro.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const clone = (v) => JSON.parse(JSON.stringify(v));
-const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta', 'lado'];
+const RESERVADAS = ['id', 'usa', 'parametros', 'cor', 'rotulo', 'oculto', 'opacidade', 'unidade', 'ponta', 'lado', 'rotacao'];
 const ANCORAS_DA_FORMA = ['centro', 'inicio', 'fim', '+x', '-x', '+y', '-y', '+z', '-z'];
 
 export const NOMES_DOS_COMPONENTES = Object.keys(COMPONENTES);
@@ -240,6 +247,7 @@ export function expandirComponentes(formas, ctx) {
 
   const saida = [];
   const pares = [];
+  const giros = [];
   const expandidas = new Map();
 
   const formasDaInstancia = (inst) => {
@@ -261,6 +269,11 @@ export function expandirComponentes(formas, ctx) {
       if (f[k] === undefined) { entradas[k] = padrao; continue; }
       const resolvida = ctx.numerosDaForma({ [k]: f[k] }, ctx.num, contexto)[k];
       entradas[k] = reescreverForma({ [k]: resolvida }, referenciaDeFora(contexto))[k];
+    }
+    /* `rotacao` da instância: o componente inteiro gira em torno do centro da principal (a menos que o componente a declare como entrada) */
+    if (f.rotacao !== undefined && !declaradas.includes('rotacao')) {
+      const rotacao = angulosDaRotacao(ctx.numerosDaForma({ rotacao: f.rotacao }, ctx.num, contexto).rotacao);
+      giros.push({ instancia: f.id, principal: `${f.id}.${comp.principal}`, rotacao });
     }
     const locais = new Set(comp.formas.map((g) => g.id));
     const prefixa = (v) => (typeof v === 'string' && locais.has(v) ? `${f.id}.${v}` : v);
@@ -357,5 +370,5 @@ export function expandirComponentes(formas, ctx) {
       saida.push(objeto(f) ? reescreverForma(f, fora) : f);
     }
   }
-  return { formas: saida, pares, aliasDeId: (id) => (dadosDe.has(id) ? principalDe(id) : undefined), instancias: dadosDe.size, ponto: (v) => (typeof v === 'string' ? fora.ponto(v, true) : v) };
+  return { formas: saida, pares, giros, aliasDeId: (id) => (dadosDe.has(id) ? principalDe(id) : undefined), instancias: dadosDe.size, ponto: (v) => (typeof v === 'string' ? fora.ponto(v, true) : v) };
 }

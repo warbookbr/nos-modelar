@@ -67,7 +67,7 @@ export function imagemDoAchado(bruto, divergencia, { vista = 'isometrica', lado 
     geometria: true,
     ocultar: ['legendas', 'numeracao', 'marcadores', 'linhasCentro', 'escala', 'titulo', 'nota'],
     ...(esboco.pontos ? { pontos: esboco.pontos } : {}),
-    opcoes: [{ titulo: opcao.titulo, ...(opcao.pontos ? { pontos: opcao.pontos } : {}), formas }],
+    opcoes: [{ titulo: opcao.titulo, ...(opcao.pontos ? { pontos: opcao.pontos } : {}), ...(opcao.giros ? { giros: opcao.giros } : {}), formas }],
   };
   const { svg, geometria, escala } = desenharEsboco(desenho);
   const { cx, cy } = geometria.paineis[0];

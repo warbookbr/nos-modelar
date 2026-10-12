@@ -43,11 +43,14 @@ export const PONTOS_ATRAS_DO_EIXO = 9;
 export const PONTOS_DO_NARIZ = 9;
 export const LADOS_DO_COMANDO = 2 * PONTOS_ATRAS_DO_EIXO + PONTOS_DO_NARIZ + 1;
 /* as seções de cada trecho (o bloco de ids do núcleo guarda 1000 vértices e 1000 faces por `loft`) */
-export const INTERVALOS_ATE_A_CURVA = 8;
+export const INTERVALOS_ATE_A_CURVA = 6;
 export const INTERVALOS_DA_RAIZ_AO_COMANDO = 4;
 export const INTERVALOS_NO_ENTALHE = 3;
 export const INTERVALOS_DO_COMANDO_A_CURVA = 3;
+/* a curva da ponta levantada: sem comando sobram seções no bloco de 1000 vértices do `loft` (6 do trecho reto e 12 da curva, contra 24 com comando), e a pá e a superfície sem comando ganham seis na curva */
 export const INTERVALOS_NA_CURVA = 6;
+export const INTERVALOS_NA_CURVA_SEM_COMANDO = 12;
+export const intervalosNaCurva = (comando) => (comando ? INTERVALOS_NA_CURVA : INTERVALOS_NA_CURVA_SEM_COMANDO);
 export const INTERVALOS_NO_COMANDO = 3;
 /* a tampa da ponta: a espessura da seção vezes o cosseno destes ângulos, e a última seção é a corda */
 export const ANGULOS_DA_TAMPA = Object.freeze([30, 55, 75]);
@@ -65,6 +68,13 @@ export const FRACAO_MAXIMA_DA_FRESTA_NO_COMANDO = 0.1;
 export const FAIXA_DO_RAIO = 0.010;
 
 const suave = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * t * (10 + t * (-15 + 6 * t)));
+/** O inverso de `suave` em [0, 1], por bisecção: a fração do trecho em que a curva da ponta chega à fração `y` do seu ângulo. */
+export function inverterSuave(y) {
+  let baixo = 0;
+  let alto = 1;
+  for (let k = 0; k < 60; k++) { const meio = (baixo + alto) / 2; if (suave(meio) < y) baixo = meio; else alto = meio; }
+  return (baixo + alto) / 2;
+}
 const arredondar = (valor) => Math.round(valor * 1e10) / 1e10;
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const norma = ([x, y, z]) => { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; };

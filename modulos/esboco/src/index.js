@@ -10,6 +10,7 @@ import { formasDoPainel, montarCamada } from './camada.js';
 import { frenteDoCorte, ladoDoCorte, lacosDoPlano, lerCorte, recortarBloco } from './corte.js';
 import { caixaDaMalha, fatiarMalha, verticesDaMalha } from './malha.js';
 import { malhaDaFamilia, nomesDeAncorasDaFamilia } from './familia.js';
+import { angulosDaMatriz, lerGiros } from './giro.js';
 import { densificar, densificarPerfil, ladosDoContorno, normaisSuavesDasFaixas, segmentosDoCanto, toleranciaDe } from './suave.js';
 
 const EIXOS = ['x', 'y', 'z'];
@@ -1103,6 +1104,34 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
   };
 }
 
+/* Giro rígido de uma forma já resolvida: o centro gira `R` em torno de `pivo`, e a forma ganha `R` na frente da matriz que já
+   tinha (o tubo e a faixa, que não têm matriz própria, giram as partes, os extremos, a trilha e o caminho, como a cópia de um
+   `arranja` radial). O prisma que não é haste volta a declarar a `rotacao` composta, que `--descrever` mostra. Quem chama é o
+   grupo de `opcao.giros` (a instância de componente com `rotacao` e as `formas` de um `curso`): a forma de dentro do grupo
+   enxerga as outras na pose de repouso, e o resto do esboço enxerga esta, a girada. */
+function girarResolvida(r, R, pivo) {
+  const rel = r.centro.map((c, i) => c - pivo[i]);
+  const centro = aplicarMatriz(rel, R).map((c, i) => pivo[i] + c);
+  const gira = (v) => aplicarMatriz(v, R);
+  if (r.partes) {
+    const partes = r.partes.map((pt) => ({ ...pt, matriz: multiplicar(R, pt.matriz ?? IDENTIDADE), dc: gira(pt.dc) }));
+    const girada = { ...r, centro, partes, matriz: null };
+    if (r.extremos) girada.extremos = { inicio: gira(r.extremos.inicio), fim: gira(r.extremos.fim) };
+    if (r.nomeadas) girada.nomeadas = Object.fromEntries(Object.entries(r.nomeadas).map(([nome, d]) => [nome, gira(d)]));
+    if (r.trilha) girada.trilha = { ...r.trilha, pontos: r.trilha.pontos.map(gira) };
+    if (r.caminho) girada.caminho = r.caminho.map(gira);
+    return { ...girada, ...caixaDeTubo(girada) };
+  }
+  const m = multiplicar(R, r.matriz ?? IDENTIDADE);
+  const local = caixaLocal(r.prisma, m);
+  return {
+    ...r, centro, matriz: m,
+    min: local.min.map((val, i) => val + centro[i]),
+    max: local.max.map((val, i) => val + centro[i]),
+    ...(r.haste || r.forma.de !== undefined ? {} : { forma: { ...r.forma, rotacao: angulosDaMatriz(m) } }),
+  };
+}
+
 /* Tubo por pontos: cada trecho reto é um cilindro (seção cilíndrica) e, com `raioCurva`, cada canto vira um
    arco de raio `raioCurva` cortado em seções retas de no máximo PASSO_DA_CURVA graus; sem `raioCurva` cada canto
    leva uma esfera do diâmetro do tubo. `pts` são os pontos do caminho já resolvidos, em mm. Devolve as partes
@@ -1346,7 +1375,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
   }
   const prontas = new Map();
   const visitando = new Set();
-  const resolver = (id) => {
+  const calcular = (id) => {
     if (prontas.has(id)) return prontas.get(id);
     const f = porId.get(id);
     const onde = `${rotuloOpcao}, forma "${id}"`;
@@ -1547,6 +1576,39 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
     visitando.delete(id);
     prontas.set(id, r);
     return r;
+  };
+  /* Giro de grupo (`opcao.giros`, ver `giro.js`): a forma do grupo se posiciona e se cita, dentro do grupo, na pose de repouso
+     (`livre`), e quem a cita de fora, o gate e o desenho enxergam a pose girada (`resolver`). `pilha` diz que forma está sendo
+     calculada, e por isso de que lado vem o pedido. O pivô dado por ponto é uma esfera de 1 mm que só serve para resolvê-lo
+     (o ponto é lido na pose de repouso do grupo, como a dobradiça de uma porta) e não sai no resultado. */
+  const giros = lerGiros(opcao.giros, new Set(porId.keys()), rotuloOpcao);
+  const giroDe = new Map();
+  giros.forEach((g, k) => {
+    for (const id of g.ids) giroDe.set(id, g);
+    if (g.pivo.ponto !== undefined) {
+      g.pivoId = `__pivo${k + 1}`;
+      porId.set(g.pivoId, { id: g.pivoId, tipo: 'esfera', diametro: 1, centro: g.pivo.ponto });
+      giroDe.set(g.pivoId, g);
+    }
+  });
+  const pilha = [];
+  const livre = (id) => {
+    if (prontas.has(id)) return prontas.get(id);
+    pilha.push(id);
+    try { return calcular(id); } finally { pilha.pop(); }
+  };
+  const expostas = new Map();
+  const resolver = (id) => {
+    const g = giroDe.get(id);
+    if (g === undefined) return livre(id);
+    const quem = pilha[pilha.length - 1];
+    if (quem !== undefined && giroDe.get(quem) === g) return livre(id);
+    if (!expostas.has(id)) {
+      const R = matrizRotacao(g.rotacao);
+      const pivo = livre(g.pivoId ?? g.pivo.forma).centro;
+      expostas.set(id, R ? girarResolvida(livre(id), R, pivo) : livre(id));
+    }
+    return expostas.get(id);
   };
   return formas.map((f) => resolver(f.id));
 }
@@ -2237,8 +2299,10 @@ function comLadosPorEscala(esboco, previa = false) {
     /* com o zoom, as curvas se medem pela janela e não pelo conjunto: é nela que a flecha de 0,35 px precisa valer */
     const alvo = enquadre ? formasDoEnquadre(todas.filter((r) => r.forma.oculto !== true), enquadre.formas) : [];
     const rs = alvo.length > 0 ? alvo : todas;
+    /* os `pontos` do enquadramento (o quadro das poses de um curso) contam na dimensão: a pose não muda o número de lados */
+    const extras = alvo.length > 0 ? (enquadre.pontos ?? []) : [];
     for (let e = 0; e < 3; e++) {
-      const lado = Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e]));
+      const lado = Math.max(...rs.map((r) => r.max[e]), ...extras.map((p) => p[e])) - Math.min(...rs.map((r) => r.min[e]), ...extras.map((p) => p[e]));
       dimensao = Math.max(dimensao, alvo.length > 0 ? lado + 2 * (enquadre.margem ?? Math.max(5, 0.15 * lado)) : lado);
     }
   }
@@ -2264,17 +2328,20 @@ function comLadosPorEscala(esboco, previa = false) {
    mínimo 5 mm), e re-renderizada nessa escala. `formas` também pode ser uma lista desses nomes, e o quadro fecha na união
    delas: é como a vista de uma unidade com vizinhas em cinza enquadra só a unidade (no avião, o capô de 1,7 m tocava a
    fuselagem de 10 m, que entrava inteira no quadro e deixava o motor com um décimo da imagem). `aviso: false` tira do
-   subtítulo o "zoom em ...", que numa imagem feita para o crítico cego é ruído. */
+   subtítulo o "zoom em ...", que numa imagem feita para o crítico cego é ruído. `pontos` (uma lista de [x, y, z] em mm) soma
+   esses pontos ao quadro: as poses de um curso de mecanismo saem todas no mesmo quadro, o da união das posições, para a
+   travessia na última pose não mudar a escala da imagem. */
 export function lerEnquadrar(v, onde = 'esboço') {
   if (v === undefined) return undefined;
   const dica = '"enquadrar" deve ser { "formas": "<id | instância | padrão>" ou uma lista deles, "margem": mm (opcional, 0 ou mais) }';
   exigir(v && typeof v === 'object' && !Array.isArray(v), `${onde}: ${dica}`);
-  for (const k of Object.keys(v)) exigir(['formas', 'margem', 'aviso'].includes(k), `${onde}: o campo "${k}" não existe em "enquadrar"; ${dica}`);
+  for (const k of Object.keys(v)) exigir(['formas', 'margem', 'aviso', 'pontos'].includes(k), `${onde}: o campo "${k}" não existe em "enquadrar"; ${dica}`);
+  exigir(v.pontos === undefined || (Array.isArray(v.pontos) && v.pontos.every((q) => Array.isArray(q) && q.length === 3 && q.every(Number.isFinite))), `${onde}: "pontos" de "enquadrar" deve ser uma lista de [x, y, z] em mm`);
   const nomeValido = (x) => typeof x === 'string' && x.trim();
   exigir(nomeValido(v.formas) || (Array.isArray(v.formas) && v.formas.length > 0 && v.formas.every(nomeValido)), `${onde}: ${dica}`);
   exigir(v.margem === undefined || (typeof v.margem === 'number' && Number.isFinite(v.margem) && v.margem >= 0), `${onde}: ${dica}; a margem ${JSON.stringify(v.margem)} não serve`);
   exigir(v.aviso === undefined || typeof v.aviso === 'boolean', `${onde}: "aviso" de "enquadrar" deve ser true ou false`);
-  return { formas: Array.isArray(v.formas) ? v.formas.map((x) => x.trim()) : v.formas.trim(), ...(v.margem !== undefined ? { margem: v.margem } : {}), ...(v.aviso === false ? { aviso: false } : {}) };
+  return { formas: Array.isArray(v.formas) ? v.formas.map((x) => x.trim()) : v.formas.trim(), ...(v.margem !== undefined ? { margem: v.margem } : {}), ...(v.aviso === false ? { aviso: false } : {}), ...(v.pontos !== undefined ? { pontos: v.pontos } : {}) };
 }
 
 const casaPadraoDeForma = (padrao, id) => new RegExp(`^${padrao.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`).test(id);
@@ -2701,7 +2768,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
       const alvo = new Set(formasDoEnquadre(itens.map((i) => i.r), enquadrar.formas));
       if (alvo.size > 0) {
         enquadreAchou = true;
-        const q = itens.filter((i) => alvo.has(i.r)).flatMap((i) => i.casco);
+        const q = [...itens.filter((i) => alvo.has(i.r)).flatMap((i) => i.casco), ...(enquadrar.pontos ?? []).map(V.p)];
         const caixa = [Math.min(...q.map((a) => a[0])), Math.min(...q.map((a) => a[1])), Math.max(...q.map((a) => a[0])), Math.max(...q.map((a) => a[1]))];
         const margem = enquadrar.margem ?? Math.max(5, 0.15 * Math.max(caixa[2] - caixa[0], caixa[3] - caixa[1]));
         janela = { min: [caixa[0] - margem, caixa[1] - margem], max: [caixa[2] + margem, caixa[3] + margem], margem, formas: [...alvo].length };

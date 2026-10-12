@@ -15,9 +15,9 @@ import { sha256Hex } from '../../nucleo/sha256.js';
 import { FAMILIAS, ErroChamadaDeFamilia, chamar, criarRegistroDeFamilias } from '../index.js';
 import { SUPERFICIE_AERODINAMICA as F } from './index.js';
 import {
-  EXPOENTE_DAS_ESTACOES, GRAUS, LADOS_DA_SECAO, PONTOS_POR_FACE, contornoDoPerfil, linhaDeCurvatura, meiaEspessura, plantaDa,
+  EXPOENTE_DAS_ESTACOES, GRAUS, LADOS_DA_SECAO, PONTOS_POR_FACE, contornoDoPerfil, linhaDeCurvatura, meiaEspessura, plantaDa, pontoDaSecao, quadrosDoLoft,
 } from './geometria.js';
-import { LADOS_DO_CUBO } from './composicoes.js';
+import { ANGULO_DO_LISO, LADOS_DO_CUBO, PONTOS_DA_OGIVA } from './composicoes.js';
 
 const registro = criarRegistroDeFamilias({ familias: [F] });
 const MM = 0.001;
@@ -274,14 +274,14 @@ describe('a asa de avião leve medida na malha (perfil asa)', () => {
     expect(medido / esperado).toBeLessThan(1.0);
   });
 
-  it('a ponta levantada sai do diedro por uma curva suave e as seções acompanham: inclinação contínua, giro por seção de no máximo 13 graus', () => {
+  it('a ponta levantada sai do diedro por uma curva suave e as seções acompanham: inclinação contínua, giro por seção de no máximo 9 graus', () => {
     const { argumentos } = chamar(F, 'a', { perfil: 'asa' });
     const posicoes = Object.keys(argumentos).filter((nome) => /^fPos\d+$/.test(nome)).sort((a, b) => Number(a.slice(4)) - Number(b.slice(4))).map((nome) => argumentos[nome]);
     const inclinacoes = posicoes.slice(1).map((q, i) => Math.atan2(q[1] - posicoes[i][1], q[0] - posicoes[i][0]) / GRAUS);
     const apos = inclinacoes.filter((_, i) => posicoes[i][0] >= 0 && posicoes[i + 1][0] > posicoes[i][0]);
     expect(apos.slice(0, 6).every((g) => Math.abs(g - 5) < 1e-6 || g === 0)).toBe(true);
     const giros = apos.slice(1).map((g, i) => g - apos[i]);
-    expect(Math.max(...giros.map(Math.abs))).toBeLessThan(13);
+    expect(Math.max(...giros.map(Math.abs))).toBeLessThan(9);
     expect(Math.max(...apos)).toBeGreaterThan(5 + 40 * 0.9);
     expect(Math.max(...apos)).toBeLessThan(5 + 40 + 1e-3);
     /* a curva só cresce: a inclinação nunca volta */
@@ -306,6 +306,85 @@ describe('a asa de avião leve medida na malha (perfil asa)', () => {
     const sem = alto(rodar({ perfil: 'asa', pontaLevantada: 0 }).neutro);
     expect(sem).toBeLessThan(alto(neutro) - 100);
     expect(sem).toBeGreaterThan(Math.tan(5 * GRAUS) * 6000);
+  });
+});
+
+/* a incidência de cada seção cheia e o giro do bordo de ataque entre seções vizinhas, medidos nos argumentos que o `derivar` entrega */
+function secoesCheias(parametros) {
+  const { argumentos: a } = chamar(F, 'x', parametros);
+  const n = Object.keys(a).filter((nome) => /^fPos\d+$/.test(nome)).length;
+  const posicoes = Array.from({ length: n }, (_, i) => a[`fPos${i}`]);
+  const quadros = quadrosDoLoft(posicoes, a.orientacaoDoMundo);
+  const cheias = [];
+  for (let i = 0; i < n; i++) if (Array.isArray(a[`fS${i}P0`])) cheias.push(i);
+  const contorno = (i) => Array.from({ length: LADOS_DA_SECAO }, (_, k) => a[`fS${i}P${k}`]);
+  const area = (pontos) => pontos.reduce((t, p, k) => { const q = pontos[(k + 1) % pontos.length]; return t + (p[0] * q[1] - q[0] * p[1]) / 2; }, 0);
+  const incidencia = (i) => {
+    const bordoDeFuga = a[`fS${i}P0`]; const bordoDeAtaque = a[`fS${i}P${PONTOS_POR_FACE + 1}`];
+    return Math.atan2(bordoDeAtaque[1] - bordoDeFuga[1], -(bordoDeAtaque[0] - bordoDeFuga[0])) / GRAUS;
+  };
+  const bordo = (k) => cheias.map((i) => pontoDaSecao(posicoes[i], quadros[i], a[`fS${i}P${k}`].slice(0, 2)));
+  const giros = (pts) => pts.slice(1, -1).map((p, i) => {
+    const d1 = p.map((c, m) => c - pts[i][m]); const d2 = pts[i + 2].map((c, m) => c - p[m]);
+    return (Math.acos(Math.max(-1, Math.min(1, dot3(d1, d2) / (norma3(d1) * norma3(d2))))) / GRAUS);
+  });
+  return { cheias, area: (i) => area(contorno(i)), incidencia, giroDoBordoDeAtaque: giros(bordo(PONTOS_POR_FACE + 1)) };
+}
+
+describe('a incidência e o bordo de ataque entre as seções', () => {
+  it('a incidência é a da raiz mais a torção vezes a fração da envergadura, com o sinal da torção, e a seção não vira acima de 90 graus', () => {
+    const casos = [[70, 60], [70, -60], [-10, -60], [-10, 60], [0, 45]];
+    for (const [incidenciaNaRaiz, torcao] of casos) {
+      const parametros = { perfil: 'pa-de-helice', incidenciaNaRaiz, torcao };
+      const { cheias, incidencia, area } = secoesCheias(parametros);
+      const v = completo(parametros);
+      const semi = v.envergadura * MM;
+      expect(incidencia(cheias[0]), `${incidenciaNaRaiz} ${torcao}`).toBeCloseTo(incidenciaNaRaiz, 0);
+      const tampa = Math.min(Math.max(0.5 * v.espessuraNaPonta * v.cordaNaPonta * semi, 0.004 * semi), 0.03 * semi);
+      expect(incidencia(cheias.at(-4)), `${incidenciaNaRaiz} ${torcao}`).toBeCloseTo(incidenciaNaRaiz + torcao * (1 - tampa / semi), 0);
+      for (const i of cheias) expect(area(i), `seção ${i} de ${incidenciaNaRaiz} ${torcao}`).toBeGreaterThan(0);
+    }
+  });
+
+  it('no ponto máximo (incidência 70, torção +60) a incidência passa de 70 a 128 graus, a convenção de todos os pontos: a torção positiva soma', () => {
+    const { cheias, incidencia, area } = secoesCheias(ponto('maximo'));
+    expect(ponto('maximo')).toMatchObject({ incidenciaNaRaiz: 70, torcao: 60 });
+    expect(incidencia(cheias[0])).toBeCloseTo(70, 0);
+    /* a última seção cheia, antes da tampa de 0,42 m da ponta (3% da semi-envergadura de 14 m), está a 97% da envergadura: 70 + 60 x 0,97 */
+    expect(incidencia(cheias.at(-4))).toBeCloseTo(70 + 60 * (1 - 0.42 / 14), 0);
+    for (let k = 1; k < cheias.length - 3; k++) expect(incidencia(cheias[k])).toBeGreaterThanOrEqual(incidencia(cheias[k - 1]) - 0.1);
+    for (const i of cheias) expect(area(i)).toBeGreaterThan(0);
+    /* e a pá do avião, com torção negativa, vai de 52 a 18 graus: a torção negativa subtrai */
+    const pa = secoesCheias({ perfil: 'pa-de-helice' });
+    expect(pa.incidencia(pa.cheias.at(-4))).toBeLessThan(pa.incidencia(pa.cheias[0]));
+  });
+
+  it('o bordo de ataque gira pouco entre seções vizinhas: 3 graus na pá, 9 na asa e 13 na asa de ponta de 60 graus; no ponto máximo, 10 no trecho reto e 11 na curva', () => {
+    expect(Math.max(...secoesCheias({ perfil: 'pa-de-helice' }).giroDoBordoDeAtaque)).toBeLessThan(3.2);
+    expect(Math.max(...secoesCheias({ perfil: 'helice' }).giroDoBordoDeAtaque)).toBeLessThan(3.2);
+    expect(Math.max(...secoesCheias({ perfil: 'asa' }).giroDoBordoDeAtaque.slice(1, -2))).toBeLessThan(9);
+    expect(Math.max(...secoesCheias({ perfil: 'asa', pontaLevantada: 60 }).giroDoBordoDeAtaque.slice(1, -2))).toBeLessThan(13);
+    const { giroDoBordoDeAtaque: g } = secoesCheias(ponto('maximo'));
+    /* a raiz (o degrau do diedro dentro do cubo), o começo da curva (a corda de 3 m contra uma curva de 0,7 m) e a tampa são as exceções medidas */
+    expect(Math.max(...g.slice(1, 7))).toBeLessThan(10);
+    expect(Math.max(...g.slice(10, 17))).toBeLessThan(11);
+    expect(Math.max(...g.slice(7, 10))).toBeLessThan(38);
+  });
+});
+
+describe('o sombreamento liso e a ogiva do cone', () => {
+  it('a pele das superfícies e da hélice vem marcada lisa pelo ângulo limite, e o cone tem uma ogiva de 14 pontos de perfil', () => {
+    const { neutro } = rodar({ perfil: 'helice' });
+    for (const parte of ['pas', 'cone', 'cubo']) {
+      const faces = [...neutro.F.values()].filter((f) => f.parte === parte);
+      expect(faces.length, parte).toBeGreaterThan(0);
+      expect(faces.every((f) => f.liso === ANGULO_DO_LISO), parte).toBe(true);
+    }
+    const asa = rodar({ perfil: 'asa' }).neutro;
+    expect([...asa.F.values()].every((f) => f.liso === ANGULO_DO_LISO)).toBe(true);
+    expect(PONTOS_DA_OGIVA).toBe(14);
+    const raios = new Set(verticesDaParte(neutro, 'cone').map(({ p }) => Math.round(Math.hypot(p[0], p[1]) * 1e3)));
+    expect(raios.size).toBeGreaterThanOrEqual(PONTOS_DA_OGIVA);
   });
 });
 
@@ -374,6 +453,32 @@ describe('o comando: fresta, eixo da dobradiça e curso', () => {
         expect(fixa.fechada && s.fechada, `${perfil} ${parte}`).toBe(true);
         expect(auditarParDeSolidos(fixa, s, 1e-9).estado, `${perfil} ${graus} ${parte}`).toBe('separadas');
       }
+    }
+  });
+
+  it('o bordo de fuga da deriva segue uma linha só: a fixa abaixo do leme, o leme e a fixa acima dele ficam na mesma reta em z, a menos de 0,05 mm', () => {
+    const n = rodar({ perfil: 'deriva' }).neutro;
+    /* o z mais atrás de uma parte no plano y = const, em mm */
+    const zDeFuga = (parte, y) => {
+      let maior = -Infinity;
+      for (const f of n.F.values()) {
+        if (f.parte !== parte) continue;
+        for (let k = 1; k < f.vs.length - 1; k++) {
+          const tri = [n.V.get(f.vs[0]), n.V.get(f.vs[k]), n.V.get(f.vs[k + 1])];
+          for (let i = 0; i < 3; i++) {
+            const a = tri[i]; const b = tri[(i + 1) % 3];
+            if ((a[1] - y) * (b[1] - y) < 0) maior = Math.max(maior, a[2] + ((y - a[1]) / (b[1] - a[1])) * (b[2] - a[2]));
+          }
+        }
+      }
+      return maior / MM;
+    };
+    const abaixo = [0.1, 0.3].map((y) => [y, zDeFuga('fixa', y)]);
+    const inclinacao = (abaixo[1][1] - abaixo[0][1]) / (abaixo[1][0] - abaixo[0][0]);
+    const reta = (y) => abaixo[0][1] + inclinacao * (y - abaixo[0][0]);
+    /* a altura do leme vai de 20% a 90% da envergadura (1.900 mm), e a fresta é de 10,6 mm em cada ponta */
+    for (const [parte, y] of [['fixa', 0.379], ['comando', 0.4], ['comando', 1.0], ['comando', 1.69], ['fixa', 1.711], ['fixa', 1.8]]) {
+      expect(Math.abs(zDeFuga(parte, y) - reta(y)), `${parte} em y = ${y}`).toBeLessThan(0.05);
     }
   });
 

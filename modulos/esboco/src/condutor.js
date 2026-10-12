@@ -15,6 +15,8 @@ import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { descreverAchado, herdarDoEspelho, lerContato, unidadesDeclaradas, verificarContato } from './contato.js';
 import { medirEsboco } from './descrever.js';
+import { achadosDoCursoNaUnidade } from './curso-varredura.js';
+import { numeroDoCurso } from './curso.js';
 import { lerPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
 
@@ -594,12 +596,19 @@ export function unidadePorNome(unidades, nome) {
 
 /* As divergências do gate de contato do mestre que citam formas da unidade: a unidade só vira feita quando o mestre, com a
    versão dela, não tem colisão, travessia acima do máximo, par que não encosta nem peça solta que a envolva. Sem o gate
-   ligado não há o que conferir. */
+   ligado não há o que conferir. Com `curso` declarado (ver `curso.js`) entram também os achados que o gate acha em alguma posição
+   do curso e não na primeira, cada um com o curso e as posições em que aparece: o trem do avião recolhia sem achado até 85 graus
+   e atravessava o capô a 90, e a unidade vinha como feita porque só a pose estendida era conferida (atrito 40). */
 function achadosDaUnidade(bruto, estado, unidade) {
   const membros = new Set(estado.unidades.find((x) => x.id === unidade).membros);
-  const gate = verificarContato(bruto, { unidades: unidadesDoEstado(estado) });
-  return gate.usar ? gate.achados.filter((a) => a.pecas.some((p) => membros.has(p))) : [];
+  const unidades = unidadesDoEstado(estado);
+  const gate = verificarContato(bruto, { unidades });
+  if (!gate.usar) return [];
+  return [...gate.achados.filter((a) => a.pecas.some((p) => membros.has(p))), ...achadosDoCursoNaUnidade(bruto, [...membros], { unidades })];
 }
+
+/* A linha de um achado aberto: a do gate e, no que vem do curso, o mecanismo e as posições em que aparece. */
+const textoDoAberto = (a) => `${descreverAchado(a)}${a.curso ? ` (no curso "${a.curso}", com ${a.parametro} em ${a.posicoes.map(numeroDoCurso).join(', ')})` : ''}`;
 
 /* Os bloqueios pela nota do crítico: cada unidade com brief (mais de 8 formas) e cada Marco cujo último veredito, depois da última
    liberação, está abaixo de 8. `rodada` conta os vereditos desde a última liberação; com `RODADAS_DO_CRITICO` rodadas o bloqueio é
@@ -682,7 +691,7 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   }
   if (!daUnidade.feito) {
     const abertos = achadosDaUnidade(bruto, estado, unidade);
-    exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map((a) => descreverAchado(a)).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
+    exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map(textoDoAberto).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
   }
   const novo = clone(estado);
   const u = novo.unidades.find((x) => x.id === unidade);

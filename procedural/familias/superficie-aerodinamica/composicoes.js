@@ -26,7 +26,9 @@ const PARTE = 'mecanifica.parte@1';
 const PORTA = 'mecanifica.porta@1';
 
 export const LADOS_DO_CUBO = 48;
-export const PONTOS_DA_OGIVA = 9;
+export const PONTOS_DA_OGIVA = 14;
+/* o ângulo limite do sombreamento liso: a quina mais fechada que ele (o bordo de fuga, a face do cubo) fica nítida */
+export const ANGULO_DO_LISO = 60;
 
 /** O id da composição de superfície: a semi ou a inteira, sem ou com comando. */
 export const idDaSuperficie = ({ simetria, comando }) => `superficie-aerodinamica.${simetria ? 'inteira' : 'semi'}${comando ? '-com-comando' : ''}`;
@@ -72,7 +74,8 @@ function noDoLoft({ id, grupo, origemId, tipos, lados }) {
 const parteDe = (id, nome, origem) => ({ id: `parte-${id}`, operacao: 'parte', argumentos: { nome, sel: { origem } } });
 const materialDe = (id, usa, origem) => ({ id: `material-${id}`, operacao: 'material', argumentos: { usa, sel: { origem } } });
 const solidoDe = (id, origem) => ({ id: `solido-${id}`, operacao: 'solido', argumentos: { sel: { origem } } });
-const corpo = (id, nome, material, origem) => [parteDe(id, nome, origem), materialDe(id, material, origem), solidoDe(id, origem)];
+const lisoDe = (id, origem) => ({ id: `liso-${id}`, operacao: 'liso', argumentos: { angulo: ANGULO_DO_LISO, sel: { origem } } });
+const corpo = (id, nome, material, origem) => [parteDe(id, nome, origem), materialDe(id, material, origem), solidoDe(id, origem), lisoDe(id, origem)];
 
 function portaDaRaiz(de) {
   return {

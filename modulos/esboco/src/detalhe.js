@@ -78,7 +78,7 @@ function limiaresDoMestre(esboco) {
 const listaDe = (c, campo) => (Array.isArray(c?.[campo]) ? clone(c[campo]) : []);
 
 /* O que o mestre tem agora e o detalhe pode reescrever: os parâmetros e os pontos que valem, as juntas e os pares do contato (da
-   raiz e da primeira opção), `tocam` e `livres` do contrato do plano e a `funcao` da unidade. */
+   raiz e da primeira opção), `tocam` e `livres` do contrato do plano, a `funcao` da unidade e o `curso` dos mecanismos (só quando o mestre o declara). */
 function fatiaDoMestre(bruto, unidade) {
   const c = bruto?.plano?.contrato;
   return {
@@ -87,6 +87,7 @@ function fatiaDoMestre(bruto, unidade) {
     contato: { raiz: { juntas: listaDe(bruto?.contato, 'juntas'), pares: listaDe(bruto?.contato, 'pares') }, opcao: { juntas: listaDe(bruto?.opcoes?.[0]?.contato, 'juntas'), pares: listaDe(bruto?.opcoes?.[0]?.contato, 'pares') } },
     plano: { tocam: listaDe(c, 'tocam'), livres: listaDe(c, 'livres') },
     funcao: typeof bruto?.unidades?.[unidade]?.funcao === 'string' ? bruto.unidades[unidade].funcao : null,
+    ...(objeto(bruto?.curso) ? { curso: clone(bruto.curso) } : {}),
   };
 }
 
@@ -274,6 +275,18 @@ function devolverAoMestre(mestre, detalhado, unidade, base = null) {
       if (atual !== undefined && igual(atual, m)) continue;
       mestre.modulos = { ...(objeto(mestre.modulos) ? mestre.modulos : {}), [nome]: clone(m) };
       voltou.push(atual === undefined ? `módulo "${nome}" (novo, ${m?.formas?.length ?? 0} formas)` : `módulo "${nome}" (alterado: ${atual?.formas?.length ?? 0} -> ${m?.formas?.length ?? 0} formas, a versão do detalhado substituiu a do mestre)`);
+    }
+  }
+  /* o `curso` que o detalhado declara ou muda (o curso do trem se acerta no detalhe, onde a pessoa vê a unidade; `--curso` varre o
+     detalhe isolado): a entrada nova entra e a que o detalhado reescreve sobre a base passa a ser a dele; a que ele só copiou do mestre
+     fica como o mestre a tem */
+  if (objeto(detalhado?.curso)) {
+    for (const [nome, c] of Object.entries(detalhado.curso)) {
+      const atual = objeto(mestre.curso) ? mestre.curso[nome] : undefined;
+      if (atual !== undefined && igual(atual, c)) continue;
+      if (base && igual(base.curso?.[nome], c)) continue;
+      mestre.curso = { ...(objeto(mestre.curso) ? mestre.curso : {}), [nome]: clone(c) };
+      voltou.push(`curso "${nome}" (${atual === undefined ? 'novo' : 'reescrito'}: ${c.parametro} de ${c.de} a ${c.ate})`);
     }
   }
   const simetria = (onde, atual, nova, grava) => {
@@ -560,6 +573,7 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
     for (const nivel of ['raiz', 'opcao']) for (const campo of ['juntas', 'pares']) if (!igual(agora.contato[nivel][campo], base.contato?.[nivel]?.[campo] ?? [])) mudouDesde.push(`${campo} do contato${nivel === 'opcao' ? ' da opção' : ''}`);
     for (const campo of ['tocam', 'livres']) if (!igual(agora.plano[campo], base.plano?.[campo] ?? [])) mudouDesde.push(`plano.contrato.${campo}`);
     if (agora.funcao !== (base.funcao ?? null)) mudouDesde.push('funcao da unidade');
+    if (!igual(agora.curso ?? {}, base.curso ?? {})) mudouDesde.push('curso');
   }
   const avisos = contratoComIdAusente(mestre, expandido.opcoes[0].formas, unidades.map((x) => x.id));
   let envelope = null;
