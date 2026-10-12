@@ -22,6 +22,8 @@ A pessoa escolheu em 2026-10-11 o avião de pequeno porte, monomotor turboélice
 asa baixa e trem recolhível, com uma referência em quatro vistas, sem marca nem
 nome de fabricante, separada em
 [`aviao-2026-10-11/referencias`](../banco-de-provas/aviao-2026-10-11/referencias/).
+O [alinhamento](../banco-de-provas/aviao-2026-10-11/ALINHAMENTO.md) e os
+[atritos](../banco-de-provas/aviao-2026-10-11/ATRITOS.md) ficam na mesma pasta.
 
 ## Resultado
 

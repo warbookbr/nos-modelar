@@ -63,3 +63,12 @@ perna, amortecedor e roda.
    recolhimento.
 6. Qualquer parte solta, sem ligação com a fuselagem por outra parte.
 7. Medida principal (envergadura, comprimento, altura) a mais de 3% da prancha.
+
+## O contorno das vistas
+
+A frontal fechou com nota 9 em 2026-10-11; a lateral e o topo pararam em 8 depois
+de três rodadas e foram aceitos pela pessoa em 2026-10-12, com as pendências no
+`aceite.json` de cada série. O roteiro do crítico de cada vista:
+[lateral](referencias/lateral.pacote/roteiro.md),
+[topo](referencias/topo.pacote/roteiro.md) e
+[frontal](referencias/frontal.pacote/roteiro.md).
