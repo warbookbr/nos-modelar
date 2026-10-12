@@ -78,6 +78,138 @@ export function fecharBuracos(mascara, largura, altura, maximo = MAXIMO_DO_BURAC
   return { buracos, pixels: indices.length, indices };
 }
 
+/* Área máxima, em px², de um dente da borda da silhueta que a suavização tira.
+   Na borda de ataque e de fuga das asas do avião (topo) o limiar de 225 pega o
+   halo claro de 1 a 3 px do desenho de forma intermitente: a linha de fora saía
+   com espigões e reentrâncias de 1 a 3 px de largura. Medido nas três vistas do
+   avião, a abertura e o fechamento 3 x 3 mudam 201, 201 e 196 pedaços ligados de
+   pixels (topo, lateral, frontal): 199, 194 e 192 deles têm 9 px² ou menos, que é
+   o que um dente de 3 x 3 px ocupa. O resto é forma da imagem: o fio do chão da
+   lateral (2 px de altura, 61, 226 e 277 px²), uma antena de 16 x 2 px (17 px²) e
+   as pontas finas de 10 a 20 px², que a abertura também come e que ficam como
+   estavam. 9 é também o MINIMO_DO_PEDACO_PX2, o tamanho abaixo do qual um
+   pedaço é ruído. Um limite de 12 já levava a ponta fina de 12 px² de um lado
+   do avião e deixava a de 13 do outro. */
+export const MAXIMO_DO_DENTE_PX2 = 9;
+
+/* Alcance, em pixels, a partir da parte, do que o pixel sem dono da silhueta
+   vizinho dela passa a ser dela. O watershed põe a divisa sobre o contorno
+   escuro do desenho, e o fundo, que o marcador da borda inunda pelo halo claro de
+   1 a 3 px, fica com o rótulo 1 do lado de fora dessa divisa: entre a parte e o
+   limiar da silhueta ficam a divisa (1 px) e o halo (até 2 px). Medido nas três
+   vistas do avião, 2 camadas (8 vizinhos) a partir da parte cobrem o anel inteiro
+   do topo e da lateral (com 1 sobram 662 e 383 px sem dono, com 2 sobra nenhum) e
+   deixam 10 px na frontal, um fio claro de 1 px que sai de uma parte e que 4
+   camadas reduzem a 5. Na lateral e na frontal do braço robótico, de foto, com 4
+   camadas ainda sobram 77 e 16 px, o halo mais largo do desenho; 4 é folga sobre
+   o avião, e o que passa disso é fundo que nenhuma semente reclama e continua
+   sem dono. */
+export const ALCANCE_DO_SEM_DONO_PX = 4;
+
+/* Tira da máscara (255 = silhueta, no próprio vetor) os dentes e as
+   reentrâncias da borda: abre com o quadrado 3 x 3 (some o que tem menos de 3 px
+   de largura) e fecha com ele (preenche o que tem menos de 3 px de vão), e de cada
+   uma das duas operações só vale a mudança em pedaços ligados de até `maximo`
+   px²; o pedaço maior, que é um fio ou um vão de verdade, volta como estava. A
+   borda da imagem não conta como fundo. Os `protegidos` (índices de pixel) nunca
+   saem: são os da semente, que numa linha fina, como o chão da frontal do avião
+   (2 a 3 px de altura, com a semente na ponta de 2 px), cairia fora da
+   silhueta. Devolve quantos pixels tirou e quantos pôs. */
+export function suavizarMascara(mascara, largura, altura, maximo = MAXIMO_DO_DENTE_PX2, protegidos = []) {
+  const n = mascara.length;
+  /* Erosão e dilatação com o quadrado 3 x 3: o quadrado preserva o canto
+     de um retângulo, que a cruz arredonda em 1 px, e a janela vazada do avião
+     continua com os quatro cantos. */
+  const quadrado = (m, comoEm) => {
+    const saida = new Uint8Array(n);
+    for (let y = 0; y < altura; y += 1) for (let x = 0; x < largura; x += 1) {
+      let todos = true; let algum = false;
+      for (let dy = -1; dy <= 1; dy += 1) for (let dx = -1; dx <= 1; dx += 1) {
+        const a = x + dx; const b = y + dy;
+        if (a < 0 || b < 0 || a >= largura || b >= altura) continue;
+        if (m[b * largura + a]) algum = true; else todos = false;
+      }
+      saida[y * largura + x] = (comoEm === 'erodir' ? m[y * largura + x] && todos : m[y * largura + x] || algum) ? 255 : 0;
+    }
+    return saida;
+  };
+  const so = (antes, depois) => {
+    /* Componentes (8 vizinhos) dos pixels que a operação mudou; os maiores que
+       o máximo voltam ao valor de antes. */
+    const visto = new Uint8Array(n); let mudados = 0;
+    for (let inicio = 0; inicio < n; inicio += 1) {
+      if (antes[inicio] === depois[inicio] || visto[inicio]) continue;
+      const fila = [inicio]; visto[inicio] = 1;
+      for (let i = 0; i < fila.length; i += 1) {
+        const p = fila[i]; const x = p % largura; const y = (p - x) / largura;
+        for (let dy = -1; dy <= 1; dy += 1) for (let dx = -1; dx <= 1; dx += 1) {
+          const a = x + dx; const b = y + dy;
+          if (a < 0 || b < 0 || a >= largura || b >= altura) continue;
+          const q = b * largura + a;
+          if (!visto[q] && antes[q] !== depois[q]) { visto[q] = 1; fila.push(q); }
+        }
+      }
+      if (fila.length > maximo) for (const p of fila) depois[p] = antes[p]; else mudados += fila.length;
+    }
+    return mudados;
+  };
+  const antes = Uint8Array.from(mascara);
+  const aberta = quadrado(quadrado(antes, 'erodir'), 'dilatar');
+  for (const p of protegidos) if (antes[p]) aberta[p] = antes[p];
+  const tirados = so(antes, aberta);
+  const fechada = quadrado(quadrado(aberta, 'dilatar'), 'erodir');
+  const postos = so(aberta, fechada);
+  mascara.set(fechada);
+  return { tirados, postos };
+}
+
+/* Dá à parte mais próxima o pixel da silhueta que nenhuma parte pegou. São de
+   dois tipos: o halo claro que o watershed deixa ao fundo (rótulo 1) e a divisa
+   (-1) entre a parte e esse fundo, a linha escura do desenho. A divisa entre
+   duas partes, no meio da silhueta, não é de ninguém e fica. Cada camada vai um
+   pixel (8 vizinhos, para o canto de uma silhueta quadrada não ficar a seis
+   passos) além da anterior, a partir das partes, e um pixel que as
+   vizinhas de rótulos diferentes disputam fica com a de mais votos, e no empate
+   com a de menor rótulo. Como a onda só anda por pixel sem dono, ela não atravessa
+   a divisa que fica entre duas partes nem a de uma parte fora do modelo, e como
+   para em `alcance` pixels não inventa parte onde nenhuma semente chega.
+   Escreve em `rotulos` e devolve quantos pixels deu. */
+export function anexarSemDono(rotulos, silhueta, largura, altura, alcance = ALCANCE_DO_SEM_DONO_PX) {
+  const n = rotulos.length;
+  const vizinhos = (p) => {
+    const x = p % largura; const y = (p - x) / largura; const lista = [];
+    for (let dy = -1; dy <= 1; dy += 1) for (let dx = -1; dx <= 1; dx += 1) {
+      if (!dx && !dy) continue;
+      const a = x + dx; const b = y + dy;
+      if (a >= 0 && b >= 0 && a < largura && b < altura) lista.push(b * largura + a);
+    }
+    return lista;
+  };
+  /* Sem dono: o fundo dentro da silhueta e a divisa que o toca. */
+  const livre = new Uint8Array(n);
+  for (let p = 0; p < n; p += 1) {
+    if (!silhueta[p]) continue;
+    if (rotulos[p] === 1) livre[p] = 1;
+    else if (rotulos[p] === -1 && vizinhos(p).some((q) => rotulos[q] === 1)) livre[p] = 1;
+  }
+  let dados = 0;
+  let borda = [];
+  for (let p = 0; p < n; p += 1) if (livre[p] && vizinhos(p).some((q) => rotulos[q] >= 2)) borda.push(p);
+  for (let camada = 0; camada < alcance && borda.length; camada += 1) {
+    const novos = [];
+    for (const p of borda) {
+      const v = new Map();
+      for (const q of vizinhos(p)) if (rotulos[q] >= 2) v.set(rotulos[q], (v.get(rotulos[q]) ?? 0) + 1);
+      novos.push([p, [...v].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0][0]]);
+    }
+    for (const [p, dono] of novos) { rotulos[p] = dono; livre[p] = 0; dados += 1; }
+    const proximos = new Set();
+    for (const [p] of novos) for (const q of vizinhos(p)) if (livre[q]) proximos.add(q);
+    borda = [...proximos].sort((a, b) => a - b);
+  }
+  return dados;
+}
+
 /* Devolve, para cada nome, a semente, o contorno externo do maior pedaço em
    pixel (`contornoPx`) e a área dele (`areaPx`), e em `pedacos` todos os
    pedaços externos da parte, do maior para o menor, cada um com `areaPx` e
@@ -85,9 +217,11 @@ export function fecharBuracos(mascara, largura, altura, maximo = MAXIMO_DO_BURAC
    hélice do avião cortada pelo cone em duas pás, ou as janelas, ficava só com
    o maior pedaço e a medida dela era a de uma pá. Devolve também o rótulo de
    cada pixel (`rotulos`, -1 na divisa, 1 no fundo, 2 em diante nas partes na
-   ordem de `nomes`), a máscara da silhueta, os pixels dela sem dono e
-   `buracosFechados`, os buracos pequenos cercados pela silhueta que ela
-   fechou (`fecharBuracos`). */
+   ordem de `nomes`), a máscara da silhueta (já lisa, `suavizarMascara`), os
+   pixels dela que continuam sem dono (`semDono`), os que passaram à parte mais
+   próxima (`semDonoAnexados`, `anexarSemDono`), o que a suavização tirou e pôs
+   (`mascaraSuavizada`) e `buracosFechados`, os buracos pequenos cercados pela
+   silhueta que ela fechou (`fecharBuracos`). */
 /* Realce para o watershed, que é onde a divisa é escolhida. O contraste local
    (CLAHE na luminância) puxa a diferença pequena entre duas partes do mesmo
    cinza, e a nitidez (máscara de desfoque) afina a costura entre elas. A
@@ -110,7 +244,7 @@ function realcar(cv, cor, novo, realce) {
   return saida;
 }
 
-export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce = false, buracoMaximo = MAXIMO_DO_BURACO_PX2 } = {}) {
+export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce = false, buracoMaximo = MAXIMO_DO_BURACO_PX2, denteMaximo = MAXIMO_DO_DENTE_PX2, alcanceSemDono = ALCANCE_DO_SEM_DONO_PX } = {}) {
   const nomes = Object.keys(regioes).sort();
   if (!nomes.length) throw new Error('o arquivo de regiões não nomeia nenhuma região.');
   const sementes = nomes.map((nome) => ({ nome, tracos: tracosDaSemente(regioes[nome]) }));
@@ -127,6 +261,21 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     /* Antes da dilatação que marca o fundo: um buraco pequeno fechado depois
        ainda guardaria uma semente de fundo no meio. */
     const fechados = fecharBuracos(silhueta.data, largura, altura, buracoMaximo);
+    /* A borda lisa vem depois do fechamento dos buracos, que conta os reflexos
+       como antes, e antes de tudo o mais: os dentes saem da máscara de que o
+       fundo, as sementes e a silhueta dependem. 0 desliga. */
+    const protegidos = new Set();
+    for (const { tracos } of sementes) for (const linha of tracos) {
+      for (let k = 0; k < linha.length; k += 1) {
+        const [ax, ay] = linha[k]; const [bx, by] = linha[Math.min(k + 1, linha.length - 1)];
+        const passos = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) * 2));
+        for (let t = 0; t <= passos; t += 1) {
+          const x = Math.round(ax + ((bx - ax) * t) / passos); const y = Math.round(ay + ((by - ay) * t) / passos);
+          if (x >= 0 && y >= 0 && x < largura && y < altura) protegidos.add(y * largura + x);
+        }
+      }
+    }
+    const suavizada = denteMaximo > 0 ? suavizarMascara(silhueta.data, largura, altura, denteMaximo, protegidos) : { tirados: 0, postos: 0 };
     const nucleo = novo(cv.Mat.ones(3, 3, cv.CV_8U));
     const larga = novo(new cv.Mat()); cv.dilate(silhueta, larga, nucleo, new cv.Point(-1, -1), 3);
     const marcas = novo(new cv.Mat(altura, largura, cv.CV_32S, new cv.Scalar(0)));
@@ -168,6 +317,10 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
         mudou = dados.length > 0;
       }
     }
+    /* O que sobrou sem dono vizinho de uma parte, o halo do contorno e a divisa
+       contra o fundo, passa à parte mais próxima: sem isso a parte para na linha
+       escura e a silhueta segue 2 ou 3 px além dela. */
+    const anexados = alcanceSemDono > 0 ? anexarSemDono(rotulos, silhueta.data, largura, altura, alcanceSemDono) : 0;
     const resultado = {};
     sementes.forEach(({ nome, tracos }, i) => {
       const so = novo(new cv.Mat(altura, largura, cv.CV_8U, new cv.Scalar(0)));
@@ -200,7 +353,7 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;
-    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono, buracosFechados: { buracos: fechados.buracos, pixels: fechados.pixels } };
+    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono, semDonoAnexados: anexados, mascaraSuavizada: suavizada, buracosFechados: { buracos: fechados.buracos, pixels: fechados.pixels } };
   } finally {
     mats.forEach((m) => m.delete());
   }

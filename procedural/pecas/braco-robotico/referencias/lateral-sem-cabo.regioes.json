@@ -24,6 +24,8 @@
   }
  ],
  "limiar": 225,
+ "denteMaximo": 0,
+ "alcanceSemDono": 0,
  "regioes": {
   "base": [
    [

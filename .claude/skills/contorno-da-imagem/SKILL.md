@@ -37,6 +37,19 @@ na frontal do avião: a silhueta guarda então todos os pedaços acima de 9 px²
 `silhueta.pedacos` (o maior primeiro, e `contornoMm` continua sendo o dele), e
 a prancha e a conferência do esboço medem a união.
 
+A borda da silhueta sai lisa e as partes chegam até ela. Antes do watershed, a
+abertura e o fechamento 3 x 3 tiram da máscara os dentes e as reentrâncias de até
+9 px² (`"denteMaximo": <px²>`, 0 desliga); o fio fino de verdade, como o chão da
+lateral do avião, e o pixel da semente ficam. Depois do watershed, o pixel da
+silhueta que nenhuma parte pegou, o halo claro e a divisa escura contra o fundo,
+passa à parte vizinha mais próxima até 4 px dela (`"alcanceSemDono": <px>`, 0
+desliga), sem atravessar a divisa que separa duas partes nem a de uma parte em
+`foraDoModelo`, e sem dar parte ao que nenhuma semente alcança. `medidas.json`
+traz `semDonoPx` (o que sobrou) e `semDonoAnexadosPx` (o que passou às partes). A
+divisa de 1 px entre duas partes vizinhas continua sendo de ninguém: os contornos
+das duas ficam a 2 px um do outro, e uma soma de larguras de partes encostadas
+fica abaixo da silhueta por esse vão.
+
 Quando o objeto tem mais de uma imagem, declare o papel de cada uma em
 `papeis.json` da pasta `referencias/` (`{ "imagens": { "<imagem>": { "papel": ..., "motivo": ..., "por": ... } } }`):
 `principal` passa por mapa e prancha, `apoio` passa só pelo mapa e dá medidas

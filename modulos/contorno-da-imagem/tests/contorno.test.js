@@ -4,7 +4,7 @@
    limite das rodadas. */
 import { describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
-import { segmentar, sobreposicao, svgDoMapa, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada, MINIMO_DO_PEDACO_PX2, MAXIMO_DO_BURACO_PX2, fecharBuracos, silhuetaEmPedacos, contornoDaSilhueta } from '../src/index.js';
+import { segmentar, sobreposicao, suavizarMascara, anexarSemDono, MAXIMO_DO_DENTE_PX2, ALCANCE_DO_SEM_DONO_PX, svgDoMapa, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada, MINIMO_DO_PEDACO_PX2, MAXIMO_DO_BURACO_PX2, fecharBuracos, silhuetaEmPedacos, contornoDaSilhueta } from '../src/index.js';
 
 /* Fundo branco, dois retângulos do mesmo cinza encostados, com uma linha um
    pouco mais escura entre eles, como a costura de duas partes. */
@@ -275,13 +275,21 @@ describe('buraco de reflexo cercado pela silhueta', () => {
       const dentro = x >= 10 && x < 110 && y >= 15 && y < 45;
       return !dentro ? 250 : (x === 60 ? 110 : 150);
     });
-    const seg = await segmentar(diagonal, config);
+    /* Sem a suavização da borda, que preenche como reentrância o pixel (31, 15)
+       aberto para o fundo: aqui só vale o fechamento de buracos. */
+    const seg = await segmentar(diagonal, { ...config, denteMaximo: 0 });
     expect(seg.buracosFechados.buracos).toBe(3);
     for (const [x, y] of [[30, 16], [49, 16], [48, 17]]) {
       expect(seg.silhueta[y * 120 + x]).toBe(255);
       expect(seg.rotulos[y * 120 + x]).toBe(seg.regioes.esquerda.rotulo);
     }
     expect(seg.silhueta[15 * 120 + 31]).toBe(0);
+    /* Com a suavização, o fechamento dos buracos conta igual e o pixel aberto
+       para o fundo, uma reentrância de 1 px na borda, também entra. */
+    const lisa = await segmentar(diagonal, config);
+    expect(lisa.buracosFechados.buracos).toBe(3);
+    expect(lisa.silhueta[15 * 120 + 31]).toBe(255);
+    expect(lisa.rotulos[15 * 120 + 31]).toBe(lisa.regioes.esquerda.rotulo);
   });
 
   it('o tamanho máximo é de 64 px²: 8 x 8 fecha, 65 não, e o furo que toca a borda nunca fecha', () => {
@@ -350,5 +358,173 @@ describe('silhueta em pedaços', () => {
     const { pedacos } = await silhuetaEmPedacos(seg);
     expect(pedacos).toHaveLength(1);
     expect(pedacos[0].areaPx).toBeLessThan(MINIMO_DO_PEDACO_PX2);
+  });
+});
+
+describe('borda lisa da silhueta', () => {
+  /* Como a borda de ataque das asas do avião no topo: a borda reta do corpo com
+     um espigão de 1 x 3 px para fora, uma reentrância de 1 px para dentro, e um
+     dente de 2 x 2 px, que o limiar da borda de pouco contraste deixa de forma
+     intermitente. Mais um fio escuro de 2 px de altura por 40 de comprimento (o
+     chão da frontal e da lateral), que é forma da imagem e não dente. */
+  const espigao = (x, y) => x === 40 && y >= 12 && y < 15;
+  const reentrancia = (x, y) => x === 70 && y === 44;
+  const dente = (x, y) => x >= 90 && x < 92 && y >= 13 && y < 15;
+  const fio = (x, y) => x >= 30 && x < 70 && y >= 52 && y < 54;
+  const png = imagemDe(120, 60, (x, y) => {
+    const corpo = x >= 10 && x < 110 && y >= 15 && y < 45 && !reentrancia(x, y);
+    if (!(corpo || espigao(x, y) || dente(x, y) || fio(x, y))) return 250;
+    return x === 60 ? 110 : 150;
+  });
+  const config = { limiar: 225, regioes: { esquerda: [30, 30], direita: [90, 30], chao: [[31, 52], [60, 52]] }, foraDoModelo: ['chao'] };
+  const aceso = (seg, [x, y]) => seg.silhueta[y * 120 + x] === 255;
+
+  it('o defeito reproduzido: sem a suavização, o espigão, o dente e a reentrância ficam na silhueta', async () => {
+    const seg = await segmentar(png, { ...config, denteMaximo: 0 });
+    expect(aceso(seg, [40, 12])).toBe(true);
+    expect(aceso(seg, [90, 13])).toBe(true);
+    expect(aceso(seg, [70, 44])).toBe(false);
+    expect(seg.mascaraSuavizada).toEqual({ tirados: 0, postos: 0 });
+  });
+
+  it('tira o espigão e o dente, enche a reentrância, e o corpo fica com o mesmo retângulo, cantos inclusive', async () => {
+    const seg = await segmentar(png, config);
+    for (const p of [[40, 12], [40, 13], [40, 14], [90, 13], [91, 14]]) expect(aceso(seg, p)).toBe(false);
+    expect(aceso(seg, [70, 44])).toBe(true);
+    for (const [x, y] of [[10, 15], [109, 15], [10, 44], [109, 44]]) expect(aceso(seg, [x, y])).toBe(true);
+    /* O corpo é exatamente o retângulo: a extensão não se mexe nem 1 px. */
+    const { pedacos } = await silhuetaEmPedacos(seg, { sem: ['chao'] });
+    expect(pedacos).toHaveLength(1);
+    const xs = pedacos[0].contornoPx.map(([x]) => x); const ys = pedacos[0].contornoPx.map(([, y]) => y);
+    expect([Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]).toEqual([10, 109, 15, 44]);
+    expect(seg.mascaraSuavizada.tirados).toBe(3 + 4);
+    expect(seg.mascaraSuavizada.postos).toBe(1);
+  });
+
+  it('o fio de 2 px é forma da imagem: fica inteiro, com a semente dentro', async () => {
+    const seg = await segmentar(png, config);
+    for (let x = 30; x < 70; x += 1) for (const y of [52, 53]) expect(aceso(seg, [x, y])).toBe(true);
+  });
+
+  it('a semente protege o pixel dela: numa ponta de 3 x 2 px o dente não leva o ponto da semente', async () => {
+    const ponta = imagemDe(60, 40, (x, y) => ((x >= 10 && x < 40 && y >= 10 && y < 30) || (x >= 40 && x < 43 && y >= 19 && y < 21) ? 150 : 250));
+    const seg = await segmentar(ponta, { limiar: 225, regioes: { a: [20, 20], ponta: [[41, 19], [42, 20]] } });
+    expect(seg.silhueta[19 * 60 + 41]).toBe(255);
+    expect(seg.silhueta[20 * 60 + 42]).toBe(255);
+  });
+
+  it('suavizarMascara, direto: o que é de até o máximo sai, o maior volta, e o protegido não sai', () => {
+    expect(MAXIMO_DO_DENTE_PX2).toBe(9);
+    const m = (rotulo) => { const v = new Uint8Array(30 * 20); for (let y = 5; y < 15; y += 1) for (let x = 5; x < 25; x += 1) v[y * 30 + x] = 255; rotulo(v); return v; };
+    const cru = m((v) => { v[3 * 30 + 10] = 255; v[4 * 30 + 10] = 255; });
+    const a = Uint8Array.from(cru);
+    expect(suavizarMascara(a, 30, 20)).toEqual({ tirados: 2, postos: 0 });
+    expect(a[3 * 30 + 10]).toBe(0);
+    const comprido = m((v) => { for (let x = 6; x < 20; x += 1) v[3 * 30 + x] = 255; });
+    const b = Uint8Array.from(comprido);
+    expect(suavizarMascara(b, 30, 20).tirados).toBe(0);
+    expect(b).toEqual(comprido);
+    const c = Uint8Array.from(cru);
+    expect(suavizarMascara(c, 30, 20, MAXIMO_DO_DENTE_PX2, [3 * 30 + 10, 4 * 30 + 10]).tirados).toBe(0);
+    expect(c).toEqual(cru);
+    const d = Uint8Array.from(cru);
+    suavizarMascara(d, 30, 20);
+    expect(suavizarMascara(Uint8Array.from(d), 30, 20)).toEqual({ tirados: 0, postos: 0 });
+  });
+});
+
+describe('pixel sem dono vizinho de uma parte', () => {
+  /* Como a borda do avião: o corpo cinza com a linha escura do contorno (60), de
+     1 px, e por fora dela o halo claro (215, que o limiar de 225 ainda pega) de
+     2 px. O watershed põe a divisa na linha escura e dá o halo ao fundo: as partes
+     paravam na linha, 3 px aquém da silhueta. */
+  const corpo = (x, y) => x >= 15 && x < 105 && y >= 18 && y < 42;
+  const contorno = (x, y) => x >= 14 && x < 106 && y >= 17 && y < 43 && !corpo(x, y);
+  const halo = (x, y) => x >= 12 && x < 108 && y >= 15 && y < 45 && !corpo(x, y) && !contorno(x, y);
+  const png = imagemDe(120, 60, (x, y) => (contorno(x, y) ? 60 : halo(x, y) ? 215 : corpo(x, y) ? (x === 60 ? 110 : 150) : 250));
+  const config = { limiar: 225, regioes: { esquerda: [35, 30], direita: [85, 30] } };
+  const largura = 120;
+  const extensao = (seg, nome) => { const xs = seg.regioes[nome].contornoPx.map(([x]) => x); const ys = seg.regioes[nome].contornoPx.map(([, y]) => y); return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]; };
+
+  it('o defeito reproduzido: sem passar o sem dono, as partes param na linha escura e o halo fica sem dono', async () => {
+    const seg = await segmentar(png, { ...config, alcanceSemDono: 0 });
+    expect(seg.semDono).toBeGreaterThan(300);
+    expect(extensao(seg, 'esquerda')[0]).toBe(15);
+    expect(seg.semDonoAnexados).toBe(0);
+  });
+
+  it('cada pixel sem dono vizinho de uma parte passa a ela, e as partes chegam à borda da silhueta', async () => {
+    const seg = await segmentar(png, config);
+    expect(seg.semDono).toBe(0);
+    expect(seg.semDonoAnexados).toBeGreaterThan(300);
+    const sil = []; for (let y = 0; y < 60; y += 1) for (let x = 0; x < largura; x += 1) if (seg.silhueta[y * largura + x]) sil.push([x, y]);
+    const silhueta = [Math.min(...sil.map(([x]) => x)), Math.max(...sil.map(([x]) => x)), Math.min(...sil.map(([, y]) => y)), Math.max(...sil.map(([, y]) => y))];
+    expect(silhueta).toEqual([12, 107, 15, 44]);
+    const e = extensao(seg, 'esquerda'); const d = extensao(seg, 'direita');
+    expect([e[0], e[2], e[3]]).toEqual([silhueta[0], silhueta[2], silhueta[3]]);
+    expect([d[1], d[2], d[3]]).toEqual([silhueta[1], silhueta[2], silhueta[3]]);
+    /* Nenhum pixel fica no rótulo do fundo dentro da silhueta. */
+    for (const [x, y] of sil) expect(seg.rotulos[y * largura + x]).not.toBe(1);
+  });
+
+  it('a divisa entre as duas partes continua uma linha, sem ser dada a nenhuma', async () => {
+    const seg = await segmentar(png, config);
+    const divisa = []; for (let y = 20; y < 40; y += 1) divisa.push(seg.rotulos[y * largura + 60]);
+    expect(divisa.every((r) => r === -1)).toBe(true);
+    expect(divisas(seg).map(({ a, b }) => [a, b].sort().join('-'))).toEqual(['direita-esquerda']);
+  });
+
+  it('o corte de uma parte fora do modelo continua cortando: a onda do sem dono não atravessa a divisa dela', async () => {
+    /* A asa de ponta a ponta com o corpo no meio, mais alto que ela, tudo com
+       linha escura e halo: tirada a parte, a asa fica em dois pedaços, e o halo
+       de cima e de baixo de cada metade não passa por cima do corpo. */
+    const asa = (x, y) => x >= 20 && x < 150 && y >= 25 && y < 45;
+    const centro = (x, y) => x >= 70 && x < 100 && y >= 15 && y < 55;
+    const dentro = (x, y) => asa(x, y) || centro(x, y);
+    const linha = (x, y) => !dentro(x, y) && (dentro(x - 1, y) || dentro(x + 1, y) || dentro(x, y - 1) || dentro(x, y + 1));
+    const aureola = (x, y) => !dentro(x, y) && !linha(x, y) && [-2, -1, 0, 1, 2].some((d) => [-2, -1, 0, 1, 2].some((e) => linha(x + d, y + e)));
+    const img = imagemDe(170, 70, (x, y) => (linha(x, y) ? 60 : aureola(x, y) ? 215 : centro(x, y) ? 90 : asa(x, y) ? 150 : 250));
+    const cfg = { limiar: 225, regioes: { asa: [[[40, 35], [60, 35]], [[110, 35], [140, 35]]], corpo: [85, 35] }, foraDoModelo: ['corpo'] };
+    const seg = await segmentar(img, cfg);
+    const { pedacos, linhasDeFora } = await silhuetaEmPedacos(seg, { sem: ['corpo'] });
+    expect(pedacos).toHaveLength(2);
+    expect(linhasDeFora).toHaveLength(2);
+    const asaRotulo = seg.regioes.asa.rotulo;
+    for (let y = 0; y < 70; y += 1) for (let x = 72; x < 98; x += 1) expect(seg.rotulos[y * 170 + x]).not.toBe(asaRotulo);
+    /* Os dois pedaços ficam um de cada lado do corpo (x de 70 a 99), sem ponte por cima dele. */
+    for (const { contornoPx } of pedacos) expect(contornoPx.some(([x]) => x >= 72 && x <= 97)).toBe(false);
+    const lados = pedacos.map(({ contornoPx }) => Math.max(...contornoPx.map(([x]) => x)) < 72).sort();
+    expect(lados).toEqual([false, true]);
+  });
+
+  it('não inventa parte onde não há semente: um bloco escuro longe de qualquer parte continua sem dono', async () => {
+    const solto = imagemDe(160, 60, (x, y) => {
+      if (x >= 120 && x < 150 && y >= 15 && y < 45) return 150;
+      return corpo(x, y) ? (x === 60 ? 110 : 150) : 250;
+    });
+    const seg = await segmentar(solto, config);
+    expect(seg.semDono).toBe(30 * 30);
+    for (let y = 15; y < 45; y += 1) for (let x = 120; x < 150; x += 1) expect(seg.rotulos[y * 160 + x]).toBe(1);
+  });
+
+  it('anexarSemDono, direto: a onda anda de camada em camada, pára no alcance, e a divisa entre partes não é cruzada', () => {
+    expect(ALCANCE_DO_SEM_DONO_PX).toBe(4);
+    /* Uma linha: parte 2, divisa de contorno (-1), cinco pixels de halo (1). */
+    const rotulos = Int32Array.from([2, 2, -1, 1, 1, 1, 1, 1]);
+    const silhueta = new Uint8Array(8).fill(255);
+    expect(anexarSemDono(rotulos, silhueta, 8, 1, 3)).toBe(3);
+    expect([...rotulos]).toEqual([2, 2, 2, 2, 2, 1, 1, 1]);
+    /* Duas partes separadas por uma divisa de dentro (-1 entre 2 e 3, sem fundo ao lado): não muda. */
+    const duas = Int32Array.from([2, 2, -1, 3, 3]);
+    expect(anexarSemDono(duas, new Uint8Array(5).fill(255), 5, 1)).toBe(0);
+    expect([...duas]).toEqual([2, 2, -1, 3, 3]);
+    /* Fora da silhueta não há dono a dar. */
+    const fora = Int32Array.from([2, -1, 1, 1]);
+    expect(anexarSemDono(fora, Uint8Array.from([255, 255, 0, 0]), 4, 1)).toBe(1);
+    expect([...fora]).toEqual([2, 2, 1, 1]);
+    /* O pixel que duas partes disputam fica com a de mais votos, e no empate com a de menor rótulo. */
+    const disputa = Int32Array.from([3, 1, 2]);
+    anexarSemDono(disputa, new Uint8Array(3).fill(255), 3, 1);
+    expect([...disputa]).toEqual([3, 2, 2]);
   });
 });

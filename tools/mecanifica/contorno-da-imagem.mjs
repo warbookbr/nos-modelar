@@ -37,6 +37,11 @@
  *   todos os pedaços em que elas a deixam (`silhueta.pedacos`).
  *   `buracoMaximo` (padrão 64) é a área, em px², até a qual um buraco de fundo
  *   cercado pela silhueta, como um reflexo claro, é fechado; 0 desliga.
+ *   `denteMaximo` (padrão 12) é a área, em px², até a qual um dente ou uma
+ *   reentrância da borda da silhueta é alisado (abertura e fechamento 3 x 3); 0
+ *   desliga. `alcanceSemDono` (padrão 4) é a distância, em px, até a qual o pixel
+ *   da silhueta que nenhuma parte pegou passa à parte vizinha mais próxima; 0
+ *   desliga.
  *
  * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
  * julgadas e o veredito do crítico. A saída do contorno é
@@ -155,7 +160,7 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
   writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, mapaDePartes: join(pasta, 'mapa-de-partes.png'), folhas }));
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
-  const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, buracosFechados: segmentacao.buracosFechados, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
+  const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, semDonoAnexadosPx: segmentacao.semDonoAnexados, mascaraSuavizada: segmentacao.mascaraSuavizada, buracosFechados: segmentacao.buracosFechados, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
   writeFileSync(join(pasta, 'medidas.json'), `${JSON.stringify(medidas, null, 1)}\n`);
   return medidas;
 }
@@ -217,6 +222,7 @@ async function principal(argv) {
     process.stdout.write(`  pacote em ${pasta}: mapa de partes, ${medidas.divisas.length} divisa(s), medidas\n`);
     if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);
     if (medidas.semDonoPx > 0) process.stdout.write(`  ${medidas.semDonoPx} pixel(s) da silhueta sem dono\n`);
+    if (medidas.semDonoAnexadosPx > 0) process.stdout.write(`  ${medidas.semDonoAnexadosPx} pixel(s) sem dono, vizinhos de uma parte, passaram à parte mais próxima; a borda da silhueta perdeu ${medidas.mascaraSuavizada.tirados} pixel(s) de dente e ganhou ${medidas.mascaraSuavizada.postos} de reentrância\n`);
     if (medidas.buracosFechados.buracos > 0) process.stdout.write(`  ${medidas.buracosFechados.buracos} buraco(s) pequeno(s) cercado(s) pela silhueta fechado(s), ${medidas.buracosFechados.pixels} pixel(s)\n`);
     if (resultado.silhueta.pedacos.length > 1) process.stdout.write(`  silhueta em ${resultado.silhueta.pedacos.length} pedaço(s), o maior com ${resultado.silhueta.pedacos[0].areaMm2} mm²\n`);
   }
