@@ -1551,6 +1551,12 @@
       "unidade": "marco-75",
       "nota": 8,
       "motivo": "Nenhuma ponta no ar, travessia ou peça fora do lugar visível na empenagem vertical e no trem do nariz, depois de o crítico saber que a frontal olha pela cauda (o leme à frente da deriva saiu da lista). Não se distinguem nas vistas o eixo e os suportes da dobradiça do leme, a ponteira cinza e o cubo da roda do nariz; os pneus apoiam no mesmo nível."
+    },
+    {
+      "ordem": 18,
+      "unidade": "trens-principais",
+      "nota": 8,
+      "motivo": "Trem recolhível coerente, sem pontas no ar nem travessias ao longo do curso 0, 30, 60 e 83. Folga quase nula da roda recolhida: o cubo e a base do garfo saem 2 a 3 px abaixo da borda da baia e a roda fica a cerca de 4 px da parede interna (cursos 83). A perna é curta para a roda, e a baia tem marcas que as vistas não explicam (ponto no teto, linhas tracejadas na lateral)."
     }
   ],
   "liberacoes": [
