@@ -1,6 +1,22 @@
 # Atritos do esboço do avião
 
-Cada atrito traz o comando que o reproduz, a partir da raiz do repositório.
+Cada atrito traz o comando que o reproduz, a partir da raiz do repositório. O
+comando descreve o estado da primeira rodada; depois da correção ele pode deixar
+de reproduzir, e a prova passa a ser o teste citado na correção.
+
+## Estado em 2026-10-12
+
+A onda 1 da fatia 5 corrigiu a referência no esboço (1 a 4), o processo do
+crítico (9, 11, 12, 20, 21, 24, 25, 29, 31 e 33), o gate de contato e os miúdos
+(6, 8, 10, 18, 23, 28, 35 e 39), a integração do detalhe e o Envelope (13, 14,
+16, 19, 22, 27, 32, 36, 37 e 41) e a blocagem da baia inclinada (44). A onda 2
+corrigiu as famílias no esboço (7), o recorte de uma forma por outra (26) e o
+curso de mecanismo (38, 40, 42 e 43). A pá girada, a torção, a seção côncava e o
+perfil reescrito em cada seção (5, 17, 30 e 34) deixam de ser contornados com a
+família de superfície aerodinâmica, que entrega asa, empenagem e hélice prontas;
+o loft continua com seção convexa e sem giro no próprio plano. A casca tracejada
+(15) é a convenção do desenho e fica como está. A segunda rodada do avião confere
+cada correção no objeto inteiro.
 
 ## 1. A conferência por parte não se desliga
 

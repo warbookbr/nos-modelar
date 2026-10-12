@@ -50,7 +50,7 @@ function casca(pr) {
     aberta: c.aberta,
     /* o plano `w` em que o fundo termina; a cavidade acompanha as seções da parede */
     fundoAte: c.wc,
-    cavidade: c.cavidade.map((sc) => secaoDe(sc)),
+    cavidade: (c.cavidadeDeclarada ?? c.cavidade).map((sc) => secaoDe(sc)),
   };
 }
 
@@ -85,7 +85,9 @@ function geometriaDoTipo(r) {
       const declaradas = Array.isArray(f.secoes) ? f.secoes : [];
       return {
         eixo, eixosDoPerfil: [EIXOS[pr.b.u], EIXOS[pr.b.v]], comprimento: pr.comprimento,
-        secoes: pr.secoes.map((sc, i) => secaoDe(sc, {
+        /* o loft `suave` sai nas seções declaradas, que o tradutor do nível zero lê como o casco reto entre elas */
+        ...(pr.suave ? { suave: true } : {}),
+        secoes: (pr.secoesDeclaradas ?? pr.secoes).map((sc, i) => secaoDe(sc, {
           ...(objeto(declaradas[i]) && typeof declaradas[i].nome === 'string' ? { nome: declaradas[i].nome } : {}),
           ...(objeto(declaradas[i]) && Array.isArray(declaradas[i].inclinacao) && declaradas[i].inclinacao.some((x) => x !== 0) ? { inclinacao: declaradas[i].inclinacao } : {}),
         })),
@@ -96,8 +98,9 @@ function geometriaDoTipo(r) {
       const declarados = Array.isArray(f.perfil) ? f.perfil : [];
       return {
         eixo, comprimento: pr.comprimento, lados: pr.secoes[0].perfil.length,
+        ...(pr.suave ? { suave: true } : {}),
         /* cada ponto do perfil: o raio e a altura ao longo do eixo, esta relativa ao centro da forma */
-        perfil: pr.secoes.map((sc, i) => ({ raio: Array.isArray(declarados[i]) ? declarados[i][0] : declarados[i].raio, altura: sc.w, ...(objeto(declarados[i]) && typeof declarados[i].nome === 'string' ? { nome: declarados[i].nome } : {}) })),
+        perfil: (pr.secoesDeclaradas ?? pr.secoes).map((sc, i) => ({ raio: Array.isArray(declarados[i]) ? declarados[i][0] : declarados[i].raio, altura: sc.w, ...(objeto(declarados[i]) && typeof declarados[i].nome === 'string' ? { nome: declarados[i].nome } : {}) })),
       };
     }
     case 'tubo':

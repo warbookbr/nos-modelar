@@ -48,7 +48,8 @@ carenagem use `loft` (a seção muda de tamanho e de centro ao longo do eixo, e
 `nome` numa seção vira a âncora `<id>.<nome>`), para uma sela ou um U use
 `extrusao` com o perfil côncavo, e para escapamento, cubo e farol use
 `revolucao`. Não há curva livre nem seção côncava de loft: as formas são
-facetadas, e mais seções ou mais pontos no perfil deixam a forma mais suave.
+facetadas, e `"suave": true` no loft e na revolução passa uma curva de tangente
+contínua pelas seções (ou mais seções e mais pontos no perfil).
 
 Posicione pela relação e não por coordenada: a primeira forma leva
 `centro: [0, 0, 0]`; as demais usam `sobre: "<id>"` (base no topo daquela) ou

@@ -65,10 +65,30 @@ const areaDoAnel = (pts) => {
   return Math.hypot(x, y, z) / 2;
 };
 
+/* As normais por vértice (`nv`, da superfície suave) de uma face recortada: as dos vértices que ficam, e nos pontos novos sobre o
+   plano a interpolação das duas normais da aresta cortada, renormalizada. Na mesma ordem de `recortarAnel`. */
+function recortarNormais(pts, nv, c, s) {
+  const saida = [];
+  for (let i = 0; i < pts.length; i++) {
+    const j = (i + 1) % pts.length;
+    const dp = distancia(pts[i], c, s);
+    const dq = distancia(pts[j], c, s);
+    if (dp >= 0) saida.push(nv[i]);
+    if ((dp > 0 && dq < 0) || (dp < 0 && dq > 0)) {
+      const t = dp / (dp - dq);
+      const n = [0, 1, 2].map((e) => nv[i][e] + t * (nv[j][e] - nv[i][e]));
+      const m = Math.hypot(...n) || 1;
+      saida.push(n.map((x) => x / m));
+    }
+  }
+  return saida;
+}
+
 function recortarFace(f, c, s) {
   const pts = recortarAnel(f.pts, c, s);
   if (!pts || areaDoAnel(pts) < EPS) return null;
   const nova = { ...f, pts };
+  if (f.nv) nova.nv = recortarNormais(f.pts, f.nv, c, s);
   if (f.furos) {
     nova.furos = f.furos.map((fu) => recortarAnel(fu, c, s)).filter((fu) => fu && areaDoAnel(fu) >= EPS);
     nova.furo = nova.furos[0] ?? null;

@@ -12,6 +12,7 @@ import { anexarRecortes, deslocarRecorte, fatiasRecortadas, secaoRecortada } fro
 import { caixaDaMalha, fatiarMalha, verticesDaMalha } from './malha.js';
 import { malhaDaFamilia, nomesDeAncorasDaFamilia } from './familia.js';
 import { angulosDaMatriz, lerGiros } from './giro.js';
+import { densificar, densificarPerfil, ladosDoContorno, normaisSuavesDasFaixas, segmentosDoCanto, toleranciaDe } from './suave.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -107,7 +108,7 @@ function amostrarRadial(poli, n) {
   return saida;
 }
 
-const CHAVES_DA_SECAO = ['pos', 'forma', 'tamanho', 'perfil', 'raio', 'centro', 'nome', 'cantos', 'segmentosPorCanto', 'inclinacao'];
+const CHAVES_DA_SECAO = ['pos', 'forma', 'tamanho', 'perfil', 'raio', 'centro', 'nome', 'cantos', 'segmentosPorCanto', 'inclinacao', 'aresta'];
 const FORMAS_DA_SECAO = ['retangulo', 'elipse', 'poligono', 'arredondado'];
 const NOMES_RESERVADOS = ['centro', 'inicio', 'fim', ...LADOS];
 
@@ -128,9 +129,10 @@ function rotacaoDaSecao([au, av]) {
 /* O w de um ponto do perfil de uma seção: o terceiro valor quando a seção está inclinada, e a posição `w` dela nas outras. */
 export const wDoPonto = (sc, q) => (q.length > 2 ? q[2] : sc.w);
 
-/* Lê uma seção do loft: o polígono convexo dela (relativo ao centro da seção, anti-horário) ou null para um ponto. */
-function lerSecao(s, onde, extremo) {
-  exigir(s && typeof s === 'object' && !Array.isArray(s), `${onde}: a seção deve ser { "pos": mm, "forma": "retangulo" | "elipse" | "poligono" | "arredondado", "tamanho": [u, v], "centro": [u, v], "nome": "...", "inclinacao": [au, av] }`);
+/* Lê uma seção do loft: o polígono convexo dela (relativo ao centro da seção, anti-horário) ou null para um ponto. `refino` (só no
+   loft `suave`) traz os lados da elipse e os segmentos do canto que o módulo escolheu pela flecha, no lugar dos 48 e dos 4 de sempre. */
+function lerSecao(s, onde, extremo, refino = null) {
+  exigir(s && typeof s === 'object' && !Array.isArray(s), `${onde}: a seção deve ser { "pos": mm, "forma": "retangulo" | "elipse" | "poligono" | "arredondado", "tamanho": [u, v], "centro": [u, v], "nome": "...", "inclinacao": [au, av], "aresta": true | false }`);
   const fora = Object.keys(s).filter((k) => !CHAVES_DA_SECAO.includes(k));
   exigir(fora.length === 0, `${onde}: a seção não tem o campo "${fora[0]}" (campos: ${CHAVES_DA_SECAO.join(', ')})`);
   exigir(typeof s.pos === 'number' && Number.isFinite(s.pos), `${onde}: falta "pos", a posição da seção ao longo do eixo em mm`);
@@ -139,6 +141,7 @@ function lerSecao(s, onde, extremo) {
   const centro = s.centro ?? [0, 0];
   exigir(Array.isArray(centro) && centro.length === 2 && centro.every(Number.isFinite), `${onde}: "centro" deve ser [u, v] em mm, o deslocamento do centro da seção no plano do perfil`);
   exigir(s.nome === undefined || (typeof s.nome === 'string' && s.nome), `${onde}: "nome" deve ser um texto não vazio`);
+  exigir(s.aresta === undefined || typeof s.aresta === 'boolean', `${onde}: "aresta" deve ser true (a seção é aresta viva: a superfície do loft "suave" quebra nela) ou false (obriga a suavidade, mesmo com mais de 40 graus de quebra); veio ${JSON.stringify(s.aresta)}`);
   exigir(forma === 'arredondado' || (s.cantos === undefined && s.segmentosPorCanto === undefined), `${onde}: "cantos" e "segmentosPorCanto" só valem na seção "arredondado"`);
   let pts;
   if (forma === 'arredondado') {
@@ -146,7 +149,7 @@ function lerSecao(s, onde, extremo) {
     exigir(Array.isArray(s.tamanho) && s.tamanho.length === 2 && s.tamanho.every((x) => Number.isFinite(x) && x > 0), `${onde}: a seção "arredondado" precisa de "tamanho": [u, v] em mm, as duas medidas maiores que zero (o ponto [0, 0] só existe na seção "retangulo")`);
     exigir(s.segmentosPorCanto === undefined || (Number.isInteger(s.segmentosPorCanto) && s.segmentosPorCanto >= 1 && s.segmentosPorCanto <= 32), `${onde}: "segmentosPorCanto" deve ser um inteiro de 1 a 32 (padrão 4)`);
     try {
-      pts = retanguloDeCantos({ largura: s.tamanho[0], profundidade: s.tamanho[1], cantos: s.cantos ?? 0, segmentosPorCanto: s.segmentosPorCanto });
+      pts = retanguloDeCantos({ largura: s.tamanho[0], profundidade: s.tamanho[1], cantos: s.cantos ?? 0, segmentosPorCanto: s.segmentosPorCanto ?? refino?.segmentosPorCanto });
     } catch (e) {
       throw new ErroDeEsboco(`${onde}: seção "arredondado": ${e.message.replace(/^retanguloArredondado: /, '')}`);
     }
@@ -166,7 +169,8 @@ function lerSecao(s, onde, extremo) {
       exigir(a > 0 && b > 0, `${onde}: "tamanho" [${a}, ${b}] tem uma medida nula; use [0, 0] para um ponto ou medidas positivas`);
       if (forma === 'elipse') {
         exigir(s.raio === undefined, `${onde}: "raio" só vale na seção "retangulo"`);
-        pts = Array.from({ length: LADOS_DA_ELIPSE }, (_, i) => [(a / 2) * Math.cos((2 * Math.PI * i) / LADOS_DA_ELIPSE), (b / 2) * Math.sin((2 * Math.PI * i) / LADOS_DA_ELIPSE)]);
+        const lados = refino?.ladosDaElipse ?? LADOS_DA_ELIPSE;
+        pts = Array.from({ length: lados }, (_, i) => [(a / 2) * Math.cos((2 * Math.PI * i) / lados), (b / 2) * Math.sin((2 * Math.PI * i) / lados)]);
       } else {
         exigir(s.raio === undefined || (typeof s.raio === 'number' && Number.isFinite(s.raio) && s.raio >= 0), `${onde}: "raio" deve ser um número em mm, maior ou igual a zero`);
         pts = retanguloArredondado(a, b, s.raio);
@@ -180,7 +184,41 @@ function lerSecao(s, onde, extremo) {
     exigir(s.inclinacao.every((x) => Math.abs(x) < 90), `${onde}: "inclinacao" ${JSON.stringify(s.inclinacao)} passa de 90 graus; a seção girada vira de costas para o eixo (use ângulos de poucos graus)`);
     if (s.inclinacao.some((x) => x !== 0)) rot = rotacaoDaSecao(s.inclinacao);
   }
-  return { pos: s.pos, centro, nome: s.nome, pts, forma, rot };
+  return { pos: s.pos, centro, nome: s.nome, pts, forma, rot, aresta: s.aresta };
+}
+
+/* A escala de um loft ou de uma revolução `suave`, lida das seções ou dos pontos como o esbocista os escreveu (já números): a maior
+   extensão da forma, o maior raio de contorno e o maior raio de canto arredondado. É com elas que `suave.js` escolhe a flecha e os
+   lados do contorno. Defensiva: a validação das seções vem depois e dá a mensagem. */
+function medidasDaForma(f) {
+  const num = (x) => (typeof x === 'number' && Number.isFinite(x) ? x : 0);
+  const cantos = (c) => (Array.isArray(c) ? c.flatMap(cantos) : [Math.abs(num(c))]);
+  let [wMin, wMax, tamanho, raio, canto] = [Infinity, -Infinity, 0, 0, 0];
+  if (f.tipo === 'revolucao') {
+    for (const q of Array.isArray(f.perfil) ? f.perfil : []) {
+      const [r, h] = Array.isArray(q) ? q : [q?.raio, q?.altura];
+      [wMin, wMax] = [Math.min(wMin, num(h)), Math.max(wMax, num(h))];
+      [tamanho, raio] = [Math.max(tamanho, 2 * num(r)), Math.max(raio, num(r))];
+    }
+  } else {
+    for (const sc of Array.isArray(f.secoes) ? f.secoes : []) {
+      if (!sc || typeof sc !== 'object') continue;
+      [wMin, wMax] = [Math.min(wMin, num(sc.pos)), Math.max(wMax, num(sc.pos))];
+      const desvio = Array.isArray(sc.centro) ? Math.max(Math.abs(num(sc.centro[0])), Math.abs(num(sc.centro[1]))) : 0;
+      const lado = Array.isArray(sc.tamanho) ? Math.max(num(sc.tamanho[0]), num(sc.tamanho[1]))
+        : Array.isArray(sc.perfil) ? 2 * Math.max(0, ...sc.perfil.flatMap((q) => (Array.isArray(q) ? q.map((x) => Math.abs(num(x))) : []))) : 0;
+      [tamanho, raio] = [Math.max(tamanho, lado + 2 * desvio), Math.max(raio, lado / 2)];
+      if (sc.forma === 'arredondado' && sc.cantos !== undefined) canto = Math.max(canto, ...cantos(sc.cantos));
+    }
+  }
+  return { extensao: Math.max(wMax - wMin, tamanho, 0), raio, canto };
+}
+
+/* `suave` do loft ou da revolução: true liga as seções por uma curva de tangente contínua (ver `suave.js`); falso ou ausente, por
+   troncos retos. */
+function lerSuave(f, onde) {
+  exigir(f.suave === undefined || typeof f.suave === 'boolean', `${onde}: "suave" deve ser true (a superfície passa por uma curva de tangente contínua pelas seções) ou false (troncos retos entre elas, o padrão); veio ${JSON.stringify(f.suave)}`);
+  return f.suave === true;
 }
 
 /* Os pontos de uma seção do loft no lugar dela: o contorno `pts` (relativo ao centro) mais o centro, e, na seção inclinada, girado em
@@ -227,19 +265,24 @@ function exigirNomes(nomes, onde) {
 /* Sólido em seções paralelas, centrado na caixa. Cada faixa entre duas seções é convexa (o gate a mede por faixa)
    e o desenho fatia o sólido ao longo do eixo. `ancoras` são [u, v, w] antes de centrar. `casca` (opcional, o loft com
    "casca") traz { espessura, aberta, fechadaNoInicio, wc, cavidade }: a superfície interna em seções, com a primeira (ou a
-   última) no plano `wc` em que o fundo termina; a caixa e as âncoras seguem a superfície externa. */
-function solidoEmSecoes(b, secoes, ancoras, casca = null) {
+   última) no plano `wc` em que o fundo termina; a caixa e as âncoras seguem a superfície externa. `suave` (o loft ou a revolução
+   com "suave") traz { secoes, vivas }: as estações que a curva pelas seções declaradas pede (ver `suave.js`) e os índices das
+   que são aresta viva, que o sólido guarda como a posição w de cada uma (`vivasEmW`), porque a cavidade da casca tem outra lista.
+   `secoes` continua sendo as declaradas, que dão a caixa e a exportação; o desenho e o gate leem as estações. */
+function solidoEmSecoes(b, secoes, ancoras, casca = null, suave = null) {
   const vs = secoes.flatMap((sc) => sc.perfil.map((q) => [q[0], q[1], wDoPonto(sc, q)]));
   const lo = [0, 1, 2].map((i) => Math.min(...vs.map((p) => p[i])));
   const hi = [0, 1, 2].map((i) => Math.max(...vs.map((p) => p[i])));
   const c = lo.map((v, i) => (v + hi[i]) / 2);
   const centra = (sc) => ({ w: sc.w - c[2], ...(sc.n ? { n: sc.n } : {}), perfil: sc.perfil.map((q) => (q.length > 2 ? [q[0] - c[0], q[1] - c[1], q[2] - c[2]] : [q[0] - c[0], q[1] - c[1]])) });
-  const centradas = secoes.map(centra);
+  const declaradas = secoes.map(centra);
+  const centradas = suave ? suave.secoes.map(centra) : declaradas;
   const ancorasLocais = Object.fromEntries(Object.entries(ancoras).map(([nome, p]) => [nome, [p[0] - c[0], p[1] - c[1], p[2] - c[2]]]));
   const { listas, ...cascaBase } = casca ?? {};
   return {
     b, perfil: centradas[0].perfil, furos: [], furo: null, comprimento: hi[2] - lo[2], secoes: centradas, porFaixas: true, naoConvexo: true, ancorasLocais,
-    ...(casca ? { casca: { ...cascaBase, wc: casca.wc - c[2], cavidade: casca.cavidade.map(centra), ...(listas ? { listas: { fundo: listas.fundo.map(centra), parede: listas.parede.map(centra), cavidade: listas.cavidade.map(centra) } } : {}) } } : {}),
+    ...(suave ? { suave: true, vivasEmW: suave.vivas.map((k) => suave.secoes[k].w - c[2]), secoesDeclaradas: declaradas } : {}),
+    ...(casca ? { casca: { ...cascaBase, wc: casca.wc - c[2], cavidade: casca.cavidade.map(centra), ...(casca.cavidadeDeclarada ? { cavidadeDeclarada: casca.cavidadeDeclarada.map(centra) } : {}), ...(listas ? { listas: { fundo: listas.fundo.map(centra), parede: listas.parede.map(centra), cavidade: listas.cavidade.map(centra) } } : {}) } } : {}),
   };
 }
 
@@ -283,8 +326,8 @@ function lerCasca(c, onde) {
 /* A superfície interna do loft com casca: cada seção recuada de `espessura` no próprio plano (`deslocarContorno`), as mesmas
    posições e centros; a ponta fechada leva o fundo, e a cavidade começa (ou termina) `espessura` adiante dela. Com seção inclinada
    o fundo acompanha a seção da ponta fechada (ver `fundoDaCascaInclinada`). */
-function cascaDoLoft({ espessura, aberta }, lidas, secoes, { horario, n, misturado }, onde) {
-  const recuadas = lidas.map((sc, i) => {
+function cascaDoLoft({ espessura, aberta }, lidas, secoes, { horario, n, misturado, densas = null }, onde) {
+  let recuadas = lidas.map((sc, i) => {
     const ccw = horario ? [...sc.pts].reverse() : sc.pts;
     let recuado;
     try {
@@ -298,6 +341,9 @@ function cascaDoLoft({ espessura, aberta }, lidas, secoes, { horario, n, mistura
     if (misturado) recuado = amostrarRadial(recuado, n);
     return { w: sc.pos, ...(sc.rot ? { n: sc.rot.n } : {}), perfil: colocarNaSecao(sc, recuado) };
   });
+  /* no loft `suave` a parede de dentro passa pelas mesmas estações da de fora, e o resto da casca trabalha com elas */
+  const declaradasDeDentro = recuadas;
+  recuadas = densas ? densas(recuadas) : recuadas;
   const inicio = secoes[0].w;
   const fim = secoes[secoes.length - 1].w;
   exigir(espessura < fim - inicio - 1e-9, `${onde}: a "casca" de ${espessura} mm não cabe no loft de ${fim - inicio} mm de comprimento: o fundo ocupa a espessura toda e não sobra cavidade`);
@@ -306,7 +352,11 @@ function cascaDoLoft({ espessura, aberta }, lidas, secoes, { horario, n, mistura
   const wc = fechadaNoInicio ? inicio + espessura : fim - espessura;
   const corte = secaoEm(recuadas, wc);
   const cavidade = fechadaNoInicio ? [corte, ...recuadas.filter((sc) => sc.w > wc + 1e-9)] : [...recuadas.filter((sc) => sc.w < wc - 1e-9), corte];
-  return { espessura, aberta, fechadaNoInicio, wc, cavidade };
+  if (!densas) return { espessura, aberta, fechadaNoInicio, wc, cavidade };
+  /* a cavidade nas seções declaradas, que é a que a exportação leva (as estações só servem ao desenho e ao gate) */
+  const corteDeclarado = secaoEm(declaradasDeDentro, wc);
+  const cavidadeDeclarada = fechadaNoInicio ? [corteDeclarado, ...declaradasDeDentro.filter((sc) => sc.w > wc + 1e-9)] : [...declaradasDeDentro.filter((sc) => sc.w < wc - 1e-9), corteDeclarado];
+  return { espessura, aberta, fechadaNoInicio, wc, cavidade, cavidadeDeclarada };
 }
 
 /* O fundo da casca de um loft com seção inclinada. O plano em que o fundo termina é o da seção da ponta fechada, deslocado da
@@ -547,7 +597,11 @@ function prisma(f, onde) {
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
     exigir(Array.isArray(f.secoes) && f.secoes.length >= 2, `${onde}: loft precisa de "secoes": lista de 2 ou mais seções { "pos": mm, "forma": "retangulo" | "elipse" | "poligono", "tamanho": [u, v] } em ordem crescente de "pos" (u e v são os eixos do plano perpendicular ao eixo: x e z para eixo y, z e y para eixo x, x e y para eixo z)`);
-    const lidas = f.secoes.map((s, i) => lerSecao(s, `${onde}, secoes[${i}]`, i === 0 || i === f.secoes.length - 1));
+    const suave = lerSuave(f, onde);
+    const medidas = suave ? medidasDaForma(f) : null;
+    const tolerancia = suave ? toleranciaDe(medidas.extensao) : 0;
+    const refino = suave ? { ladosDaElipse: ladosDoContorno(medidas.raio, tolerancia), segmentosPorCanto: segmentosDoCanto(medidas.canto, tolerancia) } : null;
+    const lidas = f.secoes.map((s, i) => lerSecao(s, `${onde}, secoes[${i}]`, i === 0 || i === f.secoes.length - 1, refino));
     lidas.forEach((sc, i) => { if (i > 0) exigir(sc.pos > lidas[i - 1].pos + 1e-9, `${onde}, secoes[${i}]: "pos" ${sc.pos} não passa da seção anterior (${lidas[i - 1].pos}); as seções vão em ordem crescente de posição`); });
     exigirNomes(nomesDasPartes(f.secoes), onde);
     const declaradaCasca = f.casca === undefined ? null : lerCasca(f.casca, onde);
@@ -563,7 +617,7 @@ function prisma(f, onde) {
     const sentidos = new Set(lidas.filter((sc) => sc.pts).map((sc) => Math.sign(sc.pts.reduce((acc, q, i) => acc + q[0] * sc.pts[(i + 1) % sc.pts.length][1] - sc.pts[(i + 1) % sc.pts.length][0] * q[1], 0))));
     exigir(sentidos.size === 1, `${onde}: os polígonos das seções têm sentidos opostos (horário e anti-horário); escreva todos no mesmo sentido`);
     const horario = [...sentidos][0] < 0;
-    const n = contagens.size === 1 ? [...contagens][0] : LADOS_DA_ELIPSE;
+    const n = contagens.size === 1 ? [...contagens][0] : (refino?.ladosDaElipse ?? LADOS_DA_ELIPSE);
     const secoes = lidas.map((sc) => {
       let pts = sc.pts && (horario ? [...sc.pts].reverse() : sc.pts);
       if (pts && contagens.size > 1) pts = amostrarRadial(pts, n);
@@ -573,19 +627,27 @@ function prisma(f, onde) {
     exigirSecoesSemCruzar(secoes, lidas, onde);
     const ancoras = { inicio: [...lidas[0].centro, lidas[0].pos], fim: [...lidas[lidas.length - 1].centro, lidas[lidas.length - 1].pos] };
     lidas.forEach((sc) => { if (sc.nome) ancoras[sc.nome] = [...sc.centro, sc.pos]; });
-    return solidoEmSecoes(base(eixo), secoes, ancoras, declaradaCasca ? cascaDoLoft(declaradaCasca, lidas, secoes, { horario, n, misturado: contagens.size > 1 }, onde) : null);
+    if (!suave) return solidoEmSecoes(base(eixo), secoes, ancoras, declaradaCasca ? cascaDoLoft(declaradaCasca, lidas, secoes, { horario, n, misturado: contagens.size > 1 }, onde) : null);
+    /* o loft suave: as estações da curva pelas seções, e a parede de dentro da casca pelas mesmas */
+    exigir(!lidas.some((sc) => sc.rot), `${onde}: o loft "suave" não aceita seção com "inclinacao": a curva liga seções paralelas; tire "suave" (troncos retos entre as seções inclinadas) ou a inclinação`);
+    const dens = densificar(secoes, { extensao: medidas.extensao, arestas: lidas.map((sc) => sc.aresta) });
+    const casca = declaradaCasca ? cascaDoLoft(declaradaCasca, lidas, secoes, { horario, n, misturado: contagens.size > 1, densas: (lista) => densificar(lista, { extensao: medidas.extensao, arestas: dens.arestas, nos: dens.nos }).secoes }, onde) : null;
+    return solidoEmSecoes(base(eixo), secoes, ancoras, casca, { secoes: dens.secoes, vivas: [...dens.vivas] });
   }
   if (tipo === 'revolucao') {
     exigir(f.comprimento === undefined, `${onde}: a revolução tem o comprimento dado pela altura do perfil; retire "comprimento"`);
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
-    const lados = f.lados ?? LADOS_DA_REVOLUCAO;
+    const suave = lerSuave(f, onde);
+    const medidas = suave ? medidasDaForma(f) : null;
+    const lados = f.lados ?? (suave ? ladosDoContorno(medidas.raio, toleranciaDe(medidas.extensao)) : LADOS_DA_REVOLUCAO);
     exigir(Number.isInteger(lados) && lados >= 6 && lados <= 128, `${onde}: "lados" deve ser um inteiro de 6 a 128 (padrão ${LADOS_DA_REVOLUCAO})`);
-    const dica = `${onde}: revolucao precisa de "perfil": [[raio, altura], ...] com 2 ou mais pontos em mm, do começo ao fim do eixo; cada ponto também pode ser { "raio": mm, "altura": mm, "nome": "..." } para virar âncora`;
+    const dica = `${onde}: revolucao precisa de "perfil": [[raio, altura], ...] com 2 ou mais pontos em mm, do começo ao fim do eixo; cada ponto também pode ser { "raio": mm, "altura": mm, "nome": "...", "aresta": true } para virar âncora ou aresta viva da revolução "suave"`;
     exigir(Array.isArray(f.perfil) && f.perfil.length >= 2, dica);
     const pts = f.perfil.map((q, i) => {
       if (Array.isArray(q)) { exigir(q.length === 2 && q.every(Number.isFinite), dica); return { raio: q[0], altura: q[1] }; }
-      exigir(q && typeof q === 'object' && Object.keys(q).every((k) => ['raio', 'altura', 'nome'].includes(k)) && Number.isFinite(q.raio) && Number.isFinite(q.altura), `${dica} (perfil[${i}])`);
+      exigir(q && typeof q === 'object' && Object.keys(q).every((k) => ['raio', 'altura', 'nome', 'aresta'].includes(k)) && Number.isFinite(q.raio) && Number.isFinite(q.altura), `${dica} (perfil[${i}])`);
+      exigir(q.aresta === undefined || typeof q.aresta === 'boolean', `${onde}: perfil[${i}]: "aresta" deve ser true (aresta viva na revolução "suave") ou false (obriga a suavidade); veio ${JSON.stringify(q.aresta)}`);
       exigir(q.nome === undefined || (typeof q.nome === 'string' && q.nome), `${onde}: perfil[${i}]: "nome" deve ser um texto não vazio`);
       return q;
     });
@@ -602,7 +664,10 @@ function prisma(f, onde) {
     const secoes = pts.map((q) => ({ w: q.altura, perfil: circuloN(q.raio, lados) }));
     const ancoras = { inicio: [0, 0, pts[0].altura], fim: [0, 0, pts[pts.length - 1].altura] };
     pts.forEach((q) => { if (q.nome) ancoras[q.nome] = [0, 0, q.altura]; });
-    return solidoEmSecoes(base(eixo), secoes, ancoras);
+    if (!suave) return solidoEmSecoes(base(eixo), secoes, ancoras);
+    /* a curva do perfil no plano (raio, altura), e uma seção circular em cada ponto dela */
+    const dens = densificarPerfil(pts, { extensao: medidas.extensao, arestas: pts.map((q) => q.aresta) });
+    return solidoEmSecoes(base(eixo), secoes, ancoras, null, { secoes: dens.pontos.map((q) => ({ w: q.altura, perfil: circuloN(q.raio, lados) })), vivas: [...dens.vivas] });
   }
   if (tipo === 'familia') {
     /* a superfície vem pronta da família (ver `familia.js`): a caixa, as âncoras, o desenho e as peças convexas saem da malha, e o
@@ -867,8 +932,8 @@ export function relacaoDe(f) {
     const a = f.arranjoDe;
     partes.push(`cópia ${a.indice} de ${a.total} de ${a.fonte}, ${a.modo === 'caminho' ? `ao longo do caminho de ${a.caminho}${a.passo !== undefined ? `, passo ${a.passo} mm` : ''}` : a.modo === 'linear' ? `linear, passo ${v(a.passo)}` : `radial, eixo ${a.eixo} em ${v(a.centro)}, ${a.graus} graus`}`);
   }
-  if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções${f.casca && typeof f.casca === 'object' ? `, casca de ${f.casca.espessura} mm aberta no ${f.casca.aberta}` : ''}${f.secoes.filter((q) => q && Array.isArray(q.inclinacao) && q.inclinacao.some((x) => x !== 0)).map((q) => `, seção ${q.nome ?? `em ${q.pos} mm`} inclinada [${q.inclinacao.join(' ')}] graus`).join('')}`);
-  if (f.tipo === 'revolucao' && Array.isArray(f.perfil)) partes.push(`revolução de um perfil de ${f.perfil.length} pontos`);
+  if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções${f.suave === true ? ', superfície suave' : ''}${f.casca && typeof f.casca === 'object' ? `, casca de ${f.casca.espessura} mm aberta no ${f.casca.aberta}` : ''}${f.secoes.filter((q) => q && Array.isArray(q.inclinacao) && q.inclinacao.some((x) => x !== 0)).map((q) => `, seção ${q.nome ?? `em ${q.pos} mm`} inclinada [${q.inclinacao.join(' ')}] graus`).join('')}`);
+  if (f.tipo === 'revolucao' && Array.isArray(f.perfil)) partes.push(`revolução de um perfil de ${f.perfil.length} pontos${f.suave === true ? ', superfície suave' : ''}`);
   if (f.tipo === 'tubo' && Array.isArray(f.caminho)) partes.push(`caminho de ${f.caminho.length} pontos${f.raioCurva ? `, raio de curva ${f.raioCurva} mm` : ''}`);
   if (f.tipo === 'familia' && typeof f.familia === 'string') partes.push(`família ${f.familia}${f.perfil ? `, perfil ${f.perfil}` : ''}${Object.keys(f.parametros ?? {}).length ? `, ajustes ${Object.entries(f.parametros).map(([k, x]) => `${k} ${x}`).join(' ')}` : ''}`);
   if (f.tipo === 'envolve' && Array.isArray(f.circulos)) partes.push(`faixa ${f.fechado === false ? 'aberta' : 'fechada'} de ${f.largura} mm por ${f.espessura} mm em torno de ${f.circulos.length} círculos (raios ${f.circulos.map((c) => c.raio).join(', ')})`);
@@ -1630,6 +1695,10 @@ function fatiarSecoes(r, olho, maxFatias = 36) {
   const nb = secoes.length - 1;
   const nm = normaisDasFaixas(r.prisma).map((fk) => fk.map((n) => rotNormal(n)));
   const cos25 = Math.cos((25 * Math.PI) / 180);
+  /* a superfície `suave` (ver `suave.js`) leva uma normal por vértice de cada face, alisada através das faces que fazem menos de 25
+     graus entre si e partida na aresta viva, e a aresta declarada é desenhada mesmo quando a quebra é menor que o vinco */
+  const vivas = new Set(secoes.flatMap((sc, k) => ((r.prisma.vivasEmW ?? []).some((x) => Math.abs(x - sc.w) < 1e-6) ? [k] : [])));
+  const nv = r.prisma.suave ? normaisSuavesDasFaixas(nm, N, vivas, cos25) : null;
   const visivel = (k, i) => dot(nm[k][i], olho) > 1e-6;
   const raioDe = (sc) => Math.max(...sc.perfil.map((q) => Math.hypot(q[0], q[1])));
   const tampaVisivel = [
@@ -1673,10 +1742,10 @@ function fatiarSecoes(r, olho, maxFatias = 36) {
         if ((silA || vincA) && diferentes(P0(i), P1(i))) doLado.push([P0(i), P1(i)]);
         if ((silD || vincD) && diferentes(P0(i2), P1(i2))) doLado.push([P0(i2), P1(i2)]);
         if (j === 0 && diferentes(P0(i), P0(i2))
-          && (k === 0 ? !tampaVisivel[0] : (!visivel(k - 1, i) || dot(n, nm[k - 1][i]) < cos25))) doLado.push([P0(i), P0(i2)]);
+          && (k === 0 ? !tampaVisivel[0] : (!visivel(k - 1, i) || dot(n, nm[k - 1][i]) < cos25 || vivas.has(k)))) doLado.push([P0(i), P0(i2)]);
         if (j === fatias - 1 && diferentes(P1(i), P1(i2))
           && (k === nb - 1 ? !tampaVisivel[1] : !visivel(k + 1, i))) doLado.push([P1(i), P1(i2)]);
-        lados.push({ papel: 'lado', n, pts: [P0(i), P0(i2), P1(i2), P1(i)], ...(r.prisma.naoConvexo ? { linhas: doLado } : {}) });
+        lados.push({ papel: 'lado', n, pts: [P0(i), P0(i2), P1(i2), P1(i)], ...(nv ? { nv: nv[k][i] } : {}), ...(r.prisma.naoConvexo ? { linhas: doLado } : {}) });
         linhas.push(...doLado);
       }
       chunks.push({ r, prof: dot(mundo(0, 0, (a.w + d.w) / 2), olho), lados, dentro: [], linhas, arcos: [], tampas: [] });
@@ -1700,7 +1769,7 @@ function fatiarCasca(r, olho, maxFatias) {
   const semCasca = { ...r.prisma, casca: undefined };
   const externo = fatiarSecoes({ ...r, prisma: semCasca }, olho, maxFatias).filter((ch) => ch.ponta !== aberta);
   const contra = olho.map((x) => -x);
-  const invertida = (f) => ({ ...f, n: f.n.map((x) => -x) });
+  const invertida = (f) => ({ ...f, n: f.n.map((x) => -x), ...(f.nv ? { nv: f.nv.map((n) => n.map((x) => -x)) } : {}) });
   const interno = fatiarSecoes({ ...r, prisma: { ...semCasca, secoes: cavidade } }, contra, maxFatias)
     .filter((ch) => ch.ponta !== aberta)
     .map((ch) => ({ ...ch, lados: [], dentro: ch.lados.map(invertida), tampas: ch.tampas.map(invertida) }));
@@ -2022,6 +2091,24 @@ function quebrar(texto, n) {
   }
   if (atual) linhas.push(atual);
   return linhas;
+}
+
+/* O preenchimento de uma face lateral da superfície suave (`suave.js`), pelas cores dos quatro vértices (`nv` são as normais alisadas
+   deles, `q` os vértices na tela, na ordem da face): uma cor só quando elas diferem menos que 3 níveis, senão um degradê de uma aresta
+   longitudinal à outra, para a face não ficar um degrau de cor entre as vizinhas. Devolve { fill, defs }, onde `defs` é o degradê a
+   declarar antes (vazio quando a cor é uma só) e `id` o número dele no desenho. */
+function preenchimentoSuave(nv, tint, q, id) {
+  const v = nv.map((n) => [1, 3, 5].map((i) => parseInt(tint(n).slice(i, i + 2), 16)));
+  const hex = (c) => `#${c.map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')}`;
+  const media = (...cs) => cs[0].map((_, i) => cs.reduce((a, c) => a + c[i], 0) / cs.length);
+  const tudo = media(...v);
+  const dif = Math.max(...v.flatMap((c) => c.map((x, i) => Math.abs(x - tudo[i]))));
+  const [a, b] = [[(q[0][0] + q[3][0]) / 2, (q[0][1] + q[3][1]) / 2], [(q[1][0] + q[2][0]) / 2, (q[1][1] + q[2][1]) / 2]];
+  if (dif < 3 || Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-3) return { fill: hex(tudo), defs: '' };
+  return {
+    fill: `url(#gs${id})`,
+    defs: `<linearGradient id="gs${id}" gradientUnits="userSpaceOnUse" x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}"><stop offset="0" stop-color="${hex(media(v[0], v[3]))}"/><stop offset="1" stop-color="${hex(media(v[1], v[2]))}"/></linearGradient>`,
+  };
 }
 
 /* O quadro e a tinta do desenho das formas, para o desenhista da blocagem (`desenho-da-blocagem.js`) ter o mesmo quadro (painel,
@@ -2733,6 +2820,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     if (alturaChave > 0) extra = alturaChave + RESERVA_FOLGA;
   }
   const baloes = [];
+  let gradientes = 0;
   const formasDaCamada = [];
   /* o que pertence às formas (a camada as substitui) vai marcado; o SVG puro junta tudo */
   const emForma = (t) => partes.push(querCamada ? { forma: t } : t);
@@ -2927,8 +3015,10 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
       const pintarFaces = (chunks) => {
         for (const ch of chunks) {
           for (const f of [...ch.dentro, ...ch.lados]) {
-            const c = tint(f.n);
-            emForma(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
+            const q = f.pts.map(V.p).map(tela);
+            const { fill: c, defs } = f.nv ? preenchimentoSuave(f.nv, tint, q, gradientes++) : { fill: tint(f.n), defs: '' };
+            if (defs) emForma(`<defs>${defs}</defs>`);
+            emForma(`<path d="${caminho(q)}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
           }
         }
       };

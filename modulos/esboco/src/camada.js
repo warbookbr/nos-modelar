@@ -75,7 +75,11 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false }) {
     const anel = (pts, fechado) => { const q = pts.map(p3); if (fechado) q.push(q[0]); tracos.push(q); };
     for (const ch of it.chunks) {
       for (const f of [...ch.dentro, ...ch.lados]) {
-        faces.push({ c: f.pts.map(p3), k: tinta(it.r, f.n) });
+        /* a superfície suave leva a cor de cada vértice (`kv`, pela normal alisada dele): o desenhista interpola entre elas, e a face
+           deixa de ser um degrau de cor; com as quatro iguais a face é de uma cor só */
+        const kv = f.nv ? f.nv.map((n) => tinta(it.r, n)) : null;
+        const lisa = kv !== null && kv.some((x) => x !== kv[0]);
+        faces.push({ c: f.pts.map(p3), k: kv === null ? tinta(it.r, f.n) : kv[0], ...(lisa ? { kv } : {}) });
         if ((it.r.prisma?.naoConvexo || it.r.subtrai) && !previa) for (const l of f.linhas ?? []) tracos.push(l.map(p3));
       }
       for (const t of ch.tampas) {

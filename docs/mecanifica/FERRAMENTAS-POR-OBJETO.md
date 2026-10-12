@@ -67,7 +67,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - gabinete (`não`, 57 objetos): nem esboço nem núcleo.
 - cabo ou mangueira entre pontos (`parcial`, 49 objetos): tubo do esboço, sem caimento nem terminais.
 - roda e pneu (`sim`, 49 objetos): família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos.
-- superfície suave por seções (`parcial`, 46 objetos): loft no esboço e no núcleo, com faces planas entre seções; inflate no núcleo.
+- superfície suave por seções (`parcial`, 46 objetos): esboço: loft e revolução com `suave: true`, curva de tangente contínua pelas seções com estações, lados e normal escolhidos pelo módulo; núcleo: loft com faces planas entre seções e inflate.
 - furação em padrão (`parcial`, 43 objetos): esboço: furos na caixa; núcleo: furo com centros; escareado, rebaixo e furo fora da caixa não.
 - perfil estrutural (`parcial`, 43 objetos): componente perfil do esboço: L, U e tubo retangular.
 - manopla e botão (`não`, 42 objetos): nem esboço nem núcleo.
@@ -210,7 +210,7 @@ Cria o pino oco de fixação dentro de um gabinete, com furo, rebaixo e raiz arr
 
 ### superfície suave por seções (`loftSuave`)
 
-Faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções. Parâmetros: seções, curvatura entre elas, densidade. Referências: Blender: Subdivision Surface; OpenVSP; FreeCAD Ship; CadQuery: loft com ruled=False. Aqui: parcial, loft no esboço e no núcleo, com faces planas entre seções; inflate no núcleo. Atende 46 objetos em 15 famílias.
+Faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções. Parâmetros: seções, curvatura entre elas, densidade. Referências: Blender: Subdivision Surface; OpenVSP; FreeCAD Ship; CadQuery: loft com ruled=False. Aqui: parcial, esboço: loft e revolução com `suave: true`, curva de tangente contínua pelas seções com estações, lados e normal escolhidos pelo módulo; núcleo: loft com faces planas entre seções e inflate. Atende 46 objetos em 15 famílias.
 
 ### furação em padrão (`furos`)
 
