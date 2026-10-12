@@ -5,6 +5,7 @@
 import { CORES_NOMEADAS, ErroDeEsboco } from './index.js';
 import { quisDizer } from './parecido.js';
 import { lerPorta } from './portas.js';
+import { lerFormaDeFamilia } from './familia.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const EIXOS = ['x', 'y', 'z'];
@@ -22,6 +23,7 @@ export const CAMPOS_POR_TIPO = {
   revolucao: ['perfil', 'eixo', 'lados'],
   tubo: ['caminho', 'diametro', 'raioCurva'],
   envolve: ['circulos', 'largura', 'espessura', 'fechado', 'sentido', 'eixo'],
+  familia: ['familia', 'perfil', 'parametros'],
 };
 export const TIPOS_DE_FORMA = Object.keys(CAMPOS_POR_TIPO);
 const NUMERICOS = ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'diametroTopo', 'raioCurva', 'opacidade'];
@@ -72,6 +74,7 @@ export function validarForma(f, onde) {
   if (f.cor !== undefined) corValida(f.cor, rotuloDaForma);
   if (f.substitui !== undefined && !(typeof f.substitui === 'string' && f.substitui)) throw new ErroDeEsboco(`${rotuloDaForma}: "substitui" deve ser o id da forma da maquete que esta forma substitui no detalhado (veio ${JSON.stringify(f.substitui)})`);
   if (f.estilo !== undefined && !(typeof f.estilo === 'string' && f.estilo)) throw new ErroDeEsboco(`${rotuloDaForma}: "estilo" deve ser o nome de um estilo declarado em "estilos" na raiz (veio ${JSON.stringify(f.estilo)})`);
+  if (f.tipo === 'familia') lerFormaDeFamilia(f, rotuloDaForma, { resolvidos: false });
   if (f.porta !== undefined) lerPorta(f.porta, `${rotuloDaForma}: porta`, f.tipo);
   if (f.oculto !== undefined && typeof f.oculto !== 'boolean') throw new ErroDeEsboco(`${rotuloDaForma}: "oculto" deve ser true ou false (veio ${JSON.stringify(f.oculto)})`);
 }

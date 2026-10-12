@@ -49,6 +49,7 @@ import {
   resumoDoConjunto,
 } from '../../src/autoria/calibracao-do-critico.js';
 import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
+import './esboco-familias.mjs';
 import { juntarPerguntas } from '../../src/autoria/perguntas-do-critico.js';
 import { ambienteDaExecucao, hashDe, MATERIAL_NEUTRO, pontosDaFamilia, pontosDosPerfis } from './aprovacao-da-familia.mjs';
 import {

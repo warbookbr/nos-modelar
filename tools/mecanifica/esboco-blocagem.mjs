@@ -19,6 +19,7 @@ import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, detalharUnidade, formasVizinhas }
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { ErroDoTradutor, traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compilarAndaime } from '../../src/autoria/medir-blocagem-nivel-zero.js';
+import './esboco-familias.mjs';
 
 const porExtenso = (ids, n = 8) => `${ids.slice(0, n).join(', ')}${ids.length > n ? ', ...' : ''}`;
 

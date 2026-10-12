@@ -22,6 +22,7 @@ import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
 import { linhasDasPerguntas } from '../../src/autoria/perguntas-do-critico.js';
 import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
+import './esboco-familias.mjs';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
 import { ajuda } from './esboco-ajuda.mjs';

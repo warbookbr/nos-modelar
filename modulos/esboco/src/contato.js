@@ -17,6 +17,7 @@ import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pon
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 import { avaliarPortas, girar, localParaMundo, mmFino } from './portas.js';
+import { pecasDaMalha } from './malha.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
 /* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
@@ -258,6 +259,10 @@ const memoPares = new WeakMap();
 
 function pecasSemMemoria(r) {
   if (r.partes) return r.partes.flatMap((pt) => pecasDe(subforma(r, pt)));
+  /* a forma de família: as peças convexas da malha, uma lista por parte da família (o aro, o pneu, a camisa, a haste), cortadas até o
+     casco de cada pedaço quase não cobrir vazio; o furo do cubo e o interior da camisa não têm peça, e por isso o eixo e a haste
+     entram neles sem se atravessar (ver `malha.js`) */
+  if (r.prisma.malha) return pecasDaMalha(r);
   if (r.prisma.casca) return pecasDaCasca(r);
   if (r.prisma.secoes) return r.prisma.porFaixas ? pecasPorFaixas(r) : [prismaDeSecoes(r)];
   const { perfil, furos } = r.prisma;
@@ -791,6 +796,7 @@ const FRACAO_TRANSVERSAL_DO_ENCAIXE = 0.6;
 function volumeDe(r) {
   const caixa = (r.max[0] - r.min[0]) * (r.max[1] - r.min[1]) * (r.max[2] - r.min[2]);
   const pr = r.prisma;
+  if (pr?.malha) return pr.malha.volume;
   if (!pr || pr.secoes || !Array.isArray(pr.perfil) || !(pr.comprimento > 0)) return caixa;
   const area = Math.abs(areaDe(pr.perfil)) / 2 - (pr.furos ?? []).reduce((acc, f) => acc + Math.abs(areaDe(f)) / 2, 0);
   return area > 0 ? area * pr.comprimento : caixa;

@@ -7,6 +7,7 @@ import { completarPelasOcultas, contarGrupos, herdarDoEspelho, lerContato, medir
 import { verificarProjecao } from './projecao.js';
 import { conferirPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
+import { girar } from './portas.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const r2 = (x) => Math.round(x * 100) / 100;
@@ -19,8 +20,24 @@ export const RUIDO_MM = 0.05;
 
 function eixoDe(r) {
   const t = r.forma.tipo;
-  if (t === 'caixa' || t === 'esfera' || t === 'tubo' || t === 'envolve') return null;
+  if (t === 'caixa' || t === 'esfera' || t === 'tubo' || t === 'envolve' || t === 'familia') return null;
   return r.forma.eixo ?? 'y';
+}
+
+/* A forma de família em texto de dado: a família, o perfil, os ajustes, as partes da peça, o volume da superfície e as portas com o
+   eixo de cada uma já girado (o do mundo), porque quem posiciona a roda do trem pelo eixo dela precisa saber para onde ele aponta. */
+function descreverFamilia(r) {
+  const m = r.prisma?.malha;
+  if (!m) return null;
+  const ajustes = r.forma.parametros ?? {};
+  return {
+    id: r.forma.familia,
+    ...(r.forma.perfil === undefined ? {} : { perfil: r.forma.perfil }),
+    ...(Object.keys(ajustes).length > 0 ? { ajustes } : {}),
+    partes: m.partes.map((p) => p.nome).filter(Boolean),
+    volume_mm3: Math.round(m.volume),
+    portas: (m.portas ?? []).map((p) => ({ id: p.id, tipo: p.tipo, papel: p.papel, ...(p.eixo ? { eixo: vec(girar(r.matriz, p.eixo)) } : {}) })),
+  };
 }
 
 function descreverForma(r) {
@@ -33,6 +50,7 @@ function descreverForma(r) {
     ...(eixoDe(r) ? { eixo: eixoDe(r) } : {}),
     ...(r.forma.rotacao !== undefined ? { rotacao: r.forma.rotacao } : {}),
     ...(relacaoDe(r.forma) ? { relacao: relacaoDe(r.forma) } : {}),
+    ...(r.prisma?.malha ? { familia: descreverFamilia(r) } : {}),
     caixa: { x: [r2(r.min[0]), r2(r.max[0])], y: [r2(r.min[1]), r2(r.max[1])], z: [r2(r.min[2]), r2(r.max[2])] },
     ancoras: Object.fromEntries(Object.entries(ancorasDe(r)).map(([k, v]) => [k, vec(v)])),
   };
@@ -153,6 +171,7 @@ const vetor = (v) => `[${v.map(mm1).join(' ')}]`;
 const faixa = (p) => `${mm1(p[0])}..${mm1(p[1])}`;
 
 const linhaDaForma = (f) => `forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`;
+const linhaDaFamilia = (f) => `família ${f.id}${f.familia.perfil ? ` (perfil ${f.familia.perfil})` : ''}: ${f.familia.partes.length} partes (${f.familia.partes.join(', ')}), volume ${Math.round(f.familia.volume_mm3)} mm3${f.familia.portas.length ? `; portas ${f.familia.portas.map((q) => `${q.id} (${q.tipo}, ${q.papel}${q.eixo ? `, eixo ${vetor(q.eixo)}` : ''})`).join('; ')}` : '; sem portas'}`;
 const linhaDeAncoras = (f) => `âncoras ${f.id}: ${Object.entries(f.ancoras).map(([k, v]) => `${k} ${vetor(v)}`).join('; ')}`;
 const linhaDeContato = (c) => `contato: ${c.a} toca ${c.b} (${c.folga_mm !== undefined ? `folga ${mm1(c.folga_mm)} mm` : `penetração ${mm1(c.penetracao_mm)} mm`})`;
 const linhaDeSobreposicao3d = (s) => `sobreposição 3D: ${s.a} e ${s.b} se atravessam ${mm1(s.penetracao_mm)} mm${s.declarado ? ' (atravessa declarado)' : ''}`;
@@ -167,6 +186,7 @@ export function formatarDescricao(d) {
     L.push(linhaDoGate(o));
     for (const f of o.formas) {
       L.push(linhaDaForma(f));
+      if (f.familia) L.push(linhaDaFamilia(f));
       L.push(linhaDeAncoras(f));
     }
     for (const c of o.contatos) L.push(linhaDeContato(c));
@@ -217,6 +237,7 @@ export function formatarForma(d, divergencias, id) {
     L.push(`opção ${i + 1} (${o.titulo}):`);
     for (const f of achadas) {
       L.push(linhaDaForma(f));
+      if (f.familia) L.push(linhaDaFamilia(f));
       L.push(linhaDeAncoras(f));
       for (const c of o.contatos) if (c.a === f.id || c.b === f.id) L.push(linhaDeContato(c));
       if (o.soltas.includes(f.id)) L.push(`solta: ${f.id} fora do maior grupo conectado`);

@@ -1,0 +1,28 @@
+{
+  "vista": "lateral",
+  "plano": {
+    "texto": "Uma perna do trem de pouso, com o cilindro hidráulico como amortecedor e a roda 2.0 de família, escritos no JSON do esboço (E7 do esboço do avião): o pino prende o olhal de trás entre duas orelhas sob a longarina, e o eixo atravessa o olhal da frente e o cubo da roda.",
+    "nivel": "detalhado",
+    "medidas": [
+      { "nome": "comprimentoRecolhido", "valor": 470, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "distancia": ["amortecedor.olhal-traseiro", "amortecedor.olhal-dianteiro"], "eixo": "y" } },
+      { "nome": "diametroDaRoda", "valor": 500, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "caixa": "y", "formas": ["roda"] } },
+      { "nome": "larguraDaRoda", "valor": 100, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "caixa": "z", "formas": ["roda"] } },
+      { "nome": "vaoDoPinoAoEixo", "valor": 470, "unidade": "mm", "origem": "ficha", "tolerancia": 1, "mede": { "distancia": ["pino.centro", "eixoDaRoda.centro"], "eixo": "y" } }
+    ],
+    "contrato": { "tocam": [["amortecedor", "pino"], ["eixoDaRoda", "roda"], ["longarina", "orelhaA"]] }
+  },
+  "contato": { "usar": true, "tolerancia": 2, "penetracao": 2, "folga": 100 },
+  "opcoes": [{
+    "titulo": "Perna",
+    "nota": "Perna do trem: amortecedor e roda de família",
+    "formas": [
+      { "id": "longarina", "tipo": "caixa", "largura": 400, "altura": 60, "profundidade": 300, "centro": [0, 1000, 0], "cor": "cinza", "unidade": "fuselagem" },
+      { "id": "amortecedor", "tipo": "familia", "familia": "cilindro-hidraulico", "rotacao": [0, 0, -90], "encaixa": { "ancora": "olhal-traseiro", "em": { "ancora": "longarina.-y", "mm": [0, -45, 0] } }, "cor": "azul", "unidade": "suspensao" },
+      { "id": "orelhaA", "tipo": "caixa", "largura": 60, "altura": 70, "profundidade": 12, "centro": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 10, -6] }, "cor": "cinza", "unidade": "suspensao" },
+      { "id": "orelhaB", "tipo": "caixa", "largura": 60, "altura": 70, "profundidade": 12, "centro": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 10, 37.5] }, "cor": "cinza", "unidade": "suspensao" },
+      { "id": "pino", "tipo": "cilindro", "diametro": 31, "eixo": "z", "de": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 0, 0] }, "para": { "ancora": "amortecedor.olhal-traseiro", "mm": [0, 0, 31.5] }, "cor": "laranja", "unidade": "suspensao" },
+      { "id": "eixoDaRoda", "tipo": "cilindro", "diametro": 31, "de": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, -6] }, "para": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, 148] }, "cor": "laranja", "unidade": "roda" },
+      { "id": "roda", "tipo": "familia", "familia": "roda-pneu", "perfil": "trem", "parametros": { "diametroPneu": 500, "diametroFuroCentral": 0.0632 }, "rotacao": [0, 90, 0], "centro": { "ancora": "amortecedor.olhal-dianteiro", "mm": [0, 0, 92] }, "cor": "preto", "unidade": "roda" }
+    ]
+  }]
+}

@@ -8,6 +8,8 @@ import { expandirArranjos, expandirEsboco } from './expandir.js';
 import { quisDizer } from './parecido.js';
 import { formasDoPainel, montarCamada } from './camada.js';
 import { frenteDoCorte, ladoDoCorte, lacosDoPlano, lerCorte, recortarBloco } from './corte.js';
+import { caixaDaMalha, fatiarMalha, verticesDaMalha } from './malha.js';
+import { malhaDaFamilia, nomesDeAncorasDaFamilia } from './familia.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -600,10 +602,17 @@ function prisma(f, onde) {
     pts.forEach((q) => { if (q.nome) ancoras[q.nome] = [0, 0, q.altura]; });
     return solidoEmSecoes(base(eixo), secoes, ancoras);
   }
-  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao, loft, revolucao, tubo ou envolve`);
+  if (tipo === 'familia') {
+    /* a superfície vem pronta da família (ver `familia.js`): a caixa, as âncoras, o desenho e as peças convexas saem da malha, e o
+       resto do prisma só preenche o que as leituras de prisma esperam */
+    const malha = malhaDaFamilia(f, onde);
+    return { b: base('y'), perfil: [], furos: [], furo: null, comprimento: malha.caixa.max[1] - malha.caixa.min[1], malha };
+  }
+  throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel, caixa, cone, esfera, extrusao, loft, revolucao, tubo, envolve ou familia`);
 }
 
 function caixaLocal(pr, m) {
+  if (pr.malha) return caixaDaMalha(pr.malha, m);
   if (pr.secoes) {
     const vs = verticesLocais(pr, m);
     return { min: [0, 1, 2].map((i) => Math.min(...vs.map((p) => p[i]))), max: [0, 1, 2].map((i) => Math.max(...vs.map((p) => p[i]))) };
@@ -668,7 +677,7 @@ const TIPOS_COM_EIXO = ['cilindro', 'anel', 'cone', 'extrusao', 'loft', 'revoluc
 
 /* O loft e a revolução ainda têm as âncoras nomeadas: `nome` de cada seção ou de cada ponto do perfil. */
 export function nomesDeAncoras(tipo, forma) {
-  const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : tipo === 'tubo' ? nomesDasPartes(forma?.caminho) : [];
+  const nomeadas = tipo === 'loft' ? nomesDasPartes(forma?.secoes) : tipo === 'revolucao' ? nomesDasPartes(forma?.perfil) : tipo === 'tubo' ? nomesDasPartes(forma?.caminho) : tipo === 'familia' ? nomesDeAncorasDaFamilia(forma) : [];
   /* a caixa só tem `inicio` e `fim` quando é uma haste entre dois pontos (`de`/`para`): as faces `+x`...`-z` são as da caixa mínima
      alinhada aos eixos, e não as do corpo inclinado, então a ponta da haste só se endereça por estes dois nomes */
   const hasteDeCaixa = tipo === 'caixa' && forma?.de !== undefined && forma?.para !== undefined;
@@ -687,6 +696,12 @@ export function ancorasDe(r) {
     a.inicio = r.centro.map((c, i) => c + r.extremos.inicio[i]);
     a.fim = r.centro.map((c, i) => c + r.extremos.fim[i]);
     for (const [nome, d] of Object.entries(r.nomeadas ?? {})) a[nome] = r.centro.map((c, i) => c + d[i]);
+  } else if (r.prisma.malha) {
+    /* família: cada porta que ela publica é uma âncora, no centro da interface dela, girada com a forma */
+    for (const [nome, p] of Object.entries(r.prisma.malha.ancoras)) {
+      const d = aplicarMatriz(p, r.matriz);
+      a[nome] = [r.centro[0] + d[0], r.centro[1] + d[1], r.centro[2] + d[2]];
+    }
   } else if (r.prisma.ancorasLocais) {
     /* loft e revolução: as pontas do eixo e as seções ou pontos nomeados, em coordenadas locais já centradas */
     for (const [nome, [u, v, w]] of Object.entries(r.prisma.ancorasLocais)) {
@@ -798,6 +813,7 @@ function rotacaoEntre(a, b) {
 
 /* Vértices do prisma girado, relativos ao centro (o anel entra como o disco externo). */
 function verticesLocais(pr, m) {
+  if (pr.malha) return verticesDaMalha(pr.malha, m);
   if (pr.secoes) return pr.secoes.flatMap((sc) => sc.perfil.map((q) => aplicarMatriz(ponto3(pr.b, q[0], q[1], wDoPonto(sc, q)), m)));
   const h = pr.comprimento / 2;
   const saida = [];
@@ -852,6 +868,7 @@ export function relacaoDe(f) {
   if (f.tipo === 'loft' && Array.isArray(f.secoes)) partes.push(`loft de ${f.secoes.length} seções${f.casca && typeof f.casca === 'object' ? `, casca de ${f.casca.espessura} mm aberta no ${f.casca.aberta}` : ''}${f.secoes.filter((q) => q && Array.isArray(q.inclinacao) && q.inclinacao.some((x) => x !== 0)).map((q) => `, seção ${q.nome ?? `em ${q.pos} mm`} inclinada [${q.inclinacao.join(' ')}] graus`).join('')}`);
   if (f.tipo === 'revolucao' && Array.isArray(f.perfil)) partes.push(`revolução de um perfil de ${f.perfil.length} pontos`);
   if (f.tipo === 'tubo' && Array.isArray(f.caminho)) partes.push(`caminho de ${f.caminho.length} pontos${f.raioCurva ? `, raio de curva ${f.raioCurva} mm` : ''}`);
+  if (f.tipo === 'familia' && typeof f.familia === 'string') partes.push(`família ${f.familia}${f.perfil ? `, perfil ${f.perfil}` : ''}${Object.keys(f.parametros ?? {}).length ? `, ajustes ${Object.entries(f.parametros).map(([k, x]) => `${k} ${x}`).join(' ')}` : ''}`);
   if (f.tipo === 'envolve' && Array.isArray(f.circulos)) partes.push(`faixa ${f.fechado === false ? 'aberta' : 'fechada'} de ${f.largura} mm por ${f.espessura} mm em torno de ${f.circulos.length} círculos (raios ${f.circulos.map((c) => c.raio).join(', ')})`);
   if (f.daInstancia) partes.push(`${f.daInstancia.principal ? 'principal' : 'parte'} do componente ${f.daInstancia.id}`);
   if (f.de !== undefined) partes.push(`de ${v(f.de)} para ${v(f.para)}`);
@@ -1708,6 +1725,7 @@ export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquad
     /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
     return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias, maxFatias, esquadrar }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
   }
+  if (r.prisma.malha) return fatiarMalha(r, olho, { semFatias });
   if (r.prisma.casca) return fatiarCasca(r, olho, maxFatias);
   if (r.prisma.secoes) return fatiarSecoes(r, olho, maxFatias);
   const { b, perfil, furos, furo, comprimento } = r.prisma;

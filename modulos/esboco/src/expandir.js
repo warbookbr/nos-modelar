@@ -108,6 +108,8 @@ export function numerosDaForma(f, num, contexto) {
     g.circulos = g.circulos.map((c, i) => (objeto(c) ? { ...c, ...(c.raio !== undefined ? { raio: num(c.raio, `circulos[${i}].raio`, contexto) } : {}), ...(c.centro !== undefined ? { centro: ponto(c.centro, num, `circulos[${i}].centro`, contexto) } : {}) } : c));
   }
   if (Array.isArray(g.secoes)) g.secoes = g.secoes.map((q, i) => numerosDaSecao(q, num, `secoes[${i}]`, contexto));
+  /* forma de família: os ajustes dos parâmetros da família aceitam número, parâmetro do esboço ou "=expressão", como o resto */
+  if (g.tipo === 'familia' && objeto(g.parametros)) g.parametros = Object.fromEntries(Object.entries(g.parametros).map(([k, v]) => [k, num(v, `parametros.${k}`, contexto)]));
   if (objeto(g.casca) && g.casca.espessura !== undefined) g.casca = { ...g.casca, espessura: num(g.casca.espessura, 'casca.espessura', contexto) };
   if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
   const r = g.rotacao;

@@ -77,6 +77,21 @@ export class Malha {
     Object.assign(this, campos);
   }
 
+  /* FNV-1a de 32 bits sobre os vértices (a 0,001 mm), as faces e as âncoras: o resumo do `toJSON` entra no hash das imagens, e uma
+     família que muda a geometria sem mudar as contagens nem o volume tem de mudar o hash. */
+  get impressao() {
+    if (this.impressaoDaMalha === undefined) {
+      let h = 0x811c9dc5;
+      const misturar = (n) => { h ^= n & 0xffff; h = Math.imul(h, 0x01000193) >>> 0; h ^= (n >>> 16) & 0xffff; h = Math.imul(h, 0x01000193) >>> 0; };
+      const milesimo = (x) => Math.round(x * 1000) | 0;
+      for (const v of this.vertices) for (const c of v) misturar(milesimo(c));
+      for (const f of this.faces) { misturar(f.length); for (const i of f) misturar(i); }
+      for (const nome of Object.keys(this.ancoras)) { for (const c of nome) misturar(c.charCodeAt(0)); for (const c of this.ancoras[nome]) misturar(milesimo(c)); }
+      this.impressaoDaMalha = h.toString(16).padStart(8, '0');
+    }
+    return this.impressaoDaMalha;
+  }
+
   toJSON() {
     return {
       formato: FORMATO_DA_MALHA,
@@ -87,6 +102,7 @@ export class Malha {
       partes: this.partes.map((p) => p.nome),
       ancoras: Object.keys(this.ancoras),
       volume_mm3: Math.round(this.volume),
+      impressao: this.impressao,
     };
   }
 }
@@ -98,8 +114,9 @@ export function lerMalha(dado, onde = 'malha') {
   if (dado instanceof Malha) return dado;
   if (objeto(dado) && memoLeitura.has(dado)) return memoLeitura.get(dado);
   exigir(objeto(dado), `${onde}: a malha deve ser { "vertices": [[x, y, z], ...], "faces": [[i, j, k, ...], ...] } em mm`);
-  const extras = Object.keys(dado).filter((k) => !['formato', 'vertices', 'faces', 'partes', 'ancoras', 'familia', 'perfil', 'versao', 'parametros', 'portas'].includes(k));
-  exigir(extras.length === 0, `${onde}: a malha não tem o campo "${extras[0]}" (campos: formato, vertices, faces, partes, ancoras, familia, perfil, versao, parametros, portas)`);
+  const extras = Object.keys(dado).filter((k) => !['formato', 'vertices', 'faces', 'partes', 'ancoras', 'familia', 'perfil', 'versao', 'parametros', 'portas', 'eixo'].includes(k));
+  exigir(extras.length === 0, `${onde}: a malha não tem o campo "${extras[0]}" (campos: formato, vertices, faces, partes, ancoras, familia, perfil, versao, parametros, portas, eixo)`);
+  exigir(dado.eixo === undefined || EIXOS.includes(dado.eixo), `${onde}: "eixo" da malha deve ser "x", "y" ou "z", o eixo principal da peça (veio ${JSON.stringify(dado.eixo)})`);
   exigir(dado.formato === undefined || dado.formato === FORMATO_DA_MALHA, `${onde}: "formato" da malha deve ser "${FORMATO_DA_MALHA}" (veio ${JSON.stringify(dado.formato)})`);
   exigir(Array.isArray(dado.vertices) && dado.vertices.length >= 4 && dado.vertices.every(ponto3), `${onde}: "vertices" deve ser uma lista de 4 ou mais [x, y, z] finitos em mm`);
   exigir(Array.isArray(dado.faces) && dado.faces.length >= 4, `${onde}: "faces" deve ser uma lista de 4 ou mais polígonos [i, j, k, ...] de índices de "vertices"`);
@@ -140,7 +157,7 @@ export function lerMalha(dado, onde = 'malha') {
   const lida = new Malha({
     ...(dado.familia === undefined ? {} : { familia: dado.familia }), ...(dado.perfil === undefined ? {} : { perfil: dado.perfil }),
     ...(dado.versao === undefined ? {} : { versao: dado.versao }), ...(dado.parametros === undefined ? {} : { parametros: dado.parametros }),
-    ...(dado.portas === undefined ? {} : { portas: dado.portas }),
+    ...(dado.portas === undefined ? {} : { portas: dado.portas }), ...(dado.eixo === undefined ? {} : { eixo: dado.eixo }),
     vertices, faces, normais, partes, ancoras, caixa, volume, deslocamento: centro,
   });
   memoLeitura.set(dado, lida);
@@ -266,7 +283,7 @@ export function pecasLocaisDaMalha(malha) {
        vazio) fica com o casco mais folgado; passando de oito subidas ela vira um casco só */
     let feitas = null;
     let limite = base;
-    for (let volta = 0; volta < 8 && !feitas; volta++, limite *= 1.6) feitas = decomporEmPecas(polis, limite, { contexto });
+    for (let volta = 0; volta < 8 && !feitas; volta++, limite *= 1.6) feitas = decomporEmPecas(polis, limite, { contexto, pecas: PECAS_POR_PARTE });
     if (!feitas) feitas = [pecaDe(pontosDe(polis))];
     pecas.push(...feitas);
   }
@@ -287,4 +304,124 @@ export function pecasDaMalha(r) {
       ...(pc.limitaArestas ? { limitaArestas: true } : {}),
     };
   });
+}
+
+/* ---------- o casco por seções, para a blocagem do nível zero ---------- */
+
+/* Quantas seções e quantos raios por seção o casco leva. 24 seções cobrem a roda e o cilindro do trem do avião sem perder o
+   flange de 6 mm; 48 raios são os do loft e da revolução do esboço (o círculo inscrito fica 0,2% menor). */
+export const SECOES_DO_CASCO = 24;
+export const RAIOS_DO_CASCO = 48;
+/* Os eixos (u, v) do plano da seção de um sólido de eixo `x`, `y` ou `z`, os mesmos do loft do esboço. */
+const PLANO_DA_SECAO = { x: [2, 1], y: [0, 2], z: [0, 1] };
+const r3 = (x) => { const v = Math.round(x * 1000) / 1000; return v === 0 ? 0 : v; };
+
+/** O eixo principal da malha: o que o adaptador declarou (`eixo`, o eixo das portas da família) ou, sem ele, o da maior extensão
+ *  (o primeiro, em empate). */
+export function eixoDaMalha(malha) {
+  if (malha.eixo !== undefined) return malha.eixo;
+  const extensao = [0, 1, 2].map((e) => malha.caixa.max[e] - malha.caixa.min[e]);
+  return EIXOS[extensao.indexOf(Math.max(...extensao))];
+}
+
+/* O casco convexo de pontos [u, v] (cadeia monótona), anti-horário, sem repetir o primeiro. */
+function cascoPlano(pontos) {
+  const p = [...pontos].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cruz = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const meio = (lista) => {
+    const h = [];
+    for (const q of lista) { while (h.length >= 2 && cruz(h[h.length - 2], h[h.length - 1], q) <= 1e-12) h.pop(); h.push(q); }
+    h.pop();
+    return h;
+  };
+  return [...meio(p), ...meio([...p].reverse())];
+}
+
+/* A coordenada a 1e-6 mm, a mesma em que a N2 guarda um ponto do contorno: o que o módulo entrega já é o que a N2 confere. */
+const r6 = (x) => { const v = Math.round(x * 1e6) / 1e6; return v === 0 ? 0 : v; };
+/* Abaixo desta área (mm2, o dobro da do triângulo) três pontos seguidos do contorno contam como colineares: é 1000 vezes o limite
+   com que a N2 recusa um contorno não convexo (1e-9), para o ruído de arredondar a 1e-6 mm não decidir a convexidade. */
+const AREA_COLINEAR_MM2 = 1e-6;
+
+/* O contorno de pontos já na ordem do ângulo, sobre uma curva convexa e arredondados a 1e-6 mm, sem nenhum ponto que não vire para o
+   lado certo: o ponto cujos vizinhos o deixam colinear (os raios que caem na mesma aresta reta) ou côncavo (o ruído do arredondamento)
+   sai e vira cópia do ponto anterior que ficou. A contagem e a ordem dos raios não mudam, de modo que o ponto `k` de uma seção continua
+   o ponto `k` da seguinte, que é o que liga as seções do casco; o que a N2 confere (cada trio com área acima de 1e-9 vira para o
+   mesmo lado) passa, porque cada trio que sobra vira mais de 1e-6 para o lado certo e os repetidos não contam. */
+function convexificar(pontos) {
+  const n = pontos.length;
+  const vira = (a, b, c) => (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]);
+  const fica = new Array(n).fill(true);
+  for (let mudou = true; mudou;) {
+    mudou = false;
+    const indices = [...fica.keys()].filter((i) => fica[i]);
+    for (let q = 0; q < indices.length && indices.length > 3; q++) {
+      const a = pontos[indices[(q + indices.length - 1) % indices.length]]; const b = pontos[indices[q]]; const c = pontos[indices[(q + 1) % indices.length]];
+      if (vira(a, b, c) <= AREA_COLINEAR_MM2) { fica[indices[q]] = false; mudou = true; break; }
+    }
+  }
+  /* o ponto que saiu copia o anterior que ficou; os do começo, antes do primeiro que ficou, copiam o último (o contorno fecha) */
+  let anterior = pontos[fica.lastIndexOf(true)];
+  return pontos.map((p, k) => { if (fica[k]) anterior = p; return anterior; });
+}
+
+/* O polígono convexo `poli` (anti-horário) amostrado em `n` raios igualmente espaçados em ângulo a partir do centro da caixa
+   dele, começando no eixo +u, e convexificado (ver `convexificar`). O centro da caixa fica dentro de um polígono convexo que a
+   contenha, o que a média dos vértices não garante num polígono de lados desiguais. */
+function raiosDoConvexo(poli, n) {
+  const c = [0, 1].map((e) => (Math.min(...poli.map((q) => q[e])) + Math.max(...poli.map((q) => q[e]))) / 2);
+  const saida = [];
+  for (let k = 0; k < n; k++) {
+    const a = (2 * Math.PI * k) / n;
+    const d = [Math.cos(a), Math.sin(a)];
+    let melhor = 0;
+    for (let i = 0; i < poli.length; i++) {
+      const p = poli[i]; const q = poli[(i + 1) % poli.length];
+      const e = [q[0] - p[0], q[1] - p[1]];
+      const den = d[0] * e[1] - d[1] * e[0];
+      if (Math.abs(den) < 1e-12) continue;
+      const t = ((p[0] - c[0]) * e[1] - (p[1] - c[1]) * e[0]) / den;
+      const s = ((p[0] - c[0]) * d[1] - (p[1] - c[1]) * d[0]) / den;
+      if (s >= -1e-9 && s <= 1 + 1e-9 && t > melhor) melhor = t;
+    }
+    saida.push([r6(c[0] + d[0] * melhor), r6(c[1] + d[1] * melhor)]);
+  }
+  return convexificar(saida);
+}
+
+/** O casco da malha por seções perpendiculares ao eixo principal, no formato de um loft sem casca (`eixo`, `eixosDoPerfil`,
+ *  `comprimento`, `secoes: [{ w, perfil }]`, `w` e `perfil` no referencial local já centrado). Cada seção é o casco convexo do corte
+ *  da superfície pelo plano dela e dos vértices que ficam entre a seção anterior e a seguinte, amostrado em `RAIOS_DO_CASCO` raios,
+ *  de modo que o sólido envolve a malha inteira, sem furo nem cavidade. É a forma que a blocagem do nível zero (a N2 só tem sólidos
+ *  de seção convexa) aceita de uma peça que o esboço desenha por superfície: a roda vira o cilindro do pneu, e o cilindro hidráulico
+ *  o tronco de seções do corpo, da haste e dos olhais. Determinístico. */
+export function cascoEmSecoes(malha, { secoes: quantas = SECOES_DO_CASCO, raios = RAIOS_DO_CASCO } = {}) {
+  const eixo = eixoDaMalha(malha);
+  const e = EIXOS.indexOf(eixo);
+  const [u, v] = PLANO_DA_SECAO[eixo];
+  const lo = malha.caixa.min[e];
+  const hi = malha.caixa.max[e];
+  const vertices = verticesDaMalha(malha, null);
+  const passo = (hi - lo) / (quantas - 1);
+  const posicao = (i) => (i === quantas - 1 ? hi : lo + i * passo);
+  const plano = (p) => [p[u], p[v]];
+  /* a aresta que cruza o plano `w` dá um ponto da seção; a aresta e o plano se tocam em pontos só quando a aresta atravessa */
+  const arestas = [];
+  for (const f of malha.faces) for (let i = 0; i < f.length; i++) arestas.push([malha.vertices[f[i]], malha.vertices[f[(i + 1) % f.length]]]);
+  const secoes = [];
+  for (let i = 0; i < quantas; i++) {
+    const w = posicao(i);
+    const antes = i === 0 ? lo - 1 : posicao(i - 1);
+    const depois = i === quantas - 1 ? hi + 1 : posicao(i + 1);
+    const pontos = vertices.filter((p) => p[e] > antes && p[e] < depois).map(plano);
+    for (const [a, b] of arestas) {
+      if ((a[e] - w) * (b[e] - w) >= 0) continue;
+      const t = (w - a[e]) / (b[e] - a[e]);
+      pontos.push([a[u] + t * (b[u] - a[u]), a[v] + t * (b[v] - a[v])]);
+    }
+    const casco = cascoPlano(pontos);
+    exigir(casco.length >= 3, 'cascoEmSecoes: a seção da malha não tem área (a peça é fina demais no eixo escolhido)');
+    secoes.push({ w: r3(w), perfil: raiosDoConvexo(casco, raios) });
+  }
+  return { eixo, eixosDoPerfil: [EIXOS[u], EIXOS[v]], comprimento: r3(hi - lo), secoes };
 }

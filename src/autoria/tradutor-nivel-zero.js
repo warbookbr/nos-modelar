@@ -7,7 +7,8 @@
    entra com aproximação declarada, e cada forma assim vai para o relatório `perdas` com o que se perdeu e o erro de volume e de
    envelope medido na blocagem do andaime (não estimado): o loft vira `casco-secoes` (a casca vira o sólido externo cheio e a
    inclinação de seção é ignorada); a caixa com raio vira a extrusão do contorno arredondado e a caixa com chanfro o casco das
-   quatro seções do esboço; o cilindro achatado vira a extrusão do círculo cortado; e o componente com detalhe interno que passa
+   quatro seções do esboço; o cilindro achatado vira a extrusão do círculo cortado; a forma de família vira o casco por seções que o
+   módulo calcula da superfície dela (`familia-como-casco`, sem o furo nem as cavidades); e o componente com detalhe interno que passa
    do orçamento de volumes (`volumesMaximos`) é recolhido a uma caixa do envelope da forma principal. O que não tem equivalente
    (faixa, furo de caixa, rotação em dois eixos de um sólido que a N2 não inclina, medida que a N2 recusa) volta em
    `naoTraduzidas` com o motivo, e `estrito: true` recusa o conjunto inteiro quando há alguma. Nada é aproximado em silêncio: uma
@@ -385,9 +386,23 @@ function volumeDoLoft(g, cols, al) {
   return aproximado(volume, 'loft-como-casco', esboco, perdido, g.casca ? externo : null);
 }
 
+/* A forma de família (a roda e o cilindro hidráulico do trem do avião, a asa): o esboço a desenha pela superfície que a família gera,
+   e a N2 não tem superfície livre. O módulo entrega junto da geometria o casco por seções perpendiculares ao eixo principal da peça
+   (o corte da superfície por cada plano e os vértices entre dois planos, em casco convexo de 48 raios), no mesmo formato de um loft
+   sem casca, e a N2 recebe esse casco: o envelope e a silhueta de cada vista saem exatos até a faceta do raio, e o furo do cubo, a
+   cavidade e a reentrância de cada seção deixam de existir, o que o relatório de perdas declara com o erro de volume medido contra o
+   volume da superfície. */
+function volumeDaFamilia(g, cols, al) {
+  if (!Array.isArray(g.secoes) || g.secoes.length < 2) recusar('família sem o casco por seções: a N2 precisa de duas ou mais seções do sólido');
+  const nome = `família ${g.familia}${g.perfil ? ` (perfil ${g.perfil})` : ''}`;
+  const { volume } = cascoDeSecoes(g, cols, al, nome);
+  return aproximado(volume, 'familia-como-casco', g.volume,
+    [perda('superficie', `a superfície da ${nome} virou o casco convexo de ${g.secoes.length} seções perpendiculares ao eixo ${g.eixo}: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (${(g.partes ?? []).join(', ') || 'uma só'}) viram um sólido só`)]);
+}
+
 const POR_TIPO = {
   caixa: volumeDaCaixa, cilindro: volumeDoCilindro, anel: volumeDoAnel, cone: volumeDoCone, esfera: volumeDaEsfera,
-  revolucao: volumeDaRevolucao, extrusao: volumeDaExtrusao, loft: volumeDoLoft,
+  revolucao: volumeDaRevolucao, extrusao: volumeDaExtrusao, loft: volumeDoLoft, familia: volumeDaFamilia,
 };
 const FORA_DO_ESCOPO = {
   envolve: 'faixa que contorna círculos: a N2 não tem faixa',

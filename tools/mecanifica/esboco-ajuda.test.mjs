@@ -82,15 +82,16 @@ describe('--ajuda <tópico>: só a sua seção', () => {
     expect(r.texto).toContain('Subtópicos (peça um com --ajuda <nome>):');
     expect(r.texto).toMatch(/\ntubo +Tubo por pontos/);
     expect(r.texto).toMatch(/\ncaixa +Caixa: medidas/);
-    expect(r.texto.trimEnd().split('\n').at(-1)).toMatch(/^tubo +Tubo por pontos/);
+    expect(r.texto.trimEnd().split('\n').at(-1)).toMatch(/^familia +Forma de uma família procedural/);
   });
 
   it('a lista do ## tem uma linha por ### e a linha que pede cada um', () => {
     const k = topicos.findIndex((t) => t.id === 'formas');
     const linhas = listaDosSubtopicos(topicos, k).trim().split('\n');
     expect(linhas[0]).toBe('Subtópicos (peça um com --ajuda <nome>):');
-    expect(linhas.slice(1).map((l) => l.split(' ')[0])).toEqual(['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo']);
+    expect(linhas.slice(1).map((l) => l.split(' ')[0])).toEqual(['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo', 'familia']);
     expect(listaDosSubtopicos(topicos, topicos.findIndex((t) => t.id === 'tubo'))).toBe('');
+    expect(listaDosSubtopicos(topicos, topicos.findIndex((t) => t.id === 'familia'))).toBe('');
   });
 
   it(`nenhuma resposta de --ajuda passa de ${TETO_DO_TOPICO} caracteres mais o tamanho da lista dos subtópicos`, () => {

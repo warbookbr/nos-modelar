@@ -350,8 +350,7 @@ const EIXOS_UNITARIOS = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
    ponto mais fundo do vazio, e fica o corte que deixa o vazio menos fundo (empate: o que deixa menos área de vazio). Devolve false quando passa de `orcamento.pecas` peças. */
 function decompor(no, limite, superficie, profundidade, saida, orcamento, parados = 0) {
   if (no.polis.length === 0 || no.pontos.length === 0) return true;
-  const folha = () => { if (globalThis.__DEBUG_FOLHA) console.log(' '.repeat(profundidade), 'folha prof', profundidade, 'vazio', no.vazio.toFixed(0), 'polis', no.polis.length, 'maxd', no.longe.length ? Math.max(...no.longe.map((p) => p.d)).toFixed(1) : 0); saida.push(pecaDe(no.pontos)); return saida.length <= orcamento.pecas; };
-  if (globalThis.__DEBUG_NO && no.longe.length) { const q = no.longe.reduce((m, p) => (p.d > m.d ? p : m), no.longe[0]); console.log(' '.repeat(profundidade), 'N', profundidade, 'planos', no.planos.length, 'deepest', q.q.map((x) => x.toFixed(0)).join(','), 'd', q.d.toFixed(1), 'bbox', [0,1,2].map((e)=>Math.min(...no.pontos.map((p)=>p[e])).toFixed(0)+'..'+Math.max(...no.pontos.map((p)=>p[e])).toFixed(0)).join(' ')); }
+  const folha = () => { saida.push(pecaDe(no.pontos)); return saida.length <= orcamento.pecas; };
   if (!no.casco || no.longe.length === 0 || profundidade >= PROFUNDIDADE_MAXIMA) return no.casco || profundidade === 0 ? folha() : true;
   const candidatos = [];
   for (const [e, n] of EIXOS_UNITARIOS.entries()) {
@@ -370,7 +369,6 @@ function decompor(no, limite, superficie, profundidade, saida, orcamento, parado
   if (candidatos.length === 0) return folha();
   const minimo = Math.min(...candidatos.map((c) => c.fundo));
   const melhor = candidatos.filter((c) => c.fundo <= minimo * 1.05 + 0.1 * limite).sort((a, b) => a.total - b.total || b.espalhado - a.espalhado)[0];
-  if (globalThis.__DEBUG_FOLHA) console.log(' '.repeat(profundidade), 'nó prof', profundidade, 'vazio', no.vazio.toFixed(0), 'maxd', Math.max(...no.longe.map((p) => p.d)).toFixed(1), 'cand', candidatos.map((c) => c.fundo.toFixed(1)).join('/'));
   const paradosAgora = melhor.fundo > 0.9 * no.fundo ? parados + 1 : 0;
   if (paradosAgora > PARADOS) return folha();
   for (const filho of melhor.filhos) if (!decompor(filho, limite, superficie, profundidade + 1, saida, orcamento, paradosAgora)) return false;
@@ -427,7 +425,6 @@ export function decomporEmPecas(polis, limite, { pecas = 160, contexto = polis }
       const total = nos.reduce((s, no) => s + no.vazio, 0);
       if (!melhor || total < melhor.total) melhor = { nos, total };
     }
-    if (globalThis.__DEBUG_MALHA) console.log('raiz vazio', raiz.vazio.toFixed(0), 'cunhas', melhor ? melhor.nos.length : null, 'total', melhor?.total.toFixed(0));
     if (melhor && melhor.total < 0.6 * raiz.vazio) partida = melhor.nos;
   }
   for (const no of partida) if (!decompor(no, limite, superficie, 0, saida, orcamento)) return null;
