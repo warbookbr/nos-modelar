@@ -65,6 +65,7 @@ export const FRASES = {
   andaime: 'O Condutor lendo o andaime compilado: medidas na blocagem, perdas do tradutor e o Envelope por receita com REFINA.',
   detalhar: 'O esboço isolado de uma unidade (`--detalhar`) e a volta ao mestre (`--integrar`).',
   critico: 'A função da unidade, o brief do crítico, o veredito, a escala da nota e o crítico do objeto.',
+  brief: 'O brief gravado em brief.md e reimpresso por --brief, de que lado cada vista olha, as vistas de outros lados da unidade e a referência como alvo.',
   execucao: 'O modo `por-unidade` e a nota de passagem entre unidades.',
   'vistas-ia': 'Vistas para a IA: corte, explosão, zoom e prévia, sob demanda.',
   corte: 'Corte por um plano, para ver o que há por dentro.',

@@ -144,7 +144,10 @@ describe('o isolamento por unidade pela procedência dos volumes', () => {
         expect(semVizinhos.paineis[0].volumes.length).toBeLessThanOrEqual(desenhados.size);
         expect(semVizinhos.paineis[0].volumes.every((v) => v.cor !== COR_DO_VIZINHO)).toBe(true);
         /* a silhueta contra o desenho atual da unidade isolada, com os vizinhos */
-        const { isolado } = esbocoIsolado(bruto, null, u.id, true);
+        /* o desenho das formas enquadra a unidade e recorta a vizinha na janela; a blocagem da unidade mantém o quadro que inclui as
+           vizinhas inteiras, e por isso a silhueta se confere contra o desenho das formas sem esse enquadramento */
+        const { isolado: comEnquadre } = esbocoIsolado(bruto, null, u.id, true);
+        const isolado = { ...comEnquadre, enquadrar: undefined };
         const escondido = { ...isolado, opcoes: [{ ...isolado.opcoes[0], formas: isolado.opcoes[0].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) }], ladosPorEscala: false };
         for (const vista of VISTAS_DA_ANALISE) {
           const novo = desenharBlocagem({ vista, paineis: b.paineis }, { camada: true });
