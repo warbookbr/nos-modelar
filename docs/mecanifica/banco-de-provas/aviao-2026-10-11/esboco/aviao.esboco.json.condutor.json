@@ -832,11 +832,16 @@
       "membros": [
         "deriva",
         "leme",
-        "eixoLeme"
+        "eixoLeme",
+        "suporteLeme1",
+        "suporteLeme2",
+        "suporteLeme3",
+        "botaDegeloDeriva",
+        "ponteiraDeriva"
       ],
       "depende": [],
       "custo": 3,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -898,6 +903,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-empenagem-vertical.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
       }
     },
     {
@@ -1353,7 +1364,8 @@
     "motor": "Capô oco (casca 20, aberta no lábio): o cone toca o anel do lábio por tolerância (28 mm), não afinar a casca. Duto preto assenta no piso e acaba na parede de trás. Escapes em y 1325 e menores, pelo Envelope. Ventre y≈797 mantido.",
     "helice": "Plano das pás em z 485: a pá chega a z 550, 50 mm à frente do lábio (z 600), acima dos 30 mm de contato, e só o cone e a placa (r 240) tocam o capô. Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT). Ponta em r 1150.",
     "asas": "Perfil poligonal convexo (hinge a 70% da corda, fresta 15, eixos de 30). Flap interno (-830..-3130) e aileron externo (-3170..-5800) como no topo.png, não como na maquete. Ponta levantada pela curva de cy e t, em um só loft.",
-    "empenagem-horizontal": "Perfil NACA 0012 em polígono convexo: estab até a dobradiça (61% da corda), profundor com fresta 15; centros das seções em reta (ehZ, ehY) para o eixo sair reto. Ponteira fecha as duas pontas desde x -2285. Suportes a 450 e 1700 da raiz."
+    "empenagem-horizontal": "Perfil NACA 0012 em polígono convexo: estab até a dobradiça (61% da corda), profundor com fresta 15; centros das seções em reta (ehZ, ehY) para o eixo sair reto. Ponteira fecha as duas pontas desde x -2285. Suportes a 450 e 1700 da raiz.",
+    "empenagem-vertical": "Perfil simétrico em polígono convexo, 10% de espessura sobre a corda cheia (deriva, fresta 15, leme). O centro das seções do leme é o eixo da dobradiça, reta. Bota e ponteira seguem dvC, dvT e dvZ; deriva até y 4170, ponteira até 4200."
   },
   "vereditos": [
     {

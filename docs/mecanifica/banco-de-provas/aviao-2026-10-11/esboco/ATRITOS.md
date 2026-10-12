@@ -343,6 +343,12 @@ grep -c 'ehCt' docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-det
 npm run esboco -- --ajuda loft
 ```
 
+Ocorrência na empenagem-vertical: a deriva (15 pontos por seção, 4 seções), o leme (8 pontos, 4 seções), a bota de degelo (7 pontos, 4 seções) e a ponteira (15 pontos, 3 seções) repetem o mesmo perfil em 15 seções, cerca de 340 expressões escritas à mão. A bota é o nariz do mesmo perfil (os 7 primeiros pontos da deriva com 4 mm a mais) e a ponteira é o perfil da deriva encolhido por `dvPs1` e `dvPs2`, de modo que uma mudança de espessura ou de corda pede editar as quatro formas.
+
+```bash
+grep -c 'dvT3' docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-vertical.esboco.json
+```
+
 ## 35. O `--descrever` arredonda os parâmetros a uma casa decimal e mostra uma inclinação como zero
 
 Na linha de parâmetros, `ehDz` (0,0188, o avanço em z do eixo por milímetro de envergadura) sai como `ehDz 0`, `ehDy` (0,136) como `ehDy 0,1` e a escala `ehS1` (0,917) como `ehS1 0,9`. Parece que o parâmetro não foi lido, e a conferência de uma inclinação ou de uma razão exige ler o JSON.
@@ -350,3 +356,13 @@ Na linha de parâmetros, `ehDz` (0,0188, o avanço em z do eixo por milímetro d
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --descrever | grep -o 'ehDz [^;]*'
 ```
+
+## 36. A `funcao` da unidade não volta ao mestre pelo `--integrar` nem se edita por `--editar`
+
+O detalhe da empenagem-vertical trazia `unidades.empenagem-vertical.funcao` reescrita (a deriva com bota de degelo e ponteira, o leme com três suportes). Depois do `--integrar` o mestre manteve o texto antigo, "deriva e leme preso por eixo, montados no dorso da cauda da fuselagem", e o `--editar` recusa o caminho porque só aceita campo que comece por uma forma declarada. A função, que o brief do crítico e o do Marco imprimem, só se atualiza editando a linha do JSON do mestre à mão. Nesta unidade, com 8 formas, o `--feito` não pediu a função nem imprimiu brief, de modo que nada acusaria o texto desatualizado.
+
+```bash
+npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json 'unidades.empenagem-vertical.funcao=teste'
+```
+
+Para reproduzir o `--integrar`, mude a `funcao` da unidade em `aviao-detalhe-empenagem-vertical.esboco.json` e rode `npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --integrar empenagem-vertical docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-vertical.esboco.json` e leia `unidades.empenagem-vertical.funcao` do mestre.

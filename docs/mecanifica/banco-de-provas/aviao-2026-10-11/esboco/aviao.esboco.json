@@ -196,7 +196,44 @@
     "ehS3": 0.436,
     "ehS4": 0.15,
     "ehDb1": 450,
-    "ehDb2": 1700
+    "ehDb2": 1700,
+    "dvEsp": 0.1,
+    "dvC0": 1259,
+    "dvC1": 957,
+    "dvC2": 695,
+    "dvC4": 318,
+    "dvC3": "=dvC2+(dvC4-dvC2)*0.94",
+    "dvZ0": 8390,
+    "dvZ1": 9038,
+    "dvZ2": 9579,
+    "dvZ4": 10059,
+    "dvZ3": "=dvZ2+(dvZ4-dvZ2)*0.94",
+    "dvF0": 1946,
+    "dvF1": 1430,
+    "dvF2": 992,
+    "dvF4": 490,
+    "dvF3": "=dvF2+(dvF4-dvF2)*0.94",
+    "dvT0": "=dvEsp*dvF0",
+    "dvT1": "=dvEsp*dvF1",
+    "dvT2": "=dvEsp*dvF2",
+    "dvT3": "=dvEsp*dvF3",
+    "dvT4": "=dvEsp*dvF4",
+    "dvH0": "=dvZ0+0.5*dvC0",
+    "dvH1": "=dvZ1+0.5*dvC1",
+    "dvH2": "=dvZ2+0.5*dvC2",
+    "dvH4": "=dvZ4+0.5*dvC4",
+    "lmE0": 646,
+    "lmE1": 458,
+    "lmE2": 282,
+    "lmE3": 168,
+    "lmZa": "=dvH0+(dvH1-dvH0)*105/850+0.5*fresta",
+    "lmZb": "=dvH1+0.5*fresta",
+    "lmZc": "=dvH2+0.5*fresta",
+    "lmZd": "=dvH2+(dvH4-dvH2)*457/500+0.5*fresta",
+    "lmTa": "=dvT0+(dvT1-dvT0)*105/850",
+    "lmTd": "=dvT2+(dvT4-dvT2)*457/500",
+    "dvPs1": 0.8,
+    "dvPs2": 0.35
   },
   "simetrico": { "eixo": "x", "pos": 0 },
   "unidades": {
@@ -205,7 +242,7 @@
     "helice": { "cor": "preto", "funcao": "cone de ponta arredondada com placa traseira e cinco pás de perfil aerodinâmico torcido da raiz à ponta, cada uma presa ao cone por um colar, que giram em torno do eixo do motor à frente do capô" },
     "asas": { "cor": "azul", "funcao": "as duas metades da asa baixa, de perfil aerodinâmico e diedro, com a ponta levantada, o flap na parte interna e o aileron na externa de cada metade, presos por eixo e por suportes sob a borda de fuga, e as metades presas aos flancos da fuselagem" },
     "empenagem-horizontal": { "cor": "laranja", "funcao": "estabilizador de perfil aerodinâmico simétrico e profundor de cada lado, com diedro, afilamento e uma ponteira cinza que fecha a ponta, o profundor separado do estabilizador por uma fresta e preso a ele por um eixo e por dois suportes sob a linha da dobradiça, a raiz de cada metade entrando no topo da cauda da fuselagem" },
-    "empenagem-vertical": { "cor": "roxo", "funcao": "deriva e leme preso por eixo, montados no dorso da cauda da fuselagem" },
+    "empenagem-vertical": { "cor": "roxo", "funcao": "deriva de perfil aerodinâmico simétrico, varrida para trás e afinando para o topo, com uma bota de degelo escura no bordo de ataque e uma ponteira cinza que fecha o topo, e leme separado dela por uma fresta, preso por um eixo e por três suportes na linha da dobradiça, a raiz da deriva entrando no dorso da cauda da fuselagem" },
     "trem-do-nariz": { "cor": "amarelo", "funcao": "roda, perna, amortecedor e garfo do trem do nariz, presos sob o capô, com o braço que o liga ao ventre da fuselagem" },
     "trens-principais": { "cor": "vermelho", "funcao": "roda, perna, amortecedor e atuador de cada trem principal, presos sob a asa" }
   },
@@ -237,7 +274,10 @@
       { "pecas": ["fuselagem", "janela1E", "janela2E", "janela3E", "janela4E", "molduraJanela1E", "molduraJanela2E", "molduraJanela3E", "molduraJanela4E", "portaE", "molduraPortaE"], "max": 40, "motivo": "vidros, molduras, porta e batente ficam rentes ao flanco esquerdo da cabine" },
       { "pecas": ["capo", "escapeE"], "max": 100, "motivo": "o tubo de escape assenta no flanco do capô, com o eixo a escSai mm da superfície" },
       { "pecas": ["capo", "flangeEscapeE", "bocalEscapeE"], "max": 80, "motivo": "o flange e o bocal do escape são anéis maiores que a distância do eixo ao flanco e afundam nele" },
-      { "pecas": ["capo", "entradaAr"], "max": 40, "motivo": "o duto da entrada de ar assenta no piso interno do capô e termina na parede de trás" }
+      { "pecas": ["capo", "entradaAr"], "max": 40, "motivo": "o duto da entrada de ar assenta no piso interno do capô e termina na parede de trás" },
+      { "pecas": ["suporteLeme1", "suporteLeme2", "suporteLeme3", "deriva", "leme", "eixoLeme"], "max": 70, "motivo": "cada suporte do leme atravessa a fresta e entra na borda de fuga da deriva e na de ataque do leme, com o eixo passando por dentro dele" },
+      { "pecas": ["botaDegeloDeriva", "deriva"], "max": 220, "motivo": "a bota de degelo é a ponta do bordo de ataque da deriva, 4 mm mais grossa que o perfil" },
+      { "pecas": ["fuselagem", "botaDegeloDeriva"], "max": 100, "motivo": "a raiz da bota de degelo entra no dorso da cauda junto com a raiz da deriva" }
     ]
   },
   "opcoes": [
@@ -286,33 +326,8 @@
         { "id": "parabrisa", "tipo": "caixa", "largura": 1000, "altura": 18, "profundidade": 699, "rotacao": [-26.57, 0, 0], "centro": [0, 2107, 3308], "cor": "azul", "unidade": "fuselagem", "rotulo": "para_brisa", "substitui": "parabrisa" },
         { "id": "molduraParabrisa", "tipo": "caixa", "largura": 1060, "altura": 14, "profundidade": 759, "rotacao": [-26.57, 0, 0], "centro": [0, 2100, 3311.5], "cor": "preto", "unidade": "fuselagem", "rotulo": "moldura_do_para_brisa" },
         { "id": "divisorParabrisa", "tipo": "caixa", "largura": 36, "altura": 14, "profundidade": 705, "rotacao": [-26.57, 0, 0], "centro": [0, 2121, 3300.5], "cor": "preto", "unidade": "fuselagem", "rotulo": "divisor_do_para_brisa" },
-        {
-          "id": "janela1E",
-          "tipo": "extrusao",
-          "eixo": "x",
-          "origem": "perfil",
-          "comprimento": 18,
-          "perfil": [[3380, 1692], [3700, 1695], [4085, 1782], [4085, 2044], [3800, 2044], [3400, 1728]],
-          "centro": [-791, 0, 0],
-          "cor": "azul",
-          "lado": "E",
-          "unidade": "fuselagem",
-          "rotulo": "janela_1",
-          "substitui": "janela1E"
-        },
-        {
-          "id": "molduraJanela1E",
-          "tipo": "extrusao",
-          "eixo": "x",
-          "origem": "perfil",
-          "comprimento": 12,
-          "perfil": [[3355, 1667], [3705, 1670], [4110, 1760], [4110, 2069], [3790, 2069], [3385, 1745]],
-          "centro": [-784, 0, 0],
-          "cor": "preto",
-          "lado": "E",
-          "unidade": "fuselagem",
-          "rotulo": "moldura_janela_1"
-        },
+        { "id": "janela1E", "tipo": "extrusao", "eixo": "x", "origem": "perfil", "comprimento": 18, "perfil": [[3380, 1692], [3700, 1695], [4085, 1782], [4085, 2044], [3800, 2044], [3400, 1728]], "centro": [-791, 0, 0], "cor": "azul", "lado": "E", "unidade": "fuselagem", "rotulo": "janela_1", "substitui": "janela1E" },
+        { "id": "molduraJanela1E", "tipo": "extrusao", "eixo": "x", "origem": "perfil", "comprimento": 12, "perfil": [[3355, 1667], [3705, 1670], [4110, 1760], [4110, 2069], [3790, 2069], [3385, 1745]], "centro": [-784, 0, 0], "cor": "preto", "lado": "E", "unidade": "fuselagem", "rotulo": "moldura_janela_1" },
         { "id": "janela2E", "tipo": "caixa", "largura": 18, "altura": 281, "profundidade": 235, "raio": 30, "centro": [-791, 1903.5, 4530], "cor": "azul", "lado": "E", "unidade": "fuselagem", "rotulo": "janela_2", "substitui": "janela2E" },
         { "id": "molduraJanela2E", "tipo": "caixa", "largura": 12, "altura": 331, "profundidade": 285, "raio": 45, "centro": [-784, 1903.5, 4530], "cor": "preto", "lado": "E", "unidade": "fuselagem", "rotulo": "moldura_janela_2" },
         { "id": "janela3E", "tipo": "caixa", "largura": 18, "altura": 281, "profundidade": 258, "raio": 30, "centro": [-791, 1903.5, 5106], "cor": "azul", "lado": "E", "unidade": "fuselagem", "rotulo": "janela_3", "substitui": "janela3E" },
@@ -406,64 +421,10 @@
             "em": { "ancora": "capo.labio", "mm": [0, -290, 0] }
           }
         },
-        {
-          "id": "escapeE",
-          "tipo": "cone",
-          "diametro": 130,
-          "diametroTopo": 96,
-          "de": { "ancora": "capo.escA", "mm": ["=-capoLargA/2-escSai", "=escAlturaY-capoCyA", 0] },
-          "para": { "ancora": "capo.escB", "mm": ["=-capoLargB/2-escSai", "=escAlturaY-capoCyB", -15] },
-          "cor": "preto",
-          "lado": "E",
-          "unidade": "motor",
-          "rotulo": "escape",
-          "substitui": "escapeE"
-        },
-        {
-          "id": "flangeEscapeE",
-          "tipo": "anel",
-          "diametroExterno": 150,
-          "diametroInterno": 100,
-          "espessura": 24,
-          "eixo": "z",
-          "rotacao": [0, "escExAng", 0],
-          "centro": { "entre": ["escapeE.inicio", "escapeE.fim"], "mm": 35 },
-          "cor": "cinza",
-          "lado": "E",
-          "unidade": "motor",
-          "rotulo": "flange_do_escape",
-          "substitui": "escapeE"
-        },
-        {
-          "id": "bocalEscapeE",
-          "tipo": "anel",
-          "diametroExterno": 110,
-          "diametroInterno": 76,
-          "espessura": 24,
-          "eixo": "z",
-          "rotacao": [0, "escExAng", 0],
-          "centro": { "entre": ["escapeE.fim", "escapeE.inicio"], "mm": 12 },
-          "cor": "cinza",
-          "lado": "E",
-          "unidade": "motor",
-          "rotulo": "bocal_do_escape",
-          "substitui": "escapeE"
-        },
-        {
-          "id": "venezianaE",
-          "tipo": "caixa",
-          "largura": 12,
-          "altura": 150,
-          "profundidade": 46,
-          "raio": 4,
-          "rotacao": [0, "=-atan(venezInc)", 0],
-          "centro": { "ancora": "capo.veneziana", "mm": ["=-capoLargV/2+3", 0, 0] },
-          "cor": "preto",
-          "lado": "E",
-          "unidade": "motor",
-          "rotulo": "veneziana",
-          "substitui": "capo"
-        },
+        { "id": "escapeE", "tipo": "cone", "diametro": 130, "diametroTopo": 96, "de": { "ancora": "capo.escA", "mm": ["=-capoLargA/2-escSai", "=escAlturaY-capoCyA", 0] }, "para": { "ancora": "capo.escB", "mm": ["=-capoLargB/2-escSai", "=escAlturaY-capoCyB", -15] }, "cor": "preto", "lado": "E", "unidade": "motor", "rotulo": "escape", "substitui": "escapeE" },
+        { "id": "flangeEscapeE", "tipo": "anel", "diametroExterno": 150, "diametroInterno": 100, "espessura": 24, "eixo": "z", "rotacao": [0, "escExAng", 0], "centro": { "entre": ["escapeE.inicio", "escapeE.fim"], "mm": 35 }, "cor": "cinza", "lado": "E", "unidade": "motor", "rotulo": "flange_do_escape", "substitui": "escapeE" },
+        { "id": "bocalEscapeE", "tipo": "anel", "diametroExterno": 110, "diametroInterno": 76, "espessura": 24, "eixo": "z", "rotacao": [0, "escExAng", 0], "centro": { "entre": ["escapeE.fim", "escapeE.inicio"], "mm": 12 }, "cor": "cinza", "lado": "E", "unidade": "motor", "rotulo": "bocal_do_escape", "substitui": "escapeE" },
+        { "id": "venezianaE", "tipo": "caixa", "largura": 12, "altura": 150, "profundidade": 46, "raio": 4, "rotacao": [0, "=-atan(venezInc)", 0], "centro": { "ancora": "capo.veneziana", "mm": ["=-capoLargV/2+3", 0, 0] }, "cor": "preto", "lado": "E", "unidade": "motor", "rotulo": "veneziana", "substitui": "capo" },
         { "arranja": { "forma": "venezianaE", "modo": "linear", "total": 3, "passo": ["=-venezInc*100", 0, 100] } },
         { "arranja": { "forma": "venezianaD", "modo": "linear", "total": 3, "passo": ["=venezInc*100", 0, 100] } },
         {
@@ -820,49 +781,9 @@
           "cor": "laranja",
           "rotulo": "flap",
           "secoes": [
-            {
-              "pos": -3130,
-              "forma": "poligono",
-              "centro": ["asZ2", "asY2"],
-              "perfil": [
-                ["=0.5*asC2+fresta", "=-0.35*asT2"],
-                ["=0.6429*asC2", "=-0.3*asT2"],
-                ["=0.7857*asC2", "=-0.2297*asT2"],
-                ["=0.9286*asC2", "=-0.15*asT2"],
-                ["=0.7857*asC2", "=-0.0021*asT2"],
-                ["=0.6429*asC2", "=0.1286*asT2"],
-                ["=0.5*asC2+fresta", "=0.23*asT2"]
-              ]
-            },
-            {
-              "pos": -1900,
-              "nome": "s1",
-              "forma": "poligono",
-              "centro": ["asZ1", "asY1"],
-              "perfil": [
-                ["=0.5*asC1+fresta", "=-0.35*asT1"],
-                ["=0.6429*asC1", "=-0.3*asT1"],
-                ["=0.7857*asC1", "=-0.2297*asT1"],
-                ["=0.9286*asC1", "=-0.15*asT1"],
-                ["=0.7857*asC1", "=-0.0021*asT1"],
-                ["=0.6429*asC1", "=0.1286*asT1"],
-                ["=0.5*asC1+fresta", "=0.23*asT1"]
-              ]
-            },
-            {
-              "pos": -830,
-              "forma": "poligono",
-              "centro": ["asZf", "asYf"],
-              "perfil": [
-                ["=0.5*asCf+fresta", "=-0.35*asTf"],
-                ["=0.6429*asCf", "=-0.3*asTf"],
-                ["=0.7857*asCf", "=-0.2297*asTf"],
-                ["=0.9286*asCf", "=-0.15*asTf"],
-                ["=0.7857*asCf", "=-0.0021*asTf"],
-                ["=0.6429*asCf", "=0.1286*asTf"],
-                ["=0.5*asCf+fresta", "=0.23*asTf"]
-              ]
-            }
+            { "pos": -3130, "forma": "poligono", "centro": ["asZ2", "asY2"], "perfil": [["=0.5*asC2+fresta", "=-0.35*asT2"], ["=0.6429*asC2", "=-0.3*asT2"], ["=0.7857*asC2", "=-0.2297*asT2"], ["=0.9286*asC2", "=-0.15*asT2"], ["=0.7857*asC2", "=-0.0021*asT2"], ["=0.6429*asC2", "=0.1286*asT2"], ["=0.5*asC2+fresta", "=0.23*asT2"]] },
+            { "pos": -1900, "nome": "s1", "forma": "poligono", "centro": ["asZ1", "asY1"], "perfil": [["=0.5*asC1+fresta", "=-0.35*asT1"], ["=0.6429*asC1", "=-0.3*asT1"], ["=0.7857*asC1", "=-0.2297*asT1"], ["=0.9286*asC1", "=-0.15*asT1"], ["=0.7857*asC1", "=-0.0021*asT1"], ["=0.6429*asC1", "=0.1286*asT1"], ["=0.5*asC1+fresta", "=0.23*asT1"]] },
+            { "pos": -830, "forma": "poligono", "centro": ["asZf", "asYf"], "perfil": [["=0.5*asCf+fresta", "=-0.35*asTf"], ["=0.6429*asCf", "=-0.3*asTf"], ["=0.7857*asCf", "=-0.2297*asTf"], ["=0.9286*asCf", "=-0.15*asTf"], ["=0.7857*asCf", "=-0.0021*asTf"], ["=0.6429*asCf", "=0.1286*asTf"], ["=0.5*asCf+fresta", "=0.23*asTf"]] }
           ],
           "encaixa": {
             "ancora": "fim",
@@ -878,109 +799,21 @@
           "cor": "laranja",
           "rotulo": "aileron",
           "secoes": [
-            {
-              "pos": -5800,
-              "forma": "poligono",
-              "centro": ["asZ4", "asY4"],
-              "perfil": [
-                ["=0.5*asC4+fresta", "=-0.35*asT4"],
-                ["=0.6429*asC4", "=-0.3*asT4"],
-                ["=0.7857*asC4", "=-0.2297*asT4"],
-                ["=0.9286*asC4", "=-0.15*asT4"],
-                ["=0.7857*asC4", "=-0.0021*asT4"],
-                ["=0.6429*asC4", "=0.1286*asT4"],
-                ["=0.5*asC4+fresta", "=0.23*asT4"]
-              ]
-            },
-            {
-              "pos": -5400,
-              "nome": "s3",
-              "forma": "poligono",
-              "centro": ["asZ3", "asY3"],
-              "perfil": [
-                ["=0.5*asC3+fresta", "=-0.35*asT3"],
-                ["=0.6429*asC3", "=-0.3*asT3"],
-                ["=0.7857*asC3", "=-0.2297*asT3"],
-                ["=0.9286*asC3", "=-0.15*asT3"],
-                ["=0.7857*asC3", "=-0.0021*asT3"],
-                ["=0.6429*asC3", "=0.1286*asT3"],
-                ["=0.5*asC3+fresta", "=0.23*asT3"]
-              ]
-            },
-            {
-              "pos": -3170,
-              "forma": "poligono",
-              "centro": ["asZ2", "asY2"],
-              "perfil": [
-                ["=0.5*asC2+fresta", "=-0.35*asT2"],
-                ["=0.6429*asC2", "=-0.3*asT2"],
-                ["=0.7857*asC2", "=-0.2297*asT2"],
-                ["=0.9286*asC2", "=-0.15*asT2"],
-                ["=0.7857*asC2", "=-0.0021*asT2"],
-                ["=0.6429*asC2", "=0.1286*asT2"],
-                ["=0.5*asC2+fresta", "=0.23*asT2"]
-              ]
-            }
+            { "pos": -5800, "forma": "poligono", "centro": ["asZ4", "asY4"], "perfil": [["=0.5*asC4+fresta", "=-0.35*asT4"], ["=0.6429*asC4", "=-0.3*asT4"], ["=0.7857*asC4", "=-0.2297*asT4"], ["=0.9286*asC4", "=-0.15*asT4"], ["=0.7857*asC4", "=-0.0021*asT4"], ["=0.6429*asC4", "=0.1286*asT4"], ["=0.5*asC4+fresta", "=0.23*asT4"]] },
+            { "pos": -5400, "nome": "s3", "forma": "poligono", "centro": ["asZ3", "asY3"], "perfil": [["=0.5*asC3+fresta", "=-0.35*asT3"], ["=0.6429*asC3", "=-0.3*asT3"], ["=0.7857*asC3", "=-0.2297*asT3"], ["=0.9286*asC3", "=-0.15*asT3"], ["=0.7857*asC3", "=-0.0021*asT3"], ["=0.6429*asC3", "=0.1286*asT3"], ["=0.5*asC3+fresta", "=0.23*asT3"]] },
+            { "pos": -3170, "forma": "poligono", "centro": ["asZ2", "asY2"], "perfil": [["=0.5*asC2+fresta", "=-0.35*asT2"], ["=0.6429*asC2", "=-0.3*asT2"], ["=0.7857*asC2", "=-0.2297*asT2"], ["=0.9286*asC2", "=-0.15*asT2"], ["=0.7857*asC2", "=-0.0021*asT2"], ["=0.6429*asC2", "=0.1286*asT2"], ["=0.5*asC2+fresta", "=0.23*asT2"]] }
           ],
           "encaixa": {
             "ancora": "fim",
             "em": { "ancora": "asaE.raiz", "mm": [-2420, "=asY2-asY0", "=asZ2-asZ0"] }
           }
         },
-        {
-          "id": "eixoFlapE",
-          "ligar": {
-            "de": { "ancora": "flapE.inicio", "mm": [0, "=-0.0592*asT2", "=0.5*asC2+0.5*fresta"] },
-            "para": { "ancora": "flapE.fim", "mm": [0, "=-0.0592*asTf", "=0.5*asCf+0.5*fresta"] },
-            "tipo": "haste",
-            "diametro": 30
-          },
-          "cor": "preto",
-          "lado": "E",
-          "unidade": "asas",
-          "rotulo": "eixo_do_flap"
-        },
-        {
-          "id": "eixoAileronE",
-          "ligar": {
-            "de": { "ancora": "aileronE.inicio", "mm": [0, "=-0.0592*asT4", "=0.5*asC4+0.5*fresta"] },
-            "para": { "ancora": "aileronE.fim", "mm": [0, "=-0.0592*asT2", "=0.5*asC2+0.5*fresta"] },
-            "tipo": "haste",
-            "diametro": 30
-          },
-          "cor": "preto",
-          "lado": "E",
-          "unidade": "asas",
-          "rotulo": "eixo_do_aileron"
-        },
+        { "id": "eixoFlapE", "ligar": { "de": { "ancora": "flapE.inicio", "mm": [0, "=-0.0592*asT2", "=0.5*asC2+0.5*fresta"] }, "para": { "ancora": "flapE.fim", "mm": [0, "=-0.0592*asTf", "=0.5*asCf+0.5*fresta"] }, "tipo": "haste", "diametro": 30 }, "cor": "preto", "lado": "E", "unidade": "asas", "rotulo": "eixo_do_flap" },
+        { "id": "eixoAileronE", "ligar": { "de": { "ancora": "aileronE.inicio", "mm": [0, "=-0.0592*asT4", "=0.5*asC4+0.5*fresta"] }, "para": { "ancora": "aileronE.fim", "mm": [0, "=-0.0592*asT2", "=0.5*asC2+0.5*fresta"] }, "tipo": "haste", "diametro": 30 }, "cor": "preto", "lado": "E", "unidade": "asas", "rotulo": "eixo_do_aileron" },
         { "id": "suporteFlap1E", "tipo": "caixa", "largura": 80, "altura": 70, "profundidade": 300, "raio": 25, "centro": { "ancora": "flapE.s1", "mm": [0, "=-0.45*asT1", "=0.5*asC1+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "asas", "rotulo": "suporte_do_flap" },
-        {
-          "id": "suporteFlap2E",
-          "tipo": "caixa",
-          "largura": 80,
-          "altura": 70,
-          "profundidade": 300,
-          "raio": 25,
-          "centro": { "ancora": "flapE.inicio", "mm": [200, "=-0.5*asT2-asInc*200", "=0.5*(asC2+asDc1*200)+0.5*fresta"] },
-          "cor": "cinza",
-          "lado": "E",
-          "unidade": "asas",
-          "rotulo": "suporte_do_flap"
-        },
+        { "id": "suporteFlap2E", "tipo": "caixa", "largura": 80, "altura": 70, "profundidade": 300, "raio": 25, "centro": { "ancora": "flapE.inicio", "mm": [200, "=-0.5*asT2-asInc*200", "=0.5*(asC2+asDc1*200)+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "asas", "rotulo": "suporte_do_flap" },
         { "id": "suporteAileron1E", "tipo": "caixa", "largura": 70, "altura": 60, "profundidade": 260, "raio": 22, "centro": { "ancora": "aileronE.s3", "mm": [0, "=-0.45*asT3", "=0.5*asC3+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "asas", "rotulo": "suporte_do_aileron" },
-        {
-          "id": "suporteAileron2E",
-          "tipo": "caixa",
-          "largura": 70,
-          "altura": 60,
-          "profundidade": 260,
-          "raio": 22,
-          "centro": { "ancora": "aileronE.fim", "mm": [-300, "=-0.45*asT2+asInc2*300", "=0.5*(asC2-asDc2*300)+0.5*fresta"] },
-          "cor": "cinza",
-          "lado": "E",
-          "unidade": "asas",
-          "rotulo": "suporte_do_aileron"
-        },
+        { "id": "suporteAileron2E", "tipo": "caixa", "largura": 70, "altura": 60, "profundidade": 260, "raio": 22, "centro": { "ancora": "aileronE.fim", "mm": [-300, "=-0.45*asT2+asInc2*300", "=0.5*(asC2-asDc2*300)+0.5*fresta"] }, "cor": "cinza", "lado": "E", "unidade": "asas", "rotulo": "suporte_do_aileron" },
         {
           "id": "estabE",
           "tipo": "loft",
@@ -1127,20 +960,7 @@
             "em": { "ancora": "estabE.raiz", "mm": [0, 0, 0] }
           }
         },
-        {
-          "id": "eixoProfundorE",
-          "ligar": {
-            "de": { "ancora": "profundorE.inicio", "mm": [0, 0, "=0.5*ehC2+0.5*fresta"] },
-            "para": { "ancora": "profundorE.fim", "mm": [0, 0, "=0.5*ehC0+0.5*fresta"] },
-            "tipo": "haste",
-            "diametro": 25
-          },
-          "cor": "preto",
-          "lado": "E",
-          "unidade": "empenagem-horizontal",
-          "rotulo": "eixo_do_profundor",
-          "substitui": "eixoProfundorE"
-        },
+        { "id": "eixoProfundorE", "ligar": { "de": { "ancora": "profundorE.inicio", "mm": [0, 0, "=0.5*ehC2+0.5*fresta"] }, "para": { "ancora": "profundorE.fim", "mm": [0, 0, "=0.5*ehC0+0.5*fresta"] }, "tipo": "haste", "diametro": 25 }, "cor": "preto", "lado": "E", "unidade": "empenagem-horizontal", "rotulo": "eixo_do_profundor", "substitui": "eixoProfundorE" },
         {
           "id": "ponteiraE",
           "tipo": "loft",
@@ -1309,11 +1129,98 @@
           "eixo": "y",
           "unidade": "empenagem-vertical",
           "rotulo": "deriva",
+          "substitui": "deriva",
           "secoes": [
-            { "pos": 2150, "nome": "raiz", "forma": "elipse", "tamanho": [220, 1259], "centro": [0, 8390] },
-            { "pos": 3000, "forma": "elipse", "tamanho": [150, 957], "centro": [0, 9038] },
-            { "pos": 3700, "forma": "elipse", "tamanho": [105, 695], "centro": [0, 9579] },
-            { "pos": 4200, "nome": "topo", "forma": "elipse", "tamanho": [70, 318], "centro": [0, 10059] }
+            {
+              "pos": 2150,
+              "nome": "raiz",
+              "forma": "poligono",
+              "centro": [0, "dvZ0"],
+              "perfil": [
+                [0, "=-0.5*dvC0"],
+                ["=0.1005*dvT0", "=-0.492*dvC0"],
+                ["=0.2155*dvT0", "=-0.46*dvC0"],
+                ["=0.3466*dvT0", "=-0.38*dvC0"],
+                ["=0.4613*dvT0", "=-0.22*dvC0"],
+                ["=0.5*dvT0", 0],
+                ["=0.4533*dvT0", "=0.28*dvC0"],
+                ["=0.3734*dvT0", "=0.5*dvC0"],
+                ["=-0.3734*dvT0", "=0.5*dvC0"],
+                ["=-0.4533*dvT0", "=0.28*dvC0"],
+                ["=-0.5*dvT0", 0],
+                ["=-0.4613*dvT0", "=-0.22*dvC0"],
+                ["=-0.3466*dvT0", "=-0.38*dvC0"],
+                ["=-0.2155*dvT0", "=-0.46*dvC0"],
+                ["=-0.1005*dvT0", "=-0.492*dvC0"]
+              ]
+            },
+            {
+              "pos": 3000,
+              "forma": "poligono",
+              "centro": [0, "dvZ1"],
+              "perfil": [
+                [0, "=-0.5*dvC1"],
+                ["=0.1005*dvT1", "=-0.492*dvC1"],
+                ["=0.2155*dvT1", "=-0.46*dvC1"],
+                ["=0.3466*dvT1", "=-0.38*dvC1"],
+                ["=0.4613*dvT1", "=-0.22*dvC1"],
+                ["=0.5*dvT1", 0],
+                ["=0.4533*dvT1", "=0.28*dvC1"],
+                ["=0.3734*dvT1", "=0.5*dvC1"],
+                ["=-0.3734*dvT1", "=0.5*dvC1"],
+                ["=-0.4533*dvT1", "=0.28*dvC1"],
+                ["=-0.5*dvT1", 0],
+                ["=-0.4613*dvT1", "=-0.22*dvC1"],
+                ["=-0.3466*dvT1", "=-0.38*dvC1"],
+                ["=-0.2155*dvT1", "=-0.46*dvC1"],
+                ["=-0.1005*dvT1", "=-0.492*dvC1"]
+              ]
+            },
+            {
+              "pos": 3700,
+              "forma": "poligono",
+              "centro": [0, "dvZ2"],
+              "perfil": [
+                [0, "=-0.5*dvC2"],
+                ["=0.1005*dvT2", "=-0.492*dvC2"],
+                ["=0.2155*dvT2", "=-0.46*dvC2"],
+                ["=0.3466*dvT2", "=-0.38*dvC2"],
+                ["=0.4613*dvT2", "=-0.22*dvC2"],
+                ["=0.5*dvT2", 0],
+                ["=0.4533*dvT2", "=0.28*dvC2"],
+                ["=0.3734*dvT2", "=0.5*dvC2"],
+                ["=-0.3734*dvT2", "=0.5*dvC2"],
+                ["=-0.4533*dvT2", "=0.28*dvC2"],
+                ["=-0.5*dvT2", 0],
+                ["=-0.4613*dvT2", "=-0.22*dvC2"],
+                ["=-0.3466*dvT2", "=-0.38*dvC2"],
+                ["=-0.2155*dvT2", "=-0.46*dvC2"],
+                ["=-0.1005*dvT2", "=-0.492*dvC2"]
+              ]
+            },
+            {
+              "pos": 4170,
+              "nome": "topo",
+              "forma": "poligono",
+              "centro": [0, "dvZ3"],
+              "perfil": [
+                [0, "=-0.5*dvC3"],
+                ["=0.1005*dvT3", "=-0.492*dvC3"],
+                ["=0.2155*dvT3", "=-0.46*dvC3"],
+                ["=0.3466*dvT3", "=-0.38*dvC3"],
+                ["=0.4613*dvT3", "=-0.22*dvC3"],
+                ["=0.5*dvT3", 0],
+                ["=0.4533*dvT3", "=0.28*dvC3"],
+                ["=0.3734*dvT3", "=0.5*dvC3"],
+                ["=-0.3734*dvT3", "=0.5*dvC3"],
+                ["=-0.4533*dvT3", "=0.28*dvC3"],
+                ["=-0.5*dvT3", 0],
+                ["=-0.4613*dvT3", "=-0.22*dvC3"],
+                ["=-0.3466*dvT3", "=-0.38*dvC3"],
+                ["=-0.2155*dvT3", "=-0.46*dvC3"],
+                ["=-0.1005*dvT3", "=-0.492*dvC3"]
+              ]
+            }
           ],
           "encaixa": {
             "ancora": "raiz",
@@ -1327,18 +1234,176 @@
           "unidade": "empenagem-vertical",
           "cor": "laranja",
           "rotulo": "leme",
+          "substitui": "leme",
           "secoes": [
-            { "pos": 2255, "forma": "retangulo", "tamanho": [120, 646], "centro": [0, 9419] },
-            { "pos": 3000, "forma": "retangulo", "tamanho": [90, 458], "centro": [0, 9761] },
-            { "pos": 3700, "forma": "retangulo", "tamanho": [65, 282], "centro": [0, 10082] },
-            { "pos": 4157, "forma": "retangulo", "tamanho": [45, 168], "centro": [0, 10292] }
+            {
+              "pos": 2255,
+              "forma": "poligono",
+              "centro": [0, "lmZa"],
+              "perfil": [
+                ["=0.3663*lmTa", "=0.5*fresta"],
+                ["=0.2673*lmTa", "=0.5*fresta+0.33*lmE0"],
+                ["=0.1504*lmTa", "=0.5*fresta+0.66*lmE0"],
+                ["=0.02*lmTa", "=0.5*fresta+lmE0"],
+                ["=-0.02*lmTa", "=0.5*fresta+lmE0"],
+                ["=-0.1504*lmTa", "=0.5*fresta+0.66*lmE0"],
+                ["=-0.2673*lmTa", "=0.5*fresta+0.33*lmE0"],
+                ["=-0.3663*lmTa", "=0.5*fresta"]
+              ]
+            },
+            {
+              "pos": 3000,
+              "forma": "poligono",
+              "centro": [0, "lmZb"],
+              "perfil": [
+                ["=0.3663*dvT1", "=0.5*fresta"],
+                ["=0.2673*dvT1", "=0.5*fresta+0.33*lmE1"],
+                ["=0.1504*dvT1", "=0.5*fresta+0.66*lmE1"],
+                ["=0.02*dvT1", "=0.5*fresta+lmE1"],
+                ["=-0.02*dvT1", "=0.5*fresta+lmE1"],
+                ["=-0.1504*dvT1", "=0.5*fresta+0.66*lmE1"],
+                ["=-0.2673*dvT1", "=0.5*fresta+0.33*lmE1"],
+                ["=-0.3663*dvT1", "=0.5*fresta"]
+              ]
+            },
+            {
+              "pos": 3700,
+              "forma": "poligono",
+              "centro": [0, "lmZc"],
+              "perfil": [
+                ["=0.3663*dvT2", "=0.5*fresta"],
+                ["=0.2673*dvT2", "=0.5*fresta+0.33*lmE2"],
+                ["=0.1504*dvT2", "=0.5*fresta+0.66*lmE2"],
+                ["=0.02*dvT2", "=0.5*fresta+lmE2"],
+                ["=-0.02*dvT2", "=0.5*fresta+lmE2"],
+                ["=-0.1504*dvT2", "=0.5*fresta+0.66*lmE2"],
+                ["=-0.2673*dvT2", "=0.5*fresta+0.33*lmE2"],
+                ["=-0.3663*dvT2", "=0.5*fresta"]
+              ]
+            },
+            {
+              "pos": 4157,
+              "forma": "poligono",
+              "centro": [0, "lmZd"],
+              "perfil": [
+                ["=0.3663*lmTd", "=0.5*fresta"],
+                ["=0.2673*lmTd", "=0.5*fresta+0.33*lmE3"],
+                ["=0.1504*lmTd", "=0.5*fresta+0.66*lmE3"],
+                ["=0.02*lmTd", "=0.5*fresta+lmE3"],
+                ["=-0.02*lmTd", "=0.5*fresta+lmE3"],
+                ["=-0.1504*lmTd", "=0.5*fresta+0.66*lmE3"],
+                ["=-0.2673*lmTd", "=0.5*fresta+0.33*lmE3"],
+                ["=-0.3663*lmTd", "=0.5*fresta"]
+              ]
+            }
           ],
           "encaixa": {
             "ancora": "inicio",
-            "em": { "ancora": "deriva.raiz", "mm": [0, 105, 1029] }
+            "em": { "ancora": "deriva.raiz", "mm": [0, 105, "=lmZa-dvZ0"] }
           }
         },
-        { "id": "eixoLeme", "ligar": { "de": { "ancora": "leme.inicio", "mm": [0, 0, -329] }, "para": { "ancora": "leme.fim", "mm": [0, 0, -90] }, "tipo": "haste", "diametro": 30 }, "cor": "preto", "unidade": "empenagem-vertical", "rotulo": "eixo_do_leme" },
+        { "id": "eixoLeme", "ligar": { "de": { "ancora": "leme.inicio", "mm": [0, 8, 0] }, "para": { "ancora": "leme.fim", "mm": [0, -8, 0] }, "tipo": "haste", "diametro": 30 }, "cor": "preto", "unidade": "empenagem-vertical", "rotulo": "eixo_do_leme", "substitui": "eixoLeme" },
+        { "id": "suporteLeme1", "tipo": "caixa", "largura": 100, "altura": 40, "profundidade": "=fresta+110", "raio": 10, "centro": { "ancora": "leme.inicio", "mm": [0, 245, "=(lmZd-lmZa)*245/1902"] }, "cor": "cinza", "unidade": "empenagem-vertical", "rotulo": "suporte_do_leme" },
+        { "id": "suporteLeme2", "tipo": "caixa", "largura": 70, "altura": 36, "profundidade": "=fresta+90", "raio": 10, "centro": { "ancora": "leme.inicio", "mm": [0, 895, "=(lmZd-lmZa)*895/1902"] }, "cor": "cinza", "unidade": "empenagem-vertical", "rotulo": "suporte_do_leme" },
+        { "id": "suporteLeme3", "tipo": "caixa", "largura": 50, "altura": 32, "profundidade": "=fresta+70", "raio": 8, "centro": { "ancora": "leme.inicio", "mm": [0, 1545, "=(lmZd-lmZa)*1545/1902"] }, "cor": "cinza", "unidade": "empenagem-vertical", "rotulo": "suporte_do_leme" },
+        {
+          "id": "botaDegeloDeriva",
+          "tipo": "loft",
+          "eixo": "y",
+          "cor": "preto",
+          "unidade": "empenagem-vertical",
+          "rotulo": "bota_de_degelo_da_deriva",
+          "secoes": [
+            { "pos": 2150, "forma": "poligono", "centro": [0, "dvZ0"], "perfil": [[0, "=-0.5*dvC0-5"], ["=0.1005*dvT0+4", "=-0.492*dvC0"], ["=0.2155*dvT0+4", "=-0.46*dvC0"], ["=0.3466*dvT0+4", "=-0.38*dvC0"], ["=-0.3466*dvT0-4", "=-0.38*dvC0"], ["=-0.2155*dvT0-4", "=-0.46*dvC0"], ["=-0.1005*dvT0-4", "=-0.492*dvC0"]] },
+            { "pos": 3000, "forma": "poligono", "centro": [0, "dvZ1"], "perfil": [[0, "=-0.5*dvC1-5"], ["=0.1005*dvT1+4", "=-0.492*dvC1"], ["=0.2155*dvT1+4", "=-0.46*dvC1"], ["=0.3466*dvT1+4", "=-0.38*dvC1"], ["=-0.3466*dvT1-4", "=-0.38*dvC1"], ["=-0.2155*dvT1-4", "=-0.46*dvC1"], ["=-0.1005*dvT1-4", "=-0.492*dvC1"]] },
+            { "pos": 3700, "forma": "poligono", "centro": [0, "dvZ2"], "perfil": [[0, "=-0.5*dvC2-5"], ["=0.1005*dvT2+4", "=-0.492*dvC2"], ["=0.2155*dvT2+4", "=-0.46*dvC2"], ["=0.3466*dvT2+4", "=-0.38*dvC2"], ["=-0.3466*dvT2-4", "=-0.38*dvC2"], ["=-0.2155*dvT2-4", "=-0.46*dvC2"], ["=-0.1005*dvT2-4", "=-0.492*dvC2"]] },
+            { "pos": 4170, "forma": "poligono", "centro": [0, "dvZ3"], "perfil": [[0, "=-0.5*dvC3-5"], ["=0.1005*dvT3+4", "=-0.492*dvC3"], ["=0.2155*dvT3+4", "=-0.46*dvC3"], ["=0.3466*dvT3+4", "=-0.38*dvC3"], ["=-0.3466*dvT3-4", "=-0.38*dvC3"], ["=-0.2155*dvT3-4", "=-0.46*dvC3"], ["=-0.1005*dvT3-4", "=-0.492*dvC3"]] }
+          ],
+          "encaixa": {
+            "ancora": "inicio",
+            "em": { "ancora": "deriva.raiz", "mm": [0, 0, 0] }
+          }
+        },
+        {
+          "id": "ponteiraDeriva",
+          "tipo": "loft",
+          "eixo": "y",
+          "cor": "cinza",
+          "unidade": "empenagem-vertical",
+          "rotulo": "ponteira_da_deriva",
+          "secoes": [
+            {
+              "pos": 4170,
+              "forma": "poligono",
+              "centro": [0, "dvZ3"],
+              "perfil": [
+                [0, "=-0.5*dvC3"],
+                ["=0.1005*dvT3", "=-0.492*dvC3"],
+                ["=0.2155*dvT3", "=-0.46*dvC3"],
+                ["=0.3466*dvT3", "=-0.38*dvC3"],
+                ["=0.4613*dvT3", "=-0.22*dvC3"],
+                ["=0.5*dvT3", 0],
+                ["=0.4533*dvT3", "=0.28*dvC3"],
+                ["=0.3734*dvT3", "=0.5*dvC3"],
+                ["=-0.3734*dvT3", "=0.5*dvC3"],
+                ["=-0.4533*dvT3", "=0.28*dvC3"],
+                ["=-0.5*dvT3", 0],
+                ["=-0.4613*dvT3", "=-0.22*dvC3"],
+                ["=-0.3466*dvT3", "=-0.38*dvC3"],
+                ["=-0.2155*dvT3", "=-0.46*dvC3"],
+                ["=-0.1005*dvT3", "=-0.492*dvC3"]
+              ]
+            },
+            {
+              "pos": 4186,
+              "forma": "poligono",
+              "centro": [0, "dvZ4"],
+              "perfil": [
+                [0, "=-0.5*dvPs1*dvC4"],
+                ["=0.1005*dvPs1*dvT4", "=-0.492*dvPs1*dvC4"],
+                ["=0.2155*dvPs1*dvT4", "=-0.46*dvPs1*dvC4"],
+                ["=0.3466*dvPs1*dvT4", "=-0.38*dvPs1*dvC4"],
+                ["=0.4613*dvPs1*dvT4", "=-0.22*dvPs1*dvC4"],
+                ["=0.5*dvPs1*dvT4", 0],
+                ["=0.4533*dvPs1*dvT4", "=0.28*dvPs1*dvC4"],
+                ["=0.3734*dvPs1*dvT4", "=0.5*dvPs1*dvC4"],
+                ["=-0.3734*dvPs1*dvT4", "=0.5*dvPs1*dvC4"],
+                ["=-0.4533*dvPs1*dvT4", "=0.28*dvPs1*dvC4"],
+                ["=-0.5*dvPs1*dvT4", 0],
+                ["=-0.4613*dvPs1*dvT4", "=-0.22*dvPs1*dvC4"],
+                ["=-0.3466*dvPs1*dvT4", "=-0.38*dvPs1*dvC4"],
+                ["=-0.2155*dvPs1*dvT4", "=-0.46*dvPs1*dvC4"],
+                ["=-0.1005*dvPs1*dvT4", "=-0.492*dvPs1*dvC4"]
+              ]
+            },
+            {
+              "pos": 4200,
+              "forma": "poligono",
+              "centro": [0, "dvZ4"],
+              "perfil": [
+                [0, "=-0.5*dvPs2*dvC4"],
+                ["=0.1005*dvPs2*dvT4", "=-0.492*dvPs2*dvC4"],
+                ["=0.2155*dvPs2*dvT4", "=-0.46*dvPs2*dvC4"],
+                ["=0.3466*dvPs2*dvT4", "=-0.38*dvPs2*dvC4"],
+                ["=0.4613*dvPs2*dvT4", "=-0.22*dvPs2*dvC4"],
+                ["=0.5*dvPs2*dvT4", 0],
+                ["=0.4533*dvPs2*dvT4", "=0.28*dvPs2*dvC4"],
+                ["=0.3734*dvPs2*dvT4", "=0.5*dvPs2*dvC4"],
+                ["=-0.3734*dvPs2*dvT4", "=0.5*dvPs2*dvC4"],
+                ["=-0.4533*dvPs2*dvT4", "=0.28*dvPs2*dvC4"],
+                ["=-0.5*dvPs2*dvT4", 0],
+                ["=-0.4613*dvPs2*dvT4", "=-0.22*dvPs2*dvC4"],
+                ["=-0.3466*dvPs2*dvT4", "=-0.38*dvPs2*dvC4"],
+                ["=-0.2155*dvPs2*dvT4", "=-0.46*dvPs2*dvC4"],
+                ["=-0.1005*dvPs2*dvT4", "=-0.492*dvPs2*dvC4"]
+              ]
+            }
+          ],
+          "encaixa": {
+            "ancora": "inicio",
+            "em": { "ancora": "deriva.fim", "mm": [0, 0, 0] }
+          }
+        },
         { "id": "rodaNariz", "usa": "roda", "parametros": { "diametro": 440, "aro": 260, "largura": 150, "salienciaCubo": 70 }, "centro": [0, 245, 1690], "unidade": "trem-do-nariz", "rotulo": "roda_do_nariz" },
         { "id": "pernaNariz", "tipo": "cilindro", "diametro": 80, "de": [0, 800, 1790], "para": [0, 620, 1760], "cor": "amarelo", "unidade": "trem-do-nariz", "rotulo": "perna_do_nariz" },
         { "id": "pistaoNariz", "tipo": "cilindro", "diametro": 50, "de": "pernaNariz.fim", "para": "traveNariz.centro", "cor": "cinza", "unidade": "trem-do-nariz", "rotulo": "amortecedor_do_nariz" },
