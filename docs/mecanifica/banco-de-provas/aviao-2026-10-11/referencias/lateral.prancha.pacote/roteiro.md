@@ -6,23 +6,7 @@ Siga as etapas na ordem e não pule nenhuma. Abra o alvo e a prancha em cada eta
 
 Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png) e a prancha (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png). A vista é lateral: na horizontal a prancha mede comprimento e na vertical altura. Confira se a silhueta da prancha segue a do alvo e se as cotas gerais de comprimento e altura estão nas bordas do objeto.
 
-## Etapa 2 — deriva
-
-- cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 703. A linha atravessa a seção que o modelador precisa, dentro de deriva?
-- altura: cota 1910. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "deriva" fica na coluna da esquerda. A chamada termina dentro de deriva, e não numa vizinha?
-- linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 3 — porta
-
-- cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 921. A linha atravessa a seção que o modelador precisa, dentro de porta?
-- altura: cota 1069. A linha mede porta de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "porta" fica na coluna da esquerda. A chamada termina dentro de porta, e não numa vizinha?
-- linhas livres: a chamada e as cotas de porta não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 4 — janelas
+## Etapa 2 — janelas
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 2606. A linha atravessa a seção que o modelador precisa, dentro de janelas?
@@ -30,7 +14,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "janelas" fica na coluna da esquerda. A chamada termina dentro de janelas, e não numa vizinha?
 - linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 5 — parabrisa
+## Etapa 3 — parabrisa
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 728. A linha atravessa a seção que o modelador precisa, dentro de parabrisa?
@@ -38,7 +22,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "parabrisa" fica na coluna da esquerda. A chamada termina dentro de parabrisa, e não numa vizinha?
 - linhas livres: a chamada e as cotas de parabrisa não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 6 — capo
+## Etapa 4 — capo
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 1667. A linha atravessa a seção que o modelador precisa, dentro de capo?
@@ -46,15 +30,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "capo" fica na coluna da esquerda. A chamada termina dentro de capo, e não numa vizinha?
 - linhas livres: a chamada e as cotas de capo não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 7 — helice
-
-- cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 140. A linha atravessa a seção que o modelador precisa, dentro de helice?
-- altura: cota 1995. A linha mede helice de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "helice" fica na coluna da esquerda. A chamada termina dentro de helice, e não numa vizinha?
-- linhas livres: a chamada e as cotas de helice não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 8 — escape
+## Etapa 5 — escape
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 493. A linha atravessa a seção que o modelador precisa, dentro de escape?
@@ -62,7 +38,15 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "escape" fica na coluna da esquerda. A chamada termina dentro de escape, e não numa vizinha?
 - linhas livres: a chamada e as cotas de escape não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 9 — cone
+## Etapa 6 — helice
+
+- cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- comprimento: cota 140. A linha atravessa a seção que o modelador precisa, dentro de helice?
+- altura: cota 1995. A linha mede helice de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "helice" fica na coluna da esquerda. A chamada termina dentro de helice, e não numa vizinha?
+- linhas livres: a chamada e as cotas de helice não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 7 — cone
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 516. A linha atravessa a seção que o modelador precisa, dentro de cone?
@@ -70,13 +54,29 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 - nome: "cone" fica na coluna da esquerda. A chamada termina dentro de cone, e não numa vizinha?
 - linhas livres: a chamada e as cotas de cone não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 10 — tremNariz
+## Etapa 8 — tremNariz
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 299. A linha atravessa a seção que o modelador precisa, dentro de tremNariz?
 - altura: cota 725. A linha mede tremNariz de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "tremNariz" fica na coluna da esquerda. A chamada termina dentro de tremNariz, e não numa vizinha?
 - linhas livres: a chamada e as cotas de tremNariz não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 9 — porta
+
+- cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- comprimento: cota 921. A linha atravessa a seção que o modelador precisa, dentro de porta?
+- altura: cota 1069. A linha mede porta de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "porta" fica na coluna da direita. A chamada termina dentro de porta, e não numa vizinha?
+- linhas livres: a chamada e as cotas de porta não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 10 — deriva
+
+- cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- comprimento: cota 703. A linha atravessa a seção que o modelador precisa, dentro de deriva?
+- altura: cota 1910. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "deriva" fica na coluna da direita. A chamada termina dentro de deriva, e não numa vizinha?
+- linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?
 
 ## Etapa 11 — leme
 

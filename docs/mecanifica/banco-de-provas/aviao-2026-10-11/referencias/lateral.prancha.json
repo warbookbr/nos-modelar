@@ -5,14 +5,16 @@
    "medida": "largura",
    "em": 2000,
    "numero": [
-    350,
+    -350,
     0
    ]
   },
   {
    "parte": "helice",
    "medida": "altura",
-   "em": -250
+   "em": 100,
+   "alemDosNomes": true,
+   "lado": "esquerda"
   },
   {
    "parte": "cone",
@@ -67,13 +69,14 @@
    "em": 3300,
    "numero": [
     -600,
-    300
+    450
    ]
   },
   {
    "parte": "janelas",
    "medida": "largura",
-   "em": -350
+   "em": 2760,
+   "afasta": 150
   },
   {
    "parte": "janelas",
@@ -97,7 +100,8 @@
   {
    "parte": "fuselagem",
    "medida": "largura",
-   "em": -900
+   "em": 120,
+   "afasta": -270
   },
   {
    "parte": "fuselagem",
@@ -141,8 +145,8 @@
     1434
    ],
    "numero": [
-    500,
-    -550
+    1028,
+    -60
    ]
   },
   {
@@ -150,20 +154,27 @@
    "medida": "altura",
    "em": 7800,
    "numero": [
-    0,
-    -400
+    1350,
+    -168
    ]
   },
   {
    "parte": "estabilizador",
    "medida": "largura",
    "em": 2100,
-   "afasta": -650
+   "numero": [
+    -122,
+    50
+   ]
   },
   {
    "parte": "estabilizador",
    "medida": "altura",
-   "em": 9850
+   "em": 9850,
+   "numero": [
+    300,
+    278
+   ]
   },
   {
    "parte": "deriva",
@@ -252,55 +263,7 @@
     1260
    ],
    "coluna": "esquerda",
-   "nivel": -1300
-  },
-  "escape": {
-   "marca": [
-    920,
-    1330
-   ],
-   "coluna": "esquerda",
-   "nivel": 3100
-  },
-  "capo": {
-   "marca": [
-    1700,
-    1600
-   ],
-   "coluna": "esquerda",
-   "nivel": 3650
-  },
-  "parabrisa": {
-   "marca": [
-    3050,
-    1890
-   ],
-   "coluna": "esquerda",
-   "nivel": 3900
-  },
-  "porta": {
-   "marca": [
-    5600,
-    2150
-   ],
-   "coluna": "esquerda",
-   "nivel": 4950
-  },
-  "janelas": {
-   "marca": [
-    4530,
-    1990
-   ],
-   "coluna": "esquerda",
-   "nivel": 4600
-  },
-  "deriva": {
-   "marca": [
-    8700,
-    2700
-   ],
-   "coluna": "esquerda",
-   "nivel": 5300
+   "nivel": 800
   },
   "tremNariz": {
    "marca": [
@@ -308,23 +271,55 @@
     120
    ],
    "coluna": "esquerda",
-   "nivel": -1600
+   "nivel": 100
   },
-  "asa": {
+  "escape": {
    "marca": [
-    5100,
-    900
+    1200,
+    1360
+   ],
+   "coluna": "esquerda",
+   "nivel": 4720
+  },
+  "capo": {
+   "marca": [
+    2250,
+    1720
+   ],
+   "coluna": "esquerda",
+   "nivel": 4880
+  },
+  "parabrisa": {
+   "marca": [
+    3050,
+    1890
+   ],
+   "coluna": "esquerda",
+   "nivel": 5170
+  },
+  "janelas": {
+   "marca": [
+    4460,
+    2000
+   ],
+   "coluna": "esquerda",
+   "nivel": 5470
+  },
+  "porta": {
+   "marca": [
+    6300,
+    2150
    ],
    "coluna": "direita",
-   "nivel": -150
+   "nivel": 5870
   },
-  "tremPrincipal": {
+  "deriva": {
    "marca": [
-    4550,
-    650
+    9590,
+    3960
    ],
    "coluna": "direita",
-   "nivel": -550
+   "nivel": 5630
   },
   "leme": {
    "marca": [
@@ -357,6 +352,22 @@
    ],
    "coluna": "direita",
    "nivel": 1350
+  },
+  "asa": {
+   "marca": [
+    5800,
+    990
+   ],
+   "coluna": "direita",
+   "nivel": 420
+  },
+  "tremPrincipal": {
+   "marca": [
+    4630,
+    480
+   ],
+   "coluna": "direita",
+   "nivel": 170
   }
  }
 }
