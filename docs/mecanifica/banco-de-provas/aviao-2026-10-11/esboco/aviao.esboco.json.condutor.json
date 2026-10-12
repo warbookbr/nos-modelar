@@ -1361,6 +1361,12 @@
       "unidade": "marco-25",
       "nota": 7,
       "motivo": "Defeito estrutural: a cauda continua um tubo fino (cerca de 14 px de largura em y≈780 na superior, ponta chata em y≈820) justo onde se prendem os estabilizadores de 184 px de envergadura. A porta esquerda segue ilegível nas vistas gerais; nos cortes, a ponta superior da placa fica 35 a 45 mm fora da curva do ombro (corte z=5940) e o bloco da janela 4 sobe acima da linha do casco, fora do contorno da porta (corte x=-770). No corte z=640 os cantos inferiores do duto se sobrepõem à parede do capô. Pontas das pás chanfradas e chapadas. A pá já não toca o capô."
+    },
+    {
+      "ordem": 9,
+      "unidade": "fuselagem",
+      "nota": 7,
+      "motivo": "Defeito estrutural: no corte x=-770 um corpo escuro (x 498 a 622, y 405 a 440, com faixa fina até x=690) sobe cerca de 12 px acima do topo da placa da porta e do topo do casco, sem explicação. A placa da porta tem só cerca de 92 mm no corte x=-770 e termina numa parede vertical do casco, sem bater com a extensão que a superior mostra (y 618 a 690); ela fica saliente uns 45 mm do flanco, e não rebaixada. A cauda termina em agulha de cerca de 10 px com fim reto, já apontada antes. As quatro vistas não mostram o lado esquerdo."
     }
   ]
 }
