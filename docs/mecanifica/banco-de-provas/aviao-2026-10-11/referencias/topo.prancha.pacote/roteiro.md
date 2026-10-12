@@ -144,9 +144,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 19 — fuselagem
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: a junta com o capô não aparece). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (da vista lateral, prevalece). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 1564. A linha atravessa a seção que o modelador precisa, dentro de fuselagem?
-- comprimento: EM FALTA: só há a nota "a junta com o capô não aparece", que não dá número. A linha mede fuselagem de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: cota 8028 (lateral, prevalece), tirada da vista lateral. A linha mede fuselagem de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "fuselagem" fica na coluna da direita. A chamada termina dentro de fuselagem, e não numa vizinha?
 - linhas livres: a chamada e as cotas de fuselagem não cruzam outra linha nem passam sobre número ou nome?
 

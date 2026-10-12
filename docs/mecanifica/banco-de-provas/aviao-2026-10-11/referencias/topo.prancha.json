@@ -165,16 +165,26 @@
   {
    "parte": "fuselagem",
    "medida": "largura",
-   "em": 0
+   "em": 0,
+   "numero": [
+    -250,
+    90
+   ]
   },
   {
    "parte": "fuselagem",
    "medida": "altura",
-   "medivel": false,
-   "motivo": "a junta com o capô não aparece",
-   "notaEm": [
-    -6400,
-    1600
+   "origem": {
+    "imagem": "lateral",
+    "medida": "largura"
+   },
+   "prevalece": "a pessoa, 2026-10-12: vale a lateral, a única vista que mostra a junta entre capô e fuselagem",
+   "em": 75,
+   "afasta": -1010,
+   "de": -6408,
+   "numero": [
+    2325,
+    -906
    ]
   },
   {
@@ -190,11 +200,11 @@
    ],
    "afasta": [
     0,
-    -2645
+    -2745
    ],
    "numero": [
-    380,
-    -40
+    -380,
+    -30
    ]
   },
   {
@@ -202,7 +212,7 @@
    "medida": "altura",
    "em": -10,
    "numero": [
-    0,
+    -200,
     -2085
    ]
   },
