@@ -20,6 +20,6 @@ describe('--vista sozinho', () => {
     expect(r.status, r.stderr).toBe(0);
     expect(existsSync(saida)).toBe(true);
     const pngs = readdirSync(saida).filter((n) => n.endsWith('.png'));
-    expect(pngs).toEqual(['cubo-lateral.png']);
+    expect(pngs).toEqual(['cubo-400px-lateral.png']);
   }, 60000);
 });

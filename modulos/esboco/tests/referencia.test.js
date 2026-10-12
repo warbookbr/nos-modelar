@@ -1,18 +1,18 @@
 /* Conferência contra a referência: a silhueta do esboço contra um contorno (gerado aqui, sem foto), por vista e por parte, com
    a razão interseção/união e o desvio em mm; as medidas tiradas do contorno; e a entrada na leitura padrão e no Condutor. */
 import { describe, expect, it } from 'vitest';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { ErroDeEsboco } from '../src/index.js';
 import { expandirEsboco } from '../src/expandir.js';
 import { conferirReferenciaNaOpcao, lerPlano, visiveisDoEsboco } from '../src/plano.js';
-import { formatarConferencia, formatarMedidasDaReferencia, lerContornos, medidasDaReferencia } from '../src/referencia.js';
+import { formatarConferencia, formatarMedidasDaReferencia, lerContornos, medidasDaReferencia, sobreposicaoDaReferencia } from '../src/referencia.js';
 import { formatarResumo, medirEsboco } from '../src/descrever.js';
 import { avancar, criarEstado, portaoDoEstagio, registrarVeredito } from '../src/condutor.js';
 import { lerArgumentos, medidasDaReferenciaArquivo, referenciaArquivo } from '../../../tools/mecanifica/esboco.mjs';
-import { referenciasDoEsboco } from '../../../tools/mecanifica/esboco-referencia.mjs';
+import { referenciasDoEsboco, vistaDoNome } from '../../../tools/mecanifica/esboco-referencia.mjs';
 
 const caixa = (id, centro, l, a, p, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 /* A base vai de x -50 a 50, y 0 a 100 e z 0 a 400; a coluna, de x 30 a 70, y 100 a 300 e z 300 a 400, pousa sobre a ponta da
@@ -123,6 +123,27 @@ describe('a silhueta do esboço contra o contorno de referência', () => {
     expect(() => conferirReferenciaNaOpcao({ arquivo: 'r.json', vista: 'frontal', partes: { inexistente: ['base'] } }, ref, x, v, 0)).toThrow(/cita a região "inexistente", que o arquivo não tem \(regiões: base, apoio, topo, fantasma\)/);
   });
 
+  it('uma região em pedaços é conferida e medida pela união deles, e não só pelo maior', () => {
+    /* A coluna da lateral cortada em duas metades, como a hélice do avião, que a imagem mostra em duas pás separadas pelo cone:
+       o contornoMm é o do maior pedaço e `pedacos` traz todos. */
+    const metades = [retangulo(300, 100, 350, 300), retangulo(350, 100, 400, 300)];
+    const lat = SILHUETAS.lateral;
+    const ler = (extra) => lerContornos({ formato: 'mecanifica.contornos@1', mmPorPx: 1, silhueta: { contornoMm: lat.silhueta }, regioes: { base: { contornoMm: lat.base }, coluna: { contornoMm: metades[0], ...extra } } });
+    const x = expandirEsboco(esboco());
+    const conferirCom = (ref) => conferirReferenciaNaOpcao({ arquivo: 'r.json', vista: 'lateral', tolerancia: 10, iou_min: 0.9 }, ref, x, visiveisDoEsboco(x), 0);
+    const inteira = ler({ pedacos: metades.map((contornoMm) => ({ contornoMm })) });
+    expect(inteira.regioes.coluna.aneis).toHaveLength(2);
+    expect(inteira.regioes.coluna.caixa).toEqual([300, 100, 400, 300]);
+    expect(parte(conferirCom(inteira), 'coluna').ok).toBe(true);
+    expect(parte(conferirCom(inteira), 'coluna').iou).toBeGreaterThan(0.95);
+    /* Sem `pedacos`, o arquivo de antes do campo, só vale o maior pedaço e o esboço inteiro reprova. */
+    const somenteMaior = ler({});
+    expect(somenteMaior.regioes.coluna.aneis).toHaveLength(1);
+    expect(parte(conferirCom(somenteMaior), 'coluna').ok).toBe(false);
+    const tamanho = (ref, eixo) => medidasDaReferencia(ref, 'lateral').linhas.find((l) => l.parte === 'coluna').eixos.find((e) => e.eixo === eixo).tamanho;
+    expect([tamanho(inteira, 'z'), tamanho(somenteMaior, 'z')]).toEqual([100, 50]);
+  });
+
   it('é determinística', () => {
     expect(JSON.stringify(conferir('lateral', { dh: 7, dv: 3 }))).toBe(JSON.stringify(conferir('lateral', { dh: 7, dv: 3 })));
   });
@@ -146,7 +167,7 @@ describe('plano.referencia no esquema', () => {
     recusa({ ...ref, tolerancia: 0 }, /"tolerancia" \(em mm\) deve ser um número maior que zero/);
     recusa({ ...ref, iou_min: 1.5 }, /"iou_min" deve ser uma fração/);
     recusa({ ...ref, tolerancai: 3 }, /o campo "tolerancai" não existe \(quis dizer "tolerancia"\?\)/);
-    recusa({ ...ref, partes: { a: [] } }, /"partes" deve ser/);
+    recusa({ ...ref, partes: { a: [1] } }, /"partes" deve ser/);
   });
 
   it('o plano aceita a origem "referencia" numa medida e recusa um envelope mal escrito', () => {
@@ -315,5 +336,161 @@ describe('--referencia e --medidas-da-referencia na linha de comando', () => {
     const b = lerArgumentos(['--medidas-da-referencia', 'c.json', 'm.esboco.json']);
     expect(b.valor('--medidas-da-referencia')).toBe('c.json');
     expect(b.alvo).toBe('m.esboco.json');
+  });
+});
+
+/* O avião do banco de provas (2026-10-11): o esboço confere a lateral e o topo com os contornos originais, e três coisas
+   obrigavam a copiar os contornos: a partição por watershed da imagem não acompanha as formas (fuselagem 0,67, parabrisa 0,11
+   com a silhueta em 0,92), o topo conta o z do eixo da asa (-5062 a 5382) enquanto a lateral conta da proa (0 a 10470), e o
+   nome `topo.contornos.json` não dizia a vista. */
+describe('a conferência por parte se desliga ou se restringe pelo plano', () => {
+  const v = visiveisDoEsboco(expandirEsboco(esboco()));
+  /* a "base" da referência é a coluna: a partição da imagem não acompanha a forma, e por parte reprova */
+  const ref = lerContornos({ formato: 'mecanifica.contornos@1', silhueta: { contornoMm: SILHUETAS.frontal.silhueta }, regioes: { base: { contornoMm: SILHUETAS.frontal.coluna }, coluna: { contornoMm: SILHUETAS.frontal.coluna } } });
+  const conferirPartes = (partes) => { const x = expandirEsboco(esboco()); return conferirReferenciaNaOpcao({ arquivo: 'r.json', vista: 'frontal', tolerancia: 10, partes }, ref, x, v, 0); };
+
+  it('sem partes a região de nome igual ao id é comparada, e por isso a partição que não acompanha a forma reprova', () => {
+    const c = conferirPartes(undefined);
+    expect(c.resultados.map((r) => r.parte)).toEqual([null, 'base', 'coluna']);
+    expect(parte(c, 'base').ok).toBe(false);
+    expect(c.ok).toBe(false);
+  });
+
+  it('"partes": [] confere só a silhueta, sem listar região sem forma', () => {
+    const c = conferirPartes([]);
+    expect(c.resultados.map((r) => r.parte)).toEqual([null]);
+    expect(c.semParte).toEqual([]);
+    expect(c.ok).toBe(true);
+    expect(formatarConferencia({ arquivo: 'r.json' }, c)).not.toContain('sem forma correspondente');
+  });
+
+  it('uma região com lista vazia fica fora e as outras continuam conferidas', () => {
+    const c = conferirPartes({ base: [] });
+    expect(c.resultados.map((r) => r.parte)).toEqual([null, 'coluna']);
+    expect(c.semParte).toEqual([]);
+    expect(c.ok).toBe(true);
+    expect(() => conferirPartes({ inexistente: [] })).toThrow(/cita a região "inexistente", que o arquivo não tem/);
+  });
+
+  it('o plano aceita a lista vazia e a região vazia, e recusa os outros formatos', () => {
+    const lido = (partes) => lerPlano({ referencia: { arquivo: 'r.json', vista: 'lateral', partes } }).referencia[0].partes;
+    expect(lido([])).toEqual([]);
+    expect(lido({ fuselagem: [] })).toEqual({ fuselagem: [] });
+    expect(lido({ fuselagem: ['fus*'] })).toEqual({ fuselagem: ['fus*'] });
+    expect(() => lido(['fuselagem'])).toThrow(/"partes" deve ser \{ "<região do arquivo>": \["id", "padrão.\*"\] \}.*"partes": \[\] confere só a silhueta/);
+    expect(() => lido({ fuselagem: 'fus' })).toThrow(/"partes" deve ser/);
+    expect(() => lido({ fuselagem: [''] })).toThrow(/"partes" deve ser/);
+  });
+});
+
+describe('vistas do mesmo objeto com origens diferentes: o deslocamento por entrada', () => {
+  it.each([
+    ['frontal', { dh: 40, dv: -25 }, { x: -40, y: 25 }],
+    ['lateral', { dh: 5000, dv: 0 }, { z: -5000 }],
+    ['superior', { dh: 0, dv: 5000 }, { z: 5000 }],
+    ['superior', { dh: 30, dv: -60 }, { x: -30, z: -60 }],
+  ])('o contorno da vista %s deslocado %j confere com o deslocamento %j e reprova sem ele', (vista, extra, deslocamento) => {
+    const sem = conferir(vista, extra);
+    expect(sem.ok).toBe(false);
+    const com = conferir(vista, extra, { deslocamento });
+    expect(com.ok).toBe(true);
+    expect(silhueta(com).iou).toBeGreaterThan(0.99);
+    for (const nome of ['base', 'coluna']) expect(parte(com, nome).iou).toBeGreaterThan(0.98);
+    expect(silhueta(com).diferenca?.centro_mm.every((c) => Math.abs(c) < 2 * com.celula_mm) ?? true).toBe(true);
+  });
+
+  it('o sinal é o do eixo do mundo: somar z leva o contorno de cima para o fundo e o da lateral para a frente', () => {
+    /* o topo do avião mede z de -5062 a 5382 e o esboço, de 0 a 10444: soma-se 5062 */
+    const dir = mkdtempSync(join(tmpdir(), 'referencia-'));
+    const f = join(dir, 'topo.contornos.json');
+    writeFileSync(f, JSON.stringify({ formato: 'mecanifica.contornos@1', silhueta: { contornoMm: deslocar(SILHUETAS.superior.silhueta, 0, 5000) }, regioes: {} }));
+    const lido = medidasDaReferenciaArquivo(f).medidas;
+    expect(lido.linhas[0].eixos.find((e) => e.eixo === 'z')).toMatchObject({ de: -5000, ate: -4600 });
+    const somado = medidasDaReferencia(contornos('superior', { dv: 5000 }), 'superior', { deslocamento: { z: 5000 } });
+    expect(somado.linhas[0].eixos.find((e) => e.eixo === 'z').ate).toBe(400);
+    expect(somado.linhas[0].eixos.find((e) => e.eixo === 'z').tamanho).toBe(400);
+    const lateral = medidasDaReferencia(contornos('lateral', { dh: -300 }), 'lateral', { deslocamento: { z: 300 } });
+    expect(lateral.linhas[0].eixos.find((e) => e.eixo === 'z')).toMatchObject({ de: 0, ate: 400 });
+  });
+
+  it('o relato diz a origem em que a referência foi conferida, e a sobreposição usa a referência deslocada', () => {
+    const x = expandirEsboco(esboco());
+    const entrada = { arquivo: 'r.json', vista: 'superior', tolerancia: 10, deslocamento: { z: 5000 } };
+    const c = conferirReferenciaNaOpcao(entrada, contornos('superior', { dv: 5000 }), x, visiveisDoEsboco(x), 0);
+    expect(formatarConferencia(entrada, c)).toContain('referência deslocada z +5000 mm, tolerância 10 mm');
+    expect(formatarConferencia({ ...entrada, deslocamento: undefined }, c)).not.toContain('deslocada');
+    const so = (e, ref) => { const s = sobreposicaoDaReferencia(e, ref, visiveisDoEsboco(x)[0]); let laranja = 0; let azul = 0; for (let k = 0; k < s.pixels.length; k += 4) { if (s.pixels[k] === 224) laranja++; if (s.pixels[k] === 61) azul++; } return { laranja, azul }; };
+    const certa = so(entrada, contornos('superior', { dv: 5000 }));
+    expect(certa.azul + certa.laranja).toBeLessThan(120);
+    const errada = so({ ...entrada, deslocamento: undefined }, contornos('superior', { dv: 5000 }));
+    expect(errada.azul).toBeGreaterThan(300);
+  });
+
+  it('o plano valida o deslocamento: números, e só os eixos que a vista mede', () => {
+    const lido = (vista, deslocamento) => lerPlano({ referencia: { arquivo: 'r.json', vista, deslocamento } }).referencia[0].deslocamento;
+    expect(lido('superior', { z: 5062 })).toEqual({ z: 5062 });
+    expect(lido('lateral', { z: -300, y: 12.5 })).toEqual({ z: -300, y: 12.5 });
+    expect(() => lido('superior', { y: 10 })).toThrow(/"deslocamento" deve ser \{ "<eixo>": mm \} com os eixos que a vista superior mede \(x e z\).*Exemplo: \{ "z": 5062 \}/);
+    expect(() => lido('lateral', { x: 10 })).toThrow(/vista lateral mede \(z e y\)/);
+    expect(() => lido('frontal', { x: '10' })).toThrow(/"deslocamento" deve ser/);
+    expect(() => lido('frontal', {})).toThrow(/"deslocamento" deve ser/);
+    expect(() => lido('frontal', [10, 0])).toThrow(/"deslocamento" deve ser/);
+  });
+
+  it('na linha de comando o deslocamento do plano vale para --referencia e para --medidas-da-referencia com o esboço', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'referencia-'));
+    const g = (nome, obj) => { writeFileSync(join(dir, nome), JSON.stringify(obj)); return join(dir, nome); };
+    const contorno = (extra) => g('topo.contornos.json', { formato: 'mecanifica.contornos@1', mmPorPx: 1, silhueta: { contornoMm: deslocar(SILHUETAS.superior.silhueta, 0, extra) }, regioes: { base: { contornoMm: deslocar(SILHUETAS.superior.base, 0, extra) }, coluna: { contornoMm: deslocar(SILHUETAS.superior.coluna, 0, extra) } } });
+    const c = contorno(5000);
+    const arq = g('m.esboco.json', esboco({ referencia: { arquivo: 'topo.contornos.json', vista: 'superior', tolerancia: 10, deslocamento: { z: 5000 } } }));
+    const r = referenciaArquivo(arq, c);
+    expect(r.codigo).toBe(0);
+    expect(r.texto).toContain('referência deslocada z +5000 mm');
+    /* a vista vem do nome (topo), e com outra --vista o deslocamento da entrada não vale */
+    expect(referenciaArquivo(arq, c, { vista: 'lateral' }).texto).not.toContain('deslocada');
+    const sem = g('n.esboco.json', esboco({ referencia: { arquivo: 'topo.contornos.json', vista: 'superior', tolerancia: 10 } }));
+    expect(referenciaArquivo(sem, c).codigo).toBe(1);
+    /* as medidas, com o esboço, saem na origem do esboço; sem ele, na da referência */
+    const com = medidasDaReferenciaArquivo(c, { esboco: arq }).medidas;
+    const faixaZ = (m) => m.linhas[0].eixos.find((e) => e.eixo === 'z');
+    expect([faixaZ(com).de + 0, faixaZ(com).ate]).toEqual([0, 400]);
+    expect([faixaZ(medidasDaReferenciaArquivo(c).medidas).de, faixaZ(medidasDaReferenciaArquivo(c).medidas).ate]).toEqual([-5000, -4600]);
+  });
+});
+
+describe('--medidas-da-referencia deduz a vista do nome do arquivo como --referencia', () => {
+  it('topo vale superior, e os outros nomes de vista valem por si', () => {
+    expect(vistaDoNome('referencias/topo.contornos.json')).toBe('superior');
+    expect(vistaDoNome('Topo.png')).toBe('superior');
+    expect(vistaDoNome('x/superior.json')).toBe('superior');
+    expect(vistaDoNome('x/lateral.contornos.json')).toBe('lateral');
+    expect(vistaDoNome('x/frontal.contornos.json')).toBe('frontal');
+  });
+
+  it('o nome que não diz a vista, ou diz duas, devolve nulo, e só o nome do arquivo conta', () => {
+    expect(vistaDoNome('x/contorno.json')).toBeNull();
+    expect(vistaDoNome('x/lateral-topo.json')).toBeNull();
+    expect(vistaDoNome('topo/contorno.json')).toBeNull();
+  });
+
+  it('as medidas de topo.contornos.json saem sem --vista, em x e z', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'referencia-'));
+    const f = join(dir, 'topo.contornos.json');
+    writeFileSync(f, JSON.stringify({ formato: 'mecanifica.contornos@1', silhueta: { contornoMm: SILHUETAS.superior.silhueta }, regioes: {} }));
+    const { texto, medidas } = medidasDaReferenciaArquivo(f);
+    expect(medidas.vista).toBe('superior');
+    expect(texto).toContain('silhueta: largura 120 mm (x de -50 a 70); profundidade 400 mm (z de 0 a 400)');
+    const solto = join(dir, 'planta.json');
+    writeFileSync(solto, readFileSync(f));
+    expect(() => medidasDaReferenciaArquivo(solto)).toThrow(/diga a vista que ".*planta.json" mostra/);
+  });
+
+  it('com o esboço, a vista declarada em plano.referencia vale quando o nome não a diz', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'referencia-'));
+    const f = join(dir, 'planta.json');
+    writeFileSync(f, JSON.stringify({ formato: 'mecanifica.contornos@1', silhueta: { contornoMm: SILHUETAS.superior.silhueta }, regioes: {} }));
+    const e = join(dir, 'm.esboco.json');
+    writeFileSync(e, JSON.stringify(esboco({ referencia: { arquivo: 'planta.json', vista: 'superior' } })));
+    expect(medidasDaReferenciaArquivo(f, { esboco: e }).medidas.vista).toBe('superior');
   });
 });

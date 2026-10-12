@@ -102,6 +102,19 @@
         "deforma"
       ],
       "justificativa": "Exercita a família prevista de cadeira com estrutura de barras e assento anatômico."
+    },
+    {
+      "nome": "avião de pequeno porte",
+      "familia": "Veículos aéreos e espaciais",
+      "nivel": "esboço",
+      "referencia": null,
+      "ferramentas": [
+        "aerofolio",
+        "loftSuave",
+        "casca",
+        "rodaPneu"
+      ],
+      "justificativa": "Objeto difícil do plano o que o avião pede: perfil aerodinâmico, superfície suave por seções e mecanismo de recolhimento."
     }
   ],
   "medicoes": [
@@ -296,6 +309,18 @@
       "origemTokens": "api",
       "nota": 8,
       "motivo": "depois do plano: sem defeito estrutural; barra grossa na altura do cubo, folga apertada da rodinha e raios que parecem atravessar o cubo; o esbocista inseriu um campo de texto por script"
+    },
+    {
+      "objeto": "avião de pequeno porte",
+      "unidade": "objeto",
+      "rodadas": 1,
+      "rodada": 1,
+      "data": "2026-10-12T16:01:51.583Z",
+      "commit": "a052a9fe",
+      "tokens": 3934576,
+      "origemTokens": "api",
+      "nota": 8,
+      "motivo": "primeira rodada do plano o que o avião pede, só com o que existia: 12 esbocistas e 19 críticas, Marco de 100% com 8; motor em 3 rodadas, fuselagem e Marco de 25% liberados pela pessoa com 7; trem do nariz atravessa o capô depois de 85 graus e o principal recolhe em carenagem sob a asa, por falta de recorte"
     }
   ]
 }

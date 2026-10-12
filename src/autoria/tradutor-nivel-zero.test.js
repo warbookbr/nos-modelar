@@ -221,6 +221,54 @@ describe('tradutor do nível zero: tipos com correspondência exata', () => {
   });
 });
 
+describe('tradutor do nível zero: a forma de família como casco por seções', () => {
+  const octogono = (r) => Array.from({ length: 8 }, (_, i) => [r * Math.cos((2 * Math.PI * i) / 8), r * Math.sin((2 * Math.PI * i) / 8)]);
+  /* o que `formasResolvidas` entrega da forma de família: o casco por seções do eixo principal (x, com o contorno em z e y), o volume
+     da superfície (o tubo de parede, bem menor que o casco cheio) e as partes que a família declara */
+  const familia = (extra = {}) => ({
+    familia: 'tubo-de-prova', parametros: {}, partes: ['corpo'], volume: 30000, extensao: [100, 40, 40],
+    eixo: 'x', eixosDoPerfil: ['z', 'y'], comprimento: 100, secoes: [{ w: -50, perfil: octogono(20) }, { w: 0, perfil: octogono(20) }, { w: 50, perfil: octogono(20) }],
+    ...extra,
+  });
+  const medida = (r, id) => medirVolumes(compilarAndaime(r.andaime)).get(id);
+
+  it('vira o casco por seções do eixo principal, com o volume contra o da superfície e a perda declarada', () => {
+    const r = traduzir([forma('tubo', 'familia', familia(), { semi: [50, 20, 20] })]);
+    expect(volumeUnico(r)).toMatchObject({ tipo: 'casco-secoes', eixoPercurso: 'x', eixosSecao: ['y', 'z'] });
+    expect(volumeUnico(r).secoes.map((q) => q.posicao)).toEqual([-50, 0, 50]);
+    expect(r.naoTraduzidas).toEqual([]);
+    const [p] = r.perdas;
+    expect(p).toMatchObject({ id: 'tubo', tipo: 'familia', aproximacao: 'familia-como-casco', volumeEsboco: 30000 });
+    expect(p.perdido).toHaveLength(1);
+    expect(p.perdido[0]).toMatchObject({ codigo: 'superficie' });
+    expect(p.perdido[0].descricao).toMatch(/a superfície da família tubo-de-prova virou o casco convexo de 3 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes \(corpo\) viram um sólido só/);
+    /* o octógono de raio 20 de 100 mm de comprimento: 2 sqrt(2) r2 x 100 */
+    perto(p.volumeAndaime, 2 * Math.SQRT2 * 400 * 100, 1e-2);
+    perto(p.volumeAndaime, medida(r, 'tubo').volume, 1e-2);
+    expect(p.erroVolume.relativo).toBeGreaterThan(1);
+    expect(p.erroEnvelope.mm).toBe(0);
+  });
+
+  it('a família girada de forma que o eixo fica sobre um eixo do mundo vai para esse eixo, e a que gira em dois eixos fica de fora com o motivo', () => {
+    const emZ = traduzir([forma('tubo', 'familia', familia(), { matriz: rotY(90), semi: [20, 20, 50] })]);
+    expect(volumeUnico(emZ)).toMatchObject({ tipo: 'casco-secoes', eixoPercurso: 'z' });
+    /* sozinha no esboço, a forma que não se traduz deixa o andaime sem volume, e a tradução inteira é recusada com o motivo dela */
+    const solta = (opcoes) => traduzir([forma('tubo', 'familia', familia(), { matriz: produto(rotY(30), rotZ(20)) }), forma('base', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 })], opcoes);
+    expect(solta().naoTraduzidas).toEqual([expect.objectContaining({ id: 'tubo', tipo: 'familia', motivo: expect.stringMatching(/família tubo-de-prova.*não deixa nenhum eixo da forma sobre um eixo do mundo/) })]);
+    expect(() => solta({ estrito: true })).toThrow(ErroDoTradutor);
+  });
+
+  it('a família sem o casco por seções fica de fora dizendo o que falta', () => {
+    const r = traduzir([forma('tubo', 'familia', familia({ secoes: [] })), forma('base', 'caixa', { eixo: 'y', largura: 10, altura: 10, profundidade: 10 })]);
+    expect(r.naoTraduzidas).toEqual([expect.objectContaining({ id: 'tubo', tipo: 'familia', motivo: expect.stringMatching(/família sem o casco por seções: a N2 precisa de duas ou mais seções/) })]);
+  });
+
+  it('o mesmo dado dá o mesmo andaime', () => {
+    const f = () => traduzir([forma('tubo', 'familia', familia(), { semi: [50, 20, 20] })]);
+    expect(JSON.stringify(f())).toBe(JSON.stringify(f()));
+  });
+});
+
 describe('tradutor do nível zero: aproximações e relatório de perdas', () => {
   const quadrado = (m) => [[-m / 2, -m / 2], [m / 2, -m / 2], [m / 2, m / 2], [-m / 2, m / 2]];
   /* o loft do esboço: eixo y, o contorno em (x, z) e a posição `w` de cada seção */

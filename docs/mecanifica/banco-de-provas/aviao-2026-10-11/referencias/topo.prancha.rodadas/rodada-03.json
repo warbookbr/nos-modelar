@@ -1,0 +1,612 @@
+{
+ "numero": 3,
+ "julgado": {
+  "vista": "topo",
+  "cotas": [
+   {
+    "parte": "cone",
+    "medida": "largura",
+    "em": 4700,
+    "numero": [
+     -150,
+     600
+    ]
+   },
+   {
+    "parte": "cone",
+    "medida": "altura",
+    "em": 60,
+    "numero": [
+     350,
+     400
+    ]
+   },
+   {
+    "parte": "heliceEsq",
+    "medida": "largura",
+    "em": 4590,
+    "numero": [
+     -720,
+     0
+    ]
+   },
+   {
+    "parte": "heliceEsq",
+    "medida": "altura",
+    "medivel": false,
+    "motivo": "sem corda",
+    "notaEm": [
+     -4650,
+     4420
+    ]
+   },
+   {
+    "parte": "heliceDir",
+    "medida": "largura",
+    "em": 4590,
+    "numero": [
+     650,
+     250
+    ]
+   },
+   {
+    "parte": "heliceDir",
+    "medida": "altura",
+    "medivel": false,
+    "motivo": "sem corda",
+    "notaEm": [
+     1650,
+     4420
+    ]
+   },
+   {
+    "parte": "escapeEsq",
+    "medida": "largura",
+    "em": 3950,
+    "numero": [
+     -850,
+     0
+    ]
+   },
+   {
+    "parte": "escapeEsq",
+    "medida": "altura",
+    "em": -500,
+    "numero": [
+     -600,
+     160
+    ]
+   },
+   {
+    "parte": "escapeDir",
+    "medida": "largura",
+    "em": 3950,
+    "numero": [
+     850,
+     0
+    ]
+   },
+   {
+    "parte": "escapeDir",
+    "medida": "altura",
+    "em": 560,
+    "numero": [
+     540,
+     156
+    ]
+   },
+   {
+    "parte": "capo",
+    "medida": "largura",
+    "em": 2400
+   },
+   {
+    "parte": "capo",
+    "medida": "altura",
+    "em": -300,
+    "origem": {
+     "imagem": "lateral",
+     "medida": "largura"
+    },
+    "de": "fim",
+    "numero": [
+     2100,
+     -607
+    ]
+   },
+   {
+    "parte": "parabrisa",
+    "medida": "largura",
+    "em": 1700,
+    "numero": [
+     306,
+     -170
+    ]
+   },
+   {
+    "parte": "parabrisa",
+    "medida": "altura",
+    "em": -378,
+    "numero": [
+     158,
+     -120
+    ]
+   },
+   {
+    "parte": "janelas",
+    "medida": "largura",
+    "de": [
+     555,
+     -880
+    ],
+    "ate": [
+     695,
+     -880
+    ],
+    "numero": [
+     625,
+     -50
+    ]
+   },
+   {
+    "parte": "janelas",
+    "medida": "altura",
+    "de": [
+     575,
+     -817
+    ],
+    "ate": [
+     575,
+     -1052
+    ],
+    "numero": [
+     425,
+     -616
+    ]
+   },
+   {
+    "parte": "fuselagem",
+    "medida": "largura",
+    "em": 0,
+    "numero": [
+     -250,
+     90
+    ]
+   },
+   {
+    "parte": "fuselagem",
+    "medida": "altura",
+    "origem": {
+     "imagem": "lateral",
+     "medida": "largura"
+    },
+    "prevalece": "a pessoa, 2026-10-12: vale a lateral, a única vista que mostra a junta entre capô e fuselagem",
+    "em": 75,
+    "afasta": -1010,
+    "de": -6408,
+    "numero": [
+     2325,
+     -906
+    ]
+   },
+   {
+    "parte": "deriva",
+    "medida": "largura",
+    "de": [
+     -87,
+     -3055
+    ],
+    "ate": [
+     58,
+     -3055
+    ],
+    "afasta": [
+     0,
+     -2745
+    ],
+    "numero": [
+     -380,
+     -30
+    ]
+   },
+   {
+    "parte": "deriva",
+    "medida": "altura",
+    "em": -10,
+    "numero": [
+     -200,
+     -2085
+    ]
+   },
+   {
+    "parte": "asaEsq",
+    "medida": "largura",
+    "em": 650
+   },
+   {
+    "parte": "asaEsq",
+    "medida": "altura",
+    "em": -1300
+   },
+   {
+    "parte": "asaDir",
+    "medida": "largura",
+    "em": 650
+   },
+   {
+    "parte": "asaDir",
+    "medida": "altura",
+    "em": 1300
+   },
+   {
+    "parte": "aileronEsq",
+    "medida": "largura",
+    "em": 0,
+    "numero": [
+     0,
+     -600
+    ]
+   },
+   {
+    "parte": "aileronEsq",
+    "medida": "altura",
+    "em": -5050,
+    "numero": [
+     150,
+     -545
+    ]
+   },
+   {
+    "parte": "aileronDir",
+    "medida": "largura",
+    "em": 0,
+    "numero": [
+     0,
+     -600
+    ]
+   },
+   {
+    "parte": "aileronDir",
+    "medida": "altura",
+    "em": 5050,
+    "numero": [
+     -150,
+     -552
+    ]
+   },
+   {
+    "parte": "flapEsq",
+    "medida": "largura",
+    "de": [
+     -4905,
+     -134
+    ],
+    "ate": [
+     -1170,
+     -411
+    ],
+    "numero": [
+     0,
+     -578
+    ]
+   },
+   {
+    "parte": "flapEsq",
+    "medida": "altura",
+    "em": -2150,
+    "numero": [
+     0,
+     -481
+    ]
+   },
+   {
+    "parte": "flapDir",
+    "medida": "largura",
+    "de": [
+     945,
+     -472
+    ],
+    "ate": [
+     4880,
+     -94
+    ],
+    "numero": [
+     0,
+     -567
+    ]
+   },
+   {
+    "parte": "flapDir",
+    "medida": "altura",
+    "em": 2150,
+    "numero": [
+     0,
+     -462
+    ]
+   },
+   {
+    "parte": "estabilizadorEsq",
+    "medida": "largura",
+    "em": -4440,
+    "numero": [
+     386,
+     90
+    ]
+   },
+   {
+    "parte": "estabilizadorEsq",
+    "medida": "altura",
+    "em": -1900,
+    "numero": [
+     250,
+     -164
+    ]
+   },
+   {
+    "parte": "estabilizadorDir",
+    "medida": "largura",
+    "em": -4440,
+    "numero": [
+     -386,
+     90
+    ]
+   },
+   {
+    "parte": "estabilizadorDir",
+    "medida": "altura",
+    "em": 1900,
+    "numero": [
+     -250,
+     -157
+    ]
+   },
+   {
+    "parte": "profundorEsq",
+    "medida": "largura",
+    "em": -4850,
+    "numero": [
+     0,
+     -710
+    ]
+   },
+   {
+    "parte": "profundorEsq",
+    "medida": "altura",
+    "em": -1600,
+    "numero": [
+     -300,
+     -653
+    ]
+   },
+   {
+    "parte": "profundorDir",
+    "medida": "largura",
+    "em": -4850,
+    "numero": [
+     0,
+     -710
+    ]
+   },
+   {
+    "parte": "profundorDir",
+    "medida": "altura",
+    "em": 1600,
+    "numero": [
+     300,
+     -653
+    ]
+   }
+  ],
+  "nomes": {
+   "cone": {
+    "marca": [
+     -40,
+     4780
+    ],
+    "coluna": "esquerda",
+    "nivel": 5300
+   },
+   "heliceEsq": {
+    "marca": [
+     -330,
+     4335
+    ],
+    "coluna": "esquerda",
+    "nivel": 4250
+   },
+   "escapeEsq": {
+    "marca": [
+     -614,
+     3850
+    ],
+    "coluna": "esquerda",
+    "nivel": 2800
+   },
+   "parabrisa": {
+    "marca": [
+     -450,
+     1500
+    ],
+    "coluna": "esquerda",
+    "nivel": 1400
+   },
+   "asaEsq": {
+    "marca": [
+     -4500,
+     400
+    ],
+    "coluna": "esquerda",
+    "nivel": 400
+   },
+   "aileronEsq": {
+    "marca": [
+     -5808,
+     -60
+    ],
+    "coluna": "esquerda",
+    "nivel": -600
+   },
+   "flapEsq": {
+    "marca": [
+     -1335,
+     -480
+    ],
+    "coluna": "esquerda",
+    "nivel": -3900
+   },
+   "deriva": {
+    "marca": [
+     -15,
+     -3025
+    ],
+    "coluna": "esquerda",
+    "nivel": -4150
+   },
+   "estabilizadorEsq": {
+    "marca": [
+     -2000,
+     -4520
+    ],
+    "coluna": "esquerda",
+    "nivel": -4520
+   },
+   "profundorEsq": {
+    "marca": [
+     -2050,
+     -4920
+    ],
+    "coluna": "esquerda",
+    "nivel": -4920
+   },
+   "heliceDir": {
+    "marca": [
+     396,
+     4370
+    ],
+    "coluna": "direita",
+    "nivel": 4250
+   },
+   "escapeDir": {
+    "marca": [
+     684,
+     3850
+    ],
+    "coluna": "direita",
+    "nivel": 2800
+   },
+   "capo": {
+    "marca": [
+     300,
+     3500
+    ],
+    "coluna": "direita",
+    "nivel": 2600
+   },
+   "janelas": {
+    "marca": [
+     625,
+     -960
+    ],
+    "coluna": "direita",
+    "nivel": -4000
+   },
+   "asaDir": {
+    "marca": [
+     4500,
+     400
+    ],
+    "coluna": "direita",
+    "nivel": 400
+   },
+   "aileronDir": {
+    "marca": [
+     5808,
+     -60
+    ],
+    "coluna": "direita",
+    "nivel": -600
+   },
+   "flapDir": {
+    "marca": [
+     1250,
+     -500
+    ],
+    "coluna": "direita",
+    "nivel": -3900
+   },
+   "fuselagem": {
+    "marca": [
+     300,
+     -1500
+    ],
+    "coluna": "direita",
+    "nivel": -4250
+   },
+   "estabilizadorDir": {
+    "marca": [
+     2000,
+     -4520
+    ],
+    "coluna": "direita",
+    "nivel": -4520
+   },
+   "profundorDir": {
+    "marca": [
+     2050,
+     -4920
+    ],
+    "coluna": "direita",
+    "nivel": -4920
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.png",
+  "nota": 6,
+  "defeitos": [
+   {
+    "parte": "heliceEsq",
+    "tipo": "cota",
+    "onde": "comprimento (etapa 3)",
+    "sentido": "faltando",
+    "evidencia": "Prancha, região (250-450, 172): só a nota 'heliceEsq comprimento: sem corda', sem número. EM FALTA no roteiro."
+   },
+   {
+    "parte": "heliceDir",
+    "tipo": "cota",
+    "onde": "comprimento (etapa 12)",
+    "sentido": "faltando",
+    "evidencia": "Prancha, região (670-860, 172): só a nota 'heliceDir comprimento: sem corda', sem número. EM FALTA no roteiro."
+   },
+   {
+    "parte": "fuselagem",
+    "tipo": "cota",
+    "onde": "comprimento 8028, linha vertical em x≈565 (etapa 19)",
+    "sentido": "mal_posta",
+    "evidencia": "Prancha: a linha vai de y≈352 a y≈892, termina uns 65 px abaixo do fim da silhueta (y≈825) e passa por cima das cotas 2141/2114, 3566 e 145 da cauda. Não mede a fuselagem entre pontas da vista."
+   },
+   {
+    "parte": "deriva",
+    "tipo": "cota",
+    "onde": "largura 145 e comprimento 3566, extremidade traseira (etapa 9)",
+    "sentido": "mal_posta",
+    "evidencia": "Prancha, região (535-565, 835-851): o 145 está num leque curto abaixo da cauda, onde não há deriva para a linha atravessar. O 3566 fica encostado na linha da fuselagem em x≈565."
+   },
+   {
+    "parte": "aileronEsq",
+    "tipo": "comprimento",
+    "onde": "extremidade interna, divisória com o flap (etapa 7)",
+    "sentido": "menor",
+    "evidencia": "Prancha, x≈237 contra a emenda do painel externo em x≈130 no alvo. A divisória do aileron e do flap (também em aileronDir, x≈885) cai bem mais para fora que no alvo, e o aileron fica curto demais. Defeito de forma de contorno, para a separação."
+   },
+   {
+    "parte": "asaEsq",
+    "tipo": "superficie",
+    "onde": "bordo de ataque (y≈408-415) e ponta (x≈130-150)",
+    "sentido": "segmentado",
+    "evidencia": "Prancha: contorno com dentes e entalhe em x≈280, enquanto o alvo mostra bordo reto e contínuo. A asaDir tem o mesmo ruído na ponta (≈990,455). Defeito de forma de contorno, para a separação."
+   }
+  ],
+  "observacao": "A silhueta e a posição das partes seguem o alvo, e quase todas as cotas estão nas partes certas; os problemas são as duas medidas EM FALTA, a linha 8028 da fuselagem que invade a cauda e o contorno ruidoso e a divisória aileron/flap, que são de forma e não de cota."
+ }
+}

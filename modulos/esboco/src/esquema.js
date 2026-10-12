@@ -5,6 +5,8 @@
 import { CORES_NOMEADAS, ErroDeEsboco } from './index.js';
 import { quisDizer } from './parecido.js';
 import { lerPorta } from './portas.js';
+import { lerFormaDeFamilia } from './familia.js';
+import { validarCurso } from './curso.js';
 import { lerSubtrai } from './recorte.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
@@ -23,11 +25,12 @@ export const CAMPOS_POR_TIPO = {
   revolucao: ['perfil', 'eixo', 'lados'],
   tubo: ['caminho', 'diametro', 'raioCurva'],
   envolve: ['circulos', 'largura', 'espessura', 'fechado', 'sentido', 'eixo'],
+  familia: ['familia', 'perfil', 'parametros'],
 };
 export const TIPOS_DE_FORMA = Object.keys(CAMPOS_POR_TIPO);
 const NUMERICOS = ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'diametroTopo', 'raioCurva', 'opacidade'];
-export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico', 'modulos', 'corte', 'previa', 'enquadrar'];
-export const CAMPOS_DA_OPCAO = ['id', 'titulo', 'nota', 'formas', 'legendas', 'explosao', 'parametros', 'pontos', 'contato', 'ocultar', 'linhasCentro', 'medidas'];
+export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico', 'modulos', 'corte', 'previa', 'enquadrar', 'baseDoMestre', 'curso'];
+export const CAMPOS_DA_OPCAO = ['id', 'titulo', 'nota', 'formas', 'legendas', 'explosao', 'parametros', 'pontos', 'contato', 'ocultar', 'linhasCentro', 'medidas', 'giros'];
 export const CAMPOS_DO_CONTATO = ['usar', 'tolerancia', 'penetracao', 'folga', 'pares', 'juntas', 'projecao'];
 const CAMPOS_DA_PROJECAO = ['limiar', 'reprova', 'folgaMinima', 'maximo'];
 const CAMPOS_DO_PAR = ['a', 'b', 'tipo', 'max', 'motivo', 'herdado', 'implicito', 'junta'];
@@ -73,6 +76,7 @@ export function validarForma(f, onde) {
   if (f.cor !== undefined) corValida(f.cor, rotuloDaForma);
   if (f.substitui !== undefined && !(typeof f.substitui === 'string' && f.substitui)) throw new ErroDeEsboco(`${rotuloDaForma}: "substitui" deve ser o id da forma da maquete que esta forma substitui no detalhado (veio ${JSON.stringify(f.substitui)})`);
   if (f.estilo !== undefined && !(typeof f.estilo === 'string' && f.estilo)) throw new ErroDeEsboco(`${rotuloDaForma}: "estilo" deve ser o nome de um estilo declarado em "estilos" na raiz (veio ${JSON.stringify(f.estilo)})`);
+  if (f.tipo === 'familia') lerFormaDeFamilia(f, rotuloDaForma, { resolvidos: false });
   if (f.porta !== undefined) lerPorta(f.porta, `${rotuloDaForma}: porta`, f.tipo);
   if (f.subtrai !== undefined) lerSubtrai(f.subtrai, `${rotuloDaForma}: subtrai`, { resolvido: false });
   if (f.cortador !== undefined && f.cortador !== true) throw new ErroDeEsboco(`${rotuloDaForma}: "cortador" deve ser true, a forma que é só o molde de um recorte (veio ${JSON.stringify(f.cortador)})`);
@@ -96,6 +100,7 @@ export function validarEsquema(esboco) {
   camposValidos(esboco, CAMPOS_DA_RAIZ, 'esboço');
   if (objeto(esboco.explosao)) { camposValidos(esboco.explosao, CAMPOS_DA_EXPLOSAO, 'esboço: explosao'); if (esboco.explosao.eixo !== undefined) conjunto(esboco.explosao.eixo, EIXOS, 'esboço: explosao', 'eixo'); }
   validarContato(esboco.contato, 'esboço');
+  validarCurso(esboco);
   if (Array.isArray(esboco.formas)) esboco.formas.forEach((f, i) => validarForma(f, `esboço, forma ${i + 1}`));
   if (!Array.isArray(esboco.opcoes)) return;
   esboco.opcoes.forEach((o, i) => {

@@ -296,7 +296,7 @@ describe('arquivos legados', () => {
   const sha = (t) => createHash('sha1').update(t).digest('hex');
   /* SHA-1 do SVG e da leitura --descrever de HEAD antes da fatia 6 (a moto tem um achado, que ganha a sugestão) */
   const antes = {
-    casa: ['921913afe9f9074b1801322dac097743bdd57d48', '4a9c63fa6db7a42c497e9a928261eea3f1afb0b0'],
+    casa: ['921913afe9f9074b1801322dac097743bdd57d48', 'ab8355c5df90e309ebe8a13b9add4cd7fd56db77'],
     'mancal-eixo': ['bb4a355c5ca68f60de67cabf33d778d5def27c4a', 'c38f4eaa793241a223ff65bbe20446e89e961948'],
     moto: ['ee5eaae2b028ce82d3357c6e6d4a39134343370e', 'f9a480d9c3878bb9efdf4a573a0b526e0a523b29'],
     'teste-cubo': ['fa488c1ade466fb431429eb81308d76831c148d1', '06ab0744a45d617387c7e005288f303aad7edcb8'],

@@ -1,0 +1,1596 @@
+{
+  "versao": 4,
+  "esboco": "aviao.esboco.json",
+  "nivel": "detalhado",
+  "nivelDoPlano": true,
+  "modo": "por-unidade",
+  "estagios": [
+    "maquete",
+    "conferencia-da-maquete",
+    "plano-de-detalhe",
+    "detalhe-por-unidade",
+    "montagem"
+  ],
+  "atual": "concluido",
+  "historico": [
+    {
+      "passo": 1,
+      "de": "maquete",
+      "para": "conferencia-da-maquete"
+    },
+    {
+      "passo": 2,
+      "de": "conferencia-da-maquete",
+      "para": "plano-de-detalhe"
+    },
+    {
+      "passo": 3,
+      "de": "plano-de-detalhe",
+      "para": "detalhe-por-unidade"
+    },
+    {
+      "passo": 4,
+      "de": "detalhe-por-unidade",
+      "para": "montagem"
+    },
+    {
+      "passo": 5,
+      "de": "montagem",
+      "para": "concluido"
+    }
+  ],
+  "unidades": [
+    {
+      "id": "fuselagem",
+      "membros": [
+        "fuselagem",
+        "barbatana",
+        "parabrisa",
+        "molduraParabrisa",
+        "divisorParabrisa",
+        "janela1E",
+        "janela1D",
+        "molduraJanela1E",
+        "molduraJanela1D",
+        "janela2E",
+        "janela2D",
+        "molduraJanela2E",
+        "molduraJanela2D",
+        "janela3E",
+        "janela3D",
+        "molduraJanela3E",
+        "molduraJanela3D",
+        "janela4E",
+        "janela4D",
+        "molduraJanela4E",
+        "molduraJanela4D",
+        "portaE",
+        "molduraPortaE",
+        "macanetaPortaE"
+      ],
+      "depende": [],
+      "custo": 12,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -800,
+            800
+          ],
+          "y": [
+            784.5,
+            2334.5
+          ],
+          "z": [
+            2350,
+            10423
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "fuselagem": {
+            "x": [
+              -790,
+              790
+            ],
+            "y": [
+              784.5,
+              2334.5
+            ],
+            "z": [
+              2350,
+              10423
+            ]
+          },
+          "barbatana": {
+            "x": [
+              -20,
+              20
+            ],
+            "y": [
+              1050,
+              1550
+            ],
+            "z": [
+              7480,
+              8780
+            ]
+          },
+          "parabrisa": {
+            "x": [
+              -550,
+              550
+            ],
+            "y": [
+              1851.4,
+              2272.6
+            ],
+            "z": [
+              2993.2,
+              3646.8
+            ]
+          },
+          "janela1E": {
+            "x": [
+              -800,
+              -770
+            ],
+            "y": [
+              1692,
+              2044
+            ],
+            "z": [
+              3379.5,
+              4084.5
+            ]
+          },
+          "janela1D": {
+            "x": [
+              770,
+              800
+            ],
+            "y": [
+              1692,
+              2044
+            ],
+            "z": [
+              3379.5,
+              4084.5
+            ]
+          },
+          "janela2E": {
+            "x": [
+              -800,
+              -770
+            ],
+            "y": [
+              1762.5,
+              2043.5
+            ],
+            "z": [
+              4412.5,
+              4647.5
+            ]
+          },
+          "janela2D": {
+            "x": [
+              770,
+              800
+            ],
+            "y": [
+              1762.5,
+              2043.5
+            ],
+            "z": [
+              4412.5,
+              4647.5
+            ]
+          },
+          "janela3E": {
+            "x": [
+              -800,
+              -770
+            ],
+            "y": [
+              1762.5,
+              2043.5
+            ],
+            "z": [
+              4977,
+              5235
+            ]
+          },
+          "janela3D": {
+            "x": [
+              770,
+              800
+            ],
+            "y": [
+              1762.5,
+              2043.5
+            ],
+            "z": [
+              4977,
+              5235
+            ]
+          },
+          "janela4E": {
+            "x": [
+              -800,
+              -775
+            ],
+            "y": [
+              1786,
+              2044
+            ],
+            "z": [
+              5774.5,
+              5985.5
+            ]
+          },
+          "janela4D": {
+            "x": [
+              775,
+              800
+            ],
+            "y": [
+              1786,
+              2044
+            ],
+            "z": [
+              5774.5,
+              5985.5
+            ]
+          },
+          "portaE": {
+            "x": [
+              -795,
+              -765
+            ],
+            "y": [
+              1129,
+              2209
+            ],
+            "z": [
+              5470.5,
+              6409.5
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-fuselagem.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "motor",
+      "membros": [
+        "capo",
+        "entradaAr",
+        "escapeE",
+        "escapeD",
+        "flangeEscapeE",
+        "flangeEscapeD",
+        "bocalEscapeE",
+        "bocalEscapeD",
+        "venezianaE",
+        "venezianaD",
+        "venezianaE1",
+        "venezianaE2",
+        "venezianaD1",
+        "venezianaD2"
+      ],
+      "depende": [],
+      "custo": 4,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -841.7,
+            841.7
+          ],
+          "y": [
+            770,
+            1790
+          ],
+          "z": [
+            600,
+            2350
+          ]
+        },
+        "portas": [
+          {
+            "forma": "capo",
+            "ancora": "-z",
+            "ponto": [
+              0,
+              1290,
+              600
+            ],
+            "usadaPor": [
+              "helice"
+            ]
+          }
+        ],
+        "formas": {
+          "capo": {
+            "x": [
+              -725,
+              725
+            ],
+            "y": [
+              790,
+              1790
+            ],
+            "z": [
+              600,
+              2350
+            ]
+          },
+          "entradaAr": {
+            "x": [
+              -210,
+              210
+            ],
+            "y": [
+              770,
+              830
+            ],
+            "z": [
+              690,
+              1210
+            ]
+          },
+          "escapeE": {
+            "x": [
+              -841.7,
+              -437.4
+            ],
+            "y": [
+              1265,
+              1415
+            ],
+            "z": [
+              863.7,
+              1387.5
+            ]
+          },
+          "escapeD": {
+            "x": [
+              437.4,
+              841.7
+            ],
+            "y": [
+              1265,
+              1415
+            ],
+            "z": [
+              863.7,
+              1387.5
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-motor.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "helice",
+      "membros": [
+        "cone",
+        "placa",
+        "colar",
+        "colar1",
+        "colar2",
+        "colar3",
+        "colar4",
+        "pa",
+        "pa1",
+        "pa2",
+        "pa3",
+        "pa4"
+      ],
+      "depende": [
+        "motor"
+      ],
+      "custo": 6,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -1136.8,
+            1136.8
+          ],
+          "y": [
+            324.6,
+            2487
+          ],
+          "z": [
+            0,
+            600
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "cone": {
+            "x": [
+              -199,
+              199
+            ],
+            "y": [
+              1129,
+              1527
+            ],
+            "z": [
+              0,
+              600
+            ]
+          },
+          "pa": {
+            "x": [
+              -111.8,
+              111.8
+            ],
+            "y": [
+              1527,
+              2487
+            ],
+            "z": [
+              390.5,
+              589.5
+            ]
+          },
+          "pa1": {
+            "x": [
+              -1136.8,
+              -154.7
+            ],
+            "y": [
+              1283.1,
+              1792.5
+            ],
+            "z": [
+              390.5,
+              589.5
+            ]
+          },
+          "pa2": {
+            "x": [
+              -771.7,
+              -26.5
+            ],
+            "y": [
+              324.6,
+              1232.7
+            ],
+            "z": [
+              390.5,
+              589.5
+            ]
+          },
+          "pa3": {
+            "x": [
+              26.5,
+              771.7
+            ],
+            "y": [
+              324.6,
+              1232.7
+            ],
+            "z": [
+              390.5,
+              589.5
+            ]
+          },
+          "pa4": {
+            "x": [
+              154.7,
+              1136.8
+            ],
+            "y": [
+              1283.1,
+              1792.5
+            ],
+            "z": [
+              390.5,
+              589.5
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-helice.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "asas",
+      "membros": [
+        "asaE",
+        "asaD",
+        "flapE",
+        "flapD",
+        "aileronE",
+        "aileronD",
+        "eixoFlapE",
+        "eixoFlapD",
+        "eixoAileronE",
+        "eixoAileronD",
+        "suporteFlap1E",
+        "suporteFlap1D",
+        "suporteFlap2E",
+        "suporteFlap2D",
+        "suporteAileron1E",
+        "suporteAileron1D",
+        "suporteAileron2E",
+        "suporteAileron2D"
+      ],
+      "depende": [],
+      "custo": 10,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -6400,
+            6400
+          ],
+          "y": [
+            790,
+            2060
+          ],
+          "z": [
+            3950,
+            5685.3
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "asaE": {
+            "x": [
+              -6400,
+              -750
+            ],
+            "y": [
+              790,
+              2060
+            ],
+            "z": [
+              3950,
+              5168
+            ]
+          },
+          "asaD": {
+            "x": [
+              750,
+              6400
+            ],
+            "y": [
+              790,
+              2060
+            ],
+            "z": [
+              3950,
+              5168
+            ]
+          },
+          "flapE": {
+            "x": [
+              -4887,
+              -830
+            ],
+            "y": [
+              812,
+              1387.5
+            ],
+            "z": [
+              4974.5,
+              5685.3
+            ]
+          },
+          "flapD": {
+            "x": [
+              830,
+              4887
+            ],
+            "y": [
+              812,
+              1387.5
+            ],
+            "z": [
+              4974.5,
+              5685.3
+            ]
+          },
+          "aileronE": {
+            "x": [
+              -6000,
+              -4910
+            ],
+            "y": [
+              1326.5,
+              1532.5
+            ],
+            "z": [
+              4918.7,
+              5276.7
+            ]
+          },
+          "aileronD": {
+            "x": [
+              4910,
+              6000
+            ],
+            "y": [
+              1326.5,
+              1532.5
+            ],
+            "z": [
+              4918.7,
+              5276.7
+            ]
+          },
+          "eixoFlapE": {
+            "x": [
+              -4889,
+              -828
+            ],
+            "y": [
+              847.1,
+              1374.9
+            ],
+            "z": [
+              4952,
+              5184
+            ]
+          },
+          "eixoFlapD": {
+            "x": [
+              828,
+              4889
+            ],
+            "y": [
+              847.1,
+              1374.9
+            ],
+            "z": [
+              4952,
+              5184
+            ]
+          },
+          "eixoAileronE": {
+            "x": [
+              -6002.2,
+              -4907.8
+            ],
+            "y": [
+              1339.2,
+              1524.8
+            ],
+            "z": [
+              4896.2,
+              4981
+            ]
+          },
+          "eixoAileronD": {
+            "x": [
+              4907.8,
+              6002.2
+            ],
+            "y": [
+              1339.2,
+              1524.8
+            ],
+            "z": [
+              4896.2,
+              4981
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-asas.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "empenagem-horizontal",
+      "membros": [
+        "estabE",
+        "estabD",
+        "profundorE",
+        "profundorD",
+        "eixoProfundorE",
+        "eixoProfundorD",
+        "ponteiraE",
+        "ponteiraD",
+        "suporteProfundor1E",
+        "suporteProfundor1D",
+        "suporteProfundor2E",
+        "suporteProfundor2D"
+      ],
+      "depende": [],
+      "custo": 6,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -2331.8,
+            2331.8
+          ],
+          "y": [
+            2000,
+            2387
+          ],
+          "z": [
+            9269.5,
+            10282.3
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "estabE": {
+            "x": [
+              -2330,
+              -150
+            ],
+            "y": [
+              2000,
+              2387
+            ],
+            "z": [
+              9269.5,
+              9886.5
+            ]
+          },
+          "estabD": {
+            "x": [
+              150,
+              2330
+            ],
+            "y": [
+              2000,
+              2387
+            ],
+            "z": [
+              9269.5,
+              9886.5
+            ]
+          },
+          "profundorE": {
+            "x": [
+              -2330,
+              -150
+            ],
+            "y": [
+              2000,
+              2362.5
+            ],
+            "z": [
+              9821.3,
+              10282.3
+            ]
+          },
+          "profundorD": {
+            "x": [
+              150,
+              2330
+            ],
+            "y": [
+              2000,
+              2362.5
+            ],
+            "z": [
+              9821.3,
+              10282.3
+            ]
+          },
+          "eixoProfundorE": {
+            "x": [
+              -2331.8,
+              -148.2
+            ],
+            "y": [
+              2022.6,
+              2357.4
+            ],
+            "z": [
+              9802.3,
+              9905.8
+            ]
+          },
+          "eixoProfundorD": {
+            "x": [
+              148.2,
+              2331.8
+            ],
+            "y": [
+              2022.6,
+              2357.4
+            ],
+            "z": [
+              9802.3,
+              9905.8
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-empenagem-horizontal.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "empenagem-vertical",
+      "membros": [
+        "deriva",
+        "leme",
+        "eixoLeme",
+        "suporteLeme1",
+        "suporteLeme2",
+        "suporteLeme3",
+        "botaDegeloDeriva",
+        "ponteiraDeriva"
+      ],
+      "depende": [],
+      "custo": 3,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -110,
+            110
+          ],
+          "y": [
+            2150,
+            4200
+          ],
+          "z": [
+            7760.5,
+            10376
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "deriva": {
+            "x": [
+              -110,
+              110
+            ],
+            "y": [
+              2150,
+              4200
+            ],
+            "z": [
+              7760.5,
+              10218
+            ]
+          },
+          "leme": {
+            "x": [
+              -60,
+              60
+            ],
+            "y": [
+              2255,
+              4157
+            ],
+            "z": [
+              9096,
+              10376
+            ]
+          },
+          "eixoLeme": {
+            "x": [
+              -15,
+              15
+            ],
+            "y": [
+              2247.4,
+              4164.6
+            ],
+            "z": [
+              9077.1,
+              10214.9
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-empenagem-vertical.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "trem-do-nariz",
+      "membros": [
+        "rodaNariz.pneu",
+        "rodaNariz.cuboE",
+        "rodaNariz.cuboD",
+        "eixoRodaNariz",
+        "mancalNarizE",
+        "mancalNarizD",
+        "eixoPivoNariz",
+        "pernaNariz",
+        "pistaoNariz",
+        "coroaNariz",
+        "garfoNarizE",
+        "garfoNarizD",
+        "compassoSupNariz",
+        "compassoInfNariz",
+        "pinoCompassoNariz",
+        "orelhaAtuadorNariz",
+        "atuadorCorpoNariz",
+        "atuadorHasteNariz",
+        "alavancaNariz"
+      ],
+      "depende": [],
+      "custo": 10,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -125,
+            125
+          ],
+          "y": [
+            25,
+            807.8
+          ],
+          "z": [
+            1470,
+            2422.4
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "rodaNariz.pneu": {
+            "x": [
+              -75,
+              75
+            ],
+            "y": [
+              25,
+              465
+            ],
+            "z": [
+              1470,
+              1910
+            ]
+          },
+          "rodaNariz.disco": {
+            "x": [
+              -25,
+              25
+            ],
+            "y": [
+              115,
+              375
+            ],
+            "z": [
+              1560,
+              1820
+            ]
+          },
+          "rodaNariz.cuboE": {
+            "x": [
+              -95,
+              -25
+            ],
+            "y": [
+              200,
+              290
+            ],
+            "z": [
+              1645,
+              1735
+            ]
+          },
+          "rodaNariz.cuboD": {
+            "x": [
+              25,
+              95
+            ],
+            "y": [
+              200,
+              290
+            ],
+            "z": [
+              1645,
+              1735
+            ]
+          },
+          "pernaNariz": {
+            "x": [
+              -40,
+              40
+            ],
+            "y": [
+              613.4,
+              806.6
+            ],
+            "z": [
+              1720.5,
+              1829.5
+            ]
+          },
+          "pistaoNariz": {
+            "x": [
+              -25,
+              25
+            ],
+            "y": [
+              488.8,
+              631.2
+            ],
+            "z": [
+              1677.6,
+              1782.4
+            ]
+          },
+          "traveNariz": {
+            "x": [
+              -125,
+              125
+            ],
+            "y": [
+              482.5,
+              517.5
+            ],
+            "z": [
+              1677.5,
+              1722.5
+            ]
+          },
+          "garfoNarizE": {
+            "x": [
+              -117,
+              -89
+            ],
+            "y": [
+              244.5,
+              500.5
+            ],
+            "z": [
+              1676,
+              1714
+            ]
+          },
+          "garfoNarizD": {
+            "x": [
+              89,
+              117
+            ],
+            "y": [
+              244.5,
+              500.5
+            ],
+            "z": [
+              1676,
+              1714
+            ]
+          },
+          "bracoNariz": {
+            "x": [
+              -18,
+              18
+            ],
+            "y": [
+              692.2,
+              807.8
+            ],
+            "z": [
+              1810.6,
+              2422.4
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-trem-do-nariz.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    },
+    {
+      "id": "trens-principais",
+      "membros": [
+        "rodaPrincE.pneu",
+        "rodaPrincE.cuboE",
+        "rodaPrincE.cuboD",
+        "rodaPrincD.pneu",
+        "rodaPrincD.cuboE",
+        "rodaPrincD.cuboD",
+        "eixoRodaPrincE",
+        "eixoRodaPrincD",
+        "pernaPrincE",
+        "pernaPrincD",
+        "pistaoPrincE",
+        "pistaoPrincD",
+        "coroaPrincE",
+        "coroaPrincD",
+        "garfoExtPrincE",
+        "garfoExtPrincD",
+        "garfoIntPrincE",
+        "garfoIntPrincD",
+        "compassoSupPrincE",
+        "compassoSupPrincD",
+        "compassoInfPrincE",
+        "compassoInfPrincD",
+        "pinoCompassoPrincE",
+        "pinoCompassoPrincD",
+        "eixoPivoPrincE",
+        "eixoPivoPrincD",
+        "mancalPrincFrenteE",
+        "mancalPrincFrenteD",
+        "mancalPrincTrasE",
+        "mancalPrincTrasD",
+        "alavancaPrincE",
+        "alavancaPrincD",
+        "orelhaAtuadorPrincE",
+        "orelhaAtuadorPrincD",
+        "atuadorCorpoPrincE",
+        "atuadorCorpoPrincD",
+        "atuadorHastePrincE",
+        "atuadorHastePrincD",
+        "baiaPrincE",
+        "baiaPrincD"
+      ],
+      "depende": [],
+      "custo": 14,
+      "feito": true,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -1996.7,
+            1996.7
+          ],
+          "y": [
+            25,
+            940.3
+          ],
+          "z": [
+            4245,
+            4795
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "rodaPrincE.pneu": {
+            "x": [
+              -1960,
+              -1740
+            ],
+            "y": [
+              25,
+              575
+            ],
+            "z": [
+              4245,
+              4795
+            ]
+          },
+          "rodaPrincE.disco": {
+            "x": [
+              -1886.7,
+              -1813.3
+            ],
+            "y": [
+              135,
+              465
+            ],
+            "z": [
+              4355,
+              4685
+            ]
+          },
+          "rodaPrincE.cuboE": {
+            "x": [
+              -1996.7,
+              -1886.7
+            ],
+            "y": [
+              230,
+              370
+            ],
+            "z": [
+              4450,
+              4590
+            ]
+          },
+          "rodaPrincE.cuboD": {
+            "x": [
+              -1813.3,
+              -1703.3
+            ],
+            "y": [
+              230,
+              370
+            ],
+            "z": [
+              4450,
+              4590
+            ]
+          },
+          "rodaPrincD.pneu": {
+            "x": [
+              1740,
+              1960
+            ],
+            "y": [
+              25,
+              575
+            ],
+            "z": [
+              4245,
+              4795
+            ]
+          },
+          "rodaPrincD.disco": {
+            "x": [
+              1813.3,
+              1886.7
+            ],
+            "y": [
+              135,
+              465
+            ],
+            "z": [
+              4355,
+              4685
+            ]
+          },
+          "rodaPrincD.cuboE": {
+            "x": [
+              1886.7,
+              1996.7
+            ],
+            "y": [
+              230,
+              370
+            ],
+            "z": [
+              4450,
+              4590
+            ]
+          },
+          "rodaPrincD.cuboD": {
+            "x": [
+              1703.3,
+              1813.3
+            ],
+            "y": [
+              230,
+              370
+            ],
+            "z": [
+              4450,
+              4590
+            ]
+          },
+          "pernaPrincE": {
+            "x": [
+              -1752,
+              -1650
+            ],
+            "y": [
+              599.7,
+              940.3
+            ],
+            "z": [
+              4470,
+              4570
+            ]
+          },
+          "pernaPrincD": {
+            "x": [
+              1650,
+              1752
+            ],
+            "y": [
+              599.7,
+              940.3
+            ],
+            "z": [
+              4470,
+              4570
+            ]
+          },
+          "pistaoPrincE": {
+            "x": [
+              -1735.8,
+              -1669.5
+            ],
+            "y": [
+              299.9,
+              600.1
+            ],
+            "z": [
+              4487.5,
+              4552.5
+            ]
+          },
+          "pistaoPrincD": {
+            "x": [
+              1669.5,
+              1735.8
+            ],
+            "y": [
+              299.9,
+              600.1
+            ],
+            "z": [
+              4487.5,
+              4552.5
+            ]
+          },
+          "atuadorPrincE": {
+            "x": [
+              -1651.4,
+              -994.6
+            ],
+            "y": [
+              745.1,
+              854.9
+            ],
+            "z": [
+              4495.5,
+              4674.5
+            ]
+          },
+          "atuadorPrincD": {
+            "x": [
+              994.6,
+              1651.4
+            ],
+            "y": [
+              745.1,
+              854.9
+            ],
+            "z": [
+              4495.5,
+              4674.5
+            ]
+          }
+        }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-trens-principais.esboco.json",
+        "tolerancia_mm": 30,
+        "falta": []
+      }
+    }
+  ],
+  "alteracoes": [],
+  "marcos": [
+    {
+      "limiar": 25,
+      "custoFeito": 22,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
+    },
+    {
+      "limiar": 50,
+      "custoFeito": 38,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice",
+        "asas",
+        "empenagem-horizontal"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
+    },
+    {
+      "limiar": 75,
+      "custoFeito": 51,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice",
+        "asas",
+        "empenagem-horizontal",
+        "empenagem-vertical",
+        "trem-do-nariz"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
+    },
+    {
+      "limiar": 100,
+      "custoFeito": 65,
+      "custoTotal": 65,
+      "unidades": [
+        "fuselagem",
+        "motor",
+        "helice",
+        "asas",
+        "empenagem-horizontal",
+        "empenagem-vertical",
+        "trem-do-nariz",
+        "trens-principais"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
+    }
+  ],
+  "avisos": [],
+  "opcao": "Monomotor turboélice",
+  "notasDePassagem": {
+    "fuselagem": "Porta e batente são lofts que seguem o flanco (5 mm salientes, sem giro); o ombro da cabine tem raio 200/230 para a porta caber no trecho plano. Cauda de 580 mm em z 9250, calota até 10452; juntas estab 160 e profundor 80.",
+    "motor": "Capô oco (casca 20, aberta no lábio): o cone toca o anel do lábio por tolerância (28 mm), não afinar a casca. Duto preto assenta no piso e acaba na parede de trás. Escapes em y 1325 e menores, pelo Envelope. Ventre y≈797 mantido.",
+    "helice": "Plano das pás em z 485: a pá chega a z 550, 50 mm à frente do lábio (z 600), acima dos 30 mm de contato, e só o cone e a placa (r 240) tocam o capô. Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT). Ponta em r 1150.",
+    "asas": "Perfil poligonal convexo (hinge a 70% da corda, fresta 15, eixos de 30). Flap interno (-830..-3130) e aileron externo (-3170..-5800) como no topo.png, não como na maquete. Ponta levantada pela curva de cy e t, em um só loft.",
+    "empenagem-horizontal": "Perfil NACA 0012 em polígono convexo: estab até a dobradiça (61% da corda), profundor com fresta 15; centros das seções em reta (ehZ, ehY) para o eixo sair reto. Ponteira fecha as duas pontas desde x -2285. Suportes a 450 e 1700 da raiz.",
+    "empenagem-vertical": "Perfil simétrico em polígono convexo, 10% de espessura sobre a corda cheia (deriva, fresta 15, leme). O centro das seções do leme é o eixo da dobradiça, reta. Bota e ponteira seguem dvC, dvT e dvZ; deriva até y 4170, ponteira até 4200.",
+    "trem-do-nariz": "Trem gira em torno do eixo x em tnP; tnCurso 0 é estendido. Gate limpo de 0 a 85 graus, folga mínima de 34 mm ao capô em 80; de 90 a roda entra no ventre, e falta a baia (atrito 26). Atuador em x -135 para a roda passar.",
+    "trens-principais": "Trem gira em z por tpCurso (0 estendido, 83 recolhido com a roda deitada, gate limpo até 87). A baia é casca sob a asa por falta de subtração (teto 900, -7,5 graus). Roda de 480 mm pela referência; pivô y 775, perna curta."
+  },
+  "vereditos": [
+    {
+      "ordem": 1,
+      "unidade": "fuselagem",
+      "nota": 8,
+      "motivo": "Sem ponta no ar e contatos coerentes com o texto. Fica a porta ambígua: o lado esquerdo não se confirma entre as vistas, na lateral ela cai no meio do casco com uma janela dentro do contorno, e na superior há marcas escuras além do flanco (x≈517, y 618 a 655), como se a porta saísse da superfície; a cauda termina em agulha que a vista não explica."
+    },
+    {
+      "ordem": 2,
+      "unidade": "motor",
+      "nota": 5,
+      "motivo": "Defeito estrutural: a entrada de ar, que a função põe sob o cone da hélice, não aparece como abertura em nenhuma vista; só há uma lasca escura sob o corpo, recuada da face da frente (lateral x≈620-775, y≈745-768), e uma placa cinza chapada no dorso traseiro, sem profundidade, que lê como ladrilho colado. O capô tem faixas de sombreamento em degraus no dorso e nos flancos. Os escapes saem do flanco em balanço, com a ponta traseira a cerca de 160 mm do corpo, embora o texto diga pontas livres: nenhuma."
+    },
+    {
+      "ordem": 3,
+      "unidade": "motor",
+      "nota": 6,
+      "motivo": "Defeito estrutural: a entrada de ar existe como cunha cinza no ventre, rente à proa (lateral x≈612-800, y≈740-768), mas nenhuma vista mostra boca nem duto, e no corte x=0 o capô acima dela é maciço, sem cavidade; a cunha lê como carenagem de ventre. Sobram, sem explicação na função, três blocos salientes por flanco na metade traseira, uma saliência no dorso que só a isométrica mostra e um retângulo escuro no corte perto da proa (x≈765-777). Resta bandeado leve no alto do flanco da lateral. Escapes e placa do dorso resolvidos."
+    },
+    {
+      "ordem": 4,
+      "unidade": "motor",
+      "nota": 8,
+      "motivo": "Defeitos estruturais anteriores resolvidos: capô oco aberto na frente, duto da entrada de ar no piso com boca, sem cunha de ventre nem saliência no dorso. Restam detalhes: as venezianas são caixas escuras salientes sem abertura para a cavidade (lateral x≈447-527), e dois tracinhos no rodapé da frontal (x≈498 e 602) sugerem o duto aflorando na parede de trás. As quatro vistas externas não mostram a boca; só os cortes."
+    },
+    {
+      "ordem": 5,
+      "unidade": "helice",
+      "nota": 7,
+      "motivo": "Defeito estrutural: a pá pa2 encosta no lábio inferior do capô (corte x=0 e lateral, região 672-678, 735-745), e uma pá que gira não pode tocar o capô parado; o texto de ligações também dá pa2 em capo. Detalhe: o perfil das pás é chapa inclinada com quinas vivas e degrau serrilhado entre estações (corte y=2108 com zoom), silhueta poligonal com pontas cegas; a placa traseira não se distingue do cone."
+    },
+    {
+      "ordem": 6,
+      "unidade": "marco-25",
+      "nota": 7,
+      "motivo": "Defeito estrutural na fuselagem: a porta traseira esquerda que a função exige não é legível em nenhuma vista (o trapézio com janela da lateral coincide com a projeção da asa) e marcas escuras saem além do flanco esquerdo na superior (x≈517, y≈618 a 655). A cauda afina em agulha (cerca de 10 px de largura em y≈780 na superior do objeto) exatamente onde os estabilizadores se prendem. No capô, as venezianas são blocos escuros que saem da silhueta, sem abertura, e a boca da entrada de ar não aparece nas vistas externas. Hélice e rodas sem defeito visível."
+    },
+    {
+      "ordem": 7,
+      "unidade": "helice",
+      "nota": 8,
+      "motivo": "Contato da pá com o lábio do capô resolvido (vão de 40 a 50 mm no corte x=0) e placa traseira distinta do cone. Restam só defeitos de superfície nas pás: a seção é tira fina inclinada de espessura constante e quinas vivas, com degrau no contorno (corte y=2108 com zoom), e a silhueta frontal tem cotovelos retos e pontas truncadas; não lê como perfil torcido."
+    },
+    {
+      "ordem": 8,
+      "unidade": "marco-25",
+      "nota": 7,
+      "motivo": "Defeito estrutural: a cauda continua um tubo fino (cerca de 14 px de largura em y≈780 na superior, ponta chata em y≈820) justo onde se prendem os estabilizadores de 184 px de envergadura. A porta esquerda segue ilegível nas vistas gerais; nos cortes, a ponta superior da placa fica 35 a 45 mm fora da curva do ombro (corte z=5940) e o bloco da janela 4 sobe acima da linha do casco, fora do contorno da porta (corte x=-770). No corte z=640 os cantos inferiores do duto se sobrepõem à parede do capô. Pontas das pás chanfradas e chapadas. A pá já não toca o capô."
+    },
+    {
+      "ordem": 9,
+      "unidade": "fuselagem",
+      "nota": 7,
+      "motivo": "Defeito estrutural: no corte x=-770 um corpo escuro (x 498 a 622, y 405 a 440, com faixa fina até x=690) sobe cerca de 12 px acima do topo da placa da porta e do topo do casco, sem explicação. A placa da porta tem só cerca de 92 mm no corte x=-770 e termina numa parede vertical do casco, sem bater com a extensão que a superior mostra (y 618 a 690); ela fica saliente uns 45 mm do flanco, e não rebaixada. A cauda termina em agulha de cerca de 10 px com fim reto, já apontada antes. As quatro vistas não mostram o lado esquerdo."
+    },
+    {
+      "ordem": 10,
+      "unidade": "motor",
+      "nota": 8,
+      "motivo": "Capô oco, abertura em torno do cone e duto com boca resolvidos e legíveis nos cortes. Restam detalhes de superfície já apontados: as venezianas são três marcas escuras cheias sem abertura legível (lateral x≈710-725, y≈630-636), e dois tracinhos no rodapé da frontal (x≈498 e 602, y≈808) sugerem o duto aflorando na parede de trás."
+    },
+    {
+      "ordem": 11,
+      "unidade": "fuselagem",
+      "nota": 7,
+      "motivo": "Defeito estrutural: a placa da porta é plana sobre um flanco que se estreita 2 a 3 graus; rente em z=5600, mas em z=6300 a face externa fica cerca de 50 mm fora do casco e só o batente preenche o vão. No corte x=-780 a janela 4 fica fora do retângulo da placa, sem apoio claro. A cauda fecha agora em ponta arredondada, mas segue haste fina (cerca de 15 por 12 px). Corpo escuro acima do casco e parede vertical da placa resolvidos."
+    },
+    {
+      "ordem": 12,
+      "unidade": "marco-25",
+      "nota": 7,
+      "motivo": "Três defeitos estruturais seguem abertos: a cauda continua um tubo fino (15 a 20 px de largura na superior, 12 px de altura na ponta) onde se prendem estabilizadores de 184 px, agora com ponta arredondada; no corte z=640 os cantos inferiores do duto atravessam a parede do capô, com dois tracinhos no rodapé da frontal; a borda traseira da placa da porta fica cerca de 50 mm fora do casco em z=6300, e o batente sobe uns 10 px acima da placa no corte x=-770. Venezianas sem abertura legível e pás em tira com pontas truncadas. Ombro da placa, janela 4 e fim reto da cauda resolvidos."
+    },
+    {
+      "ordem": 13,
+      "unidade": "asas",
+      "nota": 8,
+      "motivo": "Conjunto simétrico e coerente, sem ponta no ar: flap interno, aileron externo, diedro e ponta levantada legíveis. Detalhes de superfície: o contorno superior da ponta levantada é de segmentos retos com quebras visíveis (corte x-6250), e o bordo de ataque da seção termina em ponta aguda (cortes x-2500 e x-5300). O eixo e a fresta não se leem com clareza nos cortes."
+    },
+    {
+      "ordem": 14,
+      "unidade": "empenagem-horizontal",
+      "nota": 8,
+      "motivo": "Sem defeito estrutural: diedro, afilamento, fresta, dois suportes por lado e encaixe na cauda coerentes com a função. Acabamento da ponteira: contorno externo facetado, traço vertical solto (zoom, x≈553, y≈385 a 465) e marca em gota sem função na lateral sem vizinhos. O eixo não se distingue no corte x=600, e a ponteira cobre a fresta na ponta sem mostrar se o profundor ainda gira."
+    },
+    {
+      "ordem": 15,
+      "unidade": "marco-50",
+      "nota": 8,
+      "motivo": "Conjunto simétrico, preso e sem ponta no ar, sem defeito estrutural. Seguem os acabamentos já apontados: ponta levantada das asas com quina na base da subida e bordo de ataque da raiz em cunha aguda; o eixo das superfícies de comando não se lê em vista nenhuma. A perna do trem principal parece muito curta, com o pneu quase colado sob a asa."
+    },
+    {
+      "ordem": 16,
+      "unidade": "trem-do-nariz",
+      "nota": 8,
+      "motivo": "Sem defeito estrutural: a unidade se prende, gira e recolhe sem atravessar capô nem fuselagem nos cortes de 45 e 80 graus. Detalhe de superfície: o cilindro amarelo do amortecedor é facetado na frontal e na superior. Folgas quase nulas, não confirmáveis nas vistas, entre pneu e coroa, pé do garfo e cubo, e atuador e perna do garfo; a haste do atuador não parece telescopar entre as poses."
+    },
+    {
+      "ordem": 17,
+      "unidade": "marco-75",
+      "nota": 8,
+      "motivo": "Nenhuma ponta no ar, travessia ou peça fora do lugar visível na empenagem vertical e no trem do nariz, depois de o crítico saber que a frontal olha pela cauda (o leme à frente da deriva saiu da lista). Não se distinguem nas vistas o eixo e os suportes da dobradiça do leme, a ponteira cinza e o cubo da roda do nariz; os pneus apoiam no mesmo nível."
+    },
+    {
+      "ordem": 18,
+      "unidade": "trens-principais",
+      "nota": 8,
+      "motivo": "Trem recolhível coerente, sem pontas no ar nem travessias ao longo do curso 0, 30, 60 e 83. Folga quase nula da roda recolhida: o cubo e a base do garfo saem 2 a 3 px abaixo da borda da baia e a roda fica a cerca de 4 px da parede interna (cursos 83). A perna é curta para a roda, e a baia tem marcas que as vistas não explicam (ponto no teto, linhas tracejadas na lateral)."
+    },
+    {
+      "ordem": 19,
+      "unidade": "marco-100",
+      "nota": 8,
+      "motivo": "Sem defeito estrutural: trens principais coerentes em todo o curso de 0 a 83 graus, rodas nas três no mesmo nível de apoio, nada solto nem atravessado. Restam folgas apertadas com a roda deitada (cerca de 20 a 30 mm), a ponta do eixo rente à borda da baia, estabilizador e profundor no mesmo laranja, e os rótulos frontal e lateral das vistas da unidade parecem trocados em relação às gerais."
+    }
+  ],
+  "liberacoes": [
+    {
+      "ordem": 1,
+      "unidade": "marco-25",
+      "nota": 7,
+      "rodadas": 3,
+      "aposVeredito": 12,
+      "motivo": "a pessoa, 2026-10-12: pode fazer assim como você recomendou sim. Aceita com pendências: porta plana sobre flanco que se estreita (atrito 26), duto encostando na parede do capô, venezianas sem abertura, pás em tira; a cauda fica como está, já na largura da referência"
+    },
+    {
+      "ordem": 2,
+      "unidade": "fuselagem",
+      "nota": 7,
+      "rodadas": 3,
+      "aposVeredito": 12,
+      "motivo": "a pessoa, 2026-10-12: pode fazer assim como você recomendou sim. Aceita com pendências: porta plana sobre flanco que se estreita (atrito 26), duto encostando na parede do capô, venezianas sem abertura, pás em tira; a cauda fica como está, já na largura da referência"
+    }
+  ]
+}

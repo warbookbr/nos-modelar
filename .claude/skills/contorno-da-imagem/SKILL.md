@@ -27,6 +27,16 @@ da cintura de cerca de 62% para 90% de concordância com o contorno aprovado.
 O ajuste é sensível, e ligar ou não o realce é decisão que o crítico julga
 pelo resultado.
 
+A silhueta fecha os buracos de fundo cercados por ela até 64 px², o reflexo
+claro logo abaixo da linha do topo da fuselagem do avião (19 x 2 px) que o
+limiar deixava sem dono; o vão de verdade, como a janela vazada ou o espaço entre
+as pás, passa de 64 px² e continua fundo. `"buracoMaximo": <px²>` muda o limite
+e 0 desliga, e o comando imprime quantos buracos fechou. A parte listada em
+`foraDoModelo` sai da silhueta e pode cortá-la, como o corpo escuro sobre a asa
+na frontal do avião: a silhueta guarda então todos os pedaços acima de 9 px² em
+`silhueta.pedacos` (o maior primeiro, e `contornoMm` continua sendo o dele), e
+a prancha e a conferência do esboço medem a união.
+
 Quando o objeto tem mais de uma imagem, declare o papel de cada uma em
 `papeis.json` da pasta `referencias/` (`{ "imagens": { "<imagem>": { "papel": ..., "motivo": ..., "por": ... } } }`):
 `principal` passa por mapa e prancha, `apoio` passa só pelo mapa e dá medidas

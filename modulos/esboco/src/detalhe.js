@@ -1,6 +1,7 @@
 /* Detalhar e integrar uma Unidade de detalhe: `detalharUnidade` devolve um esboço isolado da unidade (as entradas das outras
    unidades com `oculto: true`, o plano mínimo), e `integrarUnidade` troca no mestre as entradas da unidade pelas do esboço
-   detalhado, mantendo parâmetros, pontos, juntas e pares que continuam valendo e removendo os que citam formas que saíram.
+   detalhado, levando ao mestre o que o detalhe reescreveu (parâmetros e pontos da unidade, `funcao`, juntas e pares apagados,
+   `tocam` e `livres` do contrato do plano) e removendo o que cita formas que saíram.
    O mestre e o detalhado são JSON bruto (com instâncias, espelhos, arranjos e parâmetros, como a pessoa os escreveu). Puro:
    não lê nem grava arquivo, e não muda o que recebe. */
 import { ErroDeEsboco, resolverOpcao } from './index.js';
@@ -74,6 +75,28 @@ function limiaresDoMestre(esboco) {
   return { tolerancia: daOpcao?.tolerancia ?? raiz?.tolerancia ?? p.padraoTol, penetracao: daOpcao?.penetracao ?? raiz?.penetracao ?? p.padraoPen, folga: daOpcao?.folga ?? raiz?.folga ?? p.padraoFolga };
 }
 
+const listaDe = (c, campo) => (Array.isArray(c?.[campo]) ? clone(c[campo]) : []);
+
+/* O que o mestre tem agora e o detalhe pode reescrever: os parâmetros e os pontos que valem, as juntas e os pares do contato (da
+   raiz e da primeira opção), `tocam` e `livres` do contrato do plano, a `funcao` da unidade e o `curso` dos mecanismos (só quando o mestre o declara). */
+function fatiaDoMestre(bruto, unidade) {
+  const c = bruto?.plano?.contrato;
+  return {
+    parametros: efetivos(bruto, 'parametros'),
+    pontos: efetivos(bruto, 'pontos'),
+    contato: { raiz: { juntas: listaDe(bruto?.contato, 'juntas'), pares: listaDe(bruto?.contato, 'pares') }, opcao: { juntas: listaDe(bruto?.opcoes?.[0]?.contato, 'juntas'), pares: listaDe(bruto?.opcoes?.[0]?.contato, 'pares') } },
+    plano: { tocam: listaDe(c, 'tocam'), livres: listaDe(c, 'livres') },
+    funcao: typeof bruto?.unidades?.[unidade]?.funcao === 'string' ? bruto.unidades[unidade].funcao : null,
+    ...(objeto(bruto?.curso) ? { curso: clone(bruto.curso) } : {}),
+  };
+}
+
+/* A base que o `--detalhar` grava no detalhe (`baseDoMestre`): a fatia do mestre de onde a cópia saiu. O `--integrar` só apaga
+   ou reescreve o que estava na base e o detalhe mudou; o que o mestre ganhou depois da cópia fica. */
+function baseDoMestre(bruto, unidade) {
+  return { unidade, ...fatiaDoMestre(bruto, unidade) };
+}
+
 /* O esboço isolado da unidade: as entradas dela como estão, as outras com `oculto: true` (só servem de referência de posição),
    só a primeira opção e o plano mínimo. Parâmetros, pontos e contato do mestre ficam; as juntas e os pares que citam formas
    ocultas não reprovam (o gate as ignora). */
@@ -99,6 +122,7 @@ export function detalharUnidade(bruto, estado, nome) {
   d.contato = { ...(objeto(d.contato) ? d.contato : {}) };
   for (const k of ['tolerancia', 'penetracao', 'folga']) if (d.contato[k] === undefined) d.contato[k] = l[k];
   if (onde === 'opcao') { d.opcoes[0].formas = formas; delete d.formas; } else d.formas = formas;
+  d.baseDoMestre = baseDoMestre(bruto, unidade);
   return d;
 }
 
@@ -143,19 +167,88 @@ export function comFormasVizinhas(isolado, ids) {
   return e;
 }
 
-const chaveDoPar = (p) => `${p.a}\u0000${p.b}\u0000${p.tipo}`;
 
-/* Junta os parâmetros e os pontos novos do detalhado aos do mestre: um nome que o mestre já tem fica como está, e se o
-   detalhado o redefine com outro valor é erro (renomeie no detalhado). */
-function juntarNomes(mestre, detalhado, campo) {
-  for (const de of [detalhado, detalhado?.opcoes?.[0]]) {
-    if (!objeto(de?.[campo])) continue;
-    for (const [nome, v] of Object.entries(de[campo])) {
-      const atual = mestre[campo]?.[nome] ?? mestre.opcoes?.[0]?.[campo]?.[nome];
-      if (atual === undefined) { mestre[campo] = { ...(mestre[campo] ?? {}), [nome]: clone(v) }; continue; }
-      exigir(JSON.stringify(atual) === JSON.stringify(v), `o detalhado redefine ${campo === 'parametros' ? 'o parâmetro' : 'o ponto'} "${nome}" (mestre ${JSON.stringify(atual)}, detalhado ${JSON.stringify(v)}): dê outro nome no detalhado`);
-    }
+const IDENTIFICADOR = /[A-Za-z_][A-Za-z0-9_]*/g;
+
+/* Os valores de `parametros` ou de `pontos` que valem no esboço: os da primeira opção sobrepõem os da raiz. */
+const efetivos = (doc, campo) => ({ ...(objeto(doc?.[campo]) ? doc[campo] : {}), ...(objeto(doc?.opcoes?.[0]?.[campo]) ? doc.opcoes[0][campo] : {}) });
+
+/* Acrescenta a `achados` os `nomes` que o valor JSON cita: a "=expressão" cita os identificadores dela, e o texto sem "=" cita o
+   nome quando é o texto inteiro (`"largura": "capoLargA"`). */
+function citarNomes(valor, nomes, achados) {
+  if (typeof valor === 'string') {
+    if (valor.startsWith('=')) { for (const t of valor.match(IDENTIFICADOR) ?? []) if (nomes.has(t)) achados.add(t); } else if (nomes.has(valor)) achados.add(valor);
+  } else if (Array.isArray(valor)) for (const x of valor) citarNomes(x, nomes, achados);
+  else if (objeto(valor)) for (const x of Object.values(valor)) citarNomes(x, nomes, achados);
+}
+
+/* Os nomes que o esboço cita fora dos próprios blocos `parametros` (da raiz e das opções): formas, pontos, contato, plano. */
+function nomesDoEsboco(doc, nomes) {
+  const achados = new Set();
+  const { parametros, ...resto } = doc;
+  void parametros;
+  citarNomes({ ...resto, ...(Array.isArray(resto.opcoes) ? { opcoes: resto.opcoes.map((o) => { if (!objeto(o)) return o; const { parametros: p, ...r } = o; void p; return r; }) } : {}) }, nomes, achados);
+  return achados;
+}
+
+/* `inicial` mais os parâmetros que as definições deles citam, e assim por diante (`escAng` usa `escDx` e `escDz`). */
+function comDependencias(inicial, definicoes, nomes) {
+  const todos = new Set(inicial);
+  const fila = [...inicial];
+  while (fila.length > 0) {
+    const achados = new Set();
+    citarNomes(definicoes[fila.pop()], nomes, achados);
+    for (const a of achados) if (!todos.has(a)) { todos.add(a); fila.push(a); }
   }
+  return todos;
+}
+
+/* O `bruto` sem as entradas da unidade (a lista de formas só com as de fora), para ver o que as outras unidades usam. */
+function semAUnidade(bruto, restantes, onde) {
+  const d = clone(bruto);
+  if (onde === 'opcao') d.opcoes[0].formas = clone(restantes); else d.formas = clone(restantes);
+  return d;
+}
+
+const nomeDaEntrada = (f) => (objeto(f) ? (f.id ?? (f.arranja ? `arranja de ${[f.arranja.forma].flat().join(', ')}` : '?')) : '?');
+
+/* Leva ao mestre os parâmetros (ou pontos) do detalhado. Um nome novo entra. Um nome que o mestre já tem com outro valor vale o
+   do detalhado quando nada fora da unidade o usa (nem por outro parâmetro): o detalhe é onde a unidade se ajusta, e a saída diz
+   o que mudou. Quando formas, pontos ou o contrato de outras unidades usam o nome, o novo valor as moveria sem que a pessoa
+   decidisse, e a integração é recusada com o caminho (editar o mestre, ou dar outro nome no detalhado). Devolve
+   { alterados: [{ nome, de, para }], novos: [nome] }. */
+function juntarNomes(mestre, detalhado, campo, { foraDaUnidade, entradasFora, base }) {
+  const doMestre = efetivos(mestre, campo);
+  const doDetalhe = efetivos(detalhado, campo);
+  const nomes = new Set(Object.keys(doMestre));
+  const ehParametro = campo === 'parametros';
+  const citadosFora = ehParametro ? comDependencias(nomesDoEsboco(foraDaUnidade, nomes), doMestre, nomes) : nomesDoEsboco(foraDaUnidade, nomes);
+  const alterados = [];
+  const novos = [];
+  const compartilhados = [];
+  const daBase = base?.[campo];
+  for (const [nome, v] of Object.entries(doDetalhe)) {
+    /* com a base: o valor que o detalhe tem igual ao da cópia não foi mexido por quem detalhou, e o mestre manda */
+    if (objeto(daBase) && Object.hasOwn(daBase, nome) && igual(daBase[nome], v)) continue;
+    if (!Object.hasOwn(doMestre, nome)) { mestre[campo] = { ...(objeto(mestre[campo]) ? mestre[campo] : {}), [nome]: clone(v) }; novos.push(nome); continue; }
+    if (igual(doMestre[nome], v)) continue;
+    if (citadosFora.has(nome)) { compartilhados.push({ nome, mestre: doMestre[nome], detalhe: v }); continue; }
+    const dono = objeto(mestre.opcoes?.[0]?.[campo]) && Object.hasOwn(mestre.opcoes[0][campo], nome) ? mestre.opcoes[0] : mestre;
+    dono[campo][nome] = clone(v);
+    alterados.push({ nome, de: doMestre[nome], para: v });
+    if (objeto(daBase) && Object.hasOwn(daBase, nome) && !igual(daBase[nome], doMestre[nome])) alterados[alterados.length - 1].mestreTambemMudou = true;
+  }
+  if (compartilhados.length > 0) {
+    const rotulo = ehParametro ? 'o parâmetro' : 'o ponto';
+    const quem = (nome) => {
+      const ids = entradasFora.filter((f) => { const a = new Set(); citarNomes(f, nomes, a); return (ehParametro ? comDependencias(a, doMestre, nomes) : a).has(nome); }).map(nomeDaEntrada);
+      return ids.length === 0 ? 'campos de fora da lista de formas (pontos, contato ou plano)' : `${ids.slice(0, 6).join(', ')}${ids.length > 6 ? ` e mais ${ids.length - 6}` : ''}`;
+    };
+    const linhas = compartilhados.map((c) => `${rotulo} "${c.nome}" (mestre ${JSON.stringify(c.mestre)}, detalhado ${JSON.stringify(c.detalhe)}) também é usado por ${quem(c.nome)}`);
+    const edicoes = compartilhados.map((c) => `--editar <mestre> ${campo}.${c.nome}=${JSON.stringify(c.detalhe)}`);
+    throw new ErroDeEsboco(`integrar: o detalhado muda ${compartilhados.length === 1 ? linhas[0] : `${compartilhados.length} ${ehParametro ? 'parâmetros' : 'pontos'} que outras unidades também usam:\n  - ${linhas.join('\n  - ')}`}, e o novo valor moveria essas formas junto. Se a mudança vale para todas, edite o mestre (${edicoes.join('; ')}) e integre de novo; se vale só para esta unidade, dê outro nome no detalhado e use o novo nome nas formas dela`);
+  }
+  return { alterados, novos };
 }
 
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -163,15 +256,37 @@ const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 /* Devolve ao mestre o que o detalhado muda fora da lista de formas: os `modulos` (módulo novo entra, módulo que o detalhado
    alterou passa a ser o do detalhado) e o `simetrico` da raiz e de cada unidade (o do mestre só muda se ele não tinha). Um
    `simetrico` que o mestre já tem com outro valor é conflito e a integração é recusada, dizendo qual. O que o detalhado
-   apagou não volta (o mestre mantém). Devolve a lista, em texto, do que voltou. */
-function devolverAoMestre(mestre, detalhado) {
+   apagou não volta (o mestre mantém). A `funcao` da unidade integrada, quando o detalhado a reescreve, passa a ser a do mestre:
+   é o texto que os briefs do crítico e do Marco imprimem, e o detalhe é onde a pessoa sabe o que a unidade passou a ter (a das
+   outras unidades, que o detalhado só copia do mestre, não volta). Devolve a lista, em texto, do que voltou. */
+function devolverAoMestre(mestre, detalhado, unidade, base = null) {
   const voltou = [];
+  const funcao = detalhado?.unidades?.[unidade]?.funcao;
+  if (typeof funcao === 'string' && funcao.trim() && !(base && base.funcao === funcao)) {
+    const atual = mestre.unidades?.[unidade]?.funcao;
+    if (atual !== funcao) {
+      mestre.unidades = { ...(objeto(mestre.unidades) ? mestre.unidades : {}), [unidade]: { ...(objeto(mestre.unidades?.[unidade]) ? mestre.unidades[unidade] : {}), funcao } };
+      voltou.push(`"funcao" da unidade "${abreviar(unidade)}" (${atual === undefined ? 'nova' : 'reescrita'}: ${funcao.length > 70 ? `${funcao.slice(0, 69)}…` : funcao})`);
+    }
+  }
   if (objeto(detalhado?.modulos)) {
     for (const [nome, m] of Object.entries(detalhado.modulos)) {
       const atual = objeto(mestre.modulos) ? mestre.modulos[nome] : undefined;
       if (atual !== undefined && igual(atual, m)) continue;
       mestre.modulos = { ...(objeto(mestre.modulos) ? mestre.modulos : {}), [nome]: clone(m) };
       voltou.push(atual === undefined ? `módulo "${nome}" (novo, ${m?.formas?.length ?? 0} formas)` : `módulo "${nome}" (alterado: ${atual?.formas?.length ?? 0} -> ${m?.formas?.length ?? 0} formas, a versão do detalhado substituiu a do mestre)`);
+    }
+  }
+  /* o `curso` que o detalhado declara ou muda (o curso do trem se acerta no detalhe, onde a pessoa vê a unidade; `--curso` varre o
+     detalhe isolado): a entrada nova entra e a que o detalhado reescreve sobre a base passa a ser a dele; a que ele só copiou do mestre
+     fica como o mestre a tem */
+  if (objeto(detalhado?.curso)) {
+    for (const [nome, c] of Object.entries(detalhado.curso)) {
+      const atual = objeto(mestre.curso) ? mestre.curso[nome] : undefined;
+      if (atual !== undefined && igual(atual, c)) continue;
+      if (base && igual(base.curso?.[nome], c)) continue;
+      mestre.curso = { ...(objeto(mestre.curso) ? mestre.curso : {}), [nome]: clone(c) };
+      voltou.push(`curso "${nome}" (${atual === undefined ? 'novo' : 'reescrito'}: ${c.parametro} de ${c.de} a ${c.ate})`);
     }
   }
   const simetria = (onde, atual, nova, grava) => {
@@ -191,19 +306,81 @@ function devolverAoMestre(mestre, detalhado) {
   return voltou;
 }
 
-/* Junta os pares e as juntas do contato do detalhado (na raiz e na opção) ao do mestre, sem repetir. */
-function juntarContato(mestre, detalhado) {
-  const alvo = (m) => { m.contato = objeto(m.contato) ? m.contato : {}; return m.contato; };
-  for (const [de, para] of [[detalhado?.contato, () => alvo(mestre)], [detalhado?.opcoes?.[0]?.contato, () => alvo(mestre.opcoes[0])]]) {
+/* Se o id (de forma, de instância ou padrão com `*`) cita alguma das formas `antigas` da unidade que o detalhe trocou. */
+function citaAntiga(q, antigas) {
+  if (typeof q !== 'string') return false;
+  if (q.includes('*')) { const re = padraoDe(q); return antigas.some((id) => re.test(id)); }
+  return antigas.some((id) => id === q || id.startsWith(`${q}.`));
+}
+
+const textoDaJunta = (j) => (Array.isArray(j?.pecas) ? j.pecas.join(' + ') : JSON.stringify(j));
+const textoDoPar = (p) => `${p?.a} + ${p?.b}`;
+
+/* O que o detalhado muda numa lista de juntas ou de pares, sobre a base e sobre o mestre de agora. Com `base` (a cópia de onde o
+   detalhado saiu): o que estava na base e o detalhado não tem foi apagado por quem detalhou, e só isso sai do mestre (se cita a
+   unidade e o mestre ainda o tem como estava); o que o detalhado tem e a base não tinha foi escrito por quem detalhou e entra
+   (as mesmas peças com outro `max` valem no lugar do antigo); o que o mestre ganhou depois da cópia fica. Sem `base` (detalhe
+   de antes da base): sai o que cita a unidade e o detalhado não tem, e entra o que cita uma forma nova da unidade, que é a
+   regra mais cautelosa que a cópia sem base deixa. Devolve { todos, apagados } (os apagados em texto). */
+function reconciliarLista({ doMestre, doDetalhe, daBase, cita, citaNova, texto, ident }) {
+  const json = (x) => JSON.stringify(x);
+  const noDetalhe = new Set(doDetalhe.map(json));
+  const noMestre = new Set(doMestre.map(json));
+  const apagados = [];
+  const usados = new Set();
+  const todos = [...doMestre];
+  const reescrita = (x, naoAchados) => naoAchados.find((y) => !usados.has(json(y)) && ident(y) === ident(x));
+  if (daBase) {
+    const naBase = new Set(daBase.map(json));
+    const escritos = doDetalhe.filter((y) => !naBase.has(json(y)));
+    for (const r of daBase.filter((b) => !noDetalhe.has(json(b)) && cita(b))) {
+      const k = todos.findIndex((x) => json(x) === json(r));
+      const nova = reescrita(r, escritos);
+      if (nova) usados.add(json(nova));
+      if (k < 0) continue;
+      if (nova) todos[k] = clone(nova); else { todos.splice(k, 1); apagados.push(texto(r)); }
+    }
+    for (const y of escritos) {
+      if (usados.has(json(y)) || todos.some((x) => json(x) === json(y) || ident(x) === ident(y))) continue;
+      todos.push(clone(y));
+    }
+    return { todos, apagados };
+  }
+  const novosDoDetalhe = doDetalhe.filter((y) => !noMestre.has(json(y)));
+  const fica = [];
+  for (const x of doMestre) {
+    if (noDetalhe.has(json(x)) || !cita(x)) { fica.push(x); continue; }
+    const nova = reescrita(x, novosDoDetalhe);
+    if (nova) { fica.push(clone(nova)); usados.add(json(nova)); } else apagados.push(texto(x));
+  }
+  for (const y of novosDoDetalhe) {
+    if (usados.has(json(y)) || !citaNova(y)) continue;
+    if (!fica.some((x) => ident(x) === ident(y))) fica.push(clone(y));
+  }
+  return { todos: fica, apagados };
+}
+
+/* Põe no contato (raiz e primeira opção) do mestre o que o detalhado declara de juntas e de pares, e tira o que o detalhado
+   apagou (ver `reconciliarLista`). O detalhado sem `contato` (a raiz ou a opção) não fala de contato naquele nível. Devolve as
+   juntas e os pares apagados, em texto. */
+function reconciliarContato(mestre, detalhado, antigas, novasDaUnidade, base) {
+  const apagados = { juntas: [], pares: [] };
+  for (const [de, dono, nivel] of [[detalhado?.contato, mestre, 'raiz'], [detalhado?.opcoes?.[0]?.contato, mestre.opcoes[0], 'opcao']]) {
     if (!objeto(de)) continue;
-    for (const [campo, chave] of [['pares', chaveDoPar], ['juntas', (j) => JSON.stringify(j)]]) {
-      if (!Array.isArray(de[campo])) continue;
-      const c = para();
-      const tem = new Set((c[campo] ?? []).map(chave));
-      const novos = de[campo].filter((x) => !tem.has(chave(x))).map(clone);
-      if (novos.length) c[campo] = [...(c[campo] ?? []), ...novos];
+    const dosIds = (ids) => [(p) => citaAntiga(p?.a, ids) || citaAntiga(p?.b, ids), (j) => (Array.isArray(j?.pecas) ? j.pecas.some((q) => citaAntiga(q, ids)) : false)];
+    const [citaPar, citaJunta] = dosIds(antigas);
+    const [citaNovaPar, citaNovaJunta] = dosIds(novasDaUnidade);
+    for (const [campo, cita, citaNova, texto, ident] of [['pares', citaPar, citaNovaPar, textoDoPar, (x) => `${[x?.a, x?.b].sort().join('|')}|${x?.tipo}`], ['juntas', citaJunta, citaNovaJunta, textoDaJunta, (x) => (Array.isArray(x?.pecas) ? [...x.pecas].sort().join('|') : JSON.stringify(x))]]) {
+      const doDetalhe = Array.isArray(de[campo]) ? de[campo] : [];
+      const doMestre = Array.isArray(dono.contato?.[campo]) ? dono.contato[campo] : [];
+      const daBase = Array.isArray(base?.contato?.[nivel]?.[campo]) ? base.contato[nivel][campo] : null;
+      if (doMestre.length === 0 && doDetalhe.length === 0) continue;
+      const r = reconciliarLista({ doMestre, doDetalhe, daBase, cita, citaNova, texto, ident });
+      apagados[campo].push(...r.apagados);
+      if (r.todos.length > 0) { dono.contato = objeto(dono.contato) ? dono.contato : {}; dono.contato[campo] = r.todos; } else if (objeto(dono.contato)) delete dono.contato[campo];
     }
   }
+  return apagados;
 }
 
 const padraoDe = (q) => new RegExp(`^${q.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
@@ -247,6 +424,75 @@ function comContatoSaneado(doc) {
   return d;
 }
 
+const mesmoPar = (p, q) => { const f = (x) => (Array.isArray(x) ? x : [x?.a, x?.b]); const [a, b] = f(p); const [c, d] = f(q); return (a === c && b === d) || (a === d && b === c); };
+const textoDoParDoPlano = (p) => (Array.isArray(p) ? p.join(' + ') : textoDoPar(p));
+
+/* `plano.contrato.tocam` e `livres` do mestre quando o detalhado declara os dele no `plano` mínimo: o detalhe diz quem toca
+   quem depois de trocada a unidade (o trem principal da maquete tocava a asa pela perna, e o detalhe a toca pela baia). Para
+   cada lista que o detalhado traz (até a lista vazia), os pares do mestre que citam uma forma da unidade e não estão nela
+   saem, e os pares dela que citam uma forma nova da unidade e que o mestre não tem entram. O detalhado sem `plano.contrato.tocam`
+   não mexe nos `tocam` do mestre. Com a base do `--detalhar`, sai só o par que estava nela e a lista do detalhado tirou, entra o
+   par que a lista tem e a base não tinha, e o que o mestre ganhou depois fica. Devolve { tirados, postos } em texto. */
+function reconciliarContratoDoPlano(mestre, detalhado, antigas, novasDaUnidade, base) {
+  const saida = { tirados: [], postos: [] };
+  const dc = detalhado?.plano?.contrato;
+  if (!objeto(dc) || !objeto(mestre.plano)) return saida;
+  const ids = (p) => (Array.isArray(p) ? p : [p?.a, p?.b]);
+  for (const chave of ['tocam', 'livres']) {
+    if (!Array.isArray(dc[chave])) continue;
+    mestre.plano.contrato = objeto(mestre.plano.contrato) ? mestre.plano.contrato : {};
+    const atuais = Array.isArray(mestre.plano.contrato[chave]) ? mestre.plano.contrato[chave] : [];
+    const daBase = Array.isArray(base?.plano?.[chave]) ? base.plano[chave] : null;
+    const tem = (lista, p) => lista.some((q) => mesmoPar(p, q));
+    const cita = (p) => ids(p).some((q) => citaAntiga(q, antigas));
+    let fica;
+    let novos;
+    if (daBase) {
+      /* a base diz o que a lista do detalhado tirou e o que escreveu; o resto do mestre fica */
+      const tiradosPelaPessoa = daBase.filter((p) => cita(p) && !tem(dc[chave], p));
+      fica = atuais.filter((p) => !tem(tiradosPelaPessoa, p));
+      novos = dc[chave].filter((q) => !tem(daBase, q) && !tem(atuais, q));
+    } else {
+      fica = atuais.filter((p) => !cita(p) || tem(dc[chave], p));
+      novos = dc[chave].filter((q) => !tem(atuais, q) && ids(q).some((id) => citaAntiga(id, novasDaUnidade)));
+    }
+    for (const p of atuais) if (!fica.includes(p)) saida.tirados.push(`${chave} ${textoDoParDoPlano(p)}`);
+    for (const q of novos) saida.postos.push(`${chave} ${textoDoParDoPlano(q)}`);
+    const todos = [...fica, ...novos.map(clone)];
+    if (todos.length > 0 || Array.isArray(mestre.plano.contrato[chave])) mestre.plano.contrato[chave] = todos;
+  }
+  return saida;
+}
+
+/* Os pares de `plano.contrato` (tocam, livres, simetricas) que citam um id que não existe mais no mestre integrado: não são
+   removidos (o contrato é exigência da pessoa), só acusados. O id pode ser forma, instância, padrão com `*` ou unidade. */
+function contratoComIdAusente(mestre, formas, unidades) {
+  const ids = formas.map((f) => f.id);
+  const instancias = new Set(formas.map((f) => f.daInstancia?.id).filter(Boolean));
+  const existe = (q) => typeof q !== 'string' || ids.includes(q) || instancias.has(q) || unidades.includes(q) || ids.some((id) => id.startsWith(`${q}.`)) || (q.includes('*') && ids.some((id) => padraoDe(q).test(id)));
+  const achados = [];
+  for (const chave of ['tocam', 'livres', 'simetricas']) {
+    for (const p of Array.isArray(mestre.plano?.contrato?.[chave]) ? mestre.plano.contrato[chave] : []) {
+      const par = Array.isArray(p) ? p : [p?.a, p?.b];
+      const falta = par.filter((q) => !existe(q));
+      if (falta.length > 0) achados.push(`plano.contrato.${chave} cita ${falta.map((q) => `"${q}"`).join(' e ')}, que não existe mais (${textoDoParDoPlano(p)}); reescreva o par no \`plano.contrato\` do detalhado e integre de novo, ou edite o mestre`);
+    }
+  }
+  return achados;
+}
+
+/* Quanto o parâmetro valia para quem o usava: os que saíram do mestre (e o que valiam) e os que ficaram sem uso desde antes. */
+function parametrosSemUso(bruto, mestre) {
+  const defs = efetivos(mestre, 'parametros');
+  const nomes = new Set(Object.keys(defs));
+  const defsAntes = efetivos(bruto, 'parametros');
+  const nomesAntes = new Set(Object.keys(defsAntes));
+  const depois = comDependencias(nomesDoEsboco(mestre, nomes), defs, nomes);
+  const antes = comDependencias(nomesDoEsboco(bruto, nomesAntes), defsAntes, nomesAntes);
+  const sem = [...nomes].filter((n) => !depois.has(n));
+  return { saem: sem.filter((n) => antes.has(n) && Object.hasOwn(defsAntes, n)), semUso: sem.filter((n) => !(antes.has(n) && Object.hasOwn(defsAntes, n))) };
+}
+
 /* Troca, no mestre, as entradas da unidade pelas visíveis do detalhado (as com `oculto: true` só são referência). Devolve
    { mestre, estado, envelope, removidos, formas }: o mestre novo, o estado do Condutor com a unidade no mesmo lugar (os
    membros dela passam a ser as formas novas, o Envelope da maquete continua e ganha o resultado da conferência contra o
@@ -275,10 +521,14 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
   });
   exigir(posto, `integrar: a unidade "${unidade}" não tem entrada no esboço para trocar`);
   if (onde === 'opcao') mestre.opcoes[0].formas = nova; else mestre.formas = nova;
-  juntarNomes(mestre, detalhado, 'parametros');
-  juntarNomes(mestre, detalhado, 'pontos');
-  juntarContato(mestre, detalhado);
-  const devolvidos = devolverAoMestre(mestre, detalhado);
+  /* as formas que a troca tira: as expandidas da unidade e os ids das entradas dela (a instância, o arranjo) */
+  const antigas = [...new Set([...u.membros, ...lista.flatMap((f, k) => (tipo[k] === 'dentro' && objeto(f) && typeof f.id === 'string' ? [f.id] : []))])];
+  const restantes = lista.filter((f, k) => tipo[k] !== 'dentro');
+  /* a base de onde o detalhado saiu, quando é desta unidade; o detalhado de antes dela vale como valia, com o aviso */
+  const base = objeto(detalhado.baseDoMestre) && detalhado.baseDoMestre.unidade === unidade ? detalhado.baseDoMestre : null;
+  const contexto = { foraDaUnidade: semAUnidade(bruto, restantes, onde), entradasFora: restantes, base };
+  const parametros = juntarNomes(mestre, detalhado, 'parametros', contexto);
+  const pontos = juntarNomes(mestre, detalhado, 'pontos', contexto);
   /* as referências: o que resta do contato vale só para formas que existem */
   const provisorio = clone(mestre);
   for (const c of [provisorio.contato, provisorio.opcoes[0].contato]) if (objeto(c)) { delete c.pares; delete c.juntas; }
@@ -287,7 +537,22 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
     if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`integrar: o esboço com a unidade "${unidade}" trocada não expande: ${e.message}`);
     throw e;
   }
+  const outras = new Set(unidades.filter((x) => x.id !== unidade).flatMap((x) => x.membros));
+  const visiveisDepois = depois.opcoes[0].formas.filter((f) => f.oculto !== true).map((f) => f.id);
+  const formas = visiveisDepois.filter((id) => !outras.has(id));
+  /* o que é da unidade: as formas que saem e as que entram (o detalhe só decide o que cita uma delas) */
+  const daUnidade = [...new Set([...antigas, ...formas, ...novas.flatMap((f) => (objeto(f) && typeof f.id === 'string' ? [f.id] : []))])];
+  const novasDaUnidade = daUnidade.filter((id) => !antigas.includes(id));
+  const apagados = reconciliarContato(mestre, detalhado, daUnidade, novasDaUnidade, base);
+  const contrato = reconciliarContratoDoPlano(mestre, detalhado, daUnidade, novasDaUnidade, base);
+  const devolvidos = devolverAoMestre(mestre, detalhado, unidade, base);
   const removidos = limparContato(mestre, depois.opcoes[0].formas);
+  /* o parâmetro que só a unidade trocada usava e que o detalhe deixou de usar sai; o que já estava sem uso fica e é acusado */
+  const { saem, semUso } = parametrosSemUso(bruto, mestre);
+  const retirados = [];
+  for (const n of saem) for (const c of [mestre, mestre.opcoes?.[0]]) {
+    if (objeto(c?.parametros) && Object.hasOwn(c.parametros, n)) { if (!retirados.some((r) => r.nome === n)) retirados.push({ nome: n, valor: c.parametros[n] }); delete c.parametros[n]; if (Object.keys(c.parametros).length === 0) delete c.parametros; }
+  }
   let expandido;
   try {
     expandido = expandirEsboco(mestre);
@@ -296,9 +561,21 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
     if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`integrar: o esboço com a unidade "${unidade}" trocada não resolve (alguma forma de outra unidade cita uma forma que saiu?): ${e.message}`);
     throw e;
   }
-  const visiveis = expandido.opcoes[0].formas.filter((f) => f.oculto !== true).map((f) => f.id);
-  const outras = new Set(unidades.filter((x) => x.id !== unidade).flatMap((x) => x.membros));
-  const formas = visiveis.filter((id) => !outras.has(id));
+  /* o que o mestre mudou entre o `--detalhar` e agora, na fatia que o detalhe pode reescrever */
+  const mudouDesde = [];
+  if (base) {
+    const agora = fatiaDoMestre(bruto, unidade);
+    const nomesQueMudaram = (a, b) => [...new Set([...Object.keys(a), ...Object.keys(b)])].filter((n) => !igual(a[n], b[n]));
+    const pars = nomesQueMudaram(agora.parametros, base.parametros ?? {});
+    const pts = nomesQueMudaram(agora.pontos, base.pontos ?? {});
+    if (pars.length) mudouDesde.push(`parâmetros (${pars.slice(0, 8).join(', ')}${pars.length > 8 ? `, e mais ${pars.length - 8}` : ''})`);
+    if (pts.length) mudouDesde.push(`pontos (${pts.slice(0, 8).join(', ')})`);
+    for (const nivel of ['raiz', 'opcao']) for (const campo of ['juntas', 'pares']) if (!igual(agora.contato[nivel][campo], base.contato?.[nivel]?.[campo] ?? [])) mudouDesde.push(`${campo} do contato${nivel === 'opcao' ? ' da opção' : ''}`);
+    for (const campo of ['tocam', 'livres']) if (!igual(agora.plano[campo], base.plano?.[campo] ?? [])) mudouDesde.push(`plano.contrato.${campo}`);
+    if (agora.funcao !== (base.funcao ?? null)) mudouDesde.push('funcao da unidade');
+    if (!igual(agora.curso ?? {}, base.curso ?? {})) mudouDesde.push('curso');
+  }
+  const avisos = contratoComIdAusente(mestre, expandido.opcoes[0].formas, unidades.map((x) => x.id));
   let envelope = null;
   if (u.envelope) envelope = conferirEnvelope(bruto, { ...(estado ?? {}), unidades }, unidade, comContatoSaneado(detalhado));
   let novoEstado = null;
@@ -313,5 +590,5 @@ export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'det
     if (envelope) novoEstado = registrarEnvelope(novoEstado, envelope, arquivo);
     sincronizarAvisoDeCiclo(novoEstado);
   }
-  return { mestre, estado: novoEstado, envelope, removidos, formas, devolvidos };
+  return { mestre, estado: novoEstado, envelope, removidos, formas, devolvidos, base: { presente: base !== null, mudouDesde }, parametros: { alterados: parametros.alterados, novos: parametros.novos, retirados, semUso }, pontos, apagados, contrato, avisos };
 }

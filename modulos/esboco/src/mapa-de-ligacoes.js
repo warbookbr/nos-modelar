@@ -1,6 +1,7 @@
 /* O mapa de ligações de uma opção, em texto (`--ligacoes`): quem toca quem, em quantos pontos distintos, as pontas livres e as
    unidades presas a nada. Os pontos distintos seguem a regra do `plano.contrato.fixa` (os pontos de contato separados por mais
-   de uma tolerância, agrupados em cadeia), e a ponta livre é o achado do gate de contato, que aqui vale mesmo com o contato
+   de uma tolerância, agrupados em cadeia), menos a face: o `fixa` conta como plano (três pontos) a face que cobre a peça presa, e o mapa, que
+   é simétrico e não tem peça presa, conta o local de cada par de peças. A ponta livre é o achado do gate de contato, que aqui vale mesmo com o contato
    desligado. Não desenha nem grava nada. Puro: recebe o JSON declarado e, opcionalmente, a lista de unidades do Condutor. */
 import { ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';

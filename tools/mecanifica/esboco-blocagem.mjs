@@ -19,6 +19,7 @@ import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, detalharUnidade, formasVizinhas }
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { ErroDoTradutor, traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compilarAndaime } from '../../src/autoria/medir-blocagem-nivel-zero.js';
+import './esboco-familias.mjs';
 
 const porExtenso = (ids, n = 8) => `${ids.slice(0, n).join(', ')}${ids.length > n ? ', ...' : ''}`;
 
@@ -40,12 +41,34 @@ function aparenciaDo(formas) {
   return { cor: f.cor, ...(f.opacidade !== undefined ? { opacidade: f.opacidade } : {}) };
 }
 
+/* Quanto o sólido externo de um loft de seção inclinada pode mudar de volume, em fração do volume do esboço, para a blocagem o
+   desenhar. O tradutor leva a seção inclinada da ponta ao plano perpendicular ao eixo, no ponto mais extremo dela, e declara a
+   perda em `perdas`; até aqui a forma continua a mesma (a caçamba do carrinho, 10,1%, na vista de lado fica em 0,9554 de IoU).
+   Acima disso a blocagem desenharia outra forma (o teto inclinado da baia do trem principal, 18,3%, deixa a baia 19% maior na vista
+   de frente, IoU 0,84), e o loft fica sem equivalente, como o tradutor já faz com a forma que gira em dois eixos. */
+export const MUDANCA_MAXIMA_POR_INCLINACAO = 0.15;
+
+/* O tradutor com o que a inclinação deforma demais fora do andaime: as formas cuja perda `inclinacao` passa do limite viram
+   `naoTraduzidas`, e o andaime é refeito sem elas. */
+function traduzirSemInclinacaoExcessiva(dados) {
+  const traducao = traduzirFormasParaAndaime(dados);
+  const excessivas = traducao.perdas.filter((p) => p.perdido.some((d) => d.codigo === 'inclinacao') && Math.abs((p.erroVolumeExterno ?? p.erroVolume).relativo) > MUDANCA_MAXIMA_POR_INCLINACAO);
+  if (excessivas.length === 0) return traducao;
+  const ids = new Set(excessivas.map((p) => p.id));
+  const refeita = traduzirFormasParaAndaime({ ...dados, formas: dados.formas.map((f) => (ids.has(f.id) ? { ...f, oculto: true } : f)) });
+  const recusadas = excessivas.map((p) => ({
+    id: p.id, tipo: p.tipo,
+    motivo: `a seção inclinada da ponta, levada ao plano perpendicular ao eixo, muda o volume em ${Math.round(Math.abs((p.erroVolumeExterno ?? p.erroVolume).relativo) * 1000) / 10}% (o limite é ${MUDANCA_MAXIMA_POR_INCLINACAO * 100}%), e a N2 não inclina a seção`,
+  }));
+  return { ...refeita, naoTraduzidas: [...refeita.naoTraduzidas, ...recusadas], ocultas: refeita.ocultas.filter((id) => !ids.has(id)) };
+}
+
 /* A opção `numero` do esboço traduzida e compilada: { dados, traducao, blocagem, formasDe }. */
 export function blocagemDaOpcao(bruto, numero = 1) {
   const dados = formasResolvidas(bruto, numero);
   let traducao;
   try {
-    traducao = traduzirFormasParaAndaime(dados);
+    traducao = traduzirSemInclinacaoExcessiva(dados);
   } catch (e) {
     if (e instanceof ErroDoTradutor) throw new ErroDeEsboco(`--nivel-zero: a opção ${numero} não tem blocagem: ${e.message}`);
     throw e;

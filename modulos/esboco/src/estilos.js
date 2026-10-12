@@ -5,7 +5,7 @@
    { eixo, pos }` na raiz ou na unidade gera, para toda forma com `lado: "E"` e id terminado em E (ou `lado: "D"` e id em D),
    o espelho de id com a outra letra, como se houvesse uma entrada `espelha`; o espelho herda a `unidade` e a `cor` da fonte
    (pela cópia de sempre) e leva `opacidade`, `oculto` e `substitui`. Um esboço sem esses campos sai idêntico. Puro. */
-import { ErroDeEsboco } from './index.js';
+import { ErroDeEsboco, VISTAS_EXTRAS } from './index.js';
 import { corValida } from './esquema.js';
 import { quisDizer } from './parecido.js';
 
@@ -13,7 +13,7 @@ const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const EIXOS = ['x', 'y', 'z'];
 export const CAMPOS_DO_ESTILO = ['cor', 'opacidade', 'linhaCentro'];
-const CAMPOS_DA_UNIDADE = ['cor', 'estilo', 'simetrico', 'funcao'];
+const CAMPOS_DA_UNIDADE = ['cor', 'estilo', 'simetrico', 'funcao', 'vistas'];
 const CAMPOS_DA_SIMETRIA = ['eixo', 'pos'];
 const OUTRA_LADO = { E: 'D', D: 'E' };
 
@@ -41,6 +41,11 @@ export function lerEstilos(esboco) {
     exigir(objeto(u), `${onde} deve ser um objeto { cor, estilo, simetrico }`);
     for (const k of Object.keys(u)) exigir(CAMPOS_DA_UNIDADE.includes(k), `${onde}: o campo "${k}" não existe${quisDizer(k, CAMPOS_DA_UNIDADE)}; campos válidos: ${CAMPOS_DA_UNIDADE.join(', ')}`);
     exigir(u.funcao === undefined || (typeof u.funcao === 'string' && u.funcao.trim()), `${onde}: "funcao" deve ser uma frase que diz para que a unidade serve (veio ${JSON.stringify(u.funcao)})`);
+    /* as vistas de outros lados que o brief do crítico junta às quatro de sempre quando a unidade tem um lado que elas não olham */
+    if (u.vistas !== undefined) {
+      const nomes = Object.keys(VISTAS_EXTRAS);
+      exigir(Array.isArray(u.vistas) && u.vistas.length > 0 && u.vistas.every((v) => typeof v === 'string' && nomes.includes(v)) && new Set(u.vistas).size === u.vistas.length, `${onde}: "vistas" deve ser uma lista, sem repetir, das vistas de outros lados que o crítico precisa ver a unidade (${nomes.join(', ')}), e veio ${JSON.stringify(u.vistas)}${quisDizer(Array.isArray(u.vistas) ? u.vistas.find((v) => !nomes.includes(v)) : undefined, nomes)}`);
+    }
     if (u.cor !== undefined) corValida(u.cor, onde);
     if (u.estilo !== undefined) exigir(Object.hasOwn(estilos, u.estilo), `${onde}: "estilo" com o valor ${JSON.stringify(u.estilo)} não é um estilo declarado${quisDizer(String(u.estilo), Object.keys(estilos))} (estilos: ${Object.keys(estilos).join(', ') || 'nenhum'})`);
     if (u.simetrico !== undefined && u.simetrico !== false) lerSimetria(u.simetrico, onde);

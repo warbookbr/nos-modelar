@@ -12,10 +12,14 @@ import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 
 const LIMIAR_PADRAO = 248;
 
-/* A vista que o nome do arquivo diz (`lateral.contornos.json`), ou null. */
+/* "topo" é como o avião e as fotos chamam a vista superior (`topo.contornos.json`). */
+const APELIDOS_DA_VISTA = { topo: 'superior' };
+
+/* A vista que o nome do arquivo diz (`lateral.contornos.json`, `topo.contornos.json`), ou null se não diz nenhuma ou diz duas. */
 export function vistaDoNome(arquivo) {
   const nome = basename(arquivo).toLowerCase();
-  return VISTAS_DA_REFERENCIA.find((v) => nome.includes(v)) ?? null;
+  const achadas = new Set([...VISTAS_DA_REFERENCIA, ...Object.keys(APELIDOS_DA_VISTA)].filter((v) => nome.includes(v)).map((v) => APELIDOS_DA_VISTA[v] ?? v));
+  return achadas.size === 1 ? [...achadas][0] : null;
 }
 
 function lerJson(caminho, onde) {
@@ -79,4 +83,22 @@ export function referenciasDoEsboco(bruto, base) {
     if (!mapa.has(e.arquivo)) mapa.set(e.arquivo, lerReferenciaDeArquivo(e, base));
   }
   return mapa;
+}
+
+/* Como `referenciasDoEsboco`, mas a entrada cujo arquivo (ou cujo arquivo de âncoras) não existe ao lado do esboço fica de fora em
+   vez de recusar: `{ mapa, ausentes }`, `ausentes` os `arquivo` declarados que faltam. É para o `--editar`, que só muda e grava o
+   JSON: a cópia de um mestre para outra pasta (as poses de um curso, uma variante) não leva os contornos, e recusar a edição por
+   isso não protegia nada, porque a conferência da silhueta é só a leitura que vem depois (atrito 42). Os outros comandos seguem
+   exigindo a referência, porque sem ela a divergência de silhueta deixaria de ser acusada sem ninguém saber. */
+export function referenciasPresentes(bruto, base) {
+  const mapa = new Map();
+  const ausentes = [];
+  const aqui = (c) => (isAbsolute(c) ? c : resolve(base, c));
+  for (const e of lerPlano(bruto?.plano)?.referencia ?? []) {
+    if (mapa.has(e.arquivo) || ausentes.includes(e.arquivo)) continue;
+    exigirVista(e.vista, `referência "${e.arquivo}"`);
+    if (!existsSync(aqui(e.arquivo)) || (e.ancoras && !existsSync(aqui(e.ancoras)))) { ausentes.push(e.arquivo); continue; }
+    mapa.set(e.arquivo, lerReferenciaDeArquivo(e, base));
+  }
+  return { mapa, ausentes };
 }

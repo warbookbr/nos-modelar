@@ -1,0 +1,51 @@
+{
+ "por": "a pessoa, 2026-10-12: podemos aceitar sim",
+ "quando": "2026-10-12T01:25:06.142Z",
+ "rodada": 3,
+ "nota": 7,
+ "defeitos": [
+  {
+   "parte": "janelas",
+   "tipo": "cota",
+   "onde": "comprimento 2606",
+   "sentido": "mal_posta",
+   "evidencia": "Etapa 4. Na prancha, a linha 2606 está em y≈575, de x≈430 a 640, sob o trem principal e perto de 885 e 457. Não está sobre as janelas e não tem extensão até elas."
+  },
+  {
+   "parte": "estabilizador",
+   "tipo": "cota",
+   "onde": "comprimento 989",
+   "sentido": "mal_posta",
+   "evidencia": "Etapa 12. A linha 989 está em y≈430, de x≈908 a 988, abaixo da cauda, fora do estabilizador (y 355–388) e a cerca de 5 px da chamada da barbatana. Sem extensão que a ligue à parte."
+  },
+  {
+   "parte": "fuselagem",
+   "tipo": "cota",
+   "onde": "comprimento 8028",
+   "sentido": "mal_posta",
+   "evidencia": "Etapa 13. A linha 8028 está em y≈620, de x≈349 a 1000, empilhada sobre a 10470 e longe da fuselagem. Sem extensão, lê como cota geral."
+  },
+  {
+   "parte": "escape",
+   "tipo": "cota",
+   "onde": "chamada do nome, trecho que passa pela hélice",
+   "sentido": "mal_posta",
+   "evidencia": "Etapa 8. A chamada de 'escape' vai da coluna esquerda (80,296) ao ponto (229,438) e atravessa o contorno da hélice em x≈187–207, y≈400–415. A etapa pede linhas livres."
+  },
+  {
+   "parte": "leme",
+   "tipo": "superficie",
+   "onde": "bordo de fuga, x≈980–995, y≈245–350",
+   "sentido": "segmentado",
+   "evidencia": "Etapa 11. O contorno externo da prancha tem degraus de cerca de 8 px onde o alvo mostra reta."
+  },
+  {
+   "parte": "fuselagem",
+   "tipo": "superficie",
+   "onde": "linha superior entre x≈590 e 720, y≈350–358",
+   "sentido": "segmentado",
+   "evidencia": "Etapa 13. O contorno tem pequenos dentes onde o alvo mostra linha contínua. Peso menor que os outros defeitos."
+  }
+ ],
+ "pendencias": "2606 (janelas), 989 (estabilizador) e 8028 (fuselagem) fora da parte sem linha de extensão (atrito 6); chamada do escape cruza a hélice; contorno serrilhado no leme e no dorso"
+}

@@ -154,10 +154,10 @@ describe('--corte na linha de comando', () => {
     const inteiro = await vistasArquivo(arq, { vista: 'lateral', corte: { eixo: 'x', valor: 0 }, largura: 900, saida: join(pasta, 'out') });
     expect(inteiro.destinos).toHaveLength(1);
     expect(inteiro.destinos[0]).toContain(join(pasta, 'out'));
-    expect(inteiro.destinos[0]).toMatch(/-corte-x0-lateral\.png$/);
+    expect(inteiro.destinos[0]).toMatch(/-900px-corte-x0-lateral\.png$/);
     expect(existsSync(inteiro.destinos[0])).toBe(true);
     const unidade = await unidadeArquivo(arq, 'roda', { vista: 'frontal', corte: { eixo: 'z', valor: 0 }, largura: 800 });
-    expect(unidade.destinos[0]).toMatch(/-unidade-roda-corte-z0-frontal\.png$/);
+    expect(unidade.destinos[0]).toMatch(/-unidade-roda-800px-corte-z0-frontal\.png$/);
     expect(readFileSync(unidade.destinos[0]).length).toBeGreaterThan(1000);
   });
 });

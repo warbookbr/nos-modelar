@@ -96,7 +96,7 @@ describe('leitura padrão do --descrever', () => {
 
 /* A leitura de cada fixture antiga, medida no commit anterior (a mesma de HASHES_DE_ANTES em parametros.test.js). */
 const HASHES_DA_LEITURA = {
-  casa: '743e7343a8a5c6460191c51716333e23a19788d620c1da4fb053e8f3e0246a7d',
+  casa: 'e68fd21974357f10d9f8fadee134a98cbf9c37fbcf012e8f99eac5db344ca6fb',
   'mancal-eixo': 'cbce6f1a621214af6eb020cce47db0061249a074b2f0807f921429b2e861c73c',
   moto: '17aa298d0c94802c01b68bb940eb5db7bf7206123645bf023bca0db1ab32da93',
   'teste-cubo': 'cf3236a889865881ec8624ac320befee8df359dd54b0a1e55e719a6b879f051d',

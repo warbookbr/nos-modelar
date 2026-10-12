@@ -6,14 +6,15 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
-import { desenharEsboco, ErroDeEsboco, resolverOpcao, VISTAS } from '../../modulos/esboco/src/index.js';
+import { desenharEsboco, ErroDeEsboco, resolverOpcao, VISTAS, VISTAS_EXTRAS, VISTAS_TODAS } from '../../modulos/esboco/src/index.js';
+import { ladosDasVistas, linhaDaVista } from '../../modulos/esboco/src/lados.js';
 import { descreverAchado, descreverAtravessamento, descreverPorta, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverGrupoDaProjecao, FATORES_DA_SUGESTAO, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
 import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboco } from '../../modulos/esboco/src/descrever.js';
 import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
 import { conferirReferenciaNaOpcao, lerPlano, textoDoPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { formatarConferencia, formatarMedidasDaReferencia, medidasDaReferencia, sobreposicaoDaReferencia } from '../../modulos/esboco/src/referencia.js';
-import { UNIDADE_DO_OBJETO, avancar, conferirEnvelope, criarEstado, definirModo, formatarEnvelope, formatarSituacao, funcaoDaUnidade, gravarNotaDePassagem, LIMITE_DA_FUNCAO, liberar, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
+import { UNIDADE_DO_OBJETO, avancar, conferirEnvelope, criarEstado, definirModo, formatarEnvelope, formatarSituacao, funcaoDaUnidade, gravarNotaDePassagem, LIMITE_DA_FUNCAO, liberar, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, refazerEnvelope, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
 import { comFormasVizinhas, descricaoDasVizinhas, detalharUnidade, formasVizinhas, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
 import { editarEsboco, formatarMudancas } from '../../modulos/esboco/src/editar.js';
 import { formatarLigacoes, mapaDeLigacoes } from '../../modulos/esboco/src/mapa-de-ligacoes.js';
@@ -21,13 +22,17 @@ import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
 import { linhasDasPerguntas } from '../../src/autoria/perguntas-do-critico.js';
 import { ajustarEsboco, formatarAjuste, serializarComoOriginal } from '../../modulos/esboco/src/ajustar.js';
+import './esboco-familias.mjs';
 import { recortarAmpliado } from './analise-da-peca.mjs';
-import { lerReferenciaDeArquivo, referenciasDoEsboco, vistaDoNome } from './esboco-referencia.mjs';
+import { lerReferenciaDeArquivo, referenciasDoEsboco, referenciasPresentes, vistaDoNome } from './esboco-referencia.mjs';
 import { ajuda } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
 import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
 import { blocagemDoEsboco, desenharVistaDaBlocagem } from './esboco-blocagem.mjs';
+import { FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, orientacaoDoEsboco, referenciaDoBrief, vistasDaUnidade } from './esboco-brief.mjs';
+import { aplicarPose, nomeDaPose, numeroDoCurso, posesDoBrief } from '../../modulos/esboco/src/curso.js';
+import { cursosDaUnidade, formatarCurso, quadroDoCurso, varrerCurso } from '../../modulos/esboco/src/curso-varredura.js';
 
 /* Um caminho relativo vale a partir do diretório de quem chamou: `npm run` roda no repositório e deixa esse diretório em
    `INIT_CWD`. Um caminho absoluto fica como está. */
@@ -639,6 +644,15 @@ export function condutorArquivo(arquivo, acao = {}) {
     estado = moverEmLote(bruto, estado, movimentos);
     const feitas = estado.alteracoes.length - antes;
     extra = `${feitas} ${feitas === 1 ? 'forma movida' : 'formas movidas'} em ${movimentos.length} ${movimentos.length === 1 ? 'movimento' : 'movimentos'}\n`;
+  } else if (acao.refazerEnvelope !== undefined) {
+    /* o Envelope de uma só unidade, das formas do mestre ou do detalhado dela; o motivo e as caixas ficam no histórico */
+    const detalhado = acao.de === undefined ? null : JSON.parse(readFileSync(resolverCaminho(acao.de), 'utf8'));
+    const antes = estado.unidades?.find((x) => x.id === unidadePorNome(estado.unidades ?? [], acao.refazerEnvelope));
+    estado = refazerEnvelope(bruto, estado, acao.refazerEnvelope, { motivo: acao.motivo, detalhado, arquivo: acao.de === undefined ? null : basename(acao.de) });
+    const a = estado.alteracoes[estado.alteracoes.length - 1];
+    const v = (x) => String(x).replace('.', ',');
+    const eixos = (c) => ['x', 'y', 'z'].map((e) => `${e} ${v(c[e][0])}..${v(c[e][1])}`).join(' ');
+    extra = `Envelope da unidade ${a.unidade} refeito ${a.de}, e registrado no histórico do Condutor (--condutor --historico)\n${a.mudou ? `caixa: ${antes?.envelope ? `${eixos(antes.envelope.caixa)} -> ` : ''}${eixos(a.depois)}\nA conferência anterior deixou de valer: rode --integrar ${a.unidade} <arquivo-detalhado> ou --envelope ${a.unidade} <arquivo-detalhado>\n` : 'o Envelope já era esse; nada mudou\n'}`;
   } else if (acao.replanejar) {
     estado = replanejar(bruto, estado, { motivo: acao.motivo });
     const novas = estado.alteracoes[estado.alteracoes.length - 1].novas ?? [];
@@ -684,7 +698,7 @@ export function integrarArquivo(arquivo, unidade, detalhado) {
   const r = integrarUnidade(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')), { arquivo: basename(detalhado) });
   /* o detalhe que não cabe no Envelope não é gravado: o mestre e o estado ficam como estavam */
   if (r.envelope && !r.envelope.ok) {
-    return { texto: `unidade ${unidade} NÃO integrada em ${basename(caminho)}: o detalhe não cabe no Envelope, e nada foi gravado (o esboço e o estado do Condutor ficaram como estavam)\n${formatarEnvelope(r.envelope, basename(detalhado))}caminhos: ajuste o detalhe para caber no Envelope e integre de novo; ou, se o Envelope da maquete é que precisa mudar, rode --condutor --replanejar --motivo <texto> antes (o Envelope é recalculado a partir das formas do mestre) e integre depois\n`, resultado: r, gravado: false };
+    return { texto: `unidade ${unidade} NÃO integrada em ${basename(caminho)}: o detalhe não cabe no Envelope, e nada foi gravado (o esboço e o estado do Condutor ficaram como estavam)\n${formatarEnvelope(r.envelope, basename(detalhado))}caminhos: ajuste o detalhe para caber no Envelope e integre de novo; ou, se a maquete é que estava errada, refaça o Envelope só desta unidade com --condutor --refazer-envelope ${unidade} --de ${basename(detalhado)} --motivo <texto> (o motivo e as caixas de antes e depois ficam no histórico do Condutor) e integre depois\n`, resultado: r, gravado: false };
   }
   writeFileSync(caminho, serializarComoOriginal(r.mestre, texto));
   if (r.estado) writeFileSync(memoria, `${JSON.stringify(r.estado, null, 2)}\n`);
@@ -692,6 +706,21 @@ export function integrarArquivo(arquivo, unidade, detalhado) {
   if (r.devolvidos.length > 0) L.push(`devolvido ao mestre (editado no detalhado): ${r.devolvidos.join('; ')}`);
   const { pares, juntas, pecas } = r.removidos;
   if (pares + juntas + pecas > 0) L.push(`removido do contato por citar formas que saíram: ${pares} ${pares === 1 ? 'par' : 'pares'}, ${juntas} ${juntas === 1 ? 'junta' : 'juntas'}, ${pecas} ${pecas === 1 ? 'peça' : 'peças'} de junta`);
+  const p = r.parametros;
+  const v = (x) => JSON.stringify(x);
+  if (p.alterados.length > 0) L.push(`parâmetros que o detalhado reescreveu e valem agora no mestre: ${p.alterados.map((a) => `${a.nome} ${v(a.de)} -> ${v(a.para)}`).join('; ')}`);
+  if (p.novos.length > 0) L.push(`parâmetros novos do detalhado: ${p.novos.join(', ')}`);
+  if (r.pontos.alterados.length > 0) L.push(`pontos que o detalhado reescreveu e valem agora no mestre: ${r.pontos.alterados.map((a) => `${a.nome} ${v(a.de)} -> ${v(a.para)}`).join('; ')}`);
+  if (r.pontos.novos.length > 0) L.push(`pontos novos do detalhado: ${r.pontos.novos.join(', ')}`);
+  if (p.retirados.length > 0) L.push(`parâmetros retirados do mestre (só a unidade os usava e o detalhado deixou de usá-los): ${p.retirados.map((a) => `${a.nome} (${v(a.valor)})`).join(', ')}`);
+  if (p.semUso.length > 0) L.push(`parâmetros sem uso no mestre (já estavam assim; retire com --editar <mestre> parametros.<nome>=null): ${p.semUso.slice(0, 12).join(', ')}${p.semUso.length > 12 ? `, e mais ${p.semUso.length - 12}` : ''}`);
+  if (r.apagados.juntas.length > 0) L.push(`juntas que o detalhado apagou e saíram do mestre: ${r.apagados.juntas.join('; ')}`);
+  if (r.apagados.pares.length > 0) L.push(`pares que o detalhado apagou e saíram do mestre: ${r.apagados.pares.join('; ')}`);
+  if (r.contrato.tirados.length > 0) L.push(`plano.contrato do mestre, pares tirados (o detalhado declara os dele): ${r.contrato.tirados.join('; ')}`);
+  if (r.contrato.postos.length > 0) L.push(`plano.contrato do mestre, pares postos pelo detalhado: ${r.contrato.postos.join('; ')}`);
+  if (!r.base.presente) L.push('aviso: o detalhado não traz a base do mestre (baseDoMestre, que o --detalhar grava; este é de antes dela): o que o mestre ganhou depois da cópia pode ser apagado ou não reposto; refaça o --detalhar para integrar só o que você mudou');
+  else if (r.base.mudouDesde.length > 0) L.push(`aviso: o mestre mudou desde o --detalhar (${r.base.mudouDesde.join('; ')}): o que entrou nele depois da cópia ficou, e só o que o detalhado mudou sobre a base foi levado`);
+  for (const a of r.avisos) L.push(`aviso: ${a}`);
   L.push(r.estado ? 'o estado do Condutor foi mantido (a unidade continua onde estava)' : `sem estado do Condutor (${basename(memoria)}): só o esboço foi regravado`);
   return { texto: `${L.join('\n')}\n${r.envelope ? formatarEnvelope(r.envelope, basename(detalhado)) : ''}`, resultado: r, gravado: true };
 }
@@ -744,9 +773,13 @@ function comOpcoesDeDesenho(esboco, { corte = null, previa = false, zoomForma = 
 }
 
 /* O pedaço do nome do arquivo que diz as opções de desenho, para a imagem do corte ou da explosão não substituir a normal. */
-function sufixoDasOpcoes({ corte = null, explosao = null, previa = false, zoomForma = null, nivelZero = false } = {}) {
+function sufixoDasOpcoes({ corte = null, explosao = null, previa = false, zoomForma = null, nivelZero = false, semVizinhos = false, largura = null } = {}) {
   const partes = [];
   if (nivelZero) partes.push('nivel-zero');
+  /* a imagem da unidade sem as vizinhas, ou numa largura que não é a do brief (1100 px), tem outro nome: gravar a lateral extra
+     da empenagem com `--sem-vizinhos` substituía a lateral que o `--feito` tinha gravado para o crítico, no mesmo arquivo */
+  if (semVizinhos) partes.push('sem-vizinhos');
+  if (Number.isFinite(largura) && largura !== LARGURA_DO_CRITICO) partes.push(`${largura}px`);
   if (corte) partes.push(`corte-${corte.eixo}${String(corte.valor).replace(/[^A-Za-z0-9_.-]+/g, '-')}${corte.lado === undefined ? '' : corte.lado === '+' ? '-mais' : '-menos'}`);
   if (zoomForma) partes.push(`zoom-${zoomForma.formas.replace(/\*/g, 'todas').replace(/[^A-Za-z0-9_.-]+/g, '-')}`);
   if (explosao) partes.push(`explodida${explosao.eixo ? `-${explosao.eixo}` : ''}${typeof explosao.distancia === 'number' ? `-${explosao.distancia}mm` : ''}`);
@@ -787,20 +820,37 @@ function exigirSemOpcoesDeDesenho({ corte = null, explosao = null, previa = fals
    contorno claro (os vizinhos, sem `vizinhos`) e as opções de desenho. Devolve { isolado, idsVizinhos }. */
 export function esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes = {}) {
   const idsVizinhos = unidade === null || vizinhos === false ? [] : formasVizinhas(bruto, estado, unidade);
-  const isolado = comFormasVizinhas(expandirEsboco(comOpcoesDeDesenho(unidade === null ? bruto : detalharUnidade(bruto, estado, unidade), opcoes)), idsVizinhos);
+  const proprio = expandirEsboco(comOpcoesDeDesenho(unidade === null ? bruto : detalharUnidade(bruto, estado, unidade), opcoes));
+  let isolado = comFormasVizinhas(proprio, idsVizinhos);
+  if (unidade !== null) {
+    /* a nota da opção ("Maquete do avião inteiro, com a proa em z 0") descreve o objeto, e numa imagem que mostra só o capô o
+       crítico a estranhava; o título fica. O `ocultar` da opção, quando declarado, vence o da raiz, e por isso entra nos dois. */
+    const comNota = (lista) => [...new Set([...(lista ?? []), 'nota'])];
+    isolado = { ...isolado, ocultar: comNota(isolado.ocultar), opcoes: isolado.opcoes.map((o) => (o.ocultar === undefined ? o : { ...o, ocultar: comNota(o.ocultar) })) };
+    /* o quadro fecha nas formas da unidade, e as vizinhas em cinza só aparecem onde cabem nele: o capô de 1,7 m tocava a fuselagem
+       de 10 m, que entrava inteira no quadro e deixava o motor com um décimo da imagem. Sem vizinhas o quadro já é o da unidade, e
+       com `--zoom-forma` vale o que a pessoa pediu. */
+    if (idsVizinhos.length > 0 && !opcoes.zoomForma) {
+      const proprias = visiveisDoEsboco(proprio).flat().map((r) => r.id);
+      if (proprias.length > 0) isolado = { ...isolado, enquadrar: { formas: proprias, aviso: false } };
+    }
+  }
   return { isolado, idsVizinhos };
 }
 
 /* As vistas isoladas de uma unidade (`unidade`) ou do esboço inteiro (`unidade` nulo): grava `<nome-do-arquivo>[-unidade-<nome>]
    [-<opções>]-<vista>.png` ao lado do esboço (ou em `saida`), nas quatro vistas ou só na pedida, sem legenda nem linha de
    centro. As opções de desenho são `corte`. Devolve { destinos, unidade, texto }. */
-export async function vistasArquivo(arquivo, { unidade = null, vista = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true, nivelZero = false } = {}) {
+export async function vistasArquivo(arquivo, { unidade = null, vista = null, vistas = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true, nivelZero = false } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   let estado = null;
   try { estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
-  if (vista !== null && !VISTAS_DA_ANALISE.includes(vista)) throw new ErroDeEsboco(`${unidade === null ? '--vista' : '--unidade'}: vista '${vista}' desconhecida (${VISTAS_DA_ANALISE.join(', ')}).`);
-  const opcoes = { corte, explosao, previa, zoomForma, nivelZero };
+  /* `vistas` é a lista que o brief pede (as quatro e as de outros lados da unidade); `vista` é uma só, pela linha de comando */
+  const pedidas = vistas ?? (vista === null ? VISTAS_DA_ANALISE : [vista]);
+  for (const v of pedidas) if (!Object.hasOwn(VISTAS_TODAS, v)) throw new ErroDeEsboco(`${unidade === null ? '--vista' : '--unidade'}: vista '${v}' desconhecida (${Object.keys(VISTAS_TODAS).join(', ')}).`);
+  if (nivelZero && pedidas.some((v) => Object.hasOwn(VISTAS_EXTRAS, v))) throw new ErroDeEsboco(`--nivel-zero desenha a blocagem nas quatro vistas de sempre; ${pedidas.filter((v) => Object.hasOwn(VISTAS_EXTRAS, v)).join(', ')} só vale no desenho das formas (tire --nivel-zero).`);
+  const opcoes = { corte, explosao, previa, zoomForma, nivelZero, semVizinhos: unidade !== null && vizinhos === false, largura: larguraPedida };
   if (nivelZero) exigirSemOpcoesDeDesenho(opcoes);
   const pelaBlocagem = nivelZero ? blocagemDoEsboco(bruto, estado, { unidade, vizinhos }) : null;
   const { isolado, idsVizinhos } = pelaBlocagem ? { isolado: null, idsVizinhos: pelaBlocagem.vizinhos } : esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes);
@@ -816,7 +866,7 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, lar
   const explosoes = explosao && isolado ? isolado.opcoes.map(() => explosao) : undefined;
   let navegador = null;
   try {
-    for (const v of vista === null ? VISTAS_DA_ANALISE : [vista]) {
+    for (const v of pedidas) {
       const destino = `${base}${nome === null ? '' : `-unidade-${nome}`}${sufixoDasOpcoes(opcoes)}-${v}.png`;
       destinos.push(destino);
       /* a vista cujo conteúdo não mudou desde a última gravação fica como está */
@@ -852,14 +902,21 @@ export function unidadeArquivo(arquivo, unidade, opcoes = {}) {
    isolada com os vizinhos em contorno claro, como em `--unidade`. Grava `<nome>[-unidade-<nome>]-composta.png` ao lado do
    esboço (ou em `saida`) e devolve { destino, largura, altura, celula, texto }. */
 export const LARGURA_DA_COMPOSTA = 1100;
-export async function compostaArquivo(arquivo, { unidade = null, largura = null, saida = null, vizinhos = true, nivelZero = false } = {}) {
+export async function compostaArquivo(arquivo, { unidade = null, largura = null, saida = null, vizinhos = true, nivelZero = false, pose = null, quadro = null } = {}) {
   const caminho = resolverCaminho(arquivo);
-  const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  /* `pose` ({ curso, valor }): o esboço com o parâmetro do curso nesse valor; `quadro` (os cantos de `quadroDoCurso`) fixa o quadro da
+     unidade, para todas as poses do curso saírem na mesma escala e no mesmo lugar */
+  const bruto = pose ? aplicarPose(JSON.parse(readFileSync(caminho, 'utf8')), pose.curso, pose.valor) : JSON.parse(readFileSync(caminho, 'utf8'));
   let estado = null;
   try { estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { /* sem estado: vale o Plano de detalhe do esboço */ }
   const celula = Math.floor((largura ?? LARGURA_DA_COMPOSTA) / 2);
   const pelaBlocagem = nivelZero ? blocagemDoEsboco(bruto, estado, { unidade, vizinhos }) : null;
-  const { isolado, idsVizinhos } = pelaBlocagem ? { isolado: null, idsVizinhos: pelaBlocagem.vizinhos } : esbocoIsolado(bruto, estado, unidade, vizinhos);
+  const { isolado: solto, idsVizinhos } = pelaBlocagem ? { isolado: null, idsVizinhos: pelaBlocagem.vizinhos } : esbocoIsolado(bruto, estado, unidade, vizinhos);
+  let isolado = solto;
+  if (isolado && quadro) {
+    const proprias = visiveisDoEsboco(isolado).flat().map((r) => r.id).filter((id) => !idsVizinhos.includes(id));
+    isolado = { ...isolado, enquadrar: { formas: proprias, aviso: false, pontos: quadro } };
+  }
   const navegador = await (await import('playwright')).default.chromium.launch();
   const imagens = [];
   try {
@@ -873,7 +930,7 @@ export async function compostaArquivo(arquivo, { unidade = null, largura = null,
   const grade = comporGrade(imagens, celula);
   let base = caminho.replace(/(\.esboco)?\.json$/i, '');
   if (saida) { mkdirSync(resolverCaminho(saida), { recursive: true }); base = join(resolverCaminho(saida), basename(base)); }
-  const destino = `${base}${unidade === null ? '' : `-unidade-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}`}${nivelZero ? '-nivel-zero' : ''}-composta.png`;
+  const destino = `${base}${unidade === null ? '' : `-unidade-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}`}${nivelZero ? '-nivel-zero' : ''}${pose ? `-curso-${nomeDaPose(pose.curso, pose.valor)}` : ''}-composta.png`;
   writeFileSync(destino, PNG.sync.write(grade));
   const alvo = unidade === null ? 'esboço inteiro' : `unidade ${unidade} isolada`;
   const notaVizinhos = idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro (--sem-vizinhos desliga)` : '';
@@ -927,32 +984,99 @@ export const PERGUNTAS_DO_CRITICO = [
 ];
 export const LARGURA_DO_CRITICO = 1100;
 
+/* A caixa da unidade em mm do mundo (a união das formas dela, sem as vizinhas), para recortar a referência em torno dela; null
+   sem forma visível. */
+function caixaDaUnidade(bruto, estado, unidade) {
+  const rs = visiveisDoEsboco(expandirEsboco(detalharUnidade(bruto, estado, unidade))).flat();
+  if (rs.length === 0) return null;
+  return { min: [0, 1, 2].map((k) => Math.min(...rs.map((r) => r.min[k]))), max: [0, 1, 2].map((k) => Math.max(...rs.map((r) => r.max[k]))) };
+}
+
+/* O estado do Condutor gravado ao lado do esboço, ou null (sem estado vale o Plano de detalhe do esboço). */
+function estadoGravado(caminho) {
+  try { return JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8')); } catch { return null; }
+}
+
+/* O id da unidade que um nome designa, pelas unidades do estado ou, sem estado, pelo Plano de detalhe do esboço. */
+function idDaUnidade(bruto, estado, nome) {
+  const todas = estado?.unidades?.length ? estado.unidades : planoDeDetalhe(bruto).unidades;
+  return unidadePorNome(todas, nome);
+}
+
+/* A largura da imagem de cada pose do curso no brief: a grade das quatro vistas, 700 px cada. */
+export const LARGURA_DAS_POSES = 1400;
+
+/* As poses do curso que a unidade move, para o brief do crítico: para cada mecanismo do esboço que move alguma forma da unidade
+   (`cursosDaUnidade`), a grade das quatro vistas da unidade em até 6 posições do curso, a primeira e a última incluídas, todas no
+   quadro da união das posições. O fim do curso é dito ao crítico pelo comando e não depende das posições que o esbocista escolheu
+   mostrar: o trem do nariz do avião recolhia sem achado até 85 graus e atravessava o capô a 90, e o brief trazia 45 e 80 (atrito 40).
+   Devolve { linhas, arquivos }, vazios quando a unidade não tem curso. */
+async function posesDoCursoNoBrief(arquivo, bruto, unidade, { largura, pasta, vizinhos }) {
+  const linhas = [];
+  const arquivos = [];
+  if (bruto?.curso === undefined) return { linhas, arquivos };
+  for (const { curso } of cursosDaUnidade(bruto, unidade.membros)) {
+    const valores = posesDoBrief(curso);
+    const quadro = quadroDoCurso(bruto, curso, unidade.membros, valores);
+    const destinos = [];
+    for (const valor of valores) {
+      const c = await compostaArquivo(arquivo, { unidade: unidade.id, largura: largura ?? LARGURA_DAS_POSES, saida: pasta, vizinhos, pose: { curso, valor }, quadro });
+      destinos.push([valor, c.destino]);
+    }
+    const [de, ate] = [numeroDoCurso(curso.de), numeroDoCurso(curso.ate)];
+    linhas.push(`Curso do mecanismo "${curso.nome}"${curso.rotulo ? ` (${curso.rotulo})` : ''}: ${curso.parametro} vai de ${de} a ${ate}. As ${destinos.length} imagens abaixo mostram a unidade em ${destinos.length} posições do curso, cada uma com as quatro vistas numa grade (isométrica e frontal em cima, lateral e superior embaixo), todas no mesmo quadro e na mesma escala. A primeira, com ${curso.parametro} em ${de}, é o começo do curso; a última, com ${curso.parametro} em ${ate}, é o FIM do curso e vale como as outras. O curso só está bom se em nenhuma posição, o fim inclusive, uma peça atravessa outra sem a forma explicar a travessia ou sai do lugar; aponte a posição em que isso acontece.`);
+    destinos.forEach(([valor, d], k) => linhas.push(`  ${curso.parametro} ${numeroDoCurso(valor)}${k === 0 ? ' (começo do curso)' : k === destinos.length - 1 ? ' (FIM do curso)' : ''}: ${d}`));
+    arquivos.push(...destinos.map(([, d]) => d));
+  }
+  return { linhas, arquivos };
+}
+
 /* O brief pronto para o crítico cego de uma unidade grande: gera as quatro vistas `--unidade` numa pasta (`--saida`, ou
    `<nome>-critico-<unidade>` ao lado do esboço) e devolve o texto a passar ao agente `critico-visual`, que é despachado pela
-   skill (o comando não despacha agente). */
+   skill (o comando não despacha agente). O texto também é gravado em `brief.md` na pasta (o brief só saía na tela, e quem
+   despacha o crítico precisava rodar o `--feito` de novo para tê-lo). Além das quatro vistas entram as de outros lados que a
+   unidade pede em `unidades.<id>.vistas` (a frontal-oposta, a lateral-oposta, a inferior): o brief diz de que lado cada vista
+   olha, e uma face voltada para -z, -x ou -y só aparece nelas. A referência do `plano.referencia`, recortada em torno da
+   unidade, entra quando o plano a declara. */
 export async function briefDoCritico(arquivo, unidade, { largura = null, saida = null, forcar = false, vizinhos = true } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  const estado = estadoGravado(caminho);
   const pasta = saida ?? `${caminho.replace(/(\.esboco)?\.json$/i, '')}-critico-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}`;
-  const r = await unidadeArquivo(arquivo, unidade, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, forcar, vizinhos });
+  const extras = vistasDaUnidade(bruto, idDaUnidade(bruto, estado, unidade));
+  const r = await unidadeArquivo(arquivo, unidade, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, forcar, vizinhos, vistas: [...VISTAS_DA_ANALISE, ...extras] });
+  const quatro = r.destinos.slice(0, VISTAS_DA_ANALISE.length);
+  const aMais = r.destinos.slice(VISTAS_DA_ANALISE.length);
   const funcao = funcaoDaUnidade(bruto, r.unidade.id);
+  const pastaAbs = resolverCaminho(pasta);
+  const referencia = referenciaDoBrief({ bruto, base: dirname(caminho), pasta: pastaAbs, caixa: caixaDaUnidade(bruto, estado, r.unidade.id), sufixo: `-${r.unidade.id.replace(/[^A-Za-z0-9_-]+/g, '-')}` });
   const L = [`crítico por unidade: a unidade ${r.unidade.id} (${r.unidade.membros.length} formas) tem mais de ${LIMITE_DA_FUNCAO} formas e precisa do crítico cego antes de a próxima começar.`];
   L.push('Despache o agente critico-visual (Sonnet) com o brief abaixo e as quatro imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito <unidade> --nota <0-10> --motivo <o que ele apontou>.');
-  L.push('--- brief para o crítico cego ---');
+  L.push(`O texto entre as marcas também fica em ${join(pastaAbs, 'brief.md')}; --brief ${r.unidade.id} o imprime e o regrava.`);
+  L.push(MARCA_DO_BRIEF);
   L.push(`Função da unidade: ${funcao ?? '(não declarada)'}`);
   L.push(...linhasDoAnterior(vereditoAnterior(arquivo, r.unidade.id), ''));
   L.push(`Imagens (as quatro vistas da unidade isolada, sem legenda${r.vizinhos.length > 0 ? '; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue' : ''}):`);
-  for (const d of r.destinos) L.push(`  ${d}`);
+  for (const d of quatro) L.push(`  ${d}`);
+  if (aMais.length > 0) {
+    L.push('Imagens a mais, de lados que as quatro não olham (a unidade as pede em "vistas"; as quatro de cima seguem como estão):');
+    aMais.forEach((d, k) => L.push(`  ${extras[k]}: ${d}`));
+  }
+  const poses = await posesDoCursoNoBrief(arquivo, bruto, r.unidade, { largura, pasta, vizinhos });
+  L.push(...poses.linhas);
   if (r.vizinhosDescritos.length > 0) {
     L.push('Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens seguem sem legenda):');
     for (const v of r.vizinhosDescritos) L.push(`  ${v.id}${v.rotulo ? ` (${v.rotulo})` : ''}: unidade ${v.unidade}${v.funcao ? `, função: ${v.funcao}` : ''}`);
   }
+  L.push(...referencia.linhas);
+  L.push(...ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto), extras }));
   L.push('Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:');
   for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`  ${linha}`);
   L.push('Responda, olhando só as imagens:');
   L.push(...linhasDasPerguntas(PERGUNTAS_DO_CRITICO, perguntasDoEsboco(bruto, { formas: new Set(r.unidade.membros) }).todas));
-  L.push('--- fim do brief ---');
-  return { texto: `${L.join('\n')}\n`, destinos: r.destinos, pasta, funcao };
+  L.push(FIM_DO_BRIEF);
+  const arquivoDoBrief = gravarBrief(pastaAbs, L);
+  return { texto: `${L.join('\n')}\n`, destinos: r.destinos, pasta, funcao, brief: arquivoDoBrief, referencia: referencia.arquivos, poses: poses.arquivos };
 }
 
 /* As perguntas fixas do crítico cego do Marco: o objeto inteiro nas quatro vistas gerais, e o relato por unidade. */
@@ -965,13 +1089,15 @@ export const PERGUNTAS_DO_MARCO = [
 
 /* O brief do crítico cego de um Marco: as quatro vistas gerais sem legenda (`<nome>-marco-<limiar>-<vista>.png`), e, para cada
    unidade fechada desde o Marco anterior, as vistas `--unidade` e a `funcao`. Grava numa pasta (`--saida`, ou
-   `<nome>-critico-marco-<limiar>`); o comando não despacha agente. */
+   `<nome>-critico-marco-<limiar>`), com o texto também em `brief.md` (o do Marco só existia na saída do `--feito` que o
+   cruzava, e `--brief marco-<limiar>` o reimprime e o regrava); o comando não despacha agente. Diz de que lado cada vista olha
+   e traz a referência do `plano.referencia`, inteira; as unidades que declaram `vistas` entram com as de outros lados. */
 export async function briefDoMarco(arquivo, limiar, { largura = null, saida = null } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   const estado = JSON.parse(readFileSync(`${caminho}.condutor.json`, 'utf8'));
   const novas = unidadesNovasDoMarco(estado, limiar);
-  if (!(estado.marcos ?? []).some((m) => m.limiar === limiar)) throw new ErroDeEsboco(`--marco: o Marco de ${limiar}% não está registrado`);
+  if (!(estado.marcos ?? []).some((m) => m.limiar === limiar)) throw new ErroDeEsboco(`--brief: o Marco de ${limiar}% não está registrado`);
   const pasta = resolverCaminho(saida ?? `${caminho.replace(/(\.esboco)?\.json$/i, '')}-critico-marco-${limiar}`);
   mkdirSync(pasta, { recursive: true });
   const base = join(pasta, basename(caminho.replace(/(\.esboco)?\.json$/i, '')));
@@ -988,19 +1114,29 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   } finally {
     await navegador.close();
   }
+  const orientacao = orientacaoDoEsboco(bruto);
+  const referencia = referenciaDoBrief({ bruto, base: dirname(caminho), pasta });
   const L = [`crítico do Marco: marco de ${limiar}% do custo estimado, com ${novas.length} ${novas.length === 1 ? 'unidade nova' : 'unidades novas'} desde o Marco anterior.`];
   L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito marco-${limiar} --nota <0-10> --motivo <o que ele apontou>.`);
-  L.push('--- brief para o crítico cego ---');
+  L.push(`O texto entre as marcas também fica em ${join(pasta, 'brief.md')}; --brief marco-${limiar} o imprime e o regrava.`);
+  L.push(MARCA_DO_BRIEF);
   L.push(...linhasDoAnterior(vereditoAnterior(arquivo, `marco-${limiar}`), ''));
   L.push('Imagens gerais do objeto (as quatro vistas, sem legenda):');
   for (const d of gerais) L.push(`  ${d}`);
+  L.push(...referencia.linhas);
+  L.push(...ladosDasVistas({ orientacao }));
   const unidades = [];
   for (const id of novas) {
-    const r = await unidadeArquivo(arquivo, id, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta });
+    const extras = vistasDaUnidade(bruto, id);
+    const r = await unidadeArquivo(arquivo, id, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, vistas: [...VISTAS_DA_ANALISE, ...extras] });
     const funcao = funcaoDaUnidade(bruto, r.unidade.id);
     unidades.push({ id: r.unidade.id, destinos: r.destinos, funcao });
     L.push(`Unidade ${r.unidade.id} (${r.unidade.membros.length} ${r.unidade.membros.length === 1 ? 'forma' : 'formas'}). Função da unidade: ${funcao ?? '(não declarada)'}`);
-    for (const d of r.destinos) L.push(`  ${d}`);
+    for (const d of r.destinos.slice(0, VISTAS_DA_ANALISE.length)) L.push(`  ${d}`);
+    if (extras.length > 0) {
+      L.push('  Imagens a mais desta unidade, de lados que as quatro não olham:');
+      r.destinos.slice(VISTAS_DA_ANALISE.length).forEach((d, k) => { L.push(`    ${d}`); L.push(`      ${linhaDaVista(extras[k], orientacao)}`); });
+    }
     L.push(...linhasDoAnterior(vereditoAnterior(arquivo, r.unidade.id), '  '));
     if (r.vizinhosDescritos.length > 0) {
       L.push('  Peças em cinza (de outras unidades, só mostram onde esta se prende):');
@@ -1012,8 +1148,9 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   L.push(...ligacoesArquivo(arquivo).texto.trimEnd().split('\n').slice(-1));
   L.push('Responda, olhando só as imagens:');
   L.push(...linhasDasPerguntas(PERGUNTAS_DO_MARCO, perguntasDoEsboco(bruto).todas));
-  L.push('--- fim do brief ---');
-  return { texto: `${L.join('\n')}\n`, gerais, unidades, pasta };
+  L.push(FIM_DO_BRIEF);
+  const arquivoDoBrief = gravarBrief(pasta, L);
+  return { texto: `${L.join('\n')}\n`, gerais, unidades, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
 }
 
 /* As perguntas do crítico do objeto inteiro, no nível sem Detalhe por unidade: as da unidade, ditas do objeto. */
@@ -1043,24 +1180,29 @@ export function objetoDoEsboco(bruto) {
 }
 
 /* O texto do brief do crítico do objeto, sem desenhar nada: `objeto` (título e nota), `anterior` (as linhas do veredito
-   anterior), `imagens` (os caminhos das quatro vistas) e `perguntas` de forma além das cinco fixas. */
-export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, perguntas = [] }) {
+   anterior), `imagens` (os caminhos das quatro vistas) e `perguntas` de forma além das cinco fixas. `referencia` (as linhas da
+   referência) e `lados` (de que lado cada vista olha) entram depois das imagens, e `gravadoEm` diz onde o texto também fica
+   gravado; sem eles o brief é o de antes, byte a byte (o conjunto de calibração do crítico o monta assim). */
+export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, perguntas = [], referencia = [], lados = [], gravadoEm = null }) {
   const L = ['crítico do objeto: o nível deste esboço não tem Detalhe por unidade, e a conclusão espera o veredito do crítico sobre o objeto inteiro.'];
   L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito ${UNIDADE_DO_OBJETO} --nota <0-10> --motivo <o que ele apontou> e rode --proximo de novo.`);
-  L.push('--- brief para o crítico cego ---');
+  if (gravadoEm) L.push(`O texto entre as marcas também fica em ${gravadoEm}; --brief ${UNIDADE_DO_OBJETO} o imprime e o regrava.`);
+  L.push(MARCA_DO_BRIEF);
   L.push(`Objeto: ${objeto || '(sem título no esboço)'}`);
   L.push(...anterior);
   L.push('Imagens do objeto (as quatro vistas, sem legenda):');
   for (const d of imagens) L.push(`  ${d}`);
+  L.push(...referencia);
+  L.push(...lados);
   L.push('Responda, olhando só as imagens:');
   L.push(...linhasDasPerguntas(PERGUNTAS_DO_OBJETO, perguntas));
-  L.push('--- fim do brief ---');
+  L.push(FIM_DO_BRIEF);
   return L;
 }
 
 /* O brief do crítico cego do objeto inteiro, que o nível sem Detalhe por unidade pede antes de concluir: as quatro vistas
    gerais sem legenda (`<nome>-objeto-<vista>.png`), o objeto pelo título e pela nota do esboço, o veredito anterior quando
-   houver e as ligações em texto. */
+   houver, de que lado cada vista olha e a referência do `plano.referencia`. O texto também vai para `brief.md` na pasta. */
 export async function briefDoObjeto(arquivo, { largura = null, saida = null } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
@@ -1078,10 +1220,33 @@ export async function briefDoObjeto(arquivo, { largura = null, saida = null } = 
   } finally {
     await navegador.close();
   }
+  const referencia = referenciaDoBrief({ bruto, base: dirname(caminho), pasta });
   const L = linhasDoBriefDoObjeto({
     objeto: objetoDoEsboco(bruto), anterior: linhasDoAnterior(vereditoAnterior(arquivo, UNIDADE_DO_OBJETO), ''), imagens: gerais, perguntas: perguntasDoEsboco(bruto).todas,
+    referencia: referencia.linhas, lados: ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto) }), gravadoEm: join(pasta, 'brief.md'),
   });
-  return { texto: `${L.join('\n')}\n`, gerais, pasta };
+  const arquivoDoBrief = gravarBrief(pasta, L);
+  return { texto: `${L.join('\n')}\n`, gerais, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
+}
+
+/* `--brief <unidade|marco-N|objeto>`: reimprime e regrava (`brief.md` na pasta das imagens, as imagens pelo hash) o brief do
+   crítico de uma unidade com brief (mais de 8 formas), de um Marco já registrado ou do objeto. O brief do Marco só saía no
+   `--feito` que o cruzava, e o da unidade, no `--feito` dela; depois de corrigir as unidades que o crítico apontou não havia
+   comando para obtê-lo de novo (no avião, os textos foram escritos à mão a partir da saída antiga). */
+export async function briefArquivo(arquivo, alvo, { largura = null, saida = null, vizinhos = true } = {}) {
+  const caminho = resolverCaminho(arquivo);
+  const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  const marco = /^marco-(\d+)$/i.exec(String(alvo ?? ''));
+  if (marco) return briefDoMarco(arquivo, Number(marco[1]), { largura, saida });
+  if (alvo === UNIDADE_DO_OBJETO) return briefDoObjeto(arquivo, { largura, saida });
+  const estado = estadoGravado(caminho);
+  const todas = estado?.unidades?.length ? estado.unidades : planoDeDetalhe(bruto).unidades;
+  const id = unidadePorNome(todas, alvo);
+  const u = todas.find((x) => x.id === id);
+  const comBrief = todas.filter((x) => x.membros.length > LIMITE_DA_FUNCAO).map((x) => x.id);
+  if (!u) throw new ErroDeEsboco(`--brief: "${alvo}" não é um Marco (marco-25, marco-50, marco-75 ou marco-100), o objeto (objeto) nem uma unidade (unidades: ${todas.map((x) => x.id).join(', ')})`);
+  if (u.membros.length <= LIMITE_DA_FUNCAO) throw new ErroDeEsboco(`--brief: a unidade "${id}" tem ${u.membros.length} ${u.membros.length === 1 ? 'forma' : 'formas'} e só a unidade com mais de ${LIMITE_DA_FUNCAO} passa pelo crítico (unidades com brief: ${comBrief.join(', ') || 'nenhuma'})`);
+  return briefDoCritico(arquivo, alvo, { largura, saida, vizinhos });
 }
 
 /* `--medidas`: cada medida do `plano.medidas` com o valor declarado, o medido na geometria (a medição do gate), o desvio e a
@@ -1127,15 +1292,35 @@ export function editarArquivo(arquivo, { atribuicoes = [], remover = [], adicion
   if (atribuicoes.length + remover.length + adicionar.length === 0) throw new ErroDeEsboco('--editar precisa de pelo menos uma edição: <forma>.<campo>=<valor>, --remover <forma> ou --adicionar <json-da-forma>');
   let medido;
   let editado;
+  let ausentes = [];
   try {
     editado = editarEsboco(JSON.parse(texto), { atribuicoes, remover, adicionar, unidade });
-    medido = medirEsboco(editado.esboco, { projecao: false, referencias: referenciasDoEsboco(editado.esboco, dirname(caminho)), unidades: unidadesGravadas(caminho) });
+    /* a referência que não está ao lado (a cópia do mestre noutra pasta) não impede a edição: a leitura vem sem a silhueta dela e o relato diz */
+    const lidas = referenciasPresentes(editado.esboco, dirname(caminho));
+    ausentes = lidas.ausentes;
+    medido = medirEsboco(editado.esboco, { projecao: false, referencias: lidas.mapa, unidades: unidadesGravadas(caminho) });
+    if (ausentes.length > 0) {
+      medido.divergencias = medido.divergencias.filter((d) => !(d.tipo === 'referencia-fora' && ausentes.some((a) => d.texto.includes(`"${a}"`))));
+      medido.divergencias.forEach((d, k) => { d.n = k + 1; });
+    }
   } catch (e) {
     if (e instanceof ErroDeEsboco) throw new ErroDeEsboco(`${e.message} (o arquivo não foi alterado)`);
     throw e;
   }
   writeFileSync(caminho, serializarComoOriginal(editado.esboco, texto));
-  return { texto: `${formatarMudancas(editado.mudancas).join('\n')}\n${formatarResumo(medido.descricao, medido.divergencias)}`, mudancas: editado.mudancas, descricao: medido.descricao, divergencias: medido.divergencias };
+  const semReferencia = ausentes.length > 0 ? `referência ao lado ausente (${ausentes.join(', ')}): a edição foi gravada e a leitura acima vem sem a conferência da silhueta; ponha os contornos ao lado e rode --descrever para a leitura completa\n` : '';
+  return { texto: `${formatarMudancas(editado.mudancas).join('\n')}\n${formatarResumo(medido.descricao, medido.divergencias)}${semReferencia}`, mudancas: editado.mudancas, descricao: medido.descricao, divergencias: medido.divergencias, ausentes };
+}
+
+/* `--curso [<mecanismo>]`: varre o curso declarado em `curso` (um mecanismo, ou todos) e junta os achados do gate de contato de cada
+   posição, com a posição em que cada um aparece (ver `curso-varredura.js`). No detalhe isolado (`--detalhar`) as formas ocultas das
+   outras unidades entram na varredura, porque é com elas que o curso se cruza. Sai com código 1 se algum achado não é do repouso.
+   Devolve { texto, codigo, resultado }. */
+export function cursoArquivo(arquivo, { nome = null } = {}) {
+  const caminho = resolverCaminho(arquivo);
+  const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
+  const resultado = varrerCurso(bruto, { nome, unidades: unidadesGravadas(caminho) });
+  return { ...formatarCurso(resultado), resultado };
 }
 
 /* `--referencia <arquivo>`: confere, por vista e por parte, a silhueta do esboço com a da referência (um JSON de contornos ou
@@ -1151,6 +1336,8 @@ export function referenciaArquivo(arquivo, referencia, { vista = null, ancoras =
   const vistaFinal = vista ?? declarada?.vista ?? vistaDoNome(referencia);
   if (!vistaFinal) throw new ErroDeEsboco(`--referencia: diga a vista que "${referencia}" mostra (--vista frontal, lateral ou superior), porque o nome do arquivo não a diz`);
   const entrada = { ...(declarada ?? {}), arquivo: referencia, vista: vistaFinal };
+  /* o deslocamento é dos eixos da vista que a entrada declara; com outra `--vista` ele não vale */
+  if (declarada && declarada.vista !== vistaFinal) delete entrada.deslocamento;
   const ancorasAbs = ancoras ? resolverCaminho(ancoras) : (declarada?.ancoras ? resolve(base, declarada.ancoras) : undefined);
   const ref = lerReferenciaDeArquivo({ arquivo: alvo, ancoras: ancorasAbs, recorte: declarada?.recorte, limiar: declarada?.limiar }, base, `referência "${referencia}"`);
   const visiveis = visiveisDoEsboco(esboco);
@@ -1183,17 +1370,19 @@ export function referenciaArquivo(arquivo, referencia, { vista = null, ancoras =
    cada parte. */
 export function medidasDaReferenciaArquivo(contorno, { vista = null, esboco = null } = {}) {
   const caminho = resolverCaminho(contorno);
-  const vistaFinal = vista ?? vistaDoNome(contorno);
+  /* a entrada de `plano.referencia` que cita o contorno dá a vista, o mapa das partes e o deslocamento de origem */
+  let declarada;
+  if (esboco) {
+    const bruto = JSON.parse(readFileSync(resolverCaminho(esboco), 'utf8'));
+    declarada = (lerPlano(bruto.plano)?.referencia ?? []).find((x) => resolve(dirname(resolverCaminho(esboco)), x.arquivo) === caminho);
+  }
+  const vistaFinal = vista ?? declarada?.vista ?? vistaDoNome(contorno);
   if (!vistaFinal) throw new ErroDeEsboco(`--medidas-da-referencia: diga a vista que "${contorno}" mostra (--vista frontal, lateral ou superior), porque o nome do arquivo não a diz`);
   if (!/\.json$/i.test(caminho)) throw new ErroDeEsboco('--medidas-da-referencia lê o JSON de contornos (as partes vêm dele); uma imagem só tem a silhueta, e a conferência dela é a --referencia');
   const ref = lerReferenciaDeArquivo({ arquivo: caminho }, process.env.INIT_CWD || process.cwd());
-  let formasDa = {};
-  if (esboco) {
-    const bruto = JSON.parse(readFileSync(resolverCaminho(esboco), 'utf8'));
-    const e = (lerPlano(bruto.plano)?.referencia ?? []).find((x) => resolve(dirname(resolverCaminho(esboco)), x.arquivo) === caminho);
-    formasDa = e?.partes ?? {};
-  }
-  const m = medidasDaReferencia(ref, vistaFinal, { formasDa });
+  /* a entrada só vale para a vista que ela declara: com outra `--vista`, o deslocamento não se aplica */
+  const vale = declarada && declarada.vista === vistaFinal;
+  const m = medidasDaReferencia(ref, vistaFinal, { formasDa: (vale && !Array.isArray(declarada.partes) ? declarada.partes : null) ?? {}, deslocamento: vale ? declarada.deslocamento : undefined });
   return { texto: formatarMedidasDaReferencia(m, { arquivo: basename(contorno) }), medidas: m };
 }
 
@@ -1210,7 +1399,7 @@ export function ajustarArquivo(arquivo) {
 }
 
 /* Flags que levam um valor (`--forma garfoE` ou `--forma=garfoE`); o resto é booleano. `--condutor` leva o arquivo. */
-const FLAGS_COM_VALOR = ['--ajuda', '--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--composicoes', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto'];
+const FLAGS_COM_VALOR = ['--ajuda', '--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--refazer-envelope', '--de', '--composicoes', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief', '--curso'];
 /* `--envelope <unidade> <arquivo-detalhado.esboco.json>` e `--integrar <unidade> <arquivo-detalhado>` levam dois valores, e `--detalhar <unidade> [arquivo]` leva o segundo se vier. */
 const FLAGS_COM_DOIS = ['--envelope', '--detalhar', '--integrar'];
 
@@ -1267,11 +1456,12 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json|receita.js> [--composicoes <módulo-do-registro>]] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto> | --refazer-envelope <unidade> --motivo <texto> [--de <detalhado.esboco.json>]]] [--detalhar <unidade> [arquivo]] [--medidas] [--curso [<mecanismo>]] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--brief <unidade|marco-N|objeto> [--largura <px>] [--saida <pasta>] [--sem-vizinhos]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json|receita.js> [--composicoes <módulo-do-registro>]] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
-    for (const f of ['--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    for (const f of ['--refazer-envelope', '--de', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    if (args.tem('--de') && !args.tem('--refazer-envelope')) throw new ErroDeEsboco('--de só vale junto de --refazer-envelope (--refazer-envelope <unidade> --de <detalhado.esboco.json> --motivo <texto>).');
     if (args.tem('--integrar') && (args.valor('--integrar') === undefined || args.valor('--integrar', 1) === undefined)) throw new ErroDeEsboco('--integrar precisa da unidade e do arquivo detalhado (--integrar <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--envelope') && (args.valor('--envelope') === undefined || args.valor('--envelope', 1) === undefined)) throw new ErroDeEsboco('--envelope precisa da unidade e do arquivo detalhado (--envelope <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--referencia')) {
@@ -1284,12 +1474,21 @@ async function principal(argv) {
       process.stdout.write(r.texto);
       return 0;
     }
+    if (args.tem('--curso')) {
+      const r = cursoArquivo(alvo, { nome: args.valor('--curso') ?? null });
+      process.stdout.write(r.texto);
+      return r.codigo;
+    }
     if (args.tem('--ligacoes')) {
       process.stdout.write(ligacoesArquivo(alvo, { unidade: args.valor('--unidade') ?? null, forma: args.valor('--forma') ?? null }).texto);
       return 0;
     }
     if (args.tem('--medidas')) {
       process.stdout.write(medidasArquivo(alvo).texto);
+      return 0;
+    }
+    if (args.tem('--brief')) {
+      process.stdout.write((await briefArquivo(alvo, args.valor('--brief'), { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, vizinhos: !args.tem('--sem-vizinhos') })).texto);
       return 0;
     }
     if (args.tem('--composta')) {
@@ -1321,7 +1520,7 @@ async function principal(argv) {
       if (foraDoEnvelope) process.stdout.write(`${dica('envelope')}\n`);
       return foraDoEnvelope ? 1 : 0;
     }
-    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar', '--modo', '--nota-de-passagem'].some((f) => args.tem(f))) {
+    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar', '--refazer-envelope', '--modo', '--nota-de-passagem'].some((f) => args.tem(f))) {
       /* o detalhe que é uma receita (.js ou .mjs) é conferido pelo verificador do REFINA em vez do Envelope do esboço */
       let envelope;
       if (args.tem('--envelope')) {
@@ -1333,7 +1532,7 @@ async function principal(argv) {
           envelope.resultado = await envelopeDaReceitaArquivo({ bruto: JSON.parse(readFileSync(caminho, 'utf8')), estado: estadoGravado, unidade: envelope.unidade, caminhoDaReceita: resolverCaminho(envelope.arquivo), composicoes: args.valor('--composicoes') ?? null });
         }
       }
-      const r = condutorArquivo(alvo, { envelope, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
+      const r = condutorArquivo(alvo, { envelope, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), refazerEnvelope: args.valor('--refazer-envelope'), de: args.valor('--de'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
       process.stdout.write(r.texto);
       process.stdout.write(dicaDoCondutor(r, args));
       if (r.criticoDe) process.stdout.write((await briefDoCritico(alvo, r.criticoDe, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, forcar: r.refeita, vizinhos: !args.tem('--sem-vizinhos') })).texto);

@@ -1,0 +1,41 @@
+{
+ "contato": {
+  "usar": true,
+  "tolerancia": 5,
+  "penetracao": 5,
+  "folga": 500
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "chapa",
+     "tipo": "caixa",
+     "largura": 1000,
+     "altura": 20,
+     "profundidade": 1000,
+     "centro": [
+      0,
+      0,
+      0
+     ],
+     "unidade": "motor"
+    },
+    {
+     "id": "pino",
+     "tipo": "cilindro",
+     "diametro": 40,
+     "comprimento": 60,
+     "eixo": "y",
+     "centro": [
+      0,
+      0,
+      0
+     ],
+     "unidade": "motor"
+    }
+   ]
+  }
+ ]
+}

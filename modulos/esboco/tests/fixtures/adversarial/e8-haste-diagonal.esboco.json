@@ -1,0 +1,44 @@
+{
+ "contato": {
+  "usar": true,
+  "tolerancia": 5,
+  "penetracao": 5,
+  "folga": 500
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "bloco",
+     "tipo": "caixa",
+     "largura": 100,
+     "altura": 100,
+     "profundidade": 100,
+     "centro": [
+      0,
+      0,
+      0
+     ],
+     "unidade": "m"
+    },
+    {
+     "id": "haste",
+     "tipo": "cilindro",
+     "diametro": 20,
+     "de": [
+      -200,
+      -200,
+      -200
+     ],
+     "para": [
+      200,
+      200,
+      200
+     ],
+     "unidade": "m"
+    }
+   ]
+  }
+ ]
+}

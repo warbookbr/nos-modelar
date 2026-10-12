@@ -7,6 +7,8 @@ import { pecasDe, verificarContato } from '../src/contato.js';
 import { cascoConvexo, lerSubtrai, resumoDoRecorte } from '../src/recorte.js';
 import { formatarDescricao, formatarForma, formatarResumo, medirEsboco } from '../src/descrever.js';
 import { formasResolvidas } from '../src/formas-resolvidas.js';
+import { definirProvedorDeFamilias } from '../src/familia.js';
+import { tuboOco } from './malha-de-prova.js';
 import { conferirEnvelope, criarEstado, planoDeDetalhe } from '../src/condutor.js';
 import { detalharUnidade, integrarUnidade } from '../src/detalhe.js';
 
@@ -343,5 +345,22 @@ describe('o recorte com o resto do módulo', () => {
     const curto = confere(100).caixa.x;
     expect(curto).toMatchObject({ detalhe: [-500, 450], ok: false });
     expect(curto.excesso_mm).toBeCloseTo(50, 6);
+  });
+
+  it('a forma de família (a malha da ponte) também se recorta: a janela na parede do tubo oco, pelas peças e pela fronteira', () => {
+    definirProvedorDeFamilias(() => ({ ...tuboOco({ rExt: 20, rInt: 10, comprimento: 100, eixo: 'x', ancoras: {} }), familia: 'tubo-de-prova', portas: [] }));
+    try {
+      const bruto = esboco([{ id: 'tubo', tipo: 'familia', familia: 'tubo-de-prova', centro: [0, 0, 0], subtrai: ['janela'] }, caixa('janela', [0, 20, 0], [30, 20, 30], { cortador: true })]);
+      const t = achar(resolver(bruto), 'tubo');
+      const q = resumoDoRecorte(t);
+      expect(q.retiradoMm3).toBeGreaterThan(1000);
+      expect(q.volumeMm3).toBeLessThan(q.volumeCheioMm3);
+      expect(t.max[1]).toBeLessThanOrEqual(20);
+      /* as peças da malha cobrem a concavidade que o gate aceita (o furo do tubo), e por isso o volume delas passa um pouco do da fronteira exata */
+      expect(Math.abs(volumeDaFronteira(t) - q.volumeMm3) / q.volumeMm3).toBeLessThan(0.03);
+      expect(desenharEsboco({ ...bruto, vista: 'isometrica' }, { camada: true }).camada.formas.map((f) => f.id)).toEqual(['tubo']);
+    } finally {
+      definirProvedorDeFamilias(null);
+    }
   });
 });

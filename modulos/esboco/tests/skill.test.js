@@ -69,7 +69,7 @@ describe('a skill esboco-detalhado', () => {
 
   it('traz o resumo compacto do formato com os campos e os tipos', () => {
     expect(skill).toContain('resumo-do-formato.md');
-    for (const t of ['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo']) expect(formato).toContain(`\`${t}\``);
+    for (const t of ['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo', 'familia']) expect(formato).toContain(`\`${t}\``);
     for (const c of ['juntas', 'plano', 'nivel', 'medidas', 'contrato', 'quis dizer']) expect(formato).toContain(c);
   });
 

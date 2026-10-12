@@ -6,9 +6,11 @@ import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js'
 import { ErroDeEsboco } from './index.js';
 import { catalogoDe, expandirComponentes } from './componentes.js';
 import { validarEsquema } from './esquema.js';
+import { fontesDoArranjo, nomesDasCopias } from './arranjo.js';
 import { traduzirLigacoes, validarLigacoes } from './ligar.js';
 import { ehGerador, gerarPerfil } from './perfis.js';
 import { estilosDasFormasDeModulo, lerEstilos, prepararFormas } from './estilos.js';
+import { girosDaOpcao } from './giro.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
@@ -107,6 +109,8 @@ export function numerosDaForma(f, num, contexto) {
     g.circulos = g.circulos.map((c, i) => (objeto(c) ? { ...c, ...(c.raio !== undefined ? { raio: num(c.raio, `circulos[${i}].raio`, contexto) } : {}), ...(c.centro !== undefined ? { centro: ponto(c.centro, num, `circulos[${i}].centro`, contexto) } : {}) } : c));
   }
   if (Array.isArray(g.secoes)) g.secoes = g.secoes.map((q, i) => numerosDaSecao(q, num, `secoes[${i}]`, contexto));
+  /* forma de família: os ajustes dos parâmetros da família aceitam número, parâmetro do esboço ou "=expressão", como o resto */
+  if (g.tipo === 'familia' && objeto(g.parametros)) g.parametros = Object.fromEntries(Object.entries(g.parametros).map(([k, v]) => [k, num(v, `parametros.${k}`, contexto)]));
   if (objeto(g.casca) && g.casca.espessura !== undefined) g.casca = { ...g.casca, espessura: num(g.casca.espessura, 'casca.espessura', contexto) };
   if (objeto(g.alinha) && objeto(g.alinha.com)) g.alinha = { ...g.alinha, com: ponto(g.alinha.com, num, 'alinha.com', contexto) };
   const r = g.rotacao;
@@ -167,7 +171,7 @@ function numerosDosPontos(p, num, onde) {
 const CHAVES_ARRANJA = ['forma', 'modo', 'total', 'passo', 'eixo', 'centro', 'graus', 'nomes', 'caminho', 'desde'];
 const MODOS_DO_ARRANJO = ['linear', 'radial', 'caminho'];
 
-/* Troca cada entrada `{ "arranja": {...} }` pelas cópias da forma-fonte: formas virtuais
+/* Troca cada entrada `{ "arranja": {...} }` pelas cópias da forma-fonte (ou de cada forma do grupo): formas virtuais
    `{ id, arranjoDe }` que `resolverOpcao` posiciona a partir da fonte já resolvida. `total` conta
    a fonte: ela é a peça 0 e as cópias são `<id>1` ... `<id><total-1>`. Idempotente: a forma virtual
    passa sem mudança. */
@@ -183,9 +187,10 @@ export function expandirArranjos(formas, onde = 'opção') {
     exigir(objeto(a), `${contexto}: "arranja" deve ser { "forma": "<id>", "modo": "linear" | "radial", "total": n, ... }`);
     const fora = Object.keys(a).filter((k) => !CHAVES_ARRANJA.includes(k));
     exigir(fora.length === 0, `${contexto}: "arranja" não tem o campo "${fora[0]}" (campos: ${CHAVES_ARRANJA.join(', ')})`);
-    exigir(typeof a.forma === 'string' && a.forma, `${contexto}: "arranja.forma" deve ser o id da forma-fonte`);
+    const fontes = fontesDoArranjo(a);
+    exigir(fontes.length > 0 && fontes.every((x) => typeof x === 'string' && x) && new Set(fontes).size === fontes.length, `${contexto}: "arranja.forma" deve ser o id da forma-fonte ou uma lista de ids distintos (o grupo repetido junto)`);
     exigir(MODOS_DO_ARRANJO.includes(a.modo), `${contexto}: "arranja.modo" deve ser "linear", "radial" ou "caminho"`);
-    exigir(Number.isInteger(a.total) && a.total >= 2, `${contexto}: "arranja.total" deve ser um inteiro de 2 ou mais (conta a fonte; as cópias são ${a.forma}1 a ${a.forma}<total-1>)`);
+    exigir(Number.isInteger(a.total) && a.total >= 2, `${contexto}: "arranja.total" deve ser um inteiro de 2 ou mais (conta a fonte; as cópias são ${fontes[0]}1 a ${fontes[0]}<total-1>)`);
     const vec3 = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
     let dados;
     if (a.modo === 'caminho') {
@@ -208,12 +213,21 @@ export function expandirArranjos(formas, onde = 'opção') {
     }
     if (a.nomes !== undefined) {
       const esperados = a.total - 1;
-      const veio = Array.isArray(a.nomes) ? a.nomes.length : 0;
-      exigir(Array.isArray(a.nomes) && a.nomes.length === esperados && a.nomes.every((n) => typeof n === 'string' && n) && new Set(a.nomes).size === a.nomes.length,
-        `${contexto}: "arranja.nomes" deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(a.nomes) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${a.forma}" já tem o nome dela`);
+      const conferir = (lista, fonte, rotulo) => {
+        const veio = Array.isArray(lista) ? lista.length : 0;
+        exigir(Array.isArray(lista) && lista.length === esperados && lista.every((n) => typeof n === 'string' && n) && new Set(lista).size === lista.length,
+          `${contexto}: ${rotulo} deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(lista) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${fonte}" já tem o nome dela`);
+      };
+      if (Array.isArray(a.forma)) {
+        exigir(objeto(a.nomes) && Object.keys(a.nomes).every((x) => fontes.includes(x)), `${contexto}: com uma lista em "arranja.forma", "arranja.nomes" deve ser { "<fonte>": [nomes] } com fontes do grupo (${fontes.join(', ')}); a fonte omitida usa ${fontes[0]}1, ${fontes[0]}2...`);
+        for (const [fonte, lista] of Object.entries(a.nomes)) conferir(lista, fonte, `"arranja.nomes.${fonte}"`);
+      } else conferir(a.nomes, a.forma, '"arranja.nomes"');
     }
+    const copias = nomesDasCopias(a);
     for (let k = 1; k < a.total; k++) {
-      saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: { id: f.daInstancia.id, principal: f.daInstancia.principal }, ...(f.daInstancia.oculto === undefined ? {} : { oculto: f.daInstancia.oculto }), ...(f.daInstancia.opacidade === undefined ? {} : { opacidade: f.daInstancia.opacidade }) } : {}) });
+      for (const { fonte, nomes } of copias) {
+        saida.push({ id: nomes[k - 1], arranjoDe: { fonte, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: { id: f.daInstancia.id, principal: f.daInstancia.principal }, ...(f.daInstancia.oculto === undefined ? {} : { oculto: f.daInstancia.oculto }), ...(f.daInstancia.opacidade === undefined ? {} : { opacidade: f.daInstancia.opacidade }) } : {}) });
+      }
     }
   }
   return saida;
@@ -235,7 +249,9 @@ export function expandirEsboco(esboco) {
   delete saida.formas;
   const estilos = lerEstilos(esboco);
   delete saida.estilos;
+  delete saida.curso;
   delete saida.unidades;
+  delete saida.baseDoMestre;
   delete saida.simetrico;
   if (esboco.contato !== undefined) saida.contato = numerosDoContato(esboco.contato, raiz.num, 'esboço');
   if (esboco.explosao !== undefined) saida.explosao = numerosDaExplosao(esboco.explosao, raiz.num, 'esboço');
@@ -260,6 +276,9 @@ export function expandirEsboco(esboco) {
       componentes = expandirComponentes(fonte, { num, resolvedor, numerosDaForma, onde, catalogo });
       g.formas = expandirArranjos(estilosDasFormasDeModulo(componentes.formas, estilos, onde).map((f, j) => (objeto(f) ? numerosDaForma(f, num, `${onde}, forma ${f.id ? `"${f.id}"` : j + 1}`) : f)), onde);
       validarLigacoes(g.formas, onde, Object.keys({ ...(esboco.pontos ?? {}), ...(o.pontos ?? {}) }));
+      /* o giro rígido das instâncias com `rotacao` e das `formas` de um `curso`, na pose que o parâmetro dele tem nesta opção */
+      const giros = girosDaOpcao({ formas: g.formas, instancias: componentes.giros, curso: esboco.curso, valores, num, onde });
+      if (giros.length > 0) g.giros = giros;
     }
     expansoes.push(componentes);
     /* medidas do plano: os pontos "<instancia>.<ancora>" viram a forma e a âncora reais desta opção */
@@ -339,25 +358,26 @@ function aplicarJuntas(saida, expansoes, aliasDaRaiz) {
       exigir(j.max === undefined || (typeof j.max === 'number' && Number.isFinite(j.max) && j.max >= 0), `${onde}: ${nome}.max deve ser um número em mm, finito e maior ou igual a zero`);
       exigir(j.motivo === undefined || typeof j.motivo === 'string', `${onde}: ${nome}.motivo deve ser um texto`);
       const membros = [];
-      let descartou = false;
       for (const q of j.pecas) {
         if (q.includes('*')) {
           const re = new RegExp(`^${q.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
           const casadas = ids.filter((id) => re.test(id));
-          if (casadas.length === 0 && [...ocultos].some((id) => re.test(id))) { descartou = true; continue; }
-          exigir(casadas.length > 0, `${onde}: ${nome}.pecas: o padrão "${q}" não casa com nenhuma forma visível (ids: ${ids.join(', ')})`);
-          membros.push(...casadas);
+          const casadasOcultas = [...ocultos].filter((id) => re.test(id));
+          exigir(casadas.length > 0 || casadasOcultas.length > 0, `${onde}: ${nome}.pecas: o padrão "${q}" não casa com nenhuma forma visível (ids: ${ids.join(', ')})`);
+          membros.push(...casadas, ...casadasOcultas);
         } else {
           const id = alias(q);
-          if (!ids.includes(id) && ocultos.has(id)) { descartou = true; continue; }
-          exigir(ids.includes(id), `${onde}: ${nome}.pecas cita "${q}", que não é uma forma visível (ids: ${ids.join(', ')})`);
+          exigir(ids.includes(id) || ocultos.has(id), `${onde}: ${nome}.pecas cita "${q}", que não é uma forma visível (ids: ${ids.join(', ')})`);
           membros.push(id);
         }
       }
       const unicos = [...new Set(membros)];
-      if (descartou && unicos.length < 2) continue;
+      /* a peça oculta fica na junta para o par com uma visível (a unidade isolada o confere); o par entre duas ocultas, e a junta que só tem
+         ocultas, saem em silêncio */
+      if (unicos.some((id) => ocultos.has(id)) && (unicos.length < 2 || unicos.every((id) => ocultos.has(id)))) continue;
       exigir(unicos.length >= 2, `${onde}: ${nome} precisa de pelo menos duas peças distintas depois de expandir os padrões (veio ${unicos.length}: ${unicos.join(', ') || 'nenhuma'})`);
       for (let a = 0; a < unicos.length; a++) for (let b = a + 1; b < unicos.length; b++) {
+        if (ocultos.has(unicos[a]) && ocultos.has(unicos[b])) continue;
         const chave = chaveDoPar(unicos[a], unicos[b]);
         if (existentes.has(chave)) continue;
         existentes.add(chave);

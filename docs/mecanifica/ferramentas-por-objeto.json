@@ -406,8 +406,8 @@
       "cadeira de rodas": ["barras", "rodaPneu", "tecido", "articula", "manopla"]
     },
     "Veículos aéreos e espaciais": {
-      "avião comercial": ["aerofolio", "loftSuave", "casca", "rodaPneu", "repete", "atuador"],
-      "avião de pequeno porte": ["aerofolio", "loftSuave", "casca", "rodaPneu"],
+      "avião comercial": ["aerofolio", "loftSuave", "casca", "rodaPneu", "repete", "atuador", "articula", "booleana"],
+      "avião de pequeno porte": ["aerofolio", "loftSuave", "casca", "rodaPneu", "articula", "atuador", "booleana"],
       "planador": ["aerofolio", "loftSuave", "casca"],
       "helicóptero": ["aerofolio", "loftSuave", "casca", "barras", "articula"],
       "drone multirrotor": ["aerofolio", "gabinete", "perfil", "repete", "pcb"],

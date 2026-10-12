@@ -1,0 +1,467 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "superficie-aerodinamica",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "envergadura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12800,
+      "minimo": 200,
+      "maximo": 40000,
+      "medio": 6000
+    },
+    "simetria": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 1
+    },
+    "orientacao": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 2,
+      "medio": 0
+    },
+    "pas": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 9,
+      "medio": 0
+    },
+    "cordaNaRaiz": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.114,
+      "minimo": 0.02,
+      "maximo": 0.8,
+      "medio": 0.12
+    },
+    "cordaNaPonta": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.0484,
+      "minimo": 0.01,
+      "maximo": 0.6,
+      "medio": 0.06
+    },
+    "abaulamentoDaCorda": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.6,
+      "medio": 0.2
+    },
+    "eixoDeTorcao": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.25,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 0.25
+    },
+    "enflechamento": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 0,
+      "minimo": -30,
+      "maximo": 60,
+      "medio": 10
+    },
+    "diedro": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 5,
+      "minimo": -15,
+      "maximo": 15,
+      "medio": 3
+    },
+    "torcao": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": -3,
+      "minimo": -60,
+      "maximo": 60,
+      "medio": -5
+    },
+    "incidenciaNaRaiz": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 2,
+      "minimo": -10,
+      "maximo": 70,
+      "medio": 3
+    },
+    "curvatura": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.02,
+      "minimo": 0,
+      "maximo": 0.09,
+      "medio": 0.03
+    },
+    "posicaoDaCurvatura": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.4,
+      "minimo": 0.2,
+      "maximo": 0.7,
+      "medio": 0.4
+    },
+    "espessuraNaRaiz": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.15,
+      "minimo": 0.04,
+      "maximo": 0.3,
+      "medio": 0.12
+    },
+    "espessuraNaPonta": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.12,
+      "minimo": 0.03,
+      "maximo": 0.3,
+      "medio": 0.1
+    },
+    "bordoDeFuga": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.004,
+      "minimo": 0.002,
+      "maximo": 0.02,
+      "medio": 0.006
+    },
+    "pontaLevantada": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 40,
+      "minimo": 0,
+      "maximo": 60,
+      "medio": 20
+    },
+    "extensaoDaPonta": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.05,
+      "minimo": 0.02,
+      "maximo": 0.05,
+      "medio": 0.03
+    },
+    "comando": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 1
+    },
+    "cordaDoComando": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.25,
+      "minimo": 0.1,
+      "maximo": 0.45,
+      "medio": 0.3
+    },
+    "inicioDoComando": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.62,
+      "minimo": 0.05,
+      "maximo": 0.85,
+      "medio": 0.5
+    },
+    "fimDoComando": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.9,
+      "minimo": 0.15,
+      "maximo": 0.9,
+      "medio": 0.8
+    },
+    "fresta": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.012,
+      "minimo": 0.004,
+      "maximo": 0.03,
+      "medio": 0.015
+    },
+    "deflexao": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 0,
+      "minimo": -35,
+      "maximo": 35,
+      "medio": 10
+    },
+    "comandoDiferencial": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 0
+    },
+    "cubo": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.2,
+      "minimo": 0.05,
+      "maximo": 0.4,
+      "medio": 0.2
+    },
+    "comprimentoDoCone": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.24,
+      "minimo": 0.05,
+      "maximo": 0.5,
+      "medio": 0.2
+    },
+    "comprimentoDoCubo": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.07,
+      "minimo": 0.02,
+      "maximo": 0.3,
+      "medio": 0.07
+    },
+    "cordaDaPaNaRaiz": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.06,
+      "minimo": 0.02,
+      "maximo": 0.08,
+      "medio": 0.06
+    },
+    "cordaDaPaNaPonta": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.02,
+      "minimo": 0.01,
+      "maximo": 0.08,
+      "medio": 0.03
+    }
+  },
+  "restricoes": [
+    {
+      "id": "comando-com-extensao",
+      "expressao": "inicioDoComando + 0.049 <= fimDoComando",
+      "motivo": "o comando ocupa menos de 5% da semi-envergadura, e as duas fendas das pontas e o entalhe passam a ser mais largos que ele"
+    },
+    {
+      "id": "pas-ou-nenhuma",
+      "expressao": "abs(pas - 1) >= 1",
+      "motivo": "uma pá só não é uma hélice, e a repetição em volta do eixo pede ao menos duas; use pas 0 para a superfície sem hélice"
+    },
+    {
+      "id": "pas-nao-se-tocam",
+      "expressao": "pas * cordaDaPaNaRaiz * (1 + abaulamentoDaCorda) * (abs(cos(incidenciaNaRaiz)) + (espessuraNaRaiz + curvatura) * abs(sin(incidenciaNaRaiz))) <= 2.2 * cubo",
+      "motivo": "a corda da raiz da pá (a mais larga, com o abaulamento) projetada no plano de rotação, vezes o número de pás, passa de 2,2 vezes o diâmetro do cubo (o perímetro do círculo da raiz, de 0,75 do raio do cubo, é 2,36 vezes ele), e as pás vizinhas se atravessam"
+    },
+    {
+      "id": "raiz-da-pa-cabe-no-cubo",
+      "expressao": "pas * (cordaDaPaNaRaiz * (1 + 0.5 * abaulamentoDaCorda) * (max(eixoDeTorcao, 1 - eixoDeTorcao) * abs(sin(incidenciaNaRaiz)) + (espessuraNaRaiz / 2 + curvatura) * abs(cos(incidenciaNaRaiz))) + 0.125 * cubo * abs(tan(diedro))) <= pas * 0.85 * comprimentoDoCubo / 2",
+      "motivo": "a raiz da pá, na superfície do cubo, girada pela incidência e levantada pelo diedro, passa do comprimento do cubo para frente ou para trás e atravessa o cone ou sai do outro lado do cubo"
+    },
+    {
+      "id": "pa-nao-alarga-para-a-ponta",
+      "expressao": "pas * cordaDaPaNaPonta <= pas * cordaDaPaNaRaiz",
+      "motivo": "a pá mais larga na ponta que na raiz foge do limite de solidez medido na raiz, e as pás vizinhas se atravessam longe do cubo"
+    }
+  ],
+  "portas": [
+    {
+      "id": "eixo-da-dobradica",
+      "tipo": "cilindro",
+      "papel": "externa"
+    },
+    {
+      "id": "raiz",
+      "tipo": "plano",
+      "papel": "apoia"
+    }
+  ],
+  "ferramentas": [
+    "aerofolio",
+    "articula",
+    "helice",
+    "repete"
+  ],
+  "perguntas": {
+    "fixa": [
+      "O perfil tem o intradorso côncavo onde a curvatura pede, o bordo de ataque arredondado e o bordo de fuga com a espessura mínima, sem quina viva?",
+      "A corda, a espessura e a torção variam da raiz à ponta sem degrau entre seções vizinhas, e a ponta fecha numa curva contínua, sem faceta?",
+      "A ponta levantada sobe por uma curva suave, com as seções perpendiculares a ela, sem dobra nem estrangulamento?"
+    ],
+    "comando": [
+      "O comando tem o nariz redondo concêntrico com o entalhe da parte fixa, e a fresta é a mesma em toda a volta?",
+      "As pontas do comando ficam a uma fresta das faces do entalhe, sem tocar nem atravessar a parte fixa, com o eixo da dobradiça ao longo do nariz?"
+    ],
+    "pas": [
+      "Cada pá tem a torção grande da raiz à ponta, com a corda e a espessura variando, e as pás estão igualmente espaçadas em volta do cubo?",
+      "A raiz de cada pá entra no cubo, sem ficar solta nem sair do outro lado?"
+    ],
+    "cubo": [
+      "O cone é uma ogiva lisa que continua o diâmetro do cubo, sem degrau, e o cubo é concêntrico com o eixo da hélice?"
+    ]
+  },
+  "perfis": {
+    "asa": {
+      "descricao": "asa baixa de avião leve de 12.800 mm de envergadura: inteira, corda de 1.460 mm na raiz (extrapolada ao eixo do avião) e 620 mm na ponta, perfil de curvatura 2%, diedro de 5 graus, torção de -3 graus, ponta levantada de 40 graus e aileron de 25% da corda entre 62% e 90% da semi-envergadura",
+      "parametros": {
+        "envergadura": 12800,
+        "simetria": 1,
+        "orientacao": 0,
+        "pas": 0,
+        "cordaNaRaiz": 0.114,
+        "cordaNaPonta": 0.0484,
+        "abaulamentoDaCorda": 0,
+        "eixoDeTorcao": 0.25,
+        "enflechamento": 0,
+        "diedro": 5,
+        "torcao": -3,
+        "incidenciaNaRaiz": 2,
+        "curvatura": 0.02,
+        "posicaoDaCurvatura": 0.4,
+        "espessuraNaRaiz": 0.15,
+        "espessuraNaPonta": 0.12,
+        "bordoDeFuga": 0.004,
+        "pontaLevantada": 40,
+        "extensaoDaPonta": 0.05,
+        "comando": 1,
+        "cordaDoComando": 0.25,
+        "inicioDoComando": 0.62,
+        "fimDoComando": 0.9,
+        "fresta": 0.012,
+        "deflexao": 0,
+        "comandoDiferencial": 1
+      }
+    },
+    "estabilizador": {
+      "descricao": "estabilizador horizontal de 4.250 mm de envergadura: inteiro, perfil simétrico de 10% de espessura, bordo de ataque reto (o eixo a 25% da corda recuado em -3 graus), diedro de 6 graus e profundor de 30% da corda entre 10% e 90% da semi-envergadura",
+      "parametros": {
+        "envergadura": 4250,
+        "simetria": 1,
+        "orientacao": 0,
+        "pas": 0,
+        "cordaNaRaiz": 0.23,
+        "cordaNaPonta": 0.13,
+        "abaulamentoDaCorda": 0,
+        "eixoDeTorcao": 0.25,
+        "enflechamento": -3,
+        "diedro": 6,
+        "torcao": 0,
+        "incidenciaNaRaiz": 0,
+        "curvatura": 0,
+        "posicaoDaCurvatura": 0.4,
+        "espessuraNaRaiz": 0.1,
+        "espessuraNaPonta": 0.09,
+        "bordoDeFuga": 0.004,
+        "pontaLevantada": 0,
+        "extensaoDaPonta": 0.02,
+        "comando": 1,
+        "cordaDoComando": 0.3,
+        "inicioDoComando": 0.1,
+        "fimDoComando": 0.9,
+        "fresta": 0.012,
+        "deflexao": 0,
+        "comandoDiferencial": 0
+      }
+    },
+    "deriva": {
+      "descricao": "deriva de 1.900 mm de altura, vertical (a envergadura em y), semi-superfície de perfil simétrico, corda de 1.300 mm na base e 560 mm no topo, eixo recuado em 19 graus e leme de 30% da corda entre 20% e 90% da altura",
+      "parametros": {
+        "envergadura": 1900,
+        "simetria": 0,
+        "orientacao": 1,
+        "pas": 0,
+        "cordaNaRaiz": 0.68,
+        "cordaNaPonta": 0.3,
+        "abaulamentoDaCorda": 0,
+        "eixoDeTorcao": 0.25,
+        "enflechamento": 19,
+        "diedro": 0,
+        "torcao": 0,
+        "incidenciaNaRaiz": 0,
+        "curvatura": 0,
+        "posicaoDaCurvatura": 0.4,
+        "espessuraNaRaiz": 0.1,
+        "espessuraNaPonta": 0.09,
+        "bordoDeFuga": 0.004,
+        "pontaLevantada": 0,
+        "extensaoDaPonta": 0.02,
+        "comando": 1,
+        "cordaDoComando": 0.3,
+        "inicioDoComando": 0.2,
+        "fimDoComando": 0.9,
+        "fresta": 0.012,
+        "deflexao": 0,
+        "comandoDiferencial": 0
+      }
+    },
+    "pa-de-helice": {
+      "descricao": "pá de hélice de 800 mm de comprimento, uma só, com o eixo de passo a 35% da corda: torção grande (52 graus na raiz e 18 na ponta), corda de 120 mm na raiz e 40 mm na ponta engrossada no meio, espessura de 25% na raiz e 6% na ponta e curvatura de 4%",
+      "parametros": {
+        "envergadura": 800,
+        "simetria": 0,
+        "orientacao": 2,
+        "pas": 0,
+        "cordaNaRaiz": 0.15,
+        "cordaNaPonta": 0.05,
+        "abaulamentoDaCorda": 0.5,
+        "eixoDeTorcao": 0.35,
+        "enflechamento": 0,
+        "diedro": 0,
+        "torcao": -34,
+        "incidenciaNaRaiz": 52,
+        "curvatura": 0.04,
+        "posicaoDaCurvatura": 0.4,
+        "espessuraNaRaiz": 0.25,
+        "espessuraNaPonta": 0.06,
+        "bordoDeFuga": 0.01,
+        "pontaLevantada": 0,
+        "extensaoDaPonta": 0.02,
+        "comando": 0
+      }
+    },
+    "helice": {
+      "descricao": "hélice de cinco pás de 2.000 mm de diâmetro: pás como as do perfil pa-de-helice (corda de 120 mm na raiz e 40 mm na ponta, torção de 52 a 18 graus) em torno de um cubo de 400 mm e 240 mm de comprimento, com um cone de 480 mm",
+      "parametros": {
+        "envergadura": 2000,
+        "simetria": 0,
+        "orientacao": 2,
+        "pas": 5,
+        "cordaDaPaNaRaiz": 0.06,
+        "cordaDaPaNaPonta": 0.02,
+        "abaulamentoDaCorda": 0.5,
+        "eixoDeTorcao": 0.35,
+        "enflechamento": 0,
+        "diedro": 0,
+        "torcao": -34,
+        "incidenciaNaRaiz": 52,
+        "curvatura": 0.04,
+        "posicaoDaCurvatura": 0.4,
+        "espessuraNaRaiz": 0.25,
+        "espessuraNaPonta": 0.06,
+        "bordoDeFuga": 0.01,
+        "pontaLevantada": 0,
+        "extensaoDaPonta": 0.02,
+        "comando": 0,
+        "cubo": 0.2,
+        "comprimentoDoCone": 0.24,
+        "comprimentoDoCubo": 0.12
+      }
+    }
+  }
+}

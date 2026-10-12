@@ -9,6 +9,8 @@ import * as G from './prancha-geometria.mjs';
 import { validarAutoriaPrancha } from './prancha-autoria.mjs';
 
 const n = (v) => Number(v.toFixed(2));
+/* Quanto a linha de extensão passa da linha da cota, em pixel de tela. */
+const EXTENSAO_ALEM = 3;
 
 /* Âncoras proporcionais: a referência é lida em fração ("base do para-brisa a
    0,45 do entre-eixos"), então a especificação escreve na mesma moeda e o motor
@@ -38,6 +40,7 @@ const ESTILOS = `
   .eixo{fill:none;stroke:#c8ccd2;stroke-width:1;stroke-dasharray:9 4 2 4}
   .carater{fill:none;stroke:#b3593d;stroke-width:1.7;stroke-dasharray:6 3}
   .cota{stroke:#b3593d;stroke-width:1;fill:none}
+  .ext{stroke:#b3593d;stroke-width:0.7;fill:none}
   .cotat{fill:#b3593d;font-size:11px}
   .lm{fill:#1f6f5c}
   .lmt{fill:#1f6f5c;font-size:9.5px}
@@ -52,17 +55,22 @@ const ESTILOS = `
 export const EIXOS_DA_VISTA = {
   lateral: ['z', 'y'],
   planta: ['z', 'x'],
+  /* Vista de cima com a largura na horizontal e o comprimento na vertical, como
+     as imagens de topo de referência (a planta acima tem o comprimento na
+     horizontal). Os pontos são [x, z], com z para cima na prancha. */
+  topo: ['x', 'z'],
   frontal: ['x', 'y'],
   traseira: ['x', 'y'],
 };
 
 function projetores(spec) {
   const s = spec.escala;
-  const { zMin, yMax, xMax } = spec.limites;
+  const { zMin, zMax, yMax, xMax } = spec.limites;
   const v = spec.vistas;
   return {
     lateral: ([z, y]) => [v.lateral.x + (z - zMin) * s, v.lateral.y + (yMax - y) * s],
     planta: ([z, x]) => [v.planta.x + (z - zMin) * s, v.planta.y + (x + xMax) * s],
+    topo: ([x, z]) => [v.topo.x + (x + xMax) * s, v.topo.y + (zMax - z) * s],
     frontal: ([x, y]) => [v.frontal.x + (x + xMax) * s, v.frontal.y + (yMax - y) * s],
     traseira: ([x, y]) => [v.traseira.x + (xMax - x) * s, v.traseira.y + (yMax - y) * s],
   };
@@ -204,12 +212,20 @@ function medir(spec, camadas) {
 
   for (const nome of Object.keys(spec.vistas)) {
     const daVista = camadas.filter((c) => c.vista === nome);
-    const contorno = daVista.filter((c) => c.contorno).map((c) => c.pl);
+    /* Camada de contorno com `pedaco` é outro pedaço da silhueta, fechado e
+       separado do anel principal: a frontal do avião tem a ponta da asa num
+       pedaço à parte, porque a parte fora do modelo corta a silhueta. Os pedaços
+       não se encadeiam no anel; cada um é um anel fechado a mais, e o que fica
+       dentro de qualquer deles está dentro da silhueta. */
+    const contorno = daVista.filter((c) => c.contorno && !c.pedaco).map((c) => c.pl);
+    const outrosAneis = daVista.filter((c) => c.contorno && c.pedaco).map((c) => c.pl);
     const { anel, abertos } = encadear(contorno, tol);
     const fechado = anel.length > 2
       && Math.hypot(anel[0][0] - anel[anel.length - 1][0], anel[0][1] - anel[anel.length - 1][1]) <= tol
       && abertos.length === 0;
-    const autoIntersecoes = fechado ? G.autoIntersecoes(anel) : [];
+    const aneis = fechado ? [anel, ...outrosAneis] : [];
+    const autoIntersecoes = aneis.flatMap((a) => G.autoIntersecoes(a));
+    const caixas = (fechado ? aneis : anel.length ? [anel] : []).map((a) => G.caixa(a));
 
     let fora = 0;
     const culpadas = [];
@@ -217,14 +233,14 @@ function medir(spec, camadas) {
       for (const c of daVista) {
         if (c.contorno || c.classe === 'eixo' || c.foraDoContorno) continue;
         let foraDaCamada = 0;
-        for (const p of c.pl) if (!G.dentro(p, anel)) foraDaCamada += 1;
+        for (const p of c.pl) if (!aneis.some((a) => G.dentro(p, a))) foraDaCamada += 1;
         if (foraDaCamada > 0) culpadas.push(`${c.nome ?? c.classe ?? 'camada'} (${foraDaCamada})`);
         fora += foraDaCamada;
       }
     }
 
     porVista[nome] = {
-      caixa: anel.length ? G.caixa(anel) : null,
+      caixa: caixas.length ? { xMin: Math.min(...caixas.map((b) => b.xMin)), xMax: Math.max(...caixas.map((b) => b.xMax)), yMin: Math.min(...caixas.map((b) => b.yMin)), yMax: Math.max(...caixas.map((b) => b.yMax)) } : null,
       contornoFechado: fechado,
       trechosSoltos: abertos.length,
       autoIntersecoes: autoIntersecoes.length,
@@ -241,7 +257,10 @@ function medir(spec, camadas) {
     if (c.foraDoContorno && !c.motivoForaDoContorno) {
       alertas.push(`${c.nome ?? c.classe ?? 'camada'}: foraDoContorno exige motivoForaDoContorno para não silenciar um defeito`);
     }
-    if (!c.nome) continue;
+    /* Camada com `pedaco` é o segundo pedaço ou o seguinte de uma parte que a
+       imagem mostra separada por outra (a hélice cortada pelo cone): a forma
+       da parte é medida uma vez, no pedaço que vem sem `pedaco`. */
+    if (!c.nome || c.pedaco) continue;
     const m = {
       vista: c.vista,
       comprimento: n(G.comprimento(c.pl)),
@@ -377,6 +396,20 @@ export function prancha(spec) {
     const dx = c.desloca?.[0] ?? 0; const dy = c.desloca?.[1] ?? 0;
     put(`<path class="cota" d="M ${n(ax + dx)} ${n(ay + dy)} L ${n(bx + dx)} ${n(by + dy)}"/>`);
     desenho.linhas.push({ dono, tipo: 'cota', pts: [[ax + dx, ay + dy], [bx + dx, by + dy]], ...(dx || dy ? { deslocada: true } : {}) });
+    /* `extensao` é a cota externa: a linha da cota está fora da parte, e as
+       linhas de extensão descem de cada ponta da medida, na parte, até ela, como
+       no desenho técnico. Sem elas, o número solto ao lado da parte se lia como
+       medida de outra parte (2606, 989 e 8028 na lateral do avião). Cada linha
+       passa EXTENSAO_ALEM px da linha da cota. */
+    if (c.extensao && (dx || dy)) {
+      const L = Math.hypot(dx, dy);
+      const alem = [dx / L * EXTENSAO_ALEM, dy / L * EXTENSAO_ALEM];
+      for (const [x, y] of [[ax, ay], [bx, by]]) {
+        const fim = [x + dx + alem[0], y + dy + alem[1]];
+        put(`<path class="ext" d="M ${n(x)} ${n(y)} L ${n(fim[0])} ${n(fim[1])}"/>`);
+        linha(dono, 'extensao', [[x, y], fim]);
+      }
+    }
     const mx = (ax + bx) / 2 + dx; const my = (ay + by) / 2 + dy;
     const vert = Math.abs(bx - ax) < Math.abs(by - ay);
     /* `numero` tira o número do meio da linha, em pixel de tela, com uma
@@ -483,7 +516,7 @@ export function colisoesDoDesenho(desenho) {
    PARALELAS_DIST uma da outra ao longo de mais de PARALELAS_TRECHO também
    correm juntas: na lateral do braço, anelAntebraco e juntaCotovelo
    saíam a 14 a 23 px, com 3 graus entre si, e o crítico as leu como uma. */
-export const DETECTOR = { FOLGA_DO_NUMERO: 2, CHAMADA_COLADA: 5, TRECHO_COLADO: 12, MARCA_NA_BORDA: 3, INVASAO_MIN: 4, PARALELAS_GRAUS: 8, PARALELAS_DIST: 16, PARALELAS_TRECHO: 40 };
+export const DETECTOR = { FOLGA_DO_NUMERO: 2, CHAMADA_COLADA: 5, TRECHO_COLADO: 12, MARCA_NA_BORDA: 3, INVASAO_MIN: 4, PARALELAS_GRAUS: 8, PARALELAS_DIST: 16, PARALELAS_TRECHO: 40, FENDA_RAIOS: 72, FENDA_COBERTURA: 0.9, FENDA_ALCANCE_MIN: 30 };
 
 const direcao = (pts) => Math.atan2(pts[pts.length - 1][1] - pts[0][1], pts[pts.length - 1][0] - pts[0][0]);
 const anguloEntre = (a, b) => { let d = Math.abs(direcao(a) - direcao(b)) % Math.PI; if (d > Math.PI / 2) d = Math.PI - d; return (d * 180) / Math.PI; };
@@ -507,13 +540,63 @@ function amostrarLinha(pts, passo = 1) {
 /* Comprimento da linha que corre por dentro da parte, longe da borda dela. */
 const trechoDentro = (amostras, poli, folga) => amostras.reduce((s, { p, l }) => s + (G.dentro(p, poli) && distPontoPoli(p, poli) > folga ? l : 0), 0);
 
+/* Um ponto dentro do contorno: o meio do trecho mais largo da seção horizontal
+   na altura média dos vértices. O centro de um contorno côncavo pode cair fora. */
+function pontoDentroDe(pts) {
+  const y = pts.reduce((s, [, v]) => s + v, 0) / pts.length;
+  const cortes = [];
+  for (let i = 0; i < pts.length; i += 1) {
+    const a = pts[i]; const b = pts[(i + 1) % pts.length];
+    if ((a[1] - y) * (b[1] - y) < 0) cortes.push(a[0] + ((y - a[1]) * (b[0] - a[0])) / (b[1] - a[1]));
+  }
+  cortes.sort((p, q) => p - q);
+  let melhor = null;
+  for (let i = 0; i + 1 < cortes.length; i += 2) if (!melhor || cortes[i + 1] - cortes[i] > melhor[1] - melhor[0]) melhor = [cortes[i], cortes[i + 1]];
+  return melhor ? [(melhor[0] + melhor[1]) / 2, y] : pts[0];
+}
+
+/* Fração das direções, a partir de um ponto de dentro da parte, em que o
+   contorno de `q` fecha o caminho a no máximo `alcance` px. Uma parte contida
+   fecha todas; uma parte que só encosta em `q` fecha a metade ou menos. */
+export function coberturaDoContorno(minhas, q, { raios = DETECTOR.FENDA_RAIOS, alcanceMin = DETECTOR.FENDA_ALCANCE_MIN } = {}) {
+  const maior = minhas.reduce((a, b) => (areaDoPoli(b.pts) > areaDoPoli(a.pts) ? b : a));
+  const origem = pontoDentroDe(maior.pts);
+  const todos = minhas.flatMap((m) => m.pts);
+  const xs = todos.map(([x]) => x); const ys = todos.map(([, y]) => y);
+  const alcance = Math.max(Math.hypot(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)), alcanceMin);
+  let fechados = 0;
+  for (let k = 0; k < raios; k += 1) {
+    const ang = (k / raios) * 2 * Math.PI;
+    const fim = [origem[0] + Math.cos(ang) * alcance, origem[1] + Math.sin(ang) * alcance];
+    let bate = false;
+    for (let i = 1; i < q.pts.length && !bate; i += 1) bate = segmentosSeCruzam(origem, fim, q.pts[i - 1], q.pts[i]);
+    if (bate) fechados += 1;
+  }
+  return fechados / raios;
+}
+const areaDoPoli = (pts) => Math.abs(pts.reduce((s, a, i) => { const b = pts[(i + 1) % pts.length]; return s + a[0] * b[1] - b[0] * a[1]; }, 0) / 2);
+
 export function examinarDesenho(desenho) {
   const colisoes = [];
   const avisos = [];
   const T = desenho.textos;
   const D = DETECTOR;
   const partes = desenho.linhas.filter((l) => l.parte);
-  const parteDe = (dono) => partes.find((q) => q.dono === String(dono).split('.')[0]);
+  /* Uma parte pode ter vários contornos, um por pedaço; cota e chamada dela
+     podem passar por qualquer um, e só os de outras partes contam como invasão. */
+  const pedacosDe = (dono) => partes.filter((q) => q.dono === String(dono).split('.')[0]);
+  /* `minhas` contido em `q`: todos os pontos dentro, ou, na fenda, o contorno
+     de `q` fechando quase todas as direções a partir de dentro da parte. */
+  const memoContida = new Map();
+  const contemTudo = (minhas, q) => {
+    const chave = `${minhas[0].dono}|${partes.indexOf(q)}`;
+    if (!memoContida.has(chave)) {
+      memoContida.set(chave, minhas.every((m) => m.pts.every((p) => G.dentro(p, q.pts))) || coberturaDoContorno(minhas, q) >= D.FENDA_COBERTURA);
+    }
+    return memoContida.get(chave);
+  };
+  const dentroDe = (p, qs) => qs.some((q) => G.dentro(p, q.pts));
+  const distanciaA = (p, qs) => Math.min(...qs.map((q) => distPontoPoli(p, q.pts)));
   const sobrepoe = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
   for (let i = 0; i < T.length; i += 1) {
     for (let j = i + 1; j < T.length; j += 1) {
@@ -544,7 +627,8 @@ export function examinarDesenho(desenho) {
       if (A.dono === B.dono) continue;
       /* A largura e a altura da mesma parte se cruzam dentro dela como
          qualquer par de cotas de desenho técnico; entre partes diferentes, não. */
-      if (A.tipo === 'cota' && B.tipo === 'cota' && A.dono.split('.')[0] === B.dono.split('.')[0]) continue;
+      const daCota = (l) => l.tipo === 'cota' || l.tipo === 'extensao';
+      if (daCota(A) && daCota(B) && A.dono.split('.')[0] === B.dono.split('.')[0]) continue;
       const cruza = A.pts.some((p, k) => k > 0 && B.pts.some((q, m) => m > 0 && segmentosSeCruzam(A.pts[k - 1], p, B.pts[m - 1], q)));
       if (cruza) { colisoes.push({ tipo: A.tipo === 'chamada' && B.tipo === 'chamada' ? 'chamada sobre chamada' : 'linha sobre linha', a: `${A.tipo} de ${A.dono}`, b: `${B.tipo} de ${B.dono}` }); continue; }
       /* Chamadas que não se cruzam mas correm coladas, quase paralelas, se
@@ -563,18 +647,39 @@ export function examinarDesenho(desenho) {
      outra parte aponta para ela no caminho. Cota geral e de dono sem parte
      desenhada ficam de fora. */
   for (const l of anot) {
-    const propria = parteDe(l.dono);
-    if (!propria) continue;
+    const minhas = pedacosDe(l.dono);
+    if (!minhas.length) continue;
     const amostras = amostrarLinha(l.pts);
-    const invadidas = partes.filter((q) => q !== propria && trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono);
+    /* O contorno de uma parte é o externo da região, sem os furos: o escape
+       inteiro dentro do capô e as janelas dentro da fuselagem, na lateral do
+       avião, ficam dentro do contorno de outra parte. A linha que cai dentro
+       da própria parte está no lugar certo e não invade a que a contém, então
+       para a parte que contém a própria só conta o trecho fora da própria. A
+       cota do capô que passa sobre o escape continua invadindo o escape. Uma
+       parte numa fenda da outra conta como contida: na planta do avião o
+       contorno da fuselagem desce dos dois lados da deriva, por uma fenda de
+       poucos pixels aberta no fim da cauda, e a deriva não fica dentro dele
+       por pontos soltos, mas o contorno a envolve em 99% das direções. A razão
+       está em `coberturaDoContorno`, e DETECTOR.FENDA_COBERTURA é o corte. */
+    const contem = (q) => contemTudo(minhas, q);
+    const fora = amostras.filter(({ p }) => !dentroDe(p, minhas));
+    const invadidas = [...new Set(partes.filter((q) => !minhas.includes(q) && trechoDentro(contem(q) ? fora : amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono))];
+    if (l.tipo === 'extensao') {
+      /* A linha de extensão sai da parte e atravessa quem a contém, como a
+         fileira de janelas dentro da fuselagem, até a linha da cota fora do
+         desenho; o que ela não pode é passar por uma parte alheia. */
+      const alheias = [...new Set(partes.filter((q) => !minhas.includes(q) && !contem(q) && trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono))];
+      if (alheias.length) colisoes.push({ tipo: 'extensão sobre outra parte', a: `extensão da cota de ${l.dono}`, b: alheias.join(', ') });
+      continue;
+    }
     if (l.tipo === 'cota') {
       /* Cota desenhada onde mede, sem afastamento, que sai da própria parte
          e corre colada ao contorno de outra ou da silhueta se confunde com a
          borda; o trecho que só atravessa um vão da parte côncava não conta. */
       if (!l.deslocada) {
-        const outras = desenho.linhas.filter((q) => q.tipo === 'contorno' && q !== propria);
-        const sobre = amostras.reduce((s, { p, l: c }) => s + (!G.dentro(p, propria.pts) && distPontoPoli(p, propria.pts) > D.MARCA_NA_BORDA && outras.some((q) => distPontoPoli(p, q.pts) < D.CHAMADA_COLADA / 2) ? c : 0), 0);
-        if (sobre > D.TRECHO_COLADO) colisoes.push({ tipo: 'cota sai da parte sobre contorno', a: `cota de ${l.dono}`, b: `${n(sobre)} px fora de ${propria.dono}, colada a outro contorno`, px: n(sobre) });
+        const outras = desenho.linhas.filter((q) => q.tipo === 'contorno' && !minhas.includes(q));
+        const sobre = amostras.reduce((s, { p, l: c }) => s + (!dentroDe(p, minhas) && distanciaA(p, minhas) > D.MARCA_NA_BORDA && outras.some((q) => distPontoPoli(p, q.pts) < D.CHAMADA_COLADA / 2) ? c : 0), 0);
+        if (sobre > D.TRECHO_COLADO) colisoes.push({ tipo: 'cota sai da parte sobre contorno', a: `cota de ${l.dono}`, b: `${n(sobre)} px fora de ${minhas[0].dono}, colada a outro contorno`, px: n(sobre) });
       }
       if (invadidas.length) colisoes.push({ tipo: 'cota sobre outra parte', a: `cota de ${l.dono}`, b: invadidas.join(', ') });
       continue;
@@ -582,8 +687,8 @@ export function examinarDesenho(desenho) {
     const ehNome = !String(l.dono).includes('.');
     if (ehNome) {
       const marca = l.pts[0];
-      const borda = distPontoPoli(marca, propria.pts);
-      if (!G.dentro(marca, propria.pts) || borda < D.MARCA_NA_BORDA) colisoes.push({ tipo: 'marca fora da parte', a: `chamada de ${l.dono}`, b: G.dentro(marca, propria.pts) ? `a ${n(borda)} px da borda` : 'marca fora do contorno' });
+      const borda = distanciaA(marca, minhas);
+      if (!dentroDe(marca, minhas) || borda < D.MARCA_NA_BORDA) colisoes.push({ tipo: 'marca fora da parte', a: `chamada de ${l.dono}`, b: dentroDe(marca, minhas) ? `a ${n(borda)} px da borda` : 'marca fora do contorno' });
     }
     if (!invadidas.length) continue;
     /* Parte cercada por outras dos dois lados não tem saída limpa: a
@@ -592,7 +697,7 @@ export function examinarDesenho(desenho) {
     const marca = l.pts[0];
     const xs = partes.flatMap((q) => q.pts.map(([x]) => x));
     const saida = (x) => amostrarLinha([marca, [x, marca[1]]]);
-    const livre = [Math.min(...xs) - 10, Math.max(...xs) + 10].some((x) => partes.every((q) => q === propria || trechoDentro(saida(x), q.pts, 1.5) <= D.INVASAO_MIN));
+    const livre = [Math.min(...xs) - 10, Math.max(...xs) + 10].some((x) => partes.every((q) => minhas.includes(q) || trechoDentro(saida(x), q.pts, 1.5) <= D.INVASAO_MIN));
     const registro = { tipo: 'chamada atravessa parte', a: `chamada de ${l.dono}`, b: invadidas.join(', ') };
     if (livre || !ehNome) colisoes.push(registro); else avisos.push({ ...registro, motivo: `${l.dono} não tem saída horizontal livre para nenhum dos lados` });
   }

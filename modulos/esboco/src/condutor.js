@@ -15,6 +15,8 @@ import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { descreverAchado, herdarDoEspelho, lerContato, unidadesDeclaradas, verificarContato } from './contato.js';
 import { medirEsboco } from './descrever.js';
+import { achadosDoCursoNaUnidade } from './curso-varredura.js';
+import { numeroDoCurso } from './curso.js';
 import { lerPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
 
@@ -537,6 +539,49 @@ export function replanejar(bruto, estadoBruto, { motivo }) {
   return sincronizarAvisoDeCiclo(novo);
 }
 
+/* Refaz o Envelope de uma só unidade, sem refazer o Plano de detalhe: o caminho para quando a maquete estava errada e a caixa
+   dela prenderia o detalhe (o escape da maquete em balanço, a porta reta onde o flanco afina). Pede `motivo`, vale em qualquer
+   estágio em que as unidades já existem (inclusive o Concluído) e fica em `alteracoes` do estado com as caixas de antes e de depois (`--condutor --historico` as mostra).
+   Sem `detalhado` a caixa, as portas e as caixas por forma saem das formas que o mestre tem agora (a maquete já corrigida, ou
+   o detalhe já integrado). Com `detalhado` (o esboço detalhado da unidade) a caixa e as caixas por forma de cada forma da maquete
+   que o detalhe diz substituir passam a ser as das formas dele, já giradas, e as portas continuam as da maquete: quem usa as
+   âncoras da unidade foi posicionado por elas, e o detalhe segue obrigado a mantê-las. A conferência anterior da unidade
+   (`envelopeConferido`) deixa de valer quando o Envelope muda. Devolve o estado novo; `arquivo` é só o nome que o histórico guarda. */
+export function refazerEnvelope(bruto, estadoBruto, nomeDaUnidade, { motivo, detalhado = null, arquivo = null } = {}) {
+  const estado = sincronizarNivel(estadoBruto, bruto);
+  exigir((estadoBruto.unidades ?? []).length > 0, `condutor: só há Envelope de unidade a refazer depois do Plano de detalhe, que é onde as unidades nascem (o estágio atual é ${nomeDoEstagio(estado.atual)})`);
+  const m = validarMotivo(motivo, 'refazer o Envelope de uma unidade');
+  const unidades = estado.unidades ?? [];
+  const unidade = unidadePorNome(unidades, nomeDaUnidade);
+  const ids = unidades.map((u) => u.id);
+  exigir(ids.includes(unidade), `condutor: "${nomeDaUnidade}" não é uma unidade de detalhe${quisDizer(String(nomeDaUnidade), ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
+  const antiga = unidades.find((x) => x.id === unidade);
+  const caixaDe = (lista) => Object.fromEntries(EIXOS.map((e, i) => [e, [r1(Math.min(...lista.map((r) => r.min[i]))), r1(Math.max(...lista.map((r) => r.max[i])))]]));
+  let envelope;
+  let origem;
+  if (detalhado) {
+    exigir(antiga.envelope, `condutor: a unidade "${abreviar(unidade)}" não tem Envelope gravado (o estado é de antes do Envelope): refaça o Plano de detalhe com --replanejar e um motivo`);
+    const { rs } = formasVisiveisDoDetalhado(detalhado, estado.opcao);
+    const formas = { ...(antiga.envelope.formas ?? {}) };
+    for (const alvo of new Set(rs.filter((r) => typeof r.forma.substitui === 'string').map((r) => r.forma.substitui))) formas[alvo] = caixaDe(rs.filter((r) => r.forma.substitui === alvo));
+    envelope = { caixa: caixaDe(rs), portas: antiga.envelope.portas, formas };
+    origem = `do detalhado${arquivo ? ` ${arquivo}` : ''}`;
+  } else {
+    const refeitas = montarUnidadesDoEstado(bruto, unidades.map((x) => ({ id: x.id, membros: x.membros, feito: x.feito, declarada: x.declarada, custo: x.custo })), { opcao: Math.max(0, (expandirEsboco(bruto).opcoes ?? []).findIndex((o, i) => (o.titulo ?? `Opção ${i + 1}`) === estado.opcao)) });
+    envelope = refeitas.find((x) => x.id === unidade)?.envelope;
+    exigir(envelope, `condutor: o esboço não resolve a geometria, e sem ela não há Envelope a refazer (rode a leitura do esboço para ver o erro)`);
+    origem = 'das formas do mestre';
+  }
+  const novo = clone(estado);
+  const u = novo.unidades.find((x) => x.id === unidade);
+  const mudou = JSON.stringify(u.envelope) !== JSON.stringify(envelope);
+  const antes = u.envelope?.caixa;
+  u.envelope = envelope;
+  if (mudou) delete u.envelopeConferido;
+  novo.alteracoes = [...(novo.alteracoes ?? []), { envelopeRefeito: true, unidade, motivo: m, de: origem, ...(antes ? { antes } : {}), depois: envelope.caixa, mudou }];
+  return novo;
+}
+
 /* A unidade que um nome designa: o id exato; o nome de uma forma ou de uma instância que só uma unidade contém (`rodaFrente`
    para `rodaFrente+eixoFrente+...`); ou o primeiro nome de um id composto. Sem correspondência única devolve o próprio nome,
    e a recusa de quem chama diz quais unidades existem. */
@@ -551,12 +596,19 @@ export function unidadePorNome(unidades, nome) {
 
 /* As divergências do gate de contato do mestre que citam formas da unidade: a unidade só vira feita quando o mestre, com a
    versão dela, não tem colisão, travessia acima do máximo, par que não encosta nem peça solta que a envolva. Sem o gate
-   ligado não há o que conferir. */
+   ligado não há o que conferir. Com `curso` declarado (ver `curso.js`) entram também os achados que o gate acha em alguma posição
+   do curso e não na primeira, cada um com o curso e as posições em que aparece: o trem do avião recolhia sem achado até 85 graus
+   e atravessava o capô a 90, e a unidade vinha como feita porque só a pose estendida era conferida (atrito 40). */
 function achadosDaUnidade(bruto, estado, unidade) {
   const membros = new Set(estado.unidades.find((x) => x.id === unidade).membros);
-  const gate = verificarContato(bruto, { unidades: unidadesDoEstado(estado) });
-  return gate.usar ? gate.achados.filter((a) => a.pecas.some((p) => membros.has(p))) : [];
+  const unidades = unidadesDoEstado(estado);
+  const gate = verificarContato(bruto, { unidades });
+  if (!gate.usar) return [];
+  return [...gate.achados.filter((a) => a.pecas.some((p) => membros.has(p))), ...achadosDoCursoNaUnidade(bruto, [...membros], { unidades })];
 }
+
+/* A linha de um achado aberto: a do gate e, no que vem do curso, o mecanismo e as posições em que aparece. */
+const textoDoAberto = (a) => `${descreverAchado(a)}${a.curso ? ` (no curso "${a.curso}", com ${a.parametro} em ${a.posicoes.map(numeroDoCurso).join(', ')})` : ''}`;
 
 /* Os bloqueios pela nota do crítico: cada unidade com brief (mais de 8 formas) e cada Marco cujo último veredito, depois da última
    liberação, está abaixo de 8. `rodada` conta os vereditos desde a última liberação; com `RODADAS_DO_CRITICO` rodadas o bloqueio é
@@ -585,9 +637,16 @@ export function textoDoBloqueio(b) {
 }
 
 function exigirNotaLivre(estado, { exceto } = {}) {
+  const marcoDe = (x) => { const m = /^marco-(\d+)$/.exec(x.unidade); return m === null ? undefined : (estado.marcos ?? []).find((k) => k.limiar === Number(m[1])); };
   /* o Marco abaixo de 8 (ainda não travado) deixa refazer as unidades que ele fechou: é a correção que o faz ser rejulgado */
-  const cobre = (x) => { const m = /^marco-(\d+)$/.exec(x.unidade); return m !== null && (estado.marcos ?? []).some((k) => k.limiar === Number(m[1]) && (k.unidades ?? []).includes(exceto)); };
-  const b = bloqueiosDaNota(estado).filter((x) => (x.unidade !== exceto && !cobre(x)) || x.travado);
+  const cobre = (x) => (marcoDe(x)?.unidades ?? []).includes(exceto);
+  /* e, pelo mesmo motivo, a nota de uma unidade que esse mesmo Marco aberto também fechou não trava o `--feito` de outra: no avião
+     o Marco de 25% apontava defeitos na fuselagem e no capô, e o 7 da hélice, que é da unidade, recusava o `--feito fuselagem`, de
+     modo que uma só rodada do esbocista corrigia as três unidades e só marcava a primeira. O Marco refaz o julgamento de todas
+     juntas. A regra das três rodadas fica de fora: o bloqueio travado, de qualquer unidade, continua valendo. */
+  const marcosAbertos = bloqueiosDaNota(estado).filter((x) => !x.travado && cobre(x)).map(marcoDe);
+  const irmaDoMarco = (x) => marcosAbertos.some((m) => (m.unidades ?? []).includes(x.unidade));
+  const b = bloqueiosDaNota(estado).filter((x) => (x.unidade !== exceto && !cobre(x) && !irmaDoMarco(x)) || x.travado);
   exigir(b.length === 0, `condutor: ${b.map(textoDoBloqueio).join('; ')}`);
 }
 
@@ -632,7 +691,7 @@ export function marcarFeito(bruto, estadoBruto, nomeDaUnidade) {
   }
   if (!daUnidade.feito) {
     const abertos = achadosDaUnidade(bruto, estado, unidade);
-    exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map((a) => descreverAchado(a)).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
+    exigir(abertos.length === 0, `condutor: a unidade "${abreviar(unidade)}" tem ${abertos.length} ${abertos.length === 1 ? 'achado aberto' : 'achados abertos'} do gate de contato no mestre e não vira feita assim (${abertos.slice(0, 5).map(textoDoAberto).join('; ')}${abertos.length > 5 ? `; e mais ${abertos.length - 5}` : ''}): corrija a versão detalhada, rode --integrar de novo e marque a unidade depois`);
   }
   const novo = clone(estado);
   const u = novo.unidades.find((x) => x.id === unidade);
@@ -744,6 +803,7 @@ export function formatarSituacao(estado, portao, { historico = false, marcos = t
   if (historico) for (const l of estado.liberacoes ?? []) L.push(`liberação ${l.ordem}: ${abreviar(l.unidade)} (nota ${nota1(l.nota)} em ${l.rodadas} rodadas) liberada com o motivo: ${l.motivo}`);
   if (historico) for (const [unidade, texto] of Object.entries(estado.notasDePassagem ?? {})) L.push(`nota de passagem de ${abreviar(unidade)}: ${texto}`);
   if (historico) for (const a of estado.alteracoes ?? []) if (a.forma !== undefined) L.push(`agrupamento alterado: ${a.forma} de ${abreviar(a.de)} para ${abreviar(a.para)} (${a.motivo})`);
+  if (historico) for (const a of estado.alteracoes ?? []) if (a.envelopeRefeito) L.push(`envelope refeito: ${abreviar(a.unidade)} a partir ${a.de}${a.mudou ? `; ${a.antes ? `caixa ${EIXOS.map((e) => `${e} ${faixa(a.antes[e])}`).join(' ')} -> ` : 'caixa '}${EIXOS.map((e) => `${e} ${faixa(a.depois[e])}`).join(' ')}` : '; a caixa não mudou'} (${a.motivo})`);
   for (const a of estado.avisos ?? []) L.push(`aviso: ${a}`);
   return `${L.join('\n')}\n`;
 }
@@ -772,6 +832,41 @@ export function textoDoEnvelope(e, { curto = false } = {}) {
   return `envelope: x ${faixa(e.caixa.x)} y ${faixa(e.caixa.y)} z ${faixa(e.caixa.z)}; ${e.portas.length === 0 ? 'sem portas' : `portas ${e.portas.map((p) => `${p.forma}.${p.ancora} [${p.ponto.map(n1).join(' ')}] (usada por ${quem(p.usadaPor)})`).join('; ')}`}`;
 }
 
+/* As formas visíveis e resolvidas da versão detalhada, na opção de mesmo título da maquete (ou na primeira). O Envelope mede
+   geometria: o contato do detalhado (juntas e pares que citam formas trocadas) não entra na conta. Cada caixa é a da forma
+   já girada (os vértices depois da `rotacao`), e não a da forma sem giro. */
+function formasVisiveisDoDetalhado(detalhado, titulo) {
+  const semContato = { ...detalhado, contato: undefined, opcoes: Array.isArray(detalhado?.opcoes) ? detalhado.opcoes.map((o) => (o && typeof o === 'object' ? { ...o, contato: undefined } : o)) : detalhado?.opcoes };
+  const expandido = expandirEsboco(semContato);
+  const opcoes = Array.isArray(expandido.opcoes) ? expandido.opcoes : [];
+  exigir(opcoes.length > 0, 'condutor: a versão detalhada não tem opção');
+  const k = Math.max(0, opcoes.findIndex((o, i) => (o.titulo ?? `Opção ${i + 1}`) === titulo));
+  const rs = resolverOpcao(opcoes[k], `opção ${k + 1}`, expandido.pontos).filter((r) => r.forma.oculto !== true);
+  exigir(rs.length > 0, 'condutor: a versão detalhada não tem forma visível');
+  return { expandido, opcoes, k, rs };
+}
+
+const giraRotacao = (f) => Array.isArray(f.rotacao) && f.rotacao.some((x) => Number.isFinite(x) && Math.abs(x) > 1e-9);
+
+/* Quanto o giro das formas `doAlvo` acrescenta ao excesso `excesso` (mm) no eixo `i` sobre a caixa `env` da forma da maquete: a
+   mesma conferência com a `rotacao` delas retirada. Só diz algo quando há giro e ele explica parte do excesso. Devolve o texto
+   (ou ''). */
+function notaDoGiro(expandido, k, doAlvo, env, i, excesso) {
+  if (!doAlvo.some((r) => giraRotacao(r.forma))) return '';
+  try {
+    const ids = new Set(doAlvo.map((r) => r.id));
+    const o = { ...expandido.opcoes[k], formas: expandido.opcoes[k].formas.map((f) => (ids.has(f.id) && giraRotacao(f) ? (({ rotacao, ...resto }) => { void rotacao; return resto; })(f) : f)) };
+    const sem = resolverOpcao(o, `opção ${k + 1}`, expandido.pontos).filter((r) => ids.has(r.id));
+    const d = [Math.min(...sem.map((r) => r.min[i])), Math.max(...sem.map((r) => r.max[i]))];
+    const semGiro = Math.max(env[0] - d[0], d[1] - env[1], 0);
+    if (excesso - semGiro < 0.5) return '';
+    return `; o giro das formas acrescenta ${n1(excesso - semGiro)} mm a esse excesso (sem ele passaria ${n1(semGiro)} mm), e a caixa da maquete é a de uma forma sem giro: se a forma devia seguir a inclinação, a maquete é que estava errada, e o Envelope da unidade se refaz com --condutor --refazer-envelope`;
+  } catch (e) {
+    if (e instanceof ErroDeEsboco) return '';
+    throw e;
+  }
+}
+
 /* Confere que a versão detalhada de uma unidade (um esboço à parte, `detalhado`) cabe no Envelope que a maquete deu a ela e
    mantém as portas nos mesmos pontos. A tolerância é `plano.envelope.tolerancia` da maquete (em mm) ou, sem ela, 1% da maior
    dimensão da caixa (no mínimo 1 mm). A versão detalhada usa a opção de mesmo título da maquete (ou a primeira) e precisa ter
@@ -788,15 +883,7 @@ export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
   const maior = Math.max(...EIXOS.map((e) => u.envelope.caixa[e][1] - u.envelope.caixa[e][0]), 0);
   const declarada = plano?.envelope?.tolerancia;
   const tolerancia = declarada ?? Math.max(1, 0.01 * maior);
-  /* o Envelope mede geometria: o contato do detalhado (juntas e pares que citam formas trocadas) não entra na conta */
-  const semContato = { ...detalhado, contato: undefined, opcoes: Array.isArray(detalhado?.opcoes) ? detalhado.opcoes.map((o) => (o && typeof o === 'object' ? { ...o, contato: undefined } : o)) : detalhado?.opcoes };
-  const expandido = expandirEsboco(semContato);
-  const opcoes = Array.isArray(expandido.opcoes) ? expandido.opcoes : [];
-  exigir(opcoes.length > 0, 'condutor: a versão detalhada não tem opção');
-  const titulo = estadoBruto?.opcao;
-  const k = Math.max(0, opcoes.findIndex((o, i) => (o.titulo ?? `Opção ${i + 1}`) === titulo));
-  const rs = resolverOpcao(opcoes[k], `opção ${k + 1}`, expandido.pontos).filter((r) => r.forma.oculto !== true);
-  exigir(rs.length > 0, 'condutor: a versão detalhada não tem forma visível');
+  const { expandido, opcoes, k, rs } = formasVisiveisDoDetalhado(detalhado, estadoBruto?.opcao);
   const falta = [];
   const caixa = {};
   /* o Envelope por forma: o detalhado que declara `substitui: "<forma-da-maquete>"` em uma forma é conferido contra a caixa
@@ -823,7 +910,7 @@ export function conferirEnvelope(bruto, estadoBruto, nomeDaUnidade, detalhado) {
     }
     const ok = EIXOS.every((e) => caixaDaForma[e].ok);
     porForma.push({ forma: alvo, por: doAlvo.map((r) => r.id), ok, tolerancia_mm: r1(toleranciaDaForma), caixa: caixaDaForma });
-    for (const e of EIXOS.filter((x) => !caixaDaForma[x].ok)) falta.push(`a forma "${alvo}" da maquete foi excedida: ${doAlvo.map((r) => r.id).join(', ')} passa${doAlvo.length === 1 ? '' : 'm'} ${n1(caixaDaForma[e].excesso_mm)} mm em ${e} (detalhe ${faixa(caixaDaForma[e].detalhe)}, forma da maquete ${faixa(caixaDaForma[e].envelope)}, tolerância ${n1(toleranciaDaForma)} mm)`);
+    for (const e of EIXOS.filter((x) => !caixaDaForma[x].ok)) falta.push(`a forma "${alvo}" da maquete foi excedida: ${doAlvo.map((r) => r.id).join(', ')} passa${doAlvo.length === 1 ? '' : 'm'} ${n1(caixaDaForma[e].excesso_mm)} mm em ${e} (detalhe ${faixa(caixaDaForma[e].detalhe)}, forma da maquete ${faixa(caixaDaForma[e].envelope)}, tolerância ${n1(toleranciaDaForma)} mm${notaDoGiro(expandido, k, doAlvo, env[e], EIXOS.indexOf(e), caixaDaForma[e].excesso_mm)})`);
   }
   const base = resto.length > 0 ? resto : rs;
   EIXOS.forEach((e, i) => {

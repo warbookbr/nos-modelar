@@ -90,8 +90,9 @@ describe('--ajuda <tópico>: só a sua seção', () => {
     const k = topicos.findIndex((t) => t.id === 'formas');
     const linhas = listaDosSubtopicos(topicos, k).trim().split('\n');
     expect(linhas[0]).toBe('Subtópicos (peça um com --ajuda <nome>):');
-    expect(linhas.slice(1).map((l) => l.split(' ')[0])).toEqual(['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo', 'recorte']);
+    expect(linhas.slice(1).map((l) => l.split(' ')[0])).toEqual(['caixa', 'cilindro', 'anel', 'cone', 'esfera', 'extrusao', 'loft', 'revolucao', 'tubo', 'familia', 'recorte']);
     expect(listaDosSubtopicos(topicos, topicos.findIndex((t) => t.id === 'tubo'))).toBe('');
+    expect(listaDosSubtopicos(topicos, topicos.findIndex((t) => t.id === 'familia'))).toBe('');
   });
 
   it(`nenhuma resposta de --ajuda passa de ${TETO_DO_TOPICO} caracteres mais o tamanho da lista dos subtópicos`, () => {

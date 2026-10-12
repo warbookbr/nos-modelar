@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 900" width="1240" height="900" font-family="ui-sans-serif, system-ui, sans-serif">
+<rect width="1240" height="900" fill="#fbfbfa"/>
+<style>
+  .contorno{fill:none;stroke:#12233b;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round}
+  .painel{fill:none;stroke:#2f4562;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
+  .vidro{fill:none;stroke:#3d6b86;stroke-width:1.35;stroke-linejoin:round}
+  .cromo{fill:none;stroke:#8a94a2;stroke-width:1.4;stroke-linejoin:round}
+  .roda{fill:none;stroke:#8a94a2;stroke-width:1.6}
+  .aro{fill:none;stroke:#c0c6cf;stroke-width:1.1}
+  .eixo{fill:none;stroke:#c8ccd2;stroke-width:1;stroke-dasharray:9 4 2 4}
+  .carater{fill:none;stroke:#b3593d;stroke-width:1.7;stroke-dasharray:6 3}
+  .cota{stroke:#b3593d;stroke-width:1;fill:none}
+  .ext{stroke:#b3593d;stroke-width:0.7;fill:none}
+  .cotat{fill:#b3593d;font-size:11px}
+  .lm{fill:#1f6f5c}
+  .lmt{fill:#1f6f5c;font-size:9.5px}
+  .tit{fill:#12233b;font-size:15px;font-weight:600}
+  .sub{fill:#6b7481;font-size:11px}
+  .rot{fill:#8b93a0;font-size:10.5px;letter-spacing:.06em}
+</style>
+<text x="40" y="34" class="tit">Prancha lateral pelos contornos da imagem</text>
+<text x="40" y="53" class="sub">Milímetros. 15 partes pelo watershed com sementes. Parte escondida atrás de outra aparece só no pedaço visível.</text>
+<text x="40" y="76" class="rot">LATERAL — projeção</text>
+<path class="contorno" d="M 1005 207.91 L 999.28 204.09 L 942.11 202.19 L 917.33 228.87 L 911.61 228.87 L 905.9 238.4 L 900.18 238.4 L 896.37 251.74 L 877.31 270.8 L 871.59 268.89 L 873.5 274.61 L 869.69 278.42 L 863.97 278.42 L 863.97 282.23 L 852.53 295.57 L 839.19 303.2 L 841.1 308.92 L 831.57 318.44 L 822.04 320.35 L 822.04 324.16 L 816.32 326.07 L 810.61 337.5 L 776.3 345.13 L 762.96 343.22 L 755.34 348.94 L 753.43 345.13 L 747.71 345.13 L 745.81 348.94 L 732.47 350.84 L 730.56 354.65 L 721.03 352.75 L 713.41 356.56 L 698.16 352.75 L 696.26 356.56 L 694.35 352.75 L 688.63 352.75 L 686.73 356.56 L 675.29 356.56 L 673.39 350.84 L 661.95 348.94 L 656.23 356.56 L 654.33 348.94 L 650.52 348.94 L 646.7 356.56 L 602.87 356.56 L 600.96 350.84 L 589.53 348.94 L 591.44 354.65 L 585.72 356.56 L 585.72 348.94 L 581.91 348.94 L 578.09 356.56 L 469.46 356.56 L 448.5 360.37 L 414.19 375.62 L 412.29 379.43 L 397.04 381.34 L 395.13 388.96 L 381.79 394.68 L 364.64 394.68 L 362.74 398.49 L 345.58 392.77 L 341.77 398.49 L 320.81 396.58 L 318.9 400.4 L 309.37 400.4 L 307.47 404.21 L 294.13 402.3 L 263.63 406.11 L 261.73 409.92 L 250.29 408.02 L 221.7 413.74 L 214.08 409.92 L 212.17 415.64 L 206.46 415.64 L 202.65 406.11 L 202.65 369.9 L 208.36 358.47 L 204.55 356.56 L 204.55 350.84 L 195.02 350.84 L 187.4 362.28 L 187.4 377.53 L 183.59 379.43 L 183.59 404.21 L 187.4 411.83 L 185.49 419.45 L 170.25 427.08 L 158.81 428.98 L 153.09 436.61 L 153.09 442.32 L 170.25 457.57 L 183.59 457.57 L 189.3 461.38 L 185.49 463.29 L 185.49 497.59 L 189.3 499.5 L 187.4 516.65 L 191.21 516.65 L 198.83 524.27 L 206.46 522.37 L 206.46 478.53 L 215.99 484.25 L 223.61 482.35 L 225.52 486.16 L 286.5 488.06 L 288.41 497.59 L 282.69 499.5 L 282.69 509.03 L 278.88 510.93 L 278.88 514.75 L 286.5 512.84 L 288.41 516.65 L 276.97 522.37 L 275.07 531.9 L 278.88 533.8 L 280.78 541.43 L 288.41 545.24 L 305.56 545.24 L 313.18 539.52 L 313.18 524.27 L 307.47 516.65 L 313.18 499.5 L 379.89 499.5 L 379.89 488.06 L 398.95 486.16 L 400.85 491.87 L 404.66 491.87 L 404.66 488.06 L 412.29 484.25 L 427.53 484.25 L 429.44 493.78 L 433.25 493.78 L 433.25 486.16 L 498.05 486.16 L 501.86 501.4 L 507.58 507.12 L 501.86 516.65 L 501.86 539.52 L 505.67 543.33 L 513.3 543.33 L 519.01 547.14 L 534.26 545.24 L 545.69 533.8 L 545.69 526.18 L 551.41 524.27 L 551.41 514.75 L 547.6 514.75 L 539.98 505.22 L 541.88 486.16 L 593.34 491.87 L 595.25 486.16 L 620.02 486.16 L 621.93 482.35 L 639.08 484.25 L 640.99 480.44 L 669.57 480.44 L 671.48 486.16 L 675.29 486.16 L 675.29 482.35 L 671.48 480.44 L 673.39 474.72 L 686.73 482.35 L 688.63 476.63 L 703.88 478.53 L 709.6 470.91 L 738.18 470.91 L 740.09 465.19 L 753.43 467.1 L 757.24 461.38 L 762.96 472.82 L 772.49 472.82 L 854.44 446.13 L 862.06 449.95 L 862.06 444.23 L 877.31 425.17 L 959.26 400.4 L 970.7 402.3 L 978.32 394.68 L 997.38 388.96 L 999.28 392.77 L 1003.09 392.77 L 1003.09 387.05 L 1006.91 383.24 L 1006.91 373.71 L 1003.09 369.9 L 995.47 371.81 L 989.75 366.09 L 987.85 356.56 L 984.04 354.65 L 961.17 354.65 L 955.45 347.03 L 961.17 345.13 L 964.98 331.78 L 963.07 324.16 L 966.88 314.63 L 974.51 314.63 L 974.51 310.82 L 970.7 310.82 L 968.79 307.01 L 976.41 286.05 L 982.13 284.14 L 980.22 276.52 L 985.94 274.61 L 985.94 270.8 L 982.13 268.89 L 985.94 257.46 L 993.57 253.65 L 991.66 242.21 L 1005 207.91"/>
+<path class="painel" d="M 667.67 461.38 L 663.86 457.57 L 652.42 459.48 L 618.12 451.85 L 570.47 449.95 L 555.22 434.7 L 566.66 392.77 L 557.13 390.87 L 551.41 392.77 L 517.11 425.17 L 507.58 428.98 L 492.33 428.98 L 492.33 434.7 L 486.61 440.42 L 480.9 440.42 L 477.09 436.61 L 477.09 428.98 L 473.27 427.08 L 465.65 440.42 L 440.87 440.42 L 431.35 448.04 L 435.16 455.66 L 442.78 459.48 L 448.5 457.57 L 452.31 461.38 L 448.5 469 L 458.03 480.44 L 458.03 484.25 L 499.96 484.25 L 496.14 478.53 L 496.14 472.82 L 499.96 469 L 534.26 469 L 538.07 472.82 L 538.07 484.25 L 587.62 484.25 L 591.44 482.35 L 589.53 480.44 L 597.15 470.91 L 614.31 472.82 L 650.52 467.1 L 667.67 461.38"/>
+<path class="painel" d="M 867.78 425.17 L 761.05 457.57 L 766.77 467.1 L 772.49 467.1 L 856.35 440.42 L 862.06 436.61 L 867.78 425.17"/>
+<path class="painel" d="M 345.58 402.3 L 259.82 411.83 L 206.46 421.36 L 204.55 457.57 L 210.27 461.38 L 210.27 474.72 L 221.7 480.44 L 246.48 482.35 L 345.58 482.35 L 345.58 402.3"/>
+<path class="painel" d="M 202.65 423.26 L 193.12 432.79 L 187.4 425.17 L 164.53 434.7 L 158.81 440.42 L 185.49 453.76 L 189.3 453.76 L 195.02 444.23 L 202.65 449.95 L 202.65 455.66 L 202.65 423.26"/>
+<path class="painel" d="M 966.88 228.87 L 945.92 228.87 L 942.11 225.06 L 949.73 209.81 L 940.2 211.72 L 915.43 234.59 L 911.61 234.59 L 911.61 240.31 L 814.42 341.31 L 780.11 350.84 L 764.87 350.84 L 721.03 358.47 L 780.11 362.28 L 822.04 360.37 L 825.85 364.18 L 879.22 364.18 L 913.52 368 L 896.37 366.09 L 890.65 358.47 L 966.88 228.87"/>
+<path class="painel" d="M 225.52 436.61 L 225.52 442.32 L 229.33 444.23 L 265.54 442.32 L 265.54 436.61 L 256.01 432.79 L 231.23 432.79 L 225.52 436.61"/>
+<path class="painel" d="M 907.8 375.62 L 909.71 381.34 L 926.86 385.15 L 989.75 381.34 L 984.04 360.37 L 951.64 354.65 L 928.77 356.56 L 907.8 375.62"/>
+<path class="painel" d="M 349.39 482.35 L 454.22 484.25 L 454.22 480.44 L 444.69 469 L 448.5 461.38 L 442.78 463.29 L 427.53 451.85 L 433.25 440.42 L 440.87 436.61 L 465.65 436.61 L 473.27 423.26 L 478.99 427.08 L 513.3 423.26 L 522.83 417.55 L 551.41 388.96 L 557.13 387.05 L 557.13 383.24 L 562.85 377.53 L 578.09 377.53 L 583.81 385.15 L 583.81 396.58 L 576.19 408.02 L 566.66 406.11 L 559.04 434.7 L 570.47 446.13 L 595.25 448.04 L 595.25 375.62 L 602.87 364.18 L 671.48 364.18 L 679.1 371.81 L 679.1 451.85 L 671.48 457.57 L 671.48 461.38 L 665.76 467.1 L 614.31 476.63 L 597.15 474.72 L 593.34 480.44 L 627.65 480.44 L 671.48 472.82 L 681.01 474.72 L 734.37 463.29 L 858.25 423.26 L 869.69 423.26 L 875.4 419.45 L 999.28 383.24 L 1001.19 375.62 L 991.66 373.71 L 993.57 381.34 L 989.75 385.15 L 926.86 388.96 L 909.71 385.15 L 903.99 379.43 L 903.99 375.62 L 909.71 369.9 L 825.85 368 L 822.04 364.18 L 732.47 364.18 L 721.03 362.28 L 717.22 358.47 L 701.97 360.37 L 660.04 356.56 L 593.34 356.56 L 587.62 360.37 L 581.91 356.56 L 536.17 360.37 L 520.92 356.56 L 471.37 358.47 L 461.84 364.18 L 450.4 366.09 L 448.5 369.9 L 454.22 373.71 L 454.22 377.53 L 438.97 390.87 L 425.63 396.58 L 421.82 402.3 L 398.95 404.21 L 389.42 396.58 L 381.79 400.4 L 349.39 402.3 L 349.39 482.35"/>
+<path class="painel" d="M 195.02 448.04 L 189.3 467.1 L 189.3 489.97 L 195.02 516.65 L 202.65 518.56 L 202.65 459.48 L 198.83 455.66 L 198.83 449.95 L 195.02 448.04"/>
+<path class="painel" d="M 198.83 356.56 L 193.12 362.28 L 187.4 388.96 L 187.4 408.02 L 191.21 415.64 L 189.3 423.26 L 193.12 428.98 L 200.74 421.36 L 198.83 356.56"/>
+<path class="painel" d="M 486.61 381.34 L 461.84 381.34 L 435.16 400.4 L 429.44 409.92 L 458.03 409.92 L 461.84 406.11 L 467.56 408.02 L 486.61 402.3 L 486.61 381.34"/>
+<path class="painel" d="M 513.3 381.34 L 513.3 400.4 L 517.11 404.21 L 528.54 404.21 L 532.35 398.49 L 530.45 383.24 L 513.3 381.34"/>
+<path class="painel" d="M 625.74 381.34 L 623.83 400.4 L 639.08 402.3 L 640.99 385.15 L 637.17 381.34 L 625.74 381.34"/>
+<path class="painel" d="M 562.85 381.34 L 559.04 388.96 L 566.66 388.96 L 570.47 392.77 L 568.57 404.21 L 576.19 404.21 L 580 396.58 L 578.09 381.34 L 562.85 381.34"/>
+<path class="painel" d="M 997.38 209.81 L 951.64 211.72 L 945.92 225.06 L 966.88 225.06 L 970.7 228.87 L 894.46 358.47 L 896.37 362.28 L 915.43 364.18 L 928.77 352.75 L 949.73 352.75 L 997.38 209.81"/>
+<path class="painel" d="M 450.4 373.71 L 442.78 368 L 412.29 381.34 L 391.32 394.68 L 398.95 400.4 L 421.82 398.49 L 425.63 392.77 L 438.97 387.05 L 450.4 377.53 L 450.4 373.71"/>
+<path class="painel" d="M 602.87 368 L 599.06 375.62 L 599.06 448.04 L 618.12 448.04 L 652.42 455.66 L 673.39 453.76 L 675.29 371.81 L 671.48 368 L 602.87 368"/>
+<path class="painel" d="M 284.6 537.61 L 290.31 543.33 L 303.65 543.33 L 307.47 539.52 L 309.37 528.09 L 301.75 518.56 L 301.75 507.12 L 313.18 493.78 L 376.08 495.69 L 377.98 486.16 L 292.22 484.25 L 294.13 493.78 L 297.94 497.59 L 288.41 507.12 L 296.03 512.84 L 296.03 516.65 L 284.6 524.27 L 284.6 537.61"/>
+<path class="painel" d="M 499.96 472.82 L 499.96 478.53 L 513.3 495.69 L 513.3 509.03 L 507.58 516.65 L 505.67 529.99 L 513.3 541.43 L 520.92 545.24 L 532.35 543.33 L 543.79 531.9 L 541.88 516.65 L 534.26 507.12 L 534.26 472.82 L 499.96 472.82"/>
+<path class="cota" d="M 155 648.37 L 1005 648.37"/>
+<text x="580" y="642.37" class="cotat" text-anchor="middle">comprimento 10470</text>
+<path class="cota" d="M 1137.37 545.24 L 1137.37 206"/>
+<text x="1131.37" y="375.62" class="cotat" text-anchor="middle" transform="rotate(-90 1131.37 375.62)">altura 4179</text>
+<path class="cota" d="M 188.26 384.93 L 199.67 384.93"/>
+<text x="222.38" y="384.93" class="cotat" text-anchor="middle">140</text>
+<path class="cota" stroke-dasharray="2 2" d="M 193.97 384.93 L 212.81 384.93"/>
+<path class="cota" d="M 134.7 518.56 L 134.7 356.56"/>
+<text x="128.7" y="437.56" class="cotat" text-anchor="middle" transform="rotate(-90 128.7 437.56)">1995</text>
+<path class="cota" d="M 160.72 438.51 L 202.65 438.51"/>
+<text x="146.77" y="418.22" class="cotat" text-anchor="middle">516</text>
+<path class="cota" stroke-dasharray="2 2" d="M 181.68 438.51 L 156.34 420.42"/>
+<path class="cota" d="M 114.41 455.66 L 114.41 423.26"/>
+<text x="108.41" y="439.46" class="cotat" text-anchor="middle" transform="rotate(-90 108.41 439.46)">399</text>
+<path class="cota" d="M 210.27 466.11 L 345.58 466.11"/>
+<text x="277.93" y="460.11" class="cotat" text-anchor="middle">1667</text>
+<path class="cota" d="M 341.73 482.35 L 341.73 402.73"/>
+<text x="335.73" y="442.54" class="cotat" text-anchor="middle" transform="rotate(-90 335.73 442.54)">981</text>
+<path class="cota" d="M 225.52 440.54 L 265.54 440.54"/>
+<text x="245.53" y="455.15" class="cotat" text-anchor="middle">493</text>
+<path class="cota" stroke-dasharray="2 2" d="M 245.53 440.54 L 245.53 446.35"/>
+<path class="cota" d="M 232.94 444.04 L 232.94 432.79"/>
+<text x="277.18" y="441.66" class="cotat" text-anchor="middle">139</text>
+<path class="cota" stroke-dasharray="2 2" d="M 232.94 438.42 L 267.61 438.42"/>
+<path class="cota" d="M 391.32 358.14 L 450.4 358.14"/>
+<text x="420.86" y="352.14" class="cotat" text-anchor="middle">728</text>
+<path class="cota" d="M 422.91 396.85 L 422.91 376.69"/>
+<text x="374.2" y="362.41" class="cotat" text-anchor="middle">248</text>
+<path class="cota" stroke-dasharray="2 2" d="M 422.91 386.77 L 383.77 364.61"/>
+<path class="cota" d="M 429.44 575.71 L 640.99 575.71"/>
+<text x="535.21" y="569.71" class="cotat" text-anchor="middle">2606</text>
+<path class="cota" d="M 573.1 404.21 L 573.1 381.34"/>
+<text x="573.1" y="373.29" class="cotat" text-anchor="middle">282</text>
+<path class="cota" stroke-dasharray="2 2" d="M 573.1 392.77 L 573.1 375.49"/>
+<path class="cota" d="M 599.06 433.64 L 673.85 433.64"/>
+<text x="636.46" y="427.64" class="cotat" text-anchor="middle">921</text>
+<path class="cota" d="M 662.41 454.76 L 662.41 368"/>
+<text x="656.41" y="411.38" class="cotat" text-anchor="middle" transform="rotate(-90 656.41 411.38)">1069</text>
+<path class="cota" d="M 349.39 620.37 L 1001.19 620.37"/>
+<text x="675.29" y="614.37" class="cotat" text-anchor="middle">8028</text>
+<path class="cota" d="M 707.06 469.14 L 707.06 359.74"/>
+<text x="701.06" y="414.44" class="cotat" text-anchor="middle" transform="rotate(-90 701.06 414.44)">1348</text>
+<path class="cota" d="M 450.55 459.62 L 665.91 459.62"/>
+<text x="521.69" y="454.75" class="cotat" text-anchor="middle">2653</text>
+<path class="cota" stroke-dasharray="2 2" d="M 558.23 459.62 L 534.45 456.95"/>
+<path class="cota" d="M 558.9 484.22 L 558.9 391.26"/>
+<text x="530.48" y="437.74" class="cotat" text-anchor="middle">1145</text>
+<path class="cota" stroke-dasharray="2 2" d="M 558.9 437.74 L 543.24 437.74"/>
+<path class="cota" d="M 763.89 462.38 L 864.96 430.88"/>
+<text x="855.02" y="491.28" class="cotat" text-anchor="middle">1304</text>
+<path class="cota" stroke-dasharray="2 2" d="M 814.43 446.63 L 842.26 482.48"/>
+<path class="cota" d="M 788.24 462.09 L 788.24 449.32"/>
+<text x="788.24" y="488.18" class="cotat" text-anchor="middle">157</text>
+<path class="cota" stroke-dasharray="2 2" d="M 788.24 455.7 L 788.24 479.38"/>
+<path class="cota" d="M 908.2 429.58 L 988.52 429.58"/>
+<path class="ext" d="M 908.2 376.81 L 908.2 432.58"/>
+<path class="ext" d="M 988.52 376.81 L 988.52 432.58"/>
+<text x="948.36" y="423.58" class="cotat" text-anchor="middle">989</text>
+<path class="cota" d="M 954.67 383.46 L 954.67 355.19"/>
+<text x="948.67" y="369.33" class="cotat" text-anchor="middle" transform="rotate(-90 948.67 369.33)">348</text>
+<path class="cota" d="M 889.63 263.15 L 946.72 263.15"/>
+<text x="918.17" y="257.15" class="cotat" text-anchor="middle">703</text>
+<path class="cota" d="M 885.67 364.88 L 885.67 209.81"/>
+<text x="845.07" y="254.87" class="cotat" text-anchor="middle">1910</text>
+<path class="cota" stroke-dasharray="2 2" d="M 885.67 287.34 L 857.83 257.07"/>
+<path class="cota" d="M 912.33 328.1 L 957.95 328.1"/>
+<text x="983.85" y="328.1" class="cotat" text-anchor="middle">562</text>
+<path class="cota" stroke-dasharray="2 2" d="M 935.14 328.1 L 974.28 328.1"/>
+<path class="cota" d="M 1027.74 364.18 L 1027.74 209.81"/>
+<text x="1021.74" y="287" class="cotat" text-anchor="middle" transform="rotate(-90 1021.74 287)">1901</text>
+<path class="cota" d="M 284.6 531.06 L 308.88 531.06"/>
+<text x="252.08" y="531.06" class="cotat" text-anchor="middle">299</text>
+<path class="cota" stroke-dasharray="2 2" d="M 296.74 531.06 L 261.65 531.06"/>
+<path class="cota" d="M 301.13 543.33 L 301.13 484.45"/>
+<text x="337.67" y="526.07" class="cotat" text-anchor="middle">725</text>
+<path class="cota" stroke-dasharray="2 2" d="M 301.13 513.89 L 328.1 517.27"/>
+<path class="cota" d="M 506.1 527 L 543.18 527"/>
+<text x="581.47" y="527" class="cotat" text-anchor="middle">457</text>
+<path class="cota" stroke-dasharray="2 2" d="M 524.64 527 L 571.9 527"/>
+<path class="cota" d="M 524.39 544.66 L 524.39 472.82"/>
+<text x="467.56" y="516.86" class="cotat" text-anchor="middle">885</text>
+<path class="cota" stroke-dasharray="2 2" d="M 524.39 508.74 L 477.13 508.74"/>
+<circle class="lm" cx="569.04" cy="474.23" r="2.6"/>
+<text class="lmt" x="1043.74" y="562.48">asa</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 569.04 474.23 L 1043.74 554.88"/>
+<circle class="lm" cx="853.19" cy="435.51" r="2.6"/>
+<text class="lmt" x="1043.74" y="440.7">barbatana</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 853.19 435.51 L 1043.74 435.51"/>
+<circle class="lm" cx="293.01" cy="417.4" r="2.6"/>
+<text class="lmt" x="80.41" y="253.97" text-anchor="end">capo</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 293.01 417.4 L 80.41 255.87"/>
+<circle class="lm" cx="175.3" cy="445.01" r="2.6"/>
+<text class="lmt" x="80.41" y="655.84" text-anchor="end">cone</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 175.3 445.01 L 80.41 648.24"/>
+<circle class="lm" cx="861.31" cy="328.1" r="2.6"/>
+<text class="lmt" x="80.41" y="120.02" text-anchor="end">deriva</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 861.31 328.1 L 80.41 121.92"/>
+<circle class="lm" cx="229.69" cy="439.32" r="2.6"/>
+<text class="lmt" x="80.41" y="298.63" text-anchor="end">escape</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 229.69 439.32 L 80.41 300.53"/>
+<circle class="lm" cx="970.91" cy="370.32" r="2.6"/>
+<text class="lmt" x="1043.74" y="371.69">estabilizador</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 970.91 370.32 L 1043.74 370.32"/>
+<circle class="lm" cx="763.89" cy="409.28" r="2.6"/>
+<text class="lmt" x="1043.74" y="412.28">fuselagem</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 763.89 409.28 L 1043.74 409.28"/>
+<circle class="lm" cx="193.97" cy="376.81" r="2.6"/>
+<text class="lmt" x="80.41" y="274.27" text-anchor="end">helice</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 193.97 376.81 L 80.41 276.17"/>
+<circle class="lm" cx="522.77" cy="385.74" r="2.6"/>
+<text class="lmt" x="80.41" y="176.85" text-anchor="end">janelas</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 522.77 385.74 L 80.41 178.75"/>
+<circle class="lm" cx="974.97" cy="217.69" r="2.6"/>
+<text class="lmt" x="1043.74" y="176.85">leme</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 974.97 217.69 L 1043.74 178.75"/>
+<circle class="lm" cx="402.61" cy="393.86" r="2.6"/>
+<text class="lmt" x="80.41" y="233.68" text-anchor="end">parabrisa</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 402.61 393.86 L 80.41 235.58"/>
+<circle class="lm" cx="609.64" cy="372.75" r="2.6"/>
+<text class="lmt" x="80.41" y="148.43" text-anchor="end">porta</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 609.64 372.75 L 80.41 150.33"/>
+<circle class="lm" cx="296.67" cy="537.56" r="2.6"/>
+<text class="lmt" x="80.41" y="680.2" text-anchor="end">tremNariz</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 296.67 537.56 L 80.41 672.6"/>
+<circle class="lm" cx="524.39" cy="494.53" r="2.6"/>
+<text class="lmt" x="1043.74" y="594.95">tremPrincipal</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 524.39 494.53 L 1043.74 587.35"/>
+</svg>

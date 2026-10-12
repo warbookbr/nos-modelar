@@ -8,9 +8,10 @@
    Puro: não lê nem grava arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { resumoDoRecorte } from './recorte.js';
-import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeContato, unidadesDeclaradas } from './contato.js';
+import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeApoio, unidadesDeclaradas } from './contato.js';
 import { quisDizer } from './parecido.js';
-import { conferirReferencia, exigirVista } from './referencia.js';
+import { lerOrientacao } from './lados.js';
+import { conferirReferencia, EIXOS_DA_VISTA, exigirVista } from './referencia.js';
 import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../../procedural/criterios/index.js';
 
 export const NIVEIS = ['esquematico', 'medio', 'detalhado'];
@@ -18,10 +19,10 @@ export const ORIGENS = ['ficha', 'foto', 'ia', 'referencia'];
 export const UNIDADES = { mm: 1, cm: 10, m: 1000 };
 export const MEDIDAS_TOTAIS = { alturaTotal: 'y', larguraTotal: 'x', profundidadeTotal: 'z' };
 const EIXOS = ['x', 'y', 'z'];
-const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope', 'pecas', 'familia'];
+const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope', 'pecas', 'familia', 'orientacao'];
 const CHAVES_DA_PECA = ['nome', 'formas', 'obrigatoria', 'opcoes'];
 const EXEMPLO_DA_PECA = '{ "nome": "para-lama traseiro", "formas": ["paralamaT*"], "obrigatoria": true }';
-const CHAVES_DA_REFERENCIA = ['arquivo', 'vista', 'tolerancia', 'iou_min', 'partes', 'opcoes', 'ancoras', 'recorte', 'limiar'];
+const CHAVES_DA_REFERENCIA = ['arquivo', 'vista', 'tolerancia', 'iou_min', 'partes', 'deslocamento', 'opcoes', 'ancoras', 'recorte', 'limiar'];
 const CHAVES_DA_MEDIDA = ['nome', 'valor', 'unidade', 'origem', 'tolerancia', 'mede', 'opcoes'];
 const CHAVES_DO_CONTRATO = ['tocam', 'livres', 'simetricas', 'fixa'];
 const CHAVES_DA_FIXA = ['a', 'b', 'pontos', 'peca', 'em'];
@@ -190,7 +191,7 @@ export function lerPlano(plano) {
     exigir(plano.envelope.tolerancia === undefined || (Number.isFinite(plano.envelope.tolerancia) && plano.envelope.tolerancia >= 0), 'esboço: "plano.envelope.tolerancia" deve ser um número em mm, maior ou igual a zero');
     envelope = { ...(plano.envelope.tolerancia === undefined ? {} : { tolerancia: plano.envelope.tolerancia }) };
   }
-  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), ...(pecas.length ? { pecas } : {}), ...(plano.familia === undefined ? {} : { familia: plano.familia }), estruturado: true };
+  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), ...(pecas.length ? { pecas } : {}), ...(plano.familia === undefined ? {} : { familia: plano.familia }), ...(plano.orientacao === undefined ? {} : { orientacao: lerOrientacao(plano.orientacao) }), estruturado: true };
 }
 
 const EXEMPLO_DA_REFERENCIA = '{ "arquivo": "referencias/lateral.contornos.json", "vista": "lateral", "tolerancia": 25, "iou_min": 0.85 }';
@@ -206,13 +207,17 @@ function lerReferencia(r, onde) {
   exigir(r.tolerancia === undefined || (Number.isFinite(r.tolerancia) && r.tolerancia > 0), `${onde}: "tolerancia" (em mm) deve ser um número maior que zero`);
   exigir(r.iou_min === undefined || (Number.isFinite(r.iou_min) && r.iou_min > 0 && r.iou_min <= 1), `${onde}: "iou_min" deve ser uma fração maior que 0 e no máximo 1, por exemplo 0.85`);
   if (r.partes !== undefined) {
-    exigir(objeto(r.partes) && Object.values(r.partes).every((l) => Array.isArray(l) && l.length > 0 && l.every((q) => typeof q === 'string' && q)), `${onde}: "partes" deve ser { "<região do arquivo>": ["id", "padrão.*"] }, cada região com as formas do esboço que a representam`);
+    exigir(Array.isArray(r.partes) ? r.partes.length === 0 : objeto(r.partes) && Object.values(r.partes).every((l) => Array.isArray(l) && l.every((q) => typeof q === 'string' && q)), `${onde}: "partes" deve ser { "<região do arquivo>": ["id", "padrão.*"] }, cada região com as formas do esboço que a representam (lista vazia numa região a deixa fora; "partes": [] confere só a silhueta)`);
+  }
+  if (r.deslocamento !== undefined) {
+    const eixos = Object.values(EIXOS_DA_VISTA[r.vista]);
+    exigir(objeto(r.deslocamento) && Object.keys(r.deslocamento).length > 0 && Object.entries(r.deslocamento).every(([k, v]) => eixos.includes(k) && Number.isFinite(v)), `${onde}: "deslocamento" deve ser { "<eixo>": mm } com os eixos que a vista ${r.vista} mede (${eixos.join(' e ')}): o valor soma à coordenada da referência para trazê-la à origem do esboço. Exemplo: { "z": 5062 }`);
   }
   exigir(r.opcoes === undefined || (Array.isArray(r.opcoes) && r.opcoes.length > 0 && r.opcoes.every((q) => typeof q === 'string' || Number.isInteger(q))), `${onde}: "opcoes" deve listar títulos ou números (a partir de 1) das opções a que a referência vale`);
   exigir(r.ancoras === undefined || (typeof r.ancoras === 'string' && r.ancoras), `${onde}: "ancoras" deve ser o caminho do JSON de âncoras (as duas âncoras de pixel para milímetro, o formato de conferir:referencia), só para imagem`);
   exigir(r.recorte === undefined || (Array.isArray(r.recorte) && r.recorte.length === 4 && r.recorte.every(Number.isFinite)), `${onde}: "recorte" deve ser [x0, y0, x1, y1] em pixels`);
   exigir(r.limiar === undefined || Number.isFinite(r.limiar), `${onde}: "limiar" deve ser um número de 0 a 255 (a imagem mais escura que ele é silhueta)`);
-  return { arquivo: r.arquivo, vista: r.vista, ...(r.tolerancia === undefined ? {} : { tolerancia: r.tolerancia }), ...(r.iou_min === undefined ? {} : { iou_min: r.iou_min }), ...(r.partes ? { partes: r.partes } : {}), ...(r.opcoes ? { opcoes: r.opcoes } : {}), ...(r.ancoras ? { ancoras: r.ancoras } : {}), ...(r.recorte ? { recorte: r.recorte } : {}), ...(r.limiar === undefined ? {} : { limiar: r.limiar }) };
+  return { arquivo: r.arquivo, vista: r.vista, ...(r.tolerancia === undefined ? {} : { tolerancia: r.tolerancia }), ...(r.iou_min === undefined ? {} : { iou_min: r.iou_min }), ...(r.partes ? { partes: r.partes } : {}), ...(r.deslocamento ? { deslocamento: r.deslocamento } : {}), ...(r.opcoes ? { opcoes: r.opcoes } : {}), ...(r.ancoras ? { ancoras: r.ancoras } : {}), ...(r.recorte ? { recorte: r.recorte } : {}), ...(r.limiar === undefined ? {} : { limiar: r.limiar }) };
 }
 
 /* Texto do `plano` (o de sempre, ou `plano.texto`), para o manifesto. */
@@ -403,11 +408,7 @@ export function conferirPlano(esboco, visiveis, { referencias, unidades, medidas
       for (const p of c.fixa) {
         const A = selecionarPeca(p.a, rs, ondeC, brutos, unidadeDe);
         const B = selecionarPeca(p.b, rs, ondeC, brutos, unidadeDe);
-        const achados = [];
-        for (const a of A) for (const b of B) {
-          if (a.id === b.id) continue;
-          for (const { ponto } of pontosDeContato(pecasDe(a), pecasDe(b), tol)) achados.push({ ponto, a: a.id, b: b.id });
-        }
+        const achados = pontosDeApoio(A.map((r) => ({ id: r.id, pecas: pecasDe(r) })), B.map((r) => ({ id: r.id, pecas: pecasDe(r) })), tol);
         const grupos = agruparPontos(achados.map((x) => x.ponto), tol);
         const ok = grupos.length >= p.pontos;
         const dosGrupos = grupos.map((g) => ({ ponto: g.ponto.map(r1), a: achados[g.itens[0]].a, b: achados[g.itens[0]].b }));

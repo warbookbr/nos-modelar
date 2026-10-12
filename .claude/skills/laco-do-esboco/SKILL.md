@@ -68,9 +68,23 @@ O esbocista não despacha agente, então para em cada `--feito` que imprime brie
 e devolve o caminho do brief e das imagens. Então:
 
 1. Abra você mesmo as imagens da unidade e leia o texto de `--ligacoes` que o
-   brief traz, antes de despachar o crítico.
+   brief traz, antes de despachar o crítico. O brief fica gravado em `brief.md`
+   na pasta das imagens (o texto entre as marcas "brief para o crítico cego" e
+   "fim do brief"), e `--brief <unidade|marco-N|objeto>` o reimprime e o regrava
+   quando ele já saiu da tela, como depois de o esbocista corrigir as unidades que
+   o crítico do Marco apontou e antes de chamar o crítico de novo.
 2. Despache o `critico-visual` cego só com o brief e as imagens. Não mande o
-   JSON, o plano, o histórico nem o que você viu.
+   JSON, o plano, o histórico nem o que você viu. As imagens são as que o brief
+   lista: as quatro vistas, as vistas a mais que a unidade pede em `vistas` e a
+   referência, que o brief diz ser o alvo da forma. Quando a unidade tem um mecanismo
+   com `curso` declarado, o brief traz também as poses do curso inteiro, o fim dele
+   incluso, no mesmo enquadramento, e diz qual é o fim; as posições não são escolha do
+   esbocista nem sua, e se o brief de uma unidade que se move não as trouxer, o
+   esboço está sem `curso` e isso volta ao esbocista. O brief diz de que lado cada
+   vista olha (o eixo, e as palavras do objeto quando o plano declara
+   `plano.orientacao`); não acrescente isso à mão, e se o bloco faltar ou
+   disser algo que as imagens contrariam, é defeito do brief, que você leva ao
+   esbocista e não corrige na mensagem ao crítico.
 3. Registre o veredito com `npm run esboco -- --condutor <arquivo> --veredito
    <unidade> --nota <0-10> --motivo <texto do crítico>`.
 4. No modo `objeto`, devolva a nota e o motivo ao mesmo esbocista por
@@ -85,7 +99,10 @@ e devolve o caminho do brief e das imagens. Então:
    esbocista novo. Esse novo esbocista lê no disco o motivo que o crítico
    registrou no histórico do Condutor (`--historico`).
 8. Em qualquer dos modos, o Condutor recusa o `--feito` de outra unidade e o
-   `--proximo` enquanto o último veredito for menor que 8. Depois de três
+   `--proximo` enquanto o último veredito for menor que 8, com uma exceção: a
+   nota de uma unidade não recusa o `--feito` de outra que o mesmo Marco aberto
+   também aponta, porque o Marco rejulga as unidades dele juntas e uma só
+   rodada do esbocista as corrige. Depois de três
    rodadas na mesma unidade sem chegar a 8, pare, leve o registro (`--condutor
    --historico`) à pessoa e pergunte explicitamente se prossegue. Só com o sim
    dela rode `npm run esboco -- --condutor <arquivo> --liberar <unidade|marco-N>
@@ -99,7 +116,8 @@ objeto inteiro: despache o crítico com ele, registre `--veredito objeto` e rode
 brief, com a mesma regra de três rodadas.
 
 O Marco (25, 50, 75 e 100% do custo) segue do mesmo jeito, com o brief do Marco
-e o veredito `marco-<N>`, e a mesma regra de três rodadas.
+e o veredito `marco-<N>`, e a mesma regra de três rodadas. O brief do Marco sai
+no `--feito` que cruza o limiar e depois só por `--brief marco-<N>`.
 
 Antes de aceitar uma nota alta, abra as imagens e confira que a unidade não tem
 ponta no ar, peça atravessada ou parte sem ligação. Nota alta sobre imagem que

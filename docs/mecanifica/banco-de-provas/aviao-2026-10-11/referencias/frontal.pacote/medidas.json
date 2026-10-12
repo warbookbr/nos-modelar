@@ -1,0 +1,238 @@
+{
+ "naBorda": {
+  "asaDir": 0.998,
+  "asaEsq": 1,
+  "capo": 1,
+  "chao": 1,
+  "cone": 1,
+  "corpoEscuro": 1,
+  "deriva": 1,
+  "estabilizadorDir": 0.993,
+  "estabilizadorEsq": 1,
+  "fuselagem": 1,
+  "helice": 1,
+  "parabrisa": 0.922,
+  "tremNariz": 1,
+  "tremPrincipalDir": 1,
+  "tremPrincipalEsq": 1
+ },
+ "minimo": 0.8,
+ "abaixo": [],
+ "semDonoPx": 832,
+ "buracosFechados": {
+  "buracos": 22,
+  "pixels": 37
+ },
+ "divisas": [
+  {
+   "a": "deriva",
+   "b": "helice",
+   "caixa": [
+    231,
+    51,
+    270,
+    90
+   ]
+  },
+  {
+   "a": "deriva",
+   "b": "fuselagem",
+   "caixa": [
+    231,
+    55,
+    270,
+    94
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "helice",
+   "caixa": [
+    212,
+    63,
+    289,
+    112
+   ]
+  },
+  {
+   "a": "fuselagem",
+   "b": "parabrisa",
+   "caixa": [
+    215,
+    67,
+    285,
+    109
+   ]
+  },
+  {
+   "a": "helice",
+   "b": "parabrisa",
+   "caixa": [
+    230,
+    67,
+    269,
+    106
+   ]
+  },
+  {
+   "a": "estabilizadorDir",
+   "b": "fuselagem",
+   "caixa": [
+    206,
+    66,
+    245,
+    105
+   ]
+  },
+  {
+   "a": "estabilizadorEsq",
+   "b": "fuselagem",
+   "caixa": [
+    257,
+    66,
+    296,
+    105
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "parabrisa",
+   "caixa": [
+    216,
+    75,
+    285,
+    114
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "helice",
+   "caixa": [
+    211,
+    81,
+    290,
+    150
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "fuselagem",
+   "caixa": [
+    214,
+    78,
+    286,
+    117
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "cone",
+   "caixa": [
+    229,
+    90,
+    272,
+    133
+   ]
+  },
+  {
+   "a": "cone",
+   "b": "helice",
+   "caixa": [
+    229,
+    90,
+    272,
+    132
+   ]
+  },
+  {
+   "a": "asaEsq",
+   "b": "corpoEscuro",
+   "caixa": [
+    401,
+    95,
+    440,
+    134
+   ]
+  },
+  {
+   "a": "asaDir",
+   "b": "capo",
+   "caixa": [
+    200,
+    109,
+    239,
+    148
+   ]
+  },
+  {
+   "a": "asaEsq",
+   "b": "capo",
+   "caixa": [
+    261,
+    109,
+    300,
+    148
+   ]
+  },
+  {
+   "a": "asaDir",
+   "b": "tremPrincipalDir",
+   "caixa": [
+    160,
+    110,
+    203,
+    149
+   ]
+  },
+  {
+   "a": "asaEsq",
+   "b": "tremPrincipalEsq",
+   "caixa": [
+    300,
+    111,
+    340,
+    150
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "tremNariz",
+   "caixa": [
+    227,
+    118,
+    270,
+    157
+   ]
+  },
+  {
+   "a": "chao",
+   "b": "tremPrincipalDir",
+   "caixa": [
+    160,
+    147,
+    199,
+    174
+   ]
+  },
+  {
+   "a": "chao",
+   "b": "tremNariz",
+   "caixa": [
+    231,
+    147,
+    270,
+    174
+   ]
+  },
+  {
+   "a": "chao",
+   "b": "tremPrincipalEsq",
+   "caixa": [
+    302,
+    147,
+    341,
+    174
+   ]
+  }
+ ]
+}

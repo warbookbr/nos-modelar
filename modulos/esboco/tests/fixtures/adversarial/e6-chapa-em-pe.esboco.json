@@ -1,0 +1,51 @@
+{
+ "plano": {
+  "nivel": "detalhado",
+  "contrato": {
+   "fixa": [
+    {
+     "a": "chapa",
+     "b": "base",
+     "pontos": 3
+    }
+   ]
+  }
+ },
+ "contato": {
+  "usar": true,
+  "tolerancia": 2,
+  "penetracao": 2,
+  "folga": 5000
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "base",
+     "tipo": "caixa",
+     "largura": 1200,
+     "altura": 20,
+     "profundidade": 400,
+     "centro": [
+      0,
+      -10,
+      0
+     ]
+    },
+    {
+     "id": "chapa",
+     "tipo": "caixa",
+     "largura": 1000,
+     "altura": 1000,
+     "profundidade": 10,
+     "centro": [
+      0,
+      500,
+      0
+     ]
+    }
+   ]
+  }
+ ]
+}

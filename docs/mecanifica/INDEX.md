@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Sem plano ativo. O último, [as ferramentas de modelagem](planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), fechou em 2026-10-11.
+- O plano ativo é [o que o avião pede](planos/2026-10-11-o-que-o-aviao-pede.md): modelar o avião de pequeno porte para achar ferramentas e primitivas 2.0 que faltam. O anterior, [as ferramentas de modelagem](planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), fechou em 2026-10-11.
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
@@ -138,7 +138,7 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 - O plano ativo, o rascunho aberto e os congelados estão em
   [`planos/README.md`](planos/README.md) e na pasta
   [`congelados/`](planos/congelados/README.md).
-- A carcaça da empilhadeira espera o fim do plano ativo, com o
+- A carcaça da empilhadeira é candidata de sucessão do plano ativo, com o
   [alinhamento](banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) parado
   na ordem de montagem.
 - O que foi pesquisado e ainda não entra no código fica no

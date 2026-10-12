@@ -13,10 +13,11 @@
    a folga é a menor entre elas e a penetração é a maior entre as peças, o que
    subestima um cruzamento que atravesse várias fatias do aro. */
 import earcut from 'earcut';
-import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pontasDe, resolverOpcao, subforma, wDoPonto } from './index.js';
+import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pontaSilenciosa, pontasDe, resolverOpcao, subforma, wDoPonto } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 import { avaliarPortas, girar, localParaMundo, mmFino } from './portas.js';
+import { pecasDaMalha } from './malha.js';
 import { pecasRecortadas } from './recorte.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
@@ -266,6 +267,10 @@ const memoPares = new WeakMap();
 
 function pecasSemMemoria(r) {
   if (r.partes) return r.partes.flatMap((pt) => pecasDe(subforma(r, pt)));
+  /* a forma de família: as peças convexas da malha, uma lista por parte da família (o aro, o pneu, a camisa, a haste), cortadas até o
+     casco de cada pedaço quase não cobrir vazio; o furo do cubo e o interior da camisa não têm peça, e por isso o eixo e a haste
+     entram neles sem se atravessar (ver `malha.js`) */
+  if (r.prisma.malha) return pecasDaMalha(r);
   if (r.prisma.casca) return pecasDaCasca(r);
   if (r.prisma.secoes) return r.prisma.porFaixas ? pecasPorFaixas(r) : [prismaDeSecoes(r)];
   const { perfil, furos } = r.prisma;
@@ -485,6 +490,71 @@ export function pontosDeContato(pecasA, pecasB, tol) {
     }) });
   }
   return saida;
+}
+
+/* Para valer como face, o contato precisa cobrir ao menos esta fração da peça presa em cada direção do plano (o pé de 20 mm sob o motor de 100 mm
+   cobre 0,2 e não é face; a peça apoiada inteira cobre 1) e ao menos `PISO_DA_FACE` do maior diâmetro dela (o mastro de 2 m sobre 60 mm, 0,03, não). */
+const FRACAO_DA_FACE = 0.5;
+const PISO_DA_FACE = 0.1;
+
+const maisLongeEm = (nuvem, de) => nuvem.reduce((m, q) => (norma2(sub(de, q)) > norma2(sub(de, m)) ? q : m), nuvem[0]);
+
+/* Os pontos de apoio da seleção presa (`presas`) na seleção em que ela é presa (`em`), para o `contrato.fixa`. Cada seleção é uma lista
+   `{ id, pecas }` de formas. Há dois jeitos de contar, e vale o que dá mais pontos distintos.
+   Por local: o ponto de `pontosDeContato` de cada par de peças a menos de `tol`, que é o que conta o pé de 20 mm sob o motor de 360 mm, o tubo no
+   quadro e o aro de 32 setores sob um tampo (32 locais).
+   Por face, que fixa por plano: o contato é de verdade quando as peças estão a no máximo `tol / 10` uma da outra (a placa 25 mm acima da base,
+   com tolerância de 30 mm, só chega perto) e a nuvem dos vértices de uma peça a esse tanto da outra, de todos os pares das duas seleções,
+   cobre `FRACAO_DA_FACE` da seleção presa inteira (não de uma forma só: o parafuso de uma asa de 2 m) e o `PISO_DA_FACE` do maior diâmetro
+   dela. Cobrindo só a direção de maior vão (a aresta da placa inclinada, a chapa em pé) são dois pontos, os mais afastados; cobrindo as duas,
+   três: os dois e o mais distante da reta entre eles, os que definem um plano. A cobertura é a extensão da nuvem de ponta a ponta contra a da
+   peça presa na mesma direção, e dá 1 para a peça apoiada inteira, de modo que nenhuma proporção (360 x 211 mm) cai num empate de ponto flutuante. O capô do avião apoia o aro no fogo, e o contato de face larga contava um ponto e reprovava `pontos: 2`.
+   Devolve [{ ponto, a, b }] com os ids das duas formas de cada ponto. */
+export function pontosDeApoio(presas, em, tol) {
+  const locais = [];
+  const nuvem = [];
+  const folgaDeFace = tol / 10;
+  for (const A of presas) for (const B of em) {
+    if (A.id === B.id) continue;
+    for (const a of A.pecas) for (const b of B.pecas) {
+      if (folgaAABB(a, b) > tol) continue;
+      const d = distanciaConvexa(a, b);
+      if (d > tol) continue;
+      for (const { ponto } of pontosDeContato([a], [b], tol)) locais.push({ ponto, a: A.id, b: B.id });
+      if (d > folgaDeFace) continue;
+      for (const [de, contra] of [[a, b], [b, a]]) for (const v of de.verts) {
+        if (v.some((c, i) => c < contra.min[i] - folgaDeFace || c > contra.max[i] + folgaDeFace)) continue;
+        if (distanciaDoPonto(v, [contra]) <= folgaDeFace) nuvem.push({ ponto: v, a: A.id, b: B.id });
+      }
+    }
+  }
+  const face = pontosDeFace(nuvem, presas, tol);
+  return face.length > agruparPontos(locais.map((l) => l.ponto), tol).length ? face : locais;
+}
+
+/* Os pontos que a nuvem de contato `{ ponto, a, b }` fixa como face (ver `pontosDeApoio`): três, dois ou nenhum. */
+function pontosDeFace(nuvem, presas, tol) {
+  if (nuvem.length === 0) return [];
+  const pts = nuvem.map((n) => n.ponto);
+  const todos = presas.flatMap((f) => f.pecas.flatMap((pc) => pc.verts));
+  const q1 = maisLongeEm(todos, todos[0]);
+  const diametro = Math.sqrt(norma2(sub(maisLongeEm(todos, q1), q1)));
+  const p1 = maisLongeEm(pts, pts[0]);
+  const p2 = maisLongeEm(pts, p1);
+  const vao1 = Math.sqrt(norma2(sub(p1, p2)));
+  const e1 = escala(sub(p2, p1), 1 / (vao1 || 1));
+  const extensao = (e) => { const t = todos.map((v) => dot(v, e)); return Math.max(...t) - Math.min(...t); };
+  if (vao1 <= tol || vao1 < PISO_DA_FACE * diametro || vao1 < FRACAO_DA_FACE * extensao(e1)) return [];
+  const fora = (q) => { const r = sub(q, p1); return sub(r, escala(e1, dot(r, e1))); };
+  const p3 = pts.reduce((m, q) => (norma2(fora(q)) > norma2(fora(m)) ? q : m), pts[0]);
+  const oPonto = (q) => nuvem[pts.indexOf(q)];
+  const par = [p1, p2].map(oPonto);
+  const desvio = Math.sqrt(norma2(fora(p3)));
+  if (desvio <= tol) return par;
+  const e2 = escala(fora(p3), 1 / desvio);
+  const t = pts.map((q) => dot(q, e2));
+  const vao2 = Math.max(...t) - Math.min(...t);
+  return vao2 >= PISO_DA_FACE * diametro && vao2 >= FRACAO_DA_FACE * extensao(e2) ? [...par, oPonto(p3)] : par;
 }
 
 /* Agrupa pontos a menos de `tol` uns dos outros (encadeado: o vizinho do vizinho é do mesmo grupo), na ordem em que chegam.
@@ -720,6 +790,81 @@ export function padroesDoContato(resolvidas) {
   return { padraoTol: Math.max(1, dimensao * 0.01), padraoPen: Math.max(1, dimensao * 0.003), padraoFolga: dimensao * 0.1 };
 }
 
+export const MOTIVO_DO_ENCAIXE = 'encaixe na mesma unidade';
+
+/* Metade da extensão da peça menor ao longo da direção de saída é o mais fundo que um encaixe entra. */
+const FRACAO_DO_ENCAIXE = 0.5;
+/* A peça que entra tem de ser bem menor que a hospedeira nas duas direções transversais à entrada: ocupar até 60% da extensão dela em cada uma
+   deixa ao menos 40% de sobra em volta (o suporte de 70 x 220 mm no estabilizador de 2000 x 600 mm ocupa 3% e 37%; o escape de 130 mm no
+   capô, 33% e 13%), e duas caixas iguais sobrepostas, que ocupam 100%, são descuido, e não encaixe. */
+const FRACAO_TRANSVERSAL_DO_ENCAIXE = 0.6;
+
+/* O volume da forma: o do prisma (área do perfil sem os furos vezes o comprimento) quando ela é um, e o da caixa envolvente nas outras. Uma haste
+   diagonal tem a caixa envolvente maior que a de um cubo que ela atravessa, e escolher a peça menor por ela trocava quem atravessa quem. */
+function volumeDe(r) {
+  const caixa = (r.max[0] - r.min[0]) * (r.max[1] - r.min[1]) * (r.max[2] - r.min[2]);
+  const pr = r.prisma;
+  if (pr?.malha) return pr.malha.volume;
+  if (!pr || pr.secoes || !Array.isArray(pr.perfil) || !(pr.comprimento > 0)) return caixa;
+  const area = Math.abs(areaDe(pr.perfil)) / 2 - (pr.furos ?? []).reduce((acc, f) => acc + Math.abs(areaDe(f)) / 2, 0);
+  return area > 0 ? area * pr.comprimento : caixa;
+}
+
+/* A mesma unidade aceita um encaixe sem a junta declarada e reprova o resto. O par `ra`/`rb` (formas resolvidas) é encaixe quando a peça menor
+   (a visita, de menor volume) entra na maior por uma face e para dentro dela, sem passar do outro lado e sem ir fundo: (1) nenhuma peça
+   convexa da maior que a visita toca é atravessada de lado a lado, isto é, em nenhum eixo (os do mundo, a direção de saída do SAT e o eixo
+   mais longo da visita) o intervalo da visita cobre o da peça com sobra de 0,5 mm nos dois lados (o eixo que sai pelas duas faces do cubo; a
+   haste que fura a parede de uma casca, medida pela espessura da parede, e não pela extensão da casca inteira); (2) a penetração não passa de
+   metade da extensão da visita ao longo da direção de saída (o tubo com 73 mm de um comprimento de 522 mm, o suporte do profundor com 24 mm de uma
+   altura de 56 mm). A peça idêntica, a quina, o flap com 45 mm dos 50 dentro da asa e a peça enterrada inteira passam do limite e reprovam.
+   Devolve { encaixe, razao, ... } com a visita, a hospedeira e `max`, o limite em mm. */
+export function lerEncaixe(ra, rb) {
+  const ehA = volumeDe(ra) < volumeDe(rb) || (volumeDe(ra) === volumeDe(rb) && ra.id < rb.id);
+  const [visita, hospedeira] = ehA ? [ra, rb] : [rb, ra];
+  const pv = pecasDe(visita); const ph = pecasDe(hospedeira);
+  const sair = detalharPar(pv, ph);
+  if (!sair.separa) return { encaixe: false, razao: `o par não tem direção de saída` };
+  const d = sair.separa;
+  const nuvem = pv.flatMap((pc) => pc.verts);
+  const ponta = maisLongeEm(nuvem, nuvem[0]);
+  const longo = sub(maisLongeEm(nuvem, ponta), ponta);
+  const eixos = [[1, 0, 0], [0, 1, 0], [0, 0, 1], d, ...(norma2(longo) > 1e-12 ? [escala(longo, 1 / Math.sqrt(norma2(longo)))] : [])];
+  const faixa = (pecas, e) => {
+    let lo = Infinity; let hi = -Infinity;
+    for (const pc of pecas) for (const v of pc.verts) { const t = dot(v, e); if (t < lo) lo = t; if (t > hi) hi = t; }
+    return [lo, hi];
+  };
+  const sobra = 0.5;
+  const faixasDaVisita = eixos.map((e) => faixa(pv, e));
+  for (const peca of ph) {
+    if (medirPar(pv, [peca]).penetracao <= 0) continue;
+    for (const [k, e] of eixos.entries()) {
+      const [v0, v1] = faixasDaVisita[k]; const [h0, h1] = faixa([peca], e);
+      if (v0 < h0 - sobra && v1 > h1 + sobra) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} cruza ${hospedeira.id} de lado a lado (travessia, e não encaixe)` };
+    }
+  }
+  const apoioT = Math.abs(d[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const u = unicas([cross(d, apoioT)])[0]; const w = cross(d, u);
+  for (const e of [u, w]) {
+    const [t0, t1] = faixa(pv, e); const [g0, g1] = faixa(ph, e);
+    const razao = (t1 - t0) / (g1 - g0);
+    if (razao > FRACAO_TRANSVERSAL_DO_ENCAIXE) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} ocupa ${Math.round(razao * 100)}% da extensão de ${hospedeira.id} transversal à entrada (o encaixe pede no máximo ${Math.round(FRACAO_TRANSVERSAL_DO_ENCAIXE * 100)}%: a peça menor entra numa grande, e a sobreposição de duas peças do mesmo porte é descuido)` };
+  }
+  const [s0, s1] = faixa(pv, d);
+  const limite = FRACAO_DO_ENCAIXE * (s1 - s0);
+  if (sair.penetracao > limite) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} penetra ${mmTxt(sair.penetracao)} mm em ${hospedeira.id}, mais que a metade (${mmTxt(limite)} mm) da extensão de ${visita.id} ao longo da saída (${mmTxt(s1 - s0)} mm)` };
+  return { encaixe: true, visita: visita.id, hospedeira: hospedeira.id, max: limite };
+}
+
+/* Um loft sem nada que o posicione (nem `centro`, `sobre`, `ponta`, `encaixa`, `alinha`, `encosta` ou `desloca`, nem é cópia ou parte de um
+   componente) é centrado na origem pelo centro da caixa dos vértices, e o `centro` das seções vale só como deslocamento relativo. */
+export function loftSemPosicao(r) {
+  const f = r.forma;
+  if (f.tipo !== 'loft' || f.daInstancia !== undefined || f.daLigacao !== undefined) return false;
+  if (['centro', 'sobre', 'encaixa', 'alinha', 'encosta', 'desloca', 'espelha', 'arranjoDe'].some((k) => f[k] !== undefined)) return false;
+  return !(f.ponta !== undefined && !pontaSilenciosa(f.ponta));
+}
+
 /* O registro de um par lido pelas portas, para o bloco `portas` do resultado e do manifesto: o que a porta mediu, em mm. */
 function registroDaPorta(opcao, par, lida, penetracao) {
   const fino = (x) => Math.round(x * 1000) / 1000;
@@ -912,12 +1057,60 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
           achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(max), ...(implicito ? { implicita: true, maxSugerido: Math.floor(penetracao) + 1 } : {}), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, sobra, `a travessia de ${mmTxt(penetracao)} mm passa ${mmTxt(penetracao - max)} mm do máximo de ${mmTxt(max)} mm; mais 0,1 mm de folga de arredondamento`) : null });
         }
       } else if (penetracao > penMax) {
-        const d = detalharPar(pecas[a], pecas[b]);
-        achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao + margem, `penetração de ${mmTxt(penetracao)} mm mais margem de ${mmTxt(margem)} mm`) : null });
+        /* na mesma unidade, o par sem junta que é encaixe (a peça menor entra por uma face e termina dentro da maior) passa; o que atravessa ou
+           entra por uma quina continua colisão, e a mensagem diz por que não é encaixe */
+        const lido = mesmaUnidade({ a: par[0], b: par[1] }, [i]) ? lerEncaixe(rs[a], rs[b]) : null;
+        if (lido?.encaixe) {
+          implicitas.push({ opcao: titulo, a: par[0], b: par[1], unidade: unidadeDe[i].get(par[0]), motivo: MOTIVO_DO_ENCAIXE, penetracao_mm: arred(penetracao), max_mm: arred(lido.max), maxImplicito: true, encaixe: true });
+          atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), max_mm: arred(lido.max), implicita: true, encaixe: true });
+        } else {
+          const d = detalharPar(pecas[a], pecas[b]);
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao), ...(lido ? { naoEncaixe: lido.razao } : {}), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao + margem, `penetração de ${mmTxt(penetracao)} mm mais margem de ${mmTxt(margem)} mm`) : null });
+        }
       }
     }
-    /* a forma ligada só por uma oculta (a unidade isolada) não é solta nem longe: o mestre a liga */
+    /* a forma visível contra a oculta (a unidade isolada por `--detalhar` esconde as outras): a oculta só serve de referência de posição e nunca é
+       achado, mas a visível que a atravessa além do que o mestre aceita reprova aqui também. Sem isso, alargar o cone de cauda da fuselagem
+       deixou o isolado em "divergências: nenhuma" enquanto o mestre acusava quatro travessias com o estabilizador e o profundor. Vale o mesmo
+       julgamento do par entre visíveis: `atravessa` declarado reprova acima do `max`, `encosta` e o par sem declaração acima da penetração aceita. */
     const ocultasDaOpcao = ocultasResolvidas[i] ?? [];
+    if (ocultasDaOpcao.length > 0) {
+      const pecasOcultas = ocultasDaOpcao.map(pecasDe);
+      const declaradasComOculta = new Map(paresDaOpcao.filter((p) => !vale(p)).map((p) => [chave(p.a, p.b), p]));
+      const caixasOcultas = pecasOcultas.map(caixaDasPecas);
+      for (let a = 0; a < n; a++) {
+        const caixa = caixaDasPecas(pecas[a]);
+        for (const [h, oculta] of ocultasDaOpcao.entries()) {
+          /* só a oculta de outra unidade (as duas com unidade declarada ou planejada, e diferentes): a oculta genérica, sem unidade, é guia e não é achado */
+          const ua = unidadeDe[i].get(rs[a].id); const uh = unidadeDe[i].get(oculta.id);
+          if (ua === undefined || uh === undefined || ua === uh) continue;
+          if (folgaAABB(caixa, caixasOcultas[h]) > 0) continue;
+          const declarada = declaradasComOculta.get(chave(rs[a].id, oculta.id));
+          if (declarada?.tipo === 'livre') continue;
+          const { folga, penetracao } = medirPar(pecas[a], pecasOcultas[h]);
+          if (folga > 0) continue;
+          const par = [rs[a].id, oculta.id];
+          const de = () => detalharPar(pecas[a], pecasOcultas[h]);
+          const sugerir = (d, mmSobra, motivo) => (d.separa ? conserto.forma(rs[a].id, d.separa, mmSobra, motivo) : null);
+          if (declarada?.tipo === 'atravessa') {
+            if (declarada.max !== undefined && penetracao > declarada.max) {
+              achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(declarada.max), oculta: oculta.id, sugestao: sugerir(de(), penetracao - declarada.max + 0.1, `a travessia de ${mmTxt(penetracao)} mm com ${oculta.id}, de outra unidade, passa ${mmTxt(penetracao - declarada.max)} mm do máximo de ${mmTxt(declarada.max)} mm; mais 0,1 mm de folga de arredondamento`) });
+            }
+          } else if (penetracao > penMax) {
+            const encosta = declarada?.tipo === 'encosta';
+            achadosDaOpcao.push({ opcao: titulo, tipo: encosta ? 'par-nao-encosta' : 'colisao', pecas: par, mm: arred(penetracao), ...(encosta ? { detalhe: 'penetracao' } : {}), oculta: oculta.id, sugestao: sugerir(de(), penetracao + margem, `penetração de ${mmTxt(penetracao)} mm com ${oculta.id}, de outra unidade, mais margem de ${mmTxt(margem)} mm`) });
+          }
+        }
+      }
+    }
+    /* a forma visível que atravessa duas ocultas (a fuselagem entre o estabilizador esquerdo e o direito) recebe sugestões que se desfazem
+       uma à outra (+1,1 e -1,1 mm em x): com mais de um achado contra ocultas na mesma forma, nenhum leva sugestão */
+    const contraOcultas = achadosDaOpcao.filter((x) => x.oculta !== undefined);
+    for (const x of contraOcultas) if (contraOcultas.filter((y) => y.pecas[0] === x.pecas[0]).length > 1) x.sugestao = null;
+    /* o loft sem posição vai para a origem, e na unidade isolada a origem costuma estar dentro de uma forma oculta que o liga ao resto: o
+       isolado não o via solto (o duto da entrada de ar do motor, 800 mm do capô) */
+    if (n > 1) for (const r of rs) if (loftSemPosicao(r)) achadosDaOpcao.push({ opcao: titulo, tipo: 'sem-posicao', pecas: [r.id], mm: null, sugestao: null });
+    /* a forma ligada só por uma oculta (a unidade isolada) não é solta nem longe: o mestre a liga */
     if (ocultasDaOpcao.length > 0 && n > 1 && (contarGrupos(ligados) > 1 || menorFolga.some((f) => f !== Infinity && f > folgaMax))) {
       completarPelasOcultas({ visiveis: pecas, ocultas: ocultasDaOpcao.map(pecasDe), ligados, menorFolga, tol, alcance: Math.max(tol, folgaMax), declarado: (a, h) => atravessaComOculta.has(chave(rs[a].id, ocultasDaOpcao[h].id)) });
     }
@@ -958,13 +1151,19 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
   };
 }
 
-const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido', 'ponta-livre': 'ponta livre', 'pontas-sem-coletor': 'pontas sem coletor', 'porta-fora': 'porta fora do contrato' };
+const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido', 'ponta-livre': 'ponta livre', 'pontas-sem-coletor': 'pontas sem coletor', 'porta-fora': 'porta fora do contrato', 'sem-posicao': 'loft sem posição' };
 const mm = (x) => x.toFixed(1).replace('.', ',');
 
 /* Linha legível de um achado. */
 export function descreverAchado(a) {
+  const nota = [a.oculta ? `${a.oculta} é de outra unidade e está oculta nesta leitura, onde só serve de referência` : null, a.naoEncaixe ? `na mesma unidade passaria como encaixe, mas ${a.naoEncaixe}` : null].filter(Boolean);
+  return `${textoDoAchado(a)}${nota.length ? ` (${nota.join('; ')})` : ''}`;
+}
+
+function textoDoAchado(a) {
   const p = a.pecas;
   const base = `[${a.opcao}] ${NOMES[a.tipo]}: `;
+  if (a.tipo === 'sem-posicao') return `${base}${p[0]} não tem posição (sem centro, sobre, ponta, encaixa, alinha, encosta nem desloca) e vai para a origem, centrado pela caixa dos vértices; o centro das seções vale só como deslocamento relativo. Dê "centro" ou "encaixa" a ele`;
   if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} se penetram ${mm(a.mm)} mm`;
   if (a.tipo === 'porta-fora') return `${base}${a.texto}`;
   if (a.tipo === 'ponta-livre') return `${base}${p[0]} tem a ponta ${a.ponta} em [${a.ponto.map(mmTxt).join(' ')}] sem encostar em nada (a forma mais próxima fica a ${mm(a.mm)} mm); encoste-a em outra forma ou declare "ponta": true${a.ponta === 'inicio' || a.ponta === 'fim' ? ` (ou "ponta": { "${a.ponta}": true })` : ''} se ela termina no ar de propósito`;

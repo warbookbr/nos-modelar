@@ -1,0 +1,52 @@
+{
+ "plano": {
+  "nivel": "detalhado",
+  "contrato": {
+   "fixa": [
+    {
+     "a": "tampo",
+     "b": "aro",
+     "pontos": 4
+    }
+   ]
+  }
+ },
+ "contato": {
+  "usar": true,
+  "tolerancia": 2,
+  "penetracao": 2,
+  "folga": 5000
+ },
+ "opcoes": [
+  {
+   "titulo": "T",
+   "formas": [
+    {
+     "id": "aro",
+     "tipo": "anel",
+     "diametroExterno": 380,
+     "diametroInterno": 340,
+     "espessura": 20,
+     "eixo": "y",
+     "centro": [
+      0,
+      -10,
+      0
+     ]
+    },
+    {
+     "id": "tampo",
+     "tipo": "caixa",
+     "largura": 400,
+     "altura": 10,
+     "profundidade": 400,
+     "centro": [
+      0,
+      5,
+      0
+     ]
+    }
+   ]
+  }
+ ]
+}

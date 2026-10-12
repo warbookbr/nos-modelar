@@ -42,7 +42,9 @@ describe('mapa de ligações por unidade', () => {
 
   it('o número de pontos é o mesmo que o contrato.fixa conta', () => {
     const e = objeto();
-    e.plano = { contrato: { fixa: [{ a: 'pes', b: 'chao', pontos: 2 }, { a: 'placa', b: 'antena', pontos: 1 }] } };
+    /* o mapa conta os locais de contato; a face que cobre a peça presa, que o `fixa` conta como plano (3 pontos), é um local só no mapa. Aqui a
+       peça presa é a grande (o chão sobre os pés, a placa sob a antena), e a conta das duas é a mesma */
+    e.plano = { contrato: { fixa: [{ a: 'chao', b: 'pes', pontos: 2 }, { a: 'placa', b: 'antena', pontos: 1 }] } };
     const x = expandirEsboco(e);
     const r = conferirPlano(x, visiveisDoEsboco(x));
     expect(r.opcoes[0].contrato.map((c) => c.pontos)).toEqual([2, 1]);

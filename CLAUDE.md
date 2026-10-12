@@ -51,6 +51,8 @@ passo seguinte.
 - Responda curto. Diga cada fato uma vez, sem repetir com outras palavras, sem
   recapitular o que o usuário já sabe e sem justificar além do que a decisão
   pede. Um erro se reconhece em uma frase.
+- Ao reportar à pessoa, traga um sumário breve do que foi feito, sem termos
+  internos, e diga se algo depende da decisão dela, sempre com a recomendação.
 - Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe
   sozinho a bateria curta quando só mudou peça ou documento e a completa em
   qualquer outro caso; durante o trabalho bastam os testes do que foi tocado.

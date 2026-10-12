@@ -13,6 +13,7 @@ import { comPontosReais, conferirPlano, lerPlano, visiveisDoEsboco } from '../..
 import { traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compararLeituras, lerMedidasNaBlocagem, lerMedidasNoDado } from '../../src/autoria/medidas-na-blocagem.js';
 import { avaliarG01DoAndaime } from '../../src/autoria/g01-do-andaime.js';
+import './esboco-familias.mjs';
 
 /** O andaime da opção `opcao` (número a partir de 1, ou título) de um esboço já lido. As opções do tradutor (`id`, `objetivo`,
  *  `alvo`, `familia`, `intencao`, `eixos`, `volumesMaximos`, `estrito`) passam como estão. */

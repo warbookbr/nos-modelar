@@ -33,6 +33,8 @@ const REGRAS = [
   { re: /"subtrai"|"cortador"|: subtrai: |o recorte (?:é circular|remove a forma inteira)|não subtrai a si mesma/, topico: 'recorte' },
   { re: /: porta: |A porta não o justifica|"porta" deve ser|a porta não tem o campo|o papel da porta|a classe de ajuste da porta|a face da porta|declaram classes de ajuste diferentes/, topico: 'portas' },
   { re: /↔|contato\.pares|contato\.usar|"contato"|precisa dizer por que a exceção/, topico: 'contrato' },
+  { re: /^integrar:/, topico: 'detalhar' },
+  { re: /--refazer-envelope|Envelope de unidade|Envelope de uma unidade/, topico: 'envelope' },
   { re: /\bjuntas?\b/, topico: 'juntas' },
   { re: /^editar:|--editar|--remover|--adicionar/, topico: 'editar' },
   { re: /--feito|unidade de detalhe|Plano de detalhe|--mover|--replanejar/, topico: 'unidades' },

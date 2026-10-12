@@ -7,6 +7,7 @@ import { completarPelasOcultas, contarGrupos, herdarDoEspelho, lerContato, medir
 import { verificarProjecao } from './projecao.js';
 import { conferirPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
+import { girar } from './portas.js';
 import { resumoDoRecorte } from './recorte.js';
 
 const EIXOS = ['x', 'y', 'z'];
@@ -20,7 +21,7 @@ export const RUIDO_MM = 0.05;
 
 function eixoDe(r) {
   const t = r.forma.tipo;
-  if (t === 'caixa' || t === 'esfera' || t === 'tubo' || t === 'envolve') return null;
+  if (t === 'caixa' || t === 'esfera' || t === 'tubo' || t === 'envolve' || t === 'familia') return null;
   return r.forma.eixo ?? 'y';
 }
 
@@ -29,6 +30,22 @@ function descreverRecorte(r) {
   const q = resumoDoRecorte(r);
   const cm3 = (mm3) => Math.round(mm3 / 100) / 10;
   return { cortadores: q.cortadores.map((c) => ({ id: c.id, ...(c.folga ? { folga_mm: r2(c.folga) } : {}), ...(c.profundidade !== undefined ? { profundidade_mm: r2(c.profundidade), lado: c.lado } : {}), retira_cm3: cm3(c.retiradoMm3) })), volume_cm3: cm3(q.volumeMm3), retira_cm3: cm3(q.retiradoMm3), pecas: q.pecas };
+}
+
+/* A forma de família em texto de dado: a família, o perfil, os ajustes, as partes da peça, o volume da superfície e as portas com o
+   eixo de cada uma já girado (o do mundo), porque quem posiciona a roda do trem pelo eixo dela precisa saber para onde ele aponta. */
+function descreverFamilia(r) {
+  const m = r.prisma?.malha;
+  if (!m) return null;
+  const ajustes = r.forma.parametros ?? {};
+  return {
+    id: r.forma.familia,
+    ...(r.forma.perfil === undefined ? {} : { perfil: r.forma.perfil }),
+    ...(Object.keys(ajustes).length > 0 ? { ajustes } : {}),
+    partes: m.partes.map((p) => p.nome).filter(Boolean),
+    volume_mm3: Math.round(m.volume),
+    portas: (m.portas ?? []).map((p) => ({ id: p.id, tipo: p.tipo, papel: p.papel, ...(p.eixo ? { eixo: vec(girar(r.matriz, p.eixo)) } : {}) })),
+  };
 }
 
 function descreverForma(r) {
@@ -42,6 +59,7 @@ function descreverForma(r) {
     ...(r.forma.rotacao !== undefined ? { rotacao: r.forma.rotacao } : {}),
     ...(relacaoDe(r.forma) ? { relacao: relacaoDe(r.forma) } : {}),
     ...(r.subtrai ? { recorte: descreverRecorte(r) } : {}),
+    ...(r.prisma?.malha ? { familia: descreverFamilia(r) } : {}),
     caixa: { x: [r2(r.min[0]), r2(r.max[0])], y: [r2(r.min[1]), r2(r.max[1])], z: [r2(r.min[2]), r2(r.max[2])] },
     ancoras: Object.fromEntries(Object.entries(ancorasDe(r)).map(([k, v]) => [k, vec(v)])),
   };
@@ -51,7 +69,7 @@ function descreverForma(r) {
    declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho, medida do plano
    fora da tolerância e silhueta fora da referência. A ponta livre (ponta de tubo ou de haste que não encosta em nada, ou várias pontas no mesmo ponto sem coletor) vem logo depois do contrato. */
 export const GRAVIDADES = { peca: 0, solto: 1, atravessa: 2, contrato: 3, ponta: 4, assimetria: 5, medida: 6, referencia: 7 };
-const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta', 'porta-fora': 'contrato' };
+const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta', 'porta-fora': 'contrato', 'sem-posicao': 'solto' };
 const CLASSE_DO_PLANO = { 'recorte-vazio': 'contrato', 'cortador-solto': 'contrato', 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', 'contrato-fixa': 'contrato', assimetria: 'assimetria' };
 
 /* { opcoes, ... } a partir do JSON já lido. */
@@ -156,11 +174,15 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
 }
 
 const mm1 = (x) => (Math.round(x * 10) / 10).toString().replace('.', ',');
+/* Um parâmetro não é uma medida em mm: arredondado a uma casa, `ehDz` (0,0188, o avanço em z por mm de envergadura do avião) saía 0 e `ehS1`
+   (0,917, uma escala) saía 0,9. De 10 para cima fica a casa decimal de sempre (mm); abaixo, quatro algarismos significativos mostram a inclinação e a razão como são. */
+const parametro = (x) => (typeof x !== 'number' || !Number.isFinite(x) || Number.isInteger(x) ? String(x) : (Math.abs(x) >= 10 ? Math.round(x * 10) / 10 : Number(x.toPrecision(4))).toString()).replace('.', ',');
 const vetor = (v) => `[${v.map(mm1).join(' ')}]`;
 const faixa = (p) => `${mm1(p[0])}..${mm1(p[1])}`;
 
 const textoDoRecorte = (q) => `subtrai ${q.cortadores.map((c) => `${c.id}${c.folga_mm ? ` (folga ${mm1(c.folga_mm)} mm)` : ''}${c.profundidade_mm ? ` (${mm1(c.profundidade_mm)} mm a partir de ${c.lado})` : ''}${c.retira_cm3 > 0 ? '' : ' (não toca a forma)'}`).join(', ')}; retira ${mm1(q.retira_cm3)} cm3 e sobram ${mm1(q.volume_cm3)} cm3 em ${q.pecas} peças convexas`;
 const linhaDaForma = (f) => `forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}${f.recorte ? `, recorte: ${textoDoRecorte(f.recorte)}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`;
+const linhaDaFamilia = (f) => `família ${f.id}${f.familia.perfil ? ` (perfil ${f.familia.perfil})` : ''}: ${f.familia.partes.length} partes (${f.familia.partes.join(', ')}), volume ${Math.round(f.familia.volume_mm3)} mm3${f.familia.portas.length ? `; portas ${f.familia.portas.map((q) => `${q.id} (${q.tipo}, ${q.papel}${q.eixo ? `, eixo ${vetor(q.eixo)}` : ''})`).join('; ')}` : '; sem portas'}`;
 const linhaDeAncoras = (f) => `âncoras ${f.id}: ${Object.entries(f.ancoras).map(([k, v]) => `${k} ${vetor(v)}`).join('; ')}`;
 const linhaDeContato = (c) => `contato: ${c.a} toca ${c.b} (${c.folga_mm !== undefined ? `folga ${mm1(c.folga_mm)} mm` : `penetração ${mm1(c.penetracao_mm)} mm`})`;
 const linhaDeSobreposicao3d = (s) => `sobreposição 3D: ${s.a} e ${s.b} se atravessam ${mm1(s.penetracao_mm)} mm${s.declarado ? ' (atravessa declarado)' : ''}`;
@@ -171,10 +193,11 @@ export function formatarDescricao(d) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
     L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}${o.cortadores ? `, ${o.cortadores} ${o.cortadores === 1 ? 'cortador' : 'cortadores'} (molde de recorte)` : ''}`);
-    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
+    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${parametro(v)}`).join('; ')}`);
     L.push(linhaDoGate(o));
     for (const f of o.formas) {
       L.push(linhaDaForma(f));
+      if (f.familia) L.push(linhaDaFamilia(f));
       L.push(linhaDeAncoras(f));
     }
     for (const c of o.contatos) L.push(linhaDeContato(c));
@@ -199,7 +222,7 @@ export function formatarResumo(d, divergencias) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
     L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}${o.cortadores ? `, ${o.cortadores} ${o.cortadores === 1 ? 'cortador' : 'cortadores'} (molde de recorte)` : ''}`);
-    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
+    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${parametro(v)}`).join('; ')}`);
     L.push(linhaDoGate(o));
     const meus = divergencias.filter((x) => x.opcao === o.titulo);
     if (meus.length === 0) { L.push('divergências: nenhuma'); continue; }
@@ -225,6 +248,7 @@ export function formatarForma(d, divergencias, id) {
     L.push(`opção ${i + 1} (${o.titulo}):`);
     for (const f of achadas) {
       L.push(linhaDaForma(f));
+      if (f.familia) L.push(linhaDaFamilia(f));
       L.push(linhaDeAncoras(f));
       for (const c of o.contatos) if (c.a === f.id || c.b === f.id) L.push(linhaDeContato(c));
       if (o.soltas.includes(f.id)) L.push(`solta: ${f.id} fora do maior grupo conectado`);
@@ -256,7 +280,7 @@ export function diferenca(anterior, atual) {
     const pa = p.parametros ?? {}; const pb = o.parametros ?? {};
     for (const k of new Set([...Object.keys(pa), ...Object.keys(pb)])) {
       if (pa[k] === pb[k]) continue;
-      nota(`${rot} parâmetro ${pa[k] === undefined ? 'novo' : pb[k] === undefined ? 'removido' : 'alterado'}: ${k}${pa[k] === undefined ? '' : ` de ${mm1(pa[k])}`}${pb[k] === undefined ? '' : ` para ${mm1(pb[k])}`}`, 'parametro', { opcao: o.titulo, parametro: k });
+      nota(`${rot} parâmetro ${pa[k] === undefined ? 'novo' : pb[k] === undefined ? 'removido' : 'alterado'}: ${k}${pa[k] === undefined ? '' : ` de ${parametro(pa[k])}`}${pb[k] === undefined ? '' : ` para ${parametro(pb[k])}`}`, 'parametro', { opcao: o.titulo, parametro: k });
     }
     const fa = new Map(p.formas.map((f) => [f.id, f]));
     const fb = new Map(o.formas.map((f) => [f.id, f]));

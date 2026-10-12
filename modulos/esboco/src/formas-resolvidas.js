@@ -7,6 +7,7 @@ import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { unidadesDeclaradas } from './contato.js';
 import { lerPlano } from './plano.js';
+import { cascoEmSecoes } from './malha.js';
 import { resumoDoRecorte } from './recorte.js';
 
 export const FORMATO_DAS_FORMAS = 'mecanifica.formas-resolvidas@1';
@@ -101,6 +102,17 @@ function geometriaDoTipo(r) {
     }
     case 'tubo':
       return { diametro: f.diametro, raioCurva: f.raioCurva ?? 0, caminho: r.caminho.map((q) => somaCentro(r, q)), trilha: { pontos: r.trilha.pontos.map((q) => somaCentro(r, q)), fechado: r.trilha.fechado } };
+    case 'familia': {
+      /* a superfície da família não é nenhum dos sólidos acima: sai o que a identifica (família, perfil, ajustes, partes e volume) e o
+         casco por seções perpendiculares ao eixo principal, que é o que um consumidor de blocos (a N2) consegue ler. As portas da
+         família são as âncoras da forma (`ancoras`). */
+      const m = pr.malha;
+      return {
+        familia: f.familia, ...(f.perfil === undefined ? {} : { perfil: f.perfil }), parametros: f.parametros ?? {},
+        partes: m.partes.map((p) => p.nome).filter(Boolean), volume: m.volume,
+        extensao: [0, 1, 2].map((e) => m.caixa.max[e] - m.caixa.min[e]), ...cascoEmSecoes(m),
+      };
+    }
     case 'envolve':
       return { largura: f.largura, espessura: f.espessura, fechado: f.fechado ?? true, trilha: { pontos: r.trilha.pontos.map((q) => somaCentro(r, q)), fechado: r.trilha.fechado } };
     default:

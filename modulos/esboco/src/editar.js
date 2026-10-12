@@ -5,6 +5,7 @@
    grava arquivo, não muda o que recebe e não valida a geometria (quem chama roda a leitura e só grava se ela resolve). */
 import { ErroDeEsboco } from './index.js';
 import { quisDizer } from './parecido.js';
+import { fontesDoArranjo } from './arranjo.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -144,6 +145,27 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
       mudancas.push({ acao: 'editar', forma: bloco, campo: chave.slice(bloco.length + 1), antes: antes ?? null, depois: valor });
       continue;
     }
+    /* `unidades.<unidade>.<campo>`: o texto da unidade na raiz (a `funcao` que o brief do crítico imprime, `vistas`, `cor`), que
+       não começa por uma forma; a unidade ainda sem entrada em `unidades` ganha uma */
+    if (!s && chave.startsWith('unidades.')) {
+      const caminho = passos(chave, `editar: "${chave}"`);
+      exigir(caminho.length >= 3 && typeof caminho[1] === 'string', `editar: "${chave}" cita só "unidades": diga a unidade e o campo (unidades.<unidade>.<campo>=<valor>, por exemplo unidades.motor.funcao="o motor com o capô e os escapes")`);
+      esboco.unidades = objeto(esboco.unidades) ? esboco.unidades : {};
+      const antes = gravar(esboco, caminho, valor, `editar: "${chave}"`);
+      mudancas.push({ acao: 'editar', forma: 'unidades', campo: chave.slice('unidades.'.length), antes: antes ?? null, depois: valor });
+      continue;
+    }
+    /* `curso.<mecanismo>.<campo>` edita o curso do mecanismo na raiz (`ate`, `passos`, `rotulo`...), e `curso.<mecanismo>=<json>` o declara
+       inteiro (ou, com `null`, o retira), como `unidades.<unidade>.<campo>` */
+    if (!s && chave.startsWith('curso.')) {
+      const caminho = passos(chave, `editar: "${chave}"`);
+      exigir(caminho.length >= 2 && typeof caminho[1] === 'string', `editar: "${chave}" cita só "curso": diga o mecanismo e o campo (curso.<mecanismo>.<campo>=<valor>, por exemplo curso.recolhe.ate=95)`);
+      exigir(caminho.length === 2 || (objeto(esboco.curso) && Object.hasOwn(esboco.curso, caminho[1])), `editar: "${chave}": o mecanismo "${caminho[1]}" não está em "curso" (mecanismos: ${Object.keys(esboco.curso ?? {}).join(', ') || 'nenhum'}); declare-o inteiro primeiro (curso.${caminho[1]}=<json do curso>)`);
+      const antes = gravar(esboco, caminho, valor, `editar: "${chave}"`);
+      if (objeto(esboco.curso) && Object.keys(esboco.curso).length === 0) delete esboco.curso;
+      mudancas.push({ acao: 'editar', forma: 'curso', campo: chave.slice('curso.'.length), antes: antes ?? null, depois: valor });
+      continue;
+    }
     if (!s) {
       const id = chave.split('.')[0];
       exigir(false, `editar: "${chave}" não começa por uma forma declarada${quisDizer(id, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''}); uma peça de componente (instância.parte) se muda pela instância`);
@@ -178,12 +200,12 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
       exigir(objeto(f), 'editar: --adicionar recebe um objeto de forma (ou uma lista deles)');
       if (f.id === undefined && f.arranja !== undefined) {
         /* a entrada de arranjo (`{ "arranja": { "forma": "<id>", "modo": ... } }`) não tem id: as cópias herdam o da fonte */
-        exigir(objeto(f.arranja) && typeof f.arranja.forma === 'string' && f.arranja.forma, 'editar: o arranjo de --adicionar precisa de "arranja": { "forma": "<id>", "modo": "linear" | "radial", "total": n, ... }');
+        exigir(objeto(f.arranja) && fontesDoArranjo(f.arranja).length > 0 && fontesDoArranjo(f.arranja).every((x) => typeof x === 'string' && x), 'editar: o arranjo de --adicionar precisa de "arranja": { "forma": "<id>" (ou uma lista de ids), "modo": "linear" | "radial", "total": n, ... }');
         exigir(Object.keys(f).length === 1, `editar: a entrada de arranjo só tem o campo "arranja"; retire "${Object.keys(f).find((k) => k !== 'arranja')}"`);
         const todos = [...new Set(listas.flatMap((l) => idsDe(l.lista)))];
-        exigir(todos.includes(f.arranja.forma), `editar: --adicionar o arranjo de "${f.arranja.forma}": não há forma com esse id${quisDizer(f.arranja.forma, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
+        for (const fonte of fontesDoArranjo(f.arranja)) exigir(todos.includes(fonte), `editar: --adicionar o arranjo de "${fonte}": não há forma com esse id${quisDizer(fonte, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
         for (const { lista } of listas) acrescentar(lista, clone(f), unidade);
-        mudancas.push({ acao: 'adicionar', forma: `arranja de ${f.arranja.forma}`, arranjo: true, ...(unidade === undefined ? {} : { unidade }) });
+        mudancas.push({ acao: 'adicionar', forma: `arranja de ${fontesDoArranjo(f.arranja).join(', ')}`, arranjo: true, ...(unidade === undefined ? {} : { unidade }) });
         continue;
       }
       exigir(typeof f.id === 'string' && f.id, 'editar: a forma de --adicionar precisa de "id" (ou, num arranjo, só de "arranja")');

@@ -83,6 +83,70 @@ describe('o Marco abaixo de 8 deixa refazer as unidades que ele cobre', () => {
   });
 });
 
+/* O caso do avião (atrito 24): o Marco de 25% apontava defeitos na fuselagem e no capô, e o 7 da hélice, que é da unidade e não do
+   Marco, recusava o `--feito fuselagem`. Aqui a "fila" e a "fila2" têm brief (9 formas), a "ponta" não, e o Marco cobre as duas. */
+describe('a nota de uma unidade não trava o --feito de outra que o mesmo Marco aberto aponta', () => {
+  const duas = () => {
+    const e = grande();
+    e.unidades.fila2 = { funcao: 'segunda fileira de caixas, encostada na primeira ao longo de z' };
+    e.opcoes[0].formas.push(...Array.from({ length: 9 }, (_, i) => caixa(`d${i}`, [10, 10, 20 + 20 * i], { unidade: 'fila2' })));
+    return e;
+  };
+  const comMarcoAberto = (marco, ...notasDaFila2) => {
+    const e = duas();
+    let s = naDetalhe(e);
+    s.marcos.push({ limiar: 50, custoFeito: 1, custoTotal: 10, unidades: marco, chamar: 'critico', imagens: 'limpas' });
+    s = vered(s, 'fila2', ...notasDaFila2);
+    return { e, s: vered(s, 'marco-50', 7) };
+  };
+  const feita = (r, id) => r.estado.unidades.find((u) => u.id === id).feito;
+
+  it('reproduz o avião: com o Marco aberto cobrindo as duas, o 7 de uma não recusa o --feito da outra', () => {
+    const { e, s } = comMarcoAberto(['fila', 'fila2'], 7);
+    /* sem o Marco, a mesma nota recusava (a regra de antes) */
+    const semMarco = vered(naDetalhe(e), 'fila2', 7);
+    expect(() => marcarFeito(e, semMarco, 'fila')).toThrow(/"fila2".*nota 7/);
+    expect(feita(marcarFeito(e, s, 'fila'), 'fila')).toBe(true);
+    /* e a outra, a que tirou o 7, também se refaz */
+    expect(feita(marcarFeito(e, s, 'fila2'), 'fila2')).toBe(true);
+  });
+
+  it('uma só rodada corrige as unidades do Marco: as duas viram feitas em sequência sem novo veredito', () => {
+    const { e, s } = comMarcoAberto(['fila', 'fila2'], 7);
+    const a = marcarFeito(e, s, 'fila').estado;
+    expect(feita(marcarFeito(e, a, 'fila2'), 'fila2')).toBe(true);
+  });
+
+  it('a unidade que o Marco não aponta continua recusada, pela nota da outra e pelo próprio Marco', () => {
+    const { e, s } = comMarcoAberto(['fila', 'fila2'], 7);
+    expect(() => marcarFeito(e, s, 'ponta')).toThrow(/"fila2".*nota 7/);
+  });
+
+  it('um Marco que cobre só a unidade que vai ser feita não livra a nota da outra', () => {
+    const { e, s } = comMarcoAberto(['fila'], 7);
+    expect(() => marcarFeito(e, s, 'fila')).toThrow(/"fila2".*nota 7.*rodada 1 de 3/);
+  });
+
+  it('as três rodadas continuam valendo: a unidade travada recusa o --feito da outra mesmo com o Marco aberto', () => {
+    const { e, s } = comMarcoAberto(['fila', 'fila2'], 5, 6, 7);
+    expect(() => marcarFeito(e, s, 'fila')).toThrow(/"fila2".*rodada 3 de 3.*--liberar fila2/);
+  });
+
+  it('o Marco travado bloqueia as duas, como antes', () => {
+    const e = duas();
+    let s = naDetalhe(e);
+    s.marcos.push({ limiar: 50, custoFeito: 1, custoTotal: 10, unidades: ['fila', 'fila2'], chamar: 'critico', imagens: 'limpas' });
+    s = vered(vered(s, 'fila2', 7), 'marco-50', 5, 6, 7);
+    expect(() => marcarFeito(e, s, 'fila')).toThrow(/marco-50.*rodada 3 de 3/);
+  });
+
+  it('o --proximo continua recusado com a nota de uma unidade abaixo de 8, ainda que o Marco a cubra', () => {
+    const { e, s } = comMarcoAberto(['fila', 'fila2'], 7);
+    expect(avancar(e, s).ok).toBe(false);
+    expect(avancar(e, s).bloqueio).toMatch(/nota 7/);
+  });
+});
+
 describe('três rodadas abaixo de 8 travam, e só --liberar destrava', () => {
   it('na terceira rodada a mensagem manda pedir autorização explícita e citar --liberar', () => {
     const e = grande();

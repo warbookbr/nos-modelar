@@ -1,0 +1,8 @@
+{
+  "imagens": {
+    "topo": { "papel": "principal" },
+    "lateral": { "papel": "principal" },
+    "frontal": { "papel": "apoio", "motivo": "dá a altura da ponta da asa, a bitola do trem e a envergadura da empenagem, que a lateral e o topo escondem" },
+    "traseira": { "papel": "substituida", "por": "frontal", "motivo": "mostra as mesmas larguras e alturas da frontal; o cone de cauda já aparece na lateral e no topo" }
+  }
+}

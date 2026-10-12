@@ -2,8 +2,8 @@
    contornos gravados, sem parte fora da silhueta e sem a parte fora do modelo. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { prancha, colisoesDoDesenho, examinarDesenho } from './prancha.mjs';
-import { specDosContornos, roteiroDaPrancha, cotasDaPrancha, linhasDeCotasEmFalta, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
+import { prancha, colisoesDoDesenho, examinarDesenho, coberturaDoContorno, DETECTOR } from './prancha.mjs';
+import { specDosContornos, vistaDasEscolhas, VISTAS_DA_PRANCHA, roteiroDaPrancha, cotasDaPrancha, linhasDeCotasEmFalta, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS, PASSO_ALEM_DOS_NOMES, MINIMO_DA_EXTENSAO_PX } from './prancha-dos-contornos.mjs';
 
 const escolhasDoBraco = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.prancha.json', import.meta.url), 'utf8'));
 const contornos = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.contornos.json', import.meta.url), 'utf8'));
@@ -134,7 +134,7 @@ describe('prancha dos contornos', () => {
     const r = roteiroDaPrancha({ alvo: 'a.png', prancha: 'p.png', spec });
     expect((r.match(/^## Etapa /gm) ?? []).length).toBe(spec.resumo.partes.length + 2);
     for (const parte of spec.resumo.partes) expect(r).toContain(`— ${parte}\n`);
-    expect(r).toMatch(/- largura: cota \d+/);
+    expect(r).toMatch(/- comprimento: cota \d+/);
     expect(r).toMatch(/ombro[\s\S]*altura: EM FALTA/);
     expect(r).toMatch(/linhas livres/);
   });
@@ -253,7 +253,391 @@ describe('prancha dos contornos', () => {
   it('o roteiro lista por parte as duas cotas esperadas e o estado de cada uma', () => {
     const spec = specDosContornos(contornos, { escolhas: escolhasDoBraco });
     const r = roteiroDaPrancha({ alvo: 'a.png', prancha: 'p.png', spec });
-    expect((r.match(/- cotas esperadas: largura \(.+\) e altura \(.+\)/g) ?? []).length).toBe(spec.resumo.partes.length);
-    expect(r).toMatch(/— ombro\n\n- cotas esperadas: largura \([^)]*\) e altura \(não medível/);
+    expect((r.match(/- cotas esperadas: comprimento \(.+\) e altura \(.+\)/g) ?? []).length).toBe(spec.resumo.partes.length);
+    expect(r).toMatch(/— ombro\n\n- cotas esperadas: comprimento \([^)]*\) e altura \(não medível/);
+  });
+
+  /* A hélice do avião vista de lado: o cone cobre o meio e sobram duas pás, uma
+     acima e outra abaixo dele. O maior pedaço (300 mm) mede só uma pá. */
+  describe('parte em vários pedaços', () => {
+    const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+    const pa = (z0, y0, z1, y1) => ({ areaMm2: (z1 - z0) * (y1 - y0), contornoMm: ret(z0, y0, z1, y1) });
+    const aviao = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(0, 0, 400, 1000), linhaDeForaMm: ret(-1, -1, 401, 1001) },
+      regioes: {
+        helice: { contornoMm: ret(20, 0, 60, 300), pedacos: [pa(20, 0, 60, 300), pa(20, 700, 60, 1000)] },
+        cone: { contornoMm: ret(20, 300, 60, 700), pedacos: [pa(20, 300, 60, 700)] },
+        corpo: { contornoMm: ret(60, 0, 400, 1000), pedacos: [pa(60, 0, 400, 1000)] },
+      },
+    };
+    const cotar = (extra = {}, base = aviao, lerVista) => specDosContornos(base, { escolhas: { cotas: [{ parte: 'helice', medida: 'altura', ...extra }] }, lerVista });
+
+    it('a altura e a largura medidas são as da união dos pedaços, e não as do maior', () => {
+      const alt = cotar().cotas.find((x) => x.dono === 'helice.altura');
+      expect(alt.texto).toBe('1000');
+      expect([alt.de[1], alt.ate[1]]).toEqual([0, 1000]);
+      /* Sem `pedacos`, o arquivo gravado antes do campo existir, vale o contornoMm: uma pá. */
+      const antigo = { ...aviao, regioes: { ...aviao.regioes, helice: { contornoMm: aviao.regioes.helice.contornoMm } } };
+      expect(cotar({}, antigo).cotas.find((x) => x.dono === 'helice.altura').texto).toBe('300');
+      /* A largura a um terço da altura da união cai no vão (y = 330), onde só há o cone: cai na caixa da união. */
+      const larg = specDosContornos(aviao, { escolhas: { cotas: [{ parte: 'helice', medida: 'largura' }] } }).cotas.find((x) => x.dono === 'helice.largura');
+      expect(larg.texto).toBe('40');
+      expect(larg.de[1]).toBeCloseTo(330, 6);
+    });
+
+    it('desenha todos os pedaços da parte, o segundo em diante marcados, e mede a forma uma vez', () => {
+      const spec = cotar();
+      const camadas = spec.camadas.filter((c) => c.nome === 'helice');
+      expect(camadas.map((c) => c.pts)).toEqual(aviao.regioes.helice.pedacos.map((p) => p.contornoMm));
+      expect(camadas.map((c) => c.pedaco)).toEqual([undefined, 2]);
+      const { relatorio } = prancha(spec);
+      expect(relatorio.alertas.filter((a) => /fora do contorno/.test(a))).toEqual([]);
+      /* A forma da parte é medida uma vez, no maior pedaço: o mesmo número de quando a parte só tinha esse pedaço. */
+      const so = { ...aviao, regioes: { ...aviao.regioes, helice: { contornoMm: aviao.regioes.helice.contornoMm } } };
+      expect(relatorio.porCamada.helice).toEqual(prancha(cotar({}, so)).relatorio.porCamada.helice);
+    });
+
+    it('o nome da parte fica dentro do maior pedaço, e não no centro da união, que cai no cone', () => {
+      const marca = cotar().landmarks.find((l) => l.id === 'helice').em;
+      expect(marca[1]).toBeGreaterThan(0);
+      expect(marca[1]).toBeLessThan(300);
+    });
+
+    it('a cota que passa por outro pedaço da mesma parte não o acusa como invasão, só o cone', () => {
+      const { desenho } = prancha(cotar({ em: 40, afasta: 0 }));
+      const invadidas = colisoesDoDesenho(desenho).filter((c) => c.tipo === 'cota sobre outra parte' && c.a === 'cota de helice.altura');
+      expect(invadidas.map((c) => c.b)).toEqual(['cone']);
+    });
+
+    it('a medida tirada de outra vista também é a da união dos pedaços dela', () => {
+      const frontal = { regioes: { helice: { contornoMm: ret(0, 0, 40, 300), pedacos: [pa(0, 0, 40, 300), pa(0, 700, 40, 1000)] } } };
+      const c = cotar({ em: 40, origem: { imagem: 'frontal' } }, aviao, () => frontal).cotas.find((x) => x.dono === 'helice.altura');
+      expect(c.texto).toBe('1000 (frontal)');
+    });
+  });
+
+  /* A planta do avião: a envergadura na horizontal e o comprimento na vertical. */
+  describe('vista da prancha', () => {
+    const ret = (x0, v0, x1, v1) => [[x0, v0], [x1, v0], [x1, v1], [x0, v1]];
+    const topo = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(-600, -100, 600, 1000), linhaDeForaMm: ret(-601, -101, 601, 1001) },
+      regioes: {
+        asa: { contornoMm: ret(-600, 300, 600, 500) },
+        fuselagem: { contornoMm: ret(-60, -100, 60, 1000) },
+      },
+    };
+    const escolhas = { vista: 'topo', cotas: [{ parte: 'asa', medida: 'largura' }, { parte: 'asa', medida: 'altura' }, { parte: 'fuselagem', medida: 'altura', medivel: false, motivo: 'a asa a esconde' }] };
+
+    it('a lateral é a vista de quando nada é declarado, e uma vista que não existe é recusada', () => {
+      expect(vistaDasEscolhas({})).toBe('lateral');
+      const spec = specDosContornos(contornos);
+      expect(Object.keys(spec.vistas)).toEqual(['lateral']);
+      expect(spec.vistas.lateral.rotulo).toBe('LATERAL — projeção');
+      expect(spec.titulo).toBe('Prancha lateral pelos contornos da imagem');
+      expect(spec.cotas.find((c) => c.dono === 'geral.largura').texto).toMatch(/^comprimento \d+$/);
+      expect(spec.cotas.find((c) => c.dono === 'geral.altura').texto).toMatch(/^altura \d+$/);
+      expect(() => vistaDasEscolhas({ vista: 'planta' })).toThrow(/lateral, topo, frontal.*'planta'/);
+    });
+
+    it('a prancha de topo sai com o rótulo de topo e o comprimento na vertical, e não "altura"', () => {
+      const spec = specDosContornos(topo, { escolhas });
+      expect(Object.keys(spec.vistas)).toEqual(['topo']);
+      expect(spec.vistas.topo.rotulo).toBe('TOPO — projeção');
+      expect(spec.titulo).toBe('Prancha de topo pelos contornos da imagem');
+      expect(spec.cotas.find((c) => c.dono === 'geral.largura').texto).toBe('largura 1200');
+      expect(spec.cotas.find((c) => c.dono === 'geral.altura').texto).toBe('comprimento 1100');
+      expect(spec.cotas.every((c) => c.vista === 'topo')).toBe(true);
+      expect(spec.anotacoes[0].texto).toBe('fuselagem comprimento: a asa a esconde');
+      expect(spec.camadas.map((c) => c.nome)).toEqual(['silhuetaTopo', 'asa', 'fuselagem']);
+    });
+
+    it('a prancha de topo é desenhada e medida sem alerta, e o relatório e o SVG falam de topo', () => {
+      const { svg, relatorio } = prancha(specDosContornos(topo, { escolhas }));
+      expect(relatorio.alertas).toEqual([]);
+      expect(Object.keys(relatorio.porVista)).toEqual(['topo']);
+      expect(relatorio.porVista.topo).toMatchObject({ contornoFechado: true, pontosForaDoContorno: 0 });
+      expect(Math.round(relatorio.porVista.topo.caixa.xMax - relatorio.porVista.topo.caixa.xMin)).toBe(1202);
+      expect(Math.round(relatorio.porVista.topo.caixa.yMax - relatorio.porVista.topo.caixa.yMin)).toBe(1102);
+      expect(svg).toContain('TOPO — projeção');
+      expect(svg).not.toContain('LATERAL');
+    });
+
+    it('a cota de comprimento mede na vertical e a de largura na horizontal', () => {
+      const spec = specDosContornos(topo, { escolhas: { vista: 'topo', cotas: [{ parte: 'fuselagem', medida: 'altura', em: 0 }, { parte: 'asa', medida: 'largura' }] } });
+      const comp = spec.cotas.find((c) => c.dono === 'fuselagem.altura');
+      expect([comp.de[0], comp.de[1], comp.ate[1], comp.texto]).toEqual([0, -100, 1000, '1100']);
+      const larg = spec.cotas.find((c) => c.dono === 'asa.largura');
+      expect([larg.de[0], larg.ate[0], larg.texto]).toEqual([-600, 600, '1200']);
+    });
+
+    it('o roteiro do crítico diz a vista e usa as palavras dela', () => {
+      const spec = specDosContornos(topo, { escolhas });
+      const r = roteiroDaPrancha({ alvo: 'topo.png', prancha: 'topo.prancha.png', spec });
+      expect(r).toContain('A vista é topo: na horizontal a prancha mede largura e na vertical comprimento.');
+      expect(r).toMatch(/— asa\n\n- cotas esperadas: largura \(medida aqui\) e comprimento \(medida aqui\)/);
+      expect(r).toMatch(/- comprimento: cota \d+\. A linha mede asa de ponta a ponta na vertical/);
+      expect(r).not.toMatch(/- altura:/);
+      expect(Object.keys(VISTAS_DA_PRANCHA)).toEqual(['lateral', 'topo', 'frontal']);
+    });
+
+    it('a frontal mede largura na horizontal e altura na vertical', () => {
+      const spec = specDosContornos(topo, { escolhas: { vista: 'frontal', cotas: [] } });
+      expect(spec.cotas.find((c) => c.dono === 'geral.largura').texto).toBe('largura 1200');
+      expect(spec.cotas.find((c) => c.dono === 'geral.altura').texto).toBe('altura 1100');
+      expect(prancha(spec).relatorio.porVista.frontal.contornoFechado).toBe(true);
+    });
+  });
+
+  /* O escape na lateral do avião: a região dele fica inteira dentro do contorno
+     do capô, que é o externo e não tem furo. */
+  describe('parte inteira dentro do contorno de outra', () => {
+    const quad = (dono, x0, y0, x1, y1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]] });
+    const cota = (dono, pts) => ({ dono, tipo: 'cota', pts });
+    const cotaSobre = (desenho) => colisoesDoDesenho(desenho).filter((c) => c.tipo === 'cota sobre outra parte');
+    const base = [quad('capo', 0, 0, 200, 100), quad('escape', 80, 40, 120, 60)];
+
+    it('a cota sobre a própria parte contida e o número dentro dela não invadem a parte que a contém', () => {
+      const desenho = {
+        textos: [{ dono: 'escape.altura', tipo: 'cota', texto: '20', caixa: [102, 46, 110, 55] }],
+        linhas: [...base, cota('escape.altura', [[100, 40], [100, 60]]), cota('escape.largura', [[80, 43], [120, 43]])],
+      };
+      expect(colisoesDoDesenho(desenho)).toEqual([]);
+    });
+
+    it('o trecho que sai da parte contida para dentro do capô continua invadindo o capô', () => {
+      const desenho = { textos: [], linhas: [...base, cota('escape.altura', [[100, 40], [100, 85]])] };
+      expect(cotaSobre(desenho)).toMatchObject([{ a: 'cota de escape.altura', b: 'capo' }]);
+    });
+
+    it('a cota do capô que atravessa o escape continua acusando o escape', () => {
+      const desenho = { textos: [], linhas: [...base, cota('capo.altura', [[100, 0], [100, 100]])] };
+      expect(cotaSobre(desenho)).toMatchObject([{ a: 'cota de capo.altura', b: 'escape' }]);
+    });
+
+    it('com os contornos, a cota declarada sobre o escape sai sem colisão', () => {
+      const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+      const lateral = {
+        mmPorPx: 1,
+        silhueta: { contornoMm: ret(0, 0, 400, 200), linhaDeForaMm: ret(-1, -1, 401, 201) },
+        regioes: { capo: { contornoMm: ret(0, 0, 400, 200) }, escape: { contornoMm: ret(150, 80, 250, 120) } },
+      };
+      const escolhas = { cotas: [{ parte: 'escape', medida: 'largura' }, { parte: 'escape', medida: 'altura', em: 200, afasta: 0 }] };
+      const { desenho } = prancha(specDosContornos(lateral, { escolhas }));
+      /* Fora disso o desenho tem colisões de texto do arranjo padrão, que não são deste caso. */
+      expect(colisoesDoDesenho(desenho).filter((c) => /sobre outra parte|número sobre contorno/.test(c.tipo) && /escape\.(largura|altura)/.test(`${c.a} ${c.b}`))).toEqual([]);
+    });
+  });
+
+  /* A frontal do avião: o corpo escuro, parte fora do modelo, corta a asa. A asa
+     esquerda é o pedaço maior da silhueta, e a ponta da direita é um pedaço à parte. */
+  describe('silhueta em pedaços', () => {
+    const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+    const esquerda = ret(-600, 100, 0, 300); const direita = ret(120, 100, 600, 300);
+    const frontal = {
+      mmPorPx: 1,
+      silhueta: {
+        contornoMm: esquerda,
+        linhaDeForaMm: ret(-601, 99, 1, 301),
+        pedacos: [{ areaMm2: 120000, contornoMm: esquerda }, { areaMm2: 96000, contornoMm: direita }],
+        linhasDeForaMm: [ret(-601, 99, 1, 301), ret(119, 99, 601, 301)],
+      },
+      regioes: { asaEsq: { contornoMm: esquerda }, asaDir: { contornoMm: direita } },
+    };
+    const escolhas = { vista: 'frontal', cotas: [] };
+
+    it('a cota geral mede a união dos pedaços, e não só o maior', () => {
+      expect(specDosContornos(frontal, { escolhas }).cotas.find((c) => c.dono === 'geral.largura').texto).toBe('largura 1200');
+      /* O arquivo gravado antes de `pedacos` existir só tem o maior. */
+      const antigo = { ...frontal, silhueta: { contornoMm: esquerda, linhaDeForaMm: frontal.silhueta.linhaDeForaMm } };
+      expect(specDosContornos(antigo, { escolhas }).cotas.find((c) => c.dono === 'geral.largura').texto).toBe('largura 600');
+    });
+
+    it('desenha a linha de fora de cada pedaço, o segundo marcado, sem alerta de contorno aberto nem de parte fora dele', () => {
+      const spec = specDosContornos(frontal, { escolhas });
+      const linhas = spec.camadas.filter((c) => c.contorno);
+      expect(linhas.map((c) => c.pts)).toEqual(frontal.silhueta.linhasDeForaMm);
+      expect(linhas.map((c) => c.pedaco)).toEqual([undefined, 2]);
+      const { relatorio } = prancha(spec);
+      expect(relatorio.alertas).toEqual([]);
+      expect(relatorio.porVista.frontal).toMatchObject({ contornoFechado: true, pontosForaDoContorno: 0 });
+      expect(Math.round(relatorio.porVista.frontal.caixa.xMax - relatorio.porVista.frontal.caixa.xMin)).toBe(1202);
+      /* Só com o maior pedaço, a asa direita escaparia da silhueta (o defeito do avião). */
+      const so = specDosContornos({ ...frontal, silhueta: { contornoMm: esquerda, linhaDeForaMm: frontal.silhueta.linhaDeForaMm } }, { escolhas });
+      expect(prancha(so).relatorio.alertas.join(' ')).toMatch(/fora do contorno — asaDir/);
+    });
+  });
+
+  /* A cota que não cabe sobre a parte vai para fora dela, e as linhas de extensão
+     descem das pontas da medida até a linha da cota. */
+  describe('cota externa com linhas de extensão', () => {
+    const ret = (z0, y0, z1, y1) => [[z0, y0], [z1, y0], [z1, y1], [z0, y1]];
+    const lateral = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(0, 0, 1000, 400), linhaDeForaMm: ret(-1, -1, 1001, 401) },
+      regioes: { fuselagem: { contornoMm: ret(0, 0, 1000, 300) }, janelas: { contornoMm: ret(300, 200, 500, 280) } },
+    };
+    const cotas = (extra) => [{ parte: 'fuselagem', medida: 'largura', medivel: false, motivo: 'x' }, { parte: 'fuselagem', medida: 'altura', medivel: false, motivo: 'x' }, { parte: 'janelas', medida: 'altura', medivel: false, motivo: 'x' }, extra];
+    const projetar = (spec, [z, y]) => [spec.vistas.lateral.x + (z - spec.limites.zMin) * spec.escala, spec.vistas.lateral.y + (spec.limites.yMax - y) * spec.escala];
+
+    it('a largura acima da parte sai com as duas linhas, das pontas da medida até a linha da cota e uns pixels além', () => {
+      const spec = specDosContornos(lateral, { escolhas: { cotas: cotas({ parte: 'janelas', medida: 'largura', lado: 'acima' }) } });
+      const cota = spec.cotas.find((c) => c.dono === 'janelas.largura');
+      expect(cota.extensao).toBe(true);
+      const { desenho, svg } = prancha(spec);
+      const ext = desenho.linhas.filter((l) => l.tipo === 'extensao' && l.dono === 'janelas.largura');
+      expect(ext).toHaveLength(2);
+      expect((svg.match(/class="ext"/g) ?? []).length).toBe(2);
+      const [dx, dy] = cota.desloca; const L = Math.hypot(dx, dy);
+      [cota.de, cota.ate].forEach((ponta, k) => {
+        const [x, y] = projetar(spec, ponta);
+        expect(ext[k].pts[0][0]).toBeCloseTo(x, 6); expect(ext[k].pts[0][1]).toBeCloseTo(y, 6);
+        /* Termina na linha da cota, deslocada, mais 3 px na mesma direção. */
+        expect(ext[k].pts[1][0]).toBeCloseTo(x + dx + (dx / L) * 3, 6); expect(ext[k].pts[1][1]).toBeCloseTo(y + dy + (dy / L) * 3, 6);
+      });
+      /* A extensão da janela passa pela fuselagem, que a contém, e não a acusa. */
+      expect(colisoesDoDesenho(desenho).filter((c) => /extensão/.test(c.tipo))).toEqual([]);
+    });
+
+    it('a altura à direita da parte também, e a cota que fica onde mede ou a menos de 6 px dela não ganha extensão', () => {
+      const alt = specDosContornos(lateral, { escolhas: { cotas: [{ parte: 'fuselagem', medida: 'largura', medivel: false, motivo: 'x' }, { parte: 'janelas', medida: 'largura', medivel: false, motivo: 'x' }, { parte: 'fuselagem', medida: 'altura', medivel: false, motivo: 'x' }, { parte: 'janelas', medida: 'altura', lado: 'direita' }] } });
+      expect(alt.cotas.find((c) => c.dono === 'janelas.altura').extensao).toBe(true);
+      const dentro = specDosContornos(lateral, { escolhas: { cotas: cotas({ parte: 'janelas', medida: 'largura' }) } });
+      expect(dentro.cotas.find((c) => c.dono === 'janelas.largura').extensao).toBeUndefined();
+      expect(prancha(dentro).desenho.linhas.filter((l) => l.tipo === 'extensao')).toEqual([]);
+      const colada = specDosContornos(lateral, { escolhas: { cotas: cotas({ parte: 'janelas', medida: 'largura', afasta: 0.5 * MINIMO_DA_EXTENSAO_PX / dentro.escala }) } });
+      expect(colada.cotas.find((c) => c.dono === 'janelas.largura').extensao).toBeUndefined();
+    });
+
+    describe('o detector', () => {
+      const quad = (dono, x0, y0, x1, y1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]] });
+      const ext = (dono, pts) => ({ dono, tipo: 'extensao', pts });
+      const base = [quad('corpo', 0, 0, 200, 100), quad('janela', 80, 40, 120, 60), quad('asa', 0, 110, 200, 150)];
+      const tipos = (desenho) => colisoesDoDesenho(desenho).map((c) => `${c.tipo}: ${c.a} × ${c.b}`);
+
+      it('a extensão que sai da parte pela que a contém, até a linha da cota fora do corpo, não colide', () => {
+        expect(tipos({ textos: [], linhas: [...base, ext('janela.largura', [[80, 45], [80, 105]]), ext('janela.largura', [[120, 45], [120, 105]])] })).toEqual([]);
+      });
+
+      it('a extensão que atravessa uma parte alheia colide com ela', () => {
+        expect(tipos({ textos: [], linhas: [...base, ext('janela.largura', [[80, 45], [80, 130]])] })).toEqual(['extensão sobre outra parte: extensão da cota de janela.largura × asa']);
+      });
+
+      it('a extensão cruza chamada de outra parte e número de outra cota, mas não a cota nem a extensão da mesma parte', () => {
+        const linhas = [...base, ext('janela.largura', [[80, 45], [80, 105]]), { dono: 'corpo', tipo: 'chamada', pts: [[60, 90], [100, 90]] }];
+        expect(tipos({ textos: [], linhas })).toEqual(['linha sobre linha: extensao de janela.largura × chamada de corpo']);
+        const numero = { dono: 'asa.altura', tipo: 'cota', texto: '8', caixa: [76, 70, 84, 80] };
+        expect(tipos({ textos: [numero], linhas: [...base, ext('janela.largura', [[80, 45], [80, 105]])] })).toEqual(['linha sobre número: cota "8" (asa.altura) × extensao de janela.largura']);
+        const mesma = [...base, ext('janela.largura', [[80, 45], [80, 105]]), ext('janela.altura', [[70, 90], [130, 90]]), { dono: 'janela.largura', tipo: 'cota', pts: [[80, 105], [120, 105]] }];
+        expect(tipos({ textos: [], linhas: mesma })).toEqual([]);
+      });
+    });
+  });
+
+  /* O comprimento da fuselagem na planta do avião (8.028 mm) não cabe dentro da
+     silhueta, e entre ela e a coluna de nomes seria cruzado pela chamada de todos
+     os nomes daquele lado. */
+  describe('cota além da coluna de nomes', () => {
+    const ret = (x0, v0, x1, v1) => [[x0, v0], [x1, v0], [x1, v1], [x0, v1]];
+    const topo = {
+      mmPorPx: 1,
+      silhueta: { contornoMm: ret(-600, -100, 600, 1000), linhaDeForaMm: ret(-601, -101, 601, 1001) },
+      regioes: {
+        asaEsq: { contornoMm: ret(-600, 300, -60, 500) },
+        asaDir: { contornoMm: ret(60, 300, 600, 500) },
+        fuselagem: { contornoMm: ret(-60, -100, 60, 1000) },
+      },
+    };
+    const nomes = { asaEsq: { coluna: 'esquerda', nivel: 400 }, asaDir: { coluna: 'direita', nivel: 400 }, fuselagem: { coluna: 'direita', nivel: 600 } };
+    const base = [
+      { parte: 'asaEsq', medida: 'largura' }, { parte: 'asaDir', medida: 'largura' },
+      { parte: 'fuselagem', medida: 'largura', medivel: false, motivo: 'x' },
+    ];
+    const montar = (extra, vista = 'topo') => specDosContornos(topo, { escolhas: { vista, nomes, cotas: [...base, ...extra] } });
+    const larguraDoNome = (nome) => nome.length * 9.5 * 0.58;
+    /* x da tela, relativo à vista, do nome (ponta de fora do texto) e da linha vertical da cota. */
+    const xDoNome = (spec, id) => {
+      const l = spec.landmarks.find((m) => m.id === id);
+      const zMin = -600; const x = (l.rotuloEm[0] - zMin) * spec.escala;
+      return l.rotuloAncora === 'end' ? x - larguraDoNome(id) : x + larguraDoNome(id);
+    };
+    const xDaCota = (spec, dono) => { const c = spec.cotas.find((k) => k.dono === dono); return (c.de[0] + 600) * spec.escala + c.desloca[0]; };
+
+    it('fica além do texto mais largo da coluna da direita, e nenhuma chamada a cruza', () => {
+      const spec = montar([{ parte: 'fuselagem', medida: 'altura', alemDosNomes: true }]);
+      const direita = ['asaDir', 'fuselagem'].map((id) => xDoNome(spec, id));
+      expect(xDaCota(spec, 'fuselagem.altura')).toBeGreaterThan(Math.max(...direita) + 8);
+      const { desenho } = prancha(spec);
+      const cruzadas = colisoesDoDesenho(desenho).filter((c) => /fuselagem\.altura/.test(`${c.a} ${c.b}`));
+      expect(cruzadas).toEqual([]);
+      /* A cota geral de altura vai além dela, e a tela a comporta. */
+      const geral = spec.vistas.topo.x + xDaCota(spec, 'geral.altura');
+      expect(xDaCota(spec, 'geral.altura')).toBeGreaterThan(xDaCota(spec, 'fuselagem.altura') + 10);
+      expect(spec.tela.largura).toBeGreaterThan(geral + 12);
+    });
+
+    it('sem isso, a mesma cota afastada da silhueta fica entre ela e a coluna e é cruzada pelas chamadas (o defeito)', () => {
+      const spec = montar([{ parte: 'fuselagem', medida: 'altura', afasta: 700, em: 0 }]);
+      const { desenho } = prancha(spec);
+      const cruzadas = colisoesDoDesenho(desenho).filter((c) => c.tipo === 'linha sobre linha' && /fuselagem\.altura/.test(`${c.a} ${c.b}`) && /chamada/.test(`${c.a} ${c.b}`));
+      expect(cruzadas.length).toBeGreaterThan(0);
+    });
+
+    it('duas cotas do mesmo lado ocupam uma faixa cada, e a da esquerda fica além dos nomes da esquerda, dentro da tela', () => {
+      const dupla = montar([{ parte: 'fuselagem', medida: 'altura', alemDosNomes: true }, { parte: 'asaDir', medida: 'altura', alemDosNomes: true, em: 300 }]);
+      expect(xDaCota(dupla, 'asaDir.altura') - xDaCota(dupla, 'fuselagem.altura')).toBe(PASSO_ALEM_DOS_NOMES);
+      expect(PASSO_ALEM_DOS_NOMES).toBeGreaterThanOrEqual(24);
+      const esq = montar([{ parte: 'asaEsq', medida: 'altura', alemDosNomes: true, lado: 'esquerda', em: -300 }]);
+      expect(xDaCota(esq, 'asaEsq.altura')).toBeLessThan(xDoNome(esq, 'asaEsq') - 8);
+      expect(esq.vistas.topo.x + xDaCota(esq, 'asaEsq.altura')).toBeGreaterThan(0);
+      const { desenho } = prancha(esq);
+      expect(colisoesDoDesenho(desenho).filter((c) => /asaEsq\.altura/.test(`${c.a} ${c.b}`))).toEqual([]);
+    });
+
+    it('recusa a largura além dos nomes, o afastamento junto e um lado que não existe', () => {
+      expect(() => montar([{ parte: 'fuselagem', medida: 'largura', alemDosNomes: true }])).toThrow(/alemDosNomes.*altura/);
+      expect(() => montar([{ parte: 'fuselagem', medida: 'altura', alemDosNomes: true, afasta: 100 }])).toThrow(/alemDosNomes e afasta/);
+      expect(() => montar([{ parte: 'fuselagem', medida: 'altura', alemDosNomes: true, lado: 'abaixo' }])).toThrow(/direita ou esquerda/);
+    });
+  });
+
+  /* Na planta do avião o contorno da fuselagem desce dos dois lados da deriva, por
+     uma fenda aberta no fim da cauda: a deriva não está dentro do contorno. */
+  describe('parte numa fenda de outra', () => {
+    const fenda = [[0, 0], [45, 0], [45, 60], [55, 60], [55, 0], [100, 0], [100, 100], [0, 100], [0, 0]];
+    const quad = (dono, x0, y0, x1, y1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]] });
+    const q = { dono: 'fuselagem', tipo: 'contorno', parte: true, pts: fenda };
+    const cota = (dono, pts) => ({ dono, tipo: 'cota', pts });
+    const cotaSobre = (desenho) => colisoesDoDesenho(desenho).filter((c) => c.tipo === 'cota sobre outra parte');
+
+    it('a cobertura é a fração das direções que o contorno da outra fecha: quase 1 na fenda, a metade ou menos ao lado', () => {
+      expect(coberturaDoContorno([deriva], q)).toBeGreaterThanOrEqual(DETECTOR.FENDA_COBERTURA);
+      const ao_lado = [{ pts: [[100, 40], [130, 40], [130, 60], [100, 60], [100, 40]] }];
+      expect(coberturaDoContorno(ao_lado, q)).toBeLessThanOrEqual(0.5);
+      expect(DETECTOR.FENDA_COBERTURA).toBe(0.9);
+    });
+
+    /* A deriva simplificada tem um vértice na fenda e dois nas paredes: não está
+       dentro do contorno da fuselagem, que passa 7 px por baixo dela de cada lado. */
+    const deriva = { dono: 'deriva', tipo: 'contorno', parte: true, pts: [[47, 5], [53, 5], [62, 30], [53, 58], [47, 58], [38, 30], [47, 5]] };
+
+    it('a cota sobre a parte na fenda, onde o contorno dela passa por cima da parede, não invade a outra', () => {
+      const desenho = { textos: [], linhas: [q, deriva, cota('deriva.largura', [[40, 26], [40, 34]])] };
+      expect(cotaSobre(desenho)).toEqual([]);
+    });
+
+    it('o trecho da cota que sai da parte para dentro da parede continua invadindo', () => {
+      const desenho = { textos: [], linhas: [q, deriva, cota('deriva.largura', [[40, 26], [40, 95]])] };
+      expect(cotaSobre(desenho)).toMatchObject([{ a: 'cota de deriva.largura', b: 'fuselagem' }]);
+    });
+
+    it('a parte que só encosta na outra, sem a envolver, segue invadindo quando a cota entra', () => {
+      const vizinha = quad('asa', 100, 40, 130, 60);
+      const desenho = { textos: [], linhas: [q, vizinha, cota('asa.largura', [[102, 50], [125, 50]]), cota('asa.altura', [[110, 45], [110, 55]])] };
+      expect(cotaSobre(desenho)).toEqual([]);
+      const entrando = { textos: [], linhas: [q, vizinha, cota('asa.largura', [[90, 50], [125, 50]])] };
+      expect(cotaSobre(entrando)).toMatchObject([{ a: 'cota de asa.largura', b: 'fuselagem' }]);
+    });
   });
 });
