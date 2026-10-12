@@ -101,3 +101,32 @@ inteiro numa imagem que mostra só o capô.
 ```bash
 python3 -c "print(open('docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/brief.md').read().count('sem legenda'))"
 ```
+
+## 12. Nenhuma das quatro vistas olha do nariz, e a boca da entrada de ar fica oculta
+
+A frontal olha de +z, a isométrica de [1, 1, 1], a lateral de +x e a superior de +y. Como o avião tem a proa em z 0 e a cauda em z positivo, as quatro olham pela traseira ou de lado, e uma face voltada para -z (a boca da entrada de ar sob o cone, o lábio do capô) não aparece em nenhuma delas. A frontal da unidade motor mostra o fogo do capô (a face traseira) e a entrada de ar só aparece como uma faixa cinza no perfil da lateral. Foi isso que o crítico leu como "não aparece como abertura em nenhuma vista" na rodada anterior, e a correção (casca aberta para -z com garganta escura) não muda o que as quatro vistas mostram. O `--corte x=0 --vista lateral` mostra a seção, mas o brief do `--feito` lista só as quatro vistas padrão.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --sem-vizinhos --composta --largura 1600
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --sem-vizinhos --corte x=0 --vista lateral --largura 1100
+```
+
+## 13. `--integrar` recusa o parâmetro que o detalhe reescreve, e a iteração deixa parâmetros órfãos no mestre
+
+Cada volta de ajuste de um número de parâmetro do detalhe (a largura do capô em z 1600, a inclinação das venezianas, o desvio da entrada de ar) volta recusada com "o detalhado redefine o parâmetro ... dê outro nome no detalhado", e o único caminho é dar um nome novo a cada rodada. Os nomes antigos ficam no mestre sem uso (`capoLarg1600`, `venezianaInclina`, `escBaseX`, `escBaseZ`, `escDx`, `escDz`, `escAng`, `arDy`), e o `--descrever` do mestre os lista entre os parâmetros.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --integrar motor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-motor.esboco.json
+```
+
+Para reproduzir, mude o valor de `entArDy` no detalhe e rode o comando de novo.
+
+## 14. A caixa da forma da maquete vira restrição da forma detalhada, mesmo quando a maquete estava errada
+
+Os escapes da maquete saíam em balanço, de x -500 a -800 e a 160 mm do flanco, e o Envelope guardou essa caixa (x -841,7 a -437,4). Um escape que assenta no flanco do capô, como o brief do crítico pede, termina mais para dentro do que a caixa permite e o `--envelope` reprova (67,5 mm em x), de modo que o detalhe teve de ser deformado (eixo a 55 mm do flanco, flange menor, ponta encurtada em 15 mm) para caber. Só `--condutor --replanejar` refaz o Envelope, e ele refaz o plano inteiro.
+
+Para reproduzir, ponha `"escSai": 25` no detalhe e rode:
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --envelope motor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-motor.esboco.json
+```
