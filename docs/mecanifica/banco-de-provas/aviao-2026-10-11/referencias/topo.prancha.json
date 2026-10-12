@@ -32,10 +32,10 @@
    "parte": "heliceEsq",
    "medida": "altura",
    "medivel": false,
-   "motivo": "sem corda",
+   "motivo": "vistas discordam: lateral 188, topo 349",
    "notaEm": [
-    -4650,
-    4420
+    -6500,
+    5480
    ]
   },
   {
@@ -51,10 +51,10 @@
    "parte": "heliceDir",
    "medida": "altura",
    "medivel": false,
-   "motivo": "sem corda",
+   "motivo": "vistas discordam: lateral 188, topo 349",
    "notaEm": [
-    1650,
-    4420
+    590,
+    5480
    ]
   },
   {
@@ -109,7 +109,7 @@
    "de": "fim",
    "numero": [
     2100,
-    -607
+    -200
    ]
   },
   {
@@ -179,13 +179,9 @@
     "medida": "largura"
    },
    "prevalece": "a pessoa, 2026-10-12: vale a lateral, a única vista que mostra a junta entre capô e fuselagem",
-   "em": 75,
-   "afasta": -1010,
-   "de": -6408,
-   "numero": [
-    2325,
-    -906
-   ]
+   "em": 900,
+   "de": -5420,
+   "alemDosNomes": true
   },
   {
    "parte": "deriva",
@@ -198,13 +194,9 @@
     58,
     -3055
    ],
-   "afasta": [
-    0,
-    -2745
-   ],
    "numero": [
-    -380,
-    -30
+    -130,
+    1499
    ]
   },
   {
@@ -381,8 +373,8 @@
    "medida": "largura",
    "em": -4850,
    "numero": [
-    0,
-    -710
+    -677,
+    -183
    ]
   },
   {
@@ -390,8 +382,8 @@
    "medida": "altura",
    "em": 1600,
    "numero": [
-    300,
-    -653
+    951,
+    -376
    ]
   }
  ],
@@ -454,8 +446,8 @@
   },
   "deriva": {
    "marca": [
-    -15,
-    -3025
+    -25,
+    -2900
    ],
    "coluna": "esquerda",
    "nivel": -4150
@@ -490,15 +482,15 @@
     3850
    ],
    "coluna": "direita",
-   "nivel": 2800
+   "nivel": 2900
   },
   "capo": {
    "marca": [
-    300,
-    3500
+    500,
+    2100
    ],
    "coluna": "direita",
-   "nivel": 2600
+   "nivel": 2000
   },
   "janelas": {
    "marca": [
