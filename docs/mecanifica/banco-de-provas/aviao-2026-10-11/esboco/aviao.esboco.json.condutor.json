@@ -1433,6 +1433,12 @@
       "unidade": "asas",
       "nota": 8,
       "motivo": "Conjunto simétrico e coerente, sem ponta no ar: flap interno, aileron externo, diedro e ponta levantada legíveis. Detalhes de superfície: o contorno superior da ponta levantada é de segmentos retos com quebras visíveis (corte x-6250), e o bordo de ataque da seção termina em ponta aguda (cortes x-2500 e x-5300). O eixo e a fresta não se leem com clareza nos cortes."
+    },
+    {
+      "ordem": 14,
+      "unidade": "empenagem-horizontal",
+      "nota": 8,
+      "motivo": "Sem defeito estrutural: diedro, afilamento, fresta, dois suportes por lado e encaixe na cauda coerentes com a função. Acabamento da ponteira: contorno externo facetado, traço vertical solto (zoom, x≈553, y≈385 a 465) e marca em gota sem função na lateral sem vizinhos. O eixo não se distingue no corte x=600, e a ponteira cobre a fresta na ponta sem mostrar se o profundor ainda gira."
     }
   ],
   "liberacoes": [
