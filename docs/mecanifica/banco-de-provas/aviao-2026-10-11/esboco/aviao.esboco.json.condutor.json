@@ -1367,6 +1367,12 @@
       "unidade": "fuselagem",
       "nota": 7,
       "motivo": "Defeito estrutural: no corte x=-770 um corpo escuro (x 498 a 622, y 405 a 440, com faixa fina até x=690) sobe cerca de 12 px acima do topo da placa da porta e do topo do casco, sem explicação. A placa da porta tem só cerca de 92 mm no corte x=-770 e termina numa parede vertical do casco, sem bater com a extensão que a superior mostra (y 618 a 690); ela fica saliente uns 45 mm do flanco, e não rebaixada. A cauda termina em agulha de cerca de 10 px com fim reto, já apontada antes. As quatro vistas não mostram o lado esquerdo."
+    },
+    {
+      "ordem": 10,
+      "unidade": "motor",
+      "nota": 8,
+      "motivo": "Capô oco, abertura em torno do cone e duto com boca resolvidos e legíveis nos cortes. Restam detalhes de superfície já apontados: as venezianas são três marcas escuras cheias sem abertura legível (lateral x≈710-725, y≈630-636), e dois tracinhos no rodapé da frontal (x≈498 e 602, y≈808) sugerem o duto aflorando na parede de trás."
     }
   ]
 }
