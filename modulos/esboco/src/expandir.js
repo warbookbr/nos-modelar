@@ -128,6 +128,9 @@ export function numerosDaForma(f, num, contexto) {
     if (objeto(g.encaixa.gira) && g.encaixa.gira.graus !== undefined) g.encaixa.gira = { ...g.encaixa.gira, graus: num(g.encaixa.gira.graus, 'encaixa.gira.graus', contexto) };
   }
   if (objeto(g.linhaCentro) && g.linhaCentro.extensao !== undefined) g.linhaCentro = { ...g.linhaCentro, extensao: num(g.linhaCentro.extensao, 'linhaCentro.extensao', contexto) };
+  /* recorte: a folga e a profundidade de cada molde aceitam número, parâmetro ou expressão; o cortador é oculto por natureza */
+  if (Array.isArray(g.subtrai)) g.subtrai = g.subtrai.map((e, i) => (objeto(e) ? { ...e, ...(e.folga !== undefined ? { folga: num(e.folga, `subtrai[${i}].folga`, contexto) } : {}), ...(e.profundidade !== undefined ? { profundidade: num(e.profundidade, `subtrai[${i}].profundidade`, contexto) } : {}) } : e));
+  if (g.cortador === true && g.oculto === undefined) g.oculto = true;
   if (objeto(g.espelha) && g.espelha.pos !== undefined) g.espelha = { ...g.espelha, pos: num(g.espelha.pos, 'espelha.pos', contexto) };
   if (objeto(g.arranja)) {
     g.arranja = { ...g.arranja };

@@ -148,6 +148,7 @@ function reescreverForma(f, { ponto, id }) {
   if (Array.isArray(g.caminho)) g.caminho = g.caminho.map(pt);
   if (Array.isArray(g.circulos)) g.circulos = g.circulos.map((c) => (objeto(c) && c.centro !== undefined ? { ...c, centro: pt(c.centro) } : c));
   if (objeto(g.espelha) && typeof g.espelha.forma === 'string') g.espelha = { ...g.espelha, forma: id(g.espelha.forma) };
+  if (Array.isArray(g.subtrai)) g.subtrai = g.subtrai.map((e) => (typeof e === 'string' ? id(e) : objeto(e) && typeof e.forma === 'string' ? { ...e, forma: id(e.forma) } : e));
   if (objeto(g.encaixa)) g.encaixa = { ...g.encaixa, ...(g.encaixa.em === undefined ? {} : { em: pt(g.encaixa.em) }), ...(typeof g.encaixa.ancora === 'string' ? { ancora: ponto(g.encaixa.ancora) } : {}) };
   if (objeto(g.arranja)) {
     g.arranja = { ...g.arranja };

@@ -7,6 +7,7 @@ import { completarPelasOcultas, contarGrupos, herdarDoEspelho, lerContato, medir
 import { verificarProjecao } from './projecao.js';
 import { conferirPlano } from './plano.js';
 import { quisDizer } from './parecido.js';
+import { resumoDoRecorte } from './recorte.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const r2 = (x) => Math.round(x * 100) / 100;
@@ -23,6 +24,13 @@ function eixoDe(r) {
   return r.forma.eixo ?? 'y';
 }
 
+/* O que o recorte fez (`subtrai`): os moldes, o volume que sai e o que sobra, em cm3. Só a forma recortada leva o campo. */
+function descreverRecorte(r) {
+  const q = resumoDoRecorte(r);
+  const cm3 = (mm3) => Math.round(mm3 / 100) / 10;
+  return { cortadores: q.cortadores.map((c) => ({ id: c.id, ...(c.folga ? { folga_mm: r2(c.folga) } : {}), ...(c.profundidade !== undefined ? { profundidade_mm: r2(c.profundidade), lado: c.lado } : {}), retira_cm3: cm3(c.retiradoMm3) })), volume_cm3: cm3(q.volumeMm3), retira_cm3: cm3(q.retiradoMm3), pecas: q.pecas };
+}
+
 function descreverForma(r) {
   const extensao = r.max.map((v, i) => v - r.min[i]);
   return {
@@ -33,6 +41,7 @@ function descreverForma(r) {
     ...(eixoDe(r) ? { eixo: eixoDe(r) } : {}),
     ...(r.forma.rotacao !== undefined ? { rotacao: r.forma.rotacao } : {}),
     ...(relacaoDe(r.forma) ? { relacao: relacaoDe(r.forma) } : {}),
+    ...(r.subtrai ? { recorte: descreverRecorte(r) } : {}),
     caixa: { x: [r2(r.min[0]), r2(r.max[0])], y: [r2(r.min[1]), r2(r.max[1])], z: [r2(r.min[2]), r2(r.max[2])] },
     ancoras: Object.fromEntries(Object.entries(ancorasDe(r)).map(([k, v]) => [k, vec(v)])),
   };
@@ -43,7 +52,7 @@ function descreverForma(r) {
    fora da tolerância e silhueta fora da referência. A ponta livre (ponta de tubo ou de haste que não encosta em nada, ou várias pontas no mesmo ponto sem coletor) vem logo depois do contrato. */
 export const GRAVIDADES = { peca: 0, solto: 1, atravessa: 2, contrato: 3, ponta: 4, assimetria: 5, medida: 6, referencia: 7 };
 const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato', 'ponta-livre': 'ponta', 'pontas-sem-coletor': 'ponta', 'porta-fora': 'contrato' };
-const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', 'contrato-fixa': 'contrato', assimetria: 'assimetria' };
+const CLASSE_DO_PLANO = { 'recorte-vazio': 'contrato', 'cortador-solto': 'contrato', 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'peca-ausente': 'peca', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', 'contrato-fixa': 'contrato', assimetria: 'assimetria' };
 
 /* { opcoes, ... } a partir do JSON já lido. */
 export function descreverEsboco(bruto) {
@@ -62,7 +71,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
   const ativa = (i) => (lidas[i]?.usar ?? raiz?.usar) === true;
   const todas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
-  const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis, ocultas: todas.map((rs) => rs.filter((r) => r.forma.oculto === true)), unidades }) : null;
+  const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis, ocultas: todas.map((rs) => rs.filter((r) => r.forma.oculto === true && r.forma.cortador !== true)), unidades }) : null;
   const projecao = comProjecao ? verificarProjecao(esboco, { forcar: true, resolvidas: visiveis }) : { achados: [] };
   const plano = conferirPlano(esboco, visiveis, { referencias, unidades, medidasLidas });
   const padrao = padroesDoContato(visiveis);
@@ -91,7 +100,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
       if (penetracao > penMax) sobreposicoes3d.push({ a: rs[a].id, b: rs[b].id, penetracao_mm: r2(penetracao), ...(tipo === 'atravessa' ? { declarado: true } : {}) });
     }
     /* a unidade isolada (as outras formas ocultas) julga a conectividade com o mestre inteiro, como o gate */
-    const ocultasDaOpcao = todas[i].filter((r) => r.forma.oculto === true);
+    const ocultasDaOpcao = todas[i].filter((r) => r.forma.oculto === true && r.forma.cortador !== true);
     if (ocultasDaOpcao.length > 0 && n > 1 && contarGrupos(ligados) > 1) {
       completarPelasOcultas({ visiveis: pecas, ocultas: ocultasDaOpcao.map(pecasDe), ligados, menorFolga: Array(n).fill(Infinity), tol, alcance: tol, declarado: (a, h) => tipos.get(chaveSimetrica(rs[a].id, ocultasDaOpcao[h].id)) === 'atravessa' });
     }
@@ -123,14 +132,15 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
     for (const a of plano.achados.filter((x) => x.opcao === titulo)) somar(CLASSE_DO_PLANO[a.tipo], a.texto, a.pecas, null, { tipo: a.tipo, mm: a.mm });
     divs.sort((x, y) => x.gravidade - y.gravidade);
     divergencias.push(...divs);
-    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'contrato-fixa' || x.tipo === 'assimetria' || x.tipo === 'referencia-fora' || x.tipo === 'peca-ausente');
+    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'contrato-fixa' || x.tipo === 'recorte-vazio' || x.tipo === 'cortador-solto' || x.tipo === 'assimetria' || x.tipo === 'referencia-fora' || x.tipo === 'peca-ausente');
     return {
       titulo,
       ...(o.parametros && Object.keys(o.parametros).length ? { parametros: o.parametros } : {}),
       gate: declarado
         ? { declarado: true, tolerancia_mm: r2(tol), penetracao_mm: r2(penMax) }
         : { declarado: false, tolerancia_mm: r2(tol), penetracao_mm: r2(penMax) },
-      ocultas: todas[i].length - rs.length,
+      ocultas: todas[i].filter((r) => r.forma.oculto === true && r.forma.cortador !== true).length,
+      ...(todas[i].some((r) => r.forma.cortador === true) ? { cortadores: todas[i].filter((r) => r.forma.cortador === true).length } : {}),
       formas: rs.map(descreverForma),
       contatos,
       soltas,
@@ -149,7 +159,8 @@ const mm1 = (x) => (Math.round(x * 10) / 10).toString().replace('.', ',');
 const vetor = (v) => `[${v.map(mm1).join(' ')}]`;
 const faixa = (p) => `${mm1(p[0])}..${mm1(p[1])}`;
 
-const linhaDaForma = (f) => `forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`;
+const textoDoRecorte = (q) => `subtrai ${q.cortadores.map((c) => `${c.id}${c.folga_mm ? ` (folga ${mm1(c.folga_mm)} mm)` : ''}${c.profundidade_mm ? ` (${mm1(c.profundidade_mm)} mm a partir de ${c.lado})` : ''}${c.retira_cm3 > 0 ? '' : ' (não toca a forma)'}`).join(', ')}; retira ${mm1(q.retira_cm3)} cm3 e sobram ${mm1(q.volume_cm3)} cm3 em ${q.pecas} peças convexas`;
+const linhaDaForma = (f) => `forma ${f.id}: ${f.tipo}, centro ${vetor(f.centro)}, extensão ${f.extensao.map(mm1).join('x')}${f.eixo ? `, eixo ${f.eixo}` : ''}${f.rotacao !== undefined ? `, rotação ${Array.isArray(f.rotacao) ? vetor(f.rotacao) : JSON.stringify(f.rotacao)}` : ''}${f.relacao ? `, relação: ${f.relacao}` : ''}${f.recorte ? `, recorte: ${textoDoRecorte(f.recorte)}` : ''}, caixa x ${faixa(f.caixa.x)} y ${faixa(f.caixa.y)} z ${faixa(f.caixa.z)}`;
 const linhaDeAncoras = (f) => `âncoras ${f.id}: ${Object.entries(f.ancoras).map(([k, v]) => `${k} ${vetor(v)}`).join('; ')}`;
 const linhaDeContato = (c) => `contato: ${c.a} toca ${c.b} (${c.folga_mm !== undefined ? `folga ${mm1(c.folga_mm)} mm` : `penetração ${mm1(c.penetracao_mm)} mm`})`;
 const linhaDeSobreposicao3d = (s) => `sobreposição 3D: ${s.a} e ${s.b} se atravessam ${mm1(s.penetracao_mm)} mm${s.declarado ? ' (atravessa declarado)' : ''}`;
@@ -159,7 +170,7 @@ const linhaDeProjecao = (p) => `sobreposição na vista ${p.vista}: ${p.cobre} c
 export function formatarDescricao(d) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
-    L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
+    L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}${o.cortadores ? `, ${o.cortadores} ${o.cortadores === 1 ? 'cortador' : 'cortadores'} (molde de recorte)` : ''}`);
     if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
     L.push(linhaDoGate(o));
     for (const f of o.formas) {
@@ -187,7 +198,7 @@ const linhaDoGate = (o) => (o.gate.declarado
 export function formatarResumo(d, divergencias) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
-    L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
+    L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}${o.cortadores ? `, ${o.cortadores} ${o.cortadores === 1 ? 'cortador' : 'cortadores'} (molde de recorte)` : ''}`);
     if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
     L.push(linhaDoGate(o));
     const meus = divergencias.filter((x) => x.opcao === o.titulo);

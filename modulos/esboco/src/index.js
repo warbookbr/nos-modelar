@@ -8,6 +8,7 @@ import { expandirArranjos, expandirEsboco } from './expandir.js';
 import { quisDizer } from './parecido.js';
 import { formasDoPainel, montarCamada } from './camada.js';
 import { frenteDoCorte, ladoDoCorte, lacosDoPlano, lerCorte, recortarBloco } from './corte.js';
+import { anexarRecortes, deslocarRecorte, fatiasRecortadas, secaoRecortada } from './recorte.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -907,8 +908,8 @@ function posesNoCaminho(alvo, a, onde) {
 const CHAVES_ESPELHA = ['forma', 'eixo', 'pos'];
 /* Campos de posição e de aparência que a cópia não herda da forma-fonte (a cópia refaz a posição
    a partir da fonte já resolvida; `rotulo`, `oculto` e `opacidade` são só dela). */
-const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia', 'daLigacao', 'encaixa', 'substitui'];
-const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha', 'daInstancia', 'substitui', 'unidade'];
+const NAO_HERDADOS = ['id', 'centro', 'sobre', 'ponta', 'de', 'para', 'rotacao', 'encosta', 'alinha', 'desloca', 'rotulo', 'oculto', 'opacidade', 'espelha', 'arranja', 'arranjoDe', 'caminho', 'daInstancia', 'daLigacao', 'encaixa', 'substitui', 'subtrai', 'cortador'];
+const CAMPOS_DO_ESPELHO = ['id', 'cor', 'rotulo', 'oculto', 'opacidade', 'desloca', 'espelha', 'daInstancia', 'substitui', 'unidade', 'subtrai', 'cortador'];
 
 /* Cópia refletida (`espelha`) ou repetida (`arranjoDe`, vinda de `arranja`) de uma forma já resolvida:
    a geometria sai da fonte resolvida, e não de uma regravação das relações dela. */
@@ -973,6 +974,8 @@ function copiaResolvida(f, id, onde, referencia, pontoDe) {
     ...(f.opacidade !== undefined ? { opacidade: f.opacidade } : {}),
     ...(f.substitui !== undefined ? { substitui: f.substitui } : {}),
     ...(f.unidade !== undefined ? { unidade: f.unidade } : {}),
+    ...(f.subtrai !== undefined ? { subtrai: f.subtrai } : {}),
+    ...(f.cortador !== undefined ? { cortador: f.cortador } : {}),
   };
   if (forma.cor === undefined) delete forma.cor;
   /* a ponta declarada livre é da forma, e a cópia a herda */
@@ -1441,7 +1444,7 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção', pontosDaRaiz = und
     prontas.set(id, r);
     return r;
   };
-  return formas.map((f) => resolver(f.id));
+  return anexarRecortes(formas.map((f) => resolver(f.id)), rotuloOpcao);
 }
 
 /* Projeções: tela (x para a direita, y para baixo) e profundidade para o observador. */
@@ -1607,7 +1610,7 @@ function fatiarCasca(r, olho, maxFatias) {
 /* Ordem de desenho (do fundo para a frente) das faces laterais visíveis de um prisma de perfil côncavo: uma face
    vem antes de outra quando, onde as duas se cobrem na tela, a primeira está mais longe do observador. Ordenação
    topológica; no ciclo (que um perfil simples não produz) sobra a ordem pela profundidade do centro. */
-function ordemDasFaces(lados, olho) {
+export function ordemDasFaces(lados, olho) {
   const n = lados.length;
   if (n < 2) return lados.map((_, i) => i);
   const apoio = Math.abs(olho[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
@@ -1666,7 +1669,9 @@ function ordemDasFaces(lados, olho) {
 /* `semFatias`: uma face lateral por lado do perfil em vez de uma por fatia. A ordem de profundidade do desenho
    precisa das fatias, mas a silhueta e a profundidade de cada célula da projeção não (as faces de uma mesma faixa
    são coplanares), e a projeção passa de 36 fatias por forma a uma. */
-export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquadrar = false } = {}) {
+export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquadrar = false, semRecorte = false } = {}) {
+  /* a forma que subtrai outra (`subtrai`) tem a fronteira recortada; `semRecorte` pede a forma inteira (o que o recorte parte) */
+  if (r.subtrai && !semRecorte) return fatiasRecortadas(r, olho, { semFatias, maxFatias, esquadrar });
   if (r.partes) {
     /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
     return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias, maxFatias, esquadrar }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
@@ -1964,6 +1969,8 @@ const deslocamentos = new WeakMap();
 export function deslocarForma(r, delta) {
   const somar = (v) => v.map((x, i) => x + delta[i]);
   const nova = { ...r, centro: somar(r.centro), min: somar(r.min), max: somar(r.max) };
+  /* o vão anda com a forma recortada: os moldes dela vão deslocados do mesmo tanto */
+  if (r.subtrai) nova.subtrai = deslocarRecorte(r, delta, deslocarForma);
   const origem = deslocamentos.get(r);
   deslocamentos.set(nova, origem ? { base: origem.base, delta: somar0(origem.delta, delta) } : { base: r, delta: [...delta] });
   return nova;
@@ -2157,6 +2164,7 @@ function corteDaOpcao(bruto, formas, onde) {
    o envolve são sólidos de partes que se sobrepõem nas juntas, e cada parte tem a sua seção. */
 const OLHO_DA_SECAO = normalizar([0.5412, 0.3377, 0.7697]);
 export function secaoDaForma(r, corte) {
+  if (r.subtrai) return secaoRecortada(r, corte);
   const solidos = r.partes ? r.partes.map((pt) => subforma(r, pt)) : [r];
   const contra = OLHO_DA_SECAO.map((x) => -x);
   return solidos.map((s) => {
@@ -2830,8 +2838,8 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
           }
         }
       };
-      if (g.r.prisma?.naoConvexo) {
-        /* forma côncava ou com cintura (extrusão côncava, loft, revolução): cada face leva as próprias linhas logo
+      if (g.r.prisma?.naoConvexo || g.r.subtrai) {
+        /* forma côncava ou com cintura (extrusão côncava, loft, revolução) ou recortada por `subtrai`: cada face leva as próprias linhas logo
            depois dela, e a face da frente as cobre por cima em vez de as linhas de trás aparecerem sobre ela */
         for (const ch of g.chunks) {
           for (const f of [...ch.dentro, ...ch.lados]) {

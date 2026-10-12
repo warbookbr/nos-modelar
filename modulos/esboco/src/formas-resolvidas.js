@@ -7,6 +7,7 @@ import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { unidadesDeclaradas } from './contato.js';
 import { lerPlano } from './plano.js';
+import { resumoDoRecorte } from './recorte.js';
 
 export const FORMATO_DAS_FORMAS = 'mecanifica.formas-resolvidas@1';
 
@@ -107,6 +108,18 @@ function geometriaDoTipo(r) {
   }
 }
 
+/* O recorte da forma (`subtrai`): os moldes e o volume antes e depois, em mm3. A caixa e o volume já são os da forma recortada; a
+   geometria do tipo é a da forma inteira, e o tradutor do andaime, que não subtrai, a leva inteira e declara a perda. */
+function recorteDa(r) {
+  if (!r.subtrai) return undefined;
+  const q = resumoDoRecorte(r);
+  return {
+    cortadores: q.cortadores.map((c) => ({ id: c.id, ...(c.folga ? { folga: c.folga } : {}), ...(c.profundidade !== undefined ? { profundidade: c.profundidade, lado: c.lado } : {}), retiradoMm3: c.retiradoMm3 })),
+    volumeCheioMm3: q.volumeCheioMm3,
+    volumeMm3: q.volumeMm3,
+  };
+}
+
 /* As âncoras que o desenho dá a uma forma, sem as seis faces da caixa (que saem de `caixa`): centro, as pontas do eixo e
    as seções, pontos do perfil ou pontos-guia nomeados. */
 function ancorasDaForma(r) {
@@ -176,6 +189,7 @@ export function formasResolvidas(esboco, opcao = 1) {
       id: r.id,
       tipo: r.forma.tipo,
       oculto: r.forma.oculto === true,
+      ...(r.forma.cortador === true ? { cortador: true } : {}),
       ...(r.forma.cor !== undefined ? { cor: r.forma.cor } : {}),
       ...(r.forma.rotulo !== undefined ? { rotulo: r.forma.rotulo } : {}),
       ...(r.forma.opacidade !== undefined ? { opacidade: r.forma.opacidade } : {}),
@@ -188,6 +202,7 @@ export function formasResolvidas(esboco, opcao = 1) {
         matriz: matrizDe(r),
         ...(haste ? { haste: true } : {}),
         ...geometriaDoTipo(r),
+        ...(r.subtrai ? { recorte: recorteDa(r) } : {}),
         ancoras: ancorasDaForma(r),
       },
     };

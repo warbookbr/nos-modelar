@@ -11,7 +11,9 @@
    do orçamento de volumes (`volumesMaximos`) é recolhido a uma caixa do envelope da forma principal. O que não tem equivalente
    (faixa, furo de caixa, rotação em dois eixos de um sólido que a N2 não inclina, medida que a N2 recusa) volta em
    `naoTraduzidas` com o motivo, e `estrito: true` recusa o conjunto inteiro quando há alguma. Nada é aproximado em silêncio: uma
-   forma ou está no andaime com a mesma geometria, ou está em `perdas`, ou está em `naoTraduzidas`.
+   forma ou está no andaime com a mesma geometria, ou está em `perdas`, ou está em `naoTraduzidas`. A forma que subtrai outra
+   (`geometria.recorte`: o alojamento da roda na asa, a porta rebaixada no casco) vai ao andaime inteira, porque a N2 não subtrai um
+   volume de outro, e entra em `perdas` com o volume do vão (`recorte-ignorado`, ou a perda `recorte` somada à da aproximação).
 
    A orientação sai da `matriz` de cada forma (mundo = centro + matriz · local). Uma matriz que leva os três eixos da forma a
    eixos do mundo só reordena as medidas. Uma que deixa um eixo no lugar e gira os outros dois no plano dele gira o perfil: a
@@ -402,7 +404,20 @@ function traduzirForma(forma) {
   const fazer = forma.tipo === 'tubo' ? (gg) => volumeDoTubo(gg, forma) : POR_TIPO[forma.tipo];
   if (!fazer) recusar(`tipo "${forma.tipo}" sem correspondência na N2`);
   const resultado = fazer(g, cols, al);
-  return resultado.aproximacao ? resultado : { volume: resultado, aproximacao: null };
+  const traduzida = resultado.aproximacao ? resultado : { volume: resultado, aproximacao: null };
+  return g.recorte ? comRecorteIgnorado(traduzida, g.recorte) : traduzida;
+}
+
+/* A N2 não subtrai um volume de outro (o alojamento da roda na asa, a porta rebaixada no casco): a forma recortada vai ao andaime
+   inteira, sem o vão, e a perda entra no relatório com o volume que o recorte tirava. O volume do esboço passa a ser o recortado, e
+   por isso o erro de volume medido na blocagem é o volume do vão. */
+function comRecorteIgnorado(traduzida, recorte) {
+  const retirado = recorte.volumeCheioMm3 - recorte.volumeMm3;
+  const quais = recorte.cortadores.map((c) => c.id).join(', ');
+  const p = perda('recorte', `o recorte por ${quais} (${casas(retirado, 3)} mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão`);
+  const a = traduzida.aproximacao;
+  if (a) return { volume: traduzida.volume, aproximacao: { ...a, volumeEsboco: a.volumeEsboco - retirado, perdido: [...a.perdido, p] } };
+  return aproximado(traduzida.volume, 'recorte-ignorado', recorte.volumeMm3, [p]);
 }
 
 /* O tubo: o caminho do esboço já é o declarado (em mundo), e o N2 guarda os pontos relativos ao centro do volume. O canto sem raio

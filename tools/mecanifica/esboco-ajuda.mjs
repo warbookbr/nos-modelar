@@ -28,6 +28,7 @@ export const FRASES = {
   loft: 'Sólido por seções ao longo de um eixo, com seção arredondada, seção inclinada e casca oca: tanque, banco, carenagem e caçamba.',
   revolucao: 'Sólido de revolução por perfil de raio e altura.',
   tubo: 'Tubo por pontos: caminho, diâmetro e raio de curva.',
+  recorte: 'Recorte de uma forma por outra (`subtrai`, `cortador`, folga e profundidade): o alojamento do trem, a porta rebaixada, o furo passante.',
   posicionamento: 'Posicionar por relação (sobre, encosta, ponta, alinha), não por coordenada.',
   parametros: 'Parâmetros, expressões com "=" e formas herdadas.',
   espelho: 'Espelho em torno de um eixo e arranjo em repetição.',

@@ -17,6 +17,7 @@ import { ErroDeEsboco, listasDaCasca, normaisDasFaixas, pontaDeclaradaLivre, pon
 import { expandirEsboco } from './expandir.js';
 import { criarConserto } from './conserto.js';
 import { avaliarPortas, girar, localParaMundo, mmFino } from './portas.js';
+import { pecasRecortadas } from './recorte.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
 /* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
@@ -245,10 +246,17 @@ export function decomporConvexo(perfil) {
   return polis.map((ids) => ids.map((k) => perfil[k]));
 }
 
-/* Peças convexas de uma forma resolvida. */
+/* Peças convexas de uma forma resolvida. A forma que subtrai outra (`subtrai`) leva as peças do que sobra do recorte (ver `recorte.js`). */
 export function pecasDe(r) {
-  if (!memoPecas.has(r)) memoPecas.set(r, pecasSemMemoria(r));
+  if (!memoPecas.has(r)) memoPecas.set(r, r.subtrai ? pecasRecortadas(r) : pecasSemMemoria(r));
   return memoPecas.get(r);
+}
+
+/* As peças da forma inteira, sem o recorte: o que o recorte parte e o que o desenho recorta. */
+const memoSemRecorte = new WeakMap();
+export function pecasSemRecorte(r) {
+  if (!memoSemRecorte.has(r)) memoSemRecorte.set(r, pecasSemMemoria(r));
+  return memoSemRecorte.get(r);
 }
 
 /* Uma forma resolvida (e a lista de peças dela) é imutável depois de resolvida: a leitura em texto
@@ -743,7 +751,8 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
 
   const todasAsFormas = prontas ? null : opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`, esboco?.pontos));
   const resolvidas = prontas ?? todasAsFormas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
-  const ocultasResolvidas = prontasOcultas ?? (todasAsFormas ? todasAsFormas.map((rs) => rs.filter((r) => r.forma.oculto === true)) : opcoes.map(() => []));
+  /* o cortador (o molde de um recorte) é oculto por natureza e não é referência de posição: nunca é peça do gate */
+  const ocultasResolvidas = prontasOcultas ?? (todasAsFormas ? todasAsFormas.map((rs) => rs.filter((r) => r.forma.oculto === true && r.forma.cortador !== true)) : opcoes.map(() => []));
   const todosIds = new Set(resolvidas.flat().map((r) => r.id));
   /* uma forma oculta (a unidade isolada por --detalhar esconde as outras, e a instância pode vir com `oculto`) sai dos
      pares em silêncio; só o id que não existe em forma nenhuma é erro */

@@ -86,12 +86,18 @@ export function prepararFormas(lista, { estilos, unidades, simetrico }, num, ond
     const pos = num(config.pos ?? 0, 'simetrico.pos', rotulo);
     exigir(Number.isFinite(pos), `${rotulo}: "simetrico.pos" deve ser um número em mm`);
     const substitui = g.usa === undefined && typeof g.substitui === 'string' && g.substitui.endsWith(lado) ? `${g.substitui.slice(0, -1)}${OUTRA_LADO[lado]}` : undefined;
+    /* o recorte da cópia subtrai os moldes espelhados (o molde `alojE` da forma `asaE` vira `alojD` na `asaD`) e o molde espelhado
+       continua molde */
+    const doOutroLado = (id) => (typeof id === 'string' && id.length >= 2 && id.endsWith(lado) ? `${id.slice(0, -1)}${OUTRA_LADO[lado]}` : id);
+    const subtrai = Array.isArray(g.subtrai) ? g.subtrai.map((e) => (typeof e === 'string' ? doOutroLado(e) : objeto(e) ? { ...e, forma: doOutroLado(e.forma) } : e)) : undefined;
     destino.push({
       id: idEspelho,
       espelha: { forma: g.id, eixo: config.eixo, pos },
       ...(g.cor !== undefined ? { cor: g.cor } : {}),
       ...(g.opacidade !== undefined ? { opacidade: g.opacidade } : {}),
       ...(g.oculto !== undefined ? { oculto: g.oculto } : {}),
+      ...(g.cortador !== undefined ? { cortador: g.cortador } : {}),
+      ...(subtrai !== undefined ? { subtrai } : {}),
       ...(substitui !== undefined ? { substitui } : {}),
     });
   };

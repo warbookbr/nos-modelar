@@ -54,6 +54,10 @@ describe('o tópico de cada mensagem', () => {
     ['editar: "tanque" não começa por uma forma declarada', 'editar'],
     ['condutor: --feito vale no estágio Detalhe por unidade (o estágio atual é Maquete)', 'unidades'],
     ['--corte precisa de <eixo>=<valor>', 'vistas-ia'],
+    ['opção 1, forma "asa": "subtrai" cita "alojamentoo", que não existe nesta opção (quis dizer "alojamento"?) (ids: asa, alojamento)', 'recorte'],
+    ['opção 1, forma "asa": o item 1 de "subtrai" não tem o campo "folgaa" (quis dizer "folga"?); campos válidos: forma, folga, profundidade, lado', 'recorte'],
+    ['opção 1: o recorte é circular (a subtrai b subtrai a)', 'recorte'],
+    ['opção 1, forma "m": "cortador" deve ser true (a forma é só o molde de um recorte)', 'recorte'],
   ];
   for (const [mensagem, topico] of casos) it(`${topico}: ${mensagem.slice(0, 70)}`, () => expect(topicoDaRecusa(mensagem)).toBe(topico));
 

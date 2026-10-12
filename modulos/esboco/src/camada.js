@@ -76,7 +76,7 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false }) {
     for (const ch of it.chunks) {
       for (const f of [...ch.dentro, ...ch.lados]) {
         faces.push({ c: f.pts.map(p3), k: tinta(it.r, f.n) });
-        if (it.r.prisma?.naoConvexo && !previa) for (const l of f.linhas ?? []) tracos.push(l.map(p3));
+        if ((it.r.prisma?.naoConvexo || it.r.subtrai) && !previa) for (const l of f.linhas ?? []) tracos.push(l.map(p3));
       }
       for (const t of ch.tampas) {
         const furos = t.furos && t.furos.length > 0 ? t.furos : t.furo ? [t.furo] : [];
@@ -86,7 +86,7 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false }) {
       }
       if (!previa) {
         for (const arc of ch.arcos ?? []) if (arc.length >= 2) anel(arc, false);
-        if (!it.r.prisma?.naoConvexo) for (const l of ch.linhas) tracos.push(l.map(p3));
+        if (!(it.r.prisma?.naoConvexo || it.r.subtrai)) for (const l of ch.linhas) tracos.push(l.map(p3));
       }
     }
     return { id: it.r.id, rank, opacidade: it.r.opacidade !== undefined && it.r.opacidade < 1 ? it.r.opacidade : 1, prof: it.prof, faces, tracos };

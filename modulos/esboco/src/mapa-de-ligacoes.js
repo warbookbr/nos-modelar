@@ -30,7 +30,7 @@ export function mapaDeLigacoes(bruto, { unidades, opcao = 0, funcoes = {} } = {}
   const todas = opcoes.map((x, i) => (Array.isArray(x?.formas) ? resolverOpcao(x, `opção ${i + 1}`, e.pontos) : []));
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
   const rs = visiveis[opcao];
-  const ocultas = todas[opcao].filter((r) => r.forma.oculto === true);
+  const ocultas = todas[opcao].filter((r) => r.forma.oculto === true && r.forma.cortador !== true);
   const raiz = lerContato(e.contato, 'esboço');
   const daOpcao = lerContato(o.contato, `opção ${opcao + 1}`);
   const tol = daOpcao?.tolerancia ?? raiz?.tolerancia ?? padroesDoContato(visiveis).padraoTol;

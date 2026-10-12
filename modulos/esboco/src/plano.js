@@ -7,6 +7,7 @@
    max] }`), para a proporção que a ficha ou a foto dão sem dar o tamanho.
    Puro: não lê nem grava arquivo. */
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
+import { resumoDoRecorte } from './recorte.js';
 import { agruparPontos, lerContato, medirPar, padroesDoContato, pecasDe, pontosDeContato, unidadesDeclaradas } from './contato.js';
 import { quisDizer } from './parecido.js';
 import { conferirReferencia, exigirVista } from './referencia.js';
@@ -436,6 +437,14 @@ export function conferirPlano(esboco, visiveis, { referencias, unidades, medidas
       if (d <= RUIDO_DA_SIMETRIA) continue;
       if (contrato.some((q) => q.relacao === 'simetrica' && ((q.a === r.id && q.b === e.forma) || (q.b === r.id && q.a === e.forma)))) continue;
       novo({ tipo: 'assimetria', pecas: [e.forma, r.id], mm: r1(d), texto: `${r.id} é o espelho de ${e.forma} no eixo ${e.eixo}, mas foi deslocado ${mm1(d)} mm depois de refletir` });
+    }
+    /* o cortador que nenhuma forma subtrai é um molde sem uso: oculto por natureza, não aparece em lugar nenhum */
+    const subtraidos = new Set((o.formas ?? []).flatMap((f) => (f && Array.isArray(f.subtrai) ? f.subtrai.map((e) => (typeof e === 'string' ? e : e?.forma)) : [])));
+    for (const f of o.formas ?? []) if (f && f.cortador === true && !subtraidos.has(f.id)) novo({ tipo: 'cortador-solto', pecas: [], mm: 0, texto: `"${f.id}" é um cortador que nenhuma forma subtrai: um molde sem uso não aparece em lugar nenhum, então ou entra no "subtrai" de uma forma ou sai do esboço` });
+    /* o molde que não toca a forma deixa a forma inteira (o alojamento fora do lugar), e nada mais acusa isso */
+    for (const r of rs) {
+      if (!r.subtrai) continue;
+      for (const c of resumoDoRecorte(r).cortadores) if (c.retiradoMm3 < 1e-3) novo({ tipo: 'recorte-vazio', pecas: [r.id], mm: 0, texto: `${r.id} subtrai "${c.id}" e o molde não toca a forma, de modo que o recorte não retira nada: confira a posição, a folga e o tamanho do molde` });
     }
     /* a silhueta contra a referência, por vista e por parte */
     const conferencias = [];
