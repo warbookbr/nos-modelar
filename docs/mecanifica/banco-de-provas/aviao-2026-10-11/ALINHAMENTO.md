@@ -95,3 +95,5 @@ não recorta uma forma com outra. Os atritos do caminho estão em
 `esboco/comparacao-final.png`.
 
 O último brief do crítico de cada unidade e de cada Marco: [fuselagem](esboco/aviao-critico-fuselagem/brief.md), [motor](esboco/aviao-critico-motor/brief.md), [helice](esboco/aviao-critico-helice/brief.md), [asas](esboco/aviao-critico-asas/brief.md), [empenagem-horizontal](esboco/aviao-critico-empenagem-horizontal/brief.md), [trem-do-nariz](esboco/aviao-critico-trem-do-nariz/brief.md), [trens-principais](esboco/aviao-critico-trens-principais/brief.md), [marco-25](esboco/aviao-critico-marco-25/brief.md), [marco-50](esboco/aviao-critico-marco-50/brief.md), [marco-75](esboco/aviao-critico-marco-75/brief.md), [marco-100](esboco/aviao-critico-marco-100/brief.md).
+
+A classificação dos atritos da fatia 4 está em [`CLASSIFICACAO.md`](CLASSIFICACAO.md).
