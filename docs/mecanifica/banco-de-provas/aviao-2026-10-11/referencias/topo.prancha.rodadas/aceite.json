@@ -1,0 +1,51 @@
+{
+ "por": "a pessoa, 2026-10-12: podemos aceitar sim",
+ "quando": "2026-10-12T01:25:06.461Z",
+ "rodada": 3,
+ "nota": 6,
+ "defeitos": [
+  {
+   "parte": "heliceEsq",
+   "tipo": "cota",
+   "onde": "comprimento (etapa 3)",
+   "sentido": "faltando",
+   "evidencia": "Prancha, região (250-450, 172): só a nota 'heliceEsq comprimento: sem corda', sem número. EM FALTA no roteiro."
+  },
+  {
+   "parte": "heliceDir",
+   "tipo": "cota",
+   "onde": "comprimento (etapa 12)",
+   "sentido": "faltando",
+   "evidencia": "Prancha, região (670-860, 172): só a nota 'heliceDir comprimento: sem corda', sem número. EM FALTA no roteiro."
+  },
+  {
+   "parte": "fuselagem",
+   "tipo": "cota",
+   "onde": "comprimento 8028, linha vertical em x≈565 (etapa 19)",
+   "sentido": "mal_posta",
+   "evidencia": "Prancha: a linha vai de y≈352 a y≈892, termina uns 65 px abaixo do fim da silhueta (y≈825) e passa por cima das cotas 2141/2114, 3566 e 145 da cauda. Não mede a fuselagem entre pontas da vista."
+  },
+  {
+   "parte": "deriva",
+   "tipo": "cota",
+   "onde": "largura 145 e comprimento 3566, extremidade traseira (etapa 9)",
+   "sentido": "mal_posta",
+   "evidencia": "Prancha, região (535-565, 835-851): o 145 está num leque curto abaixo da cauda, onde não há deriva para a linha atravessar. O 3566 fica encostado na linha da fuselagem em x≈565."
+  },
+  {
+   "parte": "aileronEsq",
+   "tipo": "comprimento",
+   "onde": "extremidade interna, divisória com o flap (etapa 7)",
+   "sentido": "menor",
+   "evidencia": "Prancha, x≈237 contra a emenda do painel externo em x≈130 no alvo. A divisória do aileron e do flap (também em aileronDir, x≈885) cai bem mais para fora que no alvo, e o aileron fica curto demais. Defeito de forma de contorno, para a separação."
+  },
+  {
+   "parte": "asaEsq",
+   "tipo": "superficie",
+   "onde": "bordo de ataque (y≈408-415) e ponta (x≈130-150)",
+   "sentido": "segmentado",
+   "evidencia": "Prancha: contorno com dentes e entalhe em x≈280, enquanto o alvo mostra bordo reto e contínuo. A asaDir tem o mesmo ruído na ponta (≈990,455). Defeito de forma de contorno, para a separação."
+  }
+ ],
+ "pendencias": "corda das pás sem número em vista alguma; 8028 da fuselagem (prevalece da lateral) sem lugar livre (atrito 7); cotas da deriva fora dela (atrito 8); divisa aileron/flap posta em dúvida pelo crítico; contorno serrilhado nas asas"
+}

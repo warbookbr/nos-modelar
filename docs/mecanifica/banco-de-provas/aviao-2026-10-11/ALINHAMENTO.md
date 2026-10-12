@@ -72,3 +72,13 @@ de três rodadas e foram aceitos pela pessoa em 2026-10-12, com as pendências n
 [lateral](referencias/lateral.pacote/roteiro.md),
 [topo](referencias/topo.pacote/roteiro.md) e
 [frontal](referencias/frontal.pacote/roteiro.md).
+
+## As pranchas
+
+As pranchas de lateral (nota 7) e de topo (nota 6) pararam depois de três
+rodadas e foram aceitas pela pessoa em 2026-10-12, com as medidas certas e as
+pendências de desenho no `aceite.json` de cada série (atritos 6 a 8). O
+comprimento da fuselagem vale o da lateral, 8.028 mm, por decisão da pessoa. O
+roteiro do crítico de cada uma:
+[lateral](referencias/lateral.prancha.pacote/roteiro.md) e
+[topo](referencias/topo.prancha.pacote/roteiro.md).
