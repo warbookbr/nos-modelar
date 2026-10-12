@@ -445,6 +445,10 @@ posição nenhuma do curso) ficou fora do julgamento. O processo não teria pego
 sozinho: a sessão principal só soube pelo relato. Falta o brief da unidade com
 mecanismo trazer o fim do curso declarado, ou o gate varrer o curso (atrito 38).
 
+A travessia a 95 graus se reproduz como na ocorrência do atrito 26 (copiar o
+detalhe, tirar o `oculto` de capô, duto e fuselagem e editar
+`parametros.tnCurso=95`); a lista de imagens extras está no brief:
+
 ```bash
-npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --forma rodaNariz
+grep -n "extra-" docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trem-do-nariz/brief.md
 ```
