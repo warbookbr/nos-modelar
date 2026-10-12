@@ -41,10 +41,10 @@
   {
    "parte": "escape",
    "medida": "largura",
-   "em": 1300,
+   "em": 1315,
    "numero": [
     0,
-    -165
+    -180
    ]
   },
   {
@@ -78,17 +78,10 @@
   {
    "parte": "janelas",
    "medida": "altura",
-   "de": [
-    6100,
-    1692
-   ],
-   "ate": [
-    6100,
-    2044
-   ],
-   "afasta": [
+   "em": 5150,
+   "numero": [
     0,
-    690
+    240
    ]
   },
   {
@@ -116,8 +109,8 @@
    "medida": "largura",
    "em": 1080,
    "numero": [
-    -900,
-    100
+    -450,
+    60
    ]
   },
   {
@@ -291,15 +284,15 @@
     2150
    ],
    "coluna": "esquerda",
-   "nivel": 4500
+   "nivel": 4950
   },
   "janelas": {
    "marca": [
-    5160,
-    1960
+    4530,
+    1990
    ],
    "coluna": "esquerda",
-   "nivel": 4200
+   "nivel": 4600
   },
   "deriva": {
    "marca": [
@@ -307,7 +300,7 @@
     2700
    ],
    "coluna": "esquerda",
-   "nivel": 4900
+   "nivel": 5300
   },
   "tremNariz": {
    "marca": [

@@ -26,7 +26,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 2606. A linha atravessa a seção que o modelador precisa, dentro de janelas?
-- altura: cota 352. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
+- altura: cota 282. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "janelas" fica na coluna da esquerda. A chamada termina dentro de janelas, e não numa vizinha?
 - linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
 
@@ -58,7 +58,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 493. A linha atravessa a seção que o modelador precisa, dentro de escape?
-- altura: cota 140. A linha mede escape de ponta a ponta na vertical, sem pegar parte vizinha?
+- altura: cota 139. A linha mede escape de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "escape" fica na coluna da esquerda. A chamada termina dentro de escape, e não numa vizinha?
 - linhas livres: a chamada e as cotas de escape não cruzam outra linha nem passam sobre número ou nome?
 
