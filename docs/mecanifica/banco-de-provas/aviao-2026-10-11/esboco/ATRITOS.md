@@ -90,3 +90,14 @@ Para reproduzir, tire o `encaixa` da `entradaAr` de uma cópia de `aviao-detalhe
 npm run esboco -- <cópia>.esboco.json --descrever
 npm run esboco -- <cópia>.esboco.json --forma entradaAr
 ```
+
+## 11. As vistas da unidade levam o subtítulo do objeto
+
+As quatro vistas do crítico de cada unidade saem com o título e o subtítulo do
+objeto ("Maquete do avião inteiro, com a proa em z 0"), embora o brief diga
+"sem legenda". O crítico do motor estranhou a legenda, que descreve o avião
+inteiro numa imagem que mostra só o capô.
+
+```bash
+python3 -c "print(open('docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/brief.md').read().count('sem legenda'))"
+```
