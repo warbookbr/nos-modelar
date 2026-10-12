@@ -1337,6 +1337,12 @@
       "unidade": "motor",
       "nota": 8,
       "motivo": "Defeitos estruturais anteriores resolvidos: capô oco aberto na frente, duto da entrada de ar no piso com boca, sem cunha de ventre nem saliência no dorso. Restam detalhes: as venezianas são caixas escuras salientes sem abertura para a cavidade (lateral x≈447-527), e dois tracinhos no rodapé da frontal (x≈498 e 602) sugerem o duto aflorando na parede de trás. As quatro vistas externas não mostram a boca; só os cortes."
+    },
+    {
+      "ordem": 5,
+      "unidade": "helice",
+      "nota": 7,
+      "motivo": "Defeito estrutural: a pá pa2 encosta no lábio inferior do capô (corte x=0 e lateral, região 672-678, 735-745), e uma pá que gira não pode tocar o capô parado; o texto de ligações também dá pa2 em capo. Detalhe: o perfil das pás é chapa inclinada com quinas vivas e degrau serrilhado entre estações (corte y=2108 com zoom), silhueta poligonal com pontas cegas; a placa traseira não se distingue do cone."
     }
   ]
 }
