@@ -781,6 +781,10 @@ export const MOTIVO_DO_ENCAIXE = 'encaixe na mesma unidade';
 
 /* Metade da extensão da peça menor ao longo da direção de saída é o mais fundo que um encaixe entra. */
 const FRACAO_DO_ENCAIXE = 0.5;
+/* A peça que entra tem de ser bem menor que a hospedeira nas duas direções transversais à entrada: ocupar até 60% da extensão dela em cada uma
+   deixa ao menos 40% de sobra em volta (o suporte de 70 x 220 mm no estabilizador de 2000 x 600 mm ocupa 3% e 37%; o escape de 130 mm no
+   capô, 33% e 13%), e duas caixas iguais sobrepostas, que ocupam 100%, são descuido, e não encaixe. */
+const FRACAO_TRANSVERSAL_DO_ENCAIXE = 0.6;
 
 /* O volume da forma: o do prisma (área do perfil sem os furos vezes o comprimento) quando ela é um, e o da caixa envolvente nas outras. Uma haste
    diagonal tem a caixa envolvente maior que a de um cubo que ela atravessa, e escolher a peça menor por ela trocava quem atravessa quem. */
@@ -824,6 +828,13 @@ export function lerEncaixe(ra, rb) {
       const [v0, v1] = faixasDaVisita[k]; const [h0, h1] = faixa([peca], e);
       if (v0 < h0 - sobra && v1 > h1 + sobra) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} cruza ${hospedeira.id} de lado a lado (travessia, e não encaixe)` };
     }
+  }
+  const apoioT = Math.abs(d[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const u = unicas([cross(d, apoioT)])[0]; const w = cross(d, u);
+  for (const e of [u, w]) {
+    const [t0, t1] = faixa(pv, e); const [g0, g1] = faixa(ph, e);
+    const razao = (t1 - t0) / (g1 - g0);
+    if (razao > FRACAO_TRANSVERSAL_DO_ENCAIXE) return { encaixe: false, visita: visita.id, hospedeira: hospedeira.id, razao: `${visita.id} ocupa ${Math.round(razao * 100)}% da extensão de ${hospedeira.id} transversal à entrada (o encaixe pede no máximo ${Math.round(FRACAO_TRANSVERSAL_DO_ENCAIXE * 100)}%: a peça menor entra numa grande, e a sobreposição de duas peças do mesmo porte é descuido)` };
   }
   const [s0, s1] = faixa(pv, d);
   const limite = FRACAO_DO_ENCAIXE * (s1 - s0);

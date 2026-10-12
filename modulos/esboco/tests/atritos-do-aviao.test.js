@@ -337,11 +337,21 @@ describe('regressões: E8 só aceita o encaixe raso e que não atravessa', () =>
   it.each(['e8-duplicado', 'e8-espelho-centrado', 'e8-quina', 'e8-engolida', 'e8-flap-na-asa'])('%s reprova', (nome) => {
     const c = colisoes(nome);
     expect(c.length).toBeGreaterThan(0);
-    expect(c[0].naoEncaixe).toMatch(/mais que a metade/);
+    expect(c[0].naoEncaixe).toMatch(/mais que a metade|ocupa \d+%/);
   });
-  it('o encaixe raso de 10 mm entre caixas iguais (o controle) passa, e entre unidades diferentes reprova', () => {
-    expect(verificarContato(fixture('e8-meio-a-meio-controle'), {}).achados).toEqual([]);
+  it('as caixas iguais sobrepostas 10 mm (meio a meio) são descuido e reprovam, porque a peça que entra ocupa 100% da outra; entre unidades diferentes reprova também', () => {
+    const c = colisoes('e8-meio-a-meio-controle');
+    expect(c).toHaveLength(1);
+    expect(c[0].naoEncaixe).toMatch(/ocupa 100% da extensão de .* transversal à entrada/);
     expect(colisoes('e8-unidades-diferentes')).toHaveLength(1);
+  });
+  it('a peça pequena que entra na grande passa: o escape no capô e o suporte no estabilizador ocupam bem menos que 60% da hospedeira', () => {
+    const unidade = (f) => ({ ...f, unidade: 'motor' });
+    const e = { contato: { usar: true, tolerancia: 5, penetracao: 5, folga: 500 }, opcoes: [{ titulo: 'T', formas: [unidade(caixa('estab', [0, 0, 0], 2000, 60, 600)), unidade(caixa('suporte', [0, -30 - 28 + 24, 0], 70, 56, 220))] }] };
+    const g = verificarContato(e, {});
+    expect(g.achados).toEqual([]);
+    expect(g.implicitas).toEqual([expect.objectContaining({ a: 'estab', b: 'suporte', encaixe: true, penetracao_mm: 24 })]);
+    expect(g.implicitas[0].max_mm).toBeGreaterThanOrEqual(28);
   });
   it('a haste que fura a parede de uma casca é travessia pela espessura da parede, e o pino na chapa e a haste diagonal também', () => {
     for (const nome of ['e8-casca-parede-curta', 'e8-pino-na-chapa', 'e8-haste-diagonal']) {
@@ -352,10 +362,6 @@ describe('regressões: E8 só aceita o encaixe raso e que não atravessa', () =>
   });
   it('a travessia diz quem cruza quem pelo volume do corpo, e não pela caixa envolvente (a haste diagonal cruza o bloco)', () => {
     expect(colisoes('e8-haste-diagonal')[0].naoEncaixe).toBe('haste cruza bloco de lado a lado (travessia, e não encaixe)');
-  });
-  it('o encaixe aceito vai para `implicitas` com o limite que ele respeita', () => {
-    const g = verificarContato(fixture('e8-meio-a-meio-controle'), {});
-    expect(g.implicitas).toEqual([expect.objectContaining({ a: 'a', b: 'b', encaixe: true, max_mm: 50, penetracao_mm: 10 })]);
   });
 });
 

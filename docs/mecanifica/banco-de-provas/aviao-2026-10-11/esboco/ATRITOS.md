@@ -60,9 +60,10 @@ Corrigido na fatia 5, onda 1: na mesma unidade, o par sem junta passa como encai
 ```bash
 npm run esboco -- modulos/esboco/tests/fixtures/adversarial/e8-meio-a-meio-controle.esboco.json --descrever
 npm run esboco -- modulos/esboco/tests/fixtures/adversarial/e8-flap-na-asa.esboco.json --descrever
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-empenagem-horizontal.esboco.json --descrever
 ```
 
-O primeiro (duas caixas de 100 mm que se penetram 10 mm, na mesma unidade) sai com `divergências: nenhuma`; o segundo (o flap de 50 mm com 45 mm dentro da asa) sai com "asa e flap se penetram 45,0 mm" e a razão: mais que a metade (25 mm) da extensão do flap. No avião, o suporte da dobradiça do profundor (caixa de 70 por 56 por 220 mm) com o topo 24 mm dentro do estabilizador, que era a ocorrência, passa sem junta.
+O primeiro (duas caixas iguais de 100 mm sobrepostas 10 mm, na mesma unidade) sai com "a e b se penetram 10,0 mm" e a razão: a peça menor ocupa 100% da outra transversalmente à entrada, e o encaixe pede no máximo 60%; o segundo (o flap de 50 mm com 45 mm dentro da asa) reprova por passar da metade da extensão do flap; o terceiro, com o suporte da dobradiça do profundor (caixa de 70 por 56 por 220 mm) com o topo 24 mm dentro do estabilizador, que era a ocorrência, sai com `divergências: nenhuma` sem a junta.
 
 ## 9. As vistas da unidade enquadram o avião inteiro pequeno no quadro
 
