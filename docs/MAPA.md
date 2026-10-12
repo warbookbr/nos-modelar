@@ -88,7 +88,7 @@
 
 ## .claude/skills/prancha-dos-contornos/
 
-- `SKILL.md` — Faz a prancha de uma vista (lateral, de topo ou frontal) a partir dos contornos do mapa de partes, com o desenhista escolhendo as cotas e um crítico dando no…
+- `SKILL.md` — Faz a prancha de uma vista (lateral, topo ou frontal) pelos contornos do mapa de partes, com desenhista de cotas e crítico. Use depois do mapa, antes da mode…
 
 ## docs/
 

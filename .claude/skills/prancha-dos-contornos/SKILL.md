@@ -1,6 +1,6 @@
 ---
 name: prancha-dos-contornos
-description: Faz a prancha de uma vista (lateral, de topo ou frontal) a partir dos contornos do mapa de partes, com o desenhista escolhendo as cotas e um crítico dando nota. Use depois do mapa, antes da modelagem. Não use para carroceria por medida declarada; essa é a desenhar-prancha.
+description: Faz a prancha de uma vista (lateral, topo ou frontal) pelos contornos do mapa de partes, com desenhista de cotas e crítico. Use depois do mapa, antes da modelagem. Não use para carroceria por medida declarada (é a desenhar-prancha).
 ---
 
 # Prancha dos contornos

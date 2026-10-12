@@ -20,7 +20,7 @@ pois envolve consumo significativo de recursos.
 | 5 | **cadeira de rodas** | Veículos terrestres | esboço | `barras`, `rodaPneu`, `tecido`, `articula`, `manopla` | [Link](ISO 7176) | Exercita cadeira com estrutura de barras tubulares, articulações e rodas raiadas. |
 | 6 | **guarda-roupa** | Móveis | esboço | `movel`, `articula`, `guia` | — | Exercita a família de roupeiro modular com caixaria, portas articuladas e trilhos. |
 | 7 | **cadeira** | Móveis | esboço | `movel`, `barras`, `tecido`, `deforma` | — | Exercita a família prevista de cadeira com estrutura de barras e assento anatômico. |
-| 8 | **avião de pequeno porte** | Veículos aéreos e espaciais | esboço | `aerofolio`, `loftSuave`, `casca`, `rodaPneu` | [Link](aviao-2026-10-11/referencias) | Objeto difícil do plano o que o avião pede: perfil aerodinâmico, superfície suave por seções e mecanismo de recolhimento. |
+| 8 | **avião de pequeno porte** | Veículos aéreos e espaciais | esboço | `aerofolio`, `loftSuave`, `casca`, `rodaPneu` | — | Objeto difícil do plano o que o avião pede: perfil aerodinâmico, superfície suave por seções e mecanismo de recolhimento. |
 
 ## Resumo de custo por objeto
 

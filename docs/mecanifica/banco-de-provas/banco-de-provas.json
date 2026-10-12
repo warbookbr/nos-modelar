@@ -107,7 +107,7 @@
       "nome": "avião de pequeno porte",
       "familia": "Veículos aéreos e espaciais",
       "nivel": "esboço",
-      "referencia": "aviao-2026-10-11/referencias",
+      "referencia": null,
       "ferramentas": [
         "aerofolio",
         "loftSuave",
