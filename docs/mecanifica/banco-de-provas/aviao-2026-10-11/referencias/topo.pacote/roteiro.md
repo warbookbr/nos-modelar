@@ -30,36 +30,38 @@ Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/divisas-03.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
+- fuselagem / janelas
+- janelas / parabrisa
 - asaEsq / fuselagem
 - asaDir / fuselagem
 - asaEsq / corpoNaPontaEsq
-- aileronEsq / asaEsq
-- aileronDir / asaDir
 
 ## Etapa 5 — divisas, folha 4 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/divisas-04.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
+- aileronEsq / asaEsq
+- aileronDir / asaDir
 - aileronEsq / flapEsq
 - asaEsq / flapEsq
 - asaDir / flapDir
-- aileronDir / flapDir
-- flapEsq / salienciaFlapEsq
 
 ## Etapa 6 — divisas, folha 5 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/divisas-05.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
+- aileronDir / flapDir
+- flapEsq / salienciaFlapEsq
 - flapDir / salienciaFlapDir
 - deriva / fuselagem
 - estabilizadorEsq / fuselagem
-- estabilizadorDir / fuselagem
-- estabilizadorEsq / profundorEsq
 
 ## Etapa 7 — divisas, folha 6 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/divisas-06.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
+- estabilizadorDir / fuselagem
+- estabilizadorEsq / profundorEsq
 - estabilizadorDir / profundorDir
 - fuselagem / profundorEsq
 - fuselagem / profundorDir
