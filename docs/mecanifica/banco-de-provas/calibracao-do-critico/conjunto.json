@@ -1331,6 +1331,28 @@
           "briefSha256": "sha256:33c23aaaa2cf64edc747cb205669d01a633110b2e3debd0d9aa84448347ea95c",
           "imagemSha256": "sha256:a516e50cb2f2e8cf4a8d854ce952b54b65537e63f25e5cca115759efb0d684a3",
           "data": "2026-10-12T22:56:08.215Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "corpo inteiro visto de lado e pela ponta",
+              "sentido": "facetado",
+              "evidencia": "Na lateral o contorno é um polígono de 12 lados. Na isométrica e na superior aparecem faces planas e arestas longitudinais, e a camisa lê como prisma, não como tubo redondo."
+            },
+            {
+              "parte": "olhais e bucha",
+              "tipo": "superficie",
+              "onde": "anéis dos dois olhais e bucha do olhal esquerdo",
+              "sentido": "facetado",
+              "evidencia": "Na frontal e na isométrica os anéis têm contorno de 10 a 12 lados, e na superior a bucha aparece com perfil hexagonal em vez de esférico."
+            }
+          ],
+          "briefSha256": "sha256:33c23aaaa2cf64edc747cb205669d01a633110b2e3debd0d9aa84448347ea95c",
+          "imagemSha256": "sha256:a516e50cb2f2e8cf4a8d854ce952b54b65537e63f25e5cca115759efb0d684a3",
+          "data": "2026-10-12T22:56:54.915Z"
         }
       ]
     },
@@ -1375,6 +1397,21 @@
           "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
           "imagemSha256": "sha256:5025908aec4210bfa600a33130ab0cf2ff2474513c4c9909942441c6ed3b9e97",
           "data": "2026-10-12T22:55:34.298Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "camisa",
+              "tipo": "superficie",
+              "onde": "contornos circulares da camisa, do anel da cabeça e da haste",
+              "sentido": "facetado",
+              "evidencia": "lateral: os círculos externos e o central mostram lados poligonais visíveis (cerca de 30), e a haste mostra leque de facetas na região x≈400–447, y≈530–680"
+            }
+          ],
+          "briefSha256": "sha256:48caa7ab5fb288668fff0e1374e3e6fc7c0021aedcdeb84cf789562c24c94799",
+          "imagemSha256": "sha256:5025908aec4210bfa600a33130ab0cf2ff2474513c4c9909942441c6ed3b9e97",
+          "data": "2026-10-12T22:56:49.241Z"
         }
       ]
     },
@@ -1447,6 +1484,42 @@
           "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
           "imagemSha256": "sha256:f755005cf530a214524f1a4ce4f2aaf1f2c0fb6b543016891da74a919844be51",
           "data": "2026-10-12T22:56:05.894Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "metade superior do anel, dentro da caçamba junto às paredes laterais",
+              "sentido": "atravessando",
+              "evidencia": "isométrica: arco de anel dentro da caçamba; superior: barras escuras coladas às paredes internas em y≈237 a 377; frontal: rodas traseiras na mesma faixa x das paredes da caçamba; lateral: metade superior da roda escondida atrás do corpo"
+            },
+            {
+              "parte": "rodas",
+              "tipo": "ausencia",
+              "onde": "ligação entre as quatro rodas e o corpo",
+              "sentido": "faltando",
+              "evidencia": "frontal: nenhum eixo entre as rodas na faixa x 368 a 732 abaixo do corpo; superior: rodas dianteiras só encostam na lateral do capô; lateral: nenhuma ligação ao chassi"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "faces laterais e frontal da caixa cinza",
+              "sentido": "faltando",
+              "evidencia": "isométrica e lateral: caixa cinza lisa, sem para-brisa, janela ou porta; superior: único recorte é a tampa clara no topo; sem entrada para quem dirige"
+            },
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "espessura",
+              "onde": "seção do anel da roda, nas quatro rodas",
+              "sentido": "menor",
+              "evidencia": "isométrica e lateral: rodas são anéis finos, sem pneu, cubo ou banda de rodagem; superior: largura da roda ≈17 px"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "imagemSha256": "sha256:f755005cf530a214524f1a4ce4f2aaf1f2c0fb6b543016891da74a919844be51",
+          "data": "2026-10-12T22:56:58.322Z"
         }
       ]
     },
@@ -1614,6 +1687,21 @@
           "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
           "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
           "data": "2026-10-12T22:56:07.624Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "uniao",
+              "onde": "as seis dobradiças, na borda frontal das duas laterais (y≈222, 535 e 850 na lateral)",
+              "sentido": "atravessando",
+              "evidencia": "Lateral: blocos pretos de x≈441 a 463 sobre a face externa da lateral. Frontal e superior: os blocos saem 3 a 4 px da silhueta do corpo (x≈300 e 797). Isométrica: três blocos na face direita. Ficam à vista, e não atrás da porta, presas por dentro. O vocabulário não tem sentido para 'à vista por fora', então foi usado o mais próximo."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-12T22:56:58.894Z"
         }
       ]
     },
@@ -1651,6 +1739,21 @@
           "briefSha256": "sha256:c2745bceba3c5a2dd31174b3774b648cdcf77af0578d21f604099d127938ab51",
           "imagemSha256": "sha256:c4181865e10ceb5d00f8a95769269ae3e87c004956054093c8f3147a80c1fa37",
           "data": "2026-10-12T22:56:09.261Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "olhalTraseiro",
+              "tipo": "posicao",
+              "onde": "olhal traseiro inteiro, em relação ao eixo da camisa e ao pescoço do fundo",
+              "sentido": "baixa",
+              "evidencia": "Vista lateral: o olhal traseiro está centrado em x≈428 e o dianteiro e a camisa em x≈596, com a bucha saindo para fora da silhueta da camisa (x≈300). Vista superior: o olhal está centrado em y≈639 e a camisa em y≈614, deslocado para a borda inferior da imagem. A isométrica mostra o olhal ao lado do fim da camisa, e o pescoço rosa o toca só pela borda."
+            }
+          ],
+          "briefSha256": "sha256:c2745bceba3c5a2dd31174b3774b648cdcf77af0578d21f604099d127938ab51",
+          "imagemSha256": "sha256:c4181865e10ceb5d00f8a95769269ae3e87c004956054093c8f3147a80c1fa37",
+          "data": "2026-10-12T22:56:59.459Z"
         }
       ]
     },
