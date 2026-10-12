@@ -130,3 +130,23 @@ Para reproduzir, ponha `"escSai": 25` no detalhe e rode:
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --envelope motor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-motor.esboco.json
 ```
+
+## 15. A casca desenha, nas quatro vistas de fora, as arestas da parede interna em traço tracejado
+
+Um loft com `casca` (o capô do motor, `espessura` 20, `aberta` no início) sai nas vistas lateral, superior e isométrica com uma linha tracejada paralela ao contorno, a poucos milímetros dele, que é a aresta da parede de dentro vista através da parede de fora. O crítico lê o tracejado como marca na superfície sem explicação. Quanto mais grossa a casca, mais para dentro fica o tracejado (espessura 45 deixa-o bem visível, 12 o cola no contorno). A casca fina não resolve, porque o contrato `cone toca capô` mede o intervalo até a face interna do anel do lábio e passa dos 30 mm de tolerância com espessura abaixo de 18 (36 mm com espessura 12).
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --sem-vizinhos --vista lateral --largura 1100 --saida <pasta>
+```
+
+Para ver o intervalo do cone, ponha `"espessura": 12` em `capo.casca` numa cópia do mestre e rode `npm run esboco -- <cópia> --descrever`.
+
+## 16. Cada ajuste de altura do escape volta recusado duas vezes: pelo nome do parâmetro e pela caixa da maquete
+
+Baixar o escape para que o escape do outro flanco deixe de aparecer sobre o dorso na isométrica pediu mudar `escBaseY`. O `--integrar` recusou o nome ("o detalhado redefine o parâmetro escBaseY", atrito 13), e, com o nome novo `escAlturaY` em 1230, recusou de novo pela caixa da maquete (escapes passam 120 mm em y, atrito 14). O valor que cabe (1325, só 15 mm abaixo do original) obrigou a diminuir também os diâmetros do escape para o tirar do dorso.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --integrar motor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-motor.esboco.json
+```
+
+Para reproduzir, ponha `"escAlturaY": 1230` no detalhe e rode o comando.

@@ -1,17 +1,21 @@
 --- brief para o crítico cego ---
-Função da unidade: capô do motor com a entrada de ar sob o cone da hélice e os dois escapes laterais, preso à frente da fuselagem
-Veredito anterior (rodada passada): nota 5, motivo: Defeito estrutural: a entrada de ar, que a função põe sob o cone da hélice, não aparece como abertura em nenhuma vista; só há uma lasca escura sob o corpo, recuada da face da frente (lateral x≈620-775, y≈745-768), e uma placa cinza chapada no dorso traseiro, sem profundidade, que lê como ladrilho colado. O capô tem faixas de sombreamento em degraus no dorso e nos flancos. Os escapes saem do flanco em balanço, com a ponta traseira a cerca de 160 mm do corpo, embora o texto diga pontas livres: nenhuma.
+Função da unidade: capô oco, aberto na frente em torno do cone da hélice, com o duto da entrada de ar dentro dele sob o cone, três venezianas de arrefecimento em cada flanco e os dois escapes laterais, preso à frente da fuselagem
+Veredito anterior (rodada passada): nota 6, motivo: Defeito estrutural: a entrada de ar existe como cunha cinza no ventre, rente à proa (lateral x≈612-800, y≈740-768), mas nenhuma vista mostra boca nem duto, e no corte x=0 o capô acima dela é maciço, sem cavidade; a cunha lê como carenagem de ventre. Sobram, sem explicação na função, três blocos salientes por flanco na metade traseira, uma saliência no dorso que só a isométrica mostra e um retângulo escuro no corte perto da proa (x≈765-777). Resta bandeado leve no alto do flanco da lateral. Escapes e placa do dorso resolvidos.
 Diga, para cada defeito desse motivo, se foi resolvido ou não, e não conte como novo o que já foi apontado.
 Imagens (as quatro vistas da unidade isolada, sem legenda):
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-isometrica.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-frontal.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-lateral.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-superior.png
+Imagens extras (cortes da mesma unidade isolada, sem legenda; nenhuma das quatro vistas olha pela proa, e estes cortes mostram o que há dentro do capô e como o duto da entrada de ar se abre para a frente; a casca do capô e a do duto aparecem em linha fina hachurada):
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-corte-x0-lateral.png (corte por x=0, vista lateral, fica o lado x<=0: o perfil do capô oco e o duto preto sobre o piso, com a boca à direita, na proa)
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-corte-x0-isometrica.png (o mesmo corte em isométrica: a cavidade do capô aberta na frente e o duto ao longo do piso)
+  /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/aviao-unidade-motor-corte-z1000-frontal.png (corte por z=1000, vista frontal, fica o lado z<=1000: a seção do capô em anel, as seções dos dois escapes fora dos flancos e a seção do duto no piso, com o vão claro por onde se vê a abertura da frente)
 Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:
-  unidade motor (15 formas; função: capô do motor com a entrada de ar sob o cone da hélice e os dois escapes laterais, preso à frente da fuselagem):
-    toca fuselagem: 1 ponto (capo em fuselagem [0 1290 2350])
-    toca helice: 6 pontos (capo em cone [0 1328 600]; capo em pa [0 1555,2 594,7]; capo em pa1 [-244,3 1433,2 594,7]; mais 3)
-    toca trem-do-nariz: 4 pontos (capo em pernaNariz [0 802 1735,3]; capo em bracoNariz [0 799,3 2125])
+  unidade motor (14 formas; função: capô oco, aberto na frente em torno do cone da hélice, com o duto da entrada de ar dentro dele sob o cone, três venezianas de arrefecimento em cada flanco e os dois escapes laterais, preso à frente da fuselagem):
+    toca fuselagem: 73 pontos (capo em fuselagem [0 1290 2350]; entradaAr em fuselagem [0 848,1 2340])
+    toca helice: 9 pontos (capo em cone [53,5 1540,4 600]; capo em pa [-89,2 1560,6 594,7]; capo em pa1 [-294,1 1337,4 594,7]; mais 3)
+    toca trem-do-nariz: 6 pontos (capo em pernaNariz [0 802 1735,3]; capo em bracoNariz [0 798,9 2340]; entradaAr em pernaNariz [0 807,3 1775]; mais 1)
     pontas livres: nenhuma
 Responda, olhando só as imagens:
   1. Que pontas ficam no ar, sem encostar em nada?
