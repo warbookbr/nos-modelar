@@ -76,3 +76,17 @@ Corrigido em 2026-10-12: o `<imagem>.prancha.json` declara `"vista"` (lateral,
 topo ou frontal, lateral por padrão), o rótulo, as cotas gerais, o relatório e o
 roteiro do crítico usam as palavras da vista, e imagem chamada topo ou frontal
 sem o campo é recusada. A skill e o agente desenhista dizem isso.
+
+## 5. Cota de parte contida em outra não pode ficar sobre a parte
+
+Na lateral, o escape fica inteiro dentro do contorno do capô e as janelas dentro
+do da fuselagem. A prancha acusa como "cota sobre outra parte" qualquer linha
+desenhada sobre o escape ou sobre uma janela, porque ela cai também dentro do
+capô ou da fuselagem. O desenhista pôs as cotas fora, longe da parte, e o
+crítico da rodada 2 reprovou porque o número não fica ligado ao que mede
+(escape 493 e 140 cerca de 65 px abaixo dele; janela 352 acima do teto). O
+processo pegou o sintoma pelo crítico; a causa está na regra de colisão.
+
+```bash
+npm run contorno:prancha -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.contornos.json 2>&1 | grep -i escape
+```
