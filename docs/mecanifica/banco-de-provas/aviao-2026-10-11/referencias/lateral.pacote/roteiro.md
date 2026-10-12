@@ -13,55 +13,53 @@ Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/
 - deriva / leme
 - estabilizador / leme
 - fuselagem / saliencia1
-- fuselagem / saliencia2
-- antenaTopo / fuselagem
+- deriva / fuselagem
+- fuselagem / porta
 
 ## Etapa 3 — divisas, folha 2 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/divisas-02.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- deriva / fuselagem
-- fuselagem / porta
 - deriva / estabilizador
 - fuselagem / parabrisa
 - estabilizador / fuselagem
+- fuselagem / janelas
+- janelas / porta
 
 ## Etapa 4 — divisas, folha 3 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/divisas-03.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- fuselagem / janelas
-- janelas / porta
 - asa / fuselagem
 - asa / janelas
 - capo / fuselagem
+- cone / helice
+- capo / cone
 
 ## Etapa 5 — divisas, folha 4 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/divisas-04.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- cone / helice
-- capo / cone
 - barbatana / fuselagem
 - fuselagem / luzAsa
 - asa / luzAsa
+- capo / escape
+- asa / porta
 
 ## Etapa 6 — divisas, folha 5 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/divisas-05.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- capo / escape
-- asa / porta
 - asa / tremPrincipal
 - antenaVentral / fuselagem
 - capo / tremNariz
+- fuselagem / tremNariz
+- fuselagem / saliencia3
 
 ## Etapa 7 — divisas, folha 6 de 6
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/divisas-06.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- fuselagem / tremNariz
-- fuselagem / saliencia3
 - chao / tremNariz
 - chao / tremPrincipal
 

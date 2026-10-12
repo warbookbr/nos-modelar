@@ -1,13 +1,13 @@
 {
  "naBorda": {
-  "asaDir": 0.998,
+  "asaDir": 1,
   "asaEsq": 1,
   "capo": 1,
   "chao": 1,
   "cone": 1,
   "corpoEscuro": 1,
   "deriva": 1,
-  "estabilizadorDir": 0.993,
+  "estabilizadorDir": 1,
   "estabilizadorEsq": 1,
   "fuselagem": 1,
   "helice": 1,
@@ -18,7 +18,12 @@
  },
  "minimo": 0.8,
  "abaixo": [],
- "semDonoPx": 832,
+ "semDonoPx": 5,
+ "semDonoAnexadosPx": 2372,
+ "mascaraSuavizada": {
+  "tirados": 149,
+  "postos": 27
+ },
  "buracosFechados": {
   "buracos": 22,
   "pixels": 37
@@ -48,9 +53,9 @@
    "a": "fuselagem",
    "b": "helice",
    "caixa": [
-    212,
+    213,
     63,
-    289,
+    288,
     112
    ]
   },
@@ -88,9 +93,9 @@
    "a": "estabilizadorEsq",
    "b": "fuselagem",
    "caixa": [
-    257,
+    256,
     66,
-    296,
+    295,
     105
    ]
   },
@@ -108,10 +113,10 @@
    "a": "capo",
    "b": "helice",
    "caixa": [
-    211,
+    212,
     81,
-    290,
-    150
+    289,
+    149
    ]
   },
   {
@@ -178,9 +183,9 @@
    "a": "asaDir",
    "b": "tremPrincipalDir",
    "caixa": [
-    160,
+    161,
     110,
-    203,
+    202,
     149
    ]
   },
@@ -190,7 +195,7 @@
    "caixa": [
     300,
     111,
-    340,
+    339,
     150
    ]
   },
@@ -199,18 +204,18 @@
    "b": "tremNariz",
    "caixa": [
     227,
-    118,
-    270,
-    157
+    119,
+    271,
+    158
    ]
   },
   {
    "a": "chao",
    "b": "tremPrincipalDir",
    "caixa": [
-    160,
-    147,
-    199,
+    161,
+    148,
+    200,
     174
    ]
   },
@@ -219,7 +224,7 @@
    "b": "tremNariz",
    "caixa": [
     231,
-    147,
+    148,
     270,
     174
    ]
@@ -228,9 +233,9 @@
    "a": "chao",
    "b": "tremPrincipalEsq",
    "caixa": [
-    302,
+    303,
     147,
-    341,
+    342,
     174
    ]
   }

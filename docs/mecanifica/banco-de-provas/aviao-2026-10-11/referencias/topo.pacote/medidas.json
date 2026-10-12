@@ -7,7 +7,7 @@
   "capo": 1,
   "cone": 1,
   "corpoNaPontaEsq": 1,
-  "deriva": 0.931,
+  "deriva": 0.933,
   "escapeDir": 1,
   "escapeEsq": 1,
   "estabilizadorDir": 1,
@@ -17,7 +17,7 @@
   "fuselagem": 0.999,
   "heliceDir": 1,
   "heliceEsq": 1,
-  "janelas": 0.983,
+  "janelas": 0.937,
   "parabrisa": 1,
   "profundorDir": 1,
   "profundorEsq": 1,
@@ -26,7 +26,12 @@
  },
  "minimo": 0.8,
  "abaixo": [],
- "semDonoPx": 1022,
+ "semDonoPx": 0,
+ "semDonoAnexadosPx": 2748,
+ "mascaraSuavizada": {
+  "tirados": 93,
+  "postos": 19
+ },
  "buracosFechados": {
   "buracos": 9,
   "pixels": 11
@@ -36,10 +41,10 @@
    "a": "cone",
    "b": "heliceEsq",
    "caixa": [
-    210,
-    8,
-    249,
-    47
+    211,
+    9,
+    250,
+    48
    ]
   },
   {
@@ -47,9 +52,9 @@
    "b": "heliceDir",
    "caixa": [
     224,
-    9,
+    10,
     263,
-    48
+    49
    ]
   },
   {
@@ -66,9 +71,9 @@
    "a": "capo",
    "b": "heliceEsq",
    "caixa": [
-    208,
+    209,
     15,
-    247,
+    248,
     54
    ]
   },
@@ -76,9 +81,9 @@
    "a": "capo",
    "b": "heliceDir",
    "caixa": [
-    227,
+    226,
     15,
-    266,
+    265,
     54
    ]
   },
@@ -86,10 +91,10 @@
    "a": "capo",
    "b": "escapeEsq",
    "caixa": [
-    201,
+    202,
     29,
-    240,
-    72
+    241,
+    68
    ]
   },
   {
@@ -106,9 +111,9 @@
    "a": "capo",
    "b": "fuselagem",
    "caixa": [
-    200,
+    201,
     100,
-    274,
+    273,
     139
    ]
   },
@@ -136,10 +141,10 @@
    "a": "fuselagem",
    "b": "janelas",
    "caixa": [
-    199,
+    200,
     120,
-    274,
-    238
+    273,
+    237
    ]
   },
   {
@@ -157,19 +162,19 @@
    "b": "fuselagem",
    "caixa": [
     188,
-    135,
+    136,
     227,
-    219
+    218
    ]
   },
   {
    "a": "asaDir",
    "b": "fuselagem",
    "caixa": [
-    245,
-    136,
-    284,
-    220
+    244,
+    137,
+    283,
+    219
    ]
   },
   {
@@ -186,7 +191,7 @@
    "a": "aileronEsq",
    "b": "asaEsq",
    "caixa": [
-    11,
+    12,
     164,
     80,
     203
@@ -198,7 +203,7 @@
    "caixa": [
     391,
     164,
-    456,
+    455,
     203
    ]
   },
@@ -206,10 +211,10 @@
    "a": "aileronEsq",
    "b": "flapEsq",
    "caixa": [
-    47,
-    170,
-    86,
-    209
+    48,
+    169,
+    87,
+    208
    ]
   },
   {
@@ -219,7 +224,7 @@
     56,
     174,
     209,
-    217
+    216
    ]
   },
   {
@@ -229,7 +234,7 @@
     255,
     174,
     415,
-    219
+    218
    ]
   },
   {
@@ -237,18 +242,18 @@
    "b": "flapDir",
    "caixa": [
     384,
-    170,
+    169,
     423,
-    209
+    208
    ]
   },
   {
    "a": "flapEsq",
    "b": "salienciaFlapEsq",
    "caixa": [
-    126,
+    127,
     182,
-    165,
+    166,
     221
    ]
   },
@@ -256,9 +261,9 @@
    "a": "flapDir",
    "b": "salienciaFlapDir",
    "caixa": [
-    308,
+    309,
     182,
-    347,
+    348,
     221
    ]
   },
@@ -277,7 +282,7 @@
    "b": "fuselagem",
    "caixa": [
     209,
-    311,
+    312,
     248,
     360
    ]
@@ -287,7 +292,7 @@
    "b": "fuselagem",
    "caixa": [
     223,
-    311,
+    312,
     262,
     360
    ]
@@ -296,7 +301,7 @@
    "a": "estabilizadorEsq",
    "b": "profundorEsq",
    "caixa": [
-    143,
+    144,
     325,
     240,
     364
@@ -308,7 +313,7 @@
    "caixa": [
     232,
     325,
-    328,
+    327,
     364
    ]
   },
@@ -317,7 +322,7 @@
    "b": "profundorEsq",
    "caixa": [
     209,
-    336,
+    335,
     248,
     374
    ]
@@ -327,7 +332,7 @@
    "b": "profundorDir",
    "caixa": [
     223,
-    336,
+    335,
     262,
     374
    ]
