@@ -1355,6 +1355,12 @@
       "unidade": "helice",
       "nota": 8,
       "motivo": "Contato da pá com o lábio do capô resolvido (vão de 40 a 50 mm no corte x=0) e placa traseira distinta do cone. Restam só defeitos de superfície nas pás: a seção é tira fina inclinada de espessura constante e quinas vivas, com degrau no contorno (corte y=2108 com zoom), e a silhueta frontal tem cotovelos retos e pontas truncadas; não lê como perfil torcido."
+    },
+    {
+      "ordem": 8,
+      "unidade": "marco-25",
+      "nota": 7,
+      "motivo": "Defeito estrutural: a cauda continua um tubo fino (cerca de 14 px de largura em y≈780 na superior, ponta chata em y≈820) justo onde se prendem os estabilizadores de 184 px de envergadura. A porta esquerda segue ilegível nas vistas gerais; nos cortes, a ponta superior da placa fica 35 a 45 mm fora da curva do ombro (corte z=5940) e o bloco da janela 4 sobe acima da linha do casco, fora do contorno da porta (corte x=-770). No corte z=640 os cantos inferiores do duto se sobrepõem à parede do capô. Pontas das pás chanfradas e chapadas. A pá já não toca o capô."
     }
   ]
 }
