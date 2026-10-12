@@ -124,9 +124,13 @@ e quem decide parar é quem orquestra.
 
 ## Unidade de esboço
 
-Quando vier o brief de uma unidade de esboço (a `funcao` dela, quatro vistas
-sem legenda e cinco perguntas), não há desenho alvo e a comparação com alvo não
-se aplica: você julga a unidade pelo que a `funcao` diz que ela é. Responda às
+Quando vier o brief de uma unidade de esboço (a `funcao` dela, as vistas sem
+legenda, cada uma dizendo de que lado olha, e cinco perguntas), você julga a
+unidade pelo que a `funcao` diz que ela é. Se o brief trouxer a referência, ela
+é o alvo da forma: onde a vista concorda com ela, o que parece estranho é a
+forma pedida, e você aponta onde a silhueta ou a proporção se afastam dela. Sem
+referência no brief, não há alvo e a comparação com alvo não se aplica. Se o
+brief trouxer as poses de um curso, julgue a travessia em cada pose. Responda às
 cinco perguntas na ordem (que pontas ficam no ar, o que atravessa o quê, o que
 está fora do lugar em relação à parte a que deveria estar preso, o que a vista
 mostra que o nome da peça não explica, e a nota de 0 a 10), cite a vista em cada
