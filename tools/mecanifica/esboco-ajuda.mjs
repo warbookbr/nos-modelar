@@ -26,6 +26,7 @@ export const FRASES = {
   esfera: 'Esfera: pilha de faixas, com a caixa do diâmetro.',
   extrusao: 'Extrusão de perfil simples, convexo ou côncavo, ao longo de um eixo.',
   loft: 'Sólido por seções ao longo de um eixo, com seção arredondada, seção inclinada e casca oca: tanque, banco, carenagem e caçamba.',
+  superficie: 'Superfície suave por seções (`suave: true` no loft e na revolução): a curva de tangente contínua, a aresta viva, a densidade que o módulo escolhe e o sombreamento liso.',
   revolucao: 'Sólido de revolução por perfil de raio e altura.',
   tubo: 'Tubo por pontos: caminho, diâmetro e raio de curva.',
   familia: 'Forma de uma família procedural (roda 2.0, cilindro hidráulico, superfície): perfil e ajustes, as portas como âncoras, o gate, a blocagem e a ponte.',

@@ -110,7 +110,7 @@
       "parametros": "seções, curvatura entre elas, densidade",
       "referencias": ["Blender: Subdivision Surface", "OpenVSP", "FreeCAD Ship", "CadQuery: loft com ruled=False"],
       "aqui": "parcial",
-      "onde": "loft no esboço e no núcleo, com faces planas entre seções; inflate no núcleo"
+      "onde": "esboço: loft e revolução com `suave: true`, curva de tangente contínua pelas seções com estações, lados e normal escolhidos pelo módulo; núcleo: loft com faces planas entre seções e inflate"
     },
     "helice": {
       "nome": "hélice",

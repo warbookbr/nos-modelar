@@ -111,7 +111,9 @@ const DESENHAR_CAMADA = async (texto) => {
       const v2 = (q) => new T.Vector2(q[0], q[1]);
       const idx = furos.length === 0 && c.length === 3 ? [0, 1, 2] : furos.length === 0 && c.length === 4 ? [0, 1, 2, 0, 2, 3] : T.ShapeUtils.triangulateShape(c.map(v2), furos.map((h) => h.map(v2))).flat();
       const k = rgb(f.k);
-      for (const i of idx) { const q = todos[i]; pos.push(q[0], q[1], q[2] - z0); col.push(k[0], k[1], k[2]); }
+      /* `kv`: a cor de cada vértice da face, na superfície suave; sem ela a face leva uma cor só */
+      const kv = f.kv ? f.kv.map(rgb) : null;
+      for (const i of idx) { const q = todos[i]; const kk = kv && i < kv.length ? kv[i] : k; pos.push(q[0], q[1], q[2] - z0); col.push(kk[0], kk[1], kk[2]); }
     }
   };
   const colunas = camada.colunasDoTraco ?? [-1, 0, 1];
