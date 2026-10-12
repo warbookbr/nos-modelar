@@ -69,3 +69,24 @@ despachar o crítico, a sessão principal teve de rodar o `--feito` de novo.
 ```bash
 python3 -c "from PIL import Image; import numpy as np; a=np.asarray(Image.open('docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/aviao-unidade-fuselagem-lateral.png').convert('L'))[120:1100]; xs=np.nonzero((a<200).any(0))[0]; print('largura ocupada', xs.max()-xs.min(), 'de', a.shape[1])"
 ```
+
+Na unidade motor, o esbocista achou a causa: o quadro da unidade inclui a
+vizinha que ela toca, e a fuselagem entra inteira.
+
+A ajuda diz que o enquadramento continua em torno da unidade, mas o capô toca a fuselagem e esta entra inteira (10 m) no quadro, de modo que o motor (1,7 m) ocupa cerca de um décimo de cada vista e o detalhe de escapes, venezianas e painel some. Sem vizinhos o quadro fecha no motor. Contornei gravando as imagens do crítico com `--sem-vizinhos`, o que perde o contexto do ponto onde o capô se prende.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --composta --largura 1600
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade motor --composta --largura 1600 --sem-vizinhos
+```
+
+## 10. Loft sem posição vai para a origem e o esboço isolado não o acusa solto
+
+Um loft sem `encaixa`, `centro` nem `sobre` é centrado na origem pelo centro da caixa dos vértices, e os `centro` das seções valem só como deslocamento relativo. No isolado de `--detalhar motor`, a entrada de ar e a boca dela, a 800 mm do capô, saíram com `divergências: nenhuma`, porque o grupo flutuante de duas formas não conta como solta enquanto as outras unidades estão ocultas. Só `--forma entradaAr` mostrou o centro `[0 0 0]`.
+
+Para reproduzir, tire o `encaixa` da `entradaAr` de uma cópia de `aviao-detalhe-motor.esboco.json` (guardada ao lado do estado do Condutor) e rode:
+
+```bash
+npm run esboco -- <cópia>.esboco.json --descrever
+npm run esboco -- <cópia>.esboco.json --forma entradaAr
+```
