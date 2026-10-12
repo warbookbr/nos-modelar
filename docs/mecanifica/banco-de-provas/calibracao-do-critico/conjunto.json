@@ -1927,6 +1927,21 @@
           "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
           "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
           "data": "2026-10-12T22:57:52.113Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "as seis dobradiças, três em cada borda externa, em alturas simétricas à altura da porta",
+              "sentido": "atrasada",
+              "evidencia": "Lateral, x 441-463, y≈222/536/850: blocos escuros sobre a face externa da lateral. Isométrica, quina direita x≈675. Frontal, ticks em x 300-304 e 796-799 fora da silhueta. Ficam à vista com a porta fechada, quando em porta sobreposta deveriam estar atrás da porta e presas por dentro do corpo. O deslocamento é para trás da porta e para dentro da lateral."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-12T22:58:04.545Z"
         }
       ]
     },
