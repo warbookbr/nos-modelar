@@ -175,3 +175,47 @@ Para espessar a pá depois da primeira integração (atrito 13), mudei `hB0` a `
 ```bash
 npm run esboco -- --editar docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json parametros.hB3=30
 ```
+
+## 20. Nenhum comando reimprime o brief de um Marco já registrado
+
+O Condutor recusa o `--feito` de outra unidade e o `--proximo` com o Marco de 25% em nota 7 e manda "chamar o crítico do Marco de novo", mas o brief do Marco só é impresso no `--feito` que cruza o limiar pela primeira vez. O `--feito` de uma unidade já feita reimprime o brief dela e não o do Marco, e não existe opção `--marco` na linha de comando, embora a função `briefDoMarco` exista exportada em `tools/mecanifica/esboco.mjs`. Corrigidas as unidades do Marco, a única forma de obter o brief de novo é chamar essa função por fora do comando.
+
+```bash
+npm run esboco -- --condutor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --feito helice
+```
+
+Para reproduzir, rode o comando com o Marco de 25% registrado: sai o brief da hélice e nenhum do Marco.
+
+## 21. Nenhuma vista fixa olha pelo lado esquerdo, e a porta que a função põe à esquerda não aparece em nenhuma
+
+`lateral` olha de +x, `superior` de +y e `isometrica` de [1,1,1], de modo que o flanco de x negativo (o esquerdo, E) não é visto de fora em vista nenhuma, e a porta traseira esquerda só aparece como marca escura além do flanco na superior. As janelas aparecem na lateral porque o `lado: "E"` gera as cópias D, e a porta, que não tem `lado`, não tem cópia. A zoom na porta na lateral mostra o flanco direito liso. O contorno da porta só se vê em corte (`--corte x=-770` e `--corte z=5940` com `--zoom-forma portaE`, em que a vista olha o plano de corte de dentro), e os cortes entraram no brief como imagens extras.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --unidade fuselagem --vista lateral --zoom-forma portaE --margem 600 --largura 1400 --saida <pasta>
+```
+
+## 22. O Envelope por forma conta a caixa da forma girada, e a porta inclinada para seguir a cauda deixou de caber
+
+Girar a porta 2,19 graus em torno de y, para ela acompanhar o estreitamento do flanco da fuselagem, dobra a extensão em x da caixa dela (de 36 para 70 mm com a espessura de 36), e o `--integrar` recusa pelo `substitui` ("portaE passa 42,3 mm em x"), porque a caixa da forma da maquete é uma caixa de 30 mm de espessura sem giro. A porta teve de afinar para 24 mm e mudar de centro até a caixa girada caber nos 30 mm de tolerância.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --integrar fuselagem docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-fuselagem.esboco.json
+```
+
+Para reproduzir, ponha em `portaE` do detalhe `"largura": 36`, `"rotacao": [0, 2.19, 0]` e `"centro": [-758, 1660, 5940]` e rode o comando.
+
+## 23. A âncora de uma caixa girada é a da caixa envolvente, e a maçaneta presa por `ponta` saiu do flanco
+
+`macanetaPortaE` se prende à face `-x` da porta por `ponta`, e com a porta girada a âncora `-x` passa a ser o `x` mínimo da caixa envolvente (-793,3 no extremo da proa), não o ponto da face na altura da maçaneta (-790,6 em z 5560). A maçaneta ficou 13 mm fora da face, e o `desloca` teve de levar um acerto à mão (`[17, -70, -380]`), o que volta a ser um número que não acompanha o ângulo da porta.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-detalhe-fuselagem.esboco.json --forma portaE
+```
+
+## 24. Uma nota de hélice abaixo de 8 trava o `--feito` das outras unidades que o Marco também aponta
+
+Os defeitos do Marco de 25% estão na fuselagem e no capô, e o veredito 7 da hélice, que é de unidade e não do Marco, faz o `--feito fuselagem` voltar recusado ("a unidade helice tirou nota 7"), de modo que uma só rodada do esbocista corrige as três unidades no JSON e só consegue marcar a primeira como refeita. As duas outras ficam sem brief até o veredito da hélice entrar.
+
+```bash
+npm run esboco -- --condutor docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao.esboco.json --feito fuselagem
+```

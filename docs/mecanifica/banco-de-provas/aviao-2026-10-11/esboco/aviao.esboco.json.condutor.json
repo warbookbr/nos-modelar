@@ -1309,9 +1309,9 @@
   "avisos": [],
   "opcao": "Monomotor turboélice",
   "notasDePassagem": {
-    "fuselagem": "Seções fogo, asa, tronco e cauda mantêm o centro da maquete: asa, estabilizador e deriva se ancoram nelas. O fogo (1450x1000, cantos 330) tem de coincidir com a traseira do capô. Cantos 250/280 deixam o flanco reto sob janelas e porta.",
+    "fuselagem": "Seções fogo, asa, tronco e cauda mantêm o centro: asa, estabilizador e deriva se ancoram nelas. Cauda termina em 240x210, não em agulha. Porta (24 mm, giro 2,19 graus) segue o flanco, e a caixa girada tem de caber nos 30 mm do Envelope.",
     "motor": "Capô oco (casca 20, aberta no lábio): o cone toca o anel do lábio por tolerância (28 mm), não afinar a casca. Duto preto assenta no piso e acaba na parede de trás. Escapes em y 1325 e menores, pelo Envelope. Ventre y≈797 mantido.",
-    "helice": "Plano das pás em z 510, não 490: raiz e colar ficam à frente do lábio do capô (z 600). Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT); ponta em r 1150 cabe no Envelope; o cone mantém r 199 em z 600."
+    "helice": "Plano das pás em z 485: a pá chega a z 550, 50 mm à frente do lábio (z 600), acima dos 30 mm de contato, e só o cone e a placa (r 240) tocam o capô. Pá em seções poligonais, torção 52 a 18 graus (hA/hB/hT). Ponta em r 1150."
   },
   "vereditos": [
     {
