@@ -48,11 +48,11 @@
    "parte": "escape",
    "medida": "altura",
    "de": [
-    1560,
+    850,
     1270
    ],
    "ate": [
-    1560,
+    850,
     1410
    ],
    "afasta": [
@@ -92,7 +92,7 @@
    ],
    "afasta": [
     0,
-    720
+    690
    ]
   },
   {
@@ -120,14 +120,25 @@
    "medida": "largura",
    "em": 1080,
    "numero": [
-    900,
-    -600
+    -900,
+    100
    ]
   },
   {
    "parte": "asa",
    "medida": "altura",
-   "em": 4850
+   "de": [
+    4975,
+    777
+   ],
+   "ate": [
+    4975,
+    1922
+   ],
+   "numero": [
+    -350,
+    0
+   ]
   },
   {
    "parte": "barbatana",
@@ -312,7 +323,7 @@
   },
   "asa": {
    "marca": [
-    5000,
+    5100,
     900
    ],
    "coluna": "direita",
