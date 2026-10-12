@@ -82,3 +82,14 @@ comprimento da fuselagem vale o da lateral, 8.028 mm, por decisão da pessoa. O
 roteiro do crítico de cada uma:
 [lateral](referencias/lateral.prancha.pacote/roteiro.md) e
 [topo](referencias/topo.prancha.pacote/roteiro.md).
+
+## O esboço da primeira rodada
+
+O esboço detalhado ([`esboco/aviao.esboco.json`](esboco/aviao.esboco.json)), feito
+só com o que o Mecanifica tinha, fechou com o Marco de 100% em nota 8 e foi
+aprovado pela pessoa em 2026-10-12, com duas pendências que contrariam o
+critério 5: o trem do nariz atravessa o capô depois de 85 graus do curso, e o
+principal recolhe numa carenagem sob a asa, e não dentro dela, porque o esboço
+não recorta uma forma com outra. Os atritos do caminho estão em
+[`esboco/ATRITOS.md`](esboco/ATRITOS.md), e a comparação com a referência em
+`esboco/comparacao-final.png`.

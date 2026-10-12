@@ -20,6 +20,7 @@ pois envolve consumo significativo de recursos.
 | 5 | **cadeira de rodas** | Veículos terrestres | esboço | `barras`, `rodaPneu`, `tecido`, `articula`, `manopla` | [Link](ISO 7176) | Exercita cadeira com estrutura de barras tubulares, articulações e rodas raiadas. |
 | 6 | **guarda-roupa** | Móveis | esboço | `movel`, `articula`, `guia` | — | Exercita a família de roupeiro modular com caixaria, portas articuladas e trilhos. |
 | 7 | **cadeira** | Móveis | esboço | `movel`, `barras`, `tecido`, `deforma` | — | Exercita a família prevista de cadeira com estrutura de barras e assento anatômico. |
+| 8 | **avião de pequeno porte** | Veículos aéreos e espaciais | esboço | `aerofolio`, `loftSuave`, `casca`, `rodaPneu` | [Link](aviao-2026-10-11/referencias) | Objeto difícil do plano o que o avião pede: perfil aerodinâmico, superfície suave por seções e mecanismo de recolhimento. |
 
 ## Resumo de custo por objeto
 
@@ -42,6 +43,7 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | **cadeira** | esboço | Móveis | 2026-10-07 | 2 | 2 | 136343 | 9 |
 | **cadeira** | esboço | Móveis | 2026-10-08 | 1 | 1 | 101631 | 8 |
 | **cadeira** | esboço | Móveis | 2026-10-10 | 1 | 1 | 94093 | 9 |
+| **avião de pequeno porte** | esboço | Veículos aéreos e espaciais | 2026-10-12 | 1 | 1 | 3934576 | 8 |
 
 ## Histórico de medições
 
@@ -63,4 +65,5 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | 2026-10-11T16:24:17.457Z | `2529aa08` | **carrinho de mão** | objeto | 1 | 124539 | api | 8 | depois do plano: sem defeito estrutural; casco facetado, pneu de cantos vivos e travessa com pontas sobrando |
 | 2026-10-11T16:24:17.835Z | `2529aa08` | **guarda-roupa** | objeto | 1 | 134033 | api | 8 | depois do plano: sem defeito estrutural; dobradiças com o nó na quina da frente, visíveis de fora, e vão sem função acima das gavetas |
 | 2026-10-11T16:28:55.193Z | `41d5b921` | **cadeira de rodas** | objeto | 1 | 185321 | api | 8 | depois do plano: sem defeito estrutural; barra grossa na altura do cubo, folga apertada da rodinha e raios que parecem atravessar o cubo; o esbocista inseriu um campo de texto por script |
+| 2026-10-12T16:01:51.583Z | `a052a9fe` | **avião de pequeno porte** | objeto | 1 | 3934576 | api | 8 | primeira rodada do plano o que o avião pede, só com o que existia: 12 esbocistas e 19 críticas, Marco de 100% com 8; motor em 3 rodadas, fuselagem e Marco de 25% liberados pela pessoa com 7; trem do nariz atravessa o capô depois de 85 graus e o principal recolhe em carenagem sob a asa, por falta de recorte |
 

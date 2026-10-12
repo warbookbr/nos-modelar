@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1119 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1131 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -147,6 +147,54 @@
 
 - `ALINHAMENTO.md` — Avião de pequeno porte: alinhamento
 - `ATRITOS.md` — Avião de pequeno porte: atritos
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/
+
+- `ATRITOS.md` — Atritos do esboço do avião
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-asas/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-empenagem-horizontal/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-helice/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-100/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-25/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-50/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-75/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trem-do-nariz/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trens-principais/
+
+- `brief.md` — --- brief para o crítico cego ---
 
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/
 
