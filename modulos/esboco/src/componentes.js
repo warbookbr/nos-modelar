@@ -33,6 +33,7 @@ import { ErroDeEsboco } from './index.js';
 import { COMPONENTES } from '../componentes/index.js';
 import { validarForma } from './esquema.js';
 import { quisDizer } from './parecido.js';
+import { fontesDoArranjo, nomesDasCopias } from './arranjo.js';
 import { traduzirLigacoes } from './ligar.js';
 import { lerPerguntasDoComponente } from '../../../src/autoria/perguntas-do-critico.js';
 
@@ -105,7 +106,7 @@ export function catalogoDe(modulos) {
     }
     for (const f of formasDoModulo) {
       if (f.usa !== undefined) continue;
-      if (objeto(f.arranja)) exigir(ids.includes(f.arranja.forma), `${onde}: o arranja cita a forma "${f.arranja.forma}", que não é forma do módulo (formas: ${ids.join(', ')})`);
+      if (objeto(f.arranja)) for (const fonte of fontesDoArranjo(f.arranja)) exigir(ids.includes(fonte), `${onde}: o arranja cita a forma "${fonte}", que não é forma do módulo (formas: ${ids.join(', ')})`);
       const { quando, exceto, ...limpa } = f;
       void quando; void exceto;
       validarForma(limpa, `módulo "${nome}", forma "${f.id ?? 'arranja'}"`);
@@ -152,6 +153,7 @@ function reescreverForma(f, { ponto, id }) {
   if (objeto(g.arranja)) {
     g.arranja = { ...g.arranja };
     if (typeof g.arranja.forma === 'string') g.arranja.forma = id(g.arranja.forma);
+    else if (Array.isArray(g.arranja.forma)) g.arranja.forma = g.arranja.forma.map((x) => (typeof x === 'string' ? id(x) : x));
     if (typeof g.arranja.caminho === 'string') g.arranja.caminho = id(g.arranja.caminho);
     if (g.arranja.centro !== undefined) g.arranja.centro = pt(g.arranja.centro);
   }
@@ -210,7 +212,7 @@ export function expandirComponentes(formas, ctx) {
   }
   for (const f of formas) if (!ehInstancia(f) && !ehEspelhoDeInstancia(f, idsDasInstancias)) {
     if (typeof f?.id === 'string' && dadosDe.has(f.id)) throw new ErroDeEsboco(`${onde}: o id "${f.id}" é de uma instância de componente e de outra forma ao mesmo tempo`);
-    if (objeto(f?.arranja) && dadosDe.has(f.arranja.forma)) throw new ErroDeEsboco(`${onde}: "arranja" não repete um componente ("${f.arranja.forma}"); declare uma instância por cópia`);
+    if (objeto(f?.arranja)) for (const fonte of fontesDoArranjo(f.arranja)) if (dadosDe.has(fonte)) throw new ErroDeEsboco(`${onde}: "arranja" não repete um componente ("${fonte}"); declare uma instância por cópia`);
   }
 
   /* âncoras expostas: <instancia>.<ancora> -> <instancia>.<forma>.<ancora> */
@@ -281,6 +283,8 @@ export function expandirComponentes(formas, ctx) {
       /* a entrada `arranja` do componente não tem id: as cópias dela nascem na expansão dos arranjos, com a fonte prefixada */
       if (g.id === undefined && objeto(h.arranja)) {
         if (Array.isArray(h.arranja.nomes)) h.arranja = { ...h.arranja, nomes: h.arranja.nomes.map((n) => `${f.id}.${n}`) };
+        /* o grupo (`forma` em lista) leva os nomes por fonte: a fonte e cada nome ganham o prefixo da instância */
+        else if (objeto(h.arranja.nomes)) h.arranja = { ...h.arranja, nomes: Object.fromEntries(Object.entries(h.arranja.nomes).map(([fonte, lista]) => [prefixa(fonte), Array.isArray(lista) ? lista.map((n) => `${f.id}.${n}`) : lista])) };
         /* as cópias são da instância (unidade do Condutor, mapa de ligações), mas não são a forma principal dela */
         /* o `oculto` e a `opacidade` da instância vão junto: a entrada de arranjo não os aceita no campo próprio */
         h.daInstancia = { id: f.id, principal: false, ...(f.oculto === undefined ? {} : { oculto: f.oculto }), ...(f.opacidade === undefined ? {} : { opacidade: f.opacidade }) };
@@ -313,7 +317,7 @@ export function expandirComponentes(formas, ctx) {
       if (g.id === undefined && objeto(g.arranja)) {
         const a = g.arranja;
         if (!Number.isInteger(a.total) || a.total < 2) return [];
-        const nomes = Array.isArray(a.nomes) ? a.nomes : Array.from({ length: a.total - 1 }, (_, k) => `${a.forma}${k + 1}`);
+        const nomes = nomesDasCopias(a).flatMap((c) => c.nomes);
         return nomes.map((nome) => {
           const h = { id: `${f.id}.${nome.slice(fonte.length + 1)}`, espelha: { ...e, forma: nome }, daInstancia: { id: f.id, principal: false } };
           const oculto = f.oculto ?? g.daInstancia?.oculto;

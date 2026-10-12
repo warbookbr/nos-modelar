@@ -146,6 +146,9 @@ export function medirEsboco(bruto, { projecao: comProjecao = true, referencias, 
 }
 
 const mm1 = (x) => (Math.round(x * 10) / 10).toString().replace('.', ',');
+/* Um parâmetro não é uma medida em mm: arredondado a uma casa, `ehDz` (0,0188, o avanço em z por mm de envergadura do avião) saía 0 e `ehS1`
+   (0,917, uma escala) saía 0,9. Quatro algarismos significativos mostram a inclinação e a razão como são e deixam os inteiros e os mm como estavam. */
+const parametro = (x) => (typeof x !== 'number' || !Number.isFinite(x) || Number.isInteger(x) ? String(x) : Number(x.toPrecision(4)).toString()).replace('.', ',');
 const vetor = (v) => `[${v.map(mm1).join(' ')}]`;
 const faixa = (p) => `${mm1(p[0])}..${mm1(p[1])}`;
 
@@ -160,7 +163,7 @@ export function formatarDescricao(d) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
     L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
-    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
+    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${parametro(v)}`).join('; ')}`);
     L.push(linhaDoGate(o));
     for (const f of o.formas) {
       L.push(linhaDaForma(f));
@@ -188,7 +191,7 @@ export function formatarResumo(d, divergencias) {
   const L = [];
   for (const [i, o] of d.opcoes.entries()) {
     L.push(`opção ${i + 1} (${o.titulo}): ${o.formas.length} formas${o.ocultas ? `, ${o.ocultas} ocultas (só referência)` : ''}`);
-    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${mm1(v)}`).join('; ')}`);
+    if (o.parametros) L.push(`parâmetros: ${Object.entries(o.parametros).map(([k, v]) => `${k} ${parametro(v)}`).join('; ')}`);
     L.push(linhaDoGate(o));
     const meus = divergencias.filter((x) => x.opcao === o.titulo);
     if (meus.length === 0) { L.push('divergências: nenhuma'); continue; }
@@ -245,7 +248,7 @@ export function diferenca(anterior, atual) {
     const pa = p.parametros ?? {}; const pb = o.parametros ?? {};
     for (const k of new Set([...Object.keys(pa), ...Object.keys(pb)])) {
       if (pa[k] === pb[k]) continue;
-      nota(`${rot} parâmetro ${pa[k] === undefined ? 'novo' : pb[k] === undefined ? 'removido' : 'alterado'}: ${k}${pa[k] === undefined ? '' : ` de ${mm1(pa[k])}`}${pb[k] === undefined ? '' : ` para ${mm1(pb[k])}`}`, 'parametro', { opcao: o.titulo, parametro: k });
+      nota(`${rot} parâmetro ${pa[k] === undefined ? 'novo' : pb[k] === undefined ? 'removido' : 'alterado'}: ${k}${pa[k] === undefined ? '' : ` de ${parametro(pa[k])}`}${pb[k] === undefined ? '' : ` para ${parametro(pb[k])}`}`, 'parametro', { opcao: o.titulo, parametro: k });
     }
     const fa = new Map(p.formas.map((f) => [f.id, f]));
     const fb = new Map(o.formas.map((f) => [f.id, f]));

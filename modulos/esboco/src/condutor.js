@@ -585,9 +585,16 @@ export function textoDoBloqueio(b) {
 }
 
 function exigirNotaLivre(estado, { exceto } = {}) {
+  const marcoDe = (x) => { const m = /^marco-(\d+)$/.exec(x.unidade); return m === null ? undefined : (estado.marcos ?? []).find((k) => k.limiar === Number(m[1])); };
   /* o Marco abaixo de 8 (ainda não travado) deixa refazer as unidades que ele fechou: é a correção que o faz ser rejulgado */
-  const cobre = (x) => { const m = /^marco-(\d+)$/.exec(x.unidade); return m !== null && (estado.marcos ?? []).some((k) => k.limiar === Number(m[1]) && (k.unidades ?? []).includes(exceto)); };
-  const b = bloqueiosDaNota(estado).filter((x) => (x.unidade !== exceto && !cobre(x)) || x.travado);
+  const cobre = (x) => (marcoDe(x)?.unidades ?? []).includes(exceto);
+  /* e, pelo mesmo motivo, a nota de uma unidade que esse mesmo Marco aberto também fechou não trava o `--feito` de outra: no avião
+     o Marco de 25% apontava defeitos na fuselagem e no capô, e o 7 da hélice, que é da unidade, recusava o `--feito fuselagem`, de
+     modo que uma só rodada do esbocista corrigia as três unidades e só marcava a primeira. O Marco refaz o julgamento de todas
+     juntas. A regra das três rodadas fica de fora: o bloqueio travado, de qualquer unidade, continua valendo. */
+  const marcosAbertos = bloqueiosDaNota(estado).filter((x) => !x.travado && cobre(x)).map(marcoDe);
+  const irmaDoMarco = (x) => marcosAbertos.some((m) => (m.unidades ?? []).includes(x.unidade));
+  const b = bloqueiosDaNota(estado).filter((x) => (x.unidade !== exceto && !cobre(x) && !irmaDoMarco(x)) || x.travado);
   exigir(b.length === 0, `condutor: ${b.map(textoDoBloqueio).join('; ')}`);
 }
 

@@ -6,6 +6,7 @@ import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js'
 import { ErroDeEsboco } from './index.js';
 import { catalogoDe, expandirComponentes } from './componentes.js';
 import { validarEsquema } from './esquema.js';
+import { fontesDoArranjo, nomesDasCopias } from './arranjo.js';
 import { traduzirLigacoes, validarLigacoes } from './ligar.js';
 import { ehGerador, gerarPerfil } from './perfis.js';
 import { estilosDasFormasDeModulo, lerEstilos, prepararFormas } from './estilos.js';
@@ -164,7 +165,7 @@ function numerosDosPontos(p, num, onde) {
 const CHAVES_ARRANJA = ['forma', 'modo', 'total', 'passo', 'eixo', 'centro', 'graus', 'nomes', 'caminho', 'desde'];
 const MODOS_DO_ARRANJO = ['linear', 'radial', 'caminho'];
 
-/* Troca cada entrada `{ "arranja": {...} }` pelas cópias da forma-fonte: formas virtuais
+/* Troca cada entrada `{ "arranja": {...} }` pelas cópias da forma-fonte (ou de cada forma do grupo): formas virtuais
    `{ id, arranjoDe }` que `resolverOpcao` posiciona a partir da fonte já resolvida. `total` conta
    a fonte: ela é a peça 0 e as cópias são `<id>1` ... `<id><total-1>`. Idempotente: a forma virtual
    passa sem mudança. */
@@ -180,9 +181,10 @@ export function expandirArranjos(formas, onde = 'opção') {
     exigir(objeto(a), `${contexto}: "arranja" deve ser { "forma": "<id>", "modo": "linear" | "radial", "total": n, ... }`);
     const fora = Object.keys(a).filter((k) => !CHAVES_ARRANJA.includes(k));
     exigir(fora.length === 0, `${contexto}: "arranja" não tem o campo "${fora[0]}" (campos: ${CHAVES_ARRANJA.join(', ')})`);
-    exigir(typeof a.forma === 'string' && a.forma, `${contexto}: "arranja.forma" deve ser o id da forma-fonte`);
+    const fontes = fontesDoArranjo(a);
+    exigir(fontes.length > 0 && fontes.every((x) => typeof x === 'string' && x) && new Set(fontes).size === fontes.length, `${contexto}: "arranja.forma" deve ser o id da forma-fonte ou uma lista de ids distintos (o grupo repetido junto)`);
     exigir(MODOS_DO_ARRANJO.includes(a.modo), `${contexto}: "arranja.modo" deve ser "linear", "radial" ou "caminho"`);
-    exigir(Number.isInteger(a.total) && a.total >= 2, `${contexto}: "arranja.total" deve ser um inteiro de 2 ou mais (conta a fonte; as cópias são ${a.forma}1 a ${a.forma}<total-1>)`);
+    exigir(Number.isInteger(a.total) && a.total >= 2, `${contexto}: "arranja.total" deve ser um inteiro de 2 ou mais (conta a fonte; as cópias são ${fontes[0]}1 a ${fontes[0]}<total-1>)`);
     const vec3 = (v) => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
     let dados;
     if (a.modo === 'caminho') {
@@ -205,12 +207,21 @@ export function expandirArranjos(formas, onde = 'opção') {
     }
     if (a.nomes !== undefined) {
       const esperados = a.total - 1;
-      const veio = Array.isArray(a.nomes) ? a.nomes.length : 0;
-      exigir(Array.isArray(a.nomes) && a.nomes.length === esperados && a.nomes.every((n) => typeof n === 'string' && n) && new Set(a.nomes).size === a.nomes.length,
-        `${contexto}: "arranja.nomes" deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(a.nomes) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${a.forma}" já tem o nome dela`);
+      const conferir = (lista, fonte, rotulo) => {
+        const veio = Array.isArray(lista) ? lista.length : 0;
+        exigir(Array.isArray(lista) && lista.length === esperados && lista.every((n) => typeof n === 'string' && n) && new Set(lista).size === lista.length,
+          `${contexto}: ${rotulo} deve listar ${esperados} ${esperados === 1 ? 'nome' : 'nomes'}, veio ${veio}${Array.isArray(lista) ? '' : ' (não é uma lista)'}; um por cópia, textos não vazios e distintos, e a fonte "${fonte}" já tem o nome dela`);
+      };
+      if (Array.isArray(a.forma)) {
+        exigir(objeto(a.nomes) && Object.keys(a.nomes).every((x) => fontes.includes(x)), `${contexto}: com uma lista em "arranja.forma", "arranja.nomes" deve ser { "<fonte>": [nomes] } com fontes do grupo (${fontes.join(', ')}); a fonte omitida usa ${fontes[0]}1, ${fontes[0]}2...`);
+        for (const [fonte, lista] of Object.entries(a.nomes)) conferir(lista, fonte, `"arranja.nomes.${fonte}"`);
+      } else conferir(a.nomes, a.forma, '"arranja.nomes"');
     }
+    const copias = nomesDasCopias(a);
     for (let k = 1; k < a.total; k++) {
-      saida.push({ id: a.nomes ? a.nomes[k - 1] : `${a.forma}${k}`, arranjoDe: { fonte: a.forma, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: { id: f.daInstancia.id, principal: f.daInstancia.principal }, ...(f.daInstancia.oculto === undefined ? {} : { oculto: f.daInstancia.oculto }), ...(f.daInstancia.opacidade === undefined ? {} : { opacidade: f.daInstancia.opacidade }) } : {}) });
+      for (const { fonte, nomes } of copias) {
+        saida.push({ id: nomes[k - 1], arranjoDe: { fonte, modo: a.modo, indice: k, total: a.total, ...dados }, ...(objeto(f.daInstancia) ? { daInstancia: { id: f.daInstancia.id, principal: f.daInstancia.principal }, ...(f.daInstancia.oculto === undefined ? {} : { oculto: f.daInstancia.oculto }), ...(f.daInstancia.opacidade === undefined ? {} : { opacidade: f.daInstancia.opacidade }) } : {}) });
+      }
     }
   }
   return saida;

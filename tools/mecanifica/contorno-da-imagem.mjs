@@ -33,7 +33,10 @@
  *     "regioes": { "base": [390, 470], "anelCintura": [[345, 405], [430, 405]] } }
  *   `realce` liga o realce de contraste e nitidez do módulo para o watershed.
  *   `foraDoModelo` lista as partes que têm semente só para a vizinha não as
- *   engolir, como um cabo: elas saem da silhueta e da prancha.
+ *   engolir, como um cabo: elas saem da silhueta e da prancha. A silhueta guarda
+ *   todos os pedaços em que elas a deixam (`silhueta.pedacos`).
+ *   `buracoMaximo` (padrão 64) é a área, em px², até a qual um buraco de fundo
+ *   cercado pela silhueta, como um reflexo claro, é fechado; 0 desliga.
  *
  * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
  * julgadas e o veredito do crítico. A saída do contorno é
@@ -43,7 +46,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, contornoDaSilhueta, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA,
+  segmentar, silhuetaEmPedacos, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 import { acaoDaPasta, aceitar, lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
@@ -74,20 +77,29 @@ export async function contornosDaImagem(pngBuffer, config) {
       })),
     };
   }
-  const silhuetaPx = await contornoDaSilhueta(seg, { sem: foraDoModelo });
-  const linhaDeForaPx = await contornoDaSilhueta(seg, { folga: 1, sem: foraDoModelo });
+  /* A silhueta em todos os pedaços, do maior para o menor: a parte fora do
+     modelo corta a silhueta onde passa (o corpo escuro sobre a asa da frontal do
+     avião deixa a ponta da asa num pedaço à parte), e só o maior pedaço perdia a
+     ponta. Os campos de sempre são os do maior; `pedacos` traz todos, como nas
+     partes, e `linhasDeForaMm` as linhas de fora de todos. */
+  const { pedacos: pedacosPx, linhasDeFora } = await silhuetaEmPedacos(seg, { sem: foraDoModelo });
+  const paraMm = (pts) => pts.map(([x, y]) => calibracao.paraMm(x, y).map(arred));
+  const pedacos = pedacosPx.map((p) => ({ areaMm2: Math.round(p.areaPx * mm2), contornoPx: p.contornoPx, contornoMm: paraMm(p.contornoPx) }));
+  const linhasDeForaMm = linhasDeFora.map(paraMm);
   return {
     resultado: {
       formato: FORMATO,
       imagem: { sha256: createHash('sha256').update(pngBuffer).digest('hex'), largura: seg.largura, altura: seg.altura },
       mmPorPx: Number(calibracao.mmPorPx.toFixed(5)),
       residuo: calibracao.residuo,
-      /* `contornoMm` é a silhueta medida; `linhaDeForaMm` passa um pixel além
-         dela, para a prancha desenhar as partes por dentro. */
+      /* `contornoMm` é a silhueta medida do maior pedaço; `linhaDeForaMm` passa
+         um pixel além dela, para a prancha desenhar as partes por dentro. */
       silhueta: {
-        contornoPx: silhuetaPx,
-        contornoMm: silhuetaPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
-        linhaDeForaMm: linhaDeForaPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
+        contornoPx: pedacos[0].contornoPx,
+        contornoMm: pedacos[0].contornoMm,
+        linhaDeForaMm: linhasDeForaMm[0],
+        pedacos,
+        linhasDeForaMm,
       },
       regioes,
     },
@@ -143,7 +155,7 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
   writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, mapaDePartes: join(pasta, 'mapa-de-partes.png'), folhas }));
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
-  const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
+  const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, buracosFechados: segmentacao.buracosFechados, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
   writeFileSync(join(pasta, 'medidas.json'), `${JSON.stringify(medidas, null, 1)}\n`);
   return medidas;
 }
@@ -205,6 +217,8 @@ async function principal(argv) {
     process.stdout.write(`  pacote em ${pasta}: mapa de partes, ${medidas.divisas.length} divisa(s), medidas\n`);
     if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);
     if (medidas.semDonoPx > 0) process.stdout.write(`  ${medidas.semDonoPx} pixel(s) da silhueta sem dono\n`);
+    if (medidas.buracosFechados.buracos > 0) process.stdout.write(`  ${medidas.buracosFechados.buracos} buraco(s) pequeno(s) cercado(s) pela silhueta fechado(s), ${medidas.buracosFechados.pixels} pixel(s)\n`);
+    if (resultado.silhueta.pedacos.length > 1) process.stdout.write(`  silhueta em ${resultado.silhueta.pedacos.length} pedaço(s), o maior com ${resultado.silhueta.pedacos[0].areaMm2} mm²\n`);
   }
   return 0;
 }

@@ -90,7 +90,13 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
   titulo ??= `${VISTAS_DA_PRANCHA[vista].titulo} pelos contornos da imagem`;
   const silhueta = contornos.silhueta?.contornoMm;
   if (!Array.isArray(silhueta) || silhueta.length < 3) throw new Error('o arquivo de contornos não traz a silhueta; gere de novo com `npm run contorno`.');
-  const zs = silhueta.map(([z]) => z); const ys = silhueta.map(([, y]) => y);
+  /* A silhueta inteira é a união dos pedaços: a parte fora do modelo corta a
+     silhueta onde passa, e na frontal do avião a ponta da asa direita ficava
+     num pedaço à parte. Medida só pelo maior, a caixa ia de -6.400 a 4.378 mm e
+     a cota geral de largura saía com 10.778 mm, em vez dos 12.800 do avião. */
+  const pedacosDaSilhueta = contornos.silhueta.pedacos?.length ? contornos.silhueta.pedacos.map((p) => p.contornoMm) : [silhueta];
+  const linhasDeFora = contornos.silhueta.linhasDeForaMm?.length ? contornos.silhueta.linhasDeForaMm : [contornos.silhueta.linhaDeForaMm ?? silhueta];
+  const zs = pedacosDaSilhueta.flat().map(([z]) => z); const ys = pedacosDaSilhueta.flat().map(([, y]) => y);
   const zMin = Math.min(...zs); const zMax = Math.max(...zs); const yMin = Math.min(...ys); const yMax = Math.max(...ys);
   const escala = Math.min(
     (TELA.largura - MARGEM.esquerda - MARGEM.direita) / (zMax - zMin),
@@ -282,7 +288,7 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
     camadas: [
       /* A linha de fora passa um pixel além da silhueta, para as partes, que
          tocam a borda, ficarem dentro dela; as cotas usam a silhueta medida. */
-      { vista, contorno: true, nome: `silhueta${vista[0].toUpperCase()}${vista.slice(1)}`, tipo: 'poli', pts: contornos.silhueta.linhaDeForaMm ?? silhueta, fechado: true },
+      ...linhasDeFora.map((pts, k) => ({ vista, contorno: true, nome: `silhueta${vista[0].toUpperCase()}${vista.slice(1)}`, tipo: 'poli', pts, fechado: true, ...(k ? { pedaco: k + 1 } : {}) })),
       /* Cada pedaço da parte é uma camada com o nome dela; os de depois do
          primeiro levam `pedaco`, para o motor medir a forma uma vez por parte. */
       ...nomes.flatMap((nome) => pedacosDe(contornos.regioes[nome]).map((pts, k) => ({ vista, classe: 'painel', nome, tipo: 'poli', pts, fechado: true, ...(k ? { pedaco: k + 1 } : {}) }))),

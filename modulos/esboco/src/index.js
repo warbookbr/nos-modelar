@@ -703,11 +703,33 @@ export function ancorasDe(r) {
     for (const p of pontasDe(r)) a[p.nome] = p.ponto;
   }
   const meio = r.min.map((v, i) => (v + r.max[i]) / 2);
+  const faces = r.forma.tipo === 'caixa' && !r.haste && r.matriz ? facesDaCaixaGirada(r) : null;
   for (const lado of LADOS) {
     const k = EIXOS.indexOf(lado[1]);
-    a[lado] = meio.map((v, i) => (i === k ? (lado[0] === '+' ? r.max[k] : r.min[k]) : v));
+    a[lado] = faces ? faces[lado] : meio.map((v, i) => (i === k ? (lado[0] === '+' ? r.max[k] : r.min[k]) : v));
   }
   return a;
+}
+
+/* As âncoras `+x` ... `-z` de uma caixa girada: o centro da face da caixa girada cuja normal fica mais perto do lado de mundo. A caixa envolvente
+   dava o x mínimo do canto da porta girada do avião (-793,3), 2,7 mm fora da face na altura da maçaneta, e a maçaneta presa a `-x` saía do flanco
+   e levava um `desloca` à mão que não acompanhava o ângulo. Com a caixa alinhada aos eixos (ou girada de múltiplos de 90 graus) as duas
+   coincidem; a haste `de`/`para` fica com as âncoras da caixa envolvente, como diz `nomesDeAncoras`. */
+function facesDaCaixaGirada(r) {
+  const meias = [r.forma.largura / 2, r.forma.altura / 2, r.forma.profundidade / 2];
+  const faces = [];
+  for (let e = 0; e < 3; e++) for (const sinal of [1, -1]) {
+    const local = [0, 0, 0]; local[e] = sinal * meias[e];
+    const d = aplicarMatriz(local, r.matriz);
+    faces.push({ centro: r.centro.map((c, i) => c + d[i]), normal: unit(d) });
+  }
+  const saida = {};
+  for (const lado of LADOS) {
+    const k = EIXOS.indexOf(lado[1]);
+    const alvo = lado[0] === '+' ? 1 : -1;
+    saida[lado] = faces.reduce((m, f) => (f.normal[k] * alvo > m.normal[k] * alvo + 1e-9 ? f : m)).centro;
+  }
+  return saida;
 }
 
 /* As pontas que o gate confere: as duas do caminho de um tubo e as duas de uma haste de cilindro ou de caixa (`de`/`para`). Cada
@@ -813,11 +835,14 @@ export function relacaoDe(f) {
   const partes = [];
   const v = (x) => {
     if (Array.isArray(x)) return `[${x.join(' ')}]`;
+    /* âncora com deslocamento (`{ "ancora": "capo.escA", "mm": [dx, dy, dz] }`): o texto da âncora e, se há, o deslocamento; o objeto
+       impresso direto saía "[object Object]" na haste do garfo e do escape do avião */
+    if (x && typeof x === 'object' && x.ancora !== undefined) return x.mm === undefined ? `${v(x.ancora)}` : `${v(x.ancora)} deslocada ${v(x.mm)} mm`;
     if (x && typeof x === 'object' && Array.isArray(x.entre)) {
       const medida = x.t !== undefined ? `em t ${x.t}` : x.mm !== undefined ? `a ${x.mm} mm do primeiro` : `a ${x.mmAntes} mm do segundo`;
       return `(entre ${v(x.entre[0])} e ${v(x.entre[1])} ${medida})`;
     }
-    return x;
+    return x && typeof x === 'object' ? JSON.stringify(x) : x;
   };
   if (f.espelha) partes.push(`espelho de ${f.espelha.forma} no eixo ${f.espelha.eixo} em ${f.espelha.pos ?? 0} mm`);
   if (f.arranjoDe) {
@@ -1453,6 +1478,18 @@ export const VISTAS = {
   lateral: { olho: [1, 0, 0], p: ([, y, z]) => [-z, -y] },
   superior: { olho: [0, 1, 0], p: ([x, , z]) => [x, z] },
 };
+/* As vistas de outros lados, que as quatro de cima não olham (todas olham do lado positivo de um eixo): o oposto da frontal (olho
+   em -z, que no avião é a proa), o oposto da lateral (olho em -x, o flanco esquerdo) e a de baixo (olho em -y). Ficam fora de
+   `VISTAS`, que a análise, a composta e a projeção percorrem, e só entram quando alguém as pede (`--vista`, ou `vistas` da
+   unidade no brief do crítico). A tela segue a mesma regra de `VISTAS` (x, ou o eixo que a vista mede, para a direita, e y para
+   cima), de modo que cada uma é a imagem espelhada da vista oposta: o +x vai para a esquerda na `frontal-oposta`, o +z para a
+   direita na `lateral-oposta`, e o -z sobe na `inferior`. */
+export const VISTAS_EXTRAS = {
+  'frontal-oposta': { olho: [0, 0, -1], p: ([x, y]) => [-x, -y] },
+  'lateral-oposta': { olho: [-1, 0, 0], p: ([, y, z]) => [z, -y] },
+  inferior: { olho: [0, -1, 0], p: ([x, , z]) => [x, -z] },
+};
+export const VISTAS_TODAS = { ...VISTAS, ...VISTAS_EXTRAS };
 const LUZ = normalizar([-0.35, 1, 0.55]);
 
 function normalizar(v) { const n = Math.hypot(...v) || 1; return v.map((c) => c / n); }
@@ -2029,7 +2066,7 @@ function camadasNoEixo(grupos, k) {
 /* Eixo da explosão quando não é pedido: entre os que aparecem na tela da vista (explodir ao longo do eixo do olho só muda a
    profundidade, e nada se move na imagem), o de mais camadas, e no empate o de maior extensão. */
 export function eixoDaExplosao(formas, vista = 'isometrica') {
-  const V = VISTAS[vista] ?? VISTAS.isometrica;
+  const V = VISTAS_TODAS[vista] ?? VISTAS.isometrica;
   const grupos = gruposDaExplosao(formas);
   const visiveis = [0, 1, 2].filter((k) => { const e = [0, 0, 0]; e[k] = 1; return Math.hypot(...V.p(e)) > 1e-9; });
   let melhor = visiveis[0];
@@ -2119,22 +2156,28 @@ function comLadosPorEscala(esboco, previa = false) {
 
 /* Enquadramento (`enquadrar: { formas, margem }`, o `--zoom-forma`): a vista é reenquadrada na caixa projetada de uma forma, de
    uma instância de componente ou das formas de um padrão (`garfoE.*`), com `margem` mm em volta (padrão 15% do maior lado, no
-   mínimo 5 mm), e re-renderizada nessa escala. */
+   mínimo 5 mm), e re-renderizada nessa escala. `formas` também pode ser uma lista desses nomes, e o quadro fecha na união
+   delas: é como a vista de uma unidade com vizinhas em cinza enquadra só a unidade (no avião, o capô de 1,7 m tocava a
+   fuselagem de 10 m, que entrava inteira no quadro e deixava o motor com um décimo da imagem). `aviso: false` tira do
+   subtítulo o "zoom em ...", que numa imagem feita para o crítico cego é ruído. */
 export function lerEnquadrar(v, onde = 'esboço') {
   if (v === undefined) return undefined;
-  const dica = '"enquadrar" deve ser { "formas": "<id | instância | padrão>", "margem": mm (opcional, 0 ou mais) }';
+  const dica = '"enquadrar" deve ser { "formas": "<id | instância | padrão>" ou uma lista deles, "margem": mm (opcional, 0 ou mais) }';
   exigir(v && typeof v === 'object' && !Array.isArray(v), `${onde}: ${dica}`);
-  for (const k of Object.keys(v)) exigir(['formas', 'margem'].includes(k), `${onde}: o campo "${k}" não existe em "enquadrar"; ${dica}`);
-  exigir(typeof v.formas === 'string' && v.formas.trim(), `${onde}: ${dica}`);
+  for (const k of Object.keys(v)) exigir(['formas', 'margem', 'aviso'].includes(k), `${onde}: o campo "${k}" não existe em "enquadrar"; ${dica}`);
+  const nomeValido = (x) => typeof x === 'string' && x.trim();
+  exigir(nomeValido(v.formas) || (Array.isArray(v.formas) && v.formas.length > 0 && v.formas.every(nomeValido)), `${onde}: ${dica}`);
   exigir(v.margem === undefined || (typeof v.margem === 'number' && Number.isFinite(v.margem) && v.margem >= 0), `${onde}: ${dica}; a margem ${JSON.stringify(v.margem)} não serve`);
-  return { formas: v.formas.trim(), ...(v.margem !== undefined ? { margem: v.margem } : {}) };
+  exigir(v.aviso === undefined || typeof v.aviso === 'boolean', `${onde}: "aviso" de "enquadrar" deve ser true ou false`);
+  return { formas: Array.isArray(v.formas) ? v.formas.map((x) => x.trim()) : v.formas.trim(), ...(v.margem !== undefined ? { margem: v.margem } : {}), ...(v.aviso === false ? { aviso: false } : {}) };
 }
 
 const casaPadraoDeForma = (padrao, id) => new RegExp(`^${padrao.split('*').map((t) => t.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`).test(id);
 
 /* As formas resolvidas que um id, o id de uma instância ou um padrão designam. */
 export function formasDoEnquadre(rs, entrada) {
-  return rs.filter((r) => (entrada.includes('*') ? casaPadraoDeForma(entrada, r.id) : r.id === entrada || r.forma.daInstancia?.id === entrada));
+  const nomes = Array.isArray(entrada) ? entrada : [entrada];
+  return rs.filter((r) => nomes.some((nome) => (nome.includes('*') ? casaPadraoDeForma(nome, r.id) : r.id === nome || r.forma.daInstancia?.id === nome)));
 }
 
 /* O corte desta opção, com o valor em mm: número, parâmetro (já resolvido na expansão) ou "<forma>.<âncora>" de uma forma da
@@ -2174,7 +2217,7 @@ export function validarEsboco(bruto) {
   if ((esboco.ladosPorEscala === true || esboco.previa === true) && Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0) esboco = comLadosPorEscala(esboco, esboco.previa === true);
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
   const vista = esboco.vista ?? 'isometrica';
-  exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
+  exigir(VISTAS_TODAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS_TODAS).join(', ')}`);
   const topo = lerOcultar(esboco.ocultar, 'esboço');
   const modoTopo = lerModoLegendas(esboco.legendas, 'esboço');
   const explosaoTopo = lerExplosao(esboco.explosao, 'esboço');
@@ -2524,7 +2567,7 @@ function desenharLegendasLista(partes, chave, plano, x0) {
    escala, legendas, linhas de centro, superfícies de corte e linhas de explosão ficam no SVG, por cima da camada. */
 export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
   const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);
-  const V = VISTAS[vista];
+  const V = VISTAS_TODAS[vista];
   let enquadreAchou = false;
   const olho = normalizar(V.olho);
   const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao, modo, corte, camadas }) => {
@@ -2565,7 +2608,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     const max = janela ? janela.max : [Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
     return { opcao, itens, min, max, ocultosOpcao, modo, corte, lado, camadas, janela };
   });
-  exigir(!enquadrar || enquadreAchou, `"enquadrar": "${enquadrar?.formas}" não é uma forma visível do esboço${quisDizer(enquadrar?.formas ?? '', opcoes.flatMap((o) => o.formas.map((r) => r.id)))} (ids: ${opcoes.flatMap((o) => o.formas.map((r) => r.id)).slice(0, 30).join(', ')})`);
+  exigir(!enquadrar || enquadreAchou, `"enquadrar": "${[].concat(enquadrar?.formas ?? '').join(', ')}" não é uma forma visível do esboço${quisDizer([].concat(enquadrar?.formas ?? '').join(', '), opcoes.flatMap((o) => o.formas.map((r) => r.id)))} (ids: ${opcoes.flatMap((o) => o.formas.map((r) => r.id)).slice(0, 30).join(', ')})`);
   /* Mesma escala para todas: a maior opção cabe no painel, com folga para rótulos. */
   const larg = Math.max(...projetadas.map((p) => p.max[0] - p.min[0]));
   const alt = Math.max(...projetadas.map((p) => p.max[1] - p.min[1]));
@@ -2626,7 +2669,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     const sub = [];
     if (previa) sub.push('prévia: facetas reduzidas e sem arestas finas');
     if (p.corte) sub.push(`corte ${p.corte.eixo}=${arredMm(p.corte.valor)}, fica o lado ${p.lado === '+' ? 'maior' : 'menor'} (${p.corte.eixo} ${p.lado === '+' ? '>=' : '<='} ${arredMm(p.corte.valor)})${p.itens.some((i) => i.secao) ? ', hachura: superfície de corte' : ', superfície de corte de perfil'}`);
-    if (p.janela) sub.push(`zoom em ${enquadrar.formas} (margem ${arredMm(p.janela.margem)} mm)`);
+    if (p.janela && enquadrar.aviso !== false) sub.push(`zoom em ${[].concat(enquadrar.formas).join(', ')} (margem ${arredMm(p.janela.margem)} mm)`);
     if (p.camadas) sub.push(`explodida em ${p.camadas.eixo}, passo ${arredMm(p.camadas.passo)} mm${p.camadas.ligacoes ? ', linhas finas até a posição original' : ''}`);
     sub.forEach((t, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${62 + i * 14}" font-size="13" text-anchor="middle" fill="#444444">${esc(t)}</text>`));
 

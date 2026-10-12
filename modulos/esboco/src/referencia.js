@@ -12,7 +12,9 @@
    JSON `mecanifica.contornos@1`) ou uma forma qualquer `{ dentro(h, v), caixa }` (a linha de comando monta uma assim a
    partir de uma imagem calibrada). Coordenadas da referência: h para a direita e v para cima, em milímetro, na origem do
    esboço. Na vista frontal h é x, na lateral h é z (a frente para a direita, ao contrário da tela do esboço) e na superior h
-   é x e v é menos z (o fundo para cima). Puro e determinístico. */
+   é x e v é menos z (o fundo para cima). Vistas do mesmo objeto podem ter origens diferentes (a lateral do avião conta o z da
+   proa, 0, e o topo conta do eixo da asa, de -5062 a 5382): `deslocamento` da entrada soma esse valor, por eixo do mundo, às
+   coordenadas da referência antes de comparar. Puro e determinístico. */
 import { ErroDeEsboco, VISTAS } from './index.js';
 import { facesDaVista, preencher, profundidadeAfim } from './projecao.js';
 
@@ -70,6 +72,32 @@ export function lerContornos(json, onde = 'referência') {
   return { silhueta: formaDoContorno(json.silhueta.contornoMm, `${onde}: silhueta`), regioes, mmPorPx: Number.isFinite(json.mmPorPx) ? json.mmPorPx : null };
 }
 
+/* O deslocamento declarado (`{ x, y, z }` em mm, só os eixos que a vista mede) em (h, v) da referência: h soma o eixo
+   horizontal da vista e v o vertical, e na superior o v é menos z, de modo que somar z a uma posição subtrai de v. */
+export function deslocamentoNaVista(deslocamento, vista) {
+  const d = deslocamento ?? {};
+  const e = EIXOS_DA_VISTA[vista];
+  return [d[e.h] ?? 0, vista === 'superior' ? -(d.z ?? 0) : (d[e.v] ?? 0)];
+}
+
+function deslocarForma(f, dh, dv) {
+  const caixa = [f.caixa[0] + dh, f.caixa[1] + dv, f.caixa[2] + dh, f.caixa[3] + dv];
+  if (f.aneis) return { aneis: f.aneis.map((an) => an.map(([h, v]) => [h + dh, v + dv])), caixa };
+  return { ...f, caixa, dentro: (h, v) => f.dentro(h - dh, v - dv) };
+}
+
+/* A referência lida com todas as formas deslocadas para a origem do esboço (a mesma referência quando não há deslocamento). */
+export function deslocarReferencia(ref, deslocamento, vista) {
+  const [dh, dv] = deslocamentoNaVista(deslocamento, vista);
+  if (dh === 0 && dv === 0) return ref;
+  return { ...ref, silhueta: deslocarForma(ref.silhueta, dh, dv), regioes: Object.fromEntries(Object.entries(ref.regioes).map(([n, f]) => [n, deslocarForma(f, dh, dv)])) };
+}
+
+/* "z +5062 mm": o deslocamento em palavras, para o relato dizer em que origem a referência foi conferida. */
+export function deslocamentoEmTexto(deslocamento) {
+  return ['x', 'y', 'z'].filter((k) => Number.isFinite(deslocamento?.[k]) && deslocamento[k] !== 0).map((k) => `${k} ${deslocamento[k] >= 0 ? '+' : '-'}${mm1(Math.abs(deslocamento[k]))}`).join(', ') + ' mm';
+}
+
 /* Extensão de uma forma de referência por eixo do mundo, na vista. */
 function extensaoPorEixo(forma, vista) {
   const [h0, v0, h1, v1] = forma.caixa;
@@ -79,9 +107,11 @@ function extensaoPorEixo(forma, vista) {
 }
 
 /* As medidas da referência: a silhueta e cada região, com a faixa e o tamanho em mm de cada eixo do mundo que a vista mede,
-   e as linhas sugeridas de `plano.medidas` (origem "referencia"). `formasDa` (opcional) diz as formas de cada região. */
-export function medidasDaReferencia(ref, vista, { formasDa = {} } = {}) {
+   e as linhas sugeridas de `plano.medidas` (origem "referencia"). `formasDa` (opcional) diz as formas de cada região, e
+   `deslocamento` (opcional, o da entrada de `plano.referencia`) leva as faixas para a origem do esboço. */
+export function medidasDaReferencia(refLida, vista, { formasDa = {}, deslocamento } = {}) {
   exigirVista(vista, 'medidas da referência');
+  const ref = deslocarReferencia(refLida, deslocamento, vista);
   const linha = (nome, forma) => {
     const e = extensaoPorEixo(forma, vista);
     return { parte: nome, eixos: ['h', 'v'].map((k) => ({ eixo: e[k].eixo, nome: NOME_DO_EIXO[e[k].eixo], de: r1(e[k].faixa[0]), ate: r1(e[k].faixa[1]), tamanho: r1(e[k].faixa[1] - e[k].faixa[0]) })) };
@@ -276,9 +306,10 @@ function caixaDaTela(e, vista) {
 
 /* A sobreposição das duas silhuetas numa imagem RGBA (largura x altura, na tela do esboço: a mesma orientação das vistas da
    análise): cinza onde as duas cobrem, laranja só o esboço, azul só a referência, branco fora. */
-export function sobreposicaoDaReferencia(entrada, ref, rs) {
+export function sobreposicaoDaReferencia(entrada, refLida, rs) {
   const vista = entrada.vista;
   exigirVista(vista, `referência "${entrada.arquivo}"`);
+  const ref = deslocarReferencia(refLida, entrada.deslocamento, vista);
   const g = montarGrade(rs, vista, [ref.silhueta.caixa]);
   const r = mascaraDaReferencia(ref.silhueta, vista, g);
   const pixels = new Uint8Array(g.W * g.H * 4);
@@ -295,13 +326,18 @@ const maiorDimensao = (forma) => Math.max(forma.caixa[2] - forma.caixa[0], forma
 
 /* Confere uma entrada de `plano.referencia` contra as formas visíveis `rs` de uma opção. `ref` é a referência lida
    ({ silhueta, regioes }), `selecionar(entrada)` devolve as formas resolvidas que um id ou padrão designa (e recusa o que não
-   existe), e `tentar` é o mesmo sem recusar (vazio se nada casa). Devolve { vista, celula_mm, resultados, semParte, ok }; cada
+   existe), e `tentar` é o mesmo sem recusar (vazio se nada casa). `entrada.partes` mapeia região para formas; uma lista vazia
+   (`"partes": []`) desliga a conferência por parte e deixa só a silhueta, e uma região com lista vazia (`"parede": []`) fica
+   fora (nenhuma forma do esboço a representa, como a fuselagem do avião, que a imagem parte por watershed e a forma não
+   acompanha). `entrada.deslocamento` leva a referência à origem do esboço. Devolve { vista, celula_mm, resultados, semParte, ok }; cada
    resultado traz `parte` (nulo para a silhueta inteira), `formas`, `iou`, `desvio_mm`, `desvio_medio_mm`, os limites, `ok`,
    `caixa_esboco` e `caixa_referencia` (h0, v0, h1, v1) e `texto`. */
-export function conferirReferencia(entrada, ref, rs, { selecionar, tentar, sujeito = 'do esboço' }) {
+export function conferirReferencia(entrada, refLida, rs, { selecionar, tentar, sujeito = 'do esboço' }) {
   const vista = entrada.vista;
   exigirVista(vista, `referência "${entrada.arquivo}"`);
-  const partes = entrada.partes ?? {};
+  const ref = deslocarReferencia(refLida, entrada.deslocamento, vista);
+  const soSilhueta = Array.isArray(entrada.partes);
+  const partes = soSilhueta ? {} : (entrada.partes ?? {});
   for (const nome of Object.keys(partes)) exigir(Object.hasOwn(ref.regioes, nome), `referência "${entrada.arquivo}": "partes" cita a região "${nome}", que o arquivo não tem (regiões: ${Object.keys(ref.regioes).join(', ') || 'nenhuma'})`);
   const g = montarGrade(rs, vista, [ref.silhueta.caixa, ...Object.values(ref.regioes).map((f) => f.caixa)]);
   const indice = new Map(rs.map((r, k) => [r.id, k]));
@@ -324,7 +360,8 @@ export function conferirReferencia(entrada, ref, rs, { selecionar, tentar, sujei
   };
   comparar(null, rs.map((r) => r.id), null, ref.silhueta);
   const semParte = [];
-  for (const [nome, forma] of Object.entries(ref.regioes)) {
+  for (const [nome, forma] of soSilhueta ? [] : Object.entries(ref.regioes)) {
+    if (Object.hasOwn(partes, nome) && partes[nome].length === 0) continue;
     const escolhidas = Object.hasOwn(partes, nome)
       ? [...new Set(partes[nome].flatMap((q) => selecionar(q)))]
       : tentar(nome);
@@ -366,7 +403,7 @@ function diferencaEmLinha(d) {
 
 /* As linhas impressas pela linha de comando para uma opção. */
 export function formatarConferencia(entrada, c, { titulo } = {}) {
-  const L = [`referência ${entrada.arquivo} (vista ${c.vista}, célula de ${mm1(c.celula_mm)} mm, tolerância ${mm1(c.resultados[0].tolerancia_mm)} mm${c.resultados[0].tolerancia_declarada ? '' : ' (padrão)'}, razão interseção/união mínima ${num2(c.resultados[0].iou_min)}${c.resultados[0].iou_min_declarado ? '' : ' (padrão)'})${titulo ? `, opção ${titulo}` : ''}: ${c.ok ? 'aprovada' : 'reprovada'}`];
+  const L = [`referência ${entrada.arquivo} (vista ${c.vista}, célula de ${mm1(c.celula_mm)} mm${entrada.deslocamento ? `, referência deslocada ${deslocamentoEmTexto(entrada.deslocamento)}` : ''}, tolerância ${mm1(c.resultados[0].tolerancia_mm)} mm${c.resultados[0].tolerancia_declarada ? '' : ' (padrão)'}, razão interseção/união mínima ${num2(c.resultados[0].iou_min)}${c.resultados[0].iou_min_declarado ? '' : ' (padrão)'})${titulo ? `, opção ${titulo}` : ''}: ${c.ok ? 'aprovada' : 'reprovada'}`];
   for (const r of c.resultados) {
     L.push(`  ${r.parte === null ? 'silhueta' : `parte ${r.parte}`}: desvio ${r.desvio_mm === null ? 'sem medida' : `${mm1(r.desvio_mm)} mm (médio ${mm1(r.desvio_medio_mm)} mm)`}, razão interseção/união ${num2(r.iou)}: ${r.ok ? 'passa' : 'reprova'}${r.parte === null || (r.formas.length === 1 && r.formas[0] === r.parte) ? '' : ` [${r.formas.join(', ')}]`}${r.ok || !r.diferenca ? '' : diferencaEmLinha(r.diferenca)}`);
   }

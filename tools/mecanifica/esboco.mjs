@@ -1151,6 +1151,8 @@ export function referenciaArquivo(arquivo, referencia, { vista = null, ancoras =
   const vistaFinal = vista ?? declarada?.vista ?? vistaDoNome(referencia);
   if (!vistaFinal) throw new ErroDeEsboco(`--referencia: diga a vista que "${referencia}" mostra (--vista frontal, lateral ou superior), porque o nome do arquivo não a diz`);
   const entrada = { ...(declarada ?? {}), arquivo: referencia, vista: vistaFinal };
+  /* o deslocamento é dos eixos da vista que a entrada declara; com outra `--vista` ele não vale */
+  if (declarada && declarada.vista !== vistaFinal) delete entrada.deslocamento;
   const ancorasAbs = ancoras ? resolverCaminho(ancoras) : (declarada?.ancoras ? resolve(base, declarada.ancoras) : undefined);
   const ref = lerReferenciaDeArquivo({ arquivo: alvo, ancoras: ancorasAbs, recorte: declarada?.recorte, limiar: declarada?.limiar }, base, `referência "${referencia}"`);
   const visiveis = visiveisDoEsboco(esboco);
@@ -1183,17 +1185,19 @@ export function referenciaArquivo(arquivo, referencia, { vista = null, ancoras =
    cada parte. */
 export function medidasDaReferenciaArquivo(contorno, { vista = null, esboco = null } = {}) {
   const caminho = resolverCaminho(contorno);
-  const vistaFinal = vista ?? vistaDoNome(contorno);
+  /* a entrada de `plano.referencia` que cita o contorno dá a vista, o mapa das partes e o deslocamento de origem */
+  let declarada;
+  if (esboco) {
+    const bruto = JSON.parse(readFileSync(resolverCaminho(esboco), 'utf8'));
+    declarada = (lerPlano(bruto.plano)?.referencia ?? []).find((x) => resolve(dirname(resolverCaminho(esboco)), x.arquivo) === caminho);
+  }
+  const vistaFinal = vista ?? declarada?.vista ?? vistaDoNome(contorno);
   if (!vistaFinal) throw new ErroDeEsboco(`--medidas-da-referencia: diga a vista que "${contorno}" mostra (--vista frontal, lateral ou superior), porque o nome do arquivo não a diz`);
   if (!/\.json$/i.test(caminho)) throw new ErroDeEsboco('--medidas-da-referencia lê o JSON de contornos (as partes vêm dele); uma imagem só tem a silhueta, e a conferência dela é a --referencia');
   const ref = lerReferenciaDeArquivo({ arquivo: caminho }, process.env.INIT_CWD || process.cwd());
-  let formasDa = {};
-  if (esboco) {
-    const bruto = JSON.parse(readFileSync(resolverCaminho(esboco), 'utf8'));
-    const e = (lerPlano(bruto.plano)?.referencia ?? []).find((x) => resolve(dirname(resolverCaminho(esboco)), x.arquivo) === caminho);
-    formasDa = e?.partes ?? {};
-  }
-  const m = medidasDaReferencia(ref, vistaFinal, { formasDa });
+  /* a entrada só vale para a vista que ela declara: com outra `--vista`, o deslocamento não se aplica */
+  const vale = declarada && declarada.vista === vistaFinal;
+  const m = medidasDaReferencia(ref, vistaFinal, { formasDa: (vale && !Array.isArray(declarada.partes) ? declarada.partes : null) ?? {}, deslocamento: vale ? declarada.deslocamento : undefined });
   return { texto: formatarMedidasDaReferencia(m, { arquivo: basename(contorno) }), medidas: m };
 }
 

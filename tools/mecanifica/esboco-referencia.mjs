@@ -12,10 +12,14 @@ import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 
 const LIMIAR_PADRAO = 248;
 
-/* A vista que o nome do arquivo diz (`lateral.contornos.json`), ou null. */
+/* "topo" é como o avião e as fotos chamam a vista superior (`topo.contornos.json`). */
+const APELIDOS_DA_VISTA = { topo: 'superior' };
+
+/* A vista que o nome do arquivo diz (`lateral.contornos.json`, `topo.contornos.json`), ou null se não diz nenhuma ou diz duas. */
 export function vistaDoNome(arquivo) {
   const nome = basename(arquivo).toLowerCase();
-  return VISTAS_DA_REFERENCIA.find((v) => nome.includes(v)) ?? null;
+  const achadas = new Set([...VISTAS_DA_REFERENCIA, ...Object.keys(APELIDOS_DA_VISTA)].filter((v) => nome.includes(v)).map((v) => APELIDOS_DA_VISTA[v] ?? v));
+  return achadas.size === 1 ? [...achadas][0] : null;
 }
 
 function lerJson(caminho, onde) {

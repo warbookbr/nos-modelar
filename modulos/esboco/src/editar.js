@@ -5,6 +5,7 @@
    grava arquivo, não muda o que recebe e não valida a geometria (quem chama roda a leitura e só grava se ela resolve). */
 import { ErroDeEsboco } from './index.js';
 import { quisDizer } from './parecido.js';
+import { fontesDoArranjo } from './arranjo.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -178,12 +179,12 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
       exigir(objeto(f), 'editar: --adicionar recebe um objeto de forma (ou uma lista deles)');
       if (f.id === undefined && f.arranja !== undefined) {
         /* a entrada de arranjo (`{ "arranja": { "forma": "<id>", "modo": ... } }`) não tem id: as cópias herdam o da fonte */
-        exigir(objeto(f.arranja) && typeof f.arranja.forma === 'string' && f.arranja.forma, 'editar: o arranjo de --adicionar precisa de "arranja": { "forma": "<id>", "modo": "linear" | "radial", "total": n, ... }');
+        exigir(objeto(f.arranja) && fontesDoArranjo(f.arranja).length > 0 && fontesDoArranjo(f.arranja).every((x) => typeof x === 'string' && x), 'editar: o arranjo de --adicionar precisa de "arranja": { "forma": "<id>" (ou uma lista de ids), "modo": "linear" | "radial", "total": n, ... }');
         exigir(Object.keys(f).length === 1, `editar: a entrada de arranjo só tem o campo "arranja"; retire "${Object.keys(f).find((k) => k !== 'arranja')}"`);
         const todos = [...new Set(listas.flatMap((l) => idsDe(l.lista)))];
-        exigir(todos.includes(f.arranja.forma), `editar: --adicionar o arranjo de "${f.arranja.forma}": não há forma com esse id${quisDizer(f.arranja.forma, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
+        for (const fonte of fontesDoArranjo(f.arranja)) exigir(todos.includes(fonte), `editar: --adicionar o arranjo de "${fonte}": não há forma com esse id${quisDizer(fonte, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''})`);
         for (const { lista } of listas) acrescentar(lista, clone(f), unidade);
-        mudancas.push({ acao: 'adicionar', forma: `arranja de ${f.arranja.forma}`, arranjo: true, ...(unidade === undefined ? {} : { unidade }) });
+        mudancas.push({ acao: 'adicionar', forma: `arranja de ${fontesDoArranjo(f.arranja).join(', ')}`, arranjo: true, ...(unidade === undefined ? {} : { unidade }) });
         continue;
       }
       exigir(typeof f.id === 'string' && f.id, 'editar: a forma de --adicionar precisa de "id" (ou, num arranjo, só de "arranja")');

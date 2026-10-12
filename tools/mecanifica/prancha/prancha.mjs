@@ -209,12 +209,20 @@ function medir(spec, camadas) {
 
   for (const nome of Object.keys(spec.vistas)) {
     const daVista = camadas.filter((c) => c.vista === nome);
-    const contorno = daVista.filter((c) => c.contorno).map((c) => c.pl);
+    /* Camada de contorno com `pedaco` é outro pedaço da silhueta, fechado e
+       separado do anel principal: a frontal do avião tem a ponta da asa num
+       pedaço à parte, porque a parte fora do modelo corta a silhueta. Os pedaços
+       não se encadeiam no anel; cada um é um anel fechado a mais, e o que fica
+       dentro de qualquer deles está dentro da silhueta. */
+    const contorno = daVista.filter((c) => c.contorno && !c.pedaco).map((c) => c.pl);
+    const outrosAneis = daVista.filter((c) => c.contorno && c.pedaco).map((c) => c.pl);
     const { anel, abertos } = encadear(contorno, tol);
     const fechado = anel.length > 2
       && Math.hypot(anel[0][0] - anel[anel.length - 1][0], anel[0][1] - anel[anel.length - 1][1]) <= tol
       && abertos.length === 0;
-    const autoIntersecoes = fechado ? G.autoIntersecoes(anel) : [];
+    const aneis = fechado ? [anel, ...outrosAneis] : [];
+    const autoIntersecoes = aneis.flatMap((a) => G.autoIntersecoes(a));
+    const caixas = (fechado ? aneis : anel.length ? [anel] : []).map((a) => G.caixa(a));
 
     let fora = 0;
     const culpadas = [];
@@ -222,14 +230,14 @@ function medir(spec, camadas) {
       for (const c of daVista) {
         if (c.contorno || c.classe === 'eixo' || c.foraDoContorno) continue;
         let foraDaCamada = 0;
-        for (const p of c.pl) if (!G.dentro(p, anel)) foraDaCamada += 1;
+        for (const p of c.pl) if (!aneis.some((a) => G.dentro(p, a))) foraDaCamada += 1;
         if (foraDaCamada > 0) culpadas.push(`${c.nome ?? c.classe ?? 'camada'} (${foraDaCamada})`);
         fora += foraDaCamada;
       }
     }
 
     porVista[nome] = {
-      caixa: anel.length ? G.caixa(anel) : null,
+      caixa: caixas.length ? { xMin: Math.min(...caixas.map((b) => b.xMin)), xMax: Math.max(...caixas.map((b) => b.xMax)), yMin: Math.min(...caixas.map((b) => b.yMin)), yMax: Math.max(...caixas.map((b) => b.yMax)) } : null,
       contornoFechado: fechado,
       trechosSoltos: abertos.length,
       autoIntersecoes: autoIntersecoes.length,

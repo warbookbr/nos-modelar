@@ -56,6 +56,8 @@ export const FRASES = {
   ler: 'Ler o esboço em texto (`--descrever`), antes de gerar imagem.',
   plano: 'O plano estruturado: nível, medidas, contrato, peças e referência.',
   conferencia: 'Conferência contra a referência, por silhueta e razão de sobreposição.',
+  partes: 'Na conferência, as partes que se comparam (`partes`, inclusive vazio) e o deslocamento de origem entre vistas.',
+  comandos: 'Os comandos `--referencia` e `--medidas-da-referencia`: a vista pelo nome do arquivo, o relato e a imagem.',
   imagem: 'A imagem por achado (`--achado`), com o par em cor e o resto em cinza.',
   condutor: 'O Condutor: os estágios, o nível do plano e o Portão de cada estágio.',
   unidades: 'Unidades de detalhe: o agrupamento, `--mover`, `--replanejar`, `--feito` e os Marcos.',

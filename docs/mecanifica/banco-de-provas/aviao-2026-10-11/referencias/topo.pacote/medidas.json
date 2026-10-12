@@ -27,6 +27,10 @@
  "minimo": 0.8,
  "abaixo": [],
  "semDonoPx": 1022,
+ "buracosFechados": {
+  "buracos": 9,
+  "pixels": 11
+ },
  "divisas": [
   {
    "a": "cone",
@@ -85,7 +89,7 @@
     201,
     29,
     240,
-    68
+    72
    ]
   },
   {
