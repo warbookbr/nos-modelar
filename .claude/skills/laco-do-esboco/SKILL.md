@@ -69,8 +69,7 @@ e devolve o caminho do brief e das imagens. Então:
 
 1. Abra você mesmo as imagens da unidade e leia o texto de `--ligacoes` que o
    brief traz, antes de despachar o crítico. O brief fica gravado em `brief.md`
-   na pasta das imagens (o texto entre as marcas "brief para o crítico cego" e
-   "fim do brief"), e `--brief <unidade|marco-N|objeto>` o reimprime e o regrava
+   na pasta das imagens, e `--brief <unidade|marco-N|objeto>` o reimprime e o regrava
    quando ele já saiu da tela, como depois de o esbocista corrigir as unidades que
    o crítico do Marco apontou e antes de chamar o crítico de novo.
 2. Despache o `critico-visual` cego só com o brief e as imagens. Não mande o
