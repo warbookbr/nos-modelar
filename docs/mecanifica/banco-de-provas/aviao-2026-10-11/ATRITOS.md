@@ -53,6 +53,12 @@ mostra todos os pedaços, e o contorno guardado não aparece para ele.
 node -e "const d=require('./docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.contornos.json'); const y=d.regioes.helice.contornoMm.map(p=>p[1]); console.log('altura do contorno da hélice', Math.round(Math.max(...y)-Math.min(...y)), 'mm')"
 ```
 
+Corrigido em 2026-10-12: `segmentar` guarda todos os pedaços acima de 9 px²
+no campo `pedacos`, a prancha desenha e mede a união, e o esboço confere contra a
+união. Com os contornos refeitos, a hélice da lateral tem 2 pedaços e 1.995 mm de
+altura, e as janelas têm os 4. O comando acima passa a medir só o maior pedaço,
+como antes; a união está em `pedacos`.
+
 ## 4. A prancha só sabe ser lateral
 
 A prancha de topo sai com o rótulo "LATERAL — projeção" e com o eixo do
