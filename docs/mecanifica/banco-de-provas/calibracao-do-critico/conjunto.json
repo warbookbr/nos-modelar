@@ -1622,6 +1622,42 @@
           "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
           "imagemSha256": "sha256:f755005cf530a214524f1a4ce4f2aaf1f2c0fb6b543016891da74a919844be51",
           "data": "2026-10-12T22:57:33.490Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "uniao",
+              "onde": "trecho superior das rodas, dentro da caçamba junto às paredes laterais",
+              "sentido": "atravessando",
+              "evidencia": "isométrica: argola sobe pelo piso cinza da caçamba quase até o topo da parede distante; superior: faixas escuras coladas às paredes internas em y 237–377; lateral: só a metade inferior da roda traseira aparece, sem caixa de roda"
+            },
+            {
+              "parte": "cabine",
+              "tipo": "ausencia",
+              "onde": "faces laterais e frontal do bloco cinza",
+              "sentido": "faltando",
+              "evidencia": "isométrica, frontal e lateral: bloco maciço sem para-brisa, janela, porta ou teto distintos; nada indica entrada nem posto de condução"
+            },
+            {
+              "parte": "rodas",
+              "tipo": "ausencia",
+              "onde": "interior da argola, onde ficariam disco e cubo",
+              "sentido": "faltando",
+              "evidencia": "isométrica: fundo branco visível pelo interior da roda dianteira próxima; lateral: capô vermelho visível por dentro da argola dianteira"
+            },
+            {
+              "parte": "rodasTraseiras",
+              "tipo": "posicao",
+              "onde": "bitola traseira em relação à dianteira",
+              "sentido": "adiantada",
+              "evidencia": "frontal: rodas externas em x 300–328 e 772–800 (fora do corpo) e internas em x 340–368 e 732–760 (dentro do corpo); superior: dianteiras fora do capô, traseiras dentro das paredes da caçamba"
+            }
+          ],
+          "briefSha256": "sha256:bac5edef3dfccbab7e8194fea6b192a4cdfd73ba64967c013c8bb4024664f766",
+          "imagemSha256": "sha256:f755005cf530a214524f1a4ce4f2aaf1f2c0fb6b543016891da74a919844be51",
+          "data": "2026-10-12T22:57:44.238Z"
         }
       ]
     },
@@ -1876,6 +1912,21 @@
           "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
           "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
           "data": "2026-10-12T22:56:58.894Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "dobradicas",
+              "tipo": "posicao",
+              "onde": "as seis dobradiças, presas na face externa da lateral junto à borda frontal",
+              "sentido": "adiantada",
+              "evidencia": "Lateral: três blocos escuros sobre a face externa da lateral, perto da borda frontal (y ~207-238, 520-552, 835-866). Frontal: abas pretas que passam um pouco do contorno nos dois lados (x ~300 e ~797). Isométrica: blocos na quina da lateral direita (x ~675). Nenhuma fica escondida atrás da folha, como pede porta sobreposta. O deslocamento é transversal, para fora da lateral, e não há sentido exato para ele no vocabulário."
+            }
+          ],
+          "briefSha256": "sha256:dbed0ca4eba2e6cbf940ed7a1c6a6b2e14dac635c296268908781524dea152f8",
+          "imagemSha256": "sha256:b3ea0c0419b50d8e833f173f04d619cd4765ca69c1b56d5b0f352ade963b0ccb",
+          "data": "2026-10-12T22:57:52.113Z"
         }
       ]
     },
