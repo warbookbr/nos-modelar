@@ -1386,5 +1386,23 @@
       "nota": 7,
       "motivo": "Três defeitos estruturais seguem abertos: a cauda continua um tubo fino (15 a 20 px de largura na superior, 12 px de altura na ponta) onde se prendem estabilizadores de 184 px, agora com ponta arredondada; no corte z=640 os cantos inferiores do duto atravessam a parede do capô, com dois tracinhos no rodapé da frontal; a borda traseira da placa da porta fica cerca de 50 mm fora do casco em z=6300, e o batente sobe uns 10 px acima da placa no corte x=-770. Venezianas sem abertura legível e pás em tira com pontas truncadas. Ombro da placa, janela 4 e fim reto da cauda resolvidos."
     }
+  ],
+  "liberacoes": [
+    {
+      "ordem": 1,
+      "unidade": "marco-25",
+      "nota": 7,
+      "rodadas": 3,
+      "aposVeredito": 12,
+      "motivo": "a pessoa, 2026-10-12: pode fazer assim como você recomendou sim. Aceita com pendências: porta plana sobre flanco que se estreita (atrito 26), duto encostando na parede do capô, venezianas sem abertura, pás em tira; a cauda fica como está, já na largura da referência"
+    },
+    {
+      "ordem": 2,
+      "unidade": "fuselagem",
+      "nota": 7,
+      "rodadas": 3,
+      "aposVeredito": 12,
+      "motivo": "a pessoa, 2026-10-12: pode fazer assim como você recomendou sim. Aceita com pendências: porta plana sobre flanco que se estreita (atrito 26), duto encostando na parede do capô, venezianas sem abertura, pás em tira; a cauda fica como está, já na largura da referência"
+    }
   ]
 }
