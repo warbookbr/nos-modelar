@@ -32,6 +32,8 @@ const REGRAS = [
   { re: /^([^"]*?): o campo "[^"]*" (?:não existe|não é do componente)/, topico: (m) => TOPICO_DO_LUGAR.find(([re]) => re.test(m[1]))?.[1] ?? TOPICO_DO_CAMPO_NA_RAIZ, valores: [TOPICO_DO_CAMPO_NA_RAIZ, ...TOPICO_DO_LUGAR.map(([, t]) => t)] },
   { re: /: porta: |A porta não o justifica|"porta" deve ser|a porta não tem o campo|o papel da porta|a classe de ajuste da porta|a face da porta|declaram classes de ajuste diferentes/, topico: 'portas' },
   { re: /↔|contato\.pares|contato\.usar|"contato"|precisa dizer por que a exceção/, topico: 'contrato' },
+  { re: /^integrar:/, topico: 'detalhar' },
+  { re: /--refazer-envelope|Envelope de unidade|Envelope de uma unidade/, topico: 'envelope' },
   { re: /\bjuntas?\b/, topico: 'juntas' },
   { re: /^editar:|--editar|--remover|--adicionar/, topico: 'editar' },
   { re: /--feito|unidade de detalhe|Plano de detalhe|--mover|--replanejar/, topico: 'unidades' },

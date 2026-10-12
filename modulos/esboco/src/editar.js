@@ -145,6 +145,16 @@ export function editarEsboco(bruto, { atribuicoes = [], remover = [], adicionar 
       mudancas.push({ acao: 'editar', forma: bloco, campo: chave.slice(bloco.length + 1), antes: antes ?? null, depois: valor });
       continue;
     }
+    /* `unidades.<unidade>.<campo>`: o texto da unidade na raiz (a `funcao` que o brief do crítico imprime, `vistas`, `cor`), que
+       não começa por uma forma; a unidade ainda sem entrada em `unidades` ganha uma */
+    if (!s && chave.startsWith('unidades.')) {
+      const caminho = passos(chave, `editar: "${chave}"`);
+      exigir(caminho.length >= 3 && typeof caminho[1] === 'string', `editar: "${chave}" cita só "unidades": diga a unidade e o campo (unidades.<unidade>.<campo>=<valor>, por exemplo unidades.motor.funcao="o motor com o capô e os escapes")`);
+      esboco.unidades = objeto(esboco.unidades) ? esboco.unidades : {};
+      const antes = gravar(esboco, caminho, valor, `editar: "${chave}"`);
+      mudancas.push({ acao: 'editar', forma: 'unidades', campo: chave.slice('unidades.'.length), antes: antes ?? null, depois: valor });
+      continue;
+    }
     if (!s) {
       const id = chave.split('.')[0];
       exigir(false, `editar: "${chave}" não começa por uma forma declarada${quisDizer(id, todos)} (formas declaradas: ${todos.slice(0, 40).join(', ')}${todos.length > 40 ? `, e mais ${todos.length - 40}` : ''}); uma peça de componente (instância.parte) se muda pela instância`);

@@ -219,7 +219,7 @@ describe('item 12: `--integrar` não grava o detalhe que não cabe no Envelope',
     expect(r.gravado).toBe(false);
     expect(r.texto).toMatch(/NÃO integrada.*nada foi gravado/);
     expect(r.texto).toMatch(/não cabe/);
-    expect(r.texto).toMatch(/ajuste o detalhe.*--replanejar --motivo/);
+    expect(r.texto).toMatch(/ajuste o detalhe.*--refazer-envelope lamina --de de.json --motivo/);
     expect(readFileSync(arq, 'utf8')).toBe(antes);
     const p = spawnSync('node', [cli, arq, '--integrar', 'lamina', det], { encoding: 'utf8' });
     expect(p.status).toBe(1);

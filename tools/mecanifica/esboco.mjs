@@ -14,7 +14,7 @@ import { diferenca, formatarDescricao, formatarForma, formatarResumo, medirEsboc
 import { imagemDoAchado } from '../../modulos/esboco/src/achado.js';
 import { conferirReferenciaNaOpcao, lerPlano, textoDoPlano, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { formatarConferencia, formatarMedidasDaReferencia, medidasDaReferencia, sobreposicaoDaReferencia } from '../../modulos/esboco/src/referencia.js';
-import { UNIDADE_DO_OBJETO, avancar, conferirEnvelope, criarEstado, definirModo, formatarEnvelope, formatarSituacao, funcaoDaUnidade, gravarNotaDePassagem, LIMITE_DA_FUNCAO, liberar, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
+import { UNIDADE_DO_OBJETO, avancar, conferirEnvelope, criarEstado, definirModo, formatarEnvelope, formatarSituacao, funcaoDaUnidade, gravarNotaDePassagem, LIMITE_DA_FUNCAO, liberar, marcarFeito, registrarVeredito, unidadesNovasDoMarco, moverEmLote, moverFormas, nomeDoEstagio, planoDeDetalhe, portaoDoEstagio, refazerEnvelope, registrarEnvelope, replanejar, unidadePorNome, unidadesDoEstado } from '../../modulos/esboco/src/condutor.js';
 import { comFormasVizinhas, descricaoDasVizinhas, detalharUnidade, formasVizinhas, integrarUnidade } from '../../modulos/esboco/src/detalhe.js';
 import { editarEsboco, formatarMudancas } from '../../modulos/esboco/src/editar.js';
 import { formatarLigacoes, mapaDeLigacoes } from '../../modulos/esboco/src/mapa-de-ligacoes.js';
@@ -641,6 +641,15 @@ export function condutorArquivo(arquivo, acao = {}) {
     estado = moverEmLote(bruto, estado, movimentos);
     const feitas = estado.alteracoes.length - antes;
     extra = `${feitas} ${feitas === 1 ? 'forma movida' : 'formas movidas'} em ${movimentos.length} ${movimentos.length === 1 ? 'movimento' : 'movimentos'}\n`;
+  } else if (acao.refazerEnvelope !== undefined) {
+    /* o Envelope de uma só unidade, das formas do mestre ou do detalhado dela; o motivo e as caixas ficam no histórico */
+    const detalhado = acao.de === undefined ? null : JSON.parse(readFileSync(resolverCaminho(acao.de), 'utf8'));
+    const antes = estado.unidades?.find((x) => x.id === unidadePorNome(estado.unidades ?? [], acao.refazerEnvelope));
+    estado = refazerEnvelope(bruto, estado, acao.refazerEnvelope, { motivo: acao.motivo, detalhado, arquivo: acao.de === undefined ? null : basename(acao.de) });
+    const a = estado.alteracoes[estado.alteracoes.length - 1];
+    const v = (x) => String(x).replace('.', ',');
+    const eixos = (c) => ['x', 'y', 'z'].map((e) => `${e} ${v(c[e][0])}..${v(c[e][1])}`).join(' ');
+    extra = `Envelope da unidade ${a.unidade} refeito ${a.de}, e registrado no histórico do Condutor (--condutor --historico)\n${a.mudou ? `caixa: ${antes?.envelope ? `${eixos(antes.envelope.caixa)} -> ` : ''}${eixos(a.depois)}\nA conferência anterior deixou de valer: rode --integrar ${a.unidade} <arquivo-detalhado> ou --envelope ${a.unidade} <arquivo-detalhado>\n` : 'o Envelope já era esse; nada mudou\n'}`;
   } else if (acao.replanejar) {
     estado = replanejar(bruto, estado, { motivo: acao.motivo });
     const novas = estado.alteracoes[estado.alteracoes.length - 1].novas ?? [];
@@ -686,7 +695,7 @@ export function integrarArquivo(arquivo, unidade, detalhado) {
   const r = integrarUnidade(bruto, estado, unidade, JSON.parse(readFileSync(resolverCaminho(detalhado), 'utf8')), { arquivo: basename(detalhado) });
   /* o detalhe que não cabe no Envelope não é gravado: o mestre e o estado ficam como estavam */
   if (r.envelope && !r.envelope.ok) {
-    return { texto: `unidade ${unidade} NÃO integrada em ${basename(caminho)}: o detalhe não cabe no Envelope, e nada foi gravado (o esboço e o estado do Condutor ficaram como estavam)\n${formatarEnvelope(r.envelope, basename(detalhado))}caminhos: ajuste o detalhe para caber no Envelope e integre de novo; ou, se o Envelope da maquete é que precisa mudar, rode --condutor --replanejar --motivo <texto> antes (o Envelope é recalculado a partir das formas do mestre) e integre depois\n`, resultado: r, gravado: false };
+    return { texto: `unidade ${unidade} NÃO integrada em ${basename(caminho)}: o detalhe não cabe no Envelope, e nada foi gravado (o esboço e o estado do Condutor ficaram como estavam)\n${formatarEnvelope(r.envelope, basename(detalhado))}caminhos: ajuste o detalhe para caber no Envelope e integre de novo; ou, se a maquete é que estava errada, refaça o Envelope só desta unidade com --condutor --refazer-envelope ${unidade} --de ${basename(detalhado)} --motivo <texto> (o motivo e as caixas de antes e depois ficam no histórico do Condutor) e integre depois\n`, resultado: r, gravado: false };
   }
   writeFileSync(caminho, serializarComoOriginal(r.mestre, texto));
   if (r.estado) writeFileSync(memoria, `${JSON.stringify(r.estado, null, 2)}\n`);
@@ -694,6 +703,19 @@ export function integrarArquivo(arquivo, unidade, detalhado) {
   if (r.devolvidos.length > 0) L.push(`devolvido ao mestre (editado no detalhado): ${r.devolvidos.join('; ')}`);
   const { pares, juntas, pecas } = r.removidos;
   if (pares + juntas + pecas > 0) L.push(`removido do contato por citar formas que saíram: ${pares} ${pares === 1 ? 'par' : 'pares'}, ${juntas} ${juntas === 1 ? 'junta' : 'juntas'}, ${pecas} ${pecas === 1 ? 'peça' : 'peças'} de junta`);
+  const p = r.parametros;
+  const v = (x) => JSON.stringify(x);
+  if (p.alterados.length > 0) L.push(`parâmetros que o detalhado reescreveu e valem agora no mestre: ${p.alterados.map((a) => `${a.nome} ${v(a.de)} -> ${v(a.para)}`).join('; ')}`);
+  if (p.novos.length > 0) L.push(`parâmetros novos do detalhado: ${p.novos.join(', ')}`);
+  if (r.pontos.alterados.length > 0) L.push(`pontos que o detalhado reescreveu e valem agora no mestre: ${r.pontos.alterados.map((a) => `${a.nome} ${v(a.de)} -> ${v(a.para)}`).join('; ')}`);
+  if (r.pontos.novos.length > 0) L.push(`pontos novos do detalhado: ${r.pontos.novos.join(', ')}`);
+  if (p.retirados.length > 0) L.push(`parâmetros retirados do mestre (só a unidade os usava e o detalhado deixou de usá-los): ${p.retirados.map((a) => `${a.nome} (${v(a.valor)})`).join(', ')}`);
+  if (p.semUso.length > 0) L.push(`parâmetros sem uso no mestre (já estavam assim; retire com --editar <mestre> parametros.<nome>=null): ${p.semUso.slice(0, 12).join(', ')}${p.semUso.length > 12 ? `, e mais ${p.semUso.length - 12}` : ''}`);
+  if (r.apagados.juntas.length > 0) L.push(`juntas que o detalhado apagou e saíram do mestre: ${r.apagados.juntas.join('; ')}`);
+  if (r.apagados.pares.length > 0) L.push(`pares que o detalhado apagou e saíram do mestre: ${r.apagados.pares.join('; ')}`);
+  if (r.contrato.tirados.length > 0) L.push(`plano.contrato do mestre, pares tirados (o detalhado declara os dele): ${r.contrato.tirados.join('; ')}`);
+  if (r.contrato.postos.length > 0) L.push(`plano.contrato do mestre, pares postos pelo detalhado: ${r.contrato.postos.join('; ')}`);
+  for (const a of r.avisos) L.push(`aviso: ${a}`);
   L.push(r.estado ? 'o estado do Condutor foi mantido (a unidade continua onde estava)' : `sem estado do Condutor (${basename(memoria)}): só o esboço foi regravado`);
   return { texto: `${L.join('\n')}\n${r.envelope ? formatarEnvelope(r.envelope, basename(detalhado)) : ''}`, resultado: r, gravado: true };
 }
@@ -1314,7 +1336,7 @@ export function ajustarArquivo(arquivo) {
 }
 
 /* Flags que levam um valor (`--forma garfoE` ou `--forma=garfoE`); o resto é booleano. `--condutor` leva o arquivo. */
-const FLAGS_COM_VALOR = ['--ajuda', '--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--composicoes', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief'];
+const FLAGS_COM_VALOR = ['--ajuda', '--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--refazer-envelope', '--de', '--composicoes', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief'];
 /* `--envelope <unidade> <arquivo-detalhado.esboco.json>` e `--integrar <unidade> <arquivo-detalhado>` levam dois valores, e `--detalhar <unidade> [arquivo]` leva o segundo se vier. */
 const FLAGS_COM_DOIS = ['--envelope', '--detalhar', '--integrar'];
 
@@ -1371,11 +1393,12 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto>]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--brief <unidade|marco-N|objeto> [--largura <px>] [--saida <pasta>] [--sem-vizinhos]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json|receita.js> [--composicoes <módulo-do-registro>]] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto> | --refazer-envelope <unidade> --motivo <texto> [--de <detalhado.esboco.json>]]] [--detalhar <unidade> [arquivo]] [--medidas] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--brief <unidade|marco-N|objeto> [--largura <px>] [--saida <pasta>] [--sem-vizinhos]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json|receita.js> [--composicoes <módulo-do-registro>]] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
-    for (const f of ['--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    for (const f of ['--refazer-envelope', '--de', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    if (args.tem('--de') && !args.tem('--refazer-envelope')) throw new ErroDeEsboco('--de só vale junto de --refazer-envelope (--refazer-envelope <unidade> --de <detalhado.esboco.json> --motivo <texto>).');
     if (args.tem('--integrar') && (args.valor('--integrar') === undefined || args.valor('--integrar', 1) === undefined)) throw new ErroDeEsboco('--integrar precisa da unidade e do arquivo detalhado (--integrar <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--envelope') && (args.valor('--envelope') === undefined || args.valor('--envelope', 1) === undefined)) throw new ErroDeEsboco('--envelope precisa da unidade e do arquivo detalhado (--envelope <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--referencia')) {
@@ -1429,7 +1452,7 @@ async function principal(argv) {
       if (foraDoEnvelope) process.stdout.write(`${dica('envelope')}\n`);
       return foraDoEnvelope ? 1 : 0;
     }
-    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar', '--modo', '--nota-de-passagem'].some((f) => args.tem(f))) {
+    if (args.tem('--condutor') || args.tem('--envelope') || ['--proximo', '--feito', '--veredito', '--liberar', '--mover', '--mover-lote', '--replanejar', '--refazer-envelope', '--modo', '--nota-de-passagem'].some((f) => args.tem(f))) {
       /* o detalhe que é uma receita (.js ou .mjs) é conferido pelo verificador do REFINA em vez do Envelope do esboço */
       let envelope;
       if (args.tem('--envelope')) {
@@ -1441,7 +1464,7 @@ async function principal(argv) {
           envelope.resultado = await envelopeDaReceitaArquivo({ bruto: JSON.parse(readFileSync(caminho, 'utf8')), estado: estadoGravado, unidade: envelope.unidade, caminhoDaReceita: resolverCaminho(envelope.arquivo), composicoes: args.valor('--composicoes') ?? null });
         }
       }
-      const r = condutorArquivo(alvo, { envelope, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
+      const r = condutorArquivo(alvo, { envelope, proximo: args.tem('--proximo'), feito: args.valor('--feito'), veredito: args.valor('--veredito'), liberar: args.valor('--liberar'), nota: args.valor('--nota'), tokens: args.valor('--tokens') !== undefined ? Number(args.valor('--tokens')) : undefined, mover: args.valor('--mover'), moverLote: args.valor('--mover-lote'), historico: args.tem('--historico'), para: args.valor('--para'), motivo: args.valor('--motivo'), replanejar: args.tem('--replanejar'), refazerEnvelope: args.valor('--refazer-envelope'), de: args.valor('--de'), modo: args.valor('--modo'), notaDePassagem: args.valor('--nota-de-passagem'), texto: args.valor('--texto') });
       process.stdout.write(r.texto);
       process.stdout.write(dicaDoCondutor(r, args));
       if (r.criticoDe) process.stdout.write((await briefDoCritico(alvo, r.criticoDe, { largura: lerLargura(args.valor('--largura')), saida: args.valor('--saida') ?? null, forcar: r.refeita, vizinhos: !args.tem('--sem-vizinhos') })).texto);
