@@ -6,6 +6,7 @@ import { CORES_NOMEADAS, ErroDeEsboco } from './index.js';
 import { quisDizer } from './parecido.js';
 import { lerPorta } from './portas.js';
 import { lerFormaDeFamilia } from './familia.js';
+import { validarCurso } from './curso.js';
 
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const EIXOS = ['x', 'y', 'z'];
@@ -27,8 +28,8 @@ export const CAMPOS_POR_TIPO = {
 };
 export const TIPOS_DE_FORMA = Object.keys(CAMPOS_POR_TIPO);
 const NUMERICOS = ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'diametroTopo', 'raioCurva', 'opacidade'];
-export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico', 'modulos', 'corte', 'previa', 'enquadrar', 'baseDoMestre'];
-export const CAMPOS_DA_OPCAO = ['id', 'titulo', 'nota', 'formas', 'legendas', 'explosao', 'parametros', 'pontos', 'contato', 'ocultar', 'linhasCentro', 'medidas'];
+export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico', 'modulos', 'corte', 'previa', 'enquadrar', 'baseDoMestre', 'curso'];
+export const CAMPOS_DA_OPCAO = ['id', 'titulo', 'nota', 'formas', 'legendas', 'explosao', 'parametros', 'pontos', 'contato', 'ocultar', 'linhasCentro', 'medidas', 'giros'];
 export const CAMPOS_DO_CONTATO = ['usar', 'tolerancia', 'penetracao', 'folga', 'pares', 'juntas', 'projecao'];
 const CAMPOS_DA_PROJECAO = ['limiar', 'reprova', 'folgaMinima', 'maximo'];
 const CAMPOS_DO_PAR = ['a', 'b', 'tipo', 'max', 'motivo', 'herdado', 'implicito', 'junta'];
@@ -96,6 +97,7 @@ export function validarEsquema(esboco) {
   camposValidos(esboco, CAMPOS_DA_RAIZ, 'esboço');
   if (objeto(esboco.explosao)) { camposValidos(esboco.explosao, CAMPOS_DA_EXPLOSAO, 'esboço: explosao'); if (esboco.explosao.eixo !== undefined) conjunto(esboco.explosao.eixo, EIXOS, 'esboço: explosao', 'eixo'); }
   validarContato(esboco.contato, 'esboço');
+  validarCurso(esboco);
   if (Array.isArray(esboco.formas)) esboco.formas.forEach((f, i) => validarForma(f, `esboço, forma ${i + 1}`));
   if (!Array.isArray(esboco.opcoes)) return;
   esboco.opcoes.forEach((o, i) => {
