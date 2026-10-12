@@ -1,5 +1,5 @@
 {
-  "vista": "topo",
+ "vista": "topo",
  "cotas": [
   {
    "parte": "cone",
@@ -115,26 +115,26 @@
   {
    "parte": "parabrisa",
    "medida": "largura",
-   "em": 1720,
+   "em": 1700,
    "numero": [
-    607,
-    40
+    306,
+    -170
    ]
   },
   {
    "parte": "parabrisa",
    "medida": "altura",
-   "em": -340,
+   "em": -378,
    "numero": [
-    640,
-    -200
+    158,
+    -120
    ]
   },
   {
    "parte": "janelas",
    "medida": "largura",
    "medivel": false,
-   "motivo": "só a faixa na curva do costado",
+   "motivo": "a linha cruzaria a fuselagem",
    "notaEm": [
     -6400,
     2300
@@ -143,7 +143,14 @@
   {
    "parte": "janelas",
    "medida": "altura",
-   "em": 640,
+   "de": [
+    640,
+    800
+   ],
+   "ate": [
+    640,
+    1484
+   ],
    "numero": [
     610,
     208
@@ -389,8 +396,8 @@
   },
   "parabrisa": {
    "marca": [
-    -408,
-    1350
+    -450,
+    1500
    ],
    "coluna": "esquerda",
    "nivel": 1400

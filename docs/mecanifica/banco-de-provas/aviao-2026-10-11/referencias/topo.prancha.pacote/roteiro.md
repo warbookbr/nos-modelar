@@ -33,8 +33,8 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 5 — parabrisa
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 1206. A linha atravessa a seção que o modelador precisa, dentro de parabrisa?
-- comprimento: cota 658. A linha mede parabrisa de ponta a ponta na vertical, sem pegar parte vizinha?
+- largura: cota 1211. A linha atravessa a seção que o modelador precisa, dentro de parabrisa?
+- comprimento: cota 679. A linha mede parabrisa de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "parabrisa" fica na coluna da esquerda. A chamada termina dentro de parabrisa, e não numa vizinha?
 - linhas livres: a chamada e as cotas de parabrisa não cruzam outra linha nem passam sobre número ou nome?
 
@@ -112,9 +112,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 15 — janelas
 
-- cotas esperadas: largura (não medível: só a faixa na curva do costado) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: EM FALTA: só há a nota "só a faixa na curva do costado", que não dá número. A linha atravessa a seção que o modelador precisa, dentro de janelas?
-- comprimento: cota 2553. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
+- cotas esperadas: largura (não medível: a linha cruzaria a fuselagem) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- largura: EM FALTA: só há a nota "a linha cruzaria a fuselagem", que não dá número. A linha atravessa a seção que o modelador precisa, dentro de janelas?
+- comprimento: cota 684. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "janelas" fica na coluna da direita. A chamada termina dentro de janelas, e não numa vizinha?
 - linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?
 

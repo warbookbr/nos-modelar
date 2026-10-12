@@ -83,15 +83,15 @@
 <path class="cota" d="M 541.09 303.48 L 541.09 188.38"/>
 <text x="680.22" y="286.15" class="cotat" text-anchor="middle">1737 (lateral)</text>
 <path class="cota" stroke-dasharray="2 2" d="M 541.09 245.93 L 635.56 277.35"/>
-<path class="cota" d="M 523.44 354.41 L 603.37 354.41"/>
-<text x="603.62" y="351.76" class="cotat" text-anchor="middle">1206</text>
-<path class="cota" stroke-dasharray="2 2" d="M 563.4 354.41 L 590.86 353.96"/>
-<path class="cota" d="M 538.44 382.8 L 538.44 339.24"/>
-<text x="580.84" y="374.27" class="cotat" text-anchor="middle">658</text>
-<path class="cota" stroke-dasharray="2 2" d="M 538.44 361.02 L 571.27 365.47"/>
-<path class="cota" d="M 603.37 539.21 L 603.37 370.07"/>
-<text x="643.78" y="440.86" class="cotat" text-anchor="middle">2553</text>
-<path class="cota" stroke-dasharray="2 2" d="M 603.37 454.64 L 631.02 443.06"/>
+<path class="cota" d="M 523.11 355.74 L 603.37 355.74"/>
+<text x="583.51" y="367" class="cotat" text-anchor="middle">1211</text>
+<path class="cota" stroke-dasharray="2 2" d="M 563.24 355.74 L 570.75 358.2"/>
+<path class="cota" d="M 535.92 384.2 L 535.92 339.24"/>
+<text x="546.39" y="369.67" class="cotat" text-anchor="middle">679</text>
+<path class="cota" stroke-dasharray="2 2" d="M 535.92 361.72 L 536.82 361.72"/>
+<path class="cota" d="M 603.37 415.37 L 603.37 370.05"/>
+<text x="643.78" y="378.93" class="cotat" text-anchor="middle">684</text>
+<path class="cota" stroke-dasharray="2 2" d="M 603.37 392.71 L 634.21 381.13"/>
 <path class="cota" d="M 507.42 468.37 L 611.08 468.37"/>
 <text x="559.25" y="462.37" class="cotat" text-anchor="middle">1564</text>
 <path class="cota" d="M 560.3 819.41 L 560.3 583.15"/>
@@ -155,7 +155,7 @@
 <path class="cota" stroke-dasharray="2 2" d="M 666.97 793.1 L 677.28 827.56"/>
 <text x="136.93" y="292.8" class="cotat" font-style="italic">heliceEsq comprimento: pá vista no passo</text>
 <text x="733.23" y="312.67" class="cotat" font-style="italic">heliceDir comprimento: pá vista no passo</text>
-<text x="136.93" y="315.99" class="cotat" font-style="italic">janelas largura: só a faixa na curva do costado</text>
+<text x="136.93" y="315.99" class="cotat" font-style="italic">janelas largura: a linha cruzaria a fuselagem</text>
 <text x="136.93" y="362.37" class="cotat" font-style="italic">fuselagem comprimento: a junta com o capô não aparece</text>
 <text x="136.93" y="339.18" class="cotat" font-style="italic">deriva largura: de topo é um traço de 5 px</text>
 <circle class="lm" cx="945.78" cy="472.35" r="2.6"/>
@@ -209,9 +209,9 @@
 <circle class="lm" cx="604.03" cy="397.02" r="2.6"/>
 <text class="lmt" x="1001" y="325.86">janelas</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 604.03 397.02 L 1001 327.76"/>
-<circle class="lm" cx="533.93" cy="378.93" r="2.6"/>
+<circle class="lm" cx="531.15" cy="368.99" r="2.6"/>
 <text class="lmt" x="119" y="378.62" text-anchor="end">parabrisa</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 533.93 378.93 L 119 378.93"/>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 531.15 368.99 L 119 371.02"/>
 <circle class="lm" cx="696.79" cy="794.35" r="2.6"/>
 <text class="lmt" x="1001" y="797.35">profundorDir</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 696.79 794.35 L 1001 794.35"/>
