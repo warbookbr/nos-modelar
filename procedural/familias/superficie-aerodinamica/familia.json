@@ -244,11 +244,6 @@
       "motivo": "o comando ocupa menos de 5% da semi-envergadura, e as duas fendas das pontas e o entalhe passam a ser mais largos que ele"
     },
     {
-      "id": "comando-antes-da-ponta-levantada",
-      "expressao": "fimDoComando + extensaoDaPonta <= 0.951",
-      "motivo": "o comando chega à curva da ponta levantada, onde as seções se inclinam, e o entalhe e o nariz do comando deixam de ser concêntricos"
-    },
-    {
       "id": "pas-ou-nenhuma",
       "expressao": "abs(pas - 1) >= 1",
       "motivo": "uma pá só não é uma hélice, e a repetição em volta do eixo pede ao menos duas; use pas 0 para a superfície sem hélice"

@@ -52,6 +52,9 @@ export const INTERVALOS_NO_COMANDO = 3;
 /* a tampa da ponta: a espessura da seção vezes o cosseno destes ângulos, e a última seção é a corda */
 export const ANGULOS_DA_TAMPA = Object.freeze([30, 55, 75]);
 export const FRACAO_DA_TAMPA_NA_SEMI = 0.03;
+/* o piso da tampa: numa ponta de corda curta (a pá, a asa de 200 mm) a meia espessura da ponta daria seções a micrômetros uma da outra, de
+   faces menores que a tolerância de normal do adaptador (2 vezes a área abaixo de 1e-12 m2), e a bancada recusaria o ponto mínimo */
+export const FRACAO_MINIMA_DA_TAMPA_NA_SEMI = 0.004;
 /* a raiz e as pontas do comando fecham numa corda a esta distância da última seção cheia, em metro */
 export const ESPESSURA_DA_TAMPA = 1e-4;
 export const FRACAO_DO_CORTE_NA_ENVERGADURA = 0.0004;
@@ -76,8 +79,14 @@ export function mapear(orientacao, [x, y, z]) {
 
 /* ---------- o perfil ---------- */
 
-/** As estações de corda do perfil: `n + 1` abscissas de 0 a 1, mais fechadas nos dois bordos (a distribuição em cosseno). */
-export const estacoesDeCorda = (n = PONTOS_POR_FACE) => Array.from({ length: n + 1 }, (_, i) => 0.5 * (1 - Math.cos((Math.PI * i) / n)));
+/* O expoente que fecha as estações no bordo de ataque. Com a distribuição em cosseno pura (expoente 1) o primeiro ponto de cada
+   face fica a 0,7% da corda e o contorno vira ali 42 graus no perfil da asa e 60 no do estabilizador de 10%, o bordo de ataque agudo
+   que o crítico apontou no avião; com 1,6 o giro do nariz cai a 7 e 11 graus e o maior giro do contorno fora do bordo de fuga a 17 e
+   20, com os mesmos 40 pontos por seção que cabem no bloco de 1000 vértices do `loft`. */
+export const EXPOENTE_DAS_ESTACOES = 1.6;
+
+/** As estações de corda do perfil: `n + 1` abscissas de 0 a 1, em cosseno com o expoente acima, mais fechadas no bordo de ataque que no de fuga. */
+export const estacoesDeCorda = (n = PONTOS_POR_FACE) => Array.from({ length: n + 1 }, (_, i) => 0.5 * (1 - Math.cos(Math.PI * (i / n) ** EXPOENTE_DAS_ESTACOES)));
 
 /** A linha de curvatura NACA, em fração da corda, na abscissa `x`. */
 export function linhaDeCurvatura(x, curvatura, posicao) {
@@ -114,7 +123,7 @@ export function plantaDa({
   pontaLevantada, extensaoDaPonta, bordoDeFuga,
 }) {
   const metadeDaPonta = 0.5 * espessuraNaPonta * cordaNaPonta;
-  const comprimentoDaTampa = Math.min(metadeDaPonta, FRACAO_DA_TAMPA_NA_SEMI * semi);
+  const comprimentoDaTampa = Math.min(Math.max(metadeDaPonta, FRACAO_MINIMA_DA_TAMPA_NA_SEMI * semi), FRACAO_DA_TAMPA_NA_SEMI * semi);
   const xDoCorte = semi - comprimentoDaTampa;
   const xDaCurva = xDoCorte - extensaoDaPonta * semi;
   const xDoDegrau = FRACAO_DO_DEGRAU_DA_RAIZ * semi;
