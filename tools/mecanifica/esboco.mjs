@@ -715,6 +715,8 @@ export function integrarArquivo(arquivo, unidade, detalhado) {
   if (r.apagados.pares.length > 0) L.push(`pares que o detalhado apagou e saíram do mestre: ${r.apagados.pares.join('; ')}`);
   if (r.contrato.tirados.length > 0) L.push(`plano.contrato do mestre, pares tirados (o detalhado declara os dele): ${r.contrato.tirados.join('; ')}`);
   if (r.contrato.postos.length > 0) L.push(`plano.contrato do mestre, pares postos pelo detalhado: ${r.contrato.postos.join('; ')}`);
+  if (!r.base.presente) L.push('aviso: o detalhado não traz a base do mestre (baseDoMestre, que o --detalhar grava; este é de antes dela): o que o mestre ganhou depois da cópia pode ser apagado ou não reposto; refaça o --detalhar para integrar só o que você mudou');
+  else if (r.base.mudouDesde.length > 0) L.push(`aviso: o mestre mudou desde o --detalhar (${r.base.mudouDesde.join('; ')}): o que entrou nele depois da cópia ficou, e só o que o detalhado mudou sobre a base foi levado`);
   for (const a of r.avisos) L.push(`aviso: ${a}`);
   L.push(r.estado ? 'o estado do Condutor foi mantido (a unidade continua onde estava)' : `sem estado do Condutor (${basename(memoria)}): só o esboço foi regravado`);
   return { texto: `${L.join('\n')}\n${r.envelope ? formatarEnvelope(r.envelope, basename(detalhado)) : ''}`, resultado: r, gravado: true };

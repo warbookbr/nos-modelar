@@ -244,6 +244,7 @@ export function expandirEsboco(esboco) {
   const estilos = lerEstilos(esboco);
   delete saida.estilos;
   delete saida.unidades;
+  delete saida.baseDoMestre;
   delete saida.simetrico;
   if (esboco.contato !== undefined) saida.contato = numerosDoContato(esboco.contato, raiz.num, 'esboço');
   if (esboco.explosao !== undefined) saida.explosao = numerosDaExplosao(esboco.explosao, raiz.num, 'esboço');

@@ -195,9 +195,10 @@ describe('atrito 37: a junta que o detalhe apagou', () => {
     expect(r.apagados.juntas).toEqual([]);
   });
 
-  it('a junta nova entra se cita uma forma nova da unidade; a entre formas que já existiam e o mestre não tem não volta', () => {
+  it('sem a base (detalhe de antes dela), a junta nova entra se cita uma forma nova da unidade; a entre formas que já existiam não volta', () => {
     const m = mestre();
     const d = detalheDoPe(m, (x) => {
+      delete x.baseDoMestre;
       emFormas(x, (fs) => fs.push(caixa('sapata', [0, 5, 0], 60, 10, 60, { unidade: 'pe' })));
       x.contato.juntas.push({ pecas: ['sapata', 'chao'], max: 8, motivo: 'a sapata entra no chão neste teste' });
       x.contato.juntas.push({ pecas: ['perna', 'corpo'], max: 8, motivo: 'a junta que o mestre tirou depois da cópia' });
@@ -218,6 +219,91 @@ describe('atrito 37: a junta que o detalhe apagou', () => {
     const r2 = integrarUnidade(m, null, 'pe', trocada);
     expect(r2.removidos.pares).toBe(1);
     expect(r2.mestre.contato.pares.every((p) => p.a !== 'perna' && p.b !== 'perna')).toBe(true);
+  });
+});
+
+describe('a base do mestre que o --detalhar grava no detalhe', () => {
+  const juntas = (m) => m.contato.juntas.map((j) => j.pecas.join('+'));
+  const tocam = (m) => m.plano.contrato.tocam.map((p) => p.join('+'));
+  /* o que o mestre ganha entre o --detalhar e o --integrar: uma junta que cita a perna, o altPe, a funcao e um par do plano */
+  const mestreMudado = () => {
+    const m = editarEsboco(mestre(), { atribuicoes: ['parametros.altPe=120', 'unidades.pe.funcao=a função que o mestre ganhou'] }).esboco;
+    m.contato.juntas.push({ pecas: ['perna', 'corpo'], max: 9, motivo: 'junta que o mestre ganhou depois da cópia' });
+    m.plano.contrato.tocam.push(['corpo', 'chao']);
+    return m;
+  };
+  /* o que a pessoa faz no detalhe: tira a junta perna+chao e o par perna+chao do plano, e muda larguraPe */
+  const edicaoDaPessoa = (x) => {
+    x.contato.juntas = x.contato.juntas.filter((j) => j.pecas[0] !== 'perna');
+    x.parametros.larguraPe = 44;
+    x.plano = { ...x.plano, contrato: { tocam: [['corpo', 'perna']] } };
+  };
+
+  it('o --detalhar grava a base da unidade, o esquema a aceita e a ida e volta sem mudança não altera o mestre', () => {
+    const d = detalheDoPe();
+    expect(d.baseDoMestre).toMatchObject({ unidade: 'pe', funcao: 'a perna do pé', parametros: { altPe: 100 } });
+    expect(d.baseDoMestre.contato.raiz.juntas).toHaveLength(2);
+    expect(d.baseDoMestre.plano.tocam).toEqual([['perna', 'chao'], ['corpo', 'perna']]);
+    expect(() => expandirEsboco(d)).not.toThrow();
+    const r = integrarUnidade(mestre(), null, 'pe', d);
+    expect(r.mestre).toEqual(mestre());
+    expect(r.base).toEqual({ presente: true, mudouDesde: [] });
+  });
+
+  it('com o mestre mudando entre o --detalhar e o --integrar, só se apaga o que estava na base e o detalhe tirou', () => {
+    const d = detalheDoPe(mestre(), edicaoDaPessoa);
+    const r = integrarUnidade(mestreMudado(), null, 'pe', d);
+    /* a pessoa tirou perna+chao e a junta do mestre depois da cópia (perna+corpo) fica */
+    expect(juntas(r.mestre)).toEqual(['corpo+chao', 'perna+corpo']);
+    expect(r.apagados.juntas).toEqual(['perna + chao']);
+    /* o altPe que o mestre mudou fica (o detalhe tinha o da cópia), e o larguraPe que a pessoa mudou entra */
+    expect(r.mestre.parametros.altPe).toBe(120);
+    expect(r.mestre.parametros.larguraPe).toBe(44);
+    expect(r.parametros.alterados.map((a) => a.nome)).toEqual(['larguraPe']);
+    /* a funcao que o mestre ganhou fica, o par do plano que o mestre ganhou fica, e o que a lista da pessoa tirou sai */
+    expect(r.mestre.unidades.pe.funcao).toBe('a função que o mestre ganhou');
+    expect(tocam(r.mestre)).toEqual(['corpo+perna', 'corpo+chao']);
+    expect(r.contrato.tirados).toEqual(['tocam perna + chao']);
+    /* a saída diz que o mestre mudou desde a cópia */
+    expect(r.base.presente).toBe(true);
+    expect(r.base.mudouDesde).toEqual(expect.arrayContaining([expect.stringMatching(/^parâmetros \(altPe\)/), 'juntas do contato', 'plano.contrato.tocam', 'funcao da unidade']));
+  });
+
+  it('o mesmo cenário sem a base mostra o risco que ela fecha: a junta, o altPe e a funcao do mestre se perdem', () => {
+    const d = detalheDoPe(mestre(), edicaoDaPessoa);
+    delete d.baseDoMestre;
+    d.unidades.pe.funcao = 'a função da cópia, reescrita pela pessoa';
+    const r = integrarUnidade(mestreMudado(), null, 'pe', d);
+    expect(r.base.presente).toBe(false);
+    expect(juntas(r.mestre)).toEqual(['corpo+chao']);
+    expect(r.mestre.parametros.altPe).toBe(100);
+  });
+
+  it('a base de outra unidade vale como ausente, e o parâmetro que a pessoa muda e outra unidade usa continua recusado', () => {
+    const d = detalheDoPe();
+    d.baseDoMestre.unidade = 'corpo';
+    expect(integrarUnidade(mestre(), null, 'pe', d).base.presente).toBe(false);
+    const compartilhado = detalheDoPe(mestre(), (x) => { x.parametros.comum = 60; });
+    expect(() => integrarUnidade(mestre(), null, 'pe', compartilhado)).toThrow(/também é usado por chao/);
+  });
+
+  it('pela linha de comando: o --detalhar grava a base e o --integrar avisa que o mestre mudou; o detalhe sem base avisa que é antigo', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'integracao-'));
+    const arq = join(dir, 'pe.esboco.json');
+    writeFileSync(arq, `${JSON.stringify(mestre(), null, 2)}\n`);
+    const d = detalharArquivo(arq, 'pe');
+    expect(JSON.parse(readFileSync(d.destino, 'utf8')).baseDoMestre.unidade).toBe('pe');
+    editarArquivo(arq, { atribuicoes: ['parametros.altPe=120'] });
+    editarArquivo(d.destino, { atribuicoes: ['parametros.larguraPe=44'] });
+    const r = integrarArquivo(arq, 'pe', d.destino);
+    const depois = JSON.parse(readFileSync(arq, 'utf8'));
+    expect(depois.parametros.altPe).toBe(120);
+    expect(depois.parametros.larguraPe).toBe(44);
+    expect(r.texto).toMatch(/aviso: o mestre mudou desde o --detalhar \(parâmetros \(altPe\)\)/);
+    const antigo = JSON.parse(readFileSync(d.destino, 'utf8'));
+    delete antigo.baseDoMestre;
+    writeFileSync(d.destino, JSON.stringify(antigo));
+    expect(integrarArquivo(arq, 'pe', d.destino).texto).toMatch(/aviso: o detalhado não traz a base do mestre/);
   });
 });
 
