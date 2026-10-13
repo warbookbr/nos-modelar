@@ -1091,6 +1091,12 @@
       "unidade": "empenagem-horizontal",
       "nota": 8,
       "motivo": "Planta, diedro, silhueta lateral e proporção do profundor batem com a referência; fresta, eixo, suportes e ressalto da ponta no lugar, sem ponta no ar. Detalhe: a referência superior mostra uma placa clara na borda de fuga junto à raiz, de cada lado do cone (compensador), que o modelo não tem."
+    },
+    {
+      "ordem": 6,
+      "unidade": "marco-75",
+      "nota": 8,
+      "motivo": "Conjunto fiel à referência nas três vistas; empenagem horizontal sem achado. Superfície, nas asas, persistentes: ponta levantada em bloco de corda constante com ombro reto, contra ponta que afina e sobe em curva; suportes do bordo de fuga em placas retangulares que param antes dele, contra carenagens afiladas que o passam; bordo de ataque tracejado só na asa direita, sem explicação."
     }
   ]
 }
