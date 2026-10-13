@@ -386,6 +386,79 @@ describe('a referência no brief', () => {
     expect(d.texto).toContain('superior: a imagem de "ref.contornos.json" não foi achada');
   }, 240000);
 
+  /* o defeito do avião: a referência lateral tem a proa à esquerda (o z cresce para a direita) e a vista `lateral` do esboço a põe
+     à direita; a frontal mostra a proa e a vista `frontal` olha da cauda. O crítico comparava com a vista de mesmo nome. */
+  it('a referência lateral, com a proa do lado oposto ao da vista lateral, é posta junto da lateral-oposta, e o texto manda comparar com ela', async () => {
+    const { pasta, arquivo } = comReferencia({ vista: 'lateral' });
+    const b = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'c') });
+    /* a vista lateral põe a proa à direita e a lateral-oposta à esquerda, que é onde a referência a tem */
+    expect(b.texto).toContain('lateral: olha de +x e vê o lado direito; a proa (-z) fica à direita da imagem');
+    expect(b.texto).toContain('lateral-oposta: olha de -x e vê o lado esquerdo; a proa (-z) fica à esquerda da imagem');
+    expect(b.texto).toContain('    compare com a vista lateral-oposta do esboço (olha de -x e vê o lado esquerdo; a proa (-z) fica à esquerda da imagem); na referência lateral o eixo z cresce para a direita, e a vista lateral o põe para a esquerda. A vista lateral olha do lado contrário e não é a desta imagem');
+    expect(b.texto).not.toContain('na orientação da vista de mesmo nome');
+    /* a unidade não pedia a lateral-oposta: o brief a junta, na pasta e no texto, depois das quatro */
+    expect(b.destinos).toHaveLength(5);
+    const oposta = join(pasta, 'c', 'g-unidade-fila-lateral-oposta.png');
+    expect(existsSync(oposta)).toBe(true);
+    expect(b.texto).toContain(`Imagens a mais para a referência (a unidade não as pede em "vistas"; são as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):\n  lateral-oposta: ${oposta}`);
+    expect(b.texto).not.toContain('Imagens a mais, de lados que as quatro não olham');
+    /* o par vem antes do texto que o cita só no sentido de estar no brief: a linha dos lados também o descreve */
+    expect(b.texto.indexOf('  lateral-oposta: olha de -x')).toBeGreaterThan(b.texto.indexOf('De que lado cada vista olha'));
+  }, 180000);
+
+  it('a referência frontal mostra a frente do objeto: a unidade ganha a frontal-oposta, que olha da proa, e não se compara com a frontal, que olha da cauda', async () => {
+    const { pasta, arquivo } = comReferencia({ vista: 'frontal' });
+    const b = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'c') });
+    expect(b.texto).toContain('frontal: olha de +z e vê a cauda');
+    expect(b.texto).toContain('    compare com a vista frontal-oposta do esboço (olha de -z e vê a proa; a proa (-z) fica voltada para o olho;');
+    expect(b.texto).toContain('a referência frontal é a imagem da frente do objeto (a proa, em -z). A vista frontal olha do lado contrário e não é a desta imagem');
+    expect(existsSync(join(pasta, 'c', 'g-unidade-fila-frontal-oposta.png'))).toBe(true);
+  }, 180000);
+
+  it('a unidade que já pede a vista oposta não ganha a imagem de novo, e a referência superior não pede vista nenhuma', async () => {
+    const e = objeto({ unidades: { fila: { funcao: 'fileira de caixas encostadas que faz o corpo do objeto', vistas: ['lateral-oposta'] }, base: { funcao: 'chão largo sob a fileira' } } });
+    const { pasta, arquivo } = gravar(e, { aoLado: (p) => referenciaDeTeste(p), final: { ...e, plano: { ...e.plano, referencia: [entrada({ vista: 'lateral' })] } } });
+    const b = await briefDoCritico(arquivo, 'fila', { saida: join(pasta, 'c') });
+    expect(b.destinos).toHaveLength(5);
+    expect(b.texto).toContain('Imagens a mais, de lados que as quatro não olham');
+    expect(b.texto).not.toContain('Imagens a mais para a referência');
+    expect(b.texto).toContain('compare com a vista lateral-oposta do esboço');
+    const topo = comReferencia();
+    const t = await briefDoCritico(topo.arquivo, 'fila', { saida: join(topo.pasta, 'c') });
+    expect(t.destinos).toHaveLength(4);
+    expect(t.texto).toContain('    compare com a vista superior do esboço (olha de +y e vê o lado de cima; a proa (-z) fica em cima da imagem; o lado direito (+x) fica à direita da imagem)');
+    expect(t.texto).not.toContain('olha do lado contrário');
+  }, 240000);
+
+  it('o brief do objeto traz a vista de mesmo olho que a referência, na escala do objeto inteiro', async () => {
+    const { pasta, arquivo } = comReferencia({ vista: 'lateral' });
+    const o = await briefDoObjeto(arquivo, { saida: join(pasta, 'o') });
+    expect(o.gerais).toHaveLength(4);
+    expect(o.geraisDaReferencia).toEqual([join(pasta, 'o', 'g-objeto-lateral-oposta.png')]);
+    expect(existsSync(o.geraisDaReferencia[0])).toBe(true);
+    expect(o.texto).toContain(`Imagens a mais para a referência (as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):\n  lateral-oposta: ${o.geraisDaReferencia[0]}`);
+    expect(o.texto).toContain('    compare com a vista lateral-oposta do esboço (olha de -x e vê o lado esquerdo');
+    expect(o.texto).toContain('  lateral-oposta: olha de -x e vê o lado esquerdo; a proa (-z) fica à esquerda da imagem');
+    const sem = comReferencia();
+    const s = await briefDoObjeto(sem.arquivo, { saida: join(sem.pasta, 'o') });
+    expect(s.geraisDaReferencia).toEqual([]);
+    expect(s.texto).not.toContain('Imagens a mais para a referência');
+  }, 240000);
+
+  it('o brief do Marco também: a lateral-oposta geral vem depois das quatro vistas gerais, e o texto manda comparar com ela', async () => {
+    const e = objeto();
+    const { pasta, arquivo } = gravar(e, { final: { ...e, plano: { ...e.plano, referencia: [entrada({ vista: 'lateral' })] } } });
+    referenciaDeTeste(pasta);
+    for (const u of ['fila', 'ponta']) condutorArquivo(arquivo, { feito: u });
+    const limiar = JSON.parse(readFileSync(`${arquivo}.condutor.json`, 'utf8')).marcos[0].limiar;
+    const m = await briefArquivo(arquivo, `marco-${limiar}`, { saida: join(pasta, 'marco') });
+    expect(m.gerais).toHaveLength(4);
+    expect(m.geraisDaReferencia).toEqual([join(pasta, 'marco', `g-marco-${limiar}-lateral-oposta.png`)]);
+    expect(existsSync(m.geraisDaReferencia[0])).toBe(true);
+    expect(m.texto).toContain('Imagens gerais a mais para a referência');
+    expect(m.texto).toContain('    compare com a vista lateral-oposta do esboço (olha de -x e vê o lado esquerdo');
+  }, 240000);
+
   it('sem `plano.referencia` o brief não ganha bloco nem arquivo de referência', () => {
     const { pasta, arquivo } = gravar(objeto());
     const r = referenciaDoBrief({ bruto: JSON.parse(readFileSync(arquivo, 'utf8')), base: pasta, pasta });

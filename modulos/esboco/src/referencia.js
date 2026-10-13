@@ -33,6 +33,9 @@ const TOTAL_DO_EIXO = { x: 'larguraTotal', y: 'alturaTotal', z: 'profundidadeTot
 /* (h, v) da referência para (u, w) da tela do esboço; cada um é o seu próprio inverso. */
 const TELA = { frontal: (a, b) => [a, -b], lateral: (a, b) => [-a, -b], superior: (a, b) => [a, -b] };
 
+/* A vista oposta (a de outros lados) de cada vista da referência que tem uma. */
+const OPOSTA = { frontal: 'frontal-oposta', lateral: 'lateral-oposta' };
+
 const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const exigir = (cond, msg) => { if (!cond) throw new ErroDeEsboco(msg); };
 const r1 = (x) => Math.round(x * 10) / 10;
@@ -43,6 +46,26 @@ const normalizar = (v) => { const n = Math.hypot(...v) || 1; return v.map((c) =>
 
 export function exigirVista(vista, onde) {
   exigir(VISTAS_DA_REFERENCIA.includes(vista), `${onde}: a vista ${JSON.stringify(vista)} não serve à referência (válidas: ${VISTAS_DA_REFERENCIA.join(', ')}; a isométrica não tem escala única)`);
+}
+
+/* A vista do esboço que olha do mesmo lado que a imagem da referência de uma entrada (`vista` é a que a entrada declara,
+   `orientacao` o `plano.orientacao` lido, ou null): { vista, oposta, motivo }. A imagem tem o h para a direita e o v para cima,
+   e a conferência a leva à tela da vista de mesmo nome por `TELA`. Quando essa passagem inverte o h, a imagem é a da vista
+   oposta e não a de mesmo nome: na lateral o h é z, a tela da lateral põe z para a esquerda (a proa de um objeto com a frente
+   em -z fica à direita) e a imagem a põe à esquerda, que é a `lateral-oposta`. A frontal não se decide pela passagem, que
+   serve aos dois lados e por isso só confere a silhueta: a referência frontal é a imagem da frente do objeto (no avião, a proa
+   com a hélice), e o olho dela é o do lado da frente de `plano.orientacao`, em z; com a frente em -z é a `frontal-oposta`
+   (a `frontal` olha de +z e vê a cauda). Sem orientação em z vale a passagem. A superior não inverte nada (olha de +y). A
+   isométrica não é vista de referência. Puro. */
+export function vistaDoMesmoOlho(vista, orientacao = null) {
+  exigirVista(vista, 'vista da referência');
+  const oposta = OPOSTA[vista];
+  if (vista === 'frontal' && (orientacao?.frente === '+z' || orientacao?.frente === '-z')) {
+    const daFrente = orientacao.frente === '-z';
+    return { vista: daFrente ? oposta : vista, oposta: daFrente, motivo: `a referência frontal é a imagem da frente do objeto (${orientacao.nomeDaFrente}, em ${orientacao.frente})` };
+  }
+  const espelhada = oposta !== undefined && TELA[vista](1, 0)[0] < 0;
+  return { vista: espelhada ? oposta : vista, oposta: espelhada, motivo: espelhada ? `na referência ${vista} o eixo ${EIXOS_DA_VISTA[vista].h} cresce para a direita, e a vista ${vista} o põe para a esquerda` : '' };
 }
 
 /* Uma forma de referência a partir de um contorno fechado em mm: { aneis: [[[h, v], ...]], caixa: [h0, v0, h1, v1] }. */

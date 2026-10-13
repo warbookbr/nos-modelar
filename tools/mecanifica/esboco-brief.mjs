@@ -8,6 +8,8 @@ import { dirname, extname, isAbsolute, join, resolve } from 'node:path';
 import { PNG } from 'pngjs';
 import { VISTAS_TODAS } from '../../modulos/esboco/src/index.js';
 import { lerPlano } from '../../modulos/esboco/src/plano.js';
+import { linhaDaVista } from '../../modulos/esboco/src/lados.js';
+import { vistaDoMesmoOlho } from '../../modulos/esboco/src/referencia.js';
 
 export const MARCA_DO_BRIEF = '--- brief para o crítico cego ---';
 export const FIM_DO_BRIEF = '--- fim do brief ---';
@@ -129,6 +131,23 @@ function entradasDaReferencia(bruto) {
   return (lerPlano(bruto?.plano)?.referencia ?? []).filter((e) => e.opcoes === undefined || e.opcoes.some((q) => q === 1 || q === titulo));
 }
 
+/* As vistas de outros lados que as referências do plano pedem para ter par: a vista de mesmo olho que cada imagem (ver
+   `vistaDoMesmoOlho`), quando não é uma das quatro de sempre, sem repetir. Cada brief as junta às imagens que desenha (as da
+   unidade, ou as do objeto inteiro), para o crítico comparar a referência com a vista que olha do lado dela sem inferir nada. */
+export function vistasDaReferencia(bruto) {
+  const orientacao = orientacaoDoEsboco(bruto);
+  return [...new Set(entradasDaReferencia(bruto).map((e) => vistaDoMesmoOlho(e.vista, orientacao)).filter((o) => o.oposta).map((o) => o.vista))];
+}
+
+/* A linha que diz com qual vista do esboço a imagem se compara: a de mesmo olho que ela, com o que essa vista vê e onde caem os
+   eixos, e, quando não é a de mesmo nome, que a de mesmo nome olha do lado contrário. */
+function linhaDeComparacao(entrada, orientacao) {
+  const o = vistaDoMesmoOlho(entrada.vista, orientacao);
+  const descricao = linhaDaVista(o.vista, orientacao).slice(o.vista.length + 2);
+  if (!o.oposta) return `    compare com a vista ${o.vista} do esboço (${descricao})`;
+  return `    compare com a vista ${o.vista} do esboço (${descricao}); ${o.motivo}. A vista ${entrada.vista} olha do lado contrário e não é a desta imagem`;
+}
+
 /* A referência no brief: para cada entrada de `plano.referencia`, a imagem (a do PNG declarado, ou a que o JSON de contornos
    veio de ler) inteira, ou recortada em torno da unidade quando há `caixa` (a caixa da unidade em mm do mundo) e o contorno
    permite calibrar. Grava os recortes em `pasta` como `referencia-<vista><sufixo>.png`. Devolve { linhas, arquivos } (linhas
@@ -137,7 +156,8 @@ export function referenciaDoBrief({ bruto, base, pasta, caixa = null, sufixo = '
   const entradas = entradasDaReferencia(bruto);
   if (entradas.length === 0) return { linhas: [], arquivos: [] };
   const aqui = (c) => (isAbsolute(c) ? c : resolve(base, c));
-  const linhas = [`Referência (o alvo da forma: a imagem que a pessoa escolheu, de outra escala e sem a divisão em unidades; cada uma está na orientação da vista de mesmo nome do esboço). Onde a vista concorda com ela, o que parece estranho na imagem é a forma pedida e não defeito; aponte onde a silhueta ou a proporção se afastam dela${caixa ? ' (as imagens estão recortadas em torno da unidade, com a margem de sempre, e ampliadas)' : ''}:`];
+  const orientacao = orientacaoDoEsboco(bruto);
+  const linhas = [`Referência (o alvo da forma: a imagem que a pessoa escolheu, de outra escala e sem a divisão em unidades; cada uma está na orientação da vista do esboço que a linha dela manda comparar, a que olha do mesmo lado que a imagem, e que não é sempre a de mesmo nome). Onde a vista concorda com ela, o que parece estranho na imagem é a forma pedida e não defeito; aponte onde a silhueta ou a proporção se afastam dela${caixa ? ' (as imagens estão recortadas em torno da unidade, com a margem de sempre, e ampliadas)' : ''}:`];
   const arquivos = [];
   for (const e of entradas) {
     const caminho = aqui(e.arquivo);
@@ -153,6 +173,7 @@ export function referenciaDoBrief({ bruto, base, pasta, caixa = null, sufixo = '
       }
     }
     if (png === null) { linhas.push(`  ${e.vista}: a imagem de "${e.arquivo}" não foi achada (declare o PNG em plano.referencia.arquivo, ou ponha o PNG ao lado do contorno ou em uma pasta referencias)`); continue; }
+    const compara = linhaDeComparacao(e, orientacao);
     if (caixa && calibracao && e.recorte === undefined) {
       const lida = PNG.sync.read(readFileSync(png));
       const px = caixaNaImagem({ caixa, vista: e.vista, calibracao, deslocamento: e.deslocamento ?? {}, largura: lida.width, altura: lida.height });
@@ -160,7 +181,7 @@ export function referenciaDoBrief({ bruto, base, pasta, caixa = null, sufixo = '
         const f = fatorDoRecorte(px[2] - px[0] + 1, px[3] - px[1] + 1);
         const destino = join(pasta, `referencia-${e.vista}${sufixo}.png`);
         writeFileSync(destino, PNG.sync.write(recortarPng(lida, px, f)));
-        linhas.push(`  ${e.vista}, recortada em torno da unidade: ${destino}`);
+        linhas.push(`  ${e.vista}, recortada em torno da unidade: ${destino}`, compara);
         arquivos.push(destino);
         continue;
       }
@@ -171,11 +192,11 @@ export function referenciaDoBrief({ bruto, base, pasta, caixa = null, sufixo = '
       const r = [Math.max(0, e.recorte[0]), Math.max(0, e.recorte[1]), Math.min(lida.width - 1, e.recorte[2]), Math.min(lida.height - 1, e.recorte[3])];
       const destino = join(pasta, `referencia-${e.vista}${sufixo}.png`);
       writeFileSync(destino, PNG.sync.write(recortarPng(lida, r, 1)));
-      linhas.push(`  ${e.vista}, recortada na área declarada em plano.referencia: ${destino}`);
+      linhas.push(`  ${e.vista}, recortada na área declarada em plano.referencia: ${destino}`, compara);
       arquivos.push(destino);
       continue;
     }
-    linhas.push(`  ${e.vista}, inteira: ${png}`);
+    linhas.push(`  ${e.vista}, inteira: ${png}`, compara);
     arquivos.push(png);
   }
   return { linhas, arquivos };

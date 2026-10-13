@@ -5,10 +5,10 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
-import { ErroDeEsboco } from '../src/index.js';
+import { ErroDeEsboco, VISTAS_TODAS } from '../src/index.js';
 import { expandirEsboco } from '../src/expandir.js';
 import { conferirReferenciaNaOpcao, lerPlano, visiveisDoEsboco } from '../src/plano.js';
-import { formatarConferencia, formatarMedidasDaReferencia, lerContornos, medidasDaReferencia, sobreposicaoDaReferencia } from '../src/referencia.js';
+import { EIXOS_DA_VISTA, formatarConferencia, formatarMedidasDaReferencia, lerContornos, medidasDaReferencia, sobreposicaoDaReferencia, vistaDoMesmoOlho } from '../src/referencia.js';
 import { formatarResumo, medirEsboco } from '../src/descrever.js';
 import { avancar, criarEstado, portaoDoEstagio, registrarVeredito } from '../src/condutor.js';
 import { lerArgumentos, medidasDaReferenciaArquivo, referenciaArquivo } from '../../../tools/mecanifica/esboco.mjs';
@@ -492,5 +492,40 @@ describe('--medidas-da-referencia deduz a vista do nome do arquivo como --refere
     const e = join(dir, 'm.esboco.json');
     writeFileSync(e, JSON.stringify(esboco({ referencia: { arquivo: 'planta.json', vista: 'superior' } })));
     expect(medidasDaReferenciaArquivo(f, { esboco: e }).medidas.vista).toBe('superior');
+  });
+});
+
+/* A vista do esboço com o mesmo olho que a imagem da referência (o brief do crítico compara a imagem com ela, e não com a de
+   mesmo nome): medida pela projeção, ponto a ponto, e não pelo nome. */
+describe('vistaDoMesmoOlho', () => {
+  const pontos = [[0, 0, 0], [10, 0, 0], [0, 20, 0], [0, 0, 30], [10, 20, 30], [-7, 5, 11]];
+  const tela = (vista, ponto) => VISTAS_TODAS[vista].p(ponto).map((c) => c + 0);
+  /* a imagem da referência em (h, -v) na tela, com h e v os eixos que `EIXOS_DA_VISTA` diz (na superior o v é menos z) */
+  const daImagem = (vista, [x, y, z]) => {
+    const m = { x, y, z };
+    const e = EIXOS_DA_VISTA[vista];
+    return [m[e.h], -(vista === 'superior' ? -m.z : m[e.v])].map((c) => c + 0);
+  };
+
+  it.each([['lateral', null, 'lateral-oposta'], ['lateral', { frente: '-z' }, 'lateral-oposta'], ['lateral', { frente: '+z' }, 'lateral-oposta'], ['superior', null, 'superior'], ['superior', { frente: '-z' }, 'superior'], ['frontal', null, 'frontal'], ['frontal', { frente: '+x' }, 'frontal']])('a imagem %s (orientação %j) projeta como a vista %s, ponto a ponto', (vista, orientacao, esperada) => {
+    const o = vistaDoMesmoOlho(vista, orientacao);
+    expect(o.vista).toBe(esperada);
+    expect(o.oposta).toBe(esperada !== vista);
+    for (const q of pontos) expect(tela(o.vista, q), `${vista} em ${q}`).toEqual(daImagem(vista, q));
+    if (o.oposta) for (const q of pontos.filter((p) => p[2] !== 0)) expect(tela(vista, q), `a vista ${vista} não é a da imagem`).not.toEqual(daImagem(vista, q));
+  });
+
+  it('a referência frontal é a da frente do objeto: o olho da vista escolhida fica do lado da frente, e a frontal de sempre olha da cauda quando a frente é -z', () => {
+    for (const frente of ['+z', '-z']) {
+      const o = vistaDoMesmoOlho('frontal', { frente, nomeDaFrente: 'a proa' });
+      const sinal = frente === '+z' ? 1 : -1;
+      expect(VISTAS_TODAS[o.vista].olho).toEqual([0, 0, sinal]);
+      expect(o.vista).toBe(frente === '+z' ? 'frontal' : 'frontal-oposta');
+      expect(o.motivo === '').toBe(false);
+    }
+  });
+
+  it('a isométrica não é vista de referência', () => {
+    expect(() => vistaDoMesmoOlho('isometrica', null)).toThrow(ErroDeEsboco);
   });
 });

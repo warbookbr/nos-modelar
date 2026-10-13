@@ -30,7 +30,7 @@ import { registrarUso } from './uso.mjs';
 import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
 import { blocagemDoEsboco, desenharVistaDaBlocagem } from './esboco-blocagem.mjs';
-import { FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, orientacaoDoEsboco, referenciaDoBrief, vistasDaUnidade } from './esboco-brief.mjs';
+import { FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, orientacaoDoEsboco, referenciaDoBrief, vistasDaReferencia, vistasDaUnidade } from './esboco-brief.mjs';
 import { aplicarPose, nomeDaPose, numeroDoCurso, posesDoBrief } from '../../modulos/esboco/src/curso.js';
 import { cursosDaUnidade, formatarCurso, quadroDoCurso, varrerCurso } from '../../modulos/esboco/src/curso-varredura.js';
 
@@ -1039,16 +1039,20 @@ async function posesDoCursoNoBrief(arquivo, bruto, unidade, { largura, pasta, vi
    despacha o crítico precisava rodar o `--feito` de novo para tê-lo). Além das quatro vistas entram as de outros lados que a
    unidade pede em `unidades.<id>.vistas` (a frontal-oposta, a lateral-oposta, a inferior): o brief diz de que lado cada vista
    olha, e uma face voltada para -z, -x ou -y só aparece nelas. A referência do `plano.referencia`, recortada em torno da
-   unidade, entra quando o plano a declara. */
+   unidade, entra quando o plano a declara, e com ela a vista que olha do mesmo lado que cada imagem (a lateral-oposta para a
+   lateral, a frontal-oposta para a frontal de um objeto com a frente em -z), mesmo que a unidade não a peça em `vistas`. */
 export async function briefDoCritico(arquivo, unidade, { largura = null, saida = null, forcar = false, vizinhos = true } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   const estado = estadoGravado(caminho);
   const pasta = saida ?? `${caminho.replace(/(\.esboco)?\.json$/i, '')}-critico-${unidade.replace(/[^A-Za-z0-9_-]+/g, '-')}`;
   const extras = vistasDaUnidade(bruto, idDaUnidade(bruto, estado, unidade));
-  const r = await unidadeArquivo(arquivo, unidade, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, forcar, vizinhos, vistas: [...VISTAS_DA_ANALISE, ...extras] });
+  /* a vista que olha do mesmo lado que cada referência (a lateral-oposta, a frontal-oposta) entra mesmo quando a unidade não a pede */
+  const daReferencia = vistasDaReferencia(bruto).filter((v) => !extras.includes(v));
+  const r = await unidadeArquivo(arquivo, unidade, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, forcar, vizinhos, vistas: [...VISTAS_DA_ANALISE, ...extras, ...daReferencia] });
   const quatro = r.destinos.slice(0, VISTAS_DA_ANALISE.length);
-  const aMais = r.destinos.slice(VISTAS_DA_ANALISE.length);
+  const aMais = r.destinos.slice(VISTAS_DA_ANALISE.length, VISTAS_DA_ANALISE.length + extras.length);
+  const paraReferencia = r.destinos.slice(VISTAS_DA_ANALISE.length + extras.length);
   const funcao = funcaoDaUnidade(bruto, r.unidade.id);
   const pastaAbs = resolverCaminho(pasta);
   const referencia = referenciaDoBrief({ bruto, base: dirname(caminho), pasta: pastaAbs, caixa: caixaDaUnidade(bruto, estado, r.unidade.id), sufixo: `-${r.unidade.id.replace(/[^A-Za-z0-9_-]+/g, '-')}` });
@@ -1064,6 +1068,10 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
     L.push('Imagens a mais, de lados que as quatro não olham (a unidade as pede em "vistas"; as quatro de cima seguem como estão):');
     aMais.forEach((d, k) => L.push(`  ${extras[k]}: ${d}`));
   }
+  if (paraReferencia.length > 0) {
+    L.push('Imagens a mais para a referência (a unidade não as pede em "vistas"; são as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):');
+    paraReferencia.forEach((d, k) => L.push(`  ${daReferencia[k]}: ${d}`));
+  }
   const poses = await posesDoCursoNoBrief(arquivo, bruto, r.unidade, { largura, pasta, vizinhos });
   L.push(...poses.linhas);
   if (r.vizinhosDescritos.length > 0) {
@@ -1071,7 +1079,7 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
     for (const v of r.vizinhosDescritos) L.push(`  ${v.id}${v.rotulo ? ` (${v.rotulo})` : ''}: unidade ${v.unidade}${v.funcao ? `, função: ${v.funcao}` : ''}`);
   }
   L.push(...referencia.linhas);
-  L.push(...ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto), extras }));
+  L.push(...ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto), extras: [...extras, ...daReferencia] }));
   L.push('Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:');
   for (const linha of ligacoesArquivo(arquivo, { unidade: r.unidade.id }).texto.trimEnd().split('\n').slice(1)) L.push(`  ${linha}`);
   L.push('Responda, olhando só as imagens:');
@@ -1105,13 +1113,16 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   const base = join(pasta, basename(caminho.replace(/(\.esboco)?\.json$/i, '')));
   const geral = expandirEsboco(bruto);
   const gerais = [];
+  /* as vistas que olham do mesmo lado que cada referência (a lateral-oposta, a frontal-oposta) vêm depois das quatro */
+  const daReferencia = vistasDaReferencia(bruto);
+  const geraisDaReferencia = [];
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
-    for (const v of VISTAS_DA_ANALISE) {
+    for (const v of [...VISTAS_DA_ANALISE, ...daReferencia]) {
       const r = desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
       const destino = `${base}-marco-${limiar}-${v}.png`;
       await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
-      gerais.push(destino);
+      (VISTAS_DA_ANALISE.includes(v) ? gerais : geraisDaReferencia).push(destino);
     }
   } finally {
     await navegador.close();
@@ -1125,8 +1136,12 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   L.push(...linhasDoAnterior(vereditoAnterior(arquivo, `marco-${limiar}`), ''));
   L.push('Imagens gerais do objeto (as quatro vistas, sem legenda):');
   for (const d of gerais) L.push(`  ${d}`);
+  if (geraisDaReferencia.length > 0) {
+    L.push('Imagens gerais a mais para a referência (as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):');
+    geraisDaReferencia.forEach((d, k) => L.push(`  ${daReferencia[k]}: ${d}`));
+  }
   L.push(...referencia.linhas);
-  L.push(...ladosDasVistas({ orientacao }));
+  L.push(...ladosDasVistas({ orientacao, extras: daReferencia }));
   const unidades = [];
   for (const id of novas) {
     const extras = vistasDaUnidade(bruto, id);
@@ -1152,7 +1167,7 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   L.push(...linhasDasPerguntas(PERGUNTAS_DO_MARCO, perguntasDoEsboco(bruto).todas));
   L.push(FIM_DO_BRIEF);
   const arquivoDoBrief = gravarBrief(pasta, L);
-  return { texto: `${L.join('\n')}\n`, gerais, unidades, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
+  return { texto: `${L.join('\n')}\n`, gerais, geraisDaReferencia, unidades, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
 }
 
 /* As perguntas do crítico do objeto inteiro, no nível sem Detalhe por unidade: as da unidade, ditas do objeto. */
@@ -1167,9 +1182,9 @@ export const PERGUNTAS_DO_OBJETO = [
 /* As quatro vistas do objeto inteiro como o brief do objeto as desenha (sem legenda nem linha de centro, com a camada quando o
    motor é o `webgl`), ainda sem navegador: [{ vista, r }], `r` o resultado de `desenharEsboco`. O conjunto de calibração do
    crítico confere o desenho por aqui. */
-export function desenhosDoObjeto(bruto) {
+export function desenhosDoObjeto(bruto, vistasAMais = []) {
   const geral = expandirEsboco(bruto);
-  return VISTAS_DA_ANALISE.map((vista) => ({
+  return [...VISTAS_DA_ANALISE, ...vistasAMais].map((vista) => ({
     vista,
     r: desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista, legendas: false, centros: false }), OPCOES_DA_CAMADA),
   }));
@@ -1182,10 +1197,10 @@ export function objetoDoEsboco(bruto) {
 }
 
 /* O texto do brief do crítico do objeto, sem desenhar nada: `objeto` (título e nota), `anterior` (as linhas do veredito
-   anterior), `imagens` (os caminhos das quatro vistas) e `perguntas` de forma além das cinco fixas. `referencia` (as linhas da
+   anterior), `imagens` (os caminhos das quatro vistas) e `perguntas` de forma além das cinco fixas. `imagensAMais` (as vistas de mesmo olho que a referência, "<vista>: <caminho>") entram depois delas, `referencia` (as linhas da
    referência) e `lados` (de que lado cada vista olha) entram depois das imagens, e `gravadoEm` diz onde o texto também fica
    gravado; sem eles o brief é o de antes, byte a byte (o conjunto de calibração do crítico o monta assim). */
-export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, perguntas = [], referencia = [], lados = [], gravadoEm = null }) {
+export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, imagensAMais = [], perguntas = [], referencia = [], lados = [], gravadoEm = null }) {
   const L = ['crítico do objeto: o nível deste esboço não tem Detalhe por unidade, e a conclusão espera o veredito do crítico sobre o objeto inteiro.'];
   L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito ${UNIDADE_DO_OBJETO} --nota <0-10> --motivo <o que ele apontou> e rode --proximo de novo.`);
   if (gravadoEm) L.push(`O texto entre as marcas também fica em ${gravadoEm}; --brief ${UNIDADE_DO_OBJETO} o imprime e o regrava.`);
@@ -1194,6 +1209,7 @@ export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, pergunta
   L.push(...anterior);
   L.push('Imagens do objeto (as quatro vistas, sem legenda):');
   for (const d of imagens) L.push(`  ${d}`);
+  if (imagensAMais.length > 0) L.push('Imagens a mais para a referência (as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):', ...imagensAMais.map((d) => `  ${d}`));
   L.push(...referencia);
   L.push(...lados);
   L.push('Responda, olhando só as imagens:');
@@ -1212,12 +1228,14 @@ export async function briefDoObjeto(arquivo, { largura = null, saida = null } = 
   mkdirSync(pasta, { recursive: true });
   const base = join(pasta, basename(caminho.replace(/(\.esboco)?\.json$/i, '')));
   const gerais = [];
+  const daReferencia = vistasDaReferencia(bruto);
+  const geraisDaReferencia = [];
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
-    for (const { vista, r } of desenhosDoObjeto(bruto)) {
+    for (const { vista, r } of desenhosDoObjeto(bruto, daReferencia)) {
       const destino = `${base}-objeto-${vista}.png`;
       await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
-      gerais.push(destino);
+      (VISTAS_DA_ANALISE.includes(vista) ? gerais : geraisDaReferencia).push(destino);
     }
   } finally {
     await navegador.close();
@@ -1225,10 +1243,11 @@ export async function briefDoObjeto(arquivo, { largura = null, saida = null } = 
   const referencia = referenciaDoBrief({ bruto, base: dirname(caminho), pasta });
   const L = linhasDoBriefDoObjeto({
     objeto: objetoDoEsboco(bruto), anterior: linhasDoAnterior(vereditoAnterior(arquivo, UNIDADE_DO_OBJETO), ''), imagens: gerais, perguntas: perguntasDoEsboco(bruto).todas,
-    referencia: referencia.linhas, lados: ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto) }), gravadoEm: join(pasta, 'brief.md'),
+    imagensAMais: geraisDaReferencia.map((d, k) => `${daReferencia[k]}: ${d}`),
+    referencia: referencia.linhas, lados: ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto), extras: daReferencia }), gravadoEm: join(pasta, 'brief.md'),
   });
   const arquivoDoBrief = gravarBrief(pasta, L);
-  return { texto: `${L.join('\n')}\n`, gerais, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
+  return { texto: `${L.join('\n')}\n`, gerais, geraisDaReferencia, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
 }
 
 /* `--brief <unidade|marco-N|objeto>`: reimprime e regrava (`brief.md` na pasta das imagens, as imagens pelo hash) o brief do
