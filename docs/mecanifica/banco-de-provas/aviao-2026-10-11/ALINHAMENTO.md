@@ -107,4 +107,8 @@ e de cada Marco: [fuselagem](esboco-r2/aviao-critico-fuselagem/brief.md),
 [marco-50](esboco-r2/aviao-critico-marco-50/brief.md),
 [asas](esboco-r2/aviao-critico-asas/brief.md),
 [empenagem-horizontal](esboco-r2/aviao-critico-empenagem-horizontal/brief.md),
-[marco-75](esboco-r2/aviao-critico-marco-75/brief.md).
+[marco-75](esboco-r2/aviao-critico-marco-75/brief.md),
+[empenagem-vertical](esboco-r2/aviao-critico-empenagem-vertical/brief.md),
+[trem-do-nariz](esboco-r2/aviao-critico-trem-do-nariz/brief.md),
+[trens-principais](esboco-r2/aviao-critico-trens-principais/brief.md),
+[marco-100](esboco-r2/aviao-critico-marco-100/brief.md).
