@@ -1,0 +1,37 @@
+{
+ "por": "a pessoa, 2026-10-13: 1 sim, vamos com a leitura A. 2 aceitamos",
+ "quando": "2026-10-13T11:59:45.812Z",
+ "rodada": 2,
+ "nota": 8,
+ "defeitos": [
+  {
+   "parte": "aileronEsq",
+   "tipo": "comprimento",
+   "onde": "extremidade interna (fronteira com o flap, etapas 8 e 9)",
+   "sentido": "menor",
+   "evidencia": "Prancha, asa esquerda: o aileron termina em x≈234 e o flap segue até x≈486. No alvo, a linha de painel está em x≈130, que corresponde a x≈359 na prancha, e o aileron deveria ir da ponta até ela. A fronteira da prancha cai nas marcas ovais do alvo, em x≈72."
+  },
+  {
+   "parte": "aileronDir",
+   "tipo": "comprimento",
+   "onde": "extremidade interna (fronteira com o flap, etapas 17 e 18)",
+   "sentido": "menor",
+   "evidencia": "Prancha, asa direita: o aileron começa em x≈885. No alvo, a linha de painel está em x≈343, que corresponde a x≈780 na prancha. A fronteira da prancha cai na marca oval do alvo, em x≈400."
+  },
+  {
+   "parte": "flapEsq",
+   "tipo": "comprimento",
+   "onde": "extremidade externa (etapa 9)",
+   "sentido": "maior",
+   "evidencia": "Prancha: o flap esquerdo vai de x≈235 a x≈486, cota 3785. No alvo, o flap inicia na linha de painel em x≈130, que corresponde a x≈359 na prancha, e mede cerca de 2300 mm."
+  },
+  {
+   "parte": "flapDir",
+   "tipo": "comprimento",
+   "onde": "extremidade externa (etapa 18)",
+   "sentido": "maior",
+   "evidencia": "Prancha: o flap direito vai de x≈622 a x≈885, cota 4008. No alvo, o flap termina na linha de painel em x≈343, que corresponde a x≈780 na prancha."
+  }
+ ],
+ "pendencias": "o crítico leu a divisa aileron/flap na linha de emenda da chapa (leitura B); a pessoa decidiu a leitura A, a da prancha: o aileron é a caixa da ponta e o flap a faixa do bordo de fuga até a fuselagem"
+}

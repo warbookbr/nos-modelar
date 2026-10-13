@@ -1,0 +1,16 @@
+{
+ "por": "a pessoa, 2026-10-13: 2 aceitamos",
+ "quando": "2026-10-13T11:59:46.086Z",
+ "rodada": 3,
+ "nota": 8,
+ "defeitos": [
+  {
+   "parte": "asa",
+   "tipo": "superficie",
+   "onde": "bordo de ataque, x≈420-480 e y≈515-555 da prancha",
+   "sentido": "segmentado",
+   "evidencia": "Etapa 15, prancha lateral.prancha.png: reentrância em degrau em x≈437-443 e y≈540-552, saliência em x≈457-465 e y≈515-528, e contorno fechado solto em (475,523). O alvo mostra bordo contínuo ali. É o defeito do veredito anterior, ainda presente, e não é novo. Observado sem ampliação."
+  }
+ ],
+ "pendencias": "o crítico leu como degrau o calombo e o pequeno círculo junto do bordo de ataque da asa, que são o escape e a luz que a referência mostra junto da raiz da asa"
+}

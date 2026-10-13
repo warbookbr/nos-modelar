@@ -30,6 +30,9 @@ passo seguinte.
 - Conteúdo salvo é determinístico, versionado, reexecutável e validável.
 - Modele e revise peças na bancada neutra antes de levá-las ao produto. Nenhuma
   métrica aprova forma sozinha, e quem aprova forma é a pessoa.
+- A correção que um objeto revela vai para a ferramenta, o gate ou a instrução
+  geral, e não para o arquivo daquele objeto. O que só serve a uma família ou
+  objeto entra como opção declarada sobre a ferramenta geral.
 - Mudanças gerais que possam voltar ao NÓS ficam isoladas e registradas em
   `docs/mecanifica/UPSTREAM-NOS.md`.
 - Imagem de referência com marca, logotipo ou nome de fabricante não entra no
