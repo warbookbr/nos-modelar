@@ -28,7 +28,7 @@
   {
    "parte": "cone",
    "medida": "altura",
-   "em": -500
+   "em": -40
   },
   {
    "parte": "capo",
@@ -61,15 +61,16 @@
   {
    "parte": "parabrisa",
    "medida": "largura",
-   "em": 2450
+   "em": 2240,
+   "afasta": 150
   },
   {
    "parte": "parabrisa",
    "medida": "altura",
    "em": 3300,
    "numero": [
-    -600,
-    450
+    -200,
+    260
    ]
   },
   {
@@ -250,15 +251,15 @@
     1260
    ],
    "coluna": "esquerda",
-   "nivel": 800
+   "nivel": 400
   },
   "tremNariz": {
    "marca": [
-    1745,
-    120
+    1720,
+    450
    ],
    "coluna": "esquerda",
-   "nivel": 100
+   "nivel": 60
   },
   "escape": {
    "marca": [
