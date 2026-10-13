@@ -253,6 +253,7 @@
       "membros": [
         "fuselagem",
         "parabrisa",
+        "montanteParabrisa",
         "janela1D",
         "janela1E",
         "janela2D",
@@ -975,7 +976,7 @@
   "avisos": [],
   "opcao": "Avião de pequeno porte",
   "notasDePassagem": {
-    "fuselagem": "Porta e janelas são rebaixos recortados no casco (porta 16 mm, janelas 22 mm). A base da porta (y 1160) toca a raiz da asaE em z 5600, onde a asa ainda cobre z até 5730. A barbatana entra 25 mm no ventre; o casco mede x ±780 na cabine."
+    "fuselagem": "Porta e janelas são rebaixos recortados no casco; o vidro é escuro. O bojo cônico sob a asa na lateral é a asaD vizinha vista de lado; a lente baixa da referência (região asa, x 165-282 px) é carenagem de raiz e cabe à unidade asas."
   },
   "vereditos": [
     {

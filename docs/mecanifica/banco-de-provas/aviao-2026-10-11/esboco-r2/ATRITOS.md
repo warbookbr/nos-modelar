@@ -129,3 +129,56 @@ O piso do vão da janela, a face externa da porta e o corte do rebaixo dependem 
 ```bash
 npm run esboco -- $D/aviao-detalhe-fuselagem.esboco.json --descrever --forma fuselagem | grep "âncoras"
 ```
+
+## Correção do Marco de 50% (unidades motor e fuselagem)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `D=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2`. Quando o comando pede o estado de antes da correção, ele sai do último commit com `git show HEAD:<caminho>`.
+
+### 14. Nenhuma medida confere para onde o escape aponta, e o escape de abas planas passou em tudo
+
+O escape do commit anterior saía 425 mm de lado e recuava 110 mm, com a abertura olhando para o flanco, enquanto a `funcao` da unidade diz que os escapes "se curvam para trás". O `escape comprimento` mede só a caixa em z (530 mm contra 537 mm declarados) e a leitura do mestre não traz divergência, de modo que o crítico foi quem pegou o defeito. O que falta é uma medida do recuo do fim do escape em relação ao início, por exemplo `{ "distancia": ["escapeD.inicio", "escapeD.fim"], "eixo": "z" }` em `plano.medidas` (cerca de 430 mm no escape novo). Não editei o plano.
+
+```bash
+git show HEAD:docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json > $D/zz.esboco.json
+npm run esboco -- $D/zz.esboco.json --medidas | grep escape
+npm run esboco -- $D/zz.esboco.json --descrever | grep divergências
+rm $D/zz.esboco.json*
+```
+
+### 15. O `--detalhar` regrava o arquivo de detalhe que já existe sem avisar
+
+Rodar `--detalhar motor` sobre uma unidade já integrada grava de novo `aviao-detalhe-motor.esboco.json` a partir do mestre e apaga o conteúdo anterior, sem dizer que o arquivo existia. Qualquer edição do detalhe que não tenha sido integrada se perde. É o caminho que o atrito 10 manda seguir, e por isso o aviso faria falta.
+
+```bash
+npm run esboco -- --editar $D/aviao-detalhe-motor.esboco.json "escapeD.diametro=210"
+npm run esboco -- $A --detalhar motor
+grep -c '"diametro": 210' $D/aviao-detalhe-motor.esboco.json
+```
+
+### 16. A asa vizinha em cinza lê como parte da fuselagem e vira um "bojo cônico" no flanco inferior
+
+Na vista lateral da fuselagem, a `asaD` entra como vizinha com o mesmo contorno escuro e o mesmo hachurado das formas da unidade, e a projeção lateral da asa de ponta levantada (corda de 1.762 mm na raiz e 630 mm na ponta, 550 mm mais alta) aparece como um cone assentado sobre o flanco, sob as janelas. O crítico da unidade o apontou como defeito da fuselagem ("bojo cônico no flanco inferior, sob a asa, contra uma lente baixa e longa"). Sem as vizinhas o cone some, e a lente da referência está no mapa da lateral como parte da região `asa` (x de 165 a 282 px), de modo que cabe à unidade asas. Não mudei a fuselagem por causa disso; a nota de passagem da fuselagem diz o mesmo.
+
+```bash
+npm run esboco -- $A --unidade fuselagem --vista lateral --largura 1600 --forçar
+npm run esboco -- $A --unidade fuselagem --vista lateral --largura 1600 --sem-vizinhos --forçar
+```
+
+### 17. O cotovelo do tubo sai com um leque de traços finos nas vistas superior e isométrica
+
+Cada seção reta de 6 graus do cotovelo do escape deixa um traço de aresta, e o conjunto lê como hachura ou serrilha no ponto onde o tubo vira. Na vista superior do motor o leque aparece do tamanho do próprio escape.
+
+```bash
+npm run esboco -- $D/aviao-detalhe-motor.esboco.json --unidade motor --vista superior --forçar
+```
+
+### 18. O gate acusa "travessia de lado a lado" para uma placa que só afunda no dorso
+
+O para-brisa novo (loft de eixo x com seção em paralelogramo, 1.336 mm de largura e 50 mm de espessura) assentado sobre o dorso sem a elevação de 30 mm dá `fuselagem e parabrisa se penetram 47,4 mm (... parabrisa cruza fuselagem de lado a lado (travessia, e não encaixe))`. A placa cobre o dorso em x e entra no casco só 47 mm, e a expressão "de lado a lado" descreve a caixa dela em x, não uma travessia. A sugestão de mover 63,2 mm em y resolve, mas a mensagem faz parecer que a peça atravessa o casco inteiro.
+
+```bash
+cp $D/aviao-detalhe-fuselagem.esboco.json $D/zz.esboco.json
+npm run esboco -- --editar $D/zz.esboco.json "parabrisa.desloca=[0,0,0]"
+npm run esboco -- $D/zz.esboco.json --descrever
+rm $D/zz.esboco.json*
+```
