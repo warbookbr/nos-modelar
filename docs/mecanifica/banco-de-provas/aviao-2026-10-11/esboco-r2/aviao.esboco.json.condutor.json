@@ -635,7 +635,15 @@
         "estabilizadorD",
         "estabilizadorE",
         "profundorD",
-        "profundorE"
+        "profundorE",
+        "eixoProfundorD",
+        "eixoProfundorE",
+        "suporteProfundor1D",
+        "suporteProfundor1E",
+        "suporteProfundor2D",
+        "suporteProfundor2E",
+        "suporteProfundor3D",
+        "suporteProfundor3E"
       ],
       "depende": [],
       "custo": 4,
@@ -648,8 +656,8 @@
             2390
           ],
           "y": [
-            2029.5,
-            2404
+            2026.8,
+            2401.9
           ],
           "z": [
             9077,
@@ -664,12 +672,12 @@
               2390
             ],
             "y": [
-              2029.5,
-              2404
+              2026.8,
+              2398.9
             ],
             "z": [
               9077,
-              9810
+              9824.7
             ]
           },
           "estabilizadorE": {
@@ -678,12 +686,12 @@
               -190
             ],
             "y": [
-              2029.5,
-              2404
+              2026.8,
+              2398.9
             ],
             "z": [
               9077,
-              9810
+              9824.7
             ]
           },
           "profundorD": {
@@ -692,11 +700,11 @@
               2385
             ],
             "y": [
-              2045.5,
-              2392
+              2041,
+              2401.9
             ],
             "z": [
-              9810,
+              9640,
               10289
             ]
           },
@@ -706,15 +714,21 @@
               -190
             ],
             "y": [
-              2045.5,
-              2392
+              2041,
+              2401.9
             ],
             "z": [
-              9810,
+              9640,
               10289
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-empenagem-horizontal.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     },
     {
@@ -972,6 +986,41 @@
         ]
       },
       "mudou": true
+    },
+    {
+      "envelopeRefeito": true,
+      "unidade": "empenagem-horizontal",
+      "motivo": "a referência do topo mede o profundor com 684 mm de profundidade (z 9605 a 10290) por causa do ressalto do bordo de ataque na ponta, e a maquete o tinha com 479 mm e a linha de dobradiça reta até a ponta",
+      "de": "do detalhado aviao-detalhe-empenagem-horizontal.esboco.json",
+      "antes": {
+        "x": [
+          -2390,
+          2390
+        ],
+        "y": [
+          2029.5,
+          2404
+        ],
+        "z": [
+          9077,
+          10289
+        ]
+      },
+      "depois": {
+        "x": [
+          -2390,
+          2390
+        ],
+        "y": [
+          2026.8,
+          2401.9
+        ],
+        "z": [
+          9077,
+          10289
+        ]
+      },
+      "mudou": true
     }
   ],
   "marcos": [
@@ -995,7 +1044,8 @@
   "opcao": "Avião de pequeno porte",
   "notasDePassagem": {
     "fuselagem": "Porta e janelas são rebaixos recortados no casco; o vidro é escuro. O bojo cônico sob a asa na lateral é a asaD vizinha vista de lado; a lente baixa da referência (região asa, x 165-282 px) é carenagem de raiz e cabe à unidade asas.",
-    "asas": "Asa pela família em duas chamadas cortadas em x=asaXPonta (reta e ponta curva): cortar a ponta levantada acusa recorte-vazio. Flap e aileron em vãos com folga 12 mm, eixo e suportes. Flap a partir de x 960: a referência é assimétrica."
+    "asas": "Asa pela família em duas chamadas cortadas em x=asaXPonta (reta e ponta curva): cortar a ponta levantada acusa recorte-vazio. Flap e aileron em vãos com folga 12 mm, eixo e suportes. Flap a partir de x 960: a referência é assimétrica.",
+    "empenagem-horizontal": "Estabilizador pela família (perfil simétrico), profundor recortado com fresta de 12 mm. O ressalto de 170 mm na ponta do profundor vem da referência (684 mm de profundidade); o Envelope foi refeito. Eixo no vão, suportes sob a dobradiça."
   },
   "vereditos": [
     {

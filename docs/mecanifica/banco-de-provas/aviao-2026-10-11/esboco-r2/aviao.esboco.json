@@ -240,7 +240,57 @@
     "bA1Z": "=a1Zh+sA1*(a2Zh-a1Zh)+70",
     "bA2Z": "=a1Zh+sA2*(a2Zh-a1Zh)+70",
     "asaPontaGraus": 56,
-    "asaSemiA": 5400
+    "asaSemiA": 5400,
+    "estX0": 190,
+    "estB": 2200,
+    "estEnv": 2200,
+    "estC0": 1212,
+    "estC1": 736,
+    "estYc0": 2085,
+    "estDY": 286,
+    "estTE0": 10289,
+    "estTE1": 10070,
+    "estZq0": 9380,
+    "estFresta": 12,
+    "eX0": 190,
+    "eX1": 2236,
+    "eX2": 2250,
+    "eX3": 2385,
+    "eZH0": 9810,
+    "eZH1": 9810,
+    "eZH2": 9640,
+    "eZH3": 9640,
+    "eT0": 88,
+    "eT1": 49,
+    "eT2": 66,
+    "eT3": 63,
+    "eF0": "=(eX0-estX0)/estB",
+    "eF1": "=(eX1-estX0)/estB",
+    "eF2": "=(eX2-estX0)/estB",
+    "eF3": "=(eX3-estX0)/estB",
+    "eL0": "=estTE0+(estTE1-estTE0)*eF0-eZH0",
+    "eL1": "=estTE0+(estTE1-estTE0)*eF1-eZH1",
+    "eL2": "=estTE0+(estTE1-estTE0)*eF2-eZH2",
+    "eL3": "=estTE0+(estTE1-estTE0)*eF3-eZH3",
+    "eYc0": "=estYc0+estDY*eF0",
+    "eYc1": "=estYc0+estDY*eF1",
+    "eYc2": "=estYc0+estDY*eF2",
+    "eYc3": "=estYc0+estDY*eF3",
+    "eZc0": "=eZH0+0.5*eL0",
+    "eZc1": "=eZH1+0.5*eL1",
+    "eZc2": "=eZH2+0.5*eL2",
+    "eZc3": "=eZH3+0.5*eL3",
+    "eixoX0": 215,
+    "eixoX1": 2215,
+    "eixoY0": "=estYc0+estDY*(eixoX0-estX0)/estB",
+    "eixoY1": "=estYc0+estDY*(eixoX1-estX0)/estB",
+    "eixoZ": "=eZH0-6",
+    "sP1": 600,
+    "sP2": 1300,
+    "sP3": 1950,
+    "sY1": "=estYc0+estDY*(sP1-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP1-estX0)/estB)-6",
+    "sY2": "=estYc0+estDY*(sP2-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP2-estX0)/estB)-6",
+    "sY3": "=estYc0+estDY*(sP3-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP3-estX0)/estB)-6"
   },
   "pontos": {
     "proa": [0, 1330, 8],
@@ -280,7 +330,11 @@
       "funcao": "duas metades de asa de perfil aerodinâmico, diedro e ponta levantada em curva suave, cada uma com o flap na faixa do bordo de fuga junto à raiz e o aileron na caixa da ponta, ambos em vãos recortados com fresta e presos à asa por eixo e por suportes sob o bordo de fuga",
       "vistas": ["frontal-oposta", "inferior"]
     },
-    "empenagem-horizontal": { "cor": "#9fb0c0", "funcao": "duas metades de estabilizador horizontal, cada uma com o profundor preso ao bordo de fuga", "vistas": ["frontal-oposta"] },
+    "empenagem-horizontal": {
+      "cor": "#9fb0c0",
+      "funcao": "duas metades de estabilizador horizontal de perfil simétrico e diedro, cada uma com o profundor preso ao bordo de fuga numa fresta, por um eixo e por três suportes sob a linha de dobradiça, com o ressalto do profundor na ponta",
+      "vistas": ["frontal-oposta", "inferior"]
+    },
     "empenagem-vertical": { "cor": "#9fb0c0", "funcao": "deriva presa ao dorso da cauda e leme preso ao bordo de fuga dela", "vistas": ["frontal-oposta"] },
     "trem-do-nariz": { "cor": "#5f6b78", "funcao": "perna e roda do nariz sob a carenagem do trem, na fuselagem", "vistas": ["frontal-oposta", "inferior"] },
     "trens-principais": { "cor": "#5f6b78", "funcao": "um trem principal sob cada asa, com perna presa na asa e roda", "vistas": ["frontal-oposta", "inferior"] }
@@ -712,14 +766,29 @@
           "id": "estabilizadorD",
           "unidade": "empenagem-horizontal",
           "lado": "D",
-          "tipo": "loft",
-          "eixo": "x",
-          "encaixa": { "ancora": "raiz", "em": [190, 2085, 9443.5] },
-          "secoes": [
-            { "pos": 190, "forma": "elipse", "tamanho": [733, 111], "centro": [9443.5, 2085], "nome": "raiz" },
-            { "pos": 1300, "forma": "elipse", "tamanho": [603, 100], "centro": [9508, 2229] },
-            { "pos": 2390, "forma": "elipse", "tamanho": [476, 66], "centro": [9572, 2371] }
-          ]
+          "tipo": "familia",
+          "familia": "superficie-aerodinamica",
+          "perfil": "estabilizador",
+          "substitui": "estabilizadorD",
+          "subtrai": [
+            { "forma": "profundorD", "folga": "estFresta" }
+          ],
+          "parametros": {
+            "envergadura": "estEnv",
+            "simetria": 0,
+            "cordaNaRaiz": "=estC0/estEnv",
+            "cordaNaPonta": "=estC1/estEnv",
+            "enflechamento": 3.59,
+            "diedro": 7.4,
+            "torcao": 0,
+            "incidenciaNaRaiz": 0,
+            "espessuraNaRaiz": 0.095,
+            "espessuraNaPonta": 0.09,
+            "pontaLevantada": 0,
+            "comando": 0,
+            "comandoDiferencial": 0
+          },
+          "encaixa": { "ancora": "raiz", "em": ["estX0", "estYc0", "estZq0"] }
         },
         {
           "id": "profundorD",
@@ -727,11 +796,114 @@
           "lado": "D",
           "tipo": "loft",
           "eixo": "x",
-          "encaixa": { "ancora": "inicio", "em": [190, 2085, 10049.5] },
+          "substitui": "profundorD",
+          "encaixa": { "ancora": "inicio", "em": ["eX0", "eYc0", "eZc0"] },
           "secoes": [
-            { "pos": 190, "forma": "poligono", "perfil": [[-239.5, -39.5], [-239.5, 39.5], [239.5, 4], [239.5, -4]], "centro": [10049.5, 2085] },
-            { "pos": 1300, "forma": "poligono", "perfil": [[-184, -30], [-184, 30], [184, 4], [184, -4]], "centro": [9994, 2229] },
-            { "pos": 2385, "forma": "poligono", "perfil": [[-130, -22], [-130, 22], [130, 4], [130, -4]], "centro": [9940, 2370] }
+            {
+              "pos": "eX0",
+              "forma": "poligono",
+              "centro": ["eZc0", "eYc0"],
+              "perfil": [
+                ["=-0.5*eL0+0.5*eT0", "=0.5*eT0"],
+                ["=-0.5*eL0+0.1465*eT0", "=0.3535*eT0"],
+                ["=-0.5*eL0", 0],
+                ["=-0.5*eL0+0.1465*eT0", "=-0.3535*eT0"],
+                ["=-0.5*eL0+0.5*eT0", "=-0.5*eT0"],
+                ["=0.5*eL0", -4],
+                ["=0.5*eL0", 4]
+              ]
+            },
+            {
+              "pos": "eX1",
+              "forma": "poligono",
+              "centro": ["eZc1", "eYc1"],
+              "perfil": [
+                ["=-0.5*eL1+0.5*eT1", "=0.5*eT1"],
+                ["=-0.5*eL1+0.1465*eT1", "=0.3535*eT1"],
+                ["=-0.5*eL1", 0],
+                ["=-0.5*eL1+0.1465*eT1", "=-0.3535*eT1"],
+                ["=-0.5*eL1+0.5*eT1", "=-0.5*eT1"],
+                ["=0.5*eL1", -4],
+                ["=0.5*eL1", 4]
+              ]
+            },
+            {
+              "pos": "eX2",
+              "forma": "poligono",
+              "centro": ["eZc2", "eYc2"],
+              "perfil": [
+                ["=-0.5*eL2+0.5*eT2", "=0.5*eT2"],
+                ["=-0.5*eL2+0.1465*eT2", "=0.3535*eT2"],
+                ["=-0.5*eL2", 0],
+                ["=-0.5*eL2+0.1465*eT2", "=-0.3535*eT2"],
+                ["=-0.5*eL2+0.5*eT2", "=-0.5*eT2"],
+                ["=0.5*eL2", -4],
+                ["=0.5*eL2", 4]
+              ]
+            },
+            {
+              "pos": "eX3",
+              "forma": "poligono",
+              "centro": ["eZc3", "eYc3"],
+              "perfil": [
+                ["=-0.5*eL3+0.5*eT3", "=0.5*eT3"],
+                ["=-0.5*eL3+0.1465*eT3", "=0.3535*eT3"],
+                ["=-0.5*eL3", 0],
+                ["=-0.5*eL3+0.1465*eT3", "=-0.3535*eT3"],
+                ["=-0.5*eL3+0.5*eT3", "=-0.5*eT3"],
+                ["=0.5*eL3", -4],
+                ["=0.5*eL3", 4]
+              ]
+            }
+          ]
+        },
+        { "id": "eixoProfundorD", "unidade": "empenagem-horizontal", "lado": "D", "cor": "#2b3138", "ligar": { "de": ["eixoX0", "eixoY0", "eixoZ"], "para": ["eixoX1", "eixoY1", "eixoZ"], "tipo": "haste", "diametro": 30 } },
+        {
+          "id": "suporteProfundor1D",
+          "unidade": "empenagem-horizontal",
+          "lado": "D",
+          "cor": "#5f6b78",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": ["sP1", "=sY1+4", "=eZH0-230"] },
+          "secoes": [
+            { "pos": "=eZH0-230", "forma": "arredondado", "tamanho": [58, 26], "cantos": 12, "centro": ["sP1", "=sY1+4"] },
+            { "pos": "=eZH0-90", "forma": "arredondado", "tamanho": [64, 44], "cantos": 20, "centro": ["sP1", "sY1"] },
+            { "pos": "=eZH0+30", "forma": "arredondado", "tamanho": [58, 40], "cantos": 18, "centro": ["sP1", "=sY1+4"] },
+            { "pos": "=eZH0+210", "forma": "arredondado", "tamanho": [26, 14], "cantos": 6, "centro": ["sP1", "=sY1+22"] }
+          ]
+        },
+        {
+          "id": "suporteProfundor2D",
+          "unidade": "empenagem-horizontal",
+          "lado": "D",
+          "cor": "#5f6b78",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": ["sP2", "=sY2+4", "=eZH0-230"] },
+          "secoes": [
+            { "pos": "=eZH0-230", "forma": "arredondado", "tamanho": [58, 26], "cantos": 12, "centro": ["sP2", "=sY2+4"] },
+            { "pos": "=eZH0-90", "forma": "arredondado", "tamanho": [64, 44], "cantos": 20, "centro": ["sP2", "sY2"] },
+            { "pos": "=eZH0+30", "forma": "arredondado", "tamanho": [58, 40], "cantos": 18, "centro": ["sP2", "=sY2+4"] },
+            { "pos": "=eZH0+210", "forma": "arredondado", "tamanho": [26, 14], "cantos": 6, "centro": ["sP2", "=sY2+22"] }
+          ]
+        },
+        {
+          "id": "suporteProfundor3D",
+          "unidade": "empenagem-horizontal",
+          "lado": "D",
+          "cor": "#5f6b78",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": ["sP3", "=sY3+4", "=eZH0-230"] },
+          "secoes": [
+            { "pos": "=eZH0-230", "forma": "arredondado", "tamanho": [58, 26], "cantos": 12, "centro": ["sP3", "=sY3+4"] },
+            { "pos": "=eZH0-90", "forma": "arredondado", "tamanho": [64, 44], "cantos": 20, "centro": ["sP3", "sY3"] },
+            { "pos": "=eZH0+30", "forma": "arredondado", "tamanho": [58, 40], "cantos": 18, "centro": ["sP3", "=sY3+4"] },
+            { "pos": "=eZH0+210", "forma": "arredondado", "tamanho": [26, 14], "cantos": 6, "centro": ["sP3", "=sY3+22"] }
           ]
         },
         {
