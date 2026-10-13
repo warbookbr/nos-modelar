@@ -990,6 +990,12 @@
       "unidade": "marco-50",
       "nota": 7,
       "motivo": "Conjunto coerente, proporções e posições próximas da referência nas três vistas, sem ponta no ar. Defeito estrutural: os escapes do capô são abas planas e curtas perpendiculares ao flanco, com a abertura olhando para o lado; a curva para trás que a função pede não aparece em nenhuma vista. Superfície: para-brisa lê como placa plana levemente elevada com aresta viva, contra vidro curvo sobre o dorso."
+    },
+    {
+      "ordem": 3,
+      "unidade": "marco-50",
+      "nota": 8,
+      "motivo": "Escapes ocos e curvados para trás e para-brisa em dois painéis largos resolvem a rodada anterior; proporções de envergadura, comprimento, empenagem e trem batem com a referência. Superfície: bojo no flanco sob a asa ainda é cone de base larga, contra a lente baixa e longa da referência; rebaixo e fresta da porta não se leem."
     }
   ]
 }
