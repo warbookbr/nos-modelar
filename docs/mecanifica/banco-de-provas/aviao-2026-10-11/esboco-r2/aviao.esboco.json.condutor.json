@@ -807,12 +807,27 @@
       "id": "trem-do-nariz",
       "membros": [
         "carenagemTremNariz",
+        "eixoPivoNariz",
+        "mancalNarizE",
+        "mancalNarizD",
+        "alavancaNariz",
+        "pinoAtuadorNariz",
+        "atuadorHasteNariz",
+        "atuadorCorpoNariz",
+        "orelhaAtuadorNariz",
+        "compassoSupNariz",
+        "compassoInfNariz",
+        "pinoCompassoNariz",
         "pernaNariz",
+        "pistaoNariz",
+        "coroaNariz",
+        "garfoNariz",
+        "eixoRodaNariz",
         "rodaNariz"
       ],
       "depende": [],
       "custo": 3,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -874,6 +889,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-trem-do-nariz.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     },
     {
@@ -1078,7 +1099,8 @@
     "fuselagem": "Porta e janelas são rebaixos recortados no casco; o vidro é escuro. O bojo cônico sob a asa na lateral é a asaD vizinha vista de lado; a lente baixa da referência (região asa, x 165-282 px) é carenagem de raiz e cabe à unidade asas.",
     "asas": "Asa pela família em duas chamadas cortadas em x=asaXPonta (reta e ponta curva): cortar a ponta levantada acusa recorte-vazio. Flap e aileron em vãos com folga 12 mm, eixo e suportes. Flap a partir de x 960: a referência é assimétrica.",
     "empenagem-horizontal": "Estabilizador pela família (perfil simétrico), profundor recortado com fresta de 12 mm. O ressalto de 170 mm na ponta do profundor vem da referência (684 mm de profundidade); o Envelope foi refeito. Eixo no vão, suportes sob a dobradiça.",
-    "empenagem-vertical": "A região deriva da referência inclui o filete dorsal, então lâmina e filete são o módulo deriva. O vão do leme é o cortador vaoDoLeme (fresta 12 mm); o leme tem o canto traseiro de baixo cortado e o ressalto no topo, como a referência."
+    "empenagem-vertical": "A região deriva da referência inclui o filete dorsal, então lâmina e filete são o módulo deriva. O vão do leme é o cortador vaoDoLeme (fresta 12 mm); o leme tem o canto traseiro de baixo cortado e o ressalto no topo, como a referência.",
+    "trem-do-nariz": "O alojamento é a própria carenagem oca (o --integrar não leva recorte ao casco de outra unidade), então a roda deita 90 graus nele ao recolher. Curso por expressão de tnCurso, perna vertical, garfo de um braço no lado E, pivô y 680."
   },
   "vereditos": [
     {

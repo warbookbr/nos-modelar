@@ -56,13 +56,30 @@
         ["estabilizadorE", "profundorE"],
         ["fuselagem", "deriva"],
         ["deriva", "leme"],
-        ["fuselagem", "carenagemTremNariz"],
-        ["carenagemTremNariz", "pernaNariz"],
-        ["pernaNariz", "rodaNariz"],
         ["asaD", "pernaPrincipalD"],
         ["pernaPrincipalD", "rodaPrincipalD"],
         ["asaE", "pernaPrincipalE"],
-        ["pernaPrincipalE", "rodaPrincipalE"]
+        ["pernaPrincipalE", "rodaPrincipalE"],
+        ["fuselagem", "carenagemTremNariz"],
+        ["carenagemTremNariz", "eixoPivoNariz"],
+        ["carenagemTremNariz", "mancalNarizE"],
+        ["mancalNarizE", "eixoPivoNariz"],
+        ["eixoPivoNariz", "pernaNariz"],
+        ["pernaNariz", "pistaoNariz"],
+        ["pistaoNariz", "coroaNariz"],
+        ["coroaNariz", "garfoNariz"],
+        ["garfoNariz", "eixoRodaNariz"],
+        ["eixoRodaNariz", "rodaNariz"],
+        ["pernaNariz", "alavancaNariz"],
+        ["alavancaNariz", "pinoAtuadorNariz"],
+        ["alavancaNariz", "atuadorHasteNariz"],
+        ["atuadorHasteNariz", "atuadorCorpoNariz"],
+        ["atuadorCorpoNariz", "orelhaAtuadorNariz"],
+        ["orelhaAtuadorNariz", "carenagemTremNariz"],
+        ["pernaNariz", "compassoSupNariz"],
+        ["compassoSupNariz", "pinoCompassoNariz"],
+        ["compassoInfNariz", "pinoCompassoNariz"],
+        ["compassoInfNariz", "coroaNariz"]
       ],
       "livres": [
         ["helicePa", "fuselagem"],
@@ -358,7 +375,22 @@
     "vT2": "=vTa+(vTb-vTa)*(vK2y-vY0)/(vYb-vY0)",
     "vT3": "=vTa+(vTb-vTa)*(vK3y-vY0)/(vYb-vY0)",
     "vYl0": 2240,
-    "vZh0l": "=vZh0+vKh*(vYl0-vY0)"
+    "vZh0l": "=vZh0+vKh*(vYl0-vY0)",
+    "tnCurso": 0,
+    "tnFi": "=0-tnCurso",
+    "cT": "=cos(tnCurso)",
+    "sT": "=sin(tnCurso)",
+    "cF": "=cos(tnFi)",
+    "sF": "=sin(tnFi)",
+    "tnPy": 680,
+    "tnPz": 1740,
+    "tnL": 481,
+    "tnLc": 251,
+    "tnLb": 160,
+    "tnBraco": 100,
+    "tnDRoda": 364,
+    "tnEixoY": "=atan2(sin(tnFi)*cos(tnCurso), sqrt(1-sin(tnFi)*cos(tnCurso)*sin(tnFi)*cos(tnCurso)))",
+    "tnEixoZ": "=atan2(0-sin(tnFi)*sin(tnCurso), cos(tnFi))"
   },
   "pontos": {
     "proa": [0, 1330, 8],
@@ -371,7 +403,19 @@
     "pLabioDeAr": [0, 1000, 636],
     "raizDaAsaD": ["asaX0", "asaY0", "asaZ25"],
     "inicioDoFlapD": ["f1X", "f1Yc", "f1Zc"],
-    "inicioDoAileronD": ["a1X", "a1Yc", "a1Zc"]
+    "inicioDoAileronD": ["a1X", "a1Yc", "a1Zc"],
+    "tnP": [0, "tnPy", "tnPz"],
+    "tnBarrilFim": [0, "=tnPy-tnLb*cT", "=tnPz+tnLb*sT"],
+    "tnCoroa": [0, "=tnPy-tnLc*cT", "=tnPz+tnLc*sT"],
+    "tnW": [0, "=tnPy-tnL*cT", "=tnPz+tnL*sT"],
+    "tnBracoAlto": ["=0-tnBraco*cF", "=tnPy-tnLc*cT+tnBraco*sF*sT", "=tnPz+tnLc*sT+tnBraco*sF*cT"],
+    "tnBracoBase": ["=0-tnBraco*cF", "=tnPy-tnL*cT+tnBraco*sF*sT", "=tnPz+tnL*sT+tnBraco*sF*cT"],
+    "tnEixoFim": ["=40*cF", "=tnPy-tnL*cT-40*sF*sT", "=tnPz+tnL*sT-40*sF*cT"],
+    "tnLevTip": [0, "=tnPy+70*sT", "=tnPz+70*cT"],
+    "tnAtF": [0, 738, 1900],
+    "tnLugA": [-35, "=tnPy-110*cT", "=tnPz+110*sT"],
+    "tnLugB": ["=0-45*cF", "=tnPy-tnLc*cT+45*sF*sT", "=tnPz+tnLc*sT+45*sF*cT"],
+    "tnLugJ": ["=0-(35+45*cF)/2", "=tnPy-180.5*cT+(22.5*sF-55)*sT", "=tnPz+180.5*sT+(22.5*sF-55)*cT"]
   },
   "simetrico": { "eixo": "x", "pos": 0 },
   "contato": {
@@ -384,7 +428,8 @@
       { "pecas": ["flapD", "eixoFlapD"], "max": 60, "motivo": "o eixo do flap atravessa o nariz do flap de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
       { "pecas": ["aileronD", "eixoAileronD"], "max": 60, "motivo": "o eixo do aileron atravessa o nariz do aileron de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
       { "pecas": ["deriva.fin", "deriva.dorsal"], "max": 160, "motivo": "a carenagem dorsal termina dentro do bordo de ataque da deriva, que é mais grosso atrás da linha do dorso, e a junta é a concordância entre as duas" },
-      { "pecas": ["leme", "eixoLeme"], "max": 80, "motivo": "o eixo do leme atravessa o nariz do leme de ponta a ponta, em furo" }
+      { "pecas": ["leme", "eixoLeme"], "max": 80, "motivo": "o eixo do leme atravessa o nariz do leme de ponta a ponta, em furo" },
+      { "pecas": ["eixoPivoNariz", "mancalNarizE", "mancalNarizD"], "max": 60, "motivo": "o pino do pivô atravessa a chapa de cada mancal, em furo, e termina na parede do alojamento" }
     ]
   },
   "unidades": {
@@ -410,7 +455,11 @@
       "funcao": "deriva de perfil simétrico, afinada e enflechada, unida ao dorso da cauda por uma carenagem dorsal, e leme de nariz redondo preso ao bordo de fuga dela numa fresta, por um eixo e por três pares de carenagens de dobradiça, um de cada lado",
       "vistas": ["frontal-oposta"]
     },
-    "trem-do-nariz": { "cor": "#5f6b78", "funcao": "perna e roda do nariz sob a carenagem do trem, na fuselagem", "vistas": ["frontal-oposta", "inferior"] },
+    "trem-do-nariz": {
+      "cor": "#5f6b78",
+      "funcao": "alojamento oco sob o ventre, aberto por baixo, com a perna do nariz presa por um pino de pivô: amortecedor, garfo de um braço com a roda de pneu, compasso e atuador, que recolhem para trás girando em torno do pivô, com a roda deitando dentro do alojamento",
+      "vistas": ["frontal-oposta", "inferior"]
+    },
     "trens-principais": { "cor": "#5f6b78", "funcao": "um trem principal sob cada asa, com perna presa na asa e roda", "vistas": ["frontal-oposta", "inferior"] }
   },
   "modulos": {
@@ -1237,9 +1286,33 @@
             }
           ]
         },
-        { "id": "carenagemTremNariz", "unidade": "trem-do-nariz", "tipo": "caixa", "largura": 370, "altura": 176, "profundidade": 833, "raio": 30, "centro": [0, 707, 2341.5] },
-        { "id": "pernaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 100, "de": [0, 378, 1791], "para": [0, 625, 1865] },
-        { "id": "rodaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "eixo": "x", "diametro": 360, "comprimento": 160, "centro": "hubNariz" },
+        { "id": "carenagemTremNariz", "unidade": "trem-do-nariz", "tipo": "caixa", "largura": 470, "altura": 230, "profundidade": 1120, "raio": 30, "centro": [0, 675, 2200], "subtrai": ["alojamentoNariz"] },
+        { "id": "alojamentoNariz", "unidade": "trem-do-nariz", "tipo": "caixa", "largura": 400, "altura": 225, "profundidade": 800, "raio": 20, "centro": [0, 652.5, 2090], "cortador": true },
+        { "id": "eixoPivoNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 34, "de": { "ancora": "tnP", "mm": [-222, 0, 0] }, "para": { "ancora": "tnP", "mm": [222, 0, 0] } },
+        { "id": "mancalNarizE", "unidade": "trem-do-nariz", "lado": "E", "tipo": "caixa", "largura": 30, "altura": 110, "profundidade": 110, "raio": 12, "centro": { "ancora": "tnP", "mm": [-185, 0, 0] } },
+        { "id": "alavancaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 30, "de": "tnP", "para": "tnLevTip" },
+        { "id": "pinoAtuadorNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 22, "eixo": "x", "comprimento": 50, "centro": "tnLevTip" },
+        { "id": "atuadorHasteNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 26, "de": { "entre": ["tnAtF", "tnLevTip"], "t": 0.5 }, "para": "tnLevTip" },
+        { "id": "atuadorCorpoNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 44, "de": "tnAtF", "para": { "entre": ["tnAtF", "tnLevTip"], "t": 0.5 } },
+        { "id": "orelhaAtuadorNariz", "unidade": "trem-do-nariz", "tipo": "caixa", "largura": 44, "altura": 60, "profundidade": 44, "raio": 8, "centro": "tnAtF" },
+        { "id": "compassoSupNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 18, "de": "tnLugA", "para": "tnLugJ" },
+        { "id": "compassoInfNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 18, "de": "tnLugJ", "para": "tnLugB" },
+        { "id": "pinoCompassoNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 24, "eixo": "x", "comprimento": 40, "centro": "tnLugJ" },
+        { "id": "pernaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 70, "de": "tnP", "para": "tnBarrilFim" },
+        { "id": "pistaoNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 44, "de": "tnBarrilFim", "para": "tnCoroa" },
+        { "id": "coroaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 44, "de": "tnCoroa", "para": "tnBracoAlto" },
+        { "id": "garfoNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 34, "de": "tnBracoAlto", "para": "tnBracoBase" },
+        { "id": "eixoRodaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 30, "de": "tnBracoBase", "para": "tnEixoFim", "ponta": true },
+        {
+          "id": "rodaNariz",
+          "unidade": "trem-do-nariz",
+          "tipo": "familia",
+          "familia": "roda-pneu",
+          "perfil": "carro",
+          "parametros": { "diametroPneu": "tnDRoda", "larguraPneu": 0.36, "desvio": 0 },
+          "rotacao": [0, "tnEixoY", "tnEixoZ"],
+          "centro": "tnW"
+        },
         { "id": "pernaPrincipalD", "unidade": "trens-principais", "lado": "D", "tipo": "caixa", "largura": 120, "profundidade": 330, "raio": 30, "de": [2050, 312, 4540], "para": [2050, 1075, 4540] },
         { "id": "rodaPrincipalD", "unidade": "trens-principais", "lado": "D", "tipo": "cilindro", "eixo": "x", "diametro": 590, "comprimento": 210, "centro": "hubPrincipalD" }
       ]
@@ -1254,6 +1327,7 @@
       "formas": ["helicePa*"],
       "gira": { "eixo": "z", "centro": "eixoHelice" },
       "rotulo": "a hélice girando um passo entre pás"
-    }
+    },
+    "recolhe": { "parametro": "tnCurso", "de": 0, "ate": 90, "passos": 9, "rotulo": "o trem do nariz recolhendo para trás, com a roda girando até deitar dentro do alojamento" }
   }
 }

@@ -348,3 +348,77 @@ Cada `--descrever` do mestre (ou do detalhe) depois da deriva por família de en
 ```bash
 time npm run esboco -- $A --descrever
 ```
+
+## Unidade trem-do-nariz (detalhe)
+
+Os comandos desta seção usam `A`, `D` e `R` como na anterior, no estado em que o trem do nariz foi integrado (carenagem oca com o alojamento, pino de pivô, amortecedor, garfo de um braço, roda de família, compasso e atuador, e o curso `recolhe`).
+
+### 34. O `--integrar` descarta em silêncio o `subtrai` que o detalhe escreve em forma de outra unidade, e o trem não consegue abrir o alojamento no casco que o recebe
+
+O trem recolhe para dentro do ventre, e o recorte de uma forma por outra (`subtrai`) é a ferramenta para isso, mas a forma que perde volume é o capô (e a fuselagem), de outras unidades. No detalhe essas formas ficam ocultas e só servem de referência: o cortador novo entra no mestre (é forma da unidade trem-do-nariz), o `subtrai` do capô que o cita não entra, e o mestre acusaria `cortador-solto`. Nem o `--integrar` nem o `--descrever` do detalhe avisam que o `subtrai` foi descartado (o `--editar` do detalhe aceita o campo e a leitura do detalhe já diz que nenhuma forma subtrai o cortador). A saída foi fazer do alojamento a própria carenagem, oca e aberta por baixo, e deitar a roda (90 graus em torno da perna) para ela caber nos 225 mm de altura do alojamento, o que afasta o desenho do trem que recolhe dentro do casco.
+
+```bash
+cp $A $D/zz.esboco.json && cp $A.condutor.json $D/zz.esboco.json.condutor.json
+npm run esboco -- $D/zz.esboco.json --detalhar trem-do-nariz
+npm run esboco -- --editar $D/zz-detalhe-trem-do-nariz.esboco.json 'capo.subtrai=["bocaDeAr","alojamentoNariz"]'
+npm run esboco -- $D/zz.esboco.json --integrar trem-do-nariz $D/zz-detalhe-trem-do-nariz.esboco.json
+grep -n -A1 '"id": "capo"' $D/zz.esboco.json | head -3   # o subtrai do capô segue só com bocaDeAr
+rm $D/zz*.esboco.json*
+```
+
+### 35. O `plano.contrato.tocam` do detalhe recusa o par com a forma oculta de outra unidade, e o `--integrar` tira do mestre o par que a unidade tinha com a vizinha
+
+O detalhe que declara `plano.contrato.tocam` substitui todo par que cita a unidade. Escrever nele o par `["fuselagem", "carenagemTremNariz"]` dá `esboço recusado: ... plano.contrato: "fuselagem" não é uma forma visível da opção`, porque a fuselagem está oculta no detalhe. Sem o par, o `--integrar` diz `pares tirados (o detalhado declara os dele): tocam fuselagem + carenagemTremNariz`, e o contrato do mestre perde a relação da carenagem com o casco (a `fixa` com 2 pontos continua). Repus o par à mão no mestre. É a mesma família do atrito 20: o plano é escrito fora do alcance do `--editar` e a integração não avisa do que sai.
+
+```bash
+cp $A $D/zz.esboco.json && cp $A.condutor.json $D/zz.esboco.json.condutor.json
+npm run esboco -- $D/zz.esboco.json --detalhar trem-do-nariz
+# acrescente a mão em "plano" de zz-detalhe-trem-do-nariz.esboco.json: "contrato": { "tocam": [["fuselagem", "carenagemTremNariz"]] }
+npm run esboco -- $D/zz-detalhe-trem-do-nariz.esboco.json --descrever
+rm $D/zz*.esboco.json*
+```
+
+### 36. O curso gira um grupo só por forma, e o trem que recolhe e deita a roda exige cada ponto escrito com seno e cosseno
+
+A roda do nariz gira em torno do pivô (recolhimento, 0 a 90 graus) e, ao mesmo tempo, em torno da perna (para deitar). `curso` com `formas` e `gira` dá uma rotação por forma, e uma forma em dois grupos é recusada. O contorno foi não usar `gira`: o parâmetro `tnCurso` entra por expressão em 10 pontos nomeados (`tnW`, `tnBracoAlto`, `tnLugJ`...) com `sin` e `cos` escritos à mão, e a `rotacao` da roda (`[0, tnEixoY, tnEixoZ]`) calculada da direção do eixo por `atan2`. É o cálculo de centro à mão que a skill manda evitar, e mudar o comprimento da perna exige reler todos os pontos.
+
+```bash
+cp $A $D/zz.esboco.json
+# em "curso" de zz.esboco.json, acrescente a mão:
+#   "a": { "parametro": "tnCurso", "de": 0, "ate": 90, "passos": 3, "formas": ["pernaNariz", "rodaNariz"], "gira": { "eixo": "x", "centro": "tnP" } },
+#   "b": { "parametro": "tnFi", "de": 0, "ate": -90, "passos": 3, "formas": ["rodaNariz"], "gira": { "eixo": "y", "centro": "tnW" } }
+npm run esboco -- $D/zz.esboco.json --curso a
+# esboço recusado: opção 1 (...), giro 2: a forma "rodaNariz" já gira no giro 1; uma forma gira em um grupo só
+rm $D/zz*.esboco.json*
+```
+
+### 37. As imagens do curso no brief só usam as quatro vistas de sempre, e no fim do curso o trem recolhido não aparece em nenhuma
+
+O brief traz seis poses do curso, cada uma com as quatro vistas que olham de +x, +y e +z. Com o trem recolhido dentro da carenagem (tnCurso 90) as seis vistas mostram só a caixa da carenagem, e o crítico não vê a roda deitada nem a perna, que são o que o critério de não atravessar em nenhuma posição pergunta. As `vistas` da unidade (`inferior`, `frontal-oposta`) valem só para a pose de repouso, e o curso não aceita `--corte`. Gerei à mão a pose 90 vista de baixo e em corte `x=0`, em `aviao-critico-trem-do-nariz-recolhido/`, para quem despacha o crítico juntar ao brief.
+
+```bash
+npm run esboco -- --condutor $A --brief trem-do-nariz        # abra o curso-recolhe-90-composta.png do brief
+cp $A $D/zz.esboco.json && npm run esboco -- --editar $D/zz.esboco.json parametros.tnCurso=90
+npm run esboco -- $D/zz.esboco.json --unidade trem-do-nariz --vista inferior --largura 1100
+npm run esboco -- $D/zz.esboco.json --unidade trem-do-nariz --vista lateral --corte x=0 --largura 1100
+rm $D/zz*
+```
+
+### 38. A linguagem de expressões não tem `asin` nem `abs`
+
+Para pôr o eixo da roda (a direção que sai de duas rotações seguidas) em `rotacao` precisei do arco seno, e a expressão recusa a função. O contorno é `atan2(s, sqrt(1-s*s))` com `s` o seno, que vale porque o seno ali nunca chega a 1. O menos unário vale (`=-tnCurso` é aceito); a mensagem lista as funções que existem (atan, atan2, sin, cos, tan, sqrt).
+
+```bash
+cp $A $D/zz.esboco.json
+npm run esboco -- --editar $D/zz.esboco.json 'parametros.zz="=asin(0.5)"'
+rm $D/zz*
+```
+
+### 39. O custo da unidade do trem: o curso e o `--feito` levam minutos
+
+Com o trem do nariz integrado, `--curso recolhe` no mestre leva 2 min 21 s (10 posições, cada uma com o gate completo e a roda de família), `--descrever` do mestre 1 min 12 s (1 min 05 s antes da unidade, então a unidade soma 7 s) e `--feito trem-do-nariz` 6 min 06 s (as sete vistas, as seis poses do curso e o brief). Cada passada do laço de ajuste do detalhe isolado custa de 50 s a 2 min por causa das famílias das outras unidades trazidas à vista pelo curso.
+
+```bash
+time npm run esboco -- $A --curso recolhe
+time npm run esboco -- --condutor $A --feito trem-do-nariz
+```
