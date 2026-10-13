@@ -976,5 +976,19 @@
   "opcao": "Avião de pequeno porte",
   "notasDePassagem": {
     "fuselagem": "Porta e janelas são rebaixos recortados no casco (porta 16 mm, janelas 22 mm). A base da porta (y 1160) toca a raiz da asaE em z 5600, onde a asa ainda cobre z até 5730. A barbatana entra 25 mm no ventre; o casco mede x ±780 na cabine."
-  }
+  },
+  "vereditos": [
+    {
+      "ordem": 1,
+      "unidade": "fuselagem",
+      "nota": 8,
+      "motivo": "Casco, planta, janelas, porta e barbatana nas posições da referência, sem ponta livre nem travessia. Superfície: para-brisa plano e anguloso, com 70% da largura e sem divisão, contra dois painéis curvos de largura quase total na referência; bojo cônico no flanco inferior, sob a asa, contra uma lente baixa e longa na referência; fresta da porta e vidro das janelas não se distinguem."
+    },
+    {
+      "ordem": 2,
+      "unidade": "marco-50",
+      "nota": 7,
+      "motivo": "Conjunto coerente, proporções e posições próximas da referência nas três vistas, sem ponta no ar. Defeito estrutural: os escapes do capô são abas planas e curtas perpendiculares ao flanco, com a abertura olhando para o lado; a curva para trás que a função pede não aparece em nenhuma vista. Superfície: para-brisa lê como placa plana levemente elevada com aresta viva, contra vidro curvo sobre o dorso."
+    }
+  ]
 }
