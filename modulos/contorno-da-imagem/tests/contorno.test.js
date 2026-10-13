@@ -71,7 +71,10 @@ describe('contorno da imagem', () => {
     const { pedacos, areaPx, contornoPx } = seg.regioes.lados;
     expect(pedacos).toHaveLength(3);
     expect(pedacos.map((p) => p.areaPx)).toEqual([...pedacos.map((p) => p.areaPx)].sort((a, b) => b - a));
-    expect(pedacos[2].areaPx).toBe(16);
+    /* A ilha de 5 x 5 px tem 25 px² de área de borda subpixel (16 no contorno de pixel de borda), com os cantos
+       um pouco cortados pelo meio-tom; a de 3 x 3 px fica abaixo do mínimo e sai. */
+    expect(pedacos[2].areaPx).toBeGreaterThan(18);
+    expect(pedacos[2].areaPx).toBeLessThanOrEqual(25);
     expect(MINIMO_DO_PEDACO_PX2).toBeGreaterThan(4);
     expect(MINIMO_DO_PEDACO_PX2).toBeLessThanOrEqual(16);
     /* O campo de sempre continua sendo o do maior pedaço, e uma parte inteira num pedaço só tem um. */
@@ -392,13 +395,22 @@ describe('borda lisa da silhueta', () => {
     for (const p of [[40, 12], [40, 13], [40, 14], [90, 13], [91, 14]]) expect(aceso(seg, p)).toBe(false);
     expect(aceso(seg, [70, 44])).toBe(true);
     for (const [x, y] of [[10, 15], [109, 15], [10, 44], [109, 44]]) expect(aceso(seg, [x, y])).toBe(true);
-    /* O corpo é exatamente o retângulo: a extensão não se mexe nem 1 px. */
+    /* O corpo é exatamente o retângulo: a extensão não se mexe nem 1 px. A linha
+       subpixel passa pela borda do pixel, meio pixel para fora do centro do
+       pixel de borda, e o espigão e o dente não a empurram para fora. */
     const { pedacos } = await silhuetaEmPedacos(seg, { sem: ['chao'] });
     expect(pedacos).toHaveLength(1);
     const xs = pedacos[0].contornoPx.map(([x]) => x); const ys = pedacos[0].contornoPx.map(([, y]) => y);
-    expect([Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]).toEqual([10, 109, 15, 44]);
+    [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)].forEach((v, i) => expect(v).toBeCloseTo([9.5, 109.5, 14.5, 44.5][i], 1));
     expect(seg.mascaraSuavizada.tirados).toBe(3 + 4);
     expect(seg.mascaraSuavizada.postos).toBe(1);
+  });
+
+  it('com bordaSubpixel: false o corpo é o retângulo de pixel de borda, de 10 a 109 e de 15 a 44', async () => {
+    const seg = await segmentar(png, { ...config, bordaSubpixel: false });
+    const { pedacos } = await silhuetaEmPedacos(seg, { sem: ['chao'] });
+    const xs = pedacos[0].contornoPx.map(([x]) => x); const ys = pedacos[0].contornoPx.map(([, y]) => y);
+    expect([Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]).toEqual([10, 109, 15, 44]);
   });
 
   it('o fio de 2 px é forma da imagem: fica inteiro, com a semente dentro', async () => {
@@ -449,8 +461,11 @@ describe('pixel sem dono vizinho de uma parte', () => {
   it('o defeito reproduzido: sem passar o sem dono, as partes param na linha escura e o halo fica sem dono', async () => {
     const seg = await segmentar(png, { ...config, alcanceSemDono: 0 });
     expect(seg.semDono).toBeGreaterThan(300);
-    expect(extensao(seg, 'esquerda')[0]).toBe(15);
+    expect(extensao(seg, 'esquerda')[0]).toBeGreaterThanOrEqual(14);
     expect(seg.semDonoAnexados).toBe(0);
+    /* Com o contorno de pixel de borda o corpo para em 15, o pixel de dentro da linha escura. */
+    const mascara = await segmentar(png, { ...config, alcanceSemDono: 0, bordaSubpixel: false });
+    expect(extensao(mascara, 'esquerda')[0]).toBe(15);
   });
 
   it('cada pixel sem dono vizinho de uma parte passa a ela, e as partes chegam à borda da silhueta', async () => {
@@ -460,9 +475,18 @@ describe('pixel sem dono vizinho de uma parte', () => {
     const sil = []; for (let y = 0; y < 60; y += 1) for (let x = 0; x < largura; x += 1) if (seg.silhueta[y * largura + x]) sil.push([x, y]);
     const silhueta = [Math.min(...sil.map(([x]) => x)), Math.max(...sil.map(([x]) => x)), Math.min(...sil.map(([, y]) => y)), Math.max(...sil.map(([, y]) => y))];
     expect(silhueta).toEqual([12, 107, 15, 44]);
+    /* Com a linha subpixel as partes chegam ao meio-tom da linha escura, que está
+       dentro da máscara, entre o halo de 215 e o corpo: a máscara vai a 12 e o meio-tom
+       a 13,4 (o halo de 2 px tem tom de meio-fundo, não de desenho). */
     const e = extensao(seg, 'esquerda'); const d = extensao(seg, 'direita');
-    expect([e[0], e[2], e[3]]).toEqual([silhueta[0], silhueta[2], silhueta[3]]);
-    expect([d[1], d[2], d[3]]).toEqual([silhueta[1], silhueta[2], silhueta[3]]);
+    [e[0], e[2], e[3]].forEach((v, i) => expect(v).toBeCloseTo([13.4, 16.4, 42.6][i], 1));
+    [d[1], d[2], d[3]].forEach((v, i) => expect(v).toBeCloseTo([105.6, 16.4, 42.6][i], 1));
+    for (const v of [e[0], d[1]]) expect(v).toBeGreaterThanOrEqual(silhueta[0] - 0.5);
+    /* Com o contorno de pixel de borda a parte vai até a borda da máscara. */
+    const mascara = await segmentar(png, { ...config, bordaSubpixel: false });
+    const em = extensao(mascara, 'esquerda'); const dm = extensao(mascara, 'direita');
+    expect([em[0], em[2], em[3]]).toEqual([silhueta[0], silhueta[2], silhueta[3]]);
+    expect([dm[1], dm[2], dm[3]]).toEqual([silhueta[1], silhueta[2], silhueta[3]]);
     /* Nenhum pixel fica no rótulo do fundo dentro da silhueta. */
     for (const [x, y] of sil) expect(seg.rotulos[y * largura + x]).not.toBe(1);
   });

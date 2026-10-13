@@ -13,6 +13,10 @@
  * GPL; o corte só por bordas de sombra juntava partes vizinhas do mesmo cinza. */
 import { PNG } from 'pngjs';
 import { carregarOpenCV } from './opencv.js';
+import {
+  tomDoFundo, campoDeTom, donosDoTraco, tracarSubpixel, aneisDoRotulo, pedacosDosAneis, silhuetaDoTraco, TOLERANCIA_DO_TRACO_PX,
+} from './borda-subpixel.js';
+import { aplicarFormas, TOLERANCIA_DA_FORMA_PX } from './forma-declarada.js';
 
 /* Uma semente é um ponto `[x, y]`, uma linha `[[x, y], [x, y], ...]` ou várias
    linhas `[[[x, y], ...], [[x, y], ...]]`, com pontos soltos `[x, y]` no meio se preciso. Várias linhas servem à parte que a
@@ -221,7 +225,15 @@ export function anexarSemDono(rotulos, silhueta, largura, altura, alcance = ALCA
    pixels dela que continuam sem dono (`semDono`), os que passaram à parte mais
    próxima (`semDonoAnexados`, `anexarSemDono`), o que a suavização tirou e pôs
    (`mascaraSuavizada`) e `buracosFechados`, os buracos pequenos cercados pela
-   silhueta que ela fechou (`fecharBuracos`). */
+   silhueta que ela fechou (`fecharBuracos`).
+
+   Por padrão (`bordaSubpixel`) `contornoPx`, `areaPx` e `pedacos` vêm da linha
+   subpixel de `borda-subpixel.js`: coordenadas fracionárias, com o centro do
+   pixel em (x, y) e a borda de um retângulo de pixels de x = 10 a 109 em 9.5 e
+   109.5, e a área é a de verdade (a do contorno de pixel de borda é menor por
+   meio perímetro). Devolve também `tracado` (as cadeias compartilhadas), `fundoTom`
+   e `formas`, o relatório das formas declaradas. Com `bordaSubpixel: false` tudo
+   volta ao contorno da máscara, em inteiros. */
 /* Realce para o watershed, que é onde a divisa é escolhida. O contraste local
    (CLAHE na luminância) puxa a diferença pequena entre duas partes do mesmo
    cinza, e a nitidez (máscara de desfoque) afina a costura entre elas. A
@@ -244,7 +256,10 @@ function realcar(cv, cor, novo, realce) {
   return saida;
 }
 
-export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce = false, buracoMaximo = MAXIMO_DO_BURACO_PX2, denteMaximo = MAXIMO_DO_DENTE_PX2, alcanceSemDono = ALCANCE_DO_SEM_DONO_PX } = {}) {
+export async function segmentar(pngBuffer, {
+  limiar = 225, regioes = {}, realce = false, buracoMaximo = MAXIMO_DO_BURACO_PX2, denteMaximo = MAXIMO_DO_DENTE_PX2, alcanceSemDono = ALCANCE_DO_SEM_DONO_PX,
+  bordaSubpixel = true, toleranciaDoTraco = TOLERANCIA_DO_TRACO_PX, fundo: fundoDeclarado, formas = {}, toleranciaDaForma = TOLERANCIA_DA_FORMA_PX,
+} = {}) {
   const nomes = Object.keys(regioes).sort();
   if (!nomes.length) throw new Error('o arquivo de regiões não nomeia nenhuma região.');
   const sementes = nomes.map((nome) => ({ nome, tracos: tracosDaSemente(regioes[nome]) }));
@@ -321,8 +336,27 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
        contra o fundo, passa à parte mais próxima: sem isso a parte para na linha
        escura e a silhueta segue 2 ou 3 px além dela. */
     const anexados = alcanceSemDono > 0 ? anexarSemDono(rotulos, silhueta.data, largura, altura, alcanceSemDono) : 0;
+    let tracado = null; let formasDeclaradas = { ajustadas: [], avisos: [], detalhes: [] }; let fundoTom = null;
+    if (!bordaSubpixel && Object.keys(formas ?? {}).length) throw new Error('formas: a forma declarada ajusta a borda subpixel; com "bordaSubpixel": false não há borda para ajustar.');
+    if (bordaSubpixel) {
+      /* A linha de cada borda passa pelo meio-tom da imagem, e não pelo contorno
+         da máscara (`borda-subpixel.js`): a partição é a de acima, só muda por
+         onde a linha passa. */
+      const cinzaPx = Uint8Array.from(cinza.data);
+      fundoTom = fundoDeclarado ?? tomDoFundo(cinzaPx, silhueta.data, largura, altura);
+      const w = campoDeTom(cinzaPx, silhueta.data, largura, altura, { limiar, fundo: fundoTom });
+      tracado = tracarSubpixel({ dono: donosDoTraco(rotulos, silhueta.data), w, largura, altura, maiorRotulo: nomes.length + 1, tolerancia: toleranciaDoTraco });
+      const rotuloPorNome = Object.fromEntries(nomes.map((nome, i) => [nome, i + 2]));
+      formasDeclaradas = aplicarFormas(tracado, { formas, rotuloPorNome, tolerancia: toleranciaDaForma });
+    }
     const resultado = {};
     sementes.forEach(({ nome, tracos }, i) => {
+      if (tracado) {
+        const pedacos = pedacosDosAneis(aneisDoRotulo(tracado, i + 2));
+        if (!pedacos.length) throw new Error(`'${nome}' não ficou com região nenhuma; a semente foi engolida pelas vizinhas, ou o tom da imagem põe a parte toda fora da borda (use "bordaSubpixel": false para o contorno da máscara).`);
+        resultado[nome] = { semente: tracos.flat(), rotulo: i + 2, areaPx: pedacos[0].areaPx, contornoPx: pedacos[0].contornoPx, pedacos };
+        return;
+      }
       const so = novo(new cv.Mat(altura, largura, cv.CV_8U, new cv.Scalar(0)));
       for (let p = 0; p < rotulos.length; p += 1) if (rotulos[p] === i + 2 && silhueta.data[p]) so.data[p] = 255;
       const contornos = novo(new cv.MatVector()); const hierarquia = novo(new cv.Mat());
@@ -353,7 +387,7 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;
-    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono, semDonoAnexados: anexados, mascaraSuavizada: suavizada, buracosFechados: { buracos: fechados.buracos, pixels: fechados.pixels } };
+    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono, semDonoAnexados: anexados, mascaraSuavizada: suavizada, buracosFechados: { buracos: fechados.buracos, pixels: fechados.pixels }, tracado, fundoTom, formas: formasDeclaradas };
   } finally {
     mats.forEach((m) => m.delete());
   }
@@ -380,8 +414,12 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
    pedaços por cima dele inventaria silhueta onde a imagem não a mostra. O maior
    fica sempre, mesmo abaixo do mínimo. */
 export async function silhuetaEmPedacos(segmentacao, { folga = 1, sem = [] } = {}) {
-  const { cv } = await carregarOpenCV();
   const { largura, altura, silhueta } = segmentacao;
+  if (segmentacao.tracado) {
+    const fora = new Set(sem.map((nome) => segmentacao.regioes[nome]?.rotulo).filter(Boolean));
+    return silhuetaDoTraco(segmentacao.tracado, { largura, altura, fora, folga });
+  }
+  const { cv } = await carregarOpenCV();
   const mats = [];
   const novo = (m) => { mats.push(m); return m; };
   /* Contornos externos de uma máscara, do maior para o menor; os de área abaixo

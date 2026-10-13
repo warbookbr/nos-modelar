@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1164 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1169 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -468,8 +468,10 @@
 
 ## modulos/contorno-da-imagem/src/
 
+- `borda-subpixel.js` — borda-subpixel.js — a linha de cada parte passa pela borda da imagem dentro do pixel, e não pela borda da máscara.
 - `colunas.js` — colunas.js — nomes em duas colunas fora do desenho, com chamada até a parte.
 - `desenho.js` — desenho.js — o que o crítico e a pessoa olham.
+- `forma-declarada.js` — forma-declarada.js — a forma que o desenhador de contorno declara para um trecho da borda de uma parte.
 - `index.js` — index.js — a porta do módulo contorno-da-imagem: segmentação, desenho, medida e rodadas.
 - `medida.js` — medida.js — o contorno de cada parte contra as bordas da própria imagem. Para cada parte, a fração do perímetro que fica a até `distancia` pixels de uma bord…
 - `opencv.js` — opencv.js — carrega o OpenCV uma vez. Carregado por require, e só quando usado: importado como módulo ES, o pacote quebra dentro do vitest. E o módulo volta …
@@ -478,7 +480,10 @@
 
 ## modulos/contorno-da-imagem/tests/
 
+- `ajudas-subpixel.js` — ajudas-subpixel.js — imagens sintéticas antisserrilhadas e medidas de geometria para os testes da borda abaixo do pixel e da forma declarada.
+- `borda-subpixel.test.js` — borda-subpixel.test.js — a linha de cada borda passa pelo meio-tom da imagem, dentro do pixel. Casos sintéticos antisserrilhados, em que a posição real da bo…
 - `contorno.test.js` — contorno.test.js — cada peça do módulo vista num caso construído de propósito: duas partes do mesmo cinza separadas pela semente, a pintura com a opacidade p…
+- `forma-declarada.test.js` — forma-declarada.test.js — o desenhador declara que um trecho da borda é reta, curva ou detalhe; a ferramenta ajusta quando a imagem concorda e avisa, sem aju…
 
 ## modulos/esboco/
 

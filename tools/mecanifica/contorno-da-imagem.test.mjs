@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
 import { contornosDaImagem } from './contorno-da-imagem.mjs';
+import { imagemAntisserrilhada } from '../../modulos/contorno-da-imagem/tests/ajudas-subpixel.js';
 
 const pasta = new URL('../../procedural/pecas/braco-robotico/referencias/', import.meta.url);
 const imagem = readFileSync(new URL('lateral.png', pasta));
@@ -71,9 +72,39 @@ describe('contorno da imagem', () => {
     expect(silhueta.linhasDeForaMm).toHaveLength(2);
     const zs = (aneis) => aneis.flat().map(([z]) => z);
     const uniao = zs(silhueta.pedacos.map((p) => p.contornoMm));
-    /* Só o maior pedaço acaba antes do corpo escuro; a união vai até a ponta da asa. */
+    /* Só o maior pedaço acaba antes do corpo escuro; a união vai até a ponta da asa.
+       A âncora está no centro do pixel de borda (10 e 140), e a linha subpixel passa pela
+       borda do pixel, meio pixel (5 mm) além: -655. */
     expect(Math.max(...zs([silhueta.contornoMm]))).toBeLessThan(0);
-    expect(Math.min(...uniao)).toBeCloseTo(-650, -1);
+    expect(Math.min(...uniao)).toBeCloseTo(-655, 0);
     expect(Math.max(...uniao)).toBeGreaterThan(600);
   }, 60000);
+
+  describe('forma declarada no arquivo de regiões', () => {
+    const topo = (x) => 24 - 4 * (1 - ((x - 80) / 60) ** 2);
+    const png = imagemAntisserrilhada(160, 100, (x, y) => (x < 20 || x > 140 || y < topo(x) || y > 80 ? 240 : 150));
+    const base = { ancoras: [{ nome: 'esquerda', px: [20, 50], mm: [-600, 100] }, { nome: 'direita', px: [140, 50], mm: [600, 100] }], limiar: 225, regioes: { asa: [60, 60] } };
+
+    it('traz o aviso em milímetro quando o trecho declarado reto não é reto, e não muda o contorno', async () => {
+      const sem = await contornosDaImagem(png, base);
+      const { resultado } = await contornosDaImagem(png, { ...base, formas: { asa: [{ de: [30, topo(30)], ate: [130, topo(130)], forma: 'reta', nome: 'bordo de ataque' }] } });
+      expect(sem.resultado.formas).toBeUndefined();
+      expect(resultado.formas.ajustadas).toEqual([]);
+      expect(resultado.formas.avisos).toHaveLength(1);
+      const [aviso] = resultado.formas.avisos;
+      expect(aviso).toMatchObject({ parte: 'asa', nome: 'bordo de ataque', forma: 'reta' });
+      expect(aviso.desvioMm).toBeCloseTo(aviso.desvioPx * resultado.mmPorPx, 0);
+      expect(aviso.mensagem).toMatch(/mm\)$/);
+      expect(resultado.regioes.asa.contornoMm).toEqual(sem.resultado.regioes.asa.contornoMm);
+    });
+
+    it('com o trecho reto declarado, o contorno em milímetro fica reto e o relatório diz o desvio', async () => {
+      const reto = (x) => 20 + 0.2 * (x - 20);
+      const inclinada = imagemAntisserrilhada(160, 100, (x, y) => (x < 20 || x > 140 || y < reto(x) || y > 80 ? 240 : 150));
+      const { resultado } = await contornosDaImagem(inclinada, { ...base, formas: { asa: [{ de: [40, reto(40)], ate: [120, reto(120)], forma: 'reta' }] } });
+      expect(resultado.formas.avisos).toEqual([]);
+      expect(resultado.formas.ajustadas).toHaveLength(1);
+      expect(resultado.formas.ajustadas[0].desvioMm).toBeLessThan(10);
+    });
+  });
 });

@@ -37,11 +37,23 @@
  *   todos os pedaços em que elas a deixam (`silhueta.pedacos`).
  *   `buracoMaximo` (padrão 64) é a área, em px², até a qual um buraco de fundo
  *   cercado pela silhueta, como um reflexo claro, é fechado; 0 desliga.
- *   `denteMaximo` (padrão 12) é a área, em px², até a qual um dente ou uma
+ *   `denteMaximo` (padrão 9) é a área, em px², até a qual um dente ou uma
  *   reentrância da borda da silhueta é alisado (abertura e fechamento 3 x 3); 0
  *   desliga. `alcanceSemDono` (padrão 4) é a distância, em px, até a qual o pixel
  *   da silhueta que nenhuma parte pegou passa à parte vizinha mais próxima; 0
  *   desliga.
+ *   `bordaSubpixel` (padrão true) traça a linha de cada borda pelo meio-tom da
+ *   imagem, dentro do pixel, e não pelo contorno da máscara de pixel; false volta
+ *   ao contorno da máscara (o braço robótico, de cotas aprovadas, declara false).
+ *   `toleranciaDoTraco` (padrão 0.35) é, em px, o quanto a linha simplificada
+ *   pode se afastar da borda subpixel. `fundo` (0 a 255) é o tom do fundo da
+ *   imagem para o meio-tom; sem ele vale a mediana do cinza fora da silhueta.
+ *   `formas` declara, por parte, trechos da borda e o que eles são:
+ *   { "asaEsq": [ { "de": [x, y], "ate": [x, y], "forma": "reta" | "curva" | "detalhe",
+ *   "nome": "bordo de ataque" } ] }, com os pontos em pixel da imagem. A reta e a
+ *   curva são ajustadas nos pontos da borda subpixel do trecho; se a imagem se
+ *   afasta do declarado mais que `toleranciaDaForma` (padrão 1.5 px), nada é
+ *   ajustado e o relatório avisa o trecho, a parte e o desvio.
  *
  * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
  * julgadas e o veredito do crítico. A saída do contorno é
@@ -91,6 +103,7 @@ export async function contornosDaImagem(pngBuffer, config) {
   const paraMm = (pts) => pts.map(([x, y]) => calibracao.paraMm(x, y).map(arred));
   const pedacos = pedacosPx.map((p) => ({ areaMm2: Math.round(p.areaPx * mm2), contornoPx: p.contornoPx, contornoMm: paraMm(p.contornoPx) }));
   const linhasDeForaMm = linhasDeFora.map(paraMm);
+  const formas = config.formas && Object.keys(config.formas).length ? formasEmMm(seg.formas, calibracao.mmPorPx) : null;
   return {
     resultado: {
       formato: FORMATO,
@@ -107,9 +120,16 @@ export async function contornosDaImagem(pngBuffer, config) {
         linhasDeForaMm,
       },
       regioes,
+      ...(formas ? { formas } : {}),
     },
     segmentacao: seg,
   };
+}
+
+/* O relatório das formas declaradas, com o desvio também em milímetro. */
+export function formasEmMm({ ajustadas, avisos, detalhes }, mmPorPx) {
+  const comMm = (l) => l.map((f) => ({ ...f, ...(f.desvioPx !== undefined ? { desvioMm: Math.round(f.desvioPx * mmPorPx * 10) / 10 } : {}) }));
+  return { ajustadas: comMm(ajustadas), avisos: comMm(avisos).map((a) => ({ ...a, mensagem: `${a.mensagem} (${a.desvioMm} mm)` })), detalhes };
 }
 
 /* O pacote que o crítico recebe. A pasta é refeita a cada chamada, para
@@ -141,7 +161,7 @@ export async function mapaRotulado(pngBuffer, segmentacao, { opacidade = 0.2 } =
   }
 }
 
-export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 0.2, imagemAlvo = '(imagem alvo)' } = {}) {
+export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 0.2, imagemAlvo = '(imagem alvo)', formas = null } = {}) {
   rmSync(pasta, { recursive: true, force: true });
   mkdirSync(join(pasta, 'divisas'), { recursive: true });
   const pintada = await mapaRotulado(pngBuffer, segmentacao, { opacidade });
@@ -161,6 +181,10 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
   const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, semDonoAnexadosPx: segmentacao.semDonoAnexados, mascaraSuavizada: segmentacao.mascaraSuavizada, buracosFechados: segmentacao.buracosFechados, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
+  /* O traço: se a borda passou pelo meio-tom ou pela máscara de pixel, e o
+     que a imagem tem de fundo; a máscara dá degrau de 1 px na borda inclinada. */
+  medidas.traco = { bordaSubpixel: Boolean(segmentacao.tracado), ...(segmentacao.tracado ? { fundoTom: segmentacao.fundoTom, tolerancia: segmentacao.tracado.tolerancia, subamostras: segmentacao.tracado.K } : {}) };
+  if (formas) medidas.formas = formas;
   writeFileSync(join(pasta, 'medidas.json'), `${JSON.stringify(medidas, null, 1)}\n`);
   return medidas;
 }
@@ -218,12 +242,15 @@ async function principal(argv) {
     return 2;
   }
   {
-    const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined, imagemAlvo: imagem });
+    const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined, imagemAlvo: imagem, formas: resultado.formas ?? null });
     process.stdout.write(`  pacote em ${pasta}: mapa de partes, ${medidas.divisas.length} divisa(s), medidas\n`);
     if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);
     if (medidas.semDonoPx > 0) process.stdout.write(`  ${medidas.semDonoPx} pixel(s) da silhueta sem dono\n`);
     if (medidas.semDonoAnexadosPx > 0) process.stdout.write(`  ${medidas.semDonoAnexadosPx} pixel(s) sem dono, vizinhos de uma parte, passaram à parte mais próxima; a borda da silhueta perdeu ${medidas.mascaraSuavizada.tirados} pixel(s) de dente e ganhou ${medidas.mascaraSuavizada.postos} de reentrância\n`);
     if (medidas.buracosFechados.buracos > 0) process.stdout.write(`  ${medidas.buracosFechados.buracos} buraco(s) pequeno(s) cercado(s) pela silhueta fechado(s), ${medidas.buracosFechados.pixels} pixel(s)\n`);
+    if (!medidas.traco.bordaSubpixel) process.stdout.write('  borda pela máscara de pixel (bordaSubpixel: false): a borda inclinada sai em degrau de 1 px\n');
+    for (const f of medidas.formas?.ajustadas ?? []) process.stdout.write(`  forma ajustada: '${f.parte}'${f.nome ? ` (${f.nome})` : ''}, ${f.forma} de [${f.de}] a [${f.ate}], desvio ${f.desvioPx.toFixed(2)} px (${f.desvioMm} mm)\n`);
+    for (const a of medidas.formas?.avisos ?? []) process.stdout.write(`  AVISO DE FORMA: ${a.mensagem}\n`);
     if (resultado.silhueta.pedacos.length > 1) process.stdout.write(`  silhueta em ${resultado.silhueta.pedacos.length} pedaço(s), o maior com ${resultado.silhueta.pedacos[0].areaMm2} mm²\n`);
   }
   return 0;
