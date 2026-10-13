@@ -83,7 +83,9 @@ articulado). E os que o plano [as ferramentas de
 modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md) deixou: o carrinho
 de mão como família de objeto, a bacia em casca como primitiva, a dobradiça de
 caneco e as ressalvas do fechamento dele. Junto deles, o teste do Potrace no
-contorno da imagem, combinado com a pessoa em 2026-10-13.
+contorno da imagem, combinado com a pessoa em 2026-10-13, e o da linha de comando do
+VectorCraft (família Crafting Apps do ArtCraft, MIT ou Apache-2.0), se a saída for
+idêntica entre execuções.
 
 ## Fechamento
 
