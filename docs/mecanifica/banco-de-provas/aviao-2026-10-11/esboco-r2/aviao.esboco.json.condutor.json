@@ -735,7 +735,15 @@
       "id": "empenagem-vertical",
       "membros": [
         "deriva",
-        "leme"
+        "leme",
+        "eixoLeme",
+        "carenagemDorsal",
+        "dobradicaLeme1D",
+        "dobradicaLeme1E",
+        "dobradicaLeme2D",
+        "dobradicaLeme2E",
+        "dobradicaLeme3D",
+        "dobradicaLeme3E"
       ],
       "depende": [],
       "custo": 2,
@@ -787,6 +795,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-empenagem-vertical.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     },
     {

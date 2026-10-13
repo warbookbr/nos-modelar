@@ -339,6 +339,54 @@
     "trem-do-nariz": { "cor": "#5f6b78", "funcao": "perna e roda do nariz sob a carenagem do trem, na fuselagem", "vistas": ["frontal-oposta", "inferior"] },
     "trens-principais": { "cor": "#5f6b78", "funcao": "um trem principal sob cada asa, com perna presa na asa e roda", "vistas": ["frontal-oposta", "inferior"] }
   },
+  "modulos": {
+    "derivaVertical": {
+      "parametros": { "mH": 1965, "mC0": 1956, "mC1": 710, "mFlecha": 38.9, "mTr0": 0.1, "mTr1": 0.09, "mY0": 2225, "mZq0": 8280, "mFresta": 12 },
+      "formas": [
+        {
+          "id": "fin",
+          "tipo": "familia",
+          "familia": "superficie-aerodinamica",
+          "perfil": "deriva",
+          "substitui": "deriva",
+          "subtrai": ["corteRaiz", { "forma": "leme", "folga": "mFresta" }],
+          "parametros": {
+            "envergadura": "=2*mH",
+            "simetria": 1,
+            "orientacao": 1,
+            "cordaNaRaiz": "=mC0/(2*mH)",
+            "cordaNaPonta": "=mC1/(2*mH)",
+            "enflechamento": "mFlecha",
+            "diedro": 0,
+            "torcao": 0,
+            "incidenciaNaRaiz": 0,
+            "curvatura": 0,
+            "espessuraNaRaiz": "mTr0",
+            "espessuraNaPonta": "mTr1",
+            "pontaLevantada": 0,
+            "comando": 0,
+            "comandoDiferencial": 0
+          },
+          "encaixa": { "ancora": "raiz", "em": [0, "mY0", "mZq0"] }
+        },
+        { "id": "corteRaiz", "cortador": true, "tipo": "caixa", "largura": 600, "altura": 2500, "profundidade": 3600, "centro": [0, "=mY0-1250", 8900] },
+        {
+          "id": "dorsal",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": [0, 2321, 6960] },
+          "secoes": [
+            { "pos": 6960, "forma": "arredondado", "tamanho": [24, 48], "cantos": 11, "centro": [0, 2321] },
+            { "pos": 7300, "forma": "arredondado", "tamanho": [70, 140], "cantos": 33, "centro": [0, 2339] },
+            { "pos": 7700, "forma": "arredondado", "tamanho": [100, 228], "cantos": 48, "centro": [0, 2357] },
+            { "pos": 8100, "forma": "arredondado", "tamanho": [125, 342], "cantos": 60, "centro": [0, 2394] },
+            { "pos": 8300, "forma": "arredondado", "tamanho": [80, 420], "cantos": 38, "centro": [0, 2430] }
+          ]
+        }
+      ]
+    }
+  },
   "opcoes": [
     {
       "titulo": "Avião de pequeno porte",

@@ -177,7 +177,7 @@
       { "pecas": ["fuselagem", "estabilizadorD", "estabilizadorE", "profundorD", "profundorE"], "max": 90, "motivo": "a raiz do estabilizador entra no cone de cauda, que é mais largo no bordo de ataque que no de fuga" },
       { "pecas": ["flapD", "eixoFlapD"], "max": 60, "motivo": "o eixo do flap atravessa o nariz do flap de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
       { "pecas": ["aileronD", "eixoAileronD"], "max": 60, "motivo": "o eixo do aileron atravessa o nariz do aileron de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
-      { "pecas": ["deriva", "carenagemDorsal"], "max": 160, "motivo": "a carenagem dorsal termina dentro do bordo de ataque da deriva, que é mais grosso atrás da linha do dorso, e a junta é a concordância entre as duas" },
+      { "pecas": ["deriva.fin", "deriva.dorsal"], "max": 160, "motivo": "a carenagem dorsal termina dentro do bordo de ataque da deriva, que é mais grosso atrás da linha do dorso, e a junta é a concordância entre as duas" },
       { "pecas": ["leme", "eixoLeme"], "max": 80, "motivo": "o eixo do leme atravessa o nariz do leme de ponta a ponta, em furo" }
     ],
     "folga": 1282.5126392000002
@@ -200,9 +200,57 @@
       "funcao": "duas metades de estabilizador horizontal de perfil simétrico e diedro, cada uma com o profundor preso ao bordo de fuga numa fresta, por um eixo e por três suportes sob a linha de dobradiça, com o ressalto do profundor na ponta",
       "vistas": ["frontal-oposta", "inferior"]
     },
-    "empenagem-vertical": { "cor": "#9fb0c0", "funcao": "deriva presa ao dorso da cauda e leme preso ao bordo de fuga dela", "vistas": ["frontal-oposta"] },
+    "empenagem-vertical": { "cor": "#9fb0c0", "funcao": "deriva de perfil simétrico, afinada e enflechada, unida ao dorso da cauda por uma carenagem dorsal, e leme de nariz redondo preso ao bordo de fuga dela numa fresta, por um eixo e por três pares de carenagens de dobradiça, um de cada lado", "vistas": ["frontal-oposta"] },
     "trem-do-nariz": { "cor": "#5f6b78", "funcao": "perna e roda do nariz sob a carenagem do trem, na fuselagem", "vistas": ["frontal-oposta", "inferior"] },
     "trens-principais": { "cor": "#5f6b78", "funcao": "um trem principal sob cada asa, com perna presa na asa e roda", "vistas": ["frontal-oposta", "inferior"] }
+  },
+  "modulos": {
+    "derivaVertical": {
+      "parametros": { "mH": 1965, "mC0": 1956, "mC1": 710, "mFlecha": 38.9, "mTr0": 0.1, "mTr1": 0.09, "mY0": 2225, "mZq0": 8280, "mFresta": 12 },
+      "formas": [
+        {
+          "id": "fin",
+          "tipo": "familia",
+          "familia": "superficie-aerodinamica",
+          "perfil": "deriva",
+          "substitui": "deriva",
+          "subtrai": ["corteRaiz", { "forma": "leme", "folga": "mFresta" }],
+          "parametros": {
+            "envergadura": "=2*mH",
+            "simetria": 1,
+            "orientacao": 1,
+            "cordaNaRaiz": "=mC0/(2*mH)",
+            "cordaNaPonta": "=mC1/(2*mH)",
+            "enflechamento": "mFlecha",
+            "diedro": 0,
+            "torcao": 0,
+            "incidenciaNaRaiz": 0,
+            "curvatura": 0,
+            "espessuraNaRaiz": "mTr0",
+            "espessuraNaPonta": "mTr1",
+            "pontaLevantada": 0,
+            "comando": 0,
+            "comandoDiferencial": 0
+          },
+          "encaixa": { "ancora": "raiz", "em": [0, "mY0", "mZq0"] }
+        },
+        { "id": "corteRaiz", "cortador": true, "tipo": "caixa", "largura": 600, "altura": 2500, "profundidade": 3600, "centro": [0, "=mY0-1250", 8900] },
+        {
+          "id": "dorsal",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": [0, 2321, 6960] },
+          "secoes": [
+            { "pos": 6960, "forma": "arredondado", "tamanho": [24, 48], "cantos": 11, "centro": [0, 2321] },
+            { "pos": 7300, "forma": "arredondado", "tamanho": [70, 140], "cantos": 33, "centro": [0, 2339] },
+            { "pos": 7700, "forma": "arredondado", "tamanho": [100, 228], "cantos": 48, "centro": [0, 2357] },
+            { "pos": 8100, "forma": "arredondado", "tamanho": [125, 342], "cantos": 60, "centro": [0, 2394] },
+            { "pos": 8300, "forma": "arredondado", "tamanho": [80, 420], "cantos": 38, "centro": [0, 2430] }
+          ]
+        }
+      ]
+    }
   },
   "opcoes": [
     {
@@ -829,34 +877,7 @@
           ],
           "oculto": true
         },
-        {
-          "id": "deriva",
-          "unidade": "empenagem-vertical",
-          "tipo": "familia",
-          "familia": "superficie-aerodinamica",
-          "perfil": "deriva",
-          "substitui": "deriva",
-          "subtrai": ["cortaRaizDeriva", { "forma": "leme", "folga": "vFresta" }],
-          "parametros": {
-            "envergadura": "=2*vH",
-            "simetria": 1,
-            "orientacao": 1,
-            "cordaNaRaiz": "=vC0/(2*vH)",
-            "cordaNaPonta": "=vC1/(2*vH)",
-            "enflechamento": "vFlecha",
-            "diedro": 0,
-            "torcao": 0,
-            "incidenciaNaRaiz": 0,
-            "curvatura": 0,
-            "espessuraNaRaiz": "vTr0",
-            "espessuraNaPonta": "vTr1",
-            "pontaLevantada": 0,
-            "comando": 0,
-            "comandoDiferencial": 0
-          },
-          "encaixa": { "ancora": "raiz", "em": [0, "vY0", "vZq0"] }
-        },
-        { "id": "cortaRaizDeriva", "unidade": "empenagem-vertical", "cortador": true, "tipo": "caixa", "largura": 600, "altura": 2500, "profundidade": 3600, "centro": [0, "=vY0-1250", 8900] },
+        { "id": "deriva", "usa": "derivaVertical", "unidade": "empenagem-vertical", "parametros": { "mH": "=vH", "mC0": "=vC0", "mC1": "=vC1", "mFlecha": "=vFlecha", "mTr0": "=vTr0", "mTr1": "=vTr1", "mY0": "=vY0", "mZq0": "=vZq0", "mFresta": "=vFresta" } },
         {
           "id": "leme",
           "unidade": "empenagem-vertical",
@@ -895,21 +916,6 @@
             "tipo": "haste",
             "diametro": 30
           }
-        },
-        {
-          "id": "carenagemDorsal",
-          "unidade": "empenagem-vertical",
-          "tipo": "loft",
-          "eixo": "z",
-          "suave": true,
-          "encaixa": { "ancora": "inicio", "em": [0, 2321, 6960] },
-          "secoes": [
-            { "pos": 6960, "forma": "arredondado", "tamanho": [24, 48], "cantos": 11, "centro": [0, 2321] },
-            { "pos": 7300, "forma": "arredondado", "tamanho": [70, 140], "cantos": 33, "centro": [0, 2339] },
-            { "pos": 7700, "forma": "arredondado", "tamanho": [100, 228], "cantos": 48, "centro": [0, 2357] },
-            { "pos": 8100, "forma": "arredondado", "tamanho": [125, 342], "cantos": 60, "centro": [0, 2394] },
-            { "pos": 8300, "forma": "arredondado", "tamanho": [80, 420], "cantos": 38, "centro": [0, 2430] }
-          ]
         },
         {
           "id": "dobradicaLeme1D",
