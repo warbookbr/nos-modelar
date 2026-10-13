@@ -1,0 +1,345 @@
+{
+  "plano": { "texto": "detalhe da unidade helice", "nivel": "esquematico" },
+  "parametros": { "angHelice": 0 },
+  "curso": { "gira": { "parametro": "angHelice", "de": 0, "ate": 72, "passos": 6, "formas": ["helicePa*"], "gira": { "eixo": "z", "centro": "eixoHelice" }, "rotulo": "a hélice girando um passo entre pás" } },
+  "pontos": { "proa": [0, 1330, 8], "eixoHelice": [0, 1330, 490], "pontaDaAsaD": [6050, 1599, 4733], "pEscapeD": [410, 1340, 1116], "pBocaDeAr": [0, 965, 672], "hubPrincipalD": [1890, 312, 4522], "hubNariz": [0, 205, 1740] },
+  "simetrico": { "eixo": "x", "pos": 0 },
+  "contato": {
+    "usar": true,
+    "tolerancia": 40,
+    "penetracao": 45,
+    "juntas": [
+      { "pecas": ["capo", "escapeD", "escapeE"], "max": 150, "motivo": "o escape sai do flanco do capô, que é mais largo atrás que na frente do escape" },
+      { "pecas": ["fuselagem", "estabilizadorD", "estabilizadorE", "profundorD", "profundorE"], "max": 90, "motivo": "a raiz do estabilizador entra no cone de cauda, que é mais largo no bordo de ataque que no de fuga" }
+    ],
+    "folga": 1280.1961744322227
+  },
+  "unidades": {
+    "helice": { "cor": "#b8c4d0", "funcao": "cone e cinco pás em torno do eixo do motor, com a raiz de cada pá presa ao cone", "vistas": ["frontal-oposta"] },
+    "motor": { "cor": "#7d8b99", "funcao": "capô do motor com a entrada de ar sob o cone e os dois escapes laterais", "vistas": ["frontal-oposta", "inferior"] },
+    "fuselagem": { "cor": "#c9d1d9", "funcao": "casco da cabine à cauda, com o para-brisa, quatro janelas por lado, a porta traseira à esquerda e a barbatana ventral", "vistas": ["lateral-oposta", "inferior"] },
+    "asas": { "cor": "#aeb9c4", "funcao": "duas metades de asa de ponta levantada, cada uma com flap e aileron presos ao bordo de fuga", "vistas": ["frontal-oposta", "inferior"] },
+    "empenagem-horizontal": { "cor": "#9fb0c0", "funcao": "duas metades de estabilizador horizontal, cada uma com o profundor preso ao bordo de fuga", "vistas": ["frontal-oposta"] },
+    "empenagem-vertical": { "cor": "#9fb0c0", "funcao": "deriva presa ao dorso da cauda e leme preso ao bordo de fuga dela", "vistas": ["frontal-oposta"] },
+    "trem-do-nariz": { "cor": "#5f6b78", "funcao": "perna e roda do nariz sob a carenagem do trem, na fuselagem", "vistas": ["frontal-oposta", "inferior"] },
+    "trens-principais": { "cor": "#5f6b78", "funcao": "um trem principal sob cada asa, com perna presa na asa e roda", "vistas": ["frontal-oposta", "inferior"] }
+  },
+  "opcoes": [
+    {
+      "titulo": "Avião de pequeno porte",
+      "nota": "Maquete do avião inteiro, com a proa em z 0 e a cauda em z 10461",
+      "formas": [
+        {
+          "id": "cone",
+          "unidade": "helice",
+          "tipo": "revolucao",
+          "eixo": "z",
+          "suave": true,
+          "lados": 64,
+          "perfil": [
+            [0, 0],
+            [60, 54],
+            [100, 104],
+            [125, 154],
+            [150, 204],
+            [168, 254],
+            [185, 304],
+            [200, 354],
+            [210, 404],
+            [212, 444],
+            [195, 540],
+            [182, 598]
+          ],
+          "encaixa": { "ancora": "inicio", "em": "proa" }
+        },
+        {
+          "id": "helicePa",
+          "unidade": "helice",
+          "tipo": "familia",
+          "familia": "superficie-aerodinamica",
+          "perfil": "pa-de-helice",
+          "substitui": "helicePa",
+          "parametros": { "envergadura": 912, "cordaNaRaiz": 0.22, "cordaNaPonta": 0.125 },
+          "rotacao": [0, 0, -90],
+          "encaixa": { "ancora": "raiz", "em": { "ancora": "eixoHelice", "mm": [178, 0, -45] } }
+        },
+        { "arranja": { "forma": "helicePa", "modo": "radial", "total": 5, "eixo": "z", "centro": "eixoHelice", "graus": 360 } },
+        {
+          "id": "capo",
+          "unidade": "motor",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "fim", "em": "fuselagem.frente" },
+          "secoes": [
+            { "pos": 592, "forma": "arredondado", "tamanho": [440, 503], "cantos": 200, "centro": [0, 1329.5] },
+            { "pos": 662, "forma": "arredondado", "tamanho": [470, 530], "cantos": 220, "centro": [0, 1325] },
+            { "pos": 676, "forma": "arredondado", "tamanho": [520, 730], "cantos": 250, "centro": [0, 1235], "aresta": true },
+            { "pos": 805, "forma": "arredondado", "tamanho": [720, 815], "cantos": 330, "centro": [0, 1217.5] },
+            { "pos": 905, "forma": "arredondado", "tamanho": [770, 845], "cantos": 340, "centro": [0, 1217.5] },
+            { "pos": 1212, "forma": "arredondado", "tamanho": [970, 922], "cantos": 380, "centro": [0, 1229] },
+            { "pos": 1512, "forma": "arredondado", "tamanho": [1170, 957], "cantos": 400, "centro": [0, 1246.5] },
+            { "pos": 1812, "forma": "arredondado", "tamanho": [1300, 958], "cantos": 400, "centro": [0, 1269] },
+            { "pos": 2112, "forma": "arredondado", "tamanho": [1420, 992], "cantos": 400, "centro": [0, 1286] },
+            { "pos": 2377, "forma": "arredondado", "tamanho": [1450, 1030], "cantos": 380, "centro": [0, 1303] }
+          ],
+          "oculto": true
+        },
+        { "id": "entradaDeAr", "unidade": "motor", "tipo": "caixa", "largura": 480, "altura": 190, "profundidade": 64, "raio": 40, "centro": "pBocaDeAr", "oculto": true },
+        {
+          "id": "escapeD",
+          "unidade": "motor",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "encaixa": { "ancora": "inicio", "em": "pEscapeD" },
+          "secoes": [
+            { "pos": 0, "forma": "elipse", "tamanho": [520, 188], "centro": [0, 0] },
+            { "pos": 425, "forma": "elipse", "tamanho": [440, 160], "centro": [0, 0] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "fuselagem",
+          "unidade": "fuselagem",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "frente", "em": [0, 1303, 2377] },
+          "secoes": [
+            { "pos": 2377, "forma": "arredondado", "tamanho": [1450, 1030], "cantos": 380, "centro": [0, 1303], "nome": "frente" },
+            { "pos": 2712, "forma": "arredondado", "tamanho": [1480, 1060], "cantos": 380, "centro": [0, 1308] },
+            { "pos": 3012, "forma": "arredondado", "tamanho": [1490, 1190], "cantos": 380, "centro": [0, 1353] },
+            { "pos": 3312, "forma": "arredondado", "tamanho": [1490, 1330], "cantos": 370, "centro": [0, 1443] },
+            { "pos": 3612, "forma": "arredondado", "tamanho": [1490, 1500], "cantos": 350, "centro": [0, 1498] },
+            { "pos": 3912, "forma": "arredondado", "tamanho": [1520, 1570], "cantos": 350, "centro": [0, 1533], "nome": "cabine" },
+            { "pos": 4400, "forma": "arredondado", "tamanho": [1560, 1580], "cantos": 350, "centro": [0, 1538] },
+            { "pos": 5100, "forma": "arredondado", "tamanho": [1560, 1580], "cantos": 350, "centro": [0, 1538] },
+            { "pos": 5700, "forma": "arredondado", "tamanho": [1540, 1530], "cantos": 350, "centro": [0, 1563] },
+            { "pos": 6300, "forma": "arredondado", "tamanho": [1380, 1460], "cantos": 350, "centro": [0, 1588] },
+            { "pos": 6900, "forma": "arredondado", "tamanho": [1240, 1358], "cantos": 350, "centro": [0, 1649] },
+            { "pos": 7500, "forma": "arredondado", "tamanho": [1040, 1133], "cantos": 330, "centro": [0, 1711] },
+            { "pos": 8100, "forma": "arredondado", "tamanho": [840, 930], "cantos": 300, "centro": [0, 1783] },
+            { "pos": 8700, "forma": "arredondado", "tamanho": [640, 736], "cantos": 250, "centro": [0, 1860] },
+            { "pos": 9300, "forma": "arredondado", "tamanho": [400, 535], "cantos": 190, "centro": [0, 1932], "nome": "cauda" },
+            { "pos": 9600, "forma": "arredondado", "tamanho": [370, 444], "cantos": 175, "centro": [0, 1973] },
+            { "pos": 9900, "forma": "arredondado", "tamanho": [380, 352], "cantos": 170, "centro": [0, 2014] },
+            { "pos": 10300, "forma": "arredondado", "tamanho": [360, 231], "cantos": 110, "centro": [0, 2069.5] },
+            { "pos": 10461, "forma": "arredondado", "tamanho": [200, 180], "cantos": 85, "centro": [0, 2090], "nome": "ponta" }
+          ],
+          "oculto": true
+        },
+        { "id": "parabrisa", "unidade": "fuselagem", "tipo": "caixa", "largura": 1200, "profundidade": 40, "raio": 20, "de": [0, 1900, 2885], "para": [0, 2262, 3656], "oculto": true },
+        { "id": "janela1D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 423, "profundidade": 733, "raio": 40, "centro": [780, 1856.5, 3741.5], "oculto": true },
+        { "id": "janela2D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 326, "profundidade": 267, "raio": 40, "centro": [780, 1905, 4523.5], "oculto": true },
+        { "id": "janela3D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 326, "profundidade": 299, "raio": 40, "centro": [780, 1905, 5108.5], "oculto": true },
+        { "id": "janela4D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 305, "profundidade": 256, "raio": 40, "centro": [780, 1915.5, 5882], "oculto": true },
+        { "id": "porta", "unidade": "fuselagem", "tipo": "caixa", "largura": 30, "altura": 1072, "profundidade": 977, "raio": 60, "rotacao": [0, 5.8, 0], "centro": [-735, 1696, 5943.5], "oculto": true },
+        {
+          "id": "barbatana",
+          "unidade": "fuselagem",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "origem": "perfil",
+          "comprimento": 60,
+          "perfil": [
+            [7439, 1088],
+            [7533, 944],
+            [7979, 1073],
+            [8692, 1305],
+            [8739, 1340],
+            [8811, 1522],
+            [7510, 1154]
+          ],
+          "centro": [0, 0, 0],
+          "oculto": true
+        },
+        {
+          "id": "asaD",
+          "unidade": "asas",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "encaixa": { "ancora": "raiz", "em": [745, 1049, 4849] },
+          "secoes": [
+            { "pos": 745, "forma": "elipse", "tamanho": [1762, 264], "centro": [4849, 1049], "nome": "raiz" },
+            { "pos": 905, "forma": "elipse", "tamanho": [1738, 261], "centro": [4846, 1066] },
+            { "pos": 915, "forma": "elipse", "tamanho": [1425, 261], "centro": [4690, 1067] },
+            { "pos": 4895, "forma": "elipse", "tamanho": [908, 161], "centro": [4637, 1480] },
+            { "pos": 4905, "forma": "elipse", "tamanho": [746, 160], "centro": [4556, 1481] },
+            { "pos": 6050, "forma": "elipse", "tamanho": [630, 128], "centro": [4557, 1599] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "pontaD",
+          "unidade": "asas",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "rotacao": [0, 0, 40],
+          "encaixa": { "ancora": "inicio", "em": "pontaDaAsaD" },
+          "secoes": [
+            { "pos": 0, "forma": "elipse", "tamanho": [983, 128], "centro": [0, 0] },
+            { "pos": 217, "forma": "elipse", "tamanho": [840, 100], "centro": [10, 0] },
+            { "pos": 433, "forma": "elipse", "tamanho": [600, 60], "centro": [30, 0] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "flapD",
+          "unidade": "asas",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "encaixa": { "ancora": "inicio", "em": [910, 1066, 5562] },
+          "secoes": [
+            { "pos": 910, "forma": "poligono", "perfil": [[-152, -45], [-152, 45], [152, 4], [152, -4]], "centro": [5562, 1066] },
+            { "pos": 2900, "forma": "poligono", "perfil": [[-137.5, -37.5], [-137.5, 37.5], [137.5, 4], [137.5, -4]], "centro": [5387.5, 1273] },
+            { "pos": 4890, "forma": "poligono", "perfil": [[-121.5, -30], [-121.5, 30], [121.5, 4], [121.5, -4]], "centro": [5214, 1479] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "aileronD",
+          "unidade": "asas",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "encaixa": { "ancora": "inicio", "em": [4900, 1480, 5132] },
+          "secoes": [
+            { "pos": 4900, "forma": "poligono", "perfil": [[-203, -35], [-203, 35], [203, 4], [203, -4]], "centro": [5132, 1480] },
+            { "pos": 6050, "forma": "poligono", "perfil": [[-176.5, -27.5], [-176.5, 27.5], [176.5, 4], [176.5, -4]], "centro": [5048.5, 1599] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "estabilizadorD",
+          "unidade": "empenagem-horizontal",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "encaixa": { "ancora": "raiz", "em": [190, 2085, 9443.5] },
+          "secoes": [
+            { "pos": 190, "forma": "elipse", "tamanho": [733, 111], "centro": [9443.5, 2085], "nome": "raiz" },
+            { "pos": 1300, "forma": "elipse", "tamanho": [603, 100], "centro": [9508, 2229] },
+            { "pos": 2390, "forma": "elipse", "tamanho": [476, 66], "centro": [9572, 2371] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "profundorD",
+          "unidade": "empenagem-horizontal",
+          "lado": "D",
+          "tipo": "loft",
+          "eixo": "x",
+          "encaixa": { "ancora": "inicio", "em": [190, 2085, 10049.5] },
+          "secoes": [
+            { "pos": 190, "forma": "poligono", "perfil": [[-239.5, -39.5], [-239.5, 39.5], [239.5, 4], [239.5, -4]], "centro": [10049.5, 2085] },
+            { "pos": 1300, "forma": "poligono", "perfil": [[-184, -30], [-184, 30], [184, 4], [184, -4]], "centro": [9994, 2229] },
+            { "pos": 2385, "forma": "poligono", "perfil": [[-130, -22], [-130, 22], [130, 4], [130, -4]], "centro": [9940, 2370] }
+          ],
+          "oculto": true
+        },
+        {
+          "id": "deriva",
+          "unidade": "empenagem-vertical",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "origem": "perfil",
+          "comprimento": 180,
+          "perfil": [
+            [6980, 2315],
+            [8030, 2528],
+            [8154, 2602],
+            [9676, 4166],
+            [9821, 4189],
+            [10006, 3896],
+            [9094, 2238]
+          ],
+          "centro": [0, 0, 0],
+          "oculto": true
+        },
+        {
+          "id": "leme",
+          "unidade": "empenagem-vertical",
+          "tipo": "extrusao",
+          "eixo": "x",
+          "origem": "perfil",
+          "comprimento": 140,
+          "perfil": [[9094, 2238], [9821, 2393], [10415, 4164], [10353, 4192], [9821, 4189], [10006, 3896]],
+          "centro": [0, 0, 0],
+          "oculto": true
+        },
+        { "id": "carenagemTremNariz", "unidade": "trem-do-nariz", "tipo": "caixa", "largura": 370, "altura": 176, "profundidade": 833, "raio": 30, "centro": [0, 707, 2341.5], "oculto": true },
+        { "id": "pernaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 100, "de": [0, 378, 1791], "para": [0, 625, 1865], "oculto": true },
+        { "id": "rodaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "eixo": "x", "diametro": 360, "comprimento": 160, "centro": "hubNariz", "oculto": true },
+        { "id": "pernaPrincipalD", "unidade": "trens-principais", "lado": "D", "tipo": "caixa", "largura": 120, "profundidade": 330, "raio": 30, "de": [2050, 312, 4540], "para": [2050, 1075, 4540], "oculto": true },
+        { "id": "rodaPrincipalD", "unidade": "trens-principais", "lado": "D", "tipo": "cilindro", "eixo": "x", "diametro": 590, "comprimento": 210, "centro": "hubPrincipalD", "oculto": true }
+      ]
+    }
+  ],
+  "baseDoMestre": {
+    "unidade": "helice",
+    "parametros": {},
+    "pontos": { "proa": [0, 1330, 8], "eixoHelice": [0, 1330, 490], "pontaDaAsaD": [6050, 1599, 4733], "pEscapeD": [410, 1340, 1116], "pBocaDeAr": [0, 965, 672], "hubPrincipalD": [1890, 312, 4522], "hubNariz": [0, 205, 1740] },
+    "contato": {
+      "raiz": {
+        "juntas": [
+          { "pecas": ["capo", "escapeD", "escapeE"], "max": 150, "motivo": "o escape sai do flanco do capô, que é mais largo atrás que na frente do escape" },
+          { "pecas": ["fuselagem", "estabilizadorD", "estabilizadorE", "profundorD", "profundorE"], "max": 90, "motivo": "a raiz do estabilizador entra no cone de cauda, que é mais largo no bordo de ataque que no de fuga" }
+        ],
+        "pares": []
+      },
+      "opcao": { "juntas": [], "pares": [] }
+    },
+    "plano": {
+      "tocam": [
+        ["cone", "capo"],
+        ["cone", "helicePa"],
+        ["capo", "fuselagem"],
+        ["capo", "entradaDeAr"],
+        ["capo", "escapeD"],
+        ["capo", "escapeE"],
+        ["fuselagem", "parabrisa"],
+        ["fuselagem", "janela1D"],
+        ["fuselagem", "janela4E"],
+        ["fuselagem", "porta"],
+        ["fuselagem", "barbatana"],
+        ["fuselagem", "asaD"],
+        ["fuselagem", "asaE"],
+        ["asaD", "pontaD"],
+        ["asaD", "flapD"],
+        ["asaD", "aileronD"],
+        ["pontaD", "aileronD"],
+        ["asaE", "pontaE"],
+        ["asaE", "flapE"],
+        ["asaE", "aileronE"],
+        ["pontaE", "aileronE"],
+        ["fuselagem", "estabilizadorD"],
+        ["fuselagem", "estabilizadorE"],
+        ["estabilizadorD", "profundorD"],
+        ["estabilizadorE", "profundorE"],
+        ["fuselagem", "deriva"],
+        ["deriva", "leme"],
+        ["fuselagem", "carenagemTremNariz"],
+        ["carenagemTremNariz", "pernaNariz"],
+        ["pernaNariz", "rodaNariz"],
+        ["asaD", "pernaPrincipalD"],
+        ["pernaPrincipalD", "rodaPrincipalD"],
+        ["asaE", "pernaPrincipalE"],
+        ["pernaPrincipalE", "rodaPrincipalE"]
+      ],
+      "livres": [
+        ["helicePa", "fuselagem"],
+        ["rodaNariz", "rodaPrincipalD"],
+        ["rodaNariz", "rodaPrincipalE"],
+        ["rodaPrincipalD", "rodaPrincipalE"],
+        ["pernaNariz", "pernaPrincipalD"],
+        ["aileronD", "aileronE"],
+        ["flapD", "flapE"]
+      ]
+    },
+    "funcao": "cone e cinco pás em torno do eixo do motor, com a raiz de cada pá presa ao cone"
+  }
+}

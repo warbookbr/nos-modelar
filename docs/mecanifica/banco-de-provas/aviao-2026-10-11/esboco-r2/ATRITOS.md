@@ -47,3 +47,39 @@ rm docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/zz.esboco.json*
 npm run esboco -- --editar $A 'plano.referencia[2].partes=[]'
 npm run esboco -- --editar $A --remover helicePa1
 ```
+
+## Unidade helice (detalhe)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json`, no estado em que a hélice foi integrada (cone e `helicePa` por `tipo: "familia"`, perfil `pa-de-helice`, repetida por `arranja`).
+
+### 6. O `substitui` confere a forma da maquete contra a caixa da forma detalhada, e a pá da maquete estava em bandeira
+
+A `helicePa` da maquete tem a corda de 230 mm ao longo de z e a espessura de 70 mm no plano do disco, de modo que a caixa dela em y é de 70 mm. A pá com 52 graus de incidência na raiz e 18 na ponta ocupa 195 mm em y, e o `--integrar` recusou com "a forma helicePa da maquete foi excedida: passa 91,5 mm em y", embora a caixa da unidade coubesse. O caminho foi `--refazer-envelope helice --de <detalhe>` com o motivo no histórico; o texto da recusa já aponta esse caminho, e o atrito está em a maquete ter sido escrita com a pá em bandeira sem que o gate da maquete o dissesse.
+
+```bash
+npm run esboco -- --condutor $A --historico | grep -i "envelope refeito"
+```
+
+### 7. O relato de sobreposição na vista superior acusa as pás vizinhas de um arranjo radial
+
+Cada pá do `arranja` cobre a vizinha em 33 a 62% na vista superior, com folga real de 142 mm, e o relato sai no `--descrever --forma helicePa` como se fosse achado. O contrato `livres` não tem como declarar o par entre a fonte e as próprias cópias do arranjo (`helicePa` com `helicePa*`), então o ruído não se apaga.
+
+```bash
+npm run esboco -- $A --descrever --forma helicePa
+```
+
+### 8. A medida `helice diametro` mede a caixa em y de cinco pás, que depende da fase e não do diâmetro
+
+Com cinco pás e a primeira em +x, a caixa em y vale cerca de 0,95 do diâmetro (2 x raio x sen 72 graus); o plano declara 2075 mm como diâmetro e a conferência lê 2106,8 mm com a pá de raio 1090 mm. A medida passa, mas o número que ela confere não é o diâmetro. Não editei o plano; o campo é `plano.medidas[nome=helice diametro].mede`, que poderia medir a distância entre a ponta da pá e o eixo (`{ "distancia": ["helicePa.+x", "eixoHelice"], "eixo": "x" }`).
+
+```bash
+npm run esboco -- $A --medidas | grep "helice diametro"
+```
+
+### 9. O `--detalhar` e o `--unidade` sobre o detalhe deixam imagens soltas na pasta do esboço
+
+`--unidade helice --composta` rodado sobre `aviao-detalhe-helice.esboco.json` grava `aviao-detalhe-helice-unidade-helice-composta.png` ao lado do mestre, e o arquivo de detalhe fica na pasta depois do `--integrar`. Nada os remove nem os marca como transitórios.
+
+```bash
+npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-helice.esboco.json --unidade helice --composta
+```

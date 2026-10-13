@@ -42,17 +42,17 @@
       ],
       "depende": [],
       "custo": 6,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
           "x": [
-            -888.3,
+            -923.3,
             1090
           ],
           "y": [
-            289.9,
-            2370.1
+            281.6,
+            2388.4
           ],
           "z": [
             8,
@@ -77,16 +77,16 @@
           },
           "helicePa": {
             "x": [
-              195,
+              178,
               1090
             ],
             "y": [
-              1295,
-              1365
+              1261.2,
+              1456.5
             ],
             "z": [
-              375,
-              605
+              380.5,
+              557.7
             ]
           },
           "helicePa1": {
@@ -146,6 +146,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-helice.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     },
     {
@@ -900,7 +906,43 @@
       }
     }
   ],
-  "alteracoes": [],
+  "alteracoes": [
+    {
+      "envelopeRefeito": true,
+      "unidade": "helice",
+      "motivo": "a pá da maquete tinha a corda ao longo do eixo e a espessura no plano do disco (pá em bandeira); a pá real tem a corda inclinada de 52 graus na raiz a 18 na ponta, e a caixa dela em y passa a ser a da pá torcida",
+      "de": "do detalhado aviao-detalhe-helice.esboco.json",
+      "antes": {
+        "x": [
+          -888.3,
+          1090
+        ],
+        "y": [
+          289.9,
+          2370.1
+        ],
+        "z": [
+          8,
+          606
+        ]
+      },
+      "depois": {
+        "x": [
+          -923.3,
+          1090
+        ],
+        "y": [
+          281.6,
+          2388.4
+        ],
+        "z": [
+          8,
+          606
+        ]
+      },
+      "mudou": true
+    }
+  ],
   "marcos": [],
   "avisos": [],
   "opcao": "Avião de pequeno porte"

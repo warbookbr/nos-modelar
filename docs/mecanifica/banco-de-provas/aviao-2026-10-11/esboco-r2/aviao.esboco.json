@@ -183,7 +183,7 @@
       { "arquivo": "../referencias/frontal.contornos.json", "vista": "frontal", "deslocamento": { "y": -34 }, "iou_min": 0.65, "partes": [] }
     ]
   },
-  "parametros": {},
+  "parametros": { "angHelice": 0 },
   "pontos": { "proa": [0, 1330, 8], "eixoHelice": [0, 1330, 490], "pontaDaAsaD": [6050, 1599, 4733], "pEscapeD": [410, 1340, 1116], "pBocaDeAr": [0, 965, 672], "hubPrincipalD": [1890, 312, 4522], "hubNariz": [0, 205, 1740] },
   "simetrico": { "eixo": "x", "pos": 0 },
   "contato": {
@@ -236,18 +236,16 @@
         {
           "id": "helicePa",
           "unidade": "helice",
-          "tipo": "loft",
-          "eixo": "x",
+          "tipo": "familia",
+          "familia": "superficie-aerodinamica",
+          "perfil": "pa-de-helice",
+          "substitui": "helicePa",
+          "parametros": { "envergadura": 912, "cordaNaRaiz": 0.22, "cordaNaPonta": 0.125 },
+          "rotacao": [0, 0, -90],
           "encaixa": {
-            "ancora": "inicio",
-            "em": { "ancora": "eixoHelice", "mm": [195, 0, 0] }
-          },
-          "secoes": [
-            { "pos": 0, "forma": "elipse", "tamanho": [230, 70], "centro": [0, 0] },
-            { "pos": 205, "forma": "elipse", "tamanho": [225, 55], "centro": [0, 0] },
-            { "pos": 605, "forma": "elipse", "tamanho": [175, 35], "centro": [0, 0] },
-            { "pos": 895, "forma": "elipse", "tamanho": [115, 22], "centro": [0, 0] }
-          ]
+            "ancora": "raiz",
+            "em": { "ancora": "eixoHelice", "mm": [178, 0, -62] }
+          }
         },
         { "arranja": { "forma": "helicePa", "modo": "radial", "total": 5, "eixo": "z", "centro": "eixoHelice", "graus": 360 } },
         {
@@ -452,5 +450,16 @@
         { "id": "rodaPrincipalD", "unidade": "trens-principais", "lado": "D", "tipo": "cilindro", "eixo": "x", "diametro": 590, "comprimento": 210, "centro": "hubPrincipalD" }
       ]
     }
-  ]
+  ],
+  "curso": {
+    "gira": {
+      "parametro": "angHelice",
+      "de": 0,
+      "ate": 72,
+      "passos": 6,
+      "formas": ["helicePa*"],
+      "gira": { "eixo": "z", "centro": "eixoHelice" },
+      "rotulo": "a hélice girando um passo entre pás"
+    }
+  }
 }
