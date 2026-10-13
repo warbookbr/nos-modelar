@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1175 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1177 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -161,11 +161,19 @@
 
 - `brief.md` — --- brief para o crítico cego ---
 
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-empenagem-horizontal/
+
+- `brief.md` — --- brief para o crítico cego ---
+
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-fuselagem/
 
 - `brief.md` — --- brief para o crítico cego ---
 
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-50/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-75/
 
 - `brief.md` — --- brief para o crítico cego ---
 

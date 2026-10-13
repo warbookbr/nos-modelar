@@ -249,6 +249,17 @@ Nota de método: a busca web devolveu pouco além de origami computacional, DFM 
 43. SolveSpace (restrições geométricas) — https://solvespace.com/ — CAD paramétrico com solver de restrições 2D e 3D e arquivo de texto legível. Montagem por restrições em vez de coordenadas.
 44. Metrologia por escaneamento (CloudCompare, desvio entre malha e CAD) — https://www.cloudcompare.org/ — Mede distância ponto a superfície e mostra mapa de erro colorido. Técnica para medir quanto a peça gerada se afasta de uma referência.
 
+## Crafting Apps do ArtCraft (pesquisa de 2026-10-13)
+
+Família de aplicativos nativos em Rust da Storyteller.ai, publicada em outubro de 2026, gratuitos e de código aberto sob MIT ou Apache-2.0, à escolha; o nome e as marcas ArtCraft ficam fora da licença. Cada app tem repositório próprio em `github.com/storytold`, vários com linha de comando e servidor MCP, e todos em alfa ou pré-alfa. Não se confundem com o estúdio ArtCraft de geração de imagem e vídeo, que roda na nuvem por créditos e não serve ao Mecanifica (a geração inventa detalhe e não é reproduzível). Os apps listados no README do VectorCraft, conferidos pela pessoa: PhotoCraft (edição de imagem com camadas, máscaras, texto e PSD), VectorCraft (ilustração vetorial e vetorização de imagem), FilmCraft (vídeo, cor e som), LightCraft (biblioteca de fotos e revelação raw), PdfCraft (leitura, organização e proteção de PDF), EffectCraft (animação e efeitos) e DesignCraft (diagramação e publicação). A pesquisa achou também o CADCraft (desenho técnico 2D), e a página de apps fala em treze no total.
+
+Os dois que interessam ao Mecanifica:
+
+1. VectorCraft — https://github.com/storytold/vectorcraft — Vetoriza imagem pelas ideias do potrace (quantização, borda abaixo do pixel, ajuste de curvas com quinas e trechos retos, preset de desenho técnico), com documento nativo em JSON e saída SVG, PDF e DXF. O crate `vectorcraft-trace` separa o algoritmo da interface. A linha de comando só sai pronta para macOS, e no Linux compila da fonte. Nada garante saída idêntica entre execuções. Candidato a teste contra o contorno da imagem.
+2. CADCraft — https://github.com/storytold/cadcraft — Desenho técnico 2D com cotas e o crate `cadcraft-constraints`, um resolvedor de restrições geométricas e dimensionais que acusa conflito e graus de liberdade restantes. Pré-alfa. Candidato ao plano do [desenho sem referência](planos/2026-10-13-desenho-sem-referencia.md), em que a IA escreveria peças e restrições e o resolvedor daria a geometria.
+
+Combinado com a pessoa em 2026-10-13: código aberto que não roda aqui como está ainda serve de base. O Mecanifica pode estudar o algoritmo, adaptar ou reescrever o que precisa no próprio repositório, com teste e determinismo, e usá-lo como modelo para elevar o que faz; ao trazer código, a licença de origem e o aviso de autoria vão junto.
+
 ## Addons do Blender
 
 Links de referência listados pela IA que fez a pesquisa:
