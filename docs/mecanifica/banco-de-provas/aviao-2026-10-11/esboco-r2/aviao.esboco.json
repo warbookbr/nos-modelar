@@ -15,6 +15,8 @@
       { "nome": "cone diametro", "valor": 423, "unidade": "mm", "origem": "referencia", "tolerancia": 40, "mede": { "caixa": "y", "formas": ["cone"] } },
       { "nome": "helice diametro", "valor": 2075, "unidade": "mm", "origem": "referencia", "tolerancia": 80, "mede": { "caixa": "y", "formas": ["helicePa*"] } },
       { "nome": "escape comprimento", "valor": 537, "unidade": "mm", "origem": "referencia", "tolerancia": 50, "mede": { "caixa": "z", "formas": ["escapeD"] } },
+      { "nome": "escape recuo D", "valor": 430, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": { "distancia": ["escapeD.inicio", "escapeD.fim"], "eixo": "z" } },
+      { "nome": "escape recuo E", "valor": 430, "unidade": "mm", "origem": "ia", "tolerancia": 20, "mede": { "distancia": ["escapeE.inicio", "escapeE.fim"], "eixo": "z" } },
       { "nome": "parabrisa comprimento", "valor": 771, "unidade": "mm", "origem": "referencia", "tolerancia": 50, "mede": { "caixa": "z", "formas": ["parabrisa"] } },
       { "nome": "janelas comprimento", "valor": 2635, "unidade": "mm", "origem": "referencia", "tolerancia": 50, "mede": { "caixa": "z", "formas": ["janela1D", "janela2D", "janela3D", "janela4D"] } },
       { "nome": "porta comprimento", "valor": 977, "unidade": "mm", "origem": "referencia", "tolerancia": 40, "mede": { "caixa": "z", "formas": ["porta"] } },

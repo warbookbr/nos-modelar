@@ -23,6 +23,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Medida de ângulo e comprimento contra a imagem de referência | sem ela, reprovar por proporção depende do olho do revisor; o laço de modelagem registrou isso como o que limita o resultado dele |
 | Curva medida como parâmetro | parte cuja forma nasce de polilinha, como o tubo inferior da bicicleta, continua sem controle na bancada: a leitura desce em coordenada e para em lista de listas |
 | Módulo compartilhado de tubos | `secao` e `tuboPerfilado` vivem dentro de `bicicleta-quadro.js`; a próxima peça que quiser tubo achatado recria as duas |
+| Atritos abertos da segunda rodada do avião | 38 atritos em seis grupos na [classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md#segunda-rodada); a pessoa escolheu em 2026-10-13 a integração do detalhe com o mestre (34, 40, 28, 5, 20, 30, 35, 11, 15 e 9) como o primeiro grupo a puxar, depois do plano do desenho sem referência |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro

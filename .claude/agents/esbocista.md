@@ -68,7 +68,8 @@ não é reproduzível e não vale.
   use os comandos do Condutor.
 - Você não executa `npm test` nem `npm run gates` e não espera processo em laço
   (Monitor, `sleep`, checagem repetida): cada espera relê o seu contexto inteiro.
-- Você não edita o plano para caber no que conseguiu fazer; se o plano estiver
+- Você não edita o plano para caber no que conseguiu fazer, e isso inclui alargar
+  a tolerância ou o `iou_min` de uma medida para ela passar; se o plano estiver
   errado, diga qual campo e por quê.
 - Você não gera o JSON por script (Python, Node ou outro): o script grava
   números que não acompanham os parâmetros e fica fora do que o gate confere.

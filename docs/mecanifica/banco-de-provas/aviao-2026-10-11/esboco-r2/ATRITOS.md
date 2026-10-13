@@ -76,6 +76,8 @@ Com cinco pás e a primeira em +x, a caixa em y vale cerca de 0,95 do diâmetro 
 npm run esboco -- $A --medidas | grep "helice diametro"
 ```
 
+Conferido no fechamento, o atrito não procede como escrito. A cota de 2075 mm da [prancha lateral](../referencias/lateral.prancha.json) é a altura da hélice desenhada de lado, que também depende da fase em que as pás foram desenhadas, e não o diâmetro; a caixa em y das pás do modelo mede a mesma coisa e fica. Trocar por `helice raio` com a metade da cota só passou com a tolerância alargada de 40 para 60 mm sem base, e foi desfeito. O raio da pá (1090 mm) não sai da referência sem saber a fase do desenho.
+
 ### 9. O `--detalhar` e o `--unidade` sobre o detalhe deixam imagens soltas na pasta do esboço
 
 `--unidade helice --composta` rodado sobre `aviao-detalhe-helice.esboco.json` grava `aviao-detalhe-helice-unidade-helice-composta.png` ao lado do mestre, e o arquivo de detalhe fica na pasta depois do `--integrar`. Nada os remove nem os marca como transitórios.
@@ -144,6 +146,8 @@ npm run esboco -- $D/zz.esboco.json --medidas | grep escape
 npm run esboco -- $D/zz.esboco.json --descrever | grep divergências
 rm $D/zz.esboco.json*
 ```
+
+Resolvido: `plano.medidas` ganhou `escape recuo D` e `escape recuo E`, cada uma com `{ "distancia": ["escapeX.inicio", "escapeX.fim"], "eixo": "z" }`, valor 430 mm e tolerância 20 mm; as duas medem 430 mm no escape atual. Um escape que recuasse 110 mm, como o do commit anterior, ficaria 320 mm fora da tolerância (conta feita sobre os números, não rodada). O `--descrever` do mestre segue sem divergência.
 
 ### 15. O `--detalhar` regrava o arquivo de detalhe que já existe sem avisar
 
