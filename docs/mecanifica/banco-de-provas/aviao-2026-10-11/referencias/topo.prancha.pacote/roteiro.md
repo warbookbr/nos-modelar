@@ -16,9 +16,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 3 — heliceEsq
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: vistas discordam: lateral 188, topo 349). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (da vista lateral, prevalece). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 882. A linha atravessa a seção que o modelador precisa, dentro de heliceEsq?
-- comprimento: EM FALTA: só há a nota "vistas discordam: lateral 188, topo 349", que não dá número. A linha mede heliceEsq de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: cota 235 (lateral, prevalece), tirada da vista lateral. A linha mede heliceEsq de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "heliceEsq" fica na coluna da esquerda. A chamada termina dentro de heliceEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceEsq não cruzam outra linha nem passam sobre número ou nome?
 
@@ -104,9 +104,9 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 ## Etapa 14 — heliceDir
 
-- cotas esperadas: largura (medida aqui) e comprimento (não medível: vistas discordam: lateral 188, topo 349). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
+- cotas esperadas: largura (medida aqui) e comprimento (da vista lateral, prevalece). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - largura: cota 914. A linha atravessa a seção que o modelador precisa, dentro de heliceDir?
-- comprimento: EM FALTA: só há a nota "vistas discordam: lateral 188, topo 349", que não dá número. A linha mede heliceDir de ponta a ponta na vertical, sem pegar parte vizinha?
+- comprimento: cota 235 (lateral, prevalece), tirada da vista lateral. A linha mede heliceDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "heliceDir" fica na coluna da direita. A chamada termina dentro de heliceDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de heliceDir não cruzam outra linha nem passam sobre número ou nome?
 

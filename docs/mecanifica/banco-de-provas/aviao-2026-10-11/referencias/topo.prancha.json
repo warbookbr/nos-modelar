@@ -31,12 +31,12 @@
   {
    "parte": "heliceEsq",
    "medida": "altura",
-   "medivel": false,
-   "motivo": "vistas discordam: lateral 188, topo 349",
-   "notaEm": [
-    -6500,
-    5480
-   ]
+   "origem": {
+    "imagem": "lateral",
+    "medida": "largura",
+    "parte": "helice"
+   },
+   "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida"
   },
   {
    "parte": "heliceDir",
@@ -50,12 +50,12 @@
   {
    "parte": "heliceDir",
    "medida": "altura",
-   "medivel": false,
-   "motivo": "vistas discordam: lateral 188, topo 349",
-   "notaEm": [
-    590,
-    5480
-   ]
+   "origem": {
+    "imagem": "lateral",
+    "medida": "largura",
+    "parte": "helice"
+   },
+   "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida"
   },
   {
    "parte": "escapeEsq",

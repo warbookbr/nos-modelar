@@ -68,9 +68,13 @@
 <path class="cota" d="M 488.52 164.4 L 547.07 164.4"/>
 <text x="469.98" y="164.4" class="cotat" text-anchor="middle">882</text>
 <path class="cota" stroke-dasharray="2 2" d="M 517.79 164.4 L 479.55 164.4"/>
+<path class="cota" d="M 548.88 187.16 L 548.88 171.57"/>
+<text x="542.88" y="179.37" class="cotat" text-anchor="middle" transform="rotate(-90 542.88 179.37)">235 (lateral, prevalece)</text>
 <path class="cota" d="M 576.6 164.4 L 637.27 164.4"/>
 <text x="650.1" y="147.8" class="cotat" text-anchor="middle">914</text>
 <path class="cota" stroke-dasharray="2 2" d="M 606.94 164.4 L 640.53 150"/>
+<path class="cota" d="M 637.74 187.16 L 637.74 171.57"/>
+<text x="631.74" y="179.37" class="cotat" text-anchor="middle" transform="rotate(-90 631.74 179.37)">235 (lateral, prevalece)</text>
 <path class="cota" d="M 511.74 206.9 L 531.31 206.9"/>
 <text x="465.08" y="206.9" class="cotat" text-anchor="middle">295</text>
 <path class="cota" stroke-dasharray="2 2" d="M 521.53 206.9 L 474.65 206.9"/>
@@ -171,8 +175,6 @@
 <path class="cota" d="M 666.25 807.79 L 666.25 786.02"/>
 <text x="729.4" y="821.88" class="cotat" text-anchor="middle">328</text>
 <path class="cota" stroke-dasharray="2 2" d="M 666.25 796.91 L 719.83 813.08"/>
-<text x="128.36" y="105.3" class="cotat" font-style="italic">heliceEsq comprimento: vistas discordam: lateral 188, topo 349</text>
-<text x="599.18" y="105.3" class="cotat" font-style="italic">heliceDir comprimento: vistas discordam: lateral 188, topo 349</text>
 <circle class="lm" cx="945.69" cy="473.19" r="2.6"/>
 <text class="lmt" x="1001" y="512.05">aileronDir</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 945.69 473.19 L 1001 504.45"/>
