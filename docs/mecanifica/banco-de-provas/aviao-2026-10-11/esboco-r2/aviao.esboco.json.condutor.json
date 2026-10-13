@@ -902,8 +902,32 @@
       "membros": [
         "pernaPrincipalD",
         "pernaPrincipalE",
+        "pinoPivoPrincipalD",
+        "pinoPivoPrincipalE",
+        "coroaPrincipalD",
+        "coroaPrincipalE",
+        "garfoExtPrincipalD",
+        "garfoExtPrincipalE",
+        "garfoIntPrincipalD",
+        "garfoIntPrincipalE",
+        "eixoRodaPrincipalD",
+        "eixoRodaPrincipalE",
         "rodaPrincipalD",
-        "rodaPrincipalE"
+        "rodaPrincipalE",
+        "compassoSupPrincipalD",
+        "compassoSupPrincipalE",
+        "compassoInfPrincipalD",
+        "compassoInfPrincipalE",
+        "pinoCompassoPrincipalD",
+        "pinoCompassoPrincipalE",
+        "alavancaPrincipalD",
+        "alavancaPrincipalE",
+        "atuadorCorpoPrincipalD",
+        "atuadorCorpoPrincipalE",
+        "atuadorHastePrincipalD",
+        "atuadorHastePrincipalE",
+        "orelhaAtuadorPrincipalD",
+        "orelhaAtuadorPrincipalE"
       ],
       "depende": [],
       "custo": 4,
@@ -912,16 +936,16 @@
       "envelope": {
         "caixa": {
           "x": [
-            -2110,
-            2110
+            -2072,
+            2072
           ],
           "y": [
             17,
-            1075
+            1220
           ],
           "z": [
-            4227,
-            4817
+            4225.5,
+            4818.5
           ]
         },
         "portas": [],
@@ -983,6 +1007,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-trens-principais.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     }
   ],
@@ -1060,6 +1090,41 @@
     {
       "replanejado": true,
       "motivo": "refazer a integração da empenagem vertical depois de trocar a deriva e a carência por um módulo, devolvendo o mestre à maquete"
+    },
+    {
+      "envelopeRefeito": true,
+      "unidade": "trens-principais",
+      "motivo": "a maquete parou a perna na face inferior da asa (y 1075), mas o trem recolhe para dentro da asa: o pino do pivô, o topo da perna e a orelha do atuador ficam dentro do alojamento recortado na asa, até y 1220",
+      "de": "do detalhado aviao-detalhe-trens-principais.esboco.json",
+      "antes": {
+        "x": [
+          -2110,
+          2110
+        ],
+        "y": [
+          17,
+          1075
+        ],
+        "z": [
+          4227,
+          4817
+        ]
+      },
+      "depois": {
+        "x": [
+          -2072,
+          2072
+        ],
+        "y": [
+          17,
+          1220
+        ],
+        "z": [
+          4225.5,
+          4818.5
+        ]
+      },
+      "mudou": true
     }
   ],
   "marcos": [
@@ -1100,7 +1165,8 @@
     "asas": "Asa pela família em duas chamadas cortadas em x=asaXPonta (reta e ponta curva): cortar a ponta levantada acusa recorte-vazio. Flap e aileron em vãos com folga 12 mm, eixo e suportes. Flap a partir de x 960: a referência é assimétrica.",
     "empenagem-horizontal": "Estabilizador pela família (perfil simétrico), profundor recortado com fresta de 12 mm. O ressalto de 170 mm na ponta do profundor vem da referência (684 mm de profundidade); o Envelope foi refeito. Eixo no vão, suportes sob a dobradiça.",
     "empenagem-vertical": "A região deriva da referência inclui o filete dorsal, então lâmina e filete são o módulo deriva. O vão do leme é o cortador vaoDoLeme (fresta 12 mm); o leme tem o canto traseiro de baixo cortado e o ressalto no topo, como a referência.",
-    "trem-do-nariz": "O alojamento é a própria carenagem oca (o --integrar não leva recorte ao casco de outra unidade), então a roda deita 90 graus nele ao recolher. Curso por expressão de tnCurso, perna vertical, garfo de um braço no lado E, pivô y 680."
+    "trem-do-nariz": "O alojamento é a própria carenagem oca (o --integrar não leva recorte ao casco de outra unidade), então a roda deita 90 graus nele ao recolher. Curso por expressão de tnCurso, perna vertical, garfo de um braço no lado E, pivô y 680.",
+    "trens-principais": "Recolhe para dentro da asa girando em z em torno de um pino no meio dela. A asaD subtrai três cortadores (o --integrar não leva o subtrai a forma alheia; editado à mão no mestre). Roda para em 84 graus, paralela ao intradorso (diedro)."
   },
   "vereditos": [
     {
