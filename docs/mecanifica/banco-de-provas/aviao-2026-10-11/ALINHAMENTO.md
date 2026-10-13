@@ -104,4 +104,7 @@ A segunda rodada, com as ferramentas da fatia 5, está em
 [`esboco-r2/`](esboco-r2/aviao.esboco.json), com os atritos em
 [`esboco-r2/ATRITOS.md`](esboco-r2/ATRITOS.md). O brief do crítico de cada unidade
 e de cada Marco: [fuselagem](esboco-r2/aviao-critico-fuselagem/brief.md),
-[marco-50](esboco-r2/aviao-critico-marco-50/brief.md).
+[marco-50](esboco-r2/aviao-critico-marco-50/brief.md),
+[asas](esboco-r2/aviao-critico-asas/brief.md),
+[empenagem-horizontal](esboco-r2/aviao-critico-empenagem-horizontal/brief.md),
+[marco-75](esboco-r2/aviao-critico-marco-75/brief.md).
