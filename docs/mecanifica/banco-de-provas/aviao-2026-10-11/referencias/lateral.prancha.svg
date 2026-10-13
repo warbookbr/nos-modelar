@@ -78,13 +78,12 @@
 <path class="cota" d="M 413.6 485.71 L 413.6 465.79"/>
 <text x="397.33" y="454.59" class="cotat" text-anchor="middle">245</text>
 <path class="cota" stroke-dasharray="2 2" d="M 413.6 475.75 L 406.9 456.79"/>
-<path class="cota" d="M 420.15 385.83 L 632.17 385.83"/>
-<path class="ext" d="M 420.15 398.03 L 420.15 382.83"/>
-<path class="ext" d="M 632.17 398.03 L 632.17 382.83"/>
-<text x="526.16" y="379.83" class="cotat" text-anchor="middle">2606</text>
+<path class="cota" d="M 552.09 475.33 L 569.58 475.33"/>
+<text x="511.28" y="463.13" class="cotat" text-anchor="middle">215 por janela</text>
+<path class="cota" stroke-dasharray="2 2" d="M 560.84 475.33 L 555.94 465.33"/>
 <path class="cota" d="M 564.13 494.65 L 564.13 471.73"/>
-<text x="564.13" y="463.66" class="cotat" text-anchor="middle">282</text>
-<path class="cota" stroke-dasharray="2 2" d="M 564.13 483.19 L 564.13 465.86"/>
+<text x="573.73" y="511.1" class="cotat" text-anchor="middle">282</text>
+<path class="cota" stroke-dasharray="2 2" d="M 564.13 483.19 L 564.16 502.3"/>
 <path class="cota" d="M 590.15 524.15 L 665.11 524.15"/>
 <text x="627.63" y="518.15" class="cotat" text-anchor="middle">921</text>
 <path class="cota" d="M 653.64 545.32 L 653.64 458.36"/>
@@ -162,9 +161,9 @@
 <circle class="lm" cx="184.15" cy="467.19" r="2.6"/>
 <text class="lmt" x="107.83" y="364.42" text-anchor="end">helice</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 184.15 467.19 L 107.83 366.32"/>
-<circle class="lm" cx="507.99" cy="475.33" r="2.6"/>
+<circle class="lm" cx="623.53" cy="479.4" r="2.6"/>
 <text class="lmt" x="107.83" y="124.38" text-anchor="end">janelas</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 507.99 475.33 L 107.83 126.28"/>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 623.53 479.4 L 107.83 126.28"/>
 <circle class="lm" cx="966.9" cy="307.71" r="2.6"/>
 <text class="lmt" x="1035.79" y="266.78">leme</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 966.9 307.71 L 1035.79 268.68"/>

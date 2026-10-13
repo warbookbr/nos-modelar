@@ -9,7 +9,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 2 — janelas
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 2606. A linha atravessa a seção que o modelador precisa, dentro de janelas?
+- comprimento: cota 215 por janela, com o rótulo "por janela": o número vale só para o que o rótulo diz, e não para a parte inteira. A linha atravessa a seção que o modelador precisa, dentro de janelas?
 - altura: cota 282. A linha mede janelas de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "janelas" fica na coluna da esquerda. A chamada termina dentro de janelas, e não numa vizinha?
 - linhas livres: a chamada e as cotas de janelas não cruzam outra linha nem passam sobre número ou nome?

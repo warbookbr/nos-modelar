@@ -76,16 +76,27 @@
   {
    "parte": "janelas",
    "medida": "largura",
-   "em": 2950,
-   "afasta": 150
+   "de": [
+    5002,
+    2000
+   ],
+   "ate": [
+    5217,
+    2000
+   ],
+   "rotulo": "por janela",
+   "numero": [
+    -609,
+    150
+   ]
   },
   {
    "parte": "janelas",
    "medida": "altura",
    "em": 5150,
    "numero": [
-    0,
-    240
+    118,
+    -343
    ]
   },
   {
@@ -287,8 +298,8 @@
   },
   "janelas": {
    "marca": [
-    4460,
-    2000
+    5880,
+    1950
    ],
    "coluna": "esquerda",
    "nivel": 6350
