@@ -461,3 +461,20 @@ Com a unidade integrada, `--curso recolhePrincipais` dura 2 min 02 s (8 posiçõ
 time npm run esboco -- $A --curso recolhePrincipais
 time npm run esboco -- --condutor $A --feito trens-principais
 ```
+
+### 43. O `--integrar` duplica o cortador da unidade quando o mestre já o tem
+
+Na segunda integração de `trens-principais` (refazer a unidade depois do crítico) o `--integrar` recusa com `id "alojamentoPernaPrincipalD" repetido`: os três cortadores já estão no mestre, o Condutor não os conta entre os membros da unidade (um cortador não é forma visível), e o detalhe os traz como formas novas. Contornei editando à mão os três cortadores no mestre, integrando a partir de uma cópia do detalhe com os três cortadores `"oculto": true` (o `--integrar` ignora as ocultas) e levando à mão para o mestre o parâmetro `tpBlC`, usado por eles e ainda inexistente, e a junta do contato (`pinoPivoPrincipalD` com `pernaPrincipalD`, `max` 345), que a base antiga do detalhe não deixou passar.
+
+```bash
+R=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2
+npm run esboco -- $R/aviao.esboco.json --integrar trens-principais $R/aviao-detalhe-trens-principais.esboco.json
+```
+
+### 44. A conta do crítico de colisão marca 45 mm de penetração como colisão entre peças de mesma largura
+
+A lâmina da perna atravessando a coroa em 45 mm (o valor de `contato.penetracao`) deu "colisão" em todas as poses a partir de 36, com a explicação de que o encaixe pede no máximo 60% da extensão transversal e a coroa ocupava 100% (depois 294%); com a lâmina a 25 mm do pneu e a coroa de 20 mm de altura sem se atravessarem, o achado some. A mensagem não diz que 45 é o próprio limite, de modo que não se sabe se a penetração menor passaria.
+
+```bash
+npm run esboco -- $R/aviao.esboco.json --curso recolhePrincipais
+```

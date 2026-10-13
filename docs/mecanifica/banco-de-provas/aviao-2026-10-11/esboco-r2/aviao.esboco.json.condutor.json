@@ -920,12 +920,16 @@
         "compassoInfPrincipalE",
         "pinoCompassoPrincipalD",
         "pinoCompassoPrincipalE",
-        "alavancaPrincipalD",
-        "alavancaPrincipalE",
+        "pinoCompassoAltoPrincipalD",
+        "pinoCompassoAltoPrincipalE",
+        "pinoCompassoBaixoPrincipalD",
+        "pinoCompassoBaixoPrincipalE",
         "atuadorCorpoPrincipalD",
         "atuadorCorpoPrincipalE",
         "atuadorHastePrincipalD",
         "atuadorHastePrincipalE",
+        "pinoAtuadorPrincipalD",
+        "pinoAtuadorPrincipalE",
         "orelhaAtuadorPrincipalD",
         "orelhaAtuadorPrincipalE"
       ],
@@ -1183,7 +1187,7 @@
     "empenagem-horizontal": "Estabilizador pela família (perfil simétrico), profundor recortado com fresta de 12 mm. O ressalto de 170 mm na ponta do profundor vem da referência (684 mm de profundidade); o Envelope foi refeito. Eixo no vão, suportes sob a dobradiça.",
     "empenagem-vertical": "A região deriva da referência inclui o filete dorsal, então lâmina e filete são o módulo deriva. O vão do leme é o cortador vaoDoLeme (fresta 12 mm); o leme tem o canto traseiro de baixo cortado e o ressalto no topo, como a referência.",
     "trem-do-nariz": "O alojamento é a própria carenagem oca (o --integrar não leva recorte ao casco de outra unidade), então a roda deita 90 graus nele ao recolher. Curso por expressão de tnCurso, perna vertical, garfo de um braço no lado E, pivô y 680.",
-    "trens-principais": "Recolhe para dentro da asa girando em z em torno de um pino no meio dela. A asaD subtrai três cortadores (o --integrar não leva o subtrai a forma alheia; editado à mão no mestre). Roda para em 84 graus, paralela ao intradorso (diedro)."
+    "trens-principais": "Perna em lâmina 70x340, como a lateral da referência, parada 25 mm sobre o pneu; coroa fina e garfo em placas de 190. Compasso na frente e atuador atrás, em pinos de z presos à perna e à orelha da asa. Cortadores com 400 em z, no mestre."
   },
   "vereditos": [
     {

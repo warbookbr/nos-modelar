@@ -1,5 +1,7 @@
 --- brief para o crítico cego ---
-Função da unidade: um trem principal sob cada asa: perna presa por um pino dentro da asa, coroa e garfo de dois braços com a roda de pneu, compasso e atuador, que recolhem para dentro girando em torno do pino, com a roda deitando paralela ao intradorso num alojamento recortado na própria asa
+Função da unidade: um trem principal sob cada asa: perna em lâmina larga presa por um pino dentro da asa, coroa e garfo de duas placas com a roda de pneu, compasso articulado no joelho na frente da lâmina e atuador telescópico atrás dela, preso à asa por uma orelha e à perna por um pino, que recolhem para dentro girando em torno do pino, com a roda deitando paralela ao intradorso num alojamento recortado na própria asa
+Veredito anterior (rodada passada): nota 7, motivo: Curso 0 a 84 coerente e roda alojada rente ao intradorso, mas compasso e atuador são hastes curtas que giram rígidas com a perna, sem ligar a perna a nada nem articular (a referência frontal mostra escora fina e longa ao lado da perna), e a perna é um tubo fino onde a referência lateral mostra lâmina larga, quase da largura da roda, cobrindo o pneu.
+Diga, para cada defeito desse motivo, se foi resolvido ou não, e não conte como novo o que já foi apontado.
 Imagens (as quatro vistas da unidade isolada, sem legenda; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue):
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trens-principais/aviao-unidade-trens-principais-isometrica.png
   /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trens-principais/aviao-unidade-trens-principais-frontal.png
@@ -37,8 +39,8 @@ De que lado cada vista olha (eixos do esboço, com y para cima; "olha de +z" que
   lateral-oposta: olha de -x e vê o lado esquerdo; a proa (-z) fica à esquerda da imagem
   As quatro vistas de sempre só olham dos lados positivos (+x, +y, +z).
 Ligações da unidade em texto (o --ligacoes: quem toca quem, em quantos pontos distintos, pontas livres); confira se as imagens mostram o mesmo:
-  unidade trens-principais (28 formas; função: um trem principal sob cada asa: perna presa por um pino dentro da asa, coroa e garfo de dois braços com a roda de pneu, compasso e atuador, que recolhem para dentro girando em torno do pino, com a roda deitando paralela ao intradorso num alojamento recortado na própria asa):
-    toca asas: 16 pontos (pernaPrincipalD em asaD [1920 1107,8 4574,5]; pinoPivoPrincipalD em asaD [1920 1115 4594,5]; alavancaPrincipalD em asaD [1880 1025 4406,7]; mais 9)
+  unidade trens-principais (32 formas; função: um trem principal sob cada asa: perna em lâmina larga presa por um pino dentro da asa, coroa e garfo de duas placas com a roda de pneu, compasso articulado no joelho na frente da lâmina e atuador telescópico atrás dela, preso à asa por uma orelha e à perna por um pino, que recolhem para dentro girando em torno do pino, com a roda deitando paralela ao intradorso num alojamento recortado na própria asa):
+    toca asas: 14 pontos (pernaPrincipalD em asaD [1920 1080,2 4707]; pinoPivoPrincipalD em asaD [1920 1115 4729,5]; atuadorCorpoPrincipalD em asaD [2017,5 1157,3 4724,5]; mais 5)
     pontas livres: nenhuma
 Responda, olhando só as imagens:
   1. Que pontas ficam no ar, sem encostar em nada?
