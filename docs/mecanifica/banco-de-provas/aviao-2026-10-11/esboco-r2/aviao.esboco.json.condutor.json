@@ -1116,6 +1116,12 @@
       "unidade": "marco-75",
       "nota": 8,
       "motivo": "Conjunto fiel à referência nas três vistas; empenagem horizontal sem achado. Superfície, nas asas, persistentes: ponta levantada em bloco de corda constante com ombro reto, contra ponta que afina e sobe em curva; suportes do bordo de fuga em placas retangulares que param antes dele, contra carenagens afiladas que o passam; bordo de ataque tracejado só na asa direita, sem explicação."
+    },
+    {
+      "ordem": 7,
+      "unidade": "empenagem-vertical",
+      "nota": 8,
+      "motivo": "Silhueta, enflechamento, proporções e divisão deriva/leme batem com a referência nas três vistas, sem ponta no ar. Detalhes que a referência tem e o modelo não: faixa escura no bordo de ataque da deriva, aba compensadora no terço inferior do bordo de fuga do leme, oval na lateral da deriva. Sobra uma bossa e um furo oval na base do bordo de ataque, vistos pela proa, que a referência não mostra."
     }
   ]
 }
