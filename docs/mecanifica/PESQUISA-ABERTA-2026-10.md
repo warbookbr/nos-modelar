@@ -260,6 +260,31 @@ Os dois que interessam ao Mecanifica:
 
 Combinado com a pessoa em 2026-10-13: código aberto que não roda aqui como está ainda serve de base. O Mecanifica pode estudar o algoritmo, adaptar ou reescrever o que precisa no próprio repositório, com teste e determinismo, e usá-lo como modelo para elevar o que faz; ao trazer código, a licença de origem e o aviso de autoria vão junto.
 
+## IA que desenha e resolvedores de restrições 2D (pesquisa de 2026-10-13)
+
+Feita para o plano do [desenho sem referência](planos/2026-10-13-desenho-sem-referencia.md). Os itens marcados (V) tiveram página ou código aberto na pesquisa; os demais vêm de resumo de busca ou de memória.
+
+Resolvedores de restrições 2D:
+
+1. cadcraft-constraints (V) — https://github.com/storytold/cadcraft/tree/main/crates/constraints — Gauss-Newton amortecido de mínima norma em Rust, MIT ou Apache-2.0, sem dependência de solver, sem aleatoriedade; informa graus de liberdade por componente, restrição redundante e conflito, e não grava solução que falha. Pequeno o bastante para portar a JS (cerca de 250 linhas de núcleo).
+2. planegcs (V) — https://github.com/Salusoft89/planegcs — o resolvedor do Sketcher do FreeCAD em WebAssembly, com tipos TypeScript, para Node; LGPL-2.1. Uso direto com o binário versionado, ou oráculo nos testes de um resolvedor próprio.
+3. ezpz (V) — https://github.com/KittyCAD/ezpz — resolvedor em Rust da Zoo, MIT, com crate WASM; referência de conjunto de restrições.
+4. SolveSpace (libslvs) — GPLv3; o mais maduro, só como referência de algoritmo ou conferência externa.
+5. JSketcher (V) — https://github.com/xibyte/jsketcher — CAD paramétrico no navegador com resolvedor em JS; licença a conferir.
+6. Kiwi.js (Cassowary) — só restrição linear; serve a alinhamento e margem de prancha, não a esboço.
+
+IA que desenha:
+
+7. AIDL (V) — https://github.com/deGravity/aidl — linguagem hierárquica em que o LLM declara estruturas e restrições duras e leves e o SolveSpace resolve; em 2D supera o OpenSCAD com poucos exemplos. A ideia mais próxima do plano.
+8. Casey et al., ICCV 2025 — o retorno do solver (graus de liberdade, conflito) leva os esboços totalmente restritos de 34% a 93%; o sinal serve sem treino.
+9. CAD-Assistant (ICCV 2025), CADCodeVerify (ICLR 2025, https://github.com/Kamel773/CAD_Code_Generation) — laço planejar, executar, renderizar, perguntar e corrigir; ganho modesto da crítica visual.
+10. HIPPE 2026 (DFKI) — agente que escolhe vistas de desenho técnico no FreeCAD por MCP; a crítica visual ainda erra escolhas de desenhista, e as checagens estruturais têm de ser determinísticas.
+11. build123d-mcp (V) — https://pypi.org/project/build123d-mcp/ — Apache-2.0, com `lint_drawing` (rótulo sobreposto, estouro da folha, rótulo que diverge da geometria); ideia para os testes da prancha.
+12. Zoo Text-to-CAD (KCL) — a saída da IA é linguagem versionável, resolvida pelo ezpz.
+13. Modelos treinados e benchmarks: Vitruvion e SketchGraphs, CAD-Coder, CAD-Recode, Text2CAD, SketchAgent, SVGenius, VGBench, StarVector, DeTikZify — exigem GPU ou dados; servem de vocabulário de restrição, prompt de avaliação e métrica.
+
+Recomendação da pesquisa para o plano: portar o resolvedor do cadcraft para JS dentro do repositório, gravando posição inicial e tolerância no arquivo salvo; usar o planegcs como oráculo nos testes; devolver à IA o relatório do resolvedor; adotar do AIDL as restrições duras e leves e a composição por estruturas; e manter o crítico com limite de rodadas, com as checagens estruturais no gate.
+
 ## Addons do Blender
 
 Links de referência listados pela IA que fez a pesquisa:

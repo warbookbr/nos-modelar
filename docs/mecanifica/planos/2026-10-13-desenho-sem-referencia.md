@@ -41,7 +41,11 @@ o conteúdo salvo é determinístico e reexecutável.
   geométrica e de traçado, skills e plugins), com a recomendação; entre eles, o
   resolvedor de restrições do CADCraft (família Crafting Apps, MIT ou Apache-2.0,
   pré-alfa em 2026-10-13), em que a IA escreveria as peças e as restrições e o
-  resolvedor daria a geometria, conferido pela mesma régua de determinismo;
+  resolvedor daria a geometria, conferido pela mesma régua de determinismo; a
+  pesquisa de 2026-10-13 em [IA que desenha e resolvedores de restrições
+  2D](../PESQUISA-ABERTA-2026-10.md) é o ponto de partida, com o porte desse
+  resolvedor a JS, o planegcs como oráculo nos testes, o relatório do resolvedor
+  devolvido à IA e as restrições duras e leves do AIDL;
 - o desenho do módulo, isolado do núcleo de autoria e independente de Three.js;
 - um protótipo mínimo que desenhe um objeto simples a partir de uma descrição, com
   teste e julgado pelo crítico;
