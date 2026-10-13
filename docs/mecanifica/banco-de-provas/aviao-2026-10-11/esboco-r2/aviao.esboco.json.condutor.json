@@ -1245,6 +1245,12 @@
       "unidade": "marco-100",
       "nota": 8,
       "motivo": "Silhueta, proporções e posições de asa, cauda e trens batem com a referência nas três vistas e não há ponta no ar nem travessia; a nota não sobe porque nenhum dos detalhes do veredito anterior foi resolvido (faixa do bordo de ataque, aba do leme, oval da deriva, bossa e furo na base) e a perna do nariz segue curta (0,48 do diâmetro da roda contra 0,68)."
+    },
+    {
+      "ordem": 11,
+      "unidade": "trens-principais",
+      "nota": 7,
+      "motivo": "Curso 0 a 84 coerente e roda alojada rente ao intradorso, mas compasso e atuador são hastes curtas que giram rígidas com a perna, sem ligar a perna a nada nem articular (a referência frontal mostra escora fina e longa ao lado da perna), e a perna é um tubo fino onde a referência lateral mostra lâmina larga, quase da largura da roda, cobrindo o pneu."
     }
   ]
 }
