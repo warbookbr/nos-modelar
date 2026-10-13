@@ -65,7 +65,7 @@ resultado volta ao backlog.
 - interior da cabine além do que as janelas mostram;
 - avião comercial, helicóptero, planador e drone, que entram como objetos da
   conferência de repetição e não são modelados aqui;
-- os candidatos de sucessão listados no fim.
+- os candidatos de sucessão, que passaram ao plano sucessor.
 
 ## Gate de saída
 
@@ -139,18 +139,11 @@ a pessoa escolhe os que entram e o resto volta ao backlog com o atrito que o
 justifica. Se uma primitiva nova exigir mudar o contrato de família ou de portas,
 o plano para e redesenha com a pessoa antes de ampliar.
 
-## Candidatos de sucessão
+## Sucessor
 
-Os objetos que a pessoa e Claude levantaram em 2026-10-11 para o mesmo exercício,
-cada um forçando uma falta diferente: a bicicleta (corrente, engrenagem e
-transmissão, com a roda 2.0), a empilhadeira (mastro telescópico com trilho e
-corrente e várias articulações, com o
-[alinhamento](../banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
-começado), a cadeira de escritório (estofado e espuma, base em estrela, pistão a
-gás e rodízio) e um objeto de esteira, como robô de esteira ou escavadeira (o elo
-articulado). E os que o plano anterior deixou: o carrinho de mão como família de
-objeto, a bacia em casca como primitiva, a dobradiça de caneco e as ressalvas do
-fechamento.
+O próximo plano é o [desenho sem referência](2026-10-13-desenho-sem-referencia.md),
+decidido pela pessoa em 2026-10-13. Os candidatos de sucessão levantados aqui em
+2026-10-11 passaram para o fim dele.
 
 ## Fechamento
 

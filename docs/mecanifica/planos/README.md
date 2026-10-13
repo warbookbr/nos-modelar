@@ -6,7 +6,8 @@
 
 O plano modela o avião de pequeno porte só com o que existe, classifica os atritos
 e constrói as ferramentas e primitivas 2.0 que a pessoa escolher. Os candidatos de
-sucessão estão no fim dele. O anterior, [as ferramentas de
+sucessão estão no fim do sucessor, o [desenho sem
+referência](2026-10-13-desenho-sem-referencia.md), em rascunho. O anterior, [as ferramentas de
 modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md), fechou em
 2026-10-11, com as famílias dobradiça, cilindro hidráulico, roda e pneu e móvel de
 caixa, a verificação ancorada e o crítico calibrado.

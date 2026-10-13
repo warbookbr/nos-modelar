@@ -97,3 +97,11 @@ não recorta uma forma com outra. Os atritos do caminho estão em
 O último brief do crítico de cada unidade e de cada Marco: [fuselagem](esboco/aviao-critico-fuselagem/brief.md), [motor](esboco/aviao-critico-motor/brief.md), [helice](esboco/aviao-critico-helice/brief.md), [asas](esboco/aviao-critico-asas/brief.md), [empenagem-horizontal](esboco/aviao-critico-empenagem-horizontal/brief.md), [trem-do-nariz](esboco/aviao-critico-trem-do-nariz/brief.md), [trens-principais](esboco/aviao-critico-trens-principais/brief.md), [marco-25](esboco/aviao-critico-marco-25/brief.md), [marco-50](esboco/aviao-critico-marco-50/brief.md), [marco-75](esboco/aviao-critico-marco-75/brief.md), [marco-100](esboco/aviao-critico-marco-100/brief.md).
 
 A classificação dos atritos da fatia 4 está em [`CLASSIFICACAO.md`](CLASSIFICACAO.md).
+
+## O esboço da segunda rodada
+
+A segunda rodada, com as ferramentas da fatia 5, está em
+[`esboco-r2/`](esboco-r2/aviao.esboco.json), com os atritos em
+[`esboco-r2/ATRITOS.md`](esboco-r2/ATRITOS.md). O brief do crítico de cada unidade
+e de cada Marco: [fuselagem](esboco-r2/aviao-critico-fuselagem/brief.md),
+[marco-50](esboco-r2/aviao-critico-marco-50/brief.md).

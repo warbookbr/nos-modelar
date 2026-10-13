@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1169 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1173 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -152,6 +152,18 @@
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/
 
 - `ATRITOS.md` — Atritos do esboço do avião
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/
+
+- `ATRITOS.md` — Avião de pequeno porte, segunda rodada: atritos da maquete e do plano de detalhe
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-fuselagem/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-50/
+
+- `brief.md` — --- brief para o crítico cego ---
 
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-asas/
 
@@ -305,6 +317,7 @@
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-11-o-que-o-aviao-pede.md` — O que o avião pede
+- `2026-10-13-desenho-sem-referencia.md` — Desenho sem referência
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
