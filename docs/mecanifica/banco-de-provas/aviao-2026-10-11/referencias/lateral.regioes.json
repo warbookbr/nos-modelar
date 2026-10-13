@@ -690,5 +690,53 @@
         132
       ]
     ]
+  },
+  "formas": {
+    "cone": [
+      { "nome": "cone da hélice", "de": [27.75, 128.25], "ate": [26.25, 143.4], "forma": "curva" }
+    ],
+    "capo": [
+      { "nome": "dorso do capô", "de": [39.5, 124.75], "ate": [115.25, 114.6], "forma": "curva" },
+      { "nome": "queixo do capô", "de": [42.25, 147], "ate": [85.1, 159.4], "forma": "curva" }
+    ],
+    "parabrisa": [
+      { "nome": "para-brisa", "de": [136.9, 111.5], "ate": [166.25, 96.5], "forma": "reta" }
+    ],
+    "fuselagem": [
+      { "nome": "perfil da cabine, do para-brisa ao teto", "de": [166.25, 96.5], "ate": [184.75, 92.5], "forma": "curva" },
+      { "nome": "teto da cabine até a saliência", "de": [184.75, 92.5], "ate": [237.1, 92.6], "forma": "reta" },
+      { "nome": "base da saliência do teto", "de": [237.1, 92.6], "ate": [244.9, 92.75], "forma": "detalhe" },
+      { "nome": "teto da cabine da saliência à antena", "de": [244.9, 92.75], "ate": [273, 93.25], "forma": "reta" },
+      { "nome": "base da antena do teto", "de": [273, 93.25], "ate": [280.9, 93.5], "forma": "detalhe" },
+      { "nome": "teto da cabine depois da antena", "de": [280.9, 93.5], "ate": [308.75, 92.5], "forma": "reta" },
+      { "nome": "barriga do cone de cauda", "de": [334, 143.25], "ate": [445.25, 111.4], "forma": "reta" }
+    ],
+    "deriva": [
+      { "nome": "dorsal", "de": [316.4, 90.5], "ate": [351.9, 85.4], "forma": "reta" },
+      { "nome": "bordo de ataque", "de": [361.4, 81.25], "ate": [417.25, 23.25], "forma": "reta" },
+      { "nome": "ponta", "de": [417.25, 23.25], "ate": [431, 13.6], "forma": "curva" }
+    ],
+    "leme": [
+      { "nome": "topo do leme", "de": [432.4, 13.6], "ate": [455, 13.5], "forma": "reta" },
+      { "nome": "bordo de fuga do leme", "de": [457.5, 14.6], "ate": [432.75, 86.5], "forma": "reta" },
+      { "nome": "dobradiça do leme", "de": [440.25, 26.1], "ate": [404, 87.4], "forma": "reta" }
+    ],
+    "estabilizador": [
+      { "nome": "bordo inferior", "de": [413, 106.75], "ate": [451, 106], "forma": "reta" }
+    ],
+    "asa": [
+      { "nome": "bordo de ataque", "de": [164, 135.25], "ate": [165, 146.75], "forma": "curva" }
+    ],
+    "tremNariz": [
+      { "nome": "roda", "de": [83.25, 177.6], "ate": [94.4, 178.6], "forma": "curva" }
+    ],
+    "tremPrincipal": [
+      { "nome": "roda", "de": [197.4, 178.25], "ate": [219.25, 181.6], "forma": "curva" }
+    ],
+    "chao": [
+      { "nome": "chão à frente do trem do nariz", "de": [54, 190.5], "ate": [79, 190.5], "forma": "reta" },
+      { "nome": "chão entre os trens", "de": [97, 190.5], "ate": [198, 190.5], "forma": "reta" },
+      { "nome": "chão atrás do trem principal", "de": [218, 190.5], "ate": [351, 190.5], "forma": "reta" }
+    ]
   }
 }

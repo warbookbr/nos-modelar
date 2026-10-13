@@ -7,17 +7,17 @@
   "capo": 1,
   "cone": 1,
   "corpoNaPontaEsq": 1,
-  "deriva": 0.933,
+  "deriva": 1,
   "escapeDir": 1,
   "escapeEsq": 1,
   "estabilizadorDir": 1,
   "estabilizadorEsq": 1,
   "flapDir": 1,
   "flapEsq": 1,
-  "fuselagem": 0.999,
+  "fuselagem": 0.985,
   "heliceDir": 1,
   "heliceEsq": 1,
-  "janelas": 0.937,
+  "janelas": 0.986,
   "parabrisa": 1,
   "profundorDir": 1,
   "profundorEsq": 1,
@@ -337,5 +337,567 @@
     374
    ]
   }
- ]
+ ],
+ "traco": {
+  "bordaSubpixel": true,
+  "fundoTom": 232,
+  "tolerancia": 0.35,
+  "subamostras": 8
+ },
+ "formas": {
+  "ajustadas": [
+   {
+    "parte": "cone",
+    "nome": "ponta do cone",
+    "forma": "curva",
+    "de": [
+     230.5,
+     20
+    ],
+    "ate": [
+     243,
+     19.5
+    ],
+    "desvioPx": 0.147665,
+    "verticesAntes": 5,
+    "verticesDepois": 22,
+    "desvioMm": 4.3
+   },
+   {
+    "parte": "capo",
+    "nome": "lateral esquerda do capô",
+    "forma": "curva",
+    "de": [
+     217.9,
+     58.6
+    ],
+    "ate": [
+     211.25,
+     115.5
+    ],
+    "desvioPx": 0.149716,
+    "verticesAntes": 5,
+    "verticesDepois": 23,
+    "desvioMm": 4.4
+   },
+   {
+    "parte": "capo",
+    "nome": "lateral direita do capô",
+    "forma": "curva",
+    "de": [
+     256.75,
+     61.4
+    ],
+    "ate": [
+     262.75,
+     116.5
+    ],
+    "desvioPx": 0.145906,
+    "verticesAntes": 5,
+    "verticesDepois": 24,
+    "desvioMm": 4.2
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "lateral esquerda da cabine",
+    "forma": "reta",
+    "de": [
+     211.25,
+     117
+    ],
+    "ate": [
+     211.25,
+     143
+    ],
+    "desvioPx": 0.075786,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 2.2
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "lateral direita da cabine",
+    "forma": "reta",
+    "de": [
+     262.75,
+     117.5
+    ],
+    "ate": [
+     262.5,
+     138
+    ],
+    "desvioPx": 0.097517,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 2.8
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "cone de cauda, lado esquerdo",
+    "forma": "reta",
+    "de": [
+     212.5,
+     233
+    ],
+    "ate": [
+     226.25,
+     318.5
+    ],
+    "desvioPx": 0.767584,
+    "verticesAntes": 10,
+    "verticesDepois": 2,
+    "desvioMm": 22.4
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "cone de cauda, lado direito",
+    "forma": "reta",
+    "de": [
+     259.4,
+     232
+    ],
+    "ate": [
+     245.75,
+     314.6
+    ],
+    "desvioPx": 0.883493,
+    "verticesAntes": 18,
+    "verticesDepois": 2,
+    "desvioMm": 25.7
+   },
+   {
+    "parte": "asaEsq",
+    "nome": "bordo de ataque, raiz até o volume escuro",
+    "forma": "reta",
+    "de": [
+     207.75,
+     147.4
+    ],
+    "ate": [
+     94.5,
+     152.4
+    ],
+    "desvioPx": 0.348461,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 10.1
+   },
+   {
+    "parte": "asaEsq",
+    "nome": "bordo de ataque, volume escuro até a ponta",
+    "forma": "reta",
+    "de": [
+     81.5,
+     153
+    ],
+    "ate": [
+     33,
+     155.5
+    ],
+    "desvioPx": 0.398652,
+    "verticesAntes": 3,
+    "verticesDepois": 2,
+    "desvioMm": 11.6
+   },
+   {
+    "parte": "asaEsq",
+    "nome": "ponta da asa",
+    "forma": "curva",
+    "de": [
+     33,
+     155.5
+    ],
+    "ate": [
+     17,
+     193.6
+    ],
+    "desvioPx": 0.147838,
+    "verticesAntes": 8,
+    "verticesDepois": 31,
+    "desvioMm": 4.3
+   },
+   {
+    "parte": "asaEsq",
+    "nome": "dobradiça do aileron",
+    "forma": "reta",
+    "de": [
+     32,
+     178
+    ],
+    "ate": [
+     64,
+     180
+    ],
+    "desvioPx": 0.409148,
+    "verticesAntes": 6,
+    "verticesDepois": 2,
+    "desvioMm": 11.9
+   },
+   {
+    "parte": "asaEsq",
+    "nome": "dobradiça do flap",
+    "forma": "reta",
+    "de": [
+     67.75,
+     186
+    ],
+    "ate": [
+     196.6,
+     197
+    ],
+    "desvioPx": 1.021686,
+    "verticesAntes": 24,
+    "verticesDepois": 2,
+    "desvioMm": 29.8
+   },
+   {
+    "parte": "aileronEsq",
+    "nome": "bordo de fuga do aileron",
+    "forma": "reta",
+    "de": [
+     25,
+     190.7
+    ],
+    "ate": [
+     66,
+     193.75
+    ],
+    "desvioPx": 0.525177,
+    "verticesAntes": 6,
+    "verticesDepois": 2,
+    "desvioMm": 15.3
+   },
+   {
+    "parte": "flapEsq",
+    "nome": "bordo de fuga do flap",
+    "forma": "reta",
+    "de": [
+     66.5,
+     193.8
+    ],
+    "ate": [
+     195.5,
+     206.6
+    ],
+    "desvioPx": 1.350313,
+    "verticesAntes": 17,
+    "verticesDepois": 6,
+    "desvioMm": 39.3
+   },
+   {
+    "parte": "asaDir",
+    "nome": "bordo de ataque",
+    "forma": "reta",
+    "de": [
+     265.75,
+     147.4
+    ],
+    "ate": [
+     439.5,
+     155.5
+    ],
+    "desvioPx": 0.318881,
+    "verticesAntes": 7,
+    "verticesDepois": 2,
+    "desvioMm": 9.3
+   },
+   {
+    "parte": "asaDir",
+    "nome": "ponta da asa",
+    "forma": "curva",
+    "de": [
+     439.5,
+     155.5
+    ],
+    "ate": [
+     454.1,
+     193.9
+    ],
+    "desvioPx": 0.138349,
+    "verticesAntes": 11,
+    "verticesDepois": 36,
+    "desvioMm": 4
+   },
+   {
+    "parte": "asaDir",
+    "nome": "dobradiça do aileron",
+    "forma": "reta",
+    "de": [
+     439,
+     178
+    ],
+    "ate": [
+     408,
+     180
+    ],
+    "desvioPx": 0.442681,
+    "verticesAntes": 6,
+    "verticesDepois": 2,
+    "desvioMm": 12.9
+   },
+   {
+    "parte": "asaDir",
+    "nome": "dobradiça do flap",
+    "forma": "reta",
+    "de": [
+     403.25,
+     186
+    ],
+    "ate": [
+     270,
+     196
+    ],
+    "desvioPx": 0.433221,
+    "verticesAntes": 22,
+    "verticesDepois": 2,
+    "desvioMm": 12.6
+   },
+   {
+    "parte": "aileronDir",
+    "nome": "bordo de fuga do aileron",
+    "forma": "reta",
+    "de": [
+     405.1,
+     193.9
+    ],
+    "ate": [
+     443,
+     190.5
+    ],
+    "desvioPx": 0.297414,
+    "verticesAntes": 5,
+    "verticesDepois": 2,
+    "desvioMm": 8.7
+   },
+   {
+    "parte": "flapDir",
+    "nome": "bordo de fuga do flap",
+    "forma": "reta",
+    "de": [
+     267.9,
+     207.6
+    ],
+    "ate": [
+     404.5,
+     193.9
+    ],
+    "desvioPx": 0.717378,
+    "verticesAntes": 30,
+    "verticesDepois": 6,
+    "desvioMm": 20.9
+   },
+   {
+    "parte": "estabilizadorEsq",
+    "nome": "bordo de ataque",
+    "forma": "reta",
+    "de": [
+     226.4,
+     323
+    ],
+    "ate": [
+     160.5,
+     330.5
+    ],
+    "desvioPx": 0.280792,
+    "verticesAntes": 5,
+    "verticesDepois": 2,
+    "desvioMm": 8.2
+   },
+   {
+    "parte": "estabilizadorEsq",
+    "nome": "ponta",
+    "forma": "curva",
+    "de": [
+     160.5,
+     330.5
+    ],
+    "ate": [
+     153.5,
+     341.5
+    ],
+    "desvioPx": 0.123534,
+    "verticesAntes": 5,
+    "verticesDepois": 12,
+    "desvioMm": 3.6
+   },
+   {
+    "parte": "estabilizadorEsq",
+    "nome": "dobradiça do profundor",
+    "forma": "reta",
+    "de": [
+     166,
+     348
+    ],
+    "ate": [
+     228,
+     348
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "profundorEsq",
+    "nome": "ponta",
+    "forma": "curva",
+    "de": [
+     153.5,
+     341.5
+    ],
+    "ate": [
+     157.4,
+     357.5
+    ],
+    "desvioPx": 0.122863,
+    "verticesAntes": 6,
+    "verticesDepois": 11,
+    "desvioMm": 3.6
+   },
+   {
+    "parte": "profundorEsq",
+    "nome": "bordo de fuga",
+    "forma": "reta",
+    "de": [
+     157.4,
+     357.5
+    ],
+    "ate": [
+     226,
+     364.3
+    ],
+    "desvioPx": 0.428242,
+    "verticesAntes": 12,
+    "verticesDepois": 2,
+    "desvioMm": 12.5
+   },
+   {
+    "parte": "estabilizadorDir",
+    "nome": "bordo de ataque",
+    "forma": "reta",
+    "de": [
+     245.4,
+     323.4
+    ],
+    "ate": [
+     312.5,
+     330.9
+    ],
+    "desvioPx": 0.314064,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 9.1
+   },
+   {
+    "parte": "estabilizadorDir",
+    "nome": "ponta",
+    "forma": "curva",
+    "de": [
+     312.5,
+     330.9
+    ],
+    "ate": [
+     317.6,
+     341.5
+    ],
+    "desvioPx": 0.142665,
+    "verticesAntes": 5,
+    "verticesDepois": 8,
+    "desvioMm": 4.2
+   },
+   {
+    "parte": "estabilizadorDir",
+    "nome": "dobradiça do profundor",
+    "forma": "reta",
+    "de": [
+     244.5,
+     347.8
+    ],
+    "ate": [
+     306,
+     348
+    ],
+    "desvioPx": 0.237225,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 6.9
+   },
+   {
+    "parte": "profundorDir",
+    "nome": "ponta",
+    "forma": "curva",
+    "de": [
+     317.6,
+     341.5
+    ],
+    "ate": [
+     314,
+     357.6
+    ],
+    "desvioPx": 0.118894,
+    "verticesAntes": 5,
+    "verticesDepois": 11,
+    "desvioMm": 3.5
+   },
+   {
+    "parte": "profundorDir",
+    "nome": "bordo de fuga",
+    "forma": "reta",
+    "de": [
+     314,
+     357.6
+    ],
+    "ate": [
+     244.5,
+     364.4
+    ],
+    "desvioPx": 0.290477,
+    "verticesAntes": 11,
+    "verticesDepois": 2,
+    "desvioMm": 8.5
+   }
+  ],
+  "avisos": [],
+  "detalhes": [
+   {
+    "parte": "asaEsq",
+    "nome": "volume escuro na frente da asa",
+    "forma": "detalhe",
+    "de": [
+     94.5,
+     152.4
+    ],
+    "ate": [
+     81.5,
+     153
+    ]
+   },
+   {
+    "parte": "salienciaFlapEsq",
+    "nome": "saliência sob o bordo de fuga do flap",
+    "forma": "detalhe",
+    "de": [
+     141.6,
+     201.9
+    ],
+    "ate": [
+     147.4,
+     201.9
+    ]
+   },
+   {
+    "parte": "salienciaFlapDir",
+    "nome": "saliência sob o bordo de fuga do flap",
+    "forma": "detalhe",
+    "de": [
+     326,
+     201.75
+    ],
+    "ate": [
+     330.5,
+     202
+    ]
+   }
+  ]
+ }
 }

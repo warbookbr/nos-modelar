@@ -18,5 +18,78 @@
     "tremPrincipalDir": [[[179,133],[179,148],[180,153],[180,164]],[[174,133],[174,148],[173,158]],[185,133]],
     "tremPrincipalEsq": [[[321,133],[321,148],[321,153],[321,164]],[[327,133],[327,148],[328,158]],[316,134]],
     "chao": [[[161,168],[171,168]],[[188,168],[243,168]],[[259,168],[314,168]],[[331,168],[344,168]]]
+  },
+  "formas": {
+    "deriva": [
+      { "nome": "ponta da deriva", "de": [248.2, 15], "ate": [253, 15], "forma": "curva" },
+      { "nome": "flanco esquerdo acima da barra", "de": [248.3, 16], "ate": [247.4, 32.1], "forma": "reta" },
+      { "nome": "barra que cruza a deriva, à esquerda", "de": [247.4, 32.1], "ate": [247.4, 35.75], "forma": "detalhe" },
+      { "nome": "flanco esquerdo abaixo da barra", "de": [247.4, 35.75], "ate": [246.25, 70.9], "forma": "reta" },
+      { "nome": "barra que cruza a deriva, à direita", "de": [253.75, 32.1], "ate": [253.75, 35.9], "forma": "detalhe" },
+      { "nome": "flanco direito abaixo da barra", "de": [253.75, 35.9], "ate": [255.25, 72.1], "forma": "reta" }
+    ],
+    "fuselagem": [
+      { "nome": "dorso da cabine, à esquerda da deriva", "de": [244.4, 73.5], "ate": [227.5, 83.1], "forma": "curva" },
+      { "nome": "dorso da cabine, à direita da deriva", "de": [256.6, 73.5], "ate": [273.6, 82.9], "forma": "curva" }
+    ],
+    "estabilizadorDir": [
+      { "nome": "bordo superior", "de": [227.5, 83.1], "ate": [164.1, 75.4], "forma": "reta" },
+      { "nome": "ponta", "de": [164.1, 75.4], "ate": [165.4, 81.5], "forma": "curva" },
+      { "nome": "bordo inferior", "de": [165.4, 81.5], "ate": [223.1, 89.6], "forma": "reta" }
+    ],
+    "estabilizadorEsq": [
+      { "nome": "bordo superior", "de": [273.6, 82.9], "ate": [337, 75.4], "forma": "reta" },
+      { "nome": "ponta", "de": [337, 75.4], "ate": [340.1, 80.6], "forma": "curva" },
+      { "nome": "bordo inferior", "de": [340.1, 80.6], "ate": [279.75, 89.5], "forma": "reta" }
+    ],
+    "cone": [
+      { "nome": "cone entre as pás, à esquerda", "de": [241.75, 109.9], "ate": [243.1, 118.25], "forma": "curva" },
+      { "nome": "cone entre as pás, embaixo", "de": [246.6, 120.25], "ate": [254.4, 120.25], "forma": "curva" },
+      { "nome": "cone entre as pás, à direita", "de": [258.25, 118], "ate": [258.25, 108.9], "forma": "curva" }
+    ],
+    "capo": [
+      { "nome": "escape à esquerda do capô", "de": [222.6, 105.5], "ate": [222.25, 122.25], "forma": "detalhe" },
+      { "nome": "escape à direita do capô", "de": [278.6, 108], "ate": [279.6, 122.25], "forma": "detalhe" }
+    ],
+    "asaDir": [
+      { "nome": "bordo superior", "de": [218.9, 122.4], "ate": [27.6, 105.25], "forma": "reta" },
+      { "nome": "cotovelo de cima da ponta levantada", "de": [27.6, 105.25], "ate": [17.75, 100.4], "forma": "curva" },
+      { "nome": "face de dentro da ponta levantada", "de": [17.75, 100.4], "ate": [12.4, 86], "forma": "reta" },
+      { "nome": "face de fora da ponta levantada", "de": [10.4, 88.6], "ate": [14.25, 104], "forma": "reta" },
+      { "nome": "cotovelo de baixo da ponta levantada", "de": [14.25, 104], "ate": [34.25, 113.75], "forma": "curva" },
+      { "nome": "bordo inferior, ponta até a saliência", "de": [34.25, 113.75], "ate": [79.25, 119.4], "forma": "reta" },
+      { "nome": "saliência sob a asa", "de": [79.25, 119.4], "ate": [84.25, 119.75], "forma": "detalhe" },
+      { "nome": "bordo inferior, entre as saliências", "de": [84.25, 119.75], "ate": [146, 126.75], "forma": "reta" },
+      { "nome": "saliência sob a asa, perto do trem", "de": [146, 126.75], "ate": [152.5, 127.6], "forma": "detalhe" },
+      { "nome": "bordo inferior, saliência até o trem", "de": [152.5, 127.6], "ate": [172, 129.75], "forma": "reta" }
+    ],
+    "asaEsq": [
+      { "nome": "bordo superior, raiz até o corpo escuro", "de": [280.5, 122.5], "ate": [415.1, 110.4], "forma": "reta" },
+      { "nome": "corpo escuro sobre a asa", "de": [415.1, 110.4], "ate": [414.4, 120.4], "forma": "detalhe" },
+      { "nome": "bordo inferior, corpo escuro até a saliência", "de": [414.4, 120.4], "ate": [354.9, 126.75], "forma": "reta" },
+      { "nome": "saliência sob a asa, perto do trem", "de": [354.9, 126.75], "ate": [348, 127.6], "forma": "detalhe" },
+      { "nome": "bordo inferior, saliência até o trem", "de": [348, 127.6], "ate": [328.9, 129.75], "forma": "reta" },
+      { "nome": "bordo superior, corpo escuro até a ponta", "de": [428.1, 109.5], "ate": [479.1, 104.4], "forma": "reta" },
+      { "nome": "cotovelo de cima da ponta levantada", "de": [479.1, 104.4], "ate": [483.25, 100.5], "forma": "curva" },
+      { "nome": "face de dentro da ponta levantada", "de": [483.25, 100.5], "ate": [488.75, 86], "forma": "reta" },
+      { "nome": "face de fora da ponta levantada", "de": [490.5, 90.6], "ate": [486.6, 106], "forma": "reta" },
+      { "nome": "cotovelo de baixo da ponta levantada", "de": [486.6, 106], "ate": [477.4, 112.6], "forma": "curva" },
+      { "nome": "bordo inferior, ponta até o corpo escuro", "de": [477.4, 112.6], "ate": [431.25, 118.4], "forma": "reta" }
+    ],
+    "tremNariz": [
+      { "nome": "roda", "de": [247.4, 165], "ate": [253.5, 166.9], "forma": "curva" }
+    ],
+    "tremPrincipalDir": [
+      { "nome": "roda", "de": [176.5, 166.5], "ate": [183.5, 166.1], "forma": "curva" }
+    ],
+    "tremPrincipalEsq": [
+      { "nome": "roda", "de": [317.4, 165.4], "ate": [325.4, 164], "forma": "curva" }
+    ],
+    "chao": [
+      { "nome": "chão sob a roda direita, por fora", "de": [162.5, 167.25], "ate": [172, 167.25], "forma": "reta" },
+      { "nome": "chão entre a roda direita e a do nariz", "de": [188, 167.3], "ate": [243, 167.25], "forma": "reta" },
+      { "nome": "chão entre a roda do nariz e a esquerda", "de": [261, 167.35], "ate": [313, 167.25], "forma": "reta" },
+      { "nome": "chão sob a roda esquerda, por fora", "de": [329.5, 167.25], "ate": [341.5, 167.25], "forma": "reta" }
+    ]
   }
 }

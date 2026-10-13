@@ -306,5 +306,418 @@
     204
    ]
   }
- ]
+ ],
+ "traco": {
+  "bordaSubpixel": true,
+  "fundoTom": 232,
+  "tolerancia": 0.35,
+  "subamostras": 8
+ },
+ "formas": {
+  "ajustadas": [
+   {
+    "parte": "cone",
+    "nome": "cone da hélice",
+    "forma": "curva",
+    "de": [
+     27.75,
+     128.25
+    ],
+    "ate": [
+     26.25,
+     143.4
+    ],
+    "desvioPx": 0.142304,
+    "verticesAntes": 8,
+    "verticesDepois": 28,
+    "desvioMm": 3.3
+   },
+   {
+    "parte": "capo",
+    "nome": "dorso do capô",
+    "forma": "curva",
+    "de": [
+     39.5,
+     124.75
+    ],
+    "ate": [
+     115.25,
+     114.6
+    ],
+    "desvioPx": 0.144814,
+    "verticesAntes": 8,
+    "verticesDepois": 36,
+    "desvioMm": 3.4
+   },
+   {
+    "parte": "capo",
+    "nome": "queixo do capô",
+    "forma": "curva",
+    "de": [
+     42.25,
+     147
+    ],
+    "ate": [
+     85.1,
+     159.4
+    ],
+    "desvioPx": 0.14932,
+    "verticesAntes": 8,
+    "verticesDepois": 19,
+    "desvioMm": 3.5
+   },
+   {
+    "parte": "parabrisa",
+    "nome": "para-brisa",
+    "forma": "reta",
+    "de": [
+     136.9,
+     111.5
+    ],
+    "ate": [
+     166.25,
+     96.5
+    ],
+    "desvioPx": 0.583365,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 13.7
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "perfil da cabine, do para-brisa ao teto",
+    "forma": "curva",
+    "de": [
+     166.25,
+     96.5
+    ],
+    "ate": [
+     184.75,
+     92.5
+    ],
+    "desvioPx": 0.149826,
+    "verticesAntes": 4,
+    "verticesDepois": 15,
+    "desvioMm": 3.5
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "teto da cabine até a saliência",
+    "forma": "reta",
+    "de": [
+     184.75,
+     92.5
+    ],
+    "ate": [
+     237.1,
+     92.6
+    ],
+    "desvioPx": 0.490444,
+    "verticesAntes": 19,
+    "verticesDepois": 14,
+    "desvioMm": 11.5
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "teto da cabine da saliência à antena",
+    "forma": "reta",
+    "de": [
+     244.9,
+     92.75
+    ],
+    "ate": [
+     273,
+     93.25
+    ],
+    "desvioPx": 0.454537,
+    "verticesAntes": 3,
+    "verticesDepois": 2,
+    "desvioMm": 10.7
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "teto da cabine depois da antena",
+    "forma": "reta",
+    "de": [
+     280.9,
+     93.5
+    ],
+    "ate": [
+     308.75,
+     92.5
+    ],
+    "desvioPx": 0.493308,
+    "verticesAntes": 5,
+    "verticesDepois": 2,
+    "desvioMm": 11.6
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "barriga do cone de cauda",
+    "forma": "reta",
+    "de": [
+     334,
+     143.25
+    ],
+    "ate": [
+     445.25,
+     111.4
+    ],
+    "desvioPx": 1.068296,
+    "verticesAntes": 19,
+    "verticesDepois": 4,
+    "desvioMm": 25.1
+   },
+   {
+    "parte": "deriva",
+    "nome": "dorsal",
+    "forma": "reta",
+    "de": [
+     316.4,
+     90.5
+    ],
+    "ate": [
+     351.9,
+     85.4
+    ],
+    "desvioPx": 0.360509,
+    "verticesAntes": 7,
+    "verticesDepois": 2,
+    "desvioMm": 8.5
+   },
+   {
+    "parte": "deriva",
+    "nome": "bordo de ataque",
+    "forma": "reta",
+    "de": [
+     361.4,
+     81.25
+    ],
+    "ate": [
+     417.25,
+     23.25
+    ],
+    "desvioPx": 0.257758,
+    "verticesAntes": 6,
+    "verticesDepois": 2,
+    "desvioMm": 6.1
+   },
+   {
+    "parte": "deriva",
+    "nome": "ponta",
+    "forma": "curva",
+    "de": [
+     417.25,
+     23.25
+    ],
+    "ate": [
+     431,
+     13.6
+    ],
+    "desvioPx": 0.146781,
+    "verticesAntes": 3,
+    "verticesDepois": 8,
+    "desvioMm": 3.4
+   },
+   {
+    "parte": "leme",
+    "nome": "topo do leme",
+    "forma": "reta",
+    "de": [
+     432.4,
+     13.6
+    ],
+    "ate": [
+     455,
+     13.5
+    ],
+    "desvioPx": 0.239773,
+    "verticesAntes": 2,
+    "verticesDepois": 2,
+    "desvioMm": 5.6
+   },
+   {
+    "parte": "leme",
+    "nome": "bordo de fuga do leme",
+    "forma": "reta",
+    "de": [
+     457.5,
+     14.6
+    ],
+    "ate": [
+     432.75,
+     86.5
+    ],
+    "desvioPx": 0.350329,
+    "verticesAntes": 13,
+    "verticesDepois": 2,
+    "desvioMm": 8.2
+   },
+   {
+    "parte": "leme",
+    "nome": "dobradiça do leme",
+    "forma": "reta",
+    "de": [
+     440.25,
+     26.1
+    ],
+    "ate": [
+     404,
+     87.4
+    ],
+    "desvioPx": 0.291612,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 6.8
+   },
+   {
+    "parte": "estabilizador",
+    "nome": "bordo inferior",
+    "forma": "reta",
+    "de": [
+     413,
+     106.75
+    ],
+    "ate": [
+     451,
+     106
+    ],
+    "desvioPx": 1.203117,
+    "verticesAntes": 8,
+    "verticesDepois": 2,
+    "desvioMm": 28.2
+   },
+   {
+    "parte": "asa",
+    "nome": "bordo de ataque",
+    "forma": "curva",
+    "de": [
+     164,
+     135.25
+    ],
+    "ate": [
+     165,
+     146.75
+    ],
+    "desvioPx": 0.131203,
+    "verticesAntes": 6,
+    "verticesDepois": 12,
+    "desvioMm": 3.1
+   },
+   {
+    "parte": "tremNariz",
+    "nome": "roda",
+    "forma": "curva",
+    "de": [
+     83.25,
+     177.6
+    ],
+    "ate": [
+     94.4,
+     178.6
+    ],
+    "desvioPx": 0.140672,
+    "verticesAntes": 22,
+    "verticesDepois": 36,
+    "desvioMm": 3.3
+   },
+   {
+    "parte": "tremPrincipal",
+    "nome": "roda",
+    "forma": "curva",
+    "de": [
+     197.4,
+     178.25
+    ],
+    "ate": [
+     219.25,
+     181.6
+    ],
+    "desvioPx": 0.181077,
+    "verticesAntes": 48,
+    "verticesDepois": 42,
+    "desvioMm": 4.3
+   },
+   {
+    "parte": "chao",
+    "nome": "chão à frente do trem do nariz",
+    "forma": "reta",
+    "de": [
+     54,
+     190.5
+    ],
+    "ate": [
+     79,
+     190.5
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "chao",
+    "nome": "chão entre os trens",
+    "forma": "reta",
+    "de": [
+     97,
+     190.5
+    ],
+    "ate": [
+     198,
+     190.5
+    ],
+    "desvioPx": 0.118653,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 2.8
+   },
+   {
+    "parte": "chao",
+    "nome": "chão atrás do trem principal",
+    "forma": "reta",
+    "de": [
+     218,
+     190.5
+    ],
+    "ate": [
+     351,
+     190.5
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   }
+  ],
+  "avisos": [],
+  "detalhes": [
+   {
+    "parte": "fuselagem",
+    "nome": "base da saliência do teto",
+    "forma": "detalhe",
+    "de": [
+     237.1,
+     92.6
+    ],
+    "ate": [
+     244.9,
+     92.75
+    ]
+   },
+   {
+    "parte": "fuselagem",
+    "nome": "base da antena do teto",
+    "forma": "detalhe",
+    "de": [
+     273,
+     93.25
+    ],
+    "ate": [
+     280.9,
+     93.5
+    ]
+   }
+  ]
+ }
 }

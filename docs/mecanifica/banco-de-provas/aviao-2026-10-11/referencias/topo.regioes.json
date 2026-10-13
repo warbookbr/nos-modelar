@@ -14,7 +14,7 @@
     {
       "nome": "ponta da asa direita",
       "px": [
-        456,
+        455.5,
         185
       ],
       "mm": [
@@ -973,6 +973,71 @@
         329,
         203
       ]
+    ]
+  },
+  "formas": {
+    "cone": [
+      { "nome": "ponta do cone", "de": [230.5, 20], "ate": [243, 19.5], "forma": "curva" }
+    ],
+    "capo": [
+      { "nome": "lateral esquerda do capô", "de": [217.9, 58.6], "ate": [211.25, 115.5], "forma": "curva" },
+      { "nome": "lateral direita do capô", "de": [256.75, 61.4], "ate": [262.75, 116.5], "forma": "curva" }
+    ],
+    "fuselagem": [
+      { "nome": "lateral esquerda da cabine", "de": [211.25, 117], "ate": [211.25, 143], "forma": "reta" },
+      { "nome": "lateral direita da cabine", "de": [262.75, 117.5], "ate": [262.5, 138], "forma": "reta" },
+      { "nome": "cone de cauda, lado esquerdo", "de": [212.5, 233], "ate": [226.25, 318.5], "forma": "reta" },
+      { "nome": "cone de cauda, lado direito", "de": [259.4, 232], "ate": [245.75, 314.6], "forma": "reta" }
+    ],
+    "asaEsq": [
+      { "nome": "bordo de ataque, raiz até o volume escuro", "de": [207.75, 147.4], "ate": [94.5, 152.4], "forma": "reta" },
+      { "nome": "volume escuro na frente da asa", "de": [94.5, 152.4], "ate": [81.5, 153], "forma": "detalhe" },
+      { "nome": "bordo de ataque, volume escuro até a ponta", "de": [81.5, 153], "ate": [33, 155.5], "forma": "reta" },
+      { "nome": "ponta da asa", "de": [33, 155.5], "ate": [17, 193.6], "forma": "curva" },
+      { "nome": "dobradiça do aileron", "de": [32, 178], "ate": [64, 180], "forma": "reta" },
+      { "nome": "dobradiça do flap", "de": [67.75, 186], "ate": [196.6, 197], "forma": "reta" }
+    ],
+    "aileronEsq": [
+      { "nome": "bordo de fuga do aileron", "de": [25, 190.7], "ate": [66, 193.75], "forma": "reta" }
+    ],
+    "flapEsq": [
+      { "nome": "bordo de fuga do flap", "de": [66.5, 193.8], "ate": [195.5, 206.6], "forma": "reta" }
+    ],
+    "asaDir": [
+      { "nome": "bordo de ataque", "de": [265.75, 147.4], "ate": [439.5, 155.5], "forma": "reta" },
+      { "nome": "ponta da asa", "de": [439.5, 155.5], "ate": [454.1, 193.9], "forma": "curva" },
+      { "nome": "dobradiça do aileron", "de": [439, 178], "ate": [408, 180], "forma": "reta" },
+      { "nome": "dobradiça do flap", "de": [403.25, 186], "ate": [270, 196], "forma": "reta" }
+    ],
+    "aileronDir": [
+      { "nome": "bordo de fuga do aileron", "de": [405.1, 193.9], "ate": [443, 190.5], "forma": "reta" }
+    ],
+    "flapDir": [
+      { "nome": "bordo de fuga do flap", "de": [267.9, 207.6], "ate": [404.5, 193.9], "forma": "reta" }
+    ],
+    "estabilizadorEsq": [
+      { "nome": "bordo de ataque", "de": [226.4, 323], "ate": [160.5, 330.5], "forma": "reta" },
+      { "nome": "ponta", "de": [160.5, 330.5], "ate": [153.5, 341.5], "forma": "curva" },
+      { "nome": "dobradiça do profundor", "de": [166, 348], "ate": [228, 348], "forma": "reta" }
+    ],
+    "profundorEsq": [
+      { "nome": "ponta", "de": [153.5, 341.5], "ate": [157.4, 357.5], "forma": "curva" },
+      { "nome": "bordo de fuga", "de": [157.4, 357.5], "ate": [226, 364.3], "forma": "reta" }
+    ],
+    "estabilizadorDir": [
+      { "nome": "bordo de ataque", "de": [245.4, 323.4], "ate": [312.5, 330.9], "forma": "reta" },
+      { "nome": "ponta", "de": [312.5, 330.9], "ate": [317.6, 341.5], "forma": "curva" },
+      { "nome": "dobradiça do profundor", "de": [244.5, 347.8], "ate": [306, 348], "forma": "reta" }
+    ],
+    "profundorDir": [
+      { "nome": "ponta", "de": [317.6, 341.5], "ate": [314, 357.6], "forma": "curva" },
+      { "nome": "bordo de fuga", "de": [314, 357.6], "ate": [244.5, 364.4], "forma": "reta" }
+    ],
+    "salienciaFlapEsq": [
+      { "nome": "saliência sob o bordo de fuga do flap", "de": [141.6, 201.9], "ate": [147.4, 201.9], "forma": "detalhe" }
+    ],
+    "salienciaFlapDir": [
+      { "nome": "saliência sob o bordo de fuga do flap", "de": [326, 201.75], "ate": [330.5, 202], "forma": "detalhe" }
     ]
   }
 }
