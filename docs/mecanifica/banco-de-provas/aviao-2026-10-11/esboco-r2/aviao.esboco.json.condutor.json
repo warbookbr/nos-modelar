@@ -647,7 +647,7 @@
       ],
       "depende": [],
       "custo": 4,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -1038,6 +1038,20 @@
       "saltou": [
         25
       ]
+    },
+    {
+      "limiar": 75,
+      "custoFeito": 34,
+      "custoTotal": 43,
+      "unidades": [
+        "helice",
+        "motor",
+        "fuselagem",
+        "asas",
+        "empenagem-horizontal"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
     }
   ],
   "avisos": [],
