@@ -273,3 +273,14 @@ O nariz do profundor tem de ter a espessura que o estabilizador tem na linha de 
 ```bash
 npm run esboco -- $A --descrever --forma estabilizadorD | grep "âncoras"
 ```
+
+## Blocagem (achados de quem orquestra)
+
+### 27. A blocagem levava a forma de família inteira quando um molde cortava a ponta, e a família inteira já não coincide com o desenho
+
+O gate de silhueta pela blocagem (`tools/mecanifica/esboco-blocagem.test.mjs`) reprovou a hélice, o motor e as asas desta rodada. A hélice e o motor eram defeitos da blocagem e do desenho com recorte, corrigidos na origem. Nas asas, a ponta levantada sai de um molde que corta a asa inteira da família, e o andaime levava a forma inteira, com o envelope 79 mm maior; agora a forma cujo recorte muda o envelope sai em `semEquivalente` com o motivo. Fica o achado de que a família `superficie-aerodinamica` inteira, sem recorte, dá IoU 0,89 na isométrica contra o desenho num caso mínimo (envergadura 3000, corda 0,3 e 0,15), pelo casco convexo por seções; nenhum teste cobre uma asa de família na blocagem. O processo pegou as três reprovações pelo gate; a coincidência da família inteira não tem gate.
+
+```bash
+npx vitest run tools/mecanifica/esboco-blocagem-casos.test.mjs
+npx vitest run tools/mecanifica/esboco-blocagem.test.mjs -t aviao
+```
