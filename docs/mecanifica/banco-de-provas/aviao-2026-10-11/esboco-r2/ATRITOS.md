@@ -284,3 +284,67 @@ O gate de silhueta pela blocagem (`tools/mecanifica/esboco-blocagem.test.mjs`) r
 npx vitest run tools/mecanifica/esboco-blocagem-casos.test.mjs
 npx vitest run tools/mecanifica/esboco-blocagem.test.mjs -t aviao
 ```
+
+## Unidade empenagem-vertical (detalhe)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json`, `D=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2` e `R=docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias`, no estado em que a deriva (módulo `derivaVertical`: lâmina pela família e filete dorsal) e o leme foram integrados. Os estados anteriores saem de `git show <commit>:<caminho>`.
+
+### 28. O `--integrar` recusa a unidade que traz um módulo novo, embora a ajuda diga que o módulo novo entra
+
+A deriva e o filete dorsal ficam sob o id `deriva` porque o plano cita `deriva` por id, e a única forma de dois sólidos terem um id citável é uma instância de módulo. O detalhado traz `modulos.derivaVertical` e a instância `{ "id": "deriva", "usa": "derivaVertical" }`, e o `--integrar` expande o mestre com a unidade trocada antes de copiar o `modulos` do detalhado, de modo que recusa com `o componente "derivaVertical" não existe`. O contorno foi escrever o módulo no mestre à mão e integrar depois. A ajuda de `--ajuda detalhar` diz que o módulo novo entra.
+
+```bash
+git show 422816c5:$A > $D/zz.esboco.json
+git show 52a234c4:$D/aviao-detalhe-empenagem-vertical.esboco.json > $D/zz-detalhe.esboco.json
+npm run esboco -- $D/zz.esboco.json --integrar empenagem-vertical $D/zz-detalhe.esboco.json
+rm $D/zz*.esboco.json*
+```
+
+### 29. A família recusa `cordaNaRaiz` acima de 0,8 e a deriva tem a corda da raiz quase igual à altura
+
+A deriva da referência tem 1.956 mm de corda na raiz para 1.965 mm de altura (razão 0,995), e a família aceita `cordaNaRaiz` de 0,02 a 0,8 da envergadura. O contorno foi chamar a família com `simetria: 1` (a envergadura vira o dobro da altura, a razão cai a 0,50) e cortar a metade de baixo com um molde de caixa no plano da raiz (`deriva.corteRaiz`). O volume que o recorte retira sai grande (408.524 cm3 na leitura da forma) e a metade espelhada entra no gate como peças que nunca aparecem.
+
+```bash
+cat > $D/zz.esboco.json <<'JSON'
+{ "opcoes": [ { "titulo": "deriva", "formas": [ { "id": "deriva", "tipo": "familia", "familia": "superficie-aerodinamica", "perfil": "deriva", "centro": [0, 0, 0],
+  "parametros": { "envergadura": 1965, "simetria": 0, "orientacao": 1, "cordaNaRaiz": 0.995, "cordaNaPonta": 0.361, "enflechamento": 38.9, "comando": 0, "comandoDiferencial": 0 } } ] } ] }
+JSON
+npm run esboco -- $D/zz.esboco.json --descrever
+rm $D/zz*.esboco.json*
+```
+
+### 30. O plano cita `deriva` por id em quatro campos e o detalhe que a divide em duas formas só passa se uma instância guardar o id
+
+O mapa de partes da lateral (`plano.referencia`), o contrato (`tocam` e `fixa`) e o inventário (`plano.pecas`) citam `deriva`, e o contorno da referência dessa região inclui o filete dorsal (3.063 mm de profundidade, de z 6.943 a 10.006). Com a lâmina e o filete como duas formas soltas a conferência da lateral deu `deriva` com desvio de 979,5 mm e razão interseção/união 0,83 (a lâmina sozinha tem 2.233 mm de profundidade), e o `--feito` ficaria recusado. Como o esbocista não edita o plano, as duas formas viraram uma instância de módulo com o id `deriva`, que o seletor do plano já lê como o conjunto das partes (`[deriva.fin, deriva.dorsal]`). É o mesmo defeito do atrito 20: o `--editar` não alcança `plano.*` e o `--integrar` não avisa de `plano.referencia`.
+
+```bash
+npm run esboco -- $A --referencia $R/lateral.contornos.json --vista lateral | grep "parte deriva"
+```
+
+### 31. A conferência da silhueta dá cada célula a uma forma só, a mais próxima do olho, e as carenagens de dobradiça tiram células do leme
+
+Com as três carenagens de dobradiça do lado +x a razão do leme na lateral sai 0,86 contra 0,88 sem elas (mínimo 0,85), embora o contorno do leme seja o mesmo. As carenagens cobrem parte do leme e parte da deriva e a célula coberta passa a ser delas, de modo que o diferencial pequeno entre passar e reprovar vem de uma peça que a referência nem desenha. Na primeira versão (carenagens de 300 mm de comprimento e 90 mm de altura) a razão foi 0,83 e reprovou; reduzi as carenagens a 230 mm e 70 mm.
+
+```bash
+cp $A $D/zz.esboco.json
+npm run esboco -- $D/zz.esboco.json --referencia $R/lateral.contornos.json --vista lateral | grep "parte leme"
+npm run esboco -- --editar $D/zz.esboco.json "dobradicaLeme1D.oculto=true" "dobradicaLeme2D.oculto=true" "dobradicaLeme3D.oculto=true"
+npm run esboco -- $D/zz.esboco.json --referencia $R/lateral.contornos.json --vista lateral | grep "parte leme"
+rm $D/zz*.esboco.json*
+```
+
+### 32. O `--nota-de-passagem` aceita texto de mais de 240 caracteres
+
+A ajuda e o agente dizem que a nota tem até 240 caracteres, e o comando grava uma de 244 sem recusar nem avisar.
+
+```bash
+npm run esboco -- --condutor $A --nota-de-passagem empenagem-vertical --texto "A região deriva da referência inclui o filete dorsal, então lâmina e filete são o módulo deriva. O vão do leme é o cortador vaoDoLeme (fresta 12 mm); o leme tem o canto traseiro de baixo cortado e o ressalto no topo, como a referência."
+```
+
+### 33. A leitura do mestre com a deriva em família leva cerca de um minuto
+
+Cada `--descrever` do mestre (ou do detalhe) depois da deriva por família de envergadura 3.930 mm (simetria 1, recortada pelo vão do leme e pela caixa da raiz) leva de 55 a 60 s, e o `--historico` do Condutor, que também lê o mestre, passou dos 120 s uma vez. Cada ajuste do detalhe custa essa leitura mais a do `--integrar`.
+
+```bash
+time npm run esboco -- $A --descrever
+```

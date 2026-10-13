@@ -290,7 +290,75 @@
     "sP3": 1950,
     "sY1": "=estYc0+estDY*(sP1-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP1-estX0)/estB)-6",
     "sY2": "=estYc0+estDY*(sP2-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP2-estX0)/estB)-6",
-    "sY3": "=estYc0+estDY*(sP3-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP3-estX0)/estB)-6"
+    "sY3": "=estYc0+estDY*(sP3-estX0)/estB-0.5*(eT0+(eT1-eT0)*(sP3-estX0)/estB)-6",
+    "vY0": 2225,
+    "vH": 1965,
+    "vZle0": 7791,
+    "vZle1": 9690,
+    "vC0": 1956,
+    "vC1": 710,
+    "vTr0": 0.1,
+    "vTr1": 0.09,
+    "vFlecha": "=atan((vZle1+0.25*vC1-vZle0-0.25*vC0)/vH)",
+    "vZq0": "=vZle0+0.25*vC0",
+    "vFresta": 12,
+    "vZh0": 9040,
+    "vKh": 0.5855,
+    "vZte0": 9360,
+    "vYd": 2393,
+    "vYe": 3950,
+    "vZhe": 9780,
+    "vYb": 3896,
+    "vYc": 4185,
+    "vZhc": 9825,
+    "vSa": "=(vZh0-vZle0)/vC0",
+    "vTa": "=10*vTr0*vC0*(0.2969*sqrt(vSa)-0.126*vSa-0.3516*vSa*vSa+0.2843*vSa*vSa*vSa-0.1036*vSa*vSa*vSa*vSa)",
+    "vLa": "=vZle0+vC0-vZh0",
+    "vZca": "=vZh0+0.5*vLa",
+    "vLa0": "=vZte0-vZh0l",
+    "vZca0": "=vZh0l+0.5*vLa0",
+    "vUd": "=(vYd-vY0)/vH",
+    "vCd": "=vC0+(vC1-vC0)*vUd",
+    "vZled": "=vZle0+(vZle1-vZle0)*vUd",
+    "vZhd": "=vZh0+vKh*(vYd-vY0)",
+    "vSd": "=(vZhd-vZled)/vCd",
+    "vTd": "=10*(vTr0+(vTr1-vTr0)*vUd)*vCd*(0.2969*sqrt(vSd)-0.126*vSd-0.3516*vSd*vSd+0.2843*vSd*vSd*vSd-0.1036*vSd*vSd*vSd*vSd)",
+    "vLd": "=vZled+vCd-vZhd",
+    "vZcd": "=vZhd+0.5*vLd",
+    "vUb": "=(vYb-vY0)/vH",
+    "vCb": "=vC0+(vC1-vC0)*vUb",
+    "vZleb": "=vZle0+(vZle1-vZle0)*vUb",
+    "vZhb": "=vZh0+vKh*(vYb-vY0)",
+    "vSb": "=(vZhb-vZleb)/vCb",
+    "vTb": "=10*(vTr0+(vTr1-vTr0)*vUb)*vCb*(0.2969*sqrt(vSb)-0.126*vSb-0.3516*vSb*vSb+0.2843*vSb*vSb*vSb-0.1036*vSb*vSb*vSb*vSb)",
+    "vLb": "=vZleb+vCb-vZhb",
+    "vZcb": "=vZhb+0.5*vLb",
+    "vUe": "=(vYe-vY0)/vH",
+    "vCe": "=vC0+(vC1-vC0)*vUe",
+    "vZlee": "=vZle0+(vZle1-vZle0)*vUe",
+    "vSe": "=(vZhe-vZlee)/vCe",
+    "vTe": "=10*(vTr0+(vTr1-vTr0)*vUe)*vCe*(0.2969*sqrt(vSe)-0.126*vSe-0.3516*vSe*vSe+0.2843*vSe*vSe*vSe-0.1036*vSe*vSe*vSe*vSe)",
+    "vLe": "=vZlee+vCe-vZhe",
+    "vZce": "=vZhe+0.5*vLe",
+    "vUc": "=(vYc-vY0)/vH",
+    "vCc": "=vC0+(vC1-vC0)*vUc",
+    "vZlec": "=vZle0+(vZle1-vZle0)*vUc",
+    "vSc": "=(vZhc-vZlec)/vCc",
+    "vTc": "=10*(vTr0+(vTr1-vTr0)*vUc)*vCc*(0.2969*sqrt(vSc)-0.126*vSc-0.3516*vSc*vSc+0.2843*vSc*vSc*vSc-0.1036*vSc*vSc*vSc*vSc)",
+    "vLc": "=vZlec+vCc-vZhc",
+    "vZcc": "=vZhc+0.5*vLc",
+    "vKe": "=((vZhb+0.5*vTb)-(vZh0+0.5*vTa))/(vYb-vY0)",
+    "vK1y": 2450,
+    "vK2y": 3070,
+    "vK3y": 3690,
+    "vH1": "=vZh0+vKh*(vK1y-vY0)",
+    "vH2": "=vZh0+vKh*(vK2y-vY0)",
+    "vH3": "=vZh0+vKh*(vK3y-vY0)",
+    "vT1": "=vTa+(vTb-vTa)*(vK1y-vY0)/(vYb-vY0)",
+    "vT2": "=vTa+(vTb-vTa)*(vK2y-vY0)/(vYb-vY0)",
+    "vT3": "=vTa+(vTb-vTa)*(vK3y-vY0)/(vYb-vY0)",
+    "vYl0": 2240,
+    "vZh0l": "=vZh0+vKh*(vYl0-vY0)"
   },
   "pontos": {
     "proa": [0, 1330, 8],
@@ -314,7 +382,9 @@
       { "pecas": ["capo", "escapeD", "escapeE"], "max": 150, "motivo": "o escape sai do flanco do capô, que é mais largo atrás que na frente do escape" },
       { "pecas": ["fuselagem", "estabilizadorD", "estabilizadorE", "profundorD", "profundorE"], "max": 90, "motivo": "a raiz do estabilizador entra no cone de cauda, que é mais largo no bordo de ataque que no de fuga" },
       { "pecas": ["flapD", "eixoFlapD"], "max": 60, "motivo": "o eixo do flap atravessa o nariz do flap de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
-      { "pecas": ["aileronD", "eixoAileronD"], "max": 60, "motivo": "o eixo do aileron atravessa o nariz do aileron de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" }
+      { "pecas": ["aileronD", "eixoAileronD"], "max": 60, "motivo": "o eixo do aileron atravessa o nariz do aileron de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
+      { "pecas": ["deriva.fin", "deriva.dorsal"], "max": 160, "motivo": "a carenagem dorsal termina dentro do bordo de ataque da deriva, que é mais grosso atrás da linha do dorso, e a junta é a concordância entre as duas" },
+      { "pecas": ["leme", "eixoLeme"], "max": 80, "motivo": "o eixo do leme atravessa o nariz do leme de ponta a ponta, em furo" }
     ]
   },
   "unidades": {
@@ -335,7 +405,11 @@
       "funcao": "duas metades de estabilizador horizontal de perfil simétrico e diedro, cada uma com o profundor preso ao bordo de fuga numa fresta, por um eixo e por três suportes sob a linha de dobradiça, com o ressalto do profundor na ponta",
       "vistas": ["frontal-oposta", "inferior"]
     },
-    "empenagem-vertical": { "cor": "#9fb0c0", "funcao": "deriva presa ao dorso da cauda e leme preso ao bordo de fuga dela", "vistas": ["frontal-oposta"] },
+    "empenagem-vertical": {
+      "cor": "#9fb0c0",
+      "funcao": "deriva de perfil simétrico, afinada e enflechada, unida ao dorso da cauda por uma carenagem dorsal, e leme de nariz redondo preso ao bordo de fuga dela numa fresta, por um eixo e por três pares de carenagens de dobradiça, um de cada lado",
+      "vistas": ["frontal-oposta"]
+    },
     "trem-do-nariz": { "cor": "#5f6b78", "funcao": "perna e roda do nariz sob a carenagem do trem, na fuselagem", "vistas": ["frontal-oposta", "inferior"] },
     "trens-principais": { "cor": "#5f6b78", "funcao": "um trem principal sob cada asa, com perna presa na asa e roda", "vistas": ["frontal-oposta", "inferior"] }
   },
@@ -349,7 +423,10 @@
           "familia": "superficie-aerodinamica",
           "perfil": "deriva",
           "substitui": "deriva",
-          "subtrai": ["corteRaiz", { "forma": "leme", "folga": "mFresta" }],
+          "subtrai": [
+            "corteRaiz",
+            { "forma": "vaoDoLeme", "folga": "mFresta" }
+          ],
           "parametros": {
             "envergadura": "=2*mH",
             "simetria": 1,
@@ -956,31 +1033,209 @@
         },
         {
           "id": "deriva",
+          "usa": "derivaVertical",
           "unidade": "empenagem-vertical",
-          "tipo": "extrusao",
-          "eixo": "x",
-          "origem": "perfil",
-          "comprimento": 180,
-          "perfil": [
-            [6980, 2315],
-            [8030, 2528],
-            [8154, 2602],
-            [9676, 4166],
-            [9821, 4189],
-            [10006, 3896],
-            [9094, 2238]
-          ],
-          "centro": [0, 0, 0]
+          "parametros": { "mH": "=vH", "mC0": "=vC0", "mC1": "=vC1", "mFlecha": "=vFlecha", "mTr0": "=vTr0", "mTr1": "=vTr1", "mY0": "=vY0", "mZq0": "=vZq0", "mFresta": "=vFresta" }
         },
         {
           "id": "leme",
           "unidade": "empenagem-vertical",
-          "tipo": "extrusao",
-          "eixo": "x",
-          "origem": "perfil",
-          "comprimento": 140,
-          "perfil": [[9094, 2238], [9821, 2393], [10415, 4164], [10353, 4192], [9821, 4189], [10006, 3896]],
-          "centro": [0, 0, 0]
+          "tipo": "loft",
+          "eixo": "y",
+          "substitui": "leme",
+          "encaixa": { "ancora": "inicio", "em": [0, "vYl0", "vZca0"] },
+          "secoes": [
+            {
+              "pos": "vYl0",
+              "forma": "poligono",
+              "centro": [0, "vZca0"],
+              "perfil": [
+                [4, "=0.5*vLa0"],
+                [-4, "=0.5*vLa0"],
+                ["=-0.5*vTa", "=-0.5*vLa0+0.5*vTa"],
+                ["=-0.3535*vTa", "=-0.5*vLa0+0.1465*vTa"],
+                [0, "=-0.5*vLa0"],
+                ["=0.3535*vTa", "=-0.5*vLa0+0.1465*vTa"],
+                ["=0.5*vTa", "=-0.5*vLa0+0.5*vTa"]
+              ]
+            },
+            {
+              "pos": "vYd",
+              "forma": "poligono",
+              "centro": [0, "vZcd"],
+              "perfil": [
+                [4, "=0.5*vLd"],
+                [-4, "=0.5*vLd"],
+                ["=-0.5*vTd", "=-0.5*vLd+0.5*vTd"],
+                ["=-0.3535*vTd", "=-0.5*vLd+0.1465*vTd"],
+                [0, "=-0.5*vLd"],
+                ["=0.3535*vTd", "=-0.5*vLd+0.1465*vTd"],
+                ["=0.5*vTd", "=-0.5*vLd+0.5*vTd"]
+              ]
+            },
+            {
+              "pos": "vYb",
+              "forma": "poligono",
+              "centro": [0, "vZcb"],
+              "perfil": [
+                [4, "=0.5*vLb"],
+                [-4, "=0.5*vLb"],
+                ["=-0.5*vTb", "=-0.5*vLb+0.5*vTb"],
+                ["=-0.3535*vTb", "=-0.5*vLb+0.1465*vTb"],
+                [0, "=-0.5*vLb"],
+                ["=0.3535*vTb", "=-0.5*vLb+0.1465*vTb"],
+                ["=0.5*vTb", "=-0.5*vLb+0.5*vTb"]
+              ]
+            },
+            {
+              "pos": "vYe",
+              "forma": "poligono",
+              "centro": [0, "vZce"],
+              "perfil": [
+                [4, "=0.5*vLe"],
+                [-4, "=0.5*vLe"],
+                ["=-0.5*vTe", "=-0.5*vLe+0.5*vTe"],
+                ["=-0.3535*vTe", "=-0.5*vLe+0.1465*vTe"],
+                [0, "=-0.5*vLe"],
+                ["=0.3535*vTe", "=-0.5*vLe+0.1465*vTe"],
+                ["=0.5*vTe", "=-0.5*vLe+0.5*vTe"]
+              ]
+            },
+            {
+              "pos": "vYc",
+              "forma": "poligono",
+              "centro": [0, "vZcc"],
+              "perfil": [
+                [4, "=0.5*vLc"],
+                [-4, "=0.5*vLc"],
+                ["=-0.5*vTc", "=-0.5*vLc+0.5*vTc"],
+                ["=-0.3535*vTc", "=-0.5*vLc+0.1465*vTc"],
+                [0, "=-0.5*vLc"],
+                ["=0.3535*vTc", "=-0.5*vLc+0.1465*vTc"],
+                ["=0.5*vTc", "=-0.5*vLc+0.5*vTc"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "eixoLeme",
+          "unidade": "empenagem-vertical",
+          "cor": "#2b3138",
+          "ligar": { "de": [0, "=vYl0+15", "=vZh0+0.5*vTa+vKe*(vYl0-vY0+15)"], "para": [0, "=vYb-15", "=vZhb+0.5*vTb-vKe*15"], "tipo": "haste", "diametro": 30 }
+        },
+        {
+          "id": "dobradicaLeme1D",
+          "unidade": "empenagem-vertical",
+          "lado": "D",
+          "cor": "#5f6b78",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": ["=0.46*vT1", "vK1y", "=vH1-60"] },
+          "secoes": [
+            { "pos": "=vH1-60", "forma": "arredondado", "tamanho": [30, 52], "cantos": 13, "centro": ["=0.46*vT1", "vK1y"] },
+            { "pos": "=vH1+10", "forma": "arredondado", "tamanho": [44, 70], "cantos": 17, "centro": ["=0.42*vT1", "vK1y"] },
+            { "pos": "=vH1+90", "forma": "arredondado", "tamanho": [32, 62], "cantos": 15, "centro": ["=0.38*vT1", "vK1y"] },
+            { "pos": "=vH1+170", "forma": "arredondado", "tamanho": [24, 40], "cantos": 9, "centro": ["=0.28*vT1", "vK1y"] }
+          ]
+        },
+        {
+          "id": "dobradicaLeme2D",
+          "unidade": "empenagem-vertical",
+          "lado": "D",
+          "cor": "#5f6b78",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": ["=0.46*vT2", "vK2y", "=vH2-60"] },
+          "secoes": [
+            { "pos": "=vH2-60", "forma": "arredondado", "tamanho": [30, 52], "cantos": 13, "centro": ["=0.46*vT2", "vK2y"] },
+            { "pos": "=vH2+10", "forma": "arredondado", "tamanho": [44, 70], "cantos": 17, "centro": ["=0.42*vT2", "vK2y"] },
+            { "pos": "=vH2+90", "forma": "arredondado", "tamanho": [32, 62], "cantos": 15, "centro": ["=0.38*vT2", "vK2y"] },
+            { "pos": "=vH2+170", "forma": "arredondado", "tamanho": [24, 40], "cantos": 9, "centro": ["=0.28*vT2", "vK2y"] }
+          ]
+        },
+        {
+          "id": "dobradicaLeme3D",
+          "unidade": "empenagem-vertical",
+          "lado": "D",
+          "cor": "#5f6b78",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": ["=0.46*vT3", "vK3y", "=vH3-60"] },
+          "secoes": [
+            { "pos": "=vH3-60", "forma": "arredondado", "tamanho": [30, 52], "cantos": 13, "centro": ["=0.46*vT3", "vK3y"] },
+            { "pos": "=vH3+10", "forma": "arredondado", "tamanho": [44, 70], "cantos": 17, "centro": ["=0.42*vT3", "vK3y"] },
+            { "pos": "=vH3+90", "forma": "arredondado", "tamanho": [32, 62], "cantos": 15, "centro": ["=0.38*vT3", "vK3y"] },
+            { "pos": "=vH3+170", "forma": "arredondado", "tamanho": [24, 40], "cantos": 9, "centro": ["=0.28*vT3", "vK3y"] }
+          ]
+        },
+        {
+          "id": "vaoDoLeme",
+          "unidade": "empenagem-vertical",
+          "cortador": true,
+          "tipo": "loft",
+          "eixo": "y",
+          "encaixa": { "ancora": "inicio", "em": [0, "vY0", "vZca"] },
+          "secoes": [
+            {
+              "pos": "vY0",
+              "forma": "poligono",
+              "centro": [0, "vZca"],
+              "perfil": [
+                [4, "=0.5*vLa"],
+                [-4, "=0.5*vLa"],
+                ["=-0.5*vTa", "=-0.5*vLa+0.5*vTa"],
+                ["=-0.3535*vTa", "=-0.5*vLa+0.1465*vTa"],
+                [0, "=-0.5*vLa"],
+                ["=0.3535*vTa", "=-0.5*vLa+0.1465*vTa"],
+                ["=0.5*vTa", "=-0.5*vLa+0.5*vTa"]
+              ]
+            },
+            {
+              "pos": "vYb",
+              "forma": "poligono",
+              "centro": [0, "vZcb"],
+              "perfil": [
+                [4, "=0.5*vLb"],
+                [-4, "=0.5*vLb"],
+                ["=-0.5*vTb", "=-0.5*vLb+0.5*vTb"],
+                ["=-0.3535*vTb", "=-0.5*vLb+0.1465*vTb"],
+                [0, "=-0.5*vLb"],
+                ["=0.3535*vTb", "=-0.5*vLb+0.1465*vTb"],
+                ["=0.5*vTb", "=-0.5*vLb+0.5*vTb"]
+              ]
+            },
+            {
+              "pos": "vYe",
+              "forma": "poligono",
+              "centro": [0, "vZce"],
+              "perfil": [
+                [4, "=0.5*vLe"],
+                [-4, "=0.5*vLe"],
+                ["=-0.5*vTe", "=-0.5*vLe+0.5*vTe"],
+                ["=-0.3535*vTe", "=-0.5*vLe+0.1465*vTe"],
+                [0, "=-0.5*vLe"],
+                ["=0.3535*vTe", "=-0.5*vLe+0.1465*vTe"],
+                ["=0.5*vTe", "=-0.5*vLe+0.5*vTe"]
+              ]
+            },
+            {
+              "pos": "vYc",
+              "forma": "poligono",
+              "centro": [0, "vZcc"],
+              "perfil": [
+                [4, "=0.5*vLc"],
+                [-4, "=0.5*vLc"],
+                ["=-0.5*vTc", "=-0.5*vLc+0.5*vTc"],
+                ["=-0.3535*vTc", "=-0.5*vLc+0.1465*vTc"],
+                [0, "=-0.5*vLc"],
+                ["=0.3535*vTc", "=-0.5*vLc+0.1465*vTc"],
+                ["=0.5*vTc", "=-0.5*vLc+0.5*vTc"]
+              ]
+            }
+          ]
         },
         { "id": "carenagemTremNariz", "unidade": "trem-do-nariz", "tipo": "caixa", "largura": 370, "altura": 176, "profundidade": 833, "raio": 30, "centro": [0, 707, 2341.5] },
         { "id": "pernaNariz", "unidade": "trem-do-nariz", "tipo": "cilindro", "diametro": 100, "de": [0, 378, 1791], "para": [0, 625, 1865] },

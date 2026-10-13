@@ -734,10 +734,10 @@
     {
       "id": "empenagem-vertical",
       "membros": [
-        "deriva",
+        "deriva.fin",
+        "deriva.dorsal",
         "leme",
         "eixoLeme",
-        "carenagemDorsal",
         "dobradicaLeme1D",
         "dobradicaLeme1E",
         "dobradicaLeme2D",
@@ -747,7 +747,7 @@
       ],
       "depende": [],
       "custo": 2,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -1035,6 +1035,10 @@
         ]
       },
       "mudou": true
+    },
+    {
+      "replanejado": true,
+      "motivo": "refazer a integração da empenagem vertical depois de trocar a deriva e a carência por um módulo, devolvendo o mestre à maquete"
     }
   ],
   "marcos": [
@@ -1073,7 +1077,8 @@
   "notasDePassagem": {
     "fuselagem": "Porta e janelas são rebaixos recortados no casco; o vidro é escuro. O bojo cônico sob a asa na lateral é a asaD vizinha vista de lado; a lente baixa da referência (região asa, x 165-282 px) é carenagem de raiz e cabe à unidade asas.",
     "asas": "Asa pela família em duas chamadas cortadas em x=asaXPonta (reta e ponta curva): cortar a ponta levantada acusa recorte-vazio. Flap e aileron em vãos com folga 12 mm, eixo e suportes. Flap a partir de x 960: a referência é assimétrica.",
-    "empenagem-horizontal": "Estabilizador pela família (perfil simétrico), profundor recortado com fresta de 12 mm. O ressalto de 170 mm na ponta do profundor vem da referência (684 mm de profundidade); o Envelope foi refeito. Eixo no vão, suportes sob a dobradiça."
+    "empenagem-horizontal": "Estabilizador pela família (perfil simétrico), profundor recortado com fresta de 12 mm. O ressalto de 170 mm na ponta do profundor vem da referência (684 mm de profundidade); o Envelope foi refeito. Eixo no vão, suportes sob a dobradiça.",
+    "empenagem-vertical": "A região deriva da referência inclui o filete dorsal, então lâmina e filete são o módulo deriva. O vão do leme é o cortador vaoDoLeme (fresta 12 mm); o leme tem o canto traseiro de baixo cortado e o ressalto no topo, como a referência."
   },
   "vereditos": [
     {
