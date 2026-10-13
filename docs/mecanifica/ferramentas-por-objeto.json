@@ -29,7 +29,7 @@
       "parametros": "operandos, operação",
       "referencias": ["Blender: modificador Boolean", "Manifold", "CadQuery: cut, union"],
       "aqui": "parcial",
-      "onde": "núcleo: subtrair, unir, intersectar; esboço: só furos na caixa"
+      "onde": "núcleo: subtrair, unir, intersectar; esboço: furo na caixa e recorte de uma forma por outra (`subtrai`, com folga e profundidade, também em forma de família); unir e intersectar no esboço não"
     },
     "repete": {
       "nome": "repetição em série",
@@ -181,8 +181,8 @@
       "automatiza": "gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás",
       "parametros": "perfil, corda e torção ao longo do raio ou da envergadura, pás",
       "referencias": ["OpenVSP", "gerador de perfis NACA", "Blender: Extra Objects"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não"
     },
     "tecido": {
       "nome": "tecido e estofado",

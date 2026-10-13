@@ -37,7 +37,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | não | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
 | 24 | texto e escala gravados (`texto`) | modificador | 19 (5%) | 9 | não | grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa) |
 | 25 | polia e correia (`polia`) | especializado | 18 (5%) | 7 | não | gera polias em V ou dentadas e a correia fechada que as envolve na posição certa |
-| 26 | perfil aerodinâmico e pás (`aerofolio`) | gerador | 17 (5%) | 6 | não | gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás |
+| 26 | perfil aerodinâmico e pás (`aerofolio`) | gerador | 17 (5%) | 6 | parcial | gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás |
 | 27 | elementos de construção (`arquitetura`) | gerador | 13 (4%) | 6 | não | faz parede com aberturas, laje, telhado de águas e escada por espelho e piso |
 | 28 | corte e união gerais (`booleana`) | modificador | 11 (3%) | 9 | parcial | subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas |
 | 29 | dobrar, torcer e afunilar (`deforma`) | modificador | 11 (3%) | 9 | não | deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide) |
@@ -84,9 +84,9 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - elos ao longo de caminho fechado (`não`, 19 objetos): nem esboço nem núcleo.
 - texto e escala gravados (`não`, 19 objetos): nem esboço nem núcleo.
 - polia e correia (`não`, 18 objetos): nem esboço nem núcleo.
-- perfil aerodinâmico e pás (`não`, 17 objetos): nem esboço nem núcleo.
+- perfil aerodinâmico e pás (`parcial`, 17 objetos): família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não.
 - elementos de construção (`não`, 13 objetos): nem esboço nem núcleo.
-- corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar; esboço: só furos na caixa.
+- corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar; esboço: furo na caixa e recorte de uma forma por outra (`subtrai`, com folga e profundidade, também em forma de família); unir e intersectar no esboço não.
 - dobrar, torcer e afunilar (`não`, 11 objetos): nem esboço nem núcleo.
 - rolamentos e buchas (`parcial`, 11 objetos): componentes rolamento e mancal do esboço, sem pista nem gaiola.
 - lâmina e dentes de corte (`não`, 10 objetos): nem esboço nem núcleo.
@@ -163,10 +163,6 @@ Grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostr
 ### polia e correia (`polia`)
 
 Gera polias em V ou dentadas e a correia fechada que as envolve na posição certa. Parâmetros: perfil, diâmetros, centros, largura. Referências: FreeCAD Gears: timing gear; BOSL2. Aqui: não, nem esboço nem núcleo. Atende 18 objetos em 7 famílias.
-
-### perfil aerodinâmico e pás (`aerofolio`)
-
-Gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás. Parâmetros: perfil, corda e torção ao longo do raio ou da envergadura, pás. Referências: OpenVSP; gerador de perfis NACA; Blender: Extra Objects. Aqui: não, nem esboço nem núcleo. Atende 17 objetos em 6 famílias.
 
 ### elementos de construção (`arquitetura`)
 
@@ -248,9 +244,13 @@ Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: ti
 
 Aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face. Parâmetros: padrão, passo, profundidade, face. Referências: BOSL2: knurling e textures; Blender: Displace com textura de imagem. Aqui: parcial, núcleo: displace com ruído; padrão regular não existe. Atende 21 objetos em 10 famílias.
 
+### perfil aerodinâmico e pás (`aerofolio`)
+
+Gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás. Parâmetros: perfil, corda e torção ao longo do raio ou da envergadura, pás. Referências: OpenVSP; gerador de perfis NACA; Blender: Extra Objects. Aqui: parcial, família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não. Atende 17 objetos em 6 famílias.
+
 ### corte e união gerais (`booleana`)
 
-Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar; esboço: só furos na caixa. Atende 11 objetos em 9 famílias.
+Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar; esboço: furo na caixa e recorte de uma forma por outra (`subtrai`, com folga e profundidade, também em forma de família); unir e intersectar no esboço não. Atende 11 objetos em 9 famílias.
 
 ### rolamentos e buchas (`rolamento`)
 

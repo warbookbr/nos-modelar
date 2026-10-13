@@ -104,3 +104,54 @@ faltas que mais custaram e as que impediram o avião de cumprir o alinhamento;
 as correções do crítico são baratas e mudaram notas nesta rodada. C e D, as
 correções de ferramenta e os miúdos voltam ao backlog com o atrito que os
 justifica, salvo o que a pessoa puxar para a fatia 5.
+
+## Segunda rodada
+
+A segunda rodada deixou 44 atritos em [`esboco-r2/ATRITOS.md`](esboco-r2/ATRITOS.md),
+classificados aqui em 2026-10-13 pela mesma régua. O 27, a blocagem da forma de
+família cortada por molde e da roda de furo aberto, foi corrigido durante a
+rodada. O 10 e o 43, o cortador repetido na segunda integração, o 44, a mensagem de
+colisão sem o limite, e o 8 e o 14, as medidas da hélice e do escape, estão sendo
+corrigidos no fechamento do plano.
+
+**Integração do detalhe com o mestre.** É o grupo que mais custou edição à mão do
+mestre. O `--integrar` descarta em silêncio o `subtrai` que o detalhe escreve em
+forma de outra unidade, e o trem que recolhe para dentro do capô ou da asa exige
+editar a forma alheia no mestre (34, 40); recusa a unidade que traz um módulo novo
+(28); não avisa de `plano.medidas`, `plano.pecas` e `plano.referencia` que citam a
+forma trocada, que o `--editar` também não alcança (5, 20, 30, 35); as medidas do
+plano não descem ao detalhe (11); o `--detalhar` regrava o detalhe existente sem
+avisar (15) e deixa imagens soltas na pasta (9). Correção de ferramenta que já
+existe.
+
+**Família de superfície aerodinâmica e recorte.** A família não publica âncora de
+bordo de fuga nem de espessura na linha de dobradiça, e flap, aileron e nariz do
+profundor saíram de 44 expressões e de números calculados fora do módulo (24,
+26); recusa corda na raiz acima de 0,8 da envergadura, que a deriva pede (29);
+cortar a ponta levantada acusa `recorte-vazio` e dá volume negativo (19); e o
+Envelope por `substitui` não aceita a forma de família que cobre duas formas da
+maquete (23). Correção de família e de ferramenta.
+
+**Curso de mecanismo.** Uma forma não gira em dois grupos, e o trem que recolhe e
+deita a roda saiu com seno e cosseno à mão (36); a linguagem de expressões não tem
+`asin` nem `abs` (38); as poses do curso só usam as quatro vistas de sempre e a
+unidade de duas metades afastadas sai minúscula, de modo que o fim do curso só se
+leu em cortes gerados à mão (37, 41). Ferramenta.
+
+**Conferência, gate e mensagens.** O vidro solto dentro do vão passa na tolerância
+de contato (12); a conferência da silhueta não localiza o desvio (3), dá a célula
+só à forma mais próxima (31), arredonda a razão a duas casas (21), não aceita
+tolerância nem espelho por parte (4, 22) e deixa a maquete passar com o profundor
+205 mm mais raso (25); `encaixa.em` não vira porta do Envelope (1); a pá em
+bandeira passa na maquete (6); o arranjo radial acusa as pás vizinhas (7); não há
+âncora da meia-largura do casco numa cota qualquer (13); e as mensagens da rotação
+(2), da travessia "de lado a lado" (18) e da nota de passagem acima de 240
+caracteres (32) dizem a causa errada ou nada. Correções miúdas.
+
+**Desempenho.** Cada leitura do mestre leva de 1 a 1,5 minuto, o `--curso` 2
+minutos e o `--feito` da unidade 9 minutos, por recalcular as famílias ocultas
+(33, 39, 42). A bateria dos gates subiu a 22 minutos pelo mesmo motivo e está sendo
+corrigida no fechamento.
+
+**Desenho.** A vizinha em cinza lê como parte da unidade (16) e o cotovelo de
+seções retas sai com um leque de traços (17). Correção de ferramenta.
