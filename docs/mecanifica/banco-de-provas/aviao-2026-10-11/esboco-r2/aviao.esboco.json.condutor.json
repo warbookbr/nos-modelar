@@ -1150,6 +1150,12 @@
       "unidade": "trem-do-nariz",
       "nota": 6,
       "motivo": "Curso de 0 a 70 contínuo e plausível. Fim do curso incoerente: nas vistas lateral e frontal da pose 90 do brief a roda fica inclinada, com a metade de baixo fora da caixa (cerca de 115 mm abaixo dela), enquanto a vista inferior e o corte da pose recolhida a mostram deitada dentro da cavidade; a função de deitar dentro do alojamento não se confirma nas vistas do brief. Perna visível curta (0,47 do diâmetro da roda, contra 0,68 na referência); quarto traseiro da caixa maciço."
+    },
+    {
+      "ordem": 9,
+      "unidade": "trem-do-nariz",
+      "nota": 8,
+      "motivo": "Revisto pelo crítico com a imagem da pose 90: o achado da roda para fora veio da pose 70, no meio do curso. O curso de 0 a 90 é contínuo e a roda termina deitada dentro do alojamento, confirmado pela lateral, frontal, inferior e corte. Resta a perna visível curta (0,47 do diâmetro da roda, contra 0,68 na referência)."
     }
   ]
 }
