@@ -85,8 +85,9 @@ function geometriaDoTipo(r) {
       const declaradas = Array.isArray(f.secoes) ? f.secoes : [];
       return {
         eixo, eixosDoPerfil: [EIXOS[pr.b.u], EIXOS[pr.b.v]], comprimento: pr.comprimento,
-        /* o loft `suave` sai nas seções declaradas, que o tradutor do nível zero lê como o casco reto entre elas */
-        ...(pr.suave ? { suave: true } : {}),
+        /* o loft `suave` sai nas seções declaradas (`secoes`, com nome e inclinação) e, em `estacoes`, nas que a curva pede: o tradutor
+           do nível zero lê o casco reto entre as estações, e a silhueta dele é a do desenho */
+        ...(pr.suave ? { suave: true, estacoes: pr.secoes.map((sc) => secaoDe(sc)) } : {}),
         secoes: (pr.secoesDeclaradas ?? pr.secoes).map((sc, i) => secaoDe(sc, {
           ...(objeto(declaradas[i]) && typeof declaradas[i].nome === 'string' ? { nome: declaradas[i].nome } : {}),
           ...(objeto(declaradas[i]) && Array.isArray(declaradas[i].inclinacao) && declaradas[i].inclinacao.some((x) => x !== 0) ? { inclinacao: declaradas[i].inclinacao } : {}),
@@ -98,7 +99,9 @@ function geometriaDoTipo(r) {
       const declarados = Array.isArray(f.perfil) ? f.perfil : [];
       return {
         eixo, comprimento: pr.comprimento, lados: pr.secoes[0].perfil.length,
-        ...(pr.suave ? { suave: true } : {}),
+        /* a revolução `suave` leva também as estações da curva do perfil (`estacoes`, o raio e a altura de cada uma), que o tradutor do
+           nível zero lê no lugar dos pontos declarados */
+        ...(pr.suave ? { suave: true, estacoes: pr.secoes.map((sc) => ({ raio: sc.perfil[0][0], altura: sc.w })) } : {}),
         /* cada ponto do perfil: o raio e a altura ao longo do eixo, esta relativa ao centro da forma */
         perfil: (pr.secoesDeclaradas ?? pr.secoes).map((sc, i) => ({ raio: Array.isArray(declarados[i]) ? declarados[i][0] : declarados[i].raio, altura: sc.w, ...(objeto(declarados[i]) && typeof declarados[i].nome === 'string' ? { nome: declarados[i].nome } : {}) })),
       };

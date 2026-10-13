@@ -127,6 +127,59 @@ describe('o casco por seções, para a blocagem do nível zero', () => {
   it('sem `eixo` declarado o eixo principal é o da maior extensão', () => {
     expect(eixoDaMalha(lerMalha(tuboOco({})))).toBe('x');
   });
+
+  /* a área de um polígono (shoelace), em valor absoluto */
+  const areaDe = (p) => Math.abs(p.reduce((a, q, i) => a + q[0] * p[(i + 1) % p.length][1] - p[(i + 1) % p.length][0] * q[1], 0)) / 2;
+
+  it('sem número de seções pedido, o casco tem uma seção em cada nível de nervura da malha e planos entre as nervuras que passam da faixa máxima', () => {
+    const asa = lerMalha(asaDeSecoes({ secoes: 5, n: 60 }));
+    const c = cascoEmSecoes(asa);
+    const niveis = [...new Set(asa.vertices.map((v) => Math.round(v[0] * 1000) / 1000))].sort((a, b) => a - b);
+    expect(niveis).toHaveLength(5);
+    for (const w of niveis) expect(c.secoes.map((sc) => sc.w), `a nervura em ${w}`).toContain(w);
+    const ws = c.secoes.map((sc) => sc.w);
+    for (let i = 1; i < ws.length; i++) {
+      expect(ws[i]).toBeGreaterThan(ws[i - 1]);
+      expect(ws[i] - ws[i - 1], `a faixa até ${ws[i]}`).toBeLessThanOrEqual(c.comprimento / 23 + 1e-3);
+    }
+    /* a seção do nível de uma nervura é o contorno dela: a corda e a espessura da elipse da nervura de meio de envergadura */
+    const meio = c.secoes.find((sc) => Math.abs(sc.w - niveis[2]) < 1e-3);
+    const larg = (i) => Math.max(...meio.perfil.map((q) => q[i])) - Math.min(...meio.perfil.map((q) => q[i]));
+    const corda = 700 * (1 - 0.5 * 0.5);
+    const espessura = 160 * (1 - 0.5 * 0.5);
+    expect(Math.max(larg(0), larg(1))).toBeCloseTo(corda, 1);
+    expect(Math.min(larg(0), larg(1))).toBeCloseTo(espessura, 1);
+  });
+
+  it('com o número de seções pedido, os planos são uniformes (o número pedido é o que vale)', () => {
+    const asa = lerMalha(asaDeSecoes({ secoes: 5, n: 60 }));
+    const c = cascoEmSecoes(asa, { secoes: 7, raios: 48 });
+    expect(c.secoes).toHaveLength(7);
+    expect(c.secoes[1].w - c.secoes[0].w).toBeCloseTo(c.comprimento / 6, 2);
+  });
+
+  it('a seção fina e comprida guarda os quatro cantos: o ponto de cada direção é o vértice mais extremo, e não o corte do raio a partir do centro', () => {
+    /* uma placa de 200 por 6 mm girada 4 graus no plano da seção: os cantos caem entre dois raios de 7,5 graus */
+    const a = (4 * Math.PI) / 180;
+    const gira = ([x, y]) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
+    const base = [[-100, -3], [100, -3], [100, 3], [-100, 3]].map(gira);
+    const placa = lerMalha({
+      formato: 'mecanifica.malha@1',
+      vertices: [...base.map(([x, y]) => [x, y, 0]), ...base.map(([x, y]) => [x, y, 40])],
+      faces: [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [3, 7, 6, 2], [0, 4, 7, 3], [1, 2, 6, 5]],
+      eixo: 'z',
+    });
+    for (const raios of [48, 32]) {
+      const c = cascoEmSecoes(placa, { secoes: 3, raios });
+      for (const sc of c.secoes) {
+        expect(areaDe(sc.perfil), `${raios} pontos, seção em ${sc.w}`).toBeGreaterThan(0.999 * 200 * 6);
+        for (const canto of base) {
+          const dist = Math.min(...sc.perfil.map((q) => Math.hypot(q[0] - canto[0], q[1] - canto[1])));
+          expect(dist, `canto ${canto.map((x) => x.toFixed(1))}`).toBeLessThan(1e-3);
+        }
+      }
+    }
+  });
 });
 
 describe('fatiarMalha', () => {

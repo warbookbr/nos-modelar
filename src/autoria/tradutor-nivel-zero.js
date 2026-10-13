@@ -303,7 +303,8 @@ function volumeDaEsfera(g) {
 function volumeDaRevolucao(g, _cols, al) {
   const e = EIXOS.indexOf(g.eixo);
   if (!al[e]) recusar(`revolução: ${SEM_ROTACAO_LIVRE}`);
-  let perfil = g.perfil.map((p) => [p.raio, p.altura]);
+  /* a revolução `suave` traz as estações da curva do perfil: o desenho passa por elas, e a N2 liga as estações por troncos retos */
+  let perfil = (g.estacoes ?? g.perfil).map((p) => [p.raio, p.altura]);
   if (al[e].sinal < 0) perfil = perfil.map(([raio, altura]) => [raio, -altura]).reverse();
   return { tipo: 'revolucao', eixo: EIXOS[al[e].eixo], perfil: perfil.map(vetor), segmentos: g.lados };
 }
@@ -372,13 +373,15 @@ function cascoDeSecoes(g, cols, al, nome) {
 
 function volumeDoLoft(g, cols, al) {
   if (!Array.isArray(g.secoes) || g.secoes.length < 2) recusar('loft sem seções: o casco da N2 precisa de duas ou mais');
-  const { volume, inclinadas, movidas, ampliadas } = cascoDeSecoes(g, cols, al, 'loft');
+  /* o loft `suave` traz as estações da curva, e o casco da N2 passa por elas (as seções declaradas são o que a curva liga) */
+  const secoesDoCasco = g.estacoes ?? g.secoes;
+  const { volume, inclinadas, movidas, ampliadas } = cascoDeSecoes({ ...g, secoes: secoesDoCasco }, cols, al, 'loft');
   const perdido = [];
   if (inclinadas > 0) {
     perdido.push(perda('inclinacao', `${inclinadas} seção(ões) inclinada(s): o contorno de cada uma foi projetado no plano perpendicular ao eixo${movidas.length ? `, e a seção da ponta foi levada ao ponto mais extremo dela para o envelope ao longo do eixo não encolher` : ''}`));
   }
   if (ampliadas.length > 0) perdido.push(perda('secao-ponto', `${ampliadas.length} seção(ões) ponto virou(ram) o polígono do vizinho a ${FRACAO_DA_PONTA * 100}%, porque o casco da N2 não aceita área nula`));
-  const externo = volumeEmAneis(g.secoes);
+  const externo = volumeEmAneis(secoesDoCasco);
   let esboco = externo;
   if (g.casca) {
     const cavidade = volumeEmAneis(g.casca.cavidade);
@@ -390,7 +393,7 @@ function volumeDoLoft(g, cols, al) {
 
 /* A forma de família (a roda e o cilindro hidráulico do trem do avião, a asa): o esboço a desenha pela superfície que a família gera,
    e a N2 não tem superfície livre. O módulo entrega junto da geometria o casco por seções perpendiculares ao eixo principal da peça
-   (o corte da superfície por cada plano e os vértices entre dois planos, em casco convexo de 48 raios), no mesmo formato de um loft
+   (o corte da superfície por cada plano, nos níveis das nervuras da malha e entre elas, em casco convexo de 48 pontos extremos), no mesmo formato de um loft
    sem casca, e a N2 recebe esse casco: o envelope e a silhueta de cada vista saem exatos até a faceta do raio, e o furo do cubo, a
    cavidade e a reentrância de cada seção deixam de existir, o que o relatório de perdas declara com o erro de volume medido contra o
    volume da superfície. */

@@ -305,8 +305,9 @@ export function pecasDaMalha(r) {
 
 /* ---------- o casco por seções, para a blocagem do nível zero ---------- */
 
-/* Quantas seções e quantos raios por seção o casco leva. 24 seções cobrem a roda e o cilindro do trem do avião sem perder o
-   flange de 6 mm; 48 raios são os do loft e da revolução do esboço (o círculo inscrito fica 0,2% menor). */
+/* Quantas seções e quantos pontos por seção o casco leva. 24 seções cobrem a roda e o cilindro do trem do avião sem perder o
+   flange de 6 mm (são as da superfície sem nervuras, e a faixa máxima entre duas seções quando há nervuras); 48 pontos são os do loft
+   e da revolução do esboço (o círculo inscrito fica 0,2% menor). `RAIOS_DO_CASCO` guarda o nome de quando os pontos saíam de raios. */
 export const SECOES_DO_CASCO = 24;
 export const RAIOS_DO_CASCO = 48;
 /* Os eixos (u, v) do plano da seção de um sólido de eixo `x`, `y` ou `z`, os mesmos do loft do esboço. */
@@ -362,43 +363,81 @@ function convexificar(pontos) {
   return pontos.map((p, k) => { if (fica[k]) anterior = p; return anterior; });
 }
 
-/* O polígono convexo `poli` (anti-horário) amostrado em `n` raios igualmente espaçados em ângulo a partir do centro da caixa
-   dele, começando no eixo +u, e convexificado (ver `convexificar`). O centro da caixa fica dentro de um polígono convexo que a
-   contenha, o que a média dos vértices não garante num polígono de lados desiguais. */
-function raiosDoConvexo(poli, n) {
-  const c = [0, 1].map((e) => (Math.min(...poli.map((q) => q[e])) + Math.max(...poli.map((q) => q[e]))) / 2);
+/* O polígono convexo `poli` (anti-horário) amostrado em `n` direções igualmente espaçadas em ângulo a partir de +u: o ponto `k` é o
+   vértice mais extremo na direção `k` (o apoio do polígono nela), e convexificado (ver `convexificar`). O apoio guarda os vértices que
+   dão a forma do polígono, e por isso a seção fina e comprida (o corte de uma pá de hélice, de uma asa) mantém as pontas: amostrar por
+   raios a partir do centro cortava a ponta a cada passo angular, e uma seção de 195 por 10 mm perdia a ponta inteira. Numa curva
+   densa (a roda, o loft redondo) o apoio cai onde cairia o raio. A direção que um lado do polígono atravessa em ângulo reto tem dois
+   apoios iguais, e a escolha é o mais adiante no sentido anti-horário, para o ponto `k` de uma seção continuar o ponto `k` da seguinte. */
+function apoiosDoConvexo(poli, n) {
+  const escala = Math.max(...poli.map((q) => Math.hypot(q[0], q[1])), 1);
   const saida = [];
   for (let k = 0; k < n; k++) {
     const a = (2 * Math.PI * k) / n;
     const d = [Math.cos(a), Math.sin(a)];
-    let melhor = 0;
-    for (let i = 0; i < poli.length; i++) {
-      const p = poli[i]; const q = poli[(i + 1) % poli.length];
-      const e = [q[0] - p[0], q[1] - p[1]];
-      const den = d[0] * e[1] - d[1] * e[0];
-      if (Math.abs(den) < 1e-12) continue;
-      const t = ((p[0] - c[0]) * e[1] - (p[1] - c[1]) * e[0]) / den;
-      const s = ((p[0] - c[0]) * d[1] - (p[1] - c[1]) * d[0]) / den;
-      if (s >= -1e-9 && s <= 1 + 1e-9 && t > melhor) melhor = t;
+    const t = [-d[1], d[0]];
+    let melhor = poli[0];
+    let alto = -Infinity;
+    for (const q of poli) {
+      const h = q[0] * d[0] + q[1] * d[1];
+      if (h > alto + 1e-9 * escala) { alto = h; melhor = q; continue; }
+      if (h >= alto - 1e-9 * escala && q[0] * t[0] + q[1] * t[1] > melhor[0] * t[0] + melhor[1] * t[1]) { melhor = q; if (h > alto) alto = h; }
     }
-    saida.push([r6(c[0] + d[0] * melhor), r6(c[1] + d[1] * melhor)]);
+    saida.push([r6(melhor[0]), r6(melhor[1])]);
   }
   return convexificar(saida);
 }
 
 /** O casco da malha por seções perpendiculares ao eixo principal, no formato de um loft sem casca (`eixo`, `eixosDoPerfil`,
  *  `comprimento`, `secoes: [{ w, perfil }]`, `w` e `perfil` no referencial local já centrado). Cada seção é o casco convexo do corte
- *  da superfície pelo plano dela e dos vértices que ficam entre a seção anterior e a seguinte, amostrado em `RAIOS_DO_CASCO` raios,
+ *  da superfície pelo plano dela e dos vértices que ficam entre a seção anterior e a seguinte (ou, no nível de uma nervura, os
+ *  vértices dela), amostrado em `RAIOS_DO_CASCO` direções (ver `apoiosDoConvexo`),
  *  de modo que o sólido envolve a malha inteira, sem furo nem cavidade. É a forma que a blocagem do nível zero (a N2 só tem sólidos
  *  de seção convexa) aceita de uma peça que o esboço desenha por superfície: a roda vira o cilindro do pneu, e o cilindro hidráulico
  *  o tronco de seções do corpo, da haste e dos olhais. Determinístico. */
-export function cascoEmSecoes(malha, { secoes: quantas = SECOES_DO_CASCO, raios = RAIOS_DO_CASCO } = {}) {
-  const memoria = `${quantas}x${raios}`;
+export function cascoEmSecoes(malha, { secoes: quantas = null, raios = RAIOS_DO_CASCO } = {}) {
+  const memoria = `${quantas ?? 'niveis'}x${raios}`;
   malha.cascos ??= new Map();
   if (malha.cascos.has(memoria)) return malha.cascos.get(memoria);
   const casco = cascoPorSecoes(malha, quantas, raios);
   malha.cascos.set(memoria, casco);
   return casco;
+}
+
+/* Os planos das seções, quando o número delas não é pedido: os níveis em que a própria malha tem vértices ao longo do eixo (as nervuras
+   de uma pá ou de uma asa, os pontos do perfil de uma roda), com os que ficam a menos de `JUNTA_DE_NIVEL` da extensão juntos num só, e,
+   entre dois níveis mais afastados que a extensão sobre `SECOES_DO_CASCO`, planos intermediários igualmente espaçados (o corte da
+   superfície por eles, sem vértice). A malha de uma família é feita de seções (cada nervura é um contorno, e as faces ligam duas
+   vizinhas), e cada seção do casco no nível de uma nervura é então o contorno dela, sem vértice de outro nível puxado para o plano:
+   com planos uniformes, o vértice de uma nervura entrava no contorno das duas seções vizinhas, e numa pá torcida o casco ficava até
+   0,3% maior que a malha na vista de quina, o que desencontrava o quadro do desenho. Os planos intermediários mantêm cada faixa do
+   casco curta onde as nervuras estão longe uma da outra (a pá tem sete nervuras em 912 mm), porque o casco liga o ponto `k` de uma
+   seção ao ponto `k` da seguinte, e uma faixa longa de seção torcida se afasta da superfície que a malha liga ponto a ponto. Devolve
+   null quando os níveis passam de `NIVEIS_MAXIMOS` (uma superfície sem seções, que cai nos planos uniformes) ou quando a malha tem um
+   só. */
+const JUNTA_DE_NIVEL = 1e-5;
+const NIVEIS_MAXIMOS = 96;
+function niveisDaMalha(vertices, e, lo, hi) {
+  const extensao = hi - lo;
+  const tolerancia = Math.max(extensao * JUNTA_DE_NIVEL, 1e-6);
+  const ordenados = vertices.map((p) => p[e]).sort((x, y) => x - y);
+  const grupos = [];
+  for (const w of ordenados) {
+    const g = grupos[grupos.length - 1];
+    if (g && w - g.fim <= tolerancia) { g.fim = w; g.soma += w; g.n += 1; } else grupos.push({ inicio: w, fim: w, soma: w, n: 1 });
+  }
+  if (grupos.length < 2 || grupos.length > NIVEIS_MAXIMOS) return null;
+  const niveis = grupos.map((g, i) => ({ de: g.inicio, ate: g.fim, w: i === 0 ? lo : i === grupos.length - 1 ? hi : g.soma / g.n }));
+  const maximo = extensao / (SECOES_DO_CASCO - 1);
+  const saida = [];
+  niveis.forEach((n, i) => {
+    saida.push(n);
+    const proximo = niveis[i + 1];
+    if (!proximo) return;
+    const partes = Math.ceil((proximo.w - n.w) / maximo - 1e-9);
+    for (let j = 1; j < partes; j++) { const w = n.w + ((proximo.w - n.w) * j) / partes; saida.push({ de: null, ate: null, w }); }
+  });
+  return saida;
 }
 
 function cascoPorSecoes(malha, quantas, raios) {
@@ -408,26 +447,43 @@ function cascoPorSecoes(malha, quantas, raios) {
   const lo = malha.caixa.min[e];
   const hi = malha.caixa.max[e];
   const vertices = verticesDaMalha(malha, null);
-  const passo = (hi - lo) / (quantas - 1);
-  const posicao = (i) => (i === quantas - 1 ? hi : lo + i * passo);
   const plano = (p) => [p[u], p[v]];
   /* a aresta que cruza o plano `w` dá um ponto da seção; a aresta e o plano se tocam em pontos só quando a aresta atravessa */
   const arestas = [];
   for (const f of malha.faces) for (let i = 0; i < f.length; i++) arestas.push([malha.vertices[f[i]], malha.vertices[f[(i + 1) % f.length]]]);
-  const secoes = [];
-  for (let i = 0; i < quantas; i++) {
-    const w = posicao(i);
-    const antes = i === 0 ? lo - 1 : posicao(i - 1);
-    const depois = i === quantas - 1 ? hi + 1 : posicao(i + 1);
-    const pontos = vertices.filter((p) => p[e] > antes && p[e] < depois).map(plano);
+  const doCruzamento = (w) => {
+    const pontos = [];
     for (const [a, b] of arestas) {
       if ((a[e] - w) * (b[e] - w) >= 0) continue;
       const t = (w - a[e]) / (b[e] - a[e]);
       pontos.push([a[u] + t * (b[u] - a[u]), a[v] + t * (b[v] - a[v])]);
     }
-    const casco = cascoPlano(pontos);
-    exigir(casco.length >= 3, 'cascoEmSecoes: a seção da malha não tem área (a peça é fina demais no eixo escolhido)');
-    secoes.push({ w: r3(w), perfil: raiosDoConvexo(casco, raios) });
+    return pontos;
+  };
+  const exato = (niveis) => {
+    const saida = [];
+    for (const n of niveis) {
+      const casco = cascoPlano([...(n.de === null ? [] : vertices.filter((p) => p[e] >= n.de && p[e] <= n.ate).map(plano)), ...doCruzamento(n.w)]);
+      if (casco.length < 3) return null;
+      saida.push({ w: r3(n.w), perfil: apoiosDoConvexo(casco, raios) });
+    }
+    return saida;
+  };
+  const niveis = quantas === null ? niveisDaMalha(vertices, e, lo, hi) : null;
+  let secoes = niveis ? exato(niveis) : null;
+  if (secoes === null) {
+    const n = quantas ?? SECOES_DO_CASCO;
+    const passo = (hi - lo) / (n - 1);
+    const posicao = (i) => (i === n - 1 ? hi : lo + i * passo);
+    secoes = [];
+    for (let i = 0; i < n; i++) {
+      const w = posicao(i);
+      const antes = i === 0 ? lo - 1 : posicao(i - 1);
+      const depois = i === n - 1 ? hi + 1 : posicao(i + 1);
+      const casco = cascoPlano([...vertices.filter((p) => p[e] > antes && p[e] < depois).map(plano), ...doCruzamento(w)]);
+      exigir(casco.length >= 3, 'cascoEmSecoes: a seção da malha não tem área (a peça é fina demais no eixo escolhido)');
+      secoes.push({ w: r3(w), perfil: apoiosDoConvexo(casco, raios) });
+    }
   }
   return { eixo, eixosDoPerfil: [EIXOS[u], EIXOS[v]], comprimento: r3(hi - lo), secoes };
 }

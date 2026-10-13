@@ -461,11 +461,13 @@ function polignosConvexos(pts, furos, n) {
   return saida.filter((t) => areaVetorial(t.pts) > 1e-9);
 }
 
-/* A superfície inteira da forma sem recorte (todas as faces, vistas por dois olhos opostos), em polígonos convexos. */
+/* A superfície inteira da forma sem recorte (todas as faces, vistas por dois olhos opostos), em polígonos convexos. É a superfície que o
+   desenho da forma inteira mostra, com as pontas das juntas de curva do tubo esquadradas (`esquadrar`): sem isso cada trecho de uma
+   curva ficava um prisma reto, e entre dois trechos sobrava uma fresta em cunha por onde se via o fundo. */
 function superficieBase(r) {
   const saida = [];
   for (const olho of OLHOS_DA_FRONTEIRA) {
-    for (const ch of fatiarForma(r, olho, { semFatias: true, maxFatias: 1, semRecorte: true })) {
+    for (const ch of fatiarForma(r, olho, { semFatias: true, maxFatias: 1, semRecorte: true, esquadrar: true })) {
       for (const f of [...ch.lados, ...ch.dentro, ...ch.tampas]) {
         const furos = f.furos && f.furos.length > 0 ? f.furos : f.furo ? [f.furo] : [];
         for (const q of polignosConvexos(f.pts, furos, f.n)) saida.push({ pts: q.pts, n: f.n, fl: q.pts.map(() => null) });

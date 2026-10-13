@@ -258,6 +258,30 @@ describe('formas resolvidas: o que cada forma traz', () => {
     expect(e.formas[1].geometria.centro).toEqual([-50, 0, 0]);
   });
 
+  it('o loft e a revolução `suave` saem com as seções declaradas e com as estações da curva, e o dado continua puro', () => {
+    const e = formasResolvidas({
+      opcoes: [{
+        formas: [
+          { id: 'barriga', tipo: 'loft', eixo: 'z', suave: true, secoes: [{ pos: 0, forma: 'elipse', tamanho: [200, 160], nome: 'bico' }, { pos: 300, forma: 'elipse', tamanho: [520, 420] }, { pos: 700, forma: 'elipse', tamanho: [800, 600] }, { pos: 1200, forma: 'elipse', tamanho: [500, 400] }] },
+          { id: 'bojo', tipo: 'revolucao', eixo: 'z', suave: true, lados: 48, perfil: [[0, 0], [60, 54], [100, 104], [125, 154], [150, 204], [190, 400]] },
+          { id: 'reto', tipo: 'loft', eixo: 'z', secoes: [{ pos: 0, forma: 'elipse', tamanho: [200, 160] }, { pos: 300, forma: 'elipse', tamanho: [520, 420] }] },
+        ],
+      }],
+    });
+    const [loft, revolucao, reto] = e.formas.map((f) => f.geometria);
+    expect(loft.suave).toBe(true);
+    expect(loft.secoes).toHaveLength(4);
+    expect(loft.secoes[0].nome).toBe('bico');
+    expect(loft.estacoes.length).toBeGreaterThan(loft.secoes.length);
+    expect(loft.estacoes.map((s) => s.w)).toEqual([...loft.estacoes.map((s) => s.w)].sort((a, b) => a - b));
+    for (const s of loft.secoes) expect(loft.estacoes.some((t) => Math.abs(t.w - s.w) < 1e-6), `a seção declarada em ${s.w} é uma estação`).toBe(true);
+    expect(revolucao.perfil).toHaveLength(6);
+    expect(revolucao.estacoes.length).toBeGreaterThan(revolucao.perfil.length);
+    expect(revolucao.estacoes[0]).toEqual({ raio: expect.any(Number), altura: expect.any(Number) });
+    expect(reto.estacoes).toBeUndefined();
+    expect(JSON.parse(JSON.stringify(e))).toEqual(e);
+  });
+
   it('as formas ocultas saem com `oculto: true`', () => {
     const e = formasResolvidas({ opcoes: [{ formas: [caixa('a'), caixa('b', { oculto: true, centro: [20, 0, 0] })] }] });
     expect(e.formas.map((f) => f.oculto)).toEqual([false, true]);

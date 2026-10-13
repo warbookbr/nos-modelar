@@ -169,6 +169,15 @@ describe('tradutor do nível zero: tipos com correspondência exata', () => {
     perto(m.get('torno').volume, m.get('invertido').volume, 1e-6);
   });
 
+  it('revolução suave: o perfil do andaime são as estações da curva, e sem estações são os pontos declarados', () => {
+    const perfil = [{ raio: 0, altura: -20 }, { raio: 10, altura: 0 }, { raio: 0, altura: 20 }];
+    const estacoes = [{ raio: 0, altura: -20 }, { raio: 8, altura: -10 }, { raio: 10, altura: 0 }, { raio: 8, altura: 10 }, { raio: 0, altura: 20 }];
+    const suave = traduzir([forma('bojo', 'revolucao', { eixo: 'z', comprimento: 40, lados: 48, perfil, suave: true, estacoes })]);
+    expect(volumeUnico(suave).perfil).toEqual([[0, -20], [8, -10], [10, 0], [8, 10], [0, 20]]);
+    const reta = traduzir([forma('bojo', 'revolucao', { eixo: 'z', comprimento: 40, lados: 48, perfil, suave: true })]);
+    expect(volumeUnico(reta).perfil).toEqual([[0, -20], [10, 0], [0, 20]]);
+  });
+
   it('extrusão côncava: o contorno gira com a forma, e o volume é a área vezes o comprimento', () => {
     const ele = [[-20, -20], [20, -20], [20, -5], [-5, -5], [-5, 20], [-20, 20]];
     const area = 40 * 15 + 15 * 25;
@@ -289,6 +298,18 @@ describe('tradutor do nível zero: aproximações e relatório de perdas', () =>
     perto(p.volumeAndaime, medida(r, 'tronco').volume, 1e-2);
     expect(Math.abs(p.erroVolume.relativo)).toBeLessThan(1e-9);
     expect(p.erroEnvelope).toEqual({ mm: 0, relativo: 0 });
+  });
+
+  it('o loft suave leva ao andaime as estações da curva e não as seções declaradas, e o volume do esboço é o da curva', () => {
+    const declaradas = [{ w: -50, perfil: quadrado(100) }, { w: 0, perfil: quadrado(200) }, { w: 50, perfil: quadrado(100) }];
+    const estacoes = [-50, -25, 0, 25, 50].map((w, i) => ({ w, perfil: quadrado([100, 170, 200, 170, 100][i]) }));
+    const r = traduzir([forma('barriga', 'loft', loft(declaradas, { suave: true, estacoes }))]);
+    expect(volumeUnico(r).secoes.map((q) => q.posicao)).toEqual([-50, -25, 0, 25, 50]);
+    const [p] = r.perdas;
+    expect(p.aproximacao).toBe('loft-como-casco');
+    perto(p.erroVolume.relativo, 0, 1e-9);
+    const retas = traduzir([forma('barriga', 'loft', loft(declaradas, { suave: true }))]);
+    expect(volumeUnico(retas).secoes.map((q) => q.posicao)).toEqual([-50, 0, 50]);
   });
 
   it('o loft girado em um eixo ou virado para o negativo do eixo dá o mesmo sólido no lugar certo', () => {
