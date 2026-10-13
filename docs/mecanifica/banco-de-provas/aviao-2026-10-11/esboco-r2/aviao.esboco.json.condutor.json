@@ -1239,6 +1239,12 @@
       "unidade": "trem-do-nariz",
       "nota": 8,
       "motivo": "Revisto pelo crítico com a imagem da pose 90: o achado da roda para fora veio da pose 70, no meio do curso. O curso de 0 a 90 é contínuo e a roda termina deitada dentro do alojamento, confirmado pela lateral, frontal, inferior e corte. Resta a perna visível curta (0,47 do diâmetro da roda, contra 0,68 na referência)."
+    },
+    {
+      "ordem": 10,
+      "unidade": "marco-100",
+      "nota": 8,
+      "motivo": "Silhueta, proporções e posições de asa, cauda e trens batem com a referência nas três vistas e não há ponta no ar nem travessia; a nota não sobe porque nenhum dos detalhes do veredito anterior foi resolvido (faixa do bordo de ataque, aba do leme, oval da deriva, bossa e furo na base) e a perna do nariz segue curta (0,48 do diâmetro da roda contra 0,68)."
     }
   ]
 }
