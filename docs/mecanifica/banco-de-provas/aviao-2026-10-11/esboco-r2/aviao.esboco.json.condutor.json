@@ -1015,6 +1015,12 @@
       "unidade": "marco-50",
       "nota": 8,
       "motivo": "Escapes ocos e curvados para trás e para-brisa em dois painéis largos resolvem a rodada anterior; proporções de envergadura, comprimento, empenagem e trem batem com a referência. Superfície: bojo no flanco sob a asa ainda é cone de base larga, contra a lente baixa e longa da referência; rebaixo e fresta da porta não se leem."
+    },
+    {
+      "ordem": 4,
+      "unidade": "asas",
+      "nota": 8,
+      "motivo": "Planta, diedro, divisão flap/aileron e simetria batem com a referência, sem defeito estrutural. Superfície: ponta levantada é bloco de largura constante com ombro reto, contra ponta que afina e sobe em curva côncava na referência lateral; suportes do bordo de fuga são placas retangulares que param antes dele, contra carenagens afiladas que passam do bordo de fuga; tracejado no bordo de ataque de uma asa sem explicação."
     }
   ]
 }
