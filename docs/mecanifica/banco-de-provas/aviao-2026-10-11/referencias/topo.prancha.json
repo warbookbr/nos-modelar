@@ -24,8 +24,8 @@
    "medida": "largura",
    "em": 4590,
    "numero": [
-    -820,
-    -50
+    -131,
+    188
    ]
   },
   {
@@ -37,14 +37,13 @@
     "parte": "helice"
    },
    "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida",
-   "em": -1100,
+   "em": -1085,
    "de": "fim",
-   "alemDosNomes": true,
-   "lado": "esquerda",
    "numero": [
-    1272,
-    238
-   ]
+    -1230,
+    -48
+   ],
+   "afasta": -150
   },
   {
    "parte": "heliceDir",
@@ -64,14 +63,13 @@
     "parte": "helice"
    },
    "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida",
-   "em": 1180,
+   "em": 1166,
    "de": "fim",
-   "alemDosNomes": true,
-   "lado": "direita",
    "numero": [
-    -1408,
-    238
-   ]
+    1230,
+    -48
+   ],
+   "afasta": 150
   },
   {
    "parte": "escapeEsq",
@@ -438,8 +436,8 @@
  "nomes": {
   "cone": {
    "marca": [
-    -40,
-    4780
+    -30,
+    4900
    ],
    "coluna": "esquerda",
    "nivel": 5300
@@ -518,11 +516,11 @@
   },
   "heliceDir": {
    "marca": [
-    1000,
-    4560
+    440,
+    4416
    ],
    "coluna": "direita",
-   "nivel": 4560
+   "nivel": 4125
   },
   "escapeDir": {
    "marca": [
