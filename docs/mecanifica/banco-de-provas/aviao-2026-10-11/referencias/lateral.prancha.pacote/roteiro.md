@@ -74,7 +74,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 734. A linha atravessa a seção que o modelador precisa, dentro de deriva?
-- altura: cota 1910. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
+- altura: cota 1995. A linha mede deriva de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "deriva" fica na coluna da direita. A chamada termina dentro de deriva, e não numa vizinha?
 - linhas livres: a chamada e as cotas de deriva não cruzam outra linha nem passam sobre número ou nome?
 
@@ -105,7 +105,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 14 — barbatana
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- comprimento: cota 1304. A linha atravessa a seção que o modelador precisa, dentro de barbatana?
+- comprimento: cota 1316. A linha atravessa a seção que o modelador precisa, dentro de barbatana?
 - altura: cota 212. A linha mede barbatana de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "barbatana" fica na coluna da direita. A chamada termina dentro de barbatana, e não numa vizinha?
 - linhas livres: a chamada e as cotas de barbatana não cruzam outra linha nem passam sobre número ou nome?
@@ -114,7 +114,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 
 - cotas esperadas: comprimento (medida aqui) e altura (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
 - comprimento: cota 2653. A linha atravessa a seção que o modelador precisa, dentro de asa?
-- altura: cota 1145. A linha mede asa de ponta a ponta na vertical, sem pegar parte vizinha?
+- altura: cota 1180. A linha mede asa de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "asa" fica na coluna da direita. A chamada termina dentro de asa, e não numa vizinha?
 - linhas livres: a chamada e as cotas de asa não cruzam outra linha nem passam sobre número ou nome?
 

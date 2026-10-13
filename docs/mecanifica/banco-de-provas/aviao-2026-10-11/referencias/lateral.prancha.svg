@@ -96,12 +96,12 @@
 <path class="cota" d="M 479.3 550.19 L 695.14 550.19"/>
 <text x="550.61" y="545.31" class="cotat" text-anchor="middle">2653</text>
 <path class="cota" stroke-dasharray="2 2" d="M 587.22 550.19 L 563.37 547.51"/>
-<path class="cota" d="M 587.89 574.84 L 587.89 481.68"/>
-<text x="559.41" y="528.26" class="cotat" text-anchor="middle">1145</text>
-<path class="cota" stroke-dasharray="2 2" d="M 587.89 528.26 L 572.17 528.26"/>
-<path class="cota" d="M 793.35 552.96 L 894.65 521.39"/>
-<text x="927.64" y="556.7" class="cotat" text-anchor="middle">1304</text>
-<path class="cota" stroke-dasharray="2 2" d="M 844 537.17 L 914.88 547.9"/>
+<path class="cota" d="M 587.89 577.62 L 587.89 481.64"/>
+<text x="559.41" y="529.63" class="cotat" text-anchor="middle">1180</text>
+<path class="cota" stroke-dasharray="2 2" d="M 587.89 529.63 L 572.17 529.63"/>
+<path class="cota" d="M 788.63 550.03 L 893.43 528.06"/>
+<text x="924.67" y="558.57" class="cotat" text-anchor="middle">1316</text>
+<path class="cota" stroke-dasharray="2 2" d="M 841.03 539.04 L 911.91 549.77"/>
 <path class="cota" d="M 817.76 555.86 L 817.76 538.62"/>
 <text x="927.6" y="582.07" class="cotat" text-anchor="middle">212</text>
 <path class="cota" stroke-dasharray="2 2" d="M 817.76 547.24 L 918.03 573.27"/>
@@ -113,9 +113,9 @@
 <path class="cota" stroke-dasharray="2 2" d="M 984.56 459.14 L 999.4 438.72"/>
 <path class="cota" d="M 916.85 353.28 L 976.59 353.28"/>
 <text x="946.72" y="347.28" class="cotat" text-anchor="middle">734</text>
-<path class="cota" d="M 915.4 455.23 L 915.4 299.82"/>
-<text x="874.71" y="344.98" class="cotat" text-anchor="middle">1910</text>
-<path class="cota" stroke-dasharray="2 2" d="M 915.4 377.53 L 887.47 347.18"/>
+<path class="cota" d="M 915.4 458.36 L 915.4 296"/>
+<text x="874.71" y="344.63" class="cotat" text-anchor="middle">1995</text>
+<path class="cota" stroke-dasharray="2 2" d="M 915.4 377.18 L 887.47 346.83"/>
 <path class="cota" d="M 942.12 418.37 L 990.18 418.37"/>
 <text x="1014.97" y="418.37" class="cotat" text-anchor="middle">591</text>
 <path class="cota" stroke-dasharray="2 2" d="M 966.15 418.37 L 1005.4 418.37"/>

@@ -120,29 +120,22 @@
   {
    "parte": "asa",
    "medida": "altura",
-   "de": [
-    4975,
-    777
-   ],
-   "ate": [
-    4975,
-    1922
-   ],
    "numero": [
     -350,
     0
-   ]
+   ],
+   "em": 4975
   },
   {
    "parte": "barbatana",
    "medida": "largura",
    "de": [
-    7500,
-    1046
+    7442,
+    1082
    ],
    "ate": [
-    8745,
-    1434
+    8730,
+    1352
    ],
    "numero": [
     1028,
@@ -184,18 +177,12 @@
   {
    "parte": "deriva",
    "medida": "altura",
-   "de": [
-    9000,
-    2247
-   ],
-   "ate": [
-    9000,
-    4157
-   ],
    "numero": [
     -500,
     400
-   ]
+   ],
+   "em": 6940,
+   "afasta": 2060
   },
   {
    "parte": "leme",
