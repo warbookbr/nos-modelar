@@ -182,3 +182,70 @@ npm run esboco -- --editar $D/zz.esboco.json "parabrisa.desloca=[0,0,0]"
 npm run esboco -- $D/zz.esboco.json --descrever
 rm $D/zz.esboco.json*
 ```
+
+## Unidade asas (detalhe)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json`, `D=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2` e `R=docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias`, no estado em que as asas foram integradas (asa e ponta levantada pela família `superficie-aerodinamica`, flap e aileron em vãos recortados com folga de 12 mm).
+
+### 19. Cortar a ponta levantada de uma forma de família acusa `recorte-vazio` e o volume sai negativo
+
+A asa inteira da família (perfil `asa`, `pontaLevantada` 56) com um cortador que retira só a ponta, a partir de x 6.065,7 mm, tem a caixa encolhida até esse x (o corte acontece), mas a leitura diz `cortaPontaD (não toca a forma); retira 0 cm3` e o plano reprova com a divergência `recorte-vazio`, que bloqueia o `--feito` da unidade. A mesma conta no outro sentido (a asa inteira menos o cortador da parte de dentro, para ficar só a ponta) dá `retira 1017880 cm3 e sobram -118792 cm3`, um volume negativo, de modo que as peças convexas da ponta curva têm volume com sinal invertido e a diferença entre o volume antes e depois não conta o que saiu. O contorno foi dividir a asa em duas chamadas da família: a parte reta, com `pontaLevantada` 0 e a envergadura menor (a conta do volume dá positivo ao cortar o trecho reto), e a ponta curva, que perde a parte de dentro.
+
+```bash
+cp $A $D/zz.esboco.json
+npm run esboco -- --editar $D/zz.esboco.json "asaD.parametros.pontaLevantada=56" "asaD.parametros.envergadura=asaSemi" "asaD.parametros.cordaNaRaiz==asaCRaiz/asaSemi" "asaD.parametros.cordaNaPonta==asaCPonta/asaSemi" "asaD.parametros.espessuraNaPonta=0.13"
+npm run esboco -- $D/zz.esboco.json --descrever --forma asaD | grep -E "recorte|divergência"
+npm run esboco -- $A --descrever --forma pontaD | grep recorte
+rm $D/zz.esboco.json*
+```
+
+### 20. O plano cita `pontaD` por id em quatro campos, e o `--integrar` só reescreve o contrato
+
+A asa e a ponta levantada saem de uma chamada da família, de modo que `pontaD` e `pontaE` deixariam de existir. O `--integrar` avisa dos pares de `plano.contrato` que citam a forma e manda reescrevê-los no detalhe, mas `plano.medidas` (`semi-envergadura da asa`), `plano.pecas` (`ponta levantada da asa`, obrigatória) e `plano.referencia` (`asaDir` e `asaEsq`) citam o mesmo id e só aparecem depois, quando a leitura do mestre é recusada e o mestre fica ilegível. Não editei o plano: mantive `pontaD` e `pontaE` como a ponta curva da mesma superfície, o que obrigou o corte em duas chamadas do atrito 19. Se a ponta fosse parte da asa, o campo a mudar seria `plano.pecas` (juntar `ponta levantada da asa` em `asa, duas metades`), `plano.medidas` e `plano.referencia`, e o `--integrar` poderia avisar desses três como avisa do contrato.
+
+```bash
+cp $A $D/zz.esboco.json
+npm run esboco -- --editar $D/zz.esboco.json --remover pontaD
+rm $D/zz.esboco.json*
+```
+
+### 21. A razão interseção/união sai com duas casas e `0,85 reprova` convive com `0,85 passa`
+
+Na vista superior o flap e o aileron com o mínimo de 0,85 saem como `razão interseção/união 0,85: reprova` para o aileron direito e `0,85: passa` para o esquerdo, porque a razão é arredondada na saída e comparada sem arredondar. Quem lê não sabe se falta um milésimo ou um décimo. O comando abaixo reproduz com as medidas do primeiro desenho dos comandos (flap de x 910 a 4.850 e aileron de x 4.930 a 6.030).
+
+```bash
+cp $A $D/zz.esboco.json
+npm run esboco -- --editar $D/zz.esboco.json "parametros.f1X=910" "parametros.f2X=4850" "parametros.a1X=4930" "parametros.a2X=6030" "parametros.a1L==0.355*a1C" "parametros.a2L==0.355*a2C"
+npm run esboco -- $D/zz.esboco.json --referencia $R/topo.contornos.json --vista superior | grep -E "aileron|flapEsq"
+rm $D/zz.esboco.json*
+```
+
+### 22. O contorno do topo traz o flap esquerdo começando em x 1.132 e o direito em x 910, e `plano.referencia` não tem como dizer isso
+
+`topo.contornos.json` tem `flapDir` de x 910 a 4.933 e `flapEsq` de x 1.132 a 4.944 (o mesmo desenho, dos dois lados, com 220 mm de diferença na raiz), e o contrato `simetricas` pede flaps iguais. Com o flap a partir da fuselagem nos dois lados, a parte esquerda dá razão 0,85 contra 0,91 da direita. O flap ficou em x 960 nos dois lados, a meio caminho, e a referência passou com 0,86 e 0,91. Uma tolerância por parte em `plano.referencia`, ou o aceite da assimetria de uma parte, evitaria deslocar o flap para caber na conferência.
+
+```bash
+npm run esboco -- --medidas-da-referencia $R/topo.contornos.json --vista superior | grep -E "parte flap"
+```
+
+### 23. O Envelope por `substitui` não aceita uma forma de família que cobre duas formas da maquete
+
+Quando a asa e a ponta levantada saem de uma chamada só, `substitui: "asaD"` confere a caixa inteira da família contra a asa da maquete (que acaba em x 6.050) e reprova com `asaD passa 362,6 mm em x`, embora a ponta da maquete (`pontaD`) cubra o resto. Sem o `substitui` a forma cai na caixa da unidade, que confere só o conjunto. O contorno foi o corte em duas chamadas do atrito 19, cada uma com o próprio `substitui`.
+
+```bash
+cp $D/aviao-detalhe-asas.esboco.json $D/zz-asas.esboco.json
+npm run esboco -- --editar $D/zz-asas.esboco.json "asaD.parametros.envergadura=asaSemi" "asaD.parametros.pontaLevantada=asaPontaGraus" "asaD.parametros.cordaNaRaiz==asaCRaiz/asaSemi" "asaD.parametros.cordaNaPonta==asaCPonta/asaSemi" "asaD.parametros.espessuraNaPonta=0.13" 'asaD.subtrai=[{"forma":"flapD","folga":"asaFresta"},{"forma":"aileronD","folga":"asaFresta"}]'
+npm run esboco -- $A --envelope asas $D/zz-asas.esboco.json
+rm $D/zz-asas.esboco.json*
+npm run esboco -- $A --envelope asas $D/aviao-detalhe-asas.esboco.json
+```
+
+A última linha refaz o registro do Condutor: o `--envelope` reprovado também grava `envelope reprovado com zz-asas.esboco.json` na unidade, e o Portão de Detalhe só volta a ler `envelope conferido` depois de uma conferência que passa.
+
+### 24. Posicionar o flap e o aileron na linha de dobradiça da família pede 44 expressões à mão
+
+A família não publica a linha de dobradiça nem o bordo de fuga da asa sem comando como âncora (só `raiz`, `eixo-da-dobradica` e as seis faces da caixa, que no caso da asa com diedro e ponta é a caixa inteira), de modo que o centro, a corda e a espessura de cada seção do flap e do aileron saem de 56 parâmetros que repetem a planta da asa (`asaCRaiz`, `asaFlecha`, `asaDiedro`...) e de 44 expressões nos polígonos das seções. Mudar a flecha ou a corda da asa move o flap junto, mas errar um fator de uma linha desloca uma seção sem o gate acusar. Uma âncora `bordo-de-fuga` por estação, ou um `comando` da família que aceite mais de um trecho (o flap e o aileron na mesma superfície), tiraria o cálculo.
+
+```bash
+npm run esboco -- $A --descrever | grep -o "parâmetros: .*" | tr ';' '\n' | wc -l
+```
