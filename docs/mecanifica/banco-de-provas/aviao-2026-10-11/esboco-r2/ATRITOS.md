@@ -422,3 +422,40 @@ Com o trem do nariz integrado, `--curso recolhe` no mestre leva 2 min 21 s (10 p
 time npm run esboco -- $A --curso recolhe
 time npm run esboco -- --condutor $A --feito trem-do-nariz
 ```
+
+## Unidade trens-principais (detalhe)
+
+Os comandos desta seção usam `A`, `D` e `R` como nas anteriores, no estado em que os trens principais foram integrados (perna presa por pino dentro da asa, coroa, garfo de dois braços, roda de família, compasso, atuador, três cortadores na asa e o curso `recolhePrincipais`).
+
+### 40. O trem que recolhe para dentro da asa exige editar à mão a `asaD` do mestre depois do `--integrar`
+
+É o atrito 34 outra vez, agora com a asa. Os três cortadores (`alojamentoPernaPrincipalD`, `alojamentoBracoPrincipalD`, `alojamentoRodaPrincipalD`) são formas da unidade e entram no mestre, mas o `subtrai` da `asaD` (unidade `asas`) que os cita não volta, e o mestre fica com `cortador-solto` até o `subtrai` ser escrito à mão na `asaD` do mestre. No detalhe o `subtrai` da `asaD` oculta vale para o `--curso` e para as imagens, de modo que a leitura do detalhe e a do mestre só concordam depois da edição manual, e a unidade `asas` passa a ter formas alteradas por quem não a esboçou sem que o Condutor registre isso.
+
+```bash
+cp $A $D/zz.esboco.json && cp $A.condutor.json $D/zz.esboco.json.condutor.json
+npm run esboco -- $D/zz.esboco.json --detalhar trens-principais $D/zz-detalhe.esboco.json
+# em zz-detalhe.esboco.json, acrescente a "asaD.subtrai" um cortador novo da unidade e integre:
+npm run esboco -- $D/zz.esboco.json --integrar trens-principais $D/zz-detalhe.esboco.json
+grep -n -A8 '"id": "asaD"' $D/zz.esboco.json   # o subtrai da asaD segue sem o cortador novo
+rm $D/zz*
+```
+
+### 41. A unidade de duas metades afastadas sai minúscula nas quatro vistas do brief
+
+Os dois trens ficam a 3.840 mm um do outro, e as quatro imagens do brief e as seis poses do curso enquadram a unidade inteira, de modo que a roda e o compasso ocupam poucos pixels e o fim do curso (roda deitada dentro da asa) não se lê em nenhuma. Gerei à mão o corte `x=1121` pela asa no fim do curso, o corte `z=4522` e a vista de baixo ampliada, em `aviao-critico-trens-principais-recolhido/`, para quem despacha o crítico juntar ao brief. O enquadramento por metade (`--zoom-forma` já faz uma imagem, mas o brief e o curso não o aceitam) resolveria.
+
+```bash
+npm run esboco -- --condutor $A --brief trens-principais          # abra curso-recolhePrincipais-84-composta.png do brief
+cp $A $D/zz.esboco.json && npm run esboco -- --editar $D/zz.esboco.json parametros.tpCurso=84
+npm run esboco -- $D/zz.esboco.json --unidade asas --vista lateral --corte x=1121 --largura 1500
+rm $D/zz*
+```
+
+### 42. `--feito` da unidade leva 9 minutos e cada leitura do mestre ou do detalhe leva de 1 a 1,3 minuto
+
+Com a unidade integrada, `--curso recolhePrincipais` dura 2 min 02 s (8 posições), `--descrever` do mestre 1 min 15 s e o `--feito trens-principais` 9 min 02 s (as sete vistas, as seis poses do curso e o brief da unidade e do Marco de 100%). Cada leitura do detalhe isolado leva 55 a 70 s porque as famílias ocultas da asa e da deriva são calculadas de novo.
+
+```bash
+time npm run esboco -- $A --curso recolhePrincipais
+time npm run esboco -- --condutor $A --feito trens-principais
+```
