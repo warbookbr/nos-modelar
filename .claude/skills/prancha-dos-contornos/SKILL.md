@@ -47,7 +47,9 @@ e de cada nome em `<imagem>.prancha.json`, usa `medivel: false` com motivo
 onde uma parte esconde a outra e confere em recorte ampliado a região de cada
 cota. Largura e altura por `de` e `ate` vão de borda a borda: ponto a mais de um
 pixel da imagem da borda da parte é recusado com código 1, e é assim que um
-mapa de partes regenerado acusa a cota que ficou com o número velho. Não aceite a devolução se `npm run contorno:prancha` sair com código
+mapa de partes regenerado acusa a cota que ficou com o número velho. A seção
+por `em` abaixo de um quarto da maior seção da parte também é recusada, salvo
+`secaoParcial` com o motivo. Não aceite a devolução se `npm run contorno:prancha` sair com código
 diferente de zero: ele sai com 3 enquanto houver texto sobreposto ou cruzado
 por linha que não é a dele, número sobre contorno de parte, chamadas coladas
 ou quase paralelas juntas, cota que invade outra parte ou sai da sua sobre

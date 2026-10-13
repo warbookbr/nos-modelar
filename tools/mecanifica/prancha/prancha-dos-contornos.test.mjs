@@ -724,6 +724,21 @@ describe('prancha dos contornos', () => {
       expect(cotaDe(montar([{ parte: 'janelas', medida: 'distancia', de: [340, 240], ate: [460, 240] }]), 'janelas.distancia').texto).toBe('120');
     });
 
+    it('a seção em `em` que corta só a ponta da parte é recusada, a da parte varrida não, e secaoParcial aceita com motivo', () => {
+      /* Um vidro em triângulo, de base 400 em y 200 e ponta em y 280, e uma deriva varrida: faixa de corda 100 que sobe em diagonal. */
+      const vidro = [[300, 200], [700, 200], [500, 280]];
+      const deriva = [[0, 0], [100, 0], [900, 300], [800, 300]];
+      const comPartes = { ...lateral, regioes: { ...lateral.regioes, vidro: { contornoMm: vidro }, deriva: { contornoMm: deriva } } };
+      const cotas = (extra) => [...outras, ...extra];
+      const spec = (extra) => specDosContornos(comPartes, { escolhas: { cotas: cotas(extra) } });
+      expect(cotaDe(spec([{ parte: 'vidro', medida: 'largura', em: 210 }]), 'vidro.largura').texto).toBe('350');
+      expect(() => spec([{ parte: 'vidro', medida: 'largura', em: 278 }])).toThrow(/vidro\.largura.*mede 10 mm.*menos de um quarto da maior seção/);
+      /* A corda da deriva é 100 em toda altura, e a extensão horizontal é 900: a cota por em mede a corda e passa. */
+      expect(cotaDe(spec([{ parte: 'deriva', medida: 'largura', em: 150 }]), 'deriva.largura').texto).toBe('100');
+      expect(cotaDe(spec([{ parte: 'vidro', medida: 'largura', em: 278, secaoParcial: 'a ponta é o que se mede' }]), 'vidro.largura').texto).toBe('10');
+      expect(() => spec([{ parte: 'vidro', medida: 'largura', em: 278, secaoParcial: ' ' }])).toThrow(/secaoParcial sem motivo/);
+    });
+
     it('é recusado vazio, sem ser texto e numa cota que não tem número', () => {
       for (const rotulo of ['', '   ', 8, null]) {
         expect(() => montar([{ parte: 'janelas', medida: 'largura', rotulo }])).toThrow(/janelas\.largura.*rotulo vazio/);

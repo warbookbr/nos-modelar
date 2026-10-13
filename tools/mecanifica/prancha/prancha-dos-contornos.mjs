@@ -75,6 +75,9 @@ const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
    A largura e a altura medidas de uma parte são as da união dos pedaços: na
    lateral do avião a cota da hélice media uma pá (752 mm) porque a parte só
    guardava o maior pedaço, e o diâmetro é de cerca de 2.100 mm. */
+/* A seção de uma cota por `em` abaixo dessa fração da extensão da parte é recusada. */
+const FRACAO_MINIMA_DA_SECAO = 0.25;
+
 const pedacosDe = (regiao) => (regiao.pedacos?.length ? regiao.pedacos.map((p) => p.contornoMm) : [regiao.contornoMm]);
 
 /* A menor distância, em mm, de um ponto à borda de qualquer anel da parte. */
@@ -291,17 +294,32 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
       return [comRotulo({ vista, dono, de, ate, desloca: afasta ? px(afasta) : [0, 0], texto: `${mm(d)}`, ...extra }, rotulo)];
     }
     if (medida !== 'largura' && medida !== 'altura') throw new Error(`a medida da cota de '${parte}' é largura ou altura, e veio '${medida}'.`);
+    /* A seção em `em` que corta só a ponta da parte dá um número pequeno sem
+       colidir com nada: regenerado o mapa da lateral do avião, o vidro subiu e o
+       comprimento do para-brisa caiu de 751 para 9 em silêncio. Seção abaixo de
+       um quarto da maior seção da parte é recusada, salvo `secaoParcial` com o
+       motivo, para a parte afilada que se mede de propósito num ponto. */
+    const conferirSecao = (medido, eixo, inicio, fim, onde) => {
+      if (cota.secaoParcial !== undefined && (typeof cota.secaoParcial !== 'string' || !cota.secaoParcial.trim())) throw new Error(`a cota '${dono}' declara secaoParcial sem motivo.`);
+      if (cota.secaoParcial !== undefined) return;
+      /* A maior seção da parte nesse sentido, em 40 posições: a parte varrida, como a deriva, tem a corda bem menor que a extensão inteira, e é a corda que se compara. */
+      let maior = 0;
+      for (let k = 1; k < 40; k += 1) { const s = secao(aneis, eixo, inicio + (fim - inicio) * k / 40); if (s) maior = Math.max(maior, s[1] - s[0]); }
+      if (maior > 0 && medido < FRACAO_MINIMA_DA_SECAO * maior) throw new Error(`a cota '${dono}' mede ${mm(medido)} mm na seção em ${mm(onde)}, menos de um quarto da maior seção da parte nesse sentido (${mm(maior)} mm); a seção corta só a ponta. Mude em, ou declare secaoParcial com o motivo se a medida nesse ponto é a pedida.`);
+    };
     if (medida === 'largura') {
       const yc = em ?? by0 + 0.33 * (by1 - by0);
       const [z0, z1] = secao(aneis, 'y', yc) ?? [bz0, bz1];
       const lados = { dentro: 0, acima: -(by1 - yc) * escala - 12, abaixo: (yc - by0) * escala + 14 };
       if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da largura de '${parte}' é dentro, acima ou abaixo, e veio '${lado}'.`);
+      conferirSecao(z1 - z0, 'y', by0, by1, yc);
       return [comRotulo({ vista, dono, de: [z0, yc], ate: [z1, yc], desloca: [0, afasta !== undefined ? -afasta * escala : lados[lado ?? 'dentro']], texto: `${mm(z1 - z0)}`, ...extra }, rotulo)];
     }
     const zc = em ?? bz0 + 0.75 * (bz1 - bz0);
     const [y0, y1] = secao(aneis, 'z', zc) ?? [by0, by1];
     const lados = { direita: (bz1 - zc) * escala + 12, esquerda: -(zc - bz0) * escala - 14 };
     if (lado !== undefined && !(lado in lados)) throw new Error(`o lado da altura de '${parte}' é direita ou esquerda, e veio '${lado}'.`);
+    conferirSecao(y1 - y0, 'z', bz0, bz1, zc);
     return [comRotulo({ vista, dono, de: [zc, y0], ate: [zc, y1], desloca: [afasta !== undefined ? afasta * escala : (lado === undefined && em !== undefined ? 0 : lados[lado ?? 'direita']), 0], texto: `${mm(y1 - y0)}`, ...extra }, rotulo)];
   };
   /* `alemDosNomes: true` põe a cota de altura além da coluna de nomes do lado
