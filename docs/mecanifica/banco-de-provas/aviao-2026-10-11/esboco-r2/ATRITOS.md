@@ -249,3 +249,27 @@ A família não publica a linha de dobradiça nem o bordo de fuga da asa sem com
 ```bash
 npm run esboco -- $A --descrever | grep -o "parâmetros: .*" | tr ';' '\n' | wc -l
 ```
+
+## Unidade empenagem-horizontal (detalhe)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json`, `D=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2` e `R=docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias`, no estado em que o estabilizador e o profundor foram integrados (estabilizador pela família com o profundor recortado com fresta de 12 mm, profundor com ressalto na ponta, eixo no vão e três suportes por lado).
+
+### 25. A maquete passou na conferência da silhueta com um profundor 205 mm mais raso que o da referência
+
+O profundor da maquete tinha a linha de dobradiça reta até a ponta (caixa z de 9.810 a 10.289, 479 mm), e a referência do topo o mede com 684 mm (z 4543 a 5228 no contorno, 9.605 a 10.290 no mundo), por causa do ressalto da ponta, que avança 170 mm para a frente. A conferência da silhueta deu `razão interseção/união 0,90: passa` para as duas metades, e `plano.medidas` não tinha medida da profundidade do profundor, de modo que nada acusou até o detalhe ser desenhado olhando a imagem. O Envelope da unidade recusou o detalhe depois (`profundorD passa 170 mm em z`) e foi refeito com `--refazer-envelope`. A linha `profundorDir.profundidade` que `--medidas-da-referencia` sugere não entra no plano sozinha, e o `iou_min` de 0,65 da frontal e 0,85 do topo deixa passar uma diferença dessas.
+
+```bash
+git show 4036e06e:docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json > $D/zz.esboco.json
+npm run esboco -- $D/zz.esboco.json --referencia $R/topo.contornos.json --vista superior | grep profundorDir
+npm run esboco -- $D/zz.esboco.json --descrever --forma profundorD | grep -o "caixa x.*"
+npm run esboco -- --medidas-da-referencia $R/topo.contornos.json --vista superior | grep "parte profundorDir"
+rm $D/zz.esboco.json*
+```
+
+### 26. A família não publica a espessura do perfil na linha de dobradiça, e o nariz do profundor foi desenhado com número calculado fora do módulo
+
+O nariz do profundor tem de ter a espessura que o estabilizador tem na linha de dobradiça, e a família só publica o centro, as seis faces da caixa, a raiz e o `eixo-da-dobradica` (que com `comando` 0 cai no meio da superfície, em [543 2129,7 9913,5], sem relação com a dobradiça). As quatro espessuras `eT0` a `eT3` (88, 49, 66 e 63 mm) saíram do polinômio do perfil simétrico a 60% e 42% da corda, calculado à mão, e mudar a corda ou a espessura relativa do estabilizador não as move. É o mesmo atrito 24 das asas, agora para a espessura em vez do bordo de fuga: uma âncora `dobradica` por estação, com a espessura, tiraria o cálculo.
+
+```bash
+npm run esboco -- $A --descrever --forma estabilizadorD | grep "âncoras"
+```
