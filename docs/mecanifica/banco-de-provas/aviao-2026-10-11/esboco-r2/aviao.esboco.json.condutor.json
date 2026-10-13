@@ -1255,6 +1255,12 @@
       "unidade": "trens-principais",
       "nota": 7,
       "motivo": "Curso 0 a 84 coerente e roda alojada rente ao intradorso, mas compasso e atuador são hastes curtas que giram rígidas com a perna, sem ligar a perna a nada nem articular (a referência frontal mostra escora fina e longa ao lado da perna), e a perna é um tubo fino onde a referência lateral mostra lâmina larga, quase da largura da roda, cobrindo o pneu."
+    },
+    {
+      "ordem": 12,
+      "unidade": "trens-principais",
+      "nota": 8,
+      "motivo": "Compasso em V e atuador telescópico longos ligam a perna à asa e o curso 0 a 84 não tem travessia sem explicação, mas o garfo ainda é estreito demais sobre a roda frente à referência lateral, onde a lâmina desce cobrindo o pneu."
     }
   ]
 }
