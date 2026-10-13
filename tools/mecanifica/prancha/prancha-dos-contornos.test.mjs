@@ -85,11 +85,11 @@ describe('prancha dos contornos', () => {
   it('acusa linha contra linha: cota de outra parte sobre chamada e cotas de partes diferentes cruzadas', () => {
     const { desenho } = prancha(specDosContornos(contornos, { escolhas: { cotas: [
       { parte: 'antebraco', medida: 'altura', em: 300 },
-      { parte: 'carcacaPunho', medida: 'largura', de: [250, 950], ate: [700, 950] },
+      { parte: 'carcacaPunho', medida: 'distancia', de: [250, 950], ate: [700, 950] },
     ], nomes: { anelAntebraco: { marca: [155, 950], coluna: 'direita' } } } }));
     const col = colisoesDoDesenho(desenho);
     expect(col.some((c) => c.tipo === 'linha sobre linha' && /chamada de anelAntebraco/.test(c.b) && /antebraco\.altura/.test(c.a))).toBe(true);
-    expect(col.some((c) => c.tipo === 'linha sobre linha' && /carcacaPunho\.largura/.test(c.a + c.b) && /antebraco\.altura/.test(c.a + c.b))).toBe(true);
+    expect(col.some((c) => c.tipo === 'linha sobre linha' && /carcacaPunho\.distancia/.test(c.a + c.b) && /antebraco\.altura/.test(c.a + c.b))).toBe(true);
   });
 
   it('não acusa largura e altura da mesma parte cruzadas dentro dela', () => {
@@ -646,7 +646,9 @@ describe('prancha dos contornos', () => {
     it('a cota geral de altura, além da de outra parte que passa um pouco do fim da silhueta, cruza a linha dela sem colidir', () => {
       /* A linha da fuselagem vai de -120 a 1000 e a silhueta de -100 a 1000, como a
          cota de 8.028 mm que a pessoa mandou prevalecer na planta do avião. */
-      const spec = montar([{ parte: 'fuselagem', medida: 'altura', de: [0, -120], ate: [0, 1000], alemDosNomes: true }]);
+      /* A parte vai até -120 e a silhueta só até -100: a linha da cota fica na borda da parte e passa do fim da silhueta. */
+      const passa = { ...topo, regioes: { ...topo.regioes, fuselagem: { contornoMm: ret(-60, -120, 60, 1000) } } };
+      const spec = specDosContornos(passa, { escolhas: { vista: 'topo', nomes, cotas: [...base, { parte: 'fuselagem', medida: 'altura', de: [0, -120], ate: [0, 1000], alemDosNomes: true }] } });
       const { desenho } = prancha(spec);
       const exts = desenho.linhas.filter((l) => l.tipo === 'extensao' && l.dono === 'geral.altura');
       expect(exts).toHaveLength(2);
@@ -711,6 +713,15 @@ describe('prancha dos contornos', () => {
       const sem = montar([{ parte: 'janelas', medida: 'largura' }]);
       expect(cotaDe(sem, 'janelas.largura').texto).toBe('200');
       expect(cotaDe(sem, 'janelas.largura')).not.toHaveProperty('rotulo');
+    });
+
+    it('largura e altura por dois pontos vão de borda a borda da parte, e a distância de dentro não tem a regra', () => {
+      expect(cotaDe(montar([{ parte: 'janelas', medida: 'largura', de: [300, 240], ate: [500, 240] }]), 'janelas.largura').texto).toBe('200');
+      expect(cotaDe(montar([{ parte: 'janelas', medida: 'largura', de: [300.8, 240], ate: [500, 240] }]), 'janelas.largura').texto).toBe('199');
+      /* O contorno mudou e os pontos ficaram: a ponta a 40 mm da borda é recusada dizendo qual ponto e quanto. */
+      expect(() => montar([{ parte: 'janelas', medida: 'largura', de: [340, 240], ate: [500, 240] }])).toThrow(/janelas\.largura.*ponto de \[340, 240\] a 40 mm da borda de 'janelas'/);
+      expect(() => montar([{ parte: 'janelas', medida: 'altura', de: [400, 200], ate: [400, 270] }])).toThrow(/ponto ate \[400, 270\] a 10 mm/);
+      expect(cotaDe(montar([{ parte: 'janelas', medida: 'distancia', de: [340, 240], ate: [460, 240] }]), 'janelas.distancia').texto).toBe('120');
     });
 
     it('é recusado vazio, sem ser texto e numa cota que não tem número', () => {

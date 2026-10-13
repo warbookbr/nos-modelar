@@ -45,7 +45,9 @@ nesta vista vem de outra imagem de referência com contornos (`origem`), e
 nota de texto sem número sai na lista de FALTA. O desenhista declara a posição de cada cota
 e de cada nome em `<imagem>.prancha.json`, usa `medivel: false` com motivo
 onde uma parte esconde a outra e confere em recorte ampliado a região de cada
-cota. Não aceite a devolução se `npm run contorno:prancha` sair com código
+cota. Largura e altura por `de` e `ate` vão de borda a borda: ponto a mais de um
+pixel da imagem da borda da parte é recusado com código 1, e é assim que um
+mapa de partes regenerado acusa a cota que ficou com o número velho. Não aceite a devolução se `npm run contorno:prancha` sair com código
 diferente de zero: ele sai com 3 enquanto houver texto sobreposto ou cruzado
 por linha que não é a dele, número sobre contorno de parte, chamadas coladas
 ou quase paralelas juntas, cota que invade outra parte ou sai da sua sobre

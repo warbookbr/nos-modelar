@@ -77,6 +77,20 @@ const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
    guardava o maior pedaço, e o diâmetro é de cerca de 2.100 mm. */
 const pedacosDe = (regiao) => (regiao.pedacos?.length ? regiao.pedacos.map((p) => p.contornoMm) : [regiao.contornoMm]);
 
+/* A menor distância, em mm, de um ponto à borda de qualquer anel da parte. */
+function distanciaDaBorda(aneis, [z, y]) {
+  let menor = Infinity;
+  for (const anel of aneis) {
+    for (let k = 0; k < anel.length; k += 1) {
+      const [az, ay] = anel[k]; const [bz, by] = anel[(k + 1) % anel.length];
+      const dz = bz - az; const dy = by - ay; const l2 = dz * dz + dy * dy;
+      const t = l2 ? Math.max(0, Math.min(1, ((z - az) * dz + (y - ay) * dy) / l2)) : 0;
+      menor = Math.min(menor, Math.hypot(z - az - t * dz, y - ay - t * dy));
+    }
+  }
+  return menor;
+}
+
 /* O que cada vista chama de medida. Na prancha, `largura` é sempre o sentido
    horizontal da imagem e `altura` o vertical, nas escolhas e nas cotas, e é a
    vista que diz o que cada um mede no objeto: na lateral do avião o horizontal
@@ -261,6 +275,18 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
     const extra = numero ? { numero: px(numero) } : {};
     if (de || ate) {
       if (!de || !ate) throw new Error(`a cota '${dono}' declara pontos e precisa de de e ate.`);
+      /* Largura e altura por dois pontos dizem a extensão da parte, então cada
+         ponta fica na borda dela. Os pontos são números escritos à mão e não
+         acompanham o contorno: regenerado o mapa da planta do avião, a cota das
+         janelas seguiu dizendo 140 onde a janela passou a medir 173. A distância
+         entre feições de dentro (`distancia`) não tem essa regra. */
+      if (medida === 'largura' || medida === 'altura') {
+        const tolerancia = contornos.mmPorPx ?? 1;
+        for (const [nome, p] of [['de', de], ['ate', ate]]) {
+          const longe = distanciaDaBorda(aneis, p);
+          if (longe > tolerancia) throw new Error(`a cota '${dono}' tem o ponto ${nome} [${p.join(', ')}] a ${mm(longe)} mm da borda de '${parte}' (tolerância ${mm(tolerancia)} mm, um pixel da imagem); a ${medida} por dois pontos vai de borda a borda da parte. Aponte o ponto para o contorno atual ou use em.`);
+        }
+      }
       const d = Math.hypot(ate[0] - de[0], ate[1] - de[1]);
       return [comRotulo({ vista, dono, de, ate, desloca: afasta ? px(afasta) : [0, 0], texto: `${mm(d)}`, ...extra }, rotulo)];
     }
