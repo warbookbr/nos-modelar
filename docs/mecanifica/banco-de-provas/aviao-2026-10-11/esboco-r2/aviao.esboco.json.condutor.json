@@ -931,7 +931,7 @@
       ],
       "depende": [],
       "custo": 4,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -1153,6 +1153,23 @@
         "fuselagem",
         "asas",
         "empenagem-horizontal"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas"
+    },
+    {
+      "limiar": 100,
+      "custoFeito": 43,
+      "custoTotal": 43,
+      "unidades": [
+        "helice",
+        "motor",
+        "fuselagem",
+        "asas",
+        "empenagem-horizontal",
+        "empenagem-vertical",
+        "trem-do-nariz",
+        "trens-principais"
       ],
       "chamar": "critico",
       "imagens": "limpas"
