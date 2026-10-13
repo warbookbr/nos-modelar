@@ -38,7 +38,10 @@ o conteúdo salvo é determinístico e reexecutável.
 
 - o levantamento do que a Mecanifica já tem e serve ao desenho sem imagem, e do
   que existe pronto fora (bibliotecas de desenho vetorial, de restrição
-  geométrica e de traçado, skills e plugins), com a recomendação;
+  geométrica e de traçado, skills e plugins), com a recomendação; entre eles, o
+  resolvedor de restrições do CADCraft (família Crafting Apps, MIT ou Apache-2.0,
+  pré-alfa em 2026-10-13), em que a IA escreveria as peças e as restrições e o
+  resolvedor daria a geometria, conferido pela mesma régua de determinismo;
 - o desenho do módulo, isolado do núcleo de autoria e independente de Three.js;
 - um protótipo mínimo que desenhe um objeto simples a partir de uma descrição, com
   teste e julgado pelo crítico;
