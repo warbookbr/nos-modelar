@@ -266,7 +266,7 @@
       ],
       "depende": [],
       "custo": 12,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -454,6 +454,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-fuselagem.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     },
     {
@@ -949,7 +955,26 @@
       "mudou": true
     }
   ],
-  "marcos": [],
+  "marcos": [
+    {
+      "limiar": 50,
+      "custoFeito": 22,
+      "custoTotal": 43,
+      "unidades": [
+        "helice",
+        "motor",
+        "fuselagem"
+      ],
+      "chamar": "critico",
+      "imagens": "limpas",
+      "saltou": [
+        25
+      ]
+    }
+  ],
   "avisos": [],
-  "opcao": "Avião de pequeno porte"
+  "opcao": "Avião de pequeno porte",
+  "notasDePassagem": {
+    "fuselagem": "Porta e janelas são rebaixos recortados no casco (porta 16 mm, janelas 22 mm). A base da porta (y 1160) toca a raiz da asaE em z 5600, onde a asa ainda cobre z até 5730. A barbatana entra 25 mm no ventre; o casco mede x ±780 na cabine."
+  }
 }

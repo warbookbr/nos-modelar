@@ -207,7 +207,11 @@
   "unidades": {
     "helice": { "cor": "#b8c4d0", "funcao": "cone e cinco pás em torno do eixo do motor, com a raiz de cada pá presa ao cone", "vistas": ["frontal-oposta"] },
     "motor": { "cor": "#7d8b99", "funcao": "capô do motor com a boca de ar recortada sob o cone, com lábio, e dois escapes laterais ocos que saem do flanco e se curvam para trás", "vistas": ["frontal-oposta", "inferior"] },
-    "fuselagem": { "cor": "#c9d1d9", "funcao": "casco da cabine à cauda, com o para-brisa, quatro janelas por lado, a porta traseira à esquerda e a barbatana ventral", "vistas": ["lateral-oposta", "inferior"] },
+    "fuselagem": {
+      "cor": "#c9d1d9",
+      "funcao": "casco da cabine à cauda, com o para-brisa curvo sobre o dorso, quatro janelas por lado em vãos recortados, a porta traseira à esquerda num rebaixo com fresta ao redor e a barbatana ventral de seção afilada",
+      "vistas": ["lateral-oposta", "inferior"]
+    },
     "asas": { "cor": "#aeb9c4", "funcao": "duas metades de asa de ponta levantada, cada uma com flap e aileron presos ao bordo de fuga", "vistas": ["frontal-oposta", "inferior"] },
     "empenagem-horizontal": { "cor": "#9fb0c0", "funcao": "duas metades de estabilizador horizontal, cada uma com o profundor preso ao bordo de fuga", "vistas": ["frontal-oposta"] },
     "empenagem-vertical": { "cor": "#9fb0c0", "funcao": "deriva presa ao dorso da cauda e leme preso ao bordo de fuga dela", "vistas": ["frontal-oposta"] },
@@ -325,6 +329,17 @@
           "tipo": "loft",
           "eixo": "z",
           "suave": true,
+          "subtrai": [
+            "cortePorta",
+            "corteJanela1D",
+            "corteJanela1E",
+            "corteJanela2D",
+            "corteJanela2E",
+            "corteJanela3D",
+            "corteJanela3E",
+            "corteJanela4D",
+            "corteJanela4E"
+          ],
           "encaixa": { "ancora": "frente", "em": [0, 1303, 2377] },
           "secoes": [
             { "pos": 2377, "forma": "arredondado", "tamanho": [1450, 1030], "cantos": 380, "centro": [0, 1303], "nome": "frente" },
@@ -345,32 +360,99 @@
             { "pos": 9600, "forma": "arredondado", "tamanho": [370, 444], "cantos": 175, "centro": [0, 1973] },
             { "pos": 9900, "forma": "arredondado", "tamanho": [380, 352], "cantos": 170, "centro": [0, 2014] },
             { "pos": 10300, "forma": "arredondado", "tamanho": [360, 231], "cantos": 110, "centro": [0, 2069.5] },
-            { "pos": 10461, "forma": "arredondado", "tamanho": [200, 180], "cantos": 85, "centro": [0, 2090], "nome": "ponta" }
+            { "pos": 10400, "forma": "arredondado", "tamanho": [270, 200], "cantos": 95, "centro": [0, 2082] },
+            { "pos": 10461, "forma": "arredondado", "tamanho": [130, 125], "cantos": 60, "centro": [0, 2092], "nome": "ponta" }
           ]
         },
-        { "id": "parabrisa", "unidade": "fuselagem", "tipo": "caixa", "largura": 1200, "profundidade": 40, "raio": 20, "de": [0, 1900, 2885], "para": [0, 2262, 3656] },
-        { "id": "janela1D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 423, "profundidade": 733, "raio": 40, "centro": [780, 1856.5, 3741.5] },
-        { "id": "janela2D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 326, "profundidade": 267, "raio": 40, "centro": [780, 1905, 4523.5] },
-        { "id": "janela3D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 326, "profundidade": 299, "raio": 40, "centro": [780, 1905, 5108.5] },
-        { "id": "janela4D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 60, "altura": 305, "profundidade": 256, "raio": 40, "centro": [780, 1915.5, 5882] },
-        { "id": "porta", "unidade": "fuselagem", "tipo": "caixa", "largura": 30, "altura": 1072, "profundidade": 977, "raio": 60, "rotacao": [0, 5.8, 0], "centro": [-735, 1696, 5943.5] },
+        {
+          "id": "parabrisa",
+          "unidade": "fuselagem",
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": [0, 1893.4, 2885] },
+          "secoes": [
+            { "pos": 2885, "forma": "arredondado", "tamanho": [820, 40], "cantos": 20, "centro": [0, 1893.4] },
+            { "pos": 3000, "forma": "arredondado", "tamanho": [1000, 60], "cantos": 30, "centro": [0, 1935.6] },
+            { "pos": 3200, "forma": "arredondado", "tamanho": [1000, 60], "cantos": 30, "centro": [0, 2040] },
+            { "pos": 3400, "forma": "arredondado", "tamanho": [1000, 60], "cantos": 30, "centro": [0, 2141] },
+            { "pos": 3560, "forma": "arredondado", "tamanho": [1000, 60], "cantos": 30, "centro": [0, 2216] },
+            { "pos": 3656, "forma": "arredondado", "tamanho": [940, 40], "cantos": 20, "centro": [0, 2250] }
+          ]
+        },
+        { "id": "janela1D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 20, "altura": 423, "profundidade": 733, "raio": 90, "centro": [739.5, 1856.5, 3741.5] },
+        { "id": "janela2D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 20, "altura": 326, "profundidade": 267, "raio": 110, "centro": [768, 1905, 4523.5] },
+        { "id": "janela3D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 20, "altura": 326, "profundidade": 299, "raio": 110, "centro": [768, 1905, 5108.5] },
+        { "id": "janela4D", "unidade": "fuselagem", "lado": "D", "tipo": "caixa", "largura": 35, "altura": 305, "profundidade": 256, "raio": 110, "rotacao": [0, -7, 0], "centro": [726.3, 1915.5, 5882] },
+        { "id": "corteJanela1D", "unidade": "fuselagem", "lado": "D", "cortador": true, "tipo": "caixa", "largura": 100, "altura": 433, "profundidade": 743, "raio": 95, "centro": [779.5, 1856.5, 3741.5] },
+        { "id": "corteJanela2D", "unidade": "fuselagem", "lado": "D", "cortador": true, "tipo": "caixa", "largura": 100, "altura": 336, "profundidade": 277, "raio": 115, "centro": [808, 1905, 4523.5] },
+        { "id": "corteJanela3D", "unidade": "fuselagem", "lado": "D", "cortador": true, "tipo": "caixa", "largura": 100, "altura": 336, "profundidade": 309, "raio": 115, "centro": [808, 1905, 5108.5] },
+        {
+          "id": "corteJanela4D",
+          "unidade": "fuselagem",
+          "lado": "D",
+          "cortador": true,
+          "tipo": "caixa",
+          "largura": 100,
+          "altura": 315,
+          "profundidade": 266,
+          "raio": 115,
+          "rotacao": [0, -7, 0],
+          "centro": [758.8, 1915.5, 5882]
+        },
+        {
+          "id": "porta",
+          "unidade": "fuselagem",
+          "tipo": "loft",
+          "eixo": "y",
+          "subtrai": ["corteJanela4E"],
+          "encaixa": { "ancora": "base", "em": [0, 1160, 0] },
+          "secoes": [
+            { "pos": 1160, "forma": "poligono", "perfil": [[-776, 5498], [-741, 5944], [-683, 6390], [-664, 6390], [-757, 5498]], "centro": [0, 0], "nome": "base" },
+            { "pos": 1180, "forma": "poligono", "perfil": [[-777, 5468], [-741, 5944], [-679, 6420], [-660, 6420], [-758, 5468]], "centro": [0, 0] },
+            { "pos": 1974, "forma": "poligono", "perfil": [[-777, 5458], [-741, 5944], [-678, 6430], [-659, 6430], [-758, 5458]], "centro": [0, 0] },
+            { "pos": 2090, "forma": "poligono", "perfil": [[-757, 5458], [-721, 5944], [-658, 6430], [-639, 6430], [-738, 5458]], "centro": [0, 0] },
+            { "pos": 2150, "forma": "poligono", "perfil": [[-730, 5458], [-693, 5944], [-630, 6430], [-611, 6430], [-711, 5458]], "centro": [0, 0] },
+            { "pos": 2200, "forma": "poligono", "perfil": [[-694, 5470], [-658, 5944], [-597, 6418], [-578, 6418], [-675, 5470]], "centro": [0, 0] },
+            { "pos": 2232, "forma": "poligono", "perfil": [[-663, 5498], [-627, 5944], [-569, 6390], [-550, 6390], [-644, 5498]], "centro": [0, 0] }
+          ]
+        },
+        {
+          "id": "cortePorta",
+          "unidade": "fuselagem",
+          "cortador": true,
+          "tipo": "loft",
+          "eixo": "y",
+          "encaixa": { "ancora": "base", "em": [0, 1152, 0] },
+          "secoes": [
+            { "pos": 1152, "forma": "poligono", "perfil": [[-833, 5506], [-740, 6382], [-664, 6382], [-757, 5506]], "centro": [0, 0], "nome": "base" },
+            { "pos": 1172, "forma": "poligono", "perfil": [[-834, 5476], [-737, 6412], [-661, 6412], [-758, 5476]], "centro": [0, 0] },
+            { "pos": 1974, "forma": "poligono", "perfil": [[-834, 5450], [-734, 6438], [-658, 6438], [-758, 5450]], "centro": [0, 0] },
+            { "pos": 2090, "forma": "poligono", "perfil": [[-814, 5450], [-714, 6438], [-638, 6438], [-738, 5450]], "centro": [0, 0] },
+            { "pos": 2150, "forma": "poligono", "perfil": [[-787, 5450], [-686, 6438], [-610, 6438], [-711, 5450]], "centro": [0, 0] },
+            { "pos": 2208, "forma": "poligono", "perfil": [[-744, 5478], [-648, 6410], [-572, 6410], [-668, 5478]], "centro": [0, 0] },
+            { "pos": 2240, "forma": "poligono", "perfil": [[-711, 5506], [-618, 6382], [-542, 6382], [-635, 5506]], "centro": [0, 0] }
+          ]
+        },
         {
           "id": "barbatana",
           "unidade": "fuselagem",
-          "tipo": "extrusao",
-          "eixo": "x",
-          "origem": "perfil",
-          "comprimento": 60,
-          "perfil": [
-            [7439, 1088],
-            [7533, 944],
-            [7979, 1073],
-            [8692, 1305],
-            [8739, 1340],
-            [8811, 1522],
-            [7510, 1154]
-          ],
-          "centro": [0, 0, 0]
+          "tipo": "loft",
+          "eixo": "z",
+          "suave": true,
+          "encaixa": { "ancora": "inicio", "em": [0, 1100.5, 7439] },
+          "secoes": [
+            { "pos": 7439, "forma": "arredondado", "tamanho": [36, 25], "cantos": [0, 0, 16, 16], "centro": [0, 1100.5] },
+            { "pos": 7480, "forma": "arredondado", "tamanho": [52, 126], "cantos": [0, 0, 24, 24], "centro": [0, 1088] },
+            { "pos": 7533, "forma": "arredondado", "tamanho": [60, 241.5], "cantos": [0, 0, 28, 28], "centro": [0, 1064.8] },
+            { "pos": 7700, "forma": "arredondado", "tamanho": [60, 240.8], "cantos": [0, 0, 28, 28], "centro": [0, 1112.4] },
+            { "pos": 7979, "forma": "arredondado", "tamanho": [58, 238.7], "cantos": [0, 0, 27, 27], "centro": [0, 1192.4] },
+            { "pos": 8300, "forma": "arredondado", "tamanho": [52, 225], "cantos": [0, 0, 24, 24], "centro": [0, 1290] },
+            { "pos": 8500, "forma": "arredondado", "tamanho": [46, 216.5], "cantos": [0, 0, 21, 21], "centro": [0, 1350.8] },
+            { "pos": 8692, "forma": "arredondado", "tamanho": [40, 208], "cantos": [0, 0, 18, 18], "centro": [0, 1409] },
+            { "pos": 8739, "forma": "arredondado", "tamanho": [36, 186], "cantos": [0, 0, 16, 16], "centro": [0, 1433] },
+            { "pos": 8811, "forma": "arredondado", "tamanho": [24, 25], "cantos": [0, 0, 10, 10], "centro": [0, 1534.5] }
+          ]
         },
         {
           "id": "asaD",

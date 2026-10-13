@@ -106,3 +106,26 @@ O detalhe isolado mostra `--descrever` sem divergência porque o plano mínimo d
 npm run esboco -- $D/aviao-detalhe-motor.esboco.json --medidas
 npm run esboco -- $A --medidas | grep "escape comprimento"
 ```
+
+## Unidade fuselagem (detalhe)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `D=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2`, no estado em que a fuselagem foi integrada (vãos de janela e rebaixo da porta recortados por cortadores, para-brisa e barbatana por loft).
+
+### 12. A tolerância de 40 mm do gate aceita o vidro solto dentro do vão
+
+A `janela2D` é uma caixa de 20 mm que apoia no piso do vão recortado pelo `corteJanela2D`. Afastada 30 mm do piso, ela deixa de tocar o piso e as paredes do vão, e o `--descrever` diz só "fuselagem toca janela2D (folga 9,1 mm)" e "divergências: nenhuma", porque a folga até o casco, medida na superfície externa, é menor que a tolerância. Não há como declarar que a peça se apoia no piso do vão (o contrato `fixa` conta pontos de contato, e a folga de 9 mm já conta como contato).
+
+```bash
+cp $D/aviao-detalhe-fuselagem.esboco.json $D/zz.esboco.json
+npm run esboco -- --editar $D/zz.esboco.json "janela2D.centro[0]=798"
+npm run esboco -- $D/zz.esboco.json --descrever --forma janela2D
+rm $D/zz.esboco.json*
+```
+
+### 13. Não há âncora nem medida que dê o semicomprimento do casco numa cota z qualquer
+
+O piso do vão da janela, a face externa da porta e o corte do rebaixo dependem da meia-largura do casco em cada z, e as âncoras do loft só existem nas seções nomeadas (`frente`, `cabine`, `cauda`, `ponta`). Calculei a meia-largura por interpolação linear das seções fora do módulo e escrevi os números nas seções da `porta`, do `cortePorta` e nos centros das janelas, de modo que mudar uma seção da `fuselagem` não move o vão nem a porta. A superfície suave (PCHIP) difere da interpolação linear em até 13 mm na porta, que ficou com a face externa em polígono convexo e o piso plano para compensar.
+
+```bash
+npm run esboco -- $D/aviao-detalhe-fuselagem.esboco.json --descrever --forma fuselagem | grep "âncoras"
+```
