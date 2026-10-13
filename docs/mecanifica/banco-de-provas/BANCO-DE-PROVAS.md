@@ -44,6 +44,7 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | **cadeira** | esboço | Móveis | 2026-10-08 | 1 | 1 | 101631 | 8 |
 | **cadeira** | esboço | Móveis | 2026-10-10 | 1 | 1 | 94093 | 9 |
 | **avião de pequeno porte** | esboço | Veículos aéreos e espaciais | 2026-10-12 | 1 | 1 | 3934576 | 8 |
+| **avião de pequeno porte** | esboço | Veículos aéreos e espaciais | 2026-10-13 | 1 | 1 | 3601254 | 8 |
 
 ## Histórico de medições
 
@@ -66,4 +67,5 @@ Uma linha por objeto e dia de medição; dias diferentes não se somam.
 | 2026-10-11T16:24:17.835Z | `2529aa08` | **guarda-roupa** | objeto | 1 | 134033 | api | 8 | depois do plano: sem defeito estrutural; dobradiças com o nó na quina da frente, visíveis de fora, e vão sem função acima das gavetas |
 | 2026-10-11T16:28:55.193Z | `41d5b921` | **cadeira de rodas** | objeto | 1 | 185321 | api | 8 | depois do plano: sem defeito estrutural; barra grossa na altura do cubo, folga apertada da rodinha e raios que parecem atravessar o cubo; o esbocista inseriu um campo de texto por script |
 | 2026-10-12T16:01:51.583Z | `a052a9fe` | **avião de pequeno porte** | objeto | 1 | 3934576 | api | 8 | primeira rodada do plano o que o avião pede, só com o que existia: 12 esbocistas e 19 críticas, Marco de 100% com 8; motor em 3 rodadas, fuselagem e Marco de 25% liberados pela pessoa com 7; trem do nariz atravessa o capô depois de 85 graus e o principal recolhe em carenagem sob a asa, por falta de recorte |
+| 2026-10-13T20:42:38.298Z | `8185465b` | **avião de pequeno porte** | objeto | 1 | 3601254 | api | 8 | segunda rodada do plano o que o avião pede, com as famílias, o recorte, o curso e a superfície suave: 11 esbocistas e 12 críticas, Marco de 100% com 8 e todas as unidades com 8, nenhuma liberada pela pessoa; trens principais em 2 rodadas; fora da conta, 1392870 tokens de 5 implementadores que corrigiram a blocagem, o brief e o desenho durante a rodada; restam detalhes de superfície na deriva, no leme, nas asas e na perna do nariz |
 

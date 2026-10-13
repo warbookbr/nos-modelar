@@ -1,0 +1,29 @@
+agente,papel,tokens,ferramentas
+a409263828d31ddec,esbocista maquete,446819,121
+a57a3acfec8d933f0,esbocista helice,154570,41
+a6c86e725d10bb9c2,esbocista motor,147981,44
+a084da87210ea1f37,esbocista fuselagem,196117,48
+a7348d1ad1cd1cec7,critico fuselagem,41359,10
+a56992589613f890b,critico marco-50,74786,25
+a9133c8ae094a77ee,esbocista correcao marco-50,237758,72
+a941219b48623e172,implementador brief referencia,191393,49
+a4f2e4c04e00e95db,critico marco-50 r2,71888,27
+afd97c8cc51c6b58f,esbocista asas,357882,103
+a39f6f35e6ec25b79,critico asas,42437,11
+ae4d2710869428500,implementador blocagem,327835,120
+a61b7579b260393cb,esbocista empenagem-horizontal,222879,57
+a9c4b91cd64288c9d,implementador blocagem recorte,131035,37
+a18ab53cfaf44c9e4,critico empenagem-horizontal,37978,11
+a293cf6b8ee64d0ac,critico marco-75,70484,22
+a376b0025895c8f96,esbocista empenagem-vertical,348954,102
+a67ade7ebcb9be802,critico empenagem-vertical,34209,10
+a1252abefe41671b0,esbocista trem-do-nariz,312227,105
+aa9c8ad9bcb6b6b12,critico trem-do-nariz,70985,19
+aa9c8ad9bcb6b6b12,critico trem-do-nariz revisao,8325,2
+a138f67c09468a400,esbocista trens-principais,262865,66
+aa04ca3f27245ab5b,implementador desenho,476289,202
+abe6159fec46a4aa3,critico marco-100,85333,27
+a010f451a565af5d7,critico trens-principais,98935,22
+a81641928ae234ca7,implementador blocagem furo,266318,71
+a91bd202699fa0ca5,esbocista trens-principais r2,216290,80
+ac7cece20ead633aa,critico trens-principais r2,60193,17
