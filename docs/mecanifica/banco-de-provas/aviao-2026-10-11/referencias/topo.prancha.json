@@ -182,7 +182,7 @@
    },
    "prevalece": "a pessoa, 2026-10-12: vale a lateral, a única vista que mostra a junta entre capô e fuselagem",
    "em": 900,
-   "de": -5382,
+   "de": -5353,
    "alemDosNomes": true
   },
   {
@@ -214,11 +214,11 @@
    "parte": "asaEsq",
    "medida": "largura",
    "de": [
-    -6371,
+    -6400,
     0
    ],
    "ate": [
-    -870,
+    -868,
     0
    ],
    "afasta": [
@@ -240,15 +240,15 @@
    "medida": "largura",
    "de": [
     815,
-    -145
+    -29
    ],
    "ate": [
-    6342,
-    -145
+    6400,
+    -29
    ],
    "afasta": [
     0,
-    395
+    279
    ]
   },
   {
@@ -317,7 +317,7 @@
    "medida": "altura",
    "em": -2150,
    "numero": [
-    0,
+    -250,
     -481
    ]
   },
@@ -502,8 +502,8 @@
   },
   "heliceDir": {
    "marca": [
-    396,
-    4370
+    450,
+    4420
    ],
    "coluna": "direita",
    "nivel": 4250

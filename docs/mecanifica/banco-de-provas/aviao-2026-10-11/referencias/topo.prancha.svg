@@ -103,23 +103,23 @@
 <path class="cota" d="M 505.91 469.2 L 610.23 469.2"/>
 <text x="541.47" y="463.23" class="cotat" text-anchor="middle">1571</text>
 <path class="cota" stroke-dasharray="2 2" d="M 558.07 469.2 L 554.23 465.43"/>
-<path class="cota" d="M 1111.16 826.6 L 1111.16 290.34"/>
-<path class="ext" d="M 619.77 826.6 L 1114.16 826.6"/>
-<path class="ext" d="M 619.77 290.34 L 1114.16 290.34"/>
-<text x="1105.16" y="558.47" class="cotat" text-anchor="middle" transform="rotate(-90 1105.16 558.47)">8075 (lateral, prevalece)</text>
+<path class="cota" d="M 1111.16 824.68 L 1111.16 288.42"/>
+<path class="ext" d="M 619.77 824.68 L 1114.16 824.68"/>
+<path class="ext" d="M 619.77 288.42 L 1114.16 288.42"/>
+<text x="1105.16" y="556.55" class="cotat" text-anchor="middle" transform="rotate(-90 1105.16 556.55)">8075 (lateral, prevalece)</text>
 <path class="cota" d="M 554.22 672.08 L 563.85 672.08"/>
 <text x="550.4" y="572.53" class="cotat" text-anchor="middle">145</text>
 <path class="cota" stroke-dasharray="2 2" d="M 559.04 672.08 L 559.04 574.73"/>
 <path class="cota" d="M 559.34 824.66 L 559.34 584.24"/>
 <text x="546.05" y="842.91" class="cotat" text-anchor="middle">3620</text>
 <path class="cota" stroke-dasharray="2 2" d="M 559.34 704.45 L 558.81 834.11"/>
-<path class="cota" d="M 136.93 452.6 L 502.23 452.6"/>
-<text x="319.58" y="446.6" class="cotat" text-anchor="middle">5501</text>
+<path class="cota" d="M 135 452.6 L 502.36 452.6"/>
+<text x="318.68" y="446.6" class="cotat" text-anchor="middle">5532</text>
 <path class="cota" d="M 473.67 487.73 L 473.67 396.97"/>
 <text x="453.75" y="442.35" class="cotat" text-anchor="middle">1367</text>
 <path class="cota" stroke-dasharray="2 2" d="M 473.67 442.35 L 466.51 442.35"/>
-<path class="cota" d="M 614.12 452.6 L 981.15 452.6"/>
-<text x="797.63" y="446.6" class="cotat" text-anchor="middle">5527</text>
+<path class="cota" d="M 614.12 452.6 L 985 452.6"/>
+<text x="799.56" y="446.6" class="cotat" text-anchor="middle">5585</text>
 <path class="cota" d="M 646.33 486.84 L 646.33 397.31"/>
 <text x="666.25" y="442.07" class="cotat" text-anchor="middle">1348</text>
 <path class="cota" stroke-dasharray="2 2" d="M 646.33 442.07 L 653.49 442.07"/>
@@ -139,8 +139,8 @@
 <text x="358.29" y="525.68" class="cotat" text-anchor="middle">3745</text>
 <path class="cota" stroke-dasharray="2 2" d="M 358.29 487.3 L 358.29 516.88"/>
 <path class="cota" d="M 417.23 504.91 L 417.23 486.64"/>
-<text x="417.23" y="527.72" class="cotat" text-anchor="middle">275</text>
-<path class="cota" stroke-dasharray="2 2" d="M 417.23 495.77 L 417.23 518.92"/>
+<text x="400.63" y="527.72" class="cotat" text-anchor="middle">275</text>
+<path class="cota" stroke-dasharray="2 2" d="M 417.23 495.77 L 410.19 518.92"/>
 <path class="cota" d="M 622.75 500.55 L 884.06 475.45"/>
 <text x="753.41" y="525.65" class="cotat" text-anchor="middle">3953</text>
 <path class="cota" stroke-dasharray="2 2" d="M 753.41 488 L 753.41 516.85"/>
@@ -215,9 +215,9 @@
 <circle class="lm" cx="579.92" cy="568.81" r="2.6"/>
 <text class="lmt" x="1001" y="754.43">fuselagem</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 579.92 568.81 L 1001 746.83"/>
-<circle class="lm" cx="586.3" cy="179.01" r="2.6"/>
+<circle class="lm" cx="589.88" cy="175.69" r="2.6"/>
 <text class="lmt" x="1001" y="189.98">heliceDir</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 586.3 179.01 L 1001 182.38"/>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 589.88 175.69 L 1001 182.38"/>
 <circle class="lm" cx="538.09" cy="181.33" r="2.6"/>
 <text class="lmt" x="119" y="189.98" text-anchor="end">heliceEsq</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 538.09 181.33 L 119 182.38"/>

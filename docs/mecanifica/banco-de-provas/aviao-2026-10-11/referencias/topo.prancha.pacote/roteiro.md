@@ -49,7 +49,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 7 — asaEsq
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 5501. A linha atravessa a seção que o modelador precisa, dentro de asaEsq?
+- largura: cota 5532. A linha atravessa a seção que o modelador precisa, dentro de asaEsq?
 - comprimento: cota 1367. A linha mede asaEsq de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "asaEsq" fica na coluna da esquerda. A chamada termina dentro de asaEsq, e não numa vizinha?
 - linhas livres: a chamada e as cotas de asaEsq não cruzam outra linha nem passam sobre número ou nome?
@@ -121,7 +121,7 @@ Abra o alvo (/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-202
 ## Etapa 16 — asaDir
 
 - cotas esperadas: largura (medida aqui) e comprimento (medida aqui). Cobre só estas duas; cota em falta é `cota` com sentido `faltando`.
-- largura: cota 5527. A linha atravessa a seção que o modelador precisa, dentro de asaDir?
+- largura: cota 5585. A linha atravessa a seção que o modelador precisa, dentro de asaDir?
 - comprimento: cota 1348. A linha mede asaDir de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "asaDir" fica na coluna da direita. A chamada termina dentro de asaDir, e não numa vizinha?
 - linhas livres: a chamada e as cotas de asaDir não cruzam outra linha nem passam sobre número ou nome?

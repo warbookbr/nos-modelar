@@ -61,7 +61,7 @@
   {
    "parte": "parabrisa",
    "medida": "largura",
-   "em": 2330
+   "em": 2450
   },
   {
    "parte": "parabrisa",
@@ -100,8 +100,8 @@
   {
    "parte": "fuselagem",
    "medida": "largura",
-   "em": 120,
-   "afasta": -270
+   "em": 60,
+   "afasta": -210
   },
   {
    "parte": "fuselagem",
@@ -311,15 +311,15 @@
     2150
    ],
    "coluna": "direita",
-   "nivel": 5870
+   "nivel": 6400
   },
   "deriva": {
    "marca": [
-    9590,
-    3960
+    9650,
+    4080
    ],
    "coluna": "direita",
-   "nivel": 5630
+   "nivel": 6100
   },
   "leme": {
    "marca": [
@@ -359,7 +359,7 @@
     990
    ],
    "coluna": "direita",
-   "nivel": 420
+   "nivel": 370
   },
   "tremPrincipal": {
    "marca": [
@@ -367,7 +367,7 @@
     480
    ],
    "coluna": "direita",
-   "nivel": 170
+   "nivel": 140
   }
  }
 }
