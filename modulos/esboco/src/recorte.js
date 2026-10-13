@@ -718,11 +718,24 @@ const LIMITE_DA_ORDEM = 1500;
 /* Amostras por segmento no teste de oclusão das linhas, e passos da bissecção que acha onde a oclusão começa. */
 const AMOSTRAS_DA_LINHA = 16;
 const PASSOS_DA_BISSECCAO = 8;
-/* Um ponto é coberto quando o raio dele até o olho atravessa, a mais de tanto de distância, uma face voltada para o olho. */
+/* Um ponto é coberto quando o raio dele até o olho atravessa, a mais de tanto de distância, uma face voltada para o olho. É o piso:
+   o desenho passa `mmPorPixel` (o tamanho do pixel da imagem em mm), e a tolerância sobe a `FLECHA_DA_OCLUSAO_PX` pixels, porque a
+   face de um pedaço convexo e a linha da superfície que ela aproxima diferem de décimos de milímetro numa asa. */
 const DISTANCIA_MINIMA_DA_OCLUSAO = 0.01;
+const FLECHA_DA_OCLUSAO_PX = 0.35;
+/* Uma linha só some atrás de uma face quando a faixa em volta dela também está atrás: o ponto da linha e os dois pontos a esta
+   distância (em pixels) de cada lado, na tela. Uma linha que corre sobre a borda de uma face (o contorno de um vão, a aresta que a
+   parede do alojamento faz com a superfície) tem um lado dentro e o outro fora da face que a cobriria, e o teste só do ponto, que
+   conta a borda como dentro, a escondia em trechos que dependiam de qual vizinha o ponto tocava, de modo que o contorno saía
+   quebrado e com fragmentos soltos. */
+const MARGEM_LATERAL_DA_OCLUSAO_PX = 0.5;
+/* O trecho visível de dentro de um segmento (escondido nos dois lados) com menos que isto, em pixels (três células de 2 px), não sai:
+   é a ponta solta de uma linha que um vizinho cobre quase toda. O que o vizinho cobre em menos que isso não é emendado, porque a
+   linha de trás apareceria sobre uma peça fina da frente. */
+const FRAGMENTO_MINIMO_PX = 6;
 
 /* As faces voltadas para o olho com a caixa delas na tela (s, t), para o teste de oclusão só olhar as que cobrem o ponto. */
-function facesNaTela(faces, olho) {
+export function facesNaTela(faces, olho) {
   const apoio = Math.abs(olho[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
   const S = unitario(cross(olho, apoio));
   const T = cross(olho, S);
@@ -736,12 +749,12 @@ function facesNaTela(faces, olho) {
 }
 
 /* O ponto `p` está atrás de alguma das faces (convexas, voltadas para o olho)? */
-function coberto(p, olho, tela) {
+function coberto(p, olho, tela, tolerancia = DISTANCIA_MINIMA_DA_OCLUSAO) {
   const s = dot(p, tela.S); const t = dot(p, tela.T);
   for (const { f, dn, s0, s1, t0, t1 } of tela.itens) {
     if (s < s0 || s > s1 || t < t0 || t > t1) continue;
     const d = (dot(f.n, f.pts[0]) - dot(f.n, p)) / dn;
-    if (d <= DISTANCIA_MINIMA_DA_OCLUSAO) continue;
+    if (d <= tolerancia) continue;
     const x = [p[0] + d * olho[0], p[1] + d * olho[1], p[2] + d * olho[2]];
     let dentro = true;
     for (let i = 0; i < f.pts.length && dentro; i++) {
@@ -756,11 +769,18 @@ function coberto(p, olho, tela) {
 /* O trecho de cada segmento que se vê: as linhas do contorno do vão e dos vincos das paredes ficam atrás da superfície da própria
    forma onde o vão está escondido, e o desenho com teste de profundidade deita a fita na superfície mais perto do olho sob ela, de
    modo que uma linha escondida precisa sair daqui. */
-function linhasVisiveis(linhas, tela, olho) {
+export function linhasVisiveis(linhas, tela, olho, { tolerancia = DISTANCIA_MINIMA_DA_OCLUSAO, margemLateral = 0, fragmentoMinimo = 0 } = {}) {
   const saida = [];
   for (const [p, q] of linhas) {
     const ponto = (t) => [p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1]), p[2] + t * (q[2] - p[2])];
-    const escondido = (t) => coberto(ponto(t), olho, tela);
+    /* o vetor, no plano da tela, perpendicular ao segmento, com o comprimento da margem lateral */
+    const dS = dot(sub(q, p), tela.S); const dT = dot(sub(q, p), tela.T);
+    const comprimentoNaTela = Math.hypot(dS, dT);
+    const lado = margemLateral > 0 && comprimentoNaTela > 1e-9 ? soma(esc(tela.S, (-dT / comprimentoNaTela) * margemLateral), esc(tela.T, (dS / comprimentoNaTela) * margemLateral)) : null;
+    const escondido = (t) => {
+      const c = ponto(t);
+      return coberto(c, olho, tela, tolerancia) && (lado === null || (coberto(soma(c, lado), olho, tela, tolerancia) && coberto(sub(c, lado), olho, tela, tolerancia)));
+    };
     const estados = Array.from({ length: AMOSTRAS_DA_LINHA }, (_, k) => escondido((k + 0.5) / AMOSTRAS_DA_LINHA));
     if (estados.every((e) => !e)) { saida.push([p, q]); continue; }
     if (estados.every(Boolean)) continue;
@@ -770,14 +790,21 @@ function linhasVisiveis(linhas, tela, olho) {
       for (let i = 0; i < PASSOS_DA_BISSECCAO; i++) { const m = (lo + hi) / 2; if (escondido(m) === ea) lo = m; else hi = m; }
       return (lo + hi) / 2;
     };
+    const visiveis = [];
     let inicio = estados[0] ? null : 0;
     for (let k = 1; k < AMOSTRAS_DA_LINHA; k++) {
       if (estados[k] === estados[k - 1]) continue;
       const t = fronteira((k - 0.5) / AMOSTRAS_DA_LINHA, (k + 0.5) / AMOSTRAS_DA_LINHA, estados[k - 1]);
       if (estados[k - 1]) inicio = t;
-      else { saida.push([ponto(inicio), ponto(t)]); inicio = null; }
+      else { visiveis.push([inicio, t]); inicio = null; }
     }
-    if (inicio !== null) saida.push([ponto(inicio), q]);
+    if (inicio !== null) visiveis.push([inicio, 1]);
+    /* o trecho visível de dentro do segmento (escondido dos dois lados) menor que `fragmentoMinimo` na tela é um tracinho solto: a
+       ponta de uma linha que um vizinho cobre quase toda, e não sai */
+    for (const [a, b] of visiveis) {
+      if (a > 0 && b < 1 && (b - a) * comprimentoNaTela < fragmentoMinimo) continue;
+      saida.push(a === 0 && b === 1 ? [p, q] : [a === 0 ? p : ponto(a), b === 1 ? q : ponto(b)]);
+    }
   }
   return saida.filter(([a, b]) => distancia(a, b) > 1e-3);
 }
@@ -786,6 +813,9 @@ function linhasVisiveis(linhas, tela, olho) {
    da parede do vão), as voltadas para o olho na ordem do fundo para a frente, cada uma com as linhas que lhe cabem (o contorno do
    vão, o vinco das paredes e, na última, as linhas da forma inteira que o vão não levou). */
 export function fatiasRecortadas(r, olho, opcoes = {}) {
+  /* `mmPorPixel` (só o desenho o sabe): a tolerância de profundidade e a margem lateral da oclusão das linhas valem pixels da imagem */
+  const mmPorPixel = opcoes.mmPorPixel ?? 0;
+  const oclusao = { tolerancia: Math.max(DISTANCIA_MINIMA_DA_OCLUSAO, FLECHA_DA_OCLUSAO_PX * mmPorPixel), margemLateral: MARGEM_LATERAL_DA_OCLUSAO_PX * mmPorPixel, fragmentoMinimo: (opcoes.fragmentoMinimoPx ?? FRAGMENTO_MINIMO_PX) * mmPorPixel };
   const { faces, moldes } = fronteiraDe(r);
   const visiveis = faces.filter((f) => dot(f.n, olho) > 1e-6);
   const centro = (f) => f.pts.reduce((acc, p) => acc + dot(p, olho), 0) / f.pts.length;
@@ -795,9 +825,9 @@ export function fatiasRecortadas(r, olho, opcoes = {}) {
     const f = visiveis[i];
     const linhas = [...(f.rim ?? [])];
     if (f.parede) f.pts.forEach((p, e) => { const m = f.fl[e]; if (m && m.viz && dot(esc(f.n, -1), m.viz) < COS25) linhas.push([p, f.pts[(e + 1) % f.pts.length]]); });
-    return { papel: 'lado', n: f.n, pts: f.pts, linhas: linhasVisiveis(linhas, tela, olho) };
+    return { papel: 'lado', n: f.n, pts: f.pts, linhas: linhasVisiveis(linhas, tela, olho, oclusao) };
   });
-  const daBase = linhasVisiveis(linhasDaBase(r, olho, opcoes).flatMap(([p, q]) => segmentoForaDe(p, q, moldes)), tela, olho);
+  const daBase = linhasVisiveis(linhasDaBase(r, olho, opcoes).flatMap(([p, q]) => segmentoForaDe(p, q, moldes)), tela, olho, oclusao);
   if (lados.length > 0) lados[lados.length - 1].linhas.push(...daBase);
   return [{ r, prof: dot(r.centro, olho), lados, dentro: [], linhas: [], arcos: [], tampas: [] }];
 }

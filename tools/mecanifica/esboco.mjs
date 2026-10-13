@@ -830,9 +830,11 @@ export function esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes = {}) {
     const comNota = (lista) => [...new Set([...(lista ?? []), 'nota'])];
     isolado = { ...isolado, ocultar: comNota(isolado.ocultar), opcoes: isolado.opcoes.map((o) => (o.ocultar === undefined ? o : { ...o, ocultar: comNota(o.ocultar) })) };
     /* o quadro fecha nas formas da unidade, e as vizinhas em cinza só aparecem onde cabem nele: o capô de 1,7 m tocava a fuselagem
-       de 10 m, que entrava inteira no quadro e deixava o motor com um décimo da imagem. Sem vizinhas o quadro já é o da unidade, e
-       com `--zoom-forma` vale o que a pessoa pediu. */
-    if (idsVizinhos.length > 0 && !opcoes.zoomForma) {
+       de 10 m, que entrava inteira no quadro e deixava o motor com um décimo da imagem. Sem vizinhas o quadro também é uma moldura
+       (a caixa da unidade com a margem de sempre), porque o desenho de uma moldura sem legenda enche a largura da folha, e sem ela
+       a unidade ocupava metade dela (as colunas das legendas, que a imagem do crítico não tem). Com `--zoom-forma` vale o que a pessoa
+       pediu. */
+    if (!opcoes.zoomForma) {
       const proprias = visiveisDoEsboco(proprio).flat().map((r) => r.id);
       if (proprias.length > 0) isolado = { ...isolado, enquadrar: { formas: proprias, aviso: false } };
     }

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1177 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1183 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -165,7 +165,15 @@
 
 - `brief.md` — --- brief para o crítico cego ---
 
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-empenagem-vertical/
+
+- `brief.md` — --- brief para o crítico cego ---
+
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-fuselagem/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-100/
 
 - `brief.md` — --- brief para o crítico cego ---
 
@@ -174,6 +182,14 @@
 - `brief.md` — --- brief para o crítico cego ---
 
 ## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-75/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trem-do-nariz/
+
+- `brief.md` — --- brief para o crítico cego ---
+
+## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trens-principais/
 
 - `brief.md` — --- brief para o crítico cego ---
 
@@ -570,6 +586,7 @@
 - `conserto.test.js` — Conserto proposto pelo gate e `--ajustar`: qual forma se move, quanto, e o gate aprovando depois.
 - `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
 - `correcoes-do-fluxo.test.js` — Os seis bugs do fluxo por unidades que as duas rodadas de medição acharam (plano "O esboço detalhado coerente", fatia 1), cada um em reprodução mínima, e os …
+- `corte-de-malha.test.js` — A seção de corte de uma forma cuja superfície é uma malha de pedaços convexos (a asa e a pá da família `superficie-aerodinamica`) com um vão recortado. A par…
 - `corte.test.js` — `--corte`: a vista da seção. O esboço leva `corte: { eixo, valor, lado }`; o desenho corta cada forma pelo plano, mostra só o lado escolhido e preenche a sup…
 - `critico.test.js` — O crítico por unidade (plano "O esboço detalhado coerente", fatia 2): `funcao` por unidade, `--largura` e `--saida` nas imagens de `--unidade`, o brief que o…
 - `curso-na-linha-de-comando.test.js` — O curso de um mecanismo na linha de comando e no brief do crítico (atritos 38, 40, 42 e 43 do avião): `--curso` varre as posições e junta os achados; o brief…
@@ -600,6 +617,7 @@
 - `marco-e-medidas.test.js` — O crítico cego também no Marco, o `--medidas` em texto e o Marco incremental (plano "O esboço detalhado coerente", fatia 3).
 - `modulos.test.js` — Bloco `modulos` do esboço: a IA define no próprio JSON um módulo reutilizável (parâmetros, formas e âncoras) e o usa por `usa`, pelo mesmo caminho de expansã…
 - `nota-do-critico.test.js` — A regra da nota no Condutor (plano "O esboço detalhado coerente", fatia 7): a unidade com brief (ou o Marco) cujo último veredito é menor que 8 bloqueia o --…
+- `oclusao-do-contorno.test.js` — A oclusão das linhas de uma forma recortada (`subtrai`): uma linha que corre sobre a borda de uma face não some, e uma que está de fato atrás dela continua e…
 - `parametros.test.js` — Parâmetros e expressões, formas herdadas da raiz, `espelha` e `arranja`, e o legado byte a byte.
 - `perguntas-do-critico.test.js` — As perguntas de forma por componente e por família de objeto no brief do crítico do esboço: o campo `perguntas` do componente e do módulo, `plano.familia` co…
 - `plano.test.js` — O `plano` estruturado: medidas nomeadas conferidas contra o esboço, contrato de relações e o esquema do JSON.

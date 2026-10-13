@@ -248,3 +248,42 @@ describe('a perna do trem, com a roda 2.0 e o cilindro hidráulico escritos no J
   });
 });
 
+
+/* O corte de uma asa da família `superficie-aerodinamica` com um vão recortado (a perna do trem recolhida no alojamento da asa do
+   avião, em escala 1:5): a seção da malha tem de sair como um laço fechado só, e o desenho a preenche e hachura como a de uma forma
+   comum. A parede do vão e a superfície da asa diferem de décimos de milímetro, e as pontas da seção que não se encontravam deixavam
+   trechos de laço de fio sem área, de modo que a asa saía só em contorno e sem hachura, com um buraco na linha de baixo. */
+describe('o corte de uma forma de família com vão recortado', () => {
+  const k = 0.2;
+  const asa = () => ({
+    pontos: { raiz: [745, 1022, 4408.5] },
+    opcoes: [{ titulo: 'Asa', formas: [
+      { id: 'asa', tipo: 'familia', familia: 'superficie-aerodinamica', perfil: 'asa', subtrai: ['alojamento'], encaixa: { ancora: 'raiz', em: 'raiz' },
+        parametros: { envergadura: 5400 * k, simetria: 0, cordaNaRaiz: 0.326, cordaNaPonta: 0.17, enflechamento: 0.86, diedro: 5.93, espessuraNaRaiz: 0.15, espessuraNaPonta: 0.139, torcao: 0, incidenciaNaRaiz: 0, pontaLevantada: 0 } },
+      { id: 'alojamento', tipo: 'caixa', cortador: true, largura: 390 * k, altura: 315 * k, profundidade: 175 * k, centro: [745 + 1150 * k, 1022 + 35.5 * k, 4408.5 + 86 * k] },
+    ] }],
+  });
+  const aneis = (d) => d.split('M').filter(Boolean).map((s) => s.replace(/Z\s*$/, '').split('L').map((q) => q.split(',').map(Number)));
+  const areaDoAnel = (a) => Math.abs(a.reduce((s, p, i) => s + p[0] * a[(i + 1) % a.length][1] - a[(i + 1) % a.length][0] * p[1], 0)) / 2;
+  const secao = (e, z) => {
+    const { svg, escala } = desenharEsboco({ ...e, vista: 'frontal', corte: { eixo: 'z', valor: z } });
+    const caminhos = [...svg.matchAll(/<path class="corte" data-forma="asa" d="([^"]+)"/g)].map((m) => m[1]);
+    const hachuras = [...svg.matchAll(/<path class="corte-hachura" d="([^"]+)"/g)].map((m) => m[1]);
+    return { caminhos, hachuras, escala };
+  };
+
+  for (const z of [4420.5, 4431.1, 4434.5]) {
+    it(`a seção em z=${z} é um laço fechado só, preenchido e hachurado, e menor que a da asa sem o vão`, () => {
+      const com = secao(asa(), z);
+      expect(com.caminhos).toHaveLength(1);
+      expect(com.hachuras).toEqual(com.caminhos);
+      const lacos = aneis(com.caminhos[0]);
+      expect(lacos).toHaveLength(1);
+      const sem = secao({ ...asa(), opcoes: [{ titulo: 'Asa', formas: asa().opcoes[0].formas.map((f) => (f.id === 'asa' ? { ...f, subtrai: undefined } : f)).filter((f) => f.id !== 'alojamento') }] }, z);
+      const cheia = areaDoAnel(aneis(sem.caminhos[0])[0]);
+      const recortada = areaDoAnel(lacos[0]);
+      expect(recortada).toBeLessThan(cheia);
+      expect(recortada).toBeGreaterThan(0.8 * cheia);
+    });
+  }
+});

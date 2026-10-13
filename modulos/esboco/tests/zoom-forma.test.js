@@ -7,20 +7,24 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { readFileSync } from 'node:fs';
-import { desenharEsboco, ErroDeEsboco, validarEsboco } from '../src/index.js';
+import { desenharEsboco, ErroDeEsboco, QUADRO, validarEsboco } from '../src/index.js';
 import { lerArgumentos, vistasArquivo, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 40, altura: 40, profundidade: 40, centro, ...extra });
 const esboco = (formas, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], ...extra });
 const cena = () => [caixa('longe', [-800, 0, 0]), caixa('a', [0, 0, 0]), caixa('g.1', [300, 0, 0]), caixa('g.2', [400, 0, 0]), caixa('fim', [900, 0, 0])];
 const caminhos = (svg) => (svg.match(/<path /g) ?? []).length;
+/* a área útil do painel sem legenda: a largura da folha menos a margem dos dois lados, e a altura menos 20 px em cima e embaixo */
+const ULTIL_L = QUADRO.painelL - 2 * QUADRO.margemSemColunas;
+const ULTIL_A = QUADRO.painelA - 40;
+const caber = (larg, alt) => Math.min(ULTIL_L / larg, ULTIL_A / alt);
 
 describe('--zoom-forma: reenquadra e re-renderiza', () => {
   it('a janela é a caixa da forma mais a margem, e a escala é a que cabe no painel (medida exata)', () => {
     const inteiro = desenharEsboco(esboco(cena(), { vista: 'frontal' }));
     const zoom = desenharEsboco(esboco(cena(), { vista: 'frontal', enquadrar: { formas: 'a', margem: 10 } }));
-    /* janela de 40 + 2 x 10 = 60 mm de lado; a colunas do painel dão (620 - 340) / 60 px por mm */
-    expect(zoom.escala).toBeCloseTo(280 / 60, 9);
+    /* janela de 40 + 2 x 10 = 60 mm de lado, e a área útil do painel (sem legenda, não há coluna a reservar) dá a escala */
+    expect(zoom.escala).toBeCloseTo(caber(60, 60), 9);
     expect(zoom.escala).toBeGreaterThan(inteiro.escala * 10);
     /* o quadro da imagem é o mesmo: o ganho é de detalhe vetorial, não de pixels ampliados */
     expect([zoom.largura, zoom.altura]).toEqual([inteiro.largura, inteiro.altura]);
@@ -39,7 +43,42 @@ describe('--zoom-forma: reenquadra e re-renderiza', () => {
   it('um padrão enquadra o conjunto das formas que casam', () => {
     const zoom = desenharEsboco(esboco(cena(), { vista: 'frontal', enquadrar: { formas: 'g.*', margem: 10 } }));
     /* g.1 e g.2 vão de x=280 a 420: 140 + 20 = 160 mm de largura */
-    expect(zoom.escala).toBeCloseTo(280 / 160, 9);
+    expect(zoom.escala).toBeCloseTo(caber(160, 60), 9);
+  });
+
+  it('a moldura enche a área útil da folha, na proporção da janela, e a vista da unidade com vizinhas também', () => {
+    /* o retângulo tracejado é a janela: ele toca a largura útil (janela mais larga que alta) ou a altura útil, e a proporção é a da janela */
+    const moldura = (svg) => { const m = /<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" fill="none" stroke="#bbbbbb"/.exec(svg); return m.slice(1).map(Number); };
+    for (const [vista, margem] of [['frontal', 10], ['superior', 30], ['isometrica', 5]]) {
+      const zoom = desenharEsboco(esboco(cena(), { vista, enquadrar: { formas: 'g.*', margem } }));
+      const [, , w, h] = moldura(zoom.svg);
+      expect(Math.max(w / ULTIL_L, h / ULTIL_A), vista).toBeGreaterThan(0.995);
+      expect(Math.max(w / ULTIL_L, h / ULTIL_A), vista).toBeLessThan(1.005);
+      expect(w, vista).toBeLessThanOrEqual(ULTIL_L + 0.1);
+      expect(h, vista).toBeLessThanOrEqual(ULTIL_A + 0.1);
+    }
+    /* sem o aviso (o enquadramento da unidade) a janela não é marcada, mas a escala é a mesma conta */
+    const unidade = desenharEsboco(esboco(cena(), { vista: 'frontal', enquadrar: { formas: ['g.1', 'g.2'], margem: 10, aviso: false } }));
+    expect(unidade.escala).toBeCloseTo(caber(160, 60), 9);
+  });
+
+  it('uma forma com rótulo e legenda visível mantém a reserva das colunas, e sem legenda o desenho usa a folha', () => {
+    const rotulada = cena().map((f) => (f.id === 'a' ? { ...f, rotulo: 'peça a' } : f));
+    const com = desenharEsboco(esboco(rotulada, { vista: 'frontal', enquadrar: { formas: 'a', margem: 10 } }));
+    expect(com.escala).toBeCloseTo(Math.min((QUADRO.painelL - QUADRO.reservaDasColunas) / 60, ULTIL_A / 60), 9);
+    const sem = desenharEsboco(esboco(rotulada, { vista: 'frontal', ocultar: ['legendas'], enquadrar: { formas: 'a', margem: 10 } }));
+    expect(sem.escala).toBeCloseTo(caber(60, 60), 9);
+    expect(sem.escala).toBeGreaterThan(com.escala);
+  });
+
+  it('a barra de escala encurta quando a escala a faria sair da folha', () => {
+    const larga = desenharEsboco(esboco(cena(), { vista: 'frontal', enquadrar: { formas: 'a', margem: 100 } }));
+    expect(larga.svg).toContain('>100 mm<');
+    const fina = desenharEsboco(esboco([caixa('a', [0, 0, 0], { largura: 12, altura: 12, profundidade: 12 })], { vista: 'frontal', enquadrar: { formas: 'a', margem: 2 } }));
+    const barra = /<line x1="20" y1="[\d.]+" x2="([\d.]+)" y2="[\d.]+" stroke="#111111" stroke-width="3"\/><text[^>]*>([^<]+)</.exec(fina.svg);
+    expect(Number(barra[1])).toBeLessThanOrEqual(QUADRO.painelL - 130 + 20);
+    expect(barra[2]).not.toBe('100 mm');
+    expect(barra[2]).toMatch(/^[\d,]+ mm$/);
   });
 
   it('funciona nas quatro vistas', () => {
@@ -67,15 +106,15 @@ describe('--zoom-forma: reenquadra e re-renderiza', () => {
     const zoom = desenharEsboco(esboco(formas, { ...base, enquadrar: { formas: 'cubo', margem: 5 } }));
     expect(zoom.svg).toContain('class="corte"');
     /* o cubo cortado ocupa 40 x 60 mm: com 5 mm de margem a janela é 50 x 70 */
-    expect(zoom.escala).toBeCloseTo(Math.min(280 / 50, 520 / 70), 6);
+    expect(zoom.escala).toBeCloseTo(caber(50, 70), 6);
     expect(zoom.escala).toBeGreaterThan(inteiro.escala * 2);
   });
 
   it('o id da instância, o id de forma e o padrão valem; o que não existe diz o que corrigir', () => {
     const formas = [caixa('roda.pneu', [0, 0, 0], { daInstancia: { id: 'roda', principal: true } }), caixa('roda.aro', [100, 0, 0], { daInstancia: { id: 'roda', principal: false } }), caixa('outra', [900, 0, 0])];
     const e = (q) => esboco(formas, { vista: 'frontal', enquadrar: { formas: q, margem: 0 } });
-    expect(desenharEsboco(e('roda')).escala).toBeCloseTo(280 / 140, 9);
-    expect(desenharEsboco(e('roda.pneu')).escala).toBeCloseTo(280 / 40, 9);
+    expect(desenharEsboco(e('roda')).escala).toBeCloseTo(caber(140, 40), 9);
+    expect(desenharEsboco(e('roda.pneu')).escala).toBeCloseTo(caber(40, 40), 9);
     expect(() => desenharEsboco(e('rodda'))).toThrow(/"rodda" não é uma forma.*roda/);
     expect(() => desenharEsboco(esboco(formas, { enquadrar: { formas: 'roda', margem: -1 } }))).toThrow(ErroDeEsboco);
   });

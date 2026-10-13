@@ -172,8 +172,18 @@ export function lacosDoPlano(faces, c) {
   return encadear(segmentos);
 }
 
-/* Liga segmentos pelas pontas em laços (uma cadeia que não fecha é fechada na mesma, porque a falha é de ponta que a
-   tolerância não ligou e a forma desenhada continua legível). */
+/* Dois pontos abertos de uma cadeia se ligam como o mesmo vértice quando distam menos que isto: o menor de `FECHO_MAXIMO_MM` e
+   `FECHO_RELATIVO` da diagonal do que o plano corta. Uma peça feita de pedaços convexos (a asa e a pá de uma família, cuja parede de
+   recorte é cortada pelo casco convexo do pedaço, e não pela superfície) deixa entre a parede e a superfície uma folga de décimos de
+   milímetro, muito maior que `JUNCAO_MM`, e um vão real entre duas cadeias é de outra ordem de grandeza. */
+const FECHO_MAXIMO_MM = 5;
+const FECHO_RELATIVO = 0.02;
+
+/* Liga segmentos pelas pontas em laços. As pontas que sobram abertas (grau 1: o fim de uma cadeia que não achou par pela tolerância
+   de `JUNCAO_MM`) se ligam duas a duas, a mais próxima primeiro, dentro do fecho acima; a cadeia que ainda não fecha é fechada na
+   mesma, porque a falha é de ponta que a tolerância não ligou e a forma desenhada continua legível. Os laços partem das pontas
+   abertas, para a cadeia sair inteira num laço só: partir do meio dela deixava um trecho para cada lado, e o laço de cada trecho era
+   um fio sem área que o desenho não preenchia. */
 function encadear(segmentos) {
   const grade = new Map();
   const chave = (p) => p.map((x) => Math.floor(x / JUNCAO_MM)).join(',');
@@ -190,17 +200,43 @@ function encadear(segmentos) {
     return pontos.length - 1;
   };
   const arestas = segmentos.map(([a, b]) => [no(a), no(b)]).filter(([a, b]) => a !== b);
+  const grau = new Map();
+  for (const [a, b] of arestas) for (const n of [a, b]) grau.set(n, (grau.get(n) ?? 0) + 1);
+  const abertas = [...grau].filter(([, g]) => g === 1).map(([n]) => n).sort((a, b) => a - b);
+  if (abertas.length >= 2) {
+    const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
+    for (const q of pontos) for (let e = 0; e < 3; e++) { if (q[e] < min[e]) min[e] = q[e]; if (q[e] > max[e]) max[e] = q[e]; }
+    const fecho = Math.min(FECHO_MAXIMO_MM, FECHO_RELATIVO * Math.hypot(max[0] - min[0], max[1] - min[1], max[2] - min[2]));
+    const pares = [];
+    for (let i = 0; i < abertas.length; i++) for (let j = i + 1; j < abertas.length; j++) {
+      const t = Math.hypot(...[0, 1, 2].map((e) => pontos[abertas[i]][e] - pontos[abertas[j]][e]));
+      if (t < fecho) pares.push({ a: abertas[i], b: abertas[j], t });
+    }
+    pares.sort((u, v) => u.t - v.t || u.a - v.a || u.b - v.b);
+    const ligadas = new Set();
+    for (const { a, b } of pares) {
+      if (ligadas.has(a) || ligadas.has(b)) continue;
+      ligadas.add(a); ligadas.add(b);
+      arestas.push([a, b]);
+      grau.set(a, 2); grau.set(b, 2);
+    }
+  }
   const vizinhos = new Map();
   arestas.forEach(([a, b], e) => {
     for (const n of [a, b]) { if (!vizinhos.has(n)) vizinhos.set(n, []); vizinhos.get(n).push(e); }
   });
+  /* primeiro as arestas que tocam uma ponta ainda aberta, depois as demais */
+  const ordem = [...arestas.keys()].sort((x, y) => (Number(grau.get(arestas[y][0]) === 1 || grau.get(arestas[y][1]) === 1) - Number(grau.get(arestas[x][0]) === 1 || grau.get(arestas[x][1]) === 1)) || x - y);
   const usada = new Array(arestas.length).fill(false);
   const lacos = [];
-  for (let e0 = 0; e0 < arestas.length; e0++) {
+  for (const e0 of ordem) {
     if (usada[e0]) continue;
     usada[e0] = true;
-    const laco = [arestas[e0][0]];
-    let atual = arestas[e0][1];
+    /* a aresta que começa numa ponta aberta é percorrida a partir dela */
+    const [i0, j0] = arestas[e0];
+    const [de, para] = grau.get(j0) === 1 && grau.get(i0) !== 1 ? [j0, i0] : [i0, j0];
+    const laco = [de];
+    let atual = para;
     for (;;) {
       laco.push(atual);
       const proxima = (vizinhos.get(atual) ?? []).find((e) => !usada[e]);

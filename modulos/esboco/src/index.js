@@ -1855,9 +1855,10 @@ export function ordemDasFaces(lados, olho) {
 /* `semFatias`: uma face lateral por lado do perfil em vez de uma por fatia. A ordem de profundidade do desenho
    precisa das fatias, mas a silhueta e a profundidade de cada célula da projeção não (as faces de uma mesma faixa
    são coplanares), e a projeção passa de 36 fatias por forma a uma. */
-export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquadrar = false, semRecorte = false } = {}) {
-  /* a forma que subtrai outra (`subtrai`) tem a fronteira recortada; `semRecorte` pede a forma inteira (o que o recorte parte) */
-  if (r.subtrai && !semRecorte) return fatiasRecortadas(r, olho, { semFatias, maxFatias, esquadrar });
+export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquadrar = false, semRecorte = false, mmPorPixel = 0, fragmentoMinimoPx } = {}) {
+  /* a forma que subtrai outra (`subtrai`) tem a fronteira recortada; `semRecorte` pede a forma inteira (o que o recorte parte). A
+     `mmPorPixel` (o tamanho do pixel da imagem, só o desenho o sabe) dá a tolerância e a margem lateral da oclusão das linhas dela */
+  if (r.subtrai && !semRecorte) return fatiasRecortadas(r, olho, { semFatias, maxFatias, esquadrar, mmPorPixel, fragmentoMinimoPx });
   if (r.partes) {
     /* tubo: as partes se sobrepõem nas juntas, então todas as fatias vão juntas para a ordem de profundidade */
     return r.partes.flatMap((pt) => fatiarForma(subforma(r, pt), olho, { semFatias, maxFatias, esquadrar }).filter((ch) => !(ch.ponta && pt.semTampa?.[ch.ponta])).map((ch) => ({ ...ch, r, ...(pt.semTampa?.inicio && ch.arcos?.length ? { arcos: [] } : {}) }))).sort((x, y) => x.prof - y.prof);
@@ -2113,7 +2114,25 @@ function preenchimentoSuave(nv, tint, q, id) {
 
 /* O quadro e a tinta do desenho das formas, para o desenhista da blocagem (`desenho-da-blocagem.js`) ter o mesmo quadro (painel,
    topo, rodapé), a mesma luz e o mesmo sombreamento sem repetir a conta. */
-export const QUADRO = { painelL: PAINEL_L, painelA: PAINEL_A, topo: TOPO, rodape: RODAPE, margemDaLista: 48 };
+export const QUADRO = { painelL: PAINEL_L, painelA: PAINEL_A, topo: TOPO, rodape: RODAPE, margemDaLista: 48, margemSemColunas: 24, reservaDasColunas: 340 };
+
+/* A escala do quadro: a maior caixa projetada (`larg` por `alt`, em mm) cabe na área útil do painel, e a que enche a folga é a que
+   vale (a razão de aspecto fica, porque a escala é uma só nos dois eixos). A área útil tem 20 px de folga em cima e embaixo e, nos
+   lados, a reserva das duas colunas de legenda (`comColunas`, o padrão), a margem da chave em lista (`lista`) ou, só quando não há
+   coluna a reservar, `margemSemColunas`: o desenho de uma moldura (o zoom e a vista da unidade) que não tem legenda visível ocupa a
+   largura da folha. O desenho das formas e o da blocagem chamam esta mesma conta. */
+export function escalaDoQuadro(larg, alt, { comColunas = true, lista = false } = {}) {
+  const lados = lista ? 2 * QUADRO.margemDaLista : comColunas ? QUADRO.reservaDasColunas : 2 * QUADRO.margemSemColunas;
+  return Math.min((PAINEL_L - lados) / larg, (PAINEL_A - 40) / alt);
+}
+
+/* A barra de escala do rodapé: 100 mm, ou o primeiro comprimento menor da lista que cabe na folha quando a escala é tão grande que a
+   de 100 mm sairia dela (uma vista ampliada de poucas dezenas de milímetros). Devolve { mm, px, rotulo }. */
+const BARRAS_DE_ESCALA_MM = [100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1];
+export function barraDeEscala(escala) {
+  const mm = BARRAS_DE_ESCALA_MM.find((c) => c * escala <= PAINEL_L - 130) ?? BARRAS_DE_ESCALA_MM[BARRAS_DE_ESCALA_MM.length - 1];
+  return { mm, px: mm * escala, rotulo: `${String(mm).replace('.', ',')} mm` };
+}
 export const tintaDaFace = (corDaForma, normal) => cor(hexDe(corDaForma), 0.55 + 0.5 * Math.max(0, dot(normal, LUZ)));
 export const textoDoDesenho = { f1, esc, quebrar };
 
@@ -2490,7 +2509,6 @@ function gruposDeFormas(p) {
 const CELULA = 2;
 const RAIO_BALAO = 9;
 const SEPARACAO_BALAO = 2 * RAIO_BALAO + 3;
-const MARGEM_LISTA = QUADRO.margemDaLista;
 const RESERVA_FOLGA = 16;
 const NUMERO_PROPRIO = /^\s*\d+\s*[.\-–)]/;
 
@@ -2741,6 +2759,35 @@ function desenharLegendasLista(partes, chave, plano, x0) {
   }
 }
 
+/* A escala (px por mm) que o desenho vai ter, estimada antes de fatiar as formas: a caixa de cada forma (e não o casco dela) projetada
+   dá a largura e a altura, e a janela do zoom entra com a margem. É um pouco menor que a final (a caixa cobre o casco), e serve só
+   para dizer o tamanho do pixel em mm (`mmPorPixel`), de que a oclusão das linhas da forma recortada tira a tolerância. */
+function escalaEstimada(opcoes, V, enquadrar) {
+  const extensao = (rs) => {
+    const q = rs.flatMap((r) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => V.p([i & 1 ? r.max[0] : r.min[0], i & 2 ? r.max[1] : r.min[1], i & 4 ? r.max[2] : r.min[2]])));
+    return q.length === 0 ? null : [Math.min(...q.map((a) => a[0])), Math.min(...q.map((a) => a[1])), Math.max(...q.map((a) => a[0])), Math.max(...q.map((a) => a[1]))];
+  };
+  let larg = 1e-6; let alt = 1e-6;
+  let comColunas = false; let temLista = false; let temColunas = false;
+  for (const { formas, ocultosOpcao, modo } of opcoes) {
+    const alvo = enquadrar ? formasDoEnquadre(formas, enquadrar.formas) : [];
+    let c = extensao(alvo.length > 0 ? alvo : formas);
+    if (c && alvo.length > 0) {
+      const extras = (enquadrar.pontos ?? []).map(V.p);
+      c = [Math.min(c[0], ...extras.map((a) => a[0])), Math.min(c[1], ...extras.map((a) => a[1])), Math.max(c[2], ...extras.map((a) => a[0])), Math.max(c[3], ...extras.map((a) => a[1]))];
+      const margem = enquadrar.margem ?? Math.max(5, 0.15 * Math.max(c[2] - c[0], c[3] - c[1]));
+      c = [c[0] - margem, c[1] - margem, c[2] + margem, c[3] + margem];
+    }
+    if (c) { larg = Math.max(larg, c[2] - c[0]); alt = Math.max(alt, c[3] - c[1]); }
+    if (modo === 'lista') temLista = true; else {
+      temColunas = true;
+      if (!enquadrar || formas.some((r) => r.forma.rotulo && !ocultosDe(r.ocultar, ocultosOpcao).has('legendas'))) comColunas = true;
+    }
+  }
+  const colunas = escalaDoQuadro(larg, alt, { comColunas });
+  return temLista ? (temColunas ? Math.min(escalaDoQuadro(larg, alt, { lista: true }), colunas) : escalaDoQuadro(larg, alt, { lista: true })) : colunas;
+}
+
 /* Desenha o esboço inteiro; devolve { svg, largura, altura, escala }. */
 /* `camada: true` (a ferramenta de imagem usa): além do SVG de sempre em `svg`, devolve `camada` (as faces e os traços das
    formas com a profundidade de cada vértice, para o teste de profundidade por pixel; ver camada.js) e `svgSobreCamada`, o
@@ -2751,6 +2798,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
   const V = VISTAS_TODAS[vista];
   let enquadreAchou = false;
   const olho = normalizar(V.olho);
+  const mmPorPixel = opcoes.some((o) => o.formas.some((r) => r.subtrai)) ? 1 / escalaEstimada(opcoes, V, enquadrar) : 0;
   const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao, modo, corte, camadas }) => {
     /* corte: o lado que fica, e se a superfície de corte está voltada para o observador (senão ela fica atrás do sólido) */
     const lado = corte ? ladoDoCorte(corte, olho) : null;
@@ -2758,7 +2806,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     exigir(!corte || formas.some((r) => r.min[k] < corte.valor && r.max[k] > corte.valor), `${opcao.titulo ?? 'opção'}: o plano ${corte?.eixo}=${corte?.valor} não atravessa nenhuma forma (elas vão de ${arredMm(Math.min(...formas.map((r) => r.min[k])))} a ${arredMm(Math.max(...formas.map((r) => r.max[k])))} mm em ${corte?.eixo})`);
     const secaoVisivel = corte && frenteDoCorte(corte, lado, olho) > 1e-6;
     let itens = formas.map((r) => {
-      let chunks = fatiarForma(r, olho, { esquadrar: true, ...(previa ? { maxFatias: FATIAS_DA_PREVIA } : {}) });
+      let chunks = fatiarForma(r, olho, { esquadrar: true, mmPorPixel, ...(previa ? { maxFatias: FATIAS_DA_PREVIA } : {}) });
       let secao = null;
       if (corte) {
         chunks = chunks.map((ch) => recortarBloco(ch, corte, lado === '+' ? 1 : -1)).filter(Boolean);
@@ -2795,7 +2843,10 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
   const alt = Math.max(...projetadas.map((p) => p.max[1] - p.min[1]));
   const temLista = projetadas.some((p) => p.modo === 'lista');
   const temColunas = projetadas.some((p) => p.modo !== 'lista');
-  const escalaColunas = Math.min((PAINEL_L - 340) / larg, (PAINEL_A - 40) / alt);
+  /* as colunas de legenda ocupam a folga, a não ser que o desenho tenha moldura (zoom ou vista da unidade, em `enquadrar`) e nenhuma
+     forma com rótulo e legenda visível: aí não há o que pôr nelas, e a moldura enche a largura da folha */
+  const comColunas = !enquadrar || projetadas.some((p) => p.modo !== 'lista' && p.itens.some((it) => it.r.forma.rotulo && !ocultosDe(it.r.ocultar, p.ocultosOpcao).has('legendas')));
+  const escalaColunas = escalaDoQuadro(larg, alt, { comColunas });
   /* Modo lista: sem colunas laterais o desenho usa a largura toda; a chave ganha uma faixa
      própria abaixo do desenho, e o quadro cresce em altura o que a chave ocupa. */
   let escala = escalaColunas;
@@ -2808,7 +2859,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     return { x0, cx, cy, tela: (q) => [cx + q[0] * esc, cy + q[1] * esc] };
   };
   if (temLista) {
-    escala = Math.min((PAINEL_L - 2 * MARGEM_LISTA) / larg, (PAINEL_A - 40) / alt);
+    escala = escalaDoQuadro(larg, alt, { lista: true });
     if (temColunas) escala = Math.min(escala, escalaColunas);
     projetadas.forEach((p, k) => {
       if (p.modo !== 'lista') return;
@@ -3257,9 +3308,9 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
     }
     if (!p.ocultosOpcao.has('nota')) quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + extra + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
   });
-  /* Barra de escala de 100 mm, igual para todas as opções. */
-  const barra = 100 * escala;
-  if (!projetadas.every((p) => p.ocultosOpcao.has('escala'))) partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
+  /* Barra de escala (100 mm, ou menor quando a escala a faria sair da folga), igual para todas as opções. */
+  const { px: barra, rotulo: rotuloDaBarra } = barraDeEscala(escala);
+  if (!projetadas.every((p) => p.ocultosOpcao.has('escala'))) partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">${rotuloDaBarra}</text>`);
   partes.push('</svg>');
   const saida = { svg: partes.filter((x) => typeof x === 'string' || x.forma !== undefined).map((x) => (typeof x === 'string' ? x : x.forma)).join('\n'), largura, altura, escala };
   if (querCamada) {

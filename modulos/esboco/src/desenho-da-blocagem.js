@@ -9,7 +9,7 @@
 
    O que sai é o que `desenharEsboco(esboco, { camada: true })` devolve (`svg`, `largura`, `altura`, `escala` e, com `camada`, a
    `camada` e o `svgSobreCamada`), de modo que a ferramenta desenha, compõe e grava como já faz. O quadro é o do desenho das formas
-   (painel de `QUADRO.painelL` por `QUADRO.painelA`, título, nota e barra de escala de 100 mm), a escala é a mesma conta (a maior
+   (painel de `QUADRO.painelL` por `QUADRO.painelA`, título, nota e barra de escala), a escala é a mesma conta, `escalaDoQuadro` (a maior
    caixa projetada entre as opções cabe no painel, com a folga das colunas de legenda, ou a da chave em lista quando `lista` está
    ligado), e a tinta é a mesma (`tintaDaFace`), de modo que a mesma geometria cai nos mesmos pixels. Não há legenda, linha de
    centro, corte, explosão, zoom nem prévia: ficam no desenho das formas.
@@ -19,7 +19,7 @@
    para o observador. A face de costas não é desenhada (o volume é fechado e a de frente a cobre), e a face de perfil não cobre
    pixel. A oclusão entre volumes é a da camada: o teste de profundidade por pixel, com o viés por índice de volume que desempata
    faces no mesmo plano em favor do volume que vem depois na lista. */
-import { ErroDeEsboco, QUADRO, tintaDaFace, textoDoDesenho, VISTAS } from './index.js';
+import { barraDeEscala, ErroDeEsboco, escalaDoQuadro, QUADRO, tintaDaFace, textoDoDesenho, VISTAS } from './index.js';
 import { formasDoPainel, montarCamada } from './camada.js';
 
 const { f1, esc, quebrar } = textoDoDesenho;
@@ -202,8 +202,8 @@ export function desenharBlocagem(entrada, { camada: querCamada = false } = {}) {
   /* a mesma escala para todos: a maior opção cabe no painel, com a folga das colunas de legenda ou, em lista, da margem da chave */
   const larg = Math.max(...paineis.map((p) => p.max[0] - p.min[0]));
   const alt = Math.max(...paineis.map((p) => p.max[1] - p.min[1]));
-  const escalaColunas = Math.min((QUADRO.painelL - 340) / larg, (QUADRO.painelA - 40) / alt);
-  const escalaLista = Math.min((QUADRO.painelL - 2 * QUADRO.margemDaLista) / larg, (QUADRO.painelA - 40) / alt);
+  const escalaColunas = escalaDoQuadro(larg, alt);
+  const escalaLista = escalaDoQuadro(larg, alt, { lista: true });
   const temLista = paineis.some((p) => p.lista === true);
   const temColunas = paineis.some((p) => p.lista !== true);
   const escala = temLista ? (temColunas ? Math.min(escalaLista, escalaColunas) : escalaLista) : escalaColunas;
@@ -244,8 +244,8 @@ export function desenharBlocagem(entrada, { camada: querCamada = false } = {}) {
     if (!p.ocultos.has('nota')) quebrar(p.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + QUADRO.painelL / 2}" y="${QUADRO.topo + QUADRO.painelA + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
   });
   if (!paineis.every((p) => p.ocultos.has('escala'))) {
-    const barra = 100 * escala;
-    partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
+    const { px: barra, rotulo } = barraDeEscala(escala);
+    partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">${rotulo}</text>`);
   }
   partes.push('</svg>');
 

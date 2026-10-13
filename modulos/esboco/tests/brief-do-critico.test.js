@@ -256,28 +256,34 @@ describe('a vista da unidade enquadra a unidade e não leva a nota do objeto', (
     const sem = esbocoIsolado(bruto, estado, 'fila', false);
     expect(com.idsVizinhos).toContain('chao');
     expect(com.isolado.enquadrar).toEqual({ formas: ['c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'], aviso: false });
-    expect(sem.isolado.enquadrar).toBeUndefined();
-    /* a escala (px por mm) da vista com a vizinha fica perto da sem vizinha, e sem o enquadramento seria 10 vezes menor */
+    /* sem vizinha o quadro é a mesma moldura da unidade: a moldura sem legenda enche a largura da folha */
+    expect(sem.isolado.enquadrar).toEqual({ formas: ['c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'], aviso: false });
+    /* a escala (px por mm) da vista com a vizinha é a da sem vizinha, e sem o enquadramento seria 10 vezes menor */
     const escala = (esboco) => desenharEsboco(variante({ ...esboco, ladosPorEscala: true }, { vista: 'frontal', legendas: false, centros: false })).escala;
     const semEnquadre = escala({ ...com.isolado, enquadrar: undefined });
     expect(escala(com.isolado) / semEnquadre).toBeGreaterThan(6);
-    expect(escala(com.isolado) / escala(sem.isolado)).toBeGreaterThan(0.4);
-    /* o PNG: o desenho cabe em 45% da largura (o resto é reserva de legenda), e a tinta da unidade (traço preto) ocupa mais da metade disso, onde com o chão de 2 m inteiro no quadro ocuparia 4% da largura */
+    expect(escala(com.isolado) / escala(sem.isolado)).toBeCloseTo(1, 9);
+    /* o PNG: o desenho cabe em 92% da largura (a margem da folha, sem reserva de legenda), e a tinta da unidade (traço preto) ocupa mais de um quarto dela, onde com o chão de 2 m inteiro no quadro ocuparia 4% da largura */
     const r = await vistasArquivo(arquivo, { unidade: 'fila', vista: 'frontal', largura: 1100, saida: join(pasta, 'v') });
     const [x0, , x1] = caixaDaTinta(lerPng(r.destinos[0]));
     expect((x1 - x0) / 1100).toBeGreaterThan(0.25);
     /* e a unidade sem o enquadramento (o chão inteiro no quadro) ocuparia bem menos: a mesma medida na imagem da vista sem vizinhas, que enquadra a unidade, é a de referência */
     const so = await vistasArquivo(arquivo, { unidade: 'fila', vista: 'frontal', largura: 1100, vizinhos: false, saida: join(pasta, 'v') });
     const [s0, , s1] = caixaDaTinta(lerPng(so.destinos[0]));
-    /* a margem de 15% de cada lado do enquadramento deixa a fila com 180/234 = 77% do quadro da unidade sozinha */
-    expect((x1 - x0) / (s1 - s0)).toBeGreaterThan(0.7);
+    /* a vista sem vizinhas tem a mesma moldura, e a fila ocupa nela a mesma largura que na com vizinhas */
+    expect((x1 - x0) / (s1 - s0)).toBeGreaterThan(0.95);
+    expect((x1 - x0) / (s1 - s0)).toBeLessThan(1.05);
+    /* a fila (180 mm em 234 de janela, a margem de 15% de cada lado) enche a largura útil da folha: 572/620 de 1100 px, mais de 60% */
+    expect((s1 - s0) / 1100).toBeGreaterThan(0.6);
   }, 180000);
 
-  it('sem vizinha o quadro é o de antes, e `--zoom-forma` manda sobre o enquadramento da unidade', () => {
+  it('sem vizinha o quadro também é a moldura da unidade, e `--zoom-forma` manda sobre ela', () => {
     const { arquivo } = gravar(objeto());
     const bruto = JSON.parse(readFileSync(arquivo, 'utf8'));
     const estado = JSON.parse(readFileSync(`${arquivo}.condutor.json`, 'utf8'));
-    expect(esbocoIsolado(bruto, estado, 'fila', false).isolado.enquadrar).toBeUndefined();
+    expect(esbocoIsolado(bruto, estado, 'fila', false).isolado.enquadrar).toEqual({ formas: ['c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'], aviso: false });
+    /* o esboço inteiro, sem unidade, não tem moldura */
+    expect(esbocoIsolado(bruto, estado, null, false).isolado.enquadrar).toBeUndefined();
     expect(esbocoIsolado(bruto, estado, 'fila', true, { zoomForma: { formas: 'c0', margem: 10 } }).isolado.enquadrar).toEqual({ formas: 'c0', margem: 10 });
   });
 
