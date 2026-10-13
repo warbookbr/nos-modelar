@@ -24,8 +24,8 @@
    "medida": "largura",
    "em": 4590,
    "numero": [
-    -720,
-    0
+    -820,
+    -50
    ]
   },
   {
@@ -36,7 +36,15 @@
     "medida": "largura",
     "parte": "helice"
    },
-   "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida"
+   "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida",
+   "em": -1100,
+   "de": "fim",
+   "alemDosNomes": true,
+   "lado": "esquerda",
+   "numero": [
+    1272,
+    238
+   ]
   },
   {
    "parte": "heliceDir",
@@ -55,7 +63,15 @@
     "medida": "largura",
     "parte": "helice"
    },
-   "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida"
+   "prevalece": "a pessoa, 2026-10-13: vale a lateral; na planta cada hélice junta duas pás em ângulos diferentes e dobra a medida",
+   "em": 1180,
+   "de": "fim",
+   "alemDosNomes": true,
+   "lado": "direita",
+   "numero": [
+    -1408,
+    238
+   ]
   },
   {
    "parte": "escapeEsq",
@@ -134,11 +150,11 @@
    "parte": "janelas",
    "medida": "largura",
    "de": [
-    555,
+    557,
     -880
    ],
    "ate": [
-    695,
+    733,
     -880
    ],
    "numero": [
@@ -152,11 +168,11 @@
    "medida": "altura",
    "de": [
     575,
-    -817
+    -797
    ],
    "ate": [
     575,
-    -1052
+    -1075
    ],
    "numero": [
     958,
@@ -182,23 +198,23 @@
    },
    "prevalece": "a pessoa, 2026-10-12: vale a lateral, a única vista que mostra a junta entre capô e fuselagem",
    "em": 900,
-   "de": -5353,
+   "de": -5373,
    "alemDosNomes": true
   },
   {
    "parte": "deriva",
    "medida": "largura",
    "de": [
-    -87,
+    -99,
     -3055
    ],
    "ate": [
-    58,
+    66,
     -3055
    ],
    "numero": [
     -130,
-    1499
+    1472
    ]
   },
   {
@@ -214,11 +230,11 @@
    "parte": "asaEsq",
    "medida": "largura",
    "de": [
-    -6400,
+    -6397,
     0
    ],
    "ate": [
-    -868,
+    -837,
     0
    ],
    "afasta": [
@@ -239,7 +255,7 @@
    "parte": "asaDir",
    "medida": "largura",
    "de": [
-    815,
+    794,
     -29
    ],
    "ate": [
@@ -300,12 +316,12 @@
    "parte": "flapEsq",
    "medida": "largura",
    "de": [
-    -4905,
+    -4916,
     -134
    ],
    "ate": [
-    -1170,
-    -411
+    -1142,
+    -420
    ],
    "numero": [
     0,
@@ -325,12 +341,12 @@
    "parte": "flapDir",
    "medida": "largura",
    "de": [
-    945,
+    910,
     -472
    ],
    "ate": [
-    4880,
-    -94
+    4900,
+    -93
    ],
    "numero": [
     0,
@@ -430,11 +446,11 @@
   },
   "heliceEsq": {
    "marca": [
-    -330,
-    4335
+    -450,
+    4320
    ],
    "coluna": "esquerda",
-   "nivel": 4250
+   "nivel": 4300
   },
   "escapeEsq": {
    "marca": [
@@ -502,11 +518,11 @@
   },
   "heliceDir": {
    "marca": [
-    450,
-    4420
+    1000,
+    4560
    ],
    "coluna": "direita",
-   "nivel": 4250
+   "nivel": 4560
   },
   "escapeDir": {
    "marca": [
