@@ -1085,6 +1085,12 @@
       "unidade": "asas",
       "nota": 8,
       "motivo": "Planta, diedro, divisão flap/aileron e simetria batem com a referência, sem defeito estrutural. Superfície: ponta levantada é bloco de largura constante com ombro reto, contra ponta que afina e sobe em curva côncava na referência lateral; suportes do bordo de fuga são placas retangulares que param antes dele, contra carenagens afiladas que passam do bordo de fuga; tracejado no bordo de ataque de uma asa sem explicação."
+    },
+    {
+      "ordem": 5,
+      "unidade": "empenagem-horizontal",
+      "nota": 8,
+      "motivo": "Planta, diedro, silhueta lateral e proporção do profundor batem com a referência; fresta, eixo, suportes e ressalto da ponta no lugar, sem ponta no ar. Detalhe: a referência superior mostra uma placa clara na borda de fuga junto à raiz, de cada lado do cone (compensador), que o modelo não tem."
     }
   ]
 }
