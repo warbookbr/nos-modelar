@@ -164,7 +164,7 @@
       ],
       "depende": [],
       "custo": 4,
-      "feito": false,
+      "feito": true,
       "declarada": true,
       "envelope": {
         "caixa": {
@@ -240,6 +240,12 @@
             ]
           }
         }
+      },
+      "envelopeConferido": {
+        "ok": true,
+        "arquivo": "aviao-detalhe-motor.esboco.json",
+        "tolerancia_mm": 60,
+        "falta": []
       }
     },
     {

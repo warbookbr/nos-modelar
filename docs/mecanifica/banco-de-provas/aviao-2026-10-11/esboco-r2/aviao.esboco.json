@@ -184,7 +184,16 @@
     ]
   },
   "parametros": { "angHelice": 0 },
-  "pontos": { "proa": [0, 1330, 8], "eixoHelice": [0, 1330, 490], "pontaDaAsaD": [6050, 1599, 4733], "pEscapeD": [410, 1340, 1116], "pBocaDeAr": [0, 965, 672], "hubPrincipalD": [1890, 312, 4522], "hubNariz": [0, 205, 1740] },
+  "pontos": {
+    "proa": [0, 1330, 8],
+    "eixoHelice": [0, 1330, 490],
+    "pontaDaAsaD": [6050, 1599, 4733],
+    "pEscapeD": [410, 1340, 1116],
+    "pBocaDeAr": [0, 1000, 620],
+    "hubPrincipalD": [1890, 312, 4522],
+    "hubNariz": [0, 205, 1740],
+    "pLabioDeAr": [0, 1000, 636]
+  },
   "simetrico": { "eixo": "x", "pos": 0 },
   "contato": {
     "usar": true,
@@ -197,7 +206,7 @@
   },
   "unidades": {
     "helice": { "cor": "#b8c4d0", "funcao": "cone e cinco pás em torno do eixo do motor, com a raiz de cada pá presa ao cone", "vistas": ["frontal-oposta"] },
-    "motor": { "cor": "#7d8b99", "funcao": "capô do motor com a entrada de ar sob o cone e os dois escapes laterais", "vistas": ["frontal-oposta", "inferior"] },
+    "motor": { "cor": "#7d8b99", "funcao": "capô do motor com a boca de ar recortada sob o cone, com lábio, e dois escapes laterais ocos que saem do flanco e se curvam para trás", "vistas": ["frontal-oposta", "inferior"] },
     "fuselagem": { "cor": "#c9d1d9", "funcao": "casco da cabine à cauda, com o para-brisa, quatro janelas por lado, a porta traseira à esquerda e a barbatana ventral", "vistas": ["lateral-oposta", "inferior"] },
     "asas": { "cor": "#aeb9c4", "funcao": "duas metades de asa de ponta levantada, cada uma com flap e aileron presos ao bordo de fuga", "vistas": ["frontal-oposta", "inferior"] },
     "empenagem-horizontal": { "cor": "#9fb0c0", "funcao": "duas metades de estabilizador horizontal, cada uma com o profundor preso ao bordo de fuga", "vistas": ["frontal-oposta"] },
@@ -254,6 +263,7 @@
           "tipo": "loft",
           "eixo": "z",
           "suave": true,
+          "subtrai": ["bocaDeAr"],
           "encaixa": { "ancora": "fim", "em": "fuselagem.frente" },
           "secoes": [
             { "pos": 592, "forma": "arredondado", "tamanho": [440, 503], "cantos": 200, "centro": [0, 1329.5] },
@@ -268,17 +278,45 @@
             { "pos": 2377, "forma": "arredondado", "tamanho": [1450, 1030], "cantos": 380, "centro": [0, 1303] }
           ]
         },
-        { "id": "entradaDeAr", "unidade": "motor", "tipo": "caixa", "largura": 480, "altura": 190, "profundidade": 64, "raio": 40, "centro": "pBocaDeAr" },
+        {
+          "id": "entradaDeAr",
+          "unidade": "motor",
+          "tipo": "loft",
+          "eixo": "z",
+          "subtrai": ["bocaDeAr"],
+          "encaixa": { "ancora": "inicio", "em": "pLabioDeAr" },
+          "secoes": [
+            { "pos": 0, "forma": "arredondado", "tamanho": [380, 170], "cantos": 85, "centro": [0, 0] },
+            { "pos": 64, "forma": "arredondado", "tamanho": [380, 170], "cantos": 85, "centro": [0, 0] }
+          ]
+        },
         {
           "id": "escapeD",
           "unidade": "motor",
           "lado": "D",
           "tipo": "loft",
           "eixo": "x",
+          "suave": true,
+          "casca": { "espessura": 18, "aberta": "fim" },
           "encaixa": { "ancora": "inicio", "em": "pEscapeD" },
           "secoes": [
-            { "pos": 0, "forma": "elipse", "tamanho": [520, 188], "centro": [0, 0] },
-            { "pos": 425, "forma": "elipse", "tamanho": [440, 160], "centro": [0, 0] }
+            { "pos": 0, "forma": "arredondado", "tamanho": [500, 200], "cantos": 100, "centro": [0, 0] },
+            { "pos": 140, "forma": "arredondado", "tamanho": [430, 192], "cantos": 96, "centro": [30, -4] },
+            { "pos": 300, "forma": "arredondado", "tamanho": [370, 174], "cantos": 87, "centro": [70, -8] },
+            { "pos": 425, "forma": "arredondado", "tamanho": [340, 150], "cantos": 75, "centro": [110, -10] }
+          ]
+        },
+        {
+          "id": "bocaDeAr",
+          "unidade": "motor",
+          "tipo": "loft",
+          "eixo": "z",
+          "cortador": true,
+          "encaixa": { "ancora": "inicio", "em": "pBocaDeAr" },
+          "secoes": [
+            { "pos": 0, "forma": "arredondado", "tamanho": [340, 130], "cantos": 65, "centro": [0, 0] },
+            { "pos": 120, "forma": "arredondado", "tamanho": [330, 126], "cantos": 63, "centro": [0, 0] },
+            { "pos": 260, "forma": "arredondado", "tamanho": [220, 90], "cantos": 45, "centro": [0, 0] }
           ]
         },
         {

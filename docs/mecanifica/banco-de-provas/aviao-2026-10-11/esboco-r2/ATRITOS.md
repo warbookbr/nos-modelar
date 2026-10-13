@@ -83,3 +83,26 @@ npm run esboco -- $A --medidas | grep "helice diametro"
 ```bash
 npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-helice.esboco.json --unidade helice --composta
 ```
+
+## Unidade motor (detalhe)
+
+Os comandos desta seção usam `A=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `D=docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2`, no estado em que o motor foi integrado (capô e lábio da entrada de ar recortados pelo cortador `bocaDeAr`, escapes de casca).
+
+### 10. Integrar de novo um detalhe que traz um cortador novo recusa por id repetido
+
+O detalhe do motor declara o cortador `bocaDeAr`. A primeira integração o grava no mestre. Se o detalhe é corrigido depois (aqui, o comprimento do escape, que a medida `escape comprimento` acusou no mestre) e a mesma cópia é integrada outra vez, a recusa é `id "bocaDeAr" repetido`, porque o `--integrar` troca as formas visíveis da unidade e deixa no mestre o cortador, que não é visível. A recusa não diz o caminho. O que funcionou foi refazer o `--detalhar motor` (o cortador volta ao detalhe como entrada da unidade), repetir a edição e integrar. O comando abaixo reproduz com a cópia do detalhe de antes da correção, guardada fora da pasta.
+
+```bash
+cp <copia-do-detalhe-antes-da-correcao>.json $D/zz-motor.esboco.json
+npm run esboco -- $A --integrar motor $D/zz-motor.esboco.json
+rm $D/zz-motor.esboco.json*
+```
+
+### 11. A medida `escape comprimento` só aparece no mestre depois da integração
+
+O detalhe isolado mostra `--descrever` sem divergência porque o plano mínimo dele não leva `medidas`. O escape com 440 mm de comprimento (referência 537 mm, tolerância 50 mm) passou no `--envelope` e na leitura do detalhe, e a divergência só saiu na leitura do mestre depois do `--integrar`, que gravou o mestre mesmo assim. O `--detalhar` poderia levar ao detalhe as medidas do plano que citam formas da unidade.
+
+```bash
+npm run esboco -- $D/aviao-detalhe-motor.esboco.json --medidas
+npm run esboco -- $A --medidas | grep "escape comprimento"
+```
