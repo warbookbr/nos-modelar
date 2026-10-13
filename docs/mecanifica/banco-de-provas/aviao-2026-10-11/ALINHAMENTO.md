@@ -112,3 +112,10 @@ e de cada Marco: [fuselagem](esboco-r2/aviao-critico-fuselagem/brief.md),
 [trem-do-nariz](esboco-r2/aviao-critico-trem-do-nariz/brief.md),
 [trens-principais](esboco-r2/aviao-critico-trens-principais/brief.md),
 [marco-100](esboco-r2/aviao-critico-marco-100/brief.md).
+
+A forma da segunda rodada, com todas as unidades e o Marco de 100% em 8, foi
+aprovada pela pessoa em 2026-10-13 ("vi o avião, aprovo a forma sim"), sem pedir
+a rodada de acabamento. Ficam como detalhe de superfície, sem correção: a faixa do
+bordo de ataque, a oval, a bossa e o furo da deriva, a aba do leme, o compensador
+do profundor, a ponta e os suportes da asa, o rebaixo da porta, a perna do nariz
+curta e o garfo do trem principal estreito sobre a roda.
