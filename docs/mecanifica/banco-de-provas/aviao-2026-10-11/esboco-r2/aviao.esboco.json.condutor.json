@@ -1,0 +1,907 @@
+{
+  "versao": 4,
+  "esboco": "aviao.esboco.json",
+  "nivel": "detalhado",
+  "nivelDoPlano": true,
+  "modo": "por-unidade",
+  "estagios": [
+    "maquete",
+    "conferencia-da-maquete",
+    "plano-de-detalhe",
+    "detalhe-por-unidade",
+    "montagem"
+  ],
+  "atual": "detalhe-por-unidade",
+  "historico": [
+    {
+      "passo": 1,
+      "de": "maquete",
+      "para": "conferencia-da-maquete"
+    },
+    {
+      "passo": 2,
+      "de": "conferencia-da-maquete",
+      "para": "plano-de-detalhe"
+    },
+    {
+      "passo": 3,
+      "de": "plano-de-detalhe",
+      "para": "detalhe-por-unidade"
+    }
+  ],
+  "unidades": [
+    {
+      "id": "helice",
+      "membros": [
+        "cone",
+        "helicePa",
+        "helicePa1",
+        "helicePa2",
+        "helicePa3",
+        "helicePa4"
+      ],
+      "depende": [],
+      "custo": 6,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -888.3,
+            1090
+          ],
+          "y": [
+            289.9,
+            2370.1
+          ],
+          "z": [
+            8,
+            606
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "cone": {
+            "x": [
+              -212,
+              212
+            ],
+            "y": [
+              1118,
+              1542
+            ],
+            "z": [
+              8,
+              606
+            ]
+          },
+          "helicePa": {
+            "x": [
+              195,
+              1090
+            ],
+            "y": [
+              1295,
+              1365
+            ],
+            "z": [
+              375,
+              605
+            ]
+          },
+          "helicePa1": {
+            "x": [
+              27,
+              347.3
+            ],
+            "y": [
+              1504.6,
+              2370.1
+            ],
+            "z": [
+              375,
+              605
+            ]
+          },
+          "helicePa2": {
+            "x": [
+              -888.3,
+              -137.2
+            ],
+            "y": [
+              1416.3,
+              1979.6
+            ],
+            "z": [
+              375,
+              605
+            ]
+          },
+          "helicePa3": {
+            "x": [
+              -888.3,
+              -137.2
+            ],
+            "y": [
+              680.4,
+              1243.7
+            ],
+            "z": [
+              375,
+              605
+            ]
+          },
+          "helicePa4": {
+            "x": [
+              27,
+              347.3
+            ],
+            "y": [
+              289.9,
+              1155.4
+            ],
+            "z": [
+              375,
+              605
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "motor",
+      "membros": [
+        "capo",
+        "entradaDeAr",
+        "escapeD",
+        "escapeE"
+      ],
+      "depende": [],
+      "custo": 4,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -835,
+            835
+          ],
+          "y": [
+            768,
+            1818
+          ],
+          "z": [
+            592,
+            2377
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "capo": {
+            "x": [
+              -725,
+              725
+            ],
+            "y": [
+              768,
+              1818
+            ],
+            "z": [
+              592,
+              2377
+            ]
+          },
+          "entradaDeAr": {
+            "x": [
+              -240,
+              240
+            ],
+            "y": [
+              870,
+              1060
+            ],
+            "z": [
+              640,
+              704
+            ]
+          },
+          "escapeD": {
+            "x": [
+              410,
+              835
+            ],
+            "y": [
+              1246,
+              1434
+            ],
+            "z": [
+              856,
+              1376
+            ]
+          },
+          "escapeE": {
+            "x": [
+              -835,
+              -410
+            ],
+            "y": [
+              1246,
+              1434
+            ],
+            "z": [
+              856,
+              1376
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "fuselagem",
+      "membros": [
+        "fuselagem",
+        "parabrisa",
+        "janela1D",
+        "janela1E",
+        "janela2D",
+        "janela2E",
+        "janela3D",
+        "janela3E",
+        "janela4D",
+        "janela4E",
+        "porta",
+        "barbatana"
+      ],
+      "depende": [],
+      "custo": 12,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -810,
+            810
+          ],
+          "y": [
+            748,
+            2328
+          ],
+          "z": [
+            2377,
+            10461
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "fuselagem": {
+            "x": [
+              -780,
+              780
+            ],
+            "y": [
+              748,
+              2328
+            ],
+            "z": [
+              2377,
+              10461
+            ]
+          },
+          "parabrisa": {
+            "x": [
+              -600,
+              600
+            ],
+            "y": [
+              1881.9,
+              2280.1
+            ],
+            "z": [
+              2876.5,
+              3664.5
+            ]
+          },
+          "janela1D": {
+            "x": [
+              750,
+              810
+            ],
+            "y": [
+              1645,
+              2068
+            ],
+            "z": [
+              3375,
+              4108
+            ]
+          },
+          "janela1E": {
+            "x": [
+              -810,
+              -750
+            ],
+            "y": [
+              1645,
+              2068
+            ],
+            "z": [
+              3375,
+              4108
+            ]
+          },
+          "janela2D": {
+            "x": [
+              750,
+              810
+            ],
+            "y": [
+              1742,
+              2068
+            ],
+            "z": [
+              4390,
+              4657
+            ]
+          },
+          "janela2E": {
+            "x": [
+              -810,
+              -750
+            ],
+            "y": [
+              1742,
+              2068
+            ],
+            "z": [
+              4390,
+              4657
+            ]
+          },
+          "janela3D": {
+            "x": [
+              750,
+              810
+            ],
+            "y": [
+              1742,
+              2068
+            ],
+            "z": [
+              4959,
+              5258
+            ]
+          },
+          "janela3E": {
+            "x": [
+              -810,
+              -750
+            ],
+            "y": [
+              1742,
+              2068
+            ],
+            "z": [
+              4959,
+              5258
+            ]
+          },
+          "janela4D": {
+            "x": [
+              750,
+              810
+            ],
+            "y": [
+              1763,
+              2068
+            ],
+            "z": [
+              5754,
+              6010
+            ]
+          },
+          "janela4E": {
+            "x": [
+              -810,
+              -750
+            ],
+            "y": [
+              1763,
+              2068
+            ],
+            "z": [
+              5754,
+              6010
+            ]
+          },
+          "porta": {
+            "x": [
+              -797.8,
+              -672.2
+            ],
+            "y": [
+              1160,
+              2232
+            ],
+            "z": [
+              5457.5,
+              6429.5
+            ]
+          },
+          "barbatana": {
+            "x": [
+              -30,
+              30
+            ],
+            "y": [
+              944,
+              1522
+            ],
+            "z": [
+              7439,
+              8811
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "asas",
+      "membros": [
+        "asaD",
+        "asaE",
+        "pontaD",
+        "pontaE",
+        "flapD",
+        "flapE",
+        "aileronD",
+        "aileronE"
+      ],
+      "depende": [],
+      "custo": 8,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -6401,
+            6401
+          ],
+          "y": [
+            917,
+            1900.3
+          ],
+          "z": [
+            3968,
+            5730
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "asaD": {
+            "x": [
+              745,
+              6050
+            ],
+            "y": [
+              917,
+              1663
+            ],
+            "z": [
+              3968,
+              5730
+            ]
+          },
+          "asaE": {
+            "x": [
+              -6050,
+              -745
+            ],
+            "y": [
+              917,
+              1663
+            ],
+            "z": [
+              3968,
+              5730
+            ]
+          },
+          "pontaD": {
+            "x": [
+              6008.9,
+              6401
+            ],
+            "y": [
+              1550,
+              1900.3
+            ],
+            "z": [
+              4241.5,
+              5224.5
+            ]
+          },
+          "pontaE": {
+            "x": [
+              -6401,
+              -6008.9
+            ],
+            "y": [
+              1550,
+              1900.3
+            ],
+            "z": [
+              4241.5,
+              5224.5
+            ]
+          },
+          "flapD": {
+            "x": [
+              910,
+              4890
+            ],
+            "y": [
+              1021,
+              1509
+            ],
+            "z": [
+              5092.5,
+              5714
+            ]
+          },
+          "flapE": {
+            "x": [
+              -4890,
+              -910
+            ],
+            "y": [
+              1021,
+              1509
+            ],
+            "z": [
+              5092.5,
+              5714
+            ]
+          },
+          "aileronD": {
+            "x": [
+              4900,
+              6050
+            ],
+            "y": [
+              1445,
+              1626.5
+            ],
+            "z": [
+              4872,
+              5335
+            ]
+          },
+          "aileronE": {
+            "x": [
+              -6050,
+              -4900
+            ],
+            "y": [
+              1445,
+              1626.5
+            ],
+            "z": [
+              4872,
+              5335
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "empenagem-horizontal",
+      "membros": [
+        "estabilizadorD",
+        "estabilizadorE",
+        "profundorD",
+        "profundorE"
+      ],
+      "depende": [],
+      "custo": 4,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -2390,
+            2390
+          ],
+          "y": [
+            2029.5,
+            2404
+          ],
+          "z": [
+            9077,
+            10289
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "estabilizadorD": {
+            "x": [
+              190,
+              2390
+            ],
+            "y": [
+              2029.5,
+              2404
+            ],
+            "z": [
+              9077,
+              9810
+            ]
+          },
+          "estabilizadorE": {
+            "x": [
+              -2390,
+              -190
+            ],
+            "y": [
+              2029.5,
+              2404
+            ],
+            "z": [
+              9077,
+              9810
+            ]
+          },
+          "profundorD": {
+            "x": [
+              190,
+              2385
+            ],
+            "y": [
+              2045.5,
+              2392
+            ],
+            "z": [
+              9810,
+              10289
+            ]
+          },
+          "profundorE": {
+            "x": [
+              -2385,
+              -190
+            ],
+            "y": [
+              2045.5,
+              2392
+            ],
+            "z": [
+              9810,
+              10289
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "empenagem-vertical",
+      "membros": [
+        "deriva",
+        "leme"
+      ],
+      "depende": [],
+      "custo": 2,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -90,
+            90
+          ],
+          "y": [
+            2238,
+            4192
+          ],
+          "z": [
+            6980,
+            10415
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "deriva": {
+            "x": [
+              -90,
+              90
+            ],
+            "y": [
+              2238,
+              4189
+            ],
+            "z": [
+              6980,
+              10006
+            ]
+          },
+          "leme": {
+            "x": [
+              -70,
+              70
+            ],
+            "y": [
+              2238,
+              4192
+            ],
+            "z": [
+              9094,
+              10415
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "trem-do-nariz",
+      "membros": [
+        "carenagemTremNariz",
+        "pernaNariz",
+        "rodaNariz"
+      ],
+      "depende": [],
+      "custo": 3,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -185,
+            185
+          ],
+          "y": [
+            25,
+            795
+          ],
+          "z": [
+            1560,
+            2758
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "carenagemTremNariz": {
+            "x": [
+              -185,
+              185
+            ],
+            "y": [
+              619,
+              795
+            ],
+            "z": [
+              1925,
+              2758
+            ]
+          },
+          "pernaNariz": {
+            "x": [
+              -50,
+              50
+            ],
+            "y": [
+              363.7,
+              639.3
+            ],
+            "z": [
+              1743.1,
+              1912.9
+            ]
+          },
+          "rodaNariz": {
+            "x": [
+              -80,
+              80
+            ],
+            "y": [
+              25,
+              385
+            ],
+            "z": [
+              1560,
+              1920
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "trens-principais",
+      "membros": [
+        "pernaPrincipalD",
+        "pernaPrincipalE",
+        "rodaPrincipalD",
+        "rodaPrincipalE"
+      ],
+      "depende": [],
+      "custo": 4,
+      "feito": false,
+      "declarada": true,
+      "envelope": {
+        "caixa": {
+          "x": [
+            -2110,
+            2110
+          ],
+          "y": [
+            17,
+            1075
+          ],
+          "z": [
+            4227,
+            4817
+          ]
+        },
+        "portas": [],
+        "formas": {
+          "pernaPrincipalD": {
+            "x": [
+              1990,
+              2110
+            ],
+            "y": [
+              312,
+              1075
+            ],
+            "z": [
+              4375,
+              4705
+            ]
+          },
+          "pernaPrincipalE": {
+            "x": [
+              -2110,
+              -1990
+            ],
+            "y": [
+              312,
+              1075
+            ],
+            "z": [
+              4375,
+              4705
+            ]
+          },
+          "rodaPrincipalD": {
+            "x": [
+              1785,
+              1995
+            ],
+            "y": [
+              17,
+              607
+            ],
+            "z": [
+              4227,
+              4817
+            ]
+          },
+          "rodaPrincipalE": {
+            "x": [
+              -1995,
+              -1785
+            ],
+            "y": [
+              17,
+              607
+            ],
+            "z": [
+              4227,
+              4817
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "alteracoes": [],
+  "marcos": [],
+  "avisos": [],
+  "opcao": "Avião de pequeno porte"
+}
