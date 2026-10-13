@@ -1,0 +1,389 @@
+{
+ "numero": 3,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "helice",
+    "medida": "largura",
+    "em": 2000,
+    "numero": [
+     -350,
+     0
+    ]
+   },
+   {
+    "parte": "helice",
+    "medida": "altura",
+    "em": 100,
+    "alemDosNomes": true,
+    "lado": "esquerda"
+   },
+   {
+    "parte": "cone",
+    "medida": "largura",
+    "em": 1340,
+    "numero": [
+     -430,
+     250
+    ]
+   },
+   {
+    "parte": "cone",
+    "medida": "altura",
+    "em": -40
+   },
+   {
+    "parte": "capo",
+    "medida": "largura",
+    "em": 1000
+   },
+   {
+    "parte": "capo",
+    "medida": "altura",
+    "em": 2300
+   },
+   {
+    "parte": "escape",
+    "medida": "largura",
+    "em": 1315,
+    "numero": [
+     0,
+     -205
+    ]
+   },
+   {
+    "parte": "escape",
+    "medida": "altura",
+    "em": 960,
+    "numero": [
+     570,
+     -40
+    ]
+   },
+   {
+    "parte": "parabrisa",
+    "medida": "largura",
+    "em": 2255,
+    "afasta": 140
+   },
+   {
+    "parte": "parabrisa",
+    "medida": "altura",
+    "em": 3300,
+    "numero": [
+     -200,
+     260
+    ]
+   },
+   {
+    "parte": "janelas",
+    "medida": "largura",
+    "de": [
+     4978,
+     2000
+    ],
+    "ate": [
+     5249,
+     2000
+    ],
+    "rotulo": "por janela",
+    "numero": [
+     -613,
+     150
+    ]
+   },
+   {
+    "parte": "janelas",
+    "medida": "altura",
+    "em": 5150,
+    "numero": [
+     118,
+     -311
+    ]
+   },
+   {
+    "parte": "porta",
+    "medida": "largura",
+    "em": 1400
+   },
+   {
+    "parte": "porta",
+    "medida": "altura",
+    "em": 6250
+   },
+   {
+    "parte": "fuselagem",
+    "medida": "largura",
+    "em": 60,
+    "afasta": -210
+   },
+   {
+    "parte": "fuselagem",
+    "medida": "altura",
+    "em": 6800
+   },
+   {
+    "parte": "asa",
+    "medida": "largura",
+    "em": 1080,
+    "numero": [
+     -450,
+     60
+    ]
+   },
+   {
+    "parte": "asa",
+    "medida": "altura",
+    "numero": [
+     -350,
+     0
+    ],
+    "em": 4975
+   },
+   {
+    "parte": "barbatana",
+    "medida": "largura",
+    "de": [
+     7442,
+     1082
+    ],
+    "ate": [
+     8730,
+     1352
+    ],
+    "numero": [
+     1028,
+     -240
+    ]
+   },
+   {
+    "parte": "barbatana",
+    "medida": "altura",
+    "em": 7800,
+    "numero": [
+     1350,
+     -428
+    ]
+   },
+   {
+    "parte": "estabilizador",
+    "medida": "largura",
+    "em": 2100,
+    "numero": [
+     -122,
+     50
+    ]
+   },
+   {
+    "parte": "estabilizador",
+    "medida": "altura",
+    "em": 9850,
+    "numero": [
+     300,
+     278
+    ]
+   },
+   {
+    "parte": "deriva",
+    "medida": "largura",
+    "em": 3500
+   },
+   {
+    "parte": "deriva",
+    "medida": "altura",
+    "numero": [
+     -500,
+     400
+    ],
+    "em": 6940,
+    "afasta": 2060
+   },
+   {
+    "parte": "leme",
+    "medida": "largura",
+    "em": 2700,
+    "numero": [
+     600,
+     0
+    ]
+   },
+   {
+    "parte": "leme",
+    "medida": "altura",
+    "em": 10750
+   },
+   {
+    "parte": "tremNariz",
+    "medida": "largura",
+    "em": 200,
+    "numero": [
+     -550,
+     0
+    ]
+   },
+   {
+    "parte": "tremNariz",
+    "medida": "altura",
+    "em": 1800,
+    "numero": [
+     450,
+     -150
+    ]
+   },
+   {
+    "parte": "tremPrincipal",
+    "medida": "largura",
+    "em": 250,
+    "numero": [
+     700,
+     0
+    ]
+   },
+   {
+    "parte": "tremPrincipal",
+    "medida": "altura",
+    "em": 4550,
+    "numero": [
+     -700,
+     -100
+    ]
+   }
+  ],
+  "nomes": {
+   "helice": {
+    "marca": [
+     480,
+     2100
+    ],
+    "coluna": "esquerda",
+    "nivel": 3400
+   },
+   "cone": {
+    "marca": [
+     250,
+     1260
+    ],
+    "coluna": "esquerda",
+    "nivel": 400
+   },
+   "tremNariz": {
+    "marca": [
+     1760,
+     450
+    ],
+    "coluna": "esquerda",
+    "nivel": 60
+   },
+   "escape": {
+    "marca": [
+     1200,
+     1385
+    ],
+    "coluna": "esquerda",
+    "nivel": 5560
+   },
+   "capo": {
+    "marca": [
+     2250,
+     1720
+    ],
+    "coluna": "esquerda",
+    "nivel": 5720
+   },
+   "parabrisa": {
+    "marca": [
+     3050,
+     1890
+    ],
+    "coluna": "esquerda",
+    "nivel": 6050
+   },
+   "janelas": {
+    "marca": [
+     5880,
+     1950
+    ],
+    "coluna": "esquerda",
+    "nivel": 6350
+   },
+   "porta": {
+    "marca": [
+     6300,
+     2150
+    ],
+    "coluna": "direita",
+    "nivel": 6400
+   },
+   "deriva": {
+    "marca": [
+     9650,
+     4080
+    ],
+    "coluna": "direita",
+    "nivel": 6100
+   },
+   "leme": {
+    "marca": [
+     10100,
+     4060
+    ],
+    "coluna": "direita",
+    "nivel": 4600
+   },
+   "estabilizador": {
+    "marca": [
+     10050,
+     2180
+    ],
+    "coluna": "direita",
+    "nivel": 2200
+   },
+   "fuselagem": {
+    "marca": [
+     7500,
+     1700
+    ],
+    "coluna": "direita",
+    "nivel": 1700
+   },
+   "barbatana": {
+    "marca": [
+     8600,
+     1377
+    ],
+    "coluna": "direita",
+    "nivel": 1350
+   },
+   "asa": {
+    "marca": [
+     5800,
+     990
+    ],
+    "coluna": "direita",
+    "nivel": 370
+   },
+   "tremPrincipal": {
+    "marca": [
+     4630,
+     480
+    ],
+    "coluna": "direita",
+    "nivel": 140
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png",
+  "nota": 8,
+  "defeitos": [
+   {
+    "parte": "asa",
+    "tipo": "superficie",
+    "onde": "bordo de ataque, x≈420-480 e y≈515-555 da prancha",
+    "sentido": "segmentado",
+    "evidencia": "Etapa 15, prancha lateral.prancha.png: reentrância em degrau em x≈437-443 e y≈540-552, saliência em x≈457-465 e y≈515-528, e contorno fechado solto em (475,523). O alvo mostra bordo contínuo ali. É o defeito do veredito anterior, ainda presente, e não é novo. Observado sem ampliação."
+   }
+  ],
+  "observacao": "Silhueta, 15 nomes e 30 cotas estão coerentes com o alvo e com 10.470 x 4.200 mm; resta só o bordo de ataque da asa, e três folgas de linha de cerca de 3 a 4 px que não chegam a ser cruzamento."
+ }
+}
