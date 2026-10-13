@@ -176,7 +176,9 @@
       { "pecas": ["capo", "escapeD", "escapeE"], "max": 150, "motivo": "o escape sai do flanco do capô, que é mais largo atrás que na frente do escape" },
       { "pecas": ["fuselagem", "estabilizadorD", "estabilizadorE", "profundorD", "profundorE"], "max": 90, "motivo": "a raiz do estabilizador entra no cone de cauda, que é mais largo no bordo de ataque que no de fuga" },
       { "pecas": ["flapD", "eixoFlapD"], "max": 60, "motivo": "o eixo do flap atravessa o nariz do flap de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
-      { "pecas": ["aileronD", "eixoAileronD"], "max": 60, "motivo": "o eixo do aileron atravessa o nariz do aileron de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" }
+      { "pecas": ["aileronD", "eixoAileronD"], "max": 60, "motivo": "o eixo do aileron atravessa o nariz do aileron de ponta a ponta, em furo, e entra na parede do vão da asa em cada extremo" },
+      { "pecas": ["deriva", "carenagemDorsal"], "max": 160, "motivo": "a carenagem dorsal termina dentro do bordo de ataque da deriva, que é mais grosso atrás da linha do dorso, e a junta é a concordância entre as duas" },
+      { "pecas": ["leme", "eixoLeme"], "max": 80, "motivo": "o eixo do leme atravessa o nariz do leme de ponta a ponta, em furo" }
     ],
     "folga": 1282.5126392000002
   },
