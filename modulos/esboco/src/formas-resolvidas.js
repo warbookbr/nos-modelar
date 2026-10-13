@@ -7,7 +7,7 @@ import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { unidadesDeclaradas } from './contato.js';
 import { lerPlano } from './plano.js';
-import { cascoEmSecoes } from './malha.js';
+import { cascoEmSecoes, furoDaMalha } from './malha.js';
 import { resumoDoRecorte } from './recorte.js';
 
 export const FORMATO_DAS_FORMAS = 'mecanifica.formas-resolvidas@1';
@@ -117,6 +117,7 @@ function geometriaDoTipo(r) {
         familia: f.familia, ...(f.perfil === undefined ? {} : { perfil: f.perfil }), parametros: f.parametros ?? {},
         partes: m.partes.map((p) => p.nome).filter(Boolean), volume: m.volume,
         extensao: [0, 1, 2].map((e) => m.caixa.max[e] - m.caixa.min[e]), ...cascoEmSecoes(m),
+        ...(furoDaMalha(m) === null ? {} : { furo: furoDaMalha(m) }),
       };
     }
     case 'envolve':

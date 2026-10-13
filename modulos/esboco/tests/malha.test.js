@@ -4,7 +4,7 @@
    hidráulico e o cubo da roda do trem do avião têm de oco. */
 import { describe, expect, it } from 'vitest';
 import { ErroDeEsboco } from '../src/index.js';
-import { cascoEmSecoes, eixoDaMalha, fatiarMalha, lerMalha, pecasLocaisDaMalha } from '../src/malha.js';
+import { cascoEmSecoes, eixoDaMalha, fatiarMalha, furoDaMalha, lerMalha, pecasLocaisDaMalha } from '../src/malha.js';
 import { cascoConvexo } from '../src/decomposicao-convexa.js';
 import { asaDeSecoes, tuboOco } from './malha-de-prova.js';
 
@@ -179,6 +179,24 @@ describe('o casco por seções, para a blocagem do nível zero', () => {
         }
       }
     }
+  });
+});
+
+describe('o furo que atravessa a malha ao longo do eixo', () => {
+  it('o tubo de parede tem o furo do raio interno (o apótema do polígono de 32 lados), centrado, que o casco convexo fecha', () => {
+    const m = lerMalha(tuboOco({ n: 32, rExt: 20, rInt: 10 }));
+    const furo = furoDaMalha(m);
+    expect(furo.centro).toEqual([0, 0]);
+    expect(furo.raio).toBeCloseTo(10 * Math.cos(Math.PI / 32), 2);
+    expect(furo.raio).toBeLessThanOrEqual(10 * Math.cos(Math.PI / 32));
+    expect(furoDaMalha(m)).toBe(furo);
+    const casco = cascoEmSecoes(m, { secoes: 4, raios: 48 });
+    for (const s of casco.secoes) expect(Math.min(...s.perfil.map(([u, v]) => Math.hypot(u, v)))).toBeGreaterThan(19);
+  });
+
+  it('o furo menor que a folga entre as faces não conta, e a superfície com tampas não tem furo', () => {
+    expect(furoDaMalha(lerMalha(asaDeSecoes({ secoes: 5, n: 60 })))).toBeNull();
+    expect(furoDaMalha(lerMalha(tuboOco({ n: 32, rExt: 20, rInt: 0.4 })))).toBeNull();
   });
 });
 

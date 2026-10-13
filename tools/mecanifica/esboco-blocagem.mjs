@@ -19,6 +19,7 @@ import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, detalharUnidade, formasVizinhas }
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { ErroDoTradutor, traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compilarAndaime } from '../../src/autoria/medir-blocagem-nivel-zero.js';
+import { furosAbertos } from './esboco-blocagem-furo.mjs';
 import './esboco-familias.mjs';
 
 const porExtenso = (ids, n = 8) => `${ids.slice(0, n).join(', ')}${ids.length > n ? ', ...' : ''}`;
@@ -57,16 +58,27 @@ export const MUDANCA_MAXIMA_POR_INCLINACAO = 0.15;
    desloca o quadro além do que o gate aceita. */
 export const MUDANCA_MAXIMA_DO_ENVELOPE_POR_RECORTE = 1e-3;
 
+/* Quanto do furo passante de uma forma de família pode ficar descoberto na vista, em fração da silhueta da blocagem, para a
+   blocagem a desenhar. A N2 só tem sólido de seção convexo, e a forma de família entra como o casco das seções dela, que fecha o
+   furo (a perda `superficie`); o desenho das formas o deixa aberto, e quem olha ao longo do eixo vê o fundo por ele, no que nenhuma
+   outra forma cobre (o eixo cobre só a parte dele). O gate das silhuetas admite 0,2% de diferença (0,998), e as facetas do casco
+   ficam com até 0,12% disso (0,9988 medido no chassi de tubos curvos); o furo fica com metade, 0,1%. Medido: o furo do cubo da roda
+   do trem do nariz deixa descoberto 0,07% da vista lateral e passa; o da roda do trem principal, 0,6% (0,99144 de IoU na lateral e
+   0,99785 na isométrica da unidade), e a roda sai sem equivalente. */
+export const MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO = 1e-3;
+
 const emPorcento = (x) => Math.round(Math.abs(x) * 1000) / 10;
 
 /* O tradutor com o que a N2 não representa fora do andaime: as formas cuja perda `inclinacao` passa do limite de volume, e as
    cuja perda `recorte` muda o envelope além do limite, viram `naoTraduzidas` com o motivo, e o andaime é refeito sem elas. A
-   forma cujo recorte não muda o envelope continua no andaime inteira, com a perda declarada, e é comparada como antes. */
-function traduzirSemPerdaExcessiva(dados) {
+   forma cujo recorte não muda o envelope continua no andaime inteira, com a perda declarada, e é comparada como antes. `jaRecusadas`
+   traz as formas que a medida na blocagem já recusou (o furo descoberto, ver `blocagemDaOpcao`): id -> { tipo, motivo }. */
+function traduzirSemPerdaExcessiva(dados, jaRecusadas = new Map()) {
   const traducao = traduzirFormasParaAndaime(dados);
   const motivos = new Map();
   const tipos = new Map();
   const recusar = (p, motivo) => { motivos.set(p.id, [...(motivos.get(p.id) ?? []), motivo]); tipos.set(p.id, p.tipo); };
+  for (const [id, r] of jaRecusadas) recusar({ id, tipo: r.tipo }, r.motivo);
   for (const p of traducao.perdas) {
     if (p.perdido.some((d) => d.codigo === 'inclinacao') && Math.abs((p.erroVolumeExterno ?? p.erroVolume).relativo) > MUDANCA_MAXIMA_POR_INCLINACAO) {
       recusar(p, `a seção inclinada da ponta, levada ao plano perpendicular ao eixo, muda o volume em ${emPorcento((p.erroVolumeExterno ?? p.erroVolume).relativo)}% (o limite é ${MUDANCA_MAXIMA_POR_INCLINACAO * 100}%), e a N2 não inclina a seção`);
@@ -83,17 +95,46 @@ function traduzirSemPerdaExcessiva(dados) {
   return { ...refeita, naoTraduzidas: [...refeita.naoTraduzidas, ...recusadas], ocultas: refeita.ocultas.filter((id) => !ids.has(id)) };
 }
 
-/* A opção `numero` do esboço traduzida e compilada: { dados, traducao, blocagem, formasDe }. */
+/* O painel da opção `numero`, com todos os volumes da blocagem, como o desenho da blocagem o recebe: serve a medir a silhueta que o
+   gate compara, no mesmo quadro (título, nota e chave em lista incluídos). */
+function painelDaOpcao(bruto, numero, blocagem) {
+  const expandido = expandirEsboco(bruto);
+  const o = expandido.opcoes[numero - 1];
+  return {
+    titulo: o.titulo, nota: o.nota, ocultar: o.ocultar ?? expandido.ocultar ?? [],
+    lista: (o.legendas ?? expandido.legendas) === 'lista', malha: blocagem.malha, volumes: blocagem.volumes.map((v) => ({ id: v.id, cor: '#999999' })),
+  };
+}
+
+/* A opção `numero` do esboço traduzida e compilada: { dados, traducao, blocagem, formasDe }. A forma de família cujo furo passante
+   fica descoberto na vista além do limite (`MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO`) sai do andaime como `naoTraduzidas`, com o
+   motivo: o casco da N2 fecha o furo, e a silhueta da blocagem deixa de ser a do desenho. */
 export function blocagemDaOpcao(bruto, numero = 1) {
   const dados = formasResolvidas(bruto, numero);
-  let traducao;
-  try {
-    traducao = traduzirSemPerdaExcessiva(dados);
-  } catch (e) {
-    if (e instanceof ErroDoTradutor) throw new ErroDeEsboco(`--nivel-zero: a opção ${numero} não tem blocagem: ${e.message}`);
-    throw e;
+  const traduzir = (recusadas) => {
+    try {
+      return traduzirSemPerdaExcessiva(dados, recusadas);
+    } catch (e) {
+      if (e instanceof ErroDoTradutor) throw new ErroDeEsboco(`--nivel-zero: a opção ${numero} não tem blocagem: ${e.message}`);
+      throw e;
+    }
+  };
+  let traducao = traduzir();
+  let blocagem = compilarAndaime(traducao.andaime);
+  const abertos = furosAbertos({ dados, traducao, blocagem, painel: () => painelDaOpcao(bruto, numero, blocagem) });
+  const recusadas = new Map();
+  for (const a of abertos) {
+    if (a.fracao <= MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO || (recusadas.get(a.id)?.fracao ?? 0) >= a.fracao) continue;
+    const forma = dados.formas.find((f) => f.id === a.id);
+    recusadas.set(a.id, {
+      tipo: forma.tipo, fracao: a.fracao,
+      motivo: `o furo passante de ${(2 * forma.geometria.furo.raio).toFixed(1)} mm da forma fica descoberto na vista ${a.vista}, em ${(a.fracao * 100).toFixed(2)}% da silhueta da blocagem (o limite é ${MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO * 100}%), e a N2 só tem sólido de seção convexa: o casco da família fecharia o furo`,
+    });
   }
-  const blocagem = compilarAndaime(traducao.andaime);
+  if (recusadas.size > 0) {
+    traducao = traduzir(recusadas);
+    blocagem = compilarAndaime(traducao.andaime);
+  }
   return { dados, traducao, blocagem, formasDe: procedenciaDosVolumes(dados, traducao.tabela) };
 }
 

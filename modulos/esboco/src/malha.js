@@ -440,6 +440,37 @@ function niveisDaMalha(vertices, e, lo, hi) {
   return saida;
 }
 
+/* Abaixo deste raio (mm) o vazio que a projeção deixa no centro é a folga entre as faces, e não um furo. */
+const FURO_MINIMO_MM = 0.5;
+
+/** O furo que atravessa a superfície ao longo do eixo principal: o maior círculo, centrado no centro da caixa da seção, que nenhuma
+ *  face cobre quando a malha é projetada nesse eixo (o furo do cubo de uma roda, a luz de um tubo). Quem olha a peça ao longo do
+ *  eixo vê o fundo por ele, e o casco por seções (`cascoEmSecoes`), que é convexo, o fecha. Devolve `{ centro: [u, v], raio }` nos
+ *  eixos da seção do casco (`eixosDoPerfil`), no referencial local já centrado, ou null quando uma face cobre o centro (a peça
+ *  tampada) ou o vazio é menor que `FURO_MINIMO_MM`. O furo fora do centro não é medido. Determinístico. */
+export function furoDaMalha(malha) {
+  if (malha.furoDoCasco !== undefined) return malha.furoDoCasco;
+  const [u, v] = PLANO_DA_SECAO[eixoDaMalha(malha)];
+  const c = [(malha.caixa.min[u] + malha.caixa.max[u]) / 2, (malha.caixa.min[v] + malha.caixa.max[v]) / 2];
+  let distancia = Infinity;
+  for (const f of malha.faces) {
+    const anel = f.map((i) => [malha.vertices[i][u], malha.vertices[i][v]]);
+    let dentro = false;
+    for (let i = 0, j = anel.length - 1; i < anel.length; j = i++) {
+      const a = anel[i]; const b = anel[j];
+      if ((a[1] > c[1]) !== (b[1] > c[1]) && c[0] < a[0] + ((c[1] - a[1]) * (b[0] - a[0])) / (b[1] - a[1])) dentro = !dentro;
+      const dx = b[0] - a[0]; const dy = b[1] - a[1];
+      const t = Math.max(0, Math.min(1, ((c[0] - a[0]) * dx + (c[1] - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+      distancia = Math.min(distancia, Math.hypot(c[0] - a[0] - t * dx, c[1] - a[1] - t * dy));
+    }
+    if (dentro) { distancia = 0; break; }
+  }
+  malha.furoDoCasco = distancia > FURO_MINIMO_MM && Number.isFinite(distancia)
+    ? { centro: [r3(c[0]), r3(c[1])], raio: Math.floor(distancia * 1000) / 1000 }
+    : null;
+  return malha.furoDoCasco;
+}
+
 function cascoPorSecoes(malha, quantas, raios) {
   const eixo = eixoDaMalha(malha);
   const e = EIXOS.indexOf(eixo);

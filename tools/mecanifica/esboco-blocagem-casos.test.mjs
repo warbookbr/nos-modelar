@@ -8,7 +8,11 @@
      eixos não tem equivalente e sai declarada, e a que fica sobre um eixo tem de coincidir;
    - a forma de família ou o loft cortado por molde (`subtrai`) que muda o envelope (a asa cortada para a ponta levantada): o
      andaime levava a forma inteira, com volume e envelope maiores, e o quadro das vistas se deslocava (a isométrica do avião em 0,89).
-     A forma sai sem equivalente, com o motivo, e o vão que não muda o envelope continua comparado. */
+     A forma sai sem equivalente, com o motivo, e o vão que não muda o envelope continua comparado;
+   - a roda de família, cujo furo do cubo o casco convexo fecha: o desenho o deixa aberto, e na vista ao longo do eixo a blocagem pinta
+     o casco onde o desenho mostra o fundo (a roda do trem principal do avião, 0,6% da silhueta: 0,99144 na lateral e 0,99785 na
+     isométrica). A roda cujo furo descoberto passa de 0,1% da silhueta sai sem equivalente, com o motivo; a que tem o furo coberto
+     pelo eixo, ou descoberto em fração menor, continua comparada. */
 import { describe, expect, it } from 'vitest';
 import { desenharEsboco } from '../../modulos/esboco/src/index.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
@@ -154,5 +158,38 @@ describe('a forma de superfície ou loft cortada por molde pela blocagem', () =>
     expect(vazado.b.opcoes[0].semEquivalente).toEqual([]);
     expect(mudanca(vazado.b, 'casco').perdido.map((d) => d.codigo)).toContain('recorte');
     exigirCoincidencia(vazado.medidas, 'loft com vão interno');
+  }, 120_000);
+});
+
+describe('a forma de família com furo passante pela blocagem', () => {
+  const RODA = { id: 'roda', tipo: 'familia', familia: 'roda-pneu', perfil: 'carro', parametros: { diametroPneu: 590 }, centro: [0, 0, 0] };
+  const eixo = (diametro) => ({ id: 'eixo', tipo: 'cilindro', eixo: 'x', diametro, comprimento: 400, centro: [0, 0, 0] });
+  /* a barra ao lado da roda na vista lateral (não a cobre), para a silhueta ser bem maior que a roda */
+  const barra = { id: 'barra', tipo: 'caixa', largura: 100, altura: 1500, profundidade: 3000, centro: [0, 0, 1900] };
+
+  it('a roda com o furo aberto sai sem equivalente, com o motivo, e o resto coincide com o desenho', () => {
+    const { b, medidas } = medir(esboco([RODA, eixo(20)]));
+    const [x] = b.opcoes[0].semEquivalente;
+    expect(b.opcoes[0].semEquivalente.map((n) => n.id)).toEqual(['roda']);
+    expect(x.tipo).toBe('familia');
+    expect(x.motivo).toMatch(/o furo passante de [\d.]+ mm da forma fica descoberto na vista lateral, em [\d.]+% da silhueta da blocagem \(o limite é 0.1%\).*o casco da família fecharia o furo/);
+    expect(Object.values(b.opcoes[0].tabela)).not.toContain('roda');
+    expect(b.opcoes[0].aproximadas).not.toContain('roda');
+    exigirCoincidencia(medidas, 'roda de furo aberto');
+  }, 120_000);
+
+  it('a roda cujo eixo enche o furo continua no andaime como casco, declarada, e coincide com o desenho', () => {
+    const { b, medidas } = medir(esboco([RODA, eixo(64), barra]));
+    expect(b.opcoes[0].semEquivalente).toEqual([]);
+    expect(b.opcoes[0].aproximadas).toContain('roda');
+    expect(b.opcoes[0].perdas.find((p) => p.id === 'roda').perdido.map((d) => d.codigo)).toContain('superficie');
+    exigirCoincidencia(medidas, 'roda com o eixo no furo');
+  }, 120_000);
+
+  it('a roda de furo aberto numa silhueta muito maior (o furo descoberto fica abaixo de 0,1%) continua comparada, como a do trem do nariz', () => {
+    const { b, medidas } = medir(esboco([RODA, eixo(20), barra]));
+    expect(b.opcoes[0].semEquivalente).toEqual([]);
+    expect(Object.values(b.opcoes[0].tabela)).toContain('roda');
+    exigirCoincidencia(medidas, 'roda de furo aberto numa silhueta grande');
   }, 120_000);
 });

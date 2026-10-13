@@ -280,6 +280,8 @@ npm run esboco -- $A --descrever --forma estabilizadorD | grep "âncoras"
 
 O gate de silhueta pela blocagem (`tools/mecanifica/esboco-blocagem.test.mjs`) reprovou a hélice, o motor e as asas desta rodada. A hélice e o motor eram defeitos da blocagem e do desenho com recorte, corrigidos na origem. Nas asas, a ponta levantada sai de um molde que corta a asa inteira da família, e o andaime levava a forma inteira, com o envelope 79 mm maior; agora a forma cujo recorte muda o envelope sai em `semEquivalente` com o motivo. Fica o achado de que a família `superficie-aerodinamica` inteira, sem recorte, dá IoU 0,89 na isométrica contra o desenho num caso mínimo (envergadura 3000, corda 0,3 e 0,15), pelo casco convexo por seções; nenhum teste cobre uma asa de família na blocagem. O processo pegou as três reprovações pelo gate; a coincidência da família inteira não tem gate.
 
+A unidade dos trens principais reprovou pelo mesmo caminho com a roda da família `roda-pneu`: o casco convexo fecha o furo de 62,8 mm do cubo, o desenho o mostra aberto ao longo do eixo, e a isométrica deu IoU 0,99785. Agora a blocagem mede, por vista, a fração da silhueta que o furo descoberto ocupa (`tools/mecanifica/esboco-blocagem-furo.mjs`), e a forma acima de 0,1% sai em `semEquivalente` com o motivo; a roda do nariz fica em 0,07% e segue comparada. O gate pegou a reprovação só na bateria sobre as fixtures, e agora a blocagem da própria unidade a mede.
+
 ```bash
 npx vitest run tools/mecanifica/esboco-blocagem-casos.test.mjs
 npx vitest run tools/mecanifica/esboco-blocagem.test.mjs -t aviao
