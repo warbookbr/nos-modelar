@@ -48,18 +48,38 @@ function aparenciaDo(formas) {
    de frente, IoU 0,84), e o loft fica sem equivalente, como o tradutor já faz com a forma que gira em dois eixos. */
 export const MUDANCA_MAXIMA_POR_INCLINACAO = 0.15;
 
-/* O tradutor com o que a inclinação deforma demais fora do andaime: as formas cuja perda `inclinacao` passa do limite viram
-   `naoTraduzidas`, e o andaime é refeito sem elas. */
-function traduzirSemInclinacaoExcessiva(dados) {
+/* Quanto o recorte (`subtrai`) pode mudar o envelope da forma, em fração da extensão dela no eixo, para a blocagem levar a forma
+   inteira. A N2 não subtrai um volume de outro, e o tradutor leva a forma recortada inteira ao andaime e declara a perda
+   `recorte`. Quando o vão fica dentro da forma (a boca de ar do motor, o furo do escape) o envelope é o mesmo, e a diferença que
+   sobra é a faceta do tubo (1,4e-4 medido). Quando o recorte tira uma ponta (a asa cortada para a ponta levantada, 1,5% medido
+   na asa e 15 vezes a extensão na ponta, que sai do mesmo plano), o andaime ganha volume fora do envelope, o quadro das vistas
+   muda e a silhueta inteira se desloca. O limite é o da razão das escalas que o gate confere (1e-3): uma face que passa disso
+   desloca o quadro além do que o gate aceita. */
+export const MUDANCA_MAXIMA_DO_ENVELOPE_POR_RECORTE = 1e-3;
+
+const emPorcento = (x) => Math.round(Math.abs(x) * 1000) / 10;
+
+/* O tradutor com o que a N2 não representa fora do andaime: as formas cuja perda `inclinacao` passa do limite de volume, e as
+   cuja perda `recorte` muda o envelope além do limite, viram `naoTraduzidas` com o motivo, e o andaime é refeito sem elas. A
+   forma cujo recorte não muda o envelope continua no andaime inteira, com a perda declarada, e é comparada como antes. */
+function traduzirSemPerdaExcessiva(dados) {
   const traducao = traduzirFormasParaAndaime(dados);
-  const excessivas = traducao.perdas.filter((p) => p.perdido.some((d) => d.codigo === 'inclinacao') && Math.abs((p.erroVolumeExterno ?? p.erroVolume).relativo) > MUDANCA_MAXIMA_POR_INCLINACAO);
-  if (excessivas.length === 0) return traducao;
-  const ids = new Set(excessivas.map((p) => p.id));
+  const motivos = new Map();
+  const tipos = new Map();
+  const recusar = (p, motivo) => { motivos.set(p.id, [...(motivos.get(p.id) ?? []), motivo]); tipos.set(p.id, p.tipo); };
+  for (const p of traducao.perdas) {
+    if (p.perdido.some((d) => d.codigo === 'inclinacao') && Math.abs((p.erroVolumeExterno ?? p.erroVolume).relativo) > MUDANCA_MAXIMA_POR_INCLINACAO) {
+      recusar(p, `a seção inclinada da ponta, levada ao plano perpendicular ao eixo, muda o volume em ${emPorcento((p.erroVolumeExterno ?? p.erroVolume).relativo)}% (o limite é ${MUDANCA_MAXIMA_POR_INCLINACAO * 100}%), e a N2 não inclina a seção`);
+    }
+    if (p.perdido.some((d) => d.codigo === 'recorte') && p.erroEnvelope.relativo > MUDANCA_MAXIMA_DO_ENVELOPE_POR_RECORTE) {
+      const quais = dados.formas.find((f) => f.id === p.id)?.geometria.recorte?.cortadores.map((c) => c.id).join(', ');
+      recusar(p, `o recorte por ${quais} muda o envelope da forma em ${p.erroEnvelope.mm} mm (${emPorcento(p.erroEnvelope.relativo)}% da extensão no eixo; o limite é ${MUDANCA_MAXIMA_DO_ENVELOPE_POR_RECORTE * 100}%), e a N2 não subtrai um volume de outro: o andaime levaria a forma inteira, fora do envelope`);
+    }
+  }
+  if (motivos.size === 0) return traducao;
+  const ids = new Set(motivos.keys());
   const refeita = traduzirFormasParaAndaime({ ...dados, formas: dados.formas.map((f) => (ids.has(f.id) ? { ...f, oculto: true } : f)) });
-  const recusadas = excessivas.map((p) => ({
-    id: p.id, tipo: p.tipo,
-    motivo: `a seção inclinada da ponta, levada ao plano perpendicular ao eixo, muda o volume em ${Math.round(Math.abs((p.erroVolumeExterno ?? p.erroVolume).relativo) * 1000) / 10}% (o limite é ${MUDANCA_MAXIMA_POR_INCLINACAO * 100}%), e a N2 não inclina a seção`,
-  }));
+  const recusadas = [...ids].sort().map((id) => ({ id, tipo: tipos.get(id), motivo: motivos.get(id).join('; ') }));
   return { ...refeita, naoTraduzidas: [...refeita.naoTraduzidas, ...recusadas], ocultas: refeita.ocultas.filter((id) => !ids.has(id)) };
 }
 
@@ -68,7 +88,7 @@ export function blocagemDaOpcao(bruto, numero = 1) {
   const dados = formasResolvidas(bruto, numero);
   let traducao;
   try {
-    traducao = traduzirSemInclinacaoExcessiva(dados);
+    traducao = traduzirSemPerdaExcessiva(dados);
   } catch (e) {
     if (e instanceof ErroDoTradutor) throw new ErroDeEsboco(`--nivel-zero: a opção ${numero} não tem blocagem: ${e.message}`);
     throw e;

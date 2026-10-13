@@ -5,7 +5,10 @@
    - o loft `suave` de poucas seções, pela mesma razão (o capô do motor);
    - o tubo curvo com `subtrai`, cujo desenho recortado perdia as faixas de junta das curvas e deixava frestas na silhueta;
    - a família de superfície (a pá da hélice), fina e torcida, repetida por `arranja` em torno do eixo: a cópia que gira em dois
-     eixos não tem equivalente e sai declarada, e a que fica sobre um eixo tem de coincidir. */
+     eixos não tem equivalente e sai declarada, e a que fica sobre um eixo tem de coincidir;
+   - a forma de família ou o loft cortado por molde (`subtrai`) que muda o envelope (a asa cortada para a ponta levantada): o
+     andaime levava a forma inteira, com volume e envelope maiores, e o quadro das vistas se deslocava (a isométrica do avião em 0,89).
+     A forma sai sem equivalente, com o motivo, e o vão que não muda o envelope continua comparado. */
 import { describe, expect, it } from 'vitest';
 import { desenharEsboco } from '../../modulos/esboco/src/index.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
@@ -111,5 +114,45 @@ describe('a família de superfície repetida por arranja', () => {
   it('o casco da pá guarda a ponta fina de cada seção: o envelope do andaime é o da superfície (a amostragem por raios a partir do centro cortava até 2,5 mm)', () => {
     const perda = blocagemDoEsboco(caso).opcoes[0].perdas.find((p) => p.id === 'pa');
     expect(perda.erroEnvelope.mm).toBeLessThan(0.5);
+  }, 120_000);
+});
+
+describe('a forma de superfície ou loft cortada por molde pela blocagem', () => {
+  const ASA = { id: 'asa', tipo: 'familia', familia: 'superficie-aerodinamica', perfil: 'asa', parametros: { envergadura: 3000, simetria: 0, cordaNaRaiz: 0.3, cordaNaPonta: 0.15 }, centro: [0, 0, 0] };
+  const LONGARINA = { id: 'longarina', tipo: 'cilindro', eixo: 'z', diametro: 200, comprimento: 600, centro: [-400, 0, 0] };
+  const caixaCortadora = (id, centro, tamanho) => ({ id, tipo: 'caixa', largura: tamanho[0], altura: tamanho[1], profundidade: tamanho[2], centro, cortador: true, oculto: true });
+  const mudanca = (b, id) => b.opcoes[0].perdas.find((p) => p.id === id);
+
+  it('a asa cortada na ponta por um molde (o envelope encolhe) sai sem equivalente, com o motivo, e o resto coincide com o desenho', () => {
+    const molde = caixaCortadora('cortaPonta', [1600, 0, 0], [1200, 1000, 1000]);
+    const { b, medidas } = medir(esboco([LONGARINA, { ...ASA, subtrai: ['cortaPonta'] }, molde]));
+    const [x] = b.opcoes[0].semEquivalente;
+    expect(b.opcoes[0].semEquivalente.map((n) => n.id)).toEqual(['asa']);
+    expect(x.tipo).toBe('familia');
+    expect(x.motivo).toMatch(/o recorte por cortaPonta muda o envelope da forma em [\d.]+ mm .*não subtrai um volume de outro/);
+    expect(mudanca(b, 'asa')).toBeUndefined();
+    expect(Object.values(b.opcoes[0].tabela)).not.toContain('asa');
+    exigirCoincidencia(medidas, 'asa cortada na ponta');
+  }, 120_000);
+
+  it('a asa com um vão dentro dela (o envelope não muda) continua no andaime inteira, com a perda `recorte` declarada', () => {
+    const { b } = medir(esboco([LONGARINA, { ...ASA, subtrai: ['boca'] }, caixaCortadora('boca', [0, 0, 0], [200, 400, 200])]));
+    expect(b.opcoes[0].semEquivalente).toEqual([]);
+    expect(b.opcoes[0].aproximadas).toContain('asa');
+    expect(mudanca(b, 'asa').perdido.map((d) => d.codigo)).toContain('recorte');
+    expect(mudanca(b, 'asa').erroEnvelope.relativo).toBeLessThanOrEqual(1e-3);
+    expect(Object.values(b.opcoes[0].tabela)).toContain('asa');
+  }, 120_000);
+
+  it('o loft cortado por molde que muda o envelope sai sem equivalente, e o que só abre um vão dentro dele continua comparado', () => {
+    const loft = (extra) => ({ id: 'casco', tipo: 'loft', eixo: 'x', centro: [0, 0, 0], secoes: [{ pos: -1000, forma: 'retangulo', tamanho: [300, 200] }, { pos: 1000, forma: 'retangulo', tamanho: [300, 200] }], ...extra });
+    const aparado = medir(esboco([LONGARINA, loft({ subtrai: ['aparo'] }), caixaCortadora('aparo', [900, 0, 0], [600, 600, 600])]));
+    expect(aparado.b.opcoes[0].semEquivalente.map((n) => n.id)).toEqual(['casco']);
+    expect(aparado.b.opcoes[0].semEquivalente[0].motivo).toMatch(/muda o envelope da forma/);
+    exigirCoincidencia(aparado.medidas, 'loft aparado');
+    const vazado = medir(esboco([LONGARINA, loft({ subtrai: ['vao'] }), caixaCortadora('vao', [0, 0, 0], [200, 100, 100])]));
+    expect(vazado.b.opcoes[0].semEquivalente).toEqual([]);
+    expect(mudanca(vazado.b, 'casco').perdido.map((d) => d.codigo)).toContain('recorte');
+    exigirCoincidencia(vazado.medidas, 'loft com vão interno');
   }, 120_000);
 });
