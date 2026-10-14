@@ -112,7 +112,9 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
    ferramenta está em `modulos/desenho-por-restricoes`, com `npm run desenho` e a
    skill `desenho-por-restricoes`, provada no carrinho de mão e em formas
    sintéticas. O [resultado](../banco-de-provas/desenho-braco-2026-10-14/RESULTADO.md) do
-   braço deu empate entre restrições e coordenadas.
+   braço deu empate entre restrições e coordenadas. A pessoa escolheu uma segunda prova com a
+   lateral da carcaça da empilhadeira, com esta
+   [descrição](../banco-de-provas/desenho-carcaca-2026-10-14/DESCRICAO.md).
 3. **Decisão.** A pessoa decide se o módulo segue, muda ou para.
 
 ## Riscos e parada
