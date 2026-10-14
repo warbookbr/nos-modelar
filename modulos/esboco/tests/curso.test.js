@@ -115,7 +115,7 @@ describe('o trem que recolhe e bate na parede (as formas dependem do parâmetro 
     const { texto, codigo } = formatarCurso(varrerCurso(trem()));
     expect(codigo).toBe(1);
     expect(texto).toContain('curso recolhe (o trem recolhendo para trás): angTrem de 0 a 90 em 6 passos, 7 posições');
-    expect(texto).toMatch(/roda e parede se penetram 14,9 mm\n\s+em angTrem 60 \(14,9 mm\), 75 \(29,9 mm\), 90 \(35 mm\); o pior, 35 mm em 90/);
+    expect(texto).toMatch(/roda e parede se penetram 14,9 mm, acima do limite de [\d,]+ mm \([^)]*\)\n\s+em angTrem 60 \(14,9 mm\), 75 \(29,9 mm\), 90 \(35 mm\); o pior, 35 mm em 90/);
     expect(texto).toMatch(/corpo e roda se penetram[^\n]*\n\s+em angTrem 75 /);
     expect(texto).toContain('posições sem achado novo: 0, 15, 30, 45');
   });
@@ -316,7 +316,7 @@ describe('o Portão: a unidade só vira feita sem achado em nenhuma posição do
   it('--feito recusa a unidade do trem enquanto o curso atravessa a parede, e diz o curso e as posições', () => {
     const { e, estado } = naDetalhe(trem());
     expect(() => marcarFeito(e, estado, 'trem')).toThrow(ErroDeEsboco);
-    expect(() => marcarFeito(e, estado, 'trem')).toThrow(/tem 2 achados abertos do gate de contato no mestre e não vira feita assim \(\[T\] colisão: roda e parede se penetram 14,9 mm \(no curso "recolhe", com angTrem em 60, 75, 90\); \[T\] colisão: corpo e roda se penetram 6,2 mm \(no curso "recolhe", com angTrem em 75, 90\)\)/);
+    expect(() => marcarFeito(e, estado, 'trem')).toThrow(/tem 2 achados abertos do gate de contato no mestre e não vira feita assim \(\[T\] colisão: roda e parede se penetram 14,9 mm, acima do limite de [\d,]+ mm \([^)]*\) \(no curso "recolhe", com angTrem em 60, 75, 90\); \[T\] colisão: corpo e roda se penetram 6,2 mm, acima do limite de [\d,]+ mm \([^)]*\) \(no curso "recolhe", com angTrem em 75, 90\)\)/);
   });
 
   it('sem o curso a mesma unidade passa (só a pose estendida era conferida)', () => {

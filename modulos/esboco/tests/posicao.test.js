@@ -212,10 +212,11 @@ describe('moto por relações', () => {
 describe('compatibilidade', () => {
   const sha = (s) => createHash('sha1').update(s).digest('hex').slice(0, 12);
   it('os fixtures sem campos novos geram o mesmo SVG e a mesma leitura de sempre', () => {
+    /* a leitura da moto mudou uma vez: a colisão passou a dizer o limite de penetração e a regra (atrito 44) */
     const esperado = {
       casa: ['921913afe9f9', 'ab8355c5df90'],
       'mancal-eixo': ['bb4a355c5ca6', 'c38f4eaa7932'],
-      moto: ['ee5eaae2b028', 'f9a480d9c387'],
+      moto: ['ee5eaae2b028', '0bb9f06cd5e7'],
       'teste-cubo': ['fa488c1ade46', '06ab0744a45d'],
     };
     for (const [nome, [svg, texto]] of Object.entries(esperado)) {

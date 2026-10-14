@@ -252,7 +252,7 @@ describe('leitura das sugestões', () => {
   it('--descrever mostra a sugestão ao lado do achado', () => {
     const d = descreverEsboco(esboco([caixa('a', [0, 0, 0]), caixa('b', [10, 0, 0])]));
     expect(d.opcoes[0].sugestoesDeContato[0]).toContain('mova b em [10,9 0 0] mm');
-    expect(formatarDescricao(d)).toMatch(/achado de contato: \[T\] colisão: a e b se penetram 10,0 mm; sugestão: mova b em \[10,9 0 0\] mm/);
+    expect(formatarDescricao(d)).toMatch(/achado de contato: \[T\] colisão: a e b se penetram 10,0 mm, acima do limite de [\d,]+ mm \([^)]*\); sugestão: mova b em \[10,9 0 0\] mm/);
   });
 
   it('o manifesto da análise guarda as sugestões por achado', async () => {
@@ -294,11 +294,12 @@ describe('leitura das sugestões', () => {
 
 describe('arquivos legados', () => {
   const sha = (t) => createHash('sha1').update(t).digest('hex');
-  /* SHA-1 do SVG e da leitura --descrever de HEAD antes da fatia 6 (a moto tem um achado, que ganha a sugestão) */
+  /* SHA-1 do SVG e da leitura --descrever de HEAD antes da fatia 6 (a moto tem um achado, que ganha a sugestão). A leitura da moto mudou uma
+     vez depois: a colisão passou a dizer o limite de penetração e a regra (atrito 44) */
   const antes = {
     casa: ['921913afe9f9074b1801322dac097743bdd57d48', 'ab8355c5df90e309ebe8a13b9add4cd7fd56db77'],
     'mancal-eixo': ['bb4a355c5ca68f60de67cabf33d778d5def27c4a', 'c38f4eaa793241a223ff65bbe20446e89e961948'],
-    moto: ['ee5eaae2b028ce82d3357c6e6d4a39134343370e', 'f9a480d9c3878bb9efdf4a573a0b526e0a523b29'],
+    moto: ['ee5eaae2b028ce82d3357c6e6d4a39134343370e', '0bb9f06cd5e7a046caaaf4cd47ef51b8c9037837'],
     'teste-cubo': ['fa488c1ade466fb431429eb81308d76831c148d1', '06ab0744a45d617387c7e005288f303aad7edcb8'],
     'moto-relacoes': ['524bbda4437bbd67e7fa5386b7bf591b6eef2194', '1154ae24caa52c3d36a68ee972418575ef784d16'],
     'moto-parametros': ['282776b96ac06f276181f4cbe6a2304966e313c1', '10f28aaa2420905190bdd54fa638e4404f23435d'],

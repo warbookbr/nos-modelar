@@ -68,6 +68,7 @@ export const FRASES = {
   envelope: 'O Envelope da maquete, a conferência com `--envelope` e as imagens `--unidade`.',
   andaime: 'O Condutor lendo o andaime compilado: medidas na blocagem, perdas do tradutor e o Envelope por receita com REFINA.',
   detalhar: 'O esboço isolado de uma unidade (`--detalhar`) e a volta ao mestre (`--integrar`).',
+  refazer: 'O `--integrar` de uma unidade já integrada: cortadores, parâmetros novos e juntas da unidade trocados sem edição do mestre.',
   critico: 'A função da unidade, o brief do crítico, o veredito, a escala da nota e o crítico do objeto.',
   brief: 'O brief gravado em brief.md e reimpresso por --brief, de que lado cada vista olha, as vistas de outros lados da unidade e a referência como alvo.',
   execucao: 'O modo `por-unidade` e a nota de passagem entre unidades.',

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1184 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1185 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -576,6 +576,7 @@
 ## modulos/esboco/tests/
 
 - `atritos-da-refeita.test.js` — Os treze atritos da primeira refeita (plano "O esboço detalhado coerente", fatia 5), cada um em reprodução mínima: referências internas de módulo, `--editar`…
+- `atritos-da-segunda-integracao.test.js` — Os atritos 43 e 44 do esboço do avião, cada um em reprodução mínima: o `--integrar` de uma unidade que já foi integrada, com o cortador dela já no mestre (43…
 - `atritos-do-aviao.test.js` — Os atritos do esboço do avião que são do gate de contato e dos miúdos do esboço (plano "O que o avião pede", fatia 5, onda 1): o `contrato.fixa` com face con…
 - `biblioteca.test.js` — Biblioteca genérica de componentes de arquivo: parafuso, mola, engrenagem, rolamento, perfil estrutural e dobradiça. Cada um tem teste de expansão (ids, parâ…
 - `brief-do-critico.test.js` — O processo do crítico do esboço depois do avião (atritos 9, 11, 12, 20, 21, 25, 29, 31 e 33): o brief da unidade, do Marco e do objeto vai para `brief.md` e …

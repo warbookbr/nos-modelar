@@ -6,7 +6,7 @@
    não lê nem grava arquivo, e não muda o que recebe. */
 import { ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirArranjos, expandirEsboco, numerosDaForma, resolvedor } from './expandir.js';
-import { lerContato, padroesDoContato } from './contato.js';
+import { lerContato, padroesDoContato, unidadesDeclaradas } from './contato.js';
 import { conferirEnvelope, montarUnidadesDoEstado, planoDeDetalhe, registrarEnvelope, sincronizarAvisoDeCiclo, unidadePorNome, abreviar } from './condutor.js';
 import { quisDizer } from './parecido.js';
 import { mapaDeLigacoes } from './mapa-de-ligacoes.js';
@@ -49,6 +49,17 @@ function unidadeDoEstado(bruto, estado, nome) {
   const ids = unidades.map((u) => u.id);
   exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.map(abreviar).join(', ')})`);
   return { unidades, u: unidades.find((x) => x.id === unidade) };
+}
+
+/* As unidades com os cortadores declarados nelas entre os membros. O cortador (o molde de um recorte) é oculto por natureza e
+   o Condutor não o conta entre os membros, mas o cortador que declara `unidade` é da unidade: ela o detalha e a troca o leva
+   junto, em vez de deixá-lo no mestre para o detalhe trazer de novo. Devolve { unidades, cortadores } (os ids de cada unidade). */
+function comCortadores(unidades, esboco) {
+  const formas = esboco.opcoes[0].formas;
+  const declarada = unidadesDeclaradas(formas);
+  const porUnidade = new Map();
+  for (const f of formas) if (f.cortador === true && declarada.has(f.id)) porUnidade.set(declarada.get(f.id), [...(porUnidade.get(declarada.get(f.id)) ?? []), f.id]);
+  return { unidades: unidades.map((x) => ({ ...x, membros: [...x.membros, ...(porUnidade.get(x.id) ?? []).filter((id) => !x.membros.includes(id))] })), cortadores: porUnidade };
 }
 
 /* Classifica cada entrada da lista bruta: 'dentro' (todas as formas visíveis dela são da unidade), 'fora' (nenhuma é) ou erro
@@ -101,9 +112,11 @@ function baseDoMestre(bruto, unidade) {
    só a primeira opção e o plano mínimo. Parâmetros, pontos e contato do mestre ficam; as juntas e os pares que citam formas
    ocultas não reprovam (o gate as ignora). */
 export function detalharUnidade(bruto, estado, nome) {
-  const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
-  const unidade = u.id;
+  const { unidades: doEstado, u: daEstado } = unidadeDoEstado(bruto, estado, nome);
+  const unidade = daEstado.id;
   const esboco = expandirEsboco(bruto);
+  const { unidades } = comCortadores(doEstado, esboco);
+  const u = unidades.find((x) => x.id === unidade);
   const { lista, onde } = listaDoMestre(bruto);
   const ids = idsPorEntrada(lista, esboco.opcoes[0].formas, esboco);
   const tipo = classificar(lista, ids, unidades, u);
@@ -319,14 +332,16 @@ const textoDoPar = (p) => `${p?.a} + ${p?.b}`;
 /* O que o detalhado muda numa lista de juntas ou de pares, sobre a base e sobre o mestre de agora. Com `base` (a cópia de onde o
    detalhado saiu): o que estava na base e o detalhado não tem foi apagado por quem detalhou, e só isso sai do mestre (se cita a
    unidade e o mestre ainda o tem como estava); o que o detalhado tem e a base não tinha foi escrito por quem detalhou e entra
-   (as mesmas peças com outro `max` valem no lugar do antigo); o que o mestre ganhou depois da cópia fica. Sem `base` (detalhe
+   (as mesmas peças com outro `max` valem no lugar do antigo, também quando o antigo é do mestre e não estava na base: a junta que
+   cita a unidade é da unidade, e o detalhe é onde ela se ajusta); o que o mestre ganhou depois da cópia fica. Sem `base` (detalhe
    de antes da base): sai o que cita a unidade e o detalhado não tem, e entra o que cita uma forma nova da unidade, que é a
-   regra mais cautelosa que a cópia sem base deixa. Devolve { todos, apagados } (os apagados em texto). */
+   regra mais cautelosa que a cópia sem base deixa. Devolve { todos, apagados, reescritos } (os apagados e os reescritos em texto). */
 function reconciliarLista({ doMestre, doDetalhe, daBase, cita, citaNova, texto, ident }) {
   const json = (x) => JSON.stringify(x);
   const noDetalhe = new Set(doDetalhe.map(json));
   const noMestre = new Set(doMestre.map(json));
   const apagados = [];
+  const reescritos = [];
   const usados = new Set();
   const todos = [...doMestre];
   const reescrita = (x, naoAchados) => naoAchados.find((y) => !usados.has(json(y)) && ident(y) === ident(x));
@@ -341,10 +356,15 @@ function reconciliarLista({ doMestre, doDetalhe, daBase, cita, citaNova, texto, 
       if (nova) todos[k] = clone(nova); else { todos.splice(k, 1); apagados.push(texto(r)); }
     }
     for (const y of escritos) {
-      if (usados.has(json(y)) || todos.some((x) => json(x) === json(y) || ident(x) === ident(y))) continue;
-      todos.push(clone(y));
+      if (usados.has(json(y)) || todos.some((x) => json(x) === json(y))) continue;
+      /* as mesmas peças já estão no mestre com outro valor: se são da unidade, vale o do detalhado, que é onde ela se ajusta */
+      const k = todos.findIndex((x) => ident(x) === ident(y));
+      if (k < 0) { todos.push(clone(y)); continue; }
+      if (!cita(todos[k])) continue;
+      reescritos.push(`${texto(y)} (mestre ${json(todos[k])} -> detalhado ${json(y)})`);
+      todos[k] = clone(y);
     }
-    return { todos, apagados };
+    return { todos, apagados, reescritos };
   }
   const novosDoDetalhe = doDetalhe.filter((y) => !noMestre.has(json(y)));
   const fica = [];
@@ -357,14 +377,14 @@ function reconciliarLista({ doMestre, doDetalhe, daBase, cita, citaNova, texto, 
     if (usados.has(json(y)) || !citaNova(y)) continue;
     if (!fica.some((x) => ident(x) === ident(y))) fica.push(clone(y));
   }
-  return { todos: fica, apagados };
+  return { todos: fica, apagados, reescritos };
 }
 
 /* Põe no contato (raiz e primeira opção) do mestre o que o detalhado declara de juntas e de pares, e tira o que o detalhado
    apagou (ver `reconciliarLista`). O detalhado sem `contato` (a raiz ou a opção) não fala de contato naquele nível. Devolve as
    juntas e os pares apagados, em texto. */
 function reconciliarContato(mestre, detalhado, antigas, novasDaUnidade, base) {
-  const apagados = { juntas: [], pares: [] };
+  const apagados = { juntas: [], pares: [], reescritos: [] };
   for (const [de, dono, nivel] of [[detalhado?.contato, mestre, 'raiz'], [detalhado?.opcoes?.[0]?.contato, mestre.opcoes[0], 'opcao']]) {
     if (!objeto(de)) continue;
     const dosIds = (ids) => [(p) => citaAntiga(p?.a, ids) || citaAntiga(p?.b, ids), (j) => (Array.isArray(j?.pecas) ? j.pecas.some((q) => citaAntiga(q, ids)) : false)];
@@ -377,6 +397,7 @@ function reconciliarContato(mestre, detalhado, antigas, novasDaUnidade, base) {
       if (doMestre.length === 0 && doDetalhe.length === 0) continue;
       const r = reconciliarLista({ doMestre, doDetalhe, daBase, cita, citaNova, texto, ident });
       apagados[campo].push(...r.apagados);
+      apagados.reescritos.push(...(r.reescritos ?? []).map((t) => `${campo === 'juntas' ? 'junta' : 'par'} ${t}`));
       if (r.todos.length > 0) { dono.contato = objeto(dono.contato) ? dono.contato : {}; dono.contato[campo] = r.todos; } else if (objeto(dono.contato)) delete dono.contato[campo];
     }
   }
@@ -500,17 +521,25 @@ function parametrosSemUso(bruto, mestre) {
    e os ids novos da unidade, e `devolvidos`, o que voltou ao mestre fora da lista de formas (`modulos`, `simetrico`). Sem estado, as unidades vêm do Plano de detalhe do próprio mestre e `estado` volta null. O mestre
    novo precisa resolver (todas as referências das outras unidades às formas trocadas), ou a troca é recusada. */
 export function integrarUnidade(bruto, estado, nome, detalhado, { arquivo = 'detalhado' } = {}) {
-  const { unidades, u } = unidadeDoEstado(bruto, estado, nome);
-  const unidade = u.id;
+  const { unidades, u: daEstado } = unidadeDoEstado(bruto, estado, nome);
+  const unidade = daEstado.id;
   exigir(objeto(detalhado), 'integrar: o arquivo detalhado deve ser um esboço (objeto JSON)');
   const esboco = expandirEsboco(bruto);
+  const { unidades: comCort, cortadores } = comCortadores(unidades, esboco);
+  const u = comCort.find((x) => x.id === unidade);
+  const cortadoresDaUnidade = new Set(cortadores.get(unidade) ?? []);
   const { lista, onde } = listaDoMestre(bruto);
   const ids = idsPorEntrada(lista, esboco.opcoes[0].formas, esboco);
-  const tipo = classificar(lista, ids, unidades, u);
+  const tipo = classificar(lista, ids, comCort, u);
   const doDetalhe = detalhado.opcoes?.[0]?.formas ?? detalhado.formas;
   exigir(Array.isArray(doDetalhe), 'integrar: o detalhado não tem lista de formas (nem na raiz nem na primeira opção)');
-  const novas = doDetalhe.filter((f) => !(objeto(f) && f.oculto === true)).map(clone);
+  /* a entrada `oculto: true` é só referência de posição; o cortador da unidade é oculto por natureza, e a cópia dele com `oculto: true`
+     (de um detalhe feito quando o cortador ainda ficava fora da unidade) segue sendo dele */
+  const novas = doDetalhe.filter((f) => !(objeto(f) && f.oculto === true && !(f.cortador === true && cortadoresDaUnidade.has(f.id)))).map(clone);
   exigir(novas.length > 0, 'integrar: o detalhado não tem nenhuma forma visível (as com "oculto": true só servem de referência)');
+  /* um id do detalhe que o mestre tem numa entrada de fora da unidade não pode entrar de novo: o erro diz o que fazer, em vez de "id repetido" */
+  const dosDeFora = new Set(lista.flatMap((f, k) => (tipo[k] === 'fora' ? ids[k] : [])));
+  for (const f of novas) if (objeto(f) && typeof f.id === 'string' && dosDeFora.has(f.id)) throw new ErroDeEsboco(`integrar: o detalhado traz "${f.id}" como forma da unidade "${unidade}", mas o mestre já tem esse id numa entrada que não é da unidade (${unidadesDeclaradas(esboco.opcoes[0].formas).get(f.id) ?? 'sem unidade declarada'}). Se for um cortador desta unidade, declare "unidade": "${unidade}" nele no mestre e no detalhado; se for uma forma de outra unidade, dê outro id no detalhado`);
   if (u.declarada) for (const f of novas) if (objeto(f) && f.arranja === undefined && f.unidade === undefined) f.unidade = unidade;
   const mestre = clone(bruto);
   const nova = [];

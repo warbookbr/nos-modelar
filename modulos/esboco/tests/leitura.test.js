@@ -95,10 +95,11 @@ describe('leitura padrão do --descrever', () => {
 });
 
 /* A leitura de cada fixture antiga, medida no commit anterior (a mesma de HASHES_DE_ANTES em parametros.test.js). */
+/* A leitura da moto mudou uma vez depois: a colisão passou a dizer o limite de penetração e a regra (atrito 44). */
 const HASHES_DA_LEITURA = {
   casa: 'e68fd21974357f10d9f8fadee134a98cbf9c37fbcf012e8f99eac5db344ca6fb',
   'mancal-eixo': 'cbce6f1a621214af6eb020cce47db0061249a074b2f0807f921429b2e861c73c',
-  moto: '17aa298d0c94802c01b68bb940eb5db7bf7206123645bf023bca0db1ab32da93',
+  moto: 'a10f1eafe13bfd127a830d0818751f0134f40d44f9a97ec5d8637c14c62c4f24',
   'teste-cubo': 'cf3236a889865881ec8624ac320befee8df359dd54b0a1e55e719a6b879f051d',
   'moto-relacoes': 'abaaa8aa07ee7f3b5a80e05ed71bf7cb5fc475445b53648cee85c2c46c5df492',
 };

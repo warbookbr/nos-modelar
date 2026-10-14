@@ -701,6 +701,7 @@ export const MOTIVO_DA_MESMA_UNIDADE = 'mesma unidade';
 const menorDimensao = (r) => Math.min(...[0, 1, 2].map((e) => r.max[e] - r.min[e]));
 
 const arred = (x) => Math.round(x * 10) / 10;
+const fino4 = (x) => Math.round(x * 10000) / 10000;
 const mmTxt = (x) => arred(x).toString().replace('.', ',');
 
 /* Contrato de declaração: `atravessa` e `livre` são exceções e exigem `motivo` de
@@ -1042,7 +1043,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
           achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(folga), detalhe: 'folga', sugestao: d.aproxima ? conserto.par(par[0], par[1], d.aproxima, folga, `o par devia encostar e há ${mmTxt(folga)} mm de folga`) : null });
         } else if (penetracao > penMax) {
           const d = detalharPar(pecas[a], pecas[b]);
-          achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(penetracao), detalhe: 'penetracao', sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao, `o par devia encostar e se penetra ${mmTxt(penetracao)} mm`) : null });
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(penetracao), exato_mm: fino4(penetracao), limite_mm: fino4(penMax), detalhe: 'penetracao', sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao, `o par devia encostar e se penetra ${mmTxt(penetracao)} mm`) : null });
         }
       } else if (tipo === 'atravessa') {
         const implicito = daUnidade.get(chave(rs[a].id, rs[b].id));
@@ -1065,7 +1066,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
           atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), max_mm: arred(lido.max), implicita: true, encaixe: true });
         } else {
           const d = detalharPar(pecas[a], pecas[b]);
-          achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao), ...(lido ? { naoEncaixe: lido.razao } : {}), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao + margem, `penetração de ${mmTxt(penetracao)} mm mais margem de ${mmTxt(margem)} mm`) : null });
+          achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao), exato_mm: fino4(penetracao), limite_mm: fino4(penMax), ...(lido ? { naoEncaixe: lido.razao } : {}), sugestao: d.separa ? conserto.par(par[0], par[1], d.separa, penetracao + margem, `penetração de ${mmTxt(penetracao)} mm mais margem de ${mmTxt(margem)} mm`) : null });
         }
       }
     }
@@ -1098,7 +1099,7 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
             }
           } else if (penetracao > penMax) {
             const encosta = declarada?.tipo === 'encosta';
-            achadosDaOpcao.push({ opcao: titulo, tipo: encosta ? 'par-nao-encosta' : 'colisao', pecas: par, mm: arred(penetracao), ...(encosta ? { detalhe: 'penetracao' } : {}), oculta: oculta.id, sugestao: sugerir(de(), penetracao + margem, `penetração de ${mmTxt(penetracao)} mm com ${oculta.id}, de outra unidade, mais margem de ${mmTxt(margem)} mm`) });
+            achadosDaOpcao.push({ opcao: titulo, tipo: encosta ? 'par-nao-encosta' : 'colisao', pecas: par, mm: arred(penetracao), exato_mm: fino4(penetracao), limite_mm: fino4(penMax), ...(encosta ? { detalhe: 'penetracao' } : {}), oculta: oculta.id, sugestao: sugerir(de(), penetracao + margem, `penetração de ${mmTxt(penetracao)} mm com ${oculta.id}, de outra unidade, mais margem de ${mmTxt(margem)} mm`) });
           }
         }
       }
@@ -1153,6 +1154,18 @@ export function verificarContato(bruto, { resolvidas: prontas, ocultas: prontasO
 
 const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido', 'ponta-livre': 'ponta livre', 'pontas-sem-coletor': 'pontas sem coletor', 'porta-fora': 'porta fora do contrato', 'sem-posicao': 'loft sem posição' };
 const mm = (x) => x.toFixed(1).replace('.', ',');
+/* A penetração medida e o limite em texto. Com uma casa decimal os dois podem sair iguais (45,03 mm contra o limite de 45 mm saem "45,0" e
+   "45,0", e o achado parece reprovar o que o limite aceita), então as casas crescem até a medida e o limite se distinguirem. */
+function medidaEContraLimite(medida, limite) {
+  for (let casas = 1; casas <= 4; casas++) if (medida.toFixed(casas) !== limite.toFixed(casas)) return [medida.toFixed(casas).replace('.', ','), limite.toFixed(casas).replace('.', ',')];
+  return [medida.toString().replace('.', ','), limite.toString().replace('.', ',')];
+}
+const REGRA_DA_PENETRACAO = 'contato.penetracao, a sobreposição máxima aceita entre peças sem junta que declare a travessia; acima dele o par é colisão';
+function penetraAcimaDoLimite(a) {
+  if (a.exato_mm === undefined || a.limite_mm === undefined) return `se penetram ${mm(a.mm)} mm`;
+  const [medida, limite] = medidaEContraLimite(a.exato_mm, a.limite_mm);
+  return `se penetram ${medida} mm, acima do limite de ${limite} mm (${REGRA_DA_PENETRACAO})`;
+}
 
 /* Linha legível de um achado. */
 export function descreverAchado(a) {
@@ -1164,14 +1177,14 @@ function textoDoAchado(a) {
   const p = a.pecas;
   const base = `[${a.opcao}] ${NOMES[a.tipo]}: `;
   if (a.tipo === 'sem-posicao') return `${base}${p[0]} não tem posição (sem centro, sobre, ponta, encaixa, alinha, encosta nem desloca) e vai para a origem, centrado pela caixa dos vértices; o centro das seções vale só como deslocamento relativo. Dê "centro" ou "encaixa" a ele`;
-  if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} se penetram ${mm(a.mm)} mm`;
+  if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} ${penetraAcimaDoLimite(a)}`;
   if (a.tipo === 'porta-fora') return `${base}${a.texto}`;
   if (a.tipo === 'ponta-livre') return `${base}${p[0]} tem a ponta ${a.ponta} em [${a.ponto.map(mmTxt).join(' ')}] sem encostar em nada (a forma mais próxima fica a ${mm(a.mm)} mm); encoste-a em outra forma ou declare "ponta": true${a.ponta === 'inicio' || a.ponta === 'fim' ? ` (ou "ponta": { "${a.ponta}": true })` : ''} se ela termina no ar de propósito`;
   if (a.tipo === 'pontas-sem-coletor') return `${base}${p.length} pontas (${p.join(', ')}) terminam no mesmo ponto [${a.ponto.map(mmTxt).join(' ')}] e nenhuma forma as une; ponha ali uma forma que as una (um coletor, com o atravessamento declarado) ou declare "ponta": true em uma delas se o encontro é de propósito`;
   if (a.tipo === 'atravessa-excedido') return `${base}${p[0]} e ${p[1]} se atravessam ${mm(a.mm)} mm, acima do máximo ${a.implicita ? `implícito (mesma unidade: a menor dimensão da menor das duas formas)` : 'declarado'} de ${mm(a.max)} mm${a.implicita ? `; se a travessia é intencional basta declarar "max" (sugestão: ${a.maxSugerido ?? Math.floor(a.mm) + 1}) em contato.juntas ou em contato.pares para este par, por exemplo { "a": "${p[0]}", "b": "${p[1]}", "tipo": "atravessa", "max": ${a.maxSugerido ?? Math.floor(a.mm) + 1} } (dentro da unidade não pede "motivo")` : ''}`;
   if (a.tipo === 'longe') return `${base}${p[0]} fica a ${mm(a.mm)} mm da peça mais próxima`;
   if (a.tipo === 'voando') return `${base}${p[0]} fora do grupo conectado${a.mm === null ? '' : `, a ${mm(a.mm)} mm dele`}`;
-  return `${base}${p[0]} e ${p[1]} deviam encostar, ${a.detalhe === 'penetracao' ? `mas se penetram ${mm(a.mm)} mm` : `mas há ${mm(a.mm)} mm de folga`}`;
+  return `${base}${p[0]} e ${p[1]} deviam encostar, ${a.detalhe === 'penetracao' ? `mas ${penetraAcimaDoLimite(a)}` : `mas há ${mm(a.mm)} mm de folga`}`;
 }
 
 /* Linha legível de um atravessamento declarado. */

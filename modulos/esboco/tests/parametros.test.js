@@ -358,10 +358,11 @@ describe('arranja', () => {
 });
 
 /* SVG, leitura em texto e contato de cada fixture, medidos no commit anterior a este recurso. */
+/* A leitura da moto mudou uma vez depois: a colisão passou a dizer o limite de penetração e a regra (atrito 44). */
 const HASHES_DE_ANTES = {
   casa: ['c960aa92f4718b6eca6e39a5f0126e59d3d863f8a26332269ab4307da8d9d6d0', 'e68fd21974357f10d9f8fadee134a98cbf9c37fbcf012e8f99eac5db344ca6fb', '861ae4da0195985f4f163e4d8aa4b4399c86421d48f7f33e4dc2116c5c59efaf'],
   'mancal-eixo': ['402b49db651a5b8afc7812b4395bf438cf9d7e1b9496a6942cfdfcb3cdad714c', 'cbce6f1a621214af6eb020cce47db0061249a074b2f0807f921429b2e861c73c', '861ae4da0195985f4f163e4d8aa4b4399c86421d48f7f33e4dc2116c5c59efaf'],
-  moto: ['ed68ae2b86427f13e45dbbac33fbef973737716382c7005639d1e49f4d9fde95', '17aa298d0c94802c01b68bb940eb5db7bf7206123645bf023bca0db1ab32da93', '08d7b0b0b123cb7477a5f5a28ae175b543612ff7c6b2f234941716f47ab8e99a'],
+  moto: ['ed68ae2b86427f13e45dbbac33fbef973737716382c7005639d1e49f4d9fde95', 'a10f1eafe13bfd127a830d0818751f0134f40d44f9a97ec5d8637c14c62c4f24', '08d7b0b0b123cb7477a5f5a28ae175b543612ff7c6b2f234941716f47ab8e99a'],
   'teste-cubo': ['499cb2e0eaf3b860553c37f83a7094276eb4176d2b3de8aa658b4839852f2f19', 'cf3236a889865881ec8624ac320befee8df359dd54b0a1e55e719a6b879f051d', '861ae4da0195985f4f163e4d8aa4b4399c86421d48f7f33e4dc2116c5c59efaf'],
   'moto-relacoes': ['f8ea0f86fc4fc948bdae1e92d667e0aa7320709b0b2afce07e2b2db4ee8e9f71', 'abaaa8aa07ee7f3b5a80e05ed71bf7cb5fc475445b53648cee85c2c46c5df492', 'cd17b2f3f6733e4c79c6eb20673061fa96fa0810063d1304d1bd7a711e889bcb'],
 };
@@ -373,7 +374,8 @@ describe('legado byte a byte', () => {
     expect(sha(desenharEsboco(j).svg)).toBe(svg);
     /* a fatia 6 acrescentou a `sugestao` aos achados de contato; o resto da leitura e do relato é o de antes */
     expect(sha(formatarDescricao(descreverEsboco(j)).replace(/; sugestão: .*$/gm, ''))).toBe(texto);
-    expect(sha(JSON.stringify(verificarContato(j), (k, v) => (k === 'sugestao' ? undefined : v)))).toBe(contato);
+    /* `exato_mm` e `limite_mm` do achado (atrito 44) são campos novos, e o resto do contato é o de antes */
+    expect(sha(JSON.stringify(verificarContato(j), (k, v) => (k === 'sugestao' || k === 'exato_mm' || k === 'limite_mm' ? undefined : v)))).toBe(contato);
   }, 60000);
 });
 

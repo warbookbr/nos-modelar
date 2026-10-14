@@ -111,8 +111,13 @@ A segunda rodada deixou 44 atritos em [`esboco-r2/ATRITOS.md`](esboco-r2/ATRITOS
 classificados aqui em 2026-10-13 pela mesma régua. O 27, a blocagem da forma de
 família cortada por molde e da roda de furo aberto, foi corrigido durante a
 rodada. O 10 e o 43, o cortador repetido na segunda integração, o 44, a mensagem de
-colisão sem o limite, e o 8 e o 14, as medidas da hélice e do escape, estão sendo
-corrigidos no fechamento do plano.
+colisão sem o limite, e o 14, a medida do recuo do escape, foram corrigidos no
+fechamento do plano. O 8 não procede: a cota da hélice na prancha é a altura
+desenhada de lado, e a medida do plano confere a mesma coisa. Ao corrigi-lo, um
+esbocista alargou a tolerância da medida para ela passar, o que o processo não
+pegou; o [agente](../../../../.claude/agents/esbocista.md) passou a proibir isso.
+Os 38 que seguem abertos vão ao [backlog](../../planos/BACKLOG.md), por decisão da
+pessoa em 2026-10-13, com a integração como o primeiro grupo a puxar.
 
 **Integração do detalhe com o mestre.** É o grupo que mais custou edição à mão do
 mestre. O `--integrar` descarta em silêncio o `subtrai` que o detalhe escreve em

@@ -78,8 +78,8 @@ describe('--curso: a varredura pela linha de comando', () => {
     expect(r.codigo).toBe(1);
     expect(r.texto).toContain('curso recolhe (o trem recolhendo para trás): angTrem de 0 a 90 em 5 passos, 6 posições');
     /* os passos de 18 graus: a roda alcança a parede em 54 (a 36 ainda há folga) e só entra no corpo em 90 */
-    expect(r.texto).toMatch(/parede e roda se penetram 6,2 mm\n\s+em angTrem 54 \(6,2 mm\), 72 \(27,7 mm\), 90 \(35 mm\); o pior, 35 mm em 90/);
-    expect(r.texto).toMatch(/corpo e roda se penetram 45,0 mm\n\s+em angTrem 90 \(45 mm\)\n/);
+    expect(r.texto).toMatch(/parede e roda se penetram 6,2 mm, acima do limite de [\d,]+ mm \([^)]*\)\n\s+em angTrem 54 \(6,2 mm\), 72 \(27,7 mm\), 90 \(35 mm\); o pior, 35 mm em 90/);
+    expect(r.texto).toMatch(/corpo e roda se penetram 45,0 mm, acima do limite de [\d,]+ mm \([^)]*\)\n\s+em angTrem 90 \(45 mm\)\n/);
     expect(r.texto).toContain('posições sem achado novo: 0, 18, 36');
   });
 
