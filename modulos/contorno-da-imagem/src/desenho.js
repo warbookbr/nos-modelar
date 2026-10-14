@@ -333,13 +333,21 @@ export async function folhasDasDivisas(recortes, sobreposicaoBuffer, { porFolha 
 }
 
 /* O roteiro que o crítico segue, com uma etapa por folha. `arquivos` traz o
-   caminho do alvo, do mapa de partes e de cada folha, na ordem das folhas. */
-export function roteiroDoCritico({ alvo, mapaDePartes: pintura, folhas }) {
+   caminho do alvo, do mapa de partes e de cada folha, na ordem das folhas.
+   `buracos` (`buracosFechados` da segmentação) diz ao crítico a regra dos
+   buracos pequenos: a ferramenta pinta de silhueta o buraco de fundo cercado
+   de até `maximo` px², e sem o aviso o crítico da empilhadeira de 2026-10-14
+   apontou nas três rodadas a fresta do pilar pintada com a cor do protetor,
+   que nenhuma semente devolve ao fundo. */
+export function roteiroDoCritico({ alvo, mapaDePartes: pintura, folhas, buracos = null }) {
+  const regraDosBuracos = buracos?.maximo > 0 && buracos.buracos > 0
+    ? ` Por regra da ferramenta, cada buraco de fundo cercado pela silhueta com até ${buracos.maximo} px² fica com a parte em volta, porque nesse tamanho ele é reflexo ou fresta, e não vão; nesta imagem foram ${buracos.buracos} buracos, ${buracos.pixels} px ao todo. Uma fresta pequena pintada com a cor da parte em volta não é defeito; um vão maior pintado é.`
+    : '';
   const linhas = [
     '# Roteiro da análise', '',
     'Siga as etapas na ordem e não pule nenhuma. Em cada etapa, abra os arquivos dela.', '',
     '## Etapa 1 — visão geral', '',
-    `Abra o alvo (${alvo}) e o mapa de partes (${pintura}). Confira se cada parte tem cor, se nenhuma região pega o fundo e se cada cor está na parte que o nome diz.`, '',
+    `Abra o alvo (${alvo}) e o mapa de partes (${pintura}). Confira se cada parte tem cor, se nenhuma região pega o fundo e se cada cor está na parte que o nome diz.${regraDosBuracos}`, '',
   ];
   folhas.forEach(({ arquivo, pares }, i) => {
     linhas.push(`## Etapa ${i + 2} — divisas, folha ${i + 1} de ${folhas.length}`, '',

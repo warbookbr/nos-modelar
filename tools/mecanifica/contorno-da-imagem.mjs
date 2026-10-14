@@ -177,7 +177,7 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
     writeFileSync(arquivo, f.png);
     return { arquivo, pares: f.pares };
   });
-  writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, mapaDePartes: join(pasta, 'mapa-de-partes.png'), folhas }));
+  writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, mapaDePartes: join(pasta, 'mapa-de-partes.png'), folhas, buracos: segmentacao.buracosFechados }));
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
   const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, semDonoAnexadosPx: segmentacao.semDonoAnexados, mascaraSuavizada: segmentacao.mascaraSuavizada, buracosFechados: segmentacao.buracosFechados, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };

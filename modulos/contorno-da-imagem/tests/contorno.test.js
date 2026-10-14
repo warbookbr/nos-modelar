@@ -202,6 +202,10 @@ describe('folhas das divisas e roteiro', () => {
     expect(roteiro).toMatch(/Etapa 1 — visão geral/);
     expect(roteiro).toMatch(/Etapa 3 — divisas, folha 2 de 2/);
     expect(roteiro).toMatch(/Etapa 4 — fechamento/);
+    expect(roteiro).not.toMatch(/buraco de fundo/);
+    const comBuracos = roteiroDoCritico({ alvo: 'a.png', mapaDePartes: 's.png', folhas: [], buracos: { buracos: 3, pixels: 41, maximo: 64 } });
+    expect(comBuracos).toMatch(/cada buraco de fundo cercado pela silhueta com até 64 px² fica com a parte em volta[^\n]*foram 3 buracos, 41 px ao todo\. Uma fresta pequena pintada com a cor da parte em volta não é defeito/);
+    expect(roteiroDoCritico({ alvo: 'a.png', mapaDePartes: 's.png', folhas: [], buracos: { buracos: 3, pixels: 41, maximo: 0 } })).not.toMatch(/buraco de fundo/);
   });
 });
 
@@ -250,7 +254,7 @@ describe('buraco de reflexo cercado pela silhueta', () => {
   it('sem fechar, o reflexo fica fora da silhueta, como o atrito do avião (o defeito reproduzido)', async () => {
     const seg = await segmentar(png, { ...config, buracoMaximo: 0 });
     expect(pixels(reflexo).every((p) => seg.silhueta[p] === 0)).toBe(true);
-    expect(seg.buracosFechados).toEqual({ buracos: 0, pixels: 0 });
+    expect(seg.buracosFechados).toEqual({ buracos: 0, pixels: 0, maximo: 0 });
   });
 
   it('fecha o reflexo, dá dono a cada pixel dele e deixa a janela vazada como fundo', async () => {
@@ -259,7 +263,7 @@ describe('buraco de reflexo cercado pela silhueta', () => {
     expect(pixels(reflexo).every((p) => seg.silhueta[p] === 255)).toBe(true);
     expect(pixels(reflexo).every((p) => seg.rotulos[p] === seg.regioes.esquerda.rotulo)).toBe(true);
     expect(pixels(janela).every((p) => seg.silhueta[p] === 0)).toBe(true);
-    expect(seg.buracosFechados).toEqual({ buracos: 1, pixels: 38 });
+    expect(seg.buracosFechados).toEqual({ buracos: 1, pixels: 38, maximo: 64 });
     /* O que sobra sem dono são os cantos do corpo, que o fechamento não toca. */
     expect(seg.semDono).toBe((await segmentar(png, { ...config, buracoMaximo: 0 })).semDono);
     /* A janela continua furo: a pintura não a cobre. */

@@ -147,7 +147,10 @@ mostra a divisa. O roteiro existe porque o crítico só lê arquivo e não
 lista pasta: na lateral do braço ele abriu 2 e depois 9 de 19 recortes
 soltos, e numa folha única de 19 o zoom caía à metade. Foi num recorte
 ampliado que apareceu o defeito que três críticos olhando a imagem inteira
-não viram. Nunca mande as sementes nem o que mudou.
+não viram. Nunca mande as sementes nem o que mudou. Quando a ferramenta
+fecha buracos pequenos (`buracoMaximo`), o roteiro diz ao crítico a regra e
+quantos foram, porque sem isso ele aponta como defeito a fresta pintada com a
+cor da parte em volta, que nenhuma semente devolve ao fundo.
 
 **Registre** o veredito sem editar:
 

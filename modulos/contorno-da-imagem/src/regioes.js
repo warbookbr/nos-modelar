@@ -387,7 +387,7 @@ export async function segmentar(pngBuffer, {
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;
-    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono, semDonoAnexados: anexados, mascaraSuavizada: suavizada, buracosFechados: { buracos: fechados.buracos, pixels: fechados.pixels }, tracado, fundoTom, formas: formasDeclaradas };
+    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono, semDonoAnexados: anexados, mascaraSuavizada: suavizada, buracosFechados: { buracos: fechados.buracos, pixels: fechados.pixels, maximo: buracoMaximo }, tracado, fundoTom, formas: formasDeclaradas };
   } finally {
     mats.forEach((m) => m.delete());
   }
