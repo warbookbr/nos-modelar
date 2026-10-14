@@ -1,37 +1,51 @@
 {
   "formato": "mecanifica.familia-de-desenho@1",
   "id": "carcaca-empilhadeira",
-  "versao": "1.0.0",
-  "descricao": "vista lateral da carcaça de uma empilhadeira a combustão de 1,5 a 3,5 t, sem rodas, torre, garfos, assento nem volante; ajustada a uma referência só",
+  "versao": "2.0.0",
+  "descricao": "vista lateral da carcaça de uma empilhadeira a combustão de 1,5 a 3,5 t, sem rodas, torre, garfos, assento nem volante; ajustada a duas referências, uma foto de cada empilhadeira",
   "catalogo": "pecas.json",
   "parametros": {
-    "comprimento": { "unidade": "mm", "padrao": 2150, "minimo": 2020, "medio": 2150, "maximo": 2320, "descricao": "da ponta do paralama à traseira, onde acabam o capô, o contrapeso e a tampa" },
-    "altura": { "unidade": "mm", "padrao": 852.6, "minimo": 842, "medio": 852.6, "maximo": 866, "descricao": "altura total, no topo da frente da tampa" },
-    "avanco": { "unidade": "mm", "padrao": 204, "minimo": 185, "medio": 204, "maximo": 225, "descricao": "avanço do paralama além da face da frente" },
-    "arcoD": { "unidade": "mm", "padrao": 316.5, "minimo": 295, "medio": 316.5, "maximo": 340, "descricao": "altura do topo do arco dianteiro recortado" },
-    "vaoD": { "unidade": "mm", "padrao": 226.1, "minimo": 205, "medio": 226.1, "maximo": 245, "descricao": "vão do arco dianteiro a partir da face; o raio do canto é 14,8 mm menor" },
-    "aro": { "unidade": "mm", "padrao": 346, "minimo": 325, "medio": 346, "maximo": 370, "descricao": "raio de dentro do aro sobre a roda dianteira" },
-    "arcoT": { "unidade": "mm", "padrao": 1661.4, "minimo": 1530, "medio": 1661.4, "maximo": 1780, "descricao": "posição do centro do arco traseiro, a partir da ponta do paralama" },
-    "raioT": { "unidade": "mm", "padrao": 231.6, "minimo": 210, "medio": 231.6, "maximo": 255, "descricao": "raio do arco traseiro; a base do capô fica 152,4 mm acima dele" },
-    "posto": { "unidade": "mm", "padrao": 241, "minimo": 225, "medio": 241, "maximo": 260, "descricao": "altura do chão do posto, entre o aro e o pé da rampa" },
+    "comprimento": { "unidade": "mm", "padrao": 2300, "minimo": 2020, "medio": 2300, "maximo": 2550, "descricao": "da ponta do paralama à traseira, onde acabam o capô, o contrapeso e a tampa" },
+    "face": { "unidade": "mm", "padrao": 545, "minimo": 450, "medio": 545, "maximo": 650, "descricao": "altura da face da frente, onde o paralama se apoia e o aro começa" },
+    "avanco": { "unidade": "mm", "padrao": 228.6, "minimo": 60, "medio": 228.6, "maximo": 280, "descricao": "avanço do paralama além da face da frente" },
+    "arcoD": { "unidade": "mm", "padrao": 403, "minimo": 295, "medio": 403, "maximo": 520, "descricao": "altura do topo do arco dianteiro recortado" },
+    "vaoD": { "unidade": "mm", "padrao": 262.6, "minimo": 205, "medio": 262.6, "maximo": 340, "descricao": "vão do arco dianteiro a partir da face; o raio do canto é 14,8 mm menor" },
+    "aro": { "unidade": "mm", "padrao": 346.8, "minimo": 285, "medio": 346.8, "maximo": 400, "descricao": "raio de dentro do aro sobre a roda dianteira" },
+    "raioT": { "unidade": "mm", "padrao": 250, "minimo": 210, "medio": 250, "maximo": 285, "descricao": "raio do arco traseiro; a base do capô fica 152,4 mm acima dele" },
+    "balanco": { "unidade": "mm", "padrao": 241, "minimo": 200, "medio": 241, "maximo": 300, "descricao": "balanço traseiro: da traseira do arco traseiro à traseira da carcaça" },
+    "posto": { "unidade": "mm", "padrao": 236, "minimo": 200, "medio": 236, "maximo": 350, "descricao": "altura do chão do posto, entre o aro e o pé da rampa" },
     "rampa": { "unidade": "graus", "padrao": 34.35, "minimo": 31, "medio": 34.35, "maximo": 38, "descricao": "inclinação do trecho baixo da rampa; o trecho alto tem 5,15 graus a mais" },
-    "topo": { "unidade": "mm", "padrao": 650, "minimo": 620, "medio": 650, "maximo": 680, "descricao": "altura do topo da lateral, no alto da rampa" },
-    "capo": { "unidade": "mm", "padrao": 821.6, "minimo": 808, "medio": 821.6, "maximo": 834, "descricao": "altura do topo do capô" },
-    "piso": { "unidade": "mm", "padrao": 475, "minimo": 450, "medio": 475, "maximo": 500, "descricao": "nível do piso; o encosto assenta 8 mm abaixo e a rampa quebra 50,9 mm abaixo" },
-    "encosto": { "unidade": "mm", "padrao": 706.6, "minimo": 680, "medio": 706.6, "maximo": 735, "descricao": "altura da frente do encosto" },
-    "painel": { "unidade": "mm", "padrao": 841.2, "minimo": 830, "medio": 841.2, "maximo": 852, "descricao": "altura do topo do painel, entre o encosto e a tampa" }
+    "topo": { "unidade": "mm", "padrao": 621.3, "minimo": 540, "medio": 621.3, "maximo": 760, "descricao": "altura do topo da lateral, no alto da rampa" },
+    "piso": { "unidade": "mm", "padrao": 528, "minimo": 450, "medio": 528, "maximo": 620, "descricao": "nível do piso; o encosto assenta 8 mm abaixo e a rampa quebra 50,9 mm abaixo" },
+    "encosto": { "unidade": "mm", "padrao": 766.2, "minimo": 680, "medio": 766.2, "maximo": 870, "descricao": "altura da frente do encosto" },
+    "subidaDoPainel": { "unidade": "mm", "padrao": 148.1, "minimo": 125, "medio": 148.1, "maximo": 168, "descricao": "topo do painel acima do topo da frente do encosto" },
+    "quedaDoCapo": { "unidade": "mm", "padrao": 9.9, "minimo": 0, "medio": 9.9, "maximo": 23, "descricao": "topo do capô abaixo do topo do painel" },
+    "folgaDaTampa": { "unidade": "mm", "padrao": 6.5, "minimo": 1, "medio": 6.5, "maximo": 16, "descricao": "topo da frente da tampa acima do topo do painel" }
   },
   "restricoes": [
-    { "id": "capo-abaixo-do-painel", "expressao": "capo < painel - 5", "motivo": "o painel fica acima do capô; o raio do canto de trás do painel acompanha a folga entre os dois e deixa de existir quando o capô passa do painel" },
-    { "id": "painel-perto-do-encosto", "expressao": "painel <= encosto + 162", "motivo": "o painel sobe do alto do encosto a 28 graus, e o topo reto dele tem de comportar o canto de 70 mm e o do painel; com o painel mais de 162 mm acima do encosto o canto não cabe na aresta (o limite medido é 162,75 mm, com o capô em 808 e o painel em 852)" },
-    { "id": "painel-abaixo-da-tampa", "expressao": "painel < altura", "motivo": "a tampa fica visível acima do painel" }
+    { "id": "arco-cabe-no-recorte", "expressao": "vaoD + 20 <= arcoD", "motivo": "a perna do recorte do arco dianteiro mede arcoD - 24 mm e comporta o canto de cima, de raio vaoD - 14,8 mm, e o do pé, de 10 mm; o limite medido é arcoD = vaoD + 19,2 mm" },
+    { "id": "vao-dentro-do-aro", "expressao": "vaoD <= aro - 2", "motivo": "o canto de cima do recorte do arco dianteiro (raio vaoD - 14,8 mm) tem de ficar dentro do arco do aro (raio aro, partindo da mesma face), e quando o recorte chega perto do topo da face os dois se cruzam; o limite medido é vaoD = aro - 0,45 com o topo do recorte 10 mm abaixo do topo da face, aro + 0,6 com 20 mm e aro + 6,9 com 70 mm" },
+    { "id": "encosto-acima-do-piso", "expressao": "piso + 125 <= encosto", "motivo": "o encosto assenta 8 mm abaixo do piso e sobe a prumo até 96,4 mm abaixo da frente dele; a perna a prumo tem de comportar o canto de 12 mm do pé e o de 60 mm do chanfro, e o limite medido é 119,8 mm de encosto acima do piso" },
+    { "id": "topo-perto-do-encosto", "expressao": "topo <= encosto + 5", "motivo": "o alto do encosto fica de 46,9 a 84,9 mm acima da frente dele conforme o comprimento e desce até as costas, 17,7 mm acima do topo da lateral; descendo menos de 22,5 mm, o canto de 4 mm do alto e o de 50 mm não cabem na aresta de 29,25 mm do alto, e descendo menos ainda o encosto se cruza (o limite medido é o topo 24,4 mm acima da frente do encosto no padrão e 5,1 mm no pior caso da faixa)" },
+    { "id": "base-do-encosto-na-rampa", "expressao": "avanco + 636 + (topo - piso + 8)/tan(rampa + 5.15) <= comprimento - 2*raioT - balanco - 77.65", "motivo": "a base do encosto, 8 mm abaixo do piso, chega à rampa a (topo - piso + 8)/tan(rampa + 5.15) mm antes do alto dela (comprimento - 2*raioT - balanco - 77,65), e a frente do encosto fica 623 mm depois da face; a aresta entre as duas, de nível, tem de comportar o canto de 12 mm do pé do encosto, e o limite medido é 12 mm" },
+    { "id": "arco-abaixo-da-face", "expressao": "arcoD + 12 <= face", "motivo": "o topo do recorte do arco dianteiro fica abaixo do topo da face da frente por uma faixa que o arco do aro cruza quando ela é fina; o limite medido é 9,1 mm com o vão 1 mm menor que o aro, 8,0 mm com 2 mm e 6,1 mm com 5 mm, e 1,2 mm com o vão bem menor" },
+    { "id": "face-perto-do-piso", "expressao": "face <= piso + 140", "motivo": "o limite medido é a face 145,1 mm acima do piso; acima dele o anteparo do piso, que sobe a 77 graus do topo do aro, 22 mm acima da face, e o resolvedor não converge" },
+    { "id": "rampa-depois-do-aro", "expressao": "avanco + aro + 7 + 100*tan(rampa/2) <= comprimento - 2*raioT - balanco + 170.2 - 247.85 - (piso - 50.9 - posto)/tan(rampa) - (topo - piso + 50.9)/tan(rampa + 5.15)", "motivo": "o chão do posto corre do fim do aro, a avanco + aro + 6 mm da ponta do paralama, até o pé da rampa, e o canto de 100 mm do pé gasta 100*tan(rampa/2) mm dessa aresta; o pé da rampa é o alto dela (arcoT - raioT + 170,2 - 247,85) menos o avanço dos dois trechos, e com o comprimento curto e a rampa longa o pé passa do aro e a aresta não comporta o canto" },
+    { "id": "piso-abaixo-do-topo", "expressao": "piso <= topo + 1.5", "motivo": "a base do encosto, 8 mm abaixo do piso, chega à rampa abaixo das costas dele, 6,04 mm abaixo do topo da lateral; com o topo mais de 1,96 mm abaixo do piso as duas se invertem e o encosto se cruza" }
   ],
   "perfis": {
     "referencia": {
-      "descricao": "a carcaça do contorno da referência (docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/referencias/carcaca_lateral.contornos.json)",
+      "descricao": "a carcaça do contorno da primeira referência (docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/referencias/carcaca_lateral.contornos.json)",
       "parametros": {
-        "comprimento": 2150, "altura": 852.6, "avanco": 204, "arcoD": 316.5, "vaoD": 226.1, "aro": 346, "arcoT": 1661.4, "raioT": 231.6,
-        "posto": 241, "rampa": 34.35, "topo": 650, "capo": 821.6, "piso": 475, "encosto": 706.6, "painel": 841.2
+        "comprimento": 2150, "face": 500, "avanco": 204, "arcoD": 316.5, "vaoD": 226.1, "aro": 346, "raioT": 231.6, "balanco": 257,
+        "posto": 241, "rampa": 34.35, "topo": 650, "piso": 475, "encosto": 706.6, "subidaDoPainel": 134.6, "quedaDoCapo": 19.6, "folgaDaTampa": 11.4
+      }
+    },
+    "empilhadeira-2026-10-14": {
+      "descricao": "a carcaça do contorno da segunda referência (docs/mecanifica/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.contornos.json), com os valores do ajuste dentro das faixas partindo do comprimento medido nesse contorno, 2450 mm",
+      "parametros": {
+        "comprimento": 2450, "face": 590, "avanco": 253.2, "arcoD": 489.5, "vaoD": 299.1, "aro": 347.5, "raioT": 268.47, "balanco": 225,
+        "posto": 230.9, "rampa": 34.35, "topo": 592.5, "piso": 581, "encosto": 825.8, "subidaDoPainel": 161.53, "quedaDoCapo": 0.22, "folgaDaTampa": 1.64
       }
     }
   },
@@ -41,15 +55,20 @@
     "vista": "lateral",
     "olhando": "do lado direito, frente à esquerda, sem rodas, torre, garfos, assento nem volante",
     "parametros": {
+      "arcoT": "=comprimento-raioT-balanco",
+      "painel": "=encosto+subidaDoPainel",
+      "capo": "=painel-quedaDoCapo",
+      "altura": "=painel+folgaDaTampa",
       "pe": 24,
-      "face": 500,
       "raioD": "=vaoD-14.8",
       "centroT": 129.8,
       "saidaDoLateral": 170.2,
       "topoDoLateral": 247.85,
       "baseCapo": "=raioT+152.4",
       "quebraDaRampa": 50.9,
-      "raioDoPainel": "=20*(painel-capo+3.54)/23.14",
+      "arestaDoPainel": "=quedaDoCapo+(111.7-(capo-topo+20)/tan(81.79))*tan(2.41)",
+      "retoDoPainel": "=228.535-(subidaDoPainel-56.292-tan(2.18)*(topoDaRampa-avanco-752.25))/tan(28.34)",
+      "raioDoPainel": "=min(20*arestaDoPainel/23.138, retoDoPainel-19)",
       "topoDaRampa": "=arcoT-raioT+saidaDoLateral-topoDoLateral",
       "peDaRampa": "=topoDaRampa-(piso-quebraDaRampa-posto)/tan(rampa)-(topo-piso+quebraDaRampa)/tan(rampa+5.15)",
       "frenteDoCapo": "=arcoT-raioT+136.5"
