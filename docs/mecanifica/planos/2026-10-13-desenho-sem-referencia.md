@@ -114,7 +114,10 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
    sintéticas. O [resultado](../banco-de-provas/desenho-braco-2026-10-14/RESULTADO.md) do
    braço deu empate entre restrições e coordenadas. A pessoa escolheu uma segunda prova com a
    lateral da carcaça da empilhadeira, com esta
-   [descrição](../banco-de-provas/desenho-carcaca-2026-10-14/DESCRICAO.md).
+   [descrição](../banco-de-provas/desenho-carcaca-2026-10-14/DESCRICAO.md). O
+   [resultado](../banco-de-provas/desenho-carcaca-2026-10-14/RESULTADO.md) da
+   carcaça repetiu o empate, e nas duas provas o que limitou o acerto foi a
+   descrição.
 3. **Decisão.** A pessoa decide se o módulo segue, muda ou para.
 
 ## Riscos e parada
