@@ -2,14 +2,16 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [o desenho sem referência](2026-10-13-desenho-sem-referencia.md).
+
+O plano faz a IA desenhar as vistas de um objeto a partir de uma descrição, sem
+imagem, com as partes e as relações declaradas e um resolvedor de restrições dando
+a geometria, num formato que a prancha cota e o crítico julga.
 
 [O que o avião pede](encerrados/2026-10-11-o-que-o-aviao-pede.md) fechou em
 2026-10-13, com o avião modelado duas vezes e aprovado pela pessoa, a família de
 superfície aerodinâmica, o recorte de uma forma por outra, o curso de mecanismo e a
-superfície suave por seções. O sucessor, o [desenho sem
-referência](2026-10-13-desenho-sem-referencia.md), está em rascunho, com os
-candidatos de sucessão no fim dele.
+superfície suave por seções. Os candidatos de sucessão estão no fim do plano ativo.
 Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).

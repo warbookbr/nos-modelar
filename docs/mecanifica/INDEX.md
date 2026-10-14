@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Não há plano ativo. [O que o avião pede](planos/encerrados/2026-10-11-o-que-o-aviao-pede.md) fechou em 2026-10-13, com o avião modelado duas vezes e aprovado, a família de superfície aerodinâmica, o recorte, o curso de mecanismo e a superfície suave. O sucessor, o [desenho sem referência](planos/2026-10-13-desenho-sem-referencia.md), está em rascunho.
+- O plano ativo é o [desenho sem referência](planos/2026-10-13-desenho-sem-referencia.md): a IA desenha as vistas de um objeto descrito em texto, sem imagem, com um resolvedor de restrições dando a geometria. O anterior, [o que o avião pede](planos/encerrados/2026-10-11-o-que-o-aviao-pede.md), fechou em 2026-10-13, com o avião modelado duas vezes e aprovado, a família de superfície aerodinâmica, o recorte, o curso de mecanismo e a superfície suave.
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
