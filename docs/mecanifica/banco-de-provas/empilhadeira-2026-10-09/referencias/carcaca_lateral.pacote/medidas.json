@@ -4,6 +4,7 @@
   "capo": 1,
   "contrapeso": 1,
   "encosto": 1,
+  "entalhe": 1,
   "lateral": 1,
   "longarina": 1,
   "painel": 1,
@@ -15,10 +16,10 @@
  "minimo": 0.8,
  "abaixo": [],
  "semDonoPx": 0,
- "semDonoAnexadosPx": 3715,
+ "semDonoAnexadosPx": 3669,
  "mascaraSuavizada": {
-  "tirados": 7,
-  "postos": 17
+  "tirados": 14,
+  "postos": 23
  },
  "buracosFechados": {
   "buracos": 3,
@@ -26,10 +27,40 @@
  },
  "divisas": [
   {
+   "a": "entalhe",
+   "b": "tampa",
+   "caixa": [
+    912,
+    398,
+    951,
+    437
+   ]
+  },
+  {
+   "a": "entalhe",
+   "b": "painel",
+   "caixa": [
+    905,
+    400,
+    944,
+    439
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "entalhe",
+   "caixa": [
+    908,
+    404,
+    947,
+    443
+   ]
+  },
+  {
    "a": "capo",
    "b": "tampa",
    "caixa": [
-    918,
+    917,
     411,
     1091,
     500
@@ -40,8 +71,8 @@
    "b": "painel",
    "caixa": [
     858,
-    413,
-    937,
+    412,
+    938,
     514
    ]
   },
@@ -79,10 +110,10 @@
    "a": "encosto",
    "b": "lateral",
    "caixa": [
-    666,
+    655,
     497,
     779,
-    594
+    600
    ]
   },
   {
@@ -91,8 +122,8 @@
    "caixa": [
     234,
     550,
-    421,
-    736
+    418,
+    703
    ]
   },
   {
@@ -122,7 +153,7 @@
     234,
     560,
     420,
-    736
+    734
    ]
   },
   {
@@ -140,19 +171,19 @@
    "b": "piso",
    "caixa": [
     522,
-    565,
-    690,
-    604
+    566,
+    679,
+    605
    ]
   },
   {
    "a": "lateral",
    "b": "piso",
    "caixa": [
-    394,
-    570,
-    691,
-    779
+    393,
+    576,
+    684,
+    706
    ]
   },
   {
