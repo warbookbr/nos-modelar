@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1203 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1208 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -548,6 +548,11 @@
 ## modulos/desenho-por-restricoes/tests/
 
 - `carrinho.js` — carrinho.js — a lateral de um carrinho de mão, a descrição que os testes do desenho por restrições usam: 17 relações que fecham o desenho sem grau de liberda…
+- `carrinho.test.js` — carrinho.test.js — o carrinho de mão resolve nos valores em que quatro resolvedores concordaram, os quatro cenários (completo, conflito, faltando, redundante…
+- `contornos.test.js` — contornos.test.js — a saída é o formato dos contornos da imagem com `origem`, a mesma descrição dá o mesmo arquivo byte a byte, a parte escondida fica com o …
+- `formas.js` — formas.js — objetos sintéticos pequenos para os testes do desenho por restrições: uma chapa com furo e trava (polígono, círculo, barra e as relações paralela…
+- `formas.test.js` — formas.test.js — as outras relações e partes do formato (arco, círculo, barra, polígono, paralela, perpendicular, igual, ângulo, sobre um círculo e tangência…
+- `formato.test.js` — formato.test.js — a validação do `mecanifica.desenho@1` recusa cada erro dizendo o nome do que está errado e como corrigir, e aceita o carrinho.
 
 ## modulos/esboco/
 
