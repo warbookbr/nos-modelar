@@ -86,7 +86,15 @@ só a saída para a pessoa e o crítico.
 3. **Contrato.** O formato da peça e da família de desenho, com parâmetros,
    faixas e a ligação ao formato do módulo, escrito a partir dos dois ajustes.
 4. **Famílias.** As famílias da carcaça e do braço, com a faixa de cada parâmetro
-   e a prova nos extremos, um agente para cada, em paralelo.
+   e a prova nos extremos, um agente para cada, em paralelo. Feitas em 2026-10-14, em
+   [`procedural/familias-de-desenho/`](../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md):
+   a carcaça com 15 parâmetros, três peças e 33 conjuntos provados, o perfil de
+   referência em 0,9941; o [braço](../../../procedural/familias-de-desenho/braco-colaborativo/README.md)
+   com 9 parâmetros, quatro peças e 21 conjuntos, em 0,9540. O crítico, olhando o
+   mínimo, o médio e o máximo contra a referência, deu 9 à carcaça (faltam uma linha
+   fina na base da lateral e o fim da linha do aro) e 8 ao braço (o elo da coluna
+   mais estreito que na imagem e a caixa lateral sem descer ao pé), sem defeito
+   estrutural, com os extremos plausíveis.
 5. **Prova.** Um objeto desenhado a partir de família, medido contra a referência.
 
 A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em
