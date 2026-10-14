@@ -2,7 +2,7 @@
    grava nos estados que não resolvem, recusa a descrição inválida com o que corrigir, e o arquivo que ela grava é lido sem mudança
    pelo esboço e pela prancha dos contornos, que passa a dizer de onde o desenho veio. */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -11,6 +11,7 @@ import { desenhar } from '../../modulos/desenho-por-restricoes/src/index.js';
 import { larguraDoTexto } from '../../modulos/desenho-por-restricoes/src/traco.js';
 import { carrinho, carrinhoEmConflito, carrinhoFaltando, chuteEspelhado } from '../../modulos/desenho-por-restricoes/tests/carrinho.js';
 import { chapa, placaArredondada } from '../../modulos/desenho-por-restricoes/tests/formas.js';
+import { anelCoaxial, arcoDeRodaComAro, carcacaSintetica, familiaSintetica } from '../../modulos/desenho-por-restricoes/tests/pecas.js';
 import { conferirReferenciaNaOpcao, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { formatarMedidasDaReferencia, lerContornos, medidasDaReferencia } from '../../modulos/esboco/src/referencia.js';
@@ -180,8 +181,10 @@ describe('npm run desenho: entrada errada', () => {
   it('--ajuda explica o formato e os comandos, e sem argumento sai com 2 mostrando a ajuda', async () => {
     const ajuda = await rodar(['--ajuda']);
     expect(ajuda.codigo).toBe(0);
-    expect(ajuda.out).toMatch(/mecanifica\.desenho@2/);
+    expect(ajuda.out).toMatch(/mecanifica\.desenho@3/);
     expect(ajuda.out).toMatch(/npm run desenho -- razao/);
+    expect(ajuda.out).toMatch(/npm run desenho -- familia <f\.familia-de-desenho\.json> --provar/);
+    expect(ajuda.out).toMatch(/--partes/);
     const sem = await rodar([]);
     expect(sem.codigo).toBe(2);
     expect(sem.err).toMatch(/COMANDOS/);
@@ -372,4 +375,187 @@ describe('o contorno do desenho é lido sem mudança pela prancha dos contornos,
     expect(spec.subtitulo).toMatch(/pelo watershed com sementes/);
     expect(spec.titulo).toBe('Prancha lateral pelos contornos da imagem');
   });
+});
+
+describe('npm run desenho -- razao --partes', () => {
+  const dois = async () => {
+    const dir = pasta();
+    expect((await rodar([escrever(dir, 'lateral.desenho.json', carrinho())])).codigo).toBe(0);
+    const outro = carrinho();
+    outro.relacoes.find((r) => r.nome === 'comprimento do fundo').mm = 600;
+    const sub = join(dir, 'outro');
+    mkdirSync(sub);
+    expect((await rodar([escrever(sub, 'lateral.desenho.json', outro)])).codigo).toBe(0);
+    return { a: join(dir, 'lateral.contornos.json'), b: join(sub, 'lateral.contornos.json') };
+  };
+
+  it('depois da razão geral, a razão de cada região que os dois contornos têm pelo nome, da pior para a melhor', async () => {
+    const { a, b } = await dois();
+    const r = await rodar(['razao', a, b, '--partes']);
+    expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/^razão interseção\/união, união das regiões de lateral\.contornos\.json/);
+    expect(r.out).toMatch(/por região, da pior para a melhor \(cada região medida sozinha, como --parte-a=<nome> --parte-b=<nome>\):\n {2}região +sem alinhar +melhor translação +deslocamento\n/);
+    const linhas = r.out.split('\n').filter((l) => /^ {2}(braco|cacamba|pe|roda) /.test(l));
+    expect(linhas).toHaveLength(4);
+    const numeros = linhas.map((l) => Number(l.trim().split(/\s+/)[1].replace(',', '.')));
+    expect(numeros).toEqual([...numeros].sort((x, y) => x - y));
+    expect(linhas.find((l) => l.startsWith('  roda'))).toMatch(/1,0000 +1,0000/);
+    expect(linhas.find((l) => l.startsWith('  cacamba'))).not.toMatch(/ 1,0000 /);
+  }, 120_000);
+
+  it('--json acrescenta porParte à razão geral, e --partes não combina com --parte-a', async () => {
+    const { a, b } = await dois();
+    const json = JSON.parse((await rodar(['razao', a, b, '--partes', '--json'])).out);
+    expect(json.medida).toBe('regioes');
+    expect(json.porParte.partes.map((p) => p.nome).sort()).toEqual(['braco', 'cacamba', 'pe', 'roda']);
+    expect(json.porParte.soEmA).toEqual([]);
+    const junto = await rodar(['razao', a, b, '--partes', '--parte-a=roda']);
+    expect(junto.codigo).toBe(2);
+    expect(junto.err).toMatch(/--partes mede todas as regiões .* não combina com --parte-a nem --parte-b/);
+  }, 120_000);
+});
+
+describe('npm run desenho -- familia', () => {
+  const comArquivo = (familia = familiaSintetica()) => { const dir = pasta(); return { dir, arquivo: escrever(dir, 'carcaca.familia-de-desenho.json', familia) }; };
+
+  it('--provar resolve a família nos extremos e no médio, lista cada conjunto de valores e sai com 0', async () => {
+    const { arquivo } = comArquivo();
+    const r = await rodar(['familia', arquivo, '--provar']);
+    expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/^família "carcaca-sintetica" 1\.0\.0: 28 conjuntos de valores/);
+    expect(r.out).toMatch(/\n {2}ok {5}padrão +vista 2200 x 1100 mm\n/);
+    expect(r.out).toMatch(/\n {2}ok {5}todos no máximo +vista 2600 x 1500 mm\n/);
+    expect(r.out).toMatch(/\n {2}ok {5}perfil larga +vista 2600 x 1100 mm\n/);
+    expect(r.out).toMatch(/28 de 28 resolvem, com zero grau de liberdade, sem conflito, sem lado trocado, sem polígono cruzado e sem parte escondida\.\n$/);
+    expect(r.out).not.toMatch(/FALHOU/);
+  }, 120_000);
+
+  it('--provar de uma família que quebra num extremo sai com 4 e diz o conjunto, os valores que mudam e o motivo', async () => {
+    const f = familiaSintetica();
+    f.parametros.raioDoArco.maximo = 480;
+    const { arquivo } = comArquivo(f);
+    const r = await rodar(['familia', arquivo, '--provar']);
+    expect(r.codigo).toBe(4);
+    expect(r.out).toMatch(/\n {2}FALHOU todos no máximo/);
+    expect(r.out).toMatch(/\n {9}valores: .*raioDoArco = 480 mm/);
+    expect(r.out).toMatch(/\n {9}recusado: .*o raio de canto não cabe entre/);
+    expect(r.out).toMatch(/\n {2}ok {5}padrão/);
+    expect(r.out).toMatch(/2 de 28 falharam: todos no máximo; raioDoArco no máximo\./);
+    const json = JSON.parse((await rodar(['familia', arquivo, '--provar', '--json'])).out);
+    expect(json.ok).toBe(false);
+    expect(json.casos.filter((c) => !c.ok).map((c) => c.rotulo)).toEqual(['todos no máximo', 'raioDoArco no máximo']);
+    expect(json.casos[0]).toMatchObject({ rotulo: 'padrão', ok: true, estado: 'resolvido' });
+  }, 120_000);
+
+  it('sem --grava desenha para os valores dados e imprime o relatório, sem escrever nada: o padrão, o perfil e --valores por cima', async () => {
+    const { dir, arquivo } = comArquivo();
+    const padrao = await rodar(['familia', arquivo]);
+    expect(padrao.codigo).toBe(0);
+    expect(padrao.out).toMatch(/estado resolvido, 0 graus de liberdade/);
+    expect(padrao.out).toMatch(/parâmetros: altura = 700, alturaDoMastro = 400, aro = 25, comprimento = 2200,/);
+    const larga = await rodar(['familia', arquivo, '--perfil=larga', '--valores=altura=800,recuo=200']);
+    expect(larga.codigo).toBe(0);
+    expect(larga.out).toMatch(/altura = 800, alturaDoMastro = 400, aro = 40, comprimento = 2600,/);
+    expect(larga.out).toMatch(/recuo = 200,/);
+    expect(readdirSync(dir)).toEqual(['carcaca.familia-de-desenho.json']);
+    expect(JSON.parse((await rodar(['familia', arquivo, '--json'])).out)).toMatchObject({ estado: 'resolvido', parametros: { vao: 420 } });
+  }, 120_000);
+
+  it('--grava escreve <vista>.desenho.json com as peças dentro, os contornos e a vista em traço, e o desenho gravado se resolve sozinho com os mesmos bytes', async () => {
+    const { dir, arquivo } = comArquivo();
+    const saida = join(dir, 'saida');
+    const r = await rodar(['familia', arquivo, '--perfil=compacta', `--grava=${saida}`]);
+    expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/^gravado: lateral\.desenho\.json \(a família "carcaca-sintetica" 1\.0\.0 para os valores acima, com as peças dentro\)\n/);
+    expect(r.out).toMatch(/gravado: lateral\.contornos\.json e lateral\.png/);
+    expect(readdirSync(saida).sort()).toEqual(['lateral.contornos.json', 'lateral.desenho.json', 'lateral.png']);
+    const gravado = JSON.parse(readFileSync(join(saida, 'lateral.desenho.json'), 'utf8'));
+    expect(gravado.formato).toBe('mecanifica.desenho@3');
+    expect(gravado.parametros).toMatchObject({ comprimento: 1800, vao: 300, raioDoArco: 220 });
+    expect(Object.keys(gravado.pecas)).toEqual(['arcoDeRodaComAro', 'anelCoaxial']);
+    const contornos = readFileSync(join(saida, 'lateral.contornos.json'));
+    expect(JSON.parse(contornos).origem).toMatchObject({ desenho: 'lateral.desenho.json', resolvedor: 'planegcs@1.3.0' });
+    /* o desenho gravado, sozinho, dá o mesmo arquivo que a família deu */
+    const outra = join(dir, 'outra');
+    mkdirSync(outra);
+    writeFileSync(join(outra, 'lateral.desenho.json'), readFileSync(join(saida, 'lateral.desenho.json')));
+    expect((await rodar([join(outra, 'lateral.desenho.json')])).codigo).toBe(0);
+    expect(readFileSync(join(outra, 'lateral.contornos.json')).equals(contornos)).toBe(true);
+  }, 180_000);
+
+  it('o valor fora da faixa e o perfil que não existe saem com 3 dizendo a faixa, e --valores malformado sai com 2', async () => {
+    const { arquivo } = comArquivo();
+    const fora = await rodar(['familia', arquivo, '--valores=vao=900']);
+    expect(fora.codigo).toBe(3);
+    expect(fora.err).toMatch(/o parâmetro "vao" vale 900 mm, fora da faixa da família \(de 300 a 520 mm\)/);
+    const perfil = await rodar(['familia', arquivo, '--perfil=enorme']);
+    expect(perfil.codigo).toBe(3);
+    expect(perfil.err).toMatch(/o perfil "enorme" não existe na família \(os perfis são "compacta", "larga"\)/);
+    const mal = await rodar(['familia', arquivo, '--valores=vao']);
+    expect(mal.codigo).toBe(2);
+    expect(mal.err).toMatch(/--valores deve ser nome=número separados por vírgula/);
+  });
+
+  it('a família inválida sai com 3 e lista cada erro; sem arquivo sai com 2 mostrando o uso; arquivo que não existe sai com 2', async () => {
+    const f = familiaSintetica();
+    f.parametros.vao.padrao = 100;
+    const { arquivo, dir } = comArquivo(f);
+    const r = await rodar(['familia', arquivo, '--provar']);
+    expect(r.codigo).toBe(3);
+    expect(r.err).toMatch(/a família carcaca\.familia-de-desenho\.json tem 1 erro\(s\):\n- o parâmetro "vao" tem o padrão 100 fora da faixa de 300 a 520 mm\n/);
+    const g = familiaSintetica();
+    g.parametros.corDaTinta = { unidade: 'razao', padrao: 1, minimo: 0, medio: 1, maximo: 1 };
+    expect((await rodar(['familia', comArquivo(g).arquivo])).err).toMatch(/o parâmetro "corDaTinta" não é lido por nenhum campo do desenho/);
+    expect((await rodar(['familia'])).err).toMatch(/uso: npm run desenho -- familia <f\.familia-de-desenho\.json>/);
+    const sem = await rodar(['familia', join(dir, 'nao-existe.familia-de-desenho.json')]);
+    expect(sem.codigo).toBe(2);
+    expect(sem.err).toMatch(/o arquivo .* não existe/);
+  });
+
+  it('--pecas lê o catálogo de peças: a família sem peças dentro resolve com ele, e o catálogo ilegível sai com 2, o malformado e o repetido com 3', async () => {
+    const f = familiaSintetica();
+    delete f.desenho.pecas;
+    const { dir, arquivo } = comArquivo(f);
+    const catalogo = escrever(dir, 'pecas.json', { formato: 'mecanifica.pecas-de-desenho@1', pecas: { arcoDeRodaComAro: arcoDeRodaComAro(), anelCoaxial: anelCoaxial() } });
+    expect((await rodar(['familia', arquivo])).codigo).toBe(3);
+    const r = await rodar(['familia', arquivo, `--pecas=${catalogo}`, '--provar']);
+    expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/28 de 28 resolvem/);
+    expect((await rodar(['familia', arquivo, `--pecas=${join(dir, 'nao-existe.json')}`])).codigo).toBe(2);
+    const vazio = await rodar(['familia', arquivo, '--pecas']);
+    expect(vazio.codigo).toBe(2);
+    expect(vazio.err).toMatch(/--pecas precisa de um ou mais arquivos de catálogo/);
+    const ruim = escrever(dir, 'ruim.json', { formato: 'mecanifica.pecas-de-desenho@1', pecas: { x: { pontos: {} } } });
+    const mal = await rodar(['familia', arquivo, `--pecas=${ruim}`]);
+    expect(mal.codigo).toBe(3);
+    expect(mal.err).toMatch(/1 erro\(s\) no catálogo ruim\.json:\n- a peça "x": "ligacoes" deve ser um objeto/);
+    const repetido = escrever(dir, 'repetido.json', { formato: 'mecanifica.pecas-de-desenho@1', pecas: { anelCoaxial: anelCoaxial() } });
+    const dupla = await rodar(['familia', arquivo, `--pecas=${catalogo},${repetido}`]);
+    expect(dupla.codigo).toBe(3);
+    expect(dupla.err).toMatch(/a peça "anelCoaxial" está em mais de um catálogo/);
+  }, 120_000);
+});
+
+describe('npm run desenho: o desenho com peças e parâmetros', () => {
+  it('um desenho @3 com peças resolve, e com um catálogo de fora grava o hash do catálogo na origem do contorno', async () => {
+    const dir = pasta();
+    const d = carcacaSintetica();
+    expect((await rodar([escrever(dir, 'lateral.desenho.json', d)])).codigo).toBe(0);
+    const proprio = JSON.parse(readFileSync(join(dir, 'lateral.contornos.json'), 'utf8'));
+    expect(proprio.origem.pecas).toBeUndefined();
+    expect(Object.keys(proprio.regioes)).toEqual(['arco.aro', 'arco.painel', 'mastro.anel', 'mastro.corpo']);
+
+    const fora = pasta();
+    delete d.pecas;
+    const catalogoTexto = `${JSON.stringify({ formato: 'mecanifica.pecas-de-desenho@1', pecas: { arcoDeRodaComAro: arcoDeRodaComAro(), anelCoaxial: anelCoaxial() } }, null, 2)}\n`;
+    const catalogo = escrever(fora, 'pecas.json', catalogoTexto);
+    const r = await rodar([escrever(fora, 'lateral.desenho.json', d), `--pecas=${catalogo}`]);
+    expect(r.codigo).toBe(0);
+    const doCatalogo = JSON.parse(readFileSync(join(fora, 'lateral.contornos.json'), 'utf8'));
+    expect(doCatalogo.origem.pecas).toEqual({ 'pecas.json': createHash('sha256').update(catalogoTexto).digest('hex') });
+    expect(doCatalogo.regioes).toEqual(proprio.regioes);
+    const sem = await rodar([join(fora, 'lateral.desenho.json')]);
+    expect(sem.codigo).toBe(3);
+    expect(sem.err).toMatch(/o uso "arco": a peça "arcoDeRodaComAro" não existe/);
+  }, 180_000);
 });

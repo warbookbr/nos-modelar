@@ -146,3 +146,25 @@ export async function razaoInterseccaoUniao(a, b, { parteA = null, parteB = null
   }
   return { medida, ...principal, comparada };
 }
+
+/* A razão de cada região que os dois arquivos têm pelo nome, numa chamada só, da pior para a melhor (a que mais pede correção vem
+   primeiro; o empate sai em ordem de nome). Cada região é medida como `--parte-a=<nome> --parte-b=<nome>`: sem alinhar, pelo ponto
+   declarado (se vier) e pela melhor translação da própria região. As regiões que só um dos arquivos tem saem à parte, porque não
+   há com o que comparar. */
+export async function razaoPorParte(a, b, { alinharPor = null } = {}) {
+  conferirArquivo(a, 'o primeiro contorno');
+  conferirArquivo(b, 'o segundo contorno');
+  const nomesA = Object.keys(a.regioes ?? {}).sort();
+  const nomesB = Object.keys(b.regioes ?? {}).sort();
+  const partes = [];
+  for (const nome of nomesA.filter((n) => nomesB.includes(n))) {
+    const r = await razaoInterseccaoUniao(a, b, { parteA: nome, parteB: nome, alinharPor });
+    partes.push({
+      nome, foraDoModelo: Boolean(a.regioes[nome].foraDoModelo || b.regioes[nome].foraDoModelo),
+      semAlinhar: r.semAlinhar.iou, porPonto: r.porPonto ? r.porPonto.iou : null, melhorTranslacao: r.melhorTranslacao.iou,
+      deslocamento: r.melhorTranslacao.deslocamento, areaA: r.areaA, areaB: r.areaB,
+    });
+  }
+  partes.sort((x, y) => x.semAlinhar - y.semAlinhar || (x.nome < y.nome ? -1 : 1));
+  return { partes, soEmA: nomesA.filter((n) => !nomesB.includes(n)), soEmB: nomesB.filter((n) => !nomesA.includes(n)) };
+}

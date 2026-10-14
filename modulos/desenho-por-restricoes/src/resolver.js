@@ -17,6 +17,7 @@
 import { DebugMode, GcsWrapper, init_planegcs_module, SolveStatus } from '@salusoft89/planegcs';
 import { traduzir, idDoPonto, idDaParte, nomeDaRelacao } from './traducao.js';
 import { anguloEmGraus, distancia, ladoDoPonto, refletir, retaResolvida, r3 } from './geometria.js';
+import { centroDoCanto } from './canto.js';
 
 let modulo = null;
 export function carregarPlanegcs() {
@@ -83,6 +84,12 @@ export function residuo(modelo, r, pontos, raios) {
       return { valor: Math.abs(distancia(pontos[r.ponto], centroDe(r.alvo)) - raioDe(r.alvo)), unidade: 'mm' };
     case 'coincidente': return { valor: distancia(pontos[r.a], pontos[r.b]), unidade: 'mm' };
     case 'distancia': {
+      if (r.eixo) {
+        /* Só em h ou só em v, com sinal: o primeiro ponto fica do `lado` dado em relação ao segundo. */
+        const k = r.eixo === 'h' ? 0 : 1;
+        const medido = (r.lado === 'direita' || r.lado === 'acima' ? 1 : -1) * (pontos[r.a][k] - pontos[r.b][k]);
+        return { valor: Math.abs(medido - r.mm), unidade: 'mm', pedido: r.mm, medido };
+      }
       const medido = r.linha ? distanciaPontoReta(pontos[r.a], reta(r.linha)) : distancia(pontos[r.a], pontos[r.b]);
       return { valor: Math.abs(medido - r.mm), unidade: 'mm', pedido: r.mm, medido };
     }
@@ -94,6 +101,10 @@ export function residuo(modelo, r, pontos, raios) {
     }
     case 'paralela': return { valor: Math.min(diferencaAngular(direcao(reta(r.a)), direcao(reta(r.b))), diferencaAngular(direcao(reta(r.a)) + 180, direcao(reta(r.b)))), unidade: 'graus' };
     case 'perpendicular': return { valor: Math.min(diferencaAngular(direcao(reta(r.a)) + 90, direcao(reta(r.b))), diferencaAngular(direcao(reta(r.a)) - 90, direcao(reta(r.b)))), unidade: 'graus' };
+    case 'simetrico': {
+      const [a, b] = reta(r.linha);
+      return { valor: distancia(refletir(pontos[r.a], a, b), pontos[r.b]), unidade: 'mm' };
+    }
     case 'vertical': return { valor: Math.abs(pontos[r.a][0] - pontos[r.b][0]), unidade: 'mm' };
     case 'horizontal': return { valor: Math.abs(pontos[r.a][1] - pontos[r.b][1]), unidade: 'mm' };
     case 'angulo': {
@@ -117,6 +128,43 @@ export function conferirMedidas(modelo, pontos, raios) {
     if (!(x.valor <= tol)) desvios.push({ relacao: r.nome, tipo: r.tipo, pedido: x.pedido ?? null, medido: x.medido === undefined ? null : r3(x.medido), residuo: r3(x.valor), unidade: x.unidade });
   }
   return desvios;
+}
+
+/* O centro com nome de um canto arredondado deve ficar onde as duas arestas e o raio o põem. O planegcs devolve sucesso também
+   com o outro círculo tangente às duas retas (são quatro), e quem escolhe é o chute do centro, que sai do canto como foi chutado:
+   se os pontos do canto andaram muito do chute até a solução, o centro pode ter ficado no círculo vizinho. O chute do centro é
+   do módulo, e não da descrição; por isso `ajustarCentros` o refaz a partir da solução, e só o que ainda ficar fora é dito. */
+export function conferirCentros(modelo, pontos) {
+  const trocados = [];
+  for (const nome of Object.keys(modelo.centros ?? {}).sort(porNome)) {
+    const c = modelo.centros[nome];
+    const esperado = centroDoCanto(pontos[c.anterior], pontos[c.ponto], pontos[c.proximo], c.raio);
+    const quem = `o centro do canto ${JSON.stringify(nome)} (o canto ${JSON.stringify(c.ponto)} do polígono ${JSON.stringify(c.parte)}, raio ${r3(c.raio)} mm)`;
+    const dist = esperado ? distancia(esperado, pontos[nome]) : Infinity;
+    if (esperado && dist <= tolMm(c.raio)) continue;
+    trocados.push({
+      relacao: `centro do canto ${JSON.stringify(nome)}`, pedido: 'dentro do ângulo do canto', ficou: esperado ? 'em outro círculo tangente às duas arestas' : 'sem canto', ponto: null, linha: null, centro: nome, chute: esperado,
+      mensagem: esperado
+        ? `${quem} ficou a ${r3(dist)} mm de onde as duas arestas o põem (${r3(esperado[0])}; ${r3(esperado[1])}): o resolvedor o pôs em outro círculo tangente às duas retas. Aproxime os chutes de ${JSON.stringify(c.anterior)}, ${JSON.stringify(c.ponto)} e ${JSON.stringify(c.proximo)} da forma final do canto, porque o chute do centro sai deles`
+        : `${quem} ficou sem canto depois de resolver: ${JSON.stringify(c.anterior)}, ${JSON.stringify(c.ponto)} e ${JSON.stringify(c.proximo)} ficaram na mesma reta ou no mesmo lugar`,
+    });
+  }
+  return trocados;
+}
+
+/* Refaz o chute do centro que caiu no círculo vizinho, a partir dos pontos já resolvidos (que ficam onde estão), até os centros
+   ficarem onde as arestas os põem; três voltas bastam para o canto que arrasta o vizinho. Sem centro nomeado devolve a solução. */
+async function ajustarCentros(modelo, x) {
+  let atual = x;
+  if (!Object.keys(modelo.centros ?? {}).length) return atual;
+  for (let volta = 0; volta < 3 && atual.resolvido; volta += 1) {
+    const fora = conferirCentros(modelo, atual.pontos).filter((t) => t.chute);
+    if (!fora.length) break;
+    const y = await executar(modelo, { chutes: { ...atual.pontos, ...Object.fromEntries(fora.map((t) => [t.centro, t.chute])) }, raios: atual.raios });
+    if (!y.resolvido) break;
+    atual = y;
+  }
+  return atual;
 }
 
 /* O lado de cada relação que o resolvedor não distingue, conferido na geometria resolvida. Cada item diz a relação, o que foi
@@ -160,7 +208,7 @@ export function conferirLados(modelo, pontos, raios) {
       }
     }
   }
-  return trocados;
+  return [...trocados, ...conferirCentros(modelo, pontos)];
 }
 
 /* Prende uma coordenada de cada vez no valor resolvido. Quem estava solto faz o grau de liberdade cair; quem estava determinado
@@ -224,7 +272,7 @@ async function separarConflito(modelo, grupo) {
 
 /* A resposta completa do resolvedor para a descrição, sem a geometria das partes nem o texto. */
 export async function resolver(modelo) {
-  let atual = modelo; let x = await executar(modelo);
+  let atual = modelo; let x = await ajustarCentros(modelo, await executar(modelo));
   let conflitantes = nomesDasRelacoes(x.conflitantes);
   let redundantes = nomesDasRelacoes([...x.redundantes, ...x.parciais]);
   if ((!x.resolvido || conflitantes.length) && conflitantes.length) {

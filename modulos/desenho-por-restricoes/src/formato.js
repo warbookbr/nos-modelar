@@ -1,6 +1,8 @@
-/* formato.js — o formato salvo `mecanifica.desenho@2` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir.
-   A versão 2 acrescenta à `barra` e ao `poligono` o campo opcional `raioDoCanto`; a versão 1 segue aceita, sem esse campo, e uma
-   descrição gravada em 1 dá o mesmo resultado que dava.
+/* formato.js — o formato salvo `mecanifica.desenho@3` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir.
+   A versão 2 acrescentou à `barra` e ao `poligono` o campo opcional `raioDoCanto`. A versão 3 acrescenta `parametros`, `pecas` e
+   `usos` (expandir.js), a geometria de construção (`construcao`), o centro com nome do canto arredondado
+   (`"raioDoCanto": { "P": { "raio": 8, "centro": "CP" } }`), a relação `simetrico` e a distância só em h ou só em v (`eixo`). As
+   versões 1 e 2 seguem aceitas, sem esses campos, e uma descrição gravada nelas dá o mesmo resultado que dava.
 
    A IA declara a vista de um objeto sem imagem de referência: pontos nomeados com um chute inicial em milímetro (h para a
    direita, v para cima), referências fixas (um chão, um eixo), partes feitas desses pontos e relações com nome entre eles. A
@@ -9,22 +11,28 @@
 
    `validarDescricao` não lança: devolve `{ erros, modelo }`, onde `erros` é uma lista de frases (cada uma com o nome do que
    está errado e como corrigir) e `modelo` é a descrição normalizada que o resto do módulo lê, ou null quando há erro. Puro. */
+import { expandirDescricao } from './expandir.js';
+import { centroDoCanto } from './canto.js';
 
-export const FORMATO_DO_DESENHO = 'mecanifica.desenho@2';
+export const FORMATO_DO_DESENHO = 'mecanifica.desenho@3';
 export const FORMATO_DO_DESENHO_ANTERIOR = 'mecanifica.desenho@1';
-export const FORMATOS_DO_DESENHO = [FORMATO_DO_DESENHO_ANTERIOR, FORMATO_DO_DESENHO];
+export const FORMATO_DO_DESENHO_COM_CANTO = 'mecanifica.desenho@2';
+export const FORMATOS_DO_DESENHO = [FORMATO_DO_DESENHO_ANTERIOR, FORMATO_DO_DESENHO_COM_CANTO, FORMATO_DO_DESENHO];
 export const FORMATO_DOS_CONTORNOS = 'mecanifica.contornos@1';
 export const RESOLVEDOR = 'planegcs@1.3.0';
 export const VISTAS_DO_DESENHO = ['lateral', 'topo', 'frontal'];
 export const LADOS = ['acima', 'abaixo', 'esquerda', 'direita'];
 export const TOQUES = ['fora', 'dentro'];
 export const FECHAMENTOS = ['corda', 'centro'];
-export const TIPOS_DE_RELACAO = ['sobre', 'coincidente', 'distancia', 'raio', 'tangente', 'paralela', 'perpendicular', 'vertical', 'horizontal', 'angulo', 'igual'];
+export const TIPOS_DE_RELACAO = ['sobre', 'coincidente', 'distancia', 'raio', 'tangente', 'paralela', 'perpendicular', 'vertical', 'horizontal', 'angulo', 'igual', 'simetrico'];
+export const EIXOS = ['h', 'v'];
 
 const CHAVES_DA_RAIZ = ['formato', 'objeto', 'vista', 'olhando', 'referencias', 'pontos', 'partes', 'frenteParaFundo', 'relacoes'];
+/* O que existe só a partir da versão 3. */
+const CHAVES_DA_RAIZ_DO_3 = ['parametros', 'pecas', 'usos', 'construcao'];
 const FORMAS_DE_PARTE = ['circulo', 'barra', 'poligono', 'arco'];
 const CHAVES_DA_PARTE = [...FORMAS_DE_PARTE, 'espessura', 'fecha', 'foraDoModelo', 'raioDoCanto'];
-const CHAVES_DA_RELACAO = [...TIPOS_DE_RELACAO, 'nome', 'mm', 'graus', 'lado', 'por'];
+const CHAVES_DA_RELACAO = [...TIPOS_DE_RELACAO, 'nome', 'mm', 'graus', 'lado', 'por', 'eixo'];
 
 export class ErroDeDesenho extends Error {
   constructor(mensagem, erros = []) {
@@ -44,14 +52,27 @@ const lista = (nomes) => nomes.map(q).join(', ');
 /* Dois pontos chutados no mesmo lugar não formam reta: o resolvedor não tem direção para começar. */
 const mesmoLugar = (a, b) => a[0] === b[0] && a[1] === b[1];
 
-export function validarDescricao(d) {
+export function validarDescricao(entrada, opcoes = {}) {
   const erros = [];
   const falha = (msg) => erros.push(msg);
-  if (!objeto(d)) return { erros: ['a descrição deve ser um objeto JSON com "formato", "objeto", "vista", "pontos", "partes" e "relacoes"'], modelo: null };
-  for (const k of Object.keys(d)) {
-    if (!CHAVES_DA_RAIZ.includes(k)) falha(`campo desconhecido ${q(k)} na raiz; os campos aceitos são ${lista(CHAVES_DA_RAIZ)}. Confira a grafia (sem acento nos nomes dos campos)`);
+  if (!objeto(entrada)) return { erros: ['a descrição deve ser um objeto JSON com "formato", "objeto", "vista", "pontos", "partes" e "relacoes"'], modelo: null };
+  const ehTres = entrada.formato === FORMATO_DO_DESENHO;
+  for (const k of Object.keys(entrada)) {
+    if (CHAVES_DA_RAIZ.includes(k) || (ehTres && CHAVES_DA_RAIZ_DO_3.includes(k))) continue;
+    if (CHAVES_DA_RAIZ_DO_3.includes(k)) falha(`o campo ${q(k)} existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`);
+    else falha(`campo desconhecido ${q(k)} na raiz; os campos aceitos são ${lista(ehTres ? [...CHAVES_DA_RAIZ, ...CHAVES_DA_RAIZ_DO_3] : CHAVES_DA_RAIZ)}. Confira a grafia (sem acento nos nomes dos campos)`);
   }
-  if (!FORMATOS_DO_DESENHO.includes(d.formato)) falha(`"formato" deve ser ${q(FORMATO_DO_DESENHO)} (ou ${q(FORMATO_DO_DESENHO_ANTERIOR)}, para uma descrição sem "raioDoCanto") e veio ${q(d.formato)}`);
+  /* O campo do @3 num arquivo de outra versão é a única coisa a corrigir: o resto do arquivo não é lido, para os nomes que ele cita
+     (`uso.ligacao`) não virarem uma enxurrada de nomes desconhecidos. */
+  if (!ehTres && Object.keys(entrada).some((k) => CHAVES_DA_RAIZ_DO_3.includes(k))) return { erros, modelo: null };
+  /* Parâmetros, expressões e peças: a descrição que o resto lê só tem números e nenhum `parametros`, `pecas` nem `usos`. */
+  let d = entrada; let parametros = null;
+  if (ehTres) {
+    const x = expandirDescricao(entrada, opcoes);
+    if (x.erros.length) return { erros: [...erros, ...x.erros], modelo: null };
+    d = x.descricao; parametros = x.parametros;
+  }
+  if (!FORMATOS_DO_DESENHO.includes(d.formato)) falha(`"formato" deve ser ${q(FORMATO_DO_DESENHO)} (ou ${q(FORMATO_DO_DESENHO_COM_CANTO)} ou ${q(FORMATO_DO_DESENHO_ANTERIOR)}, as versões anteriores, que seguem aceitas) e veio ${q(d.formato)}`);
   if (!texto(d.objeto)) falha('"objeto" deve ser o nome do objeto desenhado, em texto não vazio');
   if (!VISTAS_DO_DESENHO.includes(d.vista)) falha(`"vista" deve ser uma de ${lista(VISTAS_DO_DESENHO)} e veio ${q(d.vista)}`);
   if (d.olhando !== undefined && !texto(d.olhando)) falha('"olhando" é opcional e, se vier, deve ser um texto não vazio dizendo de que lado se olha (por exemplo "do lado esquerdo, roda à esquerda")');
@@ -88,6 +109,9 @@ export function validarDescricao(d) {
   }
   const ehPonto = (n) => typeof n === 'string' && Object.hasOwn(pontos, n);
   const usados = new Set();
+  const centros = {};
+  const retas = {};
+  const doTres = d.formato === FORMATO_DO_DESENHO;
 
   /* partes */
   const partes = {};
@@ -114,18 +138,43 @@ export function validarDescricao(d) {
     if (forma !== 'arco' && p.fecha !== undefined) falha(`a parte ${q(nome)} declara "fecha", que só vale para "arco"`);
     if (forma !== 'barra' && p.espessura !== undefined) falha(`a parte ${q(nome)} declara "espessura", que só vale para "barra"`);
     if (p.raioDoCanto !== undefined && forma !== 'barra' && forma !== 'poligono') falha(`a parte ${q(nome)} declara "raioDoCanto", que só vale para "barra" e "poligono" (o círculo e o arco já são curvos)`);
-    else if (p.raioDoCanto !== undefined && d.formato === FORMATO_DO_DESENHO_ANTERIOR) falha(`a parte ${q(nome)} declara "raioDoCanto", que existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`);
+    else if (p.raioDoCanto !== undefined && d.formato === FORMATO_DO_DESENHO_ANTERIOR) falha(`a parte ${q(nome)} declara "raioDoCanto", que existe a partir de ${q(FORMATO_DO_DESENHO_COM_CANTO)}; troque o "formato" da descrição`);
     const raioValido = (v) => numero(v) && v > 0;
+    /* Um canto do polígono é um raio, ou { "raio": mm, "centro": "<nome>" } quando o centro do arco ganha nome. */
+    const cantoValido = (v) => (raioValido(v) ? { raio: v, centro: null } : objeto(v) && Object.keys(v).every((k) => k === 'raio' || k === 'centro') && raioValido(v.raio) && (v.centro === undefined || texto(v.centro)) ? { raio: v.raio, centro: v.centro ?? null } : null);
     if (forma === 'poligono') {
       const ps = nomesDosPontos(p.poligono, 3, false);
       let raiosDosCantos = null;
+      let centrosDosCantos = null;
       const rc = p.raioDoCanto;
       if (rc !== undefined && ps) {
         if (raioValido(rc)) raiosDosCantos = ps.map(() => rc);
-        else if (objeto(rc) && Object.keys(rc).length > 0 && Object.entries(rc).every(([k, v]) => ps.includes(k) && raioValido(v))) raiosDosCantos = ps.map((x) => rc[x] ?? 0);
-        else falha(`o "raioDoCanto" do polígono ${q(nome)} deve ser um número em milímetro maior que zero (todos os cantos) ou { "<ponto do polígono>": <mm>, ... } (só os cantos citados), e veio ${JSON.stringify(rc)}`);
+        else if (objeto(rc) && Object.keys(rc).length > 0 && Object.entries(rc).every(([k, v]) => ps.includes(k) && cantoValido(v))) {
+          const cantos = ps.map((x) => (rc[x] === undefined ? { raio: 0, centro: null } : cantoValido(rc[x])));
+          raiosDosCantos = cantos.map((c) => c.raio);
+          if (cantos.some((c) => c.centro !== null)) {
+            if (!doTres) { falha(`o "raioDoCanto" do polígono ${q(nome)} nomeia o centro de um canto, que existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`); raiosDosCantos = null; }
+            else centrosDosCantos = cantos.map((c) => c.centro);
+          }
+        } else falha(`o "raioDoCanto" do polígono ${q(nome)} deve ser um número em milímetro maior que zero (todos os cantos) ou { "<ponto do polígono>": <mm> ou { "raio": <mm>, "centro": "<nome>" }, ... } (só os cantos citados), e veio ${JSON.stringify(rc)}`);
       }
-      if (ps && (rc === undefined || raiosDosCantos)) { partes[nome] = { tipo: 'poligono', pontos: ps, foraDoModelo, ...(raiosDosCantos ? { raiosDosCantos } : {}) }; ps.forEach((x) => usados.add(x)); }
+      if (ps && (rc === undefined || raiosDosCantos)) {
+        partes[nome] = { tipo: 'poligono', pontos: ps, foraDoModelo, ...(raiosDosCantos ? { raiosDosCantos } : {}), ...(centrosDosCantos ? { centrosDosCantos } : {}) };
+        ps.forEach((x) => usados.add(x));
+        /* O centro com nome é um ponto do desenho: o chute vem do canto como foi chutado, e o resolvedor o prende nas duas arestas. */
+        (centrosDosCantos ?? []).forEach((centro, i) => {
+          if (centro === null) return;
+          const n = ps.length;
+          registrar(centro, 'centros de canto');
+          const chute = centroDoCanto(pontos[ps[(i + n - 1) % n]], pontos[ps[i]], pontos[ps[(i + 1) % n]], raiosDosCantos[i]);
+          if (!chute) falha(`o canto ${q(ps[i])} do polígono ${q(nome)} declara o centro ${q(centro)}, mas no chute ele é reto ou fechado (os vizinhos ${q(ps[(i + n - 1) % n])} e ${q(ps[(i + 1) % n])} ficam na mesma reta que ele, ou no mesmo lugar); ponha os chutes na forma do canto, para o centro ter onde ficar`);
+          else {
+            centros[centro] = { parte: nome, ponto: ps[i], anterior: ps[(i + n - 1) % n], proximo: ps[(i + 1) % n], raio: raiosDosCantos[i] };
+            pontos[centro] = chute;
+            usados.add(centro);
+          }
+        });
+      }
     } else if (forma === 'barra') {
       const ps = nomesDosPontos(p.barra, 2, true);
       const rc = p.raioDoCanto;
@@ -154,14 +203,39 @@ export function validarDescricao(d) {
     }
   }
 
+  /* construção: o círculo e a reta que amarram relações sem virar parte nem região. O círculo entra no resolvedor como as partes e
+     fica fora dos contornos e da vista; a reta é um nome para dois pontos. */
+  if (d.construcao !== undefined) {
+    if (!objeto(d.construcao)) falha('"construcao" deve ser um objeto { nome: { "circulo": { "centro": "<ponto>" } } ou { "reta": ["<ponto>", "<ponto>"] } }');
+    for (const nome of Object.keys(objeto(d.construcao) ? d.construcao : {}).sort(porNome)) {
+      const k = d.construcao[nome];
+      registrar(nome, 'construcao');
+      if (!texto(nome)) falha(`a construção ${q(nome)} tem nome vazio ou com espaço nas pontas`);
+      const formas = objeto(k) ? ['circulo', 'reta'].filter((f) => k[f] !== undefined) : [];
+      if (formas.length !== 1 || Object.keys(k).length !== 1) { falha(`a construção ${q(nome)} deve ser { "circulo": { "centro": "<ponto>" } } ou { "reta": ["<ponto>", "<ponto>"] }, uma forma só`); continue; }
+      if (formas[0] === 'circulo') {
+        const c = k.circulo;
+        if (!objeto(c) || !ehPonto(c.centro) || !Object.keys(c).every((x) => x === 'centro' || x === 'chute')) falha(`o círculo de construção ${q(nome)} deve ser { "centro": "<ponto>" }, com "chute" opcional (o raio inicial em milímetro), e o centro deve ser um ponto declarado`);
+        else if (c.chute !== undefined && (!numero(c.chute) || c.chute <= 0)) falha(`o "chute" do raio do círculo de construção ${q(nome)} deve ser um número em milímetro maior que zero`);
+        else { partes[nome] = { tipo: 'circulo', centro: c.centro, chute: c.chute, foraDoModelo: true, construcao: true }; usados.add(c.centro); }
+      } else {
+        const r = k.reta;
+        const ok = Array.isArray(r) && r.length === 2 && r.every(ehPonto);
+        if (!ok) falha(`a reta de construção ${q(nome)} deve ser ["<ponto>", "<ponto>"], dois pontos declarados`);
+        else if (r[0] === r[1] || mesmoLugar(pontos[r[0]], pontos[r[1]])) falha(`a reta de construção ${q(nome)} tem os dois pontos ${lista(r)} no mesmo lugar ou repetidos; afaste os chutes para o resolvedor ter a direção`);
+        else { retas[nome] = [r[0], r[1]]; r.forEach((x) => usados.add(x)); }
+      }
+    }
+  }
+
   /* profundidade */
   let ordem = null;
   if (d.frenteParaFundo !== undefined) {
-    const nomes = Object.keys(partes);
+    const nomes = Object.keys(partes).filter((n) => !partes[n].construcao);
     const l = d.frenteParaFundo;
     if (!Array.isArray(l) || !l.every((n) => typeof n === 'string')) falha('"frenteParaFundo" deve ser a lista dos nomes das partes, da que fica à frente para a que fica ao fundo');
     else {
-      const desconhecidas = l.filter((n) => !Object.hasOwn(partes, n));
+      const desconhecidas = l.filter((n) => !Object.hasOwn(partes, n) || partes[n].construcao);
       const repetidas = l.filter((n, i) => l.indexOf(n) !== i);
       const faltam = nomes.filter((n) => !l.includes(n));
       if (desconhecidas.length) falha(`"frenteParaFundo" cita ${lista(desconhecidas)}, que não ${desconhecidas.length === 1 ? 'é uma parte' : 'são partes'}; corrija o nome`);
@@ -177,7 +251,7 @@ export function validarDescricao(d) {
   const nomesDeRelacao = new Set();
   const barra = (n) => partes[n]?.tipo === 'barra';
   const circular = (n) => partes[n]?.tipo === 'circulo' || partes[n]?.tipo === 'arco';
-  const classeDe = (n) => (ehPonto(n) ? 'ponto' : Object.hasOwn(referencias, n) ? 'referência' : Object.hasOwn(partes, n) ? `${{ circulo: 'círculo', barra: 'barra', poligono: 'polígono', arco: 'arco' }[partes[n].tipo]}` : 'nome desconhecido');
+  const classeDe = (n) => (ehPonto(n) ? 'ponto' : Object.hasOwn(referencias, n) ? 'referência' : Object.hasOwn(retas, n) ? 'reta de construção' : Object.hasOwn(partes, n) ? `${{ circulo: 'círculo', barra: 'barra', poligono: 'polígono', arco: 'arco' }[partes[n].tipo]}${partes[n].construcao ? ' de construção' : ''}` : 'nome desconhecido');
   (Array.isArray(d.relacoes) ? d.relacoes : []).forEach((r, i) => {
     if (!objeto(r)) { falha(`a relação na posição ${i + 1} deve ser um objeto { "nome": "...", "<tipo>": ... }`); return; }
     const onde = texto(r.nome) ? `a relação ${q(r.nome)}` : `a relação na posição ${i + 1}`;
@@ -190,6 +264,7 @@ export function validarDescricao(d) {
     const tipo = tipos[0];
     const arg = r[tipo];
     const mm = r.mm; const graus = r.graus; const lado = r.lado; const por = r.por;
+    if (r.eixo !== undefined && tipo !== 'distancia') falha(`${onde} (${tipo}) declara "eixo", que só vale para "distancia" entre dois pontos`);
     const lerPonto = (n, papel) => {
       if (ehPonto(n)) { usados.add(n); return n; }
       falha(`${onde} (${tipo}) espera ${papel} um ponto declarado em "pontos", e ${q(n)} é ${classeDe(n) === 'nome desconhecido' ? 'um nome desconhecido' : `${classeDe(n)}, não um ponto`}`);
@@ -200,7 +275,8 @@ export function validarDescricao(d) {
       if (typeof a === 'string') {
         if (Object.hasOwn(referencias, a)) return { classe: 'linha', via: 'referencia', nome: a };
         if (barra(a)) return { classe: 'linha', via: 'barra', nome: a };
-        falha(`${onde} (${tipo}) espera ${papel} uma reta, e ${q(a)} é ${classeDe(a)}; uma reta é uma referência, uma barra ou dois pontos ["P", "Q"]${partes[a]?.tipo === 'poligono' ? ` (para a aresta de ${q(a)} cite os dois pontos dela)` : ''}`);
+        if (Object.hasOwn(retas, a)) return { classe: 'linha', via: 'par', pontos: [...retas[a]], apelido: a };
+        falha(`${onde} (${tipo}) espera ${papel} uma reta, e ${q(a)} é ${classeDe(a)}; uma reta é uma referência, uma barra${doTres ? ', uma reta de construção' : ''} ou dois pontos ["P", "Q"]${partes[a]?.tipo === 'poligono' ? ` (para a aresta de ${q(a)} cite os dois pontos dela)` : ''}`);
         return null;
       }
       if (Array.isArray(a) && a.length === 2 && a.every((x) => typeof x === 'string')) {
@@ -257,12 +333,22 @@ export function validarDescricao(d) {
       if (!par(2)) return;
       const a = lerPonto(arg[0], 'no primeiro lugar');
       const ok = exigirMm();
-      if (typeof arg[1] === 'string' && ehPonto(arg[1])) {
+      if (typeof arg[1] === 'string' && ehPonto(arg[1]) && r.eixo !== undefined) {
+        /* Só em h ou só em v: o primeiro ponto fica do `lado` dado em relação ao segundo, a `mm` dele naquele eixo. */
+        const b = lerPonto(arg[1], 'no segundo lugar');
+        const certos = r.eixo === 'h' ? ['esquerda', 'direita'] : ['acima', 'abaixo'];
+        if (!doTres) falha(`${onde} (distancia) declara "eixo", que existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`);
+        else if (!EIXOS.includes(r.eixo)) falha(`${onde} (distancia) declara "eixo" ${q(r.eixo)}; use "h" (a distância na horizontal) ou "v" (na vertical)`);
+        else if (!certos.includes(lado)) falha(`${onde} (distancia, eixo ${q(r.eixo)}) precisa de "lado" ${lista(certos)}: de que lado do segundo ponto o primeiro fica (a distância só em ${r.eixo === 'h' ? 'h' : 'v'} tem sinal)`);
+        else if (a && b && a === b) falha(`${onde} (distancia) cita o ponto ${q(a)} duas vezes`);
+        else if (a && b && ok) guardar({ a, b, mm, eixo: r.eixo, lado });
+      } else if (typeof arg[1] === 'string' && ehPonto(arg[1])) {
         proibir([['lado', lado]]);
         const b = lerPonto(arg[1], 'no segundo lugar');
         if (a && b && a === b) falha(`${onde} (distancia) cita o ponto ${q(a)} duas vezes`);
         else if (a && b && ok) guardar({ a, b, mm });
       } else {
+        if (r.eixo !== undefined) falha(`${onde} (distancia) declara "eixo", que só vale entre dois pontos; a distância de um ponto a uma reta é perpendicular a ela`);
         const linha = lerLinha(arg[1], 'no segundo lugar');
         if (linha && !exigirLado(linha)) return;
         if (linha?.via === 'par' && linha.pontos.includes(a)) falha(`${onde} (distancia) mede o ponto ${q(a)} até uma reta que passa por ele mesmo; use outro ponto ou outra reta`);
@@ -305,6 +391,37 @@ export function validarDescricao(d) {
       const a = lerLinha(arg[0], 'no primeiro lugar'); const b = lerLinha(arg[1], 'no segundo lugar');
       if (!numero(graus) || graus <= -360 || graus >= 360) falha(`${onde} (angulo) precisa de "graus", o ângulo da primeira reta para a segunda no sentido anti-horário, entre -360 e 360 (exclusive)`);
       else if (a && b) guardar({ a, b, graus });
+    } else if (tipo === 'simetrico') {
+      proibir([['mm', mm], ['graus', graus], ['lado', lado], ['por', por]]);
+      if (!doTres) { falha(`${onde} é do tipo "simetrico", que existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`); return; }
+      if (!par(3)) return;
+      const eixo = lerLinha(arg[2], 'no terceiro lugar');
+      const [x, y] = arg;
+      if (typeof x === 'string' && typeof y === 'string' && Object.hasOwn(partes, x) && Object.hasOwn(partes, y)) {
+        /* Duas partes: cada ponto de uma é simétrico ao de mesma posição na lista da outra; os círculos, nos centros e no raio. */
+        const A = partes[x]; const B = partes[y];
+        const pares = [];
+        if (x === y) falha(`${onde} (simetrico) cita a parte ${q(x)} duas vezes`);
+        else if (A.tipo !== B.tipo) falha(`${onde} (simetrico) liga ${classeDe(x)} a ${classeDe(y)}; duas partes simétricas têm a mesma forma`);
+        else if (A.tipo === 'arco') falha(`${onde} (simetrico) não liga dois arcos; cite os pontos deles (centro, início e fim) dois a dois`);
+        else if (A.tipo === 'circulo') pares.push([A.centro, B.centro]);
+        else if (A.pontos.length !== B.pontos.length) falha(`${onde} (simetrico) liga ${q(x)}, de ${A.pontos.length} pontos, a ${q(y)}, de ${B.pontos.length}; as duas partes têm o mesmo número de pontos, e o de mesma posição na lista é o simétrico`);
+        else if (A.tipo === 'barra' && A.espessura !== B.espessura) falha(`${onde} (simetrico) liga as barras ${q(x)} e ${q(y)}, de espessuras ${A.espessura} e ${B.espessura} mm; a espessura não passa pelo resolvedor, então a simetria pede as duas iguais`);
+        else A.pontos.forEach((p, k) => pares.push([p, B.pontos[k]]));
+        if (eixo && pares.length) {
+          const novos = pares.map(([p, p2]) => ({ nome: `${r.nome}: ${p} e ${p2}`, posicao: i, ...(p === p2 ? { tipo: 'sobre', ponto: p, alvo: eixo } : { tipo: 'simetrico', a: p, b: p2, linha: eixo }) }));
+          if (A.tipo === 'circulo') novos.push({ nome: `${r.nome}: raios de ${x} e ${y}`, tipo: 'igual', posicao: i, a: { classe: 'circular', parte: x, tipo: 'circulo' }, b: { classe: 'circular', parte: y, tipo: 'circulo' } });
+          for (const n of novos) {
+            if (nomesDeRelacao.has(n.nome)) falha(`o nome de relação ${q(n.nome)}, gerado por ${onde}, já existe; renomeie uma das duas`);
+            else { nomesDeRelacao.add(n.nome); relacoes.push(n); }
+          }
+        }
+      } else {
+        const a = lerPonto(x, 'no primeiro lugar'); const b = lerPonto(y, 'no segundo lugar');
+        if (a && b && a === b) falha(`${onde} (simetrico) cita o ponto ${q(a)} duas vezes; para pôr um ponto sobre o eixo use "sobre"`);
+        else if (a && b && eixo?.via === 'par' && (eixo.pontos.includes(a) || eixo.pontos.includes(b))) falha(`${onde} (simetrico) usa como eixo uma reta que passa por ${eixo.pontos.includes(a) ? q(a) : q(b)}; um ponto da própria reta é simétrico dele mesmo, então use outro ponto ou outra reta`);
+        else if (a && b && eixo) guardar({ a, b, linha: eixo });
+      }
     } else if (tipo === 'igual') {
       proibir([['mm', mm], ['graus', graus], ['lado', lado], ['por', por]]);
       if (!par(2)) return;
@@ -332,15 +449,15 @@ export function validarDescricao(d) {
   if (erros.length) return { erros, modelo: null };
   const modelo = {
     objeto: d.objeto, vista: d.vista, olhando: d.olhando ?? null,
-    referencias, pontos, partes, ordem,
+    referencias, pontos, partes, ordem, centros, parametros,
     relacoes: relacoes.sort((a, b) => porNome(a.nome, b.nome)),
   };
   return { erros, modelo };
 }
 
-/* Valida e devolve o modelo, ou lança com todas as frases de correção. */
-export function modeloDaDescricao(descricao) {
-  const { erros, modelo } = validarDescricao(descricao);
+/* Valida e devolve o modelo, ou lança com todas as frases de correção. `opcoes.pecas` é o catálogo de peças de desenho. */
+export function modeloDaDescricao(descricao, opcoes = {}) {
+  const { erros, modelo } = validarDescricao(descricao, opcoes);
   if (erros.length) throw new ErroDeDesenho(`a descrição do desenho tem ${erros.length} erro(s):\n${erros.map((e) => `- ${e}`).join('\n')}`, erros);
   return modelo;
 }

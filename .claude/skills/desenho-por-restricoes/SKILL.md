@@ -11,7 +11,7 @@ Você escreve a descrição de uma vista em `<vista>.desenho.json`, e o comando 
 
 Parta das partes e das medidas da descrição, e escreva relações, não coordenadas.
 
-1. Dê um nome a cada parte (`roda`, `braco`, `cacamba`) e a cada ponto que as define (`C`, `H`). A parte é `circulo`, `barra` (eixo e espessura), `poligono` (os pontos na ordem do contorno) ou `arco`. Escreva `"formato": "mecanifica.desenho@2"`.
+1. Dê um nome a cada parte (`roda`, `braco`, `cacamba`) e a cada ponto que as define (`C`, `H`). A parte é `circulo`, `barra` (eixo e espessura), `poligono` (os pontos na ordem do contorno) ou `arco`. Escreva `"formato": "mecanifica.desenho@3"` (o @2 e o @1 seguem aceitos, sem os recursos da última seção).
 2. Ancore o desenho em referências fixas: um chão (`horizontal`, `v`) e, se precisar, um eixo (`vertical`, `h`). Sem âncora o desenho desliza.
 3. Escreva uma relação por fato da descrição, cada uma com um nome que diga o fato ("altura do pegador"): `distancia` com `mm`, `raio`, `sobre`, `tangente`, `paralela`, `perpendicular`, `vertical`, `horizontal`, `angulo` com `graus`, `igual`, `coincidente`. É por esse nome que o relatório fala.
 4. O chute de cada ponto em `pontos` é só o ponto de partida, em milímetro, h para a direita e v para cima. Ele não precisa estar certo na medida, mas precisa estar do lado certo: ponha o ponto onde ele ficaria numa folha, grosso modo.
@@ -38,3 +38,33 @@ Rode `npm run desenho -- <vista>.desenho.json`. Corrija a relação ou o `lado`,
 - **resolvido**: lê as medidas derivadas, que você não escreveu (a altura de uma parte, a posição de uma ponta, a caixa da vista), e compara com a descrição. Uma medida derivada que contraria a descrição quer dizer que falta ou sobra uma relação, mesmo com zero grau de liberdade. Aviso de redundância pede que se apague a relação repetida; aviso de sobreposição pede `frenteParaFundo`.
 
 Resolvido, o comando grava `<vista>.contornos.json` e `<vista>.png` (a vista em traço, com os nomes fora do desenho). O contorno é lido pelo esboço (`plano.referencia`) e pela prancha (`npm run contorno:prancha -- <vista>.contornos.json`) como o de uma imagem. A forma é julgada pelo crítico e pela pessoa: o relatório mostra que as relações valem, e não que o objeto se parece com o que se descreveu.
+
+## Parâmetros, peças e famílias
+
+Uma medida que se repete vai para `parametros` (`"parametros": { "largura": 120, "meia": "=largura/2" }`) e é citada pelo nome em qualquer campo numérico, inclusive no chute de um ponto, para a forma acompanhar o valor. As relações a mais do @3: `simetrico` (`["P", "Q", reta]` ou duas partes), `distancia` só em h ou só em v (`"eixo": "h"` com `"lado"` `esquerda` ou `direita`, ou `"v"` com `acima` ou `abaixo`: o primeiro ponto fica daquele lado do segundo), `construcao` (um círculo ou uma reta que amarra relações sem virar parte) e o centro com nome do canto arredondado, `"raioDoCanto": { "KF": { "raio": 20, "centro": "CKF" } }`, que dá o ponto `CKF` para dizer concêntrico (`coincidente` com o centro de um furo) ou medir o entre-eixos. A ajuda (`npm run desenho -- --ajuda`) traz a forma de cada uma.
+
+Uma forma que o objeto repete vira peça, com parâmetros de entrada e pontos de ligação, e o desenho a chama com valores. O uso põe o prefixo no nome de tudo o que é da peça, e o desenho cita só as ligações:
+
+```json
+"pecas": { "pilha": {
+  "parametros": { "diametro": null, "comprimento": 100 },
+  "pontos": { "P": [0, 0], "Q": [0, 100] },
+  "partes": { "corpo": { "barra": ["P", "Q"], "espessura": "=diametro" } },
+  "relacoes": [ { "nome": "comprimento", "distancia": ["P", "Q"], "mm": "comprimento" } ],
+  "ligacoes": { "inicio": "P", "fim": "Q", "corpo": "corpo" } } },
+"usos": { "mastro": { "peca": "pilha", "parametros": { "diametro": 60 }, "origem": [500, 0] } },
+"relacoes": [ { "nome": "mastro a prumo", "vertical": ["mastro.inicio", "mastro.fim"] } ]
+```
+
+`origem` desloca só os chutes, `nomeiaPartes` dá à parte um nome final sem prefixo (o nome de uma região da referência) e, em `frenteParaFundo`, o nome do uso vale pelas partes dele. Uma peça não usa outra peça. O catálogo de peças fica num arquivo `mecanifica.pecas-de-desenho@1` carregado com `--pecas=<arquivo>`.
+
+Uma família é o desenho de uma classe de objeto com a faixa de cada parâmetro. O parâmetro é escrito uma vez, na família, e o desenho o lê por nome:
+
+```json
+{ "formato": "mecanifica.familia-de-desenho@1", "id": "mastro", "versao": "1.0.0",
+  "parametros": { "diametro": { "unidade": "mm", "padrao": 60, "minimo": 40, "medio": 60, "maximo": 100 } },
+  "perfis": { "grosso": { "parametros": { "diametro": 90 } } },
+  "desenho": { "formato": "mecanifica.desenho@3", "...": "um desenho @3 que usa diametro" } }
+```
+
+`npm run desenho -- familia <arquivo> --valores=diametro=80 --grava=<pasta>` gera o desenho para os valores. Antes de dar a família por pronta, rode `npm run desenho -- familia <arquivo> --provar`: ela desenha com todos os parâmetros no mínimo, no médio e no máximo, com cada um nos três e com cada perfil, e cada conjunto precisa resolver sem conflito, parte solta, lado trocado, polígono cruzado nem parte escondida. O que falha só no extremo é amarração que valia perto do padrão: o chute fixo que deixa de estar do lado certo quando o parâmetro muda (escreva o chute como expressão do parâmetro), a relação que o extremo contradiz e o raio de canto que não cabe na aresta. Corrija a amarração ou estreite a faixa, e prove de novo. A prova diz que a família resolve; a forma é julgada pelo crítico e pela pessoa.

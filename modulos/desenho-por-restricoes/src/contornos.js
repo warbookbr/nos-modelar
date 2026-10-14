@@ -1,7 +1,8 @@
 /* contornos.js — a saída no formato `mecanifica.contornos@1`, o mesmo que o contorno da imagem grava, para o esboço, a prancha e o
    crítico lerem como leem o de uma imagem.
 
-   O que muda em relação ao arquivo de uma imagem: no lugar de `imagem` entra `origem` ({ desenho, sha256, resolvedor }), e saem
+   O que muda em relação ao arquivo de uma imagem: no lugar de `imagem` entra `origem` ({ desenho, sha256, resolvedor }, e `pecas`,
+   o sha256 de cada catálogo de peças, quando o desenho usou um catálogo de fora), e saem
    `mmPorPx`, `residuo`, `semente` e todos os campos de pixel, que nenhum consumidor lê (a geometria resolvida já é exata, e a
    reta e o arco saem como reta e arco). Fica o que eles leem: `silhueta` com `contornoMm`, `linhaDeForaMm`, `pedacos` e
    `linhasDeForaMm`, e em cada região `contornoMm`, `pedacos`, `areaMm2` e, quando é o caso, `foraDoModelo`.
@@ -72,7 +73,7 @@ export async function contornosDoDesenho(modelo, aneis, { origem } = {}) {
   }
   const contornos = {
     formato: FORMATO_DOS_CONTORNOS,
-    origem: { desenho: origem?.desenho ?? null, sha256: origem?.sha256 ?? null, resolvedor: RESOLVEDOR },
+    origem: { desenho: origem?.desenho ?? null, sha256: origem?.sha256 ?? null, ...(origem?.pecas ? { pecas: origem.pecas } : {}), resolvedor: RESOLVEDOR },
     silhueta: { contornoMm: pedacos[0].contornoMm, linhaDeForaMm: linhasDeForaMm[0], pedacos, linhasDeForaMm },
     regioes,
   };

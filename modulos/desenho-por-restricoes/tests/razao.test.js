@@ -1,7 +1,8 @@
 /* razao.test.js — a razão interseção/união entre dois contornos, sem alinhar, alinhada por um ponto declarado e pela melhor translação,
-   e as duas medidas do arquivo inteiro: a união das regiões (o padrão, com o vão cercado e o furo da região fora) e o anel de fora da silhueta. */
+   e as duas medidas do arquivo inteiro: a união das regiões (o padrão, com o vão cercado e o furo da região fora) e o anel de fora da silhueta.
+   A razão de todas as regiões numa chamada (`razaoPorParte`) sai da pior para a melhor e diz as regiões que só um dos arquivos tem. */
 import { describe, expect, it } from 'vitest';
-import { desenhar, razaoInterseccaoUniao, ErroDeDesenho } from '../src/index.js';
+import { desenhar, razaoInterseccaoUniao, razaoPorParte, ErroDeDesenho } from '../src/index.js';
 import { carrinho } from './carrinho.js';
 
 const retangulo = (h0, v0, h1, v1) => [[h0, v0], [h1, v0], [h1, v1], [h0, v1]];
@@ -198,5 +199,66 @@ describe('a razão interseção/união', () => {
     await expect(razaoInterseccaoUniao(contornos, contornos, { parteB: 'banco' })).rejects.toThrow(/o segundo contorno: não há a região "banco"; as regiões são "braco", "cacamba", "pe", "roda"/);
     await expect(razaoInterseccaoUniao([[[0, 0], [1, 1]]], [retangulo(0, 0, 1, 1)])).rejects.toThrow(/cada anel com 3 ou mais pontos/);
     await expect(razaoInterseccaoUniao([retangulo(0, 0, 1, 1)], [retangulo(0, 0, 1, 1)], { alinharPor: { a: [0, 0] } })).rejects.toThrow(/"alinharPor" deve ser/);
+  });
+});
+
+describe('a razão de cada região numa chamada só', () => {
+  it('dá o mesmo número que a chamada por região, da pior para a melhor, e separa as regiões que só um dos arquivos tem', async () => {
+    const a = arquivo({
+      base: regiao([retangulo(0, 0, 100, 20)]), meio: regiao([retangulo(0, 20, 100, 60)]), topo: regiao([retangulo(0, 60, 100, 80)]), soEmA: regiao([retangulo(0, 80, 10, 90)]),
+    }, [retangulo(0, 0, 100, 90)]);
+    const b = arquivo({
+      base: regiao([retangulo(0, 0, 100, 20)]), meio: regiao([retangulo(0, 20, 100, 50)]), topo: regiao([retangulo(50, 60, 150, 80)]), soEmB: regiao([retangulo(0, 80, 10, 90)]),
+    }, [retangulo(0, 0, 150, 90)]);
+    const r = await razaoPorParte(a, b);
+    expect(r.partes.map((p) => p.nome)).toEqual(['topo', 'meio', 'base']);
+    expect(r.soEmA).toEqual(['soEmA']);
+    expect(r.soEmB).toEqual(['soEmB']);
+    const topo = r.partes[0];
+    expect(topo.semAlinhar).toBeCloseTo(1000 / 3000, 6);
+    expect(topo.melhorTranslacao).toBeCloseTo(1, 4);
+    expect(topo.deslocamento[0]).toBeCloseTo(-50, 1);
+    expect(r.partes[1].semAlinhar).toBeCloseTo(30 / 40, 6);
+    expect(r.partes[2].semAlinhar).toBe(1);
+    expect(r.partes[2].deslocamento).toEqual([0, 0]);
+    for (const p of r.partes) {
+      const sozinha = await razaoInterseccaoUniao(a, b, { parteA: p.nome, parteB: p.nome });
+      expect(p.semAlinhar, p.nome).toBe(sozinha.semAlinhar.iou);
+      expect(p.melhorTranslacao, p.nome).toBe(sozinha.melhorTranslacao.iou);
+      expect(p.areaA, p.nome).toBe(sozinha.areaA);
+    }
+  });
+
+  it('o empate sai em ordem de nome, o ponto declarado entra em cada região e a região fora do modelo vem marcada', async () => {
+    const a = arquivo({ b: regiao([retangulo(0, 0, 10, 10)]), a: regiao([retangulo(20, 0, 30, 10)]), cabo: regiao([retangulo(40, 0, 80, 10)], true) }, [retangulo(0, 0, 30, 10)]);
+    const b = moverArquivo(a, 5, 0);
+    const r = await razaoPorParte(a, b, { alinharPor: { a: [0, 0], b: [5, 0] } });
+    expect(r.partes.map((p) => p.nome)).toEqual(['a', 'b', 'cabo']);
+    expect(r.partes[0].semAlinhar).toBeCloseTo(50 / 150, 6);
+    expect(r.partes[1].semAlinhar).toBeCloseTo(50 / 150, 6);
+    expect(r.partes[2].semAlinhar).toBeCloseTo(350 / 450, 6);
+    expect(r.partes.map((p) => p.porPonto)).toEqual([1, 1, 1]);
+    expect(r.partes.map((p) => p.foraDoModelo)).toEqual([false, false, true]);
+  });
+
+  it('o desenho contra ele mesmo dá 1 em todas as regiões, e com uma medida mudada as regiões saem da pior para a melhor', async () => {
+    const { contornos } = await desenhar(carrinho());
+    const igual = await razaoPorParte(contornos, contornos);
+    expect(igual.partes.map((p) => p.semAlinhar)).toEqual([1, 1, 1, 1]);
+    expect(igual.soEmA).toEqual([]);
+    const outro = carrinho();
+    outro.relacoes.find((r) => r.nome === 'raio da roda').mm = 180;
+    outro.pontos.C = [10, 160];
+    const { contornos: b } = await desenhar(outro);
+    const r = await razaoPorParte(contornos, b, { alinharPor: { a: [0, 0], b: [0, 0] } });
+    expect(r.partes).toHaveLength(4);
+    expect(r.partes[0].semAlinhar).toBeLessThan(0.9);
+    expect(r.partes.map((p) => p.semAlinhar)).toEqual([...r.partes.map((p) => p.semAlinhar)].sort((x, y) => x - y));
+    expect(r.partes.find((p) => p.nome === 'roda').semAlinhar).toBeLessThan(1);
+  });
+
+  it('recusa o que não é arquivo de contornos', async () => {
+    await expect(razaoPorParte([retangulo(0, 0, 1, 1)], [retangulo(0, 0, 1, 1)])).rejects.toThrow(/o primeiro contorno: deve ser um arquivo "formato": "mecanifica.contornos@1"/);
+    await expect(razaoPorParte(arcoFechado(), { formato: 'outro' })).rejects.toThrow(/o segundo contorno: deve ser um arquivo/);
   });
 });

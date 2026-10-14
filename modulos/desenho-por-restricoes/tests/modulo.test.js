@@ -1,5 +1,6 @@
-/* modulo.test.js — o módulo fica isolado (não importa Three.js, o núcleo de autoria nem outro módulo), o resolvedor está fixado em
-   1.3.0 e a versão que o contorno grava é a instalada, e a ajuda cobre as relações do formato. */
+/* modulo.test.js — o módulo fica isolado (não importa Three.js, o núcleo de autoria nem outro módulo; do núcleo do repositório lê só
+   a gramática de expressões, a mesma do esboço), o resolvedor está fixado em 1.3.0 e a versão que o contorno grava é a instalada, e a
+   ajuda cobre as relações do formato. */
 import { readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { RESOLVEDOR, TIPOS_DE_RELACAO, textoDaAjuda } from '../src/index.js';
@@ -8,8 +9,8 @@ const pasta = new URL('../src/', import.meta.url);
 const raiz = (caminho) => JSON.parse(readFileSync(new URL(`../../../${caminho}`, import.meta.url), 'utf8'));
 
 describe('o módulo desenho-por-restricoes', () => {
-  it('importa só ele mesmo, o Node, o planegcs e a Manifold: nada de Three.js, do núcleo de autoria nem de outro módulo', () => {
-    const permitidos = [/^\.\/[\w-]+\.js$/, /^node:crypto$/, /^@salusoft89\/planegcs$/, /^manifold-3d$/];
+  it('importa só ele mesmo, o Node, o planegcs, a Manifold e a gramática de expressões do núcleo: nada de Three.js, do núcleo de autoria nem de outro módulo', () => {
+    const permitidos = [/^\.\/[\w-]+\.js$/, /^node:crypto$/, /^@salusoft89\/planegcs$/, /^manifold-3d$/, /^\.\.\/\.\.\/\.\.\/procedural\/nucleo\/expressoes\.js$/];
     const arquivos = readdirSync(pasta).filter((f) => f.endsWith('.js'));
     expect(arquivos.length).toBeGreaterThan(8);
     for (const f of arquivos) {
@@ -28,7 +29,8 @@ describe('o módulo desenho-por-restricoes', () => {
   it('a ajuda do comando nomeia todos os tipos de relação do formato', () => {
     const ajuda = textoDaAjuda();
     for (const t of TIPOS_DE_RELACAO) expect(ajuda, t).toMatch(new RegExp(`^\\s+${t}\\b`, 'm'));
-    expect(ajuda).toMatch(/mecanifica\.desenho@2/);
+    expect(ajuda).toMatch(/mecanifica\.desenho@3/);
+    expect(ajuda).toMatch(/mecanifica\.familia-de-desenho@1/);
     expect(ajuda).toMatch(/raioDoCanto/);
     expect(ajuda).toMatch(/npm run desenho/);
   });

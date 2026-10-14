@@ -3,8 +3,13 @@
    A tradução é direta: `sobre` vira `point_on_line_pl` (ou `point_on_circle`, `point_on_arc`), `distancia` entre pontos vira
    `p2p_distance` e entre ponto e reta `p2l_distance`, `raio` vira `circle_radius`, `tangente` vira `tangent_lc` ou
    `tangent_cc`, `paralela` vira `parallel`, `perpendicular` vira `perpendicular_ll`, `angulo` vira `l2l_angle_ll` em radianos e
-   `vertical` e `horizontal` viram `vertical_pp` e `horizontal_pp`. O `lado` e o `por` não entram no resolvedor, porque o
-   planegcs não tem sinal para eles: são conferidos depois de resolver (resolver.js).
+   `vertical` e `horizontal` viram `vertical_pp` e `horizontal_pp`, `simetrico` vira `p2p_symmetric_ppl` e a `distancia` só em h
+   ou só em v vira `difference` entre as coordenadas (essa tem sinal, e o `lado` o escolhe). O `lado` das outras e o `por` não
+   entram no resolvedor, porque o planegcs não tem sinal para eles: são conferidos depois de resolver (resolver.js).
+
+   O canto arredondado com centro nomeado (`modelo.centros`) entra no resolvedor como um círculo interno de raio fixo, centrado
+   no ponto do centro e tangente às duas arestas do canto (`tangent_lc`, duas vezes); o planegcs não distingue os quatro círculos
+   que tocam duas retas, então o chute do centro (calculado do canto, `canto.js`) escolhe o ramo e o resolver.js confere o resultado.
 
    Cada restrição leva como identificador `relacao:<nome>`, o nome que a IA escreveu, e é por ele que o conflito e a redundância
    voltam. Os pontos levam `ponto:<nome>`; as retas, `reta:...`; as referências fixas, `ref:<nome>:<n>`; o que o módulo cria por
@@ -16,6 +21,7 @@ const RAIO_PADRAO_DA_SEMENTE = 1000;
 export const idDoPonto = (nome) => `ponto:${nome}`;
 export const idDaRelacao = (nome) => `relacao:${nome}`;
 export const idDaParte = (tipo, nome) => `${tipo}:${nome}`;
+export const idDoCanto = (nome) => `interna:canto:${nome}`;
 
 export function idDaLinha(l) {
   if (l.via === 'referencia') return `reta:referencia:${l.nome}`;
@@ -43,6 +49,10 @@ function linhasUsadas(modelo) {
   const ver = (l) => { if (l && !mapa.has(idDaLinha(l))) mapa.set(idDaLinha(l), l); };
   for (const nome of Object.keys(modelo.referencias)) ver({ classe: 'linha', via: 'referencia', nome });
   for (const [nome, p] of Object.entries(modelo.partes)) if (p.tipo === 'barra') ver({ classe: 'linha', via: 'barra', nome });
+  for (const c of Object.values(modelo.centros ?? {})) {
+    ver({ classe: 'linha', via: 'par', pontos: [c.ponto, c.anterior] });
+    ver({ classe: 'linha', via: 'par', pontos: [c.ponto, c.proximo] });
+  }
   for (const r of modelo.relacoes) {
     if (r.linha) ver(r.linha);
     if (r.alvo?.classe === 'linha') ver(r.alvo);
@@ -86,6 +96,14 @@ export function traduzir(modelo, { chutes = {}, raios = {}, extras = [] } = {}) 
     }
   }
   const alvoCircular = (c) => idDaParte(c.tipo, c.parte);
+  for (const nome of Object.keys(modelo.centros ?? {}).sort(porNome)) {
+    const c = modelo.centros[nome];
+    const id = idDoCanto(nome);
+    primitivas.push({ id, type: 'circle', c_id: idDoPonto(nome), radius: c.raio });
+    primitivas.push({ id: `${id}:raio`, type: 'circle_radius', c_id: id, radius: c.raio });
+    primitivas.push({ id: `${id}:anterior`, type: 'tangent_lc', l_id: idDaLinha({ via: 'par', pontos: [c.ponto, c.anterior] }), c_id: id });
+    primitivas.push({ id: `${id}:proximo`, type: 'tangent_lc', l_id: idDaLinha({ via: 'par', pontos: [c.ponto, c.proximo] }), c_id: id });
+  }
   for (const r of modelo.relacoes) {
     const id = idDaRelacao(r.nome);
     if (r.tipo === 'sobre') {
@@ -95,7 +113,12 @@ export function traduzir(modelo, { chutes = {}, raios = {}, extras = [] } = {}) 
     } else if (r.tipo === 'coincidente') primitivas.push({ id, type: 'p2p_coincident', p1_id: idDoPonto(r.a), p2_id: idDoPonto(r.b) });
     else if (r.tipo === 'distancia') {
       if (r.linha) primitivas.push({ id, type: 'p2l_distance', p_id: idDoPonto(r.a), l_id: idDaLinha(r.linha), distance: r.mm });
-      else primitivas.push({ id, type: 'p2p_distance', p1_id: idDoPonto(r.a), p2_id: idDoPonto(r.b), distance: r.mm });
+      else if (r.eixo) {
+        /* `difference` mede param2 − param1: o primeiro ponto da relação fica do `lado` dado, então o do lado menor vai em param1. */
+        const prop = r.eixo === 'h' ? 'x' : 'y';
+        const [menor, maior] = r.lado === 'direita' || r.lado === 'acima' ? [r.b, r.a] : [r.a, r.b];
+        primitivas.push({ id, type: 'difference', param1: { o_id: idDoPonto(menor), prop }, param2: { o_id: idDoPonto(maior), prop }, difference: r.mm });
+      } else primitivas.push({ id, type: 'p2p_distance', p1_id: idDoPonto(r.a), p2_id: idDoPonto(r.b), distance: r.mm });
     } else if (r.tipo === 'raio') {
       if (r.alvo.tipo === 'circulo') primitivas.push({ id, type: 'circle_radius', c_id: alvoCircular(r.alvo), radius: r.mm });
       else primitivas.push({ id, type: 'arc_radius', a_id: alvoCircular(r.alvo), radius: r.mm });
@@ -104,6 +127,7 @@ export function traduzir(modelo, { chutes = {}, raios = {}, extras = [] } = {}) 
       else primitivas.push({ id, type: 'tangent_cc', c1_id: alvoCircular(r.a), c2_id: alvoCircular(r.b) });
     } else if (r.tipo === 'paralela') primitivas.push({ id, type: 'parallel', l1_id: idDaLinha(r.a), l2_id: idDaLinha(r.b) });
     else if (r.tipo === 'perpendicular') primitivas.push({ id, type: 'perpendicular_ll', l1_id: idDaLinha(r.a), l2_id: idDaLinha(r.b) });
+    else if (r.tipo === 'simetrico') primitivas.push({ id, type: 'p2p_symmetric_ppl', p1_id: idDoPonto(r.a), p2_id: idDoPonto(r.b), l_id: idDaLinha(r.linha) });
     else if (r.tipo === 'vertical') primitivas.push({ id, type: 'vertical_pp', p1_id: idDoPonto(r.a), p2_id: idDoPonto(r.b) });
     else if (r.tipo === 'horizontal') primitivas.push({ id, type: 'horizontal_pp', p1_id: idDoPonto(r.a), p2_id: idDoPonto(r.b) });
     else if (r.tipo === 'angulo') primitivas.push({ id, type: 'l2l_angle_ll', l1_id: idDaLinha(r.a), l2_id: idDaLinha(r.b), angle: (r.graus * Math.PI) / 180 });

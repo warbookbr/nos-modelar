@@ -36,6 +36,8 @@ function linhasDasMedidas(m, ordemDeNomes) {
     else if (p.tipo === 'arco') L.push(`  ${aspas(nome)}: arco de raio ${mm(p.raioMm)} mm; ${caixa}`);
     else L.push(`  ${aspas(nome)}: polígono; ${caixa}; lados ${p.lados.map((l) => `${l.de}-${l.ate} ${mm(l.comprimentoMm)} mm a ${mm(l.anguloGraus)} graus`).join(', ')}${p.cantos ? ` (medidos entre os pontos, antes de arredondar); cantos arredondados: ${p.cantos.map((c) => `${c.ponto} raio ${mm(c.raioMm)} mm`).join(', ')}` : ''}`);
   }
+  if (m.centrosDeCanto) L.push(`  centros dos cantos: ${Object.entries(m.centrosDeCanto).map(([n, c]) => `${aspas(n)} (${mm(c.posicao[0])}; ${mm(c.posicao[1])}), canto ${c.ponto} de ${aspas(c.parte)}, raio ${mm(c.raioMm)} mm`).join(', ')}`);
+  for (const [nome, c] of Object.entries(m.construcao ?? {})) L.push(`  construção ${aspas(nome)}: círculo de raio ${mm(c.raioMm)} mm, centro (${mm(c.centro[0])}; ${mm(c.centro[1])}); fora dos contornos e da vista`);
   return L;
 }
 
@@ -44,6 +46,7 @@ export function relatorioEmTexto(r) {
   const titulo = `desenho ${aspas(r.objeto)}, vista ${r.vista}`;
   if (r.estado === 'resolvido') {
     L.push(`${titulo}: estado resolvido, ${plural(r.grausDeLiberdade, 'grau de liberdade', 'graus de liberdade')}.`);
+    if (r.parametros && Object.keys(r.parametros).length) L.push(`parâmetros: ${Object.entries(r.parametros).map(([n, v]) => `${n} = ${String(Math.round(v * 1000) / 1000).replace('.', ',')}`).join(', ')}`);
   } else if (r.estado === 'conflito') {
     L.push(`${titulo}: estado conflito.`);
     if (r.conflitantes.length) L.push(`as relações ${lista(r.conflitantes)} não cabem juntas. Apague uma delas ou corrija o valor de uma, e rode de novo; não mexa nas coordenadas.`);
@@ -52,7 +55,9 @@ export function relatorioEmTexto(r) {
   } else if (r.estado === 'lado trocado') {
     L.push(`${titulo}: estado lado trocado. O resolvedor devolveu uma solução, mas ela fica do lado errado do que você declarou:`);
     for (const t of r.ladosTrocados) L.push(`- ${t.mensagem}.`);
-    if (r.sugestao?.resolve) {
+    if (r.ladosTrocados.every((t) => t.centro)) {
+      L.push('o centro de um canto sai dos chutes dos três pontos do canto: ponha esses chutes na forma final do canto e rode de novo.');
+    } else if (r.sugestao?.resolve) {
       const novo = Object.entries(r.sugestao.pontos).map(([n, [h, v]]) => `${aspas(n)}: [${h}, ${v}]`).join(', ');
       L.push(`com o chute refletido pela reta (${novo}) o desenho resolve com todos os lados certos. Troque esse chute em "pontos"; é o chute que escolhe o ramo da solução. Se o lado declarado é que estava errado, corrija o "lado" da relação.`);
     } else if (r.sugestao) {
