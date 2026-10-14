@@ -1,0 +1,23 @@
+{
+ "por": "a pessoa, 2026-10-14: aceitar com pendências; a silhueta usada na prova do desenho sem referência não tem defeito",
+ "quando": "2026-10-14T12:40:44.126Z",
+ "rodada": 3,
+ "nota": 7,
+ "defeitos": [
+  {
+   "parte": "aro",
+   "tipo": "comprimento",
+   "onde": "extremidade inferior, no pé do arco esquerdo, abaixo da linha de quebra",
+   "sentido": "maior",
+   "evidencia": "folha 4, par aro / lateral: a faixa rosa continua pela borda vertical da lateral por cerca de 130 px da folha depois da linha de quebra, onde o original mostra a quebra e o bloco escuro. Na folha 3, par aro / piso, o mesmo trecho passa cerca de 80 px da linha de quebra."
+  },
+  {
+   "parte": "piso",
+   "tipo": "uniao",
+   "onde": "fios finos ao longo da aresta inferior e da aresta esquerda do capô, na faixa vertical entre capô e lateral, e no fundo do V junto ao capô",
+   "sentido": "atravessando",
+   "evidencia": "folha 2, par capo / lateral: faixa verde-escura (cor do piso) da altura toda do capô, no lugar da linha escura do original. Folha 5, par capo / contrapeso: fios verdes na aresta inferior do capô. Folha 1, pares capo / entalhe e capo / tampa: mancha verde no fundo do V e fio verde na aresta do capô."
+  }
+ ],
+ "pendencias": "o aro desce além da linha de quebra no pé do arco dianteiro; fios finos com a cor do piso em volta do capô vêm da paleta do mapa de partes, que soma uma parte clara a uma linha escura e dá quase o verde do piso, e confundiram o crítico em duas rodadas (correção geral da ferramenta, no backlog)"
+}

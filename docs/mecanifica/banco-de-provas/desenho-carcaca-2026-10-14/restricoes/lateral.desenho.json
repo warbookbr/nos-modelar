@@ -1,0 +1,133 @@
+{
+  "formato": "mecanifica.desenho@2",
+  "objeto": "carcaça de empilhadeira",
+  "vista": "lateral",
+  "olhando": "do lado direito, frente à esquerda, sem rodas, torre, garfos, assento nem volante",
+  "referencias": {
+    "chao": { "reta": "horizontal", "v": 0 },
+    "frente": { "reta": "vertical", "h": 0 }
+  },
+  "pontos": {
+    "Pa": [0, 465], "Pd": [0, 379], "Pc": [107, 379], "T": [107, 465],
+    "P1": [107, 310], "P2": [465, 0], "C": [128, -27], "KD": [438, 330],
+    "G": [400, 282], "CW": [744, 1482], "Rb": [971, 282], "R": [1582, 635], "J": [1582, 338],
+    "K1": [1344, 338], "A1": [1344, 0], "A2": [1613, 0], "K2": [1613, 338], "M": [1493, 338],
+    "CF": [1493, 423], "CT": [2120, 423], "CB": [2120, 0],
+    "CPfb": [1582, 423], "CPsb": [2090, 423], "CPst": [2090, 483], "CPrb": [2120, 483], "CPrt": [2120, 786], "CPft": [1582, 786],
+    "TA2": [2150, 786], "TA3": [2150, 846], "TA4": [1582, 846],
+    "E1": [1075, 342], "E3": [1582, 756], "E4": [1075, 756],
+    "S5": [71, 564], "S4": [103, 564], "S6": [123, 490], "S3": [408, 312], "S2": [971, 312]
+  },
+  "partes": {
+    "paralama": { "poligono": ["Pa", "T", "Pc", "Pd"] },
+    "lateral": {
+      "poligono": ["T", "G", "Rb", "R", "J", "K1", "A1", "P2", "KD", "P1"],
+      "raioDoCanto": { "G": 1200, "K1": 120, "KD": 338 }
+    },
+    "piso": {
+      "poligono": ["Rb", "G", "T", "S5", "S4", "S6", "S3", "S2"],
+      "raioDoCanto": { "G": 1200, "S3": 1170 }
+    },
+    "encosto": {
+      "poligono": ["E1", "R", "E3", "E4"],
+      "raioDoCanto": { "E1": 40, "R": 40, "E3": 80, "E4": 80 }
+    },
+    "capo": {
+      "poligono": ["CPfb", "CPsb", "CPst", "CPrb", "CPrt", "CPft"],
+      "raioDoCanto": { "CPrt": 80 }
+    },
+    "tampa": { "poligono": ["CPft", "TA2", "TA3", "TA4"], "raioDoCanto": 25 },
+    "contrapeso": {
+      "poligono": ["A2", "CB", "CT", "CF", "M", "K2"],
+      "raioDoCanto": { "K2": 120, "CF": 30 }
+    }
+  },
+  "frenteParaFundo": ["paralama", "piso", "encosto", "tampa", "capo", "contrapeso", "lateral"],
+  "relacoes": [
+    { "nome": "ponta do paralama na frente do desenho", "sobre": ["Pa", "frente"] },
+    { "nome": "paralama horizontal", "horizontal": ["Pa", "T"] },
+    { "nome": "avanço do paralama além da lateral", "distancia": ["Pa", "T"], "mm": 107.5 },
+    { "nome": "ponta do paralama a prumo", "vertical": ["Pa", "Pd"] },
+    { "nome": "espessura do paralama", "distancia": ["Pa", "Pd"], "mm": 86 },
+    { "nome": "base do paralama horizontal", "horizontal": ["Pd", "Pc"] },
+    { "nome": "paralama preso na face da frente", "vertical": ["Pc", "T"] },
+
+    { "nome": "altura da face da frente", "distancia": ["T", "chao"], "mm": 465, "lado": "acima" },
+    { "nome": "face da frente a prumo", "vertical": ["P1", "T"] },
+    { "nome": "início do arco dianteiro na face", "distancia": ["P1", "chao"], "mm": 310, "lado": "acima" },
+    { "nome": "fim do arco dianteiro na base", "sobre": ["P2", "chao"] },
+    { "nome": "fim do arco dianteiro a um sexto do comprimento", "distancia": ["P2", ["P1", "T"]], "mm": 358, "lado": "direita" },
+    { "nome": "raio do arco dianteiro no início", "distancia": ["C", "P1"], "mm": 338 },
+    { "nome": "raio do arco dianteiro no fim", "distancia": ["C", "P2"], "mm": 338 },
+    { "nome": "arco dianteiro tangente no início", "perpendicular": [["C", "P1"], ["P1", "KD"]] },
+    { "nome": "arco dianteiro tangente no fim", "perpendicular": [["C", "P2"], ["P2", "KD"]] },
+
+    { "nome": "fundo do poço a um terço da altura", "distancia": ["Rb", "chao"], "mm": 282, "lado": "acima" },
+    { "nome": "fundo do poço plano", "horizontal": ["G", "Rb"] },
+    { "nome": "raio da curva do poço", "distancia": ["CW", "T"], "mm": 1200 },
+    { "nome": "curva do poço tangente ao fundo", "distancia": ["CW", ["G", "Rb"]], "mm": 1200, "lado": "acima" },
+    { "nome": "curva do poço começa no alto da face", "perpendicular": [["CW", "T"], ["T", "G"]] },
+
+    { "nome": "rampa a trinta graus", "angulo": ["chao", ["Rb", "R"]], "graus": 30 },
+    { "nome": "rampa chega a três quartos da altura", "distancia": ["R", "chao"], "mm": 635, "lado": "acima" },
+    { "nome": "rampa encontra a face do capô", "vertical": ["R", "CPft"] },
+    { "nome": "traseira da lateral na face do capô", "vertical": ["J", "R"] },
+    { "nome": "traseira da lateral desce até o topo do arco traseiro", "horizontal": ["J", "K1"] },
+
+    { "nome": "arco traseiro na base", "sobre": ["A1", "chao"] },
+    { "nome": "arco traseiro a três oitavos da traseira", "distancia": ["A1", ["TA2", "TA3"]], "mm": 806, "lado": "esquerda" },
+    { "nome": "fim do arco traseiro na base", "sobre": ["A2", "chao"] },
+    { "nome": "largura do arco traseiro", "distancia": ["A1", "A2"], "mm": 269 },
+    { "nome": "perna da frente do arco traseiro a prumo", "vertical": ["A1", "K1"] },
+    { "nome": "altura do arco traseiro", "distancia": ["K1", "chao"], "mm": 338, "lado": "acima" },
+    { "nome": "perna de trás do arco traseiro a prumo", "vertical": ["A2", "K2"] },
+    { "nome": "topo do arco traseiro de nível", "horizontal": ["K1", "K2"] },
+
+    { "nome": "face da frente do capô a prumo", "vertical": ["CPfb", "CPft"] },
+    { "nome": "topo do capô horizontal", "horizontal": ["CPft", "CPrt"] },
+    { "nome": "comprimento do capô", "distancia": ["CPft", "CPrt"], "mm": 537.5 },
+    { "nome": "face de trás do capô a prumo", "vertical": ["CPrb", "CPrt"] },
+    { "nome": "degrau do capô horizontal", "horizontal": ["CPst", "CPrb"] },
+    { "nome": "profundidade do degrau", "distancia": ["CPst", "CPrb"], "mm": 30 },
+    { "nome": "degrau do capô a prumo", "vertical": ["CPsb", "CPst"] },
+    { "nome": "altura do degrau", "distancia": ["CPsb", "CPst"], "mm": 60 },
+    { "nome": "base do capô horizontal", "horizontal": ["CPfb", "CPsb"] },
+    { "nome": "contrapeso até perto da metade da altura", "distancia": ["CPfb", "chao"], "mm": 423, "lado": "acima" },
+
+    { "nome": "tampa assentada no capô", "horizontal": ["CPft", "TA2"] },
+    { "nome": "comprimento total", "distancia": ["TA2", "frente"], "mm": 2150, "lado": "direita" },
+    { "nome": "tampa passa um pouco atrás do capô", "distancia": ["CPrt", "TA2"], "mm": 30 },
+    { "nome": "traseira da tampa a prumo", "vertical": ["TA2", "TA3"] },
+    { "nome": "altura total", "distancia": ["TA3", "chao"], "mm": 846, "lado": "acima" },
+    { "nome": "topo da tampa horizontal", "horizontal": ["TA3", "TA4"] },
+    { "nome": "frente da tampa alinhada com o capô", "vertical": ["TA4", "CPft"] },
+    { "nome": "espessura da tampa", "distancia": ["TA4", "CPft"], "mm": 60 },
+
+    { "nome": "contrapeso na base", "sobre": ["CB", "chao"] },
+    { "nome": "traseira do contrapeso alinhada com o capô", "vertical": ["CB", "CPrt"] },
+    { "nome": "traseira do contrapeso a prumo", "vertical": ["CB", "CT"] },
+    { "nome": "contrapeso embaixo do capô", "horizontal": ["CT", "CPfb"] },
+    { "nome": "topo do contrapeso horizontal", "horizontal": ["CF", "CT"] },
+    { "nome": "frente do contrapeso a prumo acima do arco", "vertical": ["CF", "M"] },
+    { "nome": "frente do contrapeso no topo do arco", "horizontal": ["M", "K2"] },
+    { "nome": "contrapeso acompanha a curva do arco", "distancia": ["M", "K2"], "mm": 120 },
+
+    { "nome": "base do encosto na rampa", "sobre": ["E1", ["Rb", "R"]] },
+    { "nome": "frente do encosto perto do meio", "distancia": ["E1", "frente"], "mm": 1075, "lado": "direita" },
+    { "nome": "frente do encosto a prumo", "vertical": ["E1", "E4"] },
+    { "nome": "topo do encosto pouco abaixo do capô", "distancia": ["E4", ["CPft", "CPrt"]], "mm": 30, "lado": "abaixo" },
+    { "nome": "topo do encosto horizontal", "horizontal": ["E4", "E3"] },
+    { "nome": "encosto encostado no capô", "vertical": ["E3", "R"] },
+
+    { "nome": "anteparo inclinado para a esquerda", "angulo": ["chao", ["T", "S5"]], "graus": 110 },
+    { "nome": "anteparo até dois terços da altura", "distancia": ["S5", "chao"], "mm": 564, "lado": "acima" },
+    { "nome": "topo do anteparo horizontal", "horizontal": ["S5", "S4"] },
+    { "nome": "espessura do anteparo", "distancia": ["S4", ["T", "S5"]], "mm": 30, "lado": "direita" },
+    { "nome": "piso sobre o alto da curva", "sobre": ["S6", ["T", "CW"]] },
+    { "nome": "espessura do piso na curva", "distancia": ["S6", "T"], "mm": 30 },
+    { "nome": "piso acompanha a curva", "paralela": [["S3", "S6"], ["G", "T"]] },
+    { "nome": "espessura do piso no fundo", "distancia": ["S3", ["G", "Rb"]], "mm": 30, "lado": "acima" },
+    { "nome": "piso de nível no fundo", "horizontal": ["S3", "S2"] },
+    { "nome": "piso vai até o pé da rampa", "vertical": ["S2", "Rb"] }
+  ]
+}
