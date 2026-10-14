@@ -19,7 +19,11 @@ foto, em cinza escuro, com as partes fora do modelo em cinza claro.
 | a família ajustada à foto, com as faixas abertas | 0,733 | 0,908 | 13 fora da faixa |
 
 As razões são as da ferramenta, contra a união das regiões do
-[contorno da foto](../../empilhadeira-2026-10-14/referencias/empilhadeira_lateral.contornos.json):
+[contorno da foto](../../empilhadeira-2026-10-14/referencias/empilhadeira_lateral.contornos.json),
+que saiu em três rodadas do contorno da imagem, com nota 7, 8 e 8, e foi aceito pela
+pessoa com pendências que não tocam a carcaça (os filetes da cor do mapa no vinco do
+capô e as frestas da cabine). A rodada 3 mexeu na divisa entre o capô e a lateral, e
+as razões, medidas de novo sobre ela, mudaram no máximo 0,0001:
 
 ```bash
 npm run desenho -- razao docs/mecanifica/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.contornos.json docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/lateral.contornos.json
