@@ -6,24 +6,27 @@
  "parametros": {
   "arcoD": 295,
   "aro": 285,
-  "avanco": 60,
+  "avanco": 180,
   "balanco": 200,
   "comprimento": 2020,
+  "degrauDoOmbro": 20,
   "encosto": 680,
   "face": 450,
-  "folgaDaTampa": 1,
+  "ombroDoCapo": 100,
   "piso": 450,
   "posto": 200,
   "quedaDoCapo": 0,
   "raioT": 210,
   "rampa": 31,
   "subidaDoPainel": 125,
+  "tampaSobreOCapo": 26,
   "topo": 540,
   "vaoD": 205,
   "arcoT": "=comprimento-raioT-balanco",
   "painel": "=encosto+subidaDoPainel",
   "capo": "=painel-quedaDoCapo",
-  "altura": "=painel+folgaDaTampa",
+  "altura": "=capo+tampaSobreOCapo",
+  "peDaDescida": "=ombroDoCapo+degrauDoOmbro",
   "pe": 24,
   "raioD": "=vaoD-14.8",
   "centroT": 129.8,
@@ -747,12 +750,12 @@
    "baseCapo"
   ],
   "CA3": [
-   "=comprimento-9.9",
-   "=baseCapo+141.1"
+   "=comprimento-ombroDoCapo*tan(4)",
+   "=baseCapo+ombroDoCapo"
   ],
   "CA4": [
    "=comprimento-94.3",
-   "=baseCapo+170.9"
+   "=baseCapo+peDaDescida"
   ],
   "CA5": [
    "=comprimento-186",
@@ -781,6 +784,14 @@
   "TA4": [
    "=comprimento-19.5",
    "=altura-164.8"
+  ],
+  "CS1": [
+   "=avanco+aro+0.5",
+   "=face-aro-4"
+  ],
+  "CS2": [
+   "=avanco+aro+0.5",
+   "=pe+2"
   ],
   "CF1": [
    "=arcoT+raioT-142",
@@ -944,6 +955,14 @@
     "TA4": 15
    }
   },
+  "costura": {
+   "barra": [
+    "CS1",
+    "CS2"
+   ],
+   "espessura": 0.5,
+   "foraDoModelo": true
+  },
   "contrapeso": {
    "poligono": [
     "CF1",
@@ -964,6 +983,7 @@
   }
  },
  "frenteParaFundo": [
+  "costura",
   "paralama",
   "suporte",
   "capo",
@@ -1643,19 +1663,17 @@
      "CA2"
     ]
    ],
-   "mm": 141.1,
+   "mm": "ombroDoCapo",
    "lado": "acima"
   },
   {
-   "nome": "ombro traseiro sobe a 19,4 graus",
-   "angulo": [
-    "chao",
-    [
-     "CA3",
-     "CA4"
-    ]
+   "nome": "recuo do pé da descida do capô",
+   "distancia": [
+    "CA4",
+    "traseira"
    ],
-   "graus": 160.56
+   "mm": 94.3,
+   "lado": "esquerda"
   },
   {
    "nome": "altura do pé da descida do capô",
@@ -1666,7 +1684,7 @@
      "CA2"
     ]
    ],
-   "mm": 170.9,
+   "mm": "peDaDescida",
    "lado": "acima"
   },
   {
@@ -1805,6 +1823,29 @@
     "TA1",
     "TA4"
    ]
+  },
+  {
+   "nome": "costura nasce na ponta do aro",
+   "coincidente": [
+    "CS1",
+    "arco.pontaDoAro"
+   ]
+  },
+  {
+   "nome": "costura a prumo",
+   "vertical": [
+    "CS2",
+    "CS1"
+   ]
+  },
+  {
+   "nome": "costura desce até o pé da lateral",
+   "distancia": [
+    "CS2",
+    "chao"
+   ],
+   "mm": "=pe+2",
+   "lado": "acima"
   },
   {
    "nome": "frente do contrapeso a prumo",
