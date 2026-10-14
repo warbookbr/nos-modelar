@@ -43,9 +43,10 @@ só a saída para a pessoa e o crítico.
 ## Incluído
 
 - o desenho por restrições ajustado à referência: a IA desenha vendo o contorno e
-  a razão interseção/união, e corrige até passar do mínimo, proposto por Claude em
-  0,95 contra a união das partes em 2026-10-14, até a pessoa dizer outro, com a
-  volta à pessoa se o formato atual não chegar a ele;
+  a razão interseção/união, e corrige até passar do mínimo, de 0,95 contra a
+  união das partes, proposto por Claude e aceito pela pessoa em 2026-10-14, que
+  deixou a escolha das medidas com Claude, com a volta à pessoa se o formato
+  atual não chegar a ele;
 - as peças de desenho que as referências já contornadas repetem, e as famílias da
   carcaça da empilhadeira e do braço robótico, com as vistas do avião como terceira
   prova;
