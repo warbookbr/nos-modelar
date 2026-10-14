@@ -1,0 +1,1506 @@
+{
+ "formato": "mecanifica.desenho@3",
+ "objeto": "braço robótico colaborativo",
+ "vista": "lateral",
+ "olhando": "de lado, coluna à esquerda e antebraço horizontal indo para a direita, no sistema do contorno da referência lateral-sem-cabo",
+ "parametros": {
+  "alturaBase": 280,
+  "alturaOmbro": 205,
+  "alturaPunho": 285,
+  "comprimentoAntebraco": 720,
+  "comprimentoBraco": 610,
+  "diametroAntebraco": 148,
+  "diametroBaixo": 236,
+  "diametroCima": 195,
+  "larguraPunho": 126,
+  "nivelDoChao": -5,
+  "escalaBaixo": "=diametroBaixo/206",
+  "escalaCima": "=diametroCima/175.5",
+  "escalaAntebraco": "=diametroAntebraco/130",
+  "escalaLarguraPunho": "=larguraPunho/110",
+  "escalaAlturaPunho": "=alturaPunho/250",
+  "topoBase": "=nivelDoChao+alturaBase",
+  "meiaBase": "=diametroBaixo/2",
+  "espessuraChapa": "=28*escalaBaixo",
+  "sobraChapa": "=12*escalaBaixo",
+  "raioChapa": "=10*escalaBaixo",
+  "folgaCaixa": "=24*escalaBaixo",
+  "alturaCaixa": "=alturaBase-28*escalaBaixo",
+  "larguraCaixa": "=64.5*escalaBaixo",
+  "avancoCaixa": "=13*escalaBaixo",
+  "alturaCintura": "=51*escalaBaixo",
+  "diametroCintura": "=diametroBaixo-6",
+  "diametroOmbro": "=diametroBaixo-9",
+  "juntaOmbro": "=topoBase+alturaCintura+alturaOmbro/2",
+  "topoOmbro": "=juntaOmbro+alturaOmbro/2",
+  "raioPeloOmbroAlto": "=alturaOmbro/2-4.5*escalaBaixo",
+  "raioPeloOmbroLargo": "=diametroOmbro/2-12.5*escalaBaixo",
+  "raioPontaBraco": "=(raioPeloOmbroAlto+raioPeloOmbroLargo-sqrt((raioPeloOmbroAlto-raioPeloOmbroLargo)*(raioPeloOmbroAlto-raioPeloOmbroLargo)))/2",
+  "eixoAntebraco": "=juntaOmbro+comprimentoBraco",
+  "bordaCimaDireita": "=78.5*escalaCima",
+  "bordaCimaEsquerda": "=97*escalaCima",
+  "recuoCima": "=9.25*escalaCima",
+  "anelCotoveloAbaixo": "=134*escalaCima",
+  "alturaAnelCotovelo": "=52*escalaCima",
+  "alturaCotovelo": "=195*escalaCima",
+  "raioCotovelo": "=32*escalaCima",
+  "recuoSaidaOmbro": "=6.5*escalaCima",
+  "recuoAlargamento": "=10.5*escalaCima",
+  "inicioAlargamento": "=45*escalaCima",
+  "fimAlargamento": "=20*escalaCima",
+  "diametroJunta": "=diametroAntebraco+22",
+  "larguraJunta": "=30.5*escalaAntebraco",
+  "larguraAnelAntebraco": "=72*escalaAntebraco",
+  "raioAnelAntebraco": "=6*escalaAntebraco",
+  "raioPontaCarcaca": "=67*escalaAntebraco",
+  "comprimentoCarcaca": "=295*escalaAntebraco",
+  "raioCarcaca": "=30*escalaAntebraco",
+  "entradaDoTubo": "=30*escalaAntebraco",
+  "aneisAbaixoDaCarcaca": "=81*escalaAlturaPunho",
+  "comprimentoAneis": "=raioPontaCarcaca+aneisAbaixoDaCarcaca",
+  "raioAneis": "=12*escalaLarguraPunho"
+ },
+ "pecas": {
+  "anelCoaxial": {
+   "descricao": "tambor num eixo: a barra do início ao fim com a espessura igual ao diâmetro e o meio marcado. Empilha-se pondo o início de um no fim do outro, e o desenho de fora dá a direção do eixo. O ângulo (graus, de h para v) é a direção do início para o fim e só serve ao chute.",
+   "parametros": {
+    "diametro": null,
+    "comprimento": null,
+    "canto": 1,
+    "angulo": 90
+   },
+   "pontos": {
+    "P": [
+     0,
+     0
+    ],
+    "Q": [
+     "=comprimento*cos(angulo)",
+     "=comprimento*sin(angulo)"
+    ],
+    "M": [
+     "=comprimento/2*cos(angulo)",
+     "=comprimento/2*sin(angulo)"
+    ]
+   },
+   "partes": {
+    "corpo": {
+     "barra": [
+      "P",
+      "Q"
+     ],
+     "espessura": "diametro",
+     "raioDoCanto": "canto"
+    }
+   },
+   "relacoes": [
+    {
+     "nome": "comprimento",
+     "distancia": [
+      "P",
+      "Q"
+     ],
+     "mm": "comprimento"
+    },
+    {
+     "nome": "meio no eixo",
+     "sobre": [
+      "M",
+      [
+       "P",
+       "Q"
+      ]
+     ]
+    },
+    {
+     "nome": "meio a meio caminho",
+     "igual": [
+      [
+       "P",
+       "M"
+      ],
+      [
+       "M",
+       "Q"
+      ]
+     ]
+    }
+   ],
+   "ligacoes": {
+    "inicio": "P",
+    "fim": "Q",
+    "meio": "M",
+    "corpo": "corpo"
+   }
+  },
+  "blocoDeJunta": {
+   "descricao": "o retângulo com só os cantos de uma ponta arredondados: a base de canto vivo, assentada no que vem antes, e o topo arredondado. O ângulo (graus) é a direção da base para o topo e só serve ao chute; o desenho de fora prende a base e a direção dela.",
+   "parametros": {
+    "largura": null,
+    "altura": null,
+    "raioTopo1": null,
+    "raioTopo2": null,
+    "angulo": 90
+   },
+   "pontos": {
+    "B1": [
+     0,
+     0
+    ],
+    "B2": [
+     "=largura*cos(angulo-90)",
+     "=largura*sin(angulo-90)"
+    ],
+    "T2": [
+     "=largura*cos(angulo-90)+altura*cos(angulo)",
+     "=largura*sin(angulo-90)+altura*sin(angulo)"
+    ],
+    "T1": [
+     "=altura*cos(angulo)",
+     "=altura*sin(angulo)"
+    ]
+   },
+   "partes": {
+    "corpo": {
+     "poligono": [
+      "B1",
+      "B2",
+      "T2",
+      "T1"
+     ],
+     "raioDoCanto": {
+      "T2": "raioTopo2",
+      "T1": "raioTopo1"
+     }
+    }
+   },
+   "relacoes": [
+    {
+     "nome": "largura",
+     "distancia": [
+      "B1",
+      "B2"
+     ],
+     "mm": "largura"
+    },
+    {
+     "nome": "lado 2 em esquadro com a base",
+     "perpendicular": [
+      [
+       "B1",
+       "B2"
+      ],
+      [
+       "B2",
+       "T2"
+      ]
+     ]
+    },
+    {
+     "nome": "altura",
+     "distancia": [
+      "B2",
+      "T2"
+     ],
+     "mm": "altura"
+    },
+    {
+     "nome": "topo em esquadro com o lado 2",
+     "perpendicular": [
+      [
+       "B2",
+       "T2"
+      ],
+      [
+       "T2",
+       "T1"
+      ]
+     ]
+    },
+    {
+     "nome": "lado 1 em esquadro com o topo",
+     "perpendicular": [
+      [
+       "T2",
+       "T1"
+      ],
+      [
+       "T1",
+       "B1"
+      ]
+     ]
+    }
+   ],
+   "ligacoes": {
+    "base1": "B1",
+    "base2": "B2",
+    "topo1": "T1",
+    "topo2": "T2",
+    "corpo": "corpo"
+   }
+  },
+  "flangeComCubo": {
+   "descricao": "o garfo com o pescoço (o cubo) e a flange (o disco, uma cápsula), simétricos em torno do eixo que vai do topo do garfo ao centro da flange. O desenho de fora prende o topo e a direção do eixo. O ângulo (graus) é a direção do topo para a flange e só serve ao chute.",
+   "parametros": {
+    "larguraGarfo": null,
+    "alturaGarfo": null,
+    "larguraPescoco": null,
+    "alturaPescoco": null,
+    "diametroFlange": null,
+    "espessuraFlange": null,
+    "raioDoTopo": 5,
+    "raioDoFundo1": 4,
+    "raioDoFundo2": 10,
+    "angulo": -90
+   },
+   "pontos": {
+    "T": [
+     0,
+     0
+    ],
+    "GH": [
+     "=-larguraGarfo/2*cos(angulo+90)",
+     "=-larguraGarfo/2*sin(angulo+90)"
+    ],
+    "GG": [
+     "=larguraGarfo/2*cos(angulo+90)",
+     "=larguraGarfo/2*sin(angulo+90)"
+    ],
+    "GA": [
+     "=alturaGarfo*cos(angulo)-larguraGarfo/2*cos(angulo+90)",
+     "=alturaGarfo*sin(angulo)-larguraGarfo/2*sin(angulo+90)"
+    ],
+    "GF": [
+     "=alturaGarfo*cos(angulo)+larguraGarfo/2*cos(angulo+90)",
+     "=alturaGarfo*sin(angulo)+larguraGarfo/2*sin(angulo+90)"
+    ],
+    "GB": [
+     "=alturaGarfo*cos(angulo)-larguraPescoco/2*cos(angulo+90)",
+     "=alturaGarfo*sin(angulo)-larguraPescoco/2*sin(angulo+90)"
+    ],
+    "GE": [
+     "=alturaGarfo*cos(angulo)+larguraPescoco/2*cos(angulo+90)",
+     "=alturaGarfo*sin(angulo)+larguraPescoco/2*sin(angulo+90)"
+    ],
+    "GC": [
+     "=(alturaGarfo+alturaPescoco)*cos(angulo)-larguraPescoco/2*cos(angulo+90)",
+     "=(alturaGarfo+alturaPescoco)*sin(angulo)-larguraPescoco/2*sin(angulo+90)"
+    ],
+    "GD": [
+     "=(alturaGarfo+alturaPescoco)*cos(angulo)+larguraPescoco/2*cos(angulo+90)",
+     "=(alturaGarfo+alturaPescoco)*sin(angulo)+larguraPescoco/2*sin(angulo+90)"
+    ],
+    "N": [
+     "=(alturaGarfo+alturaPescoco)*cos(angulo)",
+     "=(alturaGarfo+alturaPescoco)*sin(angulo)"
+    ],
+    "M": [
+     "=(alturaGarfo+alturaPescoco+espessuraFlange/2)*cos(angulo)",
+     "=(alturaGarfo+alturaPescoco+espessuraFlange/2)*sin(angulo)"
+    ],
+    "L1": [
+     "=(alturaGarfo+alturaPescoco+espessuraFlange/2)*cos(angulo)-diametroFlange/2*cos(angulo+90)",
+     "=(alturaGarfo+alturaPescoco+espessuraFlange/2)*sin(angulo)-diametroFlange/2*sin(angulo+90)"
+    ],
+    "L2": [
+     "=(alturaGarfo+alturaPescoco+espessuraFlange/2)*cos(angulo)+diametroFlange/2*cos(angulo+90)",
+     "=(alturaGarfo+alturaPescoco+espessuraFlange/2)*sin(angulo)+diametroFlange/2*sin(angulo+90)"
+    ]
+   },
+   "construcao": {
+    "eixo": {
+     "reta": [
+      "T",
+      "M"
+     ]
+    }
+   },
+   "partes": {
+    "cubo": {
+     "poligono": [
+      "GA",
+      "GB",
+      "GC",
+      "GD",
+      "GE",
+      "GF",
+      "GG",
+      "GH"
+     ],
+     "raioDoCanto": {
+      "GA": "raioDoFundo1",
+      "GF": "raioDoFundo2",
+      "GG": "raioDoTopo",
+      "GH": "raioDoTopo"
+     }
+    },
+    "disco": {
+     "barra": [
+      "L1",
+      "L2"
+     ],
+     "espessura": "espessuraFlange",
+     "raioDoCanto": "=espessuraFlange/2"
+    }
+   },
+   "relacoes": [
+    {
+     "nome": "topo do garfo atravessa o eixo",
+     "sobre": [
+      "T",
+      [
+       "GH",
+       "GG"
+      ]
+     ]
+    },
+    {
+     "nome": "topo do garfo simétrico",
+     "simetrico": [
+      "GH",
+      "GG",
+      "eixo"
+     ]
+    },
+    {
+     "nome": "largura do garfo",
+     "distancia": [
+      "GH",
+      "GG"
+     ],
+     "mm": "larguraGarfo"
+    },
+    {
+     "nome": "lado do garfo paralelo ao eixo",
+     "paralela": [
+      [
+       "GH",
+       "GA"
+      ],
+      "eixo"
+     ]
+    },
+    {
+     "nome": "altura do garfo",
+     "distancia": [
+      "GH",
+      "GA"
+     ],
+     "mm": "alturaGarfo"
+    },
+    {
+     "nome": "fundo do garfo simétrico",
+     "simetrico": [
+      "GA",
+      "GF",
+      "eixo"
+     ]
+    },
+    {
+     "nome": "pescoço sai do fundo do garfo",
+     "sobre": [
+      "GB",
+      [
+       "GA",
+       "GF"
+      ]
+     ]
+    },
+    {
+     "nome": "pé do pescoço simétrico",
+     "simetrico": [
+      "GB",
+      "GE",
+      "eixo"
+     ]
+    },
+    {
+     "nome": "largura do pescoço",
+     "distancia": [
+      "GB",
+      "GE"
+     ],
+     "mm": "larguraPescoco"
+    },
+    {
+     "nome": "lado do pescoço paralelo ao eixo",
+     "paralela": [
+      [
+       "GB",
+       "GC"
+      ],
+      "eixo"
+     ]
+    },
+    {
+     "nome": "altura do pescoço",
+     "distancia": [
+      "GB",
+      "GC"
+     ],
+     "mm": "alturaPescoco"
+    },
+    {
+     "nome": "fundo do pescoço simétrico",
+     "simetrico": [
+      "GC",
+      "GD",
+      "eixo"
+     ]
+    },
+    {
+     "nome": "fundo do pescoço atravessa o eixo",
+     "sobre": [
+      "N",
+      [
+       "GC",
+       "GD"
+      ]
+     ]
+    },
+    {
+     "nome": "fundo do pescoço no eixo",
+     "sobre": [
+      "N",
+      "eixo"
+     ]
+    },
+    {
+     "nome": "flange presa sob o pescoço",
+     "distancia": [
+      "N",
+      "M"
+     ],
+     "mm": "=espessuraFlange/2"
+    },
+    {
+     "nome": "flange atravessa o eixo",
+     "sobre": [
+      "M",
+      [
+       "L1",
+       "L2"
+      ]
+     ]
+    },
+    {
+     "nome": "flange simétrica",
+     "simetrico": [
+      "L1",
+      "L2",
+      "eixo"
+     ]
+    },
+    {
+     "nome": "diâmetro da flange",
+     "distancia": [
+      "L1",
+      "L2"
+     ],
+     "mm": "diametroFlange"
+    }
+   ],
+   "ligacoes": {
+    "topo": "T",
+    "centroDaFlange": "M",
+    "eixo": "eixo",
+    "cubo": "cubo",
+    "disco": "disco"
+   },
+   "frenteParaFundo": [
+    "cubo",
+    "disco"
+   ]
+  },
+  "pontaConcentrica": {
+   "descricao": "a ponta arredondada de um elo, concêntrica com a junta: os dois lados a um raio da junta, na reta que passa por ela, e os dois cantos a um raio de cada lado, em esquadro. O polígono do elo cita os cantos e os arredonda com o mesmo raio, e a ponta sai em semicírculo com centro na junta. O ângulo (graus) é a direção para onde a ponta aponta e só serve ao chute; o desenho de fora dá a direção da reta dos lados.",
+   "parametros": {
+    "raio": null,
+    "angulo": -90
+   },
+   "pontos": {
+    "C": [
+     0,
+     0
+    ],
+    "S1": [
+     "=raio*cos(angulo+90)",
+     "=raio*sin(angulo+90)"
+    ],
+    "S2": [
+     "=raio*cos(angulo-90)",
+     "=raio*sin(angulo-90)"
+    ],
+    "K1": [
+     "=raio*cos(angulo+90)+raio*cos(angulo)",
+     "=raio*sin(angulo+90)+raio*sin(angulo)"
+    ],
+    "K2": [
+     "=raio*cos(angulo-90)+raio*cos(angulo)",
+     "=raio*sin(angulo-90)+raio*sin(angulo)"
+    ]
+   },
+   "relacoes": [
+    {
+     "nome": "lados alinhados com a junta",
+     "sobre": [
+      "C",
+      [
+       "S1",
+       "S2"
+      ]
+     ]
+    },
+    {
+     "nome": "lado 1 a um raio da junta",
+     "distancia": [
+      "C",
+      "S1"
+     ],
+     "mm": "raio"
+    },
+    {
+     "nome": "lado 2 a um raio da junta",
+     "distancia": [
+      "C",
+      "S2"
+     ],
+     "mm": "raio"
+    },
+    {
+     "nome": "canto 1 em esquadro",
+     "perpendicular": [
+      [
+       "S1",
+       "K1"
+      ],
+      [
+       "S1",
+       "S2"
+      ]
+     ]
+    },
+    {
+     "nome": "canto 1 a um raio do lado",
+     "distancia": [
+      "S1",
+      "K1"
+     ],
+     "mm": "raio"
+    },
+    {
+     "nome": "canto 2 em esquadro",
+     "perpendicular": [
+      [
+       "S2",
+       "K2"
+      ],
+      [
+       "S1",
+       "S2"
+      ]
+     ]
+    },
+    {
+     "nome": "canto 2 a um raio do lado",
+     "distancia": [
+      "S2",
+      "K2"
+     ],
+     "mm": "raio"
+    }
+   ],
+   "ligacoes": {
+    "junta": "C",
+    "lado1": "S1",
+    "lado2": "S2",
+    "canto1": "K1",
+    "canto2": "K2"
+   }
+  }
+ },
+ "referencias": {
+  "chao": {
+   "reta": "horizontal",
+   "v": "nivelDoChao"
+  },
+  "eixoDaBase": {
+   "reta": "vertical",
+   "h": 0
+  }
+ },
+ "pontos": {
+  "BA": [
+   "=-meiaBase-sobraChapa",
+   "nivelDoChao"
+  ],
+  "BB": [
+   "=meiaBase+sobraChapa",
+   "nivelDoChao"
+  ],
+  "BC": [
+   "=meiaBase+sobraChapa",
+   "=nivelDoChao+espessuraChapa"
+  ],
+  "BD": [
+   "meiaBase",
+   "=nivelDoChao+espessuraChapa"
+  ],
+  "BE": [
+   "meiaBase",
+   "topoBase"
+  ],
+  "BF": [
+   "=-meiaBase",
+   "topoBase"
+  ],
+  "BG": [
+   "=-meiaBase",
+   "=nivelDoChao+espessuraChapa"
+  ],
+  "BH": [
+   "=-meiaBase-sobraChapa",
+   "=nivelDoChao+espessuraChapa"
+  ],
+  "R4": [
+   "=bordaCimaDireita-recuoSaidaOmbro",
+   "topoOmbro"
+  ],
+  "R5": [
+   "=bordaCimaDireita-recuoAlargamento",
+   "=eixoAntebraco-anelCotoveloAbaixo-inicioAlargamento"
+  ],
+  "R6": [
+   "bordaCimaDireita",
+   "=eixoAntebraco-anelCotoveloAbaixo-fimAlargamento"
+  ],
+  "U2": [
+   "bordaCimaDireita",
+   "=eixoAntebraco-anelCotoveloAbaixo"
+  ],
+  "U1": [
+   "=-bordaCimaEsquerda",
+   "=eixoAntebraco-anelCotoveloAbaixo"
+  ],
+  "R9": [
+   "=-bordaCimaEsquerda",
+   "=eixoAntebraco-anelCotoveloAbaixo-fimAlargamento"
+  ],
+  "R10": [
+   "=-bordaCimaEsquerda+recuoAlargamento",
+   "=eixoAntebraco-anelCotoveloAbaixo-inicioAlargamento"
+  ],
+  "R11": [
+   "=-bordaCimaEsquerda+recuoSaidaOmbro",
+   "topoOmbro"
+  ],
+  "F3": [
+   "=comprimentoAntebraco+raioPontaCarcaca-comprimentoCarcaca+entradaDoTubo",
+   "eixoAntebraco"
+  ],
+  "P1": [
+   "=comprimentoAntebraco+raioPontaCarcaca-comprimentoCarcaca",
+   "=eixoAntebraco-raioPontaCarcaca"
+  ],
+  "P4": [
+   "=comprimentoAntebraco+raioPontaCarcaca-comprimentoCarcaca",
+   "=eixoAntebraco+raioPontaCarcaca"
+  ]
+ },
+ "partes": {
+  "base": {
+   "poligono": [
+    "BA",
+    "BB",
+    "BC",
+    "BD",
+    "BE",
+    "BF",
+    "BG",
+    "BH"
+   ],
+   "raioDoCanto": {
+    "BA": "raioChapa",
+    "BB": "raioChapa"
+   }
+  },
+  "braco": {
+   "poligono": [
+    "pontaBraco.canto2",
+    "pontaBraco.canto1",
+    "pontaBraco.lado1",
+    "R4",
+    "R5",
+    "R6",
+    "U2",
+    "U1",
+    "R9",
+    "R10",
+    "R11",
+    "pontaBraco.lado2"
+   ],
+   "raioDoCanto": {
+    "pontaBraco.canto2": "raioPontaBraco",
+    "pontaBraco.canto1": "raioPontaBraco"
+   }
+  },
+  "antebraco": {
+   "barra": [
+    "tamborAntebraco.fim",
+    "F3"
+   ],
+   "espessura": "diametroAntebraco"
+  },
+  "carcacaPunho": {
+   "poligono": [
+    "P1",
+    "pontaCarcaca.canto2",
+    "pontaCarcaca.canto1",
+    "P4"
+   ],
+   "raioDoCanto": {
+    "P1": "raioCarcaca",
+    "pontaCarcaca.canto2": "raioPontaCarcaca",
+    "pontaCarcaca.canto1": "raioPontaCarcaca",
+    "P4": "raioCarcaca"
+   }
+  }
+ },
+ "usos": {
+  "blocoCaixa": {
+   "peca": "blocoDeJunta",
+   "parametros": {
+    "largura": "larguraCaixa",
+    "altura": "alturaCaixa",
+    "raioTopo1": "=8*escalaBaixo",
+    "raioTopo2": "=15*escalaBaixo"
+   },
+   "origem": [
+    "=-meiaBase+avancoCaixa-larguraCaixa",
+    "=nivelDoChao+folgaCaixa"
+   ],
+   "nomeiaPartes": {
+    "corpo": "caixaLateral"
+   }
+  },
+  "tamborCintura": {
+   "peca": "anelCoaxial",
+   "parametros": {
+    "diametro": "diametroCintura",
+    "comprimento": "alturaCintura"
+   },
+   "origem": [
+    0,
+    "topoBase"
+   ],
+   "nomeiaPartes": {
+    "corpo": "anelCintura"
+   }
+  },
+  "tamborOmbro": {
+   "peca": "anelCoaxial",
+   "parametros": {
+    "diametro": "diametroOmbro",
+    "comprimento": "alturaOmbro"
+   },
+   "origem": [
+    0,
+    "=topoBase+alturaCintura"
+   ],
+   "nomeiaPartes": {
+    "corpo": "ombro"
+   }
+  },
+  "pontaBraco": {
+   "peca": "pontaConcentrica",
+   "parametros": {
+    "raio": "raioPontaBraco",
+    "angulo": -90
+   },
+   "origem": [
+    0,
+    "juntaOmbro"
+   ]
+  },
+  "tamborCotovelo": {
+   "peca": "anelCoaxial",
+   "parametros": {
+    "diametro": "diametroCima",
+    "comprimento": "alturaAnelCotovelo"
+   },
+   "origem": [
+    "=-recuoCima",
+    "=eixoAntebraco-anelCotoveloAbaixo"
+   ],
+   "nomeiaPartes": {
+    "corpo": "anelCotovelo"
+   }
+  },
+  "blocoCotovelo": {
+   "peca": "blocoDeJunta",
+   "parametros": {
+    "largura": "diametroCima",
+    "altura": "alturaCotovelo",
+    "raioTopo1": "raioCotovelo",
+    "raioTopo2": "raioCotovelo"
+   },
+   "origem": [
+    "=-bordaCimaEsquerda",
+    "=eixoAntebraco-anelCotoveloAbaixo+alturaAnelCotovelo"
+   ],
+   "nomeiaPartes": {
+    "corpo": "cotovelo"
+   }
+  },
+  "tamborJunta": {
+   "peca": "anelCoaxial",
+   "parametros": {
+    "diametro": "diametroJunta",
+    "comprimento": "larguraJunta",
+    "angulo": 0
+   },
+   "origem": [
+    "bordaCimaDireita",
+    "eixoAntebraco"
+   ],
+   "nomeiaPartes": {
+    "corpo": "juntaCotovelo"
+   }
+  },
+  "tamborAntebraco": {
+   "peca": "anelCoaxial",
+   "parametros": {
+    "diametro": "diametroJunta",
+    "comprimento": "larguraAnelAntebraco",
+    "canto": "raioAnelAntebraco",
+    "angulo": 0
+   },
+   "origem": [
+    "=bordaCimaDireita+larguraJunta",
+    "eixoAntebraco"
+   ],
+   "nomeiaPartes": {
+    "corpo": "anelAntebraco"
+   }
+  },
+  "pontaCarcaca": {
+   "peca": "pontaConcentrica",
+   "parametros": {
+    "raio": "raioPontaCarcaca",
+    "angulo": 0
+   },
+   "origem": [
+    "comprimentoAntebraco",
+    "eixoAntebraco"
+   ]
+  },
+  "tamborPunho": {
+   "peca": "anelCoaxial",
+   "parametros": {
+    "diametro": "larguraPunho",
+    "comprimento": "comprimentoAneis",
+    "canto": "raioAneis",
+    "angulo": -90
+   },
+   "origem": [
+    "comprimentoAntebraco",
+    "eixoAntebraco"
+   ],
+   "nomeiaPartes": {
+    "corpo": "aneisPunho"
+   }
+  },
+  "punho": {
+   "peca": "flangeComCubo",
+   "parametros": {
+    "larguraGarfo": "=102*escalaLarguraPunho",
+    "alturaGarfo": "=102*escalaAlturaPunho",
+    "larguraPescoco": "=56*escalaLarguraPunho",
+    "alturaPescoco": "=26*escalaAlturaPunho",
+    "diametroFlange": "=160*escalaLarguraPunho",
+    "espessuraFlange": "=41*escalaAlturaPunho",
+    "raioDoTopo": "=5*escalaLarguraPunho",
+    "raioDoFundo1": "=4*escalaLarguraPunho",
+    "raioDoFundo2": "=10*escalaLarguraPunho",
+    "angulo": -90
+   },
+   "origem": [
+    "comprimentoAntebraco",
+    "=eixoAntebraco-comprimentoAneis"
+   ],
+   "nomeiaPartes": {
+    "cubo": "garfoPunho",
+    "disco": "flange"
+   }
+  }
+ },
+ "frenteParaFundo": [
+  "caixaLateral",
+  "base",
+  "anelCintura",
+  "braco",
+  "ombro",
+  "anelCotovelo",
+  "cotovelo",
+  "juntaCotovelo",
+  "anelAntebraco",
+  "carcacaPunho",
+  "antebraco",
+  "aneisPunho",
+  "garfoPunho",
+  "flange"
+ ],
+ "relacoes": [
+  {
+   "nome": "chapa no chão à esquerda",
+   "sobre": [
+    "BA",
+    "chao"
+   ]
+  },
+  {
+   "nome": "chapa no chão à direita",
+   "sobre": [
+    "BB",
+    "chao"
+   ]
+  },
+  {
+   "nome": "borda esquerda da chapa a prumo",
+   "vertical": [
+    "BA",
+    "BH"
+   ]
+  },
+  {
+   "nome": "borda direita da chapa a prumo",
+   "vertical": [
+    "BB",
+    "BC"
+   ]
+  },
+  {
+   "nome": "espessura da chapa",
+   "distancia": [
+    "BH",
+    "chao"
+   ],
+   "mm": "espessuraChapa",
+   "lado": "acima"
+  },
+  {
+   "nome": "face de cima da chapa de nível (esquerda)",
+   "horizontal": [
+    "BH",
+    "BG"
+   ]
+  },
+  {
+   "nome": "face de cima da chapa de nível (meio)",
+   "horizontal": [
+    "BG",
+    "BD"
+   ]
+  },
+  {
+   "nome": "face de cima da chapa de nível (direita)",
+   "horizontal": [
+    "BD",
+    "BC"
+   ]
+  },
+  {
+   "nome": "meia largura da base (esquerda)",
+   "distancia": [
+    "BG",
+    "eixoDaBase"
+   ],
+   "mm": "meiaBase",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "meia largura da base (direita)",
+   "distancia": [
+    "BD",
+    "eixoDaBase"
+   ],
+   "mm": "meiaBase",
+   "lado": "direita"
+  },
+  {
+   "nome": "lado esquerdo da base a prumo",
+   "vertical": [
+    "BG",
+    "BF"
+   ]
+  },
+  {
+   "nome": "lado direito da base a prumo",
+   "vertical": [
+    "BD",
+    "BE"
+   ]
+  },
+  {
+   "nome": "altura da base",
+   "distancia": [
+    "BE",
+    "chao"
+   ],
+   "mm": "alturaBase",
+   "lado": "acima"
+  },
+  {
+   "nome": "topo da base de nível",
+   "horizontal": [
+    "BF",
+    "BE"
+   ]
+  },
+  {
+   "nome": "chapa passa do corpo à esquerda",
+   "distancia": [
+    "BH",
+    [
+     "BG",
+     "BF"
+    ]
+   ],
+   "mm": "sobraChapa",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "chapa passa do corpo à direita",
+   "distancia": [
+    "BC",
+    [
+     "BD",
+     "BE"
+    ]
+   ],
+   "mm": "sobraChapa",
+   "lado": "direita"
+  },
+  {
+   "nome": "folga da caixa sobre o chão",
+   "distancia": [
+    "blocoCaixa.base1",
+    "chao"
+   ],
+   "mm": "folgaCaixa",
+   "lado": "acima"
+  },
+  {
+   "nome": "fundo da caixa de nível",
+   "horizontal": [
+    "blocoCaixa.base1",
+    "blocoCaixa.base2"
+   ]
+  },
+  {
+   "nome": "caixa avança sobre a base",
+   "distancia": [
+    "blocoCaixa.base2",
+    [
+     "BG",
+     "BF"
+    ]
+   ],
+   "mm": "avancoCaixa",
+   "lado": "direita"
+  },
+  {
+   "nome": "anel da cintura no eixo da base",
+   "sobre": [
+    "tamborCintura.inicio",
+    "eixoDaBase"
+   ]
+  },
+  {
+   "nome": "anel da cintura assenta no topo da base",
+   "sobre": [
+    "tamborCintura.inicio",
+    [
+     "BF",
+     "BE"
+    ]
+   ]
+  },
+  {
+   "nome": "anel da cintura em pé no eixo",
+   "sobre": [
+    "tamborCintura.fim",
+    "eixoDaBase"
+   ]
+  },
+  {
+   "nome": "ombro empilhado na cintura",
+   "coincidente": [
+    "tamborOmbro.inicio",
+    "tamborCintura.fim"
+   ]
+  },
+  {
+   "nome": "ombro em pé no eixo",
+   "sobre": [
+    "tamborOmbro.fim",
+    "eixoDaBase"
+   ]
+  },
+  {
+   "nome": "ponta do braço concêntrica com a junta do ombro",
+   "coincidente": [
+    "pontaBraco.junta",
+    "tamborOmbro.meio"
+   ]
+  },
+  {
+   "nome": "ponta do braço de nível",
+   "horizontal": [
+    "pontaBraco.lado1",
+    "pontaBraco.lado2"
+   ]
+  },
+  {
+   "nome": "braço sai do topo do ombro (direita)",
+   "horizontal": [
+    "R4",
+    "tamborOmbro.fim"
+   ]
+  },
+  {
+   "nome": "recuo do braço na saída do ombro (direita)",
+   "distancia": [
+    "R4",
+    "U2"
+   ],
+   "mm": "recuoSaidaOmbro",
+   "eixo": "h",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "braço sai do topo do ombro (esquerda)",
+   "horizontal": [
+    "R11",
+    "tamborOmbro.fim"
+   ]
+  },
+  {
+   "nome": "recuo do braço na saída do ombro (esquerda)",
+   "distancia": [
+    "R11",
+    "U1"
+   ],
+   "mm": "recuoSaidaOmbro",
+   "eixo": "h",
+   "lado": "direita"
+  },
+  {
+   "nome": "recuo do braço sob o alargamento (direita)",
+   "distancia": [
+    "R5",
+    "U2"
+   ],
+   "mm": "recuoAlargamento",
+   "eixo": "h",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "alargamento do braço começa (direita)",
+   "distancia": [
+    "R5",
+    "U2"
+   ],
+   "mm": "inicioAlargamento",
+   "eixo": "v",
+   "lado": "abaixo"
+  },
+  {
+   "nome": "recuo do braço sob o alargamento (esquerda)",
+   "distancia": [
+    "R10",
+    "U1"
+   ],
+   "mm": "recuoAlargamento",
+   "eixo": "h",
+   "lado": "direita"
+  },
+  {
+   "nome": "alargamento do braço começa (esquerda)",
+   "distancia": [
+    "R10",
+    "U1"
+   ],
+   "mm": "inicioAlargamento",
+   "eixo": "v",
+   "lado": "abaixo"
+  },
+  {
+   "nome": "alargamento chega ao prumo da coluna (direita)",
+   "vertical": [
+    "R6",
+    "U2"
+   ]
+  },
+  {
+   "nome": "alargamento termina abaixo do anel (direita)",
+   "distancia": [
+    "R6",
+    "U2"
+   ],
+   "mm": "fimAlargamento",
+   "eixo": "v",
+   "lado": "abaixo"
+  },
+  {
+   "nome": "alargamento chega ao prumo da coluna (esquerda)",
+   "vertical": [
+    "R9",
+    "U1"
+   ]
+  },
+  {
+   "nome": "alargamento termina abaixo do anel (esquerda)",
+   "distancia": [
+    "R9",
+    "U1"
+   ],
+   "mm": "fimAlargamento",
+   "eixo": "v",
+   "lado": "abaixo"
+  },
+  {
+   "nome": "pé do anel do cotovelo à esquerda",
+   "horizontal": [
+    "U1",
+    "tamborCotovelo.inicio"
+   ]
+  },
+  {
+   "nome": "lado esquerdo da coluna de cima",
+   "distancia": [
+    "U1",
+    "tamborCotovelo.inicio"
+   ],
+   "mm": "=diametroCima/2",
+   "eixo": "h",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "pé do anel do cotovelo à direita",
+   "horizontal": [
+    "U2",
+    "tamborCotovelo.inicio"
+   ]
+  },
+  {
+   "nome": "lado direito da coluna de cima",
+   "distancia": [
+    "U2",
+    "tamborCotovelo.inicio"
+   ],
+   "mm": "=diametroCima/2",
+   "eixo": "h",
+   "lado": "direita"
+  },
+  {
+   "nome": "eixo da coluna de cima recuado do eixo da base",
+   "distancia": [
+    "tamborCotovelo.inicio",
+    "eixoDaBase"
+   ],
+   "mm": "recuoCima",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "anel do cotovelo abaixo do eixo do antebraço",
+   "distancia": [
+    "tamborCotovelo.inicio",
+    "tamborJunta.inicio"
+   ],
+   "mm": "anelCotoveloAbaixo",
+   "eixo": "v",
+   "lado": "abaixo"
+  },
+  {
+   "nome": "anel do cotovelo a prumo",
+   "vertical": [
+    "tamborCotovelo.inicio",
+    "tamborCotovelo.fim"
+   ]
+  },
+  {
+   "nome": "cotovelo assenta no anel (altura)",
+   "horizontal": [
+    "blocoCotovelo.base1",
+    "tamborCotovelo.fim"
+   ]
+  },
+  {
+   "nome": "cotovelo assenta no anel (lado)",
+   "distancia": [
+    "blocoCotovelo.base1",
+    "tamborCotovelo.fim"
+   ],
+   "mm": "=diametroCima/2",
+   "eixo": "h",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "base do cotovelo de nível",
+   "horizontal": [
+    "blocoCotovelo.base1",
+    "blocoCotovelo.base2"
+   ]
+  },
+  {
+   "nome": "junta do cotovelo sai da face direita do cotovelo",
+   "sobre": [
+    "tamborJunta.inicio",
+    [
+     "blocoCotovelo.base2",
+     "blocoCotovelo.topo2"
+    ]
+   ]
+  },
+  {
+   "nome": "comprimento do braço, da junta do ombro ao eixo do antebraço",
+   "distancia": [
+    "tamborJunta.inicio",
+    "tamborOmbro.meio"
+   ],
+   "mm": "comprimentoBraco",
+   "eixo": "v",
+   "lado": "acima"
+  },
+  {
+   "nome": "junta do cotovelo no eixo do antebraço",
+   "horizontal": [
+    "tamborJunta.inicio",
+    "tamborJunta.fim"
+   ]
+  },
+  {
+   "nome": "anel do antebraço empilhado na junta",
+   "coincidente": [
+    "tamborAntebraco.inicio",
+    "tamborJunta.fim"
+   ]
+  },
+  {
+   "nome": "anel do antebraço no eixo",
+   "horizontal": [
+    "tamborAntebraco.fim",
+    "tamborJunta.inicio"
+   ]
+  },
+  {
+   "nome": "tubo do antebraço no eixo",
+   "horizontal": [
+    "F3",
+    "tamborJunta.inicio"
+   ]
+  },
+  {
+   "nome": "tubo do antebraço entra na carcaça do punho",
+   "distancia": [
+    "F3",
+    "P1"
+   ],
+   "mm": "entradaDoTubo",
+   "eixo": "h",
+   "lado": "direita"
+  },
+  {
+   "nome": "eixo do punho na altura do antebraço",
+   "horizontal": [
+    "tamborPunho.inicio",
+    "tamborJunta.inicio"
+   ]
+  },
+  {
+   "nome": "comprimento do antebraço, do eixo da base ao eixo do punho",
+   "distancia": [
+    "tamborPunho.inicio",
+    "eixoDaBase"
+   ],
+   "mm": "comprimentoAntebraco",
+   "lado": "direita"
+  },
+  {
+   "nome": "anéis do punho a prumo",
+   "vertical": [
+    "tamborPunho.inicio",
+    "tamborPunho.fim"
+   ]
+  },
+  {
+   "nome": "ponta da carcaça concêntrica com o eixo do punho",
+   "coincidente": [
+    "pontaCarcaca.junta",
+    "tamborPunho.inicio"
+   ]
+  },
+  {
+   "nome": "ponta da carcaça a prumo",
+   "vertical": [
+    "pontaCarcaca.lado1",
+    "pontaCarcaca.lado2"
+   ]
+  },
+  {
+   "nome": "fundo da carcaça alinhado com a ponta",
+   "sobre": [
+    "P1",
+    [
+     "pontaCarcaca.lado2",
+     "pontaCarcaca.canto2"
+    ]
+   ]
+  },
+  {
+   "nome": "comprimento da carcaça",
+   "distancia": [
+    "P1",
+    "pontaCarcaca.canto2"
+   ],
+   "mm": "comprimentoCarcaca",
+   "eixo": "h",
+   "lado": "esquerda"
+  },
+  {
+   "nome": "topo da carcaça alinhado com a ponta",
+   "sobre": [
+    "P4",
+    [
+     "pontaCarcaca.lado1",
+     "pontaCarcaca.canto1"
+    ]
+   ]
+  },
+  {
+   "nome": "ponta esquerda da carcaça a prumo",
+   "vertical": [
+    "P1",
+    "P4"
+   ]
+  },
+  {
+   "nome": "garfo pendurado nos anéis",
+   "coincidente": [
+    "punho.topo",
+    "tamborPunho.fim"
+   ]
+  },
+  {
+   "nome": "flange no eixo do punho",
+   "sobre": [
+    "punho.centroDaFlange",
+    [
+     "tamborPunho.inicio",
+     "tamborPunho.fim"
+    ]
+   ]
+  }
+ ]
+}

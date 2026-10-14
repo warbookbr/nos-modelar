@@ -1,0 +1,145 @@
+{
+  "formato": "mecanifica.pecas-de-desenho@1",
+  "pecas": {
+    "arcoRecortadoComAro": {
+      "descricao": "a frente de um painel de lado com o arco de roda recortado embaixo (face, topo do recorte, vão e pé) e o aro em L por cima, cuja borda de dentro é o canto convexo do painel no topo da face; o painel é de quem usa a peça, que dá os raios dos cantos dele",
+      "parametros": {
+        "altura": null,
+        "topo": null,
+        "vao": null,
+        "raio": null,
+        "espessura": 22,
+        "ponta": 20.4,
+        "folga": 0.5,
+        "queda": 4,
+        "raioDeFora": "=raio+8.8"
+      },
+      "pontos": {
+        "T": [0, "altura"],
+        "FF": [0, "topo"],
+        "KF": ["vao", "topo"],
+        "PF": ["vao", 0],
+        "V": ["=raio+folga", "altura"],
+        "G2": ["=raio+folga", "=altura-raio-queda"],
+        "PB": [0, "=altura+espessura"],
+        "VO": ["=raio+folga+ponta", "=altura+espessura"],
+        "BO": ["=raio+folga+ponta", "=altura-raio-queda"]
+      },
+      "partes": {
+        "aro": { "poligono": ["PB", "VO", "BO", "G2", "V", "T"], "raioDoCanto": { "VO": "raioDeFora", "V": "raio" } }
+      },
+      "relacoes": [
+        { "nome": "face a prumo", "vertical": ["T", "FF"] },
+        { "nome": "altura da face acima do pé", "distancia": ["T", "PF"], "mm": "altura", "eixo": "v", "lado": "acima" },
+        { "nome": "topo do recorte de nível", "horizontal": ["FF", "KF"] },
+        { "nome": "vão do recorte", "distancia": ["KF", "FF"], "mm": "vao", "eixo": "h", "lado": "direita" },
+        { "nome": "perna do recorte a prumo", "vertical": ["KF", "PF"] },
+        { "nome": "altura do recorte acima do pé", "distancia": ["KF", "PF"], "mm": "topo", "eixo": "v", "lado": "acima" },
+        { "nome": "aro nasce no topo da face", "horizontal": ["V", "T"] },
+        { "nome": "raio de dentro do aro", "distancia": ["V", "T"], "mm": "=raio+folga", "eixo": "h", "lado": "direita" },
+        { "nome": "fim do aro a prumo", "vertical": ["G2", "V"] },
+        { "nome": "ponta do aro abaixo do fim do arco", "distancia": ["V", "G2"], "mm": "=raio+queda", "eixo": "v", "lado": "acima" },
+        { "nome": "aro alinhado com a face", "vertical": ["PB", "T"] },
+        { "nome": "espessura do aro no alto", "distancia": ["PB", "T"], "mm": "espessura", "eixo": "v", "lado": "acima" },
+        { "nome": "topo do aro de nível", "horizontal": ["VO", "PB"] },
+        { "nome": "espessura do aro na ponta", "distancia": ["VO", "V"], "mm": "ponta", "eixo": "h", "lado": "direita" },
+        { "nome": "aro desce a prumo", "vertical": ["BO", "VO"] },
+        { "nome": "fundo do aro de nível", "horizontal": ["BO", "G2"] }
+      ],
+      "ligacoes": {
+        "face": "T",
+        "fundoDaFace": "FF",
+        "canto": "KF",
+        "pe": "PF",
+        "cantoDoAro": "V",
+        "pontaDoAro": "G2",
+        "topoDoAro": "PB",
+        "aro": "aro"
+      },
+      "frenteParaFundo": ["aro"]
+    },
+    "vaoFechadoPelaLongarina": {
+      "descricao": "o vão de uma roda como círculo de construção, com uma perna a prumo tangente de cada lado, a saída de cada perna pela tangente ao círculo e a longarina que fecha o vão por baixo, presa nas duas pernas; as partes que cercam o vão são de quem usa a peça, e o canto delas no vão tem o raio do círculo",
+      "parametros": {
+        "raio": null,
+        "saidaDianteira": 170.2,
+        "saidaTraseira": 142,
+        "alturaDaLongarina": 17,
+        "espessuraDaLongarina": 16,
+        "fundo": 105.8
+      },
+      "pontos": {
+        "C": [0, 0],
+        "PT": ["=-raio", "=-fundo"],
+        "KT": ["=-raio", "=raio*0.76"],
+        "LT": ["=saidaDianteira-raio", "=sqrt(raio*raio-(raio-saidaDianteira)*(raio-saidaDianteira))"],
+        "PC": ["raio", "=-fundo"],
+        "KC": ["raio", "=raio*0.66"],
+        "CF": ["=raio-saidaTraseira", "=sqrt(raio*raio-(raio-saidaTraseira)*(raio-saidaTraseira))"],
+        "L1": ["=-raio", "=alturaDaLongarina-fundo"],
+        "L2": ["raio", "=alturaDaLongarina-fundo"]
+      },
+      "construcao": {
+        "vao": { "circulo": { "centro": "C", "chute": "raio" } }
+      },
+      "partes": {
+        "longarina": { "barra": ["L1", "L2"], "espessura": "espessuraDaLongarina" }
+      },
+      "relacoes": [
+        { "nome": "raio do vão", "raio": "vao", "mm": "raio" },
+        { "nome": "perna dianteira tangente ao vão", "tangente": ["vao", ["PT", "KT"]], "lado": "direita" },
+        { "nome": "perna dianteira a prumo", "vertical": ["KT", "PT"] },
+        { "nome": "saída dianteira sobre o vão", "sobre": ["LT", "vao"] },
+        { "nome": "saída dianteira pela tangente", "perpendicular": [["C", "LT"], ["KT", "LT"]] },
+        { "nome": "posição da saída dianteira", "distancia": ["LT", ["PT", "KT"]], "mm": "saidaDianteira", "lado": "direita" },
+        { "nome": "perna traseira tangente ao vão", "tangente": ["vao", ["PC", "KC"]], "lado": "esquerda" },
+        { "nome": "perna traseira a prumo", "vertical": ["KC", "PC"] },
+        { "nome": "saída traseira sobre o vão", "sobre": ["CF", "vao"] },
+        { "nome": "saída traseira pela tangente", "perpendicular": [["C", "CF"], ["KC", "CF"]] },
+        { "nome": "posição da saída traseira", "distancia": ["CF", ["PC", "KC"]], "mm": "saidaTraseira", "lado": "esquerda" },
+        { "nome": "pés das pernas de nível", "horizontal": ["PC", "PT"] },
+        { "nome": "longarina presa na perna dianteira", "sobre": ["L1", ["PT", "KT"]] },
+        { "nome": "longarina presa na perna traseira", "sobre": ["L2", ["PC", "KC"]] },
+        { "nome": "longarina de nível", "horizontal": ["L1", "L2"] },
+        { "nome": "altura da longarina acima dos pés", "distancia": ["L1", "PT"], "mm": "alturaDaLongarina", "eixo": "v", "lado": "acima" }
+      ],
+      "ligacoes": {
+        "centro": "C",
+        "vao": "vao",
+        "pernaDianteira": "PT",
+        "cantoDianteiro": "KT",
+        "saidaDianteira": "LT",
+        "pernaTraseira": "PC",
+        "cantoTraseiro": "KC",
+        "saidaTraseira": "CF",
+        "longarina": "longarina"
+      },
+      "frenteParaFundo": ["longarina"]
+    },
+    "rampaComOmbro": {
+      "descricao": "uma rampa de dois trechos que sobe para a direita, do pé ao topo, com o ombro onde a inclinação muda; os cantos arredondados do pé e do topo são do polígono de quem usa a peça",
+      "parametros": {
+        "baixa": null,
+        "alta": null,
+        "anguloBaixo": null,
+        "anguloAlto": null
+      },
+      "pontos": {
+        "P": [0, 0],
+        "Q": ["=baixa/tan(anguloBaixo)", "baixa"],
+        "R": ["=baixa/tan(anguloBaixo)+alta/tan(anguloAlto)", "=baixa+alta"]
+      },
+      "relacoes": [
+        { "nome": "subida do trecho baixo", "distancia": ["Q", "P"], "mm": "baixa", "eixo": "v", "lado": "acima" },
+        { "nome": "avanço do trecho baixo", "distancia": ["Q", "P"], "mm": "=baixa/tan(anguloBaixo)", "eixo": "h", "lado": "direita" },
+        { "nome": "subida do trecho alto", "distancia": ["R", "Q"], "mm": "alta", "eixo": "v", "lado": "acima" },
+        { "nome": "avanço do trecho alto", "distancia": ["R", "Q"], "mm": "=alta/tan(anguloAlto)", "eixo": "h", "lado": "direita" }
+      ],
+      "ligacoes": {
+        "pe": "P",
+        "ombro": "Q",
+        "topo": "R"
+      }
+    }
+  }
+}

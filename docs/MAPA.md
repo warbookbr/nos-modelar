@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1236 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1238 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -829,6 +829,14 @@
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
+
+## procedural/familias-de-desenho/braco-colaborativo/
+
+- `README.md` — Família de desenho do braço colaborativo
+
+## procedural/familias-de-desenho/carcaca-empilhadeira/
+
+- `README.md` — Família de desenho da carcaça de empilhadeira
 
 ## procedural/familias/cilindro-hidraulico/
 
