@@ -42,3 +42,27 @@ As restrições não mostraram vantagem no primeiro desenho, nem num objeto de
 retângulos nem num de arcos e rampa. A vantagem que resta sem prova é a da correção:
 mudar uma relação e o resto acompanhar, onde as coordenadas pedem recalcular os
 pontos à mão.
+
+## A rodada de correção
+
+A pessoa pediu em 2026-10-14 o teste da vantagem que restava às restrições, a
+correção. Cada desenhista recebeu, numa sessão nova, só os defeitos que o crítico
+apontou no próprio desenho, e corrigiu uma cópia dele: [`restricoes-r2/`](restricoes-r2/lateral.desenho.json)
+e [`coordenadas-r2/`](coordenadas-r2/lateral.partes.json). A
+[comparação](comparacao-r2.png) mostra os dois corrigidos sobre a silhueta escondida.
+
+| | restrições | coordenadas |
+|---|---|---|
+| razão contra a união das partes, antes | 0,666 | 0,657 |
+| razão contra a união das partes, depois | 0,741 | 0,650 |
+| tokens da correção | 103.929 | 81.233 |
+| o que mudou | 8 valores mudados, 6 relações religadas, 28 tiradas e 37 acrescentadas; 85 relações | 3 trechos do gerador reescritos e 2 valores ajustados, 95 linhas; 9 partes e 207 pontos |
+
+Na correção as restrições ganharam: o desenho subiu 0,075, e o de coordenadas ficou
+onde estava, embora tenha mudado tanto quanto. O desenhista por coordenadas
+contou o que custou: o crítico dá os defeitos como fração do desenho anterior, e
+ele teve de tirar os valores antigos e multiplicar à mão, de modo que um valor
+errado passava ao desenho novo sem que nada acusasse; no desenho por restrições o
+defeito vira o valor de uma relação, e o resolvedor refaz o resto. É uma medida
+só, com um crítico diferente para cada desenho, e não prova a vantagem; ela aponta
+para onde as restrições valem, que é a revisão e não o primeiro traço.
