@@ -2,14 +2,14 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [as famílias de desenho](2026-10-14-familias-de-desenho.md).
 
-[O desenho sem referência](encerrados/2026-10-13-desenho-sem-referencia.md) fechou
-em 2026-10-14, com o módulo de desenho por restrições e a decisão da pessoa de
-seguir com ele como o formato do desenho. O sucessor, em rascunho, são [as famílias
-de desenho](2026-10-14-familias-de-desenho.md), com o roteiro dos planos seguintes
-(esboço para receita no núcleo com o avião, a picape e a lista de objetos) e os
-candidatos de sucessão. Antes, [o que o avião
+O plano monta peças e famílias de desenho por restrições, ajustadas às referências
+que já têm contorno, e traz o roteiro dos planos seguintes (esboço para receita no
+núcleo com o avião, a picape e a lista de objetos) e os candidatos de sucessão. [O
+desenho sem referência](encerrados/2026-10-13-desenho-sem-referencia.md) fechou em
+2026-10-14, com o módulo de desenho por restrições e a decisão da pessoa de seguir
+com ele como o formato do desenho. Antes, [o que o avião
 pede](encerrados/2026-10-11-o-que-o-aviao-pede.md) fechou em 2026-10-13.
 Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 

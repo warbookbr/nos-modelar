@@ -1,6 +1,6 @@
 # As famílias de desenho
 
-**Estado:** rascunho
+**Estado:** ativo
 
 **Responsável:** Claude, com o aceite da pessoa
 
@@ -52,7 +52,11 @@ só a saída para a pessoa e o crítico.
 - a razão da ferramenta contra a união das partes ou com os furos da silhueta, que
   a prova da carcaça mostrou faltar;
 - a decisão com a pessoa de se o desenho substitui a prancha, já que as cotas
-  ficam nas relações.
+  ficam nas relações;
+- o teste da família de superfície aerodinâmica, que passou de 5 minutos e é o
+  mais lento da bateria, medido por etapa e encurtado sem perder cobertura, como
+  o teste da blocagem no plano do avião; a pessoa perguntou em 2026-10-14 como
+  acelerar os gates, e a máquina da sessão não tem folga de processador.
 
 ## Excluído
 
