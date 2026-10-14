@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1246 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1247 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -312,6 +312,7 @@
 ## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/
 
 - `DESCRICAO.md` — Carcaça da empilhadeira nova, vista lateral: a descrição
+- `RESULTADO.md` — Carcaça da empilhadeira nova pela família de desenho: o resultado da prova
 - `ajustar.mjs` — ajustar.mjs — a família da carcaça ajustada ao contorno da foto, para separar o que a família alcança do que a descrição deu.
 
 ## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/

@@ -1,0 +1,38 @@
+{
+ "modo": "faixa",
+ "iou": 0.8144809482673694,
+ "deslocamento": [
+  136.875,
+  87.5
+ ],
+ "avaliacoes": 383,
+ "valores": {
+  "altura": 866,
+  "arcoD": 340,
+  "arcoT": 1780,
+  "aro": 346,
+  "avanco": 185,
+  "capo": 833.3,
+  "comprimento": 2320,
+  "encosto": 735,
+  "painel": 852,
+  "piso": 500,
+  "posto": 241,
+  "raioT": 210,
+  "rampa": 34.35,
+  "topo": 650,
+  "vaoD": 239.6
+ },
+ "noLimite": [
+  "altura",
+  "arcoD",
+  "arcoT",
+  "avanco",
+  "comprimento",
+  "encosto",
+  "painel",
+  "piso",
+  "raioT"
+ ],
+ "foraDaFaixa": []
+}

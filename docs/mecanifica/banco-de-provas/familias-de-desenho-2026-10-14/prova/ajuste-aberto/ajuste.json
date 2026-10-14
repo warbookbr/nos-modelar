@@ -1,0 +1,115 @@
+{
+ "modo": "aberta",
+ "iou": 0.9060528473429752,
+ "deslocamento": [
+  136.25,
+  0
+ ],
+ "avaliacoes": 526,
+ "valores": {
+  "altura": 990.7,
+  "arcoD": 443.1,
+  "arcoT": 1823.6,
+  "aro": 346,
+  "avanco": 122.4,
+  "capo": 977.9,
+  "comprimento": 2320,
+  "encosto": 825.1,
+  "painel": 984.3,
+  "piso": 594.6,
+  "posto": 269.9,
+  "raioT": 267.1,
+  "rampa": 34.35,
+  "topo": 728,
+  "vaoD": 304
+ },
+ "noLimite": [
+  "altura",
+  "arcoD",
+  "arcoT",
+  "avanco",
+  "capo",
+  "comprimento",
+  "encosto",
+  "painel",
+  "piso",
+  "posto",
+  "raioT",
+  "topo",
+  "vaoD"
+ ],
+ "foraDaFaixa": [
+  {
+   "parametro": "altura",
+   "valor": 990.7,
+   "minimo": 842,
+   "maximo": 866
+  },
+  {
+   "parametro": "arcoD",
+   "valor": 443.1,
+   "minimo": 295,
+   "maximo": 340
+  },
+  {
+   "parametro": "arcoT",
+   "valor": 1823.6,
+   "minimo": 1530,
+   "maximo": 1780
+  },
+  {
+   "parametro": "avanco",
+   "valor": 122.4,
+   "minimo": 185,
+   "maximo": 225
+  },
+  {
+   "parametro": "capo",
+   "valor": 977.9,
+   "minimo": 808,
+   "maximo": 834
+  },
+  {
+   "parametro": "encosto",
+   "valor": 825.1,
+   "minimo": 680,
+   "maximo": 735
+  },
+  {
+   "parametro": "painel",
+   "valor": 984.3,
+   "minimo": 830,
+   "maximo": 852
+  },
+  {
+   "parametro": "piso",
+   "valor": 594.6,
+   "minimo": 450,
+   "maximo": 500
+  },
+  {
+   "parametro": "posto",
+   "valor": 269.9,
+   "minimo": 225,
+   "maximo": 260
+  },
+  {
+   "parametro": "raioT",
+   "valor": 267.1,
+   "minimo": 210,
+   "maximo": 255
+  },
+  {
+   "parametro": "topo",
+   "valor": 728,
+   "minimo": 620,
+   "maximo": 680
+  },
+  {
+   "parametro": "vaoD",
+   "valor": 304,
+   "minimo": 205,
+   "maximo": 245
+  }
+ ]
+}
