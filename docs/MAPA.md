@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1213 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1214 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -269,6 +269,7 @@
 ## docs/mecanifica/banco-de-provas/desenho-braco-2026-10-14/
 
 - `DESCRICAO.md` — Braço robótico, vista lateral: a descrição
+- `coordenadas.mjs` — coordenadas.mjs — o caminho da IA que desenha por coordenadas, sem resolvedor: lê <vista>.partes.json, com cada parte como um polígono em milímetro escrito à…
 
 ## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/
 
