@@ -6,7 +6,8 @@ referência](../../planos/2026-10-13-desenho-sem-referencia.md), em 2026-10-14. 
 restrições ([`restricoes/`](restricoes/lateral.desenho.json)) e outra escrevendo os
 polígonos à mão ([`coordenadas/`](coordenadas/lateral.partes.json)). O registro de
 leituras das duas mostra que nenhuma abriu a imagem nem arquivo da empilhadeira. O
-contorno da referência saiu em três rodadas do contorno da imagem, com nota 8, 8 e 7,
+contorno da referência saiu em três rodadas do contorno da imagem
+([roteiro do crítico](../empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/roteiro.md)), com nota 8, 8 e 7,
 e foi aceito pela pessoa com pendências; a silhueta, que é o que a prova mede, não
 tem defeito apontado. A [comparação](comparacao.png) põe cada desenho sobre a
 silhueta escondida.
