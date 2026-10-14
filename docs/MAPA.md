@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1216 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1221 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -276,9 +276,21 @@
 
 - `gera.mjs` — gera.mjs — o gerador que a IA do desenho por coordenadas escreveu para os polígonos do braço (cantos arredondados e círculos em mm), guardado com o resultado…
 
+## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/
+
+- `DESCRICAO.md` — Carcaça da empilhadeira, vista lateral: a descrição
+
+## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas/
+
+- `gera.mjs` — gera.mjs — gera lateral.partes.json da carcaça da empilhadeira (vista lateral, frente à esquerda, base em v = 0) por coordenadas escritas à mão a partir só d…
+
 ## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/
 
 - `ALINHAMENTO.md` — Carcaça da empilhadeira: alinhamento
+
+## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/
+
+- `roteiro.md` — Roteiro da análise
 
 ## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
 
@@ -547,10 +559,10 @@
 
 ## modulos/desenho-por-restricoes/src/
 
-- `ajuda.js` — ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@1`, as relações, o lado e o que cada estado do relatório pede. É o que `…
+- `ajuda.js` — ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@2` (o @1 segue aceito), as relações, o lado e o que cada estado do relat…
 - `booleanas.js` — booleanas.js — união, diferença, interseção, área e deslocamento de listas de anéis em milímetro, sobre a `CrossSection` da Manifold (`manifold-3d`, WebAssem…
 - `contornos.js` — contornos.js — a saída no formato `mecanifica.contornos@1`, o mesmo que o contorno da imagem grava, para o esboço, a prancha e o crítico lerem como leem o de…
-- `formato.js` — formato.js — o formato salvo `mecanifica.desenho@1` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir.
+- `formato.js` — formato.js — o formato salvo `mecanifica.desenho@2` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir. A versão 2 acrescenta à `barra`…
 - `geometria.js` — geometria.js — da geometria resolvida a anéis em milímetro e às medidas derivadas.
 - `index.js` — index.js — a porta do módulo desenho-por-restricoes: a descrição de uma vista entra, o relatório, os contornos e a vista em traço saem.
 - `razao.js` — razao.js — a razão interseção/união (IoU) entre dois contornos, para medir um desenho contra uma referência que o desenhista não viu.
@@ -561,14 +573,16 @@
 
 ## modulos/desenho-por-restricoes/tests/
 
+- `cantos.test.js` — cantos.test.js — o canto arredondado (`raioDoCanto` do polígono e da barra): o arco sai tangente às duas arestas e com o raio dado, a cápsula é uma barra com…
 - `carrinho.js` — carrinho.js — a lateral de um carrinho de mão, a descrição que os testes do desenho por restrições usam: 17 relações que fecham o desenho sem grau de liberda…
 - `carrinho.test.js` — carrinho.test.js — o carrinho de mão resolve nos valores em que quatro resolvedores concordaram, os quatro cenários (completo, conflito, faltando, redundante…
 - `contornos.test.js` — contornos.test.js — a saída é o formato dos contornos da imagem com `origem`, a mesma descrição dá o mesmo arquivo byte a byte, a parte escondida fica com o …
 - `formas.js` — formas.js — objetos sintéticos pequenos para os testes do desenho por restrições: uma chapa com furo e trava (polígono, círculo, barra e as relações paralela…
 - `formas.test.js` — formas.test.js — as outras relações e partes do formato (arco, círculo, barra, polígono, paralela, perpendicular, igual, ângulo, sobre um círculo e tangência…
-- `formato.test.js` — formato.test.js — a validação do `mecanifica.desenho@1` recusa cada erro dizendo o nome do que está errado e como corrigir, e aceita o carrinho.
+- `formato.test.js` — formato.test.js — a validação do `mecanifica.desenho@2` (e do @1, que segue aceito) recusa cada erro dizendo o nome do que está errado e como corrigir, e ace…
 - `modulo.test.js` — modulo.test.js — o módulo fica isolado (não importa Three.js, o núcleo de autoria nem outro módulo), o resolvedor está fixado em 1.3.0 e a versão que o conto…
 - `razao.test.js` — razao.test.js — a razão interseção/união entre dois contornos, sem alinhar, alinhada por um ponto declarado e pela melhor translação.
+- `traco.test.js` — traco.test.js — todo texto da vista em traço cabe na folha: com um subtítulo, um título e uma legenda das referências mais largos que o desenho, nenhum texto…
 
 ## modulos/esboco/
 
