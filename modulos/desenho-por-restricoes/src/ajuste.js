@@ -19,7 +19,7 @@
    qual, e começar de outro perfil pode dar outro. Puro, sem ler nem gravar arquivo. */
 import { maximizarTranslacao } from './booleanas.js';
 import { desenhar } from './desenhar.js';
-import { especializarFamilia, problemasDoDesenho, restricoesFeridas } from './familia.js';
+import { casasDaFaixa, especializarFamilia, problemasDoDesenho, restricoesFeridas } from './familia.js';
 import { ErroDeDesenho } from './formato.js';
 import { formaDoContorno, razaoInterseccaoUniao } from './razao.js';
 import { caixaDe } from './geometria.js';
@@ -33,8 +33,6 @@ function limitesDaBusca(p, abrir) {
   return [p.minimo - r, p.maximo + r];
 }
 
-/* A casa decimal da grade: um milésimo da largura da busca, arredondado para baixo à potência de dez. */
-const casasDaGrade = (largura) => Math.max(0, -Math.floor(Math.log10(largura / 1000)));
 const naGrade = (v, casas) => Number(v.toFixed(casas));
 
 /* Ajusta a família ao contorno `alvo` (um arquivo `mecanifica.contornos@1`). Devolve `{ iou, deslocamento, valores, avaliacoes,
@@ -51,7 +49,7 @@ export async function ajustarFamilia(familia, alvo, {
   const nomes = soltos ?? Object.keys(P);
   for (const n of nomes) if (!Object.hasOwn(P, n)) throw new ErroDeDesenho(`o parâmetro ${q(n)} não existe na família (os parâmetros são ${Object.keys(P).map(q).join(', ')})`);
   const limites = Object.fromEntries(nomes.map((n) => [n, limitesDaBusca(P[n], abrir)]));
-  const casas = Object.fromEntries(nomes.map((n) => [n, casasDaGrade(limites[n][1] - limites[n][0])]));
+  const casas = Object.fromEntries(nomes.map((n) => [n, casasDaFaixa(limites[n][1] - limites[n][0])]));
   let valores = { ...Object.fromEntries(Object.entries(P).map(([n, p]) => [n, p.padrao])), ...(inicio ?? {}) };
   const A = formaDoContorno(alvo, { medida }, 'o contorno da referência');
   const caixaA = caixaDe((Array.isArray(A) ? A : A.regioes.flat()));

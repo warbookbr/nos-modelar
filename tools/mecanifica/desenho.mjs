@@ -8,7 +8,7 @@
  *   npm run desenho -- <vista>.desenho.json [--so-relatorio] [--json] [--pecas=<catalogo.json>[,<outro.json>]]
  *   npm run desenho -- razao <a.contornos.json> <b.contornos.json> [--parte-a=<nome>] [--parte-b=<nome>] [--partes] [--ponto-a=h,v --ponto-b=h,v] [--medida=regioes|silhueta] [--json]
  *   npm run desenho -- familia <f.familia-de-desenho.json> [--perfil=<nome>|minimo|medio|maximo] [--valores=a=1,b=2] [--grava=<pasta>] [--pecas=...] [--so-relatorio] [--json]
- *   npm run desenho -- familia <f.familia-de-desenho.json> --provar [--pecas=...] [--json]
+ *   npm run desenho -- familia <f.familia-de-desenho.json> --provar [--sorteio=<n>] [--semente=<n>] [--pecas=...] [--json]
  *   npm run desenho -- familia <f.familia-de-desenho.json> --ajustar=<referencia.contornos.json> [--abrir=<fração>] [--soltos=a,b] [--perfil=...] [--valores=...] [--grava=<pasta>] [--json]
  *   npm run desenho -- conferir [<pasta das famílias>] [--json]
  *   npm run desenho -- --ajuda
@@ -168,8 +168,11 @@ function lerValores(texto) {
   return { valores };
 }
 
-async function provarDaFamilia(familia, pecas, argv, io) {
-  const prova = await provarFamilia(familia, { pecas });
+async function provarDaFamilia(familia, pecas, argv, io, valor) {
+  const inteiro = (nome) => { const t = valor(nome); return t === undefined ? undefined : /^\d+$/.test(t) ? Number(t) : NaN; };
+  const sorteio = inteiro('sorteio'); const semente = inteiro('semente');
+  if (Number.isNaN(sorteio) || Number.isNaN(semente)) { io.err('desenho: --sorteio=<n> e --semente=<n> são números inteiros, zero ou mais (por exemplo --sorteio=1500).\n'); return 2; }
+  const prova = await provarFamilia(familia, { pecas, sorteio: sorteio ?? 0, ...(semente !== undefined ? { semente } : {}) });
   if (argv.includes('--json')) { io.out(arquivoJson(prova)); return prova.ok ? 0 : 4; }
   io.out(textoDaProva(familia, prova));
   return prova.ok ? 0 : 4;
@@ -181,8 +184,11 @@ function textoDaProva(familia, prova) {
   const padroes = Object.fromEntries(Object.entries(familia.parametros).map(([n, p]) => [n, p.padrao]));
   const rotulo = prova.casos.reduce((m, c) => Math.max(m, c.rotulo.length), 0);
   const ordem = prova.recusados ? `, dos quais ${prova.recusados} fora das relações de ordem da família` : '';
-  L.push(`família ${JSON.stringify(prova.id)} ${prova.versao}: ${prova.casos.length} conjuntos de valores (todos no mínimo, no médio e no máximo; cada parâmetro no mínimo, no médio e no máximo com os outros no padrão; cada par de parâmetros nos extremos cruzados; cada perfil)${ordem}\n`);
+  const sorteados = prova.casos.filter((c) => c.sorteio);
+  L.push(`família ${JSON.stringify(prova.id)} ${prova.versao}: ${prova.casos.length} conjuntos de valores (todos no mínimo, no médio e no máximo; cada parâmetro no mínimo, no médio e no máximo com os outros no padrão; cada par de parâmetros nos extremos cruzados; cada perfil${prova.sorteio ? `; ${prova.sorteio} sorteados nas faixas com a semente ${prova.semente}` : ''})${ordem}\n`);
   for (const c of prova.casos) {
+    /* Do sorteio sai só o que falhou; o resto vai na conta do fim. */
+    if (c.sorteio && c.ok) continue;
     if (c.recusado) { L.push(`  recusa ${c.rotulo.padEnd(rotulo)}  fere ${c.feridas.map((id) => JSON.stringify(id)).join(', ')}\n`); continue; }
     const vista = c.vista ? `vista ${numeroDoParametro(c.vista.larguraMm)} x ${numeroDoParametro(c.vista.alturaMm)} mm` : '';
     L.push(`  ${c.ok ? 'ok    ' : 'FALHOU'} ${c.rotulo.padEnd(rotulo)}  ${vista}${c.redundantes.length ? `  (redundante: ${c.redundantes.join(', ')})` : ''}\n`);
@@ -190,6 +196,10 @@ function textoDaProva(familia, prova) {
       const mudados = Object.entries(c.valores).filter(([n, v]) => v !== padroes[n]).map(([n, v]) => `${n} = ${numeroDoParametro(v)} ${familia.parametros[n].unidade}`);
       L.push(`         valores: ${mudados.length ? mudados.join(', ') : 'os padrões'}\n${c.problemas.map((m) => `         ${m}\n`).join('')}`);
     }
+  }
+  if (sorteados.length) {
+    const recusa = sorteados.filter((c) => c.recusado).length; const falha = sorteados.filter((c) => !c.ok).length;
+    L.push(`sorteio: ${sorteados.length} conjuntos com a semente ${prova.semente}, ${sorteados.length - recusa} desenhados, ${recusa} recusados por relação de ordem e ${falha} falharam. A mesma semente sorteia os mesmos conjuntos; --semente=<n> sorteia outros.\n`);
   }
   if (prova.recusados) {
     const ids = [...new Set(prova.casos.flatMap((c) => c.feridas ?? []))];
@@ -215,7 +225,7 @@ async function comandoFamilia(args, valor, argv, io) {
   if (catalogo.codigo) return catalogo.codigo;
   const { erros, familia } = lerFamiliaDeDesenho(lido.json, { pecas: catalogo.pecas });
   if (erros.length) { io.err(`desenho: a família ${basename(arquivo)} tem ${erros.length} erro(s):\n${erros.map((e) => `- ${e}`).join('\n')}\n`); return 3; }
-  if (argv.includes('--provar')) return provarDaFamilia(familia, catalogo.pecas, argv, io);
+  if (argv.includes('--provar')) return provarDaFamilia(familia, catalogo.pecas, argv, io, valor);
 
   const dados = lerValores(valor('valores'));
   if (dados.erro) { io.err(`desenho: ${dados.erro}\n`); return 2; }
@@ -351,6 +361,10 @@ async function conferirPasta(familia, pecas, perfil, pasta, arquivoDaFamilia) {
 
 const USO_DO_CONFERIR = `uso: npm run desenho -- conferir [<pasta das famílias>] [--json]   (padrão: ${PASTA_DAS_FAMILIAS})\n`;
 
+/* Quantos conjuntos o gate sorteia em cada família, além da prova de pares, com a semente da família: pouco para achar sozinho a
+   combinação rara (a autoria roda `--provar --sorteio=1500`), bastante para a mudança que quebra uma região inteira das faixas. */
+const SORTEIO_DO_GATE = 100;
+
 /* O gate `familias-de-desenho:check`: a prova de toda família sob a pasta e a conferência das pastas de perfil gravadas ao lado dela. */
 async function comandoConferir(args, argv, io) {
   const raiz = resolve(args[0] ?? PASTA_DAS_FAMILIAS);
@@ -370,8 +384,8 @@ async function comandoConferir(args, argv, io) {
       continue;
     }
     const { familia } = lida;
-    const prova = await provarFamilia(familia, { pecas: catalogo.pecas });
-    const falhas = prova.casos.filter((c) => !c.ok).map((c) => `${c.rotulo}: ${c.problemas.join(' / ')}`);
+    const prova = await provarFamilia(familia, { pecas: catalogo.pecas, sorteio: SORTEIO_DO_GATE });
+    const falhas = prova.casos.filter((c) => !c.ok).map((c) => `${c.rotulo}: ${c.problemas.join(' / ')}${c.sorteio ? ` (valores: ${Object.entries(c.valores).map(([n, v]) => `${n}=${v}`).join(',')})` : ''}`);
     const dir = dirname(arquivo);
     const pastas = [];
     const perfis = [...new Set([...Object.keys(familia.perfis), ...PERFIS_DA_FAIXA])];
@@ -391,7 +405,7 @@ async function comandoConferir(args, argv, io) {
   for (const r of resultados) {
     if (r.invalida) { io.out(`${r.arquivo}: INVÁLIDA\n${r.erros.map((e) => `  - ${e}\n`).join('')}`); continue; }
     io.out(`${r.arquivo}: família ${JSON.stringify(r.id)} ${r.versao}\n`);
-    io.out(`  prova: ${r.prova.desenhados} conjuntos desenhados${r.prova.recusados ? `, ${r.prova.recusados} fora das relações de ordem` : ''}${r.falhas.length ? `; ${r.falhas.length} FALHARAM` : ', todos resolvem'}\n`);
+    io.out(`  prova: ${r.prova.desenhados} conjuntos desenhados (a prova de pares e um sorteio de ${SORTEIO_DO_GATE})${r.prova.recusados ? `, ${r.prova.recusados} fora das relações de ordem` : ''}${r.falhas.length ? `; ${r.falhas.length} FALHARAM` : ', todos resolvem'}\n`);
     for (const f of r.falhas) io.out(`    FALHOU ${f}\n`);
     for (const p of r.pastas) {
       io.out(`  ${p.perfil}/: ${p.falhas.length ? 'DIFERENTE do que a família gera' : 'igual ao que a família gera (desenho e contornos)'}\n`);

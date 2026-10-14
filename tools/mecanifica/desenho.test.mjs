@@ -692,12 +692,12 @@ describe('npm run desenho -- conferir', () => {
     expect(r.err).toBe('');
     expect(r.codigo).toBe(0);
     expect(r.out).toMatch(/carcaca\.familia-de-desenho\.json: família "carcaca-sintetica" 1\.0\.0\n/);
-    expect(r.out).toMatch(/\n {2}prova: 98 conjuntos desenhados, 2 fora das relações de ordem, todos resolvem\n/);
+    expect(r.out).toMatch(/\n {2}prova: 197 conjuntos desenhados \(a prova de pares e um sorteio de 100\), 3 fora das relações de ordem, todos resolvem\n/);
     expect(r.out).toMatch(/\n {2}referencia\/: igual ao que a família gera \(desenho e contornos\)\n/);
     expect(r.out).toMatch(/\n1 família\(s\) conferida\(s\): a prova passa e as pastas de perfil gravadas são as que elas geram\.\n$/);
     const json = JSON.parse((await rodar(['conferir', raiz, '--json'])).out);
     expect(json.ok).toBe(true);
-    expect(json.familias[0]).toMatchObject({ id: 'carcaca-sintetica', prova: { total: 100, desenhados: 98, recusados: 2 }, falhas: [] });
+    expect(json.familias[0]).toMatchObject({ id: 'carcaca-sintetica', prova: { total: 200, desenhados: 197, recusados: 3 }, falhas: [] });
     expect(json.familias[0].pastas).toEqual([{ perfil: 'referencia', falhas: [] }]);
   }, 180_000);
 
@@ -745,7 +745,7 @@ describe('npm run desenho -- conferir', () => {
     escrever(dir, 'carcaca.familia-de-desenho.json', quebrada);
     const prova = await rodar(['conferir', raiz]);
     expect(prova.codigo).toBe(4);
-    expect(prova.out).toMatch(/\n {2}prova: 100 conjuntos desenhados; \d+ FALHARAM\n {4}FALHOU todos no máximo: recusado: /);
+    expect(prova.out).toMatch(/\n {2}prova: 200 conjuntos desenhados \(a prova de pares e um sorteio de 100\); \d+ FALHARAM\n {4}FALHOU todos no máximo: recusado: /);
 
     const invalida = JSON.parse(JSON.stringify(familia));
     invalida.parametros.vao.padrao = 100;

@@ -14,8 +14,9 @@ COMANDOS
                                                    razão interseção/união entre dois contornos (ver A RAZÃO)
   npm run desenho -- familia <f.familia-de-desenho.json> [--perfil=<nome>|minimo|medio|maximo] [--valores=a=1,b=2] [--grava=<pasta>] [--pecas=...]
                                                    desenha a família para um conjunto de valores (ver A FAMÍLIA)
-  npm run desenho -- familia <f.familia-de-desenho.json> --provar
-                                                   resolve a família nos extremos, no médio e nos pares de extremos cruzados
+  npm run desenho -- familia <f.familia-de-desenho.json> --provar [--sorteio=<n>] [--semente=<n>]
+                                                   resolve a família nos extremos, no médio, nos pares de extremos cruzados
+                                                   e em n conjuntos sorteados nas faixas
   npm run desenho -- familia <f.familia-de-desenho.json> --ajustar=<referencia.contornos.json> [--abrir=0.4] [--soltos=a,b] [--grava=<pasta>]
                                                    os valores da família mais próximos da referência (ver O AJUSTE)
   npm run desenho -- conferir [<pasta das famílias>]   o gate familias-de-desenho:check: a prova de toda família sob a pasta
@@ -118,7 +119,10 @@ A FAMÍLIA (familia, conferir)
   outros no padrão, com cada par de parâmetros nos extremos cruzados (o mínimo de um com o máximo do outro, dos dois jeitos, os outros
   no padrão) e com cada perfil. Em cada conjunto exige resolvido (nenhum conflito, parte solta nem lado trocado), nenhum polígono
   cruzado, nenhuma parte toda escondida e nenhuma peça virada; o conjunto que fere uma relação de ordem não é desenhado, sai como
-  recusa dizendo qual relação, e não reprova. Sai com 4 se algum conjunto desenhado falhar.
+  recusa dizendo qual relação, e não reprova. Sai com 4 se algum conjunto desenhado falhar. "--sorteio=<n>" acrescenta n conjuntos
+  com cada parâmetro sorteado na faixa, com a semente da família (o id e a versão) ou "--semente=<n>": a mesma semente sorteia os
+  mesmos conjuntos. É o que os pares não veem, três ou mais parâmetros que se contradizem juntos; do sorteio saem só as falhas e a
+  conta. Rode "--provar --sorteio=1500" antes de dar a família por pronta; o gate sorteia 100 a cada vez.
   "conferir [<pasta>]" é o gate familias-de-desenho:check: roda a prova de toda família sob a pasta e confere que a pasta ao lado dela
   com o nome de um perfil ("referencia/", "minimo/", "medio/", "maximo/") ainda é o que a família gera para ele, nos bytes do desenho
   e dos contornos (a vista em PNG só precisa existir). A família com o perfil "referencia" e sem a pasta reprova. Sai com 3 se uma

@@ -2,7 +2,7 @@
    parâmetro, os valores que ela aceita, o desenho especializado que se resolve sozinho e a prova de que ele resolve nos extremos e no
    médio de cada parâmetro. A prova é o que pega a amarração errada: o desenho que resolve no padrão e quebra no extremo. */
 import { describe, expect, it } from 'vitest';
-import { casosDaProva, desenhar, especializarFamilia, lerCatalogoDePecas, lerFamiliaDeDesenho, provarFamilia, valoresDaFamilia } from '../src/index.js';
+import { casosDaProva, casosSorteados, desenhar, especializarFamilia, lerCatalogoDePecas, lerFamiliaDeDesenho, provarFamilia, sementeDaFamilia, valoresDaFamilia } from '../src/index.js';
 import { carrinho } from './carrinho.js';
 import { anelCoaxial, arcoDeRodaComAro, carcacaSintetica, familiaSintetica } from './pecas.js';
 
@@ -246,6 +246,47 @@ describe('provarFamilia', () => {
     expect(prova.casos.find((c) => c.rotulo === 'padrão').ok).toBe(true);
     expect(prova.casos.find((c) => c.rotulo === 'alfa no mínimo').ok).toBe(true);
   });
+
+  it('o sorteio pega o que os pares não veem: quatro ângulos que só passam de 180 graus juntos, com a mesma semente dando os mesmos conjuntos', async () => {
+    const angulos = {
+      formato: 'mecanifica.familia-de-desenho@1', id: 'angulos', versao: '1.0.0',
+      parametros: {
+        alfa: { unidade: 'graus', padrao: 40, minimo: 20, medio: 50, maximo: 80 },
+        beta: { unidade: 'graus', padrao: 80, minimo: 60, medio: 80, maximo: 100 },
+        gama: { unidade: 'graus', padrao: 0, minimo: 0, medio: 20, maximo: 40 },
+        delta: { unidade: 'graus', padrao: 50, minimo: 0, medio: 25, maximo: 50 },
+      },
+      desenho: {
+        formato: 'mecanifica.desenho@3', objeto: 'triângulo', vista: 'frontal',
+        referencias: { chao: { reta: 'horizontal', v: 0 }, parede: { reta: 'vertical', h: 0 } },
+        pontos: { A: [0, 0], B: [100, 0], C: [50, 40] },
+        partes: { triangulo: { poligono: ['A', 'B', 'C'] } },
+        relacoes: [
+          { nome: 'A no chão', sobre: ['A', 'chao'] },
+          { nome: 'A na parede', sobre: ['A', 'parede'] },
+          { nome: 'B de nível', horizontal: ['A', 'B'] },
+          { nome: 'base', distancia: ['B', 'A'], mm: 100, eixo: 'h', lado: 'direita' },
+          { nome: 'ângulo em A', angulo: [['A', 'B'], ['A', 'C']], graus: 'alfa' },
+          { nome: 'ângulo em B', angulo: [['B', 'C'], ['B', 'A']], graus: '=beta+gama-delta' },
+        ],
+      },
+    };
+    const { erros: e, familia: f } = lerFamiliaDeDesenho(angulos);
+    expect(e).toEqual([]);
+    /* a soma dos ângulos em A e em B é alfa + beta + gama - delta: no padrão, nos extremos de todos juntos e nos pares, com os outros
+       no padrão, ela não passa de 170 graus, e a prova sem sorteio passa; com alfa, beta e gama altos e delta baixo, passa de 180 */
+    expect((await provarFamilia(f)).ok).toBe(true);
+    const sorteados = casosSorteados(f, 200);
+    expect(casosSorteados(f, 200)).toEqual(sorteados);
+    expect(casosSorteados(f, 200, 7)).not.toEqual(sorteados);
+    expect(sorteados.every(({ valores: v }) => Object.entries(v).every(([n, x]) => x >= f.parametros[n].minimo && x <= f.parametros[n].maximo))).toBe(true);
+    const prova = await provarFamilia(f, { sorteio: 200 });
+    expect(prova).toMatchObject({ ok: false, sorteio: 200, semente: sementeDaFamilia(f) });
+    const falhas = prova.casos.filter((c) => !c.ok);
+    expect(falhas.length).toBeGreaterThan(0);
+    expect(falhas.every((c) => c.sorteio && c.valores.alfa + c.valores.beta + c.valores.gama - c.valores.delta >= 175)).toBe(true);
+    expect(() => casosSorteados(f, -1)).toThrow(/o sorteio da prova deve ser um número inteiro/);
+  }, 60_000);
 
   it('o canto que não cabe no extremo é recusado com o motivo: o raio do arco da roda passa do vão no máximo da faixa; com a relação de ordem o conjunto nem se desenha', async () => {
     const bruta = familiaSintetica();

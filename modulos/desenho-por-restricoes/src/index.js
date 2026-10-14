@@ -16,7 +16,7 @@ import { relatorioEmTexto } from './relatorio.js';
 import { razaoInterseccaoUniao, razaoPorParte, aneisDoContorno } from './razao.js';
 import {
   FORMATO_DA_FAMILIA_DE_DESENHO, UNIDADES_DA_FAMILIA, PERFIS_DA_FAIXA, catalogosDaFamilia, lerFamiliaDeDesenho, valoresDaFamilia, especializarFamilia,
-  casosDaProva, provarFamilia, restricoesFeridas, fraseDaRestricao, problemasDoDesenho,
+  casosDaProva, provarFamilia, restricoesFeridas, fraseDaRestricao, problemasDoDesenho, casosSorteados, sementeDaFamilia,
 } from './familia.js';
 import { ajustarFamilia } from './ajuste.js';
 import { conferirOrientacao } from './orientacao.js';
@@ -27,5 +27,5 @@ export {
   FORMATO_DO_DESENHO, FORMATOS_DO_DESENHO, FORMATO_DOS_CONTORNOS, RESOLVEDOR, VISTAS_DO_DESENHO, LADOS, EIXOS, TIPOS_DE_RELACAO,
   resolver, contornosDoDesenho, vistaEmTraco, relatorioEmTexto, razaoInterseccaoUniao, razaoPorParte, aneisDoContorno, textoDaAjuda, conferirOrientacao,
   FORMATO_DA_FAMILIA_DE_DESENHO, UNIDADES_DA_FAMILIA, PERFIS_DA_FAIXA, catalogosDaFamilia, lerFamiliaDeDesenho, valoresDaFamilia, especializarFamilia,
-  casosDaProva, provarFamilia, restricoesFeridas, fraseDaRestricao, problemasDoDesenho, ajustarFamilia,
+  casosDaProva, provarFamilia, restricoesFeridas, fraseDaRestricao, problemasDoDesenho, casosSorteados, sementeDaFamilia, ajustarFamilia,
 };

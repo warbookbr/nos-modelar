@@ -316,9 +316,49 @@ async function provarCaso(familia, caso, pecas) {
 
 /* Desenha a família em cada conjunto de `casosDaProva` e diz quais resolvem. `ok` só é verdadeiro se nenhum conjunto desenhado
    falha; o que fere uma relação de ordem fica de fora, como `recusado`, e `desenhados` e `recusados` contam cada grupo. */
-export async function provarFamilia(familia, { pecas = {} } = {}) {
+export async function provarFamilia(familia, { pecas = {}, sorteio = 0, semente = sementeDaFamilia(familia) } = {}) {
   const casos = [];
-  for (const caso of casosDaProva(familia)) casos.push(await provarCaso(familia, caso, pecas));
+  for (const caso of [...casosDaProva(familia), ...casosSorteados(familia, sorteio, semente)]) casos.push(await provarCaso(familia, caso, pecas));
   const recusados = casos.filter((c) => c.recusado).length;
-  return { id: familia.id, versao: familia.versao, ok: casos.every((c) => c.ok), desenhados: casos.length - recusados, recusados, casos };
+  return {
+    id: familia.id, versao: familia.versao, ok: casos.every((c) => c.ok), desenhados: casos.length - recusados, recusados,
+    ...(sorteio ? { sorteio, semente } : {}), casos,
+  };
+}
+
+/* A casa decimal de um valor sorteado ou buscado numa faixa: um milésimo da largura, arredondado para baixo à potência de dez. */
+export const casasDaFaixa = (largura) => Math.max(0, -Math.floor(Math.log10(largura / 1000)));
+
+/* A semente padrão do sorteio, tirada do id e da versão da família: a mesma família sorteia sempre os mesmos conjuntos, e a versão
+   nova sorteia outros. */
+export function sementeDaFamilia(familia) {
+  let h = 2166136261;
+  for (const ch of `${familia.id}@${familia.versao}`) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return h;
+}
+
+/* O sorteio da prova: `n` conjuntos com cada parâmetro sorteado por igual na faixa dele, por um gerador com semente (mulberry32), de
+   modo que a mesma família, o mesmo `n` e a mesma semente dão os mesmos conjuntos. É o que a prova de pares não vê: três ou mais
+   parâmetros que se contradizem juntos. A ampliação da família da carcaça para duas referências achou três assim em 1550
+   conjuntos sorteados à mão, todos dentro das faixas e fora dos pares. */
+export function casosSorteados(familia, n, semente = sementeDaFamilia(familia)) {
+  if (!(Number.isInteger(n) && n >= 0)) throw new ErroDeDesenho(`o sorteio da prova deve ser um número inteiro de conjuntos, zero ou mais, e veio ${q(n)}`);
+  if (!(Number.isInteger(semente) && semente >= 0)) throw new ErroDeDesenho(`a semente do sorteio deve ser um inteiro maior ou igual a zero, e veio ${q(semente)}`);
+  let a = semente >>> 0;
+  const aleatorio = () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const nomes = Object.keys(familia.parametros).sort(porNome);
+  return Array.from({ length: n }, (_, i) => ({
+    rotulo: `sorteio ${i + 1}`, sorteio: true,
+    valores: Object.fromEntries(nomes.map((nome) => {
+      const p = familia.parametros[nome];
+      const v = Number((p.minimo + aleatorio() * (p.maximo - p.minimo)).toFixed(casasDaFaixa(p.maximo - p.minimo)));
+      return [nome, Math.min(p.maximo, Math.max(p.minimo, v))];
+    })),
+  }));
 }
