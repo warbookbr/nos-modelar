@@ -9,6 +9,7 @@
  *   npm run desenho -- razao <a.contornos.json> <b.contornos.json> [--parte-a=<nome>] [--parte-b=<nome>] [--partes] [--ponto-a=h,v --ponto-b=h,v] [--medida=regioes|silhueta] [--json]
  *   npm run desenho -- familia <f.familia-de-desenho.json> [--perfil=<nome>|minimo|medio|maximo] [--valores=a=1,b=2] [--grava=<pasta>] [--pecas=...] [--so-relatorio] [--json]
  *   npm run desenho -- familia <f.familia-de-desenho.json> --provar [--pecas=...] [--json]
+ *   npm run desenho -- familia <f.familia-de-desenho.json> --ajustar=<referencia.contornos.json> [--abrir=<fração>] [--soltos=a,b] [--perfil=...] [--valores=...] [--grava=<pasta>] [--json]
  *   npm run desenho -- conferir [<pasta das famílias>] [--json]
  *   npm run desenho -- --ajuda
  *
@@ -17,6 +18,10 @@
  * contornos e a vista ao lado; `--provar` desenha com cada parâmetro no mínimo, no médio e no máximo, com os pares nos extremos
  * cruzados e com cada perfil, e exige que todos os conjuntos que a família admite resolvam. A família diz em "catalogo" o catálogo de
  * peças que usa, relativo ao arquivo dela, e `--pecas` acrescenta outros. `--perfil` aceita também `minimo`, `medio` e `maximo`.
+ * `--ajustar` procura os valores da família que dão a maior razão contra o contorno de uma referência, a partir do padrão, do perfil
+ * ou dos `--valores`, e diz quais parâmetros ficaram no limite da faixa; com `--abrir=0.4` a busca vai além da faixa, 0,4 vez o
+ * médio de cada lado, e diz quais ficaram fora dela, que é quanto a faixa precisa crescer para cobrir a referência. `--soltos`
+ * limita a busca a alguns parâmetros. Com `--grava`, grava `ajuste.json` e o desenho dos valores achados, com os contornos e a vista.
  * `conferir` é o gate `familias-de-desenho:check`: roda a prova de toda família sob a pasta (a de `procedural/familias-de-desenho`
  * por padrão) e confere que a pasta ao lado dela com o nome de um perfil (`referencia/`, `minimo/`, `medio/`, `maximo/`) ainda é o
  * que a família gera, nos bytes do desenho e dos contornos; a vista em PNG depende das fontes da máquina e só precisa existir.
@@ -35,7 +40,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  catalogosDaFamilia, desenhar, ErroDeDesenho, especializarFamilia, lerCatalogoDePecas, lerFamiliaDeDesenho, PERFIS_DA_FAIXA, provarFamilia,
+  ajustarFamilia, catalogosDaFamilia, desenhar, ErroDeDesenho, especializarFamilia, lerCatalogoDePecas, lerFamiliaDeDesenho, PERFIS_DA_FAIXA, provarFamilia,
   razaoInterseccaoUniao, razaoPorParte, textoDaAjuda, valoresDaFamilia, VISTAS_DO_DESENHO,
 } from '../../modulos/desenho-por-restricoes/src/index.js';
 
@@ -216,6 +221,7 @@ async function comandoFamilia(args, valor, argv, io) {
   if (dados.erro) { io.err(`desenho: ${dados.erro}\n`); return 2; }
   const { erros: errosDosValores, valores } = valoresDaFamilia(familia, { perfil: valor('perfil') ?? null, valores: dados.valores });
   if (errosDosValores.length) { io.err(`desenho: ${errosDosValores.map((e) => `${e}.`).join('\n')}\n`); return 3; }
+  if (valor('ajustar') !== undefined) return ajustarDaFamilia(familia, catalogo, arquivo, valores, valor, argv, io);
   const descricao = especializarFamilia(familia, valores, { pecas: catalogo.pecas });
   const destino = valor('grava');
   if (destino === undefined) {
@@ -234,6 +240,63 @@ async function comandoFamilia(args, valor, argv, io) {
   writeFileSync(gravado, arquivoJson(descricao), 'utf8');
   io.out(`gravado: ${basename(gravado)} (a família ${JSON.stringify(familia.id)} ${familia.versao} para os valores acima, com as peças dentro)\n`);
   return principal([gravado, ...argv.filter((a) => a === '--so-relatorio' || a === '--json')], io);
+}
+
+const USO_DO_AJUSTE = 'uso: npm run desenho -- familia <f.familia-de-desenho.json> --ajustar=<referencia.contornos.json> [--abrir=<fração>] [--soltos=a,b] [--perfil=<nome>] [--valores=a=1] [--grava=<pasta>] [--json]\n';
+
+/* `familia --ajustar`: os valores da família que dão a maior razão contra o contorno da referência, a partir de `inicio`. */
+async function ajustarDaFamilia(familia, catalogo, arquivo, inicio, valor, argv, io) {
+  const alvoArquivo = valor('ajustar');
+  if (!alvoArquivo) { io.err(USO_DO_AJUSTE); return 2; }
+  const alvo = lerJson(resolve(alvoArquivo), io, 'o contorno da referência');
+  if (!alvo) return 2;
+  const abrir = valor('abrir') === undefined ? 0 : Number(valor('abrir'));
+  if (!(Number.isFinite(abrir) && abrir >= 0)) { io.err(`desenho: --abrir deve ser a fração do médio que a busca alarga cada faixa para cada lado, um número maior ou igual a zero (por exemplo --abrir=0.4), e veio ${JSON.stringify(valor('abrir'))}.\n`); return 2; }
+  const soltos = valor('soltos') ? valor('soltos').split(',').filter(Boolean) : null;
+  const f = (x) => x.toFixed(4).replace('.', ',');
+  const numero = (v) => String(v).replace('.', ',');
+  let r;
+  try {
+    r = await ajustarFamilia(familia, alvo.json, {
+      pecas: catalogo.pecas, inicio, soltos, abrir,
+      aoMelhorar: (m) => io.err(`  ${m.parametro} = ${numero(m.valor)} -> ${f(m.iou)} (passo ${numero(m.passo.toFixed(4))} da busca, avaliação ${m.avaliacoes})\n`),
+    });
+  } catch (e) {
+    if (e instanceof ErroDeDesenho) { io.err(`desenho: ${e.message}\n`); return 3; }
+    throw e;
+  }
+  const saida = {
+    familia: familia.id, versao: familia.versao, referencia: relative(process.cwd(), resolve(alvoArquivo)), sha256DaReferencia: sha256(alvo.bytes),
+    medida: r.medida, abrir: r.abrir, ...(soltos ? { soltos } : {}), inicio: r.inicio, iou: r.iou, deslocamento: r.deslocamento,
+    avaliacoes: r.avaliacoes, recusados: r.recusados, valores: r.valores, noLimite: r.noLimite, foraDaFaixa: r.foraDaFaixa,
+  };
+  if (argv.includes('--json')) io.out(arquivoJson(saida));
+  else {
+    const P = familia.parametros;
+    io.out(`ajuste da família ${JSON.stringify(familia.id)} ${familia.versao} a ${basename(alvoArquivo)}, ${abrir ? `com a busca ${numero(abrir)} vez o médio além de cada faixa` : 'dentro das faixas'}: razão ${f(r.iou)} pela melhor translação (era ${f(r.inicio)} no início; o desenho deslocado de [${r.deslocamento.map((n) => n.toFixed(2).replace('.', ',')).join('; ')}] mm), em ${r.avaliacoes} avaliações, ${r.recusados} conjuntos recusados\n`);
+    for (const [n, v] of Object.entries(r.valores)) {
+      const fora = v < P[n].minimo || v > P[n].maximo;
+      const nota = fora ? `  fora da faixa (${numero(P[n].minimo)} a ${numero(P[n].maximo)})` : r.noLimite.includes(n) ? `  no ${v === P[n].minimo ? 'mínimo' : 'máximo'} da faixa` : '';
+      io.out(`  ${n} = ${numero(v)} ${P[n].unidade}${nota}\n`);
+    }
+    if (r.foraDaFaixa.length) io.out(`${r.foraDaFaixa.length} parâmetro(s) fora da faixa: para a família cobrir esta referência, a faixa de cada um precisa chegar ao valor achado.\n`);
+    else if (r.noLimite.length) io.out(`${r.noLimite.length} parâmetro(s) no limite da faixa: a referência pode pedir mais que a faixa; --abrir=0.4 mostra quanto.\n`);
+    io.out(`--valores=${Object.entries(r.valores).map(([n, v]) => `${n}=${v}`).join(',')}\n`);
+  }
+  const destino = valor('grava');
+  if (destino === undefined) return 0;
+  if (!destino) { io.err('desenho: --grava=<pasta> precisa da pasta onde gravar o ajuste.\n'); return 2; }
+  const descricao = especializarFamilia(familia, r.valores, { pecas: catalogo.pecas });
+  mkdirSync(resolve(destino), { recursive: true });
+  writeFileSync(join(resolve(destino), 'ajuste.json'), arquivoJson(saida), 'utf8');
+  const gravado = join(resolve(destino), `${descricao.vista}${SUFIXO}`);
+  writeFileSync(gravado, arquivoJson(descricao), 'utf8');
+  io.out(`gravado: ajuste.json e ${basename(gravado)} (a família ${JSON.stringify(familia.id)} ${familia.versao} nos valores do ajuste${r.foraDaFaixa.length ? ', fora da faixa dela' : ''})\n`);
+  /* O relatório do desenho já saiu na busca; aqui só os arquivos. O desenho que a busca aceitou resolve, e outro código de saída é
+     o que o comando do desenho diria sobre ele. */
+  const codigo = await principal([gravado], { out: () => {}, err: io.err });
+  if (codigo === 0) io.out(`gravados também ${descricao.vista}.contornos.json e ${descricao.vista}.png\n`);
+  return codigo;
 }
 
 /* Os arquivos `*.familia-de-desenho.json` sob a pasta, em ordem de caminho. */

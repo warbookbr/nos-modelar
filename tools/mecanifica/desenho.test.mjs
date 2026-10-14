@@ -184,6 +184,7 @@ describe('npm run desenho: entrada errada', () => {
     expect(ajuda.out).toMatch(/mecanifica\.desenho@3/);
     expect(ajuda.out).toMatch(/npm run desenho -- razao/);
     expect(ajuda.out).toMatch(/npm run desenho -- familia <f\.familia-de-desenho\.json> --provar/);
+    expect(ajuda.out).toMatch(/O AJUSTE \(familia --ajustar\)/);
     expect(ajuda.out).toMatch(/--partes/);
     const sem = await rodar([]);
     expect(sem.codigo).toBe(2);
@@ -492,6 +493,39 @@ describe('npm run desenho -- familia', () => {
     expect((await rodar([join(outra, 'lateral.desenho.json')])).codigo).toBe(0);
     expect(readFileSync(join(outra, 'lateral.contornos.json')).equals(contornos)).toBe(true);
   }, 180_000);
+
+  it('--ajustar acha os valores da família mais próximos da referência, diz o que ficou no limite ou fora da faixa e, com --grava, grava o ajuste e o desenho', async () => {
+    const { dir, arquivo } = comArquivo();
+    const f = lerFamiliaDeDesenho(familiaSintetica()).familia;
+    const alvo = (await desenhar(especializarFamilia(f, { ...valoresDaFamilia(f).valores, comprimento: 2900 }))).contornos;
+    const referencia = escrever(dir, 'referencia.contornos.json', alvo);
+    const dentro = await rodar(['familia', arquivo, `--ajustar=${referencia}`, '--soltos=comprimento']);
+    expect(dentro.codigo).toBe(0);
+    expect(dentro.out).toMatch(/^ajuste da família "carcaca-sintetica" 1\.0\.0 a referencia\.contornos\.json, dentro das faixas: razão 0,8904 pela melhor translação \(era 0,7448 no início;/);
+    expect(dentro.out).toMatch(/\n {2}comprimento = 2600 mm {2}no máximo da faixa\n/);
+    expect(dentro.out).toMatch(/1 parâmetro\(s\) no limite da faixa: a referência pode pedir mais que a faixa; --abrir=0\.4 mostra quanto\.\n--valores=altura=700,/);
+    expect(dentro.err).toMatch(/ {2}comprimento = 2\d+(,\d+)? -> 0,\d{4} \(passo/);
+    const saida = join(dir, 'ajuste');
+    const aberta = await rodar(['familia', arquivo, `--ajustar=${referencia}`, '--soltos=comprimento', '--abrir=0.4', `--grava=${saida}`]);
+    expect(aberta.codigo).toBe(0);
+    expect(aberta.out).toMatch(/com a busca 0,4 vez o médio além de cada faixa/);
+    expect(aberta.out).toMatch(/comprimento = 2\d{3}(,\d+)? mm {2}fora da faixa \(1800 a 2600\)/);
+    expect(aberta.out).toMatch(/gravado: ajuste\.json e lateral\.desenho\.json \(a família "carcaca-sintetica" 1\.0\.0 nos valores do ajuste, fora da faixa dela\)\ngravados também lateral\.contornos\.json e lateral\.png\n$/);
+    expect(readdirSync(saida).sort()).toEqual(['ajuste.json', 'lateral.contornos.json', 'lateral.desenho.json', 'lateral.png']);
+    const ajuste = JSON.parse(readFileSync(join(saida, 'ajuste.json'), 'utf8'));
+    expect(ajuste).toMatchObject({ familia: 'carcaca-sintetica', versao: '1.0.0', abrir: 0.4, soltos: ['comprimento'], medida: 'regioes' });
+    expect(ajuste.sha256DaReferencia).toBe(createHash('sha256').update(readFileSync(referencia)).digest('hex'));
+    expect(Math.abs(ajuste.valores.comprimento - 2900)).toBeLessThan(20);
+    expect(ajuste.foraDaFaixa).toEqual([{ parametro: 'comprimento', valor: ajuste.valores.comprimento, minimo: 1800, maximo: 2600, unidade: 'mm' }]);
+    expect(JSON.parse(readFileSync(join(saida, 'lateral.desenho.json'), 'utf8')).parametros.comprimento).toBe(ajuste.valores.comprimento);
+    const json = JSON.parse((await rodar(['familia', arquivo, `--ajustar=${referencia}`, '--soltos=comprimento', '--json'])).out);
+    expect(json).toMatchObject({ noLimite: ['comprimento'], foraDaFaixa: [], valores: { comprimento: 2600 } });
+    expect((await rodar(['familia', arquivo, `--ajustar=${referencia}`, '--abrir=-1'])).codigo).toBe(2);
+    expect((await rodar(['familia', arquivo, '--ajustar='])).codigo).toBe(2);
+    const semParametro = await rodar(['familia', arquivo, `--ajustar=${referencia}`, '--soltos=largura']);
+    expect(semParametro.codigo).toBe(3);
+    expect(semParametro.err).toMatch(/o parâmetro "largura" não existe na família/);
+  }, 120_000);
 
   it('o valor fora da faixa e o perfil que não existe saem com 3 dizendo a faixa, e --valores malformado sai com 2', async () => {
     const { arquivo } = comArquivo();

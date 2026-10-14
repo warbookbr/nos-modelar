@@ -282,6 +282,17 @@ function motivoDoEstado(r) {
   return `lado trocado: ${lista(r.ladosTrocados.map((t) => t.relacao))}`;
 }
 
+/* O que reprova um desenho da família: não resolver, um polígono que se cruza, uma parte toda escondida e uma peça virada contra o
+   lado que o uso deu a ela. A prova e o ajuste a uma referência usam a mesma régua. */
+export function problemasDoDesenho(rel) {
+  const problemas = [];
+  if (rel.estado !== 'resolvido') problemas.push(motivoDoEstado(rel));
+  for (const n of rel.cruzadas) problemas.push(`a parte ${q(n)} se cruza em si mesma`);
+  for (const n of rel.ocultas) problemas.push(`a parte ${q(n)} fica toda escondida`);
+  for (const o of rel.orientacao ?? []) problemas.push(o.mensagem);
+  return problemas;
+}
+
 async function provarCaso(familia, caso, pecas) {
   /* O conjunto que fere uma relação de ordem não é da família: não se desenha. Não é falha da prova, e sai com a relação que ele fere. */
   const feridas = restricoesFeridas(familia, caso.valores);
@@ -294,11 +305,7 @@ async function provarCaso(familia, caso, pecas) {
   try {
     const r = await desenhar(especializarFamilia(familia, caso.valores, { pecas }));
     const rel = r.relatorio;
-    const problemas = [];
-    if (rel.estado !== 'resolvido') problemas.push(motivoDoEstado(rel));
-    for (const n of rel.cruzadas) problemas.push(`a parte ${q(n)} se cruza em si mesma`);
-    for (const n of rel.ocultas) problemas.push(`a parte ${q(n)} fica toda escondida`);
-    for (const o of rel.orientacao ?? []) problemas.push(o.mensagem);
+    const problemas = problemasDoDesenho(rel);
     const vista = rel.medidas ? { larguraMm: rel.medidas.vista.larguraMm, alturaMm: rel.medidas.vista.alturaMm } : null;
     return { ...caso, ok: problemas.length === 0, recusado: false, estado: rel.estado, problemas, feridas: [], restricoes: [], vista, redundantes: rel.redundantes, texto: problemas.length ? r.texto : null };
   } catch (e) {

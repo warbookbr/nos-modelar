@@ -16,6 +16,8 @@ COMANDOS
                                                    desenha a família para um conjunto de valores (ver A FAMÍLIA)
   npm run desenho -- familia <f.familia-de-desenho.json> --provar
                                                    resolve a família nos extremos, no médio e nos pares de extremos cruzados
+  npm run desenho -- familia <f.familia-de-desenho.json> --ajustar=<referencia.contornos.json> [--abrir=0.4] [--soltos=a,b] [--grava=<pasta>]
+                                                   os valores da família mais próximos da referência (ver O AJUSTE)
   npm run desenho -- conferir [<pasta das famílias>]   o gate familias-de-desenho:check: a prova de toda família sob a pasta
                                                    (procedural/familias-de-desenho) e a conferência das pastas de perfil gravadas
   npm run desenho -- --ajuda                       este texto
@@ -121,6 +123,18 @@ A FAMÍLIA (familia, conferir)
   com o nome de um perfil ("referencia/", "minimo/", "medio/", "maximo/") ainda é o que a família gera para ele, nos bytes do desenho
   e dos contornos (a vista em PNG só precisa existir). A família com o perfil "referencia" e sem a pasta reprova. Sai com 3 se uma
   família for inválida, com 4 se a prova ou uma pasta falhar e com 2 se não achar família nenhuma.
+
+O AJUSTE (familia --ajustar)
+  "--ajustar=<referencia.contornos.json>" procura os valores da família que dão a maior razão interseção/união contra o contorno da
+  referência (a união das regiões, pela melhor translação, como "razao"), a partir do padrão, do --perfil e dos --valores. A busca
+  anda um parâmetro por vez, um passo para cima e para baixo, e encurta o passo quando nenhum melhora; o conjunto que fere uma relação
+  de ordem ou que a prova reprovaria não entra. Ela acha um máximo local, e começar de outro perfil pode dar outro. Diz a razão, o
+  deslocamento, cada valor e quais ficaram no mínimo ou no máximo da faixa, e termina com a linha --valores=... pronta.
+  "--abrir=0.4" deixa a busca ir além da faixa, 0,4 vez o médio de cada parâmetro para cada lado, e diz quais valores ficaram fora
+  dela: é quanto a faixa precisa crescer para a família cobrir a referência. "--soltos=a,b" busca só esses parâmetros. Com
+  --grava=<pasta>, grava ajuste.json (a referência e o sha256 dela, a razão, os valores e o que ficou no limite ou fora) e o desenho dos
+  valores achados, com os contornos e a vista. Cada avaliação desenha a família inteira: numa família de quinze parâmetros, a busca
+  leva alguns minutos.
 
 O LADO
   A distância de um ponto a uma reta e a tangência não têm sinal: o resolvedor aceita os dois lados e o chute decide. Por isso o
