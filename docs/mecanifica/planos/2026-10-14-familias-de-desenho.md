@@ -79,7 +79,8 @@ só a saída para a pessoa e o crítico.
    ou com os furos da silhueta, porque é a nota que os desenhistas perseguem.
 2. **Ajuste à referência.** A carcaça e o braço desenhados por restrições vendo a
    referência, até o mínimo, com as peças que se repetem anotadas; um agente para
-   cada objeto, em paralelo.
+   cada objeto, em paralelo. O [braço](../banco-de-provas/familias-de-desenho-2026-10-14/braco/NOTAS.md)
+   chegou a 0,9555 em 2026-10-14.
 3. **Contrato.** O formato da peça e da família de desenho, com parâmetros,
    faixas e a ligação ao formato do módulo, escrito a partir dos dois ajustes.
 4. **Famílias.** As famílias da carcaça e do braço, com a faixa de cada parâmetro
