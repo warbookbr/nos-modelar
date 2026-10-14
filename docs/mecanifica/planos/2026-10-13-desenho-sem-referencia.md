@@ -41,16 +41,22 @@ contra o contorno dessa referência meça o acerto além do olho do crítico.
 
 A pesquisa da fatia 1 decide, para cada peça do caminho atual, se o módulo novo a
 usa direto, a envolve ou a adia: as famílias e os perfis, o esboço com medidas, a
-prancha dos contornos, o formato dos contornos, o crítico cego e a calibração.
-Ferramenta, biblioteca, skill ou plugin de fora só entra versionado no repositório e
-coberto pelos testes, e código trazido de fora leva a licença de origem e o aviso
-de autoria, como o combinado de 2026-10-13 na
+prancha dos contornos, o formato dos contornos, o crítico cego e a calibração. A
+ferramenta não precisa ter sido feita para IA: a pessoa lembrou em 2026-10-14 que
+um programa aberto feito para gente, comandado pelas funções dele, serviu a outra
+tarefa melhor do que procurar um pronto para IA, e o levantamento avalia por igual
+programas de desenho técnico comandados por script (o esboço com restrições do
+FreeCAD, o SolveSpace, o LibreCAD, o Inkscape, o OpenSCAD) e bibliotecas. O que entra usado de fora tem a
+versão fixada e a instalação reproduzível, e o desenho salvo fica no formato do
+repositório, com a mesma entrada dando o mesmo arquivo; código trazido de fora
+leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 na
 [pesquisa](../PESQUISA-ABERTA-2026-10.md) permite.
 
 ## Incluído
 
 - o levantamento do que a Mecanifica já tem e serve ao desenho sem imagem, e do
-  que existe pronto fora, com a recomendação; o ponto de partida é a pesquisa de
+  que existe fora, feito para IA ou para gente, que a IA consiga comandar aqui,
+  com a recomendação; o ponto de partida é a pesquisa de
   2026-10-13 em [IA que desenha e resolvedores de restrições
   2D](../PESQUISA-ABERTA-2026-10.md), que recomenda portar a JS o resolvedor
   `cadcraft-constraints` (MIT ou Apache-2.0, pré-alfa), usar o planegcs como
