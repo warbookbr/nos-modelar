@@ -94,7 +94,9 @@ só a saída para a pessoa e o crítico.
    mínimo, o médio e o máximo contra a referência, deu 9 à carcaça (faltam uma linha
    fina na base da lateral e o fim da linha do aro) e 8 ao braço (o elo da coluna
    mais estreito que na imagem e a caixa lateral sem descer ao pé), sem defeito
-   estrutural, com os extremos plausíveis.
+   estrutural, com os extremos plausíveis. A pessoa aprovou a forma das duas
+   famílias em 2026-10-14, pelas imagens do mínimo, do médio e do máximo, com os
+   detalhes finos anotados.
 5. **Prova.** Um objeto desenhado a partir de família, medido contra a referência.
 
 A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em
