@@ -43,7 +43,9 @@ só a saída para a pessoa e o crítico.
 ## Incluído
 
 - o desenho por restrições ajustado à referência: a IA desenha vendo o contorno e
-  a razão interseção/união, e corrige até passar do mínimo;
+  a razão interseção/união, e corrige até passar do mínimo, proposto em 0,95 contra
+  a união das partes e aceito pela pessoa em 2026-10-14, com a volta à pessoa se o
+  formato atual não chegar a ele;
 - as peças de desenho que as referências já contornadas repetem, e as famílias da
   carcaça da empilhadeira e do braço robótico, com as vistas do avião como terceira
   prova;
@@ -52,11 +54,7 @@ só a saída para a pessoa e o crítico.
 - a razão da ferramenta contra a união das partes ou com os furos da silhueta, que
   a prova da carcaça mostrou faltar;
 - a decisão com a pessoa de se o desenho substitui a prancha, já que as cotas
-  ficam nas relações;
-- o teste da família de superfície aerodinâmica, que passou de 5 minutos e é o
-  mais lento da bateria, medido por etapa e encurtado sem perder cobertura, como
-  o teste da blocagem no plano do avião; a pessoa perguntou em 2026-10-14 como
-  acelerar os gates, e a máquina da sessão não tem folga de processador.
+  ficam nas relações.
 
 ## Excluído
 
@@ -66,7 +64,8 @@ só a saída para a pessoa e o crítico.
 
 ## Gate de saída
 
-1. o contrato da peça e da família de desenho escrito, com teste;
+1. a razão da ferramenta contra a união das partes, e o contrato da peça e da
+   família de desenho escrito, com teste;
 2. as peças e as famílias da carcaça e do braço ajustadas às referências acima do
    mínimo, com o crítico e a aprovação da pessoa;
 3. um objeto de prova desenhado a partir de uma família, com a razão contra a
@@ -75,13 +74,22 @@ só a saída para a pessoa e o crítico.
 
 ## Fatias
 
-1. **Contrato.** O formato da peça e da família de desenho, com parâmetros,
-   faixas e a ligação ao formato do módulo, e a correção da razão.
+1. **Razão.** A razão interseção/união da ferramenta contra a união das partes,
+   ou com os furos da silhueta, porque é a nota que os desenhistas perseguem.
 2. **Ajuste à referência.** A carcaça e o braço desenhados por restrições vendo a
-   referência, até o mínimo, com as peças que se repetem separadas.
-3. **Famílias.** As famílias da carcaça e do braço, com a faixa de cada parâmetro
-   e a prova nos extremos.
-4. **Prova.** Um objeto desenhado a partir de família, medido contra a referência.
+   referência, até o mínimo, com as peças que se repetem anotadas; um agente para
+   cada objeto, em paralelo.
+3. **Contrato.** O formato da peça e da família de desenho, com parâmetros,
+   faixas e a ligação ao formato do módulo, escrito a partir dos dois ajustes.
+4. **Famílias.** As famílias da carcaça e do braço, com a faixa de cada parâmetro
+   e a prova nos extremos, um agente para cada, em paralelo.
+5. **Prova.** Um objeto desenhado a partir de família, medido contra a referência.
+
+A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em
+paralelo sem disputa: cada um recebe a lista fechada dos arquivos que muda, quem
+mexe em código trabalha numa cópia isolada do repositório e Claude junta um por vez,
+e a bateria completa roda uma vez depois de juntar. A máquina da sessão tem quatro
+processadores, e por isso o paralelo fica em dois ou três agentes por vez.
 
 ## Riscos e parada
 
