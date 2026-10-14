@@ -26,7 +26,7 @@ import { nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { andaimeDoEsboco, medidasDoAndaime } from './esboco-para-andaime.mjs';
 import { ajuda, README_DO_ESBOCO } from './esboco-ajuda.mjs';
 import { variante, VISTAS_DA_ANALISE } from './esboco.mjs';
-import { iou, mascaraDaCamada } from './esboco-silhueta.mjs';
+import { CAMADA_DA_SILHUETA, iou, mascaraDaCamada } from './esboco-silhueta.mjs';
 
 const perna = () => JSON.parse(readFileSync(new URL('../fixtures/esboco-com-familias/perna-do-trem.esboco.json', import.meta.url), 'utf8'));
 const comForma = (esboco, id, campos) => ({ ...esboco, opcoes: esboco.opcoes.map((o) => ({ ...o, formas: o.formas.map((f) => (f.id === id ? { ...f, ...campos } : f)) })) });
@@ -220,8 +220,8 @@ describe('a perna do trem, com a roda 2.0 e o cilindro hidráulico escritos no J
     const b = blocagemDoEsboco(e);
     const x = expandirEsboco(e);
     for (const vista of VISTAS_DA_ANALISE) {
-      const novo = desenharBlocagem({ vista, paineis: [b.paineis[0]] }, { camada: true });
-      const atual = desenharEsboco(variante({ ...x, opcoes: [x.opcoes[0]], ladosPorEscala: false }, { vista, legendas: false, centros: false }), { camada: true });
+      const novo = desenharBlocagem({ vista, paineis: [b.paineis[0]] }, CAMADA_DA_SILHUETA);
+      const atual = desenharEsboco(variante({ ...x, opcoes: [x.opcoes[0]], ladosPorEscala: false }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
       const r = iou(mascaraDaCamada(novo.camada), mascaraDaCamada(atual.camada));
       expect(r.iou, vista).toBeGreaterThanOrEqual(0.94);
     }

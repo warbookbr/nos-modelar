@@ -186,8 +186,9 @@ function geometria(p, k, escala) {
 
 const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`;
 
-/* `entrada`: { vista, paineis } (ver o topo do arquivo). `camada: true` junta a camada e o `svgSobreCamada`. */
-export function desenharBlocagem(entrada, { camada: querCamada = false } = {}) {
+/* `entrada`: { vista, paineis } (ver o topo do arquivo). `camada: true` junta a camada e o `svgSobreCamada`; `perfilDosTracos: false` a entrega sem o perfil das fitas
+   (ver `formasDoPainel`), para quem mede só a área das faces. */
+export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDosTracos = true } = {}) {
   exigir(entrada && typeof entrada === 'object', 'desenharBlocagem: a entrada precisa ser { vista, paineis }');
   const vista = entrada.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
@@ -219,7 +220,7 @@ export function desenharBlocagem(entrada, { camada: querCamada = false } = {}) {
   paineis.forEach((p, k) => {
     const { x0, tela } = geometria(p, k, escala);
     if (querCamada) {
-      formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa: false, tinta: (r, n) => tintaDaFace(r.cor, n) }));
+      formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa: false, perfilDosTracos, tinta: (r, n) => tintaDaFace(r.cor, n) }));
     }
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     if (!p.ocultos.has('titulo')) partes.push(`<text x="${x0 + QUADRO.painelL / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.titulo ?? `Opção ${k + 1}`)}</text>`);

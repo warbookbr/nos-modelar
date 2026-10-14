@@ -18,7 +18,7 @@
  * laço curto enquanto conserta um gate específico.
  */
 import { spawn, spawnSync } from 'node:child_process';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -53,6 +53,35 @@ export function guardarSaidaDoGate(gate, saida, codigo, raiz = RAIZ) {
 
 export function linhaDeFalha(gate, arquivo) {
   return `▶ ${gate} — FALHOU; saída inteira em ${arquivo}`;
+}
+
+/* OS ARQUIVOS DE TESTE MAIS LENTOS.
+ *
+ * O resumo mostra o gate `test` inteiro, e em 2026-10-13 a bateria completa
+ * passou de 4 a 6 minutos para 22 sem que nada apontasse o arquivo culpado. O
+ * repórter `tools/vitest-duracoes.mjs` grava a duração de cada arquivo, este
+ * relatório a lê assim que o gate `test` termina (outro gate que rode o Vitest
+ * depois sobrescreveria o arquivo) e o resumo lista os cinco mais lentos, com
+ * aviso para o que passa de `TETO_POR_ARQUIVO_DE_TESTE_MS`. É aviso e não
+ * reprovação: o arquivo lento pede medição por etapa antes de ser dividido. */
+export const TETO_POR_ARQUIVO_DE_TESTE_MS = 120_000;
+const ARQUIVO_DAS_DURACOES = join('tmp', 'gates', 'duracoes-dos-testes.json');
+
+export function arquivosMaisLentos(duracoes, quantos = 5, teto = TETO_POR_ARQUIVO_DE_TESTE_MS) {
+  return [...duracoes].sort((a, b) => b.ms - a.ms).slice(0, quantos)
+    .map(({ arquivo, ms }) => `${ms > teto ? '⚠' : ' '} ${String(Math.round(ms / 100) / 10).padStart(6)}s  ${arquivo}`
+      + (ms > teto ? `  (passa de ${teto / 1000}s; meça por etapa antes de dividir)` : ''));
+}
+
+/* Só vale o arquivo gravado depois de o gate começar; um de execução anterior
+   listaria durações velhas como se fossem desta. */
+function lerDuracoesDosTestes(desde, raiz = RAIZ) {
+  const caminho = join(raiz, ARQUIVO_DAS_DURACOES);
+  if (!existsSync(caminho)) return null;
+  try {
+    const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
+    return Date.parse(gravado) >= desde ? duracoes : null;
+  } catch { return null; }
 }
 
 /* Exportada porque `tools/mapa/gates-espelham-ci.test.mjs` compara esta lista
@@ -226,11 +255,12 @@ function rodarGate(gate, { silencioso }) {
       const codigo = status ?? 1;
       const saida = Buffer.concat(pedacos).toString();
       const arquivo = guardarSaidaDoGate(gate, saida, codigo);
+      const lentos = gate === 'test' ? lerDuracoesDosTestes(inicio) : null;
       if (!silencioso || codigo !== 0) {
         process.stdout.write(codigo === 0 ? `▶ ${gate} — ok\n` : `${linhaDeFalha(gate, arquivo)}\n`);
         process.stdout.write(saida);
       }
-      resolver({ gate, codigo, duracao, arquivo });
+      resolver({ gate, codigo, duracao, arquivo, lentos });
     });
   });
 }
@@ -294,6 +324,12 @@ async function executar() {
   for (const { gate, codigo, duracao, arquivo } of resultados) {
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);
+  }
+  const doTeste = porGate.get('test');
+  if (doTeste?.lentos?.length) {
+    console.log('─'.repeat(52));
+    console.log('arquivos de teste mais lentos:');
+    for (const linha of arquivosMaisLentos(doTeste.lentos)) console.log(linha);
   }
   const naoRodados = bateria.length - resultados.length;
   console.log('─'.repeat(52));

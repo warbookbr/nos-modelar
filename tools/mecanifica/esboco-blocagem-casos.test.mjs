@@ -19,7 +19,7 @@ import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { blocagemDoEsboco } from './esboco-blocagem.mjs';
 import { variante, VISTAS_DA_ANALISE } from './esboco.mjs';
-import { iou, mascaraDaCamada } from './esboco-silhueta.mjs';
+import { CAMADA_DA_SILHUETA, iou, mascaraDaCamada } from './esboco-silhueta.mjs';
 
 const MINIMO = 0.998;
 const ESCALA = 1e-3;
@@ -35,8 +35,8 @@ function medir(bruto) {
   const formas = expandido.opcoes[0].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f));
   const medidas = {};
   for (const vista of VISTAS_DA_ANALISE) {
-    const novo = desenharBlocagem({ vista, paineis: [b.paineis[0]] }, { camada: true });
-    const atual = desenharEsboco(variante({ ...expandido, opcoes: [{ ...expandido.opcoes[0], formas }], ladosPorEscala: false }, { vista, legendas: false, centros: false }), { camada: true });
+    const novo = desenharBlocagem({ vista, paineis: [b.paineis[0]] }, CAMADA_DA_SILHUETA);
+    const atual = desenharEsboco(variante({ ...expandido, opcoes: [{ ...expandido.opcoes[0], formas }], ladosPorEscala: false }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
     medidas[vista] = { iou: iou(mascaraDaCamada(novo.camada), mascaraDaCamada(atual.camada)).iou, escala: Math.abs(novo.escala / atual.escala - 1) };
   }
   return { b, medidas };
@@ -91,8 +91,8 @@ describe('o tubo curvo recortado pela blocagem', () => {
     const expandido = expandirEsboco(tubo([FURO]));
     const semFuro = expandirEsboco(tubo());
     for (const vista of VISTAS_DA_ANALISE) {
-      const a = desenharEsboco(variante({ ...expandido, ladosPorEscala: false }, { vista, legendas: false, centros: false }), { camada: true });
-      const b = desenharEsboco(variante({ ...semFuro, ladosPorEscala: false }, { vista, legendas: false, centros: false }), { camada: true });
+      const a = desenharEsboco(variante({ ...expandido, ladosPorEscala: false }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
+      const b = desenharEsboco(variante({ ...semFuro, ladosPorEscala: false }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
       expect(iou(mascaraDaCamada(a.camada), mascaraDaCamada(b.camada)).iou, `desenho recortado ${vista}`).toBeGreaterThanOrEqual(0.9999);
     }
   }, 120_000);

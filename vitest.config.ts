@@ -47,5 +47,10 @@ export default defineConfig({
        rápidos. Dois preserva paralelismo sem transformar contenção de CPU e
        disco em falso vermelho. */
     maxWorkers: 2,
+
+    /* O segundo repórter grava a duração de cada arquivo em
+       `tmp/gates/duracoes-dos-testes.json`, que o `tools/gates.mjs` lê para
+       listar os arquivos mais lentos depois do gate `test`. */
+    reporters: ['default', './tools/vitest-duracoes.mjs'],
   },
 });

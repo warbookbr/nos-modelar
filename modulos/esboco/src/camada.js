@@ -57,8 +57,12 @@ export function inclinacaoDaFace(pts, maxima) {
 }
 
 /* `itens`: as formas visíveis do painel (`{ r, chunks, prof }`); `tela` leva um ponto 3D à tela (já com a projeção da
-   vista); `tinta(r, normal)` dá a cor da face. Devolve as formas da camada, na ordem do painel. */
-export function formasDoPainel(itens, { tela, olho, tinta, previa = false }) {
+   vista); `tinta(r, normal)` dá a cor da face. Devolve as formas da camada, na ordem do painel.
+
+   `perfilDosTracos: false` pula `inclinarTracos` e deixa as formas sem `inclinacoes`. As faces, os traços e a profundidade de
+   cada vértice saem iguais, e só o perfil da fita some; quem pinta o traço no WebGL precisa dele, e quem só mede a área que as
+   faces cobrem (a silhueta de `esboco-silhueta.mjs`) não, e o perfil é a maior parte do custo da camada de um esboço grande. */
+export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfilDosTracos = true }) {
   const passo = passoDeDesempate(itens.length);
   /* pixels do quadro por milímetro (a projeção é ortogonal: um vetor perpendicular ao olho mantém o comprimento) */
   const apoio = Math.abs(olho[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
@@ -95,7 +99,7 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false }) {
     }
     return { id: it.r.id, rank, opacidade: it.r.opacidade !== undefined && it.r.opacidade < 1 ? it.r.opacidade : 1, prof: it.prof, faces, tracos };
   });
-  inclinarTracos(formas, { maxima: INCLINACAO_MAXIMA / pxPorMm, maximaDaPonta: INCLINACAO_DA_PONTA / pxPorMm, maximaExterior: INCLINACAO_EXTERIOR / pxPorMm, meia: LARGURA_DO_TRACO / 2 });
+  if (perfilDosTracos) inclinarTracos(formas, { maxima: INCLINACAO_MAXIMA / pxPorMm, maximaDaPonta: INCLINACAO_DA_PONTA / pxPorMm, maximaExterior: INCLINACAO_EXTERIOR / pxPorMm, meia: LARGURA_DO_TRACO / 2 });
   return formas;
 }
 

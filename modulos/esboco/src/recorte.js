@@ -165,8 +165,27 @@ function poliedroDaCaixa(min, max) {
 }
 
 /* O casco convexo 3D de uma nuvem de pontos (incremental: a cada ponto de fora, as faces que ele enxerga saem e o horizonte
-   se liga a ele), com os triângulos coplanares fundidos em uma face por plano. Devolve o poliedro, ou null se a nuvem é plana. */
+   se liga a ele), com os triângulos coplanares fundidos em uma face por plano. Devolve o poliedro, ou null se a nuvem é plana.
+
+   O casco é função só dos pontos, e o mesmo molde ou a mesma peça volta a ele a cada vez que a opção é resolvida de novo (cada
+   vista, cada medida e cada leitura resolvem a opção outra vez, e as formas resolvidas são objetos novos, que a memória por
+   objeto de `pecasDe` e de `moldesDe` não reconhece). Por isso o casco fica guardado pelos pontos, no processo: a segunda
+   resolução do avião da segunda rodada, com 14 formas de família e 10 recortes, deixa de refazer os cascos que a primeira fez
+   (a bateria de silhueta de `esboco-blocagem.test.mjs` passou de 173 s para 127 s, medido). O poliedro devolvido é compartilhado e ninguém o altera: o módulo só o
+   lê, e as faces que ele muda (`fl`, `pts`, `rim`) são cópias feitas antes. A memória é limitada às últimas
+   `LIMITE_DA_MEMORIA_DOS_CASCOS` nuvens, para um processo longo (o servidor de autoria) não crescer sem fim. */
+const LIMITE_DA_MEMORIA_DOS_CASCOS = 4096;
+const memoriaDosCascos = new Map();
 export function cascoConvexo(entrada) {
+  const chave = entrada.map((p) => `${p[0]},${p[1]},${p[2]}`).join(';');
+  if (memoriaDosCascos.has(chave)) return memoriaDosCascos.get(chave);
+  const casco = cascoSemMemoria(entrada);
+  if (memoriaDosCascos.size >= LIMITE_DA_MEMORIA_DOS_CASCOS) memoriaDosCascos.delete(memoriaDosCascos.keys().next().value);
+  memoriaDosCascos.set(chave, casco);
+  return casco;
+}
+
+function cascoSemMemoria(entrada) {
   const unicos = new Map();
   for (const p of entrada) unicos.set(chaveDe(p, 1e7), p);
   const pts = [...unicos.values()];

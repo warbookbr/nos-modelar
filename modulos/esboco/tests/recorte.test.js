@@ -43,6 +43,19 @@ describe('o casco convexo e a leitura do campo', () => {
     expect(cascoConvexo([[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [2, 2, 0]])).toBeNull();
   });
 
+  it('a mesma nuvem volta o mesmo casco, a nuvem de outro valor volta outro, e o casco nulo também fica guardado', () => {
+    const cubo = [0, 1].flatMap((x) => [0, 1].flatMap((y) => [0, 1].map((z) => [x * 10, y * 10, z * 10])));
+    const copia = cubo.map((p) => [...p]);
+    const a = cascoConvexo(cubo);
+    expect(cascoConvexo(copia)).toBe(a);
+    const deslocado = cubo.map(([x, y, z]) => [x + 1e-9, y, z]);
+    expect(cascoConvexo(deslocado)).not.toBe(a);
+    const plana = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]];
+    expect(cascoConvexo(plana)).toBeNull();
+    expect(cascoConvexo(plana.map((p) => [...p]))).toBeNull();
+    expect(cascoConvexo(copia).caixa).toEqual({ min: [0, 0, 0], max: [10, 10, 10] });
+  });
+
   it('lerSubtrai normaliza a lista e recusa o item mal formado com a mensagem que diz o que falta', () => {
     expect(lerSubtrai(['a', { forma: 'b', folga: 5 }, { forma: 'c', profundidade: 10, lado: '-x' }], 'f')).toEqual([{ forma: 'a' }, { forma: 'b', folga: 5 }, { forma: 'c', profundidade: 10, lado: '-x' }]);
     expect(() => lerSubtrai([], 'f')).toThrow(/lista de formas a subtrair/);

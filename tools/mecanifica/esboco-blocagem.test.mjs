@@ -21,7 +21,19 @@
      igual com os dois tipos de faceta, porque a perda é de forma e não de faceta). O limite só afrouxa quando o relatório de
      perdas traz a causa.
    A escala é conferida junto: a razão entre as escalas do quadro fica em 0,1% (mesmas facetas) e 0,5% (facetas da ferramenta),
-   o que mantém a composta com as mesmas proporções e a mesma escala. Com `ESBOCO_TABELA=1` o teste imprime a tabela de IoU. */
+   o que mantém a composta com as mesmas proporções e a mesma escala. Com `ESBOCO_TABELA=1` o teste imprime a tabela de IoU.
+
+   Custo. A bateria varre todo esboço do banco de provas e desenha 8 vezes cada opção (4 vistas, com os lados do esboço e os da
+   ferramenta), e o avião da segunda rodada e os 8 detalhes dele a levaram de 4 a 8 minutos. Medido em 2026-10-14, em 4 núcleos: 517 s
+   com 69 testes; 173 s sem o perfil das fitas dos traços, que a máscara da silhueta não lê (`CAMADA_DA_SILHUETA`, de
+   `esboco-silhueta.mjs`); 127 s com o casco convexo do recorte guardado pelos pontos (`cascoConvexo`, `recorte.js`), que as 8
+   resoluções da mesma opção deixam de refazer. O que sobra é, em quase tudo, a decomposição convexa das malhas de família, que
+   é feita uma vez por malha e por processo (cerca de 35 s no primeiro detalhe do avião que a pede). O arquivo não foi dividido em
+   fatias para rodar em workers paralelos, porque cada fatia refaria essa decomposição: antes do casco guardado, os 62 esboços
+   somavam 301 s cada um em processo próprio contra 173 s todos num processo só. Com 333 arquivos disputando os 2 workers do
+   `vitest.config.ts`, o tempo da suíte é a soma da CPU dividida por 2, e a divisão aumentaria essa soma. Esboço novo e grande entra
+   na bateria sem ajuste. Se o arquivo voltar a passar de uns 3 minutos,
+   medir antes por etapa (resolver, tradução, `furosAbertos`, desenho atual, desenho da blocagem) e só então dividir. */
 import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -35,7 +47,7 @@ import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, formasVizinhas } from '../../modu
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { blocagemDoEsboco } from './esboco-blocagem.mjs';
 import { compostaArquivo, esbocoIsolado, variante, vistasArquivo, VISTAS_DA_ANALISE } from './esboco.mjs';
-import { iou, mascaraDaCamada } from './esboco-silhueta.mjs';
+import { CAMADA_DA_SILHUETA, iou, mascaraDaCamada } from './esboco-silhueta.mjs';
 
 const MINIMO_COM_AS_MESMAS_FACETAS = 0.998;
 const MINIMO_COM_AS_FACETAS_DA_FERRAMENTA = 0.98;
@@ -63,7 +75,7 @@ afterAll(() => { if (process.env.ESBOCO_TABELA) console.log(tabela.join('\n')); 
 function desenhoAtual(bruto, numero, vista, ocultas, lados) {
   const e = expandirEsboco(bruto);
   const o = { ...e.opcoes[numero - 1], formas: e.opcoes[numero - 1].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) };
-  return desenharEsboco(variante({ ...e, opcoes: [o], ladosPorEscala: lados }, { vista, legendas: false, centros: false }), { camada: true });
+  return desenharEsboco(variante({ ...e, opcoes: [o], ladosPorEscala: lados }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
 }
 
 describe('a silhueta pela blocagem coincide com a do desenho atual', () => {
@@ -78,7 +90,7 @@ describe('a silhueta pela blocagem coincide com a do desenho atual', () => {
         const inclinada = opcao.perdas.some((p) => p.perdido.some((d) => d.codigo === 'inclinacao'));
         const linha = [];
         for (const vista of VISTAS_DA_ANALISE) {
-          const novo = desenharBlocagem({ vista, paineis: [painel] }, { camada: true });
+          const novo = desenharBlocagem({ vista, paineis: [painel] }, CAMADA_DA_SILHUETA);
           const mascara = mascaraDaCamada(novo.camada);
           expect(mascara.area, `${nomeDe(caminho)} opção ${i + 1} ${vista}: a blocagem não pintou nada`).toBeGreaterThan(0);
           const medidas = [];
@@ -150,8 +162,8 @@ describe('o isolamento por unidade pela procedência dos volumes', () => {
         const isolado = { ...comEnquadre, enquadrar: undefined };
         const escondido = { ...isolado, opcoes: [{ ...isolado.opcoes[0], formas: isolado.opcoes[0].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) }], ladosPorEscala: false };
         for (const vista of VISTAS_DA_ANALISE) {
-          const novo = desenharBlocagem({ vista, paineis: b.paineis }, { camada: true });
-          const atual = desenharEsboco(variante(escondido, { vista, legendas: false, centros: false }), { camada: true });
+          const novo = desenharBlocagem({ vista, paineis: b.paineis }, CAMADA_DA_SILHUETA);
+          const atual = desenharEsboco(variante(escondido, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
           const r = iou(mascaraDaCamada(novo.camada), mascaraDaCamada(atual.camada));
           expect(r.iou, `${nome} unidade ${u.id} ${vista}`).toBeGreaterThanOrEqual(MINIMO_COM_AS_MESMAS_FACETAS);
           expect(Math.abs(novo.escala / atual.escala - 1)).toBeLessThanOrEqual(ESCALA_COM_AS_MESMAS_FACETAS);

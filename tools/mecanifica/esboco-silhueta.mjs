@@ -6,6 +6,11 @@
  * dos traços e do título, e não depende da profundidade nem da cor. `iou(a, b)` é a razão entre a interseção e a união de duas
  * máscaras do mesmo tamanho (1 quando as duas são vazias). */
 
+/* As opções de desenho para quem mede a silhueta: a camada, sem o perfil das fitas dos traços (`perfilDosTracos: false`, ver
+   `formasDoPainel` em `modulos/esboco/src/camada.js`). A máscara só lê as faces, e o perfil é a maior parte do custo da camada de
+   um esboço grande, sem mudar uma face (a bateria de `esboco-blocagem.test.mjs` passou de 517 s para 173 s). */
+export const CAMADA_DA_SILHUETA = { camada: true, perfilDosTracos: false };
+
 /** @returns {{ largura: number, altura: number, dados: Uint8Array, area: number }} */
 export function mascaraDaCamada(camada) {
   const largura = Math.ceil(camada.largura);

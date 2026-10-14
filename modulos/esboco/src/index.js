@@ -2792,8 +2792,10 @@ function escalaEstimada(opcoes, V, enquadrar) {
 /* `camada: true` (a ferramenta de imagem usa): além do SVG de sempre em `svg`, devolve `camada` (as faces e os traços das
    formas com a profundidade de cada vértice, para o teste de profundidade por pixel; ver camada.js) e `svgSobreCamada`, o
    mesmo SVG sem as formas e com um `<image href="__CAMADA__">` no lugar delas, onde a ferramenta cola a imagem da camada. Título, nota,
-   escala, legendas, linhas de centro, superfícies de corte e linhas de explosão ficam no SVG, por cima da camada. */
-export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
+   escala, legendas, linhas de centro, superfícies de corte e linhas de explosão ficam no SVG, por cima da camada.
+   `perfilDosTracos: false` (com `camada`) entrega a camada sem o perfil das fitas (`inclinacoes`), para quem mede só a área das
+   faces; o resto da camada sai igual. */
+export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTracos = true } = {}) {
   const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);
   const V = VISTAS_TODAS[vista];
   let enquadreAchou = false;
@@ -2896,7 +2898,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false } = {}) {
   projetadas.forEach((p, k) => {
     const ehLista = p.modo === 'lista';
     const { x0, tela } = geometria(p, k, escala);
-    if (querCamada) formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa, tinta: (r, n) => cor(hexDe(r.forma.cor), 0.55 + 0.5 * Math.max(0, dot(n, LUZ))) }));
+    if (querCamada) formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa, perfilDosTracos, tinta: (r, n) => cor(hexDe(r.forma.cor), 0.55 + 0.5 * Math.max(0, dot(n, LUZ))) }));
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(`${p.opcao.titulo ?? `Opção ${k + 1}`}${previa ? ' (prévia)' : ''}`)}</text>`);
     const sub = [];

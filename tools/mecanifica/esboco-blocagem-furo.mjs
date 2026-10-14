@@ -11,7 +11,7 @@
  * O furo é visto em toda vista cujo olho passa pelas duas bocas dele: ao longo do eixo, a boca inteira; de través, nenhuma. */
 import { VISTAS } from '../../modulos/esboco/src/index.js';
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
-import { mascaraDaCamada } from './esboco-silhueta.mjs';
+import { CAMADA_DA_SILHUETA, mascaraDaCamada } from './esboco-silhueta.mjs';
 
 const LADOS_DA_BOCA = 96;
 const AMOSTRAS_POR_LADO = 48;
@@ -117,7 +117,7 @@ export function furosAbertos({ dados, traducao, blocagem, painel: montarPainel }
     }
     if (medidas.length === 0) continue;
     painel ??= montarPainel();
-    const desenho = desenharBlocagem({ vista, paineis: [painel] }, { camada: true });
+    const desenho = desenharBlocagem({ vista, paineis: [painel] }, CAMADA_DA_SILHUETA);
     const silhueta = mascaraDaCamada(desenho.camada).area;
     for (const m of medidas) resultado.push({ id: m.id, vista, fracao: (m.area * desenho.escala * desenho.escala) / silhueta });
   }
