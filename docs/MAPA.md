@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1242 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1244 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -297,6 +297,10 @@
 
 - `roteiro.md` — Roteiro da análise
 
+## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/
+
+- `roteiro.md` — Roteiro da análise
+
 ## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 
 - `NOTAS.md` — Braço robótico, vista lateral: o desenho por restrições ajustado à referência
@@ -304,6 +308,10 @@
 ## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/carcaca/
 
 - `NOTAS.md` — Carcaça da empilhadeira, vista lateral: o desenho por restrições ajustado à referência
+
+## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/
+
+- `DESCRICAO.md` — Carcaça da empilhadeira nova, vista lateral: a descrição
 
 ## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
 
