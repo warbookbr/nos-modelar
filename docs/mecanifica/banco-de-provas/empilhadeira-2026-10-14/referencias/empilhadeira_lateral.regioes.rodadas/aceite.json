@@ -1,0 +1,30 @@
+{
+ "por": "a pessoa, 2026-10-14: aceitou com pendências pela escolha 'Aceitar com pendências (Recomendado)', depois de três rodadas com nota 8",
+ "quando": "2026-10-14T19:45:58.629Z",
+ "rodada": 3,
+ "nota": 8,
+ "defeitos": [
+  {
+   "parte": "capo",
+   "tipo": "espessura",
+   "sentido": "menor",
+   "onde": "borda esquerda do capo, ao lado do protetor, e linha sob a faixa da tampa",
+   "evidencia": "folha 2 capo/protetor (x 245-262, y 905-1080) e capo/tampa (y 650, x 900-1060): filete azul-marinho onde a foto mostra a borda sombreada laranja do capo; folha 3 capo/lateral (x 255-262, y 450-750): filete roxo na costura vertical"
+  },
+  {
+   "parte": "protetor",
+   "tipo": "espessura",
+   "sentido": "maior",
+   "onde": "frestas entre o pilar dianteiro e o suporte do espelho, junto ao arco do teto",
+   "evidencia": "folha 1 luzes/protetor (x 935-965, y 205-300) e espelho/protetor (x 125-155, y 375-445): cor do protetor sobre área que o original mostra branca (fundo visto pela fresta)"
+  },
+  {
+   "parte": "capo",
+   "tipo": "espessura",
+   "sentido": "menor",
+   "onde": "canto superior traseiro, borda direita",
+   "evidencia": "folha 6 capo/contrapeso (x 625-652, y 1345-1400): faixa lilás onde o original mostra o brilho laranja do capo; folha 3 capo/presilha: fio lilás na mesma borda"
+  }
+ ],
+ "pendencias": "filetes azulados nas bordas e na costura do capô, que são a cor do mapa sobre o vinco escuro (linha Paleta do mapa de partes no backlog); frestas brancas entre o pilar e o suporte do espelho pintadas com a cor do protetor, que o buracoMaximo fecha por regra e o roteiro agora avisa; a sombra no chão abaixo do mínimo de borda (linha Sombra no chão no backlog)"
+}
