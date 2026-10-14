@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1188 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1189 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -126,6 +126,7 @@
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `LEITURA-POR-TAREFA.md` — Leitura por tarefa
+- `LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md` — Levantamento: desenho sem referência
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1

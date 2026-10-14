@@ -98,7 +98,8 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
 
 1. **Levantamento.** O agente em Opus 5.5 lê o que a Mecanifica tem, pesquisa o
    que existe pronto, roda o teste do Potrace e do VectorCraft e propõe o módulo,
-   o formato salvo e o objeto de prova. A pessoa escolhe.
+   o formato salvo e o objeto de prova. A pessoa escolhe. Entregue em 2026-10-14 no
+   [levantamento](../LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md), à espera da escolha.
 2. **Protótipo.** O menor módulo que desenha o objeto de prova a partir de uma
    descrição, provado por teste, pelo crítico e pela referência escondida.
 3. **Decisão.** A pessoa decide se o módulo segue, muda ou para.
