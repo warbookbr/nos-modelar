@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1189 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1203 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -261,6 +261,10 @@
 ## docs/mecanifica/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/mecanifica/banco-de-provas/desenho-braco-2026-10-14/
+
+- `DESCRICAO.md` — Braço robótico, vista lateral: a descrição
 
 ## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/
 
@@ -526,6 +530,24 @@
 - `borda-subpixel.test.js` — borda-subpixel.test.js — a linha de cada borda passa pelo meio-tom da imagem, dentro do pixel. Casos sintéticos antisserrilhados, em que a posição real da bo…
 - `contorno.test.js` — contorno.test.js — cada peça do módulo vista num caso construído de propósito: duas partes do mesmo cinza separadas pela semente, a pintura com a opacidade p…
 - `forma-declarada.test.js` — forma-declarada.test.js — o desenhador declara que um trecho da borda é reta, curva ou detalhe; a ferramenta ajusta quando a imagem concorda e avisa, sem aju…
+
+## modulos/desenho-por-restricoes/src/
+
+- `ajuda.js` — ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@1`, as relações, o lado e o que cada estado do relatório pede. É o que `…
+- `booleanas.js` — booleanas.js — união, diferença, interseção, área e deslocamento de listas de anéis em milímetro, sobre a `CrossSection` da Manifold (`manifold-3d`, WebAssem…
+- `contornos.js` — contornos.js — a saída no formato `mecanifica.contornos@1`, o mesmo que o contorno da imagem grava, para o esboço, a prancha e o crítico lerem como leem o de…
+- `formato.js` — formato.js — o formato salvo `mecanifica.desenho@1` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir.
+- `geometria.js` — geometria.js — da geometria resolvida a anéis em milímetro e às medidas derivadas.
+- `index.js` — index.js — a porta do módulo desenho-por-restricoes: a descrição de uma vista entra, o relatório, os contornos e a vista em traço saem.
+- `razao.js` — razao.js — a razão interseção/união (IoU) entre dois contornos, para medir um desenho contra uma referência que o desenhista não viu.
+- `relatorio.js` — relatorio.js — o relatório que volta à IA, em português: o estado do desenho, o que corrigir e as medidas que ela não escreveu.
+- `resolver.js` — resolver.js — resolve o desenho com o planegcs 1.3.0 (o resolvedor do Sketcher do FreeCAD compilado para WebAssembly) e lê o que ele diz, em palavras da desc…
+- `traco.js` — traco.js — a vista em traço do desenho, em SVG: o contorno de cada parte e a silhueta, com os nomes das partes numa coluna de cada lado, fora do desenho, lig…
+- `traducao.js` — traducao.js — a descrição normalizada vira a lista de primitivas e restrições do planegcs.
+
+## modulos/desenho-por-restricoes/tests/
+
+- `carrinho.js` — carrinho.js — a lateral de um carrinho de mão, a descrição que os testes do desenho por restrições usam: 17 relações que fecham o desenho sem grau de liberda…
 
 ## modulos/esboco/
 
@@ -1490,6 +1512,7 @@
 - `descrever-montagem.mjs` — descrever-montagem.mjs — lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. Não abre renderizador, não aplica pose e não conhece automóve…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `desenho.mjs` — desenho.mjs — a porta de linha de comando do módulo `modulos/desenho-por-restricoes`, que desenha a vista de um objeto sem imagem de referência: a IA declara…
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
