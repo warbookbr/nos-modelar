@@ -1,0 +1,461 @@
+{
+ "naBorda": {
+  "aro": 0.996,
+  "banco": 1,
+  "capo": 0.998,
+  "cilindro": 0.993,
+  "contrapeso": 1,
+  "encosto": 0.995,
+  "escape": 1,
+  "espelho": 1,
+  "furo": 1,
+  "garfos": 1,
+  "inclinacao": 1,
+  "lateral": 1,
+  "luzes": 1,
+  "paralama": 1,
+  "pedais": 0.924,
+  "piso": 0.992,
+  "pocoTraseiro": 1,
+  "presilha": 0.955,
+  "protetor": 0.998,
+  "rodaDianteira": 0.932,
+  "rodaTraseira": 0.984,
+  "sombra": 0.373,
+  "tampa": 1,
+  "torre": 0.984,
+  "volante": 0.986
+ },
+ "minimo": 0.8,
+ "abaixo": [
+  "sombra"
+ ],
+ "semDonoPx": 2427,
+ "semDonoAnexadosPx": 8661,
+ "mascaraSuavizada": {
+  "tirados": 56,
+  "postos": 110
+ },
+ "buracosFechados": {
+  "buracos": 47,
+  "pixels": 363
+ },
+ "divisas": [
+  {
+   "a": "luzes",
+   "b": "protetor",
+   "caixa": [
+    443,
+    29,
+    745,
+    142
+   ]
+  },
+  {
+   "a": "espelho",
+   "b": "protetor",
+   "caixa": [
+    475,
+    107,
+    514,
+    147
+   ]
+  },
+  {
+   "a": "banco",
+   "b": "protetor",
+   "caixa": [
+    667,
+    177,
+    706,
+    231
+   ]
+  },
+  {
+   "a": "escape",
+   "b": "protetor",
+   "caixa": [
+    725,
+    184,
+    764,
+    284
+   ]
+  },
+  {
+   "a": "garfos",
+   "b": "torre",
+   "caixa": [
+    262,
+    240,
+    310,
+    500
+   ]
+  },
+  {
+   "a": "protetor",
+   "b": "volante",
+   "caixa": [
+    406,
+    245,
+    466,
+    345
+   ]
+  },
+  {
+   "a": "cilindro",
+   "b": "tampa",
+   "caixa": [
+    767,
+    250,
+    857,
+    289
+   ]
+  },
+  {
+   "a": "escape",
+   "b": "tampa",
+   "caixa": [
+    736,
+    253,
+    779,
+    292
+   ]
+  },
+  {
+   "a": "protetor",
+   "b": "tampa",
+   "caixa": [
+    729,
+    254,
+    768,
+    293
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "protetor",
+   "caixa": [
+    730,
+    257,
+    769,
+    296
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "tampa",
+   "caixa": [
+    740,
+    264,
+    885,
+    320
+   ]
+  },
+  {
+   "a": "pocoTraseiro",
+   "b": "protetor",
+   "caixa": [
+    725,
+    265,
+    764,
+    332
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "pocoTraseiro",
+   "caixa": [
+    734,
+    266,
+    828,
+    404
+   ]
+  },
+  {
+   "a": "encosto",
+   "b": "protetor",
+   "caixa": [
+    675,
+    272,
+    717,
+    311
+   ]
+  },
+  {
+   "a": "encosto",
+   "b": "piso",
+   "caixa": [
+    538,
+    282,
+    717,
+    381
+   ]
+  },
+  {
+   "a": "piso",
+   "b": "protetor",
+   "caixa": [
+    400,
+    282,
+    719,
+    367
+   ]
+  },
+  {
+   "a": "banco",
+   "b": "encosto",
+   "caixa": [
+    568,
+    283,
+    681,
+    322
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "protetor",
+   "caixa": [
+    674,
+    304,
+    753,
+    343
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "pocoTraseiro",
+   "caixa": [
+    694,
+    308,
+    757,
+    484
+   ]
+  },
+  {
+   "a": "inclinacao",
+   "b": "protetor",
+   "caixa": [
+    380,
+    313,
+    419,
+    366
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "presilha",
+   "caixa": [
+    860,
+    307,
+    899,
+    346
+   ]
+  },
+  {
+   "a": "inclinacao",
+   "b": "torre",
+   "caixa": [
+    364,
+    315,
+    403,
+    357
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "piso",
+   "caixa": [
+    482,
+    315,
+    698,
+    441
+   ]
+  },
+  {
+   "a": "furo",
+   "b": "lateral",
+   "caixa": [
+    685,
+    320,
+    744,
+    385
+   ]
+  },
+  {
+   "a": "piso",
+   "b": "volante",
+   "caixa": [
+    406,
+    321,
+    463,
+    363
+   ]
+  },
+  {
+   "a": "pedais",
+   "b": "volante",
+   "caixa": [
+    433,
+    323,
+    472,
+    362
+   ]
+  },
+  {
+   "a": "pedais",
+   "b": "piso",
+   "caixa": [
+    439,
+    329,
+    499,
+    375
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "torre",
+   "caixa": [
+    338,
+    333,
+    392,
+    373
+   ]
+  },
+  {
+   "a": "inclinacao",
+   "b": "paralama",
+   "caixa": [
+    367,
+    330,
+    411,
+    369
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "protetor",
+   "caixa": [
+    386,
+    335,
+    425,
+    374
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "piso",
+   "caixa": [
+    400,
+    343,
+    506,
+    441
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "rodaDianteira",
+   "caixa": [
+    339,
+    342,
+    388,
+    381
+   ]
+  },
+  {
+   "a": "rodaDianteira",
+   "b": "torre",
+   "caixa": [
+    302,
+    349,
+    364,
+    512
+   ]
+  },
+  {
+   "a": "aro",
+   "b": "paralama",
+   "caixa": [
+    386,
+    349,
+    505,
+    442
+   ]
+  },
+  {
+   "a": "aro",
+   "b": "rodaDianteira",
+   "caixa": [
+    378,
+    357,
+    489,
+    496
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "contrapeso",
+   "caixa": [
+    804,
+    370,
+    906,
+    409
+   ]
+  },
+  {
+   "a": "contrapeso",
+   "b": "pocoTraseiro",
+   "caixa": [
+    804,
+    380,
+    884,
+    497
+   ]
+  },
+  {
+   "a": "pocoTraseiro",
+   "b": "rodaTraseira",
+   "caixa": [
+    709,
+    394,
+    872,
+    505
+   ]
+  },
+  {
+   "a": "aro",
+   "b": "lateral",
+   "caixa": [
+    473,
+    418,
+    512,
+    497
+   ]
+  },
+  {
+   "a": "rodaDianteira",
+   "b": "sombra",
+   "caixa": [
+    399,
+    487,
+    474,
+    546
+   ]
+  },
+  {
+   "a": "rodaTraseira",
+   "b": "sombra",
+   "caixa": [
+    718,
+    489,
+    857,
+    546
+   ]
+  }
+ ],
+ "traco": {
+  "bordaSubpixel": true,
+  "fundoTom": 255,
+  "tolerancia": 0.35,
+  "subamostras": 8
+ }
+}
