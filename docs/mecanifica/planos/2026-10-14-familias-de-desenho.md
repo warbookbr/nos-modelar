@@ -108,6 +108,20 @@ só a saída para a pessoa e o crítico.
    dá 0,767 às cegas, 0,815 com a família ajustada à foto dentro das faixas e 0,908
    com as faixas abertas, treze parâmetros fora delas: uma referência não basta para
    a faixa de uma família.
+6. **Ampliação.** A pessoa escolheu em 2026-10-14 ampliar a família agora, e não
+   deixar para o backlog. O ajuste à referência virou o comando
+   `npm run desenho -- familia --ajustar`, e a prova ganhou o sorteio de conjuntos
+   nas faixas (`--provar --sorteio`), porque a prova de pares não via três
+   parâmetros que se contradizem juntos. A
+   [família da carcaça](../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md)
+   passou à versão 2.0.0, com as faixas das duas empilhadeiras: 0,9943 contra a
+   referência antiga e 0,9187 contra a nova, 268 conjuntos desenhados na prova e
+   nenhuma reprovação em 1500 sorteados. O paralama curvo da empilhadeira nova fica
+   de fora, como forma que a família não tem.
+
+Na mesma data a pessoa decidiu que o desenho não substitui a prancha por ora: a
+prancha mede a foto, e o desenho é o objeto redesenhado; a decisão volta no plano do
+esboço, quando o esboço passar a ler as medidas do desenho.
 
 A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em
 paralelo sem disputa: cada um recebe a lista fechada dos arquivos que muda, quem
