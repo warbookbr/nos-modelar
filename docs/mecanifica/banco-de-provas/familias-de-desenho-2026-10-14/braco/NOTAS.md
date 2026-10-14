@@ -1,6 +1,6 @@
 # Braço robótico, vista lateral: o desenho por restrições ajustado à referência
 
-Fatia 2 do plano [as famílias de desenho](../../../planos/2026-10-14-familias-de-desenho.md), em 2026-10-14. O
+Fatia 2 do plano [as famílias de desenho](../../../planos/encerrados/2026-10-14-familias-de-desenho.md), em 2026-10-14. O
 [desenho](lateral.desenho.json) descreve a vista lateral do braço com as 14 partes do
 [contorno da referência](../../../../../procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.contornos.json), com os
 mesmos nomes e no sistema dele: milímetro, h para a direita e v para cima, o chão na face de baixo da chapa da base (v = −5) e o

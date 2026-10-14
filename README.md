@@ -65,10 +65,9 @@ Além da peça existem a montagem persistida, o mapa canônico de dependências,
 revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo tem
 o braço robótico, em `procedural/pecas/braco-robotico/`. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
-divergem. O plano ativo são [as famílias de
-desenho](docs/mecanifica/planos/2026-10-14-familias-de-desenho.md), aberto em 2026-10-14; o
-anterior, o [desenho sem
-referência](docs/mecanifica/planos/encerrados/2026-10-13-desenho-sem-referencia.md), fechou no mesmo dia.
+divergem. Não há plano ativo: o último, [as famílias de
+desenho](docs/mecanifica/planos/encerrados/2026-10-14-familias-de-desenho.md), fechou em
+2026-10-14, e o roteiro registrado nele segue com o esboço para receita no núcleo.
 
 ## Peças são exemplos
 

@@ -1,7 +1,7 @@
 # Carcaça da empilhadeira nova, vista lateral: a descrição
 
 Prova da fatia 5 do plano [as famílias de
-desenho](../../../planos/2026-10-14-familias-de-desenho.md). A pessoa mandou em
+desenho](../../../planos/encerrados/2026-10-14-familias-de-desenho.md). A pessoa mandou em
 2026-10-14 a foto de outra empilhadeira; Claude olhou a vista lateral e descreveu a
 carcaça só em palavras e proporções aproximadas, a olho, sem conferir contra
 medida; as duas medidas tiradas do contorno da foto são o comprimento e a altura

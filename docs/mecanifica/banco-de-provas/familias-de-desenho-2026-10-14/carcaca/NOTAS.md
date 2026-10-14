@@ -1,6 +1,6 @@
 # Carcaça da empilhadeira, vista lateral: o desenho por restrições ajustado à referência
 
-Fatia 2 do plano [as famílias de desenho](../../../planos/2026-10-14-familias-de-desenho.md), em 2026-10-14. O
+Fatia 2 do plano [as famílias de desenho](../../../planos/encerrados/2026-10-14-familias-de-desenho.md), em 2026-10-14. O
 [desenho](lateral.desenho.json) descreve a vista lateral da carcaça com as onze partes do
 [contorno da referência](../../empilhadeira-2026-10-09/referencias/carcaca_lateral.contornos.json) que entram no modelo, com os
 mesmos nomes e no sistema dele: milímetro, h para a direita e v para cima, a base em v = 0 e a ponta do paralama em h = 0. A

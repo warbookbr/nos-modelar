@@ -335,6 +335,13 @@ Esta seção guarda o que o índice `planos/README.md` carregava antes de ser en
 
 ### Estado
 
+[As famílias de desenho](2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14,
+concluído com a aprovação da pessoa: as famílias de desenho da carcaça e do braço,
+ajustadas às referências acima de 0,95, e a prova numa empilhadeira nova, em que o
+desenho às cegas pela família deu 0,767 e mostrou que uma referência não basta para a
+faixa; a família da carcaça foi ampliada para as duas empilhadeiras, e o ajuste à
+referência e o sorteio da prova entraram na ferramenta.
+
 [O desenho sem referência](2026-10-13-desenho-sem-referencia.md) fechou em
 2026-10-14, concluído com a decisão da pessoa: o módulo de desenho por restrições,
 com o planegcs, e duas provas contra referência escondida, em que as restrições

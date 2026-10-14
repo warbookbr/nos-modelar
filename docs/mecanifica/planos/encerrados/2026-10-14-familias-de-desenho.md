@@ -1,6 +1,6 @@
 # As famílias de desenho
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite da pessoa
 
@@ -8,7 +8,7 @@
 
 ## Problema observado
 
-O plano do [desenho sem referência](encerrados/2026-10-13-desenho-sem-referencia.md)
+O plano do [desenho sem referência](2026-10-13-desenho-sem-referencia.md)
 mostrou que a IA desenha uma vista por partes e relações com o módulo
 `modulos/desenho-por-restricoes`, e que o que limita o acerto é a proporção que ela
 recebe ou inventa, e não a forma de desenhar: nas duas provas, o desenho por
@@ -79,17 +79,17 @@ só a saída para a pessoa e o crítico.
    ou com os furos da silhueta, porque é a nota que os desenhistas perseguem.
 2. **Ajuste à referência.** A carcaça e o braço desenhados por restrições vendo a
    referência, até o mínimo, com as peças que se repetem anotadas; um agente para
-   cada objeto, em paralelo. O [braço](../banco-de-provas/familias-de-desenho-2026-10-14/braco/NOTAS.md)
+   cada objeto, em paralelo. O [braço](../../banco-de-provas/familias-de-desenho-2026-10-14/braco/NOTAS.md)
    chegou a 0,9555 em 2026-10-14, e a
-   [carcaça](../banco-de-provas/familias-de-desenho-2026-10-14/carcaca/NOTAS.md) a
+   [carcaça](../../banco-de-provas/familias-de-desenho-2026-10-14/carcaca/NOTAS.md) a
    0,9941.
 3. **Contrato.** O formato da peça e da família de desenho, com parâmetros,
    faixas e a ligação ao formato do módulo, escrito a partir dos dois ajustes.
 4. **Famílias.** As famílias da carcaça e do braço, com a faixa de cada parâmetro
    e a prova nos extremos, um agente para cada, em paralelo. Feitas em 2026-10-14, em
-   [`procedural/familias-de-desenho/`](../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md):
+   [`procedural/familias-de-desenho/`](../../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md):
    a carcaça com 15 parâmetros, três peças e 33 conjuntos provados, o perfil de
-   referência em 0,9941; o [braço](../../../procedural/familias-de-desenho/braco-colaborativo/README.md)
+   referência em 0,9941; o [braço](../../../../procedural/familias-de-desenho/braco-colaborativo/README.md)
    com 9 parâmetros, quatro peças e 21 conjuntos, em 0,9540. O crítico, olhando o
    mínimo, o médio e o máximo contra a referência, deu 9 à carcaça (faltam uma linha
    fina na base da lateral e o fim da linha do aro) e 8 ao braço (o elo da coluna
@@ -99,12 +99,12 @@ só a saída para a pessoa e o crítico.
    detalhes finos anotados.
 5. **Prova.** Um objeto desenhado a partir de família, medido contra a referência.
    A pessoa mandou em 2026-10-14 as vistas de outra empilhadeira, sem marca, em
-   [`empilhadeira-2026-10-14/referencias/`](../banco-de-provas/empilhadeira-2026-10-14/referencias/);
-   a lateral foi contornada ([roteiro do crítico](../banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/roteiro.md)) e a [descrição](../banco-de-provas/familias-de-desenho-2026-10-14/prova/DESCRICAO.md)
+   [`empilhadeira-2026-10-14/referencias/`](../../banco-de-provas/empilhadeira-2026-10-14/referencias/);
+   a lateral foi contornada ([roteiro do crítico](../../banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/roteiro.md)) e a [descrição](../../banco-de-provas/familias-de-desenho-2026-10-14/prova/DESCRICAO.md)
    da carcaça foi a um desenhista que não vê a foto e usa só a família, que fez o
-   [desenho às cegas](../banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/NOTAS.md)
+   [desenho às cegas](../../banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/NOTAS.md)
    com dez dos quinze parâmetros presos no limite da faixa. O
-   [resultado](../banco-de-provas/familias-de-desenho-2026-10-14/prova/RESULTADO.md)
+   [resultado](../../banco-de-provas/familias-de-desenho-2026-10-14/prova/RESULTADO.md)
    dá 0,767 às cegas, 0,815 com a família ajustada à foto dentro das faixas e 0,908
    com as faixas abertas, treze parâmetros fora delas: uma referência não basta para
    a faixa de uma família.
@@ -113,7 +113,7 @@ só a saída para a pessoa e o crítico.
    `npm run desenho -- familia --ajustar`, e a prova ganhou o sorteio de conjuntos
    nas faixas (`--provar --sorteio`), porque a prova de pares não via três
    parâmetros que se contradizem juntos. A
-   [família da carcaça](../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md)
+   [família da carcaça](../../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md)
    passou à versão 2.0.0, com as faixas das duas empilhadeiras: 0,9943 contra a
    referência antiga e 0,9230 contra a nova, 335 conjuntos desenhados na prova e
    nenhuma reprovação em 1500 sorteados. O crítico deu 7 nas duas rodadas, a
@@ -145,8 +145,8 @@ desenhos e a tradução do esboço para receita no núcleo, com o avião como pr
 objeto, porque já tem esboço aprovado e é o elo que mais falta na esteira; depois a
 picape, como primeiro objeto a passar pela esteira inteira do zero, com as
 primitivas 2.0 que ela pedir; e, mais adiante, os objetos da [lista de
-famílias](../FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
-objeto](../FERRAMENTAS-POR-OBJETO.md). O [backlog](BACKLOG.md) entra onde cada plano
+famílias](../../FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
+objeto](../../FERRAMENTAS-POR-OBJETO.md). O [backlog](../BACKLOG.md) entra onde cada plano
 precisar: os atritos da segunda rodada do avião, a geometria exata e a visão
 (OpenCASCADE, Manifold no esboço e Segment Anything), as pontas cortadas e a paleta
 do mapa de partes.
@@ -157,14 +157,48 @@ Os objetos levantados em 2026-10-11 para o mesmo exercício do avião, cada um
 forçando uma falta diferente: a bicicleta (corrente, engrenagem e transmissão, com
 a roda 2.0), a empilhadeira (mastro telescópico com trilho e corrente e várias
 articulações, com o
-[alinhamento](../banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
+[alinhamento](../../banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
 começado), a cadeira de escritório (estofado e espuma, base em estrela, pistão a
 gás e rodízio) e um objeto de esteira, como robô de esteira ou escavadeira (o elo
 articulado). E os que o plano [as ferramentas de
-modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md) deixou: o carrinho
+modelagem](2026-10-07-as-ferramentas-de-modelagem.md) deixou: o carrinho
 de mão como família de objeto, a bacia em casca como primitiva, a dobradiça de
 caneco e as ressalvas do fechamento dele.
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-10-14, com a aprovação da pessoa. A razão da ferramenta mede a
+união das regiões, e o contrato da peça e da família de desenho
+(`mecanifica.pecas-de-desenho@1` e `mecanifica.familia-de-desenho@1`) está escrito
+e testado no módulo (item 1). A carcaça e o braço foram ajustados às referências
+acima do mínimo de 0,95 (0,9941 e 0,9555), viraram famílias com faixa, perfis e
+prova, e a pessoa aprovou a forma das duas depois do crítico (item 2). A prova numa
+empilhadeira nova, desenhada às cegas pela família a partir de uma descrição, deu
+0,767 pela melhor translação, contra 0,673 da carcaça desenhada sem família no plano
+anterior, e custou 153.677 tokens, contra cerca de 124.000; são objetos diferentes,
+e a comparação só indica a ordem de grandeza (item 3). A bateria completa passou
+(item 4).
+
+A prova respondeu a pergunta de quantas referências uma família pede: uma não
+basta, porque treze dos quinze parâmetros da empilhadeira nova caíram fora das
+faixas tiradas de uma foto. A pessoa escolheu ampliar a família no plano, e a
+carcaça passou à versão 2.0.0 com as faixas das duas fotos (0,9942 e 0,9230),
+aprovada com pendências. Quatro achados que o processo não pegava sozinho viraram
+ferramenta, gate ou instrução: a razão que media só o anel de fora da silhueta
+passou a medir a união das regiões; o ajuste à referência virou
+`familia --ajustar`, que diz o parâmetro no limite ou fora da faixa, e a skill pede
+o ajuste a cada referência; a prova de pares, que não via três parâmetros que se
+contradizem juntos, ganhou o sorteio, com 100 conjuntos no gate e 1500 na autoria; e
+o roteiro do crítico do contorno passou a dizer a regra dos buracos pequenos, que
+ele apontava como defeito em toda rodada. O agente de cada objeto trabalhou com a
+lista fechada de arquivos, e os 19 agentes do plano custaram cerca de 5,1 milhões de
+tokens, sem a sessão principal.
+
+Ficam como ressalva: a família do braço continua com uma referência só, e a faixa
+dela é provisória até a segunda; a empilhadeira nova pede formas que a família da
+carcaça não tem (o paralama curvo, a face de trás do capô a prumo, a lateral mais
+alta e o painel ausente), anotadas no backlog com a parte opcional, as relações de
+ordem sobre valores derivados e as partidas do ajuste; o ajuste acha um máximo
+local, e o crítico de uma família em duas rodadas achou detalhes diferentes a cada
+vez. A pessoa decidiu que o desenho não substitui a prancha por ora, e a decisão
+volta no plano do esboço, o próximo do roteiro.

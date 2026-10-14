@@ -1,6 +1,6 @@
 # Carcaça da empilhadeira nova pela família de desenho: o resultado da prova
 
-Fatia 5 do plano [as famílias de desenho](../../../planos/2026-10-14-familias-de-desenho.md),
+Fatia 5 do plano [as famílias de desenho](../../../planos/encerrados/2026-10-14-familias-de-desenho.md),
 em 2026-10-14. Claude descreveu em palavras a carcaça da foto lateral da empilhadeira
 nova ([descrição](DESCRICAO.md)), e um desenhista que não viu a foto a desenhou só com
 a família da carcaça, sem mudar a família nem o catálogo dela

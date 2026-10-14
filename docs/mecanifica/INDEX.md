@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- O plano ativo são [as famílias de desenho](planos/2026-10-14-familias-de-desenho.md): peças e famílias de desenho por restrições ajustadas às referências. O anterior, [o desenho sem referência](planos/encerrados/2026-10-13-desenho-sem-referencia.md), fechou em 2026-10-14 com o módulo de desenho por restrições. Antes, [o que o avião pede](planos/encerrados/2026-10-11-o-que-o-aviao-pede.md) fechou em 2026-10-13.
+- Nenhum plano ativo. [As famílias de desenho](planos/encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, com as famílias da carcaça e do braço ajustadas às referências, o ajuste da família a uma referência e o sorteio na prova; o roteiro registrado nele segue com o esboço para receita no núcleo, com o avião. Antes, [o desenho sem referência](planos/encerrados/2026-10-13-desenho-sem-referencia.md) fechou em 2026-10-14 com o módulo de desenho por restrições.
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs

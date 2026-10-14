@@ -133,7 +133,7 @@ modo novo, que pede calibração própria.
 
 ## Sucessor
 
-O próximo plano é o das [famílias de desenho](../2026-10-14-familias-de-desenho.md),
+O próximo plano é o das [famílias de desenho](2026-10-14-familias-de-desenho.md),
 decidido pela pessoa em 2026-10-14, com o roteiro dos planos seguintes e os
 candidatos de sucessão que estavam aqui.
 
