@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1244 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1245 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -312,6 +312,10 @@
 ## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/
 
 - `DESCRICAO.md` — Carcaça da empilhadeira nova, vista lateral: a descrição
+
+## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/
+
+- `NOTAS.md` — A carcaça da descrição pela família de desenho
 
 ## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
 

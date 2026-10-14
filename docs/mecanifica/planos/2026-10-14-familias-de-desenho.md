@@ -101,7 +101,9 @@ só a saída para a pessoa e o crítico.
    A pessoa mandou em 2026-10-14 as vistas de outra empilhadeira, sem marca, em
    [`empilhadeira-2026-10-14/referencias/`](../banco-de-provas/empilhadeira-2026-10-14/referencias/);
    a lateral foi contornada ([roteiro do crítico](../banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/roteiro.md)) e a [descrição](../banco-de-provas/familias-de-desenho-2026-10-14/prova/DESCRICAO.md)
-   da carcaça vai a um desenhista que não vê a foto e usa só a família.
+   da carcaça foi a um desenhista que não vê a foto e usa só a família, que fez o
+   [desenho às cegas](../banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/NOTAS.md)
+   com dez dos quinze parâmetros presos no limite da faixa.
 
 A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em
 paralelo sem disputa: cada um recebe a lista fechada dos arquivos que muda, quem
