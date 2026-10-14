@@ -147,4 +147,32 @@ decidido pela pessoa em 2026-10-13. Os candidatos de sucessão levantados aqui e
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-10-13, com a aceitação da pessoa. O alinhamento, as quatro
+vistas com contorno e as duas pranchas cotadas foram aceitos (item 1); as pranchas
+foram refeitas na segunda rodada com a borda subpixel e as formas declaradas do
+contorno, e aceitas de novo. A primeira rodada fechou com o Marco de 100% em 8,
+3,93 milhões de tokens e a forma aprovada pela pessoa em 2026-10-12 (item 2). Os
+atritos R1 a R8 e E1 a E43 foram reproduzidos e classificados na
+[classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md) (item 3), e a
+pessoa mandou corrigir todos. A fatia 5 entregou a família `superficie-aerodinamica`
+(asa, estabilizador, deriva, pá e hélice) aprovada nas três camadas, o recorte de
+uma forma por outra, o curso de mecanismo varrido pelo gate e mostrado ao crítico,
+a superfície suave por seções e as famílias no esboço, além das correções de
+contorno, prancha, integração, gate e processo do crítico, este recalibrado em 11
+de 12 imagens (item 4).
+
+A segunda rodada fechou com todas as unidades e o Marco de 100% em 8, sem nenhuma
+liberação da pessoa, e a forma aprovada em 2026-10-13 (item 5). Custou 3,60
+milhões de tokens contra 3,93 milhões, 8% a menos, com 11 esbocistas contra 12 e
+12 críticas contra 19; os trens recolhem dentro do capô e da asa sem atravessar, o
+que a primeira rodada não fazia. Fora dessa conta ficaram 1,39 milhão de tokens de
+cinco implementadores que corrigiram a blocagem, o brief e o desenho durante a
+rodada. A contagem de [ferramentas por objeto](../FERRAMENTAS-POR-OBJETO.md) passou
+o perfil aerodinâmico a parcial e o recorte do esboço a existente, e a bateria
+completa passa (item 6).
+
+Ficam como ressalva os detalhes de superfície que a pessoa aceitou sem a rodada de
+acabamento (deriva, leme, compensador, ponta e suportes da asa, rebaixo da porta,
+perna do nariz e garfo do trem principal) e os 38 atritos abertos da segunda
+rodada, que foram ao [backlog](BACKLOG.md) com a integração do detalhe com o mestre
+como o primeiro grupo a puxar.
