@@ -1,6 +1,6 @@
 # O que o avião pede
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite da pessoa
 
@@ -8,10 +8,10 @@
 
 ## Problema observado
 
-[As ferramentas de modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md)
+[As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md)
 deixou casca, chapa, articulações, barras e quatro famílias, provadas em carrinho
 de mão, guarda-roupa, cadeira e cadeira de rodas, que são objetos de peças retas
-ou de revolução. A [contagem por objeto](../FERRAMENTAS-POR-OBJETO.md) aponta o
+ou de revolução. A [contagem por objeto](../../FERRAMENTAS-POR-OBJETO.md) aponta o
 que esses objetos não exercitam: o perfil aerodinâmico e as pás (`aerofolio`), que
 não existe e serve a 17 objetos, e a superfície suave por seções (`loftSuave`),
 parcial e pedida por 46. Sem modelar um objeto que dependa delas, não se sabe o
@@ -21,9 +21,9 @@ virar primitiva 2.0.
 A pessoa escolheu em 2026-10-11 o avião de pequeno porte, monomotor turboélice de
 asa baixa e trem recolhível, com uma referência em quatro vistas, sem marca nem
 nome de fabricante, separada em
-[`aviao-2026-10-11/referencias`](../banco-de-provas/aviao-2026-10-11/referencias/).
-O [alinhamento](../banco-de-provas/aviao-2026-10-11/ALINHAMENTO.md) e os
-[atritos](../banco-de-provas/aviao-2026-10-11/ATRITOS.md) ficam na mesma pasta.
+[`aviao-2026-10-11/referencias`](../../banco-de-provas/aviao-2026-10-11/referencias/).
+O [alinhamento](../../banco-de-provas/aviao-2026-10-11/ALINHAMENTO.md) e os
+[atritos](../../banco-de-provas/aviao-2026-10-11/ATRITOS.md) ficam na mesma pasta.
 
 ## Resultado
 
@@ -57,7 +57,7 @@ resultado volta ao backlog.
 - a implementação do que a pessoa escolher, provada na bancada e aprovada nas
   camadas mecânica, crítico e pessoa;
 - o avião refeito com o que foi criado e a comparação com a primeira rodada no
-  [banco de provas](../banco-de-provas/BANCO-DE-PROVAS.md).
+  [banco de provas](../../banco-de-provas/BANCO-DE-PROVAS.md).
 
 ## Excluído
 
@@ -85,17 +85,17 @@ resultado volta ao backlog.
 ## Fatias
 
 1. **Alinhamento.** Pela skill
-   [`alinhar-modelagem`](../../../.claude/skills/alinhar-modelagem/SKILL.md),
+   [`alinhar-modelagem`](../../../../.claude/skills/alinhar-modelagem/SKILL.md),
    com opções de forma em imagem quando houver disputa, e fecha na anatomia do
    avião em `ALINHAMENTO.md`: partes, ligações, o que se move e o que reprova.
    Vem antes da referência porque a lista de partes do contorno sai dele, como
-   no [fluxo do objeto](../usar/FLUXO-DO-OBJETO.md). A escala é a envergadura de
+   no [fluxo do objeto](../../usar/FLUXO-DO-OBJETO.md). A escala é a envergadura de
    12,8 m, escolhida pela pessoa em 2026-10-11.
 2. **Referência.** Separar as vistas (feito na abertura), declarar os papéis em
    `papeis.json`, tirar o contorno das partes pela skill
-   [`contorno-da-imagem`](../../../.claude/skills/contorno-da-imagem/SKILL.md) e
+   [`contorno-da-imagem`](../../../../.claude/skills/contorno-da-imagem/SKILL.md) e
    fazer a prancha pela
-   [`prancha-dos-contornos`](../../../.claude/skills/prancha-dos-contornos/SKILL.md).
+   [`prancha-dos-contornos`](../../../../.claude/skills/prancha-dos-contornos/SKILL.md).
    As vistas são um desenho e podem não concordar entre si; a prancha decide a
    medida que vale e diz de qual vista ela veio.
 3. **Primeira rodada.** Esboço detalhado pelo laço do esboço, em modo por
@@ -110,7 +110,7 @@ resultado volta ao backlog.
 5. **Implementação.** O que a pessoa escolheu, cada item com prancha na bancada
    neutra nos extremos das faixas e num ponto médio, crítico e aprovação da
    pessoa. Em 2026-10-12 a pessoa escolheu corrigir todos os itens da
-   [classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md), para não
+   [classificação](../../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md), para não
    deixar pendência. A ordem vai em três ondas, cada pacote com dono de arquivos
    próprio para os agentes trabalharem em paralelo sem se cruzar:
    - onda 1, correções: o processo do crítico (brief em arquivo e reimpresso, o
@@ -141,7 +141,7 @@ o plano para e redesenha com a pessoa antes de ampliar.
 
 ## Sucessor
 
-O próximo plano é o [desenho sem referência](2026-10-13-desenho-sem-referencia.md),
+O próximo plano é o [desenho sem referência](../2026-10-13-desenho-sem-referencia.md),
 decidido pela pessoa em 2026-10-13. Os candidatos de sucessão levantados aqui em
 2026-10-11 passaram para o fim dele.
 
@@ -153,7 +153,7 @@ foram refeitas na segunda rodada com a borda subpixel e as formas declaradas do
 contorno, e aceitas de novo. A primeira rodada fechou com o Marco de 100% em 8,
 3,93 milhões de tokens e a forma aprovada pela pessoa em 2026-10-12 (item 2). Os
 atritos R1 a R8 e E1 a E43 foram reproduzidos e classificados na
-[classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md) (item 3), e a
+[classificação](../../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md) (item 3), e a
 pessoa mandou corrigir todos. A fatia 5 entregou a família `superficie-aerodinamica`
 (asa, estabilizador, deriva, pá e hélice) aprovada nas três camadas, o recorte de
 uma forma por outra, o curso de mecanismo varrido pelo gate e mostrado ao crítico,
@@ -167,12 +167,14 @@ milhões de tokens contra 3,93 milhões, 8% a menos, com 11 esbocistas contra 12
 12 críticas contra 19; os trens recolhem dentro do capô e da asa sem atravessar, o
 que a primeira rodada não fazia. Fora dessa conta ficaram 1,39 milhão de tokens de
 cinco implementadores que corrigiram a blocagem, o brief e o desenho durante a
-rodada. A contagem de [ferramentas por objeto](../FERRAMENTAS-POR-OBJETO.md) passou
+rodada. A contagem de [ferramentas por objeto](../../FERRAMENTAS-POR-OBJETO.md) passou
 o perfil aerodinâmico a parcial e o recorte do esboço a existente, e a bateria
-completa passa (item 6).
+completa passa em 14 minutos, depois de ter subido a 22 com os esboços do avião
+no teste da blocagem; o resumo dos gates passou a listar os arquivos de teste
+mais lentos (item 6).
 
 Ficam como ressalva os detalhes de superfície que a pessoa aceitou sem a rodada de
 acabamento (deriva, leme, compensador, ponta e suportes da asa, rebaixo da porta,
 perna do nariz e garfo do trem principal) e os 38 atritos abertos da segunda
-rodada, que foram ao [backlog](BACKLOG.md) com a integração do detalhe com o mestre
+rodada, que foram ao [backlog](../BACKLOG.md) com a integração do detalhe com o mestre
 como o primeiro grupo a puxar.

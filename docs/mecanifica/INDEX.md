@@ -24,7 +24,7 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- O plano ativo é [o que o avião pede](planos/2026-10-11-o-que-o-aviao-pede.md): modelar o avião de pequeno porte para achar ferramentas e primitivas 2.0 que faltam. O anterior, [as ferramentas de modelagem](planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), fechou em 2026-10-11.
+- Não há plano ativo. [O que o avião pede](planos/encerrados/2026-10-11-o-que-o-aviao-pede.md) fechou em 2026-10-13, com o avião modelado duas vezes e aprovado, a família de superfície aerodinâmica, o recorte, o curso de mecanismo e a superfície suave. O sucessor, o [desenho sem referência](planos/2026-10-13-desenho-sem-referencia.md), está em rascunho.
   O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs

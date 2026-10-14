@@ -4,7 +4,7 @@
 move, o realismo e o que reprova são a recomendação de Claude, mostrada à pessoa
 na mesma data, e valem até ela corrigir; o contorno das vistas não fixa forma, e
 a correção cabe até o começo do esboço. Fatia 1 do plano [o que o avião
-pede](../../planos/2026-10-11-o-que-o-aviao-pede.md).
+pede](../../planos/encerrados/2026-10-11-o-que-o-aviao-pede.md).
 
 ## O objeto
 

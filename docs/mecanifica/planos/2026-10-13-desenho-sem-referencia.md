@@ -12,7 +12,7 @@ Todo o caminho de forma da Mecanifica parte de uma imagem que existe: o contorno
 da imagem tira as partes de uma referência, a prancha cota esses contornos, e o
 esboço e o crítico comparam o modelo com ela. Quando o objeto não tem imagem, a IA
 fica sem o que traçar, e o que ela desenha não tem prancha, cota nem alvo que o
-crítico possa usar. O plano [o que o avião pede](2026-10-11-o-que-o-aviao-pede.md)
+crítico possa usar. O plano [o que o avião pede](encerrados/2026-10-11-o-que-o-aviao-pede.md)
 mostrou também o custo de traçar sobre imagem pequena, com a borda em escadinha e
 rodadas do crítico gastas nela.
 

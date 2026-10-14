@@ -335,6 +335,13 @@ Esta seção guarda o que o índice `planos/README.md` carregava antes de ser en
 
 ### Estado
 
+[O que o avião pede](2026-10-11-o-que-o-aviao-pede.md) fechou em 2026-10-13,
+concluído com a aceitação da pessoa: o avião de pequeno porte modelado duas vezes,
+a segunda 8% mais barata (3,60 contra 3,93 milhões de tokens) e sem liberação, a
+família de superfície aerodinâmica, o recorte de uma forma por outra, o curso de
+mecanismo e a superfície suave por seções; 38 atritos da segunda rodada foram ao
+backlog.
+
 [As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md) fechou
 em 2026-10-11, concluído com a aceitação da pessoa: o esboço sobre o nível zero, a
 camada de features, casca, chapa dobrada, barras e articulação como extensões

@@ -1,6 +1,6 @@
 # Avião de pequeno porte: classificação dos atritos
 
-Fatia 4 do plano [o que o avião pede](../../planos/2026-10-11-o-que-o-aviao-pede.md).
+Fatia 4 do plano [o que o avião pede](../../planos/encerrados/2026-10-11-o-que-o-aviao-pede.md).
 Cada atrito da [referência e da prancha](ATRITOS.md) (R1 a R8) e do
 [esboço](esboco/ATRITOS.md) (E1 a E43) entra numa de quatro classes: ferramenta
 nova ou primitiva 2.0, correção de ferramenta que já existe, correção do processo

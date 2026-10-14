@@ -1,6 +1,6 @@
 # Avião de pequeno porte: atritos
 
-Cada atrito do plano [o que o avião pede](../../planos/2026-10-11-o-que-o-aviao-pede.md),
+Cada atrito do plano [o que o avião pede](../../planos/encerrados/2026-10-11-o-que-o-aviao-pede.md),
 com o comando que o reproduz. A classificação (ferramenta nova, correção do
 núcleo ou nada) é da fatia 4.
 
