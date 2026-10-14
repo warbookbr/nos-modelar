@@ -115,9 +115,12 @@ só a saída para a pessoa e o crítico.
    parâmetros que se contradizem juntos. A
    [família da carcaça](../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md)
    passou à versão 2.0.0, com as faixas das duas empilhadeiras: 0,9943 contra a
-   referência antiga e 0,9187 contra a nova, 268 conjuntos desenhados na prova e
-   nenhuma reprovação em 1500 sorteados. O paralama curvo da empilhadeira nova fica
-   de fora, como forma que a família não tem.
+   referência antiga e 0,9230 contra a nova, 335 conjuntos desenhados na prova e
+   nenhuma reprovação em 1500 sorteados. O crítico deu 7 nas duas rodadas, a
+   primeira corrigida na família e a segunda com detalhes que a versão 1.0.0 já
+   tinha e formas da foto nova que a família não tem, e a pessoa aprovou a forma em
+   2026-10-14 com esses pontos anotados como pendência. O paralama curvo da
+   empilhadeira nova fica de fora, como forma que a família não tem.
 
 Na mesma data a pessoa decidiu que o desenho não substitui a prancha por ora: a
 prancha mede a foto, e o desenho é o objeto redesenhado; a decisão volta no plano do
