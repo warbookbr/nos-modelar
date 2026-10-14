@@ -100,7 +100,7 @@ só a saída para a pessoa e o crítico.
 5. **Prova.** Um objeto desenhado a partir de família, medido contra a referência.
    A pessoa mandou em 2026-10-14 as vistas de outra empilhadeira, sem marca, em
    [`empilhadeira-2026-10-14/referencias/`](../banco-de-provas/empilhadeira-2026-10-14/referencias/);
-   a lateral foi contornada e a [descrição](../banco-de-provas/familias-de-desenho-2026-10-14/prova/DESCRICAO.md)
+   a lateral foi contornada ([roteiro do crítico](../banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/roteiro.md)) e a [descrição](../banco-de-provas/familias-de-desenho-2026-10-14/prova/DESCRICAO.md)
    da carcaça vai a um desenhista que não vê a foto e usa só a família.
 
 A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em
