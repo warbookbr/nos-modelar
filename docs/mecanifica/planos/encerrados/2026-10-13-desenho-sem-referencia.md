@@ -1,6 +1,6 @@
 # Desenho sem referência
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite da pessoa; o levantamento da fatia 1 é de um agente em Opus 5.5, como a pessoa pediu
 
@@ -12,7 +12,7 @@ Todo o caminho de forma da Mecanifica parte de uma imagem que existe: o contorno
 da imagem tira as partes de uma referência, a prancha cota esses contornos, e o
 esboço e o crítico comparam o modelo com ela. Quando o objeto não tem imagem, a IA
 fica sem o que traçar, e o que ela desenha não tem prancha, cota nem alvo que o
-crítico possa usar. O plano [o que o avião pede](encerrados/2026-10-11-o-que-o-aviao-pede.md)
+crítico possa usar. O plano [o que o avião pede](2026-10-11-o-que-o-aviao-pede.md)
 mostrou também o custo de traçar sobre imagem pequena, com a borda em escadinha e
 rodadas do crítico gastas nela.
 
@@ -50,7 +50,7 @@ FreeCAD, o SolveSpace, o LibreCAD, o Inkscape, o OpenSCAD) e bibliotecas. O que 
 versão fixada e a instalação reproduzível, e o desenho salvo fica no formato do
 repositório, com a mesma entrada dando o mesmo arquivo; código trazido de fora
 leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 na
-[pesquisa](../PESQUISA-ABERTA-2026-10.md) permite.
+[pesquisa](../../PESQUISA-ABERTA-2026-10.md) permite.
 
 ## Incluído
 
@@ -58,7 +58,7 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
   que existe fora, feito para IA ou para gente, que a IA consiga comandar aqui,
   com a recomendação; o ponto de partida é a pesquisa de
   2026-10-13 em [IA que desenha e resolvedores de restrições
-  2D](../PESQUISA-ABERTA-2026-10.md), que recomenda portar a JS o resolvedor
+  2D](../../PESQUISA-ABERTA-2026-10.md), que recomenda portar a JS o resolvedor
   `cadcraft-constraints` (MIT ou Apache-2.0, pré-alfa), usar o planegcs como
   oráculo nos testes, devolver à IA o relatório do resolvedor (graus de liberdade,
   conflito, restrição redundante) e adotar do AIDL as restrições duras e leves;
@@ -99,7 +99,7 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
 1. **Levantamento.** O agente em Opus 5.5 lê o que a Mecanifica tem, pesquisa o
    que existe pronto, roda o teste do Potrace e do VectorCraft e propõe o módulo,
    o formato salvo e o objeto de prova. A pessoa escolhe. Entregue em 2026-10-14 no
-   [levantamento](../LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md); a pessoa aceitou no
+   [levantamento](../../LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md); a pessoa aceitou no
    mesmo dia as seis recomendações: o planegcs 1.3.0 como resolvedor, a lateral
    sem cabo do braço robótico como objeto de prova, a descrição escrita por ela
    com só a altura e o alcance totais tirados da imagem, a mesma descrição
@@ -108,17 +108,20 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
 2. **Protótipo.** O menor módulo que desenha o objeto de prova a partir de uma
    descrição, provado por teste, pelo crítico e pela referência escondida. A
    pessoa pediu que Claude escrevesse a
-   [descrição](../banco-de-provas/desenho-braco-2026-10-14/DESCRICAO.md) do braço. A
+   [descrição](../../banco-de-provas/desenho-braco-2026-10-14/DESCRICAO.md) do braço. A
    ferramenta está em `modulos/desenho-por-restricoes`, com `npm run desenho` e a
    skill `desenho-por-restricoes`, provada no carrinho de mão e em formas
-   sintéticas. O [resultado](../banco-de-provas/desenho-braco-2026-10-14/RESULTADO.md) do
+   sintéticas. O [resultado](../../banco-de-provas/desenho-braco-2026-10-14/RESULTADO.md) do
    braço deu empate entre restrições e coordenadas. A pessoa escolheu uma segunda prova com a
    lateral da carcaça da empilhadeira, com esta
-   [descrição](../banco-de-provas/desenho-carcaca-2026-10-14/DESCRICAO.md). O
-   [resultado](../banco-de-provas/desenho-carcaca-2026-10-14/RESULTADO.md) da
+   [descrição](../../banco-de-provas/desenho-carcaca-2026-10-14/DESCRICAO.md). O
+   [resultado](../../banco-de-provas/desenho-carcaca-2026-10-14/RESULTADO.md) da
    carcaça repetiu o empate, e nas duas provas o que limitou o acerto foi a
-   descrição.
-3. **Decisão.** A pessoa decide se o módulo segue, muda ou para.
+   descrição. Na rodada de correção da carcaça, pedida pela pessoa, o desenho por
+   restrições subiu de 0,67 para 0,74 e o por coordenadas ficou em 0,65.
+3. **Decisão.** A pessoa decidiu em 2026-10-14 seguir e mudar o rumo: o módulo
+   fica como o formato do desenho, e o sucessor monta peças e famílias de desenho
+   ajustadas às referências que já têm contorno.
 
 ## Riscos e parada
 
@@ -128,22 +131,30 @@ foi calibrado para comparar com referência; se ele não conseguir julgar a vist
 pela descrição, isso vira achado da fatia 2 e a pessoa decide se o crítico ganha um
 modo novo, que pede calibração própria.
 
-## Candidatos de sucessão
+## Sucessor
 
-Os objetos levantados em 2026-10-11 para o mesmo exercício do avião, cada um
-forçando uma falta diferente: a bicicleta (corrente, engrenagem e transmissão, com
-a roda 2.0), a empilhadeira (mastro telescópico com trilho e corrente e várias
-articulações, com o
-[alinhamento](../banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
-começado), a cadeira de escritório (estofado e espuma, base em estrela, pistão a
-gás e rodízio) e um objeto de esteira, como robô de esteira ou escavadeira (o elo
-articulado). E os que o plano [as ferramentas de
-modelagem](encerrados/2026-10-07-as-ferramentas-de-modelagem.md) deixou: o carrinho
-de mão como família de objeto, a bacia em casca como primitiva, a dobradiça de
-caneco e as ressalvas do fechamento dele. E, do [backlog](BACKLOG.md), os atritos
-abertos da segunda rodada do avião, com a integração do detalhe com o mestre como o
-primeiro grupo.
+O próximo plano é o das [famílias de desenho](../2026-10-14-familias-de-desenho.md),
+decidido pela pessoa em 2026-10-14, com o roteiro dos planos seguintes e os
+candidatos de sucessão que estavam aqui.
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-10-14, com a decisão da pessoa. O levantamento foi escrito, com o
+Potrace e o VectorCraft sem ganho sobre a borda subpixel, e a pessoa escolheu as
+seis recomendações (item 1). O módulo `modulos/desenho-por-restricoes` desenha por
+partes e relações com o planegcs 1.3.0, é determinístico, não usa Three.js nem o
+núcleo de autoria, grava o formato dos contornos que o esboço e a prancha leem e
+ganhou na prova o canto arredondado e o texto dentro da folha (item 2). As duas
+provas, o braço robótico e a carcaça da empilhadeira, mediram cada desenho contra a
+referência escondida e foram julgadas pelo crítico (item 3): no primeiro traço as
+restrições empataram com as coordenadas (0,80 contra 0,81 no braço e 0,67 contra
+0,66 na carcaça, com nota 6 e 5 nos dois) e custaram de 60 a 70% mais tokens; na
+correção, ganharam (0,74 contra 0,65). A pessoa não aprovou nenhuma das vistas como
+forma, porque a prova media o caminho e não a forma, e decidiu seguir com base nas
+medidas. A bateria completa passou (item 4).
+
+Ficam como ressalva: o que limitou o acerto foi a descrição, e não a forma de
+desenhar, o que dá ao sucessor o problema certo; a razão da ferramenta mede só o
+anel de fora da silhueta e exagera o acerto quando uma barra fina fecha um vão, como
+o arco traseiro da carcaça; e a paleta do mapa de partes, que confundiu o crítico do
+contorno da carcaça, foi para o backlog.

@@ -1,7 +1,7 @@
 # Carcaça da empilhadeira, vista lateral: a descrição
 
 Segunda prova da fatia 2 do plano [desenho sem
-referência](../../planos/2026-10-13-desenho-sem-referencia.md), escolhida pela pessoa
+referência](../../planos/encerrados/2026-10-13-desenho-sem-referencia.md), escolhida pela pessoa
 em 2026-10-14 porque a lateral da carcaça tem rampa, arcos e curvas que dependem uns
 dos outros, o caso em que as restrições deveriam ganhar das coordenadas. Claude
 olhou a imagem de referência e a descreveu só em palavras e proporções aproximadas,

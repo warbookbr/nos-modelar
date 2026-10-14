@@ -141,7 +141,7 @@ o plano para e redesenha com a pessoa antes de ampliar.
 
 ## Sucessor
 
-O próximo plano é o [desenho sem referência](../2026-10-13-desenho-sem-referencia.md),
+O próximo plano é o [desenho sem referência](2026-10-13-desenho-sem-referencia.md),
 decidido pela pessoa em 2026-10-13. Os candidatos de sucessão levantados aqui em
 2026-10-11 passaram para o fim dele.
 

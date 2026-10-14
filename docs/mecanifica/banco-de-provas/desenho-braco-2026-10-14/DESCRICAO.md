@@ -1,7 +1,7 @@
 # Braço robótico, vista lateral: a descrição
 
 Prova da fatia 2 do plano [desenho sem
-referência](../../planos/2026-10-13-desenho-sem-referencia.md). A pessoa pediu em
+referência](../../planos/encerrados/2026-10-13-desenho-sem-referencia.md). A pessoa pediu em
 2026-10-14 que Claude escrevesse a descrição no lugar dela. Claude olhou a imagem
 de referência e a descreveu só em palavras e proporções aproximadas, como uma
 pessoa faria; as duas únicas medidas tiradas da imagem são a altura e o alcance

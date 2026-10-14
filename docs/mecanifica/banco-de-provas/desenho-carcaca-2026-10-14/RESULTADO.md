@@ -1,7 +1,7 @@
 # Carcaça da empilhadeira, vista lateral: o resultado da prova
 
 Segunda prova da fatia 2 do plano [desenho sem
-referência](../../planos/2026-10-13-desenho-sem-referencia.md), em 2026-10-14. A
+referência](../../planos/encerrados/2026-10-13-desenho-sem-referencia.md), em 2026-10-14. A
 [descrição](DESCRICAO.md) foi desenhada por duas IAs que não viram a imagem: uma por
 restrições ([`restricoes/`](restricoes/lateral.desenho.json)) e outra escrevendo os
 polígonos à mão ([`coordenadas/`](coordenadas/lateral.partes.json)). O registro de

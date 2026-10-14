@@ -1,6 +1,6 @@
 # Braço robótico, vista lateral: o resultado da prova
 
-Fatia 2 do plano [desenho sem referência](../../planos/2026-10-13-desenho-sem-referencia.md),
+Fatia 2 do plano [desenho sem referência](../../planos/encerrados/2026-10-13-desenho-sem-referencia.md),
 em 2026-10-14. A [descrição](DESCRICAO.md) foi desenhada por duas IAs que não viram a
 imagem: uma por restrições, com a ferramenta `npm run desenho`
 ([`restricoes/`](restricoes/lateral.desenho.json)), e outra escrevendo os polígonos à
