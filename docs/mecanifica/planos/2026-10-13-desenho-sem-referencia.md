@@ -111,7 +111,8 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
    [descrição](../banco-de-provas/desenho-braco-2026-10-14/DESCRICAO.md) do braço. A
    ferramenta está em `modulos/desenho-por-restricoes`, com `npm run desenho` e a
    skill `desenho-por-restricoes`, provada no carrinho de mão e em formas
-   sintéticas.
+   sintéticas. O [resultado](../banco-de-provas/desenho-braco-2026-10-14/RESULTADO.md) do
+   braço deu empate entre restrições e coordenadas.
 3. **Decisão.** A pessoa decide se o módulo segue, muda ou para.
 
 ## Riscos e parada
