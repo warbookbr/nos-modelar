@@ -1,39 +1,39 @@
 {
  "naBorda": {
-  "aro": 0.996,
+  "aro": 0.998,
   "banco": 1,
-  "capo": 0.998,
+  "capo": 0.996,
   "cilindro": 0.993,
   "contrapeso": 1,
-  "encosto": 0.995,
+  "encosto": 1,
   "escape": 1,
   "espelho": 1,
   "furo": 1,
-  "garfos": 1,
+  "garfos": 0.999,
   "inclinacao": 1,
   "lateral": 1,
   "luzes": 1,
   "paralama": 1,
   "pedais": 0.924,
-  "piso": 0.992,
+  "piso": 0.991,
   "pocoTraseiro": 1,
   "presilha": 0.955,
   "protetor": 0.998,
-  "rodaDianteira": 0.932,
+  "rodaDianteira": 0.965,
   "rodaTraseira": 0.984,
   "sombra": 0.373,
-  "tampa": 1,
-  "torre": 0.984,
+  "tampa": 0.997,
+  "torre": 0.982,
   "volante": 0.986
  },
  "minimo": 0.8,
  "abaixo": [
   "sombra"
  ],
- "semDonoPx": 2427,
- "semDonoAnexadosPx": 8661,
+ "semDonoPx": 239,
+ "semDonoAnexadosPx": 8739,
  "mascaraSuavizada": {
-  "tirados": 56,
+  "tirados": 53,
   "postos": 110
  },
  "buracosFechados": {
@@ -55,10 +55,10 @@
    "a": "espelho",
    "b": "protetor",
    "caixa": [
-    475,
+    470,
     107,
-    514,
-    147
+    509,
+    151
    ]
   },
   {
@@ -85,9 +85,9 @@
    "a": "garfos",
    "b": "torre",
    "caixa": [
-    262,
-    240,
-    310,
+    278,
+    236,
+    320,
     500
    ]
   },
@@ -106,9 +106,9 @@
    "b": "tampa",
    "caixa": [
     767,
-    250,
-    857,
-    289
+    252,
+    864,
+    291
    ]
   },
   {
@@ -135,10 +135,10 @@
    "a": "capo",
    "b": "protetor",
    "caixa": [
-    730,
-    257,
-    769,
-    296
+    727,
+    264,
+    766,
+    332
    ]
   },
   {
@@ -152,53 +152,13 @@
    ]
   },
   {
-   "a": "pocoTraseiro",
-   "b": "protetor",
-   "caixa": [
-    725,
-    265,
-    764,
-    332
-   ]
-  },
-  {
-   "a": "capo",
-   "b": "pocoTraseiro",
-   "caixa": [
-    734,
-    266,
-    828,
-    404
-   ]
-  },
-  {
    "a": "encosto",
    "b": "protetor",
    "caixa": [
-    675,
-    272,
-    717,
-    311
-   ]
-  },
-  {
-   "a": "encosto",
-   "b": "piso",
-   "caixa": [
-    538,
-    282,
-    717,
-    381
-   ]
-  },
-  {
-   "a": "piso",
-   "b": "protetor",
-   "caixa": [
-    400,
-    282,
+    674,
+    276,
     719,
-    367
+    339
    ]
   },
   {
@@ -206,9 +166,9 @@
    "b": "encosto",
    "caixa": [
     568,
-    283,
+    282,
     681,
-    322
+    321
    ]
   },
   {
@@ -217,18 +177,18 @@
    "caixa": [
     674,
     304,
-    753,
+    754,
     343
    ]
   },
   {
-   "a": "lateral",
-   "b": "pocoTraseiro",
+   "a": "capo",
+   "b": "lateral",
    "caixa": [
-    694,
+    723,
     308,
-    757,
-    484
+    762,
+    405
    ]
   },
   {
@@ -255,20 +215,20 @@
    "a": "inclinacao",
    "b": "torre",
    "caixa": [
-    364,
+    365,
     315,
-    403,
-    357
+    407,
+    365
    ]
   },
   {
-   "a": "lateral",
-   "b": "piso",
+   "a": "encosto",
+   "b": "lateral",
    "caixa": [
-    482,
+    628,
     315,
     698,
-    441
+    377
    ]
   },
   {
@@ -279,6 +239,16 @@
     320,
     744,
     385
+   ]
+  },
+  {
+   "a": "piso",
+   "b": "protetor",
+   "caixa": [
+    395,
+    321,
+    434,
+    367
    ]
   },
   {
@@ -316,19 +286,19 @@
    "b": "torre",
    "caixa": [
     338,
-    333,
-    392,
-    373
+    338,
+    406,
+    377
    ]
   },
   {
    "a": "inclinacao",
    "b": "paralama",
    "caixa": [
-    367,
-    330,
-    411,
-    369
+    377,
+    334,
+    416,
+    373
    ]
   },
   {
@@ -352,26 +322,6 @@
    ]
   },
   {
-   "a": "paralama",
-   "b": "rodaDianteira",
-   "caixa": [
-    339,
-    342,
-    388,
-    381
-   ]
-  },
-  {
-   "a": "rodaDianteira",
-   "b": "torre",
-   "caixa": [
-    302,
-    349,
-    364,
-    512
-   ]
-  },
-  {
    "a": "aro",
    "b": "paralama",
    "caixa": [
@@ -382,13 +332,53 @@
    ]
   },
   {
+   "a": "encosto",
+   "b": "piso",
+   "caixa": [
+    538,
+    345,
+    652,
+    384
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "piso",
+   "caixa": [
+    482,
+    353,
+    652,
+    441
+   ]
+  },
+  {
+   "a": "aro",
+   "b": "torre",
+   "caixa": [
+    374,
+    353,
+    413,
+    392
+   ]
+  },
+  {
    "a": "aro",
    "b": "rodaDianteira",
    "caixa": [
-    378,
-    357,
+    382,
+    364,
     489,
     496
+   ]
+  },
+  {
+   "a": "rodaDianteira",
+   "b": "torre",
+   "caixa": [
+    302,
+    365,
+    406,
+    512
    ]
   },
   {
@@ -396,9 +386,19 @@
    "b": "contrapeso",
    "caixa": [
     804,
-    370,
-    906,
-    409
+    371,
+    905,
+    410
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "pocoTraseiro",
+   "caixa": [
+    732,
+    373,
+    828,
+    412
    ]
   },
   {
@@ -409,6 +409,16 @@
     380,
     884,
     497
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "pocoTraseiro",
+   "caixa": [
+    694,
+    381,
+    756,
+    484
    ]
   },
   {
@@ -435,7 +445,7 @@
    "a": "rodaDianteira",
    "b": "sombra",
    "caixa": [
-    399,
+    319,
     487,
     474,
     546
@@ -450,6 +460,16 @@
     857,
     546
    ]
+  },
+  {
+   "a": "garfos",
+   "b": "sombra",
+   "caixa": [
+    161,
+    484,
+    296,
+    523
+   ]
   }
  ],
  "traco": {
@@ -457,5 +477,147 @@
   "fundoTom": 255,
   "tolerancia": 0.35,
   "subamostras": 8
+ },
+ "formas": {
+  "ajustadas": [
+   {
+    "parte": "lateral",
+    "nome": "fundo da lateral",
+    "forma": "reta",
+    "de": [
+     505,
+     493.6
+    ],
+    "ate": [
+     695,
+     493.6
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "lateral",
+    "nome": "junta com o capo",
+    "forma": "reta",
+    "de": [
+     745,
+     326
+    ],
+    "ate": [
+     745,
+     388
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "lateral",
+    "nome": "rampa",
+    "forma": "curva",
+    "de": [
+     571,
+     416
+    ],
+    "ate": [
+     677,
+     337
+    ],
+    "desvioPx": 0.148402,
+    "verticesAntes": 23,
+    "verticesDepois": 61,
+    "desvioMm": 0.7
+   },
+   {
+    "parte": "lateral",
+    "nome": "borda do degrau",
+    "forma": "reta",
+    "de": [
+     499,
+     428
+    ],
+    "ate": [
+     545,
+     428
+    ],
+    "desvioPx": 0.303443,
+    "verticesAntes": 2,
+    "verticesDepois": 2,
+    "desvioMm": 1.3
+   },
+   {
+    "parte": "lateral",
+    "nome": "topo sob a coluna",
+    "forma": "reta",
+    "de": [
+     710,
+     320.5
+    ],
+    "ate": [
+     739,
+     320.5
+    ],
+    "desvioPx": 0.471243,
+    "verticesAntes": 3,
+    "verticesDepois": 2,
+    "desvioMm": 2.1
+   },
+   {
+    "parte": "capo",
+    "nome": "fundo do capo",
+    "forma": "reta",
+    "de": [
+     752,
+     392.2
+    ],
+    "ate": [
+     870,
+     392.2
+    ],
+    "desvioPx": 0.552633,
+    "verticesAntes": 4,
+    "verticesDepois": 4,
+    "desvioMm": 2.5
+   },
+   {
+    "parte": "paralama",
+    "nome": "topo da aba",
+    "forma": "reta",
+    "de": [
+     353,
+     354.7
+    ],
+    "ate": [
+     392,
+     354.5
+    ],
+    "desvioPx": 0.926149,
+    "verticesAntes": 10,
+    "verticesDepois": 4,
+    "desvioMm": 4.1
+   },
+   {
+    "parte": "paralama",
+    "nome": "fundo da aba",
+    "forma": "reta",
+    "de": [
+     353,
+     360.9
+    ],
+    "ate": [
+     392,
+     360.8
+    ],
+    "desvioPx": 0.717052,
+    "verticesAntes": 6,
+    "verticesDepois": 4,
+    "desvioMm": 3.2
+   }
+  ],
+  "avisos": [],
+  "detalhes": []
  }
 }
