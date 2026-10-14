@@ -1,5 +1,6 @@
 {
  "naBorda": {
+  "aro": 1,
   "capo": 1,
   "contrapeso": 1,
   "encosto": 1,
@@ -85,13 +86,23 @@
    ]
   },
   {
-   "a": "paralama",
+   "a": "aro",
    "b": "piso",
    "caixa": [
-    230,
+    234,
     550,
     421,
     736
+   ]
+  },
+  {
+   "a": "aro",
+   "b": "paralama",
+   "caixa": [
+    226,
+    548,
+    265,
+    587
    ]
   },
   {
@@ -105,11 +116,11 @@
    ]
   },
   {
-   "a": "lateral",
-   "b": "paralama",
+   "a": "aro",
+   "b": "lateral",
    "caixa": [
-    233,
-    561,
+    234,
+    560,
     420,
     736
    ]
