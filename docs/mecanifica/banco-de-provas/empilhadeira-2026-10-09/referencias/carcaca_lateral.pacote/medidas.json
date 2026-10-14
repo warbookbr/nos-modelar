@@ -1,0 +1,343 @@
+{
+ "naBorda": {
+  "capo": 1,
+  "contrapeso": 1,
+  "encosto": 1,
+  "lateral": 1,
+  "longarina": 1,
+  "painel": 1,
+  "paralama": 1,
+  "piso": 1,
+  "suporte": 1,
+  "tampa": 1
+ },
+ "minimo": 0.8,
+ "abaixo": [],
+ "semDonoPx": 0,
+ "semDonoAnexadosPx": 3715,
+ "mascaraSuavizada": {
+  "tirados": 7,
+  "postos": 17
+ },
+ "buracosFechados": {
+  "buracos": 3,
+  "pixels": 4
+ },
+ "divisas": [
+  {
+   "a": "capo",
+   "b": "tampa",
+   "caixa": [
+    918,
+    411,
+    1091,
+    500
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "painel",
+   "caixa": [
+    858,
+    413,
+    937,
+    514
+   ]
+  },
+  {
+   "a": "encosto",
+   "b": "painel",
+   "caixa": [
+    755,
+    441,
+    812,
+    521
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "lateral",
+   "caixa": [
+    858,
+    490,
+    901,
+    638
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "painel",
+   "caixa": [
+    755,
+    487,
+    882,
+    526
+   ]
+  },
+  {
+   "a": "encosto",
+   "b": "lateral",
+   "caixa": [
+    666,
+    497,
+    779,
+    594
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "piso",
+   "caixa": [
+    230,
+    550,
+    421,
+    736
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "suporte",
+   "caixa": [
+    210,
+    553,
+    257,
+    592
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "paralama",
+   "caixa": [
+    233,
+    561,
+    420,
+    736
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "suporte",
+   "caixa": [
+    225,
+    561,
+    264,
+    612
+   ]
+  },
+  {
+   "a": "encosto",
+   "b": "piso",
+   "caixa": [
+    522,
+    565,
+    690,
+    604
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "piso",
+   "caixa": [
+    394,
+    570,
+    691,
+    779
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "contrapeso",
+   "caixa": [
+    949,
+    607,
+    1135,
+    646
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "longarina",
+   "caixa": [
+    791,
+    765,
+    830,
+    804
+   ]
+  },
+  {
+   "a": "contrapeso",
+   "b": "longarina",
+   "caixa": [
+    1006,
+    764,
+    1045,
+    803
+   ]
+  }
+ ],
+ "traco": {
+  "bordaSubpixel": true,
+  "fundoTom": 246,
+  "tolerancia": 0.35,
+  "subamostras": 6
+ },
+ "formas": {
+  "ajustadas": [
+   {
+    "parte": "paralama",
+    "nome": "topo da aba",
+    "forma": "reta",
+    "de": [
+     151,
+     562.5
+    ],
+    "ate": [
+     243,
+     562.5
+    ],
+    "desvioPx": 0.193365,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 0.4
+   },
+   {
+    "parte": "paralama",
+    "nome": "base da aba à frente do suporte",
+    "forma": "reta",
+    "de": [
+     152,
+     572.5
+    ],
+    "ate": [
+     217,
+     572.8
+    ],
+    "desvioPx": 0.78701,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 1.7
+   },
+   {
+    "parte": "lateral",
+    "nome": "base da lateral",
+    "forma": "reta",
+    "de": [
+     420,
+     804.2
+    ],
+    "ate": [
+     785,
+     804.2
+    ],
+    "desvioPx": 0.131785,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0.3
+   },
+   {
+    "parte": "lateral",
+    "nome": "borda dianteira do painel do arco",
+    "forma": "reta",
+    "de": [
+     244,
+     602
+    ],
+    "ate": [
+     244,
+     652
+    ],
+    "desvioPx": 0.148224,
+    "verticesAntes": 1,
+    "verticesDepois": 2,
+    "desvioMm": 0.3
+   },
+   {
+    "parte": "capo",
+    "nome": "divisa vertical com a lateral",
+    "forma": "reta",
+    "de": [
+     874,
+     512
+    ],
+    "ate": [
+     874,
+     622
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "capo",
+    "nome": "base do capô à frente do contrapeso",
+    "forma": "reta",
+    "de": [
+     880,
+     625.8
+    ],
+    "ate": [
+     958,
+     626.5
+    ],
+    "desvioPx": 0.425136,
+    "verticesAntes": 3,
+    "verticesDepois": 4,
+    "desvioMm": 0.9
+   },
+   {
+    "parte": "longarina",
+    "nome": "topo da longarina",
+    "forma": "reta",
+    "de": [
+     815,
+     781.3
+    ],
+    "ate": [
+     1020,
+     781.2
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "longarina",
+    "nome": "base da longarina",
+    "forma": "reta",
+    "de": [
+     815,
+     788.2
+    ],
+    "ate": [
+     1020,
+     788.3
+    ],
+    "desvioPx": 0.145918,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0.3
+   },
+   {
+    "parte": "contrapeso",
+    "nome": "base do contrapeso",
+    "forma": "reta",
+    "de": [
+     1032,
+     793.5
+    ],
+    "ate": [
+     1085,
+     793.4
+    ],
+    "desvioPx": 0.095349,
+    "verticesAntes": 0,
+    "verticesDepois": 2,
+    "desvioMm": 0.2
+   }
+  ],
+  "avisos": [],
+  "detalhes": []
+ }
+}
