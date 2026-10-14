@@ -108,7 +108,10 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
 2. **Protótipo.** O menor módulo que desenha o objeto de prova a partir de uma
    descrição, provado por teste, pelo crítico e pela referência escondida. A
    pessoa pediu que Claude escrevesse a
-   [descrição](../banco-de-provas/desenho-braco-2026-10-14/DESCRICAO.md) do braço.
+   [descrição](../banco-de-provas/desenho-braco-2026-10-14/DESCRICAO.md) do braço. A
+   ferramenta está em `modulos/desenho-por-restricoes`, com `npm run desenho` e a
+   skill `desenho-por-restricoes`, provada no carrinho de mão e em formas
+   sintéticas.
 3. **Decisão.** A pessoa decide se o módulo segue, muda ou para.
 
 ## Riscos e parada

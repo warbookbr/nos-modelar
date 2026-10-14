@@ -32,6 +32,10 @@ ele. A definição completa está em
   que só olha imagem e diz se o modelo bate com o alvo.
 - [`contorno-da-imagem`](modulos/contorno-da-imagem/): tira de uma imagem de
   referência o contorno de cada parte, em milímetro.
+- [`desenho-por-restricoes`](modulos/desenho-por-restricoes/): desenha a vista de
+  um objeto sem imagem de referência, a partir de partes, pontos e relações em
+  milímetro resolvidos pelo planegcs, e grava os contornos no formato dos da
+  imagem (`npm run desenho`).
 - [`exportador-cad`](modulos/exportador-cad/) e
   [`exportador-obj`](modulos/exportador-obj/): exportam a malha neutra para STEP
   e para OBJ com partes nomeadas.

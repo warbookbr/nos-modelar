@@ -1,0 +1,53 @@
+/* ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@1`, as relações, o lado e o que cada estado do
+   relatório pede. É o que `npm run desenho -- --ajuda` imprime; a explicação completa está no README do módulo. */
+
+export function textoDaAjuda() {
+  return `desenho por restrições: a IA declara pontos, partes e relações em milímetro, o resolvedor dá a geometria.
+
+COMANDOS
+  npm run desenho -- <vista>.desenho.json          resolve, grava <vista>.contornos.json e <vista>.png e imprime o relatório
+  npm run desenho -- <vista>.desenho.json --so-relatorio   só o relatório, sem gravar
+  npm run desenho -- <vista>.desenho.json --json          o relatório em JSON
+  npm run desenho -- razao <a.contornos.json> <b.contornos.json> [--parte-a=<nome>] [--parte-b=<nome>] [--ponto-a=h,v --ponto-b=h,v]
+                                                   razão interseção/união entre dois contornos
+  npm run desenho -- --ajuda                       este texto
+  Códigos de saída: 0 resolvido; 2 uso errado ou arquivo ilegível; 3 descrição inválida; 4 não resolvido (conflito, solto ou lado trocado).
+
+O ARQUIVO <vista>.desenho.json
+  { "formato": "mecanifica.desenho@1", "objeto": "<nome>", "vista": "lateral" | "topo" | "frontal", "olhando": "<de que lado se olha>",
+    "referencias": { "chao": { "reta": "horizontal", "v": 0 }, "eixo": { "reta": "vertical", "h": 0 } },
+    "pontos": { "A": [h, v], ... },                 chute inicial de cada ponto; h para a direita, v para cima
+    "partes": { "<nome>": { "circulo": { "centro": "A" } } | { "barra": ["A","B"], "espessura": 40 } |
+                          { "poligono": ["A","B","C"] } | { "arco": { "centro": "A", "inicio": "B", "fim": "C" }, "fecha": "corda" | "centro" },
+                "foraDoModelo": true (opcional: a parte não entra na silhueta) },
+    "frenteParaFundo": ["<parte>", ...],            opcional: quem esconde quem; sem ele as partes não se escondem
+    "relacoes": [ { "nome": "<único>", "<tipo>": ..., "mm" | "graus" | "lado" | "por": ... } ] }
+
+AS RELAÇÕES (cada uma tem um nome, que volta no relatório)
+  sobre         ["P", reta | círculo | arco]            o ponto fica sobre a reta ou a curva
+  coincidente   ["P", "Q"]                              os dois pontos são um só
+  distancia     ["P", "Q"], mm                          distância entre pontos
+                ["P", reta], mm, lado                   distância de um ponto a uma reta; o lado é obrigatório
+  raio          "<círculo ou arco>", mm
+  tangente      ["<círculo>", reta], lado               o círculo toca a reta, e o centro fica do lado dito
+                ["<círculo>", "<círculo>"], por         por "fora" ou por "dentro"
+  paralela      [reta, reta]
+  perpendicular [reta, reta]
+  vertical      ["P", "Q"]                              os dois pontos têm o mesmo h
+  horizontal    ["P", "Q"]                              os dois pontos têm o mesmo v
+  angulo        [reta, reta], graus                     da primeira reta para a segunda, anti-horário
+  igual         [reta, reta] (mesmo comprimento) ou [círculo, círculo] (mesmo raio)
+  Uma reta é o nome de uma referência, o nome de uma barra (o eixo dela) ou dois pontos ["P","Q"], na ordem que dá o sentido.
+
+O LADO
+  A distância de um ponto a uma reta e a tangência não têm sinal: o resolvedor aceita os dois lados e o chute decide. Por isso o
+  "lado" (acima = v maior; abaixo; direita = h maior; esquerda) é obrigatório, e é conferido depois de resolver.
+
+O RELATÓRIO
+  resolvido     0 graus de liberdade: grava os contornos e a vista em traço, e lista as medidas derivadas para você conferir.
+  conflito      lista as relações que não cabem juntas, pelo nome. Corrija o valor ou apague uma; não mexa nas coordenadas.
+  solto         lista as partes e os pontos que ainda se movem. Acrescente relações que os prendam.
+  lado trocado  a solução ficou do lado oposto ao "lado" declarado. Diz a relação, o lado pedido e o lado em que ficou, e o chute
+                refletido que resolve. Redundância é só aviso.
+`;
+}

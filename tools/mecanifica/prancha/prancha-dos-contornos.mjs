@@ -45,6 +45,11 @@
  * lista as faltas por parte (`cotasDaPrancha`). Grava
  * também `<imagem>.prancha.pacote/roteiro.md`, o roteiro do crítico.
  *
+ * O arquivo de contornos também pode vir de um desenho por restrições
+ * (`npm run desenho`, `<vista>.contornos.json` com `origem` no lugar de
+ * `imagem`): a prancha lê os mesmos campos e escreve de onde o desenho veio, e
+ * o alvo do roteiro do crítico é a vista em traço `<vista>.png`.
+ *
  * USO
  *   npm run contorno:prancha -- <imagem>.contornos.json [--titulo=<texto>]
  *   npm run contorno:prancha -- <imagem>.contornos.json --acao
@@ -117,7 +122,10 @@ export function vistaDasEscolhas(escolhas = {}) {
 export function specDosContornos(contornos, { titulo, fonte = 'imagem de referência', escolhas = {}, lerVista = null } = {}) {
   const vista = vistaDasEscolhas(escolhas);
   const { palavras, rotulo } = VISTAS_DA_PRANCHA[vista];
-  titulo ??= `${VISTAS_DA_PRANCHA[vista].titulo} pelos contornos da imagem`;
+  /* Contorno que vem do módulo `desenho-por-restricoes` traz `origem` (o arquivo de desenho e o resolvedor) no lugar de `imagem`, `mmPorPx` e
+     das sementes do watershed: a prancha diz de onde o desenho veio em vez de dizer referência raster. */
+  const doDesenho = Boolean(contornos.origem);
+  titulo ??= `${VISTAS_DA_PRANCHA[vista].titulo} ${doDesenho ? 'pelo desenho por restrições' : 'pelos contornos da imagem'}`;
   const silhueta = contornos.silhueta?.contornoMm;
   if (!Array.isArray(silhueta) || silhueta.length < 3) throw new Error('o arquivo de contornos não traz a silhueta; gere de novo com `npm run contorno`.');
   /* A silhueta inteira é a união dos pedaços: a parte fora do modelo corta a
@@ -380,12 +388,16 @@ export function specDosContornos(contornos, { titulo, fonte = 'imagem de referê
   const spec = {
     autoria: {
       versao: 'mecanifica.prancha-autoria@1', estado: 'pronta', modo: 'parcial', confianca: 'media',
-      intencao: `vista ${vista} com a silhueta e o contorno de cada parte tirados da imagem de referência`,
-      procedencias: [{ id: 'contornos', tipo: 'referencia-raster-derivada', evidencia: `${fonte}, ${contornos.mmPorPx} mm por pixel, calibrada por duas âncoras` }],
+      intencao: doDesenho ? `vista ${vista} com a silhueta e o contorno de cada parte do desenho por restrições, em milímetro` : `vista ${vista} com a silhueta e o contorno de cada parte tirados da imagem de referência`,
+      procedencias: [doDesenho
+        ? { id: 'contornos', tipo: 'medidas-declaradas', evidencia: `desenho por restrições ${contornos.origem.desenho ?? fonte}, resolvido por ${contornos.origem.resolvedor ?? 'um resolvedor de restrições'}${contornos.origem.sha256 ? `, sha256 ${String(contornos.origem.sha256).slice(0, 12)}` : ''}` }
+        : { id: 'contornos', tipo: 'referencia-raster-derivada', evidencia: `${fonte}, ${contornos.mmPorPx} mm por pixel, calibrada por duas âncoras` }],
       incertezas: [],
     },
     titulo,
-    subtitulo: `Milímetros. ${nomes.length} partes pelo watershed com sementes. Parte escondida atrás de outra aparece só no pedaço visível.`,
+    subtitulo: doDesenho
+      ? `Milímetros. ${nomes.length} partes do desenho por restrições. Parte escondida atrás de outra aparece só no pedaço visível.`
+      : `Milímetros. ${nomes.length} partes pelo watershed com sementes. Parte escondida atrás de outra aparece só no pedaço visível.`,
     escala,
     tela: { largura: layout.largura, altura: Math.max(TELA.altura, Math.ceil(topo + (yMax - yMin) * escala + dLarg + 30)) },
     limites,

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1208 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1213 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -59,6 +59,10 @@
 ## .claude/skills/desenhar-prancha/
 
 - `SKILL.md` — Desenha a prancha ortográfica alvo (silhueta, aberturas, painéis e cotas nas vistas lateral, frontal, traseira e superior). Use para produzir ou corrigir o d…
+
+## .claude/skills/desenho-por-restricoes/
+
+- `SKILL.md` — Desenha a vista de um objeto sem imagem de referência, por partes, pontos e relações em milímetro que um resolvedor transforma em contorno. Use quando só há …
 
 ## .claude/skills/esbocar-opcoes/
 
@@ -531,6 +535,10 @@
 - `contorno.test.js` — contorno.test.js — cada peça do módulo vista num caso construído de propósito: duas partes do mesmo cinza separadas pela semente, a pintura com a opacidade p…
 - `forma-declarada.test.js` — forma-declarada.test.js — o desenhador declara que um trecho da borda é reta, curva ou detalhe; a ferramenta ajusta quando a imagem concorda e avisa, sem aju…
 
+## modulos/desenho-por-restricoes/
+
+- `README.md` — @mecanifica/desenho-por-restricoes
+
 ## modulos/desenho-por-restricoes/src/
 
 - `ajuda.js` — ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@1`, as relações, o lado e o que cada estado do relatório pede. É o que `…
@@ -553,6 +561,8 @@
 - `formas.js` — formas.js — objetos sintéticos pequenos para os testes do desenho por restrições: uma chapa com furo e trava (polígono, círculo, barra e as relações paralela…
 - `formas.test.js` — formas.test.js — as outras relações e partes do formato (arco, círculo, barra, polígono, paralela, perpendicular, igual, ângulo, sobre um círculo e tangência…
 - `formato.test.js` — formato.test.js — a validação do `mecanifica.desenho@1` recusa cada erro dizendo o nome do que está errado e como corrigir, e aceita o carrinho.
+- `modulo.test.js` — modulo.test.js — o módulo fica isolado (não importa Three.js, o núcleo de autoria nem outro módulo), o resolvedor está fixado em 1.3.0 e a versão que o conto…
+- `razao.test.js` — razao.test.js — a razão interseção/união entre dois contornos, sem alinhar, alinhada por um ponto declarado e pela melhor translação.
 
 ## modulos/esboco/
 
@@ -1518,6 +1528,7 @@
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `desenho.mjs` — desenho.mjs — a porta de linha de comando do módulo `modulos/desenho-por-restricoes`, que desenha a vista de um objeto sem imagem de referência: a IA declara…
+- `desenho.test.mjs` — desenho.test.mjs — a porta `npm run desenho`: resolve e grava os contornos e a vista em traço com a mesma saída byte a byte, não grava nos estados que não re…
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
