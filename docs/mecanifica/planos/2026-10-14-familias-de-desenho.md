@@ -105,8 +105,8 @@ só a saída para a pessoa e o crítico.
    [desenho às cegas](../banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/NOTAS.md)
    com dez dos quinze parâmetros presos no limite da faixa. O
    [resultado](../banco-de-provas/familias-de-desenho-2026-10-14/prova/RESULTADO.md)
-   dá 0,767 às cegas, 0,815 com a família ajustada à foto dentro das faixas e 0,906
-   com as faixas abertas, doze parâmetros fora delas: uma referência não basta para
+   dá 0,767 às cegas, 0,815 com a família ajustada à foto dentro das faixas e 0,908
+   com as faixas abertas, treze parâmetros fora delas: uma referência não basta para
    a faixa de uma família.
 
 A ordem mudou em 2026-10-14, a pedido da pessoa, para agentes trabalharem em

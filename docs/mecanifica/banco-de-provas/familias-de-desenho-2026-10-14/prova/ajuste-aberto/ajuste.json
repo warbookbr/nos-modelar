@@ -1,115 +1,129 @@
 {
- "modo": "aberta",
- "iou": 0.9060528473429752,
+ "familia": "carcaca-empilhadeira",
+ "versao": "1.0.0",
+ "referencia": "docs/mecanifica/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.contornos.json",
+ "sha256DaReferencia": "94c2891b51cc10c9c103b9a90adbeac16ff5abc60f87481e21aa6ba2b4aa6828",
+ "medida": "regioes",
+ "abrir": 0.4,
+ "inicio": 0.814491,
+ "iou": 0.9082473395194431,
  "deslocamento": [
-  136.25,
-  0
+  136.580219,
+  0.15827574999999472
  ],
- "avaliacoes": 526,
+ "avaliacoes": 721,
+ "recusados": 165,
  "valores": {
-  "altura": 990.7,
-  "arcoD": 443.1,
-  "arcoT": 1823.6,
-  "aro": 346,
+  "altura": 991.7,
+  "arcoD": 466.6,
+  "arcoT": 1824,
+  "aro": 301,
   "avanco": 122.4,
-  "capo": 977.9,
+  "capo": 981.2,
   "comprimento": 2320,
-  "encosto": 825.1,
-  "painel": 984.3,
-  "piso": 594.6,
-  "posto": 269.9,
-  "raioT": 267.1,
+  "encosto": 828.1,
+  "painel": 988.9,
+  "piso": 568.5,
+  "posto": 331.9,
+  "raioT": 268.2,
   "rampa": 34.35,
-  "topo": 728,
-  "vaoD": 304
+  "topo": 568.3,
+  "vaoD": 301.1
  },
  "noLimite": [
-  "altura",
-  "arcoD",
-  "arcoT",
-  "avanco",
-  "capo",
-  "comprimento",
-  "encosto",
-  "painel",
-  "piso",
-  "posto",
-  "raioT",
-  "topo",
-  "vaoD"
+  "comprimento"
  ],
  "foraDaFaixa": [
   {
    "parametro": "altura",
-   "valor": 990.7,
+   "valor": 991.7,
    "minimo": 842,
-   "maximo": 866
+   "maximo": 866,
+   "unidade": "mm"
   },
   {
    "parametro": "arcoD",
-   "valor": 443.1,
+   "valor": 466.6,
    "minimo": 295,
-   "maximo": 340
+   "maximo": 340,
+   "unidade": "mm"
   },
   {
    "parametro": "arcoT",
-   "valor": 1823.6,
+   "valor": 1824,
    "minimo": 1530,
-   "maximo": 1780
+   "maximo": 1780,
+   "unidade": "mm"
+  },
+  {
+   "parametro": "aro",
+   "valor": 301,
+   "minimo": 325,
+   "maximo": 370,
+   "unidade": "mm"
   },
   {
    "parametro": "avanco",
    "valor": 122.4,
    "minimo": 185,
-   "maximo": 225
+   "maximo": 225,
+   "unidade": "mm"
   },
   {
    "parametro": "capo",
-   "valor": 977.9,
+   "valor": 981.2,
    "minimo": 808,
-   "maximo": 834
+   "maximo": 834,
+   "unidade": "mm"
   },
   {
    "parametro": "encosto",
-   "valor": 825.1,
+   "valor": 828.1,
    "minimo": 680,
-   "maximo": 735
+   "maximo": 735,
+   "unidade": "mm"
   },
   {
    "parametro": "painel",
-   "valor": 984.3,
+   "valor": 988.9,
    "minimo": 830,
-   "maximo": 852
+   "maximo": 852,
+   "unidade": "mm"
   },
   {
    "parametro": "piso",
-   "valor": 594.6,
+   "valor": 568.5,
    "minimo": 450,
-   "maximo": 500
+   "maximo": 500,
+   "unidade": "mm"
   },
   {
    "parametro": "posto",
-   "valor": 269.9,
+   "valor": 331.9,
    "minimo": 225,
-   "maximo": 260
+   "maximo": 260,
+   "unidade": "mm"
   },
   {
    "parametro": "raioT",
-   "valor": 267.1,
+   "valor": 268.2,
    "minimo": 210,
-   "maximo": 255
+   "maximo": 255,
+   "unidade": "mm"
   },
   {
    "parametro": "topo",
-   "valor": 728,
+   "valor": 568.3,
    "minimo": 620,
-   "maximo": 680
+   "maximo": 680,
+   "unidade": "mm"
   },
   {
    "parametro": "vaoD",
-   "valor": 304,
+   "valor": 301.1,
    "minimo": 205,
-   "maximo": 245
+   "maximo": 245,
+   "unidade": "mm"
   }
  ]
 }
