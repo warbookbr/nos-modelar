@@ -31,7 +31,7 @@
   "sombra"
  ],
  "semDonoPx": 239,
- "semDonoAnexadosPx": 8739,
+ "semDonoAnexadosPx": 8709,
  "mascaraSuavizada": {
   "tirados": 53,
   "postos": 110
@@ -65,9 +65,9 @@
    "a": "banco",
    "b": "protetor",
    "caixa": [
-    667,
-    177,
-    706,
+    670,
+    176,
+    709,
     231
    ]
   },
@@ -85,10 +85,10 @@
    "a": "garfos",
    "b": "torre",
    "caixa": [
-    278,
+    288,
     236,
-    320,
-    500
+    327,
+    495
    ]
   },
   {
@@ -106,49 +106,49 @@
    "b": "tampa",
    "caixa": [
     767,
-    252,
+    250,
     864,
-    291
+    289
    ]
   },
   {
    "a": "escape",
    "b": "tampa",
    "caixa": [
-    736,
-    253,
-    779,
-    292
+    735,
+    252,
+    774,
+    291
    ]
   },
   {
    "a": "protetor",
    "b": "tampa",
    "caixa": [
-    729,
+    728,
     254,
-    768,
+    767,
     293
-   ]
-  },
-  {
-   "a": "capo",
-   "b": "protetor",
-   "caixa": [
-    727,
-    264,
-    766,
-    332
    ]
   },
   {
    "a": "capo",
    "b": "tampa",
    "caixa": [
-    740,
-    264,
+    738,
+    263,
     885,
     320
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "protetor",
+   "caixa": [
+    726,
+    264,
+    765,
+    332
    ]
   },
   {
@@ -238,7 +238,7 @@
     685,
     320,
     744,
-    385
+    387
    ]
   },
   {
@@ -353,20 +353,10 @@
   },
   {
    "a": "aro",
-   "b": "torre",
-   "caixa": [
-    374,
-    353,
-    413,
-    392
-   ]
-  },
-  {
-   "a": "aro",
    "b": "rodaDianteira",
    "caixa": [
-    382,
-    364,
+    380,
+    355,
     489,
     496
    ]
@@ -375,9 +365,9 @@
    "a": "rodaDianteira",
    "b": "torre",
    "caixa": [
-    302,
-    365,
-    406,
+    301,
+    356,
+    395,
     512
    ]
   },
@@ -611,10 +601,10 @@
      392,
      360.8
     ],
-    "desvioPx": 0.717052,
+    "desvioPx": 0.564117,
     "verticesAntes": 6,
     "verticesDepois": 4,
-    "desvioMm": 3.2
+    "desvioMm": 2.5
    }
   ],
   "avisos": [],
