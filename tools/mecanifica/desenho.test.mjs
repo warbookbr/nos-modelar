@@ -195,18 +195,95 @@ describe('npm run desenho -- razao', () => {
     expect((await rodar([arquivo])).codigo).toBe(0);
     const contornos = JSON.parse(readFileSync(join(dir, 'lateral.contornos.json'), 'utf8'));
     const mover = (anel) => anel.map(([h, v]) => [h + 40, v + 10]);
-    const outro = { ...contornos, silhueta: { ...contornos.silhueta, contornoMm: mover(contornos.silhueta.contornoMm), pedacos: contornos.silhueta.pedacos.map((p) => ({ ...p, contornoMm: mover(p.contornoMm) })) } };
+    const deslocar = (f) => ({ ...f, contornoMm: mover(f.contornoMm), pedacos: f.pedacos.map((p) => ({ ...p, contornoMm: mover(p.contornoMm) })) });
+    const outro = { ...contornos, silhueta: deslocar(contornos.silhueta), regioes: Object.fromEntries(Object.entries(contornos.regioes).map(([nome, regiao]) => [nome, deslocar(regiao)])) };
     const b = escrever(dir, 'outro.contornos.json', outro);
     const r = await rodar(['razao', join(dir, 'lateral.contornos.json'), b, '--ponto-a=0,0', '--ponto-b=40,10']);
     expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/razão interseção\/união, união das regiões de lateral\.contornos\.json contra união das regiões de outro\.contornos\.json \(sem as regiões foraDoModelo\)/);
     expect(r.out).toMatch(/sem alinhar \(origens como estão\): 0,\d{4}/);
     expect(r.out).toMatch(/alinhada pelo ponto declarado: 1,0000 \(o segundo contorno deslocado de \[-40,00; -10,00\] mm\)/);
     expect(r.out).toMatch(/alinhada pela melhor translação: 1,0000/);
+    /* O carrinho não tem vão cercado: a silhueta dá os mesmos números, e nada sai ao lado. */
+    expect(r.out).not.toMatch(/pela silhueta|as duas medidas diferem/);
     const json = await rodar(['razao', join(dir, 'lateral.contornos.json'), b, '--json']);
+    expect(JSON.parse(json.out)).toMatchObject({ medida: 'regioes', comparada: null });
     expect(JSON.parse(json.out).melhorTranslacao.iou).toBeCloseTo(1, 4);
     const roda = await rodar(['razao', join(dir, 'lateral.contornos.json'), join(dir, 'lateral.contornos.json'), '--parte-a=roda', '--parte-b=roda', '--json']);
     expect(JSON.parse(roda.out).semAlinhar.iou).toBe(1);
+    const parte = await rodar(['razao', join(dir, 'lateral.contornos.json'), join(dir, 'lateral.contornos.json'), '--parte-a=roda', '--parte-b=roda']);
+    expect(parte.out).toMatch(/^razão interseção\/união, parte roda de lateral\.contornos\.json contra parte roda de lateral\.contornos\.json\n/);
   }, 120_000);
+
+  describe('a medida: a união das regiões é o padrão, e o anel de fora da silhueta é a opção', () => {
+    /* Um corpo sobre dois pés e uma longarina fina: a longarina fecha o vão entre os pés (220 por 90 mm), e a silhueta, só com o anel de fora, o enche. */
+    const retangulo = (h0, v0, h1, v1) => [[h0, v0], [h1, v0], [h1, v1], [h0, v1]];
+    const regiao = (anel) => ({ contornoMm: anel, pedacos: [{ contornoMm: anel }] });
+    const contorno = (regioes, silhueta) => ({ formato: 'mecanifica.contornos@1', silhueta: { contornoMm: silhueta, pedacos: [{ contornoMm: silhueta }] }, regioes });
+    const arquivos = () => {
+      const dir = pasta();
+      const referencia = escrever(dir, 'referencia.contornos.json', contorno({
+        corpo: regiao(retangulo(0, 100, 300, 200)), peEsquerdo: regiao(retangulo(0, 10, 40, 100)), peDireito: regiao(retangulo(260, 10, 300, 100)), longarina: regiao(retangulo(0, 0, 300, 10)),
+      }, retangulo(0, 0, 300, 200)));
+      const cheio = escrever(dir, 'cheio.contornos.json', contorno({ bloco: regiao(retangulo(0, 0, 300, 200)) }, retangulo(0, 0, 300, 200)));
+      return { dir, referencia, cheio };
+    };
+
+    it('o vão fechado por uma barra fina: a razão padrão não o enche, e a da silhueta, impressa ao lado, o enche', async () => {
+      const { referencia, cheio } = arquivos();
+      const r = await rodar(['razao', referencia, cheio]);
+      expect(r.codigo).toBe(0);
+      expect(r.out).toMatch(/^razão interseção\/união, união das regiões de referencia\.contornos\.json contra união das regiões de cheio\.contornos\.json \(sem as regiões foraDoModelo\)\n/);
+      expect(r.out).toMatch(/sem alinhar \(origens como estão\): 0,6700 \(pela silhueta: 1,0000\)/);
+      expect(r.out).toMatch(/alinhada pela melhor translação: 0,6700 \(pela silhueta: 1,0000\) \(o segundo contorno deslocado de/);
+      expect(r.out).toMatch(/áreas: 40200 mm² e 60000 mm² \(pela silhueta: 60000 mm² e 60000 mm²\)/);
+      expect(r.out).toMatch(/as duas medidas diferem: .*Razões de medidas diferentes não se comparam; a padrão é a união das regiões e --medida=silhueta escolhe a outra\./);
+    });
+
+    it('--medida=silhueta dá a medida antiga e imprime a padrão ao lado; --medida=regioes é o padrão', async () => {
+      const { referencia, cheio } = arquivos();
+      const antiga = await rodar(['razao', referencia, cheio, '--medida=silhueta']);
+      expect(antiga.codigo).toBe(0);
+      expect(antiga.out).toMatch(/^razão interseção\/união, silhueta \(anel de fora\) de referencia\.contornos\.json contra silhueta \(anel de fora\) de cheio\.contornos\.json\n/);
+      expect(antiga.out).not.toMatch(/foraDoModelo/);
+      expect(antiga.out).toMatch(/sem alinhar \(origens como estão\): 1,0000 \(pela união das regiões: 0,6700\)/);
+      expect(antiga.out).toMatch(/áreas: 60000 mm² e 60000 mm² \(pela união das regiões: 40200 mm² e 60000 mm²\)/);
+      const explicita = await rodar(['razao', referencia, cheio, '--medida=regioes']);
+      expect(explicita.out).toBe((await rodar(['razao', referencia, cheio])).out);
+    });
+
+    it('--json traz a medida usada e a outra com os mesmos campos', async () => {
+      const { referencia, cheio } = arquivos();
+      const nova = JSON.parse((await rodar(['razao', referencia, cheio, '--json'])).out);
+      expect(nova.medida).toBe('regioes');
+      expect(nova.semAlinhar.iou).toBeCloseTo(0.67, 6);
+      expect(nova.comparada).toMatchObject({ medida: 'silhueta', areaA: 60000, semAlinhar: { iou: 1 } });
+      const antiga = JSON.parse((await rodar(['razao', referencia, cheio, '--medida=silhueta', '--json'])).out);
+      expect(antiga).toMatchObject({ medida: 'silhueta', semAlinhar: { iou: 1 }, comparada: { medida: 'regioes' } });
+    });
+
+    it('uma medida desconhecida sai com 2 dizendo as que existem, e a ajuda e o uso trazem a opção', async () => {
+      const { referencia, cheio } = arquivos();
+      const r = await rodar(['razao', referencia, cheio, '--medida=contorno']);
+      expect(r.codigo).toBe(2);
+      expect(r.err).toMatch(/a medida deve ser "regioes" ou "silhueta" \(--medida=<nome> no comando\), e veio "contorno"/);
+      expect((await rodar(['razao', referencia])).err).toMatch(/\[--medida=regioes\|silhueta\]/);
+      const ajuda = await rodar(['--ajuda']);
+      expect(ajuda.out).toMatch(/\[--medida=regioes\|silhueta\]/);
+      expect(ajuda.out).toMatch(/A RAZÃO \(razao\)/);
+    });
+
+    it('um arquivo sem regiões é recusado na medida padrão e medido com --medida=silhueta', async () => {
+      const dir = pasta();
+      const sem = escrever(dir, 'sem.contornos.json', contorno({}, retangulo(0, 0, 100, 50)));
+      const r = await rodar(['razao', sem, sem]);
+      expect(r.codigo).toBe(2);
+      expect(r.err).toMatch(/o primeiro contorno: não traz regiões para somar; a medida "silhueta" mede o anel de fora da silhueta/);
+      const ok = await rodar(['razao', sem, sem, '--medida=silhueta']);
+      expect(ok.codigo).toBe(0);
+      expect(ok.out).toMatch(/sem alinhar \(origens como estão\): 1,0000\n/);
+    });
+  });
 
   it('recusa o uso errado dizendo o que falta', async () => {
     const dir = pasta();

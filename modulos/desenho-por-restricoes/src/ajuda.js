@@ -8,8 +8,8 @@ COMANDOS
   npm run desenho -- <vista>.desenho.json          resolve, grava <vista>.contornos.json e <vista>.png e imprime o relatório
   npm run desenho -- <vista>.desenho.json --so-relatorio   só o relatório, sem gravar
   npm run desenho -- <vista>.desenho.json --json          o relatório em JSON
-  npm run desenho -- razao <a.contornos.json> <b.contornos.json> [--parte-a=<nome>] [--parte-b=<nome>] [--ponto-a=h,v --ponto-b=h,v]
-                                                   razão interseção/união entre dois contornos
+  npm run desenho -- razao <a.contornos.json> <b.contornos.json> [--parte-a=<nome>] [--parte-b=<nome>] [--ponto-a=h,v --ponto-b=h,v] [--medida=regioes|silhueta]
+                                                   razão interseção/união entre dois contornos (ver A RAZÃO)
   npm run desenho -- --ajuda                       este texto
   Códigos de saída: 0 resolvido; 2 uso errado ou arquivo ilegível; 3 descrição inválida; 4 não resolvido (conflito, solto ou lado trocado).
 
@@ -49,8 +49,17 @@ O LADO
   A distância de um ponto a uma reta e a tangência não têm sinal: o resolvedor aceita os dois lados e o chute decide. Por isso o
   "lado" (acima = v maior; abaixo; direita = h maior; esquerda) é obrigatório, e é conferido depois de resolver.
 
+A RAZÃO (razao)
+  Mede o primeiro contorno contra o segundo sobre os polígonos, sem rasterizar, de três jeitos: sem alinhar, pelo ponto declarado
+  (--ponto-a e --ponto-b) e pela melhor translação, que separa o erro de posição do erro de forma.
+  --medida=regioes (padrão)   a união das regiões de cada arquivo, sem as foraDoModelo. O vão que as regiões cercam, como o arco da
+                              roda sob a longarina, fica de fora; o anel de fora da silhueta o enche e exagera o acerto.
+  --medida=silhueta           a medida antiga, o anel de fora da silhueta.
+  Quando a outra medida dá um número diferente, ele sai ao lado, para ninguém comparar razões de medidas diferentes sem saber.
+  --parte-a e --parte-b medem uma região pelo nome e não dependem da medida. O arquivo precisa de regiões para a medida padrão.
+
 O RELATÓRIO
-  resolvido     0 graus de liberdade: grava os contornos e a vista em traço, e lista as medidas derivadas para você conferir.
+  resolvido    0 graus de liberdade: grava os contornos e a vista em traço, e lista as medidas derivadas para você conferir.
   conflito      lista as relações que não cabem juntas, pelo nome. Corrija o valor ou apague uma; não mexa nas coordenadas.
   solto         lista as partes e os pontos que ainda se movem. Acrescente relações que os prendam.
   lado trocado  a solução ficou do lado oposto ao "lado" declarado. Diz a relação, o lado pedido e o lado em que ficou, e o chute

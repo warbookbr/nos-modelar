@@ -61,7 +61,16 @@ async function comSecoes(fn) {
   try { return fn(CS, guardar); } finally { for (const x of limpar) x.delete(); }
 }
 
-const secaoDe = (CS, guardar, aneis) => guardar(new CS(aneis.map((a) => (areaDoAnel(a) < 0 ? [...a].reverse() : a)), 'NonZero'));
+/* Uma forma de várias regiões, que é como o arquivo de contornos desenha o objeto: cada região é uma lista de anéis lida pelo
+   preenchimento par-ímpar (um anel dentro de outro é um furo, qualquer que seja o sentido dele), e a forma é a união das regiões.
+   O vão que as regiões cercam e nenhuma cobre fica de fora da forma e sai da área; a lista de anéis de `secaoDe` abaixo, que une
+   todos, o enche quando o anel de fora é só o que se guarda. */
+export const deRegioes = (regioes) => ({ regioes });
+
+const secaoDe = (CS, guardar, forma) => {
+  if (!Array.isArray(forma)) return guardar(CS.union(forma.regioes.map((aneis) => guardar(new CS(aneis, 'EvenOdd')))));
+  return guardar(new CS(forma.map((a) => (areaDoAnel(a) < 0 ? [...a].reverse() : a)), 'NonZero'));
+};
 
 export function uniao(aneis) {
   return comSecoes((CS, g) => componentesDe(secaoDe(CS, g, aneis)));
@@ -85,7 +94,8 @@ export function areasDaInterseccao(a, b) {
   });
 }
 
-/* O mesmo que `areasDaInterseccao`, com `b` deslocado de `[dh, dv]`. */
+/* O mesmo que `areasDaInterseccao`, com `b` deslocado de `[dh, dv]`. Cada forma é uma lista de anéis ou uma forma de regiões
+   (`deRegioes`), e `a` e `b` são as áreas dela, com os furos descontados. */
 export function areasComDeslocamento(a, b, [dh, dv]) {
   return comSecoes((CS, g) => {
     const sa = secaoDe(CS, g, a); const sb = g(secaoDe(CS, g, b).translate([dh, dv]));
@@ -96,7 +106,8 @@ export function areasComDeslocamento(a, b, [dh, dv]) {
 
 /* Procura a translação de `b` que maximiza a razão interseção/união com `a`, por busca em padrão a partir de cada início: tenta
    os oito vizinhos a `passo`, anda para o melhor e, quando nenhum melhora, divide o passo ao meio, até `passoMinimo`. As duas
-   formas são montadas uma vez só. Devolve `{ deslocamento, iou, avaliacoes }` do melhor início; empate fica com o primeiro. */
+   formas, cada uma uma lista de anéis ou uma forma de regiões (`deRegioes`), são montadas uma vez só. Devolve
+   `{ deslocamento, iou, avaliacoes }` do melhor início; empate fica com o primeiro. */
 export function maximizarTranslacao(a, b, inicios, passo, passoMinimo) {
   return comSecoes((CS, g) => {
     const sa = secaoDe(CS, g, a); const sb = secaoDe(CS, g, b);
