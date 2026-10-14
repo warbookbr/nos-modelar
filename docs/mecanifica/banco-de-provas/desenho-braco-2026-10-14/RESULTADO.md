@@ -18,6 +18,11 @@ põe cada desenho, em vermelho, sobre a silhueta escondida, em cinza.
 | tokens do desenhista | 97.837 | 57.318 |
 | partes, relações e pontos | 20 partes, 125 relações, 62 pontos | 20 partes, 264 pontos |
 
+Em 2026-10-14 a razão da ferramenta passou a medir a união das partes, e não o anel
+de fora da silhueta. Pela medida nova, o braço dá 0,7698 e 0,7836 alinhado pelo
+canto da base, e 0,8163 e 0,8340 pela melhor translação, para restrições e
+coordenadas; a ordem e o empate não mudam.
+
 ```bash
 npm run desenho -- razao procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.contornos.json docs/mecanifica/banco-de-provas/desenho-braco-2026-10-14/restricoes/lateral.contornos.json --ponto-a=-117,-5 --ponto-b=0,0
 npm run desenho -- razao procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.contornos.json docs/mecanifica/banco-de-provas/desenho-braco-2026-10-14/coordenadas/lateral.contornos.json --ponto-a=-117,-5 --ponto-b=0,0
