@@ -17,8 +17,16 @@
    um nome final escolhido, para a região sair com o nome de uma referência. Em `frenteParaFundo` do desenho de fora, o nome de um
    uso vale pelas partes dele, na ordem da `frenteParaFundo` da peça (ou em ordem de nome). Uma peça não usa outra peça.
 
+   Orientação: um parâmetro pode ser uma palavra (`"sentido": "abaixo"`) e o `lado`, o `eixo` e o `por` de uma relação, no desenho ou na
+   peça, aceitam o nome de um parâmetro de palavra no lugar da palavra; assim a mesma peça serve virada para cima, para baixo ou
+   para os lados, e o uso diz para onde. O `lado` de uma distância com `eixo` aceita também um sinal, o nome de um parâmetro numérico
+   ou `"=expressão"` (positivo é a direita ou acima, negativo a esquerda ou abaixo), de modo que o mesmo número que espelha os
+   chutes da peça (`"=sentido*comprimento"`) escolhe o lado da relação. A relação cujo lado ou eixo veio de parâmetro é devolvida em
+   `orientadas`, com o uso e a peça, para o relatório conferir se o chute concorda (orientacao.js).
+
    Puro e determinístico: a mesma entrada dá a mesma saída. */
 import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js';
+import { EIXOS, LADO_DO_SINAL, PALAVRAS } from './palavras.js';
 
 const objeto = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const numero = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -45,9 +53,10 @@ export function nomesCitados(valor) {
     .map((m) => m[0]);
 }
 
-function fraseDoErro(e, quem, validos) {
+function fraseDoErro(e, quem, validos, palavras = {}) {
   const dica = `parâmetros declarados: ${validos.length ? validos.join(', ') : 'nenhum'}`;
   const ausente = /parâmetro '(.+)' não existe/.exec(e.message);
+  if (ausente && Object.hasOwn(palavras, ausente[1])) return `${quem} usa o parâmetro ${q(ausente[1])}, que é a palavra ${q(palavras[ausente[1]])} e não um número; uma palavra só vale em "lado", "eixo" e "por" de uma relação`;
   if (ausente) return `${quem} usa o parâmetro ${q(ausente[1])}, que não existe (${dica})`;
   const ciclo = /ciclo de parâmetros: (.+)$/.exec(e.message);
   if (ciclo) return `${quem} cai num ciclo de parâmetros (${ciclo[1]})`;
@@ -56,22 +65,41 @@ function fraseDoErro(e, quem, validos) {
 }
 
 /* Um escopo de parâmetros: `num(valor, quem)` devolve o número de um valor (o próprio número, o parâmetro ou a expressão) e
-   registra o erro, com `quem` dizendo onde, quando não dá. `citados` junta os nomes lidos, para a família saber o que o desenho usa. */
+   registra o erro, com `quem` dizendo onde, quando não dá. `citados` junta os nomes lidos, para a família saber o que o desenho usa.
+   Um valor que é uma palavra (`"abaixo"`) e não o nome de outro parâmetro faz do parâmetro um parâmetro de palavra: ele não entra nas
+   contas, e `palavraDoValor` e `palavraDoCampo` o devolvem. */
 function criarEscopo(declarados, erros, onde) {
   const validos = Object.keys(declarados).sort(porNome);
-  const resolvedor = criarResolverNumerico(declarados);
+  const ehPalavra = (v) => typeof v === 'string' && PALAVRAS.includes(v) && !Object.hasOwn(declarados, v);
+  const palavras = {}; const numericos = {};
+  for (const nome of validos) (ehPalavra(declarados[nome]) ? palavras : numericos)[nome] = declarados[nome];
+  const resolvedor = criarResolverNumerico(numericos);
   const citados = new Set();
   const num = (valor, quem) => {
     if (typeof valor !== 'string') return valor;
     nomesCitados(valor).forEach((n) => citados.add(n));
-    try { return resolvedor.num(valor); } catch (e) { erros.add(fraseDoErro(e, quem, validos)); return Number.NaN; }
+    try { return resolvedor.num(valor); } catch (e) { erros.add(fraseDoErro(e, quem, validos, palavras)); return Number.NaN; }
   };
   /* Os parâmetros se resolvem todos de saída, para o ciclo e o nome que não existe aparecerem mesmo sem uso; essa leitura não conta como uso. */
   const valores = {};
-  for (const nome of validos) {
-    try { valores[nome] = resolvedor.num(nome); } catch (e) { erros.add(fraseDoErro(e, `${onde}o parâmetro ${q(nome)}`, validos)); valores[nome] = Number.NaN; }
+  for (const nome of Object.keys(numericos).sort(porNome)) {
+    try { valores[nome] = resolvedor.num(nome); } catch (e) { erros.add(fraseDoErro(e, `${onde}o parâmetro ${q(nome)}`, validos, palavras)); valores[nome] = Number.NaN; }
   }
-  return { num, valores, citados };
+  /* A palavra de um valor que se passa a um parâmetro: o nome de um parâmetro de palavra, ou a palavra solta que não é nome de parâmetro. */
+  const palavraDoValor = (valor) => {
+    if (typeof valor !== 'string') return undefined;
+    if (Object.hasOwn(palavras, valor)) { citados.add(valor); return palavras[valor]; }
+    return !Object.hasOwn(declarados, valor) && PALAVRAS.includes(valor) ? valor : undefined;
+  };
+  /* A palavra de um campo de relação (`lado`, `eixo`, `por`): a palavra solta, ou o nome de um parâmetro de palavra. */
+  const palavraDoCampo = (valor) => {
+    if (typeof valor !== 'string') return undefined;
+    if (PALAVRAS.includes(valor)) return valor;
+    if (Object.hasOwn(palavras, valor)) { citados.add(valor); return palavras[valor]; }
+    return undefined;
+  };
+  const ehNumero = (valor) => typeof valor === 'string' && (valor.startsWith('=') || Object.hasOwn(numericos, valor));
+  return { num, valores, citados, palavraDoValor, palavraDoCampo, ehNumero, onde, falha: (m) => erros.add(m) };
 }
 
 /* Valida o bloco `parametros` (nomes de identificador, número ou texto) e devolve o dicionário limpo. */
@@ -107,7 +135,34 @@ function numerosDaParte(p, nome, num) {
   return g;
 }
 
-function numerosDoCorpo(c, num) {
+/* O `eixo`, o `por` e o `lado` de uma relação, com o que vem de parâmetro trocado pela palavra: o nome de um parâmetro de palavra,
+   ou, no `lado` de uma distância com `eixo`, o sinal de um número (parâmetro ou "=expressão"). `doParametro` diz se algum dos três veio
+   de parâmetro, que é o que faz a relação contar como orientada. */
+function palavrasDaRelacao(r, quem, escopo) {
+  const trocados = {};
+  let doParametro = false;
+  for (const campo of ['eixo', 'por']) {
+    const w = escopo.palavraDoCampo(r[campo]);
+    if (w !== undefined && w !== r[campo]) { trocados[campo] = w; doParametro = true; }
+  }
+  if (r.lado !== undefined) {
+    const w = escopo.palavraDoCampo(r.lado);
+    if (w !== undefined) {
+      if (w !== r.lado) { trocados.lado = w; doParametro = true; }
+    } else if (escopo.ehNumero(r.lado)) {
+      const eixo = trocados.eixo ?? r.eixo;
+      const sinal = escopo.num(r.lado, `${quem}, campo "lado"`);
+      if (Number.isNaN(sinal)) return { trocados, doParametro };
+      if (!EIXOS.includes(eixo)) escopo.falha(`${escopo.onde}${quem}: o "lado" vindo de um número (um sinal) só vale numa distância com "eixo" "h" ou "v", porque o sinal escolhe um dos dois lados do eixo`);
+      else if (sinal === 0) escopo.falha(`${escopo.onde}${quem}: o sinal do "lado" é zero; use um número positivo (${LADO_DO_SINAL[eixo].positivo}) ou negativo (${LADO_DO_SINAL[eixo].negativo})`);
+      else { trocados.lado = sinal > 0 ? LADO_DO_SINAL[eixo].positivo : LADO_DO_SINAL[eixo].negativo; doParametro = true; }
+    }
+  }
+  return { trocados, doParametro };
+}
+
+function numerosDoCorpo(c, escopo, orientadas = new Set()) {
+  const { num } = escopo;
   const g = { ...c };
   if (objeto(c.referencias)) {
     g.referencias = mapear(c.referencias, (r, nome) => {
@@ -125,7 +180,9 @@ function numerosDoCorpo(c, num) {
     g.relacoes = c.relacoes.map((r, i) => {
       if (!objeto(r)) return r;
       const quem = texto(r.nome) ? `a relação ${q(r.nome)}` : `a relação na posição ${i + 1}`;
-      return { ...r, ...(r.mm !== undefined ? { mm: num(r.mm, `${quem}, campo "mm"`) } : {}), ...(r.graus !== undefined ? { graus: num(r.graus, `${quem}, campo "graus"`) } : {}) };
+      const { trocados, doParametro } = palavrasDaRelacao(r, quem, escopo);
+      if (doParametro && texto(r.nome)) orientadas.add(r.nome);
+      return { ...r, ...(r.mm !== undefined ? { mm: num(r.mm, `${quem}, campo "mm"`) } : {}), ...(r.graus !== undefined ? { graus: num(r.graus, `${quem}, campo "graus"`) } : {}), ...trocados };
     });
   }
   return g;
@@ -201,7 +258,8 @@ export function lerCatalogoDePecas(json, onde = 'o catálogo de peças') {
 
 /* Uma instância da peça: os nomes prefixados, os números resolvidos e os chutes deslocados pela origem. Devolve null com os erros
    registrados quando a peça ou o uso estão errados. */
-function instanciar(nomeUso, uso, nomeDaPeca, peca, numFora, erros) {
+function instanciar(nomeUso, uso, nomeDaPeca, peca, fora, erros) {
+  const numFora = fora.num;
   const onde = `o uso ${q(nomeUso)} da peça ${q(nomeDaPeca)}: `;
   const antes = erros.size;
   for (const k of Object.keys(uso)) if (!CHAVES_DO_USO.includes(k)) erros.add(`${onde}campo desconhecido ${q(k)}; os aceitos são ${lista(CHAVES_DO_USO)}`);
@@ -216,8 +274,12 @@ function instanciar(nomeUso, uso, nomeDaPeca, peca, numFora, erros) {
     const faltam = Object.keys(padroes).filter((k) => padroes[k] === null && dados[k] === undefined);
     if (faltam.length) erros.add(`${onde}falta ${faltam.length === 1 ? 'o parâmetro obrigatório' : 'os parâmetros obrigatórios'} ${lista(faltam)}`);
     for (const k of Object.keys(padroes)) {
-      if (dados[k] !== undefined) { const v = numFora(dados[k], `${onde}o parâmetro ${q(k)}`); dict[k] = Number.isNaN(v) ? 0 : v; }
-      else if (padroes[k] !== null) dict[k] = padroes[k];
+      if (dados[k] !== undefined) {
+        /* Uma palavra (ou o nome de um parâmetro de palavra de fora) passa como palavra: é a orientação que o uso dá à peça. */
+        const palavra = fora.palavraDoValor(dados[k]);
+        if (palavra !== undefined) dict[k] = palavra;
+        else { const v = numFora(dados[k], `${onde}o parâmetro ${q(k)}`); dict[k] = Number.isNaN(v) ? 0 : v; }
+      } else if (padroes[k] !== null) dict[k] = padroes[k];
     }
   }
   /* Sem os parâmetros certos a peça não se avalia: o resto seria uma enxurrada de "o parâmetro não existe". */
@@ -250,7 +312,8 @@ function instanciar(nomeUso, uso, nomeDaPeca, peca, numFora, erros) {
 
   const desconhecidos = new Set();
   const citar = (n) => { if (typeof n === 'string' && !todos.has(n)) desconhecidos.add(n); return ren(n); };
-  const corpo = numerosDoCorpo({ pontos: peca.pontos, partes: peca.partes, construcao: peca.construcao, relacoes: peca.relacoes }, escopo.num);
+  const orientadasLocais = new Set();
+  const corpo = numerosDoCorpo({ pontos: peca.pontos, partes: peca.partes, construcao: peca.construcao, relacoes: peca.relacoes }, escopo, orientadasLocais);
   const pontosFinais = objeto(corpo.pontos) ? Object.fromEntries(Object.entries(corpo.pontos).map(([n, p]) => [ren(n), Array.isArray(p) && p.length === 2 && p.every(numero) && origem.every(numero) ? [p[0] + origem[0], p[1] + origem[1]] : p])) : {};
   const partesFinais = objeto(corpo.partes) ? Object.fromEntries(Object.entries(corpo.partes).map(([n, p]) => [ren(n), nomesDaParte(p, citar, ren)])) : {};
   const construcaoFinal = objeto(corpo.construcao) ? Object.fromEntries(Object.entries(corpo.construcao).map(([n, k]) => [ren(n), nomesDaConstrucao(k, citar)])) : {};
@@ -275,19 +338,20 @@ function instanciar(nomeUso, uso, nomeDaPeca, peca, numFora, erros) {
   }
 
   if (erros.size > antes) return null;
-  return { pontos: pontosFinais, partes: partesFinais, construcao: construcaoFinal, relacoes: relacoesFinais, ligacoes, ordem, declarados: [...pontos, ...partes, ...construcao, ...centros].map(ren), peca: nomeDaPeca, resolvidos: escopo.valores };
+  const orientadas = [...orientadasLocais].map((n) => [`${nomeUso}.${n}`, { uso: nomeUso, peca: nomeDaPeca }]);
+  return { pontos: pontosFinais, partes: partesFinais, construcao: construcaoFinal, relacoes: relacoesFinais, ligacoes, ordem, declarados: [...pontos, ...partes, ...construcao, ...centros].map(ren), peca: nomeDaPeca, resolvidos: escopo.valores, orientadas };
 }
 
-/* A descrição `mecanifica.desenho@3` expandida. Devolve `{ erros, descricao, parametros, usados }`: `parametros` são os valores
-   resolvidos e `usados` os nomes de parâmetro que algum campo lê, direto ou por outro parâmetro. */
+/* A descrição `mecanifica.desenho@3` expandida. Devolve `{ erros, descricao, parametros, usados, orientadas }`: `parametros` são os
+   valores resolvidos, `usados` os nomes de parâmetro que algum campo lê, direto ou por outro parâmetro, e `orientadas` o mapa das
+   relações cujo lado ou eixo veio de parâmetro (nome final da relação para `{ uso, peca }`, nulos quando é do desenho de fora). */
 export function expandirDescricao(d, { pecas: catalogo = {} } = {}) {
   const erros = new Set();
-  const saida = () => ({ erros: [...erros], descricao: null, parametros: null, usados: new Set() });
-  if (!objeto(d)) return { erros: [], descricao: d, parametros: null, usados: new Set() };
+  const saida = () => ({ erros: [...erros], descricao: null, parametros: null, usados: new Set(), orientadas: new Map() });
+  if (!objeto(d)) return { erros: [], descricao: d, parametros: null, usados: new Set(), orientadas: new Map() };
 
   const declarados = lerParametros(d.parametros, erros, '');
   const fora = criarEscopo(declarados, erros, '');
-  const numFora = (valor, quem) => fora.num(valor, quem);
 
   if (d.pecas !== undefined && !objeto(d.pecas)) erros.add('"pecas" deve ser um objeto { nome da peça: peça }');
   if (d.usos !== undefined && !objeto(d.usos)) erros.add('"usos" deve ser um objeto { nome do uso: { "peca": "<peça>", "parametros": {...} } }');
@@ -317,7 +381,7 @@ export function expandirDescricao(d, { pecas: catalogo = {} } = {}) {
     if (peca === undefined) { erros.add(`${onde}a peça ${q(uso.peca)} não existe; as peças são ${[...Object.keys(internas), ...Object.keys(doCatalogo)].sort(porNome).map(q).join(', ') || 'nenhuma'}`); continue; }
     if (Object.hasOwn(doCatalogo, uso.peca) && !conferirForma(uso.peca, peca, erros)) continue;
     if (!objeto(peca)) continue;
-    const inst = instanciar(nomeUso, uso, uso.peca, peca, numFora, erros);
+    const inst = instanciar(nomeUso, uso, uso.peca, peca, fora, erros);
     if (inst) instancias[nomeUso] = inst;
   }
   if (erros.size) return saida();
@@ -338,7 +402,9 @@ export function expandirDescricao(d, { pecas: catalogo = {} } = {}) {
   };
 
   const resto = Object.fromEntries(Object.entries(d).filter(([k]) => !['parametros', 'pecas', 'usos'].includes(k)));
-  const corpo = numerosDoCorpo(resto, numFora);
+  const orientadasFora = new Set();
+  const corpo = numerosDoCorpo(resto, fora, orientadasFora);
+  const orientadas = new Map([...orientadasFora].map((n) => [n, { uso: null, peca: null }]));
   const descricao = { ...corpo };
   if (objeto(corpo.partes)) descricao.partes = Object.fromEntries(Object.entries(corpo.partes).map(([n, p]) => [n, nomesDaParte(p, citarFora, (n) => n)]));
   if (objeto(corpo.construcao)) descricao.construcao = Object.fromEntries(Object.entries(corpo.construcao).map(([n, k]) => [n, nomesDaConstrucao(k, citarFora)]));
@@ -358,6 +424,7 @@ export function expandirDescricao(d, { pecas: catalogo = {} } = {}) {
     juntar('pontos', inst.pontos);
     juntar('partes', inst.partes);
     juntar('construcao', inst.construcao);
+    for (const [n, de] of inst.orientadas) orientadas.set(n, de);
     if (inst.relacoes.length) descricao.relacoes = [...(Array.isArray(descricao.relacoes) ? descricao.relacoes : []), ...inst.relacoes];
     for (const n of inst.declarados) {
       if (nomesGlobais.has(n)) erros.add(`o nome ${q(n)} aparece nos usos ${q(nomesGlobais.get(n))} e ${q(nomeUso)}; confira o "nomeiaPartes" deles`);
@@ -375,5 +442,5 @@ export function expandirDescricao(d, { pecas: catalogo = {} } = {}) {
     nomesCitados(declarados[n]).forEach(visitar);
   };
   [...fora.citados].forEach(visitar);
-  return { erros: [], descricao, parametros: fora.valores, usados };
+  return { erros: [], descricao, parametros: fora.valores, usados, orientadas };
 }

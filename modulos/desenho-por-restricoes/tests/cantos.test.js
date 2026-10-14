@@ -131,15 +131,55 @@ describe('formato: versão, validação e o que já estava gravado', () => {
     expect(e[0]).toMatch(/a parte "capsula" declara "raioDoCanto", que existe a partir de "mecanifica.desenho@2"; troque o "formato"/);
   });
 
-  it('recusa o raio zero, negativo, o ponto que não é do polígono, o objeto vazio, a barra além da metade da espessura e o círculo', () => {
-    expect(erros(com((x) => { x.partes.placa.raioDoCanto = 0; }))[0]).toMatch(/"raioDoCanto" do polígono "placa" deve ser um número em milímetro maior que zero.*"<ponto do polígono>"/);
-    expect(erros(com((x) => { x.partes.placa.raioDoCanto = -3; }))[0]).toMatch(/do polígono "placa"/);
+  it('recusa o raio negativo, o ponto que não é do polígono, o objeto vazio, o canto vivo com centro nomeado, a barra além da metade da espessura e o círculo', () => {
+    expect(erros(com((x) => { x.partes.placa.raioDoCanto = -3; }))[0]).toMatch(/"raioDoCanto" do polígono "placa" deve ser um número em milímetro, zero ou maior \(zero é canto vivo\).*"<ponto do polígono>"/);
+    expect(erros(com((x) => { x.partes.capsula.raioDoCanto = -1; }))[0]).toMatch(/"raioDoCanto" da barra "capsula" deve ser um número em milímetro, zero ou maior \(zero é canto vivo\), e veio -1/);
+    expect(erros(com((x) => { x.partes.placa.raioDoCanto = { A: { raio: 0, centro: 'CA' } }; }))[0]).toMatch(/do polígono "placa".*o canto com centro nomeado tem raio maior que zero/);
     expect(erros(com((x) => { x.partes.placa.raioDoCanto = { Z: 5 }; }))[0]).toMatch(/do polígono "placa".*e veio \{"Z":5\}/);
     expect(erros(com((x) => { x.partes.placa.raioDoCanto = {}; }))[0]).toMatch(/do polígono "placa"/);
     expect(erros(com((x) => { x.partes.capsula.raioDoCanto = 21; }))[0]).toMatch(/"raioDoCanto" 21 da barra "capsula" passa da metade da espessura \(20 mm\).*cápsula/);
     expect(erros(com((x) => { x.partes.capsula.raioDoCanto = { P: 5 }; }))[0]).toMatch(/da barra "capsula" deve ser um número/);
     const circulo = erros(com((x) => { x.partes.roda = { circulo: { centro: 'P' }, raioDoCanto: 5 }; x.relacoes.push({ nome: 'raio da roda', raio: 'roda', mm: 5 }); }));
     expect(circulo[0]).toMatch(/a parte "roda" declara "raioDoCanto", que só vale para "barra" e "poligono"/);
+  });
+
+  it('o raio zero é o canto vivo: no polígono inteiro, só em alguns cantos e na barra, o contorno sai igual ao de quem não declara o raio', async () => {
+    const semRaio = (x) => { delete x.partes.placa.raioDoCanto; delete x.partes.capsula.raioDoCanto; };
+    const vivo = await desenhar(com(semRaio), { origem: { desenho: 'x', sha256: 'y' } });
+    expect(vivo.relatorio.estado).toBe('resolvido');
+    const zero = await desenhar(com((x) => { x.partes.placa.raioDoCanto = 0; x.partes.capsula.raioDoCanto = 0; }), { origem: { desenho: 'x', sha256: 'y' } });
+    expect(erros(com((x) => { x.partes.placa.raioDoCanto = 0; x.partes.capsula.raioDoCanto = 0; }))).toEqual([]);
+    expect(JSON.stringify(zero.contornos)).toBe(JSON.stringify(vivo.contornos));
+    expect(zero.svg).toBe(vivo.svg);
+    expect(zero.relatorio.medidas.partes.placa.cantos).toBeUndefined();
+    expect(zero.texto).not.toMatch(/antes de arredondar/);
+    expect(zero.relatorio.medidas.partes.placa.lados).toHaveLength(4);
+    expect(zero.relatorio.medidas.partes.capsula.raioDoCantoMm).toBeUndefined();
+    /* o canto vivo tem o vértice no lugar */
+    expect(zero.contornos.regioes.placa.contornoMm).toContainEqual([0, 0]);
+    expect(zero.contornos.regioes.placa.contornoMm).toContainEqual([200, 100]);
+    expect(Math.abs(area(zero.contornos.regioes.placa.contornoMm) - 20000)).toBeLessThan(1e-6);
+
+    /* só os cantos citados com raio, os outros em zero */
+    const origem = { desenho: 'x', sha256: 'y' };
+    const misto = await desenhar(com((x) => { x.partes.placa.raioDoCanto = { A: 0, B: 10, C: 0, D: 10 }; }), { origem });
+    const so = await desenhar(com((x) => { x.partes.placa.raioDoCanto = { B: 10, D: 10 }; }), { origem });
+    expect(JSON.stringify(misto.contornos)).toBe(JSON.stringify(so.contornos));
+    expect(misto.relatorio.medidas.partes.placa.cantos).toEqual([{ ponto: 'B', raioMm: 10 }, { ponto: 'D', raioMm: 10 }]);
+  });
+
+  it('o raio de canto de um parâmetro vale zero no uso e arredonda no outro: a mesma descrição com "raioDoCanto": "canto" nos dois valores', async () => {
+    const com3 = (canto) => com((x) => {
+      x.formato = 'mecanifica.desenho@3'; x.parametros = { canto };
+      x.partes.placa.raioDoCanto = 'canto';
+    });
+    const vivo = await desenhar(com3(0));
+    const redondo = await desenhar(com3(10));
+    expect(vivo.relatorio.estado).toBe('resolvido');
+    expect(vivo.relatorio.medidas.partes.placa.cantos).toBeUndefined();
+    expect(redondo.relatorio.medidas.partes.placa.cantos).toHaveLength(4);
+    expect(vivo.contornos.regioes.placa.contornoMm).toContainEqual([0, 0]);
+    expect(redondo.contornos.regioes.placa.contornoMm).not.toContainEqual([0, 0]);
   });
 
   it('o raio que não cabe é recusado com a aresta e as medidas: 60 mm numa placa de 100 de altura', async () => {

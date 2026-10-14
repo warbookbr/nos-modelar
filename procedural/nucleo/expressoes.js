@@ -9,7 +9,8 @@ const CORPO_NOME = /[A-Za-z0-9_]/;
 
 /* A lista fechada de funções: o nome, quantos argumentos e o cálculo. Os ângulos entram e saem em graus, como `graus`
    das operações e `rotacao` do esboço; `atan2(y, x)` dá o ângulo do vetor (x, y) entre -180 e 180, e `sqrt` recusa
-   número negativo em vez de devolver NaN. */
+   número negativo em vez de devolver NaN. `min` e `max` aceitam dois ou mais argumentos (`variadica`): `aridade` é então
+   o mínimo, e o menor ou o maior de uma lista de medidas dispensa escrever a raiz do quadrado da diferença. */
 const GRAUS = 180 / Math.PI;
 const FUNCOES = {
   atan: { aridade: 1, calcular: (x) => Math.atan(x) * GRAUS },
@@ -18,6 +19,8 @@ const FUNCOES = {
   cos: { aridade: 1, calcular: (a) => Math.cos(a / GRAUS) },
   tan: { aridade: 1, calcular: (a) => Math.tan(a / GRAUS) },
   sqrt: { aridade: 1, calcular: (x) => { if (x < 0) erro(`sqrt de ${x}, que é negativo`); return Math.sqrt(x); } },
+  min: { aridade: 2, variadica: true, calcular: (...xs) => Math.min(...xs) },
+  max: { aridade: 2, variadica: true, calcular: (...xs) => Math.max(...xs) },
 };
 
 function erro(texto) { throw new Error(`oficina: expressão inválida: ${texto}`); }
@@ -78,8 +81,8 @@ export function criarResolverNumerico(dict) {
         const argumentos = [soma()];
         while (consumir(',')) argumentos.push(soma());
         if (!consumir(')')) erro(`faltou ')' em '${texto}'`);
-        const { aridade, calcular } = FUNCOES[lido];
-        if (argumentos.length !== aridade) erro(`'${lido}' recebe ${aridade} argumento(s), não ${argumentos.length}, em '${texto}'`);
+        const { aridade, variadica, calcular } = FUNCOES[lido];
+        if (variadica ? argumentos.length < aridade : argumentos.length !== aridade) erro(`'${lido}' recebe ${variadica ? `${aridade} ou mais` : aridade} argumento(s), não ${argumentos.length}, em '${texto}'`);
         return finito(calcular(...argumentos));
       }
       erro(`esperava número, nome ou '(' em '${texto}' na posição ${i + 1}`);

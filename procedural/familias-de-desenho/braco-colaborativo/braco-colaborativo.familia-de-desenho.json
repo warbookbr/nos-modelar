@@ -3,6 +3,7 @@
   "id": "braco-colaborativo",
   "versao": "1.0.0",
   "descricao": "a vista lateral de um braço robótico colaborativo de seis eixos, na pose de L (coluna em pé, antebraço na horizontal, punho para baixo), com as 14 partes do contorno da referência lateral-sem-cabo do braço robótico",
+  "catalogo": "pecas.json",
   "parametros": {
     "alturaBase": { "unidade": "mm", "padrao": 236, "minimo": 190, "medio": 236, "maximo": 280, "descricao": "do chão ao topo do corpo da base" },
     "diametroBaixo": { "unidade": "mm", "padrao": 206, "minimo": 185, "medio": 206, "maximo": 236, "descricao": "a largura do corpo da base; o anel da cintura tem 6 mm a menos e o ombro 9" },
@@ -14,6 +15,11 @@
     "larguraPunho": { "unidade": "mm", "padrao": 110, "minimo": 92, "medio": 110, "maximo": 126, "descricao": "a largura dos anéis do punho; o garfo, o pescoço e a flange seguem a proporção da referência" },
     "alturaPunho": { "unidade": "mm", "padrao": 250, "minimo": 210, "medio": 250, "maximo": 285, "descricao": "do fundo da carcaça do punho à face de baixo da flange" }
   },
+  "restricoes": [
+    { "id": "coluna-de-cima-mais-estreita", "expressao": "diametroCima <= diametroBaixo - 9", "motivo": "a coluna de cima entra no ombro, que tem 9 mm a menos que a base; mais larga que isso ela passaria do ombro" },
+    { "id": "braco-nao-atarracado", "expressao": "comprimentoBraco >= 1.9 * diametroBaixo", "motivo": "nos braços de 3 a 16 kg a razão entre o comprimento do braço e o diâmetro da base fica entre 1,9 e 3,2; abaixo disso o braço fica mais atarracado que qualquer um da classe" },
+    { "id": "braco-nao-esguio", "expressao": "comprimentoBraco <= 3.2 * diametroBaixo", "motivo": "acima de 3,2 vezes o diâmetro da base o braço fica mais esguio que qualquer um da classe" }
+  ],
   "perfis": {
     "referencia": {
       "descricao": "as medidas do desenho ajustado à referência lateral-sem-cabo (banco de provas familias-de-desenho-2026-10-14/braco)",
@@ -53,7 +59,7 @@
       "topoOmbro": "=juntaOmbro+alturaOmbro/2",
       "raioPeloOmbroAlto": "=alturaOmbro/2-4.5*escalaBaixo",
       "raioPeloOmbroLargo": "=diametroOmbro/2-12.5*escalaBaixo",
-      "raioPontaBraco": "=(raioPeloOmbroAlto+raioPeloOmbroLargo-sqrt((raioPeloOmbroAlto-raioPeloOmbroLargo)*(raioPeloOmbroAlto-raioPeloOmbroLargo)))/2",
+      "raioPontaBraco": "=min(raioPeloOmbroAlto,raioPeloOmbroLargo)",
 
       "eixoAntebraco": "=juntaOmbro+comprimentoBraco",
       "bordaCimaDireita": "=78.5*escalaCima",
@@ -129,13 +135,13 @@
       },
       "tamborCintura": {
         "peca": "anelCoaxial",
-        "parametros": { "diametro": "diametroCintura", "comprimento": "alturaCintura" },
+        "parametros": { "diametro": "diametroCintura", "comprimento": "alturaCintura", "eixo": "v", "sentido": "acima" },
         "origem": [0, "topoBase"],
         "nomeiaPartes": { "corpo": "anelCintura" }
       },
       "tamborOmbro": {
         "peca": "anelCoaxial",
-        "parametros": { "diametro": "diametroOmbro", "comprimento": "alturaOmbro" },
+        "parametros": { "diametro": "diametroOmbro", "comprimento": "alturaOmbro", "eixo": "v", "sentido": "acima" },
         "origem": [0, "=topoBase+alturaCintura"],
         "nomeiaPartes": { "corpo": "ombro" }
       },
@@ -146,7 +152,7 @@
       },
       "tamborCotovelo": {
         "peca": "anelCoaxial",
-        "parametros": { "diametro": "diametroCima", "comprimento": "alturaAnelCotovelo" },
+        "parametros": { "diametro": "diametroCima", "comprimento": "alturaAnelCotovelo", "eixo": "v", "sentido": "acima" },
         "origem": ["=-recuoCima", "=eixoAntebraco-anelCotoveloAbaixo"],
         "nomeiaPartes": { "corpo": "anelCotovelo" }
       },
@@ -158,13 +164,13 @@
       },
       "tamborJunta": {
         "peca": "anelCoaxial",
-        "parametros": { "diametro": "diametroJunta", "comprimento": "larguraJunta", "angulo": 0 },
+        "parametros": { "diametro": "diametroJunta", "comprimento": "larguraJunta", "angulo": 0, "eixo": "h", "sentido": "direita" },
         "origem": ["bordaCimaDireita", "eixoAntebraco"],
         "nomeiaPartes": { "corpo": "juntaCotovelo" }
       },
       "tamborAntebraco": {
         "peca": "anelCoaxial",
-        "parametros": { "diametro": "diametroJunta", "comprimento": "larguraAnelAntebraco", "canto": "raioAnelAntebraco", "angulo": 0 },
+        "parametros": { "diametro": "diametroJunta", "comprimento": "larguraAnelAntebraco", "canto": "raioAnelAntebraco", "angulo": 0, "eixo": "h", "sentido": "direita" },
         "origem": ["=bordaCimaDireita+larguraJunta", "eixoAntebraco"],
         "nomeiaPartes": { "corpo": "anelAntebraco" }
       },
@@ -175,7 +181,7 @@
       },
       "tamborPunho": {
         "peca": "anelCoaxial",
-        "parametros": { "diametro": "larguraPunho", "comprimento": "comprimentoAneis", "canto": "raioAneis", "angulo": -90 },
+        "parametros": { "diametro": "larguraPunho", "comprimento": "comprimentoAneis", "canto": "raioAneis", "angulo": -90, "eixo": "v", "sentido": "abaixo" },
         "origem": ["comprimentoAntebraco", "eixoAntebraco"],
         "nomeiaPartes": { "corpo": "aneisPunho" }
       },

@@ -91,7 +91,8 @@ export const carcacaSintetica = ({ comprimento = 2200, altura = 700, raioDoArco 
   frenteParaFundo: ['mastro', 'arco'],
 });
 
-/* A família da carcaça sintética: nove parâmetros com a faixa de cada um e dois perfis. */
+/* A família da carcaça sintética: nove parâmetros com a faixa de cada um, duas relações de ordem (o canto de raio igual ao do arco só
+   cabe numa aresta que não seja menor que ele) e dois perfis. */
 export const familiaSintetica = () => {
   const { parametros, ...desenho } = carcacaSintetica();
   const { comprimento, altura, raioDoArco, vao, topoDoArco, aro, recuo, alturaDoMastro, diametroDoMastro, ...derivados } = parametros;
@@ -113,6 +114,10 @@ export const familiaSintetica = () => {
       alturaDoMastro: faixa('mm', 200, 400, 600),
       diametroDoMastro: faixa('mm', 60, 100, 160),
     },
+    restricoes: [
+      { id: 'arco-cabe-no-topo', expressao: 'raioDoArco <= topoDoArco', motivo: 'o canto do aro tem o raio do arco, e a perna do recorte tem de medir ao menos isso' },
+      { id: 'arco-cabe-no-vao', expressao: 'raioDoArco <= vao', motivo: 'o canto do aro tem o raio do arco, e o topo do recorte tem de medir ao menos isso' },
+    ],
     perfis: {
       compacta: { descricao: 'a menor', parametros: { comprimento: 1800, altura: 600, vao: 300, topoDoArco: 300, raioDoArco: 220, recuo: 150 } },
       larga: { parametros: { comprimento: 2600, vao: 520, aro: 40 } },

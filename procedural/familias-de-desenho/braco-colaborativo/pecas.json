@@ -2,8 +2,8 @@
   "formato": "mecanifica.pecas-de-desenho@1",
   "pecas": {
     "anelCoaxial": {
-      "descricao": "tambor num eixo: a barra do início ao fim com a espessura igual ao diâmetro e o meio marcado. Empilha-se pondo o início de um no fim do outro, e o desenho de fora dá a direção do eixo. O ângulo (graus, de h para v) é a direção do início para o fim e só serve ao chute.",
-      "parametros": { "diametro": null, "comprimento": null, "canto": 1, "angulo": 90 },
+      "descricao": "tambor num eixo: a barra do início ao fim com a espessura igual ao diâmetro e o meio marcado. Empilha-se pondo o início de um no fim do outro. A orientação vem do uso: o eixo (h ou v) e o sentido (acima, abaixo, direita ou esquerda) em que o fim fica do início, e a distância entre os dois tem sinal. O ângulo (graus, de h para v) é a direção do início para o fim e só serve ao chute, mas precisa apontar para o mesmo lado do sentido: o uso que pede o tambor para baixo e o chuta para cima sai com o aviso de peça virada.",
+      "parametros": { "diametro": null, "comprimento": null, "canto": 1, "angulo": 90, "eixo": "v", "sentido": "acima" },
       "pontos": {
         "P": [0, 0],
         "Q": ["=comprimento*cos(angulo)", "=comprimento*sin(angulo)"],
@@ -13,7 +13,7 @@
         "corpo": { "barra": ["P", "Q"], "espessura": "diametro", "raioDoCanto": "canto" }
       },
       "relacoes": [
-        { "nome": "comprimento", "distancia": ["P", "Q"], "mm": "comprimento" },
+        { "nome": "comprimento", "distancia": ["Q", "P"], "mm": "comprimento", "eixo": "eixo", "lado": "sentido" },
         { "nome": "meio no eixo", "sobre": ["M", ["P", "Q"]] },
         { "nome": "meio a meio caminho", "igual": [["P", "M"], ["M", "Q"]] }
       ],

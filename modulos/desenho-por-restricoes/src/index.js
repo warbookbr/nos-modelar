@@ -15,13 +15,16 @@ import { vistaEmTraco } from './traco.js';
 import { relatorioEmTexto } from './relatorio.js';
 import { razaoInterseccaoUniao, razaoPorParte, aneisDoContorno } from './razao.js';
 import {
-  FORMATO_DA_FAMILIA_DE_DESENHO, UNIDADES_DA_FAMILIA, lerFamiliaDeDesenho, valoresDaFamilia, especializarFamilia, casosDaProva, provarFamilia,
+  FORMATO_DA_FAMILIA_DE_DESENHO, UNIDADES_DA_FAMILIA, PERFIS_DA_FAIXA, catalogosDaFamilia, lerFamiliaDeDesenho, valoresDaFamilia, especializarFamilia,
+  casosDaProva, provarFamilia, restricoesFeridas, fraseDaRestricao,
 } from './familia.js';
+import { conferirOrientacao } from './orientacao.js';
 import { textoDaAjuda } from './ajuda.js';
 
 export {
   desenhar, validarDescricao, modeloDaDescricao, expandirDescricao, lerCatalogoDePecas, FORMATO_DAS_PECAS_DE_DESENHO, ErroDeDesenho,
   FORMATO_DO_DESENHO, FORMATOS_DO_DESENHO, FORMATO_DOS_CONTORNOS, RESOLVEDOR, VISTAS_DO_DESENHO, LADOS, EIXOS, TIPOS_DE_RELACAO,
-  resolver, contornosDoDesenho, vistaEmTraco, relatorioEmTexto, razaoInterseccaoUniao, razaoPorParte, aneisDoContorno, textoDaAjuda,
-  FORMATO_DA_FAMILIA_DE_DESENHO, UNIDADES_DA_FAMILIA, lerFamiliaDeDesenho, valoresDaFamilia, especializarFamilia, casosDaProva, provarFamilia,
+  resolver, contornosDoDesenho, vistaEmTraco, relatorioEmTexto, razaoInterseccaoUniao, razaoPorParte, aneisDoContorno, textoDaAjuda, conferirOrientacao,
+  FORMATO_DA_FAMILIA_DE_DESENHO, UNIDADES_DA_FAMILIA, PERFIS_DA_FAIXA, catalogosDaFamilia, lerFamiliaDeDesenho, valoresDaFamilia, especializarFamilia,
+  casosDaProva, provarFamilia, restricoesFeridas, fraseDaRestricao,
 };

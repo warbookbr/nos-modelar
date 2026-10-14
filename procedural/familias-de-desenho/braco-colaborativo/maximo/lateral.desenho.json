@@ -35,7 +35,7 @@
   "topoOmbro": "=juntaOmbro+alturaOmbro/2",
   "raioPeloOmbroAlto": "=alturaOmbro/2-4.5*escalaBaixo",
   "raioPeloOmbroLargo": "=diametroOmbro/2-12.5*escalaBaixo",
-  "raioPontaBraco": "=(raioPeloOmbroAlto+raioPeloOmbroLargo-sqrt((raioPeloOmbroAlto-raioPeloOmbroLargo)*(raioPeloOmbroAlto-raioPeloOmbroLargo)))/2",
+  "raioPontaBraco": "=min(raioPeloOmbroAlto,raioPeloOmbroLargo)",
   "eixoAntebraco": "=juntaOmbro+comprimentoBraco",
   "bordaCimaDireita": "=78.5*escalaCima",
   "bordaCimaEsquerda": "=97*escalaCima",
@@ -62,12 +62,14 @@
  },
  "pecas": {
   "anelCoaxial": {
-   "descricao": "tambor num eixo: a barra do início ao fim com a espessura igual ao diâmetro e o meio marcado. Empilha-se pondo o início de um no fim do outro, e o desenho de fora dá a direção do eixo. O ângulo (graus, de h para v) é a direção do início para o fim e só serve ao chute.",
+   "descricao": "tambor num eixo: a barra do início ao fim com a espessura igual ao diâmetro e o meio marcado. Empilha-se pondo o início de um no fim do outro. A orientação vem do uso: o eixo (h ou v) e o sentido (acima, abaixo, direita ou esquerda) em que o fim fica do início, e a distância entre os dois tem sinal. O ângulo (graus, de h para v) é a direção do início para o fim e só serve ao chute, mas precisa apontar para o mesmo lado do sentido: o uso que pede o tambor para baixo e o chuta para cima sai com o aviso de peça virada.",
    "parametros": {
     "diametro": null,
     "comprimento": null,
     "canto": 1,
-    "angulo": 90
+    "angulo": 90,
+    "eixo": "v",
+    "sentido": "acima"
    },
    "pontos": {
     "P": [
@@ -97,10 +99,12 @@
     {
      "nome": "comprimento",
      "distancia": [
-      "P",
-      "Q"
+      "Q",
+      "P"
      ],
-     "mm": "comprimento"
+     "mm": "comprimento",
+     "eixo": "eixo",
+     "lado": "sentido"
     },
     {
      "nome": "meio no eixo",
@@ -787,7 +791,9 @@
    "peca": "anelCoaxial",
    "parametros": {
     "diametro": "diametroCintura",
-    "comprimento": "alturaCintura"
+    "comprimento": "alturaCintura",
+    "eixo": "v",
+    "sentido": "acima"
    },
    "origem": [
     0,
@@ -801,7 +807,9 @@
    "peca": "anelCoaxial",
    "parametros": {
     "diametro": "diametroOmbro",
-    "comprimento": "alturaOmbro"
+    "comprimento": "alturaOmbro",
+    "eixo": "v",
+    "sentido": "acima"
    },
    "origem": [
     0,
@@ -826,7 +834,9 @@
    "peca": "anelCoaxial",
    "parametros": {
     "diametro": "diametroCima",
-    "comprimento": "alturaAnelCotovelo"
+    "comprimento": "alturaAnelCotovelo",
+    "eixo": "v",
+    "sentido": "acima"
    },
    "origem": [
     "=-recuoCima",
@@ -857,7 +867,9 @@
    "parametros": {
     "diametro": "diametroJunta",
     "comprimento": "larguraJunta",
-    "angulo": 0
+    "angulo": 0,
+    "eixo": "h",
+    "sentido": "direita"
    },
    "origem": [
     "bordaCimaDireita",
@@ -873,7 +885,9 @@
     "diametro": "diametroJunta",
     "comprimento": "larguraAnelAntebraco",
     "canto": "raioAnelAntebraco",
-    "angulo": 0
+    "angulo": 0,
+    "eixo": "h",
+    "sentido": "direita"
    },
    "origem": [
     "=bordaCimaDireita+larguraJunta",
@@ -900,7 +914,9 @@
     "diametro": "larguraPunho",
     "comprimento": "comprimentoAneis",
     "canto": "raioAneis",
-    "angulo": -90
+    "angulo": -90,
+    "eixo": "v",
+    "sentido": "abaixo"
    },
    "origem": [
     "comprimentoAntebraco",

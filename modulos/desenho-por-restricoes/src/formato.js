@@ -13,6 +13,9 @@
    está errado e como corrigir) e `modelo` é a descrição normalizada que o resto do módulo lê, ou null quando há erro. Puro. */
 import { expandirDescricao } from './expandir.js';
 import { centroDoCanto } from './canto.js';
+import { EIXOS, LADOS, TOQUES } from './palavras.js';
+
+export { EIXOS, LADOS, TOQUES };
 
 export const FORMATO_DO_DESENHO = 'mecanifica.desenho@3';
 export const FORMATO_DO_DESENHO_ANTERIOR = 'mecanifica.desenho@1';
@@ -21,11 +24,8 @@ export const FORMATOS_DO_DESENHO = [FORMATO_DO_DESENHO_ANTERIOR, FORMATO_DO_DESE
 export const FORMATO_DOS_CONTORNOS = 'mecanifica.contornos@1';
 export const RESOLVEDOR = 'planegcs@1.3.0';
 export const VISTAS_DO_DESENHO = ['lateral', 'topo', 'frontal'];
-export const LADOS = ['acima', 'abaixo', 'esquerda', 'direita'];
-export const TOQUES = ['fora', 'dentro'];
 export const FECHAMENTOS = ['corda', 'centro'];
 export const TIPOS_DE_RELACAO = ['sobre', 'coincidente', 'distancia', 'raio', 'tangente', 'paralela', 'perpendicular', 'vertical', 'horizontal', 'angulo', 'igual', 'simetrico'];
-export const EIXOS = ['h', 'v'];
 
 const CHAVES_DA_RAIZ = ['formato', 'objeto', 'vista', 'olhando', 'referencias', 'pontos', 'partes', 'frenteParaFundo', 'relacoes'];
 /* O que existe só a partir da versão 3. */
@@ -66,11 +66,11 @@ export function validarDescricao(entrada, opcoes = {}) {
      (`uso.ligacao`) não virarem uma enxurrada de nomes desconhecidos. */
   if (!ehTres && Object.keys(entrada).some((k) => CHAVES_DA_RAIZ_DO_3.includes(k))) return { erros, modelo: null };
   /* Parâmetros, expressões e peças: a descrição que o resto lê só tem números e nenhum `parametros`, `pecas` nem `usos`. */
-  let d = entrada; let parametros = null;
+  let d = entrada; let parametros = null; let orientadas = new Map();
   if (ehTres) {
     const x = expandirDescricao(entrada, opcoes);
     if (x.erros.length) return { erros: [...erros, ...x.erros], modelo: null };
-    d = x.descricao; parametros = x.parametros;
+    d = x.descricao; parametros = x.parametros; orientadas = x.orientadas;
   }
   if (!FORMATOS_DO_DESENHO.includes(d.formato)) falha(`"formato" deve ser ${q(FORMATO_DO_DESENHO)} (ou ${q(FORMATO_DO_DESENHO_COM_CANTO)} ou ${q(FORMATO_DO_DESENHO_ANTERIOR)}, as versões anteriores, que seguem aceitas) e veio ${q(d.formato)}`);
   if (!texto(d.objeto)) falha('"objeto" deve ser o nome do objeto desenhado, em texto não vazio');
@@ -139,9 +139,16 @@ export function validarDescricao(entrada, opcoes = {}) {
     if (forma !== 'barra' && p.espessura !== undefined) falha(`a parte ${q(nome)} declara "espessura", que só vale para "barra"`);
     if (p.raioDoCanto !== undefined && forma !== 'barra' && forma !== 'poligono') falha(`a parte ${q(nome)} declara "raioDoCanto", que só vale para "barra" e "poligono" (o círculo e o arco já são curvos)`);
     else if (p.raioDoCanto !== undefined && d.formato === FORMATO_DO_DESENHO_ANTERIOR) falha(`a parte ${q(nome)} declara "raioDoCanto", que existe a partir de ${q(FORMATO_DO_DESENHO_COM_CANTO)}; troque o "formato" da descrição`);
-    const raioValido = (v) => numero(v) && v > 0;
-    /* Um canto do polígono é um raio, ou { "raio": mm, "centro": "<nome>" } quando o centro do arco ganha nome. */
-    const cantoValido = (v) => (raioValido(v) ? { raio: v, centro: null } : objeto(v) && Object.keys(v).every((k) => k === 'raio' || k === 'centro') && raioValido(v.raio) && (v.centro === undefined || texto(v.centro)) ? { raio: v.raio, centro: v.centro ?? null } : null);
+    /* O raio zero é o canto vivo: aceito, para uma peça deixar o arredondamento ao uso sem mudar de forma. */
+    const raioValido = (v) => numero(v) && v >= 0;
+    /* Um canto do polígono é um raio, ou { "raio": mm, "centro": "<nome>" } quando o centro do arco ganha nome (e então o raio é
+       maior que zero, porque um canto vivo não tem arco nem centro). */
+    const cantoValido = (v) => {
+      if (raioValido(v)) return { raio: v, centro: null };
+      if (!objeto(v) || !Object.keys(v).every((k) => k === 'raio' || k === 'centro') || !raioValido(v.raio)) return null;
+      if (v.centro !== undefined && !(texto(v.centro) && v.raio > 0)) return null;
+      return { raio: v.raio, centro: v.centro ?? null };
+    };
     if (forma === 'poligono') {
       const ps = nomesDosPontos(p.poligono, 3, false);
       let raiosDosCantos = null;
@@ -156,10 +163,12 @@ export function validarDescricao(entrada, opcoes = {}) {
             if (!doTres) { falha(`o "raioDoCanto" do polígono ${q(nome)} nomeia o centro de um canto, que existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`); raiosDosCantos = null; }
             else centrosDosCantos = cantos.map((c) => c.centro);
           }
-        } else falha(`o "raioDoCanto" do polígono ${q(nome)} deve ser um número em milímetro maior que zero (todos os cantos) ou { "<ponto do polígono>": <mm> ou { "raio": <mm>, "centro": "<nome>" }, ... } (só os cantos citados), e veio ${JSON.stringify(rc)}`);
+        } else falha(`o "raioDoCanto" do polígono ${q(nome)} deve ser um número em milímetro, zero ou maior (zero é canto vivo), para todos os cantos, ou { "<ponto do polígono>": <mm> ou { "raio": <mm>, "centro": "<nome>" }, ... } (só os cantos citados; o canto com centro nomeado tem raio maior que zero), e veio ${JSON.stringify(rc)}`);
       }
       if (ps && (rc === undefined || raiosDosCantos)) {
-        partes[nome] = { tipo: 'poligono', pontos: ps, foraDoModelo, ...(raiosDosCantos ? { raiosDosCantos } : {}), ...(centrosDosCantos ? { centrosDosCantos } : {}) };
+        /* Todos os cantos em zero são o polígono de canto vivo: a parte fica como se não declarasse o raio. */
+        const comArco = raiosDosCantos && raiosDosCantos.some((x) => x > 0);
+        partes[nome] = { tipo: 'poligono', pontos: ps, foraDoModelo, ...(comArco ? { raiosDosCantos } : {}), ...(centrosDosCantos ? { centrosDosCantos } : {}) };
         ps.forEach((x) => usados.add(x));
         /* O centro com nome é um ponto do desenho: o chute vem do canto como foi chutado, e o resolvedor o prende nas duas arestas. */
         (centrosDosCantos ?? []).forEach((centro, i) => {
@@ -179,11 +188,11 @@ export function validarDescricao(entrada, opcoes = {}) {
       const ps = nomesDosPontos(p.barra, 2, true);
       const rc = p.raioDoCanto;
       if (!numero(p.espessura) || p.espessura <= 0) falha(`a barra ${q(nome)} precisa de "espessura" em milímetro, maior que zero: a largura do retângulo em volta do eixo`);
-      else if (rc !== undefined && !raioValido(rc)) falha(`o "raioDoCanto" da barra ${q(nome)} deve ser um número em milímetro maior que zero, e veio ${JSON.stringify(rc)}`);
+      else if (rc !== undefined && !raioValido(rc)) falha(`o "raioDoCanto" da barra ${q(nome)} deve ser um número em milímetro, zero ou maior (zero é canto vivo), e veio ${JSON.stringify(rc)}`);
       else if (rc !== undefined && rc > p.espessura / 2) falha(`o "raioDoCanto" ${rc} da barra ${q(nome)} passa da metade da espessura (${p.espessura / 2} mm); com a metade exata a ponta fica semicircular (uma cápsula), e mais que isso não cabe`);
       else if (ps) {
         if (mesmoLugar(pontos[ps[0]], pontos[ps[1]])) falha(`a barra ${q(nome)} tem os dois pontos ${lista(ps)} no mesmo chute; afaste-os para o resolvedor ter a direção do eixo`);
-        else { partes[nome] = { tipo: 'barra', pontos: ps, espessura: p.espessura, foraDoModelo, ...(rc !== undefined ? { raioDoCanto: rc } : {}) }; ps.forEach((x) => usados.add(x)); }
+        else { partes[nome] = { tipo: 'barra', pontos: ps, espessura: p.espessura, foraDoModelo, ...(rc ? { raioDoCanto: rc } : {}) }; ps.forEach((x) => usados.add(x)); }
       }
     } else if (forma === 'circulo') {
       const c = p.circulo;
@@ -447,6 +456,8 @@ export function validarDescricao(entrada, opcoes = {}) {
   }
 
   if (erros.length) return { erros, modelo: null };
+  /* A relação cujo lado ou eixo veio de parâmetro leva o uso e a peça: o relatório confere se o chute concorda com ela (orientacao.js). */
+  for (const r of relacoes) if (orientadas.has(r.nome)) r.orientada = orientadas.get(r.nome);
   const modelo = {
     objeto: d.objeto, vista: d.vista, olhando: d.olhando ?? null,
     referencias, pontos, partes, ordem, centros, parametros,

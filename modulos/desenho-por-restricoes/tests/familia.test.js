@@ -88,7 +88,7 @@ describe('valoresDaFamilia', () => {
     const f = familia();
     expect(valoresDaFamilia(f, { valores: { vao: 900 } }).erros).toEqual(['o parâmetro "vao" vale 900 mm, fora da faixa da família (de 300 a 520 mm); a faixa vem das referências medidas, então um valor fora dela é extrapolação: amplie a faixa na família e prove de novo']);
     expect(valoresDaFamilia(f, { valores: { cor: 1 } }).erros[0]).toMatch(/o parâmetro "cor" não existe na família \(os parâmetros são "altura", "alturaDoMastro"/);
-    expect(valoresDaFamilia(f, { perfil: 'pequena' }).erros).toEqual(['o perfil "pequena" não existe na família (os perfis são "compacta", "larga")']);
+    expect(valoresDaFamilia(f, { perfil: 'pequena' }).erros).toEqual(['o perfil "pequena" não existe na família (os perfis são "compacta", "larga"; "minimo", "medio", "maximo" existem em toda família e põem todos os parâmetros no mínimo, no médio ou no máximo)']);
     expect(valoresDaFamilia(f, { valores: { vao: 'largo' } }).erros[0]).toMatch(/o parâmetro "vao" deve ser um número em mm/);
   });
 });
@@ -130,7 +130,7 @@ describe('especializarFamilia', () => {
 });
 
 describe('casosDaProva', () => {
-  it('são o padrão, todos no mínimo, no médio e no máximo, cada parâmetro nos três com os outros no padrão e cada perfil, sem repetir conjunto', () => {
+  it('são o padrão, todos no mínimo, no médio e no máximo, cada parâmetro nos três com os outros no padrão, cada par nos extremos cruzados e cada perfil, sem repetir conjunto', () => {
     const casos = casosDaProva(familia());
     const rotulos = casos.map((c) => c.rotulo);
     expect(rotulos.slice(0, 4)).toEqual(['padrão', 'todos no mínimo', 'todos no médio', 'todos no máximo']);
@@ -139,7 +139,12 @@ describe('casosDaProva', () => {
     expect(rotulos.slice(-2)).toEqual(['perfil compacta', 'perfil larga']);
     /* o médio de comprimento é o padrão, então "comprimento no médio" repete o padrão e não entra */
     expect(rotulos).not.toContain('comprimento no médio');
-    expect(rotulos).toHaveLength(1 + 3 + 9 * 3 - 5 + 2);
+    /* nove parâmetros dão 36 pares, cada um dos dois jeitos, e nenhum repete um conjunto que já saiu */
+    expect(rotulos).toHaveLength(1 + 3 + 9 * 3 - 5 + 36 * 2 + 2);
+    expect(rotulos.filter((r) => / no m[íá][nx]imo e .* no m[íá][nx]imo$/.test(r))).toHaveLength(72);
+    const cruzado = casos.find((c) => c.rotulo === 'altura no mínimo e vao no máximo');
+    expect(cruzado.valores).toMatchObject({ altura: 600, vao: 520, comprimento: 2200, raioDoArco: 260 });
+    expect(casos.find((c) => c.rotulo === 'altura no máximo e vao no mínimo').valores).toMatchObject({ altura: 900, vao: 300, comprimento: 2200 });
     expect(casos[2].valores).toMatchObject({ altura: 750, raioDoArco: 270, vao: 410, comprimento: 2200 });
     expect(new Set(casos.map((c) => JSON.stringify(c.valores))).size).toBe(casos.length);
   });
@@ -187,8 +192,12 @@ describe('provarFamilia', () => {
   it('a família sintética resolve nos extremos, no médio, no padrão e nos perfis: zero grau de liberdade, sem conflito, sem lado trocado, sem polígono cruzado', async () => {
     const prova = await provarFamilia(familia());
     expect(prova.ok).toBe(true);
-    expect(prova.casos).toHaveLength(28);
-    for (const c of prova.casos) {
+    expect(prova.casos).toHaveLength(100);
+    /* os dois pares em que o arco de 320 de raio fica com um recorte de 300 fecham fora da família, pelas relações de ordem */
+    expect(prova.recusados).toBe(2);
+    expect(prova.desenhados).toBe(98);
+    expect(prova.casos.filter((c) => c.recusado).map((c) => c.rotulo)).toEqual(['raioDoArco no máximo e topoDoArco no mínimo', 'raioDoArco no máximo e vao no mínimo']);
+    for (const c of prova.casos.filter((x) => !x.recusado)) {
       expect(c.estado, c.rotulo).toBe('resolvido');
       expect(c.problemas, c.rotulo).toEqual([]);
       expect(c.texto).toBeNull();
@@ -228,7 +237,8 @@ describe('provarFamilia', () => {
     const prova = await provarFamilia(f);
     expect(prova.ok).toBe(false);
     const falhas = prova.casos.filter((c) => !c.ok).map((c) => c.rotulo);
-    expect(falhas).toEqual(['todos no máximo', 'alfa no máximo']);
+    /* com alfa no máximo o triângulo não fecha, e o par em que ele vai ao máximo com a base no mínimo é um caso a mais da mesma falha */
+    expect(falhas).toEqual(['todos no máximo', 'alfa no máximo', 'alfa no máximo e base no mínimo']);
     const alfa = prova.casos.find((c) => c.rotulo === 'alfa no máximo');
     expect(alfa.estado).toBe('conflito');
     expect(alfa.problemas[0]).toMatch(/^conflito: o resolvedor não convergiu/);
@@ -237,17 +247,38 @@ describe('provarFamilia', () => {
     expect(prova.casos.find((c) => c.rotulo === 'alfa no mínimo').ok).toBe(true);
   });
 
-  it('o canto que não cabe no extremo é recusado com o motivo: o raio do arco da roda passa do vão no máximo da faixa', async () => {
+  it('o canto que não cabe no extremo é recusado com o motivo: o raio do arco da roda passa do vão no máximo da faixa; com a relação de ordem o conjunto nem se desenha', async () => {
     const bruta = familiaSintetica();
     bruta.parametros.raioDoArco.maximo = 480;
+    /* sem a relação de ordem que diz que o raio cabe nas arestas, a prova desenha os conjuntos e eles falham no canto */
+    bruta.restricoes = [];
     const { erros: e, familia: f } = lerFamiliaDeDesenho(bruta);
     expect(e).toEqual([]);
     const prova = await provarFamilia(f);
     const falhas = prova.casos.filter((c) => !c.ok);
-    expect(falhas.map((c) => c.rotulo)).toEqual(['todos no máximo', 'raioDoArco no máximo']);
-    expect(falhas.map((c) => c.estado)).toEqual(['recusado', 'recusado']);
+    expect(falhas.map((c) => c.rotulo).slice(0, 2)).toEqual(['todos no máximo', 'raioDoArco no máximo']);
+    expect(falhas.every((c) => c.rotulo === 'todos no máximo' || / ?raioDoArco no máximo/.test(c.rotulo))).toBe(true);
+    expect(falhas.length).toBeGreaterThan(8);
+    expect(falhas.every((c) => c.estado === 'recusado' && !c.recusado)).toBe(true);
     expect(falhas[1].problemas[0]).toMatch(/^recusado: .*o raio de canto não cabe entre/);
     expect(prova.casos.find((c) => c.rotulo === 'padrão').ok).toBe(true);
+
+    /* com as relações da família os mesmos conjuntos ferem "raioDoArco <= topoDoArco" ou "raioDoArco <= vao" e ficam de fora */
+    const comRelacoes = familiaSintetica();
+    comRelacoes.parametros.raioDoArco.maximo = 480;
+    const lida = lerFamiliaDeDesenho(comRelacoes);
+    expect(lida.erros).toEqual([]);
+    const segura = await provarFamilia(lida.familia);
+    expect(segura.ok).toBe(true);
+    const fora = segura.casos.filter((c) => c.recusado);
+    expect(fora.map((c) => c.rotulo)).toEqual(expect.arrayContaining(['todos no máximo', 'raioDoArco no máximo', 'raioDoArco no máximo e vao no mínimo']));
+    expect(fora.length).toBeGreaterThanOrEqual(falhas.length);
+    expect(fora.every((c) => c.ok && c.estado === 'recusado por relação de ordem' && c.vista === null && c.texto === null)).toBe(true);
+    expect(fora.find((c) => c.rotulo === 'raioDoArco no máximo').restricoes).toEqual([
+      'a relação de ordem "arco-cabe-no-topo" (raioDoArco <= topoDoArco) não vale: o lado esquerdo vale 480 e o direito 400; o canto do aro tem o raio do arco, e a perna do recorte tem de medir ao menos isso',
+      'a relação de ordem "arco-cabe-no-vao" (raioDoArco <= vao) não vale: o lado esquerdo vale 480 e o direito 420; o canto do aro tem o raio do arco, e o topo do recorte tem de medir ao menos isso',
+    ]);
+    expect(segura.desenhados + segura.recusados).toBe(segura.casos.length);
   }, 60_000);
 
   it('o chute fixo é a amarração errada que só o extremo mostra: a família do carrinho com o chute da caçamba fixo falha com a roda de 250; com o chute preso ao parâmetro passa em toda a faixa', async () => {

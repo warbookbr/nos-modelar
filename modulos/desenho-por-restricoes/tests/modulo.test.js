@@ -34,4 +34,19 @@ describe('o módulo desenho-por-restricoes', () => {
     expect(ajuda).toMatch(/raioDoCanto/);
     expect(ajuda).toMatch(/npm run desenho/);
   });
+
+  it('a ajuda diz o que o formato ganhou com as famílias: o catálogo declarado, as relações de ordem, os perfis da faixa, os pares cruzados, o gate, a orientação, o canto zero e min e max', () => {
+    const ajuda = textoDaAjuda();
+    expect(ajuda).toMatch(/"catalogo": "pecas\.json"/);
+    expect(ajuda).toMatch(/"restricoes": \[ \{ "id": "capo-abaixo-do-painel", "expressao": "capo < painel - 5"/);
+    expect(ajuda).toMatch(/Toda família\s+tem os perfis "minimo", "medio" e "maximo"/);
+    expect(ajuda).toMatch(/--perfil=<nome>\|minimo\|medio\|maximo/);
+    expect(ajuda).toMatch(/cada par de parâmetros nos extremos cruzados/);
+    expect(ajuda).toMatch(/npm run desenho -- conferir/);
+    expect(ajuda).toMatch(/familias-de-desenho:check/);
+    expect(ajuda).toMatch(/peça\s+virada/);
+    expect(ajuda).toMatch(/"sentido": "abaixo"/);
+    expect(ajuda).toMatch(/zero é canto vivo/);
+    expect(ajuda).toMatch(/sin, cos, tan, atan, atan2, sqrt .* e min e max/);
+  });
 });

@@ -2,12 +2,12 @@
    grava nos estados que não resolvem, recusa a descrição inválida com o que corrigir, e o arquivo que ela grava é lido sem mudança
    pelo esboço e pela prancha dos contornos, que passa a dizer de onde o desenho veio. */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { principal } from './desenho.mjs';
-import { desenhar } from '../../modulos/desenho-por-restricoes/src/index.js';
+import { desenhar, especializarFamilia, lerCatalogoDePecas, lerFamiliaDeDesenho, valoresDaFamilia } from '../../modulos/desenho-por-restricoes/src/index.js';
 import { larguraDoTexto } from '../../modulos/desenho-por-restricoes/src/traco.js';
 import { carrinho, carrinhoEmConflito, carrinhoFaltando, chuteEspelhado } from '../../modulos/desenho-por-restricoes/tests/carrinho.js';
 import { chapa, placaArredondada } from '../../modulos/desenho-por-restricoes/tests/formas.js';
@@ -422,17 +422,27 @@ describe('npm run desenho -- familia', () => {
     const { arquivo } = comArquivo();
     const r = await rodar(['familia', arquivo, '--provar']);
     expect(r.codigo).toBe(0);
-    expect(r.out).toMatch(/^família "carcaca-sintetica" 1\.0\.0: 28 conjuntos de valores/);
+    expect(r.out).toMatch(/^família "carcaca-sintetica" 1\.0\.0: 100 conjuntos de valores \(todos no mínimo.*; cada par de parâmetros nos extremos cruzados; cada perfil\), dos quais 2 fora das relações de ordem da família\n/);
     expect(r.out).toMatch(/\n {2}ok {5}padrão +vista 2200 x 1100 mm\n/);
     expect(r.out).toMatch(/\n {2}ok {5}todos no máximo +vista 2600 x 1500 mm\n/);
     expect(r.out).toMatch(/\n {2}ok {5}perfil larga +vista 2600 x 1100 mm\n/);
-    expect(r.out).toMatch(/28 de 28 resolvem, com zero grau de liberdade, sem conflito, sem lado trocado, sem polígono cruzado e sem parte escondida\.\n$/);
+    expect(r.out).toMatch(/\n {2}ok {5}altura no mínimo e vao no máximo +vista /);
+    /* o par em que o arco de 320 de raio fica com o recorte de 300 não é da família: sai como recusa, com a relação que ele fere */
+    expect(r.out).toMatch(/\n {2}recusa raioDoArco no máximo e vao no mínimo +fere "arco-cabe-no-vao"\n/);
+    expect(r.out).toMatch(/\n {2}recusa raioDoArco no máximo e topoDoArco no mínimo +fere "arco-cabe-no-topo"\n/);
+    expect(r.out).toMatch(/\n2 conjuntos ferem a relação de ordem "arco-cabe-no-topo", "arco-cabe-no-vao" da família e não foram desenhados: /);
+    expect(r.out).toMatch(/98 de 98 resolvem, com zero grau de liberdade, sem conflito, sem lado trocado, sem polígono cruzado, sem parte escondida e sem peça virada\.\n$/);
     expect(r.out).not.toMatch(/FALHOU/);
+    const json = JSON.parse((await rodar(['familia', arquivo, '--provar', '--json'])).out);
+    expect(json).toMatchObject({ ok: true, desenhados: 98, recusados: 2 });
+    expect(json.casos.filter((c) => c.recusado).map((c) => c.feridas)).toEqual([['arco-cabe-no-topo'], ['arco-cabe-no-vao']]);
   }, 120_000);
 
   it('--provar de uma família que quebra num extremo sai com 4 e diz o conjunto, os valores que mudam e o motivo', async () => {
     const f = familiaSintetica();
     f.parametros.raioDoArco.maximo = 480;
+    /* sem as relações de ordem que dizem que o raio cabe nas arestas, o conjunto é desenhado e falha */
+    f.restricoes = [];
     const { arquivo } = comArquivo(f);
     const r = await rodar(['familia', arquivo, '--provar']);
     expect(r.codigo).toBe(4);
@@ -440,10 +450,10 @@ describe('npm run desenho -- familia', () => {
     expect(r.out).toMatch(/\n {9}valores: .*raioDoArco = 480 mm/);
     expect(r.out).toMatch(/\n {9}recusado: .*o raio de canto não cabe entre/);
     expect(r.out).toMatch(/\n {2}ok {5}padrão/);
-    expect(r.out).toMatch(/2 de 28 falharam: todos no máximo; raioDoArco no máximo\./);
+    expect(r.out).toMatch(/\n\d+ de 100 falharam: todos no máximo; raioDoArco no máximo; /);
     const json = JSON.parse((await rodar(['familia', arquivo, '--provar', '--json'])).out);
     expect(json.ok).toBe(false);
-    expect(json.casos.filter((c) => !c.ok).map((c) => c.rotulo)).toEqual(['todos no máximo', 'raioDoArco no máximo']);
+    expect(json.casos.filter((c) => !c.ok).map((c) => c.rotulo).slice(0, 2)).toEqual(['todos no máximo', 'raioDoArco no máximo']);
     expect(json.casos[0]).toMatchObject({ rotulo: 'padrão', ok: true, estado: 'resolvido' });
   }, 120_000);
 
@@ -490,7 +500,7 @@ describe('npm run desenho -- familia', () => {
     expect(fora.err).toMatch(/o parâmetro "vao" vale 900 mm, fora da faixa da família \(de 300 a 520 mm\)/);
     const perfil = await rodar(['familia', arquivo, '--perfil=enorme']);
     expect(perfil.codigo).toBe(3);
-    expect(perfil.err).toMatch(/o perfil "enorme" não existe na família \(os perfis são "compacta", "larga"\)/);
+    expect(perfil.err).toMatch(/o perfil "enorme" não existe na família \(os perfis são "compacta", "larga"; "minimo", "medio", "maximo" existem em toda família/);
     const mal = await rodar(['familia', arquivo, '--valores=vao']);
     expect(mal.codigo).toBe(2);
     expect(mal.err).toMatch(/--valores deve ser nome=número separados por vírgula/);
@@ -520,7 +530,7 @@ describe('npm run desenho -- familia', () => {
     expect((await rodar(['familia', arquivo])).codigo).toBe(3);
     const r = await rodar(['familia', arquivo, `--pecas=${catalogo}`, '--provar']);
     expect(r.codigo).toBe(0);
-    expect(r.out).toMatch(/28 de 28 resolvem/);
+    expect(r.out).toMatch(/98 de 98 resolvem/);
     expect((await rodar(['familia', arquivo, `--pecas=${join(dir, 'nao-existe.json')}`])).codigo).toBe(2);
     const vazio = await rodar(['familia', arquivo, '--pecas']);
     expect(vazio.codigo).toBe(2);
@@ -534,6 +544,196 @@ describe('npm run desenho -- familia', () => {
     expect(dupla.codigo).toBe(3);
     expect(dupla.err).toMatch(/a peça "anelCoaxial" está em mais de um catálogo/);
   }, 120_000);
+});
+
+describe('npm run desenho -- familia: o catálogo declarado e os perfis da faixa', () => {
+  const catalogoDeTeste = { formato: 'mecanifica.pecas-de-desenho@1', pecas: { arcoDeRodaComAro: arcoDeRodaComAro(), anelCoaxial: anelCoaxial() } };
+  /* A família sem as peças dentro, com o catálogo ao lado declarado em "catalogo". */
+  const familiaComCatalogo = (catalogo = 'pecas.json') => { const f = familiaSintetica(); delete f.desenho.pecas; f.catalogo = catalogo; return f; };
+
+  it('a família que declara "catalogo" desenha, prova e grava sem --pecas, e o caminho é relativo ao arquivo dela e não a quem roda', async () => {
+    const dir = pasta();
+    mkdirSync(join(dir, 'familias'));
+    mkdirSync(join(dir, 'catalogos'));
+    escrever(join(dir, 'catalogos'), 'pecas.json', catalogoDeTeste);
+    const arquivo = escrever(join(dir, 'familias'), 'carcaca.familia-de-desenho.json', familiaComCatalogo('../catalogos/pecas.json'));
+    const desenhado = await rodar(['familia', arquivo]);
+    expect(desenhado.codigo).toBe(0);
+    expect(desenhado.out).toMatch(/estado resolvido, 0 graus de liberdade/);
+    const prova = await rodar(['familia', arquivo, '--provar']);
+    expect(prova.codigo).toBe(0);
+    expect(prova.out).toMatch(/98 de 98 resolvem/);
+    const saida = join(dir, 'saida');
+    expect((await rodar(['familia', arquivo, '--perfil=compacta', `--grava=${saida}`])).codigo).toBe(0);
+    expect(Object.keys(JSON.parse(readFileSync(join(saida, 'lateral.desenho.json'), 'utf8')).pecas)).toEqual(['anelCoaxial', 'arcoDeRodaComAro']);
+    /* --pecas segue aceito, e o mesmo arquivo dito nos dois lugares não conta duas vezes */
+    const mesmo = await rodar(['familia', arquivo, `--pecas=${join(dir, 'catalogos', 'pecas.json')}`, '--provar']);
+    expect(mesmo.codigo).toBe(0);
+    /* um catálogo a mais com o nome de uma peça que já veio do declarado é o erro de sempre */
+    const repetido = escrever(dir, 'repetido.json', { formato: 'mecanifica.pecas-de-desenho@1', pecas: { anelCoaxial: anelCoaxial() } });
+    const dupla = await rodar(['familia', arquivo, `--pecas=${repetido}`]);
+    expect(dupla.codigo).toBe(3);
+    expect(dupla.err).toMatch(/a peça "anelCoaxial" está em mais de um catálogo/);
+  }, 180_000);
+
+  it('o catálogo declarado que não existe sai com 2 dizendo que a família o declara, o malformado com 3, e o declarado errado com 3 dizendo o campo', async () => {
+    const dir = pasta();
+    const arquivo = escrever(dir, 'carcaca.familia-de-desenho.json', familiaComCatalogo());
+    const falta = await rodar(['familia', arquivo, '--provar']);
+    expect(falta.codigo).toBe(2);
+    expect(falta.err).toMatch(/o catálogo de peças que a família declara em "catalogo", .*pecas\.json não existe/);
+    escrever(dir, 'pecas.json', { formato: 'mecanifica.pecas-de-desenho@1', pecas: { x: { pontos: {} } } });
+    const mal = await rodar(['familia', arquivo, '--provar']);
+    expect(mal.codigo).toBe(3);
+    expect(mal.err).toMatch(/1 erro\(s\) no catálogo pecas\.json/);
+    const absoluto = escrever(dir, 'absoluto.familia-de-desenho.json', familiaComCatalogo('/tmp/pecas.json'));
+    const r = await rodar(['familia', absoluto, '--provar']);
+    expect(r.codigo).toBe(3);
+    expect(r.err).toMatch(/a família absoluto\.familia-de-desenho\.json tem 1 erro\(s\):\n- o "catalogo" "\/tmp\/pecas\.json" é um caminho absoluto/);
+  });
+
+  it('--perfil=minimo, medio e maximo põem todos os parâmetros naquele ponto da faixa, e gravam o mesmo desenho que os valores escritos um a um', async () => {
+    const dir = pasta();
+    escrever(dir, 'pecas.json', catalogoDeTeste);
+    const arquivo = escrever(dir, 'carcaca.familia-de-desenho.json', familiaComCatalogo());
+    const f = familiaSintetica();
+    const faixa = (campo) => Object.entries(f.parametros).map(([n, p]) => `${n}=${p[campo]}`).join(',');
+    for (const campo of ['minimo', 'medio', 'maximo']) {
+      const a = join(dir, `perfil-${campo}`); const b = join(dir, `valores-${campo}`);
+      const porPerfil = await rodar(['familia', arquivo, `--perfil=${campo}`, `--grava=${a}`]);
+      const porValores = await rodar(['familia', arquivo, `--valores=${faixa(campo)}`, `--grava=${b}`]);
+      expect([porPerfil.codigo, porValores.codigo], campo).toEqual([0, 0]);
+      expect(readFileSync(join(a, 'lateral.desenho.json')).equals(readFileSync(join(b, 'lateral.desenho.json'))), campo).toBe(true);
+      expect(readFileSync(join(a, 'lateral.contornos.json')).equals(readFileSync(join(b, 'lateral.contornos.json'))), campo).toBe(true);
+    }
+    const minimo = JSON.parse(readFileSync(join(dir, 'perfil-minimo', 'lateral.desenho.json'), 'utf8'));
+    expect(minimo.parametros).toMatchObject({ comprimento: 1800, altura: 600, vao: 300 });
+    const maximo = JSON.parse(readFileSync(join(dir, 'perfil-maximo', 'lateral.desenho.json'), 'utf8'));
+    expect(maximo.parametros).toMatchObject({ comprimento: 2600, altura: 900, vao: 520 });
+    /* o valor dado vale por cima do perfil, e a relação de ordem recusa o conjunto que a fere antes de desenhar */
+    const por = await rodar(['familia', arquivo, '--perfil=maximo', '--valores=vao=300']);
+    expect(por.codigo).toBe(3);
+    expect(por.err).toMatch(/esses valores ferem a relação de ordem "arco-cabe-no-vao" \(raioDoArco <= vao\) não vale: o lado esquerdo vale 320 e o direito 300/);
+  }, 180_000);
+
+  it('a peça virada aparece no relatório da família do braço: com "angulo": 90 nos usos tamborPunho e punho, o punho sai para cima contra o sentido "abaixo" do uso, e o aviso diz qual uso', async () => {
+    const D = 'procedural/familias-de-desenho/braco-colaborativo';
+    const { erros, pecas } = lerCatalogoDePecas(JSON.parse(readFileSync(`${D}/pecas.json`, 'utf8')));
+    expect(erros).toEqual([]);
+    const { erros: e, familia } = lerFamiliaDeDesenho(JSON.parse(readFileSync(`${D}/braco-colaborativo.familia-de-desenho.json`, 'utf8')), { pecas });
+    expect(e).toEqual([]);
+    const certo = await desenhar(especializarFamilia(familia, valoresDaFamilia(familia).valores, { pecas }));
+    expect(certo.relatorio.estado).toBe('resolvido');
+    expect(certo.relatorio.orientacao).toEqual([]);
+    expect(certo.relatorio.avisos).toEqual([]);
+    const virada = { ...familia, desenho: JSON.parse(JSON.stringify(familia.desenho)) };
+    virada.desenho.usos.tamborPunho.parametros.angulo = 90;
+    virada.desenho.usos.punho.parametros.angulo = 90;
+    const r = await desenhar(especializarFamilia(virada, valoresDaFamilia(virada).valores, { pecas }));
+    expect(r.relatorio.orientacao).toHaveLength(1);
+    expect(r.relatorio.orientacao[0]).toMatchObject({ relacao: 'tamborPunho.comprimento', uso: 'tamborPunho', peca: 'anelCoaxial', pedido: 'abaixo', chute: 'acima' });
+    expect(r.texto).toMatch(/aviso: a peça "anelCoaxial" usada em "tamborPunho" \(relação "tamborPunho\.comprimento"\) está virada/);
+  }, 120_000);
+});
+
+describe('npm run desenho -- conferir', () => {
+  /* Uma pasta de famílias com uma só, que tem o perfil `referencia` e o catálogo ao lado, e a pasta `referencia/` gravada pelo próprio comando. */
+  const montar = async () => {
+    const raiz = pasta();
+    const dir = join(raiz, 'carcaca');
+    mkdirSync(dir);
+    escrever(dir, 'pecas.json', { formato: 'mecanifica.pecas-de-desenho@1', pecas: { arcoDeRodaComAro: arcoDeRodaComAro(), anelCoaxial: anelCoaxial() } });
+    const f = familiaSintetica();
+    delete f.desenho.pecas;
+    f.catalogo = 'pecas.json';
+    f.perfis.referencia = { descricao: 'o ponto médio', parametros: { altura: 750, raioDoArco: 270, vao: 410, recuo: 320 } };
+    const arquivo = escrever(dir, 'carcaca.familia-de-desenho.json', f);
+    expect((await rodar(['familia', arquivo, '--perfil=referencia', `--grava=${join(dir, 'referencia')}`])).codigo).toBe(0);
+    return { raiz, dir, arquivo, familia: f };
+  };
+
+  it('prova a família e confere que a pasta referencia/ é o que ela gera: sai com 0 e diz os números', async () => {
+    const { raiz } = await montar();
+    const r = await rodar(['conferir', raiz]);
+    expect(r.err).toBe('');
+    expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/carcaca\.familia-de-desenho\.json: família "carcaca-sintetica" 1\.0\.0\n/);
+    expect(r.out).toMatch(/\n {2}prova: 98 conjuntos desenhados, 2 fora das relações de ordem, todos resolvem\n/);
+    expect(r.out).toMatch(/\n {2}referencia\/: igual ao que a família gera \(desenho e contornos\)\n/);
+    expect(r.out).toMatch(/\n1 família\(s\) conferida\(s\): a prova passa e as pastas de perfil gravadas são as que elas geram\.\n$/);
+    const json = JSON.parse((await rodar(['conferir', raiz, '--json'])).out);
+    expect(json.ok).toBe(true);
+    expect(json.familias[0]).toMatchObject({ id: 'carcaca-sintetica', prova: { total: 100, desenhados: 98, recusados: 2 }, falhas: [] });
+    expect(json.familias[0].pastas).toEqual([{ perfil: 'referencia', falhas: [] }]);
+  }, 180_000);
+
+  it('confere também as pastas minimo/, medio/ e maximo/ quando existem ao lado da família', async () => {
+    const { raiz, dir, arquivo } = await montar();
+    expect((await rodar(['familia', arquivo, '--perfil=minimo', `--grava=${join(dir, 'minimo')}`])).codigo).toBe(0);
+    const r = await rodar(['conferir', raiz]);
+    expect(r.codigo).toBe(0);
+    expect(r.out).toMatch(/\n {2}minimo\/: igual ao que a família gera/);
+    expect(r.out).not.toMatch(/medio\/|maximo\//);
+    writeFileSync(join(dir, 'minimo', 'lateral.contornos.json'), readFileSync(join(dir, 'minimo', 'lateral.contornos.json'), 'utf8').replace('1800', '1801'));
+    const ruim = await rodar(['conferir', raiz]);
+    expect(ruim.codigo).toBe(4);
+    expect(ruim.out).toMatch(/\n {2}minimo\/: DIFERENTE do que a família gera\n/);
+    expect(ruim.out).toMatch(/\n {2}referencia\/: igual/);
+  }, 180_000);
+
+  it('a pasta referencia/ que a família já não gera sai com 4 dizendo o arquivo, a linha e o comando que regrava', async () => {
+    const { raiz, dir, arquivo, familia } = await montar();
+    /* mudar um valor do perfil referencia muda o desenho especializado e os contornos */
+    familia.perfis.referencia.parametros.altura = 760;
+    escrever(dir, 'carcaca.familia-de-desenho.json', familia);
+    const r = await rodar(['conferir', raiz]);
+    expect(r.codigo).toBe(4);
+    expect(r.out).toMatch(/\n {2}referencia\/: DIFERENTE do que a família gera\n/);
+    expect(r.out).toMatch(/lateral\.desenho\.json não é o que a família gera para o perfil "referencia" \(primeira diferença na linha \d+: a família gera "\\"altura\\": 760,?" e o arquivo tem "\\"altura\\": 750,?"\)/);
+    expect(r.out).toMatch(/lateral\.contornos\.json não é o que a família gera/);
+    expect(r.out).toMatch(/regrave com npm run desenho -- familia .*carcaca\.familia-de-desenho\.json --perfil=referencia --grava=.*referencia/);
+    expect(r.out).toMatch(/\n1 de 1 família\(s\) com problema: .*carcaca\.familia-de-desenho\.json\.\n$/);
+    /* regravada, volta a passar */
+    expect((await rodar(['familia', arquivo, '--perfil=referencia', `--grava=${join(dir, 'referencia')}`])).codigo).toBe(0);
+    expect((await rodar(['conferir', raiz])).codigo).toBe(0);
+  }, 180_000);
+
+  it('a família com perfil referencia e sem a pasta sai com 4, a que não prova sai com 4 dizendo o conjunto, a inválida com 3 e a pasta sem família com 2', async () => {
+    const { raiz, dir, familia } = await montar();
+    rmSync(join(dir, 'referencia'), { recursive: true });
+    const sem = await rodar(['conferir', raiz]);
+    expect(sem.codigo).toBe(4);
+    expect(sem.out).toMatch(/\n {2}referencia\/: DIFERENTE do que a família gera\n {4}falta a pasta .*referencia; grave com npm run desenho -- familia .* --perfil=referencia --grava=/);
+
+    /* sem as relações de ordem, o raio de 480 do arco não cabe e a prova reprova */
+    const quebrada = JSON.parse(JSON.stringify(familia));
+    quebrada.restricoes = []; quebrada.parametros.raioDoArco.maximo = 480; delete quebrada.perfis.referencia;
+    escrever(dir, 'carcaca.familia-de-desenho.json', quebrada);
+    const prova = await rodar(['conferir', raiz]);
+    expect(prova.codigo).toBe(4);
+    expect(prova.out).toMatch(/\n {2}prova: 100 conjuntos desenhados; \d+ FALHARAM\n {4}FALHOU todos no máximo: recusado: /);
+
+    const invalida = JSON.parse(JSON.stringify(familia));
+    invalida.parametros.vao.padrao = 100;
+    escrever(dir, 'carcaca.familia-de-desenho.json', invalida);
+    const mal = await rodar(['conferir', raiz]);
+    expect(mal.codigo).toBe(3);
+    expect(mal.out).toMatch(/: INVÁLIDA\n {2}- o parâmetro "vao" tem o padrão 100 fora da faixa de 300 a 520 mm\n/);
+
+    /* o catálogo que a família declara e não existe deixa a família inválida para o gate, e a mensagem diz qual arquivo */
+    rmSync(join(dir, 'pecas.json'));
+    escrever(dir, 'carcaca.familia-de-desenho.json', familia);
+    const semCatalogo = await rodar(['conferir', raiz]);
+    expect(semCatalogo.codigo).toBe(3);
+    expect(semCatalogo.err).toMatch(/o catálogo de peças que a família declara em "catalogo", .*pecas\.json não existe/);
+    expect(semCatalogo.out).toMatch(/: INVÁLIDA\n/);
+
+    const vazia = pasta();
+    const nenhuma = await rodar(['conferir', vazia]);
+    expect(nenhuma.codigo).toBe(2);
+    expect(nenhuma.err).toMatch(/nenhuma família \(\*\.familia-de-desenho\.json\) sob .*; um gate que não confere nada não passa/);
+    expect((await rodar(['conferir', join(vazia, 'nao-existe')])).codigo).toBe(2);
+  }, 180_000);
 });
 
 describe('npm run desenho: o desenho com peças e parâmetros', () => {

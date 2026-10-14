@@ -31,9 +31,31 @@ describe('expressões da Oficina', () => {
     expect(num('=atan2(sin(ang), cos(ang))')).toBeCloseTo(30, 12);
   });
 
+  it('min e max dão o menor e o maior de dois ou mais valores, e aceitam parâmetros, expressões e negativos', () => {
+    const { num } = criarResolverNumerico({ a: 3, b: -7, c: '=a*2', menor: '=min(a, b)', grande: '=max(a, b, c, 5)' });
+    expect(num('=min(a, b)')).toBe(-7);
+    expect(num('=max(a, b)')).toBe(3);
+    expect(num('=min(c, 10, a + 1)')).toBe(4);
+    expect(num('=max(-1, -2)')).toBe(-1);
+    expect(num('=min(4, 4)')).toBe(4);
+    expect(num('menor')).toBe(-7);
+    expect(num('grande')).toBe(6);
+    /* o menor de dois é o que a conta pela raiz do quadrado da diferença dava, sem a raiz */
+    expect(num('=min(a, c)')).toBe(num('=(a + c - sqrt((a - c) * (a - c))) / 2'));
+    expect(num('=2 * max(a, 1) + min(a, 1)')).toBe(7);
+  });
+
+  it('min e max recusam menos de dois argumentos, e um parâmetro com o nome da função continua valendo sem parênteses', () => {
+    const { num } = criarResolverNumerico({ a: 1, min: 9, max: 2 });
+    expect(() => num('=min(a)')).toThrow(/'min' recebe 2 ou mais argumento\(s\), não 1/);
+    expect(() => num('=max(a')).toThrow(/faltou '\)'/);
+    expect(num('=min + max')).toBe(11);
+    expect(num('=max(min, max)')).toBe(9);
+  });
+
   it('recusa função fora da lista e número errado de argumentos', () => {
     const { num } = criarResolverNumerico({ a: 1 });
-    expect(() => num('=asin(a)')).toThrow(/função 'asin' não existe.*atan, atan2, sin, cos, tan, sqrt/);
+    expect(() => num('=asin(a)')).toThrow(/função 'asin' não existe.*atan, atan2, sin, cos, tan, sqrt, min, max/);
     expect(() => num('=sqrt(0 - a)')).toThrow(/sqrt de -1, que é negativo/);
     expect(() => num('=atan2(a)')).toThrow(/'atan2' recebe 2 argumento/);
     expect(() => num('=atan(a, a)')).toThrow(/'atan' recebe 1 argumento/);

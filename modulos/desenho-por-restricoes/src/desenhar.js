@@ -11,6 +11,7 @@ import { anelDaParte, cantosQueNaoCabem, medidasDerivadas, r3, seCruza, SEGMENTO
 import { contornosDoDesenho } from './contornos.js';
 import { vistaEmTraco } from './traco.js';
 import { relatorioEmTexto } from './relatorio.js';
+import { conferirOrientacao } from './orientacao.js';
 
 const sha256 = (texto) => createHash('sha256').update(texto).digest('hex');
 const aspas = (s) => JSON.stringify(s);
@@ -21,12 +22,14 @@ export async function desenhar(descricao, { origem = null, segmentosPorQuarto = 
   /* A geometria de construção amarra relações no resolvedor, mas não é parte: fica fora dos anéis, dos contornos e da vista. */
   const modelo = { ...completo, partes: Object.fromEntries(Object.entries(completo.partes).filter(([, p]) => !p.construcao)) };
   const r = await resolver(completo);
-  const avisos = [];
+  /* A peça virada: o chute dela contra o lado que o uso deu à relação. Entra como aviso em qualquer estado, e a prova da família a reprova. */
+  const orientacao = conferirOrientacao(completo);
+  const avisos = orientacao.map((o) => o.mensagem);
   const relatorio = {
     objeto: modelo.objeto, vista: modelo.vista, estado: r.estado, resolvido: r.estado === 'resolvido', parametros: completo.parametros,
     grausDeLiberdade: r.grausDeLiberdade, statusDoResolvedor: r.statusDoResolvedor, convergiu: r.convergiu,
     conflitantes: r.conflitantes, redundantes: r.redundantes, soltas: r.soltas, ladosTrocados: r.ladosTrocados.map(({ ponto, linha, chute, ...resto }) => resto),
-    desvios: r.desvios, sugestao: r.sugestao, avisos, ocultas: [], sobrepostas: [], cruzadas: [], medidas: null,
+    desvios: r.desvios, sugestao: r.sugestao, avisos, ocultas: [], sobrepostas: [], cruzadas: [], orientacao, medidas: null,
   };
   let contornos = null; let svg = null;
   if (r.pontos) {

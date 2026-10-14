@@ -220,7 +220,8 @@ export function medidasDerivadas(modelo, pontos, raios, aneis) {
         const a = pontos[n]; const b = pontos[p.pontos[(i + 1) % p.pontos.length]];
         return { de: n, ate: p.pontos[(i + 1) % p.pontos.length], comprimentoMm: r3(distancia(a, b)), anguloGraus: r3(anguloEmGraus(a, b)) };
       });
-      if (p.raiosDosCantos) m.cantos = p.pontos.map((n, i) => ({ ponto: n, raioMm: p.raiosDosCantos[i] })).filter((c) => c.raioMm > 0);
+      const arredondados = (p.raiosDosCantos ?? []).length ? p.pontos.map((n, i) => ({ ponto: n, raioMm: p.raiosDosCantos[i] })).filter((c) => c.raioMm > 0) : [];
+      if (arredondados.length) m.cantos = arredondados;
     }
     partes[nome] = m;
   }

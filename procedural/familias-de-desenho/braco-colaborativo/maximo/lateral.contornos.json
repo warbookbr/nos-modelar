@@ -2,7 +2,7 @@
  "formato": "mecanifica.contornos@1",
  "origem": {
   "desenho": "lateral.desenho.json",
-  "sha256": "8cb2159db9029dbf8df7088d754fbc60bc6b3d7e05b1c96a7258353e5ce9e99b",
+  "sha256": "7f3b0328380cd6363829f8eb1fc3daf8e5145a1302c86ed24aa19cc9bc82b95f",
   "resolvedor": "planegcs@1.3.0"
  },
  "silhueta": {

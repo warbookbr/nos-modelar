@@ -3,6 +3,7 @@
   "id": "carcaca-empilhadeira",
   "versao": "1.0.0",
   "descricao": "vista lateral da carcaça de uma empilhadeira a combustão de 1,5 a 3,5 t, sem rodas, torre, garfos, assento nem volante; ajustada a uma referência só",
+  "catalogo": "pecas.json",
   "parametros": {
     "comprimento": { "unidade": "mm", "padrao": 2150, "minimo": 2020, "medio": 2150, "maximo": 2320, "descricao": "da ponta do paralama à traseira, onde acabam o capô, o contrapeso e a tampa" },
     "altura": { "unidade": "mm", "padrao": 852.6, "minimo": 842, "medio": 852.6, "maximo": 866, "descricao": "altura total, no topo da frente da tampa" },
@@ -20,6 +21,11 @@
     "encosto": { "unidade": "mm", "padrao": 706.6, "minimo": 680, "medio": 706.6, "maximo": 735, "descricao": "altura da frente do encosto" },
     "painel": { "unidade": "mm", "padrao": 841.2, "minimo": 830, "medio": 841.2, "maximo": 852, "descricao": "altura do topo do painel, entre o encosto e a tampa" }
   },
+  "restricoes": [
+    { "id": "capo-abaixo-do-painel", "expressao": "capo < painel - 5", "motivo": "o painel fica acima do capô; o raio do canto de trás do painel acompanha a folga entre os dois e deixa de existir quando o capô passa do painel" },
+    { "id": "painel-perto-do-encosto", "expressao": "painel <= encosto + 162", "motivo": "o painel sobe do alto do encosto a 28 graus, e o topo reto dele tem de comportar o canto de 70 mm e o do painel; com o painel mais de 162 mm acima do encosto o canto não cabe na aresta (o limite medido é 162,75 mm, com o capô em 808 e o painel em 852)" },
+    { "id": "painel-abaixo-da-tampa", "expressao": "painel < altura", "motivo": "a tampa fica visível acima do painel" }
+  ],
   "perfis": {
     "referencia": {
       "descricao": "a carcaça do contorno da referência (docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/referencias/carcaca_lateral.contornos.json)",

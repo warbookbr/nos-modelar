@@ -222,6 +222,13 @@ jobs:
       - name: Famílias registradas com a geometria igual à aprovada
         run: npm run familias:check
 
+      # A família de desenho é um desenho parametrizado com a faixa de cada parâmetro. A prova desenha cada conjunto de valores que
+      # ela admite (os extremos, os pares nos extremos cruzados e cada perfil), e a pasta de perfil gravada ao lado dela tem de
+      # continuar sendo o que ela gera. Sem este passo uma peça de desenho podia mudar e a família de cima quebrar no extremo, ou
+      # a pasta de referência envelhecer, sem que ninguém visse.
+      - name: Famílias de desenho que resolvem em toda a faixa e com a pasta de perfil em dia
+        run: npm run familias-de-desenho:check
+
       # O conjunto de calibração do crítico: o desenho de cada fonte, o agente e o brief têm de ser os gravados, e a medida
       # tem de reprovar sem o crítico o que o conjunto diz ser dela. Sem este passo o crítico poderia mudar sem remedir.
       - name: Conjunto de calibração do crítico em dia com o crítico e com as fontes

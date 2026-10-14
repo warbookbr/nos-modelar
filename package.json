@@ -23,6 +23,7 @@
     "ferramentas:check": "node tools/mecanifica/ferramentas-por-objeto.mjs --check",
     "familia": "node tools/mecanifica/familia.mjs",
     "familias:check": "node tools/mecanifica/familia.mjs conferir",
+    "familias-de-desenho:check": "node tools/mecanifica/desenho.mjs conferir procedural/familias-de-desenho",
     "calibracao": "node tools/mecanifica/calibracao-do-critico.mjs",
     "calibracao:check": "node tools/mecanifica/calibracao-do-critico.mjs conferir",
     "banco-de-provas": "node tools/mecanifica/banco-de-provas.mjs",

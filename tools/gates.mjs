@@ -112,6 +112,11 @@ export const GATES = [
   /* O hash da geometria dos três pontos de cada família registrada em `procedural/familias`, preso ao `aprovacao.json`.
      Geometria que muda sem reaprovação reprova dizendo o ponto; sem família registrada, passa dizendo isso. */
   'familias:check',
+  /* As famílias de desenho: a prova de toda família sob `procedural/familias-de-desenho` (cada conjunto de valores que ela admite
+     resolve sem conflito, parte solta, lado trocado, polígono cruzado, parte escondida nem peça virada) e a conferência de que a
+     pasta `referencia/` gravada ao lado dela, e as de `minimo/`, `medio/` e `maximo/` quando existem, ainda são o que ela gera,
+     nos bytes do desenho e dos contornos. Mudar a família, o catálogo de peças ou o módulo sem regravar a pasta reprova. */
+  'familias-de-desenho:check',
   /* O conjunto de calibração do crítico: as doze imagens com a fonte que as reproduz, o hash do agente e do brief gravados
      e a medida reprovando, sem o crítico, o que o conjunto diz ser dela. Mudar o crítico, o desenhista ou a geometria de uma
      fonte exige gerar e medir de novo. */
