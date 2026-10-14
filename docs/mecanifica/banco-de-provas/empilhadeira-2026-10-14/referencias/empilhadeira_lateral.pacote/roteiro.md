@@ -70,13 +70,13 @@ Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/empilhadeira-2026
 - rodaDianteira / torre
 - capo / contrapeso
 - capo / pocoTraseiro
-- contrapeso / pocoTraseiro
+- lateral / pocoTraseiro
 
 ## Etapa 8 — divisas, folha 7 de 7
 
 Abra /home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/divisas-07.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- lateral / pocoTraseiro
+- contrapeso / pocoTraseiro
 - pocoTraseiro / rodaTraseira
 - aro / lateral
 - rodaDianteira / sombra

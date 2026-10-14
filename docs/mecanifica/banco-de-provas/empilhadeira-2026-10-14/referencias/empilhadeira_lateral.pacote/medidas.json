@@ -20,7 +20,7 @@
   "presilha": 0.955,
   "protetor": 0.998,
   "rodaDianteira": 0.965,
-  "rodaTraseira": 0.984,
+  "rodaTraseira": 1,
   "sombra": 0.373,
   "tampa": 0.997,
   "torre": 0.982,
@@ -30,8 +30,8 @@
  "abaixo": [
   "sombra"
  ],
- "semDonoPx": 239,
- "semDonoAnexadosPx": 8709,
+ "semDonoPx": 179,
+ "semDonoAnexadosPx": 8554,
  "mascaraSuavizada": {
   "tirados": 53,
   "postos": 110
@@ -46,8 +46,8 @@
    "b": "protetor",
    "caixa": [
     443,
-    29,
-    745,
+    25,
+    735,
     142
    ]
   },
@@ -177,7 +177,7 @@
    "caixa": [
     674,
     304,
-    754,
+    753,
     343
    ]
   },
@@ -185,10 +185,10 @@
    "a": "capo",
    "b": "lateral",
    "caixa": [
-    723,
+    724,
     308,
-    762,
-    405
+    763,
+    404
    ]
   },
   {
@@ -385,10 +385,20 @@
    "a": "capo",
    "b": "pocoTraseiro",
    "caixa": [
-    732,
+    734,
     373,
     828,
     412
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "pocoTraseiro",
+   "caixa": [
+    694,
+    380,
+    758,
+    484
    ]
   },
   {
@@ -399,16 +409,6 @@
     380,
     884,
     497
-   ]
-  },
-  {
-   "a": "lateral",
-   "b": "pocoTraseiro",
-   "caixa": [
-    694,
-    381,
-    756,
-    484
    ]
   },
   {
@@ -447,8 +447,8 @@
    "caixa": [
     718,
     489,
-    857,
-    546
+    859,
+    549
    ]
   },
   {
