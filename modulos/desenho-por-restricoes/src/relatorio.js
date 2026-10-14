@@ -31,10 +31,10 @@ function linhasDasMedidas(m, ordemDeNomes) {
   for (const nome of ordemDeNomes) {
     const p = m.partes[nome];
     const caixa = `${mm(p.larguraMm)} de largura (h de ${mm(p.hMin)} a ${mm(p.hMax)}) por ${mm(p.alturaMm)} de altura (v de ${mm(p.vMin)} a ${mm(p.vMax)})`;
-    if (p.tipo === 'barra') L.push(`  ${aspas(nome)}: barra de ${mm(p.comprimentoMm)} mm de comprimento a ${mm(p.anguloGraus)} graus, ${mm(p.espessuraMm)} mm de espessura; ${caixa}`);
+    if (p.tipo === 'barra') L.push(`  ${aspas(nome)}: barra de ${mm(p.comprimentoMm)} mm de comprimento a ${mm(p.anguloGraus)} graus, ${mm(p.espessuraMm)} mm de espessura${p.raioDoCantoMm ? `, cantos arredondados de raio ${mm(p.raioDoCantoMm)} mm${p.raioDoCantoMm * 2 >= p.espessuraMm ? ' (pontas semicirculares)' : ''}` : ''}; ${caixa}`);
     else if (p.tipo === 'circulo') L.push(`  ${aspas(nome)}: círculo de raio ${mm(p.raioMm)} mm; ${caixa}`);
     else if (p.tipo === 'arco') L.push(`  ${aspas(nome)}: arco de raio ${mm(p.raioMm)} mm; ${caixa}`);
-    else L.push(`  ${aspas(nome)}: polígono; ${caixa}; lados ${p.lados.map((l) => `${l.de}-${l.ate} ${mm(l.comprimentoMm)} mm a ${mm(l.anguloGraus)} graus`).join(', ')}`);
+    else L.push(`  ${aspas(nome)}: polígono; ${caixa}; lados ${p.lados.map((l) => `${l.de}-${l.ate} ${mm(l.comprimentoMm)} mm a ${mm(l.anguloGraus)} graus`).join(', ')}${p.cantos ? ` (medidos entre os pontos, antes de arredondar); cantos arredondados: ${p.cantos.map((c) => `${c.ponto} raio ${mm(c.raioMm)} mm`).join(', ')}` : ''}`);
   }
   return L;
 }

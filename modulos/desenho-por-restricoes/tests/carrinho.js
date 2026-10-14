@@ -4,7 +4,7 @@
    cópia. Objeto sintético: nenhuma medida aqui vem de uma imagem de referência. */
 
 export const carrinho = () => ({
-  formato: 'mecanifica.desenho@1',
+  formato: 'mecanifica.desenho@2',
   objeto: 'carrinho de mão',
   vista: 'lateral',
   olhando: 'do lado esquerdo, roda à esquerda',

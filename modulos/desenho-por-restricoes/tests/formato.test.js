@@ -1,4 +1,4 @@
-/* formato.test.js — a validação do `mecanifica.desenho@1` recusa cada erro dizendo o nome do que está errado e como corrigir, e aceita o carrinho. */
+/* formato.test.js — a validação do `mecanifica.desenho@2` (e do @1, que segue aceito) recusa cada erro dizendo o nome do que está errado e como corrigir, e aceita o carrinho. */
 import { describe, expect, it } from 'vitest';
 import { validarDescricao, modeloDaDescricao, ErroDeDesenho } from '../src/index.js';
 import { carrinho } from './carrinho.js';
@@ -6,7 +6,7 @@ import { carrinho } from './carrinho.js';
 const erros = (d) => validarDescricao(d).erros;
 const com = (mudar) => { const d = carrinho(); mudar(d); return d; };
 
-describe('o formato mecanifica.desenho@1', () => {
+describe('o formato mecanifica.desenho@2', () => {
   it('aceita o carrinho de mão e o normaliza em ordem de nome', () => {
     const { erros: e, modelo } = validarDescricao(carrinho());
     expect(e).toEqual([]);
@@ -18,7 +18,7 @@ describe('o formato mecanifica.desenho@1', () => {
 
   it('recusa o que não é um objeto, o formato errado e o campo com a grafia errada, dizendo os aceitos', () => {
     expect(erros(null)[0]).toMatch(/deve ser um objeto JSON/);
-    expect(erros(com((d) => { d.formato = 'mecanifica.desenho@2'; }))).toEqual(['"formato" deve ser "mecanifica.desenho@1" e veio "mecanifica.desenho@2"']);
+    expect(erros(com((d) => { d.formato = 'mecanifica.desenho@3'; }))).toEqual(['"formato" deve ser "mecanifica.desenho@2" (ou "mecanifica.desenho@1", para uma descrição sem "raioDoCanto") e veio "mecanifica.desenho@3"']);
     const e = erros(com((d) => { d.relaçoes = []; }));
     expect(e.join('\n')).toMatch(/campo desconhecido "relaçoes" na raiz.*"relacoes"/);
     expect(erros(com((d) => { d.vista = 'planta'; }))[0]).toMatch(/"vista" deve ser uma de "lateral", "topo", "frontal" e veio "planta"/);

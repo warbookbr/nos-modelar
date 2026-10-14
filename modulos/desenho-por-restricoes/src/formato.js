@@ -1,4 +1,6 @@
-/* formato.js — o formato salvo `mecanifica.desenho@1` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir.
+/* formato.js — o formato salvo `mecanifica.desenho@2` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir.
+   A versão 2 acrescenta à `barra` e ao `poligono` o campo opcional `raioDoCanto`; a versão 1 segue aceita, sem esse campo, e uma
+   descrição gravada em 1 dá o mesmo resultado que dava.
 
    A IA declara a vista de um objeto sem imagem de referência: pontos nomeados com um chute inicial em milímetro (h para a
    direita, v para cima), referências fixas (um chão, um eixo), partes feitas desses pontos e relações com nome entre eles. A
@@ -8,7 +10,9 @@
    `validarDescricao` não lança: devolve `{ erros, modelo }`, onde `erros` é uma lista de frases (cada uma com o nome do que
    está errado e como corrigir) e `modelo` é a descrição normalizada que o resto do módulo lê, ou null quando há erro. Puro. */
 
-export const FORMATO_DO_DESENHO = 'mecanifica.desenho@1';
+export const FORMATO_DO_DESENHO = 'mecanifica.desenho@2';
+export const FORMATO_DO_DESENHO_ANTERIOR = 'mecanifica.desenho@1';
+export const FORMATOS_DO_DESENHO = [FORMATO_DO_DESENHO_ANTERIOR, FORMATO_DO_DESENHO];
 export const FORMATO_DOS_CONTORNOS = 'mecanifica.contornos@1';
 export const RESOLVEDOR = 'planegcs@1.3.0';
 export const VISTAS_DO_DESENHO = ['lateral', 'topo', 'frontal'];
@@ -19,7 +23,7 @@ export const TIPOS_DE_RELACAO = ['sobre', 'coincidente', 'distancia', 'raio', 't
 
 const CHAVES_DA_RAIZ = ['formato', 'objeto', 'vista', 'olhando', 'referencias', 'pontos', 'partes', 'frenteParaFundo', 'relacoes'];
 const FORMAS_DE_PARTE = ['circulo', 'barra', 'poligono', 'arco'];
-const CHAVES_DA_PARTE = [...FORMAS_DE_PARTE, 'espessura', 'fecha', 'foraDoModelo'];
+const CHAVES_DA_PARTE = [...FORMAS_DE_PARTE, 'espessura', 'fecha', 'foraDoModelo', 'raioDoCanto'];
 const CHAVES_DA_RELACAO = [...TIPOS_DE_RELACAO, 'nome', 'mm', 'graus', 'lado', 'por'];
 
 export class ErroDeDesenho extends Error {
@@ -47,7 +51,7 @@ export function validarDescricao(d) {
   for (const k of Object.keys(d)) {
     if (!CHAVES_DA_RAIZ.includes(k)) falha(`campo desconhecido ${q(k)} na raiz; os campos aceitos são ${lista(CHAVES_DA_RAIZ)}. Confira a grafia (sem acento nos nomes dos campos)`);
   }
-  if (d.formato !== FORMATO_DO_DESENHO) falha(`"formato" deve ser ${q(FORMATO_DO_DESENHO)} e veio ${q(d.formato)}`);
+  if (!FORMATOS_DO_DESENHO.includes(d.formato)) falha(`"formato" deve ser ${q(FORMATO_DO_DESENHO)} (ou ${q(FORMATO_DO_DESENHO_ANTERIOR)}, para uma descrição sem "raioDoCanto") e veio ${q(d.formato)}`);
   if (!texto(d.objeto)) falha('"objeto" deve ser o nome do objeto desenhado, em texto não vazio');
   if (!VISTAS_DO_DESENHO.includes(d.vista)) falha(`"vista" deve ser uma de ${lista(VISTAS_DO_DESENHO)} e veio ${q(d.vista)}`);
   if (d.olhando !== undefined && !texto(d.olhando)) falha('"olhando" é opcional e, se vier, deve ser um texto não vazio dizendo de que lado se olha (por exemplo "do lado esquerdo, roda à esquerda")');
@@ -109,15 +113,28 @@ export function validarDescricao(d) {
     };
     if (forma !== 'arco' && p.fecha !== undefined) falha(`a parte ${q(nome)} declara "fecha", que só vale para "arco"`);
     if (forma !== 'barra' && p.espessura !== undefined) falha(`a parte ${q(nome)} declara "espessura", que só vale para "barra"`);
+    if (p.raioDoCanto !== undefined && forma !== 'barra' && forma !== 'poligono') falha(`a parte ${q(nome)} declara "raioDoCanto", que só vale para "barra" e "poligono" (o círculo e o arco já são curvos)`);
+    else if (p.raioDoCanto !== undefined && d.formato === FORMATO_DO_DESENHO_ANTERIOR) falha(`a parte ${q(nome)} declara "raioDoCanto", que existe a partir de ${q(FORMATO_DO_DESENHO)}; troque o "formato" da descrição`);
+    const raioValido = (v) => numero(v) && v > 0;
     if (forma === 'poligono') {
       const ps = nomesDosPontos(p.poligono, 3, false);
-      if (ps) { partes[nome] = { tipo: 'poligono', pontos: ps, foraDoModelo }; ps.forEach((x) => usados.add(x)); }
+      let raiosDosCantos = null;
+      const rc = p.raioDoCanto;
+      if (rc !== undefined && ps) {
+        if (raioValido(rc)) raiosDosCantos = ps.map(() => rc);
+        else if (objeto(rc) && Object.keys(rc).length > 0 && Object.entries(rc).every(([k, v]) => ps.includes(k) && raioValido(v))) raiosDosCantos = ps.map((x) => rc[x] ?? 0);
+        else falha(`o "raioDoCanto" do polígono ${q(nome)} deve ser um número em milímetro maior que zero (todos os cantos) ou { "<ponto do polígono>": <mm>, ... } (só os cantos citados), e veio ${JSON.stringify(rc)}`);
+      }
+      if (ps && (rc === undefined || raiosDosCantos)) { partes[nome] = { tipo: 'poligono', pontos: ps, foraDoModelo, ...(raiosDosCantos ? { raiosDosCantos } : {}) }; ps.forEach((x) => usados.add(x)); }
     } else if (forma === 'barra') {
       const ps = nomesDosPontos(p.barra, 2, true);
+      const rc = p.raioDoCanto;
       if (!numero(p.espessura) || p.espessura <= 0) falha(`a barra ${q(nome)} precisa de "espessura" em milímetro, maior que zero: a largura do retângulo em volta do eixo`);
+      else if (rc !== undefined && !raioValido(rc)) falha(`o "raioDoCanto" da barra ${q(nome)} deve ser um número em milímetro maior que zero, e veio ${JSON.stringify(rc)}`);
+      else if (rc !== undefined && rc > p.espessura / 2) falha(`o "raioDoCanto" ${rc} da barra ${q(nome)} passa da metade da espessura (${p.espessura / 2} mm); com a metade exata a ponta fica semicircular (uma cápsula), e mais que isso não cabe`);
       else if (ps) {
         if (mesmoLugar(pontos[ps[0]], pontos[ps[1]])) falha(`a barra ${q(nome)} tem os dois pontos ${lista(ps)} no mesmo chute; afaste-os para o resolvedor ter a direção do eixo`);
-        else { partes[nome] = { tipo: 'barra', pontos: ps, espessura: p.espessura, foraDoModelo }; ps.forEach((x) => usados.add(x)); }
+        else { partes[nome] = { tipo: 'barra', pontos: ps, espessura: p.espessura, foraDoModelo, ...(rc !== undefined ? { raioDoCanto: rc } : {}) }; ps.forEach((x) => usados.add(x)); }
       }
     } else if (forma === 'circulo') {
       const c = p.circulo;

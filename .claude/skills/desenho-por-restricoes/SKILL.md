@@ -11,12 +11,22 @@ Você escreve a descrição de uma vista em `<vista>.desenho.json`, e o comando 
 
 Parta das partes e das medidas da descrição, e escreva relações, não coordenadas.
 
-1. Dê um nome a cada parte (`roda`, `braco`, `cacamba`) e a cada ponto que as define (`C`, `H`). A parte é `circulo`, `barra` (eixo e espessura), `poligono` (os pontos na ordem do contorno) ou `arco`.
+1. Dê um nome a cada parte (`roda`, `braco`, `cacamba`) e a cada ponto que as define (`C`, `H`). A parte é `circulo`, `barra` (eixo e espessura), `poligono` (os pontos na ordem do contorno) ou `arco`. Escreva `"formato": "mecanifica.desenho@2"`.
 2. Ancore o desenho em referências fixas: um chão (`horizontal`, `v`) e, se precisar, um eixo (`vertical`, `h`). Sem âncora o desenho desliza.
 3. Escreva uma relação por fato da descrição, cada uma com um nome que diga o fato ("altura do pegador"): `distancia` com `mm`, `raio`, `sobre`, `tangente`, `paralela`, `perpendicular`, `vertical`, `horizontal`, `angulo` com `graus`, `igual`, `coincidente`. É por esse nome que o relatório fala.
 4. O chute de cada ponto em `pontos` é só o ponto de partida, em milímetro, h para a direita e v para cima. Ele não precisa estar certo na medida, mas precisa estar do lado certo: ponha o ponto onde ele ficaria numa folha, grosso modo.
 5. Declare o `lado` em toda distância de ponto a reta e em toda tangência a reta (`acima`, `abaixo`, `direita`, `esquerda`; acima é o lado de v maior). O resolvedor aceita os dois lados e o chute decide; o `lado` é o que impede a parte de sair espelhada. Entre dois círculos, `por` é `fora` ou `dentro`.
-6. Se partes se cobrem, liste `frenteParaFundo` (da que fica à frente para a do fundo); sem a lista, as regiões incluem a sobreposição.
+6. Canto que a descrição diz arredondado leva `raioDoCanto` (mm) na `barra` ou no `poligono`, e não um chanfro de pontos a mais. Os pontos e as relações ficam no canto vivo, como numa cotagem; o arco tangente é traçado depois. Cápsula é barra com `raioDoCanto` igual à metade da `espessura`:
+
+```json
+"partes": {
+  "placa": { "poligono": ["A", "B", "C", "D"], "raioDoCanto": 10 },
+  "capsula": { "barra": ["P", "Q"], "espessura": 40, "raioDoCanto": 20 }
+}
+```
+
+   `"raioDoCanto": { "A": 10, "C": 4 }` arredonda só os cantos citados. O raio precisa caber na aresta (dois cantos gastam raio cada um); se não couber, o comando diz qual aresta.
+7. Se partes se cobrem, liste `frenteParaFundo` (da que fica à frente para a do fundo); sem a lista, as regiões incluem a sobreposição.
 
 ## Como ler o relatório e corrigir
 

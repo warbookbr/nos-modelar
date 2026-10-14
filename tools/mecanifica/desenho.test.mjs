@@ -8,8 +8,9 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { principal } from './desenho.mjs';
 import { desenhar } from '../../modulos/desenho-por-restricoes/src/index.js';
+import { larguraDoTexto } from '../../modulos/desenho-por-restricoes/src/traco.js';
 import { carrinho, carrinhoEmConflito, carrinhoFaltando, chuteEspelhado } from '../../modulos/desenho-por-restricoes/tests/carrinho.js';
-import { chapa } from '../../modulos/desenho-por-restricoes/tests/formas.js';
+import { chapa, placaArredondada } from '../../modulos/desenho-por-restricoes/tests/formas.js';
 import { conferirReferenciaNaOpcao, visiveisDoEsboco } from '../../modulos/esboco/src/plano.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { formatarMedidasDaReferencia, lerContornos, medidasDaReferencia } from '../../modulos/esboco/src/referencia.js';
@@ -70,6 +71,38 @@ describe('npm run desenho: o desenho resolvido', () => {
   });
 });
 
+describe('npm run desenho: o texto da vista em traço cabe na folha que o Chromium rasteriza', () => {
+  it('com um subtítulo, um título e uma legenda mais largos que o desenho, cada texto medido pelo navegador fica dentro do viewBox, e a estimativa nunca fica abaixo da medida', async () => {
+    const d = carrinho();
+    d.objeto = 'carrinho de mão com caçamba de aço galvanizado e pneu de borracha maciça';
+    d.olhando = 'do lado esquerdo, com a roda à esquerda e a caçamba à direita, a coluna de apoio à esquerda e a barra de tração à direita, tudo sobre um piso nivelado de concreto liso WWWW MMMM';
+    d.referencias.eixoDaTraseiraDoConjuntoInteiro = { reta: 'vertical', h: 1500 };
+    const { svg } = await desenhar(d);
+    const { chromium } = (await import('playwright')).default;
+    const navegador = await chromium.launch();
+    const [, w, h] = svg.match(/viewBox="0 0 (\d+) (\d+)"/);
+    const [largura, altura] = [Number(w), Number(h)];
+    let medidas;
+    try {
+      const pagina = await navegador.newPage({ viewport: { width: Number(w), height: Number(h) } });
+      await pagina.setContent(`<body style="margin:0">${svg}</body>`);
+      medidas = await pagina.evaluate(() => [...document.querySelectorAll('svg text')].map((t) => {
+        const b = t.getBBox();
+        return { texto: t.textContent, esquerda: b.x, direita: b.x + b.width, largura: b.width, fundo: b.y + b.height, tamanho: Number(t.getAttribute('font-size') ?? t.ownerSVGElement.getAttribute('font-size')), negrito: t.getAttribute('font-weight') === 'bold' };
+      }));
+    } finally {
+      await navegador.close();
+    }
+    expect(medidas.length).toBeGreaterThan(10);
+    for (const m of medidas) {
+      expect(m.esquerda, `"${m.texto}" sai pela esquerda`).toBeGreaterThanOrEqual(0);
+      expect(m.direita, `"${m.texto}" passa da largura ${largura}`).toBeLessThanOrEqual(largura);
+      expect(m.fundo, `"${m.texto}" passa da altura ${altura}`).toBeLessThanOrEqual(altura);
+      expect(larguraDoTexto(m.texto, m.tamanho, m.negrito), `a estimativa de "${m.texto}" ficou abaixo da medida`).toBeGreaterThanOrEqual(m.largura);
+    }
+  }, 120_000);
+});
+
 describe('npm run desenho: o que não resolve não é gravado', () => {
   it.each([
     ['conflito', carrinhoEmConflito, /as relações "altura do pegador", "altura do pegador \(de novo\)" não cabem juntas/],
@@ -113,6 +146,17 @@ describe('npm run desenho: entrada errada', () => {
     expect(existsSync(join(dir, 'carrinho.contornos.json'))).toBe(false);
   });
 
+  it('o raio de canto que não cabe na aresta resolvida sai com 3 e diz a aresta, e o que cabe grava os contornos com os arcos', async () => {
+    const dir = pasta();
+    const r = await rodar([escrever(dir, 'frontal.desenho.json', placaArredondada(60))]);
+    expect(r.codigo).toBe(3);
+    expect(r.err).toMatch(/na parte "placa" o raio de canto não cabe entre "B" e "C": essa aresta mede 100 mm e os dois cantos pedem 120 mm/);
+    expect(existsSync(join(dir, 'frontal.contornos.json'))).toBe(false);
+    const ok = await rodar([escrever(dir, 'frontal.desenho.json', placaArredondada()), '--so-relatorio']);
+    expect(ok.codigo).toBe(0);
+    expect(ok.out).toMatch(/cantos arredondados de raio 20 mm \(pontas semicirculares\)/);
+  });
+
   it('o arquivo chamado lateral com a vista "topo" na descrição sai com 3, porque a prancha e o esboço leem a vista pelo nome', async () => {
     const dir = pasta();
     const d = carrinho(); d.vista = 'topo';
@@ -136,7 +180,7 @@ describe('npm run desenho: entrada errada', () => {
   it('--ajuda explica o formato e os comandos, e sem argumento sai com 2 mostrando a ajuda', async () => {
     const ajuda = await rodar(['--ajuda']);
     expect(ajuda.codigo).toBe(0);
-    expect(ajuda.out).toMatch(/mecanifica\.desenho@1/);
+    expect(ajuda.out).toMatch(/mecanifica\.desenho@2/);
     expect(ajuda.out).toMatch(/npm run desenho -- razao/);
     const sem = await rodar([]);
     expect(sem.codigo).toBe(2);

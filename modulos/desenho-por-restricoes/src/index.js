@@ -6,9 +6,9 @@
    quem faz isso é a porta de linha de comando (`tools/mecanifica/desenho.mjs`). Não importa Three.js, o núcleo de autoria nem
    outro módulo. */
 import { createHash } from 'node:crypto';
-import { modeloDaDescricao, validarDescricao, ErroDeDesenho, FORMATO_DO_DESENHO, FORMATO_DOS_CONTORNOS, RESOLVEDOR, VISTAS_DO_DESENHO, LADOS, TIPOS_DE_RELACAO } from './formato.js';
+import { modeloDaDescricao, validarDescricao, ErroDeDesenho, FORMATO_DO_DESENHO, FORMATOS_DO_DESENHO, FORMATO_DOS_CONTORNOS, RESOLVEDOR, VISTAS_DO_DESENHO, LADOS, TIPOS_DE_RELACAO } from './formato.js';
 import { resolver } from './resolver.js';
-import { anelDaParte, medidasDerivadas, seCruza, SEGMENTOS_POR_QUARTO } from './geometria.js';
+import { anelDaParte, cantosQueNaoCabem, medidasDerivadas, seCruza, SEGMENTOS_POR_QUARTO } from './geometria.js';
 import { contornosDoDesenho } from './contornos.js';
 import { vistaEmTraco } from './traco.js';
 import { relatorioEmTexto } from './relatorio.js';
@@ -16,7 +16,7 @@ import { razaoInterseccaoUniao, aneisDoContorno } from './razao.js';
 import { textoDaAjuda } from './ajuda.js';
 
 export {
-  validarDescricao, modeloDaDescricao, ErroDeDesenho, FORMATO_DO_DESENHO, FORMATO_DOS_CONTORNOS, RESOLVEDOR, VISTAS_DO_DESENHO, LADOS, TIPOS_DE_RELACAO,
+  validarDescricao, modeloDaDescricao, ErroDeDesenho, FORMATO_DO_DESENHO, FORMATOS_DO_DESENHO, FORMATO_DOS_CONTORNOS, RESOLVEDOR, VISTAS_DO_DESENHO, LADOS, TIPOS_DE_RELACAO,
   resolver, contornosDoDesenho, vistaEmTraco, relatorioEmTexto, razaoInterseccaoUniao, aneisDoContorno, textoDaAjuda,
 };
 
@@ -42,6 +42,9 @@ export async function desenhar(descricao, { origem = null, segmentosPorQuarto = 
       if (parte.tipo === 'poligono' && seCruza(aneis[nome])) avisos.push(`a parte ${aspas(nome)} se cruza em si mesma; confira a ordem dos pontos ${lista(parte.pontos)}: o polígono segue o contorno, sem pular de um canto ao oposto`);
     }
     if (r.estado === 'resolvido') {
+      /* O raio de canto só se confere com a geometria resolvida: a aresta que o recebe tem o comprimento que as relações deram. */
+      const naoCabem = cantosQueNaoCabem(modelo, r.pontos);
+      if (naoCabem.length) throw new ErroDeDesenho(`a descrição do desenho tem ${naoCabem.length} erro(s):\n${naoCabem.map((e) => `- ${e}`).join('\n')}`, naoCabem);
       relatorio.medidas = medidasDerivadas(modelo, r.pontos, r.raios, aneis);
       const identidade = { desenho: origem?.desenho ?? null, sha256: origem?.sha256 ?? sha256(JSON.stringify(descricao)) };
       const feito = await contornosDoDesenho(modelo, aneis, { origem: identidade });

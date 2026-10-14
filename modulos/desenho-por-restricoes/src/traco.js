@@ -5,13 +5,43 @@
    de texto puro e determinístico (números com duas casas, ordem de nome); a ferramenta o rasteriza para PNG, e os bytes do PNG
    dependem da fonte da máquina que rasteriza. Os nomes ficam em colunas fora da silhueta, na ordem da altura da marca, com
    passo mínimo entre eles; depois, qualquer par de chamadas que se cruze na mesma coluna troca de lugar, o que encurta a soma das
-   chamadas, então o laço termina. Puro. */
+   chamadas, então o laço termina.
+
+   Todo texto cabe na folha: o título, o subtítulo e a legenda das referências quebram em linhas na largura da folha (que alarga só
+   quando uma palavra sozinha é mais larga que ela), e a largura dos nomes e da régua vem da mesma estimativa, que erra para mais.
+   O SVG não mede fonte (isso depende da máquina que rasteriza); `larguraDoTexto` estima por classe de caractere, com a folga de
+   quem prefere sobrar a cortar, e o teste da porta confere a estimativa contra as caixas que o Chromium mede. Puro. */
 import { caixaDe } from './geometria.js';
 
-const FONTE = { tamanho: 14, larguraDoCaractere: 7.8, familia: 'DejaVu Sans, Arial, sans-serif' };
+const FONTE = { tamanho: 14, titulo: 18, familia: 'DejaVu Sans, Arial, sans-serif' };
+const LARGURA_MINIMA_DA_FOLHA = 360;
 const PASSO_DO_NOME = 22;
 const AREA_DO_DESENHO = { largura: 760, altura: 540 };
-const MARGEM = { topo: 84, baixo: 76, lado: 24, chamada: 46 };
+const MARGEM = { lado: 24, chamada: 46 };
+
+/* A largura estimada de um texto, em px, para o tamanho dado. Três classes de caractere sobre as larguras do DejaVu Sans (a mais
+   larga das fontes da família): estreitos 0,40 em, largos 1,00 em e os demais 0,68 em, que cobre a maiúscula, o dígito e a
+   minúscula mais larga do grupo; o negrito soma 15%. Sobra em vez de faltar, de propósito. */
+const ESTREITOS = new Set([...'iljftI .,;:\'!|()[]/-']);
+const LARGOS = new Set([...'mMwW@%']);
+export function larguraDoTexto(texto, tamanho = FONTE.tamanho, negrito = false) {
+  let em = 0;
+  for (const c of String(texto)) em += ESTREITOS.has(c) ? 0.4 : LARGOS.has(c) ? 1 : 0.68;
+  return em * tamanho * (negrito ? 1.15 : 1);
+}
+
+/* Quebra o texto em linhas de no máximo `maximo` px, nos espaços; uma palavra mais larga que isso fica sozinha numa linha. */
+export function quebrarEmLinhas(texto, tamanho, negrito, maximo) {
+  const linhas = [];
+  let atual = '';
+  for (const palavra of String(texto).split(/\s+/).filter(Boolean)) {
+    const tentativa = atual ? `${atual} ${palavra}` : palavra;
+    if (atual && larguraDoTexto(tentativa, tamanho, negrito) > maximo) { linhas.push(atual); atual = palavra; } else atual = tentativa;
+  }
+  if (atual) linhas.push(atual);
+  return linhas.length ? linhas : [''];
+}
+const palavraMaisLarga = (texto, tamanho, negrito) => Math.max(0, ...String(texto).split(/\s+/).map((p) => larguraDoTexto(p, tamanho, negrito)));
 
 const n2 = (x) => (Math.round(x * 100) / 100).toFixed(2);
 const escapar = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -97,13 +127,30 @@ export function vistaEmTraco(modelo, contornos) {
   const marcas = nomes.map((nome) => ({ nome, marcaMm: pontoInterior(contornos.regioes[nome].contornoMm) }));
   const centroH = (h0 + h1) / 2;
   const esquerda = marcas.filter((m) => m.marcaMm[0] < centroH); const direita = marcas.filter((m) => m.marcaMm[0] >= centroH);
-  const larguraDaColuna = (col) => Math.max(0, ...col.map((m) => m.nome.length)) * FONTE.larguraDoCaractere;
+  const larguraDaColuna = (col) => Math.max(0, ...col.map((m) => larguraDoTexto(m.nome)));
   const colunaE = esquerda.length ? larguraDaColuna(esquerda) + MARGEM.chamada : 0;
   const colunaD = direita.length ? larguraDaColuna(direita) + MARGEM.chamada : 0;
-  const ox = MARGEM.lado + colunaE; const oy = MARGEM.topo;
+  const ox = MARGEM.lado + colunaE;
+
+  const referencias = Object.keys(modelo.referencias).sort();
+  const titulo = `${modelo.objeto} - vista ${modelo.vista}`;
+  const subtitulo = `Milímetros. Desenho por restrições; os nomes das partes ficam fora do desenho.${modelo.olhando ? ` Olhando ${modelo.olhando}.` : ''}`;
+  const legenda = referencias.length ? `tracejado: referência (${referencias.map((n) => `${n} ${modelo.referencias[n].reta === 'horizontal' ? 'v' : 'h'} = ${modelo.referencias[n].valor}`).join('; ')})` : '';
+  const textos = [[titulo, FONTE.titulo, true], [subtitulo, FONTE.tamanho, false], [legenda, FONTE.tamanho, false]];
+
+  /* A folha nunca é mais estreita que o desenho nem que a maior palavra dos textos; o resto quebra em linhas na largura dela. */
+  const largura = Math.ceil(Math.max(ox + w * escala + colunaD + MARGEM.lado + 80, LARGURA_MINIMA_DA_FOLHA, ...textos.map(([t, tam, neg]) => palavraMaisLarga(t, tam, neg) + 2 * MARGEM.lado)));
+  const maximo = largura - 2 * MARGEM.lado;
+  const linhasDoTitulo = quebrarEmLinhas(titulo, FONTE.titulo, true, maximo);
+  const linhasDoSubtitulo = quebrarEmLinhas(subtitulo, FONTE.tamanho, false, maximo);
+  const linhasDaLegenda = legenda ? quebrarEmLinhas(legenda, FONTE.tamanho, false, maximo) : [];
+  const yTitulo = linhasDoTitulo.map((_, i) => 30 + 24 * i);
+  const ySubtitulo = linhasDoSubtitulo.map((_, i) => yTitulo.at(-1) + 22 + 20 * i);
+  const oy = ySubtitulo.at(-1) + 32;
+  const yr = Math.round(oy + alt * escala + 40);
+  const yLegenda = linhasDaLegenda.map((_, i) => yr + 44 + 20 * i);
+  const altura = Math.ceil((yLegenda.at(-1) ?? yr + 22) + 14);
   const x = (h) => ox + (h - h0) * escala; const y = (v) => oy + (v1 - v) * escala;
-  const largura = Math.ceil(ox + w * escala + colunaD + MARGEM.lado + 80);
-  const altura = Math.ceil(oy + alt * escala + MARGEM.baixo);
 
   for (const m of marcas) m.marca = [x(m.marcaMm[0]), y(m.marcaMm[1])];
   const xE = MARGEM.lado + (colunaE ? colunaE - MARGEM.chamada + 8 : 0);
@@ -115,10 +162,9 @@ export function vistaEmTraco(modelo, contornos) {
   const L = [];
   L.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${largura}" height="${altura}" viewBox="0 0 ${largura} ${altura}" font-family="${FONTE.familia}" font-size="${FONTE.tamanho}">`);
   L.push(`<rect width="${largura}" height="${altura}" fill="#ffffff"/>`);
-  L.push(`<text x="${MARGEM.lado}" y="30" font-size="18" font-weight="bold" fill="#111111">${escapar(modelo.objeto)} - vista ${escapar(modelo.vista)}</text>`);
-  L.push(`<text x="${MARGEM.lado}" y="52" fill="#555555">Milímetros. Desenho por restrições; os nomes das partes ficam fora do desenho.${modelo.olhando ? ` Olhando ${escapar(modelo.olhando)}.` : ''}</text>`);
+  linhasDoTitulo.forEach((t, i) => L.push(`<text x="${MARGEM.lado}" y="${yTitulo[i]}" font-size="${FONTE.titulo}" font-weight="bold" fill="#111111">${escapar(t)}</text>`));
+  linhasDoSubtitulo.forEach((t, i) => L.push(`<text x="${MARGEM.lado}" y="${ySubtitulo[i]}" fill="#555555">${escapar(t)}</text>`));
 
-  const referencias = Object.keys(modelo.referencias).sort();
   const folga = 14 / escala;
   for (const nome of referencias) {
     const r = modelo.referencias[nome];
@@ -141,14 +187,11 @@ export function vistaEmTraco(modelo, contornos) {
   }
 
   const regua = reguaEmMm(w);
-  const yr = altura - 36;
   L.push(`<line x1="${MARGEM.lado}" y1="${yr}" x2="${n2(MARGEM.lado + regua * escala)}" y2="${yr}" stroke="#111111" stroke-width="2"/>`);
   L.push(`<line x1="${MARGEM.lado}" y1="${yr - 5}" x2="${MARGEM.lado}" y2="${yr + 5}" stroke="#111111" stroke-width="2"/>`);
   L.push(`<line x1="${n2(MARGEM.lado + regua * escala)}" y1="${yr - 5}" x2="${n2(MARGEM.lado + regua * escala)}" y2="${yr + 5}" stroke="#111111" stroke-width="2"/>`);
   L.push(`<text x="${MARGEM.lado}" y="${yr + 22}" fill="#111111">${regua} mm</text>`);
-  if (referencias.length) {
-    L.push(`<text x="${n2(MARGEM.lado + regua * escala + 30)}" y="${yr + 22}" fill="#666666">tracejado: referência (${escapar(referencias.map((n) => `${n} ${modelo.referencias[n].reta === 'horizontal' ? 'v' : 'h'} = ${modelo.referencias[n].valor}`).join('; '))})</text>`);
-  }
+  linhasDaLegenda.forEach((t, i) => L.push(`<text x="${MARGEM.lado}" y="${yLegenda[i]}" fill="#666666">${escapar(t)}</text>`));
   L.push('</svg>');
   return { svg: `${L.join('\n')}\n`, largura, altura, escala: Math.round(escala * 1e4) / 1e4 };
 }

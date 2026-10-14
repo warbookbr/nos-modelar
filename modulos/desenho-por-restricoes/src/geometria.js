@@ -3,7 +3,10 @@
    Recebe os pontos já resolvidos (`{ nome: [h, v] }`) e os raios dos círculos, e devolve para cada parte um anel fechado: o
    polígono pelos seus pontos, o círculo e o arco discretizados com um número fixo de segmentos por quarto de volta, e a barra pelo
    retângulo em volta do eixo (a espessura não entra no resolvedor). Todo anel sai anti-horário, arredondado a 0,001 mm, sem
-   ponto repetido e começando no menor ponto, de modo que a mesma geometria dá os mesmos números. Puro. */
+   ponto repetido e começando no menor ponto, de modo que a mesma geometria dá os mesmos números.
+
+   O canto arredondado (`raioDoCanto` do polígono e da barra) não passa pelo resolvedor: as relações valem para os pontos de canto
+   vivo, como numa cotagem, e o arco tangente às duas arestas é traçado depois de resolver, com o raio dado. Puro. */
 import { areaDoAnel, iniciarNoMenor } from './booleanas.js';
 import { extremosDaLinha, pontosDaReferencia } from './traducao.js';
 
@@ -46,15 +49,91 @@ function anelDoArco(parte, pontos, segmentos) {
   return anel;
 }
 
+/* O retângulo em volta do eixo de uma barra: os quatro vértices, a partir do ponto P (um de cada lado) e depois do Q. */
+function retanguloDaBarra(parte, pontos) {
+  const [p, q] = parte.pontos.map((n) => pontos[n]);
+  const L = distancia(p, q) || 1;
+  const nh = (-(q[1] - p[1]) / L) * (parte.espessura / 2); const nv = ((q[0] - p[0]) / L) * (parte.espessura / 2);
+  return [[p[0] - nh, p[1] - nv], [q[0] - nh, q[1] - nv], [q[0] + nh, q[1] + nv], [p[0] + nh, p[1] + nv]];
+}
+
+/* Os vértices de canto vivo de um polígono ou de uma barra, o raio de cada canto (0 é canto vivo) e como chamar cada vértice numa
+   frase; null quando a parte não pede canto arredondado. */
+function cantosDaParte(parte, pontos) {
+  if (parte.tipo === 'poligono' && parte.raiosDosCantos) return { vertices: parte.pontos.map((n) => pontos[n]), raios: parte.raiosDosCantos, rotulos: parte.pontos.map((n) => `"${n}"`) };
+  if (parte.tipo === 'barra' && parte.raioDoCanto) {
+    const [p, q] = parte.pontos;
+    return { vertices: retanguloDaBarra(parte, pontos), raios: [1, 1, 1, 1].map(() => parte.raioDoCanto), rotulos: [`a ponta de "${p}"`, `a ponta de "${q}"`, `a ponta de "${q}"`, `a ponta de "${p}"`] };
+  }
+  return null;
+}
+
+/* O anel com o canto de raio r traçado como arco tangente às duas arestas. A tangente do canto de ângulo θ mede r / tan(θ/2) a partir
+   do vértice, e o centro fica na bissetriz a r / sen(θ/2). Um canto reto de raio r gasta r de cada aresta. `falhas` lista a aresta
+   em que as tangentes dos dois cantos somam mais que ela; com falha o anel ainda sai (as tangentes são limitadas à metade da aresta,
+   só para a geometria não virar), mas quem grava recusa o desenho. Um vértice reto (θ = 180 graus) ou sem raio fica como está. */
+export function arredondarCantos(vertices, raios, segmentos = SEGMENTOS_POR_QUARTO) {
+  const n = vertices.length;
+  const unit = (de, para) => { const L = distancia(de, para) || 1; return [(para[0] - de[0]) / L, (para[1] - de[1]) / L]; };
+  const cantos = vertices.map((P, i) => {
+    const A = vertices[(i + n - 1) % n]; const B = vertices[(i + 1) % n];
+    const u = unit(P, A); const w = unit(P, B);
+    const theta = Math.acos(Math.max(-1, Math.min(1, u[0] * w[0] + u[1] * w[1])));
+    if (!(raios[i] > 0) || theta < 1e-9 || theta > Math.PI - 1e-9) return { P, u, w, theta, t: 0, r: 0 };
+    return { P, u, w, theta, t: raios[i] / Math.tan(theta / 2), r: raios[i] };
+  });
+  const falhas = [];
+  for (let i = 0; i < n; i += 1) {
+    const j = (i + 1) % n;
+    const L = distancia(vertices[i], vertices[j]);
+    if (cantos[i].t + cantos[j].t > L + 1e-6) falhas.push({ de: i, ate: j, comprimentoMm: r3(L), pedeMm: r3(cantos[i].t + cantos[j].t) });
+  }
+  if (falhas.length) {
+    cantos.forEach((c, i) => {
+      const limite = Math.min(distancia(vertices[i], vertices[(i + n - 1) % n]), distancia(vertices[i], vertices[(i + 1) % n])) / 2;
+      if (c.t > limite) { c.t = limite; c.r = limite * Math.tan(c.theta / 2); }
+    });
+  }
+  const anel = [];
+  for (const { P, u, w, theta, t, r } of cantos) {
+    if (!t) { anel.push([...P]); continue; }
+    const T1 = [P[0] + u[0] * t, P[1] + u[1] * t]; const T2 = [P[0] + w[0] * t, P[1] + w[1] * t];
+    const b = [u[0] + w[0], u[1] + w[1]]; const Lb = Math.hypot(b[0], b[1]);
+    const dc = r / Math.sin(theta / 2);
+    const C = [P[0] + (b[0] / Lb) * dc, P[1] + (b[1] / Lb) * dc];
+    const a1 = Math.atan2(T1[1] - C[1], T1[0] - C[0]);
+    let varredura = Math.atan2(T2[1] - C[1], T2[0] - C[0]) - a1;
+    while (varredura > Math.PI) varredura -= 2 * Math.PI;
+    while (varredura <= -Math.PI) varredura += 2 * Math.PI;
+    const k = Math.max(2, Math.ceil((Math.abs(varredura) / (Math.PI / 2)) * segmentos));
+    for (let m = 0; m <= k; m += 1) {
+      if (m === 0) anel.push(T1);
+      else if (m === k) anel.push(T2);
+      else anel.push([C[0] + r * Math.cos(a1 + (varredura * m) / k), C[1] + r * Math.sin(a1 + (varredura * m) / k)]);
+    }
+  }
+  return { anel, falhas };
+}
+
+/* As frases dos cantos que não cabem na parte, para recusar o desenho: a aresta, quanto ela mede e quanto os dois cantos pedem. */
+export function cantosQueNaoCabem(modelo, pontos) {
+  const frases = [];
+  for (const nome of Object.keys(modelo.partes).sort()) {
+    const c = cantosDaParte(modelo.partes[nome], pontos);
+    if (!c) continue;
+    for (const f of arredondarCantos(c.vertices, c.raios).falhas) {
+      frases.push(`na parte "${nome}" o raio de canto não cabe entre ${c.rotulos[f.de]} e ${c.rotulos[f.ate]}: essa aresta mede ${f.comprimentoMm} mm e os dois cantos pedem ${f.pedeMm} mm de tangência. Reduza o "raioDoCanto" ou alongue a aresta`);
+    }
+  }
+  return frases;
+}
+
 /* O anel de uma parte, antes do arredondamento. */
 export function anelBrutoDaParte(parte, pontos, raios, nome, segmentos = SEGMENTOS_POR_QUARTO) {
+  const cantos = cantosDaParte(parte, pontos);
+  if (cantos) return arredondarCantos(cantos.vertices, cantos.raios, segmentos).anel;
   if (parte.tipo === 'poligono') return parte.pontos.map((n) => pontos[n]);
-  if (parte.tipo === 'barra') {
-    const [p, q] = parte.pontos.map((n) => pontos[n]);
-    const L = distancia(p, q) || 1;
-    const nh = (-(q[1] - p[1]) / L) * (parte.espessura / 2); const nv = ((q[0] - p[0]) / L) * (parte.espessura / 2);
-    return [[p[0] - nh, p[1] - nv], [q[0] - nh, q[1] - nv], [q[0] + nh, q[1] + nv], [p[0] + nh, p[1] + nv]];
-  }
+  if (parte.tipo === 'barra') return retanguloDaBarra(parte, pontos);
   if (parte.tipo === 'circulo') {
     const c = pontos[parte.centro]; const r = raios[nome];
     const n = 4 * segmentos;
@@ -132,6 +211,7 @@ export function medidasDerivadas(modelo, pontos, raios, aneis) {
     if (p.tipo === 'barra') {
       const [a, b] = p.pontos.map((n) => pontos[n]);
       m.comprimentoMm = r3(distancia(a, b)); m.anguloGraus = r3(anguloEmGraus(a, b)); m.espessuraMm = p.espessura;
+      if (p.raioDoCanto) m.raioDoCantoMm = p.raioDoCanto;
     } else if (p.tipo === 'circulo') m.raioMm = r3(raios[nome]);
     else if (p.tipo === 'arco') {
       m.raioMm = r3(distancia(pontos[p.centro], pontos[p.inicio]));
@@ -140,6 +220,7 @@ export function medidasDerivadas(modelo, pontos, raios, aneis) {
         const a = pontos[n]; const b = pontos[p.pontos[(i + 1) % p.pontos.length]];
         return { de: n, ate: p.pontos[(i + 1) % p.pontos.length], comprimentoMm: r3(distancia(a, b)), anguloGraus: r3(anguloEmGraus(a, b)) };
       });
+      if (p.raiosDosCantos) m.cantos = p.pontos.map((n, i) => ({ ponto: n, raioMm: p.raiosDosCantos[i] })).filter((c) => c.raioMm > 0);
     }
     partes[nome] = m;
   }

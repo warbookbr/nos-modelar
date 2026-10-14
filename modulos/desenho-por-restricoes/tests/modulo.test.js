@@ -28,7 +28,8 @@ describe('o módulo desenho-por-restricoes', () => {
   it('a ajuda do comando nomeia todos os tipos de relação do formato', () => {
     const ajuda = textoDaAjuda();
     for (const t of TIPOS_DE_RELACAO) expect(ajuda, t).toMatch(new RegExp(`^\\s+${t}\\b`, 'm'));
-    expect(ajuda).toMatch(/mecanifica\.desenho@1/);
+    expect(ajuda).toMatch(/mecanifica\.desenho@2/);
+    expect(ajuda).toMatch(/raioDoCanto/);
     expect(ajuda).toMatch(/npm run desenho/);
   });
 });

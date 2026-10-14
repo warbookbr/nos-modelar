@@ -1,4 +1,4 @@
-/* ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@1`, as relações, o lado e o que cada estado do
+/* ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@2` (o @1 segue aceito), as relações, o lado e o que cada estado do
    relatório pede. É o que `npm run desenho -- --ajuda` imprime; a explicação completa está no README do módulo. */
 
 export function textoDaAjuda() {
@@ -14,11 +14,13 @@ COMANDOS
   Códigos de saída: 0 resolvido; 2 uso errado ou arquivo ilegível; 3 descrição inválida; 4 não resolvido (conflito, solto ou lado trocado).
 
 O ARQUIVO <vista>.desenho.json
-  { "formato": "mecanifica.desenho@1", "objeto": "<nome>", "vista": "lateral" | "topo" | "frontal", "olhando": "<de que lado se olha>",
+  { "formato": "mecanifica.desenho@2", "objeto": "<nome>", "vista": "lateral" | "topo" | "frontal", "olhando": "<de que lado se olha>",
     "referencias": { "chao": { "reta": "horizontal", "v": 0 }, "eixo": { "reta": "vertical", "h": 0 } },
     "pontos": { "A": [h, v], ... },                 chute inicial de cada ponto; h para a direita, v para cima
     "partes": { "<nome>": { "circulo": { "centro": "A" } } | { "barra": ["A","B"], "espessura": 40 } |
                           { "poligono": ["A","B","C"] } | { "arco": { "centro": "A", "inicio": "B", "fim": "C" }, "fecha": "corda" | "centro" },
+                "raioDoCanto": 8 (opcional, só em barra e poligono: raio em mm de todos os cantos; no polígono também
+                                  { "A": 8, "C": 3 } só nos cantos citados; a metade da espessura faz a ponta da barra semicircular),
                 "foraDoModelo": true (opcional: a parte não entra na silhueta) },
     "frenteParaFundo": ["<parte>", ...],            opcional: quem esconde quem; sem ele as partes não se escondem
     "relacoes": [ { "nome": "<único>", "<tipo>": ..., "mm" | "graus" | "lado" | "por": ... } ] }
@@ -38,6 +40,10 @@ AS RELAÇÕES (cada uma tem um nome, que volta no relatório)
   angulo        [reta, reta], graus                     da primeira reta para a segunda, anti-horário
   igual         [reta, reta] (mesmo comprimento) ou [círculo, círculo] (mesmo raio)
   Uma reta é o nome de uma referência, o nome de uma barra (o eixo dela) ou dois pontos ["P","Q"], na ordem que dá o sentido.
+
+O CANTO ARREDONDADO
+  "raioDoCanto" não passa pelo resolvedor: as relações valem para os pontos de canto vivo, como numa cotagem, e o arco tangente às
+  duas arestas é traçado depois. O raio precisa caber: o comando recusa o desenho se as tangentes de dois cantos somam mais que a aresta.
 
 O LADO
   A distância de um ponto a uma reta e a tangência não têm sinal: o resolvedor aceita os dois lados e o chute decide. Por isso o

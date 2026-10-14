@@ -3,7 +3,7 @@
    (tangência entre círculos). Cada um tem a geometria resolvida conhecida por conta de cabeça. */
 
 export const chapa = () => ({
-  formato: 'mecanifica.desenho@1',
+  formato: 'mecanifica.desenho@2',
   objeto: 'chapa com furo',
   vista: 'frontal',
   referencias: { chao: { reta: 'horizontal', v: 0 }, parede: { reta: 'vertical', h: 0 } },
@@ -28,7 +28,7 @@ export const chapa = () => ({
 });
 
 export const meiaLua = () => ({
-  formato: 'mecanifica.desenho@1',
+  formato: 'mecanifica.desenho@2',
   objeto: 'meia lua',
   vista: 'frontal',
   referencias: { chao: { reta: 'horizontal', v: 0 }, eixo: { reta: 'vertical', h: 0 } },
@@ -44,7 +44,7 @@ export const meiaLua = () => ({
 });
 
 export const duasRodas = (chuteDoQ = [100, 100], por = 'fora') => ({
-  formato: 'mecanifica.desenho@1',
+  formato: 'mecanifica.desenho@2',
   objeto: 'duas rodas',
   vista: 'frontal',
   referencias: { chao: { reta: 'horizontal', v: 0 }, eixo: { reta: 'vertical', h: 0 } },
@@ -57,5 +57,32 @@ export const duasRodas = (chuteDoQ = [100, 100], por = 'fora') => ({
     { nome: 'raio da grande', raio: 'grande', mm: 40 },
     { nome: 'raio da pequena', raio: 'pequena', mm: 25 },
     { nome: 'se tocam', tangente: ['grande', 'pequena'], por },
+  ],
+});
+
+/* Uma placa de 200 por 100 com os quatro cantos de raio 10 (polígono) e uma cápsula de 120 por 40 (barra com a metade da espessura de raio). */
+export const placaArredondada = (raioDoCanto = 10) => ({
+  formato: 'mecanifica.desenho@2',
+  objeto: 'placa de cantos arredondados',
+  vista: 'frontal',
+  referencias: { chao: { reta: 'horizontal', v: 0 }, parede: { reta: 'vertical', h: 0 } },
+  pontos: { A: [2, 3], B: [190, 8], C: [195, 95], D: [10, 105], P: [30, 150], Q: [140, 152] },
+  partes: {
+    placa: { poligono: ['A', 'B', 'C', 'D'], raioDoCanto },
+    capsula: { barra: ['P', 'Q'], espessura: 40, raioDoCanto: 20 },
+  },
+  relacoes: [
+    { nome: 'A no chão', sobre: ['A', 'chao'] },
+    { nome: 'A na parede', sobre: ['A', 'parede'] },
+    { nome: 'B de nível com A', horizontal: ['A', 'B'] },
+    { nome: 'largura', distancia: ['A', 'B'], mm: 200 },
+    { nome: 'C a prumo de B', perpendicular: [['A', 'B'], ['B', 'C']] },
+    { nome: 'altura', distancia: ['B', 'C'], mm: 100 },
+    { nome: 'topo paralelo', paralela: [['C', 'D'], ['A', 'B']] },
+    { nome: 'topo igual à base', igual: [['C', 'D'], ['A', 'B']] },
+    { nome: 'P a 150 do chão', distancia: ['P', 'chao'], mm: 150, lado: 'acima' },
+    { nome: 'P a 30 da parede', distancia: ['P', 'parede'], mm: 30, lado: 'direita' },
+    { nome: 'cápsula de nível', horizontal: ['P', 'Q'] },
+    { nome: 'comprimento da cápsula', distancia: ['P', 'Q'], mm: 120 },
   ],
 });
