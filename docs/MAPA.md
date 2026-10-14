@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1222 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1223 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -282,6 +282,10 @@
 - `RESULTADO.md` — Carcaça da empilhadeira, vista lateral: o resultado da prova
 
 ## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas/
+
+- `gera.mjs` — gera.mjs — gera lateral.partes.json da carcaça da empilhadeira (vista lateral, frente à esquerda, base em v = 0) por coordenadas escritas à mão a partir só d…
+
+## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas-r2/
 
 - `gera.mjs` — gera.mjs — gera lateral.partes.json da carcaça da empilhadeira (vista lateral, frente à esquerda, base em v = 0) por coordenadas escritas à mão a partir só d…
 
