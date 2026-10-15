@@ -87,12 +87,13 @@ export const TABELA = {
   /* O compasso fica na frente da perna, a 185 mm do pivô para -z (`z`, de `tpZLado`). Os pontos de cima e do joelho, como deslocamento
      [em x, em y] do pivô, são `tpCpA` (o alto) e `tpCpJ` (o joelho). O de baixo (`tpCpB`) o esboço põe a 470 mm abaixo do pivô, na quina
      da perna; a pessoa decidiu que o pino de baixo toca a coroa, e por isso o ponto de baixo fica em `baixo.dx` do pivô em x e
-     `baixo.acimaDaJuncao` acima da junção da perna com a coroa (zero: o pino, de raio 12, fica metade na coroa e metade na perna). As duas
+     `baixo.acimaDaJuncao` acima da junção da perna com a coroa (6: o pino, de raio 12, desce 6 mm abaixo da junção, dentro da altura da
+     coroa, e o resto fica na altura da perna; com o centro na junção a razão com o pino do esboço seria zero). As duas
      hastes são cilindros de `haste` de diâmetro entre eles, e cada pino é um cilindro em z de `pino.diametro` e `pino.comprimento`,
      centrado no ponto. Os pinos de cima e do meio são os do esboço, e o de cima entra na face da frente da perna. O pino de baixo
      começa onde os outros começam e vai até a face da frente da coroa, `penetracaoNaCoroa` para dentro dela. */
   compasso: {
-    z: -185, alto: [0, -150], joelho: [-80, -310], baixo: { dx: 0, acimaDaJuncao: 8 }, haste: 16,
+    z: -185, alto: [0, -150], joelho: [-80, -310], baixo: { dx: 0, acimaDaJuncao: 6 }, haste: 16,
     pino: { diametro: 24, comprimento: 56, penetracaoNaCoroa: 8 },
   },
   /* O atuador fica atrás da perna, a 185 mm do pivô para +z (`z`, de `tpZLado`): da orelha `tpJF` (presa à asa) à ponta `tpJA` (o pino na
@@ -239,8 +240,8 @@ const MINIMOS = {
   eixoRoda: 0.16,
   coroa: 0.08,
   /* o pino de baixo desce à junção da perna com a coroa e vai até a face da coroa, e o braço de baixo do compasso o acompanha */
-  pinoCompassoBaixo: 0.001,
-  compassoInf: 0.38,
+  pinoCompassoBaixo: 0.01,
+  compassoInf: 0.46,
 };
 
 /* material de cada parte, pela chave de MATERIAIS; a roda leva os da família, `borracha` e `aco`. */
