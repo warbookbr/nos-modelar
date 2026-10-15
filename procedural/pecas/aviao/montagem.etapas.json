@@ -75,7 +75,19 @@
       "instancia": "asas",
       "estado": "aberta",
       "juntas": [],
-      "receita": "651f8c3f6279a3b05affcd7f1c510761878de7f71d76d510f73b762920fa8f2d"
+      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1"
+    },
+    {
+      "instancia": "empenagem-horizontal",
+      "estado": "aberta",
+      "juntas": [],
+      "receita": "fe286dae7890637fb31608407f7162ae701f63d70db2e3b4e72c62e989a2203f"
+    },
+    {
+      "instancia": "empenagem-vertical",
+      "estado": "aberta",
+      "juntas": [],
+      "receita": "fee2f963d7109933b2a9229caa0b71dcd584c612a3c4b51144b5a10285366b87"
     }
   ]
 }

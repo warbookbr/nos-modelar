@@ -30,6 +30,20 @@
         "tipo": "peca",
         "ref": "aviao/asas"
       }
+    },
+    {
+      "id": "empenagem-horizontal",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/empenagem-horizontal"
+      }
+    },
+    {
+      "id": "empenagem-vertical",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/empenagem-vertical"
+      }
     }
   ],
   "relacoes": [],
@@ -37,7 +51,9 @@
     "fuselagem",
     "motor",
     "helice",
-    "asas"
+    "asas",
+    "empenagem-horizontal",
+    "empenagem-vertical"
   ],
   "vinculos": [],
   "posicoes": []

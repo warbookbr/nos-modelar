@@ -207,3 +207,28 @@ levantada ou com degrau; comando fora do vão, sem a fresta ou atravessando a as
 suporte solto; vão sem recorte; e o `REFINA` acusando parte fora do envelope ou abaixo do
 mínimo contra o esboço.
 
+## O plano das empenagens
+
+São a quinta e a sexta etapas, independentes das asas e uma da outra, e por isso
+modeladas em paralelo. As formas vêm das unidades `empenagem-horizontal` e
+`empenagem-vertical` do esboço aprovado (o mestre e os detalhes de cada uma).
+
+A empenagem horizontal (`partes/empenagem-horizontal/receita.js`, `aviao/empenagem-horizontal`)
+tem 12 partes, seis de cada lado: `estabilizadorD` e `estabilizadorE`, a superfície da
+família com o perfil `estabilizador` e o vão do profundor recortado com a fresta;
+`profundorD` e `profundorE`, lofts no vão; `eixoProfundorD` e `eixoProfundorE`; e três
+suportes de cada lado. A escala é a envergadura do estabilizador, 4780 mm.
+
+A empenagem vertical (`partes/empenagem-vertical/receita.js`, `aviao/empenagem-vertical`)
+tem 10 partes: `deriva`, a superfície da família com o perfil `deriva`, cortada na raiz e
+no vão do leme como no esboço (a forma `deriva.fin`); `dorsal`, a aleta que desce da
+deriva ao dorso da fuselagem (a forma `deriva.dorsal`); `leme`, no vão; `eixoLeme`; e três
+pares de dobradiças. A escala é a altura da deriva com o leme, 1960 mm.
+
+Nas duas, o `REFINA` liga cada parte ao volume do andaime e à forma do esboço, com o mínimo
+de 0,95; a razão de volume é o que diz se a deriva segue o esboço, porque o envelope dela
+fica 1965 mm além. Reprova: superfície reta, sem o enflechamento ou o afinamento; comando
+fora do vão, sem a fresta ou atravessando; eixo, suporte ou dobradiça solta; vão sem
+recorte; dorsal solta ou com degrau; e o `REFINA` acusando parte fora do envelope ou abaixo
+do mínimo.
+
