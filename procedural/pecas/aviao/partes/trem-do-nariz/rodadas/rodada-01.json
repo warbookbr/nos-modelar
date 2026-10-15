@@ -1,0 +1,1129 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/trem-do-nariz",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/trem-do-nariz-composta.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Sem defeito estrutural visível; lista vazia não é aprovação. Recorte da carenagem e ligação longitudinal do atuador só aparecem no raio-x de frente; detalhe do pneu na frontal do alvo ficou sem resolução."
+  },
+  "partes": [
+    {
+      "nome": "carenagemTremNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoPivoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancalNarizE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancalNarizD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "alavancaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoAtuadorNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorHasteNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorCorpoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "orelhaAtuadorNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoSupNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoInfNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pernaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pistaoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "coroaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoRodaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaNariz",
+      "confere": false,
+      "observacao": "o pé do pneu fica 17 mm acima do chão, como no esboço; o plano promete a roda encostando no chão"
+    }
+  ],
+  "atrito": [
+    "A fuselagem não publica porta e a montagem não tem vínculo, então pivô, ponto fixo do atuador e carenagem ficam na TABELA com os números do esboço.",
+    "Tirei o contato roda-eixo, porque o furo do cubo (38,6 mm) deixa 4,3 mm de folga em volta do eixo de 30 mm, e pus rodaNariz em 4 corpos e 9 furos no lugar de solido.",
+    "A carenagem, com o topo em y 790 como no esboço, entra até 13 mm no capô e até 15 mm na fuselagem; aparar pela barriga pede o perfil que a fuselagem não publica.",
+    "vistas:critica falhou duas vezes com ENOENT enquanto o outro modelador capturava, porque a sessão da bancada é um arquivo só.",
+    "A roda 17 mm acima do chão escapou do crítico, que a deu no chão porque o montado não desenha o chão, e nenhum gate mede o apoio; o processo não a teria pego, e o apoio no chão entra na auditoria da montagem."
+  ],
+  "notaDePassagem": "Trem do nariz na pose baixada: tudo sai da TABELA a partir do pivô tnP e dos pontos do esboço. A roda não toca o eixo (folga de 4,3 mm no cubo) e a carenagem segue o esboço, entrando no capô e na fuselagem.",
+  "receita": {
+    "sha256": "sha256:70ccc9ddecc74577417d161c8c234334c72366690cfca661aa8b60049559eac3",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 407,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/trem-do-nariz — o trem do nariz do avião de pequeno porte baixado, na pose de pouso: a carenagem, o pivô e os mancais, a"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * alavanca e o atuador, o compasso, a perna, o pistão, o garfo, o eixo e a roda."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Sétima etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `trem-do-nariz` do"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * `aviao-detalhe-trem-do-nariz.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. A TABELA"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * está em milímetro, no quadro do esboço, e a conversão para metro acontece só em `derivar`. A fuselagem não publica porta e a montagem"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * não tem vínculo de medida, e por isso o pivô (o ponto `tnP` do esboço), o ponto fixo do atuador (`tnAtF`) e a carenagem com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * alojamento estão na TABELA como os pontos e as caixas do esboço, e não saem de um encaixe de porta da montagem v5. O resto do trem"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * sai do pivô: a perna desce `tnLb` até o fim do barril, `tnLc` até a coroa e `tnL` até o centro da roda, e o garfo, o eixo, o compasso"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * e a alavanca se medem a partir desses pontos, com as expressões do esboço na pose baixada (curso 0, em que o seno do curso é zero e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * cosseno é um). O recolhimento do esboço não entra: a receita é só a pose baixada."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * Todo cilindro do esboço é um `extrusao` de um círculo entre os dois pontos dele. O que segue um eixo (x, y ou z) nasce direto nele,"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * com a base no menor dos dois extremos; o que não segue (o atuador, em y e z, e os dois braços do compasso, nos três eixos) nasce em"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * x no primeiro ponto e gira em z, para a subida, e em y, para o resto, em torno do primeiro ponto. A carenagem é a caixa de canto"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * arredondado menos a caixa do alojamento, que passa 20 mm abaixo dela e deixa o alojamento aberto por baixo; os dois mancais e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * orelha do atuador são caixas de canto arredondado, todas extrudadas em y."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * A roda é a chamada da família `roda-pneu` com o perfil `carro` e os parâmetros do esboço (o diâmetro do pneu, a largura e o desvio"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * zero), expandida aqui dentro dos PASSOS. A família a gera no centro, com o eixo em x, e o esboço a põe no ponto `tnW` com a rotação"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * `[0, tnEixoY, tnEixoZ]`, que na pose baixada é nula; a receita faz o mesmo com `transladar`. Da expansão ficam as quatro formas"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * (pneu, aro, cubo e chapa), o material e o sólido, e saem as quatro partes da família, porque a receita nomeia a roda inteira como"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * `rodaNariz` (o alias `rodaInteira` junta as quatro), e as três portas, que a família publica no centro local e que a pose deixaria"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * longe da forma (`porta-fora-do-plano`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "const slug = (id) => id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "/* parte -> [forma prometida, técnica], no nome da forma do esboço */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "const PARTES = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  carenagemTremNariz: ['carenagem sob o nariz, de canto arredondado, com o alojamento do trem recortado por baixo', 'caixa do esboço recortada pelo alojamento por subtrair'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  eixoPivoNariz: ['eixo do pivô, de lado a lado do alojamento, em torno do qual o trem gira', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  mancalNarizE: ['mancal esquerdo do pivô, preso à carenagem', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  mancalNarizD: ['mancal direito do pivô, preso à carenagem', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  alavancaNariz: ['alavanca que sai do pivô para o atuador', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  pinoAtuadorNariz: ['pino que liga o atuador à alavanca', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  atuadorHasteNariz: ['haste do atuador', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  atuadorCorpoNariz: ['corpo do atuador, mais grosso que a haste', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  orelhaAtuadorNariz: ['orelha que prende o corpo do atuador à estrutura', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  compassoSupNariz: ['braço de cima do compasso, da perna ao pino do meio', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  compassoInfNariz: ['braço de baixo do compasso, do pino do meio ao garfo', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  pinoCompassoNariz: ['pino do meio do compasso', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  pernaNariz: ['perna do trem, do pivô para baixo', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  pistaoNariz: ['pistão que sai da perna, mais fino que ela', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  coroaNariz: ['coroa no pé do pistão, onde o garfo se prende', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  garfoNariz: ['garfo que segura o eixo da roda', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  eixoRodaNariz: ['eixo da roda, atravessando o garfo e o cubo', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  rodaNariz: ['roda do nariz com o pneu, de 364 mm de diâmetro, encostando no chão', 'a roda da família roda-pneu, perfil carro, com os parâmetros do esboço, expandida nos PASSOS'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "const NOMES = Object.keys(PARTES);"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  /* O pivô, o ponto `tnP` do esboço: x, y (`tnPy`) e z (`tnPz`) do eixo em torno do qual o trem gira. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  pivo: [0, 680, 1740],"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  /* O quanto a perna desce do pivô, em y: até o fim do barril (`tnLb`, onde o pistão começa), até a coroa (`tnLc`, o pé do pistão) e até"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "     o centro da roda (`tnL`, onde o garfo acaba e o eixo passa). O centro da roda fica em y 199 e o raio do pneu é 182, e por isso o pé"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "     do pneu fica em y 17: o esboço deixa a roda 17 mm acima do chão, e a escala do plano (773 mm) mede do pé da roda ao alto da"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "     carenagem, em y 790. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  descida: { barril: 160, coroa: 251, roda: 481 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  /* A perna, o pistão e a coroa, em diâmetro. A coroa é horizontal: sai do pé do pistão `braco` para -x, onde o garfo de um braço desce"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "     até o centro da roda. O eixo da roda sai do garfo, passa pelo cubo e termina `passa` além do plano médio da roda, para +x. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  perna: { diametro: 70 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  pistao: { diametro: 44 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  coroa: { diametro: 44, braco: 100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  garfo: { diametro: 34 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  eixoRoda: { diametro: 30, passa: 40 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  /* A roda: o perfil da família e os três ajustes do esboço (`diametroPneu` é `tnDRoda`, a largura é a razão do diâmetro, e o desvio"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "     zero põe o cubo no meio do aro). O resto é o do perfil `carro`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  roda: { perfil: 'carro', diametroPneu: 364, larguraPneu: 0.36, desvio: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  /* O pivô: o eixo vai `meio` para cada lado de `pivo`, e cada mancal é a caixa [largura em x, altura em y, profundidade em z] de canto"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "     arredondado `raio`, a `x` do pivô para cada lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  eixoPivo: { diametro: 34, meio: 222 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  mancal: { caixa: [30, 110, 110], raio: 12, x: 185 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  /* A alavanca sai do pivô `alcance` para +z, e o pino do atuador atravessa a ponta dela em x. O atuador liga o ponto fixo `fixo`, no"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "     alto do alojamento, à ponta da alavanca: o corpo vai do ponto fixo ao meio do caminho, e a haste do meio à ponta. A orelha é a"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "     caixa que prende o corpo ao ponto fixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  alavanca: { diametro: 30, alcance: 70 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  pinoAtuador: { diametro: 22, comprimento: 50 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  atuador: { fixo: [0, 738, 1900], corpo: 44, haste: 26 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  orelha: { caixa: [44, 60, 44], raio: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  /* O compasso: o braço de cima parte da perna, `alto.descida` abaixo do pivô e a `alto.x` do plano médio, o de baixo chega à coroa, a"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "     `baixo.x`, e os dois se juntam no joelho, no meio dos dois pontos em x e na descida média, `avanco` para a proa. O pino do joelho"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     atravessa a junta em x. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  compasso: { diametro: 18, alto: { x: -35, descida: 110 }, baixo: { x: -45 }, joelho: { avanco: -55 }, pino: { diametro: 24, comprimento: 40 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  /* A carenagem e o alojamento que ela leva recortado, em caixas de [largura em x, altura em y, profundidade em z] com o centro e o raio"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "     do canto vertical: os valores do esboço, que a fuselagem fixa. O alojamento passa 20 mm abaixo da carenagem, e fica aberto por"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "     baixo, com 25 mm de teto. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  carenagem: { caixa: [470, 230, 1120], raio: 30, centro: [0, 675, 2200] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  alojamento: { caixa: [400, 225, 800], raio: 20, centro: [0, 652.5, 2090] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  /* A resolução: os lados do círculo de cada cilindro e os segmentos de cada canto arredondado, por quarto de volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  segmentosDoCanto: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "const mAll = (v) => v.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "const GRAUS = Math.PI / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "/* Abaixo deste valor, uma componente da direção de um cilindro conta como zero. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "const EPS = 1e-9;"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "const registroDeFamilias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "/* Tudo em milímetro: os pontos do trem, os cilindros entre dois pontos e as caixas de canto arredondado. É o que `derivar` converte"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "   para metro e o que os pontos declarados medem. Um cilindro é `{ parte, de, para, diametro, material }`; uma caixa, `{ parte,"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "   centro, caixa, raio, material }`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "function medidas(t) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  const [px, py, pz] = t.pivo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  const d = t.descida;"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const c = t.compasso;"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  const abaixo = (descida, x = 0, z = 0) => [px + x, py - descida, pz + z];"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const entre = (a, b) => a.map((v, k) => (v + b[k]) / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const pivo = [px, py, pz];"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  const barrilFim = abaixo(d.barril);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const coroa = abaixo(d.coroa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const roda = abaixo(d.roda);"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const bracoAlto = abaixo(d.coroa, -t.coroa.braco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const bracoBase = abaixo(d.roda, -t.coroa.braco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  const eixoFim = abaixo(d.roda, t.eixoRoda.passa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  const alavancaPonta = [px, py, pz + t.alavanca.alcance];"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const fixo = t.atuador.fixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const meioDoAtuador = entre(fixo, alavancaPonta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const alto = abaixo(c.alto.descida, c.alto.x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const baixo = abaixo(d.coroa, c.baixo.x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const joelho = abaixo((c.alto.descida + d.coroa) / 2, (c.alto.x + c.baixo.x) / 2, c.joelho.avanco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  /* o pino que atravessa um ponto em x: o ponto menos e mais a metade do comprimento */"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  const emX = (ponto, comprimento) => [[ponto[0] - comprimento / 2, ponto[1], ponto[2]], [ponto[0] + comprimento / 2, ponto[1], ponto[2]]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  const [eixoPivoDe, eixoPivoPara] = emX(pivo, 2 * t.eixoPivo.meio);"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  const [pinoAtuadorDe, pinoAtuadorPara] = emX(alavancaPonta, t.pinoAtuador.comprimento);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  const [pinoCompassoDe, pinoCompassoPara] = emX(joelho, c.pino.comprimento);"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  const cilindros = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    { parte: 'eixoPivoNariz', de: eixoPivoDe, para: eixoPivoPara, diametro: t.eixoPivo.diametro, material: 'pino' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    { parte: 'alavancaNariz', de: pivo, para: alavancaPonta, diametro: t.alavanca.diametro, material: 'articulacao' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    { parte: 'pinoAtuadorNariz', de: pinoAtuadorDe, para: pinoAtuadorPara, diametro: t.pinoAtuador.diametro, material: 'pino' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    { parte: 'atuadorHasteNariz', de: meioDoAtuador, para: alavancaPonta, diametro: t.atuador.haste, material: 'articulacao' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "    { parte: 'atuadorCorpoNariz', de: fixo, para: meioDoAtuador, diametro: t.atuador.corpo, material: 'articulacao' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    { parte: 'compassoSupNariz', de: alto, para: joelho, diametro: c.diametro, material: 'articulacao' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    { parte: 'compassoInfNariz', de: joelho, para: baixo, diametro: c.diametro, material: 'articulacao' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    { parte: 'pinoCompassoNariz', de: pinoCompassoDe, para: pinoCompassoPara, diametro: c.pino.diametro, material: 'pino' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    { parte: 'pernaNariz', de: pivo, para: barrilFim, diametro: t.perna.diametro, material: 'perna' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    { parte: 'pistaoNariz', de: barrilFim, para: coroa, diametro: t.pistao.diametro, material: 'perna' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "    { parte: 'coroaNariz', de: coroa, para: bracoAlto, diametro: t.coroa.diametro, material: 'perna' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "    { parte: 'garfoNariz', de: bracoAlto, para: bracoBase, diametro: t.garfo.diametro, material: 'perna' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    { parte: 'eixoRodaNariz', de: bracoBase, para: eixoFim, diametro: t.eixoRoda.diametro, material: 'pino' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  const caixas = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    { parte: 'mancalNarizE', centro: [px - t.mancal.x, py, pz], caixa: t.mancal.caixa, raio: t.mancal.raio, material: 'carenagem' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    { parte: 'mancalNarizD', centro: [px + t.mancal.x, py, pz], caixa: t.mancal.caixa, raio: t.mancal.raio, material: 'carenagem' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    { parte: 'orelhaAtuadorNariz', centro: fixo, caixa: t.orelha.caixa, raio: t.orelha.raio, material: 'carenagem' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    cilindros,"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    caixas,"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    carenagem: { parte: 'carenagemTremNariz', ...t.carenagem, material: 'carenagem' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    alojamento: t.alojamento,"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "    roda,"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  const M = medidas(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  /* A direção de um cilindro, em metro: o eixo que ele segue (x, y ou z) quando os outros dois componentes são nulos, e senão os dois"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "     giros que levam +x à direção `de` a `para`: em z o seno da subida, e em y o que leva o resto de +x ao plano horizontal. Os giros"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "     são em torno de `de`, o primeiro ponto, onde a base nasce. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const cilindro = ({ parte, de, para, diametro, material }) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    const v = para.map((x, k) => x - de[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    const comprimento = Math.hypot(...v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "    const u = v.map((x) => x / comprimento);"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "    const seguidos = [0, 1, 2].filter((k) => Math.abs(u[k]) > EPS);"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "    const base = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "      parte, material, raio: m(diametro / 2), comprimento: m(comprimento), lados: t.lados,"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    };"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "    if (seguidos.length === 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "      const k = seguidos[0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "      const menor = para[k] < de[k] ? para : de;"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "      return { ...base, eixo: 'xyz'[k], em: mAll(menor), giros: [] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "    return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "      ...base,"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      eixo: 'x',"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "      em: mAll(de),"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "      giros: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "        { eixo: 'z', graus: Math.asin(u[1]) / GRAUS, pivo: mAll(de) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "        { eixo: 'y', graus: Math.atan2(-u[2], u[0]) / GRAUS, pivo: mAll(de) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "      ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "    };"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": ""
+        }
+      ],
+      "cortada": true
+    }
+  }
+}

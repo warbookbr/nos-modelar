@@ -1,0 +1,1228 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/trens-principais",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/trens-principais-composta.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "eixoRodaPrincipalD",
+        "tipo": "espessura",
+        "onde": "trecho dentro do cubo da roda",
+        "sentido": "menor",
+        "evidencia": "Roda isolada: furo do cubo passante, ~11% do diâmetro. Direita montada: ponta do eixo ~5% do diâmetro. Folga radial, roda frouxa no eixo. O alvo tem ponto igual."
+      },
+      {
+        "parte": "orelhaAtuadorPrincipalD",
+        "tipo": "uniao",
+        "onde": "topo do atuador, canto superior da perna",
+        "sentido": "afastado",
+        "evidencia": "Direita: orelha em y 275-312, placa da perna só começa em y 320 (vão ~8 px). Traseira: orelha ~9 px fora da face da perna. Não toca a perna; o alvo tem o mesmo vão."
+      },
+      {
+        "parte": "pernaPrincipalD",
+        "tipo": "uniao",
+        "onde": "saída da perna pela face inferior da asa",
+        "sentido": "atravessando",
+        "evidencia": "Etapas direita, traseira e inferior: perna e roda saem da asa sem abertura visível; o alvo mostra fenda longitudinal. Perna com ~25 px, contato pouco legível."
+      },
+      {
+        "parte": "pinoCompassoBaixoPrincipalD",
+        "tipo": "uniao",
+        "onde": "quina inferior da perna, lado do compasso",
+        "sentido": "afastado",
+        "evidencia": "Direita: pino em x 668-710, y 693-712; coroa em x 476-624, y 710-725. Sem contato com a coroa, só entra ~9 px na quina da perna. O alvo repete."
+      }
+    ],
+    "observacao": "Forma e proporções batem com o alvo e os dois lados são espelho; os pontos fracos são ligações que não tocam ou tocam por poucos mm, todas já presentes no alvo."
+  },
+  "partes": [
+    {
+      "nome": "pernaPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoPivoPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "coroaPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoExtPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoIntPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoRodaPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaPrincipalD",
+      "confere": false,
+      "observacao": "o pé do pneu fica 17 mm acima do chão, como no esboço; o plano promete a roda encostando no chão"
+    },
+    {
+      "nome": "compassoSupPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoInfPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoAltoPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoBaixoPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorCorpoPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorHastePrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoAtuadorPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "orelhaAtuadorPrincipalD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pernaPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoPivoPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "coroaPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoExtPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoIntPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoRodaPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaPrincipalE",
+      "confere": false,
+      "observacao": "o pé do pneu fica 17 mm acima do chão, como no esboço; o plano promete a roda encostando no chão"
+    },
+    {
+      "nome": "compassoSupPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoInfPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoAltoPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoBaixoPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorCorpoPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorHastePrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoAtuadorPrincipalE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "orelhaAtuadorPrincipalE",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "A roda não toca o eixo no esboço (furo do cubo de 62,9 mm contra eixo de 28 mm) e fica a 17 mm do chão; tirei o contato roda-eixo e declarei a roda com 4 corpos e 9 furos, e não como sólido.",
+    "O pino do pivô, o corpo do atuador e a orelha passam 5 a 15 mm do alojamento das asas e entram na asa, como no esboço; encurtá-los derruba o REFINA, e cumprir o critério pede mudar o esboço ou as asas.",
+    "A bancada lê a peça de sessao-ativa.json, e com dois modeladores no mesmo diretório as vistas saíram com o trem do nariz; o modelador refez o pacote numa cópia.",
+    "Atribuição (quem conduz): o PLANO diz orelha presa à perna e pino de baixo na coroa; o esboço põe a orelha no atuador, dentro da asa, e o pino na quina da perna. A medição de contatos confirma o crítico.",
+    "A roda 17 mm acima do chão escapou do crítico, que a deu no chão porque o montado não desenha o chão, e nenhum gate mede o apoio; o processo não a teria pego, e o apoio no chão entra na auditoria da montagem."
+  ],
+  "notaDePassagem": "Medidas do esboço na TABELA, pois asas e fuselagem não publicam porta; cantos da perna de 6 mm só pelo PLANO; pino do pivô, orelha e corpo do atuador entram na asa 5 a 15 mm como no esboço; roda a 17 mm do chão.",
+  "receita": {
+    "sha256": "sha256:8c628ca60ea9ce9138a470178512213dae768fef4c2cb43628e8225c09fe57a5",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 385,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * do pivô, a coroa, o garfo de dois lados, o eixo, a roda, o compasso e o atuador."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Oitava etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `trens-principais`"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * `aviao-detalhe-trens-principais.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * forma do lado direito (D) tem a do esquerdo (E) espelhada em x: a receita monta o lado D e o espelha com `espelha` antes de nomear as"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * partes, porque a cópia herda o nome da fonte. A TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece só"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * em `derivar`. As asas e a fuselagem não publicam porta, e por isso o pivô da perna (o ponto `tpP` do esboço) e a altura do cubo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * roda estão na TABELA como os parâmetros do esboço, e não saem de um vínculo de medida nem de um encaixe de porta da montagem v5. O"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * esboço tem um curso de recolhimento (`tpCurso`, de 0 a 84 graus); a receita fica só na pose baixada, em que o curso vale zero."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * Na pose baixada o trem é vertical: a perna, a coroa e o garfo são caixas em y, o eixo e o pino do pivô são cilindros em x e em z, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * as quatro hastes inclinadas (os dois braços do compasso e as duas metades do atuador) ficam no plano x y de z constante, de modo que"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * cada uma é um cilindro em y girado em z em torno da ponta `de`. A perna, a coroa e a orelha do atuador são caixas de canto"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * arredondado, extrusões em y de um retângulo de cantos redondos."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * A roda é a chamada da família `roda-pneu` com o perfil `carro` e os parâmetros do esboço (o diâmetro do pneu, a largura em razão do"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * diâmetro e o desvio zero), expandida aqui dentro dos PASSOS. A família a gera com o eixo em x e o centro na origem, e o esboço a"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * põe no centro da roda (`tpW`); a receita faz o mesmo com `transladar`. Da expansão ficam as quatro formas dela (o pneu, o aro, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * cubo furado e o disco), o material e o sólido; saem a parte, porque a receita nomeia as quatro formas como uma parte só, a roda, e as"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * três portas, que a família publica no quadro local da roda e que a pose deixaria longe da forma (`porta-fora-do-plano`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "const slug = (id) => id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "/* base do nome -> [forma prometida, técnica], sem o lado */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "const BASES = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  perna: ['perna do trem, do pivô sob a asa para baixo e para fora', 'caixa de canto arredondado do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  pinoPivo: ['pino do pivô, onde a perna gira para recolher', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  coroa: ['coroa no pé da perna, onde o garfo se prende', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  garfoExt: ['lado de fora do garfo, que segura o eixo da roda', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  garfoInt: ['lado de dentro do garfo, que segura o eixo da roda', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  eixoRoda: ['eixo da roda, atravessando os dois lados do garfo e o cubo', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  roda: ['roda principal com o pneu, de 593 mm de diâmetro, encostando no chão', 'a roda da família roda-pneu, perfil carro, com os parâmetros do esboço, expandida nos PASSOS'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  compassoSup: ['braço de cima do compasso', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  compassoInf: ['braço de baixo do compasso', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  pinoCompasso: ['pino do meio do compasso', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  pinoCompassoAlto: ['pino de cima do compasso, na perna', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  pinoCompassoBaixo: ['pino de baixo do compasso, na coroa', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  atuadorCorpo: ['corpo do atuador, mais grosso que a haste', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  atuadorHaste: ['haste do atuador', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  pinoAtuador: ['pino que liga o atuador à perna', 'cilindro entre os pontos do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  orelhaAtuador: ['orelha que prende o atuador à perna', 'caixa do esboço'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "const LADOS = [['D', 'direito'], ['E', 'esquerdo']];"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "const NOMES = LADOS.flatMap(([L]) => Object.keys(BASES).map((b) => `${b}Principal${L}`));"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "const ladoDe = (nome) => (nome.endsWith('D') ? 'direito' : 'esquerdo');"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "const baseDe = (nome) => nome.replace(/Principal[DE]$/, '');"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "/* A TABELA, em milímetro e no quadro do esboço, com o lado direito (D). Os nomes entre parênteses são os parâmetros e os pontos da"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "   unidade `trens-principais` do esboço, na pose baixada (`tpCurso` zero, em que o seno vale 0 e o cosseno vale 1). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  /* O pivô da perna (`tpX`, `tpPy` e `tpZ`): o ponto em que o pino do pivô corta a perna, dentro do alojamento que a asa recorta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  pivo: [1920, 1115, 4522],"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  /* A altura do cubo da roda (`tpHub`), o centro do eixo e da roda acima do chão. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  cubo: 313.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  /* A roda, a da família `roda-pneu` no perfil `carro`: `raio` é o raio do pneu (`tpR`, 296,5, de modo que o diâmetro é o 593 do"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "     esboço), `largura` a do pneu (`tpLargRoda`) e `desvio` o da chapa do disco, zero. `lados` não está aqui: é o da família, 96. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  roda: { perfil: 'carro', raio: 296.5, largura: 140, desvio: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  /* A perna é a cinta do esboço entre `tpTopo` e um ponto `sobreARoda` acima do topo do pneu: sobe `acimaDoPivo` além do pivô, desce"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "     até `sobreARoda` acima da roda, e tem `largura` em x (`tpBlE`) e `espessura` em z (`tpBlC`). `cantos` é o raio do canto"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "     arredondado, que o esboço não declara na perna e que o PLANO promete. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  perna: { acimaDoPivo: 40, sobreARoda: 25, largura: 70, espessura: 340, cantos: 6 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  /* O pino do pivô (`tpPinoA` a `tpPinoB`): cilindro em z de `diametro`, com `meioComprimento` para cada lado do pivô (`tpPinoMeio`). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  pinoPivo: { diametro: 38, meioComprimento: 215 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  /* A coroa: caixa de `largura` em x e de `profundidade` em z, fração da espessura da perna (0,58), com `altura` em y e o topo na"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "     face de baixo da perna; `cantos` é o raio do canto. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  coroa: { largura: 206, fracaoDaProfundidade: 0.58, altura: 20, cantos: 6 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  /* O garfo: duas cintas, uma de cada lado do pivô a `afastamento` do centro (`tpB`), de `largura` em x e `espessura` em z. Cada uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "     começa `sobreARoda` acima do topo do pneu, e passa por dentro da coroa, e termina `abaixoDoCubo` abaixo do centro do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  garfo: { afastamento: 88, sobreARoda: 33, abaixoDoCubo: 50, largura: 22, espessura: 190 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  /* O eixo (`tpAe` a `tpAi`): cilindro em x de `diametro`, com `meioComprimento` para cada lado do centro da roda (`tpBe`). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  eixo: { diametro: 28, meioComprimento: 100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  /* O compasso fica na frente da perna, a 185 mm do pivô para -z (`z`, de `tpZLado`). Os três pontos, como deslocamento [em x, em y] do pivô,"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "     são `tpCpA` (o alto), `tpCpJ` (o joelho) e `tpCpB` (o baixo). As duas hastes são cilindros de `haste` de diâmetro entre eles, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "     cada pino é um cilindro em z de `pino.diametro` e `pino.comprimento`, centrado no ponto. Os pinos de cima e de baixo entram na"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "     face da frente da perna, e o do meio fica fora dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  compasso: { z: -185, alto: [0, -150], joelho: [-80, -310], baixo: [0, -470], haste: 16, pino: { diametro: 24, comprimento: 56 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  /* O atuador fica atrás da perna, a 185 mm do pivô para +z (`z`, de `tpZLado`): da orelha `tpJF` (presa à asa) à ponta `tpJA` (o pino na"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "     perna), como deslocamento [em x, em y] do pivô. O corpo vai da orelha ao ponto que divide o percurso na fração `divisao` (0,5) e"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     a haste dali à ponta. A orelha é a caixa de `largura` em x, `altura` em y e `profundidade` em z, de canto `cantos`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  atuador: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    z: 185, orelha: [130, 75], ponta: [0, -330], divisao: 0.5, corpo: 40, haste: 26,"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    pino: { diametro: 30, comprimento: 56 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    caixaDaOrelha: { largura: 44, altura: 50, profundidade: 50, cantos: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  /* A discretização dos cilindros, em lados, e dos cantos arredondados, em segmentos por quarto de volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  lados: 32,"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  segmentosDoCanto: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "const mAll = (v) => v.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "const GRAUS = Math.PI / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "const registroDeFamilias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "/* Uma haste entre duas pontas, em mm: o eixo a que ela se alinha e, no caso inclinado, o giro em z, em graus, que leva +y à direção de"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "   `de` a `para`. Uma extrusão em y gira em z por `atan2(-dx, dy)` (+90 leva +y a -x). A haste inclinada precisa ficar no plano x y. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "function haste(de, para, raio, quem) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  const d = para.map((v, k) => v - de[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  const comprimento = Math.hypot(...d);"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  const alinhada = [0, 1, 2].filter((k) => Math.abs(d[k]) > 1e-9);"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  if (alinhada.length === 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    const k = alinhada[0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    if (d[k] < 0) throw new Error(`${quem}: a haste vai de ${de} a ${para}, e o eixo ${'xyz'[k]} pede ponta inicial menor que a final`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    return { eixo: 'xyz'[k], em: de, de, para, comprimento, raio };"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  if (Math.abs(d[2]) > 1e-9) throw new Error(`${quem}: a haste inclinada precisa ficar num plano de z constante, e vai de ${de} a ${para}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  return { eixo: 'y', em: de, de, para, comprimento, raio, giroEmZ: Math.atan2(-d[0], d[1]) / GRAUS };"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "/* O lado direito inteiro, em milímetro: a caixa ou a haste de cada parte, com a posição já resolvida, e o centro e as medidas da roda. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "function medidas(t) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const [px, py, pz] = t.pivo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const chao = t.cubo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const R = t.roda.raio;"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const doPivo = ([dx, dy], z) => [px + dx, py + dy, pz + z];"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  /* A perna vai de `acimaDoPivo` acima do pivô até `sobreARoda` acima do topo do pneu; a coroa fica sob ela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const pernaTopo = py + t.perna.acimaDoPivo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const pernaBase = chao + R + t.perna.sobreARoda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const coroaBase = pernaBase - t.coroa.altura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const garfoTopo = chao + R + t.garfo.sobreARoda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const garfoBase = chao - t.garfo.abaixoDoCubo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  const caixaDoGarfo = (lado) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    tipo: 'caixa', largura: t.garfo.largura, altura: garfoTopo - garfoBase, profundidade: t.garfo.espessura, em: [px + lado * t.garfo.afastamento, garfoBase, pz],"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  const c = t.compasso;"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  const alto = doPivo(c.alto, c.z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  const joelho = doPivo(c.joelho, c.z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  const baixo = doPivo(c.baixo, c.z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  const pinoDoCompasso = (centro) => haste([centro[0], centro[1], centro[2] - c.pino.comprimento / 2], [centro[0], centro[1], centro[2] + c.pino.comprimento / 2], c.pino.diametro / 2, 'pino do compasso');"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  const a = t.atuador;"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  const orelha = doPivo(a.orelha, a.z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  const ponta = doPivo(a.ponta, a.z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  const divisao = orelha.map((v, k) => v + a.divisao * (ponta[k] - v));"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  const o = a.caixaDaOrelha;"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    roda: { tipo: 'roda', centro: [px, chao, pz], largura: t.roda.largura, raio: R },"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "    perna: { tipo: 'caixa', largura: t.perna.largura, altura: pernaTopo - pernaBase, profundidade: t.perna.espessura, cantos: t.perna.cantos, em: [px, pernaBase, pz] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "    pinoPivo: { tipo: 'haste', ...haste([px, py, pz - t.pinoPivo.meioComprimento], [px, py, pz + t.pinoPivo.meioComprimento], t.pinoPivo.diametro / 2, 'pino do pivô') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    coroa: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "      tipo: 'caixa', largura: t.coroa.largura, altura: t.coroa.altura, profundidade: t.coroa.fracaoDaProfundidade * t.perna.espessura, cantos: t.coroa.cantos, em: [px, coroaBase, pz],"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "    },"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    garfoExt: caixaDoGarfo(1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    garfoInt: caixaDoGarfo(-1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    eixoRoda: { tipo: 'haste', ...haste([px - t.eixo.meioComprimento, chao, pz], [px + t.eixo.meioComprimento, chao, pz], t.eixo.diametro / 2, 'eixo da roda') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    compassoSup: { tipo: 'haste', ...haste(alto, joelho, c.haste / 2, 'braço de cima do compasso') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "    compassoInf: { tipo: 'haste', ...haste(joelho, baixo, c.haste / 2, 'braço de baixo do compasso') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    pinoCompasso: { tipo: 'haste', ...pinoDoCompasso(joelho) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    pinoCompassoAlto: { tipo: 'haste', ...pinoDoCompasso(alto) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    pinoCompassoBaixo: { tipo: 'haste', ...pinoDoCompasso(baixo) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    atuadorCorpo: { tipo: 'haste', ...haste(orelha, divisao, a.corpo / 2, 'corpo do atuador') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    atuadorHaste: { tipo: 'haste', ...haste(divisao, ponta, a.haste / 2, 'haste do atuador') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    pinoAtuador: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "      tipo: 'haste', ...haste([ponta[0], ponta[1], ponta[2] - a.pino.comprimento / 2], [ponta[0], ponta[1], ponta[2] + a.pino.comprimento / 2], a.pino.diametro / 2, 'pino do atuador'),"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "    },"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "    orelhaAtuador: { tipo: 'caixa', largura: o.largura, altura: o.altura, profundidade: o.profundidade, cantos: o.cantos, em: [orelha[0], orelha[1] - o.altura / 2, orelha[2]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  const M = medidas(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  /* A roda: a chamada da família, com os parâmetros do esboço, e o centro dela. A largura entra como razão do diâmetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const diametro = 2 * t.roda.raio;"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  const familia = registroDeFamilias().obter('roda-pneu');"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  const chamada = chamar(familia, 'roda', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "    perfil: t.roda.perfil, diametroPneu: diametro, larguraPneu: t.roda.largura / diametro, desvio: t.roda.desvio,"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  const partes = {};"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "  for (const [base, f] of Object.entries(M)) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "    if (f.tipo === 'caixa') {"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "      partes[base] = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "        tipo: 'caixa', largura: m(f.largura), altura: m(f.altura), profundidade: m(f.profundidade), em: mAll(f.em), ...(f.cantos ? { cantos: m(f.cantos) } : {}),"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "      };"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    } else if (f.tipo === 'haste') {"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "      partes[base] = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "        tipo: 'haste', eixo: f.eixo, em: mAll(f.em), comprimento: m(f.comprimento), raio: m(f.raio), ...(f.giroEmZ === undefined ? {} : { giroEmZ: f.giroEmZ }),"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      };"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  return { roda: { chamada, centro: mAll(M.roda.centro) }, partes, segmentosDoCirculo: t.lados / 4, segmentosDoCanto: t.segmentosDoCanto };"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "/* Identidade estrutural dos passos, escolhida aqui. A roda da família leva as origens `lathe` 1, 2, 3, 4 e 11, `arranja` 5 e"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "   `subtrair` 6, e o resto fica acima delas. A cópia espelhada (`espelha`) leva a identidade da fonte mais `ESPELHO`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "const ID = {"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
