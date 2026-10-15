@@ -1,0 +1,354 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/trem-do-nariz",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-trem-do-nariz/alvo/aviao-unidade-trem-do-nariz-composta.png",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Cortes e proporções coincidem com o alvo e os afastamentos de 17 mm e 8,5 mm batem com o declarado; só resta dúvida sobre o detalhe do pneu na frontal do alvo, que o modelo não mostra."
+  },
+  "partes": [
+    {
+      "nome": "carenagemTremNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoPivoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancalNarizE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancalNarizD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "alavancaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoAtuadorNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorHasteNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorCorpoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "orelhaAtuadorNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoSupNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoInfNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pernaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pistaoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "coroaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoRodaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaNariz",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a razão da roda contra a forma deslocada sai 1,002, acima de 1: a parte (8212 cm3) é maior que a união medida, inconsistência pequena da Manifold na forma de família",
+    "o pistão e os dois braços do compasso ainda precisam de mínimo próprio, porque alongamento e inclinação não são translação e a razão deles não volta a 1",
+    "a saída de descrever-peca e forma:esboco imprime '8.5 mm' com ponto decimal, enquanto os motivos da receita usam vírgula",
+    "vistas:critica não foi rodado nesta rodada, porque a geometria não mudou e a ferramenta confirmou a mesma malha da rodada 2",
+    "O processo não mede o apoio no chão: o crítico só confirma a roda no chão pelo deslocamento declarado, porque nenhuma vista desenha o chão; fica para a auditoria da montagem, na fatia 3."
+  ],
+  "notaDePassagem": "O 17 sai de esboco.pe - chao na TABELA, e os vetores de deslocamento e alongamento derivam dele. Só coroa, garfo, eixo e roda declaram deslocamento (o pino do joelho, metade dele). Pistão e braços do compasso alongam e giram, então declaram alongamento e mantêm o mínimo próprio (0,84; 0,66; 0,27) medido por forma:esboco. Envelope em 5 mm. O trem principal pode copiar o formato de afastamentos(t).",
+  "receita": {
+    "sha256": "sha256:6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 11,
+      "acrescentadas": 34,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 60,
+          "texto": "/* O mínimo próprio de cada parte que se afasta do esboço pela decisão da pessoa de 2026-10-15 (a roda encosta no chão e o trem desce os"
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "   17 mm pelo pistão; o furo do cubo tem o diâmetro do eixo). A razão interseção/união de uma parte do mesmo tamanho deslocada 17 mm é a"
+        },
+        {
+          "tipo": "-",
+          "linha": 62,
+          "texto": "   que o esboço não cobre, e o mínimo é a razão medida, arredondada para baixo. O pistão alonga 17 mm (138 contra 164 cm3); a coroa, o"
+        },
+        {
+          "tipo": "-",
+          "linha": 63,
+          "texto": "   garfo, o eixo e a roda descem 17 mm; o pino e os braços do compasso acompanham o joelho, que desce 8,5 mm. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "const MINIMO_PROPRIO = {"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "  pistaoNariz: 0.84, coroaNariz: 0.35, garfoNariz: 0.86, eixoRodaNariz: 0.18, rodaNariz: 0.72,"
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": "  compassoSupNariz: 0.66, compassoInfNariz: 0.27, pinoCompassoNariz: 0.38,"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "/* As partes que a decisão da pessoa de 2026-10-15 afasta do esboço (a roda encosta no chão e o trem desce pelo pistão os 17 mm que o"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "   esboço deixava entre o pé do pneu e o chão), declaradas na entrada de cada uma em `REFINA.esboco.formas`, com o motivo. A coroa, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "   garfo, o eixo da roda e a roda só descem: declaram `deslocamento`, e a razão volta a ser medida contra a forma transladada. O pino do"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "   joelho desce metade, porque o joelho fica no meio da descida entre o braço de cima, que não se move, e a coroa. O pistão e os dois"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "   braços do compasso mudam de comprimento e de inclinação, e nenhum vetor leva a forma do esboço até eles: declaram `alongamento`, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "   quanto passam do volume do andaime em cada lado, e ficam com o `minimo` próprio, que é a razão que o alongamento deixa (medida"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "   por `npm run forma:esboco` e arredondada para baixo). O furo do cubo tem o diâmetro do eixo, e a razão da roda o suporta. Os vetores"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "   saem da TABELA (`esboco.pe` menos `chao`), e não de um 17 digitado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "const afastamentos = (t) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const desce = t.esboco.pe - t.chao;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const meio = desce / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  /* o texto dos motivos, com vírgula decimal */"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const mm = (v) => String(v).replace('.', ',');"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const desceTudo = `o trem desce ${mm(desce)} mm para a roda encostar no chão`;"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    pistaoNariz: { minimo: 0.84, alongamento: { '-y': desce }, motivo: `o pistão alonga ${mm(desce)} mm para a roda encostar no chão` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    coroaNariz: { deslocamento: [0, -desce, 0], motivo: `a coroa está no pé do pistão: ${desceTudo}` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    garfoNariz: { deslocamento: [0, -desce, 0], motivo: `o garfo pende da coroa: ${desceTudo}` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    eixoRodaNariz: { deslocamento: [0, -desce, 0], motivo: `o eixo atravessa o garfo na altura do centro da roda: ${desceTudo}` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    rodaNariz: { deslocamento: [0, -desce, 0], motivo: `a roda encosta no chão: ${desceTudo}` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    pinoCompassoNariz: { deslocamento: [0, -meio, 0], motivo: `o joelho do compasso fica no meio da descida da coroa: desce ${mm(meio)} mm` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    compassoSupNariz: { minimo: 0.66, alongamento: { '-y': meio }, motivo: `o braço de cima parte da perna, que não desce, e acompanha o joelho, que desce ${mm(meio)} mm` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    compassoInfNariz: { minimo: 0.27, alongamento: { '-y': desce }, motivo: `o braço de baixo liga o joelho, que desce ${mm(meio)} mm, à coroa, que desce ${mm(desce)} mm` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "const formasDoEsboco = () => Object.fromEntries(NOMES.map((p) => [p, p in MINIMO_PROPRIO ? { formas: p, minimo: MINIMO_PROPRIO[p] } : p]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "const formasDoEsboco = (t = TABELA) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const desvios = afastamentos(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  return Object.fromEntries(NOMES.map((p) => [p, p in desvios ? { formas: p, ...desvios[p] } : p]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  /* O pé do pneu no esboço, em y: a roda ficava 17 mm acima do chão. A diferença para o `chao` é o quanto o trem desce, e é o vetor do"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "     `deslocamento` que o REFINA declara nas partes que só descem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  esboco: { pe: 17 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 424,
+          "texto": "    /* O envelope passa de 5 para 18 mm: o andaime guarda o trem na pose do esboço, com a roda 17 mm acima do chão, e a decisão da"
+        },
+        {
+          "tipo": "-",
+          "linha": 425,
+          "texto": "       pessoa (2026-10-15) desce o pistão, a coroa, o garfo, o eixo, a roda e o compasso até 17 mm abaixo do volume deles. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 426,
+          "texto": "    tolerancia: { envelope: 18, porta: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 447,
+          "texto": "    /* O andaime guarda o trem na pose do esboço, com a roda 17 mm acima do chão. A descida que a pessoa decidiu em 2026-10-15 está"
+        },
+        {
+          "tipo": "+",
+          "linha": 448,
+          "texto": "       declarada parte por parte em `esboco.formas` (deslocamento e alongamento), e por isso o envelope fica nos 5 mm de sempre. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 449,
+          "texto": "    tolerancia: { envelope: 5, porta: 0.5 },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
