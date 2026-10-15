@@ -1,0 +1,23 @@
+{
+  "formato": "mecanifica.registro-de-etapas",
+  "versao": 1,
+  "montagem": "aviao",
+  "etapas": [
+    {
+      "instancia": "fuselagem",
+      "estado": "fixa",
+      "juntas": [],
+      "receita": "f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99",
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está pela escolha 'Aceitar como está (Recomendado)', com o para-brisa anguloso, a ondulação da linha de baixo e a largura da cabine, que vêm do esboço aprovado, anotados como pendência",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 2.",
+          "fuselagem: espessura em cintura da cabine, z≈4700 a 5800",
+          "fuselagem: superficie em linha inferior entre capô e cabine, z≈2750 a 3900",
+          "parabrisa: superficie em ponta dianteira e borda inferior"
+        ],
+        "analise": "ausente"
+      }
+    }
+  ]
+}
