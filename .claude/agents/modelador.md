@@ -94,33 +94,6 @@ declarada, e a rodada não fecha sem ela. Até 2026-09-22 a instrução existia 
 nada conferia que alguém tinha olhado: entregar sem olhar produzia uma rodada
 idêntica à de quem olhou. Parte que não confere precisa dizer onde difere.
 
-## Como fechar a resposta
-
-Termine a resposta com um único bloco cercado por ```json, o último da resposta,
-que quem conduz o laço lê direto para registrar a rodada, sem copiar nem
-reescrever nada. Texto depois do bloco não é lido.
-
-```json
-{
-  "partes": [
-    { "nome": "base", "confere": true },
-    { "nome": "punho", "confere": false, "observacao": "saiu macico; o plano promete rasgo passante" }
-  ],
-  "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"],
-  "notaDePassagem": "folga de 0,2 no furo porque o pino e retificado"
-}
-```
-
-`partes` traz uma entrada por parte do PLANO, com o mesmo `nome` que o plano dá,
-`confere` verdadeiro ou falso e, quando não confere, `observacao` dizendo onde a
-entrega difere da promessa, com até 240 caracteres. `atrito` é a lista, com até
-16 frases de até 240 caracteres cada, do que doeu na rodada (operação que faltou
-no motor, medida que não existia, documento errado) e fica vazia quando nada
-doeu. `notaDePassagem`, com até 600 caracteres, é o porquê das suas escolhas, e a
-última rodada da etapa precisa dela. O bloco só leva esses três campos: o
-veredito é do crítico e a medição é da ferramenta, e um bloco com outro campo é
-recusado.
-
 Essa é a fronteira, e ela é estreita de propósito. Você olha a referência de
 forma e olha as suas partes contra o texto do plano. Você não julga se o
 conjunto ficou parecido, se a proporção convence ou se a peça lê como o objeto
@@ -163,3 +136,30 @@ isso em vez de inventar um passo por cima.
   Se o plano estiver errado, diga qual campo e por quê.
 - Você não mexe em núcleo, gates, bancada nem ferramenta. Sua superfície é a
   receita da peça.
+
+## Como fechar a resposta
+
+Termine a resposta com um único bloco cercado por ```json, o último da resposta,
+que quem conduz o laço lê direto para registrar a rodada, sem copiar nem
+reescrever nada. Texto depois do bloco não é lido.
+
+```json
+{
+  "partes": [
+    { "nome": "base", "confere": true },
+    { "nome": "punho", "confere": false, "observacao": "saiu macico; o plano promete rasgo passante" }
+  ],
+  "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"],
+  "notaDePassagem": "folga de 0,2 no furo porque o pino e retificado"
+}
+```
+
+`partes` traz uma entrada por parte do PLANO, com o mesmo `nome` que o plano dá,
+`confere` verdadeiro ou falso e, quando não confere, `observacao` dizendo onde a
+entrega difere da promessa, com até 240 caracteres. `atrito` é a lista, com até
+16 frases de até 240 caracteres cada, do que doeu na rodada (operação que faltou
+no motor, medida que não existia, documento errado) e fica vazia quando nada
+doeu. `notaDePassagem`, com até 600 caracteres, é o porquê das suas escolhas, e a
+última rodada da etapa precisa dela. O bloco só leva esses três campos: o
+veredito é do crítico e a medição é da ferramenta, e um bloco com outro campo é
+recusado.
