@@ -180,7 +180,8 @@ REFINA: {
 A forma canônica de `esboco` traz `arquivo`, `opcao` (1 quando a receita não a escreve), `minimo` e `formas` como a lista
 `[{ parte, formas, minimo? }]` em ordem de nome de parte, com as formas de cada parte em ordem de id; a normalização aceita as duas
 escritas e é idempotente. Só as partes que o campo cita são conferidas, e uma parte do `REFINA.partes` sem forma no esboço continua
-conferida só pelo envelope.
+conferida só pelo envelope. A parte cuja forma o andaime não traduz, como a pá girada de uma hélice, fica fora de `REFINA.partes` e é
+conferida só aqui: a conferência do envelope não a recusa como `parte-sem-volume` quando `esboco.formas` a cita.
 
 A razão de uma parte é `V(parte ∩ formas) / V(parte ∪ formas)`: vale 1 quando a parte é a forma e cai com a parte menor, maior ou
 deslocada. A parte que repete o recorte da forma dá 1, e a parte sem o recorte que a forma tem dá a razão que o recorte tira, um menos o

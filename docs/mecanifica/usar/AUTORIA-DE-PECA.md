@@ -126,7 +126,21 @@ caixa da asa inteira. A receita que refina uma forma do esboço declara também
 `REFINA.esboco` (o arquivo do esboço, a forma de cada parte e a razão
 interseção/união de volume mínima), e a parte que fica abaixo do mínimo reprova;
 o formato está na seção "Forma da parte contra a forma do esboço" do mesmo
-contrato.
+contrato. A imagem do esboço que vai ao crítico como alvo dessa receita é gerada de
+novo pela ferramenta atual, e não a guardada na rodada do esboço: copie o
+`.esboco.json` do detalhe para uma pasta da rodada e rode `npm run esboco --
+<cópia> --unidade <unidade> --composta`, que grava a composta ao lado da cópia;
+em 2026-10-15 o alvo do motor do avião era uma composta de antes de uma correção do
+desenho, com a silhueta tracejada, e só a pessoa percebeu.
+
+Uma família do núcleo (`procedural/familias`, como a superfície aerodinâmica da pá
+e da asa ou a roda-pneu) entra numa receita de peça pelos `PASSOS`: a receita expande
+a chamada com `expandirChamadasDeComposicao(criarRegistroDeFamilias().registroComposicoes,
+[chamar(FAMILIA, id, parametros)]).passos` (de `procedural/nucleo/composicoes.js` e
+`procedural/familias/index.js`) e soma os próprios passos depois, com blocos de id
+que não colidem. Declare em `MATERIAIS` o material que a família usa (na superfície
+aerodinâmica, `materialDaPele`). A receita que só exporta `CHAMADAS_COMPOSICOES`
+pede o registro de fora (`--composicoes`), e a guarda do acervo não o tem.
 
 ## Identidade estável
 

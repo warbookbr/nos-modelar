@@ -284,11 +284,14 @@ export function conferirRefinamentoGlobal({ refinamento, andaime, neutro }) {
   const tolPorta = declaracao.tolerancia.porta;
 
   const vinculadas = new Set(declaracao.partes.map(({ parte }) => parte));
+  /* a parte cuja forma o andaime não traduz (a pá girada de uma hélice: a N2 não inclina o sólido) não tem volume, e a ligação dela
+     à forma do esboço em `esboco.formas` é a conferência dela, pela razão de volume */
+  const pelaFormaDoEsboco = new Set((declaracao.esboco?.formas ?? []).map(({ parte }) => parte));
   for (const nome of partesEntregues(neutro)) {
-    if (!vinculadas.has(nome)) {
+    if (!vinculadas.has(nome) && !pelaFormaDoEsboco.has(nome)) {
       achados.push({
         codigo: 'parte-sem-volume', parte: nome,
-        mensagem: `a parte '${nome}' é entregue pela peça e não declara em REFINA qual volume do andaime '${normalizado.id}' ela refina; sem o volume não há envelope para conferir.`,
+        mensagem: `a parte '${nome}' é entregue pela peça e não declara em REFINA qual volume do andaime '${normalizado.id}' ela refina, nem em REFINA.esboco a forma do esboço; sem nenhum dos dois não há o que conferir.`,
       });
     }
   }

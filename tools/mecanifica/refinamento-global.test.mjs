@@ -90,7 +90,7 @@ describe('a guarda do acervo roda o refinamento no caminho da receita', () => {
   it.each([
     ['parte-fora', /sai do envelope do volume 'sapata'/],
     ['porta-movida', /a porta 'assento' não está onde o andaime a declarou/],
-    ['parte-sem-volume', /não declara em REFINA qual volume/],
+    ['parte-sem-volume', /não declara em REFINA qual volume do andaime .* nem em REFINA.esboco/],
   ])('reprova %s', async (variante, mensagem) => {
     const { reprovadas } = await guarda(variante);
     expect(reprovadas).toHaveLength(1);

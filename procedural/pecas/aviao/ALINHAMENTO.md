@@ -103,6 +103,13 @@ com nota 8; o para-brisa anguloso, a ondulação de 20 a 30 mm na linha de baixo
 o capô e a cabine e a largura da cabine contra a foto de topo, que inclui a carenagem
 da raiz da asa, vêm do esboço aprovado e ficam como pendência.
 
+Depois do motor, na mesma data, a pessoa pediu o para-brisa rente ao casco, como as
+janelas: no esboço ele é uma casca apoiada sobre a frente da cabine, sem abertura por
+baixo, e o degrau aparece. A fuselagem reabre para uma rodada depois da correção do
+sombreamento (os riscos das janelas e a junta com o capô), com a abertura recortada no
+casco, o vidro assentado rente nela e o montante central apoiado no vidro de ponta a
+ponta.
+
 ## O plano do motor
 
 É a segunda etapa. A receita fica em `partes/motor/receita.js`, com o nome
@@ -129,3 +136,28 @@ segunda com nota 8. O `REFINA.esboco` confere cada parte contra a forma de mesmo
 do esboço: capô 0,981, entrada de ar 0,958 e escapes 0,969. O furo da boca de ar, que
 abre na face de trás do capô e a fuselagem tapa, e a raiz lisa dos escapes, onde o
 esboço tem um leque de frisos, ficam como pendência.
+
+## O plano da hélice
+
+É a terceira etapa. A receita fica em `partes/helice/receita.js`, com o nome
+`aviao/helice`, e as formas vêm da unidade `helice` do esboço aprovado (o mestre e o
+[detalhe](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-helice.esboco.json)).
+
+- `cone`: o cone da hélice, de revolução em torno do eixo z pelo perfil do esboço, liso,
+  da proa em z 8 até dentro do lábio do capô.
+- `pa1` a `pa5`: as cinco pás, cada uma a pá da família `superficie-aerodinamica` com o
+  perfil `pa-de-helice` e os parâmetros do esboço (envergadura de 912 mm e as cordas
+  dele), a raiz dentro do cone e as cinco em arranjo radial de 72 graus em torno do eixo
+  da hélice, na pose do esboço. A família entra pelos `PASSOS`, como diz a
+  [autoria de peça](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md).
+
+O `REFINA` aponta `../../andaime.json` e liga o `cone` ao volume `cone` e a `pa1` ao
+volume `helice-pa`, com a tolerância de 5 mm. As outras quatro pás não têm volume,
+porque o andaime não gira o sólido, e são conferidas só pelo `REFINA.esboco`, que liga
+cada parte à forma de mesmo papel do esboço (`cone`, `helicePa` e `helicePa1` a
+`helicePa4`) com o mínimo de 0,95. A escala é o diâmetro da hélice no esboço, de ponta
+a ponta das pás. Os contatos são cada pá com o cone.
+
+Reprova a hélice: pá reta, sem a torção da família; pá que não entra no cone ou que fica
+solta; pás fora do arranjo de 72 graus; cone facetado; e o `REFINA` acusando parte fora
+do envelope ou abaixo do mínimo contra o esboço.

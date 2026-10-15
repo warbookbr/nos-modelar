@@ -224,6 +224,17 @@ describe('conferência do refinamento', () => {
     expect(r.achados[0].mensagem).toContain('tem: coluna-central, sapata');
   });
 
+  it('a parte sem volume ligada a uma forma do esboço não é recusada pelo envelope: a conferência dela é a razão de volume', () => {
+    const receita = receitaDoSuporte({ vinculo: { sapata: 'sapata' } });
+    const { neutro } = executarReceita(receita);
+    const refinamento = { ...receita.REFINA, esboco: { arquivo: 'suporte.esboco.json', formas: { coluna: 'coluna' }, minimo: 0.9 } };
+    expect(conferirRefinamentoGlobal({ refinamento, andaime: ANDAIME, neutro }).achados).toEqual([]);
+    const semForma = { ...refinamento, esboco: { ...refinamento.esboco, formas: { sapata: 'sapata' } } };
+    const r = conferirRefinamentoGlobal({ refinamento: semForma, andaime: ANDAIME, neutro });
+    expect(r.achados).toEqual([expect.objectContaining({ codigo: 'parte-sem-volume', parte: 'coluna' })]);
+    expect(r.achados[0].mensagem).toContain('nem em REFINA.esboco a forma do esboço');
+  });
+
   it('o vínculo com parte que a peça não entrega é recusado', () => {
     const r = conferir({ vinculo: { sapata: 'sapata', coluna: 'coluna-central', tampa: 'sapata' } });
     expect(r.achados).toEqual([expect.objectContaining({ codigo: 'parte-ausente', parte: 'tampa', volume: 'sapata' })]);
