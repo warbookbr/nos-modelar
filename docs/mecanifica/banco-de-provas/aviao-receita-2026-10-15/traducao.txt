@@ -1,0 +1,120 @@
+opção 1 (Avião de pequeno porte): 110 volumes no andaime andaime-aviao-de-pequeno-porte, 63 aproximado(s), 5 forma(s) sem equivalente, 25 oculta(s) fora do andaime
+  aproximado aileronD (loft, loft-como-casco): volume +0.000% (0.067 mm3), envelope até 0.000001 mm (0.000%)
+  aproximado aileronE (loft, loft-como-casco): volume +0.000% (0.134 mm3), envelope até 0.000001 mm (0.000%)
+  aproximado asaD (familia, familia-como-casco): volume +22.773% (188469203.398 mm3), envelope até 79.315 mm (1.491%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil asa) virou o casco convexo de 24 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por flapD, aileronD, cortaPontaD, alojamentoPernaPrincipalD, alojamentoBracoPrincipalD, alojamentoRodaPrincipalD (194332718.589 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado asaE (familia, familia-como-casco): volume +22.748% (188261157.755 mm3), envelope até 79.315 mm (1.491%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil asa) virou o casco convexo de 24 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por flapE, aileronE, cortaPontaE, alojamentoPernaPrincipalE, alojamentoBracoPrincipalE, alojamentoRodaPrincipalE (194332736.13 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado barbatana (loft, loft-como-casco): volume -0.000% (-0.01 mm3), envelope até 0 mm (0.000%)
+  aproximado capo (loft, loft-como-casco): volume +0.413% (6616960.259 mm3), envelope até 0 mm (0.000%)
+    perdido (recorte): o recorte por bocaDeAr (6616960.217 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado carenagemTremNariz (caixa, caixa-com-raio-como-extrusao): volume +118.362% (65527958.493 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 30 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+    perdido (recorte): o recorte por alojamentoNariz (65527958.502 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado coroaPrincipalD (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 6 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado coroaPrincipalE (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 6 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado deriva.dorsal (loft, loft-como-casco): volume -0.000% (-0.025 mm3), envelope até 0 mm (0.000%)
+  aproximado deriva.fin (familia, familia-como-casco): volume +385.448% (364926275.418 mm3), envelope até 1965 mm (115.766%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil deriva) virou o casco convexo de 24 seções perpendiculares ao eixo y: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por deriva.corteRaiz, vaoDoLeme (409759611.164 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado dobradicaLeme1D (loft, loft-como-casco): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado dobradicaLeme1E (loft, loft-como-casco): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado dobradicaLeme2D (loft, loft-como-casco): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado dobradicaLeme2E (loft, loft-como-casco): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado dobradicaLeme3D (loft, loft-como-casco): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado dobradicaLeme3E (loft, loft-como-casco): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado entradaDeAr (loft, loft-como-casco): volume +211.792% (2513597.81 mm3), envelope até 0 mm (0.000%)
+    perdido (recorte): o recorte por bocaDeAr (2513597.818 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado escapeD (tubo, recorte-ignorado): volume +8.080% (1442568.699 mm3), envelope até 0.062353 mm (0.014%)
+    perdido (recorte): o recorte por furoEscapeD (1442568.699 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado escapeE (tubo, recorte-ignorado): volume +8.080% (1442568.699 mm3), envelope até 0.062353 mm (0.014%)
+    perdido (recorte): o recorte por furoEscapeE (1442568.699 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado estabilizadorD (familia, familia-como-casco): volume +22.321% (23093271.723 mm3), envelope até 464.33395 mm (62.104%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil estabilizador) virou o casco convexo de 24 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por profundorD (35683498.609 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado estabilizadorE (familia, familia-como-casco): volume +22.346% (23119424.666 mm3), envelope até 464.33395 mm (62.104%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil estabilizador) virou o casco convexo de 24 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por profundorE (35683498.609 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado flapD (loft, loft-como-casco): volume +0.000% (0.416 mm3), envelope até 0.000001 mm (0.000%)
+  aproximado flapE (loft, loft-como-casco): volume +0.000% (0.312 mm3), envelope até 0.000001 mm (0.000%)
+  aproximado fuselagem (loft, loft-como-casco): volume +0.469% (52113959.128 mm3), envelope até 0 mm (0.000%)
+    perdido (recorte): o recorte por cortePorta, corteJanela1D, corteJanela1E, corteJanela2D, corteJanela2E, corteJanela3D, corteJanela3E, corteJanela4D, corteJanela4E (52113961.521 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado helicePa (familia, familia-como-casco): volume -1.763% (-85097.359 mm3), envelope até 0 mm (0.000%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil pa-de-helice) virou o casco convexo de 43 seções perpendiculares ao eixo y: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+  aproximado janela1D (caixa, caixa-com-raio-como-extrusao): volume +0.000% (-0.003 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 90 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela1E (caixa, caixa-com-raio-como-extrusao): volume +0.000% (-0.003 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 90 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela2D (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 110 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela2E (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 110 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela3D (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 110 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela3E (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 110 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela4D (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.025 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 110 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado janela4E (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.025 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 110 mm vira a extrusão do contorno arredondado (34 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado leme (loft, loft-como-casco): volume +0.000% (0.017 mm3), envelope até 0 mm (0.000%)
+  aproximado mancalNarizD (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 12 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado mancalNarizE (caixa, caixa-com-raio-como-extrusao): volume -0.000% (-0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 12 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado orelhaAtuadorNariz (caixa, caixa-com-raio-como-extrusao): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 8 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado orelhaAtuadorPrincipalD (caixa, caixa-com-raio-como-extrusao): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 8 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado orelhaAtuadorPrincipalE (caixa, caixa-com-raio-como-extrusao): volume -0.000% (0 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 8 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado parabrisa (loft, loft-como-casco): volume +0.000% (0.001 mm3), envelope até 0 mm (0.000%)
+  aproximado pontaD (familia, familia-como-casco): volume +3534.534% (1104714587.819 mm3), envelope até 5320.685402 mm (1533.877%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil asa) virou o casco convexo de 24 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por cortaAsaD (1023710703.725 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado pontaE (familia, familia-como-casco): volume +3519.317% (1099957681.943 mm3), envelope até 5320.685402 mm (1533.877%)
+    perdido (superficie): a superfície da família superficie-aerodinamica (perfil asa) virou o casco convexo de 24 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (fixa) viram um sólido só
+    perdido (recorte): o recorte por cortaAsaE (1023710728.539 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado porta (loft, loft-como-casco): volume +8.756% (2117088.257 mm3), envelope até 0 mm (0.000%)
+    perdido (recorte): o recorte por corteJanela4E (2205515.257 mm3 retirados) não tem equivalente na N2, que não subtrai um volume de outro: o andaime leva a forma inteira, sem o vão
+  aproximado profundorD (loft, loft-como-casco): volume +0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado profundorE (loft, loft-como-casco): volume +0.000% (0 mm3), envelope até 0 mm (0.000%)
+  aproximado rodaNariz (familia, familia-como-casco): volume +64.963% (5327617.535 mm3), envelope até 0 mm (0.000%)
+    perdido (superficie): a superfície da família roda-pneu (perfil carro) virou o casco convexo de 30 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (cubo, pneu, aro, disco) viram um sólido só
+  aproximado rodaPrincipalD (familia, familia-como-casco): volume +61.463% (14619989.404 mm3), envelope até 0 mm (0.000%)
+    perdido (superficie): a superfície da família roda-pneu (perfil carro) virou o casco convexo de 28 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (cubo, pneu, aro, disco) viram um sólido só
+  aproximado rodaPrincipalE (familia, familia-como-casco): volume +61.463% (14619989.404 mm3), envelope até 0 mm (0.000%)
+    perdido (superficie): a superfície da família roda-pneu (perfil carro) virou o casco convexo de 28 seções perpendiculares ao eixo x: o furo, as cavidades e as reentrâncias de cada seção deixam de existir, e as partes (cubo, pneu, aro, disco) viram um sólido só
+  aproximado suporteAileron1D (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteAileron1E (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteAileron2D (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteAileron2E (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteFlap1D (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteFlap1E (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteFlap2D (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteFlap2E (caixa, caixa-com-raio-como-extrusao): volume +0.000% (0.002 mm3), envelope até 0 mm (0.000%)
+    perdido (tipo): a caixa de raio 20 mm vira a extrusão do contorno arredondado (36 pontos, os do esboço); a forma não muda e o tipo deixa de ser caixa
+  aproximado suporteProfundor1D (loft, loft-como-casco): volume +0.000% (0.004 mm3), envelope até 0 mm (0.000%)
+  aproximado suporteProfundor1E (loft, loft-como-casco): volume +0.000% (0.004 mm3), envelope até 0 mm (0.000%)
+  aproximado suporteProfundor2D (loft, loft-como-casco): volume +0.000% (0.005 mm3), envelope até 0 mm (0.000%)
+  aproximado suporteProfundor2E (loft, loft-como-casco): volume +0.000% (0.005 mm3), envelope até 0 mm (0.000%)
+  aproximado suporteProfundor3D (loft, loft-como-casco): volume +0.000% (0.005 mm3), envelope até 0 mm (0.000%)
+  aproximado suporteProfundor3E (loft, loft-como-casco): volume +0.000% (0.005 mm3), envelope até 0 mm (0.000%)
+  sem equivalente helicePa1 (familia): família superficie-aerodinamica (perfil pa-de-helice): a rotação não deixa nenhum eixo da forma sobre um eixo do mundo (gira em dois eixos), e a N2 não inclina o sólido
+  sem equivalente helicePa2 (familia): família superficie-aerodinamica (perfil pa-de-helice): a rotação não deixa nenhum eixo da forma sobre um eixo do mundo (gira em dois eixos), e a N2 não inclina o sólido
+  sem equivalente helicePa3 (familia): família superficie-aerodinamica (perfil pa-de-helice): a rotação não deixa nenhum eixo da forma sobre um eixo do mundo (gira em dois eixos), e a N2 não inclina o sólido
+  sem equivalente helicePa4 (familia): família superficie-aerodinamica (perfil pa-de-helice): a rotação não deixa nenhum eixo da forma sobre um eixo do mundo (gira em dois eixos), e a N2 não inclina o sólido
+  sem equivalente montanteParabrisa (caixa): caixa com raio de canto (14 mm): o eixo da altura da caixa não fica sobre um eixo do mundo, e a N2 não inclina o sólido que o contorno extruda
+{"helice":6,"motor":4,"fuselagem":13,"asas":20,"empenagem-horizontal":12,"empenagem-vertical":10,"trem-do-nariz":18,"trens-principais":32}
+tipos {"revolucao":1,"familia":15,"loft":26,"tubo":2,"caixa":31,"cilindro":40}
