@@ -26,7 +26,7 @@
  * A ponta parte da mesma chamada da família, com o perfil e as cordas dela, e só o caminho e o contorno mudam, porque a família não
  * aceita mais de 60 graus de ponta levantada e a pessoa pediu a ponta a uns 9% da meia-asa, o que pede cerca de 72. As seções do
  * contorno vêm da expansão (interpoladas em x, que é exato: corda, espessura e enflechamento são retas) e o caminho é a mesma curva de
- * quinto grau da família (`plantaDa`), com o ângulo de `ponta.levantada`; a tampa é a da família, de comprimento fixo ao longo do
+ * quinto grau da família (`plantaDa`), com o ângulo de `asa.pontaLevantada`; a tampa é a da família, de comprimento fixo ao longo do
  * caminho. Vista de cima, a ponta tem os cantos do bordo de ataque e do de fuga arredondados: cada seção perde, em u, um recuo que
  * segue um quarto de círculo em x, do raio de `ponta.raioNoBordoDeAtaque` e de `ponta.raioNoBordoDeFuga`, e o recuo chega ao máximo
  * na corda da ponta.

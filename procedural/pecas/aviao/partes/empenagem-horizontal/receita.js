@@ -64,7 +64,7 @@ const AFASTADAS = {
   },
   profundor: {
     minimo: 0.70,
-    motivo: 'o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,706 e 0,704',
+    motivo: 'o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,705 e 0,704',
   },
   eixoProfundor: {
     minimo: 0.85,
@@ -148,7 +148,8 @@ export const TABELA = {
      que segura a aba ao profundor. O rasgo passa `alem` mm do bordo de fuga e `acima` mm das faces, para o corte atravessar o
      profundor inteiro. Fica no trecho de dentro do profundor, de 190 a 1980. */
   compensador: { x: [200, 940], profundidade: 130, entrada: 6, alma: 5, alem: 40, acima: 20 },
-  /* `avanco` é quanto o polo de cada loft fica além da seção. */
+  /* `avanco` é quanto o polo de cada loft fica além da seção. No profundor as duas seções de ponta entram `avanco` (em `derivar`), e o
+     polo cai no x da ponta, 190 e 2385, onde o esboço acaba o profundor; nas outras formas o polo passa da seção. */
   tampa: { avanco: 0.5 },
 };
 
@@ -375,7 +376,7 @@ export function derivar(t = TABELA) {
 
   return {
     estabilizador: { chamada, desloca: mAll(e.raiz) },
-    profundor: { estacoes: profundor.estacoes.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })), vao: profundor.vao.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })) },
+    profundor: { estacoes: profundor.estacoes.map((s, i, todas) => ({ pos: m(s.x + (i === 0 ? t.tampa.avanco : 0) - (i === todas.length - 1 ? t.tampa.avanco : 0)), pontos: pontosM(s) })), vao: profundor.vao.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })) },
     eixo: {
       de: mAll(eixo.de), comprimento: m(giro.comprimento), raio: m(t.eixo.diametro / 2), segmentos: t.eixo.lados / 4, giroEmZ: giro.em, giroEmY: giro.y,
     },
@@ -541,8 +542,7 @@ function caixasDoLadoDireito(t) {
   const caixas = {};
 
   const doProfundor = caixaDosPontos(profundor.estacoes.flatMap(({ x, pontos }) => pontos.map(([z, y]) => [x, y, z])));
-  doProfundor.min[0] -= avanco;
-  doProfundor.max[0] += avanco;
+  /* O profundor não passa dos x da TABELA: as duas seções de ponta entram `avanco` e o polo de cada tampa cai no x da ponta. */
   const { aba, cortador } = medidasDoCompensador(t, profundor.estacoes);
   doProfundor.max[2] = perfilDoEstabilizador(t).bordoDeFuga(cortador[1].x);
   caixas.profundor = doProfundor;
