@@ -1,0 +1,29 @@
+Primeira leitura do modelo.
+
+Um bloco citado no caminho, que não é a resposta:
+
+```json
+{
+  "nota": 3,
+  "defeitos": []
+}
+```
+
+**Nota: 7.**
+
+```json
+{
+  "alvo": "referencias/lateral.png",
+  "nota": 7,
+  "defeitos": [
+    {
+      "parte": "sapata",
+      "tipo": "uniao",
+      "onde": "base do corpo",
+      "sentido": "afastado",
+      "evidencia": "na lateral a sapata fica 8 px abaixo do corpo"
+    }
+  ],
+  "observacao": "a forma bate com o alvo e a sapata nao toca o corpo"
+}
+```

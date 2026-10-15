@@ -118,8 +118,28 @@ estenda o limite por conta própria.
 
 ## Registrando a rodada
 
-O veredito é o JSON que o crítico devolveu, sem edição, e `partes` é a
-conferência que o modelador devolveu, uma entrada por parte declarada:
+O comando lê direto o que os dois agentes devolveram. O modelador fecha a
+resposta com um bloco ```json com `partes`, `atrito` e `notaDePassagem`; o
+crítico fecha com o veredito em bloco ```json. Cada arquivo pode ser o texto
+colado ou a transcrição JSONL que o harness grava para o agente em segundo
+plano, e o comando reconhece o formato sozinho. Dele sai o último bloco ```json
+do último texto do assistente:
+
+```bash
+node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar \
+  --modelador <arquivo do modelador> --critico <arquivo do crítico> \
+  --atrito "o defeito foi do plano: a referência não mostra a fenda"
+```
+
+O veredito entra como o crítico o devolveu, sem passar por mão nenhuma. O
+`--atrito` pode repetir e acrescenta o atrito de quem conduz, como a atribuição
+do defeito da seção seguinte, depois do que o modelador declarou. Sem `--critico`
+a rodada é gravada sem veredito, que é o caso da receita que a medição reprovou.
+Quando o arquivo não tem bloco, não é JSON válido ou um campo passa do limite, o
+erro diz o arquivo e o campo, e a correção é pedir o bloco de novo ao agente.
+
+Se não houver como obter os arquivos, a alternativa é montar o JSON à mão e
+passá-lo como `--registrar <rodada.json>`. Não se misturam as duas formas.
 
 ```bash
 cat > /tmp/rodada.json <<'JSON'

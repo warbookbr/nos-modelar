@@ -1,0 +1,7 @@
+{"type": "user", "message": {"role": "user", "content": "brief do agente"}}
+{"type": "assistant", "message": {"id": "msg_1", "role": "assistant", "content": [{"type": "text", "text": "Texto anterior:\n\n```json\n{\n  \"alvo\": \"referencias/lateral.png\",\n  \"nota\": 7,\n  \"defeitos\": [\n    {\n      \"parte\": \"sapata\",\n      \"tipo\": \"uniao\",\n      \"onde\": \"base do corpo\",\n      \"sentido\": \"afastado\",\n      \"evidencia\": \"na lateral a sapata fica 8 px abaixo do corpo\"\n    }\n  ],\n  \"observacao\": \"a forma bate com o alvo e a sapata nao toca o corpo\"\n}\n```"}]}}
+{"type": "assistant", "message": {"id": "msg_1", "role": "assistant", "content": [{"type": "tool_use", "id": "toolu_1", "name": "Read", "input": {"file_path": "x.png"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"tool_use_id": "toolu_1", "type": "tool_result", "content": [{"type": "image", "source": {"type": "base64", "data": "AAAA"}}]}]}}
+{"type": "assistant", "message": {"id": "msg_2", "role": "assistant", "content": [{"type": "thinking", "thinking": "", "signature": "zzz"}]}}
+{"type": "assistant", "message": {"id": "msg_2", "role": "assistant", "content": [{"type": "text", "text": "Terminei sem bloco."}]}}
+{"type": "assistant", "message": {"id": "msg_2", "role": "assistant", "content": [{"type": "text", "text": "Nota 7."}]}}

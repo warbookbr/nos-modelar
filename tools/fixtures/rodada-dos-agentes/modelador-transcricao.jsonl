@@ -1,0 +1,7 @@
+{"type": "user", "message": {"role": "user", "content": "brief do agente"}}
+{"type": "assistant", "message": {"id": "msg_1", "role": "assistant", "content": [{"type": "text", "text": "Abrindo as vistas."}]}}
+{"type": "assistant", "message": {"id": "msg_1", "role": "assistant", "content": [{"type": "tool_use", "id": "toolu_1", "name": "Read", "input": {"file_path": "x.png"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"tool_use_id": "toolu_1", "type": "tool_result", "content": [{"type": "image", "source": {"type": "base64", "data": "AAAA"}}]}]}}
+{"type": "assistant", "message": {"id": "msg_2", "role": "assistant", "content": [{"type": "thinking", "thinking": "", "signature": "zzz"}]}}
+{"type": "assistant", "message": {"id": "msg_2", "role": "assistant", "content": [{"type": "text", "text": "Conferi as vistas isoladas parte por parte."}]}}
+{"type": "assistant", "message": {"id": "msg_2", "role": "assistant", "content": [{"type": "text", "text": "```json\n{\n  \"partes\": [\n    {\n      \"nome\": \"sapata\",\n      \"confere\": true\n    },\n    {\n      \"nome\": \"corpo\",\n      \"confere\": false,\n      \"observacao\": \"saiu maciço; o plano promete rasgo passante\"\n    }\n  ],\n  \"atrito\": [\n    \"a vista isolada da sapata sai pequena demais para conferir o rasgo\"\n  ],\n  \"notaDePassagem\": \"o rasgo ficou para a próxima rodada porque o loft não fecha tampa própria\"\n}\n```"}]}}

@@ -12,7 +12,8 @@ import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { acaoDaPeca, ajustarImportsDaCopia, gravarRodada, impressaoDaForma, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida } from './rodada-de-modelagem.mjs';
+import { acaoDaPeca, ajustarImportsDaCopia, entradaDosArquivos, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -267,4 +268,114 @@ describe('a medição da receita atual trava o laço', () => {
     const sem = await acaoDaPeca(PECA, { rodadas: [], limite: 6, medir: () => medirReceita('peca-que-nunca-existiu') });
     expect(sem).toMatchObject({ acao: 'modelar', medicao: null });
   });
+});
+
+/* A RODADA LIDA DIRETO DO QUE OS AGENTES DEVOLVERAM. As fixtures são pequenas e sintéticas, nos dois formatos que o comando reconhece:
+   texto puro e a transcrição JSONL do harness (um bloco da resposta por linha, com thinking, tool_use e dois textos na última mensagem). */
+describe('a rodada lida dos arquivos dos agentes', () => {
+  const PASTA = 'tools/fixtures/rodada-dos-agentes';
+  const f = (nome) => `${PASTA}/${nome}`;
+  const blocoDoCritico = ultimoBlocoJson(readFileSync(f('critico-texto.txt'), 'utf8'));
+  const blocoDoModelador = ultimoBlocoJson(readFileSync(f('modelador-texto.txt'), 'utf8'));
+  const escrever = (nome, texto) => { const caminho = join(area, nome); writeFileSync(caminho, texto, 'utf8'); return caminho; };
+  const comBloco = (objeto) => `Conferi.\n\n\`\`\`json\n${JSON.stringify(objeto)}\n\`\`\`\n`;
+
+  it('reconhece o texto puro e a transcrição JSONL, e pega o último bloco do último texto do assistente', () => {
+    const puro = textoFinalDoAssistente(readFileSync(f('critico-texto.txt'), 'utf8'));
+    const transcricao = textoFinalDoAssistente(readFileSync(f('critico-transcricao.jsonl'), 'utf8'));
+    expect(puro.formato).toBe('texto');
+    expect(transcricao.formato).toBe('transcrição');
+    /* o bloco citado no texto anterior (nota 3) e o citado no meio do último texto não são a resposta */
+    expect(ultimoBlocoJson(puro.texto)).toEqual(blocoDoCritico);
+    expect(ultimoBlocoJson(transcricao.texto)).toEqual(blocoDoCritico);
+    expect(blocoDoCritico.nota).toBe(7);
+    expect(ultimoBlocoJson(textoFinalDoAssistente(readFileSync(f('modelador-transcricao.jsonl'), 'utf8')).texto)).toEqual(blocoDoModelador);
+  });
+
+  it('a transcrição sem bloco no último texto é recusada, dizendo isso e o arquivo, ainda que um texto anterior tenha bloco', () => {
+    const arquivo = f('critico-transcricao-sem-bloco.jsonl');
+    expect(() => entradaDosArquivos({ modelador: f('modelador-texto.txt'), critico: arquivo }))
+      .toThrow(new RegExp(`${arquivo}: o último texto do crítico não tem bloco`));
+    const vazia = escrever('so-usuario.jsonl', `${JSON.stringify({ type: 'user', message: { role: 'user', content: 'brief' } })}\n`);
+    expect(() => textoFinalDoAssistente(readFileSync(vazia, 'utf8'), { arquivo: vazia })).toThrow(/não tem nenhum texto do assistente/);
+  });
+
+  it('o bloco que não é JSON válido é recusado com o arquivo', () => {
+    const quebrado = escrever('modelador-quebrado.txt', 'Conferi.\n\n```json\n{ "partes": [ }\n```\n');
+    expect(() => entradaDosArquivos({ modelador: quebrado })).toThrow(new RegExp(`${quebrado}: o último bloco .*não é JSON válido`));
+  });
+
+  it('monta a entrada igual nos dois formatos: o veredito é o bloco do crítico sem mudar, e o atrito de quem conduz vem depois', () => {
+    const entradaTexto = entradaDosArquivos({ modelador: f('modelador-texto.txt'), critico: f('critico-texto.txt'), atrito: ['o defeito foi do plano'] });
+    const entradaJsonl = entradaDosArquivos({ modelador: f('modelador-transcricao.jsonl'), critico: f('critico-transcricao.jsonl'), atrito: ['o defeito foi do plano'] });
+    expect(entradaJsonl).toEqual(entradaTexto);
+    expect(entradaTexto.veredito).toEqual(blocoDoCritico);
+    expect(entradaTexto.partes).toEqual(blocoDoModelador.partes);
+    expect(entradaTexto.notaDePassagem).toBe(blocoDoModelador.notaDePassagem);
+    expect(entradaTexto.atrito).toEqual([...blocoDoModelador.atrito, 'o defeito foi do plano']);
+  });
+
+  it('sem --critico a entrada não tem veredito, e sem --modelador não há entrada', () => {
+    expect(entradaDosArquivos({ modelador: f('modelador-texto.txt') })).not.toHaveProperty('veredito');
+    expect(() => entradaDosArquivos({ critico: f('critico-texto.txt') })).toThrow(/falta --modelador/);
+    expect(() => entradaDosArquivos({ modelador: join(area, 'nao-existe.txt') })).toThrow(/nao-existe\.txt: não consegui ler o arquivo do modelador/);
+  });
+
+  it('o erro de validação diz de qual arquivo e de qual campo veio', () => {
+    const longa = 'x'.repeat(241);
+    const atritoLongo = escrever('modelador-atrito.txt', comBloco({ ...blocoDoModelador, atrito: [longa] }));
+    expect(() => entradaDosArquivos({ modelador: atritoLongo })).toThrow(new RegExp(`^${atritoLongo}, campo atrito\\[0\\]: 'atrito\\[0\\]' excede 240`));
+    /* a frase de quem conduz: o erro aponta o --atrito, pela ordem em que foi dado */
+    expect(() => entradaDosArquivos({ modelador: f('modelador-texto.txt'), atrito: ['curta', longa] }))
+      .toThrow(/^--atrito nº 2: 'atrito\[2\]' excede 240/);
+    const semPartes = escrever('modelador-sem-partes.txt', comBloco({ atrito: [], notaDePassagem: 'nota' }));
+    expect(() => entradaDosArquivos({ modelador: semPartes })).toThrow(new RegExp(`^${semPartes}, campo partes: a rodada precisa trazer 'partes'`));
+    const observacaoLonga = escrever('modelador-observacao.txt', comBloco({ partes: [{ nome: 'corpo', confere: false, observacao: longa }] }));
+    expect(() => entradaDosArquivos({ modelador: observacaoLonga })).toThrow(new RegExp(`^${observacaoLonga}, campo partes: 'partes\\[0\\]\\.observacao' não passa de 240`));
+    const notaLonga = escrever('modelador-nota.txt', comBloco({ ...blocoDoModelador, notaDePassagem: 'n'.repeat(601) }));
+    expect(() => entradaDosArquivos({ modelador: notaLonga })).toThrow(new RegExp(`^${notaLonga}, campo notaDePassagem: 'notaDePassagem' não passa de 600`));
+    const vereditoRuim = escrever('critico-ruim.txt', comBloco({ ...blocoDoCritico, nota: 11 }));
+    expect(() => entradaDosArquivos({ modelador: f('modelador-texto.txt'), critico: vereditoRuim })).toThrow(new RegExp(`^${vereditoRuim}, bloco do veredito: `));
+  });
+
+  it('recusa no bloco do modelador o que não é dele', () => {
+    const alheio = escrever('modelador-com-veredito.txt', comBloco({ ...blocoDoModelador, veredito: blocoDoCritico, medidas: { passou: true } }));
+    expect(() => entradaDosArquivos({ modelador: alheio })).toThrow(new RegExp(`^${alheio}: o bloco do modelador traz 'veredito', 'medidas'`));
+  });
+
+  it('grava a rodada com o veredito idêntico ao bloco do crítico, e a medição da ferramenta continua valendo', async () => {
+    const FIXTURES = 'tools/fixtures/refina-forma-global';
+    const pasta = join(area, 'peca-de-ensaio');
+    const entrada = entradaDosArquivos({ modelador: f('modelador-transcricao.jsonl'), critico: f('critico-transcricao.jsonl'), atrito: ['atribuição de quem conduz'] });
+    const { rodada, arquivo } = await registrarMedida('peca-de-ensaio', entrada, { pasta, medir: () => medirReceita(`${FIXTURES}/ok/receita.js`) });
+    const gravada = JSON.parse(readFileSync(arquivo, 'utf8'));
+    expect(JSON.stringify(gravada.veredito)).toBe(JSON.stringify(normalizarVeredito(blocoDoCritico)));
+    expect(gravada.partes.map((p) => p.nome)).toEqual(['sapata', 'corpo']);
+    expect(rodada.atrito).toEqual([...blocoDoModelador.atrito, 'atribuição de quem conduz']);
+    expect(rodada.medidas.passou).toBe(true);
+    /* a recusa do veredito quando a medição reprova vale também para esta forma */
+    await expect(registrarMedida('peca-de-ensaio', entrada, { pasta: join(area, 'outra'), medir: () => medirReceita(`${FIXTURES}/parte-fora/receita.js`) }))
+      .rejects.toThrow(/o veredito do crítico não se registra/);
+  }, 60000);
+
+  it('lê os argumentos: --atrito repete, --registrar aceita arquivo ou nenhum, e a peça pode vir depois das opções', () => {
+    expect(lerArgumentos(['aviao/partes/x', '--registrar', '--modelador', 'm.txt', '--critico', 'c.jsonl', '--atrito', 'um', '--atrito', 'dois']))
+      .toEqual({ peca: 'aviao/partes/x', opcoes: { atrito: ['um', 'dois'], registrar: true, modelador: 'm.txt', critico: 'c.jsonl' } });
+    expect(lerArgumentos(['p', '--registrar', 'rodada.json']).opcoes.registrar).toBe('rodada.json');
+    expect(lerArgumentos(['--registrar', '--modelador', 'm.txt', 'p']).peca).toBe('p');
+    expect(() => lerArgumentos(['p', '--registrar', '--modelador'])).toThrow(/--modelador pede um valor/);
+  });
+
+  it('a linha de comando recusa misturar as duas formas e pede uma delas', () => {
+    const roda = (...args) => spawnSync(process.execPath, ['tools/mecanifica/rodada-de-modelagem.mjs', ...args], { encoding: 'utf8' });
+    const mistura = roda('peca-de-ensaio', '--registrar', 'rodada.json', '--modelador', f('modelador-texto.txt'));
+    expect(mistura.status).toBe(1);
+    expect(mistura.stderr).toContain('formas diferentes');
+    const nada = roda('peca-de-ensaio', '--registrar');
+    expect(nada.status).toBe(1);
+    expect(nada.stderr).toContain('--registrar precisa de');
+    const semArquivo = roda('peca-de-ensaio', '--registrar', '--modelador', join(area, 'nao-existe.txt'));
+    expect(semArquivo.status).toBe(1);
+    expect(semArquivo.stderr).toContain('não consegui ler o arquivo do modelador');
+  }, 60000);
 });

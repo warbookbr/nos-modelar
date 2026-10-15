@@ -1,0 +1,21 @@
+Conferi as vistas isoladas parte por parte.
+
+```json
+{
+  "partes": [
+    {
+      "nome": "sapata",
+      "confere": true
+    },
+    {
+      "nome": "corpo",
+      "confere": false,
+      "observacao": "saiu maciço; o plano promete rasgo passante"
+    }
+  ],
+  "atrito": [
+    "a vista isolada da sapata sai pequena demais para conferir o rasgo"
+  ],
+  "notaDePassagem": "o rasgo ficou para a próxima rodada porque o loft não fecha tampa própria"
+}
+```

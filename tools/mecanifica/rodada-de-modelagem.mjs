@@ -18,7 +18,14 @@
  * pelo hash do texto e devolve `modelar` enquanto a medição não passar; `--registrar` mede de novo, grava a medição da ferramenta
  * e recusa o veredito do crítico quando ela reprovou, ou quando a sessão declarou `medidas` que a ferramenta não confirma.
  *
+ * A RODADA SE REGISTRA LENDO O QUE OS AGENTES DEVOLVERAM. Montar à mão o JSON de `partes`, `veredito`, `atrito` e `notaDePassagem`
+ * custou frase de atrito acima do limite, risco de editar o veredito sem querer e a conferência por parte reescrita de prosa para
+ * JSON. Na forma `--modelador <arquivo> --critico <arquivo>` o comando pega o último bloco ```json do último texto do assistente em
+ * cada arquivo (texto puro, ou a transcrição JSONL que o harness grava para um agente em segundo plano): o do crítico entra como
+ * `veredito`, sem mudar nada, e o do modelador traz `partes`, `atrito` e `notaDePassagem`. As validações são as de sempre.
+ *
  * Uso:
+ *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"]...
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --perguntas
@@ -254,13 +261,149 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   return { ...gravada, medicao };
 }
 
+/* ---- a entrada da rodada lida dos arquivos que os agentes devolveram ---- */
+
+const ENTRADA_DO_MODELADOR = ['partes', 'atrito', 'notaDePassagem'];
+const SEM_PREFIXO = (mensagem) => String(mensagem).replace(/^laço de modelagem: /, '');
+
+const linhasJson = (conteudo) => {
+  const linhas = conteudo.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (linhas.length === 0) return null;
+  const objetos = [];
+  for (const linha of linhas) {
+    let dado;
+    try { dado = JSON.parse(linha); } catch { return null; }
+    if (!dado || typeof dado !== 'object' || Array.isArray(dado)) return null;
+    objetos.push(dado);
+  }
+  /* o que distingue a transcrição de um JSON qualquer é o `type` de cada mensagem do harness */
+  return objetos.every((o) => typeof o.type === 'string') && objetos.some((o) => o.message || o.type === 'assistant') ? objetos : null;
+};
+
+const textosDaMensagem = (mensagem) => {
+  const c = mensagem?.content;
+  if (typeof c === 'string') return [c];
+  return Array.isArray(c) ? c.filter((b) => b?.type === 'text' && typeof b.text === 'string').map((b) => b.text) : [];
+};
+
+/**
+ * O último texto do assistente num arquivo, qualquer que seja o formato: a transcrição JSONL do harness (uma mensagem por linha, e
+ * o harness grava cada bloco da resposta numa linha própria, com o mesmo `message.id`) ou texto puro, devolvido como está.
+ * `formato` diz o que foi reconhecido. Lança, dizendo o arquivo, quando a transcrição não tem texto do assistente.
+ */
+export function textoFinalDoAssistente(conteudo, { arquivo = 'entrada' } = {}) {
+  const mensagens = linhasJson(conteudo);
+  if (mensagens === null) return { formato: 'texto', texto: conteudo };
+  const doAssistente = mensagens.filter((o) => o.type === 'assistant' && (o.message?.role ?? 'assistant') === 'assistant');
+  let ultimo = -1;
+  doAssistente.forEach((o, i) => { if (textosDaMensagem(o.message).length > 0) ultimo = i; });
+  if (ultimo < 0) throw new Error(`${arquivo}: a transcrição não tem nenhum texto do assistente; o agente terminou sem responder?`);
+  const id = doAssistente[ultimo].message?.id;
+  const linhas = id ? doAssistente.filter((o) => o.message?.id === id) : [doAssistente[ultimo]];
+  return { formato: 'transcrição', texto: linhas.flatMap((o) => textosDaMensagem(o.message)).join('\n') };
+}
+
+/**
+ * O último bloco cercado por ```json do texto, já lido. O erro diz o arquivo e o que faltou: o último bloco, e nenhum outro, é o que o
+ * agente declarou como resposta, porque os anteriores são citações que ele fez no caminho.
+ */
+export function ultimoBlocoJson(texto, { arquivo = 'entrada', papel = 'agente' } = {}) {
+  const cercas = [...texto.matchAll(/^[ \t]*```json[ \t]*\r?\n([\s\S]*?)^[ \t]*```[ \t]*$/gm)];
+  if (cercas.length === 0) {
+    throw new Error(`${arquivo}: o último texto do ${papel} não tem bloco \`\`\`json. Ele precisa terminar a resposta com o bloco; peça-o de novo ao agente em vez de montar o JSON à mão.`);
+  }
+  try { return JSON.parse(cercas[cercas.length - 1][1]); } catch (erro) {
+    throw new Error(`${arquivo}: o último bloco \`\`\`json do ${papel} não é JSON válido (${erro.message}).`);
+  }
+}
+
+const lerAgente = (arquivo, papel) => {
+  let conteudo;
+  try { conteudo = readFileSync(arquivo, 'utf8'); } catch (erro) { throw new Error(`${arquivo}: não consegui ler o arquivo do ${papel} (${erro.code ?? erro.message}).`); }
+  const { texto } = textoFinalDoAssistente(conteudo, { arquivo });
+  return ultimoBlocoJson(texto, { arquivo, papel });
+};
+
+/**
+ * A entrada da rodada montada dos arquivos do modelador e do crítico, mais o atrito de quem conduz. O veredito é o bloco do crítico
+ * como veio. As validações são as de `registrarRodada`, rodadas aqui antes de medir, e o erro diz de qual arquivo (ou de qual
+ * `--atrito`) e de qual campo veio o problema. Sem `critico` a entrada não tem veredito, que é o caso da receita reprovada.
+ */
+export function entradaDosArquivos({ modelador, critico = null, atrito = [] }) {
+  if (!modelador) throw new Error('falta --modelador <arquivo>: `partes` e `notaDePassagem` vêm do que o modelador devolveu.');
+  const doModelador = lerAgente(modelador, 'modelador');
+  if (!doModelador || typeof doModelador !== 'object' || Array.isArray(doModelador)) {
+    throw new Error(`${modelador}: o bloco \`\`\`json do modelador precisa ser um objeto com ${ENTRADA_DO_MODELADOR.map((c) => `'${c}'`).join(', ')}.`);
+  }
+  const alheios = Object.keys(doModelador).filter((c) => !ENTRADA_DO_MODELADOR.includes(c));
+  if (alheios.length > 0) {
+    throw new Error(`${modelador}: o bloco do modelador traz ${alheios.map((c) => `'${c}'`).join(', ')}, que não é dele. Só ${ENTRADA_DO_MODELADOR.join(', ')}; o veredito é do crítico e a medição é da ferramenta.`);
+  }
+  const atritoDoModelador = doModelador.atrito ?? [];
+  if (!Array.isArray(atritoDoModelador)) throw new Error(`${modelador}, campo atrito: precisa ser lista de frases.`);
+  const entrada = {
+    partes: doModelador.partes,
+    atrito: [...atritoDoModelador, ...atrito],
+    ...(doModelador.notaDePassagem !== undefined ? { notaDePassagem: doModelador.notaDePassagem } : {}),
+    ...(critico ? { veredito: lerAgente(critico, 'crítico') } : {}),
+  };
+  const origem = (mensagem) => {
+    const item = /'atrito\[(\d+)\]'/.exec(mensagem);
+    if (item) {
+      const i = Number(item[1]);
+      return i < atritoDoModelador.length ? `${modelador}, campo atrito[${i}]` : `--atrito nº ${i - atritoDoModelador.length + 1}`;
+    }
+    if (/'atrito'/.test(mensagem)) return `${modelador} e --atrito, campo atrito`;
+    const campo = /'(partes|notaDePassagem)/.exec(mensagem)?.[1];
+    if (campo) return `${modelador}, campo ${campo}`;
+    return critico ? `${critico}, bloco do veredito` : null;
+  };
+  try {
+    registrarRodada({ peca: 'conferencia', numero: 1, medidas: { passou: true, relatorio: '' }, ...entrada });
+  } catch (erro) {
+    const onde = origem(erro.message);
+    throw new Error(onde ? `${onde}: ${SEM_PREFIXO(erro.message)}` : SEM_PREFIXO(erro.message));
+  }
+  return entrada;
+}
+
+const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito'];
+
+/* Separa a peça, as opções e os valores. `--atrito` repete; `--registrar` aceita valor (o JSON montado) ou nenhum (a forma nova). */
+export function lerArgumentos(argv) {
+  const opcoes = { atrito: [] };
+  let peca;
+  for (let i = 0; i < argv.length; i += 1) {
+    const a = argv[i];
+    if (!a.startsWith('--')) { peca ??= a; continue; }
+    const nome = a.slice(2);
+    if (!OPCOES_COM_VALOR.includes(a)) { opcoes[nome] = true; continue; }
+    const proximo = argv[i + 1];
+    const temValor = proximo !== undefined && !proximo.startsWith('--');
+    if (a === '--registrar') { opcoes.registrar = temValor ? proximo : true; if (temValor) i += 1; continue; }
+    if (!temValor) throw new Error(`${a} pede um valor.`);
+    i += 1;
+    if (a === '--atrito') opcoes.atrito.push(proximo); else opcoes[nome] = proximo;
+  }
+  return { peca, opcoes };
+}
+
 async function comoCLI(argv) {
-  const peca = argv.find((a) => !a.startsWith('--'));
-  const registrar = argv.indexOf('--registrar');
+  const { peca, opcoes } = lerArgumentos(argv);
   if (!peca) return { codigo: 1, texto: 'diga a peça: rodada-de-modelagem.mjs <peça> --acao' };
 
-  if (registrar >= 0) {
-    const entrada = JSON.parse(readFileSync(argv[registrar + 1], 'utf8'));
+  if (opcoes.registrar !== undefined) {
+    const doArquivo = typeof opcoes.registrar === 'string';
+    const dosAgentes = opcoes.modelador !== undefined || opcoes.critico !== undefined || opcoes.atrito.length > 0;
+    if (doArquivo && dosAgentes) {
+      return { codigo: 1, texto: '--registrar <rodada.json> e --modelador/--critico/--atrito são formas diferentes: use uma só.' };
+    }
+    if (!doArquivo && !dosAgentes) {
+      return { codigo: 1, texto: '--registrar precisa de <rodada.json> ou de --modelador <arquivo> --critico <arquivo>.' };
+    }
+    const entrada = doArquivo
+      ? JSON.parse(readFileSync(opcoes.registrar, 'utf8'))
+      : entradaDosArquivos({ modelador: opcoes.modelador, critico: opcoes.critico, atrito: opcoes.atrito });
     const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada);
     const decisao = await acaoDaPeca(peca, { medir: async () => medicao });
     return {
