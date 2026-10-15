@@ -56,9 +56,10 @@ const PARTES = Object.keys(VOLUMES);
 /* As partes que saem da forma do esboço de propósito sem se deslocar, com o mínimo próprio de cada uma na razão interseção/união de
    volume contra a forma do esboço (o geral é 0,95), logo abaixo do que a parte tem hoje: o estabilizador, com a ponta a metade da
    corda da raiz e o vão do degrau recuado (0,891), e o profundor, com o bordo de fuga mais à frente na ponta, as seções mais finas, o
-   degrau recuado e o rasgo do compensador (0,704 e 0,706). A razão cai porque a forma pedida é outra, e o mínimo próprio só impede que
+   degrau recuado e o rasgo do compensador (0,704 e 0,706), e o eixo, que acaba 21 mm antes do degrau novo, 236 mm mais curto que o do
+   esboço (0,87). A razão cai porque a forma pedida é outra, e o mínimo próprio só impede que
    caia mais. Deslocamento e alongamento não servem: nada aqui é translação, e a parte não passa do volume do andaime. */
-const MINIMO_PROPRIO = { estabilizador: 0.88, profundor: 0.70 };
+const MINIMO_PROPRIO = { estabilizador: 0.88, profundor: 0.70, eixoProfundor: 0.85 };
 /* As partes que a pessoa pediu além do esboço: sem volume no andaime e sem forma no esboço, entram em `REFINA.novas`. */
 const NOVAS = porLado((L) => [`compensador${L}`]);
 
@@ -100,9 +101,11 @@ export const TABELA = {
     nariz: [0.1465, 0.3535],
     meiaEspessuraDoBordoDeFuga: 4,
   },
-  /* O eixo é a haste de `diametro` entre os x de `x`, sobre a linha do estabilizador, `aFrente` antes da dobradiça da primeira seção
-     do profundor, em `lados` lados. */
-  eixo: { x: [215, 2215], aFrente: 6, diametro: 30, lados: 48 },
+  /* O eixo é a haste de `diametro` de x `inicio` até `antesDoDegrau` antes do degrau do profundor (`profundor.x[1]`, e o esboço o
+     para 21 mm antes do degrau dele, em 2215), sobre a linha do estabilizador, `aFrente` antes da dobradiça da primeira seção do
+     profundor, em `lados` lados. Com o degrau em 1980 a haste acaba em 1959; se ela seguisse até 2215, passaria a 3 mm da face de
+     cima do profundor na ponta, onde o trecho de lá, mais fino, a cobre por pouco. */
+  eixo: { inicio: 215, antesDoDegrau: 21, aFrente: 6, diametro: 30, lados: 48 },
   /* Os suportes ficam nos x de `x`, `abaixo` da face de baixo do profundor naquele x. A espessura do profundor ali é a reta entre
      `profundor.espessura[0]` e `profundor.espessura[1]` na fração do estabilizador, como no esboço. Cada suporte é um loft em z por
      `secoes`: `recuo` é a posição em z em relação à dobradiça da primeira seção do profundor, `tamanho` é [largura em x, altura em y]
@@ -328,7 +331,8 @@ function medidasDoCompensador(t, estacoes) {
 /* A haste do eixo e as seções de cada suporte, em mm. */
 function medidasDoEixoEDosSuportes(t, base) {
   const f = perfilDoEstabilizador(t);
-  const [x0, x1] = t.eixo.x;
+  const x0 = t.eixo.inicio;
+  const x1 = t.profundor.x[1] - t.eixo.antesDoDegrau;
   const z = base.dobradica - t.eixo.aFrente;
   const eixo = { de: [x0, f.altura(x0), z], para: [x1, f.altura(x1), z] };
   const suportes = t.suporte.x.map((x) => {
