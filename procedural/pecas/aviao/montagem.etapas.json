@@ -60,7 +60,6 @@
       "instancia": "helice",
       "estado": "fixa",
       "juntas": [],
-      "receita": "439a47cad9c062f3e2576f46091e86cd73bf32a75f05ff44db1a3d374d097bcd",
       "aceite": {
         "por": "a pessoa, 2026-10-15: aceitou a hélice como está pela escolha 'Aceitar como está (Recomendado)', depois da nota 9 na rodada 1",
         "observacao": "pendência da família: o contorno do perfil da pá sai em lados retos numa vista isolada, pela resolução da superfície aerodinâmica, igual no esboço",
@@ -69,7 +68,14 @@
           "pa1: superficie em contorno do perfil na extremidade superior esquerda da vista direita isolada"
         ],
         "analise": "ausente"
-      }
+      },
+      "receita": "439a47cad9c062f3e2576f46091e86cd73bf32a75f05ff44db1a3d374d097bcd"
+    },
+    {
+      "instancia": "asas",
+      "estado": "aberta",
+      "juntas": [],
+      "receita": "651f8c3f6279a3b05affcd7f1c510761878de7f71d76d510f73b762920fa8f2d"
     }
   ]
 }
