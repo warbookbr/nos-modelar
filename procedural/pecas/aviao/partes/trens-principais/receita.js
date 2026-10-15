@@ -13,8 +13,8 @@
  * raio do pneu e da folga ao chão, que é zero. O esboço tem um curso de recolhimento (`tpCurso`, de 0 a 84 graus); a receita fica
  * só na pose baixada, em que o curso vale zero.
  *
- * Três pontos da receita se afastam do esboço por decisão da pessoa (2026-10-15, segunda rodada), e cada parte afetada tem o mínimo
- * próprio no REFINA.esboco, com o motivo (veja `MINIMOS`): a roda encosta no chão, em y 0, e o trem desce os 17 mm que o esboço deixa
+ * Três pontos da receita se afastam do esboço por decisão da pessoa (2026-10-15, segunda rodada), e cada parte afetada declara o
+ * deslocamento ou o alongamento no REFINA.esboco, com o motivo (veja `AFASTADAS`): a roda encosta no chão, em y 0, e o trem desce os 17 mm que o esboço deixa
  * entre o pneu e o chão (a perna fica 17 mm mais comprida e leva a coroa, o garfo, o eixo e a roda); o furo do cubo tem o diâmetro do
  * eixo, e a roda assenta nele; o pino de baixo do compasso desce até a junção da perna com a coroa e entra na face da frente da coroa.
  *
@@ -228,20 +228,29 @@ const ESPELHO = 500;
 /* As quatro formas da roda, as origens que a família publica: o pneu, o aro, o cubo furado e o disco. */
 const FORMAS_DA_RODA = [{ op: 'lathe', id: 1 }, { op: 'lathe', id: 2 }, { op: 'subtrair', id: 6 }, { op: 'lathe', id: 11 }];
 
-/* O mínimo próprio, no REFINA.esboco, de cada parte que se afasta do esboço pela decisão da pessoa de 2026-10-15; as outras ficam no
-   mínimo geral, 0,95. Cada valor é a razão interseção/união medida (`npm run forma:esboco`) truncada na segunda casa, de modo que a
-   parte não pode piorar. A razão baixa de uma parte é o deslocamento dela, e não erro de medida: o trem desce 17 mm e a coroa tem só
-   20 mm de altura, o eixo 28 mm de diâmetro e o pino de baixo 24 mm. */
-const MINIMOS = {
-  /* desce os 17 mm com o trem: a roda encosta no chão (o esboço a deixa 17 mm acima) e o furo do cubo passa a ter o diâmetro do eixo */
-  roda: 0.82,
-  garfoExt: 0.91,
-  garfoInt: 0.91,
-  eixoRoda: 0.16,
-  coroa: 0.08,
-  /* o pino de baixo desce à junção da perna com a coroa e vai até a face da coroa, e o braço de baixo do compasso o acompanha */
-  pinoCompassoBaixo: 0.01,
-  compassoInf: 0.46,
+/* As partes que se afastam do esboço pela decisão da pessoa de 2026-10-15, cada uma com o afastamento declarado no REFINA.esboco e o
+   motivo; as outras ficam no mínimo geral, 0,95. A parte que só translada declara `deslocamento` (em mm, no quadro do esboço), e a
+   razão de volume e o envelope são medidos contra a forma e o volume do esboço transladados. A parte que muda de comprimento declara
+   `alongamento`, o quanto passa do volume do andaime em cada lado, e fica com o `minimo` próprio quando a razão não volta a 0,95: o
+   mínimo é a razão medida (`npm run forma:esboco`) truncada na segunda casa, e o que ele vigia é só o que a razão mede acima do
+   alongamento. Os valores abaixo são os da TABELA (17 mm de folga ao chão, 21 mm de descida do pino de baixo do compasso). */
+const DESCE = 17;
+const AFASTADAS = {
+  /* o trem desce com a perna: a roda encosta no chão (o esboço a deixa 17 mm acima), o furo do cubo passa a ter o diâmetro do eixo */
+  roda: { deslocamento: [0, -DESCE, 0], motivo: 'a roda encosta no chão: o trem desce 17 mm; o furo do cubo tem o diâmetro do eixo (28 mm), e não os 62,9 do esboço' },
+  garfoExt: { deslocamento: [0, -DESCE, 0], motivo: 'o garfo desce 17 mm com a roda, que encosta no chão' },
+  garfoInt: { deslocamento: [0, -DESCE, 0], motivo: 'o garfo desce 17 mm com a roda, que encosta no chão' },
+  eixoRoda: { deslocamento: [0, -DESCE, 0], motivo: 'o eixo desce 17 mm com a roda, que encosta no chão' },
+  coroa: { deslocamento: [0, -DESCE, 0], motivo: 'a coroa desce 17 mm com o garfo, no pé da perna' },
+  /* a perna é a que alonga: o topo fica no pivô e o pé desce os 17 mm */
+  perna: { alongamento: { '-y': DESCE }, motivo: 'a perna ganha 17 mm de comprimento no pé: o trem desce 17 mm para a roda encostar no chão' },
+  /* o pino de baixo desce 21 mm até a junção da perna com a coroa e ganha 66,4 mm em +z até entrar na face da frente da coroa */
+  pinoCompassoBaixo: {
+    deslocamento: [0, -21, 0], alongamento: { '+z': 66.4 }, minimo: 0.45,
+    motivo: 'o pino de baixo do compasso desce 21 mm até a junção da perna com a coroa e vai 66,4 mm além da ponta de trás do esboço, até entrar na face da frente da coroa',
+  },
+  /* o braço de baixo mantém o joelho e acompanha o pino de baixo, que desce 21 mm */
+  compassoInf: { alongamento: { '-y': 21 }, minimo: 0.46, motivo: 'o braço de baixo do compasso mantém o joelho e a ponta de baixo desce 21 mm com o pino de baixo' },
 };
 
 /* material de cada parte, pela chave de MATERIAIS; a roda leva os da família, `borracha` e `aco`. */
@@ -419,7 +428,7 @@ export default {
     esboco: {
       arquivo: ESBOCO,
       opcao: 1,
-      formas: Object.fromEntries(NOMES.map((p) => [p, baseDe(p) in MINIMOS ? { formas: p, minimo: MINIMOS[baseDe(p)] } : p])),
+      formas: Object.fromEntries(NOMES.map((p) => [p, baseDe(p) in AFASTADAS ? { formas: p, ...AFASTADAS[baseDe(p)] } : p])),
       minimo: 0.95,
     },
   },
