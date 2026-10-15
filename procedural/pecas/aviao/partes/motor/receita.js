@@ -518,6 +518,14 @@ const receita = {
       escapeE: 'escape-e',
     },
     tolerancia: { envelope: 5, porta: 0.5 },
+    /* cada parte contra a forma de mesmo nome do esboço aprovado, com os recortes: em 2026-10-15 deram capo 0,981, entradaDeAr 0,958
+       e os escapes 0,969 */
+    esboco: {
+      arquivo: '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json',
+      opcao: 1,
+      formas: { capo: 'capo', entradaDeAr: 'entradaDeAr', escapeD: 'escapeD', escapeE: 'escapeE' },
+      minimo: 0.95,
+    },
   },
   get PONTOS() { return pontosDeclarados(this.PARAMS); },
   get PASSOS() { return gerarPassos(this.PARAMS); },

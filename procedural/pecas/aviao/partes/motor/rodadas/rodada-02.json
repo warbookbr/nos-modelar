@@ -1,0 +1,442 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/motor",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor-unidade-motor-composta.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Forma, proporção, boca e escapes batem com o esboço. A junta do capô está alinhada em cima e embaixo. Resta o furo passante da boca na face traseira, que o esboço mostra fechada."
+  },
+  "partes": [
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "entradaDeAr",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "escapeD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "escapeE",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a vista de lado isolada do capô e dos escapes saiu igual à isométrica: o segundo foco da bancada voltava à isométrica. Corrigido na bancada, e o pacote do crítico recusa duas vistas com a mesma imagem",
+    "o crítico leu degrau na junta pela vista de trás, que não separa a junta da fuselagem que alarga atrás dela; as seções medem iguais em z 2377 e só recortes ampliados de cima e de lado desfizeram a leitura",
+    "o desenho do esboço traça a silhueta tracejada em forma recortada ou côncava: cada face pinta as linhas dela e a face seguinte as cobre. O alvo do crítico do motor saiu assim, e a pessoa percebeu"
+  ],
+  "notaDePassagem": "A boca de ar atravessa o capô (220 por 90 mm) e abre na face de trás, z 2377, que a fuselagem fecha; o capô mede 1 furo. Carenagem e boca são estádios de contorno calculado. Encaixe segue na TABELA, sem porta.",
+  "receita": {
+    "sha256": "sha256:6426e23ffeefbaf00cc116e8031d456c1af7c70be338abbdc65d573e62018830",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 15,
+      "acrescentadas": 62,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 25,
+          "texto": " * A boca de ar é um corte de loft que entra pela parede do lábio e segue 260 mm para trás, sob o capô, como no esboço; a entrada de"
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": " * ar é a carenagem em volta dela, e cada uma das duas partes leva o seu corte, porque a subtração o consome. Os escapes são tubos"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": " * por loft de seções circulares ao longo de um caminho com uma curva de `raioCurva`, as pontas fechadas por polo no eixo; o furo de"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": " * saída é um corte circular que entra pela ponta do tubo, ao longo do eixo dele."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * A boca de ar é um corte de loft que entra pela parede do lábio e segue 260 mm para trás, sob o capô, como no esboço, e daí continua"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * na seção da última estação até passar da face de trás do capô: o corte é uma passagem de ponta a ponta, e não uma cova com fundo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * porque o fundo plano a 260 mm lia como uma face fechando a fenda. A passagem sai na face de z 2377, que a fuselagem fecha na"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * montagem, e por isso o capô é medido com um furo passante (`formas`). A entrada de ar é a carenagem em volta da boca, e cada uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * das duas partes leva o seu corte, porque a subtração o consome; a carenagem leva só as estações do esboço, que é onde ela alcança."
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * As seções da carenagem e da boca são estádios (a ponta é um semicírculo de raio igual à meia altura), e o contorno delas é"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * calculado aqui, ponto a ponto: dois cantos do núcleo com esse raio deixam uma faixa de 1 mm no meio da ponta, em que a normal gira"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * 8 graus, e a sombra a mostra como um degrau. Os escapes são tubos por loft de seções circulares ao longo de um caminho com uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * curva de `raioCurva`, as pontas fechadas por polo no eixo; o furo de saída é um corte circular que entra pela ponta do tubo, ao"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " * longo do eixo dele."
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "  /* Boca de ar, o cortador: `inicio` é o ponto da boca de ar do esboço, e as estações são as mesmas colunas da entrada de ar. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  /* Boca de ar, o cortador: `inicio` é o ponto da boca de ar do esboço, e as estações são as mesmas colunas da entrada de ar. Só o"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "     corte do capô continua além da última estação: a seção dela segue até `passagem.alem` mm depois da última estação do capô, de"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "     modo que o corte atravessa a face de trás, com uma estação a cada `passagem.passo` mm no máximo, para a parede da passagem não"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "     sair em tiras de 7 mm por 1,5 m. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    passagem: { alem: 40, passo: 300 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "  /* Quanto o raio do canto fica abaixo da meia dimensão menor da seção, em mm. Um canto de raio igual à meia altura, como o da boca de"
+        },
+        {
+          "tipo": "-",
+          "linha": 89,
+          "texto": "     ar e o da entrada de ar, deixa dois pontos do contorno no mesmo lugar, e a faixa entre eles sai com área nula. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  /* Quanto o raio do canto fica abaixo da meia dimensão menor da seção, em mm, nas seções de canto arredondado (as do capô). Uma seção"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "     cujo raio alcança a meia altura, como a da boca de ar e a da entrada de ar, não passa por aqui: é um estádio e tem contorno"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "     próprio. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "/* O contorno de uma seção em estádio, [u, w] com u = x e w = -(y - y0): a reta do topo, a da base e, em cada ponta, um semicírculo de"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "   raio igual à meia altura em `2 * segmentos` passos, com um ponto no meio da ponta. Os pontos saem calculados, e não de dois cantos"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "   do núcleo, porque dois cantos com esse raio se tocam no meio da ponta. O sentido sai invertido quando é horário. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "function contornoDeEstadio({ hw, topo, base }, y0, segmentos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  const hy = (topo - base) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  if (!(hw > hy)) throw new Error(`estádio com meia largura de ${hw} m e meia altura de ${hy} m: a ponta arredondada só existe nas laterais, e a seção precisa ser mais larga que alta`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "  const meio = (topo + base) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  const passos = 2 * segmentos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  const centro = hw - hy;"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "  const ponta = (lado, de, ate) => Array.from({ length: passos + 1 }, (_, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "    const a = de + ((ate - de) * k) / passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "    return [lado * (centro + hy * Math.cos(a)), meio + hy * Math.sin(a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "  const pontos = [...ponta(1, Math.PI / 2, -Math.PI / 2), ...ponta(-1, -Math.PI / 2, Math.PI / 2)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 201,
+          "texto": "  const contorno = pontos.map(([x, y]) => [x, -(y - y0)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 202,
+          "texto": "  return { meio, lados: contorno.length, contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };"
+        },
+        {
+          "tipo": "+",
+          "linha": 203,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 204,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 177,
+          "texto": "   saem do mesmo raio, limitado pela meia dimensão menor, e o contorno que sai no sentido horário é invertido. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 178,
+          "texto": "function contornoDaSecao({ hw, topo, base, raio }, y0, folga) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 206,
+          "texto": "   saem do mesmo raio, limitado pela meia dimensão menor, e o contorno que sai no sentido horário é invertido. A seção cujo raio"
+        },
+        {
+          "tipo": "+",
+          "linha": 207,
+          "texto": "   alcança a meia dimensão menor é um estádio e tem contorno próprio. `lados` é o número de pontos depois de o núcleo expandir os"
+        },
+        {
+          "tipo": "+",
+          "linha": 208,
+          "texto": "   cantos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 209,
+          "texto": "function contornoDaSecao({ hw, topo, base, raio }, y0, folga, segmentos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 212,
+          "texto": "  /* A tolerância de um nanômetro absorve o ruído de `topo - base` em ponto flutuante. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 213,
+          "texto": "  if (raio >= Math.min(hw, hy) - 1e-9) return contornoDeEstadio({ hw, topo, base }, y0, segmentos);"
+        },
+        {
+          "tipo": "-",
+          "linha": 184,
+          "texto": "  return { meio, contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };"
+        },
+        {
+          "tipo": "+",
+          "linha": 217,
+          "texto": "  return { meio, lados: contorno.length * (segmentos + 1), contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };"
+        },
+        {
+          "tipo": "-",
+          "linha": 193,
+          "texto": "  const feitas = secoes.map((s) => ({ ...contornoDaSecao(s, y0, folga), z: s.z }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 194,
+          "texto": "  const lados = feitas[0].contorno.length * (segmentos + 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 226,
+          "texto": "  const feitas = secoes.map((s) => ({ ...contornoDaSecao(s, y0, folga, segmentos), z: s.z }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 227,
+          "texto": "  const lados = feitas[0].lados;"
+        },
+        {
+          "tipo": "+",
+          "linha": 228,
+          "texto": "  if (feitas.some((s) => s.lados !== lados)) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 229,
+          "texto": "    throw new Error(`${nome}: as seções saem com ${[...new Set(feitas.map((s) => s.lados))].join(' e ')} pontos, e o loft pede o mesmo número em todas (estádio e retângulo arredondado não casam no mesmo loft)`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 230,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 290,
+          "texto": "  const bocaNoCapo = aPartirDoPonto('bocaDeAr no capo', t.bocaDeAr);"
+        },
+        {
+          "tipo": "-",
+          "linha": 291,
+          "texto": "  const bocaNaEntrada = aPartirDoPonto('bocaDeAr na entradaDeAr', t.bocaDeAr);"
+        },
+        {
+          "tipo": "+",
+          "linha": 326,
+          "texto": "  /* O corte do capô repete a seção da última estação da boca até a saída, `passagem.alem` mm além da última estação do capô, em"
+        },
+        {
+          "tipo": "+",
+          "linha": 327,
+          "texto": "     estações a no máximo `passagem.passo` mm uma da outra; o da carenagem fica nas estações do esboço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 328,
+          "texto": "  const boca = t.bocaDeAr;"
+        },
+        {
+          "tipo": "+",
+          "linha": 329,
+          "texto": "  const ultimaDaBoca = boca.estacoes[boca.estacoes.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 330,
+          "texto": "  const fimDoCapo = t.capo.estacoes[t.capo.estacoes.length - 1][0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 331,
+          "texto": "  const dzDaSaida = fimDoCapo + boca.passagem.alem - boca.inicio[2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 332,
+          "texto": "  const trechosDaPassagem = Math.ceil((dzDaSaida - ultimaDaBoca[0]) / boca.passagem.passo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 333,
+          "texto": "  const daPassagem = Array.from({ length: trechosDaPassagem }, (_, k) => ["
+        },
+        {
+          "tipo": "+",
+          "linha": 334,
+          "texto": "    ultimaDaBoca[0] + ((dzDaSaida - ultimaDaBoca[0]) * (k + 1)) / trechosDaPassagem, ...ultimaDaBoca.slice(1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 335,
+          "texto": "  ]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 336,
+          "texto": "  const bocaNoCapo = aPartirDoPonto('bocaDeAr no capo', { ...boca, estacoes: [...boca.estacoes, ...daPassagem] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 337,
+          "texto": "  const bocaNaEntrada = aPartirDoPonto('bocaDeAr na entradaDeAr', boca);"
+        },
+        {
+          "tipo": "+",
+          "linha": 505,
+          "texto": "  /* O capô tem um furo passante, a boca de ar que entra pela parede do lábio e sai pela face de trás; a carenagem, um anel. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 460,
+          "texto": "    capo: 'solido',"
+        },
+        {
+          "tipo": "+",
+          "linha": 507,
+          "texto": "    capo: { furos: 1 },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
