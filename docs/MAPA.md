@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1256 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1013,6 +1013,14 @@
 
 - `receita-01.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral.
 - `receita-02.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral.
+
+## procedural/pecas/aviao/partes/motor/
+
+- `receita.js` — aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais.
+
+## procedural/pecas/aviao/partes/motor/rodadas/
+
+- `receita-01.js` — aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais.
 
 ## procedural/pecas/braco-robotico/
 
