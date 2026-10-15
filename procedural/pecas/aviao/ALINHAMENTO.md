@@ -259,3 +259,29 @@ As duas empenagens fecharam na primeira rodada com nota 9 e a pessoa as aceitou 
 na vertical, o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que
 contorna o canto solto da booleana, e fica como pendência.
 
+## O plano dos trens
+
+São a sétima e a oitava etapas, independentes uma da outra e modeladas em paralelo, na
+pose de pouso, com os trens baixados. As formas vêm das unidades `trem-do-nariz` e
+`trens-principais` do esboço aprovado (o mestre e os detalhes de cada uma).
+
+O trem do nariz (`partes/trem-do-nariz/receita.js`, `aviao/trem-do-nariz`) tem 18 partes:
+a carenagem com o alojamento recortado, o eixo do pivô e os dois mancais, a alavanca, o
+atuador (corpo, haste, pino e orelha), o compasso (dois braços e o pino), a perna, o
+pistão, a coroa, o garfo, o eixo e a roda, a da família `roda-pneu` com o perfil `carro`.
+A escala é a altura do trem, 773 mm.
+
+Os trens principais (`partes/trens-principais/receita.js`, `aviao/trens-principais`) têm
+32 partes, 16 de cada lado: a perna, o pino do pivô, a coroa, os dois lados do garfo, o
+eixo, a roda da família, o compasso (dois braços e três pinos) e o atuador (corpo, haste,
+pino e orelha). Os alojamentos são cortadores da asa, que as asas já recortam. A escala é
+a altura do trem, 1198 mm.
+
+Nos dois, o `REFINA` liga cada parte ao volume do andaime de mesmo nome em slug e à forma
+de mesmo id do esboço, com o mínimo de 0,95. Reprova: roda solta, fora do chão ou
+atravessando o garfo; perna, pistão, coroa, garfo ou eixo desalinhados ou soltos;
+atuador ou compasso solto; carenagem sem o alojamento; nos principais, os dois lados que
+não são espelho; e o `REFINA` acusando parte fora do envelope ou abaixo do mínimo. O
+critério do alinhamento vale na pose de pouso: o trem baixado não atravessa a asa nem a
+fuselagem.
+

@@ -44,6 +44,20 @@
         "tipo": "peca",
         "ref": "aviao/empenagem-vertical"
       }
+    },
+    {
+      "id": "trem-do-nariz",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/trem-do-nariz"
+      }
+    },
+    {
+      "id": "trens-principais",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/trens-principais"
+      }
     }
   ],
   "relacoes": [],
@@ -53,7 +67,9 @@
     "helice",
     "asas",
     "empenagem-horizontal",
-    "empenagem-vertical"
+    "empenagem-vertical",
+    "trem-do-nariz",
+    "trens-principais"
   ],
   "vinculos": [],
   "posicoes": []
