@@ -1,0 +1,1127 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/fuselagem",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "janela1D",
+        "tipo": "uniao",
+        "onde": "face externa da placa, lado direito, estação da janela grande",
+        "sentido": "afastado",
+        "evidencia": "fuselagem-superior-orto.png: faixa escura em x≈631-636, y≈385-440, fora da silhueta do casco (borda em x≈632). A sobreposição não testa este ponto."
+      },
+      {
+        "parte": "janela1E",
+        "tipo": "uniao",
+        "onde": "face externa da placa, lado esquerdo, estação da janela grande",
+        "sentido": "afastado",
+        "evidencia": "fuselagem-superior-orto.png: faixa escura em x≈464-468, y≈385-440, fora da borda do casco (x≈468). Vão correspondente não aparece em vista externa do lado esquerdo. A sobreposição não testa."
+      },
+      {
+        "parte": "porta",
+        "tipo": "uniao",
+        "onde": "borda externa do painel, na altura do ombro esquerdo",
+        "sentido": "afastado",
+        "evidencia": "fuselagem-superior-orto.png: painel claro em x≈463-480, y≈620-725 passa da borda do casco (x≈468-475) em 5 a 8 px. A sobreposição não confirma. Vão da porta sem confirmação: não há vista externa da esquerda."
+      }
+    ],
+    "observacao": "Planta coincide com a referência de topo na cabine, no afinamento e na cauda. Resta o assentamento da porta e das janelas 1 e o lado esquerdo sem vista externa. Referência é 70 a 115 mm mais larga por lado nas raízes de asa."
+  },
+  "partes": [
+    {
+      "nome": "fuselagem",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parabrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteParabrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela3E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela4D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela4E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "porta",
+      "confere": true,
+      "observacao": "o corte da porta avança 30 mm para dentro para a pele do esboço não tocar a placa; o vão da janela 4 fica aberto na porta"
+    },
+    {
+      "nome": "barbatana",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o crítico mediu a planta por fração de imagens que começam a fuselagem em pontos diferentes e viu a cauda 20% larga; em mm ela bate. O processo não pegava: falta ao pacote a peça sobre o contorno da referência em mm",
+    "o pacote de vistas não tinha a lateral esquerda, onde ficam a porta e as janelas E; ferramenta, corrigida: o conjunto traz as duas laterais",
+    "na bancada a vista frontal olha de +z, que é a cauda do avião, porque o esboço põe a proa em z 0; o crítico achou os nomes trocados; convenção a resolver",
+    "o loft tem bloco de 1000 ids por passo e o casco de 22 seções estoura com 12 segmentos por canto; o loft só fecha a ponta com polo de raio zero; REFINA.tolerancia.porta é obrigatório sem porta declarada",
+    "o envelope do REFINA só limita por cima: a parte menor que o esboço passa; a razão de volume por parte contra o andaime deu 0,99 no casco, 0,91 na porta e 0,87 a 0,98 nas janelas",
+    "a instrução do crítico não dizia o limite de 240 caracteres dos campos do veredito, e o registro recusou o primeiro; corrigido na instrução do agente"
+  ],
+  "notaDePassagem": "Sem porta publicada; o motor assenta na face da frente (z 2377, 1450x1030, centro y 1303), plana. Casco com 44 pontos por seção (teto de 1000 ids do loft); pontas fechadas por polo de 0,5 mm. Porta vazada no vão da janela 4E.",
+  "receita": {
+    "sha256": "sha256:38cd8a90d8ee4e6da5e24f302ea1d3ab181508c0735304e1d6f8f73bce0513b6",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 563,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Primeira etapa do avião (`../../montagem.json`). O combinado com a pessoa e o plano da fuselagem estão em"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * `../../ALINHAMENTO.md`; as medidas vêm da unidade `fuselagem` do esboço aprovado da segunda rodada"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `aviao-detalhe-fuselagem.esboco.json`), e a receita"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * refina o andaime `../../andaime.json`, que é a tradução desse esboço (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. A"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * fuselagem começa em z = 2377 (onde o capô encosta, na etapa seguinte) e termina em z = 10461, na ponta da cauda. A TABELA está em"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * milímetro, no quadro do esboço, e a conversão para metro acontece só em `derivar`."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * Cada loft anda numa reta paralela ao eixo dele e com todas as seções no mesmo plano: o centro de cada seção entra no contorno,"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * como no esboço, e não na posição. Se o caminho seguisse o centro das seções, o núcleo inclinaria cada anel para a tangente e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * perfil de lado sairia torto (a cabine sobe 17 graus entre duas seções). O loft só fecha uma ponta com um polo de raio zero; o"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * polo nasce no eixo, a `tampa.avanco` além da última seção, e `moveV` o leva ao centro da seção, de modo que cada ponta é um"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * leque quase plano. As seções são escritas como pontos do plano delas, no quadro do mundo, e `derivar` os converte para o plano"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * local do loft (`orientacao` fixa o +u); o contorno que sai no sentido horário nesse plano é invertido, porque o núcleo só aceita"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * anti-horário. O loft do casco tem 22 seções, e o bloco de ids de um passo é de 1000: com 10 segmentos por canto são 44 pontos por"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * seção e 924 faces, e com 11 já são 1008."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * O vão de cada janela é um corte de extrusão cuja face de dentro está no plano da face de dentro da placa da janela: a placa"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * assenta no fundo do vão e sobra a folga em volta dela, no esboço e aqui. O raio da janela arredonda o contorno dela visto de"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * lado (y por z), na placa e no vão; o esboço aplica o mesmo raio ao perfil em planta, recortado a metade da espessura, e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * janela sai quase quadrada de lado. O vão da porta é o `cortePorta`, que o esboço escreve com a folga já somada. A porta é"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * recortada pelo vão da janela 4 do lado esquerdo, e esse corte avança `porta.sobraDoVao` para dentro do avião: a face de dentro"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * da porta se afasta do plano da face de dentro da placa até 12 mm no alto do vão, e sem a sobra a placa tocaria a pele que sobra"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * da porta, um contato que o plano não declara."
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * Sem porta publicada: o andaime não declara nenhuma, e o plano da etapa não pede. O motor, que vem na frente da fuselagem, nasce da"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * seção da frente (z = 2377)."
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* Casco: uma estação por linha, [z, largura em x, altura em y, raio do canto, y do centro]. O x do centro é zero. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  casco: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "      [2377, 1450, 1030, 380, 1303],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "      [2712, 1480, 1060, 380, 1308],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "      [3012, 1490, 1190, 380, 1353],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "      [3312, 1490, 1330, 370, 1443],"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "      [3612, 1490, 1500, 350, 1498],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "      [3912, 1520, 1570, 350, 1533],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "      [4400, 1560, 1580, 350, 1538],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "      [5100, 1560, 1580, 350, 1538],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "      [5700, 1540, 1530, 350, 1563],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "      [6300, 1380, 1460, 350, 1588],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "      [6900, 1240, 1358, 350, 1649],"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "      [7500, 1040, 1133, 330, 1711],"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "      [8100, 840, 930, 300, 1783],"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "      [8700, 640, 736, 250, 1860],"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "      [9300, 400, 535, 190, 1932],"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "      [9600, 370, 444, 175, 1973],"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "      [9900, 380, 352, 170, 2014],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "      [10300, 360, 231, 110, 2069.5],"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "      [10400, 270, 200, 95, 2082],"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "      [10461, 130, 125, 60, 2092],"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    /* Segmentos de cada canto arredondado: o canto de 380 mm sai em 10 passos de 9 graus, com a corda a 1,2 mm do arco. O loft de 22"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "       seções cabe no bloco de 1000 ids de um passo com até 47 pontos por seção, e 12 segmentos dariam 52. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    segmentosPorCanto: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  /* Fechamento das pontas dos lofts: quanto o polo fica além da última seção, em z, em x ou em y, conforme o eixo do loft. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  tampa: { avanco: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  /* Para-brisa: uma faixa de 50 mm de espessura, inclinada, larga sobre o dorso e curva em x. Cada estação é"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "     [x, y do centro, meio comprimento em z, y do perfil nos quatro cantos]: dois na frente (z do centro menos o meio comprimento) e"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "     dois atrás. O z do centro é o mesmo em todas as estações, e o conjunto sobe `deslocamentoY` depois de montado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  parabrisa: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    centroZ: 3270.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    deslocamentoY: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "      [-668, 1922, 220, -127, -77, 127, 77],"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "      [-640, 1960, 280, -155, -105, 155, 105],"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "      [-600, 1996, 320, -173, -123, 173, 123],"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "      [-550, 2028, 350, -187, -137, 187, 137],"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "      [-500, 2050, 370, -196, -146, 196, 146],"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "      [-450, 2064, 380, -201, -151, 201, 151],"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "      [-375, 2072, 385, -203, -153, 203, 153],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "      [375, 2072, 385, -203, -153, 203, 153],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "      [450, 2064, 380, -201, -151, 201, 151],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "      [500, 2050, 370, -196, -146, 196, 146],"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "      [550, 2028, 350, -187, -137, 187, 137],"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "      [600, 1996, 320, -173, -123, 173, 123],"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "      [640, 1960, 280, -155, -105, 155, 105],"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "      [668, 1922, 220, -127, -77, 127, 77],"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  /* Montante do para-brisa: barra de seção retangular de cantos arredondados, do ponto `de` ao ponto `para`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  montante: { de: [0, 1955, 2900], para: [0, 2298, 3640], largura: 70, profundidade: 36, raioDoCanto: 14, segmentosPorCanto: 6 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  /* Janelas do lado direito, [x, y, z do centro, espessura em x, altura em y, profundidade em z, raio do canto, giro em y em graus]."
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "     As do lado esquerdo são o espelho em x, com o giro de sinal trocado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  janelas: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    j1: [739.5, 1856.5, 3741.5, 20, 423, 733, 90, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    j2: [768, 1905, 4523.5, 20, 326, 267, 110, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    j3: [768, 1905, 5108.5, 20, 326, 299, 110, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    j4: [726.3, 1915.5, 5882, 35, 305, 256, 110, -7],"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  /* Vão de cada janela: a folga a mais em cada lado da placa, no plano dela, e a profundidade do corte para fora a partir da face de dentro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  vao: { folga: 5, profundidade: 100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  segmentosPorCantoDaJanela: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  /* Porta traseira, do lado esquerdo: loft em y de seções de cinco pontos [x, z] da lateral externa para a de dentro. Cada estação é"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "     [y, x e z dos cinco pontos]. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  porta: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      [1160, -776, 5498, -741, 5944, -683, 6390, -664, 6390, -757, 5498],"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "      [1180, -777, 5468, -741, 5944, -679, 6420, -660, 6420, -758, 5468],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "      [1974, -777, 5458, -741, 5944, -678, 6430, -659, 6430, -758, 5458],"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "      [2090, -757, 5458, -721, 5944, -658, 6430, -639, 6430, -738, 5458],"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "      [2150, -730, 5458, -693, 5944, -630, 6430, -611, 6430, -711, 5458],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      [2200, -694, 5470, -658, 5944, -597, 6418, -578, 6418, -675, 5470],"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      [2232, -663, 5498, -627, 5944, -569, 6390, -550, 6390, -644, 5498],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    /* Quanto o corte da janela 4 avança, na porta, além do plano da face de dentro da placa, para o lado de dentro do avião. A porta"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "       acompanha o casco e a face de dentro dela se afasta desse plano para o lado de dentro, até uns 12 mm no alto do vão; sem"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "       essa sobra o vão não passa de lado a lado e a placa toca a pele que sobra. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    sobraDoVao: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    /* Vão da porta no casco: loft em y de seções de quatro pontos [x, z], com a folga em volta da porta já somada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    vao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "      [1152, -833, 5506, -740, 6382, -664, 6382, -757, 5506],"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "      [1172, -834, 5476, -737, 6412, -661, 6412, -758, 5476],"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "      [1974, -834, 5450, -734, 6438, -658, 6438, -758, 5450],"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "      [2090, -814, 5450, -714, 6438, -638, 6438, -738, 5450],"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "      [2150, -787, 5450, -686, 6438, -610, 6438, -711, 5450],"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "      [2208, -744, 5478, -648, 6410, -572, 6410, -668, 5478],"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "      [2240, -711, 5506, -618, 6382, -542, 6382, -635, 5506],"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  /* Barbatana ventral: uma estação por linha, [z, largura em x, altura em y, raio dos dois cantos de baixo, y do centro]. Os dois"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "     cantos de cima, que entram no casco, são vivos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  barbatana: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "      [7439, 36, 25, 16, 1100.5],"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "      [7480, 52, 126, 24, 1088],"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "      [7533, 60, 241.5, 28, 1064.8],"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "      [7700, 60, 240.8, 28, 1112.4],"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "      [7979, 58, 238.7, 27, 1192.4],"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "      [8300, 52, 225, 24, 1290],"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "      [8500, 46, 216.5, 21, 1350.8],"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "      [8692, 40, 208, 18, 1409],"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "      [8739, 36, 186, 16, 1433],"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "      [8811, 24, 25, 10, 1534.5],"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    segmentosPorCanto: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "/* Para cada eixo de loft: o índice do eixo, os eixos do plano da seção no quadro do mundo, o sinal que leva o segundo eixo do plano"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "   ao +w do núcleo, e a `orientacao` que fixa o +u no primeiro eixo do plano. Com `orientacao` declarada, o núcleo projeta a"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "   referência na tangente de cada seção, então u e w saem iguais em todas e w = u x tangente. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "const LOFT = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  x: { eixo: 0, plano: [1, 2], sinalW: -1, orientacao: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  y: { eixo: 1, plano: [0, 2], sinalW: 1, orientacao: [1, 0, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  z: { eixo: 2, plano: [0, 1], sinalW: -1, orientacao: [1, 0, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "/* Área com sinal pelo cadarço, sobre os dois primeiros números de cada ponto; o núcleo só aceita contorno anti-horário. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "function areaDoContorno(pontos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  let soma = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  for (let i = 0; i < pontos.length; i++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    const a = pontos[i];"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    const b = pontos[(i + 1) % pontos.length];"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    soma += a[0] * b[1] - b[0] * a[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  return soma / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "/* Quantos pontos o contorno tem depois de o núcleo trocar cada canto de raio positivo por um arco de `segmentos` segmentos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "const pontosDepoisDosArcos = (pontos, segmentos) => pontos.reduce((n, p) => n + (p[2] > 0 ? segmentos + 1 : 1), 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "/* Um loft por estações, em metro. `linha` é o ponto do mundo por onde o caminho passa (a coordenada do eixo é ignorada) e"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "   `estacoes` são `{ p, pontos }`: a posição no eixo e os pontos [a, b, raio?] do plano da seção no quadro do mundo."
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "   Devolve as seções, com um polo de raio zero antes da primeira e depois da última, os `lados`, a `orientacao` e, para cada polo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "   a região que o seleciona e o deslocamento que o leva ao centro da seção de que ele fecha a ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "function loftPorEstacoes({ eixo, linha, estacoes, avanco, segmentos }) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  const { eixo: ia, plano: [i1, i2], sinalW, orientacao } = LOFT[eixo];"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const noEixo = (p) => { const q = [...linha]; q[ia] = p; return q; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  const secoes = estacoes.map(({ p, pontos }) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    const contorno = pontos.map(([a, b, ...resto]) => [a - linha[i1], sinalW * (b - linha[i2]), ...resto]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "    return { pos: noEixo(p), contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "  const lados = pontosDepoisDosArcos(secoes[0].contorno, segmentos);"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  secoes.forEach((s, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    if (pontosDepoisDosArcos(s.contorno, segmentos) !== lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "      throw new Error(`loft em ${eixo}: a estação ${i} tem ${pontosDepoisDosArcos(s.contorno, segmentos)} pontos depois dos arcos e a primeira tem ${lados}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "  const polo = (estacao, sentido) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    const pos = noEixo(estacao.p + sentido * avanco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "    const media = (k) => estacao.pontos.reduce((soma, ponto) => soma + ponto[k], 0) / estacao.pontos.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "    const d = [0, 0, 0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "    d[i1] = media(0) - linha[i1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "    d[i2] = media(1) - linha[i2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "    const folga = avanco / 4;"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "    return { pos, d, regiao: { min: pos.map((v) => v - folga), max: pos.map((v) => v + folga) } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  const polos = [polo(estacoes[0], -1), polo(estacoes[estacoes.length - 1], 1)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "    secoes: [{ pos: polos[0].pos, raio: 0 }, ...secoes, { pos: polos[1].pos, raio: 0 }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "    lados,"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
