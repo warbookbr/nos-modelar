@@ -2,16 +2,16 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [o avião do esboço à receita](2026-10-15-o-aviao-do-esboco-a-receita.md).
 
-[As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em
-2026-10-14, com as famílias da carcaça e do braço, o ajuste da família a uma
-referência e o sorteio na prova, e a família da carcaça ampliada para duas
-empilhadeiras com a aprovação da pessoa. O roteiro combinado com a pessoa, registrado
-no plano, segue com o esboço 3D a partir dos desenhos e a tradução para receita no
-núcleo, com o avião, depois a picape e a lista de objetos; o próximo plano abre
-quando a pessoa autorizar. Antes, [o desenho sem
-referência](encerrados/2026-10-13-desenho-sem-referencia.md) fechou em 2026-10-14.
+O plano leva o avião, cujo esboço a pessoa aprovou, do esboço à receita no núcleo:
+o andaime traduzido do esboço, uma receita por parte com `REFINA` e o avião montado e
+aprovado na bancada. A picape, o braço robótico, o carrinho de mão e a empilhadeira
+entram depois do avião completo. [As famílias de
+desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, com as
+famílias da carcaça e do braço, o ajuste da família a uma referência e o sorteio na
+prova. Antes, [o desenho sem referência](encerrados/2026-10-13-desenho-sem-referencia.md)
+fechou em 2026-10-14.
 Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
