@@ -273,8 +273,8 @@ function medidasDoParabrisa(t) {
    seções, de modo que a face de cima é paralela à de baixo em cada trecho. */
 function medidasDoMontante(t) {
   const v = medidasDoParabrisa(t);
-  const [, dy, dz] = t.montante.para.map((p, k) => p - t.montante.de[k]);
-  const altura = t.montante.profundidade / Math.cos(Math.atan2(dy, dz));
+  const [dx, dy, dz] = t.montante.para.map((p, k) => p - t.montante.de[k]);
+  const altura = t.montante.profundidade / Math.cos(Math.atan2(dy, Math.hypot(dx, dz)));
   const zs = [v.zDaBase, ...t.casco.estacoes.map((e) => e[0]).filter((z) => z > v.zDaBase && z < v.zDoTopo), v.zDoTopo];
   const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z));
   return { altura, zs, embaixo };
