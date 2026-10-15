@@ -413,8 +413,9 @@ const FORA_DO_ESCOPO = {
   envolve: 'faixa que contorna círculos: a N2 não tem faixa',
 };
 
-/* O volume da N2 de uma forma e, quando é aproximado, `aproximacao` com o código, o volume do esboço e o que se perdeu. */
-function traduzirForma(forma) {
+/* O volume da N2 de uma forma, sem olhar o recorte, e, quando é aproximado, `aproximacao` com o código, o volume do esboço e o que
+   se perdeu. */
+function traduzirSemRecorte(forma) {
   if (FORA_DO_ESCOPO[forma.tipo]) recusar(FORA_DO_ESCOPO[forma.tipo]);
   const g = forma.geometria;
   const cols = colunasDe(g.matriz);
@@ -422,8 +423,29 @@ function traduzirForma(forma) {
   const fazer = forma.tipo === 'tubo' ? (gg) => volumeDoTubo(gg, forma) : POR_TIPO[forma.tipo];
   if (!fazer) recusar(`tipo "${forma.tipo}" sem correspondência na N2`);
   const resultado = fazer(g, cols, al);
-  const traduzida = resultado.aproximacao ? resultado : { volume: resultado, aproximacao: null };
-  return g.recorte ? comRecorteIgnorado(traduzida, g.recorte) : traduzida;
+  return resultado.aproximacao ? resultado : { volume: resultado, aproximacao: null };
+}
+
+/* O mesmo, com o recorte declarado como perda. */
+function traduzirForma(forma) {
+  const traduzida = traduzirSemRecorte(forma);
+  return forma.geometria.recorte ? comRecorteIgnorado(traduzida, forma.geometria.recorte) : traduzida;
+}
+
+const MATRIZ_IDENTIDADE = Object.freeze([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+
+/* O volume da N2 de uma forma no quadro local dela: o que `traduzirFormasParaAndaime` poria no andaime se a matriz fosse a identidade,
+   sem o `id`, as `regioes` e o `centro` (o caminho do tubo continua relativo ao `centro` da forma, em mundo). Quem monta o sólido do
+   esboço (`solido-do-esboco.js`) gira o resultado pela matriz da forma e o põe no centro, de modo que a rotação em dois eixos, que a N2
+   não faz, deixa de importar. `aproximacao` diz o que a N2 mudou na forma (`null` quando é exata); o recorte não entra aqui. A forma
+   que a N2 não tem (faixa, furo de caixa, tubo com canto sem raio de curva...) é recusada com `ErroDoTradutor` e o motivo. */
+export function volumeLocalDaForma(forma) {
+  try {
+    return traduzirSemRecorte({ ...forma, geometria: { ...forma.geometria, matriz: MATRIZ_IDENTIDADE } });
+  } catch (e) {
+    if (e instanceof Recusa) throw new ErroDoTradutor(e.message);
+    throw e;
+  }
 }
 
 /* A N2 não subtrai um volume de outro (o alojamento da roda na asa, a porta rebaixada no casco): a forma recortada vai ao andaime

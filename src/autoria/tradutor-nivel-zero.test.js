@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { normalizarAndaimeGlobal } from './forma-global.js';
-import { ErroDoTradutor, FORMATO_FORMAS_RESOLVIDAS, slugDe, traduzirFormasParaAndaime } from './tradutor-nivel-zero.js';
+import { ErroDoTradutor, FORMATO_FORMAS_RESOLVIDAS, slugDe, traduzirFormasParaAndaime, volumeLocalDaForma } from './tradutor-nivel-zero.js';
 import { compilarAndaime, medirVolumes } from '../../tools/fixtures/nivel-zero/medir-blocagem.js';
 
 const I = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
@@ -676,5 +676,47 @@ describe('tradutor do nível zero: determinismo e fronteira', () => {
       expect(linha).not.toMatch(/three/);
       expect(linha).not.toMatch(/node:/);
     }
+  });
+});
+
+describe('tradutor do nível zero: o volume no quadro local (a base do sólido do esboço)', () => {
+  it('a forma girada em dois eixos, que o andaime recusa, tem o volume local com as medidas dela', () => {
+    const livre = forma('pa', 'cone', { eixo: 'y', diametro: 20, diametroTopo: 10, comprimento: 40 }, { matriz: produto(rotX(30), rotZ(40)) });
+    expect(() => traduzir([livre])).toThrow(/gira em dois eixos/);
+    const local = volumeLocalDaForma(livre);
+    expect(local.volume).toMatchObject({ tipo: 'cone', eixo: 'y', raioBase: 10, raioTopo: 5, comprimento: 40 });
+    expect(local.aproximacao).toBeNull();
+  });
+
+  it('a matriz não entra: a caixa sai com as medidas do esboço no eixo de cada uma', () => {
+    const caixa = forma('cx', 'caixa', { eixo: 'y', largura: 10, altura: 20, profundidade: 30 }, { matriz: rotY(90), centro: [100, 0, 0] });
+    expect(volumeLocalDaForma(caixa).volume).toEqual({ tipo: 'caixa', dimensoes: [10, 20, 30] });
+  });
+
+  it('o recorte não entra, e a aproximação diz o que a N2 mudou na forma', () => {
+    const recortada = forma('cx', 'caixa', { eixo: 'y', largura: 10, altura: 20, profundidade: 30, raio: 3, recorte: { cortadores: [{ id: 'm', retiradoMm3: 5 }], volumeCheioMm3: 6000, volumeMm3: 5995 } });
+    const local = volumeLocalDaForma(recortada);
+    expect(local.volume.tipo).toBe('extrusao');
+    expect(local.aproximacao.codigo).toBe('caixa-com-raio-como-extrusao');
+    expect(local.aproximacao.perdido.map((p) => p.codigo)).toEqual(['tipo']);
+  });
+
+  it('o tubo continua relativo ao centro da forma, em mundo', () => {
+    const tubo = forma('tb', 'tubo', { diametro: 10, raioCurva: 0, caminho: [[100, 0, 0], [100, 50, 0]], trilha: { pontos: [[100, 0, 0], [100, 50, 0]], fechado: false } }, { centro: [100, 25, 0] });
+    expect(volumeLocalDaForma(tubo).volume).toMatchObject({ tipo: 'tubo', caminho: [[0, -25, 0], [0, 25, 0]], raio: 5 });
+  });
+
+  it('o que a N2 não tem é recusado com ErroDoTradutor e o motivo', () => {
+    expect(() => volumeLocalDaForma(forma('f', 'envolve', { largura: 10, espessura: 2 }))).toThrow(ErroDoTradutor);
+    expect(() => volumeLocalDaForma(forma('f', 'envolve', { largura: 10, espessura: 2 }))).toThrow(/a N2 não tem faixa/);
+    expect(() => volumeLocalDaForma(forma('cx', 'caixa', { eixo: 'y', largura: 10, altura: 20, profundidade: 30, furos: [{ diametro: 4, centro: [0, 0] }] }))).toThrow(/caixa com furo/);
+  });
+
+  it('não muda o andaime: a tradução da mesma forma continua igual', () => {
+    const f = forma('cx', 'caixa', { eixo: 'y', largura: 10, altura: 20, profundidade: 30 }, { matriz: rotZ(30) });
+    const antes = JSON.stringify(traduzir([f]));
+    volumeLocalDaForma(f);
+    expect(JSON.stringify(traduzir([f]))).toBe(antes);
+    expect(f.geometria.matriz).toEqual(limpa(rotZ(30)));
   });
 });
