@@ -1,6 +1,7 @@
 /* superficie-aerodinamica.test.js — a família `superficie-aerodinamica` medida na malha e nos argumentos que o `derivar` entrega.
    O perfil NACA (o bordo de fuga com a espessura pedida, o raio do nariz, o giro do nariz, o intradorso côncavo); o volume da
-   deriva e da asa contra a integral da área da seção; a ponta levantada (a inclinação contínua, o fechamento numa corda); o
+   deriva e da asa contra a integral da área da seção; a ponta levantada (a inclinação contínua, o fechamento numa corda, os 72 graus
+   do teto, a tampa declarada, os cantos arredondados e a malha que não se atravessa); o
    comando (a fresta, o giro em torno do eixo da dobradiça, o curso sem tocar a parte fixa, o aileron diferencial); a hélice (as
    pás equiespaçadas, a raiz dentro do cubo, o cone de ogiva); as portas; cada restrição do contrato e os cinco perfis chamados só
    pelo nome. A camada mecânica da aprovação, que mede os três pontos, os perfis e a escala deles, roda uma vez no fim. */
@@ -10,10 +11,12 @@ import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { auditarParDeSolidos, prepararSolido } from '../../../src/autoria/contato-de-solidos.js';
 import { aprovarFamilia, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/mecanifica/aprovacao-da-familia.mjs';
+import { analisarTopologia } from '../../../modulos/topologia/src/analisar.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
 import { FAMILIAS, ErroChamadaDeFamilia, chamar, criarRegistroDeFamilias } from '../index.js';
 import { SUPERFICIE_AERODINAMICA as F } from './index.js';
+import { derivar } from './derivar.js';
 import {
   EXPOENTE_DAS_ESTACOES, GRAUS, LADOS_DA_SECAO, PONTOS_POR_FACE, contornoDoPerfil, linhaDeCurvatura, meiaEspessura, plantaDa, pontoDaSecao, quadrosDoLoft,
 } from './geometria.js';
@@ -309,6 +312,245 @@ describe('a asa de avião leve medida na malha (perfil asa)', () => {
   });
 });
 
+/* ---------- a ponta muito levantada: a tampa declarada, os cantos arredondados e a malha que não se atravessa ---------- */
+
+const CODIGOS_DE_MALHA_ABERTA = ['casca-aberta', 'aresta-nao-manifold', 'orientacao-incoerente'];
+/* a malha fechada: nenhum achado de casca aberta, aresta com mais de duas faces ou orientação incoerente */
+const malhaAberta = (neutro) => analisarTopologia({ vertices: neutro.V, faces: neutro.F }).achados.filter((a) => CODIGOS_DE_MALHA_ABERTA.includes(a.codigo));
+const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+
+/* a interseção de dois triângulos que não dividem vértice: cada um contra o plano do outro, e os dois trechos da reta comum se sobrepondo */
+function triangulosSeCortam(a, b, folga) {
+  const normal = ([p, q, r]) => { const n = cross3(sub3(q, p), sub3(r, p)); const l = norma3(n); return [n.map((c) => c / l), l]; };
+  const [na, la] = normal(a);
+  const [nb, lb] = normal(b);
+  if (la < 1e-18 || lb < 1e-18) return false;
+  const da = a.map((p) => dot3(nb, sub3(p, b[0])));
+  const db = b.map((p) => dot3(na, sub3(p, a[0])));
+  if (da.every((d) => d > folga) || da.every((d) => d < -folga) || db.every((d) => d > folga) || db.every((d) => d < -folga)) return false;
+  const reta = cross3(na, nb);
+  if (norma3(reta) < 1e-9) return false;
+  const eixo = [0, 1, 2].reduce((m, i) => (Math.abs(reta[i]) > Math.abs(reta[m]) ? i : m), 0);
+  const trecho = (t, d) => {
+    const cortes = [];
+    for (let i = 0; i < 3; i++) {
+      const j = (i + 1) % 3;
+      if ((d[i] > 0) !== (d[j] > 0) && d[i] !== d[j]) cortes.push(t[i][eixo] + (d[i] / (d[i] - d[j])) * (t[j][eixo] - t[i][eixo]));
+    }
+    return cortes.length < 2 ? null : [Math.min(...cortes), Math.max(...cortes)];
+  };
+  const [ta, tb] = [trecho(a, da), trecho(b, db)];
+  return Boolean(ta && tb) && Math.min(ta[1], tb[1]) - Math.max(ta[0], tb[0]) > folga;
+}
+
+/** Quantos pares de triângulos da parte, sem vértice em comum, se cortam (a malha atravessa a si mesma). Para na `maximo`-ésima. */
+function atravessamentos(neutro, nome, maximo = 1) {
+  const triangulos = [];
+  for (const face of neutro.F.values()) {
+    if (face.parte !== nome) continue;
+    for (let k = 1; k < face.vs.length - 1; k++) triangulos.push([face.vs[0], face.vs[k], face.vs[k + 1]]);
+  }
+  const pontos = triangulos.map((t) => t.map((id) => neutro.V.get(id)));
+  const caixas = pontos.map((t) => [0, 1, 2].map((e) => [Math.min(...t.map((p) => p[e])), Math.max(...t.map((p) => p[e]))]));
+  const folga = 1e-7;
+  let achados = 0;
+  for (let i = 0; i < triangulos.length && achados < maximo; i++) {
+    for (let j = i + 1; j < triangulos.length && achados < maximo; j++) {
+      if (caixas[i].some(([min, max], e) => max < caixas[j][e][0] - folga || caixas[j][e][1] < min - folga)) continue;
+      if (triangulos[i].some((id) => triangulos[j].includes(id))) continue;
+      if (triangulosSeCortam(pontos[i], pontos[j], folga)) achados += 1;
+    }
+  }
+  return achados;
+}
+/* a mesma superfície, mas pelo `derivar`, sem a faixa nem as restrições do contrato: para medir o que o contrato recusa */
+function rodarSemContrato(parametros) {
+  const { composicao, argumentos } = derivar(completo(parametros));
+  return executarReceita({ CHAMADAS_COMPOSICOES: [{ id: 'superficie', composicao, argumentos }], PARAMS: {}, TOPO: {}, ALIASES: [], MATERIAIS }, registro);
+}
+
+/* a ponta da asa do avião, como a receita das asas a faz à mão: 72 graus de ponta levantada sobre 5,93 de diedro, a tampa de 130 mm ao
+   longo da tangente e os cantos de 170 mm no bordo de ataque e 120 mm no de fuga. A envergadura é o x da ponta, e a corda e a espessura
+   são as da reta da asa ali. */
+const E_DA_PONTA = 5622.668853851386;
+const PONTA_DO_AVIAO = {
+  perfil: 'asa', simetria: 0, comando: 0, comandoDiferencial: 0, enflechamento: 0.86, diedro: 5.93, torcao: 0, incidenciaNaRaiz: 0, espessuraNaRaiz: 0.15,
+  extensaoDaPonta: 0.05, envergadura: E_DA_PONTA, cordaNaRaiz: 1762 / E_DA_PONTA, cordaNaPonta: 935.8971326820188 / E_DA_PONTA, espessuraNaPonta: 0.13011786119571644,
+  pontaLevantada: 72, comprimentoDaTampa: 130 / E_DA_PONTA, raioDoCantoDeAtaque: 170 / E_DA_PONTA, raioDoCantoDeFuga: 120 / E_DA_PONTA,
+};
+/* as seções de uma chamada, em metro: posição, contorno ou corda */
+function secoesDe(parametros) {
+  const { argumentos: a } = chamar(F, 'ponta', parametros);
+  const n = Object.keys(a).filter((nome) => /^fPos\d+$/.test(nome)).length;
+  return Array.from({ length: n }, (_, i) => ({
+    pos: a[`fPos${i}`],
+    contorno: Array.isArray(a[`fS${i}P0`]) ? Array.from({ length: LADOS_DA_SECAO }, (__, k) => a[`fS${i}P${k}`]) : null,
+    corda: Array.isArray(a[`fS${i}P0`]) ? null : [[a[`fS${i}E0`], a[`fS${i}E1`]], [a[`fS${i}E2`], a[`fS${i}E3`]]],
+  }));
+}
+const extensaoEmU = (s) => { const us = (s.contorno ?? s.corda).map(([u]) => u); return [Math.min(...us), Math.max(...us)]; };
+
+describe('a ponta levantada acima de 60 graus', () => {
+  it('a faixa vai a 72 graus, e com o diedro máximo o caminho ainda fica abaixo de 90 graus, onde a tangente do caminho em X diverge', () => {
+    expect(P.pontaLevantada.maximo).toBe(72);
+    expect(P.diedro.maximo + P.pontaLevantada.maximo).toBeLessThan(90);
+    expect(() => chamar(F, 'a', { perfil: 'asa', pontaLevantada: 72 })).not.toThrow();
+    expect(recusa({ perfil: 'asa', pontaLevantada: 73 }).message).toMatch(/parametros\.pontaLevantada recebeu 73/);
+  });
+
+  it('a subida da curva cresce devagar até 84 graus de inclinação total e depressa depois, o que fixa o teto: a 78 graus ela é 7,5% da semi-asa do avião, a 88 graus 25%', () => {
+    const subida = (total) => {
+      const planta = plantaDa({
+        semi: 5.656, cordaNaRaiz: 1.762, cordaNaPonta: 0.931, abaulamentoDaCorda: 0, espessuraNaRaiz: 0.15, espessuraNaPonta: 0.13, incidenciaNaRaiz: 0, torcao: 0,
+        enflechamento: 0.86, diedro: 5.93, pontaLevantada: total - 5.93, extensaoDaPonta: 0.05, bordoDeFuga: 0,
+      });
+      return (planta.y(planta.xDoCorte) - planta.y(planta.xDaCurva) - (planta.xDoCorte - planta.xDaCurva) * Math.tan(5.93 * GRAUS)) / 5.656;
+    };
+    expect(subida(60)).toBeLessThan(0.035);
+    expect(subida(78)).toBeCloseTo(0.075, 2);
+    expect(subida(88)).toBeGreaterThan(3 * subida(78));
+    expect(subida(88)).toBeLessThan(0.3);
+  });
+
+  it('a tampa automática, medida em X, se alonga no caminho pelo inverso do cosseno da inclinação: a 78 graus ela é cinco vezes a que o perfil pede', () => {
+    const s = secoesDe({ ...PONTA_DO_AVIAO, comprimentoDaTampa: 0, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 });
+    const n = s.length;
+    const noCaminho = Math.hypot(s[n - 1].pos[0] - s[n - 5].pos[0], s[n - 1].pos[1] - s[n - 5].pos[1]);
+    const emX = s[n - 1].pos[0] - s[n - 5].pos[0];
+    expect(noCaminho / emX).toBeCloseTo(1 / Math.cos((5.93 + 72) * GRAUS), 3);
+    expect(noCaminho / emX).toBeGreaterThan(4.7);
+  });
+
+  it('com a tampa declarada, a tampa mede o comprimento pedido ao longo da tangente final, nas posições de seno de 30, 55, 75 e 90 graus, e a superfície termina em X = semi-envergadura', () => {
+    const s = secoesDe(PONTA_DO_AVIAO);
+    const n = s.length;
+    expect(n).toBe(25);
+    const fimDaCurva = s[n - 5].pos;
+    const tangente = (5.93 + 72) * GRAUS;
+    [30, 55, 75, 90].forEach((angulo, k) => {
+      const p = s[n - 4 + k].pos;
+      /* a última seção da curva fica 2 micrômetros aquém do fim dela, porque a bisseção que inverte a curva de quinto grau para antes de 1 */
+      expect(Math.hypot(p[0] - fimDaCurva[0], p[1] - fimDaCurva[1])).toBeCloseTo(0.130 * Math.sin(angulo * GRAUS), 5);
+      expect(Math.atan2(p[1] - fimDaCurva[1], p[0] - fimDaCurva[0])).toBeCloseTo(tangente, 6);
+    });
+    expect(s[n - 1].pos[0]).toBeCloseTo(E_DA_PONTA * MM, 9);
+    expect(s[n - 1].corda).not.toBeNull();
+  });
+
+  it('a espessura das três seções da tampa declarada é a da seção cheia vezes o cosseno de 30, 55 e 75 graus, como na tampa automática', () => {
+    const { argumentos } = chamar(F, 'ponta', { ...PONTA_DO_AVIAO, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 });
+    const secoes = Object.keys(argumentos).filter((nome) => /^fPos\d+$/.test(nome)).length;
+    const espessura = (i) => norma3(sub3(argumentos[`fS${i}P${PONTOS_POR_FACE + 1 - 8}`], argumentos[`fS${i}P${PONTOS_POR_FACE + 1 + 8}`]))
+      / norma3(sub3(argumentos[`fS${i}P0`], argumentos[`fS${i}P${PONTOS_POR_FACE + 1}`]));
+    const cheia = espessura(secoes - 5);
+    [30, 55, 75].forEach((angulo, k) => expect(espessura(secoes - 4 + k) / cheia).toBeCloseTo(Math.cos(angulo * GRAUS), 2));
+  });
+
+  it('a tampa declarada tem o piso da automática (0,4% da semi-envergadura), e a curva termina antes o que a tampa avança em X', () => {
+    const s = secoesDe({ ...PONTA_DO_AVIAO, comprimentoDaTampa: 0.0005, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 });
+    const n = s.length;
+    expect(Math.hypot(s[n - 1].pos[0] - s[n - 5].pos[0], s[n - 1].pos[1] - s[n - 5].pos[1])).toBeCloseTo(0.004 * E_DA_PONTA * MM, 5);
+    const longa = secoesDe(PONTA_DO_AVIAO);
+    expect(longa[longa.length - 5].pos[0]).toBeCloseTo((E_DA_PONTA - 130 * Math.cos((5.93 + 72) * GRAUS)) * MM, 5);
+  });
+
+  it('sem as opções declaradas a ponta é a de sempre: a tampa em X termina em X = semi-envergadura e nenhuma seção perde corda', () => {
+    const padrao = secoesDe({ perfil: 'asa' });
+    const zeradas = secoesDe({ perfil: 'asa', comprimentoDaTampa: 0, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 });
+    expect(JSON.stringify(zeradas)).toBe(JSON.stringify(padrao));
+    expect(padrao[padrao.length - 1].pos[0]).toBeCloseTo(6.4, 9);
+  });
+
+  it('os cantos: cada seção a menos de um raio da ponta perde, em u, o quarto de círculo do raio de cada bordo, e as de antes ficam como estavam', () => {
+    const com = secoesDe(PONTA_DO_AVIAO);
+    const sem = secoesDe({ ...PONTA_DO_AVIAO, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 });
+    const semi = E_DA_PONTA * MM;
+    const [rA, rF] = [0.170, 0.120];
+    const recuo = (x, raio) => { const r = x - (semi - raio); return r <= 0 ? 0 : raio - Math.sqrt(Math.max(0, raio * raio - r * r)); };
+    let aparadas = 0;
+    com.forEach((s, i) => {
+      const x = s.pos[0];
+      const [minCom, maxCom] = extensaoEmU(s);
+      const [minSem, maxSem] = extensaoEmU(sem[i]);
+      expect(minCom - minSem, `seção ${i}, bordo de ataque`).toBeCloseTo(recuo(x, rA), 6);
+      expect(maxSem - maxCom, `seção ${i}, bordo de fuga`).toBeCloseTo(recuo(x, rF), 6);
+      if (recuo(x, rA) > 0 || recuo(x, rF) > 0) aparadas += 1; else expect(JSON.stringify(s)).toBe(JSON.stringify(sem[i]));
+    });
+    expect(aparadas).toBeGreaterThanOrEqual(8);
+    const [minCom, maxCom] = extensaoEmU(com[com.length - 1]);
+    const [minSem, maxSem] = extensaoEmU(sem[sem.length - 1]);
+    expect(minCom - minSem).toBeCloseTo(rA, 7);
+    expect(maxSem - maxCom).toBeCloseTo(rF, 7);
+  });
+
+  it('a espessura (w) das seções não muda com os cantos: só a corda se estreita', () => {
+    const com = secoesDe(PONTA_DO_AVIAO);
+    const sem = secoesDe({ ...PONTA_DO_AVIAO, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 });
+    com.forEach((s, i) => (s.contorno ?? s.corda).forEach(([, w], k) => expect(w).toBe((sem[i].contorno ?? sem[i].corda)[k][1])));
+  });
+
+  it('a ponta do avião a 72 graus com a tampa e os cantos é uma malha fechada, sem órfão e que não se atravessa, e sobe uns 9% da semi-envergadura acima do diedro', () => {
+    const { neutro } = rodar(PONTA_DO_AVIAO);
+    expect(neutro.orfaos ?? []).toEqual([]);
+    expect(malhaAberta(neutro)).toEqual([]);
+    expect(caixasPorParte(neutro).facesSemParte).toEqual([]);
+    expect(atravessamentos(neutro, 'fixa')).toBe(0);
+    const topo = caixasPorParte(neutro).caixas.get('fixa').max[1];
+    const alturaDoDiedro = Math.tan(5.93 * GRAUS) * E_DA_PONTA * MM;
+    expect((topo - alturaDoDiedro) / (E_DA_PONTA * MM)).toBeGreaterThan(0.08);
+    expect((topo - alturaDoDiedro) / (E_DA_PONTA * MM)).toBeLessThan(0.10);
+  });
+
+  it('no teto da faixa o perfil asa (inteira, com aileron), com e sem a tampa e os cantos declarados, continua fechado e sem atravessar', () => {
+    for (const parametros of [{ perfil: 'asa', pontaLevantada: 72 }, { perfil: 'asa', pontaLevantada: 72, comprimentoDaTampa: 0.02, raioDoCantoDeAtaque: 0.04, raioDoCantoDeFuga: 0.03 }]) {
+      const { neutro } = rodar(parametros);
+      expect(neutro.orfaos ?? [], JSON.stringify(parametros)).toEqual([]);
+      expect(malhaAberta(neutro), JSON.stringify(parametros)).toEqual([]);
+      expect(atravessamentos(neutro, 'fixa'), JSON.stringify(parametros)).toBe(0);
+      expect(atravessamentos(neutro, 'comando'), JSON.stringify(parametros)).toBe(0);
+    }
+  });
+
+  it('a restrição ponta-nao-dobra só deixa passar o que não se atravessa: amostras sorteadas de asas, aceitas, ficam fechadas e sem atravessar, e o que ela recusa e se atravessa de fato existe', () => {
+    let semente = 20261015;
+    const sorteio = () => { semente = (semente + 0x6D2B79F5) | 0; let t = Math.imul(semente ^ (semente >>> 15), 1 | semente); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const entre = (a, b) => a + (b - a) * sorteio();
+    let aceitas = 0;
+    let recusadasQueSeAtravessam = 0;
+    for (let k = 0; k < 36; k += 1) {
+      const raiz = entre(0.05, 0.3);
+      const ponta = entre(0.02, raiz);
+      const parametros = {
+        perfil: 'asa', simetria: Math.round(sorteio()), comando: Math.round(sorteio()), cordaNaRaiz: raiz, cordaNaPonta: ponta, espessuraNaRaiz: entre(0.08, 0.2), espessuraNaPonta: entre(0.06, 0.3),
+        curvatura: entre(0, 0.06), torcao: entre(-10, 5), incidenciaNaRaiz: entre(-2, 6), diedro: entre(-5, 10), enflechamento: entre(-10, 30),
+        pontaLevantada: entre(20, 72), extensaoDaPonta: entre(0.02, 0.05), comprimentoDaTampa: sorteio() < 0.5 ? 0 : entre(0.004, 0.03),
+      };
+      const raio = sorteio() < 0.5 ? 0 : Math.min(parametros.extensaoDaPonta, 0.4 * ponta);
+      parametros.raioDoCantoDeAtaque = raio;
+      parametros.raioDoCantoDeFuga = raio / 2;
+      let erro = null;
+      try { rodar(parametros); } catch (e) { erro = e; }
+      /* o encontro das duas metades na raiz de uma asa torcida e enflechada pode se atravessar sem ponta levantada nenhuma: essas amostras não medem a ponta */
+      if (atravessamentos(rodarSemContrato({ ...parametros, pontaLevantada: 0, comprimentoDaTampa: 0, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 }).neutro, 'fixa') > 0) continue;
+      if (!erro) {
+        const { neutro } = rodar(parametros);
+        expect(malhaAberta(neutro), JSON.stringify(parametros)).toEqual([]);
+        expect(atravessamentos(neutro, 'fixa'), JSON.stringify(parametros)).toBe(0);
+        aceitas += 1;
+      } else if (erro.restricao === 'ponta-nao-dobra' && atravessamentos(rodarSemContrato(parametros).neutro, 'fixa') > 0) recusadasQueSeAtravessam += 1;
+    }
+    expect(aceitas).toBeGreaterThanOrEqual(20);
+    expect(recusadasQueSeAtravessam).toBeGreaterThanOrEqual(3);
+  }, 120_000);
+
+  it('uma ponta de 72 graus numa curva de 2% da semi-envergadura com a espessura de 20% se atravessa, e o contrato a recusa', () => {
+    const parametros = { perfil: 'asa', pontaLevantada: 72, extensaoDaPonta: 0.02, espessuraNaPonta: 0.2 };
+    expect(atravessamentos(rodarSemContrato(parametros).neutro, 'fixa')).toBeGreaterThan(0);
+    expect(recusa(parametros).restricao).toBe('ponta-nao-dobra');
+    expect(atravessamentos(rodarSemContrato({ ...parametros, pontaLevantada: 20 }).neutro, 'fixa')).toBe(0);
+  });
+});
+
 /* a incidência de cada seção cheia e o giro do bordo de ataque entre seções vizinhas, medidos nos argumentos que o `derivar` entrega */
 function secoesCheias(parametros) {
   const { argumentos: a } = chamar(F, 'x', parametros);
@@ -350,8 +592,9 @@ describe('a incidência e o bordo de ataque entre as seções', () => {
     const { cheias, incidencia, area } = secoesCheias(ponto('maximo'));
     expect(ponto('maximo')).toMatchObject({ incidenciaNaRaiz: 70, torcao: 60 });
     expect(incidencia(cheias[0])).toBeCloseTo(70, 0);
-    /* a última seção cheia, antes da tampa de 0,42 m da ponta (3% da semi-envergadura de 14 m), está a 97% da envergadura: 70 + 60 x 0,97 */
-    expect(incidencia(cheias.at(-4))).toBeCloseTo(70 + 60 * (1 - 0.42 / 14), 0);
+    /* a última seção cheia, antes da tampa, está onde a curva termina: a tampa do ponto máximo mede 3% da semi-envergadura de 14 m ao longo da
+       tangente de 87 graus (15 de diedro e 72 de ponta) e avança em X só o cosseno disso, 22 mm, e a seção fica a 99,8% da envergadura: 70 + 60 x 0,998 */
+    expect(incidencia(cheias.at(-4))).toBeCloseTo(70 + 60 * (1 - (0.03 * Math.cos(87 * GRAUS) * 14) / 14), 0);
     for (let k = 1; k < cheias.length - 3; k++) expect(incidencia(cheias[k])).toBeGreaterThanOrEqual(incidencia(cheias[k - 1]) - 0.1);
     for (const i of cheias) expect(area(i)).toBeGreaterThan(0);
     /* e a pá do avião, com torção negativa, vai de 52 a 18 graus: a torção negativa subtrai */
@@ -359,16 +602,17 @@ describe('a incidência e o bordo de ataque entre as seções', () => {
     expect(pa.incidencia(pa.cheias.at(-4))).toBeLessThan(pa.incidencia(pa.cheias[0]));
   });
 
-  it('o bordo de ataque gira pouco entre seções vizinhas: 3 graus na pá, 9 na asa e 13 na asa de ponta de 60 graus; no ponto máximo, 10 no trecho reto e 11 na curva', () => {
+  it('o bordo de ataque gira pouco entre seções vizinhas: 3 graus na pá, 9 na asa e 13 na asa de ponta de 60 graus; no ponto máximo (87 graus de inclinação total), 11 no trecho reto e 13 na curva', () => {
     expect(Math.max(...secoesCheias({ perfil: 'pa-de-helice' }).giroDoBordoDeAtaque)).toBeLessThan(3.2);
     expect(Math.max(...secoesCheias({ perfil: 'helice' }).giroDoBordoDeAtaque)).toBeLessThan(3.2);
     expect(Math.max(...secoesCheias({ perfil: 'asa' }).giroDoBordoDeAtaque.slice(1, -2))).toBeLessThan(9);
     expect(Math.max(...secoesCheias({ perfil: 'asa', pontaLevantada: 60 }).giroDoBordoDeAtaque.slice(1, -2))).toBeLessThan(13);
     const { giroDoBordoDeAtaque: g } = secoesCheias(ponto('maximo'));
-    /* a raiz (o degrau do diedro dentro do cubo), o começo da curva (a corda de 3 m contra uma curva de 0,7 m) e a tampa são as exceções medidas */
-    expect(Math.max(...g.slice(1, 7))).toBeLessThan(10);
-    expect(Math.max(...g.slice(10, 17))).toBeLessThan(11);
-    expect(Math.max(...g.slice(7, 10))).toBeLessThan(38);
+    /* a raiz (o degrau do diedro dentro do cubo), o começo da curva (a corda de 3 m contra uma curva de 0,7 m) e a tampa são as exceções medidas;
+       com os 72 graus de ponta do teto (eram 60, e 10, 11 e 38 graus neste ponto) o começo da curva chega a 42 graus e o resto sobe um pouco */
+    expect(Math.max(...g.slice(1, 7))).toBeLessThan(11);
+    expect(Math.max(...g.slice(10, 17))).toBeLessThan(13);
+    expect(Math.max(...g.slice(7, 10))).toBeLessThan(43);
   });
 });
 
@@ -702,6 +946,9 @@ describe('o contrato recusa combinação impossível e valor fora da faixa', () 
     'pas-nao-se-tocam': { perfil: 'helice', pas: 9 },
     'raiz-da-pa-cabe-no-cubo': { perfil: 'helice', comprimentoDoCubo: 0.08 },
     'pa-nao-alarga-para-a-ponta': { perfil: 'helice', cordaDaPaNaPonta: 0.07 },
+    'ponta-nao-dobra': { perfil: 'asa', pontaLevantada: 72, extensaoDaPonta: 0.02, espessuraNaPonta: 0.2 },
+    'canto-cabe-na-ponta': { perfil: 'asa', extensaoDaPonta: 0.03, raioDoCantoDeAtaque: 0.04 },
+    'cantos-cabem-na-corda': { perfil: 'asa', raioDoCantoDeAtaque: 0.05, raioDoCantoDeFuga: 0.05, cordaNaPonta: 0.04 },
   };
   it('há um caso para cada restrição do contrato', () => {
     expect(Object.keys(CASOS).sort()).toEqual(F.contrato.restricoes.map(({ id }) => id).sort());

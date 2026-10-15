@@ -145,7 +145,7 @@
       "unidade": "graus",
       "padrao": 40,
       "minimo": 0,
-      "maximo": 60,
+      "maximo": 72,
       "medio": 20
     },
     "extensaoDaPonta": {
@@ -155,6 +155,30 @@
       "minimo": 0.02,
       "maximo": 0.05,
       "medio": 0.03
+    },
+    "comprimentoDaTampa": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.03,
+      "medio": 0
+    },
+    "raioDoCantoDeAtaque": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.05,
+      "medio": 0
+    },
+    "raioDoCantoDeFuga": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.05,
+      "medio": 0
     },
     "comando": {
       "tipo": "inteiro",
@@ -258,6 +282,21 @@
       "id": "comando-com-extensao",
       "expressao": "inicioDoComando + 0.049 <= fimDoComando",
       "motivo": "o comando ocupa menos de 5% da semi-envergadura, e as duas fendas das pontas e o entalhe passam a ser mais largos que ele"
+    },
+    {
+      "id": "ponta-nao-dobra",
+      "expressao": "(1 - min(pas, 1)) * 0.04 * pontaLevantada * cordaNaPonta * (eixoDeTorcao * sin(max(incidenciaNaRaiz + torcao, 0)) + (1 - eixoDeTorcao) * sin(max(-(incidenciaNaRaiz + torcao), 0)) + (curvatura + espessuraNaPonta / 2) * abs(cos(incidenciaNaRaiz + torcao))) <= (1 - min(pas, 1)) * extensaoDaPonta * (1 - simetria / 2)",
+      "motivo": "a altura da ponta acima do caminho, do lado de dentro da curva (a corda vezes a espessura, a curvatura e a incidência da ponta), passa do raio da curva mais fechada da ponta levantada (a extensão da curva dividida por 1,875 vezes o ângulo em radiano, a inclinação máxima da curva de quinto grau, com 22% de folga), e as seções vizinhas da curva se atravessam pelo lado de dentro; a conta vale para a superfície sem hélice"
+    },
+    {
+      "id": "canto-cabe-na-ponta",
+      "expressao": "max(raioDoCantoDeAtaque, raioDoCantoDeFuga) <= extensaoDaPonta",
+      "motivo": "o raio do canto da ponta, em fração da semi-envergadura, passa da extensão da curva da ponta, e o quarto de círculo do recuo começa no trecho reto da asa, onde há poucas seções, de modo que o canto sai facetado"
+    },
+    {
+      "id": "cantos-cabem-na-corda",
+      "expressao": "raioDoCantoDeAtaque + raioDoCantoDeFuga <= 0.9 * cordaNaPonta * (1 + simetria)",
+      "motivo": "os dois raios dos cantos da ponta, somados, passam de 90% da corda da ponta (a razão da semi-envergadura vira a da envergadura pelo fator 1 mais a simetria), e o recuo do bordo de ataque cruza o do bordo de fuga"
     },
     {
       "id": "pas-ou-nenhuma",

@@ -9,7 +9,8 @@
    primeira face do caminho é horizontal, e a raiz fica no plano de simetria mesmo com diedro) e o trecho até o comando. O comando
    ocupa um trecho de seções com o entalhe, entre duas seções cheias a uma distância de corte do trecho, que são a parede do
    entalhe. Depois do comando, as seções até a curva da ponta, a curva, a tampa (as seções com a espessura vezes o cosseno de um
-   ângulo) e a corda da ponta.
+   ângulo) e a corda da ponta. Com `comprimentoDaTampa` a tampa tem o comprimento declarado ao longo da tangente final, e com os raios dos
+   cantos as seções a menos de um raio da ponta se estreitam em u, como em `geometria.js`.
 
    AS SEÇÕES DO COMANDO. Quatro seções cheias entre as paredes do entalhe, a uma fresta de cada uma, fechadas nas duas pontas numa
    corda a uma espessura de tampa da seção cheia. O contorno do comando é o nariz (o arco) e a parte do perfil atrás do eixo. O do
@@ -18,8 +19,8 @@
 import {
   ANGULOS_DA_TAMPA, ESPESSURA_DA_TAMPA, FAIXA_DO_RAIO, FRACAO_DO_CORTE_NA_ENVERGADURA, FRACAO_MAXIMA_DA_FRESTA_NO_COMANDO, GRAUS,
   INTERVALOS_ATE_A_CURVA, INTERVALOS_DA_RAIZ_AO_COMANDO, INTERVALOS_DO_COMANDO_A_CURVA, INTERVALOS_NO_COMANDO,
-  INTERVALOS_NO_ENTALHE, LADOS_DA_SECAO, LADOS_DO_COMANDO, MINIMO_DO_CORTE, intervalosNaCurva, inverterSuave, contornoComEntalhe, contornoDaSecao, contornoDoComando,
-  dot, mapear, meiaEspessura, norma, plantaDa, pontoDaSecao, primeiroDoGrupoDoEntalhe, quadrosDoLoft, transformarPonto,
+  INTERVALOS_NO_ENTALHE, LADOS_DA_SECAO, LADOS_DO_COMANDO, MINIMO_DO_CORTE, intervalosNaCurva, inverterSuave, aparaOsCantos, contornoComEntalhe, contornoDaSecao,
+  contornoDoComando, dot, mapear, meiaEspessura, norma, plantaDa, pontoDaSecao, primeiroDoGrupoDoEntalhe, quadrosDoLoft, transformarPonto,
 } from './geometria.js';
 
 /** O número de seções de cada `loft` de uma composição, para a composição e os testes contarem o mesmo. */
@@ -48,7 +49,8 @@ export const eixoDoEspelho = (orientacao) => (orientacao === 0 ? 0 : 1);
  * `p` (metro, graus, razões): `semi` (a extensão que o caminho percorre), `deslocamentoDaRaiz` (X da raiz, nas pás),
  * `orientacao`, `simetria`, `cordaNaRaiz`, `cordaNaPonta`, `abaulamentoDaCorda`, `eixo`, `enflechamento`, `diedro`, `torcao`,
  * `incidenciaNaRaiz`, `curvatura`, `posicaoDaCurvatura`, `espessuraNaRaiz`, `espessuraNaPonta`, `bordoDeFuga`, `pontaLevantada`,
- * `extensaoDaPonta`, `comando`, `cordaDoComando`, `inicioDoComando`, `fimDoComando` e `fresta`. `semEixo` dispensa o comando e o eixo (a pá).
+ * `extensaoDaPonta`, `comprimentoDaTampa` (metro ao longo do caminho; zero é a tampa automática em X), `raioDoCantoDeAtaque` e `raioDoCantoDeFuga`
+ * (metro; zero é a ponta sem canto arredondado), `comando`, `cordaDoComando`, `inicioDoComando`, `fimDoComando` e `fresta`. `semEixo` dispensa o comando e o eixo (a pá).
  * Sem `comando` o eixo e as seções do comando existem na mesma, para a porta do eixo da dobradiça marcar onde a dobradiça ficaria.
  */
 export function superficieEmSecoes(p) {
@@ -98,16 +100,20 @@ export function superficieEmSecoes(p) {
     .map(({ x }) => meiaEspessura(xEixo, planta.espessura(x), p.bordoDeFuga) + fresta / planta.corda(x)));
   const primeiroDoGrupo = primeiroDoGrupoDoEntalhe(xEixo, raioMaximo);
 
+  const cantos = { xDaPonta: semi, raioDeAtaque: p.raioDoCantoDeAtaque ?? 0, raioDeFuga: p.raioDoCantoDeFuga ?? 0 };
   const fixa = estacoes.map((e) => {
     const parametros = secaoEm(e.x, e.escalaDeW ?? 1);
     const pos = posicao(e.x);
-    if (e.tipo === 'borda') return { x: e.x, pos, aresta: [transformarPonto({ ...parametros, escalaDeW: 0 }, [1, 0]), transformarPonto({ ...parametros, escalaDeW: 0 }, [0, 0])] };
+    if (e.tipo === 'borda') {
+      const aresta = [transformarPonto({ ...parametros, escalaDeW: 0 }, [1, 0]), transformarPonto({ ...parametros, escalaDeW: 0 }, [0, 0])];
+      return { x: e.x, pos, aresta: aparaOsCantos(aresta, e.x, cantos) };
+    }
     if (e.tipo === 'entalhe') {
       const entalhe = contornoComEntalhe(perfilEm(e.x), parametros, { xEixo, fresta: fresta / planta.corda(e.x), primeiroDoGrupo });
       if (!entalhe) throw new Error(`superfície aerodinâmica: o entalhe do comando não corta o perfil em X = ${e.x} m`);
       return { x: e.x, pos, contorno: entalhe.pontos };
     }
-    return { x: e.x, pos, contorno: contornoDaSecao(perfilEm(e.x), parametros) };
+    return { x: e.x, pos, contorno: aparaOsCantos(contornoDaSecao(perfilEm(e.x), parametros), e.x, cantos) };
   });
 
   /* ----- o comando de cada lado ----- */

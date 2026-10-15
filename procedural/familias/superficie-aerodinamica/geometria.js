@@ -28,6 +28,16 @@
    cosseno de um ângulo até zero, e a última seção é a corda: não há faceta nem quina viva na ponta. A raiz fecha numa
    corda também (ou continua pelo plano de simetria, e a malha é espelhada).
 
+   A TAMPA DECLARADA. Por padrão a tampa mede, em X, a meia espessura da ponta (entre 0,4% e 3% da semi-envergadura), e numa ponta
+   muito levantada ela se alonga no caminho na razão de 1 sobre o cosseno da inclinação (a 78 graus, cinco vezes). Com
+   `comprimentoDaTampa` a tampa mede esse comprimento ao longo da tangente em que a curva termina, as mesmas três seções e a
+   corda a seno de 30, 55, 75 e 90 graus dele, e a superfície continua a terminar em X = semi-envergadura: a curva termina antes
+   o que a tampa avança em X, que é o comprimento vezes o cosseno da inclinação final.
+
+   OS CANTOS DA PONTA. `raioDoCantoDeAtaque` e `raioDoCantoDeFuga` arredondam a ponta vista de cima: cada seção a menos de um
+   raio da ponta perde, em u, um recuo que segue um quarto de círculo em X (zero a um raio da ponta e o raio inteiro na ponta),
+   o do bordo de ataque no lado do ataque e o do bordo de fuga no lado da fuga, e o contorno se escala em u entre os dois.
+
    O COMANDO. O comando (aileron, flap, profundor, leme) é o trecho do bordo de fuga entre `inicioDoComando` e `fimDoComando` da
    semi-envergadura, atrás do eixo da dobradiça, a `cordaDoComando` do bordo de fuga. O nariz do comando é um círculo de raio igual
    à meia espessura do perfil no eixo, centrado na linha de curvatura; a parte fixa tem ali um entalhe, um círculo concêntrico
@@ -130,10 +140,15 @@ export function contornoDoPerfil({ curvatura, posicaoDaCurvatura, espessura, bor
 /** A planta de uma superfície: corda, espessura, torção, deslocamento do eixo e caminho (X, Y) em função de X, em metro. */
 export function plantaDa({
   semi, cordaNaRaiz, cordaNaPonta, abaulamentoDaCorda, espessuraNaRaiz, espessuraNaPonta, incidenciaNaRaiz, torcao, enflechamento, diedro,
-  pontaLevantada, extensaoDaPonta, bordoDeFuga,
+  pontaLevantada, extensaoDaPonta, bordoDeFuga, comprimentoDaTampa: tampaDeclarada = 0,
 }) {
   const metadeDaPonta = 0.5 * espessuraNaPonta * cordaNaPonta;
-  const comprimentoDaTampa = Math.min(Math.max(metadeDaPonta, FRACAO_MINIMA_DA_TAMPA_NA_SEMI * semi), FRACAO_DA_TAMPA_NA_SEMI * semi);
+  const inclinacaoFinal = (diedro + pontaLevantada) * GRAUS;
+  /* a tampa declarada mede o comprimento ao longo da tangente final (com o piso da automática), e avança em X o cosseno dele */
+  const tampaNoCaminho = tampaDeclarada > 0 ? Math.max(tampaDeclarada, FRACAO_MINIMA_DA_TAMPA_NA_SEMI * semi) : 0;
+  const comprimentoDaTampa = tampaNoCaminho > 0
+    ? tampaNoCaminho * Math.cos(inclinacaoFinal)
+    : Math.min(Math.max(metadeDaPonta, FRACAO_MINIMA_DA_TAMPA_NA_SEMI * semi), FRACAO_DA_TAMPA_NA_SEMI * semi);
   const xDoCorte = semi - comprimentoDaTampa;
   const xDaCurva = xDoCorte - extensaoDaPonta * semi;
   const xDoDegrau = FRACAO_DO_DEGRAU_DA_RAIZ * semi;
@@ -150,11 +165,14 @@ export function plantaDa({
     return (soma * h) / 3;
   };
   const alturaNoInicioDaCurva = Math.max(0, xDaCurva - xDoDegrau) * tangenteDoDiedro;
-  const y = (x) => {
+  const alturaDaCurva = (x) => {
     if (x <= xDoDegrau) return 0;
     if (x <= xDaCurva) return (x - xDoDegrau) * tangenteDoDiedro;
     return alturaNoInicioDaCurva + integral(xDaCurva, x);
   };
+  /* com a tampa declarada, depois do fim da curva o caminho é a tangente final, exata, e a tampa fica sobre ela */
+  const alturaNoCorte = tampaNoCaminho > 0 ? alturaDaCurva(xDoCorte) : 0;
+  const y = tampaNoCaminho > 0 ? (x) => (x <= xDoCorte ? alturaDaCurva(x) : alturaNoCorte + (x - xDoCorte) * Math.tan(inclinacaoFinal)) : alturaDaCurva;
   const xi = (x) => x / semi;
   return {
     semi, comprimentoDaTampa, xDoCorte, xDaCurva, xDoDegrau, bordoDeFuga,
@@ -164,6 +182,31 @@ export function plantaDa({
     deslocamento: (x) => x * Math.tan(enflechamento * GRAUS),
     y,
   };
+}
+
+/* ---------- os cantos da ponta ---------- */
+
+/** O recuo, em u, de um canto arredondado visto de cima: zero até `raio` antes da ponta e, dali, o quarto de círculo que chega a `raio` na ponta. */
+export function recuoDoCanto(x, xDaPonta, raio) {
+  if (!(raio > 0)) return 0;
+  const r = x - (xDaPonta - raio);
+  return r <= 0 ? 0 : raio - Math.sqrt(Math.max(0, raio * raio - r * r));
+}
+
+/**
+ * Os pontos [u, w] de uma seção em `x` com a corda encolhida pelos dois recuos: o bordo de ataque (u mínimo) anda para trás e o de fuga
+ * para a frente, e os pontos se escalam em u entre os dois. Devolve os mesmos pontos, sem copiar, se a seção está a mais de um raio da ponta.
+ */
+export function aparaOsCantos(pontos, x, { xDaPonta, raioDeAtaque, raioDeFuga }) {
+  const dAtaque = recuoDoCanto(x, xDaPonta, raioDeAtaque);
+  const dFuga = recuoDoCanto(x, xDaPonta, raioDeFuga);
+  if (dAtaque === 0 && dFuga === 0) return pontos;
+  const us = pontos.map(([u]) => u);
+  const uMin = Math.min(...us);
+  const corda = Math.max(...us) - uMin;
+  const escala = (corda - dAtaque - dFuga) / corda;
+  if (!(escala > 0)) throw new Error(`superfície aerodinâmica: os cantos da ponta (${dAtaque} m e ${dFuga} m) não cabem na corda de ${corda} m em X = ${x} m`);
+  return pontos.map(([u, w]) => [uMin + dAtaque + (u - uMin) * escala, w]);
 }
 
 /* ---------- as seções ---------- */

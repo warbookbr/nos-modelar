@@ -3,7 +3,7 @@
   "familia": "superficie-aerodinamica",
   "versao": "1.0.0",
   "mecanica": {
-    "data": "2026-10-12",
+    "data": "2026-10-15",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -11,6 +11,7 @@
           "bordoDeFuga": 0.002,
           "comando": 0,
           "comandoDiferencial": 0,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.05,
           "comprimentoDoCubo": 0.02,
           "cordaDaPaNaPonta": 0.01,
@@ -36,6 +37,8 @@
           "pas": 0,
           "pontaLevantada": 0,
           "posicaoDaCurvatura": 0.2,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 0,
           "torcao": -60
         },
@@ -48,6 +51,7 @@
           "bordoDeFuga": 0.006,
           "comando": 1,
           "comandoDiferencial": 0,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.2,
           "comprimentoDoCubo": 0.07,
           "cordaDaPaNaPonta": 0.03,
@@ -73,6 +77,8 @@
           "pas": 0,
           "pontaLevantada": 20,
           "posicaoDaCurvatura": 0.4,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 1,
           "torcao": -5
         },
@@ -85,6 +91,7 @@
           "bordoDeFuga": 0.02,
           "comando": 1,
           "comandoDiferencial": 1,
+          "comprimentoDaTampa": 0.03,
           "comprimentoDoCone": 0.5,
           "comprimentoDoCubo": 0.3,
           "cordaDaPaNaPonta": 0.08,
@@ -108,18 +115,24 @@
           "inicioDoComando": 0.85,
           "orientacao": 2,
           "pas": 9,
-          "pontaLevantada": 60,
+          "pontaLevantada": 72,
           "posicaoDaCurvatura": 0.7,
+          "raioDoCantoDeAtaque": 0.05,
+          "raioDoCantoDeFuga": 0.05,
           "simetria": 1,
           "torcao": 60
         },
-        "hash": "sha256:6a816e1d5bc29e1aa0c57e64c9ef909d243f955ed92c69b75d3daa2b710dc7d3",
+        "hash": "sha256:5281d8855552a491c7a2607506a65ee8f2aa0cfede94c8c0580157a886be053a",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 62,
+      "sondas": 68,
       "recusasDeclaradas": [
+        {
+          "ponto": "cordaNaPonta=0.6",
+          "restricao": "ponta-nao-dobra"
+        },
         {
           "ponto": "fimDoComando=0.15",
           "restricao": "comando-com-extensao"
@@ -127,6 +140,10 @@
         {
           "ponto": "pas=9",
           "restricao": "pas-nao-se-tocam"
+        },
+        {
+          "ponto": "torcao=-60",
+          "restricao": "ponta-nao-dobra"
         }
       ]
     },
@@ -141,6 +158,7 @@
           "bordoDeFuga": 0.004,
           "comando": 1,
           "comandoDiferencial": 1,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
           "cordaDaPaNaPonta": 0.02,
@@ -166,6 +184,8 @@
           "pas": 0,
           "pontaLevantada": 40,
           "posicaoDaCurvatura": 0.4,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 1,
           "torcao": -3
         },
@@ -178,6 +198,7 @@
           "bordoDeFuga": 0.004,
           "comando": 1,
           "comandoDiferencial": 0,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
           "cordaDaPaNaPonta": 0.02,
@@ -203,6 +224,8 @@
           "pas": 0,
           "pontaLevantada": 0,
           "posicaoDaCurvatura": 0.4,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 0,
           "torcao": 0
         },
@@ -215,6 +238,7 @@
           "bordoDeFuga": 0.004,
           "comando": 1,
           "comandoDiferencial": 0,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
           "cordaDaPaNaPonta": 0.02,
@@ -240,6 +264,8 @@
           "pas": 0,
           "pontaLevantada": 0,
           "posicaoDaCurvatura": 0.4,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 1,
           "torcao": 0
         },
@@ -252,6 +278,7 @@
           "bordoDeFuga": 0.01,
           "comando": 0,
           "comandoDiferencial": 1,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.12,
           "cordaDaPaNaPonta": 0.02,
@@ -277,6 +304,8 @@
           "pas": 5,
           "pontaLevantada": 0,
           "posicaoDaCurvatura": 0.4,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 0,
           "torcao": -34
         },
@@ -289,6 +318,7 @@
           "bordoDeFuga": 0.01,
           "comando": 0,
           "comandoDiferencial": 1,
+          "comprimentoDaTampa": 0,
           "comprimentoDoCone": 0.24,
           "comprimentoDoCubo": 0.07,
           "cordaDaPaNaPonta": 0.02,
@@ -314,6 +344,8 @@
           "pas": 0,
           "pontaLevantada": 0,
           "posicaoDaCurvatura": 0.4,
+          "raioDoCantoDeAtaque": 0,
+          "raioDoCantoDeFuga": 0,
           "simetria": 0,
           "torcao": -34
         },

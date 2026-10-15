@@ -20,6 +20,13 @@
    atravessar: as pás vizinhas (`pas-nao-se-tocam`, a corda da raiz projetada no plano de rotação contra o perímetro do círculo da
    raiz da pá), a raiz contra o comprimento do cubo (`raiz-da-pa-cabe-no-cubo`) e a ponta não mais larga que a raiz.
 
+   A PONTA. `pontaLevantada` soma ao diedro uma inclinação de até 72 graus, e com o diedro máximo de 15 graus o caminho ainda fica abaixo de 90,
+   onde a tangente do caminho em X diverge (a 78 graus a curva sobe 7,5% da semi-envergadura, a 88 graus 25%). Três medidas da ponta são
+   proporções da semi-envergadura, como `extensaoDaPonta`: `comprimentoDaTampa` (zero é a tampa automática, de meia espessura da ponta em X;
+   acima de zero é o comprimento da tampa ao longo da tangente final, e a superfície termina em X = semi-envergadura), `raioDoCantoDeAtaque` e
+   `raioDoCantoDeFuga` (zero é a ponta de canto vivo; acima de zero o canto é arredondado visto de cima, e o raio não vale na hélice). A restrição
+   `ponta-nao-dobra` impede a ponta cuja altura passa do raio da curva, que se atravessa pelo lado de dentro.
+
    Puro e determinístico: nenhuma leitura de relógio, de sorteio ou de arquivo. */
 import { GRAUS } from './geometria.js';
 import {
@@ -61,6 +68,8 @@ export function derivar(v) {
     enflechamento: v.enflechamento, diedro: v.diedro, torcao: v.torcao, incidenciaNaRaiz: v.incidenciaNaRaiz,
     curvatura: v.curvatura, posicaoDaCurvatura: v.posicaoDaCurvatura, espessuraNaRaiz: v.espessuraNaRaiz, espessuraNaPonta: v.espessuraNaPonta,
     bordoDeFuga: v.bordoDeFuga, pontaLevantada: v.pontaLevantada, extensaoDaPonta: v.extensaoDaPonta,
+    comprimentoDaTampa: (v.comprimentoDaTampa ?? 0) * semi,
+    raioDoCantoDeAtaque: helice ? 0 : (v.raioDoCantoDeAtaque ?? 0) * semi, raioDoCantoDeFuga: helice ? 0 : (v.raioDoCantoDeFuga ?? 0) * semi,
     comando: helice ? 0 : v.comando, cordaDoComando: v.cordaDoComando, inicioDoComando: v.inicioDoComando, fimDoComando: v.fimDoComando,
     fresta: v.fresta, semEixo: helice,
   };
