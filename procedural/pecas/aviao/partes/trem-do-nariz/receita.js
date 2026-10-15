@@ -11,7 +11,9 @@
  * alojamento estão na TABELA como os pontos e as caixas do esboço, e não saem de um encaixe de porta da montagem v5. O resto do trem
  * sai do pivô: a perna desce `tnLb` até o fim do barril, `tnLc` até a coroa e `tnL` até o centro da roda, e o garfo, o eixo, o compasso
  * e a alavanca se medem a partir desses pontos, com as expressões do esboço na pose baixada (curso 0, em que o seno do curso é zero e o
- * cosseno é um). O recolhimento do esboço não entra: a receita é só a pose baixada.
+ * cosseno é um), menos a descida do pé do trem, que a decisão de 2026-10-15 tira do chão: a roda fica a um raio de pneu do chão (y 0) e o
+ * pistão alonga os 17 mm que o esboço deixava entre o pé do pneu e o chão. O recolhimento do esboço não entra: a receita é só a pose
+ * baixada.
  *
  * Todo cilindro do esboço é um `extrusao` de um círculo entre os dois pontos dele. O que segue um eixo (x, y ou z) nasce direto nele,
  * com a base no menor dos dois extremos; o que não segue (o atuador, em y e z, e os dois braços do compasso, nos três eixos) nasce em
@@ -20,7 +22,7 @@
  * orelha do atuador são caixas de canto arredondado, todas extrudadas em y.
  *
  * A roda é a chamada da família `roda-pneu` com o perfil `carro` e os parâmetros do esboço (o diâmetro do pneu, a largura e o desvio
- * zero), expandida aqui dentro dos PASSOS. A família a gera no centro, com o eixo em x, e o esboço a põe no ponto `tnW` com a rotação
+ * zero) mais o furo central do diâmetro do eixo, expandida aqui dentro dos PASSOS. A família a gera no centro, com o eixo em x, e o esboço a põe no ponto `tnW` com a rotação
  * `[0, tnEixoY, tnEixoZ]`, que na pose baixada é nula; a receita faz o mesmo com `transladar`. Da expansão ficam as quatro formas
  * (pneu, aro, cubo e chapa), o material e o sólido, e saem as quatro partes da família, porque a receita nomeia a roda inteira como
  * `rodaNariz` (o alias `rodaInteira` junta as quatro), e as três portas, que a família publica no centro local e que a pose deixaria
@@ -84,10 +86,10 @@ export const TABELA = {
   garfo: { diametro: 34 },
   eixoRoda: { diametro: 30, passa: 40 },
   /* A roda: o perfil da família e os três ajustes do esboço (`diametroPneu` é `tnDRoda`, a largura é a razão do diâmetro, e o desvio
-     zero põe o cubo no meio do aro). O resto é o do perfil `carro`. */
+     zero põe o cubo no meio do aro). O resto é o do perfil `carro`, menos o furo central do cubo, que tem o diâmetro do eixo da roda
+     (`diametroFuroCentral` da família, em fração do pneu, sai de `eixoRoda.diametro`): a roda assenta no eixo, e o esboço deixava 4,3 mm
+     de folga em volta dele. */
   roda: { perfil: 'carro', diametroPneu: 364, larguraPneu: 0.36, desvio: 0 },
-  /* O furo central do cubo tem o diâmetro do eixo da roda (a razão `diametroFuroCentral` da família, em fração do pneu, sai de
-     `eixoRoda.diametro`), e a roda assenta nele; o esboço deixa 4,3 mm de folga em volta do eixo. */
   /* O pivô: o eixo vai `meio` para cada lado de `pivo`, e cada mancal é a caixa [largura em x, altura em y, profundidade em z] de canto
      arredondado `raio`, a `x` do pivô para cada lado. */
   eixoPivo: { diametro: 34, meio: 222 },
