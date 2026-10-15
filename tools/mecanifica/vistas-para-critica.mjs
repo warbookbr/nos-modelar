@@ -36,7 +36,9 @@ const SAIDA_PADRAO = join(REPO, 'tools/bancadas/out');
    checagem de câmera da bancada reclama disso. */
 export const RES_CONJUNTO = '1100x1450';
 export const RES_PARTE = '900x900';
-export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,superior';
+/* As duas laterais, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a porta à
+   esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
+export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,esquerda,superior';
 export const VISTAS_DA_PARTE = 'direita,isometrica';
 export const VISTAS_DO_ARAME = 'isometrica,traseira';
 
