@@ -1009,7 +1009,7 @@
 
 ## procedural/pecas/aviao/partes/fuselagem/
 
-- `receita.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral.
+- `receita.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral.
 
 ## procedural/pecas/aviao/partes/fuselagem/rodadas/
 
