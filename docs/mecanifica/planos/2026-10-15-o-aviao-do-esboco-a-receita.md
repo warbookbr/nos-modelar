@@ -122,7 +122,10 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    próximo objeto: a receita planejada gerada da unidade do esboço, com o plano, o `REFINA`,
    os contatos e o alvo novo; e a comparação do modelo com a referência real na mesma escala.
 3. **A montagem e o aceite.** O avião inteiro no núcleo, a auditoria de interseções,
-   o crítico contra as referências e o esboço, e a aprovação da pessoa na bancada.
+   o crítico contra as referências e o esboço, e a aprovação da pessoa na bancada. A
+   auditoria mede também o apoio no chão: os dois trens saíram do esboço com as rodas
+   17 mm acima dele, os dois críticos as deram no chão porque a vista montada não o
+   desenha, e nenhum gate mede apoio.
 4. **Fechamento.** O custo, os achados e a bateria completa.
 
 ## Riscos e parada
