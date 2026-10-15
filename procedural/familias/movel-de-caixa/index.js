@@ -3,13 +3,13 @@
    para conferir o curso de cada porta e de cada gaveta; quem só chama a família por `chamar` recebe o corpo, as portas e as
    gavetas fechadas numa peça só. O perfil `roupeiro` é o roupeiro de portas de abrir embutidas que a família tinha antes de
    ganhar gavetas, portas sobrepostas, pés e vão aberto. */
-import { readFileSync } from 'node:fs';
+import contratoJson from './familia.json' with { type: 'json' };
 import { definirFamilia } from '../../../src/autoria/chamar-familia.js';
 import { COMPOSICOES } from './composicoes.js';
 import { derivar } from './derivar.js';
 import { montarMovel } from './montagem.js';
 
-export const CONTRATO_DO_MOVEL_DE_CAIXA = JSON.parse(readFileSync(new URL('./familia.json', import.meta.url), 'utf8'));
+export const CONTRATO_DO_MOVEL_DE_CAIXA = contratoJson;
 
 const definida = definirFamilia({ contrato: CONTRATO_DO_MOVEL_DE_CAIXA, composicoes: COMPOSICOES, derivar });
 
