@@ -1,0 +1,1097 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-horizontal",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/empenagem-horizontal-composta.png",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Modelo reproduz o alvo em planta, diedro, vão, eixo e suportes. O alvo é que se afasta do real (afilamento, recorte da ponta, bordo de fuga). Junção com a cauda ilegível nas vistas do conjunto."
+  },
+  "partes": [
+    {
+      "nome": "estabilizadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "estabilizadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o plano omitia pares que o esboço mostra (eixo com estabilizador, suportes com profundor, suporte 3 com eixo), e o modelador os declarou nos contatos, tirados da interseção dos sólidos do esboço",
+    "o profundorE dá 0,977 contra 0,9998 do D porque o quadrilátero não planar do profundor ganha a outra diagonal no espelho quando a razão o triangula; no esboço o E é espelho exato do D",
+    "o crítico achou o esboço diferente da referência real em três pontos (afilamento maior, recorte da ponta maior e um compensador no bordo de fuga do profundor), que vão à pessoa"
+  ],
+  "notaDePassagem": "Eixo e suportes seguem a dobradiça da seção 0 do profundor; o vão recua a fresta em x no degrau; o suporte segue a curva suave do esboço (trechos 2, 1, 2); os contatos vêm da interseção dos sólidos do esboço.",
+  "receita": {
+    "sha256": "sha256:5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 547,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * suportes, na pose de pouso, com os profundores neutros."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Quinta etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * `empenagem-horizontal` do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * e `aviao-detalhe-empenagem-horizontal.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * forma do lado direito (D) tem a do esquerdo (E) espelhada em x: a receita monta o lado D e o espelha com `espelha` antes de nomear"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * as partes, porque a cópia herda o nome da fonte. A TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * só em `derivar`. A fuselagem não publica porta, e por isso a raiz do estabilizador (o ponto de encaixe `estX0`, `estYc0` e `estZq0`"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * do esboço) está na TABELA como o ponto do esboço, e não sai de um vínculo de medida nem de um encaixe de porta da montagem v5."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * A metade do estabilizador é a chamada da família `superficie-aerodinamica` com o perfil `estabilizador` e os parâmetros do esboço,"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * expandida aqui dentro dos PASSOS. A família gera a semi-superfície na pose dela, com a raiz na origem (o ponto do eixo de torção a"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * 25% da corda, que é o da porta `raiz`) e a envergadura em +x, e o esboço a põe com a raiz no ponto de encaixe; a receita faz o"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * mesmo com `transladar`. Da expansão fica só o `loft`, com a identidade que esta receita lhe dá, e saem a parte `fixa`, o material,"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * o sólido e o liso, porque a receita nomeia as partes depois de recortá-las, e as duas portas, que a família publica no quadro local."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * O vão do profundor é o próprio profundor engrossado pela fresta (`subtrai` com `folga` no esboço): o contorno de cada seção é"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * deslocado para fora pela fresta, com a quina em esquadria. As duas extremidades avançam a fresta em x, com o contorno prolongado"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * na reta que une as duas seções vizinhas. O profundor tem um degrau a 2236 mm, onde a dobradiça recua de z 9810 para z 9640 e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * ponta da superfície fica com a corda maior; a parede do degrau olha para -x e o vão a acompanha recuada a fresta em x, de modo que"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * as seções do vão no degrau ficam a uma fresta antes das do profundor."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * O profundor é um `loft` em x de quatro seções de sete pontos, como no esboço. O loft só fecha uma ponta com um polo de raio zero, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * o polo nasce no eixo, a `tampa.avanco` além da seção, e `moveV` o leva ao centro dela, de modo que cada ponta é um leque quase"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * plano. O eixo é uma extrusão de um círculo em x, girada em z para a reta da dobradiça, e os suportes são lofts em z de quatro"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * seções de retângulo de cantos arredondados, fechados do mesmo modo. Os suportes seguem a curva suave que o esboço passa pelas"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * quatro seções (`suporte.trechos`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * Os contatos declarados são os que o esboço mostra, medidos pela interseção dos sólidos das formas dele. Os pontos declarados"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * (`PONTOS`) medem a caixa de cada parte contra a TABELA e a malha da família, sem passar pelos passos."
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "import { nucleo } from '../../../../../nucleo/entrada.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "const LADOS = [['D', 'd', 'direito'], ['E', 'e', 'esquerdo']];"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "const porLado = (fazer) => LADOS.flatMap(([L, l, nome]) => fazer(L, l, nome));"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "const VOLUMES = Object.fromEntries(porLado((L, l) => ["
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  [`estabilizador${L}`, `estabilizador-${l}`], [`profundor${L}`, `profundor-${l}`], [`eixoProfundor${L}`, `eixo-profundor-${l}`],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  ...[1, 2, 3].map((n) => [`suporteProfundor${n}${L}`, `suporte-profundor${n}-${l}`]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "const PARTES = Object.keys(VOLUMES);"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* O estabilizador: os parâmetros `est*` do esboço. `raiz` é o ponto de encaixe (`estX0`, `estYc0` e o z a 25% da corda da raiz,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "     `estZq0`); `envergadura` é `estEnv` e também o `estB` em que as frações do profundor e dos suportes se medem; `subida` é o `estDY`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "     quanto a linha dos 25% da corda sobe da raiz à ponta, que o profundor, o eixo e os suportes seguem. As cordas, em milímetro, são"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     as da raiz e as da ponta, e as espessuras são as relativas da família. `bordoDeFuga` são os z do bordo de fuga na raiz e na ponta"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "     (`estTE0` e `estTE1`), de onde sai o comprimento do profundor. `fresta` é a folga do vão do profundor em volta dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  estabilizador: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    raiz: [190, 2085, 9380],"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    envergadura: 2200,"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    cordaNaRaiz: 1212,"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    cordaNaPonta: 736,"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    enflechamento: 3.59,"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    diedro: 7.4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    torcao: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    incidenciaNaRaiz: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    espessuraNaRaiz: 0.095,"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    espessuraNaPonta: 0.09,"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    subida: 286,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    bordoDeFuga: [10289, 10070],"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    fresta: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  /* O profundor: quatro seções, nos x de `x`, cada uma com o z da dobradiça (`dobradica`, a ponta do nariz) e a espessura (`espessura`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "     O comprimento de cada seção vai da dobradiça ao bordo de fuga do estabilizador naquele x, e o centro do contorno acompanha a linha"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "     do estabilizador. O contorno é o de sete pontos do esboço: o nariz é o arco de 45 graus (`nariz`, em fração da espessura) e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "     bordo de fuga tem `meiaEspessuraDoBordoDeFuga` para cada lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  profundor: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    x: [190, 2236, 2250, 2385],"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    dobradica: [9810, 9810, 9640, 9640],"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    espessura: [88, 49, 66, 63],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    nariz: [0.1465, 0.3535],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    meiaEspessuraDoBordoDeFuga: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  /* O eixo é a haste de `diametro` entre os x de `x`, sobre a linha do estabilizador, `aFrente` antes da dobradiça da primeira seção"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "     do profundor, em `lados` lados. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  eixo: { x: [215, 2215], aFrente: 6, diametro: 30, lados: 48 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  /* Os suportes ficam nos x de `x`, `abaixo` da face de baixo do profundor naquele x. A espessura do profundor ali é a reta entre"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "     `profundor.espessura[0]` e `profundor.espessura[1]` na fração do estabilizador, como no esboço. Cada suporte é um loft em z por"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "     `secoes`: `recuo` é a posição em z em relação à dobradiça da primeira seção do profundor, `tamanho` é [largura em x, altura em y]"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     do retângulo, `cantos` é o raio do canto e `subida` é o deslocamento do centro em y em relação à linha de baixo do profundor."
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "     `segmentosDoCanto` são os segmentos do arco de cada canto, os 12 que o esboço usa. O esboço declara o suporte `suave`: uma curva"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     de tangente contínua passa pelas quatro seções. `trechos` diz em quantos trechos a receita divide cada vão entre duas seções (um"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "     número por vão, três ao todo) para o loft seguir essa curva em vez de ligar as seções por troncos retos; 2, 1 e 2 dão as seis"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "     estações que o esboço usa no suporte 1, uma a mais que as cinco do 2 e do 3. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  suporte: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    x: [600, 1300, 1950],"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    abaixo: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    secoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "      { recuo: -230, tamanho: [58, 26], cantos: 12, subida: 4 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "      { recuo: -90, tamanho: [64, 44], cantos: 20, subida: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "      { recuo: 30, tamanho: [58, 40], cantos: 18, subida: 4 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "      { recuo: 210, tamanho: [26, 14], cantos: 6, subida: 22 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    segmentosDoCanto: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    trechos: [2, 1, 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  /* `avanco` é quanto o polo de cada loft fica além da seção. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  tampa: { avanco: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "const GRAUS = Math.PI / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "const mAll = (v) => v.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "const registroDeFamilias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "/* O ponto da reta que passa por (xa, a) e (xb, b), em x. Serve para interpolar e para prolongar além das duas pontas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "const naReta = (a, xa, b, xb, x) => a.map((p, k) => ["
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  p[0] + ((b[k][0] - p[0]) * (x - xa)) / (xb - xa),"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  p[1] + ((b[k][1] - p[1]) * (x - xa)) / (xb - xa),"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "/* O contorno de sete pontos do profundor em uma seção, [z, y] em mm, anti-horário em (z, y): o topo do nariz, o arco, a ponta do"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "   nariz, o arco de baixo, a base do nariz e as duas pontas do bordo de fuga. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "function contornoDoProfundor(t, s) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const [n1, n2] = t.profundor.nariz;"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const b = t.profundor.meiaEspessuraDoBordoDeFuga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "    [s.dobradica + 0.5 * s.T, s.yc + 0.5 * s.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    [s.dobradica + n1 * s.T, s.yc + n2 * s.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "    [s.dobradica, s.yc],"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    [s.dobradica + n1 * s.T, s.yc - n2 * s.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    [s.dobradica + 0.5 * s.T, s.yc - 0.5 * s.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    [s.dobradica + s.L, s.yc - b],"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    [s.dobradica + s.L, s.yc + b],"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "/* O contorno deslocado `d` para fora, com a quina em esquadria: cada vértice anda `d` pela soma das normais das duas arestas, dividida"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "   por um mais o produto escalar delas. O contorno é anti-horário em (z, y), e a normal de fora de uma aresta (ex, ey) é (ey, -ex). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "function deslocarContorno(pontos, d) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  const n = pontos.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  const normal = (a, b) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    const ex = b[0] - a[0]; const ey = b[1] - a[1]; const l = Math.hypot(ex, ey);"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    return [ey / l, -ex / l];"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  return pontos.map((p, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    const antes = normal(pontos[(i + n - 1) % n], p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    const depois = normal(p, pontos[(i + 1) % n]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    const k = d / (1 + antes[0] * depois[0] + antes[1] * depois[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    return [p[0] + k * (antes[0] + depois[0]), p[1] + k * (antes[1] + depois[1])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "/* O retângulo de cantos arredondados centrado em (cx, cy), anti-horário em (x, y), com `segmentos` segmentos por canto: os pontos de"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "   cada canto a partir do de baixo à direita, de -90 a 0 graus e assim por diante. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "function retanguloArredondado([largura, altura], raio, segmentos, [cx, cy]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  const r = Math.min(raio, largura / 2, altura / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  const cantos = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    [largura / 2 - r, -altura / 2 + r, -90], [largura / 2 - r, altura / 2 - r, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    [-largura / 2 + r, altura / 2 - r, 90], [-largura / 2 + r, -altura / 2 + r, 180],"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  return cantos.flatMap(([ox, oy, a0]) => Array.from({ length: segmentos + 1 }, (_, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    const a = (a0 + (90 * i) / segmentos) * GRAUS;"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    return [cx + ox + r * Math.cos(a), cy + oy + r * Math.sin(a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "/* A cúbica de Hermite por trechos com a tangente de Fritsch e Carlson (a do PCHIP), a mesma que o esboço passa pelas seções de um loft"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "   `suave`: passa por todos os valores, tem tangente contínua neles e não passa do valor de nenhuma seção entre duas vizinhas. Devolve"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "   as posições e os valores nas seções e nas estações entre elas, `trechos[k]` trechos no vão k. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "function curvaSuave(posicoes, valores, trechos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  const n = posicoes.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  if (trechos.length !== n - 1) throw new Error(`suporte: ${n} seções pedem ${n - 1} números em trechos, e a TABELA traz ${trechos.length}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  const h = posicoes.slice(1).map((p, k) => p - posicoes[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  const d = valores.slice(1).map((v, k) => (v - valores[k]) / h[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  const interna = (h0, h1, d0, d1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "    if (d0 * d1 <= 0) return 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    const a = 2 * h1 + h0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    const b = h1 + 2 * h0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    return (a + b) / (a / d0 + b / d1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "  const daPonta = (h0, h1, d0, d1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "    const t = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "    if (Math.sign(t) !== Math.sign(d0)) return 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    if (Math.sign(d0) !== Math.sign(d1) && Math.abs(t) > 3 * Math.abs(d0)) return 3 * d0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "    return t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "  const tangente = valores.map((_, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "    if (k === 0) return daPonta(h[0], h[1], d[0], d[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    if (k === n - 1) return daPonta(h[n - 2], h[n - 3], d[n - 2], d[n - 3]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "    return interna(h[k - 1], h[k], d[k - 1], d[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  const saida = { posicoes: [], valores: [] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "  for (let k = 0; k < n - 1; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "    const quantos = trechos[k];"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "    if (!Number.isInteger(quantos) || quantos < 1) throw new Error(`suporte: trechos[${k}] precisa ser inteiro maior ou igual a 1`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    for (let j = 0; j < quantos; j++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "      const t = j / quantos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "      const [h00, h10, h01, h11] = [2 * t ** 3 - 3 * t ** 2 + 1, t ** 3 - 2 * t ** 2 + t, -2 * t ** 3 + 3 * t ** 2, t ** 3 - t ** 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "      saida.posicoes.push(posicoes[k] + t * h[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "      saida.valores.push(h00 * valores[k] + h10 * h[k] * tangente[k] + h01 * valores[k + 1] + h11 * h[k] * tangente[k + 1]);"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
