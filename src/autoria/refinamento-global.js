@@ -132,10 +132,13 @@ function alongamentoMm(valor, quem, parte) {
   return Object.fromEntries(LADOS_DO_ENVELOPE.filter((lado) => Object.hasOwn(valor, lado)).map((lado) => [lado, valor[lado]]));
 }
 
-function motivoDoAfastamento(valor, quem, parte, afasta) {
+function motivoDoAfastamento(valor, quem, parte, afasta, comMinimo) {
   if (!afasta) {
-    if (valor !== undefined) falhar(quem, `'formas.${parte}.motivo' só acompanha 'deslocamento' ou 'alongamento', que ele explica.`);
-    return undefined;
+    /* o mínimo próprio de uma forma mudada de propósito (a ponta mais estreita que a pessoa pediu) pode dizer o motivo, que o pedido ao
+       crítico mostra; sem deslocamento, alongamento nem mínimo, o motivo não explica nada e é recusado */
+    if (valor !== undefined && !comMinimo) falhar(quem, `'formas.${parte}.motivo' só acompanha 'deslocamento', 'alongamento' ou 'minimo', que ele explica.`);
+    if (valor !== undefined && (typeof valor !== 'string' || !valor.trim())) falhar(quem, `'formas.${parte}.motivo' precisa ser texto não vazio; recebeu ${exibir(valor)}.`);
+    return valor === undefined ? undefined : valor.trim();
   }
   if (typeof valor !== 'string' || !valor.trim()) {
     falhar(quem, `'formas.${parte}' declara deslocamento ou alongamento e precisa dizer o 'motivo' (texto não vazio): quem lê o relatório precisa saber por que a parte se afasta do esboço; recebeu ${exibir(valor)}.`);
@@ -145,7 +148,10 @@ function motivoDoAfastamento(valor, quem, parte, afasta) {
 
 /** O afastamento declarado de uma entrada canônica de `esboco.formas` (`deslocamento`, `alongamento`, `motivo`), ou `{}` quando não há. */
 export function afastamentoDaParte(entrada) {
-  if (!entrada || (entrada.deslocamento === undefined && entrada.alongamento === undefined)) return {};
+  if (!entrada) return {};
+  if (entrada.deslocamento === undefined && entrada.alongamento === undefined) {
+    return entrada.motivo !== undefined && entrada.minimo !== undefined ? { minimo: entrada.minimo, motivo: entrada.motivo } : {};
+  }
   return {
     ...(entrada.deslocamento === undefined ? {} : { deslocamento: entrada.deslocamento }),
     ...(entrada.alongamento === undefined ? {} : { alongamento: entrada.alongamento }),
@@ -158,7 +164,10 @@ export const vetorTexto = (v) => `[${v.map((x) => Number(x.toFixed(3))).join(', 
 
 /** O afastamento em texto para o relatório: `deslocada [0, -17, 0] mm, alonga -y 17 mm, motivo: ...`. Vazio quando a parte não se afasta. */
 export function textoDoAfastamento(afastamento) {
-  if (!afastamento || (afastamento.deslocamento === undefined && afastamento.alongamento === undefined)) return '';
+  if (!afastamento || afastamento.motivo === undefined) return '';
+  if (afastamento.deslocamento === undefined && afastamento.alongamento === undefined) {
+    return `forma mudada de propósito, com razão mínima própria de ${String(afastamento.minimo).replace('.', ',')}; motivo: ${afastamento.motivo}`;
+  }
   const partes = [];
   if (afastamento.deslocamento !== undefined) partes.push(`deslocada ${vetorTexto(afastamento.deslocamento)} mm`);
   if (afastamento.alongamento !== undefined) partes.push(`passa do volume ${Object.entries(afastamento.alongamento).map(([lado, mm]) => `${lado} ${numeroMm(mm)}`).join(', ')}`);
@@ -198,7 +207,7 @@ export function normalizarEsbocoDoRefinamento(valor, { quem = 'REFINA.esboco' } 
       }
     }
     const afasta = item.deslocamento !== undefined || item.alongamento !== undefined;
-    const motivo = motivoDoAfastamento(item.motivo, quem, parte, afasta);
+    const motivo = motivoDoAfastamento(item.motivo, quem, parte, afasta, item.minimo !== undefined);
     return {
       parte,
       formas: formasDaParte(item.formas, quem, parte),

@@ -1,0 +1,710 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-vertical",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-empenagem-vertical/alvo/aviao-unidade-empenagem-vertical-composta.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "dorsal",
+        "tipo": "superficie",
+        "onde": "frente da dorsal, na junção com o bordo de ataque da deriva, perto da raiz",
+        "sentido": "segmentado",
+        "evidencia": "Esquerda e direita montadas: lóbulo de cerca de 200 mm sai da diagonal do bordo de ataque; isométrica mostra face frontal quase vertical. O alvo não tem esse corte."
+      }
+    ],
+    "observacao": "Deriva, leme, eixo e seis dobradiças batem com o alvo nos cortes; o único achado fora do declarado é o degrau da frente da dorsal contra a deriva."
+  },
+  "partes": [
+    {
+      "nome": "deriva",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dorsal",
+      "confere": true,
+      "observacao": "lisa como o plano da rodada pede; razão de volume 0,63 contra o esboço, declarada com alongamento em x e mínimo 0,6"
+    },
+    {
+      "nome": "leme",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoLeme",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a fuselagem não publica porta do dorso: o y do dorso da dorsal está na TABELA, medido da malha da fuselagem",
+    "o plano da dorsal mudou na rodada de ajustes e o texto dela no PLANO da receita foi reescrito",
+    "Atribuição (modelador): o filete da dorsal termina numa parede vertical contra o bordo de ataque da deriva; a medição não pega degrau entre partes, só o crítico."
+  ],
+  "notaDePassagem": "Dorsal: filete côncavo do dorso até a crista, sem a ponta saliente do esboço. O alongamento de 87,5 mm em x e o mínimo 0,6 vêm da base de até 300 mm; se o dorso da fuselagem mudar, refaça o y do dorso na TABELA. Vão do leme sem deslocamento. A raiz da deriva ainda começa 7,86 mm acima de y0, e não testei se ainda é preciso.",
+  "receita": {
+    "sha256": "sha256:7ae5795407154b3f2c5d6fbfe97ef16259281ee9b3c674be6c5bb41d0c0677ad",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 45,
+      "acrescentadas": 78,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 25,
+          "texto": " * A booleana do núcleo recalcula cada canto novo pelos planos das faces de entrada, e a casca da família tem faces empenadas e quase"
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": " * coplanares (a 0,03 a 0,8 grau uma da outra), de modo que o canto que um corte faz sobre uma aresta da casca pode"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": " * sair a 10 mm ou a metros da peça. A família começa a superfície com uma faixa de 7,86 mm entre a seção da raiz e a seguinte, e o canto"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": " * que o vão faz sobre a aresta entre essa faixa e a de cima sai a 250 mm da peça com o vão em qualquer lugar até 8 mm do esboço. A caixa"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": " * da raiz corta, então, na segunda seção da família, e a deriva começa 7,86 mm acima de `y0`."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * A família começa a superfície com uma faixa de 7,86 mm entre a seção da raiz e a seguinte, e a caixa da raiz corta na segunda seção"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * da família: a deriva começa 7,86 mm acima de `y0`."
+        },
+        {
+          "tipo": "-",
+          "linha": 34,
+          "texto": " * das seções. No degrau do topo (de y 3896 a 3950, com 238 mm em z para 54 mm em y) a face do vão é quase horizontal, e o contorno"
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": " * deslocado 12 mm a deixaria a 3 mm do leme, onde o esboço deixa 12 mm. Com as quatro seções do vão onde o contorno deslocado as põe,"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": " * o canto que o vão faz sobre a pele da deriva junto do degrau sai a 11 mm do lugar e atravessa o leme. `deslocamentoDoVao` leva cada"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": " * seção do vão em z e em y, e com os valores da TABELA nenhum canto passa de 0,2 mm da superfície: a seção do degrau aceita de -7 a -10"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": " * mm em z, a do topo de -1,5 a -3, e a de cima do degrau qualquer valor de -3 a -20 em y, que leva a fresta do degrau de 3 a 10 mm. A"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": " * fresta fica entre 10 e 14 mm ao longo do leme e em 19 mm junto do degrau. Os pontos declarados medem a caixa da deriva, e o contato"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": " * entre a deriva e o leme acusa o deslocamento que deixar de valer."
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * das seções. As quatro seções do vão ficam onde esse contorno as põe, sem deslocamento próprio. A fresta fica em 12 mm ao longo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * leme. Os pontos declarados medem a caixa da deriva, e o contato entre a deriva e o leme acusa o vão que deixar de valer."
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": " * dorsal é um loft em z de retângulos de cantos arredondados, `suave` no esboço: uma curva de tangente contínua (cúbica de Hermite com"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": " * a tangente de Fritsch e Carlson, a do PCHIP, que não passa do valor de nenhuma seção) passa pelas seções, e a receita a avalia em"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": " * estações a mais entre elas. As dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * dorsal é um loft em z, `suave` no esboço: uma curva de tangente contínua (cúbica de Hermite com a tangente de Fritsch e Carlson, a"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * do PCHIP, que não passa do valor de nenhuma seção) passa pelas seções, e a receita a avalia em estações a mais entre elas. A seção"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * da dorsal não é o retângulo do esboço: é o dorso da fuselagem subindo até a deriva, com a crista em meia elipse e um filete côncavo"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * de cada lado até a base, e por isso a dorsal passa do volume do esboço em x e declara o `alongamento` e o `motivo` em `REFINA`. As dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não"
+        },
+        {
+          "tipo": "-",
+          "linha": 62,
+          "texto": "  deriva: 'deriva.fin', dorsal: 'deriva.dorsal', leme: 'leme', eixoLeme: 'eixoLeme',"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  deriva: 'deriva.fin',"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  dorsal: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    formas: 'deriva.dorsal',"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    minimo: 0.6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    alongamento: { '+x': 87.5, '-x': 87.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    motivo: 'a dorsal lisa pedida na rodada de ajustes: o dorso sobe até a deriva por um filete côncavo de até 300 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,63 pela largura a mais',"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  leme: 'leme', eixoLeme: 'eixoLeme',"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "     arco de 45 graus) e o bordo de fuga de `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do leme, e"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "     `deslocamentoDoVao` o deslocamento [em z, em y], em milímetro, de cada uma das quatro seções do vão: a que passa da raiz da"
+        },
+        {
+          "tipo": "-",
+          "linha": 89,
+          "texto": "     deriva, a do degrau (`vYb`), a de cima do degrau (`vYe`) e a que passa do topo do leme. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     arco de 45 graus) e o bordo de fuga de `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do leme. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "    deslocamentoDoVao: [[0, 0], [-8, 0], [0, -9], [-2, 0]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 102,
+          "texto": "  /* A dorsal: uma estação por linha, [z, largura em x, altura em y, raio do canto, y do centro]; o x do centro é zero. `subdivisoes` é"
+        },
+        {
+          "tipo": "-",
+          "linha": 103,
+          "texto": "     quantas estações a curva suave passa a ter entre duas seções, e `segmentosPorCanto` os segmentos de cada canto arredondado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  /* A dorsal lisa: o dorso da fuselagem subindo até a deriva. Uma estação por linha, [z, y do dorso da fuselagem naquele z, largura da"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "     crista, subida da crista acima do dorso, largura da base]; o x do centro é zero. O y do dorso é o topo da fuselagem em x = 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "     medido na malha dela (a fuselagem não publica porta, e o dorso é plano até uns 150 mm de cada lado do centro). A seção sobe da"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "     base, que assenta `assenta` abaixo do dorso e desce em parede até `fundo` abaixo dele, por um filete côncavo (um quarto de elipse,"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "     horizontal no dorso e vertical na crista) até a crista, que é uma meia elipse. `subdivisoes` é quantas estações a curva suave"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "     passa a ter entre duas seções, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 106,
+          "texto": "      [6960, 24, 48, 11, 2321],"
+        },
+        {
+          "tipo": "-",
+          "linha": 107,
+          "texto": "      [7300, 70, 140, 33, 2339],"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "      [7700, 100, 228, 48, 2357],"
+        },
+        {
+          "tipo": "-",
+          "linha": 109,
+          "texto": "      [8100, 125, 342, 60, 2394],"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "      [8300, 80, 420, 38, 2430],"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "      [6960, 2323, 20, 2, 60],"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "      [7300, 2294, 40, 60, 240],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      [7700, 2268, 60, 170, 300],"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      [8100, 2248, 80, 317, 260],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "      [8300, 2241, 80, 399, 150],"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    assenta: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    fundo: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    fracaoDoFundo: 0.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 113,
+          "texto": "    segmentosPorCanto: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    passosDoArco: 4,"
+        },
+        {
+          "tipo": "-",
+          "linha": 219,
+          "texto": "  const [base, b, e, topo] = t.leme.deslocamentoDoVao;"
+        },
+        {
+          "tipo": "-",
+          "linha": 220,
+          "texto": "  const desloca = ({ y, pontos }, [dz, dy]) => ({ y: y + dy, pontos: pontos.map(([x, z]) => [x, z + dz]) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 222,
+          "texto": "    desloca({ y: de, pontos: prolonga(0, 1, de) }, base),"
+        },
+        {
+          "tipo": "-",
+          "linha": 223,
+          "texto": "    desloca({ y: estacoes[1].y, pontos: dentro[1] }, b),"
+        },
+        {
+          "tipo": "-",
+          "linha": 224,
+          "texto": "    desloca({ y: estacoes[2].y, pontos: dentro[2] }, e),"
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": "    desloca({ y: ate, pontos: prolonga(n - 2, n - 1, ate) }, topo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 224,
+          "texto": "    { y: de, pontos: prolonga(0, 1, de) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 225,
+          "texto": "    { y: estacoes[1].y, pontos: dentro[1] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 226,
+          "texto": "    { y: estacoes[2].y, pontos: dentro[2] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 227,
+          "texto": "    { y: ate, pontos: prolonga(n - 2, n - 1, ate) },"
+        },
+        {
+          "tipo": "-",
+          "linha": 274,
+          "texto": "/* As estações da dorsal em mm: [z, largura, altura, raio, y do centro] como objetos, com a curva suave entre as seções. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 276,
+          "texto": "/* As estações da dorsal em mm: [z, y do dorso, largura da crista, subida, largura da base] como objetos, com a curva suave entre as"
+        },
+        {
+          "tipo": "+",
+          "linha": 277,
+          "texto": "   seções. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 276,
+          "texto": "  const secoes = t.dorsal.estacoes.map(([p, largura, altura, raio, y]) => ({ p, largura, altura, raio, y }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 279,
+          "texto": "  const secoes = t.dorsal.estacoes.map(([p, y, crista, subida, base]) => ({ p, y, crista, subida, base }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 283,
+          "texto": "/* O contorno da dorsal em uma estação, [x, y] em mm, anti-horário: a meia elipse da crista (semieixos metade da crista e `b`, o menor"
+        },
+        {
+          "tipo": "+",
+          "linha": 284,
+          "texto": "   entre ela e 0,45 da subida), o filete côncavo de cada lado, de um quarto de elipse (semieixos: metade da diferença das larguras e"
+        },
+        {
+          "tipo": "+",
+          "linha": 285,
+          "texto": "   a altura que sobra) até a base, que assenta `assenta` abaixo do dorso, e o pé enterrado, de `fracaoDoFundo` da largura da base, até"
+        },
+        {
+          "tipo": "+",
+          "linha": 286,
+          "texto": "   `fundo`. O filete sai vertical da crista e chega horizontal na base. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 287,
+          "texto": "function contornoDaDorsal(t, e) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 288,
+          "texto": "  const { assenta, fundo, passosDoArco: n, fracaoDoFundo } = t.dorsal;"
+        },
+        {
+          "tipo": "+",
+          "linha": 289,
+          "texto": "  const hc = e.crista / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 290,
+          "texto": "  const hb = e.base / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 291,
+          "texto": "  const hf = hb * fracaoDoFundo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 292,
+          "texto": "  const topo = e.y + e.subida;"
+        },
+        {
+          "tipo": "+",
+          "linha": 293,
+          "texto": "  const b = Math.min(hc, 0.45 * e.subida);"
+        },
+        {
+          "tipo": "+",
+          "linha": 294,
+          "texto": "  const equador = topo - b;"
+        },
+        {
+          "tipo": "+",
+          "linha": 295,
+          "texto": "  const chao = e.y - assenta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 296,
+          "texto": "  const altura = equador - chao;"
+        },
+        {
+          "tipo": "+",
+          "linha": 297,
+          "texto": "  const passo = Math.PI / 2 / n;"
+        },
+        {
+          "tipo": "+",
+          "linha": 298,
+          "texto": "  const crista = Array.from({ length: 2 * n + 1 }, (_, k) => [hc * Math.cos(k * passo), equador + b * Math.sin(k * passo)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 299,
+          "texto": "  const filete = Array.from({ length: n - 1 }, (_, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 300,
+          "texto": "    const fi = (k + 1) * passo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 301,
+          "texto": "    return [hc + (hb - hc) * (1 - Math.cos(fi)), chao + altura * (1 - Math.sin(fi))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 302,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 303,
+          "texto": "  const base = [hb, chao];"
+        },
+        {
+          "tipo": "+",
+          "linha": 304,
+          "texto": "  const pe = [[hf, chao], [hf, e.y - fundo]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 305,
+          "texto": "  const espelha = ([x, y]) => [-x, y];"
+        },
+        {
+          "tipo": "+",
+          "linha": 306,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 307,
+          "texto": "    ...crista,"
+        },
+        {
+          "tipo": "+",
+          "linha": 308,
+          "texto": "    ...filete.map(espelha), espelha(base),"
+        },
+        {
+          "tipo": "+",
+          "linha": 309,
+          "texto": "    ...pe.map(espelha), ...[...pe].reverse(),"
+        },
+        {
+          "tipo": "+",
+          "linha": 310,
+          "texto": "    base, ...[...filete].reverse(),"
+        },
+        {
+          "tipo": "+",
+          "linha": 311,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 312,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 313,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 411,
+          "texto": "  /* A caixa da raiz corta na segunda seção da família: a primeira faixa da superfície (7,86 mm) é onde o vão deixa um canto a 250 mm da"
+        },
+        {
+          "tipo": "-",
+          "linha": 412,
+          "texto": "     peça, e a deriva começa uma faixa acima de `y0`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 445,
+          "texto": "  /* A caixa da raiz corta na segunda seção da família, e a deriva começa uma faixa (7,86 mm) acima de `y0`. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 445,
+          "texto": "  /* A dorsal: loft em z de retângulos de cantos arredondados, com o centro em x = 0. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 478,
+          "texto": "  /* A dorsal: loft em z do contorno liso de cada estação, com o centro em x = 0. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 448,
+          "texto": "    eixo: 'z', linha: [0, m(dorsalMm[0].y), 0], avanco, segmentos: t.dorsal.segmentosPorCanto,"
+        },
+        {
+          "tipo": "-",
+          "linha": 449,
+          "texto": "    estacoes: dorsalMm.map((e) => ({ p: m(e.p), pontos: retanguloArredondado(0, m(e.y), m(e.largura), m(e.altura), m(e.raio)) })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 481,
+          "texto": "    eixo: 'z', linha: [0, m(dorsalMm[0].y), 0], avanco,"
+        },
+        {
+          "tipo": "+",
+          "linha": 482,
+          "texto": "    estacoes: dorsalMm.map((e) => ({ p: m(e.p), pontos: emMetro(contornoDaDorsal(t, e)) })),"
+        },
+        {
+          "tipo": "-",
+          "linha": 616,
+          "texto": "    min: [-Math.max(...dorsal.map((e) => e.largura / 2)), Math.min(...dorsal.map((e) => e.y - e.altura / 2)), dorsal[0].p - avanco],"
+        },
+        {
+          "tipo": "-",
+          "linha": 617,
+          "texto": "    max: [Math.max(...dorsal.map((e) => e.largura / 2)), Math.max(...dorsal.map((e) => e.y + e.altura / 2)), dorsal[dorsal.length - 1].p + avanco],"
+        },
+        {
+          "tipo": "+",
+          "linha": 649,
+          "texto": "    min: [-Math.max(...dorsal.map((e) => e.base / 2)), Math.min(...dorsal.map((e) => e.y - t.dorsal.fundo)), dorsal[0].p - avanco],"
+        },
+        {
+          "tipo": "+",
+          "linha": 650,
+          "texto": "    max: [Math.max(...dorsal.map((e) => e.base / 2)), Math.max(...dorsal.map((e) => e.y + e.subida)), dorsal[dorsal.length - 1].p + avanco],"
+        },
+        {
+          "tipo": "-",
+          "linha": 680,
+          "texto": "        forma: 'dorsal, a aleta baixa que desce da frente da deriva ao dorso da fuselagem',"
+        },
+        {
+          "tipo": "-",
+          "linha": 681,
+          "texto": "        tecnica: 'loft das seções do esboço, com as pontas fechadas e sombreado liso',"
+        },
+        {
+          "tipo": "+",
+          "linha": 713,
+          "texto": "        forma: 'dorsal lisa, o dorso da fuselagem subindo até a frente da deriva, sem a aleta de ponta fina do esboço',"
+        },
+        {
+          "tipo": "+",
+          "linha": 714,
+          "texto": "        tecnica: 'loft em z de seções de crista em meia elipse e filete côncavo até o dorso, com as pontas fechadas e sombreado liso',"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

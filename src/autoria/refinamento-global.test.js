@@ -172,7 +172,7 @@ describe('REFINA.esboco: a parte que se afasta do esboço de propósito', () => 
     [{ formas: 'roda', deslocamento: [0, -17, 0], motivo: '   ' }, /precisa dizer o 'motivo'/],
     [{ formas: 'roda', deslocamento: [0, -17, 0], motivo: 7 }, /precisa dizer o 'motivo'/],
     [{ formas: 'roda', alongamento: { '-y': 17 } }, /precisa dizer o 'motivo'/],
-    [{ formas: 'roda', motivo: MOTIVO }, /'formas\.roda\.motivo' só acompanha 'deslocamento' ou 'alongamento'/],
+    [{ formas: 'roda', motivo: MOTIVO }, /'formas\.roda\.motivo' só acompanha 'deslocamento', 'alongamento' ou 'minimo'/],
     [{ formas: 'roda', deslocamento: [0, -17], motivo: MOTIVO }, /'formas\.roda\.deslocamento' precisa ser o vetor \[dx, dy, dz\] em milímetro/],
     [{ formas: 'roda', deslocamento: [0, '-17', 0], motivo: MOTIVO }, /'formas\.roda\.deslocamento' precisa ser o vetor/],
     [{ formas: 'roda', deslocamento: [0, Number.NaN, 0], motivo: MOTIVO }, /'formas\.roda\.deslocamento' precisa ser o vetor/],
@@ -194,6 +194,7 @@ describe('REFINA.esboco: a parte que se afasta do esboço de propósito', () => 
     expect(textoDoAfastamento(entradaCanonica({ formas: 'roda', deslocamento: [0, -8.5, 0], motivo: MOTIVO }))).toBe(`deslocada [0, -8.5, 0] mm; motivo: ${MOTIVO}`);
     expect(textoDoAfastamento(entradaCanonica({ formas: 'p', alongamento: { '-y': 8.5, '+x': 2 }, motivo: MOTIVO }))).toBe(`passa do volume +x 2 mm, -y 8.5 mm; motivo: ${MOTIVO}`);
     expect(textoDoAfastamento(entradaCanonica({ formas: 'roda', minimo: 0.9 }))).toBe('');
+    expect(textoDoAfastamento(entradaCanonica({ formas: 'ponta', minimo: 0.88, motivo: MOTIVO }))).toBe(`forma mudada de propósito, com razão mínima própria de 0,88; motivo: ${MOTIVO}`);
     expect(textoDoAfastamento(undefined)).toBe('');
   });
 });

@@ -281,6 +281,10 @@ linha de comando lê o `REFINA.esboco` da receita, com os afastamentos declarado
 `--desloca='parte:dx,dy,dz:motivo;outra:...'` (o motivo não leva `;`) para medir o deslocamento numa receita que não o declara. A mensagem de
 `parte-fora-da-forma-do-esboco` e a de `parte-fora-do-envelope` dizem que a forma e o volume estão deslocados, e por quanto.
 
+A parte cuja forma muda de propósito sem ser translação nem alongamento (a ponta do estabilizador mais estreita que a pessoa pediu)
+declara o `minimo` próprio com o `motivo`; o motivo só é aceito junto de `deslocamento`, `alongamento` ou `minimo`, e o pedido ao crítico
+o lista como forma mudada de propósito.
+
 A parte que a pessoa pede além do esboço, como o casulo sob a asa ou o compensador do profundor do avião, não tem volume no andaime nem
 forma no esboço, e entra em `REFINA.novas` como `{ parte: motivo }`, com o motivo obrigatório. Ela deixa de ser `parte-sem-volume`; a
 mesma parte em `partes` é recusada na normalização, em `esboco.formas` dá `parte-nova-com-forma`, e a declarada que a peça não entrega dá

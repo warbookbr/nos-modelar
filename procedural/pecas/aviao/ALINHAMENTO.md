@@ -217,7 +217,9 @@ A empenagem horizontal (`partes/empenagem-horizontal/receita.js`, `aviao/empenag
 tem 12 partes, seis de cada lado: `estabilizadorD` e `estabilizadorE`, a superfície da
 família com o perfil `estabilizador` e o vão do profundor recortado com a fresta;
 `profundorD` e `profundorE`, lofts no vão; `eixoProfundorD` e `eixoProfundorE`; e três
-suportes de cada lado. A escala é a envergadura do estabilizador, 4780 mm.
+suportes de cada lado. A escala é a envergadura do estabilizador, 4780 mm. Na rodada de
+ajustes ela passou a 14 partes, com `compensadorD` e `compensadorE` no bordo de fuga do
+profundor, declarados em `REFINA.novas`.
 
 A empenagem vertical (`partes/empenagem-vertical/receita.js`, `aviao/empenagem-vertical`)
 tem 10 partes: `deriva`, a superfície da família com o perfil `deriva`, cortada na raiz e

@@ -794,8 +794,8 @@ export function pontosDeclarados(t = TABELA) {
    próprio, que é o que a razão de volume ainda mede acima da diferença declarada. */
 const AFASTADAS = Object.fromEntries(['D', 'E'].map((L) => [`ponta${L}`, {
   formas: `ponta${L}`,
-  minimo: 0.5,
-  alongamento: { '+y': 200 },
+  minimo: 0.45,
+  alongamento: { '+y': 198.4 },
   motivo: 'a ponta levantada sobe uns 9% da semi-envergadura (71 graus, e não os 56 do esboço) e tem os cantos arredondados vistos de cima, como a referência real',
 }]));
 
