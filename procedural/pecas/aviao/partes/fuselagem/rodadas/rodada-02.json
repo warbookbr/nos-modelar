@@ -1,0 +1,319 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/fuselagem",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "fuselagem",
+        "tipo": "espessura",
+        "onde": "cintura da cabine, z≈4700 a 5800",
+        "sentido": "menor",
+        "evidencia": "sobreposicao-aviao-fuselagem-planta.png: cinza passa do vermelho ~10-15 px (~80-120 mm) por lado; largura ~1480 mm contra ~1630-1700 mm no alvo"
+      },
+      {
+        "parte": "fuselagem",
+        "tipo": "superficie",
+        "onde": "linha inferior entre capô e cabine, z≈2750 a 3900",
+        "sentido": "segmentado",
+        "evidencia": "direita-orto x≈740-790,y≈765-777; esquerda-orto x≈335-375,y≈768-775; direita-sel-fuselagem x≈585-640,y≈487-492: ondulação leve de ~3-4 px, a confirmar"
+      },
+      {
+        "parte": "parabrisa",
+        "tipo": "superficie",
+        "onde": "ponta dianteira e borda inferior",
+        "sentido": "anguloso",
+        "evidencia": "bancada-aviao-fuselagem-isometrica-sel-parabrisa-isolar-orto-focado.png: quinas vivas em ~(440,405) e ~(460,470); traseira-orto.png: borda grossa y≈585-625"
+      }
+    ],
+    "observacao": "Forma, posições e comprimento batem com o alvo; os achados são de acabamento e de largura da cabine, e o vão da porta esquerda não pôde ser confirmado nas vistas dadas."
+  },
+  "partes": [
+    {
+      "nome": "fuselagem",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parabrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteParabrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela3E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela4D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela4E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "porta",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "barbatana",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "os três defeitos vêm do esboço aprovado: a cabine tem 1560 mm nas seções e a referência traz a carenagem da raiz da asa; o fundo das seções oscila 20 a 30 mm entre z 2377 e 3912; o crítico do esboço já via o para-brisa anguloso",
+    "a captura da lateral esquerda foi corrigida duas vezes: a primeira mudança trocou uma constante que o modo de revisão ignora, e nenhum teste confere as vistas que o pacote entrega",
+    "a rodada 2 do modelador, retomado com o contexto da rodada 1, custou 601 mil tokens em 17 chamadas; a fuselagem soma cerca de 1,54 milhão, perto de quatro vezes a média de uma unidade do esboço da segunda rodada"
+  ],
+  "notaDePassagem": "Sem porta publicada; o motor assenta na face da frente (z 2377, 1450x1030, centro y 1303), plana. Casco com 44 pontos por seção. Placas e porta aparadas pelo casco, rentes à superfície; porta vazada no vão da janela 4E.",
+  "receita": {
+    "sha256": "sha256:f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 12,
+      "acrescentadas": 27,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 24,
+          "texto": " * janela sai quase quadrada de lado. O vão da porta é o `cortePorta`, que o esboço escreve com a folga já somada. A porta é"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * janela sai quase quadrada de lado. Cada placa e a porta são aparadas pelo casco inteiro, sem os vãos (`intersectar` com um"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * loft do casco refeito a cada uso): a placa da janela 1 e o ombro da porta, retos, passavam da superfície do casco, a janela 1"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * em 4,5 mm e a porta em 3,8 mm, e agora a face de fora deles fica rente a ela, e o alto da janela 1, que está no ombro curvo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * casco, perde o que ficava fora dele. O vão da porta é o `cortePorta`, que o esboço escreve com a folga já somada. A porta é"
+        },
+        {
+          "tipo": "-",
+          "linha": 311,
+          "texto": "  porta: 150, portaVazada: 151,"
+        },
+        {
+          "tipo": "-",
+          "linha": 312,
+          "texto": "  placa: 200, vaoNoCasco: 300, vaoNaPorta: 400,"
+        },
+        {
+          "tipo": "+",
+          "linha": 314,
+          "texto": "  porta: 150, portaVazada: 151, portaAparada: 152,"
+        },
+        {
+          "tipo": "+",
+          "linha": 315,
+          "texto": "  placa: 200, vaoNoCasco: 300, vaoNaPorta: 400, placaAparada: 500, gabarito: 600, gabaritoDaPorta: 700,"
+        },
+        {
+          "tipo": "-",
+          "linha": 336,
+          "texto": "      if (polo.d.some((v) => v !== 0)) passos.push(['moveV', { sel: { regiao: polo.regiao }, d: polo.d }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 339,
+          "texto": "      /* Um deslocamento abaixo de um nanômetro é ruído da média dos pontos, e não leva o polo a lugar nenhum. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 340,
+          "texto": "      if (polo.d.some((v) => Math.abs(v) > 1e-9)) passos.push(['moveV', { sel: { regiao: polo.regiao }, d: polo.d }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 384,
+          "texto": "  /* As oito janelas: placas nos vãos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 388,
+          "texto": "  /* Cada sólido que assenta na superfície do casco (as placas das janelas e a porta) é aparado pelo casco inteiro, sem os vãos:"
+        },
+        {
+          "tipo": "+",
+          "linha": 389,
+          "texto": "     a interseção deixa a face de fora dele rente à superfície, no lugar de passar dela. O gabarito é um loft do casco refeito a"
+        },
+        {
+          "tipo": "+",
+          "linha": 390,
+          "texto": "     cada uso, porque a interseção o consome, e vem logo antes dela para o polo dele não dividir lugar com o de outro loft. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 391,
+          "texto": "  const apara = (origem, origemId, gabaritoId) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 392,
+          "texto": "    loft(gabaritoId, P.casco, t.casco.segmentosPorCanto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 393,
+          "texto": "    passos.push(['intersectar', { origemId, solidos: [{ origem }, { origem: { op: 'loft', id: gabaritoId } }] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 394,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 395,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 396,
+          "texto": "  /* As oito janelas: placas nos vãos, aparadas pela superfície do casco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 399,
+          "texto": "    const aparada = idDaJanela(ID.placaAparada, janela);"
+        },
+        {
+          "tipo": "-",
+          "linha": 388,
+          "texto": "    passos.push(['parte', { nome: janela.nome, sel: { origem: { op: 'extrusao', id } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 389,
+          "texto": "    passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'extrusao', id } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 390,
+          "texto": "    passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'extrusao', id } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 401,
+          "texto": "    apara({ op: 'extrusao', id }, aparada, idDaJanela(ID.gabarito, janela));"
+        },
+        {
+          "tipo": "+",
+          "linha": 402,
+          "texto": "    passos.push(['parte', { nome: janela.nome, sel: { origem: { op: 'intersectar', id: aparada } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 403,
+          "texto": "    passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'intersectar', id: aparada } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 404,
+          "texto": "    passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'intersectar', id: aparada } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 393,
+          "texto": "  /* A porta, recortada pelo vão da janela 4 do lado esquerdo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 407,
+          "texto": "  /* A porta, aparada pela superfície do casco e recortada pelo vão da janela 4 do lado esquerdo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 409,
+          "texto": "  apara({ op: 'loft', id: ID.porta }, ID.portaAparada, ID.gabaritoDaPorta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 400,
+          "texto": "      { origem: { op: 'loft', id: ID.porta } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 415,
+          "texto": "      { origem: { op: 'intersectar', id: ID.portaAparada } },"
+        },
+        {
+          "tipo": "-",
+          "linha": 442,
+          "texto": "  const doMeio = (caixa) => caixa.min.map((v, k) => (v + caixa.max[k]) / 2);"
+        },
+        {
+          "tipo": "-",
+          "linha": 448,
+          "texto": "    { nome: 'centro do painel da porta', parte: 'porta', medida: 'centro', em: doMeio(caixaDaPorta), toleranciaMm: tolerancia },"
+        },
+        {
+          "tipo": "+",
+          "linha": 462,
+          "texto": "    /* O máximo, e não o centro: o casco apara a face de fora da porta no ombro, e o centro em x anda uns milímetros. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 463,
+          "texto": "    { nome: 'canto de cima, de trás e de dentro do painel da porta', parte: 'porta', medida: 'maximo', em: caixaDaPorta.max, toleranciaMm: tolerancia },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
