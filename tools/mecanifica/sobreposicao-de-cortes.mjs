@@ -121,6 +121,29 @@ export function valoresDosCortes(caixa, fracoes = FRACOES_DOS_CORTES) {
   return Object.fromEntries(EIXOS_DOS_CORTES.map((eixo, k) => [eixo, fracoes.map((f) => caixa.min[k] + f * (caixa.max[k] - caixa.min[k]))]));
 }
 
+/**
+ * Os planos que não cruzam o modelo vão ao plano mais perto que cruza: o do centro do triângulo mais próximo naquele eixo. Peça de dois
+ * lados, como os trens principais do avião, tem a caixa larga e o material só nas pontas, e os cortes em um quarto, na metade e em três
+ * quartos da caixa saíram vazios. Devolve os valores e o que mudou, para o relatório dizer.
+ */
+export function planosComMaterial(valores, triangulos) {
+  const mudancas = [];
+  const novos = Object.fromEntries(Object.entries(valores).map(([eixo, lista]) => {
+    const k = EIXOS_DOS_CORTES.indexOf(eixo);
+    /* só o triângulo que atravessa o eixo: o centro de uma face rente ao plano daria um corte sobre a própria face */
+    const centros = triangulos
+      .filter((t) => Math.max(t[0][k], t[1][k], t[2][k]) - Math.min(t[0][k], t[1][k], t[2][k]) > 1e-6)
+      .map((t) => (t[0][k] + t[1][k] + t[2][k]) / 3);
+    return [eixo, lista.map((valor) => {
+      if (!centros.length || segmentosDoCorte(triangulos, eixo, valor).length) return valor;
+      const novo = centros.reduce((melhor, c) => (Math.abs(c - valor) < Math.abs(melhor - valor) ? c : melhor), centros[0]);
+      mudancas.push({ eixo, de: valor, para: novo });
+      return novo;
+    })];
+  }));
+  return { valores: novos, mudancas };
+}
+
 function distanciaAoSegmento(px, py, [x1, y1, x2, y2]) {
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -350,7 +373,9 @@ export async function sobreposicaoDeCortes({ peca, saida, fracoes = FRACOES_DOS_
   if (!triangulosDoEsboco.length) throw new Error(`o esboço ${declarado.esboco} não deu sólido para nenhuma das formas que '${peca}' liga; não há o que sobrepor.`);
 
   const orientacao = lerPlano(bruto.plano)?.orientacao ?? null;
-  const valores = valoresDosCortes(caixa, fracoes);
+  const ajuste = planosComMaterial(valoresDosCortes(caixa, fracoes), triangulosDoModelo);
+  const valores = ajuste.valores;
+  for (const { eixo, de, para } of ajuste.mudancas) notas.push(`o corte em ${eixo} = ${arredondar(de)} mm não cruzava o modelo e foi para ${eixo} = ${arredondar(para)} mm`);
   const rasterizar = dependencias.rasterizar ?? rasterizarSvg;
   mkdirSync(saida, { recursive: true });
   const arquivos = [];

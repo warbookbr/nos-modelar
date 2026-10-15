@@ -178,9 +178,10 @@ describe('a receita de prova contra o esboço', () => {
     expect(feito.paineis).toHaveLength(9);
     expect(feito.partes).toEqual(['bloco', 'viga']);
     expect(feito.formas).toEqual(['bloco', 'viga']);
-    expect(feito.notas).toEqual([]);
-    for (const painel of feito.paineis.filter((p) => p.desvioMaximoMm !== null)) expect(painel.desvioMaximoMm).toBeLessThan(1);
-    expect(feito.paineis.some((p) => p.desvioMaximoMm !== null)).toBe(true);
+    /* dois dos cortes em y caíam no vão entre o bloco e a viga e iam vazios; agora vão ao material, e todo painel tem desvio */
+    expect(feito.notas).toHaveLength(2);
+    for (const nota of feito.notas) expect(nota).toMatch(/^o corte em y = .* não cruzava o modelo e foi para y = /);
+    for (const painel of feito.paineis) expect(painel.desvioMaximoMm).toBeLessThan(1);
     const svg = readFileSync(join(pasta, 'sobreposicao-z.svg'), 'utf8');
     expect(svg).toContain('vermelho grosso: esboço; azul fino: modelo');
   }, 60_000);
@@ -221,4 +222,17 @@ describe('o PNG do desenho', () => {
     expect(png.readUInt32BE(20)).toBe(altura);
     expect(readFileSync(arquivo).equals(png)).toBe(true);
   }, 60_000);
+});
+
+describe('planos com material', () => {
+  it('o corte que cai no vão de uma peça de dois lados vai ao triângulo mais perto, e o que cruza fica', async () => {
+    const { planosComMaterial } = await import('./sobreposicao-de-cortes.mjs');
+    const tri = (x) => [[x, 0, 0], [x + 10, 0, 0], [x, 10, 5]];
+    const triangulos = [tri(-1960), tri(1950)];
+    const { valores, mudancas } = planosComMaterial({ x: [-1000, 0, 1955] }, triangulos);
+    expect(valores.x[0]).toBeCloseTo(-1960 + 10 / 3);
+    expect(valores.x[2]).toBe(1955);
+    expect(mudancas.map((m) => m.de)).toEqual([-1000, 0]);
+    expect(Math.abs(valores.x[1])).toBeGreaterThan(1900);
+  });
 });
