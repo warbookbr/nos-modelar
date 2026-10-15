@@ -304,3 +304,8 @@ e não o bojo fundido à barriga da referência, que pediria reabrir a fuselagem
 no motor a boca de ar que segue em túnel até a fuselagem, onde o esboço a fecha uns 30 cm
 para dentro, porque não aparece de fora.
 
+Na segunda rodada os dois trens ficaram com a roda no chão, o furo do cubo no diâmetro do eixo e, nos principais, o pino de baixo
+do compasso na coroa, com os afastamentos declarados no `REFINA.esboco`. O trem do nariz fechou na terceira rodada e os principais
+na segunda, os dois com nota 9 e sem defeito, e a pessoa os aceitou em 2026-10-15. Os críticos apontaram, como diferença do esboço
+para o avião real, a perna dos principais em placa larga, onde a foto mostra uma perna fina, e a roda de 593 mm contra os 532 mm da
+prancha; ficam como estão salvo pedido dela na rodada de ajustes.

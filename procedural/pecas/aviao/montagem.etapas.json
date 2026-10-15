@@ -96,7 +96,6 @@
       "instancia": "empenagem-vertical",
       "estado": "fixa",
       "juntas": [],
-      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07",
       "aceite": {
         "por": "a pessoa, 2026-10-15: aceitou a empenagem vertical pela escolha 'Aceitar as duas (Recomendado)', depois da nota 9 na rodada 1",
         "observacao": "pendência: o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que contorna o canto solto da booleana",
@@ -105,7 +104,28 @@
           "deriva: posicao em vértice do V do recorte do vão no bordo de fuga, corte y 3300"
         ],
         "analise": "ausente"
-      }
+      },
+      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07"
+    },
+    {
+      "instancia": "trem-do-nariz",
+      "estado": "fixa",
+      "juntas": [],
+      "aceite": {
+        "por": "a pessoa, 2026-10-15",
+        "analise": "ausente"
+      },
+      "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4"
+    },
+    {
+      "instancia": "trens-principais",
+      "estado": "fixa",
+      "juntas": [],
+      "aceite": {
+        "por": "a pessoa, 2026-10-15",
+        "analise": "ausente"
+      },
+      "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565"
     }
   ]
 }
