@@ -21,7 +21,8 @@
  * malha entregaria só o que existe, que é justamente o que não se quer
  * perguntar.
  */
-import { mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { olharBancada } from './olhar-bancada.mjs';
@@ -77,6 +78,7 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
 
   const conjunto = await olharBancada({ peca, revisar: true, res: RES_CONJUNTO, logger });
   exigirCaptura(conjunto, 'conjunto');
+  exigirVistasDiferentes(conjunto, 'do conjunto');
   /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
      sai numa captura própria. */
   const traseira = await olharBancada({
@@ -97,6 +99,7 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
     peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO, logger,
   });
   exigirCaptura(arame, 'arame');
+  exigirVistasDiferentes(arame, 'do arame');
   /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
      que só aparece do outro lado da peça. */
   const raioX = await olharBancada({
@@ -121,6 +124,7 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
       logger,
     });
     exigirCaptura(resultado, `parte '${parte}'`);
+    exigirVistasDiferentes(resultado, `da parte '${parte}'`);
     porParte.push({ parte, resultado });
   }
 
@@ -138,6 +142,28 @@ function exigirCaptura(resposta, quem) {
   if (Array.isArray(arquivos) && arquivos.length) return;
   const motivo = resposta?.erro?.mensagem ?? resposta?.stderr?.trim() ?? 'a bancada não disse por quê';
   throw new Error(`a captura do ${quem} não produziu imagem: ${motivo}`);
+}
+
+/* Duas vistas de uma captura com o mesmo conteúdo, byte a byte, são a mesma
+   câmera gravada com dois nomes. Em 2026-10-15 a vista de lado isolada do capô
+   e dos escapes do avião saiu igual à isométrica, porque o segundo foco da
+   bancada voltava à isométrica, e só o crítico percebeu. */
+export function vistasRepetidas(arquivos, ler = readFileSync) {
+  const vistos = new Map();
+  const repetidas = [];
+  for (const arquivo of arquivos) {
+    const hash = createHash('sha256').update(ler(arquivo)).digest('hex');
+    if (vistos.has(hash)) repetidas.push([vistos.get(hash), arquivo]);
+    else vistos.set(hash, arquivo);
+  }
+  return repetidas;
+}
+
+function exigirVistasDiferentes(resposta, quem) {
+  const repetidas = vistasRepetidas(arquivosDe(resposta));
+  if (!repetidas.length) return;
+  const pares = repetidas.map(([a, b]) => `${a} = ${b}`).join('; ');
+  throw new Error(`a captura ${quem} gravou a mesma imagem em vistas diferentes: ${pares}`);
 }
 
 /* Os caminhos saem de `resultado.arquivos`, que a bancada devolve estruturado,

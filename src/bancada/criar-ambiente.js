@@ -160,6 +160,12 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   let raioAtual = 2;
   let transicao = null;
   let publicarCameraLivreAoEstabilizar = false;
+  /* A vista canônica de onde o último foco partiu. Focar promove a câmera a
+     `livre`, e enquadrar de novo a partir de `livre` voltava à isométrica: o
+     pacote do crítico foca duas vezes por parte, e quando a transição do
+     primeiro foco terminava antes do segundo, a vista de lado saía isométrica.
+     Só o giro feito à mão ou a câmera restaurada da URL esquecem esta vista. */
+  let vistaDoFoco = null;
 
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -172,6 +178,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   controls.addEventListener('start', () => {
     transicao = null;
     publicarCameraLivreAoEstabilizar = false;
+    vistaDoFoco = null;
     vistaAtual = 'livre';
     aoMudarVista?.(vistaAtual);
   });
@@ -264,6 +271,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
      que o iniciou. Só depois da transição a promovemos a `livre`: assim a URL
      recebe a câmera que de fato apareceu na tela, não a posição intermediária. */
   function promoverCameraAtualParaLivre() {
+    if (vistaAtual !== 'livre') vistaDoFoco = vistaAtual;
     vistaAtual = 'livre';
     aoMudarVista?.(vistaAtual);
   }
@@ -279,7 +287,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       centroAtual = caixa.getCenter(new THREE.Vector3());
       raioAtual = Math.max(0.02, caixa.getBoundingSphere(new THREE.Sphere()).radius);
     }
-    definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo });
+    definirVista(vistaAtual === 'livre' ? (vistaDoFoco ?? 'isometrica') : vistaAtual, { instantaneo });
     if (reproduzivel) {
       if (transicao) publicarCameraLivreAoEstabilizar = true;
       else promoverCameraAtualParaLivre();
@@ -294,7 +302,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       raioAtual = Math.max(0.12, caixa.getBoundingSphere(new THREE.Sphere()).radius);
       alvosAtuais = objetos.slice();
     }
-    definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo });
+    definirVista(vistaAtual === 'livre' ? (vistaDoFoco ?? 'isometrica') : vistaAtual, { instantaneo });
     if (reproduzivel) {
       if (transicao) publicarCameraLivreAoEstabilizar = true;
       else promoverCameraAtualParaLivre();
@@ -341,6 +349,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     controls.target.fromArray(estado.alvo);
     camera.lookAt(controls.target);
     controls.update();
+    vistaDoFoco = null;
     vistaAtual = 'livre';
     aplicarVisibilidadeDoCenario();
     aoMudarVista?.(vistaAtual);
