@@ -112,7 +112,9 @@ janelas: no esboço ele é uma casca apoiada sobre a frente da cabine, sem abert
 baixo, e o degrau aparece. A fuselagem reabre para uma rodada depois da correção do
 sombreamento (os riscos das janelas e a junta com o capô), com a abertura recortada no
 casco, o vidro assentado rente nela e o montante central apoiado no vidro de ponta a
-ponta.
+ponta. A rodada 3 fez isso, o crítico deu nota 9 sem defeito e a pessoa aceitou a
+fuselagem em 2026-10-15; a fuselagem, o motor sem mudança e a hélice foram fixados de
+novo nessa ordem.
 
 ## O plano do motor
 
@@ -169,6 +171,6 @@ do envelope ou abaixo do mínimo contra o esboço.
 A hélice fechou na primeira rodada com nota 9, e a pessoa a aceitou como está em
 2026-10-15: as cinco pás são as da família, com razão 1,000 contra o esboço, e o cone
 dá 0,998. O contorno do perfil da pá sai em lados retos numa vista isolada, pela
-resolução da família, e fica como pendência dela. A etapa se fixa depois da fuselagem
-e do motor, que foram reabertos e vêm antes na ordem.
+resolução da família, e fica como pendência dela. A etapa ficou fixa depois da fuselagem e
+do motor, que foram reabertos e vêm antes na ordem.
 

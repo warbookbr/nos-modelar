@@ -96,7 +96,11 @@ que ele imprime no brief, depois dos critérios de reprovação; sem os campos, 
 parte que satisfaça a condição, o comando diz que não há pergunta específica. Nunca mande a receita, os
 passos, o histórico nem o que mudou: contar como foi feito faz revisão virar
 concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem
-inventar nota. Diga no despacho que `onde`, `evidencia` e `observacao` do
+inventar nota. Quando a peça refina um esboço aprovado, o alvo é a composta do
+esboço e o crítico mede contra ela, então pergunte também, entre as perguntas de
+forma, onde o alvo difere da referência real: o para-brisa saliente do avião veio
+do esboço, passou por dois críticos e só a pessoa o viu. A diferença do esboço vai
+à pessoa, que decide se a receita a corrige. Diga no despacho que `onde`, `evidencia` e `observacao` do
 veredito vão até 240 caracteres cada, porque o registro recusa o mais longo e o
 detalhe vai no texto; a regra fica no despacho, e não no agente, que mudado
 pede a calibração de novo.

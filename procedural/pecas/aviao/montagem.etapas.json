@@ -5,9 +5,14 @@
   "etapas": [
     {
       "instancia": "fuselagem",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99",
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está depois da rodada 3, com o para-brisa rente ao casco e nota 9 sem defeito",
+        "observacao": "pendências do esboço que seguem: a cintura da cabine e a ondulação da linha de baixo entre o capô e a cabine",
+        "analise": "ausente"
+      },
+      "receita": "1e52b4bcef0c036e5aa4d86fd51f3b8eab44cd206c527d10fdd644043937b1e2",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -29,8 +34,13 @@
     },
     {
       "instancia": "motor",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: o motor aceito antes volta a fixo sem mudança, depois da fuselagem reaberta",
+        "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
+        "analise": "ausente"
+      },
       "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d",
       "reaberturas": [
         {
@@ -48,9 +58,18 @@
     },
     {
       "instancia": "helice",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "1a902316ef107df3a66c9879db7c6e6d69a3057dd8fea0e5192cd3917aad2483"
+      "receita": "439a47cad9c062f3e2576f46091e86cd73bf32a75f05ff44db1a3d374d097bcd",
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: aceitou a hélice como está pela escolha 'Aceitar como está (Recomendado)', depois da nota 9 na rodada 1",
+        "observacao": "pendência da família: o contorno do perfil da pá sai em lados retos numa vista isolada, pela resolução da superfície aerodinâmica, igual no esboço",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+          "pa1: superficie em contorno do perfil na extremidade superior esquerda da vista direita isolada"
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }

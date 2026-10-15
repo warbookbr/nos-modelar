@@ -1,0 +1,1102 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/fuselagem",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/fuselagem-composta.png",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Perfil, planta e vista da cauda batem com o alvo; para-brisa rente sem degrau visível de frente. Contato do montante com o vidro e vão da porta no casco não aparecem nas vistas. Lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "fuselagem",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parabrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteParabrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela3E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela4D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "janela4E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "porta",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "barbatana",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o para-brisa saliente veio do esboço aprovado e passou por dois críticos, porque o alvo era o esboço; só a pessoa o viu. A skill do laço passa a pedir ao crítico onde o alvo do esboço difere da referência real",
+    "a faixa do para-brisa do esboço flutuava até 15 mm acima do casco na frente; o vidro rente assenta num leito, o casco descido 20 mm, e não na face de baixo da faixa",
+    "malha:conferir reprova a fuselagem por topologia desde a rodada 2 (lascas finas e um vértice em aresta), e as lascas subiram de 75 para 103 com a abertura; o comando não é gate nem medida do laço"
+  ],
+  "notaDePassagem": "O vidro é pele de 20 mm sob a superfície do casco, e não a faixa de 50 mm do esboço. A faixa flutuava na frente, e o leito (casco descido) deixa o vidro sem degrau nem lascas.",
+  "receita": {
+    "sha256": "sha256:1e52b4bcef0c036e5aa4d86fd51f3b8eab44cd206c527d10fdd644043937b1e2",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 75,
+      "acrescentadas": 154,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 1,
+          "texto": "/* aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral."
+        },
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral."
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * O para-brisa é o mesmo caso, com o contorno em planta do esboço. O esboço o faz uma faixa de 50 mm apoiada sobre a frente da"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * cabine, e a faixa passava da superfície do casco em até 41 mm e, na frente, nem a tocava (a face de baixo ficava até 15 mm acima"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " * dela). Aqui o contorno em planta da faixa vira um prisma vertical, e o vidro é a parte desse prisma que fica entre a superfície do"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " * casco e o casco descido `parabrisa.espessura` (o leito): o prisma menos o leito, aparado pelo casco inteiro, com a face de fora"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * rente e uma espessura só, e não a face de baixo reta da faixa, que deixava o vidro sem chão na frente. O vão é o mesmo prisma"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * alargado pela folga das janelas, menos o mesmo leito, e o vidro assenta no fundo dele. O prisma começa no menor y da face de baixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * da faixa, que é o piso do volume do andaime: nas pontas, onde o casco desce a esse piso, o vidro termina e o vão some, e o vidro"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * nunca desce abaixo do volume que o REFINA confere. O montante corre pela face de fora do vidro, no meio, com a face de baixo na"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": " * superfície do casco, e a segue em seções nas estações do casco: o topo do casco no meio se afasta até 12 mm da reta que une as"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " * pontas do vidro, e uma barra reta ficaria no ar na frente e entraria no vidro atrás."
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": " *"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "  /* Para-brisa: uma faixa de 50 mm de espessura, inclinada, larga sobre o dorso e curva em x. Cada estação é"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  /* Para-brisa: no esboço, uma faixa de 50 mm de espessura, inclinada, larga sobre o dorso e curva em x. Cada estação é"
+        },
+        {
+          "tipo": "-",
+          "linha": 69,
+          "texto": "     dois atrás. O z do centro é o mesmo em todas as estações, e o conjunto sobe `deslocamentoY` depois de montado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "     dois atrás. O z do centro é o mesmo em todas as estações, e o conjunto sobe `deslocamentoY` depois de montado. A receita usa da"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "     faixa o contorno em planta (x e meio comprimento) e o menor y da face de baixo, que é o piso do vidro; o vidro rente tem"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "     `espessura` de 20 mm, em y, entre a superfície do casco e o leito (o casco descido essa espessura). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    espessura: 20,"
+        },
+        {
+          "tipo": "-",
+          "linha": 90,
+          "texto": "  /* Montante do para-brisa: barra de seção retangular de cantos arredondados, do ponto `de` ao ponto `para`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  /* Montante do para-brisa: barra de seção retangular de cantos arredondados. No esboço ela vai do ponto `de` ao ponto `para`, e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "     receita guarda daí só a inclinação (a barra de `profundidade` medida na normal tem essa altura na vertical); a barra rente"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "     corre pela face de fora do vidro, da base ao topo da abertura. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 214,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 215,
+          "texto": "  const avanco = m(t.tampa.avanco);"
+        },
+        {
+          "tipo": "-",
+          "linha": 216,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 230,
+          "texto": "/* O casco por estações, com todas as alturas descidas `descida` (mm): com zero é o casco, e com a espessura do vidro é o leito. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 231,
+          "texto": "function cascoPorEstacoes(t, descida) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 218,
+          "texto": "  const casco = loftPorEstacoes({"
+        },
+        {
+          "tipo": "+",
+          "linha": 233,
+          "texto": "  return loftPorEstacoes({"
+        },
+        {
+          "tipo": "-",
+          "linha": 220,
+          "texto": "    linha: [0, m(cascoMm[0][4]), 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 235,
+          "texto": "    linha: [0, m(cascoMm[0][4] - descida), 0],"
+        },
+        {
+          "tipo": "-",
+          "linha": 222,
+          "texto": "      p: m(z), pontos: retangulo(m(largura) / 2, m(altura) / 2, m(y), [m(canto), m(canto), m(canto), m(canto)]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 237,
+          "texto": "      p: m(z), pontos: retangulo(m(largura) / 2, m(altura) / 2, m(y - descida), [m(canto), m(canto), m(canto), m(canto)]),"
+        },
+        {
+          "tipo": "-",
+          "linha": 224,
+          "texto": "    avanco,"
+        },
+        {
+          "tipo": "+",
+          "linha": 239,
+          "texto": "    avanco: m(t.tampa.avanco),"
+        },
+        {
+          "tipo": "+",
+          "linha": 242,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 244,
+          "texto": "/* Altura do topo do casco no meio (x = 0), em mm, a `z` mm da proa. Entre duas estações o casco é reto, e no meio o topo de cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 245,
+          "texto": "   seção é plano (a largura do plano é a da seção menos dois raios), então a altura é a interpolação das estações. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 246,
+          "texto": "function topoDoCascoNoMeio(t, z) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 247,
+          "texto": "  const est = t.casco.estacoes;"
+        },
+        {
+          "tipo": "+",
+          "linha": 248,
+          "texto": "  const k = est.findIndex((e, i) => i < est.length - 1 && z >= e[0] && z <= est[i + 1][0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 249,
+          "texto": "  if (k < 0) throw new Error(`topo do casco: z ${z} fica fora das estações (${est[0][0]} a ${est[est.length - 1][0]})`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 250,
+          "texto": "  const topo = (e) => e[4] + e[2] / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 251,
+          "texto": "  const f = (z - est[k][0]) / (est[k + 1][0] - est[k][0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 252,
+          "texto": "  return topo(est[k]) + f * (topo(est[k + 1]) - topo(est[k]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 253,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 254,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 255,
+          "texto": "/* O vidro do para-brisa e o montante dele, em mm: o contorno em planta da faixa do esboço, o piso (o menor y da face de baixo dela,"
+        },
+        {
+          "tipo": "+",
+          "linha": 256,
+          "texto": "   com o `deslocamentoY`), o topo do prisma e o intervalo em z do meio do vidro. O montante vai de ponta a ponta desse intervalo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 257,
+          "texto": "function medidasDoParabrisa(t) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 229,
+          "texto": "  const parabrisa = loftPorEstacoes({"
+        },
+        {
+          "tipo": "-",
+          "linha": 230,
+          "texto": "    eixo: 'x',"
+        },
+        {
+          "tipo": "-",
+          "linha": 231,
+          "texto": "    linha: [0, m(pb.estacoes[0][1] + pb.deslocamentoY), m(pb.centroZ)],"
+        },
+        {
+          "tipo": "-",
+          "linha": 232,
+          "texto": "    estacoes: pb.estacoes.map(([x, y, meio, y1, y2, y3, y4]) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 233,
+          "texto": "      const cy = y + pb.deslocamentoY;"
+        },
+        {
+          "tipo": "-",
+          "linha": 234,
+          "texto": "      return {"
+        },
+        {
+          "tipo": "-",
+          "linha": 235,
+          "texto": "        p: m(x),"
+        },
+        {
+          "tipo": "-",
+          "linha": 236,
+          "texto": "        pontos: [[m(cy + y1), m(pb.centroZ - meio)], [m(cy + y2), m(pb.centroZ - meio)], [m(cy + y3), m(pb.centroZ + meio)], [m(cy + y4), m(pb.centroZ + meio)]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 237,
+          "texto": "      };"
+        },
+        {
+          "tipo": "-",
+          "linha": 238,
+          "texto": "    }),"
+        },
+        {
+          "tipo": "-",
+          "linha": 239,
+          "texto": "    avanco,"
+        },
+        {
+          "tipo": "-",
+          "linha": 240,
+          "texto": "    segmentos: 1,"
+        },
+        {
+          "tipo": "-",
+          "linha": 241,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 259,
+          "texto": "  const frente = pb.estacoes.map(([x, , meio]) => [x, pb.centroZ - meio]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 260,
+          "texto": "  const tras = pb.estacoes.map(([x, , meio]) => [x, pb.centroZ + meio]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 261,
+          "texto": "  const meioDoMeio = Math.max(...pb.estacoes.map((e) => e[2]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 262,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 263,
+          "texto": "    planta: [...frente, ...[...tras].reverse()],"
+        },
+        {
+          "tipo": "+",
+          "linha": 264,
+          "texto": "    piso: Math.min(...pb.estacoes.flatMap(([, y, , ...ys]) => ys.map((v) => y + pb.deslocamentoY + v))),"
+        },
+        {
+          "tipo": "+",
+          "linha": 265,
+          "texto": "    topo: Math.max(...t.casco.estacoes.map((e) => e[4] + e[2] / 2)) + t.vao.folga,"
+        },
+        {
+          "tipo": "+",
+          "linha": 266,
+          "texto": "    zDaBase: pb.centroZ - meioDoMeio,"
+        },
+        {
+          "tipo": "+",
+          "linha": 267,
+          "texto": "    zDoTopo: pb.centroZ + meioDoMeio,"
+        },
+        {
+          "tipo": "+",
+          "linha": 268,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 269,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 243,
+          "texto": "  /* O eixo da barra vai de `de` a `para`; a extrusão nasce em y a partir da origem, gira em z e depois em x para apontar para"
+        },
+        {
+          "tipo": "-",
+          "linha": 244,
+          "texto": "     `para` e sobe para `de`. Com os dois pontos no mesmo x só sobra o giro em x. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 245,
+          "texto": "  const [dx, dy, dz] = t.montante.para.map((v, k) => m(v - t.montante.de[k]));"
+        },
+        {
+          "tipo": "-",
+          "linha": 246,
+          "texto": "  const comprimento = Math.hypot(dx, dy, dz);"
+        },
+        {
+          "tipo": "-",
+          "linha": 247,
+          "texto": "  const montante = {"
+        },
+        {
+          "tipo": "-",
+          "linha": 248,
+          "texto": "    comprimento,"
+        },
+        {
+          "tipo": "-",
+          "linha": 249,
+          "texto": "    giroEmZ: -(Math.asin(dx / comprimento) * 180) / Math.PI,"
+        },
+        {
+          "tipo": "-",
+          "linha": 250,
+          "texto": "    giroEmX: (Math.atan2(dz, dy) * 180) / Math.PI,"
+        },
+        {
+          "tipo": "-",
+          "linha": 251,
+          "texto": "    em: t.montante.de.map(m),"
+        },
+        {
+          "tipo": "-",
+          "linha": 252,
+          "texto": "    largura: m(t.montante.largura),"
+        },
+        {
+          "tipo": "-",
+          "linha": 253,
+          "texto": "    profundidade: m(t.montante.profundidade),"
+        },
+        {
+          "tipo": "-",
+          "linha": 254,
+          "texto": "    raio: m(t.montante.raioDoCanto),"
+        },
+        {
+          "tipo": "+",
+          "linha": 271,
+          "texto": "/* O montante: seções em z, nas pontas do vidro e em cada estação do casco entre elas, de retângulo de cantos arredondados com a face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 272,
+          "texto": "   baixo no topo do casco e a altura na vertical que dá a `profundidade` na inclinação do esboço. As alturas são as mesmas em todas as"
+        },
+        {
+          "tipo": "+",
+          "linha": 273,
+          "texto": "   seções, de modo que a face de cima é paralela à de baixo em cada trecho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 274,
+          "texto": "function medidasDoMontante(t) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 275,
+          "texto": "  const v = medidasDoParabrisa(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 276,
+          "texto": "  const [dx, dy, dz] = t.montante.para.map((p, k) => p - t.montante.de[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 277,
+          "texto": "  const altura = t.montante.profundidade / Math.cos(Math.atan2(dy, Math.hypot(dx, dz)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 278,
+          "texto": "  const zs = [v.zDaBase, ...t.casco.estacoes.map((e) => e[0]).filter((z) => z > v.zDaBase && z < v.zDoTopo), v.zDoTopo];"
+        },
+        {
+          "tipo": "+",
+          "linha": 279,
+          "texto": "  const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z));"
+        },
+        {
+          "tipo": "+",
+          "linha": 280,
+          "texto": "  return { altura, zs, embaixo };"
+        },
+        {
+          "tipo": "+",
+          "linha": 281,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 282,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 283,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 284,
+          "texto": "  const avanco = m(t.tampa.avanco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 285,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 286,
+          "texto": "  const casco = cascoPorEstacoes(t, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 287,
+          "texto": "  /* O leito do vidro: o casco descido pela espessura do vidro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 288,
+          "texto": "  const leito = cascoPorEstacoes(t, t.parabrisa.espessura);"
+        },
+        {
+          "tipo": "+",
+          "linha": 289,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 290,
+          "texto": "  /* Duas extrusões em y do contorno em planta do vidro, de y = piso até o topo do casco mais a folga: a do vidro e a do vão, que"
+        },
+        {
+          "tipo": "+",
+          "linha": 291,
+          "texto": "     é a do vidro alargada pela folga em volta. A interseção com o casco e a subtração do leito dão a forma, em `gerarPassos`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 292,
+          "texto": "  const v = medidasDoParabrisa(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 293,
+          "texto": "  const parabrisa = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 294,
+          "texto": "    planta: v.planta.map(([x, z]) => [m(x), m(z)]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 295,
+          "texto": "    piso: m(v.piso),"
+        },
+        {
+          "tipo": "+",
+          "linha": 296,
+          "texto": "    altura: m(v.topo - v.piso),"
+        },
+        {
+          "tipo": "+",
+          "linha": 297,
+          "texto": "    folga: m(t.vao.folga),"
+        },
+        {
+          "tipo": "+",
+          "linha": 300,
+          "texto": "  /* A barra é um loft em z, com o caminho na reta do centro da primeira seção. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 301,
+          "texto": "  const ms = medidasDoMontante(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 302,
+          "texto": "  const montante = loftPorEstacoes({"
+        },
+        {
+          "tipo": "+",
+          "linha": 303,
+          "texto": "    eixo: 'z',"
+        },
+        {
+          "tipo": "+",
+          "linha": 304,
+          "texto": "    linha: [0, m(ms.embaixo[0] + ms.altura / 2), 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 305,
+          "texto": "    estacoes: ms.zs.map((z, k) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 306,
+          "texto": "      p: m(z),"
+        },
+        {
+          "tipo": "+",
+          "linha": 307,
+          "texto": "      pontos: retangulo(m(t.montante.largura) / 2, m(ms.altura) / 2, m(ms.embaixo[k] + ms.altura / 2), Array(4).fill(m(t.montante.raioDoCanto))),"
+        },
+        {
+          "tipo": "+",
+          "linha": 308,
+          "texto": "    })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 309,
+          "texto": "    avanco,"
+        },
+        {
+          "tipo": "+",
+          "linha": 310,
+          "texto": "    segmentos: t.montante.segmentosPorCanto,"
+        },
+        {
+          "tipo": "+",
+          "linha": 311,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 312,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 307,
+          "texto": "  return { casco, parabrisa, montante, janelas, porta, vaoDaPorta, barbatana };"
+        },
+        {
+          "tipo": "+",
+          "linha": 363,
+          "texto": "  return { casco, leito, parabrisa, montante, janelas, porta, vaoDaPorta, barbatana };"
+        },
+        {
+          "tipo": "+",
+          "linha": 371,
+          "texto": "  prismaDoVao: 160, leitoDoVao: 161, vaoDoParabrisa: 162,"
+        },
+        {
+          "tipo": "+",
+          "linha": 372,
+          "texto": "  prismaDoVidro: 170, leitoDoVidro: 171, vidroSemAparar: 172, gabaritoDoParabrisa: 173,"
+        },
+        {
+          "tipo": "+",
+          "linha": 411,
+          "texto": "  /* O prisma do vidro do para-brisa, de y = piso até o topo do casco, menos o leito (o casco descido pela espessura do vidro): fica"
+        },
+        {
+          "tipo": "+",
+          "linha": 412,
+          "texto": "     o que está acima do leito, dentro do contorno em planta. Com `folga` o prisma cresce em volta, e é o vão. O leito é um loft do"
+        },
+        {
+          "tipo": "+",
+          "linha": 413,
+          "texto": "     casco, e vem logo antes da subtração que o consome. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 414,
+          "texto": "  const prismaMenosLeito = (prismaId, leitoId, origemId, folga) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 415,
+          "texto": "    passos.push(['extrusao', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 416,
+          "texto": "      origemId: prismaId, eixo: 'y', altura: P.parabrisa.altura, perfil: P.parabrisa.planta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 417,
+          "texto": "      ...(folga ? { deslocar: { para: 'fora', distancia: P.parabrisa.folga, canto: 'esquadria' } } : {}),"
+        },
+        {
+          "tipo": "+",
+          "linha": 418,
+          "texto": "    }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 419,
+          "texto": "    passos.push(['transladar', { d: [0, P.parabrisa.piso, 0], sel: { origem: { op: 'extrusao', id: prismaId } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 420,
+          "texto": "    loft(leitoId, P.leito, t.casco.segmentosPorCanto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 421,
+          "texto": "    passos.push(['subtrair', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 422,
+          "texto": "      origemId,"
+        },
+        {
+          "tipo": "+",
+          "linha": 423,
+          "texto": "      solidos: [{ origem: { op: 'extrusao', id: prismaId } }, { origem: { op: 'loft', id: leitoId } }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 424,
+          "texto": "    }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 425,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 426,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 428,
+          "texto": "  prismaMenosLeito(ID.prismaDoVao, ID.leitoDoVao, ID.vaoDoParabrisa, true);"
+        },
+        {
+          "tipo": "+",
+          "linha": 436,
+          "texto": "      { origem: { op: 'subtrair', id: ID.vaoDoParabrisa } },"
+        },
+        {
+          "tipo": "-",
+          "linha": 369,
+          "texto": "  /* O para-brisa e o montante dele. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 370,
+          "texto": "  loft(ID.parabrisa, P.parabrisa, 1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 371,
+          "texto": "  passos.push(['parte', { nome: 'parabrisa', sel: { origem: { op: 'loft', id: ID.parabrisa } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 372,
+          "texto": "  passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'loft', id: ID.parabrisa } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 373,
+          "texto": "  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'loft', id: ID.parabrisa } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 374,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 375,
+          "texto": "  const M = P.montante;"
+        },
+        {
+          "tipo": "-",
+          "linha": 376,
+          "texto": "  passos.push(['extrusao', {"
+        },
+        {
+          "tipo": "-",
+          "linha": 377,
+          "texto": "    origemId: ID.montante, eixo: 'y', altura: M.comprimento,"
+        },
+        {
+          "tipo": "-",
+          "linha": 378,
+          "texto": "    perfil: { retangulo: { largura: M.largura, profundidade: M.profundidade, cantos: M.raio } },"
+        },
+        {
+          "tipo": "-",
+          "linha": 379,
+          "texto": "    segmentosArco: t.montante.segmentosPorCanto,"
+        },
+        {
+          "tipo": "-",
+          "linha": 380,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 381,
+          "texto": "  if (M.giroEmZ !== 0) passos.push(['rotaciona', { eixo: 'z', graus: M.giroEmZ, pivo: [0, 0, 0], sel: { origem: { op: 'extrusao', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 382,
+          "texto": "  passos.push(['rotaciona', { eixo: 'x', graus: M.giroEmX, pivo: [0, 0, 0], sel: { origem: { op: 'extrusao', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 383,
+          "texto": "  passos.push(['transladar', { d: M.em, sel: { origem: { op: 'extrusao', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 384,
+          "texto": "  passos.push(['parte', { nome: 'montanteParabrisa', sel: { origem: { op: 'extrusao', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 385,
+          "texto": "  passos.push(['material', { usa: 'casco', sel: { origem: { op: 'extrusao', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 386,
+          "texto": "  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'extrusao', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 387,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 388,
+          "texto": "  /* Cada sólido que assenta na superfície do casco (as placas das janelas e a porta) é aparado pelo casco inteiro, sem os vãos:"
+        },
+        {
+          "tipo": "-",
+          "linha": 389,
+          "texto": "     a interseção deixa a face de fora dele rente à superfície, no lugar de passar dela. O gabarito é um loft do casco refeito a"
+        },
+        {
+          "tipo": "-",
+          "linha": 390,
+          "texto": "     cada uso, porque a interseção o consome, e vem logo antes dela para o polo dele não dividir lugar com o de outro loft. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 445,
+          "texto": "  /* Cada sólido que assenta na superfície do casco (o vidro do para-brisa, as placas das janelas e a porta) é aparado pelo casco"
+        },
+        {
+          "tipo": "+",
+          "linha": 446,
+          "texto": "     inteiro, sem os vãos: a interseção deixa a face de fora dele rente à superfície, no lugar de passar dela. O gabarito é um loft"
+        },
+        {
+          "tipo": "+",
+          "linha": 447,
+          "texto": "     do casco refeito a cada uso, porque a interseção o consome, e vem logo antes dela para o polo dele não dividir lugar com o de"
+        },
+        {
+          "tipo": "+",
+          "linha": 448,
+          "texto": "     outro loft. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 454,
+          "texto": "  /* O vidro do para-brisa, aparado pelo casco, e o montante dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 455,
+          "texto": "  prismaMenosLeito(ID.prismaDoVidro, ID.leitoDoVidro, ID.vidroSemAparar, false);"
+        },
+        {
+          "tipo": "+",
+          "linha": 456,
+          "texto": "  apara({ op: 'subtrair', id: ID.vidroSemAparar }, ID.parabrisa, ID.gabaritoDoParabrisa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 457,
+          "texto": "  passos.push(['parte', { nome: 'parabrisa', sel: { origem: { op: 'intersectar', id: ID.parabrisa } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 458,
+          "texto": "  passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'intersectar', id: ID.parabrisa } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 459,
+          "texto": "  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'intersectar', id: ID.parabrisa } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 460,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 461,
+          "texto": "  loft(ID.montante, P.montante, t.montante.segmentosPorCanto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 462,
+          "texto": "  passos.push(['parte', { nome: 'montanteParabrisa', sel: { origem: { op: 'loft', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 463,
+          "texto": "  passos.push(['material', { usa: 'casco', sel: { origem: { op: 'loft', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 464,
+          "texto": "  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'loft', id: ID.montante } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 465,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 432,
+          "texto": "/* Os pontos declarados, em milímetro, saem da mesma tabela que a malha: os extremos do casco, do para-brisa, da porta e da"
+        },
+        {
+          "tipo": "+",
+          "linha": 502,
+          "texto": "/* Os pontos declarados, em milímetro, saem da mesma tabela que a malha: os extremos do casco, do vidro do para-brisa, da porta e da"
+        },
+        {
+          "tipo": "-",
+          "linha": 444,
+          "texto": "  const pb = t.parabrisa;"
+        },
+        {
+          "tipo": "-",
+          "linha": 445,
+          "texto": "  const cantosDoParabrisa = pb.estacoes.flatMap(([x, y, meio, ...ys]) => ["
+        },
+        {
+          "tipo": "-",
+          "linha": 446,
+          "texto": "    [x, y + pb.deslocamentoY + Math.min(...ys), pb.centroZ - meio], [x, y + pb.deslocamentoY + Math.max(...ys), pb.centroZ + meio],"
+        },
+        {
+          "tipo": "-",
+          "linha": 447,
+          "texto": "  ]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 448,
+          "texto": "  const caixaDoParabrisa = extremos(cantosDoParabrisa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 514,
+          "texto": "  /* O vidro rente ocupa o contorno em planta da faixa do esboço, de z da base a z do topo, do piso até o topo do casco no fim do meio"
+        },
+        {
+          "tipo": "+",
+          "linha": 515,
+          "texto": "     do vidro (o casco sobe até lá); os extremos em x e z são os do contorno. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 516,
+          "texto": "  const vidro = medidasDoParabrisa(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 517,
+          "texto": "  const xsDoVidro = vidro.planta.map((p) => p[0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 518,
+          "texto": "  const caixaDoParabrisa = {"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
