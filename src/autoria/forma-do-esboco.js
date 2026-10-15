@@ -11,6 +11,11 @@
  * maior ou deslocada, e cai com o recorte que a parte não fez (a forma sem o vão tem mais volume que a forma recortada). A parte pode
  * refinar mais de uma forma do esboço, e então a comparação é com a união delas.
  *
+ * A parte que a pessoa decidiu pôr noutro lugar declara `deslocamento` em `REFINA.esboco.formas` (com o `motivo`), e a razão é medida
+ * contra a forma transladada por esse vetor. Como a razão não muda quando os dois sólidos andam juntos, a conta move a malha da parte
+ * pelo vetor contrário e deixa a forma onde o esboço a pôs; é a mesma razão, sem criar sólido deslocado. A parte que alonga ou gira não é
+ * translação, não declara deslocamento e fica com o mínimo próprio.
+ *
  * O QUE ELA NÃO DIZ. A razão mede volume e não posição de cada detalhe: uma parte com a metade do volume no lugar certo e o resto no
  * errado dá uma razão baixa, mas uma que erra por menos que o mínimo passa. O mínimo é de quem declara, forma a forma, e a razão que
  * a parte tem de fato vem em `partes`. A parte cuja malha não fecha, ou cuja forma não tem sólido, não tem razão: volta como achado
@@ -20,7 +25,7 @@
  * (metro) e `malhaDaFamilia(forma)` a malha da forma de família (ver `solido-do-esboco.js`). Este módulo não conhece disco, Three.js
  * nem DOM. */
 import { ErroDoSolido, criarContextoDeSolidos, criarSolidosDoEsboco, soldarMalha, triangularPoligonos } from './solido-do-esboco.js';
-import { normalizarEsbocoDoRefinamento } from './refinamento-global.js';
+import { afastamentoDaParte, normalizarEsbocoDoRefinamento, vetorTexto } from './refinamento-global.js';
 
 export const FORMATO_FORMA_DO_ESBOCO = 'mecanifica.forma-do-esboco@1';
 
@@ -35,6 +40,7 @@ export function textoDaRazao(razao, minimo) {
   const curto = razao.toFixed(3);
   return virgula(razao < minimo && curto >= minimo.toFixed(3) ? razao.toFixed(5) : curto);
 }
+const textoMm = (mm) => virgula(Number(mm.toFixed(1)));
 const cm3 = (mm3) => virgula(Math.round(mm3 / MM3_POR_CM3));
 
 /* Os ids da opção em ordem, até 20, e quantos ficaram de fora (o avião tem 140 formas). */
@@ -45,8 +51,9 @@ function listaDeIds(ids) {
   return `formas: ${mostrados}${todos.length > LIMITE_DE_IDS_NA_MENSAGEM ? ` e mais ${todos.length - LIMITE_DE_IDS_NA_MENSAGEM}` : ''}`;
 }
 
-/* As faces de uma parte da receita como triângulos, os vértices em milímetro. */
-function malhaDaParte(neutro, nome) {
+/* As faces de uma parte da receita como triângulos, os vértices em milímetro. Com `deslocamento` (o vetor que a receita declara para a
+   parte), os vértices voltam por ele ao lugar que a forma do esboço ocupa. */
+function malhaDaParte(neutro, nome, deslocamento = null) {
   const indice = new Map();
   const vertices = [];
   const poligonos = [];
@@ -57,7 +64,7 @@ function malhaDaParte(neutro, nome) {
         const p = neutro.V.get(id);
         if (!p) throw new ErroDoSolido(`a face ${face.id} da parte '${nome}' cita o vértice ${id}, que a peça não tem`, 'malha-invalida');
         indice.set(id, vertices.length);
-        vertices.push(p.map((c) => c * MM_POR_METRO));
+        vertices.push(p.map((c, k) => c * MM_POR_METRO - (deslocamento ? deslocamento[k] : 0)));
       }
       return indice.get(id);
     }));
@@ -91,8 +98,10 @@ export function conferirFormaDoEsboco({ esboco, dados, neutro, malhaDaFamilia = 
   const achados = [];
   const aMedir = [];
 
-  for (const { parte, formas, minimo: proprio } of declaracao.formas) {
+  for (const entrada of declaracao.formas) {
+    const { parte, formas, minimo: proprio } = entrada;
     const minimo = proprio ?? declaracao.minimo;
+    const afastamento = afastamentoDaParte(entrada);
     const desconhecidas = formas.filter((id) => !ids.has(id));
     if (desconhecidas.length) {
       achados.push({
@@ -108,7 +117,7 @@ export function conferirFormaDoEsboco({ esboco, dados, neutro, malhaDaFamilia = 
       });
       continue;
     }
-    aMedir.push({ parte, formas, minimo });
+    aMedir.push({ parte, formas, minimo, afastamento });
   }
 
   const semSolidoDaParte = (parte, formas, e) => achados.push({
@@ -117,9 +126,9 @@ export function conferirFormaDoEsboco({ esboco, dados, neutro, malhaDaFamilia = 
   });
   const medidas = [];
   const malhas = new Map();
-  for (const { parte, formas } of aMedir) {
+  for (const { parte, formas, afastamento } of aMedir) {
     try {
-      malhas.set(parte, malhaDaParte(neutro, parte));
+      malhas.set(parte, malhaDaParte(neutro, parte, afastamento.deslocamento ?? null));
     } catch (e) {
       if (!(e instanceof ErroDoSolido)) throw e;
       semSolidoDaParte(parte, formas, e);
@@ -131,7 +140,7 @@ export function conferirFormaDoEsboco({ esboco, dados, neutro, malhaDaFamilia = 
     const contexto = criarContextoDeSolidos({ origem: [0, 1, 2].map((i) => (caixa.min[i] + caixa.max[i]) / 2) });
     try {
       const solidos = criarSolidosDoEsboco(dados, { contexto, malhaDaFamilia });
-      for (const { parte, formas, minimo } of prontas) {
+      for (const { parte, formas, minimo, afastamento } of prontas) {
         let doEsboco;
         let daParte;
         try {
@@ -140,6 +149,19 @@ export function conferirFormaDoEsboco({ esboco, dados, neutro, malhaDaFamilia = 
           if (!(e instanceof ErroDoSolido)) throw e;
           achados.push({ codigo: 'forma-do-esboco-sem-solido', parte, formas, mensagem: `a parte '${parte}' declara refinar ${lista(formas)} do esboço, e o sólido não saiu: ${e.message}.` });
           continue;
+        }
+        /* o deslocamento tem teto proporcional à forma: uma parte posta mais longe que a maior aresta da caixa da forma saiu da vizinhança
+           do esboço, e quem decidiu isso trocou de parte e não afastou esta */
+        if (afastamento.deslocamento) {
+          const { min, max } = contexto.caixa(doEsboco);
+          const maiorAresta = Math.max(...[0, 1, 2].map((i) => max[i] - min[i]));
+          const distancia = Math.hypot(...afastamento.deslocamento);
+          if (distancia > maiorAresta) {
+            achados.push({
+              codigo: 'deslocamento-maior-que-a-forma', parte, formas, deslocamento: afastamento.deslocamento,
+              mensagem: `a parte '${parte}' declara deslocamento ${vetorTexto(afastamento.deslocamento)} mm (${textoMm(distancia)} mm) em REFINA.esboco.formas, e a maior aresta da caixa do esboço para ${lista(formas)} é ${textoMm(maiorAresta)} mm: uma parte posta mais longe que o tamanho da própria forma é outra parte, e o esboço é que muda.`,
+            });
+          }
         }
         try {
           const m = malhas.get(parte);
@@ -155,11 +177,11 @@ export function conferirFormaDoEsboco({ esboco, dados, neutro, malhaDaFamilia = 
         const uniao = volumeDaParte + volumeDasFormas - volumeComum;
         const razao = uniao > 0 ? volumeComum / uniao : 0;
         const ok = razao >= minimo;
-        medidas.push({ parte, formas, razao, minimo, ok, volumeParteMm3: volumeDaParte, volumeFormasMm3: volumeDasFormas, volumeComumMm3: volumeComum });
+        medidas.push({ parte, formas, razao, minimo, ok, ...afastamento, volumeParteMm3: volumeDaParte, volumeFormasMm3: volumeDasFormas, volumeComumMm3: volumeComum });
         if (!ok) {
           achados.push({
             codigo: 'parte-fora-da-forma-do-esboco', parte, formas, razao, minimo,
-            mensagem: `a parte '${parte}' tem razão interseção/união de volume ${textoDaRazao(razao, minimo)} com ${lista(formas)} do esboço (mínimo ${virgula(minimo)}): a parte tem ${cm3(volumeDaParte)} cm3, ${formas.length === 1 ? 'a forma tem' : 'as formas têm'} ${cm3(volumeDasFormas)} cm3 e as duas dividem ${cm3(volumeComum)} cm3.`,
+            mensagem: `a parte '${parte}' tem razão interseção/união de volume ${textoDaRazao(razao, minimo)} com ${lista(formas)} do esboço${afastamento.deslocamento ? ` deslocad${formas.length === 1 ? 'a' : 'as'} ${vetorTexto(afastamento.deslocamento)} mm (REFINA.esboco.formas.${parte}.deslocamento)` : ''} (mínimo ${virgula(minimo)}): a parte tem ${cm3(volumeDaParte)} cm3, ${formas.length === 1 ? 'a forma tem' : 'as formas têm'} ${cm3(volumeDasFormas)} cm3 e as duas dividem ${cm3(volumeComum)} cm3.`,
           });
         }
       }

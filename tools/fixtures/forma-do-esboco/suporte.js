@@ -4,7 +4,8 @@
  * 30 graus em z. `bloco.esboco.json` desenha as duas formas (o furo é o recorte de um cilindro) e `andaime.json` reserva uma caixa para
  * cada uma, folgada o bastante para o envelope do `REFINA` aprovar também as variantes defeituosas, de modo que só a razão de volume
  * contra o esboço as recuse. Cada pasta ao lado (`ok`, `sem-recorte`, `menor`, `deslocada`, `viga-reta`, `minimo-proprio`) é uma receita
- * de uma linha que chama esta função com um defeito diferente.
+ * de uma linha que chama esta função com um defeito diferente; `deslocada-declarada` é o bloco deslocado de propósito, com o
+ * deslocamento e o motivo declarados e o envelope em 5 mm.
  *
  * ELA NÃO É CONTEÚDO. Mora em `tools/fixtures/`, fora do acervo publicado; `guarda:acervo` não a varre. */
 
@@ -24,6 +25,8 @@ export function receitaDoBloco({
   formas = { bloco: 'bloco', viga: 'viga' },
   /* o que mais sobrescrever em REFINA.esboco */
   esboco = {},
+  /* REFINA.tolerancia: folgada por padrão, de modo que só a razão de volume recuse; a prova do deslocamento a aperta para 5 mm */
+  tolerancia = { envelope: 50, porta: 0.5 },
 } = {}) {
   const largura = 200 * escala;
   const altura = 100 * escala;
@@ -65,7 +68,7 @@ export function receitaDoBloco({
       andaime: '../andaime.json',
       esboco: { arquivo: '../bloco.esboco.json', opcao: 1, formas, minimo, ...esboco },
       partes: { bloco: 'bloco', viga: 'viga' },
-      tolerancia: { envelope: 50, porta: 0.5 },
+      tolerancia,
     },
     /* o cilindro do furo só fecha com as duas tampas, e a subtração exige sólido fechado */
     ALIASES: furo

@@ -29,6 +29,7 @@ import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { conferirFormaDoEsbocoDaReceita, conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
 import { conferirContornosDaPeca, contornosDaPeca } from './contorno-da-peca.mjs';
+import { afastamentoDaParte, textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca, textoDaRazao } from '../../src/autoria/razoes-da-peca.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -372,7 +373,8 @@ export async function descreverPecaReutilizavel({
       stderr += `\n${formaDoEsboco.achados.length} ACHADO(S) NA FORMA CONTRA O ESBOÇO '${formaDoEsboco.arquivo}'\n`
         + formaDoEsboco.achados.map((a) => `    ${a.mensagem}`).join('\n')
         + '\n  A parte diverge do sólido da forma do esboço que ela refina (razão interseção/união de volume): ou a receita saiu da forma,'
-        + '\n  ou o esboço precisa mudar antes, ou o mínimo declarado em REFINA.esboco não é o que a parte pode cumprir.\n';
+        + '\n  ou o esboço precisa mudar antes, ou a parte se afasta dele de propósito e precisa declarar o deslocamento e o motivo em REFINA.esboco.formas,'
+        + '\n  ou o mínimo declarado em REFINA.esboco não é o que a parte pode cumprir.\n';
       falhou = true;
     }
     try {
@@ -519,6 +521,11 @@ export async function descreverPecaReutilizavel({
     if (formaDoEsboco) {
       linhasDeReferencia.push(`forma contra o esboço (${formaDoEsboco.arquivo}, opção ${formaDoEsboco.opcao?.titulo ?? formaDoEsboco.opcao?.numero ?? formaDoEsboco.opcao}): ${formaDoEsboco.ok ? 'aprovada' : 'REPROVADA'}`
         + ` — ${formaDoEsboco.partes.map((p) => `${p.parte} ${String(Math.round(p.razao * 1000) / 1000).replace('.', ',')}`).join(', ') || 'nenhuma parte medida'} (razão interseção/união de volume, mínimo ${String(formaDoEsboco.minimo).replace('.', ',')})`);
+      /* a parte que a receita põe fora do esboço de propósito (deslocamento ou alongamento declarado) diz o quanto e por quê */
+      for (const medida of formaDoEsboco.partes) {
+        const texto = textoDoAfastamento(afastamentoDaParte(medida));
+        if (texto) linhasDeReferencia.push(`parte afastada do esboço de propósito: ${medida.parte} ${texto}`);
+      }
     }
     stdout += `\nREFERÊNCIA DA FORMA\n${linhasDeReferencia.map((l) => `  ${l}`).join('\n')}\n`;
   }

@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
-import { comoCLI, descreverFormaDoEsboco, formaDoEsbocoDaPeca, ligarPartes } from './forma-do-esboco.mjs';
+import { comDeslocamentos, comoCLI, descreverFormaDoEsboco, formaDoEsbocoDaPeca, lerDeslocamentos, ligarPartes } from './forma-do-esboco.mjs';
 import { conferirFormaDoEsbocoDoJson, formasDoEsboco, malhaDaFormaDeFamilia } from './esboco-solido.mjs';
 import { malhaDaChamada } from './esboco-familias.mjs';
 import { criarContextoDeSolidos, criarSolidosDoEsboco } from '../../src/autoria/solido-do-esboco.js';
@@ -125,11 +125,116 @@ describe('o esboço que a receita aponta', () => {
   });
 });
 
+describe('a parte que se afasta do esboço de propósito declara o deslocamento', () => {
+  const MOTIVO = 'o bloco é posto 20 mm para +x por decisão da pessoa';
+  const APERTADO = { envelope: 5, porta: 0.5 };
+  /* o bloco furado 20 mm para +x, com o envelope em 5 mm e o mínimo geral em 0,99; `formas` diz o que a receita declara dele */
+  const deslocado = (formas, opcoes = {}) => receitaDoBloco({ deslocamentoX: 20, tolerancia: APERTADO, formas: { bloco: formas, viga: 'viga' }, ...opcoes });
+  const medirModulo = (modulo) => descreverPecaReutilizavel({ peca: `${PASTA}/ok/receita.js`, modulo });
+  const declarado = { formas: 'bloco', deslocamento: [20, 0, 0], motivo: MOTIVO };
+
+  it('a razão é medida contra a forma transladada e o envelope contra o volume transladado: o bloco 20 mm adiante passa com o mínimo geral de 0,99', async () => {
+    const r = await descreverPecaReutilizavel({ peca: `${PASTA}/deslocada-declarada/receita.js` });
+    expect(r.stderr).toBe('');
+    expect(r.ok).toBe(true);
+    expect(razao(r, 'bloco')).toBeGreaterThan(0.99);
+    expect(r.resultado.formaDoEsboco.partes.find((p) => p.parte === 'bloco')).toMatchObject({ minimo: 0.99, ok: true, deslocamento: [20, 0, 0], motivo: MOTIVO });
+    expect(r.resultado.formaDoEsboco.partes.find((p) => p.parte === 'viga')).not.toHaveProperty('deslocamento');
+    expect(r.resultado.refinamento.partes.find((p) => p.parte === 'bloco')).toMatchObject({ deslocamento: [20, 0, 0], motivo: MOTIVO });
+    expect(r.resultado.refinamento.ok).toBe(true);
+  });
+
+  it('o relatório diz, em cada parte deslocada, o deslocamento e o motivo, e a parte que não se afasta não aparece', async () => {
+    const r = await descreverPecaReutilizavel({ peca: `${PASTA}/deslocada-declarada/receita.js` });
+    expect(r.stdout).toContain(`parte afastada do esboço de propósito: bloco deslocada [20, 0, 0] mm; motivo: ${MOTIVO}`);
+    expect(r.stdout.match(/parte afastada do esboço de propósito/g)).toHaveLength(1);
+    const sem = await medir('ok');
+    expect(sem.stdout).not.toContain('afastada do esboço');
+  });
+
+  it('a mesma receita sem a declaração reprova no envelope e na razão', async () => {
+    const r = await medirModulo(deslocado('bloco'));
+    expect(r.ok).toBe(false);
+    expect(r.stderr).toContain("ACHADO(S) NO REFINAMENTO DO ANDAIME");
+    expect(r.stderr).toMatch(/a parte 'bloco' sai do envelope do volume 'bloco' em \+x por 20 mm \(tolerância 5 mm\)/);
+    expect(r.stderr).toContain("ACHADO(S) NA FORMA CONTRA O ESBOÇO");
+    expect(r.stderr).toMatch(/a parte 'bloco' tem razão interseção\/união de volume 0,71\d com a forma 'bloco' do esboço \(mínimo 0,99\)/);
+  });
+
+  it('o deslocamento declarado errado reprova e a mensagem o cita; o certo menos 2 mm também, porque a régua continua em 0,99', async () => {
+    const errado = await medirModulo(deslocado({ ...declarado, deslocamento: [10, 0, 0] }));
+    expect(errado.ok).toBe(false);
+    expect(errado.stderr).toMatch(/a parte 'bloco' tem razão interseção\/união de volume 0,8\d+ com a forma 'bloco' do esboço deslocada \[10, 0, 0\] mm \(REFINA\.esboco\.formas\.bloco\.deslocamento\) \(mínimo 0,99\)/);
+    expect(errado.stderr).toMatch(/a parte 'bloco' sai do envelope do volume 'bloco' deslocado \[10, 0, 0\] mm \(REFINA\.esboco\.formas\.bloco\) em \+x por 10 mm/);
+    const quase = await medirModulo(deslocado({ ...declarado, deslocamento: [18, 0, 0] }));
+    expect(quase.resultado.formaDoEsboco.achados.map((a) => a.codigo)).toEqual(['parte-fora-da-forma-do-esboco']);
+  });
+
+  it('um erro de forma de verdade continua reprovando a parte deslocada: o bloco sem o furo', async () => {
+    const r = await medirModulo(deslocado(declarado, { furo: false }));
+    expect(r.ok).toBe(false);
+    expect(r.resultado.refinamento.ok).toBe(true);
+    expect(r.stderr).toMatch(/a parte 'bloco' tem razão interseção\/união de volume 0,88\d com a forma 'bloco' do esboço deslocada \[20, 0, 0\] mm/);
+    const menor = await medirModulo(deslocado(declarado, { escala: 0.95 }));
+    expect(menor.resultado.formaDoEsboco.achados.map((a) => a.parte)).toEqual(['bloco']);
+  });
+
+  it('o deslocamento tem teto proporcional à forma: mais longe que a maior aresta da caixa dela é outra parte', async () => {
+    const r = await medirModulo(deslocado({ ...declarado, deslocamento: [300, 0, 0] }));
+    expect(r.ok).toBe(false);
+    expect(r.resultado.formaDoEsboco.achados.map((a) => a.codigo)).toContain('deslocamento-maior-que-a-forma');
+    expect(r.stderr).toContain("a parte 'bloco' declara deslocamento [300, 0, 0] mm (300 mm) em REFINA.esboco.formas, e a maior aresta da caixa do esboço para a forma 'bloco' é 200 mm");
+    const dentro = await medirModulo(deslocado(declarado));
+    expect(dentro.resultado.formaDoEsboco.achados).toEqual([]);
+  });
+
+  it('o deslocamento não troca o mínimo: o mínimo próprio da parte deslocada vale no lugar do geral', async () => {
+    const r = await medirModulo(deslocado({ ...declarado, minimo: 0.5 }, { furo: false }));
+    expect(r.ok).toBe(true);
+    expect(r.resultado.formaDoEsboco.partes.find((p) => p.parte === 'bloco')).toMatchObject({ minimo: 0.5, ok: true });
+  });
+
+  it('a parte que passa do volume sem ser translação declara o alongamento: o envelope passa o lado declarado, e a razão fica com o mínimo próprio', async () => {
+    const r = await medirModulo(deslocado({ formas: 'bloco', minimo: 0.7, alongamento: { '+x': 20 }, motivo: 'o bloco alonga 20 mm para +x' }));
+    expect(r.stderr).toBe('');
+    expect(r.ok).toBe(true);
+    expect(r.stdout).toContain('parte afastada do esboço de propósito: bloco passa do volume +x 20 mm; motivo: o bloco alonga 20 mm para +x');
+    const curto = await medirModulo(deslocado({ formas: 'bloco', minimo: 0.7, alongamento: { '+x': 10 }, motivo: 'o bloco alonga 10 mm para +x' }));
+    expect(curto.ok).toBe(false);
+    expect(curto.stderr).toMatch(/a parte 'bloco' sai do envelope do volume 'bloco' em \+x por 20 mm \(tolerância 15 mm\)/);
+  });
+
+  it('o alongamento que sobrou da receita reprova no envelope, com o motivo da recusa', async () => {
+    const r = await medirModulo(receitaDoBloco({ tolerancia: APERTADO, formas: { bloco: { formas: 'bloco', alongamento: { '+x': 20 }, motivo: 'o bloco alonga 20 mm para +x' }, viga: 'viga' } }));
+    expect(r.ok).toBe(false);
+    expect(r.stderr).toMatch(/a parte 'bloco' declara passar do volume 'bloco' em \+x por 20 mm .* e passa por 0 mm/);
+    expect(r.resultado.refinamento.achados.map((a) => a.codigo)).toEqual(['alongamento-maior-que-a-parte']);
+  });
+
+  it('a declaração sem motivo é recusada pela normalização, antes de medir', async () => {
+    const r = await medirModulo(deslocado({ formas: 'bloco', deslocamento: [20, 0, 0] }));
+    expect(r.ok).toBe(false);
+    expect(r.stderr).toContain('REFINAMENTO DA FORMA GLOBAL INVÁLIDO');
+    expect(r.stderr).toContain("'formas.bloco' declara deslocamento ou alongamento e precisa dizer o 'motivo'");
+  });
+
+  it('a forma canônica é a mesma depois de normalizar de novo', () => {
+    const canonico = normalizarEsbocoDoRefinamento({ arquivo: 'a.esboco.json', minimo: 0.9, formas: { bloco: declarado } });
+    expect(normalizarEsbocoDoRefinamento(canonico)).toEqual(canonico);
+    expect(canonico.formas[0]).toEqual({ parte: 'bloco', formas: ['bloco'], deslocamento: [20, 0, 0], motivo: MOTIVO });
+  });
+});
+
 describe('a guarda do acervo roda a conferência no caminho da receita', () => {
   const guarda = (variante) => conferirAcervo([`${PASTA}/${variante}/receita`]);
 
   it('aprova a receita que reproduz a forma', async () => {
     const { reprovadas } = await guarda('ok');
+    expect(reprovadas).toEqual([]);
+  });
+
+  it('aprova a receita que declara o deslocamento do bloco', async () => {
+    const { reprovadas } = await guarda('deslocada-declarada');
     expect(reprovadas).toEqual([]);
   });
 
@@ -288,6 +393,55 @@ describe('a linha de comando', () => {
     expect(fora.stdout).toContain('REPROVADA');
     expect(fora.stdout).toMatch(/bloco\s+0,71\d+\s+ABAIXO/);
     expect(fora.stdout).toContain("ACHADO parte-fora-da-forma-do-esboco: a parte 'bloco' tem razão");
+  });
+
+  it('--desloca declara o deslocamento e o motivo: o bloco deslocado passa e o relatório diz o deslocamento e o motivo', async () => {
+    const motivo = 'o bloco é posto 20 mm para +x';
+    const base = [`${PASTA}/deslocada/receita.js`, `--esboco=${ESBOCO}`, '--formas=bloco:bloco,viga:viga', '--minimo=0.99'];
+    const sem = await comoCLI(base);
+    expect(sem.codigo).toBe(1);
+    expect(sem.stdout).not.toContain('afastadas do esboço');
+    const feito = await comoCLI([...base, `--desloca=bloco:20,0,0:${motivo}`]);
+    expect(feito.stderr).toBe('');
+    expect(feito.codigo).toBe(0);
+    expect(feito.stdout).toContain('aprovada');
+    expect(feito.stdout).toMatch(/bloco\s+1,0000\s+ok/);
+    expect(feito.stdout).toContain('afastadas do esboço de propósito (deslocamento e motivo declarados):');
+    expect(feito.stdout).toContain(`    bloco: deslocada [20, 0, 0] mm; motivo: ${motivo}`);
+    expect(feito.resultado.partes.find((p) => p.parte === 'bloco')).toMatchObject({ deslocamento: [20, 0, 0], motivo });
+    expect(feito.resultado.partes.find((p) => p.parte === 'viga')).not.toHaveProperty('deslocamento');
+  });
+
+  it('--desloca errado reprova com o deslocamento na mensagem, e o motivo é obrigatório', async () => {
+    const base = [`${PASTA}/deslocada/receita.js`, `--esboco=${ESBOCO}`, '--formas=bloco:bloco,viga:viga', '--minimo=0.99'];
+    const errado = await comoCLI([...base, '--desloca=bloco:0,20,0:subiu']);
+    expect(errado.codigo).toBe(1);
+    expect(errado.stdout).toContain('REPROVADA');
+    expect(errado.stdout).toContain('com a forma \'bloco\' do esboço deslocada [0, 20, 0] mm');
+    const semMotivo = await comoCLI([...base, '--desloca=bloco:20,0,0:']);
+    expect(semMotivo.codigo).toBe(1);
+    expect(semMotivo.stderr).toContain("precisa dizer o 'motivo'");
+  });
+
+  it('lerDeslocamentos lê parte:dx,dy,dz:motivo separados por ponto e vírgula, e o motivo vai até o fim do item', () => {
+    expect(lerDeslocamentos('roda:0,-17,0:a roda encosta no chão: 17 mm; pino : 0, -8.5, 0 :o joelho desce')).toEqual({
+      roda: { deslocamento: [0, -17, 0], motivo: 'a roda encosta no chão: 17 mm' },
+      pino: { deslocamento: [0, -8.5, 0], motivo: 'o joelho desce' },
+    });
+    expect(lerDeslocamentos('roda:0,x,0:m').roda.deslocamento.map(Number.isNaN)).toEqual([false, true, false]);
+    expect(() => lerDeslocamentos('roda:0,-17,0')).toThrow(/--desloca espera parte:dx,dy,dz:motivo, com itens separados por ';'.*recebi 'roda:0,-17,0'/);
+    expect(() => lerDeslocamentos(':0,0,1:m')).toThrow(/--desloca espera parte:dx,dy,dz:motivo/);
+    expect(() => lerDeslocamentos('a:1,0,0:m;a:2,0,0:n')).toThrow(/--desloca repete a parte 'a'/);
+    expect(() => lerDeslocamentos(' ; ')).toThrow(/--desloca veio vazio/);
+  });
+
+  it('comDeslocamentos junta o deslocamento à ligação da parte e recusa a parte que não está ligada', () => {
+    const ligadas = { bloco: ['bloco'], viga: ['viga'] };
+    expect(comDeslocamentos(ligadas, null)).toBe(ligadas);
+    expect(comDeslocamentos(ligadas, { bloco: { deslocamento: [1, 0, 0], motivo: 'm' } })).toEqual({
+      bloco: { formas: ['bloco'], deslocamento: [1, 0, 0], motivo: 'm' }, viga: ['viga'],
+    });
+    expect(() => comDeslocamentos(ligadas, { tampa: { deslocamento: [1, 0, 0], motivo: 'm' } })).toThrow(/--desloca cita 'tampa', que não está ligada a forma do esboço \(ligadas: bloco, viga\)/);
   });
 
   it('devolve o que mediu como dado, com as partes sem forma ligada', async () => {

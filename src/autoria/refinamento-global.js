@@ -17,10 +17,19 @@
  *       arquivo: 'aviao.esboco.json', opcao: 1,      // caminho relativo à pasta da peça; opção (número a partir de 1, ou título)
  *       formas: { coluna: 'coluna', base: ['base', 'sapata'], porta: { formas: 'porta', minimo: 0.9 } },
  *       minimo: 0.95,                                // razão interseção/união de volume, abaixo da qual a parte reprova
- *     },
+ *     },                                             // a parte que se afasta do esboço de propósito declara o deslocamento (ver abaixo)
  *     partes: { coluna: 'coluna-central', base: 'sapata' },   // parte da receita -> volume do andaime
  *     tolerancia: { envelope: 2, porta: 0.5 },       // milímetro
  *   }
+ *
+ * O AFASTAMENTO DECLARADO. A parte que a pessoa decidiu pôr em outro lugar que o do esboço não precisa de mínimo próprio que a deixe
+ * passar: a entrada dela em `esboco.formas` declara `deslocamento: [dx, dy, dz]` (mm, no quadro do esboço) e `motivo`. A razão de volume
+ * é medida contra a forma do esboço transladada por esse vetor, e o envelope da parte contra o volume do andaime transladado pelo mesmo
+ * vetor, de modo que a parte inteira volta a ser conferida com o mínimo geral. A parte que não só se move, mas alonga ou gira (um pistão
+ * que ganha comprimento, um braço de compasso cujo joelho desce), não é translação e a razão dela não volta a 1: fica com o mínimo
+ * próprio, e o envelope dela declara `alongamento: { '-y': 17 }`, quanto a parte passa do volume em cada lado, além da tolerância geral,
+ * com o `motivo`. Os dois campos pedem `motivo`, entram no relatório de `descrever-peca` e de `forma:esboco`, e a entrada sem eles é a
+ * de antes.
  *
  * Receita sem `REFINA` não muda em nada, e `REFINA` sem `esboco` também não. A declaração é opcional e versionada (`formato`, `versao`):
  * a forma canônica que sai daqui carrega os dois, e a entrada aceita escrevê-los. `esboco` só é validado aqui; a conferência está em
@@ -44,6 +53,13 @@ export const VERSAO_REFINAMENTO_GLOBAL = 1;
 /* A tolerância é licença para a parte sair do envelope, e licença sem teto deixa de ser conferência. */
 export const LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM = 50;
 export const LIMITE_DA_TOLERANCIA_DA_PORTA_MM = 5;
+/* O deslocamento declarado é licença para a parte estar noutro lugar que o do esboço, e licença sem teto deixa de ser conferência: passa
+   de um metro por eixo, a parte não "se afasta" do esboço, é outra parte. */
+export const LIMITE_DO_DESLOCAMENTO_MM = 1000;
+/* O alongamento declarado fica a até 1 mm do que a parte passa (a faceta de um cilindro girado passa de 0,3 mm), e não a uma tolerância que a
+   receita escolhe: com `tolerancia.envelope` larga a declaração deixaria de provar que a parte alonga. */
+export const FOLGA_DO_ALONGAMENTO_MM = 1;
+export const LADOS_DO_ENVELOPE = ['-x', '+x', '-y', '+y', '-z', '+z'];
 /* Direção é comparada como vetor unitário; 1e-3 corresponde a cerca de 0,06 grau. */
 export const TOLERANCIA_DE_DIRECAO = 1e-3;
 
@@ -88,10 +104,72 @@ function formasDaParte(valor, quem, parte) {
   return ids.sort(comparar);
 }
 
+const numeroFinito = (v) => typeof v === 'number' && Number.isFinite(v);
+
+function deslocamentoMm(valor, quem, parte) {
+  const campo = `formas.${parte}.deslocamento`;
+  if (!Array.isArray(valor) || valor.length !== 3 || !valor.every(numeroFinito)) {
+    falhar(quem, `'${campo}' precisa ser o vetor [dx, dy, dz] em milímetro, no quadro do esboço; recebeu ${exibir(valor)}.`);
+  }
+  if (valor.some((x) => Math.abs(x) > LIMITE_DO_DESLOCAMENTO_MM)) {
+    falhar(quem, `'${campo}' passa de ${LIMITE_DO_DESLOCAMENTO_MM} mm em algum eixo (${exibir(valor)}): uma parte que se afasta do esboço tanto assim é outra parte, e o esboço é que muda.`);
+  }
+  if (valor.every((x) => x === 0)) falhar(quem, `'${campo}' nulo não desloca nada; tire o campo.`);
+  return valor.map((x) => (x === 0 ? 0 : x));
+}
+
+function alongamentoMm(valor, quem, parte) {
+  const campo = `formas.${parte}.alongamento`;
+  if (!objeto(valor) || !Object.keys(valor).length) {
+    falhar(quem, `'${campo}' precisa ser objeto {lado: mm} (por exemplo { '-y': 17 }), com ao menos um lado; recebeu ${exibir(valor)}.`);
+  }
+  for (const lado of Object.keys(valor)) {
+    if (!LADOS_DO_ENVELOPE.includes(lado)) falhar(quem, `'${campo}.${lado}': o lado precisa ser um de ${LADOS_DO_ENVELOPE.join(', ')}.`);
+    if (!numeroFinito(valor[lado]) || valor[lado] <= 0 || valor[lado] > LIMITE_DO_DESLOCAMENTO_MM) {
+      falhar(quem, `'${campo}.${lado}' precisa ser número maior que 0 e até ${LIMITE_DO_DESLOCAMENTO_MM} mm; recebeu ${exibir(valor[lado])}.`);
+    }
+  }
+  return Object.fromEntries(LADOS_DO_ENVELOPE.filter((lado) => Object.hasOwn(valor, lado)).map((lado) => [lado, valor[lado]]));
+}
+
+function motivoDoAfastamento(valor, quem, parte, afasta) {
+  if (!afasta) {
+    if (valor !== undefined) falhar(quem, `'formas.${parte}.motivo' só acompanha 'deslocamento' ou 'alongamento', que ele explica.`);
+    return undefined;
+  }
+  if (typeof valor !== 'string' || !valor.trim()) {
+    falhar(quem, `'formas.${parte}' declara deslocamento ou alongamento e precisa dizer o 'motivo' (texto não vazio): quem lê o relatório precisa saber por que a parte se afasta do esboço; recebeu ${exibir(valor)}.`);
+  }
+  return valor.trim();
+}
+
+/** O afastamento declarado de uma entrada canônica de `esboco.formas` (`deslocamento`, `alongamento`, `motivo`), ou `{}` quando não há. */
+export function afastamentoDaParte(entrada) {
+  if (!entrada || (entrada.deslocamento === undefined && entrada.alongamento === undefined)) return {};
+  return {
+    ...(entrada.deslocamento === undefined ? {} : { deslocamento: entrada.deslocamento }),
+    ...(entrada.alongamento === undefined ? {} : { alongamento: entrada.alongamento }),
+    motivo: entrada.motivo,
+  };
+}
+
+/** O vetor como a receita o escreve, `[0, -8.5, 0]`: a vírgula separa os eixos, e o ponto fica como decimal para não confundir os dois. */
+export const vetorTexto = (v) => `[${v.map((x) => Number(x.toFixed(3))).join(', ')}]`;
+
+/** O afastamento em texto para o relatório: `deslocada [0, -17, 0] mm, alonga -y 17 mm, motivo: ...`. Vazio quando a parte não se afasta. */
+export function textoDoAfastamento(afastamento) {
+  if (!afastamento || (afastamento.deslocamento === undefined && afastamento.alongamento === undefined)) return '';
+  const partes = [];
+  if (afastamento.deslocamento !== undefined) partes.push(`deslocada ${vetorTexto(afastamento.deslocamento)} mm`);
+  if (afastamento.alongamento !== undefined) partes.push(`passa do volume ${Object.entries(afastamento.alongamento).map(([lado, mm]) => `${lado} ${numeroMm(mm)}`).join(', ')}`);
+  return `${partes.join(', ')}; motivo: ${afastamento.motivo}`;
+}
+
 /**
  * Valida e canonicaliza `REFINA.esboco`: a forma de cada parte da receita comparada ao sólido da forma do esboço que ela refina, pela
- * razão interseção/união de volume (`forma-do-esboco.js`). A entrada escreve `formas` como `{ parte: id | [ids] | { formas, minimo } }`
- * e a forma canônica é a lista `[{ parte, formas, minimo? }]`, que a normalização também aceita para ser idempotente.
+ * razão interseção/união de volume (`forma-do-esboco.js`). A entrada escreve `formas` como
+ * `{ parte: id | [ids] | { formas, minimo?, deslocamento?, alongamento?, motivo? } }` e a forma canônica é a lista
+ * `[{ parte, formas, minimo?, deslocamento?, alongamento?, motivo? }]`, que a normalização também aceita para ser idempotente.
  */
 export function normalizarEsbocoDoRefinamento(valor, { quem = 'REFINA.esboco' } = {}) {
   if (!objeto(valor)) falhar(quem, 'precisa ser objeto { arquivo, opcao, formas, minimo }.');
@@ -114,11 +192,20 @@ export function normalizarEsbocoDoRefinamento(valor, { quem = 'REFINA.esboco' } 
   const partes = lista.map((item) => {
     const parte = item.parte;
     if (typeof parte !== 'string' || !NOME_DE_PARTE.test(parte)) falhar(quem, `'formas.${parte}': o nome da parte precisa ser o mesmo identificador do passo 'parte': letras e dígitos, sem espaço.`);
-    for (const chave of Object.keys(item)) if (!['parte', 'formas', 'minimo'].includes(chave)) falhar(quem, `'formas.${parte}.${chave}' não é permitido; aceita formas e minimo.`);
+    for (const chave of Object.keys(item)) {
+      if (!['parte', 'formas', 'minimo', 'deslocamento', 'alongamento', 'motivo'].includes(chave)) {
+        falhar(quem, `'formas.${parte}.${chave}' não é permitido; aceita formas, minimo, deslocamento, alongamento e motivo.`);
+      }
+    }
+    const afasta = item.deslocamento !== undefined || item.alongamento !== undefined;
+    const motivo = motivoDoAfastamento(item.motivo, quem, parte, afasta);
     return {
       parte,
       formas: formasDaParte(item.formas, quem, parte),
       ...(item.minimo === undefined ? {} : { minimo: razaoMinima(item.minimo, quem, `formas.${parte}.minimo`) }),
+      ...(item.deslocamento === undefined ? {} : { deslocamento: deslocamentoMm(item.deslocamento, quem, parte) }),
+      ...(item.alongamento === undefined ? {} : { alongamento: alongamentoMm(item.alongamento, quem, parte) }),
+      ...(motivo === undefined ? {} : { motivo }),
     };
   }).sort((a, b) => comparar(a.parte, b.parte));
   if (new Set(partes.map(({ parte }) => parte)).size !== partes.length) falhar(quem, "'formas' não pode repetir parte.");
@@ -296,9 +383,21 @@ export function conferirRefinamentoGlobal({ refinamento, andaime, neutro }) {
     }
   }
 
+  /* o afastamento que a receita declara para a parte, em `esboco.formas`: o volume do andaime vale deslocado pelo mesmo vetor da forma do
+     esboço, e a parte pode passar do volume, em cada lado que o alongamento cita, além da tolerância */
+  const afastamentos = new Map((declaracao.esboco?.formas ?? []).map((entrada) => [entrada.parte, entrada]));
+  for (const { parte, alongamento } of afastamentos.values()) {
+    if (alongamento !== undefined && !vinculadas.has(parte)) {
+      achados.push({
+        codigo: 'alongamento-sem-volume', parte,
+        mensagem: `a parte '${parte}' declara alongamento em REFINA.esboco.formas, e alongamento é quanto a parte passa do volume do andaime; sem volume em REFINA.partes ela não tem envelope a alongar.`,
+      });
+    }
+  }
+
   for (const { parte, volume } of declaracao.partes) {
-    const limite = envelopes[volume];
-    if (!limite) {
+    const volumeDoAndaime = envelopes[volume];
+    if (!volumeDoAndaime) {
       achados.push({
         codigo: 'volume-desconhecido', parte, volume,
         mensagem: `a parte '${parte}' declara refinar o volume '${volume}', e o andaime '${normalizado.id}' não tem esse volume (tem: ${Object.keys(envelopes).join(', ')}).`,
@@ -313,14 +412,33 @@ export function conferirRefinamentoGlobal({ refinamento, andaime, neutro }) {
       });
       continue;
     }
+    const afastamento = afastamentoDaParte(afastamentos.get(parte));
+    const deslocamento = afastamento.deslocamento;
+    const alongamento = afastamento.alongamento ?? {};
+    const limite = deslocamento
+      ? { min: volumeDoAndaime.min.map((x, i) => x + deslocamento[i]), max: volumeDoAndaime.max.map((x, i) => x + deslocamento[i]) }
+      : volumeDoAndaime;
+    const doVolume = deslocamento ? `volume '${volume}' deslocado ${vetorTexto(deslocamento)} mm (REFINA.esboco.formas.${parte})` : `volume '${volume}'`;
     const lista = excessos(medida, limite);
-    medidas.push({ parte, volume, excessoMm: lista[0].excesso });
+    medidas.push({ parte, volume, excessoMm: lista[0].excesso, ...afastamento });
     for (const e of lista) {
-      if (e.excesso <= tolEnvelope + FOLGA_NUMERICA) break;
+      const permitido = tolEnvelope + (alongamento[e.lado] ?? 0);
+      if (e.excesso <= permitido + FOLGA_NUMERICA) continue;
       achados.push({
         codigo: 'parte-fora-do-envelope', parte, volume, lado: e.lado, desvio: e.excesso,
-        mensagem: `a parte '${parte}' sai do envelope do volume '${volume}' em ${e.lado} por ${numeroMm(e.excesso)} (tolerância ${numeroMm(tolEnvelope)}): a parte vai até ${e.eixo}=${numeroMm(e.parteAte)} e o envelope termina em ${e.eixo}=${numeroMm(e.volumeAte)}.`,
+        mensagem: `a parte '${parte}' sai do envelope do ${doVolume} em ${e.lado} por ${numeroMm(e.excesso)} (tolerância ${numeroMm(permitido)}): a parte vai até ${e.eixo}=${numeroMm(e.parteAte)} e o envelope termina em ${e.eixo}=${numeroMm(e.volumeAte)}.`,
       });
+    }
+    /* o alongamento declarado precisa ser o que a parte tem: o excesso medido no lado não fica mais que a folga abaixo do declarado, e a
+       declaração que sobrou da receita antes de ela mudar não deixa folga para a parte crescer depois */
+    for (const [lado, mm] of Object.entries(alongamento)) {
+      const e = lista.find((x) => x.lado === lado);
+      if (e.excesso < mm - FOLGA_DO_ALONGAMENTO_MM - FOLGA_NUMERICA) {
+        achados.push({
+          codigo: 'alongamento-maior-que-a-parte', parte, volume, lado, desvio: mm - e.excesso,
+          mensagem: `a parte '${parte}' declara passar do ${doVolume} em ${lado} por ${numeroMm(mm)} (REFINA.esboco.formas.${parte}.alongamento), e passa por ${numeroMm(Math.max(0, e.excesso))} (o declarado pode passar da medida em até ${numeroMm(FOLGA_DO_ALONGAMENTO_MM)}): a declaração deixa mais folga do que a parte usa; declare o que ela passa.`,
+        });
+      }
     }
   }
 

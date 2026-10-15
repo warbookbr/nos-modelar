@@ -9,13 +9,17 @@
  *
  *   npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --mesmo-id [--opcao=1] [--minimo=0.95]
  *   npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --formas=asa:asaD+pontaD,porta:porta
+ *   npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --mesmo-id --desloca='roda:0,-17,0:a roda encosta no chão'
  *   npm run forma:esboco -- <peça>
  *
- * Sem `--esboco`, a CLI lê o `REFINA.esboco` que a receita declara: o arquivo, a opção, o mapa das partes às formas e os mínimos. Os
+ * Sem `--esboco`, a CLI lê o `REFINA.esboco` que a receita declara: o arquivo, a opção, o mapa das partes às formas, os mínimos e os afastamentos declarados. Os
  * modeladores do avião repetiam em `--formas` o mapa que a receita já trazia, a cada medida.
  *
  * `--mesmo-id` liga cada parte da peça à forma do esboço que tem o mesmo id (as que não têm ficam de fora). `--formas` liga as partes que
- * cita, com `+` entre as formas de uma parte. A saída é não-zero quando alguma parte fica abaixo do mínimo ou não tem sólido. */
+ * cita, com `+` entre as formas de uma parte. `--desloca` declara, para as partes que cita, o deslocamento em mm no quadro do esboço e o motivo
+ * (`parte:dx,dy,dz:motivo`, itens separados por `;`), como `REFINA.esboco.formas` o declara: a razão é medida contra a forma transladada, e
+ * a saída diz, em cada parte deslocada, o deslocamento e o motivo. A saída é não-zero quando alguma parte fica abaixo do mínimo ou não tem
+ * sólido. */
 import { readFileSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -23,7 +27,7 @@ import { lerArgumentos } from './argumentos.mjs';
 import { OPCAO_COMPOSICOES } from './configuracao-composicoes.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { conferirFormaDoEsbocoDoJson, formasDoEsboco } from './esboco-solido.mjs';
-import { normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
+import { afastamentoDaParte, normalizarEsbocoDoRefinamento, textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -50,6 +54,29 @@ export function ligarPartes({ partes, ids, formas = null, mesmoId = false }) {
   return Object.fromEntries(comForma.map((parte) => [parte, [parte]]));
 }
 
+/** O `--desloca` como `{ parte: { deslocamento, motivo } }`: itens `parte:dx,dy,dz:motivo` separados por `;`, o motivo livre até o fim do item. */
+export function lerDeslocamentos(texto) {
+  const mapa = {};
+  for (const item of texto.split(';').map((t) => t.trim()).filter(Boolean)) {
+    const primeiro = item.indexOf(':');
+    const segundo = primeiro < 0 ? -1 : item.indexOf(':', primeiro + 1);
+    if (primeiro < 1 || segundo < 0) throw new Error(`--desloca espera parte:dx,dy,dz:motivo, com itens separados por ';' (o motivo não leva ';'); recebi '${item}'`);
+    const parte = item.slice(0, primeiro).trim();
+    if (Object.hasOwn(mapa, parte)) throw new Error(`--desloca repete a parte '${parte}'`);
+    mapa[parte] = { deslocamento: item.slice(primeiro + 1, segundo).split(',').map((n) => (n.trim() === '' ? Number.NaN : Number(n))), motivo: item.slice(segundo + 1) };
+  }
+  if (!Object.keys(mapa).length) throw new Error('--desloca veio vazio; informe parte:dx,dy,dz:motivo');
+  return mapa;
+}
+
+/** Junta o deslocamento declarado à ligação da parte; uma parte que não está ligada a forma não pode ser deslocada. */
+export function comDeslocamentos(ligadas, deslocamentos) {
+  if (!deslocamentos) return ligadas;
+  const desligadas = Object.keys(deslocamentos).filter((parte) => !Object.hasOwn(ligadas, parte));
+  if (desligadas.length) throw new Error(`--desloca cita ${desligadas.map((p) => `'${p}'`).join(', ')}, que não ${desligadas.length === 1 ? 'está ligada' : 'estão ligadas'} a forma do esboço (ligadas: ${Object.keys(ligadas).join(', ')})`);
+  return Object.fromEntries(Object.entries(ligadas).map(([parte, formas]) => [parte, Object.hasOwn(deslocamentos, parte) ? { formas, ...deslocamentos[parte] } : formas]));
+}
+
 /**
  * Executa a peça e confere as partes ligadas. Devolve `{ resultado, partes, semForma, tempo }` com `tempo.resolverMs` (a opção do esboço)
  * e `tempo.conferirMs` (os sólidos, as interseções e a peça executada).
@@ -64,11 +91,11 @@ export async function esbocoDeclarado(peca) {
     esboco: resolve(dirname(caminho), canonico.arquivo),
     opcao: canonico.opcao,
     minimo: canonico.minimo,
-    ligadas: Object.fromEntries(canonico.formas.map((f) => [f.parte, f.minimo === undefined ? f.formas : { formas: f.formas, minimo: f.minimo }])),
+    ligadas: Object.fromEntries(canonico.formas.map(({ parte, ...resto }) => [parte, Object.keys(resto).length === 1 ? resto.formas : resto])),
   };
 }
 
-export async function formaDoEsbocoDaPeca({ peca, esboco, opcao = 1, minimo = MINIMO_PADRAO, formas = null, mesmoId = false, ligadas: declaradas = null, composicoes = null }) {
+export async function formaDoEsbocoDaPeca({ peca, esboco, opcao = 1, minimo = MINIMO_PADRAO, formas = null, mesmoId = false, ligadas: declaradas = null, deslocamentos = null, composicoes = null }) {
   const execucao = await descreverPecaReutilizavel({ peca, semVeredito: true, composicoes });
   if (!execucao.ok) throw new Error(`a peça '${peca}' não executou:\n${execucao.stderr.trim()}`);
   const neutro = execucao.resultado.neutro;
@@ -83,7 +110,7 @@ export async function formaDoEsbocoDaPeca({ peca, esboco, opcao = 1, minimo = MI
   const resolverMs = performance.now() - t0;
   const partes = [...new Set([...neutro.F.values()].map((f) => f.parte).filter(Boolean))].sort();
   const ids = new Set(dados.formas.map((f) => f.id));
-  const ligadas = declaradas ?? ligarPartes({ partes, ids, formas, mesmoId });
+  const ligadas = declaradas ?? comDeslocamentos(ligarPartes({ partes, ids, formas, mesmoId }), deslocamentos);
   const declaracao = normalizarEsbocoDoRefinamento({ arquivo: basename(esboco), opcao, formas: ligadas, minimo });
   const t1 = performance.now();
   const resultado = conferirFormaDoEsbocoDoJson({ esboco: declaracao, bruto, neutro });
@@ -97,6 +124,7 @@ export async function formaDoEsbocoDaPeca({ peca, esboco, opcao = 1, minimo = MI
 /** O texto da conferência: uma linha por parte medida, os achados e o tempo. */
 export function descreverFormaDoEsboco({ peca, resultado, semForma, tempo }) {
   const opcao = resultado.opcao?.titulo ?? resultado.opcao?.numero ?? resultado.opcao;
+  const afastadas = resultado.partes.filter((p) => p.deslocamento !== undefined || p.alongamento !== undefined);
   const linhas = [
     `forma de ${peca} contra o esboço ${resultado.arquivo} (opção ${opcao}): ${resultado.ok ? 'aprovada' : 'REPROVADA'}`,
     `  razão interseção/união de volume, mínimo ${virgula(resultado.minimo, 2)} (as partes com mínimo próprio dizem qual)`,
@@ -105,6 +133,7 @@ export function descreverFormaDoEsboco({ peca, resultado, semForma, tempo }) {
       + `  forma ${String(Math.round(p.volumeFormasMm3 / 1000)).padStart(10)} cm3`
       + `  em comum ${String(Math.round(p.volumeComumMm3 / 1000)).padStart(10)} cm3`
       + `  (${p.formas.join('+')}${p.minimo === resultado.minimo ? '' : `, mínimo ${virgula(p.minimo, 2)}`})`),
+    ...(afastadas.length ? ['  afastadas do esboço de propósito (deslocamento e motivo declarados):', ...afastadas.map((p) => `    ${p.parte}: ${textoDoAfastamento(afastamentoDaParte(p))}`)] : []),
     ...(semForma.length ? [`  sem forma ligada, fora da conferência: ${semForma.join(', ')}`] : []),
     ...resultado.achados.map((a) => `  ACHADO ${a.codigo}: ${a.mensagem}`),
     `  tempo: resolver a opção do esboço ${segundos(tempo.resolverMs)} s, sólidos e razões ${segundos(tempo.conferirMs)} s`,
@@ -117,7 +146,7 @@ export async function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['esboco', 'opcao', 'minimo', 'formas', OPCAO_COMPOSICOES],
+      opcoes: ['esboco', 'opcao', 'minimo', 'formas', 'desloca', OPCAO_COMPOSICOES],
       bandeiras: ['mesmo-id'],
       posicional: { nome: 'a peça', obrigatorio: true },
     });
@@ -147,8 +176,10 @@ export async function comoCLI(argv) {
   const minimo = Number(lido.opcao('minimo', String(MINIMO_PADRAO)));
   if (!(minimo > 0 && minimo <= 1)) return uso(`--minimo precisa ser a razão mínima, maior que 0 e até 1; recebi '${lido.opcao('minimo')}'`);
   try {
+    const desloca = lido.opcao('desloca');
     const feito = await formaDoEsbocoDaPeca({
-      peca, esboco: resolve(esboco), opcao, minimo, formas: lido.opcao('formas'), mesmoId: lido.bandeira('mesmo-id'), composicoes: lido.opcao(OPCAO_COMPOSICOES),
+      peca, esboco: resolve(esboco), opcao, minimo, formas: lido.opcao('formas'), mesmoId: lido.bandeira('mesmo-id'),
+      deslocamentos: desloca === null ? null : lerDeslocamentos(desloca), composicoes: lido.opcao(OPCAO_COMPOSICOES),
     });
     return { codigo: feito.resultado.ok ? 0 : 1, stdout: descreverFormaDoEsboco({ peca, ...feito }), stderr: '', ...feito };
   } catch (erro) {

@@ -158,7 +158,7 @@ por isso o recorte some; não inclina o sólido, e por isso as pás da hélice e
 família vira o casco convexo das seções dela. O envelope da ponta da asa do avião é a caixa da asa inteira, que passa 5,3 m da ponta, e
 uma ponta feita em qualquer lugar dela passa. Quando a receita precisa responder se a parte tem a forma da que o esboço aprovado
 desenhou, ela declara `esboco` dentro de `REFINA`, e a conferência compara a malha da parte com o sólido da forma do próprio esboço.
-Sem o campo nada muda para receita nenhuma, e a conferência do envelope também não o lê.
+Sem o campo nada muda para receita nenhuma, e a conferência do envelope só o lê para o deslocamento e o alongamento que uma parte declara nele (seção "A parte que se afasta do esboço de propósito").
 
 ```js
 REFINA: {
@@ -178,7 +178,7 @@ REFINA: {
 ```
 
 A forma canônica de `esboco` traz `arquivo`, `opcao` (1 quando a receita não a escreve), `minimo` e `formas` como a lista
-`[{ parte, formas, minimo? }]` em ordem de nome de parte, com as formas de cada parte em ordem de id; a normalização aceita as duas
+`[{ parte, formas, minimo?, deslocamento?, alongamento?, motivo? }]` em ordem de nome de parte, com as formas de cada parte em ordem de id; a normalização aceita as duas
 escritas e é idempotente. Só as partes que o campo cita são conferidas, e uma parte do `REFINA.partes` sem forma no esboço continua
 conferida só pelo envelope. A parte cuja forma o andaime não traduz, como a pá girada de uma hélice, fica fora de `REFINA.partes` e é
 conferida só aqui: a conferência do envelope não a recusa como `parte-sem-volume` quando `esboco.formas` a cita.
@@ -233,6 +233,53 @@ declara, e a razão que a parte tem de fato volta em `partes`. A faixa (`envolve
 uma pá, usa a superfície que a N2 faz, e o volume dela difere da fórmula do prismatoide do tradutor em até 5%. O `volumeMm3` e a caixa
 que o módulo calcula para a forma de família recortada vêm das peças convexas dela e não valem como referência (a ponta da asa do avião
 sai com volume negativo e a deriva com a caixa 268 mm mais baixa); o sólido da conferência não os usa.
+
+### A parte que se afasta do esboço de propósito
+
+Quando a pessoa decide que uma parte fica noutro lugar que o do esboço, a receita declara o afastamento na entrada da parte em
+`esboco.formas`, junto de `formas` e `minimo`, em vez de baixar o mínimo até a parte passar. Uma parte que só se move, com a mesma forma,
+declara `deslocamento`, o vetor `[dx, dy, dz]` em milímetro no quadro do esboço, e o `motivo`:
+
+```js
+formas: {
+  rodaNariz: { formas: 'rodaNariz', deslocamento: [0, -17, 0], motivo: 'a roda encosta no chão: o trem desce 17 mm' },
+  pistaoNariz: { formas: 'pistaoNariz', minimo: 0.84, alongamento: { '-y': 17 }, motivo: 'o pistão alonga 17 mm para a roda encostar' },
+}
+```
+
+O deslocamento vale para as duas conferências da parte. A razão de volume é medida contra a forma do esboço transladada pelo vetor, com
+o mínimo geral ou o próprio da parte, e o envelope é medido contra o volume do andaime transladado pelo mesmo vetor, com a
+`tolerancia.envelope` de toda a receita. A parte inteira volta a ser conferida com a régua das outras: no trem do nariz do avião, a coroa,
+o garfo, o eixo e a roda descem 17 mm e o pino do joelho desce 8,5 mm, e as razões voltam de 0,19 a 0,86 para 0,998 ou mais, com o
+envelope em 5 mm no lugar de 18. Como a razão não muda quando a parte e a forma andam juntas, a conta move a malha da parte pelo vetor
+contrário e deixa o sólido da forma onde o esboço o pôs. O vetor tem três números finitos, não todos nulos, de valor absoluto até 1000 mm em cada eixo
+(`LIMITE_DO_DESLOCAMENTO_MM`), e a conferência da razão recusa, como `deslocamento-maior-que-a-forma`, o deslocamento de módulo maior que
+a maior aresta da caixa das formas da parte: uma parte posta mais longe que o tamanho da própria forma é outra parte, e o esboço é que
+muda. O deslocamento é uma declaração da receita com motivo, e o que o contrato garante é que ele aparece no relatório e que a razão
+continua exigida contra a forma transladada, não que o vetor seja o que a pessoa aprovou.
+
+A parte que alonga ou gira não é uma translação, e nenhum vetor leva a forma do esboço até ela. O pistão que ganha 17 mm de
+comprimento e os braços do compasso, cujo joelho desce 8,5 mm, são os exemplos. A razão dessas partes não volta a 1, porque a diferença
+entre a parte e a forma é o próprio alongamento, e por isso elas ficam com o `minimo` próprio, igual à razão que o alongamento deixa. O
+que o contrato dá a elas é o envelope: `alongamento` é um objeto `{ lado: mm }`, com os lados `-x`, `+x`, `-y`, `+y`, `-z` e `+z` que o
+achado `parte-fora-do-envelope` já usa, e diz quanto a parte passa do volume do andaime em cada lado, além da `tolerancia.envelope`. Cada
+valor é maior que 0 e vai até 1000 mm, o mesmo teto do deslocamento; o teto não precisa ser curto porque o valor declarado fica a 1 mm do que a parte passa (adiante). Um envelope próprio da parte, igual nos seis lados, deixaria as outras cinco
+faces tão frouxas quanto a que alonga, e o lado nomeado deixa só uma. O alongamento declarado precisa ser o que a parte tem: se o
+excesso medido no lado fica mais de 1 mm abaixo do declarado (`FOLGA_DO_ALONGAMENTO_MM`, que cobre a faceta de um cilindro girado), o
+achado `alongamento-maior-que-a-parte` reprova, e o mesmo vale para a declaração que sobrou depois de a receita mudar. A folga é fixa e
+não a tolerância da receita, porque com `tolerancia.envelope` larga a declaração deixaria de provar que a parte alonga. Um alongamento em parte que não está em `REFINA.partes` não tem envelope a alongar e
+é recusado como `alongamento-sem-volume`. O deslocamento e o alongamento podem vir juntos, e o alongamento é medido depois do
+deslocamento: o pino de baixo do compasso dos trens principais, que desce 21 mm e ganha 66,4 mm de comprimento em +z, declara `deslocamento: [0, -21, 0]` e `alongamento: { '+z': 66.4 }`, e a razão dele sobe de 0,01 para 0,456 (mínimo próprio 0,45), que é o quanto o comprimento a mais deixa da forma. O mínimo próprio dessas partes vigia só o que a razão mede acima do alongamento, de modo que um erro de forma menor que o
+alongamento passa nelas, e o contrato não remove esse limite: ele fica à vista no `minimo` e no `motivo` da parte.
+
+O `motivo` é obrigatório com qualquer um dos dois, texto não vazio, e não é aceito sozinho. O mínimo próprio sem deslocamento nem
+alongamento continua como era, sem motivo. As medidas de `partes`, no resultado do envelope e no da razão, carregam `deslocamento`,
+`alongamento` e `motivo` da parte que os declara, e a parte sem eles tem o mesmo resultado de antes. O veredito de `descrever-peca` imprime
+na seção `REFERÊNCIA DA FORMA` uma linha `parte afastada do esboço de propósito: <parte> deslocada [0, -17, 0] mm; motivo: ...` (ou
+`passa do volume -y 17 mm`) para cada parte que declara, e `npm run forma:esboco` imprime o mesmo bloco ao fim da tabela. Sem `--esboco`, a
+linha de comando lê o `REFINA.esboco` da receita, com os afastamentos declarados; com `--esboco`, ela aceita
+`--desloca='parte:dx,dy,dz:motivo;outra:...'` (o motivo não leva `;`) para medir o deslocamento numa receita que não o declara. A mensagem de
+`parte-fora-da-forma-do-esboco` e a de `parte-fora-do-envelope` dizem que a forma e o volume estão deslocados, e por quanto.
 
 ## Andaime derivado do esboço
 
@@ -362,7 +409,9 @@ npx vitest run src/autoria/refinamento-global.test.js tools/mecanifica/refinamen
 
 A forma da parte contra a forma do esboço (`REFINA.esboco`) tem a prova do sólido de cada tipo e do recorte, a da conferência sobre um
 esboço sintético (um bloco com um cilindro recortado, uma viga inclinada e uma forma de família) e a de ponta a ponta no veredito, na
-guarda do acervo e na linha de comando, com as fixtures de `tools/fixtures/forma-do-esboco/`:
+guarda do acervo e na linha de comando, com as fixtures de `tools/fixtures/forma-do-esboco/` (a pasta `deslocada-declarada` é o bloco deslocado
+de propósito, com o deslocamento e o motivo declarados, e os testes do deslocamento e do alongamento declarados estão em `refinamento-global.test.js`
+e em `forma-do-esboco.test.mjs`):
 
 ```text
 npx vitest run src/autoria/solido-do-esboco.test.js src/autoria/forma-do-esboco.test.js tools/mecanifica/forma-do-esboco.test.mjs
