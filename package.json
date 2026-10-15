@@ -61,6 +61,7 @@
     "material": "node tools/mecanifica/material-da-peca.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "forma:esboco": "node tools/mecanifica/forma-do-esboco.mjs",
+    "receita:planejada": "node tools/mecanifica/receita-planejada.mjs",
     "parametros": "node tools/mecanifica/parametros-peca.mjs",
     "varrer": "node tools/mecanifica/varrer-peca.mjs",
     "conferir:juntas": "node tools/mecanifica/conferir-juntas.mjs",

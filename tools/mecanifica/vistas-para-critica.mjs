@@ -317,13 +317,23 @@ export async function gerarAlvo({ declarado, bruto, dados, pasta, dependencias =
   exigirPrimeiraOpcao(declarado, bruto);
   const ids = [...new Set(Object.values(declarado.ligadas).flatMap((v) => (Array.isArray(v) ? v : v.formas)))].sort();
   const escolha = unidadeDoAlvo(dados, ids);
+  const { copia, imagem } = await gerarCompostaDaUnidade({ arquivo: declarado.esboco, unidade: escolha.unidade, pasta, dependencias });
+  return { copia, imagem, unidade: escolha.unidade, escolha };
+}
+
+/**
+ * A composta de uma unidade do esboço, gerada agora pela ferramenta do esboço: copia o `arquivo` (o `.esboco.json`) para `pasta/alvo` e
+ * roda a composta sobre a cópia (a unidade `null` desenha o esboço inteiro). É o que o pacote do crítico faz para o alvo, e o que a receita
+ * planejada (`receita-planejada.mjs`) usa para gravar o alvo ao lado da receita. Devolve `{ copia, imagem }`.
+ */
+export async function gerarCompostaDaUnidade({ arquivo, unidade, pasta, dependencias = {} }) {
   const pastaDoAlvo = join(pasta, 'alvo');
   mkdirSync(pastaDoAlvo, { recursive: true });
-  const copia = join(pastaDoAlvo, basename(declarado.esboco));
-  copyFileSync(declarado.esboco, copia);
-  const composta = dependencias.composta ?? (async (arquivo, opcoes) => (await import('./esboco.mjs')).compostaArquivo(arquivo, opcoes));
-  const feita = await composta(copia, { unidade: escolha.unidade });
-  return { copia, imagem: feita.destino, unidade: escolha.unidade, escolha };
+  const copia = join(pastaDoAlvo, basename(arquivo));
+  copyFileSync(arquivo, copia);
+  const composta = dependencias.composta ?? (async (destino, opcoes) => (await import('./esboco.mjs')).compostaArquivo(destino, opcoes));
+  const feita = await composta(copia, { unidade });
+  return { copia, imagem: feita.destino };
 }
 
 /** A montagem `<objeto>/montagem.json` de uma peça `<objeto>/<parte>` e a instância dela, ou null se a peça não é instância de uma. */

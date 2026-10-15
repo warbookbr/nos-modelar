@@ -1,0 +1,38 @@
+{
+  "plano": { "texto": "esboço de prova da receita planejada: um suporte com base, braço, pino e roda, de cada lado do plano x = 0", "nivel": "esquematico" },
+  "parametros": {
+    "bx": 120,
+    "esp": 30,
+    "bz": 60,
+    "pAy": 140,
+    "pBy": "=pAy-60",
+    "raioRoda": 40,
+    "larguraRoda": 24,
+    "folgaPino": 5,
+    "diametroPino": 16
+  },
+  "pontos": {
+    "pA": ["bx", "pAy", 0],
+    "pB": ["=bx+30", "pBy", 0],
+    "pC": ["=bx+30", "=pBy-folgaPino", "=bz/2"],
+    "pRoda": ["=bx+30", "=pBy-folgaPino", "=bz+raioRoda"]
+  },
+  "simetrico": { "eixo": "x", "pos": 0 },
+  "unidades": {
+    "suporte": { "funcao": "um suporte de cada lado: base, braço entre dois pontos, pino e roda", "cor": "#8899aa" }
+  },
+  "opcoes": [
+    {
+      "titulo": "Suporte de prova",
+      "nota": "um suporte por lado, com a roda da família roda-pneu",
+      "formas": [
+        { "id": "alojamentoBaseD", "unidade": "suporte", "lado": "D", "tipo": "caixa", "cortador": true, "largura": 200, "altura": 40, "profundidade": 120, "centro": ["bx", 20, 0] },
+        { "id": "baseD", "unidade": "suporte", "lado": "D", "tipo": "caixa", "largura": "=2*esp", "altura": 20, "profundidade": "bz", "raio": 4, "centro": ["bx", 10, 0] },
+        { "id": "bracoD", "unidade": "suporte", "lado": "D", "ligar": { "de": "pA", "para": { "entre": ["pA", "pB"], "t": 1 }, "tipo": "cinta", "largura": "esp", "espessura": 12 } },
+        { "id": "pinoD", "unidade": "suporte", "lado": "D", "tipo": "cilindro", "diametro": "diametroPino", "de": "pC", "para": "pRoda" },
+        { "id": "rodaD", "unidade": "suporte", "lado": "D", "tipo": "familia", "familia": "roda-pneu", "perfil": "carro", "parametros": { "diametroPneu": "=2*raioRoda", "larguraPneu": "=larguraRoda/(2*raioRoda)", "desvio": 0 }, "centro": "pRoda" },
+        { "id": "tampaD", "unidade": "suporte", "lado": "D", "tipo": "anel", "diametroExterno": 30, "diametroInterno": 12, "espessura": 6, "eixo": "y", "centro": ["bx", 23, 0] }
+      ]
+    }
+  ]
+}
