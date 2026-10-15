@@ -8,9 +8,15 @@
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada
  * forma do lado direito (D) tem a do esquerdo (E) espelhada em x: a receita monta o lado D e o espelha com `espelha` antes de nomear as
  * partes, porque a cópia herda o nome da fonte. A TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece só
- * em `derivar`. As asas e a fuselagem não publicam porta, e por isso o pivô da perna (o ponto `tpP` do esboço) e a altura do cubo da
- * roda estão na TABELA como os parâmetros do esboço, e não saem de um vínculo de medida nem de um encaixe de porta da montagem v5. O
- * esboço tem um curso de recolhimento (`tpCurso`, de 0 a 84 graus); a receita fica só na pose baixada, em que o curso vale zero.
+ * em `derivar`. As asas e a fuselagem não publicam porta, e por isso o pivô da perna (o ponto `tpP` do esboço) está na TABELA como o
+ * parâmetro do esboço, e não sai de um vínculo de medida nem de um encaixe de porta da montagem v5. A altura do cubo da roda sai do
+ * raio do pneu e da folga ao chão, que é zero. O esboço tem um curso de recolhimento (`tpCurso`, de 0 a 84 graus); a receita fica
+ * só na pose baixada, em que o curso vale zero.
+ *
+ * Três pontos da receita se afastam do esboço por decisão da pessoa (2026-10-15, segunda rodada), e cada parte afetada tem o mínimo
+ * próprio no REFINA.esboco, com o motivo (veja `MINIMOS`): a roda encosta no chão, em y 0, e o trem desce os 17 mm que o esboço deixa
+ * entre o pneu e o chão (a perna fica 17 mm mais comprida e leva a coroa, o garfo, o eixo e a roda); o furo do cubo tem o diâmetro do
+ * eixo, e a roda assenta nele; o pino de baixo do compasso desce até a junção da perna com a coroa e entra na face da frente da coroa.
  *
  * Na pose baixada o trem é vertical: a perna, a coroa e o garfo são caixas em y, o eixo e o pino do pivô são cilindros em x e em z, e
  * as quatro hastes inclinadas (os dois braços do compasso e as duas metades do atuador) ficam no plano x y de z constante, de modo que
@@ -18,7 +24,7 @@
  * arredondado, extrusões em y de um retângulo de cantos redondos.
  *
  * A roda é a chamada da família `roda-pneu` com o perfil `carro` e os parâmetros do esboço (o diâmetro do pneu, a largura em razão do
- * diâmetro e o desvio zero), expandida aqui dentro dos PASSOS. A família a gera com o eixo em x e o centro na origem, e o esboço a
+ * diâmetro e o desvio zero), menos o furo central do cubo, que tem o diâmetro do eixo (`diametroFuroCentral`), expandida aqui dentro dos PASSOS. A família a gera com o eixo em x e o centro na origem, e o esboço a
  * põe no centro da roda (`tpW`); a receita faz o mesmo com `transladar`. Da expansão ficam as quatro formas dela (o pneu, o aro, o
  * cubo furado e o disco), o material e o sólido; saem a parte, porque a receita nomeia as quatro formas como uma parte só, a roda, e as
  * três portas, que a família publica no quadro local da roda e que a pose deixaria longe da forma (`porta-fora-do-plano`).
@@ -58,8 +64,9 @@ const baseDe = (nome) => nome.replace(/Principal[DE]$/, '');
 export const TABELA = {
   /* O pivô da perna (`tpX`, `tpPy` e `tpZ`): o ponto em que o pino do pivô corta a perna, dentro do alojamento que a asa recorta. */
   pivo: [1920, 1115, 4522],
-  /* A altura do cubo da roda (`tpHub`), o centro do eixo e da roda acima do chão. */
-  cubo: 313.5,
+  /* A folga entre o pé do pneu e o chão. O esboço deixa 17 mm (o cubo, `tpHub`, a 313,5 do chão com o pneu de raio 296,5); a pessoa
+     decidiu que a roda encosta, e a altura do cubo, o centro do eixo e da roda, passa a ser o raio do pneu mais esta folga. */
+  folgaDoChao: 0,
   /* A roda, a da família `roda-pneu` no perfil `carro`: `raio` é o raio do pneu (`tpR`, 296,5, de modo que o diâmetro é o 593 do
      esboço), `largura` a do pneu (`tpLargRoda`) e `desvio` o da chapa do disco, zero. `lados` não está aqui: é o da família, 96. */
   roda: { perfil: 'carro', raio: 296.5, largura: 140, desvio: 0 },
@@ -77,11 +84,17 @@ export const TABELA = {
   garfo: { afastamento: 88, sobreARoda: 33, abaixoDoCubo: 50, largura: 22, espessura: 190 },
   /* O eixo (`tpAe` a `tpAi`): cilindro em x de `diametro`, com `meioComprimento` para cada lado do centro da roda (`tpBe`). */
   eixo: { diametro: 28, meioComprimento: 100 },
-  /* O compasso fica na frente da perna, a 185 mm do pivô para -z (`z`, de `tpZLado`). Os três pontos, como deslocamento [em x, em y] do pivô,
-     são `tpCpA` (o alto), `tpCpJ` (o joelho) e `tpCpB` (o baixo). As duas hastes são cilindros de `haste` de diâmetro entre eles, e
-     cada pino é um cilindro em z de `pino.diametro` e `pino.comprimento`, centrado no ponto. Os pinos de cima e de baixo entram na
-     face da frente da perna, e o do meio fica fora dela. */
-  compasso: { z: -185, alto: [0, -150], joelho: [-80, -310], baixo: [0, -470], haste: 16, pino: { diametro: 24, comprimento: 56 } },
+  /* O compasso fica na frente da perna, a 185 mm do pivô para -z (`z`, de `tpZLado`). Os pontos de cima e do joelho, como deslocamento
+     [em x, em y] do pivô, são `tpCpA` (o alto) e `tpCpJ` (o joelho). O de baixo (`tpCpB`) o esboço põe a 470 mm abaixo do pivô, na quina
+     da perna; a pessoa decidiu que o pino de baixo toca a coroa, e por isso o ponto de baixo fica em `baixo.dx` do pivô em x e
+     `baixo.acimaDaJuncao` acima da junção da perna com a coroa (zero: o pino, de raio 12, fica metade na coroa e metade na perna). As duas
+     hastes são cilindros de `haste` de diâmetro entre eles, e cada pino é um cilindro em z de `pino.diametro` e `pino.comprimento`,
+     centrado no ponto. Os pinos de cima e do meio são os do esboço, e o de cima entra na face da frente da perna. O pino de baixo
+     começa onde os outros começam e vai até a face da frente da coroa, `penetracaoNaCoroa` para dentro dela. */
+  compasso: {
+    z: -185, alto: [0, -150], joelho: [-80, -310], baixo: { dx: 0, acimaDaJuncao: 8 }, haste: 16,
+    pino: { diametro: 24, comprimento: 56, penetracaoNaCoroa: 8 },
+  },
   /* O atuador fica atrás da perna, a 185 mm do pivô para +z (`z`, de `tpZLado`): da orelha `tpJF` (presa à asa) à ponta `tpJA` (o pino na
      perna), como deslocamento [em x, em y] do pivô. O corpo vai da orelha ao ponto que divide o percurso na fração `divisao` (0,5) e
      a haste dali à ponta. A orelha é a caixa de `largura` em x, `altura` em y e `profundidade` em z, de canto `cantos`. */
@@ -120,8 +133,9 @@ function haste(de, para, raio, quem) {
 /* O lado direito inteiro, em milímetro: a caixa ou a haste de cada parte, com a posição já resolvida, e o centro e as medidas da roda. */
 function medidas(t) {
   const [px, py, pz] = t.pivo;
-  const chao = t.cubo;
   const R = t.roda.raio;
+  /* a altura do cubo: o pé do pneu fica a `folgaDoChao` do chão */
+  const chao = R + t.folgaDoChao;
   const doPivo = ([dx, dy], z) => [px + dx, py + dy, pz + z];
 
   /* A perna vai de `acimaDoPivo` acima do pivô até `sobreARoda` acima do topo do pneu; a coroa fica sob ela. */
@@ -137,8 +151,12 @@ function medidas(t) {
   const c = t.compasso;
   const alto = doPivo(c.alto, c.z);
   const joelho = doPivo(c.joelho, c.z);
-  const baixo = doPivo(c.baixo, c.z);
+  /* o ponto de baixo fica na junção da perna com a coroa (`pernaBase`), e não no deslocamento do esboço */
+  const baixo = [px + c.baixo.dx, pernaBase + c.baixo.acimaDaJuncao, pz + c.z];
   const pinoDoCompasso = (centro) => haste([centro[0], centro[1], centro[2] - c.pino.comprimento / 2], [centro[0], centro[1], centro[2] + c.pino.comprimento / 2], c.pino.diametro / 2, 'pino do compasso');
+  /* o pino de baixo vai da mesma ponta da frente dos outros até a face da frente da coroa, e entra nela */
+  const faceDaCoroa = pz - (t.coroa.fracaoDaProfundidade * t.perna.espessura) / 2;
+  const pinoDeBaixo = haste([baixo[0], baixo[1], baixo[2] - c.pino.comprimento / 2], [baixo[0], baixo[1], faceDaCoroa + c.pino.penetracaoNaCoroa], c.pino.diametro / 2, 'pino de baixo do compasso');
 
   const a = t.atuador;
   const orelha = doPivo(a.orelha, a.z);
@@ -160,7 +178,7 @@ function medidas(t) {
     compassoInf: { tipo: 'haste', ...haste(joelho, baixo, c.haste / 2, 'braço de baixo do compasso') },
     pinoCompasso: { tipo: 'haste', ...pinoDoCompasso(joelho) },
     pinoCompassoAlto: { tipo: 'haste', ...pinoDoCompasso(alto) },
-    pinoCompassoBaixo: { tipo: 'haste', ...pinoDoCompasso(baixo) },
+    pinoCompassoBaixo: { tipo: 'haste', ...pinoDeBaixo },
     atuadorCorpo: { tipo: 'haste', ...haste(orelha, divisao, a.corpo / 2, 'corpo do atuador') },
     atuadorHaste: { tipo: 'haste', ...haste(divisao, ponta, a.haste / 2, 'haste do atuador') },
     pinoAtuador: {
@@ -178,6 +196,8 @@ export function derivar(t = TABELA) {
   const familia = registroDeFamilias().obter('roda-pneu');
   const chamada = chamar(familia, 'roda', {
     perfil: t.roda.perfil, diametroPneu: diametro, larguraPneu: t.roda.largura / diametro, desvio: t.roda.desvio,
+    /* o furo central do cubo tem o diâmetro do eixo, e a roda assenta nele */
+    diametroFuroCentral: t.eixo.diametro / diametro,
   });
 
   const partes = {};
@@ -206,6 +226,22 @@ const ESPELHO = 500;
 
 /* As quatro formas da roda, as origens que a família publica: o pneu, o aro, o cubo furado e o disco. */
 const FORMAS_DA_RODA = [{ op: 'lathe', id: 1 }, { op: 'lathe', id: 2 }, { op: 'subtrair', id: 6 }, { op: 'lathe', id: 11 }];
+
+/* O mínimo próprio, no REFINA.esboco, de cada parte que se afasta do esboço pela decisão da pessoa de 2026-10-15; as outras ficam no
+   mínimo geral, 0,95. Cada valor é a razão interseção/união medida (`npm run forma:esboco`) truncada na segunda casa, de modo que a
+   parte não pode piorar. A razão baixa de uma parte é o deslocamento dela, e não erro de medida: o trem desce 17 mm e a coroa tem só
+   20 mm de altura, o eixo 28 mm de diâmetro e o pino de baixo 24 mm. */
+const MINIMOS = {
+  /* desce os 17 mm com o trem: a roda encosta no chão (o esboço a deixa 17 mm acima) e o furo do cubo passa a ter o diâmetro do eixo */
+  roda: 0.82,
+  garfoExt: 0.91,
+  garfoInt: 0.91,
+  eixoRoda: 0.16,
+  coroa: 0.08,
+  /* o pino de baixo desce à junção da perna com a coroa e vai até a face da coroa, e o braço de baixo do compasso o acompanha */
+  pinoCompassoBaixo: 0.001,
+  compassoInf: 0.38,
+};
 
 /* material de cada parte, pela chave de MATERIAIS; a roda leva os da família, `borracha` e `aco`. */
 const MATERIAL = {
@@ -347,10 +383,10 @@ export default {
       'o REFINA acusando parte fora do envelope do volume dela ou abaixo do mínimo contra a forma do esboço',
     ],
   },
-  /* Os contatos que o esboço mostra. A roda não toca o eixo: o furo central do cubo da família (62,9 mm) é maior que o eixo (28 mm), e
-     o par roda e eixo, que o plano declarava, não se toca no esboço e por isso não está aqui. O eixo atravessa as duas placas do
-     garfo, e o garfo passa pela coroa até a perna. Os pinos do compasso e do atuador entram na face da frente e na de trás da perna
-     (o do meio do compasso, no joelho, fica fora dela), e as hastes se encontram nos centros dos pinos e uma na outra. */
+  /* Os contatos. A roda assenta no eixo: o furo central do cubo da família tem o diâmetro do eixo (28 mm), e não os 62,9 mm do
+     esboço. O eixo atravessa as duas placas do garfo, e o garfo passa pela coroa até a perna. Os pinos de cima do compasso e o do
+     atuador entram na face da frente e na de trás da perna (o do meio do compasso, no joelho, fica fora dela); o de baixo fica na
+     junção da perna com a coroa e entra na face da frente da coroa. As hastes se encontram nos centros dos pinos e uma na outra. */
   contatos: LADOS.flatMap(([L, lado]) => [
     { par: [`pernaPrincipal${L}`, `pinoPivoPrincipal${L}`], motivo: `a perna do lado ${lado} gira no pino do pivô` },
     { par: [`coroaPrincipal${L}`, `pernaPrincipal${L}`], motivo: `a coroa fica no pé da perna do lado ${lado}` },
@@ -359,7 +395,9 @@ export default {
     { par: [`eixoRodaPrincipal${L}`, `garfoExtPrincipal${L}`], motivo: `o eixo da roda atravessa o lado de fora do garfo (${lado})` },
     { par: [`eixoRodaPrincipal${L}`, `garfoIntPrincipal${L}`], motivo: `o eixo da roda atravessa o lado de dentro do garfo (${lado})` },
     { par: [`pinoCompassoAltoPrincipal${L}`, `pernaPrincipal${L}`], motivo: `o pino de cima do compasso entra na face da frente da perna (${lado})` },
-    { par: [`pinoCompassoBaixoPrincipal${L}`, `pernaPrincipal${L}`], motivo: `o pino de baixo do compasso entra na face da frente da perna (${lado})` },
+    { par: [`pinoCompassoBaixoPrincipal${L}`, `pernaPrincipal${L}`], motivo: `o pino de baixo do compasso fica na junção e entra na face da frente da perna (${lado})` },
+    { par: [`pinoCompassoBaixoPrincipal${L}`, `coroaPrincipal${L}`], motivo: `o pino de baixo do compasso entra na face da frente da coroa, como o PLANO promete (${lado})` },
+    { par: [`rodaPrincipal${L}`, `eixoRodaPrincipal${L}`], motivo: `a roda assenta no eixo, pelo furo do cubo de mesmo diâmetro (${lado})` },
     { par: [`compassoSupPrincipal${L}`, `pinoCompassoAltoPrincipal${L}`], motivo: `o braço de cima do compasso parte do pino de cima (${lado})` },
     { par: [`compassoSupPrincipal${L}`, `pinoCompassoPrincipal${L}`], motivo: `o braço de cima do compasso chega ao pino do meio (${lado})` },
     { par: [`compassoInfPrincipal${L}`, `pinoCompassoPrincipal${L}`], motivo: `o braço de baixo do compasso parte do pino do meio (${lado})` },
@@ -377,7 +415,12 @@ export default {
     andaime: '../../andaime.json',
     partes: Object.fromEntries(NOMES.map((p) => [p, slug(p)])),
     tolerancia: { envelope: 5, porta: 0.5 },
-    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(NOMES.map((p) => [p, p])), minimo: 0.95 },
+    esboco: {
+      arquivo: ESBOCO,
+      opcao: 1,
+      formas: Object.fromEntries(NOMES.map((p) => [p, baseDe(p) in MINIMOS ? { formas: p, minimo: MINIMOS[baseDe(p)] } : p])),
+      minimo: 0.95,
+    },
   },
   get PONTOS() { return pontosDeclarados(this.PARAMS); },
   get PASSOS() { return gerarPassos(this.PARAMS); },

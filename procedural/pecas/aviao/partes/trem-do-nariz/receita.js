@@ -55,6 +55,16 @@ const PARTES = {
 };
 const NOMES = Object.keys(PARTES);
 
+/* O mínimo próprio de cada parte que se afasta do esboço pela decisão da pessoa de 2026-10-15 (a roda encosta no chão e o trem desce os
+   17 mm pelo pistão; o furo do cubo tem o diâmetro do eixo). A razão interseção/união de uma parte do mesmo tamanho deslocada 17 mm é a
+   que o esboço não cobre, e o mínimo é a razão medida, arredondada para baixo. O pistão alonga 17 mm (138 contra 164 cm3); a coroa, o
+   garfo, o eixo e a roda descem 17 mm; o pino e os braços do compasso acompanham o joelho, que desce 8,5 mm. */
+const MINIMO_PROPRIO = {
+  pistaoNariz: 0.84, coroaNariz: 0.35, garfoNariz: 0.86, eixoRodaNariz: 0.18, rodaNariz: 0.72,
+  compassoSupNariz: 0.66, compassoInfNariz: 0.27, pinoCompassoNariz: 0.38,
+};
+const formasDoEsboco = () => Object.fromEntries(NOMES.map((p) => [p, p in MINIMO_PROPRIO ? { formas: p, minimo: MINIMO_PROPRIO[p] } : p]));
+
 export const TABELA = {
   /* O pivô, o ponto `tnP` do esboço: x, y (`tnPy`) e z (`tnPz`) do eixo em torno do qual o trem gira. */
   pivo: [0, 680, 1740],
@@ -374,8 +384,9 @@ export default {
   /* Os contatos, declarados antes de medir, pela geometria do esboço na pose baixada. O eixo do pivô entra 22 mm em cada parede do
      alojamento e atravessa os dois mancais, que se apoiam nas paredes. A perna, a alavanca e o pino do atuador se tocam no pivô e na
      ponta da alavanca, e a haste do atuador termina no centro do pino. O pistão, a coroa, o garfo e o eixo da roda formam a cadeia
-     que desce da perna, e o compasso liga a perna à coroa pelo pino do joelho. A roda não toca o eixo: o furo central do cubo, de
-     38,6 mm, deixa 4,3 mm de folga em volta do eixo de 30 mm, e a roda não toca o garfo, que fica 17,5 mm além da face do pneu. */
+     que desce da perna, e o compasso liga a perna à coroa pelo pino do joelho. A roda assenta no eixo: o furo central do cubo tem o
+     diâmetro do eixo, 30 mm (decisão da pessoa em 2026-10-15; o esboço deixa 4,3 mm de folga), e o pé do pneu toca o chão, em y 0. A
+     roda não toca o garfo, que fica 17,5 mm além da face do pneu. */
   contatos: [
     { par: ['carenagemTremNariz', 'eixoPivoNariz'], motivo: 'o eixo do pivô entra 22 mm na parede de cada lado do alojamento e termina dentro dela' },
     { par: ['carenagemTremNariz', 'mancalNarizE'], motivo: 'o mancal esquerdo se apoia na parede esquerda do alojamento e entra 5 mm na da frente' },
@@ -395,6 +406,7 @@ export default {
     { par: ['coroaNariz', 'pistaoNariz'], motivo: 'a coroa fica no pé do pistão' },
     { par: ['garfoNariz', 'coroaNariz'], motivo: 'o garfo se prende na coroa' },
     { par: ['eixoRodaNariz', 'garfoNariz'], motivo: 'o eixo da roda atravessa o garfo' },
+    { par: ['rodaNariz', 'eixoRodaNariz'], motivo: 'o furo central do cubo tem o diâmetro do eixo, e a roda assenta nele' },
     { par: ['compassoSupNariz', 'pernaNariz'], motivo: 'o braço de cima do compasso se prende à perna, 110 mm abaixo do pivô' },
     { par: ['compassoInfNariz', 'compassoSupNariz'], motivo: 'os dois braços do compasso se juntam no joelho' },
     { par: ['compassoSupNariz', 'pinoCompassoNariz'], motivo: 'o pino do joelho atravessa a ponta do braço de cima' },
@@ -407,8 +419,10 @@ export default {
   REFINA: {
     andaime: '../../andaime.json',
     partes: Object.fromEntries(NOMES.map((p) => [p, slug(p)])),
-    tolerancia: { envelope: 5, porta: 0.5 },
-    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(NOMES.map((p) => [p, p])), minimo: 0.95 },
+    /* O envelope passa de 5 para 18 mm: o andaime guarda o trem na pose do esboço, com a roda 17 mm acima do chão, e a decisão da
+       pessoa (2026-10-15) desce o pistão, a coroa, o garfo, o eixo, a roda e o compasso até 17 mm abaixo do volume deles. */
+    tolerancia: { envelope: 18, porta: 0.5 },
+    esboco: { arquivo: ESBOCO, opcao: 1, formas: formasDoEsboco(), minimo: 0.95 },
   },
   get PONTOS() { return pontosDeclarados(this.PARAMS); },
   get PASSOS() { return gerarPassos(this.PARAMS); },
