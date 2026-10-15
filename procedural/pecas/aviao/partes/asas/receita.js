@@ -83,12 +83,19 @@ export const TABELA = {
      `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do comando. O eixo é a haste de `diametro`, em
      `lados` lados, que passa `sobra` além de cada seção, sobre a linha da dobradiça (o centro do nariz). Os suportes ficam nas frações
      `posicoes` do vão do comando, `abaixo` da face de baixo do comando e `atras` da dobradiça, com o `raio` do canto. `tampa.avanco` é
-     quanto o polo de cada loft fica além da seção, e `segmentosDoCanto` os segmentos do canto do suporte. */
+     quanto o polo de cada loft fica além da seção, e `segmentosDoCanto` os segmentos do canto do suporte. `assentamento` é o
+     deslocamento [em z, em y], em milímetro, que a receita dá aos dois vãos: a booleana do núcleo recalcula cada canto novo pelos
+     planos das faces de entrada, e a casca da asa tem faces de 840 mm, empenadas 0,26 mm e a 0,2 grau uma da outra, de modo que o
+     canto que a face de baixo do vão (a 1,5 grau da casca) faz sobre uma aresta longa sai a metros da peça. Com [0, 0] a asa saía com
+     um canto em x 6342, 277 mm além do corte, e em [3, -0.5] os cantos novos ficam a menos de 0,35 mm das faces de entrada; o
+     valor está numa faixa estreita (1 mm em z e 0,1 mm em y em volta dele ainda dão canto limpo, 0,2 mm em y a mais já não), e os
+     pontos declarados medem a caixa das duas asas e acusam o deslocamento que deixar de valer. */
   comando: {
     posicaoNaCorda: 0.75,
     nariz: [0.1465, 0.3535],
     meiaEspessuraDoBordoDeFuga: 4,
     fresta: 12,
+    assentamento: [3, -0.5],
     eixo: { diametro: 30, sobra: 20, lados: 48 },
     suporte: { posicoes: [0.2, 0.8], abaixo: 18, atras: 70, raio: 20, segmentosDoCanto: 6 },
     tampa: { avanco: 0.5 },
@@ -173,7 +180,9 @@ function medidasDoComando(t, comando) {
     p[0] + ((dentro[1][k][0] - p[0]) * (x - x1)) / (x2 - x1),
     p[1] + ((dentro[1][k][1] - p[1]) * (x - x1)) / (x2 - x1),
   ]);
-  const vao = [{ x: x1 - fresta, pontos: noX(x1 - fresta) }, { x: x2 + fresta, pontos: noX(x2 + fresta) }];
+  const [assentaZ, assentaY] = t.comando.assentamento;
+  const assenta = (pontos) => pontos.map(([z, y]) => [z + assentaZ, y + assentaY]);
+  const vao = [{ x: x1 - fresta, pontos: assenta(noX(x1 - fresta)) }, { x: x2 + fresta, pontos: assenta(noX(x2 + fresta)) }];
 
   const sob = t.comando.eixo.sobra;
   const eixo = { de: [x1 - sob, e[0].yc, e[0].zh], para: [x2 + sob, e[1].yc, e[1].zh] };
@@ -284,9 +293,9 @@ export function derivar(t = TABELA) {
   };
 }
 
-/* Para o eixo do loft em x: o primeiro eixo do plano da seção é y e o segundo é z, o sinal que leva z ao +w do núcleo é -1, e a
-   `orientacao` fixa o +u em y. Com ela declarada o núcleo projeta a referência na tangente de cada seção, e u e w saem iguais em todas. */
-const LOFT_EM_X = { plano: [1, 2], sinalW: -1, orientacao: [0, 1, 0] };
+/* Para o eixo do loft em x: o plano da seção é y e z, o sinal que leva z ao +w do núcleo é -1, e a `orientacao` fixa o +u em y. Com
+   ela declarada o núcleo projeta a referência na tangente de cada seção, e u e w saem iguais em todas. */
+const LOFT_EM_X = { sinalW: -1, orientacao: [0, 1, 0] };
 
 /* A área com sinal pelo cadarço, sobre os dois primeiros números de cada ponto; o núcleo só aceita contorno anti-horário. */
 function areaDoContorno(pontos) {
@@ -363,9 +372,9 @@ export function gerarPassos(t = TABELA) {
   const caixa = (origemId, c) => passos.push(['extrusao', { origemId, eixo: 'y', altura: c.altura, perfil: { retangulo: { largura: c.largura, profundidade: c.profundidade } }, em: c.em }]);
 
   /* A metade de asa e a ponta, na pose do esboço, e os cortadores do corte da ponta. */
-  passos.push([...daFamilia(P.asa, ID.asa)]);
+  passos.push(daFamilia(P.asa, ID.asa));
   passos.push(['transladar', { d: P.asa.desloca, sel: doPasso('loft', ID.asa) }]);
-  passos.push([...daFamilia(P.ponta, ID.ponta)]);
+  passos.push(daFamilia(P.ponta, ID.ponta));
   passos.push(['transladar', { d: P.ponta.desloca, sel: doPasso('loft', ID.ponta) }]);
   caixa(ID.cortaPonta, P.cortadores.cortaPonta);
   caixa(ID.cortaAsa, P.cortadores.cortaAsa);
@@ -565,18 +574,25 @@ const receita = {
       'o REFINA acusando parte fora do envelope do volume dela ou abaixo do mínimo contra a forma do esboço',
     ],
   },
+  /* Os contatos que o esboço mostra. O eixo passa 20 mm além de cada seção do comando e entra na parede do vão da asa nas duas
+     pontas. O suporte sai da asa e entra 10 mm na face de baixo do comando; ele fica a 22 mm abaixo do eixo, e o par suporte e eixo,
+     que o plano declarava, não se toca no esboço e por isso não está aqui. */
   contatos: porLado((L, l, nome) => [
     { par: [`ponta${L}`, `asa${L}`], motivo: `a ponta ${nome} continua a metade da asa` },
     { par: [`eixoFlap${L}`, `flap${L}`], motivo: `o eixo corre na dobradiça do flap ${nome}` },
     { par: [`eixoAileron${L}`, `aileron${L}`], motivo: `o eixo corre na dobradiça do aileron ${nome}` },
+    { par: [`eixoFlap${L}`, `asa${L}`], motivo: `o eixo do flap ${nome} entra na parede do vão da asa em cada ponta` },
+    { par: [`eixoAileron${L}`, `asa${L}`], motivo: `o eixo do aileron ${nome} entra na parede do vão da asa em cada ponta` },
     ...[1, 2].flatMap((n) => [
       { par: [`suporteFlap${n}${L}`, `asa${L}`], motivo: `o suporte ${n} do flap ${nome} sai da asa` },
-      { par: [`suporteFlap${n}${L}`, `eixoFlap${L}`], motivo: `o suporte ${n} segura o eixo do flap ${nome}` },
+      { par: [`suporteFlap${n}${L}`, `flap${L}`], motivo: `o suporte ${n} entra na face de baixo do flap ${nome}` },
       { par: [`suporteAileron${n}${L}`, `asa${L}`], motivo: `o suporte ${n} do aileron ${nome} sai da asa` },
-      { par: [`suporteAileron${n}${L}`, `eixoAileron${L}`], motivo: `o suporte ${n} segura o eixo do aileron ${nome}` },
+      { par: [`suporteAileron${n}${L}`, `aileron${L}`], motivo: `o suporte ${n} entra na face de baixo do aileron ${nome}` },
     ]),
   ]),
-  formas: Object.fromEntries(PARTES.map((p) => [p, 'solido'])),
+  /* O esboço deixa sob o aileron uma lâmina do bordo de fuga da asa, de 0,3 a 6 mm, que liga a parede de dentro do vão à de fora e
+     fecha uma alça: a asa do esboço tem um furo, e a de cada lado também. */
+  formas: Object.fromEntries(PARTES.map((p) => [p, /^asa[DE]$/.test(p) ? { furos: 1, corpos: 1 } : 'solido'])),
   REFINA: {
     andaime: '../../andaime.json',
     partes: VOLUMES,
