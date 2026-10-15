@@ -13,9 +13,9 @@
  * O cone é uma revolução em z. O esboço o declara `suave` e passa pelos 12 pontos do perfil uma curva de tangente contínua (cúbica de
  * Hermite com a tangente de Fritsch e Carlson, a do PCHIP, que não passa do valor de nenhum ponto); aqui a curva entra em `derivar`,
  * que a avalia no raio e acrescenta as estações entre os pontos, e o `lathe` a revoluciona em `lados` faces com o sombreado liso. O
- * `lathe` guarda 1000 vértices por passo, e com 64 lados cabem 15 anéis: os 11 pontos de raio não nulo e 4 estações a mais, nos vãos do
- * ombro do cone, onde o perfil vira. O perfil fecha na base com um polo no eixo, e a base fica dentro do capô: o cone termina a
- * 14 mm do lábio para dentro, em z 606, e o capô começa em z 592.
+ * `lathe` guarda 1000 faces por passo, e com 48 lados cabem 20 faixas: as estações a mais ficam onde a flecha de um vão passa de meio
+ * milímetro (a ponta e o ombro do cone, onde o perfil vira), e o resto fica só nos pontos do esboço. O perfil fecha na base com um polo
+ * no eixo, e a base fica dentro do capô: o cone termina 14 mm depois do lábio, em z 606, e o capô começa em z 592.
  *
  * A pá é a chamada da família `superficie-aerodinamica` com o perfil `pa-de-helice` e os parâmetros do esboço, expandida aqui dentro
  * dos PASSOS. A família a gera na pose dela (a raiz na origem, a envergadura em +y, a corda no plano de rotação), e o esboço a põe
@@ -38,13 +38,13 @@ export const TABELA = {
   eixo: [0, 1330, 490],
   /* O cone: `proa` é o z do ponto `proa` do esboço, onde nasce a ponta. O `perfil` é o do esboço, [raio, distância da ponta ao longo do
      eixo] em cada linha, e `trechos` diz quantos trechos cada vão entre dois pontos vira na curva suave, um número por vão, onze ao
-     todo: [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2] dão 14 anéis, e com 64 lados o `lathe` ocupa 960 das 1000 faces do passo. `labio` é o z
-     da primeira estação do capô, onde a base do cone tem de estar dentro. */
+     todo: [2, 2, 2, 1, 1, 1, 1, 2, 1, 4, 1] põem uma estação por meio milímetro de flecha, dão 18 anéis e 19 faixas, e com 48 lados
+     o `lathe` ocupa 912 das 1000 faces do passo. `labio` é o z da primeira estação do capô, onde a base do cone tem de estar dentro. */
   cone: {
     proa: 8,
     perfil: [[0, 0], [60, 54], [100, 104], [125, 154], [150, 204], [168, 254], [185, 304], [200, 354], [210, 404], [212, 444], [195, 540], [182, 598]],
-    trechos: [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2],
-    lados: 64,
+    trechos: [2, 2, 2, 1, 1, 1, 1, 2, 1, 4, 1],
+    lados: 48,
     labio: 592,
   },
   /* A pá: os parâmetros da família, a `raiz` como deslocamento do ponto do eixo (a âncora do esboço, em x, y, z), o `giro` em z que leva
@@ -146,7 +146,7 @@ export const MATERIAIS = {
   helice: { cor: '#b8c4d0', metalicidade: 0.3, aspereza: 0.45 },
 };
 
-/* O ângulo, em graus, a partir do qual a quina fica nítida no sombreado liso: a base do cone, de 77 graus contra a lateral, fica; o
+/* O ângulo, em graus, a partir do qual a quina fica nítida no sombreado liso: a base do cone, de 76 graus contra a lateral, fica; o
    perfil do cone, que vira menos de 15 graus por anel, fica liso. */
 const ANGULO_LISO = 30;
 
@@ -232,7 +232,7 @@ const receita = {
     partes: [
       {
         nome: 'cone',
-        forma: 'cone da hélice, de revolução em torno do eixo z, da proa em z 8 até dentro do lábio do capô, com 424 mm de diâmetro na base',
+        forma: 'cone da hélice, de revolução em torno do eixo z, da proa em z 8 até dentro do lábio do capô, com 424 mm de diâmetro no ponto mais largo, em z 452, e 364 mm na base, em z 606',
         tecnica: 'revolução pelo perfil do esboço com sombreado liso',
       },
       ...PAS.map((nome, i) => ({
