@@ -28,6 +28,7 @@ import { lerReferenciaDeArquivo, referenciasDoEsboco, referenciasPresentes, vist
 import { ajuda } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
 import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
+import { andaimeDoArquivo, descreverTraducao } from './esboco-para-andaime.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
 import { blocagemDoEsboco, desenharVistaDaBlocagem } from './esboco-blocagem.mjs';
 import { FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, orientacaoDoEsboco, referenciaDoBrief, vistasDaReferencia, vistasDaUnidade } from './esboco-brief.mjs';
@@ -1275,6 +1276,18 @@ export async function briefArquivo(arquivo, alvo, { largura = null, saida = null
 
 /* `--medidas`: cada medida do `plano.medidas` com o valor declarado, o medido na geometria (a medição do gate), o desvio e a
    tolerância, em texto, sem imagem e sem gravar nada. Sai com 0: quem decide é o gate. */
+/* `--andaime <saida.json>`: grava o andaime da forma global N2 que a primeira opção do esboço traduz, o mesmo que o Condutor e o
+   Envelope por receita leem, para a receita que refina o esboço apontar em `REFINA.andaime`, e imprime as perdas da tradução. A
+   mesma entrada dá os mesmos bytes. */
+export function andaimeArquivo(arquivo, saida) {
+  const caminho = resolverCaminho(arquivo);
+  const traducao = andaimeDoArquivo(caminho);
+  const destino = resolve(saida);
+  mkdirSync(dirname(destino), { recursive: true });
+  writeFileSync(destino, `${JSON.stringify(traducao.andaime, null, 1)}\n`);
+  return { texto: `${descreverTraducao(traducao)}\ngravado: ${destino} (${traducao.andaime.formato}, ${traducao.andaime.volumes.length} volumes)\n`, traducao };
+}
+
 export function medidasArquivo(arquivo) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
@@ -1423,7 +1436,7 @@ export function ajustarArquivo(arquivo) {
 }
 
 /* Flags que levam um valor (`--forma garfoE` ou `--forma=garfoE`); o resto é booleano. `--condutor` leva o arquivo. */
-const FLAGS_COM_VALOR = ['--ajuda', '--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--ancoras', '--envelope', '--refazer-envelope', '--de', '--composicoes', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief', '--curso'];
+const FLAGS_COM_VALOR = ['--ajuda', '--forma', '--achado', '--condutor', '--feito', '--mover', '--para', '--motivo', '--vista', '--referencia', '--medidas-da-referencia', '--andaime', '--ancoras', '--envelope', '--refazer-envelope', '--de', '--composicoes', '--mover-lote', '--detalhar', '--integrar', '--unidade', '--remover', '--adicionar', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief', '--curso'];
 /* `--envelope <unidade> <arquivo-detalhado.esboco.json>` e `--integrar <unidade> <arquivo-detalhado>` levam dois valores, e `--detalhar <unidade> [arquivo]` leva o segundo se vier. */
 const FLAGS_COM_DOIS = ['--envelope', '--detalhar', '--integrar'];
 
@@ -1480,11 +1493,11 @@ async function principal(argv) {
       throw e;
     }
   }
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto> | --refazer-envelope <unidade> --motivo <texto> [--de <detalhado.esboco.json>]]] [--detalhar <unidade> [arquivo]] [--medidas] [--curso [<mecanismo>]] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--brief <unidade|marco-N|objeto> [--largura <px>] [--saida <pasta>] [--sem-vizinhos]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json|receita.js> [--composicoes <módulo-do-registro>]] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- --ajuda [tópico] | <arquivo.esboco.json> [--estrito] [--descrever [--forma <id>] [--completo] [--mudou] [--json]] [--achado <n>] [--ajustar] [--rapido] [--analise [--sugerir] [--centros] [--largura <px>] [--saida <pasta>] [--zoom=<vista>:x0,y0,x1,y1]] [--composta [--unidade <unidade>] [--nivel-zero] [--largura <px>] [--saida <pasta>]] [--condutor [--historico] [--proximo | --feito <unidade> | --modo <objeto|por-unidade> | --nota-de-passagem <unidade> --texto <texto> | --veredito <unidade> --nota <0-10> [--tokens <n>] --motivo <texto> | --liberar <unidade|marco-N> --motivo <texto> | --mover <forma|instancia|padrao|a,b> --para <unidade> --motivo <texto> | --mover-lote <arquivo.json> | --replanejar --motivo <texto> | --refazer-envelope <unidade> --motivo <texto> [--de <detalhado.esboco.json>]]] [--detalhar <unidade> [arquivo]] [--medidas] [--andaime <saida.json>] [--curso [<mecanismo>]] [--ligacoes [--unidade <unidade>] [--forma <id>]] [--brief <unidade|marco-N|objeto> [--largura <px>] [--saida <pasta>] [--sem-vizinhos]] [--unidade <unidade> [--sem-vizinhos]] [--nivel-zero] [--vista <vista>] [--largura <px>] [--saida <pasta>] [--corte <x|y|z>=<mm> [--lado +|-]] [--explodir [--eixo <x|y|z>] [--distancia <mm>]] [--zoom-forma <id|instancia|padrao> [--margem <mm>]] [--previa] [--forçar] [--editar <arquivo> <forma>.<campo>=<valor> ... [--remover <forma[,forma]>] [--adicionar <json-da-forma ou arranja> [--unidade <unidade>]]] [--integrar <unidade> <arquivo-detalhado.esboco.json>] [--envelope <unidade> <arquivo-detalhado.esboco.json|receita.js> [--composicoes <módulo-do-registro>]] [--referencia <contorno.json ou imagem.png> [--vista <vista>] [--ancoras <json>] [--imagem]]\n       npm run esboco -- --medidas-da-referencia <contorno.json> [--vista <vista>] [<arquivo.esboco.json>]\n'); return 2; }
   const estrito = args.tem('--estrito');
   try {
     if (args.tem('--mudou') && !args.tem('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
-    for (const f of ['--refazer-envelope', '--de', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
+    for (const f of ['--andaime', '--refazer-envelope', '--de', '--largura', '--saida', '--veredito', '--liberar', '--nota', '--tokens', '--forma', '--achado', '--feito', '--mover', '--mover-lote', '--para', '--motivo', '--vista', '--referencia', '--ancoras', '--detalhar', '--unidade', '--remover', '--adicionar', '--corte', '--lado', '--eixo', '--distancia', '--zoom-forma', '--margem', '--modo', '--nota-de-passagem', '--texto', '--brief']) if (args.tem(f) && args.valor(f) === undefined) throw new ErroDeEsboco(`${f} precisa de um valor (${f} <valor>).`);
     if (args.tem('--de') && !args.tem('--refazer-envelope')) throw new ErroDeEsboco('--de só vale junto de --refazer-envelope (--refazer-envelope <unidade> --de <detalhado.esboco.json> --motivo <texto>).');
     if (args.tem('--integrar') && (args.valor('--integrar') === undefined || args.valor('--integrar', 1) === undefined)) throw new ErroDeEsboco('--integrar precisa da unidade e do arquivo detalhado (--integrar <unidade> <arquivo-detalhado.esboco.json>).');
     if (args.tem('--envelope') && (args.valor('--envelope') === undefined || args.valor('--envelope', 1) === undefined)) throw new ErroDeEsboco('--envelope precisa da unidade e do arquivo detalhado (--envelope <unidade> <arquivo-detalhado.esboco.json>).');
@@ -1509,6 +1522,10 @@ async function principal(argv) {
     }
     if (args.tem('--medidas')) {
       process.stdout.write(medidasArquivo(alvo).texto);
+      return 0;
+    }
+    if (args.tem('--andaime')) {
+      process.stdout.write(andaimeArquivo(alvo, args.valor('--andaime')).texto);
       return 0;
     }
     if (args.tem('--brief')) {

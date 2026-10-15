@@ -17,10 +17,16 @@
  * `por` e `motivo`. Imagem que o arquivo não cita, ou pasta sem o arquivo,
  * segue como principal.
  *
+ * As referências moram em `referencias/` na pasta do objeto. O objeto que já
+ * tem as referências noutra pasta do repositório (as do avião ficaram no banco
+ * de provas, citadas pelos registros das rodadas dele) as aponta em
+ * `referencias.json`, `{ "pasta": "<caminho relativo à pasta do objeto>",
+ * "motivo": "..." }`, em vez de copiá-las.
+ *
  * USO
  *   npm run objeto -- <objeto>          por exemplo braco-robotico */
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { acaoDaPasta } from './rodadas-com-critico.mjs';
 
@@ -48,10 +54,23 @@ export function papeisDasReferencias(refs) {
   return imagens;
 }
 
+/* A pasta das referências do objeto: `referencias/`, ou a que `referencias.json` aponta, relativa à pasta do objeto. */
+export function pastaDasReferencias(pasta) {
+  const arquivo = join(pasta, 'referencias.json');
+  if (!existsSync(arquivo)) return join(pasta, 'referencias');
+  const { pasta: apontada, motivo } = JSON.parse(readFileSync(arquivo, 'utf8'));
+  if (typeof apontada !== 'string' || !apontada || isAbsolute(apontada)) throw new Error('referencias.json: "pasta" deve ser um caminho relativo à pasta do objeto.');
+  if (typeof motivo !== 'string' || !motivo) throw new Error('referencias.json: diga em "motivo" por que as referências moram fora da pasta do objeto.');
+  if (existsSync(join(pasta, 'referencias'))) throw new Error('referencias.json aponta outra pasta, e o objeto também tem referencias/; fique com uma das duas.');
+  const destino = resolve(pasta, apontada);
+  if (!existsSync(destino) || !statSync(destino).isDirectory()) throw new Error(`referencias.json: a pasta ${apontada} não existe.`);
+  return destino;
+}
+
 export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
   const pasta = join(acervo, objeto);
   if (!existsSync(pasta)) throw new Error(`o objeto '${objeto}' não existe em ${relative(REPO, acervo) || acervo}.`);
-  const refs = join(pasta, 'referencias');
+  const refs = pastaDasReferencias(pasta);
   const etapas = [];
   const rel = (p) => relative(REPO, p);
 

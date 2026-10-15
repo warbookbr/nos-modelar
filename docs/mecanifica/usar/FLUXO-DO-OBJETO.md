@@ -36,6 +36,13 @@ declara largura e altura, medida, por `origem` ou `medivel: false` com
 motivo; faltando alguma, o comando para com código 4 e lista as faltas por
 parte, e o roteiro do crítico traz as duas cotas esperadas de cada parte.
 
+**Referências fora da pasta do objeto.** As referências moram em `referencias/` na
+pasta do objeto. O objeto cujas referências já existem noutra pasta do repositório,
+citadas pelos registros das rodadas que as produziram, as aponta em
+`referencias.json`, `{ "pasta": "<caminho relativo à pasta do objeto>", "motivo": "..." }`,
+em vez de copiá-las; é o caso do avião, cujas vistas ficaram no banco de provas. O
+objeto não pode ter as duas coisas.
+
 **Papel de cada imagem.** Com mais de uma imagem de referência, o arquivo
 `papeis.json` da pasta `referencias/` declara o papel de cada uma:
 `{ "imagens": { "<imagem>": { "papel": "principal" | "apoio" | "substituida", "motivo": "...", "por": "..." } } }`.

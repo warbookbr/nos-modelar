@@ -482,3 +482,45 @@ describe('o adaptador do esboço ao andaime: as fixtures do módulo e do banco d
     });
   });
 });
+
+describe('--andaime grava o andaime em disco', () => {
+  it('grava o mesmo andaime que o Condutor traduz, com os mesmos bytes a cada vez, e imprime as perdas', async () => {
+    const { mkdtempSync, rmSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { andaimeArquivo } = await import('./esboco.mjs');
+    const fixture = fileURLToPath(new URL(arquivosDoModulo[0], pastaDoModulo));
+    const pasta = mkdtempSync(join(tmpdir(), 'andaime-'));
+    try {
+      const destino = join(pasta, 'sub', 'andaime.json');
+      const r = andaimeArquivo(fixture, destino);
+      const gravado = readFileSync(destino, 'utf8');
+      expect(JSON.parse(gravado)).toEqual(JSON.parse(JSON.stringify(andaimeDoArquivo(fixture).andaime)));
+      expect(normalizarAndaimeGlobal(JSON.parse(gravado)).volumes.length).toBe(r.traducao.andaime.volumes.length);
+      expect(r.texto).toMatch(/gravado: .*andaime\.json \(mecanifica\.andaime-global@2, \d+ volumes\)\n$/);
+      andaimeArquivo(fixture, destino);
+      expect(readFileSync(destino, 'utf8')).toBe(gravado);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('npm run esboco -- <arquivo> --andaime <saida.json>', () => {
+  it('a linha de comando lê o caminho de saída e grava', async () => {
+    const { mkdtempSync, rmSync, existsSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { execFileSync } = await import('node:child_process');
+    const fixture = fileURLToPath(new URL(arquivosDoModulo[0], pastaDoModulo));
+    const pasta = mkdtempSync(join(tmpdir(), 'andaime-cli-'));
+    try {
+      const destino = join(pasta, 'andaime.json');
+      const saida = execFileSync(process.execPath, [fileURLToPath(new URL('./esboco.mjs', import.meta.url)), fixture, '--andaime', destino], { encoding: 'utf8' });
+      expect(existsSync(destino)).toBe(true);
+      expect(saida).toMatch(/gravado: .*andaime\.json/);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  }, 60_000);
+});

@@ -65,4 +65,26 @@ describe('estado do objeto', () => {
     writeFileSync(join(refs, 'papeis.json'), JSON.stringify({ imagens: { velha: { papel: 'substituida', motivo: 'x' } } }));
     expect(() => estadoDoObjeto('coisa', { acervo })).toThrow(/por qual imagem/);
   });
+
+  it('referencias.json aponta as referências que moram fora da pasta do objeto', () => {
+    const fora = join(acervo, 'banco', 'referencias');
+    mkdirSync(join(fora, 'lateral.regioes.rodadas'), { recursive: true });
+    writeFileSync(join(fora, 'lateral.regioes.json'), '{}');
+    writeFileSync(join(fora, 'lateral.regioes.rodadas', 'rodada-01.json'), JSON.stringify(rodada(1, 9)));
+    const pasta = join(acervo, 'coisa');
+    mkdirSync(pasta);
+    writeFileSync(join(pasta, 'ALINHAMENTO.md'), '# coisa\n');
+    writeFileSync(join(pasta, 'montagem.json'), JSON.stringify({ etapas: ['a'] }));
+    writeFileSync(join(pasta, 'referencias.json'), JSON.stringify({ pasta: '../banco/referencias', motivo: 'os registros das rodadas citam esta pasta' }));
+    const estado = estadoDoObjeto('coisa', { acervo });
+    expect(estado.etapas.map((e) => e.etapa)).toContain('mapear as partes de lateral');
+    expect(estado.proxima.etapa).toBe('prancha de lateral');
+    writeFileSync(join(pasta, 'referencias.json'), JSON.stringify({ pasta: '../banco/referencias' }));
+    expect(() => estadoDoObjeto('coisa', { acervo })).toThrow(/motivo/);
+    writeFileSync(join(pasta, 'referencias.json'), JSON.stringify({ pasta: '../nada', motivo: 'x' }));
+    expect(() => estadoDoObjeto('coisa', { acervo })).toThrow(/não existe/);
+    writeFileSync(join(pasta, 'referencias.json'), JSON.stringify({ pasta: '../banco/referencias', motivo: 'x' }));
+    mkdirSync(join(pasta, 'referencias'));
+    expect(() => estadoDoObjeto('coisa', { acervo })).toThrow(/fique com uma das duas/);
+  });
 });
