@@ -21,7 +21,10 @@
  * O vão de cada janela é um corte de extrusão cuja face de dentro está no plano da face de dentro da placa da janela: a placa
  * assenta no fundo do vão e sobra a folga em volta dela, no esboço e aqui. O raio da janela arredonda o contorno dela visto de
  * lado (y por z), na placa e no vão; o esboço aplica o mesmo raio ao perfil em planta, recortado a metade da espessura, e a
- * janela sai quase quadrada de lado. O vão da porta é o `cortePorta`, que o esboço escreve com a folga já somada. A porta é
+ * janela sai quase quadrada de lado. Cada placa e a porta são aparadas pelo casco inteiro, sem os vãos (`intersectar` com um
+ * loft do casco refeito a cada uso): a placa da janela 1 e o ombro da porta, retos, passavam da superfície do casco, a janela 1
+ * em 4,5 mm e a porta em 3,8 mm, e agora a face de fora deles fica rente a ela, e o alto da janela 1, que está no ombro curvo do
+ * casco, perde o que ficava fora dele. O vão da porta é o `cortePorta`, que o esboço escreve com a folga já somada. A porta é
  * recortada pelo vão da janela 4 do lado esquerdo, e esse corte avança `porta.sobraDoVao` para dentro do avião: a face de dentro
  * da porta se afasta do plano da face de dentro da placa até 12 mm no alto do vão, e sem a sobra a placa tocaria a pele que sobra
  * da porta, um contato que o plano não declara.
@@ -308,8 +311,8 @@ export function derivar(t = TABELA) {
 const ID = {
   casco: 100, fuselagem: 101, vaoDaPorta: 110,
   parabrisa: 120, montante: 130, barbatana: 140,
-  porta: 150, portaVazada: 151,
-  placa: 200, vaoNoCasco: 300, vaoNaPorta: 400,
+  porta: 150, portaVazada: 151, portaAparada: 152,
+  placa: 200, vaoNoCasco: 300, vaoNaPorta: 400, placaAparada: 500, gabarito: 600, gabaritoDaPorta: 700,
 };
 /* Uma identidade por janela: cada número e cada lado têm a sua. */
 const idDaJanela = (base, janela) => base + janela.numero * 10 + (janela.lado > 0 ? 0 : 1);
@@ -333,7 +336,8 @@ export function gerarPassos(t = TABELA) {
   const loft = (origemId, L, segmentos) => {
     passos.push(['loft', { origemId, secoes: L.secoes, lados: L.lados, segmentosCurva: segmentos, orientacao: L.orientacao }]);
     for (const polo of L.polos) {
-      if (polo.d.some((v) => v !== 0)) passos.push(['moveV', { sel: { regiao: polo.regiao }, d: polo.d }]);
+      /* Um deslocamento abaixo de um nanômetro é ruído da média dos pontos, e não leva o polo a lugar nenhum. */
+      if (polo.d.some((v) => Math.abs(v) > 1e-9)) passos.push(['moveV', { sel: { regiao: polo.regiao }, d: polo.d }]);
     }
   };
   const extrusaoDaJanela = (origemId, janela, forma, segmentos) => {
@@ -381,23 +385,34 @@ export function gerarPassos(t = TABELA) {
   passos.push(['material', { usa: 'casco', sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
   passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
 
-  /* As oito janelas: placas nos vãos. */
+  /* Cada sólido que assenta na superfície do casco (as placas das janelas e a porta) é aparado pelo casco inteiro, sem os vãos:
+     a interseção deixa a face de fora dele rente à superfície, no lugar de passar dela. O gabarito é um loft do casco refeito a
+     cada uso, porque a interseção o consome, e vem logo antes dela para o polo dele não dividir lugar com o de outro loft. */
+  const apara = (origem, origemId, gabaritoId) => {
+    loft(gabaritoId, P.casco, t.casco.segmentosPorCanto);
+    passos.push(['intersectar', { origemId, solidos: [{ origem }, { origem: { op: 'loft', id: gabaritoId } }] }]);
+  };
+
+  /* As oito janelas: placas nos vãos, aparadas pela superfície do casco. */
   for (const janela of P.janelas) {
     const id = idDaJanela(ID.placa, janela);
+    const aparada = idDaJanela(ID.placaAparada, janela);
     extrusaoDaJanela(id, janela, janela.placa, t.segmentosPorCantoDaJanela);
-    passos.push(['parte', { nome: janela.nome, sel: { origem: { op: 'extrusao', id } } }]);
-    passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'extrusao', id } } }]);
-    passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'extrusao', id } } }]);
+    apara({ op: 'extrusao', id }, aparada, idDaJanela(ID.gabarito, janela));
+    passos.push(['parte', { nome: janela.nome, sel: { origem: { op: 'intersectar', id: aparada } } }]);
+    passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'intersectar', id: aparada } } }]);
+    passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'intersectar', id: aparada } } }]);
   }
 
-  /* A porta, recortada pelo vão da janela 4 do lado esquerdo. */
+  /* A porta, aparada pela superfície do casco e recortada pelo vão da janela 4 do lado esquerdo. */
   loft(ID.porta, P.porta, 1);
+  apara({ op: 'loft', id: ID.porta }, ID.portaAparada, ID.gabaritoDaPorta);
   const janelaDaPorta = P.janelas.find((j) => j.numero === JANELA_DA_PORTA.numero && j.lado === JANELA_DA_PORTA.lado);
   extrusaoDaJanela(idDaJanela(ID.vaoNaPorta, janelaDaPorta), janelaDaPorta, janelaDaPorta.vaoNaPorta, t.segmentosPorCantoDaJanela);
   passos.push(['subtrair', {
     origemId: ID.portaVazada,
     solidos: [
-      { origem: { op: 'loft', id: ID.porta } },
+      { origem: { op: 'intersectar', id: ID.portaAparada } },
       { origem: { op: 'extrusao', id: idDaJanela(ID.vaoNaPorta, janelaDaPorta) } },
     ],
   }]);
@@ -439,13 +454,13 @@ export function pontosDeclarados(t = TABELA) {
     max: [Math.max(...bb.map((e) => e[1] / 2)), Math.max(...bb.map((e) => e[4] + e[2] / 2)), bb[bb.length - 1][0]],
   };
   const tolerancia = 1;
-  const doMeio = (caixa) => caixa.min.map((v, k) => (v + caixa.max[k]) / 2);
   const pontos = [
     { nome: 'ponta da frente do casco', parte: 'fuselagem', medida: 'minimo', em: caixaDoCasco.min, toleranciaMm: tolerancia },
     { nome: 'ponta de trás do casco', parte: 'fuselagem', medida: 'maximo', em: caixaDoCasco.max, toleranciaMm: tolerancia },
     { nome: 'extremo baixo e frontal do para-brisa', parte: 'parabrisa', medida: 'minimo', em: caixaDoParabrisa.min, toleranciaMm: tolerancia },
     { nome: 'extremo alto e traseiro do para-brisa', parte: 'parabrisa', medida: 'maximo', em: caixaDoParabrisa.max, toleranciaMm: tolerancia },
-    { nome: 'centro do painel da porta', parte: 'porta', medida: 'centro', em: doMeio(caixaDaPorta), toleranciaMm: tolerancia },
+    /* O máximo, e não o centro: o casco apara a face de fora da porta no ombro, e o centro em x anda uns milímetros. */
+    { nome: 'canto de cima, de trás e de dentro do painel da porta', parte: 'porta', medida: 'maximo', em: caixaDaPorta.max, toleranciaMm: tolerancia },
     { nome: 'ponta da frente da barbatana', parte: 'barbatana', medida: 'minimo', em: caixaDaBarbatana.min, toleranciaMm: tolerancia },
     { nome: 'ponta de trás da barbatana', parte: 'barbatana', medida: 'maximo', em: caixaDaBarbatana.max, toleranciaMm: tolerancia },
     {
