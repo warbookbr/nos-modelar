@@ -1,0 +1,202 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-horizontal",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-empenagem-horizontal/alvo/aviao-unidade-empenagem-horizontal-composta.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "suporteProfundor1D",
+        "tipo": "superficie",
+        "onde": "contorno inferior da lente, entre as duas pontas",
+        "sentido": "segmentado",
+        "evidencia": "Vista direita da parte: a borda de baixo tem quebras retas (cerca de x 330, 420, 530, 600). O alvo, na lateral, mostra a lente com curva contínua."
+      },
+      {
+        "parte": "suporteProfundor1E",
+        "tipo": "superficie",
+        "onde": "contorno inferior da lente, entre as duas pontas",
+        "sentido": "segmentado",
+        "evidencia": "Vista isométrica da parte, idêntica às do lado D: a face de baixo é poligonal."
+      },
+      {
+        "parte": "suporteProfundor2D",
+        "tipo": "superficie",
+        "onde": "contorno inferior da lente, entre as duas pontas",
+        "sentido": "segmentado",
+        "evidencia": "Vista isométrica da parte, idêntica à 1D: a face de baixo mostra facetas retas (cerca de x 350, 430, 545, 610)."
+      },
+      {
+        "parte": "suporteProfundor2E",
+        "tipo": "superficie",
+        "onde": "contorno inferior da lente, entre as duas pontas",
+        "sentido": "segmentado",
+        "evidencia": "Vista isométrica da parte, idêntica às do lado D: a face de baixo é poligonal."
+      },
+      {
+        "parte": "suporteProfundor3D",
+        "tipo": "superficie",
+        "onde": "contorno inferior da lente, entre as duas pontas",
+        "sentido": "segmentado",
+        "evidencia": "Vista isométrica da parte, idêntica à 1D: a face de baixo mostra facetas retas onde o alvo mostra curva contínua."
+      },
+      {
+        "parte": "suporteProfundor3E",
+        "tipo": "superficie",
+        "onde": "contorno inferior da lente, entre as duas pontas",
+        "sentido": "segmentado",
+        "evidencia": "Vista isométrica da parte, idêntica às do lado D: a face de baixo é poligonal."
+      }
+    ],
+    "observacao": "A forma segue o alvo dentro do declarado; o degrau a 17,2% da ponta passa do mínimo de um sexto por menos de um ponto, e a alma do compensador não aparece nas vistas."
+  },
+  "partes": [
+    {
+      "nome": "estabilizadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "estabilizadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compensadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compensadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o serrilhado do bordo de ataque e quantizacao de pixel na captura sem suavizacao de borda, com diagonais das faixas finas da familia no arame; nao e da receita e fica sem correcao possivel na minha pasta",
+    "vistas:critica nao foi rodada por ordem da tarefa; a conferencia de forma usou so a isometrica isolada do estabilizadorD, a montagem da rodada 2, as medidas e a comparacao de malha",
+    "olhar-bancada --ajuda nao existe; --saida exige caminho dentro do repositorio",
+    "o scratchpad tem um venv de outra tarefa, e as ferramentas aceitam saida so dentro do repo",
+    "Atribuição (ferramenta): o serrilhado da rodada 2 era quantização de pixel da captura sem suavização de borda; com a captura em dobro reduzida por média ele sumiu do veredito. O processo não teria pego: o modelador mediu a malha e mostrou."
+  ],
+  "notaDePassagem": "Estabilizador intocado: o serrilhado e pixel (resíduo 0,56 px a 2400 e 0,60 px a 4800 px) e diagonais do arame; a booleana nova mexeu 58 vertices so na linha do vao (z 9628 a 9838), nenhum no bordo de ataque. Profundor: o polo da tampa ficava 0,5 mm alem da secao (189,5 a 2385,5, contra 190 a 2385 do esboco); as secoes de ponta entram tampa.avanco e o polo cai no x da TABELA, nas duas pontas.",
+  "receita": {
+    "sha256": "sha256:6e4a1d4a4ff601a8f92a6055993c805045e68610f169f01074f6b2271b2bd6d5",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 5,
+      "acrescentadas": 5,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "    motivo: 'o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,706 e 0,704',"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    motivo: 'o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,705 e 0,704',"
+        },
+        {
+          "tipo": "-",
+          "linha": 151,
+          "texto": "  /* `avanco` é quanto o polo de cada loft fica além da seção. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  /* `avanco` é quanto o polo de cada loft fica além da seção. No profundor as duas seções de ponta entram `avanco` (em `derivar`), e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "     polo cai no x da ponta, 190 e 2385, onde o esboço acaba o profundor; nas outras formas o polo passa da seção. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 378,
+          "texto": "    profundor: { estacoes: profundor.estacoes.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })), vao: profundor.vao.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 379,
+          "texto": "    profundor: { estacoes: profundor.estacoes.map((s, i, todas) => ({ pos: m(s.x + (i === 0 ? t.tampa.avanco : 0) - (i === todas.length - 1 ? t.tampa.avanco : 0)), pontos: pontosM(s) })), vao: profundor.vao.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })) },"
+        },
+        {
+          "tipo": "-",
+          "linha": 544,
+          "texto": "  doProfundor.min[0] -= avanco;"
+        },
+        {
+          "tipo": "-",
+          "linha": 545,
+          "texto": "  doProfundor.max[0] += avanco;"
+        },
+        {
+          "tipo": "+",
+          "linha": 545,
+          "texto": "  /* O profundor não passa dos x da TABELA: as duas seções de ponta entram `avanco` e o polo de cada tampa cai no x da ponta. */"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
