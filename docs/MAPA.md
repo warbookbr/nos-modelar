@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1299 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1304 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -321,6 +321,10 @@
 ## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/
 
 - `NOTAS.md` — A carcaça da descrição pela família de desenho
+
+## docs/mecanifica/banco-de-provas/importar-objeto-2026-10-15/
+
+- `FONTE.md` — Fonte do objeto-prova da importação de código
 
 ## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
 
@@ -1739,6 +1743,9 @@
 - `esboco-condutor-nivel-zero.test.mjs` — O Condutor lendo o nível zero, com o adaptador de verdade (`esboco-nivel-zero.mjs`) entregue como porta: - o percurso completo da moto-curvas (Portões, Marco…
 - `esboco-familias.mjs` — esboco-familias.mjs — o adaptador que entrega ao esboço as famílias procedurais.
 - `esboco-familias.test.mjs` — A ponte das famílias procedurais para o esboço (`esboco-familias.mjs` e `modulos/esboco/src/familia.js`), com a roda 2.0 e o cilindro hidráulico de verdade: …
+- `esboco-importar-csg-conferir.mjs` — Conferência numérica da importação de `.csg`: o volume que o esboço importado desenha contra a malha que o próprio OpenSCAD exporta do mesmo objeto (`opensca…
+- `esboco-importar-csg.mjs` — Importador de `.csg` do OpenSCAD para `.esboco.json`.
+- `esboco-importar-csg.test.mjs` — O importador de .csg: a fixture sintética escrita à mão cobre cada nó, e o resultado é medido pelo próprio esboço (a caixa de cada forma depois de posta e re…
 - `esboco-medidas-no-andaime.test.mjs` — A prova das medidas do `plano.medidas` lidas na blocagem do nível zero, sobre os esboços do módulo e do banco de provas que as declaram: a leitura na blocage…
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
@@ -1782,6 +1789,7 @@
 - `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
+- `importar-csg.mjs` — Linha de comando do importador de `.csg` do OpenSCAD para `.esboco.json`. Uso: npm run importar-csg -- <arquivo.csg> [--saida <arquivo.esboco.json>] [--frent…
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
