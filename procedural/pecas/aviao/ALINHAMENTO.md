@@ -285,3 +285,22 @@ não são espelho; e o `REFINA` acusando parte fora do envelope ou abaixo do mí
 critério do alinhamento vale na pose de pouso: o trem baixado não atravessa a asa nem a
 fuselagem.
 
+Na primeira rodada o trem do nariz fechou com nota 8 e os principais ficaram em 7, e o que
+os dois críticos e a medição acharam vinha do esboço. Em 2026-10-15 a pessoa decidiu
+corrigir na segunda rodada dos dois, afastando-se do esboço de propósito, com o mínimo
+próprio no `REFINA.esboco` para cada parte que se afasta:
+
+- a roda encosta no chão, em y 0: o esboço a deixa 17 mm acima, e o trem desce os 17 mm
+  pela perna, ou pelo pistão no nariz, levando a coroa, o garfo, o eixo e a roda;
+- o furo do cubo tem o diâmetro do eixo, e a roda assenta nele: o esboço deixa folga
+  de 4,3 mm no nariz e de 17 mm nos principais;
+- nos principais, o pino de baixo do compasso toca a coroa, como o `PLANO` promete, e
+  não só a quina da perna;
+- nos principais, a orelha prende o corpo do atuador à estrutura da asa, dentro dela,
+  como no esboço e num avião real; o `PLANO` dizia "à perna" e foi corrigido.
+
+Na mesma data ela decidiu manter a carenagem do nariz como caixa de cantos arredondados,
+e não o bojo fundido à barriga da referência, que pediria reabrir a fuselagem; e manter
+no motor a boca de ar que segue em túnel até a fuselagem, onde o esboço a fecha uns 30 cm
+para dentro, porque não aparece de fora.
+

@@ -46,7 +46,7 @@ const BASES = {
   atuadorCorpo: ['corpo do atuador, mais grosso que a haste', 'cilindro entre os pontos do esboço'],
   atuadorHaste: ['haste do atuador', 'cilindro entre os pontos do esboço'],
   pinoAtuador: ['pino que liga o atuador à perna', 'cilindro entre os pontos do esboço'],
-  orelhaAtuador: ['orelha que prende o atuador à perna', 'caixa do esboço'],
+  orelhaAtuador: ['orelha que prende o corpo do atuador à estrutura da asa, dentro dela', 'caixa do esboço'],
 };
 const LADOS = [['D', 'direito'], ['E', 'esquerdo']];
 const NOMES = LADOS.flatMap(([L]) => Object.keys(BASES).map((b) => `${b}Principal${L}`));
