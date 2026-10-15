@@ -75,24 +75,37 @@
       "instancia": "asas",
       "estado": "fixa",
       "juntas": [],
-      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1",
       "aceite": {
         "por": "a pessoa, 2026-10-15: aceitou as asas como estão, depois do crítico fechar com nota 9 sem defeito na rodada 1",
         "observacao": "o esboço difere da referência real em quatro pontos (a ponta mais baixa, a ponta de cantos vivos, a raiz sem carenagem e os casulos que faltam sob as asas), que a pessoa pediu para ver antes de decidir",
         "analise": "ausente"
-      }
+      },
+      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1"
     },
     {
       "instancia": "empenagem-horizontal",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: aceitou a empenagem horizontal depois da nota 9 sem defeito na rodada 1",
+        "analise": "ausente"
+      },
       "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb"
     },
     {
       "instancia": "empenagem-vertical",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07"
+      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07",
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: aceitou a empenagem vertical pela escolha 'Aceitar as duas (Recomendado)', depois da nota 9 na rodada 1",
+        "observacao": "pendência: o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que contorna o canto solto da booleana",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+          "deriva: posicao em vértice do V do recorte do vão no bordo de fuga, corte y 3300"
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }

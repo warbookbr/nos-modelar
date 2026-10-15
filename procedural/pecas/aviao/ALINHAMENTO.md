@@ -248,4 +248,14 @@ do esboço de propósito recebe o mínimo próprio no `REFINA.esboco`, com o mot
 - Asas: a ponta com os cantos arredondados vista de cima.
 - Asas e fuselagem: a carenagem da raiz, a curva do bordo de fuga até a fuselagem.
 - Asas: o casulo escuro sob a asa esquerda e os pequenos ovais perto das pontas.
+- Empenagem horizontal: a ponta do estabilizador mais estreita, perto de metade da raiz,
+  e o recorte na ponta do profundor maior, perto de um quinto da meia-envergadura.
+- Empenagem horizontal: o compensador, a divisão no bordo de fuga do profundor.
+- Empenagem vertical: a dorsal lisa, o dorso subindo até a deriva, no lugar da aleta de
+  ponta fina do esboço.
+
+As duas empenagens fecharam na primeira rodada com nota 9 e a pessoa as aceitou em
+2026-10-15, vendo a [comparação com a referência real](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-empenagens.png);
+na vertical, o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que
+contorna o canto solto da booleana, e fica como pendência.
 
