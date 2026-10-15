@@ -1,0 +1,1072 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/motor",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor-unidade-motor-composta.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "capo",
+        "tipo": "ausencia",
+        "onde": "boca de ar: fenda sob o oval da face da proa",
+        "sentido": "faltando",
+        "evidencia": "bancada-aviao-motor-traseira-orto.png, fenda x≈490-610 y≈805-855: fundo plano claro. O raio-x traseiro mostra face triangulada fechando a fenda. Nenhuma passagem visível."
+      },
+      {
+        "parte": "entradaDeAr",
+        "tipo": "superficie",
+        "onde": "meia altura da barra na vista direita isolada",
+        "sentido": "segmentado",
+        "evidencia": "bancada-aviao-motor-direita-sel-entradaDeAr-isolar-orto-focado.png: salto duro de sombreamento em y≈450, no centro da barra x 345-555. A isométrica mostra anel fino, sem relação com a barra."
+      }
+    ],
+    "observacao": "Forma e proporção do capô e dos escapes batem com esboço e pranchas; a junta com a fuselagem não ficou conferível pela proa e a abertura da boca de ar não aparece nas vistas."
+  },
+  "partes": [
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "entradaDeAr",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "escapeD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "escapeE",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a fuselagem não publica porta e a montagem não tem relação: o encaixe do capô ficou digitado na TABELA e a junta entre peças não é declarada nem medida pela etapa; contatos só aceitam partes da própria peça",
+    "na luz da vista montada a fuselagem mostra leques de luz saindo das janelas, da triangulação dos recortes sob o liso; na luz do pacote do crítico eles não aparecem, e nenhum crítico os viu",
+    "a sonda de parametros marca inertes o raio da curva do escape e o início da boca de ar, porque mede caixa e contagem de faces; malha:conferir reprova 67 faces finas, sem gate"
+  ],
+  "notaDePassagem": "Capô com 20 estações, a última igual à frente da fuselagem (anéis a 0 mm). Furo do escape segue o eixo do tubo: em z restavam 0,7 mm de parede. O cone da hélice entra no capô em z 592. Sem porta publicada; o encaixe está na TABELA.",
+  "receita": {
+    "sha256": "sha256:4a64565f4cd48c26b1055e9f5e2ec3aa6ef75b89922899fefde3f5dbd8cacfe1",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 480,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Segunda etapa do avião (`../../montagem.json`). O combinado com a pessoa e o plano do motor estão em `../../ALINHAMENTO.md`; as"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * medidas vêm da unidade `motor` do esboço aprovado da segunda rodada"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `aviao-detalhe-motor.esboco.json`), e a receita"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * refina o andaime `../../andaime.json`, que é a tradução desse esboço (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço, o mesmo da fuselagem: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * cauda para +z. O capô vai de z = 592, onde o cone da hélice o encontra na etapa seguinte, até z = 2377, a face da frente da"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * fuselagem. A TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece só em `derivar`."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * O capô assenta na fuselagem: a última estação dele repete a primeira da fuselagem (z 2377, 1450 por 1030, canto de 380, centro em"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * y 1303), que é o que o plano e a nota de passagem da fuselagem dizem. A fuselagem não publica porta, e por isso estes números"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * estão na TABELA, e não saem de um vínculo de medida e de um encaixe de porta da montagem v5."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * O capô é um loft em z de seções de retângulo arredondado. O esboço o declara `suave` e passa por 10 seções uma curva de tangente"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * contínua (cúbica de Hermite com a tangente de Fritsch e Carlson, a do PCHIP, que não passa do valor de nenhuma seção); aqui a curva"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * entra em `derivar`, que a avalia na meia largura, no topo, na base e no raio do canto de cada seção e acrescenta as estações entre"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * elas. O lábio do capô, a parede de 14 mm entre z 662 e z 676, é aresta viva: a curva se parte nas duas seções dele. Cada loft anda"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * numa reta paralela ao eixo dele, com todas as seções no mesmo plano; o centro de cada seção entra no contorno, e não na posição."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * O loft só fecha uma ponta com um polo de raio zero; o polo nasce no eixo, a `tampa.avanco` além da última seção, e `moveV` o leva ao"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * centro da seção, de modo que cada ponta é um leque quase plano. O bloco de ids de um passo é de 1000: com 10 segmentos por canto"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * são 44 pontos por seção, e o capô cabe com até 21 estações."
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * A boca de ar é um corte de loft que entra pela parede do lábio e segue 260 mm para trás, sob o capô, como no esboço; a entrada de"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * ar é a carenagem em volta dela, e cada uma das duas partes leva o seu corte, porque a subtração o consome. Os escapes são tubos"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * por loft de seções circulares ao longo de um caminho com uma curva de `raioCurva`, as pontas fechadas por polo no eixo; o furo de"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * saída é um corte circular que entra pela ponta do tubo, ao longo do eixo dele."
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* Capô: uma estação por linha, [z, largura em x, altura em y, raio do canto, y do centro, aresta]. O x do centro é zero. `aresta`"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     vale 1 onde a curva se parte. A de z 662 o esboço acha sozinho (a parede do lábio quebra a superfície em mais de 40 graus) e a de"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     z 676 ele declara. A última linha é a primeira da fuselagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  capo: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "      [592, 440, 503, 200, 1329.5, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "      [662, 470, 530, 220, 1325, 1],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "      [676, 520, 730, 250, 1235, 1],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "      [805, 720, 815, 330, 1217.5, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "      [905, 770, 845, 340, 1217.5, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "      [1212, 970, 922, 380, 1229, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "      [1512, 1170, 957, 400, 1246.5, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "      [1812, 1300, 958, 400, 1269, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "      [2112, 1420, 992, 400, 1286, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "      [2377, 1450, 1030, 380, 1303, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    /* Quantos trechos cada vão entre duas estações vira na curva: um número por vão, nove ao todo. Com [1, 1, 3, 1, 2, 3, 3, 3, 2]"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "       são 20 estações (a curva do esboço tem 17), o que cabe no bloco de 1000 ids com 44 pontos por seção e deixa 100 mm entre as"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "       estações dos vãos longos do corpo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "    trechos: [1, 1, 3, 1, 2, 3, 3, 3, 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    /* Segmentos de cada canto arredondado: o canto de 400 mm sai em 10 passos de 9 graus, com a corda a 1,2 mm do arco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    segmentosPorCanto: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* Carenagem da entrada de ar: `inicio` é o ponto do lábio de ar do esboço, e cada estação é [distância a partir dele em z, largura"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "     em x, altura em y, raio do canto]. O centro de cada seção está sobre o ponto. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  entradaDeAr: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    inicio: [0, 1000, 636],"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "      [0, 380, 170, 85],"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "      [64, 380, 170, 85],"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  /* Boca de ar, o cortador: `inicio` é o ponto da boca de ar do esboço, e as estações são as mesmas colunas da entrada de ar. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  bocaDeAr: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    inicio: [0, 1000, 620],"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "      [0, 340, 130, 65],"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "      [120, 330, 126, 63],"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "      [260, 220, 90, 45],"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  /* Escape do lado direito; o esquerdo é o espelho em x. `inicio` é o ponto do escape do esboço, e `joelho` e `fim` são deslocamentos"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "     dele. O tubo vira no joelho numa curva de `raioCurva`, cortada em seções a cada `passoDaCurva` graus. O furo de saída entra pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "     ponta: `de` mm para dentro do tubo e `ate` mm para além da ponta, ao longo do eixo dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  escape: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    inicio: [300, 1340, 945],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    joelho: [180, 0, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    fim: [340, 0, 430],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    diametro: 200,"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    raioCurva: 130,"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    passoDaCurva: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    furo: { diametro: 130, lados: 24, de: 110, ate: 40 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  /* Fechamento das pontas dos lofts: quanto o polo fica além da última seção, ao longo do caminho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  tampa: { avanco: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  /* Quanto o raio do canto fica abaixo da meia dimensão menor da seção, em mm. Um canto de raio igual à meia altura, como o da boca de"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     ar e o da entrada de ar, deixa dois pontos do contorno no mesmo lugar, e a faixa entre eles sai com área nula. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  folgaDoRaio: 0.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "const soma = (a, b) => a.map((v, k) => v + b[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "const sub = (a, b) => a.map((v, k) => v - b[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "const mul = (a, s) => a.map((v) => v * s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "const escalar = (a, b) => a.reduce((s, v, k) => s + v * b[k], 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "const unitario = (a) => mul(a, 1 / Math.hypot(...a));"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "/* O loft em z: o eixo é o 2, o plano da seção é x por y, o +w do núcleo aponta para -y e a `orientacao` fixa o +u em x. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "const ORIENTACAO_EM_Z = [1, 0, 0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "/* Área com sinal pelo cadarço, sobre os dois primeiros números de cada ponto; o núcleo só aceita contorno anti-horário. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "function areaDoContorno(pontos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  let area = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  for (let i = 0; i < pontos.length; i++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    const a = pontos[i];"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    const b = pontos[(i + 1) % pontos.length];"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    area += a[0] * b[1] - b[0] * a[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  return area / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "/* A cúbica de Hermite por trechos, com a tangente do PCHIP. `nos` são `{ w, v, viva }`: a posição, a lista de valores e se o nó é"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "   aresta. Devolve os nós e, entre cada par deles, as estações pedidas em `trechos` (um número de trechos por vão). Num nó que é"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "   aresta a curva se parte: cada lado termina nele como uma curva termina na ponta, e dois nós vivos seguidos ficam ligados por reta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "function tangenteInterna(h0, h1, d0, d1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  if (d0 * d1 <= 0) return 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const a = 2 * h1 + h0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const b = h1 + 2 * h0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  return (a + b) / (a / d0 + b / d1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "function tangenteDaPonta(h0, h1, d0, d1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  let d = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  if (Math.sign(d) !== Math.sign(d0)) d = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  else if (Math.sign(d0) !== Math.sign(d1) && Math.abs(d) > 3 * Math.abs(d0)) d = 3 * d0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  return d;"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "function estacoesPorHermite(nos, trechos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const n = nos.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  if (trechos.length !== n - 1) throw new Error(`capo: ${n} estações pedem ${n - 1} números em trechos, e a TABELA traz ${trechos.length}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const h = nos.slice(1).map((no, k) => no.w - nos[k].w);"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  const coordenadas = nos[0].v.map((_, c) => c);"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  const inclinacao = h.map((hk, k) => nos[k + 1].v.map((y, c) => (y - nos[k].v[c]) / hk));"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  const liso = (j) => !nos[j].viva && j > 0 && j < n - 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  const esq = new Array(n);"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  const dir = new Array(n);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  for (let k = 0; k < n; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    const temEsq = k > 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    const temDir = k < n - 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    if (temEsq && temDir && !nos[k].viva) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "      const t = coordenadas.map((c) => tangenteInterna(h[k - 1], h[k], inclinacao[k - 1][c], inclinacao[k][c]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "      esq[k] = t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      dir[k] = t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      continue;"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    if (temEsq) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "      esq[k] = k >= 2 && liso(k - 1)"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "        ? coordenadas.map((c) => tangenteDaPonta(h[k - 1], h[k - 2], inclinacao[k - 1][c], inclinacao[k - 2][c]))"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "        : inclinacao[k - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "    if (temDir) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "      dir[k] = k + 2 < n && liso(k + 1)"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "        ? coordenadas.map((c) => tangenteDaPonta(h[k], h[k + 1], inclinacao[k][c], inclinacao[k + 1][c]))"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "        : inclinacao[k];"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  const saida = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  for (let k = 0; k < n; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "    saida.push({ w: nos[k].w, v: nos[k].v });"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    if (k === n - 1) continue;"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    const quantos = trechos[k];"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    if (!Number.isInteger(quantos) || quantos < 1) throw new Error(`capo: trechos[${k}] precisa ser inteiro maior ou igual a 1`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    for (let j = 1; j < quantos; j++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "      const t = j / quantos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "      const [h00, h10, h01, h11] = [2 * t ** 3 - 3 * t ** 2 + 1, t ** 3 - 2 * t ** 2 + t, -2 * t ** 3 + 3 * t ** 2, t ** 3 - t ** 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "      saida.push({"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "        w: nos[k].w + t * h[k],"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "        v: nos[k].v.map((y0, c) => h00 * y0 + h10 * h[k] * dir[k][c] + h01 * nos[k + 1].v[c] + h11 * h[k] * esq[k + 1][c]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "      });"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  return saida;"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "/* O contorno de uma seção de retângulo arredondado no plano do loft em z, [u, w, raio] com u = x e w = -(y - y0). Os quatro cantos"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "   saem do mesmo raio, limitado pela meia dimensão menor, e o contorno que sai no sentido horário é invertido. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "function contornoDaSecao({ hw, topo, base, raio }, y0, folga) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  const meio = (topo + base) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  const hy = (topo - base) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "  const r = Math.min(raio, hw - folga, hy - folga);"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "  const cantos = [[hw, topo, r], [-hw, topo, r], [-hw, base, r], [hw, base, r]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  const contorno = cantos.map(([x, y, raioDoCanto]) => [x, -(y - y0), raioDoCanto]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "  return { meio, contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "/* Um loft em z por seções de retângulo arredondado, em metro: `secoes` são `{ z, hw, topo, base, raio }`, com a meia largura em torno"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "   de `x`. A reta do caminho passa pelo centro da primeira seção; o centro das outras entra no contorno. Devolve as seções, com um polo de raio zero antes da primeira e"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "   depois da última, os `lados`, a `orientacao` e, para cada polo, a região que o seleciona e o deslocamento que o leva ao centro da"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "   seção de que ele fecha a ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "function loftEmZ({ nome, x = 0, secoes, avanco, segmentos, folga }) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  const y0 = (secoes[0].topo + secoes[0].base) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "  const feitas = secoes.map((s) => ({ ...contornoDaSecao(s, y0, folga), z: s.z }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  const lados = feitas[0].contorno.length * (segmentos + 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  const nV = feitas.length * lados + 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "  const nF = (feitas.length + 1) * lados;"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  if (nV > 1000 || nF > 1000) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "    throw new Error(`${nome}: ${feitas.length} seções de ${lados} pontos estouram o bloco de 1000 ids de um passo (${nV} vértices, ${nF} faces)`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "  const polo = (s, sentido, meio) => {"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
