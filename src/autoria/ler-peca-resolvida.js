@@ -74,7 +74,9 @@ export function lerPecaResolvida(dado) {
       vs: linha[1].slice(),
       cor: linha[2] ?? null,
       material: linha[3] ?? null,
-      liso: !!linha[4],
+      /* o liso é o ângulo da quina que fica nítida, e não um sim ou não: lido como `true`, a vista montada fazia a média das faces
+         perpendiculares em cada vértice, e a fuselagem do avião saía com riscos em leque nas janelas e uma faixa na junta com o capô */
+      liso: typeof linha[4] === 'number' ? linha[4] : !!linha[4],
       solido: !!linha[5],
     };
     const parte = parteDaFace(linha);
