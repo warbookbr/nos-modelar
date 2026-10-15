@@ -66,7 +66,9 @@ se você vê dois, diga dois, e diga que são dois.
 
 Depois do texto acima, e **sempre**, feche a resposta com um bloco de código
 JSON contendo o veredito. É ele que a rodada seguinte lê; o texto é para quem
-acompanha. Veredito em prosa é recusado pelo validador e a rodada se perde.
+acompanha. Veredito em prosa é recusado pelo validador e a rodada se perde, e o
+validador também recusa `onde`, `evidencia` e `observacao` com mais de 240
+caracteres: o detalhe longo vai no texto, e o campo fica com o lugar e a medida.
 
 ```json
 {
