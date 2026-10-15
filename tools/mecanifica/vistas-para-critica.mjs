@@ -36,9 +36,7 @@ const SAIDA_PADRAO = join(REPO, 'tools/bancadas/out');
    checagem de câmera da bancada reclama disso. */
 export const RES_CONJUNTO = '1100x1450';
 export const RES_PARTE = '900x900';
-/* As duas laterais, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a porta à
-   esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
-export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,esquerda,superior';
+export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,superior';
 export const VISTAS_DA_PARTE = 'direita,isometrica';
 export const VISTAS_DO_ARAME = 'isometrica,traseira';
 
@@ -85,6 +83,12 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
     peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
   });
   exigirCaptura(traseira, 'traseira');
+  /* A lateral esquerda também, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a
+     porta à esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
+  const esquerda = await olharBancada({
+    peca, auditoria: true, projecao: 'ortografica', vistas: 'esquerda', res: RES_CONJUNTO, logger,
+  });
+  exigirCaptura(esquerda, 'esquerda');
 
   /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
      mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
@@ -120,7 +124,7 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
     porParte.push({ parte, resultado });
   }
 
-  return { peca, partes, conjunto, traseira, arame, raioX, porParte };
+  return { peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte };
 }
 
 /* Captura que não produziu arquivo recusa alto. A bancada devolve `ok:false` e
@@ -148,6 +152,7 @@ function imprimir(resultado) {
   const linhas = [`vistas:critica — ${resultado.peca}`, '', 'CONJUNTO (proporção e silhueta):'];
   for (const arquivo of arquivosDe(resultado.conjunto)) linhas.push(`  ${arquivo}`);
   for (const arquivo of arquivosDe(resultado.traseira)) linhas.push(`  ${arquivo}`);
+  for (const arquivo of arquivosDe(resultado.esquerda)) linhas.push(`  ${arquivo}`);
   linhas.push('', 'ARAME (a malha, que a sombra esconde):');
   for (const arquivo of arquivosDe(resultado.arame)) linhas.push(`  ${arquivo}`);
   for (const arquivo of arquivosDe(resultado.raioX)) linhas.push(`  ${arquivo} (raio X)`);
