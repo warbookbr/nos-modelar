@@ -1,0 +1,466 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/trem-do-nariz",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-trem-do-nariz/alvo/aviao-unidade-trem-do-nariz-composta.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "coroaNariz",
+        "tipo": "posicao",
+        "onde": "barra horizontal no pé do pistão, no plano y=395",
+        "sentido": "baixa",
+        "evidencia": "Sobreposição y=395 painel central: o azul tem retângulo de cerca de 100 por 28 mm ao lado do círculo da perna e o vermelho tem só o círculo."
+      },
+      {
+        "parte": "eixoRodaNariz",
+        "tipo": "posicao",
+        "onde": "corpo do eixo, no plano y=197,5",
+        "sentido": "baixa",
+        "evidencia": "Sobreposição y=197,5 painel esquerdo: o vermelho mostra a seção do eixo atravessando de lado a lado; o azul só mostra o círculo do garfo, sem seção do eixo nessa altura."
+      },
+      {
+        "parte": "rodaNariz",
+        "tipo": "posicao",
+        "onde": "pneu inteiro, deslocado para baixo cerca de 16 mm, mesmo diâmetro",
+        "sentido": "baixa",
+        "evidencia": "Sobreposição z=1858,5 painel esquerdo: perfil azul 15 px abaixo do vermelho a 0,93 px/mm. Corte x=0: círculo azul passa do vermelho embaixo cerca de 8 px a 0,46 px/mm."
+      }
+    ],
+    "observacao": "A forma e a ligação das partes conferem com o alvo; o único desvio medido é o conjunto coroa, eixo e roda cerca de 16 mm mais baixo, e o alojamento da carenagem só se confirma nos cortes."
+  },
+  "partes": [
+    {
+      "nome": "carenagemTremNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoPivoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancalNarizE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancalNarizD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "alavancaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoAtuadorNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorHasteNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "atuadorCorpoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "orelhaAtuadorNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoSupNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compassoInfNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pinoCompassoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pernaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pistaoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "coroaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "garfoNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoRodaNariz",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaNariz",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "vistas:critica estourou 300 s na primeira tentativa e fechou na segunda; a bancada não carregou o Manifold (Failed to fetch), e as vistas isoladas da carenagem saíram sem o recorte.",
+    "O envelope do REFINA só aceita tolerância global, sem exceção por parte; descer 17 mm só umas partes obrigou a afrouxar a régua de todas para 18 mm.",
+    "A razão contra o esboço cai a 0,19 no eixo só pelo deslocamento de 17 mm; o mínimo próprio, tirado da razão medida, não pega mais um erro de forma nessas partes.",
+    "Atribuição (ferramenta): os três defeitos são a descida de 17 mm que a pessoa decidiu; o pedido não diz ao crítico os afastamentos declarados do esboço, e ele os mede como erro. O pedido passa a listá-los.",
+    "O pacote não tem vista de baixo, e o alojamento da carenagem, que abre para baixo, só se confirma nos cortes; o processo não pegaria um alojamento ausente nas vistas sombreadas."
+  ],
+  "notaDePassagem": "Roda no chão: o pistão alonga 17 mm e a coroa, o garfo, o eixo e a roda descem com ele. O furo do cubo tem 30 mm, igual ao eixo. O envelope do REFINA subiu a 18 mm e oito partes têm mínimo próprio.",
+  "receita": {
+    "sha256": "sha256:4b04352c3816dde620359df50217229f81e89dc45c765ba860a2b6597139e593",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 19,
+      "acrescentadas": 44,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 14,
+          "texto": " * cosseno é um). O recolhimento do esboço não entra: a receita é só a pose baixada."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * cosseno é um), menos a descida do pé do trem, que a decisão de 2026-10-15 tira do chão: a roda fica a um raio de pneu do chão (y 0) e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * pistão alonga os 17 mm que o esboço deixava entre o pé do pneu e o chão. O recolhimento do esboço não entra: a receita é só a pose"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * baixada."
+        },
+        {
+          "tipo": "-",
+          "linha": 23,
+          "texto": " * zero), expandida aqui dentro dos PASSOS. A família a gera no centro, com o eixo em x, e o esboço a põe no ponto `tnW` com a rotação"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * zero) mais o furo central do diâmetro do eixo, expandida aqui dentro dos PASSOS. A família a gera no centro, com o eixo em x, e o esboço a põe no ponto `tnW` com a rotação"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "/* O mínimo próprio de cada parte que se afasta do esboço pela decisão da pessoa de 2026-10-15 (a roda encosta no chão e o trem desce os"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "   17 mm pelo pistão; o furo do cubo tem o diâmetro do eixo). A razão interseção/união de uma parte do mesmo tamanho deslocada 17 mm é a"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "   que o esboço não cobre, e o mínimo é a razão medida, arredondada para baixo. O pistão alonga 17 mm (138 contra 164 cm3); a coroa, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "   garfo, o eixo e a roda descem 17 mm; o pino e os braços do compasso acompanham o joelho, que desce 8,5 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "const MINIMO_PROPRIO = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  pistaoNariz: 0.84, coroaNariz: 0.35, garfoNariz: 0.86, eixoRodaNariz: 0.18, rodaNariz: 0.72,"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  compassoSupNariz: 0.66, compassoInfNariz: 0.27, pinoCompassoNariz: 0.38,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "const formasDoEsboco = () => Object.fromEntries(NOMES.map((p) => [p, p in MINIMO_PROPRIO ? { formas: p, minimo: MINIMO_PROPRIO[p] } : p]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "  /* O quanto a perna desce do pivô, em y: até o fim do barril (`tnLb`, onde o pistão começa), até a coroa (`tnLc`, o pé do pistão) e até"
+        },
+        {
+          "tipo": "-",
+          "linha": 62,
+          "texto": "     o centro da roda (`tnL`, onde o garfo acaba e o eixo passa). O centro da roda fica em y 199 e o raio do pneu é 182, e por isso o pé"
+        },
+        {
+          "tipo": "-",
+          "linha": 63,
+          "texto": "     do pneu fica em y 17: o esboço deixa a roda 17 mm acima do chão, e a escala do plano (773 mm) mede do pé da roda ao alto da"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "     carenagem, em y 790. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "  descida: { barril: 160, coroa: 251, roda: 481 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  /* O quanto a perna desce do pivô, em y, até o fim do barril (`tnLb`, onde o pistão começa), e quanto o garfo desce da coroa (o pé do"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "     pistão) ao centro da roda, onde o eixo passa. O resto da descida sai do chão: o centro da roda fica a um raio de pneu do chão"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "     (`chao`, y 0), e a coroa a `garfo` acima dele. O esboço deixa a roda 17 mm acima do chão (centro em y 199, raio 182, pé em y 17);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "     por decisão da pessoa em 2026-10-15 a roda encosta no chão e o trem desce esses 17 mm pelo pistão, que alonga, levando a coroa, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "     garfo, o eixo e a roda. A escala do plano (773 mm) mede do pé da roda ao alto da carenagem, em y 790, e na pose do esboço o pé"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "     estava em 17. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  descida: { barril: 160, garfo: 230 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  chao: 0,"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "     zero põe o cubo no meio do aro). O resto é o do perfil `carro`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     zero põe o cubo no meio do aro). O resto é o do perfil `carro`, menos o furo central do cubo, que tem o diâmetro do eixo da roda"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "     (`diametroFuroCentral` da família, em fração do pneu, sai de `eixoRoda.diametro`): a roda assenta no eixo, e o esboço deixava 4,3 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "     de folga em volta dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  /* A descida do pivô ao centro da roda e à coroa: a roda a um raio de pneu do chão, a coroa a `garfo` acima do centro dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  const descidaRoda = py - (t.chao + t.roda.diametroPneu / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  const descidaCoroa = descidaRoda - d.garfo;"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "  const coroa = abaixo(d.coroa);"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "  const roda = abaixo(d.roda);"
+        },
+        {
+          "tipo": "-",
+          "linha": 124,
+          "texto": "  const bracoAlto = abaixo(d.coroa, -t.coroa.braco);"
+        },
+        {
+          "tipo": "-",
+          "linha": 125,
+          "texto": "  const bracoBase = abaixo(d.roda, -t.coroa.braco);"
+        },
+        {
+          "tipo": "-",
+          "linha": 126,
+          "texto": "  const eixoFim = abaixo(d.roda, t.eixoRoda.passa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  const coroa = abaixo(descidaCoroa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  const roda = abaixo(descidaRoda);"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  const bracoAlto = abaixo(descidaCoroa, -t.coroa.braco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  const bracoBase = abaixo(descidaRoda, -t.coroa.braco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  const eixoFim = abaixo(descidaRoda, t.eixoRoda.passa);"
+        },
+        {
+          "tipo": "-",
+          "linha": 131,
+          "texto": "  const baixo = abaixo(d.coroa, c.baixo.x);"
+        },
+        {
+          "tipo": "-",
+          "linha": 132,
+          "texto": "  const joelho = abaixo((c.alto.descida + d.coroa) / 2, (c.alto.x + c.baixo.x) / 2, c.joelho.avanco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  const baixo = abaixo(descidaCoroa, c.baixo.x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const joelho = abaixo((c.alto.descida + descidaCoroa) / 2, (c.alto.x + c.baixo.x) / 2, c.joelho.avanco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 231,
+          "texto": "    diametroFuroCentral: t.eixoRoda.diametro / r.diametroPneu,"
+        },
+        {
+          "tipo": "-",
+          "linha": 368,
+          "texto": "     que desce da perna, e o compasso liga a perna à coroa pelo pino do joelho. A roda não toca o eixo: o furo central do cubo, de"
+        },
+        {
+          "tipo": "-",
+          "linha": 369,
+          "texto": "     38,6 mm, deixa 4,3 mm de folga em volta do eixo de 30 mm, e a roda não toca o garfo, que fica 17,5 mm além da face do pneu. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 389,
+          "texto": "     que desce da perna, e o compasso liga a perna à coroa pelo pino do joelho. A roda assenta no eixo: o furo central do cubo tem o"
+        },
+        {
+          "tipo": "+",
+          "linha": 390,
+          "texto": "     diâmetro do eixo, 30 mm (decisão da pessoa em 2026-10-15; o esboço deixa 4,3 mm de folga), e o pé do pneu toca o chão, em y 0. A"
+        },
+        {
+          "tipo": "+",
+          "linha": 391,
+          "texto": "     roda não toca o garfo, que fica 17,5 mm além da face do pneu. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 411,
+          "texto": "    { par: ['rodaNariz', 'eixoRodaNariz'], motivo: 'o furo central do cubo tem o diâmetro do eixo, e a roda assenta nele' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 401,
+          "texto": "    tolerancia: { envelope: 5, porta: 0.5 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 402,
+          "texto": "    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(NOMES.map((p) => [p, p])), minimo: 0.95 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 424,
+          "texto": "    /* O envelope passa de 5 para 18 mm: o andaime guarda o trem na pose do esboço, com a roda 17 mm acima do chão, e a decisão da"
+        },
+        {
+          "tipo": "+",
+          "linha": 425,
+          "texto": "       pessoa (2026-10-15) desce o pistão, a coroa, o garfo, o eixo, a roda e o compasso até 17 mm abaixo do volume deles. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 426,
+          "texto": "    tolerancia: { envelope: 18, porta: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 427,
+          "texto": "    esboco: { arquivo: ESBOCO, opcao: 1, formas: formasDoEsboco(), minimo: 0.95 },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
