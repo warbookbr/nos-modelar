@@ -122,11 +122,12 @@ export function valoresDosCortes(caixa, fracoes = FRACOES_DOS_CORTES) {
 }
 
 /**
- * Os planos que não cruzam o modelo vão ao plano mais perto que cruza: o do centro do triângulo mais próximo naquele eixo. Peça de dois
+ * Os planos que não cruzam o modelo vão à mesma fração do material: o quantil dos centros dos triângulos naquele eixo, e dele o centro
+ * mais perto ainda não usado. Peça de dois
  * lados, como os trens principais do avião, tem a caixa larga e o material só nas pontas, e os cortes em um quarto, na metade e em três
  * quartos da caixa saíram vazios. Devolve os valores e o que mudou, para o relatório dizer.
  */
-export function planosComMaterial(valores, triangulos) {
+export function planosComMaterial(valores, triangulos, fracoes = FRACOES_DOS_CORTES) {
   const mudancas = [];
   const novos = Object.fromEntries(Object.entries(valores).map(([eixo, lista]) => {
     const k = EIXOS_DOS_CORTES.indexOf(eixo);
@@ -134,9 +135,18 @@ export function planosComMaterial(valores, triangulos) {
     const centros = triangulos
       .filter((t) => Math.max(t[0][k], t[1][k], t[2][k]) - Math.min(t[0][k], t[1][k], t[2][k]) > 1e-6)
       .map((t) => (t[0][k] + t[1][k] + t[2][k]) / 3);
-    return [eixo, lista.map((valor) => {
+    /* o plano movido não repete outro do mesmo eixo (a menos de 1 mm): dois painéis iguais não mostram nada a mais */
+    const usados = lista.filter((valor) => segmentosDoCorte(triangulos, eixo, valor).length);
+    const ordenados = [...centros].sort((a, b) => a - b);
+    return [eixo, lista.map((valor, i) => {
       if (!centros.length || segmentosDoCorte(triangulos, eixo, valor).length) return valor;
-      const novo = centros.reduce((melhor, c) => (Math.abs(c - valor) < Math.abs(melhor - valor) ? c : melhor), centros[0]);
+      /* a mesma fração, agora do material: o quantil dos centros dos triângulos, e dele o centro livre mais perto */
+      const fracao = fracoes[i] ?? 0.5;
+      const alvo = ordenados[Math.min(ordenados.length - 1, Math.floor(fracao * ordenados.length))];
+      const livres = centros.filter((c) => usados.every((u) => Math.abs(u - c) >= 1));
+      if (!livres.length) return valor;
+      const novo = livres.reduce((melhor, c) => (Math.abs(c - alvo) < Math.abs(melhor - alvo) ? c : melhor), livres[0]);
+      usados.push(novo);
       mudancas.push({ eixo, de: valor, para: novo });
       return novo;
     })];
@@ -373,7 +383,7 @@ export async function sobreposicaoDeCortes({ peca, saida, fracoes = FRACOES_DOS_
   if (!triangulosDoEsboco.length) throw new Error(`o esboço ${declarado.esboco} não deu sólido para nenhuma das formas que '${peca}' liga; não há o que sobrepor.`);
 
   const orientacao = lerPlano(bruto.plano)?.orientacao ?? null;
-  const ajuste = planosComMaterial(valoresDosCortes(caixa, fracoes), triangulosDoModelo);
+  const ajuste = planosComMaterial(valoresDosCortes(caixa, fracoes), triangulosDoModelo, fracoes);
   const valores = ajuste.valores;
   for (const { eixo, de, para } of ajuste.mudancas) notas.push(`o corte em ${eixo} = ${arredondar(de)} mm não cruzava o modelo e foi para ${eixo} = ${arredondar(para)} mm`);
   const rasterizar = dependencias.rasterizar ?? rasterizarSvg;

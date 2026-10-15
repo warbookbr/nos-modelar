@@ -234,5 +234,6 @@ describe('planos com material', () => {
     expect(valores.x[2]).toBe(1955);
     expect(mudancas.map((m) => m.de)).toEqual([-1000, 0]);
     expect(Math.abs(valores.x[1])).toBeGreaterThan(1900);
+    expect(new Set(valores.x).size).toBe(3);
   });
 });
