@@ -1,0 +1,1137 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/asas",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/asas-composta.png",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Silhueta e partes batem com o alvo nas quatro vistas. Fresta e junção ponta/asa não são legíveis nas vistas de conjunto, e dois trechos cinza no flanco, atrás do bordo de fuga (superior do montado), ficaram sem explicação."
+  },
+  "partes": [
+    {
+      "nome": "asaD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pontaD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "flapD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aileronD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoFlapD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoAileronD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "asaE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pontaE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "flapE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aileronE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoFlapE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoAileronE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron2E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o subtrair do vão do aileron devolveu um canto a 277 mm do corte, onde o vão raspa a casca da família; a receita desloca os vãos em [3, -0,5] mm e os PONTOS acusam a volta (backlog: canto solto na booleana)",
+    "o detalhe das asas não tem os alojamentos do trem e o mestre tem; o primeiro alvo, do detalhe, não os mostrava, e o alvo passou a sair do mestre com --unidade",
+    "o crítico achou o esboço diferente da referência real em quatro pontos (ponta mais baixa, casulos sob as asas, carenagem da raiz e ponta de cantos vivos), que vão à pessoa"
+  ],
+  "notaDePassagem": "Asa expandida da família e cortada por subtrair; E espelhada de D antes de nomear. O assentamento [3, -0,5] dos vãos é frágil: mudar o comando exige reconferir os PONTOS. A asa tem furos 1.",
+  "receita": {
+    "sha256": "sha256:d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 607,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada, os flaps, os ailerons, os eixos deles e os"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * suportes, na pose de pouso, com as superfícies de comando neutras."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Quarta etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `asas` do esboço"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * `aviao-detalhe-asas.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * forma do lado direito (D) tem a do esquerdo (E) espelhada em x: a receita monta o lado D e o espelha com `espelha` antes de nomear"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * as partes, porque a cópia herda o nome da fonte. A TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * só em `derivar`. A fuselagem não publica porta, e por isso a raiz da asa (o ponto `raizDaAsaD` do esboço) e as medidas do trem"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * principal, que a asa recorta, estão na TABELA como os pontos e os parâmetros do esboço, e não saem de um vínculo de medida nem de um"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * encaixe de porta da montagem v5."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * A metade da asa e a ponta são a chamada da família `superficie-aerodinamica` com o perfil `asa` e os parâmetros do esboço, expandida"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * aqui dentro dos PASSOS. A família gera a semi-asa na pose dela, com a raiz na origem e a envergadura em +x, e o esboço a põe com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * raiz em `raizDaAsaD`; a receita faz o mesmo com `transladar`. Da expansão fica só o `loft`, com a identidade que esta receita lhe dá"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * (as duas chamadas partem da mesma origem `loft` 1, e uma identidade só pode ser de um passo), e saem a parte `fixa`, o material, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * sólido e o liso, porque a receita nomeia as partes depois de recortá-las, e as duas portas, que a família publica no quadro local."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * A metade da asa tem a semi-envergadura `semiRecortada` (5400 mm) e a ponta tem a inteira (5656 mm), e as duas são cortadas no mesmo"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * plano, `x` da ponta: a metade perde o que passa dele (`cortaPonta`) e a ponta perde o que fica aquém (`cortaAsa`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * O vão do flap e o do aileron são o próprio comando engrossado pela fresta (`subtrai` com `folga` no esboço): o contorno de cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * seção é deslocado para fora pela fresta, com a quina em esquadria, e as duas extremidades avançam a fresta, com o contorno"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * prolongado na reta que une as duas seções. O alojamento do trem principal tem três cortadores, a caixa da perna, a do braço e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * cilindro da roda, de eixo quase vertical, na pose do trem recolhido (`fim`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * Cada comando é um `loft` em x de duas seções de sete pontos, como no esboço. O loft só fecha uma ponta com um polo de raio zero, e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * polo nasce no eixo, a `tampa.avanco` além da seção, e `moveV` o leva ao centro dela, de modo que cada ponta é um leque quase plano."
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * Os eixos são extrusões de um círculo em x, giradas em z e em y para a reta da dobradiça, e os suportes são extrusões em y de um"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * retângulo de cantos arredondados."
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "import { nucleo } from '../../../../../nucleo/entrada.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "const LADOS = [['D', 'd', 'direito'], ['E', 'e', 'esquerdo']];"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "const porLado = (fazer) => LADOS.flatMap(([L, l, nome]) => fazer(L, l, nome));"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "/* parte da receita -> volume do andaime: o nome da forma do esboço em slug */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "const VOLUMES = Object.fromEntries(porLado((L, l) => ["
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  [`asa${L}`, `asa-${l}`], [`ponta${L}`, `ponta-${l}`], [`flap${L}`, `flap-${l}`], [`aileron${L}`, `aileron-${l}`],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  [`eixoFlap${L}`, `eixo-flap-${l}`], [`eixoAileron${L}`, `eixo-aileron-${l}`],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  [`suporteFlap1${L}`, `suporte-flap1-${l}`], [`suporteFlap2${L}`, `suporte-flap2-${l}`],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  [`suporteAileron1${L}`, `suporte-aileron1-${l}`], [`suporteAileron2${L}`, `suporte-aileron2-${l}`],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "const PARTES = Object.keys(VOLUMES);"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  /* A asa: os parâmetros `asa*` do esboço. `raiz` é o ponto `raizDaAsaD` (x, y e o z a 25% da corda da raiz); `semi` é a"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "     semi-envergadura da asa com a ponta levantada, e `semiRecortada` a da metade de asa, que o corte da ponta aparra. As cordas, em"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     milímetro, são as da raiz e as da ponta de `semi`, e a espessura é a relativa da família (a da ponta da metade de asa sai da reta"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "     entre as duas). `degrauDaRaiz` é a fração da semi-envergadura em que o diedro começa, constante da família. A ponta levantada"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "     (`pontaLevantada`, em graus) ocupa os últimos `extensaoDaPonta` da semi-envergadura da ponta. O corte da ponta é o plano em x"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "     `raiz[0] + fracaoDaSemi * semi - fracaoDaCordaNaPonta * cordaNaPonta + folga`, que a metade de asa e a ponta dividem; `cortaPonta`"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "     e `cortaAsa` são as duas caixas dele, grandes o bastante para a asa passar (y e z do centro, altura e profundidade), e `inicio` é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "     x em que a caixa da ponta termina do lado da raiz. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  asa: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    raiz: [745, 1022, 4408.5],"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    semi: 5656,"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    semiRecortada: 5400,"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    cordaNaRaiz: 1762,"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    cordaNaPonta: 931,"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    espessuraNaRaiz: 0.15,"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    espessuraNaPonta: 0.13,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    enflechamento: 0.86,"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    diedro: 5.93,"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    degrauDaRaiz: 0.004,"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    pontaLevantada: 56,"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    extensaoDaPonta: 0.05,"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    corte: { fracaoDaSemi: 0.95, fracaoDaCordaNaPonta: 0.065, folga: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    cortaPonta: { largura: 1000, altura: 3000, profundidade: 3000, y: 1500, z: 4800 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    cortaAsa: { inicio: 600, altura: 3000, profundidade: 3000, y: 1500, z: 4800 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  /* O flap e o aileron: `x` são os dois x das seções (a raiz e a ponta do comando), `corda` e `espessura` as frações da corda da asa"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "     naquele x que dão o comprimento e a espessura do contorno, e `alturaDoCentro` a do centro do contorno acima da linha do diedro,"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "     também em fração da corda. O suporte é a caixa de cada comando, [largura em x, altura em y, profundidade em z]. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  flap: { x: [960, 4870], corda: 0.19, espessura: 0.055, alturaDoCentro: 0.0107, suporte: [80, 56, 280] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  aileron: { x: [4912, 6040], corda: 0.375, espessura: 0.08, alturaDoCentro: 0.0167, suporte: [70, 56, 260] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  /* O que os dois comandos têm em comum. O bordo de fuga do comando é o da asa (`posicaoNaCorda`: 75% da corda, de onde o comando"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "     recua o próprio comprimento), o nariz é o arco de 45 graus do contorno (`nariz`, em fração da espessura) e o bordo de fuga tem"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "     `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do comando. O eixo é a haste de `diametro`, em"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "     `lados` lados, que passa `sobra` além de cada seção, sobre a linha da dobradiça (o centro do nariz). Os suportes ficam nas frações"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "     `posicoes` do vão do comando, `abaixo` da face de baixo do comando e `atras` da dobradiça, com o `raio` do canto. `tampa.avanco` é"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "     quanto o polo de cada loft fica além da seção, e `segmentosDoCanto` os segmentos do canto do suporte. `assentamento` é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     deslocamento [em z, em y], em milímetro, que a receita dá aos dois vãos: a booleana do núcleo recalcula cada canto novo pelos"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "     planos das faces de entrada, e a casca da asa tem faces de 840 mm, empenadas 0,26 mm e a 0,2 grau uma da outra, de modo que o"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     canto que a face de baixo do vão (a 1,5 grau da casca) faz sobre uma aresta longa sai a metros da peça. Com [0, 0] a asa saía com"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "     um canto em x 6342, 277 mm além do corte, e em [3, -0.5] os cantos novos ficam a menos de 0,35 mm das faces de entrada; o"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "     valor está numa faixa estreita (1 mm em z e 0,1 mm em y em volta dele ainda dão canto limpo, 0,2 mm em y a mais já não), e os"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "     pontos declarados medem a caixa das duas asas e acusam o deslocamento que deixar de valer. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  comando: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    posicaoNaCorda: 0.75,"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    nariz: [0.1465, 0.3535],"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    meiaEspessuraDoBordoDeFuga: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    fresta: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    assentamento: [3, -0.5],"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    eixo: { diametro: 30, sobra: 20, lados: 48 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    suporte: { posicoes: [0.2, 0.8], abaixo: 18, atras: 70, raio: 20, segmentosDoCanto: 6 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    tampa: { avanco: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  /* O alojamento do trem principal, que a asa recorta: a unidade dos trens declara três cortadores, e esta é a medida deles no quadro"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "     do trem. `trem` traz o ponto de pivô da perna (x, y, z), o do cubo da roda (y), o raio e a largura da roda, o comprimento do"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "     braço e o giro do recolhimento. Os alojamentos da perna e do braço são caixas de [largura em x, altura em y] centradas no pivô"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "     mais o deslocamento [em x, em y], com a profundidade em z do braço mais `margemEmZ`; o da roda é um cilindro de `lados` lados, com"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "     o diâmetro e a largura da roda mais as margens, na posição da roda depois do giro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  trem: { pivo: [1920, 1115, 4522], cubo: 313.5, raioDaRoda: 296.5, larguraDaRoda: 140, comprimentoDoBraco: 340, recolhimento: 84 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  alojamento: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    perna: { caixa: [390, 315], deslocamento: [-25, -57.5] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    braco: { caixa: [640, 310], deslocamento: [-540, -80] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    roda: { margemNoDiametro: 40, margemNaLargura: 70, lados: 32 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    margemEmZ: 60,"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "const GRAUS = Math.PI / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "const tg = (graus) => Math.tan(graus * GRAUS);"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "const mAll = (v) => v.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "const registroDeFamilias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "/* A estação de um comando em x (mm): a corda da asa ali, o comprimento e a espessura do contorno, o centro dele em z e em y, e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "   dobradiça (`zh`, o centro do nariz). As contas são as das expressões `f1C`, `f1L`, `f1T`, `f1Zc`, `f1Yc` e `f1Zh` do esboço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "function estacaoDoComando(t, comando, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const a = t.asa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const corda = a.cordaNaRaiz + ((a.cordaNaPonta - a.cordaNaRaiz) * (x - a.raiz[0])) / a.semi;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const L = comando.corda * corda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const T = comando.espessura * corda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const zc = a.raiz[2] + (x - a.raiz[0]) * tg(a.enflechamento) + t.comando.posicaoNaCorda * corda - 0.5 * L;"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  const yc = a.raiz[1] + (x - a.raiz[0] - a.degrauDaRaiz * a.semi) * tg(a.diedro) + comando.alturaDoCentro * corda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  return { x, L, T, zc, yc, zh: zc - 0.5 * L + 0.5 * T };"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "/* O contorno de sete pontos do comando em uma estação, [z, y] em mm, anti-horário em (z, y): o topo do nariz, o arco, a ponta do"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "   nariz, o arco de baixo, a base do nariz e as duas pontas do bordo de fuga. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "function contornoDoComando(t, e) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  const [n1, n2] = t.comando.nariz;"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  const b = t.comando.meiaEspessuraDoBordoDeFuga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  const frente = e.zc - 0.5 * e.L;"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    [frente + 0.5 * e.T, e.yc + 0.5 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "    [frente + n1 * e.T, e.yc + n2 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    [frente, e.yc],"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    [frente + n1 * e.T, e.yc - n2 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    [frente + 0.5 * e.T, e.yc - 0.5 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    [e.zc + 0.5 * e.L, e.yc - b],"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    [e.zc + 0.5 * e.L, e.yc + b],"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "/* O contorno deslocado `d` para fora, com a quina em esquadria: cada vértice anda `d` pela soma das normais das duas arestas, dividida"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "   por um mais o produto escalar delas. O contorno é anti-horário em (z, y), e a normal de fora de uma aresta (ex, ey) é (ey, -ex). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "function deslocarContorno(pontos, d) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  const n = pontos.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  const normal = (a, b) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    const ex = b[0] - a[0]; const ey = b[1] - a[1]; const l = Math.hypot(ex, ey);"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "    return [ey / l, -ex / l];"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  return pontos.map((p, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    const antes = normal(pontos[(i + n - 1) % n], p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    const depois = normal(p, pontos[(i + 1) % n]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    const k = d / (1 + antes[0] * depois[0] + antes[1] * depois[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    return [p[0] + k * (antes[0] + depois[0]), p[1] + k * (antes[1] + depois[1])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "/* Os dados de um comando, em mm: as duas estações, os dois contornos, o contorno do vão deslocado pela fresta nos x das seções e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "   vão com as pontas avançadas a fresta, as duas extremidades do eixo e o centro de cada suporte. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "function medidasDoComando(t, comando) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  const [x1, x2] = comando.x;"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  const e = [estacaoDoComando(t, comando, x1), estacaoDoComando(t, comando, x2)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  const contornos = e.map((s) => contornoDoComando(t, s));"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  const fresta = t.comando.fresta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const dentro = contornos.map((c) => deslocarContorno(c, fresta));"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  /* O vão avança a fresta em x nas duas pontas: o contorno de lá é o da reta que une os dois deslocados, estendida. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  const noX = (x) => dentro[0].map((p, k) => ["
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "    p[0] + ((dentro[1][k][0] - p[0]) * (x - x1)) / (x2 - x1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "    p[1] + ((dentro[1][k][1] - p[1]) * (x - x1)) / (x2 - x1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "  ]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  const [assentaZ, assentaY] = t.comando.assentamento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "  const assenta = (pontos) => pontos.map(([z, y]) => [z + assentaZ, y + assentaY]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "  const vao = [{ x: x1 - fresta, pontos: assenta(noX(x1 - fresta)) }, { x: x2 + fresta, pontos: assenta(noX(x2 + fresta)) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "  const sob = t.comando.eixo.sobra;"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "  const eixo = { de: [x1 - sob, e[0].yc, e[0].zh], para: [x2 + sob, e[1].yc, e[1].zh] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "  const s = t.comando.suporte;"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  const suportes = s.posicoes.map((f) => ["
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "    x1 + f * (x2 - x1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "    e[0].yc + f * (e[1].yc - e[0].yc) - 0.5 * (e[0].T + f * (e[1].T - e[0].T)) - s.abaixo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "    e[0].zh + f * (e[1].zh - e[0].zh) + s.atras,"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  ]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    estacoes: e.map((s2, i) => ({ x: s2.x, pontos: contornos[i] })), vao, eixo, suportes, caixaDoSuporte: comando.suporte,"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "/* A conta do eixo: o comprimento e os dois giros, em graus, que levam +x à direção da reta `de` a `para`. Em z o giro é o seno do"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
