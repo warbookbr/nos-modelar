@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1270 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1274 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -669,6 +669,7 @@
 - `ligar.js` — `ligar`: a forma criada entre duas âncoras. `{ "id": "h", "ligar": { "de": "A.topo", "para": "B.base", "tipo": "haste", "diametro": 8 } }` vira a forma comum…
 - `malha.js` — Malha: o sólido que vem de fora do esboço como superfície, uma lista de polígonos planos sobre vértices em milímetro. É a forma que uma família procedural (r…
 - `mapa-de-ligacoes.js` — O mapa de ligações de uma opção, em texto (`--ligacoes`): quem toca quem, em quantos pontos distintos, as pontas livres e as unidades presas a nada. Os ponto…
+- `oclusao-das-linhas.js` — O que uma forma esconde de si: as linhas de uma forma que as faces de frente da própria forma cobrem.
 - `parecido.js` — "Quis dizer": o nome válido mais parecido com o que foi escrito, para as mensagens de recusa do esquema, do plano e do Condutor. Puro.
 - `perfis.js` — Perfis por função: no lugar da lista de pontos, o `perfil` de uma `extrusao`, `revolucao` ou seção de `loft` pode ser `{ "gerar": "<gerador>", ... }`, que a …
 - `perguntas.js` — As perguntas de forma que o brief do crítico do esboço traz depois das cinco fixas: as do componente (o campo `perguntas` do JSON do componente ou do módulo …
@@ -739,6 +740,7 @@
 - `relacoes.test.js` — Contrato de relações da fatia 8: `contato.juntas`, pontos-guia nomeados no `caminho` do tubo, âncora com deslocamento e `<instancia>.<parte>` em todo campo q…
 - `roda-e-perfis.test.js` — A `roda` com raios, flanges e pneu de seção arredondada, e os perfis `gerar` de pneu, de raios e de disco de freio (plano "O esboço detalhado coerente", fati…
 - `rotacao-da-instancia.test.js` — A instância de componente com `rotacao` (atrito 43 do avião): o trem principal recolhe girando em torno de z, a instância da `roda` não girava, e foi preciso…
+- `silhueta-sobre-as-faces.test.js` — O traço da silhueta de uma forma côncava ou recortada (`subtrai`) vai por cima de todas as faces dela. O desenho pintava cada face e logo depois as linhas de…
 - `skill.test.js` — As skills `esboco-detalhado`, `laco-do-esboco` e `esbocar-opcoes` e o `PARE-E-ANALISE.md` dizem o fluxo, o nível de detalhe e a proibição de auditar por imag…
 - `suave.test.js` — A superfície suave por seções (`suave: true` no loft e na revolução, `suave.js`): a curva passa pelas seções declaradas com tangente contínua, sem passar do …
 - `unidades.test.js` — A unidade declarada (`unidade` na forma, na instância e no espelho), a junta dentro da mesma unidade sem declaração, o gate que ignora forma oculta, `--mover…
@@ -1021,6 +1023,7 @@
 ## procedural/pecas/aviao/partes/motor/rodadas/
 
 - `receita-01.js` — aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais.
+- `receita-02.js` — aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais.
 
 ## procedural/pecas/braco-robotico/
 
@@ -1504,6 +1507,10 @@
 ## tools/fixtures/refina-forma-global/razao-ok/
 
 - `receita.js` — O suporte com duas razões na faixa: a coluna é de 0,90 da largura da sapata e a altura total é igual à largura total.
+
+## tools/fixtures/refina-forma-global/sapata-deslocada/
+
+- `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
 
 ## tools/fixtures/tres-blocos-vinculados/
 

@@ -17,10 +17,12 @@
    Os traços são as arestas da malha que o desenho das formas também traça: o vinco (duas faces vizinhas a mais de 30 graus uma
    da outra) e a silhueta (uma face de frente e outra de costas para o olho) de cada volume, só onde alguma das duas faces olha
    para o observador. A face de costas não é desenhada (o volume é fechado e a de frente a cobre), e a face de perfil não cobre
-   pixel. A oclusão entre volumes é a da camada: o teste de profundidade por pixel, com o viés por índice de volume que desempata
+   pixel. O que o próprio volume esconde de si (a parede do furo de um anel, vista de fora) sai pela conta que o desenho das
+   formas usa nas formas côncavas, `semOQueOVolumeEsconde` de `oclusao-das-linhas.js`. A oclusão entre volumes é a da camada: o teste de profundidade por pixel, com o viés por índice de volume que desempata
    faces no mesmo plano em favor do volume que vem depois na lista. */
 import { barraDeEscala, ErroDeEsboco, escalaDoQuadro, QUADRO, tintaDaFace, textoDoDesenho, VISTAS } from './index.js';
 import { formasDoPainel, montarCamada } from './camada.js';
+import { semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
 
 const { f1, esc, quebrar } = textoDoDesenho;
 
@@ -30,80 +32,12 @@ export const COSSENO_DO_VINCO = Math.cos(Math.PI / 6);
 const PERFIL = 1e-6;
 const AREA_MINIMA = 1e-9;
 
-/* o quanto uma face de frente do mesmo volume pode estar à frente de uma aresta (mm ao longo do olho) sem escondê-la: cobre o
-   arredondamento das coordenadas da blocagem (1e-6 mm) e a face que a própria aresta divide */
-const FOLGA_DA_OCLUSAO = 0.02;
-/* no máximo, em quantos pedaços uma aresta é repartida para tirar só a parte que o próprio volume esconde */
-const PEDACOS_DA_ARESTA = 12;
-const CELULAS_DA_GRADE = 48;
-
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const unitario = (v) => { const m = Math.hypot(...v) || 1; return v.map((c) => c / m); };
 
 function exigir(cond, msg) { if (!cond) throw new ErroDeEsboco(msg); }
-
-/* O que a própria forma esconde de si: a parede do furo de um anel, vista de fora, tem face de frente e arestas de silhueta, e o
-   corpo do anel as cobre. O desenho das formas só emite as linhas visíveis; aqui a lista de arestas vem do vinco e da silhueta
-   sem olhar a profundidade, e esta função tira delas o que uma face de frente do mesmo volume cobre. Cada aresta é repartida em
-   pedaços, e fica o que tem o meio livre: o pedaço escondido some, e o resto sai como um ou mais segmentos. A oclusão entre
-   volumes diferentes é a do teste de profundidade da camada, e não passa por aqui. */
-function semOQueOVolumeEsconde(linhas, frentes, vertices, V, olho) {
-  if (frentes.length === 0 || linhas.length === 0) return linhas;
-  const tris = frentes.map((f) => {
-    const q = f.ids.map((i) => V.p(vertices[i]));
-    const z = f.ids.map((i) => dot(vertices[i], olho));
-    return { q, z, caixa: [Math.min(...q.map((a) => a[0])), Math.min(...q.map((a) => a[1])), Math.max(...q.map((a) => a[0])), Math.max(...q.map((a) => a[1]))] };
-  });
-  const x0 = Math.min(...tris.map((t) => t.caixa[0])); const y0 = Math.min(...tris.map((t) => t.caixa[1]));
-  const x1 = Math.max(...tris.map((t) => t.caixa[2])); const y1 = Math.max(...tris.map((t) => t.caixa[3]));
-  const G = Math.max(1, Math.min(CELULAS_DA_GRADE, Math.round(Math.sqrt(tris.length))));
-  const lado = Math.max(x1 - x0, y1 - y0, 1e-9) / G;
-  const celula = (v, o) => Math.max(0, Math.min(G - 1, Math.floor((v - o) / lado)));
-  const grade = new Map();
-  for (const t of tris) {
-    for (let cx = celula(t.caixa[0], x0); cx <= celula(t.caixa[2], x0); cx++) {
-      for (let cy = celula(t.caixa[1], y0); cy <= celula(t.caixa[3], y0); cy++) {
-        const c = cy * G + cx;
-        if (!grade.has(c)) grade.set(c, []);
-        grade.get(c).push(t);
-      }
-    }
-  }
-  const extensao = Math.max(x1 - x0, y1 - y0);
-  const folga = FOLGA_DA_OCLUSAO + 1e-5 * extensao;
-  const escondido = (x, y, z) => {
-    for (const t of grade.get(celula(y, y0) * G + celula(x, x0)) ?? []) {
-      const [a, b, c] = t.q;
-      const d = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]);
-      if (Math.abs(d) < 1e-12) continue;
-      const u = ((b[1] - c[1]) * (x - c[0]) + (c[0] - b[0]) * (y - c[1])) / d;
-      const v = ((c[1] - a[1]) * (x - c[0]) + (a[0] - c[0]) * (y - c[1])) / d;
-      const w = 1 - u - v;
-      if (u < -1e-9 || v < -1e-9 || w < -1e-9) continue;
-      if (u * t.z[0] + v * t.z[1] + w * t.z[2] > z + folga) return true;
-    }
-    return false;
-  };
-  const saida = [];
-  for (const [a, b] of linhas) {
-    const pa = V.p(a); const pb = V.p(b);
-    const comprimento = Math.hypot(pb[0] - pa[0], pb[1] - pa[1]);
-    const n = Math.max(1, Math.min(PEDACOS_DA_ARESTA, Math.ceil((comprimento / extensao) * PEDACOS_DA_ARESTA)));
-    const em = (t) => a.map((c, e) => c + t * (b[e] - c));
-    const livres = Array.from({ length: n }, (_, i) => { const m = em((i + 0.5) / n); const q = V.p(m); return !escondido(q[0], q[1], dot(m, olho)); });
-    if (livres.every(Boolean)) { saida.push([a, b]); continue; }
-    for (let i = 0; i < n;) {
-      if (!livres[i]) { i++; continue; }
-      let j = i;
-      while (j + 1 < n && livres[j + 1]) j++;
-      saida.push([em(i / n), em((j + 1) / n)]);
-      i = j + 1;
-    }
-  }
-  return saida;
-}
 
 /* As faces e os traços de um volume para o olho dado: `lados` (as faces de frente, `{ pts, n }`), `linhas` (as arestas a traçar,
    dois pontos 3D cada, sem as que o próprio volume esconde) e os índices dos vértices, para a caixa projetada. */
@@ -133,7 +67,7 @@ function facesDoVolume(vertices, triangulos, olho, V) {
     if (traca) linhas.push([vertices[p], vertices[q]]);
   }
   const frentes = faces.filter((f) => f.frente);
-  return { lados: frentes.map((f) => ({ pts: f.ids.map((i) => vertices[i]), n: f.n })), linhas: semOQueOVolumeEsconde(linhas, frentes, vertices, V, olho), usados: [...usados] };
+  return { lados: frentes.map((f) => ({ pts: f.ids.map((i) => vertices[i]), n: f.n })), linhas: semOQueOVolumeEsconde(linhas, frentes, V, olho, { vertices }), usados: [...usados] };
 }
 
 /* Valida e lê um painel (uma opção). */

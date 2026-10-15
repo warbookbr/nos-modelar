@@ -13,6 +13,7 @@ import { caixaDaMalha, fatiarMalha, verticesDaMalha } from './malha.js';
 import { malhaDaFamilia, nomesDeAncorasDaFamilia } from './familia.js';
 import { angulosDaMatriz, lerGiros } from './giro.js';
 import { densificar, densificarPerfil, ladosDoContorno, normaisSuavesDasFaixas, segmentosDoCanto, toleranciaDe } from './suave.js';
+import { semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
@@ -2788,6 +2789,25 @@ function escalaEstimada(opcoes, V, enquadrar) {
   return temLista ? (temColunas ? Math.min(escalaDoQuadro(larg, alt, { lista: true }), colunas) : escalaDoQuadro(larg, alt, { lista: true })) : colunas;
 }
 
+/* Em quantos pedaços, no máximo, uma linha de uma forma côncava é repartida para tirar só o trecho que uma face da frente esconde (a divisão
+   da blocagem é de 12; o desenho das formas leva a imagem inteira, e a fronteira do trecho é refinada por bissecção). */
+const PEDACOS_DAS_LINHAS_DO_DESENHO = 32;
+
+/* As linhas das faces de um grupo de formas côncavas (`prisma.naoConvexo`) ou recortadas (`subtrai`), na ordem das faces, para o desenho as
+   traçar depois de todas as faces do grupo. Pintada logo depois da própria face, a linha era coberta pela borda (0,8 px, da cor do
+   preenchimento) das faces seguintes, e o traço de 2 px da silhueta saía tracejado. Pintada depois, nenhuma face a cobre, e o que o
+   pintor escondia por ordem sai aqui pela profundidade: o trecho atrás de uma face de frente do mesmo grupo (a perna de trás de um U, a
+   parede de dentro de uma tampa vazada) não é devolvido. A forma recortada já vem filtrada de `fatiasRecortadas`, que tira as
+   linhas que a fronteira dela cobre com a tolerância em pixels da imagem (as faces da fronteira são pedaços convexos, que diferem da
+   superfície que as linhas seguem de décimos de milímetro), e passar de novo pela tolerância de uma face exata esconderia o que ela
+   deixou. */
+function linhasDoGrupo(g, V, olho) {
+  const linhas = g.chunks.flatMap((ch) => [...ch.dentro, ...ch.lados].flatMap((f) => f.linhas ?? []));
+  if (g.r.subtrai || linhas.length === 0) return linhas;
+  const frentes = g.chunks.flatMap((ch) => [...ch.dentro, ...ch.lados, ...ch.tampas]);
+  return semOQueOVolumeEsconde(linhas, frentes, V, olho, { pedacos: PEDACOS_DAS_LINHAS_DO_DESENHO, refinar: true });
+}
+
 /* Desenha o esboço inteiro; devolve { svg, largura, altura, escala }. */
 /* `camada: true` (a ferramenta de imagem usa): além do SVG de sempre em `svg`, devolve `camada` (as faces e os traços das
    formas com a profundidade de cada vértice, para o teste de profundidade por pixel; ver camada.js) e `svgSobreCamada`, o
@@ -3111,18 +3131,19 @@ export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTr
         }
       };
       if (g.r.prisma?.naoConvexo || g.r.subtrai) {
-        /* forma côncava ou com cintura (extrusão côncava, loft, revolução) ou recortada por `subtrai`: cada face leva as próprias linhas logo
-           depois dela, e a face da frente as cobre por cima em vez de as linhas de trás aparecerem sobre ela */
+        /* forma côncava ou com cintura (extrusão côncava, loft, revolução) ou recortada por `subtrai`: as fatias vão do fundo para a
+           frente, cada uma com as faces, as tampas e os arcos, e as linhas das faces saem depois de todas, sem o que uma face da frente
+           do grupo esconde (ver `linhasDoGrupo`); a face da frente cobre a de trás, e a linha de trás não aparece sobre ela */
         for (const ch of g.chunks) {
-          for (const f of [...ch.dentro, ...ch.lados]) {
-            pintarFaces([{ dentro: [], lados: [f] }]);
-            for (const l of previa ? [] : f.linhas ?? []) {
-              const [a, b] = l.map(V.p).map(tela);
-              emForma(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
-            }
-          }
+          pintarFaces([ch]);
           pintarTampas([ch]);
           if (!previa) pintarArcos([ch]);
+        }
+        if (!previa) {
+          for (const l of linhasDoGrupo(g, V, olho)) {
+            const [a, b] = l.map(V.p).map(tela);
+            emForma(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+          }
         }
       } else {
         pintarFaces(g.chunks);
