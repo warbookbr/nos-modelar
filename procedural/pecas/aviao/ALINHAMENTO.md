@@ -241,7 +241,7 @@ pediu os quatro na rodada de ajustes antes da aprovação do avião inteiro.
 
 Antes de a pessoa aprovar o avião montado, uma rodada corrige o que ela pediu depois do
 aceite de cada etapa. Cada item reabre a etapa da peça que muda, e a parte que se afasta
-do esboço de propósito recebe o mínimo próprio no `REFINA.esboco`, com o motivo.
+do esboço de propósito declara no `REFINA.esboco` o deslocamento ou o alongamento, com o motivo.
 
 - Asas: a ponta levantada mais alta, uns 8 a 10% da meia-asa, como na referência, e não
   os 6% do esboço.
@@ -287,8 +287,8 @@ fuselagem.
 
 Na primeira rodada o trem do nariz fechou com nota 8 e os principais ficaram em 7, e o que
 os dois críticos e a medição acharam vinha do esboço. Em 2026-10-15 a pessoa decidiu
-corrigir na segunda rodada dos dois, afastando-se do esboço de propósito, com o mínimo
-próprio no `REFINA.esboco` para cada parte que se afasta:
+corrigir na segunda rodada dos dois, afastando-se do esboço de propósito, com o deslocamento
+ou o alongamento declarado no `REFINA.esboco` para cada parte que se afasta:
 
 - a roda encosta no chão, em y 0: o esboço a deixa 17 mm acima, e o trem desce os 17 mm
   pela perna, ou pelo pistão no nariz, levando a coroa, o garfo, o eixo e a roda;

@@ -449,3 +449,18 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     await expect(montar(async () => { throw new Error('o visor caiu'); })).rejects.toThrow(/o visor caiu/);
   }, 60_000);
 });
+
+describe('afastamentos declarados no pedido', () => {
+  it('lista as partes afastadas do esboço de propósito, com o motivo, e cala as que não se afastam', async () => {
+    const { afastamentosDeclarados, montarPedido } = await import('./vistas-para-critica.mjs');
+    const declarado = { ligadas: { roda: { formas: ['roda'], deslocamento: [0, -17, 0], motivo: 'a roda encosta no chão' }, perna: 'perna', pistao: { formas: ['pistao'], minimo: 0.84, alongamento: { '-y': 17 }, motivo: 'o pistão alonga até o chão' } } };
+    const afastamentos = afastamentosDeclarados(declarado);
+    expect(afastamentos.map((a) => a.parte)).toEqual(['pistao', 'roda']);
+    expect(afastamentos[1].texto).toBe('deslocada [0, -17, 0] mm; motivo: a roda encosta no chão');
+    const pedido = montarPedido({ peca: 'x/y', alvo: { imagem: '/alvo.png', unidade: 'y' }, afastamentos });
+    expect(pedido).toContain('se afastam do alvo de propósito');
+    expect(pedido).toContain('- roda: deslocada [0, -17, 0] mm; motivo: a roda encosta no chão');
+    expect(afastamentosDeclarados(null)).toEqual([]);
+    expect(montarPedido({ peca: 'x/y', alvo: { imagem: '/alvo.png', unidade: 'y' } })).not.toContain('de propósito');
+  });
+});

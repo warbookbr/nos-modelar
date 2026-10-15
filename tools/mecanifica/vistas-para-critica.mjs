@@ -43,6 +43,7 @@ import { lerPlano } from '../../modulos/esboco/src/plano.js';
 import { vistaDoMesmoOlho } from '../../modulos/esboco/src/referencia.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
+import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { vistaDoNome } from './esboco-referencia.mjs';
 import { olharBancada } from './olhar-bancada.mjs';
@@ -71,6 +72,16 @@ export const QUADRO_MONTADO = Object.freeze({ largura: 1200, altura: 1000 });
 export const PRAZO_DA_CAPTURA_MONTADA_MS = 240_000;
 
 /* A pergunta de forma que o alvo vindo do esboço pede: ele passou por dois críticos com o para-brisa saliente, e só a pessoa o viu. */
+/* As partes que o `REFINA.esboco` declara afastadas do esboço de propósito (deslocamento ou alongamento, com o motivo), em texto para o
+   pedido: o crítico do trem do nariz mediu como defeito a descida de 17 mm que a pessoa tinha decidido, porque o pedido não a dizia. */
+export function afastamentosDeclarados(declarado) {
+  if (!declarado?.ligadas) return [];
+  return Object.entries(declarado.ligadas)
+    .map(([parte, ligada]) => ({ parte, texto: typeof ligada === 'object' && !Array.isArray(ligada) ? textoDoAfastamento(ligada) : '' }))
+    .filter(({ texto }) => texto)
+    .sort((a, b) => a.parte.localeCompare(b.parte));
+}
+
 export const PERGUNTA_DO_ALVO = 'Onde o alvo difere da referência real, em silhueta ou em forma?';
 export const LIMITE_DO_VEREDITO = 240;
 
@@ -207,7 +218,7 @@ function olhoDaReferencia(caminho, orientacao) {
  * vista }] }` ou null; `sobreposicao` é `{ arquivos, notas }` ou null; `partes` são `{ nome, imagens: [{ arquivo, vista }] }` na ordem do
  * plano; `perguntas` as perguntas específicas da peça.
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [] }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [] }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -227,6 +238,14 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       '', `- ${alvo.imagem}`, '', 'De onde cada vista da composta olha:', '',
       ...lista(VISTAS_DA_COMPOSTA.map((vista) => `${vista}: ${linhaDaVista(vista, orientacao).slice(vista.length + 2)}`)),
     );
+    if (afastamentos.length) {
+      L.push(
+        '', 'A pessoa decidiu que estas partes se afastam do alvo de propósito, e a receita o declara. O afastamento dito aqui não é defeito; '
+        + 'julgue o resto da forma delas contra o alvo, e aponte só a diferença que passa do que está declarado. Os vetores estão em mm, '
+        + 'no quadro do esboço, com y para cima:', '',
+        ...lista(afastamentos.map(({ parte, texto }) => `${parte}: ${texto}`)),
+      );
+    }
   } else {
     L.push('A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte: `alvo` do veredito leva o caminho da imagem de referência que você comparou.');
   }
@@ -479,6 +498,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     plano,
     orientacao,
     alvo: alvo ? { imagem: alvo.imagem, unidade: alvo.unidade } : null,
+    afastamentos: afastamentosDeclarados(declarado),
     referencias: referencias.imagens.map((c) => ({ caminho: c })),
     modelo: [conjunto, traseira, esquerda].flatMap((r) => arquivosDe(r).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' }))),
     arame: [
