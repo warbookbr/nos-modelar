@@ -112,6 +112,15 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    em paralelo quando as partes não dependem uma da outra (as asas e as empenagens,
    os dois trens), cada um com a lista fechada dos arquivos da parte dele, e Claude
    juntando um por vez.
+   Na mesma data, com as empenagens fixas, a pessoa aprovou cinco melhorias de ferramenta
+   que a travessia mostrou, na ordem recomendada. Antes da rodada de ajustes, com os trens
+   fechados: o pacote do crítico montado pela ferramenta a partir do `PLANO`, com a vista
+   montada enquadrada na peça nova e a sobreposição dos cortes do modelo com os do esboço,
+   que desfez dois defeitos falsos lidos em vista pequena; o registro da rodada lendo direto
+   o veredito do crítico e o relato do modelador; e a correção da booleana que deixa um canto
+   solto quando o recorte raspa a casca, contornada hoje nas asas e na deriva. Antes do
+   próximo objeto: a receita planejada gerada da unidade do esboço, com o plano, o `REFINA`,
+   os contatos e o alvo novo; e a comparação do modelo com a referência real na mesma escala.
 3. **A montagem e o aceite.** O avião inteiro no núcleo, a auditoria de interseções,
    o crítico contra as referências e o esboço, e a aprovação da pessoa na bancada.
 4. **Fechamento.** O custo, os achados e a bateria completa.
