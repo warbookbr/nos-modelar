@@ -1,0 +1,20 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "aviao",
+  "instancias": [
+    {
+      "id": "fuselagem",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/fuselagem"
+      }
+    }
+  ],
+  "relacoes": [],
+  "etapas": [
+    "fuselagem"
+  ],
+  "vinculos": [],
+  "posicoes": []
+}

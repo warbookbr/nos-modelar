@@ -65,3 +65,35 @@ mostrou que a fuselagem, o motor e os trens saem no andaime com o envelope do
 esboço, e que as asas, as empenagens e a hélice não: a N2 não subtrai o recorte e
 não inclina o sólido. A fuselagem é a primeira peça; as superfícies esperam a decisão
 da pessoa sobre o que falta ao contrato.
+
+## O plano da fuselagem
+
+É a primeira etapa. A receita fica em `partes/fuselagem/receita.js`, com o nome
+`aviao/fuselagem`, e as formas e as medidas vêm da unidade `fuselagem` do esboço
+aprovado; o [detalhe da unidade](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-fuselagem.esboco.json)
+e o mestre trazem as seções, os cortes e as posições.
+
+- `fuselagem`: o casco por seções, com as 20 seções de retângulo arredondado do
+  esboço, de z 2377 a z 10.461, e a transição lisa entre elas; com os vãos da porta
+  e das oito janelas recortados no casco, onde a porta e as janelas assentam.
+- `parabrisa`: a casca do para-brisa sobre a frente da cabine, nas seções do esboço.
+- `montanteParabrisa`: a barra central do para-brisa, inclinada como no esboço.
+- `janela1D` a `janela4E`: as oito janelas, placas de canto arredondado nos vãos.
+- `porta`: o painel da porta traseira, do lado esquerdo, no vão dela.
+- `barbatana`: a aleta ventral sob a cauda.
+
+O `REFINA` aponta `../../andaime.json` e liga cada parte ao volume que ela refina:
+`fuselagem`, `parabrisa`, `porta` e `barbatana` aos volumes de mesmo nome, cada
+janela ao seu (`janela1-d` a `janela4-e`), e o `montanteParabrisa`, que o andaime
+não traduz porque gira em dois eixos, ao volume `fuselagem`, dentro de cujo
+envelope ele fica. A tolerância do envelope é de 5 mm.
+
+A escala é o comprimento da fuselagem no esboço, 8084 mm, de z 2377 a z 10.461. Os
+contatos são o para-brisa, as janelas, a porta e a barbatana com a fuselagem, e o
+montante com o para-brisa.
+
+Reprova a fuselagem: facetada ou com degrau visível entre seções; com o perfil de
+lado ou de cima fora do esboço (o topo da cabine, a curva do para-brisa e o
+afinamento até a cauda); com porta ou janela sem vão, uma placa por cima do casco;
+com parte solta, sem encostar na fuselagem; com o `REFINA` acusando parte fora do
+envelope; e com o comprimento a mais de 3% de 8084 mm.
