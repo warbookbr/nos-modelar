@@ -97,3 +97,29 @@ lado ou de cima fora do esboço (o topo da cabine, a curva do para-brisa e o
 afinamento até a cauda); com porta ou janela sem vão, uma placa por cima do casco;
 com parte solta, sem encostar na fuselagem; com o `REFINA` acusando parte fora do
 envelope; e com o comprimento a mais de 3% de 8084 mm.
+
+A fuselagem ficou fixa em 2026-10-15 com o aceite da pessoa, depois de duas rodadas
+com nota 8; o para-brisa anguloso, a ondulação de 20 a 30 mm na linha de baixo entre
+o capô e a cabine e a largura da cabine contra a foto de topo, que inclui a carenagem
+da raiz da asa, vêm do esboço aprovado e ficam como pendência.
+
+## O plano do motor
+
+É a segunda etapa. A receita fica em `partes/motor/receita.js`, com o nome
+`aviao/motor`, e as formas vêm da unidade `motor` do esboço aprovado (o mestre e o
+[detalhe](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor.esboco.json)).
+
+- `capo`: o capô por seções, liso, da face da frente da fuselagem até o cone da
+  hélice, com a boca de ar recortada embaixo.
+- `entradaDeAr`: a carenagem da entrada de ar sob o capô, com a mesma boca de ar.
+- `escapeD` e `escapeE`: os dois escapes laterais, tubos com o furo de saída.
+
+O `REFINA` aponta `../../andaime.json` e liga cada parte ao volume de mesmo nome
+(`capo`, `entrada-de-ar`, `escape-d` e `escape-e`), com a tolerância de 5 mm. A escala
+é o comprimento do capô no esboço. Os contatos são o capô com a face da frente da
+fuselagem, que é plana, em z 2377, com 1450 por 1030 mm e o centro em y 1303, a
+entrada de ar com o capô e cada escape com o capô.
+
+Reprova o motor: capô facetado ou com degrau entre seções; capô que não assenta na
+face da frente da fuselagem, com fresta ou degrau na junta; boca de ar ou escape sem
+abertura; parte solta; e o `REFINA` acusando parte fora do envelope.

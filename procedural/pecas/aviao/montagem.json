@@ -9,11 +9,19 @@
         "tipo": "peca",
         "ref": "aviao/fuselagem"
       }
+    },
+    {
+      "id": "motor",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/motor"
+      }
     }
   ],
   "relacoes": [],
   "etapas": [
-    "fuselagem"
+    "fuselagem",
+    "motor"
   ],
   "vinculos": [],
   "posicoes": []
