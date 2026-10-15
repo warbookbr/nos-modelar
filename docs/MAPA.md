@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1293 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1294 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1066,6 +1066,7 @@
 ## procedural/pecas/aviao/partes/trem-do-nariz/rodadas/
 
 - `receita-01.js` — aviao/trem-do-nariz — o trem do nariz do avião de pequeno porte baixado, na pose de pouso: a carenagem, o pivô e os mancais, a alavanca e o atuador, o compas…
+- `receita-02.js` — aviao/trem-do-nariz — o trem do nariz do avião de pequeno porte baixado, na pose de pouso: a carenagem, o pivô e os mancais, a alavanca e o atuador, o compas…
 
 ## procedural/pecas/aviao/partes/trens-principais/
 
