@@ -67,7 +67,7 @@ export const TABELA = {
      até `sobreARoda` acima da roda, e tem `largura` em x (`tpBlE`) e `espessura` em z (`tpBlC`). `cantos` é o raio do canto
      arredondado, que o esboço não declara na perna e que o PLANO promete. */
   perna: { acimaDoPivo: 40, sobreARoda: 25, largura: 70, espessura: 340, cantos: 6 },
-  /* O pino do pivô (`tpPinoA` a `tpPinoB`): cilindro em z de `diametro`, com `meiaAltura` para cada lado do pivô (`tpPinoMeio`). */
+  /* O pino do pivô (`tpPinoA` a `tpPinoB`): cilindro em z de `diametro`, com `meioComprimento` para cada lado do pivô (`tpPinoMeio`). */
   pinoPivo: { diametro: 38, meioComprimento: 215 },
   /* A coroa: caixa de `largura` em x e de `profundidade` em z, fração da espessura da perna (0,58), com `altura` em y e o topo na
      face de baixo da perna; `cantos` é o raio do canto. */
@@ -77,13 +77,14 @@ export const TABELA = {
   garfo: { afastamento: 88, sobreARoda: 33, abaixoDoCubo: 50, largura: 22, espessura: 190 },
   /* O eixo (`tpAe` a `tpAi`): cilindro em x de `diametro`, com `meioComprimento` para cada lado do centro da roda (`tpBe`). */
   eixo: { diametro: 28, meioComprimento: 100 },
-  /* O compasso, atrás do plano da perna não: na frente dela, a `z` do pivô (`tpZLado`, para -z). Os três pontos, como deslocamento
-     [em x, em y] do pivô, são `tpCpA` (o alto, na perna), `tpCpJ` (o joelho) e `tpCpB` (o baixo). As duas hastes são cilindros de
-     `haste` de diâmetro entre eles, e cada pino é um cilindro em z de `pino.diametro` e `pino.comprimento`, centrado no ponto. */
+  /* O compasso fica na frente da perna, a 185 mm do pivô para -z (`z`, de `tpZLado`). Os três pontos, como deslocamento [em x, em y] do pivô,
+     são `tpCpA` (o alto), `tpCpJ` (o joelho) e `tpCpB` (o baixo). As duas hastes são cilindros de `haste` de diâmetro entre eles, e
+     cada pino é um cilindro em z de `pino.diametro` e `pino.comprimento`, centrado no ponto. Os pinos de cima e de baixo entram na
+     face da frente da perna, e o do meio fica fora dela. */
   compasso: { z: -185, alto: [0, -150], joelho: [-80, -310], baixo: [0, -470], haste: 16, pino: { diametro: 24, comprimento: 56 } },
-  /* O atuador, atrás da perna, a `z` do pivô (`tpZLado`, para +z): da orelha `tpJF` (presa à asa) à ponta `tpJA` (o pino na perna),
-     como deslocamento [em x, em y] do pivô. O corpo vai da orelha ao ponto que divide o curso na fração `divisao` (0,5) e a haste
-     dali à ponta. A orelha é a caixa de `largura` em x, `altura` em y e `profundidade` em z, de canto `cantos`. */
+  /* O atuador fica atrás da perna, a 185 mm do pivô para +z (`z`, de `tpZLado`): da orelha `tpJF` (presa à asa) à ponta `tpJA` (o pino na
+     perna), como deslocamento [em x, em y] do pivô. O corpo vai da orelha ao ponto que divide o percurso na fração `divisao` (0,5) e
+     a haste dali à ponta. A orelha é a caixa de `largura` em x, `altura` em y e `profundidade` em z, de canto `cantos`. */
   atuador: {
     z: 185, orelha: [130, 75], ponta: [0, -330], divisao: 0.5, corpo: 40, haste: 26,
     pino: { diametro: 30, comprimento: 56 },
@@ -328,7 +329,7 @@ export default {
   meta: { nome: 'aviao/trens-principais', desc: 'trens principais do avião de pequeno porte, baixados: perna, pivô, coroa, garfo, eixo, roda, compasso e atuador de cada lado' },
   PARAMS: TABELA,
   MATERIAIS,
-  TOPO: { origem: 'a proa do avião em z 0; y para cima com o chão em y 0; x para a direita do piloto; os trens sob as asas, em x de 1850 a 2072 de cada lado' },
+  TOPO: { origem: 'a proa do avião em z 0; y para cima com o chão em y 0; x para a direita do piloto; os trens sob as asas, em x de 1820 a 2072 de cada lado' },
   PLANO: {
     objeto: 'trens principais de um avião monomotor de pequeno porte, baixados: de cada lado, a perna presa ao pivô sob a asa, com a coroa, o garfo, o eixo, a roda no chão, o compasso e o atuador',
     referencias: [

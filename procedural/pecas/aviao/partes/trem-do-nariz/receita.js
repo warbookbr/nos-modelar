@@ -16,7 +16,7 @@
  * Todo cilindro do esboço é um `extrusao` de um círculo entre os dois pontos dele. O que segue um eixo (x, y ou z) nasce direto nele,
  * com a base no menor dos dois extremos; o que não segue (o atuador, em y e z, e os dois braços do compasso, nos três eixos) nasce em
  * x no primeiro ponto e gira em z, para a subida, e em y, para o resto, em torno do primeiro ponto. A carenagem é a caixa de canto
- * arredondado menos a caixa do alojamento, que a passa 20 mm abaixo dela e deixa o alojamento aberto por baixo; os dois mancais e a
+ * arredondado menos a caixa do alojamento, que passa 20 mm abaixo dela e deixa o alojamento aberto por baixo; os dois mancais e a
  * orelha do atuador são caixas de canto arredondado, todas extrudadas em y.
  *
  * A roda é a chamada da família `roda-pneu` com o perfil `carro` e os parâmetros do esboço (o diâmetro do pneu, a largura e o desvio
@@ -59,8 +59,9 @@ export const TABELA = {
   /* O pivô, o ponto `tnP` do esboço: x, y (`tnPy`) e z (`tnPz`) do eixo em torno do qual o trem gira. */
   pivo: [0, 680, 1740],
   /* O quanto a perna desce do pivô, em y: até o fim do barril (`tnLb`, onde o pistão começa), até a coroa (`tnLc`, o pé do pistão) e até
-     o centro da roda (`tnL`, onde o garfo acaba e o eixo passa). O pé do pneu fica a `roda` menos o raio do pneu abaixo de `pivo`, em
-     y 17: o esboço deixa a roda 17 mm acima do chão, e a escala do plano (773 mm) mede do pé da roda ao alto da carenagem. */
+     o centro da roda (`tnL`, onde o garfo acaba e o eixo passa). O centro da roda fica em y 199 e o raio do pneu é 182, e por isso o pé
+     do pneu fica em y 17: o esboço deixa a roda 17 mm acima do chão, e a escala do plano (773 mm) mede do pé da roda ao alto da
+     carenagem, em y 790. */
   descida: { barril: 160, coroa: 251, roda: 481 },
   /* A perna, o pistão e a coroa, em diâmetro. A coroa é horizontal: sai do pé do pistão `braco` para -x, onde o garfo de um braço desce
      até o centro da roda. O eixo da roda sai do garfo, passa pelo cubo e termina `passa` além do plano médio da roda, para +x. */
@@ -100,7 +101,7 @@ export const TABELA = {
 const m = (mm) => mm / 1000;
 const mAll = (v) => v.map(m);
 const GRAUS = Math.PI / 180;
-/* Uma componente de direção tão perto de zero que o cilindro segue o eixo dos outros dois. */
+/* Abaixo deste valor, uma componente da direção de um cilindro conta como zero. */
 const EPS = 1e-9;
 
 let registro = null;
