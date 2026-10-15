@@ -79,8 +79,9 @@ e o mestre trazem as seções, os cortes e as posições.
 - `fuselagem`: o casco por seções, com as 20 seções de retângulo arredondado do
   esboço, de z 2377 a z 10.461, e a transição lisa entre elas; com os vãos da porta
   e das oito janelas recortados no casco, onde a porta e as janelas assentam.
-- `parabrisa`: a casca do para-brisa sobre a frente da cabine, nas seções do esboço.
-- `montanteParabrisa`: a barra central do para-brisa, inclinada como no esboço.
+- `parabrisa`: o vidro do para-brisa, rente ao casco, assentado numa abertura recortada
+  nele, no contorno em planta do esboço (até 2026-10-15 era a casca saliente do esboço).
+- `montanteParabrisa`: a barra central do para-brisa, apoiada no vidro de ponta a ponta.
 - `janela1D` a `janela4E`: as oito janelas, placas de canto arredondado nos vãos.
 - `porta`: o painel da porta traseira, do lado esquerdo, no vão dela.
 - `barbatana`: a aleta ventral sob a cauda.
@@ -164,3 +165,10 @@ a ponta das pás. Os contatos são cada pá com o cone.
 Reprova a hélice: pá reta, sem a torção da família; pá que não entra no cone ou que fica
 solta; pás fora do arranjo de 72 graus; cone facetado; e o `REFINA` acusando parte fora
 do envelope ou abaixo do mínimo contra o esboço.
+
+A hélice fechou na primeira rodada com nota 9, e a pessoa a aceitou como está em
+2026-10-15: as cinco pás são as da família, com razão 1,000 contra o esboço, e o cone
+dá 0,998. O contorno do perfil da pá sai em lados retos numa vista isolada, pela
+resolução da família, e fica como pendência dela. A etapa se fixa depois da fuselagem
+e do motor, que foram reabertos e vêm antes na ordem.
+

@@ -1,0 +1,1075 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/helice",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/helice-composta.png",
+    "nota": 9,
+    "defeitos": [
+      {
+        "parte": "pa1",
+        "tipo": "superficie",
+        "onde": "contorno do perfil na extremidade superior esquerda da vista direita isolada",
+        "sentido": "facetado",
+        "evidencia": "bancada-aviao-helice-direita-sel-pa1-isolar-orto-focado.png: contorno com cerca de 8 lados retos de ~50 px em ~600 px; o alvo não mostra esse trecho. Defeito menor."
+      }
+    ],
+    "observacao": "Arranjo de 72 graus, torção, proporções e cone liso batem com o alvo; a profundidade do cone dentro do lábio do capô não aparece nas vistas montadas e não foi confirmada."
+  },
+  "partes": [
+    {
+      "nome": "cone",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pa1",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pa2",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pa3",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pa4",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pa5",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o detalhe aviao-detalhe-helice põe a raiz da pá em z -45 do eixo e o mestre em -62: 17 mm entre os dois esboços aprovados deram razão 0,36, e a receita segue o mestre, que o REFINA mede",
+    "a família publica as portas da pá no quadro local e rotaciona não as leva junto, o que dá porta fora do plano; a receita filtra as portas da expansão (backlog: porta de família que não acompanha o giro)",
+    "o facetado do perfil da pá vem da família (19 pontos por face da seção), igual no esboço, onde a pá dá razão 1,000; o conserto, se a pessoa pedir, é na família e não na receita"
+  ],
+  "notaDePassagem": "Cone de 48 lados e 18 anéis, o que cabe nas 1000 faces do lathe com flecha abaixo de 0,5 mm. A pá 1 tem a pose do esboço mestre (raiz em z 428) e as outras quatro saem de arranja radial, nomeadas.",
+  "receita": {
+    "sha256": "sha256:439a47cad9c062f3e2576f46091e86cd73bf32a75f05ff44db1a3d374d097bcd",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 266,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/helice — o cone e as cinco pás da hélice do avião de pequeno porte, parada na pose do esboço."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Terceira etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `helice` do esboço"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * `aviao-detalhe-helice.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. O"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * eixo da hélice é a reta x = 0, y = 1330. A TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece só em"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * `derivar`. O motor e a fuselagem não publicam porta, e por isso a proa do cone, o eixo da hélice e o lábio do capô estão na TABELA"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * como os pontos do esboço (`proa`, `eixoHelice`) e como a primeira estação do capô, e não saem de um vínculo de medida e de um encaixe"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * de porta da montagem v5."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * O cone é uma revolução em z. O esboço o declara `suave` e passa pelos 12 pontos do perfil uma curva de tangente contínua (cúbica de"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * Hermite com a tangente de Fritsch e Carlson, a do PCHIP, que não passa do valor de nenhum ponto); aqui a curva entra em `derivar`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * que a avalia no raio e acrescenta as estações entre os pontos, e o `lathe` a revoluciona em `lados` faces com o sombreado liso. O"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * `lathe` guarda 1000 faces por passo, e com 48 lados cabem 20 faixas: as estações a mais ficam onde a flecha de um vão passa de meio"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * milímetro (a ponta e o ombro do cone, onde o perfil vira), e o resto fica só nos pontos do esboço. O perfil fecha na base com um polo"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * no eixo, e a base fica dentro do capô: o cone termina 14 mm depois do lábio, em z 606, e o capô começa em z 592."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * A pá é a chamada da família `superficie-aerodinamica` com o perfil `pa-de-helice` e os parâmetros do esboço, expandida aqui dentro"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * dos PASSOS. A família a gera na pose dela (a raiz na origem, a envergadura em +y, a corda no plano de rotação), e o esboço a põe"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * girando 90 graus em z para a envergadura ir a +x e levando a raiz ao ponto do eixo da hélice mais o deslocamento `raiz`; a receita"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * faz o mesmo com `rotaciona` e `transladar`. As outras quatro pás são cópias da primeira em arranjo radial em torno do eixo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * hélice, nomeadas uma a uma (`arranja` com `nomes`). Da expansão ficam a casca, o material, o sólido e o liso; saem a parte `fixa`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * porque a receita nomeia as cinco pás, e as duas portas, que a família publica no quadro local da pá e que a pose deixaria longe da"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * forma (`porta-fora-do-plano`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "import { nucleo } from '../../../../../nucleo/entrada.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "const PAS = ['pa1', 'pa2', 'pa3', 'pa4', 'pa5'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "const FORMA_DA_PA = { pa1: 'helicePa', pa2: 'helicePa1', pa3: 'helicePa2', pa4: 'helicePa3', pa5: 'helicePa4' };"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* O ponto `eixoHelice` do esboço: o eixo da hélice passa por x e y, e o z é o da âncora em que a raiz da pá se mede. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  eixo: [0, 1330, 490],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* O cone: `proa` é o z do ponto `proa` do esboço, onde nasce a ponta. O `perfil` é o do esboço, [raio, distância da ponta ao longo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "     eixo] em cada linha, e `trechos` diz quantos trechos cada vão entre dois pontos vira na curva suave, um número por vão, onze ao"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "     todo: [2, 2, 2, 1, 1, 1, 1, 2, 1, 4, 1] põem uma estação por meio milímetro de flecha, dão 18 anéis e 19 faixas, e com 48 lados"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "     o `lathe` ocupa 912 das 1000 faces do passo. `labio` é o z da primeira estação do capô, onde a base do cone tem de estar dentro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  cone: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    proa: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    perfil: [[0, 0], [60, 54], [100, 104], [125, 154], [150, 204], [168, 254], [185, 304], [200, 354], [210, 404], [212, 444], [195, 540], [182, 598]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "    trechos: [2, 2, 2, 1, 1, 1, 1, 2, 1, 4, 1],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    labio: 592,"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* A pá: os parâmetros da família, a `raiz` como deslocamento do ponto do eixo (a âncora do esboço, em x, y, z), o `giro` em z que leva"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "     a envergadura de +y a +x, e o número de pás, em arranjo radial de volta inteira em torno do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  pa: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    perfil: 'pa-de-helice',"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    envergadura: 912,"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    cordaNaRaiz: 0.22,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    cordaNaPonta: 0.125,"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    raiz: [178, 0, -62],"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    giro: -90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    total: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "const registroDeFamilias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "/* A cúbica de Hermite por trechos com a tangente do PCHIP, sobre o raio em função da distância à ponta. `pontos` são [raio, distância]"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "   em ordem crescente de distância, e `trechos` traz um número por vão. Devolve [raio, distância] nos pontos e nas estações entre eles."
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "   Os pontos do cone têm quebra de direção bem abaixo dos 40 graus em que o esboço declara aresta, e por isso nenhum é aresta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "function perfilSuave(pontos, trechos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const n = pontos.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  if (trechos.length !== n - 1) throw new Error(`cone: ${n} pontos pedem ${n - 1} números em trechos, e a TABELA traz ${trechos.length}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const h = pontos.slice(1).map((p, k) => p[1] - pontos[k][1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const d = pontos.slice(1).map((p, k) => (p[0] - pontos[k][0]) / h[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const interna = (h0, h1, d0, d1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    if (d0 * d1 <= 0) return 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    const a = 2 * h1 + h0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    const b = h1 + 2 * h0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    return (a + b) / (a / d0 + b / d1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const daPonta = (h0, h1, d0, d1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    const t = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    if (Math.sign(t) !== Math.sign(d0)) return 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    if (Math.sign(d0) !== Math.sign(d1) && Math.abs(t) > 3 * Math.abs(d0)) return 3 * d0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    return t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const tangente = pontos.map((_, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    if (k === 0) return daPonta(h[0], h[1], d[0], d[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    if (k === n - 1) return daPonta(h[n - 2], h[n - 3], d[n - 2], d[n - 3]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    return interna(h[k - 1], h[k], d[k - 1], d[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const saida = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  for (let k = 0; k < n - 1; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    saida.push(pontos[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    const quantos = trechos[k];"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    if (!Number.isInteger(quantos) || quantos < 1) throw new Error(`cone: trechos[${k}] precisa ser inteiro maior ou igual a 1`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    for (let j = 1; j < quantos; j++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "      const t = j / quantos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "      const [h00, h10, h01, h11] = [2 * t ** 3 - 3 * t ** 2 + 1, t ** 3 - 2 * t ** 2 + t, -2 * t ** 3 + 3 * t ** 2, t ** 3 - t ** 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "      saida.push(["
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "        h00 * pontos[k][0] + h10 * h[k] * tangente[k] + h01 * pontos[k + 1][0] + h11 * h[k] * tangente[k + 1],"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "        pontos[k][1] + t * h[k],"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      ]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  saida.push(pontos[n - 1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  return saida;"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  const eixo = t.eixo.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  /* O cone: o perfil suave em [raio, z] com a ponta em `proa`, fechado na base por um polo no eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  const suave = perfilSuave(t.cone.perfil, t.cone.trechos);"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const base = t.cone.proa + t.cone.perfil[t.cone.perfil.length - 1][1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  if (base <= t.cone.labio) throw new Error(`cone: a base em z ${base} mm não passa do lábio do capô, em z ${t.cone.labio} mm, e o cone ficaria fora dele`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const cone = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    perfil: [...suave.map(([raio, distancia]) => [m(raio), m(t.cone.proa + distancia)]), [0, m(base)]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    lados: t.cone.lados,"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    em: [eixo[0], eixo[1], 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  /* A pá: a chamada da família, com o material da hélice, e a pose. O esboço gira a pá em z em torno da raiz, que é a origem da pá, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "     leva a raiz ao ponto do eixo mais `raiz`. O arranjo gira em torno do eixo da hélice, e o pivô só importa em x e y. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  const p = t.pa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  const chamada = chamar(registroDeFamilias().obter('superficie-aerodinamica'), 'pa1', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    perfil: p.perfil, envergadura: p.envergadura, cordaNaRaiz: p.cordaNaRaiz, cordaNaPonta: p.cordaNaPonta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const pa = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    chamada: { ...chamada, argumentos: { ...chamada.argumentos, materialDaPele: 'helice' } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    giro: p.giro,"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    desloca: t.eixo.map((v, k) => m(v + p.raiz[k])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    pivo: [eixo[0], eixo[1], 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    total: p.total,"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  return { cone, pa };"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "/* Identidade estrutural dos passos, escolhida aqui. A pá da família leva a origem `loft` 1, e o resto fica acima dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "const ID = { cone: 100, arranjo: 200 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "const PA = { op: 'loft', id: 1 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "export const MATERIAIS = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  helice: { cor: '#b8c4d0', metalicidade: 0.3, aspereza: 0.45 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "/* O ângulo, em graus, a partir do qual a quina fica nítida no sombreado liso: a base do cone, de 76 graus contra a lateral, fica; o"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "   perfil do cone, que vira menos de 15 graus por anel, fica liso. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "const ANGULO_LISO = 30;"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  const P = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  const passos = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  /* O cone. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  const sel = { origem: { op: 'lathe', id: ID.cone } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  passos.push(['lathe', { origemId: ID.cone, eixo: 'z', lados: P.cone.lados, perfil: P.cone.perfil, em: P.cone.em }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  passos.push(['parte', { nome: 'cone', sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  passos.push(['material', { usa: 'helice', sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  passos.push(['liso', { angulo: ANGULO_LISO, sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  /* A primeira pá: a expansão da família, sem a parte `fixa` e sem as portas, na pose do esboço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  const { passos: daFamilia } = expandirChamadasDeComposicao(registroDeFamilias().registroComposicoes, [P.pa.chamada]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  passos.push(...daFamilia.filter(([operacao]) => operacao !== 'parte' && operacao !== 'publicarPorta'));"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  passos.push(['rotaciona', { eixo: 'z', graus: P.pa.giro, pivo: [0, 0, 0], sel: { origem: PA } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  passos.push(['transladar', { d: P.pa.desloca, sel: { origem: PA } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  /* As outras quatro, em arranjo radial de volta inteira em torno do eixo da hélice, cada uma com o nome dela. O arranjo vem antes de"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "     nomear a primeira, porque a cópia leva a parte da fonte e `parte` não toma face que já tem dona. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  const copias = PAS.slice(1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  passos.push(['arranja', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "    modo: 'radial', total: P.pa.total, eixo: 'z', volta: 360, pivo: P.pa.pivo, origemId: ID.arranjo, derivaDe: PA, sel: { origem: PA }, nomes: copias,"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  passos.push(['parte', { nome: PAS[0], sel: { origem: PA } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  for (const nome of copias) passos.push(['parte', { nome, sel: { origem: { op: 'arranja', id: ID.arranjo, de: PA, nome } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "/* A caixa da pá 1 na pose, em milímetro. O desenho da pá é o da família, e a conferência dele é a do `REFINA.esboco`; aqui a pá da"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "   família é executada sozinha, sem a pose, e a pose (o giro em z e o deslocamento da raiz) é aplicada aos vértices em JavaScript, para o"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "   ponto declarado provar que `rotaciona` e `transladar` fizeram o que a TABELA diz. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "function caixaDaPa(t) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "  const P = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "  const { passos } = expandirChamadasDeComposicao(registroDeFamilias().registroComposicoes, [P.pa.chamada]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "  const { V } = nucleo(passos.filter(([operacao]) => operacao === 'loft'), {}, {}, {}, null, []);"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "  const rad = (P.pa.giro * Math.PI) / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  const [c, s] = [Math.cos(rad), Math.sin(rad)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  const postos = [...V.values()].map(([x, y, z]) => [c * x - s * y + P.pa.desloca[0], s * x + c * y + P.pa.desloca[1], z + P.pa.desloca[2]].map((v) => v * 1000));"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "    min: [0, 1, 2].map((k) => Math.min(...postos.map((p) => p[k]))),"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "    max: [0, 1, 2].map((k) => Math.max(...postos.map((p) => p[k]))),"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "/* Os pontos declarados, em milímetro, saem da mesma tabela que a malha. Do cone, os extremos: a ponta em z `proa`, a base em z `proa`"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "   mais o comprimento do perfil, e o raio do perfil no ponto mais largo em x e em y em torno do eixo. Da pá 1, a raiz e a ponta em x, que"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "   são o `raiz` da TABELA mais o eixo e esse valor mais a envergadura (a ponta a 1090 mm do eixo), e o resto da caixa vem da caixa da pá. */"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}
