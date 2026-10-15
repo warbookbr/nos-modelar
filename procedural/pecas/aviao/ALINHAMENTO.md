@@ -253,6 +253,13 @@ do esboço de propósito declara no `REFINA.esboco` o deslocamento ou o alongame
 - Empenagem horizontal: o compensador, a divisão no bordo de fuga do profundor.
 - Empenagem vertical: a dorsal lisa, o dorso subindo até a deriva, no lugar da aleta de
   ponta fina do esboço.
+- Asas e empenagem vertical: os vãos sem o deslocamento que contornava o canto solto da
+  booleana, que o núcleo corrigiu em 2026-10-15.
+
+Em 2026-10-15 a pessoa decidiu que a carenagem da raiz entra na receita das asas, sem reabrir a
+fuselagem, o motor e a hélice, e as etapas posteriores às asas foram reabertas da última para a
+primeira. A parte pedida que o esboço não tem (o casulo, os ovais, a carenagem, o compensador)
+entra em `REFINA.novas` com o motivo.
 
 As duas empenagens fecharam na primeira rodada com nota 9 e a pessoa as aceitou em
 2026-10-15, vendo a [comparação com a referência real](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-empenagens.png);
