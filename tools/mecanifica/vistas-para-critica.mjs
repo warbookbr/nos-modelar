@@ -61,9 +61,10 @@ export const RES_PARTE = '900x900';
 export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,superior';
 export const VISTAS_DA_PARTE = 'direita,isometrica';
 export const VISTAS_DO_ARAME = 'isometrica,traseira';
-/* As vistas do conjunto montado, com o quadro na peça: as seis que o conjunto da peça sozinha tem, em quadro mais quadrado que o
-   da bancada, porque o quadro fecha na caixa da peça e a folga da forma dela é que decide o que sobra. */
-export const VISTAS_MONTADAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior'];
+/* As vistas do conjunto montado, com o quadro na peça: as seis que o conjunto da peça sozinha tem, mais a de baixo, em quadro mais
+   quadrado que o da bancada, porque o quadro fecha na caixa da peça e a folga da forma dela é que decide o que sobra. A de baixo
+   entrou porque o alojamento do trem do nariz, que abre para baixo, só se confirmava nos cortes. */
+export const VISTAS_MONTADAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
 export const QUADRO_MONTADO = Object.freeze({ largura: 1200, altura: 1000 });
 /* O prazo da captura montada: seis vistas do avião inteiro até a peça, com o servidor e o navegador subindo junto, passam dos 45 s que a
    captura de uma vista de teste tem de padrão, e estouraram com dois pacotes rodando ao mesmo tempo. */

@@ -423,7 +423,7 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     expect(pedidosDeEtapas).toHaveLength(1);
     expect(pedidosDeEtapas[0].arquivo.replaceAll('\\', '/')).toMatch(/procedural\/pecas\/aviao\/montagem\.json$/);
     expect(pedidosDeEtapas[0].opcoes).toMatchObject({ foco: 'motor', saida: pasta, vistas: VISTAS_MONTADAS, largura: 1200, altura: 1000, timeoutMs: PRAZO_DA_CAPTURA_MONTADA_MS });
-    expect(VISTAS_MONTADAS).toEqual(['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior']);
+    expect(VISTAS_MONTADAS).toEqual(['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior']);
     const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
     const montado = pedido.slice(pedido.indexOf('## Montado'), pedido.indexOf('## Partes'));
     expect(montado).toContain('com a peça `motor` no centro do quadro');
