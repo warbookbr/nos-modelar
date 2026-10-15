@@ -22,10 +22,16 @@
  * centro da seção, de modo que cada ponta é um leque quase plano. O bloco de ids de um passo é de 1000: com 10 segmentos por canto
  * são 44 pontos por seção, e o capô cabe com até 21 estações.
  *
- * A boca de ar é um corte de loft que entra pela parede do lábio e segue 260 mm para trás, sob o capô, como no esboço; a entrada de
- * ar é a carenagem em volta dela, e cada uma das duas partes leva o seu corte, porque a subtração o consome. Os escapes são tubos
- * por loft de seções circulares ao longo de um caminho com uma curva de `raioCurva`, as pontas fechadas por polo no eixo; o furo de
- * saída é um corte circular que entra pela ponta do tubo, ao longo do eixo dele.
+ * A boca de ar é um corte de loft que entra pela parede do lábio e segue 260 mm para trás, sob o capô, como no esboço, e daí continua
+ * na seção da última estação até passar da face de trás do capô: o corte é uma passagem de ponta a ponta, e não uma cova com fundo,
+ * porque o fundo plano a 260 mm lia como uma face fechando a fenda. A passagem sai na face de z 2377, que a fuselagem fecha na
+ * montagem, e por isso o capô é medido com um furo passante (`formas`). A entrada de ar é a carenagem em volta da boca, e cada uma
+ * das duas partes leva o seu corte, porque a subtração o consome; a carenagem leva só as estações do esboço, que é onde ela alcança.
+ * As seções da carenagem e da boca são estádios (a ponta é um semicírculo de raio igual à meia altura), e o contorno delas é
+ * calculado aqui, ponto a ponto: dois cantos do núcleo com esse raio deixam uma faixa de 1 mm no meio da ponta, em que a normal gira
+ * 8 graus, e a sombra a mostra como um degrau. Os escapes são tubos por loft de seções circulares ao longo de um caminho com uma
+ * curva de `raioCurva`, as pontas fechadas por polo no eixo; o furo de saída é um corte circular que entra pela ponta do tubo, ao
+ * longo do eixo dele.
  */
 
 export const TABELA = {
@@ -61,7 +67,10 @@ export const TABELA = {
       [64, 380, 170, 85],
     ],
   },
-  /* Boca de ar, o cortador: `inicio` é o ponto da boca de ar do esboço, e as estações são as mesmas colunas da entrada de ar. */
+  /* Boca de ar, o cortador: `inicio` é o ponto da boca de ar do esboço, e as estações são as mesmas colunas da entrada de ar. Só o
+     corte do capô continua além da última estação: a seção dela segue até `passagem.alem` mm depois da última estação do capô, de
+     modo que o corte atravessa a face de trás, com uma estação a cada `passagem.passo` mm no máximo, para a parede da passagem não
+     sair em tiras de 7 mm por 1,5 m. */
   bocaDeAr: {
     inicio: [0, 1000, 620],
     estacoes: [
@@ -69,6 +78,7 @@ export const TABELA = {
       [120, 330, 126, 63],
       [260, 220, 90, 45],
     ],
+    passagem: { alem: 40, passo: 300 },
   },
   /* Escape do lado direito; o esquerdo é o espelho em x. `inicio` é o ponto do escape do esboço, e `joelho` e `fim` são deslocamentos
      dele. O tubo vira no joelho numa curva de `raioCurva`, cortada em seções a cada `passoDaCurva` graus. O furo de saída entra pela
@@ -85,8 +95,9 @@ export const TABELA = {
   },
   /* Fechamento das pontas dos lofts: quanto o polo fica além da última seção, ao longo do caminho. */
   tampa: { avanco: 0.5 },
-  /* Quanto o raio do canto fica abaixo da meia dimensão menor da seção, em mm. Um canto de raio igual à meia altura, como o da boca de
-     ar e o da entrada de ar, deixa dois pontos do contorno no mesmo lugar, e a faixa entre eles sai com área nula. */
+  /* Quanto o raio do canto fica abaixo da meia dimensão menor da seção, em mm, nas seções de canto arredondado (as do capô). Uma seção
+     cujo raio alcança a meia altura, como a da boca de ar e a da entrada de ar, não passa por aqui: é um estádio e tem contorno
+     próprio. */
   folgaDoRaio: 0.5,
 };
 
@@ -173,15 +184,37 @@ function estacoesPorHermite(nos, trechos) {
   return saida;
 }
 
+/* O contorno de uma seção em estádio, [u, w] com u = x e w = -(y - y0): a reta do topo, a da base e, em cada ponta, um semicírculo de
+   raio igual à meia altura em `2 * segmentos` passos, com um ponto no meio da ponta. Os pontos saem calculados, e não de dois cantos
+   do núcleo, porque dois cantos com esse raio se tocam no meio da ponta. O sentido sai invertido quando é horário. */
+function contornoDeEstadio({ hw, topo, base }, y0, segmentos) {
+  const hy = (topo - base) / 2;
+  if (!(hw > hy)) throw new Error(`estádio com meia largura de ${hw} m e meia altura de ${hy} m: a ponta arredondada só existe nas laterais, e a seção precisa ser mais larga que alta`);
+  const meio = (topo + base) / 2;
+  const passos = 2 * segmentos;
+  const centro = hw - hy;
+  const ponta = (lado, de, ate) => Array.from({ length: passos + 1 }, (_, k) => {
+    const a = de + ((ate - de) * k) / passos;
+    return [lado * (centro + hy * Math.cos(a)), meio + hy * Math.sin(a)];
+  });
+  const pontos = [...ponta(1, Math.PI / 2, -Math.PI / 2), ...ponta(-1, -Math.PI / 2, Math.PI / 2)];
+  const contorno = pontos.map(([x, y]) => [x, -(y - y0)]);
+  return { meio, lados: contorno.length, contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };
+}
+
 /* O contorno de uma seção de retângulo arredondado no plano do loft em z, [u, w, raio] com u = x e w = -(y - y0). Os quatro cantos
-   saem do mesmo raio, limitado pela meia dimensão menor, e o contorno que sai no sentido horário é invertido. */
-function contornoDaSecao({ hw, topo, base, raio }, y0, folga) {
+   saem do mesmo raio, limitado pela meia dimensão menor, e o contorno que sai no sentido horário é invertido. A seção cujo raio
+   alcança a meia dimensão menor é um estádio e tem contorno próprio. `lados` é o número de pontos depois de o núcleo expandir os
+   cantos. */
+function contornoDaSecao({ hw, topo, base, raio }, y0, folga, segmentos) {
   const meio = (topo + base) / 2;
   const hy = (topo - base) / 2;
+  /* A tolerância de um nanômetro absorve o ruído de `topo - base` em ponto flutuante. */
+  if (raio >= Math.min(hw, hy) - 1e-9) return contornoDeEstadio({ hw, topo, base }, y0, segmentos);
   const r = Math.min(raio, hw - folga, hy - folga);
   const cantos = [[hw, topo, r], [-hw, topo, r], [-hw, base, r], [hw, base, r]];
   const contorno = cantos.map(([x, y, raioDoCanto]) => [x, -(y - y0), raioDoCanto]);
-  return { meio, contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };
+  return { meio, lados: contorno.length * (segmentos + 1), contorno: areaDoContorno(contorno) < 0 ? contorno.reverse() : contorno };
 }
 
 /* Um loft em z por seções de retângulo arredondado, em metro: `secoes` são `{ z, hw, topo, base, raio }`, com a meia largura em torno
@@ -190,8 +223,11 @@ function contornoDaSecao({ hw, topo, base, raio }, y0, folga) {
    seção de que ele fecha a ponta. */
 function loftEmZ({ nome, x = 0, secoes, avanco, segmentos, folga }) {
   const y0 = (secoes[0].topo + secoes[0].base) / 2;
-  const feitas = secoes.map((s) => ({ ...contornoDaSecao(s, y0, folga), z: s.z }));
-  const lados = feitas[0].contorno.length * (segmentos + 1);
+  const feitas = secoes.map((s) => ({ ...contornoDaSecao(s, y0, folga, segmentos), z: s.z }));
+  const lados = feitas[0].lados;
+  if (feitas.some((s) => s.lados !== lados)) {
+    throw new Error(`${nome}: as seções saem com ${[...new Set(feitas.map((s) => s.lados))].join(' e ')} pontos, e o loft pede o mesmo número em todas (estádio e retângulo arredondado não casam no mesmo loft)`);
+  }
   const nV = feitas.length * lados + 2;
   const nF = (feitas.length + 1) * lados;
   if (nV > 1000 || nF > 1000) {
@@ -287,8 +323,18 @@ export function derivar(t = TABELA) {
     avanco, segmentos, folga,
   });
   const entradaDeAr = aPartirDoPonto('entradaDeAr', t.entradaDeAr);
-  const bocaNoCapo = aPartirDoPonto('bocaDeAr no capo', t.bocaDeAr);
-  const bocaNaEntrada = aPartirDoPonto('bocaDeAr na entradaDeAr', t.bocaDeAr);
+  /* O corte do capô repete a seção da última estação da boca até a saída, `passagem.alem` mm além da última estação do capô, em
+     estações a no máximo `passagem.passo` mm uma da outra; o da carenagem fica nas estações do esboço. */
+  const boca = t.bocaDeAr;
+  const ultimaDaBoca = boca.estacoes[boca.estacoes.length - 1];
+  const fimDoCapo = t.capo.estacoes[t.capo.estacoes.length - 1][0];
+  const dzDaSaida = fimDoCapo + boca.passagem.alem - boca.inicio[2];
+  const trechosDaPassagem = Math.ceil((dzDaSaida - ultimaDaBoca[0]) / boca.passagem.passo);
+  const daPassagem = Array.from({ length: trechosDaPassagem }, (_, k) => [
+    ultimaDaBoca[0] + ((dzDaSaida - ultimaDaBoca[0]) * (k + 1)) / trechosDaPassagem, ...ultimaDaBoca.slice(1),
+  ]);
+  const bocaNoCapo = aPartirDoPonto('bocaDeAr no capo', { ...boca, estacoes: [...boca.estacoes, ...daPassagem] });
+  const bocaNaEntrada = aPartirDoPonto('bocaDeAr na entradaDeAr', boca);
 
   const e = t.escape;
   const escapes = [{ nome: 'escapeD', lado: 1 }, { nome: 'escapeE', lado: -1 }].map(({ nome, lado }) => {
@@ -456,8 +502,9 @@ const receita = {
     { par: ['escapeD', 'capo'], motivo: 'o escape direito sai do flanco do capô, onde o tubo começa dentro dele' },
     { par: ['escapeE', 'capo'], motivo: 'o escape esquerdo sai do flanco do capô, onde o tubo começa dentro dele' },
   ],
+  /* O capô tem um furo passante, a boca de ar que entra pela parede do lábio e sai pela face de trás; a carenagem, um anel. */
   formas: {
-    capo: 'solido',
+    capo: { furos: 1 },
     entradaDeAr: { furos: 1 },
     escapeD: 'solido',
     escapeE: 'solido',

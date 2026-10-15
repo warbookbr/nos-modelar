@@ -14,7 +14,9 @@
    (2) Pasta chamada `motor`. A palavra servia a duas coisas diferentes, o
        núcleo e o motor de prancha, e a mesma palavra em dois lugares foi o que
        espalhou o núcleo. Documento de histórico pode citar o nome antigo; pasta
-       de programa não.
+       de programa não. A pasta de uma peça do acervo (`procedural/pecas/`) não
+       é pasta de programa: ela tem o nome da parte do objeto, e o avião e a
+       picape têm motor.
 
    A raiz vem do diretório onde o vitest roda, e o teste recusa em voz alta se
    ali não estiver o `package.json` deste repositório ou se a varredura não
@@ -75,8 +77,9 @@ describe('a arrumação do núcleo', () => {
     expect(fora, 'mova para procedural/nucleo/, na pasta da operação que o teste prova').toEqual([]);
   });
 
-  it('nenhuma pasta se chama motor', () => {
-    const erradas = pastas.filter((pasta) => pasta.split(sep).includes('motor'));
+  it('nenhuma pasta de programa se chama motor', () => {
+    const acervo = `procedural${sep}pecas${sep}`;
+    const erradas = pastas.filter((pasta) => !pasta.startsWith(acervo) && pasta.split(sep).includes('motor'));
     expect(erradas, 'o núcleo se chama nucleo; o motor de prancha ganha nome próprio').toEqual([]);
   });
 
