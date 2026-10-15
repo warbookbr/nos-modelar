@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1287 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1289 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1816,6 +1816,8 @@
 - `rodadas-com-critico.test.mjs` — rodadas-com-critico.test.mjs — o aceite humano grava quem, quando, a última nota, os defeitos abertos e as pendências, fecha a série, recusa aceite sem autor…
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
+- `sobreposicao-de-cortes.mjs` — sobreposicao-de-cortes.mjs — os cortes planos do modelo sobre os do sólido do esboço que a receita refina, numa imagem por eixo.
+- `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
@@ -1826,8 +1828,8 @@
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
-- `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote de imagens que a crítica visual precisa receber.
-- `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o prefixo que apaga as imagens velhas pega só as da peça pedida.
+- `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
+- `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
 
 ## tools/mecanifica/fixtures/
 

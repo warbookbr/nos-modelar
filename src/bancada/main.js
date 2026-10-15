@@ -15,7 +15,7 @@ import { caixaDoVisivel, criarAmbienteBancada, posicionarNoEstudio } from './cri
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
 import { criarCamadaEdicaoDeMalha } from './edicao-de-malha.js';
-import { criarSincronizadorSessao } from './sessao/sincronizador.js';
+import { arquivoDaSessaoNaUrl, criarSincronizadorSessao } from './sessao/sincronizador.js';
 import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js';
 import { criarPainelReferencias } from './referencias/painel-referencias.js';
 import { criarPunhoDaImagem } from './referencias/punho-da-imagem.js';
@@ -78,9 +78,13 @@ function mostrarAviso(texto) {
   mostrarAviso.timeout = setTimeout(() => { elemento.hidden = true; }, 2200);
 }
 
-export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
+/* `sessaoPorUrl` deixa a URL escolher o arquivo de sessão (`?sessao=<caminho>`), em vez do `sessao-ativa.json` compartilhado: só o
+   harness das capturas headless o liga, para cada captura ler a peça que pediu mesmo com outra captura rodando ao lado. A bancada
+   publicada não o liga e continua lendo a sessão ativa. */
+export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = false } = {}) {
   const params = new URLSearchParams(location.search);
   const pecaPedida = params.get('peca');
+  const arquivoDaSessao = sessaoPorUrl ? arquivoDaSessaoNaUrl(params.get('sessao')) : null;
   const nomesDisponiveis = idsDoCatalogo(catalogo);
 
   const canvas = document.getElementById('cenaBancada');
@@ -1861,6 +1865,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   }
 
   sincronizador = criarSincronizadorSessao({
+    ...(arquivoDaSessao ? { arquivo: arquivoDaSessao } : {}),
     aoMudarStatus: atualizarStatusUI,
     async aoAtualizar(estado, novoModelo, { fonte }) {
       if (novoModelo && escolhaManual && fonte === 'arquivo') {

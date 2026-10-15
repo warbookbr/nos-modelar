@@ -33,6 +33,12 @@ export async function ativarReceitaBancada({
    * enquanto a BUSCA continua no acervo real, que é o que ele precisa exercitar.
    * Em uso normal os dois continuam iguais, e nada muda. */
   raizSessao = raiz,
+  /* A SESSÃO PRÓPRIA DE UMA CAPTURA. A bancada lê a peça de `sessao-ativa.json`, um arquivo só por repositório, e duas capturas
+   * headless de peças diferentes no mesmo diretório se pisavam: a segunda a ativar trocava o arquivo, e a página da primeira, que o lê
+   * ao subir, mostrava a peça da outra (medido: a imagem de `aviao-motor` saiu com a deriva). Com `arquivoDaSessao` (caminho
+   * absoluto) a sessão é gravada só nele, e a página o lê pelo `?sessao=` da URL; `sessao-ativa.json` fica como está, e com ele a peça
+   * de quem trabalha na bancada e a de qualquer outra captura. Sem ele nada muda. */
+  arquivoDaSessao = null,
 } = {}) {
   if (!alvo) {
     throw new Error('Informe a receita (ex.: peca-de-prova ou --arquivo=<caminho.js>)');
@@ -158,9 +164,14 @@ export async function ativarReceitaBancada({
     receita,
   };
 
-  mkdirSync(resolve(raizSessao, 'public'), { recursive: true });
-  writeFileSync(resolve(raizSessao, 'public/sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
-  writeFileSync(resolve(raizSessao, 'sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+  if (arquivoDaSessao) {
+    mkdirSync(dirname(arquivoDaSessao), { recursive: true });
+    writeFileSync(arquivoDaSessao, JSON.stringify(payload, null, 2), 'utf8');
+  } else {
+    mkdirSync(resolve(raizSessao, 'public'), { recursive: true });
+    writeFileSync(resolve(raizSessao, 'public/sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+    writeFileSync(resolve(raizSessao, 'sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+  }
 
   const modoEfetivo = modo ?? (focar ? 'isolar' : 'todas');
   let query = '';
@@ -182,6 +193,7 @@ export async function ativarReceitaBancada({
     query,
     url,
     payload,
+    arquivoDaSessao,
   };
 }
 

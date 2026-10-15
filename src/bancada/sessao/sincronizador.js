@@ -2,11 +2,28 @@
 import { criarEstadoSessaoInicial, validarPacoteSessao } from './estado-sessao.js';
 import { processarPayloadSessao } from './carregar-sessao.js';
 
+export const ARQUIVO_DA_SESSAO_ATIVA = 'sessao-ativa.json';
+
+/**
+ * O arquivo de sessão que a URL pede (`?sessao=<caminho>`): um `.json` relativo à base da aplicação, sem `..`, sem barra dupla e sem
+ * protocolo, ou null quando a URL não pede nenhum (vale o `sessao-ativa.json` de sempre). Pedido que não serve LANÇA: voltar em
+ * silêncio ao arquivo compartilhado era o defeito que isto conserta, a captura mostrando a peça de outra.
+ */
+export function arquivoDaSessaoNaUrl(pedido) {
+  if (pedido === null || pedido === undefined) return null;
+  if (typeof pedido !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/.test(pedido) || pedido.includes('..') || pedido.includes('//')) {
+    throw new Error(`o parâmetro 'sessao' da URL precisa ser o caminho de um .json relativo à aplicação, sem '..' nem protocolo; recebi ${JSON.stringify(pedido)}.`);
+  }
+  return pedido;
+}
+
 export function criarSincronizadorSessao({
   aoAtualizar = () => {},
   aoMudarStatus = () => {},
   aoErro = () => {},
   intervaloPolling = 1500,
+  /* o arquivo que o polling lê, relativo à base da aplicação: o da sessão ativa, ou o de uma sessão própria (`arquivoDaSessaoNaUrl`) */
+  arquivo = ARQUIVO_DA_SESSAO_ATIVA,
 } = {}) {
   let estado = criarEstadoSessaoInicial();
   let modeloAtual = null;
@@ -109,7 +126,7 @@ export function criarSincronizadorSessao({
          O harness dos gates vive em tools/bancadas/, então './' apontava para
          tools/bancadas/sessao-ativa.json (404) e a sessão ativa nunca subia na
          revisão headless — a peça em trabalho era invisível para o agente. */
-      const resposta = await fetch(`${import.meta.env?.BASE_URL ?? './'}sessao-ativa.json`, {
+      const resposta = await fetch(`${import.meta.env?.BASE_URL ?? './'}${arquivo}`, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache' },
       });

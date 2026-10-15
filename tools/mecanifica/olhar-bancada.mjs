@@ -6,7 +6,8 @@
  * devolve resultado estruturado. Importar este módulo não lê argv, não sobe
  * Vite/Playwright, não grava arquivos e não encerra o processo.
  */
-import { existsSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { existsSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
@@ -23,6 +24,8 @@ import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const OUT = join(REPO, 'tools/bancadas/out');
+/* Onde cada captura grava a sessão própria dela: dentro do que o servidor da captura serve, e numa pasta que o controle de versão ignora. */
+const SESSOES = join(OUT, 'sessoes');
 const VISTAS_VALIDAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
 const MODOS = ['todas', 'contexto', 'isolar'];
 /* Teto de imagens de par por chamada. Uma peça de 24 partes tem 276 pares; sem
@@ -214,6 +217,8 @@ export async function olharBancada({
   let encerramentoForcado = null;
   let expirou = false;
   let legendaDeAuditoria = null;
+  /* o arquivo da sessão própria desta captura (ver `ativarReceitaBancada`), apagado ao fim */
+  let sessaoDaCaptura = null;
   try {
     if (capturarEmMemoria && (saidaDeclarada !== null || relatorioDeclarado !== null)) {
       erroDeUso('captura em memória não aceita --saida ou --relatorio.');
@@ -319,7 +324,11 @@ export async function olharBancada({
       if (caminhoReceita) {
         try {
           const ativar = dependencias.ativarReceitaBancada ?? ativarReceitaBancada;
-          await ativar({ alvo: caminhoReceita, raiz: REPO });
+          /* A SESSÃO É DESTA CAPTURA. `sessao-ativa.json` é um arquivo só por repositório, e com duas capturas de peças diferentes
+             ao mesmo tempo a segunda trocava o arquivo da primeira: a imagem de `aviao-motor` saiu com a deriva. Cada captura grava
+             a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). */
+          sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
+          await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura });
           if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
         } catch (erro) {
           erroDeUso(`Falha ao ativar peça '${peca}' na bancada: ${erro.message}`);
@@ -430,6 +439,7 @@ export async function olharBancada({
       const modoAlvo = sobrepor.modo ?? modo;
       const params = new URLSearchParams();
       if (ehFixtureHarness) params.set('peca', peca);
+      if (sessaoDaCaptura) params.set('sessao', relative(REPO, sessaoDaCaptura).replaceAll('\\', '/'));
       if (alvos.length) params.set('selecionadas', [...alvos].sort().join(','));
       if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica') params.set('vista', vista);
       if (projecao === 'ortografica') params.set('projecao', 'ortografica');
@@ -762,6 +772,7 @@ export async function olharBancada({
     if (temporizador) clearTimeout(temporizador);
     const limpezaForcada = encerramentoForcado ? await encerramentoForcado : [];
     const limpeza = [...limpezaForcada, ...await fecharRecursos({ browser, vite })];
+    if (sessaoDaCaptura) rmSync(sessaoDaCaptura, { force: true });
     if (limpeza.length) {
       resposta ??= erroEstruturado({ relato, erro: new Error('A bancada falhou ao fechar seus recursos.') });
       resposta.ok = false;

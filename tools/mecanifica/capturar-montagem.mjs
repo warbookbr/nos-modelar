@@ -1,4 +1,8 @@
-/* capturar-montagem.mjs — serviço importável de vistas de montagem em memória. */
+/* capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
+ *
+ * O quadro enquadra o conjunto inteiro, ou, com `foco`, a caixa de uma instância (ou de uma submontagem, pelo caminho dela) com uma
+ * `folga` em volta e as outras peças ao redor. O conjunto inteiro faz a peça de uma etapa ocupar um décimo do quadro: o crítico leu
+ * um degrau na junta do capô, e a deriva mais grossa do que é, olhando uma peça pequena demais. */
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -71,11 +75,26 @@ export function serializarMontagemVisual(montagem, caminho = []) {
   return dados;
 }
 
+/* O foco é o caminho semântico de uma instância (ou de uma submontagem): um id, ou a lista de ids do caminho. */
+function validarFoco(foco) {
+  if (foco === null || foco === undefined) return null;
+  const caminho = typeof foco === 'string' ? [foco] : foco;
+  if (!Array.isArray(caminho) || caminho.length === 0 || caminho.some((segmento) => typeof segmento !== 'string' || !segmento)) {
+    throw new ErroCapturaMontagem('foco-invalido', 'foco precisa ser o id de uma instância ou a lista de ids do caminho dela, não vazios.');
+  }
+  return caminho.slice();
+}
+
+/* Os caminhos das peças que a captura leva ao visor, depois do filtro de `caminho`. */
+function caminhosDasPecas(dados) {
+  return dados.instancias.flatMap((instancia) => (instancia.montagem ? caminhosDasPecas(instancia.montagem) : [instancia.caminho]));
+}
+
 function falha(erro) {
   const conhecida = erro instanceof ErroCapturaMontagem;
   return {
     ok: false,
-    codigo: conhecida && ['caminho-invalido', 'caminho-ausente', 'vista-invalida'].includes(erro.codigo) ? 2 : 1,
+    codigo: conhecida && ['caminho-invalido', 'caminho-ausente', 'vista-invalida', 'foco-invalido', 'foco-ausente'].includes(erro.codigo) ? 2 : 1,
     erro: {
       categoria: conhecida ? 'uso' : 'execucao',
       codigo: erro?.codigo ?? 'falha-captura-montagem',
@@ -91,9 +110,12 @@ async function fechar(instancia) {
 export async function capturarMontagem({
   montagem,
   caminho = [],
+  foco = null,
+  folga = 0.1,
   vistas = ['isometrica', 'direita'],
   projecao = 'perspectiva',
   largura = 1280,
+  altura: alturaPedida = null,
   espera = 100,
   timeoutMs = 45_000,
   dependencias = {},
@@ -104,6 +126,13 @@ export async function capturarMontagem({
   let expirou = false;
   try {
     const dados = serializarMontagemVisual(montagem, caminho);
+    const focoDoQuadro = validarFoco(foco);
+    if (focoDoQuadro && !caminhosDasPecas(dados).some((peca) => prefixo(focoDoQuadro, peca))) {
+      throw new ErroCapturaMontagem('foco-ausente', `o foco '${focoDoQuadro.join('/')}' não encontrou peça visível na montagem.`);
+    }
+    if (!Number.isFinite(folga) || folga < 0 || folga > 2) {
+      throw new ErroCapturaMontagem('captura-invalida', 'folga precisa ser número entre 0 e 2 (fração do tamanho da peça, de cada lado).');
+    }
     if (!Array.isArray(vistas) || vistas.length === 0 || vistas.some((vista) => !VISTAS_MONTAGEM.includes(vista))) {
       throw new ErroCapturaMontagem('vista-invalida', `vistas aceitas: ${VISTAS_MONTAGEM.join(', ')}.`);
     }
@@ -112,6 +141,9 @@ export async function capturarMontagem({
     }
     if (!Number.isSafeInteger(largura) || largura < 640 || largura > 2560) {
       throw new ErroCapturaMontagem('captura-invalida', 'largura precisa ser inteiro entre 640 e 2560.');
+    }
+    if (alturaPedida !== null && (!Number.isSafeInteger(alturaPedida) || alturaPedida < 360 || alturaPedida > 2560)) {
+      throw new ErroCapturaMontagem('captura-invalida', 'altura precisa ser inteiro entre 360 e 2560.');
     }
     if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
       throw new ErroCapturaMontagem('captura-invalida', 'timeoutMs precisa ser número positivo.');
@@ -141,7 +173,7 @@ export async function capturarMontagem({
       args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
     });
     garantirPrazo();
-    const altura = Math.round(largura * 9 / 16);
+    const altura = alturaPedida ?? Math.round(largura * 9 / 16);
     const page = await browser.newPage({ viewport: { width: largura, height: altura } });
     const errosPagina = [];
     page.on('pageerror', (erro) => errosPagina.push(erro.message));
@@ -153,8 +185,14 @@ export async function capturarMontagem({
     await page.waitForFunction(() => typeof window.__mecanificaVisorMontagem === 'function');
     garantirPrazo();
     const capturas = [];
+    /* A montagem vai ao visor como texto JSON, uma vez serializada: o Playwright serializa cada número de um objeto grande, e o
+       avião até a deriva (centenas de milhares de números) levava segundos por vista, o que estourava o prazo das seis vistas. */
+    const texto = JSON.stringify(dados);
     for (const vista of vistas) {
-      const metadados = await page.evaluate(([entrada, nome, proj]) => window.__mecanificaVisorMontagem(entrada, nome, proj), [dados, vista, projecao]);
+      const metadados = await page.evaluate(
+        ([entrada, nome, proj, quadro, margem]) => window.__mecanificaVisorMontagem(entrada, nome, proj, quadro, margem),
+        [texto, vista, projecao, focoDoQuadro, folga],
+      );
       if (espera > 0) await page.waitForTimeout(espera);
       garantirPrazo();
       const dadosPng = await page.screenshot({ type: 'png' });
@@ -177,6 +215,7 @@ export async function capturarMontagem({
         versao: 1,
         id: montagem.id,
         caminho: caminho.slice(),
+        foco: focoDoQuadro,
         capturas,
       },
     };

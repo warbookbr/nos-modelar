@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { estadoDasEtapas, fixar, reabrir } from './etapas-da-montagem.mjs';
+import { estadoDasEtapas, fixar, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
 
 const ORIGEM = fileURLToPath(new URL('../fixtures/tres-blocos-vinculados/montagens/tres-blocos.json', import.meta.url));
@@ -157,5 +157,63 @@ describe('campo analise no aceite', () => {
     expect(velho.etapas[0]).toMatchObject({ estado: 'fixa', aceite: { analise: 'ausente' } });
     const sem = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, opcoes(null));
     expect(sem.etapas[0].aceite.analise).toBe('ausente');
+  });
+});
+
+describe('as etapas construídas vistas juntas, com o quadro numa instância', () => {
+  /* O quadro do conjunto faz a peça da etapa pequena demais para o crítico. Com `foco` o quadro fecha na caixa da instância e as outras
+     peças ficam em volta; a captura é trocada por um gravador, e o que se confere é o que ela recebe e o que o arquivo leva no nome. */
+  function capturaFalsa(pedidos) {
+    return async (opcoes) => {
+      pedidos.push(opcoes);
+      return {
+        ok: true,
+        resultado: {
+          capturas: opcoes.vistas.map((nome) => ({ nome, dados: Buffer.from(`png-${nome}`), enquadramento: { valida: true, area: 0.5, largura: 0.6, altura: 0.83, cortado: false } })),
+        },
+      };
+    };
+  }
+
+  it('o foco chega à captura como caminho, com a folga e o quadro pedidos, e o arquivo leva a instância no nome', async () => {
+    const pedidos = [];
+    const saida = join(area, 'vistas');
+    const r = await olharEtapas(arquivo, {
+      vistas: ['frontal', 'direita'], saida, foco: 'meio', folga: 0.2, largura: 1200, altura: 1000, capturar: capturaFalsa(pedidos), receitas: RECEITAS,
+    });
+    expect(pedidos).toHaveLength(1);
+    expect(pedidos[0]).toMatchObject({ vistas: ['frontal', 'direita'], projecao: 'ortografica', foco: ['meio'], folga: 0.2, largura: 1200, altura: 1000 });
+    expect(r.construidas).toEqual(['base', 'meio', 'topo']);
+    expect(r.foco).toEqual(['meio']);
+    expect(r.arquivos.map((a) => a.slice(saida.length + 1))).toEqual(['etapas-tres-blocos-frontal-orto-foco-meio.png', 'etapas-tres-blocos-direita-orto-foco-meio.png']);
+    expect(r.enquadramentos).toEqual([
+      { vista: 'frontal', valida: true, area: 0.5, largura: 0.6, altura: 0.83, cortado: false },
+      { vista: 'direita', valida: true, area: 0.5, largura: 0.6, altura: 0.83, cortado: false },
+    ]);
+  });
+
+  it('sem foco o pedido é o de sempre, sem foco nem quadro, e os arquivos têm os nomes de sempre', async () => {
+    const pedidos = [];
+    const saida = join(area, 'vistas-sem-foco');
+    const r = await olharEtapas(arquivo, { vistas: ['frontal'], saida, capturar: capturaFalsa(pedidos), receitas: RECEITAS });
+    expect(Object.keys(pedidos[0]).sort()).toEqual(['montagem', 'projecao', 'vistas']);
+    expect(r.foco).toBeNull();
+    expect(r.arquivos.map((a) => a.slice(saida.length + 1))).toEqual(['etapas-tres-blocos-frontal-orto.png']);
+  });
+
+  it('o foco numa etapa que ainda não tem geometria recusa com o código que diz isso, sem capturar', async () => {
+    let capturou = false;
+    const semGeometria = { ...RECEITAS, 'bloco-com-furo': { ...RECEITAS['bloco-com-furo'], PASSOS: [] } };
+    let erro;
+    try {
+      await olharEtapas(arquivo, { foco: 'topo', saida: join(area, 'v3'), capturar: async () => { capturou = true; }, receitas: semGeometria });
+    } catch (capturado) { erro = capturado; }
+    expect(erro?.codigo).toBe('foco-fora-das-etapas');
+    expect(erro?.message).toContain("a instância 'topo' não está entre as etapas já construídas (base, meio)");
+    expect(capturou).toBe(false);
+  });
+
+  it('a captura que falha vira erro com a mensagem dela', async () => {
+    await expect(olharEtapas(arquivo, { saida: join(area, 'v4'), capturar: async () => ({ ok: false, erro: { mensagem: 'o visor caiu' } }), receitas: RECEITAS })).rejects.toThrow('o visor caiu');
   });
 });

@@ -15,11 +15,14 @@
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json>
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --fixar <instância> --por <quem> [--observacao <texto>] [--aceite-humano]
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"
- *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --olhar [--vistas frontal,direita,isometrica]
+ *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --olhar [--vistas frontal,direita,isometrica] [--foco <instância>]
  *
  * `--olhar` desenha juntas, em vista ortográfica, as etapas que já têm
  * geometria. A parte de cada etapa era mostrada sozinha, e a pessoa não
- * conseguia julgar o anel da cintura sem vê-lo sobre a base.
+ * conseguia julgar o anel da cintura sem vê-lo sobre a base. `--foco` enquadra
+ * a caixa de uma instância, com uma folga, e deixa as outras peças em volta:
+ * o quadro do conjunto inteiro faz a peça da etapa pequena demais para o
+ * crítico, que leu um degrau na junta do capô e a deriva mais grossa do que é.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -163,22 +166,40 @@ export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
 
 export const SAIDA_DAS_VISTAS = join(REPO, 'tools/bancadas/out');
 
-export async function olharEtapas(arquivoMontagem, { vistas = ['frontal', 'direita', 'isometrica'], saida = SAIDA_DAS_VISTAS } = {}) {
+/* `foco` é a instância (id, ou o caminho dela) que o quadro enquadra, entre as etapas já construídas; sem ele o quadro é o do conjunto.
+   Com foco, o nome do arquivo leva `-foco-<instância>` e o resultado traz o enquadramento de cada vista, a fração do quadro que a
+   caixa da instância ocupa em largura e altura. `capturar` e `receitas` são injetáveis para o teste. */
+export async function olharEtapas(arquivoMontagem, {
+  vistas = ['frontal', 'direita', 'isometrica'], saida = SAIDA_DAS_VISTAS, foco = null, folga, largura, altura, capturar = capturarMontagem, receitas: injetadas = null, timeoutMs,
+} = {}) {
   const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
   const montagem = lerMontagemPersistida(dado);
-  const receitas = await receitasDaMontagem(montagem);
+  const receitas = injetadas ?? await receitasDaMontagem(montagem);
   const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, receitas);
   if (!construidas.length) throw new Error('nenhuma etapa tem geometria ainda; não há o que olhar.');
+  const caminhoDoFoco = foco === null ? null : (typeof foco === 'string' ? [foco] : foco);
+  if (caminhoDoFoco && !construidas.includes(caminhoDoFoco[0])) {
+    const erro = new Error(`a instância '${caminhoDoFoco.join('/')}' não está entre as etapas já construídas (${construidas.join(', ')}); não há o que enquadrar.`);
+    erro.codigo = 'foco-fora-das-etapas';
+    throw erro;
+  }
   const resolvida = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
-  const captura = await capturarMontagem({ montagem: resolvida, vistas, projecao: 'ortografica' });
+  const captura = await capturar({
+    montagem: resolvida, vistas, projecao: 'ortografica',
+    ...(caminhoDoFoco ? { foco: caminhoDoFoco } : {}),
+    ...(folga === undefined ? {} : { folga }), ...(largura === undefined ? {} : { largura }), ...(altura === undefined ? {} : { altura }),
+    ...(timeoutMs === undefined ? {} : { timeoutMs }),
+  });
   if (!captura.ok) throw new Error(captura.erro.mensagem);
   mkdirSync(saida, { recursive: true });
+  const sufixo = caminhoDoFoco ? `-foco-${caminhoDoFoco.join('-')}` : '';
   const arquivos = captura.resultado.capturas.map((vista) => {
-    const arquivo = join(saida, `etapas-${montagem.id}-${vista.nome}-orto.png`);
+    const arquivo = join(saida, `etapas-${montagem.id}-${vista.nome}-orto${sufixo}.png`);
     writeFileSync(arquivo, vista.dados);
     return arquivo;
   });
-  return { construidas, arquivos };
+  const enquadramentos = captura.resultado.capturas.map((vista) => ({ vista: vista.nome, ...vista.enquadramento }));
+  return { construidas, arquivos, enquadramentos, foco: caminhoDoFoco };
 }
 
 function gravar(arquivoMontagem, registro) {
@@ -196,8 +217,8 @@ async function comoCLI(argv) {
   const caminho = resolve(arquivo);
   const valor = (nome) => { const i = argv.indexOf(nome); return i >= 0 ? argv[i + 1] : undefined; };
   if (argv.includes('--olhar')) {
-    const { construidas, arquivos } = await olharEtapas(caminho, { vistas: valor('--vistas')?.split(',').filter(Boolean) });
-    return { codigo: 0, texto: `etapas desenhadas juntas: ${construidas.join(', ')}\n${arquivos.map((a) => `  ${a}`).join('\n')}` };
+    const { construidas, arquivos, foco } = await olharEtapas(caminho, { vistas: valor('--vistas')?.split(',').filter(Boolean), foco: valor('--foco') ?? null });
+    return { codigo: 0, texto: `etapas desenhadas juntas: ${construidas.join(', ')}${foco ? `\nquadro na instância '${foco.join('/')}'` : ''}\n${arquivos.map((a) => `  ${a}`).join('\n')}` };
   }
   const reaberta = valor('--reabrir');
   if (reaberta) {

@@ -35,8 +35,8 @@ Ao fim de cada etapa, pare e mostre à pessoa as vistas da parte montada sobre
 as já fixas, as medidas da junta e o veredito do crítico. A parte sozinha não
 basta: a pessoa não julga a altura de um anel sem vê-lo sobre a base. As vistas
 montadas, em ortográfica, saem de
-`npm run etapas -- <montagem.json> --olhar`, e entram também no pacote do
-crítico, junto das de `vistas:critica`. A etapa só fica fixa com o aceite dela, e só
+`npm run etapas -- <montagem.json> --olhar` (com `--foco <instância>` o quadro fecha na caixa dela), e entram também
+no pacote do crítico, que `vistas:critica` já monta com o quadro na peça. A etapa só fica fixa com o aceite dela, e só
 depois disso a próxima começa. Etapa fixa que uma mudança anterior quebrou
 volta na frente de todas. O estado e a próxima etapa saem de:
 
@@ -88,22 +88,25 @@ com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
 uma, e `docs/mecanifica/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
 crítico sem contar como a peça foi feita.
 
-**revisar** — a ferramenta mediu a receita atual e ela passou. Despache o `critico-visual` com a referência, o pacote de
-`npm run vistas:critica -- <peça>`, que inclui vistas em arame, e os critérios de reprovação, dizendo a forma
-e a técnica que o plano promete para cada parte. Se o `PLANO` declara `familia` ou `familiaProcedural`,
-rode `node tools/mecanifica/rodada-de-modelagem.mjs <peça> --perguntas` e ponha o bloco
-que ele imprime no brief, depois dos critérios de reprovação; sem os campos, ou sem
-parte que satisfaça a condição, o comando diz que não há pergunta específica. Nunca mande a receita, os
-passos, o histórico nem o que mudou: contar como foi feito faz revisão virar
-concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem
-inventar nota. Quando a peça refina um esboço aprovado, o alvo é a composta do
-esboço e o crítico mede contra ela, então pergunte também, entre as perguntas de
-forma, onde o alvo difere da referência real: o para-brisa saliente do avião veio
-do esboço, passou por dois críticos e só a pessoa o viu. A diferença do esboço vai
-à pessoa, que decide se a receita a corrige. Diga no despacho que `onde`, `evidencia` e `observacao` do
-veredito vão até 240 caracteres cada, porque o registro recusa o mais longo e o
-detalhe vai no texto; a regra fica no despacho, e não no agente, que mudado
-pede a calibração de novo.
+**revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que grava as
+imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/`, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
+da receita: o texto do despacho do `critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério
+do `PLANO`; mande o texto do `pedido.md` como está. Ele traz, nesta ordem, o objeto, o alvo, as referências, o modelo (as vistas
+da peça sozinha e a malha em arame), as vistas montadas, a sobreposição dos cortes, cada parte com a forma e a técnica que o plano
+promete, os critérios de reprovação, as perguntas e o limite de 240 caracteres de `onde`, `evidencia` e `observacao` do veredito
+(o registro recusa o mais longo, e o detalhe vai no texto; a regra fica no despacho, e não no agente, que mudado pede a calibração
+de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As perguntas são as da família, quando o `PLANO`
+declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
+o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
+
+Quando a receita declara `REFINA.esboco`, o alvo é a composta da unidade do esboço, gerada pela ferramenta do esboço no momento,
+sobre uma cópia do esboço declarado, e nunca a imagem guardada, que pode ser de uma versão anterior do esboço; a pasta traz também a
+sobreposição dos cortes do modelo com os do sólido do esboço, e o relatório do comando diz o desvio máximo de cada corte. A
+diferença do esboço vai à pessoa, que decide se a receita a corrige. Quando a peça é instância de `<objeto>/montagem.json`, as
+vistas montadas saem com o quadro na caixa da peça e as etapas já construídas em volta: duas vezes o crítico errou por ver a peça
+pequena demais no conjunto, e o relatório diz quanto do quadro ela ocupa. Se a peça ainda não está entre as etapas construídas, o
+relatório avisa que não há vista montada. Nunca mande a receita, os passos, o histórico nem o que mudou: contar como foi
+feito faz revisão virar concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem inventar nota.
 
 A receita que mudou depois da última rodada volta ao crítico, salvo quando a
 malha que ela produz e o `PLANO` são os da cópia que a rodada julgou, como ao

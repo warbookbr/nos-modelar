@@ -197,3 +197,42 @@ describe('perfil não vaza entre ativações no mesmo processo', () => {
     expect(semPerfil.payload.alvo.perfil).not.toBe('marcenaria');
   });
 });
+
+describe('a sessão própria de uma captura', () => {
+  /* A bancada lê a peça de `sessao-ativa.json`, um arquivo só por repositório. Duas capturas de peças diferentes ao mesmo tempo se
+     pisavam, e a imagem de uma saía com a peça da outra. Com `arquivoDaSessao` a ativação grava só no arquivo pedido. */
+  const OUTRA = BOA.replace('Fixture Boa', 'Fixture Do Trabalho');
+
+  it('grava a peça só no arquivo pedido, e a sessão ativa de quem trabalha fica como estava', async () => {
+    await ativarReceitaBancada({ alvo: receitaTemporaria('trabalho', OUTRA), raizSessao: AREA_SESSAO });
+    const antesPublica = readFileSync(SESSAO, 'utf8');
+    const antesRaiz = readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8');
+
+    const propria = join(AREA_SESSAO, 'sessoes', 'captura-1.json');
+    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('captura', BOA), raizSessao: AREA_SESSAO, arquivoDaSessao: propria });
+
+    expect(r.arquivoDaSessao).toBe(propria);
+    expect(JSON.parse(readFileSync(propria, 'utf8')).alvo.nome).toBe('Fixture Boa');
+    expect(readFileSync(SESSAO, 'utf8')).toBe(antesPublica);
+    expect(readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8')).toBe(antesRaiz);
+    expect(JSON.parse(antesPublica).alvo.nome).toBe('Fixture Do Trabalho');
+  });
+
+  it('duas sessões próprias de peças diferentes convivem, cada uma com a peça dela', async () => {
+    const a = join(AREA_SESSAO, 'sessoes', 'a.json');
+    const b = join(AREA_SESSAO, 'sessoes', 'b.json');
+    await Promise.all([
+      ativarReceitaBancada({ alvo: receitaTemporaria('par-a', BOA), raizSessao: AREA_SESSAO, arquivoDaSessao: a }),
+      ativarReceitaBancada({ alvo: receitaTemporaria('par-b', OUTRA), raizSessao: AREA_SESSAO, arquivoDaSessao: b }),
+    ]);
+    expect(JSON.parse(readFileSync(a, 'utf8')).alvo.nome).toBe('Fixture Boa');
+    expect(JSON.parse(readFileSync(b, 'utf8')).alvo.nome).toBe('Fixture Do Trabalho');
+  });
+
+  it('sem o arquivo próprio nada muda: grava a sessão ativa, a pública e a da raiz', async () => {
+    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('padrao', BOA), raizSessao: AREA_SESSAO });
+    expect(r.arquivoDaSessao).toBeNull();
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
+    expect(JSON.parse(readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8')).alvo.nome).toBe('Fixture Boa');
+  });
+});

@@ -7,7 +7,7 @@ import {
   validarPacoteSessao,
 } from './estado-sessao.js';
 import { processarReceitaSessao, processarPayloadSessao } from './carregar-sessao.js';
-import { criarSincronizadorSessao } from './sincronizador.js';
+import { ARQUIVO_DA_SESSAO_ATIVA, arquivoDaSessaoNaUrl, criarSincronizadorSessao } from './sincronizador.js';
 
 describe('Sessão Ativa (Humano + IA)', () => {
   const receitaTeste = {
@@ -123,5 +123,57 @@ describe('Sessão Ativa (Humano + IA)', () => {
     expect(sinc.obterEstado().parametros.raio).toBe(12.5);
 
     sinc.destruir();
+  });
+});
+
+describe('o arquivo de sessão que a URL pede', () => {
+  const receita = {
+    meta: { nome: 'Cubo de Ensaio' },
+    PASSOS: [
+      ['cubo', { origemId: 1, larg: 2, alt: 2, prof: 2 }],
+      ['parte', { nome: 'corpo', sel: { origem: { op: 'cubo', id: 1 } } }],
+    ],
+  };
+
+  it('sem pedido vale a sessão ativa de sempre', () => {
+    expect(arquivoDaSessaoNaUrl(null)).toBeNull();
+    expect(arquivoDaSessaoNaUrl(undefined)).toBeNull();
+    expect(ARQUIVO_DA_SESSAO_ATIVA).toBe('sessao-ativa.json');
+  });
+
+  it('aceita um .json relativo à aplicação', () => {
+    expect(arquivoDaSessaoNaUrl('tools/bancadas/out/sessoes/aviao-motor-123-abc.json')).toBe('tools/bancadas/out/sessoes/aviao-motor-123-abc.json');
+    expect(arquivoDaSessaoNaUrl('sessao-propria.json')).toBe('sessao-propria.json');
+  });
+
+  it.each(['', '../sessao-ativa.json', 'a/../b.json', '/etc/x.json', 'https://x.test/y.json', '//x.test/y.json', 'a//b.json', 'sessao.txt', 'a b.json', '.json'])(
+    'recusa o pedido %j em vez de voltar em silêncio ao arquivo compartilhado, que mostraria a peça de outra captura',
+    (pedido) => {
+      expect(() => arquivoDaSessaoNaUrl(pedido)).toThrow(/parâmetro 'sessao'/);
+    },
+  );
+
+  it('o polling lê o arquivo pedido, e o da sessão ativa quando nenhum é pedido', async () => {
+    const pedidos = [];
+    const original = globalThis.fetch;
+    globalThis.fetch = async (url) => {
+      pedidos.push(String(url));
+      return { ok: true, json: async () => ({ receita, alvo: { nome: 'x' } }) };
+    };
+    try {
+      const propria = criarSincronizadorSessao({ arquivo: 'tools/bancadas/out/sessoes/uma.json', intervaloPolling: 1e9 });
+      propria.iniciarPolling();
+      const comum = criarSincronizadorSessao({ intervaloPolling: 1e9 });
+      comum.iniciarPolling();
+      await new Promise((resolver) => { setTimeout(resolver, 20); });
+      propria.destruir();
+      comum.destruir();
+    } finally {
+      globalThis.fetch = original;
+    }
+    expect(pedidos).toHaveLength(2);
+    expect(pedidos[0]).toMatch(/tools\/bancadas\/out\/sessoes\/uma\.json$/);
+    expect(pedidos[0]).not.toContain('sessao-ativa.json');
+    expect(pedidos[1]).toMatch(/sessao-ativa\.json$/);
   });
 });

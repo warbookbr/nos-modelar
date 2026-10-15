@@ -1,6 +1,11 @@
 /* olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless. */
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { criarDicas, olharBancada } from './olhar-bancada.mjs';
+
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
 describe('olhar-bancada — validação rápida e mitigação de timeout', () => {
   it('rejeita imediatamente peça inexistente antes de iniciar servidor ou navegador', async () => {
@@ -126,5 +131,91 @@ describe('dica aparece uma vez, e só quando se aplica', () => {
     dicas.anotar('a', 'texto', 'frontal');
     dicas.listar()[0].vistas.push('invadida');
     expect(dicas.listar()[0].vistas).toEqual(['frontal']);
+  });
+});
+
+describe('cada captura lê a sessão que é dela', () => {
+  /* O defeito: `sessao-ativa.json` é um arquivo só por repositório, e duas capturas de peças diferentes ao mesmo tempo se pisavam. A
+     segunda a ativar trocava o arquivo, e a página da primeira o lia ao subir e mostrava a peça da outra (medido: a imagem de
+     `aviao-motor` saiu com a deriva). Aqui não há navegador: a ativação e a página são trocadas por gravadores, e o que se confere é o
+     que decide qual peça a página vê, o arquivo que a ativação recebe e o endereço que a página abre. */
+  const servidor = { httpServer: { address: () => ({ port: 43123 }) }, async listen() {}, async close() {} };
+
+  function capturaFalsa(rotulo, registro) {
+    return {
+      createServer: async () => servidor,
+      ativarReceitaBancada: async ({ alvo, arquivoDaSessao }) => {
+        registro.ativacoes.push({ rotulo, alvo, arquivoDaSessao });
+        mkdirSync(dirname(arquivoDaSessao), { recursive: true });
+        writeFileSync(arquivoDaSessao, JSON.stringify({ alvo }), 'utf8');
+      },
+      carregarPlaywright: async () => ({
+        chromium: {
+          launch: async () => ({
+            async newPage() {
+              return {
+                on() {},
+                async goto(url) {
+                  registro.paginas.push({ rotulo, url, arquivoExistiaAoAbrir: existsSync(registro.ativacoes.find((a) => a.rotulo === rotulo).arquivoDaSessao) });
+                  throw new Error('parar depois de abrir a página');
+                },
+              };
+            },
+            async close() {},
+          }),
+        },
+      }),
+    };
+  }
+
+  async function duasCapturasAoMesmoTempo() {
+    const registro = { ativacoes: [], paginas: [] };
+    const [a, b] = await Promise.all([
+      olharBancada({ peca: 'peca-de-prova', vistas: ['isometrica'], capturarEmMemoria: true, dependencias: capturaFalsa('a', registro) }),
+      olharBancada({ peca: 'tools/fixtures/forma-do-esboco/ok/receita.js', vistas: ['isometrica'], capturarEmMemoria: true, dependencias: capturaFalsa('b', registro) }),
+    ]);
+    return { registro, resultados: [a, b] };
+  }
+
+  it('duas capturas de peças diferentes ao mesmo tempo gravam cada uma o arquivo de sessão dela, diferente e fora do compartilhado', async () => {
+    const { registro } = await duasCapturasAoMesmoTempo();
+    expect(registro.ativacoes).toHaveLength(2);
+    const [a, b] = ['a', 'b'].map((r) => registro.ativacoes.find((x) => x.rotulo === r));
+    expect(a.alvo.replaceAll('\\', '/')).toContain('peca-de-prova/receita.js');
+    expect(b.alvo.replaceAll('\\', '/')).toContain('forma-do-esboco/ok/receita.js');
+    expect(a.arquivoDaSessao).not.toBe(b.arquivoDaSessao);
+    for (const { arquivoDaSessao } of [a, b]) {
+      expect(relative(join(REPO, 'tools/bancadas/out/sessoes'), arquivoDaSessao).startsWith('..')).toBe(false);
+      expect(arquivoDaSessao.endsWith('.json')).toBe(true);
+      expect([join(REPO, 'public/sessao-ativa.json'), join(REPO, 'sessao-ativa.json')]).not.toContain(arquivoDaSessao);
+    }
+  });
+
+  it('cada página abre apontada para a sessão da peça dela, pela URL, e o arquivo já existe quando ela abre', async () => {
+    const { registro } = await duasCapturasAoMesmoTempo();
+    expect(registro.paginas).toHaveLength(2);
+    for (const rotulo of ['a', 'b']) {
+      const { arquivoDaSessao } = registro.ativacoes.find((x) => x.rotulo === rotulo);
+      const pagina = registro.paginas.find((x) => x.rotulo === rotulo);
+      const url = new URL(pagina.url);
+      expect(url.pathname).toBe('/nos-mecanifica/tools/bancadas/harness.html');
+      expect(url.searchParams.get('sessao')).toBe(relative(REPO, arquivoDaSessao).replaceAll('\\', '/'));
+      expect(pagina.arquivoExistiaAoAbrir).toBe(true);
+    }
+    const [a, b] = registro.paginas.map((p) => new URL(p.url).searchParams.get('sessao'));
+    expect(a).not.toBe(b);
+  });
+
+  it('o arquivo de sessão da captura é apagado ao fim, também quando a captura falha', async () => {
+    const { registro, resultados } = await duasCapturasAoMesmoTempo();
+    expect(resultados.every((r) => r.ok === false)).toBe(true);
+    for (const { arquivoDaSessao } of registro.ativacoes) expect(existsSync(arquivoDaSessao)).toBe(false);
+  });
+
+  it('a fixture do harness não tem sessão, e a sessão ativa de quem trabalha não é tocada pela captura', async () => {
+    const registro = { ativacoes: [], paginas: [] };
+    await olharBancada({ peca: 'fixture-visual', vistas: ['isometrica'], capturarEmMemoria: true, dependencias: capturaFalsa('f', registro) });
+    expect(registro.ativacoes).toEqual([]);
+    expect(new URL(registro.paginas[0]?.url ?? 'http://x/?').searchParams.has('sessao')).toBe(false);
   });
 });

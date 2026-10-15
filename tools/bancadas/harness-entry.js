@@ -15,7 +15,8 @@ const catalogo = [
   { id: 'fixture-ombro-uniao', carregar: async () => ombroUniao },
 ];
 
-iniciar({ catalogo }).catch((erro) => {
+/* `sessaoPorUrl`: a captura aponta a página para a sessão própria dela (`?sessao=`), e não para o `sessao-ativa.json` compartilhado */
+iniciar({ catalogo, sessaoPorUrl: true }).catch((erro) => {
   window.__mecanificaBancada = { ready: false, erro: String(erro?.message || erro) };
   const elemento = document.getElementById('erro');
   elemento.hidden = false;

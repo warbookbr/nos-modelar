@@ -103,4 +103,76 @@ describe('captura importável de montagem', () => {
     expect(resultado).toMatchObject({ ok: false, erro: { codigo: 'caminho-ausente' } });
     expect(iniciou).toBe(false);
   });
+
+  /* O foco enquadra a caixa de uma instância: o conjunto inteiro fazia a peça de uma etapa ocupar um décimo do quadro, e o crítico leu
+     um degrau na junta do capô e a deriva mais grossa do que é. O cálculo do quadro mora no visor, que roda no navegador; aqui se
+     prova o que a captura entrega a ele e o que ela recusa antes de subir infraestrutura. */
+  function infraestruturaFalsa(argumentosDoVisor: unknown[][], viewports: unknown[] = []) {
+    const page = {
+      on() {}, async goto() {}, async waitForFunction() {}, async waitForTimeout() {},
+      async evaluate(_fn: unknown, argumentos: unknown[]) {
+        argumentosDoVisor.push(argumentos);
+        return { id: 'x', vista: argumentos[1], instancias: [], enquadramento: { valida: true, area: 0.5, largura: 0.8, altura: 0.8, cortado: false } };
+      },
+      async screenshot() { return Buffer.from('89504e470d0a1a0a', 'hex'); },
+    };
+    return {
+      criarServidor: async () => ({ httpServer: { address: () => ({ port: 4173 }) }, async listen() {}, async close() {} }),
+      carregarPlaywright: async () => ({
+        chromium: { launch: async () => ({ async newPage(opcoes: unknown) { viewports.push(opcoes); return page; }, async close() {} }) },
+      }),
+    };
+  }
+
+  it('passa ao visor o caminho do foco e a folga, e devolve o foco no resultado; o id sozinho vale como caminho de um segmento', async () => {
+    const chamadas: unknown[][] = [];
+    const resultado = await capturarMontagem({
+      montagem: await resolvida(), foco: 'movel', folga: 0.25, vistas: ['frontal', 'direita'], projecao: 'ortografica', espera: 0, dependencias: infraestruturaFalsa(chamadas),
+    });
+    expect(resultado.ok).toBe(true);
+    expect(resultado.resultado?.foco).toEqual(['movel']);
+    expect(chamadas.map((c) => c.slice(1))).toEqual([['frontal', 'ortografica', ['movel'], 0.25], ['direita', 'ortografica', ['movel'], 0.25]]);
+  });
+
+  it('sem foco o visor recebe foco nulo e a folga de sempre, e o conjunto continua sendo o quadro', async () => {
+    const chamadas: unknown[][] = [];
+    const resultado = await capturarMontagem({ montagem: await resolvida(), vistas: ['frontal'], espera: 0, dependencias: infraestruturaFalsa(chamadas) });
+    expect(resultado.resultado?.foco).toBeNull();
+    expect(chamadas[0].slice(1)).toEqual(['frontal', 'perspectiva', null, 0.1]);
+  });
+
+  it('o foco que nenhuma peça visível tem recusa antes de subir infraestrutura, com o código de uso', async () => {
+    let iniciou = false;
+    const dependencias = { criarServidor: async () => { iniciou = true; throw new Error('não deveria iniciar'); } };
+    const ausente = await capturarMontagem({ montagem: await resolvida(), foco: ['nao-existe'], dependencias });
+    expect(ausente).toMatchObject({ ok: false, codigo: 2, erro: { codigo: 'foco-ausente' } });
+    /* o foco precisa estar entre as peças que o filtro de `caminho` deixou */
+    const filtrado = await capturarMontagem({ montagem: await resolvida(), caminho: ['movel'], foco: 'referencia', dependencias });
+    expect(filtrado).toMatchObject({ ok: false, codigo: 2, erro: { codigo: 'foco-ausente' } });
+    expect(iniciou).toBe(false);
+  });
+
+  it('o foco malformado e a folga fora da faixa são recusados', async () => {
+    const dependencias = { criarServidor: async () => { throw new Error('não deveria iniciar'); } };
+    for (const foco of [[], [''], [1], 3]) {
+      expect(await capturarMontagem({ montagem: await resolvida(), foco: foco as never, dependencias })).toMatchObject({ ok: false, codigo: 2, erro: { codigo: 'foco-invalido' } });
+    }
+    for (const folga of [-0.1, 2.5, Number.NaN]) {
+      expect(await capturarMontagem({ montagem: await resolvida(), foco: 'movel', folga, dependencias })).toMatchObject({ ok: false, erro: { codigo: 'captura-invalida' } });
+    }
+  });
+
+  it('a altura pedida é a do quadro, e sem ela vale o 16 por 9 de sempre; altura fora da faixa é recusada', async () => {
+    const viewports: unknown[] = [];
+    const comAltura = await capturarMontagem({
+      montagem: await resolvida(), largura: 1200, altura: 1000, vistas: ['frontal'], espera: 0, dependencias: infraestruturaFalsa([], viewports),
+    });
+    expect(comAltura.resultado?.capturas[0]).toMatchObject({ largura: 1200, altura: 1000 });
+    const semAltura = await capturarMontagem({ montagem: await resolvida(), largura: 1280, vistas: ['frontal'], espera: 0, dependencias: infraestruturaFalsa([], viewports) });
+    expect(semAltura.resultado?.capturas[0]).toMatchObject({ largura: 1280, altura: 720 });
+    expect(viewports).toEqual([{ viewport: { width: 1200, height: 1000 } }, { viewport: { width: 1280, height: 720 } }]);
+    for (const altura of [100, 4000, 700.5]) {
+      expect(await capturarMontagem({ montagem: await resolvida(), altura, dependencias: { criarServidor: async () => { throw new Error('não deveria iniciar'); } } })).toMatchObject({ ok: false, erro: { codigo: 'captura-invalida' } });
+    }
+  });
 });

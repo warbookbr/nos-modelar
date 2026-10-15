@@ -1,5 +1,8 @@
 <!doctype html>
 <!-- visor-montagem.html — superfície privada para evidência visual de montagem. -->
 <meta charset="utf-8">
+<!-- sem a margem de 8 px do corpo e com o canvas em bloco, a imagem sai deslocada e perde 8 px embaixo e à direita, e o quadro de uma peça
+     enquadrada de perto perderia a borda dela -->
+<style>body { margin: 0; } canvas { display: block; }</style>
 <canvas id="cena"></canvas>
 <script type="module" src="./visor-montagem.js"></script>
