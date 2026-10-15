@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1281 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1282 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1010,6 +1010,10 @@
 ## procedural/pecas/aviao/partes/asas/
 
 - `receita.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada, os flaps, os ailerons, os eixos deles e os suportes, na pose de pouso, …
+
+## procedural/pecas/aviao/partes/asas/rodadas/
+
+- `receita-01.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada, os flaps, os ailerons, os eixos deles e os suportes, na pose de pouso, …
 
 ## procedural/pecas/aviao/partes/empenagem-horizontal/
 

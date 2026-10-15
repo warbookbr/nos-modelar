@@ -232,3 +232,20 @@ fora do vão, sem a fresta ou atravessando; eixo, suporte ou dobradiça solta; v
 recorte; dorsal solta ou com degrau; e o `REFINA` acusando parte fora do envelope ou abaixo
 do mínimo.
 
+As asas fecharam na primeira rodada com nota 9 sem defeito e a pessoa as aceitou em
+2026-10-15. O crítico achou o esboço diferente da referência real em quatro pontos, e a
+pessoa, vendo a [comparação](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-asas.png),
+pediu os quatro na rodada de ajustes antes da aprovação do avião inteiro.
+
+## A rodada de ajustes
+
+Antes de a pessoa aprovar o avião montado, uma rodada corrige o que ela pediu depois do
+aceite de cada etapa. Cada item reabre a etapa da peça que muda, e a parte que se afasta
+do esboço de propósito recebe o mínimo próprio no `REFINA.esboco`, com o motivo.
+
+- Asas: a ponta levantada mais alta, uns 8 a 10% da meia-asa, como na referência, e não
+  os 6% do esboço.
+- Asas: a ponta com os cantos arredondados vista de cima.
+- Asas e fuselagem: a carenagem da raiz, a curva do bordo de fuga até a fuselagem.
+- Asas: o casulo escuro sob a asa esquerda e os pequenos ovais perto das pontas.
+
