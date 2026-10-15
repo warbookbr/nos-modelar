@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1304 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1305 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -987,6 +987,7 @@
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `aviso-de-degrau.test.ts` — aviso-de-degrau.test.ts — o arredondamento que termina em degrau não passa mais calado.
+- `booleana-casca-raspada.test.ts` — booleana-casca-raspada.test.ts — o canto solto que a booleana deixava quando o corte cruza a casca de um loft (achado na rodada das asas do avião, em 2026-10…
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.

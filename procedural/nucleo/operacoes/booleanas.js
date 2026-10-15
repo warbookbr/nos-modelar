@@ -86,6 +86,24 @@ export function criarOperacoesBooleanas(servicos) {
   const ponto = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   const tamanho = (a) => Math.hypot(a[0], a[1], a[2]);
 
+  /* (A + mu·I) λ = y por eliminação de Gauss com pivô parcial, sem alterar A nem y. */
+  const resolverAmortecido = (A, y, mu) => {
+    const k = y.length;
+    const M = A.map((linha, r) => linha.map((v, c) => (r === c ? v + mu : v)));
+    const b = y.slice();
+    for (let c = 0; c < k; c++) {
+      let piv = c;
+      for (let r = c + 1; r < k; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+      [M[c], M[piv]] = [M[piv], M[c]]; [b[c], b[piv]] = [b[piv], b[c]];
+      for (let r = c + 1; r < k; r++) { const f = M[r][c] / M[c][c]; for (let q = c; q < k; q++) M[r][q] -= f * M[c][q]; b[r] -= f * b[c]; }
+    }
+    const lambda = new Array(k).fill(0);
+    for (let c = k - 1; c >= 0; c--) { let acc = b[c]; for (let q = c + 1; q < k; q++) acc -= M[c][q] * lambda[q]; lambda[c] = acc / M[c][c]; }
+    return lambda;
+  };
+  /* |Nᵀλ|, o quanto o vértice anda: λᵀ(N Nᵀ)λ = λᵀAλ. */
+  const passoDe = (A, lambda) => Math.sqrt(Math.max(0, lambda.reduce((acc, li, r) => acc + li * A[r].reduce((s2, a, c) => s2 + a * lambda[c], 0), 0)));
+
   /* qual pedaço fica com o id da face cortada: o de maior área; áreas a menos
      de 1e-9 uma da outra empatam (dois pedaços simétricos), e o empate vai
      para o pedaço com o menor id de canto, para que a peça transladada, com
@@ -429,7 +447,28 @@ export function criarOperacoesBooleanas(servicos) {
        lado de 0.1), e a face cortada deixaria de ser plana. Cada vértice novo
        é recalculado pelos planos das faces de entrada que se encontram nele:
        com três planos independentes é a interseção exata; com dois (o vértice
-       numa aresta de entrada), a menor correção que o põe nos dois. */
+       numa aresta de entrada), a menor correção que o põe nos dois.
+
+       A CORREÇÃO TEM TETO. A posição da Manifold já está na superfície das
+       entradas, com erro de Float32 e de grade (até 2^-20 da meia-caixa); a
+       correção só devolve a planaridade que esse erro tirou. Uma face de
+       entrada empenada (a casca de um loft, com faces de 840 mm e 0,26 mm de
+       empeno) não é um plano, e o plano que a representa erra a superfície
+       real por esse empeno. Dois planos de faces vizinhas a uma fração de grau
+       um do outro se cortam numa reta que desliza ao longo da casca, de
+       dezenas de milímetros a metros, quando um deles muda de 0,26 mm: a
+       interseção exata dos três planos dava o vértice a centenas de milímetros
+       do corte, fora da caixa de quem o produziu, e a face cortada ganhava um
+       canto solto. O vértice novo não anda da posição da Manifold mais que
+       `tetoDaCorrecao`, 2^-15 da meia-caixa: o mesmo valor da tolerância da solda
+       (abaixo), que também é o menor detalhe novo que o núcleo guarda, mas as duas
+       constantes são independentes e cada uma se ajusta sozinha. Dentro do
+       teto o resultado é o de antes, bit a bit. Acima dele, a correção é a de
+       mínimos quadrados amortecidos (Levenberg e Marquardt) que cabe no teto: o
+       vértice se ajusta aos planos bem condicionados e fica onde a Manifold o
+       pôs na direção em que os planos quase paralelos não o determinam. O que
+       sobra de planaridade é o empeno da entrada, que nenhum ponto corrige. */
+    const tetoDaCorrecao = Math.max(meiaCaixa, 1e-9) * 2 ** -15;
     const planosDoVertice = new Map();
     for (let t = 0; t < nTri; t++) for (const v of triDe(t)) if (v < 0) {
       if (!planosDoVertice.has(v)) planosDoVertice.set(v, new Set());
@@ -446,18 +485,20 @@ export function criarOperacoesBooleanas(servicos) {
         if (l > 1e-6) base.push({ o: r.map((x) => x / l), n, d: planos[e].d });
         if (base.length === 3) break;
       }
-      // x = p0 + Nᵀλ, com (N Nᵀ) λ = d − N p0
-      const m = base.length;
+      // x = p0 + Nᵀλ, com (N Nᵀ + mu·I) λ = d − N p0, e mu = 0 salvo quando o passo passaria do teto
       const A = base.map((q) => base.map((r) => ponto(q.n, r.n)));
       const y = base.map((q) => q.d - ponto(q.n, p0));
-      for (let c = 0; c < m; c++) {
-        let piv = c;
-        for (let r = c + 1; r < m; r++) if (Math.abs(A[r][c]) > Math.abs(A[piv][c])) piv = r;
-        [A[c], A[piv]] = [A[piv], A[c]]; [y[c], y[piv]] = [y[piv], y[c]];
-        for (let r = c + 1; r < m; r++) { const f = A[r][c] / A[c][c]; for (let q = c; q < m; q++) A[r][q] -= f * A[c][q]; y[r] -= f * y[c]; }
+      let lambda = resolverAmortecido(A, y, 0);
+      if (!(passoDe(A, lambda) <= tetoDaCorrecao)) {
+        /* o passo cai com mu (cada direção própria de A anda a/(a+mu)): acha-se o menor mu que cabe no teto */
+        let baixo = 0, alto = 1;
+        while (passoDe(A, resolverAmortecido(A, y, alto)) > tetoDaCorrecao && alto < 1e12) alto *= 10;
+        for (let rodada = 0; rodada < 60 && alto - baixo > alto * 1e-9; rodada++) {
+          const meio = (baixo + alto) / 2;
+          if (passoDe(A, resolverAmortecido(A, y, meio)) > tetoDaCorrecao) baixo = meio; else alto = meio;
+        }
+        lambda = resolverAmortecido(A, y, alto);
       }
-      const lambda = new Array(m).fill(0);
-      for (let c = m - 1; c >= 0; c--) { let s = y[c]; for (let q = c + 1; q < m; q++) s -= A[c][q] * lambda[q]; lambda[c] = s / A[c][c]; }
       const x = p0.slice();
       base.forEach((q, k) => { for (let c = 0; c < 3; c++) x[c] += lambda[k] * q.n[c]; });
       posNova.set(v, x);
