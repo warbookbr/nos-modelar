@@ -16,12 +16,20 @@
         "tipo": "peca",
         "ref": "aviao/motor"
       }
+    },
+    {
+      "id": "helice",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "aviao/helice"
+      }
     }
   ],
   "relacoes": [],
   "etapas": [
     "fuselagem",
-    "motor"
+    "motor",
+    "helice"
   ],
   "vinculos": [],
   "posicoes": []

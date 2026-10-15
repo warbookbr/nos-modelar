@@ -23,12 +23,18 @@
       "instancia": "motor",
       "estado": "fixa",
       "juntas": [],
-      "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d",
       "aceite": {
         "por": "a pessoa, 2026-10-15: aceitou o motor como está, depois do crítico fechar com nota 8 na rodada 2",
         "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
         "analise": "ausente"
-      }
+      },
+      "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d"
+    },
+    {
+      "instancia": "helice",
+      "estado": "aberta",
+      "juntas": [],
+      "receita": "c982667cae1083dc1f4e0987dcdd2ddac03040f95a960435bcf4a04dec56783d"
     }
   ]
 }

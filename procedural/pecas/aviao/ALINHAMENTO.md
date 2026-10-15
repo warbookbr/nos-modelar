@@ -34,8 +34,11 @@ e declara em `REFINA.partes` qual volume do andaime cada parte dela refina.
 
 A fuselagem primeiro, porque todas as outras peças se prendem nela; depois o motor, na
 frente dela, e a hélice, no motor; as asas; a empenagem horizontal e a vertical, na
-cauda; e os dois trens. A montagem (`montagem.json`) ganha cada peça quando a receita
-dela existe, na ordem das etapas.
+cauda; e os dois trens. Cada peça entra na montagem (`montagem.json`), na ordem das
+etapas, com uma receita planejada, só com o `PLANO` e sem passos, que o modelador
+completa na etapa dela, e a guarda do acervo a trata como planejada. Até 2026-10-15 a
+montagem ganhava a peça só quando a receita existia, e `npm run objeto` dava o avião
+por completo com duas etapas de oito.
 
 ## O quadro e a escala
 
