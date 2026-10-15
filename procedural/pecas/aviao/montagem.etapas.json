@@ -73,21 +73,26 @@
     },
     {
       "instancia": "asas",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1"
+      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1",
+      "aceite": {
+        "por": "a pessoa, 2026-10-15: aceitou as asas como estão, depois do crítico fechar com nota 9 sem defeito na rodada 1",
+        "observacao": "o esboço difere da referência real em quatro pontos (a ponta mais baixa, a ponta de cantos vivos, a raiz sem carenagem e os casulos que faltam sob as asas), que a pessoa pediu para ver antes de decidir",
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "empenagem-horizontal",
       "estado": "aberta",
       "juntas": [],
-      "receita": "fe286dae7890637fb31608407f7162ae701f63d70db2e3b4e72c62e989a2203f"
+      "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb"
     },
     {
       "instancia": "empenagem-vertical",
       "estado": "aberta",
       "juntas": [],
-      "receita": "fee2f963d7109933b2a9229caa0b71dcd584c612a3c4b51144b5a10285366b87"
+      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07"
     }
   ]
 }
