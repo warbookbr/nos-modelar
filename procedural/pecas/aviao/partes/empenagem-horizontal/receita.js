@@ -31,6 +31,14 @@
  *
  * Os contatos declarados são os que o esboço mostra, medidos pela interseção dos sólidos das formas dele. Os pontos declarados
  * (`PONTOS`) medem a caixa de cada parte contra a TABELA e a malha da família, sem passar pelos passos.
+ *
+ * A rodada de ajustes de 2026-10-15 muda três coisas em relação ao esboço, porque a pessoa viu a referência real: a ponta do
+ * estabilizador tem cerca de metade da corda da raiz (`cordaNaPonta`), o degrau da ponta do profundor recua para perto de um quinto
+ * da meia-envergadura (`profundor.x`, com a espessura das seções refeita para a corda nova) e o bordo de fuga do profundor ganha o
+ * compensador, uma aba própria (`compensadorD` e `compensadorE`) num rasgo do profundor com a fresta dos dois lados e da frente, presa
+ * por uma alma que entra na parede dianteira do rasgo. O compensador não tem volume no andaime nem forma no esboço e entra em `REFINA.novas`. A
+ * ponta mais estreita e o degrau recuado tiram a parte da forma do esboço sem deslocá-la, e por isso o `REFINA.esboco` declara o
+ * `minimo` próprio de cada uma, com o motivo no comentário dele.
  */
 import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
@@ -45,18 +53,28 @@ const VOLUMES = Object.fromEntries(porLado((L, l) => [
   ...[1, 2, 3].map((n) => [`suporteProfundor${n}${L}`, `suporte-profundor${n}-${l}`]),
 ]));
 const PARTES = Object.keys(VOLUMES);
+/* As partes que saem da forma do esboço de propósito sem se deslocar, com o mínimo próprio de cada uma na razão interseção/união de
+   volume contra a forma do esboço (o geral é 0,95), logo abaixo do que a parte tem hoje: o estabilizador, com a ponta a metade da
+   corda da raiz e o vão do degrau recuado (0,891), e o profundor, com o bordo de fuga mais à frente na ponta, as seções mais finas, o
+   degrau recuado e o rasgo do compensador (0,704 e 0,706). A razão cai porque a forma pedida é outra, e o mínimo próprio só impede que
+   caia mais. Deslocamento e alongamento não servem: nada aqui é translação, e a parte não passa do volume do andaime. */
+const MINIMO_PROPRIO = { estabilizador: 0.88, profundor: 0.70 };
+/* As partes que a pessoa pediu além do esboço: sem volume no andaime e sem forma no esboço, entram em `REFINA.novas`. */
+const NOVAS = porLado((L) => [`compensador${L}`]);
 
 export const TABELA = {
   /* O estabilizador: os parâmetros `est*` do esboço. `raiz` é o ponto de encaixe (`estX0`, `estYc0` e o z a 25% da corda da raiz,
      `estZq0`); `envergadura` é `estEnv` e também o `estB` em que as frações do profundor e dos suportes se medem; `subida` é o `estDY`,
      quanto a linha dos 25% da corda sobe da raiz à ponta, que o profundor, o eixo e os suportes seguem. As cordas, em milímetro, são
-     as da raiz e as da ponta, e as espessuras são as relativas da família. `bordoDeFuga` são os z do bordo de fuga na raiz e na ponta
-     (`estTE0` e `estTE1`), de onde sai o comprimento do profundor. `fresta` é a folga do vão do profundor em volta dele. */
+     as da raiz e as da ponta, e as espessuras são as relativas da família. O bordo de fuga, de onde sai o comprimento do profundor, é
+     a linha dos 25% da corda mais 75% da corda de cada x (`perfilDoEstabilizador`), e na raiz dá o `estTE0` do esboço, 10289; a ponta
+     do esboço tinha 736 mm (`estTE1`, 10070), e a de agora tem a metade da corda da raiz, 606 mm, com o bordo de fuga em 9972,5.
+     `fresta` é a folga do vão do profundor em volta dele e também a do rasgo do compensador. */
   estabilizador: {
     raiz: [190, 2085, 9380],
     envergadura: 2200,
     cordaNaRaiz: 1212,
-    cordaNaPonta: 736,
+    cordaNaPonta: 606,
     enflechamento: 3.59,
     diedro: 7.4,
     torcao: 0,
@@ -64,17 +82,21 @@ export const TABELA = {
     espessuraNaRaiz: 0.095,
     espessuraNaPonta: 0.09,
     subida: 286,
-    bordoDeFuga: [10289, 10070],
     fresta: 12,
   },
   /* O profundor: quatro seções, nos x de `x`, cada uma com o z da dobradiça (`dobradica`, a ponta do nariz) e a espessura (`espessura`).
      O comprimento de cada seção vai da dobradiça ao bordo de fuga do estabilizador naquele x, e o centro do contorno acompanha a linha
      do estabilizador. O contorno é o de sete pontos do esboço: o nariz é o arco de 45 graus (`nariz`, em fração da espessura) e o
-     bordo de fuga tem `meiaEspessuraDoBordoDeFuga` para cada lado. */
+     bordo de fuga tem `meiaEspessuraDoBordoDeFuga` para cada lado. O degrau, onde a dobradiça recua de 9810 para 9640, estava em 2236
+     no esboço, a 6% da meia-envergadura da ponta; agora está em 1980, e o trecho da ponta, de 1980 a 2390, tem 18,6% dos 2200 mm
+     (a referência real mostra perto de um quinto); o suporte 3, em 1950, fica sob o fim do trecho de dentro. A espessura de
+     cada seção é a do perfil do estabilizador na dobradiça, que a corda nova de 606 mm adelgaça: 41 mm no fim do trecho de dentro
+     (a dobradiça a 69% da corda), 60 mm no começo do trecho da ponta (a 50%) e 51 mm na ponta, contados do perfil da raiz e
+     escalados pela corda e pela espessura relativa de cada x, menos 1 mm que o esboço também tem abaixo do perfil. */
   profundor: {
-    x: [190, 2236, 2250, 2385],
+    x: [190, 1980, 1994, 2385],
     dobradica: [9810, 9810, 9640, 9640],
-    espessura: [88, 49, 66, 63],
+    espessura: [88, 41, 60, 51],
     nariz: [0.1465, 0.3535],
     meiaEspessuraDoBordoDeFuga: 4,
   },
@@ -92,6 +114,10 @@ export const TABELA = {
   suporte: {
     x: [600, 1300, 1950],
     abaixo: 6,
+    /* A espessura do profundor que o esboço usa para pôr os suportes, na raiz e na ponta do estabilizador (`sY1` a `sY3`): a reta entre
+       as duas na fração do estabilizador. Os suportes ficam onde o esboço os pôs, e por isso a espessura continua a do esboço, e não a
+       das seções novas do profundor. */
+    espessuraDoEsboco: [88, 49],
     secoes: [
       { recuo: -230, tamanho: [58, 26], cantos: 12, subida: 4 },
       { recuo: -90, tamanho: [64, 44], cantos: 20, subida: 0 },
@@ -101,6 +127,13 @@ export const TABELA = {
     segmentosDoCanto: 12,
     trechos: [2, 1, 2],
   },
+  /* O compensador (a divisão no bordo de fuga do profundor, a pedido da pessoa na rodada de ajustes): uma aba do bordo de fuga entre
+     os x de `x`. O rasgo que a recebe sai do profundor por subtrair e tem a parede dianteira a `profundidade` mm do bordo de fuga,
+     medida em z, de modo que a parede corra paralela ao bordo, e a `fresta` do estabilizador nos dois lados em x e entre a parede e
+     o corpo da aba. A alma da aba, `alma` mm mais fina em cada face, atravessa essa fresta e entra `entrada` mm na parede, e é ela
+     que segura a aba ao profundor. O rasgo passa `alem` mm do bordo de fuga e `acima` mm das faces, para o corte atravessar o
+     profundor inteiro. Fica no trecho de dentro do profundor, de 190 a 1980. */
+  compensador: { x: [200, 940], profundidade: 130, entrada: 6, alma: 5, alem: 40, acima: 20 },
   /* `avanco` é quanto o polo de cada loft fica além da seção. */
   tampa: { avanco: 0.5 },
 };
@@ -222,15 +255,17 @@ function giroDoEixo({ de, para }) {
   return { comprimento, em: Math.asin(u[1]) / GRAUS, y: Math.atan2(-u[2], u[0]) / GRAUS };
 }
 
-/* Os dados do estabilizador, em mm: a altura da linha dos 25% da corda e o z do bordo de fuga em um x, e a espessura do profundor
-   naquele x (a reta entre a da raiz e a da seção seguinte, na fração do estabilizador). */
+/* Os dados do estabilizador, em mm: a altura da linha dos 25% da corda e o z do bordo de fuga em um x (a linha dos 25%, que a
+   família enflecha a `enflechamento` graus a partir da raiz, mais 75% da corda daquele x), e a espessura do profundor que o esboço
+   usa para os suportes naquele x (a reta entre a da raiz e a da ponta, na fração do estabilizador). */
 function perfilDoEstabilizador(t) {
   const e = t.estabilizador;
   const fracao = (x) => (x - e.raiz[0]) / e.envergadura;
+  const [raiz, ponta] = t.suporte.espessuraDoEsboco;
   return {
     altura: (x) => e.raiz[1] + e.subida * fracao(x),
-    bordoDeFuga: (x) => e.bordoDeFuga[0] + (e.bordoDeFuga[1] - e.bordoDeFuga[0]) * fracao(x),
-    espessura: (x) => t.profundor.espessura[0] + (t.profundor.espessura[1] - t.profundor.espessura[0]) * fracao(x),
+    bordoDeFuga: (x) => e.raiz[2] + (x - e.raiz[0]) * Math.tan(e.enflechamento * GRAUS) + 0.75 * (e.cordaNaRaiz + (e.cordaNaPonta - e.cordaNaRaiz) * fracao(x)),
+    espessura: (x) => raiz + (ponta - raiz) * fracao(x),
   };
 }
 
@@ -254,6 +289,40 @@ function medidasDoProfundor(t) {
     return { x: s.x - fresta, pontos: dentro[i] };
   });
   return { estacoes: estacoes.map(({ x, pontos }) => ({ x, pontos })), vao, base: estacoes[0] };
+}
+
+/* O compensador, em mm: a aba (seções de oito pontos [z, y] nos dois x de `compensador.x`) e o cortador do rasgo (seções de quatro
+   pontos nos mesmos x, afastadas a fresta para fora). O contorno do profundor em cada x é a reta entre as duas primeiras seções, e o
+   compensador fica todo no trecho de dentro. A aba é o corpo, do bordo de fuga até a fresta da parede do rasgo, com as faces do
+   profundor entre o fim do nariz e o bordo (a de cima do ponto 0 ao 6 do contorno, a de baixo do 4 ao 5), e a alma, mais fina em
+   `alma` mm em cada face, que atravessa a fresta e entra `entrada` mm na parede, onde prende a aba ao profundor. O cortador é o
+   retângulo da parede do rasgo, a `profundidade` do bordo de fuga, até `alem` além dele, com `acima` além das faces. */
+function medidasDoCompensador(t, estacoes) {
+  const { x: [xa, xb], profundidade, entrada, alma, alem, acima } = t.compensador;
+  const fresta = t.estabilizador.fresta;
+  if (xb + fresta > estacoes[1].x) throw new Error(`compensador: o rasgo vai a x ${xb + fresta}, e o trecho de dentro do profundor acaba em ${estacoes[1].x}`);
+  const contornoEm = (x) => naReta(estacoes[0].pontos, estacoes[0].x, estacoes[1].pontos, estacoes[1].x, x);
+  const naFace = ([z0, y0], [z1, y1], z) => y0 + ((y1 - y0) * (z - z0)) / (z1 - z0);
+  const aba = [xa, xb].map((x) => {
+    const c = contornoEm(x);
+    const zAlma = c[5][0] - profundidade - entrada;
+    const zCorpo = c[5][0] - profundidade + fresta;
+    const cima = (z) => naFace(c[0], c[6], z);
+    const baixo = (z) => naFace(c[4], c[5], z);
+    return {
+      x,
+      pontos: [[zAlma, cima(zAlma) - alma], [zAlma, baixo(zAlma) + alma], [zCorpo, baixo(zCorpo) + alma], [zCorpo, baixo(zCorpo)], c[5], c[6], [zCorpo, cima(zCorpo)], [zCorpo, cima(zCorpo) - alma]],
+    };
+  });
+  const cortador = [xa - fresta, xb + fresta].map((x) => {
+    const c = contornoEm(x);
+    const zf = c[5][0] - profundidade;
+    const zr = c[5][0] + alem;
+    const yc = c[0][1] + acima;
+    const yb = c[4][1] - acima;
+    return { x, pontos: [[zf, yc], [zf, yb], [zr, yb], [zr, yc]] };
+  });
+  return { aba, cortador };
 }
 
 /* A haste do eixo e as seções de cada suporte, em mm. */
@@ -285,6 +354,7 @@ export function derivar(t = TABELA) {
 
   const profundor = medidasDoProfundor(t);
   const { eixo, suportes } = medidasDoEixoEDosSuportes(t, profundor.base);
+  const compensador = medidasDoCompensador(t, profundor.estacoes);
   const giro = giroDoEixo(eixo);
   const pontosM = (s) => s.pontos.map(mAll);
 
@@ -295,6 +365,7 @@ export function derivar(t = TABELA) {
       de: mAll(eixo.de), comprimento: m(giro.comprimento), raio: m(t.eixo.diametro / 2), segmentos: t.eixo.lados / 4, giroEmZ: giro.em, giroEmY: giro.y,
     },
     suportes: suportes.map((secoes) => secoes.map((s) => ({ pos: m(s.pos), pontos: pontosM(s) }))),
+    compensador: { aba: compensador.aba.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })), cortador: compensador.cortador.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })) },
     avanco: m(t.tampa.avanco),
   };
 }
@@ -350,7 +421,8 @@ function loftPorSecoes(eixo, estacoes, avanco) {
    (`espelha`) leva a identidade da fonte mais `ESPELHO`. */
 const ID = {
   estabilizador: 100, cortadorDoProfundor: 110, estabilizadorRecortado: 120,
-  profundor: 200, eixoProfundor: 220, suporteProfundor1: 230, suporteProfundor2: 231, suporteProfundor3: 232,
+  profundor: 200, cortadorDoCompensador: 210, profundorRecortado: 211, eixoProfundor: 220,
+  suporteProfundor1: 230, suporteProfundor2: 231, suporteProfundor3: 232, compensador: 240,
 };
 const ESPELHO = 500;
 
@@ -391,8 +463,16 @@ export function gerarPassos(t = TABELA) {
     solidos: [doPasso('loft', ID.estabilizador), doPasso('loft', ID.cortadorDoProfundor)],
   }]);
 
-  /* O profundor, o eixo e os suportes do lado direito. */
+  /* O profundor, menos o rasgo do compensador, e a aba do compensador no rasgo. */
   loft(ID.profundor, loftPorSecoes('x', P.profundor.estacoes, P.avanco));
+  loft(ID.cortadorDoCompensador, loftPorSecoes('x', P.compensador.cortador, P.avanco));
+  passos.push(['subtrair', {
+    origemId: ID.profundorRecortado,
+    solidos: [doPasso('loft', ID.profundor), doPasso('loft', ID.cortadorDoCompensador)],
+  }]);
+  loft(ID.compensador, loftPorSecoes('x', P.compensador.aba, P.avanco));
+
+  /* O eixo e os suportes do lado direito. */
   const e = P.eixo;
   passos.push(['extrusao', { origemId: ID.eixoProfundor, eixo: 'x', altura: e.comprimento, perfil: { circulo: { raio: e.raio } }, segmentosArco: e.segmentos, em: e.de }]);
   passos.push(['rotaciona', { eixo: 'z', graus: e.giroEmZ, pivo: e.de, sel: doPasso('extrusao', ID.eixoProfundor) }]);
@@ -402,7 +482,8 @@ export function gerarPassos(t = TABELA) {
   /* Cada forma do lado direito: a cópia espelhada em x e os quatro passos que a nomeiam, com o material, o sólido e o liso. */
   const formas = [
     ['estabilizador', doPasso('subtrair', ID.estabilizadorRecortado), 'superficie'],
-    ['profundor', doPasso('loft', ID.profundor), 'superficie'],
+    ['profundor', doPasso('subtrair', ID.profundorRecortado), 'superficie'],
+    ['compensador', doPasso('loft', ID.compensador), 'superficie'],
     ['eixoProfundor', doPasso('extrusao', ID.eixoProfundor), 'eixo'],
     ...[1, 2, 3].map((n) => [`suporteProfundor${n}`, doPasso('loft', ID[`suporteProfundor${n}`]), 'suporte']),
   ];
@@ -435,7 +516,8 @@ function caixaDaFamilia(t) {
 }
 
 /* A caixa de cada parte do lado direito, exceto o estabilizador, em milímetro, calculada da TABELA sem passar pelos passos: a do
-   profundor, a dos contornos e do avanço dos polos; a do eixo, a das duas tampas (um disco de raio `r` perpendicular à reta tem, em
+   profundor, a dos contornos e do avanço dos polos, com o bordo de fuga mais alto em z depois do rasgo do compensador (o do x da
+   parede de fora do rasgo, porque o bordo recua para fora); a da aba do compensador, a das duas seções e do avanço dos polos; a do eixo, a das duas tampas (um disco de raio `r` perpendicular à reta tem, em
    cada eixo, a extensão `r * sqrt(1 - d²)`); a dos suportes, a das seções (a curva suave não passa do valor de nenhuma seção). */
 function caixasDoLadoDireito(t) {
   const avanco = t.tampa.avanco;
@@ -446,7 +528,12 @@ function caixasDoLadoDireito(t) {
   const doProfundor = caixaDosPontos(profundor.estacoes.flatMap(({ x, pontos }) => pontos.map(([z, y]) => [x, y, z])));
   doProfundor.min[0] -= avanco;
   doProfundor.max[0] += avanco;
+  const { aba, cortador } = medidasDoCompensador(t, profundor.estacoes);
+  doProfundor.max[2] = perfilDoEstabilizador(t).bordoDeFuga(cortador[1].x);
   caixas.profundor = doProfundor;
+  caixas.compensador = caixaDosPontos(aba.flatMap(({ x, pontos }) => pontos.map(([z, y]) => [x, y, z])));
+  caixas.compensador.min[0] -= avanco;
+  caixas.compensador.max[0] += avanco;
 
   const comprimento = Math.hypot(...eixo.para.map((v, k) => v - eixo.de[k]));
   const raio = t.eixo.diametro / 2;
@@ -500,13 +587,18 @@ const receita = {
     partes: porLado((L, l, nome) => [
       {
         nome: `estabilizador${L}`,
-        forma: `metade ${nome} do estabilizador, da raiz junto à cauda até a ponta, com enflechamento e diedro, perfil de 9,5% afinando para a ponta e o vão do profundor recortado`,
+        forma: `metade ${nome} do estabilizador, da raiz junto à cauda até a ponta, com enflechamento e diedro, perfil de 9,5% afinando para a ponta, que tem cerca de metade da corda da raiz, e o vão do profundor recortado`,
         tecnica: 'a superfície da família superficie-aerodinamica, perfil estabilizador, com os parâmetros do esboço, expandida nos PASSOS e recortada por subtrair',
       },
       {
         nome: `profundor${L}`,
-        forma: `profundor ${nome}, superfície do bordo de fuga do estabilizador, no vão dele com a fresta do esboço em volta`,
-        tecnica: 'loft das seções do esboço, com as pontas fechadas e sombreado liso',
+        forma: `profundor ${nome}, superfície do bordo de fuga do estabilizador, no vão dele com a fresta do esboço em volta, com o degrau da ponta a perto de um quinto da meia-envergadura e o rasgo do compensador no bordo de fuga`,
+        tecnica: 'loft das seções do esboço, com as pontas fechadas e sombreado liso, e o rasgo do compensador por subtrair',
+      },
+      {
+        nome: `compensador${L}`,
+        forma: `compensador do profundor ${nome}, aba de corda constante no bordo de fuga do profundor, separada dele por fresta nos dois lados e na frente e presa por uma alma que entra na parede do rasgo`,
+        tecnica: 'loft de duas seções de oito pontos tiradas do contorno do profundor, no rasgo que o profundor recebe por subtrair',
       },
       { nome: `eixoProfundor${L}`, forma: `eixo do profundor ${nome}, haste ao longo da dobradiça`, tecnica: 'cilindro entre as duas pontas da dobradiça do esboço' },
       ...[1, 2, 3].map((n) => ({ nome: `suporteProfundor${n}${L}`, forma: `suporte ${n} do profundor ${nome}, peça fina sob o estabilizador que segura o eixo`, tecnica: 'loft das seções do esboço' })),
@@ -516,6 +608,9 @@ const receita = {
       'profundor fora do vão, sem a fresta, ou atravessando o estabilizador',
       'eixo ou suporte solto, que não segura o profundor',
       'vão do profundor sem recorte no estabilizador',
+      'ponta do estabilizador com bem mais que a metade da corda da raiz',
+      'degrau da ponta do profundor a menos de um sexto da meia-envergadura da ponta',
+      'bordo de fuga do profundor sem a divisão do compensador, ou compensador solto do profundor',
       'o REFINA acusando parte fora do envelope do volume dela ou abaixo do mínimo contra a forma do esboço',
     ],
   },
@@ -525,6 +620,7 @@ const receita = {
      estabilizador e o profundor não se tocam, pela fresta. */
   contatos: porLado((L, l, nome) => [
     { par: [`eixoProfundor${L}`, `profundor${L}`], motivo: `o eixo corre na dobradiça do profundor ${nome}` },
+    { par: [`compensador${L}`, `profundor${L}`], motivo: `a alma do compensador entra na parede dianteira do rasgo do profundor ${nome}, que o segura` },
     { par: [`eixoProfundor${L}`, `estabilizador${L}`], motivo: `o eixo do profundor ${nome} entra na parede dianteira do vão do estabilizador, ao longo da haste` },
     { par: [`eixoProfundor${L}`, `suporteProfundor3${L}`], motivo: `o suporte 3 sobe até a haste do eixo do profundor ${nome}; os suportes 1 e 2 ficam abaixo dela` },
     ...[1, 2, 3].flatMap((n) => [
@@ -532,12 +628,13 @@ const receita = {
       { par: [`suporteProfundor${n}${L}`, `profundor${L}`], motivo: `o suporte ${n} termina sob o profundor ${nome} e entra na face de baixo dele` },
     ]),
   ]),
-  formas: Object.fromEntries(PARTES.map((p) => [p, 'solido'])),
+  formas: Object.fromEntries([...PARTES, ...NOVAS].map((p) => [p, 'solido'])),
   REFINA: {
     andaime: '../../andaime.json',
     partes: VOLUMES,
     tolerancia: { envelope: 5, porta: 0.5 },
-    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(PARTES.map((p) => [p, p])), minimo: 0.95 },
+    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(PARTES.map((p) => [p, p.replace(/[DE]$/, '') in MINIMO_PROPRIO ? { formas: p, minimo: MINIMO_PROPRIO[p.replace(/[DE]$/, '')] } : p])), minimo: 0.95 },
+    novas: Object.fromEntries(NOVAS.map((p) => [p, 'a pessoa pediu na rodada de ajustes de 2026-10-15 a divisão no bordo de fuga do profundor, que a referência real mostra e o esboço não tem'])),
   },
   get PONTOS() { return pontosDeclarados(this.PARAMS); },
   get PASSOS() { return gerarPassos(this.PARAMS); },

@@ -22,28 +22,21 @@
  * material, o sólido e o liso, porque a receita nomeia a deriva depois de recortá-la, e as duas portas, que a família publica no
  * quadro local.
  *
- * A booleana do núcleo recalcula cada canto novo pelos planos das faces de entrada, e a casca da família tem faces empenadas e quase
- * coplanares (a 0,03 a 0,8 grau uma da outra), de modo que o canto que um corte faz sobre uma aresta da casca pode
- * sair a 10 mm ou a metros da peça. A família começa a superfície com uma faixa de 7,86 mm entre a seção da raiz e a seguinte, e o canto
- * que o vão faz sobre a aresta entre essa faixa e a de cima sai a 250 mm da peça com o vão em qualquer lugar até 8 mm do esboço. A caixa
- * da raiz corta, então, na segunda seção da família, e a deriva começa 7,86 mm acima de `y0`.
+ * A família começa a superfície com uma faixa de 7,86 mm entre a seção da raiz e a seguinte, e a caixa da raiz corta na segunda seção
+ * da família: a deriva começa 7,86 mm acima de `y0`.
  *
  * O vão do leme é o próprio leme engrossado pela fresta (`subtrai` com `folga` no esboço): o contorno de cada seção é deslocado para
  * fora pela fresta, com a quina em esquadria, e as duas extremidades avançam a fresta, com o contorno prolongado na reta que une as
  * duas seções de cada ponta. O esboço engrossa cada trecho entre duas seções pelos planos das faces dele, e a receita desloca o contorno
- * das seções. No degrau do topo (de y 3896 a 3950, com 238 mm em z para 54 mm em y) a face do vão é quase horizontal, e o contorno
- * deslocado 12 mm a deixaria a 3 mm do leme, onde o esboço deixa 12 mm. Com as quatro seções do vão onde o contorno deslocado as põe,
- * o canto que o vão faz sobre a pele da deriva junto do degrau sai a 11 mm do lugar e atravessa o leme. `deslocamentoDoVao` leva cada
- * seção do vão em z e em y, e com os valores da TABELA nenhum canto passa de 0,2 mm da superfície: a seção do degrau aceita de -7 a -10
- * mm em z, a do topo de -1,5 a -3, e a de cima do degrau qualquer valor de -3 a -20 em y, que leva a fresta do degrau de 3 a 10 mm. A
- * fresta fica entre 10 e 14 mm ao longo do leme e em 19 mm junto do degrau. Os pontos declarados medem a caixa da deriva, e o contato
- * entre a deriva e o leme acusa o deslocamento que deixar de valer.
+ * das seções. As quatro seções do vão ficam onde esse contorno as põe, sem deslocamento próprio. A fresta fica em 12 mm ao longo do
+ * leme. Os pontos declarados medem a caixa da deriva, e o contato entre a deriva e o leme acusa o vão que deixar de valer.
  *
  * O leme e o vão são lofts em y de seções de sete pontos, como no esboço. O loft só fecha uma ponta com um polo de raio zero, e o polo
  * nasce no eixo, a `tampa.avanco` além da seção, e `moveV` o leva ao centro dela, de modo que cada ponta é um leque quase plano. A
- * dorsal é um loft em z de retângulos de cantos arredondados, `suave` no esboço: uma curva de tangente contínua (cúbica de Hermite com
- * a tangente de Fritsch e Carlson, a do PCHIP, que não passa do valor de nenhuma seção) passa pelas seções, e a receita a avalia em
- * estações a mais entre elas. As dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não
+ * dorsal é um loft em z, `suave` no esboço: uma curva de tangente contínua (cúbica de Hermite com a tangente de Fritsch e Carlson, a
+ * do PCHIP, que não passa do valor de nenhuma seção) passa pelas seções, e a receita a avalia em estações a mais entre elas. A seção
+ * da dorsal não é o retângulo do esboço: é o dorso da fuselagem subindo até a deriva, com a crista em meia elipse e um filete côncavo
+ * de cada lado até a base, e por isso a dorsal passa do volume do esboço em x e declara o `alongamento` e o `motivo` em `REFINA`. As dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não
  * acrescenta estação entre elas. As do lado esquerdo são o espelho em x das do direito. O eixo do leme é uma extrusão de um círculo em
  * y, girada em x para a reta da dobradiça.
  */
@@ -59,7 +52,14 @@ const VOLUMES = {
   ...Object.fromEntries(DOBRADICAS.map(({ n, L, l }) => [`dobradicaLeme${n}${L}`, `dobradica-leme${n}-${l}`])),
 };
 const FORMAS = {
-  deriva: 'deriva.fin', dorsal: 'deriva.dorsal', leme: 'leme', eixoLeme: 'eixoLeme',
+  deriva: 'deriva.fin',
+  dorsal: {
+    formas: 'deriva.dorsal',
+    minimo: 0.6,
+    alongamento: { '+x': 87.5, '-x': 87.5 },
+    motivo: 'a dorsal lisa pedida na rodada de ajustes: o dorso sobe até a deriva por um filete côncavo de até 300 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,63 pela largura a mais',
+  },
+  leme: 'leme', eixoLeme: 'eixoLeme',
   ...Object.fromEntries(DOBRADICAS.map(({ n, L }) => [`dobradicaLeme${n}${L}`, `dobradicaLeme${n}${L}`])),
 };
 const PARTES = Object.keys(VOLUMES);
@@ -84,9 +84,7 @@ export const TABELA = {
      `vYb`, `vYe`, `vYc`; o vão usa a raiz da deriva no lugar da base) e a linha da dobradiça, o z do nariz do leme: `inicio` na raiz
      (`vZh0`), `inclinacao` em z por y (`vKh`) até a seção `b`, e `noE` e `noTopo` nas duas seções de cima (`vZhe`, `vZhc`). O leme
      acaba na base no `bordoDeFugaNaBase` (`vZte0`), e o contorno de sete pontos tem o nariz de `nariz` (em fração da espessura: o
-     arco de 45 graus) e o bordo de fuga de `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do leme, e
-     `deslocamentoDoVao` o deslocamento [em z, em y], em milímetro, de cada uma das quatro seções do vão: a que passa da raiz da
-     deriva, a do degrau (`vYb`), a de cima do degrau (`vYe`) e a que passa do topo do leme. */
+     arco de 45 graus) e o bordo de fuga de `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do leme. */
   leme: {
     y: { base: 2240, d: 2393, b: 3896, e: 3950, topo: 4185 },
     linhaDaDobradica: { inicio: 9040, inclinacao: 0.5855, noE: 9780, noTopo: 9825 },
@@ -94,23 +92,29 @@ export const TABELA = {
     nariz: [0.1465, 0.3535],
     meiaEspessuraDoBordoDeFuga: 4,
     fresta: 12,
-    deslocamentoDoVao: [[0, 0], [-8, 0], [0, -9], [-2, 0]],
   },
   /* O eixo do leme: haste de `diametro`, em `lados` lados, ao longo do centro do nariz, de `sobra` acima da base do leme até `sobra`
      abaixo da seção `b`. */
   eixo: { diametro: 30, sobra: 15, lados: 48 },
-  /* A dorsal: uma estação por linha, [z, largura em x, altura em y, raio do canto, y do centro]; o x do centro é zero. `subdivisoes` é
-     quantas estações a curva suave passa a ter entre duas seções, e `segmentosPorCanto` os segmentos de cada canto arredondado. */
+  /* A dorsal lisa: o dorso da fuselagem subindo até a deriva. Uma estação por linha, [z, y do dorso da fuselagem naquele z, largura da
+     crista, subida da crista acima do dorso, largura da base]; o x do centro é zero. O y do dorso é o topo da fuselagem em x = 0,
+     medido na malha dela (a fuselagem não publica porta, e o dorso é plano até uns 150 mm de cada lado do centro). A seção sobe da
+     base, que assenta `assenta` abaixo do dorso e desce em parede até `fundo` abaixo dele, por um filete côncavo (um quarto de elipse,
+     horizontal no dorso e vertical na crista) até a crista, que é uma meia elipse. `subdivisoes` é quantas estações a curva suave
+     passa a ter entre duas seções, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. */
   dorsal: {
     estacoes: [
-      [6960, 24, 48, 11, 2321],
-      [7300, 70, 140, 33, 2339],
-      [7700, 100, 228, 48, 2357],
-      [8100, 125, 342, 60, 2394],
-      [8300, 80, 420, 38, 2430],
+      [6960, 2323, 20, 2, 60],
+      [7300, 2294, 40, 60, 240],
+      [7700, 2268, 60, 170, 300],
+      [8100, 2248, 80, 317, 260],
+      [8300, 2241, 80, 399, 150],
     ],
+    assenta: 3,
+    fundo: 25,
+    fracaoDoFundo: 0.5,
     subdivisoes: 2,
-    segmentosPorCanto: 8,
+    passosDoArco: 4,
   },
   /* As dobradiças: três pares, cada um a `y` de um y da lista (`vK1y`, `vK2y`, `vK3y`). Cada estação é [z a partir da linha da
      dobradiça naquele y, largura em x, altura em y, raio do canto, fração da espessura do leme naquele y que dá o x do centro]. */
@@ -216,13 +220,11 @@ function secoesDoVao(t, estacoes) {
   const n = estacoes.length;
   const de = estacoes[0].y - fresta;
   const ate = estacoes[n - 1].y + fresta;
-  const [base, b, e, topo] = t.leme.deslocamentoDoVao;
-  const desloca = ({ y, pontos }, [dz, dy]) => ({ y: y + dy, pontos: pontos.map(([x, z]) => [x, z + dz]) });
   return [
-    desloca({ y: de, pontos: prolonga(0, 1, de) }, base),
-    desloca({ y: estacoes[1].y, pontos: dentro[1] }, b),
-    desloca({ y: estacoes[2].y, pontos: dentro[2] }, e),
-    desloca({ y: ate, pontos: prolonga(n - 2, n - 1, ate) }, topo),
+    { y: de, pontos: prolonga(0, 1, de) },
+    { y: estacoes[1].y, pontos: dentro[1] },
+    { y: estacoes[2].y, pontos: dentro[2] },
+    { y: ate, pontos: prolonga(n - 2, n - 1, ate) },
   ];
 }
 
@@ -271,10 +273,42 @@ function estacoesSuaves(secoes, subdivisoes) {
   });
 }
 
-/* As estações da dorsal em mm: [z, largura, altura, raio, y do centro] como objetos, com a curva suave entre as seções. */
+/* As estações da dorsal em mm: [z, y do dorso, largura da crista, subida, largura da base] como objetos, com a curva suave entre as
+   seções. */
 function estacoesDaDorsal(t) {
-  const secoes = t.dorsal.estacoes.map(([p, largura, altura, raio, y]) => ({ p, largura, altura, raio, y }));
+  const secoes = t.dorsal.estacoes.map(([p, y, crista, subida, base]) => ({ p, y, crista, subida, base }));
   return estacoesSuaves(secoes, t.dorsal.subdivisoes);
+}
+
+/* O contorno da dorsal em uma estação, [x, y] em mm, anti-horário: a meia elipse da crista (semieixos metade da crista e `b`, o menor
+   entre ela e 0,45 da subida), o filete côncavo de cada lado, de um quarto de elipse (semieixos: metade da diferença das larguras e
+   a altura que sobra) até a base, que assenta `assenta` abaixo do dorso, e o pé enterrado, de `fracaoDoFundo` da largura da base, até
+   `fundo`. O filete sai vertical da crista e chega horizontal na base. */
+function contornoDaDorsal(t, e) {
+  const { assenta, fundo, passosDoArco: n, fracaoDoFundo } = t.dorsal;
+  const hc = e.crista / 2;
+  const hb = e.base / 2;
+  const hf = hb * fracaoDoFundo;
+  const topo = e.y + e.subida;
+  const b = Math.min(hc, 0.45 * e.subida);
+  const equador = topo - b;
+  const chao = e.y - assenta;
+  const altura = equador - chao;
+  const passo = Math.PI / 2 / n;
+  const crista = Array.from({ length: 2 * n + 1 }, (_, k) => [hc * Math.cos(k * passo), equador + b * Math.sin(k * passo)]);
+  const filete = Array.from({ length: n - 1 }, (_, k) => {
+    const fi = (k + 1) * passo;
+    return [hc + (hb - hc) * (1 - Math.cos(fi)), chao + altura * (1 - Math.sin(fi))];
+  });
+  const base = [hb, chao];
+  const pe = [[hf, chao], [hf, e.y - fundo]];
+  const espelha = ([x, y]) => [-x, y];
+  return [
+    ...crista,
+    ...filete.map(espelha), espelha(base),
+    ...pe.map(espelha), ...[...pe].reverse(),
+    base, ...[...filete].reverse(),
+  ];
 }
 
 /* A linha da dobradiça e a espessura do leme em y, para o x do centro de cada dobradiça: o nariz do leme na seção `b` e na raiz dão a
@@ -408,8 +442,7 @@ export function derivar(t = TABELA) {
     comando: 0,
     comandoDiferencial: 0,
   });
-  /* A caixa da raiz corta na segunda seção da família: a primeira faixa da superfície (7,86 mm) é onde o vão deixa um canto a 250 mm da
-     peça, e a deriva começa uma faixa acima de `y0`. */
+  /* A caixa da raiz corta na segunda seção da família, e a deriva começa uma faixa (7,86 mm) acima de `y0`. */
   const { passos: expandidos } = expandirChamadasDeComposicao(registroDeFamilias().registroComposicoes, [chamada]);
   const [, loftDaFamilia] = expandidos.find(([operacao]) => operacao === 'loft');
   const degrauDaRaiz = loftDaFamilia.secoes[1].pos[1];
@@ -442,11 +475,11 @@ export function derivar(t = TABELA) {
   const giro = giroDoEixo(eixoMm);
   const eixo = { de: mAll(eixoMm.de), comprimento: m(giro.comprimento), raio: m(t.eixo.diametro / 2), segmentos: t.eixo.lados / 4, giroEmX: giro.emX };
 
-  /* A dorsal: loft em z de retângulos de cantos arredondados, com o centro em x = 0. */
+  /* A dorsal: loft em z do contorno liso de cada estação, com o centro em x = 0. */
   const dorsalMm = estacoesDaDorsal(t);
   const dorsal = loftPorEstacoes({
-    eixo: 'z', linha: [0, m(dorsalMm[0].y), 0], avanco, segmentos: t.dorsal.segmentosPorCanto,
-    estacoes: dorsalMm.map((e) => ({ p: m(e.p), pontos: retanguloArredondado(0, m(e.y), m(e.largura), m(e.altura), m(e.raio)) })),
+    eixo: 'z', linha: [0, m(dorsalMm[0].y), 0], avanco,
+    estacoes: dorsalMm.map((e) => ({ p: m(e.p), pontos: emMetro(contornoDaDorsal(t, e)) })),
   });
 
   /* As três dobradiças do lado direito. */
@@ -613,8 +646,8 @@ function caixasDasPartes(t) {
 
   const dorsal = estacoesDaDorsal(t);
   caixas.dorsal = {
-    min: [-Math.max(...dorsal.map((e) => e.largura / 2)), Math.min(...dorsal.map((e) => e.y - e.altura / 2)), dorsal[0].p - avanco],
-    max: [Math.max(...dorsal.map((e) => e.largura / 2)), Math.max(...dorsal.map((e) => e.y + e.altura / 2)), dorsal[dorsal.length - 1].p + avanco],
+    min: [-Math.max(...dorsal.map((e) => e.base / 2)), Math.min(...dorsal.map((e) => e.y - t.dorsal.fundo)), dorsal[0].p - avanco],
+    max: [Math.max(...dorsal.map((e) => e.base / 2)), Math.max(...dorsal.map((e) => e.y + e.subida)), dorsal[dorsal.length - 1].p + avanco],
   };
 
   const { leme } = estacoesDoLeme(t);
@@ -677,8 +710,8 @@ const receita = {
       },
       {
         nome: 'dorsal',
-        forma: 'dorsal, a aleta baixa que desce da frente da deriva ao dorso da fuselagem',
-        tecnica: 'loft das seções do esboço, com as pontas fechadas e sombreado liso',
+        forma: 'dorsal lisa, o dorso da fuselagem subindo até a frente da deriva, sem a aleta de ponta fina do esboço',
+        tecnica: 'loft em z de seções de crista em meia elipse e filete côncavo até o dorso, com as pontas fechadas e sombreado liso',
       },
       {
         nome: 'leme',
