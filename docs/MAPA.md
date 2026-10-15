@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1256 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1270 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1161,6 +1161,8 @@
 - `familia.test.js` — familia.test.js — o contrato `mecanifica.familia@1`: a fixture válida passa, cada defeito é recusado com o campo, o valor e o que é aceito, e a leitura norma…
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
 - `forma-da-parte.test.mjs` — forma-da-parte.test.mjs — a promessa de forma só vale se ela reprovar.
+- `forma-do-esboco.js` — forma-do-esboco.js — a forma de cada parte da receita contra a forma do esboço que ela refina, pela sobreposição de volume.
+- `forma-do-esboco.test.js` — forma-do-esboco.test.js — a forma de cada parte da receita contra a forma do esboço, pela razão interseção/união de volume. O esboço é sintético e escrito à …
 - `forma-global-casco.test.mjs` — Orientação da malha do casco por seções na forma global N2. Para cada combinação de eixo de percurso, ordem dos eixos da seção e sentido do contorno (doze no…
 - `forma-global-prisma.test.mjs` — Orientação da malha do prisma na forma global N2. Para cada combinação de eixo de extrusão, ordem dos eixos do perfil e sentido do contorno (doze no total), …
 - `forma-global.js` — Contrato e executor neutros da N2. A fonte é um andaime de volumes semânticos; a malha e as projeções são produtos derivados sem identidade. Este módulo não …
@@ -1213,6 +1215,8 @@
 - `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
 - `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
+- `solido-do-esboco.js` — solido-do-esboco.js — o sólido exato de uma forma do esboço, em milímetro, como volume que a Manifold subtrai e interseta.
+- `solido-do-esboco.test.js` — solido-do-esboco.test.js — o sólido exato de uma forma do esboço, a partir de formas escritas à mão no formato de `formasResolvidas`. Cada caso tem o volume …
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `topologia-da-malha.js` — topologia-da-malha.js — extrudar, duplicar, apagar e criar face.
 - `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na peça de prova: quantas faces e vértices nascem, quem some, e o que fica no lugar. A p…
@@ -1403,6 +1407,34 @@
 
 - `familia.js` — Fixture de teste: a família `bucha-de-prova`, um anel de revolução que publica a porta `assento` (anel que ocupa) na parede externa. `criarBucha({ erroDoRaio…
 - `familias.mjs` — Fixture de teste: a lista de famílias que `npm run familia -- aprovar bucha-de-prova --familias=<este módulo>` lê.
+
+## tools/fixtures/forma-do-esboco/
+
+- `suporte.js` — suporte.js — a receita de prova da conferência da forma contra o esboço.
+
+## tools/fixtures/forma-do-esboco/deslocada/
+
+- `receita.js` — O bloco furado deslocado 20 mm em x: ainda dentro da tolerância do envelope (50 mm), e fora da forma do esboço pela razão de volume.
+
+## tools/fixtures/forma-do-esboco/menor/
+
+- `receita.js` — O bloco furado com 90% das medidas do esboço: dentro do envelope, e com a razão de volume abaixo do mínimo.
+
+## tools/fixtures/forma-do-esboco/minimo-proprio/
+
+- `receita.js` — O bloco sem o furo com mínimo próprio de 0,80: a razão dele (cerca de 0,88) passa mesmo com o mínimo geral de 0,99, que a viga cumpre.
+
+## tools/fixtures/forma-do-esboco/ok/
+
+- `receita.js` — O bloco furado e a viga inclinada do esboço, com a razão de volume acima do mínimo nas duas partes.
+
+## tools/fixtures/forma-do-esboco/sem-recorte/
+
+- `receita.js` — O bloco sem o furo: a caixa do envelope aprova, e a razão de volume cai pelo que o recorte tira da forma do esboço.
+
+## tools/fixtures/forma-do-esboco/viga-reta/
+
+- `receita.js` — A viga sem a inclinação de 30 graus do esboço.
 
 ## tools/fixtures/montagem-com-instancias-repetidas/
 
@@ -1650,6 +1682,7 @@
 - `esboco-recusa.test.mjs` — esboco-recusa.test.mjs — toda recusa do esboço aponta o tópico que resolve, e o tópico existe no índice real de `npm run esboco -- --ajuda`: a forma e o camp…
 - `esboco-referencia.mjs` — Lê as referências do esboço para o módulo `modulos/esboco`, que não lê arquivo: um JSON de contornos da imagem (`mecanifica.contornos@1`, o que `npm run cont…
 - `esboco-silhueta.mjs` — esboco-silhueta.mjs — a silhueta de um desenho medida na camada, sem navegador.
+- `esboco-solido.mjs` — esboco-solido.mjs — o adaptador que liga o esboço ao sólido que a receita é conferida contra.
 - `esboco.mjs` — Linha de comando do esboço: lê `<nome>.esboco.json`, desenha as opções lado a lado com modulos/esboco e grava `<nome>.svg` e `<nome>.png` ao lado. Uso: npm r…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
@@ -1673,6 +1706,8 @@
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
 - `forma-da-peca-no-veredito.test.mjs` — forma-da-peca-no-veredito.test.mjs — o veredito da peça confere a forma contra a referência, depois do que já roda. Sobre o suporte de `tools/fixtures/refina…
+- `forma-do-esboco.mjs` — forma-do-esboco.mjs — a forma de uma receita contra a forma do esboço que ela refina, sem mudar a receita.
+- `forma-do-esboco.test.mjs` — forma-do-esboco.test.mjs — a forma da receita contra a forma do esboço, de ponta a ponta: o esboço lido pelo módulo (`formasResolvidas`), o sólido de cada fo…
 - `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
 - `forma-global-n2-g01-primitivas.test.mjs` — G01 com um andaime que usa as seis primitivas do nível zero (cone, esfera, anel, revolução, extrusão côncava e tubo): um reservatório com base em anel, corpo…
 - `forma-global-n2-primitivas.test.mjs` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução, extrusão côncava e tubo. Cada uma é provada por envelope medido, mal…

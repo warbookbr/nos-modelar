@@ -1,0 +1,19 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "bloco-andaime",
+  "objetivo": "bloco-n2",
+  "alvo": "alvo-bloco",
+  "familia": "peca-mecanica",
+  "intencao": "bloco furado com uma viga inclinada acima dele, para provar a conferência da forma contra o esboço",
+  "unidade": "mm",
+  "eixos": { "direita": "+x", "cima": "+y", "frente": "+z" },
+  "envelope": { "min": [-140, 0, -100], "max": [140, 493, 100] },
+  "landmarks": [
+    { "id": "topo", "posicao": [0, 493, 0] },
+    { "id": "pe", "posicao": [0, 0, 0] }
+  ],
+  "volumes": [
+    { "id": "bloco", "regioes": ["base"], "tipo": "caixa", "centro": [0, 50, 0], "dimensoes": [200, 100, 120] },
+    { "id": "viga", "regioes": ["viga"], "tipo": "caixa", "centro": [0, 400, 0], "dimensoes": [280, 185, 60] }
+  ]
+}

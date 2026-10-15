@@ -81,7 +81,7 @@ produz número confiante e errado.
 
 `npm run descrever -- <peça>` confere a forma contra a referência que a peça tem, depois do que já roda (plano de partes,
 refinamento, contatos e formas), e cada item sem referência diz `não conferido: sem referência`, sem aprovar nem barrar. O
-`conferir:referencia` acima continua sendo a conferência da borda contra uma foto; estes três itens não precisam de foto.
+`conferir:referencia` acima continua sendo a conferência da borda contra uma foto; estes itens não precisam de foto.
 
 - **G01 sobre a malha.** A receita que refina um andaime declara também o alvo N2 em `REFINA.alvo` (caminho relativo à pasta da
   peça, como `andaime`). O G01 roda com os triângulos da peça no lugar dos do andaime e confere envelope, regiões e as silhuetas
@@ -95,6 +95,11 @@ refinamento, contatos e formas), e cada item sem referência diz `não conferido
 - **Razões.** `RAZOES` na receita, ao lado de `PLANO`: `[{ nome, origem, mede: { razao: [A, B], faixa: [min, max] } }]`, com A e B
   as medidas do `--medidas` do esboço (`alturaTotal`, `larguraTotal`, `profundidadeTotal`, `{ caixa, formas }`, `{ distancia,
   eixo }`), em que as formas são as partes da peça. A razão fora da faixa, ou que não se lê, reprova com o valor medido.
+- **Forma contra o esboço.** A receita que refina uma forma do esboço declara `REFINA.esboco` (o arquivo do esboço, a opção, a forma de
+  cada parte e a razão interseção/união de volume mínima, geral ou por parte). Cada parte é comparada ao sólido da forma, com os recortes,
+  as inclinações e a malha de família, e reprova abaixo do mínimo com a parte, as formas, a razão e o mínimo. Só roda quando o campo
+  existe, e a linha da seção `REFERÊNCIA DA FORMA` traz a razão de cada parte. `npm run forma:esboco -- <peça> --esboco=<arquivo> --mesmo-id`
+  mede uma receita que não declara o campo, ligando cada parte à forma de mesmo id.
 
 O laço lê o mesmo veredito: `rodada-de-modelagem.mjs <peça> --acao` mede a receita atual (veredito, `guarda:acervo`,
 `guarda:referencial` e `conferir-pontos` quando há `PONTOS`) e devolve `modelar` enquanto a medição não passar; `--registrar` mede

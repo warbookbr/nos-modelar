@@ -148,8 +148,90 @@ andaime do disco. O veredito de `descrever-peca` roda a conferência sempre que 
 
 O andaime está em milímetro e o núcleo em metro, no mesmo quadro de coordenadas, com a mesma origem e os mesmos
 eixos. O envelope é um limite superior: uma parte pequena dentro de um volume grande passa, e quem decide se a
-parte preenche o volume é o G01 da blocagem e a pessoa. A conferência também não exige que todo volume do
-andaime tenha uma parte.
+parte preenche o volume é o G01 da blocagem, a razão de volume contra a forma do esboço quando a receita a declara (seção
+"Forma da parte contra a forma do esboço") e a pessoa. A conferência também não exige que todo volume do andaime tenha uma parte.
+
+## Forma da parte contra a forma do esboço
+
+O envelope acima é uma caixa e limita a parte só por cima. O andaime perde o que o esboço tem: a N2 não subtrai um volume de outro, e
+por isso o recorte some; não inclina o sólido, e por isso as pás da hélice e o montante do para-brisa não têm volume; e a forma de
+família vira o casco convexo das seções dela. O envelope da ponta da asa do avião é a caixa da asa inteira, que passa 5,3 m da ponta, e
+uma ponta feita em qualquer lugar dela passa. Quando a receita precisa responder se a parte tem a forma da que o esboço aprovado
+desenhou, ela declara `esboco` dentro de `REFINA`, e a conferência compara a malha da parte com o sólido da forma do próprio esboço.
+Sem o campo nada muda para receita nenhuma, e a conferência do envelope também não o lê.
+
+```js
+REFINA: {
+  andaime: 'andaime.json',
+  esboco: {
+    arquivo: '../../esboco/aviao.esboco.json',   // relativo à pasta da peça, confinado ao repositório, de um .esboco.json
+    opcao: 1,                                    // número a partir de 1 ou título da opção; padrão 1
+    formas: {                                    // parte da receita -> forma do esboço
+      fuselagem: 'fuselagem',
+      asa: ['asaD', 'pontaD'],                   // uma parte pode refinar mais de uma forma: a comparação é com a união delas
+      porta: { formas: 'porta', minimo: 0.9 },   // mínimo próprio da parte, no lugar do geral
+    },
+    minimo: 0.95,                                // razão interseção/união mínima de cada parte sem mínimo próprio, de 0 (aberto) a 1
+  },
+  partes: { ... }, tolerancia: { ... },
+}
+```
+
+A forma canônica de `esboco` traz `arquivo`, `opcao` (1 quando a receita não a escreve), `minimo` e `formas` como a lista
+`[{ parte, formas, minimo? }]` em ordem de nome de parte, com as formas de cada parte em ordem de id; a normalização aceita as duas
+escritas e é idempotente. Só as partes que o campo cita são conferidas, e uma parte do `REFINA.partes` sem forma no esboço continua
+conferida só pelo envelope.
+
+A razão de uma parte é `V(parte ∩ formas) / V(parte ∪ formas)`: vale 1 quando a parte é a forma e cai com a parte menor, maior ou
+deslocada. A parte que repete o recorte da forma dá 1, e a parte sem o recorte que a forma tem dá a razão que o recorte tira, um menos o
+volume do vão sobre o volume da parte. A conferência mede com a Manifold, em milímetro, e reprova a parte abaixo do mínimo com um achado
+que diz a parte, as formas, a razão e o mínimo. Em `partes` volta a razão de cada parte medida, com os volumes da parte, das formas e da
+interseção em mm3, e o veredito de `descrever-peca` imprime na seção `REFERÊNCIA DA FORMA` uma linha com a razão de cada parte quando o
+campo existe. Os achados são:
+
+- `parte-fora-da-forma-do-esboco`: a razão da parte está abaixo do mínimo dela;
+- `forma-do-esboco-desconhecida`: a parte cita uma forma que a opção do esboço não tem (a mensagem lista as que ela tem);
+- `parte-ausente-do-esboco`: a parte cita uma forma e a peça não tem nenhuma face com o nome dela;
+- `forma-do-esboco-sem-solido`: a forma não tem sólido, hoje só a faixa (`envolve`), e o motivo vem na mensagem;
+- `parte-sem-solido`: a malha da parte não forma um sólido fechado e orientado, e sem sólido não há volume para comparar. A parte que a
+  conferência não consegue medir reprova em vez de passar, porque o campo é uma declaração da receita.
+
+`src/autoria/solido-do-esboco.js` monta o sólido de cada forma de `formasResolvidas` (`mecanifica.formas-resolvidas@1`), sem importar o
+módulo do esboço. A geometria do tipo vem do tradutor do nível zero, no quadro local da forma (`volumeLocalDaForma`, que dá o volume da
+N2 com a matriz identidade, de modo que a rotação em dois eixos deixa de importar), com os mesmos lados do esboço; o sólido é essa
+malha girada pela `matriz` e posta no `centro`, e a matriz com determinante negativo (o espelho) vira os triângulos para a normal
+continuar saindo. O que a N2 muda é refeito: o loft com seção inclinada, seção ponto ou casca é a união do casco convexo dos pontos de
+cada par de seções (a casca é o externo menos a cavidade, que passa 1 mm da boca), e o loft sem nada disso fica como o tradutor o põe,
+a superfície de cada ponto ao ponto correspondente da seguinte, que é a que o esboço desenha e a que o `loft` do núcleo faz; a caixa com
+`furos` é a caixa menos um cilindro de 128 lados por furo; o tubo com canto sem raio de curva é um tubo por trecho e uma esfera por
+junta; e a forma de família é a malha que o provedor de `tools/mecanifica/esboco-familias.mjs` entrega (a que o módulo já leu,
+recentrada e com as faces para fora), uma parte da família por vez e unidas, porque o aro e o pneu se sobrepõem e a união de sólidos
+fechados é definida onde a malha das duas juntas não é.
+
+O recorte de uma forma (`geometria.recorte.cortadores`) é lido como em `modulos/esboco/src/recorte.js`: o sólido da forma inteira menos
+o sólido de cada molde, que pode ser qualquer forma da opção, visível ou `cortador`, e pode ter o próprio recorte. `folga` engrossa o
+molde deslocando cada face dele para fora (em canto vivo o vão passa de `folga`), peça convexa por peça convexa (o casco de cada faixa do
+loft), e só vale para molde convexo ou loft; `profundidade` com `lado` deixa do molde só a fatia que entra `profundidade` mm na forma a
+partir da face dela nesse lado. O recorte circular, o que remove a forma inteira e a folga num molde que não é convexo nem loft são
+recusados. As coordenadas entram na Manifold relativas ao centro das partes medidas, porque ela trabalha em Float32 (o erro fica em
+cerca de um milionésimo do volume), e os sólidos saem iguais a cada execução.
+
+`src/autoria/forma-do-esboco.js` faz a conferência (`conferirFormaDoEsboco`) e não conhece disco: recebe as formas resolvidas e a peça
+executada. O adaptador `tools/mecanifica/esboco-solido.mjs` lê a opção pelo módulo, guarda no processo o resultado de
+`formasResolvidas` pela impressão do esboço (resolver a opção do avião inteiro leva 45 s, dos quais 40 s são a superfície das 15 formas
+de família, gerada a frio pelo provedor, e 3 s os recortes do módulo; a conferência dos sólidos e das razões depois leva meio segundo),
+entrega a malha de cada família e carrega o módulo, as famílias e a Manifold só quando a receita declara o campo.
+`tools/mecanifica/refinamento-global.mjs` lê o esboço do caminho que a receita declara, confinado ao repositório como o andaime, o
+veredito de `descrever-peca` roda a conferência junto com o `REFINA`, como já roda o envelope e as portas, e a `guarda:acervo` passa por
+ele. A linha de comando `npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --mesmo-id` (ou
+`--formas=parte:forma+forma,...`, com `--minimo=` e `--opcao=`) mede uma receita que não declara o campo, ligando cada parte à forma de
+mesmo id, sem mudá-la; serve para medir uma peça fixa ou escolher o mínimo antes de escrever a declaração.
+
+Limites. A razão mede volume e não o lugar de cada detalhe, e a parte que erra por menos que o mínimo passa; o mínimo é de quem
+declara, e a razão que a parte tem de fato volta em `partes`. A faixa (`envolve`) não tem sólido. O loft de seções muito torcidas, como
+uma pá, usa a superfície que a N2 faz, e o volume dela difere da fórmula do prismatoide do tradutor em até 5%. O `volumeMm3` e a caixa
+que o módulo calcula para a forma de família recortada vêm das peças convexas dela e não valem como referência (a ponta da asa do avião
+sai com volume negativo e a deriva com a caixa 268 mm mais baixa); o sólido da conferência não os usa.
 
 ## Andaime derivado do esboço
 
@@ -275,6 +357,14 @@ A ligação ao nível detalhado tem teste próprio, com o suporte de prova de
 
 ```text
 npx vitest run src/autoria/refinamento-global.test.js tools/mecanifica/refinamento-global.test.mjs
+```
+
+A forma da parte contra a forma do esboço (`REFINA.esboco`) tem a prova do sólido de cada tipo e do recorte, a da conferência sobre um
+esboço sintético (um bloco com um cilindro recortado, uma viga inclinada e uma forma de família) e a de ponta a ponta no veredito, na
+guarda do acervo e na linha de comando, com as fixtures de `tools/fixtures/forma-do-esboco/`:
+
+```text
+npx vitest run src/autoria/solido-do-esboco.test.js src/autoria/forma-do-esboco.test.js tools/mecanifica/forma-do-esboco.test.mjs
 ```
 
 `forma-global-n2-primitivas.test.mjs` prova cada primitiva (envelope medido, malha

@@ -67,6 +67,72 @@ describe('REFINA', () => {
   });
 });
 
+describe('REFINA.esboco', () => {
+  const ESBOCO = { arquivo: '../aviao.esboco.json', formas: { fuselagem: 'fuselagem', asa: ['pontaD', 'asaD'], porta: { formas: 'porta', minimo: 0.9 } }, minimo: 0.95 };
+
+  it('sem o campo a forma canônica não ganha nada, e com o campo entra a lista de partes em ordem, com as formas em ordem', () => {
+    expect(normalizarRefinamentoGlobal(REFINA)).not.toHaveProperty('esboco');
+    const canonica = normalizarRefinamentoGlobal({ ...REFINA, esboco: ESBOCO });
+    expect(canonica.esboco).toEqual({
+      arquivo: '../aviao.esboco.json', opcao: 1, minimo: 0.95,
+      formas: [
+        { parte: 'asa', formas: ['asaD', 'pontaD'] },
+        { parte: 'fuselagem', formas: ['fuselagem'] },
+        { parte: 'porta', formas: ['porta'], minimo: 0.9 },
+      ],
+    });
+    expect(normalizarRefinamentoGlobal(canonica)).toEqual(canonica);
+  });
+
+  it('a opção é o número a partir de 1 ou o título, e o arquivo é aparado', () => {
+    expect(normalizarRefinamentoGlobal({ ...REFINA, esboco: { ...ESBOCO, opcao: 2 } }).esboco.opcao).toBe(2);
+    expect(normalizarRefinamentoGlobal({ ...REFINA, esboco: { ...ESBOCO, opcao: ' Opção B ', arquivo: ' a.esboco.json ' } }).esboco).toMatchObject({ opcao: 'Opção B', arquivo: 'a.esboco.json' });
+  });
+
+  it.each([
+    [{ ...ESBOCO, extra: 1 }, /'REFINA.esboco.extra' não é permitido/],
+    [{ formas: ESBOCO.formas, minimo: 0.9 }, /precisa declarar: arquivo/],
+    [{ arquivo: 'a.esboco.json', minimo: 0.9 }, /precisa declarar: formas/],
+    [{ arquivo: 'a.esboco.json', formas: ESBOCO.formas }, /precisa declarar: minimo/],
+    [{ ...ESBOCO, arquivo: 'andaime.json' }, /'arquivo' precisa ser o caminho relativo de um \.esboco\.json/],
+    [{ ...ESBOCO, arquivo: '/etc/a.esboco.json' }, /'arquivo' precisa ser o caminho relativo/],
+    [{ ...ESBOCO, arquivo: 'https://exemplo/a.esboco.json' }, /'arquivo' precisa ser o caminho relativo/],
+    [{ ...ESBOCO, arquivo: 'pasta\\a.esboco.json' }, /'arquivo' precisa ser o caminho relativo/],
+    [{ ...ESBOCO, opcao: 0 }, /'opcao' precisa ser o número da opção/],
+    [{ ...ESBOCO, opcao: 1.5 }, /'opcao' precisa ser o número da opção/],
+    [{ ...ESBOCO, opcao: '' }, /'opcao' precisa ser o número da opção/],
+    [{ ...ESBOCO, minimo: 0 }, /'minimo' precisa ser a razão interseção\/união mínima/],
+    [{ ...ESBOCO, minimo: 1.2 }, /'minimo' precisa ser a razão interseção\/união mínima/],
+    [{ ...ESBOCO, minimo: '0.9' }, /'minimo' precisa ser a razão interseção\/união mínima/],
+    [{ ...ESBOCO, minimo: Number.NaN }, /'minimo' precisa ser a razão interseção\/união mínima/],
+    [{ ...ESBOCO, formas: {} }, /'formas' precisa ser objeto \{parte: id da forma\} com ao menos uma parte/],
+    [{ ...ESBOCO, formas: 'fuselagem' }, /'formas' precisa ser objeto/],
+    [{ ...ESBOCO, formas: { 'a b': 'x' } }, /o nome da parte precisa ser o mesmo identificador do passo 'parte'/],
+    [{ ...ESBOCO, formas: { asa: [] } }, /'formas\.asa' precisa ser o id de uma forma do esboço ou uma lista de ids/],
+    [{ ...ESBOCO, formas: { asa: ['asaD', ''] } }, /'formas\.asa' precisa ser o id de uma forma/],
+    [{ ...ESBOCO, formas: { asa: 7 } }, /'formas\.asa' precisa ser o id de uma forma/],
+    [{ ...ESBOCO, formas: { asa: ['asaD', 'asaD'] } }, /'formas\.asa' não pode repetir forma/],
+    [{ ...ESBOCO, formas: { asa: { formas: 'asaD', minimo: 2 } } }, /'formas\.asa\.minimo' precisa ser a razão/],
+    [{ ...ESBOCO, formas: { asa: { formas: 'asaD', tolerancia: 2 } } }, /'formas\.asa\.tolerancia' não é permitido/],
+    [{ ...ESBOCO, formas: [{ parte: 'asa', formas: 'asaD' }, { parte: 'asa', formas: 'pontaD' }] }, /'formas' não pode repetir parte/],
+  ])('recusa %j', (esboco, mensagem) => {
+    expect(() => normalizarRefinamentoGlobal({ ...REFINA, esboco })).toThrow(mensagem);
+  });
+
+  it('esboco que não é objeto é recusado', () => {
+    expect(() => normalizarRefinamentoGlobal({ ...REFINA, esboco: 'a.esboco.json' })).toThrow(/REFINA\.esboco: precisa ser objeto/);
+    expect(() => normalizarRefinamentoGlobal({ ...REFINA, esboco: [] })).toThrow(/precisa ser objeto/);
+  });
+
+  it('a conferência do envelope não muda com o campo, que ela não lê', () => {
+    const sem = conferir();
+    const receita = receitaDoSuporte();
+    const { neutro } = executarReceita(receita);
+    const com = conferirRefinamentoGlobal({ refinamento: { ...receita.REFINA, esboco: ESBOCO }, andaime: ANDAIME, neutro });
+    expect(JSON.stringify(com)).toBe(JSON.stringify(sem));
+  });
+});
+
 describe('portas do andaime', () => {
   it('andaime sem portas continua canônico e sem o campo', () => {
     const { portas, ...semPortas } = copia(ANDAIME);

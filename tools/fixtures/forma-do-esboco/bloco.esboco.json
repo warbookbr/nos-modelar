@@ -1,0 +1,14 @@
+{
+  "vista": "isometrica",
+  "opcoes": [
+    {
+      "titulo": "Bloco e viga",
+      "nota": "Um bloco de 200 por 100 por 120 mm com um furo passante de 60 mm de diâmetro (o recorte de um cilindro), e uma viga de 300 por 40 por 60 mm inclinada 30 graus em z. Serve de prova da conferência da forma da receita contra o esboço.",
+      "formas": [
+        { "id": "bloco", "tipo": "caixa", "largura": 200, "altura": 100, "profundidade": 120, "centro": [0, 50, 0], "subtrai": ["furo"] },
+        { "id": "furo", "tipo": "cilindro", "diametro": 60, "comprimento": 160, "eixo": "y", "centro": [30, 50, 0], "cortador": true },
+        { "id": "viga", "tipo": "caixa", "largura": 300, "altura": 40, "profundidade": 60, "centro": [0, 400, 0], "rotacao": [0, 0, 30] }
+      ]
+    }
+  ]
+}

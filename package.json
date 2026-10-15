@@ -60,6 +60,7 @@
     "guarda:referencial": "node tools/mecanifica/guardas/guarda-referencial.mjs",
     "material": "node tools/mecanifica/material-da-peca.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
+    "forma:esboco": "node tools/mecanifica/forma-do-esboco.mjs",
     "parametros": "node tools/mecanifica/parametros-peca.mjs",
     "varrer": "node tools/mecanifica/varrer-peca.mjs",
     "conferir:juntas": "node tools/mecanifica/conferir-juntas.mjs",

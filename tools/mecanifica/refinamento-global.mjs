@@ -2,8 +2,9 @@
  *
  * O núcleo (`src/autoria/refinamento-global.js`) recebe o andaime já lido. Aqui o caminho que a receita declara em
  * `REFINA.andaime` vira o JSON do andaime: relativo à pasta da peça, e confinado ao repositório, como a referência
- * do PLANO. O alvo N2 que `REFINA.alvo` declara, para o G01 sobre a malha da peça, é lido do mesmo jeito. Quem chama é o
- * veredito de `descrever-peca`, que a guarda do acervo e a auditoria da peça já rodam. */
+ * do PLANO. O alvo N2 que `REFINA.alvo` declara, para o G01 sobre a malha da peça, e o esboço que `REFINA.esboco.arquivo` declara, para a
+ * forma de cada parte contra a forma do esboço (`conferirFormaDoEsbocoDaReceita`), são lidos do mesmo jeito. Quem chama é o veredito de
+ * `descrever-peca`, que a guarda do acervo e a auditoria da peça já rodam. */
 import { readFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,6 +51,22 @@ export function conferirRefinamentoDaReceita({ receita, neutro, caminhoDaReceita
   if (!refinamento) return null;
   const andaime = lerAndaimeDoRefinamento(refinamento, caminhoDaReceita, { raiz });
   return conferirRefinamentoGlobal({ refinamento, andaime, neutro });
+}
+
+/** O esboço que `REFINA.esboco.arquivo` declara, lido do disco, ou `null` quando a receita não declara. */
+export function lerEsbocoDoRefinamento(refinamento, caminhoDaReceita, { raiz = REPO } = {}) {
+  return refinamento.esboco === undefined ? null : lerJsonDoRefinamento('esboco.arquivo', refinamento.esboco.arquivo, caminhoDaReceita, raiz);
+}
+
+/** A forma de cada parte contra a forma do esboço que ela refina (`REFINA.esboco`), pela razão interseção/união de volume. `null` quando a
+ *  receita não declara `REFINA.esboco`; do contrário, o resultado de `conferirFormaDoEsboco`. O módulo do esboço, as famílias e a Manifold só
+ *  carregam quando a receita declara o campo. */
+export async function conferirFormaDoEsbocoDaReceita({ receita, neutro, caminhoDaReceita, raiz }) {
+  const refinamento = normalizarRefinamentoGlobal(receita.REFINA);
+  if (!refinamento || refinamento.esboco === undefined) return null;
+  const bruto = lerEsbocoDoRefinamento(refinamento, caminhoDaReceita, { raiz });
+  const { conferirFormaDoEsbocoDoJson } = await import('./esboco-solido.mjs');
+  return conferirFormaDoEsbocoDoJson({ esboco: refinamento.esboco, bruto, neutro });
 }
 
 /** O G01 sobre a malha da peça, quando a receita declara `REFINA.alvo`. `null` quando não há alvo N2 para conferir (sem `REFINA` ou

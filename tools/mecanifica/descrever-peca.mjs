@@ -27,7 +27,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
-import { conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
+import { conferirFormaDoEsbocoDaReceita, conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
 import { conferirContornosDaPeca, contornosDaPeca } from './contorno-da-peca.mjs';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca, textoDaRazao } from '../../src/autoria/razoes-da-peca.js';
 
@@ -306,6 +306,7 @@ export async function descreverPecaReutilizavel({
   let formas = null;
   let plano = null;
   let refinamento = null;
+  let formaDoEsboco = null;
   let g01 = null;
   let contornos = null;
   let razoes = null;
@@ -355,6 +356,23 @@ export async function descreverPecaReutilizavel({
         + refinamento.achados.map((a) => `    ${a.mensagem}`).join('\n')
         + '\n  A receita refina o andaime; ela não refaz o que o nível zero decidiu. Ou a peça saiu do envelope'
         + '\n  e da porta do andaime, ou o andaime precisa mudar antes e o G01 ser refeito.\n';
+      falhou = true;
+    }
+    /* FORMA CONTRA O ESBOÇO. O envelope acima é uma caixa e limita a parte só por cima. Quando a receita declara `REFINA.esboco`, cada
+       parte ligada a uma forma do esboço é comparada ao sólido dessa forma (com os recortes, as inclinações e a malha de família) pela
+       razão interseção/união de volume, e reprova abaixo do mínimo declarado. Sem o campo nada roda. */
+    try {
+      let caminho = caminhoReceita;
+      if (!caminho) { try { caminho = resolverCaminhoReceita(peca, { raiz: REPO }); } catch { caminho = null; } }
+      formaDoEsboco = await conferirFormaDoEsbocoDaReceita({ receita, neutro, caminhoDaReceita: caminho });
+    } catch (erro) {
+      return falha(`FORMA CONTRA O ESBOÇO INVÁLIDA\n  ${erro.message}`);
+    }
+    if (formaDoEsboco && !formaDoEsboco.ok) {
+      stderr += `\n${formaDoEsboco.achados.length} ACHADO(S) NA FORMA CONTRA O ESBOÇO '${formaDoEsboco.arquivo}'\n`
+        + formaDoEsboco.achados.map((a) => `    ${a.mensagem}`).join('\n')
+        + '\n  A parte diverge do sólido da forma do esboço que ela refina (razão interseção/união de volume): ou a receita saiu da forma,'
+        + '\n  ou o esboço precisa mudar antes, ou o mínimo declarado em REFINA.esboco não é o que a parte pode cumprir.\n';
       falhou = true;
     }
     try {
@@ -498,6 +516,10 @@ export async function descreverPecaReutilizavel({
         falhou = true;
       }
     }
+    if (formaDoEsboco) {
+      linhasDeReferencia.push(`forma contra o esboço (${formaDoEsboco.arquivo}, opção ${formaDoEsboco.opcao?.titulo ?? formaDoEsboco.opcao?.numero ?? formaDoEsboco.opcao}): ${formaDoEsboco.ok ? 'aprovada' : 'REPROVADA'}`
+        + ` — ${formaDoEsboco.partes.map((p) => `${p.parte} ${String(Math.round(p.razao * 1000) / 1000).replace('.', ',')}`).join(', ') || 'nenhuma parte medida'} (razão interseção/união de volume, mínimo ${String(formaDoEsboco.minimo).replace('.', ',')})`);
+    }
     stdout += `\nREFERÊNCIA DA FORMA\n${linhasDeReferencia.map((l) => `  ${l}`).join('\n')}\n`;
   }
 
@@ -515,6 +537,7 @@ export async function descreverPecaReutilizavel({
       formas,
       plano,
       refinamento,
+      formaDoEsboco,
       g01,
       contornos,
       razoes,

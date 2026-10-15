@@ -13,12 +13,18 @@
  *   REFINA: {
  *     andaime: 'andaime.json',                       // caminho relativo à pasta da peça
  *     alvo: 'alvo.json',                             // opcional: o alvo N2, para o G01 sobre a malha da peça
+ *     esboco: {                                      // opcional: a forma de cada parte contra a forma do esboço que ela refina
+ *       arquivo: 'aviao.esboco.json', opcao: 1,      // caminho relativo à pasta da peça; opção (número a partir de 1, ou título)
+ *       formas: { coluna: 'coluna', base: ['base', 'sapata'], porta: { formas: 'porta', minimo: 0.9 } },
+ *       minimo: 0.95,                                // razão interseção/união de volume, abaixo da qual a parte reprova
+ *     },
  *     partes: { coluna: 'coluna-central', base: 'sapata' },   // parte da receita -> volume do andaime
  *     tolerancia: { envelope: 2, porta: 0.5 },       // milímetro
  *   }
  *
- * Receita sem `REFINA` não muda em nada. A declaração é opcional e versionada (`formato`, `versao`): a forma
- * canônica que sai daqui carrega os dois, e a entrada aceita escrevê-los.
+ * Receita sem `REFINA` não muda em nada, e `REFINA` sem `esboco` também não. A declaração é opcional e versionada (`formato`, `versao`):
+ * a forma canônica que sai daqui carrega os dois, e a entrada aceita escrevê-los. `esboco` só é validado aqui; a conferência está em
+ * `forma-do-esboco.js` (o sólido do esboço inteiro, com recortes e inclinações, e a Manifold), que a conferência do envelope não usa.
  *
  * UNIDADES E QUADRO. O andaime está em milímetro e o núcleo em metro; o quadro de coordenadas é o mesmo, com a
  * mesma origem e os mesmos eixos. A conversão é fixa (1 mm = 0,001), a mesma que `porta-confere-forma.js` usa.
@@ -62,6 +68,63 @@ function tolerancia(valor, quem, campo, limite) {
   return valor;
 }
 
+const CAMINHO_DO_ESBOCO = /^(?![a-z][a-z0-9+.-]*:)(?!\/)(?!.*\\)[^\0]+\.esboco\.json$/i;
+const objeto = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+function razaoMinima(valor, quem, campo) {
+  if (typeof valor !== 'number' || !Number.isFinite(valor) || valor <= 0 || valor > 1) {
+    falhar(quem, `'${campo}' precisa ser a razão interseção/união mínima, número maior que 0 e até 1; recebeu ${exibir(valor)}.`);
+  }
+  return valor;
+}
+
+function formasDaParte(valor, quem, parte) {
+  const lista = typeof valor === 'string' ? [valor] : valor;
+  if (!Array.isArray(lista) || !lista.length || lista.some((id) => typeof id !== 'string' || !id.trim())) {
+    falhar(quem, `'formas.${parte}' precisa ser o id de uma forma do esboço ou uma lista de ids, sem texto vazio; recebeu ${exibir(valor)}.`);
+  }
+  const ids = lista.map((id) => id.trim());
+  if (new Set(ids).size !== ids.length) falhar(quem, `'formas.${parte}' não pode repetir forma.`);
+  return ids.sort(comparar);
+}
+
+/**
+ * Valida e canonicaliza `REFINA.esboco`: a forma de cada parte da receita comparada ao sólido da forma do esboço que ela refina, pela
+ * razão interseção/união de volume (`forma-do-esboco.js`). A entrada escreve `formas` como `{ parte: id | [ids] | { formas, minimo } }`
+ * e a forma canônica é a lista `[{ parte, formas, minimo? }]`, que a normalização também aceita para ser idempotente.
+ */
+export function normalizarEsbocoDoRefinamento(valor, { quem = 'REFINA.esboco' } = {}) {
+  if (!objeto(valor)) falhar(quem, 'precisa ser objeto { arquivo, opcao, formas, minimo }.');
+  const permitidas = ['arquivo', 'opcao', 'formas', 'minimo'];
+  for (const chave of Object.keys(valor)) if (!permitidas.includes(chave)) falhar(quem, `'${quem}.${chave}' não é permitido; aceita ${permitidas.join(', ')}.`);
+  const ausentes = ['arquivo', 'formas', 'minimo'].filter((chave) => !Object.hasOwn(valor, chave));
+  if (ausentes.length) falhar(quem, `precisa declarar: ${ausentes.join(', ')}.`);
+  if (typeof valor.arquivo !== 'string' || !CAMINHO_DO_ESBOCO.test(valor.arquivo.trim())) {
+    falhar(quem, `'arquivo' precisa ser o caminho relativo de um .esboco.json, sem caminho absoluto, endereço ou barra invertida; recebeu ${exibir(valor.arquivo)}.`);
+  }
+  const opcao = valor.opcao ?? 1;
+  if (!((Number.isInteger(opcao) && opcao >= 1) || (typeof opcao === 'string' && opcao.trim()))) {
+    falhar(quem, `'opcao' precisa ser o número da opção do esboço, a partir de 1, ou o título dela; recebeu ${exibir(valor.opcao)}.`);
+  }
+  const minimo = razaoMinima(valor.minimo, quem, 'minimo');
+  const lista = Array.isArray(valor.formas)
+    ? valor.formas.map((item) => (objeto(item) ? item : {}))
+    : Object.entries(objeto(valor.formas) ? valor.formas : {}).map(([parte, v]) => (objeto(v) ? { parte, ...v } : { parte, formas: v }));
+  if (!lista.length) falhar(quem, "'formas' precisa ser objeto {parte: id da forma} com ao menos uma parte.");
+  const partes = lista.map((item) => {
+    const parte = item.parte;
+    if (typeof parte !== 'string' || !NOME_DE_PARTE.test(parte)) falhar(quem, `'formas.${parte}': o nome da parte precisa ser o mesmo identificador do passo 'parte': letras e dígitos, sem espaço.`);
+    for (const chave of Object.keys(item)) if (!['parte', 'formas', 'minimo'].includes(chave)) falhar(quem, `'formas.${parte}.${chave}' não é permitido; aceita formas e minimo.`);
+    return {
+      parte,
+      formas: formasDaParte(item.formas, quem, parte),
+      ...(item.minimo === undefined ? {} : { minimo: razaoMinima(item.minimo, quem, `formas.${parte}.minimo`) }),
+    };
+  }).sort((a, b) => comparar(a.parte, b.parte));
+  if (new Set(partes.map(({ parte }) => parte)).size !== partes.length) falhar(quem, "'formas' não pode repetir parte.");
+  return { arquivo: valor.arquivo.trim(), opcao: typeof opcao === 'string' ? opcao.trim() : opcao, formas: partes, minimo };
+}
+
 /**
  * Valida e canonicaliza a declaração `REFINA` de uma receita.
  * `undefined` e `null` significam que a receita não refina andaime nenhum e retornam `null`.
@@ -69,7 +132,7 @@ function tolerancia(valor, quem, campo, limite) {
 export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
   if (valor === undefined || valor === null) return null;
   if (typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, 'precisa ser objeto ou estar ausente.');
-  const permitidas = ['formato', 'versao', 'andaime', 'alvo', 'partes', 'tolerancia'];
+  const permitidas = ['formato', 'versao', 'andaime', 'alvo', 'esboco', 'partes', 'tolerancia'];
   for (const chave of Object.keys(valor)) if (!permitidas.includes(chave)) falhar(quem, `'${quem}.${chave}' não é permitido; aceita ${permitidas.join(', ')}.`);
   const ausentes = ['andaime', 'partes', 'tolerancia'].filter((chave) => !Object.hasOwn(valor, chave));
   if (ausentes.length) falhar(quem, `precisa declarar: ${ausentes.join(', ')}.`);
@@ -108,6 +171,7 @@ export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
     versao: VERSAO_REFINAMENTO_GLOBAL,
     andaime: valor.andaime.trim(),
     ...(valor.alvo === undefined ? {} : { alvo: valor.alvo.trim() }),
+    ...(valor.esboco === undefined ? {} : { esboco: normalizarEsbocoDoRefinamento(valor.esboco, { quem: `${quem}.esboco` }) }),
     partes,
     tolerancia: {
       envelope: tolerancia(t.envelope, quem, 'envelope', LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM),

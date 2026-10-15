@@ -121,6 +121,12 @@ tolerância em milímetro. O veredito de `npm run descrever` e a `guarda:acervo`
 recusam a parte que sai do envelope do volume e a porta do andaime que a peça
 moveu ou não publicou. O formato e o que ele confere estão na seção "Ligação ao
 nível detalhado" do contrato da forma global N2 (`CONTRATO-FORMA-GLOBAL-N2`).
+O envelope é uma caixa e deixa passar a ponta da asa feita em qualquer lugar da
+caixa da asa inteira. A receita que refina uma forma do esboço declara também
+`REFINA.esboco` (o arquivo do esboço, a forma de cada parte e a razão
+interseção/união de volume mínima), e a parte que fica abaixo do mínimo reprova;
+o formato está na seção "Forma da parte contra a forma do esboço" do mesmo
+contrato.
 
 ## Identidade estável
 
