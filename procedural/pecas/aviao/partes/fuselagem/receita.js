@@ -1,4 +1,4 @@
-/* aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral.
+/* aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral.
  *
  * Primeira etapa do avião (`../../montagem.json`). O combinado com a pessoa e o plano da fuselagem estão em
  * `../../ALINHAMENTO.md`; as medidas vêm da unidade `fuselagem` do esboço aprovado da segunda rodada
@@ -28,6 +28,17 @@
  * recortada pelo vão da janela 4 do lado esquerdo, e esse corte avança `porta.sobraDoVao` para dentro do avião: a face de dentro
  * da porta se afasta do plano da face de dentro da placa até 12 mm no alto do vão, e sem a sobra a placa tocaria a pele que sobra
  * da porta, um contato que o plano não declara.
+ *
+ * O para-brisa é o mesmo caso, com o contorno em planta do esboço. O esboço o faz uma faixa de 50 mm apoiada sobre a frente da
+ * cabine, e a faixa passava da superfície do casco em até 41 mm e, na frente, nem a tocava (a face de baixo ficava até 15 mm acima
+ * dela). Aqui o contorno em planta da faixa vira um prisma vertical, e o vidro é a parte desse prisma que fica entre a superfície do
+ * casco e o casco descido `parabrisa.espessura` (o leito): o prisma menos o leito, aparado pelo casco inteiro, com a face de fora
+ * rente e uma espessura só, e não a face de baixo reta da faixa, que deixava o vidro sem chão na frente. O vão é o mesmo prisma
+ * alargado pela folga das janelas, menos o mesmo leito, e o vidro assenta no fundo dele. O prisma começa no menor y da face de baixo
+ * da faixa, que é o piso do volume do andaime: nas pontas, onde o casco desce a esse piso, o vidro termina e o vão some, e o vidro
+ * nunca desce abaixo do volume que o REFINA confere. O montante corre pela face de fora do vidro, no meio, com a face de baixo na
+ * superfície do casco, e a segue em seções nas estações do casco: o topo do casco no meio se afasta até 12 mm da reta que une as
+ * pontas do vidro, e uma barra reta ficaria no ar na frente e entraria no vidro atrás.
  *
  * Sem porta publicada: o andaime não declara nenhuma, e o plano da etapa não pede. O motor, que vem na frente da fuselagem, nasce da
  * seção da frente (z = 2377).
@@ -64,12 +75,15 @@ export const TABELA = {
   },
   /* Fechamento das pontas dos lofts: quanto o polo fica além da última seção, em z, em x ou em y, conforme o eixo do loft. */
   tampa: { avanco: 0.5 },
-  /* Para-brisa: uma faixa de 50 mm de espessura, inclinada, larga sobre o dorso e curva em x. Cada estação é
+  /* Para-brisa: no esboço, uma faixa de 50 mm de espessura, inclinada, larga sobre o dorso e curva em x. Cada estação é
      [x, y do centro, meio comprimento em z, y do perfil nos quatro cantos]: dois na frente (z do centro menos o meio comprimento) e
-     dois atrás. O z do centro é o mesmo em todas as estações, e o conjunto sobe `deslocamentoY` depois de montado. */
+     dois atrás. O z do centro é o mesmo em todas as estações, e o conjunto sobe `deslocamentoY` depois de montado. A receita usa da
+     faixa o contorno em planta (x e meio comprimento) e o menor y da face de baixo, que é o piso do vidro; o vidro rente tem
+     `espessura` de 20 mm, em y, entre a superfície do casco e o leito (o casco descido essa espessura). */
   parabrisa: {
     centroZ: 3270.5,
     deslocamentoY: 30,
+    espessura: 20,
     estacoes: [
       [-668, 1922, 220, -127, -77, 127, 77],
       [-640, 1960, 280, -155, -105, 155, 105],
@@ -87,7 +101,9 @@ export const TABELA = {
       [668, 1922, 220, -127, -77, 127, 77],
     ],
   },
-  /* Montante do para-brisa: barra de seção retangular de cantos arredondados, do ponto `de` ao ponto `para`. */
+  /* Montante do para-brisa: barra de seção retangular de cantos arredondados. No esboço ela vai do ponto `de` ao ponto `para`, e a
+     receita guarda daí só a inclinação (a barra de `profundidade` medida na normal tem essa altura na vertical); a barra rente
+     corre pela face de fora do vidro, da base ao topo da abertura. */
   montante: { de: [0, 1955, 2900], para: [0, 2298, 3640], largura: 70, profundidade: 36, raioDoCanto: 14, segmentosPorCanto: 6 },
   /* Janelas do lado direito, [x, y, z do centro, espessura em x, altura em y, profundidade em z, raio do canto, giro em y em graus].
      As do lado esquerdo são o espelho em x, com o giro de sinal trocado. */
@@ -211,48 +227,88 @@ const retangulo = (hx, hy, y, raios) => [
   [hx, y + hy, raios[0]], [-hx, y + hy, raios[1]], [-hx, y - hy, raios[2]], [hx, y - hy, raios[3]],
 ];
 
+/* O casco por estações, com todas as alturas descidas `descida` (mm): com zero é o casco, e com a espessura do vidro é o leito. */
+function cascoPorEstacoes(t, descida) {
+  const cascoMm = t.casco.estacoes;
+  return loftPorEstacoes({
+    eixo: 'z',
+    linha: [0, m(cascoMm[0][4] - descida), 0],
+    estacoes: cascoMm.map(([z, largura, altura, canto, y]) => ({
+      p: m(z), pontos: retangulo(m(largura) / 2, m(altura) / 2, m(y - descida), [m(canto), m(canto), m(canto), m(canto)]),
+    })),
+    avanco: m(t.tampa.avanco),
+    segmentos: t.casco.segmentosPorCanto,
+  });
+}
+
+/* Altura do topo do casco no meio (x = 0), em mm, a `z` mm da proa. Entre duas estações o casco é reto, e no meio o topo de cada
+   seção é plano (a largura do plano é a da seção menos dois raios), então a altura é a interpolação das estações. */
+function topoDoCascoNoMeio(t, z) {
+  const est = t.casco.estacoes;
+  const k = est.findIndex((e, i) => i < est.length - 1 && z >= e[0] && z <= est[i + 1][0]);
+  if (k < 0) throw new Error(`topo do casco: z ${z} fica fora das estações (${est[0][0]} a ${est[est.length - 1][0]})`);
+  const topo = (e) => e[4] + e[2] / 2;
+  const f = (z - est[k][0]) / (est[k + 1][0] - est[k][0]);
+  return topo(est[k]) + f * (topo(est[k + 1]) - topo(est[k]));
+}
+
+/* O vidro do para-brisa e o montante dele, em mm: o contorno em planta da faixa do esboço, o piso (o menor y da face de baixo dela,
+   com o `deslocamentoY`), o topo do prisma e o intervalo em z do meio do vidro. O montante vai de ponta a ponta desse intervalo. */
+function medidasDoParabrisa(t) {
+  const pb = t.parabrisa;
+  const frente = pb.estacoes.map(([x, , meio]) => [x, pb.centroZ - meio]);
+  const tras = pb.estacoes.map(([x, , meio]) => [x, pb.centroZ + meio]);
+  const meioDoMeio = Math.max(...pb.estacoes.map((e) => e[2]));
+  return {
+    planta: [...frente, ...[...tras].reverse()],
+    piso: Math.min(...pb.estacoes.flatMap(([, y, , ...ys]) => ys.map((v) => y + pb.deslocamentoY + v))),
+    topo: Math.max(...t.casco.estacoes.map((e) => e[4] + e[2] / 2)) + t.vao.folga,
+    zDaBase: pb.centroZ - meioDoMeio,
+    zDoTopo: pb.centroZ + meioDoMeio,
+  };
+}
+
+/* O montante: seções em z, nas pontas do vidro e em cada estação do casco entre elas, de retângulo de cantos arredondados com a face de
+   baixo no topo do casco e a altura na vertical que dá a `profundidade` na inclinação do esboço. As alturas são as mesmas em todas as
+   seções, de modo que a face de cima é paralela à de baixo em cada trecho. */
+function medidasDoMontante(t) {
+  const v = medidasDoParabrisa(t);
+  const [, dy, dz] = t.montante.para.map((p, k) => p - t.montante.de[k]);
+  const altura = t.montante.profundidade / Math.cos(Math.atan2(dy, dz));
+  const zs = [v.zDaBase, ...t.casco.estacoes.map((e) => e[0]).filter((z) => z > v.zDaBase && z < v.zDoTopo), v.zDoTopo];
+  const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z));
+  return { altura, zs, embaixo };
+}
+
 export function derivar(t = TABELA) {
   const avanco = m(t.tampa.avanco);
 
-  const cascoMm = t.casco.estacoes;
-  const casco = loftPorEstacoes({
+  const casco = cascoPorEstacoes(t, 0);
+  /* O leito do vidro: o casco descido pela espessura do vidro. */
+  const leito = cascoPorEstacoes(t, t.parabrisa.espessura);
+
+  /* Duas extrusões em y do contorno em planta do vidro, de y = piso até o topo do casco mais a folga: a do vidro e a do vão, que
+     é a do vidro alargada pela folga em volta. A interseção com o casco e a subtração do leito dão a forma, em `gerarPassos`. */
+  const v = medidasDoParabrisa(t);
+  const parabrisa = {
+    planta: v.planta.map(([x, z]) => [m(x), m(z)]),
+    piso: m(v.piso),
+    altura: m(v.topo - v.piso),
+    folga: m(t.vao.folga),
+  };
+
+  /* A barra é um loft em z, com o caminho na reta do centro da primeira seção. */
+  const ms = medidasDoMontante(t);
+  const montante = loftPorEstacoes({
     eixo: 'z',
-    linha: [0, m(cascoMm[0][4]), 0],
-    estacoes: cascoMm.map(([z, largura, altura, canto, y]) => ({
-      p: m(z), pontos: retangulo(m(largura) / 2, m(altura) / 2, m(y), [m(canto), m(canto), m(canto), m(canto)]),
+    linha: [0, m(ms.embaixo[0] + ms.altura / 2), 0],
+    estacoes: ms.zs.map((z, k) => ({
+      p: m(z),
+      pontos: retangulo(m(t.montante.largura) / 2, m(ms.altura) / 2, m(ms.embaixo[k] + ms.altura / 2), Array(4).fill(m(t.montante.raioDoCanto))),
     })),
     avanco,
-    segmentos: t.casco.segmentosPorCanto,
+    segmentos: t.montante.segmentosPorCanto,
   });
-
-  const pb = t.parabrisa;
-  const parabrisa = loftPorEstacoes({
-    eixo: 'x',
-    linha: [0, m(pb.estacoes[0][1] + pb.deslocamentoY), m(pb.centroZ)],
-    estacoes: pb.estacoes.map(([x, y, meio, y1, y2, y3, y4]) => {
-      const cy = y + pb.deslocamentoY;
-      return {
-        p: m(x),
-        pontos: [[m(cy + y1), m(pb.centroZ - meio)], [m(cy + y2), m(pb.centroZ - meio)], [m(cy + y3), m(pb.centroZ + meio)], [m(cy + y4), m(pb.centroZ + meio)]],
-      };
-    }),
-    avanco,
-    segmentos: 1,
-  });
-
-  /* O eixo da barra vai de `de` a `para`; a extrusão nasce em y a partir da origem, gira em z e depois em x para apontar para
-     `para` e sobe para `de`. Com os dois pontos no mesmo x só sobra o giro em x. */
-  const [dx, dy, dz] = t.montante.para.map((v, k) => m(v - t.montante.de[k]));
-  const comprimento = Math.hypot(dx, dy, dz);
-  const montante = {
-    comprimento,
-    giroEmZ: -(Math.asin(dx / comprimento) * 180) / Math.PI,
-    giroEmX: (Math.atan2(dz, dy) * 180) / Math.PI,
-    em: t.montante.de.map(m),
-    largura: m(t.montante.largura),
-    profundidade: m(t.montante.profundidade),
-    raio: m(t.montante.raioDoCanto),
-  };
 
   /* Cada janela, dos dois lados. O lado esquerdo é o espelho em x do direito, com o giro em y de sinal trocado. A extrusão em x
      tem a altura da janela em y e a profundidade em z. A placa fica centrada na origem em x, e o vão sai da face de dentro da
@@ -304,7 +360,7 @@ export function derivar(t = TABELA) {
     segmentos: bb.segmentosPorCanto,
   });
 
-  return { casco, parabrisa, montante, janelas, porta, vaoDaPorta, barbatana };
+  return { casco, leito, parabrisa, montante, janelas, porta, vaoDaPorta, barbatana };
 }
 
 /* Identidade estrutural dos passos, escolhida aqui. */
@@ -312,6 +368,8 @@ const ID = {
   casco: 100, fuselagem: 101, vaoDaPorta: 110,
   parabrisa: 120, montante: 130, barbatana: 140,
   porta: 150, portaVazada: 151, portaAparada: 152,
+  prismaDoVao: 160, leitoDoVao: 161, vaoDoParabrisa: 162,
+  prismaDoVidro: 170, leitoDoVidro: 171, vidroSemAparar: 172, gabaritoDoParabrisa: 173,
   placa: 200, vaoNoCasco: 300, vaoNaPorta: 400, placaAparada: 500, gabarito: 600, gabaritoDaPorta: 700,
 };
 /* Uma identidade por janela: cada número e cada lado têm a sua. */
@@ -350,7 +408,24 @@ export function gerarPassos(t = TABELA) {
     passos.push(['transladar', { d: janela.centro, sel: { origem: { op: 'extrusao', id: origemId } } }]);
   };
 
+  /* O prisma do vidro do para-brisa, de y = piso até o topo do casco, menos o leito (o casco descido pela espessura do vidro): fica
+     o que está acima do leito, dentro do contorno em planta. Com `folga` o prisma cresce em volta, e é o vão. O leito é um loft do
+     casco, e vem logo antes da subtração que o consome. */
+  const prismaMenosLeito = (prismaId, leitoId, origemId, folga) => {
+    passos.push(['extrusao', {
+      origemId: prismaId, eixo: 'y', altura: P.parabrisa.altura, perfil: P.parabrisa.planta,
+      ...(folga ? { deslocar: { para: 'fora', distancia: P.parabrisa.folga, canto: 'esquadria' } } : {}),
+    }]);
+    passos.push(['transladar', { d: [0, P.parabrisa.piso, 0], sel: { origem: { op: 'extrusao', id: prismaId } } }]);
+    loft(leitoId, P.leito, t.casco.segmentosPorCanto);
+    passos.push(['subtrair', {
+      origemId,
+      solidos: [{ origem: { op: 'extrusao', id: prismaId } }, { origem: { op: 'loft', id: leitoId } }],
+    }]);
+  };
+
   /* O casco e os vãos que saem dele. */
+  prismaMenosLeito(ID.prismaDoVao, ID.leitoDoVao, ID.vaoDoParabrisa, true);
   loft(ID.casco, P.casco, t.casco.segmentosPorCanto);
   loft(ID.vaoDaPorta, P.vaoDaPorta, 1);
   for (const janela of P.janelas) extrusaoDaJanela(idDaJanela(ID.vaoNoCasco, janela), janela, janela.vao, t.segmentosPorCantoDaJanela);
@@ -358,6 +433,7 @@ export function gerarPassos(t = TABELA) {
     origemId: ID.fuselagem,
     solidos: [
       { origem: { op: 'loft', id: ID.casco } },
+      { origem: { op: 'subtrair', id: ID.vaoDoParabrisa } },
       { origem: { op: 'loft', id: ID.vaoDaPorta } },
       ...P.janelas.map((janela) => ({ origem: { op: 'extrusao', id: idDaJanela(ID.vaoNoCasco, janela) } })),
     ],
@@ -366,32 +442,26 @@ export function gerarPassos(t = TABELA) {
   passos.push(['material', { usa: 'casco', sel: { origem: { op: 'subtrair', id: ID.fuselagem } } }]);
   passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'subtrair', id: ID.fuselagem } } }]);
 
-  /* O para-brisa e o montante dele. */
-  loft(ID.parabrisa, P.parabrisa, 1);
-  passos.push(['parte', { nome: 'parabrisa', sel: { origem: { op: 'loft', id: ID.parabrisa } } }]);
-  passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'loft', id: ID.parabrisa } } }]);
-  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'loft', id: ID.parabrisa } } }]);
-
-  const M = P.montante;
-  passos.push(['extrusao', {
-    origemId: ID.montante, eixo: 'y', altura: M.comprimento,
-    perfil: { retangulo: { largura: M.largura, profundidade: M.profundidade, cantos: M.raio } },
-    segmentosArco: t.montante.segmentosPorCanto,
-  }]);
-  if (M.giroEmZ !== 0) passos.push(['rotaciona', { eixo: 'z', graus: M.giroEmZ, pivo: [0, 0, 0], sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
-  passos.push(['rotaciona', { eixo: 'x', graus: M.giroEmX, pivo: [0, 0, 0], sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
-  passos.push(['transladar', { d: M.em, sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
-  passos.push(['parte', { nome: 'montanteParabrisa', sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
-  passos.push(['material', { usa: 'casco', sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
-  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'extrusao', id: ID.montante } } }]);
-
-  /* Cada sólido que assenta na superfície do casco (as placas das janelas e a porta) é aparado pelo casco inteiro, sem os vãos:
-     a interseção deixa a face de fora dele rente à superfície, no lugar de passar dela. O gabarito é um loft do casco refeito a
-     cada uso, porque a interseção o consome, e vem logo antes dela para o polo dele não dividir lugar com o de outro loft. */
+  /* Cada sólido que assenta na superfície do casco (o vidro do para-brisa, as placas das janelas e a porta) é aparado pelo casco
+     inteiro, sem os vãos: a interseção deixa a face de fora dele rente à superfície, no lugar de passar dela. O gabarito é um loft
+     do casco refeito a cada uso, porque a interseção o consome, e vem logo antes dela para o polo dele não dividir lugar com o de
+     outro loft. */
   const apara = (origem, origemId, gabaritoId) => {
     loft(gabaritoId, P.casco, t.casco.segmentosPorCanto);
     passos.push(['intersectar', { origemId, solidos: [{ origem }, { origem: { op: 'loft', id: gabaritoId } }] }]);
   };
+
+  /* O vidro do para-brisa, aparado pelo casco, e o montante dele. */
+  prismaMenosLeito(ID.prismaDoVidro, ID.leitoDoVidro, ID.vidroSemAparar, false);
+  apara({ op: 'subtrair', id: ID.vidroSemAparar }, ID.parabrisa, ID.gabaritoDoParabrisa);
+  passos.push(['parte', { nome: 'parabrisa', sel: { origem: { op: 'intersectar', id: ID.parabrisa } } }]);
+  passos.push(['material', { usa: 'vidro', sel: { origem: { op: 'intersectar', id: ID.parabrisa } } }]);
+  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'intersectar', id: ID.parabrisa } } }]);
+
+  loft(ID.montante, P.montante, t.montante.segmentosPorCanto);
+  passos.push(['parte', { nome: 'montanteParabrisa', sel: { origem: { op: 'loft', id: ID.montante } } }]);
+  passos.push(['material', { usa: 'casco', sel: { origem: { op: 'loft', id: ID.montante } } }]);
+  passos.push(['liso', { angulo: ANGULO_LISO, sel: { origem: { op: 'loft', id: ID.montante } } }]);
 
   /* As oito janelas: placas nos vãos, aparadas pela superfície do casco. */
   for (const janela of P.janelas) {
@@ -429,7 +499,7 @@ export function gerarPassos(t = TABELA) {
   return passos;
 }
 
-/* Os pontos declarados, em milímetro, saem da mesma tabela que a malha: os extremos do casco, do para-brisa, da porta e da
+/* Os pontos declarados, em milímetro, saem da mesma tabela que a malha: os extremos do casco, do vidro do para-brisa, da porta e da
    barbatana, o centro de cada placa de janela e o do montante. */
 export function pontosDeclarados(t = TABELA) {
   const extremos = (listas) => ({
@@ -441,11 +511,20 @@ export function pontosDeclarados(t = TABELA) {
     min: [-Math.max(...casco.map((e) => e[1] / 2)), Math.min(...casco.map((e) => e[4] - e[2] / 2)), casco[0][0]],
     max: [Math.max(...casco.map((e) => e[1] / 2)), Math.max(...casco.map((e) => e[4] + e[2] / 2)), casco[casco.length - 1][0]],
   };
-  const pb = t.parabrisa;
-  const cantosDoParabrisa = pb.estacoes.flatMap(([x, y, meio, ...ys]) => [
-    [x, y + pb.deslocamentoY + Math.min(...ys), pb.centroZ - meio], [x, y + pb.deslocamentoY + Math.max(...ys), pb.centroZ + meio],
-  ]);
-  const caixaDoParabrisa = extremos(cantosDoParabrisa);
+  /* O vidro rente ocupa o contorno em planta da faixa do esboço, de z da base a z do topo, do piso até o topo do casco no fim do meio
+     do vidro (o casco sobe até lá); os extremos em x e z são os do contorno. */
+  const vidro = medidasDoParabrisa(t);
+  const xsDoVidro = vidro.planta.map((p) => p[0]);
+  const caixaDoParabrisa = {
+    min: [Math.min(...xsDoVidro), vidro.piso, vidro.zDaBase],
+    max: [Math.max(...xsDoVidro), topoDoCascoNoMeio(t, vidro.zDoTopo), vidro.zDoTopo],
+  };
+  const barra = medidasDoMontante(t);
+  const centroDoMontante = [
+    0,
+    (Math.min(...barra.embaixo) + Math.max(...barra.embaixo) + barra.altura) / 2,
+    (vidro.zDaBase + vidro.zDoTopo) / 2,
+  ];
   const pontosDaPorta = t.porta.estacoes.flatMap(([y, ...xz]) => Array.from({ length: 5 }, (_, k) => [xz[2 * k], y, xz[2 * k + 1]]));
   const caixaDaPorta = extremos(pontosDaPorta);
   const bb = t.barbatana.estacoes;
@@ -467,7 +546,7 @@ export function pontosDeclarados(t = TABELA) {
       nome: 'meio do montante do para-brisa',
       parte: 'montanteParabrisa',
       medida: 'centro',
-      em: t.montante.de.map((v, k) => (v + t.montante.para[k]) / 2),
+      em: centroDoMontante,
       toleranciaMm: tolerancia,
     },
   ];
@@ -486,7 +565,7 @@ export function pontosDeclarados(t = TABELA) {
 }
 
 const PARES_COM_A_FUSELAGEM = [
-  ['parabrisa', 'o para-brisa assenta sobre a frente da cabine e a faixa dele entra no dorso do casco, que desce em curva para os lados'],
+  ['parabrisa', 'o vidro do para-brisa assenta no fundo da abertura que o casco tem na frente da cabine, com a face de fora rente à superfície do casco'],
   ['porta', 'o painel da porta assenta no fundo do vão que o casco tem do lado esquerdo, com a face de dentro sobre o fundo'],
   ['barbatana', 'a aleta ventral sai da barriga da cauda e o lado vivo dela entra no casco'],
   ...[1, 2, 3, 4].flatMap((n) => ['D', 'E'].map((lado) => [`janela${n}${lado}`, `a placa da janela ${n} do lado ${lado === 'D' ? 'direito' : 'esquerdo'} assenta no fundo do vão que o casco tem para ela`])),
@@ -508,18 +587,18 @@ const receita = {
     partes: [
       {
         nome: 'fuselagem',
-        forma: 'casco de 8084 mm de seções de retângulo arredondado, largo e alto na cabine, afinando em curva até a cauda, com o vão da porta e os das oito janelas recortados nele',
-        tecnica: 'loft das 20 seções do esboço, com as pontas fechadas, sombreado liso, e recorte dos vãos da porta e das oito janelas por subtrair',
+        forma: 'casco de 8084 mm de seções de retângulo arredondado, largo e alto na cabine, afinando em curva até a cauda, com o vão da porta, os das oito janelas e a abertura do para-brisa recortados nele',
+        tecnica: 'loft das 20 seções do esboço, com as pontas fechadas, sombreado liso, e recorte dos vãos da porta e das oito janelas e da abertura do para-brisa por subtrair',
       },
       {
         nome: 'parabrisa',
-        forma: 'faixa de 50 mm de espessura, inclinada e larga, sobre o dorso da frente da cabine, curva em x e dividida ao meio pelo montante',
-        tecnica: 'loft em x de seções de quatro pontos, com as pontas fechadas e sombreado liso',
+        forma: 'vidro de 20 mm rente ao casco, assentado numa abertura recortada na frente da cabine, com a face de fora na superfície do casco, sem degrau, e 5 mm de folga em volta; contorno do esboço, 1336 por até 770 mm, dividido pelo montante',
+        tecnica: 'extrusão em y do contorno do esboço menos o casco descido 20 mm (subtrair), aparada pelo casco inteiro (intersectar), com sombreado liso; a abertura é a mesma extrusão alargada pela folga, menos o casco descido, subtraída do casco',
       },
       {
         nome: 'montanteParabrisa',
-        forma: 'barra de 70 por 36 mm e cantos arredondados que sobe inclinada pelo meio do para-brisa, de z 2900 a z 3640',
-        tecnica: 'extrusão de retângulo de cantos arredondados, girada em x para a inclinação do esboço',
+        forma: 'barra de 70 mm de largura e cerca de 36 mm de altura, de cantos arredondados, sobre a face de fora do vidro e a seguindo da base ao topo da abertura (z 2885,5 a 3655,5), a cerca de 25 graus; a face de baixo toca o vidro e não entra nele',
+        tecnica: 'loft em z de seções de retângulo de cantos arredondados nas estações do casco, com a face de baixo na superfície do casco, as pontas fechadas e sombreado liso',
       },
       ...[1, 2, 3, 4].flatMap((n) => ['D', 'E'].map((lado) => ({
         nome: `janela${n}${lado}`,
@@ -540,7 +619,7 @@ const receita = {
     criteriosDeReprovacao: [
       'casco facetado, ou com degrau visível entre seções, em vez de curvo e liso',
       'perfil de lado ou de cima fora do esboço: o topo da cabine, a curva do para-brisa e o afinamento até a cauda',
-      'porta ou janela sem vão no casco, ou uma placa solta por cima dele',
+      'porta, janela ou para-brisa sem vão no casco, ou uma placa solta por cima dele, ou o vidro do para-brisa com degrau para o casco',
       'parte solta, que não encosta na fuselagem',
       'o REFINA acusando parte fora do envelope do volume dela',
       'fuselagem com mais de 3% de diferença para os 8084 mm de comprimento',
@@ -548,7 +627,7 @@ const receita = {
   },
   contatos: [
     ...PARES_COM_A_FUSELAGEM.map(([parte, motivo]) => ({ par: [parte, 'fuselagem'], motivo })),
-    { par: ['montanteParabrisa', 'parabrisa'], motivo: 'o montante corre pela face de cima da faixa do para-brisa e o eixo dele fica sobre ela' },
+    { par: ['montanteParabrisa', 'parabrisa'], motivo: 'o montante assenta na face de fora do vidro do para-brisa, da base ao topo da abertura, com a face de baixo sobre ela e sem entrar no vidro' },
   ],
   formas: {
     fuselagem: 'solido',
