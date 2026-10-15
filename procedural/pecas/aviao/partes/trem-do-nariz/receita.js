@@ -58,11 +58,14 @@ const NOMES = Object.keys(PARTES);
 export const TABELA = {
   /* O pivô, o ponto `tnP` do esboço: x, y (`tnPy`) e z (`tnPz`) do eixo em torno do qual o trem gira. */
   pivo: [0, 680, 1740],
-  /* O quanto a perna desce do pivô, em y: até o fim do barril (`tnLb`, onde o pistão começa), até a coroa (`tnLc`, o pé do pistão) e até
-     o centro da roda (`tnL`, onde o garfo acaba e o eixo passa). O centro da roda fica em y 199 e o raio do pneu é 182, e por isso o pé
-     do pneu fica em y 17: o esboço deixa a roda 17 mm acima do chão, e a escala do plano (773 mm) mede do pé da roda ao alto da
-     carenagem, em y 790. */
-  descida: { barril: 160, coroa: 251, roda: 481 },
+  /* O quanto a perna desce do pivô, em y, até o fim do barril (`tnLb`, onde o pistão começa), e quanto o garfo desce da coroa (o pé do
+     pistão) ao centro da roda, onde o eixo passa. O resto da descida sai do chão: o centro da roda fica a um raio de pneu do chão
+     (`chao`, y 0), e a coroa a `garfo` acima dele. O esboço deixa a roda 17 mm acima do chão (centro em y 199, raio 182, pé em y 17);
+     por decisão da pessoa em 2026-10-15 a roda encosta no chão e o trem desce esses 17 mm pelo pistão, que alonga, levando a coroa, o
+     garfo, o eixo e a roda. A escala do plano (773 mm) mede do pé da roda ao alto da carenagem, em y 790, e na pose do esboço o pé
+     estava em 17. */
+  descida: { barril: 160, garfo: 230 },
+  chao: 0,
   /* A perna, o pistão e a coroa, em diâmetro. A coroa é horizontal: sai do pé do pistão `braco` para -x, onde o garfo de um braço desce
      até o centro da roda. O eixo da roda sai do garfo, passa pelo cubo e termina `passa` além do plano médio da roda, para +x. */
   perna: { diametro: 70 },
@@ -73,6 +76,8 @@ export const TABELA = {
   /* A roda: o perfil da família e os três ajustes do esboço (`diametroPneu` é `tnDRoda`, a largura é a razão do diâmetro, e o desvio
      zero põe o cubo no meio do aro). O resto é o do perfil `carro`. */
   roda: { perfil: 'carro', diametroPneu: 364, larguraPneu: 0.36, desvio: 0 },
+  /* O furo central do cubo tem o diâmetro do eixo da roda (a razão `diametroFuroCentral` da família, em fração do pneu, sai de
+     `eixoRoda.diametro`), e a roda assenta nele; o esboço deixa 4,3 mm de folga em volta do eixo. */
   /* O pivô: o eixo vai `meio` para cada lado de `pivo`, e cada mancal é a caixa [largura em x, altura em y, profundidade em z] de canto
      arredondado `raio`, a `x` do pivô para cada lado. */
   eixoPivo: { diametro: 34, meio: 222 },
@@ -114,22 +119,25 @@ function medidas(t) {
   const [px, py, pz] = t.pivo;
   const d = t.descida;
   const c = t.compasso;
+  /* A descida do pivô ao centro da roda e à coroa: a roda a um raio de pneu do chão, a coroa a `garfo` acima do centro dela. */
+  const descidaRoda = py - (t.chao + t.roda.diametroPneu / 2);
+  const descidaCoroa = descidaRoda - d.garfo;
   const abaixo = (descida, x = 0, z = 0) => [px + x, py - descida, pz + z];
   const entre = (a, b) => a.map((v, k) => (v + b[k]) / 2);
 
   const pivo = [px, py, pz];
   const barrilFim = abaixo(d.barril);
-  const coroa = abaixo(d.coroa);
-  const roda = abaixo(d.roda);
-  const bracoAlto = abaixo(d.coroa, -t.coroa.braco);
-  const bracoBase = abaixo(d.roda, -t.coroa.braco);
-  const eixoFim = abaixo(d.roda, t.eixoRoda.passa);
+  const coroa = abaixo(descidaCoroa);
+  const roda = abaixo(descidaRoda);
+  const bracoAlto = abaixo(descidaCoroa, -t.coroa.braco);
+  const bracoBase = abaixo(descidaRoda, -t.coroa.braco);
+  const eixoFim = abaixo(descidaRoda, t.eixoRoda.passa);
   const alavancaPonta = [px, py, pz + t.alavanca.alcance];
   const fixo = t.atuador.fixo;
   const meioDoAtuador = entre(fixo, alavancaPonta);
   const alto = abaixo(c.alto.descida, c.alto.x);
-  const baixo = abaixo(d.coroa, c.baixo.x);
-  const joelho = abaixo((c.alto.descida + d.coroa) / 2, (c.alto.x + c.baixo.x) / 2, c.joelho.avanco);
+  const baixo = abaixo(descidaCoroa, c.baixo.x);
+  const joelho = abaixo((c.alto.descida + descidaCoroa) / 2, (c.alto.x + c.baixo.x) / 2, c.joelho.avanco);
   /* o pino que atravessa um ponto em x: o ponto menos e mais a metade do comprimento */
   const emX = (ponto, comprimento) => [[ponto[0] - comprimento / 2, ponto[1], ponto[2]], [ponto[0] + comprimento / 2, ponto[1], ponto[2]]];
 
@@ -208,6 +216,7 @@ export function derivar(t = TABELA) {
   const r = t.roda;
   const chamada = chamar(registroDeFamilias().obter('roda-pneu'), 'roda', {
     perfil: r.perfil, diametroPneu: r.diametroPneu, larguraPneu: r.larguraPneu, desvio: r.desvio,
+    diametroFuroCentral: t.eixoRoda.diametro / r.diametroPneu,
   });
 
   return {
