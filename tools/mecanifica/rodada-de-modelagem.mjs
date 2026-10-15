@@ -180,7 +180,8 @@ export async function medirReceita(peca) {
 }
 
 /**
- * A impressão do que o crítico julga numa receita: a malha que ela produz (vértices e faces com a parte de cada uma) e o `PLANO`,
+ * A impressão do que o crítico julga numa receita: a malha que ela produz (os vértices e as faces com tudo o que levam: parte, liso,
+ * cor, material e tinta) e o `PLANO`,
  * que diz ao crítico a forma prometida de cada parte. Duas receitas com a mesma impressão mostram ao crítico a mesma coisa, ainda que
  * o texto mude, como quando a receita ganha o `REFINA` depois de fechar. Receita que não executa sozinha (a que pede o registro de
  * composições de fora) devolve null, e quem compara trata como forma diferente.
@@ -197,7 +198,8 @@ export async function impressaoDaForma(caminho) {
   }
   const hash = createHash('sha256');
   for (const [id, v] of neutro.V) hash.update(`v${id}:${v.join(',')};`);
-  for (const [id, f] of neutro.F) hash.update(`f${id}:${f.vs.join(',')}:${f.parte ?? ''};`);
+  /* a face inteira, e não só os vértices: o liso, a cor, o material e a tinta mudam o que a imagem mostra */
+  for (const [id, f] of neutro.F) hash.update(`f${id}:${JSON.stringify(f)};`);
   hash.update(`plano:${JSON.stringify(receita.PLANO ?? null)}`);
   return `sha256:${hash.digest('hex')}`;
 }

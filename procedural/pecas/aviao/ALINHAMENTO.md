@@ -123,3 +123,9 @@ entrada de ar com o capô e cada escape com o capô.
 Reprova o motor: capô facetado ou com degrau entre seções; capô que não assenta na
 face da frente da fuselagem, com fresta ou degrau na junta; boca de ar ou escape sem
 abertura; parte solta; e o `REFINA` acusando parte fora do envelope.
+
+O motor ficou fixo em 2026-10-15 com o aceite da pessoa, depois de duas rodadas, a
+segunda com nota 8. O `REFINA.esboco` confere cada parte contra a forma de mesmo nome
+do esboço: capô 0,981, entrada de ar 0,958 e escapes 0,969. O furo da boca de ar, que
+abre na face de trás do capô e a fuselagem tapa, e a raiz lisa dos escapes, onde o
+esboço tem um leque de frisos, ficam como pendência.
