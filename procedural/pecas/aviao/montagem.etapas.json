@@ -73,59 +73,99 @@
     },
     {
       "instancia": "asas",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15: aceitou as asas como estão, depois do crítico fechar com nota 9 sem defeito na rodada 1",
-        "observacao": "o esboço difere da referência real em quatro pontos (a ponta mais baixa, a ponta de cantos vivos, a raiz sem carenagem e os casulos que faltam sob as asas), que a pessoa pediu para ver antes de decidir",
-        "analise": "ausente"
-      },
-      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1"
+      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15: aceitou as asas como estão, depois do crítico fechar com nota 9 sem defeito na rodada 1",
+            "observacao": "o esboço difere da referência real em quatro pontos (a ponta mais baixa, a ponta de cantos vivos, a raiz sem carenagem e os casulos que faltam sob as asas), que a pessoa pediu para ver antes de decidir",
+            "analise": "ausente"
+          },
+          "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1"
+        }
+      ]
     },
     {
       "instancia": "empenagem-horizontal",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15: aceitou a empenagem horizontal depois da nota 9 sem defeito na rodada 1",
-        "analise": "ausente"
-      },
-      "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb"
+      "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15: aceitou a empenagem horizontal depois da nota 9 sem defeito na rodada 1",
+            "analise": "ausente"
+          },
+          "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb"
+        }
+      ]
     },
     {
       "instancia": "empenagem-vertical",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15: aceitou a empenagem vertical pela escolha 'Aceitar as duas (Recomendado)', depois da nota 9 na rodada 1",
-        "observacao": "pendência: o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que contorna o canto solto da booleana",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
-          "deriva: posicao em vértice do V do recorte do vão no bordo de fuga, corte y 3300"
-        ],
-        "analise": "ausente"
-      },
-      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07"
+      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15: aceitou a empenagem vertical pela escolha 'Aceitar as duas (Recomendado)', depois da nota 9 na rodada 1",
+            "observacao": "pendência: o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que contorna o canto solto da booleana",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+              "deriva: posicao em vértice do V do recorte do vão no bordo de fuga, corte y 3300"
+            ],
+            "analise": "ausente"
+          },
+          "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07"
+        }
+      ]
     },
     {
       "instancia": "trem-do-nariz",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15",
-        "analise": "ausente"
-      },
-      "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4"
+      "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15",
+            "analise": "ausente"
+          },
+          "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4"
+        }
+      ]
     },
     {
       "instancia": "trens-principais",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15",
-        "analise": "ausente"
-      },
-      "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565"
+      "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15",
+            "analise": "ausente"
+          },
+          "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565"
+        }
+      ]
     }
   ]
 }
