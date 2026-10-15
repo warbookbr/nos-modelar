@@ -379,3 +379,16 @@ describe('a rodada lida dos arquivos dos agentes', () => {
     expect(semArquivo.stderr).toContain('não consegui ler o arquivo do modelador');
   }, 60000);
 });
+
+describe('a impressão da forma e os afastamentos declarados', () => {
+  it('a mesma malha com afastamento declarado no REFINA tem outra impressão, e a sem afastamento não muda', async () => {
+    const { impressaoDaForma } = await import('./rodada-de-modelagem.mjs');
+    const pasta = 'tools/fixtures/forma-do-esboco';
+    const semDeclarar = await impressaoDaForma(`${pasta}/deslocada/receita.js`);
+    const declarada = await impressaoDaForma(`${pasta}/deslocada-declarada/receita.js`);
+    expect(semDeclarar).toMatch(/^sha256:/);
+    expect(declarada).toMatch(/^sha256:/);
+    expect(declarada).not.toBe(semDeclarar);
+    expect(await impressaoDaForma(`${pasta}/deslocada/receita.js`)).toBe(semDeclarar);
+  });
+});

@@ -57,15 +57,35 @@ const PARTES = {
 };
 const NOMES = Object.keys(PARTES);
 
-/* O mínimo próprio de cada parte que se afasta do esboço pela decisão da pessoa de 2026-10-15 (a roda encosta no chão e o trem desce os
-   17 mm pelo pistão; o furo do cubo tem o diâmetro do eixo). A razão interseção/união de uma parte do mesmo tamanho deslocada 17 mm é a
-   que o esboço não cobre, e o mínimo é a razão medida, arredondada para baixo. O pistão alonga 17 mm (138 contra 164 cm3); a coroa, o
-   garfo, o eixo e a roda descem 17 mm; o pino e os braços do compasso acompanham o joelho, que desce 8,5 mm. */
-const MINIMO_PROPRIO = {
-  pistaoNariz: 0.84, coroaNariz: 0.35, garfoNariz: 0.86, eixoRodaNariz: 0.18, rodaNariz: 0.72,
-  compassoSupNariz: 0.66, compassoInfNariz: 0.27, pinoCompassoNariz: 0.38,
+/* As partes que a decisão da pessoa de 2026-10-15 afasta do esboço (a roda encosta no chão e o trem desce pelo pistão os 17 mm que o
+   esboço deixava entre o pé do pneu e o chão), declaradas na entrada de cada uma em `REFINA.esboco.formas`, com o motivo. A coroa, o
+   garfo, o eixo da roda e a roda só descem: declaram `deslocamento`, e a razão volta a ser medida contra a forma transladada. O pino do
+   joelho desce metade, porque o joelho fica no meio da descida entre o braço de cima, que não se move, e a coroa. O pistão e os dois
+   braços do compasso mudam de comprimento e de inclinação, e nenhum vetor leva a forma do esboço até eles: declaram `alongamento`, o
+   quanto passam do volume do andaime em cada lado, e ficam com o `minimo` próprio, que é a razão que o alongamento deixa (medida
+   por `npm run forma:esboco` e arredondada para baixo). O furo do cubo tem o diâmetro do eixo, e a razão da roda o suporta. Os vetores
+   saem da TABELA (`esboco.pe` menos `chao`), e não de um 17 digitado. */
+const afastamentos = (t) => {
+  const desce = t.esboco.pe - t.chao;
+  const meio = desce / 2;
+  /* o texto dos motivos, com vírgula decimal */
+  const mm = (v) => String(v).replace('.', ',');
+  const desceTudo = `o trem desce ${mm(desce)} mm para a roda encostar no chão`;
+  return {
+    pistaoNariz: { minimo: 0.84, alongamento: { '-y': desce }, motivo: `o pistão alonga ${mm(desce)} mm para a roda encostar no chão` },
+    coroaNariz: { deslocamento: [0, -desce, 0], motivo: `a coroa está no pé do pistão: ${desceTudo}` },
+    garfoNariz: { deslocamento: [0, -desce, 0], motivo: `o garfo pende da coroa: ${desceTudo}` },
+    eixoRodaNariz: { deslocamento: [0, -desce, 0], motivo: `o eixo atravessa o garfo na altura do centro da roda: ${desceTudo}` },
+    rodaNariz: { deslocamento: [0, -desce, 0], motivo: `a roda encosta no chão: ${desceTudo}` },
+    pinoCompassoNariz: { deslocamento: [0, -meio, 0], motivo: `o joelho do compasso fica no meio da descida da coroa: desce ${mm(meio)} mm` },
+    compassoSupNariz: { minimo: 0.66, alongamento: { '-y': meio }, motivo: `o braço de cima parte da perna, que não desce, e acompanha o joelho, que desce ${mm(meio)} mm` },
+    compassoInfNariz: { minimo: 0.27, alongamento: { '-y': desce }, motivo: `o braço de baixo liga o joelho, que desce ${mm(meio)} mm, à coroa, que desce ${mm(desce)} mm` },
+  };
 };
-const formasDoEsboco = () => Object.fromEntries(NOMES.map((p) => [p, p in MINIMO_PROPRIO ? { formas: p, minimo: MINIMO_PROPRIO[p] } : p]));
+const formasDoEsboco = (t = TABELA) => {
+  const desvios = afastamentos(t);
+  return Object.fromEntries(NOMES.map((p) => [p, p in desvios ? { formas: p, ...desvios[p] } : p]));
+};
 
 export const TABELA = {
   /* O pivô, o ponto `tnP` do esboço: x, y (`tnPy`) e z (`tnPz`) do eixo em torno do qual o trem gira. */
@@ -78,6 +98,9 @@ export const TABELA = {
      estava em 17. */
   descida: { barril: 160, garfo: 230 },
   chao: 0,
+  /* O pé do pneu no esboço, em y: a roda ficava 17 mm acima do chão. A diferença para o `chao` é o quanto o trem desce, e é o vetor do
+     `deslocamento` que o REFINA declara nas partes que só descem. */
+  esboco: { pe: 17 },
   /* A perna, o pistão e a coroa, em diâmetro. A coroa é horizontal: sai do pé do pistão `braco` para -x, onde o garfo de um braço desce
      até o centro da roda. O eixo da roda sai do garfo, passa pelo cubo e termina `passa` além do plano médio da roda, para +x. */
   perna: { diametro: 70 },
@@ -421,9 +444,9 @@ export default {
   REFINA: {
     andaime: '../../andaime.json',
     partes: Object.fromEntries(NOMES.map((p) => [p, slug(p)])),
-    /* O envelope passa de 5 para 18 mm: o andaime guarda o trem na pose do esboço, com a roda 17 mm acima do chão, e a decisão da
-       pessoa (2026-10-15) desce o pistão, a coroa, o garfo, o eixo, a roda e o compasso até 17 mm abaixo do volume deles. */
-    tolerancia: { envelope: 18, porta: 0.5 },
+    /* O andaime guarda o trem na pose do esboço, com a roda 17 mm acima do chão. A descida que a pessoa decidiu em 2026-10-15 está
+       declarada parte por parte em `esboco.formas` (deslocamento e alongamento), e por isso o envelope fica nos 5 mm de sempre. */
+    tolerancia: { envelope: 5, porta: 0.5 },
     esboco: { arquivo: ESBOCO, opcao: 1, formas: formasDoEsboco(), minimo: 0.95 },
   },
   get PONTOS() { return pontosDeclarados(this.PARAMS); },

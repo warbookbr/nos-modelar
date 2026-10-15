@@ -42,6 +42,7 @@ import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
 import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -208,6 +209,12 @@ export async function impressaoDaForma(caminho) {
   /* a face inteira, e não só os vértices: o liso, a cor, o material e a tinta mudam o que a imagem mostra */
   for (const [id, f] of neutro.F) hash.update(`f${id}:${JSON.stringify(f)};`);
   hash.update(`plano:${JSON.stringify(receita.PLANO ?? null)}`);
+  /* os afastamentos que o REFINA declara entram no pedido do crítico: a mesma malha com afastamento novo volta a ele, porque o crítico do
+     trem do nariz mediu como defeito a descida decidida que o pedido ainda não dizia */
+  const afastamentos = (receita.REFINA?.esboco ? normalizarEsbocoDoRefinamento(receita.REFINA.esboco).formas : [])
+    .map(({ parte, ...resto }) => ({ parte, ...afastamentoDaParte(resto) }))
+    .filter((a) => a.motivo !== undefined);
+  if (afastamentos.length) hash.update(`afastamentos:${JSON.stringify(afastamentos)}`);
   return `sha256:${hash.digest('hex')}`;
 }
 
