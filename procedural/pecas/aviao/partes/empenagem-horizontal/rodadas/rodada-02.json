@@ -1,0 +1,930 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-horizontal",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-empenagem-horizontal/alvo/aviao-unidade-empenagem-horizontal-composta.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "estabilizadorD",
+        "tipo": "superficie",
+        "onde": "bordo de ataque, da raiz até o degrau",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica do estabilizadorD e do conjunto: dentes finos ao longo do bordo de ataque, em vez de borda contínua. O arame mostra o mesmo."
+      },
+      {
+        "parte": "estabilizadorE",
+        "tipo": "superficie",
+        "onde": "bordo de ataque, da raiz até o degrau",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica do estabilizadorE e do conjunto: pontilhado leve ao longo do bordo de ataque. Mesmo padrão da metade direita, mais fraco."
+      },
+      {
+        "parte": "profundorD",
+        "tipo": "comprimento",
+        "onde": "extremidade da raiz, em x de cerca de 190 mm",
+        "sentido": "maior",
+        "evidencia": "Sobreposição em x, painel 2: o plano x=189,7 corta o modelo mas não o esboço; a seção com corda de cerca de 192 mm parece o profundor. Inferência."
+      }
+    ],
+    "observacao": "Forma, diedro, afinamento, degrau e rasgo coincidem com o alvo nos limites declarados; restam serrilhado no bordo de ataque e raiz do profundor mais para dentro."
+  },
+  "partes": [
+    {
+      "nome": "estabilizadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "estabilizadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compensadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compensadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "npm run parametros marca compensador.alma como inerte, porque a medida olha só a caixa e a alma não a muda; a alma existe na malha",
+    "o ALINHAMENTO.md ainda diz 12 partes na empenagem horizontal; o PLANO da receita já tem 14, e o documento é de fora da minha pasta",
+    "na vista da montagem (etapas) aparecem pontos soltos na face de cima do profundor perto da ponta, que não aparecem nas vistas isoladas nem em nenhuma combinação da própria peça",
+    "o etapas e o descrever leem a receita do disco, então a comparação com a base saiu igual: o commit de andamento já tinha as edições"
+  ],
+  "notaDePassagem": "Ponta com 606 mm (metade da raiz) e degrau do profundor em 1980 (18,6% da meia-envergadura); o bordo de fuga é derivado da corda e as espessuras 41/60/51 vêm do perfil da raiz escalado. Suportes ficam onde o esboço os pôs (espessuraDoEsboco). Eixo acaba 21 mm antes do degrau: até 2215 ficava a 3 mm da face de cima. Compensador: aba presa por alma que entra 6 mm na parede do rasgo, fresta de 12 mm. Mínimos próprios com motivo no REFINA: estabilizador 0,88, profundor 0,70, eixo 0,85.",
+  "receita": {
+    "sha256": "sha256:aa1df9f6237f1aa0efb318882543478f25c0c9e6c6d004dd08d401acac07d3aa",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 24,
+      "acrescentadas": 136,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " * A rodada de ajustes de 2026-10-15 muda três coisas em relação ao esboço, porque a pessoa viu a referência real: a ponta do"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * estabilizador tem cerca de metade da corda da raiz (`cordaNaPonta`), o degrau da ponta do profundor recua para perto de um quinto"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * da meia-envergadura (`profundor.x`, com a espessura das seções refeita para a corda nova) e o bordo de fuga do profundor ganha o"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * compensador, uma aba própria (`compensadorD` e `compensadorE`) num rasgo do profundor com a fresta dos dois lados e da frente, presa"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * por uma alma que entra na parede dianteira do rasgo. O compensador não tem volume no andaime nem forma no esboço e entra em `REFINA.novas`. A"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": " * ponta mais estreita, o degrau recuado e o eixo mais curto tiram a parte da forma do esboço sem deslocá-la, e por isso o"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " * `REFINA.esboco` declara o `minimo` próprio de cada uma, com o `motivo`."
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "/* As partes que saem da forma do esboço de propósito sem se deslocar, com o mínimo próprio de cada uma na razão interseção/união de"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "   volume contra a forma do esboço (o geral é 0,95), logo abaixo do que a parte tem hoje, e o motivo. A razão cai porque a forma pedida"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "   é outra, e o mínimo próprio só impede que caia mais. Deslocamento e alongamento não servem: nada aqui é translação, e a parte não"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "   passa do volume do andaime. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "const AFASTADAS = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  estabilizador: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    minimo: 0.88,"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    motivo: 'a ponta tem a metade da corda da raiz (606 mm, e não os 736 do esboço) e o vão do degrau recuado para 1980 muda o recorte; razão 0,891 na rodada de ajustes de 2026-10-15',"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  profundor: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    minimo: 0.70,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    motivo: 'o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,706 e 0,704',"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  eixoProfundor: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    minimo: 0.85,"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    motivo: 'a haste acaba 21 mm antes do degrau novo, em x 1959, 236 mm mais curta que a do esboço; até 2215 ela ficava a 3 mm da face de cima do profundor; razão 0,87',"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "/* As partes que a pessoa pediu além do esboço: sem volume no andaime e sem forma no esboço, entram em `REFINA.novas`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "const NOVAS = porLado((L) => [`compensador${L}`]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "     as da raiz e as da ponta, e as espessuras são as relativas da família. `bordoDeFuga` são os z do bordo de fuga na raiz e na ponta"
+        },
+        {
+          "tipo": "-",
+          "linha": 54,
+          "texto": "     (`estTE0` e `estTE1`), de onde sai o comprimento do profundor. `fresta` é a folga do vão do profundor em volta dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "     as da raiz e as da ponta, e as espessuras são as relativas da família. O bordo de fuga, de onde sai o comprimento do profundor, é"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "     a linha dos 25% da corda mais 75% da corda de cada x (`perfilDoEstabilizador`), e na raiz dá o `estTE0` do esboço, 10289; a ponta"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "     do esboço tinha 736 mm (`estTE1`, 10070), e a de agora tem a metade da corda da raiz, 606 mm, com o bordo de fuga em 9972,5."
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "     `fresta` é a folga do vão do profundor em volta dele e também a do rasgo do compensador. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 59,
+          "texto": "    cordaNaPonta: 736,"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    cordaNaPonta: 606,"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "    bordoDeFuga: [10289, 10070],"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "     bordo de fuga tem `meiaEspessuraDoBordoDeFuga` para cada lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "     bordo de fuga tem `meiaEspessuraDoBordoDeFuga` para cada lado. O degrau, onde a dobradiça recua de 9810 para 9640, estava em 2236"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "     no esboço, a 6% da meia-envergadura da ponta; agora está em 1980, e o trecho da ponta, de 1980 a 2390, tem 18,6% dos 2200 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "     (a referência real mostra perto de um quinto); o suporte 3, em 1950, fica sob o fim do trecho de dentro. A espessura de"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "     cada seção é a do perfil do estabilizador na dobradiça, que a corda nova de 606 mm adelgaça: 41 mm no fim do trecho de dentro"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "     (a dobradiça a 69% da corda), 60 mm no começo do trecho da ponta (a 50%) e 51 mm na ponta, contados do perfil da raiz e"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "     escalados pela corda e pela espessura relativa de cada x, menos 1 mm que o esboço também tem abaixo do perfil. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 75,
+          "texto": "    x: [190, 2236, 2250, 2385],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    x: [190, 1980, 1994, 2385],"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "    espessura: [88, 49, 66, 63],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    espessura: [88, 41, 60, 51],"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "  /* O eixo é a haste de `diametro` entre os x de `x`, sobre a linha do estabilizador, `aFrente` antes da dobradiça da primeira seção"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "     do profundor, em `lados` lados. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 83,
+          "texto": "  eixo: { x: [215, 2215], aFrente: 6, diametro: 30, lados: 48 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  /* O eixo é a haste de `diametro` de x `inicio` até `antesDoDegrau` antes do degrau do profundor (`profundor.x[1]`, e o esboço o"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "     para 21 mm antes do degrau dele, em 2215), sobre a linha do estabilizador, `aFrente` antes da dobradiça da primeira seção do"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "     profundor, em `lados` lados. Com o degrau em 1980 a haste acaba em 1959; se ela seguisse até 2215, passaria a 3 mm da face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "     cima do profundor na ponta, onde o trecho de lá, mais fino, a cobre por pouco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  eixo: { inicio: 215, antesDoDegrau: 21, aFrente: 6, diametro: 30, lados: 48 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    /* A espessura do profundor que o esboço usa para pôr os suportes, na raiz e na ponta do estabilizador (`sY1` a `sY3`): a reta entre"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "       as duas na fração do estabilizador. Os suportes ficam onde o esboço os pôs, e por isso a espessura continua a do esboço, e não a"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "       das seções novas do profundor. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    espessuraDoEsboco: [88, 49],"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  /* O compensador (a divisão no bordo de fuga do profundor, a pedido da pessoa na rodada de ajustes): uma aba do bordo de fuga entre"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "     os x de `x`. O rasgo que a recebe sai do profundor por subtrair e tem a parede dianteira a `profundidade` mm do bordo de fuga,"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "     medida em z, de modo que a parede corra paralela ao bordo, e a `fresta` do estabilizador nos dois lados em x e entre a parede e"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "     o corpo da aba. A alma da aba, `alma` mm mais fina em cada face, atravessa essa fresta e entra `entrada` mm na parede, e é ela"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "     que segura a aba ao profundor. O rasgo passa `alem` mm do bordo de fuga e `acima` mm das faces, para o corte atravessar o"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "     profundor inteiro. Fica no trecho de dentro do profundor, de 190 a 1980. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  compensador: { x: [200, 940], profundidade: 130, entrada: 6, alma: 5, alem: 40, acima: 20 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": "/* Os dados do estabilizador, em mm: a altura da linha dos 25% da corda e o z do bordo de fuga em um x, e a espessura do profundor"
+        },
+        {
+          "tipo": "-",
+          "linha": 226,
+          "texto": "   naquele x (a reta entre a da raiz e a da seção seguinte, na fração do estabilizador). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 272,
+          "texto": "/* Os dados do estabilizador, em mm: a altura da linha dos 25% da corda e o z do bordo de fuga em um x (a linha dos 25%, que a"
+        },
+        {
+          "tipo": "+",
+          "linha": 273,
+          "texto": "   família enflecha a `enflechamento` graus a partir da raiz, mais 75% da corda daquele x), e a espessura do profundor que o esboço"
+        },
+        {
+          "tipo": "+",
+          "linha": 274,
+          "texto": "   usa para os suportes naquele x (a reta entre a da raiz e a da ponta, na fração do estabilizador). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 278,
+          "texto": "  const [raiz, ponta] = t.suporte.espessuraDoEsboco;"
+        },
+        {
+          "tipo": "-",
+          "linha": 232,
+          "texto": "    bordoDeFuga: (x) => e.bordoDeFuga[0] + (e.bordoDeFuga[1] - e.bordoDeFuga[0]) * fracao(x),"
+        },
+        {
+          "tipo": "-",
+          "linha": 233,
+          "texto": "    espessura: (x) => t.profundor.espessura[0] + (t.profundor.espessura[1] - t.profundor.espessura[0]) * fracao(x),"
+        },
+        {
+          "tipo": "+",
+          "linha": 281,
+          "texto": "    bordoDeFuga: (x) => e.raiz[2] + (x - e.raiz[0]) * Math.tan(e.enflechamento * GRAUS) + 0.75 * (e.cordaNaRaiz + (e.cordaNaPonta - e.cordaNaRaiz) * fracao(x)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 282,
+          "texto": "    espessura: (x) => raiz + (ponta - raiz) * fracao(x),"
+        },
+        {
+          "tipo": "+",
+          "linha": 308,
+          "texto": "/* O compensador, em mm: a aba (seções de oito pontos [z, y] nos dois x de `compensador.x`) e o cortador do rasgo (seções de quatro"
+        },
+        {
+          "tipo": "+",
+          "linha": 309,
+          "texto": "   pontos nos mesmos x, afastadas a fresta para fora). O contorno do profundor em cada x é a reta entre as duas primeiras seções, e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 310,
+          "texto": "   compensador fica todo no trecho de dentro. A aba é o corpo, do bordo de fuga até a fresta da parede do rasgo, com as faces do"
+        },
+        {
+          "tipo": "+",
+          "linha": 311,
+          "texto": "   profundor entre o fim do nariz e o bordo (a de cima do ponto 0 ao 6 do contorno, a de baixo do 4 ao 5), e a alma, mais fina em"
+        },
+        {
+          "tipo": "+",
+          "linha": 312,
+          "texto": "   `alma` mm em cada face, que atravessa a fresta e entra `entrada` mm na parede, onde prende a aba ao profundor. O cortador é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 313,
+          "texto": "   retângulo da parede do rasgo, a `profundidade` do bordo de fuga, até `alem` além dele, com `acima` além das faces. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 314,
+          "texto": "function medidasDoCompensador(t, estacoes) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 315,
+          "texto": "  const { x: [xa, xb], profundidade, entrada, alma, alem, acima } = t.compensador;"
+        },
+        {
+          "tipo": "+",
+          "linha": 316,
+          "texto": "  const fresta = t.estabilizador.fresta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 317,
+          "texto": "  if (xb + fresta > estacoes[1].x) throw new Error(`compensador: o rasgo vai a x ${xb + fresta}, e o trecho de dentro do profundor acaba em ${estacoes[1].x}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 318,
+          "texto": "  const contornoEm = (x) => naReta(estacoes[0].pontos, estacoes[0].x, estacoes[1].pontos, estacoes[1].x, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 319,
+          "texto": "  const naFace = ([z0, y0], [z1, y1], z) => y0 + ((y1 - y0) * (z - z0)) / (z1 - z0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 320,
+          "texto": "  const aba = [xa, xb].map((x) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 321,
+          "texto": "    const c = contornoEm(x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 322,
+          "texto": "    const zAlma = c[5][0] - profundidade - entrada;"
+        },
+        {
+          "tipo": "+",
+          "linha": 323,
+          "texto": "    const zCorpo = c[5][0] - profundidade + fresta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 324,
+          "texto": "    const cima = (z) => naFace(c[0], c[6], z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 325,
+          "texto": "    const baixo = (z) => naFace(c[4], c[5], z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 326,
+          "texto": "    return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 327,
+          "texto": "      x,"
+        },
+        {
+          "tipo": "+",
+          "linha": 328,
+          "texto": "      pontos: [[zAlma, cima(zAlma) - alma], [zAlma, baixo(zAlma) + alma], [zCorpo, baixo(zCorpo) + alma], [zCorpo, baixo(zCorpo)], c[5], c[6], [zCorpo, cima(zCorpo)], [zCorpo, cima(zCorpo) - alma]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 329,
+          "texto": "    };"
+        },
+        {
+          "tipo": "+",
+          "linha": 330,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 331,
+          "texto": "  const cortador = [xa - fresta, xb + fresta].map((x) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 332,
+          "texto": "    const c = contornoEm(x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 333,
+          "texto": "    const zf = c[5][0] - profundidade;"
+        },
+        {
+          "tipo": "+",
+          "linha": 334,
+          "texto": "    const zr = c[5][0] + alem;"
+        },
+        {
+          "tipo": "+",
+          "linha": 335,
+          "texto": "    const yc = c[0][1] + acima;"
+        },
+        {
+          "tipo": "+",
+          "linha": 336,
+          "texto": "    const yb = c[4][1] - acima;"
+        },
+        {
+          "tipo": "+",
+          "linha": 337,
+          "texto": "    return { x, pontos: [[zf, yc], [zf, yb], [zr, yb], [zr, yc]] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 338,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 339,
+          "texto": "  return { aba, cortador };"
+        },
+        {
+          "tipo": "+",
+          "linha": 340,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 341,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 262,
+          "texto": "  const [x0, x1] = t.eixo.x;"
+        },
+        {
+          "tipo": "+",
+          "linha": 345,
+          "texto": "  const x0 = t.eixo.inicio;"
+        },
+        {
+          "tipo": "+",
+          "linha": 346,
+          "texto": "  const x1 = t.profundor.x[1] - t.eixo.antesDoDegrau;"
+        },
+        {
+          "tipo": "+",
+          "linha": 372,
+          "texto": "  const compensador = medidasDoCompensador(t, profundor.estacoes);"
+        },
+        {
+          "tipo": "+",
+          "linha": 383,
+          "texto": "    compensador: { aba: compensador.aba.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })), cortador: compensador.cortador.map((s) => ({ pos: m(s.x), pontos: pontosM(s) })) },"
+        },
+        {
+          "tipo": "-",
+          "linha": 353,
+          "texto": "  profundor: 200, eixoProfundor: 220, suporteProfundor1: 230, suporteProfundor2: 231, suporteProfundor3: 232,"
+        },
+        {
+          "tipo": "+",
+          "linha": 439,
+          "texto": "  profundor: 200, cortadorDoCompensador: 210, profundorRecortado: 211, eixoProfundor: 220,"
+        },
+        {
+          "tipo": "+",
+          "linha": 440,
+          "texto": "  suporteProfundor1: 230, suporteProfundor2: 231, suporteProfundor3: 232, compensador: 240,"
+        },
+        {
+          "tipo": "-",
+          "linha": 394,
+          "texto": "  /* O profundor, o eixo e os suportes do lado direito. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 481,
+          "texto": "  /* O profundor, menos o rasgo do compensador, e a aba do compensador no rasgo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 483,
+          "texto": "  loft(ID.cortadorDoCompensador, loftPorSecoes('x', P.compensador.cortador, P.avanco));"
+        },
+        {
+          "tipo": "+",
+          "linha": 484,
+          "texto": "  passos.push(['subtrair', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 485,
+          "texto": "    origemId: ID.profundorRecortado,"
+        },
+        {
+          "tipo": "+",
+          "linha": 486,
+          "texto": "    solidos: [doPasso('loft', ID.profundor), doPasso('loft', ID.cortadorDoCompensador)],"
+        },
+        {
+          "tipo": "+",
+          "linha": 487,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 488,
+          "texto": "  loft(ID.compensador, loftPorSecoes('x', P.compensador.aba, P.avanco));"
+        },
+        {
+          "tipo": "+",
+          "linha": 489,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 490,
+          "texto": "  /* O eixo e os suportes do lado direito. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 405,
+          "texto": "    ['profundor', doPasso('loft', ID.profundor), 'superficie'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 500,
+          "texto": "    ['profundor', doPasso('subtrair', ID.profundorRecortado), 'superficie'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 501,
+          "texto": "    ['compensador', doPasso('loft', ID.compensador), 'superficie'],"
+        },
+        {
+          "tipo": "-",
+          "linha": 438,
+          "texto": "   profundor, a dos contornos e do avanço dos polos; a do eixo, a das duas tampas (um disco de raio `r` perpendicular à reta tem, em"
+        },
+        {
+          "tipo": "+",
+          "linha": 534,
+          "texto": "   profundor, a dos contornos e do avanço dos polos, com o bordo de fuga mais alto em z depois do rasgo do compensador (o do x da"
+        },
+        {
+          "tipo": "+",
+          "linha": 535,
+          "texto": "   parede de fora do rasgo, porque o bordo recua para fora); a da aba do compensador, a das duas seções e do avanço dos polos; a do eixo, a das duas tampas (um disco de raio `r` perpendicular à reta tem, em"
+        },
+        {
+          "tipo": "+",
+          "linha": 546,
+          "texto": "  const { aba, cortador } = medidasDoCompensador(t, profundor.estacoes);"
+        },
+        {
+          "tipo": "+",
+          "linha": 547,
+          "texto": "  doProfundor.max[2] = perfilDoEstabilizador(t).bordoDeFuga(cortador[1].x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 549,
+          "texto": "  caixas.compensador = caixaDosPontos(aba.flatMap(({ x, pontos }) => pontos.map(([z, y]) => [x, y, z])));"
+        },
+        {
+          "tipo": "+",
+          "linha": 550,
+          "texto": "  caixas.compensador.min[0] -= avanco;"
+        },
+        {
+          "tipo": "+",
+          "linha": 551,
+          "texto": "  caixas.compensador.max[0] += avanco;"
+        },
+        {
+          "tipo": "-",
+          "linha": 503,
+          "texto": "        forma: `metade ${nome} do estabilizador, da raiz junto à cauda até a ponta, com enflechamento e diedro, perfil de 9,5% afinando para a ponta e o vão do profundor recortado`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 605,
+          "texto": "        forma: `metade ${nome} do estabilizador, da raiz junto à cauda até a ponta, com enflechamento e diedro, perfil de 9,5% afinando para a ponta, que tem cerca de metade da corda da raiz, e o vão do profundor recortado`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 508,
+          "texto": "        forma: `profundor ${nome}, superfície do bordo de fuga do estabilizador, no vão dele com a fresta do esboço em volta`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 509,
+          "texto": "        tecnica: 'loft das seções do esboço, com as pontas fechadas e sombreado liso',"
+        },
+        {
+          "tipo": "+",
+          "linha": 610,
+          "texto": "        forma: `profundor ${nome}, superfície do bordo de fuga do estabilizador, no vão dele com a fresta do esboço em volta, com o degrau da ponta a perto de um quinto da meia-envergadura e o rasgo do compensador no bordo de fuga`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 611,
+          "texto": "        tecnica: 'loft das seções do esboço, com as pontas fechadas e sombreado liso, e o rasgo do compensador por subtrair',"
+        },
+        {
+          "tipo": "+",
+          "linha": 613,
+          "texto": "      {"
+        },
+        {
+          "tipo": "+",
+          "linha": 614,
+          "texto": "        nome: `compensador${L}`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 615,
+          "texto": "        forma: `compensador do profundor ${nome}, aba de corda constante no bordo de fuga do profundor, separada dele por fresta nos dois lados e na frente e presa por uma alma que entra na parede do rasgo`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 616,
+          "texto": "        tecnica: 'loft de duas seções de oito pontos tiradas do contorno do profundor, no rasgo que o profundor recebe por subtrair',"
+        },
+        {
+          "tipo": "+",
+          "linha": 617,
+          "texto": "      },"
+        },
+        {
+          "tipo": "+",
+          "linha": 626,
+          "texto": "      'ponta do estabilizador com bem mais que a metade da corda da raiz',"
+        },
+        {
+          "tipo": "+",
+          "linha": 627,
+          "texto": "      'degrau da ponta do profundor a menos de um sexto da meia-envergadura da ponta',"
+        },
+        {
+          "tipo": "+",
+          "linha": 628,
+          "texto": "      'bordo de fuga do profundor sem a divisão do compensador, ou compensador solto do profundor',"
+        },
+        {
+          "tipo": "+",
+          "linha": 638,
+          "texto": "    { par: [`compensador${L}`, `profundor${L}`], motivo: `a alma do compensador entra na parede dianteira do rasgo do profundor ${nome}, que o segura` },"
+        },
+        {
+          "tipo": "-",
+          "linha": 535,
+          "texto": "  formas: Object.fromEntries(PARTES.map((p) => [p, 'solido'])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 646,
+          "texto": "  formas: Object.fromEntries([...PARTES, ...NOVAS].map((p) => [p, 'solido'])),"
+        },
+        {
+          "tipo": "-",
+          "linha": 540,
+          "texto": "    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(PARTES.map((p) => [p, p])), minimo: 0.95 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 651,
+          "texto": "    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(PARTES.map((p) => [p, p.replace(/[DE]$/, '') in AFASTADAS ? { formas: p, ...AFASTADAS[p.replace(/[DE]$/, '')] } : p])), minimo: 0.95 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 652,
+          "texto": "    novas: Object.fromEntries(NOVAS.map((p) => [p, 'a pessoa pediu na rodada de ajustes de 2026-10-15 a divisão no bordo de fuga do profundor, que a referência real mostra e o esboço não tem'])),"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

@@ -134,7 +134,7 @@ const FORMAS = {
     formas: 'deriva.dorsal',
     minimo: 0.3,
     alongamento: Object.fromEntries(['+x', '-x'].map((lado) => [lado, Math.max(...TABELA.dorsal.base.map(([, largura]) => largura)) / 2 - MEIA_LARGURA_DO_ESBOCO])),
-    motivo: 'a dorsal lisa pedida na rodada de ajustes: o dorso sobe e a crista vira o bordo de ataque da deriva, tangente a ele na junção a 415 mm da raiz, por um filete côncavo de até 240 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,31 porque a dorsal é mais fina e acaba na deriva',
+    motivo: 'a dorsal lisa pedida na rodada de ajustes: o dorso sobe e a crista vira o bordo de ataque da deriva, tangente a ele na junção a 415 mm da raiz, por um filete côncavo de até 240 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,30 porque a dorsal é mais fina e acaba na deriva',
   },
   leme: 'leme', eixoLeme: 'eixoLeme',
   ...Object.fromEntries(DOBRADICAS.map(({ n, L }) => [`dobradicaLeme${n}${L}`, `dobradicaLeme${n}${L}`])),
