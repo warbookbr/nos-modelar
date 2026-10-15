@@ -37,8 +37,8 @@
  * da meia-envergadura (`profundor.x`, com a espessura das seções refeita para a corda nova) e o bordo de fuga do profundor ganha o
  * compensador, uma aba própria (`compensadorD` e `compensadorE`) num rasgo do profundor com a fresta dos dois lados e da frente, presa
  * por uma alma que entra na parede dianteira do rasgo. O compensador não tem volume no andaime nem forma no esboço e entra em `REFINA.novas`. A
- * ponta mais estreita e o degrau recuado tiram a parte da forma do esboço sem deslocá-la, e por isso o `REFINA.esboco` declara o
- * `minimo` próprio de cada uma, com o motivo no comentário dele.
+ * ponta mais estreita, o degrau recuado e o eixo mais curto tiram a parte da forma do esboço sem deslocá-la, e por isso o
+ * `REFINA.esboco` declara o `minimo` próprio de cada uma, com o `motivo`.
  */
 import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
@@ -54,12 +54,23 @@ const VOLUMES = Object.fromEntries(porLado((L, l) => [
 ]));
 const PARTES = Object.keys(VOLUMES);
 /* As partes que saem da forma do esboço de propósito sem se deslocar, com o mínimo próprio de cada uma na razão interseção/união de
-   volume contra a forma do esboço (o geral é 0,95), logo abaixo do que a parte tem hoje: o estabilizador, com a ponta a metade da
-   corda da raiz e o vão do degrau recuado (0,891), e o profundor, com o bordo de fuga mais à frente na ponta, as seções mais finas, o
-   degrau recuado e o rasgo do compensador (0,704 e 0,706), e o eixo, que acaba 21 mm antes do degrau novo, 236 mm mais curto que o do
-   esboço (0,87). A razão cai porque a forma pedida é outra, e o mínimo próprio só impede que
-   caia mais. Deslocamento e alongamento não servem: nada aqui é translação, e a parte não passa do volume do andaime. */
-const MINIMO_PROPRIO = { estabilizador: 0.88, profundor: 0.70, eixoProfundor: 0.85 };
+   volume contra a forma do esboço (o geral é 0,95), logo abaixo do que a parte tem hoje, e o motivo. A razão cai porque a forma pedida
+   é outra, e o mínimo próprio só impede que caia mais. Deslocamento e alongamento não servem: nada aqui é translação, e a parte não
+   passa do volume do andaime. */
+const AFASTADAS = {
+  estabilizador: {
+    minimo: 0.88,
+    motivo: 'a ponta tem a metade da corda da raiz (606 mm, e não os 736 do esboço) e o vão do degrau recuado para 1980 muda o recorte; razão 0,891 na rodada de ajustes de 2026-10-15',
+  },
+  profundor: {
+    minimo: 0.70,
+    motivo: 'o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,706 e 0,704',
+  },
+  eixoProfundor: {
+    minimo: 0.85,
+    motivo: 'a haste acaba 21 mm antes do degrau novo, em x 1959, 236 mm mais curta que a do esboço; até 2215 ela ficava a 3 mm da face de cima do profundor; razão 0,87',
+  },
+};
 /* As partes que a pessoa pediu além do esboço: sem volume no andaime e sem forma no esboço, entram em `REFINA.novas`. */
 const NOVAS = porLado((L) => [`compensador${L}`]);
 
@@ -637,7 +648,7 @@ const receita = {
     andaime: '../../andaime.json',
     partes: VOLUMES,
     tolerancia: { envelope: 5, porta: 0.5 },
-    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(PARTES.map((p) => [p, p.replace(/[DE]$/, '') in MINIMO_PROPRIO ? { formas: p, minimo: MINIMO_PROPRIO[p.replace(/[DE]$/, '')] } : p])), minimo: 0.95 },
+    esboco: { arquivo: ESBOCO, opcao: 1, formas: Object.fromEntries(PARTES.map((p) => [p, p.replace(/[DE]$/, '') in AFASTADAS ? { formas: p, ...AFASTADAS[p.replace(/[DE]$/, '')] } : p])), minimo: 0.95 },
     novas: Object.fromEntries(NOVAS.map((p) => [p, 'a pessoa pediu na rodada de ajustes de 2026-10-15 a divisão no bordo de fuga do profundor, que a referência real mostra e o esboço não tem'])),
   },
   get PONTOS() { return pontosDeclarados(this.PARAMS); },
