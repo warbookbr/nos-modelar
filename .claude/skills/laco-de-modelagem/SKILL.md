@@ -98,6 +98,10 @@ passos, o histórico nem o que mudou: contar como foi feito faz revisão virar
 concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem
 inventar nota.
 
+A receita que mudou depois da última rodada volta ao crítico, salvo quando a
+malha que ela produz e o `PLANO` são os da cópia que a rodada julgou, como ao
+declarar o `REFINA` depois de fechar; a ação diz isso no motivo.
+
 **parar-fechou** encerra a etapa e leva o caso à pessoa. **parar-limite** e
 **parar-sem-convergencia** também param e levam o registro à pessoa; não
 estenda o limite por conta própria.

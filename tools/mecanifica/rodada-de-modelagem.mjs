@@ -34,6 +34,7 @@ import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
 import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -175,7 +176,30 @@ export async function medirReceita(peca) {
     if (!pontos.ok) falhas.push(indentar(formatarPontos(pontos)));
   }
   const passou = falhas.length === 0;
-  return { passou, sha256, texto, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')) };
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')) };
+}
+
+/**
+ * A impressão do que o crítico julga numa receita: a malha que ela produz (vértices e faces com a parte de cada uma) e o `PLANO`,
+ * que diz ao crítico a forma prometida de cada parte. Duas receitas com a mesma impressão mostram ao crítico a mesma coisa, ainda que
+ * o texto mude, como quando a receita ganha o `REFINA` depois de fechar. Receita que não executa sozinha (a que pede o registro de
+ * composições de fora) devolve null, e quem compara trata como forma diferente.
+ */
+export async function impressaoDaForma(caminho) {
+  let receita;
+  let neutro;
+  try {
+    receita = receitaDoModulo(await importarReceita(caminho));
+    const execucao = executarReceita(receita);
+    neutro = execucao.neutro ?? execucao;
+  } catch {
+    return null;
+  }
+  const hash = createHash('sha256');
+  for (const [id, v] of neutro.V) hash.update(`v${id}:${v.join(',')};`);
+  for (const [id, f] of neutro.F) hash.update(`f${id}:${f.vs.join(',')}:${f.parte ?? ''};`);
+  hash.update(`plano:${JSON.stringify(receita.PLANO ?? null)}`);
+  return `sha256:${hash.digest('hex')}`;
 }
 
 const curto = (sha256) => sha256.replace(/^sha256:/, '').slice(0, 8);
@@ -184,13 +208,23 @@ const curto = (sha256) => sha256.replace(/^sha256:/, '').slice(0, 8);
  * A ação seguinte do laço da peça, dada a receita que existe agora. `medir` devolve a medição (`medirReceita` por padrão); peça cuja
  * receita ainda não existe não tem o que medir e segue a decisão das rodadas, que começa em `modelar`.
  */
-export async function acaoDaPeca(peca, { rodadas = lerRodadas(peca), limite = limiteDaPeca(peca), medir = () => medirReceita(peca) } = {}) {
+export async function acaoDaPeca(peca, {
+  rodadas = lerRodadas(peca), limite = limiteDaPeca(peca), medir = () => medirReceita(peca), pasta = pastaDeRodadas(peca),
+} = {}) {
   let medicao = null;
   try { medicao = await medir(); } catch (erro) {
     if (!/^Receita .* não encontrada|Informe o nome/.test(erro.message)) throw erro;
   }
   if (medicao === null) return { ...proximaAcao(rodadas, { limite }), medicao: null };
-  return { ...acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao }, { limite }), medicao };
+  /* O texto mudou depois da última rodada: a cópia que ela guardou diz se o crítico julgaria outra coisa. */
+  const ultima = rodadas[rodadas.length - 1];
+  let mesmaFormaDaRodada;
+  if (medicao.passou && medicao.caminho && ultima?.receita?.sha256 && ultima.receita.sha256 !== medicao.sha256
+    && existsSync(copiaDaReceita(pasta, ultima.numero))) {
+    const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero))]);
+    if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
+  }
+  return { ...acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite }), medicao };
 }
 
 /**

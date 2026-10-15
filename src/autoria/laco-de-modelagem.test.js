@@ -146,6 +146,11 @@ describe('a ação dada a receita atual, identificada pelo hash', () => {
   it('com a medição passando, a receita igual à da última rodada segue a decisão das rodadas', () => {
     expect(acaoDaReceita([daReceita(1, HASH_A, { quantos: 2 })], atual(HASH_A)).acao).toBe('modelar');
     expect(acaoDaReceita([daReceita(1, HASH_A, { quantos: 0, nota: 9 })], atual(HASH_A)).acao).toBe('parar-fechou');
+    /* texto novo com a malha e o PLANO da rodada: o julgamento vale; com a forma de outra rodada, não */
+    const fechada = [daReceita(1, HASH_A, { quantos: 0, nota: 9 })];
+    expect(acaoDaReceita(fechada, { ...atual(HASH_B), mesmaFormaDaRodada: 1 }).acao).toBe('parar-fechou');
+    expect(acaoDaReceita(fechada, { ...atual(HASH_B), mesmaFormaDaRodada: 1 }).motivo).toContain('mesma malha e o mesmo PLANO');
+    expect(acaoDaReceita(fechada, { ...atual(HASH_B), mesmaFormaDaRodada: 2 }).acao).toBe('revisar');
     expect(acaoDaReceita([daReceita(1, HASH_A)], atual(HASH_A)).acao).toBe('revisar');
   });
 

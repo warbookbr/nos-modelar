@@ -6,13 +6,13 @@
  * achou que estava bom. O registro precisa sobreviver à rodada: veredito que
  * vive só no diálogo some com a janela de contexto.
  */
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { acaoDaPeca, ajustarImportsDaCopia, gravarRodada, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida } from './rodada-de-modelagem.mjs';
+import { acaoDaPeca, ajustarImportsDaCopia, gravarRodada, impressaoDaForma, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida } from './rodada-de-modelagem.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -208,6 +208,22 @@ describe('a medição da receita atual trava o laço', () => {
     const nova = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('g01-ok') });
     expect(nova.acao).toBe('revisar');
     expect(nova.motivo).toContain('a receita mudou depois da rodada 1');
+  });
+
+  it('a receita que mudou fora da malha e do PLANO segue as rodadas, e a que mudou a malha pede o crítico', async () => {
+    expect(await impressaoDaForma(fixture('g01-ok'))).toBe(await impressaoDaForma(fixture('ok')));
+    expect(await impressaoDaForma(fixture('sapata-deslocada'))).not.toBe(await impressaoDaForma(fixture('ok')));
+    const pasta = join(area, PECA);
+    await registrarMedida(PECA, entrada({ veredito: veredito(0, 9) }), { pasta, medir: medirFixture('ok') });
+    /* a cópia que a rodada guarda importa a partir da pasta rodadas/ da peça; aqui ela mora fora, e o import vai absoluto */
+    writeFileSync(join(pasta, 'receita-01.js'), readFileSync(fixture('ok'), 'utf8').replace("'../suporte.js'", `'${resolve(FIXTURES, 'suporte.js')}'`));
+    const mesma = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('g01-ok'), pasta });
+    expect(mesma.acao).toBe('parar-fechou');
+    expect(mesma.motivo).toContain('mas produz a mesma malha e o mesmo PLANO que o crítico julgou');
+    const outra = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('sapata-deslocada'), pasta });
+    expect(outra.medicao.passou).toBe(true);
+    expect(outra.acao).toBe('revisar');
+    expect(outra.motivo).toContain('falta o crítico julgar esta');
   });
 
   it('--registrar recusa o veredito do crítico quando a medição reprovou, e não grava nada', async () => {

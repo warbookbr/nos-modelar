@@ -233,6 +233,14 @@ export function acaoDaReceita(rodadas, receitaAtual, opcoes = {}) {
   }
   const decisao = proximaAcao(rodadas, opcoes);
   if (decisao.acao === 'parar-limite' || decisao.acao === 'parar-sem-convergencia') return decisao;
+  /* o texto mudou, mas a malha e o PLANO são os que o crítico julgou na rodada (quem chama compara com a cópia dela) */
+  if (receitaAtual.mesmaFormaDaRodada === ultima.numero) {
+    return {
+      ...decisao,
+      motivo: `a receita mudou depois da rodada ${ultima.numero} (sha256:${curto(ultima.receita.sha256)} para sha256:${curto(sha256)}), `
+        + `mas produz a mesma malha e o mesmo PLANO que o crítico julgou; ${decisao.motivo}`,
+    };
+  }
   return {
     acao: 'revisar',
     motivo: `a receita mudou depois da rodada ${ultima.numero} (sha256:${curto(ultima.receita.sha256)} para sha256:${curto(sha256)}) e a medição `
