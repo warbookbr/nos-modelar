@@ -1,0 +1,1095 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-vertical",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/empenagem-vertical-composta.png",
+    "nota": 9,
+    "defeitos": [
+      {
+        "parte": "deriva",
+        "tipo": "posicao",
+        "onde": "vértice do V do recorte do vão no bordo de fuga, corte y 3300",
+        "sentido": "adiantada",
+        "evidencia": "Só no corte y 3300 o V azul fica separado do vermelho, ~5 px à esquerda (proa), ≈4 mm a 1,29 px/mm; em 2350, 2500 e 2700 os dois coincidem na largura da linha. Marginal."
+      }
+    ],
+    "observacao": "Deriva e dorsal coincidem com o alvo nos quatro cortes, platô de espessura e emenda incluídos; a emenda da dorsal é do sólido do esboço. Leme, eixo e dobradiças não entraram na sobreposição."
+  },
+  "partes": [
+    {
+      "nome": "deriva",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dorsal",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "leme",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoLeme",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a booleana deixou cantos a 250 e a 11 mm da deriva (faces da família empenadas a 0,03 grau): a raiz começa 7,86 mm acima e o vão do leme vai deslocado, o que dá os ~4 mm que o crítico viu (backlog: canto solto na booleana)",
+    "o crítico apontou a espessura da deriva e a emenda da dorsal pela vista de cima pequena; a sobreposição dos cortes com o esboço mostrou as duas iguais ao alvo, e ele as retirou",
+    "forma:esboco não lê as formas do REFINA.esboco da receita, e quem mede peça com nome diferente do esboço precisa repetir o mapa em --formas"
+  ],
+  "notaDePassagem": "Deriva começa 7,86 mm acima de y0 e o vão tem as seções deslocadas (deslocamentoDoVao) por cantos soltos da booleana; ao mexer na TABELA da deriva ou do leme, rode conferir-pontos e descrever.",
+  "receita": {
+    "sha256": "sha256:efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 728,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * com o leme neutro."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Sexta etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `empenagem-vertical`"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * `aviao-detalhe-empenagem-vertical.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. A"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * TABELA está em milímetro, no quadro do esboço, e a conversão para metro acontece só em `derivar`. A fuselagem não publica porta, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * por isso a raiz da deriva (`y0` e o z do eixo a 25% da corda, `vY0` e `vZq0` do esboço) e a linha da dobradiça estão na TABELA como"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * os parâmetros do esboço, e nenhum vínculo de medida nem encaixe de porta da montagem v5 os fornece. Os nomes das partes não levam"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * ponto: `deriva` é a forma `deriva.fin` e `dorsal` é a `deriva.dorsal`."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * A deriva é a superfície da família `superficie-aerodinamica`, perfil `deriva`, expandida dentro dos PASSOS"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * (`docs/mecanifica/usar/AUTORIA-DE-PECA.md`) com os parâmetros do módulo `derivaVertical` do esboço, e cortada na raiz e no vão do"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * leme (`deriva.corteRaiz` e `vaoDoLeme`). A corda da raiz é 0,995 da altura, acima do teto de 0,8 da família para a semi-superfície,"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * e por isso o esboço chama a família com `simetria` 1, de envergadura o dobro da altura (a razão cai a 0,50), e corta a metade de"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * baixo com a caixa `corteRaiz`; a receita faz o mesmo. A família gera a superfície na pose dela, com a raiz na origem e a envergadura"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * em y, e o esboço a põe com a raiz em (0, `y0`, z do eixo); a receita faz o mesmo com `transladar`. Da expansão ficam o `loft` e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * espelho em y, com a identidade que esta receita lhes dá, porque a semi-superfície sai aberta na raiz e só fecha com a metade"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * espelhada, e a booleana só aceita sólido fechado (o alias `derivaInteira`, de `ALIASES`, junta os dois). Saem a parte `fixa`, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * material, o sólido e o liso, porque a receita nomeia a deriva depois de recortá-la, e as duas portas, que a família publica no"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * quadro local."
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * A booleana do núcleo recalcula cada canto novo pelos planos das faces de entrada, e a casca da família tem faces empenadas e quase"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * coplanares (a 0,03 a 0,8 grau uma da outra), de modo que o canto que um corte faz sobre uma aresta da casca pode"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * sair a 10 mm ou a metros da peça. A família começa a superfície com uma faixa de 7,86 mm entre a seção da raiz e a seguinte, e o canto"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * que o vão faz sobre a aresta entre essa faixa e a de cima sai a 250 mm da peça com o vão em qualquer lugar até 8 mm do esboço. A caixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * da raiz corta, então, na segunda seção da família, e a deriva começa 7,86 mm acima de `y0`."
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * O vão do leme é o próprio leme engrossado pela fresta (`subtrai` com `folga` no esboço): o contorno de cada seção é deslocado para"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * fora pela fresta, com a quina em esquadria, e as duas extremidades avançam a fresta, com o contorno prolongado na reta que une as"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * duas seções de cada ponta. O esboço engrossa cada trecho entre duas seções pelos planos das faces dele, e a receita desloca o contorno"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " * das seções. No degrau do topo (de y 3896 a 3950, com 238 mm em z para 54 mm em y) a face do vão é quase horizontal, e o contorno"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " * deslocado 12 mm a deixaria a 3 mm do leme, onde o esboço deixa 12 mm. Com as quatro seções do vão onde o contorno deslocado as põe,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * o canto que o vão faz sobre a pele da deriva junto do degrau sai a 11 mm do lugar e atravessa o leme. `deslocamentoDoVao` leva cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * seção do vão em z e em y, e com os valores da TABELA nenhum canto passa de 0,2 mm da superfície: a seção do degrau aceita de -7 a -10"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * mm em z, a do topo de -1,5 a -3, e a de cima do degrau qualquer valor de -3 a -20 em y, que leva a fresta do degrau de 3 a 10 mm. A"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * fresta fica entre 10 e 14 mm ao longo do leme e em 19 mm junto do degrau. Os pontos declarados medem a caixa da deriva, e o contato"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": " * entre a deriva e o leme acusa o deslocamento que deixar de valer."
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": " * O leme e o vão são lofts em y de seções de sete pontos, como no esboço. O loft só fecha uma ponta com um polo de raio zero, e o polo"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": " * nasce no eixo, a `tampa.avanco` além da seção, e `moveV` o leva ao centro dela, de modo que cada ponta é um leque quase plano. A"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": " * dorsal é um loft em z de retângulos de cantos arredondados, `suave` no esboço: uma curva de tangente contínua (cúbica de Hermite com"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": " * a tangente de Fritsch e Carlson, a do PCHIP, que não passa do valor de nenhuma seção) passa pelas seções, e a receita a avalia em"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": " * estações a mais entre elas. As dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": " * acrescenta estação entre elas. As do lado esquerdo são o espelho em x das do direito. O eixo do leme é uma extrusão de um círculo em"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": " * y, girada em x para a reta da dobradiça."
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "import { nucleo } from '../../../../../nucleo/entrada.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "const DOBRADICAS = [1, 2, 3].flatMap((n) => [['D', 'd', 'direita'], ['E', 'e', 'esquerda']].map(([L, l, lado]) => ({ n, L, l, lado })));"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "const VOLUMES = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  deriva: 'deriva-fin', dorsal: 'deriva-dorsal', leme: 'leme', eixoLeme: 'eixo-leme',"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  ...Object.fromEntries(DOBRADICAS.map(({ n, L, l }) => [`dobradicaLeme${n}${L}`, `dobradica-leme${n}-${l}`])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "const FORMAS = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  deriva: 'deriva.fin', dorsal: 'deriva.dorsal', leme: 'leme', eixoLeme: 'eixoLeme',"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  ...Object.fromEntries(DOBRADICAS.map(({ n, L }) => [`dobradicaLeme${n}${L}`, `dobradicaLeme${n}${L}`])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "const PARTES = Object.keys(VOLUMES);"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  /* A deriva: os parâmetros `v*` do esboço. `y0` é onde a raiz assenta (`vY0`), `altura` a da raiz ao topo (`vH`), e `bordoDeAtaque` e"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "     `corda` são o z do bordo de ataque e a corda na raiz e no topo (`vZle0`, `vZle1`, `vC0`, `vC1`). O eixo da superfície fica a"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "     `fracaoDoEixo` da corda da raiz (`vZq0`), e o enflechamento é o ângulo da reta dos 25% da corda da raiz ao topo. `espessura` é a"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "     relativa da família na raiz e no topo (`vTr0`, `vTr1`). `corteRaiz` é a caixa que tira a metade de baixo da superfície espelhada:"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "     largura em x, altura em y, profundidade em z e o z do centro. O topo da caixa fica na segunda seção da família (`derivar`). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  deriva: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    perfil: 'deriva',"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    y0: 2225,"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    altura: 1965,"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    bordoDeAtaque: [7791, 9690],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    corda: [1956, 710],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    espessura: [0.1, 0.09],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    fracaoDoEixo: 0.25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    corteRaiz: { largura: 600, altura: 2500, profundidade: 3600, z: 8900 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  /* O leme e o vão: o y de cada seção (a base do leme, a seção `d` logo acima, a `b` e a `e` do degrau do topo e o topo, `vYl0`, `vYd`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "     `vYb`, `vYe`, `vYc`; o vão usa a raiz da deriva no lugar da base) e a linha da dobradiça, o z do nariz do leme: `inicio` na raiz"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "     (`vZh0`), `inclinacao` em z por y (`vKh`) até a seção `b`, e `noE` e `noTopo` nas duas seções de cima (`vZhe`, `vZhc`). O leme"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "     acaba na base no `bordoDeFugaNaBase` (`vZte0`), e o contorno de sete pontos tem o nariz de `nariz` (em fração da espessura: o"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     arco de 45 graus) e o bordo de fuga de `meiaEspessuraDoBordoDeFuga` para cada lado. A `fresta` é a folga do vão em volta do leme, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "     `deslocamentoDoVao` o deslocamento [em z, em y], em milímetro, de cada uma das quatro seções do vão: a que passa da raiz da"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     deriva, a do degrau (`vYb`), a de cima do degrau (`vYe`) e a que passa do topo do leme. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  leme: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    y: { base: 2240, d: 2393, b: 3896, e: 3950, topo: 4185 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    linhaDaDobradica: { inicio: 9040, inclinacao: 0.5855, noE: 9780, noTopo: 9825 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    bordoDeFugaNaBase: 9360,"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    nariz: [0.1465, 0.3535],"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    meiaEspessuraDoBordoDeFuga: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    fresta: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    deslocamentoDoVao: [[0, 0], [-8, 0], [0, -9], [-2, 0]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  /* O eixo do leme: haste de `diametro`, em `lados` lados, ao longo do centro do nariz, de `sobra` acima da base do leme até `sobra`"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "     abaixo da seção `b`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  eixo: { diametro: 30, sobra: 15, lados: 48 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  /* A dorsal: uma estação por linha, [z, largura em x, altura em y, raio do canto, y do centro]; o x do centro é zero. `subdivisoes` é"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "     quantas estações a curva suave passa a ter entre duas seções, e `segmentosPorCanto` os segmentos de cada canto arredondado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  dorsal: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "      [6960, 24, 48, 11, 2321],"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "      [7300, 70, 140, 33, 2339],"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "      [7700, 100, 228, 48, 2357],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      [8100, 125, 342, 60, 2394],"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      [8300, 80, 420, 38, 2430],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    subdivisoes: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    segmentosPorCanto: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  /* As dobradiças: três pares, cada um a `y` de um y da lista (`vK1y`, `vK2y`, `vK3y`). Cada estação é [z a partir da linha da"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "     dobradiça naquele y, largura em x, altura em y, raio do canto, fração da espessura do leme naquele y que dá o x do centro]. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  dobradicas: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    y: [2450, 3070, 3690],"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "      [-60, 30, 52, 13, 0.46],"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "      [10, 44, 70, 17, 0.42],"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "      [90, 32, 62, 15, 0.38],"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "      [170, 24, 40, 9, 0.28],"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    subdivisoes: 1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    segmentosPorCanto: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  /* Fechamento das pontas dos lofts: quanto o polo fica além da última seção. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  tampa: { avanco: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "const GRAUS = Math.PI / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "const mAll = (v) => v.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "const registroDeFamilias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "/* A espessura do perfil simétrico do esboço (NACA de bordo de fuga fechado) a uma fração `s` da corda, em fração da corda. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "const naca = (s) => 0.2969 * Math.sqrt(s) - 0.126 * s - 0.3516 * s ** 2 + 0.2843 * s ** 3 - 0.1036 * s ** 4;"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "/* A estação do leme ou do vão no y dado, com o nariz em `zh`: a corda e o z do bordo de ataque da deriva ali, a espessura do perfil"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "   no nariz (`T`), o comprimento até o bordo de fuga (`L`) e o z do centro do contorno (`zc`). São as contas de `vSa`, `vTa`, `vLa` e"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "   `vZca` do esboço, uma estação por y. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "function estacaoDoLeme(t, y, zh) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  const d = t.deriva;"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  const u = (y - d.y0) / d.altura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  const corda = d.corda[0] + (d.corda[1] - d.corda[0]) * u;"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  const bordoDeAtaque = d.bordoDeAtaque[0] + (d.bordoDeAtaque[1] - d.bordoDeAtaque[0]) * u;"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  const espessura = 10 * (d.espessura[0] + (d.espessura[1] - d.espessura[0]) * u) * corda * naca((zh - bordoDeAtaque) / corda);"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  const L = bordoDeAtaque + corda - zh;"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  return { y, zh, T: espessura, L, zc: zh + 0.5 * L };"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "/* A linha da dobradiça: o z do nariz em y, entre a raiz e a seção `b`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "const dobradicaEm = (t, y) => t.leme.linhaDaDobradica.inicio + t.leme.linhaDaDobradica.inclinacao * (y - t.deriva.y0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "/* As cinco seções do leme e as quatro do vão, [y, zh]. O leme sai da base com a espessura da raiz e o bordo de fuga em `bordoDeFugaNaBase`"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "   (o canto de baixo cortado), e o vão começa na raiz da deriva, com a dobradiça no `inicio`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "function estacoesDoLeme(t) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  const { y, linhaDaDobradica: h, bordoDeFugaNaBase } = t.leme;"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  const raiz = estacaoDoLeme(t, t.deriva.y0, h.inicio);"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "  const naBase = estacaoDoLeme(t, y.base, dobradicaEm(t, y.base));"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  const leme = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    { ...naBase, T: raiz.T, L: bordoDeFugaNaBase - naBase.zh, zc: naBase.zh + 0.5 * (bordoDeFugaNaBase - naBase.zh) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    estacaoDoLeme(t, y.d, dobradicaEm(t, y.d)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "    estacaoDoLeme(t, y.b, dobradicaEm(t, y.b)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "    estacaoDoLeme(t, y.e, h.noE),"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "    estacaoDoLeme(t, y.topo, h.noTopo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  const vao = [raiz, leme[2], leme[3], leme[4]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  return { leme, vao };"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "/* O contorno de sete pontos do leme em uma estação, [x, z] em mm, anti-horário em (x, z): o bordo de fuga, o arco do nariz e de volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "function contornoDoLeme(t, e) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const [n1, n2] = t.leme.nariz;"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  const b = t.leme.meiaEspessuraDoBordoDeFuga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  const frente = e.zc - 0.5 * e.L;"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "    [b, e.zc + 0.5 * e.L],"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "    [-b, e.zc + 0.5 * e.L],"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "    [-0.5 * e.T, frente + 0.5 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    [-n2 * e.T, frente + n1 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "    [0, frente],"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "    [n2 * e.T, frente + n1 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "    [0.5 * e.T, frente + 0.5 * e.T],"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "/* O contorno deslocado `d` para fora, com a quina em esquadria: cada vértice anda `d` pela soma das normais das duas arestas, dividida"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "   por um mais o produto escalar delas. O contorno é anti-horário, e a normal de fora de uma aresta (ex, ey) é (ey, -ex). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "function deslocarContorno(pontos, d) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  const n = pontos.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  const normal = (a, b) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    const ex = b[0] - a[0]; const ey = b[1] - a[1]; const l = Math.hypot(ex, ey);"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "    return [ey / l, -ex / l];"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  return pontos.map((p, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "    const antes = normal(pontos[(i + n - 1) % n], p);"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}

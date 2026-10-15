@@ -299,13 +299,21 @@ describe('a linha de comando', () => {
 
   it.each([
     [['--esboco=a.esboco.json'], /diga a peça/],
-    [[`${PASTA}/ok/receita.js`], /diga o esboço: --esboco/],
+    [['tools/fixtures/refina-forma-global/ok/receita.js'], /diga o esboço: --esboco.*ou declare REFINA.esboco/],
+    [[`${PASTA}/ok/receita.js`, '--mesmo-id'], /diga o esboço: --esboco/],
     [[`${PASTA}/ok/receita.js`, `--esboco=${ESBOCO}`, '--minimo=2', '--mesmo-id'], /--minimo precisa ser a razão mínima/],
     [[`${PASTA}/ok/receita.js`, `--esboco=${ESBOCO}`, '--mesmo-id', '--minimu=0.9'], /não conheço '--minimu'.*Você quis dizer '--minimo'/s],
   ])('o uso errado %j sai com 2 e diz o que falta', async (argv, mensagem) => {
     const r = await comoCLI(argv);
     expect(r.codigo).toBe(2);
     expect(r.stderr).toMatch(mensagem);
+  });
+
+  it('sem --esboco, a CLI lê o REFINA.esboco da receita, com o mínimo próprio de cada parte', async () => {
+    const r = await comoCLI([`${PASTA}/minimo-proprio/receita.js`]);
+    expect(r.codigo).toBe(0);
+    expect(r.stdout).toContain('contra o esboço bloco.esboco.json');
+    expect(r.stdout).toMatch(/bloco .*\(bloco, mínimo 0,80\)/);
   });
 
   it('sem dizer como ligar as partes, a CLI recusa dizendo as duas maneiras', async () => {

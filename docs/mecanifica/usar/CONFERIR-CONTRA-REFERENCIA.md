@@ -98,7 +98,7 @@ refinamento, contatos e formas), e cada item sem referência diz `não conferido
 - **Forma contra o esboço.** A receita que refina uma forma do esboço declara `REFINA.esboco` (o arquivo do esboço, a opção, a forma de
   cada parte e a razão interseção/união de volume mínima, geral ou por parte). Cada parte é comparada ao sólido da forma, com os recortes,
   as inclinações e a malha de família, e reprova abaixo do mínimo com a parte, as formas, a razão e o mínimo. Só roda quando o campo
-  existe, e a linha da seção `REFERÊNCIA DA FORMA` traz a razão de cada parte. `npm run forma:esboco -- <peça> --esboco=<arquivo> --mesmo-id`
+  existe, e a linha da seção `REFERÊNCIA DA FORMA` traz a razão de cada parte. `npm run forma:esboco -- <peça>` (o `REFINA.esboco` da receita) ou `npm run forma:esboco -- <peça> --esboco=<arquivo> --mesmo-id`
   mede uma receita que não declara o campo, ligando cada parte à forma de mesmo id.
 
 O laço lê o mesmo veredito: `rodada-de-modelagem.mjs <peça> --acao` mede a receita atual (veredito, `guarda:acervo`,
