@@ -5,36 +5,52 @@
   "etapas": [
     {
       "instancia": "fuselagem",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está pela escolha 'Aceitar como está (Recomendado)', com o para-brisa anguloso, a ondulação da linha de baixo e a largura da cabine, que vêm do esboço aprovado, anotados como pendência",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 2.",
-          "fuselagem: espessura em cintura da cabine, z≈4700 a 5800",
-          "fuselagem: superficie em linha inferior entre capô e cabine, z≈2750 a 3900",
-          "parabrisa: superficie em ponta dianteira e borda inferior"
-        ],
-        "analise": "ausente"
-      },
-      "receita": "f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99"
+      "receita": "f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "pediu o para-brisa rente ao casco, como as janelas, com a abertura recortada no casco e o montante apoiado no vidro de ponta a ponta, depois da correção do sombreamento",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está pela escolha 'Aceitar como está (Recomendado)', com o para-brisa anguloso, a ondulação da linha de baixo e a largura da cabine, que vêm do esboço aprovado, anotados como pendência",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 2.",
+              "fuselagem: espessura em cintura da cabine, z≈4700 a 5800",
+              "fuselagem: superficie em linha inferior entre capô e cabine, z≈2750 a 3900",
+              "parabrisa: superficie em ponta dianteira e borda inferior"
+            ],
+            "analise": "ausente"
+          },
+          "receita": "f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99"
+        }
+      ]
     },
     {
       "instancia": "motor",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "a pessoa, 2026-10-15: aceitou o motor como está, depois do crítico fechar com nota 8 na rodada 2",
-        "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
-        "analise": "ausente"
-      },
-      "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d"
+      "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d",
+      "reaberturas": [
+        {
+          "por": "a pessoa",
+          "quando": "2026-10-15",
+          "motivo": "a fuselagem reabre para o para-brisa rente ao casco, e o motor, etapa posterior fixa, reabre antes pela regra do comando, sem mudança na peça",
+          "aceite": {
+            "por": "a pessoa, 2026-10-15: aceitou o motor como está, depois do crítico fechar com nota 8 na rodada 2",
+            "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
+            "analise": "ausente"
+          },
+          "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d"
+        }
+      ]
     },
     {
       "instancia": "helice",
       "estado": "aberta",
       "juntas": [],
-      "receita": "c982667cae1083dc1f4e0987dcdd2ddac03040f95a960435bcf4a04dec56783d"
+      "receita": "1a902316ef107df3a66c9879db7c6e6d69a3057dd8fea0e5192cd3917aad2483"
     }
   ]
 }
