@@ -174,3 +174,36 @@ dá 0,998. O contorno do perfil da pá sai em lados retos numa vista isolada, pe
 resolução da família, e fica como pendência dela. A etapa ficou fixa depois da fuselagem e
 do motor, que foram reabertos e vêm antes na ordem.
 
+## O plano das asas
+
+É a quarta etapa. A receita fica em `partes/asas/receita.js`, com o nome `aviao/asas`,
+e as formas vêm da unidade `asas` do esboço aprovado (o mestre e o
+[detalhe](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-asas.esboco.json)),
+com as 20 formas visíveis, dez de cada lado, o esquerdo espelhado em x.
+
+- `asaD` e `asaE`: as metades da asa, a superfície da família `superficie-aerodinamica`
+  com o perfil `asa` e os parâmetros do esboço (enflechamento, diedro e o afinamento),
+  com os vãos do flap e do aileron recortados com a fresta do esboço e o corte da ponta.
+  O esboço recorta da asa também os alojamentos do trem principal (perna, braço e roda),
+  que são cortadores da unidade dos trens; a asa os recorta igual.
+- `pontaD` e `pontaE`: as pontas levantadas a 56 graus, a mesma superfície com a ponta
+  levantada, cortada para ficar só além da metade da asa.
+- `flapD`, `flapE`, `aileronD` e `aileronE`: os comandos, lofts das seções do esboço, nos
+  vãos da asa, neutros.
+- `eixoFlapD` a `eixoAileronE`: os eixos, hastes de 30 mm ao longo das dobradiças.
+- `suporteFlap1D` a `suporteAileron2E`: os oito suportes, caixas de canto arredondado sob
+  a asa.
+
+O `REFINA` aponta `../../andaime.json` e liga cada parte ao volume de mesmo nome em slug
+(`asa-d`, `ponta-d`, `flap-d` e os outros), com a tolerância de 5 mm, e o
+`REFINA.esboco` liga cada parte à forma de mesmo id do esboço, com o mínimo de 0,95. É a
+razão de volume que diz se a asa e a ponta seguem o esboço, porque o envelope da ponta é
+a caixa da asa inteira. A escala é a envergadura de ponta a ponta no esboço, 12.825 mm.
+Os contatos são cada ponta com a sua metade, cada eixo com o seu comando e cada suporte
+com a asa e com o eixo que segura.
+
+Reprova as asas: asa reta, sem o enflechamento, o diedro ou o afinamento; ponta sem a
+levantada ou com degrau; comando fora do vão, sem a fresta ou atravessando a asa; eixo ou
+suporte solto; vão sem recorte; e o `REFINA` acusando parte fora do envelope ou abaixo do
+mínimo contra o esboço.
+

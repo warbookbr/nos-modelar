@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1278 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1279 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1006,6 +1006,10 @@
 ## procedural/pecas/aviao/
 
 - `ALINHAMENTO.md` — Avião de pequeno porte — o objeto no núcleo
+
+## procedural/pecas/aviao/partes/asas/
+
+- `receita.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada, os flaps, os ailerons, os eixos deles e os suportes, na pose de pouso, …
 
 ## procedural/pecas/aviao/partes/fuselagem/
 
