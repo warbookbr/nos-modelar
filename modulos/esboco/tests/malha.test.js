@@ -226,7 +226,7 @@ describe('a superfície de seções planas, como a asa de 12 m do avião', () =>
     const pontos = m.vertices;
     const casco = cascoConvexo(pontos);
     expect(casco.faces.length).toBeLessThanOrEqual(2 * pontos.length - 4);
-    /* o casco envolve todos os vértices, a menos do deslocamento de posição geral (1e-7 da extensão, 1,2 mm nesta asa) */
+    /* o casco envolve todos os vértices, a menos do deslocamento de posição geral (1e-7 da extensão, 0,0012 mm nesta asa) */
     for (const v of pontos) for (const pl of casco.planos) expect(pl.n[0] * v[0] + pl.n[1] * v[1] + pl.n[2] * v[2]).toBeLessThanOrEqual(pl.d + 3);
   });
 
@@ -239,4 +239,27 @@ describe('a superfície de seções planas, como a asa de 12 m do avião', () =>
     expect(c.eixo).toBe('x');
     expect(c.comprimento).toBe(12000);
   }, 30_000);
+});
+
+describe('a superfície fina de perfil em seções, como a deriva do avião', () => {
+  /* 30 seções de perfil simétrico de 8% (20 pontos por lado), a corda afinando de 2000 para 1000 mm em 3 m de altura. Com o
+     deslocamento de posição geral de 1e-7 da extensão, o casco desta nuvem saía com 129 mil triângulos em 6 s, e o da deriva do
+     avião, com 1828 pontos, com 257 mil em 17 s. */
+  const pontos = [];
+  for (let s = 0; s < 30; s++) {
+    const t = s / 29; const y = -1500 + 3000 * t; const corda = 2000 - 1000 * t; const z0 = 600 * t;
+    for (let i = 0; i < 20; i++) {
+      const u = (1 - Math.cos((Math.PI * i) / 19)) / 2;
+      const meia = 5 * 0.08 * (0.2969 * Math.sqrt(u) - 0.126 * u - 0.3516 * u * u + 0.2843 * u ** 3 - 0.1015 * u ** 4) * corda;
+      const x = Math.round(meia * 1e6) / 1e6;
+      pontos.push([x, y, z0 + u * corda]);
+      if (i > 0 && i < 19) pontos.push([-x, y, z0 + u * corda]);
+    }
+  }
+
+  it('o casco tem no máximo 2n - 4 triângulos e envolve todos os pontos', () => {
+    const casco = cascoConvexo(pontos);
+    expect(casco.faces.length).toBeLessThanOrEqual(2 * pontos.length - 4);
+    for (const v of pontos) for (const pl of casco.planos) expect(pl.n[0] * v[0] + pl.n[1] * v[1] + pl.n[2] * v[2]).toBeLessThanOrEqual(pl.d + 0.1);
+  });
 });

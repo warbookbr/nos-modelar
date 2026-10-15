@@ -74,32 +74,14 @@ function ruido(i, e) {
   return ((h >>> 0) / 4294967296) * 2 - 1;
 }
 
-/* O casco convexo de uma nuvem de pontos (incremental, determinístico): `{ vertices, faces, planos }`, com `faces` triângulos
-   [a, b, c] de índices de `originais` em sentido anti-horário visto de fora e `planos` { n, d } (n unitário para fora, n·p = d,
-   com os pontos como vieram). Devolve null com menos de 4 pontos, e quando a nuvem é plana, uma reta ou um ponto (sem volume).
+/* Os deslocamentos do casco, em fração da maior extensão, na ordem em que se tentam. */
+const AMPLITUDES_DO_CASCO = [1e-7, 1e-6, 1e-5];
 
-   A POSIÇÃO GERAL. O casco incremental decide por ponto e por face se a face é visível, e uma superfície de seções planas (a asa:
-   14 seções de 130 pontos, cada uma num plano) tem centenas de pontos exatamente no plano de uma face. Nesse empate o conjunto de
-   faces visíveis deixa de ser um disco, o horizonte se cruza em si mesmo e o casco passa a ter 19 triângulos por ponto (34 mil
-   para 1828 pontos, e a medida do vazio de cada um custava segundos). Cada ponto é então deslocado de um valor de até 1e-7 da maior
-   extensão (1,3 mm na asa de 13 m, 0,00005 mm na roda), mil vezes o limite de visibilidade (1e-10) e muito abaixo da concavidade que a
-   decomposição aceita (0,25% da diagonal, no mínimo 0,2 mm): nenhum empate sobra, o casco tem no máximo 2n - 4 triângulos, e o que sai
-   são índices dos pontos de entrada. Com o deslocamento perto do limite (1e-11 contra 1e-12) o casco da roda levou 4 minutos. */
-export function cascoConvexo(originais) {
+/* As faces do casco incremental dos pontos deslocados de até `amplitude` (`{ v, n, d }`, com o plano nos pontos deslocados), a partir
+   do simplex. Com `limitado`, devolve null quando as faces passam do que um casco dos pontos já inseridos pode ter. */
+function facesDoCasco(originais, [i0, i1, i2, i3], amplitude, eps, limitado) {
   const n = originais.length;
-  if (n < 4) return null;
-  const lo3 = [Infinity, Infinity, Infinity]; const hi3 = [-Infinity, -Infinity, -Infinity];
-  for (const p of originais) for (let e = 0; e < 3; e++) { if (p[e] < lo3[e]) lo3[e] = p[e]; if (p[e] > hi3[e]) hi3[e] = p[e]; }
-  const escala = Math.max(hi3[0] - lo3[0], hi3[1] - lo3[1], hi3[2] - lo3[2]);
-  if (!(escala > 0)) return null;
-  /* a nuvem plana (ou reta) não tem casco: o teste é o de sempre, nos pontos como vieram, a 1e-9 da extensão */
-  const simplex = simplexInicial(originais, escala * 1e-9);
-  if (!simplex) return null;
-  const [i0, i1, i2, i3] = simplex;
-  const amplitude = escala * 1e-7;
   const pontos = originais.map((p, i) => [p[0] + amplitude * ruido(i, 0), p[1] + amplitude * ruido(i, 1), p[2] + amplitude * ruido(i, 2)]);
-  const eps = escala * 1e-10;
-
   const faces = [];
   const nova = (a, b, c) => {
     const nrm = cross(sub(pontos[b], pontos[a]), sub(pontos[c], pontos[a]));
@@ -120,7 +102,7 @@ export function cascoConvexo(originais) {
   for (let i = 0; i < n; i++) if (!ja.has(i)) ordem.push(i);
   const dist2 = (i) => { const d = sub(pontos[i], centroIni); return dot(d, d); };
   ordem.sort((a, b) => dist2(b) - dist2(a) || a - b);
-  for (const p of ordem) {
+  for (const [feitos, p] of ordem.entries()) {
     const visiveis = [];
     for (let k = 0; k < faces.length; k++) if (dot(faces[k].n, pontos[p]) - faces[k].d > eps) visiveis.push(k);
     if (visiveis.length === 0) continue;
@@ -140,16 +122,58 @@ export function cascoConvexo(originais) {
     faces.length = 0;
     for (const f of restantes) faces.push(f);
     for (const f of novas) faces.push(f);
+    if (limitado && faces.length > 2 * (feitos + 1) + 4) return null;
+  }
+  return faces;
+}
+
+/* O casco convexo de uma nuvem de pontos (incremental, determinístico): `{ vertices, faces, planos }`, com `faces` triângulos
+   [a, b, c] de índices de `originais` em sentido anti-horário visto de fora e `planos` { n, d } (n unitário para fora, n·p = d,
+   com os pontos como vieram). Devolve null com menos de 4 pontos, e quando a nuvem é plana, uma reta ou um ponto (sem volume).
+
+   A POSIÇÃO GERAL. O casco incremental decide por ponto e por face se a face é visível, e uma superfície de seções planas (a asa:
+   14 seções de 130 pontos, cada uma num plano) tem centenas de pontos exatamente no plano de uma face. Nesse empate o conjunto de
+   faces visíveis deixa de ser um disco, o horizonte se cruza em si mesmo e o casco passa a ter 19 triângulos por ponto (34 mil
+   para 1828 pontos, e a medida do vazio de cada um custava segundos). Cada ponto é então deslocado de um valor de até 1e-7 da maior
+   extensão (0,0013 mm na asa de 13 m, 0,00005 mm na roda), mil vezes o limite de visibilidade (1e-10) e muito abaixo da concavidade que a
+   decomposição aceita (0,25% da diagonal, no mínimo 0,2 mm): nenhum empate sobra, o casco tem no máximo 2n - 4 triângulos, e o que sai
+   são índices dos pontos de entrada. Com o deslocamento perto do limite (1e-11 contra 1e-12) o casco da roda levou 4 minutos.
+
+   O DESLOCAMENTO QUE NÃO BASTA. A deriva do avião (47 seções de 39 pontos, 200 mm de espessura e 3,9 m de altura) explodiu
+   com 1e-7: os pontos vizinhos de uma seção quase reta formam faces finas, a normal delas erra mais que o limite de visibilidade
+   diante de um ponto a metros dali, e o casco saiu com 257 mil triângulos para 1828 pontos, em 17 s, e a decomposição dela em
+   41 s. Um casco de v vértices tem 2v - 4 triângulos, então a construção para assim que passa disso e recomeça com o deslocamento
+   dez vezes maior (`AMPLITUDES_DO_CASCO`). A nuvem que já fechava com 1e-7 não muda. */
+export function cascoConvexo(originais) {
+  const n = originais.length;
+  if (n < 4) return null;
+  const lo3 = [Infinity, Infinity, Infinity]; const hi3 = [-Infinity, -Infinity, -Infinity];
+  for (const p of originais) for (let e = 0; e < 3; e++) { if (p[e] < lo3[e]) lo3[e] = p[e]; if (p[e] > hi3[e]) hi3[e] = p[e]; }
+  const escala = Math.max(hi3[0] - lo3[0], hi3[1] - lo3[1], hi3[2] - lo3[2]);
+  if (!(escala > 0)) return null;
+  /* a nuvem plana (ou reta) não tem casco: o teste é o de sempre, nos pontos como vieram, a 1e-9 da extensão */
+  const simplex = simplexInicial(originais, escala * 1e-9);
+  if (!simplex) return null;
+  const eps = escala * 1e-10;
+  let faces = null;
+  let amplitude = 0;
+  for (const [k, fator] of AMPLITUDES_DO_CASCO.entries()) {
+    amplitude = escala * fator;
+    faces = facesDoCasco(originais, simplex, amplitude, eps, k < AMPLITUDES_DO_CASCO.length - 1);
+    if (faces) break;
   }
   const usados = [...new Set(faces.flatMap((f) => f.v))].sort((a, b) => a - b);
   /* o plano de cada face volta nos pontos como vieram: a normal perturbada de uma face de milhares de milímetros erra 1e-4 rad, e as
-     normais de uma face plana inteira deixariam de coincidir. A face quase degenerada (três pontos quase colineares) fica com a normal
-     perturbada, que é a que decidiu o casco. */
+     normais de uma face plana inteira deixariam de coincidir. A face quase degenerada fica com a normal perturbada, que é a que decidiu
+     o casco: a altura do triângulo nos pontos como vieram precisa passar de mil vezes o deslocamento. A regra pela área deixava passar
+     a lasca do bordo de fuga de uma deriva (três pontos quase colineares a um metro um do outro, com 0,0001 mm2), cujo plano nos
+     pontos como vieram gira à toa em torno da linha e deixava um ponto do casco 13 mm do lado de fora. */
   const planos = faces.map((f) => {
     const [a, b, c] = f.v;
     const nrm = cross(sub(originais[b], originais[a]), sub(originais[c], originais[a]));
     const t = norma(nrm);
-    if (!(t > 1e-12 * escala * escala)) return { n: f.n, d: f.d };
+    const maiorAresta = Math.max(norma(sub(originais[b], originais[a])), norma(sub(originais[c], originais[b])), norma(sub(originais[a], originais[c])));
+    if (!(t > 1e-12 * escala * escala) || !(t / maiorAresta > 1e3 * amplitude)) return { n: f.n, d: f.d };
     const un = [nrm[0] / t, nrm[1] / t, nrm[2] / t];
     return dot(un, f.n) > 0.5 ? { n: un, d: dot(un, originais[a]) } : { n: f.n, d: f.d };
   });
