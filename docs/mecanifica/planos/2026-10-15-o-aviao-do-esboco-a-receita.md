@@ -97,8 +97,8 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    o que o caminho não faz, e o que ela achar vai à ferramenta antes da fatia 2. A
    [tradução](../banco-de-provas/aviao-receita-2026-10-15/TRADUCAO.md), em
    2026-10-15, deu 110 volumes: a fuselagem, o motor e os trens saem com o envelope
-   do esboço, e as asas, as empenagens e a hélice não, porque o recorte some e as
-   pás giram em dois eixos.
+   do esboço, e as asas, as empenagens e a hélice não, porque o recorte some e a N2
+   não inclina as pás.
 2. **As outras partes.** Na ordem da montagem, com um agente por parte e até três
    em paralelo quando as partes não dependem uma da outra (as asas e as empenagens,
    os dois trens), cada um com a lista fechada dos arquivos da parte dele, e Claude

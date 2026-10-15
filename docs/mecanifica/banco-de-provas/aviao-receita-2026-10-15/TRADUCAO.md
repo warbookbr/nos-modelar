@@ -42,8 +42,9 @@ profundor foi recortado e que fica 464 mm além.
 A forma de família vira o casco convexo das seções dela. O furo, as cavidades e as
 partes somem: a roda fica um sólido só, 61 a 65% mais volumosa, e a asa 22%.
 
-Cinco formas não se traduzem, porque giram em dois eixos e a N2 não inclina o
-sólido: as quatro pás da hélice e o montante do para-brisa.
+Cinco formas não se traduzem, porque a N2 não inclina o sólido: as quatro pás da
+hélice, que giram em dois eixos, e o montante do para-brisa, uma caixa de canto
+arredondado inclinada, cuja altura não fica sobre um eixo do mundo.
 
 ## O que isso diz ao plano
 

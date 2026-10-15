@@ -85,8 +85,8 @@ e o mestre trazem as seções, os cortes e as posições.
 O `REFINA` aponta `../../andaime.json` e liga cada parte ao volume que ela refina:
 `fuselagem`, `parabrisa`, `porta` e `barbatana` aos volumes de mesmo nome, cada
 janela ao seu (`janela1-d` a `janela4-e`), e o `montanteParabrisa`, que o andaime
-não traduz porque gira em dois eixos, ao volume `fuselagem`, dentro de cujo
-envelope ele fica. A tolerância do envelope é de 5 mm.
+não traduz porque é uma caixa de canto arredondado inclinada, ao volume
+`fuselagem`, dentro de cujo envelope ele fica. A tolerância do envelope é de 5 mm.
 
 A escala é o comprimento da fuselagem no esboço, 8084 mm, de z 2377 a z 10.461. Os
 contatos são o para-brisa, as janelas, a porta e a barbatana com a fuselagem, e o
