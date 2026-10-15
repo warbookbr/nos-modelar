@@ -98,7 +98,16 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    [tradução](../banco-de-provas/aviao-receita-2026-10-15/TRADUCAO.md), em
    2026-10-15, deu 110 volumes: a fuselagem, o motor e os trens saem com o envelope
    do esboço, e as asas, as empenagens e a hélice não, porque o recorte some e a N2
-   não inclina as pás.
+   não inclina as pás. A
+   [fuselagem](../../../procedural/pecas/aviao/ALINHAMENTO.md) passou pelo laço em
+   duas rodadas, com nota 8 nas duas e os defeitos restantes vindos do esboço
+   aprovado, e a pessoa a aceitou como está em 2026-10-15; ela segue o esboço com
+   razão de volume de 0,99 no casco, mas custou cerca de 1,54 milhão de tokens, perto
+   de quatro vezes a média de uma unidade do esboço. Na mesma data a pessoa decidiu
+   que as superfícies sejam conferidas pela sobreposição de volume de cada parte com
+   a forma do próprio esboço, com recortes e inclinações, abaixo de um mínimo
+   reprova, e que o plano siga com um modelador novo a cada rodada e um pedido curto,
+   medindo o custo de cada parte.
 2. **As outras partes.** Na ordem da montagem, com um agente por parte e até três
    em paralelo quando as partes não dependem uma da outra (as asas e as empenagens,
    os dois trens), cada um com a lista fechada dos arquivos da parte dele, e Claude
