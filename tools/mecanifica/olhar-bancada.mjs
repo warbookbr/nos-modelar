@@ -20,6 +20,7 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { analisarPeca } from './analise-da-peca.mjs';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -399,7 +400,12 @@ export async function olharBancada({
       args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
     });
     garantirPrazo();
-    const page = await browser.newPage({ viewport: { width: largura, height: altura } });
+    /* BORDA SUAVIZADA: a página abre com `deviceScaleFactor` igual ao fator de amostragem, a bancada já desenha o buffer em
+       `devicePixelRatio` (criar-ambiente.js), e `fotografar` devolve o PNG reduzido ao tamanho do viewport. A razão e a escolha do
+       filtro estão em `FATOR_DE_AMOSTRAGEM`, em capturar-montagem.mjs. O layout continua em pixel CSS, e por isso a imagem final
+       tem o tamanho de sempre. */
+    const page = await browser.newPage({ viewport: { width: largura, height: altura }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
+    const fotografar = async () => reduzirPorMedia(await page.screenshot({ type: 'png' }));
     const errosDaPagina = [];
     page.on('pageerror', (erro) => errosDaPagina.push(erro.message));
     const abrirComRepeticao = async (url) => {
@@ -625,7 +631,7 @@ export async function olharBancada({
       });
       pecaRelatada = dado.peca;
       if (capturarEmMemoria) {
-        const dados = await page.screenshot({ type: 'png' });
+        const dados = await fotografar();
         garantirPrazo();
         capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
@@ -633,7 +639,7 @@ export async function olharBancada({
         const apelidoEfetivo = apelidoDeArquivo(peca ?? dado.peca);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-${vista}${sufixo}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        await page.screenshot({ path: arquivo });
+        writeFileSync(arquivo, await fotografar());
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
         if (legendaDeAuditoria?.cores) {
           const legenda = legendaDeAuditoria.legenda.map((e) => `${e.parte}=${e.cor}`).join(' ');
@@ -705,7 +711,7 @@ export async function olharBancada({
         const apelidoEfetivo = apelidoDeArquivo(peca ?? pecaRelatada);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-par-${alvo.map(apelidoDeArquivo).join('+')}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        await page.screenshot({ path: arquivo });
+        writeFileSync(arquivo, await fotografar());
         paresCapturados.push({ par: alvo, vista: inspecao.vistaEscolhida, arquivo, enquadrado: Boolean(contato?.valida) });
         registrar(relato, logger, 'stdout',
           `  ${alvo.join(' ↔ ')} (${inspecao.vistaEscolhida})${contato?.valida ? '' : ' — sem foco de contato'}: ${arquivo}`);

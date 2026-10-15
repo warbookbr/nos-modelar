@@ -458,7 +458,11 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
      estado anterior antes do próximo quadro visível. */
   function medirPixelsVisiveisPorParte(objetos) {
     const grupos = objetos.filter(Boolean);
-    const tamanho = renderer.getDrawingBufferSize(new THREE.Vector2());
+    /* O buffer de prova tem o tamanho do quadro em pixel CSS, e não o do buffer de desenho. As capturas headless abrem a página com
+       `deviceScaleFactor` 2 para suavizar a borda, e a tela de alta densidade faz o mesmo: lendo o buffer de desenho, a mesma peça
+       passaria a contar o dobro de pixels por lado (até o teto de 1024), o limite de 64 pixels por parte deixaria de querer dizer o
+       que diz e a razão do render de prova mudaria. Em pixel CSS a conta é a de uma tela de densidade 1, em qualquer densidade. */
+    const tamanho = renderer.getSize(new THREE.Vector2());
     const largura = Math.max(1, Math.min(1024, tamanho.x));
     const altura = Math.max(1, Math.min(1024, tamanho.y));
     const alvo = new THREE.WebGLRenderTarget(largura, altura, { depthBuffer: true });

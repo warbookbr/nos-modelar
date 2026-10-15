@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1306 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1308 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1029,6 +1029,7 @@
 ## procedural/pecas/aviao/partes/empenagem-horizontal/rodadas/
 
 - `receita-01.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
+- `receita-02.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
 
 ## procedural/pecas/aviao/partes/empenagem-vertical/
 
@@ -1038,6 +1039,7 @@
 
 - `receita-01.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 - `receita-02.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
+- `receita-03.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 
 ## procedural/pecas/aviao/partes/fuselagem/
 

@@ -1,14 +1,30 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 // @ts-expect-error — serviço MJS exercitado pelo contrato visual.
-import { capturarMontagem, serializarMontagemVisual, VISTAS_MONTAGEM } from './capturar-montagem.mjs';
+import { capturarMontagem, FATOR_DE_AMOSTRAGEM, reduzirPorMedia, serializarMontagemVisual, VISTAS_MONTAGEM } from './capturar-montagem.mjs';
 
 const MONTAGENS = join(process.cwd(), 'tools/mecanifica/fixtures/montagens-persistidas');
 const PECAS = join(process.cwd(), 'tools/mecanifica/fixtures/pecas-resolvidas');
 const ler = (arquivo: string) => JSON.parse(readFileSync(arquivo, 'utf8'));
+
+/* Um PNG opaco de `largura` por `altura`, cada pixel dado por `pixel(x, y)`, que devolve [r, g, b, a]. */
+function pngDe(largura: number, altura: number, pixel: (x: number, y: number) => number[] = () => [200, 210, 205, 255]): Buffer {
+  const png = new PNG({ width: largura, height: altura });
+  for (let y = 0; y < altura; y++) {
+    for (let x = 0; x < largura; x++) png.data.set(pixel(x, y), (y * largura + x) * 4);
+  }
+  return PNG.sync.write(png);
+}
+const tamanhoDoPng = (dados: Buffer) => { const png = PNG.sync.read(dados); return [png.width, png.height]; };
+/* O que o Playwright entrega: o viewport multiplicado pelo `deviceScaleFactor` da página. */
+const fotoDaPagina = (opcoes: { viewport: { width: number; height: number }; deviceScaleFactor?: number }) => {
+  const fator = opcoes.deviceScaleFactor ?? 1;
+  return pngDe(opcoes.viewport.width * fator, opcoes.viewport.height * fator);
+};
 
 async function resolvida() {
   return resolverMontagemPersistida(ler(join(MONTAGENS, 'v3-separacao-direcional.json')), {
@@ -32,7 +48,7 @@ describe('captura importável de montagem', () => {
 
   it('captura PNGs em memória e fecha browser e Vite', async () => {
     const fechamentos = { browser: 0, vite: 0 };
-    const png = Buffer.from('89504e470d0a1a0a', 'hex');
+    let abertura: { viewport: { width: number; height: number }; deviceScaleFactor?: number } | null = null;
     const page = {
       on() {},
       async goto() {},
@@ -47,11 +63,11 @@ describe('captura importável de montagem', () => {
       },
       async screenshot(opcoes: unknown) {
         expect(opcoes).toEqual({ type: 'png' });
-        return png;
+        return fotoDaPagina(abertura!);
       },
     };
     const browser = {
-      async newPage() { return page; },
+      async newPage(opcoes: typeof abertura) { abertura = opcoes; return page; },
       async close() { fechamentos.browser += 1; },
     };
     const vite = {
@@ -70,7 +86,10 @@ describe('captura importável de montagem', () => {
     });
     expect(resultado.ok).toBe(true);
     expect(resultado.resultado?.capturas).toHaveLength(2);
-    expect(resultado.resultado?.capturas[0].dados).toEqual(png);
+    /* a página abre em dobro e a imagem entregue volta ao tamanho do quadro: 1280 por 720, o de antes da suavização */
+    expect(abertura).toEqual({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
+    expect(tamanhoDoPng(resultado.resultado?.capturas[0].dados)).toEqual([1280, 720]);
+    expect(resultado.resultado?.capturas[0]).toMatchObject({ largura: 1280, altura: 720 });
     expect(fechamentos).toEqual({ browser: 1, vite: 1 });
   });
 
@@ -82,7 +101,7 @@ describe('captura importável de montagem', () => {
         pedidas.push(projecao);
         return { id: 'x', vista, instancias: [], enquadramento: { valida: true, area: 0.25, largura: 0.5, altura: 0.5, cortado: false } };
       },
-      async screenshot() { return Buffer.from('89504e470d0a1a0a', 'hex'); },
+      async screenshot() { return fotoDaPagina({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM }); },
     };
     const dependencias = {
       criarServidor: async () => ({ httpServer: { address: () => ({ port: 4173 }) }, async listen() {}, async close() {} }),
@@ -108,18 +127,19 @@ describe('captura importável de montagem', () => {
      um degrau na junta do capô e a deriva mais grossa do que é. O cálculo do quadro mora no visor, que roda no navegador; aqui se
      prova o que a captura entrega a ele e o que ela recusa antes de subir infraestrutura. */
   function infraestruturaFalsa(argumentosDoVisor: unknown[][], viewports: unknown[] = []) {
+    let abertura: { viewport: { width: number; height: number }; deviceScaleFactor?: number } = { viewport: { width: 1280, height: 720 } };
     const page = {
       on() {}, async goto() {}, async waitForFunction() {}, async waitForTimeout() {},
       async evaluate(_fn: unknown, argumentos: unknown[]) {
         argumentosDoVisor.push(argumentos);
         return { id: 'x', vista: argumentos[1], instancias: [], enquadramento: { valida: true, area: 0.5, largura: 0.8, altura: 0.8, cortado: false } };
       },
-      async screenshot() { return Buffer.from('89504e470d0a1a0a', 'hex'); },
+      async screenshot() { return fotoDaPagina(abertura); },
     };
     return {
       criarServidor: async () => ({ httpServer: { address: () => ({ port: 4173 }) }, async listen() {}, async close() {} }),
       carregarPlaywright: async () => ({
-        chromium: { launch: async () => ({ async newPage(opcoes: unknown) { viewports.push(opcoes); return page; }, async close() {} }) },
+        chromium: { launch: async () => ({ async newPage(opcoes: typeof abertura) { viewports.push(opcoes); abertura = opcoes; return page; }, async close() {} }) },
       }),
     };
   }
@@ -170,9 +190,50 @@ describe('captura importável de montagem', () => {
     expect(comAltura.resultado?.capturas[0]).toMatchObject({ largura: 1200, altura: 1000 });
     const semAltura = await capturarMontagem({ montagem: await resolvida(), largura: 1280, vistas: ['frontal'], espera: 0, dependencias: infraestruturaFalsa([], viewports) });
     expect(semAltura.resultado?.capturas[0]).toMatchObject({ largura: 1280, altura: 720 });
-    expect(viewports).toEqual([{ viewport: { width: 1200, height: 1000 } }, { viewport: { width: 1280, height: 720 } }]);
+    expect(viewports).toEqual([
+      { viewport: { width: 1200, height: 1000 }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM },
+      { viewport: { width: 1280, height: 720 }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM },
+    ]);
     for (const altura of [100, 4000, 700.5]) {
       expect(await capturarMontagem({ montagem: await resolvida(), altura, dependencias: { criarServidor: async () => { throw new Error('não deveria iniciar'); } } })).toMatchObject({ ok: false, erro: { codigo: 'captura-invalida' } });
     }
+  });
+});
+
+/* A BORDA SUAVIZADA: a página abre em dobro e o PNG volta ao tamanho do quadro pela média de cada bloco. */
+describe('redução por média da captura', () => {
+  it('cada pixel de saída é a média do bloco, canal por canal, com o alfa', () => {
+    /* bloco da esquerda: três pixels brancos e um preto (uma aresta inclinada cortando o pixel de saída); bloco da direita: tudo preto */
+    const entrada = pngDe(4, 2, (x, y) => (x < 2 ? (x === 1 && y === 1 ? [0, 0, 0, 255] : [255, 255, 255, 255]) : [0, 0, 0, 255]));
+    const saida = PNG.sync.read(reduzirPorMedia(entrada, 2));
+    expect([saida.width, saida.height]).toEqual([2, 1]);
+    expect([...saida.data.subarray(0, 4)]).toEqual([191, 191, 191, 255]);
+    expect([...saida.data.subarray(4, 8)]).toEqual([0, 0, 0, 255]);
+  });
+
+  it('uma aresta de pixel inteiro continua afiada, e um degrau de meio pixel vira nível intermediário', () => {
+    const afiada = PNG.sync.read(reduzirPorMedia(pngDe(4, 4, (x) => (x < 2 ? [255, 0, 0, 255] : [0, 0, 255, 255])), 2));
+    expect([...afiada.data.subarray(0, 4)]).toEqual([255, 0, 0, 255]);
+    expect([...afiada.data.subarray(4, 8)]).toEqual([0, 0, 255, 255]);
+    const degrau = PNG.sync.read(reduzirPorMedia(pngDe(2, 2, (_x, y) => (y === 0 ? [255, 255, 255, 255] : [0, 0, 0, 255])), 2));
+    expect([...degrau.data.subarray(0, 4)]).toEqual([128, 128, 128, 255]);
+  });
+
+  it('o fator 1 devolve a imagem como veio, e o tamanho que não divide ou o fator inválido recusam', () => {
+    const entrada = pngDe(3, 3);
+    expect(reduzirPorMedia(entrada, 1)).toEqual(entrada);
+    expect(() => reduzirPorMedia(entrada, 2)).toThrow(/não divide por 2/);
+    expect(() => reduzirPorMedia(entrada, 0)).toThrow(/inteiro, 1 ou mais/);
+    expect(() => reduzirPorMedia(entrada, 1.5)).toThrow(/inteiro, 1 ou mais/);
+  });
+
+  it('é determinística: a mesma entrada dá os mesmos bytes', () => {
+    const entrada = pngDe(8, 8, (x, y) => [(x * 37 + y * 11) % 256, (x * 5) % 256, (y * 9) % 256, 255]);
+    expect(reduzirPorMedia(entrada, 2)).toEqual(reduzirPorMedia(entrada, 2));
+  });
+
+  it('o fator padrão é 2', () => {
+    expect(FATOR_DE_AMOSTRAGEM).toBe(2);
+    expect(tamanhoDoPng(reduzirPorMedia(pngDe(2560, 1440)))).toEqual([1280, 720]);
   });
 });

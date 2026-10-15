@@ -5,6 +5,7 @@
  * um degrau na junta do capô, e a deriva mais grossa do que é, olhando uma peça pequena demais. */
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { PNG } from 'pngjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 /* Montagens aceitam o mesmo conjunto ortográfico da bancada. A revisão
@@ -13,6 +14,51 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export const VISTAS_MONTAGEM = Object.freeze([
   'isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior',
 ]);
+
+/* A BORDA SUAVIZADA VEM DE RENDERIZAR EM DOBRO E REDUZIR, e não do `antialias: true` do renderizador. O Chromium sem tela, com
+   `--use-gl=swiftshader`, aceita o pedido de MSAA e não o aplica: toda aresta inclinada saía com degrau de pixel, e o crítico apontava
+   como serrilhado de geometria um defeito que a medida da malha já tinha descartado (resíduo da silhueta de 0,56 px a 2400 px e 0,60 px
+   a 4800 px na empenagem do avião). A página abre com `deviceScaleFactor` igual a este fator, o renderizador desenha o buffer nessa
+   escala (o tamanho CSS, que decide layout, enquadramento e leitura em pixel, não muda), e `reduzirPorMedia` devolve o PNG ao tamanho
+   de antes tirando a média de cada bloco fator por fator, que é o mesmo que o MSAA faz com `fator` ao quadrado amostras por pixel. A
+   média é feita nos valores já codificados, como a resolução do MSAA no buffer da tela. O filtro é próprio, e não o do `sharp`, porque
+   o `sharp` não está declarado no `package.json` (chega só como dependência de outra) e o filtro padrão dele, o Lanczos, tem lóbulos
+   negativos que escurecem e clareiam o entorno da aresta; o `pngjs` está declarado, e a média de bloco é exata e igual em toda máquina.
+   Linhas de um pixel de largura do dispositivo (o arame e o contorno do par) saem com metade da tinta, porque passam a cobrir meio
+   pixel da imagem final. */
+export const FATOR_DE_AMOSTRAGEM = 2;
+
+/** Reduz um PNG pela média de cada bloco `fator` por `fator`. Largura e altura saem divididas pelo fator (a divisão tem de ser exata). */
+export function reduzirPorMedia(dadosPng, fator = FATOR_DE_AMOSTRAGEM) {
+  if (!Number.isInteger(fator) || fator < 1) throw new RangeError('o fator de redução precisa ser inteiro, 1 ou mais.');
+  if (fator === 1) return Buffer.from(dadosPng);
+  const origem = PNG.sync.read(Buffer.from(dadosPng));
+  if (origem.width % fator !== 0 || origem.height % fator !== 0) {
+    throw new RangeError(`a captura de ${origem.width}x${origem.height} não divide por ${fator}.`);
+  }
+  const largura = origem.width / fator;
+  const altura = origem.height / fator;
+  const destino = new PNG({ width: largura, height: altura });
+  const amostras = fator * fator;
+  const soma = [0, 0, 0, 0];
+  for (let y = 0; y < altura; y++) {
+    for (let x = 0; x < largura; x++) {
+      soma.fill(0);
+      for (let dy = 0; dy < fator; dy++) {
+        let indice = (((y * fator + dy) * origem.width) + x * fator) * 4;
+        for (let dx = 0; dx < fator; dx++, indice += 4) {
+          soma[0] += origem.data[indice];
+          soma[1] += origem.data[indice + 1];
+          soma[2] += origem.data[indice + 2];
+          soma[3] += origem.data[indice + 3];
+        }
+      }
+      const saida = (y * largura + x) * 4;
+      for (let canal = 0; canal < 4; canal++) destino.data[saida + canal] = Math.round(soma[canal] / amostras);
+    }
+  }
+  return PNG.sync.write(destino);
+}
 
 class ErroCapturaMontagem extends Error {
   constructor(codigo, mensagem) {
@@ -174,7 +220,7 @@ export async function capturarMontagem({
     });
     garantirPrazo();
     const altura = alturaPedida ?? Math.round(largura * 9 / 16);
-    const page = await browser.newPage({ viewport: { width: largura, height: altura } });
+    const page = await browser.newPage({ viewport: { width: largura, height: altura }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
     const errosPagina = [];
     page.on('pageerror', (erro) => errosPagina.push(erro.message));
     page.on('console', (mensagem) => {
@@ -195,13 +241,13 @@ export async function capturarMontagem({
       );
       if (espera > 0) await page.waitForTimeout(espera);
       garantirPrazo();
-      const dadosPng = await page.screenshot({ type: 'png' });
+      const dadosPng = reduzirPorMedia(await page.screenshot({ type: 'png' }));
       capturas.push({
         nome: vista,
         mimeType: 'image/png',
         largura,
         altura,
-        dados: Buffer.from(dadosPng),
+        dados: dadosPng,
         instancias: metadados.instancias,
         enquadramento: metadados.enquadramento,
       });

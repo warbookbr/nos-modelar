@@ -2,7 +2,11 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
+import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
 import { criarDicas, olharBancada } from './olhar-bancada.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -218,4 +222,83 @@ describe('cada captura lê a sessão que é dela', () => {
     expect(registro.ativacoes).toEqual([]);
     expect(new URL(registro.paginas[0]?.url ?? 'http://x/?').searchParams.has('sessao')).toBe(false);
   });
+});
+
+/* A BORDA SUAVIZADA: a página abre em dobro, e a imagem entregue, em memória ou em arquivo, é a mesma e tem o tamanho do quadro. */
+describe('captura suavizada', () => {
+  const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
+
+  /* Uma bancada falsa: responde ao que o laço de uma vista pergunta e fotografa um degrau inclinado no tamanho do viewport vezes o
+     `deviceScaleFactor` que a página abriu. */
+  function infraestruturaFalsa(aberturas) {
+    let abertura = { viewport: { width: 1, height: 1 } };
+    const page = {
+      on() {},
+      async goto() {},
+      async waitForFunction() {},
+      async waitForTimeout() {},
+      async evaluate(fn) {
+        const texto = String(fn);
+        if (texto.includes('b.ready')) {
+          return {
+            ready: true, erro: null, peca: 'Peça falsa', partes: ['a'], selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
+            estatisticas: { facesNeutras: 1, triangulos: 2 }, estado: null,
+          };
+        }
+        if (texto.includes('.url()')) return 'http://127.0.0.1/harness.html';
+        if (texto.includes('.enquadramento()')) return ENQUADRAMENTO;
+        throw new Error(`pergunta inesperada à página: ${texto}`);
+      },
+      async screenshot(opcoes) {
+        expect(opcoes).toEqual({ type: 'png' });
+        const fator = abertura.deviceScaleFactor ?? 1;
+        const largura = abertura.viewport.width * fator;
+        const altura = abertura.viewport.height * fator;
+        const png = new PNG({ width: largura, height: altura });
+        for (let y = 0; y < altura; y++) {
+          for (let x = 0; x < largura; x++) png.data.set(y * 3 > x ? [20, 30, 40, 255] : [230, 235, 232, 255], (y * largura + x) * 4);
+        }
+        return PNG.sync.write(png);
+      },
+    };
+    return {
+      createServer: async () => ({ httpServer: { address: () => ({ port: 43123 }) }, async listen() {}, async close() {} }),
+      carregarPlaywright: async () => ({
+        chromium: { launch: async () => ({ async newPage(opcoes) { aberturas.push(opcoes); abertura = opcoes; return page; }, async close() {} }) },
+      }),
+    };
+  }
+
+  it('abre a página em dobro e entrega, em memória e em arquivo, o mesmo PNG no tamanho do quadro', async () => {
+    const aberturas = [];
+    const pasta = `tools/bancadas/out/teste-suavizacao-${process.pid}`;
+    try {
+      const memoria = await olharBancada({
+        peca: 'fixture-visual', vistas: ['isometrica'], res: '640x360', capturarEmMemoria: true, dependencias: infraestruturaFalsa(aberturas),
+      });
+      expect(memoria.ok).toBe(true);
+      const arquivo = await olharBancada({
+        peca: 'fixture-visual', vistas: ['isometrica'], res: '640x360', saida: pasta, dependencias: infraestruturaFalsa(aberturas),
+      });
+      expect(arquivo.ok).toBe(true);
+      expect(aberturas).toEqual([
+        { viewport: { width: 640, height: 360 }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM },
+        { viewport: { width: 640, height: 360 }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM },
+      ]);
+      const [captura] = memoria.resultado.capturas;
+      expect(captura).toMatchObject({ largura: 640, altura: 360 });
+      const gravado = join(process.cwd(), pasta, 'bancada-fixture-visual-isometrica.png');
+      expect(existsSync(gravado)).toBe(true);
+      /* os mesmos bytes: a captura em memória e a gravada passam pelo mesmo caminho */
+      expect(readFileSync(gravado).equals(captura.dados)).toBe(true);
+      const imagem = PNG.sync.read(captura.dados);
+      expect([imagem.width, imagem.height]).toEqual([640, 360]);
+      /* o degrau da aresta virou nível intermediário: sem a suavização só existiriam os dois tons do desenho */
+      const tons = new Set();
+      for (let i = 0; i < imagem.data.length; i += 4) tons.add(imagem.data[i]);
+      expect(tons.size).toBeGreaterThan(2);
+    } finally {
+      rmSync(join(process.cwd(), pasta), { recursive: true, force: true });
+    }
+  }, 60_000);
 });

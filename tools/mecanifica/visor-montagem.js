@@ -4,7 +4,10 @@ import { adaptarMontagemThree } from '/src/autoria/adaptar-montagem-three.js';
 
 const canvas = document.getElementById('cena');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(1);
+/* O buffer segue a escala da página: a captura abre com `deviceScaleFactor` 2 e reduz o PNG, que é o que suaviza a borda (ver
+   `FATOR_DE_AMOSTRAGEM` em capturar-montagem.mjs). Tudo o que esta página mede (enquadramento, aspecto, tamanho do quadro) está em
+   pixel CSS ou em coordenada normalizada, e por isso não muda com a escala. */
+renderer.setPixelRatio(window.devicePixelRatio || 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#dce2df');
