@@ -464,3 +464,12 @@ describe('afastamentos declarados no pedido', () => {
     expect(montarPedido({ peca: 'x/y', alvo: { imagem: '/alvo.png', unidade: 'y' } })).not.toContain('de propósito');
   });
 });
+
+describe('partes novas no pedido', () => {
+  it('lista a parte de REFINA.novas com o motivo', async () => {
+    const { novasDeclaradas } = await import('./vistas-para-critica.mjs');
+    expect(novasDeclaradas({ REFINA: { novas: { casulo: 'a pessoa pediu o casulo da referência' } } }))
+      .toEqual([{ parte: 'casulo', texto: 'parte nova, que o alvo não tem; motivo: a pessoa pediu o casulo da referência' }]);
+    expect(novasDeclaradas({ REFINA: {} })).toEqual([]);
+  });
+});

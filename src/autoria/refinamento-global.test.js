@@ -300,6 +300,20 @@ describe('conferência do refinamento', () => {
     expect(r.achados[0].mensagem).toContain('nem em REFINA.esboco a forma do esboço');
   });
 
+  it('a parte nova declarada em REFINA.novas, com motivo, passa sem volume nem forma; a ausente e a que também tem forma são recusadas', () => {
+    const receita = receitaDoSuporte({ vinculo: { sapata: 'sapata' } });
+    const { neutro } = executarReceita(receita);
+    const refinamento = { ...receita.REFINA, novas: { coluna: 'a pessoa pediu a coluna, que o esboço não tem' } };
+    expect(conferirRefinamentoGlobal({ refinamento, andaime: ANDAIME, neutro }).achados).toEqual([]);
+    expect(normalizarRefinamentoGlobal(refinamento).novas).toEqual([{ parte: 'coluna', motivo: 'a pessoa pediu a coluna, que o esboço não tem' }]);
+    const ausente = { ...refinamento, novas: { ...refinamento.novas, tampa: 'pedida' } };
+    expect(conferirRefinamentoGlobal({ refinamento: ausente, andaime: ANDAIME, neutro }).achados).toEqual([expect.objectContaining({ codigo: 'parte-nova-ausente', parte: 'tampa' })]);
+    const comForma = { ...refinamento, esboco: { arquivo: 'suporte.esboco.json', formas: { coluna: 'coluna' }, minimo: 0.9 } };
+    expect(conferirRefinamentoGlobal({ refinamento: comForma, andaime: ANDAIME, neutro }).achados).toEqual([expect.objectContaining({ codigo: 'parte-nova-com-forma', parte: 'coluna' })]);
+    expect(() => normalizarRefinamentoGlobal({ ...refinamento, novas: { coluna: ' ' } })).toThrow(/precisa do motivo/);
+    expect(() => normalizarRefinamentoGlobal({ ...refinamento, novas: { sapata: 'x' } })).toThrow(/também está em 'partes'/);
+  });
+
   it('o vínculo com parte que a peça não entrega é recusado', () => {
     const r = conferir({ vinculo: { sapata: 'sapata', coluna: 'coluna-central', tampa: 'sapata' } });
     expect(r.achados).toEqual([expect.objectContaining({ codigo: 'parte-ausente', parte: 'tampa', volume: 'sapata' })]);

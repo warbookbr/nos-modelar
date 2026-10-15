@@ -215,6 +215,7 @@ export async function impressaoDaForma(caminho) {
     .map(({ parte, ...resto }) => ({ parte, ...afastamentoDaParte(resto) }))
     .filter((a) => a.motivo !== undefined);
   if (afastamentos.length) hash.update(`afastamentos:${JSON.stringify(afastamentos)}`);
+  if (receita.REFINA?.novas) hash.update(`novas:${JSON.stringify(receita.REFINA.novas)}`);
   return `sha256:${hash.digest('hex')}`;
 }
 

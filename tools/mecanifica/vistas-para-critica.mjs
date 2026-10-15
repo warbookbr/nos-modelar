@@ -82,6 +82,14 @@ export function afastamentosDeclarados(declarado) {
     .sort((a, b) => a.parte.localeCompare(b.parte));
 }
 
+/* As partes que o `REFINA.novas` declara, pedidas além do esboço: o alvo não as tem, e o crítico precisa saber que não são sobra. */
+export function novasDeclaradas(receita) {
+  const novas = receita?.REFINA?.novas;
+  if (!novas) return [];
+  const lista = Array.isArray(novas) ? novas : Object.entries(novas).map(([parte, motivo]) => ({ parte, motivo }));
+  return lista.map(({ parte, motivo }) => ({ parte, texto: `parte nova, que o alvo não tem; motivo: ${motivo}` }));
+}
+
 export const PERGUNTA_DO_ALVO = 'Onde o alvo difere da referência real, em silhueta ou em forma?';
 export const LIMITE_DO_VEREDITO = 240;
 
@@ -498,7 +506,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     plano,
     orientacao,
     alvo: alvo ? { imagem: alvo.imagem, unidade: alvo.unidade } : null,
-    afastamentos: afastamentosDeclarados(declarado),
+    afastamentos: [...afastamentosDeclarados(declarado), ...novasDeclaradas(receita)].sort((a, b) => a.parte.localeCompare(b.parte)),
     referencias: referencias.imagens.map((c) => ({ caminho: c })),
     modelo: [conjunto, traseira, esquerda].flatMap((r) => arquivosDe(r).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' }))),
     arame: [

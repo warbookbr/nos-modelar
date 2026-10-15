@@ -281,6 +281,12 @@ linha de comando lê o `REFINA.esboco` da receita, com os afastamentos declarado
 `--desloca='parte:dx,dy,dz:motivo;outra:...'` (o motivo não leva `;`) para medir o deslocamento numa receita que não o declara. A mensagem de
 `parte-fora-da-forma-do-esboco` e a de `parte-fora-do-envelope` dizem que a forma e o volume estão deslocados, e por quanto.
 
+A parte que a pessoa pede além do esboço, como o casulo sob a asa ou o compensador do profundor do avião, não tem volume no andaime nem
+forma no esboço, e entra em `REFINA.novas` como `{ parte: motivo }`, com o motivo obrigatório. Ela deixa de ser `parte-sem-volume`; a
+mesma parte em `partes` é recusada na normalização, em `esboco.formas` dá `parte-nova-com-forma`, e a declarada que a peça não entrega dá
+`parte-nova-ausente`. A conferência dela é do crítico e da pessoa: o pedido de `vistas:critica` a lista com o motivo, ao lado dos
+afastamentos, e a impressão da forma do laço muda quando `novas` muda.
+
 ## Andaime derivado do esboço
 
 O esboço continua sendo onde a IA escreve, e o andaime do nível zero sai dele. `src/autoria/tradutor-nivel-zero.js`

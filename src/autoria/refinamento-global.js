@@ -219,7 +219,7 @@ export function normalizarEsbocoDoRefinamento(valor, { quem = 'REFINA.esboco' } 
 export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
   if (valor === undefined || valor === null) return null;
   if (typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, 'precisa ser objeto ou estar ausente.');
-  const permitidas = ['formato', 'versao', 'andaime', 'alvo', 'esboco', 'partes', 'tolerancia'];
+  const permitidas = ['formato', 'versao', 'andaime', 'alvo', 'esboco', 'partes', 'novas', 'tolerancia'];
   for (const chave of Object.keys(valor)) if (!permitidas.includes(chave)) falhar(quem, `'${quem}.${chave}' não é permitido; aceita ${permitidas.join(', ')}.`);
   const ausentes = ['andaime', 'partes', 'tolerancia'].filter((chave) => !Object.hasOwn(valor, chave));
   if (ausentes.length) falhar(quem, `precisa declarar: ${ausentes.join(', ')}.`);
@@ -250,6 +250,21 @@ export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
     if (typeof volume !== 'string' || !SLUG.test(volume)) falhar(quem, `'partes.${parte}' precisa ser o ID de um volume do andaime (slug); recebeu ${exibir(volume)}.`);
     return { parte, volume };
   });
+  /* A parte que a pessoa pediu além do esboço (o casulo sob a asa do avião, o compensador do profundor) não tem volume no andaime nem
+     forma no esboço: `novas` a declara com o motivo, e a conferência dela é do crítico e da pessoa. A entrada é {parte: motivo}; a
+     canônica, a lista [{parte, motivo}] em ordem de nome. */
+  const mapaDasNovas = valor.novas === undefined ? {} : (Array.isArray(valor.novas)
+    ? Object.fromEntries(valor.novas.map((item) => [item?.parte, item?.motivo]))
+    : valor.novas);
+  if (!mapaDasNovas || typeof mapaDasNovas !== 'object') falhar(quem, "'novas' precisa ser objeto {parte: motivo}.");
+  const novas = Object.keys(mapaDasNovas).sort(comparar).map((parte) => {
+    if (!NOME_DE_PARTE.test(parte)) falhar(quem, `'novas.${parte}': o nome precisa ser o mesmo identificador do passo 'parte'.`);
+    if (Object.hasOwn(mapa, parte)) falhar(quem, `'novas.${parte}' também está em 'partes': a parte nova não refina volume do andaime.`);
+    const motivo = mapaDasNovas[parte];
+    if (typeof motivo !== 'string' || !motivo.trim()) falhar(quem, `'novas.${parte}' precisa do motivo: quem pediu a parte e por quê.`);
+    return { parte, motivo: motivo.trim() };
+  });
+  if (valor.novas !== undefined && !novas.length) falhar(quem, "'novas' vazio: tire o campo.");
   const t = valor.tolerancia;
   if (!t || typeof t !== 'object' || Array.isArray(t)) falhar(quem, "'tolerancia' precisa ser objeto {envelope, porta} em milímetro.");
   for (const chave of Object.keys(t)) if (!['envelope', 'porta'].includes(chave)) falhar(quem, `'tolerancia.${chave}' não é permitido; aceita envelope e porta.`);
@@ -260,6 +275,7 @@ export function normalizarRefinamentoGlobal(valor, { quem = 'REFINA' } = {}) {
     ...(valor.alvo === undefined ? {} : { alvo: valor.alvo.trim() }),
     ...(valor.esboco === undefined ? {} : { esboco: normalizarEsbocoDoRefinamento(valor.esboco, { quem: `${quem}.esboco` }) }),
     partes,
+    ...(novas.length ? { novas } : {}),
     tolerancia: {
       envelope: tolerancia(t.envelope, quem, 'envelope', LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM),
       porta: tolerancia(t.porta, quem, 'porta', LIMITE_DA_TOLERANCIA_DA_PORTA_MM),
@@ -374,11 +390,21 @@ export function conferirRefinamentoGlobal({ refinamento, andaime, neutro }) {
   /* a parte cuja forma o andaime não traduz (a pá girada de uma hélice: a N2 não inclina o sólido) não tem volume, e a ligação dela
      à forma do esboço em `esboco.formas` é a conferência dela, pela razão de volume */
   const pelaFormaDoEsboco = new Set((declaracao.esboco?.formas ?? []).map(({ parte }) => parte));
-  for (const nome of partesEntregues(neutro)) {
-    if (!vinculadas.has(nome) && !pelaFormaDoEsboco.has(nome)) {
+  const novas = new Set((declaracao.novas ?? []).map(({ parte }) => parte));
+  const entregues = new Set(partesEntregues(neutro));
+  for (const nome of novas) {
+    if (pelaFormaDoEsboco.has(nome)) {
+      achados.push({ codigo: 'parte-nova-com-forma', parte: nome, mensagem: `a parte '${nome}' está em REFINA.novas e em REFINA.esboco.formas; parte nova não tem forma no esboço.` });
+    }
+    if (!entregues.has(nome)) {
+      achados.push({ codigo: 'parte-nova-ausente', parte: nome, mensagem: `REFINA.novas declara '${nome}', que a peça não entrega.` });
+    }
+  }
+  for (const nome of entregues) {
+    if (!vinculadas.has(nome) && !pelaFormaDoEsboco.has(nome) && !novas.has(nome)) {
       achados.push({
         codigo: 'parte-sem-volume', parte: nome,
-        mensagem: `a parte '${nome}' é entregue pela peça e não declara em REFINA qual volume do andaime '${normalizado.id}' ela refina, nem em REFINA.esboco a forma do esboço; sem nenhum dos dois não há o que conferir.`,
+        mensagem: `a parte '${nome}' é entregue pela peça e não declara em REFINA qual volume do andaime '${normalizado.id}' ela refina, nem em REFINA.esboco a forma do esboço, nem em REFINA.novas que é parte nova com motivo; sem nenhum dos três não há o que conferir.`,
       });
     }
   }
