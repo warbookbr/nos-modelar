@@ -121,6 +121,10 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    solto quando o recorte raspa a casca, contornada hoje nas asas e na deriva. Antes do
    próximo objeto: a receita planejada gerada da unidade do esboço, com o plano, o `REFINA`,
    os contatos e o alvo novo; e a comparação do modelo com a referência real na mesma escala.
+   Ainda em 2026-10-15 a pessoa aprovou ampliar a receita planejada gerada para sair também
+   com a `TABELA` e os `PONTOS` tirados do esboço, e adiantá-la para logo depois do registro
+   da rodada. O modelador dos trens principais fez 110 comandos de terminal, e só uns 13
+   eram do laço; os outros garimpavam medidas e pontos no JSON do esboço.
 3. **A montagem e o aceite.** O avião inteiro no núcleo, a auditoria de interseções,
    o crítico contra as referências e o esboço, e a aprovação da pessoa na bancada. A
    auditoria mede também o apoio no chão: os dois trens saíram do esboço com as rodas
