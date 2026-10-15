@@ -24,7 +24,7 @@
  * (`cortaAsa`).
  *
  * A ponta parte da mesma chamada da família, com o perfil e as cordas dela, e só o caminho e o contorno mudam, porque a família não
- * aceita mais de 60 graus de ponta levantada e a pessoa pediu a ponta a uns 9% da meia-asa, o que pede cerca de 71. As seções do
+ * aceita mais de 60 graus de ponta levantada e a pessoa pediu a ponta a uns 9% da meia-asa, o que pede cerca de 72. As seções do
  * contorno vêm da expansão (interpoladas em x, que é exato: corda, espessura e enflechamento são retas) e o caminho é a mesma curva de
  * quinto grau da família (`plantaDa`), com o ângulo de `ponta.levantada`; a tampa é a da família, de comprimento fixo ao longo do
  * caminho. Vista de cima, a ponta tem os cantos do bordo de ataque e do de fuga arredondados: cada seção perde, em u, um recuo que
@@ -81,7 +81,7 @@ export const TABELA = {
      milímetro, são as da raiz e as da ponta de `semi`, e a espessura é a relativa da família (a da ponta da metade de asa sai da reta
      entre as duas). `degrauDaRaiz` é a fração da semi-envergadura em que o diedro começa, constante da família. A ponta levantada
      (`pontaLevantada`, em graus) ocupa os últimos `extensaoDaPonta` da semi-envergadura da ponta: o esboço a põe em 56 graus, que sobem
-     uns 6% da semi-envergadura acima da linha do diedro, e a rodada de ajustes a leva a 71, que sobem uns 9% (a pessoa pediu de 8 a
+     uns 6% da semi-envergadura acima da linha do diedro, e a rodada de ajustes a leva a 72, que sobem uns 9% (a pessoa pediu de 8 a
      10%, como na referência real). A família só aceita até `LIMITE_DA_FAMILIA` (60), e acima disso a ponta usa o caminho de `ponta`
      (adiante). O corte da ponta é o plano em x
      `raiz[0] + fracaoDaSemi * semi - fracaoDaCordaNaPonta * cordaNaPonta + folga`, que a metade de asa e a ponta dividem; `cortaPonta`
@@ -98,7 +98,7 @@ export const TABELA = {
     enflechamento: 0.86,
     diedro: 5.93,
     degrauDaRaiz: 0.004,
-    pontaLevantada: 71,
+    pontaLevantada: 72,
     extensaoDaPonta: 0.05,
     corte: { fracaoDaSemi: 0.95, fracaoDaCordaNaPonta: 0.065, folga: 8 },
     cortaPonta: { largura: 1000, altura: 3000, profundidade: 3000, y: 1500, z: 4800 },
@@ -120,7 +120,7 @@ export const TABELA = {
   /* O casulo, na asa esquerda: `x` é a distância ao eixo do avião (o casulo fica em -x); `aFrente` e `aTras` são quanto ele passa do
      bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `abaixoDoEixo` quanto o centro fica
      abaixo da linha de 25% da corda, e `lados` e `estacoes` a resolução da revolução e do meio perfil. */
-  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, abaixoDoEixo: 70, lados: 48, estacoes: 16 },
+  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, abaixoDoEixo: 50, lados: 48, estacoes: 16 },
   /* O oval: o centro fica a `x` do eixo e a `naCorda` da corda a partir do bordo de ataque; é a extrusão em y de um retângulo de
      `comprimento` em x e `largura` em z de cantos de meia largura, com `altura` acima do extradorso e `profundidadeNaAsa` abaixo dele,
      girada em z pelo diedro para ficar paralela à asa. */
@@ -136,8 +136,7 @@ export const TABELA = {
      `lados` lados, que passa `sobra` além de cada seção, sobre a linha da dobradiça (o centro do nariz). Os suportes ficam nas frações
      `posicoes` do vão do comando, `abaixo` da face de baixo do comando e `atras` da dobradiça, com o `raio` do canto. `tampa.avanco` é
      quanto o polo de cada loft fica além da seção, e `segmentosDoCanto` os segmentos do canto do suporte. Os dois vãos são o comando
-     engrossado pela fresta, sem deslocamento: até 2026-10-15 a receita os deslocava [3, -0,5] mm em [z, y], porque a booleana do núcleo
-     deixava um canto solto 277 mm além do corte, e o núcleo o corrigiu. */
+     engrossado pela fresta, sem deslocamento. */
   comando: {
     posicaoNaCorda: 0.75,
     nariz: [0.1465, 0.3535],
@@ -796,7 +795,7 @@ const AFASTADAS = Object.fromEntries(['D', 'E'].map((L) => [`ponta${L}`, {
   formas: `ponta${L}`,
   minimo: 0.45,
   alongamento: { '+y': 198.4 },
-  motivo: 'a ponta levantada sobe uns 9% da semi-envergadura (71 graus, e não os 56 do esboço) e tem os cantos arredondados vistos de cima, como a referência real',
+  motivo: 'a ponta levantada sobe uns 9% da semi-envergadura (72 graus, e não os 56 do esboço) e tem os cantos arredondados vistos de cima, como a referência real',
 }]));
 
 const receita = {
@@ -822,8 +821,8 @@ const receita = {
         },
         {
           nome: `ponta${L}`,
-          forma: `ponta ${nome} da asa, levantada uns 9% da semi-envergadura (de 8 a 10%, 71 graus), de cantos arredondados vistos de cima, continuando a metade da asa sem degrau`,
-          tecnica: 'contorno da superfície da família com a ponta levantada, em caminho de quinto grau de 71 graus (a família só aceita 60), cantos arredondados por recuo das seções; cortada além da metade da asa',
+          forma: `ponta ${nome} da asa, levantada uns 9% da semi-envergadura (de 8 a 10%, 72 graus), de cantos arredondados vistos de cima, continuando a metade da asa sem degrau`,
+          tecnica: 'contorno da superfície da família com a ponta levantada, em caminho de quinto grau de 72 graus (a família só aceita 60), cantos arredondados por recuo das seções; cortada além da metade da asa',
         },
         {
           nome: `flap${L}`,

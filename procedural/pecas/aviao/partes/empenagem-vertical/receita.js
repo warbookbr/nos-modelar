@@ -33,11 +33,13 @@
  *
  * O leme e o vão são lofts em y de seções de sete pontos, como no esboço. O loft só fecha uma ponta com um polo de raio zero, e o polo
  * nasce no eixo, a `tampa.avanco` além da seção, e `moveV` o leva ao centro dela, de modo que cada ponta é um leque quase plano. A
- * dorsal é um loft em z, `suave` no esboço: uma curva de tangente contínua (cúbica de Hermite com a tangente de Fritsch e Carlson, a
- * do PCHIP, que não passa do valor de nenhuma seção) passa pelas seções, e a receita a avalia em estações a mais entre elas. A seção
- * da dorsal não é o retângulo do esboço: é o dorso da fuselagem subindo até a deriva, com a crista em meia elipse e um filete côncavo
- * de cada lado até a base, e por isso a dorsal passa do volume do esboço em x e declara o `alongamento` e o `motivo` em `REFINA`. As dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não
- * acrescenta estação entre elas. As do lado esquerdo são o espelho em x das do direito. O eixo do leme é uma extrusão de um círculo em
+ * dorsal é um loft em z, `suave` no esboço. A dorsal da receita é o dorso da fuselagem subindo até a deriva: a crista sobe numa potência
+ * do comprimento, até o ponto do bordo de ataque da deriva `juncao.altura` acima da raiz, e o expoente é calculado para ela chegar com a
+ * inclinação do bordo de ataque, de modo que a crista vira o bordo de ataque sem degrau e a dorsal acaba ali, com a seção dentro da
+ * espessura da deriva. A seção é a crista em meia elipse e um filete côncavo de cada lado até a base. A junção fica no topo do envelope
+ * da dorsal no andaime (y 2640), e a dorsal passa do volume do esboço só em x e declara o `alongamento` e o `motivo` em `REFINA`. As
+ * dobradiças são o mesmo loft, com as quatro seções ligadas em reta, como o esboço as liga: ele não acrescenta estação entre elas. As do
+ * lado esquerdo são o espelho em x das do direito. O eixo do leme é uma extrusão de um círculo em
  * y, girada em x para a reta da dobradiça.
  */
 import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
@@ -50,17 +52,6 @@ const DOBRADICAS = [1, 2, 3].flatMap((n) => [['D', 'd', 'direita'], ['E', 'e', '
 const VOLUMES = {
   deriva: 'deriva-fin', dorsal: 'deriva-dorsal', leme: 'leme', eixoLeme: 'eixo-leme',
   ...Object.fromEntries(DOBRADICAS.map(({ n, L, l }) => [`dobradicaLeme${n}${L}`, `dobradica-leme${n}-${l}`])),
-};
-const FORMAS = {
-  deriva: 'deriva.fin',
-  dorsal: {
-    formas: 'deriva.dorsal',
-    minimo: 0.6,
-    alongamento: { '+x': 87.5, '-x': 87.5 },
-    motivo: 'a dorsal lisa pedida na rodada de ajustes: o dorso sobe até a deriva por um filete côncavo de até 300 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,63 pela largura a mais',
-  },
-  leme: 'leme', eixoLeme: 'eixoLeme',
-  ...Object.fromEntries(DOBRADICAS.map(({ n, L }) => [`dobradicaLeme${n}${L}`, `dobradicaLeme${n}${L}`])),
 };
 const PARTES = Object.keys(VOLUMES);
 
@@ -96,24 +87,26 @@ export const TABELA = {
   /* O eixo do leme: haste de `diametro`, em `lados` lados, ao longo do centro do nariz, de `sobra` acima da base do leme até `sobra`
      abaixo da seção `b`. */
   eixo: { diametro: 30, sobra: 15, lados: 48 },
-  /* A dorsal lisa: o dorso da fuselagem subindo até a deriva. Uma estação por linha, [z, y do dorso da fuselagem naquele z, largura da
-     crista, subida da crista acima do dorso, largura da base]; o x do centro é zero. O y do dorso é o topo da fuselagem em x = 0,
-     medido na malha dela (a fuselagem não publica porta, e o dorso é plano até uns 150 mm de cada lado do centro). A seção sobe da
-     base, que assenta `assenta` abaixo do dorso e desce em parede até `fundo` abaixo dele, por um filete côncavo (um quarto de elipse,
-     horizontal no dorso e vertical na crista) até a crista, que é uma meia elipse. `subdivisoes` é quantas estações a curva suave
-     passa a ter entre duas seções, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. */
+  /* A dorsal lisa: o dorso da fuselagem subindo até a deriva e emendando no bordo de ataque dela. `dorso` são os pontos [z, y do dorso da
+     fuselagem naquele z], medidos na malha dela em x = 0 (a fuselagem não publica porta, e o dorso é plano até uns 150 mm de cada lado do
+     centro); a curva suave passa por eles. A crista começa `inicio.subida` acima do dorso em `dorso[0]` e sobe numa potência do
+     comprimento, até a `juncao`: o ponto do bordo de ataque da deriva `altura` acima da raiz (`y0`). O expoente é o que faz a crista
+     chegar ali com a inclinação do bordo de ataque (`derivar` o calcula), de modo que a crista vira o bordo de ataque sem degrau. A
+     dorsal acaba na junção, e a seção dela cabe dentro da espessura da deriva ali. `crista` é a largura da crista, uns 24 mm, e a
+     largura da base é a curva suave de `base`, [fração do comprimento, largura]: ela fica abaixo da espessura da deriva na junção, e
+     por isso a dorsal não sai pelos lados do bordo de ataque. A seção sobe da base, que assenta `assenta` abaixo do dorso e desce em
+     parede até `fundo` abaixo dele, por um filete côncavo (um quarto de elipse, horizontal no dorso e vertical na crista) até a crista,
+     que é uma meia elipse. `secoes` é quantas seções a dorsal tem, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. */
   dorsal: {
-    estacoes: [
-      [6960, 2323, 20, 2, 60],
-      [7300, 2294, 40, 60, 240],
-      [7700, 2268, 60, 170, 300],
-      [8100, 2248, 80, 317, 260],
-      [8300, 2241, 80, 399, 150],
-    ],
+    dorso: [[6960, 2323], [7300, 2294], [7700, 2268], [8100, 2248], [8300, 2241]],
+    inicio: { subida: 2 },
+    juncao: { altura: 415 },
+    crista: 24,
+    base: [[0, 60], [0.3, 180], [0.6, 240], [0.8, 200], [1, 140]],
     assenta: 3,
     fundo: 25,
     fracaoDoFundo: 0.5,
-    subdivisoes: 2,
+    secoes: 24,
     passosDoArco: 4,
   },
   /* As dobradiças: três pares, cada um a `y` de um y da lista (`vK1y`, `vK2y`, `vK3y`). Cada estação é [z a partir da linha da
@@ -131,6 +124,20 @@ export const TABELA = {
   },
   /* Fechamento das pontas dos lofts: quanto o polo fica além da última seção. */
   tampa: { avanco: 0.5 },
+};
+
+/* A meia largura da dorsal do esboço, em x: a aleta de ponta fina tem 125 mm de largura. */
+const MEIA_LARGURA_DO_ESBOCO = 62.5;
+const FORMAS = {
+  deriva: 'deriva.fin',
+  dorsal: {
+    formas: 'deriva.dorsal',
+    minimo: 0.3,
+    alongamento: Object.fromEntries(['+x', '-x'].map((lado) => [lado, Math.max(...TABELA.dorsal.base.map(([, largura]) => largura)) / 2 - MEIA_LARGURA_DO_ESBOCO])),
+    motivo: 'a dorsal lisa pedida na rodada de ajustes: o dorso sobe e a crista vira o bordo de ataque da deriva, tangente a ele na junção a 415 mm da raiz, por um filete côncavo de até 240 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,31 porque a dorsal é mais fina e acaba na deriva',
+  },
+  leme: 'leme', eixoLeme: 'eixoLeme',
+  ...Object.fromEntries(DOBRADICAS.map(({ n, L }) => [`dobradicaLeme${n}${L}`, `dobradicaLeme${n}${L}`])),
 };
 
 const m = (mm) => mm / 1000;
@@ -273,11 +280,34 @@ function estacoesSuaves(secoes, subdivisoes) {
   });
 }
 
-/* As estações da dorsal em mm: [z, y do dorso, largura da crista, subida, largura da base] como objetos, com a curva suave entre as
-   seções. */
+/* O z do bordo de ataque da deriva no y dado, em mm: a reta da raiz ao topo. */
+const bordoDeAtaqueEm = (d, y) => d.bordoDeAtaque[0] + ((d.bordoDeAtaque[1] - d.bordoDeAtaque[0]) * (y - d.y0)) / d.altura;
+
+/* A junção da dorsal com o bordo de ataque da deriva, em mm: o ponto dele `juncao.altura` acima da raiz e a inclinação dele (y por z). */
+function juncaoDaDorsal(t) {
+  const d = t.deriva;
+  const y = d.y0 + t.dorsal.juncao.altura;
+  return { y, z: bordoDeAtaqueEm(d, y), inclinacao: d.altura / (d.bordoDeAtaque[1] - d.bordoDeAtaque[0]) };
+}
+
+/* As estações da dorsal em mm: [z, y do dorso, largura da crista, subida, largura da base] como objetos. A crista é `y0c + (yj - y0c) *
+   f^k` com f a fração do comprimento, de `dorso[0]` à junção: ela sai do dorso e chega ao bordo de ataque em `yj`, e `k` é o que dá a
+   ela ali a inclinação do bordo de ataque (a derivada de `f^k` em 1 é `k`). A base é a curva suave de `base` em f. */
 function estacoesDaDorsal(t) {
-  const secoes = t.dorsal.estacoes.map(([p, y, crista, subida, base]) => ({ p, y, crista, subida, base }));
-  return estacoesSuaves(secoes, t.dorsal.subdivisoes);
+  const D = t.dorsal;
+  const dorso = curvaSuave(D.dorso.map(([z]) => z), D.dorso.map(([, y]) => y));
+  const base = curvaSuave(D.base.map(([f]) => f), D.base.map(([, largura]) => largura));
+  const j = juncaoDaDorsal(t);
+  const z0 = D.dorso[0][0];
+  if (j.z > D.dorso[D.dorso.length - 1][0]) throw new Error(`dorsal: a junção, em z ${j.z.toFixed(0)} mm, passa do último ponto do dorso, em z ${D.dorso[D.dorso.length - 1][0]} mm`);
+  const y0c = dorso(z0) + D.inicio.subida;
+  const k = (j.inclinacao * (j.z - z0)) / (j.y - y0c);
+  return Array.from({ length: D.secoes }, (_, i) => {
+    const f = i / (D.secoes - 1);
+    const p = z0 + f * (j.z - z0);
+    const y = dorso(p);
+    return { p, y, crista: D.crista, subida: y0c + (j.y - y0c) * f ** k - y, base: base(f) };
+  });
 }
 
 /* O contorno da dorsal em uma estação, [x, y] em mm, anti-horário: a meia elipse da crista (semieixos metade da crista e `b`, o menor
