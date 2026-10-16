@@ -6,7 +6,7 @@
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`
 
-**Sucessor:** [importar objeto de código](../2026-10-15-importar-objeto-de-codigo.md), que voltou a ser o ativo quando este fechou.
+**Sucessor:** [importar objeto de código](2026-10-15-importar-objeto-de-codigo.md), que voltou a ser o ativo quando este fechou e foi concluído no mesmo dia.
 
 ## Problema observado
 

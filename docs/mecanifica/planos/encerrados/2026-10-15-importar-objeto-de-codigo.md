@@ -1,12 +1,6 @@
 # Importar objeto de código — um objeto descrito em OpenSCAD chega ao esboço e à receita por importação
 
-**Estado:** ativo
-
-**Histórico de estado:** congelado em 2026-10-16 para dar lugar ao plano [gates em poucos
-minutos](encerrados/2026-10-16-gates-em-poucos-minutos.md), e descongelado no mesmo dia, quando ele fechou. Ficaram parados e voltam com
-ele: a fatia 2 (do esboço à receita); a família `mesa-de-pernas-redondas`, traduzida do Infinigen, numa cópia de trabalho sem integrar, à
-espera da aprovação de forma da pessoa; e as decisões sobre o tradutor do BlendNet como ferramenta e o toro no esboço. O importador de STL
-por peça entrou no repositório durante o congelamento.
+**Estado:** concluído
 
 **Responsável:** Claude, com a pessoa aprovando forma
 
@@ -15,7 +9,7 @@ por peça entrou no repositório durante o congelamento.
 ## Problema observado
 
 Cada peça do avião custou entre 400 mil e 1,5 milhão de tokens até o aceite. O motor custou cerca de 876 mil e a fuselagem cerca de 1,54 milhão
-([plano do avião](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md)), e a lista de objetos e famílias a modelar é longa. Dos 110 comandos que o
+([plano do avião](2026-10-15-o-aviao-do-esboco-a-receita.md)), e a lista de objetos e famílias a modelar é longa. Dos 110 comandos que o
 modelador dos trens principais rodou, uns 95 garimpavam medidas e pontos no JSON do esboço. A receita planejada gerada do esboço tirou esse
 garimpo da receita, mas o esboço continua sendo desenhado à mão, unidade por unidade, pelo esbocista.
 
@@ -45,7 +39,7 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
   interseção, matriz), com teste em fixture sintética;
 - um objeto-prova: o carrinho de mão, de um `.scad` com licença que permita guardar a fonte, registrada com o endereço;
   na fatia 1 não houve carrinho de licença aberta, e o objeto-prova foi um caminhão basculante de brinquedo, com a fonte em
-  [`FONTE.md`](../banco-de-provas/importar-objeto-2026-10-15/FONTE.md);
+  [`FONTE.md`](../../banco-de-provas/importar-objeto-2026-10-15/FONTE.md);
 - a nomeação das partes e relações sobre o esboço importado, a receita planejada gerada e o laço de modelagem até o aceite;
 - a medição em tokens de cada etapa, ao lado do custo das peças do avião.
 
@@ -74,8 +68,8 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 
 ## Achados de 2026-10-16 e propostas à espera da pessoa
 
-As [sondas de 2026-10-16](../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md) e as pesquisas registradas na
-[pesquisa aberta](../PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
+As [sondas de 2026-10-16](../../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md) e as pesquisas registradas na
+[pesquisa aberta](../../PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
 paramétricas, que objetos inteiros da lista quase não existem com licença aberta, e que o importador de `.csg` recusa construções comuns em
 `.scad` reais. Três propostas esperam a decisão da pessoa antes de entrar no Incluído: corrigir o importador para `offset`, diferença 2D com
 furo e `linear_extrude` com `scale`, consertar o `--conferir` que lança exceção, e provar o importador num conjunto pequeno de `.scad` reais
@@ -91,3 +85,25 @@ Para e volta à pessoa se: importar e nomear custar mais da metade do caminho at
 da lista não tiverem forma que sirva à referência; ou o formato do esboço não expressar o que o `.csg` traz sem perder a forma.
 
 ## Fechamento
+
+Concluído em 2026-10-16 por decisão da pessoa, sem a fatia 2. A pergunta do plano, se objetos descritos em código chegam ao esboço por
+importação de forma barata, ficou respondida pelas sondas e pelos importadores, e a pessoa decidiu não seguir com a importação como caminho
+principal da lista.
+
+O que entrou no repositório: o importador de `.csg` do OpenSCAD, com `offset`, diferença 2D com furo, extrusão com `scale`, `hull` e
+`minkowski` comuns e um corpus real (drone, braço SCARA e foguete) no teste; o importador de STEP de sólidos separados e o de STL por
+peça, sobre a mesma classificação por malha (`tools/mecanifica/malha-para-esboco.mjs`), em que cada peça vira revolução, extrusão com
+furos ou caixa, com nome e contatos; e as [sondas de 2026-10-16](../../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md),
+com os scripts que as refazem.
+
+O que se mediu: o drone sai do `.scad` com 97 a 99,97% de fidelidade de volume por peça; o tradutor do BlendNet aceita 77,7% dos 12.059
+scripts, a menos de 1 ms cada, e acerta 41 de 60 numa amostra conferida contra o Blender; uma mesa do Infinigen virou família com as
+medidas da original por 250 a 300 mil tokens; o STEP e o STL de peças impressas saem exatos em peças limpas e só aproximados em peças com
+chanfro, cavidade ou detalhe interno; e STL de malha única colada não se traduz. As pesquisas, em [pesquisa
+aberta](../../PESQUISA-ABERTA-2026-10.md), mostraram que o código aberto se concentra em elementos de máquina, mecanismos e móveis
+simples, e que os objetos grandes da lista (picape, empilhadeira, carrinho de mão, máquinas) não existem prontos com licença aberta.
+
+Ficou de fora: a fatia 2, do esboço importado à receita aprovada, e a medida do custo de nomear partes; a família da mesa do Infinigen,
+descartada porque a mesa deles é básica demais; o tradutor do BlendNet como ferramenta e o toro no esboço, que foram ao
+[backlog](../BACKLOG.md). Os importadores continuam em uso para peças e objetos simples, quando ajudarem a modelar o próximo objeto da
+lista.

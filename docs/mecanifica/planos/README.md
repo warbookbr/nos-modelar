@@ -2,9 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** [importar objeto de código](2026-10-15-importar-objeto-de-codigo.md).
+**Plano ativo:** nenhum.
 
-O plano leva objetos descritos em código (OpenSCAD, STEP, STL por peça, scripts do Blender) ao esboço por importadores e deles à receita aprovada pela pessoa. Ele ficou congelado em 2026-10-16 enquanto [gates em poucos minutos](encerrados/2026-10-16-gates-em-poucos-minutos.md) trazia a bateria padrão de 27 minutos para menos de 5, e voltou quando esse fechou. [O avião do esboço à
+[Importar objeto de código](encerrados/2026-10-15-importar-objeto-de-codigo.md) fechou em 2026-10-16, com os importadores de OpenSCAD, STEP e STL no repositório e a decisão da pessoa de não seguir com a importação como caminho principal; o próximo objeto da lista está em debate com a pessoa. [Gates em poucos minutos](encerrados/2026-10-16-gates-em-poucos-minutos.md) fechou no mesmo dia. [O avião do esboço à
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14.

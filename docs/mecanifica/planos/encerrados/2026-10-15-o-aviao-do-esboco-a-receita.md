@@ -126,7 +126,7 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    da rodada. O modelador dos trens principais fez 110 comandos de terminal, e só uns 13
    eram do laço; os outros garimpavam medidas e pontos no JSON do esboço. Também em 2026-10-15
    a pessoa autorizou começar, em paralelo com a rodada de ajustes e sob este plano, a fatia 1
-   do [plano de importar objeto de código](../2026-10-15-importar-objeto-de-codigo.md), que fica
+   do [plano de importar objeto de código](2026-10-15-importar-objeto-de-codigo.md), que fica
    pronto e passa a ativo quando o avião fechar.
 3. **A montagem e o aceite.** O avião inteiro no núcleo, a auditoria de interseções,
    o crítico contra as referências e o esboço, e a aprovação da pessoa na bancada. A

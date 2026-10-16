@@ -335,6 +335,10 @@ Esta seção guarda o que o índice `planos/README.md` carregava antes de ser en
 
 ### Estado
 
+[Importar objeto de código](2026-10-15-importar-objeto-de-codigo.md) fechou em 2026-10-16, concluído por decisão da pessoa
+sem a fatia 2: os importadores de OpenSCAD, STEP e STL por peça entraram no repositório, e as sondas mostraram que a
+importação serve a peças e objetos simples, e que os objetos grandes da lista não existem prontos com licença aberta.
+
 [Gates em poucos minutos](2026-10-16-gates-em-poucos-minutos.md) fechou em 2026-10-16, concluído: a bateria padrão de
 `npm run gates` caiu de 27 minutos para menos de 5, com os testes divididos em rápidos e lentos e a bateria completa
 antes de todo envio à main, por decisão da pessoa.

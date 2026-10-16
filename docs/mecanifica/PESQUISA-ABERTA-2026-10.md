@@ -416,7 +416,7 @@ Contra a [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md), Solidify 
 
 ## Acervos abertos de objetos descritos em código (pesquisa de 2026-10-16)
 
-Pesquisa feita por um agente durante o plano [importar objeto de código](planos/2026-10-15-importar-objeto-de-codigo.md), atrás de acervos com licença aberta que guardem peças separadas e, de preferência, parâmetros, em OpenSCAD, CadQuery, build123d, JSCAD, FreeCAD, STEP ou URDF. Só entraram licenças livres sem exigência de crédito, CC-BY, CC-BY-SA, MIT, BSD, Apache, GPL e LGPL, sem NC nem ND e sem marca. Cada linha foi conferida na página do repositório ou vem de resultado de busca, e "não verificado" marca o que não foi aberto. Thingiverse, Printables e MakerWorld responderam 403 ou não mostraram a licença e ficaram fora como acervos.
+Pesquisa feita por um agente durante o plano [importar objeto de código](planos/encerrados/2026-10-15-importar-objeto-de-codigo.md), atrás de acervos com licença aberta que guardem peças separadas e, de preferência, parâmetros, em OpenSCAD, CadQuery, build123d, JSCAD, FreeCAD, STEP ou URDF. Só entraram licenças livres sem exigência de crédito, CC-BY, CC-BY-SA, MIT, BSD, Apache, GPL e LGPL, sem NC nem ND e sem marca. Cada linha foi conferida na página do repositório ou vem de resultado de busca, e "não verificado" marca o que não foi aberto. Thingiverse, Printables e MakerWorld responderam 403 ou não mostraram a licença e ficaram fora como acervos.
 
 | Nome | URL | Formato | Licença | Objetos e peças | Separadas e nomeadas | Dependências | Famílias | Nota (1 a 5) |
 |---|---|---|---|---|---|---|---|---|

@@ -37,6 +37,8 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Bloco de 1000 identificadores por forma no loft | na [empenagem horizontal do avião](../../../procedural/pecas/aviao/partes/empenagem-horizontal/receita.js), em 2026-10-16, o loft dos suportes do profundor com 52 pontos por seção só coube em 18 estações; com mais, a receita lançou erro por estourar o bloco de ids da forma. Pede medir quantas peças esbarram nisso antes de mudar o tamanho do bloco |
 | Sessão de captura órfã da bancada | desde 2026-10-15 cada captura headless grava a peça num arquivo próprio em `tools/bancadas/out/sessoes/` e o apaga ao fim; um processo que morre no meio deixa o arquivo lá, e nada limpa os órfãos |
 | Atritos abertos da segunda rodada do avião | 38 atritos em seis grupos na [classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md#segunda-rodada); a pessoa escolheu em 2026-10-13 a integração do detalhe com o mestre (34, 40, 28, 5, 20, 30, 35, 11, 15 e 9) como o primeiro grupo a puxar, depois do plano do desenho sem referência |
+| Tradutor do BlendNet como ferramenta | a [sonda de 2026-10-16](../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/blendnet/RESULTADO.md) traduziu scripts do Blender em esboço sem rodar o Blender, em Python fora do repositório; virar comando do esboço daria rascunho de objeto simples com peças nomeadas em segundos |
+| Toro no esboço | o esboço não tem a forma de anel ou boia; ela respondeu por 10,6% das recusas do BlendNet e aparece em pneu, alça e argola |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro
