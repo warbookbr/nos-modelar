@@ -107,6 +107,17 @@ bateria inteira, e por isso nenhum ajuste de paralelismo basta sem separar os le
 | `modulos/esboco/tests/critico.test.js` | 22 | 13 | desenho para o crítico |
 | `modulos/esboco/tests/desempenho.test.js` | 20 | 12 | medida de desempenho |
 
+## Fatia 2 (2026-10-16)
+
+A suíte se divide pela lista de `tools/testes-lentos.mjs`: os 59 arquivos acima de 5 s, os testes do servidor MCP e os que abrem a bancada,
+64 ao todo. `npm run test:rapidos` roda os outros 305 sempre, com quatro trabalhadores do Vitest em vez de dois, e levou 97 s sozinho;
+`npm run test:lentos` roda só os lentos ligados por importação ao que mudou desde o ramo remoto (`vitest --changed`), e todos no CI, com
+`--completo` e quando não se sabe o ramo remoto. A guarda do acervo e as duas conferências de família, que sozinhas levavam 3,7, 2,2 e
+1,9 minutos, só entram na bateria local quando muda um caminho que elas conferem (`GATES_POR_CAMINHO` em `tools/gates.mjs`), pela decisão
+da pessoa de 2026-10-16, e continuam no CI e no `--completo`. Três medições seguidas da bateria padrão, sem nada mudado desde o ramo
+remoto: 281 s, 286 s e 289 s, todas verdes. O caminho crítico passou a ser o `test:rapidos` disputando a máquina (210 s junto com os
+outros gates) e o par `mcp:check` e `mcp:visual:check`, que dividem o servidor e somam 241 s.
+
 ## Riscos e parada
 
 Para e volta à pessoa se a bateria padrão não chegar a 5 minutos sem tirar teste dela que cubra código mudado com frequência, ou se o
