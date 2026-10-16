@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1334 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1336 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1373,6 +1373,8 @@
 
 - `README.md` — tools/ — ferramentas da Mecanifica e do núcleo herdado
 - `gates.mjs` — gates.mjs — roda TODOS os gates e relata TODOS, em vez de parar no primeiro.
+- `testes-lentos.mjs` — testes-lentos.mjs — a lista dos arquivos de teste que saem da bateria padrão, e o comando que roda cada uma das duas.
+- `testes-lentos.test.mjs` — testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa.
 - `vitest-duracoes.mjs` — vitest-duracoes.mjs — repórter do Vitest que grava a duração de cada arquivo de teste.
 
 ## tools/arquitetura/
