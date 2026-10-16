@@ -1,0 +1,192 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-vertical",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-empenagem-vertical/alvo/aviao-unidade-empenagem-vertical-composta.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "leme",
+        "tipo": "comprimento",
+        "onde": "ponta fina do degrau do topo do leme",
+        "sentido": "menor",
+        "evidencia": "sobreposicao-x.png, painel x=0: o vermelho tem uma ponta fina de cerca de 20 px (110 mm a 0,18 px/mm) que o azul não cobre."
+      }
+    ],
+    "observacao": "Fora a dorsal declarada, o modelo cobre o alvo nos cortes e nas silhuetas; só sobra a ponta fina do topo do leme, um detalhe."
+  },
+  "partes": [
+    {
+      "nome": "deriva",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dorsal",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "leme",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoLeme",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "dobradicaLeme3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "vistas isoladas nao geradas por instrucao de quem conduz; conferi as partes pelas vistas montadas, pelo recorte ampliado da superior e por raios contra as malhas",
+    "a fuselagem nao publica porta do dorso: o dorso segue na TABELA, medido da malha, e a poligonal dela tem quina em z 7500 que a lista nao tinha",
+    "a medicao nao pega salto de largura visivel entre dorsal e fuselagem; so o raio sobre as duas malhas mostrou",
+    "o nucleo limita o loft a mil faces, e 12 trechos por quarto de arco forcaram a dorsal a 17 secoes",
+    "Rodada liberada pela pessoa em 2026-10-16 só para o ombro da dorsal, que sumiu; o crítico achou outro detalhe, a ponta fina do degrau do topo do leme."
+  ],
+  "notaDePassagem": "O ombro vinha de dois fatos: o dorso da TABELA ficava 2,7 mm acima da fuselagem real em z 7500 (a malha dela e poligonal com quina ali), deixando a base do filete rente a ela, e o filete de 4 trechos fazia a largura visivel saltar. Ponto novo em dorso, 12 trechos por arco, 17 secoes (limite de 1000 faces) e crista de 28 mm para a razao de volume voltar a 0,308 (minimo 0,3). Se o dorso da fuselagem mudar, refaca dorsal.dorso com a quina. A emenda com o bordo de ataque nao foi tocada.",
+  "receita": {
+    "sha256": "sha256:a0f4b9847113a707bb2435f6cc3effe6593a23bfbe1103acf1d7596cf0c25644",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 7,
+      "acrescentadas": 12,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "     centro); a curva suave passa por eles. A crista começa `inicio.subida` acima do dorso em `dorso[0]` e sobe numa potência do"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "     centro; o dorso da malha é uma poligonal com quina em z 7500, e o ponto ali impede a curva de ficar uns 3 mm acima da fuselagem, o que"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "     deixava a base do filete rente a ela e a largura visível de cima saltava); a curva suave passa por eles. A crista começa `inicio.subida` acima do dorso em `dorso[0]` e sobe numa potência do"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "     dorsal acaba na junção, e a seção dela cabe dentro da espessura da deriva ali. `crista` é a largura da crista, uns 24 mm, e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "     dorsal acaba na junção, e a seção dela cabe dentro da espessura da deriva ali. `crista` é a largura da crista, 28 mm (a razão de volume com a aleta do esboço pede ao menos 0,3), e a"
+        },
+        {
+          "tipo": "-",
+          "linha": 99,
+          "texto": "     que é uma meia elipse. `secoes` é quantas seções a dorsal tem, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "     que é uma meia elipse. `secoes` é quantas seções a dorsal tem, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. O"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "     dorso da fuselagem corta o filete a uns 3 mm da base, onde o último trecho dele é quase horizontal: com poucos trechos o ponto em"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "     que o dorso passa de um trecho ao seguinte faz a largura visível de cima saltar, e o alargamento da frente sai com um ombro; com 12"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "     por quarto de arco o salto some e a largura cresce sem quebra de inclinação. O núcleo limita o loft a mil faces, e 12 trechos dão 53"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "     lados por seção: `secoes` cai a 17 para o loft caber (18 intervalos de 53 faces). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "    dorso: [[6960, 2323], [7300, 2294], [7700, 2268], [8100, 2248], [8300, 2241]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    dorso: [[6960, 2323], [7300, 2294], [7500, 2277.5], [7700, 2268], [8100, 2248], [8300, 2241]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "    crista: 24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    crista: 28,"
+        },
+        {
+          "tipo": "-",
+          "linha": 109,
+          "texto": "    secoes: 24,"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "    passosDoArco: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    secoes: 17,"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    passosDoArco: 12,"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
