@@ -42,7 +42,8 @@
  * A carenagem da raiz é um loft em x, como os comandos, de seções de quatro pontos: a frente fica `sobreposicao` dentro do bordo de
  * fuga da asa, e o fundo segue um quarto de elipse em planta, tangente ao bordo de fuga a `alcanceEmX` da raiz e à fuselagem na
  * raiz, `alcanceEmZ` atrás do bordo de fuga. Entra `entrada` na fuselagem, que recua atrás do bordo de fuga e deixaria o canto aberto. O
- * casulo é uma revolução em z, uma elipse de meio perfil, pendurada no bordo de ataque da asa esquerda; os ovais são extrusões em y de
+ * casulo é uma revolução em z, uma elipse de meio perfil, pendurada no bordo de ataque da asa esquerda com o centro um raio abaixo da
+ * linha de 25% da corda, onde a elipse ainda toca o intradorso; os ovais são extrusões em y de
  * um retângulo de cantos de meia largura, assentadas no extradorso e giradas em z pelo diedro, com a altura da face de cima tirada
  * das seções da própria asa.
  */
@@ -758,7 +759,7 @@ const receita = {
         {
           nome: `ponta${L}`,
           forma: `ponta ${nome} da asa, levantada uns 9% da semi-envergadura (de 8 a 10%, 72 graus), de cantos arredondados vistos de cima, continuando a metade da asa sem degrau`,
-          tecnica: 'contorno da superfície da família com a ponta levantada, em caminho de quinto grau de 72 graus (a família só aceita 60), cantos arredondados por recuo das seções; cortada além da metade da asa',
+          tecnica: 'chamada da família superficie-aerodinamica com a ponta levantada de 72 graus, tampa de 130 mm e cantos de 170 e 120 mm pelas opções da família, cortada além da metade da asa',
         },
         {
           nome: `flap${L}`,
@@ -787,7 +788,7 @@ const receita = {
       ]),
       {
         nome: 'casuloE',
-        forma: 'casulo escuro sob a asa esquerda, ovoide de 620 mm por 300 mm de diâmetro, de eixo em z, pendurado no bordo de ataque a 4330 mm do eixo do avião',
+        forma: 'casulo escuro sob a asa esquerda, ovoide de 620 mm por 300 mm de diâmetro, de eixo em z, pendurado no bordo de ataque a 4330 mm do eixo do avião, com o centro um raio abaixo da linha da asa',
         tecnica: 'revolução em z de meio perfil elíptico, no material escuro que a receita já tem; parte nova da rodada de ajustes',
       },
     ],
@@ -820,7 +821,7 @@ const receita = {
     { par: [`carenagemRaiz${L}`, `asa${L}`], motivo: `a frente da carenagem entra 40 mm no bordo de fuga da asa ${nome}, na raiz` },
     { par: [`ovalPonta${L}`, `asa${L}`], motivo: `o oval ${nome} assenta no extradorso da asa, com 30 mm dentro dela` },
   ]).concat([
-    { par: ['casuloE', 'asaE'], motivo: 'o casulo pende do bordo de ataque da asa esquerda e entra 160 mm atrás dele' },
+    { par: ['casuloE', 'asaE'], motivo: 'o casulo pende sob o bordo de ataque da asa esquerda, com o centro um raio abaixo da linha da asa, e a elipse toca o intradorso junto ao nariz' },
   ]),
   /* O esboço deixa sob o aileron uma lâmina do bordo de fuga da asa, de 0,3 a 6 mm, que liga a parede de dentro do vão à de fora e
      fecha uma alça: a asa do esboço tem um furo, e a de cada lado também. */
