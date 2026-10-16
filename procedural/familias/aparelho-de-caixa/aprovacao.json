@@ -192,5 +192,23 @@
     }
   },
   "critico": null,
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-16",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png",
+    "perfis": {
+      "air-fryer-de-forno": {
+        "hash": "sha256:7c7c5e6aa96ee2ab4ad0254f00d6692d46fe3a3f1750ee592252b110bc93e269"
+      },
+      "forninho-eletrico": {
+        "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f"
+      },
+      "lava-loucas-compacta": {
+        "hash": "sha256:74f072e1a142baee92a1e00b5d3b48e61ec25e6585fc528d8cef3ffc2461db3b"
+      },
+      "micro-ondas": {
+        "hash": "sha256:d6807e4a1aeaafac662170a08f82e3462904b2986861fdff6f7dd9b8821f2514"
+      }
+    }
+  }
 }
