@@ -263,6 +263,12 @@ fuselagem, o motor e a hélice, e as etapas posteriores às asas foram reabertas
 primeira. A parte pedida que o esboço não tem (o casulo, os ovais, a carenagem, o compensador)
 entra em `REFINA.novas` com o motivo.
 
+As duas empenagens pararam sem convergência na rodada de ajustes, com nota 8 e um defeito
+diferente a cada rodada, e em 2026-10-16 a pessoa liberou mais uma rodada em cada uma, só
+para a dorsal que alarga de uma vez vista de cima e para a face facetada dos suportes do
+profundor. Nas asas ela mandou seguir: a ponta passa pela `chamar()` da família, que agora
+aceita 72 graus, e o casulo desce para um raio abaixo da asa, como na referência.
+
 As duas empenagens fecharam na primeira rodada com nota 9 e a pessoa as aceitou em
 2026-10-15, vendo a [comparação com a referência real](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-empenagens.png);
 na vertical, o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que
