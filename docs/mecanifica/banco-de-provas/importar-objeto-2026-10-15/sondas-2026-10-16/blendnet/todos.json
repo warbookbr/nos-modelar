@@ -1,0 +1,237 @@
+{
+ "total": 12059,
+ "aceitos": 9372,
+ "tipos_por_objeto": {
+  "primitiva-sem-equivalente": 1730,
+  "modo-de-edicao": 346,
+  "operador-desconhecido": 405,
+  "expressao": 139,
+  "aleatorio": 78,
+  "escala-desigual": 347,
+  "modificador": 101,
+  "erro-interno": 22,
+  "malha-propria": 29,
+  "hierarquia": 33,
+  "chamada-desconhecida": 6
+ },
+ "primeira_recusa": {
+  "primitiva-sem-equivalente": 1528,
+  "modo-de-edicao": 286,
+  "operador-desconhecido": 313,
+  "aleatorio": 73,
+  "escala-desigual": 299,
+  "erro-interno": 22,
+  "modificador": 68,
+  "expressao": 23,
+  "malha-propria": 27,
+  "hierarquia": 30,
+  "chamada-desconhecida": 5
+ },
+ "so_toro": 1284,
+ "erros_internos": 22,
+ "tempo_mediano_ms": 0.7708470002398826,
+ "tempo_p95_ms": 3.7844049998057017,
+ "tempo_max_ms": 12760.959465999804,
+ "por_categoria": {
+  "Articles of clothing and haberdashery": [
+   536,
+   688
+  ],
+  "Musical instruments": [
+   574,
+   730
+  ],
+  "Recording, telecommunication or data processing equipment": [
+   563,
+   728
+  ],
+  "Stationery and office equipment, artists' and teaching materials": [
+   659,
+   839
+  ],
+  "Medical and laboratory equipment": [
+   552,
+   718
+  ],
+  "Furnishing": [
+   647,
+   796
+  ],
+  "Foodstuffs": [
+   603,
+   767
+  ],
+  "Games, toys, tents and sports goods": [
+   581,
+   750
+  ],
+  "Graphic symbols and logos, surface patterns, ornamentation, arrangement of interiors and exteriors": [
+   658,
+   883
+  ],
+  "Travel goods, cases, parasols and personal belongings, not elsewhere specified": [
+   582,
+   759
+  ],
+  "Equipment for production, distribution or transformation of electricity": [
+   598,
+   781
+  ],
+  "Tools and hardware": [
+   567,
+   726
+  ],
+  "Means of transport or hoisting": [
+   510,
+   633
+  ],
+  "Articles for the care and handling of animals": [
+   627,
+   834
+  ],
+  "Household goods, not elsewhere specified": [
+   550,
+   708
+  ],
+  "Machines and appliances for preparing food or drink, not elsewhere specified": [
+   565,
+   719
+  ]
+ },
+ "exemplos": {
+  "primitiva-sem-equivalente": [
+   "7108f6ed-16b6-4243-90ab-a24bf9c68c26",
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Hook\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 51,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.1, minor_radius=0.02, location=(0, 0, 1.1), rotation=(math.pi / 2, 0, 0))"
+   }
+  ],
+  "modo-de-edicao": [
+   "738fd8c7-2046-4952-90c2-0601524a8042",
+   {
+    "tipo": "modo-de-edicao",
+    "texto": "bpy.ops.mesh.extrude_region_move (operador de malha/curva)",
+    "linha": 35,
+    "codigo": "bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={\"value\":(0, 0, 0.05)})"
+   }
+  ],
+  "operador-desconhecido": [
+   "790c2710-b7d8-4429-b37f-cddf6907ca33",
+   {
+    "tipo": "operador-desconhecido",
+    "texto": "bpy.ops.object.convert",
+    "linha": 29,
+    "codigo": "bpy.ops.object.convert(target='MESH')"
+   }
+  ],
+  "expressao": [
+   "7aaaa0a1-26fc-40df-9bdd-2b1847be7317",
+   {
+    "tipo": "expressao",
+    "texto": "bpy.ops.mesh.primitive_cylinder_add: valor não numérico em location: random sem semente",
+    "linha": 43,
+    "codigo": "bpy.ops.mesh.primitive_cylinder_add(radius=0.1, depth=0.02, location=(x, y, 0.1))"
+   }
+  ],
+  "aleatorio": [
+   "7aaaa0a1-26fc-40df-9bdd-2b1847be7317",
+   {
+    "tipo": "aleatorio",
+    "texto": "random.uniform sem random.seed: não determinístico",
+    "linha": 41,
+    "codigo": "x = random.uniform(-0.7, 0.7)"
+   }
+  ],
+  "escala-desigual": [
+   "6750388e-3231-4e51-b15f-06d09a05de20",
+   {
+    "tipo": "escala-desigual",
+    "texto": "esfera \"Bottom Bun\" com escala desigual (1, 1, 0.3): elipsoide sem forma equivalente",
+    "linha": 23,
+    "codigo": "bpy.ops.mesh.primitive_uv_sphere_add(radius=1, location=(0, 0, 0))"
+   }
+  ],
+  "modificador": [
+   "6b26335f-d6b9-4086-ae93-1441f1f99ae8",
+   {
+    "tipo": "modificador",
+    "texto": "modificador BEVEL",
+    "linha": 26,
+    "codigo": "bpy.ops.object.modifier_apply(modifier=\"Bevel\")"
+   }
+  ],
+  "erro-interno": [
+   "fc8d8b2a-dd31-4cb5-8f3d-5d3f75ad0888",
+   {
+    "tipo": "erro-interno",
+    "texto": "'Colecao' object is not iterable",
+    "linha": 0,
+    "codigo": ""
+   }
+  ],
+  "malha-propria": [
+   "e0b35da6-18e5-4d30-ba7c-68fe169fbcff",
+   {
+    "tipo": "malha-propria",
+    "texto": "bpy.data.objects.new: objeto com malha própria",
+    "linha": 31,
+    "codigo": "star = bpy.data.objects.new(\"Star\", mesh)"
+   }
+  ],
+  "hierarquia": [
+   "0620c666-fac9-4f18-86ea-18fc73bb8e94",
+   {
+    "tipo": "hierarquia",
+    "texto": "obj.parent: transformação herdada do pai",
+    "linha": 50,
+    "codigo": "hanging_hole.parent = handle"
+   }
+  ],
+  "chamada-desconhecida": [
+   "846ba9ea-e849-470d-9982-1ef17bf34f20",
+   {
+    "tipo": "chamada-desconhecida",
+    "texto": "chamada a \"create_func\" sem definição visível",
+    "linha": 95,
+    "codigo": "create_func(location, color)"
+   }
+  ]
+ },
+ "internos_amostra": [
+  [
+   "fc8d8b2a-dd31-4cb5-8f3d-5d3f75ad0888",
+   "TypeError: 'Colecao' object is not iterable"
+  ],
+  [
+   "459e1f4d-9c9d-471a-b773-8a78f87bf435",
+   "TypeError: 'Colecao' object is not iterable"
+  ],
+  [
+   "28039c67-2ce7-49d5-a8bd-bce938616af4",
+   "Tempo: mais de 10 s"
+  ],
+  [
+   "0c4aa761-4ae9-4261-a843-150c7d74b96f",
+   "Tempo: mais de 10 s"
+  ],
+  [
+   "a2bebab3-03fd-4b2c-a993-d942c9119dc0",
+   "TypeError: 'Ns' object is not iterable"
+  ],
+  [
+   "16f9fcc5-8673-45ad-8930-303257411f40",
+   "Tempo: mais de 10 s"
+  ],
+  [
+   "a9c60b4c-3b1c-488f-86d6-9b250b9cbe03",
+   "Tempo: mais de 10 s"
+  ],
+  [
+   "c26fa7e0-50dc-48ab-84d4-29afaf768913",
+   "TypeError: 'Colecao' object is not iterable"
+  ]
+ ],
+ "formas_mediana": 5
+}

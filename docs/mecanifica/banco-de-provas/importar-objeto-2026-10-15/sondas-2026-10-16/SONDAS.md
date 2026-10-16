@@ -42,3 +42,13 @@ Saíram 19 sólidos, 12 caixas e 7 cilindros, 10 contatos e ocupação média de
 tokens. O relatório está em `escavadeira-step.relatorio.json` e as vistas em `escavadeira-step-*.png` (à esquerda o STEP, à direita as
 formas). O gmsh não trouxe os nomes dos sólidos, que no arquivo são genéricos ("Körper1" a "Körper31"), e o arquivo é um leiaute de
 impressão, com as peças espalhadas, de modo que os contatos não descrevem a montagem.
+
+## BlendNet, scripts do Blender traduzidos em esboço
+
+Fonte: BlendNet, huggingface.co/datasets/FreedomIntelligence/BlendNet, Apache-2.0, 12.059 pares de instrução e script `bpy`. Um agente
+escreveu um tradutor que lê o script pela árvore sintática do Python, sem rodar o Blender, e o conferiu contra a execução real no Blender
+instalado como módulo Python (`pip install bpy==4.2.0`). Numa amostra de 60 objetos, 4 por categoria, 41 saem certos: sem recusa, com o mesmo
+número de partes, a caixa de cada parte dentro de 2% da diagonal e o esboço válido, com razão de volume mediana de 0,9998. Nos 12.059
+scripts, o tradutor aceita 9.372 (77,7%), a menos de 1 ms por script, e só o toro, que o esboço não tem, responde por 1.284 recusas. As
+partes vêm nomeadas pelo script em 94% dos casos. A tradução é fiel, mas os objetos do BlendNet são simples e às vezes mal montados, como a
+estante com as peças afastadas em linha. O relato completo, os scripts e as imagens estão em [`blendnet/`](blendnet/RESULTADO.md).

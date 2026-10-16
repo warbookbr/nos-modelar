@@ -1,0 +1,5333 @@
+[
+ {
+  "i": 0,
+  "id": "001c9996-1818-4dc9-81bf-8f3c0ed37ecc",
+  "nome": "Chessboard",
+  "categoria": "Articles for the care and handling of animals",
+  "t_traducao_s": 0.01868808299968805,
+  "recusas": [],
+  "avisos": [],
+  "formas": 128,
+  "cortadores": 0,
+  "nomes": [
+   "Wooden Square 1",
+   "Wooden Square 2",
+   "Wooden Square 3",
+   "Wooden Square 4",
+   "Wooden Square 5",
+   "Wooden Square 6",
+   "Wooden Square 7",
+   "Wooden Square 8",
+   "Wooden Square 9",
+   "Wooden Square 10",
+   "Wooden Square 11",
+   "Wooden Square 12",
+   "Wooden Square 13",
+   "Wooden Square 14",
+   "Wooden Square 15",
+   "Wooden Square 16",
+   "Wooden Square 17",
+   "Wooden Square 18",
+   "Wooden Square 19",
+   "Wooden Square 20",
+   "Wooden Square 21",
+   "Wooden Square 22",
+   "Wooden Square 23",
+   "Wooden Square 24",
+   "Wooden Square 25",
+   "Wooden Square 26",
+   "Wooden Square 27",
+   "Wooden Square 28",
+   "Wooden Square 29",
+   "Wooden Square 30",
+   "Wooden Square 31",
+   "Wooden Square 32",
+   "Wooden Square 33",
+   "Wooden Square 34",
+   "Wooden Square 35",
+   "Wooden Square 36",
+   "Wooden Square 37",
+   "Wooden Square 38",
+   "Wooden Square 39",
+   "Wooden Square 40",
+   "Wooden Square 41",
+   "Wooden Square 42",
+   "Wooden Square 43",
+   "Wooden Square 44",
+   "Wooden Square 45",
+   "Wooden Square 46",
+   "Wooden Square 47",
+   "Wooden Square 48",
+   "Wooden Square 49",
+   "Wooden Square 50",
+   "Wooden Square 51",
+   "Wooden Square 52",
+   "Wooden Square 53",
+   "Wooden Square 54",
+   "Wooden Square 55",
+   "Wooden Square 56",
+   "Wooden Square 57",
+   "Wooden Square 58",
+   "Wooden Square 59",
+   "Wooden Square 60",
+   "Wooden Square 61",
+   "Wooden Square 62",
+   "Wooden Square 63",
+   "Wooden Square 64",
+   "Glass Square 1",
+   "Glass Square 2",
+   "Glass Square 3",
+   "Glass Square 4",
+   "Glass Square 5",
+   "Glass Square 6",
+   "Glass Square 7",
+   "Glass Square 8",
+   "Glass Square 9",
+   "Glass Square 10",
+   "Glass Square 11",
+   "Glass Square 12",
+   "Glass Square 13",
+   "Glass Square 14",
+   "Glass Square 15",
+   "Glass Square 16",
+   "Glass Square 17",
+   "Glass Square 18",
+   "Glass Square 19",
+   "Glass Square 20",
+   "Glass Square 21",
+   "Glass Square 22",
+   "Glass Square 23",
+   "Glass Square 24",
+   "Glass Square 25",
+   "Glass Square 26",
+   "Glass Square 27",
+   "Glass Square 28",
+   "Glass Square 29",
+   "Glass Square 30",
+   "Glass Square 31",
+   "Glass Square 32",
+   "Glass Square 33",
+   "Glass Square 34",
+   "Glass Square 35",
+   "Glass Square 36",
+   "Glass Square 37",
+   "Glass Square 38",
+   "Glass Square 39",
+   "Glass Square 40",
+   "Glass Square 41",
+   "Glass Square 42",
+   "Glass Square 43",
+   "Glass Square 44",
+   "Glass Square 45",
+   "Glass Square 46",
+   "Glass Square 47",
+   "Glass Square 48",
+   "Glass Square 49",
+   "Glass Square 50",
+   "Glass Square 51",
+   "Glass Square 52",
+   "Glass Square 53",
+   "Glass Square 54",
+   "Glass Square 55",
+   "Glass Square 56",
+   "Glass Square 57",
+   "Glass Square 58",
+   "Glass Square 59",
+   "Glass Square 60",
+   "Glass Square 61",
+   "Glass Square 62",
+   "Glass Square 63",
+   "Glass Square 64"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/00.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 2.003415046999635,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 1.1098,
+  "verdade_n": 128,
+  "verdade_nomes": [
+   "Glass Square 1",
+   "Glass Square 10",
+   "Glass Square 11",
+   "Glass Square 12",
+   "Glass Square 13",
+   "Glass Square 14",
+   "Glass Square 15",
+   "Glass Square 16",
+   "Glass Square 17",
+   "Glass Square 18",
+   "Glass Square 19",
+   "Glass Square 2",
+   "Glass Square 20",
+   "Glass Square 21",
+   "Glass Square 22",
+   "Glass Square 23",
+   "Glass Square 24",
+   "Glass Square 25",
+   "Glass Square 26",
+   "Glass Square 27",
+   "Glass Square 28",
+   "Glass Square 29",
+   "Glass Square 3",
+   "Glass Square 30",
+   "Glass Square 31",
+   "Glass Square 32",
+   "Glass Square 33",
+   "Glass Square 34",
+   "Glass Square 35",
+   "Glass Square 36",
+   "Glass Square 37",
+   "Glass Square 38",
+   "Glass Square 39",
+   "Glass Square 4",
+   "Glass Square 40",
+   "Glass Square 41",
+   "Glass Square 42",
+   "Glass Square 43",
+   "Glass Square 44",
+   "Glass Square 45",
+   "Glass Square 46",
+   "Glass Square 47",
+   "Glass Square 48",
+   "Glass Square 49",
+   "Glass Square 5",
+   "Glass Square 50",
+   "Glass Square 51",
+   "Glass Square 52",
+   "Glass Square 53",
+   "Glass Square 54",
+   "Glass Square 55",
+   "Glass Square 56",
+   "Glass Square 57",
+   "Glass Square 58",
+   "Glass Square 59",
+   "Glass Square 6",
+   "Glass Square 60",
+   "Glass Square 61",
+   "Glass Square 62",
+   "Glass Square 63",
+   "Glass Square 64",
+   "Glass Square 7",
+   "Glass Square 8",
+   "Glass Square 9",
+   "Wooden Square 1",
+   "Wooden Square 10",
+   "Wooden Square 11",
+   "Wooden Square 12",
+   "Wooden Square 13",
+   "Wooden Square 14",
+   "Wooden Square 15",
+   "Wooden Square 16",
+   "Wooden Square 17",
+   "Wooden Square 18",
+   "Wooden Square 19",
+   "Wooden Square 2",
+   "Wooden Square 20",
+   "Wooden Square 21",
+   "Wooden Square 22",
+   "Wooden Square 23",
+   "Wooden Square 24",
+   "Wooden Square 25",
+   "Wooden Square 26",
+   "Wooden Square 27",
+   "Wooden Square 28",
+   "Wooden Square 29",
+   "Wooden Square 3",
+   "Wooden Square 30",
+   "Wooden Square 31",
+   "Wooden Square 32",
+   "Wooden Square 33",
+   "Wooden Square 34",
+   "Wooden Square 35",
+   "Wooden Square 36",
+   "Wooden Square 37",
+   "Wooden Square 38",
+   "Wooden Square 39",
+   "Wooden Square 4",
+   "Wooden Square 40",
+   "Wooden Square 41",
+   "Wooden Square 42",
+   "Wooden Square 43",
+   "Wooden Square 44",
+   "Wooden Square 45",
+   "Wooden Square 46",
+   "Wooden Square 47",
+   "Wooden Square 48",
+   "Wooden Square 49",
+   "Wooden Square 5",
+   "Wooden Square 50",
+   "Wooden Square 51",
+   "Wooden Square 52",
+   "Wooden Square 53",
+   "Wooden Square 54",
+   "Wooden Square 55",
+   "Wooden Square 56",
+   "Wooden Square 57",
+   "Wooden Square 58",
+   "Wooden Square 59",
+   "Wooden Square 6",
+   "Wooden Square 60",
+   "Wooden Square 61",
+   "Wooden Square 62",
+   "Wooden Square 63",
+   "Wooden Square 64",
+   "Wooden Square 7",
+   "Wooden Square 8",
+   "Wooden Square 9"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8244571760001236,
+  "valida": true,
+  "validacao_saida": "opção 1 (00-Chessboard): 128 formas\nsem gate declarado (padrões do gate: tolerância 180 mm, penetração 54 mm)\ndivergências (64, da mais grave para a menos):\n  [1] solto: Glass_Square_1 fora do maior grupo conectado\n  [2] solto: Glass_Square_2 fora do maior grupo conectado\n  [3] solto: Glass_Square_3 fora do maior grupo conectado\n  [4] solto: Glass_Square_4 fora do maior grupo conectado\n  [5] solto: Glass_Square_5 fora do maior grupo conectado\n  [6] solto: Glass_Square_6 fora do maior grupo conectado\n  [7] solto: Glass_Square_7 fora do maior grupo conectado\n  [8] solto: Glass_Square_8 fora do m",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": null,
+  "diag_mm": 19697.71560359221,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.5,
+   "pior_nome": "Wooden Square 9",
+   "pior_pct_diag": 0.0025383654128340477,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Glass Square 1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 1 não tem volume"
+   },
+   {
+    "nome": "Glass Square 10",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 10 não tem volume"
+   },
+   {
+    "nome": "Glass Square 11",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 11 não tem volume"
+   },
+   {
+    "nome": "Glass Square 12",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 12 não tem volume"
+   },
+   {
+    "nome": "Glass Square 13",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 13 não tem volume"
+   },
+   {
+    "nome": "Glass Square 14",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 14 não tem volume"
+   },
+   {
+    "nome": "Glass Square 15",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 15 não tem volume"
+   },
+   {
+    "nome": "Glass Square 16",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 16 não tem volume"
+   },
+   {
+    "nome": "Glass Square 17",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 17 não tem volume"
+   },
+   {
+    "nome": "Glass Square 18",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 18 não tem volume"
+   },
+   {
+    "nome": "Glass Square 19",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 19 não tem volume"
+   },
+   {
+    "nome": "Glass Square 2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 2 não tem volume"
+   },
+   {
+    "nome": "Glass Square 20",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 20 não tem volume"
+   },
+   {
+    "nome": "Glass Square 21",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 21 não tem volume"
+   },
+   {
+    "nome": "Glass Square 22",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 22 não tem volume"
+   },
+   {
+    "nome": "Glass Square 23",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 23 não tem volume"
+   },
+   {
+    "nome": "Glass Square 24",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 24 não tem volume"
+   },
+   {
+    "nome": "Glass Square 25",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 25 não tem volume"
+   },
+   {
+    "nome": "Glass Square 26",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 26 não tem volume"
+   },
+   {
+    "nome": "Glass Square 27",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 27 não tem volume"
+   },
+   {
+    "nome": "Glass Square 28",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 28 não tem volume"
+   },
+   {
+    "nome": "Glass Square 29",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 29 não tem volume"
+   },
+   {
+    "nome": "Glass Square 3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 3 não tem volume"
+   },
+   {
+    "nome": "Glass Square 30",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 30 não tem volume"
+   },
+   {
+    "nome": "Glass Square 31",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 31 não tem volume"
+   },
+   {
+    "nome": "Glass Square 32",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 32 não tem volume"
+   },
+   {
+    "nome": "Glass Square 33",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 33 não tem volume"
+   },
+   {
+    "nome": "Glass Square 34",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 34 não tem volume"
+   },
+   {
+    "nome": "Glass Square 35",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 35 não tem volume"
+   },
+   {
+    "nome": "Glass Square 36",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 36 não tem volume"
+   },
+   {
+    "nome": "Glass Square 37",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 37 não tem volume"
+   },
+   {
+    "nome": "Glass Square 38",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 38 não tem volume"
+   },
+   {
+    "nome": "Glass Square 39",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 39 não tem volume"
+   },
+   {
+    "nome": "Glass Square 4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 4 não tem volume"
+   },
+   {
+    "nome": "Glass Square 40",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 40 não tem volume"
+   },
+   {
+    "nome": "Glass Square 41",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 41 não tem volume"
+   },
+   {
+    "nome": "Glass Square 42",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 42 não tem volume"
+   },
+   {
+    "nome": "Glass Square 43",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 43 não tem volume"
+   },
+   {
+    "nome": "Glass Square 44",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 44 não tem volume"
+   },
+   {
+    "nome": "Glass Square 45",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 45 não tem volume"
+   },
+   {
+    "nome": "Glass Square 46",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 46 não tem volume"
+   },
+   {
+    "nome": "Glass Square 47",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 47 não tem volume"
+   },
+   {
+    "nome": "Glass Square 48",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 48 não tem volume"
+   },
+   {
+    "nome": "Glass Square 49",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 49 não tem volume"
+   },
+   {
+    "nome": "Glass Square 5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 5 não tem volume"
+   },
+   {
+    "nome": "Glass Square 50",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 50 não tem volume"
+   },
+   {
+    "nome": "Glass Square 51",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 51 não tem volume"
+   },
+   {
+    "nome": "Glass Square 52",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 52 não tem volume"
+   },
+   {
+    "nome": "Glass Square 53",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 53 não tem volume"
+   },
+   {
+    "nome": "Glass Square 54",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 54 não tem volume"
+   },
+   {
+    "nome": "Glass Square 55",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 55 não tem volume"
+   },
+   {
+    "nome": "Glass Square 56",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 56 não tem volume"
+   },
+   {
+    "nome": "Glass Square 57",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 57 não tem volume"
+   },
+   {
+    "nome": "Glass Square 58",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 58 não tem volume"
+   },
+   {
+    "nome": "Glass Square 59",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 59 não tem volume"
+   },
+   {
+    "nome": "Glass Square 6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 6 não tem volume"
+   },
+   {
+    "nome": "Glass Square 60",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 60 não tem volume"
+   },
+   {
+    "nome": "Glass Square 61",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 61 não tem volume"
+   },
+   {
+    "nome": "Glass Square 62",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 62 não tem volume"
+   },
+   {
+    "nome": "Glass Square 63",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 63 não tem volume"
+   },
+   {
+    "nome": "Glass Square 64",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 64 não tem volume"
+   },
+   {
+    "nome": "Glass Square 7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 7 não tem volume"
+   },
+   {
+    "nome": "Glass Square 8",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 8 não tem volume"
+   },
+   {
+    "nome": "Glass Square 9",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Glass Square 9 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 1 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 10",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 10 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 11",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 11 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 12",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 12 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 13",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 13 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 14",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 14 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 15",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 15 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 16",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 16 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 17",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 17 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 18",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 18 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 19",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 19 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 2 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 20",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 20 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 21",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 21 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 22",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 22 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 23",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 23 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 24",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 24 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 25",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 25 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 26",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 26 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 27",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 27 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 28",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 28 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 29",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 29 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 3 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 30",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 30 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 31",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 31 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 32",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 32 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 33",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 33 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 34",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 34 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 35",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 35 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 36",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 36 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 37",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 37 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 38",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 38 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 39",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 39 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 4 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 40",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 40 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 41",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 41 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 42",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 42 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 43",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 43 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 44",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 44 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 45",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 45 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 46",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 46 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 47",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 47 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 48",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 48 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 49",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 49 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 5 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 50",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 50 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 51",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 51 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 52",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 52 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 53",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 53 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 54",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 54 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 55",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 55 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 56",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 56 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 57",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 57 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 58",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 58 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 59",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 59 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 6 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 60",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 60 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 61",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 61 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 62",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 62 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 63",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 63 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 64",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 64 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 7 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 8",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 8 não tem volume"
+   },
+   {
+    "nome": "Wooden Square 9",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Wooden Square 9 não tem volume"
+   }
+  ],
+  "iou_partes": null,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 1,
+  "id": "005e8c0c-6971-46e1-a059-6f2745cf5ce0",
+  "nome": "Transformer",
+  "categoria": "Articles for the care and handling of animals",
+  "t_traducao_s": 0.0015866039998400083,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Primary Winding\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 24,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.6, minor_radius=0.1, location=(0, -0.6, 0))"
+   },
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Secondary Winding\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 31,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.6, minor_radius=0.1, location=(0, 0.6, 0))"
+   }
+  ],
+  "avisos": [],
+  "formas": 5,
+  "cortadores": 0,
+  "nomes": [
+   "Core",
+   "Primary Terminal 1",
+   "Primary Terminal 2",
+   "Secondary Terminal 1",
+   "Secondary Terminal 2"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/01.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8671394520001741,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0237,
+  "verdade_n": 7,
+  "verdade_nomes": [
+   "Core",
+   "Primary Terminal 1",
+   "Primary Terminal 2",
+   "Primary Winding",
+   "Secondary Terminal 1",
+   "Secondary Terminal 2",
+   "Secondary Winding"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7915700779999497,
+  "valida": true,
+  "validacao_saida": "opção 1 (01-Transformer): 5 formas\nsem gate declarado (padrões do gate: tolerância 17 mm, penetração 5,1 mm)\ndivergências (4, da mais grave para a menos):\n  [1] solto: Primary_Terminal_1 fora do maior grupo conectado\n  [2] solto: Primary_Terminal_2 fora do maior grupo conectado\n  [3] solto: Secondary_Terminal_1 fora do maior grupo conectado\n  [4] solto: Secondary_Terminal_2 fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9999009384981983,
+  "diag_mm": 2664.5848307042806,
+  "c_detalhe": {
+   "sem_par": [
+    "Primary Winding",
+    "Secondary Winding"
+   ],
+   "n_sem_par": 2,
+   "pior_mm": 0.0,
+   "pior_nome": "Secondary Terminal 2",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Primary Winding",
+    "motivo": "sem forma de mesmo nome"
+   },
+   {
+    "nome": "Secondary Winding",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 5,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 2,
+  "id": "00886aa3-212b-4936-9630-963450743aa3",
+  "nome": "Dog Leash vs. Cat Leash",
+  "categoria": "Articles for the care and handling of animals",
+  "t_traducao_s": 0.0013067410000076052,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Handle Loop\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 20,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.1, minor_radius=0.02, location=(-1, 0, 2))"
+   },
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Handle Loop.001\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 44,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.05, minor_radius=0.01, location=(1, 0, 1))"
+   }
+  ],
+  "avisos": [],
+  "formas": 6,
+  "cortadores": 0,
+  "nomes": [
+   "Dog Leash",
+   "Clip Base",
+   "Clip Arm",
+   "Cat Leash",
+   "Clip Base.001",
+   "Clip Arm.001"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/02.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6527502489998369,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0161,
+  "verdade_n": 8,
+  "verdade_nomes": [
+   "Cat Leash",
+   "Clip Arm",
+   "Clip Arm.001",
+   "Clip Base",
+   "Clip Base.001",
+   "Dog Leash",
+   "Handle Loop",
+   "Handle Loop.001"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.780575497999962,
+  "valida": true,
+  "validacao_saida": "opção 1 (02-Dog Leash vs. Cat Leash): 6 formas\nsem gate declarado (padrões do gate: tolerância 22 mm, penetração 6,6 mm)\ndivergências (7, da mais grave para a menos):\n  [1] solto: Cat_Leash fora do maior grupo conectado\n  [2] solto: Clip_Base_001 fora do maior grupo conectado\n  [3] solto: Clip_Arm_001 fora do maior grupo conectado\n  [4] atravessa: Dog_Leash e Clip_Base se atravessam 50 mm\n  [5] atravessa: Clip_Base e Clip_Arm se atravessam 50 mm\n  [6] atravessa: Cat_Leash e Clip_Base_001 se atravessam 25 mm\n  [7] atravessa: Clip_Base_001 e Clip_Arm_001 se atravessam 25 mm\ndetalhe de uma forma:",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9956265052958022,
+  "diag_mm": 3120.6409598029695,
+  "c_detalhe": {
+   "sem_par": [
+    "Handle Loop",
+    "Handle Loop.001"
+   ],
+   "n_sem_par": 2,
+   "pior_mm": 0.0,
+   "pior_nome": "Dog Leash",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Handle Loop",
+    "motivo": "sem forma de mesmo nome"
+   },
+   {
+    "nome": "Handle Loop.001",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 6,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 3,
+  "id": "008e0822-e1fb-488d-9e2c-7622064feb6f",
+  "nome": "Microscope Slide",
+  "categoria": "Articles for the care and handling of animals",
+  "t_traducao_s": 0.0006300680001913861,
+  "recusas": [],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Microscope Slide"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/03.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.645781437000096,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0017,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Microscope Slide"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7045318899999984,
+  "valida": true,
+  "validacao_saida": "opção 1 (03-Microscope Slide): 1 formas\nsem gate declarado (padrões do gate: tolerância 50 mm, penetração 15 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 5386.093203798093,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Microscope Slide",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 4,
+  "id": "00836f7f-bcaa-4a9b-ada8-89978614d494",
+  "nome": "Office Layout",
+  "categoria": "Articles of clothing and haberdashery",
+  "t_traducao_s": 0.0017102660003729397,
+  "recusas": [],
+  "avisos": [],
+  "formas": 10,
+  "cortadores": 0,
+  "nomes": [
+   "Cube",
+   "Cube.001",
+   "Cube.002",
+   "Cylinder",
+   "Cube.003",
+   "Cube.004",
+   "Cube.005",
+   "Cube.006",
+   "Cube.007",
+   "Cube.008"
+  ],
+  "nomes_padrao": 10,
+  "nao_malha": 0,
+  "esboco": "traduzidos/04.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8447575800000777,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0158,
+  "verdade_n": 10,
+  "verdade_nomes": [
+   "Cube",
+   "Cube.001",
+   "Cube.002",
+   "Cube.003",
+   "Cube.004",
+   "Cube.005",
+   "Cube.006",
+   "Cube.007",
+   "Cube.008",
+   "Cylinder"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6246169710002505,
+  "valida": true,
+  "validacao_saida": "opção 1 (04-Office Layout): 10 formas\nsem gate declarado (padrões do gate: tolerância 74,5 mm, penetração 22,4 mm)\ndivergências (9, da mais grave para a menos):\n  [1] solto: Cube_001 fora do maior grupo conectado\n  [2] solto: Cube_002 fora do maior grupo conectado\n  [3] solto: Cylinder fora do maior grupo conectado\n  [4] solto: Cube_003 fora do maior grupo conectado\n  [5] solto: Cube_004 fora do maior grupo conectado\n  [6] solto: Cube_005 fora do maior grupo conectado\n  [7] solto: Cube_006 fora do maior grupo conectado\n  [8] solto: Cube_007 fora do maior grupo conectado\n  [9] solto: Cube_008 f",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9992598916869483,
+  "diag_mm": 9159.182469522048,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.00010000000020227162,
+   "pior_nome": "Cube.004",
+   "pior_pct_diag": 1.0918005022285566e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 10,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 5,
+  "id": "0108cd4f-c5cf-420b-a0b0-e0fb81a504ce",
+  "nome": "Sushi Roll",
+  "categoria": "Articles of clothing and haberdashery",
+  "t_traducao_s": 0.0007328680003411137,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Seaweed",
+   "Rice",
+   "Filling"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/05.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6652271070001916,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0032,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Filling",
+   "Rice",
+   "Seaweed"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.625985098000001,
+  "valida": true,
+  "validacao_saida": "opção 1 (05-Sushi Roll): 3 formas\nsem gate declarado (padrões do gate: tolerância 100 mm, penetração 30 mm)\ndivergências (3, da mais grave para a menos):\n  [1] atravessa: Seaweed e Rice se atravessam 3798,9 mm\n  [2] atravessa: Seaweed e Filling se atravessam 2999,1 mm\n  [3] atravessa: Rice e Filling se atravessam 2799,2 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939859620453044,
+  "diag_mm": 11489.125293076057,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Seaweed",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 6,
+  "id": "017b9ba9-63c2-429b-bdbd-b780db25a57f",
+  "nome": "Winter Hat",
+  "categoria": "Articles of clothing and haberdashery",
+  "t_traducao_s": 0.0006481929999608838,
+  "recusas": [
+   {
+    "tipo": "escala-desigual",
+    "texto": "esfera \"Hat\" com escala desigual (1, 1, 0.75): elipsoide sem forma equivalente",
+    "linha": 16,
+    "codigo": "bpy.ops.mesh.primitive_uv_sphere_add(radius=1, location=(0, 0, 1))"
+   }
+  ],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Pom-Pom"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/06.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7368948959997397,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0165,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Hat",
+   "Pom-Pom"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6357631200003198,
+  "valida": true,
+  "validacao_saida": "opção 1 (06-Winter Hat): 1 formas\nsem gate declarado (padrões do gate: tolerância 4 mm, penetração 1,2 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9928144935949866,
+  "diag_mm": 3435.47551293881,
+  "c_detalhe": {
+   "sem_par": [
+    "Hat"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 0.0002000000000066393,
+   "pior_nome": "Pom-Pom",
+   "pior_pct_diag": 5.821610407449921e-06,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Hat",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 7,
+  "id": "00bbc065-6c9a-40df-b2d2-b44913e60109",
+  "nome": "Modular Shelving Unit",
+  "categoria": "Equipment for production, distribution or transformation of electricity",
+  "t_traducao_s": 0.0017118710002250737,
+  "recusas": [],
+  "avisos": [],
+  "formas": 6,
+  "cortadores": 0,
+  "nomes": [
+   "Shelf 1",
+   "Shelf 2",
+   "Shelf 3",
+   "Shelf 4",
+   "Support 1",
+   "Support 2"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/07.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.702557564000017,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0069,
+  "verdade_n": 6,
+  "verdade_nomes": [
+   "Shelf 1",
+   "Shelf 2",
+   "Shelf 3",
+   "Shelf 4",
+   "Support 1",
+   "Support 2"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.5918749970001045,
+  "valida": true,
+  "validacao_saida": "opção 1 (07-Modular Shelving Unit): 6 formas\nsem gate declarado (padrões do gate: tolerância 40 mm, penetração 12 mm)\ndivergências (8, da mais grave para a menos):\n  [1] atravessa: Shelf_1 e Support_1 se atravessam 50 mm\n  [2] atravessa: Shelf_1 e Support_2 se atravessam 50 mm\n  [3] atravessa: Shelf_2 e Support_1 se atravessam 50 mm\n  [4] atravessa: Shelf_2 e Support_2 se atravessam 50 mm\n  [5] atravessa: Shelf_3 e Support_1 se atravessam 50 mm\n  [6] atravessa: Shelf_3 e Support_2 se atravessam 50 mm\n  [7] atravessa: Shelf_4 e Support_1 se atravessam 50 mm\n  [8] atravessa: Shelf_4 e Support_2 ",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 4545.327270945405,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Support 2",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 6,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 8,
+  "id": "00e45260-a8d3-4280-a09c-dcf607985ae4",
+  "nome": "Motorcycle vs. Scooter",
+  "categoria": "Equipment for production, distribution or transformation of electricity",
+  "t_traducao_s": 0.0020308829998612055,
+  "recusas": [
+   {
+    "tipo": "escala-desigual",
+    "texto": "esfera \"Fuel Tank\" com escala desigual (1, 0.5, 0.5): elipsoide sem forma equivalente",
+    "linha": 25,
+    "codigo": "bpy.ops.mesh.primitive_uv_sphere_add(radius=0.4, location=(0, 2.5, 1.1))"
+   }
+  ],
+  "avisos": [],
+  "formas": 9,
+  "cortadores": 0,
+  "nomes": [
+   "Motorcycle Frame",
+   "Motorcycle Wheel 1",
+   "Motorcycle Wheel 2",
+   "Motorcycle Handlebar",
+   "Scooter Frame",
+   "Scooter Platform",
+   "Scooter Wheel 1",
+   "Scooter Wheel 2",
+   "Scooter Handlebar"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/08.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.750562211000215,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0189,
+  "verdade_n": 10,
+  "verdade_nomes": [
+   "Fuel Tank",
+   "Motorcycle Frame",
+   "Motorcycle Handlebar",
+   "Motorcycle Wheel 1",
+   "Motorcycle Wheel 2",
+   "Scooter Frame",
+   "Scooter Handlebar",
+   "Scooter Platform",
+   "Scooter Wheel 1",
+   "Scooter Wheel 2"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7356699940000908,
+  "valida": true,
+  "validacao_saida": "opção 1 (08-Motorcycle vs. Scooter): 9 formas\nsem gate declarado (padrões do gate: tolerância 56,3 mm, penetração 16,9 mm)\ndivergências (8, da mais grave para a menos):\n  [1] solto: Motorcycle_Frame fora do maior grupo conectado\n  [2] solto: Motorcycle_Wheel_1 fora do maior grupo conectado\n  [3] solto: Motorcycle_Wheel_2 fora do maior grupo conectado\n  [4] solto: Motorcycle_Handlebar fora do maior grupo conectado\n  [5] atravessa: Motorcycle_Frame e Motorcycle_Wheel_1 se atravessam 37,5 mm\n  [6] atravessa: Motorcycle_Frame e Motorcycle_Wheel_2 se atravessam 37,5 mm\n  [7] atravessa: Scooter_Plat",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9986331948454895,
+  "diag_mm": 5876.27640091924,
+  "c_detalhe": {
+   "sem_par": [
+    "Fuel Tank"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 9.999999997489795e-05,
+   "pior_nome": "Motorcycle Handlebar",
+   "pior_pct_diag": 1.7017579356759786e-06,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Fuel Tank",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 9,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 9,
+  "id": "00f79e7f-7284-4fce-a7e1-2a6b38ca9ab1",
+  "nome": "Wallpaper Pattern",
+  "categoria": "Equipment for production, distribution or transformation of electricity",
+  "t_traducao_s": 0.002623762999974133,
+  "recusas": [],
+  "avisos": [],
+  "formas": 25,
+  "cortadores": 0,
+  "nomes": [
+   "Cube",
+   "Cube.001",
+   "Cube.002",
+   "Cube.003",
+   "Cube.004",
+   "Cube.005",
+   "Cube.006",
+   "Cube.007",
+   "Cube.008",
+   "Cube.009",
+   "Cube.010",
+   "Cube.011",
+   "Cube.012",
+   "Cube.013",
+   "Cube.014",
+   "Cube.015",
+   "Cube.016",
+   "Cube.017",
+   "Cube.018",
+   "Cube.019",
+   "Cube.020",
+   "Cube.021",
+   "Cube.022",
+   "Cube.023",
+   "Cube.024"
+  ],
+  "nomes_padrao": 25,
+  "nao_malha": 0,
+  "esboco": "traduzidos/09.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7117172329999448,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0432,
+  "verdade_n": 25,
+  "verdade_nomes": [
+   "Cube",
+   "Cube.001",
+   "Cube.002",
+   "Cube.003",
+   "Cube.004",
+   "Cube.005",
+   "Cube.006",
+   "Cube.007",
+   "Cube.008",
+   "Cube.009",
+   "Cube.010",
+   "Cube.011",
+   "Cube.012",
+   "Cube.013",
+   "Cube.014",
+   "Cube.015",
+   "Cube.016",
+   "Cube.017",
+   "Cube.018",
+   "Cube.019",
+   "Cube.020",
+   "Cube.021",
+   "Cube.022",
+   "Cube.023",
+   "Cube.024"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6300131600000896,
+  "valida": true,
+  "validacao_saida": "opção 1 (09-Wallpaper Pattern): 25 formas\nsem gate declarado (padrões do gate: tolerância 45 mm, penetração 13,5 mm)\ndivergências (24, da mais grave para a menos):\n  [1] solto: Cube_001 fora do maior grupo conectado\n  [2] solto: Cube_002 fora do maior grupo conectado\n  [3] solto: Cube_003 fora do maior grupo conectado\n  [4] solto: Cube_004 fora do maior grupo conectado\n  [5] solto: Cube_005 fora do maior grupo conectado\n  [6] solto: Cube_006 fora do maior grupo conectado\n  [7] solto: Cube_007 fora do maior grupo conectado\n  [8] solto: Cube_008 fora do maior grupo conectado\n  [9] solto: Cube_00",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 6383.572667401852,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Cube.024",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 25,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 10,
+  "id": "0169f6ea-6810-4d5e-8f24-ee24e93daef5",
+  "nome": "Eraser",
+  "categoria": "Equipment for production, distribution or transformation of electricity",
+  "t_traducao_s": 0.000644652999653772,
+  "recusas": [
+   {
+    "tipo": "modo-de-edicao",
+    "texto": "bpy.ops.mesh.select_all (operador de malha/curva)",
+    "linha": 21,
+    "codigo": "bpy.ops.mesh.select_all(action='SELECT')"
+   },
+   {
+    "tipo": "modo-de-edicao",
+    "texto": "bpy.ops.mesh.bevel (operador de malha/curva)",
+    "linha": 22,
+    "codigo": "bpy.ops.mesh.bevel(offset=0.1, segments=5, profile=0.5)"
+   }
+  ],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Eraser Body"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/10.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8127520959997128,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.004,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Eraser Body"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6824743280003531,
+  "valida": true,
+  "validacao_saida": "opção 1 (10-Eraser): 1 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9933589781390011,
+  "diag_mm": 2291.28784747792,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Eraser Body",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 11,
+  "id": "00293020-f12a-44ae-bad1-02b5a93d6f71",
+  "nome": "Pet Feeder",
+  "categoria": "Foodstuffs",
+  "t_traducao_s": 0.0006930500003363704,
+  "recusas": [],
+  "avisos": [],
+  "formas": 2,
+  "cortadores": 1,
+  "nomes": [
+   "Bowl Outer",
+   "Food Container"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/11.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7919966100002966,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0524,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Bowl Outer",
+   "Food Container"
+  ],
+  "pais": [],
+  "t_validacao_s": 1.0960909290001837,
+  "valida": true,
+  "validacao_saida": "opção 1 (11-Pet Feeder): 2 formas, 1 cortador (molde de recorte)\nsem gate declarado (padrões do gate: tolerância 22,5 mm, penetração 6,8 mm)\ndivergências (1, da mais grave para a menos):\n  [1] solto: Food_Container fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9905716084925903,
+  "diag_mm": 3614.20807370024,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Food Container",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 2,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 12,
+  "id": "00297c4d-d7fa-4796-a1eb-d76e9ea25c08",
+  "nome": "Keychain",
+  "categoria": "Foodstuffs",
+  "t_traducao_s": 0.0004554889997052669,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Ring\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 9,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.5, minor_radius=0.05, location=(0, 0, 0))"
+   }
+  ],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Fob"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/12.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.644943518999753,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0049,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Fob",
+   "Ring"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.5801013620002777,
+  "valida": true,
+  "validacao_saida": "opção 1 (12-Keychain): 1 formas\nsem gate declarado (padrões do gate: tolerância 4 mm, penetração 1,2 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 1,
+  "diag_mm": 1942.292459955503,
+  "c_detalhe": {
+   "sem_par": [
+    "Ring"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 0.0,
+   "pior_nome": "Fob",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Ring",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 13,
+  "id": "0055f6af-9b03-418c-a73a-0b38f52a8bb0",
+  "nome": "Pet Feeder",
+  "categoria": "Foodstuffs",
+  "t_traducao_s": 0.001126520000070741,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Bowl",
+   "Compartment",
+   "Dispenser"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/13.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6419989420001002,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.057,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Bowl",
+   "Compartment",
+   "Dispenser"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7315412540001489,
+  "valida": true,
+  "validacao_saida": "opção 1 (13-Pet Feeder): 3 formas\nsem gate declarado (padrões do gate: tolerância 30 mm, penetração 9 mm)\ndivergências (2, da mais grave para a menos):\n  [1] atravessa: Bowl e Compartment se atravessam 750 mm\n  [2] atravessa: Compartment e Dispenser se atravessam 950 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9987724032000733,
+  "diag_mm": 4123.105625617661,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Dispenser",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 14,
+  "id": "006fff9f-a32b-4334-a628-d37e273d5d2d",
+  "nome": "Chessboard",
+  "categoria": "Furnishing",
+  "t_traducao_s": 0.006120679000105156,
+  "recusas": [],
+  "avisos": [],
+  "formas": 64,
+  "cortadores": 0,
+  "nomes": [
+   "Square_0_0",
+   "Square_0_1",
+   "Square_0_2",
+   "Square_0_3",
+   "Square_0_4",
+   "Square_0_5",
+   "Square_0_6",
+   "Square_0_7",
+   "Square_1_0",
+   "Square_1_1",
+   "Square_1_2",
+   "Square_1_3",
+   "Square_1_4",
+   "Square_1_5",
+   "Square_1_6",
+   "Square_1_7",
+   "Square_2_0",
+   "Square_2_1",
+   "Square_2_2",
+   "Square_2_3",
+   "Square_2_4",
+   "Square_2_5",
+   "Square_2_6",
+   "Square_2_7",
+   "Square_3_0",
+   "Square_3_1",
+   "Square_3_2",
+   "Square_3_3",
+   "Square_3_4",
+   "Square_3_5",
+   "Square_3_6",
+   "Square_3_7",
+   "Square_4_0",
+   "Square_4_1",
+   "Square_4_2",
+   "Square_4_3",
+   "Square_4_4",
+   "Square_4_5",
+   "Square_4_6",
+   "Square_4_7",
+   "Square_5_0",
+   "Square_5_1",
+   "Square_5_2",
+   "Square_5_3",
+   "Square_5_4",
+   "Square_5_5",
+   "Square_5_6",
+   "Square_5_7",
+   "Square_6_0",
+   "Square_6_1",
+   "Square_6_2",
+   "Square_6_3",
+   "Square_6_4",
+   "Square_6_5",
+   "Square_6_6",
+   "Square_6_7",
+   "Square_7_0",
+   "Square_7_1",
+   "Square_7_2",
+   "Square_7_3",
+   "Square_7_4",
+   "Square_7_5",
+   "Square_7_6",
+   "Square_7_7"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/14.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8010762210001303,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.195,
+  "verdade_n": 64,
+  "verdade_nomes": [
+   "Square_0_0",
+   "Square_0_1",
+   "Square_0_2",
+   "Square_0_3",
+   "Square_0_4",
+   "Square_0_5",
+   "Square_0_6",
+   "Square_0_7",
+   "Square_1_0",
+   "Square_1_1",
+   "Square_1_2",
+   "Square_1_3",
+   "Square_1_4",
+   "Square_1_5",
+   "Square_1_6",
+   "Square_1_7",
+   "Square_2_0",
+   "Square_2_1",
+   "Square_2_2",
+   "Square_2_3",
+   "Square_2_4",
+   "Square_2_5",
+   "Square_2_6",
+   "Square_2_7",
+   "Square_3_0",
+   "Square_3_1",
+   "Square_3_2",
+   "Square_3_3",
+   "Square_3_4",
+   "Square_3_5",
+   "Square_3_6",
+   "Square_3_7",
+   "Square_4_0",
+   "Square_4_1",
+   "Square_4_2",
+   "Square_4_3",
+   "Square_4_4",
+   "Square_4_5",
+   "Square_4_6",
+   "Square_4_7",
+   "Square_5_0",
+   "Square_5_1",
+   "Square_5_2",
+   "Square_5_3",
+   "Square_5_4",
+   "Square_5_5",
+   "Square_5_6",
+   "Square_5_7",
+   "Square_6_0",
+   "Square_6_1",
+   "Square_6_2",
+   "Square_6_3",
+   "Square_6_4",
+   "Square_6_5",
+   "Square_6_6",
+   "Square_6_7",
+   "Square_7_0",
+   "Square_7_1",
+   "Square_7_2",
+   "Square_7_3",
+   "Square_7_4",
+   "Square_7_5",
+   "Square_7_6",
+   "Square_7_7"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8119653159997142,
+  "valida": true,
+  "validacao_saida": "opção 1 (14-Chessboard): 64 formas\nsem gate declarado (padrões do gate: tolerância 80 mm, penetração 24 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": null,
+  "diag_mm": 11313.70849898476,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.5,
+   "pior_nome": "Square_7_7",
+   "pior_pct_diag": 0.004419417382415922,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Square_0_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_0 não tem volume"
+   },
+   {
+    "nome": "Square_0_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_1 não tem volume"
+   },
+   {
+    "nome": "Square_0_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_2 não tem volume"
+   },
+   {
+    "nome": "Square_0_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_3 não tem volume"
+   },
+   {
+    "nome": "Square_0_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_4 não tem volume"
+   },
+   {
+    "nome": "Square_0_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_5 não tem volume"
+   },
+   {
+    "nome": "Square_0_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_6 não tem volume"
+   },
+   {
+    "nome": "Square_0_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_0_7 não tem volume"
+   },
+   {
+    "nome": "Square_1_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_0 não tem volume"
+   },
+   {
+    "nome": "Square_1_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_1 não tem volume"
+   },
+   {
+    "nome": "Square_1_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_2 não tem volume"
+   },
+   {
+    "nome": "Square_1_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_3 não tem volume"
+   },
+   {
+    "nome": "Square_1_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_4 não tem volume"
+   },
+   {
+    "nome": "Square_1_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_5 não tem volume"
+   },
+   {
+    "nome": "Square_1_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_6 não tem volume"
+   },
+   {
+    "nome": "Square_1_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_1_7 não tem volume"
+   },
+   {
+    "nome": "Square_2_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_0 não tem volume"
+   },
+   {
+    "nome": "Square_2_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_1 não tem volume"
+   },
+   {
+    "nome": "Square_2_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_2 não tem volume"
+   },
+   {
+    "nome": "Square_2_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_3 não tem volume"
+   },
+   {
+    "nome": "Square_2_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_4 não tem volume"
+   },
+   {
+    "nome": "Square_2_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_5 não tem volume"
+   },
+   {
+    "nome": "Square_2_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_6 não tem volume"
+   },
+   {
+    "nome": "Square_2_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_2_7 não tem volume"
+   },
+   {
+    "nome": "Square_3_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_0 não tem volume"
+   },
+   {
+    "nome": "Square_3_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_1 não tem volume"
+   },
+   {
+    "nome": "Square_3_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_2 não tem volume"
+   },
+   {
+    "nome": "Square_3_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_3 não tem volume"
+   },
+   {
+    "nome": "Square_3_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_4 não tem volume"
+   },
+   {
+    "nome": "Square_3_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_5 não tem volume"
+   },
+   {
+    "nome": "Square_3_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_6 não tem volume"
+   },
+   {
+    "nome": "Square_3_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_3_7 não tem volume"
+   },
+   {
+    "nome": "Square_4_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_0 não tem volume"
+   },
+   {
+    "nome": "Square_4_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_1 não tem volume"
+   },
+   {
+    "nome": "Square_4_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_2 não tem volume"
+   },
+   {
+    "nome": "Square_4_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_3 não tem volume"
+   },
+   {
+    "nome": "Square_4_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_4 não tem volume"
+   },
+   {
+    "nome": "Square_4_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_5 não tem volume"
+   },
+   {
+    "nome": "Square_4_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_6 não tem volume"
+   },
+   {
+    "nome": "Square_4_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_4_7 não tem volume"
+   },
+   {
+    "nome": "Square_5_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_0 não tem volume"
+   },
+   {
+    "nome": "Square_5_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_1 não tem volume"
+   },
+   {
+    "nome": "Square_5_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_2 não tem volume"
+   },
+   {
+    "nome": "Square_5_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_3 não tem volume"
+   },
+   {
+    "nome": "Square_5_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_4 não tem volume"
+   },
+   {
+    "nome": "Square_5_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_5 não tem volume"
+   },
+   {
+    "nome": "Square_5_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_6 não tem volume"
+   },
+   {
+    "nome": "Square_5_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_5_7 não tem volume"
+   },
+   {
+    "nome": "Square_6_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_0 não tem volume"
+   },
+   {
+    "nome": "Square_6_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_1 não tem volume"
+   },
+   {
+    "nome": "Square_6_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_2 não tem volume"
+   },
+   {
+    "nome": "Square_6_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_3 não tem volume"
+   },
+   {
+    "nome": "Square_6_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_4 não tem volume"
+   },
+   {
+    "nome": "Square_6_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_5 não tem volume"
+   },
+   {
+    "nome": "Square_6_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_6 não tem volume"
+   },
+   {
+    "nome": "Square_6_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_6_7 não tem volume"
+   },
+   {
+    "nome": "Square_7_0",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_0 não tem volume"
+   },
+   {
+    "nome": "Square_7_1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_1 não tem volume"
+   },
+   {
+    "nome": "Square_7_2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_2 não tem volume"
+   },
+   {
+    "nome": "Square_7_3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_3 não tem volume"
+   },
+   {
+    "nome": "Square_7_4",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_4 não tem volume"
+   },
+   {
+    "nome": "Square_7_5",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_5 não tem volume"
+   },
+   {
+    "nome": "Square_7_6",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_6 não tem volume"
+   },
+   {
+    "nome": "Square_7_7",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square_7_7 não tem volume"
+   }
+  ],
+  "iou_partes": null,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 15,
+  "id": "024c39b1-cd2a-41a6-94a2-cd3b51b479da",
+  "nome": "Wall Art",
+  "categoria": "Furnishing",
+  "t_traducao_s": 0.00107693499967354,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "primitive_circle_add",
+    "linha": 24,
+    "codigo": "bpy.ops.mesh.primitive_circle_add(radius=0.3, location=(i * 0.7 - 0.7, 0, 0.01))"
+   }
+  ],
+  "avisos": [],
+  "formas": 4,
+  "cortadores": 0,
+  "nomes": [
+   "Base Plane",
+   "Square 1",
+   "Square 2",
+   "Square 3"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 3,
+  "esboco": "traduzidos/15.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6287061170000925,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0068,
+  "verdade_n": 7,
+  "verdade_nomes": [
+   "Base Plane",
+   "Circle 1",
+   "Circle 2",
+   "Circle 3",
+   "Square 1",
+   "Square 2",
+   "Square 3"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6790405379997537,
+  "valida": true,
+  "validacao_saida": "opção 1 (15-Wall Art): 4 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": null,
+  "diag_mm": 2828.4448023604773,
+  "c_detalhe": {
+   "sem_par": [
+    "Circle 1",
+    "Circle 2",
+    "Circle 3"
+   ],
+   "n_sem_par": 3,
+   "pior_mm": 0.5,
+   "pior_nome": "Square 3",
+   "pior_pct_diag": 0.01767755904526492,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Base Plane",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Base Plane não tem volume"
+   },
+   {
+    "nome": "Circle 1",
+    "motivo": "sem forma de mesmo nome"
+   },
+   {
+    "nome": "Circle 2",
+    "motivo": "sem forma de mesmo nome"
+   },
+   {
+    "nome": "Circle 3",
+    "motivo": "sem forma de mesmo nome"
+   },
+   {
+    "nome": "Square 1",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square 1 não forma um sólido fechado e orientado (Manifold: "
+   },
+   {
+    "nome": "Square 2",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square 2 não forma um sólido fechado e orientado (Manifold: "
+   },
+   {
+    "nome": "Square 3",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Square 3 não forma um sólido fechado e orientado (Manifold: "
+   }
+  ],
+  "iou_partes": null,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 16,
+  "id": "02729edf-0b86-4fe1-a035-f13b326bf7ab",
+  "nome": "Bookshelf",
+  "categoria": "Furnishing",
+  "t_traducao_s": 0.011169323999638436,
+  "recusas": [],
+  "avisos": [],
+  "formas": 59,
+  "cortadores": 0,
+  "nomes": [
+   "Tall Shelf Side 1",
+   "Tall Shelf Side 2",
+   "Tall Shelf 1",
+   "Tall Shelf 2",
+   "Tall Shelf 3",
+   "Tall Shelf 4",
+   "Tall Shelf 5",
+   "Tall Shelf Book 1-1",
+   "Tall Shelf Book 1-2",
+   "Tall Shelf Book 1-3",
+   "Tall Shelf Book 2-1",
+   "Tall Shelf Book 2-2",
+   "Tall Shelf Book 2-3",
+   "Tall Shelf Book 3-1",
+   "Tall Shelf Book 3-2",
+   "Tall Shelf Book 3-3",
+   "Tall Shelf Book 4-1",
+   "Tall Shelf Book 4-2",
+   "Tall Shelf Book 4-3",
+   "Tall Shelf Book 5-1",
+   "Tall Shelf Book 5-2",
+   "Tall Shelf Book 5-3",
+   "Short Shelf Side 1",
+   "Short Shelf Side 2",
+   "Short Shelf 1",
+   "Short Shelf 2",
+   "Short Shelf 3",
+   "Short Shelf 4",
+   "Short Shelf 5",
+   "Short Shelf Book 1-1",
+   "Short Shelf Book 1-2",
+   "Short Shelf Book 1-3",
+   "Short Shelf Book 1-4",
+   "Short Shelf Book 1-5",
+   "Short Shelf Book 1-6",
+   "Short Shelf Book 2-1",
+   "Short Shelf Book 2-2",
+   "Short Shelf Book 2-3",
+   "Short Shelf Book 2-4",
+   "Short Shelf Book 2-5",
+   "Short Shelf Book 2-6",
+   "Short Shelf Book 3-1",
+   "Short Shelf Book 3-2",
+   "Short Shelf Book 3-3",
+   "Short Shelf Book 3-4",
+   "Short Shelf Book 3-5",
+   "Short Shelf Book 3-6",
+   "Short Shelf Book 4-1",
+   "Short Shelf Book 4-2",
+   "Short Shelf Book 4-3",
+   "Short Shelf Book 4-4",
+   "Short Shelf Book 4-5",
+   "Short Shelf Book 4-6",
+   "Short Shelf Book 5-1",
+   "Short Shelf Book 5-2",
+   "Short Shelf Book 5-3",
+   "Short Shelf Book 5-4",
+   "Short Shelf Book 5-5",
+   "Short Shelf Book 5-6"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/16.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.9078023590000157,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.1787,
+  "verdade_n": 59,
+  "verdade_nomes": [
+   "Short Shelf 1",
+   "Short Shelf 2",
+   "Short Shelf 3",
+   "Short Shelf 4",
+   "Short Shelf 5",
+   "Short Shelf Book 1-1",
+   "Short Shelf Book 1-2",
+   "Short Shelf Book 1-3",
+   "Short Shelf Book 1-4",
+   "Short Shelf Book 1-5",
+   "Short Shelf Book 1-6",
+   "Short Shelf Book 2-1",
+   "Short Shelf Book 2-2",
+   "Short Shelf Book 2-3",
+   "Short Shelf Book 2-4",
+   "Short Shelf Book 2-5",
+   "Short Shelf Book 2-6",
+   "Short Shelf Book 3-1",
+   "Short Shelf Book 3-2",
+   "Short Shelf Book 3-3",
+   "Short Shelf Book 3-4",
+   "Short Shelf Book 3-5",
+   "Short Shelf Book 3-6",
+   "Short Shelf Book 4-1",
+   "Short Shelf Book 4-2",
+   "Short Shelf Book 4-3",
+   "Short Shelf Book 4-4",
+   "Short Shelf Book 4-5",
+   "Short Shelf Book 4-6",
+   "Short Shelf Book 5-1",
+   "Short Shelf Book 5-2",
+   "Short Shelf Book 5-3",
+   "Short Shelf Book 5-4",
+   "Short Shelf Book 5-5",
+   "Short Shelf Book 5-6",
+   "Short Shelf Side 1",
+   "Short Shelf Side 2",
+   "Tall Shelf 1",
+   "Tall Shelf 2",
+   "Tall Shelf 3",
+   "Tall Shelf 4",
+   "Tall Shelf 5",
+   "Tall Shelf Book 1-1",
+   "Tall Shelf Book 1-2",
+   "Tall Shelf Book 1-3",
+   "Tall Shelf Book 2-1",
+   "Tall Shelf Book 2-2",
+   "Tall Shelf Book 2-3",
+   "Tall Shelf Book 3-1",
+   "Tall Shelf Book 3-2",
+   "Tall Shelf Book 3-3",
+   "Tall Shelf Book 4-1",
+   "Tall Shelf Book 4-2",
+   "Tall Shelf Book 4-3",
+   "Tall Shelf Book 5-1",
+   "Tall Shelf Book 5-2",
+   "Tall Shelf Book 5-3",
+   "Tall Shelf Side 1",
+   "Tall Shelf Side 2"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8168044419999205,
+  "valida": true,
+  "validacao_saida": "opção 1 (16-Bookshelf): 59 formas\nsem gate declarado (padrões do gate: tolerância 30,5 mm, penetração 9,2 mm)\ndivergências (59, da mais grave para a menos):\n  [1] solto: Tall_Shelf_Side_1 fora do maior grupo conectado\n  [2] solto: Tall_Shelf_Side_2 fora do maior grupo conectado\n  [3] solto: Tall_Shelf_1 fora do maior grupo conectado\n  [4] solto: Tall_Shelf_2 fora do maior grupo conectado\n  [5] solto: Tall_Shelf_3 fora do maior grupo conectado\n  [6] solto: Tall_Shelf_4 fora do maior grupo conectado\n  [7] solto: Tall_Shelf_5 fora do maior grupo conectado\n  [8] solto: Tall_Shelf_Book_1_1 fora do ",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 3892.621224830384,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 9.999999997489795e-05,
+   "pior_nome": "Short Shelf Book 4-6",
+   "pior_pct_diag": 2.5689630251465146e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 59,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 17,
+  "id": "02e2de17-8aac-440f-9a23-97cbe9e96bf5",
+  "nome": "Bird Feeder",
+  "categoria": "Furnishing",
+  "t_traducao_s": 0.0017425910000383737,
+  "recusas": [],
+  "avisos": [],
+  "formas": 8,
+  "cortadores": 0,
+  "nomes": [
+   "Base",
+   "Container",
+   "Roof",
+   "Perch 1",
+   "Perch 2",
+   "Perch 3",
+   "Perch 4",
+   "Hook"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/17.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7941729010003655,
+  "bpy_erro": null,
+  "bpy_erro_original": "NameError: name 'math' is not defined",
+  "preambulo": true,
+  "t_bpy_exec_s": 0.0112,
+  "verdade_n": 8,
+  "verdade_nomes": [
+   "Base",
+   "Container",
+   "Hook",
+   "Perch 1",
+   "Perch 2",
+   "Perch 3",
+   "Perch 4",
+   "Roof"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.932600008999998,
+  "valida": true,
+  "validacao_saida": "opção 1 (17-Bird Feeder): 8 formas\nsem gate declarado (padrões do gate: tolerância 12 mm, penetração 3,6 mm)\ndivergências (7, da mais grave para a menos):\n  [1] atravessa: Container e Roof se atravessam 100 mm\n  [2] atravessa: Container e Perch_1 se atravessam 50 mm\n  [3] atravessa: Container e Perch_2 se atravessam 50 mm\n  [4] atravessa: Container e Perch_3 se atravessam 50 mm\n  [5] atravessa: Container e Perch_4 se atravessam 50 mm\n  [6] atravessa: Container e Hook se atravessam 50 mm\n  [7] atravessa: Roof e Hook se atravessam 148,6 mm\ndetalhe de uma forma: --forma <id>; imagem de uma diverg",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939935421207367,
+  "diag_mm": 2050.0,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.00047453289474930216,
+   "pior_nome": "Perch 2",
+   "pior_pct_diag": 2.3147946085331812e-05,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 8,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 18,
+  "id": "005a271b-832e-446d-a9e6-415a78bf9b97",
+  "nome": "Power Generator",
+  "categoria": "Games, toys, tents and sports goods",
+  "t_traducao_s": 0.0013646229999721982,
+  "recusas": [],
+  "avisos": [],
+  "formas": 7,
+  "cortadores": 0,
+  "nomes": [
+   "Body",
+   "Handle",
+   "Fuel Tank",
+   "Exhaust Pipe",
+   "Power Outlet 1",
+   "Power Outlet 2",
+   "Power Outlet 3"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/18.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6753015980002601,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0085,
+  "verdade_n": 7,
+  "verdade_nomes": [
+   "Body",
+   "Exhaust Pipe",
+   "Fuel Tank",
+   "Handle",
+   "Power Outlet 1",
+   "Power Outlet 2",
+   "Power Outlet 3"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7568427500000325,
+  "valida": true,
+  "validacao_saida": "opção 1 (18-Power Generator): 7 formas\nsem gate declarado (padrões do gate: tolerância 31 mm, penetração 9,3 mm)\ndivergências (3, da mais grave para a menos):\n  [1] atravessa: Body e Handle se atravessam 50,6 mm\n  [2] atravessa: Body e Fuel_Tank se atravessam 350 mm\n  [3] atravessa: Body e Exhaust_Pipe se atravessam 50 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9998576431490949,
+  "diag_mm": 4002.1791181921994,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.00031329406328950427,
+   "pior_nome": "Handle",
+   "pior_pct_diag": 7.828087000539358e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 7,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 19,
+  "id": "00ffeb10-46db-41b8-a921-d883ce96f9d9",
+  "nome": "Dog Leash",
+  "categoria": "Games, toys, tents and sports goods",
+  "t_traducao_s": 0.0014237249997677281,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Handle\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 22,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.1, minor_radius=0.02, location=(0, 0, 1.5))"
+   }
+  ],
+  "avisos": [],
+  "formas": 4,
+  "cortadores": 0,
+  "nomes": [
+   "Strap",
+   "Clip Base",
+   "Clip Body",
+   "Clip Pin"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/19.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6727348130002611,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0086,
+  "verdade_n": 5,
+  "verdade_nomes": [
+   "Clip Base",
+   "Clip Body",
+   "Clip Pin",
+   "Handle",
+   "Strap"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7009634119999646,
+  "valida": true,
+  "validacao_saida": "opção 1 (19-Dog Leash): 4 formas\nsem gate declarado (padrões do gate: tolerância 33 mm, penetração 9,9 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9951600155470727,
+  "diag_mm": 3337.304301378584,
+  "c_detalhe": {
+   "sem_par": [
+    "Handle"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 0.0,
+   "pior_nome": "Strap",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Handle",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 4,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 20,
+  "id": "010479fd-a52f-4df3-bc69-1b9321c7b75c",
+  "nome": "Coffee Grinder",
+  "categoria": "Games, toys, tents and sports goods",
+  "t_traducao_s": 0.0018342060002396465,
+  "recusas": [],
+  "avisos": [],
+  "formas": 7,
+  "cortadores": 0,
+  "nomes": [
+   "Body",
+   "Lid",
+   "Blade 1",
+   "Blade 2",
+   "Compartment",
+   "Crank Handle",
+   "Crank Knob"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/20.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6097531810000874,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0078,
+  "verdade_n": 7,
+  "verdade_nomes": [
+   "Blade 1",
+   "Blade 2",
+   "Body",
+   "Compartment",
+   "Crank Handle",
+   "Crank Knob",
+   "Lid"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.9094174140000177,
+  "valida": true,
+  "validacao_saida": "opção 1 (20-Coffee Grinder): 7 formas\nsem gate declarado (padrões do gate: tolerância 15 mm, penetração 4,5 mm)\ndivergências (8, da mais grave para a menos):\n  [1] atravessa: Body e Blade_1 se atravessam 300 mm\n  [2] atravessa: Body e Blade_2 se atravessam 300 mm\n  [3] atravessa: Body e Crank_Handle se atravessam 20 mm\n  [4] atravessa: Lid e Blade_1 se atravessam 100 mm\n  [5] atravessa: Lid e Blade_2 se atravessam 100 mm\n  [6] atravessa: Lid e Crank_Handle se atravessam 20 mm\n  [7] atravessa: Blade_1 e Blade_2 se atravessam 100 mm\n  [8] atravessa: Crank_Handle e Crank_Knob se atravessam 70 mm\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939869663372041,
+  "diag_mm": 2282.5424421026655,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 9.999999997489795e-05,
+   "pior_nome": "Crank Handle",
+   "pior_pct_diag": 4.381079542283494e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 7,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 21,
+  "id": "0116b59c-0546-4a12-9b6b-a16619301e86",
+  "nome": "Blood Glucose Meter",
+  "categoria": "Games, toys, tents and sports goods",
+  "t_traducao_s": 0.0015385330002573028,
+  "recusas": [],
+  "avisos": [],
+  "formas": 7,
+  "cortadores": 0,
+  "nomes": [
+   "DeviceBody",
+   "Screen",
+   "Button 1",
+   "Button 2",
+   "Button 3",
+   "TestStripSlot",
+   "LancetDevice"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/21.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6928438939999069,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0079,
+  "verdade_n": 7,
+  "verdade_nomes": [
+   "Button 1",
+   "Button 2",
+   "Button 3",
+   "DeviceBody",
+   "LancetDevice",
+   "Screen",
+   "TestStripSlot"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7057343819997186,
+  "valida": true,
+  "validacao_saida": "opção 1 (21-Blood Glucose Meter): 7 formas\nsem gate declarado (padrões do gate: tolerância 21 mm, penetração 6,3 mm)\ndivergências (5, da mais grave para a menos):\n  [1] solto: TestStripSlot fora do maior grupo conectado\n  [2] solto: LancetDevice fora do maior grupo conectado\n  [3] atravessa: DeviceBody e Button_1 se atravessam 90 mm\n  [4] atravessa: DeviceBody e Button_2 se atravessam 90 mm\n  [5] atravessa: DeviceBody e Button_3 se atravessam 90 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9999653649540299,
+  "diag_mm": 2682.3695215238336,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.5,
+   "pior_nome": "Screen",
+   "pior_pct_diag": 0.018640235656866316,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Screen",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Screen não forma um sólido fechado e orientado (Manifold: No"
+   }
+  ],
+  "iou_partes": 6,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 22,
+  "id": "0036cb8c-98c7-4016-8d77-a2d1699ba080",
+  "nome": "Scarf",
+  "categoria": "Graphic symbols and logos, surface patterns, ornamentation, arrangement of interiors and exteriors",
+  "t_traducao_s": 0.0004724239997813129,
+  "recusas": [],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Scarf"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/22.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6154752249999547,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0012,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Scarf"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7720303180003611,
+  "valida": true,
+  "validacao_saida": "opção 1 (22-Scarf): 1 formas\nsem gate declarado (padrões do gate: tolerância 15,2 mm, penetração 4,6 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 1527.4082623843567,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Scarf",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 23,
+  "id": "0096d68b-b302-4242-96d7-453ba0bce90e",
+  "nome": "Stapler",
+  "categoria": "Graphic symbols and logos, surface patterns, ornamentation, arrangement of interiors and exteriors",
+  "t_traducao_s": 0.0008734550001463504,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Base",
+   "Top",
+   "Hinge"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/23.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6505772669997896,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0034,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Base",
+   "Hinge",
+   "Top"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7461005189998104,
+  "valida": true,
+  "validacao_saida": "opção 1 (23-Stapler): 3 formas\nsem gate declarado (padrões do gate: tolerância 40 mm, penetração 12 mm)\ndivergências (2, da mais grave para a menos):\n  [1] solto: Base fora do maior grupo conectado\n  [2] atravessa: Top e Hinge se atravessam 100 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9999823459304579,
+  "diag_mm": 4224.926138999374,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 5.0934758860421425e-05,
+   "pior_nome": "Hinge",
+   "pior_pct_diag": 1.2055774985094709e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 24,
+  "id": "00b8b2bc-e420-4380-a8e3-7ce20aa7bfa0",
+  "nome": "Jump Rope",
+  "categoria": "Graphic symbols and logos, surface patterns, ornamentation, arrangement of interiors and exteriors",
+  "t_traducao_s": 0.0007513820000895066,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Handle 1",
+   "Handle 2",
+   "Rope"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/24.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.598572989999866,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0037,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Handle 1",
+   "Handle 2",
+   "Rope"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8430458919997363,
+  "valida": true,
+  "validacao_saida": "opção 1 (24-Jump Rope): 3 formas\nsem gate declarado (padrões do gate: tolerância 42 mm, penetração 12,6 mm)\ndivergências (2, da mais grave para a menos):\n  [1] atravessa: Handle_1 e Rope se atravessam 100 mm\n  [2] atravessa: Handle_2 e Rope se atravessam 100 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9940606977862615,
+  "diag_mm": 4234.383071948026,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 9.999999988252739e-05,
+   "pior_nome": "Rope",
+   "pior_pct_diag": 2.3616191115302765e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 25,
+  "id": "019939f3-0266-48c8-b9cf-a7c6d253e76f",
+  "nome": "Coffee Table",
+  "categoria": "Household goods, not elsewhere specified",
+  "t_traducao_s": 0.0009754510001585004,
+  "recusas": [],
+  "avisos": [],
+  "formas": 5,
+  "cortadores": 0,
+  "nomes": [
+   "Table Top",
+   "Leg 1",
+   "Leg 2",
+   "Leg 3",
+   "Leg 4"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/25.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7530261430001701,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0039,
+  "verdade_n": 5,
+  "verdade_nomes": [
+   "Leg 1",
+   "Leg 2",
+   "Leg 3",
+   "Leg 4",
+   "Table Top"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6053448939996997,
+  "valida": true,
+  "validacao_saida": "opção 1 (25-Coffee Table): 5 formas\nsem gate declarado (padrões do gate: tolerância 40 mm, penetração 12 mm)\ndivergências (4, da mais grave para a menos):\n  [1] solto: Leg_1 fora do maior grupo conectado\n  [2] solto: Leg_2 fora do maior grupo conectado\n  [3] solto: Leg_3 fora do maior grupo conectado\n  [4] solto: Leg_4 fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9999415481235159,
+  "diag_mm": 4552.197271648056,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Table Top",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 5,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 26,
+  "id": "024ff550-c955-40cd-a382-0ad2da03f9db",
+  "nome": "Stapler",
+  "categoria": "Household goods, not elsewhere specified",
+  "t_traducao_s": 0.0008338709999407001,
+  "recusas": [],
+  "avisos": [],
+  "formas": 4,
+  "cortadores": 0,
+  "nomes": [
+   "Base",
+   "Top",
+   "Hinge",
+   "Holder"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/26.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7050451659997634,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0041,
+  "verdade_n": 4,
+  "verdade_nomes": [
+   "Base",
+   "Hinge",
+   "Holder",
+   "Top"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7679511709998224,
+  "valida": true,
+  "validacao_saida": "opção 1 (26-Stapler): 4 formas\nsem gate declarado (padrões do gate: tolerância 15 mm, penetração 4,5 mm)\ndivergências (3, da mais grave para a menos):\n  [1] solto: Top fora do maior grupo conectado\n  [2] solto: Hinge fora do maior grupo conectado\n  [3] solto: Holder fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9998702492043843,
+  "diag_mm": 1781.1513130556875,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Top",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 4,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 27,
+  "id": "02835585-1776-421c-880d-54dedfe0694d",
+  "nome": "Bed",
+  "categoria": "Household goods, not elsewhere specified",
+  "t_traducao_s": 0.0012988809999114892,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Bed Frame",
+   "Mattress",
+   "Headboard"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/27.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6788583349998589,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0031,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Bed Frame",
+   "Headboard",
+   "Mattress"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6199020570002176,
+  "valida": true,
+  "validacao_saida": "opção 1 (27-Bed): 3 formas\nsem gate declarado (padrões do gate: tolerância 44 mm, penetração 13,2 mm)\ndivergências (2, da mais grave para a menos):\n  [1] atravessa: Bed_Frame e Mattress se atravessam 110 mm\n  [2] atravessa: Bed_Frame e Headboard se atravessam 160 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 5054.265525276645,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Mattress",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 28,
+  "id": "02c70d66-028f-4f78-8428-c86847cbe0ee",
+  "nome": "Puzzle Cube",
+  "categoria": "Household goods, not elsewhere specified",
+  "t_traducao_s": 0.00046863299985488993,
+  "recusas": [],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Puzzle Cube"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/28.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7399129109999194,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0014,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Puzzle Cube"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7538847339997119,
+  "valida": true,
+  "validacao_saida": "opção 1 (28-Puzzle Cube): 1 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 3464.1016151377544,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Puzzle Cube",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 29,
+  "id": "003a9bd5-6385-4779-a324-d7005ebdba30",
+  "nome": "Coffee Grinder",
+  "categoria": "Machines and appliances for preparing food or drink, not elsewhere specified",
+  "t_traducao_s": 0.001312013000188017,
+  "recusas": [],
+  "avisos": [],
+  "formas": 6,
+  "cortadores": 0,
+  "nomes": [
+   "Body",
+   "Base",
+   "Drawer",
+   "Handle Base",
+   "Handle Arm",
+   "Handle Knob"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/29.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6711108490003426,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0136,
+  "verdade_n": 6,
+  "verdade_nomes": [
+   "Base",
+   "Body",
+   "Drawer",
+   "Handle Arm",
+   "Handle Base",
+   "Handle Knob"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7418157400002201,
+  "valida": true,
+  "validacao_saida": "opção 1 (29-Coffee Grinder): 6 formas\nsem gate declarado (padrões do gate: tolerância 12,5 mm, penetração 3,8 mm)\ndivergências (4, da mais grave para a menos):\n  [1] atravessa: Body e Base se atravessam 100 mm\n  [2] atravessa: Base e Drawer se atravessam 40 mm\n  [3] atravessa: Handle_Base e Handle_Arm se atravessam 20 mm\n  [4] atravessa: Handle_Arm e Handle_Knob se atravessam 50 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9941629056353143,
+  "diag_mm": 2130.751041299757,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 9.999999997489795e-05,
+   "pior_nome": "Handle Arm",
+   "pior_pct_diag": 4.693180856731999e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 6,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 30,
+  "id": "01606ef1-0558-42c2-acea-c19009afec11",
+  "nome": "Logo Design",
+  "categoria": "Machines and appliances for preparing food or drink, not elsewhere specified",
+  "t_traducao_s": 0.0005645739997817145,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Connectivity Torus\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 21,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=1.5, minor_radius=0.2, location=(0, 0, 0))"
+   }
+  ],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Innovation Sphere"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/30.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.700602950999837,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0114,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Connectivity Torus",
+   "Innovation Sphere"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7334752010001466,
+  "valida": true,
+  "validacao_saida": "opção 1 (30-Logo Design): 1 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9928147043039813,
+  "diag_mm": 5207.6866265166145,
+  "c_detalhe": {
+   "sem_par": [
+    "Connectivity Torus"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 0.0009999999999763531,
+   "pior_nome": "Innovation Sphere",
+   "pior_pct_diag": 1.9202384315610138e-05,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Connectivity Torus",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 31,
+  "id": "01a7f1be-83e5-4785-be28-7b716ab3ef9c",
+  "nome": "Picture Frame",
+  "categoria": "Machines and appliances for preparing food or drink, not elsewhere specified",
+  "t_traducao_s": 0.001018285999634827,
+  "recusas": [],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 1,
+  "nomes": [
+   "Outer Frame"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/31.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6278155479999441,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.008,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Outer Frame"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7337115840000479,
+  "valida": true,
+  "validacao_saida": "opção 1 (31-Picture Frame): 1 formas, 1 cortador (molde de recorte)\nsem gate declarado (padrões do gate: tolerância 30 mm, penetração 9 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9999998191550926,
+  "diag_mm": 3611.0940170535578,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Outer Frame",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 32,
+  "id": "0217898d-20ba-47e3-b835-1c7275f337a6",
+  "nome": "Geometric Pattern",
+  "categoria": "Machines and appliances for preparing food or drink, not elsewhere specified",
+  "t_traducao_s": 0.0009516850000181876,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "primitive_circle_add",
+    "linha": 17,
+    "codigo": "bpy.ops.mesh.primitive_circle_add(vertices=6, radius=1, fill_type='NGON', location=location)"
+   },
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "primitive_circle_add",
+    "linha": 28,
+    "codigo": "bpy.ops.mesh.primitive_circle_add(vertices=3, radius=0.75, fill_type='NGON', location=location, rotation=rotation)"
+   }
+  ],
+  "avisos": [],
+  "formas": 0,
+  "cortadores": 0,
+  "nomes": [],
+  "nomes_padrao": 0,
+  "nao_malha": 7,
+  "esboco": null,
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.5817998960001205,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0071,
+  "verdade_n": 7,
+  "verdade_nomes": [
+   "Hexagon 1",
+   "Hexagon 2",
+   "Hexagon 3",
+   "Hexagon 4",
+   "Triangle 1",
+   "Triangle 2",
+   "Triangle 3"
+  ],
+  "pais": [],
+  "a": false,
+  "verdade_ok": true,
+  "b": null,
+  "c": null,
+  "iou": null,
+  "diag_mm": null,
+  "c_detalhe": null,
+  "d": null,
+  "certo": false
+ },
+ {
+  "i": 33,
+  "id": "0073d7f9-e42d-4eda-8ce2-761f09eeba24",
+  "nome": "Eco-Friendly Logo",
+  "categoria": "Means of transport or hoisting",
+  "t_traducao_s": 0.0008290979999401316,
+  "recusas": [
+   {
+    "tipo": "modo-de-edicao",
+    "texto": "bpy.ops.transform.rotate em modo de edição (muda a malha, não o objeto)",
+    "linha": 22,
+    "codigo": "bpy.ops.transform.rotate(value=0.5, orient_axis='X')"
+   }
+  ],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Base",
+   "Leaf",
+   "Leaf.001"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/33.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6425544459998491,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0038,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Base",
+   "Leaf",
+   "Leaf.001"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.5757078689998707,
+  "valida": true,
+  "validacao_saida": "opção 1 (33-Eco-Friendly Logo): 3 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências (2, da mais grave para a menos):\n  [1] solto: Leaf fora do maior grupo conectado\n  [2] solto: Leaf_001 fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": true,
+  "c": false,
+  "iou": 0.9939859782503215,
+  "diag_mm": 2872.259322550274,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 249.4368,
+   "pior_nome": "Leaf.001",
+   "pior_pct_diag": 8.684341209780651,
+   "n_fora": 2
+  },
+  "pulados": [
+   {
+    "nome": "Leaf",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Leaf não forma um sólido fechado e orientado (Manifold: Not "
+   },
+   {
+    "nome": "Leaf.001",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Leaf.001 não forma um sólido fechado e orientado (Manifold: "
+   }
+  ],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 34,
+  "id": "009dfc35-2b10-42f6-bade-b6cc38164138",
+  "nome": "Decorative Border",
+  "categoria": "Means of transport or hoisting",
+  "t_traducao_s": 0.0050057600001309766,
+  "recusas": [],
+  "avisos": [],
+  "formas": 30,
+  "cortadores": 0,
+  "nomes": [
+   "Pattern 1",
+   "Pattern Sphere 1",
+   "Pattern Cone 1",
+   "Pattern 2",
+   "Pattern Sphere 2",
+   "Pattern Cone 2",
+   "Pattern 3",
+   "Pattern Sphere 3",
+   "Pattern Cone 3",
+   "Pattern 4",
+   "Pattern Sphere 4",
+   "Pattern Cone 4",
+   "Pattern 5",
+   "Pattern Sphere 5",
+   "Pattern Cone 5",
+   "Pattern 6",
+   "Pattern Sphere 6",
+   "Pattern Cone 6",
+   "Pattern 7",
+   "Pattern Sphere 7",
+   "Pattern Cone 7",
+   "Pattern 8",
+   "Pattern Sphere 8",
+   "Pattern Cone 8",
+   "Pattern 9",
+   "Pattern Sphere 9",
+   "Pattern Cone 9",
+   "Pattern 10",
+   "Pattern Sphere 10",
+   "Pattern Cone 10"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/34.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7597794490002343,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.1231,
+  "verdade_n": 30,
+  "verdade_nomes": [
+   "Pattern 1",
+   "Pattern 10",
+   "Pattern 2",
+   "Pattern 3",
+   "Pattern 4",
+   "Pattern 5",
+   "Pattern 6",
+   "Pattern 7",
+   "Pattern 8",
+   "Pattern 9",
+   "Pattern Cone 1",
+   "Pattern Cone 10",
+   "Pattern Cone 2",
+   "Pattern Cone 3",
+   "Pattern Cone 4",
+   "Pattern Cone 5",
+   "Pattern Cone 6",
+   "Pattern Cone 7",
+   "Pattern Cone 8",
+   "Pattern Cone 9",
+   "Pattern Sphere 1",
+   "Pattern Sphere 10",
+   "Pattern Sphere 2",
+   "Pattern Sphere 3",
+   "Pattern Sphere 4",
+   "Pattern Sphere 5",
+   "Pattern Sphere 6",
+   "Pattern Sphere 7",
+   "Pattern Sphere 8",
+   "Pattern Sphere 9"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.9172452550001253,
+  "valida": true,
+  "validacao_saida": "opção 1 (34-Decorative Border): 30 formas\nsem gate declarado (padrões do gate: tolerância 118 mm, penetração 35,4 mm)\ndivergências (27, da mais grave para a menos):\n  [1] solto: Pattern_2 fora do maior grupo conectado\n  [2] solto: Pattern_Sphere_2 fora do maior grupo conectado\n  [3] solto: Pattern_Cone_2 fora do maior grupo conectado\n  [4] solto: Pattern_3 fora do maior grupo conectado\n  [5] solto: Pattern_Sphere_3 fora do maior grupo conectado\n  [6] solto: Pattern_Cone_3 fora do maior grupo conectado\n  [7] solto: Pattern_4 fora do maior grupo conectado\n  [8] solto: Pattern_Sphere_4 fora do ma",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9970227178729327,
+  "diag_mm": 12216.382636443574,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0008999999990919605,
+   "pior_nome": "Pattern Sphere 9",
+   "pior_pct_diag": 7.367156267740874e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 30,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 35,
+  "id": "00d9b876-a0a4-4a66-8019-9c17e34f6426",
+  "nome": "Corporate Emblem",
+  "categoria": "Means of transport or hoisting",
+  "t_traducao_s": 0.0008877469999788445,
+  "recusas": [],
+  "avisos": [
+   {
+    "tipo": "prisma-poligonal",
+    "texto": "cone \"Triangle\" com 3 lados: o cone do esboço é circular e ignora lados",
+    "linha": 24
+   },
+   {
+    "tipo": "prisma-poligonal",
+    "texto": "cilindro \"Hexagon\" com 6 lados: o esboço desenha, mas o sólido (N2) recusa lados abaixo de 8",
+    "linha": 36
+   }
+  ],
+  "formas": 4,
+  "cortadores": 0,
+  "nomes": [
+   "Boundary",
+   "Triangle",
+   "Square",
+   "Hexagon"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/35.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.766934425999807,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.006,
+  "verdade_n": 4,
+  "verdade_nomes": [
+   "Boundary",
+   "Hexagon",
+   "Square",
+   "Triangle"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6114586969997617,
+  "valida": true,
+  "validacao_saida": "opção 1 (35-Corporate Emblem): 4 formas\nsem gate declarado (padrões do gate: tolerância 30 mm, penetração 9 mm)\ndivergências (3, da mais grave para a menos):\n  [1] atravessa: Boundary e Triangle se atravessam 50 mm\n  [2] atravessa: Boundary e Square se atravessam 350 mm\n  [3] atravessa: Boundary e Hexagon se atravessam 50 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": false,
+  "iou": 0.9938840908866562,
+  "diag_mm": 4300.0,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 250.0,
+   "pior_nome": "Triangle",
+   "pior_pct_diag": 5.813953488372093,
+   "n_fora": 1
+  },
+  "pulados": [
+   {
+    "nome": "Hexagon",
+    "motivo": "sólido do esboço recusado: forma \"Hexagon\" (cilindro): a N2 recusa o volume: volumes[0].segmentos: precisa ser número finito inteiro entr"
+   }
+  ],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 36,
+  "id": "00e986ff-4567-4035-9519-04c3ce8c4bb2",
+  "nome": "Hex Key Set",
+  "categoria": "Means of transport or hoisting",
+  "t_traducao_s": 0.0015849659998821153,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Key Ring\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 14,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=1, minor_radius=0.05, location=(0, 0, 0))"
+   }
+  ],
+  "avisos": [],
+  "formas": 5,
+  "cortadores": 0,
+  "nomes": [
+   "Hex Key 1",
+   "Hex Key 2",
+   "Hex Key 3",
+   "Hex Key 4",
+   "Hex Key 5"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/36.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.5981627549999757,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0097,
+  "verdade_n": 6,
+  "verdade_nomes": [
+   "Hex Key 1",
+   "Hex Key 2",
+   "Hex Key 3",
+   "Hex Key 4",
+   "Hex Key 5",
+   "Key Ring"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.5878314920000776,
+  "valida": true,
+  "validacao_saida": "opção 1 (36-Hex Key Set): 5 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências (4, da mais grave para a menos):\n  [1] solto: Hex_Key_2 fora do maior grupo conectado\n  [2] solto: Hex_Key_3 fora do maior grupo conectado\n  [3] solto: Hex_Key_4 fora do maior grupo conectado\n  [4] solto: Hex_Key_5 fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.999999010953529,
+  "diag_mm": 3634.900273735168,
+  "c_detalhe": {
+   "sem_par": [
+    "Key Ring"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 0.0004999999999881766,
+   "pior_nome": "Hex Key 3",
+   "pior_pct_diag": 1.3755535567262874e-05,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Key Ring",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 5,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 37,
+  "id": "0058b47f-f387-4e29-9758-82b71abce3cc",
+  "nome": "Skateboard",
+  "categoria": "Medical and laboratory equipment",
+  "t_traducao_s": 0.002420918999632704,
+  "recusas": [],
+  "avisos": [],
+  "formas": 8,
+  "cortadores": 0,
+  "nomes": [
+   "Deck",
+   "Grip Tape",
+   "Truck 1",
+   "Truck 2",
+   "Wheel 1",
+   "Wheel 2",
+   "Wheel 3",
+   "Wheel 4"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/37.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6488336799998251,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0094,
+  "verdade_n": 8,
+  "verdade_nomes": [
+   "Deck",
+   "Grip Tape",
+   "Truck 1",
+   "Truck 2",
+   "Wheel 1",
+   "Wheel 2",
+   "Wheel 3",
+   "Wheel 4"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.5597596380002869,
+  "valida": true,
+  "validacao_saida": "opção 1 (37-Skateboard): 8 formas\nsem gate declarado (padrões do gate: tolerância 50 mm, penetração 15 mm)\ndivergências (4, da mais grave para a menos):\n  [1] solto: Wheel_1 fora do maior grupo conectado\n  [2] solto: Wheel_2 fora do maior grupo conectado\n  [3] solto: Wheel_3 fora do maior grupo conectado\n  [4] solto: Wheel_4 fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9999657884672967,
+  "diag_mm": 5124.4629277999475,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 3.4919089969775996e-05,
+   "pior_nome": "Wheel 4",
+   "pior_pct_diag": 6.814195060391936e-07,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 8,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 38,
+  "id": "007f7f57-3f5d-4949-b1b4-a619372426bb",
+  "nome": "Garden Bench",
+  "categoria": "Medical and laboratory equipment",
+  "t_traducao_s": 0.0023556890000691055,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Decorative Pattern\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 55,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.3, minor_radius=0.05, location=(0, -0.75, 1.2))"
+   }
+  ],
+  "avisos": [],
+  "formas": 18,
+  "cortadores": 0,
+  "nomes": [
+   "Leg 1",
+   "Leg 2",
+   "Leg 3",
+   "Leg 4",
+   "Seat Slat 1",
+   "Seat Slat 2",
+   "Seat Slat 3",
+   "Seat Slat 4",
+   "Seat Slat 5",
+   "Seat Slat 6",
+   "Backrest Slat 1",
+   "Backrest Slat 2",
+   "Backrest Slat 3",
+   "Backrest Slat 4",
+   "Backrest Slat 5",
+   "Backrest Slat 6",
+   "Armrest 1",
+   "Armrest 2"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/38.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.5984547739999471,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.029,
+  "verdade_n": 19,
+  "verdade_nomes": [
+   "Armrest 1",
+   "Armrest 2",
+   "Backrest Slat 1",
+   "Backrest Slat 2",
+   "Backrest Slat 3",
+   "Backrest Slat 4",
+   "Backrest Slat 5",
+   "Backrest Slat 6",
+   "Decorative Pattern",
+   "Leg 1",
+   "Leg 2",
+   "Leg 3",
+   "Leg 4",
+   "Seat Slat 1",
+   "Seat Slat 2",
+   "Seat Slat 3",
+   "Seat Slat 4",
+   "Seat Slat 5",
+   "Seat Slat 6"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.649344044999907,
+  "valida": true,
+  "validacao_saida": "opção 1 (38-Garden Bench): 18 formas\nsem gate declarado (padrões do gate: tolerância 27,5 mm, penetração 8,3 mm)\ndivergências (49, da mais grave para a menos):\n  [1] solto: Backrest_Slat_1 fora do maior grupo conectado\n  [2] solto: Backrest_Slat_2 fora do maior grupo conectado\n  [3] solto: Backrest_Slat_3 fora do maior grupo conectado\n  [4] solto: Backrest_Slat_4 fora do maior grupo conectado\n  [5] solto: Backrest_Slat_5 fora do maior grupo conectado\n  [6] solto: Backrest_Slat_6 fora do maior grupo conectado\n  [7] solto: Armrest_1 fora do maior grupo conectado\n  [8] solto: Armrest_2 fora do ma",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9994771536524294,
+  "diag_mm": 4109.91560132322,
+  "c_detalhe": {
+   "sem_par": [
+    "Decorative Pattern"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 0.0,
+   "pior_nome": "Seat Slat 6",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Decorative Pattern",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 18,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 39,
+  "id": "0083098e-8496-47a5-a89c-f86d055d822d",
+  "nome": "Hat",
+  "categoria": "Medical and laboratory equipment",
+  "t_traducao_s": 0.0005247770000096352,
+  "recusas": [],
+  "avisos": [],
+  "formas": 2,
+  "cortadores": 0,
+  "nomes": [
+   "Brim",
+   "Crown"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/39.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.595702641999651,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0084,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Brim",
+   "Crown"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.5342169410000679,
+  "valida": true,
+  "validacao_saida": "opção 1 (39-Hat): 2 formas\nsem gate declarado (padrões do gate: tolerância 30 mm, penetração 9 mm)\ndivergências (1, da mais grave para a menos):\n  [1] atravessa: Brim e Crown se atravessam 50 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9932800393800776,
+  "diag_mm": 4516.912662427734,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0007000000000516593,
+   "pior_nome": "Crown",
+   "pior_pct_diag": 1.549731093705553e-05,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 2,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 40,
+  "id": "016d222a-3fae-4368-8938-f27fafd0bd08",
+  "nome": "Pen",
+  "categoria": "Medical and laboratory equipment",
+  "t_traducao_s": 0.0008863449997988937,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Pen Body",
+   "Pen Tip",
+   "Pen Cap"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/40.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6977835510001569,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0053,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Pen Body",
+   "Pen Cap",
+   "Pen Tip"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6131239149999601,
+  "valida": true,
+  "validacao_saida": "opção 1 (40-Pen): 3 formas\nsem gate declarado (padrões do gate: tolerância 17,5 mm, penetração 5,3 mm)\ndivergências (1, da mais grave para a menos):\n  [1] atravessa: Pen_Body e Pen_Tip se atravessam 49 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939867993147896,
+  "diag_mm": 1752.0559351801528,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Pen Tip",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 41,
+  "id": "000190b1-1495-4415-98d1-847b90bda73d",
+  "nome": "Skateboard",
+  "categoria": "Musical instruments",
+  "t_traducao_s": 0.002518820999739546,
+  "recusas": [
+   {
+    "tipo": "escala-desigual",
+    "texto": "cilindro \"Cylinder\" com escala x≠y (1, 0.5): seção elíptica sem forma equivalente",
+    "linha": 26,
+    "codigo": "bpy.ops.mesh.primitive_cylinder_add(radius=0.5, depth=0.1, location=(2.5, 0, 0.1))"
+   },
+   {
+    "tipo": "escala-desigual",
+    "texto": "cilindro \"Cylinder.001\" com escala x≠y (1, 0.5): seção elíptica sem forma equivalente",
+    "linha": 32,
+    "codigo": "bpy.ops.mesh.primitive_cylinder_add(radius=0.5, depth=0.1, location=(-2.5, 0, 0.1))"
+   }
+  ],
+  "avisos": [],
+  "formas": 7,
+  "cortadores": 0,
+  "nomes": [
+   "Deck",
+   "Truck 1",
+   "Truck 2",
+   "Wheel 1",
+   "Wheel 2",
+   "Wheel 3",
+   "Wheel 4"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/41.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7386868349999531,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0145,
+  "verdade_n": 9,
+  "verdade_nomes": [
+   "Cylinder",
+   "Cylinder.001",
+   "Deck",
+   "Truck 1",
+   "Truck 2",
+   "Wheel 1",
+   "Wheel 2",
+   "Wheel 3",
+   "Wheel 4"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.628722684999957,
+  "valida": true,
+  "validacao_saida": "opção 1 (41-Skateboard): 7 formas\nsem gate declarado (padrões do gate: tolerância 50 mm, penetração 15 mm)\ndivergências (6, da mais grave para a menos):\n  [1] solto: Truck_1 fora do maior grupo conectado\n  [2] solto: Truck_2 fora do maior grupo conectado\n  [3] solto: Wheel_1 fora do maior grupo conectado\n  [4] solto: Wheel_2 fora do maior grupo conectado\n  [5] solto: Wheel_3 fora do maior grupo conectado\n  [6] solto: Wheel_4 fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.999678308818886,
+  "diag_mm": 5313.078796449393,
+  "c_detalhe": {
+   "sem_par": [
+    "Cylinder",
+    "Cylinder.001"
+   ],
+   "n_sem_par": 2,
+   "pior_mm": 5.400294880075762e-05,
+   "pior_nome": "Wheel 4",
+   "pior_pct_diag": 1.0164153567014014e-06,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Cylinder",
+    "motivo": "sem forma de mesmo nome"
+   },
+   {
+    "nome": "Cylinder.001",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 7,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 42,
+  "id": "0019e944-14bf-4517-83a1-4b87cb5b38b4",
+  "nome": "Drumsticks",
+  "categoria": "Musical instruments",
+  "t_traducao_s": 0.0016232180000770313,
+  "recusas": [
+   {
+    "tipo": "operador-desconhecido",
+    "texto": "bpy.ops.object.join",
+    "linha": 32,
+    "codigo": "bpy.ops.object.join()"
+   }
+  ],
+  "avisos": [],
+  "formas": 6,
+  "cortadores": 0,
+  "nomes": [
+   "Drumstick Body",
+   "Tapered End",
+   "Rounded Tip",
+   "Drumstick Body.001",
+   "Tapered End.001",
+   "Rounded Tip.001"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/42.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.9976212460001079,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0402,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Drumstick Body",
+   "Drumstick Body.001"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8047996820000662,
+  "valida": true,
+  "validacao_saida": "opção 1 (42-Drumsticks): 6 formas\nsem gate declarado (padrões do gate: tolerância 12,3 mm, penetração 3,7 mm)\ndivergências (5, da mais grave para a menos):\n  [1] solto: Drumstick_Body_001 fora do maior grupo conectado\n  [2] solto: Tapered_End_001 fora do maior grupo conectado\n  [3] solto: Rounded_Tip_001 fora do maior grupo conectado\n  [4] atravessa: Tapered_End e Rounded_Tip se atravessam 30 mm\n  [5] atravessa: Tapered_End_001 e Rounded_Tip_001 se atravessam 30 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9066362241379151,
+  "diag_mm": 1270.0,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 230.0,
+   "pior_nome": "Drumstick Body.001",
+   "pior_pct_diag": 18.11023622047244,
+   "n_fora": 2
+  },
+  "pulados": [],
+  "iou_partes": 2,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 43,
+  "id": "001d4e21-d3c1-427c-9f3b-85828d6c4e42",
+  "nome": "Smartphone",
+  "categoria": "Musical instruments",
+  "t_traducao_s": 0.0006509960003313608,
+  "recusas": [],
+  "avisos": [],
+  "formas": 2,
+  "cortadores": 0,
+  "nomes": [
+   "Smartphone Body",
+   "Smartphone Screen"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/43.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8135560559999249,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0036,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Smartphone Body",
+   "Smartphone Screen"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6200019679999969,
+  "valida": true,
+  "validacao_saida": "opção 1 (43-Smartphone): 2 formas\nsem gate declarado (padrões do gate: tolerância 16 mm, penetração 4,8 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 1791.7033794688227,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.5,
+   "pior_nome": "Smartphone Screen",
+   "pior_pct_diag": 0.027906404917773416,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Smartphone Screen",
+    "motivo": "malha da verdade sem volume (plano ou aberta): Smartphone Screen não forma um sólido fechado e orientado (M"
+   }
+  ],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 44,
+  "id": "000b8181-92cd-4112-8a0b-f5c7caa06874",
+  "nome": "Spice Rack",
+  "categoria": "Recording, telecommunication or data processing equipment",
+  "t_traducao_s": 0.0018540930000199296,
+  "recusas": [],
+  "avisos": [],
+  "formas": 14,
+  "cortadores": 0,
+  "nomes": [
+   "Back Panel",
+   "Shelf 1",
+   "Shelf 2",
+   "Shelf 3",
+   "Jar 1",
+   "Jar 2",
+   "Jar 3",
+   "Jar 4",
+   "Jar 5",
+   "Jar 6",
+   "Jar 7",
+   "Jar 8",
+   "Jar 9",
+   "Jar 10"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/44.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6904421799999909,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0216,
+  "verdade_n": 14,
+  "verdade_nomes": [
+   "Back Panel",
+   "Jar 1",
+   "Jar 10",
+   "Jar 2",
+   "Jar 3",
+   "Jar 4",
+   "Jar 5",
+   "Jar 6",
+   "Jar 7",
+   "Jar 8",
+   "Jar 9",
+   "Shelf 1",
+   "Shelf 2",
+   "Shelf 3"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6702107719997912,
+  "valida": true,
+  "validacao_saida": "opção 1 (44-Spice Rack): 14 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências (18, da mais grave para a menos):\n  [1] solto: Back_Panel fora do maior grupo conectado\n  [2] solto: Shelf_2 fora do maior grupo conectado\n  [3] solto: Shelf_3 fora do maior grupo conectado\n  [4] solto: Jar_6 fora do maior grupo conectado\n  [5] solto: Jar_7 fora do maior grupo conectado\n  [6] solto: Jar_8 fora do maior grupo conectado\n  [7] solto: Jar_9 fora do maior grupo conectado\n  [8] solto: Jar_10 fora do maior grupo conectado\n  [9] atravessa: Shelf_1 e Jar_1 se atravess",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9998014881259685,
+  "diag_mm": 2872.281323269014,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Shelf 3",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 14,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 45,
+  "id": "00417408-4705-4d48-bab8-ff4a1a52eab7",
+  "nome": "Harmonica",
+  "categoria": "Recording, telecommunication or data processing equipment",
+  "t_traducao_s": 0.0048618310001984355,
+  "recusas": [],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 0,
+  "nomes": [
+   "Harmonica Body"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/45.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8041025530001207,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.1613,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Harmonica Body"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6731529680000676,
+  "valida": true,
+  "validacao_saida": "opção 1 (45-Harmonica): 1 formas\nsem gate declarado (padrões do gate: tolerância 40 mm, penetração 12 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 4142.463035441596,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Harmonica Body",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 46,
+  "id": "00ff3328-9bba-43d0-a8fc-9f90a81dc1fd",
+  "nome": "Power Strip",
+  "categoria": "Recording, telecommunication or data processing equipment",
+  "t_traducao_s": 0.00299894999989192,
+  "recusas": [],
+  "avisos": [],
+  "formas": 9,
+  "cortadores": 0,
+  "nomes": [
+   "Power Strip",
+   "Outlet 1",
+   "Outlet 2",
+   "Outlet 3",
+   "Outlet 4",
+   "Outlet 5",
+   "Outlet 6",
+   "Switch",
+   "Cord"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/46.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6549492750000354,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0105,
+  "verdade_n": 9,
+  "verdade_nomes": [
+   "Cord",
+   "Outlet 1",
+   "Outlet 2",
+   "Outlet 3",
+   "Outlet 4",
+   "Outlet 5",
+   "Outlet 6",
+   "Power Strip",
+   "Switch"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7870217770000636,
+  "valida": true,
+  "validacao_saida": "opção 1 (46-Power Strip): 9 formas\nsem gate declarado (padrões do gate: tolerância 60 mm, penetração 18 mm)\ndivergências (8, da mais grave para a menos):\n  [1] atravessa: Power_Strip e Outlet_1 se atravessam 100 mm\n  [2] atravessa: Power_Strip e Outlet_2 se atravessam 100 mm\n  [3] atravessa: Power_Strip e Outlet_3 se atravessam 100 mm\n  [4] atravessa: Power_Strip e Outlet_4 se atravessam 100 mm\n  [5] atravessa: Power_Strip e Outlet_5 se atravessam 100 mm\n  [6] atravessa: Power_Strip e Outlet_6 se atravessam 100 mm\n  [7] atravessa: Power_Strip e Switch se atravessam 100 mm\n  [8] atravessa: Powe",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.999946041654156,
+  "diag_mm": 6806.063473109842,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Switch",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 9,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 47,
+  "id": "0125bdc4-f93b-4780-acdd-a4aa650fb048",
+  "nome": "Screwdriver",
+  "categoria": "Recording, telecommunication or data processing equipment",
+  "t_traducao_s": 0.0016350609998880827,
+  "recusas": [
+   {
+    "tipo": "operador-desconhecido",
+    "texto": "bpy.ops.object.join",
+    "linha": 51,
+    "codigo": "bpy.ops.object.join()"
+   }
+  ],
+  "avisos": [],
+  "formas": 5,
+  "cortadores": 0,
+  "nomes": [
+   "Shaft",
+   "Flat Head",
+   "Handle",
+   "Bottom Sphere",
+   "Top Sphere"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/47.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7456402210000306,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0323,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Flat Head",
+   "Handle",
+   "Shaft"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8245138649999717,
+  "valida": true,
+  "validacao_saida": "opção 1 (47-Screwdriver): 5 formas\nsem gate declarado (padrões do gate: tolerância 38,5 mm, penetração 11,6 mm)\ndivergências (3, da mais grave para a menos):\n  [1] atravessa: Shaft e Top_Sphere se atravessam 250 mm\n  [2] atravessa: Handle e Bottom_Sphere se atravessam 250 mm\n  [3] atravessa: Handle e Top_Sphere se atravessam 250 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9002830973629078,
+  "diag_mm": 3914.3964413431772,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 250.0,
+   "pior_nome": "Handle",
+   "pior_pct_diag": 6.386680647865487,
+   "n_fora": 1
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 48,
+  "id": "0079fdae-d1c0-428b-892c-fa64fa67e973",
+  "nome": "Fruit Bowl",
+  "categoria": "Stationery and office equipment, artists' and teaching materials",
+  "t_traducao_s": 0.0011069379997934448,
+  "recusas": [],
+  "avisos": [],
+  "formas": 1,
+  "cortadores": 1,
+  "nomes": [
+   "Bowl Outer"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/48.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7944194639999296,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0447,
+  "verdade_n": 1,
+  "verdade_nomes": [
+   "Bowl Outer"
+  ],
+  "pais": [],
+  "t_validacao_s": 1.1034306409997043,
+  "valida": true,
+  "validacao_saida": "opção 1 (48-Fruit Bowl): 1 formas, 1 cortador (molde de recorte)\nsem gate declarado (padrões do gate: tolerância 30 mm, penetração 9 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9814831922523581,
+  "diag_mm": 4272.001872658766,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Bowl Outer",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 1,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 49,
+  "id": "00d6b6d6-d612-466b-8330-7d311ec99725",
+  "nome": "Bird Feeder",
+  "categoria": "Stationery and office equipment, artists' and teaching materials",
+  "t_traducao_s": 0.003521515999636904,
+  "recusas": [
+   {
+    "tipo": "primitiva-sem-equivalente",
+    "texto": "torus \"Hanging Loop\": o esboço não tem toro (anel tem seção retangular)",
+    "linha": 31,
+    "codigo": "bpy.ops.mesh.primitive_torus_add(major_radius=0.1, minor_radius=0.02, location=(0, 0, 2.75))"
+   }
+  ],
+  "avisos": [],
+  "formas": 7,
+  "cortadores": 0,
+  "nomes": [
+   "Tray",
+   "Body",
+   "Roof",
+   "Perch 1",
+   "Perch 2",
+   "Perch 3",
+   "Perch 4"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/49.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7645489840001574,
+  "bpy_erro": null,
+  "bpy_erro_original": "NameError: name 'math' is not defined",
+  "preambulo": true,
+  "t_bpy_exec_s": 0.0135,
+  "verdade_n": 8,
+  "verdade_nomes": [
+   "Body",
+   "Hanging Loop",
+   "Perch 1",
+   "Perch 2",
+   "Perch 3",
+   "Perch 4",
+   "Roof",
+   "Tray"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7279506529998798,
+  "valida": true,
+  "validacao_saida": "opção 1 (49-Bird Feeder): 7 formas\nsem gate declarado (padrões do gate: tolerância 25,5 mm, penetração 7,7 mm)\ndivergências (5, da mais grave para a menos):\n  [1] atravessa: Tray e Perch_1 se atravessam 50 mm\n  [2] atravessa: Tray e Perch_2 se atravessam 50 mm\n  [3] atravessa: Tray e Perch_3 se atravessam 50 mm\n  [4] atravessa: Tray e Perch_4 se atravessam 50 mm\n  [5] atravessa: Body e Roof se atravessam 50 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": false,
+  "c": false,
+  "iou": 0.9939859897828028,
+  "diag_mm": 3994.0455680925825,
+  "c_detalhe": {
+   "sem_par": [
+    "Hanging Loop"
+   ],
+   "n_sem_par": 1,
+   "pior_mm": 2.1316282072803006e-14,
+   "pior_nome": "Perch 3",
+   "pior_pct_diag": 5.337015241662083e-16,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Hanging Loop",
+    "motivo": "sem forma de mesmo nome"
+   }
+  ],
+  "iou_partes": 7,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 50,
+  "id": "0136b964-9a61-47e7-90fe-6026baa7699d",
+  "nome": "Cake",
+  "categoria": "Stationery and office equipment, artists' and teaching materials",
+  "t_traducao_s": 0.0011087889997725142,
+  "recusas": [],
+  "avisos": [],
+  "formas": 6,
+  "cortadores": 0,
+  "nomes": [
+   "Cake Base",
+   "Frosting Layer",
+   "Cherry 1",
+   "Cherry 2",
+   "Cherry 3",
+   "Cherry 4"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/50.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7406513369996901,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0327,
+  "verdade_n": 6,
+  "verdade_nomes": [
+   "Cake Base",
+   "Cherry 1",
+   "Cherry 2",
+   "Cherry 3",
+   "Cherry 4",
+   "Frosting Layer"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.9100166799998988,
+  "valida": true,
+  "validacao_saida": "opção 1 (50-Cake): 6 formas\nsem gate declarado (padrões do gate: tolerância 21 mm, penetração 6,3 mm)\ndivergências (4, da mais grave para a menos):\n  [1] atravessa: Frosting_Layer e Cherry_1 se atravessam 50 mm\n  [2] atravessa: Frosting_Layer e Cherry_2 se atravessam 50 mm\n  [3] atravessa: Frosting_Layer e Cherry_3 se atravessam 50 mm\n  [4] atravessa: Frosting_Layer e Cherry_4 se atravessam 50 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939901089384456,
+  "diag_mm": 3063.0866784993204,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 9.999999997489795e-05,
+   "pior_nome": "Cherry 4",
+   "pior_pct_diag": 3.2646807116764433e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 6,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 51,
+  "id": "014a8a8b-769d-4d76-b67c-c4ce016b5876",
+  "nome": "Decorative Pattern",
+  "categoria": "Stationery and office equipment, artists' and teaching materials",
+  "t_traducao_s": 0.002542422000260558,
+  "recusas": [],
+  "avisos": [],
+  "formas": 25,
+  "cortadores": 0,
+  "nomes": [
+   "Cube_0_0",
+   "Cube_0_1",
+   "Cube_0_2",
+   "Cube_0_3",
+   "Cube_0_4",
+   "Cube_1_0",
+   "Cube_1_1",
+   "Cube_1_2",
+   "Cube_1_3",
+   "Cube_1_4",
+   "Cube_2_0",
+   "Cube_2_1",
+   "Cube_2_2",
+   "Cube_2_3",
+   "Cube_2_4",
+   "Cube_3_0",
+   "Cube_3_1",
+   "Cube_3_2",
+   "Cube_3_3",
+   "Cube_3_4",
+   "Cube_4_0",
+   "Cube_4_1",
+   "Cube_4_2",
+   "Cube_4_3",
+   "Cube_4_4"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/51.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7446706609998728,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0375,
+  "verdade_n": 25,
+  "verdade_nomes": [
+   "Cube_0_0",
+   "Cube_0_1",
+   "Cube_0_2",
+   "Cube_0_3",
+   "Cube_0_4",
+   "Cube_1_0",
+   "Cube_1_1",
+   "Cube_1_2",
+   "Cube_1_3",
+   "Cube_1_4",
+   "Cube_2_0",
+   "Cube_2_1",
+   "Cube_2_2",
+   "Cube_2_3",
+   "Cube_2_4",
+   "Cube_3_0",
+   "Cube_3_1",
+   "Cube_3_2",
+   "Cube_3_3",
+   "Cube_3_4",
+   "Cube_4_0",
+   "Cube_4_1",
+   "Cube_4_2",
+   "Cube_4_3",
+   "Cube_4_4"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7180683589999717,
+  "valida": true,
+  "validacao_saida": "opção 1 (51-Decorative Pattern): 25 formas\nsem gate declarado (padrões do gate: tolerância 50 mm, penetração 15 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 1,
+  "diag_mm": 7141.42842854285,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Cube_4_4",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 25,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 52,
+  "id": "0114c0e0-d954-4414-819c-262d14810be9",
+  "nome": "Coffee Grinder vs. Spice Grinder",
+  "categoria": "Tools and hardware",
+  "t_traducao_s": 0.0010358119998272741,
+  "recusas": [],
+  "avisos": [],
+  "formas": 6,
+  "cortadores": 0,
+  "nomes": [
+   "Coffee Grinder Body",
+   "Coffee Grinder Lid",
+   "Coffee Grinder Handle",
+   "Spice Grinder Body",
+   "Spice Grinder Lid",
+   "Spice Grinder Cap"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/52.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6225242499999695,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0078,
+  "verdade_n": 6,
+  "verdade_nomes": [
+   "Coffee Grinder Body",
+   "Coffee Grinder Handle",
+   "Coffee Grinder Lid",
+   "Spice Grinder Body",
+   "Spice Grinder Cap",
+   "Spice Grinder Lid"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.9428616750001311,
+  "valida": true,
+  "validacao_saida": "opção 1 (52-Coffee Grinder vs. Spice Grinder): 6 formas\nsem gate declarado (padrões do gate: tolerância 30 mm, penetração 9 mm)\ndivergências (4, da mais grave para a menos):\n  [1] solto: Coffee_Grinder_Handle fora do maior grupo conectado\n  [2] solto: Spice_Grinder_Body fora do maior grupo conectado\n  [3] solto: Spice_Grinder_Lid fora do maior grupo conectado\n  [4] solto: Spice_Grinder_Cap fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.993985963415237,
+  "diag_mm": 3379.3490497431603,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.00016781327479975516,
+   "pior_nome": "Coffee Grinder Handle",
+   "pior_pct_diag": 4.9658461534924726e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 6,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 53,
+  "id": "011dff6e-79e1-4244-9f9a-3d70073f57d6",
+  "nome": "Trash Can",
+  "categoria": "Tools and hardware",
+  "t_traducao_s": 0.00061265700014701,
+  "recusas": [],
+  "avisos": [],
+  "formas": 2,
+  "cortadores": 0,
+  "nomes": [
+   "Trash Can Body",
+   "Trash Can Lid"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/53.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.628702876999796,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0025,
+  "verdade_n": 2,
+  "verdade_nomes": [
+   "Trash Can Body",
+   "Trash Can Lid"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7872403920000579,
+  "valida": true,
+  "validacao_saida": "opção 1 (53-Trash Can): 2 formas\nsem gate declarado (padrões do gate: tolerância 11 mm, penetração 3,3 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939859590624528,
+  "diag_mm": 1905.255888325765,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Trash Can Lid",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 2,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 54,
+  "id": "021bfbc9-4a54-4cae-8b11-db2285559ab2",
+  "nome": "Highlighter",
+  "categoria": "Tools and hardware",
+  "t_traducao_s": 0.0012787480000042706,
+  "recusas": [],
+  "avisos": [],
+  "formas": 5,
+  "cortadores": 0,
+  "nomes": [
+   "Body",
+   "Transparent Section",
+   "Ink",
+   "Tip",
+   "Cap"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/54.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6183397839999998,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0059,
+  "verdade_n": 5,
+  "verdade_nomes": [
+   "Body",
+   "Cap",
+   "Ink",
+   "Tip",
+   "Transparent Section"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.9472042580000561,
+  "valida": true,
+  "validacao_saida": "opção 1 (54-Highlighter): 5 formas\nsem gate declarado (padrões do gate: tolerância 17 mm, penetração 5,1 mm)\ndivergências (3, da mais grave para a menos):\n  [1] atravessa: Body e Transparent_Section se atravessam 199,9 mm\n  [2] atravessa: Body e Ink se atravessam 189,9 mm\n  [3] atravessa: Transparent_Section e Ink se atravessam 189,9 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.993986072431662,
+  "diag_mm": 1728.2360949823956,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Transparent Section",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 5,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 55,
+  "id": "0288bff7-f7e9-47ec-9577-aa7cd1694d81",
+  "nome": "Screwdriver",
+  "categoria": "Tools and hardware",
+  "t_traducao_s": 0.0006622939999942901,
+  "recusas": [],
+  "avisos": [],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Handle",
+   "Shaft",
+   "Flat Head"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/55.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.628841478999675,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0034,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Flat Head",
+   "Handle",
+   "Shaft"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.79159439499972,
+  "valida": true,
+  "validacao_saida": "opção 1 (55-Screwdriver): 3 formas\nsem gate declarado (padrões do gate: tolerância 26,5 mm, penetração 8 mm)\ndivergências (1, da mais grave para a menos):\n  [1] solto: Flat_Head fora do maior grupo conectado\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939889873340019,
+  "diag_mm": 2665.0515942472857,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.0,
+   "pior_nome": "Shaft",
+   "pior_pct_diag": 0.0,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 3,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 56,
+  "id": "000d869b-c903-459e-81ae-e9d0aa447022",
+  "nome": "Food Processor",
+  "categoria": "Travel goods, cases, parasols and personal belongings, not elsewhere specified",
+  "t_traducao_s": 0.0017731479997564747,
+  "recusas": [],
+  "avisos": [],
+  "formas": 10,
+  "cortadores": 0,
+  "nomes": [
+   "Base",
+   "Bowl",
+   "Lid",
+   "Blade",
+   "Control Panel",
+   "Button 1",
+   "Button 2",
+   "Button 3",
+   "Dial",
+   "Chute"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/56.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.8187917109999034,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0129,
+  "verdade_n": 10,
+  "verdade_nomes": [
+   "Base",
+   "Blade",
+   "Bowl",
+   "Button 1",
+   "Button 2",
+   "Button 3",
+   "Chute",
+   "Control Panel",
+   "Dial",
+   "Lid"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.8524576700001489,
+  "valida": true,
+  "validacao_saida": "opção 1 (56-Food Processor): 10 formas\nsem gate declarado (padrões do gate: tolerância 18,5 mm, penetração 5,6 mm)\ndivergências (8, da mais grave para a menos):\n  [1] solto: Base fora do maior grupo conectado\n  [2] solto: Control_Panel fora do maior grupo conectado\n  [3] solto: Button_1 fora do maior grupo conectado\n  [4] solto: Button_2 fora do maior grupo conectado\n  [5] solto: Button_3 fora do maior grupo conectado\n  [6] solto: Dial fora do maior grupo conectado\n  [7] atravessa: Bowl e Blade se atravessam 250 mm\n  [8] atravessa: Lid e Chute se atravessam 100 mm\ndetalhe de uma forma: --forma",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9964667279063791,
+  "diag_mm": 2421.2600025606503,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 2.842170943040401e-14,
+   "pior_nome": "Blade",
+   "pior_pct_diag": 1.1738396289678134e-15,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 10,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 57,
+  "id": "00626f1d-cb85-4b7c-8f70-4c3877a63817",
+  "nome": "Stapler",
+  "categoria": "Travel goods, cases, parasols and personal belongings, not elsewhere specified",
+  "t_traducao_s": 0.0008606460000919469,
+  "recusas": [],
+  "avisos": [],
+  "formas": 4,
+  "cortadores": 0,
+  "nomes": [
+   "Base",
+   "Top",
+   "Hinge",
+   "Staple Holder"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/57.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6426247519998469,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0042,
+  "verdade_n": 4,
+  "verdade_nomes": [
+   "Base",
+   "Hinge",
+   "Staple Holder",
+   "Top"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.7532111730001816,
+  "valida": true,
+  "validacao_saida": "opção 1 (57-Stapler): 4 formas\nsem gate declarado (padrões do gate: tolerância 20 mm, penetração 6 mm)\ndivergências (1, da mais grave para a menos):\n  [1] atravessa: Top e Staple_Holder se atravessam 25 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9998939427324006,
+  "diag_mm": 2160.598192995655,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 0.00014832150841925795,
+   "pior_nome": "Hinge",
+   "pior_pct_diag": 6.864835345141669e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 4,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ },
+ {
+  "i": 58,
+  "id": "006985a4-c7df-4094-9778-2816b6e8a76d",
+  "nome": "Suitcase",
+  "categoria": "Travel goods, cases, parasols and personal belongings, not elsewhere specified",
+  "t_traducao_s": 0.001748609999594919,
+  "recusas": [
+   {
+    "tipo": "modificador",
+    "texto": "modificador BEVEL",
+    "linha": 28,
+    "codigo": "bpy.ops.object.modifier_apply(modifier=\"Bevel\")"
+   }
+  ],
+  "avisos": [],
+  "formas": 8,
+  "cortadores": 0,
+  "nomes": [
+   "Suitcase",
+   "Top Handle",
+   "Retractable Handle",
+   "Wheel 1",
+   "Wheel 2",
+   "Wheel 3",
+   "Wheel 4",
+   "Zippered Compartment"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/58.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.6858883859999878,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.0116,
+  "verdade_n": 8,
+  "verdade_nomes": [
+   "Retractable Handle",
+   "Suitcase",
+   "Top Handle",
+   "Wheel 1",
+   "Wheel 2",
+   "Wheel 3",
+   "Wheel 4",
+   "Zippered Compartment"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6043839570002092,
+  "valida": true,
+  "validacao_saida": "opção 1 (58-Suitcase): 8 formas\nsem gate declarado (padrões do gate: tolerância 16,5 mm, penetração 5 mm)\ndivergências (6, da mais grave para a menos):\n  [1] solto: Wheel_1 fora do maior grupo conectado\n  [2] solto: Wheel_2 fora do maior grupo conectado\n  [3] solto: Wheel_3 fora do maior grupo conectado\n  [4] solto: Wheel_4 fora do maior grupo conectado\n  [5] atravessa: Suitcase e Top_Handle se atravessam 120 mm\n  [6] atravessa: Suitcase e Retractable_Handle se atravessam 220 mm\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": false,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9857315011532545,
+  "diag_mm": 2025.0249149084757,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 2.5467379430210713e-05,
+   "pior_nome": "Wheel 4",
+   "pior_pct_diag": 1.2576328934383383e-06,
+   "n_fora": 0
+  },
+  "pulados": [],
+  "iou_partes": 8,
+  "erroIou": null,
+  "d": true,
+  "certo": false
+ },
+ {
+  "i": 59,
+  "id": "00da7fc5-ed1e-418a-a460-49663427a8c5",
+  "nome": "Pencil",
+  "categoria": "Travel goods, cases, parasols and personal belongings, not elsewhere specified",
+  "t_traducao_s": 0.0008037679999688407,
+  "recusas": [],
+  "avisos": [
+   {
+    "tipo": "prisma-poligonal",
+    "texto": "cilindro \"Pencil Body\" com 6 lados: o esboço desenha, mas o sólido (N2) recusa lados abaixo de 8",
+    "linha": 15
+   }
+  ],
+  "formas": 3,
+  "cortadores": 0,
+  "nomes": [
+   "Pencil Body",
+   "Pencil Tip",
+   "Eraser"
+  ],
+  "nomes_padrao": 0,
+  "nao_malha": 0,
+  "esboco": "traduzidos/59.esboco.json",
+  "bpy_rc": 0,
+  "bpy_stderr": "",
+  "t_bpy_processo_s": 0.7109458480003923,
+  "bpy_erro": null,
+  "bpy_erro_original": null,
+  "preambulo": false,
+  "t_bpy_exec_s": 0.004,
+  "verdade_n": 3,
+  "verdade_nomes": [
+   "Eraser",
+   "Pencil Body",
+   "Pencil Tip"
+  ],
+  "pais": [],
+  "t_validacao_s": 0.6654609229999551,
+  "valida": true,
+  "validacao_saida": "opção 1 (59-Pencil): 3 formas\nsem gate declarado (padrões do gate: tolerância 23 mm, penetração 6,9 mm)\ndivergências: nenhuma\ndetalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo\n",
+  "medir_rc": 0,
+  "medir_stderr": "",
+  "a": true,
+  "verdade_ok": true,
+  "b": true,
+  "c": true,
+  "iou": 0.9939864108122021,
+  "diag_mm": 2304.3437243605827,
+  "c_detalhe": {
+   "sem_par": [],
+   "n_sem_par": 0,
+   "pior_mm": 6.698729810778069,
+   "pior_nome": "Pencil Body",
+   "pior_pct_diag": 0.29070011300665904,
+   "n_fora": 0
+  },
+  "pulados": [
+   {
+    "nome": "Pencil Body",
+    "motivo": "sólido do esboço recusado: forma \"Pencil_Body\" (cilindro): a N2 recusa o volume: volumes[0].segmentos: precisa ser número finito inteiro "
+   }
+  ],
+  "iou_partes": 2,
+  "erroIou": null,
+  "d": true,
+  "certo": true
+ }
+]
