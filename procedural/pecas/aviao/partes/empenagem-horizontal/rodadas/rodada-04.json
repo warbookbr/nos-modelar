@@ -1,0 +1,147 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/empenagem-horizontal",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-empenagem-horizontal/alvo/aviao-unidade-empenagem-horizontal-composta.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Nenhum defeito de forma fora do declarado; a alma e a fresta do compensador não se confirmam nas vistas, e o corte y=2119 deixa dúvida sobre o trecho do bordo de fuga. Lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "estabilizadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "estabilizadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "profundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compensadorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "compensadorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoProfundorE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteProfundor3E",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o loft limita cada forma a 1000 vertices e faces: com 52 pontos por secao so cabem 18 estacoes, e trechos [6,5,8] lancou erro",
+    "vistas:critica nao foi rodada por ordem da tarefa; a conferencia do contorno foi numerica, na malha executada, e nao por imagem",
+    "Rodada liberada pela pessoa em 2026-10-16, depois de parar sem convergência; o pacote falhou uma vez na captura do arame com erro que não se repetiu, e um crítico chegou a ser despachado sem pedido, o que não conta como rodada."
+  ],
+  "notaDePassagem": "Causa medida na malha: o contorno de baixo dos suportes tinha 6 estacoes e quebras de 4,5 a 5,7 graus; o liso ja estava em 60 e so afeta sombreado. trechos [6,4,7] da 18 estacoes, uma a cada 23 a 30 mm, quebra maxima 2,0 graus. Mais estacoes nao cabem no bloco de 1000 ids do loft com 52 pontos por secao. Razao contra o esboco dos suportes 2 e 3 ficou em 0,955, perto do minimo de 0,95.",
+  "receita": {
+    "sha256": "sha256:3e5a678fdd9ed0bb3785572e625f1897385150c9b48644a8afd85e0f56e061f3",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 3,
+      "acrescentadas": 5,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 126,
+          "texto": "     número por vão, três ao todo) para o loft seguir essa curva em vez de ligar as seções por troncos retos; 2, 1 e 2 dão as seis"
+        },
+        {
+          "tipo": "-",
+          "linha": 127,
+          "texto": "     estações que o esboço usa no suporte 1, uma a mais que as cinco do 2 e do 3. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "     número por vão, três ao todo) para o loft seguir essa curva em vez de ligar as seções por troncos retos. Com 2, 1 e 2 (as seis"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "     estações do esboço) o contorno de baixo da lente virava poligonal, com quebras de 4,5 a 5,7 graus a cada 90 a 120 mm entre as"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "     pontas; 6, 4 e 7 põem uma estação a cada 23 a 30 mm, e a quebra cai a no máximo 2 graus. O loft aceita até 1000 vértices e"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "     faces, e com 52 pontos por seção isso limita as estações a 18, que são os 17 trechos de 6 + 4 + 7. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 142,
+          "texto": "    trechos: [2, 1, 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    trechos: [6, 4, 7],"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
