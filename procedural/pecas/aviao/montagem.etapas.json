@@ -73,9 +73,13 @@
     },
     {
       "instancia": "asas",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1",
+      "aceite": {
+        "por": "a pessoa, 2026-10-16",
+        "analise": "ausente"
+      },
+      "receita": "cd534b5363dfe0a350c40c1e355e3aabe9712626b9d70e298e5fc9ce6f2a0a95",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -92,9 +96,13 @@
     },
     {
       "instancia": "empenagem-horizontal",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb",
+      "aceite": {
+        "por": "a pessoa, 2026-10-16",
+        "analise": "ausente"
+      },
+      "receita": "3e5a678fdd9ed0bb3785572e625f1897385150c9b48644a8afd85e0f56e061f3",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -110,9 +118,16 @@
     },
     {
       "instancia": "empenagem-vertical",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07",
+      "aceite": {
+        "por": "a pessoa, 2026-10-16: aceita como está, com a ponta fina do degrau do topo do leme faltando (110 mm, só no corte)",
+        "defeitosAceitos": [
+          "leme: comprimento em ponta fina do degrau do topo do leme"
+        ],
+        "analise": "ausente"
+      },
+      "receita": "a0f4b9847113a707bb2435f6cc3effe6593a23bfbe1103acf1d7596cf0c25644",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -133,8 +148,12 @@
     },
     {
       "instancia": "trem-do-nariz",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
+      "aceite": {
+        "por": "a pessoa, 2026-10-16",
+        "analise": "ausente"
+      },
       "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4",
       "reaberturas": [
         {
@@ -151,8 +170,12 @@
     },
     {
       "instancia": "trens-principais",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
+      "aceite": {
+        "por": "a pessoa, 2026-10-16",
+        "analise": "ausente"
+      },
       "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565",
       "reaberturas": [
         {

@@ -269,6 +269,13 @@ para a dorsal que alarga de uma vez vista de cima e para a face facetada dos sup
 profundor. Nas asas ela mandou seguir: a ponta passa pela `chamar()` da família, que agora
 aceita 72 graus, e o casulo desce para um raio abaixo da asa, como na referência.
 
+A rodada de ajustes fechou em 2026-10-16. As asas fecharam na terceira rodada com nota 9 e a
+empenagem horizontal na quarta com nota 8, as duas sem defeito, e a pessoa as aceitou. A
+deriva parou de novo sem convergência, com nota 8 e a ponta fina do degrau do topo do leme
+faltando (cerca de 110 mm, visível só no corte), e a pessoa a aceitou como está. Os trens, que
+foram reabertos só pela ordem das etapas e não mudaram, foram aceitos de novo, e as oito etapas
+estão fixas.
+
 As duas empenagens fecharam na primeira rodada com nota 9 e a pessoa as aceitou em
 2026-10-15, vendo a [comparação com a referência real](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-empenagens.png);
 na vertical, o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que
