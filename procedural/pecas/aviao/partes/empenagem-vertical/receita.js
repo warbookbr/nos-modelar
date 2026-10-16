@@ -92,22 +92,26 @@ export const TABELA = {
      centro); a curva suave passa por eles. A crista começa `inicio.subida` acima do dorso em `dorso[0]` e sobe numa potência do
      comprimento, até a `juncao`: o ponto do bordo de ataque da deriva `altura` acima da raiz (`y0`). O expoente é o que faz a crista
      chegar ali com a inclinação do bordo de ataque (`derivar` o calcula), de modo que a crista vira o bordo de ataque sem degrau. A
-     dorsal acaba na junção, e a seção dela cabe dentro da espessura da deriva ali. `crista` é a largura da crista, uns 24 mm, e a
+     dorsal acaba na junção, e a seção dela cabe dentro da espessura da deriva ali. `crista` é a largura da crista, 28 mm (a razão de volume com a aleta do esboço pede ao menos 0,3), e a
      largura da base é a curva suave de `base`, [fração do comprimento, largura]: ela fica abaixo da espessura da deriva na junção, e
      por isso a dorsal não sai pelos lados do bordo de ataque. A seção sobe da base, que assenta `assenta` abaixo do dorso e desce em
      parede até `fundo` abaixo dele, por um filete côncavo (um quarto de elipse, horizontal no dorso e vertical na crista) até a crista,
-     que é uma meia elipse. `secoes` é quantas seções a dorsal tem, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. */
+     que é uma meia elipse. `secoes` é quantas seções a dorsal tem, e `passosDoArco` quantos trechos tem cada quarto de arco da seção. O
+     dorso da fuselagem corta o filete a uns 3 mm da base, onde o último trecho dele é quase horizontal: com poucos trechos o ponto em
+     que o dorso passa de um trecho ao seguinte faz a largura visível de cima saltar, e o alargamento da frente sai com um ombro; com 12
+     por quarto de arco o salto some e a largura cresce sem quebra de inclinação. O núcleo limita o loft a mil faces, e 12 trechos dão 53
+     lados por seção: `secoes` cai a 17 para o loft caber (18 intervalos de 53 faces). */
   dorsal: {
     dorso: [[6960, 2323], [7300, 2294], [7700, 2268], [8100, 2248], [8300, 2241]],
     inicio: { subida: 2 },
     juncao: { altura: 415 },
-    crista: 24,
+    crista: 28,
     base: [[0, 60], [0.3, 180], [0.6, 240], [0.8, 200], [1, 140]],
     assenta: 3,
     fundo: 25,
     fracaoDoFundo: 0.5,
-    secoes: 24,
-    passosDoArco: 4,
+    secoes: 17,
+    passosDoArco: 12,
   },
   /* As dobradiças: três pares, cada um a `y` de um y da lista (`vK1y`, `vK2y`, `vK3y`). Cada estação é [z a partir da linha da
      dobradiça naquele y, largura em x, altura em y, raio do canto, fração da espessura do leme naquele y que dá o x do centro]. */

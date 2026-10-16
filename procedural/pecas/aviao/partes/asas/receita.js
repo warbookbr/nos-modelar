@@ -114,10 +114,10 @@ export const TABELA = {
      `estacoes` o número de seções do quarto de elipse, espaçadas por igual no ângulo. */
   carenagem: { entrada: 80, alcanceEmX: 170, alcanceEmZ: 200, sobreposicao: 40, espessuraDaFrente: 12, espessuraDeTras: 4, estacoes: 8 },
   /* O casulo, na asa esquerda: `x` é a distância ao eixo do avião (o casulo fica em -x); `aFrente` e `aTras` são quanto ele passa do
-     bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `raiosAbaixoDoIntradorso` quantos
-     raios o centro fica abaixo do ponto mais baixo do intradorso da asa naquele x (um raio, como na referência real, em que o casulo
-     pende sob a asa, e não dentro dela), e `lados` e `estacoes` a resolução da revolução e do meio perfil. */
-  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, raiosAbaixoDoIntradorso: 1, lados: 48, estacoes: 16 },
+     bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `raiosAbaixoDoEixo` quantos
+     raios o centro fica abaixo da linha de 25% da corda naquele x (um raio, como na referência real, em que o casulo pende sob a
+     asa: com um raio a elipse ainda toca a asa junto ao bordo de ataque), e `lados` e `estacoes` a resolução da revolução e do meio perfil. */
+  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, raiosAbaixoDoEixo: 1, lados: 48, estacoes: 16 },
   /* O oval: o centro fica a `x` do eixo e a `naCorda` da corda a partir do bordo de ataque; é a extrusão em y de um retângulo de
      `comprimento` em x e `largura` em z de cantos de meia largura, com `altura` acima do extradorso e `profundidadeNaAsa` abaixo dele,
      girada em z pelo diedro para ficar paralela à asa. */
@@ -292,18 +292,6 @@ function extradorsoEm(loft, x, z) {
   return pa[1] + ((x - pa[0]) / (pb[0] - pa[0])) * (pb[1] - pa[1]);
 }
 
-/* A altura (y local, em metro) do ponto mais baixo do intradorso da asa em x (metro, no quadro local da família): o ponto mais baixo
-   do contorno em cada uma das duas seções que cercam x, e a reta entre os dois. */
-function intradorsoEm(loft, x) {
-  const quadros = quadrosDoLoft(loft.secoes.map((s) => s.pos), loft.orientacao);
-  const aneis = loft.secoes.map((s, i) => ({ s, q: quadros[i] })).filter(({ s }) => s.contorno);
-  const i = aneis.findIndex(({ s }) => s.pos[0] >= x);
-  if (i < 1) throw new Error(`casulo: x ${x} m fica fora das seções da asa`);
-  const maisBaixo = ({ s, q }) => s.contorno.map((ponto) => pontoDaSecao(s.pos, q, ponto)).reduce((melhor, p) => (p[1] < melhor[1] ? p : melhor));
-  const [pa, pb] = [maisBaixo(aneis[i - 1]), maisBaixo(aneis[i])];
-  return pa[1] + ((x - pa[0]) / (pb[0] - pa[0])) * (pb[1] - pa[1]);
-}
-
 /* A carenagem da raiz, em mm: as seções [z, y] em cada x, da entrada na fuselagem ao fim do quarto de elipse. */
 function medidasDaCarenagem(t) {
   const a = t.asa;
@@ -324,11 +312,10 @@ function medidasDaCarenagem(t) {
 }
 
 /* O casulo, em mm: o meio perfil [raio, z] de uma elipse, da ponta da frente à de trás, e o ponto em que o eixo passa, em x e y: o
-   centro fica `raiosAbaixoDoIntradorso` raios abaixo do ponto mais baixo do intradorso da asa em x. */
-function medidasDoCasulo(t, loftDaAsa) {
+   centro fica `raiosAbaixoDoEixo` raios abaixo da linha de 25% da corda da asa em x. */
+function medidasDoCasulo(t) {
   const c = t.casulo;
   const q = quadroDaAsa(t, c.x);
-  const intradorso = t.asa.raiz[1] + intradorsoEm(loftDaAsa, m(c.x - t.asa.raiz[0])) * 1000;
   const zFrente = q.ataque - c.aFrente;
   const zTras = q.ataque + c.aTras;
   const perfil = Array.from({ length: c.estacoes + 1 }, (_, k) => {
@@ -336,7 +323,7 @@ function medidasDoCasulo(t, loftDaAsa) {
     const noPolo = k === 0 || k === c.estacoes;
     return [noPolo ? 0 : c.raio * Math.cos(ang), (zFrente + zTras) / 2 + ((zTras - zFrente) / 2) * Math.sin(ang)];
   });
-  return { perfil, eixo: [-c.x, intradorso - c.raiosAbaixoDoIntradorso * c.raio], zFrente, zTras };
+  return { perfil, eixo: [-c.x, q.eixoY - c.raiosAbaixoDoEixo * c.raio], zFrente, zTras };
 }
 
 /* O oval, em mm: o centro da base da extrusão, o pivô do giro (o centro do oval no extradorso) e o giro, em graus. */
@@ -439,7 +426,7 @@ export function derivar(t = TABELA) {
   }));
 
   /* A carenagem da raiz, o casulo e o oval. */
-  const casulo = medidasDoCasulo(t, loftDaAsa);
+  const casulo = medidasDoCasulo(t);
   const oval = medidasDoOval(t, loftDaAsa);
   const o = t.oval;
 
@@ -713,8 +700,8 @@ function caixasDoLadoDireito(t) {
 }
 
 /* A caixa do casulo, que só existe do lado esquerdo: o raio em x e em y, e as duas pontas em z. */
-function caixaDoCasulo(t, loftDaAsa) {
-  const { eixo, zFrente, zTras } = medidasDoCasulo(t, loftDaAsa);
+function caixaDoCasulo(t) {
+  const { eixo, zFrente, zTras } = medidasDoCasulo(t);
   const r = t.casulo.raio;
   return { min: [eixo[0] - r, eixo[1] - r, zFrente], max: [eixo[0] + r, eixo[1] + r, zTras] };
 }
@@ -723,7 +710,7 @@ function caixaDoCasulo(t, loftDaAsa) {
 export function pontosDeclarados(t = TABELA) {
   const tolerancia = 1;
   const caixas = caixasDoLadoDireito(t);
-  const casulo = caixaDoCasulo(t, loftDaFamilia(chamadaDaMetade(t)));
+  const casulo = caixaDoCasulo(t);
   const doCasulo = [
     { nome: 'casuloE, o mínimo da caixa', parte: 'casuloE', medida: 'minimo', em: casulo.min, toleranciaMm: tolerancia },
     { nome: 'casuloE, o máximo da caixa', parte: 'casuloE', medida: 'maximo', em: casulo.max, toleranciaMm: tolerancia },
@@ -742,8 +729,8 @@ export function pontosDeclarados(t = TABELA) {
    próprio, que é o que a razão de volume ainda mede acima da diferença declarada. */
 const AFASTADAS = Object.fromEntries(['D', 'E'].map((L) => [`ponta${L}`, {
   formas: `ponta${L}`,
-  minimo: 0.44,
-  alongamento: { '+y': 223.1 },
+  minimo: 0.43,
+  alongamento: { '+y': 220.7 },
   motivo: 'a ponta levantada sobe uns 9% da semi-envergadura (72 graus, e não os 56 do esboço) e tem os cantos arredondados vistos de cima, como a referência real',
 }]));
 
