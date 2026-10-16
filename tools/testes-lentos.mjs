@@ -9,6 +9,7 @@
  * (variável GATES_COMPLETO=1), no CI (variável CI) e quando não dá para saber o ramo remoto. Assim nenhum teste deixa de rodar
  * antes de chegar à main. `npm test` continua rodando a suíte inteira de uma vez. */
 import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -79,6 +80,18 @@ export const TESTES_LENTOS = [
   'tools/oficina/sonda-supercarro-1-0.test.mjs',
 ];
 
+/* O ORÇAMENTO DE TEMPO DOS RÁPIDOS.
+ *
+ * Um arquivo da bateria rápida que passa de TETO_DO_RAPIDO_MS reprova o `test:rapidos`, com o nome dele: ou ele vai para a lista
+ * acima, ou fica mais leve. O teto é largo porque a duração depende da carga da máquina: medido em 2026-10-16, o mais lento dos
+ * rápidos levava 4,9 s sozinho e 18 s dentro do `npm run gates`, com outros três gates rodando ao lado. Um teste novo de 8 s
+ * sozinho já passa dele na bateria, que foi como o teste do importador de STEP, de 18 a 50 s, entrou sem ninguém notar. */
+export const TETO_DO_RAPIDO_MS = 30_000;
+
+export function acimaDoTeto(duracoes, teto = TETO_DO_RAPIDO_MS) {
+  return duracoes.filter(({ arquivo, ms }) => ms > teto && !TESTES_LENTOS.includes(arquivo));
+}
+
 function ramoRemoto() {
   const r = spawnSync('git', ['rev-parse', '--abbrev-ref', '@{u}'], { encoding: 'utf8' });
   return r.status === 0 ? r.stdout.trim() : null;
@@ -96,8 +109,19 @@ function rodar(modo) {
   const { args, motivo } = argumentosDoVitest(modo);
   console.log(`test:${modo} — ${motivo}.`);
   const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
+  const inicio = Date.now();
   const r = spawnSync('npx', ['vitest', ...args], { cwd: raiz, stdio: 'inherit', shell: true, env: { ...process.env, MECANIFICA_TESTES: modo } });
   process.exitCode = r.status ?? 1;
+  const caminho = join(raiz, 'tmp', 'gates', `duracoes-dos-testes-${modo}.json`);
+  if (modo !== 'rapidos' || !existsSync(caminho)) return;
+  const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
+  if (Date.parse(gravado) < inicio) return;
+  const lentos = acimaDoTeto(duracoes);
+  if (!lentos.length) return;
+  console.error(`test:rapidos — ${lentos.length} arquivo(s) passaram do teto de ${TETO_DO_RAPIDO_MS / 1000} s da bateria rápida:`);
+  for (const { arquivo, ms } of lentos) console.error(`  ${Math.round(ms / 100) / 10} s  ${arquivo}`);
+  console.error('Ponha cada um em TESTES_LENTOS, em tools/testes-lentos.mjs, ou deixe-o mais leve.');
+  process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

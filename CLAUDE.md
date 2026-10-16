@@ -56,10 +56,12 @@ passo seguinte.
   pede. Um erro se reconhece em uma frase.
 - Ao reportar à pessoa, traga um sumário breve do que foi feito, sem termos
   internos, e diga se algo depende da decisão dela, sempre com a recomendação.
-- Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe
-  sozinho a bateria curta quando só mudou peça ou documento e a completa em
-  qualquer outro caso; durante o trabalho bastam os testes do que foi tocado.
-  `--completo` força todos.
+- Rode os gates do INDEX com `npm run gates` antes de enviar. Ele roda os testes
+  rápidos sempre e só os lentos e as conferências de geometria ligados ao que
+  mudou; `--completo` força todos, e o CI roda todos. Durante o trabalho bastam
+  os testes do que foi tocado.
+- Agente despachado não roda `npm run gates`, e o brief não pede: a bateria roda
+  uma vez, com quem integra, e nunca duas ao mesmo tempo na mesma máquina.
 - Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode
   `npm run mapa`. O gate `mapa:check` confere.
 - Todo achado responde se o processo o teria pego sozinho. Quando não, o que

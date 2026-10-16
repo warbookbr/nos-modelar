@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { argumentosDoVitest, TESTES_LENTOS } from './testes-lentos.mjs';
+import { acimaDoTeto, argumentosDoVitest, TESTES_LENTOS, TETO_DO_RAPIDO_MS } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -20,5 +20,14 @@ describe('a lista dos testes lentos', () => {
     expect(argumentosDoVitest('lentos', { ambiente: {}, remoto: () => null }).args).toEqual(['run']);
     expect(argumentosDoVitest('lentos', { ambiente: {}, remoto }).args).toEqual(['run', '--changed', 'origin/ramo', '--passWithNoTests']);
     expect(argumentosDoVitest('rapidos', { ambiente: {}, remoto }).args).toEqual(['run']);
+  });
+
+  it('o teto reprova o rápido que passa dele e ignora o que já está na lista dos lentos', () => {
+    const duracoes = [
+      { arquivo: 'tools/x.test.mjs', ms: TETO_DO_RAPIDO_MS + 1 },
+      { arquivo: 'tools/y.test.mjs', ms: TETO_DO_RAPIDO_MS },
+      { arquivo: TESTES_LENTOS[0], ms: TETO_DO_RAPIDO_MS * 10 },
+    ];
+    expect(acimaDoTeto(duracoes).map((d) => d.arquivo)).toEqual(['tools/x.test.mjs']);
   });
 });
