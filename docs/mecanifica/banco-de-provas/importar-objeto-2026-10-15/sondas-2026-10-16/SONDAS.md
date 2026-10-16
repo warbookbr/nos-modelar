@@ -1,6 +1,6 @@
 # Sondas de importação de 2026-10-16
 
-Plano [Importar objeto de código](../../../planos/2026-10-15-importar-objeto-de-codigo.md). Três sondas baratas mediram o que se consegue
+Plano [Importar objeto de código](../../../planos/congelados/2026-10-15-importar-objeto-de-codigo.md). Três sondas baratas mediram o que se consegue
 tirar de objetos reais sem desenhá-los, e o resultado está resumido na [pesquisa aberta](../../../PESQUISA-ABERTA-2026-10.md#sondas-de-importação-de-2026-10-16).
 Os arquivos de origem não estão aqui: cada um se baixa de novo pelo endereço abaixo, e os scripts guardados refazem a medida.
 

@@ -1,6 +1,6 @@
 # Fonte do objeto-prova da importação de código
 
-Plano [Importar objeto de código](../../planos/2026-10-15-importar-objeto-de-codigo.md), fatia 1.
+Plano [Importar objeto de código](../../planos/congelados/2026-10-15-importar-objeto-de-codigo.md), fatia 1.
 
 ## A fonte
 
