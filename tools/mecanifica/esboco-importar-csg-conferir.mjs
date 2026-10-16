@@ -6,7 +6,7 @@
    resultado é o volume de cada lado, o da interseção e o da união, e a razão interseção/união (IoU). Não decide a forma: diz o
    quanto a tradução se afastou do que o OpenSCAD calcula, e onde o desvio é grande o `--descrever` e a composta mostram o porquê. */
 import { carregarManifold } from '../../procedural/nucleo/manifold.js';
-import { criarContextoDeSolidos, criarSolidosDoEsboco } from '../../src/autoria/solido-do-esboco.js';
+import { criarContextoDeSolidos, criarSolidosDoEsboco, ErroDoSolido } from '../../src/autoria/solido-do-esboco.js';
 import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
 
 /* STL de texto (o que o OpenSCAD grava) ou binário: os triângulos como listas de três pontos. */
@@ -57,13 +57,29 @@ export async function conferirComMalha(esboco, triangulos, matriz) {
   const contexto = criarContextoDeSolidos({ origem: min.map((m, i) => (m + max[i]) / 2) });
   try {
     const referencia = contexto.daMalha(vertices, tris, 'a malha do OpenSCAD');
-    const dados = formasResolvidas(esboco, 1);
-    const solidos = criarSolidosDoEsboco(dados, { contexto });
-    const visiveis = dados.formas.filter((f) => !f.cortador && !f.oculto).map((f) => solidos.solido(f.id));
-    const importado = contexto.uniao(visiveis);
-    const comum = contexto.volume(contexto.intersecao([referencia, importado]));
+    /* O que a blocagem da receita recusa (cilindro de 6 lados, por exemplo) ou o esboço vazio não derrubam a conferência: a forma
+       sem sólido sai em `formasSemMedida`, com o motivo, e o resto é medido. Quem tem recorte e perde um cortador também sai. */
+    const formasSemMedida = [];
+    const visiveis = [];
+    const formas = esboco?.opcoes?.[0]?.formas ?? [];
+    if (formas.length === 0) {
+      formasSemMedida.push({ id: null, tipo: null, codigo: 'esboco-vazio', motivo: 'o esboço importado não tem forma alguma; o volume dele é zero' });
+    } else {
+      const dados = formasResolvidas(esboco, 1);
+      const solidos = criarSolidosDoEsboco(dados, { contexto });
+      for (const f of dados.formas.filter((x) => !x.cortador && !x.oculto)) {
+        try {
+          visiveis.push(solidos.solido(f.id));
+        } catch (e) {
+          if (!(e instanceof ErroDoSolido)) throw e;
+          formasSemMedida.push({ id: f.id, tipo: f.tipo, codigo: e.codigo, motivo: e.message });
+        }
+      }
+    }
+    const importado = visiveis.length > 0 ? contexto.uniao(visiveis) : null;
+    const comum = importado ? contexto.volume(contexto.intersecao([referencia, importado])) : 0;
     const volumeReferencia = contexto.volume(referencia);
-    const volumeImportado = contexto.volume(importado);
+    const volumeImportado = importado ? contexto.volume(importado) : 0;
     const uniao = volumeReferencia + volumeImportado - comum;
     const r = (x) => Math.round(x * 1000) / 1000;
     return {
@@ -74,6 +90,7 @@ export async function conferirComMalha(esboco, triangulos, matriz) {
       soNoEsboco_mm3: r(volumeImportado - comum),
       iou: Math.round((comum / uniao) * 10000) / 10000,
       caixaDoOpenScad: { min: min.map(r), max: max.map(r) },
+      formasSemMedida,
     };
   } finally {
     contexto.liberar();

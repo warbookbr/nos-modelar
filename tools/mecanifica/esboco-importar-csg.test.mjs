@@ -1,16 +1,18 @@
 /* O importador de .csg: a fixture sintética escrita à mão cobre cada nó, e o resultado é medido pelo próprio esboço (a caixa de
    cada forma depois de posta e recortada), e não pela conta do importador. */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { descreverEsboco } from '../../modulos/esboco/src/descrever.js';
+import { validarEsboco } from '../../modulos/esboco/src/index.js';
 import { fragmentos, importarCsg, lerCsg, quadroDoEsboco, RecusaDeImportacao } from './esboco-importar-csg.mjs';
 import { conferirComMalha, lerStl } from './esboco-importar-csg-conferir.mjs';
 import { rodar } from './importar-csg.mjs';
 
+const temOpenScad = (() => { try { execFileSync('openscad', ['--version'], { stdio: 'ignore' }); return true; } catch { return false; } })();
 const FIXTURE = fileURLToPath(new URL('./fixtures/importar-csg/sintetico.csg', import.meta.url));
 const texto = readFileSync(FIXTURE, 'utf8');
 
@@ -206,8 +208,8 @@ describe('o que o esboço não expressa', () => {
   };
 
   it.each([
-    ['hull', 'hull() {\n\tcube(size = [1, 1, 1], center = false);\n}\n', /casco convexo/],
-    ['minkowski', 'minkowski() {\n\tcube(size = [1, 1, 1], center = false);\n}\n', /Minkowski/],
+    ['hull com esfera', 'hull() {\n\tsphere(r = 1);\n}\n', /sphere dentro do hull/],
+    ['minkowski de um filho só', 'minkowski() {\n\tcube(size = [1, 1, 1], center = false);\n}\n', /Minkowski/],
     ['polyhedron', 'polyhedron(points = [[0, 0, 0]], faces = [[0]], convexity = 1);\n', /poliedro/],
     ['text', 'text(text = "a", size = 10);\n', /texto/],
     ['import', 'import(file = "a.stl", layer = "", convexity = 1);\n', /malha/],
@@ -236,11 +238,10 @@ describe('o que o esboço não expressa', () => {
     expect(elipse.recusas[0].motivo).toMatch(/escala radial desigual/);
   });
 
-  it('recusa torção, escala e furo da extrusão, a revolução parcial, o toro e o perfil que volta', () => {
+  it('recusa torção, escala negativa, a revolução parcial, o toro e o perfil que volta', () => {
     const poligono = 'polygon(points = [[0, 0], [10, 0], [10, 10], [0, 10]], paths = undef, convexity = 1);';
     expect(recusa(`linear_extrude(height = 5, twist = 90) {\n\t${poligono}\n}\n`).recusas[0].motivo).toMatch(/twist/);
-    expect(recusa(`linear_extrude(height = 5, scale = [2, 2]) {\n\t${poligono}\n}\n`).recusas[0].motivo).toMatch(/scale/);
-    expect(recusa('linear_extrude(height = 5) {\n\tpolygon(points = [[0, 0], [10, 0], [10, 10], [0, 10], [2, 2], [4, 2], [4, 4]], paths = [[0, 1, 2, 3], [4, 5, 6]], convexity = 1);\n}\n').recusas[0].motivo).toMatch(/furo/);
+    expect(recusa(`linear_extrude(height = 5, scale = [-1, 1]) {\n\t${poligono}\n}\n`).recusas[0].motivo).toMatch(/scale negativo/);
     expect(recusa(`rotate_extrude(angle = 180, $fn = 32) {\n\t${poligono}\n}\n`).recusas[0].motivo).toMatch(/angle/);
     const toro = recusa(`rotate_extrude(angle = 360, $fn = 32) {\n\tmultmatrix([[1, 0, 0, 10], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {\n\t\tcircle(r = 2, $fn = 16);\n\t}\n}\n`);
     expect(toro.recusas[0]).toMatchObject({ no: 'circle', linha: 3 });
@@ -250,12 +251,12 @@ describe('o que o esboço não expressa', () => {
   });
 
   it('lista todas as recusas de uma vez, na ordem do arquivo', () => {
-    const e = recusa('hull() {\n\tcube(size = [1, 1, 1], center = false);\n}\ntext(text = "a");\nminkowski() {\n}\n');
+    const e = recusa('hull() {\n\tsphere(r = 1);\n}\ntext(text = "a");\nminkowski() {\n}\n');
     expect(e.recusas.map((r) => [r.no, r.linha])).toEqual([['hull', 1], ['text', 4], ['minkowski', 5]]);
   });
 
   it('no modo parcial grava o resto e diz o que ficou de fora, no relato e no plano', () => {
-    const r = importarCsg(`cube(size = [1, 1, 1], center = false);\nhull() {\n\tcube(size = [1, 1, 1], center = false);\n}\n`, { parcial: true, arquivo: 'x.csg' });
+    const r = importarCsg(`cube(size = [1, 1, 1], center = false);\nhull() {\n\tsphere(r = 1);\n}\n`, { parcial: true, arquivo: 'x.csg' });
     expect(r.esboco.opcoes[0].formas).toHaveLength(1);
     expect(r.relatorio.recusas).toHaveLength(1);
     expect(r.esboco.plano.texto).toMatch(/Importação parcial: 1 nó.*hull na linha 2/);
@@ -285,6 +286,225 @@ describe('o que o esboço não expressa', () => {
     const m = caixasMedidas(r.esboco);
     expect(m.caixa_1[0][0]).toBeCloseTo(5, 3);
     expect(m.caixa_1[0][1]).toBeCloseTo(10, 3);
+  });
+});
+
+/* As construções que o importador recusava e agora traduz. Cada caso é um `.csg` escrito à mão; a caixa de cada forma vem do próprio
+   esboço (`descreverEsboco`), e a medida contra o OpenSCAD está nos testes do corpus e na fixture sintética. */
+describe('as construções 2D e 3D que viraram forma', () => {
+  const LE = 'center = false, convexity = 10, scale = [1, 1], $fn = 0, $fa = 12, $fs = 2';
+  const importa = (csg) => importarCsg(csg, { arquivo: 'x.csg' });
+  const recusaDe = (csg) => { try { importarCsg(csg); } catch (e) { if (e instanceof RecusaDeImportacao) return e.recusas; throw e; } return []; };
+  const quadrado = (lado, x = 0, y = 0) => `multmatrix([[1, 0, 0, ${x}], [0, 1, 0, ${y}], [0, 0, 1, 0], [0, 0, 0, 1]]) {\n\t\t\tsquare(size = [${lado}, ${lado}], center = false);\n\t\t}`;
+  const translada = (x, y, z, filho) => `multmatrix([[1, 0, 0, ${x}], [0, 1, 0, ${y}], [0, 0, 1, ${z}], [0, 0, 0, 1]]) {\n\t${filho}\n}\n`;
+  const cil = (h, r, lados = 64) => `cylinder($fn = ${lados}, h = ${h}, r1 = ${r}, r2 = ${r}, center = false);`;
+  const ele = 'polygon(points = [[0, 0], [30, 0], [30, 10], [10, 10], [10, 30], [0, 30]], paths = undef, convexity = 1);';
+
+  it('diferença 2D com furo vira a extrusão da peça menos a extrusão do furo, que passa um pouco das faces', () => {
+    const { esboco } = importa(`linear_extrude(height = 5, ${LE}) {\n\tdifference() {\n\t\tsquare(size = [20, 20], center = false);\n\t\t${quadrado(4, 5, 5)}\n\t}\n}\n`);
+    const [corpo, furo] = esboco.opcoes[0].formas;
+    expect(corpo).toMatchObject({ id: 'caixa_1', tipo: 'caixa', subtrai: ['corte_caixa_1_f1'] });
+    expect(furo).toMatchObject({ id: 'corte_caixa_1_f1', tipo: 'caixa', cortador: true, largura: 4, profundidade: 4 });
+    expect(furo.altura).toBeGreaterThan(5); // o cortador passa das duas faces
+    expect(furo.altura).toBeLessThan(5.1);
+    expect(caixasMedidas(esboco).caixa_1).toEqual([[0, 20], [0, 5], [-20, 0]]);
+  });
+
+  it('o polígono com paths vira o contorno com os furos, e o furo dentro de furo é recusado', () => {
+    const { esboco } = importa(`linear_extrude(height = 4, ${LE}) {\n\tpolygon(points = [[0, 0], [20, 0], [20, 20], [0, 20], [5, 5], [15, 5], [15, 15], [5, 15]], paths = [[0, 1, 2, 3], [4, 5, 6, 7]], convexity = 1);\n}\n`);
+    expect(esboco.opcoes[0].formas.map((f) => [f.id, f.tipo, !!f.cortador])).toEqual([['extrusao', 'extrusao', false], ['corte_extrusao_f1', 'extrusao', true]]);
+    const ilha = recusaDe(`linear_extrude(height = 4, ${LE}) {\n\tpolygon(points = [[0, 0], [30, 0], [30, 30], [0, 30], [5, 5], [25, 5], [25, 25], [5, 25], [10, 10], [20, 10], [20, 20], [10, 20]], paths = [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]], convexity = 1);\n}\n`);
+    expect(ilha[0].motivo).toMatch(/ilha dentro de furo/);
+  });
+
+  it('o subtraendo com furo vira peças convexas que não se sobrepõem', () => {
+    const csg = `linear_extrude(height = 3, ${LE}) {\n\tdifference() {\n\t\tsquare(size = [30, 30], center = false);\n\t\tdifference() {\n\t\t\t${quadrado(10, 5, 5)}\n\t\t\t${quadrado(20, 10, 0)}\n\t\t}\n\t}\n}\n`;
+    const { esboco } = importa(csg);
+    const cortadores = esboco.opcoes[0].formas.filter((f) => f.cortador);
+    expect(cortadores).toHaveLength(1); // X - Y com Y cobrindo a metade de X deixa uma peça convexa só
+    expect(cortadores[0]).toMatchObject({ tipo: 'extrusao' });
+  });
+
+  it('offset(r) arredonda os cantos, offset(delta) os prolonga, chamfer os corta, e o negativo recua', () => {
+    const offset = (args) => importa(`linear_extrude(height = 5, ${LE}) {\n\toffset(${args}, $fa = 12, $fs = 2) {\n\t\tsquare(size = [10, 10], center = false);\n\t}\n}\n`);
+    for (const [args, caixa] of [['r = 2, $fn = 32', [[-2, 12], [0, 5], [-12, 2]]], ['delta = 2, chamfer = false, $fn = 0', [[-2, 12], [0, 5], [-12, 2]]], ['delta = 2, chamfer = true, $fn = 0', [[-2, 12], [0, 5], [-12, 2]]], ['r = -2, $fn = 32', [[2, 8], [0, 5], [-8, -2]]]]) {
+      expect(caixasMedidas(offset(args).esboco).extrusao, args).toEqual(caixa);
+    }
+    const perfil = (args) => offset(args).esboco.opcoes[0].formas[0].perfil.length;
+    expect(perfil('delta = 2, chamfer = false, $fn = 0')).toBe(4); // a esquadria mantém os quatro vértices
+    expect(perfil('delta = 2, chamfer = true, $fn = 0')).toBe(8); // o chanfro troca cada canto por dois
+    expect(perfil('r = 2, $fn = 32')).toBe(4 * 9); // 32 lados por volta: 8 passos e 9 pontos por canto de 90 graus
+  });
+
+  it('offset de círculo continua círculo, e o de círculo de poucos lados desloca o polígono', () => {
+    const { esboco } = importa(`linear_extrude(height = 5, ${LE}) {\n\toffset(r = 2, $fn = 64, $fa = 12, $fs = 2) {\n\t\tcircle($fn = 64, r = 8);\n\t}\n}\n`);
+    expect(esboco.opcoes[0].formas[0]).toMatchObject({ tipo: 'cilindro', diametro: 20 });
+    const hex = importa(`linear_extrude(height = 5, ${LE}) {\n\toffset(r = 2, $fn = 64, $fa = 12, $fs = 2) {\n\t\tcircle($fn = 6, r = 8);\n\t}\n}\n`);
+    expect(hex.esboco.opcoes[0].formas[0].tipo).toBe('extrusao');
+  });
+
+  it('offset em polígono côncavo, e o recuo que faz sumir ou cruzar', () => {
+    const { esboco } = importa(`linear_extrude(height = 5, ${LE}) {\n\toffset(delta = 3, chamfer = false, $fn = 0, $fa = 12, $fs = 2) {\n\t\t${ele}\n\t}\n}\n`);
+    expect(caixasMedidas(esboco).extrusao).toEqual([[-3, 33], [0, 5], [-33, 3]]);
+    const fino = 'polygon(points = [[0, 0], [30, 0], [30, 4], [4, 4], [4, 30], [0, 30]], paths = undef, convexity = 1);';
+    expect(recusaDe(`linear_extrude(height = 5, ${LE}) {\n\toffset(r = -3, $fn = 32, $fa = 12, $fs = 2) {\n\t\t${fino}\n\t}\n}\n`)[0].motivo).toMatch(/offset: o contorno deslocado se cruza/);
+    const some = importarCsg(`cube(size = 1);\nlinear_extrude(height = 5, ${LE}) {\n\toffset(r = -9, $fn = 32, $fa = 12, $fs = 2) {\n\t\tsquare(size = [10, 10], center = false);\n\t}\n}\n`);
+    expect(some.esboco.opcoes[0].formas).toHaveLength(1);
+    expect(some.relatorio.avisos.some((a) => /encolhe o polígono até sumir/.test(a.texto))).toBe(true);
+    expect(recusaDe('offset(r = 1) {\n\tsquare(size = 4);\n}\n')[0].motivo).toMatch(/offset 2D fora de linear_extrude/);
+  });
+
+  it('linear_extrude com scale vira cone no círculo e loft no polígono convexo, e recusa o côncavo', () => {
+    const LS = 'center = false, convexity = 10, scale = [0.5, 0.5], $fn = 0, $fa = 12, $fs = 2';
+    const cone = importa(`linear_extrude(height = 10, ${LS}) {\n\tcircle($fn = 64, r = 8);\n}\n`);
+    expect(cone.esboco.opcoes[0].formas[0]).toMatchObject({ tipo: 'cone', diametro: 16, diametroTopo: 8, comprimento: 10 });
+    const loft = importa(`linear_extrude(height = 10, ${LS}) {\n\tsquare(size = [10, 10], center = false);\n}\n`);
+    const [forma] = loft.esboco.opcoes[0].formas;
+    expect(forma.tipo).toBe('loft');
+    expect(forma.secoes.map((se) => se.pos)).toEqual([-5, 5]);
+    expect(caixasMedidas(loft.esboco).loft).toEqual([[0, 10], [0, 10], [-10, 0]]);
+    // a escala é em torno da origem do plano: a seção do topo encolhe para o canto, e não para o centro do quadrado
+    const [base, topo] = forma.secoes.map((se) => se.perfil);
+    const largura = (perfil) => Math.max(...perfil.map((q) => q[0])) - Math.min(...perfil.map((q) => q[0]));
+    expect(largura(base)).toBeCloseTo(10, 6);
+    expect(largura(topo)).toBeCloseTo(5, 6);
+    const ponta = importa(`linear_extrude(height = 10, center = false, convexity = 10, scale = [0, 0], $fn = 64, $fa = 12, $fs = 2) {\n\tcircle($fn = 64, r = 8);\n}\n`);
+    expect(ponta.esboco.opcoes[0].formas[0]).toMatchObject({ tipo: 'cone', diametroTopo: 0 });
+    expect(recusaDe(`linear_extrude(height = 10, ${LS}) {\n\t${ele}\n}\n`)[0].motivo).toMatch(/polígono côncavo/);
+    expect(recusaDe('linear_extrude(height = 10, center = false, convexity = 10, scale = [1, 2], $fn = 64, $fa = 12, $fs = 2) {\n\tcircle($fn = 64, r = 8);\n}\n')[0].motivo).toMatch(/elipse/);
+  });
+
+  it('o furo de uma extrusão com scale vira o mesmo cone ou loft como cortador', () => {
+    const { esboco } = importa('linear_extrude(height = 10, center = false, convexity = 10, scale = [0.5, 0.5], $fn = 0, $fa = 12, $fs = 2) {\n\tdifference() {\n\t\tsquare(size = [30, 30], center = true);\n\t\tcircle($fn = 64, r = 6);\n\t}\n}\n');
+    const [corpo, furo] = esboco.opcoes[0].formas;
+    expect(corpo).toMatchObject({ tipo: 'loft', subtrai: [furo.id] });
+    expect(furo).toMatchObject({ tipo: 'cone', cortador: true });
+    expect(furo.diametro).toBeCloseTo(12, 1); // um pouco acima de 12: o cortador passa da face de baixo na mesma reta do cone
+    expect(furo.diametroTopo).toBeCloseTo(6, 1);
+  });
+
+  it('hull 2D vira o polígono do casco convexo', () => {
+    const { esboco } = importa(`linear_extrude(height = 4, ${LE}) {\n\thull() {\n\t\tcircle($fn = 64, r = 5);\n\t\tmultmatrix([[1, 0, 0, 20], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {\n\t\t\tcircle($fn = 64, r = 3);\n\t\t}\n\t}\n}\n`);
+    expect(caixasMedidas(esboco).extrusao).toEqual([[-5, 23], [0, 4], [-5, 5]]);
+  });
+
+  it('hull 3D de prismas da mesma altura vira a extrusão do casco 2D das bases', () => {
+    const { esboco } = importa(`hull() {\n\t${cil(8, 5)}\n\t${translada(20, 5, 0, cil(8, 3))}}\n`);
+    expect(esboco.opcoes[0].formas).toHaveLength(1);
+    expect(esboco.opcoes[0].formas[0].tipo).toBe('extrusao');
+    expect(caixasMedidas(esboco).extrusao).toEqual([[-5, 23], [0, 8], [-8, 5]]);
+    const caixas = importa(`hull() {\n\tcube(size = [10, 10, 5], center = false);\n\t${translada(20, 5, 0, 'cube(size = [4, 4, 5], center = false);')}}\n`);
+    expect(caixasMedidas(caixas.esboco).extrusao).toEqual([[0, 24], [0, 5], [-10, 0]]);
+  });
+
+  it('hull 3D de seções semelhantes em torno do mesmo eixo vira cone, revolução ou loft', () => {
+    const discos = importa(`hull() {\n\t${cil(2, 10)}\n\t${translada(0, 0, 12, cil(2, 4))}}\n`);
+    expect(discos.esboco.opcoes[0].formas[0]).toMatchObject({ tipo: 'revolucao', perfil: [[10, 0], [10, 2], [4, 14]] });
+    const virado = importa(`multmatrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]) {\n\thull() {\n\t\tcylinder($fn = 64, h = 5, r1 = 8, r2 = 3, center = false);\n\t\t${translada(0, 0, 10, cil(3, 6))}\t}\n}\n`);
+    expect(virado.esboco.opcoes[0].formas[0]).toMatchObject({ tipo: 'cone', diametro: 16, diametroTopo: 12, comprimento: 13 });
+    const tronco = 'linear_extrude(height = 3, center = false, convexity = 5, scale = [1.2, 1.2], $fn = 0, $fa = 12, $fs = 2) {\n\t\tsquare(size = [10, 10], center = true);\n\t}';
+    const troncos = importa(`hull() {\n\t${tronco}\n\t${translada(0, 0, 8, `multmatrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]) {\n\t${tronco}\n}`)}}\n`);
+    const [loft] = troncos.esboco.opcoes[0].formas;
+    expect(loft.tipo).toBe('loft');
+    expect(loft.secoes).toHaveLength(4); // 10 mm em z=0, 12 mm em z=3 e em z=5, 10 mm em z=8
+    expect(caixasMedidas(troncos.esboco).loft).toEqual([[-6, 6], [0, 8], [-6, 6]]);
+  });
+
+  it('hull 3D que nenhuma forma do esboço expressa é recusado com o motivo', () => {
+    expect(recusaDe(`hull() {\n\tcube(size = [10, 10, 5], center = false);\n\t${translada(20, 5, 8, 'cube(size = [4, 4, 2], center = false);')}}\n`)[0].motivo).toMatch(/eixos afastados e alturas diferentes/);
+    expect(recusaDe(`hull() {\n\t${cil(5, 5)}\n\tmultmatrix([[1, 0, 0, 0], [0, 0, 1, 0], [0, -1, 0, 0], [0, 0, 0, 1]]) {\n\t\t${cil(5, 5)}\n\t}\n}\n`)[0].motivo).toMatch(/eixos que não são paralelos/);
+    expect(recusaDe(`hull() {\n\t${cil(5, 5)}\n\tcylinder($fn = 6, h = 5, r1 = 5, r2 = 2, center = false);\n}\n`)[0].motivo).toMatch(/não são semelhantes/);
+  });
+
+  it('minkowski de cubo com cilindro é a extrusão do retângulo arredondado, e com esfera é a união de 3 caixas, 12 cilindros e 8 esferas', () => {
+    const c = importa('minkowski(convexity = 0) {\n\tcube(size = [20, 10, 5], center = false);\n\tcylinder($fn = 32, h = 2, r1 = 3, r2 = 3, center = false);\n}\n');
+    expect(caixasMedidas(c.esboco).extrusao).toEqual([[-3, 23], [0, 7], [-13, 3]]);
+    const esf = importa('minkowski(convexity = 0) {\n\tcube(size = [20, 10, 5], center = false);\n\tsphere($fn = 32, r = 2);\n}\n');
+    expect(esf.relatorio.tipos).toEqual({ caixa: 3, cilindro: 12, esfera: 8 });
+    const m = Object.values(caixasMedidas(esf.esboco));
+    const uniao = [0, 1, 2].map((i) => [Math.min(...m.map((q) => q[i][0])), Math.max(...m.map((q) => q[i][1]))]);
+    expect(uniao).toEqual([[-2, 22], [-2, 7], [-12, 2]]); // o cubo [0,20]x[0,10]x[0,5] engrossado de 2 mm
+    expect(esf.relatorio.nos.minkowski).toBe(1);
+    expect(recusaDe('minkowski(convexity = 0) {\n\tsphere(r = 1);\n\tsphere(r = 1);\n}\n')[0].motivo).toMatch(/só a soma de um cubo/);
+    expect(recusaDe('minkowski(convexity = 0) {\n\tcube(size = 5);\n\tcylinder(h = 2, r1 = 3, r2 = 1);\n}\n')[0].motivo).toMatch(/cilindro da soma tem de ser reto/);
+  });
+
+  it('rotate_extrude com furo vira a revolução menos a revolução do furo', () => {
+    const { esboco } = importa('rotate_extrude(angle = 360, $fn = 48) {\n\tdifference() {\n\t\tsquare(size = [10, 10], center = false);\n\t\tmultmatrix([[1, 0, 0, 3], [0, 1, 0, 2], [0, 0, 1, 0], [0, 0, 0, 1]]) {\n\t\t\tsquare(size = [3, 5], center = false);\n\t\t}\n\t}\n}\n');
+    const [corpo, furo] = esboco.opcoes[0].formas;
+    expect(corpo).toMatchObject({ tipo: 'revolucao', subtrai: [furo.id] });
+    expect(furo).toMatchObject({ tipo: 'anel', cortador: true, diametroExterno: 12, diametroInterno: 6, espessura: 5 });
+  });
+
+  it('o esboço de cada construção nova valida', () => {
+    for (const csg of [
+      'linear_extrude(height = 10, center = false, convexity = 10, scale = [0.5, 0.5], $fn = 0, $fa = 12, $fs = 2) {\n\tsquare(size = [10, 10], center = false);\n}\n',
+      `hull() {\n\t${cil(2, 10)}\n\t${translada(0, 0, 12, cil(2, 4))}}\n`,
+      'minkowski(convexity = 0) {\n\tcube(size = [20, 10, 5], center = false);\n\tsphere($fn = 32, r = 2);\n}\n',
+    ]) {
+      const { esboco } = importa(csg);
+      expect(() => validarEsboco(JSON.parse(JSON.stringify(esboco)))).not.toThrow();
+    }
+  });
+});
+
+/* O corpus real: `.scad` de terceiros (CC-BY 4.0, ver fixtures/importar-csg/corpus/FONTE.md) e o `.csg` que o OpenSCAD exporta de cada um.
+   Cada arquivo fixa o número de formas e a lista exata de recusas (nó, linha e motivo), de modo que uma regressão ou uma recusa nova
+   aparece como diferença aqui; e fixa um piso para a razão interseção/união contra a malha que o próprio OpenSCAD calcula. */
+describe('o corpus real do Thingiverse', () => {
+  const PASTA = fileURLToPath(new URL('./fixtures/importar-csg/corpus/', import.meta.url));
+  const HULL_DAS_ALETAS = 'hull: filhos com eixos afastados e alturas diferentes: o casco não é uma extrusão nem um loft de seções semelhantes';
+  const CORPUS = [
+    { nome: 'drone, trem de pouso', arquivo: 'drone/Landing_gear.csg', formas: 17, recusas: [], piso: 0.999 },
+    { nome: 'drone, corpo inferior', arquivo: 'drone/Parametric_lower_body.csg', formas: 115, recusas: [], piso: 0.97, lento: true },
+    { nome: 'drone, corpo superior', arquivo: 'drone/Parametric_top_body_v3.csg', formas: 118, recusas: [], piso: 0.98 },
+    { nome: 'SCARA paramétrico', arquivo: 'scara/scara.csg', formas: 195, recusas: [], piso: 0.999 },
+    {
+      nome: 'foguete paramétrico',
+      arquivo: 'foguete/foguete.csg',
+      formas: 76,
+      recusas: [1533, 1573, 1613, 1653, 1693].map((linha) => `hull (linha ${linha}): ${HULL_DAS_ALETAS}`),
+      piso: 0.87,
+      lento: true,
+    },
+  ];
+  const importa = (arquivo) => importarCsg(readFileSync(join(PASTA, arquivo), 'utf8'), { parcial: true, arquivo: arquivo.replace(/^.*\//, '') });
+
+  it.each(CORPUS)('$nome: importa com $formas formas e a lista de recusas fixada, e o esboço valida', ({ arquivo, formas, recusas }) => {
+    const r = importa(arquivo);
+    expect(r.esboco.opcoes[0].formas).toHaveLength(formas);
+    expect(r.relatorio.recusas.map((x) => `${x.no} (linha ${x.linha}): ${x.motivo}`)).toEqual(recusas);
+    expect(() => validarEsboco(JSON.parse(r.texto))).not.toThrow();
+    expect(new Set(r.esboco.opcoes[0].formas.map((f) => f.id)).size).toBe(formas); // ids posicionais sem repetição
+  });
+
+  it.each(CORPUS)('$nome: o mesmo .csg dá o mesmo texto', ({ arquivo }) => {
+    expect(importa(arquivo).texto).toBe(importa(arquivo).texto);
+  });
+
+  /* A blocagem da receita só aceita de 8 a 128 lados, e o corpus tem porcas de 6 lados; sem sólido, a conferência as relata em
+     `formasSemMedida` e não as mede. Para o piso medir a tradução, a cópia do esboço leva essas formas a 8 lados. O STL sai do
+     `openscad -o x.stl x.csg` na hora (nenhum STL fica no repositório), e o OpenSCAD 2021 gasta de 8 s a 1 min por arquivo: os dois
+     mais lentos (corpo inferior do drone e foguete) só rodam com IMPORTAR_CSG_MEDIDA_COMPLETA=1. */
+  async function iouContraOpenScad(arquivo) {
+    const pasta = mkdtempSync(join(tmpdir(), 'importar-csg-corpus-'));
+    try {
+      const stl = join(pasta, 'x.stl');
+      execFileSync('openscad', ['-q', '-o', stl, join(PASTA, arquivo)], { stdio: 'ignore' });
+      const copia = JSON.parse(JSON.stringify(importa(arquivo).esboco));
+      for (const f of copia.opcoes[0].formas) if (f.lados !== undefined && f.lados < 8) f.lados = 8;
+      const medido = await conferirComMalha(copia, lerStl(readFileSync(stl)), quadroDoEsboco({}));
+      expect(medido.formasSemMedida).toEqual([]);
+      return medido.iou;
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }
+  describe.skipIf(!temOpenScad)('contra a malha do OpenSCAD', () => {
+    it.each(CORPUS.filter((c) => !c.lento))('$nome: interseção/união acima de $piso', async ({ arquivo, piso }) => {
+      expect(await iouContraOpenScad(arquivo), arquivo).toBeGreaterThan(piso);
+    }, 300_000);
+    it.skipIf(!process.env.IMPORTAR_CSG_MEDIDA_COMPLETA).each(CORPUS.filter((c) => c.lento))('$nome: interseção/união acima de $piso (lento)', async ({ arquivo, piso }) => {
+      expect(await iouContraOpenScad(arquivo), arquivo).toBeGreaterThan(piso);
+    }, 600_000);
   });
 });
 
@@ -357,6 +577,31 @@ describe('a conferência contra a malha do OpenSCAD', () => {
     expect(m.soNoOpenScad_mm3).toBeCloseTo(500, 1);
   });
 
+  it('não lança com o esboço vazio nem com a forma que a blocagem recusa: relata a forma e o motivo e mede o resto', async () => {
+    const vazio = importarCsg('', { parcial: true });
+    const r0 = await conferirComMalha(vazio.esboco, lerStl(STL_DO_CUBO), quadroDoEsboco({}));
+    expect(r0).toMatchObject({ volumeDoEsboco_mm3: 0, volumeComum_mm3: 0, iou: 0 });
+    expect(r0.volumeDoOpenScad_mm3).toBeCloseTo(1000, 1);
+    expect(r0.formasSemMedida).toEqual([{ id: null, tipo: null, codigo: 'esboco-vazio', motivo: expect.stringMatching(/não tem forma alguma/) }]);
+    const hex = importarCsg('cube(size = [10, 10, 10], center = false);\ncylinder($fn = 6, $fa = 12, $fs = 2, h = 5, r1 = 4, r2 = 4, center = false);\n');
+    const r1 = await conferirComMalha(hex.esboco, lerStl(STL_DO_CUBO), quadroDoEsboco({}));
+    expect(r1.formasSemMedida).toEqual([{ id: 'cilindro_2', tipo: 'cilindro', codigo: 'n2-recusa', motivo: expect.stringMatching(/entre 8 e 128/) }]);
+    expect(r1.volumeDoEsboco_mm3).toBeCloseTo(1000, 1); // o cubo foi medido
+    expect(r1.iou).toBe(1);
+  });
+
+  it('com --conferir, a forma que a blocagem recusa não derruba o comando e sai na lista', async () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'importar-csg-conferir-'));
+    try {
+      writeFileSync(join(pasta, 'x.csg'), 'cube(size = [10, 10, 10], center = false);\ncylinder($fn = 6, $fa = 12, $fs = 2, h = 5, r1 = 4, r2 = 4, center = false);\n');
+      writeFileSync(join(pasta, 'x.stl'), STL_DO_CUBO);
+      const texto1 = await rodar([join(pasta, 'x.csg'), '--conferir', join(pasta, 'x.stl')]);
+      expect(texto1).toMatch(/interseção\/união 1$/m);
+      expect(texto1).toMatch(/sem medida na conferência: cilindro_2 \(cilindro\): .*entre 8 e 128/);
+      expect(JSON.parse(readFileSync(join(pasta, 'x.importacao.json'), 'utf8')).conferencia.formasSemMedida).toHaveLength(1);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  });
+
   it('lê o STL binário igual ao de texto', () => {
     const tri = lerStl(STL_DO_CUBO);
     const buf = Buffer.alloc(84 + tri.length * 50);
@@ -365,7 +610,6 @@ describe('a conferência contra a malha do OpenSCAD', () => {
     expect(lerStl(buf)).toEqual(tri);
   });
 
-  const temOpenScad = (() => { try { execFileSync('openscad', ['--version'], { stdio: 'ignore' }); return true; } catch { return false; } })();
   it.skipIf(!temOpenScad)('a fixture sintética coincide com a malha que o próprio OpenSCAD calcula dela (interseção/união acima de 0,99)', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'importar-csg-stl-'));
     try {
