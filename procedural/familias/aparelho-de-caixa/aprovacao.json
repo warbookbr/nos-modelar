@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "aparelho-de-caixa",
-  "versao": "1.0.0",
+  "versao": "1.1.0",
   "mecanica": {
     "data": "2026-10-16",
     "pontos": {
@@ -10,24 +10,25 @@
           "altura": 200,
           "alturaDosPes": 8,
           "botoesDePressao": 0,
-          "botoesGiratorios": 0,
+          "botoesGiratorios": 1,
           "comVisor": 0,
           "espessuraDaPorta": 15,
           "faixaDoPainel": 50,
           "largura": 300,
-          "painelDeComando": 0,
+          "painelDeComando": 1,
           "parede": 2,
           "profundidade": 250,
+          "raioDoCorpo": 4,
           "recessoDoVidro": 3,
-          "tipoDePuxador": 0
+          "tipoDePuxador": 1
         },
-        "hash": "sha256:50023f3662669f5500b8f5cf246185daa44a17c53c83607a9e066f7e8413c56a",
+        "hash": "sha256:ab4aa525dcc12e9ff444d07a516f9a768ce8a255eed8dbc10d3ccb7f80026e8a",
         "medidas": []
       },
       "medio": {
         "parametros": {
           "altura": 350,
-          "alturaDosPes": 15,
+          "alturaDosPes": 12,
           "botoesDePressao": 1,
           "botoesGiratorios": 2,
           "comVisor": 1,
@@ -37,16 +38,17 @@
           "painelDeComando": 1,
           "parede": 3,
           "profundidade": 400,
+          "raioDoCorpo": 8,
           "recessoDoVidro": 5,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:a8275f617013c9d120768968bde4457adc57ae5d919955906bea57c2c0aa9f65",
+        "hash": "sha256:ba435b7f08503e0371deea23b3ed101226ca0ac01806ab76843a3d135a92c87d",
         "medidas": []
       },
       "maximo": {
         "parametros": {
           "altura": 500,
-          "alturaDosPes": 30,
+          "alturaDosPes": 15,
           "botoesDePressao": 2,
           "botoesGiratorios": 4,
           "comVisor": 1,
@@ -56,21 +58,17 @@
           "painelDeComando": 2,
           "parede": 4,
           "profundidade": 550,
+          "raioDoCorpo": 12,
           "recessoDoVidro": 10,
           "tipoDePuxador": 2
         },
-        "hash": "sha256:0b7735e827c032cbc120c1e845e0623f92142eaced563ec5b7e3acaf9358dfbb",
+        "hash": "sha256:afbd32468589a21f5caa9e732ccf16b4af9807df3ae4e10c197dd881d67e42a3",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 26,
-      "recusasDeclaradas": [
-        {
-          "ponto": "painelDeComando=0",
-          "restricao": "botoes-sem-painel"
-        }
-      ]
+      "sondas": 28,
+      "recusasDeclaradas": []
     },
     "portas": [],
     "perfis": {
@@ -87,15 +85,16 @@
           "painelDeComando": 1,
           "parede": 2,
           "profundidade": 380,
+          "raioDoCorpo": 8,
           "recessoDoVidro": 5,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:baff94d1862aff563e602f4c88e62f816846daa85e32185d1354d5d25ac14575",
+        "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f",
         "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 16,
+      "sondas": 18,
       "recusasDeclaradas": []
     }
   },

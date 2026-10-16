@@ -1,29 +1,25 @@
 {
   "formato": "mecanifica.familia@1",
   "id": "aparelho-de-caixa",
-  "versao": "1.0.0",
+  "versao": "1.1.0",
   "nivel": "componente",
   "parametros": {
     "largura": { "tipo": "numero", "unidade": "mm", "padrao": 480, "minimo": 300, "maximo": 700, "medio": 500 },
     "altura": { "tipo": "numero", "unidade": "mm", "padrao": 290, "minimo": 200, "maximo": 500, "medio": 350 },
     "profundidade": { "tipo": "numero", "unidade": "mm", "padrao": 380, "minimo": 250, "maximo": 550, "medio": 400 },
-    "alturaDosPes": { "tipo": "numero", "unidade": "mm", "padrao": 15, "minimo": 8, "maximo": 30, "medio": 15 },
+    "alturaDosPes": { "tipo": "numero", "unidade": "mm", "padrao": 15, "minimo": 8, "maximo": 15, "medio": 12 },
+    "raioDoCorpo": { "tipo": "numero", "unidade": "mm", "padrao": 8, "minimo": 4, "maximo": 12, "medio": 8 },
     "espessuraDaPorta": { "tipo": "numero", "unidade": "mm", "padrao": 22, "minimo": 15, "maximo": 40, "medio": 25 },
     "recessoDoVidro": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 3, "maximo": 10, "medio": 5 },
     "parede": { "tipo": "numero", "unidade": "mm", "padrao": 2, "minimo": 2, "maximo": 4, "medio": 3 },
     "faixaDoPainel": { "tipo": "numero", "unidade": "mm", "padrao": 80, "minimo": 50, "maximo": 120, "medio": 90 },
-    "painelDeComando": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 2, "medio": 1 },
-    "botoesGiratorios": { "tipo": "inteiro", "unidade": "contagem", "padrao": 3, "minimo": 0, "maximo": 4, "medio": 2 },
+    "painelDeComando": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 2, "medio": 1 },
+    "botoesGiratorios": { "tipo": "inteiro", "unidade": "contagem", "padrao": 3, "minimo": 1, "maximo": 4, "medio": 2 },
     "botoesDePressao": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 2, "medio": 1 },
-    "tipoDePuxador": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 2, "medio": 1 },
+    "tipoDePuxador": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 2, "medio": 1 },
     "comVisor": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 1, "medio": 1 }
   },
   "restricoes": [
-    {
-      "id": "botoes-sem-painel",
-      "expressao": "(botoesGiratorios + botoesDePressao) * (1 - min(1, painelDeComando)) <= 0",
-      "motivo": "os botões ficam no painel de comando: sem painel (painelDeComando 0) não há onde pôr botão; use botoesGiratorios 0 e botoesDePressao 0, ou um painel"
-    },
     {
       "id": "botoes-cabem-na-coluna",
       "expressao": "min(1, painelDeComando) * (2 - painelDeComando) * (50 * (botoesGiratorios + botoesDePressao) - (altura - alturaDosPes - 6)) <= 0",
@@ -79,28 +75,28 @@
   "ferramentas": ["arredonda", "booleana"],
   "perguntas": {
     "corpo": [
-      "O corpo se lê como uma caixa de chapa com as quinas chanfradas, aberta na frente e sobre pés curtos?",
+      "O corpo se lê como uma caixa de chapa com as quinas arredondadas, aberta na frente e sobre pés curtos?",
       "A cavidade do forno se vê pelo visor, e a grelha atravessa a cavidade de lado a lado?"
     ],
     "porta": [
-      "A porta tem uma moldura em volta do visor, e o vidro fica recuado atrás da moldura?",
+      "A porta tem uma abertura passante com moldura, e o vidro é uma peça fina recuada dentro dela?",
       "A porta encosta na frente do corpo e não o atravessa, com a mesma altura e largura em todo o painel?"
     ],
     "painel": [
       "O painel de comando é uma faixa à direita ou no topo, sem sair da frente do corpo?"
     ],
     "botoes": [
-      "Cada botão giratório é um cilindro curto que sai do painel e tem um indicador no topo?",
+      "Cada botão giratório é um cilindro curto com saia na base e um indicador no topo, saindo do painel?",
       "Os botões de pressão são discos mais baixos e mais finos que os giratórios?"
     ],
     "puxador": [
-      "O puxador é uma barra presa à porta por dois suportes, na altura do topo da porta ou na borda dela?"
+      "O puxador é uma barra afastada da porta por dois suportes nas pontas, na altura do topo da porta ou na borda dela?"
     ]
   },
   "perfis": {
     "forninho-eletrico": {
       "descricao": "Forninho elétrico de bancada de cerca de 25 litros: porta com visor, painel à direita com três botões giratórios e puxador horizontal, sobre pés curtos.",
-      "parametros": { "largura": 480, "altura": 290, "profundidade": 380, "alturaDosPes": 15, "espessuraDaPorta": 22, "recessoDoVidro": 5, "parede": 2, "faixaDoPainel": 80, "painelDeComando": 1, "botoesGiratorios": 3, "botoesDePressao": 0, "tipoDePuxador": 1, "comVisor": 1 }
+      "parametros": { "largura": 480, "altura": 290, "profundidade": 380, "alturaDosPes": 15, "raioDoCorpo": 8, "espessuraDaPorta": 22, "recessoDoVidro": 5, "parede": 2, "faixaDoPainel": 80, "painelDeComando": 1, "botoesGiratorios": 3, "botoesDePressao": 0, "tipoDePuxador": 1, "comVisor": 1 }
     }
   }
 }
