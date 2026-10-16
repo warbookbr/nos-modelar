@@ -23,13 +23,11 @@
  * duas são cortadas no mesmo plano, `x` da ponta: a metade perde o que passa dele (`cortaPonta`) e a ponta perde o que fica aquém
  * (`cortaAsa`).
  *
- * A ponta parte da mesma chamada da família, com o perfil e as cordas dela, e só o caminho e o contorno mudam, porque a família não
- * aceita mais de 60 graus de ponta levantada e a pessoa pediu a ponta a uns 9% da meia-asa, o que pede cerca de 72. As seções do
- * contorno vêm da expansão (interpoladas em x, que é exato: corda, espessura e enflechamento são retas) e o caminho é a mesma curva de
- * quinto grau da família (`plantaDa`), com o ângulo de `asa.pontaLevantada`; a tampa é a da família, de comprimento fixo ao longo do
- * caminho. Vista de cima, a ponta tem os cantos do bordo de ataque e do de fuga arredondados: cada seção perde, em u, um recuo que
- * segue um quarto de círculo em x, do raio de `ponta.raioNoBordoDeAtaque` e de `ponta.raioNoBordoDeFuga`, e o recuo chega ao máximo
- * na corda da ponta.
+ * A ponta é a chamada da família com o perfil `asa`, as cordas e a espessura da reta da semi-asa no x dela, a ponta levantada de 72
+ * graus, a tampa de 130 mm ao longo da tangente final e os cantos do bordo de ataque (170 mm) e do bordo de fuga (120 mm) arredondados
+ * vistos de cima, tudo pelas opções `pontaLevantada`, `comprimentoDaTampa`, `raioDoCantoDeAtaque` e `raioDoCantoDeFuga` da família, em
+ * razão da semi-envergadura. A família gera a semi-asa inteira até a ponta, e a metade de asa fica só com o que a `cortaAsa` deixa
+ * além do plano do corte.
  *
  * O vão do flap e o do aileron são o próprio comando engrossado pela fresta (`subtrai` com `folga` no esboço): o contorno de cada
  * seção é deslocado para fora pela fresta, com a quina em esquadria, e as duas extremidades avançam a fresta, com o contorno
@@ -51,7 +49,7 @@
 import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 import { nucleo } from '../../../../nucleo/entrada.js';
-import { ANGULOS_DA_TAMPA, inverterSuave, plantaDa, pontoDaSecao, quadrosDoLoft } from '../../../../familias/superficie-aerodinamica/geometria.js';
+import { pontoDaSecao, quadrosDoLoft } from '../../../../familias/superficie-aerodinamica/geometria.js';
 
 const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const LADOS = [['D', 'd', 'direito'], ['E', 'e', 'esquerdo']];
@@ -82,8 +80,7 @@ export const TABELA = {
      entre as duas). `degrauDaRaiz` é a fração da semi-envergadura em que o diedro começa, constante da família. A ponta levantada
      (`pontaLevantada`, em graus) ocupa os últimos `extensaoDaPonta` da semi-envergadura da ponta: o esboço a põe em 56 graus, que sobem
      uns 6% da semi-envergadura acima da linha do diedro, e a rodada de ajustes a leva a 72, que sobem uns 9% (a pessoa pediu de 8 a
-     10%, como na referência real). A família só aceita até `LIMITE_DA_FAMILIA` (60), e acima disso a ponta usa o caminho de `ponta`
-     (adiante). O corte da ponta é o plano em x
+     10%, como na referência real), pela `chamar()` da família, que aceita até 72. O corte da ponta é o plano em x
      `raiz[0] + fracaoDaSemi * semi - fracaoDaCordaNaPonta * cordaNaPonta + folga`, que a metade de asa e a ponta dividem; `cortaPonta`
      e `cortaAsa` são as duas caixas dele, grandes o bastante para a asa passar (y e z do centro, altura e profundidade), e `inicio` é o
      x em que a caixa da ponta termina do lado da raiz. */
@@ -104,13 +101,12 @@ export const TABELA = {
     cortaPonta: { largura: 1000, altura: 3000, profundidade: 3000, y: 1500, z: 4800 },
     cortaAsa: { inicio: 600, altura: 3000, profundidade: 3000, y: 1500, z: 4800 },
   },
-  /* A ponta levantada, no que se afasta da família. `recuoDoInicio` é quanto o `loft` da ponta começa antes do começo da curva (o corte
-     da ponta aparra esse trecho reto), e `intervalosNaCurva` o número de intervalos da curva, espaçados por igual no ângulo: com a tampa
-     e as duas pontas, são as 25 seções que o bloco de 1000 faces de um `loft` comporta. `comprimentoDaTampa` é o comprimento, ao longo
-     do caminho, das três seções da tampa e da corda que fecha a ponta (a família as põe a 130 mm do fim da curva, a 62 graus). Vista de
-     cima, a ponta tem o canto do bordo de ataque de `raioNoBordoDeAtaque` e o do bordo de fuga de `raioNoBordoDeFuga`, como a
-     referência real, onde o de ataque é o mais largo e o de fuga fecha em ponta curta. */
-  ponta: { recuoDoInicio: 200, intervalosNaCurva: 18, comprimentoDaTampa: 130, raioNoBordoDeAtaque: 170, raioNoBordoDeFuga: 120 },
+  /* A ponta levantada, no que a chamada da família recebe além do que a asa dá. `semi` é o x da ponta, a partir da raiz: a família
+     termina a superfície nele, e as cordas e a espessura são as da reta da semi-asa de `asa.semi` ali. `comprimentoDaTampa` é o
+     comprimento, ao longo do caminho, das três seções da tampa e da corda que fecha a ponta, e `raioNoBordoDeAtaque` e
+     `raioNoBordoDeFuga` os cantos arredondados vistos de cima, como na referência real, onde o de ataque é o mais largo e o de fuga
+     fecha em ponta curta. As três vão à família em razão da `semi` da ponta. */
+  ponta: { semi: 5622.7, comprimentoDaTampa: 130, raioNoBordoDeAtaque: 170, raioNoBordoDeFuga: 120 },
   /* A carenagem da raiz, no lado direito: `entrada` é quanto ela entra na fuselagem, para dentro da raiz da asa (x da raiz menos
      `entrada`); `alcanceEmX` e `alcanceEmZ` são os dois semieixos do quarto de elipse em planta, de x da raiz até x da raiz mais
      `alcanceEmX` na direção do vão, e de `alcanceEmZ` atrás do bordo de fuga até o próprio bordo; `sobreposicao` é quanto a frente entra
@@ -118,9 +114,10 @@ export const TABELA = {
      `estacoes` o número de seções do quarto de elipse, espaçadas por igual no ângulo. */
   carenagem: { entrada: 80, alcanceEmX: 170, alcanceEmZ: 200, sobreposicao: 40, espessuraDaFrente: 12, espessuraDeTras: 4, estacoes: 8 },
   /* O casulo, na asa esquerda: `x` é a distância ao eixo do avião (o casulo fica em -x); `aFrente` e `aTras` são quanto ele passa do
-     bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `abaixoDoEixo` quanto o centro fica
-     abaixo da linha de 25% da corda, e `lados` e `estacoes` a resolução da revolução e do meio perfil. */
-  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, abaixoDoEixo: 50, lados: 48, estacoes: 16 },
+     bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `raiosAbaixoDoIntradorso` quantos
+     raios o centro fica abaixo do ponto mais baixo do intradorso da asa naquele x (um raio, como na referência real, em que o casulo
+     pende sob a asa, e não dentro dela), e `lados` e `estacoes` a resolução da revolução e do meio perfil. */
+  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, raiosAbaixoDoIntradorso: 1, lados: 48, estacoes: 16 },
   /* O oval: o centro fica a `x` do eixo e a `naCorda` da corda a partir do bordo de ataque; é a extrusão em y de um retângulo de
      `comprimento` em x e `largura` em z de cantos de meia largura, com `altura` acima do extradorso e `profundidadeNaAsa` abaixo dele,
      girada em z pelo diedro para ficar paralela à asa. */
@@ -250,8 +247,6 @@ function giroDoEixo({ de, para }) {
   return { comprimento, em: Math.asin(u[1]) / GRAUS, y: Math.atan2(-u[2], u[0]) / GRAUS };
 }
 
-/* O máximo de `pontaLevantada` que a família aceita, em graus (a faixa de `familia.json`). */
-const LIMITE_DA_FAMILIA = 60;
 /* O eixo de torção da família fica a 25% da corda, e `raiz[2]` é o z dele na raiz. */
 const EIXO_NA_CORDA = 0.25;
 
@@ -271,75 +266,6 @@ function quadroDaAsa(t, x) {
   const eixoZ = a.raiz[2] + (x - a.raiz[0]) * tg(a.enflechamento);
   const eixoY = a.raiz[1] + Math.max(0, x - a.raiz[0] - a.degrauDaRaiz * a.semi) * tg(a.diedro);
   return { corda, eixoZ, eixoY, ataque: eixoZ - EIXO_NA_CORDA * corda, fuga: eixoZ + t.comando.posicaoNaCorda * corda };
-}
-
-/* As seções da ponta levantada e arredondada, em metro no quadro local da família: as da família (`base`, a chamada da ponta) dão o
-   contorno, e o caminho é o da curva de quinto grau dela com o ângulo de `asa.pontaLevantada`, que passa do que a família aceita. O
-   `loft` começa `ponta.recuoDoInicio` antes da curva, e as seções da curva ficam espaçadas por igual no ângulo, como as da família.
-   A tampa guarda as espessuras da família (o cosseno de 30, 55 e 75 graus), mas fica a `ponta.comprimentoDaTampa` ao longo da reta
-   do fim da curva, e não nos 60 mm em x da família, que num caminho mais inclinado alongariam a tampa. */
-function secoesDaPonta(t, base) {
-  const a = t.asa;
-  const p = t.ponta;
-  const planta = plantaDa({
-    semi: m(a.semi), cordaNaRaiz: m(a.cordaNaRaiz), cordaNaPonta: m(a.cordaNaPonta), abaulamentoDaCorda: 0, espessuraNaRaiz: a.espessuraNaRaiz,
-    espessuraNaPonta: a.espessuraNaPonta, incidenciaNaRaiz: 0, torcao: 0, enflechamento: a.enflechamento, diedro: a.diedro,
-    pontaLevantada: a.pontaLevantada, extensaoDaPonta: a.extensaoDaPonta, bordoDeFuga: 0,
-  });
-  const aneis = base.secoes.filter((s) => s.contorno);
-  const corpo = aneis.filter((s) => s.pos[0] <= planta.xDoCorte + 1e-6);
-  const tampa = aneis.filter((s) => s.pos[0] > planta.xDoCorte + 1e-6);
-  if (tampa.length !== ANGULOS_DA_TAMPA.length) throw new Error(`ponta: a família deu ${tampa.length} seções de tampa, e eram ${ANGULOS_DA_TAMPA.length}`);
-
-  /* O contorno da família em x, interpolado entre as duas seções vizinhas do corpo. */
-  const contornoEm = (x) => {
-    const i = Math.max(0, corpo.findIndex((s) => s.pos[0] >= x) - 1);
-    const A = corpo[i];
-    const B = corpo[Math.min(i + 1, corpo.length - 1)];
-    const f = B.pos[0] === A.pos[0] ? 0 : (x - A.pos[0]) / (B.pos[0] - A.pos[0]);
-    return A.contorno.map(([u, w], k) => [u + f * (B.contorno[k][0] - u), w + f * (B.contorno[k][1] - w)]);
-  };
-
-  const theta = (a.diedro + a.pontaLevantada) * GRAUS;
-  const xFim = planta.xDoCorte;
-  const yFim = planta.y(xFim);
-  const comprimento = m(p.comprimentoDaTampa);
-  const xPonta = xFim + comprimento * Math.cos(theta);
-  /* O recuo de um canto em x: zero até `raio` antes da ponta e, dali, o quarto de círculo que chega a `raio` na ponta. */
-  const recuo = (x, raio) => {
-    const r = x - (xPonta - m(raio));
-    return r <= 0 ? 0 : m(raio) - Math.sqrt(Math.max(0, m(raio) ** 2 - r * r));
-  };
-  /* Os pontos [u, w] com a corda encolhida pelos dois recuos: o bordo de ataque (u mínimo) anda para trás e o de fuga para a frente. */
-  const apara = (pontos, x) => {
-    const us = pontos.map(([u]) => u);
-    const uMin = Math.min(...us);
-    const corda = Math.max(...us) - uMin;
-    const dAtaque = recuo(x, p.raioNoBordoDeAtaque);
-    const dFuga = recuo(x, p.raioNoBordoDeFuga);
-    const k = (corda - dAtaque - dFuga) / corda;
-    return pontos.map(([u, w]) => [uMin + dAtaque + (u - uMin) * k, w]);
-  };
-  const anel = (x) => ({ pos: [x, planta.y(x), 0], contorno: apara(contornoEm(x), x) });
-  const corda = (x, pontos) => {
-    const us = pontos.map(([u]) => u);
-    return [[Math.max(...us), 0], [Math.min(...us), 0]];
-  };
-
-  const xInicio = planta.xDaCurva - m(p.recuoDoInicio);
-  const secoes = [{ pos: [xInicio, planta.y(xInicio), 0], aresta: corda(xInicio, contornoEm(xInicio)) }, anel(xInicio + 1e-4)];
-  for (let k = 0; k <= p.intervalosNaCurva; k++) {
-    const x = k === 0 ? planta.xDaCurva : k === p.intervalosNaCurva ? xFim : planta.xDaCurva + (xFim - planta.xDaCurva) * inverterSuave(k / p.intervalosNaCurva);
-    secoes.push(anel(x));
-  }
-  for (const s of tampa) {
-    const ao = (comprimento * (s.pos[0] - xFim)) / planta.comprimentoDaTampa;
-    const x = xFim + ao * Math.cos(theta);
-    secoes.push({ pos: [x, yFim + ao * Math.sin(theta), 0], contorno: apara(s.contorno, x) });
-  }
-  const ultima = base.secoes[base.secoes.length - 1];
-  secoes.push({ pos: [xPonta, yFim + comprimento * Math.sin(theta), 0], aresta: apara(ultima.aresta, xPonta) });
-  return { secoes, lados: base.lados, orientacao: base.orientacao };
 }
 
 /* A altura (y local, em metro) do extradorso da asa no ponto (x, z) do quadro local da família: as duas seções do `loft` que
@@ -366,6 +292,18 @@ function extradorsoEm(loft, x, z) {
   return pa[1] + ((x - pa[0]) / (pb[0] - pa[0])) * (pb[1] - pa[1]);
 }
 
+/* A altura (y local, em metro) do ponto mais baixo do intradorso da asa em x (metro, no quadro local da família): o ponto mais baixo
+   do contorno em cada uma das duas seções que cercam x, e a reta entre os dois. */
+function intradorsoEm(loft, x) {
+  const quadros = quadrosDoLoft(loft.secoes.map((s) => s.pos), loft.orientacao);
+  const aneis = loft.secoes.map((s, i) => ({ s, q: quadros[i] })).filter(({ s }) => s.contorno);
+  const i = aneis.findIndex(({ s }) => s.pos[0] >= x);
+  if (i < 1) throw new Error(`casulo: x ${x} m fica fora das seções da asa`);
+  const maisBaixo = ({ s, q }) => s.contorno.map((ponto) => pontoDaSecao(s.pos, q, ponto)).reduce((melhor, p) => (p[1] < melhor[1] ? p : melhor));
+  const [pa, pb] = [maisBaixo(aneis[i - 1]), maisBaixo(aneis[i])];
+  return pa[1] + ((x - pa[0]) / (pb[0] - pa[0])) * (pb[1] - pa[1]);
+}
+
 /* A carenagem da raiz, em mm: as seções [z, y] em cada x, da entrada na fuselagem ao fim do quarto de elipse. */
 function medidasDaCarenagem(t) {
   const a = t.asa;
@@ -385,10 +323,12 @@ function medidasDaCarenagem(t) {
   return estacoes;
 }
 
-/* O casulo, em mm: o meio perfil [raio, z] de uma elipse, da ponta da frente à de trás, e o ponto em que o eixo passa, em x e y. */
-function medidasDoCasulo(t) {
+/* O casulo, em mm: o meio perfil [raio, z] de uma elipse, da ponta da frente à de trás, e o ponto em que o eixo passa, em x e y: o
+   centro fica `raiosAbaixoDoIntradorso` raios abaixo do ponto mais baixo do intradorso da asa em x. */
+function medidasDoCasulo(t, loftDaAsa) {
   const c = t.casulo;
   const q = quadroDaAsa(t, c.x);
+  const intradorso = t.asa.raiz[1] + intradorsoEm(loftDaAsa, m(c.x - t.asa.raiz[0])) * 1000;
   const zFrente = q.ataque - c.aFrente;
   const zTras = q.ataque + c.aTras;
   const perfil = Array.from({ length: c.estacoes + 1 }, (_, k) => {
@@ -396,7 +336,7 @@ function medidasDoCasulo(t) {
     const noPolo = k === 0 || k === c.estacoes;
     return [noPolo ? 0 : c.raio * Math.cos(ang), (zFrente + zTras) / 2 + ((zTras - zFrente) / 2) * Math.sin(ang)];
   });
-  return { perfil, eixo: [-c.x, q.eixoY - c.abaixoDoEixo], zFrente, zTras };
+  return { perfil, eixo: [-c.x, intradorso - c.raiosAbaixoDoIntradorso * c.raio], zFrente, zTras };
 }
 
 /* O oval, em mm: o centro da base da extrusão, o pivô do giro (o centro do oval no extradorso) e o giro, em graus. */
@@ -409,35 +349,45 @@ function medidasDoOval(t, loftDaAsa) {
   return { centro: [o.x, y - o.profundidadeNaAsa, z], pivo: [o.x, y, z], altura: o.profundidadeNaAsa + o.altura, giro: a.diedro, y };
 }
 
+/* Os parâmetros que as duas chamadas da família têm em comum, com os do esboço. */
+const baseDaChamada = (a) => ({
+  perfil: 'asa', simetria: 0, enflechamento: a.enflechamento, diedro: a.diedro, torcao: 0, incidenciaNaRaiz: 0,
+  espessuraNaRaiz: a.espessuraNaRaiz, extensaoDaPonta: a.extensaoDaPonta, comando: 0, comandoDiferencial: 0,
+});
+
+/* A semi-asa da família até o x `semi` (mm), com as cordas e a espessura da reta da semi-asa inteira (`asa.semi`) naquele ponto: a
+   corda e a espessura vão em razão da envergadura da chamada. */
+function chamadaAte(nome, t, semi, extras) {
+  const a = t.asa;
+  const f = semi / a.semi;
+  return chamar(registroDeFamilias().obter('superficie-aerodinamica'), nome, {
+    ...baseDaChamada(a),
+    envergadura: semi,
+    cordaNaRaiz: a.cordaNaRaiz / semi,
+    cordaNaPonta: (a.cordaNaRaiz + (a.cordaNaPonta - a.cordaNaRaiz) * f) / semi,
+    espessuraNaPonta: a.espessuraNaRaiz - (a.espessuraNaRaiz - a.espessuraNaPonta) * f,
+    ...extras,
+  });
+}
+
+/* A metade de asa leva a semi-envergadura recortada e sem a ponta levantada. */
+const chamadaDaMetade = (t) => chamadaAte('asa', t, t.asa.semiRecortada, { pontaLevantada: 0 });
+
+/* A ponta leva a semi-envergadura dela, a levantada, a tampa e os dois cantos, estes em razão da semi-envergadura. */
+function chamadaDaPonta(t) {
+  const { semi, comprimentoDaTampa, raioNoBordoDeAtaque, raioNoBordoDeFuga } = t.ponta;
+  return chamadaAte('ponta', t, semi, {
+    pontaLevantada: t.asa.pontaLevantada, comprimentoDaTampa: comprimentoDaTampa / semi,
+    raioDoCantoDeAtaque: raioNoBordoDeAtaque / semi, raioDoCantoDeFuga: raioNoBordoDeFuga / semi,
+  });
+}
+
 export function derivar(t = TABELA) {
   const a = t.asa;
-  const registroDaFamilia = registroDeFamilias();
-  const familia = registroDaFamilia.obter('superficie-aerodinamica');
   const xDaPonta = a.raiz[0] + a.corte.fracaoDaSemi * a.semi - a.corte.fracaoDaCordaNaPonta * a.cordaNaPonta + a.corte.folga;
 
-  /* As duas chamadas da família, com os parâmetros do esboço. A metade de asa leva a semi-envergadura recortada, com as cordas e a
-     espessura da reta da semi-asa inteira naquele ponto, e sem a ponta levantada; a ponta leva a semi-envergadura inteira. */
-  const proporcao = a.semiRecortada / a.semi;
-  const base = {
-    perfil: 'asa', simetria: 0, enflechamento: a.enflechamento, diedro: a.diedro, torcao: 0, incidenciaNaRaiz: 0,
-    espessuraNaRaiz: a.espessuraNaRaiz, extensaoDaPonta: a.extensaoDaPonta, comando: 0, comandoDiferencial: 0,
-  };
-  const chamadaDaAsa = chamar(familia, 'asa', {
-    ...base,
-    envergadura: a.semiRecortada,
-    cordaNaRaiz: a.cordaNaRaiz / a.semiRecortada,
-    cordaNaPonta: (a.cordaNaRaiz + (a.cordaNaPonta - a.cordaNaRaiz) * proporcao) / a.semiRecortada,
-    espessuraNaPonta: a.espessuraNaRaiz - (a.espessuraNaRaiz - a.espessuraNaPonta) * proporcao,
-    pontaLevantada: 0,
-  });
-  const chamadaDaPonta = chamar(familia, 'ponta', {
-    ...base,
-    envergadura: a.semi,
-    cordaNaRaiz: a.cordaNaRaiz / a.semi,
-    cordaNaPonta: a.cordaNaPonta / a.semi,
-    espessuraNaPonta: a.espessuraNaPonta,
-    pontaLevantada: Math.min(a.pontaLevantada, LIMITE_DA_FAMILIA),
-  });
+  const loftDaAsa = loftDaFamilia(chamadaDaMetade(t));
+  const loftDaPonta = loftDaFamilia(chamadaDaPonta(t));
 
   /* Os cortadores do plano da ponta: caixas em x, y e z. A da ponta vai do corte para fora e a da asa do `inicio` ao corte. */
   const cp = a.cortaPonta;
@@ -489,14 +439,13 @@ export function derivar(t = TABELA) {
   }));
 
   /* A carenagem da raiz, o casulo e o oval. */
-  const loftDaAsa = loftDaFamilia(chamadaDaAsa);
-  const casulo = medidasDoCasulo(t);
+  const casulo = medidasDoCasulo(t, loftDaAsa);
   const oval = medidasDoOval(t, loftDaAsa);
   const o = t.oval;
 
   return {
     asa: { loft: loftDaAsa, desloca: mAll(a.raiz) },
-    ponta: { loft: secoesDaPonta(t, loftDaFamilia(chamadaDaPonta)), desloca: mAll(a.raiz) },
+    ponta: { loft: loftDaPonta, desloca: mAll(a.raiz) },
     cortadores, alojamentos, comandos, avanco: m(t.comando.tampa.avanco), segmentosDoCanto: t.comando.suporte.segmentosDoCanto,
     carenagem: medidasDaCarenagem(t).map(({ x, pontos }) => ({ x: m(x), pontos: pontos.map(mAll) })),
     casulo: {
@@ -764,8 +713,8 @@ function caixasDoLadoDireito(t) {
 }
 
 /* A caixa do casulo, que só existe do lado esquerdo: o raio em x e em y, e as duas pontas em z. */
-function caixaDoCasulo(t) {
-  const { eixo, zFrente, zTras } = medidasDoCasulo(t);
+function caixaDoCasulo(t, loftDaAsa) {
+  const { eixo, zFrente, zTras } = medidasDoCasulo(t, loftDaAsa);
   const r = t.casulo.raio;
   return { min: [eixo[0] - r, eixo[1] - r, zFrente], max: [eixo[0] + r, eixo[1] + r, zTras] };
 }
@@ -774,7 +723,7 @@ function caixaDoCasulo(t) {
 export function pontosDeclarados(t = TABELA) {
   const tolerancia = 1;
   const caixas = caixasDoLadoDireito(t);
-  const casulo = caixaDoCasulo(t);
+  const casulo = caixaDoCasulo(t, loftDaFamilia(chamadaDaMetade(t)));
   const doCasulo = [
     { nome: 'casuloE, o mínimo da caixa', parte: 'casuloE', medida: 'minimo', em: casulo.min, toleranciaMm: tolerancia },
     { nome: 'casuloE, o máximo da caixa', parte: 'casuloE', medida: 'maximo', em: casulo.max, toleranciaMm: tolerancia },
