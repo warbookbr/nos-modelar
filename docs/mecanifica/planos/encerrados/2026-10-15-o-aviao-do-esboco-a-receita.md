@@ -9,7 +9,7 @@
 ## Problema observado
 
 O avião de pequeno porte tem o esboço aprovado pela pessoa em 2026-10-13, na
-segunda rodada do plano [o que o avião pede](encerrados/2026-10-11-o-que-o-aviao-pede.md):
+segunda rodada do plano [o que o avião pede](2026-10-11-o-que-o-aviao-pede.md):
 o mestre e oito unidades (fuselagem, asas, empenagem horizontal, empenagem vertical,
 motor, hélice, trem do nariz e trens principais) em
 [`esboco-r2/`](../../banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json), com
@@ -71,7 +71,7 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
 
 - o curso dos trens e da hélice no núcleo: as receitas ficam na pose de pouso, e o
   movimento continua no esboço, porque montagem com pose e cinemática é capacidade
-  em aberto no [backlog](BACKLOG.md);
+  em aberto no [backlog](../BACKLOG.md);
 - materiais, cor e acabamento de produto, e o detalhe de superfície que a pessoa
   aceitou sem a rodada de acabamento no esboço;
 - os outros objetos, que entram depois do avião completo.
@@ -126,7 +126,7 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    da rodada. O modelador dos trens principais fez 110 comandos de terminal, e só uns 13
    eram do laço; os outros garimpavam medidas e pontos no JSON do esboço. Também em 2026-10-15
    a pessoa autorizou começar, em paralelo com a rodada de ajustes e sob este plano, a fatia 1
-   do [plano de importar objeto de código](2026-10-15-importar-objeto-de-codigo.md), que fica
+   do [plano de importar objeto de código](../2026-10-15-importar-objeto-de-codigo.md), que fica
    pronto e passa a ativo quando o avião fechar.
 3. **A montagem e o aceite.** O avião inteiro no núcleo, a auditoria de interseções,
    o crítico contra as referências e o esboço, e a aprovação da pessoa na bancada. A
