@@ -331,3 +331,9 @@ do compasso na coroa, com os afastamentos declarados no `REFINA.esboco`. O trem 
 na segunda, os dois com nota 9 e sem defeito, e a pessoa os aceitou em 2026-10-15. Os críticos apontaram, como diferença do esboço
 para o avião real, a perna dos principais em placa larga, onde a foto mostra uma perna fina, e a roda de 593 mm contra os 532 mm da
 prancha; ficam como estão salvo pedido dela na rodada de ajustes.
+
+## A aprovação
+
+Em 2026-10-16 a pessoa aprovou o avião montado. A auditoria da montagem passa, com os oito encaixes de junta declarados em
+`auditoriaIntersecoes` e as três rodas no chão em `apoioNoChao`, e o crítico do avião inteiro deu nota 8 sem defeito. As pás da hélice
+finas vistas de frente e a perna reta do trem principal, que o esboço também traz, ficam como estão.

@@ -156,4 +156,32 @@ objeto](../FERRAMENTAS-POR-OBJETO.md). A ordem entre os quatro fica com a pessoa
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+A pessoa aprovou o avião montado em 2026-10-16. As oito peças estão no núcleo com `REFINA` passando, cada etapa fechada pelo crítico
+ou por aceite humano (a deriva duas vezes, sem convergência e com detalhes pequenos registrados no aceite), e
+[`etapas --auditar`](../usar/AUDITORIA-DA-MONTAGEM.md) passa: oito encaixes de junta declarados com motivo e profundidade, nenhum outro
+par de peças se tocando e as três rodas no chão. O crítico do avião inteiro deu nota 8 sem defeito, com proporções, posições e simetria
+iguais às do esboço. O alinhamento de cada parte e o que a pessoa decidiu estão em
+[`ALINHAMENTO.md`](../../../procedural/pecas/aviao/ALINHAMENTO.md).
+
+O custo, contado pelos tokens dos agentes e aproximado onde a contagem se perdeu, ficou perto de 10 milhões nas partes e 4 milhões nas
+ferramentas que elas pediram. Por parte, com as rodadas de ajuste: fuselagem cerca de 1,65 milhão, motor 0,88, hélice 0,48, asas 1,48,
+empenagem horizontal perto de 1, empenagem vertical perto de 1,1, trem do nariz 0,97 e trens principais 1,02. A primeira rodada de uma
+parte custou de 0,4 a 1,2 milhão; o resto foi correção do que o esboço trazia errado e pedido da pessoa depois do aceite. O modelador
+gastava a maior parte em garimpar números no esboço, o que levou à receita planejada gerada.
+
+Os achados e o que o processo teria pego sozinho:
+- as rodas dos dois trens 17 mm acima do chão: não teria; virou `apoioNoChao` e `etapas --auditar`, com cada roda medida por parte;
+- peças se atravessando entre si, sem medida: não teria; a auditoria de interseções da montagem passou a rodar pelas etapas;
+- defeitos lidos em vista pequena (o degrau da junta do capô, a abertura na asa): não teria; o pacote do crítico ganhou a vista
+  montada enquadrada na peça, a vista de baixo e a sobreposição dos cortes, que agora caem no material;
+- o afastamento decidido pela pessoa medido como defeito pela razão e pelo crítico: não teria; `REFINA.esboco` ganhou deslocamento,
+  alongamento e motivo, `REFINA.novas` declara a parte pedida além do esboço, e o pedido ao crítico lista as duas;
+- o serrilhado que o crítico viu no bordo de ataque: não teria; era pixel da captura sem suavização, que agora sai em dobro e reduzida;
+- as peças que expandem família não abriam na bancada publicada: só um gate pegou, por acaso; virou o teste `navegador-sem-node`;
+- o canto solto da booleana na casca: estava contornado nas receitas; o núcleo foi corrigido e os desvios saíram;
+- a ponta da asa acima de 60 graus por funções internas da família: virou opção declarada da família;
+- o registro da rodada montado à mão e a captura compartilhada entre agentes: viraram o registro que lê os agentes e a sessão própria
+  de cada captura;
+- o limite de 1000 identificadores por forma no loft: ficou no backlog, para medir antes de mudar.
+
+Fica para depois, pela pessoa: as pás da hélice finas vistas de frente e a perna do trem principal reta, que o esboço também traz.
