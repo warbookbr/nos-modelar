@@ -99,5 +99,14 @@
     }
   },
   "critico": null,
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-16",
+    "aprovou": true,
+    "prancha": "docs/mecanifica/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png",
+    "perfis": {
+      "forninho-eletrico": {
+        "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f"
+      }
+    }
+  }
 }
