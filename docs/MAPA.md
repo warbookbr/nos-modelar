@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1319 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1324 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1760,6 +1760,8 @@
 - `esboco-importar-csg-conferir.mjs` — Conferência numérica da importação de `.csg`: o volume que o esboço importado desenha contra a malha que o próprio OpenSCAD exporta do mesmo objeto (`opensca…
 - `esboco-importar-csg.mjs` — Importador de `.csg` do OpenSCAD para `.esboco.json`.
 - `esboco-importar-csg.test.mjs` — O importador de .csg: a fixture sintética escrita à mão cobre cada nó, e o resultado é medido pelo próprio esboço (a caixa de cada forma depois de posta e re…
+- `esboco-importar-step.mjs` — Importador de STEP para `.esboco.json`.
+- `esboco-importar-step.test.mjs` — O importador de STEP: a fixture sintética (gerada com o OpenCascade WASM por `gerar-sintetico.mjs`) tem uma peça de cada tipo de forma, e cada peça é medida …
 - `esboco-medidas-no-andaime.test.mjs` — A prova das medidas do `plano.medidas` lidas na blocagem do nível zero, sobre os esboços do módulo e do banco de provas que as declaram: a leitura na blocage…
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
@@ -1805,6 +1807,7 @@
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-csg.mjs` — Linha de comando do importador de `.csg` do OpenSCAD para `.esboco.json`. Uso: npm run importar-csg -- <arquivo.csg> [--saida <arquivo.esboco.json>] [--frent…
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
+- `importar-step.mjs` — Linha de comando do importador de STEP para `.esboco.json`. Uso: npm run importar-step -- <arquivo.step> [--saida <arquivo.esboco.json>] [--frente +y|-y|+x|-…
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
@@ -1887,6 +1890,11 @@
 - `fixture-forma-anel-cumprida.js` — A receita promete um ANEL e entrega um anel. Passa. `lathe` revolve um perfil fechado: o resultado tem furo passante.
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.
+
+## tools/mecanifica/fixtures/importar-step/
+
+- `FONTE.md` — Fixtures do importador de STEP
+- `gerar-sintetico.mjs` — Gera `sintetico.step`, a fixture do importador de STEP, com o próprio OpenCascade WASM do repositório (`occt-wasm`). Uso: node tools/mecanifica/fixtures/impo…
 
 ## tools/mecanifica/guardas/
 
