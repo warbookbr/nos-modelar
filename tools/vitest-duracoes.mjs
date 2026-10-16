@@ -10,6 +10,8 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
+/* Um arquivo por bateria, porque `test:rapidos` e `test:lentos` rodam ao mesmo tempo no `npm run gates`. */
+export const arquivoDasDuracoes = (modo = process.env.MECANIFICA_TESTES) => join('tmp', 'gates', `duracoes-dos-testes${modo ? `-${modo}` : ''}.json`);
 export const ARQUIVO_DAS_DURACOES = join('tmp', 'gates', 'duracoes-dos-testes.json');
 
 export default class DuracoesDosTestes {
@@ -17,7 +19,7 @@ export default class DuracoesDosTestes {
     const duracoes = modulos
       .map((m) => ({ arquivo: relative(RAIZ, m.moduleId).split('\\').join('/'), ms: Math.round(m.diagnostic().duration) }))
       .sort((a, b) => b.ms - a.ms);
-    const caminho = join(RAIZ, ARQUIVO_DAS_DURACOES);
+    const caminho = join(RAIZ, arquivoDasDuracoes());
     mkdirSync(dirname(caminho), { recursive: true });
     writeFileSync(caminho, `${JSON.stringify({ gravado: new Date().toISOString(), duracoes }, null, 1)}\n`, 'utf8');
   }

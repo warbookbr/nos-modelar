@@ -65,7 +65,7 @@ export function linhaDeFalha(gate, arquivo) {
  * aviso para o que passa de `TETO_POR_ARQUIVO_DE_TESTE_MS`. É aviso e não
  * reprovação: o arquivo lento pede medição por etapa antes de ser dividido. */
 export const TETO_POR_ARQUIVO_DE_TESTE_MS = 120_000;
-const ARQUIVO_DAS_DURACOES = join('tmp', 'gates', 'duracoes-dos-testes.json');
+const arquivoDasDuracoes = (gate) => join('tmp', 'gates', `duracoes-dos-testes-${gate.split(':')[1]}.json`);
 
 export function arquivosMaisLentos(duracoes, quantos = 5, teto = TETO_POR_ARQUIVO_DE_TESTE_MS) {
   return [...duracoes].sort((a, b) => b.ms - a.ms).slice(0, quantos)
@@ -75,8 +75,8 @@ export function arquivosMaisLentos(duracoes, quantos = 5, teto = TETO_POR_ARQUIV
 
 /* Só vale o arquivo gravado depois de o gate começar; um de execução anterior
    listaria durações velhas como se fossem desta. */
-function lerDuracoesDosTestes(desde, raiz = RAIZ) {
-  const caminho = join(raiz, ARQUIVO_DAS_DURACOES);
+function lerDuracoesDosTestes(gate, desde, raiz = RAIZ) {
+  const caminho = join(raiz, arquivoDasDuracoes(gate));
   if (!existsSync(caminho)) return null;
   try {
     const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
@@ -90,7 +90,7 @@ function lerDuracoesDosTestes(desde, raiz = RAIZ) {
    teste passaria a olhar para um lugar vazio e a garantia sumiria calada, que é
    exatamente o buraco que ele existe para tapar. */
 export const GATES = [
-  'typecheck', 'test', 'mcp:check', 'mcp:visual:check', 'build',
+  'typecheck', 'test:rapidos', 'test:lentos', 'mcp:check', 'mcp:visual:check', 'build',
   'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check', 'autoria:schemas:check',
   'bancada:vazia:check', 'porteiro', 'exportar:check',
   'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:referencia', 'guarda:escolha', 'guarda:junta', 'guarda:edicao', 'guarda:gesto', 'guarda:acervo', 'guarda:referencial', 'origens:check',
@@ -173,7 +173,7 @@ const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
    e a inspeção visual falhou, e a promoção saiu `recusado` em vez de
    `aprovado` — a falha aponta para a promoção e a causa estava no cache. */
 export const RECURSOS_DO_GATE = {
-  test: ['suite-mcp', 'cache-vite'],
+  'test:lentos': ['suite-mcp', 'cache-vite'],
   'mcp:check': ['suite-mcp', 'cache-vite'],
   'mcp:visual:check': ['suite-mcp', 'cache-vite'],
   porteiro: ['cache-vite'],
@@ -199,7 +199,7 @@ export const RECURSOS_DO_GATE = {
 export const PASTAS_LEVES = [/^procedural\/pecas\//, /^docs\//, /^[^/]+\.md$/];
 
 export const GATES_CURTOS = [
-  'typecheck', 'test', 'build', 'exportar:check', 'autoria:schemas:check',
+  'typecheck', 'test:rapidos', 'test:lentos', 'build', 'exportar:check', 'autoria:schemas:check',
   'guarda:acervo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
@@ -246,12 +246,14 @@ function limiteDeConcorrencia() {
   return valor;
 }
 
+const ambienteDosGates = {};
+
 function rodarGate(gate, { silencioso }) {
   return new Promise((resolver) => {
     const inicio = Date.now();
     /* `shell: true` porque no Windows `npm` é um .cmd; sem isso o spawn não
        encontra o executável e todo gate "falha" pelo motivo errado. */
-    const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true });
+    const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true, env: { ...process.env, ...ambienteDosGates } });
     const pedacos = [];
     processo.stdout.on('data', (d) => pedacos.push(d));
     processo.stderr.on('data', (d) => pedacos.push(d));
@@ -260,7 +262,7 @@ function rodarGate(gate, { silencioso }) {
       const codigo = status ?? 1;
       const saida = Buffer.concat(pedacos).toString();
       const arquivo = guardarSaidaDoGate(gate, saida, codigo);
-      const lentos = gate === 'test' ? lerDuracoesDosTestes(inicio) : null;
+      const lentos = gate.startsWith('test:') ? lerDuracoesDosTestes(gate, inicio) : null;
       if (!silencioso || codigo !== 0) {
         process.stdout.write(codigo === 0 ? `▶ ${gate} — ok\n` : `${linhaDeFalha(gate, arquivo)}\n`);
         process.stdout.write(saida);
@@ -275,6 +277,8 @@ async function executar() {
   const silencioso = process.argv.includes('--silencioso');
   const concorrencia = pararNoPrimeiro ? 1 : limiteDeConcorrencia();
 
+  /* Com `--completo`, o `test:lentos` roda todos os lentos, e não só os ligados ao que mudou (tools/testes-lentos.mjs). */
+  if (process.argv.includes('--completo')) ambienteDosGates.GATES_COMPLETO = '1';
   const { bateria, motivo } = process.argv.includes('--completo')
     ? { bateria: GATES, motivo: '--completo' }
     : escolherBateria(arquivosAlterados());
@@ -330,11 +334,11 @@ async function executar() {
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);
   }
-  const doTeste = porGate.get('test');
-  if (doTeste?.lentos?.length) {
+  const duracoes = ['test:rapidos', 'test:lentos'].flatMap((g) => porGate.get(g)?.lentos ?? []);
+  if (duracoes.length) {
     console.log('─'.repeat(52));
     console.log('arquivos de teste mais lentos:');
-    for (const linha of arquivosMaisLentos(doTeste.lentos)) console.log(linha);
+    for (const linha of arquivosMaisLentos(duracoes)) console.log(linha);
   }
   const naoRodados = bateria.length - resultados.length;
   console.log('─'.repeat(52));

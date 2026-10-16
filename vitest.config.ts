@@ -1,5 +1,10 @@
 /* Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**. */
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
+import { TESTES_LENTOS } from './tools/testes-lentos.mjs';
+
+/* `npm run test:rapidos` e `npm run test:lentos` (tools/testes-lentos.mjs) dividem a suíte pela lista dos lentos; sem a
+   variável, `npm test` roda tudo. */
+const MODO = process.env.MECANIFICA_TESTES;
 
 export default defineConfig({
   test: {
@@ -20,6 +25,8 @@ export default defineConfig({
       'tools/**/*.test.ts', 'tools/**/*.test.mjs',
       'modulos/**/*.test.js', 'modulos/**/*.test.mjs',
     ],
+    exclude: MODO === 'rapidos' ? [...configDefaults.exclude, ...TESTES_LENTOS] : configDefaults.exclude,
+    ...(MODO === 'lentos' ? { include: TESTES_LENTOS } : {}),
     watch: false,
 
     /* 20 s por teste, não os 5 s do padrão do Vitest.
@@ -45,8 +52,9 @@ export default defineConfig({
        de revalidação só ultrapassavam o limite quando concorriam com dezenas
        de arquivos; isolados e com dois trabalhadores, ambos continuam
        rápidos. Dois preserva paralelismo sem transformar contenção de CPU e
-       disco em falso vermelho. */
-    maxWorkers: 2,
+       disco em falso vermelho. A bateria dos rápidos, sem os lentos, usa
+       quatro (plano gates em poucos minutos, 2026-10-16). */
+    maxWorkers: MODO === 'rapidos' ? 4 : 2,
 
     /* O segundo repórter grava a duração de cada arquivo em
        `tmp/gates/duracoes-dos-testes.json`, que o `tools/gates.mjs` lê para

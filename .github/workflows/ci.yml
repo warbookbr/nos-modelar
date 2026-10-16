@@ -40,8 +40,11 @@ jobs:
       - name: TypeScript Typecheck
         run: npm run typecheck
 
-      - name: Unit Tests
-        run: npm run test
+      - name: Testes rápidos
+        run: npm run test:rapidos
+
+      - name: Testes lentos (todos no CI)
+        run: npm run test:lentos
 
       - name: Servidor MCP local
         run: npm run mcp:check

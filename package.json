@@ -37,6 +37,8 @@
     "procedencia:check": "node tools/mecanifica/procedencia-check.mjs",
     "bancada:vazia:check": "node tools/mecanifica/guardas/guarda-bancada-vazia.mjs",
     "test": "vitest run",
+    "test:rapidos": "node tools/testes-lentos.mjs --rapidos",
+    "test:lentos": "node tools/testes-lentos.mjs --lentos",
     "mcp:check": "vitest run tools/mcp/mcp.test.mjs tools/mcp/procedural.test.mjs tools/mcp/perfis/autoria-execucao.test.mjs tools/mcp/perfis/parametros.test.mjs",
     "mcp:ensaio": "vitest run tools/mcp/ensaio-ponta-a-ponta.test.mjs",
     "test:watch": "vitest",

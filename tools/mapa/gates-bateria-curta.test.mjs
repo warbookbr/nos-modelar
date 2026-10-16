@@ -7,7 +7,7 @@ import { GATES, GATES_CURTOS, escolherBateria } from '../gates.mjs';
 describe('escolha da bateria de gates', () => {
   it('a curta é parte da completa e mantém build e testes', () => {
     expect(GATES_CURTOS.every((g) => GATES.includes(g))).toBe(true);
-    expect(GATES_CURTOS).toEqual(expect.arrayContaining(['build', 'test']));
+    expect(GATES_CURTOS).toEqual(expect.arrayContaining(['build', 'test:rapidos', 'test:lentos']));
   });
 
   it('receita e documento rodam a curta', () => {
