@@ -215,6 +215,23 @@ export function escolherBateria(alterados) {
     : { bateria: GATES_CURTOS, motivo: `${alterados.length} arquivo(s) só de peça ou documento, bateria curta` };
 }
 
+/* GATES QUE SÓ RODAM QUANDO MUDA O QUE ELES CONFEREM.
+ *
+ * Medido em 2026-10-16 (plano gates em poucos minutos): depois de a suíte se dividir em rápidos e lentos, a bateria padrão
+ * levava 5 minutos, e a guarda do acervo, que gera e mede todas as peças, era sozinha 3,7 deles. Ela confere geometria, e
+ * mudança em documento ou em ferramenta que não toca peça, família, núcleo nem a própria guarda não muda o veredito dela. Por
+ * isso fica de fora da bateria local quando nada desses caminhos mudou; roda com `--completo`, quando não dá para saber o que
+ * mudou, e sempre no CI, que chama o script direto. */
+export const GATES_POR_CAMINHO = {
+  'guarda:acervo': [/^procedural\//, /^src\//, /^tools\/mecanifica\/(guardas\/|descrever-peca|resolver-caminho-receita)/, /^package(-lock)?\.json$/],
+};
+
+export function filtrarPorCaminho(bateria, alterados) {
+  if (!alterados) return { bateria, pulados: [] };
+  const pulados = bateria.filter((g) => GATES_POR_CAMINHO[g] && !alterados.some((f) => GATES_POR_CAMINHO[g].some((re) => re.test(f))));
+  return { bateria: bateria.filter((g) => !pulados.includes(g)), pulados };
+}
+
 function arquivosAlterados() {
   const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
   const base = git(['rev-parse', '--abbrev-ref', '@{u}']);
@@ -279,9 +296,12 @@ async function executar() {
 
   /* Com `--completo`, o `test:lentos` roda todos os lentos, e não só os ligados ao que mudou (tools/testes-lentos.mjs). */
   if (process.argv.includes('--completo')) ambienteDosGates.GATES_COMPLETO = '1';
-  const { bateria, motivo } = process.argv.includes('--completo')
-    ? { bateria: GATES, motivo: '--completo' }
-    : escolherBateria(arquivosAlterados());
+  const completo = process.argv.includes('--completo');
+  const alterados = completo ? null : arquivosAlterados();
+  const escolha = completo ? { bateria: GATES, motivo: '--completo' } : escolherBateria(alterados);
+  const { bateria: semPulados, pulados } = filtrarPorCaminho(escolha.bateria, alterados);
+  const bateria = semPulados;
+  const motivo = escolha.motivo + (pulados.length ? `; fora: ${pulados.join(', ')} (nada do que conferem mudou)` : '');
   console.log(`gates — ${motivo}.`);
 
   const porGate = new Map();
@@ -343,7 +363,7 @@ async function executar() {
   const naoRodados = bateria.length - resultados.length;
   console.log('─'.repeat(52));
   console.log(
-    `${resultados.length - falhos.length}/${bateria.length} gates verdes${bateria === GATES ? '' : ` (curta de ${GATES.length})`} em ${Math.round(decorrido / 1000)}s`
+    `${resultados.length - falhos.length}/${bateria.length} gates verdes${bateria.length === GATES.length ? '' : ` (de ${GATES.length})`} em ${Math.round(decorrido / 1000)}s`
     + (concorrencia > 1 ? ` (${Math.round(total / 1000)}s somados, ${concorrencia} de cada vez)` : '')
     + (falhos.length ? ` — falharam: ${falhos.map((r) => r.gate).join(', ')}` : '')
     + (naoRodados ? ` — ${naoRodados} não rodaram (--parar-no-primeiro)` : ''),
