@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1337 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1342 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -880,6 +880,14 @@
 ## procedural/familias-de-desenho/carcaca-empilhadeira/
 
 - `README.md` — Família de desenho da carcaça de empilhadeira
+
+## procedural/familias/aparelho-de-caixa/
+
+- `aparelho-de-caixa.test.mjs` — aparelho-de-caixa.test.mjs — a família de aparelho de caixa: as combinações que ela declara, a caixa envolvente do perfil do forninho medida na malha, o dete…
+- `composicoes.js` — composicoes.js — as composições procedurais da família `aparelho-de-caixa`, geradas por laço porque a quantidade de botões, a presença do painel, do visor e …
+- `derivar.js` — derivar.js — dos parâmetros do aparelho de caixa (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as medidas do aparelho de caixa a partir dos parâmetros da família, em milímetro.
+- `index.js` — index.js — a família `aparelho-de-caixa` carregada: o contrato `familia.json`, as composições e o `derivar`.
 
 ## procedural/familias/cilindro-hidraulico/
 
