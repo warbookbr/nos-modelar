@@ -335,6 +335,10 @@ Esta seção guarda o que o índice `planos/README.md` carregava antes de ser en
 
 ### Estado
 
+[Gates em poucos minutos](2026-10-16-gates-em-poucos-minutos.md) fechou em 2026-10-16, concluído: a bateria padrão de
+`npm run gates` caiu de 27 minutos para menos de 5, com os testes divididos em rápidos e lentos e a bateria completa
+antes de todo envio à main, por decisão da pessoa.
+
 [O avião do esboço à receita](2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16,
 concluído com a aprovação da pessoa: as oito peças do avião no núcleo, cada uma com
 `REFINA` contra o esboço, a rodada de ajustes que ela pediu, a montagem auditada por

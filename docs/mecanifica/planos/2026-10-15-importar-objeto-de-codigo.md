@@ -1,23 +1,12 @@
 # Importar objeto de código — um objeto descrito em OpenSCAD chega ao esboço e à receita por importação
 
-**Estado:** congelado
+**Estado:** ativo
 
-**Congelado em:** 2026-10-16
-
-**Por que foi congelado:** a bateria de gates passou de 20 minutos e virou o gargalo de todo trabalho, inclusive o deste plano, e a
-pessoa decidiu em 2026-10-16 resolver isso primeiro, com o plano [gates em poucos minutos](../2026-10-16-gates-em-poucos-minutos.md).
-Nada deste plano foi refutado.
-
-**Condição de descongelamento:** o plano dos gates fechar. Este plano é o sucessor dele e volta à raiz como ativo, na fatia 2.
-
-**Levado para o plano que o substituiu:** nada do escopo. Os testes lentos que este plano acrescentou (o corpus real do importador de
-`.csg` e o braço em STEP) entram na medição e na separação de testes lentos de lá.
-
-**Fica parado junto com ele:** a fatia 2 (do esboço à receita, com o custo medido) e a medida do custo de nomear as partes; a família
-`mesa-de-pernas-redondas`, traduzida do Infinigen, numa cópia de trabalho sem integrar, à espera da aprovação de forma da pessoa; a sonda
-de importação de STL por peça, em andamento; e as decisões sobre o tradutor do BlendNet como ferramenta e o toro no esboço. Os
-importadores de `.csg` e de STEP já estão no repositório, com teste, e continuam em uso.
-
+**Histórico de estado:** congelado em 2026-10-16 para dar lugar ao plano [gates em poucos
+minutos](encerrados/2026-10-16-gates-em-poucos-minutos.md), e descongelado no mesmo dia, quando ele fechou. Ficaram parados e voltam com
+ele: a fatia 2 (do esboço à receita); a família `mesa-de-pernas-redondas`, traduzida do Infinigen, numa cópia de trabalho sem integrar, à
+espera da aprovação de forma da pessoa; e as decisões sobre o tradutor do BlendNet como ferramenta e o toro no esboço. O importador de STL
+por peça entrou no repositório durante o congelamento.
 
 **Responsável:** Claude, com a pessoa aprovando forma
 
@@ -26,7 +15,7 @@ importadores de `.csg` e de STEP já estão no repositório, com teste, e contin
 ## Problema observado
 
 Cada peça do avião custou entre 400 mil e 1,5 milhão de tokens até o aceite. O motor custou cerca de 876 mil e a fuselagem cerca de 1,54 milhão
-([plano do avião](../encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md)), e a lista de objetos e famílias a modelar é longa. Dos 110 comandos que o
+([plano do avião](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md)), e a lista de objetos e famílias a modelar é longa. Dos 110 comandos que o
 modelador dos trens principais rodou, uns 95 garimpavam medidas e pontos no JSON do esboço. A receita planejada gerada do esboço tirou esse
 garimpo da receita, mas o esboço continua sendo desenhado à mão, unidade por unidade, pelo esbocista.
 
@@ -56,7 +45,7 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
   interseção, matriz), com teste em fixture sintética;
 - um objeto-prova: o carrinho de mão, de um `.scad` com licença que permita guardar a fonte, registrada com o endereço;
   na fatia 1 não houve carrinho de licença aberta, e o objeto-prova foi um caminhão basculante de brinquedo, com a fonte em
-  [`FONTE.md`](../../banco-de-provas/importar-objeto-2026-10-15/FONTE.md);
+  [`FONTE.md`](../banco-de-provas/importar-objeto-2026-10-15/FONTE.md);
 - a nomeação das partes e relações sobre o esboço importado, a receita planejada gerada e o laço de modelagem até o aceite;
 - a medição em tokens de cada etapa, ao lado do custo das peças do avião.
 
@@ -85,8 +74,8 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 
 ## Achados de 2026-10-16 e propostas à espera da pessoa
 
-As [sondas de 2026-10-16](../../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md) e as pesquisas registradas na
-[pesquisa aberta](../../PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
+As [sondas de 2026-10-16](../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md) e as pesquisas registradas na
+[pesquisa aberta](../PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
 paramétricas, que objetos inteiros da lista quase não existem com licença aberta, e que o importador de `.csg` recusa construções comuns em
 `.scad` reais. Três propostas esperam a decisão da pessoa antes de entrar no Incluído: corrigir o importador para `offset`, diferença 2D com
 furo e `linear_extrude` com `scale`, consertar o `--conferir` que lança exceção, e provar o importador num conjunto pequeno de `.scad` reais

@@ -2,9 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** [gates em poucos minutos](2026-10-16-gates-em-poucos-minutos.md).
+**Plano ativo:** [importar objeto de código](2026-10-15-importar-objeto-de-codigo.md).
 
-O plano traz a bateria padrão de `npm run gates` de mais de 20 minutos para até 5, separando os testes lentos sem tirar nenhuma conferência. [Importar objeto de código](congelados/2026-10-15-importar-objeto-de-codigo.md) foi congelado em 2026-10-16 para dar lugar a ele e é o sucessor: volta como ativo quando ele fechar. [O avião do esboço à
+O plano leva objetos descritos em código (OpenSCAD, STEP, STL por peça, scripts do Blender) ao esboço por importadores e deles à receita aprovada pela pessoa. Ele ficou congelado em 2026-10-16 enquanto [gates em poucos minutos](encerrados/2026-10-16-gates-em-poucos-minutos.md) trazia a bateria padrão de 27 minutos para menos de 5, e voltou quando esse fechou. [O avião do esboço à
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14.

@@ -413,7 +413,7 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
+- `2026-10-15-importar-objeto-de-codigo.md` — Importar objeto de código — um objeto descrito em OpenSCAD chega ao esboço e à receita por importação
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -448,7 +448,6 @@
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
-- `2026-10-15-importar-objeto-de-codigo.md` — Importar objeto de código — um objeto descrito em OpenSCAD chega ao esboço e à receita por importação
 - `README.md` — Planos congelados
 
 ## docs/mecanifica/planos/encerrados/
@@ -529,6 +528,7 @@
 - `2026-10-13-desenho-sem-referencia.md` — Desenho sem referência
 - `2026-10-14-familias-de-desenho.md` — As famílias de desenho
 - `2026-10-15-o-aviao-do-esboco-a-receita.md` — O avião do esboço à receita
+- `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

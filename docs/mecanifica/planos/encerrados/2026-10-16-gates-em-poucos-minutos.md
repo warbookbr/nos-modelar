@@ -1,13 +1,12 @@
 # Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com a pessoa decidindo o que roda só no envio à main
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`
 
-**Sucessor:** [importar objeto de código](congelados/2026-10-15-importar-objeto-de-codigo.md), congelado em 2026-10-16 para dar lugar a
-este plano, volta como ativo quando este fechar.
+**Sucessor:** [importar objeto de código](../2026-10-15-importar-objeto-de-codigo.md), que voltou a ser o ativo quando este fechou.
 
 ## Problema observado
 
@@ -124,3 +123,17 @@ Para e volta à pessoa se a bateria padrão não chegar a 5 minutos sem tirar te
 paralelismo maior tornar a suíte instável, com teste que passa sozinho e falha junto.
 
 ## Fechamento
+
+Concluído em 2026-10-16. A bateria padrão de `npm run gates` passou de 27 minutos para 281 s, 286 s e 289 s em três medições seguidas, todas
+verdes, com os testes divididos em rápidos e lentos (fatia 2) e a guarda do acervo e as conferências de família fora da bateria local
+quando nada do que conferem mudou. A fatia 3 pôs o teto de 30 s por arquivo na bateria rápida, que reprova dizendo o arquivo, e a regra,
+gerada do `roteiros.json` para o `CLAUDE.md`, de que agente despachado não roda a bateria. `npm run gates -- --completo` passou com os 38
+gates verdes em 1.315 s (22 min), dos quais 1.154 s são do `test:lentos` rodando todos. O `reguas:check` e o teste que espelha os gates
+no CI ficaram verdes com a troca de `test` por `test:rapidos` e `test:lentos` no `ci.yml`.
+
+A pessoa decidiu em 2026-10-16 que todo envio à main roda a bateria completa antes, com `--completo` na máquina ou pelo CI, que roda
+todos os testes e todos os gates.
+
+Durante o plano, um commit foi enviado com dois testes vermelhos, porque o envio foi encadeado sem esperar o resultado da conferência; o
+teste dos roteiros pegou o `CLAUDE.md` editado à mão, e a correção saiu no commit seguinte. O processo pegou o defeito, e o que faltou
+foi esperar o resultado antes de enviar.

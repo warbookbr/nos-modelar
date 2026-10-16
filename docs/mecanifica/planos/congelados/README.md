@@ -41,4 +41,4 @@ zero daqui a três meses.
 | [vocabulário poligonal da bancada](2026-09-17-vocabulario-poligonal-da-bancada.md) (`docs/mecanifica/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md`) | 2026-09-17 | absorver edição livre deixar de ser o gargalo, ou uma peça concreta precisar de uma dessas formas |
 | [carroceria por casca deformável](2026-09-10-carroceria-por-casca-deformavel.md) (`docs/mecanifica/planos/congelados/2026-09-10-carroceria-por-casca-deformavel.md`) | 2026-09-10 | existir no acervo uma casca base de carro, fechada e com regiões nomeadas, reconhecível como carro antes de qualquer ajuste |
 | [as partes do braço](2026-09-26-as-partes-do-braco.md) (`docs/mecanifica/planos/congelados/2026-09-26-as-partes-do-braco.md`) | 2026-09-29 | o plano o esboço detalhado coerente fechar, ou a pessoa decidir antes |
-| [importar objeto de código](2026-10-15-importar-objeto-de-codigo.md) (`docs/mecanifica/planos/congelados/2026-10-15-importar-objeto-de-codigo.md`) | 2026-10-16 | o plano gates em poucos minutos fechar; é o sucessor dele |
+
