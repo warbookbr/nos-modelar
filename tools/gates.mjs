@@ -224,6 +224,9 @@ export function escolherBateria(alterados) {
  * mudou, e sempre no CI, que chama o script direto. */
 export const GATES_POR_CAMINHO = {
   'guarda:acervo': [/^procedural\//, /^src\//, /^tools\/mecanifica\/(guardas\/|descrever-peca|resolver-caminho-receita)/, /^package(-lock)?\.json$/],
+  /* As duas conferências de família, medidas na mesma rodada em 133 s e 116 s, seguem a mesma regra pelo que importam. */
+  'familias:check': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/mecanifica\/(familia|aprovacao-da-familia|importar-receita|resolver-caminho-receita|montagem-da-familia)/, /^package(-lock)?\.json$/],
+  'familias-de-desenho:check': [/^procedural\/familias-de-desenho\//, /^modulos\//, /^tools\/mecanifica\/desenho/, /^package(-lock)?\.json$/],
 };
 
 export function filtrarPorCaminho(bateria, alterados) {

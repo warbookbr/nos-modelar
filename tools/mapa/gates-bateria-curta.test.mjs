@@ -26,7 +26,7 @@ describe('gates que só rodam quando muda o que conferem', async () => {
   const { filtrarPorCaminho } = await import('../gates.mjs');
   it('a guarda do acervo sai quando só mudou documento ou ferramenta alheia, e fica quando mudou peça, núcleo ou não se sabe', () => {
     const bateria = ['test:rapidos', 'guarda:acervo'];
-    expect(filtrarPorCaminho(bateria, ['docs/x.md', 'tools/gates.mjs']).pulados).toEqual(['guarda:acervo']);
+    expect(filtrarPorCaminho(bateria, ['docs/mecanifica/INDEX.md', 'tools/gates.mjs']).pulados).toEqual(['guarda:acervo']);
     expect(filtrarPorCaminho(bateria, []).pulados).toEqual(['guarda:acervo']);
     expect(filtrarPorCaminho(bateria, ['procedural/pecas/aviao/asas/receita.js']).pulados).toEqual([]);
     expect(filtrarPorCaminho(bateria, ['src/autoria/x.js']).pulados).toEqual([]);
