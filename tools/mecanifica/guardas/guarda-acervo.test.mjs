@@ -105,15 +105,9 @@ describe('veredito de contato do acervo', () => {
     }));
     expect(medida.ok).toBe(true);
     expect(medida.resultado.plano).toBe(null);
-
-    /* O ACERVO É LIDO, E NÃO NOMEADO. Fixar o nome de uma peça aqui faz este
-       teste depender de conteúdo: o dia em que essa peça sair do acervo, o teste
-       quebra por um motivo que nada tem a ver com o que ele afirma. */
-    const { reprovadas } = await conferirAcervo(pecasDoAcervo());
-    expect(reprovadas).toEqual([]);
-  /* O tempo cresce com o acervo, que é lido inteiro: com a bateria em paralelo
-     passou de 20 s quando o ombro ganhou uma variação. */
-  }, 90000);
+    /* Que o acervo exige plano e que o de hoje passa é o teste de varredura logo abaixo: este repetia a varredura inteira,
+       que com as peças do avião passou de 88 s sozinha, e estourava o prazo quando a bateria roda em paralelo. */
+  });
 
   it('REPROVA peça do acervo que não exporta plano nenhum', async () => {
     /* A peça é escrita no acervo de verdade e apagada depois: a guarda mede o
@@ -164,11 +158,13 @@ describe('veredito de contato do acervo', () => {
   it('a guarda varre o acervo e o acervo de hoje passa', async () => {
     /* Quantas peças e quais é assunto do acervo, não deste teste: com peça ou
        sem, o que ele afirma é que nada do que está lá reprova. */
+    /* O ACERVO É LIDO, E NÃO NOMEADO. Fixar o nome de uma peça aqui faz este teste depender de conteúdo: o dia em que essa
+       peça sair do acervo, o teste quebra por um motivo que nada tem a ver com o que ele afirma. */
     const { reprovadas } = await conferirAcervo(pecasDoAcervo());
     expect(reprovadas).toEqual([]);
-  /* Lê o acervo inteiro, como o teste de peça de ensaio acima: com a bateria
-     em paralelo passa de 20 s. */
-  }, 90000);
+  /* Lê o acervo inteiro, e o tempo cresce com ele: passou de 20 s quando o ombro ganhou uma variação e de 88 s sozinho com as
+     oito peças do avião em 2026-10-16; o prazo é o dobro disso, para a bateria em paralelo. */
+  }, 180000);
 
   /* ACERVO VAZIO PRECISA SER DECLARADO. Varredura vazia sai igual quando o
      acervo está sem peça de propósito e quando a listagem quebrou, e aprovar
