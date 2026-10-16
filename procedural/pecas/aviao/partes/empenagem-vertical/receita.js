@@ -89,7 +89,8 @@ export const TABELA = {
   eixo: { diametro: 30, sobra: 15, lados: 48 },
   /* A dorsal lisa: o dorso da fuselagem subindo até a deriva e emendando no bordo de ataque dela. `dorso` são os pontos [z, y do dorso da
      fuselagem naquele z], medidos na malha dela em x = 0 (a fuselagem não publica porta, e o dorso é plano até uns 150 mm de cada lado do
-     centro); a curva suave passa por eles. A crista começa `inicio.subida` acima do dorso em `dorso[0]` e sobe numa potência do
+     centro; o dorso da malha é uma poligonal com quina em z 7500, e o ponto ali impede a curva de ficar uns 3 mm acima da fuselagem, o que
+     deixava a base do filete rente a ela e a largura visível de cima saltava); a curva suave passa por eles. A crista começa `inicio.subida` acima do dorso em `dorso[0]` e sobe numa potência do
      comprimento, até a `juncao`: o ponto do bordo de ataque da deriva `altura` acima da raiz (`y0`). O expoente é o que faz a crista
      chegar ali com a inclinação do bordo de ataque (`derivar` o calcula), de modo que a crista vira o bordo de ataque sem degrau. A
      dorsal acaba na junção, e a seção dela cabe dentro da espessura da deriva ali. `crista` é a largura da crista, 28 mm (a razão de volume com a aleta do esboço pede ao menos 0,3), e a
@@ -102,7 +103,7 @@ export const TABELA = {
      por quarto de arco o salto some e a largura cresce sem quebra de inclinação. O núcleo limita o loft a mil faces, e 12 trechos dão 53
      lados por seção: `secoes` cai a 17 para o loft caber (18 intervalos de 53 faces). */
   dorsal: {
-    dorso: [[6960, 2323], [7300, 2294], [7700, 2268], [8100, 2248], [8300, 2241]],
+    dorso: [[6960, 2323], [7300, 2294], [7500, 2277.5], [7700, 2268], [8100, 2248], [8300, 2241]],
     inicio: { subida: 2 },
     juncao: { altura: 415 },
     crista: 28,
