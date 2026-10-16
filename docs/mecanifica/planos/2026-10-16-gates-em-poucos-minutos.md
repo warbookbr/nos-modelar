@@ -77,6 +77,36 @@ continua não zero quando qualquer gate falha, e o relatório continua mostrando
 3. **Orçamento e instrução.** O gate de tempo e a instrução aos agentes.
 4. **Fechamento.** As medições finais, a decisão da pessoa e o descongelamento do sucessor.
 
+## Medição da fatia 1 (2026-10-16)
+
+A suíte inteira, sozinha no contêiner de 4 processadores, sem outra bateria rodando: 368 arquivos e 5.949 testes, todos verdes, em
+1.100 s de relógio (18 min), com 1.980 s somados por arquivo. Os 309 arquivos de até 5 s somam 155 s; os 59 acima de 5 s somam 1.824 s
+(92%), e os 36 acima de 10 s somam 1.664 s. O arquivo mais lento, o da superfície aerodinâmica, leva 309 s sozinho, mais que a meta da
+bateria inteira, e por isso nenhum ajuste de paralelismo basta sem separar os lentos. Medido com `npx vitest run --reporter=json`.
+
+| Arquivo | s | Testes | Motivo provável |
+|---|---|---|---|
+| `procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js` | 309 | 76 | geometria da família em amostras sorteadas, com a solidez de cada uma |
+| `tools/mecanifica/esboco-blocagem.test.mjs` | 196 | 70 | blocagem N2 pela Manifold, objeto a objeto |
+| `procedural/familias/roda-pneu/roda-pneu.test.js` | 108 | 89 | geometria da família em vários perfis |
+| `tools/mecanifica/guardas/guarda-acervo.test.mjs` | 101 | 11 | gera e mede todas as peças do acervo |
+| `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs` | 98 | 36 | geometria da família em vários perfis |
+| `tools/mecanifica/calibracao-do-critico.test.mjs` | 75 | 37 | imagens do conjunto de calibração |
+| `modulos/esboco/tests/brief-do-critico.test.js` | 70 | 27 | desenho das vistas do brief |
+| `tools/mecanifica/esboco-importar-csg.test.mjs` | 59 | 71 | OpenSCAD e Manifold no corpus real |
+| `tools/mecanifica/familia.test.mjs` | 52 | 10 | geometria das famílias pela ferramenta |
+| `tools/mcp/mcp.test.mjs` | 52 | 41 | servidor MCP e capturas |
+| `procedural/familias/dobradica/dobradica.test.mjs` | 51 | 9 | geometria da família |
+| `tools/mecanifica/desenho.test.mjs` | 43 | 45 | desenho e rasterização |
+| `modulos/esboco/tests/projecao.test.js` | 37 | 23 | projeção das vistas |
+| `procedural/familias/cilindro-hidraulico/cilindro-hidraulico.test.js` | 30 | 33 | geometria da família |
+| `tools/mecanifica/rodada-de-modelagem.test.mjs` | 25 | 29 | rodada com captura |
+| `modulos/esboco/tests/condutor.test.js` | 24 | 39 | Condutor com imagens |
+| `tools/oficina/sonda-supercarro-1-0.test.mjs` | 23 | 5 | sonda de peça grande |
+| `modulos/esboco/tests/contato.test.js` | 22 | 27 | gate de contato |
+| `modulos/esboco/tests/critico.test.js` | 22 | 13 | desenho para o crítico |
+| `modulos/esboco/tests/desempenho.test.js` | 20 | 12 | medida de desempenho |
+
 ## Riscos e parada
 
 Para e volta à pessoa se a bateria padrão não chegar a 5 minutos sem tirar teste dela que cubra código mudado com frequência, ou se o
