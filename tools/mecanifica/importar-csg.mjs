@@ -61,6 +61,7 @@ export async function rodar(argv) {
   ];
   for (const a of relatorio.avisos) linhas.push(`aviso: ${a.no}${a.linha ? ` na linha ${a.linha}` : ''}: ${a.texto}`);
   if (conferencia) linhas.push(`conferência contra ${basename(args.conferir)}: volume do OpenSCAD ${conferencia.volumeDoOpenScad_mm3} mm3, do esboço ${conferencia.volumeDoEsboco_mm3} mm3, interseção/união ${conferencia.iou}`);
+  for (const f of conferencia?.formasSemMedida ?? []) linhas.push(`sem medida na conferência: ${f.id ?? '(esboço)'}${f.tipo ? ` (${f.tipo})` : ''}: ${f.motivo}`);
   for (const r of relatorio.recusas) linhas.push(`FORA (parcial): ${r.no} na linha ${r.linha}: ${r.motivo}`);
   return `${linhas.join('\n')}\n`;
 }
