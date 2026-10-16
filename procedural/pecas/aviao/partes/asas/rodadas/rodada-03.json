@@ -1,0 +1,1111 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "aviao/asas",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-aviao-asas/alvo/aviao-unidade-asas-composta.png",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Silhueta, recortes e as partes batem com o alvo e com a sobreposição, a menos das diferenças declaradas; lista vazia não é aprovação, e a junção da carenagem e do casulo com a asa não aparece com clareza."
+  },
+  "partes": [
+    {
+      "nome": "asaD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "asaE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pontaD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pontaE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "flapD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "flapE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aileronD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aileronE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoFlapD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoFlapE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoAileronD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoAileronE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteFlap2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron1D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron1E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron2D",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteAileron2E",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "carenagemRaizD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "carenagemRaizE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "ovalPontaD",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "ovalPontaE",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "casuloE",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "vistas isoladas nao foram olhadas (a tarefa vetou vistas:critica); a conferencia por parte veio de caixas, contatos e do texto do plano",
+    "o casulo a um raio sob a linha da asa so toca o intradorso por tangencia: com 1,05 raio o contato asaE-casuloE falha; o estimado pelo critico (150 a 200 mm) nao cabe sem uniao nova",
+    "no recorte da frontal da referencia o circulo do casulo parece ainda sobreposto a asa, mais perto da posicao antiga que da pedida (leitura de pixel, nao medida)",
+    "a ponta a 72 graus com a chamada da familia deu razao de volume 0,431 contra o esboco (era 0,45): o minimo declarado caiu de 0,44 para 0,43",
+    "o alongamento +y da ponta teve de ser refeito (223,1 para 220,7 mm) pela mudanca da discretizacao da curva",
+    "quadrosDoLoft e pontoDaSecao seguem importados: o oval ainda le o extradorso da asa por eles, fora da chamar()",
+    "rodei git stash por engano com outros modeladores na arvore; nao criou entrada e a arvore ficou intacta"
+  ],
+  "notaDePassagem": "Ponta pela chamar(): semi 5622,7 mm e o x onde a ponta antiga terminava, e cordas e espessura saem da reta da semi-asa de 5656 mm. Casulo a um raio da linha de 25% da corda (centro em y 1242 mm): e a descida maxima em que a elipse ainda toca o intradorso. Se o critico ainda pedir mais descida, falta uma uniao (pilar) entre casulo e asa, que o plano nao descreve.",
+  "receita": {
+    "sha256": "sha256:cd534b5363dfe0a350c40c1e355e3aabe9712626b9d70e298e5fc9ce6f2a0a95",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 126,
+      "acrescentadas": 63,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": " * A ponta parte da mesma chamada da família, com o perfil e as cordas dela, e só o caminho e o contorno mudam, porque a família não"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": " * aceita mais de 60 graus de ponta levantada e a pessoa pediu a ponta a uns 9% da meia-asa, o que pede cerca de 72. As seções do"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": " * contorno vêm da expansão (interpoladas em x, que é exato: corda, espessura e enflechamento são retas) e o caminho é a mesma curva de"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": " * quinto grau da família (`plantaDa`), com o ângulo de `asa.pontaLevantada`; a tampa é a da família, de comprimento fixo ao longo do"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": " * caminho. Vista de cima, a ponta tem os cantos do bordo de ataque e do de fuga arredondados: cada seção perde, em u, um recuo que"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": " * segue um quarto de círculo em x, do raio de `ponta.raioNoBordoDeAtaque` e de `ponta.raioNoBordoDeFuga`, e o recuo chega ao máximo"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": " * na corda da ponta."
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * A ponta é a chamada da família com o perfil `asa`, as cordas e a espessura da reta da semi-asa no x dela, a ponta levantada de 72"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * graus, a tampa de 130 mm ao longo da tangente final e os cantos do bordo de ataque (170 mm) e do bordo de fuga (120 mm) arredondados"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * vistos de cima, tudo pelas opções `pontaLevantada`, `comprimentoDaTampa`, `raioDoCantoDeAtaque` e `raioDoCantoDeFuga` da família, em"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * razão da semi-envergadura. A família gera a semi-asa inteira até a ponta, e a metade de asa fica só com o que a `cortaAsa` deixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * além do plano do corte."
+        },
+        {
+          "tipo": "-",
+          "linha": 47,
+          "texto": " * casulo é uma revolução em z, uma elipse de meio perfil, pendurada no bordo de ataque da asa esquerda; os ovais são extrusões em y de"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": " * casulo é uma revolução em z, uma elipse de meio perfil, pendurada no bordo de ataque da asa esquerda com o centro um raio abaixo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": " * linha de 25% da corda, onde a elipse ainda toca o intradorso; os ovais são extrusões em y de"
+        },
+        {
+          "tipo": "-",
+          "linha": 54,
+          "texto": "import { ANGULOS_DA_TAMPA, inverterSuave, plantaDa, pontoDaSecao, quadrosDoLoft } from '../../../../../familias/superficie-aerodinamica/geometria.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "import { pontoDaSecao, quadrosDoLoft } from '../../../../../familias/superficie-aerodinamica/geometria.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 85,
+          "texto": "     10%, como na referência real). A família só aceita até `LIMITE_DA_FAMILIA` (60), e acima disso a ponta usa o caminho de `ponta`"
+        },
+        {
+          "tipo": "-",
+          "linha": 86,
+          "texto": "     (adiante). O corte da ponta é o plano em x"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "     10%, como na referência real), pela `chamar()` da família, que aceita até 72. O corte da ponta é o plano em x"
+        },
+        {
+          "tipo": "-",
+          "linha": 107,
+          "texto": "  /* A ponta levantada, no que se afasta da família. `recuoDoInicio` é quanto o `loft` da ponta começa antes do começo da curva (o corte"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "     da ponta aparra esse trecho reto), e `intervalosNaCurva` o número de intervalos da curva, espaçados por igual no ângulo: com a tampa"
+        },
+        {
+          "tipo": "-",
+          "linha": 109,
+          "texto": "     e as duas pontas, são as 25 seções que o bloco de 1000 faces de um `loft` comporta. `comprimentoDaTampa` é o comprimento, ao longo"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "     do caminho, das três seções da tampa e da corda que fecha a ponta (a família as põe a 130 mm do fim da curva, a 62 graus). Vista de"
+        },
+        {
+          "tipo": "-",
+          "linha": 111,
+          "texto": "     cima, a ponta tem o canto do bordo de ataque de `raioNoBordoDeAtaque` e o do bordo de fuga de `raioNoBordoDeFuga`, como a"
+        },
+        {
+          "tipo": "-",
+          "linha": 112,
+          "texto": "     referência real, onde o de ataque é o mais largo e o de fuga fecha em ponta curta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 113,
+          "texto": "  ponta: { recuoDoInicio: 200, intervalosNaCurva: 18, comprimentoDaTampa: 130, raioNoBordoDeAtaque: 170, raioNoBordoDeFuga: 120 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  /* A ponta levantada, no que a chamada da família recebe além do que a asa dá. `semi` é o x da ponta, a partir da raiz: a família"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "     termina a superfície nele, e as cordas e a espessura são as da reta da semi-asa de `asa.semi` ali. `comprimentoDaTampa` é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "     comprimento, ao longo do caminho, das três seções da tampa e da corda que fecha a ponta, e `raioNoBordoDeAtaque` e"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "     `raioNoBordoDeFuga` os cantos arredondados vistos de cima, como na referência real, onde o de ataque é o mais largo e o de fuga"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "     fecha em ponta curta. As três vão à família em razão da `semi` da ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  ponta: { semi: 5622.7, comprimentoDaTampa: 130, raioNoBordoDeAtaque: 170, raioNoBordoDeFuga: 120 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "     bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `abaixoDoEixo` quanto o centro fica"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "     abaixo da linha de 25% da corda, e `lados` e `estacoes` a resolução da revolução e do meio perfil. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, abaixoDoEixo: 50, lados: 48, estacoes: 16 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "     bordo de ataque da asa para a frente e para trás, `raio` o de meia altura e de meia largura, `raiosAbaixoDoEixo` quantos"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "     raios o centro fica abaixo da linha de 25% da corda naquele x (um raio, como na referência real, em que o casulo pende sob a"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "     asa: com um raio a elipse ainda toca a asa junto ao bordo de ataque), e `lados` e `estacoes` a resolução da revolução e do meio perfil. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  casulo: { x: 4330, aFrente: 460, aTras: 160, raio: 150, raiosAbaixoDoEixo: 1, lados: 48, estacoes: 16 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 253,
+          "texto": "/* O máximo de `pontaLevantada` que a família aceita, em graus (a faixa de `familia.json`). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 254,
+          "texto": "const LIMITE_DA_FAMILIA = 60;"
+        },
+        {
+          "tipo": "-",
+          "linha": 276,
+          "texto": "/* As seções da ponta levantada e arredondada, em metro no quadro local da família: as da família (`base`, a chamada da ponta) dão o"
+        },
+        {
+          "tipo": "-",
+          "linha": 277,
+          "texto": "   contorno, e o caminho é o da curva de quinto grau dela com o ângulo de `asa.pontaLevantada`, que passa do que a família aceita. O"
+        },
+        {
+          "tipo": "-",
+          "linha": 278,
+          "texto": "   `loft` começa `ponta.recuoDoInicio` antes da curva, e as seções da curva ficam espaçadas por igual no ângulo, como as da família."
+        },
+        {
+          "tipo": "-",
+          "linha": 279,
+          "texto": "   A tampa guarda as espessuras da família (o cosseno de 30, 55 e 75 graus), mas fica a `ponta.comprimentoDaTampa` ao longo da reta"
+        },
+        {
+          "tipo": "-",
+          "linha": 280,
+          "texto": "   do fim da curva, e não nos 60 mm em x da família, que num caminho mais inclinado alongariam a tampa. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 281,
+          "texto": "function secoesDaPonta(t, base) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 282,
+          "texto": "  const a = t.asa;"
+        },
+        {
+          "tipo": "-",
+          "linha": 283,
+          "texto": "  const p = t.ponta;"
+        },
+        {
+          "tipo": "-",
+          "linha": 284,
+          "texto": "  const planta = plantaDa({"
+        },
+        {
+          "tipo": "-",
+          "linha": 285,
+          "texto": "    semi: m(a.semi), cordaNaRaiz: m(a.cordaNaRaiz), cordaNaPonta: m(a.cordaNaPonta), abaulamentoDaCorda: 0, espessuraNaRaiz: a.espessuraNaRaiz,"
+        },
+        {
+          "tipo": "-",
+          "linha": 286,
+          "texto": "    espessuraNaPonta: a.espessuraNaPonta, incidenciaNaRaiz: 0, torcao: 0, enflechamento: a.enflechamento, diedro: a.diedro,"
+        },
+        {
+          "tipo": "-",
+          "linha": 287,
+          "texto": "    pontaLevantada: a.pontaLevantada, extensaoDaPonta: a.extensaoDaPonta, bordoDeFuga: 0,"
+        },
+        {
+          "tipo": "-",
+          "linha": 288,
+          "texto": "  });"
+        },
+        {
+          "tipo": "-",
+          "linha": 289,
+          "texto": "  const aneis = base.secoes.filter((s) => s.contorno);"
+        },
+        {
+          "tipo": "-",
+          "linha": 290,
+          "texto": "  const corpo = aneis.filter((s) => s.pos[0] <= planta.xDoCorte + 1e-6);"
+        },
+        {
+          "tipo": "-",
+          "linha": 291,
+          "texto": "  const tampa = aneis.filter((s) => s.pos[0] > planta.xDoCorte + 1e-6);"
+        },
+        {
+          "tipo": "-",
+          "linha": 292,
+          "texto": "  if (tampa.length !== ANGULOS_DA_TAMPA.length) throw new Error(`ponta: a família deu ${tampa.length} seções de tampa, e eram ${ANGULOS_DA_TAMPA.length}`);"
+        },
+        {
+          "tipo": "-",
+          "linha": 293,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 294,
+          "texto": "  /* O contorno da família em x, interpolado entre as duas seções vizinhas do corpo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 295,
+          "texto": "  const contornoEm = (x) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 296,
+          "texto": "    const i = Math.max(0, corpo.findIndex((s) => s.pos[0] >= x) - 1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 297,
+          "texto": "    const A = corpo[i];"
+        },
+        {
+          "tipo": "-",
+          "linha": 298,
+          "texto": "    const B = corpo[Math.min(i + 1, corpo.length - 1)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 299,
+          "texto": "    const f = B.pos[0] === A.pos[0] ? 0 : (x - A.pos[0]) / (B.pos[0] - A.pos[0]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 300,
+          "texto": "    return A.contorno.map(([u, w], k) => [u + f * (B.contorno[k][0] - u), w + f * (B.contorno[k][1] - w)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 301,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 302,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 303,
+          "texto": "  const theta = (a.diedro + a.pontaLevantada) * GRAUS;"
+        },
+        {
+          "tipo": "-",
+          "linha": 304,
+          "texto": "  const xFim = planta.xDoCorte;"
+        },
+        {
+          "tipo": "-",
+          "linha": 305,
+          "texto": "  const yFim = planta.y(xFim);"
+        },
+        {
+          "tipo": "-",
+          "linha": 306,
+          "texto": "  const comprimento = m(p.comprimentoDaTampa);"
+        },
+        {
+          "tipo": "-",
+          "linha": 307,
+          "texto": "  const xPonta = xFim + comprimento * Math.cos(theta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 308,
+          "texto": "  /* O recuo de um canto em x: zero até `raio` antes da ponta e, dali, o quarto de círculo que chega a `raio` na ponta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 309,
+          "texto": "  const recuo = (x, raio) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 310,
+          "texto": "    const r = x - (xPonta - m(raio));"
+        },
+        {
+          "tipo": "-",
+          "linha": 311,
+          "texto": "    return r <= 0 ? 0 : m(raio) - Math.sqrt(Math.max(0, m(raio) ** 2 - r * r));"
+        },
+        {
+          "tipo": "-",
+          "linha": 312,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 313,
+          "texto": "  /* Os pontos [u, w] com a corda encolhida pelos dois recuos: o bordo de ataque (u mínimo) anda para trás e o de fuga para a frente. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 314,
+          "texto": "  const apara = (pontos, x) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 315,
+          "texto": "    const us = pontos.map(([u]) => u);"
+        },
+        {
+          "tipo": "-",
+          "linha": 316,
+          "texto": "    const uMin = Math.min(...us);"
+        },
+        {
+          "tipo": "-",
+          "linha": 317,
+          "texto": "    const corda = Math.max(...us) - uMin;"
+        },
+        {
+          "tipo": "-",
+          "linha": 318,
+          "texto": "    const dAtaque = recuo(x, p.raioNoBordoDeAtaque);"
+        },
+        {
+          "tipo": "-",
+          "linha": 319,
+          "texto": "    const dFuga = recuo(x, p.raioNoBordoDeFuga);"
+        },
+        {
+          "tipo": "-",
+          "linha": 320,
+          "texto": "    const k = (corda - dAtaque - dFuga) / corda;"
+        },
+        {
+          "tipo": "-",
+          "linha": 321,
+          "texto": "    return pontos.map(([u, w]) => [uMin + dAtaque + (u - uMin) * k, w]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 322,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 323,
+          "texto": "  const anel = (x) => ({ pos: [x, planta.y(x), 0], contorno: apara(contornoEm(x), x) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 324,
+          "texto": "  const corda = (x, pontos) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 325,
+          "texto": "    const us = pontos.map(([u]) => u);"
+        },
+        {
+          "tipo": "-",
+          "linha": 326,
+          "texto": "    return [[Math.max(...us), 0], [Math.min(...us), 0]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 327,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 328,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 329,
+          "texto": "  const xInicio = planta.xDaCurva - m(p.recuoDoInicio);"
+        },
+        {
+          "tipo": "-",
+          "linha": 330,
+          "texto": "  const secoes = [{ pos: [xInicio, planta.y(xInicio), 0], aresta: corda(xInicio, contornoEm(xInicio)) }, anel(xInicio + 1e-4)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 331,
+          "texto": "  for (let k = 0; k <= p.intervalosNaCurva; k++) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 332,
+          "texto": "    const x = k === 0 ? planta.xDaCurva : k === p.intervalosNaCurva ? xFim : planta.xDaCurva + (xFim - planta.xDaCurva) * inverterSuave(k / p.intervalosNaCurva);"
+        },
+        {
+          "tipo": "-",
+          "linha": 333,
+          "texto": "    secoes.push(anel(x));"
+        },
+        {
+          "tipo": "-",
+          "linha": 334,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 335,
+          "texto": "  for (const s of tampa) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 336,
+          "texto": "    const ao = (comprimento * (s.pos[0] - xFim)) / planta.comprimentoDaTampa;"
+        },
+        {
+          "tipo": "-",
+          "linha": 337,
+          "texto": "    const x = xFim + ao * Math.cos(theta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 338,
+          "texto": "    secoes.push({ pos: [x, yFim + ao * Math.sin(theta), 0], contorno: apara(s.contorno, x) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 339,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 340,
+          "texto": "  const ultima = base.secoes[base.secoes.length - 1];"
+        },
+        {
+          "tipo": "-",
+          "linha": 341,
+          "texto": "  secoes.push({ pos: [xPonta, yFim + comprimento * Math.sin(theta), 0], aresta: apara(ultima.aresta, xPonta) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 342,
+          "texto": "  return { secoes, lados: base.lados, orientacao: base.orientacao };"
+        },
+        {
+          "tipo": "-",
+          "linha": 343,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 344,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 388,
+          "texto": "/* O casulo, em mm: o meio perfil [raio, z] de uma elipse, da ponta da frente à de trás, e o ponto em que o eixo passa, em x e y. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 315,
+          "texto": "/* O casulo, em mm: o meio perfil [raio, z] de uma elipse, da ponta da frente à de trás, e o ponto em que o eixo passa, em x e y: o"
+        },
+        {
+          "tipo": "+",
+          "linha": 316,
+          "texto": "   centro fica `raiosAbaixoDoEixo` raios abaixo da linha de 25% da corda da asa em x. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 399,
+          "texto": "  return { perfil, eixo: [-c.x, q.eixoY - c.abaixoDoEixo], zFrente, zTras };"
+        },
+        {
+          "tipo": "+",
+          "linha": 327,
+          "texto": "  return { perfil, eixo: [-c.x, q.eixoY - c.raiosAbaixoDoEixo * c.raio], zFrente, zTras };"
+        },
+        {
+          "tipo": "+",
+          "linha": 340,
+          "texto": "/* Os parâmetros que as duas chamadas da família têm em comum, com os do esboço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 341,
+          "texto": "const baseDaChamada = (a) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 342,
+          "texto": "  perfil: 'asa', simetria: 0, enflechamento: a.enflechamento, diedro: a.diedro, torcao: 0, incidenciaNaRaiz: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 343,
+          "texto": "  espessuraNaRaiz: a.espessuraNaRaiz, extensaoDaPonta: a.extensaoDaPonta, comando: 0, comandoDiferencial: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 344,
+          "texto": "});"
+        },
+        {
+          "tipo": "+",
+          "linha": 345,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 346,
+          "texto": "/* A semi-asa da família até o x `semi` (mm), com as cordas e a espessura da reta da semi-asa inteira (`asa.semi`) naquele ponto: a"
+        },
+        {
+          "tipo": "+",
+          "linha": 347,
+          "texto": "   corda e a espessura vão em razão da envergadura da chamada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 348,
+          "texto": "function chamadaAte(nome, t, semi, extras) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 349,
+          "texto": "  const a = t.asa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 350,
+          "texto": "  const f = semi / a.semi;"
+        },
+        {
+          "tipo": "+",
+          "linha": 351,
+          "texto": "  return chamar(registroDeFamilias().obter('superficie-aerodinamica'), nome, {"
+        },
+        {
+          "tipo": "+",
+          "linha": 352,
+          "texto": "    ...baseDaChamada(a),"
+        },
+        {
+          "tipo": "+",
+          "linha": 353,
+          "texto": "    envergadura: semi,"
+        },
+        {
+          "tipo": "+",
+          "linha": 354,
+          "texto": "    cordaNaRaiz: a.cordaNaRaiz / semi,"
+        },
+        {
+          "tipo": "+",
+          "linha": 355,
+          "texto": "    cordaNaPonta: (a.cordaNaRaiz + (a.cordaNaPonta - a.cordaNaRaiz) * f) / semi,"
+        },
+        {
+          "tipo": "+",
+          "linha": 356,
+          "texto": "    espessuraNaPonta: a.espessuraNaRaiz - (a.espessuraNaRaiz - a.espessuraNaPonta) * f,"
+        },
+        {
+          "tipo": "+",
+          "linha": 357,
+          "texto": "    ...extras,"
+        },
+        {
+          "tipo": "+",
+          "linha": 358,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 359,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 360,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 361,
+          "texto": "/* A metade de asa leva a semi-envergadura recortada e sem a ponta levantada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 362,
+          "texto": "const chamadaDaMetade = (t) => chamadaAte('asa', t, t.asa.semiRecortada, { pontaLevantada: 0 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 363,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 364,
+          "texto": "/* A ponta leva a semi-envergadura dela, a levantada, a tampa e os dois cantos, estes em razão da semi-envergadura. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 365,
+          "texto": "function chamadaDaPonta(t) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 366,
+          "texto": "  const { semi, comprimentoDaTampa, raioNoBordoDeAtaque, raioNoBordoDeFuga } = t.ponta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 367,
+          "texto": "  return chamadaAte('ponta', t, semi, {"
+        },
+        {
+          "tipo": "+",
+          "linha": 368,
+          "texto": "    pontaLevantada: t.asa.pontaLevantada, comprimentoDaTampa: comprimentoDaTampa / semi,"
+        },
+        {
+          "tipo": "+",
+          "linha": 369,
+          "texto": "    raioDoCantoDeAtaque: raioNoBordoDeAtaque / semi, raioDoCantoDeFuga: raioNoBordoDeFuga / semi,"
+        },
+        {
+          "tipo": "+",
+          "linha": 370,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 371,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 372,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 414,
+          "texto": "  const registroDaFamilia = registroDeFamilias();"
+        },
+        {
+          "tipo": "-",
+          "linha": 415,
+          "texto": "  const familia = registroDaFamilia.obter('superficie-aerodinamica');"
+        },
+        {
+          "tipo": "-",
+          "linha": 418,
+          "texto": "  /* As duas chamadas da família, com os parâmetros do esboço. A metade de asa leva a semi-envergadura recortada, com as cordas e a"
+        },
+        {
+          "tipo": "-",
+          "linha": 419,
+          "texto": "     espessura da reta da semi-asa inteira naquele ponto, e sem a ponta levantada; a ponta leva a semi-envergadura inteira. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 420,
+          "texto": "  const proporcao = a.semiRecortada / a.semi;"
+        },
+        {
+          "tipo": "-",
+          "linha": 421,
+          "texto": "  const base = {"
+        },
+        {
+          "tipo": "-",
+          "linha": 422,
+          "texto": "    perfil: 'asa', simetria: 0, enflechamento: a.enflechamento, diedro: a.diedro, torcao: 0, incidenciaNaRaiz: 0,"
+        },
+        {
+          "tipo": "-",
+          "linha": 423,
+          "texto": "    espessuraNaRaiz: a.espessuraNaRaiz, extensaoDaPonta: a.extensaoDaPonta, comando: 0, comandoDiferencial: 0,"
+        },
+        {
+          "tipo": "-",
+          "linha": 424,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 425,
+          "texto": "  const chamadaDaAsa = chamar(familia, 'asa', {"
+        },
+        {
+          "tipo": "-",
+          "linha": 426,
+          "texto": "    ...base,"
+        },
+        {
+          "tipo": "-",
+          "linha": 427,
+          "texto": "    envergadura: a.semiRecortada,"
+        },
+        {
+          "tipo": "-",
+          "linha": 428,
+          "texto": "    cordaNaRaiz: a.cordaNaRaiz / a.semiRecortada,"
+        },
+        {
+          "tipo": "-",
+          "linha": 429,
+          "texto": "    cordaNaPonta: (a.cordaNaRaiz + (a.cordaNaPonta - a.cordaNaRaiz) * proporcao) / a.semiRecortada,"
+        },
+        {
+          "tipo": "-",
+          "linha": 430,
+          "texto": "    espessuraNaPonta: a.espessuraNaRaiz - (a.espessuraNaRaiz - a.espessuraNaPonta) * proporcao,"
+        },
+        {
+          "tipo": "-",
+          "linha": 431,
+          "texto": "    pontaLevantada: 0,"
+        },
+        {
+          "tipo": "-",
+          "linha": 432,
+          "texto": "  });"
+        },
+        {
+          "tipo": "-",
+          "linha": 433,
+          "texto": "  const chamadaDaPonta = chamar(familia, 'ponta', {"
+        },
+        {
+          "tipo": "-",
+          "linha": 434,
+          "texto": "    ...base,"
+        },
+        {
+          "tipo": "-",
+          "linha": 435,
+          "texto": "    envergadura: a.semi,"
+        },
+        {
+          "tipo": "-",
+          "linha": 436,
+          "texto": "    cordaNaRaiz: a.cordaNaRaiz / a.semi,"
+        },
+        {
+          "tipo": "-",
+          "linha": 437,
+          "texto": "    cordaNaPonta: a.cordaNaPonta / a.semi,"
+        },
+        {
+          "tipo": "-",
+          "linha": 438,
+          "texto": "    espessuraNaPonta: a.espessuraNaPonta,"
+        },
+        {
+          "tipo": "-",
+          "linha": 439,
+          "texto": "    pontaLevantada: Math.min(a.pontaLevantada, LIMITE_DA_FAMILIA),"
+        },
+        {
+          "tipo": "-",
+          "linha": 440,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 377,
+          "texto": "  const loftDaAsa = loftDaFamilia(chamadaDaMetade(t));"
+        },
+        {
+          "tipo": "+",
+          "linha": 378,
+          "texto": "  const loftDaPonta = loftDaFamilia(chamadaDaPonta(t));"
+        },
+        {
+          "tipo": "-",
+          "linha": 492,
+          "texto": "  const loftDaAsa = loftDaFamilia(chamadaDaAsa);"
+        },
+        {
+          "tipo": "-",
+          "linha": 499,
+          "texto": "    ponta: { loft: secoesDaPonta(t, loftDaFamilia(chamadaDaPonta)), desloca: mAll(a.raiz) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 436,
+          "texto": "    ponta: { loft: loftDaPonta, desloca: mAll(a.raiz) },"
+        },
+        {
+          "tipo": "-",
+          "linha": 796,
+          "texto": "  minimo: 0.44,"
+        },
+        {
+          "tipo": "-",
+          "linha": 797,
+          "texto": "  alongamento: { '+y': 223.1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 733,
+          "texto": "  minimo: 0.43,"
+        },
+        {
+          "tipo": "+",
+          "linha": 734,
+          "texto": "  alongamento: { '+y': 220.7 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 825,
+          "texto": "          tecnica: 'contorno da superfície da família com a ponta levantada, em caminho de quinto grau de 72 graus (a família só aceita 60), cantos arredondados por recuo das seções; cortada além da metade da asa',"
+        },
+        {
+          "tipo": "+",
+          "linha": 762,
+          "texto": "          tecnica: 'chamada da família superficie-aerodinamica com a ponta levantada de 72 graus, tampa de 130 mm e cantos de 170 e 120 mm pelas opções da família, cortada além da metade da asa',"
+        },
+        {
+          "tipo": "-",
+          "linha": 854,
+          "texto": "        forma: 'casulo escuro sob a asa esquerda, ovoide de 620 mm por 300 mm de diâmetro, de eixo em z, pendurado no bordo de ataque a 4330 mm do eixo do avião',"
+        },
+        {
+          "tipo": "+",
+          "linha": 791,
+          "texto": "        forma: 'casulo escuro sob a asa esquerda, ovoide de 620 mm por 300 mm de diâmetro, de eixo em z, pendurado no bordo de ataque a 4330 mm do eixo do avião, com o centro um raio abaixo da linha da asa',"
+        },
+        {
+          "tipo": "-",
+          "linha": 887,
+          "texto": "    { par: ['casuloE', 'asaE'], motivo: 'o casulo pende do bordo de ataque da asa esquerda e entra 160 mm atrás dele' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 824,
+          "texto": "    { par: ['casuloE', 'asaE'], motivo: 'o casulo pende sob o bordo de ataque da asa esquerda, com o centro um raio abaixo da linha da asa, e a elipse toca o intradorso junto ao nariz' },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
