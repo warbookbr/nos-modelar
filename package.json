@@ -113,6 +113,7 @@
     "esboco": "node tools/mecanifica/esboco.mjs",
     "importar-csg": "node tools/mecanifica/importar-csg.mjs",
     "importar-step": "node tools/mecanifica/importar-step.mjs",
+    "importar-stl": "node tools/mecanifica/importar-stl.mjs",
     "desenho": "node tools/mecanifica/desenho.mjs",
     "contorno:prancha": "node tools/mecanifica/prancha/prancha-dos-contornos.mjs",
     "objeto": "node tools/mecanifica/objeto.mjs"

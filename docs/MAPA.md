@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1324 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1330 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1762,6 +1762,8 @@
 - `esboco-importar-csg.test.mjs` — O importador de .csg: a fixture sintética escrita à mão cobre cada nó, e o resultado é medido pelo próprio esboço (a caixa de cada forma depois de posta e re…
 - `esboco-importar-step.mjs` — Importador de STEP para `.esboco.json`.
 - `esboco-importar-step.test.mjs` — O importador de STEP: a fixture sintética (gerada com o OpenCascade WASM por `gerar-sintetico.mjs`) tem uma peça de cada tipo de forma, e cada peça é medida …
+- `esboco-importar-stl.mjs` — Importador de STL para `.esboco.json`.
+- `esboco-importar-stl.test.mjs` — O importador de STL: a fixture sintética (o STEP sintético do importador de STEP, tesselado pelo OpenCascade, ver FONTE.md) dá uma peça de cada tipo de forma…
 - `esboco-medidas-no-andaime.test.mjs` — A prova das medidas do `plano.medidas` lidas na blocagem do nível zero, sobre os esboços do módulo e do banco de provas que as declaram: a leitura na blocage…
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
@@ -1808,9 +1810,11 @@
 - `importar-csg.mjs` — Linha de comando do importador de `.csg` do OpenSCAD para `.esboco.json`. Uso: npm run importar-csg -- <arquivo.csg> [--saida <arquivo.esboco.json>] [--frent…
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `importar-step.mjs` — Linha de comando do importador de STEP para `.esboco.json`. Uso: npm run importar-step -- <arquivo.step> [--saida <arquivo.esboco.json>] [--frente +y|-y|+x|-…
+- `importar-stl.mjs` — Linha de comando do importador de STL para `.esboco.json`. Uso: npm run importar-stl -- <pasta-ou-arquivos.stl...> [--saida <arquivo.esboco.json>] [--escala …
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
+- `malha-para-esboco.mjs` — O que o importador de STEP e o de STL têm em comum: a malha de um sólido (vértices, triângulos e normais, no quadro do esboço) vira a forma mais simples que …
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
 - `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.
@@ -1895,6 +1899,11 @@
 
 - `FONTE.md` — Fixtures do importador de STEP
 - `gerar-sintetico.mjs` — Gera `sintetico.step`, a fixture do importador de STEP, com o próprio OpenCascade WASM do repositório (`occt-wasm`). Uso: node tools/mecanifica/fixtures/impo…
+
+## tools/mecanifica/fixtures/importar-stl/
+
+- `FONTE.md` — Fixtures do importador de STL
+- `gerar-sintetico.mjs` — Gera a fixture sintética do importador de STL a partir da do importador de STEP: cada sólido de `../importar-step/sintetico.step` vira um STL, tesselado pelo…
 
 ## tools/mecanifica/guardas/
 
