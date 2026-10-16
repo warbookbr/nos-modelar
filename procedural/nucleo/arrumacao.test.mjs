@@ -26,7 +26,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve, dirname, sep } from 'node:path';
 
 const RAIZ = process.cwd();
-const PULAR = new Set(['node_modules', 'dist', '.git', 'coverage', 'test-results']);
+const PULAR = new Set(['node_modules', 'dist', '.git', '.claude', 'coverage', 'test-results']);
 
 function exigirRaiz() {
   const pacote = join(RAIZ, 'package.json');
