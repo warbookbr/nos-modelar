@@ -1,14 +1,15 @@
 /* etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa
    ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as
    juntas passando e o aceite da pessoa. Cada recusa tem o seu caso. */
-import { copyFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { estadoDasEtapas, fixar, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { auditarEtapas, descreverAuditoria, estadoDasEtapas, fixar, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
 
 const ORIGEM = fileURLToPath(new URL('../fixtures/tres-blocos-vinculados/montagens/tres-blocos.json', import.meta.url));
@@ -215,5 +216,141 @@ describe('as etapas construídas vistas juntas, com o quadro numa instância', (
 
   it('a captura que falha vira erro com a mensagem dela', async () => {
     await expect(olharEtapas(arquivo, { saida: join(area, 'v4'), capturar: async () => ({ ok: false, erro: { mensagem: 'o visor caiu' } }), receitas: RECEITAS })).rejects.toThrow('o visor caiu');
+  });
+});
+
+describe('a auditoria da montagem construída (--auditar)', () => {
+  /* Um carro de dois cubos de lado 1: a roda assenta na base e o corpo vai em
+     cima dela. O que está sob prova é a ligação das duas medidas ao comando; a
+     geometria delas tem suítes próprias. */
+  const CUBO = { 'cubo': { meta: { nome: 'cubo' }, PARAMS: {}, PASSOS: [
+    ['cubo', { origemId: 1, larg: 1, alt: 1, prof: 1, em: [0, 0, 0] }],
+    ['parte', { nome: 'corpo', sel: { origem: { op: 'cubo', id: 1 } } }],
+    ['solido', { sel: { grupo: 'corpo' } }],
+  ] } };
+  const pose = (x, y) => ({ rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [x, y, 0] });
+  const CHAO = { plano: { normal: [0, 1, 0], altura: 0 }, toleranciaNumerica: 0.001, apoiam: [{ caminho: ['roda'] }] };
+  const EXPECTATIVA = { id: 'corpo-na-roda', a: { caminho: ['corpo'] }, b: { caminho: ['roda'] }, motivo: 'o corpo assenta de propósito na roda, rente' };
+
+  function escreverCarro({ alturaDaRoda = 0, alturaDoCorpo = 1, extras = {} } = {}) {
+    const dado = {
+      formato: 'mecanifica.montagem',
+      versao: 5,
+      id: 'carro',
+      instancias: [
+        { id: 'roda', alvo: { tipo: 'peca', ref: 'cubo' }, pose: pose(0, alturaDaRoda) },
+        { id: 'corpo', alvo: { tipo: 'peca', ref: 'cubo' }, pose: pose(0, alturaDoCorpo) },
+      ],
+      relacoes: [],
+      etapas: ['roda', 'corpo'],
+      vinculos: [],
+      posicoes: [],
+      ...extras,
+    };
+    const caminho = join(area, 'carro.json');
+    writeFileSync(caminho, JSON.stringify(dado), 'utf8');
+    return caminho;
+  }
+
+  it('a descrição aceita uma auditoria de interseções feita sem profundidade', async () => {
+    const r = await auditarEtapas(escreverCarro({ alturaDoCorpo: 0.6 }), { receitas: CUBO });
+    const { profundidade, ...semProfundidade } = r.intersecoes.naoDeclarados[0];
+    const sem = { ...r, intersecoes: { ...r.intersecoes, naoDeclarados: [semProfundidade], pares: [semProfundidade] } };
+    expect(profundidade).toBeGreaterThan(0);
+    expect(() => descreverAuditoria(sem)).not.toThrow();
+    expect(descreverAuditoria(sem)).not.toContain('profundidade');
+  });
+
+  it('a roda no chão e o corpo rente em cima passam: o encosto não declarado avisa e não reprova', async () => {
+    const r = await auditarEtapas(escreverCarro({ extras: { apoioNoChao: CHAO } }), { receitas: CUBO });
+    expect(r.codigo).toBe(0);
+    expect(r.construidas).toEqual(['roda', 'corpo']);
+    expect(r.intersecoes.naoDeclarados.map((par) => par.estado)).toEqual(['encostam']);
+    expect(r.apoio.apoios[0]).toMatchObject({ caminho: ['roda'], estado: 'apoia' });
+    expect(descreverAuditoria(r)).toContain('resultado: passa.');
+  });
+
+  it('a roda 17 mm acima do chão reprova no apoio, com a altura no relatório', async () => {
+    const r = await auditarEtapas(escreverCarro({ alturaDaRoda: 0.017, alturaDoCorpo: 1.017, extras: { apoioNoChao: CHAO } }), { receitas: CUBO });
+    expect(r.codigo).toBe(1);
+    expect(r.apoio.apoios[0].estado).toBe('flutua');
+    const texto = descreverAuditoria(r);
+    expect(texto).toContain('REPROVA roda: flutua, ponto mais baixo a 0.017 do chão');
+    expect(texto).toContain('resultado: REPROVA.');
+  });
+
+  it('o corpo enterrado na roda e sem declaração reprova, com a profundidade, e a declaração o cala', async () => {
+    const r = await auditarEtapas(escreverCarro({ alturaDoCorpo: 0.6 }), { receitas: CUBO });
+    expect(r.codigo).toBe(1);
+    expect(r.apoio).toBeNull();
+    expect(r.intersecoes.naoDeclarados).toHaveLength(1);
+    expect(r.intersecoes.naoDeclarados[0].estado).toBe('interpenetram');
+    expect(r.intersecoes.naoDeclarados[0].profundidade).toBeGreaterThan(0);
+    const texto = descreverAuditoria(r);
+    expect(texto).toMatch(/REPROVA corpo x roda: interpenetram \(.+\), profundidade 0\.\d+/);
+    expect(texto).toContain('a montagem não declara apoioNoChao; nada foi medido.');
+
+    const declarado = await auditarEtapas(escreverCarro({ alturaDoCorpo: 0.6, extras: { auditoriaIntersecoes: { toleranciaNumerica: 1e-9, expectativas: [EXPECTATIVA] } } }), { receitas: CUBO });
+    expect(declarado.codigo).toBe(0);
+    expect(declarado.intersecoes.naoDeclarados).toEqual([]);
+    expect(descreverAuditoria(declarado)).toMatch(/declara corpo x roda: interpenetram .*declarado 'corpo-na-roda'/);
+  });
+
+  it('os não declarados vêm antes dos declarados no relatório, e a declaração sem contato aparece', async () => {
+    const r = await auditarEtapas(escreverCarro({ alturaDoCorpo: 5, extras: { auditoriaIntersecoes: { toleranciaNumerica: 1e-9, expectativas: [EXPECTATIVA] } } }), { receitas: CUBO });
+    expect(r.codigo).toBe(0);
+    expect(descreverAuditoria(r)).toContain("declarações sem contato (não reprovam, mas descrevem o que não existe):\n  corpo x roda: 'corpo-na-roda'");
+  });
+
+  it('o apoio reprova também quando uma peça que não se apoia passa abaixo do chão', async () => {
+    const r = await auditarEtapas(escreverCarro({ alturaDoCorpo: -3, extras: { apoioNoChao: CHAO } }), { receitas: CUBO });
+    expect(r.codigo).toBe(1);
+    expect(r.apoio.abaixoDoChao.map((item) => item.caminho)).toEqual([['corpo']]);
+    expect(descreverAuditoria(r)).toContain('REPROVA corpo: passa 3 abaixo do chão');
+  });
+
+  it('só as etapas construídas entram: a citação de instância sem geometria sai da auditoria, e o relatório diz', async () => {
+    const semGeometria = { ...CUBO, 'cubo-vazio': { meta: { nome: 'v' }, PARAMS: {}, PASSOS: [] } };
+    const arquivoParcial = join(area, 'parcial.json');
+    const dado = JSON.parse(readFileSync(escreverCarro({ extras: { apoioNoChao: { ...CHAO, apoiam: [{ caminho: ['roda'] }, { caminho: ['corpo'] }] }, auditoriaIntersecoes: { toleranciaNumerica: 1e-9, expectativas: [EXPECTATIVA] } } }), 'utf8'));
+    dado.instancias[1].alvo.ref = 'cubo-vazio';
+    writeFileSync(arquivoParcial, JSON.stringify(dado), 'utf8');
+    const r = await auditarEtapas(arquivoParcial, { receitas: semGeometria });
+    expect(r.construidas).toEqual(['roda']);
+    expect(r.foraDasEtapas).toEqual(['corpo']);
+    expect(r.apoioForaDasEtapas).toEqual([['corpo']]);
+    expect(r.apoio.apoios.map((item) => item.caminho)).toEqual([['roda']]);
+    expect(descreverAuditoria(r)).toContain("apoio declarado em 'corpo', fora das etapas construídas, não medido.");
+    /* Etapa sem geometria nunca passa por auditoria completa: o código é 2. */
+    expect(r.codigo).toBe(2);
+    expect(descreverAuditoria(r)).toContain('resultado: nada reprova, mas a auditoria é incompleta');
+  });
+
+  it('com o apoio todo em etapa sem geometria, a auditoria não diz que passou: mede só o que existe e sai com 2', async () => {
+    const semGeometria = { ...CUBO, 'cubo-vazio': { meta: { nome: 'v' }, PARAMS: {}, PASSOS: [] } };
+    const caminho = escreverCarro({ extras: { apoioNoChao: { ...CHAO, apoiam: [{ caminho: ['corpo'] }] } } });
+    const dado = JSON.parse(readFileSync(caminho, 'utf8'));
+    dado.instancias[1].alvo.ref = 'cubo-vazio';
+    writeFileSync(caminho, JSON.stringify(dado), 'utf8');
+    const { dado: parcial, construidas } = montagemAteAGeometria(dado, lerMontagemPersistida(dado), semGeometria);
+    expect(construidas).toEqual(['roda']);
+    expect(Object.hasOwn(parcial, 'apoioNoChao')).toBe(false);
+    expect(() => lerMontagemPersistida(parcial)).not.toThrow();
+    const r = await auditarEtapas(caminho, { receitas: semGeometria });
+    expect(r.apoio.apoios).toEqual([]);
+    expect(r.apoioForaDasEtapas).toEqual([['corpo']]);
+    expect(r.codigo).toBe(2);
+    /* e a peça construída ainda é conferida contra o chão */
+    dado.instancias[0].pose = pose(0, -3);
+    writeFileSync(caminho, JSON.stringify(dado), 'utf8');
+    const funda = await auditarEtapas(caminho, { receitas: semGeometria });
+    expect(funda.codigo).toBe(1);
+    expect(funda.apoio.abaixoDoChao.map((item) => item.caminho)).toEqual([['roda']]);
+  });
+
+  it('a auditoria não grava o registro de etapas', async () => {
+    const caminho = escreverCarro();
+    await auditarEtapas(caminho, { receitas: CUBO });
+    expect(() => readFileSync(caminho.replace(/\.json$/, '.etapas.json'))).toThrow();
   });
 });

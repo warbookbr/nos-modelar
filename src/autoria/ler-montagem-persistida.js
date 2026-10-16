@@ -195,6 +195,53 @@ function lerAuditoriaIntersecoes(valor) {
   return { toleranciaNumerica: numeroFinitoNaoNegativo(valor.toleranciaNumerica, `${caminho}.toleranciaNumerica`), expectativas };
 }
 
+/* O chão da montagem e as instâncias que se apoiam nele. A normal é unitária
+   para `altura` ter um só significado (a distância do plano à origem, ao longo
+   dela), e a tolerância é obrigatória: sem ela a medida escolheria uma por
+   conta própria. `apoiam` vazio é recusado, porque a declaração então só diria
+   que nada passa abaixo do chão e não afirmaria apoio de ninguém. */
+function lerApoioNoChao(valor, idsDasInstancias) {
+  const caminho = 'apoioNoChao';
+  if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
+  chavesExatas(valor, ['plano', 'toleranciaNumerica', 'apoiam'], caminho);
+  if (!ehObjetoSimples(valor.plano)) falhar('apoio-invalido', `${caminho}.plano`, 'precisa ser objeto simples.');
+  chavesExatas(valor.plano, ['normal', 'altura'], `${caminho}.plano`);
+  const normal = valor.plano.normal;
+  if (!Array.isArray(normal) || normal.length !== 3 || normal.some((numero) => !Number.isFinite(numero))) {
+    falhar('apoio-invalido', `${caminho}.plano.normal`, 'precisa ter três números finitos.');
+  }
+  if (Math.abs(Math.hypot(...normal) - 1) > 1e-9) {
+    falhar('apoio-invalido', `${caminho}.plano.normal`, 'precisa ser vetor unitário; a altura é medida ao longo dele.');
+  }
+  if (!Number.isFinite(valor.plano.altura)) falhar('apoio-invalido', `${caminho}.plano.altura`, 'precisa ser número finito.');
+  if (!Array.isArray(valor.apoiam) || valor.apoiam.length === 0) {
+    falhar('apoio-invalido', `${caminho}.apoiam`, 'precisa ser array com ao menos uma instância que se apoia no chão.');
+  }
+  const vistos = new Set();
+  const apoiam = valor.apoiam.map((item, indice) => {
+    const onde = `${caminho}.apoiam[${indice}]`;
+    if (!ehObjetoSimples(item)) falhar('apoio-invalido', onde, 'precisa ser objeto simples.');
+    chavesExatas(item, ['caminho'], onde);
+    if (!Array.isArray(item.caminho) || item.caminho.length === 0) {
+      falhar('apoio-invalido', `${onde}.caminho`, 'precisa ser caminho de instância não vazio.');
+    }
+    const ids = item.caminho.map((id, j) => textoNaoVazio(id, 'apoio-invalido', `${onde}.caminho[${j}]`));
+    if (!idsDasInstancias.has(ids[0])) {
+      falhar('instancia-desconhecida', `${onde}.caminho[0]`, `a montagem não tem a instância '${ids[0]}'.`);
+    }
+    const chave = JSON.stringify(ids);
+    if (vistos.has(chave)) falhar('apoio-duplicado', onde, `o caminho ${chave} já foi declarado.`);
+    vistos.add(chave);
+    return { caminho: ids };
+  });
+  apoiam.sort((a, b) => compararTexto(JSON.stringify(a.caminho), JSON.stringify(b.caminho)));
+  return {
+    plano: { normal: normal.map((numero) => (Object.is(numero, -0) ? 0 : numero)), altura: Object.is(valor.plano.altura, -0) ? 0 : valor.plano.altura },
+    toleranciaNumerica: numeroFinitoNaoNegativo(valor.toleranciaNumerica, `${caminho}.toleranciaNumerica`),
+    apoiam,
+  };
+}
+
 function lerRelacao(valor, indice, permitirDirecional = false) {
   const caminho = `relacoes[${indice}]`;
   if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
@@ -292,8 +339,8 @@ function lerV4(dado) {
 }
 
 function lerV5(dado) {
-  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'posicoes', 'auditoriaIntersecoes'], '$');
-  const { etapas: etapasBrutas, vinculos: vinculosBrutos, posicoes: posicoesBrutas, auditoriaIntersecoes, ...base } = dado;
+  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'posicoes', 'auditoriaIntersecoes', 'apoioNoChao'], '$');
+  const { etapas: etapasBrutas, vinculos: vinculosBrutos, posicoes: posicoesBrutas, auditoriaIntersecoes, apoioNoChao, ...base } = dado;
   const lida = lerV3({ ...base, versao: VERSAO_ATUAL });
   const posesDeclaradas = new Set(dado.instancias
     .filter((instancia) => ehObjetoSimples(instancia) && instancia.pose !== undefined)
@@ -319,6 +366,7 @@ function lerV5(dado) {
     vinculos,
     posicoes,
     ...(auditoriaIntersecoes !== undefined ? { auditoriaIntersecoes: lerAuditoriaIntersecoes(auditoriaIntersecoes) } : {}),
+    ...(apoioNoChao !== undefined ? { apoioNoChao: lerApoioNoChao(apoioNoChao, new Set(lida.instancias.map((instancia) => instancia.id))) } : {}),
   };
 }
 

@@ -35,7 +35,7 @@ function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
 function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
 function comprimento2(a) { return dot(a, a); }
 
-function transformar(ponto, pose) {
+export function transformar(ponto, pose) {
   const escala = pose?.escala ?? 1;
   return add(pose?.deslocamento ?? [0, 0, 0], mult([
     dot(pose?.rotacao?.[0] ?? [1, 0, 0], ponto),
@@ -265,7 +265,40 @@ function raioAtravessaTriangulo(origem, triangulo, tolerancia) {
   return t > tolerancia ? t : null;
 }
 
+/* O PONTO FORA DA CAIXA NÃO PRECISA DO RAIO. Cada ponto de amostragem custa um
+   percurso por todos os triângulos da outra malha, e na montagem do avião, com
+   dezenas de milhares de triângulos por peça, o par asa e fuselagem levava 79 s
+   quase todo em pontos que nem estão perto da fuselagem. Numa malha FECHADA, um
+   ponto fora da caixa dela, com a folga abaixo, não está dentro e não está a
+   menos de uma tolerância de triângulo nenhum, então a resposta do percurso é
+   "fora". A folga é a do pior triângulo: a região que `pontoNoTriangulo` aceita
+   é o triângulo alargado de uma tolerância por lado e uma no plano, e num
+   vértice de ângulo θ ela passa do vértice por `tolerância / sen(θ/2)`. Malha
+   aberta não usa o atalho, para o veredito dela seguir idêntico. */
+const folgasDeCaixa = new WeakMap();
+
+function folgaDaCaixa(malha, tolerancia) {
+  const guardada = folgasDeCaixa.get(malha);
+  if (guardada?.tolerancia === tolerancia) return guardada.folga;
+  let menorSenoDaMetade = 1;
+  for (const [a, b, c] of malha.triangulos) {
+    for (const [p, q, r] of [[a, b, c], [b, c, a], [c, a, b]]) {
+      const u = sub(q, p); const v = sub(r, p);
+      const tamanhos = Math.sqrt(comprimento2(u) * comprimento2(v));
+      const seno = tamanhos > 0 ? Math.sqrt(Math.max(0, (1 - dot(u, v) / tamanhos) / 2)) : 0;
+      if (seno < menorSenoDaMetade) menorSenoDaMetade = seno;
+    }
+  }
+  const folga = menorSenoDaMetade > 0 ? tolerancia * (1 + 1 / menorSenoDaMetade) : Infinity;
+  folgasDeCaixa.set(malha, { tolerancia, folga });
+  return folga;
+}
+
 function pontoDentroMalha(ponto, malha, tolerancia) {
+  if (malha.fechada && malha.caixa) {
+    const folga = folgaDaCaixa(malha, tolerancia);
+    if ([0, 1, 2].some((eixo) => ponto[eixo] < malha.caixa.min[eixo] - folga || ponto[eixo] > malha.caixa.max[eixo] + folga)) return false;
+  }
   let contagem = 0;
   for (const triangulo of malha.triangulos) {
     if (pontoNoTriangulo(ponto, triangulo, tolerancia)) return null;
@@ -313,7 +346,27 @@ function pontosDeAmostragem(solido) {
   return [...solido.triangulos.flatMap((t) => t), ...solido.triangulos.map(centroide)];
 }
 
-export function auditarParDeSolidos(a, b, tolerancia) {
+/* O maior afundamento, na superfície de `malha`, dos pontos que a contenção já
+   acusou dentro dela. Quem já tem os estados da contenção não a refaz. */
+function maiorAfundamento(pontos, estados, malha) {
+  let maior = null;
+  pontos.forEach((ponto, indice) => {
+    if (estados[indice] !== true) return;
+    let menor = Infinity;
+    for (const triangulo of malha.triangulos) menor = Math.min(menor, distancia2PontoTriangulo(ponto, triangulo));
+    const profundidade = Math.sqrt(menor);
+    if (maior === null || profundidade > maior) maior = profundidade;
+  });
+  return maior;
+}
+
+const maiorDosDois = (x, y) => (x === null ? y : y === null ? x : Math.max(x, y));
+
+/* Com `{ profundidade: true }` o par que se invade traz `profundidade`, no
+   mesmo sentido de `profundidadeDeInterpenetracao` (um piso, porque só amostra
+   pontos; `null` quando nenhum ponto cai dentro e as malhas só se cruzam por
+   arestas), reaproveitando a contenção que o estado já mediu. */
+export function auditarParDeSolidos(a, b, tolerancia, { profundidade = false } = {}) {
   if (a.inconclusivo || b.inconclusivo) return { estado: 'inconclusivo', diagnosticos: [a.inconclusivo, b.inconclusivo].filter(Boolean) };
   if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return { estado: 'separadas', metodo: 'caixa-mundo' };
   const pontosA = pontosDeAmostragem(a);
@@ -322,7 +375,11 @@ export function auditarParDeSolidos(a, b, tolerancia) {
   const estadosB = pontosB.map((ponto) => pontoDentroMalha(ponto, a, tolerancia));
   if (estadosA.includes(true) || estadosB.includes(true)) {
     return a.fechada && b.fechada
-      ? { estado: 'interpenetram', metodo: 'contencao-e-malha' }
+      ? {
+        estado: 'interpenetram',
+        metodo: 'contencao-e-malha',
+        ...(profundidade ? { profundidade: maiorDosDois(maiorAfundamento(pontosA, estadosA, b), maiorAfundamento(pontosB, estadosB, a)) } : {}),
+      }
       : { estado: 'inconclusivo', diagnosticos: ['contencao-em-malha-aberta'] };
   }
   const superficie = estadosA.includes(null) || estadosB.includes(null);
@@ -337,7 +394,7 @@ export function auditarParDeSolidos(a, b, tolerancia) {
       : { estado: 'inconclusivo', diagnosticos: ['contato-em-malha-aberta'] };
   }
   return a.fechada && b.fechada
-    ? { estado: 'interpenetram', metodo: 'intersecao-de-superficies' }
+    ? { estado: 'interpenetram', metodo: 'intersecao-de-superficies', ...(profundidade ? { profundidade: null } : {}) }
     : { estado: 'inconclusivo', diagnosticos: ['intersecao-em-malha-aberta'] };
 }
 
@@ -382,15 +439,8 @@ export function profundidadeDeInterpenetracao(a, b, tolerancia) {
   if (a.inconclusivo || b.inconclusivo || !a.fechada || !b.fechada) return null;
   if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return null;
   const maiorDentro = (de, em) => {
-    let maior = null;
-    for (const ponto of pontosDeAmostragem(de)) {
-      if (pontoDentroMalha(ponto, em, tolerancia) !== true) continue;
-      let menor = Infinity;
-      for (const triangulo of em.triangulos) menor = Math.min(menor, distancia2PontoTriangulo(ponto, triangulo));
-      const profundidade = Math.sqrt(menor);
-      if (maior === null || profundidade > maior) maior = profundidade;
-    }
-    return maior;
+    const pontos = pontosDeAmostragem(de);
+    return maiorAfundamento(pontos, pontos.map((ponto) => pontoDentroMalha(ponto, em, tolerancia)), em);
   };
   const deAemB = maiorDentro(a, b); const deBemA = maiorDentro(b, a);
   if (deAemB === null) return deBemA;

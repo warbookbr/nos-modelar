@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1310 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1315 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1022,6 +1022,7 @@
 
 - `receita-01.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada, os flaps, os ailerons, os eixos deles e os suportes, na pose de pouso, …
 - `receita-02.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada e arredondada, os flaps, os ailerons, os eixos deles, os suportes e a ca…
+- `receita-03.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada e arredondada, os flaps, os ailerons, os eixos deles, os suportes e a ca…
 
 ## procedural/pecas/aviao/partes/empenagem-horizontal/
 
@@ -1032,6 +1033,7 @@
 - `receita-01.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
 - `receita-02.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
 - `receita-03.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
+- `receita-04.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
 
 ## procedural/pecas/aviao/partes/empenagem-vertical/
 
@@ -1042,6 +1044,7 @@
 - `receita-01.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 - `receita-02.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 - `receita-03.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
+- `receita-04.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 
 ## procedural/pecas/aviao/partes/fuselagem/
 
@@ -1189,6 +1192,8 @@
 - `alvo-de-cada-operacao.test.js` — alvo-de-cada-operacao.test.js — toda operação de topologia produz alvo que a régua da absorção entende, reproduz e reprova enquanto a receita não mudar.
 - `alvo-do-ajuste.js` — alvo-do-ajuste.js — o que a pessoa deixou na bancada, escrito como medida.
 - `alvo-do-ajuste.test.js` — alvo-do-ajuste.test.js — a régua que decide se a receita reescrita chegou onde a pessoa deixou a peça na bancada.
+- `apoio-no-chao.js` — apoio no chão — serviço neutro, sem Three.js.
+- `apoio-no-chao.test.mjs` — O apoio no chão é medido sobre a malha resolvida: a instância declarada toca o plano do chão dentro da tolerância e nenhuma outra passa abaixo dele. Os cubos…
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…

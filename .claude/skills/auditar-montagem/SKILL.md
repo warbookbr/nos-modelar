@@ -93,6 +93,14 @@ No serviço local, foco `incidente` testa o alvo contra toda a raiz; foco
 segundo para inspecionar um subconjunto grande sem receber todos os vizinhos,
 mas reporte `paresOmitidosPorFoco`: consulta interna nunca vira passe global.
 
+Para uma montagem v5 construída por etapas, que ainda não está publicada,
+`npm run etapas -- <montagem.json> --auditar` resolve as etapas que já têm
+geometria e roda a mesma auditoria de interseções, com a profundidade de cada
+invasão, mais o apoio no chão quando a montagem declara `apoioNoChao`. A saída é
+1 quando um par não declarado se invade ou o apoio reprova, e 2 quando nada
+reprova e a auditoria é incompleta, por par que não pôde ser medido ou por etapa
+ainda sem geometria. É o único comando que mede o apoio no chão.
+
 Para comparar poses, prefira alterações compactas endereçadas pelo id da
 instância e pelo campo inteiro `pose.rotacao`/`pose.deslocamento`. Audite cada
 estado separadamente. Duas poses estáticas não provam folga em toda a trajetória;

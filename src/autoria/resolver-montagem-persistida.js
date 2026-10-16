@@ -267,6 +267,7 @@ function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem, poseMonta
     ...(montagem.auditoriaIntersecoes !== undefined
       ? { auditoriaIntersecoes: montagem.auditoriaIntersecoes }
       : {}),
+    ...(montagem.apoioNoChao !== undefined ? { apoioNoChao: montagem.apoioNoChao } : {}),
   };
 }
 

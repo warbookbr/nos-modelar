@@ -108,3 +108,24 @@ describe('declaração morta falha em vez de sumir', () => {
     }))).toThrow(/já foi declarado/);
   });
 });
+
+/* A profundidade é pedida, e não vem por padrão: ela percorre as malhas de cada
+   par que se invade, e o resultado de quem não a pede não pode mudar. */
+describe('a profundidade da invasão é opcional', () => {
+  it('sem pedir, o par que se invade sai como sempre, sem o campo', () => {
+    const r = auditarIntersecoesMontagem(montagem({ separacao: 0.5, expectativas: [] }));
+    expect(Object.hasOwn(r.pares[0], 'profundidade')).toBe(false);
+  });
+
+  it('pedida, vem em unidade de mundo só nos pares que se invadem', () => {
+    const r = auditarIntersecoesMontagem(montagem({ separacao: 0.5, expectativas: [] }), { profundidade: true });
+    expect(r.pares[0].estado).toBe('interpenetram');
+    expect(r.pares[0].profundidade).toBeGreaterThan(0);
+    const separado = auditarIntersecoesMontagem(montagem({ separacao: 5, expectativas: [] }), { profundidade: true });
+    expect(Object.hasOwn(separado.pares[0], 'profundidade')).toBe(false);
+  });
+
+  it('recusa valor que não é booleano', () => {
+    expect(() => auditarIntersecoesMontagem(montagem({ separacao: 5, expectativas: [] }), { profundidade: 'sim' })).toThrow(/profundidade precisa ser booleano/);
+  });
+});

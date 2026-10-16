@@ -109,10 +109,11 @@ function conferirExpectativas(expectativas, folhas, quem) {
 export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
   if (!montagemResolvida || !Array.isArray(montagemResolvida.instancias)) throw new TypeError('auditar interseções: montagem resolvida inválida.');
   if (!opcoes || typeof opcoes !== 'object' || Array.isArray(opcoes)) throw new TypeError('auditar interseções: opções inválidas.');
-  const extras = Object.keys(opcoes).filter((chave) => !['caminho', 'modoFoco', 'toleranciaNumerica'].includes(chave));
+  const extras = Object.keys(opcoes).filter((chave) => !['caminho', 'modoFoco', 'toleranciaNumerica', 'profundidade'].includes(chave));
   if (extras.length) throw new Error(`auditar interseções: opção desconhecida '${extras[0]}'.`);
   const caminho = opcoes.caminho ?? [];
   if (!Array.isArray(caminho) || caminho.some((item) => typeof item !== 'string' || item === '')) throw new Error('auditar interseções: caminho precisa ser lista de IDs não vazios.');
+  if (opcoes.profundidade !== undefined && typeof opcoes.profundidade !== 'boolean') throw new Error('auditar interseções: profundidade precisa ser booleano.');
   const modoFoco = opcoes.modoFoco ?? 'incidente';
   if (modoFoco !== 'incidente' && modoFoco !== 'interno') throw new Error("auditar interseções: modoFoco precisa ser 'incidente' ou 'interno'.");
   const tolerancia = exigirToleranciaDeContato(opcoes.toleranciaNumerica
@@ -129,8 +130,12 @@ export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
     const bNoFoco = dentroDoFoco(b.caminho, caminho);
     const incluido = modoFoco === 'interno' ? aNoFoco && bNoFoco : aNoFoco || bNoFoco;
     if (!incluido) { filtrados += 1; continue; }
-    const resultado = auditarParDeSolidos(a, b, tolerancia);
+    const resultado = auditarParDeSolidos(a, b, tolerancia, { profundidade: opcoes.profundidade === true });
     const expectativa = expectativaDoPar(expectativas, a.caminho, b.caminho);
+    /* A PROFUNDIDADE É OPCIONAL: ela soma ao estado um percurso pelos
+       triângulos de cada ponto que cai dentro, e só o relatório que a mostra a
+       paga. `null` num par que se invade é penetração indeterminada (as malhas
+       se cruzam só por arestas), e nunca zero. */
     pares.push({
       a: a.caminho,
       b: b.caminho,

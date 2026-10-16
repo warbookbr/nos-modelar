@@ -28,6 +28,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { auditarIntersecoesMontagem } from '../../src/autoria/auditar-intersecoes-montagem.js';
+import { medirApoioNoChao, submontagensComDeclaracao } from '../../src/autoria/apoio-no-chao.js';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 import {
@@ -71,10 +73,19 @@ export function montagemAteAGeometria(dado, montagem, receitas) {
   const construidas = montagem.etapas.slice(0, primeiraVazia);
   const fica = new Set(construidas);
   const topo = (lado) => lado?.caminho?.[0];
+  /* As expectativas citam instâncias pelo caminho, e uma citação de instância
+     ainda sem geometria não casaria com nada: ficam as que cabem nas etapas
+     construídas. O apoio no chão sai inteiro da montagem parcial, e quem
+     audita o devolve com as instâncias de apoio que já existem. */
+  const auditoria = dado.auditoriaIntersecoes
+    ? { auditoriaIntersecoes: { ...dado.auditoriaIntersecoes, expectativas: dado.auditoriaIntersecoes.expectativas.filter((e) => fica.has(topo(e.a)) && fica.has(topo(e.b))) } }
+    : {};
+  const { auditoriaIntersecoes, apoioNoChao, ...resto } = dado;
   return {
     construidas,
     dado: {
-      ...dado,
+      ...resto,
+      ...auditoria,
       instancias: dado.instancias.filter((item) => fica.has(item.id)),
       etapas: construidas,
       relacoes: (dado.relacoes ?? []).filter((r) => fica.has(topo(r.referencia)) && fica.has(topo(r.movel))),
@@ -202,6 +213,115 @@ export async function olharEtapas(arquivoMontagem, {
   return { construidas, arquivos, enquadramentos, foco: caminhoDoFoco };
 }
 
+/* A AUDITORIA DA MONTAGEM CONSTRUÍDA. Resolve a montagem com as etapas que já
+   têm geometria e roda as duas medidas sobre ela: as interseções entre as peças
+   (com a profundidade de cada invasão) e, quando a montagem declara
+   `apoioNoChao`, o apoio no chão. Não grava nada. `receitas` é injetável para o
+   teste.
+
+   A decisão de reprovar mora aqui, e não em quem imprime: `codigo` 1 quando um
+   par que se invade não foi declarado ou o apoio reprova, 2 quando nada reprova
+   mas a auditoria é incompleta (algum par não pôde ser medido, ou há etapas
+   ainda sem geometria: inconclusivo e não construído não são livres), 0 no
+   resto.
+   Par que só encosta, sem declaração, aparece no relatório e não reprova, como
+   na auditoria de interseções. */
+export async function auditarEtapas(arquivoMontagem, { receitas: injetadas = null, toleranciaNumerica } = {}) {
+  const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
+  const montagem = lerMontagemPersistida(dado);
+  const receitas = injetadas ?? await receitasDaMontagem(montagem);
+  const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, receitas);
+  if (!construidas.length) throw new Error('nenhuma etapa tem geometria ainda; não há o que auditar.');
+  const resolvidaSemApoio = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
+  /* O apoio é medido com as instâncias de apoio que já têm geometria. As que
+     ainda não têm ficam em `apoioForaDasEtapas`, e a auditoria deixa de ser
+     completa por isso: apoio adiado não pode passar por apoio conferido. */
+  const apoioDeclarado = montagem.apoioNoChao;
+  const apoioForaDasEtapas = (apoioDeclarado?.apoiam ?? [])
+    .filter((item) => !construidas.includes(item.caminho[0])).map((item) => item.caminho);
+  const resolvida = apoioDeclarado
+    ? { ...resolvidaSemApoio, apoioNoChao: { ...apoioDeclarado, apoiam: apoioDeclarado.apoiam.filter((item) => construidas.includes(item.caminho[0])) } }
+    : resolvidaSemApoio;
+  const opcoesDeInterseccao = { profundidade: true, ...(toleranciaNumerica === undefined ? {} : { toleranciaNumerica }) };
+  const intersecoes = auditarIntersecoesMontagem(resolvida, opcoesDeInterseccao);
+  const apoio = apoioDeclarado
+    ? medirApoioNoChao(resolvida, toleranciaNumerica === undefined ? {} : { toleranciaNumerica })
+    : null;
+  const invadem = intersecoes.naoDeclarados.filter((par) => par.estado === 'interpenetram');
+  const reprova = invadem.length > 0 || (apoio !== null && !apoio.aprovado);
+  const foraDasEtapas = montagem.etapas.filter((id) => !construidas.includes(id));
+  const incompleta = intersecoes.cobertura.inconclusivos > 0 || foraDasEtapas.length > 0;
+  return {
+    montagem: montagem.id,
+    construidas,
+    foraDasEtapas,
+    apoioForaDasEtapas,
+    apoioIgnorado: submontagensComDeclaracao(resolvida),
+    intersecoes,
+    apoio,
+    codigo: reprova ? 1 : (incompleta ? 2 : 0),
+  };
+}
+
+const caminhoTexto = (caminho) => caminho.join('/');
+const medida = (numero) => (Math.abs(numero) < 1e-6 && numero !== 0 ? numero.toExponential(2) : String(Number(numero.toFixed(6))));
+const pontoTexto = (ponto) => `[${ponto.map(medida).join(', ')}]`;
+
+function linhaDoPar(par, rotulo) {
+  const profundidade = par.estado === 'interpenetram' && par.profundidade !== undefined
+    ? `, profundidade ${par.profundidade === null ? 'indeterminada (só as arestas se cruzam)' : medida(par.profundidade)}`
+    : '';
+  const declaracao = par.expectativa ? ` — declarado '${par.expectativa.id}': ${par.expectativa.motivo}` : '';
+  return `  ${rotulo} ${caminhoTexto(par.a)} x ${caminhoTexto(par.b)}: ${par.estado} (${par.metodo})${profundidade}${declaracao}`;
+}
+
+/* O texto do relatório: os pares que se invadem ou encostam sem declaração
+   primeiro, na ordem de gravidade que a auditoria já entrega, depois os
+   declarados, os declarados sem contato e a cobertura. As unidades são as da
+   montagem. */
+export function descreverAuditoria(auditoria) {
+  const { intersecoes, apoio } = auditoria;
+  const linhas = [];
+  linhas.push(`auditoria da montagem '${auditoria.montagem}': ${auditoria.construidas.length} etapas construídas (${auditoria.construidas.join(', ')}).`);
+  if (auditoria.foraDasEtapas.length) linhas.push(`  fora da auditoria, sem geometria ainda: ${auditoria.foraDasEtapas.join(', ')}.`);
+  linhas.push(`interseções entre peças, tolerância ${medida(intersecoes.toleranciaNumerica)}:`);
+  const declarados = intersecoes.pares.filter((par) => par.expectativa && (par.estado === 'interpenetram' || par.estado === 'encostam'))
+    .sort((x, y) => (x.estado === y.estado ? 0 : x.estado === 'interpenetram' ? -1 : 1));
+  if (!intersecoes.naoDeclarados.length) linhas.push('  nenhum par sem declaração se invade ou encosta.');
+  for (const par of intersecoes.naoDeclarados) linhas.push(linhaDoPar(par, par.estado === 'interpenetram' ? 'REPROVA' : 'avisa  '));
+  if (declarados.length) {
+    linhas.push('pares declarados em contato:');
+    for (const par of declarados) linhas.push(linhaDoPar(par, 'declara'));
+  }
+  if (intersecoes.declaradosSemContato.length) {
+    linhas.push('declarações sem contato (não reprovam, mas descrevem o que não existe):');
+    for (const item of intersecoes.declaradosSemContato) linhas.push(`  ${caminhoTexto(item.a)} x ${caminhoTexto(item.b)}: '${item.id}' — ${item.motivo}`);
+  }
+  const inconclusivos = intersecoes.pares.filter((par) => par.estado === 'inconclusivo');
+  for (const par of inconclusivos) linhas.push(`  INCONCLUSIVO ${caminhoTexto(par.a)} x ${caminhoTexto(par.b)}: ${par.diagnosticos.join(', ')}`);
+  const { cobertura } = intersecoes;
+  linhas.push(`cobertura: ${cobertura.paresVerificados} de ${cobertura.paresTotais} pares verificados, ${cobertura.inconclusivos} inconclusivos, ${cobertura.completa ? 'completa' : 'incompleta'}.`);
+  if (!apoio) {
+    linhas.push('apoio no chão: a montagem não declara apoioNoChao; nada foi medido.');
+  } else {
+    linhas.push(`apoio no chão, plano de normal ${pontoTexto(apoio.plano.normal)} e altura ${medida(apoio.plano.altura)}, tolerância ${medida(apoio.toleranciaNumerica)}:`);
+    for (const item of apoio.apoios) {
+      linhas.push(item.estado === 'inconclusivo'
+        ? `  REPROVA ${caminhoTexto(item.caminho)}: inconclusivo (${item.diagnostico} em ${caminhoTexto(item.peca)})`
+        : `  ${item.estado === 'apoia' ? 'passa  ' : 'REPROVA'} ${caminhoTexto(item.caminho)}: ${item.estado}, ponto mais baixo a ${medida(item.altura)} do chão em ${pontoTexto(item.ponto)}, na peça ${caminhoTexto(item.peca)}`);
+    }
+    if (!apoio.abaixoDoChao.length) linhas.push('  nenhuma outra peça passa abaixo do chão.');
+    for (const item of apoio.abaixoDoChao) linhas.push(`  REPROVA ${caminhoTexto(item.caminho)}: passa ${medida(-item.altura)} abaixo do chão, em ${pontoTexto(item.ponto)}`);
+    for (const item of apoio.inconclusivos) linhas.push(`  REPROVA ${caminhoTexto(item.caminho)}: sem malha para medir (${item.diagnostico})`);
+  }
+  for (const caminho of auditoria.apoioForaDasEtapas) linhas.push(`  apoio declarado em '${caminhoTexto(caminho)}', fora das etapas construídas, não medido.`);
+  for (const caminho of auditoria.apoioIgnorado) linhas.push(`  a submontagem '${caminhoTexto(caminho)}' declara apoioNoChao, e só a declaração da raiz vale.`);
+  linhas.push(auditoria.codigo === 1 ? 'resultado: REPROVA.'
+    : auditoria.codigo === 2 ? 'resultado: nada reprova, mas a auditoria é incompleta (etapas sem geometria ou pares que não puderam ser medidos).'
+      : 'resultado: passa.');
+  return linhas.join('\n');
+}
+
 function gravar(arquivoMontagem, registro) {
   writeFileSync(arquivoDoRegistro(arquivoMontagem), `${JSON.stringify(registro, null, 2)}\n`, 'utf8');
 }
@@ -216,6 +336,10 @@ async function comoCLI(argv) {
   if (!arquivo) return { codigo: 1, texto: 'diga a montagem: etapas-da-montagem.mjs <montagem.json> [--fixar <instância> --por <quem>]' };
   const caminho = resolve(arquivo);
   const valor = (nome) => { const i = argv.indexOf(nome); return i >= 0 ? argv[i + 1] : undefined; };
+  if (argv.includes('--auditar')) {
+    const auditoria = await auditarEtapas(caminho);
+    return { codigo: auditoria.codigo, texto: argv.includes('--json') ? JSON.stringify(auditoria, null, 2) : descreverAuditoria(auditoria), saida: true };
+  }
   if (argv.includes('--olhar')) {
     const { construidas, arquivos, foco } = await olharEtapas(caminho, { vistas: valor('--vistas')?.split(',').filter(Boolean), foco: valor('--foco') ?? null });
     return { codigo: 0, texto: `etapas desenhadas juntas: ${construidas.join(', ')}${foco ? `\nquadro na instância '${foco.join('/')}'` : ''}\n${arquivos.map((a) => `  ${a}`).join('\n')}` };
@@ -241,8 +365,9 @@ async function comoCLI(argv) {
 }
 
 if (process.argv[1] && process.argv[1].endsWith('etapas-da-montagem.mjs')) {
-  comoCLI(process.argv.slice(2)).then(({ codigo, texto }) => {
-    (codigo === 0 ? console.log : console.error)(texto);
+  comoCLI(process.argv.slice(2)).then(({ codigo, texto, saida }) => {
+    /* Na auditoria o relatório é a saída, passe ou reprove. */
+    (codigo === 0 || saida ? console.log : console.error)(texto);
     process.exit(codigo);
   }).catch((erro) => {
     console.error(`etapas-da-montagem: ${erro.codigo ? `[${erro.codigo}] ` : ''}${erro.message}`);
