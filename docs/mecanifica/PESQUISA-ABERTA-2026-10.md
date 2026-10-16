@@ -447,3 +447,59 @@ O código aberto se concentra em elementos de máquina e em caixas, quase sempre
 Ficaram fora por licença ou formato: cadquery-models (Unlicense), Gear Lab (CC BY-NC-SA), Technic.scad e LEGO.scad (marca no nome), os geradores de polia sem licença declarada, Zoo KCL (licença não vista), Faze4 (formato não verificado), gggears (licença não verificada) e DeltaRobot (software de ROS 2, sem modelo 3D). O JSCAD é um núcleo de modelagem, e não um acervo de peças.
 
 Não apareceu acervo com licença aceita para picape, caminhão, empilhadeira, carrinho de mão, carrinho de supermercado, bicicleta, foguete ou estrutura de drone, nem para robô SCARA, cartesiano ou delta, cilindro hidráulico, came, biela e manivela, torno, fresadora, esteira transportadora, válvulas ou móveis. Uma prova feita na mesma data com um STL de picape do Thingiverse (CC-BY-SA) mostrou que a malha de várias cascas abertas não se traduz em formas por fatiamento; o STL serve como referência e alvo de medida, e só peças simples e isoladas, como as rodas, foram reconhecidas como primitivas.
+
+## Printables e o espelho do Thingiverse (pesquisa de 2026-10-16)
+
+Os sites do Thingiverse, do Printables e do MakerWorld respondem 403 a acesso automático vindo de servidor de nuvem, por uma proteção anti-robô da Cloudflare, e não pela regra de rede do ambiente. Duas entradas passam por ela. A primeira é a API GraphQL do Printables (`https://api.printables.com/graphql/`), consultada com curl: a introspecção está desligada, a busca `searchPrints2` aceita uma palavra por consulta e `offset`, o campo `stls` de `print(id:)` lista também `.scad`, `.step` e `.f3d`, a mutação `getDownloadLink` devolve o endereço do arquivo, e a API às vezes responde "Request was throttled", o que se resolve esperando. A segunda é o espelho do Thingiverse no Internet Archive, com itens `thingiverse-<id>`, busca em `archive.org/advancedsearch.php` e licença em `archive.org/metadata/<item>`; a lista de arquivos mostra só o zip, e a licença do metadado divergiu da que vem dentro do zip em três casos.
+
+| Objeto ou família | Título | Endereço | Formato | Licença | Peças separadas | Nota (1 a 5) |
+|---|---|---|---|---|---|---|
+| Redutor planetário | Solid Core Compound Planetary Gearbox (customizable) | thingiverse.com/thing:3511382 | `.scad` visto | CC-BY-SA 3.0 | não verificado | 5 |
+| Braço SCARA | Parametric SCARA Robot Arm | thingiverse.com/thing:4595836 | `.scad` visto | CC-BY 4.0 | não verificado | 4 |
+| Braço SCARA | dacb scara arm, customizer version | thingiverse.com/thing:1353302 | `.scad` visto | CC-BY 4.0 (o zip diz 3.0) | não verificado | 4 |
+| Quadro de drone | Complete frame for TinyTina drone, OpenSCAD parametric | thingiverse.com/thing:3519833 | três `.scad` vistos | CC-BY 4.0 | sim, corpo superior, inferior e trem | 4 |
+| Quadro de drone | JeNo 5.1" Drone Frame | printables.com/model/339099 | STEP | CC-BY | sim | 3 |
+| Foguete | Space Rocket, parametric model | thingiverse.com/thing:4284015 | `.scad` visto | CC-BY 4.0 | não | 4 |
+| Cone de foguete | Parametric Conical e Elliptical Nose Cone | thingiverse.com/thing:509295 e 507830 | `.scad` visto | CC-BY-SA 3.0 | não | 3 |
+| Engrenagens | Parametric gear wheels | thingiverse.com/thing:7794 | `.scad` visto | CC-BY-SA 3.0 | não | 4 |
+| Redutor planetário | Mini Planetary Gearbox | printables.com/model/853296 | STEP por peça | domínio público | sim | 4 |
+| Redutor cicloidal | Cycloidal Gearbox | printables.com/model/1113200 | STEP por peça | CC-BY | sim | 3 |
+| Dobradiça | Parametric hinge | printables.com/model/307580 | `.scad` listado | CC-BY | não verificado | 4 |
+| Polias | Project: Pulley systems V2 | printables.com/model/6380 | `.scad` listado | CC-BY | sim | 4 |
+| Polias GT2 | GT2 Pulley Collection, parametric | printables.com/model/1183441 | F3D | GPL v3 | sim | 3 |
+| Rolamento impresso | FPBB, Fully Printable Ball Bearing | printables.com/model/425273 | F3D | CC-BY-SA | sim | 3 |
+| Braço de escavadeira | Excavator Arm | printables.com/model/971298 | um STEP com 19 sólidos | CC-BY | sim | 3 |
+| Escavadeira e trator pequenos | Small tractor, flexi excavator e tractor spinner | printables.com/model/233416 e 233171 | `.scad` visto | CC-BY | não, peça única | 3 |
+| Escavadeira articulada | Yellow Excavator with Movements | printables.com/model/552625 | STEP, F3D e 3MF | CC-BY | não verificado | 3 |
+| Cadeira | chair | printables.com/model/437985 | FCStd | CC-BY | não | 3 |
+| Came, biela, protetor de corrente | Ratchet Cam, Customizable Linkage, Chainguard for bicycles | thingiverse.com/thing:1079362, 1978423 e 990049 | `.scad` visto | CC-BY 4.0 e CC-BY-SA 3.0 | não | 2 a 3 |
+
+Continuam sem fonte com CAD e licença aceita o carrinho de mão completo, o carrinho de supermercado, a empilhadeira, a picape e o caminhão, a bicicleta completa, o cilindro hidráulico, a biela e manivela completas, o robô delta, a esteira transportadora, a válvula, o torno, a fresadora, a mesa e o armário. Itens com marca no título, como peças de impressora, de móvel ou de linha de produto de fabricante, foram descartados.
+
+## Hardware aberto, robôs de simulação e acervos acadêmicos (pesquisa de 2026-10-16)
+
+Pesquisa atrás de objetos com peças separadas e nomeadas, juntas ou parâmetros. Gazebo Fuel, BCN3D Moveo, AR4, Shapeoko, Prusa, FarmBot, bicicletas e drones ficaram sem pesquisar, e a licença de CAD-Recode, GeoCode e Infinigen Indoors não foi aberta.
+
+| Nome | Endereço | Formato | Licença | Peças separadas e nomeadas | Juntas ou parâmetros | Cobre | Nota (1 a 5) |
+|---|---|---|---|---|---|---|---|
+| SO-ARM100 | github.com/TheRobotStudio/SO-ARM100 | STEP e STL | Apache-2.0 | sim, por pasta | não verificado | braço robótico | 5 |
+| Thor | github.com/AngelLM/Thor | FreeCAD, STEP | CC-BY-SA-4.0 | sim, por pasta | não verificado | braço robótico | 4 |
+| Voron-2 | github.com/VoronDesign/Voron-2 | STEP | GPL-3.0 | parcial | não | impressora | 3 |
+| JPL Open Source Rover | github.com/nasa-jpl/open-source-rover | Onshape | Apache-2.0 | não verificado | não verificado | rover | 3 |
+| Sawppy | github.com/Roger-random/Sawppy_Rover | Onshape, STL | MIT | não verificado | não | rover | 3 |
+| awesome-robot-descriptions | github.com/robot-descriptions/awesome-robot-descriptions | URDF, MJCF, SDF | lista com licença livre sem exigência de crédito, cada modelo com a sua | não verificado | sim | braços, bípedes, drones, robôs com rodas | 4 |
+| MuJoCo Menagerie | github.com/google-deepmind/mujoco_menagerie | MJCF | por modelo (Go2 BSD-3, Panda Apache-2.0) | sim | sim | braços, quadrúpede | 4 |
+| example-robot-data | github.com/Gepetto/example-robot-data | URDF | BSD-3-Clause | não verificado | sim | braços, humanoides | 3 |
+| AWS RoboMaker small warehouse | github.com/aws-robotics/aws-robomaker-small-warehouse-world | SDF | MIT-0 | não verificado | não verificado | estantes, transpaleteira | 2 |
+| Infinigen e Infinigen Indoors | github.com/princeton-vl/infinigen | código Python sobre o Blender | BSD-3-Clause | objetos gerados | parâmetros | móveis, interiores, objetos de cena | 3 |
+| DeepCAD | github.com/ChrisWu1997/DeepCAD | sequências de esboço e extrusão | código MIT, dados não verificados | não | sim | peças prismáticas | 3 |
+| ABC | archive.nyu.edu/handle/2451/43778 | STEP, Parasolid | MIT, modelos sob os termos do Onshape | em parte | não | peças mecânicas | 3 |
+| ShapeAssembly | github.com/rkjones4/ShapeAssembly | linguagem de caixas ligadas por encaixe | não verificada | sim | sim | montagens por contato | 4 |
+
+Servem só como método, por licença de dados restrita a pesquisa não comercial ou não verificada, o PartNet-Mobility (peças e juntas de móveis), o MeshCoder (malha para código do Blender, CC-BY-NC-SA), o Fusion 360 Gallery (montagens com juntas), o CAD-Recode (um milhão de programas CadQuery) e o GeoCode.
+
+## Sondas de importação de 2026-10-16
+
+Duas sondas, feitas fora do repositório, mediram o que o caminho de importação faz com objetos reais. O quadro de drone TinyTina (três `.scad`, CC-BY 4.0) passou pelo importador de `.csg`: o trem de pouso saiu sem nenhuma forma, e os corpos inferior e superior saíram com 36 e 16 formas e 22 e 27 recusas. As recusas foram o deslocamento de contorno 2D (`offset`, 14 no corpo superior), a diferença 2D que deixa furo no perfil, a extrusão com `scale`, o casco convexo (`hull`) e a soma de Minkowski. A conferência contra a malha (`--conferir`) quebrou com exceção quando o esboço importado fica vazio e quando há cilindro de 6 lados, que a blocagem recusa, em vez de relatar o problema. Nenhum gate pegou isso, porque o importador só era provado na fixture sintética e no caminhão de brinquedo.
+
+O braço de escavadeira do Printables (um STEP com 19 sólidos, CC-BY) passou por um leitor de STEP aberto (gmsh) e por um ajuste de uma caixa ou um cilindro orientado por sólido, com os contatos achados por proximidade. A leitura e o ajuste levaram segundos, sem gasto de tokens. Os pinos saíram como cilindros e os braços retos como caixas, mas a ocupação média foi de 0,44: as peças em L, em garfo e a pá ficam mal representadas por uma forma só. As faces do STEP são exatas (501 planos, 151 cilindros e 114 cones), e as peças impressas costumam ser extrusões de um contorno, o que indica o passo seguinte: tomar a maior face plana de cada sólido como perfil e o sólido como extrusão dele. O arquivo era um leiaute de impressão, com as peças espalhadas, e por isso os contatos achados não descrevem a montagem.
