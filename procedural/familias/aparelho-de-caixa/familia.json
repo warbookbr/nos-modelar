@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.familia@1",
   "id": "aparelho-de-caixa",
-  "versao": "1.1.0",
+  "versao": "1.2.0",
   "nivel": "componente",
   "parametros": {
     "largura": { "tipo": "numero", "unidade": "mm", "padrao": 480, "minimo": 300, "maximo": 700, "medio": 500 },
@@ -15,20 +15,26 @@
     "faixaDoPainel": { "tipo": "numero", "unidade": "mm", "padrao": 80, "minimo": 50, "maximo": 120, "medio": 90 },
     "painelDeComando": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 2, "medio": 1 },
     "botoesGiratorios": { "tipo": "inteiro", "unidade": "contagem", "padrao": 3, "minimo": 1, "maximo": 4, "medio": 2 },
-    "botoesDePressao": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 2, "medio": 1 },
+    "botoesDePressao": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 12, "medio": 1 },
+    "fileirasDosBotoes": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 3, "medio": 1 },
     "tipoDePuxador": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 2, "medio": 1 },
     "comVisor": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 1, "medio": 1 }
   },
   "restricoes": [
     {
       "id": "botoes-cabem-na-coluna",
-      "expressao": "min(1, painelDeComando) * (2 - painelDeComando) * (50 * (botoesGiratorios + botoesDePressao) - (altura - alturaDosPes - 6)) <= 0",
-      "motivo": "o painel à direita tem um botão a cada 50 mm na coluna, e os botões passam da altura da frente; use menos botões, um corpo mais alto ou o painel em cima"
+      "expressao": "min(1, painelDeComando) * (2 - painelDeComando) * (50 * (botoesGiratorios + botoesDePressao + fileirasDosBotoes - 1) - fileirasDosBotoes * (altura - alturaDosPes - 6)) <= 0",
+      "motivo": "o painel à direita tem um botão a cada 50 mm na coluna (de uma fileira), e os botões passam da altura da frente; use menos botões, mais fileiras, um corpo mais alto ou o painel em cima"
     },
     {
       "id": "botoes-cabem-na-faixa",
-      "expressao": "max(0, painelDeComando - 1) * (50 * (botoesGiratorios + botoesDePressao) - (largura - 6)) <= 0",
-      "motivo": "o painel em cima tem um botão a cada 50 mm na linha, e os botões passam da largura da frente; use menos botões ou um corpo mais largo"
+      "expressao": "max(0, painelDeComando - 1) * (50 * (botoesGiratorios + botoesDePressao + fileirasDosBotoes - 1) - fileirasDosBotoes * (largura - 6)) <= 0",
+      "motivo": "o painel em cima tem um botão a cada 50 mm na linha (de uma fileira), e os botões passam da largura da frente; use menos botões, mais fileiras ou um corpo mais largo"
+    },
+    {
+      "id": "botoes-cabem-na-fileira",
+      "expressao": "(fileirasDosBotoes - 1) * (38 * fileirasDosBotoes - (min(1, painelDeComando) * (2 - painelDeComando) * (faixaDoPainel - 1) + max(0, painelDeComando - 1) * (faixaDoPainel - 3))) <= 0",
+      "motivo": "com mais de uma fileira, cada botão giratório com a saia (38 mm) precisa da sua própria célula através da faixa; use menos fileiras ou uma faixa de painel mais larga"
     },
     {
       "id": "porta-baixa-no-painel-de-cima",
@@ -87,7 +93,7 @@
     ],
     "botoes": [
       "Cada botão giratório é um cilindro curto com saia na base e um indicador no topo, saindo do painel?",
-      "Os botões de pressão são discos mais baixos e mais finos que os giratórios?"
+      "Os botões de pressão são discos mais baixos e mais finos que os giratórios, e numa grade ficam em fileiras alinhadas?"
     ],
     "puxador": [
       "O puxador é uma barra afastada da porta por dois suportes nas pontas, na altura do topo da porta ou na borda dela?"
@@ -97,6 +103,18 @@
     "forninho-eletrico": {
       "descricao": "Forninho elétrico de bancada de cerca de 25 litros: porta com visor, painel à direita com três botões giratórios e puxador horizontal, sobre pés curtos.",
       "parametros": { "largura": 480, "altura": 290, "profundidade": 380, "alturaDosPes": 15, "raioDoCorpo": 8, "espessuraDaPorta": 22, "recessoDoVidro": 5, "parede": 2, "faixaDoPainel": 80, "painelDeComando": 1, "botoesGiratorios": 3, "botoesDePressao": 0, "tipoDePuxador": 1, "comVisor": 1 }
+    },
+    "micro-ondas": {
+      "descricao": "Micro-ondas de bancada de cerca de 25 litros: porta com visor que ocupa a maior parte da frente, puxador vertical na borda esquerda, painel à direita com um botão giratório e uma grade de 12 botões de pressão em 3 fileiras, sobre pés curtos.",
+      "parametros": { "largura": 480, "altura": 280, "profundidade": 370, "alturaDosPes": 8, "raioDoCorpo": 6, "espessuraDaPorta": 25, "recessoDoVidro": 5, "parede": 2, "faixaDoPainel": 120, "painelDeComando": 1, "botoesGiratorios": 1, "botoesDePressao": 12, "fileirasDosBotoes": 3, "tipoDePuxador": 2, "comVisor": 1 }
+    },
+    "air-fryer-de-forno": {
+      "descricao": "Air fryer de forno de bancada de cerca de 300 por 380 por 330 milímetros: porta com visor, painel de comando em cima com dois botões giratórios, puxador horizontal, sobre pés curtos.",
+      "parametros": { "largura": 300, "altura": 380, "profundidade": 330, "alturaDosPes": 10, "raioDoCorpo": 8, "espessuraDaPorta": 22, "recessoDoVidro": 5, "parede": 2, "faixaDoPainel": 70, "painelDeComando": 2, "botoesGiratorios": 2, "botoesDePressao": 0, "tipoDePuxador": 1, "comVisor": 1 }
+    },
+    "lava-loucas-compacta": {
+      "descricao": "Lava-louças compacta de bancada de cerca de 550 por 440 por 500 milímetros: porta cheia sem visor, puxador horizontal, painel de comando em cima com três botões de pressão e um giratório, sobre pés curtos.",
+      "parametros": { "largura": 550, "altura": 440, "profundidade": 500, "alturaDosPes": 10, "raioDoCorpo": 8, "espessuraDaPorta": 22, "recessoDoVidro": 5, "parede": 2, "faixaDoPainel": 60, "painelDeComando": 2, "botoesGiratorios": 1, "botoesDePressao": 3, "fileirasDosBotoes": 1, "tipoDePuxador": 1, "comVisor": 0 }
     }
   }
 }

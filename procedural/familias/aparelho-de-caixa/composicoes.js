@@ -24,9 +24,10 @@ const SEGMENTOS_DO_CANTO = 3;
 const metro = (mm) => Number((mm * MM).toPrecision(12));
 const p = (nome) => ({ parametro: nome });
 
-/* Os botões ficam em 1 a 4 giratórios (todo aparelho tem ao menos um comando) e 0 a 2 de pressão; o painel, em 1 (à direita)
-   ou 2 (em cima). Sem painel não há botão, e o painel é a faixa onde os botões ficam. */
-export const FAIXA_DE_BOTOES = Object.freeze({ giratorios: { minimo: 1, maximo: 4 }, pressao: { minimo: 0, maximo: 2 } });
+/* Os botões ficam em 1 a 4 giratórios (todo aparelho tem ao menos um comando) e 0 a 12 de pressão (um teclado de micro-ondas);
+   o painel, em 1 (à direita) ou 2 (em cima). A quantidade de botões muda a estrutura (um passo por botão), por isso é uma
+   dimensão da combinação; as fileiras só mudam a posição, e entram como medida, não como combinação. */
+export const FAIXA_DE_BOTOES = Object.freeze({ giratorios: { minimo: 1, maximo: 4 }, pressao: { minimo: 0, maximo: 12 } });
 
 export const idDoAparelho = ({ painel, giratorios, pressao, puxador, visor }) =>
   `aparelho-de-caixa.p${painel}-g${giratorios}-b${pressao}-t${puxador}-v${visor}`;
@@ -217,7 +218,7 @@ function composicaoDe(combo) {
   /* a geometria de exemplo dá os nomes e os tipos; os valores não entram na composição */
   const exemplo = geometriaDoAparelho({
     largura: 480, altura: 290, profundidade: 380, alturaDosPes: 15, espessuraDaPorta: 22, recessoDoVidro: 5, parede: 2, faixaDoPainel: 80,
-    raioDoCorpo: 8, painelDeComando: combo.painel, botoesGiratorios: combo.giratorios, botoesDePressao: combo.pressao, tipoDePuxador: combo.puxador, comVisor: combo.visor,
+    raioDoCorpo: 8, fileirasDosBotoes: 1, painelDeComando: combo.painel, botoesGiratorios: combo.giratorios, botoesDePressao: combo.pressao, tipoDePuxador: combo.puxador, comVisor: combo.visor,
   });
   const { nos, argumentos } = planoDoAparelho(combo, exemplo);
   return Object.freeze({

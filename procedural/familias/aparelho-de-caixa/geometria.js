@@ -3,7 +3,8 @@
    Função pura sobre números. O corpo é uma caixa de quinas arredondadas com a frente aberta, fechada pela porta, que tem um
    furo passante (a abertura do visor) com a moldura da própria porta em volta. O vidro é uma peça separada, fina, dentro da
    abertura e recuada atrás da frente. O painel de comando fica à direita (painelDeComando 1) ou no topo (2), na frente do
-   corpo, e os botões giratórios e de pressão ficam numa coluna ou numa linha dentro dele. O eixo x é a largura (o centro do
+   corpo, e os botões giratórios e de pressão ficam numa coluna ou numa linha dentro dele, em uma ou mais fileiras que
+   atravessam a faixa (`fileirasDosBotoes`). O eixo x é a largura (o centro do
    corpo é x = 0), o eixo y sobe do chão (y = 0 é a face de baixo dos pés) e o eixo z é a profundidade, com a frente em +z.
    Os valores ficam em milímetro; a composição recebe metro (`composicoes.js`).
 
@@ -61,6 +62,7 @@ export function geometriaDoAparelho(parametros) {
   const k = Math.min(1, painel) * (2 - painel); // 1 com o painel à direita
   const s = Math.max(0, painel - 1); // 1 com o painel em cima
   const botoes = giratorios + pressao;
+  const fileiras = parametros.fileirasDosBotoes;
   const zF = D / 2 + esp; // a face da frente da porta
 
   const x0 = -W / 2 + MARGEM_DA_PORTA;
@@ -88,7 +90,7 @@ export function geometriaDoAparelho(parametros) {
     : [];
 
   return Object.freeze({
-    W, H, D, pes, esp, rec, parede, faixa, painel, giratorios, pressao, puxador, visor, raio, k, s, botoes, zF,
+    W, H, D, pes, esp, rec, parede, faixa, painel, giratorios, pressao, puxador, visor, raio, k, s, botoes, fileiras, zF,
     x0, x1, y0, y1, Dx, Dy, cx, cy, Vw, Vh, vy0, visorLargo, painelMm, grelhas,
     yTopoDoPainel: painelMm && k ? painelMm.y1 : 0,
     faixaDoPuxadorHorizontal: 0.55 * Dx,
@@ -99,12 +101,16 @@ export function geometriaDoAparelho(parametros) {
   });
 }
 
-/** O centro (x, y) em mm do botão `i` no painel: de cima para baixo à direita, da esquerda para a direita em cima. */
+/* O centro (x, y) em mm do botão `i` no painel. Os botões enchem a grade por linhas longas: `fileiras` botões atravessam a faixa
+   (a largura do painel à direita, a altura do painel em cima) e as linhas longas somam `ceil(botoes / fileiras)`. Com uma
+   fileira é a coluna à direita de cima para baixo, ou a linha em cima da esquerda para a direita, como antes. */
 export function posicaoDoBotao(g, i) {
+  const linhas = Math.ceil(g.botoes / g.fileiras);
+  const longo = Math.floor(i / g.fileiras);
+  const atravessa = i % g.fileiras;
+  const { x0, x1, y0, y1 } = g.painelMm;
   if (g.k) {
-    const passo = (g.painelMm.y1 - g.painelMm.y0) / g.botoes;
-    return [(g.painelMm.x0 + g.painelMm.x1) / 2, g.painelMm.y1 - (i + 0.5) * passo];
+    return [x0 + (atravessa + 0.5) * ((x1 - x0) / g.fileiras), y1 - (longo + 0.5) * ((y1 - y0) / linhas)];
   }
-  const passo = (g.painelMm.x1 - g.painelMm.x0) / g.botoes;
-  return [g.painelMm.x0 + (i + 0.5) * passo, (g.painelMm.y0 + g.painelMm.y1) / 2];
+  return [x0 + (longo + 0.5) * ((x1 - x0) / linhas), y0 + (atravessa + 0.5) * ((y1 - y0) / g.fileiras)];
 }

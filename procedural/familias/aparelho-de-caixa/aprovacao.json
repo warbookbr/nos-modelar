@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "aparelho-de-caixa",
-  "versao": "1.1.0",
+  "versao": "1.2.0",
   "mecanica": {
     "data": "2026-10-16",
     "pontos": {
@@ -14,6 +14,7 @@
           "comVisor": 0,
           "espessuraDaPorta": 15,
           "faixaDoPainel": 50,
+          "fileirasDosBotoes": 1,
           "largura": 300,
           "painelDeComando": 1,
           "parede": 2,
@@ -34,6 +35,7 @@
           "comVisor": 1,
           "espessuraDaPorta": 25,
           "faixaDoPainel": 90,
+          "fileirasDosBotoes": 1,
           "largura": 500,
           "painelDeComando": 1,
           "parede": 3,
@@ -49,11 +51,12 @@
         "parametros": {
           "altura": 500,
           "alturaDosPes": 15,
-          "botoesDePressao": 2,
+          "botoesDePressao": 12,
           "botoesGiratorios": 4,
           "comVisor": 1,
           "espessuraDaPorta": 40,
           "faixaDoPainel": 120,
+          "fileirasDosBotoes": 3,
           "largura": 700,
           "painelDeComando": 2,
           "parede": 4,
@@ -62,16 +65,46 @@
           "recessoDoVidro": 10,
           "tipoDePuxador": 2
         },
-        "hash": "sha256:afbd32468589a21f5caa9e732ccf16b4af9807df3ae4e10c197dd881d67e42a3",
+        "hash": "sha256:be39000715d176dadd83e92451dc0e98d83c081c1e3fd19942f5875a4d8f5b02",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 28,
-      "recusasDeclaradas": []
+      "sondas": 30,
+      "recusasDeclaradas": [
+        {
+          "ponto": "botoesDePressao=12",
+          "restricao": "botoes-cabem-na-coluna"
+        },
+        {
+          "ponto": "fileirasDosBotoes=3",
+          "restricao": "botoes-cabem-na-fileira"
+        }
+      ]
     },
     "portas": [],
     "perfis": {
+      "air-fryer-de-forno": {
+        "parametros": {
+          "altura": 380,
+          "alturaDosPes": 10,
+          "botoesDePressao": 0,
+          "botoesGiratorios": 2,
+          "comVisor": 1,
+          "espessuraDaPorta": 22,
+          "faixaDoPainel": 70,
+          "fileirasDosBotoes": 1,
+          "largura": 300,
+          "painelDeComando": 2,
+          "parede": 2,
+          "profundidade": 330,
+          "raioDoCorpo": 8,
+          "recessoDoVidro": 5,
+          "tipoDePuxador": 1
+        },
+        "hash": "sha256:7c7c5e6aa96ee2ab4ad0254f00d6692d46fe3a3f1750ee592252b110bc93e269",
+        "medidas": []
+      },
       "forninho-eletrico": {
         "parametros": {
           "altura": 290,
@@ -81,6 +114,7 @@
           "comVisor": 1,
           "espessuraDaPorta": 22,
           "faixaDoPainel": 80,
+          "fileirasDosBotoes": 1,
           "largura": 480,
           "painelDeComando": 1,
           "parede": 2,
@@ -91,22 +125,72 @@
         },
         "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f",
         "medidas": []
+      },
+      "lava-loucas-compacta": {
+        "parametros": {
+          "altura": 440,
+          "alturaDosPes": 10,
+          "botoesDePressao": 3,
+          "botoesGiratorios": 1,
+          "comVisor": 0,
+          "espessuraDaPorta": 22,
+          "faixaDoPainel": 60,
+          "fileirasDosBotoes": 1,
+          "largura": 550,
+          "painelDeComando": 2,
+          "parede": 2,
+          "profundidade": 500,
+          "raioDoCorpo": 8,
+          "recessoDoVidro": 5,
+          "tipoDePuxador": 1
+        },
+        "hash": "sha256:74f072e1a142baee92a1e00b5d3b48e61ec25e6585fc528d8cef3ffc2461db3b",
+        "medidas": []
+      },
+      "micro-ondas": {
+        "parametros": {
+          "altura": 280,
+          "alturaDosPes": 8,
+          "botoesDePressao": 12,
+          "botoesGiratorios": 1,
+          "comVisor": 1,
+          "espessuraDaPorta": 25,
+          "faixaDoPainel": 120,
+          "fileirasDosBotoes": 3,
+          "largura": 480,
+          "painelDeComando": 1,
+          "parede": 2,
+          "profundidade": 370,
+          "raioDoCorpo": 6,
+          "recessoDoVidro": 5,
+          "tipoDePuxador": 2
+        },
+        "hash": "sha256:d6807e4a1aeaafac662170a08f82e3462904b2986861fdff6f7dd9b8821f2514",
+        "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 18,
-      "recusasDeclaradas": []
+      "sondas": 72,
+      "recusasDeclaradas": [
+        {
+          "ponto": "air-fryer-de-forno: altura=200",
+          "restricao": "porta-baixa-no-painel-de-cima"
+        },
+        {
+          "ponto": "micro-ondas: altura=200",
+          "restricao": "botoes-cabem-na-coluna"
+        },
+        {
+          "ponto": "micro-ondas: faixaDoPainel=50",
+          "restricao": "botoes-cabem-na-fileira"
+        },
+        {
+          "ponto": "micro-ondas: largura=300",
+          "restricao": "puxador-vertical-com-visor-largo"
+        }
+      ]
     }
   },
   "critico": null,
-  "pessoa": {
-    "data": "2026-10-16",
-    "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png",
-    "perfis": {
-      "forninho-eletrico": {
-        "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f"
-      }
-    }
-  }
+  "pessoa": null
 }

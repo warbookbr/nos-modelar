@@ -8,6 +8,7 @@ import { sha256Hex } from '../../nucleo/sha256.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { APARELHO_DE_CAIXA, CONTRATO_DO_APARELHO_DE_CAIXA } from './index.js';
 import { COMPOSICOES, combinacoes, idDoAparelho } from './composicoes.js';
+import { geometriaDoAparelho, posicaoDoBotao } from './geometria.js';
 import { criarRegistroDeFamilias } from '../index.js';
 
 const registro = criarRegistroDeFamilias({ familias: [APARELHO_DE_CAIXA] });
@@ -26,7 +27,7 @@ describe('o contrato e as composições', () => {
     expect(CONTRATO_DO_APARELHO_DE_CAIXA.nivel).toBe('componente');
     expect(APARELHO_DE_CAIXA.contrato.portas).toEqual([]);
     const combos = combinacoes();
-    expect(combos).toHaveLength(96);
+    expect(combos).toHaveLength(2 * 4 * 13 * 2 * 2); // painel, giratórios 1 a 4, pressão 0 a 12, puxador, visor
     expect(COMPOSICOES).toHaveLength(combos.length);
     expect(new Set(COMPOSICOES.map(({ id }) => id)).size).toBe(combos.length);
     expect(COMPOSICOES.map(({ id }) => id)).toContain(idDoAparelho({ painel: 1, giratorios: 3, pressao: 0, puxador: 1, visor: 1 }));
@@ -112,5 +113,41 @@ describe('as recusas dizem a restrição e não geram malha', () => {
     const erro = recusa({ altura: 200, alturaDosPes: 15, botoesGiratorios: 4, botoesDePressao: 2 });
     expect(erro.restricao).toBe('botoes-cabem-na-coluna');
     expect(erro.motivo).toMatch(/um botão a cada 50 mm/);
+  });
+
+  it('giratórios com saia numa grade de mais de uma fileira precisam de célula de 38 mm através da faixa', () => {
+    expect(recusa({ perfil: 'micro-ondas', faixaDoPainel: 100 }).restricao).toBe('botoes-cabem-na-fileira');
+  });
+});
+
+describe('os perfis de bancada', () => {
+  it('o micro-ondas tem a grade de 12 botões de pressão em 3 fileiras, o giratório e o visor com puxador vertical', () => {
+    const { neutro } = rodar({ perfil: 'micro-ondas' });
+    expect(partesDaMalha(neutro).has('botaoDePressao')).toBe(true);
+    expect(partesDaMalha(neutro).has('vidro')).toBe(true);
+    const pressoes = [...neutro.F.values()].filter((f) => f.parte === 'botaoDePressao');
+    expect(pressoes.length).toBeGreaterThan(0);
+  });
+
+  it('o forno de ar e a lava-louças têm o painel em cima, e a lava-louças não tem visor nem vidro', () => {
+    const forno = rodar({ perfil: 'air-fryer-de-forno' }).neutro;
+    expect(partesDaMalha(forno).has('vidro')).toBe(true);
+    const lava = rodar({ perfil: 'lava-loucas-compacta' }).neutro;
+    expect(partesDaMalha(lava).has('vidro')).toBe(false);
+    expect(partesDaMalha(lava).has('botaoDePressao')).toBe(true);
+    expect(partesDaMalha(lava).has('botao')).toBe(true);
+  });
+
+  it('a grade põe as fileiras alinhadas através da faixa, e uma fileira só é a coluna de antes', () => {
+    const completos = Object.fromEntries(Object.entries(CONTRATO_DO_APARELHO_DE_CAIXA.parametros).map(([nome, p]) => [nome, p.padrao]));
+    const grade = geometriaDoAparelho({ ...completos, ...CONTRATO_DO_APARELHO_DE_CAIXA.perfis['micro-ondas'].parametros });
+    const centros = Array.from({ length: grade.botoes }, (_, i) => posicaoDoBotao(grade, i));
+    expect(centros[1][1]).toBeCloseTo(centros[2][1], 9); // a fileira 0 tem o giratório e dois botões de pressão, na mesma altura
+    expect(centros[1][0]).toBeLessThan(centros[2][0]);
+    expect(centros[3][1]).toBeLessThan(centros[2][1]); // a fileira seguinte fica mais abaixo
+    const coluna = geometriaDoAparelho({ ...completos, ...CONTRATO_DO_APARELHO_DE_CAIXA.perfis['micro-ondas'].parametros, fileirasDosBotoes: 1 });
+    const alturas = Array.from({ length: coluna.botoes }, (_, i) => posicaoDoBotao(coluna, i)[1]);
+    expect(alturas.every((y, i) => i === 0 || y < alturas[i - 1])).toBe(true);
+    expect(new Set(Array.from({ length: coluna.botoes }, (_, i) => posicaoDoBotao(coluna, i)[0])).size).toBe(1);
   });
 });
