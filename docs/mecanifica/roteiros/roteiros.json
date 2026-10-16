@@ -90,7 +90,7 @@
     {
       "id": "gates",
       "secao": "qualidade",
-      "texto": "Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe sozinho a bateria curta quando só mudou peça ou documento e a completa em qualquer outro caso; durante o trabalho bastam os testes do que foi tocado. `--completo` força todos.",
+      "texto": "Rode `npm run gates` antes de enviar: ele roda os testes rápidos sempre e os lentos ligados ao que mudou, e `--completo` e o CI rodam todos. Agente despachado não o roda; quem integra roda uma vez.",
       "gate": null
     },
     {
