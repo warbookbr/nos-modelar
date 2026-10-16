@@ -45,7 +45,7 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 
 ## Excluído
 
-- importar malha (STL, OBJ) ou cena do Blender;
+- importar malha de cascas coladas (STL, OBJ) ou cena do Blender; o STEP com sólidos separados entrou em 2026-10-16;
 - arquivo de marca ou de licença que não permita guardar a fonte;
 - corrigir a forma do `.scad` além do que a referência e a pessoa pedirem para o objeto-prova.
 
@@ -75,6 +75,9 @@ paramétricas, que objetos inteiros da lista quase não existem com licença abe
 furo e `linear_extrude` com `scale`, consertar o `--conferir` que lança exceção, e provar o importador num conjunto pequeno de `.scad` reais
 para que a recusa apareça num teste; transformar a sonda do STEP num importador que tome a maior face plana de cada sólido como perfil
 extrudado; e traduzir uma amostra do BlendNet (Apache-2.0) em esboço, medindo quantos objetos saem certos.
+
+A pessoa aprovou as três em 2026-10-16, e elas entram no Incluído: a correção do importador de `.csg` com o corpus real, o importador de
+STEP por perfil extrudado, que tira a importação de STEP do Excluído, e a sonda do BlendNet. Importar STL de malha única continua excluído.
 
 ## Riscos e parada
 
