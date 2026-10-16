@@ -264,6 +264,7 @@ export async function auditarEtapas(arquivoMontagem, { receitas: injetadas = nul
 }
 
 const caminhoTexto = (caminho) => caminho.join('/');
+const apoioTexto = (item) => `${caminhoTexto(item.caminho)}${item.parte ? ` (parte ${item.parte})` : ''}`;
 const medida = (numero) => (Math.abs(numero) < 1e-6 && numero !== 0 ? numero.toExponential(2) : String(Number(numero.toFixed(6))));
 const pontoTexto = (ponto) => `[${ponto.map(medida).join(', ')}]`;
 
@@ -307,8 +308,8 @@ export function descreverAuditoria(auditoria) {
     linhas.push(`apoio no chão, plano de normal ${pontoTexto(apoio.plano.normal)} e altura ${medida(apoio.plano.altura)}, tolerância ${medida(apoio.toleranciaNumerica)}:`);
     for (const item of apoio.apoios) {
       linhas.push(item.estado === 'inconclusivo'
-        ? `  REPROVA ${caminhoTexto(item.caminho)}: inconclusivo (${item.diagnostico} em ${caminhoTexto(item.peca)})`
-        : `  ${item.estado === 'apoia' ? 'passa  ' : 'REPROVA'} ${caminhoTexto(item.caminho)}: ${item.estado}, ponto mais baixo a ${medida(item.altura)} do chão em ${pontoTexto(item.ponto)}, na peça ${caminhoTexto(item.peca)}`);
+        ? `  REPROVA ${apoioTexto(item)}: inconclusivo (${item.diagnostico} em ${caminhoTexto(item.peca)})`
+        : `  ${item.estado === 'apoia' ? 'passa  ' : 'REPROVA'} ${apoioTexto(item)}: ${item.estado}, ponto mais baixo a ${medida(item.altura)} do chão em ${pontoTexto(item.ponto)}, na peça ${caminhoTexto(item.peca)}`);
     }
     if (!apoio.abaixoDoChao.length) linhas.push('  nenhuma outra peça passa abaixo do chão.');
     for (const item of apoio.abaixoDoChao) linhas.push(`  REPROVA ${caminhoTexto(item.caminho)}: passa ${medida(-item.altura)} abaixo do chão, em ${pontoTexto(item.ponto)}`);

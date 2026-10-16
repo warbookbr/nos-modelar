@@ -199,7 +199,8 @@ function lerAuditoriaIntersecoes(valor) {
    para `altura` ter um só significado (a distância do plano à origem, ao longo
    dela), e a tolerância é obrigatória: sem ela a medida escolheria uma por
    conta própria. `apoiam` vazio é recusado, porque a declaração então só diria
-   que nada passa abaixo do chão e não afirmaria apoio de ninguém. */
+   que nada passa abaixo do chão e não afirmaria apoio de ninguém. `parte`, em
+   cada item, é opcional e limita a medida àquela parte da peça. */
 function lerApoioNoChao(valor, idsDasInstancias) {
   const caminho = 'apoioNoChao';
   if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
@@ -221,7 +222,7 @@ function lerApoioNoChao(valor, idsDasInstancias) {
   const apoiam = valor.apoiam.map((item, indice) => {
     const onde = `${caminho}.apoiam[${indice}]`;
     if (!ehObjetoSimples(item)) falhar('apoio-invalido', onde, 'precisa ser objeto simples.');
-    chavesExatas(item, ['caminho'], onde);
+    chavesExatas(item, ['caminho', 'parte'], onde);
     if (!Array.isArray(item.caminho) || item.caminho.length === 0) {
       falhar('apoio-invalido', `${onde}.caminho`, 'precisa ser caminho de instância não vazio.');
     }
@@ -229,12 +230,13 @@ function lerApoioNoChao(valor, idsDasInstancias) {
     if (!idsDasInstancias.has(ids[0])) {
       falhar('instancia-desconhecida', `${onde}.caminho[0]`, `a montagem não tem a instância '${ids[0]}'.`);
     }
-    const chave = JSON.stringify(ids);
-    if (vistos.has(chave)) falhar('apoio-duplicado', onde, `o caminho ${chave} já foi declarado.`);
+    const parte = item.parte === undefined ? undefined : textoNaoVazio(item.parte, 'apoio-invalido', `${onde}.parte`);
+    const chave = JSON.stringify(parte === undefined ? ids : [ids, parte]);
+    if (vistos.has(chave)) falhar('apoio-duplicado', onde, `${parte === undefined ? 'o caminho' : 'o caminho com esta parte'} ${JSON.stringify(ids)} já foi declarado.`);
     vistos.add(chave);
-    return { caminho: ids };
+    return { caminho: ids, ...(parte === undefined ? {} : { parte }) };
   });
-  apoiam.sort((a, b) => compararTexto(JSON.stringify(a.caminho), JSON.stringify(b.caminho)));
+  apoiam.sort((a, b) => compararTexto(JSON.stringify(a.caminho), JSON.stringify(b.caminho)) || compararTexto(a.parte ?? '', b.parte ?? ''));
   return {
     plano: { normal: normal.map((numero) => (Object.is(numero, -0) ? 0 : numero)), altura: Object.is(valor.plano.altura, -0) ? 0 : valor.plano.altura },
     toleranciaNumerica: numeroFinitoNaoNegativo(valor.toleranciaNumerica, `${caminho}.toleranciaNumerica`),

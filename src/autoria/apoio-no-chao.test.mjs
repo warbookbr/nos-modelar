@@ -84,6 +84,53 @@ describe('a instância que se apoia no chão precisa tocá-lo', () => {
   });
 });
 
+/* Uma peça com duas rodas, como os trens principais: sem a parte, a roda que
+   toca o chão esconde a que está no ar. */
+describe('apoio por parte', () => {
+  const duasRodas = (alturaD, alturaE) => executarReceita({
+    meta: { nome: 'trens' },
+    PASSOS: [
+      ['cubo', { origemId: 1, larg: 1, alt: 1, prof: 1, em: [2, alturaD, 0] }],
+      ['parte', { nome: 'rodaD', sel: { origem: { op: 'cubo', id: 1 } } }],
+      ['cubo', { origemId: 2, larg: 1, alt: 1, prof: 1, em: [-2, alturaE, 0] }],
+      ['parte', { nome: 'rodaE', sel: { origem: { op: 'cubo', id: 2 } } }],
+      ['solido', { sel: { grupo: 'rodaD' } }],
+      ['solido', { sel: { grupo: 'rodaE' } }],
+    ],
+  }).neutro;
+  const trens = (alturaD, alturaE) => peca('trens', naAltura(0), duasRodas(alturaD, alturaE));
+  const porParte = (...partes) => CHAO([], { apoiam: partes.map((parte) => ({ caminho: ['trens'], parte })) });
+
+  it('sem a parte, a roda no chão esconde a roda no ar; com a parte, a que flutua reprova', () => {
+    const noAr = trens(0, 0.017);
+    expect(medirApoioNoChao(montagem([noAr], CHAO([['trens']]))).apoios[0].estado).toBe('apoia');
+    const r = medirApoioNoChao(montagem([noAr], porParte('rodaD', 'rodaE')));
+    expect(r.apoios.map((a) => [a.parte, a.estado])).toEqual([['rodaD', 'apoia'], ['rodaE', 'flutua']]);
+    expect(r.apoios[1].altura).toBeCloseTo(0.017, 12);
+    expect(r.aprovado).toBe(false);
+  });
+
+  it('as duas rodas no chão passam, e cada parte mede só as faces dela', () => {
+    const r = medirApoioNoChao(montagem([trens(0, 0)], porParte('rodaD', 'rodaE')));
+    expect(r.apoios.map((a) => a.estado)).toEqual(['apoia', 'apoia']);
+    expect(r.apoios[0].ponto[0]).toBeGreaterThan(1);
+    expect(r.apoios[1].ponto[0]).toBeLessThan(-1);
+    expect(r.aprovado).toBe(true);
+  });
+
+  it('a parte não declarada de uma peça declarada por parte não pode passar abaixo do chão', () => {
+    const r = medirApoioNoChao(montagem([trens(0, -0.5)], porParte('rodaD')));
+    expect(r.apoios[0].estado).toBe('apoia');
+    expect(r.abaixoDoChao.map((item) => item.caminho)).toEqual([['trens']]);
+    expect(r.aprovado).toBe(false);
+  });
+
+  it('parte que nenhuma peça sob o caminho tem falha nomeando as partes disponíveis', () => {
+    expect(() => medirApoioNoChao(montagem([trens(0, 0)], porParte('rodaX'))))
+      .toThrow(/nenhuma peça sob \["trens"\] tem a parte 'rodaX'. Partes disponíveis: rodaD, rodaE/);
+  });
+});
+
 describe('nenhuma outra instância passa abaixo do chão', () => {
   it('a peça que afunda sem ser de apoio reprova, e a mais funda vem primeiro', () => {
     const r = medirApoioNoChao(montagem([
@@ -206,6 +253,13 @@ describe('a leitura de apoioNoChao na montagem v5', () => {
     recusa(comChao({ ...valido(), plano: { normal: [0, 1], altura: 0 } }), 'apoio-invalido', 'apoioNoChao.plano.normal');
     recusa(comChao({ ...valido(), plano: { normal: [0, 1, 0] } }), 'apoio-invalido', 'apoioNoChao.plano.altura');
     recusa(comChao({ ...valido(), plano: { normal: [0, 1, 0], altura: 0, outro: 1 } }), 'chave-desconhecida', 'apoioNoChao.plano');
+  });
+
+  it('aceita parte opcional no apoio, sem parte vale a instância inteira, e ordena por caminho e parte', () => {
+    const lida = lerMontagemPersistida(comChao({ ...valido(), apoiam: [{ caminho: ['roda'], parte: 'pneu' }, { caminho: ['roda'] }, { caminho: ['roda'], parte: 'aro' }] }));
+    expect(lida.apoioNoChao.apoiam).toEqual([{ caminho: ['roda'] }, { caminho: ['roda'], parte: 'aro' }, { caminho: ['roda'], parte: 'pneu' }]);
+    recusa(comChao({ ...valido(), apoiam: [{ caminho: ['roda'], parte: 'aro' }, { caminho: ['roda'], parte: 'aro' }] }), 'apoio-duplicado', 'apoioNoChao.apoiam[1]');
+    recusa(comChao({ ...valido(), apoiam: [{ caminho: ['roda'], parte: '' }] }), 'apoio-invalido', 'apoioNoChao.apoiam[0].parte');
   });
 
   it('recusa apoio vazio, duplicado e de instância que a montagem não tem', () => {

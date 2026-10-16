@@ -264,6 +264,12 @@ apoiam no chão.
 }
 ```
 
+Cada item de `apoiam` pode trazer `parte`, e então só as faces dessa parte da
+peça contam: os trens principais declaram `rodaPrincipalD` e `rodaPrincipalE`
+em itens separados, e uma roda no ar não se esconde atrás da outra. Sem `parte`
+vale a instância inteira, e nas peças declaradas só por parte as outras partes
+entram na regra de não passar abaixo do chão.
+
 A medida confere que o ponto mais baixo de cada instância de apoio, tomado nos
 vértices que a malha usa e já no mundo, fica a no máximo a tolerância do plano,
 para cima ou para baixo, e que nenhuma outra instância passa abaixo do plano
