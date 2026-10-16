@@ -66,6 +66,16 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 3. **A decisão.** Com os números, segue para o URDF e o braço robótico, ou o importador muda, ou o plano para.
 4. **Fechamento.**
 
+## Achados de 2026-10-16 e propostas à espera da pessoa
+
+As [sondas de 2026-10-16](../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md) e as pesquisas registradas na
+[pesquisa aberta](../PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
+paramétricas, que objetos inteiros da lista quase não existem com licença aberta, e que o importador de `.csg` recusa construções comuns em
+`.scad` reais. Três propostas esperam a decisão da pessoa antes de entrar no Incluído: corrigir o importador para `offset`, diferença 2D com
+furo e `linear_extrude` com `scale`, consertar o `--conferir` que lança exceção, e provar o importador num conjunto pequeno de `.scad` reais
+para que a recusa apareça num teste; transformar a sonda do STEP num importador que tome a maior face plana de cada sólido como perfil
+extrudado; e traduzir uma amostra do BlendNet (Apache-2.0) em esboço, medindo quantos objetos saem certos.
+
 ## Riscos e parada
 
 Para e volta à pessoa se: importar e nomear custar mais da metade do caminho atual por objeto; os `.scad` de licença aberta para os objetos
