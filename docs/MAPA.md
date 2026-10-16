@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1315 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1317 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -544,6 +544,7 @@
 
 - `AJUSTE-DA-BANCADA.md` — Ajuste da bancada
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
+- `AUDITORIA-DA-MONTAGEM.md` — O apoio no chão e a auditoria da montagem construída
 - `AUTORIA-DE-PECA.md` — Autoria de peça — o contrato
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `CONFERIR-CONTRA-REFERENCIA.md` — Conferir a peça contra uma foto de referência
@@ -1832,6 +1833,7 @@
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
 - `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
+- `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.

@@ -38,6 +38,8 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 - o importador `.csg` → `.esboco.json` (cubo, cilindro e cone, esfera, polígono, extrusão linear e rotacional, união, diferença,
   interseção, matriz), com teste em fixture sintética;
 - um objeto-prova: o carrinho de mão, de um `.scad` com licença que permita guardar a fonte, registrada com o endereço;
+  na fatia 1 não houve carrinho de licença aberta, e o objeto-prova foi um caminhão basculante de brinquedo, com a fonte em
+  [`FONTE.md`](../banco-de-provas/importar-objeto-2026-10-15/FONTE.md);
 - a nomeação das partes e relações sobre o esboço importado, a receita planejada gerada e o laço de modelagem até o aceite;
 - a medição em tokens de cada etapa, ao lado do custo das peças do avião.
 

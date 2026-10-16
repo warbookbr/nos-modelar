@@ -226,12 +226,13 @@ describe('a leitura de apoioNoChao na montagem v5', () => {
     expect(apoioNoChao).toEqual(valido());
   });
 
-  it('o avião e a fixture de três blocos, sem o campo, seguem lidos sem ele', () => {
-    for (const arquivo of ['../../procedural/pecas/aviao/montagem.json', '../../tools/fixtures/tres-blocos-vinculados/montagens/tres-blocos.json']) {
-      const lida = lerMontagemPersistida(JSON.parse(readFileSync(fileURLToPath(new URL(arquivo, import.meta.url)), 'utf8')));
-      expect(lida.versao).toBe(5);
-      expect(Object.hasOwn(lida, 'apoioNoChao')).toBe(false);
-    }
+  it('a fixture de três blocos, sem o campo, segue lida sem ele, e o avião, que o declara, o lê com as três rodas', () => {
+    const ler = (arquivo) => lerMontagemPersistida(JSON.parse(readFileSync(fileURLToPath(new URL(arquivo, import.meta.url)), 'utf8')));
+    const blocos = ler('../../tools/fixtures/tres-blocos-vinculados/montagens/tres-blocos.json');
+    expect(blocos.versao).toBe(5);
+    expect(Object.hasOwn(blocos, 'apoioNoChao')).toBe(false);
+    const aviao = ler('../../procedural/pecas/aviao/montagem.json');
+    expect(aviao.apoioNoChao.apoiam.map((item) => item.parte)).toEqual(['rodaNariz', 'rodaPrincipalD', 'rodaPrincipalE']);
   });
 
   it('ordena os apoios por caminho, para o arquivo ter uma forma só', () => {

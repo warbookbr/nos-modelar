@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { PNG } from 'pngjs';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
@@ -1186,7 +1187,8 @@ describe('servidor MCP local — perfil revisao', () => {
 
   it('captura quatro PNGs em memória e fecha navegador e Vite sem criar saída', async () => {
     const fechamentos = { browser: 0, vite: 0 };
-    const png = Buffer.from('89504e470d0a1a0a', 'hex');
+    /* a captura sai em dobro e é reduzida pela média, que lê o PNG: a página falsa devolve um PNG de verdade, de 2 por 2 */
+    const png = PNG.sync.write(new PNG({ width: 2, height: 2 }));
     const page = {
       on() {},
       async goto() {},
