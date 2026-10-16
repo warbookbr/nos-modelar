@@ -140,7 +140,9 @@ describe('a forma de superfície ou loft cortada por molde pela blocagem', () =>
   }, 120_000);
 
   it('a asa com um vão dentro dela (o envelope não muda) continua no andaime inteira, com a perda `recorte` declarada', () => {
-    const { b } = medir(esboco([LONGARINA, { ...ASA, subtrai: ['boca'] }, caixaCortadora('boca', [0, 0, 0], [200, 400, 200])]));
+    /* 60 mm de altura, dentro da espessura da asa no meio: um cortador de 100 mm já vara a asa na vista superior, e a blocagem o
+       pintaria cheio (ver `esboco-blocagem-recorte.test.mjs`) */
+    const { b } = medir(esboco([LONGARINA, { ...ASA, subtrai: ['boca'] }, caixaCortadora('boca', [0, 0, 0], [200, 60, 200])]));
     expect(b.opcoes[0].semEquivalente).toEqual([]);
     expect(b.opcoes[0].aproximadas).toContain('asa');
     expect(mudanca(b, 'asa').perdido.map((d) => d.codigo)).toContain('recorte');

@@ -20,6 +20,7 @@ import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.j
 import { ErroDoTradutor, traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compilarAndaime } from '../../src/autoria/medir-blocagem-nivel-zero.js';
 import { furosAbertos } from './esboco-blocagem-furo.mjs';
+import { recortesAbertos } from './esboco-blocagem-recorte.mjs';
 import './esboco-familias.mjs';
 
 const porExtenso = (ids, n = 8) => `${ids.slice(0, n).join(', ')}${ids.length > n ? ', ...' : ''}`;
@@ -67,6 +68,12 @@ export const MUDANCA_MAXIMA_DO_ENVELOPE_POR_RECORTE = 1e-3;
    0,99785 na isométrica da unidade), e a roda sai sem equivalente. */
 export const MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO = 1e-3;
 
+/* Quanto da silhueta da blocagem o recorte de uma forma pode tirar no desenho das formas, em fração, para a blocagem levar a forma
+   inteira. O envelope sozinho não basta (`MUDANCA_MAXIMA_DO_ENVELOPE_POR_RECORTE`): um cortador que vara a forma de lado a lado
+   deixa o envelope igual e abre um vão na vista (os arcos de roda do chassi do caminhão importado, 10% da isométrica; a fenda da
+   caçamba). O limite é o do furo passante, pela mesma conta: o gate das silhuetas admite 0,2% e as facetas ocupam até 0,12%. */
+export const MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE = 1e-3;
+
 const emPorcento = (x) => Math.round(Math.abs(x) * 1000) / 10;
 
 /* O tradutor com o que a N2 não representa fora do andaime: as formas cuja perda `inclinacao` passa do limite de volume, e as
@@ -108,7 +115,8 @@ function painelDaOpcao(bruto, numero, blocagem) {
 
 /* A opção `numero` do esboço traduzida e compilada: { dados, traducao, blocagem, formasDe }. A forma de família cujo furo passante
    fica descoberto na vista além do limite (`MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO`) sai do andaime como `naoTraduzidas`, com o
-   motivo: o casco da N2 fecha o furo, e a silhueta da blocagem deixa de ser a do desenho. */
+   motivo: o casco da N2 fecha o furo, e a silhueta da blocagem deixa de ser a do desenho. O mesmo vale para a forma cujo recorte,
+   de envelope igual, tira da silhueta além do limite (`MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE`). */
 export function blocagemDaOpcao(bruto, numero = 1) {
   const dados = formasResolvidas(bruto, numero);
   const traduzir = (recusadas) => {
@@ -129,6 +137,15 @@ export function blocagemDaOpcao(bruto, numero = 1) {
     recusadas.set(a.id, {
       tipo: forma.tipo, fracao: a.fracao,
       motivo: `o furo passante de ${(2 * forma.geometria.furo.raio).toFixed(1)} mm da forma fica descoberto na vista ${a.vista}, em ${(a.fracao * 100).toFixed(2)}% da silhueta da blocagem (o limite é ${MUDANCA_MAXIMA_DA_SILHUETA_POR_FURO * 100}%), e a N2 só tem sólido de seção convexa: o casco da família fecharia o furo`,
+    });
+  }
+  for (const a of recortesAbertos({ bruto, numero, traducao, blocagem })) {
+    if (a.fracao <= MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE || (recusadas.get(a.id)?.fracao ?? 0) >= a.fracao) continue;
+    const forma = dados.formas.find((f) => f.id === a.id);
+    const quais = forma.geometria.recorte?.cortadores.map((c) => c.id).join(', ');
+    recusadas.set(a.id, {
+      tipo: forma.tipo, fracao: a.fracao,
+      motivo: `o recorte por ${quais} abre um vão na vista ${a.vista}, em ${(a.fracao * 100).toFixed(2)}% da silhueta da blocagem (o limite é ${MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE * 100}%), e a N2 não subtrai um volume de outro: o andaime levaria a forma inteira, sem o vão`,
     });
   }
   if (recusadas.size > 0) {

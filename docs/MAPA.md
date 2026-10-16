@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1317 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1319 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1748,6 +1748,8 @@
 - `esboco-ajuda.test.mjs` — esboco-ajuda.test.mjs — o `--ajuda [tópico]` do esboço: o índice cobre todos os títulos do README, cada tópico devolve só a sua seção, o tópico desconhecido …
 - `esboco-blocagem-casos.test.mjs` — Os casos mínimos da silhueta pela blocagem do nível zero: cada forma que fez a blocagem se afastar do desenho atual, sozinha numa cena pequena, com o mesmo m…
 - `esboco-blocagem-furo.mjs` — esboco-blocagem-furo.mjs — o fundo que o furo passante de uma forma de família deixa ver nas vistas, medido na blocagem.
+- `esboco-blocagem-recorte.mjs` — esboco-blocagem-recorte.mjs — o que o recorte (`subtrai`) de uma forma tira da silhueta, medido contra o desenho das formas.
+- `esboco-blocagem-recorte.test.mjs` — O recorte de envelope igual na blocagem do nível zero: a forma recortada vai inteira ao andaime quando o recorte não muda o envelope, e só fica fora quando o…
 - `esboco-blocagem.mjs` — esboco-blocagem.mjs — as vistas do esboço desenhadas pela blocagem do nível zero (`--nivel-zero`).
 - `esboco-blocagem.test.mjs` — O `--nivel-zero` do esboço: as vistas `--unidade` e `--composta` desenhadas pela blocagem do nível zero, comparadas com o desenho das formas (`desenharEsboco…
 - `esboco-brief.mjs` — O que o brief do crítico cego do esboço junta às imagens da unidade, do Marco e do objeto: o arquivo `brief.md` ao lado das imagens (o brief só saía na tela,…

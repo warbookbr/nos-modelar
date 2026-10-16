@@ -20,6 +20,11 @@
      leva o contorno de cada seção ao plano perpendicular ao eixo, e a bacia muda de forma na vista de lado (0,9554 medido,
      igual com os dois tipos de faceta, porque a perda é de forma e não de faceta). O limite só afrouxa quando o relatório de
      perdas traz a causa.
+   Os três mínimos valem para o que a blocagem leva. A forma que a blocagem não consegue desenhar na silhueta sai dela como
+   `naoTraduzidas` e do desenho atual, e isso inclui a forma de recorte (`subtrai`) de envelope igual cujo cortador vara a forma na
+   direção de uma vista e abre um vão que a blocagem pinta (`MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE`, 0,1% da silhueta, medido por
+   `esboco-blocagem-recorte.mjs`): os arcos de roda que atravessam o chassi do caminhão importado de OpenSCAD davam 0,9807 na
+   isométrica e 0,8965 na lateral, e quatro formas recortadas dele saem da blocagem, com o motivo no relatório.
    A escala é conferida junto: a razão entre as escalas do quadro fica em 0,1% (mesmas facetas) e 0,5% (facetas da ferramenta),
    o que mantém a composta com as mesmas proporções e a mesma escala. Com `ESBOCO_TABELA=1` o teste imprime a tabela de IoU.
 
