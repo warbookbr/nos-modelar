@@ -72,5 +72,153 @@
     "trens-principais"
   ],
   "vinculos": [],
-  "posicoes": []
+  "posicoes": [],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-09,
+    "expectativas": [
+      {
+        "id": "asas-na-fuselagem",
+        "a": {
+          "caminho": [
+            "asas"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "fuselagem"
+          ]
+        },
+        "motivo": "a raiz das asas e a carenagem da raiz entram até 76 mm na fuselagem, escondidas no casco; aceito por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "asas-nos-trens-principais",
+        "a": {
+          "caminho": [
+            "asas"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "trens-principais"
+          ]
+        },
+        "motivo": "o pino do pivô, a orelha e o atuador dos trens entram 15 mm na estrutura da asa, além do alojamento, como no esboço; aceito por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "empenagem-horizontal-na-fuselagem",
+        "a": {
+          "caminho": [
+            "empenagem-horizontal"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "fuselagem"
+          ]
+        },
+        "motivo": "a raiz do estabilizador entra até 36 mm na cauda, escondida no casco; aceito por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "empenagem-vertical-na-fuselagem",
+        "a": {
+          "caminho": [
+            "empenagem-vertical"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "fuselagem"
+          ]
+        },
+        "motivo": "a raiz da deriva e a base da dorsal entram até 30 mm no dorso da cauda, escondidas no casco; aceito por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "helice-no-motor",
+        "a": {
+          "caminho": [
+            "helice"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "motor"
+          ]
+        },
+        "motivo": "o eixo e o cubo da hélice entram 14,5 mm no nariz do capô, onde a hélice se prende ao motor; aceito por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "motor-na-fuselagem",
+        "a": {
+          "caminho": [
+            "fuselagem"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "motor"
+          ]
+        },
+        "motivo": "o capô encosta na face da frente da fuselagem, com 1 mm de sobreposição na junta; aceito por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "trem-do-nariz-na-fuselagem",
+        "a": {
+          "caminho": [
+            "fuselagem"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "trem-do-nariz"
+          ]
+        },
+        "motivo": "a carenagem do trem do nariz entra até 15 mm na barriga da fuselagem, como no esboço; aceita como caixa pela pessoa em 2026-10-15 e declarada por a pessoa, 2026-10-16"
+      },
+      {
+        "id": "trem-do-nariz-no-motor",
+        "a": {
+          "caminho": [
+            "motor"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "trem-do-nariz"
+          ]
+        },
+        "motivo": "a carenagem do trem do nariz entra até 13 mm no capô, como no esboço; aceita como caixa pela pessoa em 2026-10-15 e declarada por a pessoa, 2026-10-16"
+      }
+    ]
+  },
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.001,
+    "apoiam": [
+      {
+        "caminho": [
+          "trem-do-nariz"
+        ],
+        "parte": "rodaNariz"
+      },
+      {
+        "caminho": [
+          "trens-principais"
+        ],
+        "parte": "rodaPrincipalD"
+      },
+      {
+        "caminho": [
+          "trens-principais"
+        ],
+        "parte": "rodaPrincipalE"
+      }
+    ]
+  }
 }
