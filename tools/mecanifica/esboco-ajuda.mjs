@@ -43,7 +43,7 @@ export const FRASES = {
   catalogo: 'Cada componente de arquivo (roda, garfo, quadro, mancal, parafuso, mola...) com parâmetros e âncoras.',
   vistas: 'As vistas isométrica, frontal, lateral e superior, e o que cada uma mostra.',
   importar: 'Importar um `.csg` do OpenSCAD para o esboço: o que o importador cobre, o que recusa, o quadro e os nomes.',
-  step: 'Importar um STEP de sólidos separados: cada sólido vira revolução, extrusão com furos ou caixa, com nome e contatos.',
+  step: 'Importar um STEP de sólidos separados ou os STL de um projeto, um por peça: cada peça vira revolução, extrusão com furos ou caixa, com nome e contatos.',
   desenhos: 'O SVG é o desenho puro, e o PNG acrescenta a camada das formas.',
   legendas: 'Legendas numeradas por colunas ou em lista.',
   modo: 'O modo `lista`, que tira as legendas do desenho e as põe ao lado.',

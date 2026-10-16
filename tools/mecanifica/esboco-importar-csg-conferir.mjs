@@ -52,8 +52,9 @@ export async function conferirComMalha(esboco, triangulos, matriz) {
   await carregarManifold();
   const { vertices, triangulos: tris } = soldar(triangulos, matriz);
   if (tris.length === 0) throw new Error('a malha de referência não tem triângulos');
-  const min = [0, 1, 2].map((i) => Math.min(...vertices.map((v) => v[i])));
-  const max = [0, 1, 2].map((i) => Math.max(...vertices.map((v) => v[i])));
+  /* Laço, e não `Math.min(...lista)`: o espalhamento estoura a pilha acima de uns 120 mil vértices, como nos STL do braço. */
+  const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+  for (const v of vertices) for (let i = 0; i < 3; i++) { if (v[i] < min[i]) min[i] = v[i]; if (v[i] > max[i]) max[i] = v[i]; }
   const contexto = criarContextoDeSolidos({ origem: min.map((m, i) => (m + max[i]) / 2) });
   try {
     const referencia = contexto.daMalha(vertices, tris, 'a malha do OpenSCAD');
