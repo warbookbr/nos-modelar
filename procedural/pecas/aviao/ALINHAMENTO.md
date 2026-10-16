@@ -1,7 +1,7 @@
 # Avião de pequeno porte — o objeto no núcleo
 
 Registro da passagem do avião do esboço à receita, fatia 1 do plano [o avião do esboço
-à receita](../../../docs/mecanifica/planos/2026-10-15-o-aviao-do-esboco-a-receita.md),
+à receita](../../../docs/mecanifica/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md),
 em 2026-10-15. O objeto, a escala, as partes, o que se move, o realismo e o que
 reprova foram combinados com a pessoa no
 [alinhamento do avião](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/ALINHAMENTO.md),

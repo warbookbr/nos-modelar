@@ -1,6 +1,6 @@
 # Importar objeto de código — um objeto descrito em OpenSCAD chega ao esboço e à receita por importação
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** Claude, com a pessoa aprovando forma
 
@@ -9,7 +9,7 @@
 ## Problema observado
 
 Cada peça do avião custou entre 400 mil e 1,5 milhão de tokens até o aceite. O motor custou cerca de 876 mil e a fuselagem cerca de 1,54 milhão
-([plano do avião](2026-10-15-o-aviao-do-esboco-a-receita.md)), e a lista de objetos e famílias a modelar é longa. Dos 110 comandos que o
+([plano do avião](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md)), e a lista de objetos e famílias a modelar é longa. Dos 110 comandos que o
 modelador dos trens principais rodou, uns 95 garimpavam medidas e pontos no JSON do esboço. A receita planejada gerada do esboço tirou esse
 garimpo da receita, mas o esboço continua sendo desenhado à mão, unidade por unidade, pelo esbocista.
 

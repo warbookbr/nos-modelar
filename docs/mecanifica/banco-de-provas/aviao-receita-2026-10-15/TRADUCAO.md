@@ -1,6 +1,6 @@
 # O esboço do avião traduzido para o andaime
 
-Fatia 1 do plano [o avião do esboço à receita](../../planos/2026-10-15-o-aviao-do-esboco-a-receita.md),
+Fatia 1 do plano [o avião do esboço à receita](../../planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md),
 em 2026-10-15. O esboço aprovado, o [mestre da segunda
 rodada](../aviao-2026-10-11/esboco-r2/aviao.esboco.json), foi traduzido para o andaime
 da forma global N2 pelo tradutor do nível zero (`src/autoria/tradutor-nivel-zero.js`),

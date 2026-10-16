@@ -1,6 +1,6 @@
 # O avião do esboço à receita
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite da pessoa
 
@@ -12,18 +12,18 @@ O avião de pequeno porte tem o esboço aprovado pela pessoa em 2026-10-13, na
 segunda rodada do plano [o que o avião pede](encerrados/2026-10-11-o-que-o-aviao-pede.md):
 o mestre e oito unidades (fuselagem, asas, empenagem horizontal, empenagem vertical,
 motor, hélice, trem do nariz e trens principais) em
-[`esboco-r2/`](../banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json), com
+[`esboco-r2/`](../../banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json), com
 o Marco de 100% em 8. Ele existe só como esboço: no núcleo, as peças do acervo são o
 braço robótico e o suporte do tubo, e nenhum objeto ainda passou do esboço para a
 receita.
 
 O caminho existe em pedaços e nunca foi percorrido por um objeto real. O tradutor do
 nível zero (`src/autoria/tradutor-nivel-zero.js`) traduz o esboço para o andaime da
-[forma global N2](../CONTRATO-FORMA-GLOBAL-N2.md); a receita declara `REFINA` e o
+[forma global N2](../../CONTRATO-FORMA-GLOBAL-N2.md); a receita declara `REFINA` e o
 verificador do refinamento confere cada parte dentro do envelope do volume que ela
 refina e as portas do andaime; e `npm run esboco -- --envelope <unidade> <receita.js>`
 confere a receita contra a unidade do esboço. Nenhuma receita do acervo declara
-`REFINA`. O [fluxo do objeto](../usar/FLUXO-DO-OBJETO.md) leva um objeto de várias
+`REFINA`. O [fluxo do objeto](../../usar/FLUXO-DO-OBJETO.md) leva um objeto de várias
 partes do alinhamento ao aceite, com uma receita por parte na ordem da montagem, e
 foi escrito antes do esboço: ele não diz como o esboço aprovado entra na modelagem.
 
@@ -43,7 +43,7 @@ seguinte passe pelo mesmo caminho sem descobri-lo de novo.
 ## Filtro Agent-First
 
 O tradutor do nível zero, `REFINA`, o verificador do refinamento, o Envelope por
-receita, o [fluxo do objeto](../usar/FLUXO-DO-OBJETO.md) (`npm run objeto`,
+receita, o [fluxo do objeto](../../usar/FLUXO-DO-OBJETO.md) (`npm run objeto`,
 `npm run etapas`), o laço de modelagem com o modelador e o crítico, as famílias do
 núcleo (`superficie-aerodinamica` para asa, estabilizador, deriva, pá e hélice, e
 `roda-pneu` para as rodas) e a bancada neutra são usados direto. Onde a travessia
@@ -95,11 +95,11 @@ nome dela na montagem e no `REFINA`, nunca a posição de um passo.
    parte da montagem, a fuselagem, levada do andaime à receita pelo laço de
    modelagem, com `REFINA`, o Envelope por receita e a bancada. É a fatia que mostra
    o que o caminho não faz, e o que ela achar vai à ferramenta antes da fatia 2. A
-   [tradução](../banco-de-provas/aviao-receita-2026-10-15/TRADUCAO.md), em
+   [tradução](../../banco-de-provas/aviao-receita-2026-10-15/TRADUCAO.md), em
    2026-10-15, deu 110 volumes: a fuselagem, o motor e os trens saem com o envelope
    do esboço, e as asas, as empenagens e a hélice não, porque o recorte some e a N2
    não inclina as pás. A
-   [fuselagem](../../../procedural/pecas/aviao/ALINHAMENTO.md) passou pelo laço em
+   [fuselagem](../../../../procedural/pecas/aviao/ALINHAMENTO.md) passou pelo laço em
    duas rodadas, com nota 8 nas duas e os defeitos restantes vindos do esboço
    aprovado, e a pessoa a aceitou como está em 2026-10-15; ela segue o esboço com
    razão de volume de 0,99 no casco, mas custou cerca de 1,54 milhão de tokens, perto
@@ -151,17 +151,17 @@ Combinado com a pessoa em 2026-10-15: com o avião completo, seguem a picape, o 
 robótico, o carrinho de mão e a empilhadeira, cujos esboços ela ainda não aprovou,
 cada um pelo esboço a partir dos desenhos e pela receita no núcleo, com as primitivas
 2.0 que pedirem; e, mais adiante, os objetos da [lista de
-famílias](../FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
-objeto](../FERRAMENTAS-POR-OBJETO.md). A ordem entre os quatro fica com a pessoa.
+famílias](../../FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
+objeto](../../FERRAMENTAS-POR-OBJETO.md). A ordem entre os quatro fica com a pessoa.
 
 ## Fechamento
 
 A pessoa aprovou o avião montado em 2026-10-16. As oito peças estão no núcleo com `REFINA` passando, cada etapa fechada pelo crítico
 ou por aceite humano (a deriva duas vezes, sem convergência e com detalhes pequenos registrados no aceite), e
-[`etapas --auditar`](../usar/AUDITORIA-DA-MONTAGEM.md) passa: oito encaixes de junta declarados com motivo e profundidade, nenhum outro
+[`etapas --auditar`](../../usar/AUDITORIA-DA-MONTAGEM.md) passa: oito encaixes de junta declarados com motivo e profundidade, nenhum outro
 par de peças se tocando e as três rodas no chão. O crítico do avião inteiro deu nota 8 sem defeito, com proporções, posições e simetria
 iguais às do esboço. O alinhamento de cada parte e o que a pessoa decidiu estão em
-[`ALINHAMENTO.md`](../../../procedural/pecas/aviao/ALINHAMENTO.md).
+[`ALINHAMENTO.md`](../../../../procedural/pecas/aviao/ALINHAMENTO.md).
 
 O custo, contado pelos tokens dos agentes e aproximado onde a contagem se perdeu, ficou perto de 10 milhões nas partes e 4 milhões nas
 ferramentas que elas pediram. Por parte, com as rodadas de ajuste: fuselagem cerca de 1,65 milhão, motor 0,88, hélice 0,48, asas 1,48,

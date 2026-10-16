@@ -335,6 +335,12 @@ Esta seção guarda o que o índice `planos/README.md` carregava antes de ser en
 
 ### Estado
 
+[O avião do esboço à receita](2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16,
+concluído com a aprovação da pessoa: as oito peças do avião no núcleo, cada uma com
+`REFINA` contra o esboço, a rodada de ajustes que ela pediu, a montagem auditada por
+`etapas --auditar` com os encaixes declarados e as rodas no chão, e as ferramentas que a
+travessia pediu, da receita planejada gerada ao pacote do crítico montado pela ferramenta.
+
 [As famílias de desenho](2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14,
 concluído com a aprovação da pessoa: as famílias de desenho da carcaça e do braço,
 ajustadas às referências acima de 0,95, e a prova numa empilhadeira nova, em que o
