@@ -123,8 +123,10 @@ export const TABELA = {
      do retângulo, `cantos` é o raio do canto e `subida` é o deslocamento do centro em y em relação à linha de baixo do profundor.
      `segmentosDoCanto` são os segmentos do arco de cada canto, os 12 que o esboço usa. O esboço declara o suporte `suave`: uma curva
      de tangente contínua passa pelas quatro seções. `trechos` diz em quantos trechos a receita divide cada vão entre duas seções (um
-     número por vão, três ao todo) para o loft seguir essa curva em vez de ligar as seções por troncos retos; 2, 1 e 2 dão as seis
-     estações que o esboço usa no suporte 1, uma a mais que as cinco do 2 e do 3. */
+     número por vão, três ao todo) para o loft seguir essa curva em vez de ligar as seções por troncos retos. Com 2, 1 e 2 (as seis
+     estações do esboço) o contorno de baixo da lente virava poligonal, com quebras de 4,5 a 5,7 graus a cada 90 a 120 mm entre as
+     pontas; 6, 4 e 7 põem uma estação a cada 23 a 30 mm, e a quebra cai a no máximo 2 graus. O loft aceita até 1000 vértices e
+     faces, e com 52 pontos por seção isso limita as estações a 18, que são os 17 trechos de 6 + 4 + 7. */
   suporte: {
     x: [600, 1300, 1950],
     abaixo: 6,
@@ -139,7 +141,7 @@ export const TABELA = {
       { recuo: 210, tamanho: [26, 14], cantos: 6, subida: 22 },
     ],
     segmentosDoCanto: 12,
-    trechos: [2, 1, 2],
+    trechos: [6, 4, 7],
   },
   /* O compensador (a divisão no bordo de fuga do profundor, a pedido da pessoa na rodada de ajustes): uma aba do bordo de fuga entre
      os x de `x`. O rasgo que a recebe sai do profundor por subtrair e tem a parede dianteira a `profundidade` mm do bordo de fuga,
