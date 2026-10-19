@@ -19,8 +19,7 @@
 export const RECUO_DA_FRENTE = 10; // mm entre a frente do assento e a frente das pernas da frente
 export const FOLGA_ENTRE_TABUAS = 12; // mm entre duas tábuas do assento
 export const SOBREPOSICAO = 0.5; // mm que uma peça entra na outra onde se encostam (o limite do teste é 1 mm)
-export const RECUO_DA_SAIA = 1; // mm entre a face de fora da saia e a face de fora da perna
-export const LARGURA_DO_TRAVESSAO = 25; // mm da travessa lateral baixa, no sentido da largura
+export const RECUO_DA_SAIA = 6; // mm entre a face de fora da saia e a face de fora da perna (nunca menos que 5: ver `degrausEntreCaixas`)
 export const ALTURA_DO_TRAVESSAO = 40; // mm da travessa lateral baixa
 export const OCUPACAO_TOTAL = 0.999; // a partir daqui as ripas vão de poste a poste e entram neles
 
@@ -92,29 +91,30 @@ export function geometriaDaCadeira(parametros) {
     caixas.push(caixa('poste-dir', xPerna, y0, zTras, lp, p.alturaDosPostes - y0, pp));
   }
 
-  /* as saias ficam entre as pernas, dentro do contorno delas: a frente e o fundo de perna a perna, e (saia === 2) os lados de
-     perna a perna; sobem até 0,25 mm dentro do assento, e a face de fora fica 1 mm para dentro da face de fora das pernas */
+  /* as saias ficam entre as pernas, alinhadas com a face de dentro delas e recuadas RECUO_DA_SAIA da face de fora (a espessura é a da
+     perna menos o recuo): a frente e o fundo de perna a perna, e (saia === 2) os lados de perna a perna. O topo é o das pernas */
   if (combo.saia) {
-    const t = p.espessuraDaSaia;
+    const tz = pp - RECUO_DA_SAIA;
+    const tx = lp - RECUO_DA_SAIA;
     const y0 = yU - p.alturaDaSaia;
-    const alt = p.alturaDaSaia + SOBREPOSICAO / 2;
+    const alt = p.alturaDaSaia + SOBREPOSICAO;
     const larguraEntrePernas = 2 * (xi + 0.3);
-    caixas.push(caixa('saia-frente', 0, y0, zFora - RECUO_DA_SAIA - t / 2, larguraEntrePernas, alt, t));
-    caixas.push(caixa('saia-tras', 0, y0, zFaceDeTras + RECUO_DA_SAIA + t / 2, larguraEntrePernas, alt, t));
+    caixas.push(caixa('saia-frente', 0, y0, zFora - RECUO_DA_SAIA - tz / 2, larguraEntrePernas, alt, tz));
+    caixas.push(caixa('saia-tras', 0, y0, zFaceDeTras + RECUO_DA_SAIA + tz / 2, larguraEntrePernas, alt, tz));
     if (combo.saia === 2) {
       const profLado = zTrasDeFrente - zFrenteDeTras + 2 * SOBREPOSICAO;
       const zLado = (zTrasDeFrente + zFrenteDeTras) / 2;
-      caixas.push(caixa('saia-esq', -(xo - RECUO_DA_SAIA - t / 2), y0, zLado, t, alt, profLado));
-      caixas.push(caixa('saia-dir', xo - RECUO_DA_SAIA - t / 2, y0, zLado, t, alt, profLado));
+      caixas.push(caixa('saia-esq', -(xo - RECUO_DA_SAIA - tx / 2), y0, zLado, tx, alt, profLado));
+      caixas.push(caixa('saia-dir', xo - RECUO_DA_SAIA - tx / 2, y0, zLado, tx, alt, profLado));
     }
   }
 
-  /* o travessão: uma barra baixa de cada lado, de perna a perna */
+  /* o travessão: uma barra baixa de cada lado, de perna a perna, 12 mm mais estreita que a perna */
   if (combo.travessao) {
     const prof = zTrasDeFrente - zFrenteDeTras + 2 * SOBREPOSICAO;
     const zc = (zTrasDeFrente + zFrenteDeTras) / 2;
-    caixas.push(caixa('travessao-esq', -xPerna, p.alturaDoTravessaoLateral - ALTURA_DO_TRAVESSAO / 2, zc, LARGURA_DO_TRAVESSAO, ALTURA_DO_TRAVESSAO, prof));
-    caixas.push(caixa('travessao-dir', xPerna, p.alturaDoTravessaoLateral - ALTURA_DO_TRAVESSAO / 2, zc, LARGURA_DO_TRAVESSAO, ALTURA_DO_TRAVESSAO, prof));
+    caixas.push(caixa('travessao-esq', -xPerna, p.alturaDoTravessaoLateral - ALTURA_DO_TRAVESSAO / 2, zc, lp - 12, ALTURA_DO_TRAVESSAO, prof));
+    caixas.push(caixa('travessao-dir', xPerna, p.alturaDoTravessaoLateral - ALTURA_DO_TRAVESSAO / 2, zc, lp - 12, ALTURA_DO_TRAVESSAO, prof));
   }
 
   /* o encosto: ripas, centradas no plano das pernas de trás; entre os postes quando há postes, e na largura entre as faces de
@@ -123,6 +123,7 @@ export function geometriaDaCadeira(parametros) {
   const larguraDoConjunto = combo.postes && p.ocupacaoDoVao >= OCUPACAO_TOTAL ? vao + 2 * SOBREPOSICAO : p.ocupacaoDoVao * vao;
   const larguraDaRipa = (larguraDoConjunto - (combo.ripas - 1) * p.vaoEntreRipas) / combo.ripas;
   const passo = larguraDaRipa + p.vaoEntreRipas;
+  const meioDoConjunto = ((combo.ripas - 1) / 2) * passo + larguraDaRipa / 2; // a face de fora da ripa de fora, em módulo
   const baseDaAlta = p.topoDaTravessaAlta - p.alturaDaTravessaAlta;
   const apoiaEmBaixo = combo.baixa || Math.abs(p.baseDasRipas - hA) < 1;
   /* com postes e travessa alta as ripas sobem até a travessa (entram 0,5 mm nela) e o parâmetro `topoDasRipas` não conta */
@@ -130,24 +131,23 @@ export function geometriaDaCadeira(parametros) {
   const yRipa0 = p.baseDasRipas - (apoiaEmBaixo ? SOBREPOSICAO : 0);
   const yRipa1 = sobeAteATravessa ? baseDaAlta + SOBREPOSICAO : p.topoDasRipas;
 
-  /* as travessas: entre os postes (entram 0,5 mm em cada um), com a face de trás 1 mm para dentro da face de trás dos postes;
-     a travessa alta que começa no topo dos postes fica sobre eles, na largura de fora a fora; sem postes elas ficam na frente das
-     ripas, na largura do conjunto menos 2 mm */
+  /* as travessas. Com postes ficam no plano deles, com a mesma profundidade (as faces de trás e da frente alinhadas) e entre eles
+     (entram 0,5 mm em cada um); a travessa alta que começa no topo dos postes fica sobre eles, na largura de fora a fora. Sem
+     postes ficam na frente das ripas (entram 0,5 mm nelas), na largura do conjunto de ripas, com as pontas alinhadas às delas. */
   const sobrePostes = combo.postes && combo.alta && Math.abs(baseDaAlta - p.alturaDosPostes) <= 1;
-  const larguraDaTravessa = combo.postes ? 2 * xi + 2 * SOBREPOSICAO : larguraDoConjunto - 2;
-  const zTravessa = combo.postes
-    ? zFaceDeTras + 2 + p.espessuraDasTravessas / 2
-    : zTras + p.espessuraDaRipa / 2 - SOBREPOSICAO + p.espessuraDasTravessas / 2;
+  const larguraDaTravessa = combo.postes ? 2 * xi + 2 * SOBREPOSICAO : 2 * meioDoConjunto;
+  const profDaTravessa = combo.postes ? pp : p.espessuraDasTravessas;
+  const zTravessa = combo.postes ? zTras : zTras + p.espessuraDaRipa / 2 - SOBREPOSICAO + p.espessuraDasTravessas / 2;
   if (combo.baixa) {
     const base = p.baseDasRipas - p.alturaDaTravessaBaixa;
     const desce = Math.abs(base - hA) < 1 ? SOBREPOSICAO : 0;
-    caixas.push(caixa('travessa-baixa', 0, base - desce, zTravessa, larguraDaTravessa, p.alturaDaTravessaBaixa + desce, p.espessuraDasTravessas));
+    caixas.push(caixa('travessa-baixa', 0, base - desce, zTravessa, larguraDaTravessa, p.alturaDaTravessaBaixa + desce, profDaTravessa));
   }
   for (let k = 0; k < combo.ripas; k += 1) {
     caixas.push(caixa(`ripa-${k + 1}`, (k - (combo.ripas - 1) / 2) * passo, yRipa0, zTras, larguraDaRipa, yRipa1 - yRipa0, p.espessuraDaRipa));
   }
   if (combo.alta) {
-    caixas.push(caixa('travessa-alta', 0, baseDaAlta, zTravessa, sobrePostes ? 2 * xo : larguraDaTravessa, p.alturaDaTravessaAlta, p.espessuraDasTravessas));
+    caixas.push(caixa('travessa-alta', 0, baseDaAlta, zTravessa, sobrePostes ? 2 * xo : larguraDaTravessa, p.alturaDaTravessaAlta, profDaTravessa));
   }
 
   return Object.freeze({ combo, caixas, yU, xPerna, zFrente, zTras, zFaceDeTras, larguraDaRipa, passo, sobrePostes });
@@ -176,4 +176,27 @@ export function contatoEntreCaixas(a, b) {
   const sobre = [0, 1, 2].map((k) => Math.min(ha[k], hb[k]) - Math.max(la[k], lb[k]));
   const atravessa = sobre.every((s) => s > 1e-9);
   return { sobre, atravessa, penetracao: atravessa ? Math.min(...sobre) : 0, encosta: sobre.filter((s) => s >= -1e-9).length === 3 };
+}
+
+/** O menor degrau que conta como defeito (mm): faces paralelas que se tocam e diferem por menos que isso são degrau, e acima dele são recuo de propósito. */
+export const DEGRAU_MINIMO = 0.25;
+export const RECUO_MINIMO = 5;
+
+/**
+ * Os degraus entre duas caixas que se tocam: faces paralelas do mesmo lado (mínimo com mínimo, máximo com máximo, em cada eixo)
+ * cuja diferença está entre DEGRAU_MINIMO e RECUO_MINIMO. As faces ou ficam rigorosamente alinhadas (diferença abaixo de 0,25 mm)
+ * ou diferem por ao menos 5 mm. A entrada de uma peça na outra (máximo de uma com mínimo da outra) não conta.
+ */
+export function degrausEntreCaixas(a, b) {
+  if (!contatoEntreCaixas(a, b).sobre.every((s) => s >= -1e-9)) return [];
+  const lo = (c) => [c.centro[0] - c.larg / 2, c.centro[1], c.centro[2] - c.prof / 2];
+  const hi = (c) => [c.centro[0] + c.larg / 2, c.centro[1] + c.alt, c.centro[2] + c.prof / 2];
+  const achados = [];
+  ['x', 'y', 'z'].forEach((eixo, k) => {
+    for (const [lado, fa, fb] of [['minimo', lo(a)[k], lo(b)[k]], ['maximo', hi(a)[k], hi(b)[k]]]) {
+      const d = Math.abs(fa - fb);
+      if (d >= DEGRAU_MINIMO && d < RECUO_MINIMO - 1e-6) achados.push({ a: a.nome, b: b.nome, eixo, lado, diferenca: d });
+    }
+  });
+  return achados;
 }

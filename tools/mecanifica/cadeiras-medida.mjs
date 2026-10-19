@@ -15,6 +15,7 @@ import { descreverEsboco } from '../../modulos/esboco/src/descrever.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { chamar } from '../../src/autoria/chamar-familia.js';
 import { CADEIRA } from '../../procedural/familias/cadeira/index.js';
+import { geometriaDaCadeira } from '../../procedural/familias/cadeira/geometria.js';
 import { criarRegistroDeFamilias } from '../../procedural/familias/index.js';
 import { chanfroDoEsboco, receitaParaEsboco, volumeDaPeca } from './receita-externa.mjs';
 
@@ -218,9 +219,10 @@ const limites = (itens) => {
 
 /* Um quadro SVG com a cadeira na escala `esc` (px por mm), centrada em x e apoiada na base; cada face é pintada e logo depois leva
    só as arestas de forma, de modo que a aresta escondida por uma face mais próxima é coberta por ela. */
-function quadro(itens, esc, larg, alt, margemBaixo) {
+function quadro(itens, esc, larg, alt, margemBaixo, centro = null) {
   const b = limites(itens);
-  const dx = larg / 2 - ((b.x0 + b.x1) / 2) * esc; const dy = alt - margemBaixo - b.y1 * esc;
+  const dx = centro ? larg / 2 - centro[0] * esc : larg / 2 - ((b.x0 + b.x1) / 2) * esc;
+  const dy = centro ? alt / 2 - centro[1] * esc : alt - margemBaixo - b.y1 * esc;
   const P = ([x, y]) => `${(x * esc + dx).toFixed(2)},${(y * esc + dy).toFixed(2)}`;
   return itens.map((i) => {
     const cor = `rgb(${i.preenche.join(',')})`;
@@ -230,6 +232,26 @@ function quadro(itens, esc, larg, alt, margemBaixo) {
   }).join('');
 }
 
+/* Os três pontos delicados de cada perfil (em mm, quadro da malha) para o recorte ampliado: a base e o topo do encosto e o encontro
+   da travessa com o poste (ou, sem postes, a ponta da travessa). */
+function pontosDeRecorte(perfil) {
+  const parametros = { ...Object.fromEntries(Object.entries(CADEIRA.contrato.parametros).map(([k, v]) => [k, v.padrao])), ...CADEIRA.contrato.perfis[perfil].parametros };
+  const g = geometriaDaCadeira(parametros);
+  const caixa = (nome) => g.caixas.find((c) => c.nome === nome);
+  const topo = (c) => [c.centro[0], c.centro[1] + c.alt, c.centro[2]];
+  const base = (c) => [c.centro[0], c.centro[1], c.centro[2]];
+  const ultimaRipa = caixa(`ripa-${g.combo.ripas}`);
+  if (g.combo.postes) {
+    const trav = caixa('travessa-alta') ?? caixa('travessa-baixa');
+    const poste = caixa('poste-esq');
+    const ripa = caixa('ripa-1');
+    const junta = trav ? [poste.centro[0], trav.centro[1] + trav.alt / 2, poste.centro[2]] : [poste.centro[0], ripa.centro[1] + ripa.alt / 2, poste.centro[2]];
+    return [['base do poste', base(poste)], ['topo do poste', topo(caixa('poste-dir'))], [trav ? 'encontro travessa-poste' : 'encontro tábua-poste', junta]];
+  }
+  const trav = caixa('travessa-alta');
+  return [['base do encosto', base(caixa('ripa-1'))], ['topo do encosto', topo(ultimaRipa)], ['ponta da travessa (direita)', [trav.centro[0] + trav.larg / 2, trav.centro[1] + trav.alt / 2, trav.centro[2]]]];
+}
+
 /** O HTML da prancha: uma linha por perfil, com as vistas isométrica, frontal, lateral e superior da família, na mesma escala. */
 export function htmlDaPrancha() {
   const perfis = Object.keys(ALVOS).sort();
@@ -237,20 +259,21 @@ export function htmlDaPrancha() {
   const dados = perfis.map((perfil) => {
     const neutro = executarPerfil(perfil);
     const polis = poligonosDaMalha(neutro);
-    return { perfil, malha: medirMalha(neutro), vistas: Object.entries(VISTAS).map(([nome, vista]) => ({ nome, rotulo: vista.rotulo, itens: projetar(polis, vista, azul) })) };
+    return { perfil, malha: medirMalha(neutro), recortes: pontosDeRecorte(perfil), vistas: Object.entries(VISTAS).map(([nome, vista]) => ({ nome, rotulo: vista.rotulo, itens: projetar(polis, vista, azul) })) };
   });
   let maior = 0;
   for (const d of dados) for (const v of d.vistas) { const b = limites(v.itens); maior = Math.max(maior, b.y1 - b.y0, (b.x1 - b.x0) * 1.15); }
-  const LARG = 300; const ALT = 380; const MARGEM = 26;
+  const LARG = 300; const ALT = 380; const MARGEM = 26; const RECORTE = 270;
   const esc = (ALT - MARGEM - 24) / maior;
   const f = (v) => Math.round(v);
   const linhas = dados.map((d) => `<section><h2>${d.perfil}</h2><div class="fila">${d.vistas.map((v) => `<div class="cel"><svg width="${LARG}" height="${ALT}" viewBox="0 0 ${LARG} ${ALT}">${quadro(v.itens, esc, LARG, ALT, MARGEM)}<line x1="10" y1="${ALT - MARGEM}" x2="${LARG - 10}" y2="${ALT - MARGEM}" stroke="#999" stroke-width="0.6" stroke-dasharray="3 3"/></svg><div class="rot">${v.rotulo}</div></div>`).join('')}</div>
+<div class="fila">${d.recortes.map(([rotulo, pt]) => { const cam = camera(VISTAS.isometrica); const c = [dot(pt, cam.direita), -dot(pt, cam.cima)]; const iso = d.vistas.find((v) => v.nome === 'isometrica').itens; return `<div class="cel" style="margin-right:20px"><svg width="${RECORTE}" height="${RECORTE}" viewBox="0 0 ${RECORTE} ${RECORTE}" style="background:#fbfbf9;outline:1px solid #cfcdc6">${quadro(iso, esc * 3, RECORTE, RECORTE, 0, c)}</svg><div class="rot rec">${rotulo} (3x)</div></div>`; }).join('')}</div>
 <p>${d.malha.tamanho.map(f).join(' × ')} mm (largura × altura × profundidade)</p></section>`);
   return `<!doctype html><meta charset="utf-8"><style>
 body{margin:0;background:#f4f3ef;font:13px/1.35 system-ui,sans-serif;color:#222;padding:14px;width:${LARG * 4 + 40}px}
 h1{font-size:17px;margin:0 0 4px} .sub{color:#555;margin:0 0 10px}
 section{border-top:1px solid #cfcdc6;padding:6px 0 4px} h2{font-size:15px;margin:2px 0 0}
-.fila{display:flex} .cel{flex:none} .rot{color:#666;text-align:center;margin-top:-22px;position:relative;height:18px}
+.fila{display:flex} .cel{flex:none} .rot{color:#666;text-align:center;margin-top:-22px;position:relative;height:18px} .rot.rec{margin-top:2px;height:auto;width:270px}
 section p{margin:0 0 4px;color:#444}
 </style><body id="prancha"><h1>Família cadeira — cinco perfis de encosto alto</h1>
 <p class="sub">Geometria da família (malha executada), sem o alvo. Mesma escala em todas as vistas; as linhas escuras são as arestas da forma.</p>${linhas.join('')}</body>`;

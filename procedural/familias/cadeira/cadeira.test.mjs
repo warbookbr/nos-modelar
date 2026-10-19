@@ -12,7 +12,7 @@ import { sha256Hex } from '../../nucleo/sha256.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { CADEIRA, CONTRATO_DA_CADEIRA } from './index.js';
 import { COMPOSICOES, combinacoes } from './composicoes.js';
-import { combinacaoDaCadeira, contatoEntreCaixas, envolventeDasCaixas, geometriaDaCadeira, idDaCadeira } from './geometria.js';
+import { combinacaoDaCadeira, contatoEntreCaixas, degrausEntreCaixas, envolventeDasCaixas, geometriaDaCadeira, idDaCadeira } from './geometria.js';
 import { criarRegistroDeFamilias } from '../index.js';
 import { ALVOS, compararPerfil } from '../../../tools/mecanifica/cadeiras-medida.mjs';
 
@@ -203,6 +203,34 @@ describe('as regras construtivas, medidas na geometria', () => {
     }
   });
 
+  it.each(CASOS)('%s: duas caixas que se tocam não têm faces paralelas com diferença entre 0,25 e 5 mm (degrau): ou alinhadas ou recuadas de propósito', (nome) => {
+    const { caixas } = g(nome);
+    const degraus = [];
+    for (let i = 0; i < caixas.length; i += 1) for (let j = i + 1; j < caixas.length; j += 1) degraus.push(...degrausEntreCaixas(caixas[i], caixas[j]));
+    expect(degraus.map((d) => `${d.a} x ${d.b} ${d.eixo} ${d.lado}: ${d.diferenca.toFixed(2)} mm`)).toEqual([]);
+  });
+
+  it('a regra do degrau pega 1 mm de diferença e aceita 0 mm e 5 mm', () => {
+    const base = { nome: 'a', centro: [0, 0, 0], larg: 50, alt: 100, prof: 50 };
+    const com = (alt, nome = 'b') => ({ nome, centro: [0, 0, 0], larg: 50, alt, prof: 50 });
+    expect(degrausEntreCaixas(base, com(101)).map((d) => d.eixo)).toEqual(['y']);
+    expect(degrausEntreCaixas(base, com(100))).toEqual([]);
+    expect(degrausEntreCaixas(base, com(105))).toEqual([]);
+  });
+
+  it('o topo da travessa alta é o dos postes quando ela fica entre eles, e a travessa sobre os postes tem as faces de trás e da frente alinhadas com as deles', () => {
+    const madeira = g('cadeira-de-madeira').caixas;
+    expect(faixa(achar(madeira, 'travessa-alta')).y1).toBeCloseTo(faixa(achar(madeira, 'poste-esq')).y1, 6);
+    expect(faixa(achar(madeira, 'travessa-alta')).z0).toBeCloseTo(faixa(achar(madeira, 'poste-esq')).z0, 6);
+    expect(faixa(achar(madeira, 'travessa-baixa')).z0).toBeCloseTo(faixa(achar(madeira, 'poste-esq')).z0, 6);
+    const trabalhada = g('cadeira-trabalhada').caixas;
+    const alta = faixa(achar(trabalhada, 'travessa-alta'));
+    const poste = faixa(achar(trabalhada, 'poste-esq'));
+    expect(alta.z0).toBeCloseTo(poste.z0, 6);
+    expect(alta.z1).toBeCloseTo(poste.z1, 6);
+    expect(alta.x0).toBeCloseTo(poste.x0, 6);
+  });
+
   it('as pernas da frente da cadeira branca de madeira encostam no assento (ajuste da pessoa)', () => {
     const { caixas, yU } = g('cadeira-branca-de-madeira');
     for (const lado of ['esq', 'dir']) expect(Math.abs(faixa(achar(caixas, `perna-frente-${lado}`)).y1 - yU)).toBeLessThanOrEqual(TOLERANCIA);
@@ -249,9 +277,13 @@ describe('as recusas dizem a restrição e não geram malha', () => {
     expect(recusa({ topoDaTravessaAlta: 1121 }).restricao).toBe('travessa-alta-encaixa-nos-postes');
   });
 
-  it('assento de tábuas sem saia nos lados, e saia mais grossa que as pernas', () => {
+  it('assento de tábuas sem saia nos lados', () => {
     expect(recusa({ tabuasDoAssento: 2, saiaNosLados: 0 }).restricao).toBe('assento-de-tabuas-precisa-de-saia');
-    expect(recusa({ espessuraDaSaia: 60 }).restricao).toBe('saia-dentro-das-pernas');
+  });
+
+  it('degraus de poucos milímetros: topo da travessa alta a 1 mm do topo dos postes, ripa só 1 mm mais fina que a perna', () => {
+    expect(recusa({ topoDaTravessaAlta: 1119 }).restricao).toBe('travessa-alta-encaixa-nos-postes');
+    expect(recusa({ profundidadeDaPerna: 35, espessuraDaRipa: 34 }).restricao).toBe('ripa-alinhada-ou-recuada');
   });
 
   it('ripa mais grossa que as pernas de trás', () => {

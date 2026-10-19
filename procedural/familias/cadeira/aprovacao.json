@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "cadeira",
-  "versao": "1.1.0",
+  "versao": "1.2.0",
   "mecanica": {
     "data": "2026-10-19",
     "pontos": {
@@ -15,24 +15,23 @@
           "alturaDosPostes": 0,
           "baseDasRipas": 370,
           "espessuraDaRipa": 15,
-          "espessuraDaSaia": 15,
           "espessuraDasTravessas": 12,
           "espessuraDoAssento": 35,
-          "larguraDaPerna": 25,
+          "larguraDaPerna": 40,
           "larguraDoAssento": 440,
           "numeroDeRipas": 1,
           "ocupacaoDoVao": 0.2,
-          "profundidadeDaPerna": 25,
+          "profundidadeDaPerna": 30,
           "profundidadeDoAssento": 440,
-          "recuoDeTras": 1,
-          "recuoLateral": 1,
+          "recuoDeTras": 5,
+          "recuoLateral": 5,
           "saiaNosLados": 0,
           "tabuasDoAssento": 1,
           "topoDaTravessaAlta": 600,
           "topoDasRipas": 780,
           "vaoEntreRipas": 4
         },
-        "hash": "sha256:265a42eced6bb6f242c653ce37f322aa94254b23a7ae37b0f470a49d87022427",
+        "hash": "sha256:e1dab83eb0903adfec0082f257eae232a4efeb3c0c34ac438e0861e9c2f06ba3",
         "medidas": []
       },
       "medio": {
@@ -45,7 +44,6 @@
           "alturaDosPostes": 1000,
           "baseDasRipas": 560,
           "espessuraDaRipa": 25,
-          "espessuraDaSaia": 30,
           "espessuraDasTravessas": 30,
           "espessuraDoAssento": 60,
           "larguraDaPerna": 50,
@@ -62,7 +60,7 @@
           "topoDasRipas": 950,
           "vaoEntreRipas": 40
         },
-        "hash": "sha256:05364ff9c0f07acf6e9a07314536101533d9ea11e5026ff61e27a71d21297c89",
+        "hash": "sha256:49f0beadb960073343aa44999ddd634293a9b78e8ccbd474c12319d6f343951e",
         "medidas": []
       },
       "maximo": {
@@ -75,7 +73,6 @@
           "alturaDosPostes": 1150,
           "baseDasRipas": 720,
           "espessuraDaRipa": 55,
-          "espessuraDaSaia": 70,
           "espessuraDasTravessas": 45,
           "espessuraDoAssento": 105,
           "larguraDaPerna": 75,
@@ -92,12 +89,12 @@
           "topoDasRipas": 1100,
           "vaoEntreRipas": 90
         },
-        "hash": "sha256:f88b1e47bc00f55b74233b475927cc2ddcae62ebcc34597c8a418f51727c3ebc",
+        "hash": "sha256:ffdb871cc8558b1060888ce76636c86ff84a536e988b03e801430478d46093d2",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 48,
+      "sondas": 46,
       "recusasDeclaradas": [
         {
           "ponto": "alturaDaTravessaBaixa=90",
@@ -112,14 +109,6 @@
           "restricao": "ripas-acima-do-assento"
         },
         {
-          "ponto": "espessuraDaSaia=70",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
-          "ponto": "larguraDaPerna=25",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
           "ponto": "larguraDaPerna=75",
           "restricao": "ripas-tem-largura"
         },
@@ -130,10 +119,6 @@
         {
           "ponto": "ocupacaoDoVao=0.2",
           "restricao": "ripas-tem-largura"
-        },
-        {
-          "ponto": "profundidadeDaPerna=25",
-          "restricao": "saia-dentro-das-pernas"
         },
         {
           "ponto": "recuoLateral=30",
@@ -165,7 +150,6 @@
           "alturaDosPostes": 1083.8,
           "baseDasRipas": 600,
           "espessuraDaRipa": 20,
-          "espessuraDaSaia": 20,
           "espessuraDasTravessas": 40,
           "espessuraDoAssento": 45,
           "larguraDaPerna": 52,
@@ -174,15 +158,15 @@
           "ocupacaoDoVao": 0.869,
           "profundidadeDaPerna": 52,
           "profundidadeDoAssento": 471.7,
-          "recuoDeTras": 1,
-          "recuoLateral": 1,
+          "recuoDeTras": 5,
+          "recuoLateral": 5,
           "saiaNosLados": 1,
           "tabuasDoAssento": 1,
           "topoDaTravessaAlta": 1060,
           "topoDasRipas": 930,
           "vaoEntreRipas": 46
         },
-        "hash": "sha256:40fef4451e0e0ba9e75ef609cdcbe49d465547ed54f454ecde98a6fd9e720433",
+        "hash": "sha256:d35c486e80fc9637d34573e18bd1d0ccdafa653c578b762babcb8e4c37c8fb38",
         "medidas": []
       },
       "cadeira-branca-simples": {
@@ -195,7 +179,6 @@
           "alturaDosPostes": 1002.9,
           "baseDasRipas": 680,
           "espessuraDaRipa": 35,
-          "espessuraDaSaia": 30,
           "espessuraDasTravessas": 30,
           "espessuraDoAssento": 101.5,
           "larguraDaPerna": 65,
@@ -222,10 +205,9 @@
           "alturaDaTravessaBaixa": 40,
           "alturaDoAssento": 490,
           "alturaDoTravessaoLateral": 0,
-          "alturaDosPostes": 1121,
+          "alturaDosPostes": 1120,
           "baseDasRipas": 530,
           "espessuraDaRipa": 17,
-          "espessuraDaSaia": 50,
           "espessuraDasTravessas": 30,
           "espessuraDoAssento": 50,
           "larguraDaPerna": 55,
@@ -242,7 +224,7 @@
           "topoDasRipas": 1020,
           "vaoEntreRipas": 45
         },
-        "hash": "sha256:d22ad6d9be42c0d4fb7ef0bd22441921ba0ef24b764c246c2dd95265149bff41",
+        "hash": "sha256:b0bc2db2f87c99eac6678638a1155f589d2939d2b9ece2920a3c7119ab98807c",
         "medidas": []
       },
       "cadeira-rustica": {
@@ -255,7 +237,6 @@
           "alturaDosPostes": 0,
           "baseDasRipas": 460,
           "espessuraDaRipa": 55,
-          "espessuraDaSaia": 40,
           "espessuraDasTravessas": 15,
           "espessuraDoAssento": 40,
           "larguraDaPerna": 70,
@@ -264,7 +245,7 @@
           "ocupacaoDoVao": 0.966,
           "profundidadeDaPerna": 70,
           "profundidadeDoAssento": 545,
-          "recuoDeTras": 1,
+          "recuoDeTras": 5,
           "recuoLateral": 10,
           "saiaNosLados": 1,
           "tabuasDoAssento": 5,
@@ -272,7 +253,7 @@
           "topoDasRipas": 1050,
           "vaoEntreRipas": 10
         },
-        "hash": "sha256:06dacd165bd4d7e104d56f0dd9bbf2bb268ff1bf1dd7771ccc2624d5d41a9d2e",
+        "hash": "sha256:eae88909755352538e8d498aa0d32ab70b882b6aa1b16fa693a538faea0eb44e",
         "medidas": []
       },
       "cadeira-trabalhada": {
@@ -284,8 +265,7 @@
           "alturaDoTravessaoLateral": 0,
           "alturaDosPostes": 793.2,
           "baseDasRipas": 382.4,
-          "espessuraDaRipa": 33,
-          "espessuraDaSaia": 30,
+          "espessuraDaRipa": 34,
           "espessuraDasTravessas": 33,
           "espessuraDoAssento": 88.6,
           "larguraDaPerna": 60,
@@ -302,12 +282,12 @@
           "topoDasRipas": 792.7,
           "vaoEntreRipas": 81
         },
-        "hash": "sha256:c12fd49df39afee4062633caf4f469781faa3870daef6f21846bc3e3009e4872",
+        "hash": "sha256:cf5c028105bd6ec83fce312d57eb629c146dcccf4293ee76b8b252cf426417a2",
         "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 200,
+      "sondas": 190,
       "recusasDeclaradas": [
         {
           "ponto": "cadeira-branca-de-madeira: baseDasRipas=370",
@@ -316,14 +296,6 @@
         {
           "ponto": "cadeira-branca-de-madeira: espessuraDaRipa=55",
           "restricao": "ripa-cabe-na-perna"
-        },
-        {
-          "ponto": "cadeira-branca-de-madeira: espessuraDaSaia=70",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
-          "ponto": "cadeira-branca-de-madeira: profundidadeDaPerna=25",
-          "restricao": "travessa-cabe-na-perna"
         },
         {
           "ponto": "cadeira-branca-de-madeira: topoDaTravessaAlta=600",
@@ -354,7 +326,11 @@
           "restricao": "ripas-acima-do-assento"
         },
         {
-          "ponto": "cadeira-branca-simples: profundidadeDaPerna=25",
+          "ponto": "cadeira-branca-simples: espessuraDaRipa=55",
+          "restricao": "ripa-alinhada-ou-recuada"
+        },
+        {
+          "ponto": "cadeira-branca-simples: profundidadeDaPerna=30",
           "restricao": "ripa-cabe-na-perna"
         },
         {
@@ -378,24 +354,12 @@
           "restricao": "ripas-acima-do-assento"
         },
         {
-          "ponto": "cadeira-de-madeira: espessuraDaSaia=70",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
-          "ponto": "cadeira-de-madeira: larguraDaPerna=25",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
           "ponto": "cadeira-de-madeira: larguraDaPerna=75",
           "restricao": "ripas-tem-largura"
         },
         {
           "ponto": "cadeira-de-madeira: larguraDoAssento=440",
           "restricao": "ripas-tem-largura"
-        },
-        {
-          "ponto": "cadeira-de-madeira: profundidadeDaPerna=25",
-          "restricao": "saia-dentro-das-pernas"
         },
         {
           "ponto": "cadeira-de-madeira: recuoLateral=30",
@@ -442,15 +406,7 @@
           "restricao": "ripas-apoiadas"
         },
         {
-          "ponto": "cadeira-rustica: espessuraDaSaia=70",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
-          "ponto": "cadeira-rustica: larguraDaPerna=25",
-          "restricao": "saia-dentro-das-pernas"
-        },
-        {
-          "ponto": "cadeira-rustica: profundidadeDaPerna=25",
+          "ponto": "cadeira-rustica: profundidadeDaPerna=30",
           "restricao": "ripa-cabe-na-perna"
         },
         {
@@ -478,11 +434,7 @@
           "restricao": "ripa-cabe-na-perna"
         },
         {
-          "ponto": "cadeira-trabalhada: espessuraDasTravessas=45",
-          "restricao": "travessa-cabe-na-perna"
-        },
-        {
-          "ponto": "cadeira-trabalhada: profundidadeDaPerna=25",
+          "ponto": "cadeira-trabalhada: profundidadeDaPerna=30",
           "restricao": "ripa-cabe-na-perna"
         },
         {

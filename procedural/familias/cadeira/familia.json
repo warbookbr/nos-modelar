@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.familia@1",
   "id": "cadeira",
-  "versao": "1.1.0",
+  "versao": "1.2.0",
   "nivel": "componente",
   "parametros": {
     "larguraDoAssento": {
@@ -48,7 +48,7 @@
       "tipo": "numero",
       "unidade": "mm",
       "padrao": 55,
-      "minimo": 25,
+      "minimo": 40,
       "maximo": 75,
       "medio": 50
     },
@@ -56,7 +56,7 @@
       "tipo": "numero",
       "unidade": "mm",
       "padrao": 55,
-      "minimo": 25,
+      "minimo": 30,
       "maximo": 75,
       "medio": 50
     },
@@ -64,7 +64,7 @@
       "tipo": "numero",
       "unidade": "mm",
       "padrao": 10,
-      "minimo": 1,
+      "minimo": 5,
       "maximo": 30,
       "medio": 10
     },
@@ -72,7 +72,7 @@
       "tipo": "numero",
       "unidade": "mm",
       "padrao": 10,
-      "minimo": 1,
+      "minimo": 5,
       "maximo": 50,
       "medio": 10
     },
@@ -92,14 +92,6 @@
       "maximo": 1,
       "medio": 0
     },
-    "espessuraDaSaia": {
-      "tipo": "numero",
-      "unidade": "mm",
-      "padrao": 50,
-      "minimo": 15,
-      "maximo": 70,
-      "medio": 30
-    },
     "alturaDoTravessaoLateral": {
       "tipo": "numero",
       "unidade": "mm",
@@ -111,7 +103,7 @@
     "alturaDosPostes": {
       "tipo": "numero",
       "unidade": "mm",
-      "padrao": 1121,
+      "padrao": 1120,
       "minimo": 0,
       "maximo": 1150,
       "medio": 1000
@@ -219,11 +211,6 @@
       "motivo": "a saia desce da face de baixo do assento e deixa ao menos 50 mm até o chão; use uma saia mais baixa ou um assento mais alto"
     },
     {
-      "id": "saia-dentro-das-pernas",
-      "expressao": "min(1, alturaDaSaia) * (espessuraDaSaia + 1 - min(larguraDaPerna, profundidadeDaPerna)) <= 0",
-      "motivo": "a saia fica entre as pernas e não passa da seção delas; use uma saia mais fina ou pernas mais grossas"
-    },
-    {
       "id": "assento-de-tabuas-precisa-de-saia",
       "expressao": "(tabuasDoAssento - 1) * (1 - saiaNosLados * min(1, alturaDaSaia)) <= 0",
       "motivo": "as tábuas do assento se apoiam nas saias dos lados; com mais de uma tábua use saia, com saia nos lados"
@@ -284,9 +271,9 @@
       "motivo": "a ripa é mais grossa que a profundidade das pernas de trás e sairia do plano delas; use uma ripa mais fina ou pernas mais fundas"
     },
     {
-      "id": "travessa-cabe-na-perna",
-      "expressao": "espessuraDasTravessas + 1 <= profundidadeDaPerna",
-      "motivo": "a travessa é mais grossa que a profundidade das pernas de trás e sairia do plano delas; use uma travessa mais fina ou pernas mais fundas"
+      "id": "ripa-alinhada-ou-recuada",
+      "expressao": "max(0, min(profundidadeDaPerna - espessuraDaRipa - 0.25, 10 - (profundidadeDaPerna - espessuraDaRipa))) <= 0",
+      "motivo": "a ripa tem a profundidade das pernas de trás (faces alinhadas) ou ao menos 10 mm a menos (5 mm de recuo de cada lado); uma diferença menor deixa um degrau de poucos milímetros na face"
     },
     {
       "id": "travessa-alta-ou-nenhuma",
@@ -300,8 +287,13 @@
     },
     {
       "id": "travessa-alta-encaixa-nos-postes",
-      "expressao": "min(1, alturaDosPostes) * min(1, alturaDaTravessaAlta) * max(0, min(abs(topoDaTravessaAlta - alturaDaTravessaAlta - alturaDosPostes) - 1, topoDaTravessaAlta - alturaDosPostes + 1)) <= 0",
-      "motivo": "com postes, a travessa alta fica entre eles (o topo dela ao menos 1 mm abaixo do topo dos postes) ou sobre eles (a base dela a até 1 mm do topo dos postes); ela não pode ficar ao lado deles nem atravessá-los"
+      "expressao": "min(1, alturaDosPostes) * min(1, alturaDaTravessaAlta) * max(0, min(min(abs(alturaDosPostes - topoDaTravessaAlta) - 0.249, 5 - (alturaDosPostes - topoDaTravessaAlta)), abs(topoDaTravessaAlta - alturaDaTravessaAlta - alturaDosPostes) - 1)) <= 0",
+      "motivo": "com postes, a travessa alta termina na mesma altura dos postes (diferença menor que 0,25 mm), ou ao menos 5 mm abaixo do topo deles, ou começa no topo dos postes e fica sobre eles; uma diferença menor deixa um degrau no topo"
+    },
+    {
+      "id": "ripas-e-postes-no-topo",
+      "expressao": "min(1, alturaDosPostes) * (1 - min(1, alturaDaTravessaAlta)) * max(0, min(1, (ocupacaoDoVao - 0.998) * 1000)) * max(0, min(abs(alturaDosPostes - topoDasRipas) - 0.249, 5 - (alturaDosPostes - topoDasRipas))) <= 0",
+      "motivo": "com a ocupação total do vão e sem travessa alta, as ripas encostam nos postes: o topo delas fica na altura dos postes (diferença menor que 0,25 mm) ou ao menos 5 mm abaixo; uma diferença menor deixa um degrau"
     },
     {
       "id": "travessa-baixa-ou-nenhuma",
@@ -346,9 +338,8 @@
         "recuoDeTras": 10,
         "alturaDaSaia": 60,
         "saiaNosLados": 1,
-        "espessuraDaSaia": 50,
         "alturaDoTravessaoLateral": 0,
-        "alturaDosPostes": 1121,
+        "alturaDosPostes": 1120,
         "numeroDeRipas": 5,
         "ocupacaoDoVao": 0.67,
         "vaoEntreRipas": 45,
@@ -375,13 +366,12 @@
         "recuoDeTras": 47,
         "alturaDaSaia": 0,
         "saiaNosLados": 0,
-        "espessuraDaSaia": 30,
         "alturaDoTravessaoLateral": 0,
         "alturaDosPostes": 793.2,
         "numeroDeRipas": 2,
         "ocupacaoDoVao": 0.572,
         "vaoEntreRipas": 81,
-        "espessuraDaRipa": 33,
+        "espessuraDaRipa": 34,
         "baseDasRipas": 382.4,
         "topoDasRipas": 792.7,
         "alturaDaTravessaAlta": 208.6,
@@ -404,7 +394,6 @@
         "recuoDeTras": 18,
         "alturaDaSaia": 0,
         "saiaNosLados": 0,
-        "espessuraDaSaia": 30,
         "alturaDoTravessaoLateral": 0,
         "alturaDosPostes": 1002.9,
         "numeroDeRipas": 1,
@@ -429,11 +418,10 @@
         "tabuasDoAssento": 1,
         "larguraDaPerna": 52,
         "profundidadeDaPerna": 52,
-        "recuoLateral": 1,
-        "recuoDeTras": 1,
+        "recuoLateral": 5,
+        "recuoDeTras": 5,
         "alturaDaSaia": 101.5,
         "saiaNosLados": 1,
-        "espessuraDaSaia": 20,
         "alturaDoTravessaoLateral": 0,
         "alturaDosPostes": 1083.8,
         "numeroDeRipas": 5,
@@ -459,10 +447,9 @@
         "larguraDaPerna": 70,
         "profundidadeDaPerna": 70,
         "recuoLateral": 10,
-        "recuoDeTras": 1,
+        "recuoDeTras": 5,
         "alturaDaSaia": 80,
         "saiaNosLados": 1,
-        "espessuraDaSaia": 40,
         "alturaDoTravessaoLateral": 140,
         "alturaDosPostes": 0,
         "numeroDeRipas": 3,
