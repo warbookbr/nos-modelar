@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1374 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1375 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1981,6 +1981,10 @@
 
 - `FONTE.md` — Fixtures do importador de STL
 - `gerar-sintetico.mjs` — Gera a fixture sintética do importador de STL a partir da do importador de STEP: cada sólido de `../importar-step/sintetico.step` vira um STL, tesselado pelo…
+
+## tools/mecanifica/fixtures/receita-externa-cadeiras/
+
+- `LEIA-ME.md` — Cadeiras escolhidas como alvo de forma (2026-10-19)
 
 ## tools/mecanifica/guardas/
 

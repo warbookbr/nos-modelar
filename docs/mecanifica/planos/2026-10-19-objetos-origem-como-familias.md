@@ -83,3 +83,6 @@ uma peça do avião; ou se a pessoa não reconhecer os objetos como os dela depo
 ## Andamento
 
 Fatia 1 feita em 2026-10-19: a [triagem](../banco-de-provas/receitas-externas-2026-10-19/triagem.md) classifica as 66 receitas em dez grupos, com medidas, número de peças, recusas do tradutor e a família candidata, e aguarda a escolha da pessoa dos grupos e da ordem.
+
+A pessoa escolheu a cadeira como primeiro grupo e onze receitas como perfis (`cadeira_fibra_azul`, `cadeira_ripada_marrom`, `cadeira_larga_estofada_clara`, `cadeira_desgastada_madeira`, `cadeira_fibra_roxa`, `cadeira_classica_creme` e `cadeira_classica_vinho`, `cadeira_basica_clara`, `cadeira_almofadada_clara`, `cadeira_ripada_simples` e `cadeira_larga_estofada_amarela`), com dois ajustes: a `cadeira_larga_estofada_clara` passa a branca, e na `cadeira_almofadada_clara` o topo das pernas da frente precisa encostar no assento. As receitas estão em `tools/mecanifica/fixtures/receita-externa-cadeiras/`.
+
