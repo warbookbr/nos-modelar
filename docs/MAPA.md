@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1388 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1400 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -344,6 +344,20 @@
 - `receita_para_esboco.mjs` — Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima, z para a fr…
 - `triagem.md` — Triagem das 66 receitas por família candidata
 - `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolv…
+
+## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/defeitos-marcados/
+
+- `cadeira_fibra_azul.md` — Defeitos marcados em cadeira_fibra_azul
+- `cadeira_ripada_marrom.md` — Defeitos marcados em cadeira_ripada_marrom
+- `cadeira_larga_estofada_clara.md` — Defeitos marcados em cadeira_larga_estofada_clara
+- `cadeira_desgastada_madeira.md` — Defeitos marcados em cadeira_desgastada_madeira
+- `cadeira_fibra_roxa.md` — Defeitos marcados em cadeira_fibra_roxa
+- `cadeira_classica_creme.md` — Defeitos marcados em cadeira_classica_creme
+- `cadeira_classica_vinho.md` — Defeitos marcados em cadeira_classica_vinho
+- `cadeira_basica_clara.md` — Defeitos marcados em cadeira_basica_clara
+- `cadeira_almofadada_clara.md` — Defeitos marcados em cadeira_almofadada_clara
+- `cadeira_ripada_simples.md` — Defeitos marcados em cadeira_ripada_simples
+- `cadeira_larga_estofada_amarela.md` — Defeitos marcados em cadeira_larga_estofada_amarela
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/sonda-passos/
 
@@ -1971,6 +1985,7 @@
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
+- `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Mecanifica, para conferir o que a conversão e os ajustes fizeram.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
 
