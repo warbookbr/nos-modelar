@@ -159,10 +159,44 @@ function passosDaForma(f, origemId) {
  * Os passos da receita de uma opção do esboço.
  * @returns {{ passos: Array, partes: string[], recusas: Array<{forma:string,motivo:string}>, conferencias: Array }}
  */
-export function passosDoEsboco(esboco, { opcao = 1, alinhar = false } = {}) {
+/**
+ * Aplica à lista de formas resolvidas os ajustes da pessoa, em milímetro, sobre caixas sem giro. Cada ajuste é um objeto:
+ *   { forma, face: { eixo: 'x'|'y'|'z', lado: 'min'|'max', para } }   leva uma face da caixa à posição `para`;
+ *   { forma, deslocar: [dx, dy, dz] }                                   desloca a caixa inteira;
+ *   { forma, remover: true }                                            tira a forma da receita.
+ * Uma forma que não existe, que não é caixa reta ou uma face que inverte a caixa é erro, com a mensagem do ajuste.
+ */
+export function aplicarAjustes(formas, ajustes) {
+  const saida = formas.map((f) => ({ ...f, geometria: { ...f.geometria, caixa: { min: [...f.geometria.caixa.min], max: [...f.geometria.caixa.max] } } }));
+  const feitos = [];
+  for (const a of ajustes) {
+    const i = saida.findIndex((f) => f.id === a.forma);
+    if (i < 0) throw new Error(`ajuste: a forma "${a.forma}" não existe (formas: ${saida.map((f) => f.id).join(', ')})`);
+    if (a.remover) { saida.splice(i, 1); feitos.push(a); continue; }
+    const f = saida[i]; const g = f.geometria;
+    if (f.tipo !== 'caixa' || !identidade(g.matriz)) throw new Error(`ajuste: a forma "${a.forma}" não é uma caixa sem giro`);
+    const c = g.caixa;
+    if (a.face) {
+      const k = { x: 0, y: 1, z: 2 }[a.face.eixo];
+      if (k === undefined || !['min', 'max'].includes(a.face.lado) || !Number.isFinite(a.face.para)) throw new Error(`ajuste: face inválida em "${a.forma}": ${JSON.stringify(a.face)}`);
+      c[a.face.lado][k] = a.face.para;
+    } else if (a.deslocar) {
+      if (!Array.isArray(a.deslocar) || a.deslocar.length !== 3 || !a.deslocar.every(Number.isFinite)) throw new Error(`ajuste: deslocar inválido em "${a.forma}"`);
+      for (let k = 0; k < 3; k += 1) { c.min[k] += a.deslocar[k]; c.max[k] += a.deslocar[k]; }
+    } else throw new Error(`ajuste: "${a.forma}" sem face, deslocar nem remover`);
+    if ([0, 1, 2].some((k) => c.max[k] - c.min[k] <= 0)) throw new Error(`ajuste: a caixa "${a.forma}" ficou sem volume`);
+    g.centro = [0, 1, 2].map((k) => (c.min[k] + c.max[k]) / 2);
+    g.largura = c.max[0] - c.min[0]; g.altura = c.max[1] - c.min[1]; g.profundidade = c.max[2] - c.min[2];
+    feitos.push(a);
+  }
+  return { formas: saida, feitos };
+}
+
+export function passosDoEsboco(esboco, { opcao = 1, alinhar = false, ajustes = [] } = {}) {
   const dados = formasResolvidas(esboco, opcao);
   let alteracoes = [];
   if (alinhar) { const r = alinharCaixas(dados.formas); dados.formas = r.formas; alteracoes = r.alteracoes; }
+  if (ajustes.length) dados.formas = aplicarAjustes(dados.formas, ajustes).formas;
   const passos = []; const partes = []; const recusas = []; const conferencias = [];
   const usados = new Set();
   let id = 1;

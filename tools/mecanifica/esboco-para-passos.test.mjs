@@ -55,3 +55,23 @@ describe('esboço para passos de receita', () => {
     expect(recusas).toEqual([{ forma: 'esf', motivo: 'forma esfera ainda não é convertida' }]);
   });
 });
+
+describe('ajustes da pessoa sobre as caixas', () => {
+  const dados = (formas) => ({ opcoes: [{ titulo: 't', formas }] });
+  const base = dados([
+    { id: 'a', tipo: 'caixa', largura: 100, altura: 100, profundidade: 100, centro: [0, 50, 0] },
+    { id: 'b', tipo: 'caixa', largura: 50, altura: 100, profundidade: 50, centro: [200, 50, 0] },
+  ]);
+  it('face leva uma face à posição, deslocar move a caixa e remover tira a forma', () => {
+    const r = passosDoEsboco(base, { ajustes: [{ forma: 'a', face: { eixo: 'y', lado: 'max', para: 120 } }, { forma: 'b', deslocar: [10, 0, 0] }] });
+    const c = caixaDosPassos(r.passos);
+    expect(c.max[1]).toBeCloseTo(120, 3);
+    expect(c.max[0]).toBeCloseTo(235, 3);
+    expect(passosDoEsboco(base, { ajustes: [{ forma: 'b', remover: true }] }).partes).toEqual(['a']);
+  });
+  it('recusa a forma inexistente, a face inválida e a caixa que perde o volume', () => {
+    expect(() => passosDoEsboco(base, { ajustes: [{ forma: 'z', deslocar: [0, 0, 0] }] })).toThrow(/não existe/);
+    expect(() => passosDoEsboco(base, { ajustes: [{ forma: 'a', face: { eixo: 'w', lado: 'min', para: 0 } }] })).toThrow(/face inválida/);
+    expect(() => passosDoEsboco(base, { ajustes: [{ forma: 'a', face: { eixo: 'y', lado: 'max', para: -5 } }] })).toThrow(/sem volume/);
+  });
+});
