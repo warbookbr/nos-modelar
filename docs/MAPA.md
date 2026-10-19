@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1345 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1346 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1396,6 +1396,7 @@
 
 - `fronteira-da-bancada.mjs` — fronteira-da-bancada.mjs — a bancada é um módulo, não o centro do projeto.
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
+- `malha-fora-do-git.test.mjs` — malha-fora-do-git.test.mjs — nenhuma malha importada (.obj ou .mtl) entra no versionamento: o `.gitignore` as cobre, e nenhuma está rastreada.
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.
 - `mapear-motor-procedural.test.mjs` — Guarda que o mapa R00 continue descrevendo a fachada procedural real.
 - `navegador-sem-node.test.mjs` — navegador-sem-node.test.mjs — o código que a bancada publicada empacota não importa módulo do Node. Em 2026-10-15 as famílias `movel-de-caixa`, `dobradica` e…

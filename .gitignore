@@ -60,3 +60,9 @@ public/sessao-ativa.json
 *.descrever.json
 # Estado do Condutor do esboço (`esboco --condutor`, artefato gerado ao lado do esboço)
 *.condutor.json
+
+# Malhas importadas (.obj e .mtl): ficam fora do versionamento, para que apagar um ramo de cópia ou uma cópia local
+# não deixe malha de terceiros na main. Importe-as numa pasta `importados/` ou num ramo separado, que nunca vai à main.
+*.obj
+*.mtl
+importados/
