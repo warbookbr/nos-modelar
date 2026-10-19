@@ -1,0 +1,5 @@
+[
+  { "forma": "perna_td", "face": { "eixo": "x", "lado": "max", "para": 153 }, "motivo": "simetria com perna_te (x -302..-237, 65 mm): a espelhada em torno do centro do assento (-74,5) é 88..153; a face externa também passa a coincidir com a de poste_d (153), tirando o degrau de 1 mm" },
+  { "forma": "travessa_topo", "face": { "eixo": "x", "lado": "min", "para": -302 }, "motivo": "a travessa sobrava 12 mm além da face externa de poste_e (-302), que a apoia; a face passa a coincidir com a do poste" },
+  { "forma": "travessa_topo", "face": { "eixo": "x", "lado": "max", "para": 153 }, "motivo": "a travessa sobrava 12 mm além da face externa de poste_d (153), que a apoia; a face passa a coincidir com a do poste" }
+]
