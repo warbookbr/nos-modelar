@@ -130,8 +130,10 @@ export function tabelaDeMedidas() {
 /* ------------------------------ a prancha ------------------------------ */
 
 const VISTAS = Object.freeze({
-  isometrica: { azimute: 35, elevacao: 25 },
-  lateral: { azimute: 90, elevacao: 0 },
+  isometrica: { azimute: 35, elevacao: 25, rotulo: 'isométrica' },
+  frontal: { azimute: 0, elevacao: 0, rotulo: 'frontal' },
+  lateral: { azimute: 90, elevacao: 0, rotulo: 'lateral (frente à esquerda)' },
+  superior: { azimute: 0, elevacao: 90, rotulo: 'superior (frente embaixo)' },
 });
 const LUZ = (() => { const v = [0.45, 0.8, 0.55]; const n = Math.hypot(...v); return v.map((x) => x / n); })();
 const sub = (a, b) => a.map((x, k) => x - b[k]);
@@ -140,6 +142,8 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const unit = (a) => { const n = Math.hypot(...a); return a.map((x) => x / n); };
 
 function camera({ azimute, elevacao }) {
+  /* vista de cima: x para a direita e a frente (+z) para baixo na tela */
+  if (elevacao === 90) return { f: [0, -1, 0], direita: [1, 0, 0], cima: [0, 0, -1] };
   const az = (azimute * Math.PI) / 180; const el = (elevacao * Math.PI) / 180;
   const f = unit([-Math.cos(el) * Math.sin(az), -Math.sin(el), -Math.cos(el) * Math.cos(az)]);
   const direita = unit(cruz(f, [0, 1, 0]));
@@ -147,51 +151,61 @@ function camera({ azimute, elevacao }) {
   return { f, direita, cima };
 }
 
-/* Os polígonos (em mm, com normal para fora) de uma lista de caixas e cilindros do alvo. */
-function poligonosDoAlvo(receita) {
-  const polis = [];
-  /* receita (x, y, z) → mundo (x, z, -y), o mesmo quadro do esboço */
-  const m = (v) => [v[0] * 1000, v[2] * 1000, -v[1] * 1000];
-  for (const p of receita.pecas) {
-    if (p.forma === 'caixa') {
-      const a = m(p.min); const b = m(p.max);
-      const lo = [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.min(a[2], b[2])]; const hi = [Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.max(a[2], b[2])];
-      const q = (x, y, z) => [x ? hi[0] : lo[0], y ? hi[1] : lo[1], z ? hi[2] : lo[2]];
-      polis.push([q(1, 0, 0), q(1, 1, 0), q(1, 1, 1), q(1, 0, 1)], [q(0, 0, 1), q(0, 1, 1), q(0, 1, 0), q(0, 0, 0)],
-        [q(0, 1, 0), q(0, 1, 1), q(1, 1, 1), q(1, 1, 0)], [q(0, 0, 1), q(0, 0, 0), q(1, 0, 0), q(1, 0, 1)],
-        [q(0, 0, 1), q(1, 0, 1), q(1, 1, 1), q(0, 1, 1)], [q(1, 0, 0), q(0, 0, 0), q(0, 1, 0), q(1, 1, 0)]);
-    } else {
-      const eixo = p.eixo ?? 'z'; const n = 12;
-      const c0 = p.centro.map((v) => v * 1000); const h = p.altura * 1000; const r = p.raio * 1000;
-      const perm = { z: (x, y, z) => [x, y, z], x: (x, y, z) => [z, x, y], y: (x, y, z) => [y, z, x] }[eixo];
-      const anel = (z) => Array.from({ length: n }, (_, i) => { const t = (2 * Math.PI * i) / n; return m(perm(r * Math.cos(t), r * Math.sin(t), z).map((v, k) => v / 1000 + c0[k] / 1000)); });
-      const base = anel(0); const topo = anel(h);
-      for (let i = 0; i < n; i += 1) polis.push([base[i], base[(i + 1) % n], topo[(i + 1) % n], topo[i]]);
-      polis.push(base, topo);
-    }
+/* Os polígonos da malha, em mm, com a orientação corrigida para a normal sair do sólido. */
+function normalDe(p) {
+  const w = [0, 0, 0];
+  for (let i = 0; i < p.length; i += 1) {
+    const a = p[i]; const b = p[(i + 1) % p.length];
+    w[0] += (a[1] - b[1]) * (a[2] + b[2]); w[1] += (a[2] - b[2]) * (a[0] + b[0]); w[2] += (a[0] - b[0]) * (a[1] + b[1]);
   }
-  return polis;
+  return w;
 }
 
-/* Os polígonos da malha, em mm, com a orientação corrigida para a normal sair do sólido. */
 function poligonosDaMalha(neutro) {
   const polis = [...neutro.F.values()].map((f) => f.vs.map((id) => neutro.V.get(id).map((x) => x * 1000)));
-  const normal = (p) => { const n = [0, 0, 0]; for (let i = 0; i < p.length; i += 1) { const a = p[i]; const b = p[(i + 1) % p.length]; n[0] += (a[1] - b[1]) * (a[2] + b[2]); n[1] += (a[2] - b[2]) * (a[0] + b[0]); n[2] += (a[0] - b[0]) * (a[1] + b[1]); } return n; };
   let vol = 0;
-  for (const p of polis) vol += dot(normal(p), p[0]);
+  for (const p of polis) vol += dot(normalDe(p), p[0]);
   return vol < 0 ? polis.map((p) => [...p].reverse()) : polis;
+}
+
+/* As arestas de forma: a de uma face só e a entre faces de normais diferentes. Uma aresta entre dois triângulos da mesma face plana
+   (a triangulação que a união deixa) não é aresta da forma e não é desenhada. */
+function arestasDeForma(polis) {
+  const chave = (v) => v.map((x) => Math.round(x * 100)).join(',');
+  const mapa = new Map();
+  polis.forEach((p, i) => {
+    const n = unit(normalDe(p));
+    for (let k = 0; k < p.length; k += 1) {
+      const a = chave(p[k]); const b = chave(p[(k + 1) % p.length]);
+      const id = a < b ? `${a}|${b}` : `${b}|${a}`;
+      if (!mapa.has(id)) mapa.set(id, []);
+      mapa.get(id).push({ face: i, n });
+    }
+  });
+  const deForma = new Set();
+  for (const [id, lista] of mapa) {
+    const nitida = lista.length !== 2 || dot(lista[0].n, lista[1].n) < 0.9999;
+    if (nitida) deForma.add(id);
+  }
+  return { chave, deForma };
 }
 
 function projetar(polis, vista, cor) {
   const cam = camera(vista);
+  const { chave, deForma } = arestasDeForma(polis);
   const itens = [];
   for (const p of polis) {
-    const n = (() => { const w = [0, 0, 0]; for (let i = 0; i < p.length; i += 1) { const a = p[i]; const b = p[(i + 1) % p.length]; w[0] += (a[1] - b[1]) * (a[2] + b[2]); w[1] += (a[2] - b[2]) * (a[0] + b[0]); w[2] += (a[0] - b[0]) * (a[1] + b[1]); } return unit(w); })();
+    const n = unit(normalDe(p));
     if (dot(n, cam.f) >= -1e-9) continue; // face de costas
     const pts = p.map((v) => [dot(v, cam.direita), -dot(v, cam.cima)]);
     const prof = p.reduce((s, v) => s + dot(v, cam.f), 0) / p.length;
     const luz = 0.42 + 0.58 * Math.max(0, dot(n, LUZ));
-    itens.push({ pts, prof, preenche: cor.map((c) => Math.round(c * luz)) });
+    const linhas = [];
+    for (let k = 0; k < p.length; k += 1) {
+      const a = chave(p[k]); const b = chave(p[(k + 1) % p.length]);
+      if (deForma.has(a < b ? `${a}|${b}` : `${b}|${a}`)) linhas.push([pts[k], pts[(k + 1) % p.length]]);
+    }
+    itens.push({ pts, prof, linhas, preenche: cor.map((c) => Math.round(c * luz)) });
   }
   itens.sort((a, b) => b.prof - a.prof);
   return itens;
@@ -202,51 +216,44 @@ const limites = (itens) => {
   return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
 };
 
-/* Um quadro SVG de lado `larg` x `alt` com a cadeira na escala `esc` (px por mm), centrada em x e apoiada na base. */
+/* Um quadro SVG com a cadeira na escala `esc` (px por mm), centrada em x e apoiada na base; cada face é pintada e logo depois leva
+   só as arestas de forma, de modo que a aresta escondida por uma face mais próxima é coberta por ela. */
 function quadro(itens, esc, larg, alt, margemBaixo) {
   const b = limites(itens);
   const dx = larg / 2 - ((b.x0 + b.x1) / 2) * esc; const dy = alt - margemBaixo - b.y1 * esc;
-  const polis = itens.map((i) => `<polygon points="${i.pts.map(([x, y]) => `${(x * esc + dx).toFixed(2)},${(y * esc + dy).toFixed(2)}`).join(' ')}" fill="rgb(${i.preenche.join(',')})" stroke="#2b2b2b" stroke-width="0.6" stroke-linejoin="round"/>`);
-  return { svg: polis.join(''), largura: (b.x1 - b.x0) * esc };
+  const P = ([x, y]) => `${(x * esc + dx).toFixed(2)},${(y * esc + dy).toFixed(2)}`;
+  return itens.map((i) => {
+    const cor = `rgb(${i.preenche.join(',')})`;
+    const poli = `<polygon points="${i.pts.map(P).join(' ')}" fill="${cor}" stroke="${cor}" stroke-width="0.8" stroke-linejoin="round"/>`;
+    const linhas = i.linhas.map(([a, c]) => `<line x1="${P(a).split(',')[0]}" y1="${P(a).split(',')[1]}" x2="${P(c).split(',')[0]}" y2="${P(c).split(',')[1]}" stroke="#262626" stroke-width="0.7" stroke-linecap="round"/>`);
+    return poli + linhas.join('');
+  }).join('');
 }
 
-/** O HTML da prancha: uma linha por perfil, com isométrica e lateral do alvo e da família. */
+/** O HTML da prancha: uma linha por perfil, com as vistas isométrica, frontal, lateral e superior da família, na mesma escala. */
 export function htmlDaPrancha() {
   const perfis = Object.keys(ALVOS).sort();
+  const azul = [150, 176, 206];
   const dados = perfis.map((perfil) => {
-    const alvo = medirAlvo(perfil);
     const neutro = executarPerfil(perfil);
-    const cinza = [190, 188, 182]; const azul = [150, 176, 206];
-    return {
-      perfil, alvo, malha: medirMalha(neutro),
-      vistas: Object.entries(VISTAS).map(([nome, vista]) => ({
-        nome, alvo: projetar(poligonosDoAlvo(alvo.receita), vista, cinza), familia: projetar(poligonosDaMalha(neutro), vista, azul),
-      })),
-    };
+    const polis = poligonosDaMalha(neutro);
+    return { perfil, malha: medirMalha(neutro), vistas: Object.entries(VISTAS).map(([nome, vista]) => ({ nome, rotulo: vista.rotulo, itens: projetar(polis, vista, azul) })) };
   });
-  /* uma escala só para toda a prancha, para os tamanhos serem comparáveis */
   let maior = 0;
-  for (const d of dados) for (const v of d.vistas) for (const itens of [v.alvo, v.familia]) { const b = limites(itens); maior = Math.max(maior, b.y1 - b.y0, (b.x1 - b.x0) * 1.25); }
-  const LARG = 330; const ALT = 400; const MARGEM = 26;
-  const esc = (ALT - MARGEM - 40) / maior;
-  const celula = (itens, rotulo) => {
-    const q = quadro(itens, esc, LARG, ALT, MARGEM);
-    return `<div class="cel"><svg width="${LARG}" height="${ALT}" viewBox="0 0 ${LARG} ${ALT}">${q.svg}<line x1="12" y1="${ALT - MARGEM}" x2="${LARG - 12}" y2="${ALT - MARGEM}" stroke="#999" stroke-width="0.6" stroke-dasharray="3 3"/></svg><div class="rot">${rotulo}</div></div>`;
-  };
+  for (const d of dados) for (const v of d.vistas) { const b = limites(v.itens); maior = Math.max(maior, b.y1 - b.y0, (b.x1 - b.x0) * 1.15); }
+  const LARG = 300; const ALT = 380; const MARGEM = 26;
+  const esc = (ALT - MARGEM - 24) / maior;
   const f = (v) => Math.round(v);
-  const linhas = dados.map((d) => {
-    const iso = d.vistas.find((v) => v.nome === 'isometrica'); const lat = d.vistas.find((v) => v.nome === 'lateral');
-    return `<section><h2>${d.perfil}</h2><div class="fila">${celula(iso.alvo, 'alvo · isométrica')}${celula(iso.familia, 'família · isométrica')}${celula(lat.alvo, 'alvo · lateral (frente à esquerda)')}${celula(lat.familia, 'família · lateral')}</div>
-<p>alvo ${d.alvo.tamanho.map(f).join(' × ')} mm · família ${d.malha.tamanho.map(f).join(' × ')} mm (largura × altura × profundidade)</p></section>`;
-  });
+  const linhas = dados.map((d) => `<section><h2>${d.perfil}</h2><div class="fila">${d.vistas.map((v) => `<div class="cel"><svg width="${LARG}" height="${ALT}" viewBox="0 0 ${LARG} ${ALT}">${quadro(v.itens, esc, LARG, ALT, MARGEM)}<line x1="10" y1="${ALT - MARGEM}" x2="${LARG - 10}" y2="${ALT - MARGEM}" stroke="#999" stroke-width="0.6" stroke-dasharray="3 3"/></svg><div class="rot">${v.rotulo}</div></div>`).join('')}</div>
+<p>${d.malha.tamanho.map(f).join(' × ')} mm (largura × altura × profundidade)</p></section>`);
   return `<!doctype html><meta charset="utf-8"><style>
 body{margin:0;background:#f4f3ef;font:13px/1.35 system-ui,sans-serif;color:#222;padding:14px;width:${LARG * 4 + 40}px}
 h1{font-size:17px;margin:0 0 4px} .sub{color:#555;margin:0 0 10px}
 section{border-top:1px solid #cfcdc6;padding:6px 0 4px} h2{font-size:15px;margin:2px 0 0}
 .fila{display:flex} .cel{flex:none} .rot{color:#666;text-align:center;margin-top:-22px;position:relative;height:18px}
 section p{margin:0 0 4px;color:#444}
-</style><body id="prancha"><h1>Família cadeira — cinco perfis de encosto alto, cada um ao lado do esboço alvo</h1>
-<p class="sub">Cinza: esboço alvo (receita do externo). Azul: geometria da família. Mesma escala em todas as vistas.</p>${linhas.join('')}</body>`;
+</style><body id="prancha"><h1>Família cadeira — cinco perfis de encosto alto</h1>
+<p class="sub">Geometria da família (malha executada), sem o alvo. Mesma escala em todas as vistas; as linhas escuras são as arestas da forma.</p>${linhas.join('')}</body>`;
 }
 
 async function gerarPrancha(saida) {
@@ -262,9 +269,7 @@ async function gerarPrancha(saida) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [comando, arg] = process.argv.slice(2);
   if (comando === 'medidas') {
-    const { texto } = tabelaDeMedidas();
-    console.log(texto);
-    if (process.argv.includes('--escrever')) writeFileSync(join(PASTA_DAS_PROVAS, 'medidas.tabela.md'), `${texto}\n`);
+    console.log(tabelaDeMedidas().texto);
   } else if (comando === 'prancha') {
     console.log(await gerarPrancha(arg ?? join(PASTA_DAS_PROVAS, 'cadeira-prancha.png')));
   } else {

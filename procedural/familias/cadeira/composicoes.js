@@ -75,9 +75,9 @@ function exemploDe(combo) {
     larguraDoAssento: 520, profundidadeDoAssento: 520, alturaDoAssento: 450, espessuraDoAssento: 50, tabuasDoAssento: combo.tabuas,
     larguraDaPerna: 50, profundidadeDaPerna: 50, recuoLateral: 10, recuoDeTras: 10,
     alturaDaSaia: combo.saia ? 60 : 0, saiaNosLados: combo.saia === 2 ? 1 : 0, espessuraDaSaia: 30, alturaDoTravessaoLateral: combo.travessao ? 140 : 0,
-    alturaDosPostes: combo.postes ? 1000 : 0, numeroDeRipas: combo.ripas, larguraDoConjuntoDasRipas: 300, vaoEntreRipas: 20, espessuraDaRipa: 20,
+    alturaDosPostes: combo.postes ? 1000 : 0, numeroDeRipas: combo.ripas, ocupacaoDoVao: 0.8, vaoEntreRipas: 20, espessuraDaRipa: 20,
     baseDasRipas: 550, topoDasRipas: 950, alturaDaTravessaAlta: combo.alta ? 100 : 0, topoDaTravessaAlta: 1000,
-    alturaDaTravessaBaixa: combo.baixa ? 40 : 0, larguraDasTravessas: 400, espessuraDasTravessas: 30,
+    alturaDaTravessaBaixa: combo.baixa ? 40 : 0, espessuraDasTravessas: 30,
   };
 }
 

@@ -268,7 +268,7 @@
 
 ## docs/mecanifica/banco-de-provas/cadeiras-2026-10-19/
 
-- `medidas.md` — Cadeira: medida de cada perfil contra o esboço alvo
+- `medidas.md` — Cadeira: regras construtivas e medida de proporção contra o alvo
 
 ## docs/mecanifica/banco-de-provas/carrinho-refeito-2026-10-08/
 
@@ -942,7 +942,7 @@
 
 ## procedural/familias/cadeira/
 
-- `cadeira.test.mjs` — cadeira.test.mjs — a família de cadeira: as combinações, as faixas e restrições, a solidez da malha, o determinismo do hash, as partes nomeadas e uma medida …
+- `cadeira.test.mjs` — cadeira.test.mjs — a família de cadeira: as combinações, as faixas e restrições, a solidez da malha, o determinismo do hash, as partes nomeadas, as regras co…
 - `composicoes.js` — composicoes.js — as composições procedurais da família `cadeira`, geradas por laço porque a quantidade de tábuas do assento e de ripas, e a presença de poste…
 - `derivar.js` — derivar.js — dos parâmetros da cadeira (milímetro) à chamada de composição (metro).
 - `geometria.js` — geometria.js — as caixas da cadeira a partir dos parâmetros da família, em milímetro.

@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "cadeira",
-  "versao": "1.0.0",
+  "versao": "1.1.0",
   "mecanica": {
     "data": "2026-10-19",
     "pontos": {
@@ -13,27 +13,26 @@
           "alturaDoAssento": 370,
           "alturaDoTravessaoLateral": 0,
           "alturaDosPostes": 0,
-          "baseDasRipas": 380,
+          "baseDasRipas": 370,
           "espessuraDaRipa": 15,
           "espessuraDaSaia": 15,
           "espessuraDasTravessas": 12,
           "espessuraDoAssento": 35,
           "larguraDaPerna": 25,
-          "larguraDasTravessas": 150,
           "larguraDoAssento": 440,
-          "larguraDoConjuntoDasRipas": 60,
           "numeroDeRipas": 1,
+          "ocupacaoDoVao": 0.2,
           "profundidadeDaPerna": 25,
           "profundidadeDoAssento": 440,
-          "recuoDeTras": 0,
-          "recuoLateral": 0,
+          "recuoDeTras": 1,
+          "recuoLateral": 1,
           "saiaNosLados": 0,
           "tabuasDoAssento": 1,
           "topoDaTravessaAlta": 600,
           "topoDasRipas": 780,
           "vaoEntreRipas": 4
         },
-        "hash": "sha256:7c0784f732f1bae36f017ee3c984a71f1caf9f813cee32cf984204ccc89ad4bb",
+        "hash": "sha256:265a42eced6bb6f242c653ce37f322aa94254b23a7ae37b0f470a49d87022427",
         "medidas": []
       },
       "medio": {
@@ -50,21 +49,20 @@
           "espessuraDasTravessas": 30,
           "espessuraDoAssento": 60,
           "larguraDaPerna": 50,
-          "larguraDasTravessas": 420,
           "larguraDoAssento": 520,
-          "larguraDoConjuntoDasRipas": 300,
           "numeroDeRipas": 3,
+          "ocupacaoDoVao": 0.6,
           "profundidadeDaPerna": 50,
           "profundidadeDoAssento": 510,
           "recuoDeTras": 10,
           "recuoLateral": 10,
           "saiaNosLados": 0,
           "tabuasDoAssento": 1,
-          "topoDaTravessaAlta": 1000,
+          "topoDaTravessaAlta": 990,
           "topoDasRipas": 950,
           "vaoEntreRipas": 40
         },
-        "hash": "sha256:caae145413ac707a683d919f3a59836e4a155dcd771461b20b3ad0b6e399752d",
+        "hash": "sha256:05364ff9c0f07acf6e9a07314536101533d9ea11e5026ff61e27a71d21297c89",
         "medidas": []
       },
       "maximo": {
@@ -77,30 +75,29 @@
           "alturaDosPostes": 1150,
           "baseDasRipas": 720,
           "espessuraDaRipa": 55,
-          "espessuraDaSaia": 250,
+          "espessuraDaSaia": 70,
           "espessuraDasTravessas": 45,
           "espessuraDoAssento": 105,
           "larguraDaPerna": 75,
-          "larguraDasTravessas": 600,
           "larguraDoAssento": 640,
-          "larguraDoConjuntoDasRipas": 560,
           "numeroDeRipas": 5,
+          "ocupacaoDoVao": 1,
           "profundidadeDaPerna": 75,
           "profundidadeDoAssento": 600,
           "recuoDeTras": 50,
           "recuoLateral": 30,
           "saiaNosLados": 1,
           "tabuasDoAssento": 6,
-          "topoDaTravessaAlta": 1150,
+          "topoDaTravessaAlta": 1140,
           "topoDasRipas": 1100,
-          "vaoEntreRipas": 100
+          "vaoEntreRipas": 90
         },
-        "hash": "sha256:654cd1fe26168b9224dcf7a73397942233c73b4a02e55cb976f28f7bc5c272f8",
+        "hash": "sha256:f88b1e47bc00f55b74233b475927cc2ddcae62ebcc34597c8a418f51727c3ebc",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 50,
+      "sondas": 48,
       "recusasDeclaradas": [
         {
           "ponto": "alturaDaTravessaBaixa=90",
@@ -111,43 +108,47 @@
           "restricao": "travessa-baixa-acima-do-assento"
         },
         {
-          "ponto": "baseDasRipas=380",
+          "ponto": "baseDasRipas=370",
           "restricao": "ripas-acima-do-assento"
         },
         {
+          "ponto": "espessuraDaSaia=70",
+          "restricao": "saia-dentro-das-pernas"
+        },
+        {
           "ponto": "larguraDaPerna=25",
-          "restricao": "travessas-entram-nos-postes"
+          "restricao": "saia-dentro-das-pernas"
         },
         {
-          "ponto": "larguraDasTravessas=150",
-          "restricao": "travessas-entram-nos-postes"
-        },
-        {
-          "ponto": "larguraDasTravessas=600",
-          "restricao": "travessas-cabem-no-assento"
-        },
-        {
-          "ponto": "larguraDoAssento=640",
-          "restricao": "travessas-entram-nos-postes"
-        },
-        {
-          "ponto": "larguraDoConjuntoDasRipas=60",
+          "ponto": "larguraDaPerna=75",
           "restricao": "ripas-tem-largura"
         },
         {
-          "ponto": "larguraDoConjuntoDasRipas=560",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "larguraDoAssento=440",
+          "restricao": "ripas-tem-largura"
         },
         {
-          "ponto": "recuoLateral=0",
-          "restricao": "travessas-entram-nos-postes"
+          "ponto": "ocupacaoDoVao=0.2",
+          "restricao": "ripas-tem-largura"
+        },
+        {
+          "ponto": "profundidadeDaPerna=25",
+          "restricao": "saia-dentro-das-pernas"
+        },
+        {
+          "ponto": "recuoLateral=30",
+          "restricao": "ripas-tem-largura"
         },
         {
           "ponto": "topoDaTravessaAlta=600",
-          "restricao": "travessa-alta-acima-do-assento"
+          "restricao": "ripas-tem-altura-ate-a-travessa"
         },
         {
-          "ponto": "vaoEntreRipas=100",
+          "ponto": "topoDaTravessaAlta=1140",
+          "restricao": "travessa-alta-encaixa-nos-postes"
+        },
+        {
+          "ponto": "vaoEntreRipas=90",
           "restricao": "ripas-tem-largura"
         }
       ]
@@ -168,21 +169,20 @@
           "espessuraDasTravessas": 40,
           "espessuraDoAssento": 45,
           "larguraDaPerna": 52,
-          "larguraDasTravessas": 374,
           "larguraDoAssento": 465.5,
-          "larguraDoConjuntoDasRipas": 314,
           "numeroDeRipas": 5,
+          "ocupacaoDoVao": 0.869,
           "profundidadeDaPerna": 52,
           "profundidadeDoAssento": 471.7,
-          "recuoDeTras": 0,
-          "recuoLateral": 0,
+          "recuoDeTras": 1,
+          "recuoLateral": 1,
           "saiaNosLados": 1,
           "tabuasDoAssento": 1,
           "topoDaTravessaAlta": 1060,
           "topoDasRipas": 930,
           "vaoEntreRipas": 46
         },
-        "hash": "sha256:615d0b098c837f47e9925419408e848edd29afd2866d0419126870cce6cf7647",
+        "hash": "sha256:40fef4451e0e0ba9e75ef609cdcbe49d465547ed54f454ecde98a6fd9e720433",
         "medidas": []
       },
       "cadeira-branca-simples": {
@@ -199,10 +199,9 @@
           "espessuraDasTravessas": 30,
           "espessuraDoAssento": 101.5,
           "larguraDaPerna": 65,
-          "larguraDasTravessas": 380,
           "larguraDoAssento": 503.4,
-          "larguraDoConjuntoDasRipas": 354,
           "numeroDeRipas": 1,
+          "ocupacaoDoVao": 1,
           "profundidadeDaPerna": 62,
           "profundidadeDoAssento": 510.4,
           "recuoDeTras": 18,
@@ -213,7 +212,7 @@
           "topoDasRipas": 950,
           "vaoEntreRipas": 4
         },
-        "hash": "sha256:fc6d4e348b541e95d8f905cf2b74139191cf2d0fa732e12e209e1626f84d20c5",
+        "hash": "sha256:eac59431c217fcea32be1ba187a7bf66cafead9c10b18f23e5a304c1582e671f",
         "medidas": []
       },
       "cadeira-de-madeira": {
@@ -223,17 +222,16 @@
           "alturaDaTravessaBaixa": 40,
           "alturaDoAssento": 490,
           "alturaDoTravessaoLateral": 0,
-          "alturaDosPostes": 1120,
+          "alturaDosPostes": 1121,
           "baseDasRipas": 530,
           "espessuraDaRipa": 17,
-          "espessuraDaSaia": 250,
+          "espessuraDaSaia": 50,
           "espessuraDasTravessas": 30,
           "espessuraDoAssento": 50,
           "larguraDaPerna": 55,
-          "larguraDasTravessas": 384,
           "larguraDoAssento": 510,
-          "larguraDoConjuntoDasRipas": 255,
           "numeroDeRipas": 5,
+          "ocupacaoDoVao": 0.67,
           "profundidadeDaPerna": 55,
           "profundidadeDoAssento": 540,
           "recuoDeTras": 10,
@@ -244,7 +242,7 @@
           "topoDasRipas": 1020,
           "vaoEntreRipas": 45
         },
-        "hash": "sha256:f0ef92085a6bb0a50cb4b4d23d0c19cad88f113a98b1127e833f8d728f0dfd7b",
+        "hash": "sha256:d22ad6d9be42c0d4fb7ef0bd22441921ba0ef24b764c246c2dd95265149bff41",
         "medidas": []
       },
       "cadeira-rustica": {
@@ -255,27 +253,26 @@
           "alturaDoAssento": 460,
           "alturaDoTravessaoLateral": 140,
           "alturaDosPostes": 0,
-          "baseDasRipas": 400,
+          "baseDasRipas": 460,
           "espessuraDaRipa": 55,
           "espessuraDaSaia": 40,
           "espessuraDasTravessas": 15,
           "espessuraDoAssento": 40,
           "larguraDaPerna": 70,
-          "larguraDasTravessas": 560,
           "larguraDoAssento": 600,
-          "larguraDoConjuntoDasRipas": 560,
           "numeroDeRipas": 3,
+          "ocupacaoDoVao": 0.966,
           "profundidadeDaPerna": 70,
           "profundidadeDoAssento": 545,
-          "recuoDeTras": 0,
+          "recuoDeTras": 1,
           "recuoLateral": 10,
-          "saiaNosLados": 0,
+          "saiaNosLados": 1,
           "tabuasDoAssento": 5,
           "topoDaTravessaAlta": 670,
           "topoDasRipas": 1050,
           "vaoEntreRipas": 10
         },
-        "hash": "sha256:dad26f5c717cc31bc5a47d942aa1e3ce9cc4d0f067ae45377379156380367d7b",
+        "hash": "sha256:06dacd165bd4d7e104d56f0dd9bbf2bb268ff1bf1dd7771ccc2624d5d41a9d2e",
         "medidas": []
       },
       "cadeira-trabalhada": {
@@ -285,81 +282,88 @@
           "alturaDaTravessaBaixa": 0,
           "alturaDoAssento": 382.4,
           "alturaDoTravessaoLateral": 0,
-          "alturaDosPostes": 817.4,
+          "alturaDosPostes": 793.2,
           "baseDasRipas": 382.4,
-          "espessuraDaRipa": 36,
+          "espessuraDaRipa": 33,
           "espessuraDaSaia": 30,
           "espessuraDasTravessas": 33,
           "espessuraDoAssento": 88.6,
           "larguraDaPerna": 60,
-          "larguraDasTravessas": 478,
           "larguraDoAssento": 478,
-          "larguraDoConjuntoDasRipas": 191,
           "numeroDeRipas": 2,
-          "profundidadeDaPerna": 30,
+          "ocupacaoDoVao": 0.572,
+          "profundidadeDaPerna": 34,
           "profundidadeDoAssento": 476,
           "recuoDeTras": 47,
           "recuoLateral": 12,
           "saiaNosLados": 0,
           "tabuasDoAssento": 1,
           "topoDaTravessaAlta": 1001.3,
-          "topoDasRipas": 817.4,
+          "topoDasRipas": 792.7,
           "vaoEntreRipas": 81
         },
-        "hash": "sha256:bb0e8cf444d2cc2d86fd798747275bd8e10ef5fb71ed3be4ef8a34d2fb9c13a3",
+        "hash": "sha256:c12fd49df39afee4062633caf4f469781faa3870daef6f21846bc3e3009e4872",
         "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 220,
+      "sondas": 200,
       "recusasDeclaradas": [
         {
-          "ponto": "cadeira-branca-de-madeira: baseDasRipas=380",
-          "restricao": "travessa-baixa-acima-do-assento"
+          "ponto": "cadeira-branca-de-madeira: baseDasRipas=370",
+          "restricao": "ripas-acima-do-assento"
         },
         {
-          "ponto": "cadeira-branca-de-madeira: larguraDaPerna=25",
-          "restricao": "travessas-entram-nos-postes"
+          "ponto": "cadeira-branca-de-madeira: espessuraDaRipa=55",
+          "restricao": "ripa-cabe-na-perna"
         },
         {
-          "ponto": "cadeira-branca-de-madeira: larguraDasTravessas=150",
-          "restricao": "travessas-entram-nos-postes"
+          "ponto": "cadeira-branca-de-madeira: espessuraDaSaia=70",
+          "restricao": "saia-dentro-das-pernas"
         },
         {
-          "ponto": "cadeira-branca-de-madeira: larguraDasTravessas=600",
-          "restricao": "travessas-cabem-no-assento"
-        },
-        {
-          "ponto": "cadeira-branca-de-madeira: larguraDoAssento=640",
-          "restricao": "travessas-entram-nos-postes"
-        },
-        {
-          "ponto": "cadeira-branca-de-madeira: larguraDoConjuntoDasRipas=60",
-          "restricao": "ripas-tem-largura"
-        },
-        {
-          "ponto": "cadeira-branca-de-madeira: larguraDoConjuntoDasRipas=560",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "cadeira-branca-de-madeira: profundidadeDaPerna=25",
+          "restricao": "travessa-cabe-na-perna"
         },
         {
           "ponto": "cadeira-branca-de-madeira: topoDaTravessaAlta=600",
-          "restricao": "travessa-alta-acima-do-assento"
+          "restricao": "ripas-tem-altura-ate-a-travessa"
         },
         {
-          "ponto": "cadeira-branca-de-madeira: vaoEntreRipas=100",
+          "ponto": "cadeira-branca-de-madeira: topoDaTravessaAlta=1140",
+          "restricao": "travessa-alta-encaixa-nos-postes"
+        },
+        {
+          "ponto": "cadeira-branca-de-madeira: topoDasRipas=1100",
+          "restricao": "ripas-abaixo-do-topo-dos-postes"
+        },
+        {
+          "ponto": "cadeira-branca-de-madeira: vaoEntreRipas=90",
           "restricao": "ripas-tem-largura"
         },
         {
-          "ponto": "cadeira-branca-simples: larguraDasTravessas=600",
-          "restricao": "travessas-cabem-no-assento"
+          "ponto": "cadeira-branca-simples: alturaDaTravessaAlta=210",
+          "restricao": "ripas-tem-altura-ate-a-travessa"
         },
         {
-          "ponto": "cadeira-branca-simples: larguraDoConjuntoDasRipas=560",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "cadeira-branca-simples: alturaDosPostes=0",
+          "restricao": "ripas-apoiadas"
+        },
+        {
+          "ponto": "cadeira-branca-simples: baseDasRipas=370",
+          "restricao": "ripas-acima-do-assento"
+        },
+        {
+          "ponto": "cadeira-branca-simples: profundidadeDaPerna=25",
+          "restricao": "ripa-cabe-na-perna"
         },
         {
           "ponto": "cadeira-branca-simples: topoDasRipas=780",
           "restricao": "ripas-tem-altura"
+        },
+        {
+          "ponto": "cadeira-branca-simples: topoDasRipas=1100",
+          "restricao": "ripas-abaixo-do-topo-dos-postes"
         },
         {
           "ponto": "cadeira-de-madeira: alturaDaTravessaBaixa=90",
@@ -370,44 +374,48 @@
           "restricao": "travessa-baixa-acima-do-assento"
         },
         {
-          "ponto": "cadeira-de-madeira: baseDasRipas=380",
+          "ponto": "cadeira-de-madeira: baseDasRipas=370",
           "restricao": "ripas-acima-do-assento"
         },
         {
+          "ponto": "cadeira-de-madeira: espessuraDaSaia=70",
+          "restricao": "saia-dentro-das-pernas"
+        },
+        {
           "ponto": "cadeira-de-madeira: larguraDaPerna=25",
-          "restricao": "travessas-entram-nos-postes"
+          "restricao": "saia-dentro-das-pernas"
         },
         {
-          "ponto": "cadeira-de-madeira: larguraDasTravessas=150",
-          "restricao": "travessas-entram-nos-postes"
-        },
-        {
-          "ponto": "cadeira-de-madeira: larguraDasTravessas=600",
-          "restricao": "travessas-cabem-no-assento"
-        },
-        {
-          "ponto": "cadeira-de-madeira: larguraDoAssento=640",
-          "restricao": "travessas-entram-nos-postes"
-        },
-        {
-          "ponto": "cadeira-de-madeira: larguraDoConjuntoDasRipas=60",
+          "ponto": "cadeira-de-madeira: larguraDaPerna=75",
           "restricao": "ripas-tem-largura"
         },
         {
-          "ponto": "cadeira-de-madeira: larguraDoConjuntoDasRipas=560",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "cadeira-de-madeira: larguraDoAssento=440",
+          "restricao": "ripas-tem-largura"
         },
         {
-          "ponto": "cadeira-de-madeira: recuoLateral=0",
-          "restricao": "travessas-entram-nos-postes"
+          "ponto": "cadeira-de-madeira: profundidadeDaPerna=25",
+          "restricao": "saia-dentro-das-pernas"
+        },
+        {
+          "ponto": "cadeira-de-madeira: recuoLateral=30",
+          "restricao": "ripas-tem-largura"
         },
         {
           "ponto": "cadeira-de-madeira: topoDaTravessaAlta=600",
-          "restricao": "travessa-alta-acima-do-assento"
+          "restricao": "ripas-tem-altura-ate-a-travessa"
         },
         {
-          "ponto": "cadeira-de-madeira: vaoEntreRipas=100",
+          "ponto": "cadeira-de-madeira: topoDaTravessaAlta=1140",
+          "restricao": "travessa-alta-encaixa-nos-postes"
+        },
+        {
+          "ponto": "cadeira-de-madeira: vaoEntreRipas=90",
           "restricao": "ripas-tem-largura"
+        },
+        {
+          "ponto": "cadeira-rustica: alturaDaSaia=0",
+          "restricao": "assento-de-tabuas-precisa-de-saia"
         },
         {
           "ponto": "cadeira-rustica: alturaDaTravessaAlta=210",
@@ -418,12 +426,36 @@
           "restricao": "travessa-baixa-acima-do-assento"
         },
         {
-          "ponto": "cadeira-rustica: larguraDoAssento=440",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "cadeira-rustica: alturaDoAssento=370",
+          "restricao": "ripas-apoiadas"
         },
         {
-          "ponto": "cadeira-rustica: recuoLateral=30",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "cadeira-rustica: alturaDoAssento=500",
+          "restricao": "ripas-acima-do-assento"
+        },
+        {
+          "ponto": "cadeira-rustica: baseDasRipas=370",
+          "restricao": "ripas-acima-do-assento"
+        },
+        {
+          "ponto": "cadeira-rustica: baseDasRipas=720",
+          "restricao": "ripas-apoiadas"
+        },
+        {
+          "ponto": "cadeira-rustica: espessuraDaSaia=70",
+          "restricao": "saia-dentro-das-pernas"
+        },
+        {
+          "ponto": "cadeira-rustica: larguraDaPerna=25",
+          "restricao": "saia-dentro-das-pernas"
+        },
+        {
+          "ponto": "cadeira-rustica: profundidadeDaPerna=25",
+          "restricao": "ripa-cabe-na-perna"
+        },
+        {
+          "ponto": "cadeira-trabalhada: alturaDaTravessaAlta=210",
+          "restricao": "travessa-alta-encaixa-nos-postes"
         },
         {
           "ponto": "cadeira-trabalhada: alturaDaTravessaBaixa=90",
@@ -434,36 +466,36 @@
           "restricao": "ripas-acima-do-assento"
         },
         {
+          "ponto": "cadeira-trabalhada: baseDasRipas=370",
+          "restricao": "ripas-acima-do-assento"
+        },
+        {
           "ponto": "cadeira-trabalhada: baseDasRipas=720",
           "restricao": "ripas-tem-altura"
         },
         {
-          "ponto": "cadeira-trabalhada: larguraDasTravessas=150",
-          "restricao": "travessas-entram-nos-postes"
+          "ponto": "cadeira-trabalhada: espessuraDaRipa=55",
+          "restricao": "ripa-cabe-na-perna"
         },
         {
-          "ponto": "cadeira-trabalhada: larguraDasTravessas=600",
-          "restricao": "travessas-cabem-no-assento"
+          "ponto": "cadeira-trabalhada: espessuraDasTravessas=45",
+          "restricao": "travessa-cabe-na-perna"
         },
         {
-          "ponto": "cadeira-trabalhada: larguraDoAssento=440",
-          "restricao": "travessas-cabem-no-assento"
-        },
-        {
-          "ponto": "cadeira-trabalhada: larguraDoAssento=640",
-          "restricao": "travessas-entram-nos-postes"
-        },
-        {
-          "ponto": "cadeira-trabalhada: larguraDoConjuntoDasRipas=60",
-          "restricao": "ripas-tem-largura"
-        },
-        {
-          "ponto": "cadeira-trabalhada: larguraDoConjuntoDasRipas=560",
-          "restricao": "ripas-cabem-no-vao"
+          "ponto": "cadeira-trabalhada: profundidadeDaPerna=25",
+          "restricao": "ripa-cabe-na-perna"
         },
         {
           "ponto": "cadeira-trabalhada: topoDaTravessaAlta=600",
-          "restricao": "travessa-alta-acima-do-assento"
+          "restricao": "ripas-tem-altura-ate-a-travessa"
+        },
+        {
+          "ponto": "cadeira-trabalhada: topoDaTravessaAlta=1140",
+          "restricao": "travessa-alta-encaixa-nos-postes"
+        },
+        {
+          "ponto": "cadeira-trabalhada: topoDasRipas=1100",
+          "restricao": "ripas-abaixo-do-topo-dos-postes"
         }
       ]
     }
