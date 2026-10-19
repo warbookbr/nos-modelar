@@ -16,7 +16,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Costuras topológicas de `lathe` | investigação de núcleo, sem alterar receita por atalho |
 | Endereço único para grupo linear | capacidade semântica aberta |
 | Abertura oblonga | ainda não expressável; não simular com pintura |
-| Contrato genérico de materiais | coberto em 2026-10-19 pelo plano [receitas com material e textura](2026-10-19-receitas-com-material-e-textura.md), na forma de escolha de material por peça e textura gerada; PBR e paleta nova seguem fora |
+| Contrato genérico de materiais | coberto em 2026-10-19 pelo plano [receitas com material e textura](encerrados/2026-10-19-receitas-com-material-e-textura.md), na forma de escolha de material por peça e textura gerada; PBR e paleta nova seguem fora |
 | Movimento e espaço varrido | exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
 | A-4, A-6, A-7, A-8, A-16 e A-29 | capacidades abertas comprovadas, sem inventar IDs novos |
 | Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos geram tubo aberto nas extremidades, e o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha não-manifold, volume incalculável, STEP falha em sólido. Afeta qualquer peça oca. Sem contorno hoje |
@@ -40,6 +40,8 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Tradutor do BlendNet como ferramenta | a [sonda de 2026-10-16](../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/blendnet/RESULTADO.md) traduziu scripts do Blender em esboço sem rodar o Blender, em Python fora do repositório; virar comando do esboço daria rascunho de objeto simples com peças nomeadas em segundos |
 | Objetos do projeto externo como receita de peça e família | depois do plano de material e textura: levar os aparelhos e móveis que o tradutor aceita por inteiro (41 de 66) a perfis de `aparelho-de-caixa` e `movel-de-caixa`, com a forma aprovada pela pessoa e o custo medido |
 | Arredondamento verdadeiro na porta do aparelho | a porta de `aparelho-de-caixa` tem chanfro de 2 mm porque a união com o arredondamento falhou; investigar a falha da união antes de trocar |
+| Teto de chanfro do tradutor de receitas | o tradutor limita o chanfro a 20% da menor medida e corta 247 caixas das 66 receitas; o esboço aceita quase a metade; testar o gate com essas 247 antes de subir o teto |
+| Peças de receita com corte, curva ou afinamento | 16 peças das receitas do projeto externo ficam fora do tradutor, e a torneira de `sanitario_quimico` tem perfil que se cruza na própria receita de origem |
 | Toro no esboço | o esboço não tem a forma de anel ou boia; ela respondeu por 10,6% das recusas do BlendNet e aparece em pneu, alça e argola |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas

@@ -1,15 +1,15 @@
 # Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com a pessoa aprovando forma e textura
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`. O plano [aparelhos de caixa](encerrados/2026-10-16-aparelhos-de-caixa.md) fechou em 2026-10-19; este foi ativado pela pessoa no mesmo dia.
+**Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`. O plano [aparelhos de caixa](2026-10-16-aparelhos-de-caixa.md) fechou em 2026-10-19; este foi ativado pela pessoa no mesmo dia.
 
 ## Problema observado
 
 A pessoa remodelou em 3D objetos do projeto externo e guardou as receitas em `repositorio-externo` (`externo`). A
-[sonda de 2026-10-19](../banco-de-provas/receitas-externas-2026-10-19/README.md) traduziu essas receitas para o esboço: 1.179 das 1.394 peças (85%) viram forma do
+[sonda de 2026-10-19](../../banco-de-provas/receitas-externas-2026-10-19/README.md) traduziu essas receitas para o esboço: 1.179 das 1.394 peças (85%) viram forma do
 esboço, e os sete objetos conferidos ficam reconhecíveis. Duas coisas impedem que o formato de lá e o do Mecanifica sejam um só.
 
 A primeira é que o tradutor descarta o bloco `realista.materiais` da receita (tipo, cor, desgaste, veio de cada material), então o objeto não
@@ -83,12 +83,24 @@ instalado para funcionar.
 
 ## Fechamento
 
-O plano seguinte, a adaptação dos objetos do projeto externo como receita de peça e família do Mecanifica, está no [backlog](BACKLOG.md) e só abre
+O plano seguinte, a adaptação dos objetos do projeto externo como receita de peça e família do Mecanifica, está no [backlog](../BACKLOG.md) e só abre
 com o sim da pessoa. Os aparelhos e os móveis dos 41 objetos que o tradutor já aceita por inteiro são os candidatos naturais a perfis das famílias
 `aparelho-de-caixa` e `movel-de-caixa`.
 
 ## Andamento
 
-Fatia 1 feita em 2026-10-19: o esboço guarda `materiais` e `material` sem interpretar, o acordo mudou e a volta do bloco de materiais está provada em sete receitas. As fatias 2, 3 e 4 rodaram em paralelo no mesmo dia. Tradutor: 59 das 66 receitas e 1.377 das 1.394 peças traduzem (98,8%), com a volta geométrica provada dentro de 0,5 mm e a medida em `tools/mecanifica/receita-externa-medida.mjs`; sobram 16 peças com corte, curva ou afinamento e uma torneira cujo perfil se cruza na própria receita de origem. Exportação: a tolerância de 1 mm do exportador de OBJ deixou de recusar os triângulos dos cantos arredondados, o OBJ sai com `.mtl`, `map_Kd` e coordenadas de textura em escala do mundo, e a conferência no Blender rodou (script em `banco-de-provas/exportacao-2026-10-19/`). Textura: a madeira em Node está em `modulos/textura/`, e a [folha de amostras](../banco-de-provas/textura-2026-10-19/README.md) espera o julgamento da pessoa, com a lista do que difere do Blender.
+Fatia 1 feita em 2026-10-19: o esboço guarda `materiais` e `material` sem interpretar, o acordo mudou e a volta do bloco de materiais está provada em sete receitas. As fatias 2, 3 e 4 rodaram em paralelo no mesmo dia. Tradutor: 59 das 66 receitas e 1.377 das 1.394 peças traduzem (98,8%), com a volta geométrica provada dentro de 0,5 mm e a medida em `tools/mecanifica/receita-externa-medida.mjs`; sobram 16 peças com corte, curva ou afinamento e uma torneira cujo perfil se cruza na própria receita de origem. Exportação: a tolerância de 1 mm do exportador de OBJ deixou de recusar os triângulos dos cantos arredondados, o OBJ sai com `.mtl`, `map_Kd` e coordenadas de textura em escala do mundo, e a conferência no Blender rodou (script em `banco-de-provas/exportacao-2026-10-19/`). Textura: a madeira em Node está em `modulos/textura/`, e a [folha de amostras](../../banco-de-provas/textura-2026-10-19/README.md) espera o julgamento da pessoa, com a lista do que difere do Blender.
 
 A pessoa aprovou a madeira em 2026-10-19, olhando a folha de amostras, com as diferenças para o Blender registradas (anéis mais marcados, desgaste espalhado pelo miolo em vez de só nas quinas). Segue a textura do metal e do tecido, e do liso, que já existe.
+
+A pessoa aprovou o metal e o tecido em 2026-10-19, olhando as folhas, e o liso foi mostrado no fechamento, em `liso-folha.png`.
+
+## Resultado final
+
+Concluído em 2026-10-19. O esboço guarda `materiais` na raiz e `material` na forma, sem interpretar, e o acordo do repositório passou a admitir material como escolha por peça e textura por módulo próprio, sem PBR nem paleta nova. O tradutor `tools/mecanifica/receita-externa.mjs` leva a receita do projeto externo ao esboço e de volta: 59 das 66 receitas e 1.377 das 1.394 peças traduzem (98,8%), a volta geométrica bate dentro de 0,5 mm e o bloco de materiais volta idêntico. O módulo `modulos/textura/` gera em Node a imagem de cor de madeira, metal, tecido e liso, determinística e sem emenda. O exportador de OBJ escreve `.mtl`, `map_Kd` e coordenadas de textura em escala do mundo, a conferência no Blender rodou com o `bpy` e a tolerância de 1 mm, que recusava os cantos arredondados, deixou de recusá-los. A bateria completa passou com os 38 gates verdes antes do envio à main.
+
+Custo medido: a etapa 1 foi minha, e os agentes gastaram 350 mil tokens no tradutor (Haiku, 121 chamadas), 184 mil na exportação (Haiku, 76), 142 mil na madeira e 168 mil no metal e no tecido (Sonnet, 58 e 62), cerca de 850 mil no total.
+
+Achados e se o processo os teria pego: (1) um commit meu foi enviado ao ramo com três testes vermelhos, porque encadeei o envio sem esperar a conferência; o ramo não é a main, mas o hábito é o mesmo de antes, e a regra de rodar os testes do que mudou antes de enviar já está no acordo. (2) Os agentes deixaram 26 MB de PNG numa pasta de prova; o processo não pegou, e agora um teste (`tools/arquitetura/imagem-pesada-no-git.test.mjs`) reprova imagem rastreada acima de 3 MB. (3) A tolerância do exportador de OBJ foi corrigida na ferramenta geral, como o acordo manda. (4) O teto de chanfro de 20% do tradutor corta 247 caixas, e o do esboço aceita quase a metade; está no backlog.
+
+Pendências no backlog: o teto de chanfro, as 16 peças com corte, curva ou afinamento, a torneira do `sanitario_quimico` cujo perfil se cruza na receita de origem, e a adaptação dos objetos do projeto externo como receita de peça e família.

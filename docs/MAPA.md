@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1370 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1371 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -422,7 +422,6 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -540,6 +539,7 @@
 - `2026-10-15-o-aviao-do-esboco-a-receita.md` — O avião do esboço à receita
 - `2026-10-16-aparelhos-de-caixa.md` — Aparelhos de caixa — uma família gera eletrodomésticos e eletrônicos de caixa, provada no forninho elétrico
 - `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
+- `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -1433,6 +1433,7 @@
 ## tools/arquitetura/
 
 - `fronteira-da-bancada.mjs` — fronteira-da-bancada.mjs — a bancada é um módulo, não o centro do projeto.
+- `imagem-pesada-no-git.test.mjs` — imagem-pesada-no-git.test.mjs — nenhuma imagem rastreada passa de 3 MB: o git guarda para sempre o que entra, e agentes despachados já deixaram 26 MB de amos…
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
 - `malha-fora-do-git.test.mjs` — malha-fora-do-git.test.mjs — nenhuma malha importada (.obj ou .mtl) entra no versionamento: o `.gitignore` as cobre, e nenhuma está rastreada.
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.

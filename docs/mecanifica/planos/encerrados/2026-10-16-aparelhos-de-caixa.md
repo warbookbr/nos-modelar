@@ -101,4 +101,4 @@ hash a esvaziou, e a instrução agora manda terminar as faixas antes de pedir o
 
 Os próximos grupos da classe (móveis, instalações, ferramentas) não abrem sem a decisão da pessoa. A recomendação é repetir a receita em
 móveis e em aparelhos sem porta, como caixa de som e roteador. Os objetos do projeto externo, que a pessoa trouxe depois, seguem pelo
-[plano de material e textura](../2026-10-19-receitas-com-material-e-textura.md) e pelo backlog.
+[plano de material e textura](./2026-10-19-receitas-com-material-e-textura.md) e pelo backlog.
