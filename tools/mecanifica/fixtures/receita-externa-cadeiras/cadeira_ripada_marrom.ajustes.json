@@ -1,5 +1,17 @@
 [
-  { "forma": "perna_td", "face": { "eixo": "x", "lado": "max", "para": 153 }, "motivo": "simetria com perna_te (x -302..-237, 65 mm): a espelhada em torno do centro do assento (-74,5) é 88..153; a face externa também passa a coincidir com a de poste_d (153), tirando o degrau de 1 mm" },
-  { "forma": "travessa_topo", "face": { "eixo": "x", "lado": "min", "para": -302 }, "motivo": "a travessa sobrava 12 mm além da face externa de poste_e (-302), que a apoia; a face passa a coincidir com a do poste" },
-  { "forma": "travessa_topo", "face": { "eixo": "x", "lado": "max", "para": 153 }, "motivo": "a travessa sobrava 12 mm além da face externa de poste_d (153), que a apoia; a face passa a coincidir com a do poste" }
+ {"forma":"perna_td","face":{"eixo":"x","lado":"max","para":153},"motivo":"simetria com perna_te (x -302..-237, 65 mm): a espelhada em torno do centro do assento (-74,5) é 88..153; a face externa também passa a coincidir com a de poste_d (153), tirando o degrau de 1 mm"},
+ {"forma":"travessa_topo","face":{"eixo":"x","lado":"min","para":-302},"motivo":"a travessa sobrava 12 mm além da face externa de poste_e (-302), que a apoia; a face passa a coincidir com a do poste"},
+ {"forma":"travessa_topo","face":{"eixo":"x","lado":"max","para":153},"motivo":"a travessa sobrava 12 mm além da face externa de poste_d (153), que a apoia; a face passa a coincidir com a do poste"},
+ {"forma":"ripa_1","face":{"eixo":"y","lado":"max","para":793},"motivo":"o topo para na face de baixo da travessa do topo (y 793) em vez de entrar 24 mm nela"},
+ {"forma":"ripa_2","face":{"eixo":"y","lado":"max","para":793},"motivo":"o topo para na face de baixo da travessa do topo (y 793) em vez de entrar 24 mm nela"},
+ {"forma":"poste_e","face":{"eixo":"y","lado":"max","para":793},"motivo":"o topo para na face de baixo da travessa do topo (y 793) em vez de entrar 24 mm nela"},
+ {"forma":"poste_d","face":{"eixo":"y","lado":"max","para":793},"motivo":"o topo para na face de baixo da travessa do topo (y 793) em vez de entrar 24 mm nela"},
+ {"forma":"perna_fe","face":{"eixo":"z","lado":"min","para":173},"motivo":"a perna tinha 28 mm de profundidade contra 66 de largura; engrossa 38 mm para dentro do assento e fica quadrada"},
+ {"forma":"perna_fd","face":{"eixo":"z","lado":"min","para":173},"motivo":"a perna tinha 28 mm de profundidade contra 66 de largura; engrossa 38 mm para dentro do assento e fica quadrada"},
+ {"forma":"perna_te","face":{"eixo":"z","lado":"max","para":-124},"motivo":"a perna tinha 28 mm de profundidade contra 66 de largura; engrossa 38 mm para dentro do assento e fica quadrada"},
+ {"forma":"perna_td","face":{"eixo":"z","lado":"max","para":-124},"motivo":"a perna tinha 28 mm de profundidade contra 66 de largura; engrossa 38 mm para dentro do assento e fica quadrada"},
+ {"forma":"perna_te","face":{"eixo":"x","lado":"min","para":-314},"motivo":"as pernas de trás ficavam de 7 a 12 mm fora do alinhamento das da frente em x; ficam na mesma coluna"},
+ {"forma":"perna_te","face":{"eixo":"x","lado":"max","para":-244},"motivo":"as pernas de trás ficavam de 7 a 12 mm fora do alinhamento das da frente em x; ficam na mesma coluna"},
+ {"forma":"perna_td","face":{"eixo":"x","lado":"min","para":95},"motivo":"as pernas de trás ficavam de 7 a 12 mm fora do alinhamento das da frente em x; ficam na mesma coluna"},
+ {"forma":"perna_td","face":{"eixo":"x","lado":"max","para":165},"motivo":"as pernas de trás ficavam de 7 a 12 mm fora do alinhamento das da frente em x; ficam na mesma coluna"}
 ]

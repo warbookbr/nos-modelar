@@ -17,6 +17,5 @@
  {"forma":"base","face":{"eixo":"z","lado":"max","para":410},"motivo":"frente da base na dos braços (z 410), antes 10 mm aquém (D3)"},
  {"forma":"base","face":{"eixo":"y","lado":"min","para":85},"motivo":"face de baixo da base na do braço e no topo do pé (y 85), antes 5 mm abaixo"},
  {"forma":"assento","face":{"eixo":"z","lado":"max","para":410},"motivo":"frente do assento na dos braços e da base (z 410), antes 10 mm aquém (D3)"},
- {"forma":"assento","face":{"eixo":"z","lado":"min","para":-120},"motivo":"costas do assento encostam na frente do encosto (z -120), antes folga de 10 mm"},
- {"forma":"encosto","face":{"eixo":"z","lado":"min","para":-420},"motivo":"costas do encosto na traseira da base e dos braços (z -420), antes patamar de 110 mm da base exposto atrás dele (D2)"}
+ {"forma":"assento","face":{"eixo":"z","lado":"min","para":-120},"motivo":"costas do assento encostam na frente do encosto (z -120), antes folga de 10 mm"}
 ]

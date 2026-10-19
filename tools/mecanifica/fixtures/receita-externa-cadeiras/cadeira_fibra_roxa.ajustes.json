@@ -13,5 +13,6 @@
  {"forma":"pes_xy","face":{"eixo":"y","lado":"max","para":90},"motivo":"o topo do pé encosta na face de baixo da base"},
  {"forma":"encosto_vime","face":{"eixo":"x","lado":"min","para":-350},"motivo":"o encosto para na face interna do braço esquerdo e deixa de atravessá-lo (D4)"},
  {"forma":"encosto_vime","face":{"eixo":"x","lado":"max","para":350},"motivo":"o encosto para na face interna do braço direito e deixa de atravessá-lo (D4)"},
- {"forma":"almofada_assento","face":{"eixo":"z","lado":"max","para":350},"motivo":"a frente da almofada fica rente à face frontal da base e dos braços (D5)"}
+ {"forma":"almofada_assento","face":{"eixo":"z","lado":"max","para":350},"motivo":"a frente da almofada fica rente à face frontal da base e dos braços (D5)"},
+ {"forma":"almofada_encosto","deslocar":[0,0,65],"motivo":"a almofada girada entrava 63 mm no encosto de vime (face da frente em z -280); desloca para a frente até a caixa girada ficar rente a essa face"}
 ]

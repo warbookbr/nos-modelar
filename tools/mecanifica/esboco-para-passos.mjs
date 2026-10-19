@@ -174,7 +174,7 @@ export function aplicarAjustes(formas, ajustes) {
     if (i < 0) throw new Error(`ajuste: a forma "${a.forma}" não existe (formas: ${saida.map((f) => f.id).join(', ')})`);
     if (a.remover) { saida.splice(i, 1); feitos.push(a); continue; }
     const f = saida[i]; const g = f.geometria;
-    if (f.tipo !== 'caixa' || !identidade(g.matriz)) throw new Error(`ajuste: a forma "${a.forma}" não é uma caixa sem giro`);
+    if (f.tipo !== 'caixa' || (!a.deslocar && !identidade(g.matriz))) throw new Error(`ajuste: a forma "${a.forma}" não é uma caixa sem giro (só \`deslocar\` aceita caixa girada)`);
     const c = g.caixa;
     if (a.face) {
       const k = { x: 0, y: 1, z: 2 }[a.face.eixo];
@@ -185,8 +185,10 @@ export function aplicarAjustes(formas, ajustes) {
       for (let k = 0; k < 3; k += 1) { c.min[k] += a.deslocar[k]; c.max[k] += a.deslocar[k]; }
     } else throw new Error(`ajuste: "${a.forma}" sem face, deslocar nem remover`);
     if ([0, 1, 2].some((k) => c.max[k] - c.min[k] <= 0)) throw new Error(`ajuste: a caixa "${a.forma}" ficou sem volume`);
-    g.centro = [0, 1, 2].map((k) => (c.min[k] + c.max[k]) / 2);
-    g.largura = c.max[0] - c.min[0]; g.altura = c.max[1] - c.min[1]; g.profundidade = c.max[2] - c.min[2];
+    if (identidade(g.matriz)) {
+      g.centro = [0, 1, 2].map((k) => (c.min[k] + c.max[k]) / 2);
+      g.largura = c.max[0] - c.min[0]; g.altura = c.max[1] - c.min[1]; g.profundidade = c.max[2] - c.min[2];
+    } else g.centro = g.centro.map((v, k) => v + a.deslocar[k]);
     feitos.push(a);
   }
   return { formas: saida, feitos };
