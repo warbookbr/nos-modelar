@@ -1,0 +1,13 @@
+[
+  {"forma": "base", "face": {"eixo": "x", "lado": "min", "para": -310}, "motivo": "A base ficava 10 mm afastada do braço esquerdo e nada a ligava aos braços; a face passa a encostar na face interna do braço (x -310)."},
+  {"forma": "base", "face": {"eixo": "x", "lado": "max", "para": 310}, "motivo": "Mesma correção do lado direito, para manter a simetria esquerda e direita."},
+  {"forma": "assento", "face": {"eixo": "x", "lado": "min", "para": -310}, "motivo": "O assento acompanha a base e encosta no braço esquerdo, sem folga de 10 mm."},
+  {"forma": "assento", "face": {"eixo": "x", "lado": "max", "para": 310}, "motivo": "O assento acompanha a base e encosta no braço direito."},
+  {"forma": "assento", "face": {"eixo": "z", "lado": "min", "para": -120}, "motivo": "A face de trás do assento (z -110) deixava 10 mm de folga até a frente do encosto (z -120); passam a se encostar."},
+  {"forma": "encosto", "face": {"eixo": "x", "lado": "min", "para": -310}, "motivo": "O encosto (x -320) entrava 10 mm no braço esquerdo; a face passa a encostar na face interna do braço."},
+  {"forma": "encosto", "face": {"eixo": "x", "lado": "max", "para": 310}, "motivo": "O encosto (x 320) entrava 10 mm no braço direito; mesma correção, simétrica."},
+  {"forma": "pes", "deslocar": [-10, 0, 10], "motivo": "Pé da frente esquerdo: face de fora alinhada à do braço (x -450) e face da frente alinhada à ponta do braço (z 410)."},
+  {"forma": "pes_x", "deslocar": [10, 0, 10], "motivo": "Pé da frente direito: face de fora em x 450 e face da frente em z 410, como o esquerdo."},
+  {"forma": "pes_y", "deslocar": [-10, 0, -20], "motivo": "Pé de trás esquerdo: face de fora em x -450 e face de trás alinhada ao braço (z -420), em vez de recuada 20 mm."},
+  {"forma": "pes_xy", "deslocar": [10, 0, -20], "motivo": "Pé de trás direito: face de fora em x 450 e face de trás em z -420, como o esquerdo."}
+]
