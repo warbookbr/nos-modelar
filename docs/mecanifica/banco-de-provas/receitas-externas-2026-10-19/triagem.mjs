@@ -1,8 +1,11 @@
 /* Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`.
    Mede a caixa envolvente aproximada (peças sem giro; o cilindro entra pela caixa do eixo), conta peças e recusas do tradutor, e marca a família do
    Mecanifica que já cobre o grupo ou a que falta. */
-import { readdirSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { receitaParaEsboco } from '../../../../tools/mecanifica/receita-externa.mjs';
 
 const MARCAS = /fabricante_a|fabricante_b|fabricante_c|fabricante_d|fabricante_e|fabricante_f|fabricante_g|fabricante_h/;
@@ -31,21 +34,32 @@ function caixa(r) {
   return max.map((v, i) => Math.round((v - min[i]) * 1000)); // x largura, y profundidade, z altura, em mm
 }
 
+const RAIZ = fileURLToPath(new URL('../../../../', import.meta.url));
+const tmp = mkdtempSync(join(tmpdir(), 'triagem-'));
+/* O portão de contato do esboço sobre o alvo traduzido: quantas peças se atravessam e quantas ficam soltas. É o que revela os defeitos de posicionamento da própria receita de origem. */
+function contatos(esboco, id) {
+  const arq = join(tmp, `${id}.esboco.json`);
+  writeFileSync(arq, JSON.stringify(esboco));
+  const saida = spawnSync('node', [join(RAIZ, 'tools/mecanifica/esboco.mjs'), arq, '--descrever'], { encoding: 'utf8' }).stdout;
+  return { atravessa: (saida.match(/\batravessa:/g) ?? []).length, solto: (saida.match(/\bsolto:/g) ?? []).length };
+}
+
 const pasta = process.argv[2];
 const linhas = readdirSync(pasta).filter((f) => f.endsWith('.json')).sort().map((f) => {
   const r = JSON.parse(readFileSync(join(pasta, f), 'utf8'));
-  const { recusas } = receitaParaEsboco(r);
+  const { esboco, recusas } = receitaParaEsboco(r);
+  const c = contatos(esboco, r.id);
   const [, grupo, familia] = grupoDe(r.id);
   const [l, p, a] = caixa(r);
-  return { id: r.id, grupo, familia, pecas: r.pecas.length, recusas: recusas.filter((x) => x.motivo).length, l, p, a, marca: MARCAS.test(r.id) };
+  return { id: r.id, grupo, familia, pecas: r.pecas.length, recusas: recusas.filter((x) => x.motivo).length, l, p, a, marca: MARCAS.test(r.id), ...c };
 });
 console.log('# Triagem das 66 receitas por família candidata\n');
 console.log('Medidas aproximadas em milímetro (largura × profundidade × altura, peças sem giro). A coluna "marca" marca o objeto cujo nome carrega marca ou fabricante: ele só entra com nome neutro.\n');
 const porGrupo = Map.groupBy(linhas, (x) => x.grupo);
-console.log('| Grupo | Receitas | Peças (mediana) | Recusas | Família candidata |\n|---|---|---|---|---|');
+console.log('| Grupo | Receitas | Peças (mediana) | Recusas | Receitas com peças atravessadas | Família candidata |\n|---|---|---|---|---|---|');
 for (const [g, v] of [...porGrupo].sort((a, b) => b[1].length - a[1].length)) {
   const ps = v.map((x) => x.pecas).sort((a, b) => a - b);
-  console.log(`| ${g} | ${v.length} | ${ps[Math.floor(ps.length / 2)]} | ${v.reduce((s, x) => s + x.recusas, 0)} | ${v[0].familia} |`);
+  console.log(`| ${g} | ${v.length} | ${ps[Math.floor(ps.length / 2)]} | ${v.reduce((s, x) => s + x.recusas, 0)} | ${v.filter((x) => x.atravessa > 0).length} de ${v.length} | ${v[0].familia} |`);
 }
-console.log('\n## Por receita\n\n| Receita | Grupo | Peças | Recusas | L × P × A (mm) | Marca |\n|---|---|---|---|---|---|');
-for (const x of linhas) console.log(`| ${x.id} | ${x.grupo} | ${x.pecas} | ${x.recusas} | ${x.l} × ${x.p} × ${x.a} | ${x.marca ? 'sim' : ''} |`);
+console.log('\n## Por receita\n\n| Receita | Grupo | Peças | Recusas | Atravessa | Solto | L × P × A (mm) | Marca |\n|---|---|---|---|---|---|---|---|');
+for (const x of linhas) console.log(`| ${x.id} | ${x.grupo} | ${x.pecas} | ${x.recusas} | ${x.atravessa} | ${x.solto} | ${x.l} × ${x.p} × ${x.a} | ${x.marca ? 'sim' : ''} |`);
