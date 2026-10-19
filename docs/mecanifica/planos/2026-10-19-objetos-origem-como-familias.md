@@ -96,3 +96,5 @@ Fatia 2, terceira rodada (2026-10-19): a pessoa circulou na isométrica lascas e
 
 A pessoa preferiu converter as cadeiras do esboço traduzido em receita do Mecanifica, em vez da família modelada à mão. A [sonda](../banco-de-provas/receitas-externas-2026-10-19/sonda-passos/RESULTADO.md) mostrou que a conversão é mecânica e sem agente: seis das onze cadeiras saem completas, com a caixa idêntica ao esboço, e as outras cinco pedem traduzir giro, cilindro e extrusão. A família `cadeira` fica no ramo, sem aprovação, como alternativa parametrizada.
 
+A conversão foi estendida (`tools/mecanifica/esboco-para-passos.mjs`): giro, cilindro, extrusão e chanfro. As onze cadeiras convertem sem recusa e com a caixa envolvente idêntica à do esboço, sem agente.
+

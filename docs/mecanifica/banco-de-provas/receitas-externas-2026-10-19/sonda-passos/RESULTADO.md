@@ -17,3 +17,8 @@ A pessoa preferiu converter as cadeiras do esboço traduzido em receita do Mecan
 | cadeira_classica_vinho | 10 | 21 (extrusões, cilindros, giradas) | muito menor |
 
 Seis das onze saem completas e com a caixa idêntica. O que falta para as outras cinco é traduzir três coisas que o núcleo já tem como operações: o giro de uma forma, o cilindro e a extrusão. O chanfro de 2 a 10 mm dos cantos das caixas não entrou (seria um `arredondarAresta` por aresta) e é uma diferença de acabamento em todas. A conversão também copia o que a receita de origem tem de errado (peças atravessadas e desalinhadas); os ajustes da pessoa e qualquer limpeza ficam como passo explícito sobre a receita convertida.
+
+## Extensão (2026-10-19)
+
+A conversão virou a ferramenta `tools/mecanifica/esboco-para-passos.mjs`, com teste, e passou a cobrir o giro (a matriz do esboço vira até três `rotaciona` em torno do centro da forma), o cilindro em qualquer eixo, a extrusão e o chanfro (`chamferBox`). Cada forma é executada sozinha pelo núcleo e conferida contra a do esboço (caixa envolvente em 0,5 mm e, na extrusão, o conjunto dos vértices do perfil); a orientação e o sinal que o núcleo usa em `eixo` e em `rotaciona` saem da própria conferência. As onze cadeiras convertem sem nenhuma recusa, com a caixa envolvente da malha idêntica à do esboço, e as vitorianas (extrusões e cilindros girados, 20 e 26 peças) levam cerca de 0,2 s cada.
+
