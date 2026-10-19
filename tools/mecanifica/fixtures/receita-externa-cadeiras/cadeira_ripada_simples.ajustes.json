@@ -1,0 +1,10 @@
+[
+  { "forma": "pes", "face": { "eixo": "y", "lado": "max", "para": 440 }, "motivo": "topo da perna dianteira encosta na face de baixo do assento (440), sem entrar 10 mm nele" },
+  { "forma": "pes_x", "face": { "eixo": "y", "lado": "max", "para": 440 }, "motivo": "topo da perna dianteira encosta na face de baixo do assento (440), sem entrar 10 mm nele" },
+  { "forma": "pes_y", "face": { "eixo": "y", "lado": "max", "para": 440 }, "motivo": "topo da perna traseira encosta na face de baixo do assento (440), sem entrar 40 mm nele" },
+  { "forma": "pes_xy", "face": { "eixo": "y", "lado": "max", "para": 440 }, "motivo": "topo da perna traseira encosta na face de baixo do assento (440), sem entrar 40 mm nele" },
+  { "forma": "postes_encosto", "face": { "eixo": "y", "lado": "min", "para": 490 }, "motivo": "a base do poste apoia na face de cima do assento (490), sem entrar 10 mm nele" },
+  { "forma": "postes_encosto_x", "face": { "eixo": "y", "lado": "min", "para": 490 }, "motivo": "a base do poste apoia na face de cima do assento (490), sem entrar 10 mm nele" },
+  { "forma": "ripa_3", "face": { "eixo": "x", "lado": "min", "para": -7.5 }, "motivo": "ripa central com 15 mm como as outras quatro, centrada em x=0 (tinha 16 mm)" },
+  { "forma": "ripa_3", "face": { "eixo": "x", "lado": "max", "para": 7.5 }, "motivo": "ripa central com 15 mm como as outras quatro, centrada em x=0 (tinha 16 mm)" }
+]
