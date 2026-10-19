@@ -1,0 +1,411 @@
+{
+ "opcoes": [
+  {
+   "titulo": "televisao_tubo_pequena",
+   "nota": "TV de tubo pequena: corpo da frente cinza com moldura e tela escura opaca, traseira em tronco que afina para tras (prisma eixo x) com relevo central traseiro, base preta chanfrada atras com 3 luzinhas",
+   "formas": [
+    {
+     "id": "corpo_frente",
+     "rotulo": "corpo_frente",
+     "cor": "#737378",
+     "tipo": "caixa",
+     "largura": 733.6,
+     "altura": 639,
+     "profundidade": 95.1,
+     "centro": [
+      -43.5,
+      702.3,
+      62.55
+     ],
+     "chanfro": 12
+    },
+    {
+     "id": "moldura",
+     "rotulo": "moldura",
+     "cor": "#737378",
+     "tipo": "caixa",
+     "largura": 713.6,
+     "altura": 619,
+     "profundidade": 8,
+     "centro": [
+      -43.5,
+      702.3,
+      114.1
+     ],
+     "chanfro": 1.6
+    },
+    {
+     "id": "tela",
+     "rotulo": "tela",
+     "cor": "#181a1c",
+     "tipo": "caixa",
+     "largura": 590,
+     "altura": 425,
+     "profundidade": 6,
+     "centro": [
+      -75,
+      722.5,
+      121.1
+     ],
+     "chanfro": 1.2
+    },
+    {
+     "id": "entrada_fita",
+     "rotulo": "entrada_fita",
+     "cor": "#181a1c",
+     "tipo": "caixa",
+     "largura": 300,
+     "altura": 50,
+     "profundidade": 3,
+     "centro": [
+      -120,
+      455,
+      119.6
+     ],
+     "chanfro": 0.6
+    },
+    {
+     "id": "botao_a",
+     "rotulo": "botao_a",
+     "cor": "#101012",
+     "tipo": "caixa",
+     "largura": 20,
+     "altura": 20,
+     "profundidade": 6,
+     "centro": [
+      110,
+      440,
+      121.1
+     ]
+    },
+    {
+     "id": "botao_b",
+     "rotulo": "botao_b",
+     "cor": "#101012",
+     "tipo": "caixa",
+     "largura": 20,
+     "altura": 20,
+     "profundidade": 6,
+     "centro": [
+      160,
+      440,
+      121.1
+     ]
+    },
+    {
+     "id": "traseira",
+     "rotulo": "traseira",
+     "cor": "#737378",
+     "tipo": "extrusao",
+     "eixo": "x",
+     "perfil": [
+      [
+       20,
+       620
+      ],
+      [
+       -220,
+       620
+      ],
+      [
+       -220,
+       835
+      ],
+      [
+       -165,
+       1005
+      ],
+      [
+       20,
+       1005
+      ]
+     ],
+     "comprimento": 673,
+     "centro": [
+      -18.5,
+      812.5,
+      -100
+     ]
+    },
+    {
+     "id": "traseira_relevo",
+     "rotulo": "traseira_relevo",
+     "cor": "#5f5f64",
+     "tipo": "caixa",
+     "largura": 260,
+     "altura": 215,
+     "profundidade": 30,
+     "centro": [
+      -20,
+      727.5,
+      -230
+     ],
+     "chanfro": 6
+    },
+    {
+     "id": "base_escura",
+     "rotulo": "base_escura",
+     "cor": "#1e1e21",
+     "tipo": "extrusao",
+     "eixo": "x",
+     "perfil": [
+      [
+       20,
+       382.8
+      ],
+      [
+       -180,
+       382.8
+      ],
+      [
+       -220,
+       425
+      ],
+      [
+       -220,
+       625
+      ],
+      [
+       20,
+       625
+      ]
+     ],
+     "comprimento": 673,
+     "centro": [
+      -18.5,
+      503.9,
+      -100
+     ]
+    },
+    {
+     "id": "luz_amarela",
+     "rotulo": "luz_amarela",
+     "cor": "#a59641",
+     "tipo": "caixa",
+     "largura": 30,
+     "altura": 25,
+     "profundidade": 10,
+     "centro": [
+      -215,
+      537.5,
+      -220
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "luz_branca",
+     "rotulo": "luz_branca",
+     "cor": "#c8c8cd",
+     "tipo": "caixa",
+     "largura": 30,
+     "altura": 25,
+     "profundidade": 10,
+     "centro": [
+      -215,
+      487.5,
+      -220
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "luz_vermelha",
+     "rotulo": "luz_vermelha",
+     "cor": "#a0322d",
+     "tipo": "caixa",
+     "largura": 30,
+     "altura": 25,
+     "profundidade": 10,
+     "centro": [
+      -215,
+      437.5,
+      -220
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "grade_lateral",
+     "rotulo": "grade_lateral",
+     "cor": "#525256",
+     "tipo": "caixa",
+     "largura": 9,
+     "altura": 120,
+     "profundidade": 120,
+     "centro": [
+      317.5,
+      710,
+      -130
+     ],
+     "chanfro": 1.8
+    },
+    {
+     "id": "grade_friso_1",
+     "rotulo": "grade_friso_1",
+     "cor": "#161619",
+     "tipo": "caixa",
+     "largura": 8,
+     "altura": 15,
+     "profundidade": 90,
+     "centro": [
+      322,
+      742.5,
+      -130
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "grade_friso_2",
+     "rotulo": "grade_friso_2",
+     "cor": "#161619",
+     "tipo": "caixa",
+     "largura": 8,
+     "altura": 15,
+     "profundidade": 90,
+     "centro": [
+      322,
+      707.5,
+      -130
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "grade_friso_3",
+     "rotulo": "grade_friso_3",
+     "cor": "#161619",
+     "tipo": "caixa",
+     "largura": 8,
+     "altura": 15,
+     "profundidade": 90,
+     "centro": [
+      322,
+      672.5,
+      -130
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "grade_lateral_esq",
+     "rotulo": "grade_lateral_esq",
+     "cor": "#525256",
+     "tipo": "caixa",
+     "largura": 9,
+     "altura": 120,
+     "profundidade": 120,
+     "centro": [
+      -354.5,
+      710,
+      -130
+     ],
+     "chanfro": 1.8
+    },
+    {
+     "id": "grade_esq_friso_1",
+     "rotulo": "grade_esq_friso_1",
+     "cor": "#161619",
+     "tipo": "caixa",
+     "largura": 8,
+     "altura": 15,
+     "profundidade": 90,
+     "centro": [
+      -359,
+      742.5,
+      -130
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "grade_esq_friso_2",
+     "rotulo": "grade_esq_friso_2",
+     "cor": "#161619",
+     "tipo": "caixa",
+     "largura": 8,
+     "altura": 15,
+     "profundidade": 90,
+     "centro": [
+      -359,
+      707.5,
+      -130
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "grade_esq_friso_3",
+     "rotulo": "grade_esq_friso_3",
+     "cor": "#161619",
+     "tipo": "caixa",
+     "largura": 8,
+     "altura": 15,
+     "profundidade": 90,
+     "centro": [
+      -359,
+      672.5,
+      -130
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "reflexo_tela_larga",
+     "rotulo": "reflexo_tela_larga",
+     "cor": "#dce4eb",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "perfil": [
+      [
+       -340,
+       900
+      ],
+      [
+       -240,
+       900
+      ],
+      [
+       -70,
+       620
+      ],
+      [
+       -170,
+       620
+      ]
+     ],
+     "comprimento": 1,
+     "centro": [
+      -205,
+      760,
+      126.6
+     ]
+    },
+    {
+     "id": "reflexo_tela_fina",
+     "rotulo": "reflexo_tela_fina",
+     "cor": "#dce4eb",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "perfil": [
+      [
+       -200,
+       900
+      ],
+      [
+       -190,
+       900
+      ],
+      [
+       -20,
+       620
+      ],
+      [
+       -30,
+       620
+      ]
+     ],
+     "comprimento": 1,
+     "centro": [
+      -110,
+      760,
+      126.6
+     ]
+    }
+   ]
+  }
+ ],
+ "vista": "isometrica"
+}

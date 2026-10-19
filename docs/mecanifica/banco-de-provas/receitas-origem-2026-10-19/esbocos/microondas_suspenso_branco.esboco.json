@@ -1,0 +1,311 @@
+{
+ "opcoes": [
+  {
+   "titulo": "microondas_suspenso_branco",
+   "nota": "Micro-ondas de bancada suspenso (z 81-131 cm): corpo, base, porta com janela, painel com visor e botoes, grades laterais.",
+   "formas": [
+    {
+     "id": "corpo",
+     "rotulo": "corpo",
+     "cor": "#eeeee8",
+     "tipo": "caixa",
+     "largura": 638,
+     "altura": 469.8,
+     "profundidade": 435,
+     "centro": [
+      -58.9,
+      1070.2,
+      -135.9
+     ],
+     "chanfro": 25
+    },
+    {
+     "id": "base_escura",
+     "rotulo": "base_escura",
+     "cor": "#79665d",
+     "tipo": "caixa",
+     "largura": 598,
+     "altura": 22,
+     "profundidade": 395,
+     "centro": [
+      -58.9,
+      825.3,
+      -135.9
+     ],
+     "chanfro": 4
+    },
+    {
+     "id": "porta",
+     "rotulo": "porta",
+     "cor": "#e0dec6",
+     "tipo": "caixa",
+     "largura": 385,
+     "altura": 315,
+     "profundidade": 12,
+     "centro": [
+      -132.5,
+      1057.5,
+      87.6
+     ],
+     "chanfro": 2.4
+    },
+    {
+     "id": "janela",
+     "rotulo": "janela",
+     "cor": "#3a3e52",
+     "tipo": "caixa",
+     "largura": 325,
+     "altura": 230,
+     "profundidade": 5,
+     "centro": [
+      -132.5,
+      1060,
+      95.1
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "painel",
+     "rotulo": "painel",
+     "cor": "#e2e0d6",
+     "tipo": "caixa",
+     "largura": 150,
+     "altura": 410,
+     "profundidade": 10,
+     "centro": [
+      170,
+      1070,
+      86.6
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "visor",
+     "rotulo": "visor",
+     "cor": "#3a3e52",
+     "tipo": "caixa",
+     "largura": 110,
+     "altura": 85,
+     "profundidade": 5,
+     "centro": [
+      170,
+      1192.5,
+      93.1
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "botao0",
+     "rotulo": "botao0",
+     "cor": "#8c4e44",
+     "tipo": "caixa",
+     "largura": 90,
+     "altura": 22,
+     "profundidade": 7,
+     "centro": [
+      170,
+      901,
+      94.1
+     ],
+     "chanfro": 1.4
+    },
+    {
+     "id": "botao1",
+     "rotulo": "botao1",
+     "cor": "#8c4e44",
+     "tipo": "caixa",
+     "largura": 90,
+     "altura": 22,
+     "profundidade": 7,
+     "centro": [
+      170,
+      941,
+      94.1
+     ],
+     "chanfro": 1.4
+    },
+    {
+     "id": "botao2",
+     "rotulo": "botao2",
+     "cor": "#8c4e44",
+     "tipo": "caixa",
+     "largura": 90,
+     "altura": 22,
+     "profundidade": 7,
+     "centro": [
+      170,
+      981,
+      94.1
+     ],
+     "chanfro": 1.4
+    },
+    {
+     "id": "botao3",
+     "rotulo": "botao3",
+     "cor": "#8c4e44",
+     "tipo": "caixa",
+     "largura": 90,
+     "altura": 22,
+     "profundidade": 7,
+     "centro": [
+      170,
+      1021,
+      94.1
+     ],
+     "chanfro": 1.4
+    },
+    {
+     "id": "botao4",
+     "rotulo": "botao4",
+     "cor": "#8c4e44",
+     "tipo": "caixa",
+     "largura": 90,
+     "altura": 22,
+     "profundidade": 7,
+     "centro": [
+      170,
+      1061,
+      94.1
+     ],
+     "chanfro": 1.4
+    },
+    {
+     "id": "botao5",
+     "rotulo": "botao5",
+     "cor": "#8c4e44",
+     "tipo": "caixa",
+     "largura": 90,
+     "altura": 22,
+     "profundidade": 7,
+     "centro": [
+      170,
+      1101,
+      94.1
+     ],
+     "chanfro": 1.4
+    },
+    {
+     "id": "ventilacao_e0",
+     "rotulo": "ventilacao_e0",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      263.1,
+      975.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_e1",
+     "rotulo": "ventilacao_e1",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      263.1,
+      993.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_e2",
+     "rotulo": "ventilacao_e2",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      263.1,
+      1011.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_e3",
+     "rotulo": "ventilacao_e3",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      263.1,
+      1029.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_w0",
+     "rotulo": "ventilacao_w0",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      -380.9,
+      975.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_w1",
+     "rotulo": "ventilacao_w1",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      -380.9,
+      993.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_w2",
+     "rotulo": "ventilacao_w2",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      -380.9,
+      1011.5,
+      -225
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "ventilacao_w3",
+     "rotulo": "ventilacao_w3",
+     "cor": "#bebdb6",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 11,
+     "profundidade": 90,
+     "centro": [
+      -380.9,
+      1029.5,
+      -225
+     ],
+     "chanfro": 1
+    }
+   ]
+  }
+ ],
+ "vista": "isometrica"
+}

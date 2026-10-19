@@ -1,0 +1,673 @@
+{
+ "opcoes": [
+  {
+   "titulo": "lava_loucas_inox",
+   "nota": "Lava-louças compacta de bancada: corpo, porta com junta de rodapé, faixa de painel com display e botões, frisa do tampo, módulo de controle com botão e luzes laranja; traseira com placa-moldura, paine",
+   "formas": [
+    {
+     "id": "corpo",
+     "rotulo": "corpo",
+     "cor": "#c7c6c3",
+     "tipo": "caixa",
+     "largura": 974,
+     "altura": 744.9,
+     "profundidade": 591,
+     "centro": [
+      10.7,
+      372.45,
+      -200.6
+     ],
+     "chanfro": 4
+    },
+    {
+     "id": "porta",
+     "rotulo": "porta",
+     "cor": "#c7c6c3",
+     "tipo": "caixa",
+     "largura": 974,
+     "altura": 535,
+     "profundidade": 15,
+     "centro": [
+      10.7,
+      307.5,
+      102.4
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "faixa_painel",
+     "rotulo": "faixa_painel",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 974,
+     "altura": 140,
+     "profundidade": 10,
+     "centro": [
+      10.7,
+      655,
+      99.9
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "frisa_tampo",
+     "rotulo": "frisa_tampo",
+     "cor": "#b2aca2",
+     "tipo": "caixa",
+     "largura": 979,
+     "altura": 19.9,
+     "profundidade": 20,
+     "centro": [
+      8.2,
+      734.95,
+      104.9
+     ]
+    },
+    {
+     "id": "bloco_controle",
+     "rotulo": "bloco_controle",
+     "cor": "#c8c6be",
+     "tipo": "caixa",
+     "largura": 270,
+     "altura": 105,
+     "profundidade": 5,
+     "centro": [
+      335,
+      662.5,
+      107.4
+     ],
+     "chanfro": 1
+    },
+    {
+     "id": "botao_giratorio",
+     "rotulo": "botao_giratorio",
+     "cor": "#c8c6be",
+     "tipo": "cilindro",
+     "diametro": 50,
+     "comprimento": 15,
+     "eixo": "z",
+     "centro": [
+      350,
+      660,
+      112.4
+     ]
+    },
+    {
+     "id": "moldura_traseira",
+     "rotulo": "moldura_traseira",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 974,
+     "altura": 744.9,
+     "profundidade": 3,
+     "centro": [
+      10.7,
+      372.45,
+      -497.6
+     ]
+    },
+    {
+     "id": "painel_traseiro",
+     "rotulo": "painel_traseiro",
+     "cor": "#969694",
+     "tipo": "caixa",
+     "largura": 804,
+     "altura": 615,
+     "profundidade": 2,
+     "centro": [
+      26,
+      347.5,
+      -500.1
+     ]
+    },
+    {
+     "id": "grade_ventilacao",
+     "rotulo": "grade_ventilacao",
+     "cor": "#969694",
+     "tipo": "caixa",
+     "largura": 287,
+     "altura": 120,
+     "profundidade": 3,
+     "centro": [
+      243.5,
+      158,
+      -502.6
+     ]
+    },
+    {
+     "id": "grade_ventilacao_2",
+     "rotulo": "grade_ventilacao_2",
+     "cor": "#969694",
+     "tipo": "caixa",
+     "largura": 275,
+     "altura": 120,
+     "profundidade": 3,
+     "centro": [
+      -182.5,
+      165,
+      -502.6
+     ]
+    },
+    {
+     "id": "furo_traseiro",
+     "rotulo": "furo_traseiro",
+     "cor": "#2d2d30",
+     "tipo": "cilindro",
+     "diametro": 80,
+     "comprimento": 6,
+     "eixo": "z",
+     "centro": [
+      290,
+      345,
+      -504.1
+     ]
+    },
+    {
+     "id": "display",
+     "rotulo": "display",
+     "cor": "#0e0e10",
+     "tipo": "caixa",
+     "largura": 175,
+     "altura": 75,
+     "profundidade": 2,
+     "centro": [
+      -127.5,
+      662.5,
+      105.9
+     ]
+    },
+    {
+     "id": "botao_painel_e11",
+     "rotulo": "botao_painel_e11",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 24,
+     "profundidade": 4,
+     "centro": [
+      -413,
+      625,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_e12",
+     "rotulo": "botao_painel_e12",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 24,
+     "profundidade": 4,
+     "centro": [
+      -413,
+      685,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_e21",
+     "rotulo": "botao_painel_e21",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 24,
+     "profundidade": 4,
+     "centro": [
+      -346,
+      625,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_e22",
+     "rotulo": "botao_painel_e22",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 24,
+     "profundidade": 4,
+     "centro": [
+      -346,
+      685,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_e31",
+     "rotulo": "botao_painel_e31",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 24,
+     "profundidade": 4,
+     "centro": [
+      -283,
+      625,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_e32",
+     "rotulo": "botao_painel_e32",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 24,
+     "profundidade": 4,
+     "centro": [
+      -283,
+      685,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_d1",
+     "rotulo": "botao_painel_d1",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 25,
+     "profundidade": 4,
+     "centro": [
+      13.7,
+      652.5,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_d2",
+     "rotulo": "botao_painel_d2",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 25,
+     "profundidade": 4,
+     "centro": [
+      83.7,
+      652.5,
+      106.9
+     ]
+    },
+    {
+     "id": "botao_painel_d3",
+     "rotulo": "botao_painel_d3",
+     "cor": "#5c5c60",
+     "tipo": "caixa",
+     "largura": 28,
+     "altura": 25,
+     "profundidade": 4,
+     "centro": [
+      150,
+      652.5,
+      106.9
+     ]
+    },
+    {
+     "id": "luz_laranja_1",
+     "rotulo": "luz_laranja_1",
+     "cor": "#eb8c28",
+     "tipo": "caixa",
+     "largura": 22,
+     "altura": 40,
+     "profundidade": 2,
+     "centro": [
+      251,
+      665,
+      110.9
+     ]
+    },
+    {
+     "id": "luz_laranja_2",
+     "rotulo": "luz_laranja_2",
+     "cor": "#eb8c28",
+     "tipo": "caixa",
+     "largura": 12,
+     "altura": 20,
+     "profundidade": 2.5,
+     "centro": [
+      350,
+      678,
+      120.15
+     ]
+    },
+    {
+     "id": "ripa_g1_c1_r1",
+     "rotulo": "ripa_g1_c1_r1",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      171.5,
+      113,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c1_r2",
+     "rotulo": "ripa_g1_c1_r2",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      171.5,
+      141,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c1_r3",
+     "rotulo": "ripa_g1_c1_r3",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      171.5,
+      169,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c1_r4",
+     "rotulo": "ripa_g1_c1_r4",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      171.5,
+      197,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c2_r1",
+     "rotulo": "ripa_g1_c2_r1",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      315.5,
+      113,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c2_r2",
+     "rotulo": "ripa_g1_c2_r2",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      315.5,
+      141,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c2_r3",
+     "rotulo": "ripa_g1_c2_r3",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      315.5,
+      169,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g1_c2_r4",
+     "rotulo": "ripa_g1_c2_r4",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 127,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      315.5,
+      197,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c1_r1",
+     "rotulo": "ripa_g2_c1_r1",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -251,
+      120,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c1_r2",
+     "rotulo": "ripa_g2_c1_r2",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -251,
+      148,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c1_r3",
+     "rotulo": "ripa_g2_c1_r3",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -251,
+      176,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c1_r4",
+     "rotulo": "ripa_g2_c1_r4",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -251,
+      204,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c2_r1",
+     "rotulo": "ripa_g2_c2_r1",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -114,
+      120,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c2_r2",
+     "rotulo": "ripa_g2_c2_r2",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -114,
+      148,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c2_r3",
+     "rotulo": "ripa_g2_c2_r3",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -114,
+      176,
+      -504.85
+     ]
+    },
+    {
+     "id": "ripa_g2_c2_r4",
+     "rotulo": "ripa_g2_c2_r4",
+     "cor": "#2d2d30",
+     "tipo": "caixa",
+     "largura": 122,
+     "altura": 10,
+     "profundidade": 1.5,
+     "centro": [
+      -114,
+      204,
+      -504.85
+     ]
+    },
+    {
+     "id": "linha_topo_frente",
+     "rotulo": "linha_topo_frente",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 982,
+     "altura": 6,
+     "profundidade": 4,
+     "centro": [
+      10.7,
+      725.5,
+      116.9
+     ]
+    },
+    {
+     "id": "linha_topo_lat_dir",
+     "rotulo": "linha_topo_lat_dir",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 4,
+     "altura": 6,
+     "profundidade": 615,
+     "centro": [
+      499.7,
+      725.5,
+      -188.6
+     ]
+    },
+    {
+     "id": "linha_topo_lat_esq",
+     "rotulo": "linha_topo_lat_esq",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 4,
+     "altura": 6,
+     "profundidade": 615,
+     "centro": [
+      -478.3,
+      725.5,
+      -188.6
+     ]
+    },
+    {
+     "id": "linha_rodape_frente",
+     "rotulo": "linha_rodape_frente",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 982,
+     "altura": 6,
+     "profundidade": 4,
+     "centro": [
+      10.7,
+      176,
+      111.9
+     ]
+    },
+    {
+     "id": "linha_rodape_lat_dir",
+     "rotulo": "linha_rodape_lat_dir",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 4,
+     "altura": 6,
+     "profundidade": 610,
+     "centro": [
+      499.7,
+      176,
+      -191.1
+     ]
+    },
+    {
+     "id": "linha_rodape_lat_esq",
+     "rotulo": "linha_rodape_lat_esq",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 4,
+     "altura": 6,
+     "profundidade": 610,
+     "centro": [
+      -478.3,
+      176,
+      -191.1
+     ]
+    },
+    {
+     "id": "quina_vertical_dir",
+     "rotulo": "quina_vertical_dir",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 4,
+     "altura": 685,
+     "profundidade": 10,
+     "centro": [
+      499.7,
+      382.5,
+      113.9
+     ]
+    },
+    {
+     "id": "quina_vertical_esq",
+     "rotulo": "quina_vertical_esq",
+     "cor": "#141416",
+     "tipo": "caixa",
+     "largura": 4,
+     "altura": 685,
+     "profundidade": 10,
+     "centro": [
+      -478.3,
+      382.5,
+      113.9
+     ]
+    }
+   ]
+  }
+ ],
+ "vista": "isometrica"
+}

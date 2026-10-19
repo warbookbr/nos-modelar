@@ -1,0 +1,226 @@
+{
+ "opcoes": [
+  {
+   "titulo": "balcao_alto_marrom",
+   "nota": "",
+   "formas": [
+    {
+     "id": "tampo",
+     "rotulo": "tampo",
+     "cor": "#582e12",
+     "tipo": "caixa",
+     "largura": 1047,
+     "altura": 106.6,
+     "profundidade": 622.2,
+     "centro": [
+      -43.6,
+      1098.3,
+      -173.5
+     ],
+     "chanfro": 8
+    },
+    {
+     "id": "corpo",
+     "rotulo": "corpo",
+     "cor": "#542808",
+     "tipo": "caixa",
+     "largura": 997,
+     "altura": 955,
+     "profundidade": 572.2,
+     "centro": [
+      -43.6,
+      567.5,
+      -173.5
+     ],
+     "chanfro": 5
+    },
+    {
+     "id": "rodape",
+     "rotulo": "rodape",
+     "cor": "#784218",
+     "tipo": "caixa",
+     "largura": 1047,
+     "altura": 90,
+     "profundidade": 622.2,
+     "centro": [
+      -43.6,
+      45,
+      -173.5
+     ],
+     "chanfro": 5
+    },
+    {
+     "id": "porta_esq",
+     "rotulo": "porta_esq",
+     "cor": "#562a0a",
+     "tipo": "caixa",
+     "largura": 480,
+     "altura": 925,
+     "profundidade": 20,
+     "centro": [
+      -295,
+      567.5,
+      122.6
+     ],
+     "chanfro": 4
+    },
+    {
+     "id": "porta_dir",
+     "rotulo": "porta_dir",
+     "cor": "#562a0a",
+     "tipo": "caixa",
+     "largura": 493,
+     "altura": 925,
+     "profundidade": 20,
+     "centro": [
+      201.5,
+      567.5,
+      122.6
+     ],
+     "chanfro": 4
+    },
+    {
+     "id": "moldura_porta_esq_base",
+     "rotulo": "moldura_porta_esq_base",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 420,
+     "altura": 6,
+     "profundidade": 4,
+     "centro": [
+      -295,
+      138,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_esq_topo",
+     "rotulo": "moldura_porta_esq_topo",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 420,
+     "altura": 6,
+     "profundidade": 4,
+     "centro": [
+      -295,
+      997,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_esq_lado_esq",
+     "rotulo": "moldura_porta_esq_lado_esq",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 865,
+     "profundidade": 4,
+     "centro": [
+      -502,
+      567.5,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_esq_lado_dir",
+     "rotulo": "moldura_porta_esq_lado_dir",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 865,
+     "profundidade": 4,
+     "centro": [
+      -88,
+      567.5,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_dir_base",
+     "rotulo": "moldura_porta_dir_base",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 433,
+     "altura": 6,
+     "profundidade": 4,
+     "centro": [
+      201.5,
+      138,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_dir_topo",
+     "rotulo": "moldura_porta_dir_topo",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 433,
+     "altura": 6,
+     "profundidade": 4,
+     "centro": [
+      201.5,
+      997,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_dir_lado_esq",
+     "rotulo": "moldura_porta_dir_lado_esq",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 865,
+     "profundidade": 4,
+     "centro": [
+      -12,
+      567.5,
+      133.6
+     ]
+    },
+    {
+     "id": "moldura_porta_dir_lado_dir",
+     "rotulo": "moldura_porta_dir_lado_dir",
+     "cor": "#3c1c06",
+     "tipo": "caixa",
+     "largura": 6,
+     "altura": 865,
+     "profundidade": 4,
+     "centro": [
+      415,
+      567.5,
+      133.6
+     ]
+    },
+    {
+     "id": "puxador_esq",
+     "rotulo": "puxador_esq",
+     "cor": "#3c1c06",
+     "tipo": "cilindro",
+     "diametro": 36,
+     "comprimento": 22,
+     "eixo": "z",
+     "centro": [
+      -125,
+      905,
+      141.6
+     ]
+    },
+    {
+     "id": "puxador_dir",
+     "rotulo": "puxador_dir",
+     "cor": "#3c1c06",
+     "tipo": "cilindro",
+     "diametro": 36,
+     "comprimento": 22,
+     "eixo": "z",
+     "centro": [
+      25,
+      905,
+      141.6
+     ]
+    }
+   ]
+  }
+ ],
+ "vista": "isometrica"
+}

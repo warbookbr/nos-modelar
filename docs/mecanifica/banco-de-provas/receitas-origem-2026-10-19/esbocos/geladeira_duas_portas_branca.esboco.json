@@ -1,0 +1,443 @@
+{
+ "opcoes": [
+  {
+   "titulo": "geladeira_duas_portas_branca",
+   "nota": "Geladeira branca de duas portas, traseira com serpentina e vao do compressor.",
+   "formas": [
+    {
+     "id": "corpo",
+     "rotulo": "corpo",
+     "cor": "#d6d0c0",
+     "tipo": "caixa",
+     "largura": 900,
+     "altura": 1150,
+     "profundidade": 670,
+     "centro": [
+      -50,
+      975,
+      -115
+     ],
+     "chanfro": 35
+    },
+    {
+     "id": "corpo_baixo",
+     "rotulo": "corpo_baixo",
+     "cor": "#d6d0c0",
+     "tipo": "caixa",
+     "largura": 900,
+     "altura": 450,
+     "profundidade": 590,
+     "centro": [
+      -50,
+      225,
+      -75
+     ],
+     "chanfro": 20
+    },
+    {
+     "id": "jamba_esq",
+     "rotulo": "jamba_esq",
+     "cor": "#d6d0c0",
+     "tipo": "caixa",
+     "largura": 40,
+     "altura": 450,
+     "profundidade": 80,
+     "centro": [
+      -480,
+      225,
+      -410
+     ]
+    },
+    {
+     "id": "jamba_dir",
+     "rotulo": "jamba_dir",
+     "cor": "#d6d0c0",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 450,
+     "profundidade": 80,
+     "centro": [
+      372.5,
+      225,
+      -410
+     ]
+    },
+    {
+     "id": "rodape",
+     "rotulo": "rodape",
+     "cor": "#605242",
+     "tipo": "caixa",
+     "largura": 840,
+     "altura": 110,
+     "profundidade": 610,
+     "centro": [
+      -50,
+      5,
+      -115
+     ],
+     "chanfro": 5
+    },
+    {
+     "id": "porta_cima",
+     "rotulo": "porta_cima",
+     "cor": "#d6d0c0",
+     "tipo": "caixa",
+     "largura": 880,
+     "altura": 490,
+     "profundidade": 35,
+     "centro": [
+      -50,
+      1290,
+      232.5
+     ],
+     "chanfro": 7
+    },
+    {
+     "id": "porta_baixo",
+     "rotulo": "porta_baixo",
+     "cor": "#d6d0c0",
+     "tipo": "caixa",
+     "largura": 880,
+     "altura": 955,
+     "profundidade": 35,
+     "centro": [
+      -50,
+      552.5,
+      232.5
+     ],
+     "chanfro": 7
+    },
+    {
+     "id": "vao_compressor",
+     "rotulo": "vao_compressor",
+     "cor": "#3c3834",
+     "tipo": "caixa",
+     "largura": 810,
+     "altura": 290,
+     "profundidade": 5,
+     "centro": [
+      -55,
+      225,
+      -372.5
+     ]
+    },
+    {
+     "id": "compressor",
+     "rotulo": "compressor",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 250,
+     "comprimento": 250,
+     "eixo": "y",
+     "centro": [
+      -80,
+      215,
+      -300
+     ]
+    },
+    {
+     "id": "compressor_tubo",
+     "rotulo": "compressor_tubo",
+     "cor": "#c48c64",
+     "tipo": "caixa",
+     "largura": 45,
+     "altura": 240,
+     "profundidade": 80,
+     "centro": [
+      137.5,
+      220,
+      -380
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "compressor_tubo_azul",
+     "rotulo": "compressor_tubo_azul",
+     "cor": "#96a2b4",
+     "tipo": "cilindro",
+     "diametro": 60,
+     "comprimento": 200,
+     "eixo": "x",
+     "centro": [
+      160,
+      280,
+      -400
+     ]
+    },
+    {
+     "id": "serpentina_fundo",
+     "rotulo": "serpentina_fundo",
+     "cor": "#96a2b4",
+     "tipo": "caixa",
+     "largura": 700,
+     "altura": 960,
+     "profundidade": 10,
+     "centro": [
+      -50,
+      900,
+      -455
+     ]
+    },
+    {
+     "id": "serpentina_moldura_esq",
+     "rotulo": "serpentina_moldura_esq",
+     "cor": "#767e8a",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 960,
+     "profundidade": 15,
+     "centro": [
+      -392.5,
+      900,
+      -457.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "serpentina_moldura_dir",
+     "rotulo": "serpentina_moldura_dir",
+     "cor": "#767e8a",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 960,
+     "profundidade": 15,
+     "centro": [
+      292.5,
+      900,
+      -457.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "serpentina_tubo0",
+     "rotulo": "serpentina_tubo0",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      470,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo1",
+     "rotulo": "serpentina_tubo1",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      595,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo2",
+     "rotulo": "serpentina_tubo2",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      720,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo3",
+     "rotulo": "serpentina_tubo3",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      845,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo4",
+     "rotulo": "serpentina_tubo4",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      970,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo5",
+     "rotulo": "serpentina_tubo5",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      1095,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo6",
+     "rotulo": "serpentina_tubo6",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      1220,
+      -470
+     ]
+    },
+    {
+     "id": "serpentina_tubo7",
+     "rotulo": "serpentina_tubo7",
+     "cor": "#767e8a",
+     "tipo": "cilindro",
+     "diametro": 16,
+     "comprimento": 740,
+     "eixo": "x",
+     "centro": [
+      -50,
+      1345,
+      -470
+     ]
+    },
+    {
+     "id": "puxador_cima_haste",
+     "rotulo": "puxador_cima_haste",
+     "cor": "#c4c4c0",
+     "tipo": "cilindro",
+     "diametro": 22,
+     "comprimento": 240,
+     "eixo": "y",
+     "centro": [
+      -445,
+      1250,
+      284
+     ]
+    },
+    {
+     "id": "puxador_cima_suporte_baixo",
+     "rotulo": "puxador_cima_suporte_baixo",
+     "cor": "#c4c4c0",
+     "tipo": "caixa",
+     "largura": 20,
+     "altura": 40,
+     "profundidade": 36,
+     "centro": [
+      -445,
+      1120,
+      268
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "puxador_cima_suporte_cima",
+     "rotulo": "puxador_cima_suporte_cima",
+     "cor": "#c4c4c0",
+     "tipo": "caixa",
+     "largura": 20,
+     "altura": 40,
+     "profundidade": 36,
+     "centro": [
+      -445,
+      1380,
+      268
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "puxador_baixo_haste",
+     "rotulo": "puxador_baixo_haste",
+     "cor": "#c4c4c0",
+     "tipo": "cilindro",
+     "diametro": 22,
+     "comprimento": 490,
+     "eixo": "y",
+     "centro": [
+      -445,
+      725,
+      284
+     ]
+    },
+    {
+     "id": "puxador_baixo_suporte_baixo",
+     "rotulo": "puxador_baixo_suporte_baixo",
+     "cor": "#c4c4c0",
+     "tipo": "caixa",
+     "largura": 20,
+     "altura": 40,
+     "profundidade": 36,
+     "centro": [
+      -445,
+      470,
+      268
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "puxador_baixo_suporte_cima",
+     "rotulo": "puxador_baixo_suporte_cima",
+     "cor": "#c4c4c0",
+     "tipo": "caixa",
+     "largura": 20,
+     "altura": 40,
+     "profundidade": 36,
+     "centro": [
+      -445,
+      980,
+      268
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "friso_cobre_cima",
+     "rotulo": "friso_cobre_cima",
+     "cor": "#c48c64",
+     "tipo": "caixa",
+     "largura": 9,
+     "altura": 480,
+     "profundidade": 4,
+     "centro": [
+      -488,
+      1290,
+      252
+     ]
+    },
+    {
+     "id": "friso_cobre_baixo",
+     "rotulo": "friso_cobre_baixo",
+     "cor": "#c48c64",
+     "tipo": "caixa",
+     "largura": 9,
+     "altura": 945,
+     "profundidade": 4,
+     "centro": [
+      -488,
+      552.5,
+      252
+     ]
+    }
+   ]
+  }
+ ],
+ "vista": "isometrica"
+}

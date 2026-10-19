@@ -1,0 +1,236 @@
+{
+ "opcoes": [
+  {
+   "titulo": "cadeira_ripada_simples",
+   "nota": "",
+   "formas": [
+    {
+     "id": "pes",
+     "rotulo": "pes",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 450,
+     "profundidade": 55,
+     "centro": [
+      -217.5,
+      225,
+      232.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "pes_x",
+     "rotulo": "pes.x",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 450,
+     "profundidade": 55,
+     "centro": [
+      217.5,
+      225,
+      232.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "pes_y",
+     "rotulo": "pes.y",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 450,
+     "profundidade": 55,
+     "centro": [
+      -217.5,
+      225,
+      -232.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "pes_xy",
+     "rotulo": "pes.xy",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 450,
+     "profundidade": 55,
+     "centro": [
+      217.5,
+      225,
+      -232.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "saia_base",
+     "rotulo": "saia_base",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 470,
+     "altura": 60,
+     "profundidade": 500,
+     "centro": [
+      0,
+      410,
+      0
+     ],
+     "chanfro": 5
+    },
+    {
+     "id": "assento",
+     "rotulo": "assento",
+     "cor": "#783c23",
+     "tipo": "caixa",
+     "largura": 510,
+     "altura": 50,
+     "profundidade": 540,
+     "centro": [
+      0,
+      465,
+      0
+     ],
+     "chanfro": 10
+    },
+    {
+     "id": "postes_encosto",
+     "rotulo": "postes_encosto",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 640,
+     "profundidade": 55,
+     "centro": [
+      -217.5,
+      800,
+      -232.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "postes_encosto_x",
+     "rotulo": "postes_encosto.x",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 55,
+     "altura": 640,
+     "profundidade": 55,
+     "centro": [
+      217.5,
+      800,
+      -232.5
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "travessa_alta",
+     "rotulo": "travessa_alta",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 380,
+     "altura": 100,
+     "profundidade": 30,
+     "centro": [
+      0,
+      1070,
+      -245
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "travessa_baixa",
+     "rotulo": "travessa_baixa",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 380,
+     "altura": 40,
+     "profundidade": 30,
+     "centro": [
+      0,
+      510,
+      -245
+     ],
+     "chanfro": 3
+    },
+    {
+     "id": "ripa_1",
+     "rotulo": "ripa_1",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 490,
+     "profundidade": 17,
+     "centro": [
+      -120,
+      775,
+      -244.5
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "ripa_2",
+     "rotulo": "ripa_2",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 490,
+     "profundidade": 17,
+     "centro": [
+      -60,
+      775,
+      -244.5
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "ripa_3",
+     "rotulo": "ripa_3",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 490,
+     "profundidade": 17,
+     "centro": [
+      0,
+      775,
+      -244.5
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "ripa_4",
+     "rotulo": "ripa_4",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 490,
+     "profundidade": 17,
+     "centro": [
+      60,
+      775,
+      -244.5
+     ],
+     "chanfro": 2
+    },
+    {
+     "id": "ripa_5",
+     "rotulo": "ripa_5",
+     "cor": "#5f301e",
+     "tipo": "caixa",
+     "largura": 15,
+     "altura": 490,
+     "profundidade": 17,
+     "centro": [
+      120,
+      775,
+      -244.5
+     ],
+     "chanfro": 2
+    }
+   ]
+  }
+ ],
+ "vista": "isometrica"
+}

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1342 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -339,6 +339,11 @@
 - `README.md` — Suporte de tubo sem identificador numérico
 - `alvo.md` — Alvo do suporte-tubo
 - `receita.js` — suporte-tubo — suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede.
+
+## docs/mecanifica/banco-de-provas/receitas-origem-2026-10-19/
+
+- `README.md` — Receitas do projeto externo no esboço do Mecanifica (2026-10-19)
+- `receita_para_esboco.mjs` — Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima, z para a fr…
 
 ## docs/mecanifica/gerado/
 
