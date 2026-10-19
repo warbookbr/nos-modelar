@@ -1,0 +1,19 @@
+{
+  "metal": [
+    { "id": "A", "nota": "pintado, sem desgaste (branco do micro-ondas)", "material": { "tipo": "metal", "cor": [238, 238, 232] } },
+    { "id": "B", "nota": "micro-ondas: desgaste 0,2, ferrugem 0,1", "material": { "tipo": "metal", "cor": [238, 238, 232], "desgaste": 0.2, "ferrugem": 0.1 } },
+    { "id": "C", "nota": "geladeira: desgaste 0,5", "material": { "tipo": "metal", "cor": [214, 208, 192], "desgaste": 0.5 } },
+    { "id": "D", "nota": "pintado forçado: desgaste 0,6, ferrugem 0,6", "material": { "tipo": "metal", "cor": [238, 238, 232], "desgaste": 0.6, "ferrugem": 0.6 } },
+    { "id": "E", "nota": "escovado, sem desgaste (cinza da lava-louças)", "material": { "tipo": "metal", "cor": [199, 198, 195] } },
+    { "id": "F", "nota": "lava-louças: escovado, desgaste 0,25", "material": { "tipo": "metal", "cor": [199, 198, 195], "desgaste": 0.25 } },
+    { "id": "G", "nota": "ventilação do micro-ondas: escovado, desgaste 0,25, ferrugem 0,15", "material": { "tipo": "metal", "cor": [190, 189, 182], "desgaste": 0.25, "ferrugem": 0.15 } }
+  ],
+  "tecido": [
+    { "id": "A", "nota": "azul da cadeira moderna, sem desgaste", "material": { "tipo": "tecido", "cor": [50, 60, 120] } },
+    { "id": "B", "nota": "cadeira moderna: desgaste 0,3", "material": { "tipo": "tecido", "cor": [50, 60, 120], "desgaste": 0.3 } },
+    { "id": "C", "nota": "cadeira de madeira: marrom, desgaste 0,35, ferrugem 0,1", "material": { "tipo": "tecido", "cor": [120, 60, 35], "desgaste": 0.35, "ferrugem": 0.1 } },
+    { "id": "D", "nota": "azul, desgaste 0,6", "material": { "tipo": "tecido", "cor": [50, 60, 120], "desgaste": 0.6 } },
+    { "id": "E", "nota": "azul, desgaste 0,3, manchas 0,6", "material": { "tipo": "tecido", "cor": [50, 60, 120], "desgaste": 0.3, "manchas": 0.6 } },
+    { "id": "F", "nota": "azul, desgaste 0,3, rasgos 0,6", "material": { "tipo": "tecido", "cor": [50, 60, 120], "desgaste": 0.3, "rasgos": 0.6 } }
+  ]
+}

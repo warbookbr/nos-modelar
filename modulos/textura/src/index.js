@@ -6,13 +6,16 @@ import { PNG } from 'pngjs';
 import { linearParaSrgb255 } from './cor.js';
 import { aplicarDesgaste } from './desgaste.js';
 import { ErroDeTextura } from './erro.js';
+import { aplicarEstrago } from './estrago.js';
 import { pintarLiso } from './liso.js';
 import { pintarMadeira } from './madeira.js';
+import { ehCinzaMedio, pintarMetal } from './metal.js';
 import { campoDeRuido } from './ruido.js';
+import { pintarTecido } from './tecido.js';
 
 export { ErroDeTextura };
 
-export const METROS_POR_TILE = { madeira: 0.5, liso: 0.5 };
+export const METROS_POR_TILE = { madeira: 0.5, liso: 0.5, metal: 0.5, tecido: 0.5 };
 
 function numero(material, campo, padrao, min, max) {
   const v = material[campo];
@@ -31,7 +34,7 @@ function validarCor(cor) {
 }
 
 /**
- * @param {{tipo: string, cor: number[], desgaste?: number, veio?: number, borda?: number, tabuas?: number, ferrugem?: number}} material
+ * @param {{tipo: string, cor: number[], desgaste?: number, veio?: number, borda?: number, tabuas?: number, ferrugem?: number, manchas?: number, rasgos?: number, acabamento?: string}} material
  * @returns {{largura: number, altura: number, rgba: Uint8ClampedArray, metrosPorTile: number}}
  */
 export function gerarTextura(material, { px = 512, semente = 1 } = {}) {
@@ -39,15 +42,18 @@ export function gerarTextura(material, { px = 512, semente = 1 } = {}) {
   if (!Number.isInteger(px) || px < 16 || px > 4096) throw new ErroDeTextura('px deve ser um inteiro de 16 a 4096.');
   if (typeof semente !== 'number' || !Number.isFinite(semente)) throw new ErroDeTextura('semente deve ser um número.');
   const { tipo } = material;
-  if (tipo === 'metal' || tipo === 'tecido') {
-    throw new ErroDeTextura(`A textura de ${tipo} ainda não existe; só madeira e liso.`);
-  }
-  if (tipo !== 'madeira' && tipo !== 'liso') {
+  if (typeof tipo !== 'string' || !Object.hasOwn(METROS_POR_TILE, tipo)) {
     throw new ErroDeTextura(`Tipo de material desconhecido: ${JSON.stringify(tipo)}.`);
   }
   const cor = validarCor(material.cor);
   const desgaste = numero(material, 'desgaste', 0, 0, 1);
   const ferrugem = numero(material, 'ferrugem', 0, 0, 1);
+  const manchas = numero(material, 'manchas', 0, 0, 1);
+  const rasgos = numero(material, 'rasgos', 0, 0, 1);
+  const { acabamento } = material;
+  if (acabamento !== undefined && acabamento !== 'pintado' && acabamento !== 'escovado') {
+    throw new ErroDeTextura('material.acabamento deve ser "pintado" ou "escovado".');
+  }
   const veio = numero(material, 'veio', 1, 0, 10);
   const borda = numero(material, 'borda', 0, 0, 1);
   const tabuas = numero(material, 'tabuas', 0, 0, 32);
@@ -66,11 +72,14 @@ export function gerarTextura(material, { px = 512, semente = 1 } = {}) {
   };
 
   const col = new Float32Array(px * px * 3);
-  const juntas = tipo === 'madeira'
-    ? pintarMadeira(col, ctx, { cor, veio, borda, tabuas, semente, metros })
-    : pintarLiso(col, ctx, { cor });
+  let juntas = null;
+  if (tipo === 'madeira') juntas = pintarMadeira(col, ctx, { cor, veio, borda, tabuas, semente, metros });
+  else if (tipo === 'metal') pintarMetal(col, ctx, { cor, semente, escovado: acabamento ? acabamento === 'escovado' : ehCinzaMedio(cor) });
+  else if (tipo === 'tecido') pintarTecido(col, ctx, { cor, semente });
+  else pintarLiso(col, ctx, { cor });
   ctx.juntas = juntas;
   if (desgaste > 0) aplicarDesgaste(col, ctx, desgaste, ferrugem);
+  if ((tipo === 'metal' || tipo === 'tecido') && (manchas > 0 || rasgos > 0)) aplicarEstrago(col, ctx, { manchas, rasgos });
 
   const rgba = new Uint8ClampedArray(px * px * 4);
   for (let p = 0; p < px * px; p += 1) {

@@ -100,12 +100,13 @@ describe('gerarTextura', () => {
     expect(t.metrosPorTile).toBe(0.5);
   });
 
-  it('recusa metal e tecido dizendo que ainda não existem, e entradas inválidas', () => {
-    expect(() => gerarTextura({ tipo: 'metal', cor: [1, 2, 3] })).toThrow(ErroDeTextura);
-    expect(() => gerarTextura({ tipo: 'tecido', cor: [1, 2, 3] })).toThrow(/ainda não existe/);
+  it('recusa tipo desconhecido e entradas inválidas', () => {
     expect(() => gerarTextura({ tipo: 'vidro', cor: [1, 2, 3] })).toThrow(/desconhecido/);
+    expect(() => gerarTextura({ tipo: 'toString', cor: [1, 2, 3] })).toThrow(/desconhecido/);
     expect(() => gerarTextura({ tipo: 'madeira' })).toThrow(/cor/);
     expect(() => gerarTextura({ ...madeira, desgaste: 2 })).toThrow(/desgaste/);
+    expect(() => gerarTextura({ tipo: 'metal', cor: [1, 2, 3], acabamento: 'x' })).toThrow(/acabamento/);
+    expect(() => gerarTextura({ tipo: 'tecido', cor: [1, 2, 3], rasgos: 3 })).toThrow(/rasgos/);
     expect(() => gerarTextura(madeira, { px: 3 })).toThrow(/px/);
   });
 });

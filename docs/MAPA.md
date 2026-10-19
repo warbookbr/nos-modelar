@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1365 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1370 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -840,19 +840,24 @@
 ## modulos/textura/scripts/
 
 - `folha-madeira.mjs` — Gera a folha de amostras da madeira: node modulos/textura/scripts/folha-madeira.mjs <pasta-de-saida> [--blender <pasta com blender-A.png ... blender-E.png>] …
+- `folha-metal-tecido.mjs` — Gera as folhas de amostras do metal e do tecido: node modulos/textura/scripts/folha-metal-tecido.mjs <pasta-de-saida> [--blender <pasta com blender-<tipo>-<i…
 
 ## modulos/textura/src/
 
 - `cor.js` — Conversão entre sRGB 0-255 e luz linear 0-1.
 - `desgaste.js` — Camada de uso por cima da cor base (porte de `_aplicar_desgaste` do Blender, em linear): tinta amarelada, encardido, escorridos, ferrugem e tinta lascada.
 - `erro.js` — Erro de entrada ou de tipo de material que o gerador ainda não cobre.
+- `estrago.js` — Estrago por cima do material (porte de `_aplicar_estrago` do Blender, sem `podre`, que é da madeira): manchas irregulares com auréola amarelada de umidade e …
 - `index.js` — Gerador determinístico da imagem de cor de um material, em JavaScript puro (sem Blender, sem Three.js e sem o núcleo do Mecanifica). A entrada é o material n…
 - `liso.js` — Cor chapada de tinta ou plástico com variação suave e ruído fraco (porte de `_liso` do Blender).
 - `madeira.js` — Madeira (porte de `_madeira` do Blender para um tile contínuo).
+- `metal.js` — Metal (porte de `_metal` do Blender para um tile contínuo).
 - `ruido.js` — Ruído determinístico e contínuo nas bordas do tile (gradiente de Perlin com rede periódica). Sem Math.random: todo número vem de um hash inteiro da semente e…
+- `tecido.js` — Tecido (porte de `_tecido` do Blender para um tile contínuo): trama simples de dois fios que se cruzam alternados (xadrez de fios por cima e por baixo), cada…
 
 ## modulos/textura/tests/
 
+- `metal-tecido.test.js` — Testes de metal e tecido: determinismo, tile contínuo, efeito de cada campo, e regressão de madeira e liso.
 - `textura.test.js` — Testes do gerador de textura: determinismo, tile contínuo, veio, tábuas, liso e recusas.
 
 ## modulos/topologia/src/
