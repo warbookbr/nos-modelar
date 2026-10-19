@@ -39,6 +39,8 @@ ele. A definição completa está em
 - [`exportador-cad`](modulos/exportador-cad/) e
   [`exportador-obj`](modulos/exportador-obj/): exportam a malha neutra para STEP
   e para OBJ com partes nomeadas.
+- [`textura`](modulos/textura/): gera em JavaScript a imagem de cor de um
+  material (madeira e liso) como tile contínuo.
 - [`otimizador-malha`](modulos/otimizador-malha/),
   [`preparo-micropoligono`](modulos/preparo-micropoligono/) e
   [`topologia`](modulos/topologia/): reduzem a malha sem mudar a silhueta,

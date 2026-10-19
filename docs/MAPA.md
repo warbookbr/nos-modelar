@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1354 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1365 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -344,6 +344,10 @@
 - `README.md` — Suporte de tubo sem identificador numérico
 - `alvo.md` — Alvo do suporte-tubo
 - `receita.js` — suporte-tubo — suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede.
+
+## docs/mecanifica/banco-de-provas/textura-2026-10-19/
+
+- `README.md` — Madeira em Node ao lado da do Blender (2026-10-19)
 
 ## docs/mecanifica/gerado/
 
@@ -828,6 +832,28 @@
 ## modulos/preparo-micropoligono/tests/
 
 - `preparar.test.js` — preparar.test.js — cada requisito é visto reprovando o seu defeito.
+
+## modulos/textura/
+
+- `README.md` — Textura
+
+## modulos/textura/scripts/
+
+- `folha-madeira.mjs` — Gera a folha de amostras da madeira: node modulos/textura/scripts/folha-madeira.mjs <pasta-de-saida> [--blender <pasta com blender-A.png ... blender-E.png>] …
+
+## modulos/textura/src/
+
+- `cor.js` — Conversão entre sRGB 0-255 e luz linear 0-1.
+- `desgaste.js` — Camada de uso por cima da cor base (porte de `_aplicar_desgaste` do Blender, em linear): tinta amarelada, encardido, escorridos, ferrugem e tinta lascada.
+- `erro.js` — Erro de entrada ou de tipo de material que o gerador ainda não cobre.
+- `index.js` — Gerador determinístico da imagem de cor de um material, em JavaScript puro (sem Blender, sem Three.js e sem o núcleo do Mecanifica). A entrada é o material n…
+- `liso.js` — Cor chapada de tinta ou plástico com variação suave e ruído fraco (porte de `_liso` do Blender).
+- `madeira.js` — Madeira (porte de `_madeira` do Blender para um tile contínuo).
+- `ruido.js` — Ruído determinístico e contínuo nas bordas do tile (gradiente de Perlin com rede periódica). Sem Math.random: todo número vem de um hash inteiro da semente e…
+
+## modulos/textura/tests/
+
+- `textura.test.js` — Testes do gerador de textura: determinismo, tile contínuo, veio, tábuas, liso e recusas.
 
 ## modulos/topologia/src/
 
