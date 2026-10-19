@@ -9,7 +9,7 @@
 ## Problema observado
 
 A pessoa remodelou em 3D objetos do projeto externo e guardou as receitas em `repositorio-externo` (`externo`). A
-[sonda de 2026-10-19](../banco-de-provas/receitas-origem-2026-10-19/README.md) traduziu essas receitas para o esboço: 1.179 das 1.394 peças (85%) viram forma do
+[sonda de 2026-10-19](../banco-de-provas/receitas-externas-2026-10-19/README.md) traduziu essas receitas para o esboço: 1.179 das 1.394 peças (85%) viram forma do
 esboço, e os sete objetos conferidos ficam reconhecíveis. Duas coisas impedem que o formato de lá e o do Mecanifica sejam um só.
 
 A primeira é que o tradutor descarta o bloco `realista.materiais` da receita (tipo, cor, desgaste, veio de cada material), então o objeto não

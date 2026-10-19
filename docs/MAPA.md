@@ -334,16 +334,16 @@
 
 - `RESULTADO.md` — BlendNet para esboço: sonda de tradução barata e determinística
 
+## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/
+
+- `README.md` — Receitas do projeto externo no esboço do Mecanifica (2026-10-19)
+- `receita_para_esboco.mjs` — Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima, z para a fr…
+
 ## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
 
 - `README.md` — Suporte de tubo sem identificador numérico
 - `alvo.md` — Alvo do suporte-tubo
 - `receita.js` — suporte-tubo — suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede.
-
-## docs/mecanifica/banco-de-provas/receitas-origem-2026-10-19/
-
-- `README.md` — Receitas do projeto externo no esboço do Mecanifica (2026-10-19)
-- `receita_para_esboco.mjs` — Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima, z para a fr…
 
 ## docs/mecanifica/gerado/
 
