@@ -39,6 +39,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Atritos abertos da segunda rodada do avião | 38 atritos em seis grupos na [classificação](../banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md#segunda-rodada); a pessoa escolheu em 2026-10-13 a integração do detalhe com o mestre (34, 40, 28, 5, 20, 30, 35, 11, 15 e 9) como o primeiro grupo a puxar, depois do plano do desenho sem referência |
 | Tradutor do BlendNet como ferramenta | a [sonda de 2026-10-16](../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/blendnet/RESULTADO.md) traduziu scripts do Blender em esboço sem rodar o Blender, em Python fora do repositório; virar comando do esboço daria rascunho de objeto simples com peças nomeadas em segundos |
 | Objetos do projeto externo como receita de peça e família | depois do plano de material e textura: levar os aparelhos e móveis que o tradutor aceita por inteiro (41 de 66) a perfis de `aparelho-de-caixa` e `movel-de-caixa`, com a forma aprovada pela pessoa e o custo medido |
+| Arredondamento verdadeiro na porta do aparelho | a porta de `aparelho-de-caixa` tem chanfro de 2 mm porque a união com o arredondamento falhou; investigar a falha da união antes de trocar |
 | Toro no esboço | o esboço não tem a forma de anel ou boia; ela respondeu por 10,6% das recusas do BlendNet e aparece em pneu, alça e argola |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas

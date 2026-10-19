@@ -4,7 +4,7 @@
 
 **Responsável:** Claude, com a pessoa aprovando forma e textura
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`. Ativa quando o plano [aparelhos de caixa](2026-10-16-aparelhos-de-caixa.md) fechar, porque só um plano pode estar ativo.
+**Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`. O plano [aparelhos de caixa](encerrados/2026-10-16-aparelhos-de-caixa.md) fechou em 2026-10-19; este fica pronto, para ativar com o sim da pessoa.
 
 ## Problema observado
 

@@ -10,6 +10,7 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- [Aparelhos de caixa](./2026-10-16-aparelhos-de-caixa.md) foi concluído em 2026-10-19: uma família gera eletrodomésticos e eletrônicos de caixa, e o forninho elétrico, o micro-ondas, a air fryer de forno e a lava-louças compacta foram aprovados em forma pela pessoa, por um processo leve que custou uma fração de uma peça do avião.
 - As [referências visuais e controles da bancada](./2026-09-09-bancada-referencias-e-controles.md)
   foram concluídas em 2026-09-10, com o desenho em
   [DESENHO-bancada-referencias-e-controles.md](./DESENHO-bancada-referencias-e-controles.md).

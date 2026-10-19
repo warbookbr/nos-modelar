@@ -1,6 +1,6 @@
 # Aparelhos de caixa — uma família gera eletrodomésticos e eletrônicos de caixa, provada no forninho elétrico
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com a pessoa aprovando forma
 
@@ -8,12 +8,12 @@
 
 ## Problema observado
 
-A classe "construído e equipamento" da [lista de famílias](../FAMILIAS-DE-OBJETOS.md) tem uns vinte grupos, e modelar cada objeto pelo
+A classe "construído e equipamento" da [lista de famílias](../../FAMILIAS-DE-OBJETOS.md) tem uns vinte grupos, e modelar cada objeto pelo
 caminho do avião custa caro: cada peça dele levou de 400 mil a 1,5 milhão de tokens até o aceite
-([plano do avião](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md)), porque passou por alinhamento, esboço com crítico unidade por
+([plano do avião](2026-10-15-o-aviao-do-esboco-a-receita.md)), porque passou por alinhamento, esboço com crítico unidade por
 unidade, receita e várias rodadas de crítico visual. Um forninho elétrico pelo mesmo caminho custaria uma fração disso só por ser mais
 simples, e a lista tem centenas de objetos. Em 2026-10-16, uma mesa traduzida do Infinigen virou família com as medidas da original por
-250 a 300 mil tokens ([importar objeto de código](encerrados/2026-10-15-importar-objeto-de-codigo.md)): a família custa uma vez e cada
+250 a 300 mil tokens ([importar objeto de código](2026-10-15-importar-objeto-de-codigo.md)): a família custa uma vez e cada
 objeto dela sai como perfil. Boa parte dos eletrodomésticos e eletrônicos tem o mesmo esqueleto, uma caixa com uma frente (porta ou
 tampa, visor, botões, puxador, pés), e o `movel-de-caixa` já resolve caixa com portas, gavetas e pés para móveis.
 
@@ -31,7 +31,7 @@ de cada etapa medido e um processo leve de modelagem escrito para objeto simples
 - **`movel-de-caixa`:** REFATORAR ou ENVOLVER, decidido na fatia 1. Se a frente de aparelho (visor, botões, painel de comando, puxador
   de barra) couber como opção declarada dele sem torná-lo confuso, ele ganha a opção; senão a família nova reaproveita a geometria dele
   e declara só o que é de aparelho. A correção geral vai para a ferramenta, e o que é só de aparelho entra como opção declarada.
-- **Contrato da família e `familias:check`:** USAR DIRETO, como estão ([contrato](../CONTRATO-DA-FAMILIA.md)).
+- **Contrato da família e `familias:check`:** USAR DIRETO, como estão ([contrato](../../CONTRATO-DA-FAMILIA.md)).
 - **Laço de modelagem completo:** ADIAR para objeto complexo. O processo leve usa um modelador, a família e uma ou duas rodadas do
   crítico visual sobre os perfis, sem esboço unidade por unidade, e para na terceira rodada como o laço completo.
 - **Referência:** USAR DIRETO o que existe para imagem de referência (contorno, prancha) só se a pessoa trouxer foto; sem foto, as
@@ -82,3 +82,23 @@ Para e volta à pessoa se a família ficar tão cheia de opções que o modelado
 leve mais da metade de uma peça do avião; ou se a pessoa não reconhecer os aparelhos como realistas depois de três rodadas.
 
 ## Fechamento
+
+Concluído em 2026-10-19. A família `aparelho-de-caixa` (contrato 1.2.0) gera corpo com cantos arredondados, porta com janela e vidro em peça
+própria, cavidade e grelha, painel lateral ou superior, botões giratórios e de pressão, puxador horizontal ou vertical e pés. Os quatro perfis, forninho
+elétrico, micro-ondas, air fryer de forno e lava-louças compacta, foram aprovados em forma pela pessoa em 2026-10-16, e a prancha está em
+`docs/mecanifica/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png`. A decisão da fatia 1 foi família nova, e não opção do
+`movel-de-caixa`.
+
+Custo medido: a família levou cerca de 294 mil tokens e 91 chamadas (100 mil só de leitura), os ajustes do forninho 285 mil e 104 chamadas (45 de
+leitura), e os três perfis seguintes 184 mil e 60 chamadas. Uma peça do avião custou de 400 mil a 1,5 milhão. O forninho pelo processo leve custou
+bem menos da metade de uma peça do avião, então o limite de parada não foi atingido. O processo leve está escrito em
+`.claude/skills/laco-de-modelagem/SKILL.md` e o roteiro `modelar/peca` o aponta.
+
+Achados, e se o processo os teria pego: (1) a tolerância de 1 mm do exportador de OBJ recusa os triângulos pequenos dos cantos arredondados;
+o processo não pegou, e a correção entrou na fatia do exportador do plano de material e textura. (2) A porta tem chanfro e não arredondamento
+verdadeiro, porque a união falhou; está no backlog. (3) Mudar uma faixa de opção esvazia a aprovação da pessoa; o processo pegou, porque o
+hash a esvaziou, e a instrução agora manda terminar as faixas antes de pedir o aceite.
+
+Os próximos grupos da classe (móveis, instalações, ferramentas) não abrem sem a decisão da pessoa. A recomendação é repetir a receita em
+móveis e em aparelhos sem porta, como caixa de som e roteador. Os objetos do projeto externo, que a pessoa trouxe depois, seguem pelo
+[plano de material e textura](../2026-10-19-receitas-com-material-e-textura.md) e pelo backlog.

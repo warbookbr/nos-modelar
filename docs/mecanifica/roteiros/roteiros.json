@@ -300,6 +300,10 @@
         {
           "arquivo": "docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md",
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
+          "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem esboço por unidade"
         }
       ],
       "skill": "criar-peca",
