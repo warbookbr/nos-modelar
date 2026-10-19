@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1414 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1420 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -374,6 +374,13 @@
 - `cadeira_almofadada_clara.md` — Defeitos marcados em cadeira_almofadada_clara
 - `cadeira_ripada_simples.md` — Defeitos marcados em cadeira_ripada_simples
 - `cadeira_larga_estofada_amarela.md` — Defeitos marcados em cadeira_larga_estofada_amarela
+
+## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/
+
+- `RELATORIO.md` — cadeira_ripada_simples: remodelagem em PASSOS
+- `cadeira_ripada_simples.receita.mjs` — cadeira_ripada_simples.receita.mjs — cadeira de madeira simples (4 pernas, assento, saia, 2 postes de encosto, travessa alta e baixa, 5 ripas), remodelada do zero em P…
+- `conferir.mjs` — conferir.mjs — executa a receita de cadeira_ripada_simples pelo executor do repositório e confere: (a) caixa total contra o alvo, (b) simetria esquerda/direita, (c) po…
+- `vistas.mjs` — vistas.mjs — as seis vistas de cadeira_ripada_simples (isométricas frente-direita, trás-esquerda e frente-esquerda, frontal, lateral direita e superior) em cadeira_ripada_simples…
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/sonda-passos/
 
@@ -1278,6 +1285,14 @@
 ## procedural/pecas/braco-robotico/referencias/lateral.prancha.pacote/
 
 - `roteiro.md` — Roteiro da crítica da prancha
+
+## procedural/pecas/cadeira-madeira/
+
+- `receita.js` — cadeira-madeira — cadeira de madeira simples: quatro pernas, assento, saia sob o assento, dois postes de encosto, duas travessas e cinco ripas.
+
+## procedural/pecas/cadeira-madeira/referencias/
+
+- `alvo.md` — Alvo da cadeira de madeira
 
 ## procedural/pecas/suporte-tubo/
 
