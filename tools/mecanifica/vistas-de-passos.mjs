@@ -12,6 +12,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { PNG } from 'pngjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { passosDoEsboco } from './esboco-para-passos.mjs';
 import { receitaParaEsboco } from './receita-externa.mjs';
@@ -30,22 +31,50 @@ export const VISTAS = [
 function hsl(h, s, l) { const a = s * Math.min(l, 1 - l); const f = (n) => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); }; return [f(0), f(8), f(4)].map((x) => Math.round(255 * x)); }
 const corDe = (i, luz) => `rgb(${hsl((i * 47) % 360, 0.55, 0.55 * luz + 0.1).join(',')})`;
 
-/** O quadro SVG de uma vista. A direita da tela é `dir × cima`, a de quem olha na direção `dir`. */
+/** O quadro de uma vista, rasterizado com profundidade por pixel (ordenar polígonos pela profundidade média desenha pontas e cantos errados onde as peças se tocam). A direita da tela é `dir × cima`, a de quem olha na direção `dir`. */
 export function quadroDaVista(polis, indice, [rotulo, d, up], W, H) {
   const dir = unit(d); const direita = unit(cruz(dir, up)); const cima = unit(cruz(direita, dir));
   const itens = [];
   for (const { p, parte } of polis) {
     const n = normal(p);
     if (dot(n, dir) >= -1e-9) continue;
-    itens.push({ pts: p.map((v) => [dot(v, direita), -dot(v, cima)]), prof: p.reduce((s, v) => s + dot(v, dir), 0) / p.length, luz: 0.6 + 0.4 * Math.max(0, dot(n, unit([0.4, 0.9, 0.5]))), parte });
+    itens.push({ pts: p.map((v) => [dot(v, direita), -dot(v, cima), dot(v, dir)]), luz: 0.6 + 0.4 * Math.max(0, dot(n, unit([0.4, 0.9, 0.5]))), parte });
   }
-  itens.sort((a, b) => b.prof - a.prof);
   const xs = itens.flatMap((i) => i.pts.map((q) => q[0])); const ys = itens.flatMap((i) => i.pts.map((q) => q[1]));
   const x0 = Math.min(...xs); const x1 = Math.max(...xs); const y0 = Math.min(...ys); const y1 = Math.max(...ys);
   const e = Math.min((W - 30) / (x1 - x0), (H - 50) / (y1 - y0));
   const dx = W / 2 - ((x0 + x1) / 2) * e; const dy = H / 2 + 8 - ((y0 + y1) / 2) * e;
-  const corpo = itens.map((i) => `<polygon points="${i.pts.map(([x, y]) => `${(x * e + dx).toFixed(1)},${(y * e + dy).toFixed(1)}`).join(' ')}" fill="${corDe(indice.get(i.parte), i.luz)}" stroke="#222" stroke-width="0.8" stroke-linejoin="round"/>`).join('');
-  return `<div class="q"><svg width="${W}" height="${H}">${corpo}</svg><div class="t">${rotulo}</div></div>`;
+  const S = 2; const w = W * S; const h = H * S;
+  const prof = new Float64Array(w * h).fill(Infinity); const quem = new Int32Array(w * h).fill(-1); const rgb = new Uint8Array(w * h * 3).fill(244);
+  for (const it of itens) {
+    const cor = corDe(indice.get(it.parte), it.luz).match(/\d+/g).map(Number);
+    const q = it.pts.map(([x, y, z]) => [(x * e + dx) * S, (y * e + dy) * S, z]);
+    for (let k = 1; k < q.length - 1; k += 1) {
+      const [A, B, C] = [q[0], q[k], q[k + 1]];
+      const den = (B[1] - C[1]) * (A[0] - C[0]) + (C[0] - B[0]) * (A[1] - C[1]);
+      if (Math.abs(den) < 1e-12) continue;
+      for (let py = Math.max(0, Math.floor(Math.min(A[1], B[1], C[1]))); py <= Math.min(h - 1, Math.ceil(Math.max(A[1], B[1], C[1]))); py += 1) {
+        for (let px = Math.max(0, Math.floor(Math.min(A[0], B[0], C[0]))); px <= Math.min(w - 1, Math.ceil(Math.max(A[0], B[0], C[0]))); px += 1) {
+          const X = px + 0.5; const Y = py + 0.5;
+          const l1 = ((B[1] - C[1]) * (X - C[0]) + (C[0] - B[0]) * (Y - C[1])) / den;
+          const l2 = ((C[1] - A[1]) * (X - C[0]) + (A[0] - C[0]) * (Y - C[1])) / den;
+          const l3 = 1 - l1 - l2;
+          if (l1 < -1e-9 || l2 < -1e-9 || l3 < -1e-9) continue;
+          const z = l1 * A[2] + l2 * B[2] + l3 * C[2]; const i = py * w + px;
+          if (z < prof[i] - 1e-6) { prof[i] = z; quem[i] = it.parte === undefined ? -2 : indice.get(it.parte); rgb[i * 3] = cor[0]; rgb[i * 3 + 1] = cor[1]; rgb[i * 3 + 2] = cor[2]; }
+        }
+      }
+    }
+  }
+  const limiar = 2 / e; // salto de profundidade, em milímetro, que conta como contorno
+  for (let y = 0; y < h - 1; y += 1) for (let x = 0; x < w - 1; x += 1) {
+    const i = y * w + x;
+    for (const j of [i + 1, i + w]) if (quem[i] !== quem[j] || Math.abs(prof[i] - prof[j]) > limiar * 4) { for (const m of [quem[i] !== -1 && prof[i] <= prof[j] ? i : j]) { rgb[m * 3] = 34; rgb[m * 3 + 1] = 34; rgb[m * 3 + 2] = 34; } }
+  }
+  const png = new PNG({ width: w, height: h });
+  for (let i = 0; i < w * h; i += 1) { png.data[i * 4] = rgb[i * 3]; png.data[i * 4 + 1] = rgb[i * 3 + 1]; png.data[i * 4 + 2] = rgb[i * 3 + 2]; png.data[i * 4 + 3] = 255; }
+  const uri = `data:image/png;base64,${PNG.sync.write(png).toString('base64')}`;
+  return `<div class="q"><img src="${uri}" width="${W}" height="${H}"><div class="t">${rotulo}</div></div>`;
 }
 
 const identidade = (m) => m.every((l, i) => l.every((v, j) => Math.abs(v - (i === j ? 1 : 0)) < 1e-9));
