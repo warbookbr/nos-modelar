@@ -1,0 +1,7 @@
+[
+  { "forma": "tabua_encosto_1", "face": { "eixo": "y", "lado": "min", "para": 460 }, "motivo": "D1: o pé da tábua entrava 60 mm no assento (y 400); passa a apoiar na face de cima do assento" },
+  { "forma": "tabua_encosto_2", "face": { "eixo": "y", "lado": "min", "para": 460 }, "motivo": "D1: o pé da tábua entrava 60 mm no assento (y 400); passa a apoiar na face de cima do assento" },
+  { "forma": "tabua_encosto_3", "face": { "eixo": "y", "lado": "min", "para": 460 }, "motivo": "D1: o pé da tábua entrava 60 mm no assento (y 400); passa a apoiar na face de cima do assento" },
+  { "forma": "travessa_lateral", "deslocar": [2.5, 0, 0], "motivo": "centra a travessa na espessura da perna (recuo de 22,5 mm nos dois lados, antes 20 e 25), simétrica à do outro lado" },
+  { "forma": "travessa_lateral_x", "deslocar": [-2.5, 0, 0], "motivo": "centra a travessa na espessura da perna (recuo de 22,5 mm nos dois lados, antes 25 e 20), simétrica à do outro lado" }
+]
