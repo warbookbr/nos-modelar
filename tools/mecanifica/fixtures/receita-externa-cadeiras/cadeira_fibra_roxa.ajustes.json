@@ -1,0 +1,17 @@
+[
+ {"forma":"base_vime","face":{"eixo":"x","lado":"min","para":-480},"motivo":"a base acompanha as faces externas dos braços (D1): braços e base ficam rentes, sem balanço, e a caixa envolvente total não muda"},
+ {"forma":"base_vime","face":{"eixo":"x","lado":"max","para":480},"motivo":"a base acompanha as faces externas dos braços (D1)"},
+ {"forma":"base_vime","face":{"eixo":"z","lado":"min","para":-430},"motivo":"a face traseira fica rente à dos braços (D1) e à do encosto (D4)"},
+ {"forma":"base_vime","face":{"eixo":"z","lado":"max","para":350},"motivo":"a face frontal fica rente à dos braços (D1)"},
+ {"forma":"pes","deslocar":[-50,0,-40],"motivo":"o pé acompanha a base alargada e recentra em z (centro da base em -40), com recuo igual de 70 mm na frente e atrás (D3)"},
+ {"forma":"pes_x","deslocar":[50,0,-40],"motivo":"o pé acompanha a base alargada e recentra em z, com recuo igual de 70 mm (D3)"},
+ {"forma":"pes_y","deslocar":[-50,0,-40],"motivo":"o pé acompanha a base alargada e recentra em z, com recuo igual de 70 mm (D3)"},
+ {"forma":"pes_xy","deslocar":[50,0,-40],"motivo":"o pé acompanha a base alargada e recentra em z, com recuo igual de 70 mm (D3)"},
+ {"forma":"pes","face":{"eixo":"y","lado":"max","para":90},"motivo":"o topo do pé encosta na face de baixo da base, em vez de entrar 30 mm nela"},
+ {"forma":"pes_x","face":{"eixo":"y","lado":"max","para":90},"motivo":"o topo do pé encosta na face de baixo da base"},
+ {"forma":"pes_y","face":{"eixo":"y","lado":"max","para":90},"motivo":"o topo do pé encosta na face de baixo da base"},
+ {"forma":"pes_xy","face":{"eixo":"y","lado":"max","para":90},"motivo":"o topo do pé encosta na face de baixo da base"},
+ {"forma":"encosto_vime","face":{"eixo":"x","lado":"min","para":-350},"motivo":"o encosto para na face interna do braço esquerdo e deixa de atravessá-lo (D4)"},
+ {"forma":"encosto_vime","face":{"eixo":"x","lado":"max","para":350},"motivo":"o encosto para na face interna do braço direito e deixa de atravessá-lo (D4)"},
+ {"forma":"almofada_assento","face":{"eixo":"z","lado":"max","para":350},"motivo":"a frente da almofada fica rente à face frontal da base e dos braços (D5)"}
+]
