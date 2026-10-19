@@ -10,7 +10,7 @@ Prova de aparência para a pessoa julgar; nada aqui está aprovado. Todas usam a
 - D: desgaste 0,3, veio 3 (anéis e fibras bem visíveis).
 - E: desgaste 0,3, veio 1, 4 tábuas, borda 0,5.
 
-`madeira-repeticao.png` repete as amostras A e E em 2x2 para mostrar que não há emenda. Os arquivos `madeira-X.png` são os tiles em Node e `blender-X.png` os do Blender.
+`madeira-repeticao.png` repete as amostras A e E em 2x2 para mostrar que não há emenda. Os tiles soltos em Node e os do Blender não ficam no repositório, para não pesar o histórico do git, e as folhas os trazem lado a lado; os scripts em `modulos/textura/scripts/` os regeram.
 
 Diferenças que ficaram: o Blender neste recorte tem anéis retos e regulares, e o Node tem arcos e nós mais marcados, porque o centro do tronco cai dentro do tile de 0,5 m. A cor média do Node é cerca de 6% mais clara. O desgaste do Blender no miolo da face quase não aparece (só nas quinas da peça); o Node, sem quinas num tile, espalha pontos de tinta lascada e ferrugem por cristas de ruído, mais visíveis em C. As juntas entre tábuas e a borda (E) ficaram parecidas.
 
@@ -30,7 +30,7 @@ Diferenças que ficaram: o Node tem o dobro do contraste de textura do Blender n
 
 ## Tecido em Node ao lado do Blender
 
-`tecido-folha.png` segue o mesmo arranjo (Blender à esquerda, Node à direita, semente 1), com as cores das cadeiras. `tecido-X.png`, `blender-tecido-X.png` e `tecido-repeticao.png` (A e F em 2x2) são os arquivos soltos.
+`tecido-folha.png` segue o mesmo arranjo (Blender à esquerda, Node à direita, semente 1), com as cores das cadeiras. Os tiles soltos e a repetição em 2x2 não ficam no repositório, pelo mesmo motivo.
 
 - A: azul da cadeira moderna (50, 60, 120), sem desgaste.
 - B: o mesmo azul, desgaste 0,3.
