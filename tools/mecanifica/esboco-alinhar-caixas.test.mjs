@@ -27,11 +27,11 @@ describe('alinhar caixas', () => {
   });
 
   it('degrau: duas faces que se tocam com 2 mm de diferença ficam iguais; com 8 mm ficam como estão', () => {
-    const duas = (dx) => alinharCaixas(resolvidas([caixa('a', [0, 100], [0, 100], [0, 100]), caixa('b', [0, 100 + dx], [100, 130], [0, 100])]));
+    const duas = (dx) => alinharCaixas(resolvidas([caixa('a', [0, 100], [0, 100], [0, 100]), caixa('b', [0, 100], [100, 130], [0, 100 + dx])]));
     const perto = duas(2).formas;
-    expect(de(perto, 'a').max[0]).toBeCloseTo(de(perto, 'b').max[0], 6);
+    expect(de(perto, 'a').max[2]).toBeCloseTo(de(perto, 'b').max[2], 6);
     const longe = duas(8).formas;
-    expect([de(longe, 'a').max[0], de(longe, 'b').max[0]]).toEqual([100, 108]);
+    expect([de(longe, 'a').max[2], de(longe, 'b').max[2]]).toEqual([100, 108]);
   });
 
   it('folga: o topo da perna a 32 mm do assento é estendido até ele, e a 60 mm não', () => {
