@@ -348,7 +348,7 @@
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/sonda-passos/
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
-- `sonda-passos.mjs` — **SEM CABEÇALHO**
+- `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
 
 ## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
 

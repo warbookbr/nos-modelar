@@ -1,3 +1,4 @@
+/* sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha executada com a do esboço: `node sonda-passos.mjs <receita> <pasta dos esboços>`. Resultado em RESULTADO.md. */
 import { readFileSync } from 'node:fs';
 import { executarReceita } from '../../../../src/autoria/executar-receita.js';
 import { formasResolvidas } from '../../../../modulos/esboco/src/formas-resolvidas.js';
