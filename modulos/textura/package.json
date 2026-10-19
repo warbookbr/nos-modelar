@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Gerador determinístico da imagem de cor de um material (madeira e liso), em JavaScript puro.",
+  "name": "@mecanifica/textura",
+  "version": "0.1.0",
+  "type": "module"
+}
