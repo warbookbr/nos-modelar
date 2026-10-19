@@ -1,0 +1,11 @@
+[
+  {"forma":"base_vime","face":{"eixo":"z","lado":"min","para":-440},"motivo":"D1: a face de trás da base fica rente às dos braços e do encosto (z -440); antes recuava 20 mm."},
+  {"forma":"pes","deslocar":[-10,0,20],"motivo":"D3: o pé da frente à esquerda fica rente à quina da base (x -445, z 340)."},
+  {"forma":"pes_x","deslocar":[10,0,20],"motivo":"D3: o pé da frente à direita fica rente à quina da base (x 435, z 340), espelho do esquerdo em torno de x -5."},
+  {"forma":"pes_y","deslocar":[-10,0,-120],"motivo":"D3: o pé de trás à esquerda fica rente à quina de trás da base (x -445, z -440); antes 120 mm para dentro."},
+  {"forma":"pes_xy","deslocar":[10,0,-120],"motivo":"D3: o pé de trás à direita fica rente à quina de trás da base (x 435, z -440)."},
+  {"forma":"pes","face":{"eixo":"y","lado":"max","para":90},"motivo":"Topo do pé encosta na face de baixo da base (y 90); antes entrava 30 mm."},
+  {"forma":"pes_x","face":{"eixo":"y","lado":"max","para":90},"motivo":"Idem, pé da frente à direita."},
+  {"forma":"pes_y","face":{"eixo":"y","lado":"max","para":90},"motivo":"Idem, pé de trás à esquerda."},
+  {"forma":"pes_xy","face":{"eixo":"y","lado":"max","para":90},"motivo":"Idem, pé de trás à direita."}
+]
