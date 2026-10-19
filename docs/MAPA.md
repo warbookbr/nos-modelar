@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1386 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1388 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1833,6 +1833,8 @@
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `esboco-ajuda.mjs` — A referência do JSON do esboço por tópico: `npm run esboco -- --ajuda [tópico]`. A fonte é o README do módulo. Os tópicos saem dos títulos `##` e `###` dele …
 - `esboco-ajuda.test.mjs` — esboco-ajuda.test.mjs — o `--ajuda [tópico]` do esboço: o índice cobre todos os títulos do README, cada tópico devolve só a sua seção, o tópico desconhecido …
+- `esboco-alinhar-caixas.mjs` — esboco-alinhar-caixas.mjs — alinha as caixas de um esboço onde a receita de origem as deixou desencontradas por pouco. Núcleo puro: recebe as formas resolvid…
+- `esboco-alinhar-caixas.test.mjs` — O alinhamento das caixas de um esboço: simetria, colunas, degrau, contato e folga, com o limite de cada regra, e as onze cadeiras convertem com o alinhamento…
 - `esboco-blocagem-casos.test.mjs` — Os casos mínimos da silhueta pela blocagem do nível zero: cada forma que fez a blocagem se afastar do desenho atual, sozinha numa cena pequena, com o mesmo m…
 - `esboco-blocagem-furo.mjs` — esboco-blocagem-furo.mjs — o fundo que o furo passante de uma forma de família deixa ver nas vistas, medido na blocagem.
 - `esboco-blocagem-recorte.mjs` — esboco-blocagem-recorte.mjs — o que o recorte (`subtrai`) de uma forma tira da silhueta, medido contra o desenho das formas.

@@ -15,6 +15,7 @@
    Núcleo puro: recebe o esboço lido e devolve `{ passos, partes, recusas, conferencias }`. */
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
+import { alinharCaixas } from './esboco-alinhar-caixas.mjs';
 
 const TOLERANCIA_MM = 0.5;
 const LADOS_MINIMOS = 12;
@@ -158,8 +159,10 @@ function passosDaForma(f, origemId) {
  * Os passos da receita de uma opção do esboço.
  * @returns {{ passos: Array, partes: string[], recusas: Array<{forma:string,motivo:string}>, conferencias: Array }}
  */
-export function passosDoEsboco(esboco, { opcao = 1 } = {}) {
+export function passosDoEsboco(esboco, { opcao = 1, alinhar = false } = {}) {
   const dados = formasResolvidas(esboco, opcao);
+  let alteracoes = [];
+  if (alinhar) { const r = alinharCaixas(dados.formas); dados.formas = r.formas; alteracoes = r.alteracoes; }
   const passos = []; const partes = []; const recusas = []; const conferencias = [];
   const usados = new Set();
   let id = 1;
@@ -172,7 +175,7 @@ export function passosDoEsboco(esboco, { opcao = 1 } = {}) {
     conferencias.push({ forma: f.id, tipo: f.tipo, girada: !identidade(f.geometria.matriz) });
     id += 1;
   }
-  return { passos, partes, recusas, conferencias, dados };
+  return { passos, partes, recusas, conferencias, dados, alteracoes };
 }
 
 /** A caixa envolvente (mm) da malha dos passos, para o chamador comparar com a do esboço. */
