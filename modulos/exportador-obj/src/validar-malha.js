@@ -16,6 +16,22 @@ function areaTriangular(a, b, c) {
   return Math.hypot(...cross) / 2;
 }
 
+function distancia(a, b) {
+  return Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+}
+
+/* A altura do triângulo sobre o seu maior lado (2 × área ÷ maior aresta) é um comprimento, então pode ser comparada
+   com a tolerância, que também é um comprimento. Comparar a área com tolerância² tratava 1 mm como 1 mm² e recusava
+   os triângulos de leque dos cantos arredondados. */
+function alturaMinima(a, b, c) {
+  const maior = Math.max(distancia(a, b), distancia(b, c), distancia(c, a));
+  return maior > 0 ? (2 * areaTriangular(a, b, c)) / maior : 0;
+}
+
+/* Fração da tolerância abaixo da qual a altura é tratada como zero (1 mm vira 1 nm). Só separa o triângulo sem área
+   de fato; a geometria real de um canto arredondado fica muito acima. */
+export const FRACAO_DA_TOLERANCIA_PARA_DEGENERADO = 1e-6;
+
 function aresta(a, b) {
   return a < b ? `${a}:${b}` : `${b}:${a}`;
 }
@@ -60,9 +76,10 @@ export function validarMalhaObj(neutro, { tolerancia = 0.001, exigirFechado = fa
       return vertices.get(vertice);
     });
 
+    const limiteDegenerado = tolerancia * FRACAO_DA_TOLERANCIA_PARA_DEGENERADO;
     for (let i = 1; i < pontos.length - 1; i++) {
-      if (areaTriangular(pontos[0], pontos[i], pontos[i + 1]) <= tolerancia * tolerancia) {
-        erro('face-degenerada', 'Face tem área abaixo da tolerância.', { face: id });
+      if (alturaMinima(pontos[0], pontos[i], pontos[i + 1]) <= limiteDegenerado) {
+        erro('face-degenerada', 'Face tem triângulo sem área (altura abaixo da tolerância).', { face: id });
       }
     }
 
@@ -75,7 +92,8 @@ export function validarMalhaObj(neutro, { tolerancia = 0.001, exigirFechado = fa
       incidencias.set(chave, lista);
     }
 
-    faces.push({ id, vs: vs.slice(), parte: face.parte.trim() });
+    const material = typeof face.material === 'string' && face.material.trim() ? face.material.trim() : null;
+    faces.push({ id, vs: vs.slice(), parte: face.parte.trim(), material });
   }
 
   if (exigirFechado) {
