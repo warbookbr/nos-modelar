@@ -47,7 +47,7 @@ export function quadroDaVista(polis, indice, [rotulo, d, up], W, H) {
   const S = 2; const w = W * S; const h = H * S;
   const prof = new Float64Array(w * h).fill(Infinity); const quem = new Int32Array(w * h).fill(-1); const rgb = new Uint8Array(w * h * 3).fill(244);
   for (const it of itens) {
-    const cor = corDe(indice.get(it.parte), it.luz).match(/\d+/g).map(Number);
+    const cor = (indice.has(it.parte) ? corDe(indice.get(it.parte), it.luz).match(/\d+/g).map(Number) : [150, 150, 150]);
     const q = it.pts.map(([x, y, z]) => [(x * e + dx) * S, (y * e + dy) * S, z]);
     for (let k = 1; k < q.length - 1; k += 1) {
       const [A, B, C] = [q[0], q[k], q[k + 1]];
@@ -61,7 +61,7 @@ export function quadroDaVista(polis, indice, [rotulo, d, up], W, H) {
           const l3 = 1 - l1 - l2;
           if (l1 < -1e-9 || l2 < -1e-9 || l3 < -1e-9) continue;
           const z = l1 * A[2] + l2 * B[2] + l3 * C[2]; const i = py * w + px;
-          if (z < prof[i] - 1e-6) { prof[i] = z; quem[i] = it.parte === undefined ? -2 : indice.get(it.parte); rgb[i * 3] = cor[0]; rgb[i * 3 + 1] = cor[1]; rgb[i * 3 + 2] = cor[2]; }
+          if (z < prof[i] - 1e-6) { prof[i] = z; quem[i] = indice.has(it.parte) ? indice.get(it.parte) : -2; rgb[i * 3] = cor[0]; rgb[i * 3 + 1] = cor[1]; rgb[i * 3 + 2] = cor[2]; }
         }
       }
     }
