@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1375 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1382 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -265,6 +265,10 @@
 ## docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/
 
 - `TRADUCAO.md` — O esboço do avião traduzido para o andaime
+
+## docs/mecanifica/banco-de-provas/cadeiras-2026-10-19/
+
+- `medidas.md` — Cadeira: medida de cada perfil contra o esboço alvo
 
 ## docs/mecanifica/banco-de-provas/carrinho-refeito-2026-10-08/
 
@@ -935,6 +939,14 @@
 - `derivar.js` — derivar.js — dos parâmetros do aparelho de caixa (milímetro) à chamada de composição (metro).
 - `geometria.js` — geometria.js — as medidas do aparelho de caixa a partir dos parâmetros da família, em milímetro.
 - `index.js` — index.js — a família `aparelho-de-caixa` carregada: o contrato `familia.json`, as composições e o `derivar`.
+
+## procedural/familias/cadeira/
+
+- `cadeira.test.mjs` — cadeira.test.mjs — a família de cadeira: as combinações, as faixas e restrições, a solidez da malha, o determinismo do hash, as partes nomeadas e uma medida …
+- `composicoes.js` — composicoes.js — as composições procedurais da família `cadeira`, geradas por laço porque a quantidade de tábuas do assento e de ripas, e a presença de poste…
+- `derivar.js` — derivar.js — dos parâmetros da cadeira (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as caixas da cadeira a partir dos parâmetros da família, em milímetro.
+- `index.js` — index.js — a família `cadeira` carregada: o contrato `familia.json`, as composições e o `derivar`.
 
 ## procedural/familias/cilindro-hidraulico/
 
@@ -1771,6 +1783,7 @@
 - `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
 - `banco-de-provas.mjs` — Catálogo e registro de custo do banco de provas de modelagem. Compara autonomia, rodadas, notas e tokens consumidos entre o início e o fim do plano de ferram…
 - `banco-de-provas.test.mjs` — Testes do catálogo do banco de provas e registro de custo de modelagem. Valida esquema de medições, agregação de custo por objeto e cobertura de ferramentas …
+- `cadeiras-medida.mjs` — cadeiras-medida.mjs — a medida da família `cadeira` contra o esboço alvo de cada perfil, e a prancha com os dois lado a lado.
 - `calibracao-do-critico.mjs` — calibracao-do-critico.mjs — o conjunto de calibração do crítico visual e o gate `calibracao:check`.
 - `calibracao-do-critico.test.mjs` — calibracao-do-critico.test.mjs — o gate `calibracao:check`: o conjunto versionado passa, e cada coisa que ele confere reprova quando muda.
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…

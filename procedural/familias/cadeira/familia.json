@@ -1,0 +1,464 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "cadeira",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "larguraDoAssento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 510,
+      "minimo": 440,
+      "maximo": 640,
+      "medio": 520
+    },
+    "profundidadeDoAssento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 540,
+      "minimo": 440,
+      "maximo": 600,
+      "medio": 510
+    },
+    "alturaDoAssento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 490,
+      "minimo": 370,
+      "maximo": 500,
+      "medio": 440
+    },
+    "espessuraDoAssento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 50,
+      "minimo": 35,
+      "maximo": 105,
+      "medio": 60
+    },
+    "tabuasDoAssento": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 6,
+      "medio": 1
+    },
+    "larguraDaPerna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 55,
+      "minimo": 25,
+      "maximo": 75,
+      "medio": 50
+    },
+    "profundidadeDaPerna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 55,
+      "minimo": 25,
+      "maximo": 75,
+      "medio": 50
+    },
+    "recuoLateral": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 10,
+      "minimo": 0,
+      "maximo": 30,
+      "medio": 10
+    },
+    "recuoDeTras": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 10,
+      "minimo": 0,
+      "maximo": 50,
+      "medio": 10
+    },
+    "alturaDaSaia": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 60,
+      "minimo": 0,
+      "maximo": 110,
+      "medio": 0
+    },
+    "saiaNosLados": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 0
+    },
+    "espessuraDaSaia": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 250,
+      "minimo": 15,
+      "maximo": 250,
+      "medio": 30
+    },
+    "alturaDoTravessaoLateral": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 250,
+      "medio": 0
+    },
+    "alturaDosPostes": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1120,
+      "minimo": 0,
+      "maximo": 1150,
+      "medio": 1000
+    },
+    "numeroDeRipas": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 5,
+      "minimo": 1,
+      "maximo": 5,
+      "medio": 3
+    },
+    "larguraDoConjuntoDasRipas": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 255,
+      "minimo": 60,
+      "maximo": 560,
+      "medio": 300
+    },
+    "vaoEntreRipas": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 45,
+      "minimo": 4,
+      "maximo": 100,
+      "medio": 40
+    },
+    "espessuraDaRipa": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 17,
+      "minimo": 15,
+      "maximo": 55,
+      "medio": 25
+    },
+    "baseDasRipas": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 530,
+      "minimo": 380,
+      "maximo": 720,
+      "medio": 560
+    },
+    "topoDasRipas": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1020,
+      "minimo": 780,
+      "maximo": 1100,
+      "medio": 950
+    },
+    "alturaDaTravessaAlta": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 100,
+      "minimo": 0,
+      "maximo": 210,
+      "medio": 100
+    },
+    "topoDaTravessaAlta": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1120,
+      "minimo": 600,
+      "maximo": 1150,
+      "medio": 1000
+    },
+    "alturaDaTravessaBaixa": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 40,
+      "minimo": 0,
+      "maximo": 90,
+      "medio": 40
+    },
+    "larguraDasTravessas": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 384,
+      "minimo": 150,
+      "maximo": 600,
+      "medio": 420
+    },
+    "espessuraDasTravessas": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 12,
+      "maximo": 45,
+      "medio": 30
+    }
+  },
+  "restricoes": [
+    {
+      "id": "pernas-separadas-na-largura",
+      "expressao": "100 + 2 * recuoLateral + 2 * larguraDaPerna <= larguraDoAssento",
+      "motivo": "as pernas de um lado e do outro ficam a menos de 100 mm entre si; use pernas mais finas, menos recuo lateral ou um assento mais largo"
+    },
+    {
+      "id": "pernas-separadas-na-profundidade",
+      "expressao": "70 + recuoDeTras + 2 * profundidadeDaPerna <= profundidadeDoAssento",
+      "motivo": "as pernas da frente e as de trás ficam a menos de 60 mm entre si; use pernas mais finas, menos recuo de trás ou um assento mais fundo"
+    },
+    {
+      "id": "saia-alta-ou-nenhuma",
+      "expressao": "min(1, alturaDaSaia) * (30 - alturaDaSaia) <= 0",
+      "motivo": "a saia tem 0 (sem saia) ou ao menos 30 mm de altura"
+    },
+    {
+      "id": "saia-cabe-sob-o-assento",
+      "expressao": "alturaDaSaia <= alturaDoAssento - espessuraDoAssento - 50",
+      "motivo": "a saia desce da face de baixo do assento e deixa ao menos 50 mm até o chão; use uma saia mais baixa ou um assento mais alto"
+    },
+    {
+      "id": "travessao-alto-ou-nenhum",
+      "expressao": "min(1, alturaDoTravessaoLateral) * (60 - alturaDoTravessaoLateral) <= 0",
+      "motivo": "o travessão lateral tem 0 (sem travessão) ou o centro a ao menos 60 mm do chão"
+    },
+    {
+      "id": "travessao-sob-o-assento",
+      "expressao": "min(1, alturaDoTravessaoLateral) * (alturaDoTravessaoLateral + 20 - (alturaDoAssento - espessuraDoAssento)) <= 0",
+      "motivo": "o travessão lateral fica abaixo do assento; use uma altura menor para ele ou um assento mais alto"
+    },
+    {
+      "id": "postes-altos-ou-nenhum",
+      "expressao": "min(1, alturaDosPostes) * (alturaDoAssento + 250 - alturaDosPostes) <= 0",
+      "motivo": "os postes do encosto têm 0 (as pernas de trás acabam no assento) ou sobem ao menos 250 mm acima do assento"
+    },
+    {
+      "id": "ripas-cabem-no-vao",
+      "expressao": "larguraDoConjuntoDasRipas <= larguraDoAssento - 2 * recuoLateral",
+      "motivo": "o conjunto de ripas passa da largura entre as faces de fora das pernas de trás; use um conjunto mais estreito, menos recuo lateral ou um assento mais largo"
+    },
+    {
+      "id": "ripas-tem-largura",
+      "expressao": "10 * numeroDeRipas + (numeroDeRipas - 1) * vaoEntreRipas <= larguraDoConjuntoDasRipas",
+      "motivo": "com esse vão entre as ripas cada uma ficaria com menos de 10 mm; use menos ripas, um vão menor ou um conjunto mais largo"
+    },
+    {
+      "id": "ripas-acima-do-assento",
+      "expressao": "alturaDoAssento - 100 <= baseDasRipas",
+      "motivo": "as ripas começam mais de 100 mm abaixo do topo do assento; suba a base das ripas ou baixe o assento"
+    },
+    {
+      "id": "ripas-tem-altura",
+      "expressao": "baseDasRipas + 150 <= topoDasRipas",
+      "motivo": "as ripas têm menos de 150 mm de altura; suba o topo ou baixe a base"
+    },
+    {
+      "id": "travessa-alta-ou-nenhuma",
+      "expressao": "min(1, alturaDaTravessaAlta) * (40 - alturaDaTravessaAlta) <= 0",
+      "motivo": "a travessa alta tem 0 (sem travessa) ou ao menos 40 mm de altura"
+    },
+    {
+      "id": "travessa-alta-acima-do-assento",
+      "expressao": "min(1, alturaDaTravessaAlta) * (alturaDoAssento + 50 - (topoDaTravessaAlta - alturaDaTravessaAlta)) <= 0",
+      "motivo": "a travessa alta desce a menos de 50 mm do assento; suba o topo dela ou use uma travessa mais baixa"
+    },
+    {
+      "id": "travessa-baixa-ou-nenhuma",
+      "expressao": "min(1, alturaDaTravessaBaixa) * (20 - alturaDaTravessaBaixa) <= 0",
+      "motivo": "a travessa baixa tem 0 (sem travessa) ou ao menos 20 mm de altura"
+    },
+    {
+      "id": "travessa-baixa-acima-do-assento",
+      "expressao": "min(1, alturaDaTravessaBaixa) * (alturaDoAssento - (baseDasRipas - alturaDaTravessaBaixa)) <= 0",
+      "motivo": "a travessa baixa, que fica sob as ripas, desceria abaixo do topo do assento; suba a base das ripas ou use uma travessa mais baixa"
+    },
+    {
+      "id": "travessas-entram-nos-postes",
+      "expressao": "min(1, alturaDosPostes) * min(1, alturaDaTravessaAlta + alturaDaTravessaBaixa) * (larguraDoAssento - 2 * recuoLateral - 2 * larguraDaPerna + 4 - larguraDasTravessas) <= 0",
+      "motivo": "com postes, as travessas precisam passar do vão entre eles em ao menos 4 mm, para entrar 2 mm em cada poste; use travessas mais largas, pernas mais grossas ou um assento mais estreito"
+    },
+    {
+      "id": "travessas-cabem-no-assento",
+      "expressao": "larguraDasTravessas <= larguraDoAssento",
+      "motivo": "as travessas do encosto são mais largas que o assento; use travessas mais estreitas ou um assento mais largo"
+    }
+  ],
+  "portas": [],
+  "ferramentas": [
+    "booleana"
+  ],
+  "perguntas": {
+    "assento": [
+      "O assento é uma placa (ou tábuas separadas por uma folga) apoiada sobre as pernas, com a altura de uma cadeira?",
+      "As pernas são quatro colunas retas que sobem até a face de baixo do assento e o tocam?"
+    ],
+    "encosto": [
+      "O encosto sobe das pernas de trás ou de postes, com ripas ou uma tábua larga entre eles?",
+      "As travessas, quando existem, prendem as ripas em cima e embaixo e não saem da largura do assento?"
+    ],
+    "estrutura": [
+      "A saia e o travessão, quando existem, ligam as pernas sem passar do chão nem do assento?"
+    ]
+  },
+  "perfis": {
+    "cadeira-de-madeira": {
+      "descricao": "Cadeira de madeira de encosto alto: assento acolchoado sobre um bloco de saia, quatro pernas quadradas, dois postes, cinco ripas finas e duas travessas.",
+      "parametros": {
+        "larguraDoAssento": 510,
+        "profundidadeDoAssento": 540,
+        "alturaDoAssento": 490,
+        "espessuraDoAssento": 50,
+        "tabuasDoAssento": 1,
+        "larguraDaPerna": 55,
+        "profundidadeDaPerna": 55,
+        "recuoLateral": 10,
+        "recuoDeTras": 10,
+        "alturaDaSaia": 60,
+        "saiaNosLados": 1,
+        "espessuraDaSaia": 250,
+        "alturaDoTravessaoLateral": 0,
+        "alturaDosPostes": 1120,
+        "numeroDeRipas": 5,
+        "larguraDoConjuntoDasRipas": 255,
+        "vaoEntreRipas": 45,
+        "espessuraDaRipa": 17,
+        "baseDasRipas": 530,
+        "topoDasRipas": 1020,
+        "alturaDaTravessaAlta": 100,
+        "topoDaTravessaAlta": 1120,
+        "alturaDaTravessaBaixa": 40,
+        "larguraDasTravessas": 384,
+        "espessuraDasTravessas": 30
+      }
+    },
+    "cadeira-trabalhada": {
+      "descricao": "Cadeira de madeira trabalhada, baixa e de assento grosso: pernas retangulares curtas, dois postes e duas ripas largas sob uma travessa alta que passa dos postes.",
+      "parametros": {
+        "larguraDoAssento": 478,
+        "profundidadeDoAssento": 476,
+        "alturaDoAssento": 382.4,
+        "espessuraDoAssento": 88.6,
+        "tabuasDoAssento": 1,
+        "larguraDaPerna": 60,
+        "profundidadeDaPerna": 30,
+        "recuoLateral": 12,
+        "recuoDeTras": 47,
+        "alturaDaSaia": 0,
+        "saiaNosLados": 0,
+        "espessuraDaSaia": 30,
+        "alturaDoTravessaoLateral": 0,
+        "alturaDosPostes": 817.4,
+        "numeroDeRipas": 2,
+        "larguraDoConjuntoDasRipas": 191,
+        "vaoEntreRipas": 81,
+        "espessuraDaRipa": 36,
+        "baseDasRipas": 382.4,
+        "topoDasRipas": 817.4,
+        "alturaDaTravessaAlta": 208.6,
+        "topoDaTravessaAlta": 1001.3,
+        "alturaDaTravessaBaixa": 0,
+        "larguraDasTravessas": 478,
+        "espessuraDasTravessas": 33
+      }
+    },
+    "cadeira-branca-simples": {
+      "descricao": "Cadeira simples de assento grosso: pernas de trás que sobem como postes e uma tábua larga de encosto entre elas, sem travessas nem saia.",
+      "parametros": {
+        "larguraDoAssento": 503.4,
+        "profundidadeDoAssento": 510.4,
+        "alturaDoAssento": 449.5,
+        "espessuraDoAssento": 101.5,
+        "tabuasDoAssento": 1,
+        "larguraDaPerna": 65,
+        "profundidadeDaPerna": 62,
+        "recuoLateral": 12,
+        "recuoDeTras": 18,
+        "alturaDaSaia": 0,
+        "saiaNosLados": 0,
+        "espessuraDaSaia": 30,
+        "alturaDoTravessaoLateral": 0,
+        "alturaDosPostes": 1002.9,
+        "numeroDeRipas": 1,
+        "larguraDoConjuntoDasRipas": 354,
+        "vaoEntreRipas": 4,
+        "espessuraDaRipa": 35,
+        "baseDasRipas": 680,
+        "topoDasRipas": 950,
+        "alturaDaTravessaAlta": 0,
+        "topoDaTravessaAlta": 1000,
+        "alturaDaTravessaBaixa": 0,
+        "larguraDasTravessas": 380,
+        "espessuraDasTravessas": 30
+      }
+    },
+    "cadeira-branca-de-madeira": {
+      "descricao": "Cadeira de madeira com almofada: saias de quatro lados entre as pernas, que encostam no assento, dois postes e cinco ripas entre duas travessas.",
+      "parametros": {
+        "larguraDoAssento": 465.5,
+        "profundidadeDoAssento": 471.7,
+        "alturaDoAssento": 476.5,
+        "espessuraDoAssento": 45,
+        "tabuasDoAssento": 1,
+        "larguraDaPerna": 52,
+        "profundidadeDaPerna": 52,
+        "recuoLateral": 0,
+        "recuoDeTras": 0,
+        "alturaDaSaia": 101.5,
+        "saiaNosLados": 1,
+        "espessuraDaSaia": 20,
+        "alturaDoTravessaoLateral": 0,
+        "alturaDosPostes": 1083.8,
+        "numeroDeRipas": 5,
+        "larguraDoConjuntoDasRipas": 314,
+        "vaoEntreRipas": 46,
+        "espessuraDaRipa": 20,
+        "baseDasRipas": 600,
+        "topoDasRipas": 930,
+        "alturaDaTravessaAlta": 130,
+        "topoDaTravessaAlta": 1060,
+        "alturaDaTravessaBaixa": 80,
+        "larguraDasTravessas": 374,
+        "espessuraDasTravessas": 40
+      }
+    },
+    "cadeira-rustica": {
+      "descricao": "Cadeira rústica de tábuas: assento de cinco tábuas com folga, pernas grossas ligadas por saias na frente e atrás e por travessões laterais baixos, e três tábuas de encosto presas por uma travessa.",
+      "parametros": {
+        "larguraDoAssento": 600,
+        "profundidadeDoAssento": 545,
+        "alturaDoAssento": 460,
+        "espessuraDoAssento": 40,
+        "tabuasDoAssento": 5,
+        "larguraDaPerna": 70,
+        "profundidadeDaPerna": 70,
+        "recuoLateral": 10,
+        "recuoDeTras": 0,
+        "alturaDaSaia": 80,
+        "saiaNosLados": 0,
+        "espessuraDaSaia": 40,
+        "alturaDoTravessaoLateral": 140,
+        "alturaDosPostes": 0,
+        "numeroDeRipas": 3,
+        "larguraDoConjuntoDasRipas": 560,
+        "vaoEntreRipas": 10,
+        "espessuraDaRipa": 55,
+        "baseDasRipas": 400,
+        "topoDasRipas": 1050,
+        "alturaDaTravessaAlta": 50,
+        "topoDaTravessaAlta": 670,
+        "alturaDaTravessaBaixa": 0,
+        "larguraDasTravessas": 560,
+        "espessuraDasTravessas": 15
+      }
+    }
+  }
+}
