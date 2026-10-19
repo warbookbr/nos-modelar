@@ -9,6 +9,52 @@ import { importarReceita } from './importar-receita.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(AQUI, '../..');
+export const CAMINHO_MODULO_TEXTURA = resolve(REPO, 'modulos/textura/src/index.js');
+const PX_TEXTURA_PADRAO = 256;
+
+/* FNV-1a de 32 bits: a semente da textura vem do nome do arquivo e do material, então a mesma saída gera a mesma imagem. */
+export function sementeDe(texto) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < texto.length; i++) {
+    hash ^= texto.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash;
+}
+
+/* O módulo de textura é opcional: só é importado quando a flag --com-textura está ligada. */
+export async function carregarModuloTextura(caminho = CAMINHO_MODULO_TEXTURA) {
+  if (!existsSync(caminho)) {
+    throw new Error(
+      '--com-textura: o módulo de textura não existe neste checkout (esperado em modulos/textura/src/index.js). '
+      + 'A exportação não gerou imagens; exporte sem --com-textura ou aguarde o módulo.',
+    );
+  }
+  const modulo = await import(pathToFileURL(caminho).href);
+  if (typeof modulo.gerarTextura !== 'function' || typeof modulo.texturaParaPng !== 'function') {
+    throw new Error('--com-textura: o módulo de textura precisa exportar gerarTextura e texturaParaPng.');
+  }
+  return modulo;
+}
+
+function materiaisDaMalha(neutro) {
+  const nomes = new Set();
+  for (const face of neutro.F.values()) {
+    if (typeof face.material === 'string' && face.material.trim()) nomes.add(face.material.trim());
+  }
+  return [...nomes].sort();
+}
+
+function gravarAtomico(caminho, bytes) {
+  const tempPath = `${caminho}.tmp.${Date.now()}`;
+  try {
+    writeFileSync(tempPath, bytes);
+    renameSync(tempPath, caminho);
+  } catch (err) {
+    if (existsSync(tempPath)) unlinkSync(tempPath);
+    throw err;
+  }
+}
 
 export function conferirSemOrfaos(nome, orfaos) {
   if (!orfaos || orfaos.length === 0) return;
@@ -30,6 +76,7 @@ export function parseArgs(args = process.argv.slice(2)) {
     diagnosticoJson: false,
     somenteValidar: false,
     exigirFechado: false,
+    comTextura: false,
   };
 
   for (const arg of args) {
@@ -47,6 +94,8 @@ export function parseArgs(args = process.argv.slice(2)) {
       opcoes.sobrescrever = true;
     } else if (arg === '--exigir-fechado') {
       opcoes.exigirFechado = true;
+    } else if (arg === '--com-textura') {
+      opcoes.comTextura = true;
     } else if (arg === '--diagnostico=json') {
       opcoes.diagnosticoJson = true;
     } else if (arg === '--somente-validar') {
@@ -108,6 +157,8 @@ export async function exportarArquivoObj(opcoesArg) {
     diagnosticoJson = false,
     somenteValidar = false,
     exigirFechado = false,
+    comTextura = false,
+    moduloTextura,
   } = opcoesArg;
 
   const escala = resolverEscalaPadrao(unidade, escalaInformada);
@@ -140,6 +191,26 @@ export async function exportarArquivoObj(opcoesArg) {
     return { diagnostico, somenteValidar: true };
   }
 
+  const caminhoSaida = saida
+    ? (isAbsolute(saida) ? resolve(saida) : resolve(process.cwd(), saida))
+    : resolve(REPO, 'exportacoes/obj', `${nomeNormalizado}.obj`);
+
+  /* O .mtl leva o nome do .obj, e as imagens levam o nome do .obj mais o material: tudo na mesma pasta, sem colisão
+     entre objetos diferentes. */
+  const stem = basename(caminhoSaida, '.obj').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const imagens = [];
+  let texturas;
+  if (comTextura) {
+    const modulo = moduloTextura ?? await carregarModuloTextura();
+    texturas = {};
+    for (const material of materiaisDaMalha(neutro)) {
+      const textura = await modulo.gerarTextura(material, { px: PX_TEXTURA_PADRAO, semente: sementeDe(`${stem}:${material}`) });
+      const arquivo = `${stem}_${material}.png`;
+      texturas[material] = { arquivo, metrosPorTile: textura.metrosPorTile };
+      imagens.push({ arquivo, bytes: Buffer.from(await modulo.texturaParaPng(textura)) });
+    }
+  }
+
   const resultado = await exportarObj({
     nome: nomeNormalizado,
     neutro,
@@ -147,26 +218,27 @@ export async function exportarArquivoObj(opcoesArg) {
     tolerancia: normalizadas.tolerancia,
     escala: normalizadas.escala,
     exigirFechado: normalizadas.exigirFechado,
+    texturas,
+    nomeMtl: `${stem}.mtl`,
   });
 
-  const caminhoSaida = saida
-    ? (isAbsolute(saida) ? resolve(saida) : resolve(process.cwd(), saida))
-    : resolve(REPO, 'exportacoes/obj', `${nomeNormalizado}.obj`);
-
-  if (existsSync(caminhoSaida) && !sobrescrever) {
-    throw new Error(`Arquivo de destino já existe: ${caminhoSaida}. Use --sobrescrever para substituir.`);
+  const pastaDestino = dirname(caminhoSaida);
+  const caminhoMtl = resultado.mtl ? join(pastaDestino, resultado.nomeMtl) : null;
+  const destinos = [caminhoSaida, caminhoMtl, ...imagens.map((i) => join(pastaDestino, i.arquivo))].filter(Boolean);
+  if (!sobrescrever) {
+    const existente = destinos.find((caminho) => existsSync(caminho));
+    if (existente) {
+      throw new Error(`Arquivo de destino já existe: ${existente}. Use --sobrescrever para substituir.`);
+    }
   }
 
-  const pastaDestino = dirname(caminhoSaida);
   mkdirSync(pastaDestino, { recursive: true });
-
-  const tempPath = `${caminhoSaida}.tmp.${Date.now()}`;
-  try {
-    writeFileSync(tempPath, resultado.bytes);
-    renameSync(tempPath, caminhoSaida);
-  } catch (err) {
-    if (existsSync(tempPath)) unlinkSync(tempPath);
-    throw err;
+  gravarAtomico(caminhoSaida, resultado.bytes);
+  if (caminhoMtl) {
+    gravarAtomico(caminhoMtl, new TextEncoder().encode(resultado.mtl));
+  }
+  for (const imagem of imagens) {
+    gravarAtomico(join(pastaDestino, imagem.arquivo), imagem.bytes);
   }
 
   const stat = statSync(caminhoSaida);
@@ -174,6 +246,7 @@ export async function exportarArquivoObj(opcoesArg) {
     caminhoSaida,
     caminhoRelativo: relative(REPO, caminhoSaida),
     tamanhoBytes: stat.size,
+    arquivosTextura: [...(caminhoMtl ? [relative(REPO, caminhoMtl)] : []), ...imagens.map((i) => relative(REPO, join(pastaDestino, i.arquivo)))],
     diagnostico: resultado.diagnostico,
     diagnosticoJson,
   };
@@ -189,6 +262,7 @@ async function main() {
       process.stderr.write('  --unidade=<m|cm|mm>     Unidade de exportação (padrão: m)\n');
       process.stderr.write('  --escala=<fator>        Fator multiplicador explícito\n');
       process.stderr.write('  --sobrescrever          Sobrescreve arquivo de destino existente\n');
+      process.stderr.write('  --com-textura           Gera as imagens dos materiais e o .mtl ao lado do .obj (exige modulos/textura)\n');
       process.stderr.write('  --somente-validar       Apenas valida a receita e malha sem gravar\n');
       process.stderr.write('  --diagnostico=json      Emite diagnóstico detalhado em JSON no stdout\n');
       process.exit(1);
@@ -219,6 +293,9 @@ async function main() {
       process.stdout.write(`Corpos:   ${res.diagnostico.totalCorpos}\n`);
       process.stdout.write(`Vértices: ${res.diagnostico.totalVertices}\n`);
       process.stdout.write(`Faces:    ${res.diagnostico.totalTriangulos} triângulos\n`);
+      for (const arquivo of res.arquivosTextura) {
+        process.stdout.write(`Textura:  ${arquivo}\n`);
+      }
     }
   } catch (err) {
     process.stderr.write(`Erro: ${err.message}\n`);

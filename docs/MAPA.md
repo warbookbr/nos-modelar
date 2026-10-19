@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1348 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1353 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -787,16 +787,23 @@
 
 - `exportador-cad.test.js` — exportador-cad.test.js — suíte de testes do exportador CAD cobrindo R01, R02 e R04.
 
+## modulos/exportador-obj/
+
+- `README.md` — Exportador Wavefront OBJ
+
 ## modulos/exportador-obj/src/
 
 - `contrato.js` — contrato.js — tipos, erros e validação de opções do exportador Wavefront OBJ.
-- `gerar-obj.js` — gerar-obj.js — serializador Wavefront OBJ (.obj) puro e determinístico com suporte a multipartes.
+- `gerar-mtl.js` — gerar-mtl.js — serializador do arquivo .mtl que liga cada material à sua imagem. Só escreve a referência: não gera nem grava a imagem.
+- `gerar-obj.js` — gerar-obj.js — serializador Wavefront OBJ (.obj) puro e determinístico com suporte a multipartes e coordenadas de textura.
 - `index.js` — index.js — porta pública do módulo exportador Wavefront OBJ.
 - `validar-malha.js` — validar-malha.js — validação e normalização de malha neutra para exportação OBJ.
 
 ## modulos/exportador-obj/tests/
 
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
+- `textura.test.js` — textura.test.js — material por parte, arquivo .mtl, usemtl, coordenadas vt em mapeamento planar e recusas.
+- `tolerancia.test.js` — tolerancia.test.js — tolerância de triângulo degenerado e regressão de saída sem texturas.
 
 ## modulos/otimizador-malha/src/
 
@@ -1911,6 +1918,7 @@
 
 ## tools/mecanifica/fixtures/
 
+- `fixture-cubo-material.js` — fixture-cubo-material.js — caixa com todas as faces em um material declarado, para a exportação OBJ com texturas.
 - `fixture-cubo.js` — fixture-cubo.js — receita procedural de teste para exportação CAD/STEP.
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
 - `fixture-ombro-uniao.js` — fixture-ombro-uniao.js — fixture neutra copiada em 2026-09-29 do ombro do braço robótico (procedural/pecas/braco-robotico/partes/ombro/receita.js), para os t…
