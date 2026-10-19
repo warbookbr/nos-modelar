@@ -7,7 +7,7 @@
  * material que a parte usa.
  *
  * Forma e medidas: receita externa de poltrona de vime, convertida pelo esboço do Mecanifica e refeita em passos. Esta
- * reescrita mantém a forma da base, com diferença de 0,00 mm nas medidas de cada caixa e na caixa total (x ±480, y 0 a 733,
+ * reescrita mantém a forma da base, com diferença de 0,00 mm nas medidas de cada caixa e na caixa total (x ±480, y 0 a 726,7,
  * z -430 a 350). Mudanças em relação à base: os nomes das partes passam para camelCase sem underscore (pes -> pesFrenteEsq e
  * assim por diante, braco_esq -> bracoEsq), a caixa da almofada do encosto passa a ter o pivô e o giro na TABELA, e cada parte
  * recebe o material declarado em MATERIAIS.
@@ -178,7 +178,7 @@ const receita = {
   },
   TOPO: { origem: 'chão, no meio da poltrona em x e em z; y para cima e a frente da poltrona em +z' },
   PLANO: {
-    objeto: 'poltrona de vime de 960 mm de largura, 780 mm de profundidade e 733 mm de altura total, com assento a 360 mm do chão e encosto alto',
+    objeto: 'poltrona de vime de 960 mm de largura, 780 mm de profundidade e 727 mm de altura total, com assento a 360 mm do chão e encosto alto',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'largura total da poltrona', milimetros: 960 },
     familia: 'assento',
