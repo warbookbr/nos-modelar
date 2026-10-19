@@ -1,0 +1,22 @@
+[
+ {"forma":"pes","face":{"eixo":"x","lado":"min","para":-450},"motivo":"pé alinhado ao braço que o apoia: face externa em x do pé a 450 mm, a do braço (D4)"},
+ {"forma":"pes_y","face":{"eixo":"x","lado":"min","para":-450},"motivo":"pé alinhado ao braço que o apoia: face externa em x do pé a 450 mm, a do braço (D4)"},
+ {"forma":"pes_x","face":{"eixo":"x","lado":"max","para":450},"motivo":"pé alinhado ao braço que o apoia: face externa em x do pé a 450 mm, a do braço (D4)"},
+ {"forma":"pes_xy","face":{"eixo":"x","lado":"max","para":450},"motivo":"pé alinhado ao braço que o apoia: face externa em x do pé a 450 mm, a do braço (D4)"},
+ {"forma":"pes","face":{"eixo":"z","lado":"max","para":410},"motivo":"pé da frente alinhado à face frontal do braço (z 410), antes recuado 10 mm (D4)"},
+ {"forma":"pes_x","face":{"eixo":"z","lado":"max","para":410},"motivo":"pé da frente alinhado à face frontal do braço (z 410), antes recuado 10 mm (D4)"},
+ {"forma":"pes_y","face":{"eixo":"z","lado":"min","para":-420},"motivo":"pé de trás alinhado à face traseira do braço (z -420), antes recuado 20 mm (D4)"},
+ {"forma":"pes_xy","face":{"eixo":"z","lado":"min","para":-420},"motivo":"pé de trás alinhado à face traseira do braço (z -420), antes recuado 20 mm (D4)"},
+ {"forma":"base","face":{"eixo":"x","lado":"min","para":-310},"motivo":"face lateral da base na face interna do braço (x -310); havia folga de 10 mm e a base não se apoiava em nada"},
+ {"forma":"base","face":{"eixo":"x","lado":"max","para":310},"motivo":"face lateral da base na face interna do braço (x 310); havia folga de 10 mm e a base não se apoiava em nada"},
+ {"forma":"assento","face":{"eixo":"x","lado":"min","para":-310},"motivo":"face lateral do assento na face interna do braço (x -310); havia folga de 10 mm"},
+ {"forma":"assento","face":{"eixo":"x","lado":"max","para":310},"motivo":"face lateral do assento na face interna do braço (x 310); havia folga de 10 mm"},
+ {"forma":"encosto","face":{"eixo":"x","lado":"min","para":-310},"motivo":"encosto não entra mais no braço: face lateral na face interna do braço (x -310), antes entrava 10 mm (D1)"},
+ {"forma":"encosto","face":{"eixo":"x","lado":"max","para":310},"motivo":"encosto não entra mais no braço: face lateral na face interna do braço (x 310), antes entrava 10 mm (D1)"},
+ {"forma":"base","face":{"eixo":"z","lado":"min","para":-420},"motivo":"traseira da base na dos braços (z -420), antes 10 mm aquém (D3)"},
+ {"forma":"base","face":{"eixo":"z","lado":"max","para":410},"motivo":"frente da base na dos braços (z 410), antes 10 mm aquém (D3)"},
+ {"forma":"base","face":{"eixo":"y","lado":"min","para":85},"motivo":"face de baixo da base na do braço e no topo do pé (y 85), antes 5 mm abaixo"},
+ {"forma":"assento","face":{"eixo":"z","lado":"max","para":410},"motivo":"frente do assento na dos braços e da base (z 410), antes 10 mm aquém (D3)"},
+ {"forma":"assento","face":{"eixo":"z","lado":"min","para":-120},"motivo":"costas do assento encostam na frente do encosto (z -120), antes folga de 10 mm"},
+ {"forma":"encosto","face":{"eixo":"z","lado":"min","para":-420},"motivo":"costas do encosto na traseira da base e dos braços (z -420), antes patamar de 110 mm da base exposto atrás dele (D2)"}
+]
