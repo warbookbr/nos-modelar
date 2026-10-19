@@ -1,0 +1,13 @@
+[
+  { "forma": "assento_estofado", "face": { "eixo": "x", "lado": "min", "para": -360 }, "motivo": "Simetria: a receita tem ±360 em x e o alinhamento deixou o eixo em +1 mm (pernas e braços estão em torno de 0); volta ao eixo 0." },
+  { "forma": "assento_estofado", "face": { "eixo": "x", "lado": "max", "para": 360 }, "motivo": "Simetria: ver a face esquerda do assento." },
+  { "forma": "assento_estofado", "face": { "eixo": "y", "lado": "min", "para": 360 }, "motivo": "O assento entrava 10 mm no trilho_frente (base em y 350, topo do trilho em 360), embutido que não aparece; a base passa a encostar na face de cima do trilho." },
+  { "forma": "trilho_frente", "face": { "eixo": "x", "lado": "min", "para": -420 }, "motivo": "Simetria: receita ±420, eixo do alinhamento em +1 mm; volta ao eixo 0." },
+  { "forma": "trilho_frente", "face": { "eixo": "x", "lado": "max", "para": 420 }, "motivo": "Simetria: ver a face esquerda do trilho." },
+  { "forma": "trilho_tras", "face": { "eixo": "x", "lado": "min", "para": -420 }, "motivo": "Simetria: receita ±420, eixo do alinhamento em +1 mm; volta ao eixo 0." },
+  { "forma": "trilho_tras", "face": { "eixo": "x", "lado": "max", "para": 420 }, "motivo": "Simetria: ver a face esquerda do trilho." },
+  { "forma": "trilho_lado", "face": { "eixo": "x", "lado": "min", "para": 405 }, "motivo": "Simetria: receita 405..460, alinhamento deixou 406..461." },
+  { "forma": "trilho_lado", "face": { "eixo": "x", "lado": "max", "para": 460 }, "motivo": "Simetria: ver a face interna do trilho." },
+  { "forma": "trilho_lado_x", "face": { "eixo": "x", "lado": "min", "para": -460 }, "motivo": "Simetria: receita -460..-405, alinhamento deixou -459..-404." },
+  { "forma": "trilho_lado_x", "face": { "eixo": "x", "lado": "max", "para": -405 }, "motivo": "Simetria: ver a face externa do trilho." }
+]
