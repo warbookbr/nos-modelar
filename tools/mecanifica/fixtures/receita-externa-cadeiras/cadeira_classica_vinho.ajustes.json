@@ -1,0 +1,17 @@
+[
+ { "forma": "assento_estofado", "face": { "eixo": "x", "lado": "min", "para": -340 }, "motivo": "o assento entrava 19 a 21 mm nos braços (face interna plana em |x|=340); passa a encostar nelas e fica simétrico em x=0 (o eixo do alinhamento ficou em x=+1 por causa dos cilindros do braço)" },
+ { "forma": "assento_estofado", "face": { "eixo": "x", "lado": "max", "para": 340 }, "motivo": "encosta na face interna do braço direito, simétrico ao esquerdo" },
+ { "forma": "assento_estofado", "face": { "eixo": "y", "lado": "min", "para": 340 }, "motivo": "o assento entrava 10 mm nos trilhos; a base passa a ficar na face de cima deles (340), a mesma da base dos braços" },
+ { "forma": "trilho_frente", "face": { "eixo": "x", "lado": "min", "para": -405 }, "motivo": "a ponta entrava 15 mm no trilho lateral; passa a encostar na face interna (|x|=405) e fica simétrico em x=0" },
+ { "forma": "trilho_frente", "face": { "eixo": "x", "lado": "max", "para": 405 }, "motivo": "encosta no trilho lateral direito, simétrico ao esquerdo" },
+ { "forma": "trilho_frente", "face": { "eixo": "y", "lado": "max", "para": 340 }, "motivo": "topo do trilho na face de baixo do assento e dos braços (340)" },
+ { "forma": "trilho_tras", "face": { "eixo": "x", "lado": "min", "para": -405 }, "motivo": "a ponta entrava 15 mm no trilho lateral; passa a encostar na face interna (|x|=405) e fica simétrico em x=0" },
+ { "forma": "trilho_tras", "face": { "eixo": "x", "lado": "max", "para": 405 }, "motivo": "encosta no trilho lateral direito, simétrico ao esquerdo" },
+ { "forma": "trilho_tras", "face": { "eixo": "y", "lado": "max", "para": 340 }, "motivo": "topo do trilho na face de baixo do assento e dos braços (340)" },
+ { "forma": "trilho_lado", "face": { "eixo": "x", "lado": "min", "para": 405 }, "motivo": "face interna em 405, igual à do lado esquerdo (antes 406 contra 404)" },
+ { "forma": "trilho_lado", "face": { "eixo": "x", "lado": "max", "para": 460 }, "motivo": "face externa em 460 (antes 461 contra 459 no outro lado)" },
+ { "forma": "trilho_lado", "face": { "eixo": "y", "lado": "max", "para": 340 }, "motivo": "o topo entrava 20 mm na base do braço (340); passa a encostar" },
+ { "forma": "trilho_lado_x", "face": { "eixo": "x", "lado": "min", "para": -460 }, "motivo": "espelho do trilho lateral direito (antes -459)" },
+ { "forma": "trilho_lado_x", "face": { "eixo": "x", "lado": "max", "para": -405 }, "motivo": "espelho do trilho lateral direito (antes -404)" },
+ { "forma": "trilho_lado_x", "face": { "eixo": "y", "lado": "max", "para": 340 }, "motivo": "o topo entrava 20 mm na base do braço (340); passa a encostar" }
+]
