@@ -110,8 +110,10 @@ Carro e motor são montagens recursivas. Não são receitas monolíticas.
 - Escrita inválida não pode publicar receita, montagem ou relação parcial.
 - Medição e contratos mecânicos básicos não podem ser substituídos apenas por
   uma imagem convincente.
-- Materiais permanecem declarativos, mas o contrato genérico de materiais ainda
-  não existe.
+- Materiais permanecem declarativos: o esboço guarda a escolha de material por
+  peça (`materiais` na raiz e `material` na forma) sem interpretá-la, e a textura
+  é gerada por módulo próprio (plano de material e textura). PBR e paleta nova
+  continuam fora.
 
 ## Estado operacional
 

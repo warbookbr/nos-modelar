@@ -48,7 +48,7 @@
     {
       "id": "escopo",
       "secao": "regras",
-      "texto": "Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de produto nesta documentação.",
+      "texto": "Material e textura entram só como escolha de material por peça, guardada na receita, e como módulo de textura que a gera; PBR, paleta nova e capacidade de produto não entram sem plano.",
       "gate": null
     },
     {

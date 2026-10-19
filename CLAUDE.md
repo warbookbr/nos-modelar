@@ -37,8 +37,9 @@ passo seguinte.
   `docs/mecanifica/UPSTREAM-NOS.md`.
 - Imagem de referência com marca, logotipo ou nome de fabricante não entra no
   repositório.
-- Não invente contrato genérico de materiais, PBR, paleta nova ou capacidade de
-  produto nesta documentação.
+- Material e textura entram só como escolha de material por peça, guardada na
+  receita, e como módulo de textura que a gera; PBR, paleta nova e capacidade de
+  produto não entram sem plano.
 - Sem plano ativo, o backlog não autoriza implementação.
 - O trabalho dividido com outra IA neste repositório passa por `comunicacao.md`,
   com uma tarefa por seção.

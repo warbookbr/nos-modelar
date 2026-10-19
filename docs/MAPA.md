@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1346 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1348 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1876,6 +1876,8 @@
 - `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
 - `receita-planejada.mjs` — receita-planejada.mjs — grava a receita planejada de uma peça a partir de uma unidade do esboço aprovado.
 - `receita-planejada.test.mjs` — receita-planejada.test.mjs — a receita planejada que o comando grava a partir de uma unidade do esboço.
+- `receita-externa.mjs` — Tradutor da receita do externo (projeto externo, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica. Núcleo puro: r…
+- `receita-externa.test.mjs` — O tradutor da receita do externo: sete receitas reais (as do repositório projeto externo, já expandidas) viram esboço que o módulo valida e descreve, e o …
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.

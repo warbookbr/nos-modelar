@@ -174,7 +174,7 @@ Ainda não existem:
 - camada completa de escrita para IA;
 - solver geral de encaixe;
 - validação geral de movimento e espaço varrido;
-- contrato genérico de materiais;
+- PBR e contrato de materiais além da escolha por peça e da textura gerada;
 - física de engenharia em tempo real.
 
 ## Sinal de progresso

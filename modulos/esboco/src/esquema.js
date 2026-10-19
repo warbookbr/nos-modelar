@@ -13,7 +13,7 @@ const objeto = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const EIXOS = ['x', 'y', 'z'];
 
 /* Campos de toda forma (posição, aparência e relações) e os internos que a expansão deixa nas formas já expandidas. */
-const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'daLigacao', 'encaixa', 'unidade', 'estilo', 'substitui', 'porta', 'subtrai', 'cortador'];
+const COMUNS = ['id', 'tipo', 'cor', 'rotulo', 'material', 'opacidade', 'oculto', 'ocultar', 'linhaCentro', 'desloca', 'rotacao', 'centro', 'sobre', 'ponta', 'lado', 'encosta', 'alinha', 'de', 'para', 'daInstancia', 'daLigacao', 'encaixa', 'unidade', 'estilo', 'substitui', 'porta', 'subtrai', 'cortador'];
 export const CAMPOS_POR_TIPO = {
   caixa: ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'furos', 'furo'],
   cilindro: ['diametro', 'comprimento', 'eixo', 'achatado', 'lados'],
@@ -29,7 +29,7 @@ export const CAMPOS_POR_TIPO = {
 };
 export const TIPOS_DE_FORMA = Object.keys(CAMPOS_POR_TIPO);
 const NUMERICOS = ['largura', 'altura', 'profundidade', 'raio', 'chanfro', 'diametro', 'comprimento', 'diametroExterno', 'diametroInterno', 'espessura', 'diametroTopo', 'raioCurva', 'opacidade'];
-export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico', 'modulos', 'corte', 'previa', 'enquadrar', 'baseDoMestre', 'curso'];
+export const CAMPOS_DA_RAIZ = ['nota', 'opcoes', 'plano', 'vista', 'linhasCentro', 'ocultar', 'legendas', 'explosao', 'parametros', 'formas', 'pontos', 'contato', 'ladosPorEscala', 'geometria', 'estilos', 'unidades', 'simetrico', 'modulos', 'corte', 'previa', 'enquadrar', 'baseDoMestre', 'curso', 'materiais'];
 export const CAMPOS_DA_OPCAO = ['id', 'titulo', 'nota', 'formas', 'legendas', 'explosao', 'parametros', 'pontos', 'contato', 'ocultar', 'linhasCentro', 'medidas', 'giros'];
 export const CAMPOS_DO_CONTATO = ['usar', 'tolerancia', 'penetracao', 'folga', 'pares', 'juntas', 'projecao'];
 const CAMPOS_DA_PROJECAO = ['limiar', 'reprova', 'folgaMinima', 'maximo'];
@@ -94,10 +94,29 @@ function validarContato(c, onde) {
   }
 }
 
+/* O bloco `materiais` da raiz é um dado do objeto que o esboço guarda e devolve sem interpretar: cada nome aponta para um objeto com `tipo` (texto
+   não vazio) e quaisquer outros campos (cor, desgaste, veio...). `material` numa forma só diz o nome, que precisa existir no bloco. */
+function validarMateriais(esboco) {
+  const bloco = esboco.materiais;
+  if (bloco !== undefined) {
+    if (!objeto(bloco)) throw new ErroDeEsboco('esboço: "materiais" deve ser um objeto { nome: { tipo, ... } }');
+    for (const [nome, m] of Object.entries(bloco)) {
+      if (!objeto(m) || typeof m.tipo !== 'string' || !m.tipo.trim()) throw new ErroDeEsboco(`esboço: materiais.${nome} deve ser um objeto com "tipo" (texto não vazio, como madeira, metal, tecido ou liso)`);
+    }
+  }
+  const formas = [...(esboco.formas ?? []), ...(esboco.opcoes ?? []).flatMap((o) => (objeto(o) && Array.isArray(o.formas) ? o.formas : []))];
+  for (const f of formas) {
+    if (!objeto(f) || f.material === undefined) continue;
+    if (typeof f.material !== 'string' || !f.material.trim()) throw new ErroDeEsboco(`esboço, forma "${f.id}": "material" deve ser o nome de um material (texto não vazio)`);
+    if (!objeto(bloco) || !Object.hasOwn(bloco, f.material)) throw new ErroDeEsboco(`esboço, forma "${f.id}": o material ${JSON.stringify(f.material)} não está no bloco "materiais"${objeto(bloco) ? `${quisDizer(f.material, Object.keys(bloco))}; materiais declarados: ${lista(Object.keys(bloco))}` : ', que não foi declarado'}`);
+  }
+}
+
 /* Valida o esboço bruto (antes de parâmetros e componentes). Lança ErroDeEsboco na primeira divergência. */
 export function validarEsquema(esboco) {
   if (!objeto(esboco)) return;
   camposValidos(esboco, CAMPOS_DA_RAIZ, 'esboço');
+  validarMateriais(esboco);
   if (objeto(esboco.explosao)) { camposValidos(esboco.explosao, CAMPOS_DA_EXPLOSAO, 'esboço: explosao'); if (esboco.explosao.eixo !== undefined) conjunto(esboco.explosao.eixo, EIXOS, 'esboço: explosao', 'eixo'); }
   validarContato(esboco.contato, 'esboço');
   validarCurso(esboco);
