@@ -86,3 +86,7 @@ instalado para funcionar.
 O plano seguinte, a adaptação dos objetos do projeto externo como receita de peça e família do Mecanifica, está no [backlog](BACKLOG.md) e só abre
 com o sim da pessoa. Os aparelhos e os móveis dos 41 objetos que o tradutor já aceita por inteiro são os candidatos naturais a perfis das famílias
 `aparelho-de-caixa` e `movel-de-caixa`.
+
+## Andamento
+
+Fatia 1 feita em 2026-10-19: o esboço guarda `materiais` e `material` sem interpretar, o acordo mudou e a volta do bloco de materiais está provada em sete receitas. As fatias 2, 3 e 4 rodaram em paralelo no mesmo dia. Tradutor: 59 das 66 receitas e 1.377 das 1.394 peças traduzem (98,8%), com a volta geométrica provada dentro de 0,5 mm e a medida em `tools/mecanifica/receita-externa-medida.mjs`; sobram 16 peças com corte, curva ou afinamento e uma torneira cujo perfil se cruza na própria receita de origem. Exportação: a tolerância de 1 mm do exportador de OBJ deixou de recusar os triângulos dos cantos arredondados, o OBJ sai com `.mtl`, `map_Kd` e coordenadas de textura em escala do mundo, e a conferência no Blender rodou (script em `banco-de-provas/exportacao-2026-10-19/`). Textura: a madeira em Node está em `modulos/textura/`, e a [folha de amostras](../banco-de-provas/textura-2026-10-19/README.md) espera o julgamento da pessoa, com a lista do que difere do Blender.
