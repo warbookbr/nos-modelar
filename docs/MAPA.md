@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1400 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1414 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -345,8 +345,24 @@
 - `triagem.md` — Triagem das 66 receitas por família candidata
 - `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolv…
 
+## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/cadeiras-ajustadas/
+
+- `README.md` — Cadeiras ajustadas (2026-10-19)
+- `cadeira_fibra_azul.md` — cadeira_fibra_azul: ajustes de construção
+- `cadeira_ripada_marrom.md` — cadeira_ripada_marrom: ajustes de construção
+- `cadeira_larga_estofada_clara.md` — cadeira_larga_estofada_clara: ajustes de construção
+- `cadeira_desgastada_madeira.md` — cadeira_desgastada_madeira: ajustes sobre a folha alinhada
+- `cadeira_fibra_roxa.md` — cadeira_fibra_roxa: ajustes de construção
+- `cadeira_classica_creme.md` — cadeira_classica_creme: ajustes de construção
+- `cadeira_classica_vinho.md` — cadeira_classica_vinho: ajustes de construção
+- `cadeira_basica_clara.md` — cadeira_basica_clara: relato dos ajustes
+- `cadeira_almofadada_clara.md` — cadeira_almofadada_clara: ajustes
+- `cadeira_ripada_simples.md` — cadeira_ripada_simples: ajustes de construção
+- `cadeira_larga_estofada_amarela.md` — cadeira_larga_estofada_amarela: ajustes de construção
+
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/defeitos-marcados/
 
+- `README.md` — Defeitos marcados nas cadeiras (2026-10-19)
 - `cadeira_fibra_azul.md` — Defeitos marcados em cadeira_fibra_azul
 - `cadeira_ripada_marrom.md` — Defeitos marcados em cadeira_ripada_marrom
 - `cadeira_larga_estofada_clara.md` — Defeitos marcados em cadeira_larga_estofada_clara
@@ -1802,6 +1818,7 @@
 - `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
 - `banco-de-provas.mjs` — Catálogo e registro de custo do banco de provas de modelagem. Compara autonomia, rodadas, notas e tokens consumidos entre o início e o fim do plano de ferram…
 - `banco-de-provas.test.mjs` — Testes do catálogo do banco de provas e registro de custo de modelagem. Valida esquema de medições, agregação de custo por objeto e cobertura de ferramentas …
+- `cadeiras-ajustadas.test.mjs` — Os ajustes das onze cadeiras (`<id>.ajustes.json` ao lado de cada receita): cada arquivo aplica sem erro, a conversão não recusa forma, a caixa envolvente mu…
 - `cadeiras-medida.mjs` — cadeiras-medida.mjs — a medida da família `cadeira` contra o esboço alvo de cada perfil, e a prancha com os dois lado a lado.
 - `calibracao-do-critico.mjs` — calibracao-do-critico.mjs — o conjunto de calibração do crítico visual e o gate `calibracao:check`.
 - `calibracao-do-critico.test.mjs` — calibracao-do-critico.test.mjs — o gate `calibracao:check`: o conjunto versionado passa, e cada coisa que ele confere reprova quando muda.

@@ -30,3 +30,4 @@ A pessoa marcou na imagem trinta e cinco pontos com defeito. Eles vêm de desenc
 
 Correção (2026-10-19): as duas imagens `receitas-nucleo*.png` saíram espelhadas da esquerda para a direita na primeira versão, porque o renderizador da sonda usava o vetor da direita da tela com o sinal trocado. A forma das cadeiras e os números não mudam, e as imagens foram regeradas com a direita da tela em +x e a frente em +z.
 
+Os defeitos marcados em cada cadeira estão em [`defeitos-marcados/`](../defeitos-marcados/README.md), e a correção, com as folhas antes e depois, em [`cadeiras-ajustadas/`](../cadeiras-ajustadas/README.md).
