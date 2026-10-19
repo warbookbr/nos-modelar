@@ -1,0 +1,407 @@
+[
+ [
+  "chamferBox",
+  {
+   "origemId": 1,
+   "larg": 0.055,
+   "alt": 0.44,
+   "prof": 0.055,
+   "chanfro": 0.003,
+   "em": [
+    -0.2175,
+    0,
+    0.2325
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "pes",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 1
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 2,
+   "larg": 0.055,
+   "alt": 0.44,
+   "prof": 0.055,
+   "chanfro": 0.003,
+   "em": [
+    0.2175,
+    0,
+    0.2325
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "pes_x",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 2
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 3,
+   "larg": 0.055,
+   "alt": 0.44,
+   "prof": 0.055,
+   "chanfro": 0.003,
+   "em": [
+    -0.2175,
+    0,
+    -0.2325
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "pes_y",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 3
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 4,
+   "larg": 0.055,
+   "alt": 0.44,
+   "prof": 0.055,
+   "chanfro": 0.003,
+   "em": [
+    0.2175,
+    0,
+    -0.2325
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "pes_xy",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 4
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 5,
+   "larg": 0.47,
+   "alt": 0.06,
+   "prof": 0.5,
+   "chanfro": 0.005,
+   "em": [
+    0,
+    0.38,
+    0
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "saia_base",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 5
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 6,
+   "larg": 0.51,
+   "alt": 0.05,
+   "prof": 0.54,
+   "chanfro": 0.01,
+   "em": [
+    0,
+    0.44,
+    0
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "assento",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 6
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 7,
+   "larg": 0.055,
+   "alt": 0.63,
+   "prof": 0.055,
+   "chanfro": 0.003,
+   "em": [
+    -0.2175,
+    0.49,
+    -0.2325
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "postes_encosto",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 7
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 8,
+   "larg": 0.055,
+   "alt": 0.63,
+   "prof": 0.055,
+   "chanfro": 0.003,
+   "em": [
+    0.2175,
+    0.49,
+    -0.2325
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "postes_encosto_x",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 8
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 9,
+   "larg": 0.38,
+   "alt": 0.1,
+   "prof": 0.03,
+   "chanfro": 0.003,
+   "em": [
+    0,
+    1.02,
+    -0.245
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "travessa_alta",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 9
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 10,
+   "larg": 0.38,
+   "alt": 0.04,
+   "prof": 0.03,
+   "chanfro": 0.003,
+   "em": [
+    0,
+    0.49,
+    -0.245
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "travessa_baixa",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 10
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 11,
+   "larg": 0.015,
+   "alt": 0.49,
+   "prof": 0.023,
+   "chanfro": 0.002,
+   "em": [
+    -0.12,
+    0.53,
+    -0.2415
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "ripa_1",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 11
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 12,
+   "larg": 0.015,
+   "alt": 0.49,
+   "prof": 0.023,
+   "chanfro": 0.002,
+   "em": [
+    -0.06,
+    0.53,
+    -0.2415
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "ripa_2",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 12
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 13,
+   "larg": 0.015,
+   "alt": 0.49,
+   "prof": 0.023,
+   "chanfro": 0.002,
+   "em": [
+    0,
+    0.53,
+    -0.2415
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "ripa_3",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 13
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 14,
+   "larg": 0.015,
+   "alt": 0.49,
+   "prof": 0.023,
+   "chanfro": 0.002,
+   "em": [
+    0.06,
+    0.53,
+    -0.2415
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "ripa_4",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 14
+    }
+   }
+  }
+ ],
+ [
+  "chamferBox",
+  {
+   "origemId": 15,
+   "larg": 0.015,
+   "alt": 0.49,
+   "prof": 0.023,
+   "chanfro": 0.002,
+   "em": [
+    0.12,
+    0.53,
+    -0.2415
+   ]
+  }
+ ],
+ [
+  "parte",
+  {
+   "nome": "ripa_5",
+   "sel": {
+    "origem": {
+     "op": "chamferBox",
+     "id": 15
+    }
+   }
+  }
+ ]
+]
