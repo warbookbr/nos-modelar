@@ -79,3 +79,7 @@ Para e volta à pessoa se uma família exigir tantas opções que o modelador er
 uma peça do avião; ou se a pessoa não reconhecer os objetos como os dela depois de três rodadas de um grupo.
 
 ## Fechamento
+
+## Andamento
+
+Fatia 1 feita em 2026-10-19: a [triagem](../banco-de-provas/receitas-externas-2026-10-19/triagem.md) classifica as 66 receitas em dez grupos, com medidas, número de peças, recusas do tradutor e a família candidata, e aguarda a escolha da pessoa dos grupos e da ordem.
