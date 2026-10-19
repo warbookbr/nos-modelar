@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1420 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1434 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1286,6 +1286,30 @@
 
 - `roteiro.md` — Roteiro da crítica da prancha
 
+## procedural/pecas/cadeira-artesanal/
+
+- `receita.js` — cadeira-artesanal — cadeira de madeira com assento de tábua única, quatro pernas, dois postes de encosto, duas ripas e uma travessa no topo.
+
+## procedural/pecas/cadeira-artesanal/referencias/
+
+- `alvo.md` — Alvo da cadeira artesanal
+
+## procedural/pecas/cadeira-branca-madeira/
+
+- `receita.js` — cadeira-branca-madeira — cadeira de madeira clara: duas pernas da frente, assento, saia em quatro réguas sob o assento, dois postes de encosto que sobem do c…
+
+## procedural/pecas/cadeira-branca-madeira/referencias/
+
+- `alvo.md` — Alvo da cadeira de madeira clara
+
+## procedural/pecas/cadeira-branca-simples/
+
+- `receita.js` — cadeira-branca-simples — cadeira simples de quatro pernas, assento e painel de encosto preso às pernas de trás.
+
+## procedural/pecas/cadeira-branca-simples/referencias/
+
+- `alvo.md` — Alvo da cadeira branca simples
+
 ## procedural/pecas/cadeira-madeira/
 
 - `receita.js` — cadeira-madeira — cadeira de madeira simples: quatro pernas, assento, saia sob o assento, dois postes de encosto, duas travessas e cinco ripas.
@@ -1293,6 +1317,38 @@
 ## procedural/pecas/cadeira-madeira/referencias/
 
 - `alvo.md` — Alvo da cadeira de madeira
+
+## procedural/pecas/poltrona-moderna-amarela/
+
+- `receita.js` — poltrona-moderna-amarela — poltrona de estrutura de madeira e revestimento de tecido: quatro pés, dois braços retos, base sob o assento, assento, e encosto d…
+
+## procedural/pecas/poltrona-moderna-amarela/referencias/
+
+- `alvo.md` — Alvo da poltrona moderna amarela
+
+## procedural/pecas/poltrona-moderna-branca/
+
+- `receita.js` — poltrona-moderna-branca — poltrona de estofado com dois braços, assento e encosto sobre uma base, com quatro pés de madeira.
+
+## procedural/pecas/poltrona-moderna-branca/referencias/
+
+- `alvo.md` — Alvo da poltrona moderna branca
+
+## procedural/pecas/poltrona-vime-azul/
+
+- `receita.js` — poltrona-vime-azul — poltrona de vime sobre quatro pés, com base de vime, dois braços, encosto de vime, almofada de assento e almofada de encosto girada para…
+
+## procedural/pecas/poltrona-vime-azul/referencias/
+
+- `alvo.md` — Alvo da poltrona de vime
+
+## procedural/pecas/poltrona-vime-roxa/
+
+- `receita.js` — poltrona-vime-roxa — poltrona de vime com base baixa, braços, encosto alto de vime e duas almofadas de tecido: a do assento e a do encosto, esta girada 12 gr…
+
+## procedural/pecas/poltrona-vime-roxa/referencias/
+
+- `alvo.md` — Alvo da poltrona de vime
 
 ## procedural/pecas/suporte-tubo/
 
