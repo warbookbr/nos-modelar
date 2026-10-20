@@ -18,8 +18,10 @@
  *   - Medidas: nenhuma. Toda face da base cabe nesta receita com diferença de 0 mm, e a caixa total é x ±450, y 0 a 800 e
  *     z -420 a 410 (900 por 800 por 830 mm), igual à da base.
  *   - Encosto: 180 mm de espessura, de z -300 a -120, sem engrossar, e x ±310, igual ao vão entre os braços.
- *   - Cor: a base não tem cor branca, e a receita não a escolhe. Os materiais carregam as cores da própria base (madeira escura
- *     e tecido bege), e a cor branca fica para o passo de material.
+ *   - Cor: a cor branca foi aplicada por pedido aprovado, porque a poltrona deve ser branca; a base e a receita externa eram
+ *     marrons. Cada caixa leva o material da sua parte (`material` em `derivar`) e `gerarPassos` escreve a operação `material`
+ *     logo depois da `parte`: o tecido, de assento e encosto, fica em branco quente e a estrutura, de base, braços e pés, em
+ *     off-white, para as partes continuarem distinguíveis. Nenhuma medida, parte ou contato mudou.
  */
 
 export const TABELA = {
@@ -87,7 +89,7 @@ export function derivar(T) {
     ['pesTrasDir', +1, T.pe_z_tras, pesTrasZ1],
   ];
   for (const [nome, sinal, z0, z1] of pes) {
-    caixas.push({ nome, ...lado(sinal, pesX0, T.pe_x_externo), y0: 0, y1: T.pe_altura, z0, z1, chanfro: T.pe_chanfro });
+    caixas.push({ nome, ...lado(sinal, pesX0, T.pe_x_externo), y0: 0, y1: T.pe_altura, z0, z1, chanfro: T.pe_chanfro, material: 'madeira' });
   }
 
   /* base: entre as faces internas dos braços, sobre o topo dos pés e dos braços */
@@ -96,7 +98,7 @@ export function derivar(T) {
     x0: -meiaX, x1: meiaX,
     y0: baseY0, y1: baseY1,
     z0: T.base_z_tras, z1: T.base_z_frente,
-    chanfro: T.base_chanfro,
+    chanfro: T.base_chanfro, material: 'madeira',
   });
 
   /* braços: de x ±310 até x ±450, da altura dos pés à altura do braço */
@@ -106,7 +108,7 @@ export function derivar(T) {
       ...lado(sinal, meiaX, T.braco_x_externo),
       y0: bracoY0, y1: bracoY1,
       z0: T.base_z_tras, z1: T.base_z_frente,
-      chanfro: T.braco_chanfro,
+      chanfro: T.braco_chanfro, material: 'madeira',
     });
   }
 
@@ -116,7 +118,7 @@ export function derivar(T) {
     x0: -meiaX, x1: meiaX,
     y0: assentoY0, y1: assentoY1,
     z0: assentoZ0, z1: T.assento_z_frente,
-    chanfro: T.assento_chanfro,
+    chanfro: T.assento_chanfro, material: 'tecido',
   });
 
   /* encosto: 180 mm de espessura, atrás do assento, do topo da base até y 800 */
@@ -125,7 +127,7 @@ export function derivar(T) {
     x0: -meiaX, x1: meiaX,
     y0: encostoY0, y1: T.encosto_topo,
     z0: encostoZ0, z1: encostoZ1,
-    chanfro: T.encosto_chanfro,
+    chanfro: T.encosto_chanfro, material: 'tecido',
   });
 
   return caixas;
@@ -147,6 +149,7 @@ export function gerarPassos(T) {
       em: [m((c.x0 + c.x1) / 2), m(c.y0), m((c.z0 + c.z1) / 2)],
     }]);
     passos.push(['parte', { nome: c.nome, sel: { origem: { op: 'chamferBox', id } } }]);
+    passos.push(['material', { sel: { origem: { op: 'chamferBox', id } }, usa: c.material }]);
   });
   return passos;
 }
@@ -170,8 +173,8 @@ const receita = {
   meta: { nome: 'poltrona-moderna-branca', desc: 'poltrona de estofado com dois braços, assento e encosto sobre base e quatro pés de madeira' },
   PARAMS: TABELA,
   MATERIAIS: {
-    madeira: { cor: '#4b3220', metalicidade: 0, aspereza: 0.8 },
-    tecido: { cor: '#988167', metalicidade: 0, aspereza: 0.8 },
+    madeira: { cor: '#e8e4dc', metalicidade: 0, aspereza: 0.8 },
+    tecido: { cor: '#f2efe9', metalicidade: 0, aspereza: 0.8 },
   },
   TOPO: { origem: 'chão, no meio da poltrona em x e em z; y para cima e a frente da poltrona em +z' },
   PLANO: {
