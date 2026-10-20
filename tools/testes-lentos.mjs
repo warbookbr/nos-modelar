@@ -40,6 +40,7 @@ export const TESTES_LENTOS = [
   'modulos/esboco/tests/vizinhos.test.js',
   'modulos/esboco/tests/zoom-forma.test.js',
   'modulos/exportador-cad/tests/exportador-cad.test.js',
+  'modulos/textura/tests/metal-tecido.test.js',
   'procedural/familias/cilindro-hidraulico/cilindro-hidraulico.test.js',
   'procedural/familias/dobradica/dobradica.test.mjs',
   'procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs',
