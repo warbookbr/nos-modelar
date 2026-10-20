@@ -100,7 +100,8 @@ export function contatosDasCaixas(formas) {
 
 export async function gerarFolha(entrada, { alinhar = false, ajustes = [], saida, nome }) {
   const { chromium } = await import('playwright');
-  const esboco = entrada.pecas ? receitaParaEsboco(entrada).esboco : entrada;
+  const traducao = entrada.pecas ? receitaParaEsboco(entrada) : { esboco: entrada, recusas: [] };
+  const esboco = traducao.esboco;
   const id = nome ?? entrada.id ?? 'objeto';
   const r = passosDoEsboco(esboco, { alinhar, ajustes });
   const { neutro } = executarReceita({ meta: { nome: id }, PASSOS: r.passos });
@@ -117,7 +118,7 @@ export async function gerarFolha(entrada, { alinhar = false, ajustes = [], saida
   await pg.setContent(html); await pg.screenshot({ path: join(saida, `${id}.png`), fullPage: true }); await navegador.close();
   const linhas = r.dados.formas.map((f) => { const c = f.geometria.caixa; const girada = !identidade(f.geometria.matriz); return `${f.id}\t${f.tipo}${girada ? ' (girada)' : ''}\tx ${c.min[0].toFixed(0)}..${c.max[0].toFixed(0)}\ty ${c.min[1].toFixed(0)}..${c.max[1].toFixed(0)}\tz ${c.min[2].toFixed(0)}..${c.max[2].toFixed(0)}`; });
   writeFileSync(join(saida, `${id}.pecas.txt`), `Peças de ${id} (milímetro; caixa envolvente de cada peça; x direita, y cima, z frente):\n${linhas.join('\n')}\n`);
-  return { ...r, contatos: contatosDasCaixas(r.dados.formas), id };
+  return { ...r, contatos: contatosDasCaixas(r.dados.formas), id, recusasDaTraducao: traducao.recusas };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
@@ -129,6 +130,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const ajustes = valor('--ajustes') ? JSON.parse(readFileSync(valor('--ajustes'), 'utf8')) : [];
   const r = await gerarFolha(entrada, { alinhar: args.includes('--alinhar'), ajustes, saida: valor('--saida') ?? '.', nome: entrada.id ?? basename(arquivo).replace(/\..*$/, '') });
   console.log(`${r.id}: ${r.partes.length} peças, ${r.recusas.length} recusadas, ${r.alteracoes.length} alterações do alinhamento, ${ajustes.length} ajustes`);
+  for (const q of r.recusasDaTraducao) console.log(`  PEÇA FORA DA FOLHA: ${q.peca} (${q.motivo ?? q.aviso})`);
   console.log(`atravessam embutidos: ${r.contatos.embutidos.length}; passantes: ${r.contatos.passantes.length}`);
   for (const p of r.contatos.passantes) console.log(`  passante: ${p.a} / ${p.b} (${p.eixo}, ${p.mm} mm)`);
 }

@@ -20,9 +20,8 @@
  * Omitido de propósito: a base dos pés tinha afinamento de 12 mm em dois lados (`afinar`), que o conversor recusou. Os pés saem
  * como caixas retas de 80 por 80 por 680 mm com chanfro de 4 mm, e o afinamento fica no backlog.
  *
- * Sobreposição declarada: a saia tem 730 mm entre as faces externas da base, e por isso entra 5 mm na face interna de cada pé que
- * ela encontra (x de 360 a 365 ou z de 360 a 365). A medida foi mantida para não passar de 0,5 mm da base, e o contato declara essa
- * entrada como o que é.
+ * Saias: a base tinha a saia com 730 mm e ela entrava 5 mm na face interna de cada pé. A pessoa aprovou encurtá-la para 720 mm, o
+ * vão entre as faces internas dos pés (x ou z de -360 a 360), e a saia agora só encosta no pé, sem atravessá-lo.
  *
  * Material: o tampo leva `madeira`, e os pés, as saias e as cantoneiras levam `madeiraEscura`, como na base.
  */
@@ -41,7 +40,7 @@ export const TABELA = {
   saia_altura: 115,
   saia_recuo: 412, /* face interna da saia, a 412 mm do eixo da mesa */
   saia_espessura: 22,
-  saia_comprimento: 730,
+  saia_comprimento: 720,
   saia_chanfro: 3,
 
   cantoneira_cateto: 50,
@@ -191,7 +190,7 @@ const PARES_SAIA_PE = [
 export const CONTATOS = [
   ...PES.map((p) => ({ par: ['tampo', p], motivo: 'o topo do pé topa na face de baixo do tampo, em y 680, e a face do pé fica dentro da área do tampo' })),
   ...SAIAS.map((s) => ({ par: ['tampo', s], motivo: 'o topo da saia encosta na face de baixo do tampo, em y 680, e fica dentro da área do tampo' })),
-  ...PARES_SAIA_PE.map(([s, p]) => ({ par: [s, p], motivo: 'a saia entra 5 mm na face interna do pé, por causa do comprimento de 730 mm da base; é sobreposição declarada' })),
+  ...PARES_SAIA_PE.map(([s, p]) => ({ par: [s, p], motivo: 'a ponta da saia, de 720 mm, encosta na face interna do pé, que fica a 360 mm do eixo da mesa' })),
   ...CANTONEIRAS.map(([c, p]) => ({ par: [c, p], motivo: 'a perna de 50 mm da cantoneira encosta na face interna do pé, na quina da saia' })),
   ...CANTONEIRAS.map(([c, , s]) => ({ par: [c, s], motivo: 'a outra perna da cantoneira encosta na face de baixo da saia, em y 565' })),
 ];
