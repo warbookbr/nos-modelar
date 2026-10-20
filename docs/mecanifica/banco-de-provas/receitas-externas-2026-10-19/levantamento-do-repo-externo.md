@@ -1,12 +1,12 @@
-# O que o repositório do projeto externo tem de objetos extraídos
+# O que o repositório do projeto externo da pessoa tem de objetos extraídos
 
-Levantamento de 2026-10-20 no clone local do repositório do projeto externo, feito por um agente de pesquisa somente leitura, para saber se há objetos além das 66 receitas que o Mecanifica já traz. Os números vêm de contagem de arquivos e do `fila-de-objetos.json`; a família de cada item foi atribuída por expressão regular sobre o nome e é aproximada.
+Levantamento de 2026-10-20 no clone local do repositório do projeto externo da pessoa, feito por um agente de pesquisa somente leitura, para saber se há objetos além das 66 receitas que o Mecanifica já traz. Os números vêm de contagem de arquivos e do `fila-de-objetos.json`; a família de cada item foi atribuída por expressão regular sobre o nome e é aproximada.
 
 ## Resposta curta
 
-O clone não tem objetos extraídos além dos já conhecidos: 66 receitas `externo` em JSON, 25 arquivos `.obj` e 25 `.mtl` feitos à mão (24 objetos prontos e 1 de teste), e listas de candidatos. Não há `.glb`, `.fbx`, `.blend`, `.x`, `.stl`, nem textura alguma (nenhum `.png`, `.dds` ou pacote). O acervo grande que os documentos do repositório descrevem (42.544 objetos, 40.233 imagens, 952 modelos originais do jogo e 2.250 texturas) está no `.gitignore` e fica só na máquina do autor, e por isso não foi contado.
+O clone não tem objetos extraídos além dos já conhecidos: 66 receitas `externo` em JSON, 25 arquivos `.obj` e 25 `.mtl` feitos à mão (24 objetos prontos e 1 de teste), e listas de candidatos. Não há `.glb`, `.fbx`, `.blend`, `.x`, `.stl`, nem textura alguma (nenhum `.png`, `.dds` ou pacote). O acervo grande que os documentos do repositório descrevem (42.544 objetos, 40.233 imagens, 952 modelos originais e 2.250 texturas) está no `.gitignore` e fica só na máquina do autor, e por isso não foi contado.
 
-## Onde moram os objetos, em `projeto-externo`
+## Onde moram os objetos
 
 | Pasta | O que tem |
 |---|---|
@@ -14,8 +14,8 @@ O clone não tem objetos extraídos além dos já conhecidos: 66 receitas `exter
 | `externo/fichas/` | 66 fichas do inspetor |
 | `externo/vereditos/` | 40 pastas, 84 JSON de três rodadas |
 | `externo/fila/fila-de-objetos.json` | 583 objetos com estado: 509 em fila, 46 aguardando aprovação, 15 aprovados, 3 em retrabalho, 2 em inspeção, 1 em modelagem, 4 não portar e 3 reprovados |
-| `pasta-de-modelos-prontos/` | 24 `.obj` e 24 `.mtl` em três pastas, e `manifesto-do-pacote` |
-| `objetos-extraidos/catalogo_de_sprites.json` | catálogo de 1.942 entradas e 1.742 identificadores únicos de sprite, a lista do que pode ser extraído |
+| pasta de objetos prontos | 24 `.obj` e 24 `.mtl` em três pastas, e `manifesto-do-pacote` |
+| catálogo de objetos extraíveis | 1.942 entradas e 1.742 identificadores únicos, a lista do que pode ser extraído |
 
 ## Objetos por família
 
@@ -47,7 +47,7 @@ O clone não tem objetos extraídos além dos já conhecidos: 66 receitas `exter
 | Outros (nomes genéricos como `peca_artesanal_*`) | 2 | 2 | 216 | 217 |
 | Total | 66 | 25 | 509 | 583 |
 
-Por categoria da fila: móveis 304, eletrodomésticos 131, contêineres 108, cozinha 27 e banheiro 13. O catálogo de sprites soma, por categoria, gôndolas e prateleiras 686, móveis e contêineres 580, portas e janelas 298, eletrodomésticos 131 e itens de chão 47.
+Por categoria da fila: móveis 304, eletrodomésticos 131, contêineres 108, cozinha 27 e banheiro 13. O catálogo soma, por categoria, gôndolas e prateleiras 686, móveis e contêineres 580, portas e janelas 298, eletrodomésticos 131 e itens de chão 47.
 
 ## Discrepâncias que o levantamento achou
 

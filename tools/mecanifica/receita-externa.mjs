@@ -1,4 +1,4 @@
-/* Tradutor da receita do externo (projeto externo, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e o caminho de volta.
+/* Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e o caminho de volta.
    Núcleo puro: recebe o objeto da receita (ou do esboço) e devolve `{ esboco, recusas }` (ou `{ receita, recusas }`).
 
    Quadro. A receita é em metro, com x leste, y norte, z para cima e o objeto virado para o sul (frente em -y). O esboço é em milímetro, com y para

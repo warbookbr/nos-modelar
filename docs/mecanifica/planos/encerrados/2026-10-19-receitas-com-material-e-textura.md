@@ -1,4 +1,4 @@
-# Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
+# Receitas com material e textura — tradução sem perdas do projeto externo da pessoa e geração de textura em Node
 
 **Estado:** concluído
 
@@ -8,7 +8,7 @@
 
 ## Problema observado
 
-A pessoa remodelou em 3D objetos do projeto externo e guardou as receitas em `repositorio-externo` (`externo`). A
+A pessoa remodelou em 3D objetos de um projeto externo e guardou as receitas em um repositório externo privado (pasta `externo`). A
 [sonda de 2026-10-19](../../banco-de-provas/receitas-externas-2026-10-19/README.md) traduziu essas receitas para o esboço: 1.179 das 1.394 peças (85%) viram forma do
 esboço, e os sete objetos conferidos ficam reconhecíveis. Duas coisas impedem que o formato de lá e o do Mecanifica sejam um só.
 
@@ -20,7 +20,7 @@ escolha de material de cada peça guardada junto da receita.
 
 ## Resultado
 
-Um módulo de tradução que lê e escreve a receita do projeto externo e o esboço do Mecanifica sem perder o bloco de materiais, um módulo de
+Um módulo de tradução que lê e escreve a receita externa e o esboço do Mecanifica sem perder o bloco de materiais, um módulo de
 textura que gera em Node a imagem de cor de cada material e exporta o objeto com textura para o Blender, e o acordo do repositório mudado
 para admitir material e textura nessa forma.
 
@@ -37,7 +37,7 @@ para admitir material e textura nessa forma.
 ## Incluído
 
 - o bloco de materiais como campo declarado do esboço, guardado sem interpretar (tipo, cor, desgaste, veio e o que mais a receita trouxer);
-- o tradutor nos dois sentidos, receita do projeto externo para esboço e esboço para receita do projeto externo, com a prova da volta (converter, voltar e
+- o tradutor nos dois sentidos, receita externa para esboço e esboço para receita externa, com a prova da volta (converter, voltar e
   comparar com a original) e as peças giradas (`rot`), que respondem por 200 das 215 peças que a sonda recusou;
 - o módulo de textura com os quatro tipos de material (madeira, metal, tecido, liso), desgaste e UV de caixa e cilindro, determinístico;
 - a exportação para OBJ com `.mtl` e imagem, aberta no Blender;
@@ -46,7 +46,7 @@ para admitir material e textura nessa forma.
 
 ## Excluído
 
-- adaptar os objetos do projeto externo como receita de peça ou família do Mecanifica (asset, primitiva 2.0): é o plano seguinte, apontado no
+- adaptar os objetos externos como receita de peça ou família do Mecanifica (asset, primitiva 2.0): é o plano seguinte, apontado no
   fechamento;
 - PBR completo (rugosidade, normal, metálico), transparência real do vidro e animação;
 - imagem de referência de projeto externo com marca ou nome de fabricante;
@@ -59,7 +59,7 @@ imagem versionado junto da peça. O núcleo continua sem Three.js. Quem aprova f
 
 ## Gate de saída
 
-1. a volta sem perdas provada em todas as receitas do projeto externo que o tradutor aceita, e as recusas listadas com o motivo;
+1. a volta sem perdas provada em todas as receitas externas que o tradutor aceita, e as recusas listadas com o motivo;
 2. a textura da madeira, do metal, do tecido e do liso aprovada pela pessoa em imagem, ao lado da referência do Blender;
 3. o objeto exportado abre no Blender com a textura aplicada (conferido por renderização);
 4. o acordo mudado no `roteiros.json` e `CLAUDE.md` regerado;
@@ -83,7 +83,7 @@ instalado para funcionar.
 
 ## Fechamento
 
-O plano seguinte, a adaptação dos objetos do projeto externo como receita de peça e família do Mecanifica, está no [backlog](../BACKLOG.md) e só abre
+O plano seguinte, a adaptação dos objetos externos como receita de peça e família do Mecanifica, está no [backlog](../BACKLOG.md) e só abre
 com o sim da pessoa. Os aparelhos e os móveis dos 41 objetos que o tradutor já aceita por inteiro são os candidatos naturais a perfis das famílias
 `aparelho-de-caixa` e `movel-de-caixa`.
 
@@ -97,10 +97,10 @@ A pessoa aprovou o metal e o tecido em 2026-10-19, olhando as folhas, e o liso f
 
 ## Resultado final
 
-Concluído em 2026-10-19. O esboço guarda `materiais` na raiz e `material` na forma, sem interpretar, e o acordo do repositório passou a admitir material como escolha por peça e textura por módulo próprio, sem PBR nem paleta nova. O tradutor `tools/mecanifica/receita-externa.mjs` leva a receita do projeto externo ao esboço e de volta: 59 das 66 receitas e 1.377 das 1.394 peças traduzem (98,8%), a volta geométrica bate dentro de 0,5 mm e o bloco de materiais volta idêntico. O módulo `modulos/textura/` gera em Node a imagem de cor de madeira, metal, tecido e liso, determinística e sem emenda. O exportador de OBJ escreve `.mtl`, `map_Kd` e coordenadas de textura em escala do mundo, a conferência no Blender rodou com o `bpy` e a tolerância de 1 mm, que recusava os cantos arredondados, deixou de recusá-los. A bateria completa passou com os 38 gates verdes antes do envio à main.
+Concluído em 2026-10-19. O esboço guarda `materiais` na raiz e `material` na forma, sem interpretar, e o acordo do repositório passou a admitir material como escolha por peça e textura por módulo próprio, sem PBR nem paleta nova. O tradutor `tools/mecanifica/receita-externa.mjs` leva a receita externa ao esboço e de volta: 59 das 66 receitas e 1.377 das 1.394 peças traduzem (98,8%), a volta geométrica bate dentro de 0,5 mm e o bloco de materiais volta idêntico. O módulo `modulos/textura/` gera em Node a imagem de cor de madeira, metal, tecido e liso, determinística e sem emenda. O exportador de OBJ escreve `.mtl`, `map_Kd` e coordenadas de textura em escala do mundo, a conferência no Blender rodou com o `bpy` e a tolerância de 1 mm, que recusava os cantos arredondados, deixou de recusá-los. A bateria completa passou com os 38 gates verdes antes do envio à main.
 
 Custo medido: a etapa 1 foi minha, e os agentes gastaram 350 mil tokens no tradutor (Haiku, 121 chamadas), 184 mil na exportação (Haiku, 76), 142 mil na madeira e 168 mil no metal e no tecido (Sonnet, 58 e 62), cerca de 850 mil no total.
 
 Achados e se o processo os teria pego: (1) um commit meu foi enviado ao ramo com três testes vermelhos, porque encadeei o envio sem esperar a conferência; o ramo não é a main, mas o hábito é o mesmo de antes, e a regra de rodar os testes do que mudou antes de enviar já está no acordo. (2) Os agentes deixaram 26 MB de PNG numa pasta de prova; o processo não pegou, e agora um teste (`tools/arquitetura/imagem-pesada-no-git.test.mjs`) reprova imagem rastreada acima de 3 MB. (3) A tolerância do exportador de OBJ foi corrigida na ferramenta geral, como o acordo manda. (4) O teto de chanfro de 20% do tradutor corta 247 caixas, e o do esboço aceita quase a metade; está no backlog.
 
-Pendências no backlog: o teto de chanfro, as 16 peças com corte, curva ou afinamento, a torneira do `sanitario_quimico` cujo perfil se cruza na receita de origem, e a adaptação dos objetos do projeto externo como receita de peça e família.
+Pendências no backlog: o teto de chanfro, as 16 peças com corte, curva ou afinamento, a torneira do `sanitario_quimico` cujo perfil se cruza na receita de origem, e a adaptação dos objetos externos como receita de peça e família.

@@ -1,4 +1,4 @@
-// Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica.
+// Sonda: receita externo (repositório externo da pessoa) -> .esboco.json do Mecanifica.
 // receita: x leste, y norte, z cima, metros, frente = -y.  esboço: y cima, z para a frente, mm.  (x,y,z)->(x, z, -y)*1000
 import { readFileSync, writeFileSync } from 'node:fs';
 

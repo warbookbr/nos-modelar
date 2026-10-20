@@ -94,3 +94,5 @@ O risco maior é uma fatia mudar a forma de peça aprovada sem ninguém ver; o r
 ## Andamento
 
 Aberto em 2026-10-20 com a reprodução dos onze achados e o primeiro caso do gabarito do Blender, sem implementação.
+
+Limpeza de texto pedida pela pessoa, fora das fatias: o repositório deixou de nomear o projeto externo de origem das receitas externo, com dois documentos renomeados e os links atualizados.

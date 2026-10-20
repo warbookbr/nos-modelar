@@ -1,6 +1,6 @@
-# Receitas do projeto externo no esboço do Mecanifica (2026-10-19)
+# Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)
 
-A pessoa remodelou em 3D objetos do projeto externo, que no jogo são desenhos para câmera 2.5D, e guardou as receitas no repositório `repositorio-externo` (pasta `externo/receitas`). A receita deles é um JSON de peças `caixa`, `cilindro` e `prisma` com `chanfro`, em metro, com x leste, y norte e z para cima, e o objeto virado para o sul. O `receita_para_esboco.mjs` daqui traduz cada peça para a forma equivalente do esboço (`caixa` com `chanfro`, `cilindro`, `cone`, `extrusao`), em milímetro e com a troca de eixos (x, y, z) para (x, z, -y). As cores vêm da tabela `cores` da receita.
+A pessoa remodelou em 3D objetos de um projeto externo e guardou as receitas em um repositório externo privado (pasta `externo/receitas`). A receita deles é um JSON de peças `caixa`, `cilindro` e `prisma` com `chanfro`, em metro, com x leste, y norte e z para cima, e o objeto virado para o sul. O `receita_para_esboco.mjs` daqui traduz cada peça para a forma equivalente do esboço (`caixa` com `chanfro`, `cilindro`, `cone`, `extrusao`), em milímetro e com a troca de eixos (x, y, z) para (x, z, -y). As cores vêm da tabela `cores` da receita.
 
 As receitas com `espelhar` precisam ser expandidas antes, pela função `expandir` do `externo/receita.py` do repositório de origem.
 
@@ -18,4 +18,4 @@ A textura de cada receita é feita por redes de nós do Blender (`externo/blende
 
 Os esboços são o formato de importação. Para virar receita de peça ou família, o objeto precisa de alinhamento, do crítico visual e da aprovação da pessoa na forma. Pelo que a pasta mostra, os aparelhos e os móveis dos 41 objetos inteiros são candidatos a perfis das famílias `aparelho-de-caixa` e `movel-de-caixa`.
 
-[O que o repositório do projeto externo tem de objetos extraídos](levantamento-do-repo-origem.md): contagem por família de receitas, malhas e objetos em fila (583), de 2026-10-20.
+[O que o repositório do projeto externo da pessoa tem de objetos extraídos](levantamento-do-repo-externo.md): contagem por família de receitas, malhas e objetos em fila (583), de 2026-10-20.

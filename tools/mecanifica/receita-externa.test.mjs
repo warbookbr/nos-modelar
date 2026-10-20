@@ -1,4 +1,4 @@
-/* O tradutor da receita do externo: nove receitas reais (as do repositório projeto externo, já expandidas), sete sem giro e duas com peças giradas.
+/* O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas.
    Cada uma vira esboço que o módulo valida e descreve; a caixa envolvente de cada peça traduzida bate com a da receita (com o chanfro como o
    esboço o monta, 0,5 mm), e a volta devolve a mesma caixa envolvente e o mesmo volume. O bloco de materiais volta igual ao que a receita tinha. */
 import { readdirSync, readFileSync } from 'node:fs';

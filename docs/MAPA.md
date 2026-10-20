@@ -341,9 +341,9 @@
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/
 
-- `README.md` — Receitas do projeto externo no esboço do Mecanifica (2026-10-19)
-- `levantamento-do-repo-origem.md` — O que o repositório do projeto externo tem de objetos extraídos
-- `receita_para_esboco.mjs` — Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima, z para a fr…
+- `README.md` — Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)
+- `levantamento-do-repo-externo.md` — O que o repositório do projeto externo da pessoa tem de objetos extraídos
+- `receita_para_esboco.mjs` — Sonda: receita externo (repositório externo da pessoa) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima,…
 - `triagem.md` — Triagem das 66 receitas por família candidata
 - `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolv…
 
@@ -598,8 +598,8 @@
 - `2026-10-15-o-aviao-do-esboco-a-receita.md` — O avião do esboço à receita
 - `2026-10-16-aparelhos-de-caixa.md` — Aparelhos de caixa — uma família gera eletrodomésticos e eletrônicos de caixa, provada no forninho elétrico
 - `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
-- `2026-10-19-objetos-origem-como-familias.md` — Objetos do projeto externo como famílias do Mecanifica — da receita traduzida ao perfil aprovado
-- `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
+- `2026-10-19-objetos-externos-como-familias.md` — Objetos externos como famílias do Mecanifica — da receita traduzida ao perfil aprovado
+- `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo da pessoa e geração de textura em Node
 - `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
@@ -2372,8 +2372,8 @@
 - `receita-planejada.mjs` — receita-planejada.mjs — grava a receita planejada de uma peça a partir de uma unidade do esboço aprovado.
 - `receita-planejada.test.mjs` — receita-planejada.test.mjs — a receita planejada que o comando grava a partir de uma unidade do esboço.
 - `receita-externa-medida.mjs` — Mede a tradução da receita do externo sobre uma pasta de receitas já expandidas (os espelhos aplicados pelo `externo/receita.py::expandir`). Uso: node tools…
-- `receita-externa.mjs` — Tradutor da receita do externo (projeto externo, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e o caminho de…
-- `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório projeto externo, já expandidas), sete sem giro e duas com peças giradas. Cada uma…
+- `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e …
+- `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma…
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.

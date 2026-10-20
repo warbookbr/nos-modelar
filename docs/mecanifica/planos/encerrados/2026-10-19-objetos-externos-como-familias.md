@@ -1,4 +1,4 @@
-# Objetos do projeto externo como famílias do Mecanifica — da receita traduzida ao perfil aprovado
+# Objetos externos como famílias do Mecanifica — da receita traduzida ao perfil aprovado
 
 **Estado:** concluído
 
@@ -8,7 +8,7 @@
 
 ## Problema observado
 
-O [plano de material e textura](./2026-10-19-receitas-com-material-e-textura.md) traduz as receitas do projeto externo para o esboço do
+O [plano de material e textura](./2026-10-19-receitas-com-material-e-textura.md) traduz as receitas externas para o esboço do
 Mecanifica: 59 das 66 receitas e 1.377 das 1.394 peças. O esboço, porém, é um alvo de forma, e não um objeto do acervo: ele não tem
 parâmetros, faixas nem aprovação da pessoa, e cada um dos 66 custaria uma peça inteira pelo caminho do avião (de 400 mil a 1,5 milhão de
 tokens). O [plano dos aparelhos de caixa](./2026-10-16-aparelhos-de-caixa.md) mostrou o caminho barato: uma família com perfis,
@@ -20,7 +20,7 @@ aparelhos de caixa e o `movel-de-caixa` já cobrem uma parte desses grupos, e a 
 
 ## Resultado
 
-As famílias que cobrem os objetos do projeto externo que a pessoa quiser, cada uma com perfis aprovados pela pessoa em imagem, usando o
+As famílias que cobrem os objetos externos que a pessoa quiser, cada uma com perfis aprovados pela pessoa em imagem, usando o
 esboço traduzido como alvo de medida e de forma, e com o custo de cada família medido.
 
 ## Filtro Agent-First
@@ -43,7 +43,7 @@ esboço traduzido como alvo de medida e de forma, e com o custo de cada família
 
 ## Excluído
 
-- objetos cujo nome de arquivo ou de receita carrega marca ou nome de fabricante do projeto externo ou do mundo real (`fabricante_a`, `fabricante_b`,
+- objetos cujo nome de arquivo ou de receita carrega marca ou nome de fabricante, do mundo real ou de outro projeto (`fabricante_a`, `fabricante_b`,
   `fabricante_c`, `fabricante_d`, `fabricante_e`, `fabricante_f`, `fabricante_g`): quando a pessoa escolher o objeto, o perfil recebe nome
   neutro e nenhuma marca entra no repositório;
 - as 16 peças com corte, curva ou afinamento e a torneira de `sanitario_quimico`, que seguem no backlog;
@@ -121,7 +121,7 @@ Para a pessoa julgar eletrodoméstico com acabamento, a exportação OBJ passou 
 
 ## Resultado final
 
-Concluído em 2026-10-20. O plano nasceu para fazer famílias do Mecanifica a partir das 66 receitas do projeto externo e terminou fazendo peças do acervo, uma por objeto, e não famílias. A família `cadeira` feita à mão custou 915 mil tokens, e a conversão automática do esboço para passos do núcleo, com ajustes por face, mostrou-se o caminho barato. Entraram 19 peças em `procedural/pecas/`, todas aprovadas pela pessoa em imagem: oito cadeiras e poltronas (`cadeira-madeira`, `cadeira-branca-simples`, `cadeira-branca-madeira`, `cadeira-artesanal`, `poltrona-vime-azul`, `poltrona-vime-roxa`, `poltrona-moderna-amarela`, `poltrona-moderna-branca`), seis balcões e mesa (`balcao-de-bar`, `balcao-de-bar-escuro`, `balcao-liso`, `mesa-quadrada-escura`, `balcao-em-l`, `meio-balcao-vitrine-aquecida`) e cinco eletrodomésticos (`lavadora-secadora-branca`, `lava-loucas-compacta-branca`, `micro-ondas-branco`, `geladeira-compacta-branca`, `freezer-horizontal`). Três foram modeladas do zero por agentes a partir de imagens que a pessoa forneceu: a lava-louças, a lavadora-secadora e a geladeira compacta.
+Concluído em 2026-10-20. O plano nasceu para fazer famílias do Mecanifica a partir das 66 receitas externas e terminou fazendo peças do acervo, uma por objeto, e não famílias. A família `cadeira` feita à mão custou 915 mil tokens, e a conversão automática do esboço para passos do núcleo, com ajustes por face, mostrou-se o caminho barato. Entraram 19 peças em `procedural/pecas/`, todas aprovadas pela pessoa em imagem: oito cadeiras e poltronas (`cadeira-madeira`, `cadeira-branca-simples`, `cadeira-branca-madeira`, `cadeira-artesanal`, `poltrona-vime-azul`, `poltrona-vime-roxa`, `poltrona-moderna-amarela`, `poltrona-moderna-branca`), seis balcões e mesa (`balcao-de-bar`, `balcao-de-bar-escuro`, `balcao-liso`, `mesa-quadrada-escura`, `balcao-em-l`, `meio-balcao-vitrine-aquecida`) e cinco eletrodomésticos (`lavadora-secadora-branca`, `lava-loucas-compacta-branca`, `micro-ondas-branco`, `geladeira-compacta-branca`, `freezer-horizontal`). Três foram modeladas do zero por agentes a partir de imagens que a pessoa forneceu: a lava-louças, a lavadora-secadora e a geladeira compacta.
 
 Por pedido da pessoa foram descartados o micro-ondas cromado, as duas lava-louças convertidas, a lavadora azul e a geladeira mini convertida. Ficaram de fora as cadeiras vitorianas e a `cadeira_desgastada_madeira` (defeitos nos cilindros e discos), 10 cadeiras que a pessoa não escolheu, as geladeiras grandes, os fogões e fornos, os eletrônicos e as louças sanitárias.
 
