@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1530 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1532 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2172,6 +2172,8 @@
 ## tools/mecanifica/
 
 - `absorver-ajuste.mjs` — absorver-ajuste.mjs — a régua da rodada de absorção.
+- `acervo-real.test.mjs` — O diagnóstico de parâmetros do acervo REAL, inteiro, uma vez.
+- `acervo-reduzido.mjs` — acervo-reduzido.mjs — monta um acervo de três peças pequenas sob `tmp/`.
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `alinhar-modelagem.test.mjs` — alinhar-modelagem.test.mjs — a rodada de alinhamento continua colada ao formato que ela produz.

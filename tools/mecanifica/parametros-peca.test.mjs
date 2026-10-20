@@ -24,6 +24,7 @@ import {
   lerCaminho,
   receitaComParametros,
 } from '../../src/autoria/parametros-vivos.js';
+import { montarAcervoReduzido } from './acervo-reduzido.mjs';
 import { alvosDoAcervo, parametrosReutilizavel } from './parametros-peca.mjs';
 import { REPO } from './resolver-caminho-receita.mjs';
 
@@ -207,9 +208,14 @@ const CAMINHO_MINIMA = resolve(AREA_MINIMA, 'minima.js');
 writeFileSync(CAMINHO_MINIMA, fonteReceitaMinima(), 'utf8');
 const MINIMA = CAMINHO_MINIMA.slice(REPO.length + 1).replace(/\\/g, '/');
 
-describe('acervo real', () => {
+/* Acervo reduzido (3 peças pequenas): o custo do teste de conta não depende de
+   quantas peças o acervo real tem. O real inteiro é conferido por `acervo-real.test.mjs`. */
+const REDUZIDO = montarAcervoReduzido();
+
+describe('acervo', () => {
   afterAll(() => {
     rmSync(AREA_MINIMA, { recursive: true, force: true });
+    rmSync(REDUZIDO.absoluta, { recursive: true, force: true });
   });
 
   it('mede a fixture mínima: 5 declarados, 2 vivos, e a saída cabe numa tela', async () => {
@@ -227,17 +233,18 @@ describe('acervo real', () => {
        sozinho, e não de um número escrito aqui: o acervo cresce e encolhe com as
        peças, e o que o teste prova é que a varredura inteira e a medida de cada
        alvo dão a mesma conta, sem alvo ausente nem a mais. */
-    const alvos = alvosDoAcervo().map((a) => a.nome);
-    expect(alvos).toContain('peca-de-prova');
+    const raiz = REDUZIDO.raiz;
+    const alvos = alvosDoAcervo({ raiz }).map((a) => a.nome);
+    expect(alvos).toEqual(['curta', 'minima', 'peca-de-prova']);
     const individuais = [];
     for (const alvo of alvos) {
-      const um = await parametrosReutilizavel({ alvo });
+      const um = await parametrosReutilizavel({ alvo, raiz });
       expect(um.ok, alvo).toBe(true);
       individuais.push([alvo, um.resultado.registro.totais]);
     }
     const soma = (campo) => individuais.reduce((total, [, t]) => total + t[campo], 0);
 
-    const r = await parametrosReutilizavel({ acervo: true });
+    const r = await parametrosReutilizavel({ acervo: true, raiz });
     expect(r.ok).toBe(true);
     expect(r.resultado.registros.map((x) => x.alvo)).toEqual(alvos);
     expect(r.resultado.totais).toEqual({ declarados: soma('declarados'), vivos: soma('vivos'), inertes: soma('inertes') });
@@ -252,7 +259,13 @@ describe('acervo real', () => {
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
     expect(r.resultado.registros.every((x) => x.determinismo.estavel)).toBe(true);
-  }, 180_000);
+  }, 60_000);
+
+  it('recusa uma raiz de acervo fora do repositório', async () => {
+    const r = await parametrosReutilizavel({ acervo: true, raiz: '../fora' });
+    expect(r.codigo).toBe(2);
+    expect(r.stderr).toContain('fora do repositório');
+  });
 
   it('recusa uso ambíguo em vez de escolher por conta própria', async () => {
     expect((await parametrosReutilizavel({})).codigo).toBe(2);

@@ -10,7 +10,7 @@
  * medir a derivada de um enfeite.
  */
 import { readdirSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { diagnosticarParametros, formatarDiagnostico } from '../../src/autoria/parametros-vivos.js';
@@ -24,14 +24,30 @@ const REPO = resolve(HERE, '../..');
    `pecas` e `maquinas` escritas a mao, e o comando anunciava "acervo inteiro"
    varrendo dois tercos dele: `armas/` tem tres receitas e nunca entrou na
    conta. Derivar do resolvedor faz as duas listas nao poderem divergir. */
-const PASTAS = PASTAS_BUSCA.filter(Boolean).map((relativo) => join(REPO, relativo));
+const PASTAS_RELATIVAS = PASTAS_BUSCA.filter(Boolean);
+
+/** Valida a raiz do acervo. Padrão: o repositório. Uma raiz própria serve a
+ *  quem precisa varrer um acervo REDUZIDO (os testes de encanamento, que não
+ *  medem peça alguma) e tem a mesma estrutura do repositório: as receitas moram
+ *  nas mesmas pastas de `PASTAS_BUSCA` sob ela. Como a varredura importa e
+ *  executa as receitas, a raiz precisa ficar dentro do repositório. */
+export function raizDoAcervo(raiz = null) {
+  if (raiz === null || raiz === undefined) return REPO;
+  const absoluta = resolve(REPO, raiz);
+  const rel = relative(REPO, absoluta);
+  if (rel.startsWith('..') || isAbsolute(rel)) {
+    throw new Error(`a raiz do acervo '${raiz}' fica fora do repositório.`);
+  }
+  return absoluta;
+}
 
 /** Todo alvo do acervo: receita é arquivo, pasta com `receita.js` — a pasta da
  *  peça, onde a receita mora junto das referências — ou pasta com
- *  `montagem.js`. */
-export function alvosDoAcervo() {
+ *  `montagem.js`. `raiz` (padrão: o repositório) troca a base das pastas. */
+export function alvosDoAcervo({ raiz = null } = {}) {
+  const base = raizDoAcervo(raiz);
   const alvos = [];
-  for (const pasta of PASTAS) {
+  for (const pasta of PASTAS_RELATIVAS.map((relativo) => join(base, relativo))) {
     let entradas;
     try { entradas = readdirSync(pasta, { withFileTypes: true }); } catch { continue; }
     for (const entrada of entradas) {
@@ -65,10 +81,10 @@ function erroDeUso(mensagem) {
 }
 
 /** Diagnostica um alvo já resolvido; devolve o registro, nunca lança. */
-async function diagnosticarAlvo(alvo) {
+async function diagnosticarAlvo(alvo, raiz = REPO) {
   let caminho;
   try {
-    caminho = resolverCaminhoReceita(alvo, { raiz: REPO });
+    caminho = resolverCaminhoReceita(alvo, { raiz });
   } catch (erro) {
     return { alvo, carregou: false, erro: erro.message, totais: { declarados: 0, vivos: 0, inertes: 0 } };
   }
@@ -151,8 +167,12 @@ function tabelaDoAcervo(registros) {
 
 /**
  * Diagnostica um alvo, ou o acervo inteiro quando `acervo` é verdadeiro.
+ * `raiz` (CLI: `--raiz=pasta`) aponta um acervo reduzido dentro do repositório,
+ * com a mesma estrutura de pastas; o padrão é o acervo real.
  */
-export async function parametrosReutilizavel({ alvo = null, acervo = false, completo = false } = {}) {
+export async function parametrosReutilizavel({ alvo = null, acervo = false, completo = false, raiz = null } = {}) {
+  let base;
+  try { base = raizDoAcervo(raiz); } catch (erro) { return erroDeUso(erro.message); }
   if (acervo && alvo) {
     return erroDeUso('--acervo varre tudo e não aceita um alvo junto; escolha um dos dois.');
   }
@@ -165,7 +185,7 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
 
   if (acervo) {
     const registros = [];
-    for (const { nome } of alvosDoAcervo()) registros.push(await diagnosticarAlvo(nome));
+    for (const { nome } of alvosDoAcervo({ raiz: base })) registros.push(await diagnosticarAlvo(nome, base));
     const vivos = registros.reduce((soma, r) => soma + r.totais.vivos, 0);
     const declarados = registros.reduce((soma, r) => soma + r.totais.declarados, 0);
     return {
@@ -177,7 +197,7 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
     };
   }
 
-  const registro = await diagnosticarAlvo(alvo);
+  const registro = await diagnosticarAlvo(alvo, base);
   if (!registro.carregou) {
     return {
       ok: false,
@@ -203,7 +223,7 @@ function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: [],
+      opcoes: ['raiz'],
       bandeiras: ['acervo', 'completo'],
       posicional: { nome: 'a receita', obrigatorio: false },
     });
@@ -214,6 +234,7 @@ function comoCLI(argv) {
     alvo: lido.posicional,
     acervo: lido.bandeira('acervo'),
     completo: lido.bandeira('completo'),
+    raiz: lido.opcao('raiz') ?? null,
   });
 }
 

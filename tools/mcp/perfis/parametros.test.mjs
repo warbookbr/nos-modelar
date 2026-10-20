@@ -18,6 +18,7 @@ import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { criarFerramentasParametros } from './parametros.mjs';
 import { parametrosReutilizavel } from '../../mecanifica/parametros-peca.mjs';
+import { montarAcervoReduzido } from '../../mecanifica/acervo-reduzido.mjs';
 import { REPO } from '../../mecanifica/resolver-caminho-receita.mjs';
 
 const ferramentas = criarFerramentasParametros();
@@ -122,8 +123,11 @@ writeFileSync(CAMINHO_LITERAL, fonteReceitaLiteral(), 'utf8');
 const VIVA = CAMINHO_VIVA.slice(REPO.length + 1).replace(/\\/g, '/');
 const LITERAL = CAMINHO_LITERAL.slice(REPO.length + 1).replace(/\\/g, '/');
 
+const REDUZIDO = montarAcervoReduzido();
+
 afterAll(() => {
   rmSync(AREA, { recursive: true, force: true });
+  rmSync(REDUZIDO.absoluta, { recursive: true, force: true });
 });
 
 describe('porta MCP da varredura', () => {
@@ -147,19 +151,20 @@ describe('porta MCP da varredura', () => {
     expect(um.estruturado.resultado.vivos).toContain('w');
     expect(um.conteudo[0].text).toContain(`PARÂMETROS DE ${VIVA}`);
 
-    const todos = await chamar('diagnosticar_parametros', { acervo: true });
+    /* Acervo reduzido (3 peças pequenas, opção `raiz`): o teste prova o
+       encanamento da porta e não pode custar o que o acervo real custa. O real
+       inteiro é conferido uma vez, por `tools/mecanifica/acervo-real.test.mjs`. */
+    const todos = await chamar('diagnosticar_parametros', { acervo: true, raiz: REDUZIDO.raiz });
     /* A porta MCP e a CLI leem a mesma varredura, então o total do acervo que
        uma devolve é o que a outra devolve na mesma árvore. O número não é
        escrito aqui: cada peça nova do acervo o muda, e `parametros-peca.test.mjs`
        prova que ele é a soma dos alvos que o acervo lista. */
-    const cli = await parametrosReutilizavel({ acervo: true });
+    const cli = await parametrosReutilizavel({ acervo: true, raiz: REDUZIDO.raiz });
     expect(cli.ok).toBe(true);
+    expect(cli.resultado.registros).toHaveLength(3);
     expect(todos.estruturado.resultado.totais).toEqual(cli.resultado.totais);
     expect(todos.estruturado.resultado.totais.declarados).toBeGreaterThan(0);
-  }, 360_000);
-  /* O diagnóstico do acervo roda duas vezes aqui, pela porta MCP e pela CLI, e custa a soma de cada peça: em 2026-10-20, com 30 peças,
-     76 s por rodada, dos quais 58 s das três peças de eletrodoméstico com mais partes (micro-ondas-branco 27 s, lavadora-secadora-branca
-     23 s, lava-loucas-compacta-branca 7 s), porque cada parâmetro da TABELA reconstrói a peça inteira. O teto de 90 s deixou de caber. */
+  }, 60_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {
     const r = await chamar('varrer_parametros', { alvo: VIVA, criterio: 'menor-folga' });

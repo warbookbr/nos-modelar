@@ -18,6 +18,8 @@ export const diagnosticarParametrosEntrada = z.object({
   alvo: z.string().min(1).optional(),
   acervo: z.boolean().optional(),
   completo: z.boolean().optional(),
+  /* Acervo reduzido dentro do repositório, com a estrutura de pastas do real. Omitido, vale o acervo real. */
+  raiz: z.string().min(1).optional(),
 }).strict();
 
 export const varrerParametrosEntrada = z.object({
@@ -60,6 +62,7 @@ async function executarDiagnosticar(entrada) {
     alvo: entrada.alvo ?? null,
     acervo: entrada.acervo ?? false,
     completo: entrada.completo ?? false,
+    raiz: entrada.raiz ?? null,
   });
   return { ...bruto, ...comAcao(bruto, 'Informe um alvo do acervo, ou acervo:true para o retrato inteiro.') };
 }
