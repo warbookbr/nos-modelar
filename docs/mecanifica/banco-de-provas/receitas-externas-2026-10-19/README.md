@@ -17,3 +17,5 @@ A textura de cada receita é feita por redes de nós do Blender (`externo/blende
 ## O que falta para virar receita do Mecanifica
 
 Os esboços são o formato de importação. Para virar receita de peça ou família, o objeto precisa de alinhamento, do crítico visual e da aprovação da pessoa na forma. Pelo que a pasta mostra, os aparelhos e os móveis dos 41 objetos inteiros são candidatos a perfis das famílias `aparelho-de-caixa` e `movel-de-caixa`.
+
+[O que o repositório do projeto externo tem de objetos extraídos](levantamento-do-repo-origem.md): contagem por família de receitas, malhas e objetos em fila (583), de 2026-10-20.

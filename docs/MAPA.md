@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1453 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1454 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -341,6 +341,7 @@
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/
 
 - `README.md` — Receitas do projeto externo no esboço do Mecanifica (2026-10-19)
+- `levantamento-do-repo-origem.md` — O que o repositório do projeto externo tem de objetos extraídos
 - `receita_para_esboco.mjs` — Sonda: receita externo (projeto externo) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima, z para a fr…
 - `triagem.md` — Triagem das 66 receitas por família candidata
 - `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolv…
