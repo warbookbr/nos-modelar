@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1434 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1438 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1212,6 +1212,14 @@
 - `receita-01.js` — aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino do pivô, a coroa, o garfo …
 - `receita-02.js` — aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino do pivô, a coroa, o garfo …
 
+## procedural/pecas/balcao-em-l/
+
+- `receita.js` — balcao-em-l — balcão de canto em L, como uma peça só por camada: o contorno em L de seis pontos é desenhado uma vez por camada e extrudado na vertical com `e…
+
+## procedural/pecas/balcao-em-l/referencias/
+
+- `alvo.md` — Alvo do balcão em L
+
 ## procedural/pecas/braco-robotico/
 
 - `ALINHAMENTO.md` — Braço robótico — rodada de alinhamento
@@ -1317,6 +1325,14 @@
 ## procedural/pecas/cadeira-madeira/referencias/
 
 - `alvo.md` — Alvo da cadeira de madeira
+
+## procedural/pecas/meio-balcao-vitrine-aquecida/
+
+- `receita.js` — meio-balcao-vitrine-aquecida — metade de um balcão de vitrine aquecida de salgados: base com rodapé, tampo de quatro bordas com cuba, poste de um lado, trilh…
+
+## procedural/pecas/meio-balcao-vitrine-aquecida/referencias/
+
+- `alvo.md` — Alvo: meio-balcao-vitrine-aquecida
 
 ## procedural/pecas/poltrona-moderna-amarela/
 
