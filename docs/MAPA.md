@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1438 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1446 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1212,6 +1212,22 @@
 - `receita-01.js` — aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino do pivô, a coroa, o garfo …
 - `receita-02.js` — aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino do pivô, a coroa, o garfo …
 
+## procedural/pecas/balcao-de-bar/
+
+- `receita.js` — balcao-de-bar — balcão de bar de madeira: corpo fechado por duas portas de frente, cada uma com moldura, rodapé, tampo que avança sobre o corpo e dois puxado…
+
+## procedural/pecas/balcao-de-bar-escuro/
+
+- `receita.js` — balcao-de-bar-escuro — balcão de bar de madeira escura: corpo fechado por duas portas de frente, rodapé recuado, tampo que avança sobre o corpo e dois puxado…
+
+## procedural/pecas/balcao-de-bar-escuro/referencias/
+
+- `alvo.md` — Alvo do balcão de bar escuro
+
+## procedural/pecas/balcao-de-bar/referencias/
+
+- `alvo.md` — Alvo do balcão de bar
+
 ## procedural/pecas/balcao-em-l/
 
 - `receita.js` — balcao-em-l — balcão de canto em L, como uma peça só por camada: o contorno em L de seis pontos é desenhado uma vez por camada e extrudado na vertical com `e…
@@ -1219,6 +1235,14 @@
 ## procedural/pecas/balcao-em-l/referencias/
 
 - `alvo.md` — Alvo do balcão em L
+
+## procedural/pecas/balcao-liso/
+
+- `receita.js` — balcao-liso — balcão liso de três partes: um rodapé no chão, um corpo sobre ele e um tampo sobre o corpo, todos caixas retas sem chanfro.
+
+## procedural/pecas/balcao-liso/referencias/
+
+- `alvo.md` — Alvo do balcão liso
 
 ## procedural/pecas/braco-robotico/
 
@@ -1333,6 +1357,14 @@
 ## procedural/pecas/meio-balcao-vitrine-aquecida/referencias/
 
 - `alvo.md` — Alvo: meio-balcao-vitrine-aquecida
+
+## procedural/pecas/mesa-quadrada-escura/
+
+- `receita.js` — mesa-quadrada-escura — mesa quadrada de madeira escura: tampo de 980 por 980 mm, quatro pés de 80 mm, quatro saias sob o tampo e oito cantoneiras de reforço …
+
+## procedural/pecas/mesa-quadrada-escura/referencias/
+
+- `alvo.md` — Alvo da mesa quadrada escura
 
 ## procedural/pecas/poltrona-moderna-amarela/
 
