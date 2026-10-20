@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [ajustes no núcleo dos veículos](2026-10-21-ajustes-no-nucleo-dos-veiculos.md) (2026-10-21-ajustes-no-nucleo-dos-veiculos.md), aberto em 2026-10-20: os onze achados do núcleo e das ferramentas que os 27 veículos revelaram, reproduzidos, com quatro decisões da pessoa.
 
 [Veículos de referência livre](encerrados/2026-10-20-veiculos-de-referencia-livre.md) fechou em 2026-10-20 com 27 veículos aprovados pela pessoa. [Objetos do projeto externo](encerrados/2026-10-19-objetos-origem-como-familias.md) fechou em 2026-10-20. [Receitas com material e textura](encerrados/2026-10-19-receitas-com-material-e-textura.md) fechou em 2026-10-19, com o tradutor das receitas do projeto externo, o campo de materiais no esboço e o módulo de textura de madeira, metal, tecido e liso. [Aparelhos de caixa](encerrados/2026-10-16-aparelhos-de-caixa.md) fechou em 2026-10-19, com a família `aparelho-de-caixa`, quatro perfis aprovados pela pessoa e o processo leve de modelagem escrito. [Importar objeto de código](encerrados/2026-10-15-importar-objeto-de-codigo.md) fechou em 2026-10-16, com os importadores de OpenSCAD, STEP e STL no repositório e a decisão da pessoa de não seguir com a importação como caminho principal. [Gates em poucos minutos](encerrados/2026-10-16-gates-em-poucos-minutos.md) fechou no mesmo dia. [O avião do esboço à
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
