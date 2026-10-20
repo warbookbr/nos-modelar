@@ -22,7 +22,7 @@ hora certa. Os documentos abaixo são o contrato que as skills aplicam.
 | conferir um conjunto montado | `auditar-montagem` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | parar e analisar uma forma antes de declará-la pronta | `olhar-bancada --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md) |
 | parar e analisar um esboço de opções antes de mostrá-lo | `esboco --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
-| esboçar um objeto inteiro em formas primitivas, com crítico entre unidades | `esboco-detalhado` (quem esboça) e `laco-do-esboco` (quem conduz) | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
+| esboçar um objeto inteiro em formas primitivas, com crítico entre unidades (opcional: só objeto sem forma de referência, por escolha da pessoa) | `esboco-detalhado` (quem esboça) e `laco-do-esboco` (quem conduz) | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
 | desenhar a prancha alvo | `desenhar-prancha` | [`CONTRATO-AUTORIA-PRANCHA.md`](CONTRATO-AUTORIA-PRANCHA.md) |
 | trazer de volta um ajuste feito na bancada | `absorver-ajuste-da-bancada` | [`AJUSTE-DA-BANCADA.md`](AJUSTE-DA-BANCADA.md) |
 

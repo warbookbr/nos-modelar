@@ -14,8 +14,8 @@ passo seguinte.
 - `documentar`: Escrever, mover ou cortar documento, fora de um plano.
 - `pesquisar`: Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
 - `modelar/peca`: Escrever ou corrigir a receita de uma peça e prová-la na bancada.
-- `modelar/esboco`: Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.
-- `modelar/laco-do-esboco`: Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.
+- `modelar/esboco`: Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço.
+- `modelar/laco-do-esboco`: Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço.
 - `modelar/auditar-peca`: Obter evidência objetiva de uma peça antes de publicar ou homologar.
 - `modelar/auditar-montagem`: Conferir composição, relações, encaixes e impacto de um conjunto montado.
 <!-- roteiros:fim -->

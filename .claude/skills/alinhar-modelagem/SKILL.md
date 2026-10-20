@@ -86,7 +86,7 @@ delas. Num objeto de várias partes, a ordem do passo 1 vai
 para `etapas` da montagem v5, e cada encaixe anotado vira um vínculo de medida
 ou uma posição por porta, conforme
 [`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md).
-Quando a peça nasce de uma unidade de esboço aprovado, rode primeiro
+O alinhamento parte da forma de referência ou da medida; o esboço detalhado é opcional e só serve sem referência. Quando a peça nasce de uma unidade de esboço aprovado, rode primeiro
 `npm run receita:planejada -- <esboço.esboco.json> --unidade <unidade> --peca <objeto>/<peça>`.
 Ele grava a receita planejada com a `TABELA`, os `PONTOS`, o `REFINA`, os `contatos`,
 as `formas`, as partes do `PLANO` e a composta da unidade como alvo, a partir do que o

@@ -1,9 +1,11 @@
 ---
 name: laco-do-esboco
-description: Conduz o laço do esboço detalhado: despacha o esbocista por objeto ou unidade, o crítico cego a cada parada, refaz a unidade abaixo de 8 e mede no fim. Use quando a sessão principal orquestra. Não use para esboçar à mão nem para opções de forma.
+description: Conduz o laço do esboço detalhado: esbocista por unidade, crítico cego a cada parada, medição no fim. Opcional: só sem forma de referência e por escolha da pessoa. Não use para esboçar à mão nem para opções de forma.
 ---
 
 # Conduzir o laço do esboço
+
+Opcional: só para objeto sem forma de referência alguma, se a pessoa escolher esboçar.
 
 Você orquestra e não modela. Você não escreve o JSON do esboço, não pontua a
 unidade no lugar do crítico e não decide sozinho que uma unidade está boa. Se

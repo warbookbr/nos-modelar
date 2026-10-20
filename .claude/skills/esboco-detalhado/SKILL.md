@@ -1,9 +1,11 @@
 ---
 name: esboco-detalhado
-description: Esboça um objeto inteiro em primitivas e componentes, com contrato, gate de contato, crítico cego e Marcos, por `npm run esboco -- --condutor`. Use para o esboço detalhado. Não use para opções de forma (é a esbocar-opcoes) nem peça final.
+description: Esboça um objeto em primitivas e componentes, com contrato, gate de contato e crítico cego, por `npm run esboco -- --condutor`. Opcional: só sem forma de referência e por escolha da pessoa. Não use para opções de forma.
 ---
 
 # Esboço detalhado
+
+Opcional: o fluxo padrão parte de forma de referência ou medida; o esboço só serve a objeto sem referência alguma, se a pessoa escolher.
 
 Esta skill diz como esboçar um objeto inteiro, qualquer que seja, com a
 ferramenta `npm run esboco`. A referência do JSON se consulta por tópico, com `npm run esboco -- --ajuda

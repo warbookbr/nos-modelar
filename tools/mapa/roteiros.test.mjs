@@ -174,4 +174,19 @@ describe('o gate leitura:obrigatoria recusa', () => {
     expect(problemas).toContain('"id" repetido');
     expect(problemas).toContain('"linhaDeBase" deve ser');
   });
+
+  it('o esboço detalhado é opcional: nenhum roteiro padrão o cita como etapa, e os dois do esboço dizem a condição de uso', () => {
+    const dados = carregarRoteiros();
+    const DO_ESBOCO = ['modelar/esboco', 'modelar/laco-do-esboco'];
+    const cita = (texto) => /esbo[çc]|esbocista/i.test(texto);
+    for (const r of dados.roteiros.filter((x) => !DO_ESBOCO.includes(x.id))) {
+      const etapa = [r.skill, r.passo, ...(r.comandos ?? []), ...(r.ler ?? []).map((l) => (typeof l === 'string' ? l : l.arquivo))].join('\n');
+      expect(cita(etapa), `o roteiro ${r.id} cita o esboço como etapa`).toBe(false);
+    }
+    for (const id of DO_ESBOCO) {
+      const r = dados.roteiros.find((x) => x.id === id);
+      expect(r.quando, id).toMatch(/sem forma de referência/);
+      expect(r.quando, id).toMatch(/escolha da pessoa/);
+    }
+  });
 });

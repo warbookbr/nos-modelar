@@ -16,8 +16,8 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 | `documentar` | trabalhar na documentação | Escrever, mover ou cortar documento, fora de um plano. |
 | `pesquisar` | pesquisar | Saber o que já se tentou, mediu ou pesquisou antes de propor algo. |
 | `modelar/peca` | modelar | Escrever ou corrigir a receita de uma peça e prová-la na bancada. |
-| `modelar/esboco` | modelar | Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista. |
-| `modelar/laco-do-esboco` | modelar | Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos. |
+| `modelar/esboco` | modelar | Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço. |
+| `modelar/laco-do-esboco` | modelar | Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço. |
 | `modelar/auditar-peca` | modelar | Obter evidência objetiva de uma peça antes de publicar ou homologar. |
 | `modelar/auditar-montagem` | modelar | Conferir composição, relações, encaixes e impacto de um conjunto montado. |
 
@@ -117,19 +117,19 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 - `docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
-- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem esboço por unidade.
+- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 
 Skill: `criar-peca`.
 
 Comandos: `node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
 
-Passo seguinte, sem estado lido: Com peça nova, combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.
+Passo seguinte, sem estado lido: Com peça nova, parta da forma de referência ou da medida (conversão, modelo de referência, imagem, prancha), combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.
 
 Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.
 
 ## modelar/esboco: Esboçar um objeto em formas primitivas
 
-Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.
+Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço.
 
 Ler antes de começar, num orçamento de 14.000 bytes (linha de base de 23.789 bytes em 2026-10-08):
 
@@ -153,7 +153,7 @@ Conferido no fim: O Portão de cada estágio do Condutor e a nota 8 ou mais do c
 
 ## modelar/laco-do-esboco: Conduzir o laço do esboço
 
-Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.
+Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço.
 
 Ler antes de começar, num orçamento de 12.000 bytes (linha de base de 13.878 bytes em 2026-10-08):
 

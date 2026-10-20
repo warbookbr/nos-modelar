@@ -19,7 +19,7 @@ ele. A definição completa está em
 
 ## Ferramentas
 
-- **esboço** ([`modulos/esboco`](modulos/esboco/README.md), skills
+- **esboço**, opcional e fora do fluxo padrão, indicado só para objeto sem forma de referência e por escolha da pessoa ([`modulos/esboco`](modulos/esboco/README.md), skills
   `esboco-detalhado` e `laco-do-esboco`): desenha o objeto inteiro em formas
   primitivas a partir de um JSON, com gate de contato, Condutor por estágios e
   crítico cego, antes da peça procedural; a referência do JSON se consulta por

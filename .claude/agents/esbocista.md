@@ -1,6 +1,6 @@
 ---
 name: esbocista
-description: Modela o esboço detalhado de um objeto ou unidade pela skill esboco-detalhado, parando a cada --feito até a nota do crítico. Não julga o próprio resultado nem mexe no código. Use dentro do laço do esboço; para mudar o módulo, use o implementador.
+description: Esboça um objeto ou unidade pela skill esboco-detalhado, parando a cada --feito até a nota do crítico. Opcional: só sem forma de referência e por escolha da pessoa. Não julga o resultado nem mexe no código.
 model: sonnet
 ---
 

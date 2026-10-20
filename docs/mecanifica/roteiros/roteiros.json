@@ -303,7 +303,7 @@
         },
         {
           "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
-          "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem esboço por unidade"
+          "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         }
       ],
       "skill": "criar-peca",
@@ -312,7 +312,7 @@
         "npm run parametros",
         "npm run conferir:referencia"
       ],
-      "passo": "Com peça nova, combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.",
+      "passo": "Com peça nova, parta da forma de referência ou da medida (conversão, modelo de referência, imagem, prancha), combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.",
       "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
       "orcamentoBytes": 65000,
       "linhaDeBase": {
@@ -324,7 +324,7 @@
       "id": "modelar/esboco",
       "intencao": "modelar",
       "titulo": "Esboçar um objeto em formas primitivas",
-      "quando": "Escrever o JSON do esboço de um objeto ou de uma unidade, como esbocista.",
+      "quando": "Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço.",
       "ler": [
         "CLAUDE.md",
         ".claude/skills/esboco-detalhado/SKILL.md"
@@ -366,7 +366,7 @@
       "id": "modelar/laco-do-esboco",
       "intencao": "modelar",
       "titulo": "Conduzir o laço do esboço",
-      "quando": "Despachar esbocista e crítico, registrar vereditos e medir o custo de um ou mais objetos.",
+      "quando": "Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço.",
       "ler": [
         "CLAUDE.md",
         ".claude/skills/laco-do-esboco/SKILL.md"
