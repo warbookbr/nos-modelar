@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1532 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1537 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -397,6 +397,14 @@
 ## docs/mecanifica/banco-de-provas/textura-2026-10-19/
 
 - `README.md` — Madeira em Node ao lado da do Blender (2026-10-19)
+
+## docs/mecanifica/blender/
+
+- `COMO-COMECAR.md` — Como começar com o Blender
+- `FLUXO-GENERICO.md` — Fluxo genérico de modelagem com Blender
+- `INSTALAR-E-CONVERTER.md` — Instalar o Blender e converter para GLB
+- `README.md` — Blender com o Mecanifica
+- `USOS-E-LIMITES.md` — Usos do Blender, limites e regras
 
 ## docs/mecanifica/gerado/
 

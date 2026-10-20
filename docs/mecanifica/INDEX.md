@@ -25,7 +25,6 @@ plano. O que está encerrado vive em
 ## Estado atual
 
 - Nenhum plano está ativo. [Veículos de referência livre](planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) fechou em 2026-10-20 com 27 veículos de licença livre sem exigência de crédito aprovados pela pessoa. [Objetos do projeto externo](planos/encerrados/2026-10-19-objetos-origem-como-familias.md) fechou em 2026-10-20 com 19 peças. [Receitas com material e textura](planos/encerrados/2026-10-19-receitas-com-material-e-textura.md) fechou em 2026-10-19. [Aparelhos de caixa](planos/encerrados/2026-10-16-aparelhos-de-caixa.md) fechou em 2026-10-19. [Importar objeto de código](planos/encerrados/2026-10-15-importar-objeto-de-codigo.md) fechou em 2026-10-16, e [gates em poucos minutos](planos/encerrados/2026-10-16-gates-em-poucos-minutos.md) fechou no mesmo dia, com a bateria padrão abaixo de 5 minutos. O anterior, [o avião do esboço à receita](planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md), fechou em 2026-10-16 com as oito peças no núcleo, a montagem auditada e o avião aprovado pela pessoa; antes dele, [as famílias de desenho](planos/encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14. Antes, [o desenho sem referência](planos/encerrados/2026-10-13-desenho-sem-referencia.md) fechou em 2026-10-14 com o módulo de desenho por restrições.
-  O que fechou antes dele está em `planos/README.md` e na crônica abaixo.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
   `npm run exportar:step` e `npm run exportar:obj`. O STEP sai por
@@ -85,6 +84,7 @@ o núcleo nem define o modelo de autoria.
 | `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
 | `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |
 | `docs/mecanifica/historico/` | evidências encerradas, sem autoridade nova |
+| `docs/mecanifica/blender/` | [Blender](blender/README.md) externo e opcional, com fluxo de modelagem |
 
 Montagem persistida v1 tem contrato e resolvedor em `src/autoria/` e provas em
 `tools/mecanifica/fixtures/montagens-persistidas/`; o mapa global de dependências
