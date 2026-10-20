@@ -12,6 +12,7 @@ O Blender é opcional. A receita do Mecanifica continua sendo o produto, porque 
 | [`INSTALAR-E-CONVERTER.md`](INSTALAR-E-CONVERTER.md) | instalação verificada do Blender 4.2 LTS e o script de conversão para GLB |
 | [`FLUXO-GENERICO.md`](FLUXO-GENERICO.md) | as etapas de a a e, com o que entra, o que sai e quem aprova, e o caminho para objeto sem forma de referência |
 | [`USOS-E-LIMITES.md`](USOS-E-LIMITES.md) | os usos do Blender, o que está provado e o que é hipótese, e as regras de licença e de gate |
+| [`modelar-veiculos.md`](../modelar-veiculos.md) | as instruções de modelagem de veículo a partir de fonte de referência: técnica das três vistas e seção por grupo |
 
 ## O que está provado
 

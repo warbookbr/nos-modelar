@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1537 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1538 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -142,6 +142,7 @@
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
+- `modelar-veiculos.md` — Veículos de referência livre: análise da primeira leva e instruções para o modelador
 
 ## docs/mecanifica/banco-de-provas/
 
