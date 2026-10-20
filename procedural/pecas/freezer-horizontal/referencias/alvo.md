@@ -1,0 +1,7 @@
+# Alvo do freezer horizontal
+
+Não há imagem de referência: o alvo é a medida. Caixa total x -485 a 480, y 0 a 776, z -530 a 257 (965 por 776 por 787 mm). O corpo é uma caixa de 941 por 668 por 713 mm, sobre o chão, com as doze arestas arredondadas em 8 mm, a face de trás em z -488 e a de frente em z 225. Uma junta escura de 965 por 25 por 737 mm, de y 655 a 680, cobre o topo do corpo e avança 12 mm além dele em x e em z. O tampo é uma placa de 965 por 96 por 737 mm, de y 680 a 776, com as doze arestas arredondadas em 8 mm, assentada sobre a junta. Um puxador de 360 por 25 por 20 mm sai 20 mm da frente do tampo, de x -175 a 185 e de y 715 a 740. Duas dobradiças de 50 por 100 por 30 mm, de y 620 a 720, ficam presas na face de trás da junta e do tampo, em x 315 a 365 e x -325 a -275, e saem 30 mm para trás. Quatro grades de 20 por 130 por 14 mm, de y 40 a 170, ficam na face de trás do corpo, em x 240 a 260, 290 a 310, 340 a 360 e 390 a 410.
+
+O corpo, o tampo e o puxador são brancos e limpos, com desgaste até 0,02. O módulo de textura não modela brilho, então o acabamento lustroso fica só como cor clara e lisa. As dobradiças também são brancas, e a junta e as grades são escuras.
+
+A forma veio de uma receita externa de freezer convertida em passos do núcleo, com alinhamento das caixas. Nas rodadas seguintes, a pessoa pediu a tampa 40 mm mais fina no total, arestas arredondadas no lugar do chanfro, branco no gabinete e nas dobradiças. A pessoa aprova a forma.

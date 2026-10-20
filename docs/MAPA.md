@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1454 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1458 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1350,6 +1350,22 @@
 ## procedural/pecas/cadeira-madeira/referencias/
 
 - `alvo.md` — Alvo da cadeira de madeira
+
+## procedural/pecas/freezer-horizontal/
+
+- `receita.js` — freezer-horizontal — freezer horizontal de tampo: corpo branco sobre o chão, junta escura que cobre o topo do corpo, tampo arredondado assentado sobre a junt…
+
+## procedural/pecas/freezer-horizontal/referencias/
+
+- `alvo.md` — Alvo do freezer horizontal
+
+## procedural/pecas/geladeira-compacta-branca/
+
+- `receita.js` — geladeira-compacta-branca — frigobar alto de uma porta, todo branco: gabinete de cantos levemente arredondados, porta de placa com as bordas arredondadas, um…
+
+## procedural/pecas/geladeira-compacta-branca/referencias/
+
+- `alvo.md` — Alvo: geladeira compacta branca
 
 ## procedural/pecas/lava-loucas-compacta-branca/
 
