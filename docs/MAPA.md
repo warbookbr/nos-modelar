@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1446 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1453 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1350,6 +1350,22 @@
 
 - `alvo.md` — Alvo da cadeira de madeira
 
+## procedural/pecas/lava-loucas-compacta-branca/
+
+- `receita.js` — lava-loucas-compacta-branca — lava-louças compacta branca de embutir sob bancada, com caixa branca, painel de controle na faixa de cima da frente, porta, pux…
+
+## procedural/pecas/lava-loucas-compacta-branca/referencias/
+
+- `alvo.md` — Alvo: lava-louças compacta branca
+
+## procedural/pecas/lavadora-secadora-branca/
+
+- `receita.js` — lavadora-secadora-branca — lavadora e secadora de roupa branca de porta frontal: caixa branca com um rebaixo na frente-topo que guarda o painel escuro (com a…
+
+## procedural/pecas/lavadora-secadora-branca/referencias/
+
+- `alvo.md` — Alvo: lavadora e secadora branca de porta frontal
+
 ## procedural/pecas/meio-balcao-vitrine-aquecida/
 
 - `receita.js` — meio-balcao-vitrine-aquecida — metade de um balcão de vitrine aquecida de salgados: base com rodapé, tampo de quatro bordas com cuba, poste de um lado, trilh…
@@ -1365,6 +1381,14 @@
 ## procedural/pecas/mesa-quadrada-escura/referencias/
 
 - `alvo.md` — Alvo da mesa quadrada escura
+
+## procedural/pecas/micro-ondas-branco/
+
+- `receita.js` — micro-ondas-branco — micro-ondas de bancada: corpo de metal claro sobre uma base escura, porta com janela à esquerda, painel detalhado em coluna alta à direi…
+
+## procedural/pecas/micro-ondas-branco/referencias/
+
+- `alvo.md` — Alvo do micro-ondas branco
 
 ## procedural/pecas/poltrona-moderna-amarela/
 
@@ -2124,6 +2148,7 @@
 - `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Mecanifica, para conferir o que a conversão e os ajustes fizeram.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
+- `vistas-texturizadas.mjs` — vistas-texturizadas.mjs — três vistas de uma peça do acervo COM a textura que a exportação OBJ gera, para quem precisa julgar o acabamento (eletrodoméstico, …
 
 ## tools/mecanifica/fixtures/
 

@@ -5,6 +5,7 @@ import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   carregarModuloTextura,
+  especificacaoDeTextura,
   exportarArquivoObj,
   parseArgs,
   REPO,
@@ -154,5 +155,33 @@ describe('CLI exportar-obj com --com-textura', () => {
     expect(readFileSync(saida, 'utf8')).not.toContain('mtllib');
     expect(existsSync(join(pasta, 'caixa.mtl'))).toBe(false);
     expect(readdirSync(pasta)).toEqual(['caixa.obj']);
+  });
+});
+
+describe('textura da receita do acervo na exportação OBJ', () => {
+  it('a especificação sai do tipo e da cor hexadecimal de MATERIAIS', () => {
+    expect(especificacaoDeTextura('pintura', { tipo: 'metal', cor: '#ff8000', acabamento: 'escovado', desgaste: 0.2 }))
+      .toEqual({ tipo: 'metal', cor: [255, 128, 0], acabamento: 'escovado', desgaste: 0.2 });
+  });
+
+  it('sem tipo declarado o nome do material decide, e o que não se reconhece vira liso', () => {
+    expect(especificacaoDeTextura('madeiraCorpo', { cor: '#101010' }).tipo).toBe('madeira');
+    expect(especificacaoDeTextura('aco', { cor: '#101010' }).tipo).toBe('metal');
+    expect(especificacaoDeTextura('plastico', { cor: '#101010' }).tipo).toBe('liso');
+  });
+
+  it('tipo fora de madeira, metal, tecido e liso é recusado com o nome do material', () => {
+    expect(() => especificacaoDeTextura('x', { tipo: 'vidro', cor: '#ffffff' })).toThrow(/material 'x'.*vidro/);
+  });
+
+  it('uma peça com MATERIAIS e PASSOS nomeado exporta com textura, sem passo de material órfão', async () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'exp-mat-'));
+    try {
+      const saida = join(pasta, 'balcao.obj');
+      await exportarArquivoObj({ arquivo: resolve(REPO, 'procedural/pecas/cadeira-madeira/receita.js'), saida, unidade: 'm', comTextura: false, sobrescrever: true });
+      expect(existsSync(saida)).toBe(true);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
   });
 });

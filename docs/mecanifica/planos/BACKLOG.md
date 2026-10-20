@@ -42,6 +42,8 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Teto de chanfro do tradutor de receitas | o tradutor limita o chanfro a 20% da menor medida e corta 247 caixas das 66 receitas; o esboço aceita quase a metade; testar o gate com essas 247 antes de subir o teto |
 | Peças de receita com corte, curva ou afinamento | 16 peças das receitas do projeto externo ficam fora do tradutor, e a torneira de `sanitario_quimico` tem perfil que se cruza na própria receita de origem |
 | Toro no esboço | o esboço não tem a forma de anel ou boia; ela respondeu por 10,6% das recusas do BlendNet e aparece em pneu, alça e argola |
+| Texto e ícones sobre o objeto | o painel do micro-ondas branco, o da lava-louças compacta e o da lavadora-secadora têm nomes de função, ícones e dígitos que só existem na imagem de referência; o núcleo não modela texto, e o módulo de textura não tem etiqueta (decalque). Quando a textura ganhar escrita, esses painéis são as primeiras peças a alterar, e cada receita lista no cabeçalho o que a imagem escreve |
+| Afinamento do pé da mesa quadrada | o pé de `mesa_pes_recortados_escura` tem afinamento de 12 mm em dois lados perto do chão, recusado pelo tradutor de receitas; `mesa-quadrada-escura` usa pé reto de 80 por 80 mm |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro

@@ -37,6 +37,27 @@ export async function carregarModuloTextura(caminho = CAMINHO_MODULO_TEXTURA) {
   return modulo;
 }
 
+const TIPOS_DE_TEXTURA = ['madeira', 'metal', 'tecido', 'liso'];
+
+/* O módulo de textura recebe a especificação do material ({ tipo, cor: [r, g, b], ... }), e a receita do acervo guarda o material por
+   nome, com `tipo` e `cor` em hexadecimal em MATERIAIS. Sem `tipo` declarado, o nome decide: o que cita metal, aço ou cromo vira
+   `metal`, madeira vira `madeira`, tecido ou pano vira `tecido`, e o resto vira `liso`. */
+export function especificacaoDeTextura(nome, entrada = {}) {
+  const { tipo: tipoDeclarado, cor, metalicidade, aspereza, ...resto } = entrada;
+  let tipo = tipoDeclarado;
+  if (!tipo) {
+    const n = nome.toLowerCase();
+    tipo = /madeira|vime/.test(n) ? 'madeira' : /tecido|pano|estofado/.test(n) ? 'tecido' : /metal|inox|cromo|ferro|^aco/.test(n) ? 'metal' : 'liso';
+  }
+  if (!TIPOS_DE_TEXTURA.includes(tipo)) throw new Error(`material '${nome}': tipo '${tipo}' desconhecido (esperado ${TIPOS_DE_TEXTURA.join(', ')}).`);
+  let rgb = [128, 128, 128];
+  if (typeof cor === 'string' && /^#[0-9a-fA-F]{6}$/.test(cor)) rgb = [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16));
+  else if (Array.isArray(cor) && cor.length === 3) rgb = cor;
+  const extras = {};
+  for (const campo of ['desgaste', 'veio', 'borda', 'tabuas', 'ferrugem', 'manchas', 'rasgos', 'acabamento']) if (resto[campo] !== undefined) extras[campo] = resto[campo];
+  return { tipo, cor: rgb, ...extras };
+}
+
 function materiaisDaMalha(neutro) {
   const nomes = new Set();
   for (const face of neutro.F.values()) {
@@ -128,10 +149,12 @@ export async function carregarReceita(caminhoArquivo) {
   }
 
   const mod = await importarReceita(caminhoAbsoluto);
-  const receita = mod.PASSOS || mod.CHAMADAS_COMPOSICOES
-    ? mod
-    : (mod.default?.PASSOS || mod.default?.CHAMADAS_COMPOSICOES
-        ? mod.default
+  /* A exportação default da receita traz o conjunto inteiro (PASSOS, MATERIAIS, ALIASES); uma peça que também exporta PASSOS nomeado
+     perdia o MATERIAIS quando o módulo inteiro era escolhido, e o passo `material` ficava órfão. */
+  const receita = mod.default?.PASSOS || mod.default?.CHAMADAS_COMPOSICOES
+    ? mod.default
+    : (mod.PASSOS || mod.CHAMADAS_COMPOSICOES
+        ? mod
         : Object.values(mod).find((v) => v && (Array.isArray(v.PASSOS) || Array.isArray(v.CHAMADAS_COMPOSICOES))));
 
   if (!receita) {
@@ -204,7 +227,7 @@ export async function exportarArquivoObj(opcoesArg) {
     const modulo = moduloTextura ?? await carregarModuloTextura();
     texturas = {};
     for (const material of materiaisDaMalha(neutro)) {
-      const textura = await modulo.gerarTextura(material, { px: PX_TEXTURA_PADRAO, semente: sementeDe(`${stem}:${material}`) });
+      const textura = await modulo.gerarTextura(especificacaoDeTextura(material, receita.MATERIAIS?.[material]), { px: PX_TEXTURA_PADRAO, semente: sementeDe(`${stem}:${material}`) });
       const arquivo = `${stem}_${material}.png`;
       texturas[material] = { arquivo, metrosPorTile: textura.metrosPorTile };
       imagens.push({ arquivo, bytes: Buffer.from(await modulo.texturaParaPng(textura)) });
