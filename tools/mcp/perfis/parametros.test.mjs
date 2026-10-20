@@ -156,7 +156,10 @@ describe('porta MCP da varredura', () => {
     expect(cli.ok).toBe(true);
     expect(todos.estruturado.resultado.totais).toEqual(cli.resultado.totais);
     expect(todos.estruturado.resultado.totais.declarados).toBeGreaterThan(0);
-  }, 90_000);
+  }, 360_000);
+  /* O diagnóstico do acervo roda duas vezes aqui, pela porta MCP e pela CLI, e custa a soma de cada peça: em 2026-10-20, com 30 peças,
+     76 s por rodada, dos quais 58 s das três peças de eletrodoméstico com mais partes (micro-ondas-branco 27 s, lavadora-secadora-branca
+     23 s, lava-loucas-compacta-branca 7 s), porque cada parâmetro da TABELA reconstrói a peça inteira. O teto de 90 s deixou de caber. */
 
   it('varre sensibilidade e devolve onde olhar', async () => {
     const r = await chamar('varrer_parametros', { alvo: VIVA, criterio: 'menor-folga' });
