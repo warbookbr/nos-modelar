@@ -471,7 +471,6 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -591,6 +590,7 @@
 - `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
 - `2026-10-19-objetos-origem-como-familias.md` — Objetos do projeto externo como famílias do Mecanifica — da receita traduzida ao perfil aprovado
 - `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
+- `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

@@ -80,7 +80,7 @@ uma peça do avião; ou se a pessoa não reconhecer os objetos como os dela depo
 
 ## Fechamento
 
-O plano seguinte é o de [veículos de referência livre](../2026-10-20-veiculos-de-referencia-livre.md), que cobre veículos a partir de malhas com licença livre sem exigência de crédito. O resto do projeto de origem (fogões e fornos, geladeiras grandes, eletrônicos, louças sanitárias e as cadeiras que a pessoa não escolheu) entra quando a pessoa enviar mais receitas, e o [backlog](../BACKLOG.md) guarda as pendências.
+O plano seguinte é o de [veículos de referência livre](./2026-10-20-veiculos-de-referencia-livre.md), que cobre veículos a partir de malhas com licença livre sem exigência de crédito. O resto do projeto de origem (fogões e fornos, geladeiras grandes, eletrônicos, louças sanitárias e as cadeiras que a pessoa não escolheu) entra quando a pessoa enviar mais receitas, e o [backlog](../BACKLOG.md) guarda as pendências.
 
 ## Andamento
 

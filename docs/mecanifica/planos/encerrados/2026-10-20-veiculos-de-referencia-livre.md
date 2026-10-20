@@ -1,6 +1,6 @@
 # Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com a pessoa aprovando forma
 
@@ -85,13 +85,29 @@ Peça determinística e versionada, aprovada pelo `guarda:acervo` com plano de m
 3. **Primeiro lote de 9 veículos, refeito.** Os nove modelados por agentes Haiku foram recusados pela pessoa, exceto o `carro-sedan-compacto`. Um Opus analisou a abordagem (carroceria com largura constante, rodas dentro do corpo, perfis laterais errados e uma silhueta que media escala e não forma) e escreveu as instruções por grupo de veículo; as outras oito peças foram refeitas por agentes Sonnet pela interseção do perfil lateral, da seção frontal e da planta, com os arcos de roda no próprio perfil. Aprovadas pela pessoa em 2026-10-20. Feita.
 4. **Os 18 restantes,** em dois lotes de 9 por agentes Sonnet, com as instruções do Opus e as lições do lote anterior. Aprovados pela pessoa em 2026-10-20. Feita.
 5. **Brilho.** Autorizada pela pessoa em 2026-10-20. O material de `MATERIAIS` aceita `brilho` (número de 0 a 1; ausente mantém o comportamento atual, e nenhuma peça existente muda). O campo é validado em `especificacaoDeTextura` e em `validarTexturas`, o `.mtl` da exportação OBJ grava `Ns` (brilho x 200) e `Ks` cinza (brilho x 0,5), e `vistas-texturizadas.mjs` mostra o reflexo pelo `MeshPhongMaterial` que o `MTLLoader` já cria. Aplicado só na `geladeira-compacta-branca` (`branco` e `brancoCinza`) e no `freezer-horizontal` (`branco`), com 0,7. Os testes de `.mtl` com e sem brilho e a recusa de valor fora de 0 a 1 impedem o campo de cair em silêncio. PBR completo (aspereza, metalicidade, normal) e paleta nova seguem fora. Feita.
-6. **Fechamento.** Custos, achados e a decisão sobre as peças recusadas.
+6. **Fechamento.** Custos, achados e a decisão sobre as peças recusadas. Feita.
 
 ## Riscos e parada
 
 O agente pode errar rodas, janelas e perfil, que são o que mais separa um veículo reconhecível de uma caixa. A primeira leva, de agentes Haiku, foi recusada em oito de nove peças; o plano passou a usar agentes Sonnet com as instruções por grupo. Para e volta à pessoa se menos da metade de um lote passar na aprovação da pessoa, ou se o custo por veículo ficar acima do planejado.
 
 ## Fechamento
+
+O plano terminou com 27 veículos de referência livre (7 de três pacotes e 20 de outro pacote, todos de licença livre sem exigência de crédito) recriados no núcleo e aprovados pela pessoa em imagem, e nenhuma peça foi recusada. Saíram do plano as ferramentas de comparação de forma com a fonte, o campo `brilho` do módulo de textura e o esboço detalhado fora do fluxo padrão.
+
+O custo em tokens de subagente, lido das notificações da sessão, vai em valores arredondados e aproximados. O primeiro lote, de 9 agentes Haiku, custou cerca de 2,9 milhões no total (250 a 410 mil cada) e só um veículo foi aprovado pela pessoa. A análise do Opus custou cerca de 260 mil, e as ferramentas, feitas por um Sonnet, cerca de 260 mil. Os oito refazeres por Sonnet custaram cerca de 1,9 milhão (150 a 310 mil cada) e todos foram aprovados. O segundo lote, de 9 Sonnet, custou cerca de 2,4 milhões (200 a 330 mil cada), e o terceiro, também de 9 Sonnet, cerca de 2,4 milhões (200 a 375 mil cada), todos aprovados. O total fica em torno de 10 milhões de tokens: cerca de 350 a 400 mil por veículo aprovado quando se conta o lote Haiku recusado, e cerca de 250 mil por veículo nos lotes Sonnet.
+
+Cada achado abaixo responde se o processo o teria pego sozinho.
+
+1. A primeira leva com Haiku passou na silhueta e foi recusada pela pessoa, porque o comparador por vértices media escala e não forma. O processo não pegou. O que faltava virou `--rigoroso`, `--cabine` e a folha comparativa com vista de diferença, e a regra de que a aprovação de forma vem da folha aberta entrou nas instruções dos agentes.
+2. O comparador por vértices acusava peças corretas porque a fonte tem triângulos grandes. O processo pegou apenas pelo sintoma. Virou medida por superfície e o campo `metodo` no `partes.json`, recusado quando ausente.
+3. Uma fonte (pacote C) veio com a frente invertida. O processo não pegou. Virou o campo `frente`, gravado por `modelo-de-referencia.mjs` e recusado por `comparar-silhueta`, `folha-comparativa` e `medidas-da-fonte` quando falta.
+4. A origem de uma peça foi registrada no pacote errado. O processo não pegou no cabeçalho da receita. Virou `origem-das-fontes.test.mjs`, que confere `docs/mecanifica/veiculos-referencias.json` contra o plano, o `fonte-partes.json` e o `alvo.md`, mas ainda não confere o cabeçalho de `receita.js`. Essa lacuna fica registrada.
+5. O teste do diagnóstico do acervo inteiro estourou o tempo ao passar de 30 para 57 peças, e o primeiro remendo, subir o teto, só adiou a falha. O processo pegou, mas mal. Virou a opção `raiz` e o teste de encanamento sobre um acervo reduzido, mais o teste lento `acervo-real.test.mjs` com teto por peça.
+6. `npm run vistas:critica` estourou 30 s em vários agentes sem causa investigada. O processo não explica o motivo. Fica como pendência, descrita em 'Ajustes no núcleo'.
+7. Agentes com monitores de fundo acordavam a sessão em laço até serem parados. O processo não pegou. A instrução de que agente despachado não deixa monitor ou processo de fundo foi escrita só no brief dos lotes e ainda não está em skill ou gate. Essa lacuna fica registrada.
+
+Os achados do núcleo ficam em 'Ajustes no núcleo' e na tabela do [backlog](../BACKLOG.md), sem implementação, e dependem de plano próprio. As 27 peças estão no acervo, sem peça recusada.
 
 ## Andamento
 
@@ -111,7 +127,7 @@ O processo teria pego sozinho? Não. O roteiro padrão apresentava o esboço com
 
 ## Ajustes no núcleo
 
-Os três problemas abaixo apareceram nas nove peças da primeira leva. Nenhum é implementado neste plano: cada um tem contorno testado, e a correção mexe no núcleo, o que pede plano próprio depois desta leva, com o caso mínimo do sintoma como prova. As linhas correspondentes estão em [`BACKLOG.md`](BACKLOG.md).
+Os três problemas abaixo apareceram nas nove peças da primeira leva. Nenhum é implementado neste plano: cada um tem contorno testado, e a correção mexe no núcleo, o que pede plano próprio depois desta leva, com o caso mínimo do sintoma como prova. As linhas correspondentes estão em [`BACKLOG.md`](../BACKLOG.md).
 
 **Face fina deixada por subtrair cilindros em carroceria.** Sintoma: no experimento da perua, `subtrair` de cilindros de 8 lados na carroceria gerou a face 8006 com razão 1,81e-3, que `conferir-malha` reprova (limite 3e-3), e é a origem provável das faces degeneradas que o exportador recusa. Contorno atual: recortar o arco da roda no próprio perfil lateral 2D antes de extrudar, sem lasca; `subtrair` continua bom em peça pequena. A correção pede plano próprio: a triangulação das faces cortadas fica no núcleo.
 
