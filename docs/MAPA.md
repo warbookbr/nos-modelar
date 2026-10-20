@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1458 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1494 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -471,7 +471,7 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-10-19-objetos-origem-como-familias.md` — Objetos do projeto externo como famílias do Mecanifica — da receita traduzida ao perfil aprovado
+- `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -589,6 +589,7 @@
 - `2026-10-15-o-aviao-do-esboco-a-receita.md` — O avião do esboço à receita
 - `2026-10-16-aparelhos-de-caixa.md` — Aparelhos de caixa — uma família gera eletrodomésticos e eletrônicos de caixa, provada no forninho elétrico
 - `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
+- `2026-10-19-objetos-origem-como-familias.md` — Objetos do projeto externo como famílias do Mecanifica — da receita traduzida ao perfil aprovado
 - `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo e geração de textura em Node
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
@@ -1351,6 +1352,46 @@
 
 - `alvo.md` — Alvo da cadeira de madeira
 
+## procedural/pecas/carro-perua/
+
+- `receita.js` — carro-perua — perua (station wagon) de facetas retas: capô baixo e inclinado, para-brisa em rampa, teto longo e quase plano até uma traseira curta, com vidro…
+
+## procedural/pecas/carro-perua/referencias/
+
+- `alvo.md` — Alvo da perua
+
+## procedural/pecas/carro-sedan-angular/
+
+- `receita.js` — carro-sedan-angular — sedã de faces retas e angulares, recriado em primitivas do núcleo a partir do modelo "Sedan" do pacote D.
+
+## procedural/pecas/carro-sedan-angular/referencias/
+
+- `alvo.md` — Alvo: carro-sedan-angular
+
+## procedural/pecas/carro-sedan-classico/
+
+- `receita.js` — carro-sedan-classico — sedã de caixa dos anos 80, vermelho, com cabine, vidros, para-choques, faróis, lanternas, retrovisores e quatro rodas com pneu e aro. …
+
+## procedural/pecas/carro-sedan-classico/referencias/
+
+- `alvo.md` — Alvo: pacote B
+
+## procedural/pecas/carro-sedan-compacto/
+
+- `receita.js` — carro-sedan-compacto — sedã compacto estilizado, de carroceria vermelha, cabine curta e alta, vidros azul claros, para-lamas salientes em volta das rodas, ro…
+
+## procedural/pecas/carro-sedan-compacto/referencias/
+
+- `alvo.md` — Alvo: carro-sedan-compacto
+
+## procedural/pecas/carro-taxi/
+
+- `receita.js` — carro-taxi — táxi estilizado, amarelo, com cabine alta, luminoso branco no teto, vidros azul claros, para-choques, faróis, lanternas, retrovisores e quatro r…
+
+## procedural/pecas/carro-taxi/referencias/
+
+- `alvo.md` — Alvo: carro-taxi
+
 ## procedural/pecas/freezer-horizontal/
 
 - `receita.js` — freezer-horizontal — freezer horizontal de tampo: corpo branco sobre o chão, junta escura que cobre o topo do corpo, tampo arredondado assentado sobre a junt…
@@ -1366,6 +1407,14 @@
 ## procedural/pecas/geladeira-compacta-branca/referencias/
 
 - `alvo.md` — Alvo: geladeira compacta branca
+
+## procedural/pecas/jipe-aberto/
+
+- `receita.js` — jipe-aberto — jipe aberto de poucos polígonos, em primitivas: carroceria verde baixa com piso rebaixado entre os para-lamas, arco de segurança em barras (doi…
+
+## procedural/pecas/jipe-aberto/referencias/
+
+- `alvo.md` — Alvo do jipe-aberto
 
 ## procedural/pecas/lava-loucas-compacta-branca/
 
@@ -1406,6 +1455,30 @@
 ## procedural/pecas/micro-ondas-branco/referencias/
 
 - `alvo.md` — Alvo do micro-ondas branco
+
+## procedural/pecas/onibus-rodoviario/
+
+- `receita.js` — onibus-rodoviario — ônibus de viagem alongado, sem interior, recriado em primitivas do núcleo a partir do modelo "pacote C" de autor C (repositório de modelos livres, licença livre sem exigência de crédito, …
+
+## procedural/pecas/onibus-rodoviario/referencias/
+
+- `alvo.md` — alvo: onibus-rodoviario
+
+## procedural/pecas/onibus-urbano/
+
+- `receita.js` — onibus-urbano — ônibus urbano de 11,5 m de comprimento e 3,68 m de altura, com carroceria de perfil lateral e planta, para-brisa inclinado na frente, seis ja…
+
+## procedural/pecas/onibus-urbano/referencias/
+
+- `alvo.md` — Alvo: ônibus urbano
+
+## procedural/pecas/picape-angular/
+
+- `receita.js` — picape-angular — picape de caçamba aberta, com cabine trapezoidal, para-brisa inclinado, barra de proteção atrás da cabine, para-choques de barra, grade, far…
+
+## procedural/pecas/picape-angular/referencias/
+
+- `alvo.md` — Alvo: picape-angular
 
 ## procedural/pecas/poltrona-moderna-amarela/
 
@@ -1993,6 +2066,8 @@
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
 - `comecar.test.mjs` — comecar.test.mjs — a entrada por intenção: a lista dos roteiros com o estado, cada roteiro com a sua leitura e o passo seguinte, o grupo de uma intenção, o n…
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
+- `comparar-silhueta.mjs` — comparar-silhueta.mjs — compara a silhueta de uma receita do acervo com a de um modelo de referência medido por `modelo-de-referencia.mjs`.
+- `comparar-silhueta.test.mjs` — Cabine mais estreita que a da fonte (600 contra 900 de meia largura): o perfil lateral e a planta do corpo não mudam, só a seção da estufa.
 - `composicao-na-varredura.test.mjs` — A varredura de parâmetros, o `descrever` e o Envelope do Condutor enxergam o registro de composições.
 - `conferir-contra-referencia.mjs` — conferir-contra-referencia.mjs — desvio em MILÍMETRO entre a silhueta lateral de partes de uma peça e a borda correspondente de uma foto de referência.
 - `conferir-contra-referencia.test.mjs` — A REFERÊNCIA É A SILHUETA DA PRÓPRIA PEÇA DE PROVA, desenhada a partir da malha dela e guardada ao lado da receita. Uma foto de conteúdo faria este teste dep…
@@ -2079,12 +2154,17 @@
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
+- `folha-comparativa.mjs` — folha-comparativa.mjs — a fonte e a receita lado a lado, nas MESMAS câmeras e na MESMA escala, e a vista de diferença que marca onde a receita sobra ou falta.
+- `folha-comparativa.test.mjs` — Testes de folha-comparativa.mjs: as câmeras são as de modelo-de-referencia, a receita igual à fonte não deixa sobra nem falta, e a cabine mais estreita ou o …
+- `fonte-sintetica.mjs` — fonte-sintetica.mjs — monta, no Node e sem navegador, um `partes.json` no formato de `modelo-de-referencia.mjs` a partir dos triângulos de uma receita.
 - `forma-da-peca-no-veredito.test.mjs` — forma-da-peca-no-veredito.test.mjs — o veredito da peça confere a forma contra a referência, depois do que já roda. Sobre o suporte de `tools/fixtures/refina…
 - `forma-do-esboco.mjs` — forma-do-esboco.mjs — a forma de uma receita contra a forma do esboço que ela refina, sem mudar a receita.
 - `forma-do-esboco.test.mjs` — forma-do-esboco.test.mjs — a forma da receita contra a forma do esboço, de ponta a ponta: o esboço lido pelo módulo (`formasResolvidas`), o sólido de cada fo…
 - `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
 - `forma-global-n2-g01-primitivas.test.mjs` — G01 com um andaime que usa as seis primitivas do nível zero (cone, esfera, anel, revolução, extrusão côncava e tubo): um reservatório com base em anel, corpo…
 - `forma-global-n2-primitivas.test.mjs` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução, extrusão côncava e tubo. Cada uma é provada por envelope medido, mal…
+- `frente-da-fonte.mjs` — frente-da-fonte.mjs — de que lado fica a frente de uma malha de referência, e a conferência de que o `partes.json` a registrou.
+- `frente-da-fonte.test.mjs` — Testes de frente-da-fonte.mjs: a frente lida pelas rodas, faróis e para-brisa nomeados, a declaração obrigatória quando a malha é uma peça só, a recusa da fr…
 - `gerar-evidencias-forma-global-n2.mjs` — Gera o pacote reexecutável da prova N2 a partir de duas fontes versionadas. SVG/PNG são derivados; alvo e andaime continuam sendo a autoria.
 - `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
@@ -2101,8 +2181,11 @@
 - `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
 - `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
+- `medidas-da-fonte.mjs` — medidas-da-fonte.mjs — tira de `fonte-partes.json`, em milímetro, o ponto de partida das três vistas da carroceria: o perfil lateral, a planta, a seção front…
+- `medidas-da-fonte.test.mjs` — Testes de medidas-da-fonte.mjs sobre a fonte sintética da fixture de caixas: perfil, seção, planta, rodas, o trecho de receita que o núcleo executa e a recus…
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
+- `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
 - `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
@@ -2113,6 +2196,7 @@
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
 - `ombro-uniao.test.ts` — ombro-uniao.test.ts — a rodada do ombro do plano "União de sólidos": a união e o arredondamento sobre superfícies CURVAS facetadas. A fixture (`fixtures/fixt…
+- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente escrev…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
@@ -2149,10 +2233,13 @@
 - `rodadas-com-critico.mjs` — rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo volta,…
 - `rodadas-com-critico.test.mjs` — rodadas-com-critico.test.mjs — o aceite humano grava quem, quando, a última nota, os defeitos abertos e as pendências, fecha a série, recusa aceite sem autor…
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
+- `silhueta-da-superficie.mjs` — silhueta-da-superficie.mjs — extensão de uma malha de triângulos em fatias ao longo de um eixo, medida na SUPERFÍCIE e não nos vértices.
+- `silhueta-da-superficie.test.mjs` — Teto grande: uma placa y = 1 de z = 0 a z = 10 em dois triângulos, só com vértices nas pontas.
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
 - `sobreposicao-de-cortes.mjs` — sobreposicao-de-cortes.mjs — os cortes planos do modelo sobre os do sólido do esboço que a receita refina, numa imagem por eixo.
 - `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `triangulos-da-receita.mjs` — triangulos-da-receita.mjs — os triângulos de uma receita em milímetro, com a parte de cada um, pela mesma triangulação que a cena usa (`adaptarThree`).
 - `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `uso.mjs` — uso.mjs — registro local do que a IA pede às ferramentas de entrada, e o resumo dele: `npm run uso`.
@@ -2162,6 +2249,8 @@
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
+- `vistas-da-receita.mjs` — vistas-da-receita.mjs — a folha de seis vistas de uma receita `.js` do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes.
+- `vistas-da-receita.test.mjs` — Testes de vistas-da-receita.mjs: os polígonos da receita em milímetro com as partes na ordem de aparição e a folha de seis vistas pela linha de comando.
 - `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Mecanifica, para conferir o que a conversão e os ajustes fizeram.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
@@ -2200,6 +2289,10 @@
 ## tools/mecanifica/fixtures/receita-externa-cadeiras/
 
 - `LEIA-ME.md` — Cadeiras escolhidas como alvo de forma (2026-10-19)
+
+## tools/mecanifica/fixtures/veiculo-caixa/
+
+- `receita.js` — veiculo-caixa — um veículo de caixas, só para os testes das ferramentas que comparam uma receita com uma fonte de referência (comparar-silhueta, folha-compar…
 
 ## tools/mecanifica/guardas/
 

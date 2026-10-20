@@ -31,8 +31,10 @@ export const VISTAS = [
 function hsl(h, s, l) { const a = s * Math.min(l, 1 - l); const f = (n) => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); }; return [f(0), f(8), f(4)].map((x) => Math.round(255 * x)); }
 const corDe = (i, luz) => `rgb(${hsl((i * 47) % 360, 0.55, 0.55 * luz + 0.1).join(',')})`;
 
-/** O quadro de uma vista, rasterizado com profundidade por pixel (ordenar polígonos pela profundidade média desenha pontas e cantos errados onde as peças se tocam). A direita da tela é `dir × cima`, a de quem olha na direção `dir`. */
-export function quadroDaVista(polis, indice, [rotulo, d, up], W, H) {
+/** Rasteriza uma vista com profundidade por pixel (ordenar polígonos pela profundidade média desenha pontas e cantos errados onde as peças se tocam). A direita da tela é `dir × cima`, a de quem olha na direção `dir`.
+    Sem `enquadre`, a escala e o deslocamento ajustam a vista à folha; com `enquadre = { e, dx, dy }` (pixel por milímetro e deslocamento em pixel), várias vistas e imagens saem na mesma escala e no mesmo lugar.
+    Devolve os buffers (largura `w`, altura `h`, supersampling `S`): `rgb`, `quem` (índice da parte, -1 fora do objeto, -2 sem parte) e `prof`, e o enquadre usado. */
+export function rasterDaVista(polis, indice, [rotulo, d, up], W, H, { enquadre = null, S = 2 } = {}) {
   const dir = unit(d); const direita = unit(cruz(dir, up)); const cima = unit(cruz(direita, dir));
   const itens = [];
   for (const { p, parte } of polis) {
@@ -40,11 +42,15 @@ export function quadroDaVista(polis, indice, [rotulo, d, up], W, H) {
     if (dot(n, dir) >= -1e-9) continue;
     itens.push({ pts: p.map((v) => [dot(v, direita), -dot(v, cima), dot(v, dir)]), luz: 0.6 + 0.4 * Math.max(0, dot(n, unit([0.4, 0.9, 0.5]))), parte });
   }
-  const xs = itens.flatMap((i) => i.pts.map((q) => q[0])); const ys = itens.flatMap((i) => i.pts.map((q) => q[1]));
-  const x0 = Math.min(...xs); const x1 = Math.max(...xs); const y0 = Math.min(...ys); const y1 = Math.max(...ys);
-  const e = Math.min((W - 30) / (x1 - x0), (H - 50) / (y1 - y0));
-  const dx = W / 2 - ((x0 + x1) / 2) * e; const dy = H / 2 + 8 - ((y0 + y1) / 2) * e;
-  const S = 2; const w = W * S; const h = H * S;
+  let e; let dx; let dy;
+  if (enquadre) ({ e, dx, dy } = enquadre);
+  else {
+    const xs = itens.flatMap((i) => i.pts.map((q) => q[0])); const ys = itens.flatMap((i) => i.pts.map((q) => q[1]));
+    const x0 = Math.min(...xs); const x1 = Math.max(...xs); const y0 = Math.min(...ys); const y1 = Math.max(...ys);
+    e = Math.min((W - 30) / (x1 - x0), (H - 50) / (y1 - y0));
+    dx = W / 2 - ((x0 + x1) / 2) * e; dy = H / 2 + 8 - ((y0 + y1) / 2) * e;
+  }
+  const w = W * S; const h = H * S;
   const prof = new Float64Array(w * h).fill(Infinity); const quem = new Int32Array(w * h).fill(-1); const rgb = new Uint8Array(w * h * 3).fill(244);
   for (const it of itens) {
     const cor = (indice.has(it.parte) ? corDe(indice.get(it.parte), it.luz).match(/\d+/g).map(Number) : [150, 150, 150]);
@@ -71,6 +77,12 @@ export function quadroDaVista(polis, indice, [rotulo, d, up], W, H) {
     const i = y * w + x;
     for (const j of [i + 1, i + w]) if (quem[i] !== quem[j] || Math.abs(prof[i] - prof[j]) > limiar * 4) { for (const m of [quem[i] !== -1 && prof[i] <= prof[j] ? i : j]) { rgb[m * 3] = 34; rgb[m * 3 + 1] = 34; rgb[m * 3 + 2] = 34; } }
   }
+  return { rotulo, w, h, S, rgb, quem, prof, enquadre: { e, dx, dy }, direita, cima, dir };
+}
+
+/** O quadro de uma vista (PNG embutido e rótulo) para a folha em HTML. */
+export function quadroDaVista(polis, indice, vista, W, H) {
+  const { rotulo, w, h, rgb } = rasterDaVista(polis, indice, vista, W, H);
   const png = new PNG({ width: w, height: h });
   for (let i = 0; i < w * h; i += 1) { png.data[i * 4] = rgb[i * 3]; png.data[i * 4 + 1] = rgb[i * 3 + 1]; png.data[i * 4 + 2] = rgb[i * 3 + 2]; png.data[i * 4 + 3] = 255; }
   const uri = `data:image/png;base64,${PNG.sync.write(png).toString('base64')}`;

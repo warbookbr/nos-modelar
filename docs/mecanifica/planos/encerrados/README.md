@@ -10,6 +10,7 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- [Objetos do projeto externo como famílias](./2026-10-19-objetos-origem-como-familias.md) foi concluído em 2026-10-20: o plano terminou fazendo 19 peças do acervo (oito cadeiras e poltronas, seis balcões e mesa, cinco eletrodomésticos), todas aprovadas pela pessoa em imagem, em vez de famílias, depois que a família `cadeira` feita à mão custou 915 mil tokens e a conversão do esboço em passos do núcleo se mostrou o caminho barato.
 - [Receitas com material e textura](./2026-10-19-receitas-com-material-e-textura.md) foi concluído em 2026-10-19: o esboço passou a guardar o material por peça, o tradutor leva 98,8% das peças das receitas do projeto externo ao esboço e de volta, e um módulo gera em Node a textura de madeira, metal, tecido e liso, aprovada pela pessoa em imagem.
 - [Aparelhos de caixa](./2026-10-16-aparelhos-de-caixa.md) foi concluído em 2026-10-19: uma família gera eletrodomésticos e eletrônicos de caixa, e o forninho elétrico, o micro-ondas, a air fryer de forno e a lava-louças compacta foram aprovados em forma pela pessoa, por um processo leve que custou uma fração de uma peça do avião.
 - As [referências visuais e controles da bancada](./2026-09-09-bancada-referencias-e-controles.md)
