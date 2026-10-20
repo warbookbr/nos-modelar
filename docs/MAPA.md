@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1494 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1530 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1132,6 +1132,14 @@
 - `triangulacao-sem-leque.test.ts` — triangulacao-sem-leque.test.ts — face plana grande (tampa de superelipse, pedaço de união) não sai em leque: grau máximo por canto e ângulo mínimo dos triâng…
 - `uniao-lateral-rente.test.ts` — uniao-lateral-rente.test.ts — `unir` com laterais coplanares (rentes). Caso do ombro do braço robótico: coluna e braço com a MESMA meia largura. A saída tem …
 
+## procedural/pecas/ambulancia/
+
+- `receita.js` — ambulancia — ambulância estilizada: cabine de picape na frente e baú alto, mais largo e mais alto, atrás. O baú é branco com faixa vermelha e faixa cinza, te…
+
+## procedural/pecas/ambulancia/referencias/
+
+- `alvo.md` — Alvo: ambulancia
+
 ## procedural/pecas/aviao/
 
 - `ALINHAMENTO.md` — Avião de pequeno porte — o objeto no núcleo
@@ -1352,13 +1360,85 @@
 
 - `alvo.md` — Alvo da cadeira de madeira
 
+## procedural/pecas/caminhao-bombeiro/
+
+- `receita.js` — caminhao-bombeiro — caminhão de bombeiros estilizado: cabine vermelha curta e baixa na frente, com para-brisa e vidro lateral azul claros, faróis amarelos, t…
+
+## procedural/pecas/caminhao-bombeiro/referencias/
+
+- `alvo.md` — Alvo: caminhao-bombeiro
+
+## procedural/pecas/caminhao-entrega/
+
+- `receita.js` — caminhao-entrega — caminhão de entrega estilizado: cabine curta e alta, de lavanda clara, na frente, baú verde alto e mais largo atrás, com uma escotilha no …
+
+## procedural/pecas/caminhao-entrega-aberto/
+
+- `receita.js` — caminhao-entrega-aberto — caminhão de entrega de brinquedo de plataforma aberta: cabine curta e afunilada, capô e lados baixos laranja, cabine e teto laranja…
+
+## procedural/pecas/caminhao-entrega-aberto/referencias/
+
+- `alvo.md` — Alvo: caminhao-entrega-aberto
+
+## procedural/pecas/caminhao-entrega/referencias/
+
+- `alvo.md` — Alvo: caminhao-entrega
+
+## procedural/pecas/caminhao-lixo/
+
+- `receita.js` — caminhao-lixo — caminhão de coleta de lixo de brinquedo: cabine curta de capô claro e teto verde na frente, caçamba compactadora verde de topo aberto, com a …
+
+## procedural/pecas/caminhao-lixo/referencias/
+
+- `alvo.md` — Alvo: caminhao-lixo
+
+## procedural/pecas/carro-corrida/
+
+- `receita.js` — carro-corrida — carro de corrida de rodas descobertas, estilizado: monocoque laranja estreito e longo, nariz que sobe até o cockpit, asa dianteira cinza com …
+
+## procedural/pecas/carro-corrida-futurista/
+
+- `receita.js` — carro-corrida-futurista — carro de corrida de rodas descobertas, azul, baixo e comprido, com monocoque estreito de nariz em rampa, bico e asa dianteira cinza…
+
+## procedural/pecas/carro-corrida-futurista/referencias/
+
+- `alvo.md` — Alvo: carro-corrida-futurista
+
+## procedural/pecas/carro-corrida/referencias/
+
+- `alvo.md` — Alvo: carro-corrida
+
+## procedural/pecas/carro-esportivo-hatch/
+
+- `receita.js` — carro-esportivo-hatch — hatch esportivo estilizado, verde, baixo e comprido, com capô em rampa, teto reto até um aerofólio cinza na ponta do teto, traseira e…
+
+## procedural/pecas/carro-esportivo-hatch/referencias/
+
+- `alvo.md` — Alvo: carro-esportivo-hatch
+
+## procedural/pecas/carro-esportivo-sedan/
+
+- `receita.js` — carro-esportivo-sedan — sedã esportivo estilizado, laranja, baixo e longo, de cabine rebaixada e afunilada, nariz inclinado com faróis amarelos sobre o capô,…
+
+## procedural/pecas/carro-esportivo-sedan/referencias/
+
+- `alvo.md` — Alvo: carro-esportivo-sedan
+
 ## procedural/pecas/carro-perua/
 
-- `receita.js` — carro-perua — perua (station wagon) de facetas retas: capô baixo e inclinado, para-brisa em rampa, teto longo e quase plano até uma traseira curta, com vidro…
+- `receita.js` — carro-perua — perua (station wagon) de facetas retas: capô baixo e inclinado, para-brisa em rampa, teto longo e quase plano até uma traseira curta e vertical…
 
 ## procedural/pecas/carro-perua/referencias/
 
 - `alvo.md` — Alvo da perua
+
+## procedural/pecas/carro-policia/
+
+- `receita.js` — carro-policia — viatura estilizada de brinquedo: carroceria azul acinzentada com as portas claras, anéis de para-lama e soleira lavanda, cabine que afunila c…
+
+## procedural/pecas/carro-policia/referencias/
+
+- `alvo.md` — Alvo: carro-policia
 
 ## procedural/pecas/carro-sedan-angular/
 
@@ -1370,7 +1450,7 @@
 
 ## procedural/pecas/carro-sedan-classico/
 
-- `receita.js` — carro-sedan-classico — sedã de caixa dos anos 80, vermelho, com cabine, vidros, para-choques, faróis, lanternas, retrovisores e quatro rodas com pneu e aro. …
+- `receita.js` — carro-sedan-classico — sedã de caixa dos anos 80, vermelho, de cabine longa e estufa afunilada, com capô de tomada de ar, para-lamas em volta dos arcos das r…
 
 ## procedural/pecas/carro-sedan-classico/referencias/
 
@@ -1384,9 +1464,25 @@
 
 - `alvo.md` — Alvo: carro-sedan-compacto
 
+## procedural/pecas/carro-suv/
+
+- `receita.js` — carro-suv — SUV de brinquedo, verde, de teto e traseira cinza em caixa alta, estufa que afunila, frente alta com grade rebaixada e faróis redondos, para-lama…
+
+## procedural/pecas/carro-suv-luxo/
+
+- `receita.js` — carro-suv-luxo — SUV de brinquedo, de carroceria laranja de uma cor, teto longo e quase plano com teto solar, para-brisa em rampa, estufa que afunila para de…
+
+## procedural/pecas/carro-suv-luxo/referencias/
+
+- `alvo.md` — carro-suv-luxo — alvo
+
+## procedural/pecas/carro-suv/referencias/
+
+- `alvo.md` — Alvo: carro-suv
+
 ## procedural/pecas/carro-taxi/
 
-- `receita.js` — carro-taxi — táxi estilizado, amarelo, com cabine alta, luminoso branco no teto, vidros azul claros, para-choques, faróis, lanternas, retrovisores e quatro r…
+- `receita.js` — carro-taxi — táxi estilizado, amarelo, de frente alta e vertical, chassi cinza mais largo que a carroceria, para-lamas em cápsula em volta das rodas, cabine …
 
 ## procedural/pecas/carro-taxi/referencias/
 
@@ -1400,6 +1496,14 @@
 
 - `alvo.md` — Alvo do freezer horizontal
 
+## procedural/pecas/furgao/
+
+- `receita.js` — furgao — furgão (van) estilizado, azul, de volume único alto e longo, capô curto inclinado, para-brisa grande, cabine que afunila para o teto, painel de teto…
+
+## procedural/pecas/furgao/referencias/
+
+- `alvo.md` — Alvo: furgao
+
 ## procedural/pecas/geladeira-compacta-branca/
 
 - `receita.js` — geladeira-compacta-branca — frigobar alto de uma porta, todo branco: gabinete de cantos levemente arredondados, porta de placa com as bordas arredondadas, um…
@@ -1410,7 +1514,7 @@
 
 ## procedural/pecas/jipe-aberto/
 
-- `receita.js` — jipe-aberto — jipe aberto de poucos polígonos, em primitivas: carroceria verde baixa com piso rebaixado entre os para-lamas, arco de segurança em barras (doi…
+- `receita.js` — jipe-aberto — jipe aberto de poucos polígonos: banheira verde baixa sem teto nem portas, para-brisa inclinado com moldura e vidro, arco de segurança em barra…
 
 ## procedural/pecas/jipe-aberto/referencias/
 
@@ -1458,7 +1562,7 @@
 
 ## procedural/pecas/onibus-rodoviario/
 
-- `receita.js` — onibus-rodoviario — ônibus de viagem alongado, sem interior, recriado em primitivas do núcleo a partir do modelo "pacote C" de autor C (repositório de modelos livres, licença livre sem exigência de crédito, …
+- `receita.js` — onibus-rodoviario — ônibus de viagem de 12 m, de carroceria branca, fileira de nove vidros escuros com colunas finas, para-brisa grande de frente quase verti…
 
 ## procedural/pecas/onibus-rodoviario/referencias/
 
@@ -1466,7 +1570,7 @@
 
 ## procedural/pecas/onibus-urbano/
 
-- `receita.js` — onibus-urbano — ônibus urbano de 11,5 m de comprimento e 3,68 m de altura, com carroceria de perfil lateral e planta, para-brisa inclinado na frente, seis ja…
+- `receita.js` — onibus-urbano — ônibus urbano de 11,5 m de comprimento e 3,68 m de altura, de carroceria verde com a fileira de seis janelas por lado, a frente de vidro que …
 
 ## procedural/pecas/onibus-urbano/referencias/
 
@@ -1474,11 +1578,27 @@
 
 ## procedural/pecas/picape-angular/
 
-- `receita.js` — picape-angular — picape de caçamba aberta, com cabine trapezoidal, para-brisa inclinado, barra de proteção atrás da cabine, para-choques de barra, grade, far…
+- `receita.js` — picape-angular — picape de cabine afunilada e caçamba aberta (fundo, paredes laterais e tampa traseira), com santantônio atrás da cabine, para-choques de bar…
 
 ## procedural/pecas/picape-angular/referencias/
 
 - `alvo.md` — Alvo: picape-angular
+
+## procedural/pecas/picape-compacta/
+
+- `receita.js` — picape-compacta — picape de brinquedo, de carroceria verde, cabine curta e afunilada na frente, caçamba aberta atrás de paredes grossas, chassi cinza mais la…
+
+## procedural/pecas/picape-compacta/referencias/
+
+- `alvo.md` — Alvo: picape-compacta
+
+## procedural/pecas/picape-plataforma/
+
+- `receita.js` — picape-plataforma — picape de brinquedo de cabine curta e afunilada, cinza claro, com vidros azul claros, caçamba rasa de borda larga e piso escuro, aletas e…
+
+## procedural/pecas/picape-plataforma/referencias/
+
+- `alvo.md` — Alvo: picape-plataforma
 
 ## procedural/pecas/poltrona-moderna-amarela/
 
@@ -1519,6 +1639,30 @@
 ## procedural/pecas/suporte-tubo/referencias/
 
 - `alvo.md` — Alvo do suporte-tubo
+
+## procedural/pecas/trator/
+
+- `receita.js` — trator — trator de brinquedo de capô laranja, estreito e longo, cabine alta de vidros azul claros e teto saliente sobre as rodas traseiras, que são muito mai…
+
+## procedural/pecas/trator-pa/
+
+- `receita.js` — trator-pa — trator de brinquedo verde com pá frontal: rodas traseiras grandes e dianteiras pequenas (pneu escuro, aro laranja, cubo cinza), capô verde estrei…
+
+## procedural/pecas/trator-pa/referencias/
+
+- `alvo.md` — Alvo: trator-pa
+
+## procedural/pecas/trator-sirene/
+
+- `receita.js` — trator-sirene — trator de brinquedo da viatura: capô estreito e branco, cabine alta de vidro com teto branco saliente e barra de sirene azul, preta e vermelh…
+
+## procedural/pecas/trator-sirene/referencias/
+
+- `alvo.md` — Alvo: trator-sirene
+
+## procedural/pecas/trator/referencias/
+
+- `alvo.md` — trator — alvo
 
 ## procedural/servicos/
 

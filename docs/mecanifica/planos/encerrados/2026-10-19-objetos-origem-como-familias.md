@@ -39,8 +39,7 @@ esboço traduzido como alvo de medida e de forma, e com o custo de cada família
   modelar nada, para a pessoa escolher os grupos;
 - a família de cadeira, com os perfis que a pessoa escolher entre as 22 receitas, e a família ou opção de cada grupo escolhido depois;
 - para cada perfil, a medida contra o esboço traduzido (caixa envolvente e volume) e a prancha para a pessoa aprovar;
-- o custo em tokens e em chamadas de cada família, ao lado do dos aparelhos de caixa;
-- a fatia de brilho (fatia 5): campo opcional `brilho` (0 a 1) por material em `MATERIAIS`, opção declarada sobre o módulo de textura.
+- o custo em tokens e em chamadas de cada família, ao lado do dos aparelhos de caixa.
 
 ## Excluído
 
@@ -48,7 +47,7 @@ esboço traduzido como alvo de medida e de forma, e com o custo de cada família
   `fabricante_c`, `fabricante_d`, `fabricante_e`, `fabricante_f`, `fabricante_g`): quando a pessoa escolher o objeto, o perfil recebe nome
   neutro e nenhuma marca entra no repositório;
 - as 16 peças com corte, curva ou afinamento e a torneira de `sanitario_quimico`, que seguem no backlog;
-- PBR completo (mapas de aspereza e metalicidade, normal) e paleta nova, animação e qualquer imagem do projeto externo; só entram as receitas da pessoa e as imagens que o Mecanifica gera;
+- PBR, animação e qualquer imagem do projeto externo; só entram as receitas da pessoa e as imagens que o Mecanifica gera;
 - os grupos que a pessoa não escolher na fatia 1.
 
 ## Invariantes
@@ -73,16 +72,6 @@ aprova forma é a pessoa; nenhum `.obj` ou `.mtl` entra no repositório.
 3. **Grupos escolhidos.** Um grupo por vez, como opção do `aparelho-de-caixa` ou do `movel-de-caixa` quando couber, ou família nova quando
    não couber, cada um aprovado pela pessoa em prancha.
 4. **Fechamento.** Custos, achados e a decisão sobre os grupos que sobraram.
-
-5. **Brilho.** Autorizada pela pessoa em 2026-10-20. O material de `MATERIAIS` aceita `brilho` (número de 0 a 1; ausente mantém o
-   comportamento atual, e nenhuma peça existente muda). O campo é validado em `especificacaoDeTextura` e em `validarTexturas`, o `.mtl` da
-   exportação OBJ grava `Ns` (brilho x 200) e `Ks` cinza (brilho x 0,5), e `vistas-texturizadas.mjs` mostra o reflexo pelo
-   `MeshPhongMaterial` que o `MTLLoader` já cria. Aplicado só na `geladeira-compacta-branca` (`branco` e `brancoCinza`) e no
-   `freezer-horizontal` (`branco`), com 0,7; a geladeira mini não existe no acervo. Critério de pronto: testes de validação, de `.mtl`
-   com e sem brilho e de determinismo verdes; imagem antes e depois em que o branco lustroso se distingue do fosco; peças sem `brilho`
-   com `.mtl` idêntico ao de antes. O processo teria pego? A ausência de brilho não quebra gate algum, então o que impede o campo de
-   cair em silêncio é o teste de `.mtl` com `Ns` e `Ks` e a recusa de valor fora de 0 a 1, ambos nos testes de `exportar-obj` e de
-   `exportador-obj`.
 
 ## Riscos e parada
 
