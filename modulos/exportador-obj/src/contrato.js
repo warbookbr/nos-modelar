@@ -43,7 +43,15 @@ export function validarTexturas(texturas) {
     if (!Number.isFinite(entrada.metrosPorTile) || entrada.metrosPorTile <= 0) {
       throw new ErroExportacaoObj('textura-invalida', `metrosPorTile de '${material}' precisa ser número positivo finito, em metros.`);
     }
-    mapa.set(material, { material, arquivo: entrada.arquivo, metrosPorTile: entrada.metrosPorTile });
+    if (entrada.brilho !== undefined && (!Number.isFinite(entrada.brilho) || entrada.brilho < 0 || entrada.brilho > 1)) {
+      throw new ErroExportacaoObj('textura-invalida', `brilho de '${material}' precisa ser número entre 0 e 1.`);
+    }
+    mapa.set(material, {
+      material,
+      arquivo: entrada.arquivo,
+      metrosPorTile: entrada.metrosPorTile,
+      ...(entrada.brilho !== undefined ? { brilho: entrada.brilho } : {}),
+    });
   }
   return mapa.size ? mapa : null;
 }

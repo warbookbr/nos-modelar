@@ -16,7 +16,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Costuras topológicas de `lathe` | investigação de núcleo, sem alterar receita por atalho |
 | Endereço único para grupo linear | capacidade semântica aberta |
 | Abertura oblonga | ainda não expressável; não simular com pintura |
-| Contrato genérico de materiais | coberto em 2026-10-19 pelo plano [receitas com material e textura](encerrados/2026-10-19-receitas-com-material-e-textura.md), na forma de escolha de material por peça e textura gerada; PBR e paleta nova seguem fora |
+| Contrato genérico de materiais | coberto em 2026-10-19 pelo plano [receitas com material e textura](encerrados/2026-10-19-receitas-com-material-e-textura.md), na forma de escolha de material por peça e textura gerada; o brilho por material entrou no plano dos objetos do projeto externo (fatia 5), e PBR completo e paleta nova seguem fora |
 | Movimento e espaço varrido | exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
 | A-4, A-6, A-7, A-8, A-16 e A-29 | capacidades abertas comprovadas, sem inventar IDs novos |
 | Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos geram tubo aberto nas extremidades, e o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha não-manifold, volume incalculável, STEP falha em sólido. Afeta qualquer peça oca. Sem contorno hoje |

@@ -170,6 +170,34 @@ describe('textura da receita do acervo na exportação OBJ', () => {
     expect(especificacaoDeTextura('plastico', { cor: '#101010' }).tipo).toBe('liso');
   });
 
+  it('brilho atravessa a especificação, sem brilho a especificação fica igual e o valor inválido é recusado', () => {
+    expect(especificacaoDeTextura('branco', { tipo: 'liso', cor: '#ffffff', brilho: 0.7 })).toEqual({ tipo: 'liso', cor: [255, 255, 255], brilho: 0.7 });
+    expect(especificacaoDeTextura('branco', { tipo: 'liso', cor: '#ffffff' })).toEqual({ tipo: 'liso', cor: [255, 255, 255] });
+    for (const brilho of [-1, 1.5, '0.5', Number.NaN]) {
+      expect(() => especificacaoDeTextura('branco', { tipo: 'liso', cor: '#ffffff', brilho })).toThrow(/material 'branco'.*brilho/);
+    }
+  });
+
+  it('a geladeira com brilho exporta o .mtl com Ns e Ks só nos materiais lustrosos, igual em duas exportações', async () => {
+    const moduloFalso = {
+      gerarTextura: (material, { px }) => ({ largura: px, altura: px, rgba: new Uint8Array(4), metrosPorTile: 0.5, material }),
+      texturaParaPng: () => new Uint8Array([137, 80, 78, 71]),
+    };
+    const pasta = mkdtempSync(join(tmpdir(), 'exp-brilho-'));
+    try {
+      const mtls = [];
+      for (const nome of ['a', 'b']) {
+        await exportarArquivoObj({ arquivo: resolve(REPO, 'procedural/pecas/geladeira-compacta-branca/receita.js'), saida: join(pasta, nome, 'g.obj'), unidade: 'm', comTextura: true, moduloTextura: moduloFalso, sobrescrever: true });
+        mtls.push(readFileSync(join(pasta, nome, 'g.mtl'), 'utf8'));
+      }
+      expect(mtls[0]).toBe(mtls[1]);
+      expect(mtls[0]).toMatch(/newmtl branco\nKd 1 1 1\nNs 140\nKs 0.35 0.35 0.35\n/);
+      expect(mtls[0]).toMatch(/newmtl cinzaClaro\nKd 1 1 1\nmap_Kd/);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  });
+
   it('tipo fora de madeira, metal, tecido e liso é recusado com o nome do material', () => {
     expect(() => especificacaoDeTextura('x', { tipo: 'vidro', cor: '#ffffff' })).toThrow(/material 'x'.*vidro/);
   });

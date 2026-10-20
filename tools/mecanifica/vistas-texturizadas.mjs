@@ -29,6 +29,7 @@ const W = 560, H = 560;
 const mtl = await new MTLLoader().setPath('/obj/').loadAsync(base + '.mtl');
 mtl.preload();
 for (const m of Object.values(mtl.materials)) { m.side = THREE.DoubleSide; if (m.map) { m.map.colorSpace = THREE.SRGBColorSpace; m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; } }
+/* O MTLLoader lê Ns e Ks (brilho do módulo de textura) num MeshPhongMaterial; sem Ks o material fica fosco como antes. */
 const objeto = await new OBJLoader().setMaterials(mtl).setPath('/obj/').loadAsync(base + '.obj');
 /* O MTLLoader devolve o material antes de as imagens chegarem; renderizar nessa hora pinta a peça de preto. */
 const mapas = Object.values(mtl.materials).map((m) => m.map).filter(Boolean);
@@ -37,7 +38,9 @@ mapas.forEach((m) => { m.needsUpdate = true; });
 const caixa = new THREE.Box3().setFromObject(objeto);
 const centro = caixa.getCenter(new THREE.Vector3()); const tam = caixa.getSize(new THREE.Vector3());
 const raio = tam.length() / 2;
-const vistas = [['isométrica frente-direita', [1, 0.8, 1]], ['isométrica trás-esquerda', [-1, 0.8, -1]], ['frontal', [0, 0.15, 1]]];
+/* Cada vista leva a normal da face principal: a luz de reflexo é posta no espelhamento da câmera por essa normal, para que o brilho
+   (Ks e Ns do .mtl) apareça como reflexo nessa face; o material fosco quase não responde a ela. */
+const vistas = [['isométrica frente-direita', [1, 0.8, 1], [0, 0, 1]], ['isométrica trás-esquerda', [-1, 0.8, -1], [0, 0, -1]], ['frontal', [0, 0.15, 1], [0, 0, 1]]];
 const render = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 render.setSize(W * 3, H); render.setScissorTest(true); render.setClearColor(0xf4f2ee);
 render.outputColorSpace = THREE.SRGBColorSpace;
@@ -45,10 +48,13 @@ const cena = new THREE.Scene(); cena.add(objeto);
 cena.add(new THREE.HemisphereLight(0xffffff, 0x8a8a8a, 1.6));
 const sol = new THREE.DirectionalLight(0xffffff, 1.6); sol.position.set(2, 4, 3); cena.add(sol);
 const sol2 = new THREE.DirectionalLight(0xffffff, 0.7); sol2.position.set(-3, 2, -2); cena.add(sol2);
-vistas.forEach(([, d], i) => {
+const reflexo = new THREE.DirectionalLight(0xffffff, 0.4); cena.add(reflexo);
+vistas.forEach(([, d, n], i) => {
   const cam = new THREE.OrthographicCamera(-raio * 1.1, raio * 1.1, raio * 1.1, -raio * 1.1, 0.01, raio * 20);
   const dir = new THREE.Vector3(...d).normalize().multiplyScalar(raio * 5);
   cam.position.copy(centro).add(dir); cam.lookAt(centro);
+  const v = new THREE.Vector3(...d).normalize(); const nf = new THREE.Vector3(...n);
+  reflexo.position.copy(nf.multiplyScalar(2 * v.dot(nf)).sub(v).multiplyScalar(raio * 5).add(centro)); reflexo.target.position.copy(centro); reflexo.target.updateMatrixWorld();
   render.setViewport(i * W, 0, W, H); render.setScissor(i * W, 0, W, H); render.render(cena, cam);
 });
 document.body.appendChild(render.domElement);

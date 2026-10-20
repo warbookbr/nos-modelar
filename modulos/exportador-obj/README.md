@@ -10,7 +10,7 @@ Até a fatia de material e textura de 2026-10-19, a comparação era a área con
 
 ## Material e textura
 
-Cada face pode trazer `material`, o nome declarado na receita. Quando o chamador passa `texturas: { nomeDoMaterial: { arquivo, metrosPorTile } }`, a saída ganha `mtllib`, `usemtl` por parte e coordenadas `vt`. O `.mtl` tem `newmtl`, `Kd 1 1 1` e `map_Kd <arquivo>` para cada material usado, e o nome dele vem de `nomeMtl` (padrão `<nome>.mtl`).
+Cada face pode trazer `material`, o nome declarado na receita. Quando o chamador passa `texturas: { nomeDoMaterial: { arquivo, metrosPorTile } }`, a saída ganha `mtllib`, `usemtl` por parte e coordenadas `vt`. O `.mtl` tem `newmtl`, `Kd 1 1 1` e `map_Kd <arquivo>` para cada material usado, e o nome dele vem de `nomeMtl` (padrão `<nome>.mtl`). A entrada de `texturas` pode trazer `brilho` (número de 0 a 1): o material então ganha `Ns` (brilho x 200) e `Ks` cinza (brilho x 0,5) entre `Kd` e `map_Kd`; sem `brilho` o `.mtl` é o de antes.
 
 As coordenadas são planares. Cada triângulo se projeta no plano do eixo dominante da sua normal, e (u, v) é a posição em metros da malha neutra dividida por `metrosPorTile`. A escala da saída não entra, então o tile tem o mesmo tamanho em qualquer unidade. O OBJ aceita u e v fora de 0 a 1, e o Blender repete a imagem.
 

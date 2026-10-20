@@ -28,7 +28,7 @@
  *    chanfro de 4 mm, que já era pequeno, e o puxador e as dobradiças passam de 5 e 6 mm para 2 mm. As grades mantêm 1 mm.
  *  - material do gabinete (pedido da pessoa): corpo, tampo e puxador usam `branco`, com a cor #f3f3ee e desgaste 0,02. Testei o
  *    tipo `liso` e `metal` com `acabamento: 'pintado'` nas duas vistas com textura. O `metal` pintado saiu cinza e com cara de chapa,
- *    e o `liso` saiu mais branco e mais limpo, então o gabinete fica em `liso`. O módulo não modela brilho, então o lustro não entra.
+ *    e o `liso` saiu mais branco e mais limpo, então o gabinete fica em `liso`. O lustro entra como `brilho` 0,7 no material `branco`, que o .mtl grava em Ns e Ks.
  *    As dobradiças também passam a `branco` (pedido da pessoa), e o `metal` sai da lista de materiais. A junta e as grades mantêm
  *    `liso` escuro, como estavam.
  *  - a receita original não traz a tabela `cores`. A cor da junta e das grades é uma escolha de material, tirada da descrição da
@@ -218,7 +218,7 @@ const receita = {
   meta: { nome: 'freezer-horizontal', desc: 'freezer horizontal de tampo branco, com corpo arredondado, junta escura, tampo, puxador frontal, duas dobradiças traseiras e quatro grades de ventilação' },
   PARAMS: TABELA,
   MATERIAIS: {
-    branco: { tipo: 'liso', cor: '#f3f3ee', desgaste: 0.02 },
+    branco: { tipo: 'liso', cor: '#f3f3ee', desgaste: 0.02, brilho: 0.7 },
     liso: { tipo: 'liso', cor: '#2b2b2b' },
   },
   TOPO: { origem: 'chão, em x e z da base convertida, sem deslocamento; y para cima e a frente do freezer em +z' },

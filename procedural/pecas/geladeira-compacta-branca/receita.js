@@ -299,8 +299,8 @@ const receita = {
   meta: { nome: 'geladeira-compacta-branca', desc: 'frigobar alto branco de uma porta, com caixa, porta, puxador de topo com canaleta na face de cima, dobradiça superior e quatro pés' },
   PARAMS: TABELA,
   MATERIAIS: {
-    branco: { tipo: 'liso', cor: '#f3f3ee', desgaste: 0.01 },
-    brancoCinza: { tipo: 'liso', cor: '#ebebe6', desgaste: 0.015 },
+    branco: { tipo: 'liso', cor: '#f3f3ee', desgaste: 0.01, brilho: 0.7 },
+    brancoCinza: { tipo: 'liso', cor: '#ebebe6', desgaste: 0.015, brilho: 0.7 },
     cinzaClaro: { tipo: 'liso', cor: '#c8c8c4', desgaste: 0.02 },
   },
   TOPO: { origem: 'chão, no meio do aparelho em x e em z; y para cima e a frente do aparelho em +z' },

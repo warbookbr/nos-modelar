@@ -43,7 +43,7 @@ const TIPOS_DE_TEXTURA = ['madeira', 'metal', 'tecido', 'liso'];
    nome, com `tipo` e `cor` em hexadecimal em MATERIAIS. Sem `tipo` declarado, o nome decide: o que cita metal, aço ou cromo vira
    `metal`, madeira vira `madeira`, tecido ou pano vira `tecido`, e o resto vira `liso`. */
 export function especificacaoDeTextura(nome, entrada = {}) {
-  const { tipo: tipoDeclarado, cor, metalicidade, aspereza, ...resto } = entrada;
+  const { tipo: tipoDeclarado, cor, metalicidade, aspereza, brilho, ...resto } = entrada;
   let tipo = tipoDeclarado;
   if (!tipo) {
     const n = nome.toLowerCase();
@@ -55,6 +55,10 @@ export function especificacaoDeTextura(nome, entrada = {}) {
   else if (Array.isArray(cor) && cor.length === 3) rgb = cor;
   const extras = {};
   for (const campo of ['desgaste', 'veio', 'borda', 'tabuas', 'ferrugem', 'manchas', 'rasgos', 'acabamento']) if (resto[campo] !== undefined) extras[campo] = resto[campo];
+  if (brilho !== undefined) {
+    if (typeof brilho !== 'number' || !Number.isFinite(brilho) || brilho < 0 || brilho > 1) throw new Error(`material '${nome}': brilho precisa ser número entre 0 e 1 (recebido ${JSON.stringify(brilho)}).`);
+    extras.brilho = brilho;
+  }
   return { tipo, cor: rgb, ...extras };
 }
 
@@ -227,9 +231,10 @@ export async function exportarArquivoObj(opcoesArg) {
     const modulo = moduloTextura ?? await carregarModuloTextura();
     texturas = {};
     for (const material of materiaisDaMalha(neutro)) {
-      const textura = await modulo.gerarTextura(especificacaoDeTextura(material, receita.MATERIAIS?.[material]), { px: PX_TEXTURA_PADRAO, semente: sementeDe(`${stem}:${material}`) });
+      const { brilho, ...especificacao } = especificacaoDeTextura(material, receita.MATERIAIS?.[material]);
+      const textura = await modulo.gerarTextura(especificacao, { px: PX_TEXTURA_PADRAO, semente: sementeDe(`${stem}:${material}`) });
       const arquivo = `${stem}_${material}.png`;
-      texturas[material] = { arquivo, metrosPorTile: textura.metrosPorTile };
+      texturas[material] = { arquivo, metrosPorTile: textura.metrosPorTile, ...(brilho !== undefined ? { brilho } : {}) };
       imagens.push({ arquivo, bytes: Buffer.from(await modulo.texturaParaPng(textura)) });
     }
   }

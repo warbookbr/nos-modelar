@@ -40,6 +40,26 @@ describe('material e textura no OBJ', () => {
     expect(out.materiais).toEqual([{ material: 'madeira', arquivo: 'madeira.png', metrosPorTile: 0.5 }]);
   });
 
+  it('grava Ns e Ks no .mtl só quando o material tem brilho, e a saída é determinística', async () => {
+    const com = { madeira: { ...TEXTURAS.madeira, brilho: 0.6 } };
+    const a = await exportarObj({ nome: 'cubo', neutro: cuboComMaterial(), unidade: 'm', texturas: com });
+    const b = await exportarObj({ nome: 'cubo', neutro: cuboComMaterial(), unidade: 'm', texturas: com });
+    const sem = await exportarObj({ nome: 'cubo', neutro: cuboComMaterial(), unidade: 'm', texturas: TEXTURAS });
+
+    expect(a.mtl).toContain('Ns 120\nKs 0.3 0.3 0.3\nmap_Kd madeira.png');
+    expect(a.mtl).toBe(b.mtl);
+    expect(sem.mtl).not.toMatch(/^(Ns|Ks) /m);
+    expect(sem.mtl).toBe('# Mecanifica MTL v1.0\n# Modelo: cubo\n\nnewmtl madeira\nKd 1 1 1\nmap_Kd madeira.png\n');
+    expect(a.texto).toBe(sem.texto);
+  });
+
+  it('brilho fora de 0 a 1 ou não numérico é recusado', () => {
+    for (const brilho of [-0.1, 1.1, Number.NaN, '0.5']) {
+      expect(() => validarTexturas({ madeira: { ...TEXTURAS.madeira, brilho } })).toThrowError(/brilho de 'madeira'/);
+    }
+    expect(validarTexturas({ madeira: { ...TEXTURAS.madeira, brilho: 0 } }).get('madeira').brilho).toBe(0);
+  });
+
   it('calcula u,v pelo plano do eixo dominante em metros divididos por metrosPorTile', async () => {
     // Face com normal em z: o plano é o xy. Vértices (0,0), (0.02,0.03) e (0.02,0) em metros, com tile de 0,5 m.
     const out = await exportarObj({ nome: 'cubo', neutro: cuboComMaterial(), unidade: 'm', texturas: TEXTURAS });
