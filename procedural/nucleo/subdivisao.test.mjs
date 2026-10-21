@@ -1,12 +1,26 @@
-/* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação e vértice sem face. */
+/* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação, vincos nomeados e vértice sem face. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS } from './subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA } from './subdivisao.js';
+import { enderecosPorIndice } from './operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 
 const oraculo = JSON.parse(readFileSync(new URL('./fixtures/subdivisao-oraculo-blender.json', import.meta.url)));
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const desvio = (P, Q) => Math.max(...P.map((p) => Math.min(...Q.map((q) => dist(p, q)))));
+
+/* Um caso por índice da fixture escrito como receita nomeada: o ponto k vira 'p<k>' e cada aresta vincada vira um vinco
+   de dois pontos, com o vinco do Blender como nitidez da receita. */
+const receitaDoCaso = (caso) => {
+  const nome = (k) => `p${k}`;
+  return {
+    pontos: Object.fromEntries(caso.vertices.map((p, k) => [nome(k), p])),
+    passo: {
+      vertices: caso.vertices.map((_, k) => nome(k)), faces: caso.faces.map((f) => f.map(nome)), borda: caso.borda ?? 'suave',
+      vincos: caso.vincos.map(([a, b, c], k) => ({ nome: `v${k}`, pontos: [nome(a), nome(b)], nitidez: c })),
+    },
+  };
+};
 
 describe('subdivisão Catmull-Clark com vincos', () => {
   for (const caso of oraculo.casos) {
@@ -48,21 +62,22 @@ describe('subdivisão Catmull-Clark com vincos', () => {
   for (const caso of oraculo.casos) {
     for (const n of caso.niveis) {
       it(`a operação subdivisao confere com o Blender: ${caso.nome}, ${n} nível(is)`, () => {
-        const passos = [['subdivisao', { origemId: 1, vertices: caso.vertices, faces: caso.faces, vincos: caso.vincos.map(([a, b, c]) => [a, b, nitidezDoVinco(c)]), niveis: n, borda: caso.borda ?? 'suave' }]];
-        const neutro = nucleo(passos, {});
+        const { pontos, passo } = receitaDoCaso(caso);
+        const passos = [['subdivisao', { origemId: 1, ...passo, niveis: n }]];
+        const neutro = nucleo(passos, pontos);
         expect(neutro.orfaos).toEqual([]);
         const P = [...neutro.V.values()];
         const b = oraculo.blender[`${caso.nome}@${n}`];
         expect(P.length).toBe(b.length);
         expect(Math.max(desvio(P, b), desvio(b, P))).toBeLessThan(1e-6);
-        expect(JSON.stringify(neutroCanonico(nucleo(passos, {})))).toBe(JSON.stringify(neutroCanonico(neutro)));
+        expect(JSON.stringify(neutroCanonico(nucleo(passos, pontos)))).toBe(JSON.stringify(neutroCanonico(neutro)));
       });
     }
   }
 
   it('a operação subdivisao publica as faces da superfície como origem', () => {
-    const c = oraculo.casos[1];
-    const neutro = nucleo([['subdivisao', { origemId: 1, vertices: c.vertices, faces: c.faces, vincos: c.vincos.map(([a, b]) => [a, b]), niveis: 2 }]], {});
+    const { pontos, passo } = receitaDoCaso(oraculo.casos[1]);
+    const neutro = nucleo([['subdivisao', { origemId: 1, ...passo, vincos: passo.vincos.map((v) => ({ ...v, nitidez: 'viva' })), niveis: 2 }]], pontos);
     expect(neutro.orfaos).toEqual([]);
     expect(neutro.V.size).toBe(98);
     expect(neutro.F.size).toBe(96);
@@ -146,7 +161,7 @@ describe('subdivisão Catmull-Clark com vincos', () => {
     const c = oraculo.casos[0];
     const nomes = c.vertices.map((_, k) => `p${k}`);
     const pontos = Object.fromEntries(nomes.map((n, k) => [n, c.vertices[k]]));
-    const passo = (extra) => [['subdivisao', { origemId: 1, vertices: nomes, faces: c.faces, niveis: 2, vincos: [[4, 5], [5, 6], [6, 7], [7, 4]], ...extra }]];
+    const passo = (extra) => [['subdivisao', { origemId: 1, vertices: nomes, faces: c.faces.map((f) => f.map((k) => nomes[k])), niveis: 2, vincos: [{ nome: 'aroDeCima', pontos: ['p4', 'p5', 'p6', 'p7', 'p4'], nitidez: 'viva' }], ...extra }]];
 
     it('ajusta só os pontos medidos, entrega a malha no limite e põe cada ponto medido nela, bit a bit', () => {
       const medidas = ['p4', 'p6', 'p1'];
@@ -182,7 +197,7 @@ describe('subdivisão Catmull-Clark com vincos', () => {
     it('na simetria em x, a imagem do ponto medido também passa pela superfície', () => {
       const meia = { vertices: [[0, 0, 0], [0.5, 0.1, 0], [1, 0, 0], [0, 0.2, 1], [0.5, 0.3, 1], [1, 0.1, 1]], faces: [[0, 3, 4, 1], [1, 4, 5, 2]] };
       const nm = meia.vertices.map((_, k) => `m${k}`);
-      const neutro = nucleo([['subdivisao', { origemId: 1, simetria: 'x', vertices: nm, faces: meia.faces, niveis: 1, medidas: ['m4', 'm3'] }]], Object.fromEntries(nm.map((n, k) => [n, meia.vertices[k]])));
+      const neutro = nucleo([['subdivisao', { origemId: 1, simetria: 'x', vertices: nm, faces: meia.faces.map((f) => f.map((k) => nm[k])), niveis: 1, medidas: ['m4', 'm3'] }]], Object.fromEntries(nm.map((n, k) => [n, meia.vertices[k]])));
       expect(neutro.orfaos).toEqual([]);
       const inteira = espelharGaiolaEmX(meia);
       const ajustada = ajustarGaiolaAsMedidas(inteira, [4, 3, inteira.imagem[4], inteira.imagem[3]]);
@@ -204,6 +219,148 @@ describe('subdivisão Catmull-Clark com vincos', () => {
       const neutro = nucleo(passo({ medidas: ['outro'] }), { ...pontos, outro: [9, 9, 9] });
       expect(neutro.orfaos[0].motivo).toContain("'outro'");
       expect(neutro.V.size).toBe(0);
+    });
+  });
+
+  /* Receitas do oráculo escritas só com nomes: a gaiola, as faces, os vincos e os cantos citam pontos por nome, e o
+     Blender recebeu a nitidez da receita como vinco (a 'viva' como vinco 1) e o canto como vinco de vértice 1. */
+  describe('vincos nomeados contra o oráculo', () => {
+    // a gaiola por índice que a operação monta a partir dos nomes, para conferir a superfície limite pela função pura
+    const gaiolaDaReceita = (r, nitidez) => {
+      const k = new Map(r.passo.vertices.map((n, i) => [n, i]));
+      const vincos = r.passo.vincos.flatMap((v) => v.pontos.slice(1).map((q, j) => [k.get(v.pontos[j]), k.get(q), nitidezDoVinco(nitidez ?? v.nitidez)]));
+      return { vertices: r.passo.vertices.map((n) => r.pontos[n]), faces: r.passo.faces.map((f) => f.map((n) => k.get(n))), vincos, cantos: (r.passo.cantos ?? []).map((n) => k.get(n)), borda: r.passo.borda ?? 'suave' };
+    };
+    const receita = (nome) => oraculo.receitas.find((x) => x.nome === nome);
+
+    it('as receitas cobrem vinco de nitidez 0,25, 0,5, 0,75 e vivo, e nenhuma endereça a gaiola por índice', () => {
+      const nitidezes = new Set(oraculo.receitas.flatMap((r) => r.passo.vincos.map((v) => v.nitidez)));
+      for (const n of [0.25, 0.5, 0.75, 'viva']) expect(nitidezes.has(n)).toBe(true);
+      for (const r of oraculo.receitas) {
+        expect(enderecosPorIndice(r.passo)).toEqual([]);
+        expect(JSON.stringify([r.passo.vertices, r.passo.faces, r.passo.vincos.map((v) => v.pontos), r.passo.cantos ?? []])).not.toMatch(/[[,]-?\d/);
+      }
+      // o detector acusa a forma por índice
+      expect(enderecosPorIndice({ vertices: [[0, 0, 0], 'a'], faces: [[0, 1, 'a']], vincos: [[0, 1, 2], { nome: 'v', pontos: ['a', 3] }], cantos: [4], medidas: ['a'] }))
+        .toEqual(['vertices[0]', 'faces[0][0]', 'faces[0][1]', 'vincos[0][0]', 'vincos[0][1]', 'vincos[0][2]', 'vincos[1].pontos[1]', 'cantos[0]']);
+    });
+
+    for (const r of oraculo.receitas) {
+      for (const n of r.niveis) {
+        it(`a operação com vincos nomeados confere com o Blender: ${r.nome}, ${n} nível(is)`, () => {
+          const passos = [['subdivisao', { origemId: 1, ...r.passo, niveis: n }]];
+          const neutro = nucleo(passos, r.pontos);
+          expect(neutro.orfaos).toEqual([]);
+          const P = [...neutro.V.values()];
+          const b = oraculo.blender[`${r.nome}@${n}`];
+          expect(P.length).toBe(b.length);
+          expect(Math.max(desvio(P, b), desvio(b, P))).toBeLessThan(1e-6);
+          expect(JSON.stringify(neutroCanonico(nucleo(passos, r.pontos)))).toBe(JSON.stringify(neutroCanonico(neutro)));
+        });
+      }
+      for (const n of r.limite) {
+        it(`a superfície limite confere com a do Blender (use_limit_surface): ${r.nome}, ${n} nível(is)`, () => {
+          const L = subdividirCatmullClark({ ...gaiolaDaReceita(r), niveis: n, aoLimite: true }).vertices;
+          const b = oraculo.blender[`${r.nome}@${n}@limite`];
+          expect(Math.max(desvio(L, b), desvio(b, L))).toBeLessThan(1e-6);
+        });
+      }
+    }
+
+    it('o vinco 1 do Blender é vivo: a superfície limite dele não confere com a nitidez finita logo abaixo de 10', () => {
+      const r = receita('cubo-1m-arestas-viva');
+      const g = gaiolaDaReceita(r);
+      expect(nitidezDoVinco(1)).toBe(Infinity);
+      expect(subdividirCatmullClark({ ...g, vincos: g.vincos.map(([a, b]) => [a, b, NITIDEZ_VIVA]), niveis: 2, aoLimite: true })).toEqual(subdividirCatmullClark({ ...g, niveis: 2, aoLimite: true }));
+      const quase = subdividirCatmullClark({ ...g, vincos: g.vincos.map(([a, b]) => [a, b, NITIDEZ_VIVA - 0.01]), niveis: 2, aoLimite: true }).vertices;
+      const b = oraculo.blender[`${r.nome}@2@limite`];
+      expect(Math.max(desvio(quase, b), desvio(b, quase))).toBeGreaterThan(1e-4);
+    });
+
+    /* Raio de borda: no cubo de 1 m com as 12 arestas vincadas, o meio da aresta cai na superfície limite à folga g da
+       quina, medida na diagonal, e o filete circular de mesma folga tem raio g / (√2 - 1). */
+    it('a nitidez dá o raio de borda: 107 mm em 0,5, 12,2 mm em 0,75, 2,1 mm em 0,9 e zero no vinco vivo, no cubo de 1 m', () => {
+      const r = receita('cubo-1m-arestas-viva');
+      const raio = (n) => {
+        const g = refinarGaiola(gaiolaDaReceita(r, n));
+        const L = limitesDaGaiola(g);
+        const meio = g.vertices.findIndex((p) => dist(p, [0, 0.5, 0.5]) < 1e-12);
+        return dist(L[meio], [0, 0.5, 0.5]) / (Math.SQRT2 - 1);
+      };
+      expect(raio(0.5)).toBeCloseTo(0.10669, 5);
+      expect(raio(0.75)).toBeCloseTo(0.012227, 5);
+      expect(raio(0.9)).toBeCloseTo(0.002113, 5);
+      expect(raio('viva')).toBe(0);
+    });
+
+    it('medidas continuam passando pela superfície com vincos nomeados, bit a bit', () => {
+      const casos = [['cubo-1m-arestas-05', ['c000', 'c100', 'c110', 'c010', 'c001', 'c101', 'c111', 'c011']], ['cubo-1m-arestas-075', ['c000', 'c110', 'c011']], ['cubo-1m-arestas-viva', ['c000', 'c111']], ['chapa-vincos-025-05-075', ['g1_2', 'g4_3', 'g3_1', 'g2_2', 'g0_0', 'g5_4']], ['chapa-vinco-vivo-borda-cantos', ['g1_2', 'g3_2', 'g4_3', 'g2_1']]];
+      for (const [nome, medidas] of casos) {
+        const r = receita(nome);
+        const passos = [['subdivisao', { origemId: 1, ...r.passo, niveis: 2, medidas }]];
+        expect(enderecosPorIndice(passos[0][1])).toEqual([]);
+        const neutro = nucleo(passos, r.pontos);
+        expect(neutro.orfaos).toEqual([]);
+        const P = [...neutro.V.values()];
+        for (const m of medidas) expect(Math.min(...P.map((p) => dist(p, r.pontos[m])))).toBeLessThan(1e-6);
+        expect(JSON.stringify(neutroCanonico(nucleo(passos, r.pontos)))).toBe(JSON.stringify(neutroCanonico(neutro)));
+      }
+    });
+  });
+
+  describe('vincos e cantos nomeados gritam com os nomes', () => {
+    const r = oraculo.receitas.find((x) => x.nome === 'chapa-vincos-025-05-075');
+    const grito = (extra) => {
+      const neutro = nucleo([['subdivisao', { origemId: 1, ...r.passo, niveis: 1, ...extra }]], { ...r.pontos, solto: [9, 9, 9] });
+      expect(neutro.V.size).toBe(0);
+      expect(neutro.orfaos).toHaveLength(1);
+      return neutro.orfaos[0];
+    };
+
+    it('recusa vinco por índice de aresta e mostra a forma nomeada', () => {
+      const o = grito({ vincos: [[0, 1, 0.5]] });
+      expect(o).toMatchObject({ op: 'subdivisao', ref: 'vincos' });
+      expect(o.motivo).toMatch(/índice de aresta não é aceito/);
+      expect(o.motivo).toContain("pontos: ['a', 'b', 'c']");
+      expect(o.motivo).toContain("'viva'");
+    });
+
+    it('recusa canto por índice de vértice e mostra a forma nomeada', () => {
+      const o = grito({ cantos: [3] });
+      expect(o).toMatchObject({ ref: 'cantos' });
+      expect(o.motivo).toMatch(/canto por índice de vértice não é aceito/);
+      expect(grito({ cantos: ['g9_9'] }).motivo).toContain("'g9_9'");
+    });
+
+    it('par de pontos consecutivos que não é aresta da gaiola grita com os nomes', () => {
+      expect(grito({ vincos: [{ nome: 'diagonal', pontos: ['g0_0', 'g1_1'], nitidez: 0.5 }] }).motivo).toBe("o vinco 'diagonal' liga 'g0_0' a 'g1_1', que não formam aresta da gaiola");
+      expect(grito({ vincos: [{ nome: 'parado', pontos: ['g0_0', 'g0_0'], nitidez: 0.5 }] }).motivo).toContain("liga 'g0_0' a 'g0_0'");
+    });
+
+    it('ponto inexistente, nome de vinco repetido e aresta em dois vincos gritam', () => {
+      expect(grito({ vincos: [{ nome: 'dobra', pontos: ['g0_0', 'g9_9'], nitidez: 0.5 }] }).motivo).toBe("o vinco 'dobra' cita o ponto 'g9_9', que não é ponto nomeado da gaiola");
+      expect(grito({ vincos: [{ nome: 'dobra', pontos: ['g0_0', 'solto'], nitidez: 0.5 }] }).motivo).toContain("'solto'");
+      expect(grito({ vincos: [{ nome: 'a', pontos: ['g0_0', 'g1_0'], nitidez: 1 }, { nome: 'a', pontos: ['g1_0', 'g2_0'], nitidez: 1 }] }).motivo).toBe("o nome de vinco 'a' aparece mais de uma vez");
+      expect(grito({ vincos: [{ nome: 'a', pontos: ['g0_0', 'g1_0'], nitidez: 1 }, { nome: 'b', pontos: ['g2_0', 'g1_0', 'g0_0'], nitidez: 1 }] }).motivo).toBe("a aresta 'g1_0'-'g0_0' está nos vincos 'a' e 'b'");
+    });
+
+    it('nitidez fora de 0 a 1, ausente ou com campo desconhecido grita', () => {
+      expect(grito({ vincos: [{ nome: 'a', pontos: ['g0_0', 'g1_0'], nitidez: 1.5 }] }).motivo).toMatch(/nitidez vai de 0 a 1/);
+      expect(grito({ vincos: [{ nome: 'a', pontos: ['g0_0', 'g1_0'] }] }).motivo).toMatch(/precisa de nitidez/);
+      expect(grito({ vincos: [{ nome: 'a', pontos: ['g0_0', 'g1_0'], nitidez: 1, aresta: 3 }] }).motivo).toMatch(/campo desconhecido 'aresta'/);
+    });
+
+    it('ponto repetido na gaiola e face com ponto inexistente gritam', () => {
+      expect(grito({ vertices: [...r.passo.vertices, 'g0_0'] }).motivo).toBe("o ponto 'g0_0' aparece mais de uma vez na gaiola");
+      expect(grito({ faces: [...r.passo.faces, ['g0_0', 'g1_0', 'nenhum']] }).motivo).toContain("cita o ponto 'nenhum'");
+    });
+
+    it('a nitidez aceita nome de PARAMS', () => {
+      const passo = { ...r.passo, vincos: r.passo.vincos.map((v) => ({ ...v, nitidez: v.nitidez === 0.5 ? 'nitidezDaDobra' : v.nitidez })) };
+      const a = nucleo([['subdivisao', { origemId: 1, ...passo, niveis: 1 }]], { ...r.pontos, nitidezDaDobra: 0.5 });
+      const b = nucleo([['subdivisao', { origemId: 1, ...r.passo, niveis: 1 }]], r.pontos);
+      expect(a.orfaos).toEqual([]);
+      expect(JSON.stringify(neutroCanonico(a))).toBe(JSON.stringify(neutroCanonico(b)));
     });
   });
 

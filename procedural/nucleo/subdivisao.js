@@ -15,7 +15,12 @@
  *
  * A borda segue o Blender: `borda: 'suave'` (padrão, "All" no Blender) deixa o vértice de borda com duas arestas na
  * regra de vinco; `borda: 'cantos'` ("Keep Corners") faz canto do vértice de borda que só tem uma face.
- * O vinco do Blender (0 a 1) vira nitidez por `nitidezDoVinco(c) = 10 c²`.
+ *
+ * Nitidez de NITIDEZ_VIVA (10) para cima é vinco vivo, que nunca se apaga, como em OpenSubdiv (Sdc::Crease, em que
+ * SHARPNESS_INFINITE = 10 e IsInfinite(s) é s >= 10). O vinco do Blender e a nitidez da receita, de 0 a 1, viram nitidez
+ * em níveis por `nitidezDoVinco(c) = 10 c²`, a conversão do Blender; por isso o vinco 1 do Blender é vivo, e a superfície
+ * limite do Blender com vinco 1 só confere com a do núcleo quando a nitidez 10 conta como viva. `'viva'` é a escrita
+ * explícita do mesmo vinco vivo.
  *
  * A ordem da saída é determinística: primeiro os pontos de vértice (na ordem da gaiola), depois os de aresta (na
  * ordem em que as arestas aparecem varrendo as faces) e por fim os de face; cada face de k lados vira k quads
@@ -23,10 +28,14 @@
  */
 
 export const NITIDEZ_INFINITA = Infinity;
+export const NITIDEZ_VIVA = 10;
 
+/** nitidezDoVinco(c) -> nitidez em níveis: c de 0 a 1 (vinco do Blender ou nitidez da receita) vira 10 c², e 1 ou
+ *  'viva' vira vinco vivo. */
 export function nitidezDoVinco(c) {
+  if (c === 'viva') return NITIDEZ_INFINITA;
   const v = Math.max(0, Math.min(1, Number(c)));
-  return v >= 1 ? 10 : 10 * v * v;
+  return v >= 1 ? NITIDEZ_INFINITA : NITIDEZ_VIVA * v * v;
 }
 
 const chave = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
@@ -136,7 +145,7 @@ function refinar(V, F, nitidez, cantos, borda) {
 
 /**
  * subdividirCatmullClark({ vertices, faces, vincos, niveis, cantos, borda }) -> { vertices, faces }
- * vincos: lista de [a, b, nitidez] (nitidez em níveis; use NITIDEZ_INFINITA ou >= niveis para vinco vivo).
+ * vincos: lista de [a, b, nitidez] (nitidez em níveis; de NITIDEZ_VIVA para cima, ou NITIDEZ_INFINITA, é vinco vivo).
  * cantos: índices de vértice que ficam fixos (canto vivo).
  */
 function nitidezDosVincos(faces, vincos) {
@@ -147,7 +156,7 @@ function nitidezDosVincos(faces, vincos) {
     const [a, b, x] = v;
     if (!indice.has(chave(a, b))) throw new TypeError(`subdivisão: vinco ${k} cita a aresta ${a}-${b}, que não existe na gaiola`);
     if (!(x >= 0)) throw new TypeError(`subdivisão: vinco ${k} com nitidez inválida`);
-    nitidez.set(chave(a, b), x);
+    nitidez.set(chave(a, b), x >= NITIDEZ_VIVA ? NITIDEZ_INFINITA : x);
   }
   return nitidez;
 }
@@ -188,9 +197,8 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
  * de `refinar` aplicado à base, e l sai de eliminação de Gauss, sem iteração. O dardo de nitidez finita não chega aí,
  * porque o refino apaga a nitidez antes.
  *
- * A nitidez finita conta inteira no limite (uma nitidez 10 é vinco por dez níveis e liso depois), e por isso o refino
- * da estrela vai até ceil(nitidez) níveis, com teto de NIVEIS_MAXIMOS_DO_LIMITE. */
-export const NIVEIS_MAXIMOS_DO_LIMITE = 64;
+ * A nitidez finita conta inteira no limite (uma nitidez 9,5 é vinco por nove níveis e meio e liso depois), e por isso
+ * o refino da estrela vai até ceil(nitidez) níveis, no máximo dez, porque de NITIDEZ_VIVA para cima o vinco é vivo. */
 
 function estrelaDe(V, F, facesDoVertice, nitidez, i) {
   const mapa = new Map([[i, 0]]); const Vm = [V[i]]; const Fm = []; const globais = [i];
@@ -279,7 +287,6 @@ function limiteDaEstrela(estrela, canto, borda) {
     const vivasAgora = arestasDa(F).arestas.filter((e) => (e.a === 0 || e.b === 0) && (e.faces.length !== 2 || (nitidez.get(chave(e.a, e.b)) ?? 0) > 0)).length;
     if (vivasAgora === 1 || F.some((f) => f.length !== 4)) niveis = 1;
   }
-  if (niveis > NIVEIS_MAXIMOS_DO_LIMITE) throw new TypeError(`subdivisão: nitidez finita ${maior} passa de ${NIVEIS_MAXIMOS_DO_LIMITE} níveis; declare o vinco vivo`);
   const cantos = canto ? new Set([0]) : new Set();
   for (let n = 0; n < niveis; n++) {
     const r = refinar(V, F, nitidez, cantos, borda);

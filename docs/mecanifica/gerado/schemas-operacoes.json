@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:dc949f891b7d95a2e3b149b7fd2c2c2c5f178e88ef4df9e3d02505bb1ab024e3",
+  "assinatura": "sha256:76d69edc9be340cc73402f74e3132548de580b397f41ab9a8f6a6f775f452a9d",
   "total": 38,
   "operacoes": [
     {
@@ -3712,22 +3712,23 @@
             },
             "vertices": {
               "type": "array",
-              "description": "Vértices da gaiola, [x,y,z] escalares ou nome de ponto."
+              "description": "Vértices da gaiola: nome de ponto de PARAMS (cada nome uma vez), que faces, vincos, cantos e medidas citam, ou [x,y,z] anônimo."
             },
             "faces": {
               "type": "array",
-              "description": "Faces da gaiola por índice de vértice, sentido anti-horário visto de fora."
+              "description": "Faces da gaiola, cada uma a lista dos nomes de ponto em sentido anti-horário visto de fora; o índice de vértice só serve à gaiola anônima."
             },
             "vincos": {
               "type": "array",
-              "description": "Arestas vincadas: [a, b] viva ou [a, b, nitidez] semiaguda, em níveis."
+              "description": "Vincos nomeados {nome, pontos, nitidez}: pontos é a sequência de nomes de ponto ao longo das arestas da gaiola (repita o primeiro no fim para fechar), e nitidez vai de 0 (liso) a 1 (vivo), ou 'viva'; a nitidez n vira 10 n² níveis de Catmull-Clark, como o vinco do Blender."
             },
             "cantos": {
               "type": "array",
               "items": {
-                "type": "integer"
+                "type": "string",
+                "minLength": 1
               },
-              "description": "Vértices de canto vivo."
+              "description": "Nomes de ponto da gaiola que ficam como canto vivo."
             },
             "niveis": {
               "anyOf": [
@@ -3814,7 +3815,8 @@
           "É superfície da gaiola: aberta se a gaiola for aberta.",
           "A regra é a do OpenSubdiv no modo uniforme, sem projeção na superfície limite; confere com o Subdivision Surface do Blender com use_limit_surface desligado.",
           "Sem medidas, a superfície aproxima a gaiola e não passa pelos pontos; com medidas, só os pontos marcados passam pela superfície limite, e todo vértice da malha entregue vai ao seu ponto limite, de modo que a cota é vértice da malha.",
-          "Medidas que a superfície limite não separa, ou que movem a gaiola mais de 100 vezes o erro do alvo, gritam com os nomes dos pontos."
+          "Medidas que a superfície limite não separa, ou que movem a gaiola mais de 100 vezes o erro do alvo, gritam com os nomes dos pontos.",
+          "Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes."
         ],
         "diagnosticos": []
       }

@@ -303,10 +303,12 @@ encaminhe-os a todas as chamadas do núcleo que recebem aliases.
 
 `subdivisao` gera uma superfície Catmull-Clark lisa a partir de uma gaiola de
 quads com poucos pontos, a forma de modelar uma chapa contínua com dobras vivas.
-Os campos são `vertices` (cada um `[x,y,z]` ou o nome de um ponto de `PARAMS`),
-`faces` (índices de vértice, anti-horário visto de fora), `vincos`, `cantos`,
-`niveis` (0 a 6, padrão 2), `borda`, `simetria` e `medidas`. O catálogo e
-`descrever_capacidade` trazem o contrato completo.
+Os campos são `vertices` (cada um o nome de um ponto de `PARAMS`, uma vez só,
+ou `[x,y,z]` anônimo), `faces` (os nomes de ponto de cada face, anti-horário
+visto de fora), `vincos`, `cantos` (nomes de ponto), `niveis` (0 a 6, padrão 2),
+`borda`, `simetria` e `medidas`. O catálogo e `descrever_capacidade` trazem o
+contrato completo. Escreva a gaiola por nomes: o índice de vértice na face só
+serve à gaiola anônima, e vinco e canto não aceitam índice.
 
 Sem `medidas`, a superfície aproxima a gaiola e não passa pelos pontos: cada
 medida da `TABELA` aplicada a um vértice sai encolhida, e o canto de borda não
@@ -334,15 +336,29 @@ gaiola. A regra é a do OpenSubdiv no modo uniforme e confere,
 a 1e-6 m, com a saída congelada do modificador Subdivision Surface do Blender
 em `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`.
 
-Um vinco `[a, b]` é vivo e `[a, b, nitidez]` é semiagudo, com a nitidez em
-níveis de refinamento. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é
-espelhada antes de subdividir para a costura sair lisa. Um vértice declarado
-que nenhuma face usa grita com o nome do ponto, e a operação não gera malha.
+O vinco é uma sequência nomeada de pontos da gaiola ao longo das arestas, como
+`vincos: [{ nome: 'dobraDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.75 }]`;
+para fechar um aro, repita o primeiro ponto no fim. A `nitidez` vai de 0 (liso)
+a 1 (vivo), aceita nome de `PARAMS`, e `'viva'` é a escrita explícita do vinco
+vivo. A nitidez n vira 10 n² níveis de Catmull-Clark semiaguda, a mesma
+conversão do vinco do Blender, e de 10 níveis para cima o vinco é vivo, como
+no OpenSubdiv; por isso a nitidez 1 já é viva, e a superfície limite do Blender
+com vinco 1 confere com a do núcleo a 2e-7 m e fica a 4e-4 m da nitidez finita
+9,99. O raio de borda escala com a gaiola: num cubo de 1 m com as doze arestas
+vincadas, o meio da aresta fica na superfície limite como num filete de
+107 mm de raio com nitidez 0,5, 12,2 mm com 0,75, 2,1 mm com 0,9, 1,1 mm com
+0,95 e zero com 1, o que dá raio ≈ 0,6 × lado da face × 2^(−10 n²). Abaixo de
+0,5 o cubo já não tem face plana (com 0,25 o meio da face cai 3 cm), e a
+nitidez só arredonda a forma toda. Vinco ou canto por índice grita com a forma
+nomeada; par de pontos do vinco que não é aresta da gaiola, ponto que não está
+na gaiola, nome de vinco repetido e aresta em dois vincos gritam com os nomes.
+`cantos: ['quina']` fixa o ponto como canto vivo, o vinco de vértice 1 do
+Blender. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é espelhada
+antes de subdividir para a costura sair lisa, com os vincos e cantos
+espelhados. Um vértice declarado que nenhuma face usa grita com o nome do
+ponto, e a operação não gera malha.
 
-A gaiola e os vincos desta operação ainda são endereçados por índice dentro do
-próprio passo, que é o dado da receita e não uma referência persistida a outra
-parte; o endereçamento por nome está previsto no plano de carroceria por
-subdivisão e ainda não existe. A superfície sai aberta se a gaiola for aberta,
+A superfície sai aberta se a gaiola for aberta,
 sem espessura, e não aceita booleana nem `filete` sobre ela. `origem` publica
 somente as faces da superfície, sem sub-endereço, porque a ordem de saída não é
 identidade.

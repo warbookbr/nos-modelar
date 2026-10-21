@@ -1,6 +1,71 @@
 /* subdivisao.js (operação) — gera uma superfície Catmull-Clark com vincos a partir de uma gaiola declarada.
-   A geometria sai de `procedural/nucleo/subdivisao.js`, função pura. */
-import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, NITIDEZ_INFINITA } from '../subdivisao.js';
+   A geometria sai de `procedural/nucleo/subdivisao.js`, função pura. A receita endereça a gaiola por nome: o vértice é o
+   nome de um ponto, a face lista nomes de ponto e o vinco é uma sequência nomeada de pontos; o passo traduz os nomes em
+   índices só para chamar a função pura, e nenhum índice de aresta, vértice ou face sai da receita. */
+import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, nitidezDoVinco } from '../subdivisao.js';
+
+const EXEMPLO_DE_VINCO = "{ nome: 'vincoDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.5 }";
+const EXEMPLO_DE_CANTO = "cantos: ['quinaDaTampa']";
+
+/** enderecosPorIndice(argumentos) -> caminhos dos campos de um passo `subdivisao` que endereçam a gaiola por índice
+ *  numérico (face, vinco, canto ou medida), para o teste que confere que a receita só usa nomes. Vazio quando a receita
+ *  endereça tudo por nome. */
+export function enderecosPorIndice(a) {
+  const achados = [];
+  const olhar = (valor, caminho) => {
+    if (typeof valor === 'number') achados.push(caminho);
+    else if (Array.isArray(valor)) valor.forEach((v, k) => olhar(v, `${caminho}[${k}]`));
+  };
+  (a.vertices ?? []).forEach((v, k) => { if (typeof v !== 'string') achados.push(`vertices[${k}]`); });
+  olhar(a.faces ?? [], 'faces');
+  (a.vincos ?? []).forEach((v, k) => {
+    if (v && typeof v === 'object' && !Array.isArray(v)) olhar(v.pontos ?? [], `vincos[${k}].pontos`);
+    else olhar(v, `vincos[${k}]`);
+  });
+  olhar(a.cantos ?? [], 'cantos');
+  olhar(a.medidas ?? [], 'medidas');
+  return achados;
+}
+
+const chave = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
+const citar = (nome) => `'${nome}'`;
+
+/* Traduz os vincos nomeados em [a, b, nitidez em níveis] sobre as arestas da gaiola. Devolve { vincos } ou { erro }. */
+function vincosPorNome(lista, indiceDoNome, faces, st) {
+  if (!Array.isArray(lista)) return { erro: `vincos precisa ser lista de vincos nomeados, como ${EXEMPLO_DE_VINCO}` };
+  const arestas = new Set();
+  for (const f of faces) for (let k = 0; k < f.length; k++) arestas.add(chave(f[k], f[(k + 1) % f.length]));
+  const nomes = new Set(); const dono = new Map(); const vincos = [];
+  for (const v of lista) {
+    if (Array.isArray(v)) return { erro: `vinco por índice de aresta não é aceito, porque índice não é identidade; declare o vinco pelos pontos nomeados da gaiola, como ${EXEMPLO_DE_VINCO}, com nitidez de 0 a 1 ou 'viva'` };
+    if (!v || typeof v !== 'object') return { erro: `cada vinco precisa ser objeto como ${EXEMPLO_DE_VINCO}` };
+    if (typeof v.nome !== 'string' || !v.nome) return { erro: `cada vinco precisa de nome, como ${EXEMPLO_DE_VINCO}` };
+    const extra = Object.keys(v).filter((k) => !['nome', 'pontos', 'nitidez'].includes(k));
+    if (extra.length) return { erro: `o vinco ${citar(v.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome, pontos e nitidez` };
+    if (nomes.has(v.nome)) return { erro: `o nome de vinco ${citar(v.nome)} aparece mais de uma vez` };
+    nomes.add(v.nome);
+    if (!Array.isArray(v.pontos) || v.pontos.length < 2 || v.pontos.some((p) => typeof p !== 'string')) return { erro: `o vinco ${citar(v.nome)} precisa de pontos: lista de dois ou mais nomes de ponto da gaiola, em sequência ao longo das arestas` };
+    for (const p of v.pontos) if (!indiceDoNome.has(p)) return { erro: `o vinco ${citar(v.nome)} cita o ponto ${citar(p)}, que não é ponto nomeado da gaiola` };
+    let s;
+    if (v.nitidez === 'viva') s = nitidezDoVinco('viva');
+    else {
+      if (v.nitidez == null) return { erro: `o vinco ${citar(v.nome)} precisa de nitidez de 0 a 1, ou 'viva'` };
+      const x = st.num(v.nitidez);
+      if (!Number.isFinite(x) || x < 0 || x > 1) return { erro: `o vinco ${citar(v.nome)} tem nitidez ${x}; a nitidez vai de 0 a 1, ou é 'viva'` };
+      s = nitidezDoVinco(x);
+    }
+    for (let k = 0; k + 1 < v.pontos.length; k++) {
+      const p = v.pontos[k], q = v.pontos[k + 1];
+      const a = indiceDoNome.get(p), b = indiceDoNome.get(q);
+      const c = chave(a, b);
+      if (a === b || !arestas.has(c)) return { erro: `o vinco ${citar(v.nome)} liga ${citar(p)} a ${citar(q)}, que não formam aresta da gaiola` };
+      if (dono.has(c)) return { erro: `a aresta ${citar(p)}-${citar(q)} está ${dono.get(c) === v.nome ? `duas vezes no vinco ${citar(v.nome)}` : `nos vincos ${citar(dono.get(c))} e ${citar(v.nome)}`}` };
+      dono.set(c, v.nome);
+      vincos.push([a, b, s]);
+    }
+  }
+  return { vincos };
+}
 
 export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem }) {
   return {
@@ -9,13 +74,40 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'subdivisao', 'origemId', 'origemId precisa ser inteiro não-negativo');
     let gaiola; let soltos = [];
     const declarados = a.vertices ?? [];
+    /* Os pontos nomeados da gaiola: o nome endereça o vértice em faces, vincos, cantos e medidas. */
+    const indiceDoNome = new Map();
+    for (const [k, v] of declarados.entries()) {
+      if (typeof v !== 'string') continue;
+      if (indiceDoNome.has(v)) return grita(st, i, 'subdivisao', 'vertices', `o ponto ${citar(v)} aparece mais de uma vez na gaiola`);
+      indiceDoNome.set(v, k);
+    }
+    let faces;
+    if (!Array.isArray(a.faces)) return grita(st, i, 'subdivisao', 'faces', 'faces precisa ser lista de faces, cada uma uma lista de nomes de ponto da gaiola');
+    try {
+      faces = a.faces.map((f) => {
+        if (!Array.isArray(f)) throw new TypeError('cada face precisa ser lista de nomes de ponto da gaiola');
+        return f.map((p) => {
+          if (typeof p !== 'string') return p;
+          if (!indiceDoNome.has(p)) throw new TypeError(`a face [${f.map(citar).join(', ')}] cita o ponto ${citar(p)}, que não é ponto nomeado da gaiola`);
+          return indiceDoNome.get(p);
+        });
+      });
+    } catch (e) { return grita(st, i, 'subdivisao', 'faces', String(e.message)); }
+    const traduzidos = vincosPorNome(a.vincos ?? [], indiceDoNome, faces.filter((f) => f.every((x) => Number.isInteger(x))), st);
+    if (traduzidos.erro) return grita(st, i, 'subdivisao', 'vincos', traduzidos.erro);
+    const cantos = [];
+    if (a.cantos != null) {
+      if (!Array.isArray(a.cantos)) return grita(st, i, 'subdivisao', 'cantos', `cantos precisa ser lista de nomes de ponto da gaiola, como ${EXEMPLO_DE_CANTO}`);
+      for (const c of a.cantos) {
+        if (typeof c !== 'string') return grita(st, i, 'subdivisao', 'cantos', `canto por índice de vértice não é aceito; declare o canto pelo nome do ponto da gaiola, como ${EXEMPLO_DE_CANTO}`);
+        if (!indiceDoNome.has(c)) return grita(st, i, 'subdivisao', 'cantos', `o canto ${citar(c)} não é ponto nomeado da gaiola`);
+        cantos.push(indiceDoNome.get(c));
+      }
+    }
     try {
       const vertices = declarados.map((p) => st.vec(p));
-      const faces = a.faces ?? [];
-      /* vinco: [a, b] é vivo (nitidez infinita); [a, b, nitidez] é semiagudo, em níveis (OpenSubdiv). */
-      const vincos = (a.vincos ?? []).map((v) => (Array.isArray(v) && v.length === 2 ? [v[0], v[1], NITIDEZ_INFINITA] : [v[0], v[1], st.num(v[2])]));
-      gaiola = { vertices, faces, vincos, cantos: a.cantos ?? [] };
-      const usados = new Set(faces.flatMap((f) => (Array.isArray(f) ? f : [])));
+      gaiola = { vertices, faces, vincos: traduzidos.vincos, cantos };
+      const usados = new Set(faces.flat());
       soltos = vertices.map((p, k) => (usados.has(k) ? null : (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${p.join(', ')}]`))).filter((x) => x !== null);
       if (a.simetria === 'x') gaiola = espelharGaiolaEmX(gaiola);
       else if (a.simetria != null) return grita(st, i, 'subdivisao', 'simetria', "simetria só aceita 'x'");
@@ -29,9 +121,8 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       if (!Array.isArray(a.medidas) || !a.medidas.length || a.medidas.some((m) => typeof m !== 'string')) return grita(st, i, 'subdivisao', 'medidas', 'medidas precisa ser lista não vazia de nomes de ponto da gaiola');
       const indices = [];
       for (const nome of a.medidas) {
-        const achados = declarados.flatMap((v, k) => (v === nome ? [k] : []));
-        if (!achados.length) return grita(st, i, 'subdivisao', 'medidas', `a medida '${nome}' não é ponto declarado da gaiola`);
-        indices.push(...achados);
+        if (!indiceDoNome.has(nome)) return grita(st, i, 'subdivisao', 'medidas', `a medida '${nome}' não é ponto declarado da gaiola`);
+        indices.push(indiceDoNome.get(nome));
       }
       const origem = gaiola.vertices.map((_, k) => k);
       if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
@@ -53,8 +144,8 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (r.vertices.length > limite || r.faces.length > limite) return grita(st, i, 'subdivisao', 'niveis', `a subdivisão gera ${r.vertices.length} vértices e ${r.faces.length} faces, acima do limite do passo (${limite})`);
     r.vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
-    const faces = r.faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); return id; });
-    if (a.origemId != null) registraOrigem(st, i, 'subdivisao', a.origemId, { faces });
+    const facesSaida = r.faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); return id; });
+    if (a.origemId != null) registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida });
   },
   };
 }
