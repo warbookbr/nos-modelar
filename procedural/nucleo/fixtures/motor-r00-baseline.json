@@ -38,7 +38,8 @@
     "liso",
     "material",
     "parte",
-    "pesar"
+    "pesar",
+    "subdivisao"
   ],
   "casos": [
     {
@@ -409,6 +410,16 @@
       "hashCanonico": "289f707e37c3d102624c316f9d829102c2b6165ba3ffef48d5668ad0bc1817f7",
       "vertices": 8,
       "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/subdivisao",
+      "operacoes": [
+        "subdivisao"
+      ],
+      "hashCanonico": "b76b133d5904c315b8b9c18e7cabdfdd64b13a5ca7f9bcfdd0a506ef27f1f470",
+      "vertices": 9,
+      "faces": 4,
       "diagnosticos": 0
     }
   ]

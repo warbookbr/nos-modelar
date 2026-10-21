@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:60cc344cb88a60b685391648e248a32a38838ff6796a17f491682cb9cdc70cf2",
+  "assinatura": "sha256:9dc581d27c0a01564f087292726f8ca851a5ff1fa6c647b383349e026184e6b5",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -986,6 +986,36 @@
             "intencao": "Marcar faces para renderização sólida.",
             "schema": "mecanifica.argumentos.solido@1",
             "obrigatorios": []
+          }
+        },
+        {
+          "id": "mecanifica.operacao.subdivisao",
+          "nome": "subdivisao",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "cria-geometria"
+          ],
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Gerar superfície Catmull-Clark com vincos a partir de uma gaiola de vértices e faces.",
+            "schema": "mecanifica.argumentos.subdivisao@1",
+            "obrigatorios": [
+              "vertices",
+              "faces"
+            ]
           }
         },
         {
@@ -2093,6 +2123,36 @@
         "intencao": "Marcar faces para renderização sólida.",
         "schema": "mecanifica.argumentos.solido@1",
         "obrigatorios": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.subdivisao",
+      "nome": "subdivisao",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "cria-geometria"
+      ],
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Gerar superfície Catmull-Clark com vincos a partir de uma gaiola de vértices e faces.",
+        "schema": "mecanifica.argumentos.subdivisao@1",
+        "obrigatorios": [
+          "vertices",
+          "faces"
+        ]
       }
     },
     {

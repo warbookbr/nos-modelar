@@ -299,6 +299,35 @@ seleciona somente laterais. Para o cilindro inteiro, una lateral, `fundo` e
 união plana de origens. Não encadeie alias. Valide-os antes do primeiro passo e
 encaminhe-os a todas as chamadas do núcleo que recebem aliases.
 
+## Superfície subdividida: `subdivisao`
+
+`subdivisao` gera uma superfície Catmull-Clark lisa a partir de uma gaiola de
+quads com poucos pontos, a forma de modelar uma chapa contínua com dobras vivas.
+Os campos são `vertices` (cada um `[x,y,z]` ou o nome de um ponto de `PARAMS`),
+`faces` (índices de vértice, anti-horário visto de fora), `vincos`, `cantos`,
+`niveis` (0 a 6, padrão 2), `borda` e `simetria`. O catálogo e
+`descrever_capacidade` trazem o contrato completo.
+
+A superfície aproxima a gaiola e não passa pelos pontos: cada medida da
+`TABELA` aplicada a um vértice sai encolhida, e o canto de borda não tem raio
+controlado. Declare a gaiola maior que a forma, ou meça a superfície na bancada
+antes de confiar na cota. A regra é a do OpenSubdiv no modo uniforme e confere,
+a 1e-6 m, com a saída congelada do modificador Subdivision Surface do Blender
+em `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`.
+
+Um vinco `[a, b]` é vivo e `[a, b, nitidez]` é semiagudo, com a nitidez em
+níveis de refinamento. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é
+espelhada antes de subdividir para a costura sair lisa. Um vértice declarado
+que nenhuma face usa grita com o nome do ponto, e a operação não gera malha.
+
+A gaiola e os vincos desta operação ainda são endereçados por índice dentro do
+próprio passo, que é o dado da receita e não uma referência persistida a outra
+parte; o endereçamento por nome está previsto no plano de carroceria por
+subdivisão e ainda não existe. A superfície sai aberta se a gaiola for aberta,
+sem espessura, e não aceita booleana nem `filete` sobre ela. `origem` publica
+somente as faces da superfície, sem sub-endereço, porque a ordem de saída não é
+identidade.
+
 ## Detalhes de seleção, aliases e proveniência
 
 **Nenhuma op de edição exige ID LITERAL: `sel` ocupa o lugar do id em todas.**

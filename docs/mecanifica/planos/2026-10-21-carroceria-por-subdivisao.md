@@ -77,3 +77,5 @@ O risco maior é a interpolação não convergir em gaiola com vinco vivo, o que
 ## Andamento
 
 Escrito e ativado em 2026-10-21 a partir do estudo local, com as três decisões aprovadas, sem implementação no repositório.
+
+Fatia 1 feita em 2026-10-21: a operação `subdivisao` e a fixture do oráculo entraram copiadas do estudo, sem os comentários que citavam o estudo, com o catálogo, a skill `criar-peca` e `UPSTREAM-NOS.md`. A fixture tem 7 gaiolas desenhadas por código em 16 combinações de gaiola e nível, e não 16 gaiolas como o texto do plano dizia. O gate 1 passa sem vincos fracionários novos: a diferença máxima para o Blender é 9e-7 m, quase toda do arredondamento da fixture a 1e-6, e a mesma receita dá a mesma malha bit a bit. Vértice de gaiola sem face grita com o nome do ponto. Falta a medida de vincos fracionários na fatia 3, que acrescenta gaiolas ao oráculo.

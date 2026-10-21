@@ -2,9 +2,9 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:60cc344cb88a60b685391648e248a32a38838ff6796a17f491682cb9cdc70cf2`.
+Assinatura do registro: `sha256:9dc581d27c0a01564f087292726f8ca851a5ff1fa6c647b383349e026184e6b5`.
 
-Há 37 operações em 1 módulo(s).
+Há 38 operações em 1 módulo(s).
 
 | operação | intenção | entra/sai | interfaces | custo | schema |
 |---|---|---|---|---:|---|
@@ -41,6 +41,7 @@ Há 37 operações em 1 módulo(s).
 | `publicarPorta` | Publicar interface semântica endereçável de uma origem existente. | `mecanifica.malha-poligonal@1` → `mecanifica.porta@1` | — → — | 1 | `mecanifica.argumentos.publicarPorta@1` |
 | `rotaciona` | Rotacionar malha ou seleção em convenção destra. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.rotaciona@1` |
 | `solido` | Marcar faces para renderização sólida. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.solido@1` |
+| `subdivisao` | Gerar superfície Catmull-Clark com vincos a partir de uma gaiola de vértices e faces. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.subdivisao@1` |
 | `subtrair` | Tirar do primeiro sólido o volume dos demais. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.subtrair@1` |
 | `transladar` | Transladar malha inteira ou seleção semântica. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.transladar@1` |
 | `unir` | Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.unir@1` |

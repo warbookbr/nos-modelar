@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.hipergrafo-capacidades@1",
-  "assinatura": "sha256:60cc344cb88a60b685391648e248a32a38838ff6796a17f491682cb9cdc70cf2",
+  "assinatura": "sha256:9dc581d27c0a01564f087292726f8ca851a5ff1fa6c647b383349e026184e6b5",
   "nos": [
     {
       "id": "artefato:mecanifica.malha-poligonal@1",
@@ -186,6 +186,11 @@
       "id": "mecanifica.operacao.solido",
       "tipo": "operacao",
       "nome": "solido"
+    },
+    {
+      "id": "mecanifica.operacao.subdivisao",
+      "tipo": "operacao",
+      "nome": "subdivisao"
     },
     {
       "id": "mecanifica.operacao.subtrair",
@@ -515,6 +520,14 @@
       "entra": [
         "artefato:mecanifica.malha-poligonal@1"
       ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.subdivisao",
+      "operacao": "mecanifica.operacao.subdivisao",
+      "entra": [],
       "sai": [
         "artefato:mecanifica.malha-poligonal@1"
       ]

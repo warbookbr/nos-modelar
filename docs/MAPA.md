@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1533 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1536 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1103,6 +1103,8 @@
 - `selecao-geometrica.test.mjs` — selecao-geometrica.test.mjs — `sel.onde`: face e aresta por propriedade geométrica, sem identificador numérico. As expectativas vêm de contas sobre as coorde…
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
+- `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
+- `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo e vértice sem face.
 - `tex.js` — helpers de TEXTURA do motor v3 (D-55) — paleta Resurrect64, ruído, dither e o gerador de canvas. Uma peça pode devolver índice da paleta OU [r,g,b] direto (m…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
@@ -1140,6 +1142,7 @@
 - `perfis.js` — perfis.js — `extrusao`: um perfil 2D com furos e deslocamento de contorno vira um sólido prismático.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
+- `subdivisao.js` — subdivisao.js (operação) — gera uma superfície Catmull-Clark com vincos a partir de uma gaiola declarada. A geometria sai de `procedural/nucleo/subdivisao.js…
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `triangulacao-sem-leque.test.ts` — triangulacao-sem-leque.test.ts — face plana grande (tampa de superelipse, pedaço de união) não sai em leque: grau máximo por canto e ângulo mínimo dos triâng…
 - `uniao-lateral-rente.test.ts` — uniao-lateral-rente.test.ts — `unir` com laterais coplanares (rentes). Caso do ombro do braço robótico: coluna e braço com a MESMA meia largura. A saída tem …

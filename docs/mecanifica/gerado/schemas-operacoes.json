@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:60cc344cb88a60b685391648e248a32a38838ff6796a17f491682cb9cdc70cf2",
-  "total": 37,
+  "assinatura": "sha256:9dc581d27c0a01564f087292726f8ca851a5ff1fa6c647b383349e026184e6b5",
+  "total": 38,
   "operacoes": [
     {
       "id": "mecanifica.operacao.apagaFace",
@@ -3686,6 +3686,126 @@
         },
         "precondicoes": [],
         "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.subdivisao",
+      "nome": "subdivisao",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Gerar superfície Catmull-Clark com vincos a partir de uma gaiola de vértices e faces.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.subdivisao@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "vertices",
+            "faces"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "vertices": {
+              "type": "array",
+              "description": "Vértices da gaiola, [x,y,z] escalares ou nome de ponto."
+            },
+            "faces": {
+              "type": "array",
+              "description": "Faces da gaiola por índice de vértice, sentido anti-horário visto de fora."
+            },
+            "vincos": {
+              "type": "array",
+              "description": "Arestas vincadas: [a, b] viva ou [a, b, nitidez] semiaguda, em níveis."
+            },
+            "cantos": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Vértices de canto vivo."
+            },
+            "niveis": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Níveis de refinamento, 0 a 6."
+            },
+            "borda": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'suave' (padrão) ou 'cantos'."
+            },
+            "simetria": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'x': a gaiola é a metade x >= 0 e é espelhada antes de subdividir, com a costura lisa."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "subdivisao",
+              {
+                "vertices": [
+                  [
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "faces": [
+                  [
+                    0,
+                    3,
+                    2,
+                    1
+                  ]
+                ],
+                "niveis": 1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "É superfície da gaiola: aberta se a gaiola for aberta.",
+          "A regra é a do OpenSubdiv no modo uniforme, sem projeção na superfície limite; confere com o Subdivision Surface do Blender com use_limit_surface desligado."
+        ],
         "diagnosticos": []
       }
     },

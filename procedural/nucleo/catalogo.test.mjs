@@ -44,7 +44,7 @@ describe('catálogo de capacidades — R05', () => {
       nome: 'publicarPorta', uso: { schema: 'mecanifica.argumentos.publicarPorta@1', obrigatorios: ['de'] },
     }]);
     expect(buscarCapacidades(catalogo, { produz: 'mecanifica.parte@1' }).operacoes.map(({ nome }) => nome)).toEqual(['parte']);
-    expect(buscarCapacidades(catalogo, { identidade: 'cria-por-passo' }).total).toBe(10);
+    expect(buscarCapacidades(catalogo, { identidade: 'cria-por-passo' }).total).toBe(11);
   });
 
   it('explica ausência com candidatas e não inventa capacidade', () => {
@@ -60,7 +60,7 @@ describe('catálogo de capacidades — R05', () => {
     expect(buscarCapacidades(catalogo, { texto: 'revolucionar' }).operacoes.map(({ nome }) => nome)).toContain('lathe');
     const primeira = buscarCapacidades(catalogo, { limite: 3 });
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
-    expect(primeira).toMatchObject({ total: 37, retornadas: 3, truncado: true, omitidas: 34 });
+    expect(primeira).toMatchObject({ total: 38, retornadas: 3, truncado: true, omitidas: 35 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
   });
 

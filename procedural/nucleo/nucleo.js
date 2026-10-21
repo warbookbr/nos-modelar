@@ -14,6 +14,7 @@ import { criarResolverNumerico } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
 import { usoDaOperacao } from './uso-operacoes.js';
+import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.js';
 import { criarOperacoesPrimitivasSuperficie } from './operacoes/primitivas-superficie.js';
 import { criarOperacoesEdicaoDireta } from './operacoes/edicao-direta.js';
@@ -1659,6 +1660,8 @@ CONTRATOS_ORIGEM.intersectar = contratoBooleana('intersectar');
    elas saem de uma bola poliédrica, e um índice pela ordem da saída seria
    identidade posicional. */
 CONTRATOS_ORIGEM.arredondarCostura = contratoFaces('arredondarCostura');
+/* subdivisao — as faces da superfície refinada, sem sub-endereço (a ordem de saída não é identidade). */
+CONTRATOS_ORIGEM.subdivisao = contratoFaces('subdivisao');
 /* casca — extensão nativa `procedural/extensoes/casca`: o resultado publica três grupos, citáveis por `parte`:
    `externa` (as faces fechadas do sólido, que continuam com id e vértices), `interna` (a parede de dentro, uma por face
    externa) e `borda` (a borda das faces abertas, uma por aresta). Sem `parte`, são todas. Os grupos são de significado
@@ -2850,6 +2853,7 @@ const operacoesPerfis = criarOperacoesPerfis({ BLOCO, FAIXA_ESTENDIDA, idDoPasso
 const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
 const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
+const operacoesSubdivisao = criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem });
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, resolverSelecao, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {
@@ -2862,7 +2866,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesTransformacoes,
   ...operacoesAtributos,
   ...operacoesBooleanas,
-
+  ...operacoesSubdivisao,
 };
 
 /* Configuração explícita do módulo que preserva os nomes curtos das receitas.
@@ -2873,11 +2877,11 @@ const NOMES_DAS_OPERACOES = [
   'vira', 'apagaFace', 'displace', 'encostar', 'transladar', 'rotaciona',
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
-  'solido', 'liso', 'material', 'parte', 'pesar',
+  'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
-const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'extrusao', 'inflate']);
+const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'extrusao', 'inflate', 'subdivisao']);
 const ATRIBUTOS = new Set(['pincel', 'solido', 'liso', 'material']);
 function contratoDaOperacao(nome) {
   if (nome === 'publicarPorta') return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: ['mecanifica.porta@1'] }, efeitos: ['publica-porta'], identidade: 'declara-semantica' };
