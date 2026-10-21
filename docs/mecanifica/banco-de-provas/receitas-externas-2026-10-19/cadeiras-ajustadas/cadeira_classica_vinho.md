@@ -1,6 +1,6 @@
 # cadeira_classica_vinho: ajustes de construção
 
-Folhas: `cadeira_classica_vinho-antes.png` e `cadeira_classica_vinho-depois.png`. Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_classica_vinho.ajustes.json` (15 faces, só em caixas retas). Antes: 5 embutidos, 0 passantes; depois: 0 e 0. Caixa envolvente total idêntica (x -516..518, y 0..1117, z -455..390). Este relato não aprova a forma.
+Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_classica_vinho.ajustes.json` (15 faces, só em caixas retas). Antes: 5 embutidos, 0 passantes; depois: 0 e 0. Caixa envolvente total idêntica (x -516..518, y 0..1117, z -455..390). Este relato não aprova a forma.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

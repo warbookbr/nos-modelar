@@ -206,7 +206,7 @@ describe('textura da receita do acervo na exportação OBJ', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'exp-mat-'));
     try {
       const saida = join(pasta, 'balcao.obj');
-      await exportarArquivoObj({ arquivo: resolve(REPO, 'procedural/pecas/cadeira-madeira/receita.js'), saida, unidade: 'm', comTextura: false, sobrescrever: true });
+      await exportarArquivoObj({ arquivo: resolve(REPO, 'procedural/pecas/poltrona-moderna-branca/receita.js'), saida, unidade: 'm', comTextura: false, sobrescrever: true });
       expect(existsSync(saida)).toBe(true);
     } finally {
       rmSync(pasta, { recursive: true, force: true });

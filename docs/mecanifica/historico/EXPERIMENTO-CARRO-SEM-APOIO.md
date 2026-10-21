@@ -5,7 +5,7 @@ modelasse um carro esportivo do zero, sem usar o núcleo procedural, sem
 contratos, sem schemas e sem nenhuma peça do acervo. O objetivo era ver como ela
 se sairia sozinha, para comparar com o que a esteira da Mecanifica produz.
 
-Este documento guarda o que aconteceu e as vistas do resultado. O gerador e o
+Este documento guarda o que aconteceu. O gerador e o
 visor foram removidos do repositório em 2026-09-11, e a razão está no fim. A
 receita ficou: ela é lida pelo gerador de evidências do canal de percepção N3,
 que mede a pele dela, e por isso passou a morar ao lado de quem a lê, em
@@ -40,10 +40,10 @@ O README do experimento declarava a tentativa reprovada pelo critério visual qu
 o próprio autor dela escreveu: silhueta, integração entre carroceria, cabine e
 rodas, e acabamento continuaram insuficientes para um esportivo italiano.
 
-As cinco vistas estão em [`carro-sem-apoio/`](carro-sem-apoio/): isométrica,
-lateral, frontal, traseira e superior. Nelas dá para ver a postura baixa, a anca
-traseira cheia e a cabine avançada — e também barras vermelhas flutuando sobre o
-teto e blocos claros nos para-lamas, que são espelhos e faróis fora do lugar.
+Nas cinco vistas geradas (isométrica, lateral, frontal, traseira e superior) via-se
+a postura baixa, a anca traseira cheia e a cabine avançada, e também barras
+vermelhas flutuando sobre o teto e blocos claros nos para-lamas, que eram
+espelhos e faróis fora do lugar.
 
 ## O que a comparação ensina
 
@@ -67,6 +67,6 @@ página subia e parava em "gerando malha…".
 Ninguém tinha percebido porque nada no repositório executava aquele código.
 Guardar gerador quebrado que ninguém roda é guardar dívida com aparência de
 acervo, e é a mesma classe de defeito que este repositório vem fechando: código
-sem régua que o chame apodrece em silêncio. As vistas acima foram obtidas numa
-cópia temporária com as duas correções mínimas, e é isso que sobra como
+sem régua que o chame apodrece em silêncio. As vistas foram obtidas numa
+cópia temporária com as duas correções mínimas, e este texto é o que sobra como
 evidência.

@@ -1,6 +1,6 @@
 # cadeira_desgastada_madeira: ajustes sobre a folha alinhada
 
-Folha antes: `cadeira_desgastada_madeira-antes.png` (alinhamento, sem ajustes). Folha depois: `cadeira_desgastada_madeira-depois.png`. Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_desgastada_madeira.ajustes.json`. Medidas em milímetro, da tabela de peças. A caixa envolvente total não mudou (x -300..300, y 0..1040, z -278..285). Passantes: 7 antes, 4 depois; embutidos: 11 antes, 6 depois. Quem julga a forma é a pessoa.
+Antes: só o alinhamento, sem ajustes. Depois: com os ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_desgastada_madeira.ajustes.json`. Medidas em milímetro, da tabela de peças. A caixa envolvente total não mudou (x -300..300, y 0..1040, z -278..285). Passantes: 7 antes, 4 depois; embutidos: 11 antes, 6 depois. Quem julga a forma é a pessoa.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

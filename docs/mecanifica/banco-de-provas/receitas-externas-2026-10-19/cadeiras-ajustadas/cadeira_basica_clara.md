@@ -1,6 +1,6 @@
 # cadeira_basica_clara: relato dos ajustes
 
-Medido sobre a folha atual (com alinhamento) e a tabela de peças. A lista de ajustes ficou vazia (`cadeira_basica_clara.ajustes.json`): nenhum erro de posição ou medida foi encontrado. A folha depois é idêntica à antes, e a caixa envolvente total não mudou (x -252..252, y 0..1003, z -237..273). Não aprovo a forma; quem julga é a pessoa.
+Medido sobre a tabela de peças atual (com alinhamento). A lista de ajustes ficou vazia (`cadeira_basica_clara.ajustes.json`): nenhum erro de posição ou medida foi encontrado. A tabela depois é idêntica à antes, e a caixa envolvente total não mudou (x -252..252, y 0..1003, z -237..273). Não aprovo a forma; quem julga é a pessoa.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

@@ -1,6 +1,6 @@
 # cadeira_classica_creme: ajustes de construção
 
-Folhas: `cadeira_classica_creme-antes.png` (só alinhamento) e `cadeira_classica_creme-depois.png` (alinhamento mais `cadeira_classica_creme.ajustes.json`, 11 ajustes). A caixa envolvente total não mudou e os passantes seguem em 0; os embutidos caíram de 5 para 4. Só são caixas retas o assento e os quatro trilhos; todo o resto é extrusão, cilindro ou peça girada e `aplicarAjustes` não o alcança. Quem julga a forma é a pessoa.
+Comparação entre só o alinhamento e o alinhamento mais `cadeira_classica_creme.ajustes.json` (11 ajustes). A caixa envolvente total não mudou e os passantes seguem em 0; os embutidos caíram de 5 para 4. Só são caixas retas o assento e os quatro trilhos; todo o resto é extrusão, cilindro ou peça girada e `aplicarAjustes` não o alcança. Quem julga a forma é a pessoa.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

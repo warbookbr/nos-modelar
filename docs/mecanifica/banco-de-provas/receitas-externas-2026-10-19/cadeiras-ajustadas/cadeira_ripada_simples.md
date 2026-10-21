@@ -1,6 +1,6 @@
 # cadeira_ripada_simples: ajustes de construção
 
-Folhas: `cadeira_ripada_simples-antes.png` (conversão com alinhamento, sem ajustes) e `cadeira_ripada_simples-depois.png` (com `cadeira_ripada_simples.ajustes.json`). Medidas em milímetro, na tabela de peças da folha. Este relato não aprova a forma; quem julga é a pessoa.
+Comparação entre a conversão com alinhamento, sem ajustes, e a conversão com `cadeira_ripada_simples.ajustes.json`. Medidas em milímetro, na tabela de peças. Este relato não aprova a forma; quem julga é a pessoa.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

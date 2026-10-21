@@ -1,6 +1,6 @@
 # cadeira_almofadada_clara: ajustes
 
-Medido com `vistas-de-passos.mjs --alinhar` sobre a receita atual. A lista de ajustes (`cadeira_almofadada_clara.ajustes.json`) ficou vazia: o alinhamento por regra já deixa as medidas no critério, e nenhum ponto restante é erro de posição que um ajuste de caixa reta possa tratar. As folhas `-antes.png` e `-depois.png` e as tabelas de peças são idênticas byte a byte; a caixa envolvente total não mudou (0 mm por eixo).
+Medido com `vistas-de-passos.mjs --alinhar` sobre a receita atual. A lista de ajustes (`cadeira_almofadada_clara.ajustes.json`) ficou vazia: o alinhamento por regra já deixa as medidas no critério, e nenhum ponto restante é erro de posição que um ajuste de caixa reta possa tratar. As tabelas de peças de antes e depois são idênticas byte a byte; a caixa envolvente total não mudou (0 mm por eixo).
 
 Medidas em milímetro; o conjunto é simétrico em torno de x = 37 (pernas e postes de 52 mm, assento de x -196 a 270).
 

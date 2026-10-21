@@ -1,6 +1,6 @@
 # cadeira_fibra_azul: ajustes de construção
 
-Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_fibra_azul.ajustes.json`, aplicados depois do alinhamento. Folhas: `cadeira_fibra_azul-antes.png` e `cadeira_fibra_azul-depois.png`. Medidas em milímetro, tiradas da tabela de peças atual. Não é aprovação de forma; quem julga é a pessoa.
+Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_fibra_azul.ajustes.json`, aplicados depois do alinhamento. Medidas em milímetro, tiradas da tabela de peças atual. Não é aprovação de forma; quem julga é a pessoa.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

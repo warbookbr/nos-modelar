@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1544 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1532 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1339,38 +1339,6 @@
 
 - `roteiro.md` — Roteiro da crítica da prancha
 
-## procedural/pecas/cadeira-artesanal/
-
-- `receita.js` — cadeira-artesanal — cadeira de madeira com assento de tábua única, quatro pernas, dois postes de encosto, duas ripas e uma travessa no topo.
-
-## procedural/pecas/cadeira-artesanal/referencias/
-
-- `alvo.md` — Alvo da cadeira artesanal
-
-## procedural/pecas/cadeira-branca-madeira/
-
-- `receita.js` — cadeira-branca-madeira — cadeira de madeira clara: duas pernas da frente, assento, saia em quatro réguas sob o assento, dois postes de encosto que sobem do c…
-
-## procedural/pecas/cadeira-branca-madeira/referencias/
-
-- `alvo.md` — Alvo da cadeira de madeira clara
-
-## procedural/pecas/cadeira-branca-simples/
-
-- `receita.js` — cadeira-branca-simples — cadeira simples de quatro pernas, assento e painel de encosto preso às pernas de trás.
-
-## procedural/pecas/cadeira-branca-simples/referencias/
-
-- `alvo.md` — Alvo da cadeira branca simples
-
-## procedural/pecas/cadeira-madeira/
-
-- `receita.js` — cadeira-madeira — cadeira de madeira simples: quatro pernas, assento, saia sob o assento, dois postes de encosto, duas travessas e cinco ripas.
-
-## procedural/pecas/cadeira-madeira/referencias/
-
-- `alvo.md` — Alvo da cadeira de madeira
-
 ## procedural/pecas/caminhao-bombeiro/
 
 - `receita.js` — caminhao-bombeiro — caminhão de bombeiros estilizado: cabine vermelha curta e baixa na frente, com para-brisa e vidro lateral azul claros, faróis amarelos, t…
@@ -1547,14 +1515,6 @@
 
 - `alvo.md` — Alvo: lavadora e secadora branca de porta frontal
 
-## procedural/pecas/meio-balcao-vitrine-aquecida/
-
-- `receita.js` — meio-balcao-vitrine-aquecida — metade de um balcão de vitrine aquecida de salgados: base com rodapé, tampo de quatro bordas com cuba, poste de um lado, trilh…
-
-## procedural/pecas/meio-balcao-vitrine-aquecida/referencias/
-
-- `alvo.md` — Alvo: meio-balcao-vitrine-aquecida
-
 ## procedural/pecas/mesa-quadrada-escura/
 
 - `receita.js` — mesa-quadrada-escura — mesa quadrada de madeira escura: tampo de 980 por 980 mm, quatro pés de 80 mm, quatro saias sob o tampo e oito cantoneiras de reforço …
@@ -1610,14 +1570,6 @@
 ## procedural/pecas/picape-plataforma/referencias/
 
 - `alvo.md` — Alvo: picape-plataforma
-
-## procedural/pecas/poltrona-moderna-amarela/
-
-- `receita.js` — poltrona-moderna-amarela — poltrona de estrutura de madeira e revestimento de tecido: quatro pés, dois braços retos, base sob o assento, assento, e encosto d…
-
-## procedural/pecas/poltrona-moderna-amarela/referencias/
-
-- `alvo.md` — Alvo da poltrona moderna amarela
 
 ## procedural/pecas/poltrona-moderna-branca/
 

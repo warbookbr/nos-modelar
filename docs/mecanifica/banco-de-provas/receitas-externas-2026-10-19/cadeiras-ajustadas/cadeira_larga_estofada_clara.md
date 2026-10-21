@@ -1,6 +1,6 @@
 # cadeira_larga_estofada_clara: ajustes de construção
 
-Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_larga_estofada_clara.ajustes.json` (20 faces, cada uma com `motivo`), aplicados depois do alinhamento por regra. Folhas: `cadeira_larga_estofada_clara-antes.png` e `cadeira_larga_estofada_clara-depois.png`. Medidas em mm, da tabela de peças. A forma não está aprovada; quem julga é a pessoa.
+Ajustes em `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_larga_estofada_clara.ajustes.json` (20 faces, cada uma com `motivo`), aplicados depois do alinhamento por regra. Medidas em mm, da tabela de peças. A forma não está aprovada; quem julga é a pessoa.
 
 | Defeito | Decisão | Evidência (medida) | Ajuste |
 |---|---|---|---|

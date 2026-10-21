@@ -1,6 +1,6 @@
 # cadeira_ripada_marrom: ajustes de construção
 
-Folhas: `cadeira_ripada_marrom-antes.png` (só alinhamento) e `cadeira_ripada_marrom-depois.png` (com `cadeira_ripada_marrom.ajustes.json`). Medidas em milímetro, da tabela de peças. Forma não aprovada; quem julga é a pessoa.
+Comparação entre só o alinhamento e o alinhamento mais `cadeira_ripada_marrom.ajustes.json`. Medidas em milímetro, da tabela de peças. Forma não aprovada; quem julga é a pessoa.
 
 | Defeito | Decisão | Evidência | Ajuste |
 |---|---|---|---|

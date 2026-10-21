@@ -1,6 +1,6 @@
 # cadeira_fibra_roxa: ajustes de construção
 
-Folhas: `cadeira_fibra_roxa-antes.png` e `cadeira_fibra_roxa-depois.png`. Ajustes: `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_fibra_roxa.ajustes.json` (15 itens, todos com motivo). Quem julga a forma é a pessoa; este relato não a aprova.
+Ajustes: `tools/mecanifica/fixtures/receita-externa-cadeiras/cadeira_fibra_roxa.ajustes.json` (15 itens, todos com motivo). Quem julga a forma é a pessoa; este relato não a aprova.
 
 Medidas globais (mm): caixa envolvente total x ±480, y 0..727, z -430..350, idêntica antes e depois. Pares que se atravessam: 10 embutidos e 0 passantes antes, 4 embutidos e 0 passantes depois.
 

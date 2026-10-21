@@ -1,6 +1,6 @@
 # cadeira_larga_estofada_amarela: ajustes de construção
 
-Folhas: `cadeira_larga_estofada_amarela-antes.png` (alinhamento por regra, sem ajustes) e `cadeira_larga_estofada_amarela-depois.png` (com `cadeira_larga_estofada_amarela.ajustes.json`, em `tools/mecanifica/fixtures/receita-externa-cadeiras/`). Medidas em milímetro, x à direita, z à frente, conforme a tabela de peças da folha. Quem julga a forma é a pessoa; este relato só trata erro de posição e medida.
+Antes: alinhamento por regra, sem ajustes. Depois: com `cadeira_larga_estofada_amarela.ajustes.json`, em `tools/mecanifica/fixtures/receita-externa-cadeiras/`. Medidas em milímetro, x à direita, z à frente, conforme a tabela de peças. Quem julga a forma é a pessoa; este relato só trata erro de posição e medida.
 
 Antes: 2 embutidos, 0 passantes. Depois: 0 embutidos, 0 passantes. A caixa envolvente total é a mesma nos dois (x -450..450, y 0..800, z -420..410), variação de 0 mm por eixo.
 
