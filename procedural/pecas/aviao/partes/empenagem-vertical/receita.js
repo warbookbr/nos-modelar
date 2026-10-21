@@ -732,9 +732,7 @@ const receita = {
   PLANO: {
     objeto: 'empenagem vertical de um avião monomotor de pequeno porte: a deriva sobre a cauda, a dorsal que a liga ao dorso da fuselagem, o leme no bordo de fuga, o eixo dele e três pares de dobradiças',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
     ],
     escala: { medida: 'altura da deriva com o leme no esboço, da raiz em y 2225 ao topo do leme em y 4185', milimetros: 1960 },
     partes: [

@@ -379,8 +379,6 @@ export default {
   PLANO: {
     objeto: 'trens principais de um avião monomotor de pequeno porte, baixados: de cada lado, a perna presa ao pivô sob a asa, com a coroa, o garfo, o eixo, a roda no chão, o compasso e o atuador',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
     ],
     escala: { medida: 'altura do trem principal no esboço, do pé da roda ao alto do pivô', milimetros: 1198 },

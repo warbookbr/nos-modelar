@@ -392,9 +392,7 @@ export default {
   PLANO: {
     objeto: 'trem do nariz de um avião monomotor de pequeno porte, baixado: a perna presa ao pivô sob o nariz, com o atuador, o compasso, o pistão, o garfo e a roda no chão',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
     ],
     escala: { medida: 'altura do trem do nariz no esboço, do pé da roda ao alto da carenagem', milimetros: 773 },
     partes: NOMES.map((nome) => ({ nome, forma: PARTES[nome][0], tecnica: PARTES[nome][1] })),

@@ -74,7 +74,7 @@ const receita = {
   TOPO: { origem: 'centro da face de baixo do anel; y para cima' },
   PLANO: {
     objeto: 'anel de giro da cintura do braço robótico, entre o topo da base e o ombro',
-    referencias: ['../../referencias/lateral.png'],
+    referencias: ['../../referencias/lateral.prancha.png'],
     escala: { medida: 'diâmetro do anel, igual ao da base', milimetros: 180 },
     partes: [
       { nome: 'anel', forma: 'anel de revolução escuro, cerca de 25 mm de altura, uma faixa só, bordas com chanfro estreito de bordas suavizadas', tecnica: 'revolução com perfil' },

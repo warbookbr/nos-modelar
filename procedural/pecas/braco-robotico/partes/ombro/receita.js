@@ -156,7 +156,7 @@ const receita = {
   TOPO: { origem: 'centro da boca de baixo do pescoço; y para cima, a saída para +Z' },
   PLANO: {
     objeto: 'ombro do braço robótico: gira com a cintura e carrega a junta do ombro, de eixo horizontal',
-    referencias: ['../../referencias/frontal.png'],
+    referencias: ['../../referencias/frontal.contornos.json'],
     escala: { medida: 'diâmetro do anel da cintura, onde o pé assenta', milimetros: 210 },
     partes: [
       { nome: 'pescoco', forma: 'L de ponta-cabeça: pé redondo no diâmetro do anel da cintura, dobra arredondada de 90 graus para +Z, trecho de cima reto de seção quase quadrada com cantos arredondados, saída redonda', tecnica: 'loft por caminho curvo com seção de superelipse variando' },

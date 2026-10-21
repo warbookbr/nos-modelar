@@ -1,6 +1,6 @@
 # Alvo: lava-louças compacta branca
 
-Referências desta pasta: `frontal.png`, `isometrica.png`, `medidas.png` (silhueta lateral com 51,0 por 63,0 por 65,0 cm) e `painel.png`.
+As imagens de referência desta peça eram fotos de terceiros e saíram do repositório; as razões e as medidas tiradas delas seguem registradas neste documento e na receita, que não dependem mais das imagens. Eram frontal.png, isometrica.png, medidas.png (silhueta lateral com 51,0 por 63,0 por 65,0 cm) e painel.png.
 
 ## Medidas aprovadas (mm)
 

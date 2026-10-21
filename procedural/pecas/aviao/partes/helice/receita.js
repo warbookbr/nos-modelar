@@ -224,9 +224,7 @@ const receita = {
   PLANO: {
     objeto: 'hélice de cinco pás de um avião monomotor de pequeno porte, parada: o cone na frente do capô e as cinco pás saindo dele em arranjo radial',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
     ],
     escala: { medida: 'diâmetro da hélice no esboço, de ponta a ponta das pás (o dobro de 1090 mm do eixo à ponta)', milimetros: 2180 },
     partes: [

@@ -386,7 +386,7 @@ const receita = {
   TOPO: { origem: 'chão, no meio do aparelho em x e em z; y para cima e a frente do aparelho em +z' },
   PLANO: {
     objeto: 'lavadora e secadora branca de porta frontal, 600 por 850 (com os pés) por 620 mm, com painel escuro em rebaixo, seletor, porta redonda, tampa do filtro, rasgos laterais e quatro pés',
-    referencias: ['referencias/frontal.png', 'referencias/isometrica-medidas.png', 'referencias/isometrica-setas.png', 'referencias/painel.png', 'referencias/pe.png', 'referencias/alvo.md'],
+    referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do aparelho com os pés', milimetros: 850 },
     familia: 'movel-de-caixa',
     partes: [

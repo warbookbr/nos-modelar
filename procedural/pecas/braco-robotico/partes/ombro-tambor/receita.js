@@ -194,7 +194,7 @@ const receita = {
   PLANO: {
     objeto: 'ombro do braço robótico: gira com a cintura e carrega a junta do ombro, de eixo horizontal',
     referencias: [
-      '../../referencias/lateral.png',
+      '../../referencias/lateral.prancha.png',
       '../../referencias/ombro-rascunho2-arame-costas.png',
       '../../referencias/ombro-rascunho2-arame-lado.png',
       '../../referencias/ombro-rascunho2-arame-perspectiva.png',

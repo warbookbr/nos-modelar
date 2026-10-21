@@ -426,7 +426,7 @@ const receita = {
   TOPO: { origem: 'chão, no meio do aparelho em x e em z; y para cima e a frente do aparelho em +z' },
   PLANO: {
     objeto: 'lava-louças compacta branca de 520 mm de largura, 640 mm de altura e 677,7 mm de profundidade, com caixa, porta, painel de controle com botões e pontos, puxador de aço escovado, borracha, rodapé e duas pecinhas em L',
-    referencias: ['referencias/frontal.png', 'referencias/isometrica.png', 'referencias/medidas.png', 'referencias/painel.png', 'referencias/alvo.md'],
+    referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do aparelho', milimetros: 640 },
     familia: 'movel-de-caixa',
     partes: [

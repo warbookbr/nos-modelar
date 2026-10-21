@@ -1,6 +1,6 @@
 # Alvo: geladeira compacta branca
 
-Referências desta pasta: `frontal.png` (frontal, 685 por 590 px) e `tres-quartos.png` (três quartos pela direita, 810 por 590 px). Sem marca nem texto.
+As imagens de referência desta peça eram fotos de terceiros e saíram do repositório; as razões e as medidas tiradas delas seguem registradas neste documento e na receita, que não dependem mais das imagens. Eram frontal.png (frontal, 685 por 590 px) e tres-quartos.png (três quartos pela direita, 810 por 590 px).
 
 ## Medidas aprovadas (mm)
 

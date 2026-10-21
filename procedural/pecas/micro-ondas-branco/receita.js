@@ -541,7 +541,7 @@ const receita = {
   TOPO: { origem: 'chão, no meio do micro-ondas em x e em z; y para cima e a frente do micro-ondas em +z' },
   PLANO: {
     objeto: 'micro-ondas de bancada no chão, 712 por 491 por 454 mm: base escura, porta grande com janela e puxador vertical, painel em coluna com visor, três faixas de botões e 15 teclas, e grades laterais',
-    referencias: ['referencias/alvo.md', 'referencias/painel.png'],
+    referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do micro-ondas', milimetros: 491 },
     familia: 'movel-de-caixa',
     partes: derivar(TABELA).map(parteDoPlano),

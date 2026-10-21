@@ -579,7 +579,6 @@ const receita = {
   PLANO: {
     objeto: 'fuselagem de um avião monomotor de asa baixa e pequeno porte, do ponto em que o capô a encontra até a ponta da cauda',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
     ],

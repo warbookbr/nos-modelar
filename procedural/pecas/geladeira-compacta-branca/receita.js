@@ -306,7 +306,7 @@ const receita = {
   TOPO: { origem: 'chão, no meio do aparelho em x e em z; y para cima e a frente do aparelho em +z' },
   PLANO: {
     objeto: 'geladeira compacta branca (frigobar alto) de uma porta, 475 por 870 (com os pés) por 515 mm, com puxador de topo com canaleta na face de cima, dobradiça superior e quatro pés',
-    referencias: ['referencias/frontal.png', 'referencias/tres-quartos.png', 'referencias/alvo.md'],
+    referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do aparelho com os pés', milimetros: 870 },
     familia: 'movel-de-caixa',
     partes: [

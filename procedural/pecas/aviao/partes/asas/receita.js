@@ -743,10 +743,7 @@ const receita = {
   PLANO: {
     objeto: 'asa baixa de um monomotor de pequeno porte: as duas metades, com a ponta levantada, o flap, o aileron, os eixos, os suportes e a carenagem da raiz, mais o casulo sob a asa esquerda e um oval perto de cada ponta',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
     ],
     escala: { medida: 'envergadura no esboço, de ponta a ponta das pontas levantadas', milimetros: 12825 },
     partes: [

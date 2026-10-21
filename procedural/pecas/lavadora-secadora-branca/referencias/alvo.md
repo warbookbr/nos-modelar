@@ -1,6 +1,6 @@
 # Alvo: lavadora e secadora branca de porta frontal
 
-Referências desta pasta: `frontal.png`, `isometrica-medidas.png` (59,5 por 85 por 62,5 cm na imagem; a pessoa aprovou 60 por 85 por 62), `isometrica-setas.png` (seta vermelha no rebaixo do painel, seta verde nos rasgos da lateral), `painel.png` e `pe.png`.
+As imagens de referência desta peça eram fotos de terceiros e saíram do repositório; as razões e as medidas tiradas delas seguem registradas neste documento e na receita, que não dependem mais das imagens. Eram frontal.png, isometrica-medidas.png (59,5 por 85 por 62,5 cm na imagem; a pessoa aprovou 60 por 85 por 62), isometrica-setas.png (seta vermelha no rebaixo do painel, seta verde nos rasgos da lateral), painel.png e pe.png.
 
 ## Medidas aprovadas (mm)
 

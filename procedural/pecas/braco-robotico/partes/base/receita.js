@@ -141,7 +141,7 @@ const receita = {
   TOPO: { origem: 'centro do fundo do pé no chão; y para cima, a caixa em -X' },
   PLANO: {
     objeto: 'base do braço robótico industrial, presa no chão, com uma caixa colada no lado esquerdo',
-    referencias: ['../../referencias/lateral.png'],
+    referencias: ['../../referencias/lateral.prancha.png'],
     escala: { medida: 'diâmetro do corpo da base', milimetros: 210 },
     partes: [
       { nome: 'corpo', forma: 'cilindro de revolução em pé, 210 mm de diâmetro e 200 mm de altura; a quina do topo leva só um chanfro pequeno, sem sulco na junção com o anel', tecnica: 'revolução com perfil' },

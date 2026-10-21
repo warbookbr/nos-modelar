@@ -596,9 +596,7 @@ const receita = {
   PLANO: {
     objeto: 'empenagem horizontal de um avião monomotor de pequeno porte: as duas metades do estabilizador na cauda, cada uma com o profundor no bordo de fuga, o eixo dele e três suportes',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.png',
       'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
     ],
     escala: { medida: 'envergadura do estabilizador no esboço, de ponta a ponta', milimetros: 4780 },
     partes: porLado((L, l, nome) => [
