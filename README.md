@@ -109,5 +109,7 @@ resultados já medidos e não autorizam trabalho novo.
 
 ## Licença e origem
 
-O código está sob a licença [MIT](LICENSE). O histórico Git original foi
+O código e os documentos do projeto estão sob a licença [MIT](LICENSE). As
+bibliotecas de terceiros mantêm as suas licenças, listadas em
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md). O histórico Git original foi
 preservado para comparação e contribuições futuras.

@@ -2,6 +2,7 @@
   "name": "mecanifica",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Mecanifica - simulador 3D interativo para explicar sistemas automotivos.",
   "engines": {
