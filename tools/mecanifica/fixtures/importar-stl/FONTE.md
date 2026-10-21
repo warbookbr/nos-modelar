@@ -4,16 +4,6 @@
 
 Nove arquivos `.stl.gz` (dez peças) gerados por `node tools/mecanifica/fixtures/importar-stl/gerar-sintetico.mjs` a partir do `sintetico.step` do importador de STEP (`../importar-step/`), tesselados pelo OpenCascade WASM do repositório (`occt-wasm`) com até 0,2 rad por segmento, o que dá cilindros de 35 a 63 lados. Cada STL tem o nome que a peça teria num projeto de impressão (`blocoFuroCego`, `pontaFenda`), e as peças ficam nas posições do STEP, as mesmas da tabela `ESPERADO` do teste. `pino_e_bucha.stl.gz` tem dois componentes desconectados (o pino encosta na bucha sem dividir vértice), e `sapata.stl.gz` é ASCII. O gerador é determinístico (o gzip sai sem data) e o teste não regera os arquivos. Sem restrição de uso.
 
-## braco/base_spacer.stl.gz
+## denso/anel_espacador.stl.gz
 
-
-```bash
-curl -s -X POST https://api.printables.com/graphql/ -H 'content-type: application/json' \
-curl -s -X POST https://api.printables.com/graphql/ -H 'content-type: application/json' \
-```
-
-e baixar o `link` devolvido (se vier "throttled", esperar alguns segundos entre as chamadas). O braço inteiro não é guardado aqui: os nove STL somam 55 MB.
-
-## Medida no braço (importar-stl --conferir)
-
-Nove peças, uma por arquivo, na posição do arquivo: 1 exata (o anel), 3 revoluções aproximadas pelo contorno externo e 5 caixas de último recurso, sem nenhum contato (as peças de impressão estão espalhadas). Ocupação média 0,49. A conferência contra a malha de cada arquivo mede 7 das 9 peças: `base` (306 mil triângulos) e `connector_straight` (367 mil) passam do que `conferirComMalha` aguenta (o `Math.min(...vertices)` dele estoura a pilha acima de uns 120 mil vértices soldados) e ficam sem medida. Importação em 15 a 17 s, dos quais 10 s nesses dois arquivos. Contra o STEP do mesmo módulo, o importador de STL dá a mesma forma nas nove peças e uma ocupação que difere até 0,02. O volume do sólido difere até 1% em seis peças; em `driveSmall` (2%), `driveBig_rotor` (9%) e `connector_straight` (38%) o STL e o STEP do modelo não têm o mesmo volume, e a diferença vem dos arquivos, e não da importação.
+Um anel de 32 mm de diâmetro externo, 31 mm de diâmetro interno e 9,5 mm de espessura, com o eixo em z e 252 lados, gerado por `node tools/mecanifica/fixtures/importar-stl/gerar-denso.mjs` sem nenhuma entrada externa. A parede é dividida em 27 faixas de altura igual, o que dá 28.224 triângulos (1,4 MB de STL binário, 255 KB compactado), a ordem de grandeza de uma malha de impressão exportada de um CAD e a que mantém o importador exercitado em malha grande. Os vértices são compartilhados entre triângulos vizinhos, a diagonal de cada quadrado alterna com a paridade da faixa e da coluna, e o anel fica longe da origem (centro em x = 210 e y = -85, base em z = 35). O gerador confere o volume da malha contra o do anel de 252 lados antes de gravar, é determinístico (sem relógio nem sorteio, e o gzip sai sem data) e o teste não regera o arquivo. Sem restrição de uso.

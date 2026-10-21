@@ -59,9 +59,9 @@ export const EXCECOES_DE_MALHA = [
     motivo: 'STEP sintético do teste do importador de STEP, dez sólidos desenhados por código e gravados pelo OpenCascade do repositório com `gerar-sintetico.mjs` (FONTE.md ao lado)',
   },
   {
-    caminho: 'tools/mecanifica/fixtures/importar-stl/braco/base_spacer.stl.gz',
-    blob: '98da5ce3e56a3f75e28cc93a8634d6eb72085fd8',
-    motivo: 'malha externa de domínio público, um anel de braço robótico, usada pelo teste do importador de STL para a comparação STL contra STEP (origem e licença em FONTE.md ao lado); entrou antes deste gate e fica até a pessoa decidir se sai',
+    caminho: 'tools/mecanifica/fixtures/importar-stl/denso/anel_espacador.stl.gz',
+    blob: '8b0046098e6766fbaac5493934640db8929a0f62',
+    motivo: 'STL sintético do teste do importador de STL, um anel de 252 lados e uns 28 mil triângulos gerado por `gerar-denso.mjs` (FONTE.md ao lado)',
   },
   ...[
     ['blocoFuroCego', '06556e14f0295e46ec03dd2b59fa271930612246'], ['cantoneira', 'e911894cd89586a1da14c2867d7ea308d93067a5'],

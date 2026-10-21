@@ -1,7 +1,7 @@
 /* O importador de STL: a fixture sintética (o STEP sintético do importador de STEP, tesselado pelo OpenCascade, ver FONTE.md) dá uma peça de
    cada tipo de forma e é comparada com o que o importador de STEP faz do mesmo STEP; cada peça é medida pelo próprio esboço, e não
-   pela conta do importador. Os prismas regulares montados aqui fixam o número de lados, e um STL real do braço (licença livre sem exigência de crédito, guardado
-   compactado) fixa o anel de 252 lados. */
+   pela conta do importador. Os prismas regulares montados aqui fixam o número de lados, e um anel denso gerado por código (`gerar-denso.mjs`,
+   guardado compactado) fixa o anel de 252 lados numa malha de dezenas de milhares de triângulos. */
 import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -14,7 +14,7 @@ import { conferirStl, idDoArquivo, importarStl, lerStl, RecusaDeImportacao } fro
 import { arquivosDasEntradas, rodar } from './importar-stl.mjs';
 
 const PASTA = fileURLToPath(new URL('./fixtures/importar-stl/sintetico/', import.meta.url));
-const BRACO = fileURLToPath(new URL('./fixtures/importar-stl/braco/base_spacer.stl.gz', import.meta.url));
+const ANEL_DENSO = fileURLToPath(new URL('./fixtures/importar-stl/denso/anel_espacador.stl.gz', import.meta.url));
 const STEP = fileURLToPath(new URL('./fixtures/importar-step/sintetico.step', import.meta.url));
 
 const arquivosDaPasta = () => readdirSync(PASTA).filter((n) => n.endsWith('.stl.gz')).sort().map((nome) => ({ nome, bytes: gunzipSync(readFileSync(join(PASTA, nome))) }));
@@ -253,10 +253,10 @@ describe('o STL facetado', () => {
   });
 });
 
-describe('o STL real do braço (base_spacer)', () => {
+describe('a malha densa (anel_espacador)', () => {
   it('vira um anel exato de 252 lados, com a razão interseção/união acima de 0,98', async () => {
-    const r = await importarStl([{ nome: 'base_spacer.stl', bytes: gunzipSync(readFileSync(BRACO)) }], { conferir: true });
-    expect(r.esboco.opcoes[0].formas[0]).toMatchObject({ id: 'base_spacer', tipo: 'anel', diametroExterno: 32, diametroInterno: 31, espessura: 9.5 });
+    const r = await importarStl([{ nome: 'anel_espacador.stl', bytes: gunzipSync(readFileSync(ANEL_DENSO)) }], { conferir: true });
+    expect(r.esboco.opcoes[0].formas[0]).toMatchObject({ id: 'anel_espacador', tipo: 'anel', diametroExterno: 32, diametroInterno: 31, espessura: 9.5 });
     expect(r.relatorio.pecas[0]).toMatchObject({ classe: 'revolucao', ocupacao: 1, lados: 252 });
     const c = await conferirStl(r);
     expect(c.iouDoConjunto).toBeGreaterThan(0.98);
