@@ -163,8 +163,10 @@ describe('veredito de contato do acervo', () => {
     const { reprovadas } = await conferirAcervo(pecasDoAcervo());
     expect(reprovadas).toEqual([]);
   /* Lê o acervo inteiro, e o tempo cresce com ele: passou de 20 s quando o ombro ganhou uma variação e de 88 s sozinho com as
-     oito peças do avião em 2026-10-16; o prazo é o dobro disso, para a bateria em paralelo. */
-  }, 180000);
+     oito peças do avião em 2026-10-16; o prazo é o dobro disso, para a bateria em paralelo. Em 2026-10-21 o CI estourou
+     180 s em sete execuções seguidas, com a bateria lenta em paralelo na máquina do CI, enquanto a local levava 124 s;
+     o prazo subiu para 600 s, e a medida por etapa fica para o retrato do acervo do plano de ajustes no núcleo. */
+  }, 600000);
 
   /* ACERVO VAZIO PRECISA SER DECLARADO. Varredura vazia sai igual quando o
      acervo está sem peça de propósito e quando a listagem quebrou, e aprovar
