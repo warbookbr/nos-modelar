@@ -133,6 +133,10 @@ bateria curta `GATES_CURTOS`, sem os gates de navegador e de MCP; qualquer outro
 arquivo roda todos, e `--completo` força todos. O CI roda sempre a lista
 inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
+O gate de vazamento (`tools/arquitetura/termos-proibidos.test.mjs`) pede a chave
+da lista em `MECANIFICA_CHAVE_TERMOS_ARQUIVO=<arquivo fora do repositório>`; sem
+ela, ignora esses casos com aviso, e o CI reprova.
+
 ## Pendências atuais
 
 - O plano ativo, o rascunho aberto e os congelados estão em

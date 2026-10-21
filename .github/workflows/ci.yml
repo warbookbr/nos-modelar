@@ -11,8 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # O histórico inteiro, com ramos e tags, porque o gate de vazamento
+      # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
+      # commit e todo nome de ramo e tag, e reprova num checkout raso. Medido em
+      # 2026-10-21: 2.449 commits, 144 MB de pacote e 0,2 s de leitura.
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -40,8 +46,13 @@ jobs:
       - name: TypeScript Typecheck
         run: npm run typecheck
 
+      # A chave da lista embaralhada de termos proibidos; sem ela o gate de
+      # vazamento reprova no CI. Pull request vindo de fork não recebe segredo
+      # e reprova também.
       - name: Testes rápidos
         run: npm run test:rapidos
+        env:
+          MECANIFICA_CHAVE_TERMOS: ${{ secrets.MECANIFICA_CHAVE_TERMOS }}
 
       - name: Testes lentos (todos no CI)
         run: npm run test:lentos
