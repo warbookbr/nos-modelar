@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:9dc581d27c0a01564f087292726f8ca851a5ff1fa6c647b383349e026184e6b5",
+  "assinatura": "sha256:d75f68e111d6398de75f462b2cb69e2a93816009d624cad0849ee99ce1dec788",
   "total": 38,
   "operacoes": [
     {
@@ -3752,6 +3752,14 @@
               "type": "string",
               "minLength": 1,
               "description": "'x': a gaiola é a metade x >= 0 e é espelhada antes de subdividir, com a costura lisa."
+            },
+            "medidas": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Nomes de ponto da gaiola por onde a superfície limite passa; os outros pontos ficam onde foram declarados."
             }
           }
         },
@@ -3804,7 +3812,9 @@
         "precondicoes": [],
         "limites": [
           "É superfície da gaiola: aberta se a gaiola for aberta.",
-          "A regra é a do OpenSubdiv no modo uniforme, sem projeção na superfície limite; confere com o Subdivision Surface do Blender com use_limit_surface desligado."
+          "A regra é a do OpenSubdiv no modo uniforme, sem projeção na superfície limite; confere com o Subdivision Surface do Blender com use_limit_surface desligado.",
+          "Sem medidas, a superfície aproxima a gaiola e não passa pelos pontos; com medidas, só os pontos marcados passam pela superfície limite, e a malha de nível finito se aproxima deles conforme o nível sobe.",
+          "Medidas que a superfície limite não separa, ou que movem a gaiola mais de 100 vezes o erro do alvo, gritam com os nomes dos pontos."
         ],
         "diagnosticos": []
       }

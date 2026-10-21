@@ -165,7 +165,7 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
   return { vertices: V, faces: F };
 }
 
-/* ---- ponto limite e interpolação ----
+/* ---- ponto limite e medidas ----
  *
  * A estrela de um vértice (as faces que o tocam) refina para a estrela do mesmo vértice no nível seguinte: o ponto de
  * vértice, os pontos das arestas que o tocam e os pontos das faces que o tocam só dependem dessas faces. Por isso o
@@ -178,22 +178,85 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
  *   liso (nenhuma aresta viva), valência n, e_j as pontas das arestas e f_j os cantos opostos dos quads:
  *     L = (n² P + 4 Σ e_j + Σ f_j) / (n (n + 5)), que no vértice regular (n = 4) é a máscara 1-4-1 ao quadrado / 36.
  *
- * O dardo vivo (uma só aresta de nitidez infinita chegando a um vértice liso) grita: a máscara lisa aplicada a ele erra
- * o ponto limite em 3,4e-2 m no cubo de 2 m com uma aresta viva, medido contra a estrela refinada
- * 80 níveis. O dardo de nitidez finita não chega à fórmula, porque o refino apaga a nitidez antes.
+ * O dardo vivo (uma só aresta de nitidez infinita chegando a um vértice liso, que é o ponto onde um vinco termina)
+ * não tem fórmula fechada confiável aqui: a máscara lisa aplicada a ele erra o ponto limite em 3,4e-2 m no cubo de 2 m
+ * com uma aresta viva. Depois do refino, a estrela do dardo refina para uma estrela de mesma forma pela mesma matriz S,
+ * e o ponto limite é l·estrela, com l o autovetor à esquerda de S para o autovalor 1 e soma 1 (l S = l). A matriz S sai
+ * de `refinar` aplicado à base, e l sai de eliminação de Gauss, sem iteração. O dardo de nitidez finita não chega aí,
+ * porque o refino apaga a nitidez antes.
  *
  * A nitidez finita conta inteira no limite (uma nitidez 10 é vinco por dez níveis e liso depois), e por isso o refino
  * da estrela vai até ceil(nitidez) níveis, com teto de NIVEIS_MAXIMOS_DO_LIMITE. */
 export const NIVEIS_MAXIMOS_DO_LIMITE = 64;
 
 function estrelaDe(V, F, facesDoVertice, nitidez, i) {
-  const mapa = new Map([[i, 0]]); const Vm = [V[i]]; const Fm = [];
+  const mapa = new Map([[i, 0]]); const Vm = [V[i]]; const Fm = []; const globais = [i];
   for (const fi of facesDoVertice) {
-    Fm.push(F[fi].map((j) => { let m = mapa.get(j); if (m === undefined) { m = Vm.length; mapa.set(j, m); Vm.push(V[j]); } return m; }));
+    Fm.push(F[fi].map((j) => { let m = mapa.get(j); if (m === undefined) { m = Vm.length; mapa.set(j, m); Vm.push(V[j]); globais.push(j); } return m; }));
   }
   const nm = new Map();
   for (const [j, m] of mapa) { if (j === i) continue; const s = nitidez.get(chave(i, j)); if (s !== undefined) nm.set(chave(0, m), s); }
-  return { V: Vm, F: Fm, nitidez: nm };
+  return { V: Vm, F: Fm, nitidez: nm, globais };
+}
+
+/* Eliminação de Gauss com pivotamento parcial em ordem fixa: as colunas são eliminadas da primeira à última e, em cada
+ * uma, o pivô é a linha de maior |valor| a partir da diagonal, com empate resolvido pela linha de menor índice. A mesma
+ * matriz passa pelas mesmas operações na mesma ordem e dá o mesmo resultado bit a bit. Pivô de módulo até PIVO_NULO
+ * para a fatoração e devolve a coluna em que ela parou. */
+const PIVO_NULO = 1e-12;
+
+function fatorarLU(A) {
+  const n = A.length; const M = A.map((r) => [...r]); const perm = [...Array(n).keys()];
+  for (let k = 0; k < n; k++) {
+    let p = k;
+    for (let r = k + 1; r < n; r++) if (Math.abs(M[r][k]) > Math.abs(M[p][k])) p = r;
+    if (Math.abs(M[p][k]) <= PIVO_NULO) return { M, perm, singularEm: k };
+    if (p !== k) { [M[p], M[k]] = [M[k], M[p]]; [perm[p], perm[k]] = [perm[k], perm[p]]; }
+    for (let r = k + 1; r < n; r++) {
+      const f = M[r][k] / M[k][k]; M[r][k] = f;
+      for (let c = k + 1; c < n; c++) M[r][c] -= f * M[k][c];
+    }
+  }
+  return { M, perm, singularEm: -1 };
+}
+
+function resolverLU({ M, perm }, b) {
+  const n = M.length; const y = perm.map((i) => b[i]);
+  for (let r = 0; r < n; r++) for (let c = 0; c < r; c++) y[r] -= M[r][c] * y[c];
+  for (let r = n - 1; r >= 0; r--) { for (let c = r + 1; c < n; c++) y[r] -= M[r][c] * y[c]; y[r] /= M[r][r]; }
+  return y;
+}
+
+/* Vetor quase nulo da matriz cuja fatoração parou na coluna k: x_k = 1, x_j = 0 para j > k, e o bloco triangular de
+ * cima resolve o resto. Os índices com |x_j| relevante são as incógnitas presas na dependência. */
+function vetorNulo({ M }, k) {
+  const x = new Array(M.length).fill(0); x[k] = 1;
+  for (let r = k - 1; r >= 0; r--) { let s = -M[r][k]; for (let c = r + 1; c < k; c++) s -= M[r][c] * x[c]; x[r] = s / M[r][r]; }
+  return x;
+}
+
+function limiteDoDardo(V, F, nitidez, borda) {
+  const m = V.length; const { arestas } = arestasDa(F); const nE = arestas.length;
+  const novo = new Array(m).fill(-1); novo[0] = 0;
+  arestas.forEach((e, k) => { if (e.a === 0 || e.b === 0) novo[e.a === 0 ? e.b : e.a] = m + k; });
+  F.forEach((q, fi) => {
+    const d = q[(q.indexOf(0) + 2) % 4];
+    if (q.length !== 4 || novo[d] !== -1) throw new TypeError('subdivisão: a estrela do dardo não é um leque de quads');
+    novo[d] = m + nE + fi;
+  });
+  if (novo.includes(-1)) throw new TypeError('subdivisão: a estrela do dardo não é um leque de quads');
+  const S = Array.from({ length: m }, () => new Array(m).fill(0));
+  for (let b = 0; b < m; b += 3) {
+    const base = V.map((_, c) => [c === b ? 1 : 0, c === b + 1 ? 1 : 0, c === b + 2 ? 1 : 0]);
+    const r = refinar(base, F, nitidez, new Set(), borda);
+    for (let t = 0; t < m; t++) for (let k = 0; k < 3 && b + k < m; k++) S[t][b + k] = r.V[novo[t]][k];
+  }
+  // l S = l com soma 1: (Sᵀ - I) l = 0, com a última equação trocada pela soma
+  const A = Array.from({ length: m }, (_, c) => Array.from({ length: m }, (_, t) => (c === m - 1 ? 1 : S[t][c] - (t === c ? 1 : 0))));
+  const lu = fatorarLU(A);
+  if (lu.singularEm >= 0) throw new TypeError('subdivisão: a matriz de refino do dardo não tem autovetor único para o autovalor 1');
+  const l = resolverLU(lu, A.map((_, c) => (c === m - 1 ? 1 : 0)));
+  return [0, 1, 2].map((j) => { let soma = 0; for (let t = 0; t < m; t++) soma += l[t] * V[t][j]; return soma; });
 }
 
 const facesPorVertice = (nV, F) => {
@@ -224,9 +287,9 @@ function limiteDaEstrela(estrela, canto, borda) {
     const A = V[outro(vivas[0])], B = V[outro(vivas[1])];
     return [0, 1, 2].map((j) => (A[j] + 4 * P[j] + B[j]) / 6);
   }
-  if (vivas.length === 1) throw new TypeError('subdivisão: o ponto limite do dardo (vértice liso com uma só aresta viva) ainda não tem fórmula; dê nitidez finita ao vinco ou leve-o até outra aresta viva');
   const n = incidentes.length;
   if (F.length !== n) throw new TypeError('subdivisão: o ponto limite pede vértice de variedade, com tantas faces quantas arestas em volta');
+  if (vivas.length === 1) return limiteDoDardo(V, F, nitidez, borda);
   const e = [0, 0, 0], f = [0, 0, 0];
   for (const a of incidentes) { const q = V[outro(a)]; e[0] += q[0]; e[1] += q[1]; e[2] += q[2]; }
   for (const quad of F) { const q = V[quad[(quad.indexOf(0) + 2) % 4]]; f[0] += q[0]; f[1] += q[1]; f[2] += q[2]; }
@@ -257,29 +320,84 @@ export function limitesDaGaiola(gaiola) {
   return limitesInternos(gaiola.vertices, gaiola.faces, nitidez, C, gaiola.borda ?? 'suave', facesDoV);
 }
 
-/* Interpolação: a gaiola começa nos pontos declarados P e, a cada iteração, cada vértice anda a diferença entre o ponto
- * declarado e o ponto limite atual (C += P - L(C)). O número de iterações é fixo e declarado, sem critério de parada por
- * tolerância, para que a mesma gaiola dê a mesma correção bit a bit. A função devolve a gaiola corrigida e a distância
- * de cada ponto declarado ao seu ponto limite depois da última iteração, que é a distância do ponto à superfície
- * limite, porque o ponto limite está nela.
- *
- * Cada iteração encolhe o erro pelo fator 1 - λ, com λ o menor autovalor do operador de ponto limite da gaiola, que nas
- * gaiolas do oráculo vai de 0,015 a 0,33. Com as 20 iterações da regra de parada do plano, só o cubo liso fecha 1e-6 m;
- * as outras gaiolas pedem de 25 a 677. Por isso a operação `subdivisao` ainda não expõe a opção. */
-export const ITERACOES_INTERPOLACAO = 20;
-
-export function interpolarGaiola(gaiola, iteracoes = ITERACOES_INTERPOLACAO) {
-  if (!Number.isInteger(iteracoes) || iteracoes < 0) throw new TypeError('subdivisão: iteracoes da interpolação precisa ser inteiro não-negativo');
-  const { nitidez, C: cantos, facesDoV } = prepararLimite(gaiola);
-  const { vertices: P, faces: F } = gaiola; const borda = gaiola.borda ?? 'suave';
-  let C = P.map((p) => [...p]);
-  for (let k = 0; k < iteracoes; k++) {
-    const L = limitesInternos(C, F, nitidez, cantos, borda, facesDoV);
-    C = C.map((c, i) => [c[0] + (P[i][0] - L[i][0]), c[1] + (P[i][1] - L[i][1]), c[2] + (P[i][2] - L[i][2])]);
+/* Pesos do ponto limite: o ponto limite é linear nas posições da estrela, e os pesos saem do próprio cálculo aplicado à
+ * base, três vértices por vez (um em cada eixo). O resultado é o mesmo nos três eixos. */
+function pesosDaEstrela(estrela, canto, borda) {
+  const m = estrela.V.length; const w = new Array(m).fill(0);
+  for (let b = 0; b < m; b += 3) {
+    const V = estrela.V.map((_, c) => [c === b ? 1 : 0, c === b + 1 ? 1 : 0, c === b + 2 ? 1 : 0]);
+    const L = limiteDaEstrela({ ...estrela, V }, canto, borda);
+    for (let k = 0; k < 3 && b + k < m; k++) w[b + k] = L[k];
   }
-  const L = limitesInternos(C, F, nitidez, cantos, borda, facesDoV);
-  const residuos = P.map((p, i) => Math.hypot(p[0] - L[i][0], p[1] - L[i][1], p[2] - L[i][2]));
-  return { vertices: C, residuos };
+  return w;
+}
+
+/* Medidas: os vértices marcados passam pela superfície limite, e os outros ficam onde a gaiola os declarou. As posições
+ * dos marcados são as incógnitas x_M; o ponto limite de cada marcado é W_i · gaiola, e o sistema
+ *
+ *   W_MM x_M = alvo_M - W_M,resto x_resto      (alvo = posição declarada; o mesmo sistema nos três eixos)
+ *
+ * se resolve de uma vez pela eliminação de Gauss acima, com os pesos calculados uma vez por gaiola. O ganho
+ * ‖W_MM⁻¹‖∞ é o maior fator pelo qual um deslocamento do alvo vira deslocamento da gaiola. Acima de
+ * GANHO_MAXIMO_DAS_MEDIDAS o sistema conta como mal condicionado e falha: com ganho 100, uma cota declarada com 1 mm de
+ * erro já pode mover um ponto da gaiola 10 cm, e a gaiola deixa de ser a forma que o modelador desenhou. O arredondamento
+ * não é o que limita, porque com ganho 100 o erro dele fica perto de 1e-14 da escala da peça. Pivô nulo é sistema
+ * singular e falha com os pontos do vetor nulo. */
+export const GANHO_MAXIMO_DAS_MEDIDAS = 100;
+export const TOLERANCIA_DAS_MEDIDAS = 1e-6;
+
+export class ErroDasMedidas extends TypeError {
+  constructor(motivo, indices) { super(`subdivisão: ${motivo}: vértices ${indices.join(', ')}`); this.motivo = motivo; this.indices = indices; }
+}
+
+/** ajustarGaiolaAsMedidas(gaiola, medidas) -> { vertices, ganho, residuos }
+ *  medidas: índices dos vértices que a superfície limite deve atravessar; os demais vértices não se movem. */
+export function ajustarGaiolaAsMedidas(gaiola, medidas) {
+  const { nitidez, C, facesDoV } = prepararLimite(gaiola);
+  const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
+  if (!Array.isArray(medidas)) throw new TypeError('subdivisão: medidas precisa ser lista de vértices');
+  for (const i of medidas) {
+    if (!Number.isInteger(i) || i < 0 || i >= P.length) throw new TypeError(`subdivisão: medida cita vértice inexistente ${i}`);
+    if (!facesDoV[i].length) throw new ErroDasMedidas('medida em vértice sem face', [i]);
+  }
+  const M = [...new Set(medidas)].sort((a, b) => a - b);
+  const linha = new Map(M.map((i, r) => [i, r]));
+  const n = M.length;
+  const A = Array.from({ length: n }, () => new Array(n).fill(0));
+  const B = M.map((i) => {
+    const est = estrelaDe(P, F, facesDoV[i], nitidez, i);
+    const w = pesosDaEstrela(est, C.has(i), borda);
+    const b = [...P[i]]; const r = linha.get(i);
+    est.globais.forEach((j, c) => {
+      const k = linha.get(j);
+      if (k !== undefined) A[r][k] += w[c];
+      else { b[0] -= w[c] * P[j][0]; b[1] -= w[c] * P[j][1]; b[2] -= w[c] * P[j][2]; }
+    });
+    return b;
+  });
+  const lu = fatorarLU(A);
+  if (lu.singularEm >= 0) {
+    const x = vetorNulo(lu, lu.singularEm); const maior = Math.max(...x.map(Math.abs));
+    throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M.filter((_, r) => Math.abs(x[r]) > 1e-9 * maior));
+  }
+  const inversa = M.map((_, c) => resolverLU(lu, M.map((__, r) => (r === c ? 1 : 0)))); // colunas da inversa
+  let ganho = 0, pior = 0;
+  for (let r = 0; r < n; r++) { let s = 0; for (let c = 0; c < n; c++) s += Math.abs(inversa[c][r]); if (s > ganho) { ganho = s; pior = r; } }
+  if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) {
+    const maior = Math.max(...inversa.map((col) => Math.abs(col[pior])));
+    throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS})`, M.filter((_, c) => Math.abs(inversa[c][pior]) >= 0.01 * maior));
+  }
+  const eixos = [0, 1, 2].map((ax) => resolverLU(lu, B.map((b) => b[ax])));
+  const V = P.map((p) => [...p]);
+  M.forEach((i, r) => { V[i] = [eixos[0][r], eixos[1][r], eixos[2][r]]; });
+  // conferência independente dos pesos: o ponto limite recalculado pela geometria da gaiola nova
+  const residuos = M.map((i) => {
+    const L = limiteDaEstrela(estrelaDe(V, F, facesDoV[i], nitidez, i), C.has(i), borda);
+    return Math.hypot(P[i][0] - L[0], P[i][1] - L[1], P[i][2] - L[2]);
+  });
+  const fora = M.filter((_, r) => residuos[r] > TOLERANCIA_DAS_MEDIDAS);
+  if (fora.length) throw new ErroDasMedidas(`a superfície limite não chegou a ${TOLERANCIA_DAS_MEDIDAS} m das medidas`, fora);
+  return { vertices: V, ganho, residuos };
 }
 
 /* Espelha a gaiola no plano x = 0 ANTES de subdividir: os vértices com |x| <= tolerância ficam compartilhados pelas duas
@@ -298,5 +416,5 @@ export function espelharGaiolaEmX({ vertices, faces, vincos = [], cantos = [] },
     const c = chave(a, b); if (chaves.has(c)) continue; chaves.add(c); vin.push([a, b, s]);
   }
   const can = [...new Set([...cantos, ...cantos.map((i) => imagem[i])])];
-  return { vertices: V, faces: F, vincos: vin, cantos: can };
+  return { vertices: V, faces: F, vincos: vin, cantos: can, imagem };
 }

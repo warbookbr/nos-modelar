@@ -305,13 +305,28 @@ encaminhe-os a todas as chamadas do núcleo que recebem aliases.
 quads com poucos pontos, a forma de modelar uma chapa contínua com dobras vivas.
 Os campos são `vertices` (cada um `[x,y,z]` ou o nome de um ponto de `PARAMS`),
 `faces` (índices de vértice, anti-horário visto de fora), `vincos`, `cantos`,
-`niveis` (0 a 6, padrão 2), `borda` e `simetria`. O catálogo e
+`niveis` (0 a 6, padrão 2), `borda`, `simetria` e `medidas`. O catálogo e
 `descrever_capacidade` trazem o contrato completo.
 
-A superfície aproxima a gaiola e não passa pelos pontos: cada medida da
-`TABELA` aplicada a um vértice sai encolhida, e o canto de borda não tem raio
-controlado. Declare a gaiola maior que a forma, ou meça a superfície na bancada
-antes de confiar na cota. A regra é a do OpenSubdiv no modo uniforme e confere,
+Sem `medidas`, a superfície aproxima a gaiola e não passa pelos pontos: cada
+medida da `TABELA` aplicada a um vértice sai encolhida, e o canto de borda não
+tem raio controlado. Para que a superfície passe por uma cota, escreva o vértice
+como nome de ponto e liste esse nome em `medidas`, por exemplo
+`medidas: ['quinaDoTeto', 'pontaDoCapo']`. Os pontos listados passam pela
+superfície limite a menos de 1e-6 m, e os outros pontos da gaiola ficam onde
+foram declarados. Na simetria em `x`, a imagem espelhada do ponto medido também
+é medida. A posição dos pontos medidos se resolve de uma vez por eliminação de
+Gauss sobre os pesos do ponto limite, e o resultado é bit a bit. A malha de
+nível finito ainda não passa exatamente pelo ponto: no nível 2 das gaiolas do
+oráculo ela fica de 1 a 18 cm dele, numa forma de 2 m, e chega mais perto a cada
+nível. Marque só as cotas que a peça precisa acertar. A gaiola ajustada se move
+mais que a cota: para passar pelos oito cantos de um cubo de 2 m, o canto da
+gaiola anda até 3 m, e a superfície se desloca no máximo 7% além da correção
+no ponto, de modo que entre os pontos ela quase não incha. Um conjunto de medidas que a superfície
+limite não separa, como os oito cantos de um cubo liso, grita com os nomes dos
+pontos e não gera malha. Também grita o conjunto em que um erro no alvo moveria
+a gaiola mais de 100 vezes esse erro, porque aí 1 mm de cota vira 10 cm de
+gaiola. A regra é a do OpenSubdiv no modo uniforme e confere,
 a 1e-6 m, com a saída congelada do modificador Subdivision Surface do Blender
 em `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`.
 
