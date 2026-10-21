@@ -10,6 +10,9 @@ tools/
                executar.mjs   — replay headless do núcleo procedural em Node (npm run executar)
                bench/         — gabarito de silhueta e estatísticas PNG usados pelas bancadas
                out/           — PNGs/saídas (gitignorado; evidência regenerável)
+  blender/     Ferramentas opcionais do Blender, fora do núcleo, do CI e do --completo:
+               regua.py, pacote-cego.py, olhar-candidata.py e oraculo-subdivisao.mjs
+               (uso em docs/mecanifica/blender/REGUA-E-PACOTE-CEGO.md)
   mapa/        mapa.mjs (docs/MAPA.md gerado dos cabeçalhos + gate mapa:check),
                links.mjs (referências + alcançabilidade a partir do índice da
                Mecanifica) e toc.mjs (índice de docs/oficina.md)

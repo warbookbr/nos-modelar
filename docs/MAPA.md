@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1542 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1545 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -406,6 +406,7 @@
 - `FLUXO-GENERICO.md` — Fluxo genérico de modelagem com Blender
 - `INSTALAR-E-CONVERTER.md` — Instalar o Blender e converter para GLB
 - `README.md` — Blender com o Mecanifica
+- `REGUA-E-PACOTE-CEGO.md` — Régua, pacote cego e oráculo da subdivisão
 - `USOS-E-LIMITES.md` — Usos do Blender, limites e regras
 
 ## docs/mecanifica/gerado/
@@ -1879,6 +1880,11 @@
 ## tools/bancadas/fixtures/
 
 - `catalogo-visual.js` — catalogo-visual.js — fixtures mínimas do harness privado.
+
+## tools/blender/
+
+- `blender.test.mjs` — blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a régua dá zero na identidade e acusa a ve…
+- `oraculo-subdivisao.mjs` — oraculo-subdivisao.mjs — gera a fixture do oráculo da subdivisão, `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`, com o modificador Subdivision…
 
 ## tools/catalogo/
 
