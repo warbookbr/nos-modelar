@@ -97,9 +97,9 @@ describe('gate de vazamento: termo e malha injetados num repositório de teste',
     writeFileSync(join(pasta, 'limpo.txt'), 'nada aqui\n');
     git(pasta, 'add', '.');
     git(pasta, 'commit', '-q', '-m', 'Começa limpo');
-    mkdirSync(join(pasta, 'docs'));
-    writeFileSync(join(pasta, 'docs', 'nota.md'), 'linha um\nfala de zorbla-quindim aqui\n');
-    writeFileSync(join(pasta, 'docs', 'zorbla_quindim.txt'), 'conteúdo neutro\n');
+    mkdirSync(join(pasta, 'texto'));
+    writeFileSync(join(pasta, 'texto', 'nota.md'), 'linha um\nfala de zorbla-quindim aqui\n');
+    writeFileSync(join(pasta, 'texto', 'zorbla_quindim.txt'), 'conteúdo neutro\n');
     git(pasta, 'add', '.');
     git(pasta, 'commit', '-q', '-m', 'Acrescenta nota\n\nCorpo da mensagem\ncita ZorblaQuindim na terceira linha');
     git(pasta, 'branch', 'tarefa/zorbla-quindim');
@@ -114,7 +114,7 @@ describe('gate de vazamento: termo e malha injetados num repositório de teste',
 
   it('acha o termo no conteúdo e no caminho, e o caminho com termo sai como objeto do índice', () => {
     const achados = varrerRepositorio(pasta, proibidos);
-    expect(achados.find((a) => a.caminho === 'docs/nota.md')).toEqual({ caminho: 'docs/nota.md', linha: 2 });
+    expect(achados.find((a) => a.caminho === 'texto/nota.md')).toEqual({ caminho: 'texto/nota.md', linha: 2 });
     const peloNome = achados.filter((a) => a.caminho.startsWith('blob '));
     expect(peloNome).toHaveLength(1);
     expect(peloNome[0].linha).toBe(0);
