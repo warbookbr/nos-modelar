@@ -1,7 +1,7 @@
-/* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo e vértice sem face. */
+/* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação e vértice sem face. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco } from './subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, interpolarGaiola, ITERACOES_INTERPOLACAO } from './subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 
 const oraculo = JSON.parse(readFileSync(new URL('./fixtures/subdivisao-oraculo-blender.json', import.meta.url)));
@@ -66,6 +66,53 @@ describe('subdivisão Catmull-Clark com vincos', () => {
     expect(neutro.orfaos).toEqual([]);
     expect(neutro.V.size).toBe(98);
     expect(neutro.F.size).toBe(96);
+  });
+
+  describe('ponto limite e interpolação', () => {
+    const gaiolaDo = (c) => ({ vertices: c.vertices, faces: c.faces, borda: c.borda ?? 'suave', vincos: c.vincos.map(([a, b, x]) => [a, b, nitidezDoVinco(x)]) });
+    const gaiolas = oraculo.casos.map((c) => [c.nome, gaiolaDo(c)]);
+    gaiolas.push(['grade-aberta com vinco infinito', { ...gaiolaDo(oraculo.casos[4]), vincos: oraculo.casos[4].vincos.map(([a, b]) => [a, b, Infinity]) }]);
+    // a estrela de um vértice, como gaiola, com o vértice no índice 0: o refino dela dá a estrela do mesmo vértice
+    const estrela = (g, i) => {
+      const mapa = new Map([[i, 0]]); const vertices = [g.vertices[i]]; const faces = [];
+      for (const f of g.faces) if (f.includes(i)) faces.push(f.map((j) => { if (!mapa.has(j)) { mapa.set(j, vertices.length); vertices.push(g.vertices[j]); } return mapa.get(j); }));
+      const vincos = (g.vincos ?? []).filter(([a, b]) => (a === i && mapa.has(b)) || (b === i && mapa.has(a))).map(([a, b, s]) => [mapa.get(a), mapa.get(b), s]);
+      return { vertices, faces, vincos, cantos: (g.cantos ?? []).includes(i) ? [0] : [], borda: g.borda };
+    };
+    const limiteRefinado = (g, i, niveis) => { let e = estrela(g, i); for (let k = 0; k < niveis; k++) e = estrela(refinarGaiola(e), 0); return e.vertices[0]; };
+
+    for (const [nome, g] of gaiolas) {
+      it(`a fórmula do ponto limite confere com a estrela refinada 80 níveis e não muda com o refino: ${nome}`, () => {
+        const L = limitesDaGaiola(g);
+        expect(Math.max(...L.map((p, i) => dist(p, limiteRefinado(g, i, 80))))).toBeLessThan(1e-12);
+        let gk = g;
+        for (let k = 0; k < 3; k++) {
+          gk = refinarGaiola(gk);
+          const Lk = limitesDaGaiola(gk);
+          expect(Math.max(...L.map((p, i) => dist(p, Lk[i])))).toBeLessThan(1e-12);
+        }
+      });
+    }
+
+    it('o dardo vivo grita, porque a máscara lisa erra o ponto limite dele', () => {
+      const cubo = gaiolaDo(oraculo.casos[0]);
+      const dardo = { ...cubo, vincos: [[4, 5, Infinity]] };
+      expect(() => limitesDaGaiola(dardo)).toThrow(/dardo/);
+      // o dardo de nitidez finita chega liso à fórmula e confere com o refino
+      const finito = { ...cubo, vincos: [[4, 5, 3]] };
+      const L = limitesDaGaiola(finito);
+      expect(dist(L[4], limiteRefinado(finito, 4, 80))).toBeLessThan(1e-12);
+    });
+
+    it('a interpolação é determinística e, no cubo liso, põe cada ponto a menos de 1e-6 m do limite em 20 iterações', () => {
+      const g = gaiolaDo(oraculo.casos[0]);
+      const a = interpolarGaiola(g); const b = interpolarGaiola(g);
+      expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+      expect(ITERACOES_INTERPOLACAO).toBe(20);
+      expect(Math.max(...a.residuos)).toBeLessThan(1e-6);
+      const L = limitesDaGaiola({ ...g, vertices: a.vertices });
+      expect(Math.max(...L.map((p, i) => dist(p, g.vertices[i])))).toBeLessThan(1e-6);
+    });
   });
 
   describe('vértice de gaiola sem face', () => {

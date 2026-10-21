@@ -139,11 +139,9 @@ function refinar(V, F, nitidez, cantos, borda) {
  * vincos: lista de [a, b, nitidez] (nitidez em níveis; use NITIDEZ_INFINITA ou >= niveis para vinco vivo).
  * cantos: índices de vértice que ficam fixos (canto vivo).
  */
-export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave' }) {
-  validar(vertices, faces, vincos, niveis);
-  if (borda !== 'suave' && borda !== 'cantos') throw new TypeError("subdivisão: borda precisa ser 'suave' ou 'cantos'");
+function nitidezDosVincos(faces, vincos) {
   const { indice } = arestasDa(faces);
-  let nitidez = new Map();
+  const nitidez = new Map();
   for (const [k, v] of vincos.entries()) {
     if (!Array.isArray(v) || v.length !== 3) throw new TypeError(`subdivisão: vinco ${k} precisa ser [a, b, nitidez]`);
     const [a, b, x] = v;
@@ -151,6 +149,13 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
     if (!(x >= 0)) throw new TypeError(`subdivisão: vinco ${k} com nitidez inválida`);
     nitidez.set(chave(a, b), x);
   }
+  return nitidez;
+}
+
+export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave' }) {
+  validar(vertices, faces, vincos, niveis);
+  if (borda !== 'suave' && borda !== 'cantos') throw new TypeError("subdivisão: borda precisa ser 'suave' ou 'cantos'");
+  let nitidez = nitidezDosVincos(faces, vincos);
   let V = vertices.map((p) => [...p]); let F = faces.map((f) => [...f]);
   let C = new Set(cantos);
   for (let n = 0; n < niveis; n++) {
@@ -158,6 +163,123 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
     V = r.V; F = r.F; nitidez = r.nitidez; // os pontos de vértice mantêm o índice, então os cantos continuam válidos
   }
   return { vertices: V, faces: F };
+}
+
+/* ---- ponto limite e interpolação ----
+ *
+ * A estrela de um vértice (as faces que o tocam) refina para a estrela do mesmo vértice no nível seguinte: o ponto de
+ * vértice, os pontos das arestas que o tocam e os pontos das faces que o tocam só dependem dessas faces. Por isso o
+ * ponto limite de um vértice da gaiola sai da estrela dele sozinha: ela é refinada com `refinar` até que nenhuma aresta
+ * que toca o vértice guarde nitidez finita (no mínimo um nível, para que toda face vire quad), e então se aplica a
+ * fórmula fechada do ponto limite de Catmull-Clark:
+ *
+ *   canto (canto declarado, três ou mais arestas vivas, ou vértice de face única com borda 'cantos'):  L = P;
+ *   vinco ou borda (duas arestas vivas, A e B nas outras pontas; a borda é aresta viva):  L = (A + 4P + B) / 6;
+ *   liso (nenhuma aresta viva), valência n, e_j as pontas das arestas e f_j os cantos opostos dos quads:
+ *     L = (n² P + 4 Σ e_j + Σ f_j) / (n (n + 5)), que no vértice regular (n = 4) é a máscara 1-4-1 ao quadrado / 36.
+ *
+ * O dardo vivo (uma só aresta de nitidez infinita chegando a um vértice liso) grita: a máscara lisa aplicada a ele erra
+ * o ponto limite em 3,4e-2 m no cubo de 2 m com uma aresta viva, medido contra a estrela refinada
+ * 80 níveis. O dardo de nitidez finita não chega à fórmula, porque o refino apaga a nitidez antes.
+ *
+ * A nitidez finita conta inteira no limite (uma nitidez 10 é vinco por dez níveis e liso depois), e por isso o refino
+ * da estrela vai até ceil(nitidez) níveis, com teto de NIVEIS_MAXIMOS_DO_LIMITE. */
+export const NIVEIS_MAXIMOS_DO_LIMITE = 64;
+
+function estrelaDe(V, F, facesDoVertice, nitidez, i) {
+  const mapa = new Map([[i, 0]]); const Vm = [V[i]]; const Fm = [];
+  for (const fi of facesDoVertice) {
+    Fm.push(F[fi].map((j) => { let m = mapa.get(j); if (m === undefined) { m = Vm.length; mapa.set(j, m); Vm.push(V[j]); } return m; }));
+  }
+  const nm = new Map();
+  for (const [j, m] of mapa) { if (j === i) continue; const s = nitidez.get(chave(i, j)); if (s !== undefined) nm.set(chave(0, m), s); }
+  return { V: Vm, F: Fm, nitidez: nm };
+}
+
+const facesPorVertice = (nV, F) => {
+  const r = Array.from({ length: nV }, () => []);
+  F.forEach((f, fi) => { for (const i of f) r[i].push(fi); });
+  return r;
+};
+
+function limiteDaEstrela(estrela, canto, borda) {
+  let { V, F, nitidez } = estrela;
+  if (!F.length) return [...V[0]];
+  let maior = 0; for (const s of nitidez.values()) if (s !== NITIDEZ_INFINITA && s > maior) maior = s;
+  const niveis = Math.max(1, Math.ceil(maior));
+  if (niveis > NIVEIS_MAXIMOS_DO_LIMITE) throw new TypeError(`subdivisão: nitidez finita ${maior} passa de ${NIVEIS_MAXIMOS_DO_LIMITE} níveis; declare o vinco vivo`);
+  const cantos = canto ? new Set([0]) : new Set();
+  for (let n = 0; n < niveis; n++) {
+    const r = refinar(V, F, nitidez, cantos, borda);
+    ({ V, F, nitidez } = estrelaDe(r.V, r.F, facesPorVertice(r.V.length, r.F)[0], r.nitidez, 0));
+  }
+  const { arestas } = arestasDa(F);
+  const incidentes = arestas.filter((e) => e.a === 0 || e.b === 0);
+  const outro = (e) => (e.a === 0 ? e.b : e.a);
+  const vivas = incidentes.filter((e) => e.faces.length !== 2 || (nitidez.get(chave(e.a, e.b)) ?? 0) > 0);
+  const P = V[0];
+  const ehCanto = canto || (borda === 'cantos' && F.length === 1 && incidentes.some((e) => e.faces.length === 1));
+  if (ehCanto || vivas.length >= 3) return [...P];
+  if (vivas.length === 2) {
+    const A = V[outro(vivas[0])], B = V[outro(vivas[1])];
+    return [0, 1, 2].map((j) => (A[j] + 4 * P[j] + B[j]) / 6);
+  }
+  if (vivas.length === 1) throw new TypeError('subdivisão: o ponto limite do dardo (vértice liso com uma só aresta viva) ainda não tem fórmula; dê nitidez finita ao vinco ou leve-o até outra aresta viva');
+  const n = incidentes.length;
+  if (F.length !== n) throw new TypeError('subdivisão: o ponto limite pede vértice de variedade, com tantas faces quantas arestas em volta');
+  const e = [0, 0, 0], f = [0, 0, 0];
+  for (const a of incidentes) { const q = V[outro(a)]; e[0] += q[0]; e[1] += q[1]; e[2] += q[2]; }
+  for (const quad of F) { const q = V[quad[(quad.indexOf(0) + 2) % 4]]; f[0] += q[0]; f[1] += q[1]; f[2] += q[2]; }
+  return [0, 1, 2].map((j) => (n * n * P[j] + 4 * e[j] + f[j]) / (n * (n + 5)));
+}
+
+function limitesInternos(V, F, nitidez, cantos, borda, facesDoV) {
+  return V.map((_, i) => limiteDaEstrela(estrelaDe(V, F, facesDoV[i], nitidez, i), cantos.has(i), borda));
+}
+
+function prepararLimite({ vertices, faces, vincos = [], cantos = [], borda = 'suave' }) {
+  validar(vertices, faces, vincos, 0);
+  if (borda !== 'suave' && borda !== 'cantos') throw new TypeError("subdivisão: borda precisa ser 'suave' ou 'cantos'");
+  return { nitidez: nitidezDosVincos(faces, vincos), C: new Set(cantos), facesDoV: facesPorVertice(vertices.length, faces) };
+}
+
+/** refinarGaiola(gaiola) -> a gaiola de um nível abaixo, no mesmo formato, com a nitidez dos filhos e os mesmos cantos
+ *  (os pontos de vértice mantêm o índice). Serve para conferir que o ponto limite não muda com o refino. */
+export function refinarGaiola({ vertices, faces, vincos = [], cantos = [], borda = 'suave' }) {
+  const { nitidez, C } = prepararLimite({ vertices, faces, vincos, cantos, borda });
+  const r = refinar(vertices, faces, nitidez, C, borda);
+  return { vertices: r.V, faces: r.F, vincos: [...r.nitidez].map(([k, s]) => [...k.split(',').map(Number), s]), cantos: [...C], borda };
+}
+
+/** limitesDaGaiola({ vertices, faces, vincos, cantos, borda }) -> onde cada vértice da gaiola cai na superfície limite. */
+export function limitesDaGaiola(gaiola) {
+  const { nitidez, C, facesDoV } = prepararLimite(gaiola);
+  return limitesInternos(gaiola.vertices, gaiola.faces, nitidez, C, gaiola.borda ?? 'suave', facesDoV);
+}
+
+/* Interpolação: a gaiola começa nos pontos declarados P e, a cada iteração, cada vértice anda a diferença entre o ponto
+ * declarado e o ponto limite atual (C += P - L(C)). O número de iterações é fixo e declarado, sem critério de parada por
+ * tolerância, para que a mesma gaiola dê a mesma correção bit a bit. A função devolve a gaiola corrigida e a distância
+ * de cada ponto declarado ao seu ponto limite depois da última iteração, que é a distância do ponto à superfície
+ * limite, porque o ponto limite está nela.
+ *
+ * Cada iteração encolhe o erro pelo fator 1 - λ, com λ o menor autovalor do operador de ponto limite da gaiola, que nas
+ * gaiolas do oráculo vai de 0,015 a 0,33. Com as 20 iterações da regra de parada do plano, só o cubo liso fecha 1e-6 m;
+ * as outras gaiolas pedem de 25 a 677. Por isso a operação `subdivisao` ainda não expõe a opção. */
+export const ITERACOES_INTERPOLACAO = 20;
+
+export function interpolarGaiola(gaiola, iteracoes = ITERACOES_INTERPOLACAO) {
+  if (!Number.isInteger(iteracoes) || iteracoes < 0) throw new TypeError('subdivisão: iteracoes da interpolação precisa ser inteiro não-negativo');
+  const { nitidez, C: cantos, facesDoV } = prepararLimite(gaiola);
+  const { vertices: P, faces: F } = gaiola; const borda = gaiola.borda ?? 'suave';
+  let C = P.map((p) => [...p]);
+  for (let k = 0; k < iteracoes; k++) {
+    const L = limitesInternos(C, F, nitidez, cantos, borda, facesDoV);
+    C = C.map((c, i) => [c[0] + (P[i][0] - L[i][0]), c[1] + (P[i][1] - L[i][1]), c[2] + (P[i][2] - L[i][2])]);
+  }
+  const L = limitesInternos(C, F, nitidez, cantos, borda, facesDoV);
+  const residuos = P.map((p, i) => Math.hypot(p[0] - L[i][0], p[1] - L[i][1], p[2] - L[i][2]));
+  return { vertices: C, residuos };
 }
 
 /* Espelha a gaiola no plano x = 0 ANTES de subdividir: os vértices com |x| <= tolerância ficam compartilhados pelas duas
