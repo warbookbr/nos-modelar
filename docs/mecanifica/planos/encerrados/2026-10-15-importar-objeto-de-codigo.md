@@ -38,8 +38,8 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 - o importador `.csg` → `.esboco.json` (cubo, cilindro e cone, esfera, polígono, extrusão linear e rotacional, união, diferença,
   interseção, matriz), com teste em fixture sintética;
 - um objeto-prova: o carrinho de mão, de um `.scad` com licença que permita guardar a fonte, registrada com o endereço;
-  na fatia 1 não houve carrinho de licença aberta, e o objeto-prova foi um caminhão basculante de brinquedo, com a fonte em
-  [`FONTE.md`](../../banco-de-provas/importar-objeto-2026-10-15/FONTE.md);
+  na fatia 1 não houve carrinho de licença aberta, e o objeto-prova foi um caminhão basculante de brinquedo; a fonte e os derivados
+  saíram do repositório depois, e [`FONTE.md`](../../banco-de-provas/importar-objeto-2026-10-15/FONTE.md) registra o que houve;
 - a nomeação das partes e relações sobre o esboço importado, a receita planejada gerada e o laço de modelagem até o aceite;
 - a medição em tokens de cada etapa, ao lado do custo das peças do avião.
 
@@ -91,12 +91,12 @@ importação de forma barata, ficou respondida pelas sondas e pelos importadores
 principal da lista.
 
 O que entrou no repositório: o importador de `.csg` do OpenSCAD, com `offset`, diferença 2D com furo, extrusão com `scale`, `hull` e
-`minkowski` comuns e um corpus real (drone, braço SCARA e foguete) no teste; o importador de STEP de sólidos separados e o de STL por
+`minkowski` comuns, provado no teste pela fixture sintética escrita à mão (o corpus real de terceiros, com licença que exige crédito, e o objeto-prova de licença copyleft saíram do repositório depois, por decisão da pessoa); o importador de STEP de sólidos separados e o de STL por
 peça, sobre a mesma classificação por malha (`tools/mecanifica/malha-para-esboco.mjs`), em que cada peça vira revolução, extrusão com
 furos ou caixa, com nome e contatos; e as [sondas de 2026-10-16](../../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md),
 com os scripts que as refazem.
 
-O que se mediu: o drone sai do `.scad` com 97 a 99,97% de fidelidade de volume por peça; o tradutor do BlendNet aceita 77,7% dos 12.059
+O que se mediu, antes de o corpus sair do repositório: um quadro de drone saiu do `.scad` com 97 a 99,97% de fidelidade de volume por peça; o tradutor do BlendNet aceita 77,7% dos 12.059
 scripts, a menos de 1 ms cada, e acerta 41 de 60 numa amostra conferida contra o Blender; uma mesa do Infinigen virou família com as
 medidas da original por 250 a 300 mil tokens; o STEP e o STL de peças impressas saem exatos em peças limpas e só aproximados em peças com
 chanfro, cavidade ou detalhe interno; e STL de malha única colada não se traduz. As pesquisas, em [pesquisa

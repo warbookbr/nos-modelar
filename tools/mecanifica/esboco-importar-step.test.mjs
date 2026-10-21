@@ -1,18 +1,15 @@
 /* O importador de STEP: a fixture sintética (gerada com o OpenCascade WASM por `gerar-sintetico.mjs`) tem uma peça de cada tipo de forma,
-   e cada peça é medida pelo próprio esboço (a caixa da forma depois de posta e recortada), e não pela conta do importador. O braço de
-   escavadeira real (CC-BY, guardado compactado, ver FONTE.md) fixa o número de peças por tipo e um piso de ocupação. */
+   e cada peça é medida pelo próprio esboço (a caixa da forma depois de posta e recortada), e não pela conta do importador. */
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gunzipSync } from 'node:zlib';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { descreverEsboco } from '../../modulos/esboco/src/descrever.js';
 import { conferirStep, decodificarTextoStep, idDoNome, importarStep, nomesDosSolidosNoTexto, RecusaDeImportacao } from './esboco-importar-step.mjs';
 import { rodar } from './importar-step.mjs';
 
 const FIXTURE = fileURLToPath(new URL('./fixtures/importar-step/sintetico.step', import.meta.url));
-const BRACO = fileURLToPath(new URL('./fixtures/importar-step/ExcavArm-v7.step.gz', import.meta.url));
 const texto = readFileSync(FIXTURE, 'utf8');
 
 /* O intervalo de cada peça no quadro do CAD (z para cima), escrito no comentário do gerador, no quadro do esboço: (x, y, z) -> (x, z, -y). */
@@ -211,20 +208,5 @@ describe('o comando', () => {
     } finally {
       rmSync(pasta, { recursive: true, force: true });
     }
-  }, 120000);
-});
-
-describe('o braço de escavadeira real (Printables 971298)', () => {
-  it('importa os 19 sólidos: nenhum é exato, 9 viram prisma ou revolução aproximados e 10 ficam em caixa, com a ocupação acima da da caixa única (0,44)', async () => {
-    const r = await importarStep(gunzipSync(readFileSync(BRACO)).toString('utf8'), { arquivo: 'ExcavArm-v7.step' });
-    expect(r.relatorio.pecas).toHaveLength(19);
-    expect(r.relatorio.pecas.every((p) => p.nomeGenerico)).toBe(true); // "Körper1" a "Körper31"
-    expect(r.relatorio.pecas.every((p, i) => p.id.startsWith(`peca_${String(i + 1).padStart(2, '0')}_`))).toBe(true); // a ordem e a forma dão o nome
-    expect(r.relatorio.classes).toEqual({ extrusao: 3, caixa: 10, revolucao: 6 });
-    expect(r.relatorio.exatas).toBe(0);
-    expect(r.relatorio.aproximadas).toBe(9);
-    expect(r.relatorio.caixasUltimoRecurso).toBe(10);
-    expect(r.relatorio.ocupacaoMedia).toBeGreaterThan(0.55);
-    expect(r.relatorio.contatos).toHaveLength(5);
   }, 120000);
 });

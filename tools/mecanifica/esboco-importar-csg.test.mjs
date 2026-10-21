@@ -290,7 +290,7 @@ describe('o que o esboço não expressa', () => {
 });
 
 /* As construções que o importador recusava e agora traduz. Cada caso é um `.csg` escrito à mão; a caixa de cada forma vem do próprio
-   esboço (`descreverEsboco`), e a medida contra o OpenSCAD está nos testes do corpus e na fixture sintética. */
+   esboço (`descreverEsboco`), e a medida contra o OpenSCAD está na fixture sintética. */
 describe('as construções 2D e 3D que viraram forma', () => {
   const LE = 'center = false, convexity = 10, scale = [1, 1], $fn = 0, $fa = 12, $fs = 2';
   const importa = (csg) => importarCsg(csg, { arquivo: 'x.csg' });
@@ -445,95 +445,6 @@ describe('as construções 2D e 3D que viraram forma', () => {
       const { esboco } = importa(csg);
       expect(() => validarEsboco(JSON.parse(JSON.stringify(esboco)))).not.toThrow();
     }
-  });
-});
-
-/* O corpus real: `.scad` de terceiros (CC-BY 4.0, ver fixtures/importar-csg/corpus/FONTE.md) e o `.csg` que o OpenSCAD exporta de cada um.
-   Cada arquivo fixa o número de formas e a lista exata de recusas (nó, linha e motivo), de modo que uma regressão ou uma recusa nova
-   aparece como diferença aqui; e fixa um piso para a razão interseção/união contra a malha que o próprio OpenSCAD calcula. */
-describe('o corpus real do Thingiverse', () => {
-  const PASTA = fileURLToPath(new URL('./fixtures/importar-csg/corpus/', import.meta.url));
-  const HULL_DAS_ALETAS = 'hull: filhos com eixos afastados e alturas diferentes: o casco não é uma extrusão nem um loft de seções semelhantes';
-  const CORPUS = [
-    { nome: 'drone, trem de pouso', arquivo: 'drone/Landing_gear.csg', formas: 17, recusas: [], piso: 0.999 },
-    { nome: 'drone, corpo inferior', arquivo: 'drone/Parametric_lower_body.csg', formas: 115, recusas: [], piso: 0.97, lento: true },
-    { nome: 'drone, corpo superior', arquivo: 'drone/Parametric_top_body_v3.csg', formas: 118, recusas: [], piso: 0.98 },
-    { nome: 'SCARA paramétrico', arquivo: 'scara/scara.csg', formas: 195, recusas: [], piso: 0.999 },
-    {
-      nome: 'foguete paramétrico',
-      arquivo: 'foguete/foguete.csg',
-      formas: 76,
-      recusas: [1533, 1573, 1613, 1653, 1693].map((linha) => `hull (linha ${linha}): ${HULL_DAS_ALETAS}`),
-      piso: 0.87,
-      lento: true,
-    },
-  ];
-  const importa = (arquivo) => importarCsg(readFileSync(join(PASTA, arquivo), 'utf8'), { parcial: true, arquivo: arquivo.replace(/^.*\//, '') });
-
-  it.each(CORPUS)('$nome: importa com $formas formas e a lista de recusas fixada, e o esboço valida', ({ arquivo, formas, recusas }) => {
-    const r = importa(arquivo);
-    expect(r.esboco.opcoes[0].formas).toHaveLength(formas);
-    expect(r.relatorio.recusas.map((x) => `${x.no} (linha ${x.linha}): ${x.motivo}`)).toEqual(recusas);
-    expect(() => validarEsboco(JSON.parse(r.texto))).not.toThrow();
-    expect(new Set(r.esboco.opcoes[0].formas.map((f) => f.id)).size).toBe(formas); // ids posicionais sem repetição
-  });
-
-  it.each(CORPUS)('$nome: o mesmo .csg dá o mesmo texto', ({ arquivo }) => {
-    expect(importa(arquivo).texto).toBe(importa(arquivo).texto);
-  });
-
-  /* A blocagem da receita só aceita de 8 a 128 lados, e o corpus tem porcas de 6 lados; sem sólido, a conferência as relata em
-     `formasSemMedida` e não as mede. Para o piso medir a tradução, a cópia do esboço leva essas formas a 8 lados. O STL sai do
-     `openscad -o x.stl x.csg` na hora (nenhum STL fica no repositório), e o OpenSCAD 2021 gasta de 8 s a 1 min por arquivo: os dois
-     mais lentos (corpo inferior do drone e foguete) só rodam com IMPORTAR_CSG_MEDIDA_COMPLETA=1. */
-  async function iouContraOpenScad(arquivo) {
-    const pasta = mkdtempSync(join(tmpdir(), 'importar-csg-corpus-'));
-    try {
-      const stl = join(pasta, 'x.stl');
-      execFileSync('openscad', ['-q', '-o', stl, join(PASTA, arquivo)], { stdio: 'ignore' });
-      const copia = JSON.parse(JSON.stringify(importa(arquivo).esboco));
-      for (const f of copia.opcoes[0].formas) if (f.lados !== undefined && f.lados < 8) f.lados = 8;
-      const medido = await conferirComMalha(copia, lerStl(readFileSync(stl)), quadroDoEsboco({}));
-      expect(medido.formasSemMedida).toEqual([]);
-      return medido.iou;
-    } finally { rmSync(pasta, { recursive: true, force: true }); }
-  }
-  describe.skipIf(!temOpenScad)('contra a malha do OpenSCAD', () => {
-    it.each(CORPUS.filter((c) => !c.lento))('$nome: interseção/união acima de $piso', async ({ arquivo, piso }) => {
-      expect(await iouContraOpenScad(arquivo), arquivo).toBeGreaterThan(piso);
-    }, 300_000);
-    it.skipIf(!process.env.IMPORTAR_CSG_MEDIDA_COMPLETA).each(CORPUS.filter((c) => c.lento))('$nome: interseção/união acima de $piso (lento)', async ({ arquivo, piso }) => {
-      expect(await iouContraOpenScad(arquivo), arquivo).toBeGreaterThan(piso);
-    }, 600_000);
-  });
-});
-
-describe('o objeto-prova guardado no banco de provas', () => {
-  const PASTA = fileURLToPath(new URL('../../docs/mecanifica/banco-de-provas/importar-objeto-2026-10-15/', import.meta.url));
-  const opcoes = { arquivo: 'toy-truck10-v3a.csg', girar: [-90, 0, 0], frente: '+x' };
-
-  it('o esboço guardado é o que o importador dá hoje para o .csg guardado, byte a byte', () => {
-    const r = importarCsg(readFileSync(join(PASTA, 'toy-truck10-v3a.csg'), 'utf8'), opcoes);
-    expect(r.texto).toBe(readFileSync(join(PASTA, 'toy-truck10-v3a.esboco.json'), 'utf8'));
-    const guardado = JSON.parse(readFileSync(join(PASTA, 'toy-truck10-v3a.importacao.json'), 'utf8'));
-    const { conferencia, ...semConferencia } = guardado;
-    expect(r.relatorio).toEqual(semConferencia);
-    expect(conferencia.iou).toBeGreaterThan(0.98);
-  });
-
-  it('dá 17 formas sólidas e 17 cortadoras, e o esboço as lê sem recusar', () => {
-    const { esboco } = importarCsg(readFileSync(join(PASTA, 'toy-truck10-v3a.csg'), 'utf8'), opcoes);
-    const formas = esboco.opcoes[0].formas;
-    expect(formas.filter((f) => !f.cortador)).toHaveLength(17);
-    expect(formas.filter((f) => f.cortador)).toHaveLength(17);
-    expect(() => descreverEsboco(JSON.parse(JSON.stringify(esboco)))).not.toThrow();
-  });
-
-  it('a fonte guardada é a que o .csg guardado exporta: os mesmos números e o mesmo corpo', () => {
-    const csg = readFileSync(join(PASTA, 'toy-truck10-v3a.csg'), 'utf8');
-    expect(csg).toMatch(/cube\(size = \[34\.5, 22, 12\.5\], center = true\)/); // o corpo: length 34,5 x width 22 x wheel_dia 12,5
-    expect(readFileSync(join(PASTA, 'toy-truck10-v3a.scad'), 'utf8')).toMatch(/License - Public domain/);
-    expect(readFileSync(join(PASTA, 'FONTE.md'), 'utf8')).toMatch(/42ac2a801d96f131b70cbef1fdb88e7ab348ad62/);
   });
 });
 

@@ -1,8 +1,8 @@
 /* O recorte de envelope igual na blocagem do nível zero: a forma recortada vai inteira ao andaime quando o recorte não muda o
    envelope, e só fica fora quando o recorte tira da silhueta além de `MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE`. Um cortador que
    vara a forma abre um vão na vista ao longo dele, e o desenho das formas o deixa aberto; um cortador interno, ou coberto por outra
-   forma, não muda a silhueta. A origem do caso é o caminhão importado de OpenSCAD (`toy-truck10-v3a`), cujo chassi tem arcos de
-   roda que o atravessam. */
+   forma, não muda a silhueta. A origem do caso é um caminhão importado de OpenSCAD, cujo chassi tinha arcos de
+   roda que o atravessavam; o objeto saiu do repositório e os casos abaixo o reproduzem com caixas. */
 import { describe, expect, it } from 'vitest';
 import { blocagemDaOpcao, MUDANCA_MAXIMA_DA_SILHUETA_POR_RECORTE } from './esboco-blocagem.mjs';
 import { recortesAbertos } from './esboco-blocagem-recorte.mjs';

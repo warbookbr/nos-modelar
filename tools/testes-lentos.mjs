@@ -64,7 +64,6 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/esboco-composta.test.mjs',
   'tools/mecanifica/esboco-condutor-nivel-zero.test.mjs',
   'tools/mecanifica/esboco-familias.test.mjs',
-  'tools/mecanifica/esboco-importar-csg.test.mjs',
   'tools/mecanifica/esboco-importar-step.test.mjs',
   'tools/mecanifica/esboco-importar-stl.test.mjs',
   'tools/mecanifica/familia.test.mjs',

@@ -2,7 +2,7 @@
 
 Plano [Importar objeto de código](../../../planos/encerrados/2026-10-15-importar-objeto-de-codigo.md). Três sondas baratas mediram o que se consegue
 tirar de objetos reais sem desenhá-los, e o resultado está resumido na [pesquisa aberta](../../../PESQUISA-ABERTA-2026-10.md#sondas-de-importação-de-2026-10-16).
-Os arquivos de origem não estão aqui: cada um se baixa de novo pelo endereço abaixo, e os scripts guardados refazem a medida.
+Os arquivos de origem não estão aqui, e os scripts guardados refazem a medida com qualquer arquivo do mesmo tipo.
 
 ## Picape em STL, por fatias
 
@@ -15,8 +15,7 @@ as rodas, se traduzem em primitivas.
 
 ## Quadro de drone em OpenSCAD, pelo importador
 
-Fonte: "Complete frame for TinyTina drone - OpenSCAD parametric - reinforced prop guards", de Josep V. Moragues, thingiverse.com/thing:3519833,
-CC-BY 4.0, obtido pelo espelho do Internet Archive (`archive.org/details/thingiverse-3519833`). Comandos, a partir dos três `.scad`:
+A fonte era um quadro de drone paramétrico de terceiros, em três `.scad` com licença que exige crédito. Os arquivos e os relatos derivados saíram do repositório por decisão da pessoa. Os comandos que refazem a sonda com qualquer `.scad` são:
 
 ```bash
 openscad -q -o <peca>.csg <peca>.scad
@@ -24,24 +23,17 @@ openscad -q -o <peca>.stl <peca>.scad
 npm run importar-csg -- <peca>.csg --frente +y --parcial [--conferir <peca>.stl]
 ```
 
-Os relatos estão em `drone-*.importacao.json`. O trem de pouso saiu sem forma; os corpos inferior e superior saíram com 36 e 16 formas e 22 e
-27 recusas, por `offset`, diferença 2D com furo, `linear_extrude` com `scale`, `hull` e `minkowski`. O `--conferir` lançou exceção com o esboço
-vazio e com cilindro de 6 lados.
+O trem de pouso saiu sem forma; os corpos inferior e superior saíram com 36 e 16 formas e 22 e 27 recusas, por `offset`, diferença 2D com furo, `linear_extrude` com `scale`, `hull` e `minkowski`. O `--conferir` lançou exceção com o esboço vazio e com cilindro de 6 lados. As construções foram implementadas depois no importador e os dois casos do `--conferir` têm teste com fixture escrita à mão.
 
 ## Braço de escavadeira em STEP, uma forma por sólido
 
-Fonte: "Excavator Arm", printables.com/model/971298, arquivo `ExcavArm v7.step`, CC-BY, obtido pela API do Printables (`getDownloadLink`).
-O `sonda_step.py` lê o STEP com o gmsh (`pip install gmsh numpy scipy pillow`; no contêiner faltavam `libxft2`, `libglu1-mesa`, `libxinerama1`
-e `libxcursor1`), ajusta a cada sólido uma caixa ou um cilindro orientado pelos eixos principais e acha contatos por proximidade:
+A fonte era um STEP de 19 sólidos de um modelo externo com licença que exige crédito, retirado do repositório por decisão da pessoa junto com o relatório e as vistas derivados. O `sonda_step.py` lê um STEP com o gmsh (`pip install gmsh numpy scipy pillow`; no contêiner faltavam `libxft2`, `libglu1-mesa`, `libxinerama1` e `libxcursor1`), ajusta a cada sólido uma caixa ou um cilindro orientado pelos eixos principais e acha contatos por proximidade:
 
 ```bash
 python -I sonda_step.py <arquivo.step> <saida> <pasta-destes-scripts>
 ```
 
-Saíram 19 sólidos, 12 caixas e 7 cilindros, 10 contatos e ocupação média de 0,44 (volume do sólido sobre o da forma), em segundos e sem
-tokens. O relatório está em `escavadeira-step.relatorio.json` e as vistas em `escavadeira-step-*.png` (à esquerda o STEP, à direita as
-formas). O gmsh não trouxe os nomes dos sólidos, que no arquivo são genéricos ("Körper1" a "Körper31"), e o arquivo é um leiaute de
-impressão, com as peças espalhadas, de modo que os contatos não descrevem a montagem.
+Nesse arquivo saíram 19 sólidos, 12 caixas e 7 cilindros, 10 contatos e ocupação média de 0,44 (volume do sólido sobre o da forma), em segundos e sem tokens. O gmsh não trouxe os nomes dos sólidos, que no arquivo eram genéricos, e o arquivo era um leiaute de impressão, com as peças espalhadas, de modo que os contatos não descreviam a montagem.
 
 ## BlendNet, scripts do Blender traduzidos em esboço
 
