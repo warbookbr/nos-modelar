@@ -168,6 +168,45 @@ describe('face fina e vértice no meio de aresta', () => {
     expect(achado?.onde.vertice).toBe(6);
   });
 
+  it('a grade acha os mesmos encontros em T, na mesma ordem, que a comparação de cada aresta com cada vértice', () => {
+    /* Uma faixa de 40 blocos em T encadeados num corpo só, com relevo em z para espalhar as células, e uma aresta longa
+       em diagonal que cruza células demais e cai na lista do componente. */
+    const vertices = new Map(); const faces = new Map();
+    let f = 0;
+    const id = (i, j) => i * 3 + j;
+    const z = (i) => (i % 2 ? (z(i - 1) + z(i + 1)) / 2 : 0.3 * Math.sin(i));
+    for (let i = 0; i <= 80; i++) for (let j = 0; j < 3; j++) vertices.set(id(i, j), [i * 0.5, j, z(i)]);
+    for (let b = 0; b < 40; b++) {
+      const i = 2 * b;
+      faces.set(f++, { vs: [id(i, 0), id(i + 1, 0), id(i + 1, 1), id(i, 1)] });
+      faces.set(f++, { vs: [id(i + 1, 0), id(i + 2, 0), id(i + 2, 1), id(i + 1, 1)] });
+      faces.set(f++, { vs: [id(i, 1), id(i + 2, 1), id(i + 2, 2), id(i, 2)] });
+    }
+    vertices.set(1000, [0, 0, -30]); vertices.set(1001, [40, 2, 30]);
+    faces.set(f++, { vs: [id(0, 0), 1000, 1001] });
+    const r = analisarTopologia({ vertices, faces }).achados.filter((a) => a.codigo === 'vertice-em-aresta').map((a) => a.onde);
+    // a comparação de antes, aresta por aresta contra todos os vértices do corpo
+    const esperado = [];
+    const pontas = new Map();
+    for (const { vs } of faces.values()) vs.forEach((a, k) => { const b = vs[(k + 1) % vs.length]; pontas.set(a < b ? `${a}|${b}` : `${b}|${a}`, [a, b]); });
+    const usados = [...new Set([...faces.values()].flatMap((x) => x.vs))];
+    const ordem = []; const visto = new Set(); const adj = new Map();
+    for (const { vs } of faces.values()) vs.forEach((a, k) => { const b = vs[(k + 1) % vs.length]; for (const [p, q] of [[a, b], [b, a]]) { if (!adj.has(p)) adj.set(p, new Set()); adj.get(p).add(q); } });
+    for (const v of adj.keys()) { if (visto.has(v)) continue; const fila = [v]; visto.add(v); ordem.push(v); while (fila.length) { const x = fila.pop(); for (const w of adj.get(x)) if (!visto.has(w)) { visto.add(w); ordem.push(w); fila.push(w); } } }
+    expect(usados.length).toBe(ordem.length);
+    for (const [a, b] of pontas.values()) {
+      const A = vertices.get(a), B = vertices.get(b); const d = [0, 1, 2].map((e) => B[e] - A[e]); const L2 = d[0] ** 2 + d[1] ** 2 + d[2] ** 2;
+      for (const v of ordem) {
+        if (v === a || v === b) continue;
+        const P = vertices.get(v); const ap = [0, 1, 2].map((e) => P[e] - A[e]); const s = (ap[0] * d[0] + ap[1] * d[1] + ap[2] * d[2]) / L2;
+        if (s <= 1e-6 || s >= 1 - 1e-6) continue;
+        if (Math.hypot(...[0, 1, 2].map((e) => ap[e] - s * d[e])) < 1e-6) esperado.push({ vertice: v, aresta: [a, b] });
+      }
+    }
+    expect(esperado).toHaveLength(40);
+    expect(r).toEqual(esperado);
+  });
+
   it('não acusa vértice de outro corpo que só encosta na aresta', () => {
     const { vertices, faces } = cuboSao();
     vertices.set(10, [0.5, 0, 0]); vertices.set(11, [0.5, -1, 0]); vertices.set(12, [0.5, -1, -1]);

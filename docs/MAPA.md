@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1539 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1542 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1066,6 +1066,8 @@
 - `curva2d.js` — curva2d.js — contorno 2D escrito por trechos (reto, arco, arco tangente, concordância e spline), puro.
 - `curva2d.test.mjs` — curva2d.test.mjs — contorno 2D por trechos (reto, arco, arco tangente, concordância e spline).
 - `entrada.js` — oficina.js — fachada pública compatível do motor procedural. A implementação é separada por responsabilidade; esta entrada preserva o contrato usado por rece…
+- `espessura.js` — espessura.js — dá espessura a uma superfície aberta e devolve o sólido fechado
+- `espessura.test.mjs` — espessura.test.mjs — a espessura da superfície aberta: a função pura sobre placa, caixa aberta e tubo, o passo `subdivisao` com `espessura` (sólido fechado, …
 - `executor.js` — executor.js — orquestra núcleo, adaptador e animação sem duplicar execução.
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
@@ -1114,6 +1116,7 @@
 ## procedural/nucleo/fixtures/
 
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
+- `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 
 ## procedural/nucleo/operacoes/
 

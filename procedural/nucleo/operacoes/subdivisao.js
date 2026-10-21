@@ -1,8 +1,11 @@
 /* subdivisao.js (operação) — gera uma superfície Catmull-Clark com vincos a partir de uma gaiola declarada.
    A geometria sai de `procedural/nucleo/subdivisao.js`, função pura. A receita endereça a gaiola por nome: o vértice é o
    nome de um ponto, a face lista nomes de ponto e o vinco é uma sequência nomeada de pontos; o passo traduz os nomes em
-   índices só para chamar a função pura, e nenhum índice de aresta, vértice ou face sai da receita. */
+   índices só para chamar a função pura, e nenhum índice de aresta, vértice ou face sai da receita. Com `espessura`, a
+   superfície vira a face externa de um sólido fechado por `procedural/nucleo/espessura.js`, e o grito da espessura que
+   passa do raio local cita os pontos nomeados da gaiola. */
 import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, nitidezDoVinco } from '../subdivisao.js';
+import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
 
 const EXEMPLO_DE_VINCO = "{ nome: 'vincoDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.5 }";
 const EXEMPLO_DE_CANTO = "cantos: ['quinaDaTampa']";
@@ -65,6 +68,38 @@ function vincosPorNome(lista, indiceDoNome, faces, st) {
     }
   }
   return { vincos };
+}
+
+const MAXIMO_DE_LUGARES = 5;
+const arredondar = (x) => Number(x.toPrecision(3));
+
+/* Os lugares em que a espessura passa do raio local, com o nome do ponto da gaiola mais perto de cada um. Os vértices
+   da malha de índice menor que o número de pontos da gaiola são os pontos da gaiola refinados (o refino mantém o índice),
+   e a imagem espelhada de um ponto declarado sai com o nome dele e a marca de espelhada. */
+function lugaresDaEspessura(lugares, malha, gaiola, declarados) {
+  const nG = gaiola.vertices.length;
+  const origem = gaiola.vertices.map((_, k) => k);
+  const espelhado = new Set();
+  if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { if (k !== j) { origem[k] = j; espelhado.add(k); } });
+  const nome = (j) => (typeof declarados[j] === 'string' ? `'${declarados[j]}'` : `[${gaiola.vertices[j].map(arredondar).join(', ')}]`);
+  /* um lugar por ponto declarado, do pior para o melhor; a imagem espelhada não ocupa outro lugar */
+  const porPonto = new Map();
+  for (const l of lugares) {
+    let melhor = 0, dMelhor = Infinity;
+    for (let k = 0; k < nG; k++) {
+      const p = malha[k]; const d = Math.hypot(p[0] - l.ponto[0], p[1] - l.ponto[1], p[2] - l.ponto[2]);
+      if (d < dMelhor) { dMelhor = d; melhor = k; }
+    }
+    const j = origem[melhor];
+    if (!porPonto.has(j)) {
+      if (porPonto.size === MAXIMO_DE_LUGARES) continue;
+      porPonto.set(j, { l, direto: false, imagem: false });
+    }
+    porPonto.get(j)[espelhado.has(melhor) ? 'imagem' : 'direto'] = true;
+  }
+  if (!porPonto.size) return '';
+  const textos = [...porPonto].map(([j, { l, direto, imagem }]) => `${nome(j)}${imagem ? (direto ? ' e a imagem espelhada' : ' espelhado') : ''} (raio ${arredondar(l.raio)} em [${l.ponto.map(arredondar).join(', ')}])`);
+  return `, perto de ${textos.join(', ')} (${lugares.length} par(es) de vértices da malha ao todo); reduza a espessura abaixo do raio, abra a curva ali ou troque o lado; no vinco vivo o raio local é a largura da faixa de faces ao lado dele e cai pela metade a cada nível`;
 }
 
 export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem }) {
@@ -135,17 +170,39 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
         return grita(st, i, 'subdivisao', 'medidas', `${e.motivo}: ${nomes.join(', ')}`);
       }
     }
+    let espessura = null;
+    if (a.espessura != null) {
+      espessura = st.num(a.espessura);
+      if (!Number.isFinite(espessura) || espessura <= 0) return grita(st, i, 'subdivisao', 'espessura', `a espessura precisa ser maior que zero, e veio ${espessura}`);
+      if (a.lado != null && a.lado !== 'contraNormal' && a.lado !== 'normal') return grita(st, i, 'subdivisao', 'lado', `lado precisa ser 'contraNormal' (o material contra a normal das faces, o padrão) ou 'normal', e veio ${JSON.stringify(a.lado)}`);
+    } else if (a.lado != null) return grita(st, i, 'subdivisao', 'lado', 'lado só vale com espessura: declare a espessura da chapa');
     let r;
     try {
       /* Com medidas, a malha entregue vai à superfície limite: sem isso o ponto medido ficaria a centímetros da malha de
          nível finito, e a cota não apareceria na peça. Sem medidas, a malha é a do nível pedido, como no oráculo. */
       r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null });
     } catch (e) { return grita(st, i, 'subdivisao', 'gaiola', String(e.message)); }
+    let partes = null;
+    if (espessura !== null) {
+      /* A superfície subdividida é a face externa, e nela ficam as medidas; a interna e a parede das bordas livres e dos
+         vãos são derivadas. Quando a espessura passa do raio local, o grito cita os pontos nomeados da gaiola mais perto
+         de onde a face interna se dobra. */
+      try {
+        const s = espessarSuperficie({ vertices: r.vertices, faces: r.faces, espessura, lado: a.lado ?? 'contraNormal' });
+        r = s; partes = s.partes;
+      } catch (e) {
+        if (!(e instanceof ErroDaEspessura)) return grita(st, i, 'subdivisao', 'espessura', String(e.message));
+        return grita(st, i, 'subdivisao', 'espessura', `${e.motivo}${lugaresDaEspessura(e.lugares, r.vertices, gaiola, declarados)}`);
+      }
+    }
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (r.vertices.length > limite || r.faces.length > limite) return grita(st, i, 'subdivisao', 'niveis', `a subdivisão gera ${r.vertices.length} vértices e ${r.faces.length} faces, acima do limite do passo (${limite})`);
     r.vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
     const facesSaida = r.faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); return id; });
-    if (a.origemId != null) registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida });
+    if (a.origemId != null) {
+      const grupos = partes ? Object.fromEntries(Object.entries(partes).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])])) : {};
+      registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida, espessura: partes !== null, ...grupos });
+    }
   },
   };
 }

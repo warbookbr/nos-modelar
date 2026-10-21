@@ -405,10 +405,27 @@ lados), o vão que deixa ponto sem face, o vinco sobre aresta que a fusão ou o
 vão tirou, o ponto com x < 0 na simetria e a aresta no plano x = 0 com duas
 faces.
 
-A superfície sai aberta se a gaiola for aberta,
-sem espessura, e não aceita booleana nem `filete` sobre ela. `origem` publica
-somente as faces da superfície, sem sub-endereço, porque a ordem de saída não é
-identidade.
+Sem `espessura`, a superfície sai aberta se a gaiola for aberta, e o
+`conferir-malha` acusa casca aberta. Com `espessura: 0.002` (número ou nome de
+`PARAMS`), a superfície subdividida vira a face externa de um sólido fechado:
+cada vértice anda a espessura contra a normal das faces até a face interna, a
+parede fecha cada borda livre e cada vão, e as medidas continuam na face
+externa. `lado: 'normal'` põe o material a favor da normal, para a gaiola
+declarada com a normal para dentro; a superfície declarada é sempre a externa.
+Na dobra viva e no canto o deslocamento vai à esquadria, e a face interna fica
+a uma espessura de cada face externa. Na forma de prova da gaiola por estações,
+com 2 mm de chapa em nível 2, o sólido sai sem casca aberta, sem cruzamento,
+com a face interna entre 0,994 e 1,0004 espessura da externa e volume 0,13%
+abaixo da área vezes a espessura. A espessura que passa do raio de curvatura
+local do lado do material grita com os pontos nomeados da gaiola mais perto,
+porque ali a face interna se dobraria sobre si; no vinco vivo esse raio é a
+largura da faixa de faces ao lado dele dividida pela tangente do meio ângulo
+da dobra, e cai pela metade a cada nível (na forma de prova, 6,1 cm no nível 1,
+3 cm no 2 e 1,5 cm no 3). Partes distantes da chapa a menos de uma espessura
+uma da outra não são conferidas. `origem` publica as faces sem sub-endereço
+por posição, porque a ordem de saída não é identidade; com espessura,
+`parte: 'externa'`, `'interna'` ou `'borda'` cita cada grupo, como na casca.
+A superfície não aceita booleana nem `filete` sobre ela.
 
 ## Detalhes de seleção, aliases e proveniência
 

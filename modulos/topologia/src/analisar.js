@@ -239,13 +239,42 @@ export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxim
     if (!porComponente.has(c)) porComponente.set(c, []);
     porComponente.get(c).push(v);
   }
+  /* GRADE. Comparar cada aresta com cada vértice do componente é quadrático: uma casca de 27 mil vértices e 54 mil
+     arestas levava quase dois minutos. A grade, com célula do tamanho da aresta média, entrega a cada aresta só os
+     vértices das células que a caixa dela (alargada em EPS_EM_ARESTA) toca, que contêm todo vértice a menos de
+     EPS_EM_ARESTA dela; os candidatos voltam na ordem do componente, e os achados saem os mesmos e na mesma ordem.
+     A aresta que cruzaria células demais usa a lista do componente, como antes. */
+  const ordemNoComponente = new Map();
+  for (const lista of porComponente.values()) lista.forEach((v, k) => ordemNoComponente.set(v, k));
+  let somaDasArestas = 0;
+  for (const [a, b] of pontasDeAresta.values()) somaDasArestas += distancia(vertices.get(a), vertices.get(b));
+  const celula = Math.max(pontasDeAresta.size ? somaDasArestas / pontasDeAresta.size : 0, EPS_EM_ARESTA * 4);
+  const MAXIMO_DE_CELULAS_POR_ARESTA = 4096;
+  const grade = new Map();
+  const indiceDaCelula = (x) => Math.floor(x / celula);
+  for (const [v, P] of vertices) {
+    if (!componenteDe.has(v)) continue;
+    const ch = `${indiceDaCelula(P[0])},${indiceDaCelula(P[1])},${indiceDaCelula(P[2])}`;
+    if (!grade.has(ch)) grade.set(ch, []);
+    grade.get(ch).push(v);
+  }
+  const candidatos = (A, B, componente) => {
+    const lo = [0, 1, 2].map((e) => indiceDaCelula(Math.min(A[e], B[e]) - EPS_EM_ARESTA));
+    const hi = [0, 1, 2].map((e) => indiceDaCelula(Math.max(A[e], B[e]) + EPS_EM_ARESTA));
+    if ((hi[0] - lo[0] + 1) * (hi[1] - lo[1] + 1) * (hi[2] - lo[2] + 1) > MAXIMO_DE_CELULAS_POR_ARESTA) return porComponente.get(componente) ?? [];
+    const achados = [];
+    for (let i = lo[0]; i <= hi[0]; i++) for (let j = lo[1]; j <= hi[1]; j++) for (let k = lo[2]; k <= hi[2]; k++) {
+      for (const v of grade.get(`${i},${j},${k}`) ?? []) if (componenteDe.get(v) === componente) achados.push(v);
+    }
+    return achados.sort((p, q) => ordemNoComponente.get(p) - ordemNoComponente.get(q));
+  };
   for (const [a, b] of pontasDeAresta.values()) {
     const A = vertices.get(a);
     const B = vertices.get(b);
     const d = [B[0] - A[0], B[1] - A[1], B[2] - A[2]];
     const L2 = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
     if (L2 <= EPS_POS * EPS_POS) continue;
-    for (const v of porComponente.get(componenteDe.get(a)) ?? []) {
+    for (const v of candidatos(A, B, componenteDe.get(a))) {
       if (v === a || v === b) continue;
       const P = vertices.get(v);
       const ap = [P[0] - A[0], P[1] - A[1], P[2] - A[2]];

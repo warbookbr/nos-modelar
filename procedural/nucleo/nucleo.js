@@ -1660,8 +1660,28 @@ CONTRATOS_ORIGEM.intersectar = contratoBooleana('intersectar');
    elas saem de uma bola poliédrica, e um índice pela ordem da saída seria
    identidade posicional. */
 CONTRATOS_ORIGEM.arredondarCostura = contratoFaces('arredondarCostura');
-/* subdivisao — as faces da superfície refinada, sem sub-endereço (a ordem de saída não é identidade). */
-CONTRATOS_ORIGEM.subdivisao = contratoFaces('subdivisao');
+/* subdivisao — as faces da superfície refinada, sem sub-endereço por posição (a ordem de saída não é identidade). Com
+   `espessura`, o sólido publica três grupos de significado fixo, citáveis por `parte`, como a casca: `externa` (a
+   superfície subdividida, onde ficam as medidas), `interna` (a face derivada, a uma espessura dela) e `borda` (a parede
+   das bordas livres e dos vãos). Sem `parte`, são todas. */
+CONTRATOS_ORIGEM.subdivisao = {
+  validar(origem) {
+    const msg = "subdivisao usa op, id e parte opcional ('externa', 'interna' ou 'borda', só com espessura)";
+    if (!Object.keys(origem).every((k) => k === 'op' || k === 'id' || k === 'parte')) return msg;
+    if (origem.parte != null && !['externa', 'interna', 'borda'].includes(origem.parte)) return msg;
+    return null;
+  },
+  resolver(st, registro, origem) {
+    if (origem.parte != null && !registro.espessura) return { erro: `origem subdivisao:${origem.id} (${origem.parte}): a superfície não tem espessura, e parte só existe com espessura` };
+    const lista = origem.parte ? registro[origem.parte] : registro.faces;
+    for (const f of lista) {
+      const consumo = conferirConsumo(st, f, `a face ${f} da origem subdivisao:${origem.id}`);
+      if (consumo) return { erro: consumo };
+    }
+    const faces = lista.filter((f) => st.F.has(f));
+    return faces.length ? { faces } : { erro: `origem subdivisao:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
+  },
+};
 /* casca — extensão nativa `procedural/extensoes/casca`: o resultado publica três grupos, citáveis por `parte`:
    `externa` (as faces fechadas do sólido, que continuam com id e vértices), `interna` (a parede de dentro, uma por face
    externa) e `borda` (a borda das faces abertas, uma por aresta). Sem `parte`, são todas. Os grupos são de significado

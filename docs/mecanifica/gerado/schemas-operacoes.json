@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:76d69edc9be340cc73402f74e3132548de580b397f41ab9a8f6a6f775f452a9d",
+  "assinatura": "sha256:f7fa8ace14b3169d879afd604bf807cdc292197cf7e630f9917046c3bd7dd199",
   "total": 38,
   "operacoes": [
     {
@@ -3761,6 +3761,25 @@
                 "minLength": 1
               },
               "description": "Nomes de ponto da gaiola por onde a superfície limite passa; os outros pontos ficam onde foram declarados."
+            },
+            "espessura": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Espessura da chapa: a superfície subdividida vira a face externa, a interna fica a esta distância e a parede fecha as bordas livres e os vãos; o resultado é sólido fechado."
+            },
+            "lado": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Com espessura: 'contraNormal' (padrão) põe o material contra a normal das faces, para dentro quando elas são anti-horárias vistas de fora; 'normal' põe a favor. A superfície declarada é sempre a face externa."
             }
           }
         },
@@ -3812,11 +3831,12 @@
         },
         "precondicoes": [],
         "limites": [
-          "É superfície da gaiola: aberta se a gaiola for aberta.",
+          "Sem espessura, é a superfície da gaiola, aberta se a gaiola for aberta; com espessura, é sólido fechado, com as partes externa, interna e borda citáveis por origem.",
           "A regra é a do OpenSubdiv no modo uniforme, sem projeção na superfície limite; confere com o Subdivision Surface do Blender com use_limit_surface desligado.",
           "Sem medidas, a superfície aproxima a gaiola e não passa pelos pontos; com medidas, só os pontos marcados passam pela superfície limite, e todo vértice da malha entregue vai ao seu ponto limite, de modo que a cota é vértice da malha.",
           "Medidas que a superfície limite não separa, ou que movem a gaiola mais de 100 vezes o erro do alvo, gritam com os nomes dos pontos.",
-          "Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes."
+          "Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes.",
+          "Com espessura, a espessura que passa do raio de curvatura local do lado do material grita com os pontos nomeados mais perto; no vinco vivo esse raio é a largura da faixa de faces ao lado dele e cai pela metade a cada nível. Partes distantes da chapa a menos de uma espessura uma da outra não são conferidas."
         ],
         "diagnosticos": []
       }
