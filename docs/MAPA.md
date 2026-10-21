@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1545 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1546 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2416,6 +2416,7 @@
 ## tools/mecanifica/fixtures/importar-stl/
 
 - `FONTE.md` — Fixtures do importador de STL
+- `gerar-denso.mjs` — Gera a fixture de malha densa do importador de STL: um anel de 32 mm de diâmetro externo, 31 mm de diâmetro interno e 9,5 mm de espessura, com o eixo em z, 2…
 - `gerar-sintetico.mjs` — Gera a fixture sintética do importador de STL a partir da do importador de STEP: cada sólido de `../importar-step/sintetico.step` vira um STL, tesselado pelo…
 
 ## tools/mecanifica/fixtures/receita-externa-cadeiras/
