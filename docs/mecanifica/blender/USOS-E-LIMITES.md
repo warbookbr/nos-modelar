@@ -6,7 +6,8 @@ Cada uso abaixo diz o ganho esperado e o custo, e vem marcado como provado ou po
 |---|---|---|---|
 | Conversão de formatos | provado | abrir `.blend` e outros formatos no fluxo de referência, que lê glb, obj e fbx | instalar 1,6 GB fora do repositório e rodar um script curto |
 | Renderização com luz real | por provar | ler vincos e curvaturas que a máscara de silhueta e a cor chapada não mostram | script de câmera e luz, tempo de render e uma comparação com a folha atual |
-| Diferença de superfície entre fonte e receita | por provar | medir o que hoje só se vê por silhueta e folha de vistas, isto é, relevo dentro da silhueta | exportar a receita como malha, alinhar com a fonte e calcular distância, o que é ferramenta nova |
+| Diferença de superfície entre fonte e receita | provado em 2026-10-21 sobre forma desenhada por código, em `tools/blender/regua.py` | medir o que hoje só se vê por silhueta e folha de vistas, isto é, relevo dentro da silhueta, vincos e normais | exportar a receita como malha alinhada com a fonte e escolher a caixa; uso em [`REGUA-E-PACOTE-CEGO.md`](REGUA-E-PACOTE-CEGO.md) |
+| Oráculo da subdivisão | provado em 2026-10-21: `tools/blender/oraculo-subdivisao.mjs` regera a fixture congelada do núcleo a 1e-7 | conferir a operação `subdivisao` contra o modificador do Blender sem que os testes do núcleo dependam dele | rodar o gerador quando a fixture mudar |
 | Oráculo de booleana e arredondamento | por provar | comparar o que o núcleo gera com o que o Blender gera nos mesmos casos e achar as falhas listadas em "Ajustes no núcleo" do plano de veículos | casos mínimos reproduzíveis nos dois lados e leitura da diferença |
 | Malha suave como alvo visual de forma curva | por provar | dar à pessoa um alvo mais liso que as primitivas facetadas do núcleo | risco de a malha virar fonte de forma que a receita não reproduz |
 

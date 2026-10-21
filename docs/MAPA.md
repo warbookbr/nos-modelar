@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1542 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1549 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -141,6 +141,8 @@
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 - `modelar-veiculos.md` — Veículos de referência livre: análise da primeira leva e instruções para o modelador
@@ -406,6 +408,7 @@
 - `FLUXO-GENERICO.md` — Fluxo genérico de modelagem com Blender
 - `INSTALAR-E-CONVERTER.md` — Instalar o Blender e converter para GLB
 - `README.md` — Blender com o Mecanifica
+- `REGUA-E-PACOTE-CEGO.md` — Régua, pacote cego e oráculo da subdivisão
 - `USOS-E-LIMITES.md` — Usos do Blender, limites e regras
 
 ## docs/mecanifica/gerado/
@@ -482,6 +485,8 @@
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
+- `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
+- `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
 - `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -1879,6 +1884,11 @@
 ## tools/bancadas/fixtures/
 
 - `catalogo-visual.js` — catalogo-visual.js — fixtures mínimas do harness privado.
+
+## tools/blender/
+
+- `blender.test.mjs` — blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a régua dá zero na identidade e acusa a ve…
+- `oraculo-subdivisao.mjs` — oraculo-subdivisao.mjs — gera a fixture do oráculo da subdivisão, `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`, com o modificador Subdivision…
 
 ## tools/catalogo/
 
