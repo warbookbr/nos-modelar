@@ -152,7 +152,7 @@ function nitidezDosVincos(faces, vincos) {
   return nitidez;
 }
 
-export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave' }) {
+export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave', aoLimite = false }) {
   validar(vertices, faces, vincos, niveis);
   if (borda !== 'suave' && borda !== 'cantos') throw new TypeError("subdivisão: borda precisa ser 'suave' ou 'cantos'");
   let nitidez = nitidezDosVincos(faces, vincos);
@@ -162,6 +162,9 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
     const r = refinar(V, F, nitidez, C, borda);
     V = r.V; F = r.F; nitidez = r.nitidez; // os pontos de vértice mantêm o índice, então os cantos continuam válidos
   }
+  /* aoLimite: cada vértice da malha final vai para o seu ponto limite, calculado com a nitidez que sobrou neste nível.
+     O vértice i < vertices.length continua sendo o vértice i da gaiola, e o ponto limite dele é o da gaiola. */
+  if (aoLimite) V = limitesInternos(V, F, nitidez, C, borda, facesPorVertice(V.length, F));
   return { vertices: V, faces: F };
 }
 
@@ -269,7 +272,13 @@ function limiteDaEstrela(estrela, canto, borda) {
   let { V, F, nitidez } = estrela;
   if (!F.length) return [...V[0]];
   let maior = 0; for (const s of nitidez.values()) if (s !== NITIDEZ_INFINITA && s > maior) maior = s;
-  const niveis = Math.max(1, Math.ceil(maior));
+  /* Sem nitidez finita e com a estrela toda em quads, a fórmula vale já neste nível e o refino é dispensado; o dardo
+     sempre refina um nível, porque a matriz dele pede a estrela de vértices distintos que o refino garante. */
+  let niveis = Math.ceil(maior);
+  if (niveis === 0) {
+    const vivasAgora = arestasDa(F).arestas.filter((e) => (e.a === 0 || e.b === 0) && (e.faces.length !== 2 || (nitidez.get(chave(e.a, e.b)) ?? 0) > 0)).length;
+    if (vivasAgora === 1 || F.some((f) => f.length !== 4)) niveis = 1;
+  }
   if (niveis > NIVEIS_MAXIMOS_DO_LIMITE) throw new TypeError(`subdivisão: nitidez finita ${maior} passa de ${NIVEIS_MAXIMOS_DO_LIMITE} níveis; declare o vinco vivo`);
   const cantos = canto ? new Set([0]) : new Set();
   for (let n = 0; n < niveis; n++) {

@@ -46,7 +46,9 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     }
     let r;
     try {
-      r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave' });
+      /* Com medidas, a malha entregue vai à superfície limite: sem isso o ponto medido ficaria a centímetros da malha de
+         nível finito, e a cota não apareceria na peça. Sem medidas, a malha é a do nível pedido, como no oráculo. */
+      r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null });
     } catch (e) { return grita(st, i, 'subdivisao', 'gaiola', String(e.message)); }
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (r.vertices.length > limite || r.faces.length > limite) return grita(st, i, 'subdivisao', 'niveis', `a subdivisão gera ${r.vertices.length} vértices e ${r.faces.length} faces, acima do limite do passo (${limite})`);

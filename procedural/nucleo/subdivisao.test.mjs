@@ -148,17 +148,35 @@ describe('subdivisão Catmull-Clark com vincos', () => {
     const pontos = Object.fromEntries(nomes.map((n, k) => [n, c.vertices[k]]));
     const passo = (extra) => [['subdivisao', { origemId: 1, vertices: nomes, faces: c.faces, niveis: 2, vincos: [[4, 5], [5, 6], [6, 7], [7, 4]], ...extra }]];
 
-    it('ajusta só os pontos medidos e dá a malha da gaiola ajustada, bit a bit', () => {
+    it('ajusta só os pontos medidos, entrega a malha no limite e põe cada ponto medido nela, bit a bit', () => {
       const medidas = ['p4', 'p6', 'p1'];
       const neutro = nucleo(passo({ medidas }), pontos);
       expect(neutro.orfaos).toEqual([]);
       const g = { vertices: c.vertices, faces: c.faces, vincos: [[4, 5, Infinity], [5, 6, Infinity], [6, 7, Infinity], [7, 4, Infinity]] };
       const ajustada = ajustarGaiolaAsMedidas(g, [4, 6, 1]);
-      const esperado = subdividirCatmullClark({ ...g, vertices: ajustada.vertices, niveis: 2 }).vertices;
-      expect(JSON.stringify([...neutro.V.values()])).toBe(JSON.stringify(esperado));
+      const esperado = subdividirCatmullClark({ ...g, vertices: ajustada.vertices, niveis: 2, aoLimite: true }).vertices;
+      const entregue = [...neutro.V.values()];
+      expect(JSON.stringify(entregue)).toBe(JSON.stringify(esperado));
       expect(JSON.stringify(neutroCanonico(nucleo(passo({ medidas }), pontos)))).toBe(JSON.stringify(neutroCanonico(neutro)));
-      const L = limitesDaGaiola({ ...g, vertices: ajustada.vertices });
-      for (const k of [4, 6, 1]) expect(dist(L[k], c.vertices[k])).toBeLessThan(1e-6);
+      // na malha exportada, cada ponto medido é um vértice a menos de 1e-6 m da cota
+      for (const k of [4, 6, 1]) expect(Math.min(...entregue.map((p) => dist(p, c.vertices[k])))).toBeLessThan(1e-6);
+    });
+
+    it('aoLimite põe cada vértice do nível final no seu ponto limite, conferido pela estrela refinada 60 níveis', () => {
+      const g = { vertices: c.vertices, faces: c.faces, vincos: [[4, 5, Infinity], [5, 6, 0.4]] };
+      let g2 = g; for (let k = 0; k < 2; k++) g2 = refinarGaiola(g2);
+      const r = subdividirCatmullClark({ ...g, niveis: 2, aoLimite: true });
+      expect(r.faces).toEqual(subdividirCatmullClark({ ...g, niveis: 2 }).faces);
+      const estrelaDe = (gg, i) => {
+        const mapa = new Map([[i, 0]]); const vertices = [gg.vertices[i]]; const faces = [];
+        for (const f of gg.faces) if (f.includes(i)) faces.push(f.map((j) => { if (!mapa.has(j)) { mapa.set(j, vertices.length); vertices.push(gg.vertices[j]); } return mapa.get(j); }));
+        const vincos = gg.vincos.filter(([a, b]) => (a === i && mapa.has(b)) || (b === i && mapa.has(a))).map(([a, b, s]) => [mapa.get(a), mapa.get(b), s]);
+        return { vertices, faces, vincos };
+      };
+      for (let k = 0; k < r.vertices.length; k += 3) {
+        let e = estrelaDe(g2, k); for (let n = 0; n < 60; n++) e = estrelaDe(refinarGaiola(e), 0);
+        expect(dist(r.vertices[k], e.vertices[0])).toBeLessThan(1e-12);
+      }
     });
 
     it('na simetria em x, a imagem do ponto medido também passa pela superfície', () => {
@@ -170,7 +188,7 @@ describe('subdivisão Catmull-Clark com vincos', () => {
       const ajustada = ajustarGaiolaAsMedidas(inteira, [4, 3, inteira.imagem[4], inteira.imagem[3]]);
       const L = limitesDaGaiola({ ...inteira, vertices: ajustada.vertices });
       expect(dist(L[inteira.imagem[4]], [-0.5, 0.3, 1])).toBeLessThan(1e-6);
-      expect(JSON.stringify([...neutro.V.values()])).toBe(JSON.stringify(subdividirCatmullClark({ ...inteira, vertices: ajustada.vertices, niveis: 1 }).vertices));
+      expect(JSON.stringify([...neutro.V.values()])).toBe(JSON.stringify(subdividirCatmullClark({ ...inteira, vertices: ajustada.vertices, niveis: 1, aoLimite: true }).vertices));
     });
 
     it('grita com os nomes dos pontos quando o sistema é singular, e não gera malha', () => {

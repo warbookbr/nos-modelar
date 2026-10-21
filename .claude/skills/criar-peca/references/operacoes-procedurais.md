@@ -316,10 +316,14 @@ como nome de ponto e liste esse nome em `medidas`, por exemplo
 superfície limite a menos de 1e-6 m, e os outros pontos da gaiola ficam onde
 foram declarados. Na simetria em `x`, a imagem espelhada do ponto medido também
 é medida. A posição dos pontos medidos se resolve de uma vez por eliminação de
-Gauss sobre os pesos do ponto limite, e o resultado é bit a bit. A malha de
-nível finito ainda não passa exatamente pelo ponto: no nível 2 das gaiolas do
-oráculo ela fica de 1 a 18 cm dele, numa forma de 2 m, e chega mais perto a cada
-nível. Marque só as cotas que a peça precisa acertar. A gaiola ajustada se move
+Gauss sobre os pesos do ponto limite, e o resultado é bit a bit. Com `medidas`,
+todo vértice da malha entregue vai ao seu ponto limite, e cada ponto medido é
+um vértice da malha exportada a menos de 1e-6 m da cota; sem a projeção, a malha
+de nível 2 ficaria de 1 a 18 cm dele numa forma de 2 m. O preço é a corda: o
+meio de cada face fica mais longe da superfície limite que sem a projeção (no
+cubo de 2 m em nível 2, 5,8 cm contra 2 cm), então suba `niveis` quando a face
+precisar acompanhar a curva, porque essa distância cai de três a quatro vezes a
+cada nível. Marque só as cotas que a peça precisa acertar. A gaiola ajustada se move
 mais que a cota: para passar pelos oito cantos de um cubo de 2 m, o canto da
 gaiola anda até 3 m, e a superfície se desloca no máximo 7% além da correção
 no ponto, de modo que entre os pontos ela quase não incha. Um conjunto de medidas que a superfície
