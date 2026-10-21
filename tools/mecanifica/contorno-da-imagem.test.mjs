@@ -5,17 +5,19 @@ import { describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
 import { contornosDaImagem } from './contorno-da-imagem.mjs';
 import { imagemAntisserrilhada } from '../../modulos/contorno-da-imagem/tests/ajudas-subpixel.js';
+import { FRONTAL, LATERAL } from './fixtures/contorno-da-imagem/braco-sintetico.mjs';
 
-const pasta = new URL('../../procedural/pecas/braco-robotico/referencias/', import.meta.url);
-const imagem = readFileSync(new URL('lateral.png', pasta));
-const regioes = JSON.parse(readFileSync(new URL('lateral.regioes.json', pasta), 'utf8'));
+/* As imagens são as sintéticas de `fixtures/contorno-da-imagem/braco-sintetico.mjs`, desenhadas por código; o `.contornos.json` ao
+   lado é o que a ferramenta grava para a lateral. */
+const imagem = LATERAL.png();
+const regioes = LATERAL.regioes;
 
 describe('contorno da imagem', () => {
   it('é igual nas duas execuções e bate com o arquivo gravado', async () => {
     const { resultado: a } = await contornosDaImagem(imagem, regioes);
     const { resultado: b } = await contornosDaImagem(imagem, regioes);
     expect(a).toEqual(b);
-    expect(a).toEqual(JSON.parse(readFileSync(new URL('lateral.contornos.json', pasta), 'utf8')));
+    expect(a).toEqual(JSON.parse(readFileSync(new URL('./fixtures/contorno-da-imagem/braco-sintetico.lateral.contornos.json', import.meta.url), 'utf8')));
   }, 60000);
 
   it('recusa ponto fora da silhueta e semente mal escrita', async () => {
@@ -24,9 +26,7 @@ describe('contorno da imagem', () => {
   }, 60000);
 
   it('guarda em milímetro todos os pedaços de uma parte, com o maior igual ao contorno de sempre', async () => {
-    const frontal = readFileSync(new URL('frontal.png', pasta));
-    const config = JSON.parse(readFileSync(new URL('frontal.regioes.json', pasta), 'utf8'));
-    const { resultado: { regioes: r } } = await contornosDaImagem(frontal, config);
+    const { resultado: { regioes: r } } = await contornosDaImagem(FRONTAL.png(), FRONTAL.regioes);
     /* A carcaça do punho aparece de frente dos dois lados do antebraço. */
     const carcaca = r.carcacaPunho;
     expect(carcaca.pedacos).toHaveLength(2);
@@ -38,9 +38,11 @@ describe('contorno da imagem', () => {
     for (const parte of Object.values(r)) expect(parte.pedacos.length).toBeGreaterThanOrEqual(1);
   }, 60000);
 
-  it('separa o ombro da coluna, que têm o mesmo cinza', async () => {
+  /* Os dois retângulos têm o mesmo cinza e se tocam: o ombro de 60 por 60 px (22.500 mm² a 2,5 mm por px) e o braço que sobe dele. */
+  it('separa o ombro do braço, que têm o mesmo cinza', async () => {
     const { resultado: { regioes: r } } = await contornosDaImagem(imagem, regioes);
-    expect(r.ombro.areaMm2).toBeGreaterThan(5000);
+    expect(r.ombro.areaMm2).toBeGreaterThan(20000);
+    expect(r.ombro.areaMm2).toBeLessThan(24500);
     expect(r.braco.areaMm2).toBeGreaterThan(r.ombro.areaMm2);
   }, 60000);
 
