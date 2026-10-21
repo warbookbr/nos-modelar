@@ -1,6 +1,6 @@
 # Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** Claude, com a pessoa decidindo as três escolhas da seção de decisões
 
@@ -32,7 +32,7 @@ Uma receita descreve uma carroceria de chapa como gaiola nomeada com vincos nome
 
 ## Incluído
 
-A operação `subdivisao` promovida ao núcleo com catálogo, skill e fixture do oráculo; a interpolação; os vincos nomeados com nitidez fracionária para raio de borda; o ajudante de gaiola por estações; o passo de espessura; `tools/blender/regua.py` e `tools/blender/pacote-cego.py` com instrução de uso em `docs/mecanifica/blender/`; uma peça de prova desenhada por código, sem referência externa, que exercite vinco, arco e vão; a instrução `docs/mecanifica/modelar-carroceria.md`; o gate de vazamento; a nota em `docs/mecanifica/UPSTREAM-NOS.md`.
+A operação `subdivisao` promovida ao núcleo com catálogo, skill e fixture do oráculo; a interpolação; os vincos nomeados com nitidez fracionária para raio de borda; o ajudante de gaiola por estações; o passo de espessura; `tools/blender/regua.py` e `tools/blender/pacote-cego.py` com instrução de uso em `docs/mecanifica/blender/`; uma peça de prova desenhada por código, sem referência externa, que exercite vinco, arco e vão; uma instrução nova de modelar carroceria em `docs/mecanifica/`, ao lado da de veículos; o gate de vazamento; a nota em `docs/mecanifica/UPSTREAM-NOS.md`.
 
 ## Excluído
 
@@ -60,15 +60,15 @@ O núcleo continua sem Three.js, sem domínio automotivo e sem ferramenta extern
 4. **Gaiola por estações.** O ajudante monta a gaiola de estações e colunas nomeadas, aceita colunas que se fundem e vãos tirados por nome. Pronto quando a peça de prova sai com menos de um terço dos vértices da mesma forma em grade cheia.
 5. **Espessura.** O passo desloca a superfície pela normal e costura as bordas, com os vãos fechados por parede. Pronto quando o gate 4 passa.
 6. **Régua e pacote cego.** `tools/blender/regua.py` e `tools/blender/pacote-cego.py` saem dos scripts locais sem nenhum dado, com o recorte exato por planos, a remoção de componente solto, a visibilidade pelo lado de fora e o avesso marcado em outra cor; validados em teste que se ignora sem `MECANIFICA_BLENDER`, contra uma forma desenhada por código e sua versão decimada.
-7. **Gate de vazamento.** O teste de termos proibidos passa a ler mensagens de commit e nomes de ramo, recusa arquivo de malha ou cena no índice e passa a usar lista protegida por chave guardada como segredo do CI (decisão 3).
-8. **Prova e instrução.** A peça de prova vai à bancada e à pessoa; `modelar-carroceria.md` escreve o fluxo: vistas e ficha, gaiola por estações, vincos nomeados, espessura, régua. O trecho cego é refeito localmente e o gate 5 é medido.
+7. **Gate de vazamento.** O teste de termos proibidos passa a ler mensagens de commit e nomes de ramo, recusa arquivo de malha ou cena no índice e passa a usar a lista embaralhada com a chave do segredo do CI (decisão 3); sem a chave, o teste local diz que ela falta e o CI falha.
+8. **Prova e instrução.** A peça de prova vai à bancada e à pessoa; a instrução de modelar carroceria escreve o fluxo: vistas e ficha, gaiola por estações, vincos nomeados, espessura, régua. O trecho cego é refeito localmente e o gate 5 é medido.
 9. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`.
 
-## Decisões que dependem da pessoa
+## Decisões da pessoa
 
-1. **Ordem dos planos.** Só um plano fica ativo por vez, e o de ajustes no núcleo dos veículos ainda não começou as fatias. Recomendo ativar este primeiro: ele só acrescenta operações, nenhuma peça aprovada muda, e é ele que destrava a carroceria; o de ajustes volta logo depois.
-2. **Interpolar por padrão ou por opção.** Recomendo opção declarada, com a aproximação como padrão: a aproximação é o que o oráculo confere, e a interpolação muda o sentido do dado salvo.
-3. **Segredo do CI.** O gate de vazamento precisa de uma chave registrada pela pessoa como segredo do repositório no GitHub. Recomendo registrar antes da fatia 7; sem ela, a fatia fica com a lista local e o CI só confere o formato.
+1. **Ordem dos planos.** Aprovada em 2026-10-21: este plano fica ativo primeiro, porque só acrescenta operações e nenhuma peça aprovada muda; o de ajustes no núcleo dos veículos volta a `pronto` e é o seguinte.
+2. **Interpolar por opção.** Aprovada em 2026-10-21: a aproximação continua o padrão, que é o que o oráculo confere, e a interpolação é opção declarada, porque muda o sentido do dado salvo.
+3. **Segredo do CI.** Aprovada em 2026-10-21, porque o repositório deve ficar público: a lista de termos é embaralhada com a chave `MECANIFICA_CHAVE_TERMOS`, cadastrada pela pessoa como segredo do repositório no mesmo dia; a cópia local fica fora do repositório e a pessoa a guarda. Antes de tornar o repositório público, o histórico limpo vai para um repositório novo, porque o GitHub pode guardar commits antigos acessíveis pelo código depois de um push forçado.
 
 ## Riscos e parada
 
@@ -76,4 +76,4 @@ O risco maior é a interpolação não convergir em gaiola com vinco vivo, o que
 
 ## Andamento
 
-Escrito em 2026-10-21 a partir do estudo local, sem implementação no repositório.
+Escrito e ativado em 2026-10-21 a partir do estudo local, com as três decisões aprovadas, sem implementação no repositório.
