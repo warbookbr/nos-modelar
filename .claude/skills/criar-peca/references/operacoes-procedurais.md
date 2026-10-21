@@ -358,6 +358,53 @@ antes de subdividir para a costura sair lisa, com os vincos e cantos
 espelhados. Um vértice declarado que nenhuma face usa grita com o nome do
 ponto, e a operação não gera malha.
 
+A gaiola de uma chapa longa se escreve por estações, com `gaiolaPorEstacoes`
+de `procedural/nucleo/gaiola-por-estacoes.js`, chamada em `gerarPassos` com os
+números que `derivar()` tirou da `TABELA`. Cada estação tem nome, posição `em`
+no eixo e as colunas nomeadas em ordem, cada uma com `em: [u, v]` nos outros
+dois eixos (na ordem x, y, z) e, se preciso, um terceiro número que desloca o
+ponto ao longo do eixo. O ponto se chama `estacao_coluna`, e o ajudante devolve
+`pontos`, que entram em `PARAMS`, e `passo`, que se espalha no passo:
+
+```js
+const coluna = (nome, u, v) => ({ nome, em: [u, v] });
+const secao = (nome, em, comCintura) => ({ nome, em, colunas: [
+  coluna('soleira', P.largura, P.base),
+  ...(comCintura ? [coluna('cintura', P.saliencia, P.cintura)] : []),
+  coluna('ombro', P.largura - P.recuo, P.altura), coluna('centro', 0, P.teto),
+] });
+const lateral = gaiolaPorEstacoes({
+  eixo: 'z', simetria: 'x',
+  estacoes: [secao('frente', 0, false), secao('meio', P.meio, true), secao('pilar', P.pilar, true), secao('tras', P.comprimento, true)],
+  vincos: [{ nome: 'ombro', coluna: 'ombro', nitidez: 0.75 }, { nome: 'linhaDeCintura', coluna: 'cintura', nitidez: 'viva' }],
+  vaos: [{ nome: 'claraboia', estacoes: ['meio', 'pilar'], colunas: ['ombro', 'centro'] }],
+  medidas: [{ coluna: 'ombro' }],
+});
+// PARAMS: { ...derivados, ...lateral.pontos }; passo: ['subdivisao', { origemId: 1, ...lateral.passo, niveis: 2 }]
+```
+
+A coluna liga-se à de mesmo nome na estação anterior. A que surge entre duas
+que seguem, como `cintura` acima, começa ali e fecha um pentágono, e a que some
+termina ali; `de: ['m', 'n']` funde duas colunas da estação anterior numa só, e
+duas colunas com o mesmo `de` dividem uma em duas, cada uma fechando um
+triângulo. Assim a gaiola adensa só perto de um vinco: na forma de prova do
+teste do ajudante, a chapa com vinco vivo, ombro de nitidez 0,75, arco na borda
+e vão sai com 472 pontos de gaiola e 13.603 vértices, contra 1.596 pontos e
+48.671 vértices da mesma forma em grade cheia na densidade do vinco, e as duas
+superfícies ficam a até 4,8 mm uma da outra, 0,4 mm perto do vinco. O vão tira
+as faces entre duas estações e duas colunas, o vinco segue uma coluna
+(`coluna`, com `de` e `ate` em estações) ou uma estação (`estacao`, com `de` e
+`ate` em colunas), e `cantos` e `medidas` marcam por `{ estacao, coluna }`, em
+que só a estação marca a estação inteira e só a coluna marca a coluna inteira.
+A borda que sobra é livre, e `borda: 'cantos'` no passo mantém os cantos dela.
+A face sai com a normal no sentido (colunas) × (estações), e `virar: true`
+inverte. Com `simetria: 'x'` a gaiola é a metade `x >= 0`. Gritam com os nomes
+a coluna citada que a estação não tem, a transição impossível (ligações que se
+cruzam, a primeira ou a última coluna sem ligação e face de mais de cinco
+lados), o vão que deixa ponto sem face, o vinco sobre aresta que a fusão ou o
+vão tirou, o ponto com x < 0 na simetria e a aresta no plano x = 0 com duas
+faces.
+
 A superfície sai aberta se a gaiola for aberta,
 sem espessura, e não aceita booleana nem `filete` sobre ela. `origem` publica
 somente as faces da superfície, sem sub-endereço, porque a ordem de saída não é

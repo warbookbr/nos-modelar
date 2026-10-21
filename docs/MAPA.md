@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1536 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1539 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1075,6 +1075,8 @@
 - `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `extensoes.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
+- `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
+- `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
@@ -1108,6 +1110,10 @@
 - `tex.js` — helpers de TEXTURA do motor v3 (D-55) — paleta Resurrect64, ruído, dither e o gerador de canvas. Uma peça pode devolver índice da paleta OU [r,g,b] direto (m…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
+
+## procedural/nucleo/fixtures/
+
+- `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
 
 ## procedural/nucleo/operacoes/
 
