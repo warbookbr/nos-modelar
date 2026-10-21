@@ -302,6 +302,10 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
+          "arquivo": "docs/mecanifica/modelar-carroceria.md",
+          "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
+        },
+        {
           "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         }

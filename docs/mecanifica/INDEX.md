@@ -99,6 +99,8 @@ fontes é inventário, não porta de entrada.
 
 A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
 
+Carroceria: [`modelar-veiculos.md`](modelar-veiculos.md) e [`modelar-carroceria.md`](modelar-carroceria.md).
+
 ## Comandos principais
 
 ```text

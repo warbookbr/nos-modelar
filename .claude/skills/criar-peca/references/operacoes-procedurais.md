@@ -364,7 +364,11 @@ números que `derivar()` tirou da `TABELA`. Cada estação tem nome, posição `
 no eixo e as colunas nomeadas em ordem, cada uma com `em: [u, v]` nos outros
 dois eixos (na ordem x, y, z) e, se preciso, um terceiro número que desloca o
 ponto ao longo do eixo. O ponto se chama `estacao_coluna`, e o ajudante devolve
-`pontos`, que entram em `PARAMS`, e `passo`, que se espalha no passo:
+`pontos`, que a receita publica num getter de `TOPO` calculado de `this.PARAMS`,
+e `passo`, que se espalha no passo. Em `PARAMS` os pontos ficariam fixos desde a
+carga do módulo, e mudar a `TABELA` não moveria a gaiola; o exemplo completo é
+`procedural/pecas/carenagem-de-prova/`, e o fluxo está em
+`docs/mecanifica/modelar-carroceria.md`:
 
 ```js
 const coluna = (nome, u, v) => ({ nome, em: [u, v] });
@@ -380,7 +384,7 @@ const lateral = gaiolaPorEstacoes({
   vaos: [{ nome: 'claraboia', estacoes: ['meio', 'pilar'], colunas: ['ombro', 'centro'] }],
   medidas: [{ coluna: 'ombro' }],
 });
-// PARAMS: { ...derivados, ...lateral.pontos }; passo: ['subdivisao', { origemId: 1, ...lateral.passo, niveis: 2 }]
+// get TOPO() { return { origem, ...lateral.pontos }; }; passo: ['subdivisao', { origemId: 1, ...lateral.passo, niveis: 2 }]
 ```
 
 A coluna liga-se à de mesmo nome na estação anterior. A que surge entre duas

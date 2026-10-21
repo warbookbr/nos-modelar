@@ -117,6 +117,7 @@ Abrir só quando a condição aparecer:
 - `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 - `docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
+- `docs/mecanifica/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 
 Skill: `criar-peca`.
