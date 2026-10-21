@@ -5,13 +5,14 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1539 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1544 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
 - `AGENTS.md` — Mecanifica — instruções para agentes
 - `CLAUDE.md` — Mecanifica — acordo de trabalho
 - `README.md` — Mecanifica
+- `THIRD-PARTY-NOTICES.md` — Avisos de terceiros
 - `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
 - `comunicacao.md` — Comunicação entre IAs
 - `vite.config.js` — vite.config.js — build estático da BANCADA de autoria, publicada em warbookbr/nos-mecanifica no GitHub Pages. O produto que o cliente abre vive em warbookbr/…
@@ -345,44 +346,44 @@
 - `levantamento-do-repo-externo.md` — O que o repositório do projeto externo da pessoa tem de objetos extraídos
 - `receita_para_esboco.mjs` — Sonda: receita externo (repositório externo da pessoa) -> .esboco.json do Mecanifica. receita: x leste, y norte, z cima, metros, frente = -y. esboço: y cima,…
 - `triagem.md` — Triagem das 66 receitas por família candidata
-- `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolv…
+- `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolve…
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/cadeiras-ajustadas/
 
 - `README.md` — Cadeiras ajustadas (2026-10-19)
-- `cadeira_fibra_azul.md` — cadeira_fibra_azul: ajustes de construção
-- `cadeira_ripada_marrom.md` — cadeira_ripada_marrom: ajustes de construção
-- `cadeira_larga_estofada_clara.md` — cadeira_larga_estofada_clara: ajustes de construção
-- `cadeira_desgastada_madeira.md` — cadeira_desgastada_madeira: ajustes sobre a folha alinhada
-- `cadeira_fibra_roxa.md` — cadeira_fibra_roxa: ajustes de construção
+- `cadeira_almofadada_clara.md` — cadeira_almofadada_clara: ajustes
+- `cadeira_basica_clara.md` — cadeira_basica_clara: relato dos ajustes
 - `cadeira_classica_creme.md` — cadeira_classica_creme: ajustes de construção
 - `cadeira_classica_vinho.md` — cadeira_classica_vinho: ajustes de construção
-- `cadeira_basica_clara.md` — cadeira_basica_clara: relato dos ajustes
-- `cadeira_almofadada_clara.md` — cadeira_almofadada_clara: ajustes
-- `cadeira_ripada_simples.md` — cadeira_ripada_simples: ajustes de construção
+- `cadeira_desgastada_madeira.md` — cadeira_desgastada_madeira: ajustes sobre a folha alinhada
+- `cadeira_fibra_azul.md` — cadeira_fibra_azul: ajustes de construção
+- `cadeira_fibra_roxa.md` — cadeira_fibra_roxa: ajustes de construção
 - `cadeira_larga_estofada_amarela.md` — cadeira_larga_estofada_amarela: ajustes de construção
+- `cadeira_larga_estofada_clara.md` — cadeira_larga_estofada_clara: ajustes de construção
+- `cadeira_ripada_marrom.md` — cadeira_ripada_marrom: ajustes de construção
+- `cadeira_ripada_simples.md` — cadeira_ripada_simples: ajustes de construção
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/defeitos-marcados/
 
 - `README.md` — Defeitos marcados nas cadeiras (2026-10-19)
-- `cadeira_fibra_azul.md` — Defeitos marcados em cadeira_fibra_azul
-- `cadeira_ripada_marrom.md` — Defeitos marcados em cadeira_ripada_marrom
-- `cadeira_larga_estofada_clara.md` — Defeitos marcados em cadeira_larga_estofada_clara
-- `cadeira_desgastada_madeira.md` — Defeitos marcados em cadeira_desgastada_madeira
-- `cadeira_fibra_roxa.md` — Defeitos marcados em cadeira_fibra_roxa
+- `cadeira_almofadada_clara.md` — Defeitos marcados em cadeira_almofadada_clara
+- `cadeira_basica_clara.md` — Defeitos marcados em cadeira_basica_clara
 - `cadeira_classica_creme.md` — Defeitos marcados em cadeira_classica_creme
 - `cadeira_classica_vinho.md` — Defeitos marcados em cadeira_classica_vinho
-- `cadeira_basica_clara.md` — Defeitos marcados em cadeira_basica_clara
-- `cadeira_almofadada_clara.md` — Defeitos marcados em cadeira_almofadada_clara
-- `cadeira_ripada_simples.md` — Defeitos marcados em cadeira_ripada_simples
+- `cadeira_desgastada_madeira.md` — Defeitos marcados em cadeira_desgastada_madeira
+- `cadeira_fibra_azul.md` — Defeitos marcados em cadeira_fibra_azul
+- `cadeira_fibra_roxa.md` — Defeitos marcados em cadeira_fibra_roxa
 - `cadeira_larga_estofada_amarela.md` — Defeitos marcados em cadeira_larga_estofada_amarela
+- `cadeira_larga_estofada_clara.md` — Defeitos marcados em cadeira_larga_estofada_clara
+- `cadeira_ripada_marrom.md` — Defeitos marcados em cadeira_ripada_marrom
+- `cadeira_ripada_simples.md` — Defeitos marcados em cadeira_ripada_simples
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/
 
 - `RELATORIO.md` — cadeira_ripada_simples: remodelagem em PASSOS
-- `cadeira_ripada_simples.receita.mjs` — cadeira_ripada_simples.receita.mjs — cadeira de madeira simples (4 pernas, assento, saia, 2 postes de encosto, travessa alta e baixa, 5 ripas), remodelada do zero em P…
-- `conferir.mjs` — conferir.mjs — executa a receita de cadeira_ripada_simples pelo executor do repositório e confere: (a) caixa total contra o alvo, (b) simetria esquerda/direita, (c) po…
-- `vistas.mjs` — vistas.mjs — as seis vistas de cadeira_ripada_simples (isométricas frente-direita, trás-esquerda e frente-esquerda, frontal, lateral direita e superior) em cadeira_ripada_simples…
+- `cadeira_ripada_simples.receita.mjs` — cadeira_ripada_simples.receita.mjs — cadeira de madeira simples (4 pernas, assento, saia, 2 postes de encosto, travessa alta e baixa, 5 ripas), remodelada do…
+- `conferir.mjs` — conferir.mjs — executa a receita de cadeira_ripada_simples pelo executor do repositório e confere: (a) caixa total contra o alvo, (b) simetria esquerda/direi…
+- `vistas.mjs` — vistas.mjs — as seis vistas de cadeira_ripada_simples (isométricas frente-direita, trás-esquerda e frente-esquerda, frontal, lateral direita e superior) em c…
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/sonda-passos/
 
@@ -1869,6 +1870,7 @@
 
 ## tools/arquitetura/
 
+- `avisos-de-terceiros.test.mjs` — avisos-de-terceiros.test.mjs — toda dependência de runtime que entra no pacote da bancada tem seção em THIRD-PARTY-NOTICES.md, e o build a copia para `dist/`…
 - `fronteira-da-bancada.mjs` — fronteira-da-bancada.mjs — a bancada é um módulo, não o centro do projeto.
 - `imagem-pesada-no-git.test.mjs` — imagem-pesada-no-git.test.mjs — nenhuma imagem rastreada passa de 3 MB: o git guarda para sempre o que entra, e agentes despachados já deixaram 26 MB de amos…
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
@@ -1878,9 +1880,12 @@
 - `navegador-sem-node.test.mjs` — navegador-sem-node.test.mjs — o código que a bancada publicada empacota não importa módulo do Node. Em 2026-10-15 as famílias `movel-de-caixa`, `dobradica` e…
 - `nucleo-sem-three.mjs` — nucleo-sem-three.mjs — o núcleo de autoria é independente de Three.js.
 - `nucleo-sem-three.test.mjs` — nucleo-sem-three.test.mjs — o invariante "o núcleo de autoria é independente de Three.js", conferido por máquina: o núcleo real não importa Three.js, e um ar…
+- `termos-proibidos.mjs` — termos-proibidos.mjs — normalização e varredura do gate de termos proibidos.
+- `termos-proibidos.test.mjs` — termos-proibidos.test.mjs — o repositório não recebe menção aos termos da lista de hashes. A lista (`termos-proibidos.hashes.json`) guarda só sha256, e a men…
 
 ## tools/bancadas/
 
+- `avisos-de-terceiros.mjs` — avisos-de-terceiros.mjs — o pacote da bancada leva o texto das licenças das bibliotecas que empacota.
 - `criar-aliases.test.mjs` — criar-aliases.test.mjs — impede que a bancada criar volte a diagnosticar como órfã uma peça válida por esquecer o sexto campo do envelope: ALIASES.
 - `criar.mjs` — criar.mjs — P7 do playground (D-120): A CAMADA IA, laço único.
 - `estado-peca.mjs` — estado-peca.mjs — executa o envelope completo de uma peça procedural para que bancadas distintas não percam MATERIAIS, ESQUELETO ou ALIASES.
@@ -2280,7 +2285,7 @@
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
 - `esboco-para-andaime.test.mjs` — A prova do tradutor do nível zero sobre os esboços do módulo e do banco de provas: o andaime é aceito por `normalizarAndaimeGlobal`, a blocagem compila e fec…
 - `esboco-para-passos.mjs` — esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Mecanifica (`cubo`, `chamferBox`, `cilindro`, `extrusao`, `rotaciona` e …
-- `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núc…
+- `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núcl…
 - `esboco-proximo-mede-antes.test.mjs` — O --proximo do esboço só gera o brief do crítico depois das medidas do plano aprovadas, as em milímetro e as razões. O brief do objeto inteiro sai quando o P…
 - `esboco-recorte-no-andaime.test.mjs` — O recorte (`subtrai`) na blocagem do nível zero: a N2 não subtrai um volume de outro, então a forma recortada vai ao andaime inteira e a perda entra no relat…
 - `esboco-recusa.mjs` — Para onde cada recusa do esboço aponta: a mensagem "esboço recusado: ...", o gate de contato que reprova e o Portão do Condutor que não passa ganham no fim `…
@@ -2352,7 +2357,7 @@
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
 - `ombro-uniao.test.ts` — ombro-uniao.test.ts — a rodada do ombro do plano "União de sólidos": a união e o arredondamento sobre superfícies CURVAS facetadas. A fixture (`fixtures/fixt…
-- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente escrev…
+- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente e…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
@@ -2369,11 +2374,11 @@
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
+- `receita-externa-medida.mjs` — Mede a tradução da receita do externo sobre uma pasta de receitas já expandidas (os espelhos aplicados pelo `externo/receita.py::expandir`). Uso: node tools/…
+- `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e o…
+- `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `receita-planejada.mjs` — receita-planejada.mjs — grava a receita planejada de uma peça a partir de uma unidade do esboço aprovado.
 - `receita-planejada.test.mjs` — receita-planejada.test.mjs — a receita planejada que o comando grava a partir de uma unidade do esboço.
-- `receita-externa-medida.mjs` — Mede a tradução da receita do externo sobre uma pasta de receitas já expandidas (os espelhos aplicados pelo `externo/receita.py::expandir`). Uso: node tools…
-- `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e …
-- `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma…
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
@@ -2428,9 +2433,9 @@
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.
 
-## tools/mecanifica/fixtures/importar-csg/corpus/
+## tools/mecanifica/fixtures/contorno-da-imagem/
 
-- `FONTE.md` — Fonte do corpus real do importador de `.csg`
+- `braco-sintetico.mjs` — braco-sintetico.mjs — as duas imagens sintéticas, desenhadas por código, com que o teste do contorno da imagem prova a ferramenta: uma vista lateral de um br…
 
 ## tools/mecanifica/fixtures/importar-step/
 
