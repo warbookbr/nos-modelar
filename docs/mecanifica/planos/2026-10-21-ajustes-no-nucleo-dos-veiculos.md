@@ -4,7 +4,7 @@
 
 **Responsável:** Claude, com a pessoa decidindo as quatro escolhas da seção de decisões
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, ramo `claude/revisar-plano-ativo-cyj8c3`, igual à main em `dcbb265`
+**Repositório e base:** `warbookbr/nos-modelar`, main em `8f33c169` (o retrato de antes é tirado dessa base)
 
 ## Problema observado
 

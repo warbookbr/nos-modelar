@@ -1,0 +1,79 @@
+# Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
+
+**Estado:** pronto
+
+**Responsável:** Claude, com a pessoa decidindo as três escolhas da seção de decisões
+
+**Repositório e base:** `warbookbr/nos-modelar`, main em `8f33c169`
+
+## Problema observado
+
+O núcleo modela bem peça de bloco, por extrusão, interseção de vistas, loft fechado e booleana, mas não tem como descrever uma carroceria de chapa contínua com dobras vivas, que é como se modela à mão a superfície hard surface: uma gaiola de quads de poucas centenas de pontos, vincos marcados e a superfície lisa que sai da subdivisão. Um estudo local em 2026-10-21, fora do repositório, modelou trechos de carroceria a partir só de vistas ortográficas com grade e de uma ficha de medidas, sem acesso a malha, e comparou cinco representações. A interseção de vistas saiu facetada; o loft por parâmetros nomeados e a subdivisão Catmull-Clark com vincos acertaram o volume no mesmo nível; e só a subdivisão deu superfície lisa sem remendo de lofts. Num segundo trecho, totalmente cego, o modelador escolheu sozinho a subdivisão e montou a estrutura da receita. Nos dois trechos o volume ficou certo e as linhas vincadas não: menos de um quinto delas coincidiu a até 5 mm, o mesmo que uma malha reduzida a um vigésimo dos vértices.
+
+O estudo deixou uma operação `subdivisao` experimental, conferida contra o modificador Subdivision Surface do Blender a 1,5e-7 m em 16 gaiolas desenhadas por código, e cinco atritos que o modelador relatou e que são do núcleo, não da leitura das imagens:
+
+| Atrito | Consequência | O processo pegaria? |
+|---|---|---|
+| a subdivisão aproxima e não passa pelos pontos da gaiola | toda medida da TABELA sai encolhida, e o canto de borda não tem raio controlado | não: a peça exporta sem erro |
+| vinco declarado por índice de aresta | índice de array vira endereço salvo, contra a regra do `CLAUDE.md`, e mudar a gaiola desloca os vincos | não |
+| a gaiola em grade adensa a peça inteira para adensar perto de um vinco | dez vezes mais vértices que o necessário (35 mil na meia peça) | não |
+| vértice de gaiola sem face vira órfão na saída | a receita compacta a gaiola à mão | sim, `neutro.orfaos` acusa |
+| superfície sem espessura | não fecha sólido para contato, volume e exportação de peça | sim, `conferir-malha` acusa casca aberta |
+
+A régua que mediu o estudo (distância nos dois sentidos só do que se vê de fora, erro de normais, casamento de vincos e folha com listras de reflexo) e o preparo do pacote cego (recorte exato pelos planos de uma caixa, vistas com grade, avesso marcado) ficaram em scripts locais. Dois defeitos deles só foram vistos pela pessoa: o recorte por triângulo inteiro deixava lascas no alvo, e a vista que olha a chapa por dentro mostrava o avesso como se fosse a superfície.
+
+## Resultado
+
+Uma receita descreve uma carroceria de chapa como gaiola nomeada com vincos nomeados, a superfície passa pelos pontos declarados e fecha sólido com espessura, e a régua geral do repositório mede vincos, distância e normais entre duas malhas quaisquer, de modo que um trecho cego refeito com o núcleo novo acerta mais linhas vincadas que antes, medido pela mesma régua.
+
+## Filtro Agent-First
+
+`subdivisao` é USAR DIRETO: passo do núcleo, determinístico, sem Three.js, com a gaiola e os vincos como dados da receita. A interpolação é REFATORAR da operação: uma opção declarada que resolve a gaiola para que a superfície limite passe pelos pontos dados, em número fixo de iterações, para continuar bit a bit. Os vincos por nome e a gaiola por estações são ENVOLVER: um ajudante em `procedural/nucleo/` monta a gaiola a partir de estações e colunas nomeadas, aceita colunas que se fundem (polígono de três ou cinco lados na transição) e traduz vinco nomeado em arestas, sem que a receita veja índice. A espessura é USAR DIRETO como passo novo sobre superfície aberta. A régua e o pacote cego são ENVOLVER do Blender, em `tools/blender/`, opcionais e fora do núcleo, do CI e do `--completo`, como o gabarito do plano de ajustes. O loft de chapa aberta fica ADIAR: a subdivisão cobre o caso, e o pedido volta ao backlog.
+
+## Incluído
+
+A operação `subdivisao` promovida ao núcleo com catálogo, skill e fixture do oráculo; a interpolação; os vincos nomeados com nitidez fracionária para raio de borda; o ajudante de gaiola por estações; o passo de espessura; `tools/blender/regua.py` e `tools/blender/pacote-cego.py` com instrução de uso em `docs/mecanifica/blender/`; uma peça de prova desenhada por código, sem referência externa, que exercite vinco, arco e vão; a instrução `docs/mecanifica/modelar-carroceria.md`; o gate de vazamento; a nota em `docs/mecanifica/UPSTREAM-NOS.md`.
+
+## Excluído
+
+Modelar o carro inteiro, que é plano próprio depois deste; o loft de chapa aberta; superfície NURBS; booleana sobre superfície subdividida; mudança em peça aprovada do acervo; qualquer malha, imagem, medida ou nome tirado de referência externa dentro do repositório.
+
+## Invariantes
+
+O núcleo continua sem Three.js, sem domínio automotivo e sem ferramenta externa. Mesma receita, mesma malha, bit a bit. Nenhum índice de vértice, aresta ou face vira identidade salva: gaiola, estações, colunas e vincos são endereçados por nome. As 53 peças do acervo regeneram iguais, porque nenhuma usa a operação. O Blender fica só como oráculo congelado em fixture e como ferramenta opcional local.
+
+## Gate de saída
+
+1. `subdivisao` confere com o oráculo congelado a 1e-6 m em todas as gaiolas da fixture, com e sem vincos inteiros e fracionários.
+2. Com `interpolar`, cada ponto declarado da gaiola fica a no máximo 1e-6 m da superfície limite, nas gaiolas da fixture e na peça de prova.
+3. A receita da peça de prova não contém índice numérico de aresta, vértice ou face, e o teste confere.
+4. A peça de prova com espessura sai fechada em `conferir-malha`, com volume igual à área vezes a espessura a 2%.
+5. Um trecho cego refeito localmente, fora do repositório, com o mesmo pacote e a mesma régua do estudo, sobe o F1 dos vincos a 5 mm em relação ao registrado no estudo; a folha vai à pessoa, que aprova a forma.
+6. O gate de vazamento recusa, em teste, arquivo de malha ou cena, mensagem de commit e nome de ramo com termo da lista protegida.
+7. `npm run gates -- --completo` verde.
+
+## Fatias
+
+1. **Promover a subdivisão.** A operação experimental do estudo entra com a fixture do oráculo de 16 gaiolas desenhadas por código, o catálogo, `uso-operacoes.js` e `.claude/skills/criar-peca/references/operacoes-procedurais.md`. Vértice de gaiola sem face passa a gritar com o nome do ponto, no lugar de virar órfão. Pronto quando o gate 1 passa e o teste do catálogo e o da skill listam a operação.
+2. **Interpolação.** A opção `interpolar` corrige a gaiola por iteração fixa de ponto limite até a superfície passar pelos pontos declarados (decisão 2). Pronto quando o gate 2 passa e duas execuções dão a mesma malha bit a bit.
+3. **Vincos nomeados e raio de borda.** O vinco se declara como sequência de pontos nomeados da gaiola com nitidez de 0 a 1; a fração dá o raio de borda. O oráculo ganha gaiolas com vinco fracionário. Pronto quando os gates 1 e 3 passam para essas gaiolas.
+4. **Gaiola por estações.** O ajudante monta a gaiola de estações e colunas nomeadas, aceita colunas que se fundem e vãos tirados por nome. Pronto quando a peça de prova sai com menos de um terço dos vértices da mesma forma em grade cheia.
+5. **Espessura.** O passo desloca a superfície pela normal e costura as bordas, com os vãos fechados por parede. Pronto quando o gate 4 passa.
+6. **Régua e pacote cego.** `tools/blender/regua.py` e `tools/blender/pacote-cego.py` saem dos scripts locais sem nenhum dado, com o recorte exato por planos, a remoção de componente solto, a visibilidade pelo lado de fora e o avesso marcado em outra cor; validados em teste que se ignora sem `MECANIFICA_BLENDER`, contra uma forma desenhada por código e sua versão decimada.
+7. **Gate de vazamento.** O teste de termos proibidos passa a ler mensagens de commit e nomes de ramo, recusa arquivo de malha ou cena no índice e passa a usar lista protegida por chave guardada como segredo do CI (decisão 3).
+8. **Prova e instrução.** A peça de prova vai à bancada e à pessoa; `modelar-carroceria.md` escreve o fluxo: vistas e ficha, gaiola por estações, vincos nomeados, espessura, régua. O trecho cego é refeito localmente e o gate 5 é medido.
+9. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`.
+
+## Decisões que dependem da pessoa
+
+1. **Ordem dos planos.** Só um plano fica ativo por vez, e o de ajustes no núcleo dos veículos ainda não começou as fatias. Recomendo ativar este primeiro: ele só acrescenta operações, nenhuma peça aprovada muda, e é ele que destrava a carroceria; o de ajustes volta logo depois.
+2. **Interpolar por padrão ou por opção.** Recomendo opção declarada, com a aproximação como padrão: a aproximação é o que o oráculo confere, e a interpolação muda o sentido do dado salvo.
+3. **Segredo do CI.** O gate de vazamento precisa de uma chave registrada pela pessoa como segredo do repositório no GitHub. Recomendo registrar antes da fatia 7; sem ela, a fatia fica com a lista local e o CI só confere o formato.
+
+## Riscos e parada
+
+O risco maior é a interpolação não convergir em gaiola com vinco vivo, o que tornaria a medida da TABELA inexata justamente nas quinas; a fatia 2 para e volta à pessoa se o gate 2 não fechar em 20 iterações. Também para se uma fatia passar de dois dias, se o núcleo precisar de dependência externa ou se o trecho cego refeito não subir os vincos, caso em que o investimento muda para a conversão assistida.
+
+## Andamento
+
+Escrito em 2026-10-21 a partir do estudo local, sem implementação no repositório.
