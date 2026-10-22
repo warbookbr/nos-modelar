@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:f7fa8ace14b3169d879afd604bf807cdc292197cf7e630f9917046c3bd7dd199",
-  "total": 38,
+  "assinatura": "sha256:8cf74923c8b1f925a4de8e42d346c338267aa3b36487f9f0b9c211a74f4e093c",
+  "total": 39,
   "operacoes": [
     {
       "id": "mecanifica.operacao.apagaFace",
@@ -1803,6 +1803,249 @@
           "Não é arredondamento multi-painel. O canto de duas arestas chanfradas fecha em esquadria; o de três é recusado, porque o vértice triplo pede um número par de painéis.",
           "Numa tampa partida (grupo de faces coplanares) o recuo é conferido contra todos os vértices do grupo e recusa quando não cabe; o canto em leque, a peça de tampa que fica côncava e a ponta oblíqua seguem as regras do `arredondarAresta`.",
           "Com sel, a face de apoio é a de menor id entre as que usam a aresta."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.friso",
+      "nome": "friso",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.friso@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "linha",
+            "perfil"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "linha": {
+              "type": "object",
+              "description": "Linha nomeada {nome, pontos}. Com superficie, pontos são nomes de ponto da gaiola em sequência ao longo das arestas, como no vinco; sem ela, nomes de ponto de PARAMS/TOPO ou [x,y,z]. Repita o primeiro ponto no fim para fechar a volta."
+            },
+            "superficie": {
+              "type": "object",
+              "description": "Origem {op:'subdivisao', id} de um passo anterior: a linha segue os vértices da malha dele sobre as arestas da gaiola (no ponto limite quando ele tem medidas), e v segue a normal da face de fora da chapa."
+            },
+            "normal": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Só na polilinha, sem superficie: a direção para onde v aponta em todos os pontos."
+            },
+            "perfil": {
+              "anyOf": [
+                {
+                  "type": "array"
+                },
+                {
+                  "type": "object"
+                }
+              ],
+              "description": "Perfil [u, v] em metros: v pela normal, com v = 0 na linha, e u para a esquerda de quem segue a linha; lista de pontos, {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno}. Na chapa com espessura, a parte de v negativo entra nela, menos que a espessura."
+            },
+            "ponta": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              ],
+              "description": "'aberta' (padrão: tampa plana), 'fechada' (o perfil encolhe em quarto de elipse até um ponto da linha) ou [inicio, fim]; a volta fechada não tem ponta."
+            },
+            "fechamento": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Com ponta 'fechada': o comprimento ao longo da linha em que o perfil encolhe; o padrão é a largura do perfil."
+            },
+            "segmentosArco": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por quarto de volta no círculo e nos cantos arredondados do perfil (padrão 4)."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "subdivisao",
+              {
+                "origemId": 1,
+                "vertices": [
+                  "g00",
+                  "g01",
+                  "g02",
+                  "g10",
+                  "g11",
+                  "g12",
+                  "g20",
+                  "g21",
+                  "g22"
+                ],
+                "faces": [
+                  [
+                    "g00",
+                    "g01",
+                    "g11",
+                    "g10"
+                  ],
+                  [
+                    "g01",
+                    "g02",
+                    "g12",
+                    "g11"
+                  ],
+                  [
+                    "g10",
+                    "g11",
+                    "g21",
+                    "g20"
+                  ],
+                  [
+                    "g11",
+                    "g12",
+                    "g22",
+                    "g21"
+                  ]
+                ],
+                "niveis": 1,
+                "espessura": 0.002
+              }
+            ],
+            [
+              "friso",
+              {
+                "origemId": 2,
+                "superficie": {
+                  "op": "subdivisao",
+                  "id": 1
+                },
+                "linha": {
+                  "nome": "nervura",
+                  "pontos": [
+                    "g01",
+                    "g11",
+                    "g21"
+                  ]
+                },
+                "perfil": {
+                  "retangulo": {
+                    "largura": 0.006,
+                    "profundidade": 0.004,
+                    "centro": [
+                      0,
+                      0.001
+                    ]
+                  }
+                }
+              }
+            ]
+          ],
+          "PARAMS": {
+            "g00": [
+              0,
+              0,
+              0
+            ],
+            "g01": [
+              0,
+              0,
+              0.1
+            ],
+            "g02": [
+              0,
+              0,
+              0.2
+            ],
+            "g10": [
+              0.1,
+              0,
+              0
+            ],
+            "g11": [
+              0.1,
+              0.01,
+              0.1
+            ],
+            "g12": [
+              0.1,
+              0,
+              0.2
+            ],
+            "g20": [
+              0.2,
+              0,
+              0
+            ],
+            "g21": [
+              0.2,
+              0,
+              0.1
+            ],
+            "g22": [
+              0.2,
+              0,
+              0.2
+            ]
+          },
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Com superficie, o passo subdivisao citado vem antes e gerou malha, e cada par seguido da linha é aresta da gaiola dele.",
+          "Sem superficie, a polilinha declara normal."
+        ],
+        "limites": [
+          "O friso é sólido fechado próprio, que interpenetra a chapa pela parte de v negativo; a receita nomeia as partes e declara o contato (contatos), que contatosDaPeca mede. Não há fusão por booleana com a superfície subdividida.",
+          "Sobre a superfície, a linha segue só arestas da gaiola, e cada trecho entre dois vértices da malha é corda da chapa: com medidas, os vértices estão na superfície limite e a corda se afasta dela cerca de passo² / (8 × raio).",
+          "Na chapa com espessura, o perfil sem parte abaixo de v = 0 e o que entra mais que a espessura gritam; a folga entre a base reta do perfil e a chapa que curva de lado (cerca de curvatura × (largura/2)² / 2) não é conferida pelo passo, e o perfil precisa entrar mais que ela.",
+          "Cada junta põe o perfil no plano bissetor e o estica pela esquadria; a curva fechada demais para a largura do perfil grita com o ponto da gaiola mais perto. Partes distantes do friso que se cruzam não são conferidas.",
+          "Na simetria em x da superfície, a linha que toca o plano x = 0 numa ponta continua na imagem espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia espelhada; o perfil assimétrico emendado pela costura não fica espelhado.",
+          "origem publica as faces sem sub-endereço por posição; parte: 'lateral' cita a superfície varrida e 'pontas' as tampas das pontas abertas."
         ],
         "diagnosticos": []
       }

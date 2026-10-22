@@ -46,7 +46,7 @@ Nomes semânticos sempre: `origemId`, `ALIASES`, `parte`, `publicarPorta`.
 Identidade persistida nunca é índice nem posição de passo. `sel:{alias:...}` é
 nome de seleção, não nome de parte.
 
-<!-- operacoes-com-origem: arranja, arredondarAresta, arredondarCostura, casca, chamferBox, chapaDobrada, cilindro, cone, cubo, esfera, espelha, extrusao, filete, furo, inflate, intersectar, lathe, loft, plano, subdivisao, subtrair, unir -->
+<!-- operacoes-com-origem: arranja, arredondarAresta, arredondarCostura, casca, chamferBox, chapaDobrada, cilindro, cone, cubo, esfera, espelha, extrusao, filete, friso, furo, inflate, intersectar, lathe, loft, plano, subdivisao, subtrair, unir -->
 
 As operações que publicam `origem` aceitam endereçamento estrutural conforme
 [`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
@@ -92,8 +92,8 @@ então troque `PARAMS`; `{...receita}` avalia o getter com a tabela velha e o
 número novo não tem efeito.
 
 `meta.colisao`, `colisaoDe` e `solido` são compatibilidade opcionais para
-consumidores v3, e não requisito. Quando a peça exporta `ALIASES`, eles vão para
-`colisaoDe` e para `executar`.
+consumidores v3. Quando a peça exporta `ALIASES`, eles vão para `colisaoDe` e
+para `executar`.
 
 ## Ver e medir
 

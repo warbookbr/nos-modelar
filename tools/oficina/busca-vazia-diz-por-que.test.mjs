@@ -12,22 +12,32 @@ import { criarServicoDescobertaProcedural } from '../../procedural/servicos/desc
 const servico = criarServicoDescobertaProcedural();
 
 describe('busca de capacidade que volta vazia', () => {
+  /* 'tubo' entrou no índice com a operação friso, em 2026-10-22; a palavra fora
+     do índice do caso passou a ser 'mangueira'. */
   it('explica que a frase é casada inteira, e diz qual palavra acha sozinha', () => {
-    const r = servico.buscar({ texto: 'tubo cilindro caminho' });
+    const r = servico.buscar({ texto: 'mangueira cilindro caminho' });
     expect(r.total).toBe(0);
     expect(r.diagnostico.motivo).toBe('texto-casa-como-frase-inteira');
 
     const porTermo = Object.fromEntries(r.diagnostico.termos.map(({ termo, operacoes }) => [termo, operacoes]));
-    expect(porTermo).toEqual({ tubo: 0, cilindro: 1, caminho: 1 });
+    expect(porTermo).toEqual({ mangueira: 0, cilindro: 1, caminho: 1 });
     expect(r.diagnostico.sugestao).toBe('cilindro');
     expect(r.diagnostico.explicacao).toContain('frase única');
-    expect(r.diagnostico.explicacao).toContain("'tubo' não está no índice");
+    expect(r.diagnostico.explicacao).toContain("'mangueira' não está no índice");
+  });
+
+  it('quando toda palavra acha algo sozinha, não cita palavra fora do índice', () => {
+    const r = servico.buscar({ texto: 'tubo cilindro caminho' });
+    expect(r.total).toBe(0);
+    expect(r.diagnostico.termos.every(({ operacoes }) => operacoes > 0)).toBe(true);
+    expect(r.diagnostico.explicacao).not.toContain('não está no índice');
+    expect(r.diagnostico.explicacao).toMatch(/'caminho' acha 1\.$/);
   });
 
   it('a sugestão funciona de verdade quando seguida', () => {
     /* Sugestão que não achasse nada seria pior que silêncio: mandaria a próxima
        rodada para o mesmo lugar com confiança. */
-    const vazia = servico.buscar({ texto: 'tubo cilindro caminho' });
+    const vazia = servico.buscar({ texto: 'mangueira cilindro caminho' });
     const seguindo = servico.buscar({ texto: vazia.diagnostico.sugestao });
     expect(seguindo.total).toBeGreaterThan(0);
     expect(seguindo.diagnostico).toBeNull();

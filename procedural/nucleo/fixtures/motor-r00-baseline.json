@@ -39,7 +39,8 @@
     "material",
     "parte",
     "pesar",
-    "subdivisao"
+    "subdivisao",
+    "friso"
   ],
   "casos": [
     {
@@ -420,6 +421,16 @@
       "hashCanonico": "b76b133d5904c315b8b9c18e7cabdfdd64b13a5ca7f9bcfdd0a506ef27f1f470",
       "vertices": 9,
       "faces": 4,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/friso",
+      "operacoes": [
+        "friso"
+      ],
+      "hashCanonico": "78cb1ec93e4f3d40614cc750c58604e9d487429a52925470578d6abbb8794adf",
+      "vertices": 70,
+      "faces": 68,
       "diagnosticos": 0
     }
   ]

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1556 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1559 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -484,8 +484,6 @@
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
-- `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
-- `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
 - `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
 - `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
 - `BACKLOG.md` — Backlog aberto
@@ -1082,6 +1080,9 @@
 - `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `extensoes.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
+- `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão: na chapa curva com vão de `fixtures/friso-prova.js`, …
+- `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
+- `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
 - `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
 - `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
@@ -1120,6 +1121,7 @@
 
 ## procedural/nucleo/fixtures/
 
+- `friso-prova.js` — friso-prova.js — a chapa curva com vão e os frisos desenhados por código para o teste do passo `friso`.
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 
@@ -1148,6 +1150,7 @@
 - `estouro-de-bloco.test.ts` — estouro-de-bloco.test.ts — nenhum passo que passa de BLOCO ids lança erro: espelha, arranja, furo e os geradores com lados:{desvio} continuam na faixa estend…
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `extrusao-de-perfil.test.ts` — extrusao-de-perfil.test.ts — `extrusao` e o `lathe` com `furos` e `deslocar`: perfil 2D com furo e deslocamento de contorno, levantado ou revolucionado em só…
+- `friso.js` — friso.js (operação) — nervura, tubo ou friso que segue uma linha nomeada, com perfil declarado. A linha é uma sequência de pontos nomeados da gaiola de um pa…
 - `furo-raio-por-grupo.test.ts` — furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode declarar raio e, em furo cego, profundidade próprios, e receber um nome semântico pa…
 - `geradores-avancados.js` — geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.

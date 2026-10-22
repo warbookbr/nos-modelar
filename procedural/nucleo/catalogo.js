@@ -130,14 +130,17 @@ function diagnosticarBuscaVazia(catalogo, filtros) {
     operacoes: buscarCapacidades(catalogo, { texto: termo }).total,
   }));
   const acham = porTermo.filter(({ operacoes }) => operacoes > 0);
+  /* Quando toda palavra acha algo sozinha, não há palavra fora do índice para citar; antes a frase terminava em
+     "; não está no índice." sem nome nenhum. */
+  const ausentes = porTermo.filter(({ operacoes }) => operacoes === 0).map(({ termo }) => `'${termo}'`);
   return {
     motivo: 'texto-casa-como-frase-inteira',
     termos: porTermo,
     sugestao: acham.length ? acham[0].termo : null,
     explicacao: acham.length
       ? `'${filtros.texto}' é procurado como frase única, não como conjunto de palavras.`
-        + ` Sozinho(s), ${acham.map(({ termo, operacoes }) => `'${termo}' acha ${operacoes}`).join(', ')};`
-        + ` ${porTermo.filter(({ operacoes }) => operacoes === 0).map(({ termo }) => `'${termo}'`).join(', ')} não está no índice.`
+        + ` Sozinho(s), ${acham.map(({ termo, operacoes }) => `'${termo}' acha ${operacoes}`).join(', ')}`
+        + (ausentes.length ? `; ${ausentes.join(', ')} não está no índice.` : '.')
       : `nenhuma das palavras de '${filtros.texto}' está no índice, nem sozinha.`,
   };
 }

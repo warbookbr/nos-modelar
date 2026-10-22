@@ -441,6 +441,57 @@ por posição, porque a ordem de saída não é identidade; com espessura,
 `parte: 'externa'`, `'interna'` ou `'borda'` cita cada grupo, como na casca.
 A superfície não aceita booleana nem `filete` sobre ela.
 
+## Friso ao longo de curva: `friso`
+
+`friso` desenha nervura, tubo ou friso de perfil declarado seguindo uma linha
+nomeada. Sobre a chapa, a linha é a sequência dos nomes de ponto da gaiola de um
+passo `subdivisao` anterior, citado por `superficie: { op: 'subdivisao', id }`,
+ao longo das arestas da gaiola, como no vinco, e repetir o primeiro nome no fim
+fecha a volta:
+
+```js
+['friso', { origemId: 20, superficie: { op: 'subdivisao', id: 1 },
+  linha: { nome: 'molduraDoVao', pontos: ['b2_2', 'b3_2', 'b4_2', 'b4_3', 'b4_4', 'b3_4', 'b2_4', 'b2_3', 'b2_2'] },
+  perfil: { circulo: { raio: 'moldura_raio', centro: [0, 'moldura_altura'] } } }],
+['parte', { nome: 'moldura', sel: { origem: { op: 'friso', id: 20 } } }],
+```
+
+Cada ponto da linha é o vértice que o passo da superfície entregou sobre essas
+arestas, e com `medidas` esse vértice está na superfície limite; a normal é a da
+face de fora da chapa, e o friso acompanha a chapa mesmo depois de uma pose ou
+`transladar` dela. O perfil é `[u, v]` em metro, com `v` pela normal e `v = 0`
+na linha, e `u` para a esquerda de quem segue a linha com a normal para cima:
+lista de pontos, `{retangulo}`, `{circulo}` ou `{contorno}`, como no perfil da
+extrusão. A parte de `v` negativo entra na chapa: com espessura, o perfil que não
+desce abaixo de `v = 0` grita, porque só encostaria numa linha, e o que entra
+mais que a espessura grita, porque atravessaria a face de dentro. Entre em
+torno de metade da espessura, e mais que a folga da base reta do perfil na chapa
+que curva de lado, cerca de curvatura × (largura/2)² / 2, que o passo não confere.
+`ponta: 'aberta'` (o padrão) tampa o perfil plano; `'fechada'` encolhe o perfil
+em quarto de elipse até um ponto da linha ao longo de `fechamento` (o padrão é a
+largura do perfil); `[inicio, fim]` escolhe cada ponta, e a volta não tem ponta.
+Sem `superficie`, a linha é uma polilinha de pontos nomeados de `PARAMS` ou
+`[x,y,z]`, com `normal` declarada.
+
+O friso é um sólido próprio que entra na chapa, e não uma fusão: a booleana sobre
+a superfície subdividida ficou de fora do plano que criou a operação, e o friso
+precisaria da chapa inteira como sólido de entrada. Nomeie a chapa e o friso com
+`parte` e declare o contato em `contatos` da receita, com o motivo; o
+`contatosDaPeca` mede o par como `interpenetram`, e esquecer a declaração
+reprova. Em cada junta o perfil fica no plano bissetor e se estica pela
+esquadria, de modo que uma volta de cantos de 90 graus sai sem fresta; a curva
+fechada demais para a largura do perfil grita com o ponto da gaiola mais perto.
+A linha que muda de direção numa aresta da gaiola faz canto mesmo na chapa lisa,
+porque cada aresta da gaiola vira uma curva da superfície que chega ao ponto na
+direção da aresta. Cada trecho é corda da chapa, e com `medidas` a corda fica a
+cerca de passo² / (8 × raio) da superfície limite: na chapa de prova do teste,
+com raios de 600 e 900 mm e nível 2, o tubo, a nervura e o friso de ponta
+fechada ficam a no máximo 0,15 mm da linha limite. Na simetria em `x` da
+superfície, a linha que toca o plano `x = 0` numa ponta continua na imagem
+espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia
+espelhada. `origem` publica as faces, `parte: 'lateral'` a superfície varrida e
+`parte: 'pontas'` as tampas das pontas abertas.
+
 ## Detalhes de seleção, aliases e proveniência
 
 **Nenhuma op de edição exige ID LITERAL: `sel` ocupa o lugar do id em todas.**

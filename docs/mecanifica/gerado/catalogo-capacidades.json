@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:f7fa8ace14b3169d879afd604bf807cdc292197cf7e630f9917046c3bd7dd199",
+  "assinatura": "sha256:8cf74923c8b1f925a4de8e42d346c338267aa3b36487f9f0b9c211a74f4e093c",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -448,6 +448,36 @@
             "schema": "mecanifica.argumentos.filete@1",
             "obrigatorios": [
               "origemId"
+            ]
+          }
+        },
+        {
+          "id": "mecanifica.operacao.friso",
+          "nome": "friso",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "cria-geometria"
+          ],
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha.",
+            "schema": "mecanifica.argumentos.friso@1",
+            "obrigatorios": [
+              "linha",
+              "perfil"
             ]
           }
         },
@@ -1585,6 +1615,36 @@
         "schema": "mecanifica.argumentos.filete@1",
         "obrigatorios": [
           "origemId"
+        ]
+      }
+    },
+    {
+      "id": "mecanifica.operacao.friso",
+      "nome": "friso",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "cria-geometria"
+      ],
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha.",
+        "schema": "mecanifica.argumentos.friso@1",
+        "obrigatorios": [
+          "linha",
+          "perfil"
         ]
       }
     },

@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.hipergrafo-capacidades@1",
-  "assinatura": "sha256:f7fa8ace14b3169d879afd604bf807cdc292197cf7e630f9917046c3bd7dd199",
+  "assinatura": "sha256:8cf74923c8b1f925a4de8e42d346c338267aa3b36487f9f0b9c211a74f4e093c",
   "nos": [
     {
       "id": "artefato:mecanifica.malha-poligonal@1",
@@ -96,6 +96,11 @@
       "id": "mecanifica.operacao.filete",
       "tipo": "operacao",
       "nome": "filete"
+    },
+    {
+      "id": "mecanifica.operacao.friso",
+      "tipo": "operacao",
+      "nome": "friso"
     },
     {
       "id": "mecanifica.operacao.furo",
@@ -348,6 +353,14 @@
       "entra": [
         "artefato:mecanifica.malha-poligonal@1"
       ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.friso",
+      "operacao": "mecanifica.operacao.friso",
+      "entra": [],
       "sai": [
         "artefato:mecanifica.malha-poligonal@1"
       ]
