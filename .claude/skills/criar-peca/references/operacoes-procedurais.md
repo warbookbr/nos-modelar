@@ -368,6 +368,22 @@ antes de subdividir para a costura sair lisa, com os vincos e cantos
 espelhados. Um vértice declarado que nenhuma face usa grita com o nome do
 ponto, e a operação não gera malha.
 
+As faces geradas saem lisas com ângulo de 30 graus, o mesmo `liso` com
+`angulo` do passo `liso`, e as arestas que descendem de um vinco vivo levam
+quebra de sombra, de modo que a dobra continua aresta também nas pontas, onde o
+diedro cai abaixo do ângulo. Não marque a superfície com um passo `liso`
+depois: ele trocaria o ângulo e manteria as quebras. `liso: 45` (número ou nome
+de `PARAMS`) muda o ângulo, `liso: false` devolve as faces chapadas,
+`quebraNosVincos: 'todos'` quebra também nos vincos de nitidez fracionária
+(que na superfície limite são lisos, e por isso ficam fora por padrão) e
+`'nenhum'` deixa só o ângulo. Só a marca de sombra muda: as posições e as faces
+são as mesmas com qualquer valor. Na carenagem de prova, a sombra lisa tira as
+listras de triângulo que a luz chapada desenhava nas pontas da cintura e a
+quebra mantém a dobra até onde o vinco termina. A bancada respeita a quebra; as
+vistas da receita (`vistas-da-receita`) desenham toda face chapada. Um ombro
+de nitidez fracionária que em nível 2 tem arestas acima de 30 graus continua
+facetado; suba `niveis` ou adense as colunas antes de subir o ângulo.
+
 A gaiola de uma chapa longa se escreve por estações, com `gaiolaPorEstacoes`
 de `procedural/nucleo/gaiola-por-estacoes.js`, chamada em `gerarPassos` com os
 números que `derivar()` tirou da `TABELA`. Cada estação tem nome, posição `em`

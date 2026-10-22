@@ -3,9 +3,16 @@
    nome de um ponto, a face lista nomes de ponto e o vinco é uma sequência nomeada de pontos; o passo traduz os nomes em
    índices só para chamar a função pura, e nenhum índice de aresta, vértice ou face sai da receita. Com `espessura`, a
    superfície vira a face externa de um sólido fechado por `procedural/nucleo/espessura.js`, e o grito da espessura que
-   passa do raio local cita os pontos nomeados da gaiola. */
+   passa do raio local cita os pontos nomeados da gaiola.
+
+   A SOMBRA. As faces geradas saem lisas com ângulo (`liso`, padrão LISO_PADRAO graus, o mecanismo do passo `liso`), e
+   as arestas que descendem de um vinco vivo levam quebra de sombra (`face.quebras`), de modo que a dobra continua aresta
+   mesmo onde o diedro cai abaixo do ângulo, nas pontas do vinco. `quebraNosVincos: 'todos'` quebra também nos vincos de
+   nitidez fracionária, e `'nenhum'` deixa só o ângulo; `liso: false` devolve as faces chapadas. Só a marca de sombra
+   muda: as posições e as faces são as mesmas com qualquer opção. */
 import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, nitidezDoVinco } from '../subdivisao.js';
 import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
+import { valorDoLiso } from '../liso-por-angulo.js';
 
 const EXEMPLO_DE_VINCO = "{ nome: 'vincoDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.5 }";
 const EXEMPLO_DE_CANTO = "cantos: ['quinaDaTampa']";
@@ -31,6 +38,8 @@ export function enderecosPorIndice(a) {
 }
 
 const chave = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
+export const LISO_PADRAO = 30;
+const QUEBRAS = ['vivos', 'todos', 'nenhum'];
 const citar = (nome) => `'${nome}'`;
 
 /* Traduz os vincos nomeados em [a, b, nitidez em níveis] sobre as arestas da gaiola. Devolve { vincos } ou { erro }. */
@@ -176,12 +185,23 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       if (!Number.isFinite(espessura) || espessura <= 0) return grita(st, i, 'subdivisao', 'espessura', `a espessura precisa ser maior que zero, e veio ${espessura}`);
       if (a.lado != null && a.lado !== 'contraNormal' && a.lado !== 'normal') return grita(st, i, 'subdivisao', 'lado', `lado precisa ser 'contraNormal' (o material contra a normal das faces, o padrão) ou 'normal', e veio ${JSON.stringify(a.lado)}`);
     } else if (a.lado != null) return grita(st, i, 'subdivisao', 'lado', 'lado só vale com espessura: declare a espessura da chapa');
+    let liso = false;
+    if (a.liso !== false) {
+      const angulo = a.liso == null ? LISO_PADRAO : st.num(a.liso);
+      try { liso = valorDoLiso(angulo); } catch { return grita(st, i, 'subdivisao', 'liso', `liso precisa ser ângulo em graus entre 0 e 180 (padrão ${LISO_PADRAO}), ou false para as faces chapadas, e veio ${JSON.stringify(a.liso)}`); }
+    }
+    const quebra = a.quebraNosVincos ?? 'vivos';
+    if (!QUEBRAS.includes(quebra)) return grita(st, i, 'subdivisao', 'quebraNosVincos', `quebraNosVincos precisa ser 'vivos' (o padrão: a sombra se divide nos vincos vivos), 'todos' (também nos de nitidez fracionária) ou 'nenhum', e veio ${JSON.stringify(quebra)}`);
+    if (liso === false && a.quebraNosVincos != null) return grita(st, i, 'subdivisao', 'quebraNosVincos', 'quebraNosVincos só vale com as faces lisas; com liso: false toda aresta já divide a sombra');
     let r;
     try {
       /* Com medidas, a malha entregue vai à superfície limite: sem isso o ponto medido ficaria a centímetros da malha de
          nível finito, e a cota não apareceria na peça. Sem medidas, a malha é a do nível pedido, como no oráculo. */
-      r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null });
+      r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null, comVincos: true });
     } catch (e) { return grita(st, i, 'subdivisao', 'gaiola', String(e.message)); }
+    /* as arestas da superfície em que a sombra se divide; com espessura, a face interna repete cada uma a nS vértices */
+    const nS = r.vertices.length;
+    const quebras = liso === false || quebra === 'nenhum' ? [] : r.vincos.filter(([, , viva]) => quebra === 'todos' || viva).map(([p, q]) => [p, q]);
     let partes = null;
     if (espessura !== null) {
       /* A superfície subdividida é a face externa, e nela ficam as medidas; a interna e a parede das bordas livres e dos
@@ -199,6 +219,20 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     if (r.vertices.length > limite || r.faces.length > limite) return grita(st, i, 'subdivisao', 'niveis', `a subdivisão gera ${r.vertices.length} vértices e ${r.faces.length} faces, acima do limite do passo (${limite})`);
     r.vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
     const facesSaida = r.faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); return id; });
+    if (liso !== false) {
+      const naQuebra = new Set(quebras.map(([p, q]) => chave(p, q)));
+      if (espessura !== null) for (const [p, q] of quebras) naQuebra.add(chave(p + nS, q + nS));
+      r.faces.forEach((f, k) => {
+        const face = st.F.get(facesSaida[k]); face.liso = liso;
+        if (!naQuebra.size) return;
+        const daFace = [];
+        for (let j = 0; j < f.length; j++) {
+          const p = f[j], q = f[(j + 1) % f.length];
+          if (naQuebra.has(chave(p, q))) { const ip = idDoPasso(i, p), iq = idDoPasso(i, q); daFace.push(ip < iq ? [ip, iq] : [iq, ip]); }
+        }
+        if (daFace.length) face.quebras = daFace;
+      });
+    }
     if (a.origemId != null) {
       const grupos = partes ? Object.fromEntries(Object.entries(partes).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])])) : {};
       registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida, espessura: partes !== null, ...grupos });

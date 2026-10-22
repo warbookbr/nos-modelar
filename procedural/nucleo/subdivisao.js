@@ -68,8 +68,10 @@ function arestasDa(faces) {
   return { arestas, indice };
 }
 
-/* Um nível de refinamento. `nitidez` é um Map chave->nitidez; `cantos` é um Set de índices. */
-function refinar(V, F, nitidez, cantos, borda) {
+/* Um nível de refinamento. `nitidez` é um Map chave->nitidez; `cantos` é um Set de índices. `linhagem`, quando vem, é o
+   Set das chaves das arestas que descendem de um vinco declarado, e a saída traz o Set dos filhos delas; ela não entra
+   em nenhuma conta de posição. */
+function refinar(V, F, nitidez, cantos, borda, linhagem = null) {
   const { arestas, indice } = arestasDa(F);
   const nV = V.length, nE = arestas.length;
   const s = arestas.map((e) => (e.faces.length !== 2 ? NITIDEZ_INFINITA : (nitidez.get(chave(e.a, e.b)) ?? 0)));
@@ -140,7 +142,10 @@ function refinar(V, F, nitidez, cantos, borda) {
       nitidezN.set(chave(e.a, nV + k), filho); nitidezN.set(chave(nV + k, e.b), filho);
     }
   });
-  return { V: Vn, F: Fn, nitidez: nitidezN };
+  if (!linhagem) return { V: Vn, F: Fn, nitidez: nitidezN };
+  const linhagemN = new Set();
+  arestas.forEach((e, k) => { if (linhagem.has(chave(e.a, e.b))) { linhagemN.add(chave(e.a, nV + k)); linhagemN.add(chave(nV + k, e.b)); } });
+  return { V: Vn, F: Fn, nitidez: nitidezN, linhagem: linhagemN };
 }
 
 /**
@@ -161,20 +166,29 @@ function nitidezDosVincos(faces, vincos) {
   return nitidez;
 }
 
-export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave', aoLimite = false }) {
+/* comVincos: a saída traz também `vincos`, as arestas da malha final que descendem de um vinco declarado de nitidez
+ * maior que zero, como [a, b, viva], em que viva diz que a nitidez é infinita (o vinco vivo, que fica dobra na superfície
+ * limite); o vinco de nitidez finita se apaga no refino e a superfície fica lisa por cima dele. A ordem segue a das
+ * arestas da malha varrendo as faces, e a geometria não muda. */
+export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave', aoLimite = false, comVincos = false }) {
   validar(vertices, faces, vincos, niveis);
   if (borda !== 'suave' && borda !== 'cantos') throw new TypeError("subdivisão: borda precisa ser 'suave' ou 'cantos'");
   let nitidez = nitidezDosVincos(faces, vincos);
+  let linhagem = comVincos ? new Set([...nitidez].filter(([, s]) => s > 0).map(([c]) => c)) : null;
   let V = vertices.map((p) => [...p]); let F = faces.map((f) => [...f]);
   let C = new Set(cantos);
   for (let n = 0; n < niveis; n++) {
-    const r = refinar(V, F, nitidez, C, borda);
-    V = r.V; F = r.F; nitidez = r.nitidez; // os pontos de vértice mantêm o índice, então os cantos continuam válidos
+    const r = refinar(V, F, nitidez, C, borda, linhagem);
+    V = r.V; F = r.F; nitidez = r.nitidez; linhagem = r.linhagem ?? null; // os pontos de vértice mantêm o índice, então os cantos continuam válidos
   }
   /* aoLimite: cada vértice da malha final vai para o seu ponto limite, calculado com a nitidez que sobrou neste nível.
      O vértice i < vertices.length continua sendo o vértice i da gaiola, e o ponto limite dele é o da gaiola. */
   if (aoLimite) V = limitesInternos(V, F, nitidez, C, borda, facesPorVertice(V.length, F));
-  return { vertices: V, faces: F };
+  if (!comVincos) return { vertices: V, faces: F };
+  const { arestas } = arestasDa(F);
+  const saida = arestas.filter((e) => e.faces.length === 2 && linhagem.has(chave(e.a, e.b)))
+    .map((e) => [e.a, e.b, nitidez.get(chave(e.a, e.b)) === NITIDEZ_INFINITA]);
+  return { vertices: V, faces: F, vincos: saida };
 }
 
 /* ---- ponto limite e medidas ----
