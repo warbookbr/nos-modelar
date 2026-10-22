@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1562 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1565 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2349,6 +2349,8 @@
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
 - `ombro-uniao.test.ts` — ombro-uniao.test.ts — a rodada do ombro do plano "União de sólidos": a união e o arredondamento sobre superfícies CURVAS facetadas. A fixture (`fixtures/fixt…
+- `ondulacao-da-superficie.mjs` — ondulacao-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita ondula, salta ou dobra fora dos vincos declarados, e diz quanto (em milímet…
+- `ondulacao-da-superficie.test.mjs` — ondulacao-da-superficie.test.mjs — a ferramenta de ondulação endereçada sobre a chapa desenhada por código.
 - `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente e…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
@@ -2417,6 +2419,7 @@
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
 - `fixture-ombro-uniao.js` — fixture-ombro-uniao.js — fixture neutra copiada em 2026-09-29 do ombro do braço robótico (procedural/pecas/braco-robotico/partes/ombro/receita.js), para os t…
 - `fixture-uniao.js` — fixture-uniao.js — fixture neutra da fatia 5 do plano "União de sólidos": uma coluna e um braço unidos por `unir`, pousados numa base. Prova que as ferrament…
+- `ondulacao-prova.js` — ondulacao-prova.js — a chapa desenhada por código para o teste da ferramenta de ondulação endereçada.
 
 ## tools/mecanifica/fixtures/contatos/
 

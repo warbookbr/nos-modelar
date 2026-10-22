@@ -515,6 +515,26 @@ por posição, porque a ordem de saída não é identidade; com espessura,
 `parte: 'externa'`, `'interna'` ou `'borda'` cita cada grupo, como na casca.
 A superfície não aceita booleana nem `filete` sobre ela.
 
+Para achar onde a superfície ondula, rode `npm run ondulacao -- <peça>`, e não
+leia listras de reflexo: a ferramenta executa a receita como as outras, lê a
+superfície externa de cada passo `subdivisao` e devolve em JSON cada falha com
+`posicaoMm`, `amplitudeMm` (o desvio pela normal a uma versão suavizada local,
+um ajuste cúbico robusto a até três espaçamentos da gaiola), `extensaoMm`,
+`tipo` (`ondulacao` quando o desvio troca de sinal, `calombo` para fora ou para
+dentro, `emenda` quando a normal salta fora de um vinco) e `pontos`, os dois a
+quatro pontos nomeados da gaiola que mais pesam na falha, em ordem, pelos pesos
+que a própria subdivisão dá a cada ponto na malha entregue. Mexa nesses pontos e
+rode de novo até a falha sumir. A falha a menos de um espaçamento de um vinco,
+de uma borda ou de um canto declarados sai em `junto`, e não em `falhas`, porque
+ali o desvio é da feição pedida; um vinco que a forma tem e o passo não declara
+sai como falha. O limiar padrão é 0,3 mm (`--limiar-mm=`): numa chapa desenhada
+por código com todos os pontos medidos, a forma lisa fica abaixo de 0,23 mm e a
+ondulação de 1 mm plantada entre dois pontos vizinhos sai com 0,88 mm e esses
+dois pontos à frente. Com `medidas`, os pontos citados são os da gaiola
+ajustada, e mexer no ponto declarado move o ajustado. A função
+`ondulacaoDaReceita`, de `tools/mecanifica/ondulacao-da-superficie.mjs`, faz o
+mesmo num teste. A zebra continua para a pessoa e o crítico conferirem.
+
 ## Friso ao longo de curva: `friso`
 
 `friso` desenha nervura, tubo ou friso de perfil declarado seguindo uma linha

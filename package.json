@@ -92,6 +92,7 @@
     "exportar:obj": "node tools/mecanifica/exportar-obj.mjs",
     "ativar:bancada": "node tools/mecanifica/ativar-bancada.mjs",
     "malha:conferir": "node tools/mecanifica/conferir-malha.mjs",
+    "ondulacao": "node tools/mecanifica/ondulacao-da-superficie.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
     "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs",
     "gates": "node tools/gates.mjs",
