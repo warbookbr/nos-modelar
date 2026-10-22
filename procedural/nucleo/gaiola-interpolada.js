@@ -173,8 +173,12 @@ function lerCurvas(curvas) {
   return porNome;
 }
 
-/* A lista de colunas da estação com cada entrada de curva trocada pelas colunas dela. */
-function expandirColunas(estacao, curvas) {
+/* A chave de uma coluna numa estação, para o mapa de origens. */
+export const chaveDaColuna = (estacao, coluna) => `${estacao}\u0000${coluna}`;
+
+/* A lista de colunas da estação com cada entrada de curva trocada pelas colunas dela. Cada coluna que sai de uma curva
+   entra em `origens` com a curva, a fração e os pontos-chave da estação. */
+function expandirColunas(estacao, curvas, origens) {
   return estacao.colunas.flatMap((c, j) => {
     if (!c || typeof c !== 'object' || !('curva' in c)) return [c];
     exigirCampos(c, ['curva', 'pontos'], `a curva da coluna ${j} da estação ${citar(estacao.nome)}`);
@@ -182,8 +186,35 @@ function expandirColunas(estacao, curvas) {
     if (!C) falha(`a estação ${citar(estacao.nome)} usa a curva ${citar(c.curva)}, que não está em curvas`);
     const curva = curvaCentripeta(c.pontos, `${c.curva}' da estação '${estacao.nome}`);
     const tres = c.pontos.some((p) => Array.isArray(p) && p.length === 3);
-    return C.colunas.map((col) => { const p = curva.naFracao(col.fracao); return { nome: col.nome, em: tres ? p : [p[0], p[1]] }; });
+    return C.colunas.map((col) => {
+      const p = curva.naFracao(col.fracao);
+      origens.set(chaveDaColuna(estacao.nome, col.nome), { tipo: 'curva', curva: c.curva, estacao: estacao.nome, coluna: col.nome, fracao: col.fracao, pontosChave: c.pontos.map((q) => [...q]) });
+      return { nome: col.nome, em: tres ? p : [p[0], p[1]] };
+    });
   });
+}
+
+const EIXOS_LOCAIS = ['u', 'v', 'w'];
+
+/**
+ * entradasDaDefinicao(estacoes) -> as entradas editáveis da gaiola, na ordem das estações e das colunas declaradas: cada
+ * coordenada local [u, v, w] de uma coluna declarada ({ id: 'estacao/coluna.u', ... }) e de cada ponto-chave de uma curva de
+ * seção ({ id: 'estacao/curva[k].u', ... }). A estação sem colunas (interpolada) e a que a interpolação gera não têm
+ * entrada: os pontos delas saem das chaves.
+ */
+export function entradasDaDefinicao(estacoes) {
+  const entradas = [];
+  for (const e of estacoes) {
+    if (!Array.isArray(e?.colunas)) continue;
+    for (const c of e.colunas) {
+      if (c && typeof c === 'object' && 'curva' in c) {
+        (c.pontos ?? []).forEach((p, k) => p.forEach((valor, q) => entradas.push({ id: `${e.nome}/${c.curva}[${k}].${EIXOS_LOCAIS[q]}`, tipo: 'curva', estacao: e.nome, alvo: c.curva, pontoChave: k, eixo: EIXOS_LOCAIS[q], valor })));
+      } else if (c && typeof c === 'object' && Array.isArray(c.em)) {
+        c.em.forEach((valor, q) => entradas.push({ id: `${e.nome}/${c.nome}.${EIXOS_LOCAIS[q]}`, tipo: 'coluna', estacao: e.nome, alvo: c.nome, eixo: EIXOS_LOCAIS[q], valor }));
+      }
+    }
+  }
+  return entradas;
 }
 
 /* ---------------------------------------------------------- interpolar */
@@ -201,19 +232,19 @@ function ligadas(B, nome) {
 }
 
 /* Os nós (em, [u, v, w]) da coluna `nome` de keys[i] até a sua ligação em keys[i + 1], estendidos pelas chaves de antes
-   e de depois enquanto a ligação é de um para um. */
+   e de depois enquanto a ligação é de um para um. Cada nó leva, em terceiro, o nome da estação-chave de onde veio. */
 function nosDaColuna(keys, i, nome) {
   const A = keys[i], B = keys[i + 1];
   const colA = A.colunas.find((c) => c.nome === nome);
   const alvo = ligadas(B, nome);
-  const nos = [[A.em, local(colA, A.nome)], [B.em, media(alvo, B.nome)]];
+  const nos = [[A.em, local(colA, A.nome), A.nome], [B.em, media(alvo, B.nome), B.nome]];
   /* para trás */
   let atual = colA;
   for (let j = i; j > 0 && atual; j--) {
     const K = keys[j - 1];
     const pais = atual.de != null ? K.colunas.filter((c) => Array.isArray(atual.de) && atual.de.includes(c.nome)) : (atual.comeca === true ? [] : K.colunas.filter((c) => c.nome === atual.nome));
     if (!pais.length || pais.some((c) => c.termina === true)) break;
-    nos.unshift([K.em, media(pais, K.nome)]);
+    nos.unshift([K.em, media(pais, K.nome), K.nome]);
     atual = pais.length === 1 ? pais[0] : null;
   }
   /* para frente */
@@ -221,7 +252,7 @@ function nosDaColuna(keys, i, nome) {
   for (let j = i + 1; j + 1 < keys.length && atual && atual.termina !== true; j++) {
     const filhos = ligadas(keys[j + 1], atual.nome);
     if (!filhos.length) break;
-    nos.push([keys[j + 1].em, media(filhos, keys[j + 1].nome)]);
+    nos.push([keys[j + 1].em, media(filhos, keys[j + 1].nome), keys[j + 1].nome]);
     atual = filhos.length === 1 ? filhos[0] : null;
   }
   return nos;
@@ -278,11 +309,17 @@ function gerarPosicoes(declaradas, livre, passo) {
 
 /**
  * expandirEstacoes(estacoes, { interpolar, curvas, regioes, fechada })
- *   -> { estacoes, tipos: Map nome -> 'chave' | 'interpolada' | 'gerada' | 'parcial', chaves: Set, geradas: Set }
- * As estações de volta são comuns: cada uma com `colunas` escritas, que `gaiolaPorEstacoes` lê como sempre.
+ *   -> { estacoes, tipos: Map nome -> 'chave' | 'interpolada' | 'gerada' | 'parcial', chaves: Set, geradas: Set,
+ *        origens: Map chaveDaColuna(estacao, coluna) -> origem }
+ * As estações de volta são comuns: cada uma com `colunas` escritas, que `gaiolaPorEstacoes` lê como sempre. `origens`
+ * guarda, das colunas que não são entrada declarada, de onde vieram: { tipo: 'curva', curva, estacao, coluna, fracao,
+ * pontosChave } para a coluna amostrada numa curva de seção, e { tipo: 'gerada' ou 'interpolada', estacao, coluna,
+ * chaves: [A, B], fracao, nos } para a coluna de uma estação que a interpolação preencheu, com as duas chaves que a
+ * cercam, a fração do intervalo e as estações-chave que servem de nó à interpolação da coluna.
  */
 export function expandirEstacoes(estacoes, { interpolar, curvas, regioes, fechada }) {
   const C = lerCurvas(curvas);
+  const origens = new Map();
   const opcao = interpolar == null ? null : lerInterpolar(interpolar, fechada);
   if (!Array.isArray(estacoes) || estacoes.length < 2) falha('estacoes precisa ser lista de duas ou mais estações');
   const declaradas = estacoes.map((e, k) => {
@@ -293,9 +330,9 @@ export function expandirEstacoes(estacoes, { interpolar, curvas, regioes, fechad
       return { ...e, interpolada: true };
     }
     if (!Array.isArray(e.colunas)) return e;
-    return { ...e, colunas: expandirColunas(e, C) };
+    return { ...e, colunas: expandirColunas(e, C, origens) };
   });
-  if (!opcao) return { estacoes: declaradas, tipos: new Map(declaradas.map((e) => [e.nome, e.regiao != null ? 'parcial' : 'chave'])), chaves: new Set(declaradas.filter((e) => e.regiao == null).map((e) => e.nome)), geradas: new Set() };
+  if (!opcao) return { estacoes: declaradas, tipos: new Map(declaradas.map((e) => [e.nome, e.regiao != null ? 'parcial' : 'chave'])), chaves: new Set(declaradas.filter((e) => e.regiao == null).map((e) => e.nome)), geradas: new Set(), origens };
 
   for (const [k, e] of declaradas.entries()) {
     if (typeof e.em !== 'number' || !Number.isFinite(e.em)) falha(`a estação ${citar(e.nome)} precisa de em: posição finita`);
@@ -342,11 +379,12 @@ export function expandirEstacoes(estacoes, { interpolar, curvas, regioes, fechad
       const nos = nosDaColuna(keys, i, c.nome);
       const x = nos.map(([em]) => em);
       const valor = [0, 1, 2].map((q) => pchip(x, nos.map(([, p]) => p[q]))(e.em));
+      origens.set(chaveDaColuna(e.nome, c.nome), { tipo: e.gerada ? 'gerada' : 'interpolada', estacao: e.nome, coluna: c.nome, chaves: [A.nome, B.nome], fracao: (e.em - A.em) / (B.em - A.em), nos: nos.map(([, , n]) => n) });
       return { nome: c.nome, em: valor };
     });
     if (colunas.length < 2) falha(`a estação ${citar(e.nome)} é interpolada entre as chaves ${citar(A.nome)} e ${citar(B.nome)}, mas só ${colunas.length} coluna liga as duas; ligue as colunas por nome ou por de`);
     const { interpolada, gerada, ...resto } = e;
     return { ...resto, colunas };
   });
-  return { estacoes: saida, tipos, chaves: new Set(keys.map((e) => e.nome)), geradas };
+  return { estacoes: saida, tipos, chaves: new Set(keys.map((e) => e.nome)), geradas, origens };
 }

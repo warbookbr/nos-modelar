@@ -47,6 +47,12 @@
  * reaparece nos vizinhos. Com medidas, a gaiola é a ajustada pelo núcleo: mexer no ponto declarado move o ajustado e a
  * superfície passa pelo ponto declarado.
  *
+ * A ORIGEM. Quando a gaiola saiu de `gaiolaPorEstacoes`, cada ponto citado traz `origem`: a entrada declarada (estação e coluna),
+ * a coluna amostrada numa curva de seção (curva e fração) ou a estação gerada pela interpolação (as chaves que a cercam, a fração
+ * e os nós), que é o que diz se o ponto se edita ou sai de outros. Falha de mais de três espaçamentos se resolve com
+ * `npm run alisar`, que usa `devolverOperador`: a linha do operador linear do desvio de cada vértice (o desvio é a normal vezes o
+ * vértice menos a soma dos pesos vezes a vizinhança, dividida pela inclinação do ajuste), com os pesos robustos e o referencial fixos.
+ *
  * Mesma receita, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa.
  *
  *   node tools/mecanifica/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2]
@@ -56,6 +62,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { criarResolverNumerico } from '../../procedural/nucleo/expressoes.js';
 import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
+import { capturarGaiolas } from '../../procedural/nucleo/gaiola-por-estacoes.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -108,7 +115,7 @@ function topologia(V, F) {
 
 /* A face da gaiola de que cada face da malha descende: no primeiro nível a face de k lados vira k quads em sequência, e
  * em cada nível seguinte cada quad vira quatro, na ordem de `subdividirCatmullClark`. */
-function donoNaGaiola(facesGaiola, niveis) {
+export function donoNaGaiola(facesGaiola, niveis) {
   if (niveis === 0) return (f) => f;
   const dono1 = [];
   facesGaiola.forEach((f, fi) => { for (let k = 0; k < f.length; k++) dono1.push(fi); });
@@ -148,6 +155,24 @@ function ajustar(phi, z, pesos) {
   return resolver(A.map((r) => [...r]), [...b]);
 }
 
+/* A linha do ajuste que dá o primeiro coeficiente (o valor ajustado no ponto): com a base `phi` e os pesos `pesos` do
+   último ajuste, c0 = Σ π_i z_i, e π_i = w_i (φ_i · y) com (Φᵀ W Φ) y = e0. Vale para os pesos fixos, que é o que o
+   desvio do vértice, linear nas posições da vizinhança, precisa para ser derivado dela. */
+function linhaDoAjuste(phi, pesos) {
+  const m = phi[0].length; const A = Array.from({ length: m }, () => new Float64Array(m));
+  for (let i = 0; i < phi.length; i++) {
+    const w = pesos[i]; if (!(w > 0)) continue;
+    const f = phi[i];
+    for (let r = 0; r < m; r++) { const wr = w * f[r]; const Ar = A[r]; for (let c = r; c < m; c++) Ar[c] += wr * f[c]; }
+  }
+  for (let r = 0; r < m; r++) for (let c = 0; c < r; c++) A[r][c] = A[c][r];
+  let traco = 0; for (let r = 0; r < m; r++) traco += A[r][r];
+  for (let r = 0; r < m; r++) A[r][r] += 1e-12 * traco;
+  const e0 = new Array(m).fill(0); e0[0] = 1;
+  const y = resolver(A.map((r) => [...r]), e0);
+  return y ? phi.map((f, i) => (pesos[i] > 0 ? pesos[i] * avaliar(y, f) : 0)) : null;
+}
+
 const avaliar = (c, f) => { let s = 0; for (let k = 0; k < c.length; k++) s += c[k] * f[k]; return s; };
 
 function mediana(lista) {
@@ -171,7 +196,7 @@ function curvaturas(c, escala) {
 /** superficiesDaReceita(receita) -> uma entrada por passo `subdivisao` executado, com a malha externa que o passo
  *  entregou (posições lidas do estado da receita), a gaiola de que ela saiu e o que é declarado nela. */
 export function superficiesDaReceita(receita) {
-  const { entrada, neutro } = executarReceita(receita);
+  const { resultado: { entrada, neutro }, gaiolas } = capturarGaiolas(() => executarReceita(receita));
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
   const vec = (a) => (typeof a === 'string' ? dict[a] : a).map(num);
@@ -180,7 +205,7 @@ export function superficiesDaReceita(receita) {
     if (op !== 'subdivisao') return;
     const resolvida = gaiolaDoPasso(args, { vec, num });
     if (resolvida.erro) throw new Error(`ondulacao: o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
-    const { gaiola, declarados } = resolvida;
+    const { gaiola, declarados, declaradaCheia, medidas } = resolvida;
     const niveis = Math.trunc(num(args.niveis ?? 2));
     const borda = args.borda ?? 'suave';
     const aoLimite = args.medidas != null;
@@ -193,10 +218,14 @@ export function superficiesDaReceita(receita) {
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     const nomeDe = (j) => { const d = declarados[origem[j]]; return typeof d === 'string' ? d : `[${vec(d).map((x) => arred(x * MM, 1)).join(', ')}]`; };
+    /* a origem de cada ponto, quando a gaiola saiu de `gaiolaPorEstacoes`: a entrada declarada, a coluna de curva de seção
+       ou a estação gerada de que ele vem */
+    const montada = gaiolas.find((x) => x.passo.vertices.length === declarados.length && x.passo.vertices.every((n, k) => n === declarados[k])) ?? null;
+    const origemDe = (j) => { const d = declarados[origem[j]]; return montada && typeof d === 'string' ? (montada.origens[d] ?? null) : null; };
     lista.push({
       passo: i, origemId: args.origemId ?? null, niveis, borda, aoLimite, simetria: args.simetria ?? null,
       vertices, faces: r.faces, vincos: r.vincos, gaiola: { ...gaiola, borda }, calculados: r.vertices,
-      origem, nomeDe,
+      origem, nomeDe, origemDe, declarados, declaradaCheia, medidas,
     });
   });
   return lista;
@@ -350,24 +379,36 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     const g = pts.map((a) => Math.exp(-((dist(V[a], p) / sigma) ** 2)));
     const base = pts.length >= 20 ? BASE_CUBICA : BASE_QUADRATICA;
     const phi = loc.map((q) => base(q[0], q[1])); const z = loc.map((q) => q[2]);
-    let pesos = g; let c = null;
+    let pesos = g; let c = null; let usados = g;
     for (let it = 0; it < ITERACOES_ROBUSTAS; it++) {
+      usados = pesos;
       c = ajustar(phi, z, pesos); if (!c) return null;
       const res = z.map((zi, k) => (zi - avaliar(c, phi[k])) * R);
       const s = Math.max(sMin, 1.4826 * mediana(res.map(Math.abs)));
       pesos = g.map((w, k) => { const t = res[k] / (TUKEY * s); return Math.abs(t) < 1 ? w * (1 - t * t) ** 2 : 0; });
     }
-    const desvio = (-c[0] * R) / Math.sqrt(1 + c[1] * c[1] + c[2] * c[2]);
-    return { desvio, c, e1, e2, nz, R };
+    const inclinacao = Math.sqrt(1 + c[1] * c[1] + c[2] * c[2]);
+    const desvio = (-c[0] * R) / inclinacao;
+    return { desvio, c, e1, e2, nz, R, pts, phi, usados, inclinacao };
   }
 
-  const desvio = new Float64Array(nV); const ajuste = new Array(nV);
+  /* A linha do operador do desvio de um vértice: com os pesos e o referencial fixos, desvio = (nz · (V_v − Σ π_a V_a)) / s,
+     uma combinação linear das posições da vizinhança. Guarda só o que a ferramenta de alisamento precisa. */
+  function linhaDoOperador(v, d) {
+    const pi = linhaDoAjuste(d.phi, d.usados); if (!pi) return null;
+    const itens = []; for (let k = 0; k < pi.length; k++) if (pi[k] !== 0) itens.push([d.pts[k], pi[k]]);
+    return { v, nz: d.nz, s: d.inclinacao, itens };
+  }
+
+  const desvio = new Float64Array(nV); const ajuste = new Array(nV); const operador = opcoes.devolverOperador ? new Array(nV).fill(null) : null;
   for (let v = 0; v < nV; v++) {
     const R = o.raio * h[v]; let melhor = null;
     /* na simetria em x, a metade espelhada só é lida perto da costura, onde uma falha da metade declarada pode cruzar */
     if (sup.simetria && sup.calculados[v][0] < -2 * R) continue;
     for (const s of setores(v)) { const d = desvioNoSetor(v, s, R); if (d && (!melhor || Math.abs(d.desvio) < Math.abs(melhor.desvio))) melhor = d; }
     desvio[v] = melhor ? melhor.desvio : 0; ajuste[v] = melhor;
+    if (operador && melhor) operador[v] = linhaDoOperador(v, melhor);
+    if (melhor) { melhor.phi = null; melhor.pts = null; melhor.usados = null; }
   }
 
   /* regiões: sementes acima do limiar, crescendo pelos vizinhos de mesmo sinal acima da metade dele */
@@ -412,7 +453,11 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     const escolhidos = ordem.slice(0, 2);
     for (const par of ordem.slice(2, MAXIMO_DE_PONTOS)) if (par[1] >= 0.5 * ordem[1][1]) escolhidos.push(par); else break;
     /* o desvio com sinal do vértice do próprio ponto diz para que lado ele está: positivo, para fora da versão suavizada */
-    return escolhidos.map(([j, peso]) => ({ nome: sup.nomeDe(j), influencia: arred(peso / total), desvioMm: arred(desvio[j] * MM) }));
+    return escolhidos.map(([j, peso]) => {
+      const completa = sup.origemDe?.(j) ?? null;
+      const { pontosChave, ...origem } = completa ?? {};
+      return { nome: sup.nomeDe(j), influencia: arred(peso / total), desvioMm: arred(desvio[j] * MM), ...(completa ? { origem } : {}) };
+    });
   };
   const curvaturaDaSuperficie = (v) => {
     const r = 0.75 * h[v]; let melhor = null;
@@ -509,7 +554,7 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
   fora.sort((x, y) => x - y);
   const q = (p) => (fora.length ? arred(fora[Math.min(fora.length - 1, Math.floor(p * fora.length))]) : 0);
   const resumo = { falhas, junto, desvioMm: { p50: q(0.5), p95: q(0.95), maximo: fora.length ? arred(fora[fora.length - 1]) : 0, vertices: fora.length } };
-  return opcoes.devolverDesvios ? { ...resumo, desvios: desvio } : resumo;
+  return opcoes.devolverDesvios || operador ? { ...resumo, desvios: desvio, ...(operador ? { operador, espacamentos: h, amostra, foraDaZona: (v) => metadeDeclarada(v) && distFeicao(v) > o.zonaDeclarada * h[v] } : {}) } : resumo;
 }
 
 /** ondulacaoDaReceita(receita, opcoes) -> { opcoes, superficies: [...], falhas } */

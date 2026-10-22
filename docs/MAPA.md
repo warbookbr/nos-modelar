@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1587 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1593 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1087,6 +1087,7 @@
 - `gaiola-interpolada.js` — gaiola-interpolada.js — estações interpoladas e colunas por curva de seção, opções da gaiola por estações
 - `gaiola-interpolada.test.mjs` — gaiola-interpolada.test.mjs — as opções `interpolar` e `curvas` da gaiola por estações: a interpolação monótona das colunas entre estações-chave reproduz uma…
 - `gaiola-local.test.mjs` — gaiola-local.test.mjs — a gaiola por estações adensada só num trecho (fatia 12 do plano de carroceria por subdivisão): a região com estações parciais e colun…
+- `gaiola-origem.test.mjs` — gaiola-origem.test.mjs — a gaiola por estações publica de onde vem cada ponto.
 - `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
 - `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
@@ -1104,6 +1105,7 @@
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
+- `operador-das-medidas.test.mjs` — operador-das-medidas.test.mjs — a gaiola ajustada pelas medidas vista como transformação linear da declarada.
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
@@ -2199,6 +2201,9 @@
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `alinhar-modelagem.test.mjs` — alinhar-modelagem.test.mjs — a rodada de alinhamento continua colada ao formato que ela produz.
+- `alisar-a-superficie.mjs` — alisar-a-superficie.mjs — calcula de uma vez quanto mover cada valor editável de uma receita para tirar as falhas de ondulação da superfície de subdivisão se…
+- `alisar-a-superficie.test.mjs` — alisar-a-superficie.test.mjs — a ferramenta de alisamento sobre chapas desenhadas por código.
+- `alisar-numerico.mjs` — alisar-numerico.mjs — a álgebra e a geometria pequenas da ferramenta de alisamento.
 - `alterar-montagem.test.ts` — alterar-montagem.test.ts — alteração semântica compacta de montagem.
 - `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `analise-da-peca.mjs` — analise-da-peca.mjs — o passo "Pare e analise": a matriz de vistas que a IA precisa olhar antes de declarar uma forma pronta, o manifesto que prova que ela f…
@@ -2433,6 +2438,7 @@
 
 ## tools/mecanifica/fixtures/
 
+- `alisar-prova.js` — alisar-prova.js — a chapa desenhada por código para o teste da ferramenta de alisamento.
 - `fixture-cubo-material.js` — fixture-cubo-material.js — caixa com todas as faces em um material declarado, para a exportação OBJ com texturas.
 - `fixture-cubo.js` — fixture-cubo.js — receita procedural de teste para exportação CAD/STEP.
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.

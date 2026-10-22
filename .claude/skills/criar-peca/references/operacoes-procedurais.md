@@ -561,9 +561,9 @@ dentro, `emenda` quando a normal salta fora de um vinco) e `pontos`, os dois a
 quatro pontos nomeados da gaiola que mais pesam na falha, em ordem, pelos pesos
 que a própria subdivisão dá a cada ponto na malha entregue, cada um com `desvioMm`,
 o desvio com sinal do vértice dele (positivo, para fora da versão suavizada), e a
-falha traz `extensaoEmEspacamentos`. Mova cada ponto nomeado 1,5 vez o desvio
-contra o sinal dele e rode de novo, e repita até a falha sumir: até uns dois
-espaçamentos uma rodada tira quase tudo, e acima de três a versão suavizada
+falha traz `extensaoEmEspacamentos`. Até uns dois espaçamentos, mova cada ponto
+nomeado 1,5 vez o desvio contra o sinal dele e rode de novo, e repita até a
+falha sumir: uma rodada tira quase tudo, e acima de três a versão suavizada
 acompanha o ponto que se moveu, uma rodada tira cerca de um quarto e a falha
 reaparece nos vizinhos (numa ondulação de seis pontos de 1,7 mm desenhada por
 código, cinco rodadas). O ponto nomeado pode não ser entrada da `TABELA`: o de
@@ -589,6 +589,46 @@ adense as colunas ao redor dela. Na carenagem de prova, colunas a 175 mm longe d
 vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora da
 forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra continua para a
 pessoa e o crítico conferirem.
+
+Para a falha de mais de três espaçamentos, rode `npm run alisar --
+<receita.js>` (`tools/mecanifica/alisar-a-superficie.mjs`) em vez de rodadas de
+ponto a ponto: o fluxo é rodar a ondulação, alisar, aplicar e conferir. A
+ferramenta resolve de uma vez, por mínimos quadrados com regularização, o
+deslocamento dos números da `TABELA` que movem uma coluna escrita numa
+estação-chave ou um ponto-chave de curva de seção (os únicos valores
+editáveis; o ponto de estação gerada e o de coluna de curva saem deles), de
+modo que os desvios da superfície caiam sem afastá-la dos pontos medidos mais
+que o erro de leitura. Os pontos medidos são as `medidas` da receita, na
+posição declarada antes da edição, e, com `--cortes=<cortes lidos.json>` (a
+saída de `ler-corte.py`), os pontos do traço de cada corte, cada um com o
+`erro_mm` do corte dele; `--tolerancia-mm=` fixa um erro de leitura para todos
+(padrão: a mediana dos `erro_mm` dos cortes, ou 2 mm sem cortes). Nenhum
+número anda mais que o dobro da tolerância, e o ponto da superfície amarrado a
+uma medida não anda mais que ela. A saída em JSON traz `edicoes` (por nome:
+`tabela`, `indice`, `antigo`, `novo`, `deslocamentoMm` e as `entradas` da
+gaiola que o número move), `antes` e `depois` com as falhas da receita rodada
+com as edições, `medidas` e `cortes` com o quanto cada ponto medido estava
+longe e ficou, `modelo` (a diferença entre o desvio previsto e o medido) e
+`alisavel`. Aplique as edições à `TABELA`, ou grave uma cópia com
+`--gravar=<cópia.js>` (os números precisam estar escritos no texto da
+receita), e rode `npm run ondulacao` de novo. `--rodadas=2` lineariza de novo
+em torno do primeiro resultado, para edições de vários milímetros. Receita fora
+do repositório pede `--raiz=<pasta>`. Quando `alisavel` é falso, as falhas que
+sobram saem em `sobram`, cada uma com as medidas que estão no limite da
+tolerância ao redor dela (`impedem`), e é o caso em que a forma pede vinco ou
+estação nova: as edições que saem são a melhor tentativa dentro da tolerância.
+A gaiola dá a base: `gaiolaPorEstacoes` devolve `origens` (de cada ponto, a
+entrada declarada, a coluna de curva de seção com a curva, a fração e os
+pontos-chave, ou a estação gerada com as chaves, a fração e os nós),
+`entradas` (as coordenadas editáveis, como `z800/quarto[2].v`) e `estrutura`
+(o que não é entrada), e a ondulação traz `origem` em cada ponto que cita.
+Numa chapa desenhada por código, com erro de leitura de até 1,5 mm plantado nos
+pontos-chave, o alisamento tira as nove falhas (de até 0,74 mm, quatro delas de
+mais de três espaçamentos) editando números de no máximo 1,4 mm, com as
+medidas a até 1,66 mm; com uma quina real de 15 graus sem vinco, a falha
+cai de 0,59 a 0,48 mm e sai `alisavel: false`. A entrega de carroceria não
+deixa falha de ondulação que o alisamento consiga tirar dentro do erro de
+leitura dos cortes.
 
 Quando os vincos vêm das linhas 3D de um pacote (`ler-linhas --3d`, que confere
 cada linha contra os cortes do pacote e põe a que atravessa um corte longe do

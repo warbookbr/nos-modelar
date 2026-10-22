@@ -62,6 +62,7 @@ export const TESTES_LENTOS = [
   'tools/mcp/procedural.test.mjs',
   'tools/mcp/universo-dependencias.test.mjs',
   'tools/mecanifica/acervo-real.test.mjs',
+  'tools/mecanifica/alisar-a-superficie.test.mjs',
   'tools/mecanifica/calibracao-do-critico.test.mjs',
   'tools/mecanifica/capturar-montagem.test.ts',
   'tools/mecanifica/cilindro-hidraulico-aprovacao.test.mjs',

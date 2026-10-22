@@ -556,6 +556,94 @@ export function ajustarGaiolaAsMedidasComPeso(gaiola, medidas) {
   return { vertices: V, ganho, residuos, medidas: M };
 }
 
+/**
+ * operadorDasMedidas(gaiola, medidas) -> { aplicar(delta), exato }
+ * A mesma gaiola ajustada de `ajustarGaiolaAsMedidas` (todas as medidas exatas) ou de `ajustarGaiolaAsMedidasComPeso`
+ * (as outras), vista como a transformação linear que ela é: a posição ajustada de cada vértice é combinação linear das
+ * posições declaradas, com os mesmos pesos do ponto limite e a mesma fatoração. `aplicar(delta)` recebe um campo de
+ * deslocamentos [x, y, z] por vértice da gaiola (a lista toda, com [0, 0, 0] onde nada se move) e devolve o deslocamento
+ * que esse campo causa na gaiola ajustada: quem edita pontos declarados lê, sem refatorar nem refazer a superfície, quanto
+ * a gaiola ajustada se move. `medidas` é a lista de { indice, peso } da gaiola, com peso Infinity para a medida exata, como
+ * o passo `subdivisao` as monta. Não confere o ganho nem os resíduos, que as duas funções acima conferem na primeira vez.
+ */
+export function operadorDasMedidas(gaiola, medidas) {
+  const { nitidez, C, facesDoV } = prepararLimite(gaiola);
+  const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
+  const pesoDe = new Map();
+  for (const m of medidas) pesoDe.set(m.indice, m.peso);
+  const M = [...pesoDe.keys()].sort((a, b) => a - b);
+  const exato = M.every((i) => pesoDe.get(i) === Infinity);
+  const nV = P.length;
+  const linhaDe = new Map(M.map((i) => {
+    const est = estrelaDe(P, F, facesDoV[i], nitidez, i);
+    return [i, { globais: est.globais, w: pesosDaEstrela(est, C.has(i), borda) }];
+  }));
+  const somar = (D, termos) => { const b = [0, 0, 0]; for (const [j, w] of termos) { b[0] += w * D[j][0]; b[1] += w * D[j][1]; b[2] += w * D[j][2]; } return b; };
+  if (exato) {
+    const linha = new Map(M.map((i, r) => [i, r])); const n = M.length;
+    const A = Array.from({ length: n }, () => new Array(n).fill(0));
+    const fora = M.map((i) => {
+      const { globais, w } = linhaDe.get(i); const r = linha.get(i); const termos = [];
+      globais.forEach((j, c) => { const k = linha.get(j); if (k !== undefined) A[r][k] += w[c]; else termos.push([j, w[c]]); });
+      return termos;
+    });
+    const lu = fatorarLU(A);
+    if (lu.singularEm >= 0) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M);
+    const aplicar = (D) => {
+      const B = M.map((i, r) => { const b = somar(D, fora[r]); return [D[i][0] - b[0], D[i][1] - b[1], D[i][2] - b[2]]; });
+      const eixos = [0, 1, 2].map((ax) => resolverLU(lu, B.map((b) => b[ax])));
+      const V = D.map((d) => [...d]);
+      M.forEach((i, r) => { V[i] = [eixos[0][r], eixos[1][r], eixos[2][r]]; });
+      return V;
+    };
+    return { aplicar, exato, tamanho: nV };
+  }
+  const exatos = M.filter((i) => pesoDe.get(i) === Infinity); const comPeso = M.filter((i) => pesoDe.get(i) !== Infinity);
+  const emU = new Set(exatos);
+  for (const i of comPeso) for (const j of linhaDe.get(i).globais) emU.add(j);
+  const U = [...emU].sort((a, b) => a - b); const col = new Map(U.map((j, k) => [j, k]));
+  const nU = U.length; const nE = exatos.length; const n = nU + nE;
+  const esparsa = (i) => {
+    const { globais, w } = linhaDe.get(i); const termos = []; const fora = [];
+    globais.forEach((j, c) => {
+      if (w[c] === 0) return;
+      const k = col.get(j);
+      if (k !== undefined) termos.push([k, w[c]]); else fora.push([j, w[c]]);
+    });
+    return { termos, fora };
+  };
+  const A = Array.from({ length: n }, () => new Array(n).fill(0));
+  for (let k = 0; k < nU; k++) A[k][k] = 1;
+  const linhasComPeso = comPeso.map((i) => {
+    const e = esparsa(i); const p = pesoDe.get(i);
+    for (const [r, wr] of e.termos) for (const [c, wc] of e.termos) A[r][c] += p * wr * wc;
+    return { i, p, ...e };
+  });
+  const linhasExatas = exatos.map((i, s) => {
+    const e = esparsa(i); const r = nU + s;
+    for (const [c, wc] of e.termos) { A[r][c] += wc; A[c][r] += wc; }
+    return { i, r, ...e };
+  });
+  const lu = fatorarLU(A);
+  if (lu.singularEm >= 0) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M);
+  const aplicar = (D) => {
+    const rhs = [0, 1, 2].map((ax) => U.map((j) => D[j][ax]).concat(new Array(nE).fill(0)));
+    for (const { i, p, termos, fora } of linhasComPeso) {
+      const b = somar(D, fora);
+      for (const [r, wr] of termos) for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * (D[i][ax] - b[ax]);
+    }
+    for (const { i, r, fora } of linhasExatas) {
+      const b = somar(D, fora);
+      for (let ax = 0; ax < 3; ax++) rhs[ax][r] = D[i][ax] - b[ax];
+    }
+    const eixos = rhs.map((b) => resolverLU(lu, b));
+    const V = D.map((d) => [...d]);
+    U.forEach((j, r) => { V[j] = [eixos[0][r], eixos[1][r], eixos[2][r]]; });
+    return V;
+  };
+  return { aplicar, exato, tamanho: nV };
+}
+
 /* Espelha a gaiola no plano x = 0 ANTES de subdividir: os vértices com |x| <= tolerância ficam compartilhados pelas duas
  * metades e a costura sai lisa (subdividir a metade e espelhar depois deixaria a costura como borda, na regra de vinco).
  * Vértices novos: os da metade original nos mesmos índices, depois as imagens dos que não estão no plano, na ordem. */

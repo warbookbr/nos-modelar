@@ -50,11 +50,22 @@
  *         `passo` gera as que faltam, pela interpolação monótona das colunas entre as estações-chave. Com `interpolar`,
  *         `chaves: true` num seletor de cantos ou medidas marca só as estações-chave, e a estação gerada não é citável.
  *
+ * origens, entradas e estrutura: informação a mais na saída, para quem edita a gaiola por nome (a ferramenta de alisamento).
+ *         `origens` dá, de cada ponto, de onde ele vem: { tipo: 'declarada', estacao, coluna, entrada } para a coluna escrita
+ *         em `em`; { tipo: 'curva', curva, estacao, coluna, fracao, pontosChave } para a coluna amostrada numa curva de
+ *         seção; { tipo: 'gerada' (pelo passo) ou 'interpolada' (estação declarada sem colunas), estacao, coluna, chaves,
+ *         fracao, nos } para a coluna que a interpolação preencheu. `entradas` lista os valores editáveis, cada coordenada
+ *         [u, v, w] de uma coluna declarada ('estacao/coluna.u') e de um ponto-chave de uma curva ('estacao/curva[k].v'),
+ *         com o valor escrito; o ponto de origem 'curva' ou 'gerada' não tem entrada própria, e mexer nele é mexer nas
+ *         entradas de que ele sai. `estrutura` é o resumo do que não é entrada (estações e posições, nomes das colunas,
+ *         curvas, interpolação, vincos, vãos, medidas), para comparar duas execuções. `capturarGaiolas(fn)` devolve as
+ *         saídas das gaiolas montadas durante a chamada de `fn`, para ler essa informação de uma receita pronta.
+ *
  * A ordem de saída é determinística: os pontos por estação, na ordem declarada, e dentro dela por coluna; as faces por
  * estação, cada uma com as que ela fecha contra a frente aberta, da primeira coluna à última, e as do fechamento do
  * anel por último; vincos, cantos e medidas na ordem declarada e dos pontos. */
 
-import { expandirEstacoes } from './gaiola-interpolada.js';
+import { chaveDaColuna, entradasDaDefinicao, expandirEstacoes } from './gaiola-interpolada.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const TOLERANCIA_DA_COSTURA = 1e-9;
@@ -482,9 +493,18 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves) {
   return vertices.filter((p) => marcados.has(p)).map((p) => (pesos.has(p) ? { ponto: p, peso: pesos.get(p) } : p));
 }
 
+let capturando = null;
+
+/** capturarGaiolas(fn) -> { resultado, gaiolas }: as saídas de `gaiolaPorEstacoes` das chamadas feitas por `fn`, na ordem. */
+export function capturarGaiolas(fn) {
+  const anterior = capturando; const gaiolas = [];
+  capturando = gaiolas;
+  try { return { resultado: fn(), gaiolas }; } finally { capturando = anterior; }
+}
+
 /**
  * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, vincos, cantos, medidas, simetria, virar, prefixo, curvas, interpolar })
- *   -> { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, estacoes? }
+ *   -> { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, estacoes? }
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`: { vertices, faces, vincos, cantos?, medidas?,
  * simetria? }, tudo em nomes de ponto. `regioes` dá, para cada região, os nomes dos pontos dela, na ordem dos pontos.
  * `bordaDoVao(vao)` devolve os nomes dos pontos da borda do vão, em sequência ao longo das arestas da gaiola, com o
@@ -617,7 +637,17 @@ export function gaiolaPorEstacoes(definicao) {
     return S.colunas[S.indice.get(coluna)].ponto;
   };
   const porRegiao = Object.fromEntries([...regioes.values()].map((R) => [R.nome, vertices.filter((p) => R.pontos.includes(p))]));
-  const saida = { pontos, passo, ponto, bordaDoVao, regioes: porRegiao };
+  const origens = {};
+  for (const S of lidas) for (const c of S.colunas) {
+    origens[c.ponto] = expandida?.origens.get(chaveDaColuna(S.nome, c.nome)) ?? { tipo: 'declarada', estacao: S.nome, coluna: c.nome, entrada: `${S.nome}/${c.nome}` };
+  }
+  const { estacoes: _estacoes, ...demais } = definicao;
+  const estrutura = {
+    definicao: demais,
+    estacoes: lidas.map((S) => ({ nome: S.nome, em: S.em, regiao: S.regiao, colunas: S.colunas.map((c) => [c.nome, c.de, c.comeca, c.termina, c.regiao]) })),
+  };
+  const saida = { pontos, passo, ponto, bordaDoVao, regioes: porRegiao, origens, entradas: entradasDaDefinicao(definicao.estacoes), estrutura };
   if (chaves) saida.estacoes = lidas.map((e) => ({ nome: e.nome, em: e.em, tipo: expandida.tipos.get(e.nome) }));
+  if (capturando) capturando.push(saida);
   return saida;
 }

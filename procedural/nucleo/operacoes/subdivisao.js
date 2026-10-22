@@ -114,14 +114,19 @@ function lugaresDaEspessura(lugares, malha, gaiola, declarados) {
   return `, perto de ${textos.join(', ')} (${lugares.length} par(es) de vértices da malha ao todo); reduza a espessura abaixo do raio, abra a curva ali ou troque o lado; no vinco vivo o raio local é a largura da faixa de faces ao lado dele e cai pela metade a cada nível`;
 }
 
-/** gaiolaDoPasso(a, { vec, num }) -> { gaiola, declarados } ou { erro: [campo, mensagem] }
+/** gaiolaDoPasso(a, { vec, num }) -> { gaiola, declarados, declaradaCheia, medidas } ou { erro: [campo, mensagem] }
  *  A gaiola que o passo `subdivisao` subdivide, resolvida dos argumentos do passo: os nomes traduzidos em índices, a
  *  simetria aplicada (com `imagem`, o índice da imagem espelhada de cada ponto) e, com `medidas`, os pontos ajustados
  *  para a superfície limite passar pelas cotas. `vec` e `num` resolvem ponto e número pelo dicionário da peça. O passo
- *  usa esta função, e uma ferramenta que lê a superfície entregue pode usá-la para saber de que gaiola ela saiu. */
+ *  usa esta função, e uma ferramenta que lê a superfície entregue pode usá-la para saber de que gaiola ela saiu.
+ *  Com `medidas`, `declaradaCheia` é a gaiola como foi declarada (com a simetria aplicada, antes do ajuste) e `medidas` a
+ *  lista de { indice, peso } da gaiola cheia (peso Infinity para a medida exata, as imagens espelhadas incluídas), que
+ *  `operadorDasMedidas` de `subdivisao.js` lê para dizer como a gaiola ajustada acompanha a declarada; sem `medidas`, os
+ *  dois são null. */
 export function gaiolaDoPasso(a, { vec, num }) {
   const erro = (campo, mensagem) => ({ erro: [campo, mensagem] });
   let gaiola; let soltos = [];
+  let declaradaCheia = null; let medidasLidas = null;
   const declarados = a.vertices ?? [];
   /* Os pontos nomeados da gaiola: o nome endereça o vértice em faces, vincos, cantos e medidas. */
   const indiceDoNome = new Map();
@@ -186,6 +191,7 @@ export function gaiolaDoPasso(a, { vec, num }) {
     }
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
+    declaradaCheia = gaiola;
     const vistos = new Map();
     for (const m of lidas) {
       if (vistos.has(m.nome) && vistos.get(m.nome) !== m.peso) return erro('medidas', `o ponto ${citar(m.nome)} aparece em medidas com pesos diferentes`);
@@ -196,10 +202,12 @@ export function gaiolaDoPasso(a, { vec, num }) {
         /* só medidas exatas: o caminho de sempre, que a saída das fixtures guarda bit a bit */
         const indices = lidas.map((m) => m.indice);
         const marcados = gaiola.imagem ? [...indices, ...indices.map((k) => gaiola.imagem[k])] : indices;
+        medidasLidas = [...new Set(marcados)].map((indice) => ({ indice, peso: Infinity }));
         gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidas({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
       } else {
         const marcados = lidas.map(({ indice, peso }) => ({ indice, peso }));
         if (gaiola.imagem) marcados.push(...lidas.map(({ indice, peso }) => ({ indice: gaiola.imagem[indice], peso })));
+        medidasLidas = marcados;
         gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidasComPeso({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
       }
     } catch (e) {
@@ -208,7 +216,7 @@ export function gaiolaDoPasso(a, { vec, num }) {
       return erro('medidas', `${e.motivo}: ${nomes.join(', ')}`);
     }
   }
-  return { gaiola, declarados };
+  return { gaiola, declarados, declaradaCheia, medidas: medidasLidas };
 }
 
 export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem }) {
