@@ -419,6 +419,44 @@ lados), o vão que deixa ponto sem face, o vinco sobre aresta que a fusão ou o
 vão tirou, o ponto com x < 0 na simetria e a aresta no plano x = 0 com duas
 faces.
 
+Para adensar só um trecho, como uma borda enrolada ou a volta de um friso na
+ponta de um vão, declare uma região e marque com `regiao` as estações parciais
+e as colunas extras dela. A estação parcial vai de uma coluna a outra dentro da
+faixa de colunas da região (`null` é a borda) e fica entre as duas estações
+inteiras da faixa; a face de fora que encosta nela fecha um pentágono, e por
+isso, entre duas estações inteiras, só uma parcial toca cada coluna de borda da
+região. `termina: true` na última estação de uma coluna deixa a chapa acabar ali
+daquele lado, com a aresta até a vizinha como borda livre (a tampa que acaba
+antes da última estação), e `comeca: true` faz a coluna nascer na borda:
+
+```js
+const g = gaiolaPorEstacoes({
+  eixo: 'z',
+  regioes: [{ nome: 'moldura', estacoes: ['e03', 'e07'], colunas: ['d', null] }],
+  estacoes: [
+    secao('e03', 0.30),
+    { nome: 'm35', em: 0.35, regiao: 'moldura', colunas: [d, e, ...aba.map((c) => ({ ...c, comeca: true }))] },
+    secao('e04', 0.40, { extras: aba.map((c) => ({ ...c, regiao: 'moldura' })) }),
+    // ... m45, e05, m55, e06, e a última parcial com termina: true nas colunas da aba
+    secao('e07', 0.70),
+  ],
+});
+// g.regioes.moldura lista os pontos da região
+```
+
+Na borda enrolada de prova (`procedural/nucleo/fixtures/borda-enrolada.js`), a
+região acrescenta 62 pontos à chapa de 55, todos dentro da faixa, com 8
+pentágonos na transição; a superfície em nível 2 sai sem cruzamento e com no
+máximo 19,7 graus entre faces vizinhas, os 1.095 vértices novos ficam nas faces
+que a região mudou e nas vizinhas delas, e o resto da chapa sai igual. O eixo
+também pode ser uma curva nomeada, para o anel em volta de um vão:
+`eixo: { curva: 'vidro', pontos, normal: [1, 0, 0], fechada: true }`, com `em`
+como fração do comprimento da poligonal, de 0 a menos de 1, e a coluna em
+`[u, v, w]` no triedro da curva: v na normal declarada, w na tangente e u = T × V,
+que aponta para fora quando a curva gira no sentido anti-horário visto do lado da
+normal. O anel liga a última estação à primeira, e o vinco que segue uma coluna
+inteira volta ao primeiro ponto.
+
 Sem `espessura`, a superfície sai aberta se a gaiola for aberta, e o
 `conferir-malha` acusa casca aberta. Com `espessura: 0.002` (número ou nome de
 `PARAMS`), a superfície subdividida vira a face externa de um sólido fechado:
