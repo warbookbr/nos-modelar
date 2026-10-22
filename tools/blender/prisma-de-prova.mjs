@@ -16,8 +16,31 @@ export const CAIXA = [0, 0.45, -0.05, 0.4, CAIXA_Z0, 0.9];
 
 const ARCO = { meia: 0.25, base: 0.3, topo: 0.34, facetas: 12 };
 
-/** A seção (x, y), no sentido anti-horário, a partir do canto de baixo à esquerda. */
-export function secao() {
+/** O raio e as facetas com que a quina do chanfro se arredonda na variante sem esse vinco: cada faceta dobra 10 graus, e
+    a primeira e a última 5, abaixo do limiar de 25 graus. */
+export const ARREDONDAMENTO = { raio: 0.03, facetas: 4 };
+
+/** A quina P arredondada por um arco tangente às duas retas (de anterior a P e de P a seguinte), em facetas iguais. */
+function arredondar(anterior, P, seguinte, { raio, facetas }) {
+  const un = (v) => { const l = Math.hypot(...v); return v.map((x) => x / l); };
+  const a = un([P[0] - anterior[0], P[1] - anterior[1]]);
+  const b = un([seguinte[0] - P[0], seguinte[1] - P[1]]);
+  const giro = Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1])));
+  const sinal = Math.sign(a[0] * b[1] - a[1] * b[0]);
+  const t = raio * Math.tan(giro / 2);
+  const T1 = [P[0] - a[0] * t, P[1] - a[1] * t];
+  const centro = [T1[0] - sinal * raio * a[1], T1[1] + sinal * raio * a[0]];
+  const r0 = [T1[0] - centro[0], T1[1] - centro[1]];
+  return Array.from({ length: facetas + 1 }, (_, k) => {
+    const g = (sinal * giro * k) / facetas;
+    return [centro[0] + r0[0] * Math.cos(g) - r0[1] * Math.sin(g), centro[1] + r0[0] * Math.sin(g) + r0[1] * Math.cos(g)];
+  });
+}
+
+/** A seção (x, y), no sentido anti-horário, a partir do canto de baixo à esquerda. As variantes mexem nas duas quinas do
+    chanfro, (±0,35, 0,18), que dão os vincos longitudinais do chanfro: semVinco as arredonda em facetas que não passam do
+    limiar, e o vinco some com a forma quase igual; subirVinco as sobe essa altura em metro, e o vinco se desloca. */
+export function secao({ semVinco = false, subirVinco = 0 } = {}) {
   const { meia, base, topo, facetas } = ARCO;
   // círculo que passa por (±meia, base) e (0, topo)
   const c = (meia ** 2 + base ** 2 - topo ** 2) / (2 * (base - topo));
@@ -27,15 +50,25 @@ export function secao() {
     const a = a0 - (2 * a0 * i) / facetas;
     return [R * Math.sin(a), c + R * Math.cos(a)];
   });
-  return [[-0.35, 0], [0.35, 0], [0.35, 0.18], ...arco, [-0.35, 0.18]];
+  const yq = 0.18 + subirVinco;
+  if (!semVinco) return [[-0.35, 0], [0.35, 0], [0.35, yq], ...arco, [-0.35, yq]];
+  const direita = arredondar([0.35, 0], [0.35, yq], arco[0], ARREDONDAMENTO);
+  const esquerda = arredondar(arco[arco.length - 1], [-0.35, yq], [-0.35, 0], ARREDONDAMENTO);
+  return [[-0.35, 0], [0.35, 0], ...direita, ...arco, ...esquerda];
+}
+
+/** O ponto do meio do arco que arredonda a quina do chanfro na variante sem vinco, do lado x > 0. */
+export function meioDoArredondamento() {
+  const S = secao({ semVinco: true });
+  return S[2 + ARREDONDAMENTO.facetas / 2];
 }
 
 const zFrente = (y) => FRENTE - INCLINACAO * y;
 
 /** A malha fechada em OBJ: as faces laterais de z = 0 até a frente, a tampa da frente e a de trás; desloca é a translação
-    da forma inteira, em metro. */
-export function obj(desloca = [0, 0, 0]) {
-  const S = secao();
+    da forma inteira, em metro, e variante vai à seção (semVinco ou subirVinco). */
+export function obj(desloca = [0, 0, 0], variante = {}) {
+  const S = secao(variante);
   const n = S.length;
   const L = [];
   const v = (x, y, z) => `v ${x + desloca[0]} ${y + desloca[1]} ${z + desloca[2]}`;

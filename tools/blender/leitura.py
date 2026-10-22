@@ -718,6 +718,31 @@ def mapa_da_vista(mt):
     return para_mm, ['x_camera', 'y_camera']
 
 
+def projetar_na_vista(P, mt):
+    """Pontos 3D em metro levados a mm no plano da vista, no quadro de mapa_da_vista: na vista alinhada, as coordenadas do
+    mundo dos dois eixos da imagem; na oblíqua, a projeção nos eixos da câmera."""
+    P = np.asarray(P, float).reshape(-1, 3)
+    ex = eixos_da_vista(mt)
+    if ex:
+        return P[:, [ex[1], ex[3]]] * 1000
+    return np.stack([P @ np.array(mt['x_cam'], float), P @ np.array(mt['y_cam'], float)], 1) * 1000
+
+
+def mm_para_px(Q, mt):
+    """O inverso de mapa_da_vista: pontos em mm no plano da vista levados a pixel da imagem dela."""
+    Q = np.asarray(Q, float).reshape(-1, 2) / 1000
+    c = np.array(mt['centro'], float)
+    s, W, H = mt['escala'], mt['W'], mt['H']
+    ex = eixos_da_vista(mt)
+    if ex:
+        _, ah, sh, av, sv = ex
+        X, Y = sh * (Q[:, 0] - c[ah]), sv * (Q[:, 1] - c[av])
+    else:
+        X = Q[:, 0] - c @ np.array(mt['x_cam'], float)
+        Y = Q[:, 1] - c @ np.array(mt['y_cam'], float)
+    return np.stack([W / 2 + X * W / s, H / 2 - Y * W / s], 1)
+
+
 def ler_vista_de_linhas(imagem, v, mt, grade=None, falha_max=10.0, minimo_px=None):
     """As linhas de feição (traço preto) e as bordas de corte da caixa (cinza fino) de uma vista, em mm no plano dela."""
     rgb = np.asarray(Image.open(imagem).convert('RGB'))
@@ -844,6 +869,38 @@ def comparar_contornos(lidas, candidatas, erro_mm=0.0, passo=0.5):
             e['ponto_da_maxima'] = np.round(Q[int(np.argmax(d))], 2).tolist()
             e['fracao_acima_do_erro'] = round(float((d > erro_mm).mean()), 4)
         out[nome] = e
+    return out
+
+
+def distancias_entre_linhas(de, para, passo=1.0):
+    """Os pontos de cada polilinha de `de` ([{pontos_mm, fechada}], em qualquer dimensão), a cada passo mm, e a distância
+    de cada um à polilinha de `para` mais perto (infinita quando `para` está vazio)."""
+    Q = [reamostrar(np.asarray(p['pontos_mm'], float), passo, p.get('fechada', False)) for p in de if len(p['pontos_mm'])]
+    Q = np.vstack(Q) if Q else np.zeros((0, 2))
+    A, B = segmentos([{'pontos': p['pontos_mm'], 'fechada': p.get('fechada', False)} for p in para], eps=0.02)
+    if not len(Q):
+        return Q, np.zeros(0)
+    return Q, distancia_a_segmentos(Q, A, B, bloco=max(16, 4_000_000 // max(1, len(A))))
+
+
+def medidas_de_casamento(d_lc, d_cl, comp_lido, comp_cand, tolerancias=(2.0, 5.0), erro_mm=None):
+    """Cobertura (fração dos pontos lidos do pacote a até tau de uma linha da candidata), precisão (o contrário) e F1 a cada
+    tolerância, o desvio (mediana e p90 da distância do lido à candidata) e, com o erro de leitura, a fração do lido acima
+    dele, que é o piso da medida."""
+    out = {'comprimento_pacote_mm': round(float(comp_lido), 1), 'comprimento_candidata_mm': round(float(comp_cand), 1)}
+    for tau in tolerancias:
+        c = round(float((d_lc <= tau).mean()), 3) if len(d_lc) else 0.0
+        p = round(float((d_cl <= tau).mean()), 3) if len(d_cl) else 0.0
+        out[f'cobertura_{tau:g}mm'], out[f'precisao_{tau:g}mm'] = c, p
+        out[f'f1_{tau:g}mm'] = round(2 * c * p / (c + p), 3) if c + p > 0 else 0.0
+    fin = d_lc[np.isfinite(d_lc)]
+    out['desvio_mediana_mm'] = round(float(np.median(fin)), 3) if len(fin) else None
+    out['desvio_p90_mm'] = round(float(np.percentile(fin, 90)), 3) if len(fin) else None
+    fin = d_cl[np.isfinite(d_cl)]
+    out['excesso_mediana_mm'] = round(float(np.median(fin)), 3) if len(fin) else None
+    if erro_mm is not None:
+        out['erro_leitura_mm'] = erro_mm
+        out['fracao_acima_do_erro'] = round(float((d_lc > erro_mm).mean()), 4) if len(d_lc) else None
     return out
 
 
