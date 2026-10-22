@@ -350,26 +350,39 @@ def _uniao(n, pares):
 
 # ---------- visibilidade ----------
 
-def direcoes(vis, espelhar=False):
-    """Direções da esfera de Fibonacci permitidas ao observador; com espelhar, o lado é o da metade x < 0."""
-    n = int(vis['direcoes'])
+def direcoes_espelhadas(n):
+    """Cerca de n direções da esfera de Fibonacci, simétricas em x: as da metade x >= 0 e a imagem espelhada de cada uma
+    (a do plano x = 0 uma vez só). A esfera de Fibonacci sozinha não é simétrica em x, e a metade x < 0, que usa as
+    direções pelo lado espelhado, veria a peça por outras direções que a metade x > 0."""
     g = math.pi * (3 - math.sqrt(5))
+    metade = []
+    for i in range(int(n)):
+        y = 1 - 2 * (i + 0.5) / n
+        r = math.sqrt(1 - y * y)
+        th = g * i
+        d = (r * math.cos(th), y, r * math.sin(th))
+        if d[0] >= 0:
+            metade.append(d)
+    out = []
+    for d in metade:
+        out.append(d)
+        if d[0] > 0:
+            out.append((-d[0], d[1], d[2]))
+    return np.array(out, float)
+
+
+def direcoes(vis, espelhar=False):
+    """Direções permitidas ao observador, de um conjunto simétrico em x; com espelhar, o lado e o cima são os da metade
+    x < 0 (as imagens espelhadas), de modo que as direções da metade x < 0 são as imagens das da metade x >= 0."""
     cima = np.array(vis['cima'], float)
     cima /= np.linalg.norm(cima)
     lado = np.array(vis['lado'], float)
     lado /= np.linalg.norm(lado)
     if espelhar:
         lado = lado * np.array([-1.0, 1.0, 1.0])
+        cima = cima * np.array([-1.0, 1.0, 1.0])
     ok = lambda d: d @ cima >= vis['elevacao_minima'] and d @ lado >= vis['lado_minimo']
-    out = []
-    for i in range(n):
-        y = 1 - 2 * (i + 0.5) / n
-        r = math.sqrt(1 - y * y)
-        th = g * i
-        d = np.array([r * math.cos(th), y, r * math.sin(th)])
-        if ok(d):
-            out.append(Vector(d))
-    return out, ok
+    return [Vector(d) for d in direcoes_espelhadas(int(vis['direcoes'])) if ok(d)], ok
 
 
 class Visibilidade:
@@ -452,6 +465,11 @@ def preparar_referencia(V, F, rot, cfg, oclusores=None):
     manter = entra[inv_p]
     cont['paineis'] = int(len(ids_p))
     cont['paineis_removidos'] = int((~entra).sum())
+    espelhados = 0
+    if cfg['simetria_x']:
+        # a metade x < 0 leva a decisão da imagem espelhada: a mesma superfície triangulada de outro jeito (na referência
+        # ou no bisect) dá outros pontos de visibilidade e outra fração visível do painel, e a decisão sairia de um lado só
+        manter, espelhados = espelhar_decisao(Vr, Fr, manter)
     # componentes por aresta entre faces mantidas
     ambos = manter[internas[2]] & manter[internas[3]]
     comp = _uniao(len(Fr), zip(internas[2][ambos], internas[3][ambos]))
@@ -471,10 +489,46 @@ def preparar_referencia(V, F, rot, cfg, oclusores=None):
         cont['triangulos_rotulo_herdado'] = int((manter & excl).sum())
     cont['triangulos_mantidos'] = int(manter.sum())
     cont['area_mantida_m2'] = round(float(area[manter].sum()), 6)
+    if cfg['simetria_x']:
+        cont['simetria'] = {'triangulos_decididos_pelo_espelho': espelhados, **simetria_do_recorte(Vr, Fr, manter)}
     cont['bordas'] = classificar_bordas(Vr, Fr, manter, regiao, cfg['angulo_painel'])
     fora = np.maximum(regiao[:, 0] - Vr[np.unique(Fr[manter])], Vr[np.unique(Fr[manter])] - regiao[:, 1]).max()
     cont['fora_da_caixa_m'] = float(max(0.0, fora))
     return {'V': Vr, 'F': Fr, 'manter': manter, 'visivel': vis, 'rotulo': rot_r, 'regiao': regiao, 'contagens': cont}
+
+
+def espelhar_decisao(V, F, manter, tol=1e-3):
+    """Com simetria em x: cada triângulo de centro em x < 0 fica ou sai como o triângulo onde cai a imagem espelhada do
+    centro dele, a até tol metro; sem imagem na malha, fica a própria decisão. Devolve a decisão nova e quantos triângulos
+    ela mudou."""
+    arv = bvh(V, F)
+    C_ = V[F].mean(1)
+    novo = manter.copy()
+    for t in np.nonzero(C_[:, 0] < 0)[0]:
+        idx = arv.find_nearest(Vector(C_[t] * np.array([-1.0, 1.0, 1.0])), tol)[2]
+        if idx is not None:
+            novo[t] = manter[idx]
+    return novo, int((novo != manter).sum())
+
+
+def simetria_do_recorte(V, F, manter, tol=1e-3):
+    """Com simetria em x, confere que o recorte é simétrico: a imagem espelhada do centro de cada triângulo mantido cai, a
+    até tol metro, sobre um triângulo do recorte, e esse triângulo também fica. Devolve a área (e a contagem) dos mantidos
+    cujo espelho caiu num triângulo tirado, que é a assimetria do próprio recorte, e a área dos que não têm espelho na malha,
+    que é a assimetria da referência."""
+    arv = bvh(V, F)
+    _, area = normais(V, F)
+    Cm = V[F].mean(1) * np.array([-1.0, 1.0, 1.0])
+    tirado, n_tirado, sem = 0.0, 0, 0.0
+    for t in np.nonzero(manter)[0]:
+        idx = arv.find_nearest(Vector(Cm[t]), tol)[2]
+        if idx is None:
+            sem += area[t]
+        elif not manter[idx]:
+            tirado += area[t]
+            n_tirado += 1
+    return {'tolerancia_m': tol, 'triangulos_espelho_tirado': n_tirado, 'area_espelho_tirado_m2': round(float(tirado), 6),
+            'area_sem_espelho_m2': round(float(sem), 6)}
 
 
 def classificar_bordas(V, F, manter, regiao, angulo_painel):

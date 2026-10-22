@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1572 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1573 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1906,6 +1906,7 @@
 ## tools/blender/
 
 - `blender.test.mjs` — blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a régua dá zero na identidade, acusa a ver…
+- `caixa-de-prova.mjs` — caixa-de-prova.mjs — a forma simétrica em x, desenhada por código, com que se prova que o pacote cego sai simétrico: uma caixa oca de chapa sem espessura, co…
 - `cotas-dos-cortes.test.mjs` — cotas-dos-cortes.test.mjs — o rótulo de cada cota de um corte não pode cobrir o traço do contorno: o desenho afasta a caixa do ponto e liga os dois por uma l…
 - `distancias-de-prova.mjs` — distancias-de-prova.mjs — as medidas com que os testes das leituras do pacote conferem polilinhas lidas contra as exatas, em qualquer dimensão: os pontos a c…
 - `leitura-blender.test.mjs` — leitura-blender.test.mjs — ler-corte, ler-linhas e comparar-cortes sobre um pacote cego feito de verdade pelo pacote-cego.py, a partir do prisma de prova (pr…

@@ -14,7 +14,10 @@
 # direções permitidas ao observador, contra a referência inteira mais os oclusores; (3) rótulos excluídos fora; (4) painéis,
 # faces ligadas por aresta com diedro abaixo de angulo_painel, entram inteiros quando a maior parte da área se vê de fora,
 # de modo que a borda do que fica é corte, borda livre ou dobra; (5) componentes com menos de fracao_componente da área do
-# maior saem. A configuração, as vistas e o padrão de cada chave estão em comum.PADRAO.
+# maior saem. A configuração, as vistas e o padrão de cada chave estão em comum.PADRAO. Com --simetria-x, as direções do
+# observador formam um conjunto simétrico em x, a metade x < 0 leva a decisão da imagem espelhada de cada triângulo, e
+# pacote.json traz em contagens.simetria quantos triângulos o espelho decidiu e a área mantida cujo espelho saiu (zero
+# quando o recorte é simétrico; acima de zero, o pacote avisa).
 #
 # Além das vistas sombreadas, desenha as linhas de feição (arestas com diedro acima de angulo_feicao, padrão 25 graus) e as
 # bordas do recorte, em traço preto sobre branco na mesma câmera e grade (vistas/<vista>-linhas.png), e os cortes planos da
@@ -91,4 +94,8 @@ pacote = {
                                          'excluir', 'resolucao', 'amostras_render', 'avesso', 'angulo_feicao', 'cortes')},
 }
 json.dump(pacote, open(os.path.join(a['saida'], 'pacote.json'), 'w'), ensure_ascii=False, indent=1)
+sim = prep['contagens'].get('simetria')
+if sim and sim['area_espelho_tirado_m2'] > 0:
+    print(f"AVISO: o recorte não saiu simétrico em x: {sim['triangulos_espelho_tirado']} triângulos mantidos "
+          f"({sim['area_espelho_tirado_m2']} m²) têm o espelho tirado", file=sys.stderr)
 print('PACOTE', json.dumps({'contagens': prep['contagens'], 'avesso': avesso}, ensure_ascii=False))
