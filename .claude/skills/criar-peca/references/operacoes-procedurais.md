@@ -588,7 +588,9 @@ vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora d
 forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra continua para a
 pessoa e o crítico conferirem.
 
-Quando os vincos vêm das linhas 3D de um pacote (`ler-linhas --3d`), rode
+Quando os vincos vêm das linhas 3D de um pacote (`ler-linhas --3d`, que confere
+cada linha contra os cortes do pacote e põe a que atravessa um corte longe do
+contorno dele em `recusadas_pelos_cortes`, fora de `polilinhas_3d`), rode
 `npm run vincos-das-linhas -- <peça> --linhas=<linhas.json>` e declare o que
 ela sugere, em vez de escolher a coluna a olho. A ferramenta separa as colunas
 e as estações pelos nomes `estacao_coluna` da `gaiolaPorEstacoes` (sem esse
@@ -605,8 +607,17 @@ ponto da linha em cada estação; `comVincos` diz se o passo aceita tudo, e cada
 vinco traz a distância à linha e o diedro na malha refeita. Numa forma
 desenhada por código com linhas de ruído de ±1 mm, os vincos sugeridos ficaram
 a até 1,95 mm das linhas e o friso entre duas colunas saiu a 0,406 do caminho,
-com 0,4 desenhado. A função `vincosDasLinhas`, do mesmo arquivo, faz o mesmo
-num teste.
+com 0,4 desenhado. Só cita nomes que a receita declara. Com `interpolar`, a
+estação gerada (`${chave}_${k}`) não é citável: o vinco de coluna vai de
+estação-chave a estação-chave, e a coluna que passa por estação gerada sai sem
+`pontos`, com `semPontosNoPasso`, e vale `vincosNaGaiola`; o que começa, acaba
+ou dobra numa estação gerada sai com `deEntreChaves` e `ateEntreChaves` ou em
+`cantosSemChave`, entre que chaves e a que fração, e a linha ao longo de uma
+estação gerada sai em `faltantes` como estação-chave nova entre as duas chaves.
+A aresta de uma face só, na borda da peça ou na de um vão, é borda e a chapa
+termina ali: o trecho sai como `borda` (em `bordas`, com `emBorda` quando só
+parte dele é borda) e nenhum vinco se sugere nela. A função `vincosDasLinhas`,
+do mesmo arquivo, faz o mesmo num teste.
 
 ## Friso ao longo de curva: `friso`
 
