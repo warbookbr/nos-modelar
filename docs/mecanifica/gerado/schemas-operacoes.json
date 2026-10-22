@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:0a4963535ae2c5d2ed1ff812e1e4ee8c623cccae88dba6d308e53be82ad21147",
+  "assinatura": "sha256:cde79864c9c933295aaaa3ff93787ed438b18d81d04e6b02721a4c0c1dde209e",
   "total": 39,
   "operacoes": [
     {
@@ -1812,15 +1812,14 @@
       "nome": "friso",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha.",
+        "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha, ou a aba que dobra a borda livre de um vão.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.friso@1",
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "linha",
-            "perfil"
+            "linha"
           ],
           "properties": {
             "origemId": {
@@ -1859,6 +1858,10 @@
                 }
               ],
               "description": "Perfil [u, v] em metros: v pela normal, com v = 0 na linha, e u para a esquerda de quem segue a linha; lista de pontos, {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno}. Na chapa com espessura, a parte de v negativo entra nela, menos que a espessura."
+            },
+            "aba": {
+              "type": "object",
+              "description": "Em vez de perfil, só sobre a superficie e com espessura: a aba que dobra a borda livre da chapa para dentro, {largura, angulo, raio} em metros e graus, os três obrigatórios. A linha é a borda de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao da gaiolaPorEstacoes dá a de um vão), em qualquer sentido: o passo acha o lado da chapa. largura é a perna reta depois da dobra, angulo quanto a chapa gira (90 deixa a aba perpendicular) e raio o da face de dentro da dobra, com raio + espessura na de fora. A dobra começa na linha e se estende raio + espessura para o lado do vão. As faces saem lisas a 30 graus, e a dobra, a ponta e a espessura ficam vivas."
             },
             "ponta": {
               "anyOf": [
@@ -2037,7 +2040,8 @@
         },
         "precondicoes": [
           "Com superficie, o passo subdivisao citado vem antes e gerou malha, e cada par seguido da linha é aresta da gaiola dele.",
-          "Sem superficie, a polilinha declara normal."
+          "Sem superficie, a polilinha declara normal.",
+          "Declare perfil ou aba, um dos dois; a aba exige superficie com espessura e uma linha de arestas de borda livre."
         ],
         "limites": [
           "O friso é sólido fechado próprio, que interpenetra a chapa pela parte de v negativo; a receita nomeia as partes e declara o contato (contatos), que contatosDaPeca mede. Não há fusão por booleana com a superfície subdividida.",
@@ -2045,6 +2049,8 @@
           "Na chapa com espessura, o perfil sem parte abaixo de v = 0 e o que entra mais que a espessura gritam; a folga entre a base reta do perfil e a chapa que curva de lado (cerca de curvatura × (largura/2)² / 2) não é conferida pelo passo, e o perfil precisa entrar mais que ela.",
           "Cada junta põe o perfil no plano bissetor e o estica pela esquadria; a curva fechada demais para a largura do perfil grita com o ponto da gaiola mais perto. Partes distantes do friso que se cruzam não são conferidas.",
           "Na simetria em x da superfície, a linha que toca o plano x = 0 numa ponta continua na imagem espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia espelhada; o perfil assimétrico emendado pela costura não fica espelhado.",
+          "A aba é sólido próprio que encosta na parede da borda da chapa, sem fusão: a receita nomeia as partes e declara o contato. Ela sai da linha pela normal média das faces da borda, e não pela tangente exata da superfície limite.",
+          "A aba que volta por baixo da chapa (ângulo grande com perna longa) e a que atravessa a própria dobra gritam; nas quinas de um vão o perfil estica pela esquadria.",
           "origem publica as faces sem sub-endereço por posição; parte: 'lateral' cita a superfície varrida e 'pontas' as tampas das pontas abertas."
         ],
         "diagnosticos": []

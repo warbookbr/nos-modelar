@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1581 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1583 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1080,7 +1080,8 @@
 - `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `extensoes.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
-- `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão: na chapa curva com vão de `fixtures/friso-prova.js`, …
+- `friso-aba.test.mjs` — friso-aba.test.mjs — a aba que dobra a borda livre de um vão (fatia 25, item 6 do plano da carroceria por subdivisão). A chapa de referência dobra uns 90 gra…
+- `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão (e o da aba da fatia 25): na chapa curva com vão de `f…
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
 - `gaiola-interpolada.js` — gaiola-interpolada.js — estações interpoladas e colunas por curva de seção, opções da gaiola por estações
@@ -1125,6 +1126,7 @@
 
 ## procedural/nucleo/fixtures/
 
+- `aba-prova.js` — aba-prova.js — a chapa curva com um vão de janela nomeado e a aba que dobra a borda dele, desenhadas por código.
 - `borda-enrolada.js` — borda-enrolada.js — a borda enrolada de prova da gaiola local, desenhada só por código
 - `friso-prova.js` — friso-prova.js — a chapa curva com vão e os frisos desenhados por código para o teste do passo `friso`.
 - `gaiola-interpolada-prova.js` — gaiola-interpolada-prova.js — a forma de prova da gaiola interpolada, desenhada só por código

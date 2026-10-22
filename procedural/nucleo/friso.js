@@ -77,6 +77,78 @@ export function cadeiaRefinada(faces, nVertices, niveis, cadeia) {
   return { cadeia: c, faces: F, vertices: nV };
 }
 
+/**
+ * perfilDaAba({ espessura, raio, largura, angulo, segmentosPorQuarto }) -> [[w, v], ...]
+ *   O perfil em L da aba que dobra a borda de uma chapa de espessura `espessura`, em metro e graus. A chapa chega ao
+ *   ponto (w = 0, v = 0) da face de fora, com a face de dentro em v = -espessura, e dobra para dentro (v negativo) num
+ *   arco de raio `raio` na face de dentro, `raio + espessura` na de fora, que gira `angulo` graus; depois a perna reta
+ *   de comprimento `largura` segue na direção em que o arco acabou. w cresce para além da borda (para o lado livre).
+ *   O arco tem `segmentosPorQuarto` segmentos a cada 90 graus (pelo menos um), e as duas faces da dobra usam o mesmo
+ *   número deles. Grita com ErroDoFriso no valor inválido e na aba que volta por baixo da chapa (w < 0).
+ */
+export const ANGULO_MAXIMO_DA_ABA = 180;
+const PASSOS_DO_QUARTO_DA_ABA = 4;
+export function perfilDaAba({ espessura, raio, largura, angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA }) {
+  const finito = (x) => typeof x === 'number' && Number.isFinite(x);
+  if (!finito(espessura) || !(espessura > 0)) throw new ErroDoFriso(`a espessura da chapa precisa ser maior que zero, e veio ${espessura}`);
+  if (!finito(raio) || !(raio > 0)) throw new ErroDoFriso(`o raio da dobra precisa ser maior que zero, e veio ${raio}`);
+  if (!finito(largura) || !(largura > 0)) throw new ErroDoFriso(`a largura da aba precisa ser maior que zero, e veio ${largura}`);
+  if (!finito(angulo) || !(angulo > 0) || !(angulo < ANGULO_MAXIMO_DA_ABA)) throw new ErroDoFriso(`o ângulo da aba precisa ficar entre 0 e ${ANGULO_MAXIMO_DA_ABA} graus, e veio ${angulo}`);
+  const ri = raio; const ro = raio + espessura; const alfa = (angulo * Math.PI) / 180;
+  const n = Math.max(1, Math.ceil((segmentosPorQuarto * alfa) / (Math.PI / 2) - 1e-9));
+  const arco = (r, k) => { const t = (alfa * k) / n; return [r * Math.sin(t), -ro + r * Math.cos(t)]; };
+  const perna = [largura * Math.cos(alfa), -largura * Math.sin(alfa)];
+  const fora = Array.from({ length: n + 1 }, (_, k) => arco(ro, k));
+  const dentro = Array.from({ length: n + 1 }, (_, k) => arco(ri, k));
+  const perfil = [...fora, [fora[n][0] + perna[0], fora[n][1] + perna[1]], [dentro[n][0] + perna[0], dentro[n][1] + perna[1]], ...dentro.reverse()];
+  /* a face de dentro começa em -espessura, e o arredondamento não deve tirá-la de lá */
+  perfil[perfil.length - 1] = [0, -espessura];
+  const menorW = Math.min(...perfil.map((p) => p[0]));
+  if (menorW < -1e-12) throw new ErroDoFriso(`a aba de ${angulo} graus com perna de ${largura} passa ${Number((-menorW).toPrecision(3))} por baixo da chapa, além da borda onde a dobra começa: reduza o ângulo ou a largura`);
+  return perfil;
+}
+
+/**
+ * tampaDaAba(perfil) -> [[índices], ...]
+ *   As tampas de uma ponta aberta da aba como quadriláteros, uma escada entre a face de fora e a de dentro da dobra e da
+ *   perna, em vez do leque do earcut, cujo vértice de valência 9 o conferir-malha marca como polo. Os índices são os do
+ *   perfil de `perfilDaAba`.
+ */
+export function tampaDaAba(perfil) {
+  const n = (perfil.length - 4) / 2;
+  const quadros = [];
+  for (let k = 0; k < n; k++) quadros.push([k, k + 1, 2 * n + 2 - k, 2 * n + 3 - k]);
+  quadros.push([n, n + 1, n + 2, n + 3]);
+  return quadros;
+}
+
+/**
+ * ladoDaBorda(faces, cadeia) -> 1 | -1
+ *   `faces`: as faces da superfície que tocam a cadeia, cada uma a lista de ids de vértice no sentido em que a normal
+ *   dela aponta para fora; `cadeia`: ids em sequência ao longo de arestas (a volta repete o primeiro no fim). Devolve o
+ *   sinal de u do lado livre da borda: +1 quando a chapa fica à direita de quem segue a cadeia (o lado livre fica à
+ *   esquerda, onde u cresce), -1 quando fica à esquerda. Grita com ErroDoFriso, com o índice do par, no trecho que não
+ *   é borda livre (nenhuma face, ou mais de uma, o tem) e no que troca de lado.
+ */
+export function ladoDaBorda(faces, cadeia) {
+  const dirigidas = new Set(); const contagem = new Map();
+  for (const f of faces) for (let k = 0; k < f.length; k++) {
+    const a = f[k], b = f[(k + 1) % f.length];
+    dirigidas.add(`${a}>${b}`);
+    contagem.set(chave(a, b), (contagem.get(chave(a, b)) ?? 0) + 1);
+  }
+  let lado = 0;
+  for (let k = 0; k + 1 < cadeia.length; k++) {
+    const a = cadeia[k], b = cadeia[k + 1];
+    const n = contagem.get(chave(a, b)) ?? 0;
+    if (n !== 1) throw new ErroDoFriso(`este trecho da linha não é borda livre da chapa: ${n === 0 ? 'nenhuma face o tem' : `${n} faces o têm`}`, k);
+    const aqui = dirigidas.has(`${a}>${b}`) ? -1 : 1;
+    if (lado !== 0 && aqui !== lado) throw new ErroDoFriso('a chapa passa de um lado da linha ao outro neste trecho', k);
+    lado = aqui;
+  }
+  return lado;
+}
+
 /* As estações da varredura: os pontos da linha, os pontos que dividem os trechos longos e os da volta de cada ponta
    fechada, cada uma com posição, normal, escala do perfil e o índice do ponto de entrada mais perto. */
 function estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento, trechoMaximo }) {
@@ -138,11 +210,12 @@ function estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento, trechoM
  *   pontos e normais: listas de [x, y, z] do mesmo tamanho (a linha fechada não repete o primeiro ponto);
  *   perfil: [u, v] de um polígono simples; pontas: [inicio, fim], cada uma 'aberta' (tampa plana) ou 'fechada' (o perfil
  *   encolhe em quarto de elipse ao longo de `fechamento` até virar um ponto na linha); trechoMaximo: comprimento acima do
- *   qual um trecho é dividido (o padrão é TRECHO_MAXIMO_EM_ARESTAS vezes a menor aresta do perfil).
+ *   qual um trecho é dividido (o padrão é TRECHO_MAXIMO_EM_ARESTAS vezes a menor aresta do perfil); tampa: os polígonos
+ *   das tampas das pontas abertas, cada um a lista de índices do perfil, no lugar da triangulação (a aba usa quadriláteros).
  *   Grita com ErroDoFriso, com o índice do ponto, no trecho nulo, na normal paralela à linha, na volta para trás e no
  *   recuo da esquadria que não cabe no trecho.
  */
-export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas = ['aberta', 'aberta'], fechamento = null, trechoMaximo = null }) {
+export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas = ['aberta', 'aberta'], fechamento = null, trechoMaximo = null, tampa = null }) {
   if (!Array.isArray(pontos) || pontos.length < (fechada ? 3 : 2)) throw new ErroDoFriso(`a linha ${fechada ? 'fechada' : 'aberta'} precisa de ${fechada ? 3 : 2} pontos distintos ou mais`);
   if (!Array.isArray(normais) || normais.length !== pontos.length) throw new ErroDoFriso('é preciso uma normal por ponto da linha');
   if (!Array.isArray(perfil) || perfil.length < 3) throw new ErroDoFriso('o perfil precisa de 3 pontos [u, v] ou mais');
@@ -223,7 +296,16 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
   if (!fechada) {
     const giro = (a, b, c) => (P2[b][0] - P2[a][0]) * (P2[c][1] - P2[a][1]) - (P2[b][1] - P2[a][1]) * (P2[c][0] - P2[a][0]);
     const triangulos = [];
-    if (P2.every((_, k) => giro(k, (k + 1) % np, (k + 2) % np) > 0)) {
+    if (tampa) {
+      /* os polígonos declarados no sentido do perfil de entrada; no perfil invertido os índices andam ao contrário */
+      const mapa = (k) => (area > 0 ? k : np - 1 - k);
+      for (const poligono of tampa) {
+        const ids = poligono.map(mapa);
+        let sinal = 0;
+        for (let k = 0; k < ids.length; k++) { const q = P2[ids[k]], r = P2[ids[(k + 1) % ids.length]]; sinal += q[0] * r[1] - r[0] * q[1]; }
+        triangulos.push(sinal > 0 ? ids : [...ids].reverse());
+      }
+    } else if (P2.every((_, k) => giro(k, (k + 1) % np, (k + 2) % np) > 0)) {
       /* perfil convexo: a tampa em zigue-zague de um lado ao outro, que dá a cada canto no máximo duas diagonais; o leque
          de um canto só (ou o do earcut) deixa um vértice de valência alta, que o conferir-malha marca como polo */
       for (let a = 0, b = np - 1, lado = true; b - a >= 2; lado = !lado) {
@@ -234,8 +316,13 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
       for (let k = 0; k < tri.length; k += 3) { const [a, b, c] = [tri[k], tri[k + 1], tri[k + 2]]; triangulos.push(giro(a, b, c) > 0 ? [a, b, c] : [a, c, b]); }
     }
     /* a tampa do início olha para trás da linha (horária em u, v), a do fim para a frente (anti-horária) */
-    if (estacoes[0].escala !== 0) for (const [a, b, c] of triangulos) { tampas.push(faces.length); faces.push([anel[0] + a, anel[0] + c, anel[0] + b]); }
-    if (estacoes[m - 1].escala !== 0) for (const [a, b, c] of triangulos) { tampas.push(faces.length); faces.push([anel[m - 1] + a, anel[m - 1] + b, anel[m - 1] + c]); }
+    if (tampa) {
+      if (estacoes[0].escala !== 0) for (const ids of triangulos) { tampas.push(faces.length); faces.push([...ids].reverse().map((k) => anel[0] + k)); }
+      if (estacoes[m - 1].escala !== 0) for (const ids of triangulos) { tampas.push(faces.length); faces.push(ids.map((k) => anel[m - 1] + k)); }
+    } else {
+      if (estacoes[0].escala !== 0) for (const [a, b, c] of triangulos) { tampas.push(faces.length); faces.push([anel[0] + a, anel[0] + c, anel[0] + b]); }
+      if (estacoes[m - 1].escala !== 0) for (const [a, b, c] of triangulos) { tampas.push(faces.length); faces.push([anel[m - 1] + a, anel[m - 1] + b, anel[m - 1] + c]); }
+    }
   }
   const total = estacoes[m - 1].s + (fechada ? comprimento(sub(estacoes[0].p, estacoes[m - 1].p)) : 0);
   return { vertices, faces, partes: { lateral, pontas: tampas }, estacoes: m, comprimento: total };

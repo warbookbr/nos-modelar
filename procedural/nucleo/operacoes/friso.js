@@ -8,12 +8,22 @@
    entra e não atravessa. O friso é um sólido próprio que interpenetra a chapa, e a receita declara o contato entre as
    partes (`contatos`), que `contatosDaPeca` mede; a fusão por booleana fica de fora, como no plano da carroceria.
    Na simetria em x, o friso segue a chapa: a linha que toca o plano x = 0 numa ponta continua na imagem espelhada, a
-   que toca nas duas vira volta fechada, e a que não toca ganha a cópia espelhada. Nenhum índice sai da receita. */
-import { ErroDoFriso, cadeiaRefinada, varrerPerfil } from '../friso.js';
+   que toca nas duas vira volta fechada, e a que não toca ganha a cópia espelhada. Nenhum índice sai da receita.
+
+   A ABA. No lugar de `perfil`, `aba: { largura, angulo, raio }` dobra para dentro a borda livre de uma chapa com
+   espessura: a linha é a borda de um vão ou do contorno, pelos nomes da gaiola (`bordaDoVao` da gaiola por estações dá a
+   de um vão), em qualquer sentido, e o passo acha o lado da chapa pelo sentido em que as faces percorrem a aresta. O perfil
+   em L (`perfilDaAba`) nasce na face de fora e na de dentro da chapa sobre a linha, dobra no raio e no ângulo declarados e
+   segue em perna reta; as faces saem lisas a 30 graus e as tampas das pontas abertas são quadriláteros. */
+import { ErroDoFriso, cadeiaRefinada, ladoDaBorda, perfilDaAba, tampaDaAba, varrerPerfil } from '../friso.js';
+import { valorDoLiso } from '../liso-por-angulo.js';
 import { espelharGaiolaEmX } from '../subdivisao.js';
 import { formaParaContorno, ErroDePerfil, SEGMENTOS_ARCO_PADRAO } from '../perfil2d.js';
 import { ehSimples } from '../contorno.js';
 
+/** A aba sai com as faces lisas até este ângulo, como as da superfície: a dobra arredonda a sombra e a ponta e a espessura ficam vivas. */
+const LISO_DA_ABA = valorDoLiso(30);
+const EXEMPLO_DE_ABA = "aba: { largura: 0.02, angulo: 90, raio: 0.003 }";
 const EXEMPLO_DE_LINHA = "{ nome: 'frisoDaPorta', pontos: ['a', 'b', 'c'] }";
 const citar = (nome) => `'${nome}'`;
 const iguais = (p, q) => (typeof p === 'string' || typeof q === 'string' ? p === q : Array.isArray(p) && Array.isArray(q) && p.length === q.length && p.every((x, k) => x === q[k]));
@@ -108,14 +118,40 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         }
         pontos.push(p); normais.push(n);
       }
-      lista.push({
-        pontos, normais, fechada: c.fechada, espelhada: c.espelhada,
-        nomeDoIndice: (j) => nomeDoPonto(c.cadeia[Math.min(c.cadeia.length - 1, Math.round(j / passoDaCadeia))]),
-      });
+      const nomeDoIndice = (j) => nomeDoPonto(c.cadeia[Math.min(c.cadeia.length - 1, Math.round(j / passoDaCadeia))]);
+      /* a aba precisa saber de que lado da linha a chapa fica: a linha é borda livre, e a chapa é o lado da face que a tem */
+      let lado = null;
+      if (a.aba != null) {
+        const tocadas = new Set();
+        for (const fis of facesDoVertice.values()) for (const fi of fis) tocadas.add(fi);
+        try {
+          lado = ladoDaBorda([...tocadas].map((fi) => st.F.get(idDoPasso(passo, fi)).vs), r.cadeia.map((v) => idDoPasso(passo, v)));
+        } catch (e) {
+          if (!(e instanceof ErroDoFriso)) throw e;
+          return { erro: ['linha', `a aba segue a borda livre da chapa, e na linha ${citar(a.linha.nome)}, perto de ${nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}: ${e.motivo}; cite os pontos da borda de um vão ou do contorno (bordaDoVao dá a de um vão)`] };
+        }
+      }
+      lista.push({ pontos, normais, fechada: c.fechada, espelhada: c.espelhada, lado, nomeDoIndice });
     }
     let espessura = null;
     if (args.espessura != null) espessura = st.num(args.espessura);
     return { cadeias: lista, espessura };
+  }
+
+  /* A aba declarada: largura (da perna reta), angulo (de quanto a chapa gira na dobra, em graus) e raio (da face de
+     dentro da dobra), todos obrigatórios para a medida da aba ficar escrita na receita. */
+  function lerAba(st, a) {
+    if (a.perfil != null) return { erro: ['aba', 'aba e perfil se excluem: a aba desenha o próprio perfil em L; declare só um dos dois'] };
+    const aba = a.aba;
+    if (!aba || typeof aba !== 'object' || Array.isArray(aba)) return { erro: ['aba', `aba precisa ser a medida da dobra, como ${EXEMPLO_DE_ABA}`] };
+    const extra = Object.keys(aba).filter((k) => k !== 'largura' && k !== 'angulo' && k !== 'raio');
+    if (extra.length) return { erro: ['aba', `a aba tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são largura, angulo e raio`] };
+    const lida = {};
+    for (const campo of ['largura', 'angulo', 'raio']) {
+      if (aba[campo] == null) return { erro: ['aba', `a aba precisa de ${campo}, como ${EXEMPLO_DE_ABA}: largura da perna reta, angulo em graus e raio da face de dentro da dobra`] };
+      try { lida[campo] = st.num(aba[campo]); } catch (e) { return { erro: ['aba', `${campo} da aba: ${e.message}`] }; }
+    }
+    return lida;
   }
 
   return {
@@ -144,18 +180,28 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       fechamento = st.num(a.fechamento);
       if (!Number.isFinite(fechamento) || fechamento <= 0) return grita(st, i, 'friso', 'fechamento', `o fechamento precisa ser maior que zero, e veio ${fechamento}`);
     }
-    let perfil;
+    let segmentosArco;
     try {
-      const segmentosArco = a.segmentosArco == null ? SEGMENTOS_ARCO_PADRAO : st.num(a.segmentosArco);
-      if (!Number.isInteger(segmentosArco) || segmentosArco < 1) return grita(st, i, 'friso', 'segmentosArco', `segmentosArco precisa ser inteiro de 1 para cima, e veio ${segmentosArco}`);
-      perfil = formaParaContorno(a.perfil, 'perfil', { num: st.num, segmentosArco });
-    } catch (e) {
-      if (e instanceof ErroDePerfil) return grita(st, i, 'friso', 'perfil', `${e.message}; o perfil é [u, v] com v pela normal (v = 0 na superfície) e u para a esquerda de quem segue a linha`);
-      throw e;
+      segmentosArco = a.segmentosArco == null ? SEGMENTOS_ARCO_PADRAO : st.num(a.segmentosArco);
+    } catch (e) { return grita(st, i, 'friso', 'segmentosArco', String(e.message)); }
+    if (!Number.isInteger(segmentosArco) || segmentosArco < 1) return grita(st, i, 'friso', 'segmentosArco', `segmentosArco precisa ser inteiro de 1 para cima, e veio ${segmentosArco}`);
+    const comAba = a.aba != null;
+    let perfil = null; let vMin = null; let vMax = null; let medidasDaAba = null;
+    if (comAba) {
+      const lida = lerAba(st, a);
+      if (lida.erro) return grita(st, i, 'friso', lida.erro[0], lida.erro[1]);
+      medidasDaAba = lida;
+    } else {
+      try {
+        perfil = formaParaContorno(a.perfil, 'perfil', { num: st.num, segmentosArco });
+      } catch (e) {
+        if (e instanceof ErroDePerfil) return grita(st, i, 'friso', 'perfil', `${e.message}; o perfil é [u, v] com v pela normal (v = 0 na superfície) e u para a esquerda de quem segue a linha`);
+        throw e;
+      }
+      if (!ehSimples(perfil)) return grita(st, i, 'friso', 'perfil', 'o perfil se cruza; desenhe um polígono simples');
+      vMin = Math.min(...perfil.map((p) => p[1])); vMax = Math.max(...perfil.map((p) => p[1]));
+      if (!(vMax > 0)) return grita(st, i, 'friso', 'perfil', `o perfil fica todo abaixo da linha (v de ${vMin} a ${vMax}); o friso sai pela normal, com v > 0`);
     }
-    if (!ehSimples(perfil)) return grita(st, i, 'friso', 'perfil', 'o perfil se cruza; desenhe um polígono simples');
-    const vMin = Math.min(...perfil.map((p) => p[1])), vMax = Math.max(...perfil.map((p) => p[1]));
-    if (!(vMax > 0)) return grita(st, i, 'friso', 'perfil', `o perfil fica todo abaixo da linha (v de ${vMin} a ${vMax}); o friso sai pela normal, com v > 0`);
 
     let cadeias;
     if (a.superficie != null) {
@@ -163,12 +209,22 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       let r;
       try { r = linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
-      if (r.espessura !== null) {
+      if (comAba) {
+        if (r.espessura === null) return grita(st, i, 'friso', 'aba', 'a aba dobra a borda de uma chapa com espessura: declare espessura no passo subdivisao da superfície');
+        try {
+          perfil = perfilDaAba({ ...medidasDaAba, espessura: r.espessura, segmentosPorQuarto: segmentosArco });
+        } catch (e) {
+          if (!(e instanceof ErroDoFriso)) throw e;
+          return grita(st, i, 'friso', 'aba', e.motivo);
+        }
+        if (!ehSimples(perfil)) return grita(st, i, 'friso', 'aba', `o perfil da aba se cruza: com raio ${medidasDaAba.raio}, espessura ${r.espessura}, largura ${medidasDaAba.largura} e ${medidasDaAba.angulo} graus a perna atravessa a dobra; reduza o ângulo ou a largura`);
+      } else if (r.espessura !== null) {
         if (!(vMin < 0)) return grita(st, i, 'friso', 'perfil', `o perfil não entra na chapa (v vai de ${vMin} a ${vMax}): sem uma parte abaixo de v = 0 o friso só encostaria numa linha da superfície; desça o perfil para dentro da chapa, de menos que a espessura ${r.espessura}`);
         if (!(-vMin < r.espessura)) return grita(st, i, 'friso', 'perfil', `o perfil entra ${-vMin} na chapa, e a espessura é ${r.espessura}: ele atravessaria a face de dentro; suba o perfil para entrar menos que a espessura`);
       }
       cadeias = r.cadeias;
     } else {
+      if (comAba) return grita(st, i, 'friso', 'aba', "a aba dobra a borda da chapa: cite a superfície por superficie: { op: 'subdivisao', id } e a borda de um vão pelos nomes da gaiola");
       if (a.normal == null) return grita(st, i, 'friso', 'normal', "a polilinha precisa de normal, o vetor para onde v aponta; ou cite a superfície por superficie: { op: 'subdivisao', id } com os nomes da gaiola");
       let normal; let pontos;
       try {
@@ -183,7 +239,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     for (const c of cadeias) {
       let s;
       try {
-        s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil, fechada: c.fechada, pontas, fechamento });
+        s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil, fechada: c.fechada, pontas, fechamento, tampa: comAba ? tampaDaAba(perfil) : null });
       } catch (e) {
         if (!(e instanceof ErroDoFriso)) return grita(st, i, 'friso', 'linha', String(e.message));
         return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${e.motivo}`);
@@ -198,7 +254,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (vertices.length > limite || faces.length > limite) return grita(st, i, 'friso', 'linha', `o friso gera ${vertices.length} vértices e ${faces.length} faces, acima do limite do passo (${limite})`);
     vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
-    const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); return id; });
+    const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); if (comAba) st.F.get(id).liso = LISO_DA_ABA; return id; });
     if (a.origemId != null) registraOrigem(st, i, 'friso', a.origemId, { faces: facesSaida, lateral: lateral.map((k) => facesSaida[k]), pontas: tampas.map((k) => facesSaida[k]) });
   },
   };
