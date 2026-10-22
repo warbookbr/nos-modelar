@@ -10,7 +10,8 @@
 # <prefixo><vista>-cinza.png, <prefixo><vista>-zebra.png, <prefixo><vista>-linhas.png (as linhas de feição e as bordas da
 # candidata, com o mesmo angulo_feicao do pacote), <prefixo>grade.json, <prefixo>olhar.json com a fração de avesso de cada
 # vista cinza e, se o pacote tem cortes, <prefixo>cortes/<nome>.png e <prefixo>cortes/cotas.md, os cortes da candidata nos
-# mesmos planos e no mesmo quadro dos desenhos do pacote.
+# mesmos planos e no mesmo quadro dos desenhos do pacote, e <prefixo>cortes/contornos.json, o contorno exato da candidata
+# em cada corte, em mm no plano dele, que comparar-cortes.py mede contra o contorno lido do pacote.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
@@ -60,5 +61,17 @@ if cfg.get('cortes') and os.path.exists(quadro):
                    {'cadeias': [P.round(6).tolist() for P in c['cadeias_uv']]} for c in cs]}, t)
     C.imagens('cortes', t.name, pc, quadro)
     os.unlink(t.name)
+    # o contorno exato da candidata em mm, para comparar-cortes.py medir contra o contorno lido do pacote
+    contornos = []
+    for c in cs:
+        polis = []
+        for P in c['cadeias_uv']:
+            fechada = len(P) > 2 and float(np.linalg.norm(P[0] - P[-1])) < 1e-6
+            Q = P[:-1] if fechada else P
+            polis.append({'fechada': fechada, 'pontos_mm': np.round(Q * 1000, 3).tolist()})
+        contornos.append({'corte': c['nome'], 'eixo': c['eixo'], 'valor_mm': round(c['valor'] * 1000, 3), 'eixos_uv': c['eixos_uv'],
+                          'polilinhas': polis})
+    json.dump({'origem': 'candidata, recortada pela caixa do pacote', 'unidade': 'mm', 'cortes': contornos},
+              open(os.path.join(pc, 'contornos.json'), 'w'), indent=1)
 json.dump({'triangulos_recorte': int(len(Fr)), 'area_m2': round(float(C.normais(Vr, Fr)[1].sum()), 6), 'avesso': avesso}, open(f"{a['saida']}olhar.json", 'w'), indent=1)
 print('OLHAR', json.dumps(avesso))

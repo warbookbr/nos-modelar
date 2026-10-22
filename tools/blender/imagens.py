@@ -46,83 +46,90 @@ def cruza(a, b, folga=2):
     return not (a[2] + folga <= b[0] or b[2] + folga <= a[0] or a[3] + folga <= b[1] or b[3] + folga <= a[1])
 
 
+def desenhar_grade(im, v, mt, f):
+    """Desenha na imagem RGB im, da vista v com a câmera mt de camera.json, a grade em milímetro (só na vista alinhada a dois
+    eixos), o título e a barra de escala, e devolve o registro de grade.json. A posição de tudo depende só da câmera, de modo
+    que leitura.py redesenha a mesma grade sobre fundos lisos para separá-la do traço."""
+    c = np.array(mt['centro'], float)
+    s = mt['escala']
+    W, H = mt['W'], mt['H']
+    xc = np.array(mt['x_cam'], float)
+    yc = np.array(mt['y_cam'], float)
+    px = lambda p: (W / 2 + ((p - c) @ xc) / s * W, H / 2 - ((p - c) @ yc) / s * W)
+    alinhada = abs(xc).max() > 0.999 and abs(yc).max() > 0.999
+    passo = passo_redondo(s * 1000 / 20)
+    d = ImageDraw.Draw(im, 'RGBA')
+    rotulos = []
+    titulo = f'vista {v}' + (f' (ortográfica), grade de {passo} mm' if alinhada else ' (ortográfica)')
+    caixa_titulo = d.textbbox((10, 8), titulo, font=f)
+    d.rectangle(caixa_titulo, fill=(255, 255, 255, 200))
+    d.text((10, 8), titulo, fill='black', font=f)
+    if alinhada:
+        ah = int(np.argmax(np.abs(xc)))
+        av = int(np.argmax(np.abs(yc)))
+        for eixo, horiz in ((ah, True), (av, False)):
+            ini = math.floor((c[eixo] - s) * 1000 / passo)
+            fim = math.ceil((c[eixo] + s) * 1000 / passo)
+            for k in range(ini, fim + 1):
+                mm = k * passo
+                p = c.copy()
+                p[eixo] = mm / 1000
+                x, y = px(p)
+                forte = k % 2 == 0
+                if horiz and 0 <= x < W:
+                    d.line([(x, 0), (x, H)], fill=(*COR_X, 120 if forte else 50), width=1)
+                    if forte:
+                        t = f'{EIXO[eixo]}={mm:g}'
+                        bb = d.textbbox((x + 2, H - 20), t, font=f)
+                        if bb[2] < W and not cruza(bb, caixa_titulo):
+                            d.text((x + 2, H - 20), t, fill=(0, 60, 160), font=f)
+                            rotulos.append(list(bb))
+                if not horiz and 0 <= y < H:
+                    d.line([(0, y), (W, y)], fill=(*COR_Y, 120 if forte else 50), width=1)
+                    if forte:
+                        t = f'{EIXO[eixo]}={mm:g}'
+                        bb = d.textbbox((4, y - 18), t, font=f)
+                        if bb[1] > 0 and not cruza(bb, caixa_titulo) and not any(cruza(bb, r) for r in rotulos):
+                            d.text((4, y - 18), t, fill=(20, 100, 20), font=f)
+                            rotulos.append(list(bb))
+    # barra de escala de cerca de um quarto da largura, no primeiro canto livre de rótulo e de título
+    comp_mm = passo_redondo(s * 1000 / 4)
+    L = comp_mm / 1000 / s * W
+    texto = f'{comp_mm:g} mm'
+    tb = d.textbbox((0, 0), texto, font=f)
+    alt = 12 + (tb[3] - tb[1]) + 6
+    cantos = [(W - 30 - L, H - 30 - alt), (W - 30 - L, 40), (30, H - 30 - alt), (30, 40),
+              (W - 30 - L, H / 2 - alt / 2), (W / 2 - L / 2, H - 30 - alt), (W / 2 - L / 2, 40)]
+    barra = None
+    for x0, y0 in cantos:
+        bb = [x0 - 4, y0 - 4, x0 + max(L, tb[2]) + 4, y0 + alt + 4]
+        if not cruza(bb, caixa_titulo) and not any(cruza(bb, r) for r in rotulos):
+            barra = bb
+            break
+    cobre = barra is None
+    if cobre:
+        x0, y0 = cantos[0]
+        barra = [x0 - 4, y0 - 4, x0 + max(L, tb[2]) + 4, y0 + alt + 4]
+    x0, y0 = barra[0] + 4, barra[1] + 4
+    d.rectangle(barra, fill=(255, 255, 255, 220))
+    d.rectangle([x0, y0, x0 + L, y0 + 10], fill=(0, 0, 0))
+    d.text((x0, y0 + 12), texto, fill='black', font=f)
+    return {'passo_mm': passo if alinhada else None, 'rotulos': rotulos, 'titulo': list(caixa_titulo),
+            'barra': [round(b, 1) for b in barra], 'barra_mm': comp_mm, 'barra_cobre_rotulo': cobre}
+
+
 def grade(arq_camera, prefixo):
     meta = json.load(open(arq_camera))
     f = fonte(16)
     registro = {}
     for v, mt in meta.items():
-        c = np.array(mt['centro'], float)
-        s = mt['escala']
-        W, H = mt['W'], mt['H']
-        xc = np.array(mt['x_cam'], float)
-        yc = np.array(mt['y_cam'], float)
-        px = lambda p: (W / 2 + ((p - c) @ xc) / s * W, H / 2 - ((p - c) @ yc) / s * W)
-        alinhada = abs(xc).max() > 0.999 and abs(yc).max() > 0.999
-        passo = passo_redondo(s * 1000 / 20)
         for tipo in ('cinza', 'zebra', 'linhas'):
             arq = f'{prefixo}{v}-{tipo}.png'
             if tipo == 'linhas' and not os.path.exists(arq):
                 continue
             im = Image.open(arq).convert('RGB')
-            d = ImageDraw.Draw(im, 'RGBA')
-            rotulos = []
-            titulo = f'vista {v}' + (f' (ortográfica), grade de {passo} mm' if alinhada else ' (ortográfica)')
-            caixa_titulo = d.textbbox((10, 8), titulo, font=f)
-            d.rectangle(caixa_titulo, fill=(255, 255, 255, 200))
-            d.text((10, 8), titulo, fill='black', font=f)
-            if alinhada:
-                ah = int(np.argmax(np.abs(xc)))
-                av = int(np.argmax(np.abs(yc)))
-                for eixo, horiz in ((ah, True), (av, False)):
-                    ini = math.floor((c[eixo] - s) * 1000 / passo)
-                    fim = math.ceil((c[eixo] + s) * 1000 / passo)
-                    for k in range(ini, fim + 1):
-                        mm = k * passo
-                        p = c.copy()
-                        p[eixo] = mm / 1000
-                        x, y = px(p)
-                        forte = k % 2 == 0
-                        if horiz and 0 <= x < W:
-                            d.line([(x, 0), (x, H)], fill=(*COR_X, 120 if forte else 50), width=1)
-                            if forte:
-                                t = f'{EIXO[eixo]}={mm:g}'
-                                bb = d.textbbox((x + 2, H - 20), t, font=f)
-                                if bb[2] < W and not cruza(bb, caixa_titulo):
-                                    d.text((x + 2, H - 20), t, fill=(0, 60, 160), font=f)
-                                    rotulos.append(list(bb))
-                        if not horiz and 0 <= y < H:
-                            d.line([(0, y), (W, y)], fill=(*COR_Y, 120 if forte else 50), width=1)
-                            if forte:
-                                t = f'{EIXO[eixo]}={mm:g}'
-                                bb = d.textbbox((4, y - 18), t, font=f)
-                                if bb[1] > 0 and not cruza(bb, caixa_titulo) and not any(cruza(bb, r) for r in rotulos):
-                                    d.text((4, y - 18), t, fill=(20, 100, 20), font=f)
-                                    rotulos.append(list(bb))
-            # barra de escala de cerca de um quarto da largura, no primeiro canto livre de rótulo e de título
-            comp_mm = passo_redondo(s * 1000 / 4)
-            L = comp_mm / 1000 / s * W
-            texto = f'{comp_mm:g} mm'
-            tb = d.textbbox((0, 0), texto, font=f)
-            alt = 12 + (tb[3] - tb[1]) + 6
-            cantos = [(W - 30 - L, H - 30 - alt), (W - 30 - L, 40), (30, H - 30 - alt), (30, 40),
-                      (W - 30 - L, H / 2 - alt / 2), (W / 2 - L / 2, H - 30 - alt), (W / 2 - L / 2, 40)]
-            barra = None
-            for x0, y0 in cantos:
-                bb = [x0 - 4, y0 - 4, x0 + max(L, tb[2]) + 4, y0 + alt + 4]
-                if not cruza(bb, caixa_titulo) and not any(cruza(bb, r) for r in rotulos):
-                    barra = bb
-                    break
-            cobre = barra is None
-            if cobre:
-                x0, y0 = cantos[0]
-                barra = [x0 - 4, y0 - 4, x0 + max(L, tb[2]) + 4, y0 + alt + 4]
-            x0, y0 = barra[0] + 4, barra[1] + 4
-            d.rectangle(barra, fill=(255, 255, 255, 220))
-            d.rectangle([x0, y0, x0 + L, y0 + 10], fill=(0, 0, 0))
-            d.text((x0, y0 + 12), texto, fill='black', font=f)
+            registro[f'{v}-{tipo}'] = desenhar_grade(im, v, mt, f)
             im.save(arq)
-            registro[f'{v}-{tipo}'] = {'passo_mm': passo if alinhada else None, 'rotulos': rotulos, 'titulo': list(caixa_titulo),
-                                       'barra': [round(b, 1) for b in barra], 'barra_mm': comp_mm, 'barra_cobre_rotulo': cobre}
     json.dump(registro, open(f'{prefixo}grade.json', 'w'), indent=1)
 
 
@@ -257,10 +264,22 @@ def _ligacao(ancora, bb):
     return (min(max(ancora[0], bb[0]), bb[2]), min(max(ancora[1], bb[1]), bb[3]))
 
 
+CORTE_W, CORTE_H, CORTE_M = 1200, 900, 70   # tamanho e margem do desenho de cada corte, em px
+
+
+def passo_do_corte(q):
+    """O passo da grade do desenho de um corte, em mm, pelo quadro dele."""
+    return passo_redondo((q['W'] - 2 * CORTE_M) / q['escala_px_m'] * 1000 / 12)
+
+
+def titulo_do_corte(nome, eixo, valor, U, Vn, passo):
+    return f"corte {nome}: plano {eixo} = {_mm(valor)} mm; {U} na horizontal, {Vn} na vertical, grade de {passo:g} mm"
+
+
 def cortes(arq_json, pasta, arq_quadro=None):
     d = json.load(open(arq_json))
     quadros = json.load(open(arq_quadro)) if arq_quadro else {}
-    W, H, M = 1200, 900, 70
+    W, H, M = CORTE_W, CORTE_H, CORTE_M
     f, fp = fonte(16), fonte(14)
     tabela = ['| corte | cota | posição (mm) |', '|---|---|---|']
     novo_quadro, registro = {}, {}
@@ -284,8 +303,7 @@ def cortes(arq_json, pasta, arq_quadro=None):
         px = lambda p: (M + (p[0] - q['u0']) * q['escala_px_m'], H - M - (p[1] - q['v0']) * q['escala_px_m'])
         im = Image.new('RGB', (W, H), 'white')
         dr = ImageDraw.Draw(im, 'RGBA')
-        larg_m = (W - 2 * M) / q['escala_px_m']
-        passo = passo_redondo(larg_m * 1000 / 12)
+        passo = passo_do_corte(q)
         u0, u1 = q['u0'], q['u0'] + (W - M) / q['escala_px_m']
         v0, v1 = q['v0'], q['v0'] + (H - M) / q['escala_px_m']
         for k in range(math.floor(u0 * 1000 / passo), math.ceil(u1 * 1000 / passo) + 1):
@@ -303,7 +321,7 @@ def cortes(arq_json, pasta, arq_quadro=None):
                     dr.text((4, y - 8), f'{Vn}={k * passo:g}', fill=(20, 100, 20), font=fp)
         for x in cad:
             dr.line([px(p) for p in x], fill=(0, 0, 0), width=3, joint='curve')
-        titulo = f"corte {c['nome']}: plano {c['eixo']} = {_mm(c['valor'])} mm; {U} na horizontal, {Vn} na vertical, grade de {passo:g} mm"
+        titulo = titulo_do_corte(c['nome'], c['eixo'], c['valor'], U, Vn, passo)
         dr.rectangle(dr.textbbox((10, 8), titulo, font=f), fill=(255, 255, 255, 220))
         dr.text((10, 8), titulo, fill='black', font=f)
         caixas = [dr.textbbox((10, 8), titulo, font=f)]
