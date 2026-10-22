@@ -23,7 +23,9 @@ let saidaGit;
 try {
   saidaGit = execFileSync(
     'git',
-    ['ls-files', '--cached', '--others', '--exclude-standard'],
+    /* `--deduplicate` porque, no meio de um conflito de junção, o índice guarda
+       três estágios do arquivo em conflito e o mapa o listaria três vezes. */
+    ['ls-files', '--cached', '--others', '--exclude-standard', '--deduplicate'],
     /* O corpus de evidências contém centenas de PNGs; o inventário pode passar
        do buffer padrão do Node sem que o Git tenha falhado. */
     { cwd: REPO, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 },
