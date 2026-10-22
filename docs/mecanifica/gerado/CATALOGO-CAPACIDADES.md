@@ -2,7 +2,7 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:0a4963535ae2c5d2ed1ff812e1e4ee8c623cccae88dba6d308e53be82ad21147`.
+Assinatura do registro: `sha256:cde79864c9c933295aaaa3ff93787ed438b18d81d04e6b02721a4c0c1dde209e`.
 
 Há 39 operações em 1 módulo(s).
 
@@ -23,7 +23,7 @@ Há 39 operações em 1 módulo(s).
 | `extruda` | Extrudar uma face, por ID posicional ou por seleção que resolva para uma face só. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.extruda@1` |
 | `extrusao` | Extrudir em y um perfil 2D com furos e deslocamento de contorno (canto redondo, reto ou em esquadria), sem calcular pontos à mão. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.extrusao@1` |
 | `filete` | Criar chanfro plano compatível com o filete v1. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.filete@1` |
-| `friso` | Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.friso@1` |
+| `friso` | Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha, ou a aba que dobra a borda livre de um vão. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.friso@1` |
 | `furo` | Abrir um ou vários furos estruturais passantes ou cegos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.furo@1` |
 | `inflate` | Construir volume fechado pelo cruzamento de uma silhueta lateral e uma planta. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.inflate@1` |
 | `intersectar` | Manter só o volume comum a todos os sólidos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.intersectar@1` |

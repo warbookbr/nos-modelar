@@ -34,7 +34,7 @@
  *         parcial por vez toca cada coluna de borda da região, e as outras ficam mais estreitas, em escada.
  * vãos:   { nome, estacoes: [de, ate], colunas: [de, ate] } tira as faces cujos pontos ficam todos entre as duas
  *         estações e, em cada uma, entre as duas colunas, que precisam estar abertas nela. Ponto que fica sem face grita
- *         com o nome do vão. O vão não atravessa o fechamento do anel.
+ *         com o nome do vão. O vão não atravessa o fechamento do anel. `bordaDoVao(nome)` dá a borda dele por nome.
  * vincos: { nome, coluna, de?, ate?, nitidez } segue uma coluna de uma estação a outra (por padrão, por todas as
  *         estações em que ela existe, e no anel fechado volta ao primeiro ponto); { nome, estacao, de?, ate?, nitidez }
  *         segue uma estação de uma coluna a outra. A nitidez passa ao passo como veio: de 0 a 1, 'viva' ou nome de PARAMS.
@@ -484,10 +484,11 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves) {
 
 /**
  * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, vincos, cantos, medidas, simetria, virar, prefixo, curvas, interpolar })
- *   -> { pontos, passo, ponto(estacao, coluna), regioes, estacoes? }
+ *   -> { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, estacoes? }
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`: { vertices, faces, vincos, cantos?, medidas?,
  * simetria? }, tudo em nomes de ponto. `regioes` dá, para cada região, os nomes dos pontos dela, na ordem dos pontos.
- * Com `interpolar`, `estacoes` lista { nome, em, tipo } de cada estação, com tipo 'chave', 'interpolada' (declarada sem
+ * `bordaDoVao(vao)` devolve os nomes dos pontos da borda do vão, em sequência ao longo das arestas da gaiola, com o
+ * primeiro repetido no fim quando a borda volta sobre si: a linha que o friso (e a aba dele) segue. Com `interpolar`, `estacoes` lista { nome, em, tipo } de cada estação, com tipo 'chave', 'interpolada' (declarada sem
  * colunas), 'gerada' (pelo passo) ou 'parcial'.
  */
 export function gaiolaPorEstacoes(definicao) {
@@ -568,6 +569,46 @@ export function gaiolaPorEstacoes(definicao) {
   if (medidas) passo.medidas = medidas;
   if (simetria) passo.simetria = simetria;
   const indiceDaEstacao = new Map(lidas.map((e) => [e.nome, e]));
+  /* A borda de cada vão: as arestas das faces que ficaram e que uma face tirada do vão também tinha, percorridas no
+     sentido da face que ficou (a chapa à esquerda de quem anda, vista de fora). */
+  const bordasDosVaos = new Map();
+  for (const v of vaos) {
+    const dosTirados = new Set();
+    for (const f of todas) {
+      if (!f.vaos.includes(v.nome)) continue;
+      const n = f.nomes;
+      for (let k = 0; k < n.length; k++) dosTirados.add(chave(n[k], n[(k + 1) % n.length]));
+    }
+    const seguinte = new Map(); const ordem = [];
+    for (const f of faces) {
+      for (let k = 0; k < f.length; k++) {
+        const a = f[k], b = f[(k + 1) % f.length];
+        if (!dosTirados.has(chave(a, b)) || arestas.get(chave(a, b)) !== 1) continue;
+        if (seguinte.has(a)) falha(`a borda do vão ${citar(v.nome)} se bifurca no ponto ${citar(a)}; cite a linha pelos pontos`);
+        seguinte.set(a, b); ordem.push(a);
+      }
+    }
+    const chegadas = new Set(seguinte.values());
+    const visitado = new Set(); const cadeias = [];
+    const andar = (inicio) => {
+      const cadeia = [inicio]; visitado.add(inicio);
+      for (let atual = seguinte.get(inicio); atual !== undefined; atual = seguinte.get(atual)) {
+        cadeia.push(atual);
+        if (visitado.has(atual)) break;
+        visitado.add(atual);
+      }
+      return cadeia;
+    };
+    for (const a of ordem) if (!chegadas.has(a) && !visitado.has(a)) cadeias.push(andar(a));
+    for (const a of ordem) if (!visitado.has(a)) cadeias.push(andar(a));
+    bordasDosVaos.set(v.nome, cadeias);
+  }
+  const bordaDoVao = (nome) => {
+    if (!bordasDosVaos.has(nome)) falha(`o vão ${citar(nome)} não existe; os vãos declarados são ${vaos.length ? lista(vaos.map((v) => v.nome)) : 'nenhum'}`);
+    const cadeias = bordasDosVaos.get(nome);
+    if (cadeias.length !== 1) falha(`a borda do vão ${citar(nome)} tem ${cadeias.length} trechos separados; cite cada linha pelos pontos`);
+    return [...cadeias[0]];
+  };
   const ponto = (estacao, coluna) => {
     citavel(estacao, 'ponto()');
     const S = indiceDaEstacao.get(estacao);
@@ -576,7 +617,7 @@ export function gaiolaPorEstacoes(definicao) {
     return S.colunas[S.indice.get(coluna)].ponto;
   };
   const porRegiao = Object.fromEntries([...regioes.values()].map((R) => [R.nome, vertices.filter((p) => R.pontos.includes(p))]));
-  const saida = { pontos, passo, ponto, regioes: porRegiao };
+  const saida = { pontos, passo, ponto, bordaDoVao, regioes: porRegiao };
   if (chaves) saida.estacoes = lidas.map((e) => ({ nome: e.nome, em: e.em, tipo: expandida.tipos.get(e.nome) }));
   return saida;
 }

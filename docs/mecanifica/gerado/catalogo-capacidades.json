@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:0a4963535ae2c5d2ed1ff812e1e4ee8c623cccae88dba6d308e53be82ad21147",
+  "assinatura": "sha256:cde79864c9c933295aaaa3ff93787ed438b18d81d04e6b02721a4c0c1dde209e",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -473,11 +473,10 @@
           ],
           "identidade": "cria-por-passo",
           "uso": {
-            "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha.",
+            "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha, ou a aba que dobra a borda livre de um vão.",
             "schema": "mecanifica.argumentos.friso@1",
             "obrigatorios": [
-              "linha",
-              "perfil"
+              "linha"
             ]
           }
         },
@@ -1640,11 +1639,10 @@
       ],
       "identidade": "cria-por-passo",
       "uso": {
-        "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha.",
+        "intencao": "Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha, ou a aba que dobra a borda livre de um vão.",
         "schema": "mecanifica.argumentos.friso@1",
         "obrigatorios": [
-          "linha",
-          "perfil"
+          "linha"
         ]
       }
     },

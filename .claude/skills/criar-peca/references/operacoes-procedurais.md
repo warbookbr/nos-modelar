@@ -446,7 +446,9 @@ as faces entre duas estações e duas colunas, o vinco segue uma coluna
 (`coluna`, com `de` e `ate` em estações) ou uma estação (`estacao`, com `de` e
 `ate` em colunas), e `cantos` e `medidas` marcam por `{ estacao, coluna }`, em
 que só a estação marca a estação inteira e só a coluna marca a coluna inteira.
-A borda que sobra é livre, e `borda: 'cantos'` no passo mantém os cantos dela.
+A borda que sobra é livre, e `borda: 'cantos'` no passo mantém os cantos dela;
+`bordaDoVao(nome)` devolve os pontos da borda de um vão pelo nome dele, a linha de
+uma aba (veja `aba` no `friso`).
 A face sai com a normal no sentido (colunas) × (estações), e `virar: true`
 inverte. Com `simetria: 'x'` a gaiola é a metade `x >= 0`. Gritam com os nomes
 a coluna citada que a estação não tem, a transição impossível (ligações que se
@@ -622,7 +624,7 @@ do mesmo arquivo, faz o mesmo num teste.
 ## Friso ao longo de curva: `friso`
 
 `friso` desenha nervura, tubo ou friso de perfil declarado seguindo uma linha
-nomeada. Sobre a chapa, a linha é a sequência dos nomes de ponto da gaiola de um
+nomeada, ou a aba que dobra a borda de um vão (opção `aba`, mais adiante). Sobre a chapa, a linha é a sequência dos nomes de ponto da gaiola de um
 passo `subdivisao` anterior, citado por `superficie: { op: 'subdivisao', id }`,
 ao longo das arestas da gaiola, como no vinco, e repetir o primeiro nome no fim
 fecha a volta:
@@ -669,6 +671,26 @@ superfície, a linha que toca o plano `x = 0` numa ponta continua na imagem
 espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia
 espelhada. `origem` publica as faces, `parte: 'lateral'` a superfície varrida e
 `parte: 'pontas'` as tampas das pontas abertas.
+
+### Aba que dobra a borda de um vão: `aba`
+
+A chapa de uma carroceria dobra uns 90 graus para dentro na borda do vão da janela, em poucos milímetros de raio, e forma a aba em que o vidro assenta. O `friso` com perfil desenhado à mão não faz essa aba: o passo recusa o perfil que não sobe acima da linha (`o perfil fica todo abaixo da linha`) e, se ele sobe um pouco, o que desce mais que a espessura (`ele atravessaria a face de dentro`), de modo que uma perna de 20 mm não passa. A opção `aba` toma o lugar de `perfil` e desenha o perfil em L sozinha:
+
+```js
+const g = gaiolaPorEstacoes({ /* ... */ vaos: [{ nome: 'janela', estacoes: ['e3', 'e5'], colunas: ['c3', 'c5'] }] });
+['subdivisao', { origemId: 1, ...g.passo, borda: 'cantos', espessura: 'chapa_espessura' }],
+['friso', { origemId: 2, superficie: { op: 'subdivisao', id: 1 },
+  linha: { nome: 'abaDaJanela', pontos: g.bordaDoVao('janela') },
+  aba: { largura: 'aba_largura', angulo: 90, raio: 'aba_raio' } }],
+['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
+['parte', { nome: 'aba', sel: { origem: { op: 'friso', id: 2 } } }],
+```
+
+`aba: { largura, angulo, raio }` tem os três campos obrigatórios, para a medida da aba ficar escrita na receita. `largura` e `raio` são metros (a `TABELA` os declara em milímetro e `derivar()` converte) e `angulo` são graus, número ou nome de `PARAMS` que `derivar()` deixa em graus. O perfil sai da `espessura` do passo da superfície, que a aba exige: a face de fora da chapa chega à linha, dobra para dentro (contra a normal) num arco de raio `raio` na face de dentro e `raio + espessura` na de fora, que gira `angulo` graus, e a perna reta de comprimento `largura` segue na direção em que o arco acabou. Com `angulo: 90` a perna fica paralela à normal da chapa na linha, a ponta livre a `raio + espessura + largura` abaixo da face de fora. A dobra começa na linha e se estende `raio + espessura` para o lado do vão, de modo que a linha da gaiola fica onde a chapa plana acaba, e não na ponta da aba; um vão de 200 mm com aba de raio 2 mm e chapa de 2 mm fica 8 mm mais estreito na boca da dobra. O `angulo` vai de zero a menos de 180 graus, e a aba que passa por baixo da chapa (ângulo grande com perna longa) grita com a distância, assim como a que atravessa a própria dobra.
+
+A linha é a borda livre de um vão ou do contorno, pelos nomes de ponto da gaiola e em qualquer sentido: o passo acha de que lado fica a chapa pelo sentido em que a face percorre cada aresta, e grita com o ponto quando um trecho tem duas faces (`este trecho da linha não é borda livre da chapa`) ou muda de lado. `gaiolaPorEstacoes` devolve `bordaDoVao(nome)`, a sequência de pontos da borda do vão pelo nome que o vão tem em `vaos`, com o primeiro repetido no fim quando a borda é uma volta e sem repetir quando o vão abre na borda da chapa; a ordem é a da face que ficou (a chapa à esquerda, vista de fora) e `virar` a inverte. Na simetria em `x`, a borda de um vão que cruza o plano `x = 0` vira uma volta só e fica simétrica, como em qualquer friso. As quinas vivas de 90 graus do vão saem com a esquadria do varrimento, e a ponta aberta da borda do contorno ganha tampas de quadriláteros.
+
+As faces da aba saem lisas a 30 graus, como as da superfície: as arestas vivas (a ponta livre, a parede de espessura, o canto da perna) dividem a normal por inteiro e o arco de 22,5 graus por segmento (`segmentosArco` por quarto de volta, padrão 4) não divide; só nas quinas vivas de 90 graus do vão a sombra do arco se divide até 13 graus, porque as faces de lados opostos da esquadria ficam a 31 graus umas das outras, perto do limiar. A aba é um sólido próprio que nasce na parede da borda da chapa, sem fusão: nomeie as duas com `parte` e declare o contato em `contatos`, que `contatosDaPeca` mede como `interpenetram` porque a costura difere da parede por até 0,07 mm. Na chapa de prova (`procedural/nucleo/fixtures/aba-prova.js`, raios de 600 e 900 mm, nível 2, aba de 20 mm a 90 graus com raio de 2 mm e chapa de 2 mm) a aba acompanha a borda do vão a no máximo 0,17 mm da linha limite, a dobra tem o raio e o ângulo declarados (erro de 0,0007 mm no raio e 0,01 grau, a raiz a até 0,4 grau da normal da chapa), os 32 vértices de fora da costura coincidem com os da chapa e os de dentro ficam a até 0,07 mm, e cada parte fecha sem achado no `conferir-malha`. A aba não confere colisão com outras partes nem com a aba de um vão vizinho.
 
 ## Detalhes de seleção, aliases e proveniência
 

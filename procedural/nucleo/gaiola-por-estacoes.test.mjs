@@ -238,3 +238,37 @@ describe('forma de prova da gaiola por estações', () => {
     expect(pertoDoVinco).toBeLessThan(5e-4);
   });
 });
+
+describe('bordaDoVao', () => {
+  const cinco = [['a', 0], ['b', 1], ['c', 2], ['d', 3], ['e', 4]];
+  const semC = (k) => (k === 2 ? cinco.filter(([n]) => n !== 'c') : cinco);
+  const janela = { nome: 'janela', estacoes: ['e1', 'e3'], colunas: ['b', 'd'] };
+
+  it('dá os pontos da borda do vão em sequência, com o primeiro repetido no fim, percorrida com a chapa à esquerda', () => {
+    const g = gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2, 3, 4], semC), vaos: [janela] });
+    const borda = g.bordaDoVao('janela');
+    expect(borda).toEqual(['e1_c', 'e1_b', 'e2_b', 'e3_b', 'e3_c', 'e3_d', 'e2_d', 'e1_d', 'e1_c']);
+    /* cada par é aresta de uma face só, e a face que a tem a percorre no mesmo sentido */
+    for (let k = 0; k + 1 < borda.length; k++) {
+      const dirigidas = g.passo.faces.filter((f) => f.some((p, j) => p === borda[k] && f[(j + 1) % f.length] === borda[k + 1]));
+      const ambas = g.passo.faces.filter((f) => f.includes(borda[k]) && f.includes(borda[k + 1]));
+      expect(ambas).toHaveLength(1);
+      expect(dirigidas).toHaveLength(1);
+    }
+    /* com as faces viradas a borda anda ao contrário */
+    const virada = gaiolaPorEstacoes({ eixo: 'z', virar: true, estacoes: plana([0, 1, 2, 3, 4], semC), vaos: [janela] }).bordaDoVao('janela');
+    expect(virada).toEqual(['e1_b', 'e1_c', 'e1_d', 'e2_d', 'e3_d', 'e3_c', 'e3_b', 'e2_b', 'e1_b']);
+    expect(gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2, 3, 4], semC), vaos: [janela] }).bordaDoVao('janela')).toEqual(borda);
+  });
+
+  it('o vão que se abre na borda da chapa dá um caminho aberto, sem repetir o primeiro ponto', () => {
+    const g = gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2, 3], () => tres), vaos: [{ nome: 'recorte', estacoes: ['e1', 'e2'], colunas: ['b', 'c'] }] });
+    expect(g.bordaDoVao('recorte')).toEqual(['e1_c', 'e1_b', 'e2_b', 'e2_c']);
+  });
+
+  it('o vão que não existe grita com os vãos declarados', () => {
+    const g = gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2, 3, 4], semC), vaos: [janela] });
+    expect(() => g.bordaDoVao('porta')).toThrow("gaiola por estações: o vão 'porta' não existe; os vãos declarados são 'janela'");
+    expect(() => gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2], () => tres) }).bordaDoVao('porta')).toThrow(/os vãos declarados são nenhum/);
+  });
+});
