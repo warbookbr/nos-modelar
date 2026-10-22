@@ -34,8 +34,9 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de 
    estão ligados.
 4. Toda operação usada vem do
    [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
-   lida por `descrever_capacidade` no MCP procedural. Receita antiga não é
-   molde: o acervo hoje não tem receita, e a peça de prova em
+   lida por `descrever_capacidade` no MCP procedural. As receitas do acervo são
+   aprovadas e provam capacidades do núcleo, mas não são molde de forma, que
+   vem da referência e do plano. A peça de prova em
    `tools/fixtures/acervo/peca-de-prova/` é ferramenta de teste, não exemplo de
    forma.
 
@@ -122,17 +123,18 @@ mora em [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md).
 
 ## Consulta
 
-Documentos para quando a tarefa pedir, e não para ler de partida:
-[`GUIA-AUTORIA-IA.md`](../../../docs/mecanifica/usar/GUIA-AUTORIA-IA.md), a
-anatomia da receita e a esteira de comandos;
-[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md),
-o que já falhou ao gerar forma;
-[`INTENCAO-PECA-V1.md`](../../../docs/mecanifica/usar/INTENCAO-PECA-V1.md), o
-contrato opcional `INTENCAO` para quando a função não é óbvia pela geometria;
-[`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md),
-a receita como dado JSON, usada pela autoria por MCP; e
-[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md),
-o desvio medido entre a borda da peça e a foto. Para curva bilateral contínua,
+O que ler antes e o que abrir só quando a condição aparece está no roteiro
+`modelar/peca` (`npm run comecar -- modelar/peca`), com
+[`GUIA-AUTORIA-IA.md`](../../../docs/mecanifica/usar/GUIA-AUTORIA-IA.md) (a anatomia
+da receita e a esteira de comandos) e
+[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md)
+(o que já falhou ao gerar forma),
+[`INTENCAO-PECA-V1.md`](../../../docs/mecanifica/usar/INTENCAO-PECA-V1.md) (o
+contrato opcional `INTENCAO`, para quando a função não é óbvia pela geometria),
+[`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md)
+(a receita como dado JSON, usada pela autoria por MCP) e
+[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md)
+(a borda da peça contra a foto). Para curva bilateral contínua,
 `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` garante a
 simetria sem fresta nas pontas.
 

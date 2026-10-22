@@ -15,18 +15,8 @@ Uma peça é uma unidade física ou geométrica que faz sentido editar e validar
 como um objeto próprio. Sua forma nasce de uma receita procedural ou de outra
 representação de autoria aceita pelo núcleo.
 
-Exemplos possíveis:
-
-- pneu;
-- aro;
-- disco de freio;
-- eixo;
-- pistão;
-- biela;
-- capô;
-- carcaça;
-- engrenagem;
-- parafuso.
+Exemplos: pneu, aro, disco de freio, eixo, pistão, biela, capô, carcaça,
+engrenagem e parafuso.
 
 Uma peça pode possuir regiões internas nomeadas, materiais, portas, grupos e
 subpartes semânticas. Isso não obriga cada região a virar outro arquivo.
@@ -38,17 +28,8 @@ montagens. Ela registra identidade, posição, relações e intenção mecânica
 os componentes. A montagem não deve esconder a origem das peças nem copiar toda
 a geometria para dentro de uma receita gigante.
 
-Exemplos possíveis:
-
-- roda completa;
-- freio;
-- suspensão dianteira;
-- porta do carro;
-- cabeçote;
-- motor;
-- eixo dianteiro;
-- carroceria;
-- carro completo.
+Exemplos: roda completa, freio, suspensão dianteira, porta do carro, cabeçote,
+motor, eixo dianteiro, carroceria e carro completo.
 
 A regra estrutural é:
 
@@ -119,14 +100,18 @@ A receita que parte de um andaime da forma global N2 declara isso em `REFINA`, a
 lado de `PLANO`: o caminho do andaime, o volume que cada parte refina e a
 tolerância em milímetro. O veredito de `npm run descrever` e a `guarda:acervo`
 recusam a parte que sai do envelope do volume e a porta do andaime que a peça
-moveu ou não publicou. O formato e o que ele confere estão na seção "Ligação ao
-nível detalhado" do contrato da forma global N2 (`CONTRATO-FORMA-GLOBAL-N2`).
-O envelope é uma caixa e deixa passar a ponta da asa feita em qualquer lugar da
-caixa da asa inteira. A receita que refina uma forma do esboço declara também
-`REFINA.esboco` (o arquivo do esboço, a forma de cada parte e a razão
-interseção/união de volume mínima), e a parte que fica abaixo do mínimo reprova;
-o formato está na seção "Forma da parte contra a forma do esboço" do mesmo
-contrato. O alvo que vai ao crítico é a composta da unidade, gerada de novo (`npm run vistas:critica`) e não a imagem guardada na rodada do esboço: em 2026-10-15 o alvo do motor do avião era de antes de uma correção do desenho, e só a pessoa percebeu. A receita planejada de uma unidade do esboço aprovado sai de `npm run receita:planejada -- <esboço.esboco.json> --unidade <unidade> --peca <objeto>/<peça>` (`--saida <pasta>` não toca o acervo): traz `TABELA`, `PONTOS`, `REFINA`, `contatos` e o alvo, e deixa vazios o objeto, as referências e os critérios (o `PLANO` é recusado até lá). O cabeçalho do comando diz de onde vem cada campo.
+moveu ou não publicou. O envelope é uma caixa e deixa passar a ponta da asa feita
+em qualquer lugar da caixa da asa inteira; por isso a receita que refina uma
+forma do esboço declara também `REFINA.esboco`, e a parte abaixo da razão
+interseção/união de volume mínima reprova. O formato e o que cada um confere
+estão no contrato da forma global N2 (`CONTRATO-FORMA-GLOBAL-N2`) e em
+[`CONFERIR-CONTRA-REFERENCIA.md`](CONFERIR-CONTRA-REFERENCIA.md). O alvo que vai
+ao crítico é a composta da unidade, gerada de novo por `npm run vistas:critica`, e
+nunca a imagem guardada na rodada do esboço: o alvo do motor do avião era de antes
+de uma correção do desenho, e só a pessoa percebeu. A receita planejada de uma
+unidade do esboço aprovado sai de `npm run receita:planejada`, descrito em
+[`alinhar-modelagem`](../../../.claude/skills/alinhar-modelagem/SKILL.md); ela deixa
+vazios o objeto, as referências e os critérios, e o `PLANO` é recusado até lá.
 
 Uma família do núcleo (`procedural/familias`, como a superfície aerodinâmica da pá
 e da asa ou a roda-pneu) entra numa receita de peça pelos `PASSOS`: a receita expande

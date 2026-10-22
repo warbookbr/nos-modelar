@@ -90,8 +90,68 @@ export function conferirPlanos({
   return { problemas, planos, ativos };
 }
 
+/* Os três lugares que dizem qual plano está ativo (README.md da raiz,
+   docs/mecanifica/INDEX.md e o índice de planos) divergiram sem que nada
+   reprovasse: o README da raiz seguiu dizendo "nenhum plano está ativo"
+   depois da ativação de um plano. Cada lugar é reduzido ao nome do arquivo
+   apontado, ou a 'nenhum', e os três precisam coincidir. */
+const SEM_PLANO = 'nenhum';
+
+function nomeDoLink(destino) {
+  return destino.split('#')[0].split('/').pop();
+}
+
+const PADROES_DE_ATIVO = {
+  raiz: { link: /plano ativo é \[[^\]]*\]\(([^)]+)\)/i, nenhum: /nenhum plano está ativo/i },
+  indice: {
+    link: /^-\s*Ativo:\s*\[[^\]]*\]\(([^)]+)\)/mi,
+    nenhum: /^-\s*(Ativo:\s*nenhum|Nenhum plano ativo)/mi,
+  },
+  planos: {
+    link: /^\*\*Plano ativo:\*\*\s*\[[^\]]*\]\(([^)]+)\)/mi,
+    nenhum: /^\*\*Plano ativo:\*\*\s*nenhum\.?\s*$/mi,
+  },
+};
+
+export function planoAtivoDeclarado(texto, tipo) {
+  const padroes = PADROES_DE_ATIVO[tipo];
+  const link = texto.match(padroes.link);
+  if (link) return nomeDoLink(link[1]);
+  return padroes.nenhum.test(texto) ? SEM_PLANO : undefined;
+}
+
+export function conferirPlanoAtivoNosIndices({
+  readme = join(RAIZ, 'README.md'),
+  indice = join(RAIZ, 'docs/mecanifica/INDEX.md'),
+  planos = join(RAIZ, 'docs/mecanifica/planos/README.md'),
+} = {}) {
+  const fontes = [
+    ['README.md', readme, 'raiz', 'frase "O plano ativo é [..](..)" ou "Nenhum plano está ativo"'],
+    ['docs/mecanifica/INDEX.md', indice, 'indice', 'linha "- Ativo: [..](..)" ou "- Ativo: nenhum"'],
+    ['docs/mecanifica/planos/README.md', planos, 'planos', 'declaração "**Plano ativo:**"'],
+  ];
+  const problemas = [];
+  const declarados = [];
+  for (const [nome, caminho, tipo, esperado] of fontes) {
+    if (!existsSync(caminho)) {
+      problemas.push(`${nome}: arquivo ausente`);
+      continue;
+    }
+    const declarado = planoAtivoDeclarado(readFileSync(caminho, 'utf8'), tipo);
+    if (!declarado) problemas.push(`${nome}: não declara o plano ativo (esperado ${esperado})`);
+    else declarados.push([nome, declarado]);
+  }
+  if (new Set(declarados.map(([, valor]) => valor)).size > 1) {
+    problemas.push(
+      `plano ativo diverge entre os índices: ${declarados.map(([nome, valor]) => `${nome} → ${valor}`).join('; ')}`,
+    );
+  }
+  return { problemas, declarados };
+}
+
 function executar() {
   const resultado = conferirPlanos();
+  resultado.problemas.push(...conferirPlanoAtivoNosIndices().problemas);
   if (resultado.problemas.length > 0) {
     console.error(`planos:check FALHOU — ${resultado.problemas.length} problema(s):`);
     for (const problema of resultado.problemas) console.error(`  - ${problema}`);
