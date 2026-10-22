@@ -73,6 +73,7 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/guardas/guarda-acervo.test.mjs',
   'tools/mecanifica/mcp-degrau-1-preparacao.test.mjs',
   'tools/mecanifica/olhar-bancada.test.mjs',
+  'tools/mecanifica/ondulacao-da-superficie.test.mjs',
   'tools/mecanifica/parametros-peca.test.mjs',
   'tools/mecanifica/receita-planejada.test.mjs',
   'tools/mecanifica/rodada-de-modelagem.test.mjs',

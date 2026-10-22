@@ -114,98 +114,111 @@ function lugaresDaEspessura(lugares, malha, gaiola, declarados) {
   return `, perto de ${textos.join(', ')} (${lugares.length} par(es) de vértices da malha ao todo); reduza a espessura abaixo do raio, abra a curva ali ou troque o lado; no vinco vivo o raio local é a largura da faixa de faces ao lado dele e cai pela metade a cada nível`;
 }
 
+/** gaiolaDoPasso(a, { vec, num }) -> { gaiola, declarados } ou { erro: [campo, mensagem] }
+ *  A gaiola que o passo `subdivisao` subdivide, resolvida dos argumentos do passo: os nomes traduzidos em índices, a
+ *  simetria aplicada (com `imagem`, o índice da imagem espelhada de cada ponto) e, com `medidas`, os pontos ajustados
+ *  para a superfície limite passar pelas cotas. `vec` e `num` resolvem ponto e número pelo dicionário da peça. O passo
+ *  usa esta função, e uma ferramenta que lê a superfície entregue pode usá-la para saber de que gaiola ela saiu. */
+export function gaiolaDoPasso(a, { vec, num }) {
+  const erro = (campo, mensagem) => ({ erro: [campo, mensagem] });
+  let gaiola; let soltos = [];
+  const declarados = a.vertices ?? [];
+  /* Os pontos nomeados da gaiola: o nome endereça o vértice em faces, vincos, cantos e medidas. */
+  const indiceDoNome = new Map();
+  for (const [k, v] of declarados.entries()) {
+    if (typeof v !== 'string') continue;
+    if (indiceDoNome.has(v)) return erro('vertices', `o ponto ${citar(v)} aparece mais de uma vez na gaiola`);
+    indiceDoNome.set(v, k);
+  }
+  let faces;
+  if (!Array.isArray(a.faces)) return erro('faces', 'faces precisa ser lista de faces, cada uma uma lista de nomes de ponto da gaiola');
+  try {
+    faces = a.faces.map((f) => {
+      if (!Array.isArray(f)) throw new TypeError('cada face precisa ser lista de nomes de ponto da gaiola');
+      return f.map((p) => {
+        if (typeof p !== 'string') return p;
+        if (!indiceDoNome.has(p)) throw new TypeError(`a face [${f.map(citar).join(', ')}] cita o ponto ${citar(p)}, que não é ponto nomeado da gaiola`);
+        return indiceDoNome.get(p);
+      });
+    });
+  } catch (e) { return erro('faces', String(e.message)); }
+  const traduzidos = vincosPorNome(a.vincos ?? [], indiceDoNome, faces.filter((f) => f.every((x) => Number.isInteger(x))), { num });
+  if (traduzidos.erro) return erro('vincos', traduzidos.erro);
+  const cantos = [];
+  if (a.cantos != null) {
+    if (!Array.isArray(a.cantos)) return erro('cantos', `cantos precisa ser lista de nomes de ponto da gaiola, como ${EXEMPLO_DE_CANTO}`);
+    for (const c of a.cantos) {
+      if (typeof c !== 'string') return erro('cantos', `canto por índice de vértice não é aceito; declare o canto pelo nome do ponto da gaiola, como ${EXEMPLO_DE_CANTO}`);
+      if (!indiceDoNome.has(c)) return erro('cantos', `o canto ${citar(c)} não é ponto nomeado da gaiola`);
+      cantos.push(indiceDoNome.get(c));
+    }
+  }
+  try {
+    const vertices = declarados.map((p) => vec(p));
+    gaiola = { vertices, faces, vincos: traduzidos.vincos, cantos };
+    const usados = new Set(faces.flat());
+    soltos = vertices.map((p, k) => (usados.has(k) ? null : (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${p.join(', ')}]`))).filter((x) => x !== null);
+    if (a.simetria === 'x') gaiola = espelharGaiolaEmX(gaiola);
+    else if (a.simetria != null) return erro('simetria', "simetria só aceita 'x'");
+  } catch (e) { return erro('vertices', String(e.message)); }
+  /* Vértice sem face não pertence a nenhuma superfície: grita com o nome do ponto (ou a posição, se foi escrito como
+     número), em vez de sair como vértice solto na malha. */
+  if (soltos.length) return erro('vertices', `${soltos.length === 1 ? 'o vértice' : 'os vértices'} ${soltos.join(', ')} da gaiola ${soltos.length === 1 ? 'não pertence' : 'não pertencem'} a nenhuma face`);
+  /* medidas: nomes de ponto da gaiola que a superfície limite atravessa, ou { ponto, peso } para a cota que a superfície
+     só aproxima por mínimos quadrados; os outros pontos ficam onde foram declarados (com peso, perto de onde foram
+     declarados). Na simetria em x, a imagem espelhada de um ponto medido também é medida, com o mesmo peso. */
+  if (a.medidas != null) {
+    if (!Array.isArray(a.medidas) || !a.medidas.length) return erro('medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
+    const lidas = [];
+    for (const m of a.medidas) {
+      let nome = m; let peso = Infinity;
+      if (m && typeof m === 'object' && !Array.isArray(m)) {
+        const extra = Object.keys(m).filter((k) => k !== 'ponto' && k !== 'peso');
+        if (extra.length) return erro('medidas', `a medida com peso tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são ponto e peso, como ${EXEMPLO_DE_MEDIDA}`);
+        if (typeof m.ponto !== 'string') return erro('medidas', `a medida com peso precisa do nome do ponto, como ${EXEMPLO_DE_MEDIDA}`);
+        nome = m.ponto;
+        if (m.peso == null) return erro('medidas', `a medida ${citar(nome)} precisa de peso maior que zero, como ${EXEMPLO_DE_MEDIDA}; para a cota exata, escreva só o nome`);
+        peso = num(m.peso);
+        if (!Number.isFinite(peso) || peso <= 0) return erro('medidas', `a medida ${citar(nome)} tem peso ${peso}; o peso é número finito maior que zero, e a cota exata se escreve só com o nome`);
+      } else if (typeof m !== 'string') return erro('medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
+      if (!indiceDoNome.has(nome)) return erro('medidas', `a medida '${nome}' não é ponto declarado da gaiola`);
+      lidas.push({ indice: indiceDoNome.get(nome), peso, nome });
+    }
+    const origem = gaiola.vertices.map((_, k) => k);
+    if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
+    const vistos = new Map();
+    for (const m of lidas) {
+      if (vistos.has(m.nome) && vistos.get(m.nome) !== m.peso) return erro('medidas', `o ponto ${citar(m.nome)} aparece em medidas com pesos diferentes`);
+      vistos.set(m.nome, m.peso);
+    }
+    try {
+      if (lidas.every((m) => m.peso === Infinity)) {
+        /* só medidas exatas: o caminho de sempre, que a saída das fixtures guarda bit a bit */
+        const indices = lidas.map((m) => m.indice);
+        const marcados = gaiola.imagem ? [...indices, ...indices.map((k) => gaiola.imagem[k])] : indices;
+        gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidas({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
+      } else {
+        const marcados = lidas.map(({ indice, peso }) => ({ indice, peso }));
+        if (gaiola.imagem) marcados.push(...lidas.map(({ indice, peso }) => ({ indice: gaiola.imagem[indice], peso })));
+        gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidasComPeso({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
+      }
+    } catch (e) {
+      if (!e.indices) return erro('medidas', String(e.message));
+      const nomes = [...new Set(e.indices.map((k) => origem[k]))].map((k) => (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${gaiola.vertices[k].join(', ')}]`));
+      return erro('medidas', `${e.motivo}: ${nomes.join(', ')}`);
+    }
+  }
+  return { gaiola, declarados };
+}
+
 export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem }) {
   return {
   subdivisao(st, a, i) {
     confereId(st, i, 'subdivisao', a);
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'subdivisao', 'origemId', 'origemId precisa ser inteiro não-negativo');
-    let gaiola; let soltos = [];
-    const declarados = a.vertices ?? [];
-    /* Os pontos nomeados da gaiola: o nome endereça o vértice em faces, vincos, cantos e medidas. */
-    const indiceDoNome = new Map();
-    for (const [k, v] of declarados.entries()) {
-      if (typeof v !== 'string') continue;
-      if (indiceDoNome.has(v)) return grita(st, i, 'subdivisao', 'vertices', `o ponto ${citar(v)} aparece mais de uma vez na gaiola`);
-      indiceDoNome.set(v, k);
-    }
-    let faces;
-    if (!Array.isArray(a.faces)) return grita(st, i, 'subdivisao', 'faces', 'faces precisa ser lista de faces, cada uma uma lista de nomes de ponto da gaiola');
-    try {
-      faces = a.faces.map((f) => {
-        if (!Array.isArray(f)) throw new TypeError('cada face precisa ser lista de nomes de ponto da gaiola');
-        return f.map((p) => {
-          if (typeof p !== 'string') return p;
-          if (!indiceDoNome.has(p)) throw new TypeError(`a face [${f.map(citar).join(', ')}] cita o ponto ${citar(p)}, que não é ponto nomeado da gaiola`);
-          return indiceDoNome.get(p);
-        });
-      });
-    } catch (e) { return grita(st, i, 'subdivisao', 'faces', String(e.message)); }
-    const traduzidos = vincosPorNome(a.vincos ?? [], indiceDoNome, faces.filter((f) => f.every((x) => Number.isInteger(x))), st);
-    if (traduzidos.erro) return grita(st, i, 'subdivisao', 'vincos', traduzidos.erro);
-    const cantos = [];
-    if (a.cantos != null) {
-      if (!Array.isArray(a.cantos)) return grita(st, i, 'subdivisao', 'cantos', `cantos precisa ser lista de nomes de ponto da gaiola, como ${EXEMPLO_DE_CANTO}`);
-      for (const c of a.cantos) {
-        if (typeof c !== 'string') return grita(st, i, 'subdivisao', 'cantos', `canto por índice de vértice não é aceito; declare o canto pelo nome do ponto da gaiola, como ${EXEMPLO_DE_CANTO}`);
-        if (!indiceDoNome.has(c)) return grita(st, i, 'subdivisao', 'cantos', `o canto ${citar(c)} não é ponto nomeado da gaiola`);
-        cantos.push(indiceDoNome.get(c));
-      }
-    }
-    try {
-      const vertices = declarados.map((p) => st.vec(p));
-      gaiola = { vertices, faces, vincos: traduzidos.vincos, cantos };
-      const usados = new Set(faces.flat());
-      soltos = vertices.map((p, k) => (usados.has(k) ? null : (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${p.join(', ')}]`))).filter((x) => x !== null);
-      if (a.simetria === 'x') gaiola = espelharGaiolaEmX(gaiola);
-      else if (a.simetria != null) return grita(st, i, 'subdivisao', 'simetria', "simetria só aceita 'x'");
-    } catch (e) { return grita(st, i, 'subdivisao', 'vertices', String(e.message)); }
-    /* Vértice sem face não pertence a nenhuma superfície: grita com o nome do ponto (ou a posição, se foi escrito como
-       número), em vez de sair como vértice solto na malha. */
-    if (soltos.length) return grita(st, i, 'subdivisao', 'vertices', `${soltos.length === 1 ? 'o vértice' : 'os vértices'} ${soltos.join(', ')} da gaiola ${soltos.length === 1 ? 'não pertence' : 'não pertencem'} a nenhuma face`);
-    /* medidas: nomes de ponto da gaiola que a superfície limite atravessa, ou { ponto, peso } para a cota que a superfície
-       só aproxima por mínimos quadrados; os outros pontos ficam onde foram declarados (com peso, perto de onde foram
-       declarados). Na simetria em x, a imagem espelhada de um ponto medido também é medida, com o mesmo peso. */
-    if (a.medidas != null) {
-      if (!Array.isArray(a.medidas) || !a.medidas.length) return grita(st, i, 'subdivisao', 'medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
-      const lidas = [];
-      for (const m of a.medidas) {
-        let nome = m; let peso = Infinity;
-        if (m && typeof m === 'object' && !Array.isArray(m)) {
-          const extra = Object.keys(m).filter((k) => k !== 'ponto' && k !== 'peso');
-          if (extra.length) return grita(st, i, 'subdivisao', 'medidas', `a medida com peso tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são ponto e peso, como ${EXEMPLO_DE_MEDIDA}`);
-          if (typeof m.ponto !== 'string') return grita(st, i, 'subdivisao', 'medidas', `a medida com peso precisa do nome do ponto, como ${EXEMPLO_DE_MEDIDA}`);
-          nome = m.ponto;
-          if (m.peso == null) return grita(st, i, 'subdivisao', 'medidas', `a medida ${citar(nome)} precisa de peso maior que zero, como ${EXEMPLO_DE_MEDIDA}; para a cota exata, escreva só o nome`);
-          peso = st.num(m.peso);
-          if (!Number.isFinite(peso) || peso <= 0) return grita(st, i, 'subdivisao', 'medidas', `a medida ${citar(nome)} tem peso ${peso}; o peso é número finito maior que zero, e a cota exata se escreve só com o nome`);
-        } else if (typeof m !== 'string') return grita(st, i, 'subdivisao', 'medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
-        if (!indiceDoNome.has(nome)) return grita(st, i, 'subdivisao', 'medidas', `a medida '${nome}' não é ponto declarado da gaiola`);
-        lidas.push({ indice: indiceDoNome.get(nome), peso, nome });
-      }
-      const origem = gaiola.vertices.map((_, k) => k);
-      if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
-      const vistos = new Map();
-      for (const m of lidas) {
-        if (vistos.has(m.nome) && vistos.get(m.nome) !== m.peso) return grita(st, i, 'subdivisao', 'medidas', `o ponto ${citar(m.nome)} aparece em medidas com pesos diferentes`);
-        vistos.set(m.nome, m.peso);
-      }
-      try {
-        if (lidas.every((m) => m.peso === Infinity)) {
-          /* só medidas exatas: o caminho de sempre, que a saída das fixtures guarda bit a bit */
-          const indices = lidas.map((m) => m.indice);
-          const marcados = gaiola.imagem ? [...indices, ...indices.map((k) => gaiola.imagem[k])] : indices;
-          gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidas({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
-        } else {
-          const marcados = lidas.map(({ indice, peso }) => ({ indice, peso }));
-          if (gaiola.imagem) marcados.push(...lidas.map(({ indice, peso }) => ({ indice: gaiola.imagem[indice], peso })));
-          gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidasComPeso({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
-        }
-      } catch (e) {
-        if (!e.indices) return grita(st, i, 'subdivisao', 'medidas', String(e.message));
-        const nomes = [...new Set(e.indices.map((k) => origem[k]))].map((k) => (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${gaiola.vertices[k].join(', ')}]`));
-        return grita(st, i, 'subdivisao', 'medidas', `${e.motivo}: ${nomes.join(', ')}`);
-      }
-    }
+    const resolvida = gaiolaDoPasso(a, st);
+    if (resolvida.erro) return grita(st, i, 'subdivisao', ...resolvida.erro);
+    let { gaiola } = resolvida; const { declarados } = resolvida;
     let espessura = null;
     if (a.espessura != null) {
       espessura = st.num(a.espessura);
