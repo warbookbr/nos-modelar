@@ -93,6 +93,7 @@
     "ativar:bancada": "node tools/mecanifica/ativar-bancada.mjs",
     "malha:conferir": "node tools/mecanifica/conferir-malha.mjs",
     "ondulacao": "node tools/mecanifica/ondulacao-da-superficie.mjs",
+    "vincos-das-linhas": "node tools/mecanifica/vincos-das-linhas.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
     "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs",
     "gates": "node tools/gates.mjs",

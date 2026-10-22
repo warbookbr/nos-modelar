@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1572 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1575 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2409,6 +2409,8 @@
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
 - `vinco-na-imagem.test.mjs` — vinco-na-imagem.test.mjs — a dobra viva chega à imagem como aresta, nos dois caminhos de imagem: a cena da bancada (`adaptarThree`, que põe a normal de cada …
+- `vincos-das-linhas.mjs` — vincos-das-linhas.mjs — casa as linhas 3D lidas do pacote cego com as colunas e as estações nomeadas da gaiola de uma receita de subdivisão, e devolve a decl…
+- `vincos-das-linhas.test.mjs` — vincos-das-linhas.test.mjs — os vincos a partir das linhas 3D do pacote, sobre a forma desenhada por código.
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
@@ -2427,6 +2429,7 @@
 - `fixture-ombro-uniao.js` — fixture-ombro-uniao.js — fixture neutra copiada em 2026-09-29 do ombro do braço robótico (procedural/pecas/braco-robotico/partes/ombro/receita.js), para os t…
 - `fixture-uniao.js` — fixture-uniao.js — fixture neutra da fatia 5 do plano "União de sólidos": uma coluna e um braço unidos por `unir`, pousados numa base. Prova que as ferrament…
 - `ondulacao-prova.js` — ondulacao-prova.js — a chapa desenhada por código para o teste da ferramenta de ondulação endereçada.
+- `vincos-das-linhas-prova.js` — vincos-das-linhas-prova.js — a forma desenhada por código e o pacote sintético de linhas 3D do teste de `vincos-das-linhas.mjs`.
 
 ## tools/mecanifica/fixtures/contatos/
 

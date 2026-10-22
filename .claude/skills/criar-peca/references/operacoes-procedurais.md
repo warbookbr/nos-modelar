@@ -574,6 +574,26 @@ vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora d
 forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra continua para a
 pessoa e o crítico conferirem.
 
+Quando os vincos vêm das linhas 3D de um pacote (`ler-linhas --3d`), rode
+`npm run vincos-das-linhas -- <peça> --linhas=<linhas.json>` e declare o que
+ela sugere, em vez de escolher a coluna a olho. A ferramenta separa as colunas
+e as estações pelos nomes `estacao_coluna` da `gaiolaPorEstacoes` (sem esse
+formato, usa os laços de arestas), avalia cada uma na superfície limite e, para
+cada linha, espelhada para x ≥ 0 na simetria, dá a coluna ou a estação que a
+acompanha a até 5 mm na mesma direção, a distância média e máxima e a
+declaração em `vincos` (`{ nome, pontos, nitidez }`, para o passo) e em
+`vincosNaGaiola` (`{ nome, coluna, de, ate, nitidez }`, para o ajudante). A
+nitidez é `'viva'`, ou, com `angulo_graus` na linha, a menor de 0,5 a 0,9 que
+dobra a malha a 90% do ângulo lido. `cantos` pede canto no ponto onde a linha
+dobra e o vinco liso passa a mais de 2 mm dela; `faltantes` dá, para o trecho
+que nenhuma coluna acompanha, entre que colunas pôr a nova, a que fração e o
+ponto da linha em cada estação; `comVincos` diz se o passo aceita tudo, e cada
+vinco traz a distância à linha e o diedro na malha refeita. Numa forma
+desenhada por código com linhas de ruído de ±1 mm, os vincos sugeridos ficaram
+a até 1,95 mm das linhas e o friso entre duas colunas saiu a 0,406 do caminho,
+com 0,4 desenhado. A função `vincosDasLinhas`, do mesmo arquivo, faz o mesmo
+num teste.
+
 ## Friso ao longo de curva: `friso`
 
 `friso` desenha nervura, tubo ou friso de perfil declarado seguindo uma linha

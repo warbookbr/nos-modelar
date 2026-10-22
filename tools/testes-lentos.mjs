@@ -79,6 +79,7 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/receita-planejada.test.mjs',
   'tools/mecanifica/rodada-de-modelagem.test.mjs',
   'tools/mecanifica/vinco-na-imagem.test.mjs',
+  'tools/mecanifica/vincos-das-linhas.test.mjs',
   'tools/oficina/ensaio-ponta-a-ponta-dobradica.test.mjs',
   'tools/oficina/oficina.test.ts',
   'tools/oficina/plataforma-procedural-campo-r10.test.mjs',
