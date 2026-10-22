@@ -1080,6 +1080,7 @@
 - `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `extensoes.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
+- `gaiola-local.test.mjs` — gaiola-local.test.mjs — a gaiola por estações adensada só num trecho (fatia 12 do plano de carroceria por subdivisão): a região com estações parciais e colun…
 - `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
 - `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
@@ -1118,6 +1119,7 @@
 
 ## procedural/nucleo/fixtures/
 
+- `borda-enrolada.js` — borda-enrolada.js — a borda enrolada de prova da gaiola local, desenhada só por código
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 

@@ -123,7 +123,7 @@ describe('gaiola por estações', () => {
       expect(grito({ eixo: 'z', estacoes: plana([0, 1], (k) => (k ? [['a', 0], ['c', 1, { de: ['c'] }], ['b', 2, { de: ['b'] }]] : tres)) }))
         .toBe("gaiola por estações: transição impossível entre as estações 'e0' e 'e1': as ligações 'b' → 'b' e 'c' → 'c' se cruzam");
       expect(grito({ eixo: 'z', estacoes: plana([0, 1], (k) => (k ? [['novo', -1], ...tres] : tres)) }))
-        .toBe("gaiola por estações: transição impossível entre as estações 'e0' e 'e1': a primeira coluna de uma, 'a', precisa se ligar à primeira da outra, 'novo'; declare de: ['a'] na coluna 'novo'");
+        .toBe("gaiola por estações: transição impossível entre as estações 'e0' e 'e1': a primeira coluna de uma, 'a', precisa se ligar à primeira da outra, 'novo'; declare de: ['a'] na coluna 'novo', ou comeca: true na coluna 'novo' se ela começa na borda");
       expect(grito({ eixo: 'z', estacoes: plana([0, 1], (k) => (k ? [...tres, ['d', 3]] : tres)) })).toMatch(/a última coluna de uma, 'c', precisa se ligar à última da outra, 'd'/);
       const seis = grito({ eixo: 'z', estacoes: plana([0, 1], (k) => (k ? [['a', 0], ['m', 0.3], ['n', 0.6], ['c', 2]] : tres)) });
       expect(seis).toMatch(/transição impossível entre as estações 'e0' e 'e1': a face \['e0_a', 'e0_b', 'e0_c', 'e1_c', 'e1_n', 'e1_m', 'e1_a'\] tem 7 lados/);
