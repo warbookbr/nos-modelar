@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1562 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1565 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1083,6 +1083,8 @@
 - `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão: na chapa curva com vão de `fixtures/friso-prova.js`, …
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
+- `gaiola-interpolada.js` — gaiola-interpolada.js — estações interpoladas e colunas por curva de seção, opções da gaiola por estações
+- `gaiola-interpolada.test.mjs` — gaiola-interpolada.test.mjs — as opções `interpolar` e `curvas` da gaiola por estações: a interpolação monótona das colunas entre estações-chave reproduz uma…
 - `gaiola-local.test.mjs` — gaiola-local.test.mjs — a gaiola por estações adensada só num trecho (fatia 12 do plano de carroceria por subdivisão): a região com estações parciais e colun…
 - `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
 - `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
@@ -1125,6 +1127,7 @@
 
 - `borda-enrolada.js` — borda-enrolada.js — a borda enrolada de prova da gaiola local, desenhada só por código
 - `friso-prova.js` — friso-prova.js — a chapa curva com vão e os frisos desenhados por código para o teste do passo `friso`.
+- `gaiola-interpolada-prova.js` — gaiola-interpolada-prova.js — a forma de prova da gaiola interpolada, desenhada só por código
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 
