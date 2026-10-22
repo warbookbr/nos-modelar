@@ -137,8 +137,10 @@ def linhas(arq_json, saida):
     d = json.load(open(arq_json))
     im = Image.new('RGB', (d['W'], d['H']), 'white')
     dr = ImageDraw.Draw(im)
+    # Traço de feição com largura ímpar: com 2 px o Pillow põe o pixel a mais de um lado que a imagem não guarda, e a
+    # leitura do meio do traço erra meio pixel a mais.
     for tipo in ('corte', 'feicao', 'dobra', 'natural'):
-        cor, larg = ((150, 150, 150), 1) if tipo == 'corte' else ((0, 0, 0), 2)
+        cor, larg = ((150, 150, 150), 1) if tipo == 'corte' else ((0, 0, 0), 3)
         for pl in d['linhas'].get(tipo, []):
             dr.line([tuple(p) for p in pl], fill=cor, width=larg, joint='curve')
     im.save(saida)
