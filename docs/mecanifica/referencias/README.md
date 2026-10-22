@@ -58,9 +58,6 @@ Não conclua nada sobre caráter de superfície a partir da curvatura dela.
 
 ## Conteúdo
 
-- `fastback-1965-silhueta.json` — silhueta lateral, topo e base, de um cupê
-  fastback de 1965. Calibrada por entre-eixos de 2743 mm; resíduo de −1,9% no
-  comprimento e +1,8% na altura.
-O repositório guarda hoje um conjunto derivado e nenhuma folha de peça: as
+O repositório não guarda hoje nenhum conjunto derivado nem folha de peça: as
 imagens de alvo visual das peças já modeladas foram apagadas junto com elas, e o
 que cada rodada ensinou continua nos relatórios de texto.
