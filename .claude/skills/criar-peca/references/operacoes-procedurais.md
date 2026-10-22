@@ -493,6 +493,40 @@ que aponta para fora quando a curva gira no sentido anti-horário visto do lado 
 normal. O anel liga a última estação à primeira, e o vinco que segue uma coluna
 inteira volta ao primeiro ponto.
 
+Quando só alguns cortes da forma são conhecidos, escreva só eles e deixe o
+ajudante preencher o resto, sem escrever interpolação na receita. `curvas`
+declara as colunas a frações fixas do comprimento de uma curva de seção, e cada
+estação dá a curva por pontos-chave; a curva é a Catmull-Rom centrípeta, que
+passa pelos pontos e não faz laço, e a fração conta o comprimento, então as
+colunas não se amontoam onde os pontos se juntam, como num canto arredondado.
+`interpolar` faz da estação sem `colunas` uma estação interpolada e, com
+`passo`, gera as que faltam entre duas declaradas, graduadas a no máximo o
+dobro do vizinho; cada coluna sai da interpolação monótona (PCHIP) das chaves,
+que não passa dos valores dos nós. Marque as medidas só nas chaves, com
+`chaves: true`, porque cota em estação interpolada ondula:
+
+```js
+const g = gaiolaPorEstacoes({
+  eixo: 'z', simetria: 'x', interpolar: { passo: 0.1 },
+  curvas: [{ nome: 'secao', colunas: [0, 0.25, 0.5, 0.75, 1].map((fracao, j) => ({ nome: `s${j}`, fracao })) }],
+  estacoes: cortes.map(({ nome, z, pontos }) => ({ nome, em: z, colunas: [{ curva: 'secao', pontos }] })),
+  medidas: [{ chaves: true }],
+});
+// g.estacoes lista { nome, em, tipo: 'chave' | 'interpolada' | 'gerada' }
+```
+
+A estação gerada se chama `${anterior}_${k}`, nome que muda com o passo, e por
+isso cantos, medidas, vincos, vãos e regiões não a citam (grita); declare
+`{ nome, em }` sem colunas para a estação que precisa de nome. Entre duas
+chaves, a estação interpolada leva as colunas da primeira que se ligam à
+segunda, e a fusão, a divisão e a coluna nova ficam na chave seguinte. Como a
+interpolação não passa dos nós, tire um corte em cada extremo da forma (o
+ponto mais alto do teto, a seção mais larga): na prova do ajudante, cinco
+cortes de uma superfície analítica de 2,4 m a cada 0,6 m reproduzem a
+superfície a 0,37 mm, a interpolação linear ficaria a 1,25 mm, e com o máximo
+de uma coluna caindo 0,23 m depois de um corte o desvio sobe a 0,73 mm. A
+interpolação não extrapola, não entra numa região e não vale no eixo fechado.
+
 Sem `espessura`, a superfície sai aberta se a gaiola for aberta, e o
 `conferir-malha` acusa casca aberta. Com `espessura: 0.002` (número ou nome de
 `PARAMS`), a superfície subdividida vira a face externa de um sólido fechado:

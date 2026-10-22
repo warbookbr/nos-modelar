@@ -45,10 +45,16 @@
  * borda livre: a borda da gaiola é aberta, e o passo escolhe a regra dela por `borda`, como em qualquer gaiola.
  * simetria: 'x' declara a metade x >= 0, que o passo espelha antes de subdividir; ponto com x < 0 grita, e a aresta no
  *         plano x = 0 precisa ser borda da metade, para a costura sair com duas faces.
+ * curvas e interpolar: opções em `gaiola-interpolada.js`. `curvas` declara colunas a frações fixas do comprimento de uma
+ *         curva de seção, que cada estação dá por pontos-chave; `interpolar` preenche as estações sem colunas, e com
+ *         `passo` gera as que faltam, pela interpolação monótona das colunas entre as estações-chave. Com `interpolar`,
+ *         `chaves: true` num seletor de cantos ou medidas marca só as estações-chave, e a estação gerada não é citável.
  *
  * A ordem de saída é determinística: os pontos por estação, na ordem declarada, e dentro dela por coluna; as faces por
  * estação, cada uma com as que ela fecha contra a frente aberta, da primeira coluna à última, e as do fechamento do
  * anel por último; vincos, cantos e medidas na ordem declarada e dos pontos. */
+
+import { expandirEstacoes } from './gaiola-interpolada.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const TOLERANCIA_DA_COSTURA = 1e-9;
@@ -170,6 +176,7 @@ function lerEstacoes(estacoes, E, prefixo, regioes) {
       if (!regioes.has(regiao)) falha(`a estação ${citar(nome)} cita a região ${citar(regiao)}, que não existe`);
       if (k === 0) falha(`a estação ${citar(nome)} é a primeira e não pode ser parcial da região ${citar(regiao)}`);
     }
+    if (e.colunas == null) falha(`a estação ${citar(nome)} não tem colunas; declare as colunas, ou interpolar para que elas saiam das estações-chave`);
     if (!Array.isArray(e.colunas) || e.colunas.length < 2) falha(`a estação ${citar(nome)} precisa de duas ou mais colunas`);
     const triedro = E.reto ? null : triedroDaCurva(E, e.em, nome);
     const indice = new Map();
@@ -219,10 +226,11 @@ function lerEstacoes(estacoes, E, prefixo, regioes) {
 }
 
 /* As faixas de cada região: estações inteiras nas pontas, estações parciais entre elas, colunas extras dentro. */
-function conferirRegioes(regioes, lidas) {
+function conferirRegioes(regioes, lidas, citavel) {
   const indiceDaEstacao = new Map(lidas.map((e, k) => [e.nome, k]));
   for (const R of regioes.values()) {
     for (const e of R.estacoes) {
+      citavel(e, `a região ${citar(R.nome)}`);
       if (!indiceDaEstacao.has(e)) falha(`a região ${citar(R.nome)} cita a estação ${citar(e)}, que não existe`);
       if (lidas[indiceDaEstacao.get(e)].regiao !== null) falha(`a região ${citar(R.nome)} vai até a estação ${citar(e)}, que é parcial; as pontas da faixa de uma região são estações inteiras`);
     }
@@ -251,7 +259,7 @@ function conferirRegioes(regioes, lidas) {
   }
 }
 
-function lerVaos(vaos, lidas) {
+function lerVaos(vaos, lidas, citavel) {
   if (vaos == null) return [];
   if (!Array.isArray(vaos)) falha('vaos precisa ser lista de { nome, estacoes: [de, ate], colunas: [de, ate] }');
   const nomes = new Set();
@@ -267,7 +275,7 @@ function lerVaos(vaos, lidas) {
     };
     const [e0, e1] = par(v.estacoes, 'estacoes');
     const colunas = par(v.colunas, 'colunas');
-    for (const e of [e0, e1]) if (!indiceDaEstacao.has(e)) falha(`o vão ${citar(nome)} cita a estação ${citar(e)}, que não existe`);
+    for (const e of [e0, e1]) { citavel(e, `o vão ${citar(nome)}`); if (!indiceDaEstacao.has(e)) falha(`o vão ${citar(nome)} cita a estação ${citar(e)}, que não existe`); }
     const i0 = indiceDaEstacao.get(e0), i1 = indiceDaEstacao.get(e1);
     if (!(i0 < i1)) falha(`o vão ${citar(nome)} vai da estação ${citar(e0)} à ${citar(e1)}, que precisa vir depois`);
     return { nome, i0, i1, colunas, dentro: new Set() };
@@ -380,7 +388,7 @@ function marcarVaos(vaos, E, frente) {
 }
 
 /* A linha de um vinco: os pontos em sequência, ao longo de uma coluna ou de uma estação. */
-function linhaDoVinco(v, nome, lidas, fechada) {
+function linhaDoVinco(v, nome, lidas, fechada, citavel) {
   const indiceDaEstacao = new Map(lidas.map((e, k) => [e.nome, k]));
   if ((v.coluna == null) === (v.estacao == null)) falha(`o vinco ${citar(nome)} segue uma coluna ou uma estação: declare coluna ou estacao, um dos dois`);
   if (v.coluna != null) {
@@ -389,6 +397,7 @@ function linhaDoVinco(v, nome, lidas, fechada) {
     if (!tem.length) falha(`o vinco ${citar(nome)} segue a coluna ${citar(col)}, que nenhuma estação tem`);
     const estacao = (e, padrao) => {
       if (e == null) return padrao;
+      citavel(e, `o vinco ${citar(nome)}`);
       if (!indiceDaEstacao.has(e)) falha(`o vinco ${citar(nome)} cita a estação ${citar(e)}, que não existe`);
       return indiceDaEstacao.get(e);
     };
@@ -407,6 +416,7 @@ function linhaDoVinco(v, nome, lidas, fechada) {
     return pontos;
   }
   const est = exigirNome(v.estacao, `a estação do vinco ${citar(nome)}`);
+  citavel(est, `o vinco ${citar(nome)}`);
   if (!indiceDaEstacao.has(est)) falha(`o vinco ${citar(nome)} segue a estação ${citar(est)}, que não existe`);
   const E = lidas[indiceDaEstacao.get(est)];
   const coluna = (c, padrao) => {
@@ -419,7 +429,7 @@ function linhaDoVinco(v, nome, lidas, fechada) {
   return E.colunas.slice(j0, j1 + 1).map((c) => c.ponto);
 }
 
-function lerVincos(vincos, lidas, arestas, fechada) {
+function lerVincos(vincos, lidas, arestas, fechada, citavel) {
   if (vincos == null) return [];
   if (!Array.isArray(vincos)) falha('vincos precisa ser lista de vincos nomeados');
   const nomes = new Set();
@@ -430,7 +440,7 @@ function lerVincos(vincos, lidas, arestas, fechada) {
     nomes.add(nome);
     const ok = v.nitidez === 'viva' || (typeof v.nitidez === 'string' && v.nitidez) || (typeof v.nitidez === 'number' && v.nitidez >= 0 && v.nitidez <= 1);
     if (!ok) falha(`o vinco ${citar(nome)} precisa de nitidez de 0 a 1, 'viva' ou nome de PARAMS`);
-    const pontos = linhaDoVinco(v, nome, lidas, fechada);
+    const pontos = linhaDoVinco(v, nome, lidas, fechada, citavel);
     for (let k = 0; k + 1 < pontos.length; k++) {
       if (!arestas.has(chave(pontos[k], pontos[k + 1]))) falha(`o vinco ${citar(nome)} liga ${citar(pontos[k])} a ${citar(pontos[k + 1])}, que não formam aresta da gaiola (um vão, uma fusão ou uma divisão tirou essa aresta)`);
     }
@@ -438,20 +448,26 @@ function lerVincos(vincos, lidas, arestas, fechada) {
   });
 }
 
-/* cantos e medidas: { estacao?, coluna? } vira a lista dos pontos marcados, na ordem dos pontos. Nas medidas, `peso`
-   passa ao passo, e o ponto com peso sai como { ponto, peso }. */
-function marcar(seletores, campo, lidas, vertices) {
+/* cantos e medidas: { estacao?, coluna?, chaves? } vira a lista dos pontos marcados, na ordem dos pontos. Nas medidas,
+   `peso` passa ao passo, e o ponto com peso sai como { ponto, peso }. `chaves: true` restringe às estações-chave da
+   interpolação. */
+function marcar(seletores, campo, lidas, vertices, citavel, chaves) {
   if (seletores == null) return null;
   if (!Array.isArray(seletores) || !seletores.length) falha(`${campo} precisa ser lista não vazia de { estacao, coluna }`);
   const marcados = new Set(); const pesos = new Map();
   const indiceDaEstacao = new Map(lidas.map((e, k) => [e.nome, k]));
   for (const [n, s] of seletores.entries()) {
-    exigirCampos(s, campo === 'medidas' ? ['estacao', 'coluna', 'peso'] : ['estacao', 'coluna'], `${campo}[${n}]`);
+    exigirCampos(s, campo === 'medidas' ? ['estacao', 'coluna', 'peso', 'chaves'] : ['estacao', 'coluna', 'chaves'], `${campo}[${n}]`);
+    const soChaves = s.chaves ?? false;
+    if (soChaves !== false && soChaves !== true) falha(`${campo}[${n}] aceita chaves só como true ou false`);
+    if (soChaves && !chaves) falha(`${campo}[${n}] marca chaves: true, mas a gaiola não declara interpolar; sem interpolação toda estação declarada é chave`);
+    if (s.estacao != null) citavel(s.estacao, `${campo}[${n}]`);
     const peso = s.peso ?? null;
     if (peso !== null && !(typeof peso === 'string' || (typeof peso === 'number' && Number.isFinite(peso) && peso > 0))) falha(`${campo}[${n}] tem peso ${peso}; o peso é número finito maior que zero ou nome de PARAMS, e a medida sem peso é exata`);
-    if (s.estacao == null && s.coluna == null) falha(`${campo}[${n}] precisa de estacao, coluna ou os dois`);
+    if (s.estacao == null && s.coluna == null && !soChaves) falha(`${campo}[${n}] precisa de estacao, coluna ou os dois`);
     if (s.estacao != null && !indiceDaEstacao.has(s.estacao)) falha(`${campo}[${n}] cita a estação ${citar(s.estacao)}, que não existe`);
-    const estacoes = s.estacao != null ? [lidas[indiceDaEstacao.get(s.estacao)]] : lidas;
+    if (soChaves && s.estacao != null && !chaves.has(s.estacao)) falha(`${campo}[${n}] marca chaves: true e cita a estação ${citar(s.estacao)}, que não é estação-chave`);
+    const estacoes = (s.estacao != null ? [lidas[indiceDaEstacao.get(s.estacao)]] : lidas).filter((E) => !soChaves || chaves.has(E.nome));
     let achou = 0;
     for (const E of estacoes) {
       if (s.coluna != null && !E.indice.has(s.coluna)) continue;
@@ -461,28 +477,38 @@ function marcar(seletores, campo, lidas, vertices) {
         marcados.add(c.ponto); if (peso !== null) pesos.set(c.ponto, peso); achou += 1;
       }
     }
-    if (!achou) falha(`${campo}[${n}] cita a coluna ${citar(s.coluna)}, que ${s.estacao != null ? `a estação ${citar(s.estacao)} não tem` : 'nenhuma estação tem'}`);
+    if (!achou) falha(`${campo}[${n}] cita a coluna ${citar(s.coluna)}, que ${s.estacao != null ? `a estação ${citar(s.estacao)} não tem` : `nenhuma estação${soChaves ? '-chave' : ''} tem`}`);
   }
   return vertices.filter((p) => marcados.has(p)).map((p) => (pesos.has(p) ? { ponto: p, peso: pesos.get(p) } : p));
 }
 
 /**
- * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, vincos, cantos, medidas, simetria, virar, prefixo })
- *   -> { pontos, passo, ponto(estacao, coluna), regioes }
+ * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, vincos, cantos, medidas, simetria, virar, prefixo, curvas, interpolar })
+ *   -> { pontos, passo, ponto(estacao, coluna), regioes, estacoes? }
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`: { vertices, faces, vincos, cantos?, medidas?,
  * simetria? }, tudo em nomes de ponto. `regioes` dá, para cada região, os nomes dos pontos dela, na ordem dos pontos.
+ * Com `interpolar`, `estacoes` lista { nome, em, tipo } de cada estação, com tipo 'chave', 'interpolada' (declarada sem
+ * colunas), 'gerada' (pelo passo) ou 'parcial'.
  */
 export function gaiolaPorEstacoes(definicao) {
-  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'vincos', 'cantos', 'medidas', 'simetria', 'virar', 'prefixo'], 'a definição da gaiola');
+  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'vincos', 'cantos', 'medidas', 'simetria', 'virar', 'prefixo', 'curvas', 'interpolar'], 'a definição da gaiola');
   const { simetria = null, virar = false, prefixo = '' } = definicao;
   const E = lerEixo(definicao.eixo);
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
   if (typeof virar !== 'boolean') falha('virar precisa ser true ou false');
   if (typeof prefixo !== 'string') falha('prefixo precisa ser texto');
   const regioes = lerRegioes(definicao.regioes);
-  const { lidas, pontos, vertices } = lerEstacoes(definicao.estacoes, E, prefixo, regioes);
-  conferirRegioes(regioes, lidas);
-  const vaos = lerVaos(definicao.vaos, lidas);
+  const expandida = definicao.curvas != null || definicao.interpolar != null
+    ? expandirEstacoes(definicao.estacoes, { interpolar: definicao.interpolar, curvas: definicao.curvas, regioes: definicao.regioes, fechada: E.fechada })
+    : null;
+  const geradas = expandida?.geradas ?? new Set();
+  const chaves = definicao.interpolar != null ? expandida.chaves : null;
+  const citavel = (nome, onde) => {
+    if (geradas.has(nome)) falha(`${onde} cita a estação ${citar(nome)}, que a interpolação gerou pelo passo; o nome dela muda com o passo e não é identidade, então cite uma estação-chave ou declare a estação { nome, em } sem colunas`);
+  };
+  const { lidas, pontos, vertices } = lerEstacoes(expandida?.estacoes ?? definicao.estacoes, E, prefixo, regioes);
+  conferirRegioes(regioes, lidas, citavel);
+  const vaos = lerVaos(definicao.vaos, lidas, citavel);
 
   const todas = [];
   let frente = entradas(lidas[0]);
@@ -534,20 +560,23 @@ export function gaiolaPorEstacoes(definicao) {
     }
   }
 
-  const vincos = lerVincos(definicao.vincos, lidas, arestas, E.fechada);
-  const cantos = marcar(definicao.cantos, 'cantos', lidas, vertices);
-  const medidas = marcar(definicao.medidas, 'medidas', lidas, vertices);
+  const vincos = lerVincos(definicao.vincos, lidas, arestas, E.fechada, citavel);
+  const cantos = marcar(definicao.cantos, 'cantos', lidas, vertices, citavel, chaves);
+  const medidas = marcar(definicao.medidas, 'medidas', lidas, vertices, citavel, chaves);
   const passo = { vertices: [...vertices], faces, vincos };
   if (cantos) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
   if (simetria) passo.simetria = simetria;
   const indiceDaEstacao = new Map(lidas.map((e) => [e.nome, e]));
   const ponto = (estacao, coluna) => {
+    citavel(estacao, 'ponto()');
     const S = indiceDaEstacao.get(estacao);
     if (!S) falha(`a estação ${citar(estacao)} não existe`);
     if (!S.indice.has(coluna)) falha(`a estação ${citar(estacao)} não tem a coluna ${citar(coluna)}`);
     return S.colunas[S.indice.get(coluna)].ponto;
   };
   const porRegiao = Object.fromEntries([...regioes.values()].map((R) => [R.nome, vertices.filter((p) => R.pontos.includes(p))]));
-  return { pontos, passo, ponto, regioes: porRegiao };
+  const saida = { pontos, passo, ponto, regioes: porRegiao };
+  if (chaves) saida.estacoes = lidas.map((e) => ({ nome: e.nome, em: e.em, tipo: expandida.tipos.get(e.nome) }));
+  return saida;
 }
