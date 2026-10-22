@@ -567,7 +567,12 @@ ondulação de 1 mm plantada entre dois pontos vizinhos sai com 0,88 mm e esses
 dois pontos à frente. Com `medidas`, os pontos citados são os da gaiola
 ajustada, e mexer no ponto declarado move o ajustado. A função
 `ondulacaoDaReceita`, de `tools/mecanifica/ondulacao-da-superficie.mjs`, faz o
-mesmo num teste. A zebra continua para a pessoa e o crítico conferirem.
+mesmo num teste. Uma feição desenhada mais estreita que três espaçamentos da
+gaiola sai acusada mesmo com a superfície sobre a forma; alargue a feição ou
+adense as colunas ao redor dela. Na carenagem de prova, colunas a 175 mm longe do
+vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora da
+forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra continua para a
+pessoa e o crítico conferirem.
 
 ## Friso ao longo de curva: `friso`
 

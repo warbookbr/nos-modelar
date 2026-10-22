@@ -49,6 +49,7 @@ export const TESTES_LENTOS = [
   'procedural/nucleo/friso-contato.test.mjs',
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
   'procedural/nucleo/operacoes/booleana-casca-raspada.test.ts',
+  'procedural/pecas/carenagem-de-prova/receita.test.mjs',
   'tools/mcp/catalogo-montagens.test.mjs',
   'tools/mcp/ensaio-ponta-a-ponta.test.mjs',
   'tools/mcp/mcp.test.mjs',

@@ -1,15 +1,16 @@
 /* vinco-na-imagem.test.mjs — a dobra viva chega à imagem como aresta, nos dois caminhos de imagem: a cena da bancada
    (`adaptarThree`, que põe a normal de cada canto) e o rasterizador das vistas da receita (`vistas-de-passos.mjs`, uma
-   luz por triângulo). A prova é a cintura da carenagem de prova, uma dobra de cerca de 42 graus.
+   luz por triângulo). A prova é a cintura da carenagem de prova, uma dobra de cerca de 40 graus (42 antes de 2026-10-22, quando o pé da
+   saliência era uma quina).
 
    Medido em 2026-10-22 (fatia 10 do plano da carroceria por subdivisão): nenhum dos dois caminhos suaviza a normal por
    cima da dobra. A faixa borrada que se via na cintura é a forma da TABELA: a dobra é o alto de uma saliência de
-   `cintura_saliencia` com `cintura_faixa` de cada lado, que sobe e desce por `vinco_rampa` nas pontas, e não sombreado.
+   `cintura_saliencia` cujo pé fica a 2,6 vezes `cintura_faixa` de cada lado, que sobe e desce por `vinco_rampa` nas pontas, e não sombreado.
 
    O complemento da fatia 10: o passo `subdivisao` marca as faces geradas lisas a 30 graus e põe quebra de sombra nas
    arestas que descendem do vinco vivo. A superfície sai sem as listras de triângulo que a luz chapada desenha onde ela
    curva muito, nas pontas da dobra, e a dobra continua aresta também ali, onde o diedro cai abaixo dos 30 graus. Este
-   teste guarda a divisão de 42 graus no meio da dobra, nenhuma divisão no resto da chapa, a divisão nas pontas que só a
+   teste guarda a divisão de 40 graus no meio da dobra, nenhuma divisão no resto da chapa, a divisão nas pontas que só a
    quebra dá (sem ela a sombra passa por cima), o borrão do `liso` sem ângulo e sem quebra, as listras medidas numa
    imagem da normal da cena e o salto nas vistas da receita. */
 import { describe, expect, it } from 'vitest';
@@ -157,14 +158,16 @@ describe('a dobra viva chega à imagem como aresta', () => {
   const internas = arestasInternas(neutro);
   const dobra = arestasDaDobra(internas);
   const quebras = new Set([...neutro.F.values()].flatMap((f) => (f.quebras ?? []).map(([a, b]) => chave(a, b))));
-  /* as arestas do vinco nas pontas, onde a rampa baixa o diedro abaixo do ângulo do liso, na face externa do lado +x */
-  const pontas = internas.filter((e) => quebras.has(chave(e.a, e.b)) && e.diedro > 5 && e.diedro < LIMIAR && e.meio[0] > 0.7);
+  /* as arestas do vinco nas pontas, onde a rampa baixa o diedro abaixo do ângulo do liso, na face externa do lado +x.
+     A aresta a menos de 2 graus do ângulo fica de fora: ela divide o vértice com a vizinha acima do ângulo, e a sombra
+     separa as normais ali, em cerca de 11 graus, mesmo sem a quebra. */
+  const pontas = internas.filter((e) => quebras.has(chave(e.a, e.b)) && e.diedro > 5 && e.diedro < LIMIAR - 2 && e.meio[0] > 0.7);
 
-  it('a cintura é uma dobra de cerca de 42 graus na malha, na altura da TABELA', () => {
+  it('a cintura é uma dobra de cerca de 40 graus na malha, na altura da TABELA', () => {
     expect(dobra.length).toBeGreaterThanOrEqual(40);
     for (const e of dobra) {
-      expect(e.diedro).toBeGreaterThan(38);
-      expect(e.diedro).toBeLessThan(46);
+      expect(e.diedro).toBeGreaterThan(37);
+      expect(e.diedro).toBeLessThan(44);
       expect(Math.abs(e.y * 1000 - TABELA.cintura_altura)).toBeLessThan(5);
     }
   });
@@ -181,11 +184,11 @@ describe('a dobra viva chega à imagem como aresta', () => {
 
   it('na cena da bancada a normal se divide na dobra e em nenhuma aresta lisa do resto da chapa', () => {
     const cena = normaisDaCena(neutro);
-    expect(Math.min(...divisoes(cena, dobra).flat())).toBeGreaterThan(38);
+    expect(Math.min(...divisoes(cena, dobra).flat())).toBeGreaterThan(37);
     const lisas = internas.filter((e) => !quebras.has(chave(e.a, e.b)) && e.diedro < LIMIAR);
     expect(lisas.length).toBeGreaterThan(50000);
     /* o que sobra é o arredondamento do Float32 da cena */
-    expect(Math.max(...divisoes(cena, lisas).flat())).toBeLessThan(0.1);
+    expect(divisoes(cena, lisas).flat().reduce((m, d) => Math.max(m, d), 0)).toBeLessThan(0.1);
   });
 
   it('nas pontas do vinco a quebra mantém a divisão abaixo do ângulo, e as mutações a perdem', () => {

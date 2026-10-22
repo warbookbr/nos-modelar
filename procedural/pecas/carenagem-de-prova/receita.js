@@ -9,7 +9,7 @@
  * Referencial do acervo: y para cima, a borda de baixo em y = borda_altura (fora do arco), a traseira em z = 0 e a
  * frente em z = comprimento, como no resto do acervo; x cresce para a direita de quem olha a frente, e a gaiola declarada é a metade x >= 0.
  *
- * A gaiola sai de `gaiolaPorEstacoes` em `derivar`, adensada só perto do vinco: longe dele a seção tem 9 colunas, perto
+ * A gaiola sai de `gaiolaPorEstacoes` em `derivar`, adensada só perto do vinco: longe dele a seção tem 13 colunas, perto
  * dele 17, e a transição fecha pentágonos onde as colunas começam e triângulos onde se fundem. Os pontos da gaiola são
  * dado derivado da TABELA, sem liberdade própria, e moram em `TOPO`, por um getter que lê `this.PARAMS`: em PARAMS eles
  * virariam cerca de 1.300 coordenadas sondadas pelo diagnóstico de parâmetros, e ficariam fixas desde a carga do módulo
@@ -63,20 +63,22 @@ const suave = (t) => { const u = Math.min(1, Math.max(0, t)); return u * u * (3 
 
 /* As colunas da seção: frações s de 0 (borda de baixo) a 1 (ombro) na lateral e r de 0 (ombro) a 1 (costura) no teto.
    As colunas da lateral ficam a passos de 1/16 contados da cintura, de sete abaixo dela a cinco acima. Longe do vinco a
-   lateral tem a soleira e três colunas grossas; na transição entram as meias, e perto do vinco as finas e a cintura. O
+   lateral tem a soleira e sete colunas, a duas colunas finas uma da outra, e perto do vinco as finas e a cintura. O
    rodapé e o alto graduam o passo entre a faixa fina e a soleira e o ombro, de no máximo o dobro de uma coluna à
-   seguinte: com todos os pontos medidos, um salto de quatro vezes no passo fazia a superfície ondular junto da faixa. */
+   seguinte: com todos os pontos medidos, um salto de quatro vezes no passo fazia a superfície ondular junto da faixa, e
+   uma lateral longe do vinco com colunas a 175 mm, que se fundiam duas a duas em triângulos depois do vão, deixava a
+   superfície até 0,5 mm fora da forma ali, de um lado e do outro do trecho fino. */
 const PASSO_DA_COLUNA = 1 / 16;
+/* Alcance do pé da saliência da cintura, em faixas (cintura_faixa), de cada lado do vinco. */
+const ALCANCE_DO_PE = 2.6;
 /* Fração da lateral até onde o arco levanta as colunas, de todo o arco na soleira a nada nesta fração. */
 const LEVANTE_DO_ARCO = 0.75;
 const COLUNAS_DA_LATERAL = {
-  grossa: [['saia', -5], ['flanco', -1], ['costado', 3]],
   meias: [['rodape', -7], ['saia', -5], ['meiaBaixa', -3], ['flanco', -1], ['meiaAlta', 1], ['costado', 3], ['alto', 5]],
   finas: [['rodape', -7], ['saia', -5], ['finaA', -4], ['meiaBaixa', -3], ['finaB', -2], ['flanco', -1], ['cintura', 0], ['meiaAlta', 1], ['finaC', 2], ['costado', 3], ['alto', 5]],
 };
-/* Depois do vinco as finas se fundem duas a duas e depois as meias, cada fusão fechando um triângulo. */
+/* Depois do vinco as finas se fundem duas a duas nas meias, cada fusão fechando um triângulo. */
 const FUSAO_DAS_FINAS = { meiaBaixa: ['finaA', 'meiaBaixa'], flanco: ['finaB', 'flanco'], meiaAlta: ['cintura', 'meiaAlta'], costado: ['finaC', 'costado'] };
-const FUSAO_DAS_MEIAS = { saia: ['saia', 'meiaBaixa'], flanco: ['flanco', 'meiaAlta'] };
 
 /** A forma em milímetro, tudo da TABELA: as funções da seção numa estação z, o perfil da lateral por altura e as
  *  colunas; o teste mede a malha contra `perfil` e `teto`. */
@@ -96,7 +98,15 @@ export function forma(T) {
   const colunasDaLateral = (tipo) => [['soleira', 0], ...COLUNAS_DA_LATERAL[tipo].map(([n, k]) => [n, sc + k * PASSO_DA_COLUNA])];
   const faixa = T.cintura_faixa / lateralNoMeio;
   const rampa = (z) => suave((z - T.vinco_inicio) / T.vinco_rampa) * suave((T.vinco_fim - z) / T.vinco_rampa);
-  const dobra = (z, s) => T.cintura_saliencia * rampa(z) * Math.max(0, 1 - Math.abs(s - sc) / faixa);
+  /* O perfil da saliência é (1 − d/alcance)³, com d a distância à cintura: vivo no alto, onde fica o vinco, e com
+     tangente e curvatura nulas no pé, sem quina. A rampa linear antiga tinha uma quina sem vinco em cada pé, que a
+     superfície, medida em todos os pontos, passava alisando e voltando; a leitura de ondulação acusava um afundamento
+     junto de cada pé e um calombo um espaçamento e meio além. O alcance de 2,6 faixas, 182 mm, é o equilíbrio medido:
+     com a faixa só (70 mm) o pé fica a menos de dois espaçamentos de coluna e a leitura acusa calombos de até 1,3 mm;
+     a 3 faixas ou mais ela não acusa nada, mas a dobra da cintura cai de 42 para 35 graus; a 2,6 a dobra fica em 39,5
+     graus e a leitura não acusa falha. */
+  const alcance = ALCANCE_DO_PE * faixa;
+  const dobra = (z, s) => T.cintura_saliencia * rampa(z) * Math.max(0, 1 - Math.abs(s - sc) / alcance) ** 3;
   /* A lateral é o perfil x(z, b), com b a fração da altura da borda reta (borda_altura) ao ombro. O arco só recorta a
      borda de baixo: ele levanta as colunas da gaiola para caberem acima do recorte, mas cada coluna continua no mesmo
      perfil, porque x sai da altura b em que a coluna ficou. Se o perfil seguisse a coluna levantada, a lateral inteira,
@@ -171,19 +181,17 @@ function estacoesDaForma(T) {
   const estacoes = zs.map((z) => {
     let nome = posicoes.get(z);
     if (nome) { ultima = nome; k = 0; } else { k += 1; nome = `${ultima ?? 'antes'}${k}`; }
-    return { nome, z, tipo: 'grossa' };
+    return { nome, z, tipo: 'meias' };
   });
-  /* o tipo sai da ordem: finas da primeira estação em zFinas0 ou depois até a última em zFinas1 ou antes, meias na
-     estação anterior, e as duas fusões nas duas seguintes; assim uma cota que cai no meio da transição não a quebra */
+  /* o tipo sai da ordem: meias em todas as estações, finas da primeira estação em zFinas0 ou depois até a última em
+     zFinas1 ou antes, e a fusão das finas nas meias na seguinte; assim uma cota que cai no meio da transição não a quebra */
   const primeira = estacoes.findIndex((e) => e.z >= zFinas0);
   const ultimaFina = estacoes.findLastIndex((e) => e.z <= zFinas1);
-  if (primeira < 1 || ultimaFina + 2 >= estacoes.length - 1) {
-    throw new Error(`carenagem-de-prova: o vinco de z ${T.vinco_inicio} a ${T.vinco_fim} mm precisa de uma estação antes da zona fina e de duas depois dela, antes das pontas`);
+  if (primeira < 1 || ultimaFina + 1 >= estacoes.length - 1) {
+    throw new Error(`carenagem-de-prova: o vinco de z ${T.vinco_inicio} a ${T.vinco_fim} mm precisa de uma estação antes da zona fina e de uma depois dela, antes das pontas`);
   }
-  estacoes[primeira - 1].tipo = 'meias';
   for (let j = primeira; j <= ultimaFina; j++) estacoes[j].tipo = 'finas';
   estacoes[ultimaFina + 1].tipo = 'fusaoDasFinas';
-  estacoes[ultimaFina + 2].tipo = 'fusaoDasMeias';
   return estacoes;
 }
 
@@ -199,8 +207,8 @@ export function derivar(T) {
   const colunasDe = (z, lateral, fusao = {}) => [...lateral, ...f.colunasDoTeto.map(([n, r]) => [n, 1 + r])]
     .map(([n, s]) => coluna(z, n, s, fusao[n]));
   const estacoes = estacoesDaForma(T).map(({ nome, z, tipo }) => {
-    const lateral = f.colunasDaLateral({ fusaoDasFinas: 'meias', fusaoDasMeias: 'grossa' }[tipo] ?? tipo);
-    const fusao = tipo === 'fusaoDasFinas' ? FUSAO_DAS_FINAS : (tipo === 'fusaoDasMeias' ? FUSAO_DAS_MEIAS : {});
+    const lateral = f.colunasDaLateral(tipo === 'fusaoDasFinas' ? 'meias' : tipo);
+    const fusao = tipo === 'fusaoDasFinas' ? FUSAO_DAS_FINAS : {};
     return { nome, em: m(z), colunas: colunasDe(z, lateral, fusao) };
   });
   const gaiola = gaiolaPorEstacoes({

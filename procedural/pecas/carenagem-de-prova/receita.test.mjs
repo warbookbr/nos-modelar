@@ -1,8 +1,8 @@
 /* receita.test.mjs — a carenagem de prova da superfície por subdivisão: a receita só endereça a gaiola por nome, cada
    cota medida da TABELA é vértice da malha (gate 2 do plano da carroceria por subdivisão), o sólido sai fechado com o
    volume igual à área externa vezes a espessura (gate 4), a gaiola adensa só perto do vinco, a superfície segue a forma
-   desenhada tanto onde a gaiola é fina quanto onde é grossa, e os pontos da gaiola, que moram em TOPO, seguem a TABELA
-   quando ela muda. */
+   desenhada tanto onde a gaiola é fina quanto onde é grossa, a leitura de ondulação não acha falha acima de 0,3 mm fora
+   do que a forma declara, e os pontos da gaiola, que moram em TOPO, seguem a TABELA quando ela muda. */
 import { describe, expect, it } from 'vitest';
 import receita, { derivar, forma, gerarPassos, TABELA } from './receita.js';
 import { enderecosPorIndice } from '../../nucleo/operacoes/subdivisao.js';
@@ -11,6 +11,7 @@ import { area, volume } from '../../nucleo/fixtures/medidas-de-malha.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { receitaComParametros } from '../../../src/autoria/parametros-vivos.js';
 import { analisarTopologia } from '../../../modulos/topologia/src/analisar.js';
+import { ondulacaoDaReceita } from '../../../tools/mecanifica/ondulacao-da-superficie.mjs';
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const malha = (neutro) => {
@@ -34,10 +35,10 @@ describe('carenagem de prova', () => {
     const { passo } = derivar(TABELA);
     const lados = {};
     for (const f of passo.faces) lados[f.length] = (lados[f.length] ?? 0) + 1;
-    expect(passo.vertices).toHaveLength(511);
-    expect(lados).toEqual({ 3: 6, 4: 438, 5: 10 });
+    expect(passo.vertices).toHaveLength(583);
+    expect(lados).toEqual({ 3: 4, 4: 516, 5: 4 });
     expect(neutro.orfaos).toEqual([]);
-    expect(M.vertices).toHaveLength(29694);
+    expect(M.vertices).toHaveLength(34174);
   });
 
   it('todo ponto da gaiola é medida, e cada cota da TABELA é vértice da malha a menos de 1e-6 m, com a imagem espelhada', () => {
@@ -74,8 +75,11 @@ describe('carenagem de prova', () => {
 
   /* Só com as sete cotas medidas, a superfície ficava para dentro das amostras da forma cerca de curvatura × passo² / 6:
      4,5 mm onde as colunas são grossas e 0,3 mm na faixa fina junto do vinco, que saltava para fora do resto da lateral
-     como um degrau de 4,5 mm (de −6,2 a +3,1 mm contra a forma), e cada cota virava um calombo isolado. */
-  it('a superfície segue a forma desenhada a até 2,5 mm na lateral e no teto, fora do arredondamento do ombro', () => {
+     como um degrau de 4,5 mm (de −6,2 a +3,1 mm contra a forma), e cada cota virava um calombo isolado. Com todos os
+     pontos medidos e o pé da saliência da cintura sem quina, a lateral fica a 0,94 mm da forma (no começo do arco da
+     frente da faixa fina) e o teto a 1,88 mm, no canto do vão, que a superfície arredonda; as tolerâncias têm folga de
+     cerca de um quarto sobre esses valores. */
+  it('a superfície segue a forma desenhada a até 1,2 mm na lateral e 2,2 mm no teto, fora do arredondamento do ombro', () => {
     const semEspessura = receita.PASSOS.map(([op, a]) => {
       if (op !== 'subdivisao') return [op, a];
       const { espessura, ...resto } = a;
@@ -96,9 +100,20 @@ describe('carenagem de prova', () => {
     }
     expect(nLateral).toBeGreaterThan(3000);
     expect(nTeto).toBeGreaterThan(2000);
-    expect(lateral).toBeLessThan(2.5);
-    expect(teto).toBeLessThan(2.5);
+    expect(lateral).toBeLessThan(1.2);
+    expect(teto).toBeLessThan(2.2);
   });
+
+  /* A leitura de ondulação compara cada vértice com uma versão suavizada local, a três espaçamentos da gaiola. Com a
+     saliência da cintura de rampa linear e pé em quina, e com a lateral longe do vinco a 175 mm de coluna, fundida em
+     triângulos depois do vão, ela acusava cinco falhas de 0,48 a 1,05 mm fora do que a forma declara. */
+  it('a leitura de ondulação não acha falha acima de 0,3 mm fora do que a forma declara', () => {
+    const leitura = ondulacaoDaReceita(receita);
+    expect(leitura.superficies).toHaveLength(1);
+    expect(leitura.superficies[0].falhas).toEqual([]);
+    expect(leitura.falhas).toBe(0);
+    expect(leitura.superficies[0].desvioMm.maximo).toBeLessThan(0.3);
+  }, 120_000);
 
   it('a mesma receita dá a mesma malha, e os pontos da gaiola seguem a TABELA que muda', () => {
     expect(JSON.stringify(neutroCanonico(executarReceita(receita).neutro))).toBe(JSON.stringify(neutroCanonico(neutro)));
