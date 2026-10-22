@@ -184,13 +184,86 @@ def _cotas_do_corte(cadeias, meia, U='u', Vn='v'):
     return out[:6]
 
 
+def _segmentos_cruzam_caixa(A, B, caixa):
+    """Para cada segmento A[i]-B[i] (px), se ele toca a caixa (x0, y0, x1, y1): corte de Liang-Barsky, vetorizado."""
+    x0, y0, x1, y1 = caixa
+    d = B - A
+    t0 = np.zeros(len(A))
+    t1 = np.ones(len(A))
+    ok = np.ones(len(A), bool)
+    for p, q in ((-d[:, 0], A[:, 0] - x0), (d[:, 0], x1 - A[:, 0]), (-d[:, 1], A[:, 1] - y0), (d[:, 1], y1 - A[:, 1])):
+        paralelo = np.abs(p) < 1e-12
+        ok &= ~(paralelo & (q < 0))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            r = np.where(paralelo, 0.0, q / np.where(paralelo, 1.0, p))
+        t0 = np.where(~paralelo & (p < 0), np.maximum(t0, r), t0)
+        t1 = np.where(~paralelo & (p > 0), np.minimum(t1, r), t1)
+    return ok & (t0 <= t1)
+
+
+def _expande(bb, m):
+    return (bb[0] - m, bb[1] - m, bb[2] + m, bb[3] + m)
+
+
+def _cruza_contorno(bb, A, B, folga=4):
+    """Se a caixa, engordada de folga px (meia largura do traço mais respiro), toca algum segmento do contorno."""
+    if len(A) == 0:
+        return False
+    return bool(_segmentos_cruzam_caixa(A, B, _expande(bb, folga)).any())
+
+
+def posicionar_rotulo(ancora, tam, A, B, ocupadas, limites, padrao=(9, 6)):
+    """Caixa (x0, y0, x1, y1) de um rótulo de tam = (largura, altura) px para a âncora, longe do contorno (segmentos A-B em px) e
+    das caixas e âncoras ocupadas. Tenta primeiro o lugar colado de sempre (âncora + padrao) e depois anéis cada vez mais
+    afastados em 16 direções; devolve (caixa, afastado, cruzava_no_padrao). Sem lugar livre, a caixa com menos cruzamentos."""
+    ax, ay = ancora
+    w, h = tam
+    xmin, ymin, xmax, ymax = limites
+    pontos, caixas = ocupadas
+
+    def livre(bb):
+        if bb[0] < xmin or bb[1] < ymin or bb[2] > xmax or bb[3] > ymax:
+            return False
+        if any(cruza(bb, o) for o in caixas):
+            return False
+        return not any(bb[0] - 10 < px_ < bb[2] + 10 and bb[1] - 10 < py_ < bb[3] + 10 for px_, py_ in pontos)
+
+    padrao_bb = (ax + padrao[0], ay + padrao[1], ax + padrao[0] + w, ay + padrao[1] + h)
+    cruzava = _cruza_contorno(padrao_bb, A, B)
+    if livre(padrao_bb) and not cruzava:
+        return padrao_bb, False, False
+    melhor = None
+    for d in (22, 34, 48, 64, 84, 110, 140, 180, 230, 300):
+        for k in range(16):
+            ang = (k * 22.5 + 45) * math.pi / 180   # começa em cima à direita
+            c, s_ = math.cos(ang), -math.sin(ang)
+            cx = ax + c * d + (w / 2 if c > 0.3 else -w / 2 if c < -0.3 else 0)
+            cy = ay + s_ * d + (h / 2 if s_ > 0.3 else -h / 2 if s_ < -0.3 else 0)
+            bb = (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+            if not livre(bb):
+                continue
+            if not _cruza_contorno(bb, A, B):
+                return bb, True, cruzava
+            n = int(_segmentos_cruzam_caixa(A, B, _expande(bb, 4)).sum())
+            if melhor is None or n < melhor[0]:
+                melhor = (n, bb)
+    if melhor is None:
+        melhor = (0, padrao_bb)
+    return melhor[1], True, cruzava
+
+
+def _ligacao(ancora, bb):
+    """O ponto da caixa mais perto da âncora, onde a linha fina de ligação termina."""
+    return (min(max(ancora[0], bb[0]), bb[2]), min(max(ancora[1], bb[1]), bb[3]))
+
+
 def cortes(arq_json, pasta, arq_quadro=None):
     d = json.load(open(arq_json))
     quadros = json.load(open(arq_quadro)) if arq_quadro else {}
     W, H, M = 1200, 900, 70
     f, fp = fonte(16), fonte(14)
     tabela = ['| corte | cota | posição (mm) |', '|---|---|---|']
-    novo_quadro = {}
+    novo_quadro, registro = {}, {}
     for c in d['cortes']:
         U, Vn = c['eixos_uv']
         cad = [np.asarray(x, float) for x in c['cadeias'] if len(x) >= 2]
@@ -234,24 +307,35 @@ def cortes(arq_json, pasta, arq_quadro=None):
         dr.rectangle(dr.textbbox((10, 8), titulo, font=f), fill=(255, 255, 255, 220))
         dr.text((10, 8), titulo, fill='black', font=f)
         caixas = [dr.textbbox((10, 8), titulo, font=f)]
-        for rot, p in _cotas_do_corte(cad, meia, U, Vn):
-            x, y = px(p)
-            dr.ellipse([x - 5, y - 5, x + 5, y + 5], outline=(200, 0, 0), width=2)
+        pts = [np.array([px(p) for p in x]) for x in cad]
+        A = np.vstack([q[:-1] for q in pts]) if pts else np.zeros((0, 2))
+        B = np.vstack([q[1:] for q in pts]) if pts else np.zeros((0, 2))
+        cotas = _cotas_do_corte(cad, meia, U, Vn)
+        ancoras = [px(p) for _, p in cotas]
+        rotulos, ligacoes, deslocs = [], [], []
+        for i, (rot, p) in enumerate(cotas):
             texto = f'{U}={_mm(p[0])}, {Vn}={_mm(p[1])} ({rot})'
-            tx, ty = x + 9, y + 6
-            for _ in range(12):
-                bb = dr.textbbox((tx, ty), texto, font=fp)
-                if bb[2] > W - 4:
-                    tx = x - 9 - (bb[2] - bb[0]); bb = dr.textbbox((tx, ty), texto, font=fp)
-                if not any(cruza(bb, o) for o in caixas) and bb[3] < H - M:
-                    break
-                ty += 18
-            dr.rectangle(bb, fill=(255, 255, 255, 210))
-            dr.text((tx, ty), texto, fill=(170, 0, 0), font=fp)
+            bb0 = dr.textbbox((0, 0), texto, font=fp)
+            outras = [a for j, a in enumerate(ancoras) if j != i]
+            bb, afastado, cruzava = posicionar_rotulo(ancoras[i], (bb0[2] - bb0[0], bb0[3] - bb0[1]), A, B, (outras, caixas),
+                                                      (M, 4, W - 4, H - M))
             caixas.append(bb)
+            deslocs.append((bb0[0], bb0[1]))
+            rotulos.append({'texto': texto, 'ancora': [round(ancoras[i][0], 1), round(ancoras[i][1], 1)],'caixa': [round(b, 1) for b in bb], 'afastado': afastado, 'cruzava_no_lugar_padrao': cruzava,
+                            'cruza_contorno': _cruza_contorno(bb, A, B, 0)})
+            ligacoes.append((ancoras[i], _ligacao(ancoras[i], bb), afastado))
             tabela.append(f"| {c['nome']} ({c['eixo']} = {_mm(c['valor'])}) | {rot} | {U} = {_mm(p[0])}, {Vn} = {_mm(p[1])} |")
+        for a, b, afastado in ligacoes:
+            if afastado:
+                dr.line([a, b], fill=(170, 0, 0, 200), width=1)
+        for a, bb, r, off in zip(ancoras, caixas[1:], rotulos, deslocs):
+            dr.ellipse([a[0] - 5, a[1] - 5, a[0] + 5, a[1] + 5], outline=(200, 0, 0), width=2)
+            dr.rectangle(bb, fill=(255, 255, 255, 210))
+            dr.text((bb[0] - off[0], bb[1] - off[1]), r['texto'], fill=(170, 0, 0), font=fp)
+        registro[c['nome']] = rotulos
         im.save(os.path.join(pasta, f"{c['nome']}.png"))
     open(os.path.join(pasta, 'cotas.md'), 'w').write('\n'.join(tabela) + '\n')
+    json.dump(registro, open(os.path.join(pasta, 'rotulos.json'), 'w'), indent=1)
     if not arq_quadro:
         json.dump(novo_quadro, open(os.path.join(pasta, 'quadro.json'), 'w'), indent=1)
 

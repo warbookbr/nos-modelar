@@ -195,6 +195,9 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
       expect(k, n).toBeGreaterThanOrEqual(4);
       expect(k, n).toBeLessThanOrEqual(6);
     }
+    // nenhuma caixa de rótulo de cota cobre o traço do contorno (a forma desenhada por código tem a prova própria em cotas-dos-cortes.test.mjs)
+    const rotulos = JSON.parse(readFileSync(p('pacote-sujo/cortes/rotulos.json'), 'utf8'));
+    for (const n of ['meio', 'lateral']) for (const r of rotulos[n]) expect(r.cruza_contorno, `${n}: ${r.texto}`).toBe(false);
     const quadro = JSON.parse(readFileSync(p('pacote-sujo/cortes/quadro.json'), 'utf8'));
     expect(JSON.stringify(quadro)).not.toContain('cadeias');
     const privado = JSON.parse(readFileSync(p('pacote-sujo-privado/cortes.json'), 'utf8'));

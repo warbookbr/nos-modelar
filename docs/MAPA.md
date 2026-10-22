@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1551 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1552 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1894,6 +1894,7 @@
 ## tools/blender/
 
 - `blender.test.mjs` — blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a régua dá zero na identidade, acusa a ver…
+- `cotas-dos-cortes.test.mjs` — cotas-dos-cortes.test.mjs — o rótulo de cada cota de um corte não pode cobrir o traço do contorno: o desenho afasta a caixa do ponto e liga os dois por uma l…
 - `oraculo-subdivisao.mjs` — oraculo-subdivisao.mjs — gera a fixture do oráculo da subdivisão, `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`, com o modificador Subdivision…
 
 ## tools/catalogo/
