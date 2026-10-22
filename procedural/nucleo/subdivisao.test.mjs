@@ -402,6 +402,81 @@ describe('subdivisão Catmull-Clark com vincos', () => {
     });
   });
 
+  /* A sombra: as faces saem lisas a 30 graus e as arestas do vinco vivo levam quebra de sombra; só a marca muda. */
+  describe('a sombra da superfície subdividida', () => {
+    const receita = (nome) => oraculo.receitas.find((x) => x.nome === nome);
+    const rodar = (r, extra = {}) => nucleo([['subdivisao', { origemId: 1, ...r.passo, niveis: 2, ...extra }]], r.pontos);
+    const geometria = (n) => { const c = neutroCanonico(n); return JSON.stringify([c.V, c.F.map((l) => [l[0], l[1], l[2], l[3], l[5]])]); };
+    const quebras = (n) => new Set([...n.F.values()].flatMap((f) => (f.quebras ?? []).map(([a, b]) => `${a},${b}`)));
+    const viva = receita('cubo-1m-arestas-viva'); const fracionaria = receita('chapa-vincos-025-05-075');
+
+    it('nenhuma opção muda os vértices nem as faces', () => {
+      for (const r of [viva, fracionaria, receita('chapa-vinco-vivo-borda-cantos')]) {
+        const base = geometria(rodar(r));
+        for (const extra of [{ liso: false }, { liso: 50 }, { quebraNosVincos: 'todos' }, { quebraNosVincos: 'nenhum' }]) {
+          expect(geometria(rodar(r, extra)), `${r.nome} ${JSON.stringify(extra)}`).toBe(base);
+        }
+        expect(geometria(rodar(r, { espessura: 0.002, liso: false }))).toBe(geometria(rodar(r, { espessura: 0.002 })));
+      }
+    });
+
+    it('por padrão toda face sai lisa a 30 graus e a quebra fica nos vincos vivos', () => {
+      const n = rodar(viva);
+      expect([...n.F.values()].every((f) => f.liso === 30)).toBe(true);
+      /* as 12 arestas vivas do cubo viram 48 em nível 2, cada uma declarada pelas duas faces que a dividem */
+      expect(quebras(n).size).toBe(48);
+      expect([...n.F.values()].reduce((s, f) => s + (f.quebras?.length ?? 0), 0)).toBe(96);
+      /* a quebra cai sobre a aresta do cubo: dois eixos no extremo de ±0,5 m */
+      for (const c of quebras(n)) for (const v of c.split(',').map(Number)) expect(n.V.get(v).filter((x) => Math.abs(Math.abs(x) - 0.5) < 1e-12).length).toBeGreaterThanOrEqual(2);
+      /* o vinco de nitidez fracionária se apaga no refino e a superfície fica lisa por cima dele: sem quebra */
+      expect(quebras(rodar(fracionaria)).size).toBe(0);
+    });
+
+    it("'todos' quebra também nos vincos fracionários, 'nenhum' em nenhum, e liso false devolve as faces chapadas", () => {
+      /* dobra, friso e nervura somam 8 arestas de gaiola, 32 em nível 2 */
+      expect(quebras(rodar(fracionaria, { quebraNosVincos: 'todos' })).size).toBe(32);
+      expect(quebras(rodar(viva, { quebraNosVincos: 'nenhum' })).size).toBe(0);
+      const chapada = rodar(viva, { liso: false });
+      expect([...chapada.F.values()].every((f) => f.liso === false && f.quebras === undefined)).toBe(true);
+      expect([...nucleo([['subdivisao', { origemId: 1, ...viva.passo, niveis: 1, liso: 'anguloDoLiso' }]], { ...viva.pontos, anguloDoLiso: 45 }).F.values()].every((f) => f.liso === 45)).toBe(true);
+    });
+
+    it('com espessura, a face interna repete as quebras e a parede sai lisa', () => {
+      const n = rodar(receita('chapa-vinco-vivo-borda-cantos'), { espessura: 0.002 });
+      const so = rodar(receita('chapa-vinco-vivo-borda-cantos'));
+      expect(quebras(n).size).toBe(2 * quebras(so).size);
+      expect(quebras(so).size).toBe(16);
+      expect([...n.F.values()].every((f) => f.liso === 30)).toBe(true);
+      expect(JSON.stringify(neutroCanonico(rodar(receita('chapa-vinco-vivo-borda-cantos'), { espessura: 0.002 })))).toBe(JSON.stringify(neutroCanonico(n)));
+    });
+
+    it('a quebra entra no canônico como cauda { quebras } só na face que a tem', () => {
+      const c = neutroCanonico(rodar(viva));
+      const comCauda = c.F.filter((l) => l.length > 6);
+      /* as faces que tocam uma aresta do cubo: o anel de 12 quads de cada face */
+      expect(comCauda.length).toBe(72);
+      for (const l of comCauda) expect(Object.keys(l[6])).toEqual(['quebras']);
+      expect(neutroCanonico(rodar(viva, { liso: false })).F.every((l) => l.length === 6)).toBe(true);
+    });
+
+    it('a função pura devolve as arestas descendentes dos vincos sem mudar a malha', () => {
+      const c = oraculo.casos[2];
+      const g = { vertices: c.vertices, faces: c.faces, vincos: c.vincos.map(([a, b, v]) => [a, b, nitidezDoVinco(v)]), niveis: 2 };
+      const sem = subdividirCatmullClark(g); const com = subdividirCatmullClark({ ...g, comVincos: true });
+      expect(JSON.stringify([com.vertices, com.faces])).toBe(JSON.stringify([sem.vertices, sem.faces]));
+      expect(com.vincos.length).toBe(4 * c.vincos.filter(([, , v]) => v > 0).length);
+      expect(com.vincos.every(([, , vivo]) => vivo === false || vivo === true)).toBe(true);
+    });
+
+    it('opção de sombra inválida grita', () => {
+      const motivo = (extra) => rodar(viva, extra).orfaos.map((o) => `${o.ref}: ${o.motivo}`).join(' | ');
+      expect(motivo({ liso: 0 })).toMatch(/^liso: .*entre 0 e 180/);
+      expect(motivo({ liso: 200 })).toMatch(/^liso:/);
+      expect(motivo({ quebraNosVincos: 'algum' })).toMatch(/^quebraNosVincos: .*'vivos'/);
+      expect(motivo({ liso: false, quebraNosVincos: 'todos' })).toMatch(/^quebraNosVincos: .*liso: false/);
+    });
+  });
+
   describe('vértice de gaiola sem face', () => {
     const quad = [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 0, 1]];
 

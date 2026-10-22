@@ -346,6 +346,26 @@ gaiola. A regra é a do OpenSubdiv no modo uniforme e confere,
 a 1e-6 m, com a saída congelada do modificador Subdivision Surface do Blender
 em `procedural/nucleo/fixtures/subdivisao-oraculo-blender.json`.
 
+A cota que tem erro, como a lida de imagem ou de foto, se declara com peso:
+`medidas: ['quinaDoTeto', { ponto: 'cotaLida', peso: 1 }]`. O nome sozinho
+continua a cota exata, e o peso (número maior que zero ou nome de `PARAMS`)
+faz a superfície se aproximar da cota por mínimos quadrados sem passar por
+ela, com cada ponto da gaiola em volta pagando o quanto anda: peso 1 pesa o
+desvio à cota igual ao deslocamento de um ponto da gaiola, e quanto maior o
+peso, mais perto da cota e mais a superfície copia o erro dela. Use o peso
+quando muitas cotas vizinhas vêm de uma leitura com erro da ordem de
+milímetros, porque com todas exatas a superfície passa por cada erro e ondula;
+use a cota exata para o que a peça precisa acertar, como a altura de um vão ou
+de um encaixe, e misture as duas no mesmo passo. Numa chapa de grade de
+100 mm com vinte cotas alinhadas e ruído de até ±2 mm, a exata dá desvio de
+normal p95 de 1,43 grau, e o peso 1 dá 0,65 grau, com desvio médio de 0,79 mm
+às cotas (ruído médio de 1,04 mm) e de 0,53 mm à forma sem ruído, contra
+1,04 mm da exata; peso 4 deixa 0,48 mm nas cotas e 0,85 grau, peso 16,
+0,22 mm e 1,06 grau. Na `gaiolaPorEstacoes`, `peso` entra no seletor da
+medida, como `{ estacao: 'meio', peso: 1 }`. A formulação, o sistema normal e
+o ganho, que grita como na exata, estão em `ajustarGaiolaAsMedidasComPeso`, em
+`procedural/nucleo/subdivisao.js`.
+
 O vinco é uma sequência nomeada de pontos da gaiola ao longo das arestas, como
 `vincos: [{ nome: 'dobraDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.75 }]`;
 para fechar um aro, repita o primeiro ponto no fim. A `nitidez` vai de 0 (liso)
@@ -367,6 +387,22 @@ Blender. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é espelhada
 antes de subdividir para a costura sair lisa, com os vincos e cantos
 espelhados. Um vértice declarado que nenhuma face usa grita com o nome do
 ponto, e a operação não gera malha.
+
+As faces geradas saem lisas com ângulo de 30 graus, o mesmo `liso` com
+`angulo` do passo `liso`, e as arestas que descendem de um vinco vivo levam
+quebra de sombra, de modo que a dobra continua aresta também nas pontas, onde o
+diedro cai abaixo do ângulo. Não marque a superfície com um passo `liso`
+depois: ele trocaria o ângulo e manteria as quebras. `liso: 45` (número ou nome
+de `PARAMS`) muda o ângulo, `liso: false` devolve as faces chapadas,
+`quebraNosVincos: 'todos'` quebra também nos vincos de nitidez fracionária
+(que na superfície limite são lisos, e por isso ficam fora por padrão) e
+`'nenhum'` deixa só o ângulo. Só a marca de sombra muda: as posições e as faces
+são as mesmas com qualquer valor. Na carenagem de prova, a sombra lisa tira as
+listras de triângulo que a luz chapada desenhava nas pontas da cintura e a
+quebra mantém a dobra até onde o vinco termina. A bancada respeita a quebra; as
+vistas da receita (`vistas-da-receita`) desenham toda face chapada. Um ombro
+de nitidez fracionária que em nível 2 tem arestas acima de 30 graus continua
+facetado; suba `niveis` ou adense as colunas antes de subir o ângulo.
 
 A gaiola de uma chapa longa se escreve por estações, com `gaiolaPorEstacoes`
 de `procedural/nucleo/gaiola-por-estacoes.js`, chamada em `gerarPassos` com os

@@ -1,6 +1,6 @@
 /* adaptador.js — projeção visual do neutro; não conhece receitas nem execução. */
 import { N_INFLU, norm3, normalDaFace, temNomeDeParte } from './nucleo.js';
-import { normalLisaDoCanto } from './liso-por-angulo.js';
+import { chaveDoCantoLiso, normalLisaDoCanto } from './liso-por-angulo.js';
 import { triangularFace } from './triangulacao-face.js';
 
 /* ----------------------------------------------------------------------------
@@ -61,16 +61,19 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
      lisas que o tocam. (Intocado do swatch — o 11a só troca a textura+UV.) */
   const nFace = new Map();
   for (const f of faces) nFace.set(f.id, normalDaFace(V, f.vs));
+  /* a soma é por canto: a chave é o vértice, ou o vértice e o setor quando uma face lisa declara `quebras` (o vinco
+     vivo da subdivisão), e a média não passa por cima da quebra; sem quebra, a chave é o vértice, como antes. */
+  const chave = chaveDoCantoLiso(faces);
   const acc = new Map();
-  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { const s = acc.get(v) || [0, 0, 0]; acc.set(v, [s[0] + n[0], s[1] + n[1], s[2] + n[2]]); } }
+  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { const c = chave(f, v); const s = acc.get(c) || [0, 0, 0]; acc.set(c, [s[0] + n[0], s[1] + n[1], s[2] + n[2]]); } }
   const nSuave = new Map();
   for (const [v, s] of acc) nSuave.set(v, norm3(s[0], s[1], s[2]));
   /* liso com ângulo: a média muda por face, e sai de `normalLisaDoCanto`. */
   const lisasPorVertice = new Map();
-  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { if (!lisasPorVertice.has(v)) lisasPorVertice.set(v, []); lisasPorVertice.get(v).push({ u: n, n }); } }
+  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { const c = chave(f, v); if (!lisasPorVertice.has(c)) lisasPorVertice.set(c, []); lisasPorVertice.get(c).push({ u: n, n }); } }
   const normalLisa = (f, v) => (typeof f.liso === 'number'
-    ? normalLisaDoCanto(nFace.get(f.id), f.liso, lisasPorVertice.get(v) ?? [])
-    : nSuave.get(v));
+    ? normalLisaDoCanto(nFace.get(f.id), f.liso, lisasPorVertice.get(chave(f, v)) ?? [])
+    : nSuave.get(chave(f, v)));
 
   /* GRADE de ilhas: uma por face (ordem por id), quadriculado ~quadrado. Cada
      ilha ocupa um bloco TILE×TILE; o UV endereça só o retângulo INTERNO (inset

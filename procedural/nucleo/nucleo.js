@@ -3489,6 +3489,10 @@ export function neutroCanonico(neutro) {
          ao de antes — a compat pra trás é inegociável. Forma fixa [a,b,cor,raio,dureza]
          por dab, na ordem de pintura, pra o JSON ir-e-voltar igual (determinismo). */
       if (f.tinta && f.tinta.length) row.push(f.tinta.map((t) => [t.a, t.b, t.cor ?? null, t.raio, t.dureza]));
+      /* quebras de sombra (o vinco vivo da subdivisão, em que a sombra lisa se divide): só entram quando a face as tem,
+         como objeto `{ quebras: [[a, b], ...] }`, tipo disjunto do tinta (array) e da parte (string); a face sem quebra
+         canoniza byte-idêntica à de antes. */
+      if (Array.isArray(f.quebras) && f.quebras.length) row.push({ quebras: f.quebras.map(([a, b]) => [a, b]) });
       /* parte (13a): mesmo padrão do tinta — só anexa quando a face TEM parte. Face
          SEM parte => linha byte-idêntica ao de antes (peças/testes de 1..12b não mudam
          de canon). Vem DEPOIS do tinta (o outro opcional-de-cauda): tinta é array, parte

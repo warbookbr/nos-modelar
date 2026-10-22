@@ -81,6 +81,9 @@ export function lerPecaResolvida(dado) {
     };
     const parte = parteDaFace(linha);
     if (parte) face.parte = parte;
+    /* as quebras de sombra vêm na cauda como objeto `{ quebras }`, o único opcional que não é array nem string */
+    const quebras = linha.slice(6).find((x) => x && typeof x === 'object' && !Array.isArray(x) && Array.isArray(x.quebras));
+    if (quebras) face.quebras = quebras.quebras.map(([a, b]) => [a, b]);
     F.set(face.id, face);
   }
 

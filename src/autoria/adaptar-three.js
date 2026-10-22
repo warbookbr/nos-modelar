@@ -1,6 +1,6 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
-import { normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
+import { chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
 import { triangularConvexa } from '../../procedural/nucleo/triangulacao-face.js';
 
 const COR_PADRAO = '#77817d';
@@ -199,10 +199,16 @@ function prepararFaces(neutro) {
  * A soma é do estado NEUTRO inteiro, antes do adaptador partir a peça em malhas
  * por parte e material: uma superfície lisa cortada por uma troca de material
  * continua lisa, sem costura na divisa.
+ *
+ * A soma é por CANTO: a chave é o vértice, ou o vértice e o setor dele quando
+ * uma face lisa declara `quebras` (o vinco vivo da subdivisão), e a média não
+ * passa por cima da quebra (`chaveDoCantoLiso`). Sem quebra a chave é o
+ * próprio vértice, e a soma é a de antes.
  */
 function normaisSuaves(neutro, preparo) {
   const soma = new Map();
   const porVertice = new Map();
+  const chave = chaveDoCantoLiso(neutro.F.values());
   for (const face of neutro.F.values()) {
     if (!face.liso) continue;
     const { pontos, tris, normal: uFace } = preparo.get(face.id);
@@ -210,7 +216,7 @@ function normaisSuaves(neutro, preparo) {
     for (const [ia, ib, ic] of tris) {
       const n = normalDoTriangulo(pontos[ia], pontos[ib], pontos[ic]);
       for (const k of [ia, ib, ic]) {
-        const id = face.vs[k];
+        const id = chave(face, face.vs[k]);
         const acc = soma.get(id);
         if (acc) { acc[0] += n[0]; acc[1] += n[1]; acc[2] += n[2]; } else soma.set(id, [n[0], n[1], n[2]]);
         const daFace = somaDaFace.get(id);
@@ -226,6 +232,7 @@ function normaisSuaves(neutro, preparo) {
   /* liso com ângulo: além da média global, guarda por vértice cada face lisa
      que o toca, para a média filtrada por ângulo em `triangularFace`. */
   suaves.porVertice = porVertice;
+  suaves.chave = chave;
   for (const [id, acc] of soma) {
     const n = normalizar(acc);
     /* soma degenerada (normais opostas se cancelando) não vira normal nula
@@ -260,8 +267,8 @@ function triangularFace(face, preparo, destino, destinoNormais, destinoOrigens, 
     for (const k of cantos) {
       const suave = !face.liso ? null
         : typeof face.liso === 'number'
-          ? normalLisaDoCanto(normal, face.liso, suaves.porVertice.get(face.vs[k]) ?? [])
-          : suaves.get(face.vs[k]);
+          ? normalLisaDoCanto(normal, face.liso, suaves.porVertice.get(suaves.chave(face, face.vs[k])) ?? [])
+          : suaves.get(suaves.chave(face, face.vs[k]));
       destinoNormais.push(...(suave ?? chapada));
     }
   }

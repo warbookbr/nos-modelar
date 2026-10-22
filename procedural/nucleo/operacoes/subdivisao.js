@@ -3,12 +3,20 @@
    nome de um ponto, a face lista nomes de ponto e o vinco é uma sequência nomeada de pontos; o passo traduz os nomes em
    índices só para chamar a função pura, e nenhum índice de aresta, vértice ou face sai da receita. Com `espessura`, a
    superfície vira a face externa de um sólido fechado por `procedural/nucleo/espessura.js`, e o grito da espessura que
-   passa do raio local cita os pontos nomeados da gaiola. */
-import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, nitidezDoVinco } from '../subdivisao.js';
+   passa do raio local cita os pontos nomeados da gaiola.
+
+   A SOMBRA. As faces geradas saem lisas com ângulo (`liso`, padrão LISO_PADRAO graus, o mecanismo do passo `liso`), e
+   as arestas que descendem de um vinco vivo levam quebra de sombra (`face.quebras`), de modo que a dobra continua aresta
+   mesmo onde o diedro cai abaixo do ângulo, nas pontas do vinco. `quebraNosVincos: 'todos'` quebra também nos vincos de
+   nitidez fracionária, e `'nenhum'` deixa só o ângulo; `liso: false` devolve as faces chapadas. Só a marca de sombra
+   muda: as posições e as faces são as mesmas com qualquer opção. */
+import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco } from '../subdivisao.js';
 import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
+import { valorDoLiso } from '../liso-por-angulo.js';
 
 const EXEMPLO_DE_VINCO = "{ nome: 'vincoDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.5 }";
 const EXEMPLO_DE_CANTO = "cantos: ['quinaDaTampa']";
+const EXEMPLO_DE_MEDIDA = "{ ponto: 'cotaDoTeto', peso: 4 }";
 
 /** enderecosPorIndice(argumentos) -> caminhos dos campos de um passo `subdivisao` que endereçam a gaiola por índice
  *  numérico (face, vinco, canto ou medida), para o teste que confere que a receita só usa nomes. Vazio quando a receita
@@ -26,11 +34,15 @@ export function enderecosPorIndice(a) {
     else olhar(v, `vincos[${k}]`);
   });
   olhar(a.cantos ?? [], 'cantos');
-  olhar(a.medidas ?? [], 'medidas');
+  (a.medidas ?? []).forEach((m, k) => {
+    if (m && typeof m === 'object' && !Array.isArray(m)) { if (typeof m.ponto !== 'string') achados.push(`medidas[${k}].ponto`); } else olhar(m, `medidas[${k}]`);
+  });
   return achados;
 }
 
 const chave = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
+export const LISO_PADRAO = 30;
+const QUEBRAS = ['vivos', 'todos', 'nenhum'];
 const citar = (nome) => `'${nome}'`;
 
 /* Traduz os vincos nomeados em [a, b, nitidez em níveis] sobre as arestas da gaiola. Devolve { vincos } ou { erro }. */
@@ -150,20 +162,44 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     /* Vértice sem face não pertence a nenhuma superfície: grita com o nome do ponto (ou a posição, se foi escrito como
        número), em vez de sair como vértice solto na malha. */
     if (soltos.length) return grita(st, i, 'subdivisao', 'vertices', `${soltos.length === 1 ? 'o vértice' : 'os vértices'} ${soltos.join(', ')} da gaiola ${soltos.length === 1 ? 'não pertence' : 'não pertencem'} a nenhuma face`);
-    /* medidas: nomes de ponto da gaiola que a superfície limite atravessa; os outros pontos ficam onde foram declarados.
-       Na simetria em x, a imagem espelhada de um ponto medido também é medida. */
+    /* medidas: nomes de ponto da gaiola que a superfície limite atravessa, ou { ponto, peso } para a cota que a superfície
+       só aproxima por mínimos quadrados; os outros pontos ficam onde foram declarados (com peso, perto de onde foram
+       declarados). Na simetria em x, a imagem espelhada de um ponto medido também é medida, com o mesmo peso. */
     if (a.medidas != null) {
-      if (!Array.isArray(a.medidas) || !a.medidas.length || a.medidas.some((m) => typeof m !== 'string')) return grita(st, i, 'subdivisao', 'medidas', 'medidas precisa ser lista não vazia de nomes de ponto da gaiola');
-      const indices = [];
-      for (const nome of a.medidas) {
+      if (!Array.isArray(a.medidas) || !a.medidas.length) return grita(st, i, 'subdivisao', 'medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
+      const lidas = [];
+      for (const m of a.medidas) {
+        let nome = m; let peso = Infinity;
+        if (m && typeof m === 'object' && !Array.isArray(m)) {
+          const extra = Object.keys(m).filter((k) => k !== 'ponto' && k !== 'peso');
+          if (extra.length) return grita(st, i, 'subdivisao', 'medidas', `a medida com peso tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são ponto e peso, como ${EXEMPLO_DE_MEDIDA}`);
+          if (typeof m.ponto !== 'string') return grita(st, i, 'subdivisao', 'medidas', `a medida com peso precisa do nome do ponto, como ${EXEMPLO_DE_MEDIDA}`);
+          nome = m.ponto;
+          if (m.peso == null) return grita(st, i, 'subdivisao', 'medidas', `a medida ${citar(nome)} precisa de peso maior que zero, como ${EXEMPLO_DE_MEDIDA}; para a cota exata, escreva só o nome`);
+          peso = st.num(m.peso);
+          if (!Number.isFinite(peso) || peso <= 0) return grita(st, i, 'subdivisao', 'medidas', `a medida ${citar(nome)} tem peso ${peso}; o peso é número finito maior que zero, e a cota exata se escreve só com o nome`);
+        } else if (typeof m !== 'string') return grita(st, i, 'subdivisao', 'medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
         if (!indiceDoNome.has(nome)) return grita(st, i, 'subdivisao', 'medidas', `a medida '${nome}' não é ponto declarado da gaiola`);
-        indices.push(indiceDoNome.get(nome));
+        lidas.push({ indice: indiceDoNome.get(nome), peso, nome });
       }
       const origem = gaiola.vertices.map((_, k) => k);
       if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
-      const marcados = gaiola.imagem ? [...indices, ...indices.map((k) => gaiola.imagem[k])] : indices;
+      const vistos = new Map();
+      for (const m of lidas) {
+        if (vistos.has(m.nome) && vistos.get(m.nome) !== m.peso) return grita(st, i, 'subdivisao', 'medidas', `o ponto ${citar(m.nome)} aparece em medidas com pesos diferentes`);
+        vistos.set(m.nome, m.peso);
+      }
       try {
-        gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidas({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
+        if (lidas.every((m) => m.peso === Infinity)) {
+          /* só medidas exatas: o caminho de sempre, que a saída das fixtures guarda bit a bit */
+          const indices = lidas.map((m) => m.indice);
+          const marcados = gaiola.imagem ? [...indices, ...indices.map((k) => gaiola.imagem[k])] : indices;
+          gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidas({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
+        } else {
+          const marcados = lidas.map(({ indice, peso }) => ({ indice, peso }));
+          if (gaiola.imagem) marcados.push(...lidas.map(({ indice, peso }) => ({ indice: gaiola.imagem[indice], peso })));
+          gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidasComPeso({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
+        }
       } catch (e) {
         if (!e.indices) return grita(st, i, 'subdivisao', 'medidas', String(e.message));
         const nomes = [...new Set(e.indices.map((k) => origem[k]))].map((k) => (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${gaiola.vertices[k].join(', ')}]`));
@@ -176,12 +212,23 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       if (!Number.isFinite(espessura) || espessura <= 0) return grita(st, i, 'subdivisao', 'espessura', `a espessura precisa ser maior que zero, e veio ${espessura}`);
       if (a.lado != null && a.lado !== 'contraNormal' && a.lado !== 'normal') return grita(st, i, 'subdivisao', 'lado', `lado precisa ser 'contraNormal' (o material contra a normal das faces, o padrão) ou 'normal', e veio ${JSON.stringify(a.lado)}`);
     } else if (a.lado != null) return grita(st, i, 'subdivisao', 'lado', 'lado só vale com espessura: declare a espessura da chapa');
+    let liso = false;
+    if (a.liso !== false) {
+      const angulo = a.liso == null ? LISO_PADRAO : st.num(a.liso);
+      try { liso = valorDoLiso(angulo); } catch { return grita(st, i, 'subdivisao', 'liso', `liso precisa ser ângulo em graus entre 0 e 180 (padrão ${LISO_PADRAO}), ou false para as faces chapadas, e veio ${JSON.stringify(a.liso)}`); }
+    }
+    const quebra = a.quebraNosVincos ?? 'vivos';
+    if (!QUEBRAS.includes(quebra)) return grita(st, i, 'subdivisao', 'quebraNosVincos', `quebraNosVincos precisa ser 'vivos' (o padrão: a sombra se divide nos vincos vivos), 'todos' (também nos de nitidez fracionária) ou 'nenhum', e veio ${JSON.stringify(quebra)}`);
+    if (liso === false && a.quebraNosVincos != null) return grita(st, i, 'subdivisao', 'quebraNosVincos', 'quebraNosVincos só vale com as faces lisas; com liso: false toda aresta já divide a sombra');
     let r;
     try {
       /* Com medidas, a malha entregue vai à superfície limite: sem isso o ponto medido ficaria a centímetros da malha de
          nível finito, e a cota não apareceria na peça. Sem medidas, a malha é a do nível pedido, como no oráculo. */
-      r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null });
+      r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null, comVincos: true });
     } catch (e) { return grita(st, i, 'subdivisao', 'gaiola', String(e.message)); }
+    /* as arestas da superfície em que a sombra se divide; com espessura, a face interna repete cada uma a nS vértices */
+    const nS = r.vertices.length;
+    const quebras = liso === false || quebra === 'nenhum' ? [] : r.vincos.filter(([, , viva]) => quebra === 'todos' || viva).map(([p, q]) => [p, q]);
     let partes = null;
     if (espessura !== null) {
       /* A superfície subdividida é a face externa, e nela ficam as medidas; a interna e a parede das bordas livres e dos
@@ -199,6 +246,20 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     if (r.vertices.length > limite || r.faces.length > limite) return grita(st, i, 'subdivisao', 'niveis', `a subdivisão gera ${r.vertices.length} vértices e ${r.faces.length} faces, acima do limite do passo (${limite})`);
     r.vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
     const facesSaida = r.faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); return id; });
+    if (liso !== false) {
+      const naQuebra = new Set(quebras.map(([p, q]) => chave(p, q)));
+      if (espessura !== null) for (const [p, q] of quebras) naQuebra.add(chave(p + nS, q + nS));
+      r.faces.forEach((f, k) => {
+        const face = st.F.get(facesSaida[k]); face.liso = liso;
+        if (!naQuebra.size) return;
+        const daFace = [];
+        for (let j = 0; j < f.length; j++) {
+          const p = f[j], q = f[(j + 1) % f.length];
+          if (naQuebra.has(chave(p, q))) { const ip = idDoPasso(i, p), iq = idDoPasso(i, q); daFace.push(ip < iq ? [ip, iq] : [iq, ip]); }
+        }
+        if (daFace.length) face.quebras = daFace;
+      });
+    }
     if (a.origemId != null) {
       const grupos = partes ? Object.fromEntries(Object.entries(partes).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])])) : {};
       registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida, espessura: partes !== null, ...grupos });
