@@ -80,6 +80,43 @@ describe('ondulação endereçada aos pontos da gaiola', () => {
     expect(ondulacaoDaSuperficie(sup).falhas.filter((f) => f.tipo === 'emenda')).toEqual([]);
   });
 
+  it('cada ponto nomeado traz o desvio com sinal do vértice dele: a ondulação tem os dois sinais e a lombada, o do sentido', () => {
+    const [onda] = ler({ vincos: true, plantar: PLANTADA }).falhas;
+    const porNome = Object.fromEntries(onda.pontos.map((p) => [p.nome, p.desvioMm]));
+    expect(porNome.p5_3).toBeGreaterThan(0.5);
+    expect(porNome.p6_3).toBeLessThan(-0.5);
+    expect(onda.extensaoEmEspacamentos).toBeLessThan(3);
+    const [fora] = ler({ vincos: true, plantar: { p5_3: 1, p6_3: 1 } }).falhas;
+    expect(fora.sentido).toBe('fora');
+    for (const p of fora.pontos.slice(0, 2)) expect(p.desvioMm).toBeGreaterThan(0.3);
+    const [dentro] = ler({ vincos: true, plantar: { p5_3: -1, p6_3: -1 } }).falhas;
+    expect(dentro.sentido).toBe('dentro');
+    for (const p of dentro.pontos.slice(0, 2)) expect(p.desvioMm).toBeLessThan(-0.3);
+  });
+
+  it('a ondulação de seis pontos passa de três espaçamentos: uma rodada tira pouco, e mexer os nomeados pelo desvio tira em poucas', () => {
+    /* lóbulos de dois pontos, de 2 mm para fora e para dentro, ao longo de x */
+    const plantar = Object.fromEntries([3, 4, 5, 6, 7, 8].map((i) => [`p${i}_3`, (Math.floor((i - 3) / 2) % 2 ? -1 : 1) * 2]));
+    const rodadas = [];
+    for (let r = 0; r <= 10; r++) {
+      const s = ler({ plantar });
+      rodadas.push(s.falhas);
+      if (!s.falhas.length) break;
+      /* o que a instrução manda: cada ponto nomeado anda contra o desvio dele, e o ganho 1,5 cobre o que a versão
+         suavizada acompanha */
+      for (const p of s.falhas[0].pontos) plantar[p.nome] = (plantar[p.nome] ?? 0) - 1.5 * p.desvioMm;
+    }
+    const [primeira] = rodadas[0];
+    expect(primeira.tipo).toBe('ondulacao');
+    expect(primeira.extensaoEmEspacamentos).toBeGreaterThan(3);
+    expect(primeira.amplitudeMm).toBeGreaterThan(1.2);
+    /* uma rodada tira menos de um terço, porque o ponto que anda leva consigo a versão suavizada */
+    expect(rodadas[1][0].amplitudeMm).toBeGreaterThan(0.6 * primeira.amplitudeMm);
+    /* e as rodadas seguintes a tiram, com o plantado de volta quase a zero */
+    expect(rodadas.length).toBeLessThanOrEqual(8);
+    expect(rodadas.at(-1)).toEqual([]);
+  });
+
   it('a mesma receita dá a mesma saída, e a linha de comando a imprime em JSON', () => {
     const a = JSON.stringify(ler({ vincos: true, plantar: PLANTADA }));
     expect(JSON.stringify(ler({ vincos: true, plantar: PLANTADA }))).toBe(a);
