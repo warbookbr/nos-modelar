@@ -58,6 +58,8 @@ const ANGULO_DO_CANTO = 10;
 const JANELA_DO_CANTO_MM = 40;
 const JANELA_DA_TANGENTE = 3;
 const MM = 1000;
+const TEXTO_DA_BORDA = 'borda livre da gaiola: a chapa termina ali, na borda da peça ou na de um vão, e não dobra; a ferramenta não sugere vinco';
+const TEXTO_DA_BORDA_PARCIAL = 'parte do trecho segue a borda livre da gaiola, onde a chapa termina e não dobra; o vinco sugerido cobre só o resto';
 
 const arred = (x, casas = 2) => { const f = 10 ** casas; const r = Math.round(x * f) / f; return Object.is(r, -0) ? 0 : r; };
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -228,8 +230,46 @@ function lacosDeArestas(faces, n0, nV) {
   return saida;
 }
 
+/** classificarEstacoes(estacoes, vertices) -> { chaves, geradas }: das estações da gaiola, na ordem do eixo ({ nome, pontos }),
+ *  quais a receita declara (as chaves) e quais a interpolação gerou. A estação gerada se chama `${dono}_${k}`, com o dono a
+ *  última estação declarada antes dela e k a ordem a partir dali (`gaiola-interpolada.js`), e só existe entre duas
+ *  declaradas, de modo que a que vem depois da última chave é uma declarada de nome parecido. Cada gerada traz a chave de
+ *  antes, a de depois e a fração entre elas: a posição da estação no eixo, que é a coordenada em que todos os pontos dela
+ *  concordam (a de maior variação entre as estações sobre a de dentro de cada uma) ou, sem eixo reto, a projeção do centro
+ *  dela na reta dos centros das duas chaves. */
+export function classificarEstacoes(estacoes, vertices) {
+  const marcada = estacoes.map(() => false);
+  let dono = null, k = 0;
+  estacoes.forEach((e, i) => {
+    if (dono !== null && e.nome === `${dono}_${k + 1}`) { k += 1; marcada[i] = true; } else { dono = e.nome; k = 0; }
+  });
+  for (let i = estacoes.length - 1; i >= 0 && marcada[i]; i--) marcada[i] = false;
+  const media = estacoes.map((e) => [0, 1, 2].map((a) => e.pontos.reduce((s, p) => s + vertices[p][a], 0) / e.pontos.length));
+  const global = [0, 1, 2].map((a) => media.reduce((s, m) => s + m[a], 0) / Math.max(1, media.length));
+  const razao = [0, 1, 2].map((a) => {
+    const entre = media.reduce((s, m) => s + (m[a] - global[a]) ** 2, 0) / Math.max(1, media.length);
+    const dentro = estacoes.reduce((s, e, i) => s + e.pontos.reduce((t, p) => t + (vertices[p][a] - media[i][a]) ** 2, 0) / e.pontos.length, 0) / Math.max(1, estacoes.length);
+    return entre / (dentro + 1e-18);
+  });
+  const eixo = razao.indexOf(Math.max(...razao));
+  const eixoReto = razao[eixo] >= 4;
+  const corda = media.length ? sub(media[media.length - 1], media[0]) : [0, 0, 0];
+  const em = media.map((m) => (eixoReto ? m[eixo] : dot(sub(m, media[0]), corda) / Math.max(dot(corda, corda), 1e-18)));
+  const chaves = estacoes.filter((_, i) => !marcada[i]).map((e) => e.nome);
+  const geradas = new Map();
+  estacoes.forEach((e, i) => {
+    if (!marcada[i]) return;
+    let a = i, b = i;
+    while (marcada[a]) a--;
+    while (marcada[b]) b++;
+    geradas.set(e.nome, { antes: estacoes[a].nome, depois: estacoes[b].nome, fracao: (em[i] - em[a]) / (em[b] - em[a]) });
+  });
+  return { chaves, geradas };
+}
+
 /** cadeiasDaGaiola(declarados, faces, nV) -> as colunas e as estações nomeadas da metade declarada da gaiola, ou os laços
- *  de arestas quando os nomes não seguem `estacao_coluna`. */
+ *  de arestas quando os nomes não seguem `estacao_coluna`; `estacoes` traz as estações na ordem dos pontos, cada uma com os
+ *  pontos dela. */
 export function cadeiasDaGaiola(declarados, faces, nV) {
   const n0 = declarados.length;
   const nomeDe = (p) => (typeof declarados[p] === 'string' ? declarados[p] : `#${p}`);
@@ -251,7 +291,12 @@ export function cadeiasDaGaiola(declarados, faces, nV) {
   } else {
     for (const c of lacosDeArestas(faces, n0, nV)) cadeias.push({ tipo: 'aresta', nome: `${nomeDe(c.pontos[0])}…${nomeDe(c.pontos[c.pontos.length - 1])}`, ...c, rotulos: c.pontos.map(nomeDe) });
   }
-  return { porNome: Boolean(partes), cadeias: cadeias.map((c, indice) => ({ indice, ...c, nomes: c.pontos.map(nomeDe) })) };
+  const estacoes = [];
+  if (partes) {
+    const porNome = new Map();
+    partes.forEach((pt, p) => { if (!porNome.has(pt.estacao)) { const e = { nome: pt.estacao, pontos: [] }; porNome.set(pt.estacao, e); estacoes.push(e); } porNome.get(pt.estacao).pontos.push(p); });
+  }
+  return { porNome: Boolean(partes), estacoes, cadeias: cadeias.map((c, indice) => ({ indice, ...c, nomes: c.pontos.map(nomeDe) })) };
 }
 
 /* As cadeias seguidas pelos níveis de Catmull-Clark, todas de uma vez, com a numeração de `subdividirCatmullClark` (pontos
@@ -313,7 +358,10 @@ function prepararPasso(entrada, i, args) {
   const resolver = (troca) => gaiolaDoPasso(troca ? { ...args, ...troca } : args, { vec, num });
   const r = resolver(null);
   if (r.erro) throw new Error(`vincos-das-linhas: o passo ${i} (subdivisao) não resolve a gaiola: ${r.erro[1]}`);
-  return { resolver, gaiola: r.gaiola, declarados: r.declarados, niveis: Math.trunc(num(args.niveis ?? 2)), borda: args.borda ?? 'suave', aoLimite: args.medidas != null };
+  /* as posições declaradas dos pontos, antes de a medida as ajustar: o que a receita escreveu, sem o deslocamento da superfície
+     limite, que desloca os pontos de uma estação por igual e mexe a posição dela no eixo */
+  const declaradas = r.declarados.map((n) => (typeof n === 'string' && Array.isArray(dict[n]) ? dict[n].map(num) : null));
+  return { resolver, gaiola: r.gaiola, declarados: r.declarados, declaradas: declaradas.every(Boolean) ? declaradas : null, niveis: Math.trunc(num(args.niveis ?? 2)), borda: args.borda ?? 'suave', aoLimite: args.medidas != null };
 }
 
 /* O diedro em graus de cada aresta descendente de vinco da malha que o passo entrega, com a reta da aresta. */
@@ -374,15 +422,32 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
   const R = 2 ** NIVEL_DA_AMOSTRA;
 
   /* as cadeias e a curva limite de cada uma */
-  const { porNome, cadeias } = cadeiasDaGaiola(declarados, gaiola.faces, gaiola.vertices.length);
+  const { porNome, cadeias, estacoes } = cadeiasDaGaiola(declarados, gaiola.faces, gaiola.vertices.length);
   const facesDaAresta = new Map();
   for (const f of gaiola.faces) for (let k = 0; k < f.length; k++) { const c = chave(f[k], f[(k + 1) % f.length]); facesDaAresta.set(c, (facesDaAresta.get(c) ?? 0) + 1); }
   const refinadas = refinarCadeias(gaiola.faces, gaiola.vertices.length, NIVEL_DA_AMOSTRA, cadeias.map((c) => c.pontos));
   const curvas = curvasNoLimite(gaiola, sup.borda, refinadas);
+  /* a aresta da cadeia com uma face só é borda: a chapa termina ali, na borda da gaiola ou na de um vão, e não dobra */
+  const ehBorda = (c, k) => facesDaAresta.get(chave(c.pontos[k], c.pontos[k + 1])) === 1;
   cadeias.forEach((c, k) => {
     c.curva = curvas[k];
     c.borda = c.pontos.slice(1).every((p, j) => facesDaAresta.get(chave(c.pontos[j], p)) === 1);
   });
+  /* as estações que a interpolação gerou não se citam na receita: o nome muda com o passo. A cadeia de uma estação gerada
+     não acompanha linha nenhuma (a linha ao longo dela é estação nova entre as duas chaves), e onde a linha acaba ou
+     dobra numa estação gerada a saída diz entre que chaves e a que fração. */
+  const est = classificarEstacoes(estacoes, sup.declaradas ?? gaiola.vertices);
+  const ehGerada = (nome) => est.geradas.has(nome);
+  const emChaves = (nome) => { const g = est.geradas.get(nome); return { chaves: [g.antes, g.depois], fracao: arred(g.fracao, 3) }; };
+  /* o índice da chave mais perto de k ao longo da coluna, para trás (sentido -1) ou para a frente (+1); sem chave nesse
+     sentido, no outro */
+  const kChave = (c, k, sentido) => {
+    if (c.tipo !== 'coluna' || !ehGerada(c.rotulos[k])) return k;
+    for (const s of [sentido, -sentido]) { let j = k; while (j >= 0 && j < c.pontos.length && ehGerada(c.rotulos[j])) j += s; if (j >= 0 && j < c.pontos.length) return j; }
+    return k;
+  };
+  const ativas = cadeias.filter((c) => !(c.tipo === 'estacao' && ehGerada(c.nome)));
+  const temGerada = (c, k0, k1) => c.tipo === 'coluna' && c.rotulos.slice(k0, k1 + 1).some(ehGerada);
   /* os vincos já declarados no passo, por aresta da gaiola, com o nome */
   const indiceDoNome = new Map(declarados.map((d, k) => [d, k]));
   const declaradoEm = new Map();
@@ -391,8 +456,18 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     for (let k = 0; k + 1 < idx.length; k++) if (idx[k] !== undefined && idx[k + 1] !== undefined) declaradoEm.set(chave(idx[k], idx[k + 1]), v.nome);
   }
 
-  const descrever = (c, k0, k1) => (c.tipo === 'coluna' ? { coluna: c.nome, de: c.rotulos[k0], ate: c.rotulos[k1] }
-    : c.tipo === 'estacao' ? { estacao: c.nome, de: c.rotulos[k0], ate: c.rotulos[k1] } : { pontos: [c.nomes[k0], c.nomes[k1]] });
+  /* o trecho da cadeia em nomes da receita: da estação-chave de antes do começo à de depois do fim, e, onde o começo ou o
+     fim cai numa estação gerada, a fração entre as duas chaves em que ele cai */
+  const descrever = (c, k0, k1) => {
+    if (c.tipo === 'coluna') {
+      return {
+        coluna: c.nome, de: c.rotulos[kChave(c, k0, -1)], ate: c.rotulos[kChave(c, k1, 1)],
+        ...(ehGerada(c.rotulos[k0]) ? { deEntreChaves: emChaves(c.rotulos[k0]) } : {}),
+        ...(ehGerada(c.rotulos[k1]) ? { ateEntreChaves: emChaves(c.rotulos[k1]) } : {}),
+      };
+    }
+    return c.tipo === 'estacao' ? { estacao: c.nome, de: c.rotulos[k0], ate: c.rotulos[k1] } : { pontos: [c.nomes[k0], c.nomes[k1]] };
+  };
 
   /* as peças das linhas, com o espelho na simetria */
   const pecas = [];
@@ -419,7 +494,7 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     if (p.espelhoDe) continue;
     const rotulos = p.amostras.map((q, s) => {
       let melhor = -1, dm = Infinity;
-      for (const c of cadeias) { const m = maisPerto(q, c.curva, limiar); if (m && m.d <= limiar && m.d < dm && alinhada(p.tangentes[s], m)) { dm = m.d; melhor = c.indice; } }
+      for (const c of ativas) { const m = maisPerto(q, c.curva, limiar); if (m && m.d <= limiar && m.d < dm && alinhada(p.tangentes[s], m)) { dm = m.d; melhor = c.indice; } }
       return melhor;
     });
     p.trechos = rodadas(rotulos, minimo).map(({ c, i: s0, n }) => ({ cadeia: c, s0, s1: s0 + n - 1 }));
@@ -442,16 +517,18 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
         distancia: { media: ds.reduce((s, x) => s + x, 0) / ds.length, maxima: Math.max(...ds) },
         sobra: { antes: arco(c.curva, tmin) - arco(c.curva, k0 * R), depois: arco(c.curva, k1 * R) - arco(c.curva, tmax) },
       });
-      if (c.borda) continue;
       if (!intervalos.has(c.indice)) intervalos.set(c.indice, []);
-      intervalos.get(c.indice).push({ k0, k1, angulo: p.angulo });
+      /* o vinco de coluna vai de estação-chave a estação-chave: o intervalo sobe à chave de antes e à de depois */
+      intervalos.get(c.indice).push({ k0: kChave(c, k0, -1), k1: kChave(c, k1, 1), angulo: p.angulo });
     }
   }
 
-  /* os vincos sugeridos: os intervalos de cada cadeia juntos quando se tocam, sem as arestas já declaradas */
+  /* os vincos sugeridos: os intervalos de cada cadeia juntos quando se tocam, sem as arestas já declaradas e sem as de
+     borda, onde a chapa termina (a borda da gaiola e a de um vão) e não dobra */
   const nomesUsados = new Set((args.vincos ?? []).map((v) => v.nome));
   const vincos = [];
-  for (const c of cadeias) {
+  const semVinco = (c, k) => declaradoEm.has(chave(c.pontos[k], c.pontos[k + 1])) || ehBorda(c, k);
+  for (const c of ativas) {
     const lista = (intervalos.get(c.indice) ?? []).sort((a, b) => a.k0 - b.k0 || a.k1 - b.k1);
     const juntos = [];
     for (const x of lista) { const u = juntos[juntos.length - 1]; if (u && x.k0 <= u.k1) { u.k1 = Math.max(u.k1, x.k1); if (x.angulo !== null) u.angulo = Math.max(u.angulo ?? 0, x.angulo); } else juntos.push({ ...x }); }
@@ -459,8 +536,8 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     for (const x of juntos) {
       let k = x.k0;
       while (k < x.k1) {
-        while (k < x.k1 && declaradoEm.has(chave(c.pontos[k], c.pontos[k + 1]))) k++;
-        let j = k; while (j < x.k1 && !declaradoEm.has(chave(c.pontos[j], c.pontos[j + 1]))) j++;
+        while (k < x.k1 && semVinco(c, k)) k++;
+        let j = k; while (j < x.k1 && !semVinco(c, j)) j++;
         if (j > k) partes.push({ k0: k, k1: j, angulo: x.angulo });
         k = j;
       }
@@ -473,6 +550,13 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     }
   }
   const declaracao = (v, nitidez = v.nitidez) => ({ nome: v.nome, pontos: cadeias[v.cadeia].nomes.slice(v.k0, v.k1 + 1), nitidez });
+  /* a declaração do vinco em pontos, para o passo, só se cita quando todos os pontos são da receita: a coluna que passa por
+     estação gerada tem pontos que a receita não nomeia, e ali vale a declaração por coluna e estação-chave */
+  const declaracaoPublica = (v) => {
+    const c = cadeias[v.cadeia];
+    if (!temGerada(c, v.k0, v.k1)) return declaracao(v);
+    return { nome: v.nome, nitidez: v.nitidez, semPontosNoPasso: 'a coluna passa por estações que a interpolação gerou, e os pontos delas não são da receita; declare o vinco por coluna e estação-chave (vincosNaGaiola)' };
+  };
   const pontosDoVinco = (v) => cadeias[v.cadeia].pontos.slice(v.k0, v.k1 + 1);
   const trechosDoVinco = (v) => pecas.flatMap((p) => (p.espelhoDe ? [] : p.trechos.filter((tr) => tr.cadeia === v.cadeia && tr.k1 > v.k0 && tr.k0 < v.k1).map((tr) => ({ p, s0: tr.s0, s1: tr.s1 }))));
   const amostrasDoVinco = (v) => trechosDoVinco(v).flatMap(({ p, s0, s1 }) => p.amostras.slice(s0, s1 + 1));
@@ -502,7 +586,7 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
   const sugerir = (p, tr) => {
     const amostras = p.amostras.slice(tr.s0, tr.s1 + 1); const tangs = p.tangentes.slice(tr.s0, tr.s1 + 1);
     const lados = amostras.map((q, s) => {
-      const alinhadas = cadeias.map((c) => ({ c, m: maisPerto(q, c.curva) })).filter(({ m }) => m && alinhada(tangs[s], m));
+      const alinhadas = ativas.map((c) => ({ c, m: maisPerto(q, c.curva) })).filter(({ m }) => m && alinhada(tangs[s], m));
       if (!alinhadas.length) return null;
       const A = alinhadas.reduce((x, y) => (y.m.d < x.m.d ? y : x));
       const perp = (m) => { const v = sub(m.ponto, q); return sub(v, tangs[s].map((x) => x * dot(v, tangs[s]))); };
@@ -534,7 +618,7 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     });
     /* o vão ao longo da cadeia de referência: de que ponto a que ponto da cadeia a linha corre */
     const ts = amostras.map((q) => maisPerto(q, C1.curva).t); const m = C1.pontos.length - 1;
-    const ka = Math.max(0, Math.floor(Math.min(...ts) / R)), kb = Math.min(m, Math.ceil(Math.max(...ts) / R));
+    const ka = kChave(C1, Math.max(0, Math.floor(Math.min(...ts) / R)), -1), kb = kChave(C1, Math.min(m, Math.ceil(Math.max(...ts) / R)), 1);
     const rotuloDoOutro = tipo === 'coluna' ? 'estacoes' : tipo === 'estacao' ? 'colunas' : 'pontos';
     if (!C2) {
       return { ...base, sugestao: { tipo, alem: C1.nome, [rotuloDoOutro]: [C1.rotulos[ka], C1.rotulos[kb]] }, texto: `a linha passa além de ${citar(C1.nome)}, onde a gaiola acaba, a ${base.distanciaMm.media} mm dela em média: estenda a gaiola até a linha` };
@@ -545,9 +629,10 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     const porPonto = [];
     for (let k = ka; k <= kb; k++) {
       const r = C1.rotulos[k]; if (tipo === 'aresta') break;
+      if (tipo === 'coluna' && ehGerada(r)) continue; // a estação gerada não se cita: a coluna nova só se mede nas chaves
       const j = C2.rotulos.indexOf(r); if (j < 0) continue;
       const a = C1.curva.P[k * R], b = C2.curva.P[j * R]; const ab = sub(b, a); const l2 = dot(ab, ab);
-      const S = cadeias.find((x) => x.tipo !== tipo && x.nome === r && x.pontos.includes(C1.pontos[k]) && x.pontos.includes(C2.pontos[j]));
+      const S = ativas.find((x) => x.tipo !== tipo && x.nome === r && x.pontos.includes(C1.pontos[k]) && x.pontos.includes(C2.pontos[j]));
       if (!S) continue;
       const ia = S.pontos.indexOf(C1.pontos[k]), ib = S.pontos.indexOf(C2.pontos[j]);
       const meio = S.curva.P[Math.round(((ia + ib) / 2) * R)];
@@ -581,14 +666,25 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     };
   };
 
+  /* os trechos de aresta de borda dentro de [k0, k1] da cadeia, como pares de índices */
+  const corridasDeBorda = (c, k0, k1) => {
+    const r = []; let k = k0;
+    while (k < k1) {
+      while (k < k1 && !ehBorda(c, k)) k++;
+      let j = k; while (j < k1 && ehBorda(c, j)) j++;
+      if (j > k) r.push([k, j]);
+      k = j;
+    }
+    return r;
+  };
+
   /* a receita com todos os vincos sugeridos (e os cantos, na segunda volta) */
   const jaVincados = [];
   for (const c of cadeias) {
-    if (c.borda) { jaVincados.push(c.pontos); continue; }
     let k = 0;
     while (k < c.pontos.length - 1) {
-      while (k < c.pontos.length - 1 && !declaradoEm.has(chave(c.pontos[k], c.pontos[k + 1]))) k++;
-      let j = k; while (j < c.pontos.length - 1 && declaradoEm.has(chave(c.pontos[j], c.pontos[j + 1]))) j++;
+      while (k < c.pontos.length - 1 && !semVinco(c, k)) k++;
+      let j = k; while (j < c.pontos.length - 1 && semVinco(c, j)) j++;
       if (j > k) jaVincados.push(c.pontos.slice(k, j + 1));
       k = j;
     }
@@ -637,7 +733,7 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
       if (sj - janela < 0 || sj + janela >= A.length) continue;
       const a = unit(sub(A[sj], A[sj - janela])), b = unit(sub(A[sj + janela], A[sj]));
       const graus = (Math.acos(Math.max(-1, Math.min(1, dot(a, b)))) * 180) / Math.PI;
-      if (graus >= ANGULO_DO_CANTO) saida.push({ ponto: c.nomes[j], k: j, anguloGraus: arred(graus, 1), distanciaMm: arred(d * MM) });
+      if (graus >= ANGULO_DO_CANTO) saida.push({ ponto: c.nomes[j], k: j, anguloGraus: arred(graus, 1), distanciaMm: arred(d * MM), gerada: c.tipo === 'coluna' && ehGerada(c.rotulos[j]) });
     }
     return saida;
   };
@@ -645,7 +741,12 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
   let aval = avaliar([]);
   if (aval.erro) comVincos = { aceitos: false, erro: aval.erro };
   else {
-    vincos.forEach((v, k) => { v.cantos = cantosDe(v, aval.porVinco[k]); });
+    /* o canto numa estação gerada não se declara: a saída diz entre que chaves e a que fração, para pôr ali uma estação-chave */
+    vincos.forEach((v, k) => {
+      const todos = cantosDe(v, aval.porVinco[k]);
+      v.cantos = todos.filter((x) => !x.gerada).map(({ gerada, ...x }) => x);
+      v.cantosSemChave = todos.filter((x) => x.gerada).map((x) => ({ coluna: cadeias[v.cadeia].nome, ...emChaves(cadeias[v.cadeia].rotulos[x.k]), anguloGraus: x.anguloGraus, distanciaMm: x.distanciaMm }));
+    });
     const cantosNovos = [...new Set(vincos.flatMap((v) => v.cantos.map((x) => x.ponto)))];
     if (cantosNovos.length) {
       const semCantos = aval;
@@ -674,16 +775,19 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
           const comp = { comprimentoMm: arred(comprimento(p.amostras.slice(tr.s0, tr.s1 + 1)) * MM, 1), deMm: emMm(p.amostras[tr.s0]), ateMm: emMm(p.amostras[tr.s1]) };
           if (tr.cadeia < 0) return { faltante: true, ...comp, ...sugerir(p, tr) };
           const c = cadeias[tr.cadeia];
+          const corridas = corridasDeBorda(c, tr.k0, tr.k1);
+          const toda = corridas.length === 1 && corridas[0][0] === tr.k0 && corridas[0][1] === tr.k1;
           const out = {
-            ...comp, tipo: c.borda ? 'borda' : c.tipo, acompanha: descrever(c, tr.k0, tr.k1),
+            ...comp, tipo: toda ? 'borda' : c.tipo, acompanha: descrever(c, tr.k0, tr.k1),
             distanciaMm: { media: arred(tr.distancia.media * MM), maxima: arred(tr.distancia.maxima * MM) },
             sobraMm: { antes: arred(tr.sobra.antes * MM, 1), depois: arred(tr.sobra.depois * MM, 1) },
           };
-          if (c.borda) return out;
+          if (toda) return { ...out, texto: TEXTO_DA_BORDA };
+          if (corridas.length) out.emBorda = corridas.map(([a, b]) => descrever(c, a, b));
           const ja = [...new Set(c.pontos.slice(tr.k0 + 1, tr.k1 + 1).map((q, j) => declaradoEm.get(chave(c.pontos[tr.k0 + j], q))).filter(Boolean))];
           const meus = vincos.filter((v) => v.cadeia === c.indice && v.k1 > tr.k0 && v.k0 < tr.k1).map((v) => nomeDoVinco.get(v.nome));
           if (ja.length) out.jaDeclarado = ja;
-          if (meus.length) out.vincos = meus.map((v) => declaracao(v));
+          if (meus.length) out.vincos = meus.map((v) => declaracaoPublica(v));
           return out;
         }),
       };
@@ -696,14 +800,23 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
     if (c.tipo === 'estacao') return { nome: v.nome, estacao: c.nome, de: c.rotulos[v.k0], ate: c.rotulos[v.k1], nitidez: v.nitidez };
     return null;
   };
+  const bordas = saidaDasLinhas.flatMap((L) => L.pecas.flatMap((p) => (p.trechos ?? []).filter((t) => t.tipo === 'borda' || t.emBorda).map((t) => ({
+    linha: L.linha, peca: p.peca, comprimentoMm: t.comprimentoMm, acompanha: t.acompanha,
+    ...(t.tipo === 'borda' ? {} : { parcial: true, emBorda: t.emBorda }), texto: t.tipo === 'borda' ? TEXTO_DA_BORDA : TEXTO_DA_BORDA_PARCIAL,
+  }))));
+  const cantosSemChave = vincos.flatMap((v) => v.cantosSemChave ?? []).filter((x, k, todos) => todos.findIndex((y) => y.coluna === x.coluna && y.chaves.join() === x.chaves.join() && y.fracao === x.fracao) === k);
   const faltantes = saidaDasLinhas.flatMap((L) => L.pecas.flatMap((p) => (p.trechos ?? []).filter((t) => t.faltante).map((t) => ({ linha: L.linha, peca: p.peca, comprimentoMm: t.comprimentoMm, texto: t.texto, sugestao: t.sugestao }))));
   return {
     passo: i, origemId: args.origemId ?? null, simetria: simetria ? 'x' : null,
-    cadeias: { porNome, colunas: cadeias.filter((c) => c.tipo === 'coluna').length, estacoes: cadeias.filter((c) => c.tipo === 'estacao').length, arestas: cadeias.filter((c) => c.tipo === 'aresta').length },
+    cadeias: {
+      porNome, colunas: cadeias.filter((c) => c.tipo === 'coluna').length, estacoes: ativas.filter((c) => c.tipo === 'estacao').length, arestas: cadeias.filter((c) => c.tipo === 'aresta').length,
+      ...(est.geradas.size ? { estacoesGeradas: est.geradas.size } : {}),
+    },
     linhas: saidaDasLinhas,
     vincos: vincos.map((v) => ({
-      ...declaracao(v), acompanha: descrever(cadeias[v.cadeia], v.k0, v.k1), nitidezPorque: v.nitidezPorque,
-      ...(v.escada ? { escada: v.escada } : {}), ...(v.cantos?.length ? { cantos: v.cantos.map(({ k, ...x }) => x) } : {}), ...(v.comVinco ? { comVinco: v.comVinco } : {}),
+      ...declaracaoPublica(v), acompanha: descrever(cadeias[v.cadeia], v.k0, v.k1), nitidezPorque: v.nitidezPorque,
+      ...(v.escada ? { escada: v.escada } : {}), ...(v.cantos?.length ? { cantos: v.cantos.map(({ k, ...x }) => x) } : {}),
+      ...(v.cantosSemChave?.length ? { cantosSemChave: v.cantosSemChave } : {}), ...(v.comVinco ? { comVinco: v.comVinco } : {}),
     })),
     vincosNaGaiola: porNome ? vincos.map(naGaiola) : null,
     cantos: [...new Set(vincos.flatMap((v) => (v.cantos ?? []).map((x) => x.ponto)))],
@@ -711,6 +824,8 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}) {
       const c = cadeias[v.cadeia];
       return c.tipo === 'coluna' ? { estacao: c.rotulos[x.k], coluna: c.nome } : { estacao: c.nome, coluna: c.rotulos[x.k] };
     })).filter((x, k, todos) => todos.findIndex((y) => y.estacao === x.estacao && y.coluna === x.coluna) === k) : null,
+    ...(cantosSemChave.length ? { cantosSemChave } : {}),
+    bordas,
     faltantes,
     comVincos,
   };

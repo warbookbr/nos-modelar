@@ -647,7 +647,11 @@ def ler_corte(imagem, q, nome, falha_max=10.0, minimo_px=None):
         return np.stack([(q['u0'] + (P[:, 0] - M) / esc) * 1000, (q['v0'] + (H - M - P[:, 1]) / esc) * 1000], 1)
     px_mm = esc / 1000
     e = erro_px(resumo)
+    # a moldura do desenho, fora das faixas dos rótulos: o que o corte mostra, em mm no plano dele
+    moldura = [[round(q['u0'] * 1000, 2), round(q['v0'] * 1000, 2)],
+               [round((q['u0'] + (q['W'] - M) / esc) * 1000, 2), round((q['v0'] + (H - M) / esc) * 1000, 2)]]
     return {'corte': nome, 'eixo': q.get('eixo'), 'valor_mm': round(1000 * float(q.get('valor', 0.0)), 3), 'eixos_uv': q['eixos_uv'],
+            'moldura_mm': moldura,
             'escala_px_por_mm': round(px_mm, 5), 'espessura_traco_px': resumo['espessura_px'],
             'espessura_traco_mm': round(resumo['espessura_px'] / px_mm, 3) if resumo['espessura_px'] else None,
             'erro_px': round(e, 3), 'erro_mm': round(e / px_mm, 3), 'leitura': resumo,
@@ -949,7 +953,143 @@ def _funcao(Q, k):
     return Q[o, k], Q[o, 1 - k]
 
 
-def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, classe='feicao', folga_iou=0.15):
+def preparar_cortes(cortes):
+    """Os cortes lidos (ler_corte) prontos para conferir curvas 3D: o plano, os eixos do contorno, a moldura que o desenho
+    cobre e os segmentos do contorno, em mm. Corte sem contorno fica de fora."""
+    out = []
+    for c in cortes:
+        pols = [p for p in c.get('polilinhas', []) if len(p['pontos_mm'])]
+        if not pols:
+            continue
+        u, w = (EIXOS.index(x) for x in c['eixos_uv'])
+        moldura = c.get('moldura_mm')
+        if moldura is None:
+            Q = np.vstack([np.asarray(p['pontos_mm'], float) for p in pols])
+            folga = 0.15 * float(np.ptp(Q, axis=0).max())
+            moldura = [(Q.min(0) - folga).tolist(), (Q.max(0) + folga).tolist()]
+        out.append({'nome': c.get('corte'), 'e': EIXOS.index(c['eixo']), 'u': u, 'w': w, 'valor': float(c['valor_mm']),
+                    'moldura': np.asarray(moldura, float), 'erro_mm': float(c.get('erro_mm') or 0.0),
+                    'seg': segmentos([{'pontos': p['pontos_mm'], 'fechada': p.get('fechada', False)} for p in pols], eps=0.05)})
+    return out
+
+
+def travessias_dos_cortes(P, cortes, simetria_x=False, plano_min=0.25):
+    """Onde a curva P (mm, n x 3) atravessa o plano de cada corte preparado, dentro da moldura do desenho, e a distância do
+    ponto da travessia ao contorno do corte, no plano dele: [{corte, ponto_mm, distancia_mm, erro_corte_mm}]. O corte que não
+    mostra o ponto (a moldura do desenho de meia forma) é conferido pela imagem espelhada do ponto, se a simetria em x vale, e
+    com ela o plano x = v também vê a curva da metade x < 0. A curva que corre quase no plano do corte (a componente da
+    tangente normal a ele abaixo de plano_min) não localiza a travessia e fica de fora."""
+    P = np.asarray(P, float)
+    espelho = np.array([-1.0, 1.0, 1.0])
+    out = []
+    for c in cortes:
+        e, u, w = c['e'], c['u'], c['w']
+        for Q, vira in ((P, False), (P * espelho, True)):
+            if vira and not (simetria_x and e == 0):
+                continue
+            d = Q[:, e] - c['valor']
+            d = np.where(d == 0, 1e-9, d)   # a amostra exatamente no plano conta como do lado positivo, e a travessia não some
+            for i in np.nonzero(d[:-1] * d[1:] < 0)[0]:
+                f = d[i] / (d[i] - d[i + 1])
+                X = Q[i] + f * (Q[i + 1] - Q[i])
+                t = Q[min(i + 10, len(Q) - 1)] - Q[max(i - 9, 0)]
+                if abs(t[e]) < plano_min * max(np.linalg.norm(t), 1e-9):
+                    continue
+                q = X[[u, w]]
+                dentro = lambda r: bool((r >= c['moldura'][0]).all() and (r <= c['moldura'][1]).all())
+                if not dentro(q):
+                    if not (simetria_x and 0 in (u, w)):
+                        continue
+                    q = q * np.array([-1.0 if k == 0 else 1.0 for k in (u, w)])
+                    if not dentro(q):
+                        continue
+                dist = float(distancia_a_segmentos(q[None], *c['seg'])[0])
+                out.append({'corte': c['nome'], 'ponto_mm': np.round(X * (espelho if vira else 1.0), 1).tolist(),
+                            'distancia_mm': round(dist, 1), 'erro_corte_mm': c['erro_mm']})
+    return out
+
+
+def _conferir_pelos_cortes(P, cortes, erros, vistas, tol_corte_mm=None, simetria_x=False):
+    """A conferência de uma curva contra os cortes: as travessias, a tolerância de cada uma e a pior. A tolerância é duas vezes
+    o erro combinado das duas vistas que formaram a curva, mais o erro de leitura do corte, e no mínimo 2 mm; tol_corte_mm a
+    fixa. Devolve {travessias, distancia_maxima_mm, falha}, em que falha é a travessia que passa da tolerância (a mais longe)
+    ou None."""
+    tr = travessias_dos_cortes(P, cortes, simetria_x)
+    base = 2.0 * math.hypot(*(erros[v] for v in vistas[:2]))
+    pior = None
+    for t in tr:
+        t['tolerancia_mm'] = round(tol_corte_mm if tol_corte_mm is not None else max(2.0, base + t['erro_corte_mm']), 2)
+        if t['distancia_mm'] > t['tolerancia_mm'] and (pior is None or t['distancia_mm'] > pior['distancia_mm']):
+            pior = t
+    return {'travessias': tr, 'distancia_maxima_mm': max((t['distancia_mm'] for t in tr), default=None), 'falha': pior}
+
+
+def _aceitar(validos, terceira, simetria_x, tol_mm, folga_iou, nA, nB, destino):
+    """A regra de aceitação de linhas_3d sobre os pares válidos de um par de direções: acrescenta a destino as curvas cuja
+    correspondência é inequívoca e devolve quantas ficaram ambíguas."""
+    memo, ambiguas = {}, 0
+
+    def unico(lado, idx, chave):
+        """Se o par chave é o único parceiro do trecho idx: só contam os pares cuja faixa comum fica a até folga_iou
+        da melhor do trecho, e com simetria em x a curva espelhada de outra conta como a mesma."""
+        if (lado, idx) not in memo:
+            chaves = [k for k in validos if k[lado] == idx]
+            melhor = max(validos[k][2] for k in chaves)
+            chaves = [k for k in chaves if validos[k][2] >= melhor - folga_iou]
+            grupos = []
+            for k in chaves:
+                P = validos[k][0]
+                Pm = P * np.array([-1.0, 1.0, 1.0])
+                if not (simetria_x and any(np.median(distancia_a_segmentos(Q[::4], *sg)) <= tol_mm for G, sg in grupos for Q in (P, Pm))):
+                    grupos.append((P, segmentos([{'pontos': P}], eps=0.1) if simetria_x else None))
+            memo[(lado, idx)] = (set(chaves), len(grupos))
+        chaves, n = memo[(lado, idx)]
+        return chave in chaves and n == 1
+    for (ia, ib), (P, confere, _) in sorted(validos.items()):
+        ua = unico(0, ia, (ia, ib))
+        ub = unico(1, ib, (ia, ib))
+        if terceira and ua and ub:
+            conf = 'alta'
+        elif (terceira and (ua or ub)) or (not terceira and ua and ub):
+            conf = 'media'
+        else:
+            ambiguas += 1
+            continue
+        destino.append({'pontos': P, 'confianca': conf, 'vistas': [nA, nB] + ([terceira[0]] if terceira else []),
+                        'terceira_vista_confere': None if confere is None else round(confere, 3)})
+    return ambiguas
+
+
+def _sem_repeticoes(aceitas, tol_mm):
+    """Tira as repetições: em ordem de confiança e comprimento, cada curva perde os trechos a até tol_mm das já aceitas."""
+    ordem = sorted(aceitas, key=lambda c: (c['confianca'] != 'alta', -comprimento(c['pontos']), c['pontos'][0].tolist()))
+    finais, seg_a, seg_b = [], [], []   # os segmentos de cada final se calculam uma vez, quando ele entra
+    for c in ordem:
+        P = c['pontos']
+        if finais:
+            livre = distancia_a_segmentos(P, np.vstack(seg_a), np.vstack(seg_b)) > tol_mm
+        else:
+            livre = np.ones(len(P), bool)
+        i = 0
+        while i < len(P):
+            if not livre[i]:
+                i += 1
+                continue
+            j = i
+            while j < len(P) and livre[j]:
+                j += 1
+            Q = P[i:j]
+            if comprimento(Q) >= max(5.0, 3 * tol_mm):
+                finais.append({**c, 'pontos': Q})
+                a, b = segmentos([{'pontos': Q}], eps=0.1)
+                seg_a.append(a)
+                seg_b.append(b)
+            i = j
+    return finais
+
+
+def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, classe='feicao', folga_iou=0.15, cortes=None,
+              tol_corte_mm=None, cortes_no_casamento=True):
     """Casa as linhas de duas vistas alinhadas de direções diferentes pelo eixo que elas dividem e devolve as polilinhas 3D
     cuja correspondência é inequívoca. Cada par de trechos (um por vista, monótonos no eixo comum, com sobreposição de pelo
     menos metade do menor) dá uma curva candidata; com uma terceira vista, a candidata só vale se a projeção dela cai sobre o
@@ -958,7 +1098,16 @@ def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, class
     união das duas faixas, fica a até folga_iou da melhor do trecho, de modo que o traço que acaba antes não empata), com a
     confiança 'alta' quando os dois lados são únicos e a terceira vista confere e 'media' quando só um lado é único com a
     terceira vista ou os dois são únicos sem ela. As demais são ambíguas e só se contam. Curvas repetidas por pares
-    diferentes de vistas entram uma vez."""
+    diferentes de vistas entram uma vez.
+
+    Com os cortes lidos do pacote (ler_corte), cada curva é conferida onde atravessa o plano de um corte: o ponto da travessia
+    tem de cair perto do contorno daquele corte (tolerância em _conferir_pelos_cortes, ou tol_corte_mm). A terceira vista não
+    separa as curvas de um feixe de linhas paralelas mais juntas que tol_mm, nem a leitura separa as que o traço funde, e a
+    curva que o par de vistas monta entre elas pode não estar sobre nenhuma; o corte, que mostra a pele no plano, as separa. O
+    par cuja curva falha na conferência deixa de ser candidato antes da regra de unicidade (cortes_no_casamento), de modo que
+    o parceiro verdadeiro, que a curva falsa tornava ambíguo, pode entrar. Sai em recusadas_pelos_cortes cada curva que o
+    casamento sem os cortes devolveria e a conferência recusa, com a travessia que falhou, e cada curva que fica traz a
+    conferência em `cortes`."""
     por_eixo = {}
     for nome, lt in leituras.items():
         ex = eixos_da_vista(cameras[nome])
@@ -967,10 +1116,12 @@ def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, class
     if tol_mm is None:
         erros = [lt[classe]['erro_mm'] for _, _, lt in por_eixo.values()]
         tol_mm = max(3.0, 3 * max(erros)) if erros else 3.0
+    prep = preparar_cortes(cortes) if cortes else []
+    erros_vista = {n: lt[classe]['erro_mm'] for n, lt in leituras.items() if classe in lt}
     segs = {}
     for ad, (nome, ex, lt) in por_eixo.items():
         segs[ad] = segmentos([{'pontos': p['pontos_mm'], 'fechada': p['fechada']} for p in lt[classe]['polilinhas']], eps=0.1)
-    aceitas, ambiguas, pares_testados = [], 0, 0
+    aceitas, aceitas_sem, ambiguas, pares_testados = [], [], 0, 0
     eixos_dir = sorted(por_eixo)
     for i, a_dir in enumerate(eixos_dir):
         for b_dir in eixos_dir[i + 1:]:
@@ -984,7 +1135,7 @@ def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, class
             pecasB = [Q for p in ltB[classe]['polilinhas'] for Q in _pecas_monotonas(np.asarray(p['pontos_mm'], float), kB, p['fechada'])]
             fa = [_funcao(Q, kA) for Q in pecasA]
             fb = [_funcao(Q, kB) for Q in pecasB]
-            validos = {}
+            validos, falham = {}, set()
             for ia, (sa, ya) in enumerate(fa):
                 for ib, (sb, yb) in enumerate(fb):
                     lo, hi = max(sa[0], sb[0]), min(sa[-1], sb[-1])
@@ -1006,64 +1157,51 @@ def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, class
                             continue
                     iou = (hi - lo) / (max(sa[-1], sb[-1]) - min(sa[0], sb[0]))
                     validos[(ia, ib)] = (P, confere, iou)
-
-            def unico(lado, idx, chave):
-                """Se o par chave é o único parceiro do trecho idx: só contam os pares cuja faixa comum fica a até folga_iou
-                da melhor do trecho, e com simetria em x a curva espelhada de outra conta como a mesma."""
-                if (lado, idx) not in memo:
-                    chaves = [k for k in validos if k[lado] == idx]
-                    melhor = max(validos[k][2] for k in chaves)
-                    chaves = [k for k in chaves if validos[k][2] >= melhor - folga_iou]
-                    grupos = []
-                    for k in chaves:
-                        P = validos[k][0]
-                        Pm = P * np.array([-1.0, 1.0, 1.0])
-                        if not (simetria_x and any(np.median(distancia_a_segmentos(Q[::4], *segmentos([{'pontos': G}], eps=0.1))) <= tol_mm
-                                                   for G in grupos for Q in (P, Pm))):
-                            grupos.append(P)
-                    memo[(lado, idx)] = (set(chaves), len(grupos))
-                chaves, n = memo[(lado, idx)]
-                return chave in chaves and n == 1
-            memo = {}
-            for (ia, ib), (P, confere, _) in sorted(validos.items()):
-                ua = unico(0, ia, (ia, ib))
-                ub = unico(1, ib, (ia, ib))
-                if terceira and ua and ub:
-                    conf = 'alta'
-                elif (terceira and (ua or ub)) or (not terceira and ua and ub):
-                    conf = 'media'
-                else:
-                    ambiguas += 1
-                    continue
-                aceitas.append({'pontos': P, 'confianca': conf, 'vistas': [nA, nB] + ([terceira[0]] if terceira else []),
-                                'terceira_vista_confere': None if confere is None else round(confere, 3)})
-    # tira as repetições: em ordem de confiança e comprimento, cada curva perde os trechos a até tol_mm das já aceitas
-    ordem = sorted(aceitas, key=lambda c: (c['confianca'] != 'alta', -comprimento(c['pontos']), c['pontos'][0].tolist()))
-    finais = []
-    for c in ordem:
-        P = c['pontos']
-        if finais:
-            A, B = segmentos([{'pontos': f['pontos']} for f in finais], eps=0.1)
-            livre = distancia_a_segmentos(P, A, B) > tol_mm
-        else:
-            livre = np.ones(len(P), bool)
-        i = 0
-        while i < len(P):
-            if not livre[i]:
-                i += 1
+                    if prep and _conferir_pelos_cortes(P, prep, erros_vista, [nA, nB], tol_corte_mm, simetria_x)['falha']:
+                        falham.add((ia, ib))
+            if not validos:
                 continue
-            j = i
-            while j < len(P) and livre[j]:
-                j += 1
-            Q = P[i:j]
-            if comprimento(Q) >= max(5.0, 3 * tol_mm):
-                finais.append({**c, 'pontos': Q})
-            i = j
-    out = [{'confianca': f['confianca'], 'vistas': f['vistas'], 'terceira_vista_confere': f['terceira_vista_confere'],
-            'comprimento_mm': round(comprimento(f['pontos']), 1), 'pontos_mm': np.round(f['pontos'], 2).tolist()} for f in finais]
-    return {'classe': classe, 'tolerancia_mm': round(tol_mm, 3), 'simetria_x': bool(simetria_x),
-            'vistas_por_eixo': {EIXOS[k]: v[0] for k, v in sorted(por_eixo.items())}, 'pares_testados': pares_testados,
-            'ambiguas': ambiguas, 'polilinhas_3d': out}
+            if prep:
+                _aceitar(validos, terceira, simetria_x, tol_mm, folga_iou, nA, nB, aceitas_sem)
+            usados = {k: v for k, v in validos.items() if k not in falham} if prep and cortes_no_casamento else validos
+            if usados:
+                ambiguas += _aceitar(usados, terceira, simetria_x, tol_mm, folga_iou, nA, nB, aceitas)
+    finais = _sem_repeticoes(aceitas, tol_mm)
+    recusadas = []
+    if prep:
+        # a conferência de cada trecho que fica, e o que o casamento sem os cortes devolveria e ela recusa
+        for f in finais:
+            f['cortes'] = _conferir_pelos_cortes(f['pontos'], prep, erros_vista, f['vistas'], tol_corte_mm, simetria_x)
+        finais = [f for f in finais if not f['cortes']['falha']]
+        for f in _sem_repeticoes(aceitas_sem, tol_mm):
+            c = _conferir_pelos_cortes(f['pontos'], prep, erros_vista, f['vistas'], tol_corte_mm, simetria_x)
+            if c['falha']:
+                recusadas.append({**f, 'cortes': c})
+    out = []
+    for f in finais:
+        o = {'confianca': f['confianca'], 'vistas': f['vistas'], 'terceira_vista_confere': f['terceira_vista_confere'],
+             'comprimento_mm': round(comprimento(f['pontos']), 1), 'pontos_mm': np.round(f['pontos'], 2).tolist()}
+        if prep:
+            c = f['cortes']
+            o['cortes'] = {'travessias': len(c['travessias']), 'distancia_maxima_mm': c['distancia_maxima_mm'],
+                           'tolerancia_mm': max((t['tolerancia_mm'] for t in c['travessias']), default=None)}
+        out.append(o)
+    saida = {'classe': classe, 'tolerancia_mm': round(tol_mm, 3), 'simetria_x': bool(simetria_x),
+             'vistas_por_eixo': {EIXOS[k]: v[0] for k, v in sorted(por_eixo.items())}, 'pares_testados': pares_testados,
+             'ambiguas': ambiguas, 'polilinhas_3d': out}
+    if prep:
+        saida['conferencia_dos_cortes'] = {
+            'conferida': True, 'cortes': [c['nome'] for c in prep], 'no_casamento': bool(cortes_no_casamento),
+            'sem_corte': sum(1 for o in out if not o['cortes']['travessias']),
+            'recusadas': {k: sum(1 for r in recusadas if r['confianca'] == k) for k in ('alta', 'media')}}
+        saida['recusadas_pelos_cortes'] = [
+            {'confianca': r['confianca'], 'vistas': r['vistas'], 'comprimento_mm': round(comprimento(r['pontos']), 1),
+             'motivo': (f"atravessa o corte {r['cortes']['falha']['corte']} em {r['cortes']['falha']['ponto_mm']} a "
+                        f"{r['cortes']['falha']['distancia_mm']} mm do contorno, e a tolerância é {r['cortes']['falha']['tolerancia_mm']} mm"),
+             'corte': r['cortes']['falha']['corte'], 'ponto_mm': r['cortes']['falha']['ponto_mm'],
+             'distancia_mm': r['cortes']['falha']['distancia_mm'], 'tolerancia_mm': r['cortes']['falha']['tolerancia_mm'],
+             'pontos_mm': np.round(r['pontos'], 2).tolist()} for r in recusadas]
+    return saida
 
 
 # ---------- ângulo da dobra pelos cortes ----------
@@ -1137,6 +1275,7 @@ def angulos_pelos_cortes(curvas, cortes, perto_mm=4.0, giro_min=8.0, a_mm=5.0, b
             u, w = (EIXOS.index(x) for x in c['eixos_uv'])
             v = float(c['valor_mm'])
             d = P[:, e] - v
+            d = np.where(d == 0, 1e-9, d)   # a amostra exatamente no plano conta como do lado positivo, e a travessia não some
             for i in np.nonzero(d[:-1] * d[1:] < 0)[0]:
                 f = d[i] / (d[i] - d[i + 1])
                 X = P[i] + f * (P[i + 1] - P[i])

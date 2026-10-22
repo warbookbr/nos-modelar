@@ -45,7 +45,7 @@ export function cameras() {
 /** Os eixos do mundo da vista alinhada: [horizontal, vertical]. */
 export const eixosDaVista = (c) => [c.x_cam, c.y_cam].map((e) => e.findIndex((v) => Math.abs(v) > 0.999));
 
-function paraPixel(c, p) {
+export function paraPixel(c, p) {
   const d = p.map((v, i) => v - c.centro[i]);
   const dx = d.reduce((s, v, i) => s + v * c.x_cam[i], 0);
   const dy = d.reduce((s, v, i) => s + v * c.y_cam[i], 0);

@@ -113,6 +113,27 @@ describe.skipIf(!temPillow)('leitura do pacote cego desenhado por código', () =
     expect(cobertura).toBeGreaterThan(0.85);
   });
 
+  it('ler-linhas confere as curvas 3D contra os cortes, inclusive a da metade x < 0 pelo corte em x > 0, e nenhuma verdadeira cai', () => {
+    const r3 = lidos.linhas.linhas_3d;
+    expect(r3.conferencia_dos_cortes).toMatchObject({ conferida: true, cortes: ['secao', 'longitudinal'], recusadas: { alta: 0, media: 0 } });
+    expect(r3.recusadas_pelos_cortes).toEqual([]);
+    // cada curva que atravessa um corte traz a distância do ponto ao contorno, dentro da tolerância, e o corte longitudinal
+    // (só em x > 0) também confere as curvas do lado x < 0, pela simetria
+    const conferidas = r3.polilinhas_3d.filter((l) => l.cortes.travessias > 0);
+    expect(conferidas.length).toBeGreaterThanOrEqual(6);
+    for (const l of conferidas) {
+      expect(l.cortes.distancia_maxima_mm, JSON.stringify(l.cortes)).toBeLessThan(1.5);
+      expect(l.cortes.distancia_maxima_mm).toBeLessThanOrEqual(l.cortes.tolerancia_mm);
+    }
+    expect(r3.polilinhas_3d.some((l) => l.pontos_mm.some(([x]) => x < -1) && l.cortes.travessias > 0)).toBe(true);
+    expect(r3.conferencia_dos_cortes.sem_corte).toBe(r3.polilinhas_3d.length - conferidas.length);
+    // o desenho de cada corte traz a moldura que ele cobre, e o contorno cabe nela
+    for (const c of lidos.corte.cortes) {
+      const [[u0, v0], [u1, v1]] = c.moldura_mm;
+      for (const q of c.polilinhas) for (const [u, v] of q.pontos_mm) { expect(u).toBeGreaterThan(u0); expect(u).toBeLessThan(u1); expect(v).toBeGreaterThan(v0); expect(v).toBeLessThan(v1); }
+    }
+  });
+
   it('ler-linhas dá o ângulo da dobra de cada curva 3D que atravessa um corte, com a incerteza', () => {
     // a dobra exata é o ângulo entre as normais das duas faces do vinco mais perto do ponto onde a curva atravessa o corte
     const exata = (ponto) => {

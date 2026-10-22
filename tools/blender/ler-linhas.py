@@ -4,7 +4,8 @@
 #
 # Uso:
 #   python3 tools/blender/ler-linhas.py --pacote <pasta do pacote ou vistas/> [--vista frente,lado,topo] [--3d]
-#       [--simetria-x | --sem-simetria] [--tolerancia-mm 3] [--sem-angulo] [--saida <arq.json>]
+#       [--simetria-x | --sem-simetria] [--tolerancia-mm 3] [--sem-cortes] [--tolerancia-corte-mm 5] [--sem-angulo]
+#       [--saida <arq.json>]
 #
 # Lê vistas/<vista>-linhas.png com a câmera de vistas/camera.json. A grade, o título e a barra de escala saem por
 # redesenho: a grade de cada vista depende só da câmera, e a leitura a redesenha (imagens.desenhar_grade) sobre um fundo
@@ -17,7 +18,13 @@
 # Com --3d, cada par de vistas alinhadas de direções diferentes (a primeira de cada eixo, ou as de --vista) casa os trechos
 # de traço preto pelo eixo comum, e a terceira vista confere a curva candidata (leitura.linhas_3d); sai a confiança 'alta'
 # (única dos dois lados e conferida) ou 'media', e as ambíguas só se contam. A simetria em x vem de pacote.json, se houver;
-# --simetria-x e --sem-simetria a forçam. Se o pacote tem cortes, cada curva 3D que atravessa um corte ganha o ângulo da
+# --simetria-x e --sem-simetria a forçam. Se o pacote tem cortes, cada curva 3D é conferida contra eles (leitura.linhas_3d
+# com cortes): onde atravessa o plano de um corte, o ponto dela tem de cair perto do contorno daquele corte, e a que fica
+# longe sai de polilinhas_3d e vai para recusadas_pelos_cortes, com a travessia e a distância no motivo. O par de vistas que
+# a curva falsa estraga deixa de ser ambíguo quando ela cai, de modo que o parceiro verdadeiro entra. A tolerância é duas
+# vezes o erro combinado das duas vistas da curva mais o erro do corte (--tolerancia-corte-mm a fixa), e --sem-cortes
+# desliga a conferência. A linha que não atravessa nenhum corte fica sem conferência, e a saída conta quantas são. Se o
+# pacote tem cortes, cada curva 3D que atravessa um corte ganha o ângulo da
 # dobra naquele ponto (leitura.com_angulos): o canto que o contorno do corte faz ali dá a direção das duas faces no plano, e
 # a dobra sai delas e da tangente da curva, com a incerteza em graus; a curva que não atravessa corte fica sem o campo, e
 # --sem-angulo não o calcula. Sem --saida, imprime o JSON.
@@ -52,11 +59,19 @@ if a.get('3d'):
     if a.get('sem_simetria'):
         simetria = False
     tol = float(a['tolerancia_mm']) if 'tolerancia_mm' in a else None
-    saida['linhas_3d'] = L.linhas_3d(leituras, cameras, tol_mm=tol, simetria_x=simetria)
+    cortes = []
     arq_q = os.path.join(pasta_cortes, 'quadro.json')
-    if not a.get('sem_angulo') and os.path.exists(arq_q):
+    if os.path.exists(arq_q) and not (a.get('sem_angulo') and a.get('sem_cortes')):
         quadros = json.load(open(arq_q))
         cortes = [L.ler_corte(os.path.join(pasta_cortes, f'{n}.png'), q, n) for n, q in quadros.items()
                   if os.path.exists(os.path.join(pasta_cortes, f'{n}.png'))]
+    conferir = bool(cortes) and not a.get('sem_cortes')
+    tol_corte = float(a['tolerancia_corte_mm']) if 'tolerancia_corte_mm' in a else None
+    saida['linhas_3d'] = L.linhas_3d(leituras, cameras, tol_mm=tol, simetria_x=simetria, cortes=cortes if conferir else None,
+                                     tol_corte_mm=tol_corte)
+    if not conferir:
+        saida['linhas_3d']['conferencia_dos_cortes'] = {
+            'conferida': False, 'motivo': 'desligada por --sem-cortes' if a.get('sem_cortes') else 'o pacote não tem cortes'}
+    if cortes and not a.get('sem_angulo'):
         L.com_angulos(saida['linhas_3d'], cortes)
 L.gravar_json(saida, a.get('saida'))

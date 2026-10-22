@@ -5,7 +5,7 @@
 # Uso:
 #   python3 tools/blender/comparar-vincos.py --pacote <pasta do pacote> --saida <pasta> \
 #       (--candidata <cand.obj|.glb|.blend> [--objeto <nome>] [--z-cima] [--blender <executável>] | --vincos-candidata <json>) \
-#       [--vista frente,lado] [--passo-mm 1] [--sem-3d] [--tolerancia-3d-mm 3]
+#       [--vista frente,lado] [--passo-mm 1] [--sem-3d] [--tolerancia-3d-mm 3] [--sem-cortes]
 #
 # Com --candidata, roda olhar-candidata.py no Blender (--blender ou a variável MECANIFICA_BLENDER) com o pacote, o que recorta
 # a candidata pela caixa do pacote e grava em <saida>/candidata-vincos.json o traço preto dela em 3D: as arestas com diedro
@@ -19,7 +19,8 @@
 # da candidata a até 2 e 5 mm de uma linha do pacote), o F1, o desvio (mediana e p90 da distância do pacote à candidata) e o
 # excesso (mediana da distância da candidata ao pacote), em mm; por vista, o erro de leitura do traço do pacote, que é o piso
 # da medida, e a fração do pacote acima dele. Em 3D, as linhas do pacote são as curvas que as vistas ortogonais casam sem
-# ambiguidade (ler-linhas --3d), e a candidata é o traço que se vê em alguma vista; a curva que o desenho de linhas não
+# ambiguidade (ler-linhas --3d) e que os cortes do pacote confirmam (a curva que atravessa um corte longe do contorno dele
+# fica fora; --sem-cortes desliga a conferência), e a candidata é o traço que se vê em alguma vista; a curva que o desenho de linhas não
 # decide falta no pacote, e a precisão em 3D é limite de baixo. E grava <saida>/<vista>-vincos.png com a grade da vista, as
 # linhas do pacote em preto e as da candidata em vermelho por cima, mais finas: onde as duas coincidem, o traço é preto com
 # o miolo vermelho; o preto sozinho é vinco que falta, e o vermelho sozinho, vinco a mais.
@@ -39,7 +40,7 @@ for k in ('pacote', 'saida'):
     if k not in a:
         L.erro(f'falta --{k}')
 os.makedirs(a['saida'], exist_ok=True)
-pasta, _ = L.pastas_do_pacote(a['pacote'])
+pasta, pasta_cortes = L.pastas_do_pacote(a['pacote'])
 arq_cam = os.path.join(pasta, 'camera.json')
 if not os.path.exists(arq_cam):
     L.erro(f'{pasta}: sem camera.json')
@@ -174,7 +175,14 @@ if not a.get('sem_3d'):
     pacote_json = os.path.join(os.path.dirname(pasta), 'pacote.json')
     simetria = bool(json.load(open(pacote_json)).get('simetria_x')) if os.path.exists(pacote_json) else False
     tol = float(a['tolerancia_3d_mm']) if 'tolerancia_3d_mm' in a else None
-    l3 = L.linhas_3d(leituras, cameras, tol_mm=tol, simetria_x=simetria)
+    # as curvas 3D do pacote são conferidas contra os cortes dele, como em ler-linhas: a curva que o casamento das vistas
+    # monta fora da pele não entra como vinco da referência
+    arq_q = os.path.join(pasta_cortes, 'quadro.json')
+    cortes = []
+    if os.path.exists(arq_q) and not a.get('sem_cortes'):
+        cortes = [L.ler_corte(os.path.join(pasta_cortes, f'{n}.png'), q, n) for n, q in json.load(open(arq_q)).items()
+                  if os.path.exists(os.path.join(pasta_cortes, f'{n}.png'))]
+    l3 = L.linhas_3d(leituras, cameras, tol_mm=tol, simetria_x=simetria, cortes=cortes or None)
     lidas3 = [{'fechada': False, 'pontos_mm': p['pontos_mm']} for p in l3['polilinhas_3d']]
     c3 = polilinhas_3d_mm(cand.get('qualquer_vista', []))
     if simetria:
@@ -186,6 +194,7 @@ if not a.get('sem_3d'):
         _, d_cl = L.distancias_entre_linhas(c3, lidas3, passo)
         saida['3d'] = {'curvas_pacote': len(lidas3), 'ambiguas': l3['ambiguas'], 'tolerancia_leitura_mm': l3['tolerancia_mm'],
                        'vistas_por_eixo': l3['vistas_por_eixo'],
+                       'recusadas_pelos_cortes': len(l3.get('recusadas_pelos_cortes', [])) if cortes else None,
                        'nota': 'só as curvas que as vistas casam sem ambiguidade; a precisão em 3D é limite de baixo',
                        **L.medidas_de_casamento(d_lc, d_cl, comprimento(lidas3), comprimento(c3), TOLERANCIAS)}
     else:
