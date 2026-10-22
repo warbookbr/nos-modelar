@@ -40,10 +40,9 @@ Recebe as referências, os renders atuais nas mesmas vistas e o nível de
 realismo desejado. Na primeira passada, não recebe justificativas nem o histórico
 de construção: avalia o resultado, não a narrativa do modelador.
 
-> **O crítico é uma sessão separada, despachada, sem contexto.** Papel separado
-> dentro da mesma sessão é ficção: quem modelou *tem* a narrativa e não consegue
-> não tê-la. O orquestrador despacha um subagente e passa apenas o artefato, as
-> vistas e o critério — nunca o próprio raciocínio.
+O crítico é uma sessão separada, despachada, sem contexto, que recebe o artefato,
+as vistas e o critério e nunca o raciocínio de quem modelou (seção 3 de
+[`LACO-VISUAL.md`](LACO-VISUAL.md)).
 
 Isto não é preciosismo de processo. O modo de falha documentado não é
 incapacidade, é **apego à própria narrativa**: numa comparação de silhueta, o
@@ -51,21 +50,12 @@ autor afirmou que o defeito grave era a linha do teto; a medida mostrou desvio d
 17 mm no teto e de 112 mm na traseira, que ele não havia apontado. Um crítico frio
 não herda a expectativa de quem desenhou.
 
-### Antes de despachar: OLHE você mesmo
+### Antes de despachar: olhe você mesmo
 
-O crítico existe porque quem modelou não consegue não ter a narrativa. Ele
-**não** existe para substituir o ato de olhar. Rasterize as vistas e abra a
-imagem:
-
-```
-node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
-```
-
-e leia o PNG como imagem. SVG entregue ao usuário e nunca aberto por quem
-desenhou é o modo de falha real desta investigação: um nariz aberto de
-600 x 370 mm ficou várias rodadas visível na vista frontal e só foi achado por
-um script que contava laços de borda. Medição só pega o defeito que alguém já
-imaginou; olhar pega o resto.
+O crítico não substitui o ato de olhar. Antes de despachar, rasterize as vistas
+e leia o PNG como imagem, como manda a seção 1 de
+[`LACO-VISUAL.md`](LACO-VISUAL.md), que traz o comando e o caso que motivou a
+regra.
 
 ### Regra obrigatória de inspeção individual
 
@@ -94,11 +84,10 @@ pareamento e o crítico registra os hashes de ambos os lados da comparação.
 
 ### O crítico recebe IMAGEM
 
-O que se despacha ao crítico é a **imagem**, e a pergunta é sobre o que ela
-mostra. Não se despacha receita, código, passos, contrato nem relatório para
-revisão: isso é revisão de código, tem outro dono, e um crítico lendo a receita
-volta a julgar a intenção em vez do resultado — que é exatamente o defeito que o
-papel existe para cobrir.
+O que se despacha ao crítico é a imagem, e a pergunta é sobre o que ela
+mostra. Receita, código, passos, contrato e relatório não vão para ele, pelo
+motivo dado na seção 3 de [`LACO-VISUAL.md`](LACO-VISUAL.md), com a única
+exceção da forma 3 abaixo.
 
 Três formas de despacho, da mais forte para a mais fraca:
 
@@ -112,11 +101,8 @@ Três formas de despacho, da mais forte para a mais fraca:
    peça a leitura independente. Pega o caso em que o autor explica um alerta em
    vez de corrigir. É a forma mais fraca porque reintroduz números.
 
-Limites do papel, que valem mais que os achados:
+Além de "achado, nunca aprovação" (`LACO-VISUAL.md`, seção 3), o papel obedece a estes:
 
-- **produz achado, nunca aprovação.** Silêncio do crítico não é evidência de
-  qualidade, e não pode ser registrado como aceite. Aprovação de forma é do
-  usuário;
 - **legibilidade cega roda sempre que uma forma vai ao usuário.** É barata e é
   a única defesa contra entregar algo que o autor já não consegue enxergar. As
   formas 2 e 3, essas sim, rodam em marco e depois da medida limpa: são caras e

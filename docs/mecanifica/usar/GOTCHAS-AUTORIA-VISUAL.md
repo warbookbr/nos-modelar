@@ -20,7 +20,7 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
 | Gotcha | Por que engana | Bloqueio obrigatório |
 | --- | --- | --- |
 | Malha fechada tratada como objeto bom | Topologia não mede caráter, proporção nem reconhecimento. | Nunca promover por fechamento/manifold. |
-| IoU/silhueta global verde | Pode esconder cabine, arcos, frente, traseira e conexões erradas. | Métrica é diagnóstico; não aprova sem veredito visual por vista. |
+| IoU/silhueta global verde | Pode esconder cabine, arcos, frente, traseira e conexões erradas. | Veredito visual por vista; a regra de que métrica não aprova forma está em `LACO-VISUAL.md`. |
 | Painel/mosaico | Miniaturas escondem desconexões, faces invertidas e proporções ruins. | Abrir referência, render e comparação separadamente em tamanho nativo. |
 | Volume genérico parametrizado | Estações ou primitivas suaves tendem a gerar cápsulas, caixas ou bonecos articulados. | Usar gramática da família antes de gerar a primeira forma. |
 | Peças feitas isoladamente | Uma peça aceitável pode falhar ao ser montada. | Validar encaixe, oclusão e silhueta do conjunto em cada alteração. |
@@ -73,7 +73,7 @@ observáveis e incontestáveis antes que contaminem as etapas seguintes.
 Um avaliador não pode aprovar por “parece razoável” se faltar um marco. Ele
 precisa anexar a evidência da vista, os marcos encontrados/ausentes e a razão
 do veredito. Métricas de distância, IoU, diedro ou continuidade complementam o
-diagnóstico, mas não recebem permissão de promoção.
+diagnóstico, nos termos da regra de `LACO-VISUAL.md` de que métrica não aprova forma.
 ## Política de parada e rastreabilidade
 
 - Toda rodada começa `em-avaliação`; não existe sucesso implícito por gerar
@@ -91,24 +91,18 @@ diagnóstico, mas não recebem permissão de promoção.
 
 As trinta e oito falhas medidas (V-01 a V-38) moram em
 [`../historico/REGISTRO-FALHAS-AUTORIA-V.md`](../historico/REGISTRO-FALHAS-AUTORIA-V.md).
-Elas saíram daqui porque eram 15,6 dos 35,8 KB deste documento, que é leitura
-obrigatória antes de gerar forma, e a maior parte delas é a arqueologia do
-programa de carroceria N6, hoje congelado.
+Elas saíram daqui por pesarem 15,6 dos 35,8 KB deste documento de leitura
+obrigatória; a maior parte é o programa de carroceria N6, congelado.
 
 **Vá lá antes de abrir experimento de forma.** Redescobrir por conta própria algo
 que aquela tabela já mediu é a falha V-31, e ela custou uma rodada inteira: o
 canário N6 chegou a "silhueta não carrega topologia automotiva" construindo um
 casco por interseção, quando `prova-secoes-por-medida` já tinha medido isso.
 
-Para modelar uma peça, uma arma ou uma máquina, o que vale está abaixo: a regra
-zero, o pipeline mínimo, os limites do crítico e as lições de motor — `loft`
-contra `inflate`, furar chapa, as armadilhas de `loft` e a proporção que só a
-imagem corrige.
 ## Checklist antes de aceitar uma receita
 
-Veio do registro de modelagem procedural, escrito a partir de máquinas e
-equipamentos. Vale para qualquer objeto: o que reprovou uma prensa reprova uma
-carroceria pelo mesmo motivo.
+Vale para qualquer objeto: o que reprovou uma prensa reprova uma carroceria pelo
+mesmo motivo.
 
 - A origem, os eixos, a escala e o plano de apoio estão explícitos?
 - Toda parte estrutural tem apoio, interface ou relação de montagem verificável?
@@ -145,10 +139,9 @@ está em
 [`GOTCHAS-POR-OPERACAO.md`](../referencias/GOTCHAS-POR-OPERACAO.md). O limite
 diz o que evitar; o caso diz por que, e é o que faz a lição grudar.
 
-Uma delas estava arquivada errado e vale registrar: a armadilha das tampas do
-`cilindro`, que ficam sem parte quando citadas sem `tampa:'fundo'` ou
-`tampa:'topo'`, vivia sob o título "armadilhas de `loft`". Quem foi usar
-`cilindro` não tinha como chegar nela.
+A das tampas do `cilindro`, que ficam sem parte quando citadas sem
+`tampa:'fundo'` ou `tampa:'topo'`, vivia arquivada sob "armadilhas de `loft`", onde
+quem usava `cilindro` não a achava.
 
 ## Proporção: a medida que só a imagem corrige
 

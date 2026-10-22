@@ -37,8 +37,7 @@ tarefa que produza forma: olhar o PNG, sobrepor ao alvo, despachar o crítico se
 contexto e saber onde o método diagnóstico para de render.
 
 [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md) é o registro do que já
-falhou e não pode se repetir. Malha fechada não é objeto bom, métrica verde não
-aprova forma, e perspectiva bonita não compensa ortográfica ruim. Ler antes
+falhou e não pode se repetir. Ler antes
 custa minutos; descobrir depois já custou doze rodadas neste repositório.
 
 [`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](METODO-DIAGNOSTICO-E-SEU-LIMITE.md) diz

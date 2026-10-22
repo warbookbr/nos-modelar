@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { conferirPlanos } from './planos.mjs';
+import { conferirPlanoAtivoNosIndices, conferirPlanos } from './planos.mjs';
 
 const temporarias = [];
 
@@ -63,5 +63,69 @@ describe('gate dos planos curtos', () => {
     const pasta = ambiente();
     gravar(pasta, '2026-08-02-a.md', 'ativo');
     expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/não aponta/);
+  });
+});
+
+describe('gate do plano ativo nos três índices', () => {
+  const nome = '2026-10-21-a.md';
+
+  function tres({ raiz, indice, planos }) {
+    const pasta = mkdtempSync(join(tmpdir(), 'mecanifica-ativo-'));
+    temporarias.push(pasta);
+    writeFileSync(join(pasta, 'raiz.md'), raiz);
+    writeFileSync(join(pasta, 'indice.md'), indice);
+    writeFileSync(join(pasta, 'planos.md'), planos);
+    return { readme: join(pasta, 'raiz.md'), indice: join(pasta, 'indice.md'), planos: join(pasta, 'planos.md') };
+  }
+
+  it('aceita os três apontando o mesmo plano', () => {
+    const caminhos = tres({
+      raiz: `O plano ativo é [A](docs/mecanifica/planos/${nome}).\n`,
+      indice: `- Ativo: [A](planos/${nome}); pronto: outro.\n`,
+      planos: `**Plano ativo:** [A](${nome}) (${nome}), ativado.\n`,
+    });
+    const { problemas, declarados } = conferirPlanoAtivoNosIndices(caminhos);
+    expect(problemas).toEqual([]);
+    expect(declarados.map(([, valor]) => valor)).toEqual([nome, nome, nome]);
+  });
+
+  it('aceita os três sem plano ativo', () => {
+    const caminhos = tres({
+      raiz: 'Nenhum plano está ativo; o último fechou.\n',
+      indice: '- Ativo: nenhum.\n',
+      planos: '**Plano ativo:** nenhum.\n',
+    });
+    expect(conferirPlanoAtivoNosIndices(caminhos).problemas).toEqual([]);
+  });
+
+  it('recusa o README da raiz que diz nenhum quando os outros apontam um plano', () => {
+    const caminhos = tres({
+      raiz: 'Nenhum plano está ativo; o último fechou.\n',
+      indice: `- Ativo: [A](planos/${nome}).\n`,
+      planos: `**Plano ativo:** [A](${nome}) (${nome}).\n`,
+    });
+    expect(conferirPlanoAtivoNosIndices(caminhos).problemas.join('\n')).toMatch(/diverge.*README\.md → nenhum/);
+  });
+
+  it('recusa índices que apontam planos diferentes', () => {
+    const caminhos = tres({
+      raiz: `O plano ativo é [A](docs/mecanifica/planos/${nome}).\n`,
+      indice: '- Ativo: [B](planos/2026-10-22-b.md).\n',
+      planos: `**Plano ativo:** [A](${nome}) (${nome}).\n`,
+    });
+    expect(conferirPlanoAtivoNosIndices(caminhos).problemas.join('\n')).toMatch(/diverge/);
+  });
+
+  it('recusa índice que deixa de declarar o plano ativo', () => {
+    const caminhos = tres({
+      raiz: 'Sem declaração.\n',
+      indice: '- Ativo: nenhum.\n',
+      planos: '**Plano ativo:** nenhum.\n',
+    });
+    expect(conferirPlanoAtivoNosIndices(caminhos).problemas.join('\n')).toMatch(/README\.md: não declara/);
+  });
+
+  it('os arquivos reais concordam', () => {
+    expect(conferirPlanoAtivoNosIndices().problemas).toEqual([]);
   });
 });

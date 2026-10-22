@@ -201,45 +201,23 @@ teto abaulada; medindo, o teto desviava 17 mm e os erros reais eram a traseira
 alta em 112 mm e a ponta do nariz em 314 mm. Quando medida e olho divergem, a
 medida ganha.
 
-### Antes de tudo: OLHE a imagem
+### Antes de tudo: olhe a imagem
 
-Rasterize as vistas e **abra o PNG**:
-
-```
-node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
-```
-
-Ler o PNG como imagem é passo obrigatório antes de julgar, antes de despachar
-crítico e antes de levar qualquer coisa ao usuário. SVG gerado, entregue e nunca
-aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 mm
-ficou várias rodadas visível na vista frontal e só foi achado por um script.
-Medição pega o defeito que alguém já imaginou; olhar pega o resto.
+Rasterize as vistas e leia o PNG como imagem antes de julgar, de despachar o
+crítico e de levar a prancha ao usuário. O comando, a captura em modo de
+auditoria e o caso que motivou a regra estão em
+[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), seção 1.
 
 ## 9. Despachar o crítico, sem contexto
 
-Quando o relatório determinístico estiver **limpo** e antes de levar o resultado
-ao usuário, despache um subagente como **crítico visual**. O protocolo completo
-está em
-[`../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
-
-Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
-relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
-VER a imagem — revisão de receita é outro trabalho, com outro dono, e um crítico
-que lê a receita volta a julgar a intenção em vez do resultado, que é
-exatamente o defeito que este papel existe para cobrir. Papel separado dentro da
-mesma sessão é ficção: quem modelou tem a narrativa e não consegue não tê-la.
-
-A forma padrão é legibilidade cega: entregue a imagem sem dizer o que é e
-pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
-teste não exige gosto — só verifica se a forma comunica.
-
-Três limites, todos inegociáveis:
-
-- **achado, nunca aprovação.** Silêncio do crítico não vira evidência de
-  qualidade nem entra num registro como aceite. Forma quem aprova é o usuário;
-- **depois da medida, nunca no lugar dela.** Se o relatório ainda acusa, corrija
-  primeiro: crítico é caro e não determinístico, medida é grátis e determinística;
-- **em marco, não a cada rodada.** Cada despacho é partida fria.
+Despache o `critico-visual` quando o relatório determinístico estiver limpo e
+antes de levar a prancha ao usuário. O que se passa a ele (só a imagem), a forma
+padrão de legibilidade cega e os limites do papel estão em
+[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), seção 3, e o
+protocolo completo em
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
+Com o relatório ainda acusando, corrija primeiro: o crítico é caro e não
+determinístico, e a medida é grátis e determinística.
 
 ## 10. Checklist de defeitos recorrentes
 
@@ -274,30 +252,11 @@ Todos já aconteceram. Confira antes de entregar:
 Se a prancha for referência vinculante de um plano, diga explicitamente que ela
 é **derivada** da tabela de medidas: divergiu, a tabela manda.
 
-## Antes de qualquer julgamento: abra o alvo e sobreponha
+## Sobrepor ao alvo e os limites do método
 
-Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem
-isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto uma
-única vez, e o crítico visual recebendo só o render.
-
-1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
-2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
-   do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
-3. despache o agente `critico-visual` passando os **três** caminhos — alvo,
-   modelo e sobreposição. Crítico que recebe só o render dá opinião.
-
-Sem alvo desenhado, desenhe antes: veja
-[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
-
-## Antes de caçar defeito: o método tem limite
-
-Se você está tentando decidir **forma, proporção ou caráter**, não é problema
-diagnóstico, e eliminar defeito ali rende conserto certo num objeto que continua
-ruim. O sintoma é os achados encolherem e a nota não subir. Ver
-[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
-
-Quando o método valer, dois passos são obrigatórios e são os que mais somem:
-**identificar o que falta** (o desenho de referência existia desde a primeira
-rodada e nunca foi aberto) e **levantar hipóteses no plural antes de testar**
-(o serrilhado foi culpa do renderizador duas vezes antes de alguém rastrear o
-loop).
+Abrir o alvo e sobrepor a silhueta do modelo a ele antes de qualquer julgamento
+(seção 2), e saber onde o método diagnóstico para de render (seção 4, com o
+detalhe em
+[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md)),
+estão em [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md). Sem
+alvo desenhado, esta skill é o que o produz.

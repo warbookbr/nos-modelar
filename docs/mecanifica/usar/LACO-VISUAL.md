@@ -93,7 +93,11 @@ loop).
 
 ## Antes de gerar a primeira forma
 
+Nenhuma métrica aprova forma sozinha: IoU, silhueta, hash e fechamento de malha
+verdes só dizem que nada foi acusado, e quem aprova a forma é a pessoa, com a
+imagem aberta.
+
 Leia [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md): o registro do que
-já falhou aqui e não pode se repetir. Malha fechada não é objeto bom, métrica
-verde não aprova forma, mosaico esconde defeito que a vista em tamanho nativo
-mostra, e perspectiva bonita não compensa ortográfica ruim.
+já falhou aqui e não pode se repetir. Malha fechada não é objeto bom, mosaico
+esconde defeito que a vista em tamanho nativo mostra, e perspectiva bonita não
+compensa ortográfica ruim.
