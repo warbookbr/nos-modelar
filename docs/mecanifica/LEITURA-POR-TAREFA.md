@@ -11,6 +11,10 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   módulos no README de cada um; o que faz cada arquivo de `tools/` e `src/`
   em [`../MAPA.md`](../MAPA.md).
 - Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões em `AUTORIA-IA.md`.
+- Carroceria e chapa contínua: a forma facetada pelas três vistas em
+  [`modelar-veiculos.md`](modelar-veiculos.md), e a superfície lisa por
+  subdivisão, com vincos, raio de borda, medidas e espessura, em
+  [`modelar-carroceria.md`](modelar-carroceria.md).
 - **Investigar defeito ou entender por que uma abordagem falha:**
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e

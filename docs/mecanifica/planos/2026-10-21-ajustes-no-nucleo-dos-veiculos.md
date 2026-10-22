@@ -24,11 +24,11 @@ O plano [veículos de referência livre](encerrados/2026-10-20-veiculos-de-refer
 | 10. origem no cabeçalho de `receita.js` | os 27 cabeçalhos citam hoje o autor certo e nenhum autor proibido | `tools/mecanifica/origem-das-fontes.test.mjs` confere `alvo.md` e `fonte-partes.json`, não o cabeçalho | não |
 | 11. `lasca.mjs` | protótipo em `tmp/repro/r1-lasca.mjs` lista face, parte, razão e cantos em mm e achou as faces dos casos 1 e 7 | a ferramenta ficou só no rascunho | não se aplica |
 
-O acervo tem 53 peças para `pecasDoAcervo` (41 pastas e as 12 partes do avião e do braço), e não 57. O retrato de caixa, volume, área, faces, faces finas, partes e órfãos das 53 roda em 19,6 s; hoje nenhuma peça tem órfão e só peças anteriores aos veículos têm face fina (as oito partes do avião, o ombro do braço, a lava-louças, a lavadora-secadora e o suporte-tubo).
+O acervo tinha 53 peças para `pecasDoAcervo` (41 pastas e as 12 partes do avião e do braço), e não 57; desde a fatia 8 do plano de carroceria por subdivisão tem 54, com a carenagem de prova. O retrato de caixa, volume, área, faces, faces finas, partes e órfãos das 53 roda em 19,6 s; hoje nenhuma peça tem órfão e só peças anteriores aos veículos têm face fina (as oito partes do avião, o ombro do braço, a lava-louças, a lavadora-secadora e o suporte-tubo).
 
 ## Resultado
 
-Cada um dos onze achados passa a falhar alto com a causa e o lugar, ou deixa de acontecer pela ferramenta geral, com um teste que reproduz o caso mínimo; e as 53 peças do acervo regeneradas no fim têm a mesma caixa, o mesmo volume e as mesmas partes que no retrato tirado antes da primeira fatia.
+Cada um dos onze achados passa a falhar alto com a causa e o lugar, ou deixa de acontecer pela ferramenta geral, com um teste que reproduz o caso mínimo; e as 54 peças do acervo regeneradas no fim têm a mesma caixa, o mesmo volume e as mesmas partes que no retrato tirado antes da primeira fatia.
 
 ## Filtro Agent-First
 
@@ -49,7 +49,7 @@ O núcleo continua sem Three.js, sem domínio automotivo e sem ferramenta extern
 ## Gate de saída
 
 1. Cada achado tem um teste novo que falhava antes da fatia e passa depois, nomeado na fatia.
-2. `node tools/mecanifica/retrato-do-acervo.mjs --comparar tools/mecanifica/fixtures/retrato-do-acervo/antes.json` sai com 0 sobre as 53 peças: caixa, volume, área e partes iguais; faces e faces finas só podem cair, e só nas peças que a fatia 10 lista.
+2. `node tools/mecanifica/retrato-do-acervo.mjs --comparar tools/mecanifica/fixtures/retrato-do-acervo/antes.json` sai com 0 sobre as 54 peças: caixa, volume, área e partes iguais; faces e faces finas só podem cair, e só nas peças que a fatia 10 lista.
 3. `npm run guarda:acervo` e `npm run gates -- --completo` verdes.
 4. `vistas:critica` da perua abaixo de 90 s na máquina parada e sem estouro de prazo com quatro execuções simultâneas, medido e registrado.
 5. As decisões da pessoa registradas abaixo, com a data, antes da fatia que depende de cada uma.
@@ -58,7 +58,7 @@ O núcleo continua sem Three.js, sem domínio automotivo e sem ferramenta extern
 
 As fatias seguem por valor e risco: primeiro a régua de comparação, depois o que só falha alto ou só muda ferramenta, e por último o que mexe em geometria. Cada fatia termina com `retrato-do-acervo --comparar` igual ao de antes, salvo o que ela declara.
 
-1. **Retrato do acervo e lista de lascas.** `retrato-do-acervo.mjs` grava, por peça, caixa, volume, área, faces, faces finas, partes, órfãos e tempo, e `--comparar` diz o que mudou e sai com 1 se caixa, volume, área ou partes mudarem; o retrato de `dcbb265` entra como `antes.json`. `lasca.mjs <receita>` lista cada face fina com a parte, a razão, os cantos em mm e o passo que criou a face. Pronto quando o retrato das 53 peças sai em menos de 60 s, `--comparar` contra si mesmo sai com 0, e o teste `retrato-do-acervo.test.mjs` prova a recusa com uma peça de ensaio de caixa alterada e `lasca.test.mjs` acha as duas faces do caso 1. O processo teria pego sozinho? Não: nenhuma ferramenta comparava o acervo antes e depois de mudar o núcleo. Para se o retrato não for determinístico entre duas execuções.
+1. **Retrato do acervo e lista de lascas.** `retrato-do-acervo.mjs` grava, por peça, caixa, volume, área, faces, faces finas, partes, órfãos e tempo, e `--comparar` diz o que mudou e sai com 1 se caixa, volume, área ou partes mudarem; o retrato de `dcbb265` entra como `antes.json`. `lasca.mjs <receita>` lista cada face fina com a parte, a razão, os cantos em mm e o passo que criou a face. Pronto quando o retrato das 54 peças sai em menos de 60 s, `--comparar` contra si mesmo sai com 0, e o teste `retrato-do-acervo.test.mjs` prova a recusa com uma peça de ensaio de caixa alterada e `lasca.test.mjs` acha as duas faces do caso 1. O processo teria pego sozinho? Não: nenhuma ferramenta comparava o acervo antes e depois de mudar o núcleo. Para se o retrato não for determinístico entre duas execuções.
 
 2. **O que falha alto.** O `lathe` em modo polilinha cujo perfil não toca o eixo nas duas pontas nem volta ao primeiro ponto grita com a dica de fechar o perfil ou passar `furos: []`, salvo `superficie: true` declarada (decisão 2). `ehSimples` ganha um irmão que diz qual ponto se repete ou quais arestas se cruzam, e `montarPerfil` usa a resposta na mensagem, com a dica do espelhamento sobre o eixo. `limparContorno(pontos, { colineares, repetidos, tolerancia })` entra em `contorno.js` como função pura, sem ser chamada pelo núcleo (decisão 1). `descrever-peca` passa a conferir no começo que cada caminho de `PLANO.referencias` existe, e a mensagem de `vistas:critica` deixa de chamar `.md` de imagem. Pronto quando os testes `lathe-aberto.test.ts`, `ponto-repetido.test.ts` e `limpar-contorno.test.mjs` reproduzem os casos 4 e 5 e `descrever-peca` recusa a peça de ensaio sem `alvo.md`; o retrato fica igual. O processo teria pego sozinho? O caso 5 não: `descrever` saía com 0. Para se alguma peça do acervo ou fixture de teste usar `lathe` aberto de propósito: aí a decisão 2 volta à pessoa com a lista.
 

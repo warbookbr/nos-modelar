@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1547 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1551 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -143,6 +143,7 @@
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
+- `modelar-carroceria.md` — Modelar carroceria de chapa contínua
 - `modelar-veiculos.md` — Veículos de referência livre: análise da primeira leva e instruções para o modelador
 
 ## docs/mecanifica/banco-de-provas/
@@ -1384,6 +1385,15 @@
 ## procedural/pecas/caminhao-lixo/referencias/
 
 - `alvo.md` — Alvo: caminhao-lixo
+
+## procedural/pecas/carenagem-de-prova/
+
+- `receita.js` — carenagem-de-prova — meia carenagem de chapa desenhada só por código, a peça de prova da superfície por subdivisão.
+- `receita.test.mjs` — receita.test.mjs — a carenagem de prova da superfície por subdivisão: a receita só endereça a gaiola por nome, cada cota medida da TABELA é vértice da malha …
+
+## procedural/pecas/carenagem-de-prova/referencias/
+
+- `alvo.md` — Alvo da carenagem de prova
 
 ## procedural/pecas/carro-corrida/
 

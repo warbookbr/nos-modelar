@@ -19,7 +19,7 @@
  * parâmetro que não está ligado à geometria.
  */
 import { sha256Hex } from './assinatura-geometria.js';
-import { descreverPeca } from './descrever-partes.js';
+import { descreverPeca, fixo } from './descrever-partes.js';
 import { executarReceita } from './executar-receita.js';
 
 /**
@@ -100,23 +100,71 @@ export function receitaComParametros(receita, params) {
   return copia;
 }
 
+/* Casas decimais da forma medida: posição a 1 µm, área a 1 mm² e volume a 1 mm³ (em metro). */
+const CASAS_DA_POSICAO = 6;
+const CASAS_DA_AREA = 6;
+const CASAS_DO_VOLUME = 9;
+
+/**
+ * Forma de cada parte, por dentro da caixa: área, volume e um hash das posições
+ * dos vértices arredondadas a 1 µm, ordenadas como texto.
+ *
+ * A caixa e a contagem de faces não veem o parâmetro que muda a forma sem
+ * mudar os extremos nem a topologia: na carenagem de prova, a nitidez do ombro,
+ * a espessura da chapa, a faixa e a rampa do vinco, a altura do arco e as
+ * bordas do vão saíam inertes, e todos mudam a malha. A área e o volume dão a
+ * ordem de grandeza da mudança, e o hash das posições pega o que as duas somas
+ * compensam. As posições entram ordenadas e sem id de vértice, porque id não é
+ * identidade; o volume é o da divergência sobre as faces da parte, com sinal, e
+ * numa parte aberta só serve de assinatura.
+ */
+export function formaDasPartes(neutro) {
+  const porParte = new Map();
+  for (const face of neutro.F.values()) {
+    if (typeof face.parte !== 'string' || !face.parte) continue;
+    let parte = porParte.get(face.parte);
+    if (!parte) { parte = { area: 0, volume: 0, vertices: new Set() }; porParte.set(face.parte, parte); }
+    const P = face.vs.map((id) => neutro.V.get(id));
+    for (let k = 1; k + 1 < P.length; k++) {
+      const [a, b, c] = [P[0], P[k], P[k + 1]];
+      const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+      const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+      const n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+      parte.area += Math.hypot(n[0], n[1], n[2]) / 2;
+      parte.volume += (a[0] * (b[1] * c[2] - b[2] * c[1]) + a[1] * (b[2] * c[0] - b[0] * c[2]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6;
+    }
+    for (const id of face.vs) parte.vertices.add(id);
+  }
+  return [...porParte.keys()].sort((a, b) => a.localeCompare(b)).map((nome) => {
+    const parte = porParte.get(nome);
+    const posicoes = [...parte.vertices].map((id) => neutro.V.get(id).map((x) => fixo(x, CASAS_DA_POSICAO)).join(',')).sort();
+    return {
+      nome,
+      area: fixo(parte.area, CASAS_DA_AREA),
+      volume: fixo(parte.volume, CASAS_DO_VOLUME),
+      posicoes: `sha256:${sha256Hex(posicoes.join('\n'))}`,
+    };
+  });
+}
+
 /**
  * Assinatura da peça MEDIDA — o que a régua da casa enxerga.
  *
- * Cobre forma (caixa e contagem de faces/corpos por parte) e contato (tipo e
+ * Cobre a caixa e a contagem de faces/corpos por parte, o contato (tipo e
  * distância de cada relação), porque um parâmetro pode mover só a folga entre
- * duas partes sem mexer em nenhuma caixa. Comparação é exata, sem arredondar:
- * a execução já foi provada determinística, então parâmetro que não entra na
- * conta produz bit idêntico, e qualquer diferença é efeito real.
+ * duas partes sem mexer em nenhuma caixa, e, quando vem, a forma de cada parte
+ * por dentro da caixa (`formaDasPartes`). A caixa e a distância entram sem
+ * arredondar: a execução já foi provada determinística, então parâmetro que não
+ * entra na conta produz bit idêntico, e qualquer diferença é efeito real.
  */
-export function assinaturaMedida(descricao) {
+export function assinaturaMedida(descricao, forma = null) {
   const partes = descricao.partes
     .map((p) => [p.nome, p.faces, p.corpos, p.min, p.max])
     .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
   const relacoes = descricao.relacoes
     .map((r) => [r.a, r.b, r.tipo, r.distancia])
     .sort((a, b) => `${a[0]}|${a[1]}`.localeCompare(`${b[0]}|${b[1]}`));
-  return `sha256:${sha256Hex(JSON.stringify({ totais: descricao.totais, partes, relacoes }))}`;
+  return `sha256:${sha256Hex(JSON.stringify({ totais: descricao.totais, partes, relacoes, ...(forma ? { forma } : {}) }))}`;
 }
 
 /**
@@ -136,11 +184,11 @@ function sondas(valor) {
   return lista;
 }
 
-/** Mede uma receita e devolve `{ descricao }` ou `{ erro }`, sem lançar. */
+/** Mede uma receita e devolve `{ descricao, forma }` ou `{ erro }`, sem lançar. */
 function medirReceita(receita) {
   try {
     const { neutro } = executarReceita(receita);
-    return { descricao: descreverPeca(neutro) };
+    return { descricao: descreverPeca(neutro), forma: formaDasPartes(neutro) };
   } catch (erro) {
     return { erro: erro.message };
   }
@@ -187,13 +235,13 @@ export function diagnosticarParametros(receita, { medir = medirReceita } = {}) {
     };
   }
 
-  const assinaturaBase = assinaturaMedida(base.descricao);
+  const assinaturaBase = assinaturaMedida(base.descricao, base.forma);
 
   /* Determinismo primeiro: se a mesma entrada já produz saídas diferentes,
      "mudou" não distingue efeito de ruído e todo o resto perde sentido. */
   const repetida = medir(receitaComParametros(receita, params));
   const determinismo = {
-    estavel: !repetida.erro && assinaturaMedida(repetida.descricao) === assinaturaBase,
+    estavel: !repetida.erro && assinaturaMedida(repetida.descricao, repetida.forma) === assinaturaBase,
   };
 
   const parametros = [];
@@ -211,7 +259,7 @@ export function diagnosticarParametros(receita, { medir = medirReceita } = {}) {
         registro = { ...registro, estado: 'vivo', efeito: 'recusa', mensagem: resultado.erro };
         break;
       }
-      if (assinaturaMedida(resultado.descricao) !== assinaturaBase) {
+      if (assinaturaMedida(resultado.descricao, resultado.forma) !== assinaturaBase) {
         registro = { ...registro, estado: 'vivo', efeito: 'geometria' };
         break;
       }

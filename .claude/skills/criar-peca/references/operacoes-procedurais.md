@@ -325,7 +325,17 @@ de nível 2 ficaria de 1 a 18 cm dele numa forma de 2 m. O preço é a corda: o
 meio de cada face fica mais longe da superfície limite que sem a projeção (no
 cubo de 2 m em nível 2, 5,8 cm contra 2 cm), então suba `niveis` quando a face
 precisar acompanhar a curva, porque essa distância cai de três a quatro vezes a
-cada nível. Marque só as cotas que a peça precisa acertar. A gaiola ajustada se move
+cada nível. Quando a gaiola é amostra de uma forma desenhada e a densidade
+dela varia, marque todos os pontos, e não só as cotas: sem medida, a superfície
+fica para dentro da amostra cerca de curvatura × passo² / 6, e a faixa adensada
+salta para fora do resto (4,5 mm na carenagem de prova, contra 0,3 mm na faixa
+fina), enquanto cada cota medida sozinha vira um calombo. Com todos os pontos
+marcados, gradue o passo para que nenhum intervalo passe do dobro do vizinho,
+porque um salto de quatro vezes ondula a superfície junto da faixa e, junto de
+uma borda livre, espreme as linhas da malha até dobrar a face; e um recorte na
+borda, como um arco, deve levantar as colunas sem mudar a forma que elas
+amostram, ou a forma ganha quina nas pontas do recorte. A eliminação aproveita
+que a matriz é esparsa: mil pontos medidos levam cerca de 0,6 s. A gaiola ajustada se move
 mais que a cota: para passar pelos oito cantos de um cubo de 2 m, o canto da
 gaiola anda até 3 m, e a superfície se desloca no máximo 7% além da correção
 no ponto, de modo que entre os pontos ela quase não incha. Um conjunto de medidas que a superfície
@@ -364,7 +374,11 @@ números que `derivar()` tirou da `TABELA`. Cada estação tem nome, posição `
 no eixo e as colunas nomeadas em ordem, cada uma com `em: [u, v]` nos outros
 dois eixos (na ordem x, y, z) e, se preciso, um terceiro número que desloca o
 ponto ao longo do eixo. O ponto se chama `estacao_coluna`, e o ajudante devolve
-`pontos`, que entram em `PARAMS`, e `passo`, que se espalha no passo:
+`pontos`, que a receita publica num getter de `TOPO` calculado de `this.PARAMS`,
+e `passo`, que se espalha no passo. Em `PARAMS` os pontos ficariam fixos desde a
+carga do módulo, e mudar a `TABELA` não moveria a gaiola; o exemplo completo é
+`procedural/pecas/carenagem-de-prova/`, e o fluxo está em
+`docs/mecanifica/modelar-carroceria.md`:
 
 ```js
 const coluna = (nome, u, v) => ({ nome, em: [u, v] });
@@ -378,9 +392,9 @@ const lateral = gaiolaPorEstacoes({
   estacoes: [secao('frente', 0, false), secao('meio', P.meio, true), secao('pilar', P.pilar, true), secao('tras', P.comprimento, true)],
   vincos: [{ nome: 'ombro', coluna: 'ombro', nitidez: 0.75 }, { nome: 'linhaDeCintura', coluna: 'cintura', nitidez: 'viva' }],
   vaos: [{ nome: 'claraboia', estacoes: ['meio', 'pilar'], colunas: ['ombro', 'centro'] }],
-  medidas: [{ coluna: 'ombro' }],
+  medidas: ['frente', 'meio', 'pilar', 'tras'].map((estacao) => ({ estacao })),
 });
-// PARAMS: { ...derivados, ...lateral.pontos }; passo: ['subdivisao', { origemId: 1, ...lateral.passo, niveis: 2 }]
+// get TOPO() { return { origem, ...lateral.pontos }; }; passo: ['subdivisao', { origemId: 1, ...lateral.passo, niveis: 2 }]
 ```
 
 A coluna liga-se à de mesmo nome na estação anterior. A que surge entre duas

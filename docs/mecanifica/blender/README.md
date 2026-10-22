@@ -14,6 +14,7 @@ O Blender é opcional. A receita do Mecanifica continua sendo o produto, porque 
 | [`USOS-E-LIMITES.md`](USOS-E-LIMITES.md) | os usos do Blender, o que está provado e o que é hipótese, e as regras de licença e de gate |
 | [`REGUA-E-PACOTE-CEGO.md`](REGUA-E-PACOTE-CEGO.md) | o uso de `tools/blender/`: a régua entre duas malhas numa caixa, o pacote cego com grade e avesso marcado, o olhar da candidata nas mesmas câmeras e o gerador do oráculo da subdivisão |
 | [`modelar-veiculos.md`](../modelar-veiculos.md) | as instruções de modelagem de veículo a partir de fonte de referência: técnica das três vistas e seção por grupo |
+| [`modelar-carroceria.md`](../modelar-carroceria.md) | o fluxo da carroceria de chapa contínua por subdivisão: vistas e ficha, gaiola por estações, vincos nomeados e raio de borda, medidas, espessura e o que observar nas vistas |
 
 ## O que está provado
 

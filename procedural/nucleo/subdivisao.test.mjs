@@ -1,7 +1,7 @@
 /* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação, vincos nomeados e vértice sem face. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA } from './subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU } from './subdivisao.js';
 import { enderecosPorIndice } from './operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 
@@ -146,6 +146,44 @@ describe('subdivisão Catmull-Clark com vincos', () => {
         });
       }
     }
+
+    /* A eliminação pula o multiplicador zero e a coluna zero da linha do pivô; as operações que sobram são as da
+       eliminação densa, na mesma ordem, e o resultado tem de ser o mesmo valor a valor. A matriz é esparsa como a das
+       medidas, com pivô fora da diagonal para exercitar a troca de linhas. */
+    it('a eliminação esparsa dá o mesmo resultado da densa, valor a valor', () => {
+      const densa = (A) => {
+        const n = A.length; const M = A.map((r) => [...r]); const perm = [...Array(n).keys()];
+        for (let k = 0; k < n; k++) {
+          let p = k;
+          for (let r = k + 1; r < n; r++) if (Math.abs(M[r][k]) > Math.abs(M[p][k])) p = r;
+          if (p !== k) { [M[p], M[k]] = [M[k], M[p]]; [perm[p], perm[k]] = [perm[k], perm[p]]; }
+          for (let r = k + 1; r < n; r++) { const f = M[r][k] / M[k][k]; M[r][k] = f; for (let c = k + 1; c < n; c++) M[r][c] -= f * M[k][c]; }
+        }
+        const resolver = (b) => {
+          const y = perm.map((i) => b[i]);
+          for (let r = 0; r < n; r++) for (let c = 0; c < r; c++) y[r] -= M[r][c] * y[c];
+          for (let r = n - 1; r >= 0; r--) { for (let c = r + 1; c < n; c++) y[r] -= M[r][c] * y[c]; y[r] /= M[r][r]; }
+          return y;
+        };
+        return { M, perm, resolver };
+      };
+      let semente = 7;
+      const sorteio = () => { semente = (semente * 48271) % 2147483647; return semente / 2147483647; };
+      const n = 80;
+      const A = Array.from({ length: n }, (_, r) => Array.from({ length: n }, (__, c) => {
+        if (c === (r + 3) % n) return 1 + sorteio();
+        return Math.abs(r - c) <= 4 && sorteio() < 0.5 ? sorteio() - 0.5 : 0;
+      }));
+      const esparsa = fatorarLU(A); const ref = densa(A);
+      expect(esparsa.singularEm).toBe(-1);
+      expect(esparsa.perm).toEqual(ref.perm);
+      const iguais = (u, v) => u.length === v.length && u.every((x, k) => x === v[k]);
+      expect(esparsa.M.every((linha, r) => iguais(linha, ref.M[r]))).toBe(true);
+      for (let t = 0; t < 5; t++) {
+        const b = Array.from({ length: n }, (_, k) => (k % (t + 2) === 0 ? sorteio() - 0.5 : 0));
+        expect(iguais(resolverLU(esparsa, b), ref.resolver(b))).toBe(true);
+      }
+    });
 
     it('medidas que o limite não separa falham com os pontos envolvidos, e as mal condicionadas também', () => {
       const cubo = gaiolaDo(oraculo.casos[0]);

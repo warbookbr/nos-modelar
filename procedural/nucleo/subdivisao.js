@@ -216,25 +216,46 @@ function estrelaDe(V, F, facesDoVertice, nitidez, i) {
  * para a fatoração e devolve a coluna em que ela parou. */
 const PIVO_NULO = 1e-12;
 
-function fatorarLU(A) {
+/* A matriz das medidas é esparsa (cada ponto só pesa a sua estrela), e a eliminação pula o que é zero: a linha cujo
+ * multiplicador é zero e a coluna em que a linha do pivô é zero. As operações que sobram são as mesmas, na mesma ordem,
+ * de modo que o resultado é o da eliminação densa (o termo pulado somaria um zero). Com mil medidas, a densa levava
+ * cerca de 4 s, quase todos na inversa do ganho. */
+export function fatorarLU(A) {
   const n = A.length; const M = A.map((r) => [...r]); const perm = [...Array(n).keys()];
   for (let k = 0; k < n; k++) {
     let p = k;
     for (let r = k + 1; r < n; r++) if (Math.abs(M[r][k]) > Math.abs(M[p][k])) p = r;
     if (Math.abs(M[p][k]) <= PIVO_NULO) return { M, perm, singularEm: k };
     if (p !== k) { [M[p], M[k]] = [M[k], M[p]]; [perm[p], perm[k]] = [perm[k], perm[p]]; }
+    const linha = M[k]; const colunas = [];
+    for (let c = k + 1; c < n; c++) if (linha[c] !== 0) colunas.push(c);
     for (let r = k + 1; r < n; r++) {
-      const f = M[r][k] / M[k][k]; M[r][k] = f;
-      for (let c = k + 1; c < n; c++) M[r][c] -= f * M[k][c];
+      if (M[r][k] === 0) continue;
+      const f = M[r][k] / linha[k]; const Mr = M[r]; Mr[k] = f;
+      for (const c of colunas) Mr[c] -= f * linha[c];
     }
   }
   return { M, perm, singularEm: -1 };
 }
 
-function resolverLU({ M, perm }, b) {
-  const n = M.length; const y = perm.map((i) => b[i]);
-  for (let r = 0; r < n; r++) for (let c = 0; c < r; c++) y[r] -= M[r][c] * y[c];
-  for (let r = n - 1; r >= 0; r--) { for (let c = r + 1; c < n; c++) y[r] -= M[r][c] * y[c]; y[r] /= M[r][r]; }
+/* As posições não nulas de L e de U por linha, em ordem crescente de coluna, guardadas na fatoração na primeira vez. */
+function naoNulos(lu) {
+  if (!lu.nz) {
+    const n = lu.M.length;
+    lu.nz = lu.M.map((linha, r) => {
+      const L = [], U = [];
+      for (let c = 0; c < r; c++) if (linha[c] !== 0) L.push(c);
+      for (let c = r + 1; c < n; c++) if (linha[c] !== 0) U.push(c);
+      return { L, U };
+    });
+  }
+  return lu.nz;
+}
+
+export function resolverLU(lu, b) {
+  const { M, perm } = lu; const n = M.length; const y = perm.map((i) => b[i]); const nz = naoNulos(lu);
+  for (let r = 0; r < n; r++) for (const c of nz[r].L) y[r] -= M[r][c] * y[c];
+  for (let r = n - 1; r >= 0; r--) { for (const c of nz[r].U) y[r] -= M[r][c] * y[c]; y[r] /= M[r][r]; }
   return y;
 }
 
