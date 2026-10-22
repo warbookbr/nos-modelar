@@ -113,6 +113,36 @@ describe.skipIf(!temPillow)('leitura do pacote cego desenhado por código', () =
     expect(cobertura).toBeGreaterThan(0.85);
   });
 
+  it('ler-linhas dá o ângulo da dobra de cada curva 3D que atravessa um corte, com a incerteza', () => {
+    // a dobra exata é o ângulo entre as normais das duas faces do vinco mais perto do ponto onde a curva atravessa o corte
+    const exata = (ponto) => {
+      let melhor = null;
+      for (const a of vincos()) {
+        const d = distancias([ponto], [{ fechada: false, pontos: a.pontos.map((q) => q.map((v) => v * 1000)) }])[0];
+        if (!melhor || d < melhor.d) melhor = { d, graus: (Math.acos(a.normais[0].reduce((s, v, i) => s + v * a.normais[1][i], 0)) * 180) / Math.PI };
+      }
+      return melhor;
+    };
+    const r3 = lidos.linhas.linhas_3d;
+    expect(r3.angulo_pelos_cortes).toEqual(['secao', 'longitudinal']);
+    const medidas = r3.polilinhas_3d.flatMap((l) => (l.angulo_travessias || []).map((t) => ({ ...t, curva: l })));
+    // as seis longitudinais atravessam a seção (90, 39,8 e 33,5 graus dos dois lados) e a borda de baixo e o arco da frente
+    // atravessam o corte longitudinal (116,6 e perto de 64 graus)
+    expect(medidas.length).toBeGreaterThanOrEqual(8);
+    const verdades = new Set();
+    for (const m of medidas) {
+      const e = exata(m.ponto_mm);
+      expect(e.d, JSON.stringify(m.ponto_mm)).toBeLessThan(r3.tolerancia_mm);
+      verdades.add(Math.round(e.graus));
+      const erro = Math.abs(m.angulo_graus - e.graus);
+      expect(erro, `${m.corte} ${JSON.stringify(m.ponto_mm)}: ${m.angulo_graus} contra ${e.graus.toFixed(2)}`).toBeLessThanOrEqual(m.incerteza_graus);
+      expect(erro).toBeLessThan(1.5);
+      expect(m.incerteza_graus).toBeLessThan(3);
+      expect(m.curva.angulo_graus).toBe(m.angulo_graus);
+    }
+    expect([...verdades].sort((a, b) => a - b)).toEqual([34, 40, 64, 90, 117]);
+  });
+
   it('comparar-cortes dá zero a menos do erro de leitura para a forma contra ela mesma e o desvio conhecido para a deslocada', () => {
     const contornos = (desloca) => ({ cortes: CORTES.map((c) => ({ corte: c.nome, eixo: c.eixo, valor_mm: c.valor * 1000, eixos_uv: c.eixos_uv,
       polilinhas: corte(c.eixo, c.valor, desloca).map((q) => ({ fechada: q.fechada, pontos_mm: q.pontos })) })) });

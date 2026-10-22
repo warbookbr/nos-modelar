@@ -4,7 +4,7 @@
 #
 # Uso:
 #   python3 tools/blender/ler-linhas.py --pacote <pasta do pacote ou vistas/> [--vista frente,lado,topo] [--3d]
-#       [--simetria-x | --sem-simetria] [--tolerancia-mm 3] [--saida <arq.json>]
+#       [--simetria-x | --sem-simetria] [--tolerancia-mm 3] [--sem-angulo] [--saida <arq.json>]
 #
 # Lê vistas/<vista>-linhas.png com a câmera de vistas/camera.json. A grade, o título e a barra de escala saem por
 # redesenho: a grade de cada vista depende só da câmera, e a leitura a redesenha (imagens.desenhar_grade) sobre um fundo
@@ -17,7 +17,10 @@
 # Com --3d, cada par de vistas alinhadas de direções diferentes (a primeira de cada eixo, ou as de --vista) casa os trechos
 # de traço preto pelo eixo comum, e a terceira vista confere a curva candidata (leitura.linhas_3d); sai a confiança 'alta'
 # (única dos dois lados e conferida) ou 'media', e as ambíguas só se contam. A simetria em x vem de pacote.json, se houver;
-# --simetria-x e --sem-simetria a forçam. Sem --saida, imprime o JSON.
+# --simetria-x e --sem-simetria a forçam. Se o pacote tem cortes, cada curva 3D que atravessa um corte ganha o ângulo da
+# dobra naquele ponto (leitura.com_angulos): o canto que o contorno do corte faz ali dá a direção das duas faces no plano, e
+# a dobra sai delas e da tangente da curva, com a incerteza em graus; a curva que não atravessa corte fica sem o campo, e
+# --sem-angulo não o calcula. Sem --saida, imprime o JSON.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import leitura as L
@@ -25,7 +28,7 @@ import leitura as L
 a = L.argumentos()
 if 'pacote' not in a:
     L.erro('falta --pacote <pasta do pacote ou vistas/>')
-pasta, _ = L.pastas_do_pacote(a['pacote'])
+pasta, pasta_cortes = L.pastas_do_pacote(a['pacote'])
 arq_cam = os.path.join(pasta, 'camera.json')
 if not os.path.exists(arq_cam):
     L.erro(f'{pasta}: sem camera.json')
@@ -50,4 +53,10 @@ if a.get('3d'):
         simetria = False
     tol = float(a['tolerancia_mm']) if 'tolerancia_mm' in a else None
     saida['linhas_3d'] = L.linhas_3d(leituras, cameras, tol_mm=tol, simetria_x=simetria)
+    arq_q = os.path.join(pasta_cortes, 'quadro.json')
+    if not a.get('sem_angulo') and os.path.exists(arq_q):
+        quadros = json.load(open(arq_q))
+        cortes = [L.ler_corte(os.path.join(pasta_cortes, f'{n}.png'), q, n) for n, q in quadros.items()
+                  if os.path.exists(os.path.join(pasta_cortes, f'{n}.png'))]
+        L.com_angulos(saida['linhas_3d'], cortes)
 L.gravar_json(saida, a.get('saida'))

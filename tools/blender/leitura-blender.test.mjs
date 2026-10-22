@@ -115,6 +115,19 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
     expect(linhas.length).toBeGreaterThan(3);
     expect(distanciasA(pontosDe(linhas, 2), verdade, r3.tolerancia_mm)).toBeGreaterThan(0.95);
     expect(distanciasA(pontosDe(verdade, 2), linhas, r3.tolerancia_mm)).toBeGreaterThan(0.7);
+    // o ângulo da dobra onde a curva atravessa um corte, contra o da aresta exata mais perto
+    const medidas = r3.polilinhas_3d.flatMap((l) => l.angulo_travessias || []);
+    expect(medidas.length).toBeGreaterThanOrEqual(6);
+    for (const m of medidas) {
+      let melhor = null;
+      for (const a of vincos()) {
+        const d = distancias([m.ponto_mm], [{ fechada: false, pontos: a.pontos.map((q) => q.map((v) => v * 1000)) }])[0];
+        if (!melhor || d < melhor.d) melhor = { d, graus: (Math.acos(a.normais[0].reduce((s, v, i) => s + v * a.normais[1][i], 0)) * 180) / Math.PI };
+      }
+      const erro = Math.abs(m.angulo_graus - melhor.graus);
+      expect(erro, `${m.corte} ${JSON.stringify(m.ponto_mm)}: ${m.angulo_graus} contra ${melhor.graus.toFixed(2)}`).toBeLessThanOrEqual(m.incerteza_graus);
+      expect(erro).toBeLessThan(1.5);
+    }
   });
 
   it('comparar-cortes dá zero a menos do erro de leitura para a forma e o desvio conhecido para a deslocada', { timeout: 600000 }, () => {
