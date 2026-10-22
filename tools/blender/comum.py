@@ -32,6 +32,13 @@ PADRAO = {
     'cortes': [],                 # lista de {nome, eixo: 'x'|'y'|'z', valor (m)}: cortes planos cotados do pacote
     'passo_corte_regua': 0.01,    # m: passo dos pontos do contorno de cada corte no JSON privado (só para a régua)
     'omitidas': [],               # rótulos que a régua relata à parte, como regiões que a candidata pode omitir
+    'mapa_sinal_mm': 4.0,         # mm: escala (±) do mapa de distância com sinal da régua; 0 tira o mapa com sinal das imagens
+    'resolucao_vista': [1440, 1080],  # px: cada painel da imagem grande por vista da régua; 0 ou nulo não grava as imagens
+    'curvatura_raio_mm': 20.0,    # mm: vizinhança fixa em que a régua mede o ângulo de normal para comparar a curvatura
+    'curvatura_densidade': 160000.0,  # amostras por m² da superfície visível em que a curvatura se mede (as da distância são menos)
+    'curvatura_pareamento_mm': 40.0,  # mm: ponto da referência a mais que isto da candidata não entra na curvatura comparada
+    'curvatura_limite_1_m': 15.0, # 1/m: diferença de curvatura acima da qual o ponto conta em fracao_acima_limite; a região passa com até 10% deles
+    'ampliacao_mm': 120.0,        # mm: largura da ampliação em grade de 10 mm de cada corte da régua
 }
 
 
@@ -67,6 +74,23 @@ def _juntar(base, novo):
             base[k] = v
 
 
+def cortes_da_linha(texto):
+    """Os cortes de `--cortes z=1.0,x=0.72`: cada par eixo=valor (em metro) vira {nome, eixo, valor}, com o nome no eixo e no
+    valor em milímetro (z1000, x720)."""
+    out = []
+    for par in [s for s in texto.split(',') if s]:
+        eixo, _, valor = par.partition('=')
+        eixo = eixo.strip().lower()
+        try:
+            v = float(valor)
+        except ValueError:
+            v = None
+        if eixo not in ('x', 'y', 'z') or v is None:
+            erro(f'corte "{par}": use eixo=valor em metro, como z=1.0')
+        out.append({'nome': f'{eixo}{int(round(v * 1000))}', 'eixo': eixo, 'valor': v})
+    return out
+
+
 def configuracao(a, exige_caixa=True):
     """PADRAO, depois o --config do usuário (JSON fora do repositório), depois os argumentos da linha de comando."""
     cfg = json.loads(json.dumps(PADRAO))
@@ -85,6 +109,13 @@ def configuracao(a, exige_caixa=True):
         cfg['omitidas'] = [s for s in a['omitidas'].split(',') if s]
     if 'resolucao' in a:
         cfg['resolucao'] = [int(s) for s in a['resolucao'].split('x')]
+    if 'resolucao_vista' in a:
+        cfg['resolucao_vista'] = [int(s) for s in a['resolucao_vista'].split('x')]
+    for k in ('mapa_sinal_mm', 'curvatura_raio_mm', 'curvatura_pareamento_mm', 'curvatura_limite_1_m', 'ampliacao_mm'):
+        if k in a:
+            cfg[k] = float(a[k])
+    if isinstance(a.get('cortes'), str):
+        cfg['cortes'] = cortes_da_linha(a['cortes'])
     if 'caixa' in cfg:
         c = np.array(cfg['caixa'], float).reshape(3, 2)
         if np.any(c[:, 0] >= c[:, 1]):
@@ -467,6 +498,26 @@ class Visibilidade:
                     break
         return ok
 
+    def lado_externo(self, p, n):
+        """+1 se a frente da normal n, no ponto p, é o lado de fora; -1 se é o verso (o avesso); +1 também quando não decide.
+        Dos raios das direções permitidas que saem do ponto sem bater no oclusor, conta os que saem pela frente e os que saem
+        por trás (o rasante, a menos de 0,05 do plano, não conta); só decide com o dobro de um lado contra o outro, de modo
+        que a chapa solta, vista pelos dois lados, fica com a normal que tem."""
+        lado = -1 if self.simetria and p[0] < 0 else 1
+        dirs, _ = self.d[lado]
+        pv, nv = Vector(p), Vector(n)
+        frente = tras = 0
+        for d in dirs[::2]:
+            c = d.dot(nv)
+            if abs(c) < 0.05:
+                continue
+            if self.arvore.ray_cast(pv + d * DESLOCAMENTO, d)[0] is None:
+                if c > 0:
+                    frente += 1
+                else:
+                    tras += 1
+        return -1 if tras >= 2 * max(frente, 1) else 1
+
     def triangulos(self, V, F, mascara=None):
         """Triângulo visível: o centro ou um dos três pontos a 2/3 do caminho do centro a cada vértice se vê de fora."""
         N, _ = normais(V, F)
@@ -479,6 +530,116 @@ class Visibilidade:
             pts = sum(wk * V[F[falta, k]] for k, wk in enumerate(w))
             ok[falta] = self.pontos(pts, N[falta])
         return ok
+
+
+def amostras_regulares(V, F, mascara, densidade, maximo):
+    """Amostras por área em retícula, sem acaso: cada triângulo da máscara se divide em n² triângulos iguais, com n o menor
+    inteiro que dá ao menos `densidade` amostras por m², e leva uma amostra no centro de cada um. Devolve (P, T, W): o ponto,
+    o triângulo e o peso (a área que a amostra representa, em m²). Se passaria de `maximo` amostras, a densidade cai até caber.
+    A mesma superfície triangulada do mesmo jeito dá as mesmas amostras, e a triangulada de outro jeito, amostras de mesma
+    densidade e sem o ruído de contagem do sorteio, que numa dobra dentro da vizinhança variava a fração de cada lado."""
+    idx = np.nonzero(mascara)[0]
+    _, area = normais(V, F[idx])
+    n = np.maximum(1, np.ceil(np.sqrt(area * densidade))).astype(int)
+    while (n * n).sum() > maximo:
+        densidade *= 0.8
+        n = np.maximum(1, np.ceil(np.sqrt(area * densidade))).astype(int)
+    P, T, W = [], [], []
+    for k in np.unique(n):
+        sel = np.nonzero(n == k)[0]
+        a = np.array([(i, j) for i in range(k) for j in range(k - i)], float).reshape(-1, 2)
+        b = np.array([(i, j) for i in range(k) for j in range(k - 1 - i)], float).reshape(-1, 2)
+        u = np.concatenate([(a[:, 0] + 1 / 3) / k, (b[:, 0] + 2 / 3) / k])
+        w = np.concatenate([(a[:, 1] + 1 / 3) / k, (b[:, 1] + 2 / 3) / k])
+        bary = np.stack([1 - u - w, u, w], 1)
+        tri = F[idx[sel]]
+        pts = np.einsum('mc,tcx->tmx', bary, V[tri]).reshape(-1, 3)
+        P.append(pts)
+        T.append(np.repeat(idx[sel], len(bary)))
+        W.append(np.repeat(area[sel] / (k * k), len(bary)))
+    if not P:
+        return np.zeros((0, 3)), np.zeros(0, int), np.zeros(0)
+    return np.vstack(P), np.concatenate(T), np.concatenate(W)
+
+
+def curvatura_em(P, Q, N, W, raio, minimo=0.1):
+    """Curvatura equivalente, em 1/m, em cada ponto de consulta P (m), sobre as amostras Q (m) de normal N e peso W (m²,
+    de amostras_regulares): o ângulo médio, pesado, entre a normal de cada amostra a até raio (m) e o eixo dominante das
+    normais da vizinhança (o autovetor maior de Σ w n nᵀ, que não depende da orientação de cada face), vezes 3π/(4 raio).
+    Num cilindro de raio r esse ângulo médio é 4 raio/(3π r), e a conta devolve 1/r; numa dobra dentro da vizinhança, o ângulo
+    da dobra entra na média pela fração da área da vizinhança que fica do lado menor dela (a medida cresce até o ponto em que
+    a dobra divide a vizinhança ao meio). Não usa a normal do ponto de consulta, que numa malha facetada pula de uma faceta à
+    outra, e só usa posição, normal e área de amostras, de modo que não depende de como a superfície foi triangulada e a
+    consulta pode ser feita no mesmo ponto em duas superfícies. NaN onde a vizinhança tem menos de `minimo` de um disco de
+    área (a borda da superfície tem meio disco)."""
+    out = np.full(len(P), np.nan)
+    if not len(P) or not len(Q):
+        return out
+
+    def grupos(X):
+        ids, inv = np.unique(np.floor(X / raio).astype(np.int64), axis=0, return_inverse=True)
+        inv = inv.ravel()
+        ordem = np.argsort(inv, kind='stable')
+        corte = np.searchsorted(inv[ordem], np.arange(len(ids) + 1))
+        return ids, [ordem[corte[k]:corte[k + 1]] for k in range(len(ids))]
+    idp, mp = grupos(P)
+    idq, mq = grupos(Q)
+    indice = {tuple(c): k for k, c in enumerate(idq)}
+    desloc = [(i, j, k) for i in (-1, 0, 1) for j in (-1, 0, 1) for k in (-1, 0, 1)]
+    for k, c in enumerate(idp):
+        viz = [mq[indice[t]] for t in ((c[0] + a, c[1] + b, c[2] + d) for a, b, d in desloc) if t in indice]
+        if not viz:
+            continue
+        cand = np.concatenate(viz)
+        q = mp[k]
+        Nc, Wc = N[cand], W[cand]
+        peso = (((P[q][:, None, :] - Q[cand][None, :, :]) ** 2).sum(2) <= raio * raio) * Wc[None, :]
+        area = peso.sum(1)
+        S = (peso @ (Nc[:, :, None] * Nc[:, None, :]).reshape(len(cand), 9)).reshape(-1, 3, 3)
+        eixo = np.linalg.eigh(S)[1][:, :, -1]
+        ang = np.arccos(np.clip(np.abs(eixo @ Nc.T), 0.0, 1.0))
+        media = (ang * peso).sum(1) / np.maximum(area, 1e-30)
+        out[q] = np.where(area >= minimo * math.pi * raio * raio, media, np.nan)
+    return 0.75 * math.pi * out / raio
+
+
+def distancia_a_polilinhas(P, cadeias):
+    """Distância de cada ponto de P (n, 2) ao segmento mais perto das cadeias (listas de pontos (k, 2)), exata e não de
+    ponto a ponto; inf se não há cadeia."""
+    A = np.vstack([c[:-1] for c in cadeias if len(c) >= 2]) if any(len(c) >= 2 for c in cadeias) else np.zeros((0, 2))
+    B = np.vstack([c[1:] for c in cadeias if len(c) >= 2]) if len(A) else np.zeros((0, 2))
+    if not len(A):
+        return np.full(len(P), np.inf)
+    d = B - A
+    ll = np.maximum((d * d).sum(1), 1e-30)
+    out = np.empty(len(P))
+    for i in range(0, len(P), 256):
+        Q = P[i:i + 256]
+        t = np.clip(((Q[:, None, :] - A[None]) * d[None]).sum(2) / ll[None], 0.0, 1.0)
+        pr = A[None] + t[:, :, None] * d[None]
+        out[i:i + 256] = np.sqrt(((Q[:, None, :] - pr) ** 2).sum(2).min(1))
+    return out
+
+
+def ondulacao_da_receita(receita):
+    """Roda tools/mecanifica/ondulacao-da-superficie.mjs na receita e devolve as falhas abertas (as que não estão junto de
+    vinco, borda ou canto declarados), a maior amplitude em mm e as cinco maiores, com os pontos da gaiola a mexer."""
+    receita = os.path.abspath(receita)
+    if not os.path.exists(receita):
+        erro(f'--receita {receita}: o arquivo não existe')
+    raiz = os.path.dirname(os.path.dirname(AQUI))
+    r = subprocess.run([os.environ.get('MECANIFICA_NODE', 'node'), os.path.join(raiz, 'tools', 'mecanifica', 'ondulacao-da-superficie.mjs'),
+                        receita], capture_output=True, text=True, cwd=raiz)
+    if r.returncode != 0:
+        erro(f'ondulacao-da-superficie.mjs saiu com {r.returncode}:\n{r.stderr[-1500:]}')
+    d = json.loads(r.stdout)
+    falhas = [f | {'passo': s['passo']} for s in d['superficies'] for f in s['falhas']]
+    falhas.sort(key=lambda f: -f['amplitudeMm'])
+    return {'receita': os.path.basename(receita), 'superficies': len(d['superficies']), 'falhas_abertas': len(falhas),
+            'maior_amplitude_mm': falhas[0]['amplitudeMm'] if falhas else 0.0,
+            'junto_de_feicao_declarada': sum(len(s['junto']) for s in d['superficies']),
+            'maiores': [{'tipo': f['tipo'], 'amplitude_mm': f['amplitudeMm'], 'extensao_mm': f['extensaoMm'], 'posicao_mm': f['posicaoMm'],
+                         'pontos': [p['nome'] for p in f['pontos']], 'passo': f['passo']} for f in falhas[:5]]}
 
 
 def ler_oclusores(caminho, z_cima=False):

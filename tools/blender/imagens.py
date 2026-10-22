@@ -14,8 +14,16 @@
 #       tabela curta <pasta>/cotas.md e o quadro de cada desenho em <pasta>/quadro.json. Com <quadro.json>, usa o quadro dado
 #       (para desenhar outra malha na mesma escala e posição) e não o regrava.
 #   python3 -I imagens.py folha <pasta> <metricas.json> <vista,vista,...>
-#       Compõe <pasta>/folha.png: linhas referência e candidata em cinza e em listras de reflexo e o mapa de distância,
-#       colunas as vistas, e o resumo das medidas no alto.
+#       Compõe <pasta>/folha.png: linhas referência e candidata em cinza e em listras de reflexo, o mapa de distância e o
+#       mapa com sinal (se há), colunas as vistas, e o resumo das medidas no alto.
+#   python3 -I imagens.py vista <vista.json>
+#       Compõe uma imagem grande de uma vista ({saida, paineis: [{arquivo, titulo, subtitulo, px_por_mm, legenda_mm?}]}): os
+#       painéis lado a lado, recortados pelo mesmo retângulo ao conteúdo de todos (o fundo é branco), cada um com título,
+#       subtítulo e barra de escala em milímetro, e com legenda de cor (azul, branco, vermelho) onde legenda_mm é dado.
+#   python3 -I imagens.py perfis <perfis.json> <pasta>
+#       Desenha, de cada corte de perfis.json, os perfis sobrepostos em milímetro: <pasta>/corte-<nome>.png com o corte inteiro
+#       e <pasta>/corte-<nome>-ampliado.png em grade de 10 mm em volta do trecho declarado ou do de maior diferença, com a
+#       referência em preto e cada candidata numa cor.
 import json, math, os, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -359,15 +367,158 @@ def cortes(arq_json, pasta, arq_quadro=None):
     if not arq_quadro:
         json.dump(novo_quadro, open(os.path.join(pasta, 'quadro.json'), 'w'), indent=1)
 
+COR_AZUL, COR_BRANCO, COR_VERMELHO = (26, 64, 217), (247, 247, 247), (217, 31, 20)   # as do mapa com sinal da régua
+CORES_CANDIDATAS = [(230, 110, 0), (0, 110, 230), (30, 150, 60), (170, 40, 160)]
+
+
+def _conteudo(im, folga=252):
+    """Caixa (x0, y0, x1, y1) dos pixels que não são fundo branco, ou None."""
+    a = np.asarray(im.convert('RGB'))
+    m = (a < folga).any(2)
+    if not m.any():
+        return None
+    ys, xs = np.nonzero(m)
+    return xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
+
+
+def _barra_de_escala(d, f, x0, y1, px_por_mm):
+    """Barra de escala de cerca de 120 px, em milímetro redondo, com o canto inferior esquerdo em (x0, y1)."""
+    mm = passo_redondo(120 / px_por_mm)
+    L = mm * px_por_mm
+    texto = f'{mm:g} mm'
+    tb = d.textbbox((0, 0), texto, font=f)
+    d.rectangle([x0 - 4, y1 - 38, x0 + max(L, tb[2]) + 4, y1 - 4], fill=(255, 255, 255))
+    d.rectangle([x0, y1 - 34, x0 + L, y1 - 24], fill=(0, 0, 0))
+    d.text((x0, y1 - 22), texto, fill='black', font=f)
+
+
+def vista(arq_json):
+    d = json.load(open(arq_json))
+    imgs = [Image.open(p['arquivo']).convert('RGB') for p in d['paineis']]
+    caixas = [c for c in map(_conteudo, imgs) if c]
+    W, H = imgs[0].size
+    folga = 18
+    if caixas:
+        x0, y0 = max(0, min(c[0] for c in caixas) - folga), max(0, min(c[1] for c in caixas) - folga)
+        x1, y1 = min(W, max(c[2] for c in caixas) + folga), min(H, max(c[3] for c in caixas) + folga)
+    else:
+        x0, y0, x1, y1 = 0, 0, W, H
+    cw, ch = x1 - x0, y1 - y0
+    TH, GAP = 84, 14
+    BH = 44   # a faixa da barra de escala, abaixo do conteúdo
+    out = Image.new('RGB', (len(imgs) * cw + (len(imgs) - 1) * GAP, TH + ch + BH), 'white')
+    dr = ImageDraw.Draw(out)
+    ft, fs = fonte(22), fonte(16)
+    for i, (im, p) in enumerate(zip(imgs, d['paineis'])):
+        ox = i * (cw + GAP)
+        out.paste(im.crop((x0, y0, x1, y1)), (ox, TH))
+        dr.text((ox + 8, 6), p['titulo'], fill='black', font=ft)
+        if p.get('subtitulo'):
+            dr.text((ox + 8, 36), p['subtitulo'], fill=(50, 50, 50), font=fs)
+        lg = p.get('legenda_mm')
+        if lg:
+            bx, by, bl = ox + 8, 62, max(40, min(cw - 190, 260))
+            for k in range(int(bl)):
+                t = 2 * k / max(bl - 1, 1) - 1
+                a, b = (COR_AZUL, COR_BRANCO) if t < 0 else (COR_BRANCO, COR_VERMELHO)
+                u = t + 1 if t < 0 else t
+                cor = tuple(int(round(a[j] * (1 - u) + b[j] * u)) for j in range(3))
+                dr.line([(bx + k, by), (bx + k, by + 12)], fill=cor)
+            dr.rectangle([bx, by, bx + bl, by + 12], outline=(120, 120, 120))
+            dr.text((bx + bl + 8, by - 3), f'-{lg:g} / 0 / +{lg:g} mm', fill='black', font=fs)
+        if p.get('px_por_mm'):
+            _barra_de_escala(dr, fs, ox + 10, TH + ch + BH, p['px_por_mm'])
+        if i:
+            dr.line([(ox - GAP // 2, 0), (ox - GAP // 2, TH + ch + BH)], fill=(200, 200, 200))
+    out.save(d['saida'])
+
+
+def _desenhar_perfis(c, janela, passo, titulo, legenda, arquivo, marcas=(), W=1400, H=1050):
+    u0, u1, v0, v1 = janela
+    esc = min(W / (u1 - u0), H / (v1 - v0))
+    cu, cv = (u0 + u1) / 2, (v0 + v1) / 2
+    px = lambda p: (W / 2 + (p[0] - cu) * esc, H / 2 - (p[1] - cv) * esc)
+    im = Image.new('RGB', (W, H), 'white')
+    dr = ImageDraw.Draw(im, 'RGBA')
+    f, fp = fonte(17), fonte(14)
+    U, Vn = c['eixos_uv']
+    umin, umax, vmin, vmax = cu - W / 2 / esc, cu + W / 2 / esc, cv - H / 2 / esc, cv + H / 2 / esc
+    rotulo_a_cada = max(1, int(math.ceil(46 / (passo * esc))))
+    for k in range(math.floor(umin / passo), math.ceil(umax / passo) + 1):
+        x, _ = px((k * passo, 0))
+        forte = k % rotulo_a_cada == 0
+        dr.line([(x, 0), (x, H)], fill=(*COR_X, 100 if forte else 40))
+        if forte:
+            dr.text((x + 3, H - 20), f'{U}={k * passo:g}', fill=(0, 60, 160), font=fp)
+    for k in range(math.floor(vmin / passo), math.ceil(vmax / passo) + 1):
+        _, y = px((0, k * passo))
+        forte = k % rotulo_a_cada == 0
+        dr.line([(0, y), (W, y)], fill=(*COR_Y, 100 if forte else 40))
+        if forte:
+            dr.text((4, y - 17), f'{Vn}={k * passo:g}', fill=(20, 100, 20), font=fp)
+    for k, cand in enumerate(c['candidatas']):
+        cor = CORES_CANDIDATAS[k % len(CORES_CANDIDATAS)]
+        for cad in cand['cadeias']:
+            if len(cad) >= 2:
+                dr.line([px(p) for p in cad], fill=cor, width=3, joint='curve')
+    for cad in c['referencia']:
+        if len(cad) >= 2:
+            dr.line([px(p) for p in cad], fill=(0, 0, 0), width=3, joint='curve')
+    for (u, v), cor in marcas:
+        x, y = px((u, v))
+        dr.ellipse([x - 11, y - 11, x + 11, y + 11], outline=cor, width=2)
+    linhas = [(titulo, (0, 0, 0))] + legenda
+    for i, (t, cor) in enumerate(linhas):
+        bb = dr.textbbox((10, 8 + 22 * i), t, font=f)
+        dr.rectangle(bb, fill=(255, 255, 255, 225))
+        dr.text((10, 8 + 22 * i), t, fill=cor, font=f)
+    im.save(arquivo)
+
+
+def _janela_4x3(c0, c1, d0, d1):
+    """A janela (u0, u1, v0, v1) de proporção 4 por 3 que contém o retângulo dado, com o mesmo centro."""
+    w, h = c1 - c0, d1 - d0
+    if w * 3 < h * 4:
+        w = h * 4 / 3
+    else:
+        h = w * 3 / 4
+    cu, cv = (c0 + c1) / 2, (d0 + d1) / 2
+    return cu - w / 2, cu + w / 2, cv - h / 2, cv + h / 2
+
+
+def perfis(arq_json, pasta):
+    d = json.load(open(arq_json))
+    os.makedirs(pasta, exist_ok=True)
+    for c in d['cortes']:
+        todas = [np.asarray(x, float) for x in c['referencia'] + [y for cd in c['candidatas'] for y in cd['cadeias']] if len(x) >= 2]
+        P = np.vstack(todas) if todas else np.zeros((2, 2)) + np.array([[0.0, 0.0], [1.0, 1.0]])
+        lo, hi = P.min(0), P.max(0)
+        folga = 0.06 * float(max(hi - lo)) + 1e-3
+        janela = _janela_4x3(lo[0] - folga, hi[0] + folga, lo[1] - folga, hi[1] + folga)
+        passo = passo_redondo((janela[1] - janela[0]) / 14)
+        legenda = [('referência em preto', (0, 0, 0))]
+        for k, cand in enumerate(c['candidatas']):
+            legenda.append((f"{cand['nome']}: {cand['resumo']}", CORES_CANDIDATAS[k % len(CORES_CANDIDATAS)]))
+        marcas = [(tuple(m), CORES_CANDIDATAS[k % len(CORES_CANDIDATAS)]) for k, m in enumerate(c.get('maximas', [])) if m]
+        t = f"corte {c['nome']}: plano {c['eixo']} = {c['valor_mm']:g} mm; {c['eixos_uv'][0]} na horizontal, {c['eixos_uv'][1]} na vertical, grade de {passo:g} mm"
+        _desenhar_perfis(c, janela, passo, t, legenda, os.path.join(pasta, f"corte-{c['nome']}.png"), marcas)
+        z = c.get('ampliacao')
+        if z:
+            zj = _janela_4x3(*z)
+            tz = (f"corte {c['nome']} ampliado: plano {c['eixo']} = {c['valor_mm']:g} mm; {c['eixos_uv'][0]} de {zj[0]:.0f} a {zj[1]:.0f}, "
+                  f"{c['eixos_uv'][1]} de {zj[2]:.0f} a {zj[3]:.0f} mm; grade de 10 mm")
+            _desenhar_perfis(c, zj, 10, tz, legenda, os.path.join(pasta, f"corte-{c['nome']}-ampliado.png"), marcas)
+
 
 def folha(pasta, arq_metricas, vistas):
     met = json.load(open(arq_metricas))
     linhas = [('ref_cinza', 'referência'), ('cand_cinza', 'candidata'), ('ref_zebra', 'ref. listras'),
-              ('cand_zebra', 'cand. listras'), ('mapa', 'distância')]
+              ('cand_zebra', 'cand. listras'), ('mapa', 'distância'), ('mapa_sinal', 'com sinal')]
     cols = vistas.split(',')
+    linhas = [(l, r) for l, r in linhas if os.path.exists(f'{pasta}/{l}-{cols[0]}.png')]
     amostra = Image.open(f'{pasta}/ref_cinza-{cols[0]}.png')
     W, H = amostra.size
-    ML, MT = 140, 96
+    ML, MT = 140, 124
     img = Image.new('RGB', (ML + W * len(cols), MT + H * len(linhas) + 40), 'white')
     dr = ImageDraw.Draw(img)
     f = fonte(17)
@@ -376,6 +527,15 @@ def folha(pasta, arq_metricas, vistas):
             f"precisão {vc['precisao_5mm']}/{vc['precisao_10mm']}, desvio mediano {vc['desvio_mediana_mm']} mm)", fill='black', font=f)
     dr.text((10, 32), f"ref→cand mediana {rc['mediana']} / p90 {rc['p90']} mm; cand→ref mediana {cr['mediana']} / p90 {cr['p90']} mm; "
             f"normal p90 {met['normal_ref_para_cand_graus']['p90']}°; vértices na caixa {met['vertices_na_caixa']}", fill='black', font=f)
+    cv = met.get('curvatura')
+    if cv:
+        t = cv['total']
+        dr.text((10, 56), f"curvatura (raio {cv['raio_mm']:g} mm, 1/m): diferença mediana {t['diferenca_abs_1_m']['mediana']} / p90 {t['diferenca_abs_1_m']['p90']} / "
+                f"p99 {t['diferenca_abs_1_m']['p99']}; falta (dobra a menos) p99 {t['falta_1_m']['p99']}; excesso (ondulação) p99 {t['excesso_1_m']['p99']}",
+                fill='black', font=f)
+    ond = met.get('ondulacao_da_receita')
+    if ond:
+        dr.text((10, 80), f"ondulação da receita: {ond['falhas_abertas']} falhas abertas, a maior de {ond['maior_amplitude_mm']} mm", fill='black', font=f)
     for j, c in enumerate(cols):
         dr.text((ML + j * W + 10, MT - 26), c, fill='black', font=f)
     for i, (l, rot) in enumerate(linhas):
@@ -383,8 +543,10 @@ def folha(pasta, arq_metricas, vistas):
         for j, c in enumerate(cols):
             img.paste(Image.open(f'{pasta}/{l}-{c}.png').convert('RGB'), (ML + j * W, MT + i * H))
     m = met['mapa_max_mm']
-    dr.text((10, MT + H * len(linhas) + 10),
-            f'distância: azul 0 mm, ciano {m / 3:.0f} mm, amarelo {2 * m / 3:.0f} mm, vermelho {m:.0f} mm ou mais; avesso em magenta', fill='black', font=f)
+    texto = f'distância: azul 0 mm, ciano {m / 3:.0f} mm, amarelo {2 * m / 3:.0f} mm, vermelho {m:.0f} mm ou mais; avesso em magenta'
+    if any(l == 'mapa_sinal' for l, _ in linhas):
+        texto += f"; com sinal: azul onde a candidata afunda, branco em cima, vermelho onde sobra, a ±{met['mapa_sinal_mm']:g} mm"
+    dr.text((10, MT + H * len(linhas) + 10), texto, fill='black', font=f)
     img.save(f'{pasta}/folha.png')
 
 
@@ -397,5 +559,9 @@ if __name__ == '__main__':
         cortes(sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else None)
     elif len(sys.argv) >= 5 and sys.argv[1] == 'folha':
         folha(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif len(sys.argv) >= 3 and sys.argv[1] == 'vista':
+        vista(sys.argv[2])
+    elif len(sys.argv) >= 4 and sys.argv[1] == 'perfis':
+        perfis(sys.argv[2], sys.argv[3])
     else:
-        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas>')
+        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas> | vista <vista.json> | perfis <perfis.json> <pasta>')
