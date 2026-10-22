@@ -17,13 +17,18 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import {
+  assinaturaMedida,
   caminhosNumericos,
   comCaminho,
   diagnosticarParametros,
+  formaDasPartes,
   formatarDiagnostico,
   lerCaminho,
   receitaComParametros,
 } from '../../src/autoria/parametros-vivos.js';
+import { descreverPeca } from '../../src/autoria/descrever-partes.js';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import carenagem, { TABELA as TABELA_DA_CARENAGEM } from '../../procedural/pecas/carenagem-de-prova/receita.js';
 import { montarAcervoReduzido } from './acervo-reduzido.mjs';
 import { alvosDoAcervo, parametrosReutilizavel } from './parametros-peca.mjs';
 import { REPO } from './resolver-caminho-receita.mjs';
@@ -174,6 +179,60 @@ describe('diagnóstico de parâmetro vivo', () => {
     const texto = formatarDiagnostico(diagnosticarParametros(receitaDecorativa()), { alvo: 'teste' });
     expect(texto).toContain('NÃO HÁ O QUE VARRER');
     expect(texto).toContain('PASSOS');
+  });
+});
+
+/* A carenagem de prova só com dois parâmetros declarados, a nitidez do ombro e a espessura, e o resto da TABELA fixo:
+   o diagnóstico da receita inteira sonda 27 parâmetros a cerca de 2 s por execução. */
+function carenagemSo(campos) {
+  const topo = Object.getOwnPropertyDescriptor(carenagem, 'TOPO').get;
+  const passos = Object.getOwnPropertyDescriptor(carenagem, 'PASSOS').get;
+  return {
+    meta: carenagem.meta,
+    MATERIAIS: carenagem.MATERIAIS,
+    PARAMS: Object.fromEntries(campos.map((campo) => [campo, TABELA_DA_CARENAGEM[campo]])),
+    get TOPO() { return topo.call({ PARAMS: { ...TABELA_DA_CARENAGEM, ...this.PARAMS } }); },
+    get PASSOS() { return passos.call({ PARAMS: { ...TABELA_DA_CARENAGEM, ...this.PARAMS } }); },
+  };
+}
+
+describe('forma por dentro da caixa', () => {
+  /* A assinatura comparava só a caixa e a contagem de faces de cada parte, e dava como inertes sete parâmetros da
+     carenagem que mudam a malha, entre eles a nitidez do ombro e a espessura. Com a área, o volume e as posições
+     arredondadas na assinatura, os dois saem vivos. Desde que a carenagem mede todos os pontos da gaiola, a nitidez
+     também move a caixa por frações de mícron, e a espessura continua invisível para a caixa e a contagem. */
+  it('vê a nitidez do ombro e a espessura da carenagem, que a caixa e a contagem de faces não veem', () => {
+    const receita = carenagemSo(['ombro_nitidez', 'espessura']);
+    const d = diagnosticarParametros(receita);
+    expect(d.determinismo.estavel).toBe(true);
+    expect(d.parametros.map((p) => [p.caminho, p.estado, p.efeito])).toEqual([
+      ['ombro_nitidez', 'vivo', 'geometria'],
+      ['espessura', 'vivo', 'geometria'],
+    ]);
+    const medir = (params) => executarReceita(receitaComParametros(receita, params)).neutro;
+    const base = medir(receita.PARAMS);
+    const formaBase = formaDasPartes(base);
+    for (const campo of ['ombro_nitidez', 'espessura']) {
+      const sondada = medir({ ...receita.PARAMS, [campo]: receita.PARAMS[campo] * 1.1 + 1e-6 });
+      if (campo === 'espessura') expect(assinaturaMedida(descreverPeca(sondada))).toBe(assinaturaMedida(descreverPeca(base)));
+      const forma = formaDasPartes(sondada);
+      expect(forma[0].posicoes, campo).not.toBe(formaBase[0].posicoes);
+      if (campo === 'espessura') expect(Number(forma[0].volume) / Number(formaBase[0].volume)).toBeCloseTo(1.1, 2);
+    }
+  }, 120_000);
+
+  it('não muda com o id dos vértices nem com a ordem das faces, só com a posição', () => {
+    const quadrado = (ids, faces) => ({
+      V: new Map(ids.map((id, k) => [id, [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]][k]])),
+      F: new Map(faces.map((vs, k) => [k + 1, { id: k + 1, vs, parte: 'placa' }])),
+    });
+    const a = formaDasPartes(quadrado([1, 2, 3, 4], [[1, 2, 3], [1, 3, 4]]));
+    const b = formaDasPartes(quadrado([9, 8, 7, 6], [[9, 7, 6], [9, 8, 7]]));
+    expect(b).toEqual(a);
+    expect(a).toEqual([{ nome: 'placa', area: '1.000000', volume: '0.000000000', posicoes: a[0].posicoes }]);
+    const deslocado = quadrado([1, 2, 3, 4], [[1, 2, 3], [1, 3, 4]]);
+    deslocado.V.set(3, [1, 1, 2e-6]);
+    expect(formaDasPartes(deslocado)[0].posicoes).not.toBe(a[0].posicoes);
   });
 });
 

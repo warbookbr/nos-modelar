@@ -1,9 +1,10 @@
 /* receita.test.mjs — a carenagem de prova da superfície por subdivisão: a receita só endereça a gaiola por nome, cada
    cota medida da TABELA é vértice da malha (gate 2 do plano da carroceria por subdivisão), o sólido sai fechado com o
-   volume igual à área externa vezes a espessura (gate 4), a gaiola adensa só perto do vinco, e os pontos da gaiola, que
-   moram em TOPO, seguem a TABELA quando ela muda. */
+   volume igual à área externa vezes a espessura (gate 4), a gaiola adensa só perto do vinco, a superfície segue a forma
+   desenhada tanto onde a gaiola é fina quanto onde é grossa, e os pontos da gaiola, que moram em TOPO, seguem a TABELA
+   quando ela muda. */
 import { describe, expect, it } from 'vitest';
-import receita, { derivar, gerarPassos, TABELA } from './receita.js';
+import receita, { derivar, forma, gerarPassos, TABELA } from './receita.js';
 import { enderecosPorIndice } from '../../nucleo/operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from '../../nucleo/entrada.js';
 import { area, volume } from '../../nucleo/fixtures/medidas-de-malha.js';
@@ -33,15 +34,16 @@ describe('carenagem de prova', () => {
     const { passo } = derivar(TABELA);
     const lados = {};
     for (const f of passo.faces) lados[f.length] = (lados[f.length] ?? 0) + 1;
-    expect(passo.vertices).toHaveLength(433);
-    expect(lados).toEqual({ 3: 6, 4: 370, 5: 6 });
+    expect(passo.vertices).toHaveLength(511);
+    expect(lados).toEqual({ 3: 6, 4: 438, 5: 10 });
     expect(neutro.orfaos).toEqual([]);
-    expect(M.vertices).toHaveLength(24990);
+    expect(M.vertices).toHaveLength(29694);
   });
 
-  it('cada cota medida da TABELA é vértice da malha a menos de 1e-6 m, e a imagem espelhada também', () => {
+  it('todo ponto da gaiola é medida, e cada cota da TABELA é vértice da malha a menos de 1e-6 m, com a imagem espelhada', () => {
     const { cotas, passo } = derivar(TABELA);
-    expect(Object.keys(cotas).sort()).toEqual([...passo.medidas].sort());
+    expect(passo.medidas).toEqual(passo.vertices);
+    for (const nome of Object.keys(cotas)) expect(passo.medidas).toContain(nome);
     expect(cotas.meio_centro[1]).toBe(TABELA.teto_altura);
     expect(cotas.meio_ombro[1]).toBe(TABELA.ombro_altura);
     expect(cotas.meio_soleira).toEqual([TABELA.soleira_meia_largura, TABELA.borda_altura, TABELA.comprimento / 2]);
@@ -70,16 +72,47 @@ describe('carenagem de prova', () => {
     expect(Math.abs(V / (A * TABELA.espessura / 1000) - 1)).toBeLessThan(0.02);
   });
 
+  /* Só com as sete cotas medidas, a superfície ficava para dentro das amostras da forma cerca de curvatura × passo² / 6:
+     4,5 mm onde as colunas são grossas e 0,3 mm na faixa fina junto do vinco, que saltava para fora do resto da lateral
+     como um degrau de 4,5 mm (de −6,2 a +3,1 mm contra a forma), e cada cota virava um calombo isolado. */
+  it('a superfície segue a forma desenhada a até 2,5 mm na lateral e no teto, fora do arredondamento do ombro', () => {
+    const semEspessura = receita.PASSOS.map(([op, a]) => {
+      if (op !== 'subdivisao') return [op, a];
+      const { espessura, ...resto } = a;
+      return [op, resto];
+    });
+    const S = malha(nucleo(semEspessura, receita.PARAMS, receita.TOPO));
+    const f = forma(TABELA);
+    let lateral = 0, teto = 0, nLateral = 0, nTeto = 0;
+    for (const p of S.vertices) {
+      const [x, y, z] = p.map((c) => c * 1000);
+      if (x <= 0) continue;
+      const altura = f.altura(z); const ombroY = TABELA.borda_altura + altura; const ombroX = f.perfil(z, 1);
+      if (y <= ombroY - 40 && x > ombroX) {
+        lateral = Math.max(lateral, Math.abs(x - f.perfil(z, (y - TABELA.borda_altura) / altura))); nLateral += 1;
+      } else if (y > ombroY && x < ombroX - 40) {
+        teto = Math.max(teto, Math.abs(y - f.teto(z, 1 - x / ombroX)[1])); nTeto += 1;
+      }
+    }
+    expect(nLateral).toBeGreaterThan(3000);
+    expect(nTeto).toBeGreaterThan(2000);
+    expect(lateral).toBeLessThan(2.5);
+    expect(teto).toBeLessThan(2.5);
+  });
+
   it('a mesma receita dá a mesma malha, e os pontos da gaiola seguem a TABELA que muda', () => {
     expect(JSON.stringify(neutroCanonico(executarReceita(receita).neutro))).toBe(JSON.stringify(neutroCanonico(neutro)));
     const maisLonga = receitaComParametros(receita, { ...TABELA, comprimento: 2500 });
     const zs = [...executarReceita(maisLonga).neutro.V.values()].map((p) => p[2]);
     expect(Math.max(...zs)).toBeCloseTo(2.5, 9);
-    expect(passoDaSubdivisao(maisLonga.PASSOS).medidas).toEqual(passoDaSubdivisao(receita.PASSOS).medidas);
+    const passoLongo = passoDaSubdivisao(maisLonga.PASSOS);
+    expect(passoLongo.medidas).toEqual(passoLongo.vertices);
+    for (const nome of Object.keys(derivar(TABELA).cotas)) expect(passoLongo.medidas).toContain(nome);
   });
 
   it('a cintura fora da faixa das colunas finas e duas cotas na mesma estação gritam com os nomes', () => {
-    expect(() => gerarPassos({ ...TABELA, cintura_altura: 700 })).toThrow(/cintura_altura 700 não deixa cinco colunas finas abaixo da cintura e três acima dela \(a cintura vai de 318\.75 a 668\.75 mm\)/);
+    expect(() => gerarPassos({ ...TABELA, cintura_altura: 700 })).toThrow(/cintura_altura 700 não deixa sete colunas abaixo da cintura e cinco acima dela \(a cintura vai de 406\.25 a 581\.25 mm\)/);
+    expect(() => gerarPassos({ ...TABELA, arco_altura: 300 })).toThrow(/arco_altura 300 cruza as colunas da lateral acima do arco; o arco precisa ficar abaixo de 243\.75 mm/);
     expect(() => gerarPassos({ ...TABELA, comprimento: 2600 })).toThrow(/as estações 'meio' e 'vaoInicio' caem na mesma posição, z 1300 mm/);
   });
 });
