@@ -557,8 +557,22 @@ um ajuste cúbico robusto a até três espaçamentos da gaiola), `extensaoMm`,
 `tipo` (`ondulacao` quando o desvio troca de sinal, `calombo` para fora ou para
 dentro, `emenda` quando a normal salta fora de um vinco) e `pontos`, os dois a
 quatro pontos nomeados da gaiola que mais pesam na falha, em ordem, pelos pesos
-que a própria subdivisão dá a cada ponto na malha entregue. Mexa nesses pontos e
-rode de novo até a falha sumir. A falha a menos de um espaçamento de um vinco,
+que a própria subdivisão dá a cada ponto na malha entregue, cada um com `desvioMm`,
+o desvio com sinal do vértice dele (positivo, para fora da versão suavizada), e a
+falha traz `extensaoEmEspacamentos`. Mova cada ponto nomeado 1,5 vez o desvio
+contra o sinal dele e rode de novo, e repita até a falha sumir: até uns dois
+espaçamentos uma rodada tira quase tudo, e acima de três a versão suavizada
+acompanha o ponto que se moveu, uma rodada tira cerca de um quarto e a falha
+reaparece nos vizinhos (numa ondulação de seis pontos de 1,7 mm desenhada por
+código, cinco rodadas). O ponto nomeado pode não ser entrada da `TABELA`: o de
+estação gerada pela interpolação (`estacao_k_coluna`) não se cita, e quem o
+define são as duas estações-chave vizinhas na mesma coluna, que andam juntas, e
+o de coluna que sai de curva de seção sai dos pontos-chave da curva, que são o
+que se move. O deslocamento que as rodadas pedem é da forma lida, e a comparação
+de cortes confere depois que ele ficou dentro do erro de leitura. Declarar como
+vinco uma dobra que a linha de feição lida não confirma tira a falha de
+`falhas` e deixa o desvio colado ao vinco em `junto`, sem corrigir nada. A
+falha a menos de um espaçamento de um vinco,
 de uma borda ou de um canto declarados sai em `junto`, e não em `falhas`, porque
 ali o desvio é da feição pedida; um vinco que a forma tem e o passo não declara
 sai como falha. O limiar padrão é 0,3 mm (`--limiar-mm=`): numa chapa desenhada

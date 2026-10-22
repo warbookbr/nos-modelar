@@ -39,8 +39,13 @@
  * ponto da gaiola num vértice sai do próprio núcleo, rodando `subdividirCatmullClark` sobre um recorte da gaiola em volta
  * da falha com a base no lugar das posições, três pontos por vez, como `pesosDaEstrela` faz no ponto limite; o recorte é
  * conferido, porque cada vértice da falha tem de sair dele na mesma posição que na malha inteira. A influência de um
- * ponto é a soma, nos vértices da falha, do desvio vezes o peso, e saem de dois a quatro pontos em ordem. Com medidas, a
- * gaiola é a ajustada pelo núcleo: mexer no ponto declarado move o ajustado e a superfície passa pelo ponto declarado.
+ * ponto é a soma, nos vértices da falha, do desvio vezes o peso, e saem de dois a quatro pontos em ordem, cada um com o
+ * `desvioMm` do vértice dele (positivo, para fora da versão suavizada): numa `ondulacao` os pontos têm sinais contrários,
+ * e o sentido de cada um só se lê aí. `extensaoEmEspacamentos` é a extensão da falha dividida pelo espaçamento da gaiola
+ * nela. Até uns dois espaçamentos a falha é de um ou dois pontos, e o desvio cai quase por inteiro quando eles andam o
+ * desvio; acima de três a versão suavizada acompanha o ponto que se moveu, uma rodada tira cerca de um quarto e a falha
+ * reaparece nos vizinhos. Com medidas, a gaiola é a ajustada pelo núcleo: mexer no ponto declarado move o ajustado e a
+ * superfície passa pelo ponto declarado.
  *
  * Mesma receita, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa.
  *
@@ -406,7 +411,8 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     const ordem = [...porNome].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
     const escolhidos = ordem.slice(0, 2);
     for (const par of ordem.slice(2, MAXIMO_DE_PONTOS)) if (par[1] >= 0.5 * ordem[1][1]) escolhidos.push(par); else break;
-    return escolhidos.map(([j, peso]) => ({ nome: sup.nomeDe(j), influencia: arred(peso / total) }));
+    /* o desvio com sinal do vértice do próprio ponto diz para que lado ele está: positivo, para fora da versão suavizada */
+    return escolhidos.map(([j, peso]) => ({ nome: sup.nomeDe(j), influencia: arred(peso / total), desvioMm: arred(desvio[j] * MM) }));
   };
   const curvaturaDaSuperficie = (v) => {
     const r = 0.75 * h[v]; let melhor = null;
@@ -439,6 +445,7 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     const a = ajuste[pico]; const ks = curvaturaDaSuperficie(pico);
     falhas.push({
       ...base,
+      extensaoEmEspacamentos: arred(diametro(membros) / h[pico], 1),
       ...(base.tipo === 'ondulacao' ? { picosMm: { fora: arred(Math.max(...positivos.map((k) => desvio[k])) * MM), dentro: arred(Math.min(...negativos.map((k) => desvio[k])) * MM) } } : {}),
       /* os pontos saem do miolo da falha, os vértices com pelo menos metade da amplitude */
       pontos: pontosDe(membros.filter((k) => Math.abs(desvio[k]) >= amplitude / 2).map((k) => ({ v: k, desvio: desvio[k] }))),
