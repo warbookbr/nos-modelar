@@ -26,7 +26,9 @@
  *         estações em que ela existe); { nome, estacao, de?, ate?, nitidez } segue uma estação de uma coluna a outra.
  *         A nitidez passa ao passo como veio: de 0 a 1, 'viva' ou nome de PARAMS.
  * cantos e medidas: listas de { estacao?, coluna? }; só a estação marca a estação inteira, só a coluna marca a coluna
- *         inteira, e os dois marcam um ponto.
+ *         inteira, e os dois marcam um ponto. A medida aceita `peso` (número maior que zero ou nome de PARAMS), e os
+ *         pontos dela saem como { ponto, peso }, a cota que a superfície aproxima sem passar; sem peso, a cota é exata.
+ *         O mesmo ponto marcado por duas medidas com pesos diferentes grita.
  * borda livre: a borda da gaiola é aberta, e o passo escolhe a regra dela por `borda`, como em qualquer gaiola.
  * simetria: 'x' declara a metade x >= 0, que o passo espelha antes de subdividir; ponto com x < 0 grita, e a aresta no
  *         plano x = 0 precisa ser borda da metade, para a costura sair com duas faces.
@@ -230,25 +232,32 @@ function lerVincos(vincos, lidas, arestas) {
   });
 }
 
-/* cantos e medidas: { estacao?, coluna? } vira a lista dos pontos marcados, na ordem dos pontos. */
+/* cantos e medidas: { estacao?, coluna? } vira a lista dos pontos marcados, na ordem dos pontos. Nas medidas, `peso`
+   passa ao passo, e o ponto com peso sai como { ponto, peso }. */
 function marcar(seletores, campo, lidas, vertices) {
   if (seletores == null) return null;
   if (!Array.isArray(seletores) || !seletores.length) falha(`${campo} precisa ser lista não vazia de { estacao, coluna }`);
-  const marcados = new Set();
+  const marcados = new Set(); const pesos = new Map();
   const indiceDaEstacao = new Map(lidas.map((e, k) => [e.nome, k]));
   for (const [n, s] of seletores.entries()) {
-    exigirCampos(s, ['estacao', 'coluna'], `${campo}[${n}]`);
+    exigirCampos(s, campo === 'medidas' ? ['estacao', 'coluna', 'peso'] : ['estacao', 'coluna'], `${campo}[${n}]`);
+    const peso = s.peso ?? null;
+    if (peso !== null && !(typeof peso === 'string' || (typeof peso === 'number' && Number.isFinite(peso) && peso > 0))) falha(`${campo}[${n}] tem peso ${peso}; o peso é número finito maior que zero ou nome de PARAMS, e a medida sem peso é exata`);
     if (s.estacao == null && s.coluna == null) falha(`${campo}[${n}] precisa de estacao, coluna ou os dois`);
     if (s.estacao != null && !indiceDaEstacao.has(s.estacao)) falha(`${campo}[${n}] cita a estação ${citar(s.estacao)}, que não existe`);
     const estacoes = s.estacao != null ? [lidas[indiceDaEstacao.get(s.estacao)]] : lidas;
     let achou = 0;
     for (const E of estacoes) {
       if (s.coluna != null && !E.indice.has(s.coluna)) continue;
-      for (const c of E.colunas) if (s.coluna == null || c.nome === s.coluna) { marcados.add(c.ponto); achou += 1; }
+      for (const c of E.colunas) {
+        if (s.coluna != null && c.nome !== s.coluna) continue;
+        if (marcados.has(c.ponto) && (pesos.get(c.ponto) ?? null) !== peso) falha(`${campo}[${n}] marca ${citar(c.ponto)} com outro peso que uma medida anterior`);
+        marcados.add(c.ponto); if (peso !== null) pesos.set(c.ponto, peso); achou += 1;
+      }
     }
     if (!achou) falha(`${campo}[${n}] cita a coluna ${citar(s.coluna)}, que ${s.estacao != null ? `a estação ${citar(s.estacao)} não tem` : 'nenhuma estação tem'}`);
   }
-  return vertices.filter((p) => marcados.has(p));
+  return vertices.filter((p) => marcados.has(p)).map((p) => (pesos.has(p) ? { ponto: p, peso: pesos.get(p) } : p));
 }
 
 /**

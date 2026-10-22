@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:3318b1bed3438365d97ecdf3e2ffc134b696f49a79d10fa9ec6733e12b554a9d",
+  "assinatura": "sha256:a6754cfb2e8cea90faacb5c1815880fab60e4fce612f7c8ab51ea58e22dc7688",
   "total": 38,
   "operacoes": [
     {
@@ -3756,11 +3756,7 @@
             },
             "medidas": {
               "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1
-              },
-              "description": "Nomes de ponto da gaiola por onde a superfície limite passa; os outros pontos ficam onde foram declarados."
+              "description": "Cotas da gaiola: o nome de ponto é cota exata, por onde a superfície limite passa; { ponto, peso } é cota que a superfície aproxima por mínimos quadrados, sem passar por ela, com os pontos em volta presos perto da gaiola declarada (peso 1 pesa o desvio à cota igual ao deslocamento de um ponto da gaiola; quanto maior, mais perto da cota). Os pontos não citados ficam onde foram declarados."
             },
             "espessura": {
               "anyOf": [
@@ -3856,7 +3852,8 @@
           "Sem espessura, é a superfície da gaiola, aberta se a gaiola for aberta; com espessura, é sólido fechado, com as partes externa, interna e borda citáveis por origem.",
           "A regra é a do OpenSubdiv no modo uniforme, sem projeção na superfície limite; confere com o Subdivision Surface do Blender com use_limit_surface desligado.",
           "Sem medidas, a superfície aproxima a gaiola e não passa pelos pontos; com medidas, só os pontos marcados passam pela superfície limite, e todo vértice da malha entregue vai ao seu ponto limite, de modo que a cota é vértice da malha.",
-          "Medidas que a superfície limite não separa, ou que movem a gaiola mais de 100 vezes o erro do alvo, gritam com os nomes dos pontos.",
+          "Medidas que a superfície limite não separa, ou que movem a gaiola mais de 100 vezes o erro do alvo, gritam com os nomes dos pontos, com peso ou exatas.",
+          "A medida com peso não passa pela cota: o desvio que sobra cai com o peso, e o sistema normal se resolve pela mesma eliminação de Gauss em ordem fixa, bit a bit.",
           "Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes.",
           "As faces saem lisas a 30 graus com quebra de sombra nos vincos vivos (face.quebras, que a bancada respeita); o rasterizador das vistas da receita desenha toda face chapada.",
           "Com espessura, a espessura que passa do raio de curvatura local do lado do material grita com os pontos nomeados mais perto; no vinco vivo esse raio é a largura da faixa de faces ao lado dele e cai pela metade a cada nível. Partes distantes da chapa a menos de uma espessura uma da outra não são conferidas."

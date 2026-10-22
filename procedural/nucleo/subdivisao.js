@@ -451,6 +451,111 @@ export function ajustarGaiolaAsMedidas(gaiola, medidas) {
   return { vertices: V, ganho, residuos };
 }
 
+/* Medidas com peso: a superfície limite se aproxima das cotas por mínimos quadrados, sem ser forçada a passar por elas,
+ * para que muitas cotas lidas de imagem, cada uma com o seu erro, não ondulem a chapa. A medida exata (peso infinito)
+ * continua restrição. As incógnitas são as posições x_U de U, os vértices das estrelas dos pontos com peso e os pontos
+ * exatos; os demais ficam onde a gaiola os declarou, porque nenhum ponto limite medido depende deles. Com L_i(x) = W_i · x
+ * o ponto limite do ponto medido i, a_i a cota (a posição declarada dele), c_j a posição declarada de cada vértice e p_i
+ * o peso, a gaiola ajustada minimiza
+ *
+ *   E(x) = Σ_{i com peso} p_i ‖L_i(x) − a_i‖² + Σ_{j ∈ U} ‖x_j − c_j‖²     sujeita a  L_k(x) = a_k  para cada k exato.
+ *
+ * O segundo termo é a regularização: cada vértice de U, medido ou não, paga o quadrado do quanto anda, e por isso os
+ * pontos não medidos ficam perto da gaiola declarada e o ponto medido só anda o que a cota justifica. O peso não tem
+ * unidade: peso 1 pesa o desvio da superfície à cota igual ao deslocamento de um ponto da gaiola, e o desvio que sobra
+ * na cota cai com o peso, até a medida exata no limite. Como o ponto limite é média da estrela, a cota que discorda das
+ * vizinhas (o ruído) só seria alcançada movendo a gaiola várias vezes o erro, o que a regularização cobra; a cota que
+ * concorda com as vizinhas (o encolhimento da aproximação) custa pouco e é seguida. Zerando o gradiente, com W̃_i os
+ * pesos de W_i em U e b_i a parte de W_i · c fora de U, sai o sistema normal, o mesmo nos três eixos:
+ *
+ *   [ H  Gᵀ ] [ x_U ]   [ Σ p_i W̃_iᵀ (a_i − b_i) + c_U ]        H = Σ p_i W̃_iᵀ W̃_i + I,
+ *   [ G  0  ] [  μ  ] = [ a_E − b_E                     ]        G = as linhas W̃_k dos pontos exatos,
+ *
+ * em que μ são os multiplicadores das restrições. Ele se resolve pela mesma eliminação de Gauss em ordem fixa (U e os
+ * pontos em ordem crescente de índice), bit a bit. O ganho é o mesmo das medidas exatas: o maior fator pelo qual um erro
+ * nas cotas vira deslocamento de um ponto da gaiola, ‖∂x_U/∂a‖∞, calculado resolvendo o sistema para cada cota; acima de
+ * GANHO_MAXIMO_DAS_MEDIDAS falha com os pontos que mais pesam, e o sistema singular falha com os pontos do vetor nulo. */
+export function ajustarGaiolaAsMedidasComPeso(gaiola, medidas) {
+  const { nitidez, C, facesDoV } = prepararLimite(gaiola);
+  const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
+  if (!Array.isArray(medidas)) throw new TypeError('subdivisão: medidas precisa ser lista de { indice, peso }');
+  const pesoDe = new Map();
+  for (const m of medidas) {
+    const i = m?.indice; const p = m?.peso;
+    if (!Number.isInteger(i) || i < 0 || i >= P.length) throw new TypeError(`subdivisão: medida cita vértice inexistente ${i}`);
+    if (!(p > 0)) throw new TypeError(`subdivisão: o peso da medida do vértice ${i} precisa ser maior que zero, e veio ${p}`);
+    if (!facesDoV[i].length) throw new ErroDasMedidas('medida em vértice sem face', [i]);
+    if (pesoDe.has(i) && pesoDe.get(i) !== p) throw new ErroDasMedidas('o mesmo ponto aparece em medidas com pesos diferentes', [i]);
+    pesoDe.set(i, p);
+  }
+  const M = [...pesoDe.keys()].sort((a, b) => a - b);
+  const exatos = M.filter((i) => pesoDe.get(i) === Infinity); const comPeso = M.filter((i) => pesoDe.get(i) !== Infinity);
+  /* as estrelas e os pesos do ponto limite de cada ponto medido, calculados uma vez */
+  const linhaDe = new Map(M.map((i) => {
+    const est = estrelaDe(P, F, facesDoV[i], nitidez, i);
+    return [i, { globais: est.globais, w: pesosDaEstrela(est, C.has(i), borda) }];
+  }));
+  const emU = new Set(exatos);
+  for (const i of comPeso) for (const j of linhaDe.get(i).globais) emU.add(j);
+  const U = [...emU].sort((a, b) => a - b); const col = new Map(U.map((j, k) => [j, k]));
+  const nU = U.length; const nE = exatos.length; const n = nU + nE;
+  /* cada ponto medido como linha esparsa sobre U ([coluna, peso]) e a parte fixa b_i fora de U */
+  const esparsa = (i) => {
+    const { globais, w } = linhaDe.get(i); const termos = []; const b = [0, 0, 0];
+    globais.forEach((j, c) => {
+      if (w[c] === 0) return;
+      const k = col.get(j);
+      if (k !== undefined) termos.push([k, w[c]]);
+      else { b[0] += w[c] * P[j][0]; b[1] += w[c] * P[j][1]; b[2] += w[c] * P[j][2]; }
+    });
+    return { termos, b };
+  };
+  const A = Array.from({ length: n }, () => new Array(n).fill(0));
+  const rhs = [0, 1, 2].map((ax) => U.map((j) => P[j][ax]).concat(new Array(nE).fill(0)));
+  for (let k = 0; k < nU; k++) A[k][k] = 1;
+  const sensibilidade = []; // a coluna do lado direito que cada cota move, para o ganho
+  for (const i of comPeso) {
+    const { termos, b } = esparsa(i); const p = pesoDe.get(i);
+    for (const [r, wr] of termos) for (const [c, wc] of termos) A[r][c] += p * wr * wc;
+    for (const [r, wr] of termos) for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * (P[i][ax] - b[ax]);
+    const e = new Array(n).fill(0); for (const [r, wr] of termos) e[r] += p * wr;
+    sensibilidade.push(e);
+  }
+  exatos.forEach((i, s) => {
+    const { termos, b } = esparsa(i); const r = nU + s;
+    for (const [c, wc] of termos) { A[r][c] += wc; A[c][r] += wc; }
+    for (let ax = 0; ax < 3; ax++) rhs[ax][r] = P[i][ax] - b[ax];
+    const e = new Array(n).fill(0); e[r] = 1;
+    sensibilidade.push(e);
+  });
+  const quem = [...comPeso, ...exatos];
+  const lu = fatorarLU(A);
+  if (lu.singularEm >= 0) {
+    const x = vetorNulo(lu, lu.singularEm); const maior = Math.max(...x.map(Math.abs));
+    const envolvidos = new Set();
+    x.forEach((v, r) => { if (Math.abs(v) > 1e-9 * maior) envolvidos.add(r < nU ? U[r] : exatos[r - nU]); });
+    throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', [...envolvidos].sort((a, b) => a - b));
+  }
+  const colunas = sensibilidade.map((e) => resolverLU(lu, e));
+  let ganho = 0, pior = 0;
+  for (let r = 0; r < nU; r++) { let s = 0; for (const c of colunas) s += Math.abs(c[r]); if (s > ganho) { ganho = s; pior = r; } }
+  if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) {
+    const maior = Math.max(...colunas.map((c) => Math.abs(c[pior])));
+    throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS})`, quem.filter((_, t) => Math.abs(colunas[t][pior]) >= 0.01 * maior).sort((a, b) => a - b));
+  }
+  const eixos = rhs.map((b) => resolverLU(lu, b));
+  const V = P.map((p) => [...p]);
+  U.forEach((j, r) => { V[j] = [eixos[0][r], eixos[1][r], eixos[2][r]]; });
+  /* conferência pela geometria da gaiola nova: o exato passa a TOLERANCIA_DAS_MEDIDAS, o com peso só relata o desvio */
+  const residuos = M.map((i) => {
+    const L = limiteDaEstrela(estrelaDe(V, F, facesDoV[i], nitidez, i), C.has(i), borda);
+    return Math.hypot(P[i][0] - L[0], P[i][1] - L[1], P[i][2] - L[2]);
+  });
+  const fora = M.filter((i, r) => pesoDe.get(i) === Infinity && residuos[r] > TOLERANCIA_DAS_MEDIDAS);
+  if (fora.length) throw new ErroDasMedidas(`a superfície limite não chegou a ${TOLERANCIA_DAS_MEDIDAS} m das medidas exatas`, fora);
+  return { vertices: V, ganho, residuos, medidas: M };
+}
+
 /* Espelha a gaiola no plano x = 0 ANTES de subdividir: os vértices com |x| <= tolerância ficam compartilhados pelas duas
  * metades e a costura sai lisa (subdividir a metade e espelhar depois deixaria a costura como borda, na regra de vinco).
  * Vértices novos: os da metade original nos mesmos índices, depois as imagens dos que não estão no plano, na ordem. */
