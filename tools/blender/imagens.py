@@ -5,10 +5,18 @@
 #       Desenha a grade nas imagens <prefixo><vista>-cinza.png e <prefixo><vista>-zebra.png de cada vista alinhada a dois
 #       eixos, com rótulo a cada duas linhas, a barra de escala num canto que não cobre rótulo nem título, e grava em
 #       <prefixo>grade.json o passo, as caixas dos rótulos e a da barra de cada imagem.
+#   python3 -I imagens.py linhas <linhas.json> <saida.png>
+#       Desenha as polilinhas de linhas.json ({W, H, linhas: {tipo: [[[u, v], ...], ...]}}) em traço preto sobre branco; o
+#       tipo 'corte' (a borda sobre um plano da caixa) sai em cinza fino.
+#   python3 -I imagens.py cortes <cortes.json> <pasta> [<quadro.json>]
+#       Desenha cada corte de cortes.json ({simetria_x, cortes: [{nome, eixo, valor, eixos_uv, cadeias: [[[u, v], ...]]}]}, em
+#       metro) como contorno 2D em mm com grade e as cotas dos extremos e da maior saliência, em <pasta>/<nome>.png; grava a
+#       tabela curta <pasta>/cotas.md e o quadro de cada desenho em <pasta>/quadro.json. Com <quadro.json>, usa o quadro dado
+#       (para desenhar outra malha na mesma escala e posição) e não o regrava.
 #   python3 -I imagens.py folha <pasta> <metricas.json> <vista,vista,...>
 #       Compõe <pasta>/folha.png: linhas referência e candidata em cinza e em listras de reflexo e o mapa de distância,
 #       colunas as vistas, e o resumo das medidas no alto.
-import json, math, sys
+import json, math, os, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
@@ -51,8 +59,10 @@ def grade(arq_camera, prefixo):
         px = lambda p: (W / 2 + ((p - c) @ xc) / s * W, H / 2 - ((p - c) @ yc) / s * W)
         alinhada = abs(xc).max() > 0.999 and abs(yc).max() > 0.999
         passo = passo_redondo(s * 1000 / 20)
-        for tipo in ('cinza', 'zebra'):
+        for tipo in ('cinza', 'zebra', 'linhas'):
             arq = f'{prefixo}{v}-{tipo}.png'
+            if tipo == 'linhas' and not os.path.exists(arq):
+                continue
             im = Image.open(arq).convert('RGB')
             d = ImageDraw.Draw(im, 'RGBA')
             rotulos = []
@@ -116,6 +126,136 @@ def grade(arq_camera, prefixo):
     json.dump(registro, open(f'{prefixo}grade.json', 'w'), indent=1)
 
 
+def linhas(arq_json, saida):
+    d = json.load(open(arq_json))
+    im = Image.new('RGB', (d['W'], d['H']), 'white')
+    dr = ImageDraw.Draw(im)
+    for tipo in ('corte', 'feicao', 'dobra', 'natural'):
+        cor, larg = ((150, 150, 150), 1) if tipo == 'corte' else ((0, 0, 0), 2)
+        for pl in d['linhas'].get(tipo, []):
+            dr.line([tuple(p) for p in pl], fill=cor, width=larg, joint='curve')
+    im.save(saida)
+
+
+def _mm(v):
+    """Metro para milímetro inteiro, sem o sinal do zero negativo."""
+    return str(int(round(v * 1000)))
+
+
+def _cotas_do_corte(cadeias, meia, U='u', Vn='v'):
+    """De quatro a seis cotas (rótulo, ponto em m), na metade u >= 0 quando meia: extremos de u e v, a maior saliência das
+    duas linhas mais longas e, se faltar, as pontas das linhas, sem repetir ponto a menos de 20 mm."""
+    cad = [np.asarray(c, float) for c in cadeias]
+    if meia:
+        cad = [c[c[:, 0] >= -1e-9] for c in cad]
+    cad = [c for c in cad if len(c) >= 2]
+    if not cad:
+        return []
+    P = np.vstack(cad)
+    alto, baixo = ('mais alto', 'mais baixo') if Vn == 'y' else (f'{Vn} máximo', f'{Vn} mínimo')
+    largo, estreito = ('mais largo', 'mais perto do meio') if U == 'x' else (f'{U} máximo', f'{U} mínimo')
+    cotas = [(alto, P[np.argmax(P[:, 1])]), (largo, P[np.argmax(P[:, 0])]), (baixo, P[np.argmin(P[:, 1])])]
+    comprimento = lambda c: np.linalg.norm(np.diff(c, axis=0), axis=1).sum()
+    por_tamanho = sorted(cad, key=comprimento, reverse=True)
+    for ordem, linha in enumerate(por_tamanho[:2]):
+        a, b = linha[0], linha[-1]
+        corda = b - a
+        if np.linalg.norm(corda) > 1e-9:
+            n = np.array([-corda[1], corda[0]]) / np.linalg.norm(corda)
+            dist = (linha - a) @ n
+            k = int(np.argmax(np.abs(dist)))
+            qual = 'maior saliência' if ordem == 0 else 'saliência da 2ª linha'
+            cotas.append((f'{qual} (flecha {abs(dist[k]) * 1000:.0f} mm sobre a corda)', linha[k]))
+    cotas.append((estreito, P[np.argmin(P[:, 0])]))
+    # se faltar, as pontas das linhas mais longas completam até quatro cotas
+    for linha in por_tamanho:
+        cotas += [('ponta de linha', linha[0]), ('ponta de linha', linha[-1])]
+    for linha in por_tamanho:
+        s_ = np.concatenate([[0], np.cumsum(np.linalg.norm(np.diff(linha, axis=0), axis=1))])
+        for f in (0.5, 0.25, 0.75):
+            k = int(np.argmin(np.abs(s_ - f * s_[-1])))
+            cotas.append((f'a {round(f * 100)}% do comprimento da linha', linha[k]))
+    out = []
+    for r, p in cotas:
+        if (r == 'ponta de linha' or r.startswith('a ')) and len(out) >= 4:
+            break
+        if all(np.linalg.norm(p - q) > 0.02 for _, q in out):
+            out.append((r, p))
+    return out[:6]
+
+
+def cortes(arq_json, pasta, arq_quadro=None):
+    d = json.load(open(arq_json))
+    quadros = json.load(open(arq_quadro)) if arq_quadro else {}
+    W, H, M = 1200, 900, 70
+    f, fp = fonte(16), fonte(14)
+    tabela = ['| corte | cota | posição (mm) |', '|---|---|---|']
+    novo_quadro = {}
+    for c in d['cortes']:
+        U, Vn = c['eixos_uv']
+        cad = [np.asarray(x, float) for x in c['cadeias'] if len(x) >= 2]
+        meia = bool(d.get('simetria_x')) and U == 'x'
+        if c['nome'] in quadros:
+            q = quadros[c['nome']]
+        else:
+            P = np.vstack(cad) if cad else np.zeros((1, 2))
+            lo, hi = P.min(0), P.max(0)
+            folga = 0.08 * max(hi - lo)
+            lo, hi = lo - folga, hi + folga
+            esc = min((W - 2 * M) / max(hi[0] - lo[0], 1e-6), (H - 2 * M) / max(hi[1] - lo[1], 1e-6))
+            meio = (lo + hi) / 2   # o contorno fica centrado no desenho
+            lo = meio - np.array([(W - 2 * M) / esc / 2, (H - 2 * M) / esc / 2])
+            q = {'u0': float(lo[0]), 'v0': float(lo[1]), 'escala_px_m': float(esc), 'W': W, 'H': H, 'eixos_uv': [U, Vn],
+                 'eixo': c['eixo'], 'valor': c['valor']}
+        novo_quadro[c['nome']] = q
+        px = lambda p: (M + (p[0] - q['u0']) * q['escala_px_m'], H - M - (p[1] - q['v0']) * q['escala_px_m'])
+        im = Image.new('RGB', (W, H), 'white')
+        dr = ImageDraw.Draw(im, 'RGBA')
+        larg_m = (W - 2 * M) / q['escala_px_m']
+        passo = passo_redondo(larg_m * 1000 / 12)
+        u0, u1 = q['u0'], q['u0'] + (W - M) / q['escala_px_m']
+        v0, v1 = q['v0'], q['v0'] + (H - M) / q['escala_px_m']
+        for k in range(math.floor(u0 * 1000 / passo), math.ceil(u1 * 1000 / passo) + 1):
+            x, _ = px((k * passo / 1000, 0))
+            if M <= x <= W:
+                dr.line([(x, 0), (x, H - M)], fill=(*COR_X, 110 if k % 2 == 0 else 45))
+                rot_u = f'{U}={k * passo:g}'
+                if k % 2 == 0 and dr.textbbox((x - 14, H - M + 6), rot_u, font=fp)[2] < W - 2:
+                    dr.text((x - 14, H - M + 6), rot_u, fill=(0, 60, 160), font=fp)
+        for k in range(math.floor(v0 * 1000 / passo), math.ceil(v1 * 1000 / passo) + 1):
+            _, y = px((0, k * passo / 1000))
+            if 0 <= y <= H - M:
+                dr.line([(M, y), (W, y)], fill=(*COR_Y, 110 if k % 2 == 0 else 45))
+                if k % 2 == 0:
+                    dr.text((4, y - 8), f'{Vn}={k * passo:g}', fill=(20, 100, 20), font=fp)
+        for x in cad:
+            dr.line([px(p) for p in x], fill=(0, 0, 0), width=3, joint='curve')
+        titulo = f"corte {c['nome']}: plano {c['eixo']} = {_mm(c['valor'])} mm; {U} na horizontal, {Vn} na vertical, grade de {passo:g} mm"
+        dr.rectangle(dr.textbbox((10, 8), titulo, font=f), fill=(255, 255, 255, 220))
+        dr.text((10, 8), titulo, fill='black', font=f)
+        caixas = [dr.textbbox((10, 8), titulo, font=f)]
+        for rot, p in _cotas_do_corte(cad, meia, U, Vn):
+            x, y = px(p)
+            dr.ellipse([x - 5, y - 5, x + 5, y + 5], outline=(200, 0, 0), width=2)
+            texto = f'{U}={_mm(p[0])}, {Vn}={_mm(p[1])} ({rot})'
+            tx, ty = x + 9, y + 6
+            for _ in range(12):
+                bb = dr.textbbox((tx, ty), texto, font=fp)
+                if bb[2] > W - 4:
+                    tx = x - 9 - (bb[2] - bb[0]); bb = dr.textbbox((tx, ty), texto, font=fp)
+                if not any(cruza(bb, o) for o in caixas) and bb[3] < H - M:
+                    break
+                ty += 18
+            dr.rectangle(bb, fill=(255, 255, 255, 210))
+            dr.text((tx, ty), texto, fill=(170, 0, 0), font=fp)
+            caixas.append(bb)
+            tabela.append(f"| {c['nome']} ({c['eixo']} = {_mm(c['valor'])}) | {rot} | {U} = {_mm(p[0])}, {Vn} = {_mm(p[1])} |")
+        im.save(os.path.join(pasta, f"{c['nome']}.png"))
+    open(os.path.join(pasta, 'cotas.md'), 'w').write('\n'.join(tabela) + '\n')
+    if not arq_quadro:
+        json.dump(novo_quadro, open(os.path.join(pasta, 'quadro.json'), 'w'), indent=1)
+
+
 def folha(pasta, arq_metricas, vistas):
     met = json.load(open(arq_metricas))
     linhas = [('ref_cinza', 'referência'), ('cand_cinza', 'candidata'), ('ref_zebra', 'ref. listras'),
@@ -147,7 +287,11 @@ def folha(pasta, arq_metricas, vistas):
 if __name__ == '__main__':
     if len(sys.argv) >= 4 and sys.argv[1] == 'grade':
         grade(sys.argv[2], sys.argv[3])
+    elif len(sys.argv) >= 4 and sys.argv[1] == 'linhas':
+        linhas(sys.argv[2], sys.argv[3])
+    elif len(sys.argv) >= 4 and sys.argv[1] == 'cortes':
+        cortes(sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else None)
     elif len(sys.argv) >= 5 and sys.argv[1] == 'folha':
         folha(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
-        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | imagens.py folha <pasta> <metricas.json> <vistas>')
+        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas>')

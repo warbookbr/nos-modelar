@@ -28,6 +28,10 @@ PADRAO = {
     'amostras_render': 16,
     'vistas': None,               # lista de {nome, direcao, cima, escala?, meia?}; sem ela, vistas_padrao()
     'avesso': [0.85, 0.30, 0.80], # cor que multiplica o avesso (face vista por trás) nas vistas cinza e zebra
+    'angulo_feicao': 25.0,        # graus: aresta com diedro acima disto entra nas vistas de linhas de feição
+    'cortes': [],                 # lista de {nome, eixo: 'x'|'y'|'z', valor (m)}: cortes planos cotados do pacote
+    'passo_corte_regua': 0.01,    # m: passo dos pontos do contorno de cada corte no JSON privado (só para a régua)
+    'omitidas': [],               # rótulos que a régua relata à parte, como regiões que a candidata pode omitir
 }
 
 
@@ -70,13 +74,15 @@ def configuracao(a, exige_caixa=True):
         _juntar(cfg, json.load(open(a['config'])))
     if 'caixa' in a:
         cfg['caixa'] = [float(s) for s in a['caixa'].split(',')]
-    for k in ('margem', 'angulo_vinco', 'densidade'):
+    for k in ('margem', 'angulo_vinco', 'densidade', 'angulo_feicao'):
         if k in a:
             cfg[k] = float(a[k])
     if a.get('simetria_x'):
         cfg['simetria_x'] = True
     if 'excluir' in a:
         cfg['excluir'] = [s for s in a['excluir'].split(',') if s]
+    if 'omitidas' in a:
+        cfg['omitidas'] = [s for s in a['omitidas'].split(',') if s]
     if 'resolucao' in a:
         cfg['resolucao'] = [int(s) for s in a['resolucao'].split('x')]
     if 'caixa' in cfg:
@@ -402,7 +408,8 @@ class Visibilidade:
 
 
 def ler_oclusores(caminho, z_cima=False):
-    """Malha extra que só bloqueia a vista (por exemplo, tampas de vãos que o observador não atravessa)."""
+    """Malha extra que só bloqueia a vista (por exemplo, tampas de vãos que o observador não atravessa). Ela vem no quadro de
+    trabalho (y para cima), qualquer que seja o da referência; --z-cima-oclusores a converte como --z-cima."""
     if not caminho:
         return None
     V, F, _ = ler_malha(caminho, z_cima=z_cima)
@@ -454,6 +461,14 @@ def preparar_referencia(V, F, rot, cfg, oclusores=None):
     cont['componentes'] = int(len(ids_c))
     cont['componentes_removidos'] = int(len(pequenos))
     manter &= ~np.isin(comp, pequenos)
+    # o painel mantido pode levar triângulos de rótulo excluído (borda da região rotulada); eles recebem o rótulo do
+    # triângulo mantido e não excluído mais perto, para que a medida por rótulo não relate região escondida
+    if rot_r is not None and (manter & excl).any() and (manter & ~excl).any():
+        bons = np.nonzero(manter & ~excl)[0]
+        k = kd(C[bons])
+        for t in np.nonzero(manter & excl)[0]:
+            rot_r[t] = rot_r[bons[k.find(Vector(C[t]))[1]]]
+        cont['triangulos_rotulo_herdado'] = int((manter & excl).sum())
     cont['triangulos_mantidos'] = int(manter.sum())
     cont['area_mantida_m2'] = round(float(area[manter].sum()), 6)
     cont['bordas'] = classificar_bordas(Vr, Fr, manter, regiao, cfg['angulo_painel'])
@@ -702,7 +717,7 @@ def python_do_sistema():
 
 
 def imagens(*args):
-    """Chama imagens.py (Python do sistema com Pillow) para a grade e a folha."""
+    """Chama imagens.py (Python do sistema com Pillow) para a grade, as linhas, os cortes e a folha."""
     subprocess.run([python_do_sistema(), '-I', os.path.join(AQUI, 'imagens.py'), *map(str, args)], check=True)
 
 
@@ -716,3 +731,159 @@ def compactar(V, F):
     mp = -np.ones(len(V), int)
     mp[u] = np.arange(len(u))
     return V[u], mp[F]
+
+
+# ---------- linhas de feição ----------
+
+def linhas_de_feicao(V, F, manter, regiao, angulo):
+    """Segmentos (a, b) em 3D e o tipo de cada um, das faces mantidas: 'feicao' (aresta entre duas faces mantidas com diedro
+    acima de angulo), 'dobra' (aresta entre face mantida e face tirada), 'natural' (borda livre da malha) e 'corte' (borda
+    sobre um plano da caixa)."""
+    internas, bordas, _ = arestas(F)
+    a, b, t1, t2, _ = internas
+    di = diedros(V, F, internas)
+    m1, m2 = manter[t1], manter[t2]
+    segs, tipos = [], []
+    sel = m1 & m2 & (di > angulo)
+    segs += list(zip(V[a[sel]], V[b[sel]]))
+    tipos += ['feicao'] * int(sel.sum())
+    sel = m1 != m2
+    segs += list(zip(V[a[sel]], V[b[sel]]))
+    tipos += ['dobra'] * int(sel.sum())
+    ba, bb, bt = bordas
+    m = manter[bt]
+    no_plano = np.zeros(len(ba), bool)
+    for e in range(3):
+        for c in regiao[e]:
+            no_plano |= (np.abs(V[ba, e] - c) < TOL_PLANO) & (np.abs(V[bb, e] - c) < TOL_PLANO)
+    for sel, tipo in ((m & ~no_plano, 'natural'), (m & no_plano, 'corte')):
+        segs += list(zip(V[ba[sel]], V[bb[sel]]))
+        tipos += [tipo] * int(sel.sum())
+    return segs, tipos
+
+
+def linhas_na_vista(segs, tipos, arvore, vista, passo=0.002, meia=False):
+    """Projeta os segmentos na vista ortográfica e tira o trecho escondido: cada ponto, a cada passo metros, é visível se o
+    raio dele para a câmera não bate na superfície. Devolve {tipo: [polilinha em pixels, ...]}."""
+    c = np.array(vista['centro'], float)
+    xc, yc, zc = (np.array(vista[k], float) for k in ('x_cam', 'y_cam', 'z_cam'))
+    s, W = vista['escala'], vista['W']
+    H = vista['H']
+    zv = Vector(zc)
+    out = {}
+    for (p, q), tipo in zip(segs, tipos):
+        if meia and (p[0] < -1e-9 or q[0] < -1e-9):
+            continue
+        k = max(1, int(np.ceil(np.linalg.norm(q - p) / passo)))
+        ts = np.linspace(0, 1, k + 1)
+        pts = p[None] + ts[:, None] * (q - p)[None]
+        vis = np.array([arvore.ray_cast(Vector(pt) + zv * 1e-3, zv)[0] is None for pt in pts])
+        uv = np.stack([W / 2 + ((pts - c) @ xc) / s * W, H / 2 - ((pts - c) @ yc) / s * W], 1)
+        atual = []
+        for ok, ponto in zip(vis, uv):
+            if ok:
+                atual.append([round(float(ponto[0]), 2), round(float(ponto[1]), 2)])
+            elif len(atual) >= 2:
+                out.setdefault(tipo, []).append(atual)
+                atual = []
+            else:
+                atual = []
+        if len(atual) >= 2:
+            out.setdefault(tipo, []).append(atual)
+    return out
+
+
+# ---------- cortes ----------
+
+EIXOS_DO_CORTE = {0: (2, 1), 1: (0, 2), 2: (0, 1)}   # plano x: (z, y); plano y: (x, z); plano z: (x, y)
+
+
+def cortar_plano(V, F, mascara, eixo, valor, tol=1e-6):
+    """Interseção das faces da máscara com o plano eixo = valor, encadeada em polilinhas 3D (listas de pontos)."""
+    T = V[F[mascara]]
+    d = T[:, :, eixo] - valor
+    d = np.where(np.abs(d) < 1e-12, 1e-12, d)
+    s = np.sign(d)
+    cruza = (s.max(1) > 0) & (s.min(1) < 0)
+    segs = []
+    for tri, dd in zip(T[cruza], d[cruza]):
+        pts = []
+        for i in range(3):
+            j = (i + 1) % 3
+            if (dd[i] > 0) != (dd[j] > 0):
+                u = dd[i] / (dd[i] - dd[j])
+                pts.append(tri[i] + u * (tri[j] - tri[i]))
+        if len(pts) == 2:
+            segs.append(pts)
+    # encadeia pelos extremos soldados; segmento de comprimento nulo (o plano passando por um vértice) sai
+    chave = lambda p: tuple(np.round(np.asarray(p) / tol).astype(np.int64))
+    arestas_c, pos, viz = [], {}, {}
+    for p, q in segs:
+        a_, b_ = chave(p), chave(q)
+        if a_ == b_:
+            continue
+        pos[a_], pos[b_] = p, q
+        k = len(arestas_c)
+        arestas_c.append((a_, b_))
+        viz.setdefault(a_, []).append(k)
+        viz.setdefault(b_, []).append(k)
+    usada = np.zeros(len(arestas_c), bool)
+    cadeias = []
+    ordem = sorted(viz, key=lambda n: len(viz[n]) == 2)   # começa pelas pontas e bifurcações; os laços ficam por último
+    for ini in ordem:
+        for k0 in viz[ini]:
+            if usada[k0]:
+                continue
+            cadeia, cur, k = [ini], ini, k0
+            while True:
+                usada[k] = True
+                a_, b_ = arestas_c[k]
+                cur = b_ if a_ == cur else a_
+                cadeia.append(cur)
+                if len(viz[cur]) != 2:
+                    break
+                prox = [e for e in viz[cur] if not usada[e]]
+                if not prox:
+                    break
+                k = prox[0]
+            cadeias.append(np.array([pos[n] for n in cadeia]))
+    return cadeias
+
+
+def reamostrar_polilinha(P, passo):
+    """Pontos a cada passo ao longo da polilinha (os extremos inclusos)."""
+    seg = np.linalg.norm(np.diff(P, axis=0), axis=1)
+    s = np.concatenate([[0], np.cumsum(seg)])
+    if s[-1] <= 0:
+        return P[:1]
+    alvo = np.append(np.arange(0, s[-1], passo), s[-1])
+    return np.stack([np.interp(alvo, s, P[:, j]) for j in range(P.shape[1])], 1)
+
+
+def desenhar_linhas(V, F, manter, regiao, angulo, vistas, prefixo):
+    """Grava <prefixo><vista>-linhas.png de cada vista: as linhas de feição e as bordas das faces mantidas, sem o trecho
+    escondido, em traço preto sobre branco (o corte da caixa em cinza), no tamanho e na câmera da vista."""
+    import tempfile
+    segs, tipos = linhas_de_feicao(V, F, manter, regiao, angulo)
+    Vk, Fk = compactar(V, F[manter])
+    arv = bvh(Vk, Fk)
+    contagem = {t: tipos.count(t) for t in ('feicao', 'dobra', 'natural', 'corte')}
+    for v in vistas:
+        pl = linhas_na_vista(segs, tipos, arv, v, meia=bool(v.get('meia')))
+        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as t:
+            json.dump({'W': v['W'], 'H': v['H'], 'linhas': pl}, t)
+        imagens('linhas', t.name, f"{prefixo}{v['nome']}-linhas.png")
+        os.unlink(t.name)
+    return contagem
+
+
+def contornos_dos_cortes(V, F, mascara, cortes):
+    """Para cada corte {nome, eixo, valor}: as cadeias do contorno em 3D e em (u, v) do plano, em metro."""
+    out = []
+    for c in cortes:
+        e = 'xyz'.index(c['eixo'])
+        u, w = EIXOS_DO_CORTE[e]
+        cad = cortar_plano(V, F, mascara, e, float(c['valor']))
+        out.append({'nome': c['nome'], 'eixo': c['eixo'], 'valor': float(c['valor']), 'eixos_uv': ['xyz'[u], 'xyz'[w]],
+                    'cadeias_3d': cad, 'cadeias_uv': [P[:, [u, w]] for P in cad]})
+    return out

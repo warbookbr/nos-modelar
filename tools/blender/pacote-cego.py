@@ -7,7 +7,7 @@
 #       --referencia <ref.obj|.glb|.gltf|.blend> [--objeto <nome>] [--z-cima] \
 #       --caixa xmin,xmax,ymin,ymax,zmin,zmax --saida <pasta> \
 #       [--config <cfg.json>] [--simetria-x] [--rotulos <rotulos.json>] [--excluir a,b] [--oclusores <malha>] \
-#       [--resolucao 1400x1050]
+#       [--resolucao 1400x1050] [--angulo-feicao 25] [--privado <pasta fora do pacote>]
 #
 # O preparo, em comum.preparar_referencia: (1) bisect pelos seis planos, sem preenchimento, de modo que nenhum triângulo
 # atravessa a borda da caixa; (2) visibilidade de cada triângulo por quatro pontos e raios pela normal, contra ela e pelas
@@ -15,6 +15,13 @@
 # faces ligadas por aresta com diedro abaixo de angulo_painel, entram inteiros quando a maior parte da área se vê de fora,
 # de modo que a borda do que fica é corte, borda livre ou dobra; (5) componentes com menos de fracao_componente da área do
 # maior saem. A configuração, as vistas e o padrão de cada chave estão em comum.PADRAO.
+#
+# Além das vistas sombreadas, desenha as linhas de feição (arestas com diedro acima de angulo_feicao, padrão 25 graus) e as
+# bordas do recorte, em traço preto sobre branco na mesma câmera e grade (vistas/<vista>-linhas.png), e os cortes planos da
+# chave `cortes` da configuração ({nome, eixo, valor}), cada um como contorno 2D em mm com grade e cotas dos extremos e da maior
+# saliência (cortes/<nome>.png), a tabela curta de cotas (cortes/cotas.md) e o quadro de cada desenho (cortes/quadro.json,
+# sem contorno, para olhar-candidata.py desenhar a candidata no mesmo quadro). Os pontos do contorno, a cada
+# passo_corte_regua, vão só para <privado>/cortes.json, fora do pacote, para a régua; sem --privado, não são gravados.
 #
 # Grava em <saida>/: vistas/<vista>-cinza.png e vistas/<vista>-zebra.png, vistas/camera.json (centro, escala, tamanho e eixos
 # de cada câmera, para olhar-candidata.py), vistas/grade.json (passo, rótulos e barra de cada imagem) e pacote.json (caixa,
@@ -31,7 +38,7 @@ cfg = C.configuracao(a)
 z_cima = bool(a.get('z_cima'))
 V, F, P = C.ler_malha(a['referencia'], a.get('objeto'), z_cima)
 rot = C.rotulos_dos_triangulos(a.get('rotulos'), V, F, P)
-prep = C.preparar_referencia(V, F, rot, cfg, C.ler_oclusores(a.get('oclusores'), z_cima))
+prep = C.preparar_referencia(V, F, rot, cfg, C.ler_oclusores(a.get('oclusores'), bool(a.get('z_cima_oclusores'))))
 
 pasta = os.path.join(a['saida'], 'vistas')
 os.makedirs(pasta, exist_ok=True)
@@ -55,13 +62,33 @@ for v in vistas:
 camera = {v['nome']: {k: v[k] for k in ('centro', 'escala', 'W', 'H', 'x_cam', 'y_cam', 'z_cam', 'direcao', 'cima')} | {'meia': bool(v.get('meia'))}
           for v in vistas}
 json.dump(camera, open(os.path.join(pasta, 'camera.json'), 'w'), indent=1)
+linhas = C.desenhar_linhas(prep['V'], prep['F'], prep['manter'], prep['regiao'], cfg['angulo_feicao'], vistas, pasta + os.sep)
 C.imagens('grade', os.path.join(pasta, 'camera.json'), pasta + os.sep)
+
+cortes = []
+if cfg['cortes']:
+    import tempfile
+    pc = os.path.join(a['saida'], 'cortes')
+    os.makedirs(pc, exist_ok=True)
+    cs = C.contornos_dos_cortes(prep['V'], prep['F'], prep['manter'], cfg['cortes'])
+    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as t:
+        json.dump({'simetria_x': cfg['simetria_x'], 'cortes': [{k: c[k] for k in ('nome', 'eixo', 'valor', 'eixos_uv')} |
+                   {'cadeias': [P.round(6).tolist() for P in c['cadeias_uv']]} for c in cs]}, t)
+    C.imagens('cortes', t.name, pc)
+    os.unlink(t.name)
+    cortes = [{'nome': c['nome'], 'eixo': c['eixo'], 'valor': c['valor'], 'cadeias': len(c['cadeias_3d'])} for c in cs]
+    if a.get('privado'):
+        os.makedirs(a['privado'], exist_ok=True)
+        json.dump({'aviso': 'pontos do contorno de cada corte; só para a régua, não vai para quem modela',
+                   'passo_m': cfg['passo_corte_regua'], 'cortes': [{'nome': c['nome'], 'eixo': c['eixo'], 'valor': c['valor'],
+                   'cadeias': [C.reamostrar_polilinha(P, cfg['passo_corte_regua']).round(5).tolist() for P in c['cadeias_3d']]} for c in cs]},
+                  open(os.path.join(a['privado'], 'cortes.json'), 'w'), indent=1)
 
 pacote = {
     'caixa': cfg['caixa'].tolist(), 'simetria_x': cfg['simetria_x'], 'regiao_do_recorte': prep['regiao'].tolist(),
-    'contagens': prep['contagens'], 'avesso': avesso, 'vistas': [v['nome'] for v in vistas],
+    'contagens': prep['contagens'], 'avesso': avesso, 'vistas': [v['nome'] for v in vistas], 'linhas': linhas, 'cortes': cortes,
     'configuracao': {k: cfg[k] for k in ('margem', 'visibilidade', 'angulo_painel', 'fracao_painel_visivel', 'fracao_componente',
-                                         'excluir', 'resolucao', 'amostras_render', 'avesso')},
+                                         'excluir', 'resolucao', 'amostras_render', 'avesso', 'angulo_feicao', 'cortes')},
 }
 json.dump(pacote, open(os.path.join(a['saida'], 'pacote.json'), 'w'), ensure_ascii=False, indent=1)
 print('PACOTE', json.dumps({'contagens': prep['contagens'], 'avesso': avesso}, ensure_ascii=False))

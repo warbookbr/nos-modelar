@@ -1,6 +1,7 @@
 /* blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a
-   régua dá zero na identidade e acusa a versão decimada, e o pacote cego de uma forma com painel interno e lasca sai com a
-   borda limpa, o avesso marcado e a barra de escala fora dos rótulos.
+   régua dá zero na identidade, acusa a versão decimada e separa distância e vincos por rótulo (com as omitidas à parte), e o
+   pacote cego de uma forma com painel interno e lasca sai com a borda limpa, o avesso marcado, a barra de escala fora dos
+   rótulos, as vistas de linhas de feição e os cortes cotados (os pontos do contorno só na pasta privada).
 
    Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
    inteiro se ignora, e o Blender fica fora do CI e do `--completo`. A forma medida é a forma de prova da gaiola por
@@ -70,7 +71,9 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
     writeFileSync(p('forma.obj'), obj());
     writeFileSync(p('forma-suja.obj'), obj([...painelInterno(), LASCA]));
     writeFileSync(p('rotulos.json'), JSON.stringify({ sementes: { lateral: [[0.8, 0.4, 1.0]], teto: [[0, 0.9, 1.0]] } }));
-    writeFileSync(p('cfg.json'), JSON.stringify({ visibilidade: { elevacao_minima: 0.3 }, resolucao: [480, 360], amostras_render: 4 }));
+    writeFileSync(p('cfg.json'), JSON.stringify({ visibilidade: { elevacao_minima: 0.3 }, resolucao: [480, 360], amostras_render: 4,
+      cortes: [{ nome: 'meio', eixo: 'z', valor: 1.1 }, { nome: 'lateral', eixo: 'x', valor: 0.3 }] }));
+    writeFileSync(p('cfg-omitidas.json'), JSON.stringify({ omitidas: ['teto'] }));
     writeFileSync(p('decimar.py'), [
       'import bpy, sys',
       "ent, sai = sys.argv[sys.argv.index('--') + 1:][:2]",
@@ -83,7 +86,7 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
       "bpy.ops.wm.obj_export(filepath=sai, export_selected_objects=True, forward_axis='NEGATIVE_Z', up_axis='Y', export_materials=False, export_uv=False, export_normals=False)",
     ].join('\n'));
     blender(p('decimar.py'), [p('forma.obj'), p('decimada.obj')]);
-  });
+  }, 180000);
   // MECANIFICA_BLENDER_GUARDAR=1 guarda a pasta com as malhas, as medidas e as imagens para olhar depois
   afterAll(() => {
     if (!dir) return;
@@ -91,13 +94,13 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
     else rmSync(dir, { recursive: true, force: true });
   });
 
-  it('o oráculo regera a fixture da subdivisão a 1e-7', () => {
+  it('o oráculo regera a fixture da subdivisão a 1e-7', { timeout: 120000 }, () => {
     const { erros, pior } = compararFixtures(gerarFixture(BLENDER), JSON.parse(readFileSync(FIXTURE, 'utf8')));
     expect(erros).toEqual([]);
     expect(pior).toBeLessThanOrEqual(1e-7);
   });
 
-  it('a régua dá zero na identidade, acusa a decimada e repete a medida', () => {
+  it('a régua dá zero na identidade, acusa a decimada e repete a medida', { timeout: 600000 }, () => {
     const regua = (cand, nome, extra = []) => blender('regua.py', ['--referencia', p('forma.obj'), '--candidata', cand, '--caixa', CAIXA,
       '--simetria-x', '--saida', p(nome), '--nome', nome, '--sem-imagens', ...extra]);
     regua(p('forma.obj'), 'identidade');
@@ -127,19 +130,30 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
     expect(Math.abs(id.area_recorte_candidata_m2 / id.referencia.area_mantida_m2 - 1)).toBeLessThan(1e-6);
   });
 
-  it('a régua desenha a folha e separa a distância por rótulo', () => {
+  it('a régua desenha a folha e separa a distância e os vincos por rótulo, com as omitidas à parte', { timeout: 600000 }, () => {
     blender('regua.py', ['--referencia', p('forma.obj'), '--candidata', p('decimada.obj'), '--caixa', CAIXA, '--simetria-x',
-      '--saida', p('folha'), '--nome', 'folha', '--rotulos', p('rotulos.json')]);
+      '--saida', p('folha'), '--nome', 'folha', '--rotulos', p('rotulos.json'), '--config', p('cfg-omitidas.json')]);
     const m = metricas(p('folha'));
     expect(Object.keys(m.por_rotulo)).toEqual(['lateral', 'teto']);
     expect(m.por_rotulo.lateral.fracao + m.por_rotulo.teto.fracao).toBeCloseTo(1, 2);
+    expect(m.por_rotulo.teto.omitida).toBe(true);
+    expect(m.por_rotulo.lateral.omitida).toBe(false);
+    // os vincos por rótulo somam o comprimento total, e sem a omitida a medida é a do rótulo que sobra
+    const vr = m.vincos_por_rotulo;
+    expect(Object.values(vr).reduce((s, v) => s + v.ref_comprimento_mm, 0)).toBeCloseTo(m.vincos.ref_comprimento_mm, -1);
+    expect(Object.values(vr).reduce((s, v) => s + v.cand_comprimento_mm, 0)).toBeCloseTo(m.vincos.cand_comprimento_mm, -1);
+    expect(m.vincos_sem_omitidas.omitidas).toEqual(['teto']);
+    const resto = Object.entries(vr).filter(([n]) => n !== 'teto').map(([, v]) => v.ref_comprimento_mm).reduce((s, x) => s + x, 0);
+    expect(m.vincos_sem_omitidas.ref_comprimento_mm).toBeCloseTo(resto, -1);
+    expect(m.ref_para_cand_sem_omitidas_mm.n).toBeLessThan(m.ref_para_cand_mm.n);
     expect(existsSync(p('folha/folha.png'))).toBe(true);
     for (const l of ['ref_cinza', 'cand_cinza', 'ref_zebra', 'cand_zebra', 'mapa']) expect(existsSync(p(`folha/${l}-frente.png`))).toBe(true);
   });
 
   it('o pacote cego tira o painel interno e a lasca, deixa a borda limpa e marca o avesso', () => {
     const pacote = (ref, saida) => {
-      blender('pacote-cego.py', ['--referencia', ref, '--caixa', CAIXA, '--simetria-x', '--config', p('cfg.json'), '--saida', p(saida)]);
+      blender('pacote-cego.py', ['--referencia', ref, '--caixa', CAIXA, '--simetria-x', '--config', p('cfg.json'), '--saida', p(saida),
+        '--privado', p(`${saida}-privado`)]);
       return JSON.parse(readFileSync(p(`${saida}/pacote.json`), 'utf8'));
     };
     const limpo = pacote(p('forma.obj'), 'pacote-limpo');
@@ -165,6 +179,31 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
       if (!img.startsWith('tresquartos')) expect(g.rotulos.length, img).toBeGreaterThan(2);
     }
 
+    // linhas de feição: uma imagem por vista, com traço; a lasca e o painel interno saíram, então as contagens são as da limpa
+    expect(sujo.linhas).toEqual(limpo.linhas);
+    expect(sujo.linhas.feicao + sujo.linhas.natural).toBeGreaterThan(0);
+    for (const v of sujo.vistas) expect(existsSync(p(`pacote-sujo/vistas/${v}-linhas.png`)), v).toBe(true);
+    for (const [img, g] of Object.entries(grade)) if (img.endsWith('-linhas')) expect(g.barra_cobre_rotulo, img).toBe(false);
+    expect(Object.keys(grade).filter((k) => k.endsWith('-linhas')).length).toBe(sujo.vistas.length);
+    // cortes: a imagem e a tabela no pacote, o quadro sem contorno, e os pontos a cada 10 mm só na pasta privada
+    expect(sujo.cortes.map((c) => c.nome)).toEqual(['meio', 'lateral']);
+    for (const c of sujo.cortes) expect(c.cadeias, c.nome).toBeGreaterThan(0);
+    for (const n of ['meio', 'lateral']) expect(existsSync(p(`pacote-sujo/cortes/${n}.png`)), n).toBe(true);
+    const cotas = readFileSync(p('pacote-sujo/cortes/cotas.md'), 'utf8').trim().split('\n').slice(2);
+    for (const n of ['meio', 'lateral']) {
+      const k = cotas.filter((l) => l.startsWith(`| ${n} `)).length;
+      expect(k, n).toBeGreaterThanOrEqual(4);
+      expect(k, n).toBeLessThanOrEqual(6);
+    }
+    const quadro = JSON.parse(readFileSync(p('pacote-sujo/cortes/quadro.json'), 'utf8'));
+    expect(JSON.stringify(quadro)).not.toContain('cadeias');
+    const privado = JSON.parse(readFileSync(p('pacote-sujo-privado/cortes.json'), 'utf8'));
+    for (const c of privado.cortes) for (const cad of c.cadeias) {
+      const passos = cad.slice(1).map((q, i) => Math.hypot(...q.map((x, j) => x - cad[i][j])));
+      expect(Math.max(...passos.slice(0, -1), 0.01), c.nome).toBeLessThanOrEqual(0.0101);
+    }
+    expect(existsSync(p('pacote-sujo/cortes.json'))).toBe(false);
+
     // a candidata igual à forma limpa, olhada nas câmeras do pacote, dá as mesmas imagens
     blender('olhar-candidata.py', ['--candidata', p('forma.obj'), '--pacote', p('pacote-limpo'), '--saida', p('olhar-')]);
     const olhar = JSON.parse(readFileSync(p('olhar-olhar.json'), 'utf8'));
@@ -173,5 +212,8 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
       expect(Math.abs(olhar.avesso[v].pixels_objeto - a.pixels_objeto), v).toBeLessThanOrEqual(0.005 * a.pixels_objeto);
       expect(Math.abs(olhar.avesso[v].pixels_avesso - a.pixels_avesso), v).toBeLessThanOrEqual(0.005 * a.pixels_objeto);
     }
-  });
+    // e desenha as linhas e os cortes dela no mesmo quadro: as cotas da forma limpa olhada são as do pacote dela
+    for (const v of limpo.vistas) expect(existsSync(p(`olhar-${v}-linhas.png`)), v).toBe(true);
+    expect(readFileSync(p('olhar-cortes/cotas.md'), 'utf8')).toBe(readFileSync(p('pacote-limpo/cortes/cotas.md'), 'utf8'));
+  }, 600000);
 });

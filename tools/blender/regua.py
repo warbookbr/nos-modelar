@@ -5,10 +5,10 @@
 # Uso:
 #   blender -b --factory-startup --python tools/blender/regua.py -- \
 #       --referencia <ref.obj|.glb|.gltf|.blend> [--objeto-referencia <nome>] \
-#       --candidata <cand.obj|.glb|.gltf|.blend> [--objeto-candidata <nome>] [--z-cima] \
+#       --candidata <cand.obj|.glb|.gltf|.blend> [--objeto-candidata <nome>] [--z-cima | --z-cima-referencia | --z-cima-candidata] \
 #       --caixa xmin,xmax,ymin,ymax,zmin,zmax --saida <pasta> --nome <rótulo da medida> \
 #       [--config <cfg.json>] [--simetria-x] [--rotulos <rotulos.json>] [--excluir a,b] [--oclusores <malha>] \
-#       [--angulo-vinco 40] [--densidade 40000] [--sem-imagens]
+#       [--angulo-vinco 40] [--densidade 40000] [--omitidas a,b] [--sem-imagens]
 #
 # A referência passa pelo mesmo preparo do pacote cego (comum.preparar_referencia): recorte exato pela caixa, pele visível
 # de fora, painéis inteiros, componentes pequenos fora. Mede-se só dentro da caixa declarada (com --simetria-x, a metade
@@ -20,7 +20,10 @@
 #   vincos: arestas com diedro acima de angulo_vinco (padrão 40 graus) entre faces visíveis, amostradas a cada 2 mm; a
 #     cobertura é a fração do vinco da referência a até 5 ou 10 mm de um vinco da candidata, a precisão o contrário, o F1 a
 #     média harmônica, e o desvio a distância do vinco da referência ao da candidata (mediana e p90).
-#   por_rotulo: com --rotulos, a distância da referência para a candidata por rótulo.
+#   por_rotulo: com --rotulos, a distância da referência para a candidata por rótulo; vincos_por_rotulo, os vincos por
+#     rótulo (o ponto de vinco da referência leva o rótulo da face dele, e o da candidata o da face da referência mais perto);
+#     com a chave `omitidas` da configuração (rótulos que a candidata pode omitir), cada rótulo traz omitida, e
+#     ref_para_cand_sem_omitidas_mm e vincos_sem_omitidas repetem a medida sem eles.
 # Grava em <saida>/: metricas.json e, sem --sem-imagens, as imagens de cada linha e vista e folha.png.
 import json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -43,6 +46,10 @@ cfg.setdefault('resolucao_folha', [480, 360])
 CX = cfg['caixa']
 MARGEM = cfg['margem']
 z_cima = bool(a.get('z_cima'))
+# --z-cima vale para as duas malhas; --z-cima-referencia e --z-cima-candidata, para uma só (referência em .blend Z para
+# cima e candidata em OBJ já no quadro Y para cima, por exemplo)
+z_ref = z_cima or bool(a.get('z_cima_referencia'))
+z_cand = z_cima or bool(a.get('z_cima_candidata'))
 os.makedirs(a['saida'], exist_ok=True)
 
 
@@ -74,19 +81,38 @@ def distancias(arvore, P, Nfonte):
 
 def vincos(V, F, elegivel, ambos):
     """Pontos a cada 2 mm nas arestas com diedro acima de angulo_vinco, com um dos dois triângulos elegível e os dois em
-    ambos, só dentro da caixa de medida."""
+    ambos, só dentro da caixa de medida; e, para cada ponto, o triângulo elegível da aresta (para o rótulo)."""
     internas = C.arestas(F)[0]
     di = C.diedros(V, F, internas)
     a_, b_, t1, t2, _ = internas
     sel = (di > cfg['angulo_vinco']) & (elegivel[t1] | elegivel[t2]) & ambos[t1] & ambos[t2]
     A, B = V[a_[sel]], V[b_[sel]]
-    pts = []
-    for p, q in zip(A, B):
+    tri = np.where(elegivel[t1[sel]], t1[sel], t2[sel])
+    pts, tt = [], []
+    for p, q, t in zip(A, B, tri):
         k = max(1, int(np.linalg.norm(q - p) / 0.002))
         s = (np.arange(k) + 0.5) / k
         pts.append(p[None] + s[:, None] * (q - p)[None])
-    P = np.concatenate(pts) if pts else np.zeros((0, 3))
-    return P[C.na_caixa(P, CX)] if len(P) else P
+        tt.append(np.full(k, t))
+    if not pts:
+        return np.zeros((0, 3)), np.zeros(0, int)
+    P, T = np.concatenate(pts), np.concatenate(tt)
+    m = C.na_caixa(P, CX)
+    return P[m], T[m]
+
+
+def casamento(drc, dcr):
+    """Cobertura, precisão e F1 a cada tolerância e o desvio, das distâncias de cada ponto de vinco da referência ao vinco
+    mais perto da candidata (drc) e o contrário (dcr), em mm."""
+    out = {'ref_comprimento_mm': int(round(len(drc) * 2.0)), 'cand_comprimento_mm': int(round(len(dcr) * 2.0))}
+    for tau in TAUS:
+        c = round(float((drc <= tau).mean()), 3) if len(drc) else 0.0
+        p = round(float((dcr <= tau).mean()), 3) if len(dcr) else 0.0
+        out[f'cobertura_{tau:g}mm'], out[f'precisao_{tau:g}mm'] = c, p
+        out[f'f1_{tau:g}mm'] = round(2 * c * p / (c + p), 3) if c + p > 0 else 0.0
+    out['desvio_mediana_mm'] = round(float(np.median(drc)), 3) if len(drc) and np.isfinite(drc).any() else None
+    out['desvio_p90_mm'] = round(float(np.percentile(drc, 90)), 3) if len(drc) and np.isfinite(drc).any() else None
+    return out
 
 
 def resumo(D):
@@ -99,9 +125,9 @@ def resumo(D):
 
 
 # ---------- referência ----------
-RV, RF, RP = C.ler_malha(a['referencia'], a.get('objeto_referencia'), z_cima)
+RV, RF, RP = C.ler_malha(a['referencia'], a.get('objeto_referencia'), z_ref)
 rot = C.rotulos_dos_triangulos(a.get('rotulos'), RV, RF, RP)
-ocl = C.ler_oclusores(a.get('oclusores'), z_cima)
+ocl = C.ler_oclusores(a.get('oclusores'), bool(a.get('z_cima_oclusores')))
 prep = C.preparar_referencia(RV, RF, rot, cfg, ocl)
 SV, SF, manter = prep['V'], prep['F'], prep['manter']
 SN, _ = C.normais(SV, SF)
@@ -119,7 +145,7 @@ alvo = C.toca_caixa(RV, RF, prep['regiao'], MARGEM)
 arv_ref = C.bvh(RV, RF[alvo])
 
 # ---------- candidata ----------
-CV, CF, _ = C.ler_malha(a['candidata'], a.get('objeto_candidata'), z_cima)
+CV, CF, _ = C.ler_malha(a['candidata'], a.get('objeto_candidata'), z_cand)
 CN, CA = C.normais(CV, CF)
 CF = CF[CA > 1e-14]
 CN, _ = C.normais(CV, CF)
@@ -137,24 +163,28 @@ d_rc, a_rc = distancias(arv_cand, Pr, SN[tr])
 d_cr, a_cr = distancias(arv_ref, Pc, CN[tc])
 
 # ---------- vincos ----------
-VR = vincos(SV, SF, ref_tri_vis, manter)
-VCp = vincos(CV, CF, cand_tri_vis & perto, perto)
 TAUS = [float(t) for t in cfg['tolerancias_mm']]
-vinc = {'angulo_graus': cfg['angulo_vinco'], 'ref_comprimento_mm': int(round(len(VR) * 2.0)), 'cand_comprimento_mm': int(round(len(VCp) * 2.0))}
+VR, TVR = vincos(SV, SF, ref_tri_vis, manter)
+VCp, _ = vincos(CV, CF, cand_tri_vis & perto, perto)
 if len(VCp) and len(VR):
     kc, kr = C.kd(VCp), C.kd(VR)
     drc = np.array([kc.find(Vector(p))[2] for p in VR]) * 1000
     dcr = np.array([kr.find(Vector(p))[2] for p in VCp]) * 1000
-    for tau in TAUS:
-        c, p = round(float((drc <= tau).mean()), 3), round(float((dcr <= tau).mean()), 3)
-        vinc[f'cobertura_{tau:g}mm'], vinc[f'precisao_{tau:g}mm'] = c, p
-        vinc[f'f1_{tau:g}mm'] = round(2 * c * p / (c + p), 3) if c + p > 0 else 0.0
-    vinc['desvio_mediana_mm'] = round(float(np.median(drc)), 3)
-    vinc['desvio_p90_mm'] = round(float(np.percentile(drc, 90)), 3)
 else:
-    for tau in TAUS:
-        vinc[f'cobertura_{tau:g}mm'] = vinc[f'precisao_{tau:g}mm'] = vinc[f'f1_{tau:g}mm'] = 0.0
-    vinc['desvio_mediana_mm'] = vinc['desvio_p90_mm'] = None
+    drc, dcr = np.full(len(VR), np.inf), np.full(len(VCp), np.inf)
+vinc = {'angulo_graus': cfg['angulo_vinco']} | casamento(drc, dcr)
+omitidas = [str(r) for r in cfg.get('omitidas', [])]
+vinc_rot, vinc_sem = None, None
+if prep['rotulo'] is not None and (len(VR) or len(VCp)):
+    rot_vr = prep['rotulo'][TVR].astype(str) if len(VR) else np.zeros(0, str)
+    kept = np.nonzero(manter)[0]
+    arv_rot = C.bvh(SV, SF[manter])
+    rot_vc = np.array([str(prep['rotulo'][kept[arv_rot.find_nearest(Vector(p))[2]]]) for p in VCp]) if len(VCp) else np.zeros(0, str)
+    vinc_rot = {}
+    for n in sorted(set(rot_vr) | set(rot_vc) | set(prep['rotulo'][manter].astype(str))):
+        vinc_rot[n] = casamento(drc[rot_vr == n], dcr[rot_vc == n]) | {'omitida': n in omitidas}
+    if omitidas:
+        vinc_sem = casamento(drc[~np.isin(rot_vr, omitidas)], dcr[~np.isin(rot_vc, omitidas)]) | {'omitidas': omitidas}
 
 met = {
     'nome': a['nome'], 'candidata': os.path.basename(a['candidata']), 'caixa': CX.tolist(), 'simetria_x': cfg['simetria_x'],
@@ -168,7 +198,14 @@ met = {
 if prep['rotulo'] is not None:
     rot_p = prep['rotulo'][tr].astype(str)
     met['por_rotulo'] = {str(n): {'fracao': round(float((rot_p == n).mean()), 3), 'mediana': round(float(np.median(d_rc[rot_p == n])), 2),
-                                  'p90': round(float(np.percentile(d_rc[rot_p == n], 90)), 2)} for n in sorted(set(rot_p))}
+                                  'p90': round(float(np.percentile(d_rc[rot_p == n], 90)), 2), 'omitida': str(n) in omitidas}
+                         for n in sorted(set(rot_p))}
+    if vinc_rot is not None:
+        met['vincos_por_rotulo'] = vinc_rot
+    if omitidas:
+        sem = ~np.isin(rot_p, omitidas)
+        met['ref_para_cand_sem_omitidas_mm'] = resumo(d_rc[sem]) | {'omitidas': omitidas}
+        met['vincos_sem_omitidas'] = vinc_sem
 # a candidata recortada pelos mesmos planos, para as imagens; a área dela mostra se o recorte perdeu triângulo comprido
 CVr, CFr = C.recortar(CV, CF[C.toca_caixa(CV, CF, prep['regiao'])], prep['regiao'])
 met['area_recorte_candidata_m2'] = round(float(C.normais(CVr, CFr)[1].sum()), 6)
