@@ -15,6 +15,7 @@ import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, proced
 import { criarRegistroOperacoes } from './registro.js';
 import { usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
+import { criarOperacoesFriso } from './operacoes/friso.js';
 import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.js';
 import { criarOperacoesPrimitivasSuperficie } from './operacoes/primitivas-superficie.js';
 import { criarOperacoesEdicaoDireta } from './operacoes/edicao-direta.js';
@@ -1682,6 +1683,25 @@ CONTRATOS_ORIGEM.subdivisao = {
     return faces.length ? { faces } : { erro: `origem subdivisao:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
   },
 };
+/* friso — as faces do sólido varrido, sem sub-endereço por posição; `parte: 'lateral'` cita a superfície varrida e
+   `parte: 'pontas'` as tampas das pontas abertas (vazia na volta fechada e nas pontas fechadas). */
+CONTRATOS_ORIGEM.friso = {
+  validar(origem) {
+    const msg = "friso usa op, id e parte opcional ('lateral' ou 'pontas')";
+    if (!Object.keys(origem).every((k) => k === 'op' || k === 'id' || k === 'parte')) return msg;
+    if (origem.parte != null && !['lateral', 'pontas'].includes(origem.parte)) return msg;
+    return null;
+  },
+  resolver(st, registro, origem) {
+    const lista = origem.parte ? registro[origem.parte] : registro.faces;
+    for (const f of lista) {
+      const consumo = conferirConsumo(st, f, `a face ${f} da origem friso:${origem.id}`);
+      if (consumo) return { erro: consumo };
+    }
+    const faces = lista.filter((f) => st.F.has(f));
+    return faces.length ? { faces } : { erro: `origem friso:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
+  },
+};
 /* casca — extensão nativa `procedural/extensoes/casca`: o resultado publica três grupos, citáveis por `parte`:
    `externa` (as faces fechadas do sólido, que continuam com id e vértices), `interna` (a parede de dentro, uma por face
    externa) e `borda` (a borda das faces abertas, uma por aresta). Sem `parte`, são todas. Os grupos são de significado
@@ -2874,6 +2894,7 @@ const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, F
 const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
 const operacoesSubdivisao = criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem });
+const operacoesFriso = criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem });
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, resolverSelecao, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {
@@ -2887,6 +2908,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesAtributos,
   ...operacoesBooleanas,
   ...operacoesSubdivisao,
+  ...operacoesFriso,
 };
 
 /* Configuração explícita do módulo que preserva os nomes curtos das receitas.
@@ -2897,11 +2919,11 @@ const NOMES_DAS_OPERACOES = [
   'vira', 'apagaFace', 'displace', 'encostar', 'transladar', 'rotaciona',
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
-  'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao',
+  'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao', 'friso',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
-const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'extrusao', 'inflate', 'subdivisao']);
+const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'extrusao', 'inflate', 'subdivisao', 'friso']);
 const ATRIBUTOS = new Set(['pincel', 'solido', 'liso', 'material']);
 function contratoDaOperacao(nome) {
   if (nome === 'publicarPorta') return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: ['mecanifica.porta@1'] }, efeitos: ['publica-porta'], identidade: 'declara-semantica' };
@@ -3405,7 +3427,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia() };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;

@@ -46,6 +46,7 @@ export const TESTES_LENTOS = [
   'procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs',
   'procedural/familias/roda-pneu/roda-pneu.test.js',
   'procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js',
+  'procedural/nucleo/friso-contato.test.mjs',
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
   'procedural/nucleo/operacoes/booleana-casca-raspada.test.ts',
   'tools/mcp/catalogo-montagens.test.mjs',

@@ -36,7 +36,10 @@ describe('catálogo de capacidades — R05', () => {
        MCP junto; fica registrado como atrito, e o teto deixa folga para quatro
        operações do tamanho da maior: 32 574 + 4 × 1 100 ≈ 37 000. */
     expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(37_000);
-    expect(Buffer.byteLength(JSON.stringify(hipergrafoDeCapacidades(catalogo)))).toBeLessThan(10_000);
+    /* O hipergrafo custa cerca de 260 bytes por operação (a hiperaresta e o nó do contrato). Medido em 2026-10-22: com
+       a operação friso, 39 operações somam 10 078 bytes, e o teto antigo de 10 000 não tinha folga; o novo deixa
+       folga para quatro operações. */
+    expect(Buffer.byteLength(JSON.stringify(hipergrafoDeCapacidades(catalogo)))).toBeLessThan(11_200);
   });
 
   it('busca por efeito, artefato e identidade sem executar receita', () => {
@@ -44,7 +47,7 @@ describe('catálogo de capacidades — R05', () => {
       nome: 'publicarPorta', uso: { schema: 'mecanifica.argumentos.publicarPorta@1', obrigatorios: ['de'] },
     }]);
     expect(buscarCapacidades(catalogo, { produz: 'mecanifica.parte@1' }).operacoes.map(({ nome }) => nome)).toEqual(['parte']);
-    expect(buscarCapacidades(catalogo, { identidade: 'cria-por-passo' }).total).toBe(11);
+    expect(buscarCapacidades(catalogo, { identidade: 'cria-por-passo' }).total).toBe(12);
   });
 
   it('explica ausência com candidatas e não inventa capacidade', () => {
@@ -60,7 +63,7 @@ describe('catálogo de capacidades — R05', () => {
     expect(buscarCapacidades(catalogo, { texto: 'revolucionar' }).operacoes.map(({ nome }) => nome)).toContain('lathe');
     const primeira = buscarCapacidades(catalogo, { limite: 3 });
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
-    expect(primeira).toMatchObject({ total: 38, retornadas: 3, truncado: true, omitidas: 35 });
+    expect(primeira).toMatchObject({ total: 39, retornadas: 3, truncado: true, omitidas: 36 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
   });
 
