@@ -6,8 +6,8 @@
 #       eixos, com rótulo a cada duas linhas, a barra de escala num canto que não cobre rótulo nem título, e grava em
 #       <prefixo>grade.json o passo, as caixas dos rótulos e a da barra de cada imagem.
 #   python3 -I imagens.py linhas <linhas.json> <saida.png>
-#       Desenha as polilinhas de linhas.json ({W, H, linhas: {tipo: [[[u, v], ...], ...]}}) em traço preto sobre branco; o
-#       tipo 'corte' (a borda sobre um plano da caixa) sai em cinza fino.
+#       Desenha as polilinhas de linhas.json ({W, H, linhas: {tipo: [[[u, v], ...], ...]}}) em traço preto sobre branco (os
+#       tipos feicao, dobra, natural e declarado); o tipo 'corte' (a borda sobre um plano da caixa) sai em cinza fino.
 #   python3 -I imagens.py cortes <cortes.json> <pasta> [<quadro.json>]
 #       Desenha cada corte de cortes.json ({simetria_x, cortes: [{nome, eixo, valor, eixos_uv, cadeias: [[[u, v], ...]]}]}, em
 #       metro) como contorno 2D em mm com grade e as cotas dos extremos e da maior saliência, em <pasta>/<nome>.png; grava a
@@ -139,7 +139,7 @@ def linhas(arq_json, saida):
     dr = ImageDraw.Draw(im)
     # Traço de feição com largura ímpar: com 2 px o Pillow põe o pixel a mais de um lado que a imagem não guarda, e a
     # leitura do meio do traço erra meio pixel a mais.
-    for tipo in ('corte', 'feicao', 'dobra', 'natural'):
+    for tipo in ('corte', 'feicao', 'dobra', 'natural', 'declarado'):
         cor, larg = ((150, 150, 150), 1) if tipo == 'corte' else ((0, 0, 0), 3)
         for pl in d['linhas'].get(tipo, []):
             dr.line([tuple(p) for p in pl], fill=cor, width=larg, joint='curve')

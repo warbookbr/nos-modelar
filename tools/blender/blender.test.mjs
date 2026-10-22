@@ -1,7 +1,9 @@
 /* blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a
    régua dá zero na identidade, acusa a versão decimada e separa distância e vincos por rótulo (com as omitidas à parte), e o
    pacote cego de uma forma com painel interno e lasca sai com a borda limpa, o avesso marcado, a barra de escala fora dos
-   rótulos, as vistas de linhas de feição e os cortes cotados (os pontos do contorno só na pasta privada).
+   rótulos, as vistas de linhas de feição e os cortes cotados (os pontos do contorno só na pasta privada); e o pacote de uma
+   forma simétrica em x (caixa-de-prova.mjs) sai com o recorte simétrico e as vistas de frente, traseira e topo iguais ao
+   próprio espelho a até 1 px, também com a triangulação que não é espelhada.
 
    Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
    inteiro se ignora, e o Blender fica fora do CI e do `--completo`. A forma medida é a forma de prova da gaiola por
@@ -16,6 +18,7 @@ import { gaiolaPorEstacoes } from '../../procedural/nucleo/gaiola-por-estacoes.j
 import { definicaoAdensada } from '../../procedural/nucleo/fixtures/gaiola-por-estacoes-prova.js';
 import { nucleo } from '../../procedural/nucleo/entrada.js';
 import { FIXTURE, compararFixtures, gerarFixture } from './oraculo-subdivisao.mjs';
+import { CAIXA as CAIXA_CAIXA, obj as caixaObj } from './caixa-de-prova.mjs';
 
 const BLENDER = process.env.MECANIFICA_BLENDER;
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
@@ -219,4 +222,45 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
     for (const v of limpo.vistas) expect(existsSync(p(`olhar-${v}-linhas.png`)), v).toBe(true);
     expect(readFileSync(p('olhar-cortes/cotas.md'), 'utf8')).toBe(readFileSync(p('pacote-limpo/cortes/cotas.md'), 'utf8'));
   }, 600000);
+
+  it('o pacote de uma forma simétrica sai com o recorte e as vistas simétricos', { timeout: 600000 }, () => {
+    // a caixa com janelas: as placas atrás das janelas se veem de fora só por um cone estreito de direções, e o recorte as
+    // decide pelas direções do observador que caem nele; com as direções da esfera de Fibonacci sem espelho, o observador
+    // acima do horizonte deixava 4 triângulos (0,0015 m²) de um lado só e a vista de frente com traço a 9 px do espelho
+    writeFileSync(p('caixa.obj'), caixaObj());
+    writeFileSync(p('caixa-diagonal.obj'), caixaObj({ diagonalTrocada: true }));
+    writeFileSync(p('cfg-caixa.json'), JSON.stringify({ fracao_componente: 0, resolucao: [700, 525], amostras_render: 1 }));
+    writeFileSync(p('cfg-caixa-alto.json'), JSON.stringify({ fracao_componente: 0, resolucao: [700, 525], amostras_render: 1,
+      visibilidade: { elevacao_minima: 0.3 } }));
+    const pacote = (ref, cfg, saida) => {
+      blender('pacote-cego.py', ['--referencia', p(ref), '--caixa', CAIXA_CAIXA.join(','), '--simetria-x', '--config', p(cfg), '--saida', p(saida)]);
+      const r = spawnSync('python3', ['-I', join(AQUI, 'simetria-das-vistas.py'), '--pacote', p(saida), '--vista', 'frente,traseira,topo'],
+        { encoding: 'utf8' });
+      if (r.status !== 0) throw new Error(r.stderr);
+      return { contagens: JSON.parse(readFileSync(p(`${saida}/pacote.json`), 'utf8')).contagens, vistas: JSON.parse(r.stdout).vistas };
+    };
+    const casos = [
+      // a triangulação espelhada: as direções simétricas bastam, e o espelho não muda decisão nenhuma
+      ['caixa.obj', 'cfg-caixa.json', 'simetrica-todas', 0],
+      ['caixa.obj', 'cfg-caixa-alto.json', 'simetrica-alto', 0],
+      // a mesma superfície com as placas espelhadas trianguladas pela outra diagonal: a fração visível de duas placas muda
+      // com os triângulos, e a metade x < 0 leva a decisão do espelho
+      ['caixa-diagonal.obj', 'cfg-caixa-alto.json', 'diagonal-alto', 1],
+    ];
+    for (const [ref, cfg, saida, espelhados] of casos) {
+      const { contagens: c, vistas } = pacote(ref, cfg, saida);
+      expect(c.simetria.area_sem_espelho_m2, saida).toBe(0);
+      expect(c.simetria.triangulos_espelho_tirado, saida).toBe(0);
+      if (espelhados) expect(c.simetria.triangulos_decididos_pelo_espelho, saida).toBeGreaterThan(0);
+      else expect(c.simetria.triangulos_decididos_pelo_espelho, saida).toBe(0);
+      // o teste não é vazio: há placas tiradas e mantidas
+      expect(c.paineis_removidos, saida).toBeGreaterThan(0);
+      expect(c.paineis_removidos, saida).toBeLessThan(c.paineis - 6);
+      for (const v of ['frente', 'traseira', 'topo']) {
+        expect(vistas[v].pixels_traco, `${saida} ${v}`).toBeGreaterThan(1000);
+        expect(vistas[v].desvio_centro_px, `${saida} ${v}`).toBe(0);
+        expect(vistas[v].maxima_px, `${saida} ${v}`).toBeLessThanOrEqual(1);
+      }
+    }
+  });
 });

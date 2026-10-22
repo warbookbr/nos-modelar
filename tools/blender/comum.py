@@ -169,7 +169,8 @@ def _ler_glb(caminho, objeto):
     return r
 
 
-def _ler_blend(caminho, objeto, z_cima):
+def _com_blend(caminho, objeto, fn):
+    """Carrega os objetos do .blend (só o de nome objeto, se dado), chama fn com as malhas e os tira da cena."""
     with bpy.data.libraries.load(caminho, link=False) as (src, dst):
         nomes = list(src.objects)
         dst.objects = [n for n in nomes if objeto is None or n == objeto]
@@ -180,9 +181,69 @@ def _ler_blend(caminho, objeto, z_cima):
     for o in objs:
         bpy.context.scene.collection.objects.link(o)
     bpy.context.view_layer.update()
-    r = _malhas_de_objetos(malhas, z_cima)
+    r = fn(malhas)
     _remover(objs)
     return r
+
+
+def _ler_blend(caminho, objeto, z_cima):
+    return _com_blend(caminho, objeto, lambda malhas: _malhas_de_objetos(malhas, z_cima))
+
+
+def _arestas_marcadas(objs, z_cima):
+    """Segmentos (n, 2, 3) das arestas marcadas como vinco nos objetos de malha, com os modificadores aplicados: vinco de
+    subdivisão (atributo crease_edge acima de zero) ou aresta viva (sharp_edge). A subdivisão do Blender propaga as duas
+    marcas às arestas que gera."""
+    dg = bpy.context.evaluated_depsgraph_get()
+    segs = []
+    for o in sorted(objs, key=lambda o: o.name):
+        ev = o.evaluated_get(dg)
+        me = ev.to_mesh()
+        M = ev.matrix_world
+        marca = np.zeros(len(me.edges), bool)
+        for nome in ('crease_edge', 'sharp_edge'):
+            at = me.attributes.get(nome)
+            if at is not None and at.domain == 'EDGE':
+                v = np.zeros(len(me.edges), float)
+                at.data.foreach_get('value', v)
+                marca |= v > 0
+        for e in np.nonzero(marca)[0]:
+            p = [M @ me.vertices[i].co for i in me.edges[int(e)].vertices]
+            segs.append([[w.x, w.z, -w.y] if z_cima else [w.x, w.y, w.z] for w in p])
+        ev.to_mesh_clear()
+    return np.array(segs, float).reshape(-1, 2, 3)
+
+
+def ler_vincos_declarados(caminho, objeto=None, z_cima=False):
+    """Os vincos que a malha declara, como segmentos (n, 2, 3): no .blend, as arestas com vinco de subdivisão ou marcadas
+    como vivas; OBJ, GLB e glTF não guardam essa marca, e saem sem nenhum."""
+    if os.path.splitext(caminho)[1].lower() != '.blend':
+        return np.zeros((0, 2, 3))
+    return _com_blend(caminho, objeto, lambda malhas: _arestas_marcadas(malhas, z_cima))
+
+
+def recortar_segmentos(S, caixa, tol=1e-9):
+    """Os segmentos (n, 2, 3) recortados pela caixa 3x2 (Liang e Barsky); os que ficam fora saem."""
+    out = []
+    for p, q in S:
+        d = q - p
+        t0, t1 = 0.0, 1.0
+        for e in range(3):
+            for lim, sinal in ((caixa[e, 0], -1.0), (caixa[e, 1], 1.0)):
+                num = sinal * (lim - p[e])
+                den = sinal * d[e]
+                if abs(den) < 1e-15:
+                    if num < -tol:
+                        t0, t1 = 1.0, 0.0
+                else:
+                    t = num / den
+                    if den < 0:
+                        t0 = max(t0, t)
+                    else:
+                        t1 = min(t1, t)
+        if t1 - t0 > tol:
+            out.append([p + t0 * d, p + t1 * d])
+    return np.array(out, float).reshape(-1, 2, 3)
 
 
 def ler_malha(caminho, objeto=None, z_cima=False):
@@ -350,26 +411,39 @@ def _uniao(n, pares):
 
 # ---------- visibilidade ----------
 
-def direcoes(vis, espelhar=False):
-    """Direções da esfera de Fibonacci permitidas ao observador; com espelhar, o lado é o da metade x < 0."""
-    n = int(vis['direcoes'])
+def direcoes_espelhadas(n):
+    """Cerca de n direções da esfera de Fibonacci, simétricas em x: as da metade x >= 0 e a imagem espelhada de cada uma
+    (a do plano x = 0 uma vez só). A esfera de Fibonacci sozinha não é simétrica em x, e a metade x < 0, que usa as
+    direções pelo lado espelhado, veria a peça por outras direções que a metade x > 0."""
     g = math.pi * (3 - math.sqrt(5))
+    metade = []
+    for i in range(int(n)):
+        y = 1 - 2 * (i + 0.5) / n
+        r = math.sqrt(1 - y * y)
+        th = g * i
+        d = (r * math.cos(th), y, r * math.sin(th))
+        if d[0] >= 0:
+            metade.append(d)
+    out = []
+    for d in metade:
+        out.append(d)
+        if d[0] > 0:
+            out.append((-d[0], d[1], d[2]))
+    return np.array(out, float)
+
+
+def direcoes(vis, espelhar=False):
+    """Direções permitidas ao observador, de um conjunto simétrico em x; com espelhar, o lado e o cima são os da metade
+    x < 0 (as imagens espelhadas), de modo que as direções da metade x < 0 são as imagens das da metade x >= 0."""
     cima = np.array(vis['cima'], float)
     cima /= np.linalg.norm(cima)
     lado = np.array(vis['lado'], float)
     lado /= np.linalg.norm(lado)
     if espelhar:
         lado = lado * np.array([-1.0, 1.0, 1.0])
+        cima = cima * np.array([-1.0, 1.0, 1.0])
     ok = lambda d: d @ cima >= vis['elevacao_minima'] and d @ lado >= vis['lado_minimo']
-    out = []
-    for i in range(n):
-        y = 1 - 2 * (i + 0.5) / n
-        r = math.sqrt(1 - y * y)
-        th = g * i
-        d = np.array([r * math.cos(th), y, r * math.sin(th)])
-        if ok(d):
-            out.append(Vector(d))
-    return out, ok
+    return [Vector(d) for d in direcoes_espelhadas(int(vis['direcoes'])) if ok(d)], ok
 
 
 class Visibilidade:
@@ -452,6 +526,11 @@ def preparar_referencia(V, F, rot, cfg, oclusores=None):
     manter = entra[inv_p]
     cont['paineis'] = int(len(ids_p))
     cont['paineis_removidos'] = int((~entra).sum())
+    espelhados = 0
+    if cfg['simetria_x']:
+        # a metade x < 0 leva a decisão da imagem espelhada: a mesma superfície triangulada de outro jeito (na referência
+        # ou no bisect) dá outros pontos de visibilidade e outra fração visível do painel, e a decisão sairia de um lado só
+        manter, espelhados = espelhar_decisao(Vr, Fr, manter)
     # componentes por aresta entre faces mantidas
     ambos = manter[internas[2]] & manter[internas[3]]
     comp = _uniao(len(Fr), zip(internas[2][ambos], internas[3][ambos]))
@@ -471,10 +550,46 @@ def preparar_referencia(V, F, rot, cfg, oclusores=None):
         cont['triangulos_rotulo_herdado'] = int((manter & excl).sum())
     cont['triangulos_mantidos'] = int(manter.sum())
     cont['area_mantida_m2'] = round(float(area[manter].sum()), 6)
+    if cfg['simetria_x']:
+        cont['simetria'] = {'triangulos_decididos_pelo_espelho': espelhados, **simetria_do_recorte(Vr, Fr, manter)}
     cont['bordas'] = classificar_bordas(Vr, Fr, manter, regiao, cfg['angulo_painel'])
     fora = np.maximum(regiao[:, 0] - Vr[np.unique(Fr[manter])], Vr[np.unique(Fr[manter])] - regiao[:, 1]).max()
     cont['fora_da_caixa_m'] = float(max(0.0, fora))
     return {'V': Vr, 'F': Fr, 'manter': manter, 'visivel': vis, 'rotulo': rot_r, 'regiao': regiao, 'contagens': cont}
+
+
+def espelhar_decisao(V, F, manter, tol=1e-3):
+    """Com simetria em x: cada triângulo de centro em x < 0 fica ou sai como o triângulo onde cai a imagem espelhada do
+    centro dele, a até tol metro; sem imagem na malha, fica a própria decisão. Devolve a decisão nova e quantos triângulos
+    ela mudou."""
+    arv = bvh(V, F)
+    C_ = V[F].mean(1)
+    novo = manter.copy()
+    for t in np.nonzero(C_[:, 0] < 0)[0]:
+        idx = arv.find_nearest(Vector(C_[t] * np.array([-1.0, 1.0, 1.0])), tol)[2]
+        if idx is not None:
+            novo[t] = manter[idx]
+    return novo, int((novo != manter).sum())
+
+
+def simetria_do_recorte(V, F, manter, tol=1e-3):
+    """Com simetria em x, confere que o recorte é simétrico: a imagem espelhada do centro de cada triângulo mantido cai, a
+    até tol metro, sobre um triângulo do recorte, e esse triângulo também fica. Devolve a área (e a contagem) dos mantidos
+    cujo espelho caiu num triângulo tirado, que é a assimetria do próprio recorte, e a área dos que não têm espelho na malha,
+    que é a assimetria da referência."""
+    arv = bvh(V, F)
+    _, area = normais(V, F)
+    Cm = V[F].mean(1) * np.array([-1.0, 1.0, 1.0])
+    tirado, n_tirado, sem = 0.0, 0, 0.0
+    for t in np.nonzero(manter)[0]:
+        idx = arv.find_nearest(Vector(Cm[t]), tol)[2]
+        if idx is None:
+            sem += area[t]
+        elif not manter[idx]:
+            tirado += area[t]
+            n_tirado += 1
+    return {'tolerancia_m': tol, 'triangulos_espelho_tirado': n_tirado, 'area_espelho_tirado_m2': round(float(tirado), 6),
+            'area_sem_espelho_m2': round(float(sem), 6)}
 
 
 def classificar_bordas(V, F, manter, regiao, angulo_painel):
@@ -762,34 +877,76 @@ def linhas_de_feicao(V, F, manter, regiao, angulo):
     return segs, tipos
 
 
-def linhas_na_vista(segs, tipos, arvore, vista, passo=0.002, meia=False):
-    """Projeta os segmentos na vista ortográfica e tira o trecho escondido: cada ponto, a cada passo metros, é visível se o
-    raio dele para a câmera não bate na superfície. Devolve {tipo: [polilinha em pixels, ...]}."""
-    c = np.array(vista['centro'], float)
-    xc, yc, zc = (np.array(vista[k], float) for k in ('x_cam', 'y_cam', 'z_cam'))
-    s, W = vista['escala'], vista['W']
-    H = vista['H']
-    zv = Vector(zc)
-    out = {}
-    for (p, q), tipo in zip(segs, tipos):
-        if meia and (p[0] < -1e-9 or q[0] < -1e-9):
-            continue
+def pontos_dos_segmentos(segs, passo=0.002):
+    """Os pontos de cada segmento a cada passo metros, com as duas pontas."""
+    out = []
+    for p, q in segs:
         k = max(1, int(np.ceil(np.linalg.norm(q - p) / passo)))
         ts = np.linspace(0, 1, k + 1)
-        pts = p[None] + ts[:, None] * (q - p)[None]
-        vis = np.array([arvore.ray_cast(Vector(pt) + zv * 1e-3, zv)[0] is None for pt in pts])
-        uv = np.stack([W / 2 + ((pts - c) @ xc) / s * W, H / 2 - ((pts - c) @ yc) / s * W], 1)
-        atual = []
-        for ok, ponto in zip(vis, uv):
-            if ok:
-                atual.append([round(float(ponto[0]), 2), round(float(ponto[1]), 2)])
-            elif len(atual) >= 2:
-                out.setdefault(tipo, []).append(atual)
-                atual = []
-            else:
-                atual = []
-        if len(atual) >= 2:
-            out.setdefault(tipo, []).append(atual)
+        out.append(p[None] + ts[:, None] * (q - p)[None])
+    return out
+
+
+def _escapa(arvore, origem, d, rasante=1e-3, voltas=8):
+    """Se o raio de origem na direção d sai sem bater na superfície. A face de perfil, com a normal a menos de rasante do
+    perpendicular ao raio, não esconde nada (não tem área na vista), e o raio segue além dela: a aresta de silhueta tem uma
+    face de perfil ao lado, e o raio que corre rente a ela batia ou não conforme o arredondamento das coordenadas."""
+    o = origem
+    for _ in range(voltas):
+        loc, nrm, _, _ = arvore.ray_cast(o, d)
+        if loc is None:
+            return True
+        if abs(nrm.dot(d)) > rasante:
+            return False
+        o = loc + d * 1e-6
+    return False
+
+
+def visiveis_na_vista(pontos, segs, arvore, vista, meia=False):
+    """Para os pontos de cada segmento, se cada um se vê na vista ortográfica: o raio dele para a câmera não bate na
+    superfície (_escapa). Na vista de meia peça, o segmento com uma ponta em x < 0 fica todo escondido."""
+    zv = Vector(np.array(vista['z_cam'], float))
+    out = []
+    for pts, (p, q) in zip(pontos, segs):
+        if meia and (p[0] < -1e-9 or q[0] < -1e-9):
+            out.append(np.zeros(len(pts), bool))
+            continue
+        out.append(np.array([_escapa(arvore, Vector(pt) + zv * 1e-3, zv) for pt in pts]))
+    return out
+
+
+def trechos(pts, vis):
+    """Os trechos de pontos visíveis seguidos, com dois pontos ou mais."""
+    out, i = [], 0
+    while i < len(pts):
+        if not vis[i]:
+            i += 1
+            continue
+        j = i
+        while j < len(pts) and vis[j]:
+            j += 1
+        if j - i >= 2:
+            out.append(pts[i:j])
+        i = j
+    return out
+
+
+def para_pixels(P, vista):
+    c = np.array(vista['centro'], float)
+    xc, yc = np.array(vista['x_cam'], float), np.array(vista['y_cam'], float)
+    s, W, H = vista['escala'], vista['W'], vista['H']
+    return np.stack([W / 2 + ((P - c) @ xc) / s * W, H / 2 - ((P - c) @ yc) / s * W], 1)
+
+
+def linhas_na_vista(segs, tipos, arvore, vista, passo=0.002, meia=False, pontos=None, vis=None):
+    """Projeta os segmentos na vista ortográfica e tira o trecho escondido: cada ponto, a cada passo metros, é visível se o
+    raio dele para a câmera não bate na superfície. Devolve {tipo: [polilinha em pixels, ...]}."""
+    pontos = pontos if pontos is not None else pontos_dos_segmentos(segs, passo)
+    vis = vis if vis is not None else visiveis_na_vista(pontos, segs, arvore, vista, meia)
+    out = {}
+    for pts, v, tipo in zip(pontos, vis, tipos):
+        for T in trechos(pts, v):
+            out.setdefault(tipo, []).append([[round(float(a), 2), round(float(b), 2)] for a, b in para_pixels(T, vista)])
     return out
 
 
@@ -860,20 +1017,42 @@ def reamostrar_polilinha(P, passo):
     return np.stack([np.interp(alvo, s, P[:, j]) for j in range(P.shape[1])], 1)
 
 
-def desenhar_linhas(V, F, manter, regiao, angulo, vistas, prefixo):
+TIPOS_PRETOS = ('feicao', 'dobra', 'natural', 'declarado')   # o traço preto das vistas de linhas; 'corte' sai em cinza
+
+
+def desenhar_linhas(V, F, manter, regiao, angulo, vistas, prefixo, declarados=None, trechos_3d=None):
     """Grava <prefixo><vista>-linhas.png de cada vista: as linhas de feição e as bordas das faces mantidas, sem o trecho
-    escondido, em traço preto sobre branco (o corte da caixa em cinza), no tamanho e na câmera da vista."""
+    escondido, em traço preto sobre branco (o corte da caixa em cinza), no tamanho e na câmera da vista. declarados são
+    segmentos (n, 2, 3) de vinco que a malha declara, desenhados em preto como a feição, menos os que repetem uma aresta já
+    desenhada. Com trechos_3d (um dicionário), guarda nele, por vista, os trechos visíveis do traço preto em 3D, como
+    [(tipo, pontos (k, 3))], e em '_qualquer' os trechos visíveis em ao menos uma das vistas."""
     import tempfile
     segs, tipos = linhas_de_feicao(V, F, manter, regiao, angulo)
+    if declarados is not None and len(declarados):
+        chave = lambda p, q: tuple(sorted((tuple(np.round(p / 1e-6).astype(np.int64)), tuple(np.round(q / 1e-6).astype(np.int64)))))
+        ja = {chave(p, q) for (p, q), t in zip(segs, tipos) if t != 'corte'}
+        novos = [(p, q) for p, q in declarados if chave(p, q) not in ja]
+        segs += novos
+        tipos += ['declarado'] * len(novos)
     Vk, Fk = compactar(V, F[manter])
     arv = bvh(Vk, Fk)
-    contagem = {t: tipos.count(t) for t in ('feicao', 'dobra', 'natural', 'corte')}
+    contagem = {t: tipos.count(t) for t in ('feicao', 'dobra', 'natural', 'corte', 'declarado')}
+    if not contagem['declarado']:
+        del contagem['declarado']
+    pontos = pontos_dos_segmentos(segs)
+    algum = [np.zeros(len(p), bool) for p in pontos]
     for v in vistas:
-        pl = linhas_na_vista(segs, tipos, arv, v, meia=bool(v.get('meia')))
+        vis = visiveis_na_vista(pontos, segs, arv, v, bool(v.get('meia')))
+        pl = linhas_na_vista(segs, tipos, arv, v, pontos=pontos, vis=vis)
         with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as t:
             json.dump({'W': v['W'], 'H': v['H'], 'linhas': pl}, t)
         imagens('linhas', t.name, f"{prefixo}{v['nome']}-linhas.png")
         os.unlink(t.name)
+        if trechos_3d is not None:
+            trechos_3d[v['nome']] = [(tp, T) for pts, vv, tp in zip(pontos, vis, tipos) if tp in TIPOS_PRETOS for T in trechos(pts, vv)]
+            algum = [a | vv for a, vv in zip(algum, vis)]
+    if trechos_3d is not None:
+        trechos_3d['_qualquer'] = [(tp, T) for pts, a, tp in zip(pontos, algum, tipos) if tp in TIPOS_PRETOS for T in trechos(pts, a)]
     return contagem
 
 

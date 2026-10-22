@@ -718,6 +718,31 @@ def mapa_da_vista(mt):
     return para_mm, ['x_camera', 'y_camera']
 
 
+def projetar_na_vista(P, mt):
+    """Pontos 3D em metro levados a mm no plano da vista, no quadro de mapa_da_vista: na vista alinhada, as coordenadas do
+    mundo dos dois eixos da imagem; na oblíqua, a projeção nos eixos da câmera."""
+    P = np.asarray(P, float).reshape(-1, 3)
+    ex = eixos_da_vista(mt)
+    if ex:
+        return P[:, [ex[1], ex[3]]] * 1000
+    return np.stack([P @ np.array(mt['x_cam'], float), P @ np.array(mt['y_cam'], float)], 1) * 1000
+
+
+def mm_para_px(Q, mt):
+    """O inverso de mapa_da_vista: pontos em mm no plano da vista levados a pixel da imagem dela."""
+    Q = np.asarray(Q, float).reshape(-1, 2) / 1000
+    c = np.array(mt['centro'], float)
+    s, W, H = mt['escala'], mt['W'], mt['H']
+    ex = eixos_da_vista(mt)
+    if ex:
+        _, ah, sh, av, sv = ex
+        X, Y = sh * (Q[:, 0] - c[ah]), sv * (Q[:, 1] - c[av])
+    else:
+        X = Q[:, 0] - c @ np.array(mt['x_cam'], float)
+        Y = Q[:, 1] - c @ np.array(mt['y_cam'], float)
+    return np.stack([W / 2 + X * W / s, H / 2 - Y * W / s], 1)
+
+
 def ler_vista_de_linhas(imagem, v, mt, grade=None, falha_max=10.0, minimo_px=None):
     """As linhas de feição (traço preto) e as bordas de corte da caixa (cinza fino) de uma vista, em mm no plano dela."""
     rgb = np.asarray(Image.open(imagem).convert('RGB'))
@@ -844,6 +869,38 @@ def comparar_contornos(lidas, candidatas, erro_mm=0.0, passo=0.5):
             e['ponto_da_maxima'] = np.round(Q[int(np.argmax(d))], 2).tolist()
             e['fracao_acima_do_erro'] = round(float((d > erro_mm).mean()), 4)
         out[nome] = e
+    return out
+
+
+def distancias_entre_linhas(de, para, passo=1.0):
+    """Os pontos de cada polilinha de `de` ([{pontos_mm, fechada}], em qualquer dimensão), a cada passo mm, e a distância
+    de cada um à polilinha de `para` mais perto (infinita quando `para` está vazio)."""
+    Q = [reamostrar(np.asarray(p['pontos_mm'], float), passo, p.get('fechada', False)) for p in de if len(p['pontos_mm'])]
+    Q = np.vstack(Q) if Q else np.zeros((0, 2))
+    A, B = segmentos([{'pontos': p['pontos_mm'], 'fechada': p.get('fechada', False)} for p in para], eps=0.02)
+    if not len(Q):
+        return Q, np.zeros(0)
+    return Q, distancia_a_segmentos(Q, A, B, bloco=max(16, 4_000_000 // max(1, len(A))))
+
+
+def medidas_de_casamento(d_lc, d_cl, comp_lido, comp_cand, tolerancias=(2.0, 5.0), erro_mm=None):
+    """Cobertura (fração dos pontos lidos do pacote a até tau de uma linha da candidata), precisão (o contrário) e F1 a cada
+    tolerância, o desvio (mediana e p90 da distância do lido à candidata) e, com o erro de leitura, a fração do lido acima
+    dele, que é o piso da medida."""
+    out = {'comprimento_pacote_mm': round(float(comp_lido), 1), 'comprimento_candidata_mm': round(float(comp_cand), 1)}
+    for tau in tolerancias:
+        c = round(float((d_lc <= tau).mean()), 3) if len(d_lc) else 0.0
+        p = round(float((d_cl <= tau).mean()), 3) if len(d_cl) else 0.0
+        out[f'cobertura_{tau:g}mm'], out[f'precisao_{tau:g}mm'] = c, p
+        out[f'f1_{tau:g}mm'] = round(2 * c * p / (c + p), 3) if c + p > 0 else 0.0
+    fin = d_lc[np.isfinite(d_lc)]
+    out['desvio_mediana_mm'] = round(float(np.median(fin)), 3) if len(fin) else None
+    out['desvio_p90_mm'] = round(float(np.percentile(fin, 90)), 3) if len(fin) else None
+    fin = d_cl[np.isfinite(d_cl)]
+    out['excesso_mediana_mm'] = round(float(np.median(fin)), 3) if len(fin) else None
+    if erro_mm is not None:
+        out['erro_leitura_mm'] = erro_mm
+        out['fracao_acima_do_erro'] = round(float((d_lc > erro_mm).mean()), 4) if len(d_lc) else None
     return out
 
 
@@ -1007,6 +1064,139 @@ def linhas_3d(leituras, cameras, tol_mm=None, simetria_x=False, passo=1.0, class
     return {'classe': classe, 'tolerancia_mm': round(tol_mm, 3), 'simetria_x': bool(simetria_x),
             'vistas_por_eixo': {EIXOS[k]: v[0] for k, v in sorted(por_eixo.items())}, 'pares_testados': pares_testados,
             'ambiguas': ambiguas, 'polilinhas_3d': out}
+
+
+# ---------- ângulo da dobra pelos cortes ----------
+
+def _ao_longo(P, fechada=False):
+    """O comprimento acumulado ao longo da polilinha."""
+    if fechada:
+        P = np.vstack([P, P[:1]])
+    return np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=1))]), P
+
+
+def _lado_do_canto(P, s, s0, sentido, a, b):
+    """Os pontos da polilinha a uma distância entre a e b mm do canto (em s0), ao longo dela, no sentido dado."""
+    d = (s - s0) * sentido
+    return P[(d >= a) & (d <= b)]
+
+
+def _direcao(Q, canto):
+    """A direção da reta ajustada aos pontos, orientada para longe do canto, e o erro padrão do ângulo dela em radianos: o
+    desvio quadrático médio dos pontos à reta sobre a raiz da soma dos quadrados das posições ao longo dela."""
+    m, u, r = _reta(Q)
+    if (m - canto) @ u < 0:
+        u = -u
+    t = (Q - m) @ u
+    n = len(Q)
+    return u, (r * math.sqrt(n / max(n - 2, 1))) / max(math.sqrt(float(t @ t)), 1e-9)
+
+
+def _canto_no_corte(P, fechada, alvo, perto, janela=6.0, braco=5.0):
+    """O canto do contorno perto de alvo: o ponto, a até janela mm (ao longo do traço) do ponto mais perto de alvo, onde o
+    traço mais vira entre as cordas de braco mm para trás e para a frente. O contorno fechado se abre no lado oposto ao ponto
+    mais perto, para que o canto fique no meio. Devolve ((s do canto, giro em graus) ou None, s, pontos)."""
+    P = np.asarray(P, float)
+    if fechada:
+        P = np.roll(P, len(P) // 2 - int(np.argmin(np.linalg.norm(P - alvo, axis=1))), axis=0)
+    s, Pf = _ao_longo(P)
+    d = np.linalg.norm(Pf - alvo, axis=1)
+    k = int(np.argmin(d))
+    if d[k] > perto:
+        return None, s, Pf
+    melhor, s_melhor = -1.0, None
+    for j in np.nonzero(np.abs(s - s[k]) <= janela)[0]:
+        if s[j] - braco < s[0] or s[j] + braco > s[-1]:
+            continue
+        a = np.array([np.interp(s[j] - braco, s, Pf[:, 0]), np.interp(s[j] - braco, s, Pf[:, 1])])
+        b = np.array([np.interp(s[j] + braco, s, Pf[:, 0]), np.interp(s[j] + braco, s, Pf[:, 1])])
+        u, w = Pf[j] - a, b - Pf[j]
+        g = math.degrees(math.acos(max(-1.0, min(1.0, float(u @ w) / max(np.linalg.norm(u) * np.linalg.norm(w), 1e-12)))))
+        if g > melhor:
+            melhor, s_melhor = g, s[j]
+    return (s_melhor, melhor), s, Pf
+
+
+def angulos_pelos_cortes(curvas, cortes, perto_mm=4.0, giro_min=8.0, a_mm=5.0, b_mm=20.0, b_curto_mm=12.0, minimo_lado_mm=4.0):
+    """O ângulo da dobra de cada curva 3D (polilinhas em mm) onde ela atravessa um corte lido do pacote (ler_corte). No
+    ponto em que a curva cruza o plano, o contorno do corte faz um canto; as retas ajustadas ao contorno dos dois lados do
+    canto, entre a_mm e b_mm dele, dão uma direção de cada face no plano, e a dobra é 180 graus menos o ângulo entre as duas
+    faces, medido no plano perpendicular à tangente da curva (as duas faces contêm a curva). A incerteza soma duas vezes o
+    erro padrão do ângulo das duas retas, que sai do espalhamento dos pontos lidos em volta delas, metade da diferença para
+    o ajuste mais curto (até b_curto_mm), que mostra quanto a face curva perto da dobra, e metade do ângulo que o erro de
+    leitura do corte faz sobre o comprimento ajustado, que cobre o desvio sistemático da borda do traço lido. Começar a
+    a_mm do canto deixa de fora o canto que o traço grosso arredonda. Devolve, para cada curva, a lista das travessias
+    medidas."""
+    out = []
+    for C in curvas:
+        P = np.asarray(C, float)
+        s3, _ = _ao_longo(P)
+        medidas = []
+        for c in cortes:
+            e = EIXOS.index(c['eixo'])
+            u, w = (EIXOS.index(x) for x in c['eixos_uv'])
+            v = float(c['valor_mm'])
+            d = P[:, e] - v
+            for i in np.nonzero(d[:-1] * d[1:] < 0)[0]:
+                f = d[i] / (d[i] - d[i + 1])
+                X = P[i] + f * (P[i + 1] - P[i])
+                sx = s3[i] + f * (s3[i + 1] - s3[i])
+                if sx < 3.0 or s3[-1] - sx < 3.0:
+                    continue
+                q = lambda t: np.array([np.interp(t, s3, P[:, k]) for k in range(3)])
+                t = q(min(sx + 10.0, s3[-1])) - q(max(sx - 10.0, 0.0))
+                t /= np.linalg.norm(t)
+                if abs(t[e]) < 0.2:
+                    continue   # a curva corre quase no plano do corte, e a travessia não se localiza
+                alvo = X[[u, w]]
+                for pl in c['polilinhas']:
+                    Q = np.asarray(pl['pontos_mm'], float)
+                    if len(Q) < 3:
+                        continue
+                    canto, s, Qf = _canto_no_corte(Q, pl.get('fechada', False), alvo, perto_mm)
+                    if canto is None or canto[0] is None or canto[1] < giro_min:
+                        continue
+                    s0 = canto[0]
+                    cp = np.array([np.interp(s0, s, Qf[:, 0]), np.interp(s0, s, Qf[:, 1])])
+                    dobras = []
+                    for b in (b_mm, b_curto_mm):
+                        lados = [_lado_do_canto(Qf, s, s0, sg, a_mm, b) for sg in (-1, 1)]
+                        if any(len(L_) < 3 or comprimento(L_) < min(minimo_lado_mm, 0.6 * (b - a_mm)) for L_ in lados):
+                            break
+                        dirs = []
+                        for L_ in lados:
+                            d2, sig = _direcao(L_, cp)
+                            D = np.zeros(3)
+                            D[u], D[w] = d2
+                            D -= (D @ t) * t
+                            dirs.append((D / np.linalg.norm(D), sig, comprimento(L_)))
+                        ang = math.degrees(math.acos(max(-1.0, min(1.0, float(dirs[0][0] @ dirs[1][0])))))
+                        dobras.append((180.0 - ang, math.degrees(math.hypot(dirs[0][1], dirs[1][1])), min(dirs[0][2], dirs[1][2])))
+                    if len(dobras) < 2:
+                        continue
+                    (dobra, sigma, comp), (dobra_curta, _, _) = dobras
+                    leitura = math.degrees(math.atan(float(c.get('erro_mm') or 0.0) / max(comp, 1e-9))) / 2
+                    medidas.append({'corte': c.get('corte'), 'ponto_mm': np.round(X, 1).tolist(), 'angulo_graus': round(dobra, 1),
+                                    'incerteza_graus': round(2 * sigma + abs(dobra - dobra_curta) / 2 + leitura, 1)})
+                    break
+        out.append(medidas)
+    return out
+
+
+def com_angulos(linhas3d, cortes):
+    """Acrescenta a cada curva de linhas_3d o ângulo da dobra pelos cortes que ela atravessa: angulo_graus (a mediana das
+    travessias), angulo_incerteza_graus (a maior incerteza delas, ou metade da faixa entre elas, se maior) e
+    angulo_travessias; a curva que não atravessa corte, ou cujo canto o corte não mostra, fica sem o campo."""
+    curvas = [p['pontos_mm'] for p in linhas3d['polilinhas_3d']]
+    for p, med in zip(linhas3d['polilinhas_3d'], angulos_pelos_cortes(curvas, cortes)):
+        if not med:
+            continue
+        a = [m['angulo_graus'] for m in med]
+        p['angulo_graus'] = round(float(np.median(a)), 1)
+        p['angulo_incerteza_graus'] = round(max(max(m['incerteza_graus'] for m in med), (max(a) - min(a)) / 2), 1)
+        p['angulo_travessias'] = med
+    linhas3d['angulo_pelos_cortes'] = [c.get('corte') for c in cortes]
+    return linhas3d
 
 
 # ---------- pacote ----------
