@@ -366,6 +366,32 @@ medida, como `{ estacao: 'meio', peso: 1 }`. A formulação, o sistema normal e
 o ganho, que grita como na exata, estão em `ajustarGaiolaAsMedidasComPeso`, em
 `procedural/nucleo/subdivisao.js`.
 
+Dado lido de imagem entra com peso por padrão: a cota exata nos pontos lidos faz a
+superfície passar por cada erro de leitura (no sétimo teste cego, erros de 1,6 a
+2,9 mm viraram rugas). No passo, `pesoPadrao: 1` (número ou nome de `PARAMS`) faz o
+nome escrito sozinho em `medidas` ter esse peso em vez de ser exato, e a cota de
+projeto que a peça precisa acertar se escreve `{ ponto: 'alturaDoVao', exata: true }`;
+a declaração de um ponto (peso ou `exata`) vence o padrão sobre ele, e `exata` com
+`peso` grita. Na `gaiolaPorEstacoes`, `leitura: true` (ou `leitura: { peso, erro,
+inclinacao, estrito }`) declara que as estações e as colunas vêm de leitura, e a
+medida sem `peso` ganha o peso da leitura (1 por padrão); `exata: true` na medida
+a mantém exata, como em `{ estacao: 'e1', coluna: 'c2', exata: true }`, e o `peso`
+próprio vale mais que o da leitura. Sem `leitura` nem `pesoPadrao`, o nome sozinho
+continua cota exata, e a receita escrita antes tem a mesma malha. Numa chapa de
+1600 mm com erro de ±2 mm plantado em todos os pontos, a exata ondula até 2,32 mm
+(21 falhas a `--limiar-mm=1`) e o peso padrão até 0,73 mm (nenhuma a esse limiar), e o
+peso não leva a chapa abaixo de 0,3 mm quando o erro está nos pontos da gaiola;
+numa chapa lisa de raio 2 m o peso 1 deixa a superfície perto de 0,7 mm para dentro
+dos pontos. A leitura também avisa pelo nome quando duas estações-chave vizinhas
+ficam mais perto do que o erro sustenta: duas leituras diferem até 2 × `erro` (mm,
+2 por padrão), e a inclinação que só o erro põe é essa diferença dividida pelo
+espaçamento; acima de `inclinacao` (0,1) a gaiola devolve em `avisos`
+`{ ref: 'estacoesProximas', estacoes, espacamentoMm, minimoRecomendadoMm, inclinacao,
+texto }`, com o mínimo 2 × erro / inclinacao (40 mm nos padrões), e
+`npm run ondulacao` os traz em `avisosDaGaiola`. `estrito: true` faz o aviso gritar.
+Seis estações a 4 mm, com a cota exata, dobram uma chapa lisa em 384 faces; com a
+leitura, nenhuma, e o aviso já tinha dito.
+
 O vinco é uma sequência nomeada de pontos da gaiola ao longo das arestas, como
 `vincos: [{ nome: 'dobraDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.75 }]`;
 para fechar um aro, repita o primeiro ponto no fim. A `nitidez` vai de 0 (liso)
@@ -627,7 +653,8 @@ superfície externa de cada passo `subdivisao` e devolve em JSON cada falha com
 `posicaoMm`, `amplitudeMm` (o desvio pela normal a uma versão suavizada local,
 um ajuste cúbico robusto a até três espaçamentos da gaiola), `extensaoMm`,
 `tipo` (`ondulacao` quando o desvio troca de sinal, `calombo` para fora ou para
-dentro, `emenda` quando a normal salta fora de um vinco) e `pontos`, os dois a
+dentro, `emenda` quando a normal salta fora de um vinco, `faceVirada` quando a
+normal de uma face se inverte em relação à da vizinha) e `pontos`, os dois a
 quatro pontos nomeados da gaiola que mais pesam na falha, em ordem, pelos pesos
 que a própria subdivisão dá a cada ponto na malha entregue, cada um com `desvioMm`,
 o desvio com sinal do vértice dele (positivo, para fora da versão suavizada), e a
@@ -647,7 +674,13 @@ vinco uma dobra que a linha de feição lida não confirma tira a falha de
 falha a menos de um espaçamento de um vinco,
 de uma borda ou de um canto declarados sai em `junto`, e não em `falhas`, porque
 ali o desvio é da feição pedida; um vinco que a forma tem e o passo não declara
-sai como falha. O limiar padrão é 0,3 mm (`--limiar-mm=`): numa chapa desenhada
+sai como falha. A `faceVirada` é a aresta fora dos vincos e das bordas em que as
+normais das duas faces passam de 90 graus (`--virada-graus=`), a superfície dobrada
+sobre si que o desvio e a emenda não pegam; ela é falha mesmo junto de uma feição, e
+traz `faces`, `facesViradas` (a mancha cuja normal fica contra a da face da gaiola
+declarada de que descende), `arestas` e `anguloGraus`, e a superfície traz
+`facesViradas`, a soma: a cota exata nos pontos do anel dá 58, perto das 56 da área
+projetada. O limiar padrão é 0,3 mm (`--limiar-mm=`): numa chapa desenhada
 por código com todos os pontos medidos, a forma lisa fica abaixo de 0,23 mm e a
 ondulação de 1 mm plantada entre dois pontos vizinhos sai com 0,88 mm e esses
 dois pontos à frente. Com `medidas`, os pontos citados são os da gaiola
