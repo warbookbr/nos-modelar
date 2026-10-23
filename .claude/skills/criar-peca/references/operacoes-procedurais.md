@@ -903,7 +903,7 @@ espelhada. `origem` publica as faces, `parte: 'lateral'` a superfície varrida e
 
 ### Aba que dobra a borda de um vão: `aba`
 
-A chapa de uma carroceria dobra uns 90 graus para dentro na borda do vão da janela, em poucos milímetros de raio, e forma a aba em que o vidro assenta. O `friso` com perfil desenhado à mão não faz essa aba: o passo recusa o perfil que não sobe acima da linha (`o perfil fica todo abaixo da linha`) e, se ele sobe um pouco, o que desce mais que a espessura (`ele atravessaria a face de dentro`), de modo que uma perna de 20 mm não passa. A opção `aba` toma o lugar de `perfil` e desenha o perfil em L sozinha:
+Uma chapa pode dobrar para dentro na borda de um vão, em poucos milímetros de raio, e formar uma aba; um corte que atravessa a borda mostra se há aba, o ângulo, o raio e a largura. O `friso` com perfil desenhado à mão não faz essa aba: o passo recusa o perfil que não sobe acima da linha (`o perfil fica todo abaixo da linha`) e, se ele sobe um pouco, o que desce mais que a espessura (`ele atravessaria a face de dentro`), de modo que uma perna de 20 mm não passa. A opção `aba` toma o lugar de `perfil` e desenha o perfil em L sozinha:
 
 ```js
 const g = gaiolaPorEstacoes({ /* ... */ vaos: [{ nome: 'janela', estacoes: ['e3', 'e5'], colunas: ['c3', 'c5'] }] });
