@@ -338,7 +338,10 @@ describe('passo friso com aba: gritos com o nome', () => {
     expect(orfao({ aba: { largura: 0.02, angulo: 90 } })).toMatch(/^a aba precisa de raio, como aba: \{ largura: 0\.02, angulo: 90, raio: 0\.003 \}/);
     expect(orfao({ aba: { largura: 0.02, angulo: 90, raio: 0.002, folga: 1 } })).toBe("a aba tem campo desconhecido 'folga'; os campos são largura, angulo e raio");
     expect(orfao({ aba: 5 })).toMatch(/^aba precisa ser a medida da dobra/);
-    expect(orfao({}, { espessura: null })).toBe('a aba dobra a borda de uma chapa com espessura: declare espessura no passo subdivisao da superfície');
+    /* sem espessura a chapa é só a pele e a aba sai pele (friso-aba-pele.test.mjs), com os mesmos gritos de medida */
+    expect(orfao({}, { espessura: null })).toBeUndefined();
+    expect(orfao({ aba: { largura: 0.02, angulo: 90, raio: 0 } }, { espessura: null })).toBe('o raio da dobra precisa ser maior que zero, e veio 0');
+    expect(orfao({ aba: { largura: 0.02, angulo: 150, raio: 0.002 } }, { espessura: null })).toMatch(/^a aba de 150 graus com perna de 0\.02 passa 0\.0\d* por baixo da chapa/);
     expect(orfao({ aba: { largura: 0.02, angulo: 90, raio: 0 } })).toBe('o raio da dobra precisa ser maior que zero, e veio 0');
     expect(orfao({ aba: { largura: 0.02, angulo: 200, raio: 0.002 } })).toBe('o ângulo da aba precisa ficar entre 0 e 180 graus, e veio 200');
     expect(orfao({ aba: { largura: 0.02, angulo: 150, raio: 0.002 } })).toMatch(/^a aba de 150 graus com perna de 0\.02 passa 0\.0\d* por baixo da chapa/);

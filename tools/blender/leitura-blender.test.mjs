@@ -162,8 +162,10 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
   });
 
   it('comparar-vincos dá a forma contra o próprio pacote acima de 0,9 e acusa o vinco ausente, o deslocado e o declarado', { timeout: 900000 }, () => {
+    // o prisma tem vincos de 33,5 e 39,8 graus, que o pacote desenha (a partir de 25) e o limiar da régua (40) chama de rasos: as
+    // provas abaixo medem todas as linhas desenhadas, com --angulo-vinco 25, e o limiar padrão tem a prova própria no fim
     const comparar = (cand, saida, extra = []) => {
-      py('comparar-vincos.py', ['--pacote', p('pacote'), '--candidata', cand, '--blender', BLENDER, '--saida', p(saida), ...extra]);
+      py('comparar-vincos.py', ['--pacote', p('pacote'), '--candidata', cand, '--blender', BLENDER, '--angulo-vinco', '25', '--saida', p(saida), ...extra]);
       return JSON.parse(readFileSync(p(saida, 'comparacao-vincos.json'), 'utf8'));
     };
     const igual = comparar(p('forma.obj'), 'vin-igual');
@@ -176,7 +178,7 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
     for (const k of ['cobertura_5mm', 'precisao_5mm']) expect(igual['3d'][k], `3d ${k}`).toBeGreaterThan(0.9);
     for (const n of vistas) expect(existsSync(p('vin-igual', `${n}-vincos.png`)), n).toBe(true);
     // o vincos.json do olhar-candidata.py, reusado sem Blender, dá a mesma medida
-    py('comparar-vincos.py', ['--pacote', p('pacote'), '--vincos-candidata', p('vin-igual', 'candidata-vincos.json'), '--saida', p('vin-reuso')]);
+    py('comparar-vincos.py', ['--pacote', p('pacote'), '--vincos-candidata', p('vin-igual', 'candidata-vincos.json'), '--angulo-vinco', '25', '--saida', p('vin-reuso')]);
     expect(readFileSync(p('vin-reuso', 'comparacao-vincos.json'), 'utf8')).toBe(readFileSync(p('vin-igual', 'comparacao-vincos.json'), 'utf8'));
 
     // sem o vinco do chanfro (a quina arredondada em facetas de 10 graus): a perda no lado, no topo e em 3D, e não na frente
@@ -202,5 +204,18 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
     expect(decl.segmentos_candidata.declarado).toBe(2);
     for (const n of ['lado', 'topo']) expect(decl.vistas[n].cobertura_5mm, n).toBeGreaterThan(0.95);
     expect(decl['3d'].cobertura_5mm).toBeGreaterThan(0.9);
+
+    // pelo limiar padrão da régua (40 graus) os vincos de 33,5 e 39,8 graus da candidata são dobras rasas: ficam fora da
+    // cobertura, que cai onde o pacote os desenha (a imagem não guarda o ângulo, e o pacote não se filtra), e a saída
+    // relata o comprimento delas e a medida de antes ao lado
+    py('comparar-vincos.py', ['--pacote', p('pacote'), '--vincos-candidata', p('vin-igual', 'candidata-vincos.json'), '--saida', p('vin-padrao-40')]);
+    const quarenta = JSON.parse(readFileSync(p('vin-padrao-40', 'comparacao-vincos.json'), 'utf8'));
+    expect(quarenta.angulo_vinco).toBe(40);
+    expect(quarenta.rasas.faixa_graus).toEqual([25, 40]);
+    expect(quarenta.rasas.comprimento_candidata_3d_mm).toBeGreaterThan(1500);
+    expect(igual.rasas.comprimento_candidata_3d_mm).toBe(0);
+    expect(quarenta.total.cobertura_5mm).toBeLessThan(igual.total.cobertura_5mm - 0.1);
+    expect(quarenta.total.precisao_5mm).toBeGreaterThan(0.95);
+    expect(quarenta.total.contando_as_rasas.cobertura_5mm).toBeGreaterThan(0.9);
   });
 });

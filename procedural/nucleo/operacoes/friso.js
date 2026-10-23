@@ -10,12 +10,15 @@
    Na simetria em x, o friso segue a chapa: a linha que toca o plano x = 0 numa ponta continua na imagem espelhada, a
    que toca nas duas vira volta fechada, e a que não toca ganha a cópia espelhada. Nenhum índice sai da receita.
 
-   A ABA. No lugar de `perfil`, `aba: { largura, angulo, raio }` dobra para dentro a borda livre de uma chapa com
-   espessura: a linha é a borda de um vão ou do contorno, pelos nomes da gaiola (`bordaDoVao` da gaiola por estações dá a
-   de um vão), em qualquer sentido, e o passo acha o lado da chapa pelo sentido em que as faces percorrem a aresta. O perfil
+   A ABA. No lugar de `perfil`, `aba: { largura, angulo, raio }` dobra para dentro a borda livre de uma chapa:
+   a linha é a borda de um vão ou do
+   contorno, pelos nomes da gaiola (`bordaDoVao` da gaiola por estações dá a de um vão), em qualquer sentido, e o passo acha o lado da chapa pelo sentido em que as faces percorrem a aresta. O perfil
    em L (`perfilDaAba`) nasce na face de fora e na de dentro da chapa sobre a linha, dobra no raio e no ângulo declarados e
-   segue em perna reta; as faces saem lisas a 30 graus e as tampas das pontas abertas são quadriláteros. */
-import { ErroDoFriso, cadeiaRefinada, ladoDaBorda, perfilDaAba, tampaDaAba, varrerPerfil } from '../friso.js';
+   segue em perna reta; as faces saem lisas a 30 graus e as tampas das pontas abertas são quadriláteros.
+   Na chapa SEM espessura a aba sai como PELE: uma superfície aberta, sem tampas, que continua a borda do vão com a mesma
+   orientação das faces da chapa, dobra num arco de raio `raio` (o da própria pele, e não o da face de dentro) e segue em
+   perna reta de `largura`. A receita que quer a aba sólida declara a espessura na chapa; a aba não ganha espessura própria. */
+import { ErroDoFriso, cadeiaRefinada, ladoDaBorda, perfilDaAba, perfilDaPeleDaAba, tampaDaAba, varrerPerfil } from '../friso.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 import { espelharGaiolaEmX } from '../subdivisao.js';
 import { formaParaContorno, ErroDePerfil, SEGMENTOS_ARCO_PADRAO } from '../perfil2d.js';
@@ -186,7 +189,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     } catch (e) { return grita(st, i, 'friso', 'segmentosArco', String(e.message)); }
     if (!Number.isInteger(segmentosArco) || segmentosArco < 1) return grita(st, i, 'friso', 'segmentosArco', `segmentosArco precisa ser inteiro de 1 para cima, e veio ${segmentosArco}`);
     const comAba = a.aba != null;
-    let perfil = null; let vMin = null; let vMax = null; let medidasDaAba = null;
+    let daPele = false; let perfil = null; let vMin = null; let vMax = null; let medidasDaAba = null;
     if (comAba) {
       const lida = lerAba(st, a);
       if (lida.erro) return grita(st, i, 'friso', lida.erro[0], lida.erro[1]);
@@ -210,14 +213,17 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       try { r = linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
       if (comAba) {
-        if (r.espessura === null) return grita(st, i, 'friso', 'aba', 'a aba dobra a borda de uma chapa com espessura: declare espessura no passo subdivisao da superfície');
+        daPele = r.espessura === null;
         try {
-          perfil = perfilDaAba({ ...medidasDaAba, espessura: r.espessura, segmentosPorQuarto: segmentosArco });
+          /* sem espessura a chapa é só a pele, e a aba sai pele: a polilinha aberta da dobra, sem espessura e sem tampas */
+          perfil = daPele
+            ? perfilDaPeleDaAba({ ...medidasDaAba, segmentosPorQuarto: segmentosArco })
+            : perfilDaAba({ ...medidasDaAba, espessura: r.espessura, segmentosPorQuarto: segmentosArco });
         } catch (e) {
           if (!(e instanceof ErroDoFriso)) throw e;
           return grita(st, i, 'friso', 'aba', e.motivo);
         }
-        if (!ehSimples(perfil)) return grita(st, i, 'friso', 'aba', `o perfil da aba se cruza: com raio ${medidasDaAba.raio}, espessura ${r.espessura}, largura ${medidasDaAba.largura} e ${medidasDaAba.angulo} graus a perna atravessa a dobra; reduza o ângulo ou a largura`);
+        if (r.espessura !== null && !ehSimples(perfil)) return grita(st, i, 'friso', 'aba', `o perfil da aba se cruza: com raio ${medidasDaAba.raio}, espessura ${r.espessura}, largura ${medidasDaAba.largura} e ${medidasDaAba.angulo} graus a perna atravessa a dobra; reduza o ângulo ou a largura`);
       } else if (r.espessura !== null) {
         if (!(vMin < 0)) return grita(st, i, 'friso', 'perfil', `o perfil não entra na chapa (v vai de ${vMin} a ${vMax}): sem uma parte abaixo de v = 0 o friso só encostaria numa linha da superfície; desça o perfil para dentro da chapa, de menos que a espessura ${r.espessura}`);
         if (!(-vMin < r.espessura)) return grita(st, i, 'friso', 'perfil', `o perfil entra ${-vMin} na chapa, e a espessura é ${r.espessura}: ele atravessaria a face de dentro; suba o perfil para entrar menos que a espessura`);
@@ -239,7 +245,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     for (const c of cadeias) {
       let s;
       try {
-        s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil, fechada: c.fechada, pontas, fechamento, tampa: comAba ? tampaDaAba(perfil) : null });
+        s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil, fechada: c.fechada, pontas, fechamento, tampa: comAba && !daPele ? tampaDaAba(perfil) : null, aberto: daPele });
       } catch (e) {
         if (!(e instanceof ErroDoFriso)) return grita(st, i, 'friso', 'linha', String(e.message));
         return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${e.motivo}`);

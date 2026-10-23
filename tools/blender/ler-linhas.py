@@ -5,6 +5,7 @@
 # Uso:
 #   python3 tools/blender/ler-linhas.py --pacote <pasta do pacote ou vistas/> [--vista frente,lado,topo] [--3d]
 #       [--simetria-x | --sem-simetria] [--tolerancia-mm 3] [--sem-cortes] [--tolerancia-corte-mm 5] [--sem-angulo]
+#       [--angulo-vinco 40]
 #       [--saida <arq.json>]
 #
 # Lê vistas/<vista>-linhas.png com a câmera de vistas/camera.json. A grade, o título e a barra de escala saem por
@@ -27,10 +28,14 @@
 # pacote tem cortes, cada curva 3D que atravessa um corte ganha o ângulo da
 # dobra naquele ponto (leitura.com_angulos): o canto que o contorno do corte faz ali dá a direção das duas faces no plano, e
 # a dobra sai delas e da tangente da curva, com a incerteza em graus; a curva que não atravessa corte fica sem o campo, e
-# --sem-angulo não o calcula. Sem --saida, imprime o JSON.
+# --sem-angulo não o calcula. Cada curva com ângulo é classificada pelo limiar de dobra da régua (limiares.ANGULO_VINCO, 40
+# graus, ou --angulo-vinco): 'vinco' se o ângulo o passa e 'rasa' se não (o pacote desenha as linhas a partir de 25 graus, e a
+# dobra entre os dois aparece no desenho e fica fora da medida de vincos), e 'dobras_pelo_limiar' resume quantas e quanto
+# comprimento. Sem --saida, imprime o JSON.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import leitura as L
+import limiares
 
 a = L.argumentos()
 if 'pacote' not in a:
@@ -74,4 +79,5 @@ if a.get('3d'):
             'conferida': False, 'motivo': 'desligada por --sem-cortes' if a.get('sem_cortes') else 'o pacote não tem cortes'}
     if cortes and not a.get('sem_angulo'):
         L.com_angulos(saida['linhas_3d'], cortes)
+        L.classificar_dobras(saida['linhas_3d'], float(a.get('angulo_vinco', limiares.ANGULO_VINCO)), limiares.ANGULO_FEICAO)
 L.gravar_json(saida, a.get('saida'))

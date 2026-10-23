@@ -11,6 +11,9 @@ from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
+if AQUI not in sys.path:
+    sys.path.insert(0, AQUI)
+import limiares
 DESLOCAMENTO = 2e-4  # o raio de visibilidade sai 0,2 mm fora da face para não bater nela mesma
 TOL_PLANO = 1e-6
 
@@ -28,7 +31,8 @@ PADRAO = {
     'amostras_render': 16,
     'vistas': None,               # lista de {nome, direcao, cima, escala?, meia?}; sem ela, vistas_padrao()
     'avesso': [0.85, 0.30, 0.80], # cor que multiplica o avesso (face vista por trás) nas vistas cinza e zebra
-    'angulo_feicao': 25.0,        # graus: aresta com diedro acima disto entra nas vistas de linhas de feição
+    'angulo_feicao': limiares.ANGULO_FEICAO,  # graus: aresta com diedro acima disto entra nas vistas de linhas de feição
+    'angulo_vinco': limiares.ANGULO_VINCO,    # graus: diedro acima do qual a aresta é vinco na medida (régua, comparar-vincos, ler-linhas)
     'cortes': [],                 # lista de {nome, eixo: 'x'|'y'|'z', valor (m)}: cortes planos cotados do pacote
     'passo_corte_regua': 0.01,    # m: passo dos pontos do contorno de cada corte no JSON privado (só para a régua)
     'omitidas': [],               # rótulos que a régua relata à parte, como regiões que a candidata pode omitir
@@ -1012,20 +1016,22 @@ def compactar(V, F):
 # ---------- linhas de feição ----------
 
 def linhas_de_feicao(V, F, manter, regiao, angulo):
-    """Segmentos (a, b) em 3D e o tipo de cada um, das faces mantidas: 'feicao' (aresta entre duas faces mantidas com diedro
-    acima de angulo), 'dobra' (aresta entre face mantida e face tirada), 'natural' (borda livre da malha) e 'corte' (borda
-    sobre um plano da caixa)."""
+    """Segmentos (a, b) em 3D, o tipo de cada um e o diedro dele em graus, das faces mantidas: 'feicao' (aresta entre duas
+    faces mantidas com diedro acima de angulo), 'dobra' (aresta entre face mantida e face tirada), 'natural' (borda livre
+    da malha) e 'corte' (borda sobre um plano da caixa). O diedro só existe na 'feicao' e é None nos outros tipos."""
     internas, bordas, _ = arestas(F)
     a, b, t1, t2, _ = internas
     di = diedros(V, F, internas)
     m1, m2 = manter[t1], manter[t2]
-    segs, tipos = [], []
+    segs, tipos, angulos = [], [], []
     sel = m1 & m2 & (di > angulo)
     segs += list(zip(V[a[sel]], V[b[sel]]))
     tipos += ['feicao'] * int(sel.sum())
+    angulos += [float(x) for x in di[sel]]
     sel = m1 != m2
     segs += list(zip(V[a[sel]], V[b[sel]]))
     tipos += ['dobra'] * int(sel.sum())
+    angulos += [None] * int(sel.sum())
     ba, bb, bt = bordas
     m = manter[bt]
     no_plano = np.zeros(len(ba), bool)
@@ -1035,7 +1041,8 @@ def linhas_de_feicao(V, F, manter, regiao, angulo):
     for sel, tipo in ((m & ~no_plano, 'natural'), (m & no_plano, 'corte')):
         segs += list(zip(V[ba[sel]], V[bb[sel]]))
         tipos += [tipo] * int(sel.sum())
-    return segs, tipos
+        angulos += [None] * int(sel.sum())
+    return segs, tipos, angulos
 
 
 def pontos_dos_segmentos(segs, passo=0.002):
@@ -1186,15 +1193,17 @@ def desenhar_linhas(V, F, manter, regiao, angulo, vistas, prefixo, declarados=No
     escondido, em traço preto sobre branco (o corte da caixa em cinza), no tamanho e na câmera da vista. declarados são
     segmentos (n, 2, 3) de vinco que a malha declara, desenhados em preto como a feição, menos os que repetem uma aresta já
     desenhada. Com trechos_3d (um dicionário), guarda nele, por vista, os trechos visíveis do traço preto em 3D, como
-    [(tipo, pontos (k, 3))], e em '_qualquer' os trechos visíveis em ao menos uma das vistas."""
+    [(tipo, pontos (k, 3), diedro)], e em '_qualquer' os trechos visíveis em ao menos uma das vistas; o diedro em graus só
+    existe nos trechos de 'feicao' (None nos outros, e nos vincos declarados, cujo ângulo a malha não guarda)."""
     import tempfile
-    segs, tipos = linhas_de_feicao(V, F, manter, regiao, angulo)
+    segs, tipos, angulos = linhas_de_feicao(V, F, manter, regiao, angulo)
     if declarados is not None and len(declarados):
         chave = lambda p, q: tuple(sorted((tuple(np.round(p / 1e-6).astype(np.int64)), tuple(np.round(q / 1e-6).astype(np.int64)))))
         ja = {chave(p, q) for (p, q), t in zip(segs, tipos) if t != 'corte'}
         novos = [(p, q) for p, q in declarados if chave(p, q) not in ja]
         segs += novos
         tipos += ['declarado'] * len(novos)
+        angulos += [None] * len(novos)
     Vk, Fk = compactar(V, F[manter])
     arv = bvh(Vk, Fk)
     contagem = {t: tipos.count(t) for t in ('feicao', 'dobra', 'natural', 'corte', 'declarado')}
@@ -1210,10 +1219,10 @@ def desenhar_linhas(V, F, manter, regiao, angulo, vistas, prefixo, declarados=No
         imagens('linhas', t.name, f"{prefixo}{v['nome']}-linhas.png")
         os.unlink(t.name)
         if trechos_3d is not None:
-            trechos_3d[v['nome']] = [(tp, T) for pts, vv, tp in zip(pontos, vis, tipos) if tp in TIPOS_PRETOS for T in trechos(pts, vv)]
+            trechos_3d[v['nome']] = [(tp, T, an) for pts, vv, tp, an in zip(pontos, vis, tipos, angulos) if tp in TIPOS_PRETOS for T in trechos(pts, vv)]
             algum = [a | vv for a, vv in zip(algum, vis)]
     if trechos_3d is not None:
-        trechos_3d['_qualquer'] = [(tp, T) for pts, a, tp in zip(pontos, algum, tipos) if tp in TIPOS_PRETOS for T in trechos(pts, a)]
+        trechos_3d['_qualquer'] = [(tp, T, an) for pts, a, tp, an in zip(pontos, algum, tipos, angulos) if tp in TIPOS_PRETOS for T in trechos(pts, a)]
     return contagem
 
 

@@ -164,6 +164,31 @@ describe.skipIf(!temPillow)('leitura do pacote cego desenhado por código', () =
     expect([...verdades].sort((a, b) => a - b)).toEqual([34, 40, 64, 90, 117]);
   });
 
+  it('ler-linhas classifica cada curva com ângulo pelo limiar de dobra da régua, 40 graus, e --angulo-vinco o troca', () => {
+    const r3 = lidos.linhas.linhas_3d;
+    const comAngulo = r3.polilinhas_3d.filter((l) => l.angulo_graus !== undefined);
+    expect(comAngulo.length).toBeGreaterThanOrEqual(8);
+    for (const l of comAngulo) {
+      expect(l.classe, `${l.angulo_graus}`).toBe(l.angulo_graus > 40 ? 'vinco' : 'rasa');
+      // a curva cujo limiar cai dentro da incerteza do ângulo (a de 39,8 graus) sai marcada como incerta
+      expect(l.classe_incerta, `${l.angulo_graus}`).toBe(Math.abs(l.angulo_graus - 40) <= l.angulo_incerteza_graus);
+    }
+    expect(comAngulo.some((l) => l.classe === 'vinco' && l.angulo_graus > 60)).toBe(true);
+    expect(comAngulo.some((l) => l.classe === 'rasa' && l.angulo_graus < 35)).toBe(true);
+    expect(comAngulo.some((l) => l.classe_incerta)).toBe(true);
+    const resumo = r3.dobras_pelo_limiar;
+    expect(resumo).toMatchObject({ angulo_vinco: 40, angulo_feicao: 25 });
+    expect(resumo.vincos).toBe(comAngulo.filter((l) => l.classe === 'vinco').length);
+    expect(resumo.rasas).toBe(comAngulo.filter((l) => l.classe === 'rasa').length);
+    expect(resumo.sem_angulo).toBe(r3.polilinhas_3d.length - comAngulo.length);
+    expect(resumo.comprimento_rasas_mm).toBeGreaterThan(500);
+    // com o limiar em 30 graus, as dobras de 33,5 graus passam a vinco e nenhuma curva fica rasa
+    py('ler-linhas.py', ['--pacote', p('pacote'), '--3d', '--angulo-vinco', '30', '--saida', p('linhas-30.json')]);
+    const r30 = JSON.parse(readFileSync(p('linhas-30.json'), 'utf8')).linhas_3d;
+    expect(r30.dobras_pelo_limiar).toMatchObject({ angulo_vinco: 30, rasas: 0, comprimento_rasas_mm: 0 });
+    expect(r30.dobras_pelo_limiar.vincos).toBe(comAngulo.length);
+  });
+
   it('comparar-cortes dá zero a menos do erro de leitura para a forma contra ela mesma e o desvio conhecido para a deslocada', () => {
     const contornos = (desloca) => ({ cortes: CORTES.map((c) => ({ corte: c.nome, eixo: c.eixo, valor_mm: c.valor * 1000, eixos_uv: c.eixos_uv,
       polilinhas: corte(c.eixo, c.valor, desloca).map((q) => ({ fechada: q.fechada, pontos_mm: q.pontos })) })) });

@@ -13,12 +13,14 @@
 # mesmos planos e no mesmo quadro dos desenhos do pacote, e <prefixo>cortes/contornos.json, o contorno exato da candidata
 # em cada corte, em mm no plano dele, que comparar-cortes.py mede contra o contorno lido do pacote. Grava também
 # <prefixo>vincos.json, o traço preto da candidata em 3D (vincos com diedro acima de angulo_feicao, bordas livres e os vincos
-# que a malha declara, que só o .blend guarda), trecho a trecho, visível em cada vista e em alguma delas, que
-# comparar-vincos.py mede contra as linhas de feição lidas do pacote; os vincos declarados saem em preto também nas linhas.
+# que a malha declara, que só o .blend guarda), trecho a trecho, visível em cada vista e em alguma delas, cada trecho de
+# feição com o diedro da aresta em angulo_graus, que comparar-vincos.py mede contra as linhas de feição lidas do pacote;
+# os vincos declarados saem em preto também nas linhas.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import comum as C
+import limiares
 
 a = C.argumentos()
 for k in ('candidata', 'pacote', 'saida'):
@@ -52,13 +54,15 @@ arq_camera = f"{a['saida']}camera.json"
 json.dump(camera, open(arq_camera, 'w'), indent=1)
 todas = np.ones(len(Fr), bool)
 declarados = C.recortar_segmentos(C.ler_vincos_declarados(a['candidata'], a.get('objeto'), bool(a.get('z_cima'))), regiao)
-angulo = cfg.get('angulo_feicao', 25.0)
+angulo = cfg.get('angulo_feicao', limiares.ANGULO_FEICAO)
 trechos = {}
 contagem = C.desenhar_linhas(Vr, Fr, todas, regiao, angulo, [v | {'nome': n} for n, v in camera.items()], a['saida'],
                              declarados=declarados, trechos_3d=trechos)
 # o traço preto da candidata em 3D, visível em cada vista e em alguma delas, para comparar-vincos.py medir contra as linhas
 # lidas do pacote
-lista = lambda ts: [{'tipo': t, 'pontos_m': np.round(T, 6).tolist()} for t, T in ts]
+# cada trecho de 'feicao' leva o diedro da aresta em graus (angulo_graus), que comparar-vincos compara com o limiar da régua
+lista = lambda ts: [{'tipo': t, 'pontos_m': np.round(T, 6).tolist()} | ({'angulo_graus': round(an, 3)} if an is not None else {})
+                    for t, T, an in ts]
 json.dump({'origem': 'candidata, recortada pela caixa do pacote', 'unidade': 'm', 'angulo_feicao': angulo, 'passo_m': 0.002,
            'segmentos': contagem, 'vistas': {n: lista(trechos[n]) for n in camera}, 'qualquer_vista': lista(trechos['_qualquer'])},
           open(f"{a['saida']}vincos.json", 'w'))

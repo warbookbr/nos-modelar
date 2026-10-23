@@ -20,7 +20,7 @@
 #   ref_para_cand_mm: de cada ponto da referência à superfície visível da candidata perto da caixa (o que a candidata deixa
 #     de cobrir); cand_para_ref_mm: de cada ponto da candidata à referência inteira perto da caixa (o que ela põe a mais).
 #   normal_*_graus: o ângulo entre a normal do ponto e a do triângulo mais perto do outro lado, sem sinal.
-#   vincos: arestas com diedro acima de angulo_vinco (padrão 40 graus) entre faces visíveis, amostradas a cada 2 mm; a
+#   vincos: arestas com diedro acima de angulo_vinco (padrão 40 graus, o de limiares.py, que comparar-vincos e ler-linhas também usam) entre faces visíveis, amostradas a cada 2 mm; a
 #     cobertura é a fração do vinco da referência a até 5 ou 10 mm de um vinco da candidata, a precisão o contrário, o F1 a
 #     média harmônica, e o desvio a distância do vinco da referência ao da candidata (mediana e p90).
 #   por_rotulo: com --rotulos, a distância da referência para a candidata por rótulo; vincos_por_rotulo, os vincos por
@@ -66,7 +66,6 @@ for k in ('referencia', 'candidata', 'saida', 'nome'):
     if k not in a:
         C.erro(f'falta --{k}')
 cfg = C.configuracao(a)
-cfg.setdefault('angulo_vinco', 40.0)
 cfg.setdefault('densidade', 40000.0)
 cfg.setdefault('max_amostras', 250000)
 cfg.setdefault('tolerancias_mm', [5.0, 10.0])

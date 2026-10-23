@@ -1338,6 +1338,30 @@ def com_angulos(linhas3d, cortes):
     return linhas3d
 
 
+def classificar_dobras(linhas3d, angulo_vinco, angulo_feicao):
+    """Classifica cada curva de linhas_3d que tem angulo_graus (com_angulos) pelo mesmo limiar da régua: 'vinco' se o ângulo é
+    maior que angulo_vinco e 'rasa' se é igual ou menor (o pacote desenha a partir de angulo_feicao, e a dobra entre os dois
+    aparece no desenho mas a régua não a conta). A curva marca classe_incerta quando o limiar cai dentro da incerteza do
+    ângulo. A curva sem ângulo (nenhum corte a atravessa) fica sem classe. Acrescenta a linhas3d o resumo em
+    'dobras_pelo_limiar' e o devolve."""
+    vincos = rasas = sem = 0
+    comp_rasas = 0.0
+    for p in linhas3d['polilinhas_3d']:
+        if 'angulo_graus' not in p:
+            sem += 1
+            continue
+        p['classe'] = 'vinco' if p['angulo_graus'] > angulo_vinco else 'rasa'
+        p['classe_incerta'] = abs(p['angulo_graus'] - angulo_vinco) <= p.get('angulo_incerteza_graus', 0.0)
+        if p['classe'] == 'vinco':
+            vincos += 1
+        else:
+            rasas += 1
+            comp_rasas += comprimento(np.asarray(p['pontos_mm'], float))
+    linhas3d['dobras_pelo_limiar'] = {'angulo_vinco': angulo_vinco, 'angulo_feicao': angulo_feicao, 'vincos': vincos, 'rasas': rasas,
+                                      'sem_angulo': sem, 'comprimento_rasas_mm': round(comp_rasas, 1)}
+    return linhas3d
+
+
 # ---------- pacote ----------
 
 def pastas_do_pacote(pacote):

@@ -2,7 +2,7 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:81673c552aebc0f1df190dc07555bc042eb9a9e8693203bb47eb68e83d4fa326`.
+Assinatura do registro: `sha256:f31a150994cda466248fa53d05731102f0679f111d0549d48fd9a8d5b50bede2`.
 
 Há 39 operações em 1 módulo(s).
 

@@ -109,6 +109,31 @@ export function perfilDaAba({ espessura, raio, largura, angulo, segmentosPorQuar
 }
 
 /**
+ * perfilDaPeleDaAba({ raio, largura, angulo, segmentosPorQuarto }) -> [[w, v], ...]
+ *   O perfil ABERTO da aba numa chapa sem espessura, em metro e graus: a polilinha da pele, que continua a borda em
+ *   (w = 0, v = 0), dobra para dentro (v negativo) num arco de raio `raio` que gira `angulo` graus, com centro em
+ *   (0, -raio), e segue em perna reta de comprimento `largura` na direção em que o arco acabou. O raio é o da própria pele,
+ *   que na chapa com espessura seria o da face de fora menos a espessura; a espessura do arco é nula. O arco tem
+ *   `segmentosPorQuarto` segmentos a cada 90 graus, como `perfilDaAba`. Grita com ErroDoFriso no valor inválido e na aba
+ *   que volta por baixo da chapa (w < 0).
+ */
+export function perfilDaPeleDaAba({ raio, largura, angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA }) {
+  const finito = (x) => typeof x === 'number' && Number.isFinite(x);
+  if (!finito(raio) || !(raio > 0)) throw new ErroDoFriso(`o raio da dobra precisa ser maior que zero, e veio ${raio}`);
+  if (!finito(largura) || !(largura > 0)) throw new ErroDoFriso(`a largura da aba precisa ser maior que zero, e veio ${largura}`);
+  if (!finito(angulo) || !(angulo > 0) || !(angulo < ANGULO_MAXIMO_DA_ABA)) throw new ErroDoFriso(`o ângulo da aba precisa ficar entre 0 e ${ANGULO_MAXIMO_DA_ABA} graus, e veio ${angulo}`);
+  const alfa = (angulo * Math.PI) / 180;
+  const n = Math.max(1, Math.ceil((segmentosPorQuarto * alfa) / (Math.PI / 2) - 1e-9));
+  const arco = Array.from({ length: n + 1 }, (_, k) => { const t = (alfa * k) / n; return [raio * Math.sin(t), -raio + raio * Math.cos(t)]; });
+  arco[0] = [0, 0];
+  const fim = arco[n];
+  const perfil = [...arco, [fim[0] + largura * Math.cos(alfa), fim[1] - largura * Math.sin(alfa)]];
+  const menorW = Math.min(...perfil.map((p) => p[0]));
+  if (menorW < -1e-12) throw new ErroDoFriso(`a aba de ${angulo} graus com perna de ${largura} passa ${Number((-menorW).toPrecision(3))} por baixo da chapa, além da borda onde a dobra começa: reduza o ângulo ou a largura`);
+  return perfil;
+}
+
+/**
  * tampaDaAba(perfil) -> [[índices], ...]
  *   As tampas de uma ponta aberta da aba como quadriláteros, uma escada entre a face de fora e a de dentro da dobra e da
  *   perna, em vez do leque do earcut, cujo vértice de valência 9 o conferir-malha marca como polo. Os índices são os do
@@ -212,19 +237,22 @@ function estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento, trechoM
  *   encolhe em quarto de elipse ao longo de `fechamento` até virar um ponto na linha); trechoMaximo: comprimento acima do
  *   qual um trecho é dividido (o padrão é TRECHO_MAXIMO_EM_ARESTAS vezes a menor aresta do perfil); tampa: os polígonos
  *   das tampas das pontas abertas, cada um a lista de índices do perfil, no lugar da triangulação (a aba usa quadriláteros).
+ *   aberto: o perfil é uma polilinha aberta, e o resultado é uma pele sem espessura, só com as faces laterais (sem tampas
+ *   e com `pontas` sem efeito de tampa). A normal da pele no começo do perfil é a normal N da linha, qualquer que seja o
+ *   sentido de u em que o perfil anda, e então a pele continua a chapa que a linha acompanha com a mesma orientação.
  *   Grita com ErroDoFriso, com o índice do ponto, no trecho nulo, na normal paralela à linha, na volta para trás e no
  *   recuo da esquadria que não cabe no trecho.
  */
-export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas = ['aberta', 'aberta'], fechamento = null, trechoMaximo = null, tampa = null }) {
+export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas = ['aberta', 'aberta'], fechamento = null, trechoMaximo = null, tampa = null, aberto = false }) {
   if (!Array.isArray(pontos) || pontos.length < (fechada ? 3 : 2)) throw new ErroDoFriso(`a linha ${fechada ? 'fechada' : 'aberta'} precisa de ${fechada ? 3 : 2} pontos distintos ou mais`);
   if (!Array.isArray(normais) || normais.length !== pontos.length) throw new ErroDoFriso('é preciso uma normal por ponto da linha');
   if (!Array.isArray(perfil) || perfil.length < 3) throw new ErroDoFriso('o perfil precisa de 3 pontos [u, v] ou mais');
-  const area = areaDoPerfil(perfil);
+  const area = aberto ? 1 : areaDoPerfil(perfil);
   if (!(Math.abs(area) > 0)) throw new ErroDoFriso('o perfil tem área nula');
   const P2 = area > 0 ? perfil.map((p) => [...p]) : [...perfil].reverse().map((p) => [...p]);
   const np = P2.length;
   let menorAresta = Infinity;
-  for (let k = 0; k < np; k++) menorAresta = Math.min(menorAresta, Math.hypot(P2[(k + 1) % np][0] - P2[k][0], P2[(k + 1) % np][1] - P2[k][1]));
+  for (let k = 0; k < (aberto ? np - 1 : np); k++) menorAresta = Math.min(menorAresta, Math.hypot(P2[(k + 1) % np][0] - P2[k][0], P2[(k + 1) % np][1] - P2[k][1]));
   const largura = Math.max(...P2.map((p) => Math.abs(p[0]))) * 2;
   const estacoes = estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento: fechamento ?? largura, trechoMaximo: trechoMaximo ?? TRECHO_MAXIMO_EM_ARESTAS * menorAresta });
   const m = estacoes.length;
@@ -284,16 +312,20 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
   });
   const ponto = (j, k) => (estacoes[j].escala === 0 ? anel[j] : anel[j] + k);
   const faces = []; const lateral = []; const tampas = [];
+  /* a pele: a normal da face acompanha +N no primeiro trecho em que o perfil anda em u (sai para u positivo), e a face
+     do perfil que anda para u negativo se vira ao contrário para a pele ficar do mesmo lado nos dois sentidos */
+  let viraPele = false;
+  if (aberto) { const d = P2.slice(1).map((q, k) => q[0] - P2[k][0]).find((x) => Math.abs(x) > 1e-12); viraPele = d > 0; }
   for (let j = 0; j < nTrechos; j++) {
     const j2 = (j + 1) % m;
-    for (let k = 0; k < np; k++) {
+    for (let k = 0; k < (aberto ? np - 1 : np); k++) {
       const k2 = (k + 1) % np;
-      const f = [ponto(j, k), ponto(j, k2), ponto(j2, k2), ponto(j2, k)];
+      const f = viraPele ? [ponto(j, k), ponto(j2, k), ponto(j2, k2), ponto(j, k2)] : [ponto(j, k), ponto(j, k2), ponto(j2, k2), ponto(j2, k)];
       const unicos = f.filter((x, i) => f.indexOf(x) === i);
       lateral.push(faces.length); faces.push(unicos);
     }
   }
-  if (!fechada) {
+  if (!fechada && !aberto) {
     const giro = (a, b, c) => (P2[b][0] - P2[a][0]) * (P2[c][1] - P2[a][1]) - (P2[b][1] - P2[a][1]) * (P2[c][0] - P2[a][0]);
     const triangulos = [];
     if (tampa) {
