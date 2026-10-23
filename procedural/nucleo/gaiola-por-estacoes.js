@@ -50,6 +50,18 @@
  *         inteira, e os dois marcam um ponto. A medida aceita `peso` (número maior que zero ou nome de PARAMS), e os
  *         pontos dela saem como { ponto, peso }, a cota que a superfície aproxima sem passar; sem peso, a cota é exata.
  *         O mesmo ponto marcado por duas medidas com pesos diferentes grita.
+ * leitura: true | { peso?, erro?, inclinacao?, estrito? } declara que as estações e as colunas da gaiola vêm de leitura de imagem,
+ *         com erro. Cota lida de imagem que passa exata por cada ponto copia o erro em rugas, e por isso, com `leitura`, a medida
+ *         sem `peso` ganha o peso da leitura (`peso`, 1 por padrão: o desvio à cota pesa o mesmo que o deslocamento de um ponto
+ *         da gaiola) em vez de ser exata. A cota de projeto que a peça precisa acertar se declara `exata: true` na medida, e o
+ *         `peso` próprio da medida vale mais que o da leitura; a declaração de uma medida vence o padrão da leitura sobre o mesmo
+ *         ponto, e duas declarações com pesos diferentes sobre o ponto gritam. Sem `leitura`, a medida sem peso continua exata, e
+ *         a receita salva antes dela tem o mesmo significado. A leitura também confere o espaçamento das estações-chave (as que
+ *         declaram colunas): `erro` é o erro de leitura em mm (2 por padrão), duas leituras vizinhas diferem até 2 × erro, e duas
+ *         estações a `espacamento` mm uma da outra têm inclinação 2 × erro / espacamento por causa só do erro. Acima de `inclinacao`
+ *         (0,1 por padrão) a gaiola avisa pelo nome das duas estações e diz o espaçamento mínimo recomendado, 2 × erro / inclinacao
+ *         mm; o aviso sai em `avisos` (`ref: 'estacoesProximas'`) e a ferramenta de ondulação o relata. Com `estrito: true` o aviso
+ *         vira erro, que cita todos os pares.
  * borda livre: a borda da gaiola é aberta, e o passo escolhe a regra dela por `borda`, como em qualquer gaiola.
  * simetria: 'x' declara a metade x >= 0, que o passo espelha antes de subdividir; ponto com x < 0 grita, e a aresta no
  *         plano x = 0 precisa ser borda da metade, para a costura sair com duas faces.
@@ -79,6 +91,7 @@ import { construirAneis, extraordinarios, lerAneis } from './gaiola-aneis.js';
 const EIXOS = ['x', 'y', 'z'];
 const TOLERANCIA_DA_COSTURA = 1e-9;
 const MAIOR_FACE = 5;
+const MM = 1000;
 
 const citar = (n) => `'${n}'`;
 const lista = (nomes) => nomes.map(citar).join(', ');
@@ -484,26 +497,80 @@ function lerVincos(vincos, lidas, arestas, fechada, citavel, aneis) {
   });
 }
 
+/* A leitura de imagem declarada: o peso que a medida sem peso ganha, o erro de leitura em mm e o limiar de inclinação a
+   partir do qual duas estações-chave vizinhas ganham aviso. */
+export const LEITURA_PADRAO = Object.freeze({ peso: 1, erro: 2, inclinacao: 0.1, estrito: false });
+
+function lerLeitura(l) {
+  if (l == null || l === false) return null;
+  const x = l === true ? {} : l;
+  exigirCampos(x, ['peso', 'erro', 'inclinacao', 'estrito'], 'a leitura');
+  const o = { ...LEITURA_PADRAO, ...Object.fromEntries(Object.entries(x).filter(([, v]) => v != null)) };
+  if (!(typeof o.peso === 'string' && o.peso) && !(typeof o.peso === 'number' && Number.isFinite(o.peso) && o.peso > 0)) falha(`a leitura tem peso ${JSON.stringify(o.peso)}; o peso é número finito maior que zero ou nome de PARAMS`);
+  for (const campo of ['erro', 'inclinacao']) {
+    if (typeof o[campo] !== 'number' || !Number.isFinite(o[campo]) || !(o[campo] > 0)) falha(`a leitura tem ${campo} ${JSON.stringify(o[campo])}; ${campo} é número finito maior que zero${campo === 'erro' ? ', o erro de leitura em mm' : ', a inclinação a partir da qual o erro sozinho mexe a superfície'}`);
+  }
+  if (typeof o.estrito !== 'boolean') falha('a leitura precisa de estrito: true ou false');
+  return o;
+}
+
+/* Duas estações-chave vizinhas mais perto do que o erro de leitura sustenta: a diferença que duas leituras podem ter só pelo
+   erro (2 × erro) dividida pelo espaçamento dá a inclinação que o erro sozinho põe na superfície. Acima do limiar, avisa. */
+function avisosDeEstacoesProximas(chaves, E, leitura) {
+  const avisos = [];
+  const total = E.reto ? 1 : E.acum[E.trechos];
+  const escala = E.reto ? MM : MM * total;
+  const diferenca = 2 * leitura.erro;
+  const minimo = diferenca / leitura.inclinacao;
+  const par = (a, b, fracao) => {
+    const espacamento = fracao * escala;
+    const inclinacao = diferenca / espacamento;
+    if (!(inclinacao > leitura.inclinacao * (1 + 1e-9))) return;
+    const mm = (x) => (Math.round(x * 10) / 10);
+    const br = (x) => String(x).replace('.', ',');
+    avisos.push({
+      ref: 'estacoesProximas', estacoes: [a.nome, b.nome], espacamentoMm: mm(espacamento), minimoRecomendadoMm: mm(minimo), inclinacao: Math.round(inclinacao * 100) / 100,
+      texto: `as estações-chave ${citar(a.nome)} e ${citar(b.nome)} ficam a ${br(mm(espacamento))} mm uma da outra, e leituras que diferem até ${br(diferenca)} mm (erro de ${br(leitura.erro)} mm) dão inclinação ${br(Math.round(inclinacao * 100) / 100)}, acima de ${br(leitura.inclinacao)}; o espaçamento mínimo recomendado é ${br(mm(minimo))} mm, então funda as duas numa estação ou afaste-as`,
+    });
+  };
+  for (let k = 1; k < chaves.length; k++) par(chaves[k - 1], chaves[k], chaves[k].em - chaves[k - 1].em);
+  if (E.fechada && chaves.length > 2) par(chaves[chaves.length - 1], chaves[0], 1 - chaves[chaves.length - 1].em + chaves[0].em);
+  return avisos;
+}
+
 /* cantos e medidas: { estacao?, coluna?, chaves? } vira a lista dos pontos marcados, na ordem dos pontos. Nas medidas,
-   `peso` passa ao passo, e o ponto com peso sai como { ponto, peso }. `chaves: true` restringe às estações-chave da
-   interpolação. */
-function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis) {
+   `peso` passa ao passo, e o ponto com peso sai como { ponto, peso }. Com `leitura`, a medida sem `peso` ganha o peso da
+   leitura, salvo `exata: true`; a declaração (`peso` ou `exata`) vence esse padrão sobre o mesmo ponto, e duas declarações
+   de pesos diferentes gritam. `chaves: true` restringe às estações-chave da interpolação. */
+function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis, leitura) {
   if (seletores == null) return null;
   if (!Array.isArray(seletores) || !seletores.length) falha(`${campo} precisa ser lista não vazia de { estacao, coluna }`);
+  const medidas = campo === 'medidas';
   const marcados = new Set(); const pesos = new Map();
   const indiceDaEstacao = new Map(lidas.map((e, k) => [e.nome, k]));
+  const lerPeso = (s, n) => {
+    const peso = s.peso ?? null;
+    if (peso !== null && !(typeof peso === 'string' || (typeof peso === 'number' && Number.isFinite(peso) && peso > 0))) falha(`${campo}[${n}] tem peso ${peso}; o peso é número finito maior que zero ou nome de PARAMS, e a medida sem peso é exata${leitura && medidas ? ' só com exata: true, e sem ele ganha o peso da leitura' : ''}`);
+    if (s.exata != null && s.exata !== true && s.exata !== false) falha(`${campo}[${n}] aceita exata só como true ou false`);
+    if (s.exata === true && peso !== null) falha(`${campo}[${n}] declara exata e peso; a cota exata não tem peso`);
+    if (s.exata === true) return { valor: Infinity, declarado: true };
+    if (peso !== null) return { valor: peso, declarado: true };
+    return leitura && medidas ? { valor: leitura.peso, declarado: false } : { valor: Infinity, declarado: true };
+  };
+  const pesar = (p, peso, n) => {
+    const antes = pesos.get(p);
+    if (antes?.declarado && !peso.declarado) return;
+    if (antes?.declarado && antes.valor !== peso.valor) falha(`${campo}[${n}] marca ${citar(p)} com outro peso que uma medida anterior`);
+    pesos.set(p, peso);
+  };
   for (const [n, s] of seletores.entries()) {
-    exigirCampos(s, campo === 'medidas' ? ['estacao', 'coluna', 'anel', 'volta', 'peso', 'chaves'] : ['estacao', 'coluna', 'anel', 'volta', 'chaves'], `${campo}[${n}]`);
+    exigirCampos(s, medidas ? ['estacao', 'coluna', 'anel', 'volta', 'peso', 'exata', 'chaves'] : ['estacao', 'coluna', 'anel', 'volta', 'chaves'], `${campo}[${n}]`);
     if (s.anel != null) {
       if (s.estacao != null || s.coluna != null || s.chaves != null) falha(`${campo}[${n}] marca um anel: declare anel, e volta se for uma só, sem estacao, coluna nem chaves`);
-      const peso = s.peso ?? null;
-      if (peso !== null && !(typeof peso === 'string' || (typeof peso === 'number' && Number.isFinite(peso) && peso > 0))) falha(`${campo}[${n}] tem peso ${peso}; o peso é número finito maior que zero ou nome de PARAMS, e a medida sem peso é exata`);
+      const peso = lerPeso(s, n);
       const a = aneis?.porNome.get(s.anel);
       const voltas = s.volta != null ? [voltaDoAnel(aneis, s.anel, s.volta, `${campo}[${n}]`)] : (a ? [...a.voltas, ...a.costuras] : voltaDoAnel(aneis, s.anel, 1, `${campo}[${n}]`));
-      for (const p of voltas.flat()) {
-        if (marcados.has(p) && (pesos.get(p) ?? null) !== peso) falha(`${campo}[${n}] marca ${citar(p)} com outro peso que uma medida anterior`);
-        marcados.add(p); if (peso !== null) pesos.set(p, peso);
-      }
+      for (const p of voltas.flat()) { marcados.add(p); pesar(p, peso, n); }
       continue;
     }
     if (s.volta != null) falha(`${campo}[${n}] declara volta sem anel`);
@@ -511,8 +578,7 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis) {
     if (soChaves !== false && soChaves !== true) falha(`${campo}[${n}] aceita chaves só como true ou false`);
     if (soChaves && !chaves) falha(`${campo}[${n}] marca chaves: true, mas a gaiola não declara interpolar; sem interpolação toda estação declarada é chave`);
     if (s.estacao != null) citavel(s.estacao, `${campo}[${n}]`);
-    const peso = s.peso ?? null;
-    if (peso !== null && !(typeof peso === 'string' || (typeof peso === 'number' && Number.isFinite(peso) && peso > 0))) falha(`${campo}[${n}] tem peso ${peso}; o peso é número finito maior que zero ou nome de PARAMS, e a medida sem peso é exata`);
+    const peso = lerPeso(s, n);
     if (s.estacao == null && s.coluna == null && !soChaves) falha(`${campo}[${n}] precisa de estacao, coluna ou os dois`);
     if (s.estacao != null && !indiceDaEstacao.has(s.estacao)) falha(`${campo}[${n}] cita a estação ${citar(s.estacao)}, que não existe`);
     if (soChaves && s.estacao != null && !chaves.has(s.estacao)) falha(`${campo}[${n}] marca chaves: true e cita a estação ${citar(s.estacao)}, que não é estação-chave`);
@@ -522,13 +588,12 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis) {
       if (s.coluna != null && !E.indice.has(s.coluna)) continue;
       for (const c of E.colunas) {
         if (s.coluna != null && c.nome !== s.coluna) continue;
-        if (marcados.has(c.ponto) && (pesos.get(c.ponto) ?? null) !== peso) falha(`${campo}[${n}] marca ${citar(c.ponto)} com outro peso que uma medida anterior`);
-        marcados.add(c.ponto); if (peso !== null) pesos.set(c.ponto, peso); achou += 1;
+        marcados.add(c.ponto); pesar(c.ponto, peso, n); achou += 1;
       }
     }
     if (!achou) falha(`${campo}[${n}] cita a coluna ${citar(s.coluna)}, que ${s.estacao != null ? `a estação ${citar(s.estacao)} não tem` : `nenhuma estação${soChaves ? '-chave' : ''} tem`}`);
   }
-  return vertices.filter((p) => marcados.has(p)).map((p) => (pesos.has(p) ? { ponto: p, peso: pesos.get(p) } : p));
+  return vertices.filter((p) => marcados.has(p)).map((p) => (pesos.get(p).valor !== Infinity ? { ponto: p, peso: pesos.get(p).valor } : p));
 }
 
 let capturando = null;
@@ -541,8 +606,8 @@ export function capturarGaiolas(fn) {
 }
 
 /**
- * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, aneis, vincos, cantos, medidas, simetria, virar, prefixo, curvas, interpolar })
- *   -> { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, estacoes?, aneis? }
+ * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, aneis, vincos, cantos, medidas, leitura, simetria, virar, prefixo, curvas, interpolar })
+ *   -> { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, estacoes?, aneis?, avisos? }
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`: { vertices, faces, vincos, cantos?, medidas?,
  * simetria? }, tudo em nomes de ponto. `regioes` dá, para cada região, os nomes dos pontos dela, na ordem dos pontos.
  * `bordaDoVao(vao)` devolve os nomes dos pontos da borda do vão, em sequência ao longo das arestas da gaiola, com o
@@ -552,9 +617,10 @@ export function capturarGaiolas(fn) {
  * colunas), 'gerada' (pelo passo) ou 'parcial'.
  */
 export function gaiolaPorEstacoes(definicao) {
-  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'aneis', 'vincos', 'cantos', 'medidas', 'simetria', 'virar', 'prefixo', 'curvas', 'interpolar'], 'a definição da gaiola');
+  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'aneis', 'vincos', 'cantos', 'medidas', 'leitura', 'simetria', 'virar', 'prefixo', 'curvas', 'interpolar'], 'a definição da gaiola');
   const { simetria = null, virar = false, prefixo = '' } = definicao;
   const E = lerEixo(definicao.eixo);
+  const leitura = lerLeitura(definicao.leitura);
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
   if (typeof virar !== 'boolean') falha('virar precisa ser true ou false');
   if (typeof prefixo !== 'string') falha('prefixo precisa ser texto');
@@ -691,8 +757,14 @@ export function gaiolaPorEstacoes(definicao) {
   }
 
   const vincos = lerVincos(definicao.vincos, lidas, arestas, E.fechada, citavel, aneis);
-  const cantos = marcar(definicao.cantos, 'cantos', lidas, todosOsVertices, citavel, chaves, aneis);
-  const medidas = marcar(definicao.medidas, 'medidas', lidas, todosOsVertices, citavel, chaves, aneis);
+  const cantos = marcar(definicao.cantos, 'cantos', lidas, todosOsVertices, citavel, chaves, aneis, null);
+  const medidas = marcar(definicao.medidas, 'medidas', lidas, todosOsVertices, citavel, chaves, aneis, leitura);
+  let avisos = null;
+  if (leitura) {
+    const doEixo = lidas.filter((S) => S.regiao === null && (expandida ? expandida.tipos.get(S.nome) === 'chave' : true));
+    avisos = avisosDeEstacoesProximas(doEixo, E, leitura);
+    if (leitura.estrito && avisos.length) falha(`a leitura é estrita e ${avisos.length === 1 ? 'um par de estações-chave está' : `${avisos.length} pares de estações-chave estão`} mais perto do que o erro de leitura sustenta: ${avisos.map((a) => a.texto).join('; ')}`);
+  }
   const passo = { vertices: [...todosOsVertices], faces, vincos };
   if (cantos) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
@@ -734,6 +806,7 @@ export function gaiolaPorEstacoes(definicao) {
       vao: a.vao, fechada: a.fechada, voltas: a.voltas.map((v) => [...v]), costuras: a.costuras.map((v) => [...v]), borda: [...a.borda], extraordinarios: extraordinariosDosAneis[a.anel.nome],
     }]));
   }
+  if (avisos) saida.avisos = avisos;
   if (chaves) saida.estacoes = lidas.map((e) => ({ nome: e.nome, em: e.em, tipo: expandida.tipos.get(e.nome) }));
   if (capturando) capturando.push(saida);
   return saida;

@@ -47,6 +47,17 @@
  * reaparece nos vizinhos. Com medidas, a gaiola é a ajustada pelo núcleo: mexer no ponto declarado move o ajustado e a
  * superfície passa pelo ponto declarado.
  *
+ * A FACE VIRADA. A superfície que se dobra sobre si mesma, como a de uma faixa estreita ao lado de faces largas sem transição, ou a de
+ * cota exata nos pontos de um anel, tem faces cuja normal se inverte em relação à da vizinha; a curvatura, o desvio à versão suavizada
+ * e a emenda não a acusam, e uma transição malfeita virou 137 faces em nível 2 sem falha. A aresta fora dos vincos e das bordas
+ * declarados em que o ângulo entre as normais das duas faces passa de `viradaGraus` (90) é de face virada; as que se tocam formam uma
+ * falha `faceVirada`, que traz `faces` (as das duas bandas das arestas), `facesViradas` (as que têm a normal contra a da face da gaiola
+ * declarada de que descendem, na mancha toda e não só junto da aresta), `arestas`, o maior `anguloGraus`, a posição e os pontos nomeados que mais pesam nela, e a superfície
+ * traz `facesViradas`, a soma. Toda face virada é falha, mesmo junto de uma feição.
+ *
+ * OS AVISOS DA GAIOLA. A gaiola que declara `leitura` avisa pelo nome quando duas estações-chave vizinhas ficam mais perto do que o
+ * erro de leitura sustenta; a superfície traz esses avisos em `avisosDaGaiola`, que não contam como falha.
+ *
  * A ORIGEM. Quando a gaiola saiu de `gaiolaPorEstacoes`, cada ponto citado traz `origem`: a entrada declarada (estação e coluna),
  * a coluna amostrada numa curva de seção (curva e fração) ou a estação gerada pela interpolação (as chaves que a cercam, a fração
  * e os nós), que é o que diz se o ponto se edita ou sai de outros. Falha de mais de três espaçamentos se resolve com
@@ -55,7 +66,7 @@
  *
  * Mesma receita, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa.
  *
- *   node tools/mecanifica/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2]
+ *   node tools/mecanifica/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90]
  */
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -67,7 +78,7 @@ import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
-export const PADROES = Object.freeze({ limiarMm: 0.3, raio: 3, zonaDeclarada: 1, emendaGraus: 2 });
+export const PADROES = Object.freeze({ limiarMm: 0.3, raio: 3, zonaDeclarada: 1, emendaGraus: 2, viradaGraus: 90 });
 const MM = 1000;
 const JUNTAR = 1.5;
 const TUKEY = 4.685;
@@ -225,7 +236,7 @@ export function superficiesDaReceita(receita) {
     lista.push({
       passo: i, origemId: args.origemId ?? null, niveis, borda, aoLimite, simetria: args.simetria ?? null,
       vertices, faces: r.faces, vincos: r.vincos, gaiola: { ...gaiola, borda }, calculados: r.vertices,
-      origem, nomeDe, origemDe, declarados, declaradaCheia, medidas,
+      origem, nomeDe, origemDe, declarados, declaradaCheia, medidas, avisos: montada?.avisos ?? [],
     });
   });
   return lista;
@@ -546,6 +557,59 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     falhas.push({ ...base, pontos: pontosDe(verts.map((v) => ({ v, desvio: Math.max(Math.abs(desvio[v]), 1e-6) }))) });
   }
 
+  /* faces viradas: a aresta fora dos vincos declarados em que as normais das duas faces passam de `viradaGraus` (90 por padrão) é
+     a superfície dobrada sobre si mesma, o que nenhuma curvatura nem emenda faz: a normal de uma face se inverte em relação à da
+     vizinha. As arestas que se tocam formam uma falha, com as faces das duas bandas e os pontos nomeados que mais pesam nela. */
+  const util = (f) => norma(nf[f]) > 1e-18;
+  /* a face virada, entre as que tocam a aresta, é a que tem a normal contra a da face da gaiola declarada de que descende */
+  const declaradaDaGaiola = sup.declaradaCheia ?? G;
+  const normalDoPai = declaradaDaGaiola.faces.map((f) => newell(f.map((v) => declaradaDaGaiola.vertices[v])));
+  const contraOPai = (f) => dot(nf[f], normalDoPai[dono(f)]) < 0;
+  /* a mancha virada: das faces contra o pai que tocam a aresta, cresce pelas vizinhas que também o estão */
+  const contadas = new Set();
+  const manchaVirada = (sementes) => {
+    const fila = sementes.filter((f) => contraOPai(f) && !contadas.has(f)); const mancha = new Set(fila);
+    for (let q = 0; q < fila.length; q++) {
+      const f = fila[q]; const fv = F[f];
+      for (let k = 0; k < fv.length; k++) {
+        for (const g of arestas.get(chave(fv[k], fv[(k + 1) % fv.length])).faces) if (g !== f && !mancha.has(g) && !contadas.has(g) && contraOPai(g)) { mancha.add(g); fila.push(g); }
+      }
+    }
+    for (const f of mancha) contadas.add(f);
+    return mancha.size;
+  };
+  const viradas = [];
+  for (const [c, e] of [...arestas].sort((x, y) => x[0] - y[0])) {
+    if (declarada.has(c) || e.faces.length !== 2 || !util(e.faces[0]) || !util(e.faces[1])) continue;
+    const t = angulo(e.faces[0], e.faces[1]);
+    if (t > o.viradaGraus) viradas.push({ e, angulo: t });
+  }
+  const vDe = new Map(); viradas.forEach((x, k) => { for (const v of [x.e.a, x.e.b]) { if (!vDe.has(v)) vDe.set(v, []); vDe.get(v).push(k); } });
+  const vista = new Uint8Array(viradas.length);
+  for (let k0 = 0; k0 < viradas.length; k0++) {
+    if (vista[k0]) continue;
+    const fila = [k0]; vista[k0] = 1;
+    for (let q = 0; q < fila.length; q++) for (const v of [viradas[fila[q]].e.a, viradas[fila[q]].e.b]) for (const k of vDe.get(v)) if (!vista[k]) { vista[k] = 1; fila.push(k); }
+    const pior = fila.reduce((m, k) => (viradas[k].angulo > viradas[m].angulo ? k : m), fila[0]);
+    const { e } = viradas[pior]; const meio = [0, 1, 2].map((j) => (V[e.a][j] + V[e.b][j]) / 2);
+    const verts = [...new Set(fila.flatMap((k) => [viradas[k].e.a, viradas[k].e.b]))].sort((x, y) => x - y);
+    const vPico = dist(V[e.a], meio) <= dist(V[e.b], meio) ? e.a : e.b;
+    if (!metadeDeclarada(vPico)) continue;
+    falhas.push({
+      tipo: 'faceVirada',
+      posicaoMm: meio.map((x) => arred(x * MM, 1)),
+      anguloGraus: arred(viradas[pior].angulo, 2),
+      faces: new Set(fila.flatMap((k) => viradas[k].e.faces)).size,
+      facesViradas: manchaVirada([...new Set(fila.flatMap((k) => viradas[k].e.faces))]),
+      arestas: fila.length,
+      amplitudeMm: arred(Math.max(...verts.map((v) => Math.abs(desvio[v]))) * MM),
+      extensaoMm: arred(fila.reduce((s, k) => s + dist(V[viradas[k].e.a], V[viradas[k].e.b]), 0) * MM, 1),
+      vertices: verts.length,
+      espacamentoMm: arred(h[vPico] * MM, 1),
+      pontos: pontosDe(verts.map((v) => ({ v, desvio: Math.max(Math.abs(desvio[v]), 1e-6) }))),
+    });
+  }
+
   const ordenar = (a, b) => b.amplitudeMm - a.amplitudeMm || (b.saltoDeNormalGraus ?? 0) - (a.saltoDeNormalGraus ?? 0)
     || a.posicaoMm[0] - b.posicaoMm[0] || a.posicaoMm[1] - b.posicaoMm[1] || a.posicaoMm[2] - b.posicaoMm[2];
   falhas.sort(ordenar); junto.sort(ordenar);
@@ -568,6 +632,8 @@ export function ondulacaoDaReceita(receita, opcoes = {}) {
     return {
       passo: sup.passo, origemId: sup.origemId, niveis: sup.niveis, vertices: sup.vertices.length, faces: sup.faces.length,
       pontosDaGaiola: G.vertices.length,
+      facesViradas: r.falhas.reduce((n, f) => n + (f.tipo === 'faceVirada' ? f.facesViradas : 0), 0),
+      avisosDaGaiola: sup.avisos,
       espacamentoDaGaiolaMm: { minimo: arred(hs[0] * MM, 1), mediana: arred(mediana(hs) * MM, 1), maximo: arred(hs[hs.length - 1] * MM, 1) },
       ...r,
     };
@@ -577,7 +643,7 @@ export function ondulacaoDaReceita(receita, opcoes = {}) {
 
 function lerOpcoes(args) {
   const o = {};
-  const nomes = { 'limiar-mm': 'limiarMm', raio: 'raio', zona: 'zonaDeclarada', 'emenda-graus': 'emendaGraus' };
+  const nomes = { 'limiar-mm': 'limiarMm', raio: 'raio', zona: 'zonaDeclarada', 'emenda-graus': 'emendaGraus', 'virada-graus': 'viradaGraus' };
   for (const a of args) {
     const m = /^--([a-z-]+)=(.+)$/.exec(a);
     if (!m || !nomes[m[1]]) throw new Error(`ondulacao: opção desconhecida ${a}; as opções são ${Object.keys(nomes).map((k) => `--${k}=`).join(', ')}`);
@@ -589,7 +655,7 @@ function lerOpcoes(args) {
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/mecanifica/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: node tools/mecanifica/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90]\n'); return 2; }
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) { process.stderr.write(`ondulacao: não achei a receita '${alvo}'.\n`); return 2; }
   const receita = receitaDoModulo(await importarReceita(caminho));

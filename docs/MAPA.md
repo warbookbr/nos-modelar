@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1598 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1601 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1089,6 +1089,7 @@
 - `gaiola-aneis.test.mjs` — gaiola-aneis.test.mjs — os anéis de gaiola em volta de um vão e de um arco, na chapa curva desenhada por código
 - `gaiola-interpolada.js` — gaiola-interpolada.js — estações interpoladas e colunas por curva de seção, opções da gaiola por estações
 - `gaiola-interpolada.test.mjs` — gaiola-interpolada.test.mjs — as opções `interpolar` e `curvas` da gaiola por estações: a interpolação monótona das colunas entre estações-chave reproduz uma…
+- `gaiola-leitura.test.mjs` — gaiola-leitura.test.mjs — a leitura de imagem declarada na gaiola por estações e o peso padrão do passo `subdivisao` (fatia 2 do plano da gaiola que segue as…
 - `gaiola-local.test.mjs` — gaiola-local.test.mjs — a gaiola por estações adensada só num trecho (fatia 12 do plano de carroceria por subdivisão): a região com estações parciais e colun…
 - `gaiola-origem.test.mjs` — gaiola-origem.test.mjs — a gaiola por estações publica de onde vem cada ponto.
 - `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
@@ -2377,6 +2378,7 @@
 - `ondulacao-aneis.test.mjs` — ondulacao-aneis.test.mjs — a leitura de ondulação da chapa com anéis de gaiola em volta de um vão e de um arco
 - `ondulacao-da-superficie.mjs` — ondulacao-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita ondula, salta ou dobra fora dos vincos declarados, e diz quanto (em milímet…
 - `ondulacao-da-superficie.test.mjs` — ondulacao-da-superficie.test.mjs — a ferramenta de ondulação endereçada sobre a chapa desenhada por código.
+- `ondulacao-leitura.test.mjs` — ondulacao-leitura.test.mjs — o dado lido com peso, o aviso de estações próximas e a face virada na ferramenta de ondulação
 - `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente e…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
@@ -2449,6 +2451,7 @@
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
 - `fixture-ombro-uniao.js` — fixture-ombro-uniao.js — fixture neutra copiada em 2026-09-29 do ombro do braço robótico (procedural/pecas/braco-robotico/partes/ombro/receita.js), para os t…
 - `fixture-uniao.js` — fixture-uniao.js — fixture neutra da fatia 5 do plano "União de sólidos": uma coluna e um braço unidos por `unir`, pousados numa base. Prova que as ferrament…
+- `leitura-prova.js` — leitura-prova.js — a chapa curva lida com erro, desenhada por código
 - `ondulacao-prova-lisa.js` — ondulacao-prova-lisa.js — a mesma chapa de ondulacao-prova.js sem vinco e sem ondulação plantada, como receita de arquivo (a linha de comando da ferramenta d…
 - `ondulacao-prova.js` — ondulacao-prova.js — a chapa desenhada por código para o teste da ferramenta de ondulação endereçada.
 - `vincos-das-linhas-chaves-prova.js` — vincos-das-linhas-chaves-prova.js — a forma desenhada por código e as linhas 3D sintéticas do teste de `vincos-das-linhas.mjs` sobre uma gaiola com estações …

@@ -3,7 +3,7 @@
  * O gate da fatia 1 do plano da gaiola que segue as feições: a chapa curva da prova (procedural/nucleo/fixtures/gaiola-aneis-prova.js)
  * sai lisa na zona da costura, isto é, a ferramenta de ondulação não acusa falha fora de `junto`, com os anéis lisos e com a moldura
  * em relevo. As medidas do anel têm peso: com a cota exata nos pontos do anel a superfície ganha faces viradas junto dos cantos, e a
- * ferramenta acusa emendas. */
+ * ferramenta acusa a face virada e as emendas. */
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -55,7 +55,14 @@ describe('ondulação da chapa com anéis', () => {
     expect(viradas({ medidasDosAneis: [{ anel: 'janela' }, { anel: 'arco' }] })).toBe(56);
     const exata = ler({ medidasDosAneis: [{ anel: 'janela' }, { anel: 'arco' }] });
     expect(exata.falhas.length).toBeGreaterThan(0);
-    expect(exata.falhas.every((f) => f.tipo === 'emenda' && f.amplitudeMm < 0.15)).toBe(true);
+    expect(exata.falhas.every((f) => (f.tipo === 'emenda' || f.tipo === 'faceVirada') && f.amplitudeMm < 0.15)).toBe(true);
+    /* a ferramenta conta a face virada, e a conta fica perto das 56 da área projetada (a normal contra a da face da gaiola de que
+       descende pega duas a mais, na dobra) */
+    expect(exata.falhas.some((f) => f.tipo === 'faceVirada')).toBe(true);
+    expect(exata.facesViradas).toBeGreaterThanOrEqual(56);
+    expect(exata.facesViradas).toBeLessThanOrEqual(62);
+    for (const f of exata.falhas.filter((x) => x.tipo === 'faceVirada')) expect(f.pontos.every((p) => /^(janela|arco)_/.test(p.nome))).toBe(true);
+    expect(ler({}).facesViradas).toBe(0);
   });
 
   it('pela linha de comando, a receita da prova passa com a moldura e dá a mesma saída', () => {

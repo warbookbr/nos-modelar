@@ -17,6 +17,7 @@ import { valorDoLiso } from '../liso-por-angulo.js';
 const EXEMPLO_DE_VINCO = "{ nome: 'vincoDaAba', pontos: ['a', 'b', 'c'], nitidez: 0.5 }";
 const EXEMPLO_DE_CANTO = "cantos: ['quinaDaTampa']";
 const EXEMPLO_DE_MEDIDA = "{ ponto: 'cotaDoTeto', peso: 4 }";
+const EXEMPLO_DE_EXATA = "{ ponto: 'alturaDoVao', exata: true }";
 
 /** enderecosPorIndice(argumentos) -> caminhos dos campos de um passo `subdivisao` que endereçam a gaiola por índice
  *  numérico (face, vinco, canto ou medida), para o teste que confere que a receita só usa nomes. Vazio quando a receita
@@ -171,32 +172,50 @@ export function gaiolaDoPasso(a, { vec, num }) {
   if (soltos.length) return erro('vertices', `${soltos.length === 1 ? 'o vértice' : 'os vértices'} ${soltos.join(', ')} da gaiola ${soltos.length === 1 ? 'não pertence' : 'não pertencem'} a nenhuma face`);
   /* medidas: nomes de ponto da gaiola que a superfície limite atravessa, ou { ponto, peso } para a cota que a superfície
      só aproxima por mínimos quadrados; os outros pontos ficam onde foram declarados (com peso, perto de onde foram
-     declarados). Na simetria em x, a imagem espelhada de um ponto medido também é medida, com o mesmo peso. */
+     declarados). Na simetria em x, a imagem espelhada de um ponto medido também é medida, com o mesmo peso.
+     `pesoPadrao` declara que os pontos da gaiola vêm de leitura de imagem: o nome escrito sozinho ganha esse peso em vez de
+     ser cota exata, e a cota de projeto que a peça precisa acertar se escreve { ponto, exata: true }. A declaração de um
+     ponto (peso ou exata) vence o padrão sobre ele. Sem `pesoPadrao`, o nome sozinho continua a cota exata. */
   if (a.medidas != null) {
     if (!Array.isArray(a.medidas) || !a.medidas.length) return erro('medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
+    let pesoPadrao = null;
+    if (a.pesoPadrao != null) {
+      pesoPadrao = num(a.pesoPadrao);
+      if (!Number.isFinite(pesoPadrao) || pesoPadrao <= 0) return erro('pesoPadrao', `pesoPadrao precisa ser número finito maior que zero, e veio ${pesoPadrao}`);
+    }
     const lidas = [];
     for (const m of a.medidas) {
-      let nome = m; let peso = Infinity;
+      let nome = m; let peso = pesoPadrao ?? Infinity; let declarada = pesoPadrao === null;
       if (m && typeof m === 'object' && !Array.isArray(m)) {
-        const extra = Object.keys(m).filter((k) => k !== 'ponto' && k !== 'peso');
-        if (extra.length) return erro('medidas', `a medida com peso tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são ponto e peso, como ${EXEMPLO_DE_MEDIDA}`);
+        const extra = Object.keys(m).filter((k) => k !== 'ponto' && k !== 'peso' && k !== 'exata');
+        if (extra.length) return erro('medidas', `a medida com peso tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são ponto e peso, como ${EXEMPLO_DE_MEDIDA}, ou ponto e exata, como ${EXEMPLO_DE_EXATA}`);
         if (typeof m.ponto !== 'string') return erro('medidas', `a medida com peso precisa do nome do ponto, como ${EXEMPLO_DE_MEDIDA}`);
-        nome = m.ponto;
-        if (m.peso == null) return erro('medidas', `a medida ${citar(nome)} precisa de peso maior que zero, como ${EXEMPLO_DE_MEDIDA}; para a cota exata, escreva só o nome`);
-        peso = num(m.peso);
-        if (!Number.isFinite(peso) || peso <= 0) return erro('medidas', `a medida ${citar(nome)} tem peso ${peso}; o peso é número finito maior que zero, e a cota exata se escreve só com o nome`);
+        nome = m.ponto; declarada = true;
+        if (m.exata != null && m.exata !== true) return erro('medidas', `a medida ${citar(nome)} aceita exata só como true, como ${EXEMPLO_DE_EXATA}`);
+        if (m.exata === true) {
+          if (m.peso != null) return erro('medidas', `a medida ${citar(nome)} declara exata e peso; a cota exata não tem peso`);
+          peso = Infinity;
+        } else {
+          if (m.peso == null) return erro('medidas', `a medida ${citar(nome)} precisa de peso maior que zero, como ${EXEMPLO_DE_MEDIDA}; para a cota exata, escreva só o nome${pesoPadrao === null ? '' : ' (com pesoPadrao, { ponto, exata: true })'}`);
+          peso = num(m.peso);
+          if (!Number.isFinite(peso) || peso <= 0) return erro('medidas', `a medida ${citar(nome)} tem peso ${peso}; o peso é número finito maior que zero, e a cota exata se escreve só com o nome${pesoPadrao === null ? '' : ' ou { ponto, exata: true }'}`);
+        }
       } else if (typeof m !== 'string') return erro('medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
       if (!indiceDoNome.has(nome)) return erro('medidas', `a medida '${nome}' não é ponto declarado da gaiola`);
-      lidas.push({ indice: indiceDoNome.get(nome), peso, nome });
+      lidas.push({ indice: indiceDoNome.get(nome), peso, nome, declarada });
     }
+    /* o padrão não vence uma declaração sobre o mesmo ponto; duas declarações de pesos diferentes gritam */
+    const vistos = new Map();
+    for (const m of lidas) {
+      const antes = vistos.get(m.nome);
+      if (antes?.declarada && !m.declarada) continue;
+      if (antes?.declarada && m.declarada && antes.peso !== m.peso) return erro('medidas', `o ponto ${citar(m.nome)} aparece em medidas com pesos diferentes`);
+      vistos.set(m.nome, m);
+    }
+    lidas.splice(0, lidas.length, ...vistos.values());
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     declaradaCheia = gaiola;
-    const vistos = new Map();
-    for (const m of lidas) {
-      if (vistos.has(m.nome) && vistos.get(m.nome) !== m.peso) return erro('medidas', `o ponto ${citar(m.nome)} aparece em medidas com pesos diferentes`);
-      vistos.set(m.nome, m.peso);
-    }
     try {
       if (lidas.every((m) => m.peso === Infinity)) {
         /* só medidas exatas: o caminho de sempre, que a saída das fixtures guarda bit a bit */
