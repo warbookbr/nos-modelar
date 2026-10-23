@@ -529,6 +529,76 @@ superfície a 0,37 mm, a interpolação linear ficaria a 1,25 mm, e com o máxim
 de uma coluna caindo 0,23 m depois de um corte o desvio sobe a 0,73 mm. A
 interpolação não extrapola, não entra numa região e não vale no eixo fechado.
 
+A moldura em volta de um vão, a calha e o lábio de um arco pedem laços de arestas
+que contornam a borda, e a grade de estações e colunas não os tem: o vão sai
+retangular e o arco corta a grade na diagonal. `aneis` põe esses laços dentro de
+um vão declarado, costurados à grade ao redor. O vão é o limite de fora; a
+abertura de verdade, a borda livre da chapa, fica `recuo` mm para dentro dele, e é
+a volta 1 do anel. As voltas 2, 3... se afastam dela em direção à grade, a
+`largura` mm uma da outra (ou a `larguras`, uma entre cada par de voltas), e
+`raio` arredonda os cantos da abertura. Os pontos se chamam
+`<anel>_a<volta>_<ponto da borda do vão>`, com `_arco<j>` nos pontos do arco de
+cada canto, e a gaiola devolve `aneis[nome]` com os nomes de cada volta. Vincos,
+cantos e medidas os citam por nome, e `relevo` desloca cada volta pela normal, em
+mm (positivo no sentido da normal das faces):
+
+```js
+const g = gaiolaPorEstacoes({
+  eixo: 'z', virar: true, estacoes,
+  vaos: [{ nome: 'janela', estacoes: ['e5', 'e14'], colunas: ['c3', 'c13'] }, { nome: 'arco', estacoes: ['e0', 'e3'], colunas: ['c4', 'c12'] }],
+  aneis: [
+    { nome: 'janela', vao: 'janela', recuo: 140, voltas: 3, largura: 10, raio: 50, relevo: [0, 10, 0] },
+    { nome: 'arco', vao: 'arco', recuo: 130, voltas: 2, largura: 10, raio: 50 },
+  ],
+  vincos: [{ nome: 'molduraDeDentro', anel: 'janela', volta: 1, nitidez: 'viva' }, { nome: 'molduraDeFora', anel: 'janela', volta: 3, nitidez: 'viva' }],
+  medidas: [...estacoes.map(({ nome }) => ({ estacao: nome })), { anel: 'janela', volta: 2, peso: 50 }, { anel: 'arco', peso: 5 }],
+});
+// g.bordaDoVao('janela') passa a ser a volta 1, a linha da aba do friso; g.aneis.janela.voltas[0] lista os pontos dela
+```
+
+O vão que se abre na borda da chapa, como o recorte de uma roda, dá um anel aberto:
+as voltas começam e acabam sobre a borda livre. Entre a última volta e a borda do
+vão o anel acrescenta sozinho laços de transição (`<anel>_c<j>_…`), cada um até duas
+vezes mais largo que o anterior, até a aresta da grade: a face de 10 mm ao lado de
+uma de 100 mm dobra a superfície quando a subdivisão leva os vértices ao limite
+(na chapa de prova, com uma só faixa de 120 mm ao lado da volta de 10 mm, 137 faces
+viradas em nível 2 e 614 em nível 3, mesmo com os pontos do anel de peso 5; com a
+transição, nenhuma), e o dobro de uma faixa à seguinte é o que ela aguenta. Por isso o `recuo` precisa
+deixar espaço para essa transição, uns 80 a 140 mm sobre uma grade de 100 mm, e o
+anel grita com o intervalo que a transição pede quando ele não deixa. A costura liga
+o laço de fora aos pontos da borda do vão um a um por uma faixa só de quadriláteros;
+o arco de cada canto, de `segmentos` por quarto de volta (par, padrão 4), tem mais
+pontos que o canto da borda, e a faixa acrescenta esses pontos com faces de três
+pontos de um laço e um do outro. Os vértices extraordinários que isso deixa, 5 nos
+pontos da borda do vão e 3 nos do arco, são três e dois por canto, e a gaiola os
+devolve declarados em `aneis[nome].extraordinarios` com a valência; o resto da
+malha é de quadriláteros regulares. Mais de quatro segmentos põem mais de um
+deslocamento no mesmo ponto da borda, a valência sobe a 6 ou mais e a grade ondula
+longe do vão.
+
+As distâncias do anel são medidas sobre a chapa, e as alturas saem de um ajuste
+polinomial aos pontos da borda e da fileira da grade em volta dela, de modo que
+os pontos do anel ficam sobre a chapa que a grade desenha. Na chapa de prova
+(`procedural/nucleo/fixtures/gaiola-aneis-prova.js`, raios de 2 e 3 m, um vão de
+900 × 1000 mm com cantos de 50 mm e um recorte de 300 × 800 mm na borda), os
+pontos do anel ficam a 0,009 mm da chapa, os lados das voltas a 0,03 mm do
+gabarito da janela e a 0,11 mm do do recorte, o raio dos arcos a 0,12 mm do pedido
+(medido pelo círculo por três pontos do arco), e as pontas do anel aberto
+exatamente sobre a borda livre. O raio do canto mais o recuo da esquina precisam
+caber entre a esquina e o primeiro ponto do lado, e o anel grita com os dois pontos
+quando não cabem: com pontos a 100 mm, um canto de 50 mm com recuo de 140 mm cabe
+num vão de 900 mm de lado e não cabe num de 800 mm. Meça os pontos do anel com peso (5 serve; 50 na
+volta deslocada de uma moldura): a cota exata põe 56 faces viradas na superfície em
+nível 2 junto dos cantos, e a de peso 5 deixa a chapa sem nenhuma e sem falha de
+`npm run ondulacao` fora de `junto`. Com a moldura de 10 mm em relevo (volta 2
+deslocada, voltas 1 e 3 vincadas vivas), a gaiola declarada tem o diedro de 44,6 graus
+que 10 mm de relevo em 10 mm de largura pedem, a superfície chega a 9,9 mm de altura
+na crista, e o diedro no vinco da superfície limite sai a 49,4 graus: 5 graus mais
+aberto, porque a superfície passa pela crista e o flanco sobe mais depressa que a corda
+da gaiola. Com a cota exata na volta deslocada a crista chega a 10,0 mm e o diedro sobe a
+56,8 graus, e sem cota nos anéis da janela a crista fica em 6,2 mm e o diedro em
+44,4 graus: o peso escolhe onde parar entre os dois.
+
 Sem `espessura`, a superfície sai aberta se a gaiola for aberta, e o
 `conferir-malha` acusa casca aberta. Com `espessura: 0.002` (número ou nome de
 `PARAMS`), a superfície subdividida vira a face externa de um sólido fechado:

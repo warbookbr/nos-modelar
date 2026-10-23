@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:cde79864c9c933295aaaa3ff93787ed438b18d81d04e6b02721a4c0c1dde209e",
+  "assinatura": "sha256:81673c552aebc0f1df190dc07555bc042eb9a9e8693203bb47eb68e83d4fa326",
   "total": 39,
   "operacoes": [
     {
@@ -1861,7 +1861,7 @@
             },
             "aba": {
               "type": "object",
-              "description": "Em vez de perfil, só sobre a superficie e com espessura: a aba que dobra a borda livre da chapa para dentro, {largura, angulo, raio} em metros e graus, os três obrigatórios. A linha é a borda de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao da gaiolaPorEstacoes dá a de um vão), em qualquer sentido: o passo acha o lado da chapa. largura é a perna reta depois da dobra, angulo quanto a chapa gira (90 deixa a aba perpendicular) e raio o da face de dentro da dobra, com raio + espessura na de fora. A dobra começa na linha e se estende raio + espessura para o lado do vão. As faces saem lisas a 30 graus, e a dobra, a ponta e a espessura ficam vivas."
+              "description": "Em vez de perfil, só sobre a superficie e com espessura: a aba que dobra a borda livre da chapa para dentro, {largura, angulo, raio} em metros e graus, os três obrigatórios. A linha é a borda de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao da gaiolaPorEstacoes dá a de um vão, e a abertura dele quando o vão tem anéis), em qualquer sentido: o passo acha o lado da chapa. largura é a perna reta depois da dobra, angulo quanto a chapa gira (90 deixa a aba perpendicular) e raio o da face de dentro da dobra, com raio + espessura na de fora. A dobra começa na linha e se estende raio + espessura para o lado do vão. As faces saem lisas a 30 graus, e a dobra, a ponta e a espessura ficam vivas."
             },
             "ponta": {
               "anyOf": [
