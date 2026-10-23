@@ -84,6 +84,7 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/olhar-bancada.test.mjs',
   'tools/mecanifica/ondulacao-aneis.test.mjs',
   'tools/mecanifica/ondulacao-da-superficie.test.mjs',
+  'tools/mecanifica/ondulacao-gota.test.mjs',
   'tools/mecanifica/ondulacao-leitura.test.mjs',
   'tools/mecanifica/parametros-peca.test.mjs',
   'tools/mecanifica/receita-planejada.test.mjs',

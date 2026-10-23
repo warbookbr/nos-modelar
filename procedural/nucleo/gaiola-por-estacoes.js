@@ -35,10 +35,17 @@
  * vãos:   { nome, estacoes: [de, ate], colunas: [de, ate] } tira as faces cujos pontos ficam todos entre as duas
  *         estações e, em cada uma, entre as duas colunas, que precisam estar abertas nela. Ponto que fica sem face grita
  *         com o nome do vão. O vão não atravessa o fechamento do anel. `bordaDoVao(nome)` dá a borda dele por nome.
- * aneis: [{ nome, vao, recuo, voltas, largura | larguras, raio?, relevo?, segmentos? }] preenche um vão por dentro com laços de arestas
- *         que contornam a borda dele, costurados à grade ao redor (opções e geometria em `gaiola-aneis.js`). A volta 1 é a nova
- *         borda do vão, `recuo` mm para dentro, e as voltas seguintes se afastam dela, a `largura` mm uma da outra, até laços
- *         de transição que alargam até a grade. Os pontos se chamam `${nome}_a${volta}_${ponto da borda}`, com `_arco${j}` nos
+ *         `livre: true` declara o vão que não tira face: a abertura é a borda livre que as colunas que terminam (`termina`) e
+ *         começam (`comeca`) deixam, como a janela de trás de uma carroceria na metade com simetria, em que as colunas do meio
+ *         terminam numa estação e recomeçam em outra. O vão vai da estação em que elas terminam à em que recomeçam e da primeira
+ *         coluna delas à primeira que a chapa conserva entre as duas estações; a primeira coluna pode faltar nas estações do meio,
+ *         e a borda do vão é a borda livre entre os pontos dele.
+ * aneis: [{ nome, vao, recuo, voltas, largura | larguras, raio?, raios?, relevo?, segmentos?, camadas?, arredondar? }] põe laços de arestas
+ *         que contornam a abertura, costurados à grade ao redor (opções e geometria em `gaiola-aneis.js`). Com `recuo` em mm, número
+ *         ou um por lado (`{ baixo: 60, cima: 80, e5: 70, e14: 70 }`, pelos nomes das colunas e estações do vão), o anel preenche o vão
+ *         por dentro: a volta 1 é a nova borda do vão, `recuo` mm para dentro. Com `recuo: 0` a abertura é a própria borda do vão e as
+ *         voltas crescem para fora, sobre a grade, trocando a faixa de faces que cerca o vão (`camadas`). As voltas seguintes se afastam
+ *         da 1, a `largura` mm uma da outra, até laços de transição que alargam até a grade. Os pontos se chamam `${nome}_a${volta}_${ponto da borda}`, com `_arco${j}` nos
  *         arcos dos cantos, e a transição `${nome}_c${j}_…`. Vincos, cantos e medidas os citam por nome: `{ nome, anel, volta,
  *         nitidez }` segue uma volta, e `{ anel, volta? }` marca a volta (ou o anel inteiro, com a transição) em cantos e medidas,
  *         com `peso` nas medidas. `bordaDoVao(vao)` passa a dar a volta 1, e a saída traz `aneis[nome]` com as voltas, a transição e
@@ -298,7 +305,7 @@ function lerVaos(vaos, lidas, citavel) {
   const nomes = new Set();
   const indiceDaEstacao = new Map(lidas.map((e, k) => [e.nome, k]));
   return vaos.map((v, n) => {
-    exigirCampos(v, ['nome', 'estacoes', 'colunas'], `o vão ${n}`);
+    exigirCampos(v, ['nome', 'estacoes', 'colunas', 'livre'], `o vão ${n}`);
     const nome = exigirNome(v.nome, `o vão ${n}`);
     if (nomes.has(nome)) falha(`o nome de vão ${citar(nome)} aparece mais de uma vez`);
     nomes.add(nome);
@@ -311,7 +318,9 @@ function lerVaos(vaos, lidas, citavel) {
     for (const e of [e0, e1]) { citavel(e, `o vão ${citar(nome)}`); if (!indiceDaEstacao.has(e)) falha(`o vão ${citar(nome)} cita a estação ${citar(e)}, que não existe`); }
     const i0 = indiceDaEstacao.get(e0), i1 = indiceDaEstacao.get(e1);
     if (!(i0 < i1)) falha(`o vão ${citar(nome)} vai da estação ${citar(e0)} à ${citar(e1)}, que precisa vir depois`);
-    return { nome, i0, i1, colunas, dentro: new Set() };
+    const livre = v.livre ?? false;
+    if (livre !== true && livre !== false) falha(`o vão ${citar(nome)} aceita livre só como true ou false`);
+    return { nome, i0, i1, colunas, livre, dentro: new Set() };
   });
 }
 
@@ -413,9 +422,11 @@ function marcarVaos(vaos, E, frente) {
   for (const v of vaos) {
     if (E.k < v.i0 || E.k > v.i1) continue;
     const [c0, c1] = v.colunas;
-    const p0 = maisNova(frente, c0), p1 = maisNova(frente, c1);
+    /* no vão de borda livre a primeira coluna pode ter terminado: o vão começa então na primeira coluna da estação */
+    const p0 = v.livre && maisNova(frente, c0) < 0 ? frente.findIndex((e) => e.k === E.k) : maisNova(frente, c0);
+    const p1 = maisNova(frente, c1);
     for (const [c, p] of [[c0, p0], [c1, p1]]) if (p < 0) falha(`o vão ${citar(v.nome)} cita a coluna ${citar(c)}, que a estação ${citar(E.nome)} não tem`);
-    if (!(p0 < p1)) falha(`o vão ${citar(v.nome)} vai da coluna ${citar(c0)} à ${citar(c1)}, que na estação ${citar(E.nome)} precisa vir depois`);
+    if (v.livre ? p0 > p1 : !(p0 < p1)) falha(`o vão ${citar(v.nome)} vai da coluna ${citar(c0)} à ${citar(c1)}, que na estação ${citar(E.nome)} precisa vir depois`);
     frente.forEach((e, q) => { if (e.k === E.k && q >= p0 && q <= p1) v.dentro.add(e.ponto); });
   }
 }
@@ -491,7 +502,7 @@ function lerVincos(vincos, lidas, arestas, fechada, citavel, aneis) {
     if (!ok) falha(`o vinco ${citar(nome)} precisa de nitidez de 0 a 1, 'viva' ou nome de PARAMS`);
     const pontos = linhaDoVinco(v, nome, lidas, fechada, citavel, aneis);
     for (let k = 0; k + 1 < pontos.length; k++) {
-      if (!arestas.has(chave(pontos[k], pontos[k + 1]))) falha(`o vinco ${citar(nome)} liga ${citar(pontos[k])} a ${citar(pontos[k + 1])}, que não formam aresta da gaiola (um vão, uma fusão ou uma divisão tirou essa aresta)`);
+      if (!arestas.has(chave(pontos[k], pontos[k + 1]))) falha(`o vinco ${citar(nome)} liga ${citar(pontos[k])} a ${citar(pontos[k + 1])}, que não formam aresta da gaiola (um vão, uma fusão ou uma divisão tirou essa aresta${aneis && [...aneis.porNome.values()].some((a) => a.anel.fora) ? '; e um anel de recuo 0 troca a faixa de faces em volta do seu vão, com as arestas dela' : ''})`);
     }
     return { nome, pontos, nitidez: v.nitidez };
   });
@@ -569,7 +580,8 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis, leitu
       if (s.estacao != null || s.coluna != null || s.chaves != null) falha(`${campo}[${n}] marca um anel: declare anel, e volta se for uma só, sem estacao, coluna nem chaves`);
       const peso = lerPeso(s, n);
       const a = aneis?.porNome.get(s.anel);
-      const voltas = s.volta != null ? [voltaDoAnel(aneis, s.anel, s.volta, `${campo}[${n}]`)] : (a ? [...a.voltas, ...a.costuras] : voltaDoAnel(aneis, s.anel, 1, `${campo}[${n}]`));
+      /* o anel inteiro não marca a volta 1 do anel de recuo 0: ela é a borda do vão, pontos da grade que as estações já marcam */
+      const voltas = s.volta != null ? [voltaDoAnel(aneis, s.anel, s.volta, `${campo}[${n}]`)] : (a ? [...(a.anel.fora ? a.voltas.slice(1) : a.voltas), ...a.costuras] : voltaDoAnel(aneis, s.anel, 1, `${campo}[${n}]`));
       for (const p of voltas.flat()) { marcados.add(p); pesar(p, peso, n); }
       continue;
     }
@@ -655,7 +667,7 @@ export function gaiolaPorEstacoes(definicao) {
   for (const v of vaos) {
     let tiradas = 0;
     for (const f of todas) if (!f.fechamento && f.nomes.every((p) => v.dentro.has(p))) { f.vaos.push(v.nome); tiradas += 1; }
-    if (!tiradas) falha(`o vão ${citar(v.nome)} não tira nenhuma face`);
+    if (!tiradas && !v.livre) falha(`o vão ${citar(v.nome)} não tira nenhuma face; se a abertura é a borda livre que as colunas que terminam e começam deixam, declare livre: true no vão`);
   }
   const ficam = todas.filter((f) => !f.vaos.length);
   for (const f of ficam) {
@@ -685,6 +697,12 @@ export function gaiolaPorEstacoes(definicao) {
       if (!f.vaos.includes(v.nome)) continue;
       const n = f.nomes;
       for (let k = 0; k < n.length; k++) dosTirados.add(chave(n[k], n[(k + 1) % n.length]));
+    }
+    /* o vão de borda livre não tira face: a borda dele é a borda livre da chapa entre os pontos do vão */
+    if (v.livre) {
+      for (const f of faces) {
+        for (let k = 0; k < f.length; k++) { const a = f[k], b = f[(k + 1) % f.length]; if (v.dentro.has(a) && v.dentro.has(b)) dosTirados.add(chave(a, b)); }
+      }
     }
     const seguinte = new Map(); const ordem = [];
     for (const f of faces) {
@@ -733,7 +751,31 @@ export function gaiolaPorEstacoes(definicao) {
       }
       return null;
     };
-    aneis = construirAneis(aneisLidos, { pos: (p) => pontos[p], faces, bordaDoVao: caminhoDoVao, vizinhoLivre });
+    const donoDoPonto = new Map();
+    for (const S of lidas) for (const c of S.colunas) donoDoPonto.set(c.ponto, { estacao: S.nome, coluna: c.nome });
+    const localizar = (p) => donoDoPonto.get(p) ?? null;
+    const limitesDoVao = (nome) => {
+      const v = vaos.find((x) => x.nome === nome);
+      return { estacoes: [lidas[v.i0].nome, lidas[v.i1].nome], colunas: [...v.colunas] };
+    };
+    /* o limite do vão (coluna ou estação) em que a aresta fica, para o recuo por lado do anel */
+    const ladoDaAresta = (nome, a, b) => {
+      const L = limitesDoVao(nome); const la = localizar(a), lb = localizar(b);
+      if (!la || !lb) return null;
+      if (la.coluna === lb.coluna && L.colunas.includes(la.coluna)) return la.coluna;
+      if (la.estacao === lb.estacao && L.estacoes.includes(la.estacao)) return la.estacao;
+      return null;
+    };
+    aneis = construirAneis(aneisLidos, { pos: (p) => pontos[p], faces, bordaDoVao: caminhoDoVao, vizinhoLivre, limitesDoVao, ladoDaAresta, localizar, simetria });
+    /* o anel de recuo 0 troca as faces da grade em volta do vão pelas suas, e os pontos que ficavam só nelas saem da gaiola */
+    if (aneis.remover.length) {
+      const sai = new Set(aneis.remover);
+      for (let i = faces.length - 1; i >= 0; i--) if (sai.has(i)) faces.splice(i, 1);
+      arestas.clear();
+      for (const f of faces) for (let k = 0; k < f.length; k++) { const c = chave(f[k], f[(k + 1) % f.length]); arestas.set(c, (arestas.get(c) ?? 0) + 1); }
+      const sem = new Set(aneis.removidos);
+      for (let i = todosOsVertices.length - 1; i >= 0; i--) if (sem.has(todosOsVertices[i])) todosOsVertices.splice(i, 1);
+    }
     for (const [n, q] of Object.entries(aneis.pontos)) {
       if (n in pontos) falha(`o ponto ${citar(n)} do anel já é ponto da gaiola; renomeie o anel`);
       pontos[n] = q; todosOsVertices.push(n);
@@ -791,7 +833,7 @@ export function gaiolaPorEstacoes(definicao) {
   if (aneis) {
     for (const a of aneis.porNome.values()) {
       Object.assign(origens, a.origens);
-      const dosAneis = new Set([...a.ancoras, ...a.voltas.flat(), ...a.costuras.flat()]);
+      const dosAneis = new Set([...a.ancoras, ...a.voltas.flat(), ...a.costuras.flat(), ...a.grade]);
       extraordinariosDosAneis[a.anel.nome] = extraordinarios(todosOsVertices.filter((p) => dosAneis.has(p)), faces);
     }
   }
@@ -803,7 +845,7 @@ export function gaiolaPorEstacoes(definicao) {
   const saida = { pontos, passo, ponto, bordaDoVao, regioes: porRegiao, origens, entradas: entradasDaDefinicao(definicao.estacoes), estrutura };
   if (aneis) {
     saida.aneis = Object.fromEntries([...aneis.porNome.values()].map((a) => [a.anel.nome, {
-      vao: a.vao, fechada: a.fechada, voltas: a.voltas.map((v) => [...v]), costuras: a.costuras.map((v) => [...v]), borda: [...a.borda], extraordinarios: extraordinariosDosAneis[a.anel.nome],
+      vao: a.vao, fechada: a.fechada, ...(a.anel.fora ? { fora: true, camadas: a.camadas, grade: [...a.grade] } : {}), voltas: a.voltas.map((v) => [...v]), costuras: a.costuras.map((v) => [...v]), borda: [...a.borda], extraordinarios: extraordinariosDosAneis[a.anel.nome],
     }]));
   }
   if (avisos) saida.avisos = avisos;
