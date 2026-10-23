@@ -67,7 +67,7 @@ Além da peça existem a montagem persistida, o mapa canônico de dependências,
 revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo tem
 o braço robótico, em `procedural/pecas/braco-robotico/`. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
-divergem. O plano ativo é [carroceria por subdivisão](docs/mecanifica/planos/2026-10-21-carroceria-por-subdivisao.md).
+divergem. O plano ativo é [gaiola que segue as feições](docs/mecanifica/planos/2026-10-23-gaiola-que-segue-as-feicoes.md).
 Já fecharam [veículos de referência livre](docs/mecanifica/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
 como famílias](docs/mecanifica/planos/encerrados/2026-10-19-objetos-externos-como-familias.md) em 2026-10-20; [receitas com material e
 textura](docs/mecanifica/planos/encerrados/2026-10-19-receitas-com-material-e-textura.md) em 2026-10-19; [aparelhos de

@@ -4,7 +4,7 @@
 
 **Responsável:** Claude, com a pessoa aprovando o resultado da medida final
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano de carroceria por subdivisão
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [gaiola que segue as feições](2026-10-23-gaiola-que-segue-as-feicoes.md)
 
 ## Problema observado
 

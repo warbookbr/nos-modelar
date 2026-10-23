@@ -1,6 +1,6 @@
 # Blender com o Mecanifica
 
-Esta pasta explica como usar o Blender como ferramenta externa de apoio à modelagem no Mecanifica e dá um fluxo genérico para a IA e para a pessoa modelarem objetos novos. Os documentos descrevem o que já foi provado e marcam o que ainda é hipótese, e nada aqui autoriza código novo sem plano. As ferramentas de `tools/blender/` (régua, pacote cego, olhar da candidata, leituras do pacote e oráculo da subdivisão) vieram do plano [carroceria por subdivisão](../planos/2026-10-21-carroceria-por-subdivisao.md).
+Esta pasta explica como usar o Blender como ferramenta externa de apoio à modelagem no Mecanifica e dá um fluxo genérico para a IA e para a pessoa modelarem objetos novos. Os documentos descrevem o que já foi provado e marcam o que ainda é hipótese, e nada aqui autoriza código novo sem plano. As ferramentas de `tools/blender/` (régua, pacote cego, olhar da candidata, leituras do pacote e oráculo da subdivisão) vieram do plano [carroceria por subdivisão](../planos/encerrados/2026-10-21-carroceria-por-subdivisao.md).
 
 O Blender é opcional. A receita do Mecanifica continua sendo o produto, porque o conteúdo salvo é determinístico, versionado e reexecutável a partir dela, e uma malha feita no Blender é um arquivo opaco que muda entre versões do programa. Por isso o Blender fica fora do núcleo, fora do CI e fora do `--completo`, e nunca é versionado.
 
