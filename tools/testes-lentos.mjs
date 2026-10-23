@@ -52,6 +52,7 @@ export const TESTES_LENTOS = [
   'procedural/pecas/carenagem-de-prova/receita.test.mjs',
   'tools/blender/blender.test.mjs',
   'tools/blender/comparar-vincos.test.mjs',
+  'tools/blender/conferir-refino.test.mjs',
   'tools/blender/leitura-blender.test.mjs',
   'tools/blender/leitura-do-pacote.test.mjs',
   'tools/blender/limiar-de-dobra.test.mjs',
