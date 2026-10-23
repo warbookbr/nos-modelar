@@ -19,7 +19,10 @@
 #   python3 -I imagens.py vista <vista.json>
 #       Compõe uma imagem grande de uma vista ({saida, paineis: [{arquivo, titulo, subtitulo, px_por_mm, legenda_mm?}]}): os
 #       painéis lado a lado, recortados pelo mesmo retângulo ao conteúdo de todos (o fundo é branco), cada um com título,
-#       subtítulo e barra de escala em milímetro, e com legenda de cor (azul, branco, vermelho) onde legenda_mm é dado.
+#       subtítulo e barra de escala em milímetro, e com legenda de cor (azul, branco, vermelho) onde legenda_mm é dado
+#       (legenda_zero troca o branco do meio). Um painel com `desenhos` ([{linhas: [[[x, y], ...]], cor, largura?, rotulo?,
+#       rotulo_em?}], em pixels da imagem do painel antes do recorte) leva esses traços por cima, como as caixas das zonas da
+#       conferência do refino.
 #   python3 -I imagens.py perfis <perfis.json> <pasta>
 #       Desenha, de cada corte de perfis.json, os perfis sobrepostos em milímetro: <pasta>/corte-<nome>.png com o corte inteiro
 #       e <pasta>/corte-<nome>-ampliado.png em grade de 10 mm em volta do trecho declarado ou do de maior diferença, com a
@@ -392,6 +395,26 @@ def _barra_de_escala(d, f, x0, y1, px_por_mm):
     d.text((x0, y1 - 22), texto, fill='black', font=f)
 
 
+def _desenhos(img, desenhos, x0, y0):
+    """Traça sobre o painel já recortado (cujo canto estava em x0, y0 na imagem inteira) as linhas de cada desenho, e o rótulo
+    dele num retângulo branco com a mesma cor de borda, empurrado para dentro do painel."""
+    if not desenhos:
+        return
+    dr = ImageDraw.Draw(img)
+    f = fonte(16)
+    for ds in desenhos:
+        cor = tuple(ds['cor'])
+        for seg in ds['linhas']:
+            dr.line([(x - x0, y - y0) for x, y in seg], fill=cor, width=int(ds.get('largura', 2)))
+        if ds.get('rotulo'):
+            tb = dr.textbbox((0, 0), ds['rotulo'], font=f)
+            w, h = tb[2] - tb[0], tb[3] - tb[1]
+            x = min(max(4, ds['rotulo_em'][0] - x0), max(4, img.width - w - 8))
+            y = min(max(4, ds['rotulo_em'][1] - y0), max(4, img.height - h - 10))
+            dr.rectangle([x - 3, y - 3, x + w + 3, y + h + 5], fill=(255, 255, 255), outline=cor)
+            dr.text((x, y - tb[1]), ds['rotulo'], fill=cor, font=f)
+
+
 def vista(arq_json):
     d = json.load(open(arq_json))
     imgs = [Image.open(p['arquivo']).convert('RGB') for p in d['paineis']]
@@ -411,7 +434,9 @@ def vista(arq_json):
     ft, fs = fonte(22), fonte(16)
     for i, (im, p) in enumerate(zip(imgs, d['paineis'])):
         ox = i * (cw + GAP)
-        out.paste(im.crop((x0, y0, x1, y1)), (ox, TH))
+        painel = im.crop((x0, y0, x1, y1))
+        _desenhos(painel, p.get('desenhos', []), x0, y0)
+        out.paste(painel, (ox, TH))
         dr.text((ox + 8, 6), p['titulo'], fill='black', font=ft)
         if p.get('subtitulo'):
             dr.text((ox + 8, 36), p['subtitulo'], fill=(50, 50, 50), font=fs)
@@ -420,7 +445,8 @@ def vista(arq_json):
             bx, by, bl = ox + 8, 62, max(40, min(cw - 190, 260))
             for k in range(int(bl)):
                 t = 2 * k / max(bl - 1, 1) - 1
-                a, b = (COR_AZUL, COR_BRANCO) if t < 0 else (COR_BRANCO, COR_VERMELHO)
+                zero = tuple(p.get('legenda_zero', COR_BRANCO))
+                a, b = (COR_AZUL, zero) if t < 0 else (zero, COR_VERMELHO)
                 u = t + 1 if t < 0 else t
                 cor = tuple(int(round(a[j] * (1 - u) + b[j] * u)) for j in range(3))
                 dr.line([(bx + k, by), (bx + k, by + 12)], fill=cor)
