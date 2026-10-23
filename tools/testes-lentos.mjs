@@ -54,6 +54,7 @@ export const TESTES_LENTOS = [
   'tools/blender/comparar-vincos.test.mjs',
   'tools/blender/leitura-blender.test.mjs',
   'tools/blender/leitura-do-pacote.test.mjs',
+  'tools/blender/linhas-pelos-cortes.test.mjs',
   'tools/blender/regua-sinal-curvatura-cortes.test.mjs',
   'tools/mcp/catalogo-montagens.test.mjs',
   'tools/mcp/ensaio-ponta-a-ponta.test.mjs',
