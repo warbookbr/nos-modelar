@@ -255,9 +255,13 @@ describe('anéis de gaiola em volta de um vão e de um arco', () => {
     });
 
     it('recuo que não deixa espaço, transição que não cabe e raio que não cabe entre os pontos da borda', () => {
-      expect(grito({ janelaDoAnel: { recuo: 20 } })).toMatch(/recua 20 mm da borda do vão e as 3 voltas ocupam 20 mm/);
-      expect(grito({ janelaDoAnel: { recuo: 60 } })).toMatch(/a última volta fica a 40\.0 mm dela; a transição dessa volta de 10\.0 mm de largura até a grade, de 10\d\.\d mm, pede entre/);
+      expect(grito({ janelaDoAnel: { recuo: 20 } })).toMatch(/recua 20 mm da borda do vão e as 3 voltas ocupam 20 mm da abertura; o recuo precisa passar disso.* declare recuo: 0/);
+      expect(grito({ janelaDoAnel: { recuo: 60 } })).toMatch(/a transição das voltas até a grade não fecha: ao longo da estação 'e5', entre as colunas 'c4' e 'c5' \(e mais 9 trechos desse lado\).* sobram 40\.0 mm entre a última volta \(a 20\.0 mm da abertura\) e a borda do vão \(recuo de 60\.0 mm\), e as arestas da grade ali medem 10\d\.\d mm; a transição pede 8\d\.\d mm ou mais; aumente o recuo desses lados para pelo menos 10\d\.\d mm, ou acrescente uma estação entre 'e5' e 'e4'/);
       expect(grito({ janelaDoAnel: { raio: 150 } })).toMatch(/o raio de 1[67]0\.0 mm dos cantos não cabe entre 'e5_c3' e 'e14_c3'|dos cantos não cabe entre/);
+      /* o raio que a mensagem diz que cabe, cabe: 52 mm na grade de 100 mm, e o de 53 não */
+      expect(grito({ janelaDoAnel: { raio: 150 } })).toMatch(/reduza o raio do anel para 52 mm ou menos \(raio: 52\)/);
+      expect(montagem({ janelaDoAnel: { raio: 52 } }).aneis.janela.voltas).toHaveLength(3);
+      expect(() => montagem({ janelaDoAnel: { raio: 53 } })).toThrow(/o raio dos cantos não cabe/);
     });
 
     it('vinco, canto ou medida que cita anel ou volta que não existe', () => {
