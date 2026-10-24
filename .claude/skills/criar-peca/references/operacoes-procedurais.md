@@ -880,7 +880,9 @@ que curva de lado, cerca de curvatura × (largura/2)² / 2, que o passo não con
 em quarto de elipse até um ponto da linha ao longo de `fechamento` (o padrão é a
 largura do perfil); `[inicio, fim]` escolhe cada ponta, e a volta não tem ponta.
 Sem `superficie`, a linha é uma polilinha de pontos nomeados de `PARAMS` ou
-`[x,y,z]`, com `normal` declarada.
+`[x,y,z]`, com `normal` declarada. O perfil de um detalhe de borda que um pacote
+cego mostra em corte se lê em milímetro, nesta convenção, com `ler-perfil`
+(`docs/mecanifica/modelar-carroceria.md`), em vez de se desenhar à mão.
 
 O friso é um sólido próprio que entra na chapa, e não uma fusão: a booleana sobre
 a superfície subdividida ficou de fora do plano que criou a operação, e o friso

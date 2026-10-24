@@ -23,11 +23,14 @@ const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
 /** O ponto da chapa em w = wa (mm) no plano de corte {eixo, valor}, em mm, como `u,w` de --alvo. */
 const noCorte = (eixo, valor, wa) => contornoDoCorte({ eixo, valor }, [[wa, 0]])[0].map((v) => Math.round(v * 1e4) / 10).join(',');
 
-/** Distâncias nos dois sentidos, em mm, entre o contorno lido e o esperado (aberto, de base a base). */
-function entre(lido, esperado) {
+/** Distâncias nos dois sentidos, em mm, entre o contorno lido e o esperado (aberto, de base a base). Com LER_PERFIL_MEDIDAS=1 as
+    medidas saem no console, com o rótulo, para o texto da documentação. */
+function entre(lido, esperado, rotulo = '') {
   const a = distancias(pontosDe([{ fechada: false, pontos: lido }], 0.25), [{ fechada: false, pontos: esperado }]);
   const b = distancias(pontosDe([{ fechada: false, pontos: esperado }], 0.25), [{ fechada: false, pontos: lido }]);
-  return { lidoParaEsperado: Math.max(...a), esperadoParaLido: Math.max(...b), maxima: Math.max(...a, ...b) };
+  const d = { lidoParaEsperado: Math.max(...a), esperadoParaLido: Math.max(...b), maxima: Math.max(...a, ...b) };
+  if (process.env.LER_PERFIL_MEDIDAS) console.log(`medida ${rotulo} ${JSON.stringify(d)}`);
+  return d;
 }
 
 /** Os segmentos do plano de corte (eixo, valor) com a malha {V, F}, em mm, como pares [[a, y], [a, y]] (a é x no corte z e z no corte x). */
@@ -102,7 +105,7 @@ describe.skipIf(!temPillow)('perfil lido do corte, em chapa desenhada por códig
     for (const nome of ['z400', 'z600', 'x300']) {
       const c = corte(lidos.cordao, nome);
       expect(c.detalhe, nome).toBe(true);
-      const d = entre(c.perfil_aberto_mm, esperado);
+      const d = entre(c.perfil_aberto_mm, esperado, `cordão ${nome} erro ${JSON.stringify(c.erro_mm)} largura ${c.largura_mm} altura ${c.altura_mm}`);
       // a leitura cobre o desvio medido: o erro declarado (leitura, base e direção da linha) é o limite
       expect(d.maxima, `${nome}: ${JSON.stringify(d)} erro ${JSON.stringify(c.erro_mm)}`).toBeLessThanOrEqual(c.erro_mm.total);
       if (nome !== 'x300') expect(d.maxima, `${nome}: ${JSON.stringify(d)}`).toBeLessThan(1);
@@ -120,7 +123,7 @@ describe.skipIf(!temPillow)('perfil lido do corte, em chapa desenhada por códig
     const esperado = perfilEsperado(CALHA, WA_CALHA);
     for (const nome of ['z400', 'z600']) {
       const c = corte(lidos.calha, nome);
-      const d = entre(c.perfil_aberto_mm, esperado);
+      const d = entre(c.perfil_aberto_mm, esperado, `calha ${nome} erro ${JSON.stringify(c.erro_mm)} largura ${c.largura_mm} altura ${c.altura_mm}`);
       expect(d.maxima, `${nome}: ${JSON.stringify(d)} erro ${JSON.stringify(c.erro_mm)}`).toBeLessThan(1);
       const larguraEsperada = Math.max(...esperado.map((r) => r[0])) - Math.min(...esperado.map((r) => r[0]));
       expect(Math.abs(c.largura_mm - larguraEsperada), nome).toBeLessThan(1.5);
@@ -181,33 +184,40 @@ describe.skipIf(!temPillow)('perfil lido do corte, em chapa desenhada por códig
     expect(entre(c.perfil_aberto_mm, esperado.map(([u, v]) => [u - u0, v])).maxima).toBeLessThan(1);
   });
 
-  it('o friso refeito com o perfil lido, sobre a chapa sem o detalhe, volta à forma desenhada a menos de 1 mm', () => {
+  /** O friso de `perfil` (metro) na polilinha ao longo de t pelo âncora wa, com a normal da chapa, cortado pelo plano dado e unido à chapa sem o
+      detalhe (o mais alto dos dois em cada abscissa), contra o contorno desenhado do detalhe nesse plano: as distâncias nos dois sentidos. */
+  function refazerOFriso(nome, detalhe, wa, perfil, plano) {
+    const q = quadroEsperado(wa);
+    const A = q.p.map((v, i) => v - 0.8 * q.t[i]);
+    const B = q.p.map((v, i) => v + 0.8 * q.t[i]);
+    const n = nucleo([['friso', { origemId: 1, linha: { nome: 'detalhe', pontos: [A, q.p, B] }, normal: q.n, perfil, ponta: 'aberta' }]]);
+    expect(n.orfaos, nome).toEqual([]);
+    const segs = cortarMalha(n.V, n.F, plano.eixo, plano.valor);
+    expect(segs.length, nome).toBeGreaterThan(10);
+    const a = segs.flat().map((s) => s[0]);
+    const [lo, hi] = [Math.min(...a) - 8, Math.max(...a) + 8];
+    const yBase = (abs) => base(plano.eixo === 'z' ? (abs / 1000) * Math.cos(FI) - plano.valor * Math.sin(FI) : plano.valor * Math.cos(FI) - (abs / 1000) * Math.sin(FI)) * 1000;
+    const uniao = [];
+    for (let abs = lo; abs <= hi; abs += 0.25) uniao.push([abs, Math.max(yBase(abs), topoDaSecao(segs, abs))]);
+    const desenhado = contornoDoCorte(plano, secaoDoDetalhe(detalhe)).map(([u, v]) => [u * 1000, v * 1000]).filter(([u]) => u >= lo && u <= hi).sort((r, s) => r[0] - s[0]);
+    return entre(uniao, desenhado, `friso ${nome} ${plano.eixo}=${plano.valor}`);
+  }
+
+  it('o friso refeito com o perfil lido, sobre a chapa sem o detalhe, volta à forma desenhada a menos de 1 mm, nos planos z e x', () => {
     for (const [nome, lido, detalhe, wa] of [['cordão', lidos.cordao, CORDAO, WA_CORDAO], ['calha', lidos.calha, CALHA, WA_CALHA]]) {
-      const secao = secaoDoDetalhe(detalhe);
-      const q = quadroEsperado(wa);
       const c = corte(lido, 'z400');
       expect(c.perfil_valido, nome).toBe(true);
-      // o friso na polilinha ao longo de t pelo ponto da âncora, com a normal da chapa e o perfil lido em metro
-      const A = q.p.map((v, i) => v - 0.8 * q.t[i]);
-      const B = q.p.map((v, i) => v + 0.8 * q.t[i]);
-      const n = nucleo([['friso', { origemId: 1, linha: { nome: 'detalhe', pontos: [A, q.p, B] }, normal: q.n, perfil: c.perfil, ponta: 'aberta' }]]);
-      expect(n.orfaos, nome).toEqual([]);
-      for (const corteDoFriso of [{ eixo: 'z', valor: 0.4 }, { eixo: 'z', valor: 0.55 }, { eixo: 'x', valor: 0.3 }]) {
-        const segs = cortarMalha(n.V, n.F, corteDoFriso.eixo, corteDoFriso.valor);
-        expect(segs.length, nome).toBeGreaterThan(10);
-        const a = segs.flat().map((s) => s[0]);
-        const [lo, hi] = [Math.min(...a) - 8, Math.max(...a) + 8];
-        // a chapa sem o detalhe: a base na abscissa a do plano; a união é o mais alto dos dois
-        const yBase = (abs) => base(corteDoFriso.eixo === 'z' ? (abs / 1000) * Math.cos(FI) - corteDoFriso.valor * Math.sin(FI) : corteDoFriso.valor * Math.cos(FI) - (abs / 1000) * Math.sin(FI)) * 1000;
-        const uniao = [];
-        for (let abs = lo; abs <= hi; abs += 0.25) uniao.push([abs, Math.max(yBase(abs), topoDaSecao(segs, abs))]);
-        const desenhado = contornoDoCorte({ eixo: corteDoFriso.eixo, valor: corteDoFriso.valor }, secao).map(([u, v]) => [u * 1000, v * 1000]).filter(([u]) => u >= lo && u <= hi);
-        const ordenado = desenhado.sort((r, s) => r[0] - s[0]);
-        const d = entre(uniao, ordenado);
-        // o plano de 55 graus da normal da linha estica por 1 / 0,6 o erro em u do perfil, e o limite sobe com ele
-        expect(d.maxima, `${nome} no plano ${corteDoFriso.eixo}=${corteDoFriso.valor}: ${JSON.stringify(d)}`).toBeLessThan(corteDoFriso.eixo === 'z' ? 1 : 1.7);
+      for (const plano of [{ eixo: 'z', valor: 0.4 }, { eixo: 'z', valor: 0.55 }, { eixo: 'x', valor: 0.3 }]) {
+        const d = refazerOFriso(nome, detalhe, wa, c.perfil, plano);
+        expect(d.maxima, `${nome} no plano ${plano.eixo}=${plano.valor}: ${JSON.stringify(d)}`).toBeLessThan(1);
       }
     }
+  });
+
+  it('o teste do friso não é vazio: o perfil espelhado em u, que é o da linha percorrida ao contrário, fica a mais de 3 mm da forma desenhada', () => {
+    const c = corte(lidos.cordao, 'z400');
+    const d = refazerOFriso('cordão espelhado', CORDAO, WA_CORDAO, c.perfil_se_a_linha_for_percorrida_ao_contrario, { eixo: 'z', valor: 0.4 });
+    expect(d.maxima, JSON.stringify(d)).toBeGreaterThan(3);
   });
 
   it('o lábio enrolado de uma calha, que a leitura quebra no cruzamento, sai como círculo ajustado, e o resto como polígono simples que o friso aceita', () => {
@@ -252,6 +262,7 @@ describe.skipIf(!temPillow)('perfil lido do corte, em chapa desenhada por códig
     expect(u.perfil_medio.length).toBeGreaterThan(6);
     const afunilado = ler('afunilado', ['--alvo', `z400:${noCorte('z', 0.4, WA_CORDAO)};z600:${noCorte('z', 0.6, WA_CORDAO)}`, '--corte', 'z400,z600', '--tangente', T, '--ancora', 'inicio']);
     const v = afunilado.conjunto;
+    if (process.env.LER_PERFIL_MEDIDAS) console.log(`medida afunilado ${JSON.stringify({ largura: v.largura_mm, altura: v.altura_mm, distancia: v.distancia_maxima_entre_perfis_mm, erro: v.erro_de_leitura_mm })}`);
     // o cordão de 25 mm contra o de 20 mm: a largura varia 5 mm no desenho, no perfil lido a menos do erro de leitura
     expect(v.largura_mm.variacao).toBeGreaterThan(3);
     expect(v.largura_mm.variacao).toBeLessThan(7);

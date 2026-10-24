@@ -20,7 +20,7 @@
 # O perfil sai aberto (o contorno do detalhe, de base a base) e fechado (o polígono simples que o friso aceita, com o fundo
 # `fundo_mm` abaixo da menor altura da base). O friso só acrescenta à chapa: o que desce abaixo da base sai medido em
 # `abaixo_da_chapa_mm` e avisado.
-import json, math, os, sys
+import math, os, sys
 import numpy as np
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -91,6 +91,12 @@ def _saida(Q, fim, k=4):
     return d / n if n > 1e-9 else np.zeros(2)
 
 
+def _sem_recuo(R, ponta, te, limite=8):
+    """R (que começa perto de `ponta`) sem os primeiros pontos que ficam atrás dela no sentido te, até `limite` pontos."""
+    ok = np.nonzero((R[:limite] - ponta) @ te > 0)[0]
+    return R[int(ok[0]):] if len(ok) else R
+
+
 def estender_cadeia(Q, outros, tol, cos_minimo=0.5):
     """O contorno Q com as peças de `outros` que o continuam: a leitura quebra o traço onde ele cruza a si mesmo (a calha enrolada) e
     onde se encontram três ramos, e a peça que começa a até `tol` mm da ponta de Q e segue na mesma direção (cosseno da
@@ -120,10 +126,15 @@ def estender_cadeia(Q, outros, tol, cos_minimo=0.5):
             break
         _, ei, k, er = melhor
         R = outros[k]
+        te = _saida(Q, ei)
+        # a peça começa no encontro, a até tol da ponta de Q, e pode recuar antes de seguir: os pontos que ficam atrás da ponta
+        # de Q, no sentido de saída dela, saem, para o encontro não fazer um gancho
         if ei == 1:
-            Q = np.vstack([Q, R if er == 0 else R[::-1]])
+            Rn = R if er == 0 else R[::-1]
+            Q = np.vstack([Q, _sem_recuo(Rn, Q[-1], te)])
         else:
-            Q = np.vstack([R if er == 1 else R[::-1], Q])
+            Rn = R if er == 1 else R[::-1]
+            Q = np.vstack([_sem_recuo(Rn[::-1], Q[0], te)[::-1], Q])
         usadas.add(k)
     return Q, usadas
 
@@ -235,16 +246,17 @@ def ajustar_base(Q, s, sa, sb, flanco, folga, grau, erro):
         k = min(k, max(pares - 1, 0))
         coef = np.polyfit(x, y, k)
         return k, coef, float(np.sum((y - np.polyval(coef, x)) ** 2))
-    if not (ok_e and ok_d):
-        k, coef, rss = ajuste(1)
-    elif grau != 'auto':
-        k, coef, rss = ajuste(int(grau))
+    de_um_lado = not (ok_e and ok_d)
+    if grau != 'auto':
+        k, coef, rss = ajuste(int(grau) if not de_um_lado else min(int(grau), 2))
     else:
         # o menor grau que o seguinte não melhora de forma significativa (teste F, com limiar alto porque os pontos vizinhos se
         # parecem); a base atravessa o trecho entre as faixas, e uma reta numa chapa abaulada erra a flecha no meio dele
         k, coef, rss = ajuste(1)
+        # numa faixa só, a base se estende pelo trecho e um grau a mais erra muito: no máximo o 2, e só com 40 mm de chapa
+        maximo = 3 if not de_um_lado else (2 if comp(m) >= 40.0 else 1)
         for limiar, kk in ((10.0, 2), (25.0, 3)):
-            if k != kk - 1 or n <= kk + 2:
+            if k != kk - 1 or n <= kk + 2 or kk > maximo:
                 break
             k2, coef2, rss2 = ajuste(kk)
             if rss2 > 0 and (rss - rss2) / (rss2 / max(n - kk - 1, 1)) > limiar:
@@ -253,7 +265,7 @@ def ajustar_base(Q, s, sa, sb, flanco, folga, grau, erro):
     A = np.vander(x, k + 1)
     cov = np.linalg.pinv(A.T @ A)
     sigma = max(rms * math.sqrt(n / max(n - k - 1, 1)), erro / 3.0)
-    return Base(origem, ex, coef, cov, sigma, rms, k, n, [round(comp(esq), 1), round(comp(dire), 1)], not (ok_e and ok_d))
+    return Base(origem, ex, coef, cov, sigma, rms, k, n, [round(comp(esq), 1), round(comp(dire), 1)], de_um_lado)
 
 
 def _pe(x, dev, s, i, sentido, alcance_mm=6.0, janela_mm=3.0):
