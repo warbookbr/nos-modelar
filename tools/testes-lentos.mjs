@@ -120,10 +120,17 @@ export function pesadosSozinhos(lentos, medir, teto = TETO_SOZINHO_MS) {
   return lentos.map((d) => ({ ...d, sozinhoMs: medir(d.arquivo) })).filter((d) => d.sozinhoMs > teto);
 }
 
+/* Mede o arquivo pelo próprio relatório do vitest (do começo ao fim dos testes dele), e não pelo relógio de parede, que soma
+ * a partida do vitest e a importação (3 a 7 s com a máquina ocupada) e fez o primeiro uso reprovar um arquivo de 4,8 s. */
 function medirSozinho(raiz) {
   return (arquivo) => {
+    const saida = join(raiz, 'tmp', 'gates', 'sozinho.json');
     const inicio = Date.now();
-    spawnSync('npx', ['vitest', 'run', arquivo], { cwd: raiz, stdio: 'ignore', shell: true });
+    spawnSync('npx', ['vitest', 'run', arquivo, '--reporter=json', `--outputFile=${saida}`], { cwd: raiz, stdio: 'ignore', shell: true });
+    try {
+      const r = JSON.parse(readFileSync(saida, 'utf8')).testResults?.[0];
+      if (r && Number.isFinite(r.endTime - r.startTime)) return r.endTime - r.startTime;
+    } catch { /* sem relatório: cai no relógio de parede */ }
     return Date.now() - inicio;
   };
 }
