@@ -850,6 +850,36 @@ termina ali: o trecho sai como `borda` (em `bordas`, com `emBorda` quando só
 parte dele é borda) e nenhum vinco se sugere nela. A função `vincosDasLinhas`,
 do mesmo arquivo, faz o mesmo num teste.
 
+### Rede de curvas e retalhos: `gaiolaPorRede`
+
+A gaiola por estações é uma grade de fatias, e as feições de uma carroceria (contorno da janela, arco da roda, cintura, linha do teto, bordas dos vãos) a contornam e cruzam. `gaiolaPorRede`, de `procedural/nucleo/gaiola-por-rede.js`, faz as arestas da gaiola seguirem as feições: a receita declara curvas nomeadas e quais curvas fecham cada retalho, e o ajudante devolve `pontos`, `passo` (vertices, faces, vincos, cantos e medidas, tudo em nomes), `linha(curva, de, ate)` para o `friso`, `extraordinarios`, `densidades`, `continuidade` e `avisos`. As curvas entram em mm, como a `TABELA`, e `pontos` sai em metro, como `TOPO`. Cada curva é uma Catmull-Rom centrípeta por pontos-chave (a mesma de `curvas` da gaiola por estações), ou a polilinha por eles com `poligonal: true`, medida pelo comprimento de arco. Um nó é um ponto nomeado onde curvas se encontram: o nó dado por coordenada é ponto-chave de toda curva que o cita pelo nome, e o dado por `{ curva, fracao }` fica sobre essa curva, que é como uma curva termina em outra. O nó parte a curva em arcos, e as pontas de uma curva aberta são nós.
+
+```js
+const rede = gaiolaPorRede({
+  passo: 40, fora: [0, 1, 0],
+  nos: { D: [0, 0, 580], tP1: [780, -9, 594] /* … */ },
+  curvas: [
+    { nome: 'teto', pontos: ['D', [150, 38, 596], [300, 49, 598], 'tP1'] },
+    { nome: 'cintura', pontos: ['FB', [70, 3, 250], 'cL' /* … */], vinco: 'viva' },
+    { nome: 'janela', fechada: true, pontos: ['U1', [74, 21, 477] /* … */, 'L1'] },
+  ],
+  retalhos: [
+    { nome: 'topo', borda: [{ curva: 'teto', de: 'D', ate: 'tP1' }, 'ligU2', { curva: 'janela', de: 'U2', ate: 'U1' }, 'ligU1'] },
+  ],
+});
+// get TOPO() { return { origem, ...rede.pontos }; }
+// ['subdivisao', { origemId: 1, ...rede.passo, niveis: 2 }]
+// ['friso', { origemId: 2, superficie: { op: 'subdivisao', id: 1 }, linha: { nome: 'molduraDaJanela', pontos: rede.linha('janela') }, perfil: { retangulo: { largura: 0.01, profundidade: 0.0035, centro: [0, 0.00125] } } }]
+```
+
+O retalho é a lista das curvas que o fecham, uma curva inteira ou `{ curva, de, ate }` com nós ou frações do comprimento. O ajudante acha o sentido de cada lado (cada um começa onde o anterior termina) e o das faces (consistente entre retalhos, viradas para `fora`), e a decisão do autor por retalho é só essa lista. Um lado pode passar por nós onde outras curvas terminam, e a curva que o vizinho vê em dois arcos vira lado de vários arcos. Quatro lados dão quadriláteros; três e cinco (até oito) dão um centro com um quadrilátero por lado, e o centro é vértice extraordinário declarado, de valência igual ao número de lados. A densidade sai do `passo` da rede (ou de `passo` da curva) e de `anguloMax` (15 graus por padrão, o desvio de direção entre duas arestas seguidas): o espaçamento desejado em cada ponto da curva é o menor dos dois, limitado em declive para crescer no máximo 0,4 mm por mm de curva, e os pontos de cada arco ficam a quantias iguais do inverso desse espaçamento, de modo que uma ponta de raio 20 mm recebe pontos a uns 4 mm, a reta ao lado a uns 30 mm e a transição é gradual, sem nó nem curva a mais. O número de divisões de cada arco sai de um sistema inteiro (lados opostos de um retalho de quatro lados somam o mesmo, os de um retalho de n lados somam o mesmo número par, e o arco compartilhado tem as mesmas divisões nos dois retalhos), resolvido por eliminação e por busca local do custo mínimo, e `densidades` traz o que saiu. Um retalho pode fixar `divisoes: [nU, nV]` (um número par nos de n lados), e o sistema grita com os nomes se as divisões dos vizinhos não fecham.
+
+O interior de um retalho de quatro lados é a interpolação transfinita de Coons das quatro curvas, exata para uma forma aditiva; o de n lados é um centro, calculado pela média dos cantos e dos meios dos lados mais a flecha dos meios sobre 1/sen²(π/n), e n retalhos de Coons ligados por raios parabólicos. Dois preenchimentos de Coons vizinhos só se encontram em posição, e a subdivisão deixa a dobra da tangente como um calombo de décimos de milímetro. Com `liso` (padrão) o miolo dos retalhos de quatro lados é alisado pela normal antes da subdivisão, minimizando a variação do laplaciano da gaiola (`procedural/nucleo/gaiola-por-rede-liso.js`), com a borda livre, o vinco e os vértices extraordinários fora: a dobra declarada continua dobra, e o salto de tangente nas outras curvas compartilhadas cai. `liso: false` deixa o preenchimento como saiu. `continuidade` traz, por curva compartilhada, o salto de normal entre as faces da gaiola dos dois lados.
+
+A curva pode ser `vinco` (nitidez de 0 a 1 ou `'viva'`, que vira vinco nomeado ao longo de todas as arestas dela) e pode levar `peso` ou `exata: true`. As curvas e os pontos de dentro entram em `medidas` (curva exata por padrão, interior com o peso 1 de `interior`), e `leitura: true` faz a cota da curva sem peso ganhar o peso da leitura, com aviso dos pontos-chave mais perto do que o erro sustenta, como na gaiola por estações. O canto vivo da borda (desvio de direção acima de `anguloDeCanto`, 35 graus) sai sozinho em `passo.cantos`. A moldura é um `friso` com `linha: { nome, pontos: rede.linha('janela') }`, e a linha da curva fechada repete o primeiro ponto no fim. Três coisas gritam ou avisam com o nome: o canto quase reto ou agudo que dobra o preenchimento de Coons (`cantoQuaseReto`, `cantoAgudo`, ou grito se uma face dobra), o arco que vira mais de 22,5 graus numa divisão só (`curvaturaConcentrada`, que pede um nó onde a curvatura muda, como a emenda de um arco com uma reta) e o espaçamento que salta de um arco ao vizinho mais de três vezes (`gradacaoBrusca`).
+
+Na chapa de prova de 1000 × 600 mm (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`), com a janela em gota de 230 mm na parte larga e ponta de raio 20 mm, o arco de roda de raio 140 mm e a coluna inclinada, 19 curvas e 10 retalhos (8 de quatro lados e 2 de cinco) dão 654 pontos de gaiola e, em nível 2, 9.480 vértices só de quadriláteros. A superfície passa pelas curvas a até 0,26 mm, os vértices extraordinários são 3 de valência 5 no interior (2 centros e um nó) e 2 nós de borda, a borda da janela é um laço de arestas da malha, o salto de normal da superfície nas curvas lisas compartilhadas fica em até 0,96 grau e na cintura vincada em 12, e `npm run ondulacao` sai sem falha e sem face virada, com o desvio máximo de 0,17 mm; sem o alisamento sai um calombo de 0,43 mm. A moldura de 10 mm como `friso` sobre a curva da janela fecha sólida e interpenetra a chapa de 1,5 mm de espessura. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/mecanifica/ondulacao-rede.test.mjs`.
+
 ## Friso ao longo de curva: `friso`
 
 `friso` desenha nervura, tubo ou friso de perfil declarado seguindo uma linha

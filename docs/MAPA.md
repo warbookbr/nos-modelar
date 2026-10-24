@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1617 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1624 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1097,6 +1097,11 @@
 - `gaiola-origem.test.mjs` — gaiola-origem.test.mjs — a gaiola por estações publica de onde vem cada ponto.
 - `gaiola-por-estacoes.js` — gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
 - `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
+- `gaiola-por-rede-contato.test.mjs` — gaiola-por-rede-contato.test.mjs — o contato declarado da moldura de 10 mm com a chapa por rede de curvas
+- `gaiola-por-rede-liso.js` — gaiola-por-rede-liso.js — o miolo dos retalhos alisado pela normal, para a tangente não quebrar nas curvas compartilhadas
+- `gaiola-por-rede-prova.test.mjs` — gaiola-por-rede-prova.test.mjs — o gate da fatia 2 do plano da carroceria por rede de curvas: a chapa lateral de 1000 × 600 mm
+- `gaiola-por-rede.js` — gaiola-por-rede.js — monta a gaiola da operação `subdivisao` a partir de uma rede de curvas nomeadas e dos retalhos que elas fecham
+- `gaiola-por-rede.test.mjs` — gaiola-por-rede.test.mjs — o ajudante que monta a gaiola da subdivisão por uma rede de curvas nomeadas e os retalhos que elas fecham
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
@@ -1143,6 +1148,7 @@
 - `gaiola-gota-prova.js` — gaiola-gota-prova.js — a chapa curva com um vão em forma de gota, de ponta estreita, desenhada por código na escala de uma carroceria
 - `gaiola-interpolada-prova.js` — gaiola-interpolada-prova.js — a forma de prova da gaiola interpolada, desenhada só por código
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
+- `gaiola-por-rede-prova.js` — gaiola-por-rede-prova.js — a chapa lateral desenhada por código para a prova da gaiola por rede de curvas
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 
 ## procedural/nucleo/operacoes/
@@ -2398,6 +2404,7 @@
 - `ondulacao-da-superficie.test.mjs` — ondulacao-da-superficie.test.mjs — a ferramenta de ondulação endereçada sobre a chapa desenhada por código.
 - `ondulacao-gota.test.mjs` — ondulacao-gota.test.mjs — a leitura de ondulação das chapas com anel no vão real: a gota estreita e o vão aberto pelas colunas que terminam e começam
 - `ondulacao-leitura.test.mjs` — ondulacao-leitura.test.mjs — o dado lido com peso, o aviso de estações próximas e a face virada na ferramenta de ondulação
+- `ondulacao-rede.test.mjs` — ondulacao-rede.test.mjs — a leitura de ondulação da chapa lateral montada por rede de curvas
 - `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente e…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
