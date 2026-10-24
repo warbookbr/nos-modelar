@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { acimaDoTeto, argumentosDoVitest, TESTES_LENTOS, TETO_DO_RAPIDO_MS } from './testes-lentos.mjs';
+import { acimaDoTeto, argumentosDoVitest, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -29,5 +29,11 @@ describe('a lista dos testes lentos', () => {
       { arquivo: TESTES_LENTOS[0], ms: TETO_DO_RAPIDO_MS * 10 },
     ];
     expect(acimaDoTeto(duracoes).map((d) => d.arquivo)).toEqual(['tools/x.test.mjs']);
+  });
+
+  it('o arquivo acima do teto só reprova se continuar pesado rodando sozinho', () => {
+    const lentos = [{ arquivo: 'a.test.mjs', ms: 35_000 }, { arquivo: 'b.test.mjs', ms: 40_000 }];
+    const sozinho = { 'a.test.mjs': 5_000, 'b.test.mjs': TETO_SOZINHO_MS + 1 };
+    expect(pesadosSozinhos(lentos, (f) => sozinho[f]).map((d) => [d.arquivo, d.sozinhoMs])).toEqual([['b.test.mjs', TETO_SOZINHO_MS + 1]]);
   });
 });

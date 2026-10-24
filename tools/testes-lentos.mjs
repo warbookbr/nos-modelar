@@ -110,6 +110,24 @@ export function acimaDoTeto(duracoes, teto = TETO_DO_RAPIDO_MS) {
   return duracoes.filter(({ arquivo, ms }) => ms > teto && !TESTES_LENTOS.includes(arquivo));
 }
 
+/* O arquivo que passou do teto dentro da bateria roda de novo sozinho, e só reprova se ainda passar de TETO_SOZINHO_MS. Entre
+ * 2026-10-22 e 2026-10-24 o teto reprovou quase toda bateria completa com arquivos de 4 a 12 s sozinhos que passaram de 30 s
+ * só porque os testes que abrem o Blender e os agentes de modelagem disputavam os 4 processadores; a conferência sozinha separa
+ * a carga da máquina do arquivo pesado, que é o que o teto quer pegar (um teste de 8 s sozinho já passa dele na bateria). */
+export const TETO_SOZINHO_MS = 12_000;
+
+export function pesadosSozinhos(lentos, medir, teto = TETO_SOZINHO_MS) {
+  return lentos.map((d) => ({ ...d, sozinhoMs: medir(d.arquivo) })).filter((d) => d.sozinhoMs > teto);
+}
+
+function medirSozinho(raiz) {
+  return (arquivo) => {
+    const inicio = Date.now();
+    spawnSync('npx', ['vitest', 'run', arquivo], { cwd: raiz, stdio: 'ignore', shell: true });
+    return Date.now() - inicio;
+  };
+}
+
 function ramoRemoto() {
   const r = spawnSync('git', ['rev-parse', '--abbrev-ref', '@{u}'], { encoding: 'utf8' });
   return r.status === 0 ? r.stdout.trim() : null;
@@ -136,8 +154,14 @@ function rodar(modo) {
   if (Date.parse(gravado) < inicio) return;
   const lentos = acimaDoTeto(duracoes);
   if (!lentos.length) return;
-  console.error(`test:rapidos — ${lentos.length} arquivo(s) passaram do teto de ${TETO_DO_RAPIDO_MS / 1000} s da bateria rápida:`);
-  for (const { arquivo, ms } of lentos) console.error(`  ${Math.round(ms / 100) / 10} s  ${arquivo}`);
+  const pesados = pesadosSozinhos(lentos, medirSozinho(raiz));
+  const s1 = (ms) => `${Math.round(ms / 100) / 10} s`;
+  for (const d of lentos.filter((l) => !pesados.some((p) => p.arquivo === l.arquivo))) {
+    console.log(`test:rapidos — ${d.arquivo} levou ${s1(d.ms)} na bateria, mas roda sozinho abaixo de ${TETO_SOZINHO_MS / 1000} s: carga da máquina, não reprova.`);
+  }
+  if (!pesados.length) return;
+  console.error(`test:rapidos — ${pesados.length} arquivo(s) passaram do teto de ${TETO_DO_RAPIDO_MS / 1000} s da bateria rápida e de ${TETO_SOZINHO_MS / 1000} s sozinhos:`);
+  for (const { arquivo, ms, sozinhoMs } of pesados) console.error(`  ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`);
   console.error('Ponha cada um em TESTES_LENTOS, em tools/testes-lentos.mjs, ou deixe-o mais leve.');
   process.exitCode = 1;
 }
