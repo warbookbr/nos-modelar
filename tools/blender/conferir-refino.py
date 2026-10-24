@@ -8,19 +8,32 @@
 #       --anterior <cand.obj|.glb|.gltf|.blend|receita.js> [--objeto-anterior <nome>] \
 #       --nova <cand.obj|.glb|.gltf|.blend|receita.js> [--objeto-nova <nome>] [--z-cima | --z-cima-anterior | --z-cima-nova] \
 #       --zonas <zonas.json> --saida <pasta> [--caixa xmin,xmax,ymin,ymax,zmin,zmax] [--tolerancia-mm 3] \
-#       [--criterio maximo|p95] [--config <cfg.json>] [--simetria-x] [--oclusores <malha>] [--densidade 40000] \
-#       [--mapa-sinal-mm 6] [--resolucao-vista 1440x1080] [--sem-imagens] [--nome <rótulo>]
+#       [--criterio maximo|p95] [--partes nome,nome | --todas-as-partes] [--config <cfg.json>] [--simetria-x] \
+#       [--oclusores <malha>] [--densidade 40000] [--mapa-sinal-mm 6] [--resolucao-vista 1440x1080] [--sem-imagens] [--nome <rótulo>]
 #
 # As zonas (JSON, em milímetro, no quadro do pacote: y para cima e a frente em +z) são caixas por faixa de x, y e z, as que o
 # orquestrador tira das posições que o crítico leu na grade:
 #   { "tolerancia_mm": 3, "criterio": "maximo",
-#     "zonas": [ { "nome": "janela-lateral", "x": [300, 700], "y": [250, 450], "z": [-20, 20] },
+#     "zonas": [ { "nome": "janela-lateral", "x": [300, 700], "y": [250, 450], "z": [-20, 20],
+#                  "pedido": [ { "descricao": "arredondar a ponta esquerda da janela", "x": [295, 335], "y": [245, 285] } ] },
 #                { "nome": "teto", "caixa": [0, 900, 560, 600, 0, 300], "tolerancia_mm": 2 } ] }
 # O eixo que a zona não declara fica livre. Cada zona tem nome (é a identidade dela; sem índice) e pode trazer a própria
 # tolerância. Uma lista de zonas sozinha, sem o objeto em volta, também vale.
 #
+# O pedido (também aceito como "ignorar") é o que o próprio crítico mandou mudar dentro da zona: uma caixa menor, ou uma lista
+# delas, cada uma com "descricao" (a identidade, o texto do pedido no veredito) e os limites x, y, z ou "caixa" em milímetro; o
+# eixo que o pedido não declara fica com os limites da zona, e o pedido tem de caber na zona sem cobri-la inteira. Os pontos
+# dentro de um pedido não entram na conta da zona, e a saída diz, à parte, quanto a superfície andou nele.
+#
+# Com receita (.js) nas duas rodadas, a comparação é por parte nomeada: por padrão entram só as partes presentes nas duas
+# (a lataria que o crítico julgou), e as partes novas e as que sumiram saem à parte, com a caixa e a zona em que caem, sem
+# serem acusadas. --partes escolhe as partes por nome (todas precisam existir nas duas rodadas) e --todas-as-partes devolve a
+# comparação de tudo. Um corpo de uma parte que a receita separa em vários (parte__2) conta como a parte. Com OBJ, GLB ou
+# .blend, que não trazem partes, a comparação inclui tudo, e a saída diz isso.
+#
 # O que se mede: cada candidata passa pelo que a régua faz com a candidata: as faces que tocam a caixa, só o que se vê de fora
-# (com os oclusores), amostras em retícula sem acaso dentro da caixa (densidade amostras por m²). De cada amostra da anterior
+# (com os oclusores), amostras em retícula sem acaso dentro da caixa (densidade amostras por m²). Na comparação por parte, cada
+# candidata é só as partes comparadas, de modo que o friso que cobre a chapa não esconde a chapa. De cada amostra da anterior
 # mede-se a distância exata à superfície visível da nova (o que a nova deixou de cobrir ou moveu) e de cada amostra da nova a
 # distância à anterior (o que a nova pôs a mais), com mediana, p95 e máximo em mm, no total, em cada zona e fora de todas as
 # zonas. O sinal é o do deslocamento da nova em relação à anterior: positivo onde a nova sobra ou avança, negativo onde ela
@@ -29,13 +42,15 @@
 # regra do que a nova tem a mais ou a menos. A zona fica `mexida` quando o critério (o máximo, ou o p95 com --criterio p95)
 # passa da tolerância, e a saída diz onde (o ponto do máximo, o vetor que leva a nova à anterior, a caixa dos pontos acima da
 # tolerância). O que se mede é a distância entre superfícies: uma faixa lisa que anda ao longo de si mesma não aparece, e as
-# bordas e os contornos, que acabam, aparecem.
+# bordas e os contornos, que acabam, aparecem. Uma parte lataria que mudou de nome entre as rodadas aparece como nova e como
+# sumida, fora da comparação; a nota diz isso e --todas-as-partes a traz de volta.
 #
-# Grava em <saida>/: conferencia.json, conferencia.md (o texto que se devolve ao modelador) e, sem --sem-imagens, uma imagem
-# por vista, conferencia-<vista>.png, com a anterior e a nova pintadas pelo deslocamento com sinal e as zonas desenhadas
-# (verde: conferida; magenta: mexida). Escreve no fim a linha CONFERENCIA com o JSON; sai com 0 mesmo havendo zona mexida, e
-# com 2 quando a entrada não serve.
-import json, os, shutil, subprocess, sys, tempfile, time
+# Grava em <saida>/: conferencia.json, conferencia.md (o texto que se devolve ao modelador), conferencia-notas.md (as partes
+# novas e sumidas, o modo da comparação e os pedidos, para quem conduz o laço) e, sem --sem-imagens, uma imagem por vista,
+# conferencia-<vista>.png, com a anterior e a nova pintadas pelo deslocamento com sinal e as zonas desenhadas (verde: conferida;
+# magenta: mexida). Escreve no fim a linha CONFERENCIA com o JSON; sai com 0 mesmo havendo zona mexida, e com 2 quando a entrada
+# não serve.
+import json, os, re, shutil, subprocess, sys, tempfile, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 from mathutils import Vector
@@ -72,9 +87,55 @@ TOL_PADRAO = numero(a.get('tolerancia_mm', 3.0), '--tolerancia-mm')
 CRITERIOS = ('maximo', 'p95')
 
 
+def ler_caixa(z, rotulo, base):
+    """Os limites [min, max] em mm dos três eixos de um objeto com "caixa" (seis números) e/ou "x", "y", "z"; o eixo que não
+    declara fica com o de `base`."""
+    caixa = base.copy()
+    if 'caixa' in z:
+        c = z['caixa']
+        if not isinstance(c, list) or len(c) != 6:
+            C.erro(f'{rotulo}: "caixa" são seis números xmin,xmax,ymin,ymax,zmin,zmax em mm')
+        caixa = np.array([float(x) for x in c]).reshape(3, 2)
+    for e, eixo in enumerate('xyz'):
+        if eixo in z:
+            if not isinstance(z[eixo], list) or len(z[eixo]) != 2:
+                C.erro(f'{rotulo}: "{eixo}" é [min, max] em mm')
+            caixa[e] = [float(z[eixo][0]), float(z[eixo][1])]
+    if np.any(caixa[:, 0] >= caixa[:, 1]):
+        C.erro(f'{rotulo}: faixa vazia {caixa.tolist()}')
+    return caixa
+
+
+def ler_pedidos(z, nome, caixa_da_zona):
+    """Os pedidos da zona ("pedido" ou "ignorar", um objeto ou uma lista), cada um com descrição e uma caixa que cabe na zona
+    sem cobri-la inteira."""
+    brutos = []
+    for chave in ('pedido', 'ignorar'):
+        if chave in z:
+            v = z[chave]
+            brutos += v if isinstance(v, list) else [v]
+    out, descricoes = [], set()
+    for p in brutos:
+        if not isinstance(p, dict):
+            C.erro(f'zona "{nome}": cada pedido é um objeto com "descricao" e a caixa')
+        d = p.get('descricao')
+        if not d or not isinstance(d, str):
+            C.erro(f'zona "{nome}": todo pedido precisa de "descricao" (o que o crítico mandou mudar; é a identidade dele)')
+        if d in descricoes:
+            C.erro(f'zona "{nome}": pedido "{d}" repetido')
+        descricoes.add(d)
+        caixa = ler_caixa(p, f'zona "{nome}", pedido "{d}"', caixa_da_zona)
+        if np.any(caixa[:, 0] < caixa_da_zona[:, 0] - 1e-9) or np.any(caixa[:, 1] > caixa_da_zona[:, 1] + 1e-9):
+            C.erro(f'zona "{nome}": o pedido "{d}" sai da zona')
+        if np.allclose(caixa, caixa_da_zona):
+            C.erro(f'zona "{nome}": o pedido "{d}" cobre a zona inteira; o pedido é uma caixa menor, só do que o crítico mandou mudar')
+        out.append({'descricao': d, 'caixa': caixa})
+    return out
+
+
 def ler_zonas(caminho):
     """(zonas, tolerância, critério): cada zona com nome, os limites [min, max] em mm dos três eixos (LIVRE onde não declara),
-    a própria tolerância e o critério."""
+    a própria tolerância, o critério e os pedidos."""
     try:
         d = json.load(open(caminho, encoding='utf8'))
     except (OSError, ValueError) as e:
@@ -94,24 +155,12 @@ def ler_zonas(caminho):
         if nome in nomes:
             C.erro(f'zona "{nome}" repetida')
         nomes.add(nome)
-        caixa = np.array([[-LIVRE, LIVRE]] * 3, float)
-        if 'caixa' in z:
-            c = z['caixa']
-            if not isinstance(c, list) or len(c) != 6:
-                C.erro(f'zona "{nome}": "caixa" são seis números xmin,xmax,ymin,ymax,zmin,zmax em mm')
-            caixa = np.array([float(x) for x in c]).reshape(3, 2)
-        for e, eixo in enumerate('xyz'):
-            if eixo in z:
-                if not isinstance(z[eixo], list) or len(z[eixo]) != 2:
-                    C.erro(f'zona "{nome}": "{eixo}" é [min, max] em mm')
-                caixa[e] = [float(z[eixo][0]), float(z[eixo][1])]
-        if np.any(caixa[:, 0] >= caixa[:, 1]):
-            C.erro(f'zona "{nome}": faixa vazia {caixa.tolist()}')
+        caixa = ler_caixa(z, f'zona "{nome}"', np.array([[-LIVRE, LIVRE]] * 3, float))
         zc = z.get('criterio', crit)
         if zc not in CRITERIOS:
             C.erro(f'zona "{nome}": critério "{zc}"')
         out.append({'nome': nome, 'caixa': caixa, 'tolerancia_mm': numero(z.get('tolerancia_mm', tol), f'zona "{nome}": tolerancia_mm'),
-                    'criterio': zc})
+                    'criterio': zc, 'pedidos': ler_pedidos(z, nome, caixa)})
     return out, tol, crit
 
 
@@ -127,21 +176,92 @@ def receita_para_obj(caminho):
     return obj, destino
 
 
+def rotulos_da_receita(obj):
+    """A parte de cada polígono do OBJ que a receita exportou, na ordem de leitura. O exportador nomeia cada corpo pela parte e
+    põe __2, __3 nos outros corpos conexos dela; o sufixo sai, e o corpo volta a ser a parte."""
+    rot, atual = [], None
+    for linha in open(obj, encoding='utf8', errors='replace'):
+        if linha.startswith('o ') or linha.startswith('g '):
+            atual = re.sub(r'__\d+$', '', linha[2:].strip())
+        elif linha.startswith('f '):
+            rot.append(atual)
+    return np.array(rot, dtype=object)
+
+
 def ler(caminho, objeto, z_cima):
-    destino = None
+    """(V, F, partes): a malha e a parte de cada triângulo, quando a entrada é receita sem --objeto (senão, None)."""
+    destino, poligonos = None, None
     if os.path.splitext(caminho)[1].lower() in ('.js', '.mjs'):
         caminho, destino = receita_para_obj(caminho)
-    V, F, _ = C.ler_malha(caminho, objeto, z_cima)
+        if objeto is None:
+            poligonos = rotulos_da_receita(caminho)
+    V, F, P = C.ler_malha(caminho, objeto, z_cima)
     if destino:
         shutil.rmtree(destino, ignore_errors=True)
     _, A = C.normais(V, F)
-    return V, F[A > 1e-14]
+    ok = A > 1e-14
+    return V, F[ok], (poligonos[P[ok]] if poligonos is not None else None)
 
 
 ZONAS, TOL, CRITERIO = ler_zonas(a['zonas'])
 z_cima = bool(a.get('z_cima'))
-AV, AF = ler(a['anterior'], a.get('objeto_anterior'), z_cima or bool(a.get('z_cima_anterior')))
-NV, NF = ler(a['nova'], a.get('objeto_nova'), z_cima or bool(a.get('z_cima_nova')))
+AV, AF, AR = ler(a['anterior'], a.get('objeto_anterior'), z_cima or bool(a.get('z_cima_anterior')))
+NV, NF, NR = ler(a['nova'], a.get('objeto_nova'), z_cima or bool(a.get('z_cima_nova')))
+
+
+def caixa_da_parte(V, F, rot, nome):
+    """A caixa em mm, por eixo, dos triângulos da parte."""
+    Q = V[np.unique(F[rot == nome])] * 1000.0
+    return np.stack([Q.min(0), Q.max(0)], 1)
+
+
+def zonas_que_a_caixa_toca(caixa):
+    return [z['nome'] for z in ZONAS if np.all((caixa[:, 1] >= z['caixa'][:, 0]) & (caixa[:, 0] <= z['caixa'][:, 1]))]
+
+
+def escolher_partes():
+    """Decide o que se compara. Com receita nas duas rodadas, as partes presentes nas duas (ou as de --partes); senão, tudo.
+    Devolve o relato (modo, motivo, partes comparadas, novas, sumidas e as que ficaram fora a pedido) e reduz as malhas às
+    partes comparadas."""
+    global AV, AF, NV, NF
+    escolhidas = [s.strip() for s in str(a['partes']).split(',') if s.strip()] if a.get('partes') not in (None, True) else None
+    if 'partes' in a and not escolhidas:
+        C.erro('--partes pede os nomes das partes, separados por vírgula')
+    if AR is None or NR is None:
+        if escolhidas:
+            C.erro('--partes só vale com receita (.js) nas duas rodadas, sem --objeto-anterior nem --objeto-nova; o OBJ não traz partes')
+        quem = ('a entrada não traz partes (OBJ, GLB, glTF ou .blend, ou receita com --objeto)' if AR is None and NR is None
+                else 'só uma das rodadas traz partes (receita sem --objeto), e a outra não')
+        return {'comparacao': 'tudo', 'motivo': quem, 'comparadas': [], 'novas': [], 'sumidas': [], 'fora_a_pedido': []}
+    antes, depois = set(AR.tolist()), set(NR.tolist())
+    comuns = antes & depois
+    novas, sumidas = sorted(depois - antes), sorted(antes - depois)
+    if a.get('todas_as_partes'):
+        return {'comparacao': 'tudo', 'motivo': 'a pedido (--todas-as-partes): entram também as partes novas e as que sumiram',
+                'comparadas': sorted(antes | depois), 'novas': [], 'sumidas': [], 'fora_a_pedido': []}
+    if escolhidas:
+        falta = [n for n in escolhidas if n not in comuns]
+        if falta:
+            C.erro('--partes: ' + ', '.join(f'"{n}"' for n in falta) + ' não está nas duas rodadas; as partes comuns são ' +
+                   (', '.join(f'"{n}"' for n in sorted(comuns)) or 'nenhuma'))
+        comparadas = sorted(set(escolhidas))
+    else:
+        comparadas = sorted(comuns)
+    if not comparadas:
+        C.erro('nenhuma parte está nas duas rodadas; use --todas-as-partes ou confira os nomes das partes')
+    relato = {'comparacao': 'por-parte',
+              'motivo': 'as partes escolhidas em --partes' if escolhidas else 'as partes presentes nas duas rodadas',
+              'comparadas': comparadas, 'fora_a_pedido': sorted(comuns - set(comparadas)),
+              'novas': [{'nome': n, 'caixa_mm': caixa_da_parte(NV, NF, NR, n)} for n in novas],
+              'sumidas': [{'nome': n, 'caixa_mm': caixa_da_parte(AV, AF, AR, n)} for n in sumidas]}
+    for item in relato['novas'] + relato['sumidas']:
+        item['zonas'] = zonas_que_a_caixa_toca(item['caixa_mm'])
+    AV, AF = C.compactar(AV, AF[np.isin(AR, comparadas)])
+    NV, NF = C.compactar(NV, NF[np.isin(NR, comparadas)])
+    return relato
+
+
+PARTES = escolher_partes()
 if 'caixa' not in cfg:
     todos = np.vstack([AV, NV])
     cfg['caixa'] = np.stack([todos.min(0) - 1e-3, todos.max(0) + 1e-3], 1)
@@ -275,14 +395,24 @@ met = {'nome': a.get('nome', 'conferencia'), 'anterior': os.path.basename(a['ant
 dentro_de_alguma = {c: np.zeros(len(d['P']), bool) for c, (d, _) in DADOS.items()}
 mexidas = []
 for z in ZONAS:
-    masc = {c: no_zona(d['P'], z['caixa']) for c, (d, _) in DADOS.items()}
-    for c in masc:
-        dentro_de_alguma[c] |= masc[c]
+    na_zona = {c: no_zona(d['P'], z['caixa']) for c, (d, _) in DADOS.items()}
+    for c in na_zona:
+        dentro_de_alguma[c] |= na_zona[c]
+    # o que o crítico mandou mudar na zona sai da conta da zona e é medido à parte
+    pedidos = []
+    masc = {c: m.copy() for c, m in na_zona.items()}
+    for ped in z['pedidos']:
+        no_pedido = {c: na_zona[c] & no_zona(d['P'], ped['caixa']) for c, (d, _) in DADOS.items()}
+        for c in masc:
+            masc[c] &= ~no_pedido[c]
+        pedidos.append({'descricao': ped['descricao'], 'caixa_mm': {e: [r(x, 2) for x in ped['caixa'][i]] for i, e in enumerate('xyz')},
+                        **{c: ({'n': int(no_pedido[c].sum()), 'maximo': r(DADOS[c][0]['D'][no_pedido[c]].max())} if no_pedido[c].any()
+                               else {'n': 0}) for c in no_pedido}})
     res = medir(masc, z['tolerancia_mm'])
     valores = {c: (v.get(z['criterio']) if v.get('n') else None) for c, v in res.items()}
     vistos = {c: x for c, x in valores.items() if x is not None}
     item = {'caixa_mm': {e: [None if abs(x) >= LIVRE else r(x, 2) for x in z['caixa'][i]] for i, e in enumerate('xyz')},
-            'tolerancia_mm': z['tolerancia_mm'], 'criterio': z['criterio'], **res}
+            'tolerancia_mm': z['tolerancia_mm'], 'criterio': z['criterio'], **({'pedidos': pedidos} if pedidos else {}), **res}
     if not vistos:
         item |= {'valor_mm': None, 'mexida': False, 'sem_pontos': True}
     else:
@@ -321,6 +451,44 @@ if met['sem_pontos']:
                   + ', '.join(f'"{n}"' for n in met['sem_pontos']) + '.')
 met['texto'] = linhas
 open(os.path.join(a['saida'], 'conferencia.md'), 'w', encoding='utf8').write('\n\n'.join(linhas) + '\n')
+
+
+def trecho_da_caixa(c):
+    return ', '.join(f'{e} {virgula(c[i][0], 0)} a {virgula(c[i][1], 0)}' for i, e in enumerate('xyz'))
+
+
+def onde_cai(item):
+    return ('cai na zona ' if len(item['zonas']) == 1 else 'cai nas zonas ') + ', '.join(f'"{n}"' for n in item['zonas']) \
+        if item['zonas'] else 'não cai em nenhuma zona'
+
+
+# as notas de quem conduz o laço: o modo da comparação, as partes que ficaram fora dela e os pedidos fora da conta
+notas = []
+if PARTES['comparacao'] == 'tudo':
+    notas.append(f"A comparação inclui tudo: {PARTES['motivo']}.")
+else:
+    notas.append('A comparação é por parte, com ' + PARTES['motivo'] + ': ' + ', '.join(f'"{n}"' for n in PARTES['comparadas']) + '.')
+    if PARTES['fora_a_pedido']:
+        notas.append('Partes presentes nas duas rodadas, deixadas fora da comparação por --partes: '
+                     + ', '.join(f'"{n}"' for n in PARTES['fora_a_pedido']) + '.')
+    for p in PARTES['novas']:
+        notas.append(f"Parte nova na rodada, fora da comparação e sem acusação: \"{p['nome']}\" ({trecho_da_caixa(p['caixa_mm'])} mm); "
+                     f"{onde_cai(p)}.")
+    for p in PARTES['sumidas']:
+        notas.append(f"Parte que sumiu na rodada, fora da comparação e sem acusação: \"{p['nome']}\" ({trecho_da_caixa(p['caixa_mm'])} mm "
+                     f"na anterior); {onde_cai(p)}. Se foi a lataria que mudou de nome, rode de novo com --todas-as-partes.")
+for nome, z in met['zonas'].items():
+    for ped in z.get('pedidos', []):
+        n = max(ped['anterior_para_nova_mm']['n'], ped['nova_para_anterior_mm']['n'])
+        andou = max(ped['anterior_para_nova_mm'].get('maximo', 0.0), ped['nova_para_anterior_mm'].get('maximo', 0.0))
+        notas.append(f"Zona \"{nome}\": o pedido \"{ped['descricao']}\" ({trecho_da_caixa([ped['caixa_mm'][e] for e in 'xyz'])} mm) ficou "
+                     f"fora da conta; nele a superfície andou até {virgula(andou)} mm" + ('' if n else ' (nenhum ponto medido)') + '.')
+met['partes'] = {'comparacao': PARTES['comparacao'], 'motivo': PARTES['motivo'], 'comparadas': PARTES['comparadas'],
+                 'fora_a_pedido': PARTES['fora_a_pedido'],
+                 **{k: [{'nome': p['nome'], 'caixa_mm': {e: [r(x, 1) for x in p['caixa_mm'][i]] for i, e in enumerate('xyz')}, 'zonas': p['zonas']}
+                        for p in PARTES[k]] for k in ('novas', 'sumidas')}}
+met['notas'] = notas
+open(os.path.join(a['saida'], 'conferencia-notas.md'), 'w', encoding='utf8').write('\n\n'.join(notas) + '\n')
 met['segundos_medida'] = round(time.time() - t0, 1)
 
 
@@ -389,4 +557,5 @@ if not a.get('sem_imagens') and cfg['resolucao_vista'] and all(cfg['resolucao_vi
 met['segundos_total'] = round(time.time() - t0, 1)
 json.dump(met, open(os.path.join(a['saida'], 'conferencia.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 print('\n'.join(linhas))
+print('\n'.join(['Notas para quem conduz o laço (não vão ao modelador):'] + notas))
 print('CONFERENCIA', json.dumps(met, ensure_ascii=False))

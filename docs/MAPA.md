@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1611 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1615 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1937,6 +1937,13 @@
 - `placa-de-prova.mjs` — placa-de-prova.mjs — a chapa desenhada por código com que se prova o mapa com sinal, a curvatura comparada e os cortes da régua: uma chapa quadrada de 300 mm…
 - `prisma-de-prova.mjs` — prisma-de-prova.mjs — a forma desenhada por código com que se provam as leituras do pacote cego (ler-corte, ler-linhas e comparar-cortes): um prisma convexo …
 - `regua-sinal-curvatura-cortes.test.mjs` — regua-sinal-curvatura-cortes.test.mjs — o que a fatia 25 do plano da carroceria por subdivisão deu à régua, provado sobre a chapa de tools/blender/placa-de-p…
+
+## tools/blender/receitas-de-prova/
+
+- `chapa-com-abertura.mjs` — chapa-com-abertura.mjs — a receita desenhada por código com que se prova a conferência do refino entre receitas: uma chapa de 1 m (x) por 0,6 m (y) e 6 mm de…
+- `chapa-rodada-1.js` — chapa-rodada-1.js — a primeira rodada da chapa com abertura: só a chapa, com a abertura de x 300 a 700 e y 250 a 450 mm.
+- `chapa-rodada-2.js` — chapa-rodada-2.js — a segunda rodada: a chapa igual, o friso em volta da abertura e um canto da abertura arredondado.
+- `chapa-rodada-3.js` — chapa-rodada-3.js — a rodada em que a abertura da chapa e o friso descem 45 mm (o canto arredondado da segunda fica).
 
 ## tools/catalogo/
 
