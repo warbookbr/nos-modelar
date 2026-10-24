@@ -625,7 +625,7 @@ def tinta_do_corte(rgb, q, nome):
     fora[:, :M] = True
     fora[H - M:, :] = True
     U_, Vn = q['eixos_uv']
-    titulo = IM.titulo_do_corte(nome, q.get('eixo', '?'), q.get('valor', 0.0), U_, Vn, IM.passo_do_corte(q))
+    titulo = IM.titulo_do_corte(nome, q.get('eixo', '?'), q.get('valor', 0.0), U_, Vn, IM.passo_do_corte(q), q.get('ampliacao_px_por_mm'))
     from PIL import ImageDraw
     bb = ImageDraw.Draw(Image.new('RGB', (8, 8))).textbbox((10, 8), titulo, font=IM.fonte(16))
     fora[max(int(bb[1]) - 1, 0):int(math.ceil(bb[3])) + 2, max(int(bb[0]) - 1, 0):int(math.ceil(bb[2])) + 2] = True
@@ -650,8 +650,11 @@ def ler_corte(imagem, q, nome, falha_max=10.0, minimo_px=None):
     # a moldura do desenho, fora das faixas dos rótulos: o que o corte mostra, em mm no plano dele
     moldura = [[round(q['u0'] * 1000, 2), round(q['v0'] * 1000, 2)],
                [round((q['u0'] + (q['W'] - M) / esc) * 1000, 2), round((q['v0'] + (H - M) / esc) * 1000, 2)]]
+    if q.get('ampliacao_px_por_mm'):   # o corte de detalhe mostra o contorno só onde o recorte o deixou: sem o título e a folga
+        u0_, u1_, v0_, v1_ = IM.recorte_do_quadro(q)
+        moldura = [[round(u0_ * 1000, 2), round(v0_ * 1000, 2)], [round(u1_ * 1000, 2), round(v1_ * 1000, 2)]]
     return {'corte': nome, 'eixo': q.get('eixo'), 'valor_mm': round(1000 * float(q.get('valor', 0.0)), 3), 'eixos_uv': q['eixos_uv'],
-            'moldura_mm': moldura,
+            'moldura_mm': moldura, 'ampliado': bool(q.get('ampliacao_px_por_mm')), 'corte_base': q.get('corte_base'), 'regiao': q.get('regiao'),
             'escala_px_por_mm': round(px_mm, 5), 'espessura_traco_px': resumo['espessura_px'],
             'espessura_traco_mm': round(resumo['espessura_px'] / px_mm, 3) if resumo['espessura_px'] else None,
             'erro_px': round(e, 3), 'erro_mm': round(e / px_mm, 3), 'leitura': resumo,
@@ -1368,5 +1371,39 @@ def pastas_do_pacote(pacote):
     """(pasta das vistas, pasta dos cortes) a partir da pasta do pacote, da pasta vistas/ ou da pasta cortes/."""
     p = os.path.abspath(pacote)
     vistas = p if os.path.exists(os.path.join(p, 'camera.json')) else os.path.join(p, 'vistas')
-    cortes = p if os.path.exists(os.path.join(p, 'quadro.json')) else os.path.join(p, 'cortes')
+    tem = lambda d: os.path.exists(os.path.join(d, 'quadro.json')) or os.path.exists(os.path.join(d, 'quadro-detalhe.json'))
+    cortes = p if tem(p) else os.path.join(p, 'cortes')
     return vistas, cortes
+
+
+def quadros_do_pacote(pasta):
+    """Os quadros dos cortes da pasta dos cortes: (os do trecho inteiro, de quadro.json; os de detalhe ampliado, de
+    quadro-detalhe.json, com o nome <corte>-<região>). Um arquivo que falta dá {}."""
+    def ler(nome):
+        arq = os.path.join(pasta, nome)
+        return json.load(open(arq)) if os.path.exists(arq) else {}
+    return ler('quadro.json'), ler('quadro-detalhe.json')
+
+
+def corte_ampliado_do_ponto(nome, base, detalhes, ponto_mm, regioes=None, margem_mm=10.0):
+    """O corte de detalhe que substitui o corte `nome` ao redor do ponto (u, v) em mm: entre os cortes ampliados de `nome` (campo
+    corte_base do quadro) que cobrem o ponto com ao menos margem_mm até a borda do desenho e que pertencem às regiões pedidas (se
+    houver), o de maior escala e, nela, o de maior margem. Devolve (nome do corte, margem em mm) ou (None, motivo)."""
+    cand = [n for n, q in detalhes.items() if q.get('corte_base') == nome and (not regioes or q.get('regiao') in regioes)]
+    if not cand:
+        return None, 'não há corte ampliado deste corte' + (f' nas regiões {sorted(regioes)}' if regioes else '')
+    melhor, razoes = None, []
+    for n in sorted(cand):
+        q = detalhes[n]
+        esc = q['escala_px_m']
+        u0, u1, v0, v1 = (x * 1000 for x in IM.recorte_do_quadro(q))
+        m = min(ponto_mm[0] - u0, u1 - ponto_mm[0], ponto_mm[1] - v0, v1 - ponto_mm[1])
+        if m < margem_mm:
+            razoes.append(f'{n} deixa o ponto a {m:.0f} mm da borda')
+            continue
+        chave = (esc, m)
+        if melhor is None or chave > melhor[0]:
+            melhor = (chave, n, m)
+    if melhor is None:
+        return None, 'nenhum corte ampliado cobre o ponto com ' + f'{margem_mm:g} mm de folga (' + '; '.join(razoes) + ')'
+    return melhor[1], melhor[2]

@@ -2,7 +2,8 @@
 # sem Blender (Python do sistema com Pillow e numpy).
 #
 # Uso:
-#   python3 tools/blender/ler-corte.py --pacote <pasta do pacote ou cortes/> [--corte nome,nome] [--passo-mm 1] [--saida <arq.json>]
+#   python3 tools/blender/ler-corte.py --pacote <pasta do pacote ou cortes/> [--corte nome,nome] [--regiao nome,nome | --detalhes]
+#       [--passo-mm 1] [--saida <arq.json>]
 #   python3 tools/blender/ler-corte.py --imagem <corte.png> --quadro <quadro.json> --corte <nome> [--saida <arq.json>]
 #
 # Lê cortes/<nome>.png com o quadro de cortes/quadro.json (u0, v0, escala em px por metro, eixos do plano) e devolve, para
@@ -13,6 +14,12 @@
 # estimado (erro_mm) é meio pixel de quantização mais metade do desvio da espessura medida, levado a mm pela escala do quadro;
 # o desenho do pacote não tem antisserrilhado, e o traço reto alinhado a um eixo não se lê melhor que meio pixel.
 # Sem --saida, imprime o JSON.
+#
+# Os cortes de detalhe ampliados (as regiões de detalhe do pacote, com 3 a 8 pixels por milímetro) estão em
+# cortes/quadro-detalhe.json, com o nome <corte>-<região>. Sem --corte, a leitura traz os cortes do trecho inteiro (ou, num pacote
+# só com detalhes, os detalhes); --corte z850-janela lê um deles pelo nome, --regiao janela lê todos os cortes dessa região e
+# --detalhes lê todos. O erro_mm de cada um sai da escala do próprio quadro: um desenho de 4 px por mm erra uns 0,15 mm, e o do
+# trecho inteiro uns 2 mm. O contorno de um corte ampliado acaba na borda da janela; moldura_mm diz o retângulo que o desenho cobre.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
@@ -30,11 +37,21 @@ if 'imagem' in a:
     alvos = [(a['corte'], a['imagem'], quadros[a['corte']])]
 elif 'pacote' in a:
     _, pasta = L.pastas_do_pacote(a['pacote'])
-    arq = os.path.join(pasta, 'quadro.json')
-    if not os.path.exists(arq):
-        L.erro(f'{pasta}: sem quadro.json (o pacote foi feito sem cortes?)')
-    quadros = json.load(open(arq))
-    nomes = [s for s in a['corte'].split(',') if s] if isinstance(a.get('corte'), str) else list(quadros)
+    base, detalhes = L.quadros_do_pacote(pasta)
+    if not base and not detalhes:
+        L.erro(f'{pasta}: sem quadro.json nem quadro-detalhe.json (o pacote foi feito sem cortes?)')
+    quadros = {**base, **detalhes}
+    if isinstance(a.get('corte'), str):
+        nomes = [s for s in a['corte'].split(',') if s]
+    elif isinstance(a.get('regiao'), str):
+        regioes = {s for s in a['regiao'].split(',') if s}
+        nomes = [n for n, q in detalhes.items() if q.get('regiao') in regioes]
+        if not nomes:
+            L.erro(f'regiões que o pacote não tem: {sorted(regioes)}; há {sorted({q.get("regiao") for q in detalhes.values()})}')
+    elif a.get('detalhes'):
+        nomes = list(detalhes)
+    else:
+        nomes = list(base or detalhes)
     falta = [n for n in nomes if n not in quadros]
     if falta:
         L.erro(f'cortes que o quadro não tem: {falta}; há {sorted(quadros)}')

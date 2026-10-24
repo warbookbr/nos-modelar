@@ -46,10 +46,16 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
     writeFileSync(p('sem-vinco.obj'), obj([0, 0, 0], { semVinco: true }));
     writeFileSync(p('vinco-deslocado.obj'), obj([0, 0, 0], { subirVinco: 0.005 }));
     writeFileSync(p('cfg.json'), JSON.stringify({ amostras_render: 1,
-      cortes: CORTES.map(({ nome, eixo, valor }) => ({ nome, eixo, valor })) }));
+      cortes: CORTES.map(({ nome, eixo, valor }) => ({ nome, eixo, valor })),
+      // duas regiões de detalhe em volta da quina do chanfro (350, 180 mm): uma por janela no plano, outra por caixa 3D
+      detalhes: [{ nome: 'quina', cortes: ['secao'], janela_mm: [300, 400, 130, 230] },
+        { nome: 'quina-caixa', caixa: [[0.3, 0.4], [0.13, 0.23], [0.2, 0.6]], px_por_mm: 3 }] }));
+    writeFileSync(p('cfg-vazia.json'), JSON.stringify({ amostras_render: 1, cortes: [{ nome: 'secao', eixo: 'z', valor: 0.5 }],
+      detalhes: [{ nome: 'longe', cortes: ['secao'], janela_mm: [1000, 1100, 0, 100] }] }));
     blender('pacote-cego.py', ['--referencia', p('forma.obj'), '--caixa', CAIXA.join(','), '--simetria-x', '--config', p('cfg.json'),
       '--saida', p('pacote'), '--privado', p('privado')]);
     py('ler-corte.py', ['--pacote', p('pacote'), '--saida', p('corte.json')]);
+    py('ler-corte.py', ['--pacote', p('pacote'), '--detalhes', '--saida', p('detalhes.json')]);
     py('ler-linhas.py', ['--pacote', p('pacote'), '--vista', 'frente,lado,topo', '--3d', '--saida', p('linhas.json')]);
     lidoCorte = JSON.parse(readFileSync(p('corte.json'), 'utf8'));
     lidoLinhas = JSON.parse(readFileSync(p('linhas.json'), 'utf8'));
@@ -85,6 +91,41 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
       const pv = privado.cortes.find((x) => x.nome === c.nome).cadeias.flat().map((q) => [q['xyz'.indexOf(r.eixos_uv[0])] * 1000, q['xyz'.indexOf(r.eixos_uv[1])] * 1000]);
       expect(Math.max(...distancias(pv, lido)), c.nome).toBeLessThan(1);
     }
+  });
+
+  it('as regiões de detalhe saem como cortes ampliados ao lado dos do trecho inteiro, lidos com o erro da escala deles', () => {
+    const pacote = JSON.parse(readFileSync(p('pacote', 'pacote.json'), 'utf8'));
+    expect(pacote.detalhes.map((d) => d.nome)).toEqual(['secao-quina', 'secao-quina-caixa']);
+    expect(pacote.detalhes.map((d) => d.px_por_mm)).toEqual([4, 3]);
+    expect(pacote.detalhes.every((d) => d.cadeias_na_janela >= 1)).toBe(true);
+    // a caixa 3D vira a janela do plano z: x de 300 a 400 mm e y de 130 a 230 mm
+    expect(pacote.detalhes[1].janela_mm).toEqual([300, 400, 130, 230]);
+    const lidos = JSON.parse(readFileSync(p('detalhes.json'), 'utf8')).cortes;
+    expect(lidos.map((c) => c.corte)).toEqual(['secao-quina', 'secao-quina-caixa']);
+    const exato = corte('z', 0.5);
+    for (const c of lidos) {
+      expect(existsSync(p('pacote', 'cortes', `${c.corte}.png`)), c.corte).toBe(true);
+      expect(c.ampliado, c.corte).toBe(true);
+      expect(c.escala_px_por_mm, c.corte).toBeGreaterThanOrEqual(3);
+      expect(c.erro_mm, c.corte).toBeLessThan(0.5);
+      const [[u0, v0], [u1, v1]] = c.moldura_mm;
+      const dentro = (pts) => pts.filter(([u, v]) => u > u0 + 3 && u < u1 - 3 && v > v0 + 3 && v < v1 - 3);
+      const lido = polis(c.polilinhas);
+      const a = distancias(dentro(pontosDe(lido, 0.2)), exato);
+      const b = distancias(dentro(pontosDe(exato, 0.2)), lido);
+      expect(a.length, c.corte).toBeGreaterThan(100);
+      expect(Math.max(...a), `${c.corte}: lido para exato`).toBeLessThan(0.5);
+      expect(Math.max(...b), `${c.corte}: exato para lido`).toBeLessThan(0.5);
+    }
+    // o corte do trecho inteiro continua com o erro de sempre, e o quadro dele não ganhou os de detalhe
+    const quadro = JSON.parse(readFileSync(p('pacote', 'cortes', 'quadro.json'), 'utf8'));
+    expect(Object.keys(quadro)).toEqual(CORTES.map((c) => c.nome));
+    expect(lidoCorte.cortes.map((c) => c.corte)).toEqual(CORTES.map((c) => c.nome));
+  });
+
+  it('uma região de detalhe cuja janela não toca o contorno do corte para o pacote com o motivo', () => {
+    expect(() => blender('pacote-cego.py', ['--referencia', p('forma.obj'), '--caixa', CAIXA.join(','), '--simetria-x', '--config', p('cfg-vazia.json'),
+      '--saida', p('pacote-vazio')])).toThrow(/longe: o contorno do corte secao não passa pela janela/);
   });
 
   it('ler-linhas recupera os vincos e a borda de corte com cobertura e precisão a 2 mm acima de 0,9', () => {

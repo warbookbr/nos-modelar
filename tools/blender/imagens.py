@@ -12,7 +12,10 @@
 #       Desenha cada corte de cortes.json ({simetria_x, cortes: [{nome, eixo, valor, eixos_uv, cadeias: [[[u, v], ...]]}]}, em
 #       metro) como contorno 2D em mm com grade e as cotas dos extremos e da maior saliência, em <pasta>/<nome>.png; grava a
 #       tabela curta <pasta>/cotas.md e o quadro de cada desenho em <pasta>/quadro.json. Com <quadro.json>, usa o quadro dado
-#       (para desenhar outra malha na mesma escala e posição) e não o regrava.
+#       (para desenhar outra malha na mesma escala e posição) e não o regrava. Um corte com `janela` ([u0, u1, v0, v1] em metro)
+#       e `px_por_mm` (padrão 4) é um corte de DETALHE ampliado: o desenho é uma janela do plano, na escala pedida, com o
+#       contorno cortado pela janela; com "detalhe": true em cortes.json, os arquivos saem como cotas-detalhe.md,
+#       rotulos-detalhe.json e quadro-detalhe.json, para não misturar com os cortes do trecho inteiro.
 #   python3 -I imagens.py folha <pasta> <metricas.json> <vista,vista,...>
 #       Compõe <pasta>/folha.png: linhas referência e candidata em cinza e em listras de reflexo, o mapa de distância e o
 #       mapa com sinal (se há), colunas as vistas, e o resumo das medidas no alto.
@@ -30,6 +33,9 @@
 import json, math, os, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from janela import cortar_na_janela  # noqa: E402
 
 FONTE = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 EIXO = {0: 'x', 1: 'y', 2: 'z'}
@@ -278,21 +284,63 @@ def _ligacao(ancora, bb):
 
 
 CORTE_W, CORTE_H, CORTE_M = 1200, 900, 70   # tamanho e margem do desenho de cada corte, em px
+DETALHE_PX_POR_MM = 4.0                      # a escala padrão de um corte de detalhe; a declarada vai de 3 a 8 px por mm
+DETALHE_PX_MINIMO, DETALHE_PX_MAXIMO = 3.0, 8.0
+DETALHE_W_MIN, DETALHE_H_MIN = 840, 520      # px: o menor desenho de detalhe, para o título caber; a janela declarada fica no meio
+DETALHE_LADO_MAXIMO = 2400                   # px: o maior lado de um desenho de detalhe
+DETALHE_FOLGA_MM = 1.0                       # mm: a faixa em volta do traço cortado pela janela, para o traço acabar antes da borda
+DETALHE_TOPO_PX = 56                         # px: a faixa do título (duas linhas), em que o traço de um corte de detalhe não entra
 
 
 def passo_do_corte(q):
     """O passo da grade do desenho de um corte, em mm, pelo quadro dele."""
+    if q.get('passo_mm'):
+        return float(q['passo_mm'])
     return passo_redondo((q['W'] - 2 * CORTE_M) / q['escala_px_m'] * 1000 / 12)
 
 
-def titulo_do_corte(nome, eixo, valor, U, Vn, passo):
-    return f"corte {nome}: plano {eixo} = {_mm(valor)} mm; {U} na horizontal, {Vn} na vertical, grade de {passo:g} mm"
+def titulo_do_corte(nome, eixo, valor, U, Vn, passo, ampliacao=None):
+    t = f"corte {nome}: plano {eixo} = {_mm(valor)} mm; {U} na horizontal, {Vn} na vertical, grade de {passo:g} mm"
+    return t + (f"\nampliado: {ampliacao:g} px por mm" if ampliacao else '')
+
+
+def quadro_do_detalhe(c):
+    """O quadro de um corte de detalhe (c com `janela` [u0, u1, v0, v1] em metro e `px_por_mm`): a escala pedida, o desenho com o
+    tamanho da janela mais a folga (no mínimo DETALHE_W_MIN por DETALHE_H_MIN) e a janela declarada no meio. Devolve o quadro e o
+    retângulo (u0, u1, v0, v1) em metro em que o contorno é cortado: o desenho menos a folga."""
+    s = float(c.get('px_por_mm') or DETALHE_PX_POR_MM)
+    if not DETALHE_PX_MINIMO <= s <= DETALHE_PX_MAXIMO:
+        raise ValueError(f"corte {c['nome']}: px_por_mm {s:g} fora de {DETALHE_PX_MINIMO:g} a {DETALHE_PX_MAXIMO:g}")
+    u0, u1, v0, v1 = (float(x) for x in c['janela'])
+    if not (u1 > u0 and v1 > v0):
+        raise ValueError(f"corte {c['nome']}: janela vazia {list(c['janela'])}")
+    M = CORTE_M
+    W = max(DETALHE_W_MIN, M + int(math.ceil((u1 - u0) * 1000 * s + 2 * DETALHE_FOLGA_MM * s)))
+    H = max(DETALHE_H_MIN, M + DETALHE_TOPO_PX + int(math.ceil((v1 - v0) * 1000 * s + 2 * DETALHE_FOLGA_MM * s)))
+    if max(W, H) > DETALHE_LADO_MAXIMO:
+        raise ValueError(f"corte {c['nome']}: a janela de {(u1 - u0) * 1000:.0f} por {(v1 - v0) * 1000:.0f} mm a {s:g} px por mm pede "
+                         f"{W} por {H} px, acima de {DETALHE_LADO_MAXIMO}; diminua a janela ou a escala")
+    esc = s * 1000.0
+    larg, alt = (W - M) / esc, (H - M - DETALHE_TOPO_PX) / esc   # a altura que o traço pode ocupar, abaixo do título
+    q = {'u0': (u0 + u1) / 2 - larg / 2, 'v0': (v0 + v1) / 2 - alt / 2, 'escala_px_m': esc, 'W': W, 'H': H, 'eixos_uv': list(c['eixos_uv']),
+         'eixo': c['eixo'], 'valor': c['valor'], 'ampliacao_px_por_mm': s, 'janela_mm': [round(x * 1000, 3) for x in (u0, u1, v0, v1)]}
+    q['passo_mm'] = passo_redondo(max(larg, alt) * 1000 / 25)
+    return q, recorte_do_quadro(q)
+
+
+def recorte_do_quadro(q):
+    """O retângulo (u0, u1, v0, v1) em metro em que o contorno de um corte de detalhe é cortado: o desenho, sem a faixa do título
+    e menos a folga."""
+    f = DETALHE_FOLGA_MM / 1000
+    return (q['u0'] + f, q['u0'] + (q['W'] - CORTE_M) / q['escala_px_m'] - f,
+            q['v0'] + f, q['v0'] + (q['H'] - CORTE_M - DETALHE_TOPO_PX) / q['escala_px_m'] - f)
 
 
 def cortes(arq_json, pasta, arq_quadro=None):
     d = json.load(open(arq_json))
     quadros = json.load(open(arq_quadro)) if arq_quadro else {}
-    W, H, M = CORTE_W, CORTE_H, CORTE_M
+    sufixo = '-detalhe' if d.get('detalhe') else ''
+    M = CORTE_M
     f, fp = fonte(16), fonte(14)
     tabela = ['| corte | cota | posição (mm) |', '|---|---|---|']
     novo_quadro, registro = {}, {}
@@ -300,9 +348,19 @@ def cortes(arq_json, pasta, arq_quadro=None):
         U, Vn = c['eixos_uv']
         cad = [np.asarray(x, float) for x in c['cadeias'] if len(x) >= 2]
         meia = bool(d.get('simetria_x')) and U == 'x'
-        if c['nome'] in quadros:
+        if c.get('janela'):
+            q, recorte = quadro_do_detalhe(c)
+            if c['nome'] in quadros:
+                q = quadros[c['nome']]
+                recorte = recorte_do_quadro(q)
+            for extra in ('corte_base', 'regiao'):
+                if c.get(extra):
+                    q[extra] = c[extra]
+            cad = [x for ch in cad for x in cortar_na_janela(ch, recorte)]
+        elif c['nome'] in quadros:
             q = quadros[c['nome']]
         else:
+            W, H = CORTE_W, CORTE_H
             P = np.vstack(cad) if cad else np.zeros((1, 2))
             lo, hi = P.min(0), P.max(0)
             folga = 0.08 * max(hi - lo)
@@ -312,6 +370,7 @@ def cortes(arq_json, pasta, arq_quadro=None):
             lo = meio - np.array([(W - 2 * M) / esc / 2, (H - 2 * M) / esc / 2])
             q = {'u0': float(lo[0]), 'v0': float(lo[1]), 'escala_px_m': float(esc), 'W': W, 'H': H, 'eixos_uv': [U, Vn],
                  'eixo': c['eixo'], 'valor': c['valor']}
+        W, H = q['W'], q['H']
         novo_quadro[c['nome']] = q
         px = lambda p: (M + (p[0] - q['u0']) * q['escala_px_m'], H - M - (p[1] - q['v0']) * q['escala_px_m'])
         im = Image.new('RGB', (W, H), 'white')
@@ -334,7 +393,7 @@ def cortes(arq_json, pasta, arq_quadro=None):
                     dr.text((4, y - 8), f'{Vn}={k * passo:g}', fill=(20, 100, 20), font=fp)
         for x in cad:
             dr.line([px(p) for p in x], fill=(0, 0, 0), width=3, joint='curve')
-        titulo = titulo_do_corte(c['nome'], c['eixo'], c['valor'], U, Vn, passo)
+        titulo = titulo_do_corte(c['nome'], c['eixo'], c['valor'], U, Vn, passo, q.get('ampliacao_px_por_mm'))
         dr.rectangle(dr.textbbox((10, 8), titulo, font=f), fill=(255, 255, 255, 220))
         dr.text((10, 8), titulo, fill='black', font=f)
         caixas = [dr.textbbox((10, 8), titulo, font=f)]
@@ -365,10 +424,10 @@ def cortes(arq_json, pasta, arq_quadro=None):
             dr.text((bb[0] - off[0], bb[1] - off[1]), r['texto'], fill=(170, 0, 0), font=fp)
         registro[c['nome']] = rotulos
         im.save(os.path.join(pasta, f"{c['nome']}.png"))
-    open(os.path.join(pasta, 'cotas.md'), 'w').write('\n'.join(tabela) + '\n')
-    json.dump(registro, open(os.path.join(pasta, 'rotulos.json'), 'w'), indent=1)
+    open(os.path.join(pasta, f'cotas{sufixo}.md'), 'w').write('\n'.join(tabela) + '\n')
+    json.dump(registro, open(os.path.join(pasta, f'rotulos{sufixo}.json'), 'w'), indent=1)
     if not arq_quadro:
-        json.dump(novo_quadro, open(os.path.join(pasta, 'quadro.json'), 'w'), indent=1)
+        json.dump(novo_quadro, open(os.path.join(pasta, f'quadro{sufixo}.json'), 'w'), indent=1)
 
 COR_AZUL, COR_BRANCO, COR_VERMELHO = (26, 64, 217), (247, 247, 247), (217, 31, 20)   # as do mapa com sinal da régua
 CORES_CANDIDATAS = [(230, 110, 0), (0, 110, 230), (30, 150, 60), (170, 40, 160)]

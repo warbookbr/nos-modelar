@@ -26,18 +26,27 @@
 # sem contorno, para olhar-candidata.py desenhar a candidata no mesmo quadro). Os pontos do contorno, a cada
 # passo_corte_regua, vão só para <privado>/cortes.json, fora do pacote, para a régua; sem --privado, não são gravados.
 #
+# Os cortes de detalhe: a chave `detalhes` da configuração declara regiões de detalhe, cada uma com os cortes a ampliar e a janela
+# do plano (em mm, ou a projeção de uma caixa 3D), e o pacote grava, ao lado dos cortes do trecho inteiro, um corte ampliado de
+# cada um, com 3 a 8 pixels por milímetro (padrão 4), a mesma calibração, grade, cotas, recorte e visibilidade, e o contorno
+# cortado pela janela: cortes/<corte>-<região>.png, o quadro deles em cortes/quadro-detalhe.json, as cotas em
+# cortes/cotas-detalhe.md e, em pacote.json, a lista `detalhes`. O formato da declaração está em comum.planejar_detalhes, e o
+# uso, em docs/mecanifica/blender/REGUA-E-PACOTE-CEGO.md. ler-corte.py e ler-perfil.py leem esses cortes.
+#
 # Grava em <saida>/: vistas/<vista>-cinza.png e vistas/<vista>-zebra.png, vistas/camera.json (centro, escala, tamanho e eixos
 # de cada câmera, para olhar-candidata.py), vistas/grade.json (passo, rótulos e barra de cada imagem) e pacote.json (caixa,
 # simetria, contagens do recorte, bordas por tipo e a fração de avesso de cada vista cinza). Nenhuma malha é gravada.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import comum as C
+from janela import cortar_na_janela
 
 a = C.argumentos()
 for k in ('referencia', 'saida'):
     if k not in a:
         C.erro(f'falta --{k}')
 cfg = C.configuracao(a)
+plano_detalhes = C.planejar_detalhes(cfg)
 z_cima = bool(a.get('z_cima'))
 V, F, P = C.ler_malha(a['referencia'], a.get('objeto'), z_cima)
 rot = C.rotulos_dos_triangulos(a.get('rotulos'), V, F, P)
@@ -69,17 +78,41 @@ linhas = C.desenhar_linhas(prep['V'], prep['F'], prep['manter'], prep['regiao'],
 C.imagens('grade', os.path.join(pasta, 'camera.json'), pasta + os.sep)
 
 cortes = []
-if cfg['cortes']:
+detalhes = []
+if cfg['cortes'] or cfg['detalhes']:
     import tempfile
     pc = os.path.join(a['saida'], 'cortes')
     os.makedirs(pc, exist_ok=True)
     cs = C.contornos_dos_cortes(prep['V'], prep['F'], prep['manter'], cfg['cortes'])
-    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as t:
-        json.dump({'simetria_x': cfg['simetria_x'], 'cortes': [{k: c[k] for k in ('nome', 'eixo', 'valor', 'eixos_uv')} |
-                   {'cadeias': [P.round(6).tolist() for P in c['cadeias_uv']]} for c in cs]}, t)
-    C.imagens('cortes', t.name, pc)
-    os.unlink(t.name)
+    if cfg['cortes']:
+        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as t:
+            json.dump({'simetria_x': cfg['simetria_x'], 'cortes': [{k: c[k] for k in ('nome', 'eixo', 'valor', 'eixos_uv')} |
+                       {'cadeias': [P.round(6).tolist() for P in c['cadeias_uv']]} for c in cs]}, t)
+        C.imagens('cortes', t.name, pc)
+        os.unlink(t.name)
     cortes = [{'nome': c['nome'], 'eixo': c['eixo'], 'valor': c['valor'], 'cadeias': len(c['cadeias_3d'])} for c in cs]
+    if plano_detalhes:
+        # o contorno de cada plano de detalhe: o do corte do trecho inteiro quando o plano é o mesmo, ou o calculado agora
+        por_plano = {(c['eixo'], round(c['valor'], 9)): c for c in cs}
+        novos = [{'nome': d['corte_base'], 'eixo': d['eixo'], 'valor': d['valor']} for d in plano_detalhes
+                 if (d['eixo'], round(d['valor'], 9)) not in por_plano]
+        for c in C.contornos_dos_cortes(prep['V'], prep['F'], prep['manter'], novos):
+            por_plano[(c['eixo'], round(c['valor'], 9))] = c
+        lista = []
+        for d in plano_detalhes:
+            c = por_plano[(d['eixo'], round(d['valor'], 9))]
+            dentro = [x for P in c['cadeias_uv'] for x in cortar_na_janela(P, d['janela'])]
+            if not dentro:
+                C.erro(f"detalhes {d['regiao']}: o contorno do corte {d['corte_base']} não passa pela janela {[round(x * 1000, 1) for x in d['janela']]} mm")
+            lista.append({'nome': d['nome'], 'eixo': d['eixo'], 'valor': d['valor'], 'eixos_uv': c['eixos_uv'], 'janela': d['janela'],
+                          'px_por_mm': d['px_por_mm'], 'corte_base': d['corte_base'], 'regiao': d['regiao'],
+                          'cadeias': [P.round(6).tolist() for P in c['cadeias_uv']]})
+            detalhes.append({'nome': d['nome'], 'regiao': d['regiao'], 'corte': d['corte_base'], 'eixo': d['eixo'], 'valor': d['valor'],
+                             'janela_mm': [round(x * 1000, 3) for x in d['janela']], 'px_por_mm': d['px_por_mm'], 'cadeias_na_janela': len(dentro)})
+        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as t:
+            json.dump({'detalhe': True, 'simetria_x': cfg['simetria_x'], 'cortes': lista}, t)
+        C.imagens('cortes', t.name, pc)
+        os.unlink(t.name)
     if a.get('privado'):
         os.makedirs(a['privado'], exist_ok=True)
         json.dump({'aviso': 'pontos do contorno de cada corte; só para a régua, não vai para quem modela',
@@ -89,9 +122,9 @@ if cfg['cortes']:
 
 pacote = {
     'caixa': cfg['caixa'].tolist(), 'simetria_x': cfg['simetria_x'], 'regiao_do_recorte': prep['regiao'].tolist(),
-    'contagens': prep['contagens'], 'avesso': avesso, 'vistas': [v['nome'] for v in vistas], 'linhas': linhas, 'cortes': cortes,
+    'contagens': prep['contagens'], 'avesso': avesso, 'vistas': [v['nome'] for v in vistas], 'linhas': linhas, 'cortes': cortes, 'detalhes': detalhes,
     'configuracao': {k: cfg[k] for k in ('margem', 'visibilidade', 'angulo_painel', 'fracao_painel_visivel', 'fracao_componente',
-                                         'excluir', 'resolucao', 'amostras_render', 'avesso', 'angulo_feicao', 'cortes')},
+                                         'excluir', 'resolucao', 'amostras_render', 'avesso', 'angulo_feicao', 'cortes', 'detalhes')},
 }
 json.dump(pacote, open(os.path.join(a['saida'], 'pacote.json'), 'w'), ensure_ascii=False, indent=1)
 sim = prep['contagens'].get('simetria')

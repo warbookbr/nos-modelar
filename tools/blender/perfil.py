@@ -520,7 +520,11 @@ def perfil_do_corte(c, alvo=None, caixa=None, tangente=None, fora=None, ancora=N
                 'erro_leitura_mm': round(erro, 3), 'avisos': avisos + ['nenhum ponto do trecho passa do erro de leitura: o detalhe não aparece neste corte']}
     i1, i2 = int(fora_do_erro[0]), int(fora_do_erro[1])
     sj = s[idx]
-    xs = np.array([float(x[i1]) if livre_e else _pe(x, dev, sj, i1, -1), float(x[i2]) if livre_d else _pe(x, dev, sj, i2, 1)])
+    # a janela e o alcance do pé crescem com o erro de leitura: com 2 mm de erro valem os 3 e os 6 mm de sempre, e num corte ampliado,
+    # com 0,2 mm de erro, uma janela de 3 mm pegaria a rampa inteira de um cordão de 10 mm e levaria o pé a mais de 1 mm de onde está
+    janela_pe, alcance_pe = min(3.0, max(0.75, 1.5 * erro)), min(6.0, max(1.5, 3.0 * erro))
+    xs = np.array([float(x[i1]) if livre_e else _pe(x, dev, sj, i1, -1, alcance_pe, janela_pe),
+                   float(x[i2]) if livre_d else _pe(x, dev, sj, i2, 1, alcance_pe, janela_pe)])
 
     # o quadro do perfil
     t_dado = tangente is not None

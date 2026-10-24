@@ -23,6 +23,9 @@ export const W_MAX = 0.16;
 /** O cordão: 25 mm de largura, 6 mm de altura, com degrau de 1,5 mm na borda de um lado e de 2 mm no outro, e os ombros em um ou
     dois segmentos, de modo que o perfil não é simétrico (um espelho em u se acusa). */
 export const CORDAO = [[-12.5, 0], [-12.5, 1.5], [-10.5, 4.5], [-6, 6], [4, 6], [9, 5], [12.5, 2], [12.5, 0]];
+/** O cordão fino de 10 mm de largura e 3 mm de altura, também assimétrico: o detalhe que o corte do trecho inteiro, com menos de meio
+    pixel por milímetro, não resolve, e o corte ampliado lê. */
+export const CORDAO_10 = [[-5, 0], [-5, 1], [-3, 3], [3, 3], [5, 1.5], [5, 0]];
 /** A calha de canal duplo, 62 mm: três nervuras (as bordas de 9 e 7 mm e a do meio de 6 mm) e dois canais cujo fundo toca a chapa. */
 export const CALHA = [[-31, 0], [-31, 2], [-28, 9], [-23, 9], [-19, 3], [-15, 0.5], [-10, 0.5], [-6, 4], [-3, 6], [3, 6], [6, 4], [10, 0.5], [15, 0.5],
   [19, 3], [23, 7], [28, 7], [31, 2], [31, 0]];
@@ -49,9 +52,9 @@ const unit = (a) => { const l = Math.hypot(...a); return a.map((v) => v / l); };
 
 /** A seção (w, h) em mm do detalhe, com a chapa lisa em volta de -W_MAX a +W_MAX, e `largura` o fator que estica o detalhe em w
     (1 = como declarado), tudo reamostrado a cada `passo` mm de comprimento de arco. */
-export function secaoDoDetalhe(detalhe, { largura = 1, passo = 0.25 } = {}) {
+export function secaoDoDetalhe(detalhe, { largura = 1, passo = 0.25, semi = W_MAX * 1000 } = {}) {
   const d = detalhe.map(([w, h]) => [w * largura, h]);
-  const L = W_MAX * 1000;
+  const L = semi;
   const cru = [[-L, 0], ...d, [L, 0]];
   const out = [cru[0]];
   for (let i = 0; i + 1 < cru.length; i++) {
@@ -123,6 +126,21 @@ export function montarPacoteDaChapa(dir, cortes) {
   const lista = cortes.map((c) => ({ nome: c.nome, eixo: c.eixo, valor: c.valor, eixos_uv: c.eixo === 'z' ? ['x', 'y'] : ['z', 'y'], cadeias: [contornoDoCorte(c, c.secao)] }));
   writeFileSync(p('cortes.json'), JSON.stringify({ simetria_x: false, cortes: lista }));
   py('imagens.py', ['cortes', p('cortes.json'), p('pacote', 'cortes')]);
+  return lista;
+}
+
+/** Grava em <dir>/pacote/cortes os cortes de detalhe ampliados de `detalhes` ({regiao, corte (o nome do corte do trecho inteiro),
+    janela [u0, u1, v0, v1] em metro, px_por_mm}), desenhados pelo imagens.py com "detalhe": true, a partir dos cortes dados, como
+    pacote-cego.py faz: cortes/<corte>-<regiao>.png e cortes/quadro-detalhe.json. */
+export function montarDetalhesDaChapa(dir, cortes, detalhes) {
+  const p = (...n) => join(dir, ...n);
+  const lista = detalhes.map((d) => {
+    const c = cortes.find((x) => x.nome === d.corte);
+    return { nome: `${d.corte}-${d.regiao}`, eixo: c.eixo, valor: c.valor, eixos_uv: c.eixo === 'z' ? ['x', 'y'] : ['z', 'y'], janela: d.janela,
+      px_por_mm: d.px_por_mm, corte_base: d.corte, regiao: d.regiao, cadeias: [contornoDoCorte(c, c.secao)] };
+  });
+  writeFileSync(p('detalhes.json'), JSON.stringify({ detalhe: true, simetria_x: false, cortes: lista }));
+  py('imagens.py', ['cortes', p('detalhes.json'), p('pacote', 'cortes')]);
   return lista;
 }
 

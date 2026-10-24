@@ -34,6 +34,7 @@ PADRAO = {
     'angulo_feicao': limiares.ANGULO_FEICAO,  # graus: aresta com diedro acima disto entra nas vistas de linhas de feição
     'angulo_vinco': limiares.ANGULO_VINCO,    # graus: diedro acima do qual a aresta é vinco na medida (régua, comparar-vincos, ler-linhas)
     'cortes': [],                 # lista de {nome, eixo: 'x'|'y'|'z', valor (m)}: cortes planos cotados do pacote
+    'detalhes': [],               # regiões de detalhe: {nome, cortes, janela_mm | janelas_mm | caixa, px_por_mm}: cortes ampliados de uma janela do plano
     'passo_corte_regua': 0.01,    # m: passo dos pontos do contorno de cada corte no JSON privado (só para a régua)
     'omitidas': [],               # rótulos que a régua relata à parte, como regiões que a candidata pode omitir
     'mapa_sinal_mm': 4.0,         # mm: escala (±) do mapa de distância com sinal da régua; 0 tira o mapa com sinal das imagens
@@ -1224,6 +1225,75 @@ def desenhar_linhas(V, F, manter, regiao, angulo, vistas, prefixo, declarados=No
     if trechos_3d is not None:
         trechos_3d['_qualquer'] = [(tp, T, an) for pts, a, tp, an in zip(pontos, algum, tipos, angulos) if tp in TIPOS_PRETOS for T in trechos(pts, a)]
     return contagem
+
+
+def planejar_detalhes(cfg):
+    """Os cortes de detalhe ampliados que as regiões de `detalhes` da configuração pedem. Cada região é
+    {nome, cortes?, janela_mm? | janelas_mm? | caixa?, px_por_mm?}:
+      nome       o nome da região, sem espaço, barra, vírgula nem dois-pontos; o corte ampliado de z850 na região janela é `z850-janela`;
+      cortes     os cortes da região: o nome de um corte da chave `cortes`, ou {eixo, valor (m), nome?} para um plano novo;
+                 sem a chave, com `caixa`, são todos os cortes da configuração cujo plano atravessa a caixa;
+      janela_mm  [u0, u1, v0, v1] em milímetro, nos eixos do plano de cada corte (plano z: x e y; x: z e y; y: x e z);
+      janelas_mm {corte: [u0, u1, v0, v1]} para uma janela por corte (vale sobre janela_mm);
+      caixa      [[x0, x1], [y0, y1], [z0, z1]] ou [x0, x1, y0, y1, z0, z1] em metro: a janela de cada corte é a projeção da caixa;
+      px_por_mm  a escala do desenho, de 3 a 8 (padrão 4).
+    Devolve uma lista de {nome (do arquivo), regiao, corte_base, eixo, valor (m), janela (m), px_por_mm}."""
+    base = {c['nome']: c for c in cfg.get('cortes', [])}
+    out, vistos = [], set()
+    for d in cfg.get('detalhes', []):
+        regiao = d.get('nome')
+        if not isinstance(regiao, str) or not regiao or any(ch in regiao for ch in ' /\\:;,'):
+            erro(f'detalhes: cada região precisa de um nome sem espaço, barra, vírgula nem dois-pontos; veio {regiao!r}')
+        if regiao in vistos:
+            erro(f'detalhes: a região {regiao} aparece duas vezes')
+        vistos.add(regiao)
+        caixa = None
+        if d.get('caixa') is not None:
+            v = np.array(d['caixa'], float).reshape(3, 2)
+            if np.any(v[:, 0] >= v[:, 1]):
+                erro(f'detalhes {regiao}: caixa vazia {v.tolist()}')
+            caixa = v
+        planos = []
+        for c in d.get('cortes') or []:
+            if isinstance(c, str):
+                if c not in base:
+                    erro(f'detalhes {regiao}: o corte {c} não está em `cortes` da configuração (há {sorted(base)})')
+                planos.append(base[c])
+            elif isinstance(c, dict) and c.get('eixo') in ('x', 'y', 'z') and isinstance(c.get('valor'), (int, float)):
+                planos.append({'nome': c.get('nome') or f"{c['eixo']}{int(round(c['valor'] * 1000))}", 'eixo': c['eixo'], 'valor': float(c['valor'])})
+            else:
+                erro(f'detalhes {regiao}: um corte é o nome de um corte da configuração ou {{eixo, valor}} em metro; veio {c!r}')
+        if not d.get('cortes'):
+            if caixa is None:
+                erro(f'detalhes {regiao}: sem `cortes` e sem `caixa`, não há como saber quais cortes ampliar')
+            planos = [c for c in cfg.get('cortes', []) if caixa['xyz'.index(c['eixo'])][0] <= float(c['valor']) <= caixa['xyz'.index(c['eixo'])][1]]
+            if not planos:
+                erro(f'detalhes {regiao}: nenhum corte da configuração atravessa a caixa {caixa.tolist()}')
+        unicos = {p['nome'] for p in planos}
+        if len(unicos) != len(planos):
+            erro(f'detalhes {regiao}: um corte aparece duas vezes')
+        extras = set(d.get('janelas_mm') or {}) - unicos
+        if extras:
+            erro(f'detalhes {regiao}: janelas_mm cita cortes que a região não tem: {sorted(extras)}')
+        px = float(d.get('px_por_mm', 4.0))
+        if not 3.0 <= px <= 8.0:
+            erro(f'detalhes {regiao}: px_por_mm de 3 a 8, e veio {px:g}')
+        for p in planos:
+            e = 'xyz'.index(p['eixo'])
+            u, w = EIXOS_DO_CORTE[e]
+            if p['nome'] in (d.get('janelas_mm') or {}):
+                jan = [x / 1000 for x in d['janelas_mm'][p['nome']]]
+            elif d.get('janela_mm') is not None:
+                jan = [x / 1000 for x in d['janela_mm']]
+            elif caixa is not None:
+                jan = [caixa[u][0], caixa[u][1], caixa[w][0], caixa[w][1]]
+            else:
+                erro(f'detalhes {regiao}: dê `janela_mm`, `janelas_mm` ou `caixa`')
+            if len(jan) != 4 or not (jan[1] > jan[0] and jan[3] > jan[2]):
+                erro(f'detalhes {regiao}, corte {p["nome"]}: a janela é [u0, u1, v0, v1] em mm com u0 < u1 e v0 < v1; veio {jan}')
+            out.append({'nome': f"{p['nome']}-{regiao}", 'regiao': regiao, 'corte_base': p['nome'], 'eixo': p['eixo'],
+                        'valor': float(p['valor']), 'janela': [float(x) for x in jan], 'px_por_mm': px})
+    return out
 
 
 def contornos_dos_cortes(V, F, mascara, cortes):

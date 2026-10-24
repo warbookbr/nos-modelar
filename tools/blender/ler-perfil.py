@@ -13,6 +13,13 @@
 #   python3 tools/blender/ler-perfil.py --pacote <pasta> --caixa "z850:u0,u1,w0,w1;z1000:u0,u1,w0,w1" [--tangente x,y,z]
 #       O detalhe é o trecho do contorno dentro de uma caixa no plano do corte, em mm.
 #
+# O corte ampliado como fonte: se o pacote tem cortes de detalhe ampliados (regiões de detalhe, cortes/quadro-detalhe.json, nomes
+# <corte>-<região>), o corte pedido (z850) vale pelo ampliado que cobre o ponto do detalhe com ao menos --margem-mm 10 de folga até
+# a borda do desenho, e o de maior escala se vários cobrem; um corte ampliado também se pede pelo nome (--corte z850-janela). --regiao
+# janela limita a escolha a essa região, e --sem-ampliado fixa os cortes do trecho inteiro. O corte ampliado erra uns 0,15 mm, e o do
+# trecho inteiro uns 2 mm; cada corte do resultado diz de qual fonte veio (`ampliado`, `corte_pedido`, `escala_px_por_mm`), e quando
+# um corte pedido volta ao do trecho inteiro, o resumo diz por quê.
+#
 # Opções: --fora x,y,z (para onde a chapa olha; sem ela, o lado oposto ao centro dos contornos do corte), --ancora
 # linha|centro|inicio|fim (onde fica u = 0; padrão: linha com --linhas ou --alvo, centro com --caixa), --janela-mm n (meia janela
 # fixa em volta do ponto; sem ela a busca cresce até o contorno voltar à base), --flanco-mm 30 e --folga-mm 3 (as faixas de chapa
@@ -36,10 +43,10 @@ a = L.argumentos()
 if 'pacote' not in a:
     L.erro('falta --pacote <pasta do pacote ou cortes/>')
 _, pasta = L.pastas_do_pacote(a['pacote'])
-arq_q = os.path.join(pasta, 'quadro.json')
-if not os.path.exists(arq_q):
-    L.erro(f'{pasta}: sem quadro.json (o pacote foi feito sem cortes?)')
-quadros = json.load(open(arq_q))
+base, detalhes = L.quadros_do_pacote(pasta)
+if not base and not detalhes:
+    L.erro(f'{pasta}: sem quadro.json nem quadro-detalhe.json (o pacote foi feito sem cortes?)')
+quadros = {**base, **detalhes}
 
 
 def numeros(texto, n, nome):
@@ -72,13 +79,38 @@ caixas = por_corte(a['caixa'], 4, '--caixa') if fonte == 'caixa' else {}
 if 'corte' in a and isinstance(a['corte'], str):
     nomes = [s for s in a['corte'].split(',') if s]
 elif fonte == 'linhas':
-    nomes = list(quadros)
+    nomes = list(base or detalhes)
 else:
     nomes = list(alvos or caixas)
 falta = [n for n in nomes if n not in quadros]
 if falta:
     L.erro(f'cortes que o quadro não tem: {falta}; há {sorted(quadros)}')
-cortes = {n: L.ler_corte(os.path.join(pasta, f'{n}.png'), quadros[n], n) for n in nomes}
+regioes = {r for r in a['regiao'].split(',') if r} if isinstance(a.get('regiao'), str) else None
+if regioes and not (regioes & {q.get('regiao') for q in detalhes.values()}):
+    L.erro(f'regiões que o pacote não tem: {sorted(regioes)}; há {sorted({q.get("regiao") for q in detalhes.values()})}')
+margem_mm = float(a.get('margem_mm', 10.0))
+leituras = {}
+
+
+def ler_o_corte(n):
+    if n not in leituras:
+        leituras[n] = L.ler_corte(os.path.join(pasta, f'{n}.png'), quadros[n], n)
+    return leituras[n]
+
+
+def meta_do_corte(n):
+    """O que travessias_da_linha pede do corte, sem ler a imagem: o plano e os eixos."""
+    q = quadros[n]
+    return {'eixo': q['eixo'], 'valor_mm': 1000.0 * float(q['valor']), 'eixos_uv': q['eixos_uv'], 'corte': n}
+
+
+def fonte_do_corte(n, ponto_uv):
+    """(corte a ler, motivo de ter ficado no do trecho inteiro ou None). Um corte ampliado pedido pelo nome vale por ele; um corte do
+    trecho inteiro vale pelo ampliado que cobre o ponto (u, v) em mm, se o pacote tem e --sem-ampliado não o proíbe."""
+    if n in detalhes or a.get('sem_ampliado') or not detalhes:
+        return n, None
+    c, m = L.corte_ampliado_do_ponto(n, base, detalhes, ponto_uv, regioes, margem_mm)
+    return (c, None) if c else (n, m if (regioes or any(q.get('corte_base') == n for q in detalhes.values())) else None)
 
 curva, tol3d, err_tangente = None, None, None
 if fonte == 'linhas':
@@ -111,33 +143,43 @@ opcoes = dict(fora=fora, ancora=a.get('ancora'), janela_mm=float(a['janela_mm'])
               grau=('auto' if a.get('grau', 'auto') == 'auto' else int(a['grau'])), fundo_mm=float(a.get('fundo_mm', 5.0)),
               perto_mm=float(a.get('perto_mm', 12.0)), unir=not a.get('sem_unir'), simplificar_mm=float(a['simplificar_mm']) if 'simplificar_mm' in a else None)
 
-resultados, recusados = [], []
+resultados, recusados, voltas = [], [], []
 for nome in nomes:
-    c = cortes[nome]
     try:
         t, alvo = tangente_dada, None
+        usado, motivo = nome, None
         if fonte == 'linhas':
-            trav = P.travessias_da_linha(c, curva, perto)
+            trav = P.travessias_da_linha(meta_do_corte(nome), curva, perto)
             if not trav:
                 raise P.ErroDoPerfil(f'a linha de feição não atravessa o plano do corte {nome}')
             if len(trav) > 1 and perto is None:
                 raise P.ErroDoPerfil(f'a linha atravessa o plano do corte {nome} em {len(trav)} pontos '
                                      f'({[np.round(x, 0).tolist() for x, _ in trav]}); escolha um com --perto x,y,z')
             X, tg = trav[0]
-            _, iu, iw = P._indices(c)
+            _, iu, iw = P._indices(meta_do_corte(nome))
             alvo = X[[iu, iw]]
             t = (-tg if a.get('sentido_inverso') else tg).tolist() if t is None else t
+            usado, motivo = fonte_do_corte(nome, alvo)
         elif fonte == 'alvo':
             if nome not in alvos:
                 raise P.ErroDoPerfil(f'--alvo sem o corte {nome}')
             alvo = alvos[nome]
+            usado, motivo = fonte_do_corte(nome, alvo)
         caixa = caixas.get(nome) if fonte == 'caixa' else None
-        if fonte == 'caixa' and caixa is None:
-            raise P.ErroDoPerfil(f'--caixa sem o corte {nome}')
+        if fonte == 'caixa':
+            if caixa is None:
+                raise P.ErroDoPerfil(f'--caixa sem o corte {nome}')
+            usado, motivo = fonte_do_corte(nome, [(caixa[0] + caixa[1]) / 2, (caixa[2] + caixa[3]) / 2])
+        if motivo:
+            voltas.append(f'{nome}: lido no corte do trecho inteiro, porque {motivo}')
+        c = ler_o_corte(usado)
         r = P.perfil_do_corte(c, alvo=alvo, caixa=caixa, tangente=t, erro_tangente_graus=err_tangente if t is not None else None, **opcoes)
+        r['corte_pedido'] = nome
+        r['ampliado'] = c['ampliado']
+        r['escala_px_por_mm'] = c['escala_px_por_mm']
         resultados.append(r)
         if r.get('detalhe') and a.get('imagens'):
-            P.desenhar(r, c, os.path.join(a['imagens'], f'perfil-{nome}.png'))
+            P.desenhar(r, c, os.path.join(a['imagens'], f'perfil-{usado}.png'))
     except P.ErroDoPerfil as e:
         recusados.append({'corte': nome, 'erro': str(e)})
 if not resultados:
@@ -172,5 +214,6 @@ if conjunto and len(conjunto['cortes']) > 1:
         f"ficam a até {conjunto['distancia_maxima_entre_perfis_mm']} mm um do outro (erro de leitura {conjunto['erro_de_leitura_mm']} mm); "
         + ('a variação passa do erro: o detalhe muda ao longo da linha' if conjunto['variacao_acima_do_erro'] else 'a variação cabe no erro: um perfil serve aos cortes')
         + f"; representante {conjunto['representante']}")
+linhas_do_resumo += voltas
 saida['resumo'] = linhas_do_resumo
 L.gravar_json(saida, a.get('saida'))
