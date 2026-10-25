@@ -1,10 +1,10 @@
 # Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** Claude, com a pessoa aprovando o resultado da medida final
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [carroceria por rede de curvas](2026-10-24-carroceria-por-rede-de-curvas.md)
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [carroceria por rede de curvas](encerrados/2026-10-24-carroceria-por-rede-de-curvas.md)
 
 ## Problema observado
 
@@ -67,4 +67,4 @@ O risco maior é uma regra sumir na mudança e voltar a falhar em silêncio; o i
 
 ## Andamento
 
-Escrito em 2026-10-22 a partir dos inventários de leitura e de código, sem implementação.
+Escrito em 2026-10-22 a partir dos inventários de leitura e de código, sem implementação. Ativado em 2026-10-25, depois do fechamento do plano da rede de curvas.

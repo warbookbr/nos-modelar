@@ -158,6 +158,6 @@ O diagnóstico de parâmetros (`npm run parametros`) compara, além da caixa e d
 
 A peça vai à pessoa com `npm run descrever -- <peça>` sem achado, `conferir-pontos` dentro da tolerância, `conferir-malha` com a topologia aprovada, `npm run guarda:acervo` aprovando a peça, as seis vistas de `vistas-da-receita.mjs` e as de `vistas-texturizadas.mjs`, as vistas da bancada (isométrica, frontal, lateral direita, superior e traseira), a saída de `npm run ondulacao -- <peça>` com cada falha corrigida ou explicada, a de `npm run alisar -- <receita.js>` sem edição que tire falha dentro do erro de leitura, e um teste ao lado da receita que confere o endereçamento só por nome, as cotas como vértices da malha, a distância da superfície à forma desenhada, o sólido fechado com o volume a 2% da área vezes a espessura e a gaiola recalculada quando a `TABELA` muda. As imagens de trabalho ficam em `tmp/`, fora do controle de versão.
 
-## O que o trecho cego mediu
+## Nível oficial de carroceria
 
-A preencher pelo orquestrador.
+O nível oficial de carroceria é a lataria lisa com os detalhes de borda como peças à parte: a chapa contínua sai da gaiola por estações ou da rede de curvas, e a moldura, a calha, o lábio e a aba saem como `friso` sobre a curva ou a linha nomeada, com o perfil lido no corte. Nos testes cegos medidos até 2026-10-25, esse nível chegou à forma geral a 1,3 a 2,3 mm e à nota 7 do crítico no trecho inteiro, e os detalhes finos de borda ficaram em 5 na região deles, sem chegar a 7 com mais rodadas. A pessoa decidiu esse nível no fechamento do plano da [carroceria por rede de curvas](planos/encerrados/2026-10-24-carroceria-por-rede-de-curvas.md); um detalhe fino de borda que precise passar disso pede plano.
