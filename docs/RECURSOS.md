@@ -23,7 +23,7 @@ usados estão:
 npm test
 npm run typecheck
 npm run build
-npm run criar -- _viga
+npm run descrever -- balcao-liso
 npm run bancada -- freio-disco --vistas=isometrica
 npm run mapa
 npm run mapa:check
@@ -31,14 +31,14 @@ npm run docs:links:check
 ```
 
 Para a lista completa, use `npm run` ou leia os scripts do `package.json`; não
-há mais comandos `oficina`, `servir`, `guardar:salvar` ou `jogar`.
+há mais comandos `oficina`, `servir`, `guardar:salvar`, `jogar`, `criar`, `executar`, `gabarito` ou `peca`.
 
 ## Contratos
 
 - [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](./mecanifica/FLUXO-MODELAGEM-IA.md):
   contrato v4 de autoria e revisão.
 - [`docs/nos-herdado/oficina-contrato.md`](./nos-herdado/oficina-contrato.md): vocabulário procedural
-  preservado para `npm run criar`.
+  herdado do NÓS.
 - [`docs/nos-herdado/oficina-referencia.md`](./nos-herdado/oficina-referencia.md): aviso de
   compatibilidade da interface removida.
 

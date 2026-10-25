@@ -115,8 +115,8 @@ prancha.
 Foto de produto de terceiro nunca entra no repositório; entra a prancha
 desenhada com `desenhar-prancha` ou as coordenadas derivadas dela.
 
-`npm run peca` e `porteiro` permanecem diagnósticos do visor legado; não
-substituem a descrição nem as vistas da bancada.
+`porteiro` permanece diagnóstico da bancada; não substitui a descrição nem as
+vistas da bancada.
 
 O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto)
 mora em [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md).

@@ -148,9 +148,8 @@ peça isolada e não inventa validade global de uma montagem.
    npm run malha:conferir -- <peca>
    ```
 
-   `porteiro`, `npm run peca` e `npm run criar` ainda podem ajudar a diagnosticar
-   o visor v3, mas são compatibilidade legada, não publicação nem o gate visual
-   oficial da Mecanifica, e não fazem parte da auditoria.
+   `porteiro` ajuda a diagnosticar a bancada, mas não é publicação nem o gate
+   visual oficial da Mecanifica, e não faz parte da auditoria.
 
 ## O que não é requisito
 

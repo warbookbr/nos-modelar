@@ -3,12 +3,9 @@
 ```
 tools/
   bancadas/    As BANCADAS — prova por medição (Playwright headless / Node, offline):
-               olhar-peca.mjs — screenshot de PEÇA em 3 ângulos / giro / visão de
-                                geometria --geo=normais|flat (npm run peca)
                porteiro.mjs   — gate de render: pageerror/__ready/frame degenerado
                                 (npm run porteiro)
-               executar.mjs   — replay headless do núcleo procedural em Node (npm run executar)
-               bench/         — gabarito de silhueta e estatísticas PNG usados pelas bancadas
+               bench/         — estatísticas PNG usadas pelas bancadas
                out/           — PNGs/saídas (gitignorado; evidência regenerável)
   blender/     Ferramentas opcionais do Blender, fora do núcleo, do CI e do --completo:
                regua.py, pacote-cego.py, olhar-candidata.py e oraculo-subdivisao.mjs

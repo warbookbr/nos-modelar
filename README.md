@@ -93,7 +93,7 @@ npm ci
 npm run dev
 npm run build
 npm test
-npm run criar -- <nome-da-peca>
+npm run descrever -- <nome-da-peca>
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 

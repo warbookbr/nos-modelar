@@ -191,7 +191,7 @@ describe('SKILL criar-peca x núcleo — operações que publicam origem', () =>
   it('declara a bancada como laço visual oficial e rebaixa o render herdado a diagnóstico', () => {
     expect(texto).toMatch(/laço oficial/i);
     expect(texto).toMatch(/npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior/);
-    expect(texto).toMatch(/`npm run peca` e `porteiro` permanecem[\s\S]{0,100}diagnóstico/i);
+    expect(texto).toMatch(/`porteiro` permanece diagnóstico/i);
   });
 });
 

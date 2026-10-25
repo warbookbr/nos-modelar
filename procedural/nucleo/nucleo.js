@@ -2879,9 +2879,8 @@ function expandirConcordancias(st, i, op, pontosBrutos, { fechado, segmentosCurv
 
 /* exportado (P7 do playground, D-120): o MANIFESTO de capacidades da Oficina
    sai daqui — `Object.keys(OPS)` é a lista de ops IMPLEMENTADAS de verdade,
-   nunca precisa ser copiada à mão num doc que pode desatualizar. A bancada
-   `criar.mjs` cruza isso contra a tabela da skill `criar-peca` e avisa se
-   divergir (op no núcleo sem doc, ou doc citando op que não existe mais). */
+   nunca precisa ser copiada à mão num doc que pode desatualizar; o catálogo
+   gerado e o teste da skill `criar-peca` a leem daqui. */
 const operacoesPrimitivasBasicas = criarOperacoesPrimitivasBasicas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem });
 
 const operacoesPrimitivasSuperficie = criarOperacoesPrimitivasSuperficie({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem, norm3, normalDaFace });

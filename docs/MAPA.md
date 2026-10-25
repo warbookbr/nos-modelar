@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1523 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1478 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -875,8 +875,7 @@
 
 ## procedural/
 
-- `README.md` — v3 — núcleo procedural, peças e visor
-- `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
+- `README.md` — procedural — núcleo, receitas, famílias e extensões
 
 ## procedural/criterios/
 
@@ -1033,7 +1032,6 @@
 - `gaiola-por-rede-prova.test.mjs` — gaiola-por-rede-prova.test.mjs — o gate da fatia 2 do plano da carroceria por rede de curvas: a chapa lateral de 1000 × 600 mm
 - `gaiola-por-rede.js` — gaiola-por-rede.js — monta a gaiola da operação `subdivisao` a partir de uma rede de curvas nomeadas e dos retalhos que elas fecham
 - `gaiola-por-rede.test.mjs` — gaiola-por-rede.test.mjs — o ajudante que monta a gaiola da subdivisão por uma rede de curvas nomeadas e os retalhos que elas fecham
-- `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
@@ -1044,7 +1042,6 @@
 - `liso-por-angulo.test.js` — liso-por-angulo.test.js — o valor gravado e a média filtrada por ângulo.
 - `loft-aresta.test.js` — loft-aresta.test.js — a ponta do loft fecha numa linha, com malha fechada e sem leque nem triângulo dobrado.
 - `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
-- `mat4.js` — mat4 mínimo do motor v3 (D-55) — colunas-major, como o WebGL espera
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
@@ -1058,14 +1055,12 @@
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `registro.js` — registro.js — configuração explícita, determinística e sem estado global de operações.
 - `registro.test.mjs` — registro-operacoes.test.mjs — prova configuração explícita e despacho determinístico da R02.
-- `render.js` — O VISOR do motor v3 (D-55) — o ambiente PADRÃO onde toda peça é criada e auditada: framebuffer fixo (?res) com upscale NEAREST (pixel art, custo independente…
 - `selecao-geometrica.js` — selecao-geometrica.js — o seletor `onde` de `sel`: face ou aresta por propriedade geométrica.
 - `selecao-geometrica.test.mjs` — selecao-geometrica.test.mjs — `sel.onde`: face e aresta por propriedade geométrica, sem identificador numérico. As expectativas vêm de contas sobre as coorde…
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
-- `tex.js` — helpers de TEXTURA do motor v3 (D-55) — paleta Resurrect64, ruído, dither e o gerador de canvas. Uma peça pode devolver índice da paleta OU [r,g,b] direto (m…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
 
@@ -1814,30 +1809,18 @@
 ## tools/bancadas/
 
 - `avisos-de-terceiros.mjs` — avisos-de-terceiros.mjs — o pacote da bancada leva o texto das licenças das bibliotecas que empacota.
-- `criar-aliases.test.mjs` — criar-aliases.test.mjs — impede que a bancada criar volte a diagnosticar como órfã uma peça válida por esquecer o sexto campo do envelope: ALIASES.
-- `criar.mjs` — criar.mjs — P7 do playground (D-120): A CAMADA IA, laço único.
-- `estado-peca.mjs` — estado-peca.mjs — executa o envelope completo de uma peça procedural para que bancadas distintas não percam MATERIAIS, ESQUELETO ou ALIASES.
-- `executar.mjs` — executar.mjs — a bancada do REPLAY da OFICINA (passo 1), sem browser. Roda a lista de PASSOS de uma peça, serializa a lista, re-parseia e re-executa, e afirm…
-- `gabarito-selecao-lib.mjs` — gabarito-selecao-lib.mjs — regras puras da Prova Zero: compara o acervo atual ao gabarito gravado e permite declarar SOMENTE peças novas nomeadas.
-- `gabarito-selecao-lib.test.mjs` — gabarito-selecao-lib.test.mjs — protege a exceção estreita para peça nova: `--novas` aceita presença nova, mas nunca esconde hash, remoção ou erro de nome.
-- `gabarito.mjs` — gabarito.mjs — P5 do playground (D-118): FORMA COMO NÚMERO. Mede a silhueta RENDERIZADA de uma peça contra um CONTORNO de referência (o gabarito, desenhado à…
 - `harness-entry.js` — harness-entry.js — catálogo privado dos gates visuais. Este módulo só é carregado por harness.html; não participa da entrada publicada da bancada. /
 - `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
-- `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
 - `sem-sessao-no-pacote.mjs` — sem-sessao-no-pacote.mjs — a sessão ativa não vai para `dist/`.
 - `sem-sessao-no-pacote.test.mjs` — sem-sessao-no-pacote.test.mjs — o pacote sai sem a sessão de quem construiu.
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
 - `versao-publicada.mjs` — versao-publicada.mjs — de qual commit veio a página que está aberta.
 - `versao-publicada.test.mjs` — versao-publicada.test.mjs — prova que a versão na tela diz a verdade sobre a construção, inclusive quando não há git, não há commit ou a árvore está suja.
-- `visor-imports.test.mjs` — Prova a resolução de imports bare no visor legado servido sem transformação.
 
 ## tools/bancadas/bench/
 
-- `gabarito-nucleo.mjs` — gabarito-nucleo.mjs — P5 do playground (docs/nos-herdado/playground.md): FORMA COMO NÚMERO. Lógica PURA (sem Playwright/browser — unit-testável) por trás da …
-- `gabarito-nucleo.test.ts` — Vitest do NÚCLEO PURO da bancada de gabarito (P5 do playground, D-118): máscara por diferença de fundo (+ o corte do HUD), filtro de componente pequeno (o pi…
 - `pngstats.mjs` — pngstats.mjs — decodifica um PNG (8-bit, colortype 2/6) via zlib. Sem dependência externa. `decodePng` devolve os pixels CRUS (usado pelo porteiro via `pngSt…
-- `pngwrite.mjs` — pngwrite.mjs — codifica um buffer RGB em PNG (8-bit, colortype 2), sem dependência externa (par do decodePng em pngstats.mjs). Usado pela bancada de gabarito…
 
 ## tools/bancadas/fixtures/
 
@@ -1913,17 +1896,6 @@
 - `materializar-catalogo.mjs` — Materializa o conjunto do eixo como catálogo MCP descartável, na pasta passada como argumento. O destino é obrigatório: gravar dentro do repositório por omis…
 - `suporte-de-eixo.js` — suporte-de-eixo.js — suporte com alojamento, piloto e assento anular, do conjunto de prova descrito em `eixo-guia.js`.
 
-## tools/fixtures/dobradica-com-extensao/
-
-- `carregar-estudo.mjs` — Fixture de teste: uma dobradiça de três receitas compostas que usa a extensão `prisma-triangular`. Quem a usa é `tools/oficina/ensaio-ponta-a-ponta-dobradica…
-- `composicoes.js` — Subgrafos privados e paramétricos do ensaio 1.0.
-
-## tools/fixtures/dobradica-com-extensao/receitas/
-
-- `folha-batente.js` — Receita privada: folha do batente com dois olhais.
-- `folha-porta.js` — Receita privada: folha da porta com olhal central.
-- `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
-
 ## tools/fixtures/familia-chamavel/
 
 - `composicoes.js` — Fixture de teste: as duas composições da família `tubo-de-prova`, uma barra maciça e um tubo de parede. Quem a usa é `procedural/familias/familias.test.js` e…
@@ -1980,27 +1952,6 @@
 ## tools/fixtures/forma-do-esboco/viga-reta/
 
 - `receita.js` — A viga sem a inclinação de 30 graus do esboço.
-
-## tools/fixtures/montagem-com-instancias-repetidas/
-
-- `carregar-estudo.mjs` — Fixture de teste: uma montagem de doze peças com uma submontagem de roda instanciada quatro vezes. Quem a usa é `tools/oficina/sonda-supercarro-1-0.test.mjs`…
-- `composicoes.js` — Bloco privado reutilizável: volume facetado com identidade e aparência.
-- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
-
-## tools/fixtures/montagem-com-instancias-repetidas/receitas/
-
-- `aerodinamica.js` — Subconjunto externo com identidades separadas de splitter, difusor e asa.
-- `aro.js` — Aro com anel e oito raios, uma definição reutilizada em quatro posições.
-- `cabine.js` — Canópia contínua por loft, separável da carroceria e de baixo perfil.
-- `carroceria.js` — Envelope principal por seções: x=largura, y=altura, z=frente positiva.
-- `disco-freio.js` — Disco visível sem prometer sistema de freio interno funcional.
-- `entrada-frontal.js` — Entrada de ar frontal compartilhada; volume visual, não duto funcional.
-- `espelho.js` — Espelho externo facetado da sonda privada de supercarro.
-- `farol.js` — Farol emissivo dianteiro da sonda privada de supercarro.
-- `lanterna.js` — Lanterna emissiva traseira da sonda privada de supercarro.
-- `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
-- `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
-- `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
 
 ## tools/fixtures/nivel-zero/
 
@@ -2061,17 +2012,6 @@
 ## tools/fixtures/tres-blocos-vinculados/receitas/
 
 - `bloco.js` — bloco.js — o bloco da fixture neutra "três blocos vinculados", nas três variações que ela usa: só pino, furo e pino, e só furo. Um arquivo só gera as três, p…
-
-## tools/fixtures/tres-familias-com-extensao/
-
-- `carregar-estudo.mjs` — Fixture de teste: três famílias de peça numa montagem, uma delas feita com a extensão `prisma-triangular`. Quem a usa é `tools/oficina/plataforma-procedural-…
-- `composicoes.js` — Subgrafos privados do estudo R10. Não entram no catálogo de peças.
-
-## tools/fixtures/tres-familias-com-extensao/receitas/
-
-- `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
-- `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
-- `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
 
 ## tools/mapa/
 
@@ -2453,11 +2393,8 @@
 - `busca-vazia-diz-por-que.test.mjs` — Busca que volta vazia diz por quê.
 - `chao-do-ciclo6.test.ts` — chao-do-ciclo6.test.ts — caso vermelho da quinta propriedade: um triângulo emitido pode ter área zero mesmo com núcleo, adaptador e casca saudáveis.
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
-- `ensaio-ponta-a-ponta-dobradica.test.mjs` — Primeira sonda 1.0: autoria, composição, exportação, montagem e revisão.
 - `furo-ordens-de-ponte.test.ts` — furo-ordens-de-ponte.test.ts — as promessas do A-30 que a geometria sozinha não mostra.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
-- `plataforma-procedural-campo-r10.test.mjs` — Campo R10: três famílias, composição, extensão, montagem e duas vistas por alvo.
-- `sonda-supercarro-1-0.test.mjs` — Sonda de escala 1.0: sistema exterior ficcional, privado e recursivo.
 
 ## tools/testes/
 

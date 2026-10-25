@@ -91,10 +91,7 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/vinco-na-imagem.test.mjs',
   'tools/mecanifica/vincos-da-rede.test.mjs',
   'tools/mecanifica/vincos-das-linhas.test.mjs',
-  'tools/oficina/ensaio-ponta-a-ponta-dobradica.test.mjs',
   'tools/oficina/oficina.test.ts',
-  'tools/oficina/plataforma-procedural-campo-r10.test.mjs',
-  'tools/oficina/sonda-supercarro-1-0.test.mjs',
 ];
 
 /* O ORÇAMENTO DE TEMPO DOS RÁPIDOS.
