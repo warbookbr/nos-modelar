@@ -819,6 +819,23 @@ cai de 0,59 a 0,48 mm e sai `alisavel: false`. A entrega de carroceria não
 deixa falha de ondulação que o alisamento consiga tirar dentro do erro de
 leitura dos cortes.
 
+Na gaiola por rede de curvas (`gaiolaPorRede`), o alisamento edita as
+coordenadas dos pontos-chave de curvas e dos nós dados por coordenada: a rede
+publica `origens` (ponto-chave, ponto de arco com a curva, a fração e os
+pontos-chave que o cercam, nó em curva, ponto de retalho), `entradas`
+(`cintura[3].y`, `no:cL.y`, em metro), `estrutura` e `fixacao`, e cada edição
+sai com `onde` (a curva e o ponto-chave, ou o nó, e o eixo). As medidas são os
+pontos das curvas; o ponto de dentro de um retalho segue o preenchimento e não é
+medida. A ferramenta fixa as divisões de cada arco e a posição dos pontos nele
+(a rede as refaz a cada milímetro movido e desliza os pontos com a curvatura) e
+confere no fim sem fixar: `malhaNova` diz se a rede refez a divisão de algum
+arco e quantas falhas a malha nova tem. Numa chapa desenhada por código (19
+curvas, 10 retalhos, 264 números), com erro de 1,5 mm em nove pontos-chave, as
+seis falhas (até 0,65 mm) saem editando 122 números de no máximo 1,8 mm, com os
+240 pontos medidos a até 1,27 mm; com a cintura e a coluna sem o vinco que a
+forma dobra, e a tolerância de 1 mm, sai `alisavel: false` com duas falhas, de
+0,44 e 0,35 mm.
+
 Quando os vincos vêm das linhas 3D de um pacote (`ler-linhas --3d`, que confere
 cada linha contra os cortes do pacote e põe a que atravessa um corte longe do
 contorno dele em `recusadas_pelos_cortes`, fora de `polilinhas_3d`), rode
@@ -849,6 +866,20 @@ A aresta de uma face só, na borda da peça ou na de um vão, é borda e a chapa
 termina ali: o trecho sai como `borda` (em `bordas`, com `emBorda` quando só
 parte dele é borda) e nenhum vinco se sugere nela. A função `vincosDasLinhas`,
 do mesmo arquivo, faz o mesmo num teste.
+
+Na gaiola por rede de curvas a ferramenta lê as curvas da rede que a receita
+monta ao ser lida, no lugar de colunas e estações: a linha sai com `acompanha: {
+curva, de, ate }` (os nós), o vinco sai na curva (`{ nome, curva, vinco }` em
+`vincos` e `vincosNaRede`, porque o vinco da rede é da curva inteira) com a
+nitidez medida na rede refeita com o vinco na curva, o trecho de parte da curva
+sai com `parcial: true` e os nós, e o canto só se declara num nó. O trecho que
+nenhuma curva acompanha sai em `faltantes` com a curva nova (`pontos`, `nos` em
+`{ curva, fracao }`, as curvas das pontas em `entre`, os `retalhos` que ela
+atravessa e, para cada um, os dois em que ele se parte, com os lados na sintaxe
+de `borda`); `verificada` diz se a rede monta com ela, e `monta: false` traz o
+erro, em geral divisões que pedem `divisoes` nos retalhos em volta.
+`--passo-da-curva-mm` (60) e `--fundir-mm` (10) ajustam os pontos-chave e o
+reaproveitamento de nó.
 
 ### Rede de curvas e retalhos: `gaiolaPorRede`
 

@@ -43,7 +43,7 @@ describe('alisamento da chapa por rede de curvas', () => {
     if (r.status !== 0) throw new Error(`a linha de comando falhou: ${r.stderr}`);
     cli = JSON.parse(r.stdout);
     const d = receitaDeProva({ dobra: true });
-    relatorioDobra = alisarReceita({ receita: d.receita, tabela: d.TABELA });
+    relatorioDobra = alisarReceita({ receita: d.receita, tabela: d.TABELA }, { toleranciaMm: 1 });
   }, 900000);
 
   it('a ondulação plantada passa do limiar, em calombos das três ligações, e a origem dos pontos vem da rede', () => {
@@ -129,12 +129,17 @@ describe('alisamento da chapa por rede de curvas', () => {
   it('a forma com uma dobra real e sem vinco declarado sai como não alisável dentro da tolerância, com as falhas que sobram', () => {
     expect(relatorioDobra.antes.falhas).toBeGreaterThan(0);
     expect(relatorioDobra.alisavel).toBe(false);
-    expect(relatorioDobra.motivo).toMatch(/^não alisável dentro da tolerância de 2 mm.*vinco ou estação nova/);
+    expect(relatorioDobra.motivo).toMatch(/^não alisável dentro da tolerância de 1 mm.*vinco ou estação nova/);
     expect(relatorioDobra.depois.falhas).toBeGreaterThan(0);
     expect(relatorioDobra.sobram.length).toBe(relatorioDobra.depois.falhas);
     const maior = relatorioDobra.sobram[0];
     expect(maior.impedem.length).toBeGreaterThan(0);
-    for (const m of maior.impedem) { expect(m.distanciaMm).toBeGreaterThanOrEqual(0.85 * m.limiteMm); expect(m.limiteMm).toBeCloseTo(2, 5); }
+    for (const m of maior.impedem) { expect(m.distanciaMm).toBeGreaterThanOrEqual(0.85 * m.limiteMm); expect(m.limiteMm).toBeCloseTo(1, 5); }
+    expect(relatorioDobra.medidas.depois.maximoMm).toBeLessThanOrEqual(1.05);
+    /* a rede refez a divisão de alguns arcos com as edições, e a malha nova, lida sem fixar nada, mantém as falhas */
+    expect(relatorioDobra.malhaNova.malhaIgual).toBe(false);
+    expect(relatorioDobra.malhaNova.arcosComOutraDivisao).toBeGreaterThan(0);
+    expect(relatorioDobra.malhaNova.falhas).toBeGreaterThan(0);
     /* a falha está junto da dobra: a cintura ou a coluna */
     expect(maior.pontos.some((p) => /^(cintura|colunaB|coluna|baixo|ponta|ligL2|atrasDaColuna)/.test(p))).toBe(true);
   });

@@ -60,7 +60,9 @@
  *
  * A ORIGEM. Quando a gaiola saiu de `gaiolaPorEstacoes`, cada ponto citado traz `origem`: a entrada declarada (estação e coluna),
  * a coluna amostrada numa curva de seção (curva e fração) ou a estação gerada pela interpolação (as chaves que a cercam, a fração
- * e os nós), que é o que diz se o ponto se edita ou sai de outros. Falha de mais de três espaçamentos se resolve com
+ * e os nós), que é o que diz se o ponto se edita ou sai de outros. Quando saiu de `gaiolaPorRede`, a origem é o ponto-chave declarado
+ * (o nó dado por coordenada), o ponto de dentro de um arco de curva (a curva, a fração do comprimento e os dois pontos-chave que o cercam)
+ * ou o ponto de dentro de um retalho (as curvas da borda dele). Falha de mais de três espaçamentos se resolve com
  * `npm run alisar`, que usa `devolverOperador`: a linha do operador linear do desvio de cada vértice (o desvio é a normal vezes o
  * vértice menos a soma dos pesos vezes a vizinhança, dividida pela inclinação do ajuste), com os pesos robustos e o referencial fixos.
  *

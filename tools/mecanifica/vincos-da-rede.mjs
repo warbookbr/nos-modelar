@@ -236,7 +236,8 @@ export function sugerirCurvaNova({ rede, declarados, posicoes, amostras, nome, r
   const nos = {};
   const nosDaRede = (curva) => rede.curvas[curva].nosPontos.map((nm, k) => ({ id: rede.curvas[curva].nos[k], nome: nm }));
   const noNaCurva = (achado, nomeNovo) => {
-    for (const { id, nome: nm } of nosDaRede(achado.curva)) if (dist(achado.ponto, P(nm)) * MM <= o.fundirMm) return { nome: id, existente: true, ponto: P(nm), curva: achado.curva };
+    /* o nó anônimo (a ponta de curva escrita em coordenada, `^`) e o que uma fração criou (`@`) não têm nome que a receita cite */
+    for (const { id, nome: nm } of nosDaRede(achado.curva)) if (!/[@^]/.test(id) && dist(achado.ponto, P(nm)) * MM <= o.fundirMm) return { nome: id, existente: true, ponto: P(nm), curva: achado.curva };
     nos[nomeNovo] = { curva: achado.curva, fracao: arred(achado.fracao - (rede.curvas[achado.curva].fechada ? Math.floor(achado.fracao) : 0), 4) };
     return { nome: nomeNovo, existente: false, ponto: achado.ponto, curva: achado.curva };
   };

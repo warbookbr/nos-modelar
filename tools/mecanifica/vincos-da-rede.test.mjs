@@ -110,6 +110,18 @@ describe('vincos das linhas 3D sobre a rede de curvas', () => {
     expect(trechos(declarada, 0)[0].jaDeclarado).toEqual(['cintura']);
   });
 
+  it('a linha que acompanha só um trecho da curva, de nó a nó, sai com os nós e o aviso de que a curva precisa ser partida', () => {
+    const trecho = reta(150, 250, 470, 250, 80);
+    const p = vincosDasLinhas(receita, { polilinhas_3d: [{ pontos_mm: trecho, angulo_graus: 10 }] }).superficies[0];
+    expect(trechos(p, 0)[0].acompanha).toEqual({ curva: 'cintura', de: 'cL', ate: 'cR' });
+    const [v] = p.vincos;
+    expect(v).toMatchObject({ curva: 'cintura', parcial: true, de: 'cL', ate: 'cR' });
+    expect(v.texto).toMatch(/parta a curva nesses nós/);
+    expect(v.nitidezPorque).toMatch(/só um trecho da curva/);
+    expect(v.comVinco.diedroGraus).toBeNull();
+    expect(p.vincosNaRede).toEqual([{ nome: v.nome, curva: 'cintura', vinco: v.vinco, parcial: true, de: 'cL', ate: 'cR' }]);
+  }, 120000);
+
   it('a linha que nenhuma curva acompanha sai faltante, com a curva nova entre as ligações e o retalho que ela parte em dois', () => {
     const [t] = trechos(s, 1);
     expect(trechos(s, 1)).toHaveLength(1);

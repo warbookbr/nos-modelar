@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* vincos-das-linhas.mjs — casa as linhas 3D lidas do pacote cego com as colunas e as estações nomeadas da gaiola de uma
- * receita de subdivisão, e devolve a declaração de vinco de cada linha, em nomes, e onde falta coluna.
+ * receita de subdivisão (ou com as curvas da rede, se a gaiola sai de `gaiolaPorRede`), e devolve a declaração de vinco de cada
+ * linha, em nomes, e onde falta coluna ou curva.
  *
  * POR QUE ELE EXISTE. `ler-linhas --3d` dá os vincos da referência como polilinhas em milímetro, mas a receita declara o
  * vinco por pontos nomeados da gaiola. Sem esta ferramenta o modelador escolhia a coluna do vinco a olho, e a linha que
@@ -33,10 +34,21 @@
  * trecho ao vinco na superfície limite nova, a cobertura de cada linha a até `coberturaMm` e o diedro na malha ao longo
  * de cada vinco.
  *
+ * A REDE DE CURVAS. Quando a receita monta a gaiola com `gaiolaPorRede` ao ser lida (o `capturarGaiolas` de `gaiola-captura.js` a capta),
+ * as cadeias são as curvas da rede (`vincos-da-rede.mjs`), e a saída muda assim. O trecho acompanhado diz a curva e os nós entre os quais
+ * ela o acompanha (`acompanha: { curva, de, ate }`). O vinco sai na curva, `{ nome, curva, vinco }` em `vincos` e em `vincosNaRede`, porque o
+ * vinco da rede é da curva inteira, com a nitidez medida na rede refeita com o vinco na curva (o alisamento do miolo deixa de passar por
+ * ela); o trecho que cobre só parte da curva sai com `parcial: true` e os nós, e pede a curva partida neles. O canto só se declara num nó,
+ * e fora de um nó sai em `cantosSemChave` com a posição. O trecho que nenhuma curva acompanha sai em `faltantes` com a curva nova a declarar:
+ * os pontos-chave, os nós nas curvas que ela encontra (`{ curva, fracao }`), os retalhos que ela atravessa e, para cada um, os dois retalhos
+ * em que ele se parte, com a lista de lados na sintaxe de `borda`. `verificada` diz se a rede monta com a sugestão: `monta: false` traz o
+ * erro da rede, em geral um sistema de divisões que pede `divisoes` nos retalhos em volta. A receita cuja rede é montada ao importar o
+ * módulo, e não ao ser lida, não se refaz, e a ferramenta devolve a sugestão sem a verificação.
+ *
  * Mesma receita e mesmas linhas, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa.
  *
  *   node tools/mecanifica/vincos-das-linhas.mjs <peça> --linhas=<linhas.json> [--limiar-mm=5] [--passo-mm=2]
- *       [--alinhamento-graus=30] [--minimo-mm=15] [--cobertura-mm=2]
+ *       [--alinhamento-graus=30] [--minimo-mm=15] [--cobertura-mm=2] [--passo-da-curva-mm=60] [--fundir-mm=10]
  */
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -806,7 +818,11 @@ export function vincosDoPasso(entrada, i, linhas, opcoes = {}, contexto = {}) {
     }
     if (!comVincos) {
       comVincos = { aceitos: true, ...(cantosNovos.length ? { cantos: cantosNovos } : {}) };
-      vincos.forEach((v, k) => { v.comVinco = { ...aval.porVinco[k].resumo, ...(v.semCantos ? { semCantosDistanciaMm: v.semCantos } : {}) }; });
+      vincos.forEach((v, k) => {
+        v.comVinco = { ...aval.porVinco[k].resumo, ...(v.semCantos ? { semCantosDistanciaMm: v.semCantos } : {}) };
+        /* o vinco do trecho de uma curva só vale com a curva partida nos nós, e a rede lida com ele não dobra: a dobra não se mede */
+        if (REDE && !v.toda) v.comVinco = { distanciaMm: v.comVinco.distanciaMm, diedroGraus: null, diedroNaoMedido: 'o vinco da rede é da curva inteira; com a curva partida nos nós a dobra do trecho se mede' };
+      });
       for (const [p, x] of aval.coberturas) p.cobertura = x;
     }
   }
@@ -915,7 +931,7 @@ function lerOpcoes(args) {
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/mecanifica/vincos-das-linhas.mjs <peça> --linhas=<linhas.json> [--limiar-mm=5] [--passo-mm=2] [--alinhamento-graus=30] [--minimo-mm=15] [--cobertura-mm=2]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: node tools/mecanifica/vincos-das-linhas.mjs <peça> --linhas=<linhas.json> [--limiar-mm=5] [--passo-mm=2] [--alinhamento-graus=30] [--minimo-mm=15] [--cobertura-mm=2] [--passo-da-curva-mm=60] [--fundir-mm=10]\n'); return 2; }
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) { process.stderr.write(`vincos-das-linhas: não achei a receita '${alvo}'.\n`); return 2; }
   const { o, linhas } = lerOpcoes(resto);

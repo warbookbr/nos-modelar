@@ -16,6 +16,17 @@
  * ponto vem (`origens`), quais entradas existem (`entradas`) e um resumo do que não é entrada (`estrutura`), e é isso que separa o
  * número editável do estrutural, sem a ferramenta conhecer a receita.
  *
+ * A REDE DE CURVAS. A gaiola de `gaiolaPorRede` publica o mesmo (`origens`, `entradas`, `estrutura`): os valores editáveis são as coordenadas
+ * dos pontos-chave escritos em coordenada numa curva ('cintura[3].y') e dos nós dados por coordenada ('no:cL.y'), e cada edição sai com `onde`,
+ * a curva e o ponto-chave (ou o nó) e o eixo. O ponto de dentro de um arco e o de dentro de um retalho saem das curvas e não são entrada nem
+ * medida: as medidas são os pontos das curvas (exatos, ou com o peso da leitura), que a edição não afasta mais que a tolerância. A rede
+ * decide as divisões de cada arco pelo comprimento dele e espaça os pontos pela curvatura, de modo que um décimo de milímetro pode dar outra
+ * divisão e alguns milímetros deslizam os pontos ao longo da curva; por isso a ferramenta fixa, enquanto sonda e confere, as divisões e a
+ * posição de cada ponto no arco que a receita tem ao começar (`comDivisoesFixas`, de `gaiola-captura.js`), e a malha é a mesma antes e depois
+ * de mexer. No fim ela roda a receita com as edições sem fixar nada, que é o que a pessoa vai ter: se a rede refez a divisão de algum arco,
+ * `malhaNova` diz quantos e quantas falhas a malha nova tem, e `alisavel` só vale se ela não tem. Os pontos de dentro de um retalho não são
+ * medidas porque seguem o preenchimento das curvas, que a edição move junto.
+ *
  * O MODELO LINEAR. A superfície entregue é linear na gaiola declarada: a gaiola ajustada pelas medidas é a declarada vezes um
  * operador fixo (`operadorDasMedidas`, o mesmo sistema do passo, com a fatoração feita uma vez), e cada vértice da malha é o
  * ponto limite da gaiola ajustada, com os pesos tirados do próprio núcleo, três pontos por vez, em grupos de pontos distantes
@@ -591,7 +602,7 @@ function conferirSemFixar({ receita, raizes, acumulado, fixas, leituraDaGaiola, 
     if (!arcos) return { malhaIgual: true };
     const sup = superficiesDaReceita(receita)[o.passo];
     const ond = ondulacaoDaSuperficie(sup, opcoesDeOndulacao(o));
-    return { malhaIgual: false, arcosComOutraDivisao: arcos, vertices: sup.calculados.length, falhas: ond.falhas.length, maiorAmplitudeMm: ond.falhas.length ? Math.max(...ond.falhas.map((f) => f.amplitudeMm)) : 0 };
+    return { malhaIgual: false, arcosComOutraDivisao: arcos, falhas: ond.falhas.length, maiorAmplitudeMm: ond.falhas.length ? Math.max(...ond.falhas.map((f) => f.amplitudeMm)) : 0 };
   } finally {
     alvos.forEach((a, k) => pr(a, antes[k]));
   }

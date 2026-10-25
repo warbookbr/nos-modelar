@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1624 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1630 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1090,6 +1090,7 @@
 - `gaiola-aneis-gota.test.mjs` — gaiola-aneis-gota.test.mjs — os anéis de gaiola no vão real de uma carroceria: a gota estreita, o recuo por lado e a abertura que é a própria borda
 - `gaiola-aneis.js` — gaiola-aneis.js — anéis de gaiola em volta de um vão, opção da gaiola por estações
 - `gaiola-aneis.test.mjs` — gaiola-aneis.test.mjs — os anéis de gaiola em volta de um vão e de um arco, na chapa curva desenhada por código
+- `gaiola-captura.js` — gaiola-captura.js — a captura das gaiolas montadas durante uma chamada
 - `gaiola-interpolada.js` — gaiola-interpolada.js — estações interpoladas e colunas por curva de seção, opções da gaiola por estações
 - `gaiola-interpolada.test.mjs` — gaiola-interpolada.test.mjs — as opções `interpolar` e `curvas` da gaiola por estações: a interpolação monótona das colunas entre estações-chave reproduz uma…
 - `gaiola-leitura.test.mjs` — gaiola-leitura.test.mjs — a leitura de imagem declarada na gaiola por estações e o peso padrão do passo `subdivisao` (fatia 2 do plano da gaiola que segue as…
@@ -1099,6 +1100,7 @@
 - `gaiola-por-estacoes.test.mjs` — gaiola-por-estacoes.test.mjs — o ajudante que monta a gaiola da subdivisão por estações e colunas nomeadas: faces, transições de três e cinco lados, vãos, vi…
 - `gaiola-por-rede-contato.test.mjs` — gaiola-por-rede-contato.test.mjs — o contato declarado da moldura de 10 mm com a chapa por rede de curvas
 - `gaiola-por-rede-liso.js` — gaiola-por-rede-liso.js — o miolo dos retalhos alisado pela normal, para a tangente não quebrar nas curvas compartilhadas
+- `gaiola-por-rede-origem.test.mjs` — gaiola-por-rede-origem.test.mjs — a gaiola por rede de curvas publica de onde vem cada ponto, as entradas editáveis e a estrutura.
 - `gaiola-por-rede-prova.test.mjs` — gaiola-por-rede-prova.test.mjs — o gate da fatia 2 do plano da carroceria por rede de curvas: a chapa lateral de 1000 × 600 mm
 - `gaiola-por-rede.js` — gaiola-por-rede.js — monta a gaiola da operação `subdivisao` a partir de uma rede de curvas nomeadas e dos retalhos que elas fecham
 - `gaiola-por-rede.test.mjs` — gaiola-por-rede.test.mjs — o ajudante que monta a gaiola da subdivisão por uma rede de curvas nomeadas e os retalhos que elas fecham
@@ -2233,6 +2235,7 @@
 - `alisar-a-superficie.mjs` — alisar-a-superficie.mjs — calcula de uma vez quanto mover cada valor editável de uma receita para tirar as falhas de ondulação da superfície de subdivisão se…
 - `alisar-a-superficie.test.mjs` — alisar-a-superficie.test.mjs — a ferramenta de alisamento sobre chapas desenhadas por código.
 - `alisar-numerico.mjs` — alisar-numerico.mjs — a álgebra e a geometria pequenas da ferramenta de alisamento.
+- `alisar-rede.test.mjs` — alisar-rede.test.mjs — a ferramenta de alisamento sobre a gaiola por rede de curvas.
 - `alterar-montagem.test.ts` — alterar-montagem.test.ts — alteração semântica compacta de montagem.
 - `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `analise-da-peca.mjs` — analise-da-peca.mjs — o passo "Pare e analise": a matriz de vistas que a IA precisa olhar antes de declarar uma forma pronta, o manifesto que prova que ela f…
@@ -2456,8 +2459,10 @@
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
 - `vinco-na-imagem.test.mjs` — vinco-na-imagem.test.mjs — a dobra viva chega à imagem como aresta, nos dois caminhos de imagem: a cena da bancada (`adaptarThree`, que põe a normal de cada …
+- `vincos-da-rede.mjs` — vincos-da-rede.mjs — as peças de `vincos-das-linhas.mjs` para a gaiola que sai de `gaiolaPorRede`: as cadeias são as curvas da rede, a declaração de vinco va…
+- `vincos-da-rede.test.mjs` — vincos-da-rede.test.mjs — `vincos-das-linhas` sobre a gaiola por rede de curvas.
 - `vincos-das-linhas-chaves.test.mjs` — vincos-das-linhas-chaves.test.mjs — `vincos-das-linhas` cita só nomes que a receita declara e separa a borda de vão.
-- `vincos-das-linhas.mjs` — vincos-das-linhas.mjs — casa as linhas 3D lidas do pacote cego com as colunas e as estações nomeadas da gaiola de uma receita de subdivisão, e devolve a decl…
+- `vincos-das-linhas.mjs` — vincos-das-linhas.mjs — casa as linhas 3D lidas do pacote cego com as colunas e as estações nomeadas da gaiola de uma receita de subdivisão (ou com as curvas…
 - `vincos-das-linhas.test.mjs` — vincos-das-linhas.test.mjs — os vincos a partir das linhas 3D do pacote, sobre a forma desenhada por código.
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
@@ -2472,6 +2477,7 @@
 ## tools/mecanifica/fixtures/
 
 - `alisar-prova.js` — alisar-prova.js — a chapa desenhada por código para o teste da ferramenta de alisamento.
+- `alisar-rede-prova.js` — alisar-rede-prova.js — a chapa lateral por rede de curvas, com os pontos-chave na TABELA, para o teste do alisamento sobre a rede.
 - `fixture-cubo-material.js` — fixture-cubo-material.js — caixa com todas as faces em um material declarado, para a exportação OBJ com texturas.
 - `fixture-cubo.js` — fixture-cubo.js — receita procedural de teste para exportação CAD/STEP.
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
