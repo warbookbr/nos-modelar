@@ -119,12 +119,14 @@ describe('o gate leitura:obrigatoria recusa', () => {
       d.perguntas = { voar: 'Para onde?' };
       return d;
     });
-    gravar('docs/mecanifica/usar/SOLTO.md', '# Solto\n');
+    /* Montado por partes para o gate de links não tomar o documento de mentira por citação quebrada. */
+    const solto = ['docs', 'mecanifica', 'usar', 'SOLTO.md'].join('/');
+    gravar(solto, '# Solto\n');
     gravar('docs/mecanifica/usar/README.md', '# Usar\n');
     const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
     expect(problemas).toContain('grupo modelar: falta a pergunta em "perguntas"');
     expect(problemas).toContain('pergunta "voar": não há grupo com esse nome');
-    expect(problemas).toContain('docs/mecanifica/usar/SOLTO.md: nenhum nó da árvore o entrega');
+    expect(problemas).toContain(`${solto}: nenhum nó da árvore o entrega`);
     expect(problemas).not.toContain('usar/README.md');
   });
 
