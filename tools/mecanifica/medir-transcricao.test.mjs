@@ -45,4 +45,22 @@ describe('medirTranscricao', () => {
     expect(texto).toContain('== soma das 2 transcrições');
     expect(texto).toMatch(/imagem aberta +3\.200 tok +[\d.]+%/);
   });
+
+  it('conta o que voltou das ferramentas até a primeira escrita, por arquivo lido, e o contexto do turno que escreveu', () => {
+    const t = [
+      usuario('tarefa'),
+      assistente('a1', uso(10, 1000, 5), [{ type: 'tool_use', id: 'r1', name: 'Read', input: { file_path: '/r/CLAUDE.md' } }]),
+      usuario([{ type: 'tool_result', tool_use_id: 'r1', content: 'é'.repeat(10) }]),
+      assistente('a2', uso(10, 1200, 5), [{ type: 'tool_use', id: 'b1', name: 'Bash', input: { command: 'npm run comecar' } }]),
+      usuario([{ type: 'tool_result', tool_use_id: 'b1', content: [{ type: 'text', text: 'x'.repeat(30) }, { type: 'image', source: {} }] }]),
+      assistente('a3', uso(10, 1500, 5), [{ type: 'tool_use', id: 'w1', name: 'Edit', input: { file_path: '/r/a.js' } }]),
+      usuario([{ type: 'tool_result', tool_use_id: 'w1', content: 'ok' }]),
+      assistente('a4', uso(10, 1600, 5), [{ type: 'tool_use', id: 'r2', name: 'Read', input: { file_path: '/r/b.md' } }]),
+      usuario([{ type: 'tool_result', tool_use_id: 'r2', content: 'y'.repeat(99) }]),
+    ].join('\n');
+    const m = medirTranscricao(t);
+    expect(m.primeiroPasso).toEqual({ turno: 3, contexto: 1510, bytes: 50, imagens: 1, chamadas: 2, arquivos: { '/r/CLAUDE.md': 20 } });
+    expect(textoDaMedicao([{ nome: 't', medicao: m }])).toContain('até o primeiro passo (turno 3): 50 bytes de texto, 1 imagens, 2 chamadas, contexto 1.510');
+    expect(medirTranscricao(TRANSCRICAO).primeiroPasso).toBeNull();
+  });
 });

@@ -1,0 +1,13 @@
+diff --git a/procedural/nucleo/operacoes/estruturais.js b/procedural/nucleo/operacoes/estruturais.js
+index 47845a1d..a607e128 100644
+--- a/procedural/nucleo/operacoes/estruturais.js
++++ b/procedural/nucleo/operacoes/estruturais.js
+@@ -97,7 +97,7 @@ export function criarOperacoesEstruturais(servicos) {
+     let traseiraDaReferencia = Infinity;
+     for (const v of referencia) traseiraDaReferencia = Math.min(traseiraDaReferencia, proj(v));
+ 
+-    const t = traseiraDaReferencia - frenteDoMovel - folga;
++    const t = traseiraDaReferencia - frenteDoMovel + folga;
+     for (const v of movidos) {
+       const p = st.V.get(v);
+       st.V.set(v, [p[0] + u[0] * t, p[1] + u[1] * t, p[2] + u[2] * t]);

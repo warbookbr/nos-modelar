@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1630 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1633 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -340,6 +340,12 @@
 ## docs/mecanifica/banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/blendnet/
 
 - `RESULTADO.md` — BlendNet para esboço: sonda de tradução barata e determinística
+
+## docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10/
+
+- `ROTEIRO.md` — Medida de leitura da leitura por demanda
+- `tarefa-corrigir.md` — Tarefa de corrigir
+- `tarefa-modelar.md` — Tarefa de modelar
 
 ## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/
 
