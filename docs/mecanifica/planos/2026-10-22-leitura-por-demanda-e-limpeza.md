@@ -51,7 +51,7 @@ Nenhuma regra some: cada regra que sai de um documento passa a outro lugar dito 
 7. **Limpeza de código.** Saem, com testes, gates, passos de CI, documentos e skills ligados: os resíduos sem chamador, o fluxo N1/N2 e seu esquema, a parte morta do canal de percepção, o laboratório de calibração cega, o alvo do chassi de agosto, o desenho por restrições com as famílias de desenho, os importadores (com o documento curto de recriação) e os módulos de otimização de malha e de preparo de micropolígono, cujas três verificações úteis (face torta, triângulo sem área, malha aberta) passam ao módulo de topologia. As áreas que o inventário marcou para investigar (bancadas herdadas, tradutor de receitas externas, revalidação opcional do MCP, estudos históricos que rodam como teste, famílias que nenhuma peça chama) vão à pessoa com recomendação antes de sair.
 8. **Tempo da bateria.** `mcp:check` entra em `mcp:visual:check`, e o teste que varre o acervo é medido por etapa e reorganizado sem perder o que prova.
 9. **Medida de depois.** As tarefas da fatia 1 são refeitas por IAs novas pelo caminho novo, e o gate 1 é medido; o inventário de regras é refeito.
-10. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o plano de ajustes no núcleo dos veículos volta a ser o seguinte.
+10. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o de [renomear para Modelar](2026-10-25-renomear-para-modelar.md), e depois dele o de ajustes no núcleo dos veículos.
 
 ## Decisões da pessoa
 

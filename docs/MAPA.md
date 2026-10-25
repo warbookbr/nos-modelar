@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1633 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1634 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -492,6 +492,7 @@
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 - `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
+- `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
