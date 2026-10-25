@@ -80,9 +80,6 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: npm run test:lentos
 
-      - name: Servidor MCP local
-        run: npm run mcp:check
-
       - name: Build da Mecanifica
         run: npm run build
 

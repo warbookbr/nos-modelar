@@ -200,8 +200,12 @@ function medirReceita(receita) {
  * `medir` é injetável só para teste; o padrão é o mesmo caminho que a bancada e
  * o `descrever` usam, porque um diagnóstico que mede por outra régua responderia
  * sobre uma peça que ninguém vê.
+ *
+ * `sondar: false` para depois do determinismo: a receita carrega, executa duas
+ * vezes igual e tem os parâmetros contados, sem nenhum declarado vivo ou inerte.
+ * Serve à varredura do acervo real, em que as sondas são quase todo o custo.
  */
-export function diagnosticarParametros(receita, { medir = medirReceita } = {}) {
+export function diagnosticarParametros(receita, { medir = medirReceita, sondar = true } = {}) {
   if (!receita || typeof receita !== 'object') {
     throw new Error('diagnosticarParametros: informe uma receita já carregada.');
   }
@@ -243,6 +247,18 @@ export function diagnosticarParametros(receita, { medir = medirReceita } = {}) {
   const determinismo = {
     estavel: !repetida.erro && assinaturaMedida(repetida.descricao, repetida.forma) === assinaturaBase,
   };
+
+  if (!sondar) {
+    return {
+      carregou: true,
+      erro: null,
+      indiagnosticavel: null,
+      totais: { declarados: caminhosNumericos(params).length, vivos: null, inertes: null },
+      parametros: [],
+      determinismo,
+      assinaturaBase,
+    };
+  }
 
   const parametros = [];
   for (const caminho of caminhosNumericos(params)) {

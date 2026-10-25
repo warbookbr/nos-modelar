@@ -40,6 +40,12 @@ export const FORA_DOS_GATES = new Map([
     + 'sai com código 2 sem ele. É ferramenta de inspeção com nome de régua, e '
     + 'renomear custaria quebrar as citações que já existem',
   ],
+  [
+    'mcp:check',
+    'roda dentro do gate `mcp:visual:check`, que o chama com o ensaio visual '
+    + 'ligado; saiu da bateria em 2026-10-25 porque repetia os mesmos arquivos, e '
+    + 'fica como script para quem quer a suíte do MCP sem navegador',
+  ],
 ]);
 
 export function comandosDoCI(raiz = REPO) {

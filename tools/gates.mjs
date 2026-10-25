@@ -90,7 +90,7 @@ function lerDuracoesDosTestes(gate, desde, raiz = RAIZ) {
    teste passaria a olhar para um lugar vazio e a garantia sumiria calada, que é
    exatamente o buraco que ele existe para tapar. */
 export const GATES = [
-  'typecheck', 'test:rapidos', 'test:lentos', 'mcp:check', 'mcp:visual:check', 'build',
+  'typecheck', 'test:rapidos', 'test:lentos', 'mcp:visual:check', 'build',
   'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check',
   'bancada:vazia:check', 'porteiro', 'exportar:check',
   'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:referencia', 'guarda:escolha', 'guarda:junta', 'guarda:edicao', 'guarda:gesto', 'guarda:acervo', 'guarda:referencial', 'origens:check',
@@ -138,9 +138,10 @@ export const GATES = [
  * cache um do outro, e o pedido do outro volta com 504 "Outdated Optimize Dep".
  * Foi assim que `porteiro` reprovou duas fixtures de quatro.
  *
- * A suíte de MCP é rodada por três gates diferentes — `test` roda tudo,
- * `mcp:check` roda só ela, e `mcp:visual:check` roda `mcp:check` com o ensaio
- * visual ligado. Os mesmos arquivos de teste escrevem no mesmo repositório de
+ * A suíte de MCP é rodada por dois gates — `test:lentos` roda os arquivos
+ * dela entre os lentos, e `mcp:visual:check` roda `mcp:check` com o ensaio
+ * visual ligado (o `mcp:check` sozinho saiu da bateria em 2026-10-25, porque
+ * repetia os mesmos arquivos sem o ensaio). Os mesmos arquivos de teste escrevem no mesmo repositório de
  * autoria, então dois deles ao mesmo tempo disputam o mesmo diretório.
  *
  * E cinco gates leem `dist/`, que é escrito pelo gate `build`. Em série a ordem
@@ -161,7 +162,7 @@ export const GATES = [
 const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
 
 /* Os recursos que cada gate ocupa sozinho. Os ausentes não disputam nada.
-   Os três de MCP aparecem nos dois grupos: além de rodarem os mesmos arquivos
+   Os de MCP aparecem nos dois grupos: além de rodarem os mesmos arquivos
    de teste, a promoção de autoria de montagem faz inspeção visual, que sobe
    servidor de desenvolvimento por `capturar-montagem.mjs`. Isso foi medido:
    com `mcp:check` só em `suite-mcp`, ele rodou ao lado de um gate de navegador
@@ -169,7 +170,6 @@ const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
    `aprovado` — a falha aponta para a promoção e a causa estava no cache. */
 export const RECURSOS_DO_GATE = {
   'test:lentos': ['suite-mcp', 'cache-vite'],
-  'mcp:check': ['suite-mcp', 'cache-vite'],
   'mcp:visual:check': ['suite-mcp', 'cache-vite'],
   porteiro: ['cache-vite'],
   'bancada:vazia:check': ['cache-vite'],

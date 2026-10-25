@@ -143,6 +143,13 @@ describe('diagnóstico de parâmetro vivo', () => {
     expect(decorativa.parametros.map((p) => p.caminho)).toEqual(['corpo.larg', 'corpo.alt']);
   });
 
+  it('sem sondas, confere carga e determinismo e só conta os declarados', () => {
+    let medidas = 0;
+    const d = diagnosticarParametros(receitaViva(), { sondar: false, medir: (r) => { medidas += 1; const { neutro } = executarReceita(r); return { descricao: descreverPeca(neutro), forma: formaDasPartes(neutro) }; } });
+    expect(medidas).toBe(2);
+    expect(d).toMatchObject({ carregou: true, parametros: [], determinismo: { estavel: true }, totais: { declarados: 4, vivos: null, inertes: null } });
+  });
+
   it('conta como vivo o parâmetro que o motor RECUSA, não como inerte', () => {
     /* Recusa prova ligação: o valor chegou ao motor e foi julgado. Chamar isso
        de inerte mandaria a IA procurar o efeito em outro lugar. */

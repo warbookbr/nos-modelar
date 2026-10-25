@@ -81,7 +81,7 @@ function erroDeUso(mensagem) {
 }
 
 /** Diagnostica um alvo já resolvido; devolve o registro, nunca lança. */
-async function diagnosticarAlvo(alvo, raiz = REPO) {
+async function diagnosticarAlvo(alvo, raiz = REPO, { sondar = true } = {}) {
   let caminho;
   try {
     caminho = resolverCaminhoReceita(alvo, { raiz });
@@ -106,7 +106,7 @@ async function diagnosticarAlvo(alvo, raiz = REPO) {
       totais: { declarados: 0, vivos: 0, inertes: 0 },
     };
   }
-  return { alvo, ...diagnosticarParametros(receita) };
+  return { alvo, ...diagnosticarParametros(receita, { sondar }) };
 }
 
 function tabelaDoAcervo(registros) {
@@ -170,7 +170,7 @@ function tabelaDoAcervo(registros) {
  * `raiz` (CLI: `--raiz=pasta`) aponta um acervo reduzido dentro do repositório,
  * com a mesma estrutura de pastas; o padrão é o acervo real.
  */
-export async function parametrosReutilizavel({ alvo = null, acervo = false, completo = false, raiz = null } = {}) {
+export async function parametrosReutilizavel({ alvo = null, acervo = false, completo = false, raiz = null, sondar = true } = {}) {
   let base;
   try { base = raizDoAcervo(raiz); } catch (erro) { return erroDeUso(erro.message); }
   if (acervo && alvo) {
@@ -197,7 +197,7 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
     };
   }
 
-  const registro = await diagnosticarAlvo(alvo, base);
+  const registro = await diagnosticarAlvo(alvo, base, { sondar });
   if (!registro.carregou) {
     return {
       ok: false,
