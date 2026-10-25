@@ -5,7 +5,7 @@
 Cada roteiro diz o que ler antes de começar, o que abrir só quando a condição aparecer, a
 skill, os comandos e o que se confere no fim, e `npm run comecar -- <roteiro>` (ou a ferramenta
 MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelo
-`CLAUDE.md`, que traz os invariantes e a lista destes roteiros. `npm run leitura:obrigatoria` imprime
+`CLAUDE.md`, que traz as regras que nenhuma ferramenta confere e a lista destes roteiros. `npm run leitura:obrigatoria` imprime
 o tamanho da leitura de cada roteiro contra o orçamento e a linha de base, e o gate recusa o
 roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o papel do
 `CLAUDE.md` e não entra na soma.
@@ -21,6 +21,15 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 | `modelar/auditar-peca` | modelar | Obter evidência objetiva de uma peça antes de publicar ou homologar. |
 | `modelar/auditar-montagem` | modelar | Conferir composição, relações, encaixes e impacto de um conjunto montado. |
 
+## Regras cobradas por gate
+
+Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no momento do erro:
+
+- O núcleo de autoria é independente de Three.js e do domínio automotivo. O teste
+  `tools/arquitetura/nucleo-sem-three.test.mjs`, do gate `test`, confere.
+- Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode `npm run mapa`. O gate
+  `mapa:check` confere.
+
 ## mudar: Mudar o Mecanifica
 
 Mudar núcleo, gate, arquitetura, ferramenta ou plano.
@@ -34,9 +43,9 @@ Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 b
 Abrir só quando a condição aparecer:
 
 - `docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md`, quando a tarefa pede o que o último plano deixou, as referências ou o que vem depois dele.
-- `comunicacao.md`, quando há tarefa aberta com a outra IA.
+- `comunicacao.md`, quando o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção.
 - `docs/mecanifica/ARQUITETURA.md`, quando a mudança atravessa camadas.
-- `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS.
+- `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
 - `docs/mecanifica/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.

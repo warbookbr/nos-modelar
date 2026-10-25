@@ -10,15 +10,13 @@ narrativa e apresentação externa não definem o escopo. A Oficina humana, a
 aplicação jogável e o som foram removidos desta árvore. `bancada.html` é a única
 aplicação publicada aqui.
 
-## Se você só vai usar o Mecanifica
+## Entrada
 
-Criar, inspecionar, corrigir ou auditar uma peça **não passa por este
-documento**. A porta é [`usar/README.md`](usar/README.md)
-(`docs/mecanifica/usar/README.md`): a skill da tarefa e o contrato que ela
-aplica, sem o material de desenvolvimento no caminho.
-
-Este INDEX é para quem vai **mudar** o Mecanifica — núcleo, gates, arquitetura,
-plano. O que está encerrado vive em
+A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
+`npm run comecar -- <roteiro>`, que diz o que ler. Este índice é a leitura do
+roteiro `mudar`; criar, inspecionar, corrigir ou auditar uma peça segue o
+roteiro de modelar e a porta [`usar/README.md`](usar/README.md). O que está
+encerrado vive em
 [`historico/README.md`](historico/README.md)
 (`docs/mecanifica/historico/README.md`) e não governa trabalho novo.
 

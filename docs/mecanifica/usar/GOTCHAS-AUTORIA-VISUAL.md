@@ -136,7 +136,7 @@ não lido.
 
 O caso completo de cada uma, com a peça que a originou e os números medidos,
 está em
-[`GOTCHAS-POR-OPERACAO.md`](../referencias/GOTCHAS-POR-OPERACAO.md). O limite
+[`GOTCHAS-POR-OPERACAO.md`](GOTCHAS-POR-OPERACAO.md). O limite
 diz o que evitar; o caso diz por que, e é o que faz a lição grudar.
 
 A das tampas do `cilindro`, que ficam sem parte quando citadas sem

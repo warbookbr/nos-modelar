@@ -156,11 +156,13 @@ function quebrar(texto, marca, largura = 80) {
   return linhas.map((l, i) => (i === 0 ? marca : ' '.repeat(marca.length)) + l);
 }
 
-/* O bloco de regras do `CLAUDE.md`: uma seção por grupo de invariantes, com um item por invariante. */
+/* O bloco de regras do `CLAUDE.md`: uma seção por grupo de invariantes, com um item por invariante sem gate. O `CLAUDE.md` é
+   o contrato mínimo, lido em todo contexto, e guarda só o que nenhuma ferramenta confere; a regra com gate chega como recusa
+   do gate no momento do erro e fica listada no `ROTEIROS.md`. */
 export function gerarBlocoInvariantes(dados) {
   const partes = [];
   for (const [chave, titulo] of Object.entries(SECOES_DOS_INVARIANTES)) {
-    const itens = dados.invariantes.filter((inv) => inv.secao === chave);
+    const itens = dados.invariantes.filter((inv) => inv.secao === chave && !inv.gate);
     if (itens.length === 0) continue;
     if (partes.length > 0) partes.push('');
     partes.push(`## ${titulo}`, '', ...itens.flatMap((inv) => quebrar(textoDoInvariante(inv), '- ')));
@@ -197,7 +199,7 @@ export function gerarRoteirosMd(dados) {
     'Cada roteiro diz o que ler antes de começar, o que abrir só quando a condição aparecer, a',
     'skill, os comandos e o que se confere no fim, e `npm run comecar -- <roteiro>` (ou a ferramenta',
     'MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelo',
-    '`CLAUDE.md`, que traz os invariantes e a lista destes roteiros. `npm run leitura:obrigatoria` imprime',
+    '`CLAUDE.md`, que traz as regras que nenhuma ferramenta confere e a lista destes roteiros. `npm run leitura:obrigatoria` imprime',
     'o tamanho da leitura de cada roteiro contra o orçamento e a linha de base, e o gate recusa o',
     'roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o papel do',
     '`CLAUDE.md` e não entra na soma.',
@@ -206,6 +208,11 @@ export function gerarRoteirosMd(dados) {
     '| --- | --- | --- |',
     ...dados.roteiros.map((r) => `| ${codigo(r.id)} | ${r.intencao} | ${r.quando} |`),
   ];
+  const cobradas = dados.invariantes.filter((inv) => inv.gate);
+  if (cobradas.length > 0) {
+    partes.push('', '## Regras cobradas por gate', '', 'Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no momento do erro:', '');
+    for (const inv of cobradas) partes.push(...quebrar(textoDoInvariante(inv), '- ', 100));
+  }
   for (const r of dados.roteiros) {
     partes.push('', `## ${r.id}: ${r.titulo}`, '', r.quando, '');
     partes.push(`Ler antes de começar, num orçamento de ${milhar(r.orcamentoBytes)} bytes (linha de base de ${milhar(r.linhaDeBase.bytes)} bytes em ${r.linhaDeBase.data}):`, '');

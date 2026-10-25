@@ -69,7 +69,7 @@ describe('veredito de contato do acervo', () => {
     const modulo = duasPartes({ distancia: 0.4, contatos: [{ par: ['esquerda', 'direita'], motivo: MOTIVO }] });
     modulo.default.PLANO = {
       objeto: 'par de ensaio com tres partes prometidas',
-      referencias: ['docs/mecanifica/referencias/README.md'],
+      referencias: ['docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md'],
       escala: { medida: 'lado do cubo', milimetros: 400 },
       partes: [
         { nome: 'esquerda', forma: 'cubo de quatrocentos milimetros de lado', tecnica: 'cubo' },
@@ -88,7 +88,7 @@ describe('veredito de contato do acervo', () => {
     const modulo = duasPartes({ distancia: 0.4, contatos: [{ par: ['esquerda', 'direita'], motivo: MOTIVO }] });
     modulo.default.PLANO = {
       objeto: 'par de ensaio com uma parte prometida a menos',
-      referencias: ['docs/mecanifica/referencias/README.md'],
+      referencias: ['docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md'],
       escala: { medida: 'lado do cubo', milimetros: 400 },
       partes: [{ nome: 'esquerda', forma: 'cubo de quatrocentos milimetros de lado', tecnica: 'cubo' }],
       criteriosDeReprovacao: ['peça com parte que o plano não descreve'],

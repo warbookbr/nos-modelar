@@ -3,10 +3,9 @@
 Esta pasta é para quem vai **usar** o Mecanifica: criar, inspecionar, corrigir
 ou auditar uma peça. Não é preciso ler nada fora daqui para isso.
 
-As regras que valem em qualquer tarefa estão no `CLAUDE.md`.
-
-Quem vai **mudar** o Mecanifica — núcleo, gates, arquitetura, plano — entra por
-[`../INDEX.md`](../INDEX.md) (`docs/mecanifica/INDEX.md`), não por aqui.
+A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
+`npm run comecar -- <roteiro>`, que diz o que ler. Quem vai **mudar** o
+Mecanifica (núcleo, gates, arquitetura, plano) segue o roteiro `mudar`.
 
 ## Por onde começar
 

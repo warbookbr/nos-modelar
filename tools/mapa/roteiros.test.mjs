@@ -51,12 +51,17 @@ describe('os roteiros do repositório', () => {
     expect(roteiros.length).toBeGreaterThan(0);
   });
 
-  it('trazem no CLAUDE.md cada invariante inteiro e uma linha por roteiro, e o teste que confere o gate "test"', () => {
+  it('trazem no CLAUDE.md cada invariante sem gate inteiro e uma linha por roteiro, e no ROTEIROS.md os cobrados por gate', () => {
     const dados = carregarRoteiros();
     const claude = readFileSync(join(RAIZ, CAMINHO_CLAUDE), 'utf8').replace(/\n {2}/g, ' ');
-    for (const inv of dados.invariantes) expect(claude, inv.id).toContain(inv.texto);
+    const pagina = readFileSync(join(RAIZ, CAMINHO_ROTEIROS), 'utf8').replace(/\n {2}/g, ' ');
+    for (const inv of dados.invariantes.filter((i) => !i.gate)) expect(claude, inv.id).toContain(inv.texto);
+    for (const inv of dados.invariantes.filter((i) => i.gate)) {
+      expect(claude, inv.id).not.toContain(inv.texto);
+      expect(pagina, inv.id).toContain(inv.texto);
+      if (inv.gate === 'test') expect(pagina).toContain(inv.teste);
+    }
     for (const r of dados.roteiros) expect(claude).toContain(`- \`${r.id}\`: ${r.quando}`);
-    for (const inv of dados.invariantes.filter((i) => i.gate === 'test')) expect(claude).toContain(inv.teste);
   });
 
   it('têm as quatro intenções do plano e uma frase de índice por roteiro', () => {
@@ -160,11 +165,14 @@ describe('o gate leitura:obrigatoria recusa', () => {
     expect(problemas).toContain(MARCADORES.invariantes[0]);
   });
 
-  it('gera as seções com o gate dito em cada regra', () => {
-    const bloco = gerarBlocoInvariantes(repositorio().dados).replace(/\n {2}/g, ' ');
-    expect(bloco).toMatch(/^## Regras\n\n- O núcleo não importa Three\.js\. O teste `tests\/nucleo\.test\.mjs`, do gate `test`, confere\./);
-    expect(bloco).toContain('## Coordenação e qualidade');
-    expect(bloco).toContain('- Rode npm run mapa. O gate `mapa:check` confere.');
+  it('deixa no CLAUDE.md só as regras sem gate e lista as cobradas por gate no ROTEIROS.md, com o gate de cada uma', () => {
+    const { dados } = repositorio();
+    const bloco = gerarBlocoInvariantes(dados);
+    expect(bloco).toBe('## Coordenação e qualidade\n\n- Use pt-BR.');
+    const pagina = gerarRoteirosMd(dados).replace(/\n {2}/g, ' ');
+    expect(pagina).toContain('## Regras cobradas por gate');
+    expect(pagina).toContain('- O núcleo não importa Three.js. O teste `tests/nucleo.test.mjs`, do gate `test`, confere.');
+    expect(pagina).toContain('- Rode npm run mapa. O gate `mapa:check` confere.');
   });
 
   it('o JSON sem linha de base ou com id repetido', () => {

@@ -35,7 +35,7 @@ const PASTA_SKILLS = '.claude/skills';
    escrita à mão e revisável. */
 export const ALLOWLIST_G1 = new Map([
   [
-    'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/mecanifica/referencias/GOTCHAS-POR-OPERACAO.md',
+    'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md',
     'as armadilhas de loft, inflate, cilindro, arranja e furo viraram os `limites` de cada '
     + 'operação, que chegam por `descrever_capacidade` no momento em que a operação é '
     + 'escolhida; o ponteiro guarda o CASO de cada uma — a peça, o número medido, a rodada '

@@ -5,12 +5,12 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1634 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1633 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
 - `AGENTS.md` — Mecanifica — instruções para agentes
-- `CLAUDE.md` — Mecanifica — acordo de trabalho
+- `CLAUDE.md` — Mecanifica — contrato mínimo
 - `README.md` — Mecanifica
 - `THIRD-PARTY-NOTICES.md` — Avisos de terceiros
 - `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
@@ -626,11 +626,6 @@
 
 - `01-fatia-1a-piloto-leitura.md` — MCP — encerramento da Fatia 1A somente leitura
 
-## docs/mecanifica/referencias/
-
-- `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
-- `README.md` — Referências de forma
-
 ## docs/mecanifica/roteiros/
 
 - `ROTEIROS.md` — Roteiros de leitura por intenção
@@ -647,6 +642,7 @@
 - `CRITICA-VISUAL-CONTRATO-E-CASOS.md` — Crítica visual — contrato do achado e casos aplicados
 - `FLUXO-DO-OBJETO.md` — Fluxo do objeto
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
+- `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
 - `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACO-VISUAL.md` — O laço visual — olhar, sobrepor, despachar

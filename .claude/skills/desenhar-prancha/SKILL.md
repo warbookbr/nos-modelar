@@ -189,7 +189,7 @@ ter capô perfeito e traseira 112 mm alta.
 **Dois limites que valem mais que o resultado:**
 
 - a imagem de referência não entra no repositório, só as coordenadas derivadas.
-  Ver `docs/mecanifica/referencias/README.md`;
+  Ver `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`;
 - **desvio é confiável, curvatura de raster não é.** Numa prancha de 736 px, o
   desvio médio é estável sob suavização e a contagem de inversões varia de 31 a
   51 sem convergir. Julgue proporção e posição pela referência; julgue caráter

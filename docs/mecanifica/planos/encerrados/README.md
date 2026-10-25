@@ -186,8 +186,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   puro, calibra pixel→milímetro pelo entre-eixos entre as manchas de contato das
   rodas e compara silhuetas por desvio. A imagem de terceiro não entra no
   repositório: entram só as coordenadas derivadas, sob a regra de procedência de
-  [`referencias/README.md`](../../referencias/README.md)
-  (`docs/mecanifica/referencias/README.md`). Limite medido e registrado: desvio
+  [`REFERENCIA-E-CRITICA-VISUAL.md`](../../usar/REFERENCIA-E-CRITICA-VISUAL.md)
+  (`docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`). Limite medido e registrado: desvio
   de silhueta é confiável, curvatura vinda de raster é ruído. A medida contrariou
   a análise visual — o erro grave não era o teto, eram a traseira e o nariz.
 - O plano de [autonomia verificável do Motor de Prancha](../2026-08-20-motor-de-prancha-autonomia.md)

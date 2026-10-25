@@ -1,13 +1,8 @@
-# Mecanifica — acordo de trabalho
+# Mecanifica — contrato mínimo
 
-Núcleo procedural, receitas, bancada e ferramentas com que a IA cria, inspeciona e
-audita peças e montagens. `bancada.html` é a única aplicação publicada aqui.
-
-## Entrada de contexto
-
-Rode `npm run comecar` (ou a ferramenta MCP `comecar`) e escolha o roteiro da
-tarefa; `npm run comecar -- <roteiro>` devolve o que ler, a skill, os comandos e o
-passo seguinte.
+Só o que nenhuma ferramenta confere; a regra que um gate cobra chega como recusa
+dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP
+`comecar`) diz o que ler, a skill, os comandos e o passo seguinte.
 
 <!-- roteiros:inicio -->
 - `mudar`: Mudar núcleo, gate, arquitetura, ferramenta ou plano.
@@ -23,8 +18,6 @@ passo seguinte.
 <!-- invariantes:inicio -->
 ## Regras
 
-- O núcleo de autoria é independente de Three.js e do domínio automotivo. O
-  teste `tools/arquitetura/nucleo-sem-three.test.mjs`, do gate `test`, confere.
 - IDs internos, índices de arrays e posições de passos nunca são identidade
   persistida.
 - Conteúdo salvo é determinístico, versionado, reexecutável e validável.
@@ -33,34 +26,25 @@ passo seguinte.
 - A correção que um objeto revela vai para a ferramenta, o gate ou a instrução
   geral, e não para o arquivo daquele objeto. O que só serve a uma família ou
   objeto entra como opção declarada sobre a ferramenta geral.
-- Mudanças gerais que possam voltar ao NÓS ficam isoladas e registradas em
-  `docs/mecanifica/UPSTREAM-NOS.md`.
 - Imagem de referência com marca, logotipo ou nome de fabricante não entra no
-  repositório.
+  repositório, nem prancha de terceiro, da qual entram só as coordenadas
+  derivadas. Imagem gerada por IA vale como caráter da forma, nunca como medida.
 - Material entra só como escolha por peça na receita e módulo de textura; PBR e
   paleta nova, só com plano.
 - Sem plano ativo, o backlog não autoriza implementação.
-- O trabalho dividido com outra IA neste repositório passa por `comunicacao.md`,
-  com uma tarefa por seção.
 
 ## Coordenação e qualidade
 
 - Use pt-BR.
 - Escreva em parágrafos corridos e literais, aqui e nas respostas ao usuário.
   Sem frases picotadas, listas de fragmentos, oposições "não X, e sim Y" nem
-  negrito no meio do texto. Descreva o fato, não a analogia: diga "o valor fixo
-  deixa de corresponder ao parâmetro e as partes se atravessam", não "o número
-  envelhece mal".
-- Responda curto. Diga cada fato uma vez, sem repetir com outras palavras, sem
-  recapitular o que o usuário já sabe e sem justificar além do que a decisão
-  pede. Um erro se reconhece em uma frase.
+  negrito no meio do texto. Descreva o fato, não a analogia.
+- Responda curto: cada fato uma vez, sem recapitular o que o usuário já sabe nem
+  justificar além do que a decisão pede. Um erro se reconhece em uma frase.
 - Ao reportar à pessoa, traga um sumário breve do que foi feito, sem termos
   internos, e diga se algo depende da decisão dela, sempre com a recomendação.
-- Rode `npm run gates` antes de enviar: ele roda os testes rápidos sempre e os
-  lentos ligados ao que mudou, e `--completo` e o CI rodam todos. Agente
-  despachado não o roda; quem integra roda uma vez.
-- Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode
-  `npm run mapa`. O gate `mapa:check` confere.
+- Rode `npm run gates` antes de enviar (`--completo` e o CI rodam todos os
+  testes lentos). Agente despachado não o roda; quem integra roda uma vez.
 - Todo achado responde se o processo o teria pego sozinho. Quando não, o que
   falta vira gate, campo ou instrução antes de a correção ser dada por pronta.
 - Histórico e evidências encerradas não governam trabalho novo, nem por citação

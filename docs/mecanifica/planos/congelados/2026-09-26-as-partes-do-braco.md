@@ -21,7 +21,7 @@ modelagem](../encerrados/2026-10-07-as-ferramentas-de-modelagem.md).
 fixo na montagem. O inventário do que cada parte restante pede ao núcleo está no
 fechamento do plano da união, e a lacuna que ele apontou, o arredondamento das
 bordas convexas e internas, foi resolvida com limitações escritas em
-`docs/mecanifica/referencias/GOTCHAS-POR-OPERACAO.md`. Cada etapa passa a
+`docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md`. Cada etapa passa a
 cumprir o passo [Pare e analise](../../usar/PARE-E-ANALISE.md) antes de ser dada
 por boa e antes de pedir o aceite da pessoa.
 

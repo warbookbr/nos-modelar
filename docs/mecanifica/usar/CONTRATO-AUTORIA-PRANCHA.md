@@ -46,3 +46,25 @@ Landmarks e cotas continuam nas listas top-level `landmarks` e `cotas` da especi
 3. Rode o script da prancha e leia a linha `autoria:` e todos os alertas antes de inspeção visual, crítica independente ou modelagem 3D.
 
 O contrato não converte raster em verdade geométrica, não mede confiança por adivinhação e não substitui a crítica visual independente.
+
+## Procedência e medida da referência
+
+A regra de procedência está no `CLAUDE.md`: prancha de terceiro não entra no
+repositório, só as coordenadas derivadas dela, e imagem gerada por IA a pedido
+da pessoa entra como alvo de caráter (que partes existem e que forma cada uma
+tem), uma vista por arquivo, sem valer como medida. A dimensão vem da `TABELA`
+da receita, e quando as duas divergem a tabela manda. Um derivado declara a
+origem, o método de calibração e o resíduo, para que quem tiver a prancha confira
+a medida, e não é regerado pelo CI, porque a imagem de origem não está versionada.
+
+A calibração de pixel para milímetro devolve como resíduo o erro contra medidas
+independentes, que diz o quanto a prancha está fora de esquadro. Numa prancha de
+736 px, variando a suavização de 1 a 41 px, o
+desvio absoluto médio de silhueta foi de 46 para 39 mm e as inversões de
+curvatura variaram de 31 a 51 sem convergir: compare proporção e posição contra
+uma referência rasterizada, e não conclua nada sobre o caráter da superfície pela
+curvatura dela.
+
+O anexo de imagem de uma sessão vive em base64 dentro da transcrição do projeto,
+em `~/.claude/projects/**/**.jsonl`, e sai de lá por decodificação; procurar por
+arquivo de imagem recente não o acha e levou a concluir que a imagem não existia.

@@ -10,8 +10,9 @@ Canal de trabalho entre duas IAs neste repositório.
 1. A Planejadora escreve em "Tarefas". A Executora escreve só em "Relatório" da
    própria tarefa e no campo `Status`.
 2. Uma tarefa por seção, numerada, sem reescrever as antigas.
-3. Antes de começar, a Executora lê os arquivos de "Ler antes" e o `CLAUDE.md`, e
-   não lê além disso sem necessidade.
+3. Antes de começar, a Executora lê o `CLAUDE.md`, roda o `npm run comecar` do
+   roteiro da tarefa e lê os arquivos de "Ler antes", e não lê além disso sem
+   necessidade.
 4. Não sair do escopo da tarefa. Se algo fora do escopo parecer necessário, parar,
    registrar em "Relatório" e marcar `Status: bloqueada`.
 5. Rodar o que a tarefa pedir em "Verificação" e colar o resultado real, inclusive

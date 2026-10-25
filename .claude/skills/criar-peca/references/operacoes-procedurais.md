@@ -22,6 +22,7 @@ receita; a convenção de cada operação vem do catálogo, e não de receita an
 - seleção semântica, identidade e limites: seção de seleção;
 - proveniência de `origem`, rotação e exemplos: detalhes de seleção;
 - aliases, atributos e animação: bloco de aliases e leis do núcleo.
+- o caso de cada armadilha de operação, com a peça e o número medido: `docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md`.
 
 ## Operações disponíveis
 

@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes são a fonte das regras do CLAUDE.md, que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro, e valem para toda intenção porque o CLAUDE.md entra em todo contexto. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
+  "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
   "invariantes": [
     {
       "id": "nucleo-independente",
@@ -34,15 +34,9 @@
       "gate": null
     },
     {
-      "id": "upstream",
-      "secao": "regras",
-      "texto": "Mudanças gerais que possam voltar ao NÓS ficam isoladas e registradas em `docs/mecanifica/UPSTREAM-NOS.md`.",
-      "gate": null
-    },
-    {
       "id": "marca",
       "secao": "regras",
-      "texto": "Imagem de referência com marca, logotipo ou nome de fabricante não entra no repositório.",
+      "texto": "Imagem de referência com marca, logotipo ou nome de fabricante não entra no repositório, nem prancha de terceiro, da qual entram só as coordenadas derivadas. Imagem gerada por IA vale como caráter da forma, nunca como medida.",
       "gate": null
     },
     {
@@ -58,12 +52,6 @@
       "gate": null
     },
     {
-      "id": "coordenacao",
-      "secao": "regras",
-      "texto": "O trabalho dividido com outra IA neste repositório passa por `comunicacao.md`, com uma tarefa por seção.",
-      "gate": null
-    },
-    {
       "id": "idioma",
       "secao": "qualidade",
       "texto": "Use pt-BR.",
@@ -72,13 +60,13 @@
     {
       "id": "escrita",
       "secao": "qualidade",
-      "texto": "Escreva em parágrafos corridos e literais, aqui e nas respostas ao usuário. Sem frases picotadas, listas de fragmentos, oposições \"não X, e sim Y\" nem negrito no meio do texto. Descreva o fato, não a analogia: diga \"o valor fixo deixa de corresponder ao parâmetro e as partes se atravessam\", não \"o número envelhece mal\".",
+      "texto": "Escreva em parágrafos corridos e literais, aqui e nas respostas ao usuário. Sem frases picotadas, listas de fragmentos, oposições \"não X, e sim Y\" nem negrito no meio do texto. Descreva o fato, não a analogia.",
       "gate": null
     },
     {
       "id": "resposta-curta",
       "secao": "qualidade",
-      "texto": "Responda curto. Diga cada fato uma vez, sem repetir com outras palavras, sem recapitular o que o usuário já sabe e sem justificar além do que a decisão pede. Um erro se reconhece em uma frase.",
+      "texto": "Responda curto: cada fato uma vez, sem recapitular o que o usuário já sabe nem justificar além do que a decisão pede. Um erro se reconhece em uma frase.",
       "gate": null
     },
     {
@@ -90,7 +78,7 @@
     {
       "id": "gates",
       "secao": "qualidade",
-      "texto": "Rode `npm run gates` antes de enviar: ele roda os testes rápidos sempre e os lentos ligados ao que mudou, e `--completo` e o CI rodam todos. Agente despachado não o roda; quem integra roda uma vez.",
+      "texto": "Rode `npm run gates` antes de enviar (`--completo` e o CI rodam todos os testes lentos). Agente despachado não o roda; quem integra roda uma vez.",
       "gate": null
     },
     {
@@ -130,7 +118,7 @@
         },
         {
           "arquivo": "comunicacao.md",
-          "quando": "há tarefa aberta com a outra IA"
+          "quando": "o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção"
         },
         {
           "arquivo": "docs/mecanifica/ARQUITETURA.md",
@@ -138,7 +126,7 @@
         },
         {
           "arquivo": "docs/mecanifica/UPSTREAM-NOS.md",
-          "quando": "a mudança é geral e pode voltar ao NÓS"
+          "quando": "a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele"
         },
         {
           "arquivo": "docs/mecanifica/LEITURA-POR-TAREFA.md",
