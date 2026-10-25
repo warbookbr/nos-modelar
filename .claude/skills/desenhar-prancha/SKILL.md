@@ -12,9 +12,9 @@ bancada.
 Ferramentas:
 `tools/mecanifica/prancha/prancha.mjs` (motor) e
 `tools/mecanifica/prancha/prancha-geometria.mjs` (traçado e medida).
-Exemplo: `tools/mecanifica/prancha/prancha-chassi-p0.mjs` — leia como uso do motor, não
-como alvo. Os landmarks daquele P0 estão marcados NÃO VINCULANTES no próprio
-documento: eles foram inventados e usados como alvo por rodadas, e o perfil
+Exemplo de uso do motor: `tools/mecanifica/prancha/prancha-dos-contornos.mjs`. A
+prancha de um chassi de agosto (P0, já fora do repositório) teve os landmarks
+inventados e usados como alvo por rodadas, e o perfil
 medido de um cupê real põe o alto do nariz 321 mm abaixo do que o P0 declarava
 (V-27). O programa de carroceria está congelado; esta skill continua valendo
 para qualquer carenagem ou invólucro.

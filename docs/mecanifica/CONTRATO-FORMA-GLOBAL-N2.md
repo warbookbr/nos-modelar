@@ -405,9 +405,7 @@ continuam lacunas explícitas.
 ## Reexecução
 
 ```text
-npx vitest run tools/mecanifica/forma-global-n2-caixa-preta.test.mjs tools/mecanifica/forma-global-n2-primitivas.test.mjs tools/mecanifica/forma-global-n2-g01-primitivas.test.mjs
-npm run autoria:n2:evidencias
-npm run autoria:n2:evidencias:check
+npx vitest run tools/mecanifica/forma-global-n2-primitivas.test.mjs src/autoria/forma-global-casco.test.mjs src/autoria/forma-global-prisma.test.mjs
 ```
 
 A ligação ao nível detalhado tem teste próprio, com o suporte de prova de
@@ -428,9 +426,9 @@ npx vitest run src/autoria/solido-do-esboco.test.js src/autoria/forma-do-esboco.
 ```
 
 `forma-global-n2-primitivas.test.mjs` prova cada primitiva (envelope medido, malha
-fechada, volume conhecido, determinismo e recusa) e
-`forma-global-n2-g01-primitivas.test.mjs` aprova no G01 um andaime que usa as seis,
-com três casos vermelhos (envelope, região e silhueta).
+fechada, volume conhecido, determinismo e recusa). O serviço que envolvia
+`forma-global.js` para o fluxo N1/N2, com o consumidor caixa-preta e as
+evidências em PNG, saiu em 2026-10-25 sem chamador.
 
 O tradutor do nível zero e a leitura das medidas na blocagem têm teste próprio:
 

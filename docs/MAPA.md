@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1634 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1592 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1692,8 +1692,6 @@
 ## procedural/servicos/
 
 - `descoberta.js` — descoberta.js — porta neutra de descoberta procedural; sem I/O, MCP ou visor.
-- `fluxo-autoria.js` — Configuração nativa atual: fluxo N1 + capacidade medida de forma global N2.
-- `provedor-autoria.js` — Adaptador N1 da descoberta procedural para o contrato de provedores. Ele só planeja: não executa receita, não registra lacuna e não escreve.
 
 ## src/autoria/
 
@@ -1772,7 +1770,6 @@
 - `medir-blocagem-nivel-zero.js` — Medida sobre a blocagem N2 de um andaime: compila com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por volume, o volum…
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
 - `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
-- `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
 - `parametros-declarados.test.js` — parametros-declarados.test.js — a pergunta única não adivinha.
 - `parametros-vivos.js` — parametros-vivos.js — separa liberdade DECLARADA de liberdade REAL.
@@ -1787,25 +1784,17 @@
 - `posicao-por-porta.js` — posicao-por-porta.js — a pose de uma instância derivada do encaixe de uma porta dela numa porta de outra instância já construída.
 - `primitivas-forma-global.js` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução de perfil, extrusão de perfil côncavo e tubo por pontos com raio de c…
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
-- `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
-- `provedor-forma-global.js` — Provedor N2: cobre planejamento de alvo, andaime e blocagem porque há um serviço puro correspondente. Crítica e aceite continuam fora deste manifesto.
-- `qualificacao-alvo.js` — qualificacao-alvo.js — declara o que uma referência permite inferir.
 - `razoes-da-peca.js` — razoes-da-peca.js — as razões que a receita declara, medidas na malha da peça executada.
 - `razoes-da-peca.test.js` — razoes-da-peca.test.js — as razões que a receita declara, medidas na malha da peça executada: a picape de altura 0,29 do comprimento fora da faixa [0,30, 0,4…
 - `refinamento-global.js` — refinamento-global.js — a receita detalhada refina um andaime da forma global N2.
 - `refinamento-global.test.js` — refinamento-global.test.js — a declaração REFINA, as portas do andaime e a conferência contra a peça executada.
 - `regua-de-portas.js` — regua-de-portas.js — a conta das portas, pura e sem nenhum import.
 - `regua-de-portas.test.js` — regua-de-portas.test.js — a conta das portas que o núcleo e o gate de contato do esboço dividem.
-- `renderizar-forma-global-svg.js` — Adaptador SVG puro da N2. Consome somente alvo e blocagem neutros; não usa DOM, Three.js, câmera de runtime ou caminhos de arquivo.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
-- `schemas-autoria-3d.js` — JSON Schemas descobríveis de N1/N2. A validação semântica final continua nos normalizadores e na máquina de estados; schemas são a fronteira estrutural.
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
-- `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
-- `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `solido-do-esboco.js` — solido-do-esboco.js — o sólido exato de uma forma do esboço, em milímetro, como volume que a Manifold subtrai e interseta.
 - `solido-do-esboco.test.js` — solido-do-esboco.test.js — o sólido exato de uma forma do esboço, a partir de formas escritas à mão no formato de `formasResolvidas`. Cada caso tem o volume …
-- `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `topologia-da-malha.js` — topologia-da-malha.js — extrudar, duplicar, apagar e criar face.
 - `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na peça de prova: quantas faces e vértices nascem, quem some, e o que fica no lugar. A p…
 - `tradutor-nivel-zero.js` — Tradutor do nível zero: lê as formas resolvidas do esboço (`mecanifica.formas-resolvidas@1`, dado puro) e gera o andaime da forma global N2 (`mecanifica.anda…
@@ -2362,21 +2351,15 @@
 - `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
 - `ferramentas-por-objeto.mjs` — Gera docs/mecanifica/FERRAMENTAS-POR-OBJETO.md a partir de docs/mecanifica/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
-- `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
-- `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
 - `folha-comparativa.mjs` — folha-comparativa.mjs — a fonte e a receita lado a lado, nas MESMAS câmeras e na MESMA escala, e a vista de diferença que marca onde a receita sobra ou falta.
 - `folha-comparativa.test.mjs` — Testes de folha-comparativa.mjs: as câmeras são as de modelo-de-referencia, a receita igual à fonte não deixa sobra nem falta, e a cabine mais estreita ou o …
 - `fonte-sintetica.mjs` — fonte-sintetica.mjs — monta, no Node e sem navegador, um `partes.json` no formato de `modelo-de-referencia.mjs` a partir dos triângulos de uma receita.
 - `forma-da-peca-no-veredito.test.mjs` — forma-da-peca-no-veredito.test.mjs — o veredito da peça confere a forma contra a referência, depois do que já roda. Sobre o suporte de `tools/fixtures/refina…
 - `forma-do-esboco.mjs` — forma-do-esboco.mjs — a forma de uma receita contra a forma do esboço que ela refina, sem mudar a receita.
 - `forma-do-esboco.test.mjs` — forma-do-esboco.test.mjs — a forma da receita contra a forma do esboço, de ponta a ponta: o esboço lido pelo módulo (`formasResolvidas`), o sólido de cada fo…
-- `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
-- `forma-global-n2-g01-primitivas.test.mjs` — G01 com um andaime que usa as seis primitivas do nível zero (cone, esfera, anel, revolução, extrusão côncava e tubo): um reservatório com base em anel, corpo…
 - `forma-global-n2-primitivas.test.mjs` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução, extrusão côncava e tubo. Cada uma é provada por envelope medido, mal…
 - `frente-da-fonte.mjs` — frente-da-fonte.mjs — de que lado fica a frente de uma malha de referência, e a conferência de que o `partes.json` a registrou.
 - `frente-da-fonte.test.mjs` — Testes de frente-da-fonte.mjs: a frente lida pelas rodas, faróis e para-brisa nomeados, a declaração obrigatória quando a malha é uma peça só, a recusa da fr…
-- `gerar-evidencias-forma-global-n2.mjs` — Gera o pacote reexecutável da prova N2 a partir de duas fontes versionadas. SVG/PNG são derivados; alvo e andaime continuam sendo a autoria.
-- `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-csg.mjs` — Linha de comando do importador de `.csg` do OpenSCAD para `.esboco.json`. Uso: npm run importar-csg -- <arquivo.csg> [--saida <arquivo.esboco.json>] [--frent…
@@ -2428,8 +2411,6 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
-- `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
-- `receita-externa-medida.mjs` — Mede a tradução da receita do externo sobre uma pasta de receitas já expandidas (os espelhos aplicados pelo `externo/receita.py::expandir`). Uso: node tools/…
 - `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e o…
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `receita-planejada.mjs` — receita-planejada.mjs — grava a receita planejada de uma peça a partir de uma unidade do esboço aprovado.
@@ -2542,8 +2523,6 @@
 ## tools/mecanifica/prancha/
 
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
-- `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
-- `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
 - `prancha-dos-contornos.mjs` — prancha-dos-contornos.mjs — a prancha de uma vista desenhada com os contornos que `npm run contorno` tirou da imagem de referência, em milímetro.
 - `prancha-dos-contornos.test.mjs` — prancha-dos-contornos.test.mjs — a prancha da lateral do braço sai dos contornos gravados, sem parte fora da silhueta e sem a parte fora do modelo.
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
@@ -2560,37 +2539,17 @@
 - `aceite-visual-regional.test.mjs` — aceite-visual-regional.test.mjs — prova cobertura regional, hashes e crítica obrigatória no aceite v2.
 - `aceite-visual.mjs` — aceite-visual.mjs — porteiro de vínculo entre revisão, briefing e evidências visuais.
 - `aceite-visual.test.mjs` — aceite-visual.test.mjs — corpus de vínculo, bytes e reprovações visuais.
-- `analisar-calibracao-critico.mjs` — Estatística P0-C: mede respostas já ingeridas; não chama nem simula um crítico externo.
-- `analisar-calibracao-critico.test.mjs` — Estatística P0-C: quatro respostas por item e bootstrap por objeto, não por apresentação.
-- `calibracao-critico-cli.mjs` — Porta offline para enviar estímulos e reingressar respostas sem chamar rede/modelo.
-- `calibracao-critico-cli.test.mjs` — CLI offline: separa lote público, chave local e respostas para auditoria.
 - `caminho-repositorio.mjs` — caminho-repositorio.mjs — resolução portátil e confinada de repo://.
 - `caminho-repositorio.test.mjs` — caminho-repositorio.test.mjs — confinamento de evidências repo:// portátil.
 - `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
-- `contrato-julgamento-critico.mjs` — Resposta de crítico externo: dados assinados, nunca veredito inferido localmente.
-- `contrato-julgamento-critico.test.mjs` — Contrato assinado que mantém o julgamento externo rastreável.
 - `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
 - `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
-- `despachar-consulta-visual.mjs` — Materializa um despacho visual mínimo. Não é sandbox de modelo: prova os bytes entregues, e deixa explícito que isolamento do processo é outra camada.
-- `despachar-consulta-visual.test.mjs` — despachar-consulta-visual.test.mjs — prova que o despacho entrega somente a consulta declarada e íntegra.
 - `fechar-aceite-visual.mjs` — fechar-aceite-visual.mjs — fecha tecnicamente uma revisão privada só após conferir briefing, modelo, arquivos e crítica pelo porteiro visual.
 - `fechar-aceite-visual.test.mjs` — fechar-aceite-visual.test.mjs — o fechamento não concede aceite retroativo.
 - `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
-- `gerar-canario-geometrico-p0.mjs` — Canário P0: fixture sintética calibrada para provar o fluxo de fitting.
-- `gerar-canario-geometrico-p0.test.mjs` — Canário P0: prova o contrato calibrado, não qualidade de modelagem.
-- `gerar-corpus-p0.mjs` — Gera controles visuais sintéticos P0. Não representa produto, veículo ou humanoide aprovados.
-- `gerar-corpus-p0.test.mjs` — Corpus sintético P0: estímulos rastreáveis para calibrar crítico, não modelos de produto.
-- `orquestrar-calibracao-critico.mjs` — Transporte offline: exporta estímulos cegos e ingere respostas assinadas.
-- `orquestrar-calibracao-critico.test.mjs` — Lote cego: o transporte não revela gabarito e exige cobertura completa.
-- `orquestrar-revisao-regional.mjs` — Caminho único R1A: despacho mínimo, revisor limitado e crítica persistida.
-- `orquestrar-revisao-regional.test.mjs` — orquestrar-revisao-regional.test.mjs — fixa a ordem despacho, revisão limitada e crítica persistida.
 - `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
 - `revisao-modelagem.mjs` — Revisão de modelagem — núcleo puro do ciclo assistido por IA.
 - `revisar-pacote.mjs` — revisar-pacote.mjs — marco 2 do fluxo assistido: a única ponte entre o pacote, a régua headless e as quatro câmeras da bancada.
-- `revisor-limitado.mjs` — Revisor visual em processo separado. O pai libera leitura apenas do próprio programa e do despacho; a criança prova que não alcança outro arquivo.
-- `revisor-limitado.test.mjs` — revisor-limitado.test.mjs — prova leitura do despacho e recusa de acesso externo pelo crítico Node.
-- `validar-corpus-avaliacao.mjs` — Contrato local do corpus P0; não chama modelo nem infere qualidade visual.
-- `validar-corpus-avaliacao.test.mjs` — O corpus P0 só fica elegível após cobertura, isolamento e quatro julgamentos cegos.
 - `validar-pacote.mjs` — validar-pacote.mjs — porta fail-closed do marco 1. Lê, exige bytes canônicos e confere o alvo com a régua headless assim que a fonte canônica existir.
 
 ## tools/oficina/
@@ -2600,7 +2559,6 @@
 - `chao-do-ciclo6.test.ts` — chao-do-ciclo6.test.ts — caso vermelho da quinta propriedade: um triângulo emitido pode ter área zero mesmo com núcleo, adaptador e casca saudáveis.
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `ensaio-ponta-a-ponta-dobradica.test.mjs` — Primeira sonda 1.0: autoria, composição, exportação, montagem e revisão.
-- `filete-v2-aceitacao.mjs` — filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real. Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR, exibindo a l…
 - `furo-ordens-de-ponte.test.ts` — furo-ordens-de-ponte.test.ts — as promessas do A-30 que a geometria sozinha não mostra.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
 - `plataforma-procedural-campo-r10.test.mjs` — Campo R10: três famílias, composição, extensão, montagem e duas vistas por alvo.

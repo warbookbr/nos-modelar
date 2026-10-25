@@ -91,7 +91,7 @@ function lerDuracoesDosTestes(gate, desde, raiz = RAIZ) {
    exatamente o buraco que ele existe para tapar. */
 export const GATES = [
   'typecheck', 'test:rapidos', 'test:lentos', 'mcp:check', 'mcp:visual:check', 'build',
-  'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check', 'autoria:schemas:check',
+  'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check',
   'bancada:vazia:check', 'porteiro', 'exportar:check',
   'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:referencia', 'guarda:escolha', 'guarda:junta', 'guarda:edicao', 'guarda:gesto', 'guarda:acervo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
@@ -199,7 +199,7 @@ export const RECURSOS_DO_GATE = {
 export const PASTAS_LEVES = [/^procedural\/pecas\//, /^docs\//, /^[^/]+\.md$/];
 
 export const GATES_CURTOS = [
-  'typecheck', 'test:rapidos', 'test:lentos', 'build', 'exportar:check', 'autoria:schemas:check',
+  'typecheck', 'test:rapidos', 'test:lentos', 'build', 'exportar:check',
   'guarda:acervo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',

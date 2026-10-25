@@ -15,7 +15,6 @@ import {
   LIMITE_DA_TOLERANCIA_DA_PORTA_MM, LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM, normalizarRefinamentoGlobal,
 } from './refinamento-global.js';
 import { resolverPortasDeMontagem } from './interfaces-montagem.js';
-import { indiceSchemasAutoria3D } from './schemas-autoria-3d.js';
 
 const ler = (caminho) => JSON.parse(readFileSync(new URL(caminho, import.meta.url), 'utf8'));
 const fixture = () => ler('../../tools/fixtures/familia-de-prova/familia.json');
@@ -393,11 +392,6 @@ describe('familia — vocabulário conferido contra o núcleo e os documentos', 
 describe('familia — schema JSON', () => {
   const ajv = new Ajv2020({ strict: false, allErrors: true });
   const validar = ajv.compile(SCHEMA_FAMILIA);
-
-  it('está no índice dos schemas de autoria, com o mesmo conteúdo', () => {
-    expect(indiceSchemasAutoria3D().contratos.familia).toEqual(SCHEMA_FAMILIA);
-    expect(SCHEMA_FAMILIA.$id).toBe(FORMATO_FAMILIA);
-  });
 
   it('aceita a fixture e a leitura normalizada dela', () => {
     expect(validar(fixture()), JSON.stringify(validar.errors)).toBe(true);

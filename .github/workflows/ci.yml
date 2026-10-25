@@ -142,9 +142,6 @@ jobs:
       - name: A bancada e modulo, nao dependencia de quem roda sem navegador
         run: npm run bancada:fronteira:check
 
-      - name: Schemas de autoria 3D em dia
-        run: npm run autoria:schemas:check
-
       # A imagem da peça sai do pacote construído, e não de `public/`. Trocar o
       # glob que a emite deixaria a página subir, os testes verdes e a
       # referência ausente só no endereço publicado.

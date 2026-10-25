@@ -1,12 +1,9 @@
 /* refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda
    do acervo. A mesma receita passa inteira, e é recusada com a parte deslocada para fora do envelope, com a porta movida e
    com uma parte sem volume. A receita sem REFINA não muda. */
-import Ajv2020 from 'ajv/dist/2020.js';
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
-import { criarServicoAutoria3DNativa } from '../../procedural/servicos/fluxo-autoria.js';
 import { receitaDoSuporte } from '../fixtures/refina-forma-global/suporte.js';
 
 const PASTA = 'tools/fixtures/refina-forma-global';
@@ -95,21 +92,5 @@ describe('a guarda do acervo roda o refinamento no caminho da receita', () => {
     const { reprovadas } = await guarda(variante);
     expect(reprovadas).toHaveLength(1);
     expect(reprovadas[0].motivo).toMatch(mensagem);
-  });
-});
-
-describe('o andaime com portas é válido nos schemas', () => {
-  it('publica o andaime com portas e recusa a porta de forma desconhecida', () => {
-    const servico = criarServicoAutoria3DNativa();
-    const ajv = new Ajv2020({ strict: false, allErrors: true });
-    Object.values(servico.schemas().contratos).forEach((schema) => ajv.addSchema(schema));
-    const andaime = JSON.parse(readFileSync(new URL(`../../${PASTA}/andaime.json`, import.meta.url), 'utf8'));
-    const normalizado = servico.formaGlobal.normalizarAndaime(andaime);
-    expect(normalizado.portas.map(({ id }) => id)).toEqual(['assento']);
-    expect(ajv.validate('mecanifica.andaime-global@2', normalizado), ajv.errorsText()).toBe(true);
-    const ruim = { ...normalizado, portas: [{ id: 'assento', interface: { forma: 'rosca', papel: 'recebe' } }] };
-    expect(ajv.validate('mecanifica.andaime-global@2', ruim)).toBe(false);
-    const { portas, ...semPortas } = normalizado;
-    expect(ajv.validate('mecanifica.andaime-global@2', semPortas), ajv.errorsText()).toBe(true);
   });
 });

@@ -59,20 +59,12 @@ gravação do aceite técnico v2 aprovável.
 
 ## Despacho material
 
-`tools/modelagem/despachar-consulta-visual.mjs` materializa uma consulta v2 em
-um diretório novo: copia somente as três evidências declaradas para o papel e a
-região, mais um manifesto de entrega. Antes de copiar, confere os hashes no
-repositório; byte alterado, arquivo extra, symlink externo ou destino existente
-interrompem o despacho. Isso prova os bytes preparados para entrega, mas não
-é sandbox de processo: o isolamento técnico do ambiente que executa o crítico
-continua uma condição separada da R1A.
-
-`tools/modelagem/revisor-limitado.mjs` cobre essa camada para o revisor Node:
-ele inicia um processo com permissões de leitura apenas para o programa e o
-diretório de despacho. O teste prova que as três evidências são legíveis e que
-um arquivo secreto fora do diretório recebe `ERR_ACCESS_DENIED`. Qualquer
-orquestrador que despache crítico precisa usar esse lançador; outro runtime não
-herda essa garantia automaticamente.
+O despacho material da consulta v2 (`despachar-consulta-visual.mjs`) e o lançador
+do revisor Node com leitura limitada (`revisor-limitado.mjs`) eram parte do
+laboratório de calibração cega do crítico, parado com o plano congelado dele, e
+saíram do repositório em 2026-10-25 sem chamador. O crítico dos laços atuais é o
+agente `critico-visual`, despachado como diz o protocolo em
+`usar/REFERENCIA-E-CRITICA-VISUAL.md`.
 
 ## Fechamento privado
 

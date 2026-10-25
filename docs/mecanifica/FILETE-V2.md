@@ -120,8 +120,9 @@ aresta e contra o volume retirado, com desvio declarado abaixo de 1e-9.
 
 ## Aceite do Escopo B
 
-`node tools/oficina/filete-v2-aceitacao.mjs` passa com uma aresta de
-`chamferBox` em 28 V/28 F e sem órfãos. O teste de núcleo cobre as 24 arestas,
+O script de aceite da época passou com uma aresta de
+`chamferBox` em 28 V/28 F e sem órfãos, e saiu do repositório em 2026-10-25 sem
+chamador. O teste de núcleo cobre as 24 arestas,
 manifold, polígono simples, painéis, replay e recusa atômica; a fixture neutra
 confere a leitura visual. A pinça e o suporte do freio não foram alterados: o
 resultado fecha a capacidade geral sem ampliar esta rodada para produto.

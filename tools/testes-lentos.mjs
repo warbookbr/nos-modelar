@@ -81,7 +81,6 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/esboco-importar-stl.test.mjs',
   'tools/mecanifica/familia.test.mjs',
   'tools/mecanifica/forma-do-esboco.test.mjs',
-  'tools/mecanifica/forma-global-n2-g01-primitivas.test.mjs',
   'tools/mecanifica/guardas/guarda-acervo.test.mjs',
   'tools/mecanifica/mcp-degrau-1-preparacao.test.mjs',
   'tools/mecanifica/olhar-bancada.test.mjs',
