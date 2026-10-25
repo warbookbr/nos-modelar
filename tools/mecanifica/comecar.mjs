@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /* comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
  *
- * Sem roteiro, lista os roteiros com a frase de cada um e o estado do trabalho. Com um roteiro (`mudar`, `modelar/esboco`,
- * ou só `esboco` quando o nome é único), devolve o que ler antes, o que abrir só quando a condição aparecer, a skill, os
- * comandos, o que o roteiro tem disponível para modelar e o passo seguinte lido do estado: o plano ativo e a tarefa de
- * `comunicacao.md` para quem muda o projeto, e a situação do Condutor para o esboço com `--arquivo`. Uma intenção que agrupa
- * roteiros (`modelar`) devolve só a lista deles. Os roteiros são os de `docs/mecanifica/roteiros/roteiros.json`.
+ * Os roteiros de `docs/mecanifica/roteiros/roteiros.json` formam uma árvore pelos nomes (`modelar/peca/familia`). Sem roteiro,
+ * ou com o nome de um grupo (`modelar`, `modelar/peca`), o comando faz a pergunta do grupo e lista os ramos, e a resposta é o
+ * argumento da chamada seguinte. Com uma folha (ou só o último nome, quando é único), devolve a leitura antes de começar, com
+ * as seções `arquivo#âncora` entregues ali mesmo, o que abrir só quando a condição aparecer, a skill, os comandos, a lista
+ * gerada na hora (famílias, peças do acervo ou operações) e o passo seguinte lido do estado: o plano ativo e a tarefa de
+ * `comunicacao.md` para quem muda o projeto, e a situação do Condutor para o esboço com `--arquivo`. Um nome que não é nó
+ * busca o tópico nos títulos dos documentos de uso, das skills e de `docs/mecanifica/`, e `arquivo#âncora` entrega a seção.
  *
  * O comando só lê. O Condutor só é consultado quando o estado dele já existe, porque a situação do Condutor cria o estado
  * (com o estado existente, ela o regrava com o mesmo conteúdo). A
@@ -14,7 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { carregarRoteiros, medirRoteiro, RAIZ } from '../mapa/roteiros.mjs';
+import { ancoraDe, carregarRoteiros, filhosDoNo, medirRoteiro, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
 import { lerTopicos, README_DO_ESBOCO } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
 import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
@@ -75,8 +77,32 @@ export function situacaoDoCondutor(arquivo, raiz = RAIZ) {
   return { texto, passo };
 }
 
+/* As famílias registradas, do `familia.json` de cada uma: `id versão: perfis`. */
+export function listaDeFamilias(raiz = RAIZ) {
+  const pasta = join(raiz, 'procedural/familias');
+  return readdirSync(pasta, { withFileTypes: true }).filter((e) => e.isDirectory() && existsSync(join(pasta, e.name, 'familia.json'))).map((e) => {
+    const f = JSON.parse(readFileSync(join(pasta, e.name, 'familia.json'), 'utf8'));
+    const perfis = Object.keys(f.perfis ?? {});
+    return `${f.id} ${f.versao}: ${perfis.length > 0 ? `perfis ${perfis.join(', ')}` : 'sem perfil gravado'}`;
+  }).sort();
+}
+
+/* As peças do acervo, cada pasta de `procedural/pecas/` com `receita.js`, e as partes de um objeto como `objeto/parte`. */
+export function listaDePecas(raiz = RAIZ) {
+  const pasta = join(raiz, 'procedural/pecas');
+  const nomes = [];
+  for (const e of readdirSync(pasta, { withFileTypes: true }).filter((x) => x.isDirectory())) {
+    if (existsSync(join(pasta, e.name, 'receita.js'))) nomes.push(e.name);
+    const partes = join(pasta, e.name, 'partes');
+    if (existsSync(partes)) for (const p of readdirSync(partes, { withFileTypes: true })) if (p.isDirectory() && existsSync(join(partes, p.name, 'receita.js'))) nomes.push(`${e.name}/${p.name}`);
+  }
+  return nomes.sort();
+}
+
 /* O que o roteiro de modelar tem disponível, sem carregar referência inteira. */
 function disponivel(roteiro, raiz) {
+  if (roteiro.lista === 'familias') return listaDeFamilias(raiz).map((l) => `família ${l}`);
+  if (roteiro.lista === 'pecas') return [`${listaDePecas(raiz).length} peças no acervo: ${listaDePecas(raiz).join(', ')}`];
   if (roteiro.id === 'modelar/esboco' || roteiro.id === 'modelar/laco-do-esboco') {
     const topicos = lerTopicos(readFileSync(README_DO_ESBOCO, 'utf8'));
     const k = topicos.findIndex((t) => t.id === 'formas');
@@ -116,24 +142,65 @@ function passoDeMudar(estado, roteiro) {
   return `Trabalhe na fatia ${estado.plano.fatiaAberta.numero} de ${estado.plano.arquivo}.`;
 }
 
-/* Resolve a consulta: { roteiro }, { grupo: [roteiros] } quando é uma intenção ou um prefixo, ou { desconhecido: true }. */
+/* Resolve a consulta: { roteiro }, { grupo: id, filhos } quando é um nó da árvore, ou { desconhecido: true }. */
 export function resolverRoteiro(roteiros, consulta) {
   const q = String(consulta).trim().toLowerCase();
   const exato = roteiros.find((r) => r.id === q);
   if (exato) return { roteiro: exato };
-  const grupo = roteiros.filter((r) => r.id.startsWith(`${q}/`) || r.intencao === q);
-  if (grupo.length === 1) return { roteiro: grupo[0] };
-  if (grupo.length > 1) return { grupo };
+  const filhos = filhosDoNo(roteiros, q);
+  if (filhos.length === 1 && filhos[0].roteiro) return { roteiro: filhos[0].roteiro };
+  if (filhos.length > 0) return { grupo: q, filhos };
   const ultimo = roteiros.filter((r) => r.id.split('/').pop() === q);
   if (ultimo.length === 1) return { roteiro: ultimo[0] };
   return { desconhecido: true };
 }
 
-const linhaDoRoteiro = (r, largura) => `  ${r.id.padEnd(largura)}${r.intencao}: ${r.quando}`;
+/* As linhas de um nó: cada ramo com a frase da folha, ou com a pergunta do grupo, que leva a outra chamada. */
+function linhasDosFilhos(filhos, perguntas) {
+  const largura = Math.max(...filhos.map((f) => f.id.length)) + 2;
+  return filhos.map((f) => `  ${f.id.padEnd(largura)}${f.roteiro ? f.roteiro.quando : `${perguntas?.[f.id] ?? ''} (npm run comecar -- ${f.id})`}`);
+}
+
+const resumoDosFilhos = (filhos, perguntas) => filhos.map((f) => (f.roteiro
+  ? { id: f.id, intencao: f.roteiro.intencao, quando: f.roteiro.quando }
+  : { id: f.id, grupo: true, pergunta: perguntas?.[f.id] ?? null }));
 
 function textoDaLista(roteiros, titulo) {
   const largura = Math.max(...roteiros.map((r) => r.id.length)) + 2;
-  return [`${titulo} (npm run comecar -- <roteiro>):`, ...roteiros.map((r) => linhaDoRoteiro(r, largura))].join('\n');
+  return [`${titulo} (npm run comecar -- <roteiro>):`, ...roteiros.map((r) => `  ${r.id.padEnd(largura)}${r.quando}`)].join('\n');
+}
+
+/* Os documentos onde a busca por tópico procura títulos: os de uso, as skills e os de `docs/mecanifica/` na raiz dela. */
+function documentosDaBusca(raiz) {
+  const lista = [];
+  const pastaDe = (rel) => (existsSync(join(raiz, rel)) ? readdirSync(join(raiz, rel)).filter((n) => n.endsWith('.md')).map((n) => `${rel}/${n}`) : []);
+  lista.push(...pastaDe('docs/mecanifica/usar'), ...pastaDe('docs/mecanifica'));
+  const skills = join(raiz, '.claude/skills');
+  if (existsSync(skills)) for (const s of readdirSync(skills)) if (existsSync(join(skills, s, 'SKILL.md'))) lista.push(`.claude/skills/${s}/SKILL.md`);
+  return lista;
+}
+
+const semAcento = (t) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
+/* A busca por tópico: os títulos que contêm mais palavras da consulta, como `arquivo#âncora`, com o tamanho da seção. */
+export function buscarTopico(consulta, raiz = RAIZ, limite = 8) {
+  const palavras = semAcento(consulta).split(/[^\p{L}\p{N}]+/u).filter((p) => p.length >= 3);
+  if (palavras.length === 0) return [];
+  const achados = [];
+  for (const arquivo of documentosDaBusca(raiz)) {
+    let cerca = false;
+    for (const linha of readFileSync(join(raiz, arquivo), 'utf8').split('\n')) {
+      if (/^```/.test(linha)) cerca = !cerca;
+      const m = !cerca && /^#{1,4} (.+)$/.exec(linha);
+      if (!m) continue;
+      const titulo = semAcento(m[1]);
+      const pontos = palavras.filter((p) => titulo.includes(p)).length;
+      if (pontos === 0) continue;
+      const item = `${arquivo}#${ancoraDe(m[1])}`;
+      achados.push({ item, titulo: m[1].trim(), pontos, bytes: Buffer.byteLength(textoDaLeitura(item, raiz) ?? '') });
+    }
+  }
+  return achados.sort((a, b) => b.pontos - a.pontos || a.bytes - b.bytes || a.item.localeCompare(b.item)).slice(0, limite);
 }
 
 /* A resposta da entrada: { ok, codigo, texto, resultado }. `arquivo` é o esboço cujo Condutor dá o passo seguinte. */
@@ -141,26 +208,37 @@ export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ 
   const dados = carregarRoteiros(raiz);
   const estado = estadoGeral(raiz);
   if (consulta === null || String(consulta).trim() === '') {
-    const passo = 'Escolha o roteiro da tarefa e rode npm run comecar -- <roteiro>.';
-    const texto = [textoDaLista(dados.roteiros, 'Roteiros'), '', 'Estado:', ...estado.linhas.map((l) => `  ${l}`), '', `Passo seguinte: ${passo}`].join('\n');
-    return { ok: true, codigo: 0, texto: `${texto}\n`, resultado: { roteiros: dados.roteiros.map(({ id, intencao, quando }) => ({ id, intencao, quando })), estado: estado.linhas, passo } };
+    const filhos = filhosDoNo(dados.roteiros, '');
+    const passo = 'Escolha o ramo da tarefa e rode npm run comecar -- <ramo>; para outra coisa, npm run comecar -- <tópico>.';
+    const texto = ['Qual é a tarefa? (npm run comecar -- <ramo>)', ...linhasDosFilhos(filhos, dados.perguntas), '', 'Estado:', ...estado.linhas.map((l) => `  ${l}`), '', `Passo seguinte: ${passo}`].join('\n');
+    return { ok: true, codigo: 0, texto: `${texto}\n`, resultado: { roteiros: resumoDosFilhos(filhos, dados.perguntas), estado: estado.linhas, passo } };
   }
-  const achado = resolverRoteiro(dados.roteiros, consulta);
-  registrarUso({ evento: 'comecar', roteiro: String(consulta).trim().toLowerCase(), achado: achado.desconhecido !== true });
+  const q = String(consulta).trim();
+  if (q.includes('#')) {
+    const secao = textoDaLeitura(q, raiz);
+    if (secao !== null) return { ok: true, codigo: 0, texto: `${secao}\n`, resultado: { secao: q, bytes: Buffer.byteLength(secao) } };
+  }
+  const achado = resolverRoteiro(dados.roteiros, q);
+  registrarUso({ evento: 'comecar', roteiro: q.toLowerCase(), achado: achado.desconhecido !== true });
   if (achado.grupo) {
-    const passo = 'Escolha um destes roteiros e rode npm run comecar -- <roteiro>.';
+    const pergunta = dados.perguntas?.[achado.grupo] ?? `Qual destes ramos de "${achado.grupo}"?`;
+    const passo = 'Escolha o ramo e rode npm run comecar -- <ramo>.';
     return {
       ok: true, codigo: 0,
-      texto: `${textoDaLista(achado.grupo, `Roteiros de "${consulta}"`)}\n\nPasso seguinte: ${passo}\n`,
-      resultado: { roteiros: achado.grupo.map(({ id, intencao, quando }) => ({ id, intencao, quando })), passo },
+      texto: `${[pergunta, ...linhasDosFilhos(achado.filhos, dados.perguntas)].join('\n')}\n\nPasso seguinte: ${passo}\n`,
+      resultado: { grupo: achado.grupo, pergunta, roteiros: resumoDosFilhos(achado.filhos, dados.perguntas), passo },
     };
   }
   if (achado.desconhecido) {
+    const topicos = buscarTopico(q, raiz);
+    const linhas = topicos.length > 0
+      ? [`"${q}" não é um ramo; os títulos mais perto (npm run comecar -- '<arquivo#âncora>' entrega a seção):`, ...topicos.map((t) => `  ${t.item} (${milhar(t.bytes)} bytes)`)]
+      : [`"${q}" não é um ramo nem um título de documento.`];
     return {
-      ok: false, codigo: 1,
-      texto: `roteiro "${consulta}" não existe.\n\n${textoDaLista(dados.roteiros, 'Roteiros')}\n`,
-      resultado: { roteiros: dados.roteiros.map(({ id }) => id) },
-      erro: { codigo: 'roteiro_desconhecido', mensagem: `roteiro "${consulta}" não existe.`, acao: 'Use um dos roteiros listados, ou chame sem roteiro para a lista.' },
+      ok: topicos.length > 0, codigo: topicos.length > 0 ? 0 : 1,
+      texto: `${linhas.join('\n')}\n\n${textoDaLista(dados.roteiros, 'Ramos')}\n`,
+      resultado: { roteiros: dados.roteiros.map(({ id }) => id), topicos },
+      ...(topicos.length > 0 ? {} : { erro: { codigo: 'roteiro_desconhecido', mensagem: `"${q}" não é um ramo nem um título de documento.`, acao: 'Use um dos ramos listados, ou chame sem argumento para a pergunta inicial.' } }),
     };
   }
 
@@ -182,13 +260,17 @@ export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ 
       estadoTexto = ['sem --arquivo: passe o esboço em andamento para ler o Condutor dele'];
     }
   }
+  const inteiros = r.ler.filter((a) => partesDaLeitura(a).ancora === null);
+  const secoes = r.ler.filter((a) => partesDaLeitura(a).ancora !== null);
   const partes = [
     `roteiro ${r.id}: ${r.titulo}`,
     r.quando,
     '',
-    `Ler antes (${milhar(total)} bytes, orçamento ${milhar(r.orcamentoBytes)}):`,
-    ...r.ler.map((a) => `  ${a}`),
+    `Ler antes (${milhar(total)} bytes, orçamento ${milhar(r.orcamentoBytes)}, com as seções abaixo):`,
+    ...inteiros.map((a) => `  ${a}`),
   ];
+  for (const a of secoes) partes.push('', `--- ${a}`, textoDaLeitura(a, raiz) ?? '(seção não encontrada)');
+  if (secoes.length > 0) partes.push('---');
   if ((r.sobDemanda ?? []).length > 0) partes.push('', 'Abrir só quando:', ...r.sobDemanda.map((s) => `  ${s.arquivo}: quando ${s.quando}`));
   if (r.skill) partes.push('', `Skill: ${r.skill}`);
   if ((r.comandos ?? []).length > 0) partes.push('', 'Comandos:', ...r.comandos.map((c) => `  ${c}`));

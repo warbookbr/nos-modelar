@@ -8,11 +8,7 @@ dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP
 - `mudar`: Mudar núcleo, gate, arquitetura, ferramenta ou plano.
 - `documentar`: Escrever, mover ou cortar documento, fora de um plano.
 - `pesquisar`: Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
-- `modelar/peca`: Escrever ou corrigir a receita de uma peça e prová-la na bancada.
-- `modelar/esboco`: Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço.
-- `modelar/laco-do-esboco`: Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço.
-- `modelar/auditar-peca`: Obter evidência objetiva de uma peça antes de publicar ou homologar.
-- `modelar/auditar-montagem`: Conferir composição, relações, encaixes e impacto de um conjunto montado.
+- `modelar`: A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?
 <!-- roteiros:fim -->
 
 <!-- invariantes:inicio -->

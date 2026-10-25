@@ -15,11 +15,20 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 | `mudar` | trabalhar no projeto | Mudar núcleo, gate, arquitetura, ferramenta ou plano. |
 | `documentar` | trabalhar na documentação | Escrever, mover ou cortar documento, fora de um plano. |
 | `pesquisar` | pesquisar | Saber o que já se tentou, mediu ou pesquisou antes de propor algo. |
-| `modelar/peca` | modelar | Escrever ou corrigir a receita de uma peça e prová-la na bancada. |
+| `modelar/peca/familia` | modelar | A peça é um caso de uma família que já existe, como aparelho, móvel, cadeira ou roda. |
+| `modelar/peca/nova` | modelar | Nenhuma família serve, e a receita nova se escreve com as operações do motor. |
+| `modelar/peca/corrigir` | modelar | Corrigir ou refinar uma peça que já está no acervo, ou absorver um ajuste feito na bancada. |
 | `modelar/esboco` | modelar | Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço. |
 | `modelar/laco-do-esboco` | modelar | Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço. |
 | `modelar/auditar-peca` | modelar | Obter evidência objetiva de uma peça antes de publicar ou homologar. |
 | `modelar/auditar-montagem` | modelar | Conferir composição, relações, encaixes e impacto de um conjunto montado. |
+
+## Perguntas da árvore
+
+Sem roteiro, ou com o nome de um grupo, o `comecar` faz a pergunta do grupo e lista os ramos:
+
+- `modelar`: A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?
+- `modelar/peca`: A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?
 
 ## Regras cobradas por gate
 
@@ -98,24 +107,77 @@ Passo seguinte, sem estado lido: Abra docs/mecanifica/historico/README.md e siga
 
 Conferido no fim: Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.
 
-## modelar/peca: Criar ou refinar uma peça procedural
+## modelar/peca/familia: Peça de uma família
 
-Escrever ou corrigir a receita de uma peça e prová-la na bancada.
+A peça é um caso de uma família que já existe, como aparelho, móvel, cadeira ou roda.
 
-Ler antes de começar, num orçamento de 65.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/mecanifica/usar/GUIA-AUTORIA-IA.md`
-- `docs/mecanifica/usar/LACO-VISUAL.md`
 - `.claude/skills/criar-peca/SKILL.md`
-- `docs/mecanifica/usar/AUTORIA-DE-PECA.md`
-- `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`
-- `docs/mecanifica/usar/INTENCAO-PECA-V1.md`
-- `docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`
-- `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`
+- `docs/mecanifica/usar/AUTORIA-DE-PECA.md#peça-de-uma-família`
+- `docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
+
+Lista gerada na hora: familias.
 
 Abrir só quando a condição aparecer:
 
+- `docs/mecanifica/usar/GUIA-AUTORIA-IA.md`, quando for preciso ver a anatomia inteira da receita ou a esteira de validação.
+- `docs/mecanifica/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
+- `docs/mecanifica/usar/AUTORIA-DE-PECA.md`, quando a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem.
+- `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, quando a receita for escrita como dado JSON, pela autoria por MCP.
+- `docs/mecanifica/usar/INTENCAO-PECA-V1.md`, quando a função da peça não for óbvia pela geometria e pedir o contrato INTENCAO.
+- `docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`, quando for gerar forma pela primeira vez ou um defeito visual se repetir.
+- `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for montar o pacote do crítico ou parear referência e render.
+- `docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md`, quando uma operação se comportar diferente do esperado e for preciso o caso medido dela.
+- `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem.
+- `docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md`, quando a peça for nova e precisar da rodada de alinhamento antes do PLANO.
+- `.claude/skills/criar-peca/references/operacoes-procedurais.md`, quando for escolher uma operação.
+- `docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, quando os achados encolhem e a qualidade não sobe.
+- `docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md`, quando for montar o pedido ao crítico ou ler o formato do achado.
+- `docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md`, quando a peça entra numa montagem.
+- `docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md`, quando for carregar a peça na bancada da sessão.
+- `docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md`, quando a peça parte de uma prancha.
+- `docs/mecanifica/usar/PARAMETROS-VIVOS.md`, quando for alterar um número da receita.
+- `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
+- `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
+- `docs/mecanifica/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
+- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+
+Skill: `criar-peca`.
+
+Comandos: `node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
+
+Passo seguinte, sem estado lido: Escolha a família e o perfil mais perto do pedido, escreva a receita que a chama com os parâmetros da TABELA e prove a peça na bancada.
+
+Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.
+
+## modelar/peca/nova: Receita nova por operações
+
+Nenhuma família serve, e a receita nova se escreve com as operações do motor.
+
+Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
+
+- `CLAUDE.md`
+- `.claude/skills/criar-peca/SKILL.md`
+- `docs/mecanifica/usar/GUIA-AUTORIA-IA.md#2-anatomia-canônica-de-uma-receita-procedural`
+- `docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
+
+Lista gerada na hora: operacoes.
+
+Abrir só quando a condição aparecer:
+
+- `docs/mecanifica/usar/GUIA-AUTORIA-IA.md`, quando for preciso ver a anatomia inteira da receita ou a esteira de validação.
+- `docs/mecanifica/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
+- `docs/mecanifica/usar/AUTORIA-DE-PECA.md`, quando a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem.
+- `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, quando a receita for escrita como dado JSON, pela autoria por MCP.
+- `docs/mecanifica/usar/INTENCAO-PECA-V1.md`, quando a função da peça não for óbvia pela geometria e pedir o contrato INTENCAO.
+- `docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`, quando for gerar forma pela primeira vez ou um defeito visual se repetir.
+- `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for montar o pacote do crítico ou parear referência e render.
+- `docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md`, quando uma operação se comportar diferente do esperado e for preciso o caso medido dela.
+- `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem.
+- `docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md`, quando a peça for nova e precisar da rodada de alinhamento antes do PLANO.
 - `.claude/skills/criar-peca/references/operacoes-procedurais.md`, quando for escolher uma operação.
 - `docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, quando os achados encolhem e a qualidade não sobe.
 - `docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md`, quando for montar o pedido ao crítico ou ler o formato do achado.
@@ -134,6 +196,53 @@ Skill: `criar-peca`.
 Comandos: `node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
 
 Passo seguinte, sem estado lido: Com peça nova, parta da forma de referência ou da medida (conversão, modelo de referência, imagem, prancha), combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.
+
+Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.
+
+## modelar/peca/corrigir: Corrigir uma peça do acervo
+
+Corrigir ou refinar uma peça que já está no acervo, ou absorver um ajuste feito na bancada.
+
+Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
+
+- `CLAUDE.md`
+- `.claude/skills/criar-peca/SKILL.md`
+- `docs/mecanifica/usar/GUIA-AUTORIA-IA.md#4-esteira-canônica-de-validação-local`
+- `docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
+
+Lista gerada na hora: pecas.
+
+Abrir só quando a condição aparecer:
+
+- `docs/mecanifica/usar/GUIA-AUTORIA-IA.md`, quando for preciso ver a anatomia inteira da receita ou a esteira de validação.
+- `docs/mecanifica/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
+- `docs/mecanifica/usar/AUTORIA-DE-PECA.md`, quando a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem.
+- `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, quando a receita for escrita como dado JSON, pela autoria por MCP.
+- `docs/mecanifica/usar/INTENCAO-PECA-V1.md`, quando a função da peça não for óbvia pela geometria e pedir o contrato INTENCAO.
+- `docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`, quando for gerar forma pela primeira vez ou um defeito visual se repetir.
+- `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for montar o pacote do crítico ou parear referência e render.
+- `docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md`, quando uma operação se comportar diferente do esperado e for preciso o caso medido dela.
+- `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem.
+- `docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md`, quando a peça for nova e precisar da rodada de alinhamento antes do PLANO.
+- `.claude/skills/criar-peca/references/operacoes-procedurais.md`, quando for escolher uma operação.
+- `docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, quando os achados encolhem e a qualidade não sobe.
+- `docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md`, quando for montar o pedido ao crítico ou ler o formato do achado.
+- `docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md`, quando a peça entra numa montagem.
+- `docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md`, quando for carregar a peça na bancada da sessão.
+- `docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md`, quando a peça parte de uma prancha.
+- `docs/mecanifica/usar/PARAMETROS-VIVOS.md`, quando for alterar um número da receita.
+- `docs/mecanifica/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
+- `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
+- `docs/mecanifica/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
+- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+- `docs/mecanifica/usar/AJUSTE-DA-BANCADA.md`, quando a pessoa salvou um ajuste na bancada que precisa voltar à receita.
+
+Skill: `criar-peca`.
+
+Comandos: `node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
+
+Passo seguinte, sem estado lido: Leia a receita da peça e o veredito ou o ajuste que pede a correção, mude a TABELA ou os passos e prove de novo na bancada.
 
 Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.
 
@@ -224,6 +333,7 @@ Abrir só quando a condição aparecer:
 
 - `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for julgar as vistas do conjunto.
 - `docs/mecanifica/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/mecanifica/usar/AUDITORIA-DA-MONTAGEM.md`, quando a dúvida for o apoio no chão ou a auditoria da montagem construída.
 
 Skill: `auditar-montagem`.
 

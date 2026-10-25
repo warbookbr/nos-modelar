@@ -1,20 +1,20 @@
-/* comecar.test.mjs — a entrada por intenção: a lista dos roteiros com o estado, cada roteiro com a sua leitura e o passo
-   seguinte, o grupo de uma intenção, o nome desconhecido, o passo lido do plano ativo, de comunicacao.md e do Condutor, e a
-   ferramenta MCP respondendo igual à função. */
+/* comecar.test.mjs — a entrada por intenção: a pergunta inicial com o estado, a pergunta de cada grupo da árvore, cada folha
+   com a sua leitura, as seções entregues e o passo seguinte, a busca por tópico e a seção por âncora, o passo lido do plano
+   ativo, de comunicacao.md e do Condutor, e a ferramenta MCP respondendo igual à função. */
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { carregarRoteiros, CAMINHO_JSON, RAIZ } from '../mapa/roteiros.mjs';
-import { comecar, planoAtivo, resolverRoteiro, situacaoDoCondutor, tarefasAbertas } from './comecar.mjs';
+import { carregarRoteiros, CAMINHO_JSON, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
+import { buscarTopico, comecar, listaDeFamilias, listaDePecas, planoAtivo, resolverRoteiro, situacaoDoCondutor, tarefasAbertas } from './comecar.mjs';
 import { comecarEntrada, criarFerramentasComecar } from '../mcp/perfis/comecar.mjs';
 
 const CLI = fileURLToPath(new URL('./comecar.mjs', import.meta.url));
 const ESBOCO = fileURLToPath(new URL('./esboco.mjs', import.meta.url));
 const FIXTURE = join(RAIZ, 'modulos/esboco/tests/fixtures/moto-curvas.esboco.json');
-const roteiros = carregarRoteiros().roteiros;
+const { roteiros, perguntas } = carregarRoteiros();
 /* Montado por partes para o gate de links não tomar o plano de mentira por citação quebrada. */
 const PLANO_DE_TESTE = ['docs', 'mecanifica', 'planos', '2026-01-01-teste.md'].join('/');
 
@@ -45,12 +45,14 @@ const PLANO = `# O plano de teste
 `;
 
 describe('comecar sem roteiro', () => {
-  it('lista todos os roteiros com a intenção e a frase, mais o estado e o passo seguinte', () => {
+  it('pergunta pela tarefa com o primeiro nível da árvore, cada folha com a frase e cada grupo com a pergunta, mais o estado', () => {
     const r = comecar();
     expect(r).toMatchObject({ ok: true, codigo: 0 });
-    for (const rot of roteiros) expect(r.texto).toContain(`${rot.intencao}: ${rot.quando}`);
+    expect(r.resultado.roteiros.map((x) => x.id)).toEqual(['mudar', 'documentar', 'pesquisar', 'modelar']);
+    expect(r.texto).toContain(roteiros.find((x) => x.id === 'mudar').quando);
+    expect(r.texto).toContain(`${perguntas.modelar} (npm run comecar -- modelar)`);
     expect(r.texto).toMatch(/Estado:\n {2}(plano ativo|nenhum plano ativo)/);
-    expect(r.resultado.passo).toContain('npm run comecar -- <roteiro>');
+    expect(r.resultado.passo).toContain('npm run comecar -- <ramo>');
   });
 });
 
@@ -59,7 +61,10 @@ describe('comecar <roteiro>', () => {
     for (const rot of roteiros) {
       const r = comecar({ roteiro: rot.id });
       expect(r.ok, rot.id).toBe(true);
-      for (const a of rot.ler) expect(r.texto).toContain(`  ${a}\n`);
+      for (const a of rot.ler) {
+        if (partesDaLeitura(a).ancora === null) expect(r.texto).toContain(`  ${a}\n`);
+        else expect(r.texto).toContain(`--- ${a}\n${textoDaLeitura(a)}\n`);
+      }
       for (const s of rot.sobDemanda ?? []) expect(r.texto).toContain(`  ${s.arquivo}: quando ${s.quando}`);
       if (rot.skill) expect(r.texto).toContain(`Skill: ${rot.skill}`);
       expect(r.texto).toContain('Passo seguinte: ');
@@ -72,20 +77,42 @@ describe('comecar <roteiro>', () => {
     const esboco = comecar({ roteiro: 'modelar/esboco' }).resultado.disponivel.join('\n');
     expect(esboco).toMatch(/formas caixa, cilindro.*tubo/);
     expect(esboco).toMatch(/componentes roda, garfo.*dobradica/);
-    expect(comecar({ roteiro: 'modelar/peca' }).resultado.disponivel[0]).toMatch(/^\d+ operações do motor/);
+    expect(comecar({ roteiro: 'modelar/peca/nova' }).resultado.disponivel[0]).toMatch(/^\d+ operações do motor/);
   });
 
-  it('uma intenção que agrupa roteiros devolve só a lista deles, e o último nome único resolve sozinho', () => {
+  it('as listas saem do acervo e dos registros na hora: as famílias com os perfis e as peças, com as partes de um objeto', () => {
+    const familias = comecar({ roteiro: 'modelar/peca/familia' }).resultado.disponivel;
+    expect(familias).toEqual(listaDeFamilias().map((l) => `família ${l}`));
+    expect(familias.join('\n')).toMatch(/família aparelho-de-caixa [\d.]+: perfis forninho-eletrico/);
+    expect(listaDePecas()).toContain('aviao/helice');
+    expect(comecar({ roteiro: 'modelar/peca/corrigir' }).resultado.disponivel[0]).toContain(`${listaDePecas().length} peças no acervo`);
+  });
+
+  it('um grupo faz a pergunta dele e lista só os filhos diretos, e o último nome único resolve sozinho', () => {
     const grupo = comecar({ roteiro: 'modelar' });
-    expect(grupo.resultado.roteiros.map((x) => x.id)).toEqual(roteiros.filter((x) => x.intencao === 'modelar').map((x) => x.id));
+    expect(grupo.resultado.pergunta).toBe(perguntas.modelar);
+    expect(grupo.resultado.roteiros.map((x) => x.id)).toEqual(['modelar/peca', 'modelar/esboco', 'modelar/laco-do-esboco', 'modelar/auditar-peca', 'modelar/auditar-montagem']);
+    expect(grupo.resultado.roteiros[0]).toEqual({ id: 'modelar/peca', grupo: true, pergunta: perguntas['modelar/peca'] });
+    expect(comecar({ roteiro: 'modelar/peca' }).resultado.roteiros.map((x) => x.id)).toEqual(['modelar/peca/familia', 'modelar/peca/nova', 'modelar/peca/corrigir']);
     expect(resolverRoteiro(roteiros, 'esboco').roteiro.id).toBe('modelar/esboco');
+    expect(resolverRoteiro(roteiros, 'familia').roteiro.id).toBe('modelar/peca/familia');
     expect(resolverRoteiro(roteiros, 'pesquisar').roteiro.id).toBe('pesquisar');
   });
 
-  it('um roteiro desconhecido sai com código 1, o erro e a lista', () => {
-    const r = comecar({ roteiro: 'voar' });
+  it('um nome que não é nó busca o tópico nos títulos, e arquivo#âncora entrega a seção', () => {
+    const r = comecar({ roteiro: 'peça de uma família' });
+    expect(r).toMatchObject({ ok: true, codigo: 0 });
+    expect(r.resultado.topicos[0].item).toBe('docs/mecanifica/usar/AUTORIA-DE-PECA.md#peça-de-uma-família');
+    expect(buscarTopico('ab')).toEqual([]);
+    const secao = comecar({ roteiro: r.resultado.topicos[0].item });
+    expect(secao.texto).toMatch(/^## Peça de uma família\n/);
+    expect(secao.texto).not.toContain('## Identidade estável');
+  });
+
+  it('um nome que não é nó nem título sai com código 1, o erro e a lista', () => {
+    const r = comecar({ roteiro: 'xqzw' });
     expect(r).toMatchObject({ ok: false, codigo: 1, erro: { codigo: 'roteiro_desconhecido' } });
-    expect(r.texto).toContain('roteiro "voar" não existe.');
+    expect(r.texto).toContain('"xqzw" não é um ramo nem um título de documento.');
     expect(r.texto).toContain('modelar/esboco');
   });
 });
@@ -132,9 +159,9 @@ describe('a linha de comando e o MCP', () => {
     const ok = spawnSync(process.execPath, [CLI, 'pesquisar'], { encoding: 'utf8' });
     expect(ok.status).toBe(0);
     expect(ok.stdout).toBe(comecar({ roteiro: 'pesquisar' }).texto);
-    const ruim = spawnSync(process.execPath, [CLI, 'voar'], { encoding: 'utf8' });
+    const ruim = spawnSync(process.execPath, [CLI, 'xqzw'], { encoding: 'utf8' });
     expect(ruim.status).toBe(1);
-    expect(ruim.stderr).toContain('roteiro "voar" não existe.');
+    expect(ruim.stderr).toContain('"xqzw" não é um ramo');
   });
 
   it('a ferramenta MCP comecar devolve o mesmo que a função, no esquema anunciado', async () => {

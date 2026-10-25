@@ -1,8 +1,9 @@
 /* comecar.mjs — a entrada por intenção no MCP.
  *
- * A mesma função de `npm run comecar`: sem roteiro, a lista dos roteiros com a frase de cada um e o estado do trabalho; com um
- * roteiro, o que ler antes, o que abrir só quando a condição aparecer, a skill, os comandos e o passo seguinte lido do
- * estado. Um agente que fala com o Mecanifica por MCP começa por aqui em vez de abrir documentos para descobrir por onde
+ * A mesma função de `npm run comecar`: sem roteiro, a pergunta inicial da árvore com o estado do trabalho; com um grupo, a
+ * pergunta dele e os ramos; com uma folha, a leitura com as seções entregues ali, o que abrir só quando a condição aparecer, a
+ * skill, os comandos, a lista gerada e o passo seguinte lido do estado; com outro nome, os títulos de documento mais perto, e
+ * com `arquivo#âncora`, a seção. Um agente que fala com o Mecanifica por MCP começa por aqui em vez de abrir documentos para descobrir por onde
  * entrar. Só lê.
  */
 import { z } from 'zod';
@@ -19,9 +20,11 @@ export function criarFerramentasComecar() {
     {
       nome: 'comecar',
       descricao:
-        'Por onde começar uma tarefa no Mecanifica. Sem roteiro, lista os roteiros por intenção (mudar, documentar, pesquisar, '
-        + 'modelar/...) e o estado do trabalho. Com um roteiro, devolve o que ler antes, o que abrir só quando a condição aparecer, '
-        + 'a skill, os comandos e o passo seguinte, lido do plano ativo, de comunicacao.md ou, com arquivo, do Condutor do esboço.',
+        'Por onde começar uma tarefa no Mecanifica, por perguntas. Sem roteiro, pergunta pela tarefa (mudar, documentar, pesquisar, '
+        + 'modelar) e dá o estado do trabalho; com um grupo (modelar, modelar/peca), faz a pergunta dele e lista os ramos. Com uma '
+        + 'folha, devolve a leitura com as seções entregues, o que abrir só quando a condição aparecer, a skill, os comandos, a lista '
+        + 'gerada (famílias, peças, operações) e o passo seguinte, lido do plano ativo, de comunicacao.md ou, com arquivo, do Condutor '
+        + 'do esboço. Outro nome busca o tópico nos títulos dos documentos, e arquivo#âncora entrega a seção.',
       inputSchema: comecarEntrada,
       outputSchema: z.object({
         ok: z.boolean(),

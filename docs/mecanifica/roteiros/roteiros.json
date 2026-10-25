@@ -1,6 +1,10 @@
 {
   "versao": 1,
   "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
+  "perguntas": {
+    "modelar": "A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?",
+    "modelar/peca": "A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?"
+  },
   "invariantes": [
     {
       "id": "nucleo-independente",
@@ -233,22 +237,57 @@
       }
     },
     {
-      "id": "modelar/peca",
+      "id": "modelar/peca/familia",
       "intencao": "modelar",
-      "titulo": "Criar ou refinar uma peça procedural",
-      "quando": "Escrever ou corrigir a receita de uma peça e prová-la na bancada.",
+      "titulo": "Peça de uma família",
+      "quando": "A peça é um caso de uma família que já existe, como aparelho, móvel, cadeira ou roda.",
       "ler": [
         "CLAUDE.md",
-        "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
-        "docs/mecanifica/usar/LACO-VISUAL.md",
         ".claude/skills/criar-peca/SKILL.md",
-        "docs/mecanifica/usar/AUTORIA-DE-PECA.md",
-        "docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md",
-        "docs/mecanifica/usar/INTENCAO-PECA-V1.md",
-        "docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md",
-        "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md"
+        "docs/mecanifica/usar/AUTORIA-DE-PECA.md#peça-de-uma-família",
+        "docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto"
       ],
       "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
+          "quando": "for preciso ver a anatomia inteira da receita ou a esteira de validação"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/LACO-VISUAL.md",
+          "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUTORIA-DE-PECA.md",
+          "quando": "a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md",
+          "quando": "a receita for escrita como dado JSON, pela autoria por MCP"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/INTENCAO-PECA-V1.md",
+          "quando": "a função da peça não for óbvia pela geometria e pedir o contrato INTENCAO"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md",
+          "quando": "for gerar forma pela primeira vez ou um defeito visual se repetir"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md",
+          "quando": "for montar o pacote do crítico ou parear referência e render"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md",
+          "quando": "uma operação se comportar diferente do esperado e for preciso o caso medido dela"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/FLUXO-DO-OBJETO.md",
+          "quando": "o objeto tiver várias partes, da imagem à montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md",
+          "quando": "a peça for nova e precisar da rodada de alinhamento antes do PLANO"
+        },
         {
           "arquivo": ".claude/skills/criar-peca/references/operacoes-procedurais.md",
           "quando": "for escolher uma operação"
@@ -304,9 +343,246 @@
         "npm run parametros",
         "npm run conferir:referencia"
       ],
+      "lista": "familias",
+      "passo": "Escolha a família e o perfil mais perto do pedido, escreva a receita que a chama com os parâmetros da TABELA e prove a peça na bancada.",
+      "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
+      "orcamentoBytes": 15000,
+      "linhaDeBase": {
+        "bytes": 62482,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/peca/nova",
+      "intencao": "modelar",
+      "titulo": "Receita nova por operações",
+      "quando": "Nenhuma família serve, e a receita nova se escreve com as operações do motor.",
+      "ler": [
+        "CLAUDE.md",
+        ".claude/skills/criar-peca/SKILL.md",
+        "docs/mecanifica/usar/GUIA-AUTORIA-IA.md#2-anatomia-canônica-de-uma-receita-procedural",
+        "docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
+          "quando": "for preciso ver a anatomia inteira da receita ou a esteira de validação"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/LACO-VISUAL.md",
+          "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUTORIA-DE-PECA.md",
+          "quando": "a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md",
+          "quando": "a receita for escrita como dado JSON, pela autoria por MCP"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/INTENCAO-PECA-V1.md",
+          "quando": "a função da peça não for óbvia pela geometria e pedir o contrato INTENCAO"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md",
+          "quando": "for gerar forma pela primeira vez ou um defeito visual se repetir"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md",
+          "quando": "for montar o pacote do crítico ou parear referência e render"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md",
+          "quando": "uma operação se comportar diferente do esperado e for preciso o caso medido dela"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/FLUXO-DO-OBJETO.md",
+          "quando": "o objeto tiver várias partes, da imagem à montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md",
+          "quando": "a peça for nova e precisar da rodada de alinhamento antes do PLANO"
+        },
+        {
+          "arquivo": ".claude/skills/criar-peca/references/operacoes-procedurais.md",
+          "quando": "for escolher uma operação"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md",
+          "quando": "os achados encolhem e a qualidade não sobe"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md",
+          "quando": "for montar o pedido ao crítico ou ler o formato do achado"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md",
+          "quando": "a peça entra numa montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md",
+          "quando": "for carregar a peça na bancada da sessão"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md",
+          "quando": "a peça parte de uma prancha"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARAMETROS-VIVOS.md",
+          "quando": "for alterar um número da receita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
+          "quando": "for declarar a forma pronta"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md",
+          "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
+        },
+        {
+          "arquivo": "docs/mecanifica/modelar-carroceria.md",
+          "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
+          "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
+        }
+      ],
+      "skill": "criar-peca",
+      "comandos": [
+        "node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>",
+        "npm run parametros",
+        "npm run conferir:referencia"
+      ],
+      "lista": "operacoes",
       "passo": "Com peça nova, parta da forma de referência ou da medida (conversão, modelo de referência, imagem, prancha), combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.",
       "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
-      "orcamentoBytes": 65000,
+      "orcamentoBytes": 15000,
+      "linhaDeBase": {
+        "bytes": 62482,
+        "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/peca/corrigir",
+      "intencao": "modelar",
+      "titulo": "Corrigir uma peça do acervo",
+      "quando": "Corrigir ou refinar uma peça que já está no acervo, ou absorver um ajuste feito na bancada.",
+      "ler": [
+        "CLAUDE.md",
+        ".claude/skills/criar-peca/SKILL.md",
+        "docs/mecanifica/usar/GUIA-AUTORIA-IA.md#4-esteira-canônica-de-validação-local",
+        "docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/usar/GUIA-AUTORIA-IA.md",
+          "quando": "for preciso ver a anatomia inteira da receita ou a esteira de validação"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/LACO-VISUAL.md",
+          "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUTORIA-DE-PECA.md",
+          "quando": "a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md",
+          "quando": "a receita for escrita como dado JSON, pela autoria por MCP"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/INTENCAO-PECA-V1.md",
+          "quando": "a função da peça não for óbvia pela geometria e pedir o contrato INTENCAO"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md",
+          "quando": "for gerar forma pela primeira vez ou um defeito visual se repetir"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md",
+          "quando": "for montar o pacote do crítico ou parear referência e render"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md",
+          "quando": "uma operação se comportar diferente do esperado e for preciso o caso medido dela"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/FLUXO-DO-OBJETO.md",
+          "quando": "o objeto tiver várias partes, da imagem à montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md",
+          "quando": "a peça for nova e precisar da rodada de alinhamento antes do PLANO"
+        },
+        {
+          "arquivo": ".claude/skills/criar-peca/references/operacoes-procedurais.md",
+          "quando": "for escolher uma operação"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md",
+          "quando": "os achados encolhem e a qualidade não sobe"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md",
+          "quando": "for montar o pedido ao crítico ou ler o formato do achado"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md",
+          "quando": "a peça entra numa montagem"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md",
+          "quando": "for carregar a peça na bancada da sessão"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md",
+          "quando": "a peça parte de uma prancha"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARAMETROS-VIVOS.md",
+          "quando": "for alterar um número da receita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/PARE-E-ANALISE.md",
+          "quando": "for declarar a forma pronta"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/README.md",
+          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md",
+          "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
+        },
+        {
+          "arquivo": "docs/mecanifica/modelar-carroceria.md",
+          "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
+          "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AJUSTE-DA-BANCADA.md",
+          "quando": "a pessoa salvou um ajuste na bancada que precisa voltar à receita"
+        }
+      ],
+      "skill": "criar-peca",
+      "comandos": [
+        "node tools/mecanifica/olhar-bancada.mjs --analise --peca=<nome>",
+        "npm run parametros",
+        "npm run conferir:referencia"
+      ],
+      "lista": "pecas",
+      "passo": "Leia a receita da peça e o veredito ou o ajuste que pede a correção, mude a TABELA ou os passos e prove de novo na bancada.",
+      "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
+      "orcamentoBytes": 15000,
       "linhaDeBase": {
         "bytes": 62482,
         "data": "2026-10-08"
@@ -454,6 +730,10 @@
         {
           "arquivo": "docs/mecanifica/usar/README.md",
           "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
+        },
+        {
+          "arquivo": "docs/mecanifica/usar/AUDITORIA-DA-MONTAGEM.md",
+          "quando": "a dúvida for o apoio no chão ou a auditoria da montagem construída"
         }
       ],
       "skill": "auditar-montagem",

@@ -12,7 +12,7 @@
  *
  *   npm run roteiros:gerar   regrava o ROTEIROS.md e os blocos do CLAUDE.md
  */
-import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -55,6 +55,62 @@ function problemaDoComando(comando, scripts, raiz) {
 }
 
 const textoCheio = (v) => typeof v === 'string' && v.trim() !== '';
+
+/* A âncora de um título, como o GitHub a escreve: minúsculas, sem pontuação, espaço vira hífen, acento fica. */
+export function ancoraDe(titulo) {
+  return titulo.trim().toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '').replace(/\s/g, '-');
+}
+
+/* Um item de leitura é um arquivo inteiro ou uma seção dele, `arquivo#âncora`. */
+export function partesDaLeitura(item) {
+  const i = item.indexOf('#');
+  return i < 0 ? { arquivo: item, ancora: null } : { arquivo: item.slice(0, i), ancora: item.slice(i + 1) };
+}
+
+/* A seção de um documento pela âncora do título: do título até o próximo título do mesmo nível ou acima, fora de bloco de
+   código. Devolve o texto, ou null quando a âncora não existe. */
+export function secaoPorAncora(texto, ancora) {
+  const linhas = texto.split('\n');
+  let nivel = 0; let inicio = -1; let cerca = false;
+  for (let i = 0; i < linhas.length; i++) {
+    if (/^```/.test(linhas[i])) cerca = !cerca;
+    const m = !cerca && /^(#{1,6}) (.+)$/.exec(linhas[i]);
+    if (!m) continue;
+    if (inicio >= 0 && m[1].length <= nivel) return linhas.slice(inicio, i).join('\n').trimEnd();
+    if (inicio < 0 && ancoraDe(m[2]) === ancora) { inicio = i; nivel = m[1].length; }
+  }
+  return inicio < 0 ? null : linhas.slice(inicio).join('\n').trimEnd();
+}
+
+/* O texto que um item de leitura entrega: o arquivo inteiro ou só a seção. null quando o arquivo ou a âncora não existem. */
+export function textoDaLeitura(item, raiz = RAIZ) {
+  const { arquivo, ancora } = partesDaLeitura(item);
+  const caminho = join(raiz, arquivo);
+  if (!existsSync(caminho)) return null;
+  const texto = readFileSync(caminho, 'utf8');
+  return ancora === null ? texto : secaoPorAncora(texto, ancora);
+}
+
+/* Os filhos diretos de um nó da árvore: os roteiros e os grupos um nível abaixo do prefixo, na ordem do JSON. Cada filho é
+   { id, roteiro } (folha) ou { id, grupo: true }. */
+export function filhosDoNo(roteiros, prefixo) {
+  const base = prefixo ? `${prefixo}/` : '';
+  const filhos = [];
+  for (const r of roteiros) {
+    if (!r.id.startsWith(base)) continue;
+    const resto = r.id.slice(base.length).split('/');
+    const id = base + resto[0];
+    if (filhos.some((f) => f.id === id)) continue;
+    filhos.push(resto.length === 1 ? { id, roteiro: r } : { id, grupo: true });
+  }
+  return filhos;
+}
+
+/* Os documentos de uso que um nó precisa entregar: cada `.md` de `docs/mecanifica/usar/`, menos o README. */
+const PASTA_USAR = 'docs/mecanifica/usar';
+
+/* As listas que o `comecar` gera na hora para uma folha, do acervo e dos registros, nunca escritas à mão. */
+export const LISTAS = ['familias', 'pecas', 'operacoes'];
 
 /* Os problemas do JSON, um por linha, cada um dizendo o que corrigir. Lista vazia quando está tudo certo. */
 export function validarRoteiros(dados, raiz = RAIZ) {
@@ -99,11 +155,16 @@ export function validarRoteiros(dados, raiz = RAIZ) {
     const ler = Array.isArray(r?.ler) ? r.ler : [];
     if (ler.length === 0) problemas.push(`${onde}: a lista "ler" está vazia.`);
     if (!ler.includes(CAMINHO_CLAUDE)) problemas.push(`${onde}: "ler" precisa incluir ${CAMINHO_CLAUDE}, que traz os invariantes e toda intenção lê.`);
-    for (const relativo of ler) if (!existe(relativo)) problemas.push(`${onde}: ${relativo} não existe (corrija o caminho em "ler" ou tire a linha).`);
+    for (const item of ler) {
+      const { arquivo, ancora } = partesDaLeitura(item);
+      if (!existe(arquivo)) problemas.push(`${onde}: ${arquivo} não existe (corrija o caminho em "ler" ou tire a linha).`);
+      else if (ancora !== null && textoDaLeitura(item, raiz) === null) problemas.push(`${onde}: ${arquivo} não tem a seção #${ancora} (confira o título, ou tire a âncora para ler o arquivo inteiro).`);
+    }
     for (const item of r?.sobDemanda ?? []) {
       if (!textoCheio(item?.arquivo) || !existe(item.arquivo)) problemas.push(`${onde}: ${item?.arquivo} de "sobDemanda" não existe.`);
       if (!textoCheio(item?.quando)) problemas.push(`${onde}: ${item?.arquivo} de "sobDemanda" não diz "quando" abrir.`);
       if (ler.includes(item?.arquivo)) problemas.push(`${onde}: ${item.arquivo} está em "ler" e em "sobDemanda".`);
+      else if (textoCheio(item?.arquivo) && item.arquivo.includes('#') && textoDaLeitura(item.arquivo, raiz) === null) problemas.push(`${onde}: ${item.arquivo} de "sobDemanda" aponta seção que não existe.`);
     }
     if (r?.skill !== null && !(textoCheio(r?.skill) && existe(`.claude/skills/${r.skill}/SKILL.md`))) {
       problemas.push(`${onde}: a skill ${JSON.stringify(r?.skill)} não existe em .claude/skills/.`);
@@ -112,6 +173,7 @@ export function validarRoteiros(dados, raiz = RAIZ) {
       const p = problemaDoComando(comando, scripts, raiz);
       if (p) problemas.push(`${onde}: o comando "${comando}" não serve: ${p}.`);
     }
+    if (r?.lista !== undefined && !LISTAS.includes(r.lista)) problemas.push(`${onde}: "lista" deve ser uma de ${LISTAS.join(', ')} (recebido ${JSON.stringify(r.lista)}).`);
     if (!Number.isInteger(r?.orcamentoBytes) || r.orcamentoBytes <= 0) problemas.push(`${onde}: "orcamentoBytes" deve ser um inteiro positivo.`);
     const base = r?.linhaDeBase;
     if (!(Number.isInteger(base?.bytes) && base.bytes > 0 && /^\d{4}-\d{2}-\d{2}$/.test(base?.data ?? ''))) {
@@ -119,14 +181,35 @@ export function validarRoteiros(dados, raiz = RAIZ) {
     }
   }
   if (ids.size === 0) problemas.push(`${CAMINHO_JSON}: a lista "roteiros" está vazia.`);
+
+  /* A árvore: todo grupo com mais de um filho pergunta qual escolher, e toda pergunta é de um grupo que existe. */
+  const roteiros = (dados?.roteiros ?? []).filter((r) => textoCheio(r?.id));
+  const perguntas = dados?.perguntas ?? {};
+  const grupos = new Set();
+  for (const r of roteiros) { const p = r.id.split('/'); for (let k = 1; k < p.length; k++) grupos.add(p.slice(0, k).join('/')); }
+  for (const g of grupos) {
+    if (ids.has(g)) problemas.push(`roteiro ${g}: é folha e grupo ao mesmo tempo; dê outro nome à folha.`);
+    if (filhosDoNo(roteiros, g).length > 1 && !textoCheio(perguntas[g])) problemas.push(`grupo ${g}: falta a pergunta em "perguntas", que diz como escolher entre os ${filhosDoNo(roteiros, g).length} ramos.`);
+  }
+  for (const g of Object.keys(perguntas)) if (!grupos.has(g)) problemas.push(`pergunta "${g}": não há grupo com esse nome.`);
+
+  /* Cobertura: todo documento de uso é entregue por algum nó, inteiro ou por seção, em "ler" ou em "sobDemanda". */
+  const pastaUsar = join(raiz, PASTA_USAR);
+  if (existsSync(pastaUsar)) {
+    const entregues = new Set(roteiros.flatMap((r) => [...(r.ler ?? []), ...(r.sobDemanda ?? []).map((x) => x?.arquivo ?? '')]).map((x) => partesDaLeitura(x).arquivo));
+    for (const nome of readdirSync(pastaUsar).filter((n) => n.endsWith('.md') && n !== 'README.md').sort()) {
+      const relativo = `${PASTA_USAR}/${nome}`;
+      if (!entregues.has(relativo)) problemas.push(`${relativo}: nenhum nó da árvore o entrega; ponha-o em "ler" ou "sobDemanda" do roteiro em que ele serve.`);
+    }
+  }
   return problemas;
 }
 
 /* O tamanho de cada arquivo de "ler" e o total, em bytes. Arquivo que não existe conta 0 (a validação já o aponta). */
 export function medirRoteiro(roteiro, raiz = RAIZ) {
   const arquivos = roteiro.ler.map((relativo) => {
-    const caminho = join(raiz, relativo);
-    return { relativo, bytes: existsSync(caminho) ? statSync(caminho).size : 0 };
+    const texto = textoDaLeitura(relativo, raiz);
+    return { relativo, bytes: texto === null ? 0 : Buffer.byteLength(texto) };
   });
   return { arquivos, total: arquivos.reduce((soma, a) => soma + a.bytes, 0) };
 }
@@ -170,9 +253,10 @@ export function gerarBlocoInvariantes(dados) {
   return partes.join('\n');
 }
 
-/* A lista de roteiros do `CLAUDE.md`: o id e a frase de cada um. */
+/* A lista do `CLAUDE.md`: o primeiro nível da árvore, cada folha com a frase dela e cada grupo com a pergunta que o
+   `comecar` faz nele. */
 export function gerarBlocoRoteiros(dados) {
-  return dados.roteiros.map((r) => `- ${codigo(r.id)}: ${r.quando}`).join('\n');
+  return filhosDoNo(dados.roteiros, '').map((f) => `- ${codigo(f.id)}: ${f.roteiro ? f.roteiro.quando : dados.perguntas?.[f.id] ?? ''}`).join('\n');
 }
 
 /* Troca o que está entre os marcadores de `nome` por `bloco`. Devolve null quando os marcadores faltam ou estão fora de ordem. */
@@ -208,6 +292,11 @@ export function gerarRoteirosMd(dados) {
     '| --- | --- | --- |',
     ...dados.roteiros.map((r) => `| ${codigo(r.id)} | ${r.intencao} | ${r.quando} |`),
   ];
+  const perguntas = Object.entries(dados.perguntas ?? {});
+  if (perguntas.length > 0) {
+    partes.push('', '## Perguntas da árvore', '', 'Sem roteiro, ou com o nome de um grupo, o `comecar` faz a pergunta do grupo e lista os ramos:', '');
+    for (const [g, p] of perguntas) partes.push(`- ${codigo(g)}: ${p}`);
+  }
   const cobradas = dados.invariantes.filter((inv) => inv.gate);
   if (cobradas.length > 0) {
     partes.push('', '## Regras cobradas por gate', '', 'Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no momento do erro:', '');
@@ -217,6 +306,7 @@ export function gerarRoteirosMd(dados) {
     partes.push('', `## ${r.id}: ${r.titulo}`, '', r.quando, '');
     partes.push(`Ler antes de começar, num orçamento de ${milhar(r.orcamentoBytes)} bytes (linha de base de ${milhar(r.linhaDeBase.bytes)} bytes em ${r.linhaDeBase.data}):`, '');
     for (const relativo of r.ler) partes.push(`- ${codigo(relativo)}`);
+    if (r.lista) partes.push('', `Lista gerada na hora: ${r.lista}.`);
     if ((r.sobDemanda ?? []).length > 0) {
       partes.push('', 'Abrir só quando a condição aparecer:', '');
       for (const item of r.sobDemanda) partes.push(`- ${codigo(item.arquivo)}, quando ${item.quando}.`);

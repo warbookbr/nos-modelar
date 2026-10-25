@@ -122,6 +122,22 @@ que não colidem. Declare em `MATERIAIS` o material que a família usa (na super
 aerodinâmica, `materialDaPele`). A receita que só exporta `CHAMADAS_COMPOSICOES`
 pede o registro de fora (`--composicoes`), e a guarda do acervo não o tem.
 
+## Peça de uma família
+
+Quando a forma é um caso de uma família registrada em `procedural/familias/`, a
+receita não refaz a geometria. `derivar()` chama a família com
+`chamar(criarRegistroDeFamilias().obter('<família>'), '<id>', parametros)`, que
+recusa parâmetro fora dos limites do `familia.json` dela, e `gerarPassos()`
+expande a chamada com
+`expandirChamadasDeComposicao(registro.registroComposicoes, [chamada])` e
+acrescenta só o que é da peça, como o material de cada parte que a família
+nomeia. Os parâmetros saem da `TABELA`, em milímetro, e os perfis aprovados de
+cada família estão no `familia.json` dela; `npm run comecar -- modelar/peca/familia`
+lista as famílias e os perfis. O que falta na forma se corrige na família, com
+novo aceite da pessoa, e não na receita. A hélice do avião,
+`procedural/pecas/aviao/partes/helice/receita.js`, é uma receita que chama
+família.
+
 ## Identidade estável
 
 Toda peça, montagem, instância, parte relevante, porta e relação precisa de

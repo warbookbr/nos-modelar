@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { conferirLeituraObrigatoria } from './leitura-obrigatoria.mjs';
 import {
-  CAMINHO_CLAUDE, CAMINHO_JSON, CAMINHO_ROTEIROS, carregarRoteiros, gerarBlocoInvariantes, gerarClaude, gerarRoteirosMd,
+  ancoraDe, CAMINHO_CLAUDE, CAMINHO_JSON, CAMINHO_ROTEIROS, carregarRoteiros, filhosDoNo, gerarBlocoInvariantes, gerarClaude, gerarRoteirosMd,
   MARCADORES, medirRoteiro, paginasDesatualizadas, RAIZ, TETO_DA_FRASE, validarRoteiros,
 } from './roteiros.mjs';
 
@@ -61,7 +61,7 @@ describe('os roteiros do repositório', () => {
       expect(pagina, inv.id).toContain(inv.texto);
       if (inv.gate === 'test') expect(pagina).toContain(inv.teste);
     }
-    for (const r of dados.roteiros) expect(claude).toContain(`- \`${r.id}\`: ${r.quando}`);
+    for (const f of filhosDoNo(dados.roteiros, '')) expect(claude).toContain(`- \`${f.id}\`: ${f.roteiro ? f.roteiro.quando : dados.perguntas[f.id]}`);
   });
 
   it('têm as quatro intenções do plano e uma frase de índice por roteiro', () => {
@@ -99,6 +99,33 @@ describe('o gate leitura:obrigatoria recusa', () => {
     expect(problemas).toContain('o gate "test" precisa de "teste"');
     expect(problemas).toContain('"teste" só vale com o gate "test"');
     expect(problemas).toContain('"secao" deve ser uma de regras, qualidade');
+  });
+
+  it('a seção pela âncora conta só os bytes dela, e a âncora que não existe é recusada', () => {
+    const { raiz, gravar } = repositorio();
+    gravar('notas/guia.md', '# Guia\n\n## Peça de uma família\n\nTexto da seção.\n\n### Detalhe\n\nMais.\n\n## Outra seção\n\nFora.\n');
+    expect(ancoraDe('3. Despachar o crítico, sem contexto')).toBe('3-despachar-o-crítico-sem-contexto');
+    const { dados } = repositorio((d) => roteiro(d, { ler: [CAMINHO_CLAUDE, 'notas/guia.md#peça-de-uma-família'] }));
+    const secao = '## Peça de uma família\n\nTexto da seção.\n\n### Detalhe\n\nMais.';
+    expect(medirRoteiro(dados.roteiros[0], raiz).arquivos[1]).toEqual({ relativo: 'notas/guia.md#peça-de-uma-família', bytes: Buffer.byteLength(secao) });
+    const { raiz: outra, gravar: gravarOutra } = repositorio((d) => roteiro(d, { ler: [CAMINHO_CLAUDE, 'notas/guia.md#sumiu'] }));
+    gravarOutra('notas/guia.md', '# Guia\n');
+    expect(conferirLeituraObrigatoria(outra).problemas.join('\n')).toContain('notas/guia.md não tem a seção #sumiu');
+  });
+
+  it('o grupo da árvore com mais de um ramo sem pergunta, a pergunta sem grupo e o documento de uso que nenhum nó entrega', () => {
+    const { raiz, gravar } = repositorio((d) => {
+      d.roteiros.push({ ...d.roteiros[0], id: 'modelar/auditar', quando: 'Auditar.' });
+      d.perguntas = { voar: 'Para onde?' };
+      return d;
+    });
+    gravar('docs/mecanifica/usar/SOLTO.md', '# Solto\n');
+    gravar('docs/mecanifica/usar/README.md', '# Usar\n');
+    const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
+    expect(problemas).toContain('grupo modelar: falta a pergunta em "perguntas"');
+    expect(problemas).toContain('pergunta "voar": não há grupo com esse nome');
+    expect(problemas).toContain('docs/mecanifica/usar/SOLTO.md: nenhum nó da árvore o entrega');
+    expect(problemas).not.toContain('usar/README.md');
   });
 
   it('o comando, a skill e o gate de invariante que não existem', () => {
