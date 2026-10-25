@@ -28,6 +28,10 @@ peça e compara com a base. O parâmetro sai como:
 - **inerte** — a peça medida saiu idêntica. O parâmetro está declarado e não
   entra na conta de nada.
 
+A peça medida é, por parte, a caixa, a contagem de faces e de corpos, a área, o
+volume com sinal e um hash das posições arredondadas a 1 µm, mais as relações;
+mudança por dentro da caixa também conta.
+
 Quando **nenhum** parâmetro é vivo, o comando diz isso em voz alta. Não é uma
 peculiaridade rara: hoje é o caso da maioria do acervo.
 
@@ -98,7 +102,7 @@ npm run varrer -- <receita> --criterio=menor-folga
 
 Sensibilidade: sonda cada parâmetro para baixo e para cima (±10%, mude com
 `--delta`) e responde quais movem o critério, quanto, e **o que cada movimento
-custa**. Na cadeira, de 21 parâmetros, um só move a menor folga — encolher a
+custa**. Numa cadeira de 21 parâmetros, medida quando ela estava no acervo, um só move a menor folga — encolher a
 seção da perna abre 6,07 mm e cria quatro interpenetrações; engordar abre
 2,00 mm sem quebrar nada.
 

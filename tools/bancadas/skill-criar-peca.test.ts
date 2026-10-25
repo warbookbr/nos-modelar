@@ -8,8 +8,8 @@
        ÚNICA op que remove face, isto é, a única forma de abrir um vão. A IA que
        seguisse o manual escreveria `['apagaFace', { face: 4003 }]` e persistiria
        id posicional, a referência que o `CLAUDE.md` proíbe, num caso em que o
-       caminho semântico existe. O gate `id-cru:check` não pega: `face` é forma
-       SINGULAR, declarada fora de escopo.
+       caminho semântico existe. A regra do id posicional, que a guarda do acervo
+       aplica, não pega: `face` é forma SINGULAR, declarada fora de escopo.
 
    (2) O SINAL DA ROTAÇÃO. A skill dava a fórmula `p' = pivo + R_eixo(graus)·
        (p−pivo)` e nada sobre o SENTIDO. Toda primitiva de revolução nasce em

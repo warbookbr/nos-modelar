@@ -1,8 +1,9 @@
 # Montagens semânticas
 
 > **Estado e direção, não plano de implementação.** Este documento descreve o
-> que já existe para consultar partes e relações e fixa o modelo que uma futura
-> montagem persistida deve respeitar. Nenhuma seção autoriza trabalho automático;
+> que já existe para consultar partes e relações, incluindo a montagem
+> persistida (v1 a v5, na tabela de maturidade abaixo), e fixa o modelo que a
+> ampliação dela deve respeitar. Nenhuma seção autoriza trabalho automático;
 > implementação exige plano executivo próprio.
 
 A definição ampla de autoria está em
@@ -329,7 +330,7 @@ ortográfica, as etapas que já têm geometria, e grava as imagens em
 
 Ainda não há:
 
-- relações persistidas gerais;
+- relações persistidas gerais, fora do universo explícito de uma montagem (as relações locais dentro dela existem);
 - descoberta de dependências fora de universo explícito;
 - resolução automática de contato;
 - solver geral de encaixe;

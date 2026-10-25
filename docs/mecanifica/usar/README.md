@@ -1,7 +1,8 @@
 # Usar o Mecanifica
 
 Esta pasta é para quem vai **usar** o Mecanifica: criar, inspecionar, corrigir
-ou auditar uma peça. Não é preciso ler nada fora daqui para isso.
+ou auditar uma peça. Fora dela, a leitura de uso são as skills e o catálogo
+gerado de operações, que os roteiros entregam.
 
 A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
 `npm run comecar -- <roteiro>`, que diz o que ler. Quem vai **mudar** o
@@ -9,27 +10,28 @@ Mecanifica (núcleo, gates, arquitetura, plano) segue o roteiro `mudar`.
 
 ## Por onde começar
 
-Comece pela skill da tarefa; ela diz os passos e aponta o documento certo na
-hora certa. Os documentos abaixo são o contrato que as skills aplicam.
+O roteiro entrega a skill da tarefa, e ela diz os passos e aponta o documento
+certo na hora certa. Os documentos abaixo são o contrato que as skills aplicam;
+o que se lê antes de começar é o que o roteiro diz.
 
 | se a tarefa é | skill | contrato |
 | --- | --- | --- |
 | conduzir um objeto de várias partes, da imagem à montagem | `npm run objeto` e as skills de cada etapa | [`FLUXO-DO-OBJETO.md`](FLUXO-DO-OBJETO.md) |
-| combinar o que modelar, antes do primeiro passo | `alinhar-modelagem` | [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](RODADA-DE-ALINHAMENTO-EXEMPLO.md) |
-| criar ou refinar uma peça | `criar-peca` | [`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md), [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) |
+| combinar o que modelar, antes do primeiro passo | `alinhar-modelagem` | a própria skill; um caso respondido em [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](RODADA-DE-ALINHAMENTO-EXEMPLO.md) |
+| criar ou refinar uma peça | `criar-peca` | [`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md), [`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md), [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) |
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
-| conferir um conjunto montado | `auditar-montagem` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
+| conferir um conjunto montado | `auditar-montagem` | [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) |
 | parar e analisar uma forma antes de declará-la pronta | `olhar-bancada --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md) |
 | parar e analisar um esboço de opções antes de mostrá-lo | `esboco --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
 | esboçar um objeto inteiro em formas primitivas, com crítico entre unidades (opcional: só objeto sem forma de referência, por escolha da pessoa) | `esboco-detalhado` (quem esboça) e `laco-do-esboco` (quem conduz) | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
 | desenhar a prancha alvo | `desenhar-prancha` | [`CONTRATO-AUTORIA-PRANCHA.md`](CONTRATO-AUTORIA-PRANCHA.md) |
 | trazer de volta um ajuste feito na bancada | `absorver-ajuste-da-bancada` | [`AJUSTE-DA-BANCADA.md`](AJUSTE-DA-BANCADA.md) |
 
-## Leitura obrigatória antes de gerar forma
+## Documentos que pedem contexto
 
-A lista que vale é a do roteiro `modelar/peca`, em `docs/mecanifica/roteiros/`,
-e o gate `leitura:obrigatoria` a confere contra o orçamento. Aqui ficam só os
-que precisam de contexto, porque lista repetida envelhece em duas velocidades.
+A leitura obrigatória é a de cada ramo de `npm run comecar -- modelar/peca`, e o
+gate `leitura:obrigatoria` a confere contra o orçamento. Aqui ficam os documentos
+que o roteiro abre sob demanda e que precisam de uma frase sobre quando servem.
 
 [`LACO-VISUAL.md`](LACO-VISUAL.md) reúne as quatro regras que valem em qualquer
 tarefa que produza forma: olhar o PNG, sobrepor ao alvo, despachar o crítico sem

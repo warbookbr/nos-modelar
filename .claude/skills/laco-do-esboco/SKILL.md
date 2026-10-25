@@ -32,8 +32,7 @@ menores ou quando a continuidade de contexto na mesma sessão for desejada.
 O modo `por-unidade` despacha um esbocista novo para cada unidade de detalhe,
 sem retomada por `SendMessage`. O estado mora nos arquivos e no Condutor. Use este
 modo em objetos grandes para evitar acúmulo de contexto e propagação de premissas
-incorretas entre unidades. A fatia 9 mede o modo por unidade contra o modo objeto
-para comparar o consumo de tokens e a coerência final.
+incorretas entre unidades.
 
 ## Despachar o esbocista
 
@@ -131,7 +130,7 @@ nova.
 Meça, com números, e não por impressão: quantas formas ficaram por relação e
 quantas por coordenada absoluta, quantas chamadas de ferramenta o esbocista
 fez, quantas imagens foram abertas e quantos contornos foram registrados.
-Reproduza cada atrito que o esbocista relatou em `ATRITOS.md`, com o comando
+Reproduza cada atrito que o esbocista relatou no `ATRITOS.md` da pasta do objeto, com o comando
 dele, antes de tratá-lo como bug do módulo; o que não reproduz volta ao
 esbocista com a pergunta. Diga a cada achado se o processo o teria pego sozinho
 e, quando não, o que falta vira gate, campo ou instrução.

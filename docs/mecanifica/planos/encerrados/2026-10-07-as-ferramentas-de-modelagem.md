@@ -148,7 +148,7 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    em `REFINA` o volume que cada parte refina, com o verificador no veredito da
    peça recusando parte fora do envelope e porta movida.
 4. O esboço refeito sobre o nível zero, com o processo do módulo atual, pelo
-   [desenho](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-4) que a
+   [desenho](../../historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-4) que a
    pessoa aprovou em 2026-10-10. Feita em 2026-10-10: a cadeira refeita pelo
    nível zero custou 94.093 tokens com nota 9, contra 101.631 e nota 8; as vistas
    do crítico seguem no desenhista atual, que mostra a cavidade.
@@ -168,9 +168,9 @@ olhar, e o custo de cada objeto (tokens, rodadas e nota) é registrado como dado
    ficam, por amostragem). Aceitas pelas famílias da fatia 9.
 8. A verificação ancorada no caminho de toda peça e o crítico calibrado, com as
    perguntas por componente e por família, pelo
-   [desenho](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-8) aprovado em
+   [desenho](../../historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-8) aprovado em
    2026-10-11. Feita em 2026-10-11.
-9. As primeiras famílias, pelo [desenho](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9) aprovado em 2026-10-11. Feita em 2026-10-11.
+9. As primeiras famílias, pelo [desenho](../../historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md#desenho-da-fatia-9) aprovado em 2026-10-11. Feita em 2026-10-11.
 10. O banco de provas refeito e o fechamento. Feita em 2026-10-11.
 
 ## Riscos e desvios
@@ -203,10 +203,10 @@ Ficam como ressalva: a norma do cilindro escrita de memória; o MCP e o comando 
 parâmetros sem o registro das famílias; a bancada sem abrir família; a dobradiça
 de caneco, que daria 110° à porta sobreposta, fora; e o ganho de custo do esboço,
 menor que o prometido. Os detalhes estão no [contexto do
-plano](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md).
+plano](../../historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md).
 
 ## Depois deste plano
 
 O que vem depois, o que já existe e este plano reaproveita, e as referências de
-cada fatia estão no [contexto do plano](../../CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md),
+cada fatia estão no [contexto do plano](../../historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md),
 aberto quando a fatia pede.

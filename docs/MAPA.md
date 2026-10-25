@@ -71,7 +71,6 @@
 
 ## .claude/skills/esboco-detalhado/
 
-- `CONFERENCIA.md` — Conferência da divisão da skill esboco-detalhado
 - `SKILL.md` — Esboça um objeto em primitivas e componentes, com contrato, gate de contato e crítico cego, por `npm run esboco -- --condutor`. Opcional: só sem forma de ref…
 - `escrever-menos-json.md` — Escrever menos JSON
 - `faixas-rodas-discos.md` — Faixas, rodas e discos
@@ -110,7 +109,6 @@
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
-- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
@@ -144,7 +142,7 @@
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 - `modelar-carroceria.md` — Modelar carroceria de chapa contínua
-- `modelar-veiculos.md` — Veículos de referência livre: análise da primeira leva e instruções para o modelador
+- `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
 ## docs/mecanifica/banco-de-provas/
 
@@ -433,6 +431,7 @@
 - `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
 - `CHEGADA-2026-09-11.md` — O que chegou aqui em 2026-09-11
 - `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
+- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
 - `DOSSIE-CABO-DE-PA.md` — Cabo de pá: alternativas ao eucalipto — dossiê técnico
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
 - `DOSSIE-LABORATORIO-IA.md` — Laboratório computacional para investigação por IA
@@ -482,6 +481,7 @@
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
 - `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
 - `REVISAO-DE-RUMO-2026-10.md` — Revisão de rumo do Mecanifica (2026-10-06)
+- `VEICULOS-PRIMEIRA-LEVA-2026-10.md` — Veículos de referência livre: o diagnóstico da primeira leva
 
 ## docs/mecanifica/planos/
 

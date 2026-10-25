@@ -194,7 +194,7 @@ reprova parâmetro novo sem origem mesmo em receita que ainda não declara nada.
 
 ## Limite
 
-O editor de malha completo — vértice, aresta, face, extrusão, duplicação — não
-existe e está adiado de propósito. Enquanto o caminho de volta não estiver
+O modo de edição move vértice, aresta e face, como descrito acima; extrusão,
+duplicação, apagar e criar geometria não existem e estão adiados de propósito. Enquanto o caminho de volta não estiver
 provado, liberdade de edição só produz arquivo que não salva. Esta página cobre
 o gesto por junta, que é o que hoje volta inteiro.

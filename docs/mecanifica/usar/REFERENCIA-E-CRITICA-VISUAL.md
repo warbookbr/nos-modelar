@@ -44,7 +44,8 @@ A rodada fecha com nota 8 ou mais e nenhum defeito. No laço de uma peça
 rodadas seguidas não reduzem os defeitos; passar disso é decisão da pessoa,
 gravada no `limite.json` da pasta de rodadas da peça, com quem decidiu e por quê. No laço do esboço, cada unidade tem 3
 rodadas para chegar a 8, e a quarta só com o sim da pessoa, registrado pelo
-Condutor. O veredito entra no registro como o crítico o devolveu, e quem conduz
+Condutor. No mapa de partes e na prancha (`rodadas-com-critico.mjs`), que julgam
+desenho e não forma, a nota 9 fecha, e depois de três rodadas a pessoa decide. O veredito entra no registro como o crítico o devolveu, e quem conduz
 o laço não edita a nota nem os defeitos.
 
 ## Princípio
@@ -188,12 +189,10 @@ que a planta era 500 mm mais larga que o alvo na ponta.
 5. Modelar envelope e interfaces; depois, uma região por vez.
 6. Renderizar vistas canônicas equivalentes às referências, **e sobrepor ao
    alvo** com `comparar:alvo` antes de julgar qualquer coisa.
-7. Rodar crítica intermediária **por despacho** — subagente `critico-visual`,
-   sem contexto, recebendo alvo, modelo e sobreposição,
-   limitado às cinco maiores divergências — depois que a prova determinística
-   estiver limpa.
-8. Classificar cada divergência e corrigir somente as prioritárias.
-9. Repetir uma vez; nova rodada exige evidência de ganho ou bloqueio real.
+7. Rodar a crítica **por despacho**, como em [O laço do crítico](#o-laço-do-crítico),
+   depois que a prova determinística estiver limpa.
+8. Corrigir os defeitos do veredito, cada um na parte e na vista que ele aponta.
+9. Repetir até a rodada fechar ou o limite de rodadas parar o laço.
 10. Integrar somente depois dos gates semânticos, geométricos e visuais.
 
 O fluxo tem limite: checklist e crítica não crescem indefinidamente. Divergência

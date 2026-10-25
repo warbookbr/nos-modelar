@@ -28,8 +28,8 @@ polegadas, tamanho M, módulo 1 de 5. Termina onde começa o garfo, a roda, o
 guidão e a transmissão. O canote e o selim não entram: pertencem a outro
 módulo, ainda que a altura do selim tenha mandado em dois números daqui.
 
-**2. Quais imagens de referência.** Três recortes em
-`docs/mecanifica/referencias/bicicleta-29/`: `lateral.png` para a proporção
+**2. Quais imagens de referência.** Três recortes, numa pasta de referências
+que saiu do repositório com a peça: `lateral.png` para a proporção
 geral, `lateral-quadro.png` para as juntas do triângulo principal, e
 `triangulo-traseiro.png` para o encontro dos balanços na ponteira.
 

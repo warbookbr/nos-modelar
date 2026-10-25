@@ -179,8 +179,10 @@ const c = compararSilhuetas(ref, minhaSilhueta);
 ```
 
 Leia primeiro o **resíduo** da calibração. Ele compara duas medidas
-independentes contra o que a escala prevê; acima de uns 3%, a prancha está fora
-de esquadro e o resto da comparação carrega esse erro.
+independentes contra o que a escala prevê; `calibrarPorRodas` recusa acima de 3%
+(`maxErroRelativo`), porque a prancha está fora de esquadro e o resto da
+comparação carregaria esse erro. A calibração por âncoras de
+`conferir:referencia`, contra foto, é outra e recusa acima de 2%.
 
 Depois leia o desvio **por região** — traseira, teto, para-brisa, capô, nariz —
 e não só o total. O agregado esconde: um desenho com 45 mm de desvio médio pode
@@ -189,7 +191,7 @@ ter capô perfeito e traseira 112 mm alta.
 **Dois limites que valem mais que o resultado:**
 
 - a imagem de referência não entra no repositório, só as coordenadas derivadas.
-  Ver `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`;
+  Ver `docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md`;
 - **desvio é confiável, curvatura de raster não é.** Numa prancha de 736 px, o
   desvio médio é estável sob suavização e a contagem de inversões varia de 31 a
   51 sem convergir. Julgue proporção e posição pela referência; julgue caráter

@@ -29,8 +29,9 @@ incompleta, confirmação divergente ou revisão velha bloqueiam a publicação.
 
 ## Perfil MCP
 
-No MCP v4, o perfil `autoria` é aditivo: conserva as oito ferramentas de leitura
-de peças e montagens e acrescenta quatro ferramentas de autoria de montagem e:
+No MCP, o perfil `autoria` é aditivo: conserva as ferramentas de leitura de peças
+e montagens, acrescenta as de autoria de montagem e, para receita, estas quatro
+(a lista completa de cada perfil está em `tools/mcp/perfis/`):
 
 - `observar_autoria_receita`;
 - `planejar_autoria_receita`;

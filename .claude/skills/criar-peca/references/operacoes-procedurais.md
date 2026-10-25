@@ -10,10 +10,11 @@ Pelo MCP, prefira `descrever_capacidade`: ele entrega somente o contrato complet
 da operação pedida. O executor continua sendo a autoridade final para validar
 uma receita concreta e produzir recusas ligadas ao estado real da malha.
 
-As peças citadas como exemplo nesta referência foram removidas do acervo em
-`c78961f`. As lições continuam medidas e válidas — o que não existe mais é o
-arquivo para abrir. O acervo mora em `procedural/pecas/`, e hoje não tem
-receita; a convenção de cada operação vem do catálogo, e não de receita antiga.
+Algumas peças citadas como exemplo nesta referência saíram do acervo em
+`c78961f`; as lições continuam medidas e válidas, e o que não existe mais é o
+arquivo para abrir. O acervo atual mora em `procedural/pecas/`
+(`npm run comecar -- modelar/peca/corrigir` lista as peças), e a convenção de
+cada operação vem do catálogo, e não de receita antiga.
 
 ## Navegação
 
@@ -1348,12 +1349,11 @@ ainda faces PLANAS, só sem quina viva); `displace` quebra a monotonia de
 qualquer malha fechada com relevo orgânico determinístico (pedra, tronco
 áspero, terreno) — os dois juntos (chamferBox + displace) dão pedra
 lascada/rocha sem precisar de `inflate`. As peças de exercício que demonstravam cada
-uma dessas primitivas saíram do acervo. Para ver a operação em uso hoje, a
-tabela "Contrato mínimo" da skill aponta a receita atual por FORMA — caixa e
-junção, seção que viaja, assimetria num plano, detalhe repetido em torno de um
-eixo.
+uma dessas primitivas saíram do acervo; o exemplo executável de cada operação
+está no catálogo gerado (`descrever_capacidade`).
 
 ## Limites honestos
 
-`inflate` continua blocky; `filete` ainda é limitado; JS puro não tem replay
-canônico. Não declare uma forma coberta sem evidência visual e estrutural.
+`inflate` continua blocky; o `filete` tem os limites declarados no catálogo;
+JS puro não tem replay canônico. Superfície lisa de chapa é a `subdivisao`, com a
+técnica de `docs/mecanifica/modelar-carroceria.md`. Não declare uma forma coberta sem evidência visual e estrutural.

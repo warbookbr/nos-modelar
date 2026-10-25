@@ -57,8 +57,11 @@ da receita, e quando as duas divergem a tabela manda. Um derivado declara a
 origem, o método de calibração e o resíduo, para que quem tiver a prancha confira
 a medida, e não é regerado pelo CI, porque a imagem de origem não está versionada.
 
-A calibração de pixel para milímetro devolve como resíduo o erro contra medidas
-independentes, que diz o quanto a prancha está fora de esquadro. Numa prancha de
+`tools/mecanifica/prancha/prancha-referencia.mjs` decodifica o PNG em Node, acha
+os painéis com tinta, extrai o envelope e calibra pixel para milímetro pelo
+entre-eixos entre as manchas de contato das rodas com o solo
+(`calibrarPorRodas`), e devolve como resíduo o erro contra o comprimento e a
+altura, que diz o quanto a prancha está fora de esquadro. Numa prancha de
 736 px, variando a suavização de 1 a 41 px, o
 desvio absoluto médio de silhueta foi de 46 para 39 mm e as inversões de
 curvatura variaram de 31 a 51 sem convergir: compare proporção e posição contra

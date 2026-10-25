@@ -56,16 +56,18 @@ As operações do motor estão em
 [`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
 gerado do registro do motor, e o catálogo é a fonte da convenção de cada uma.
 Não existem ainda solver geral de encaixe, verificação de colisão em movimento
-nem contrato genérico de materiais, e o vocabulário poligonal (subdivisão,
-bisel, corte em anel) está num
+nem material PBR (o material é escolha por peça, com textura gerada); a superfície
+subdividida existe no núcleo (`subdivisao`), e o resto do vocabulário poligonal da
+bancada (bisel, corte em anel) está num
 [plano congelado](docs/mecanifica/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md).
 Intenção que o catálogo não resolve vira registro de lacuna pelo formato de
 [`LACUNAS-DE-CAPACIDADE-V1.md`](docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md),
 e não operação inventada dentro da receita.
 
 Além da peça existem a montagem persistida, o mapa canônico de dependências, a
-revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo tem
-o braço robótico, em `procedural/pecas/braco-robotico/`. Os gates rodam de uma
+revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo, em
+`procedural/pecas/`, tem veículos, eletrodomésticos, móveis, o avião e o braço
+robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem. O plano ativo é [leitura por demanda e limpeza](docs/mecanifica/planos/2026-10-22-leitura-por-demanda-e-limpeza.md).
 Já fecharam [veículos de referência livre](docs/mecanifica/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
@@ -79,7 +81,7 @@ receita](docs/mecanifica/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receit
 
 ## Peças são exemplos
 
-**Nenhuma peça deste repositório é homologada, e nenhuma serve de base.** Cada
+**Nenhuma peça deste repositório é homologada como base de produto, e nenhuma serve de molde de forma.** Cada
 uma existe para provar uma capacidade do núcleo, com medidas escolhidas para
 isso, e pode mudar ou sair sem aviso nem migração. O contrato do repositório é
 o núcleo e as capacidades provadas, e uma mudança boa no núcleo que quebre uma

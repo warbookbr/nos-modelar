@@ -25,9 +25,11 @@ saída é tirá-lo de lá, e não abrir exceção. Detalhe em
 
 ## Camadas que existem hoje
 
-1. **Receita**: módulos em `procedural/pecas/` exportam `meta` e
-   `construir`, ou `PASSOS`, `PARAMS`, `TOPO` e contratos auxiliares.
-2. **Núcleo**: `procedural/nucleo/oficina.js` resolve parâmetros,
+1. **Receita**: módulos em `procedural/pecas/<peça>/receita.js` exportam a
+   `TABELA`, `derivar()`, `gerarPassos()` e a receita com `PARAMS`, `PASSOS`
+   (getter), `TOPO` e contratos auxiliares.
+2. **Núcleo**: `procedural/nucleo/nucleo.js`, com a fachada
+   `procedural/nucleo/entrada.js`, resolve parâmetros,
    topologia, identidades, portas, materiais declarados e malha neutra sem
    conhecer Three.js.
 3. **Adaptadores de inspeção**: convertem o neutro para visualização sem mudar o
@@ -73,13 +75,12 @@ fundir todos os objetos em uma receita única.
 7. **Portas de acesso**: MCP, CLI, API ou edição assistida podem expor essas
    capacidades. Nenhuma dessas portas define a estrutura interna.
 
-O plano ativo da plataforma procedural extensível acrescenta uma fronteira
-interna a essa direção: o núcleo executa um registro explícito de módulos e
+A plataforma procedural extensível, de um plano já encerrado, acrescentou uma
+fronteira interna a essa direção: o núcleo executa um registro explícito de módulos e
 operações; contratos executáveis derivam catálogo, schemas, documentação e
 grafos de capacidades; subgrafos declarativos e extensões nativas confinadas
-ampliam o vocabulário sem concentrá-lo novamente num arquivo único. O
-`oficina.js` pode permanecer como entrada canônica pequena, mas não como dono
-das implementações.
+ampliam o vocabulário sem concentrá-lo novamente num arquivo único. A
+`entrada.js` é a entrada canônica pequena, e não a dona das implementações.
 
 Capacidades, procedimento e montagem possuem grafos diferentes. O grafo de
 capacidades explica disponibilidade e dependências do motor; o procedural
@@ -117,21 +118,14 @@ Carro e motor são montagens recursivas. Não são receitas monolíticas.
 
 ## Estado operacional
 
-Casos 1 e 2 estão homologados e a série foi encerrada aí. Os contratos
-`mecanifica.montagem` v1/v2, pose rígida e relações locais persistidas já
-existem. O descritor `mecanifica.contexto-montagem` projeta a árvore resolvida
+Os contratos `mecanifica.montagem` (v1 a v5), pose rígida e relações locais
+persistidas existem. O descritor `mecanifica.contexto-montagem` projeta a árvore resolvida
 em JSON consultável, sem malha ou identidade de runtime; veja
 [`CONTEXTO-MONTAGEM-IA.md`](CONTEXTO-MONTAGEM-IA.md).
 
-O Módulo 1 do MCP, somente leitura e auditoria, foi aprovado. A primeira
-tentativa de autoria controlada foi encerrada com decisão `interromper`; o PR
-#25 foi fechado sem merge. A autoria de montagem posterior foi aprovada em perfil
-MCP opt-in, com repositório e catálogo autorizados pelo host. Receita e outras
+O MCP tem leitura e auditoria, e a autoria de montagem fica em perfil MCP
+opt-in, com repositório e catálogo autorizados pelo host. Receita e outras
 portas exigem plano próprio e as garantias de [`AUTORIA-IA.md`](AUTORIA-IA.md).
-
-O visor legado declara um import map para resolver `earcut` quando servido sem
-transformação. A correção pertence à infraestrutura de inspeção e não altera a
-geometria.
 
 ## Limites que permanecem
 
@@ -139,8 +133,10 @@ O mapa canônico, seu contexto derivado e a revalidação em cascata existem par
 um universo explícito e persistido. A escrita transacional opt-in materializa
 receitas declarativas e montagens autorizadas. Não existem descoberta fora desse
 universo, correção ou promoção automática de dependentes, solver geral de
-encaixe, validação de movimento/espaço varrido ou contrato genérico de
-materiais. Esses limites não devem ser simulados por posições de câmera, UUIDs
+encaixe, espaço varrido contínuo ou material PBR. A articulação amostra o curso
+em poses discretas, e as portas de interface têm cinco formas (cilindro, anel,
+plano, padrão de furos e trilho), descritas em
+[`usar/MONTAGENS-SEMANTICAS.md`](usar/MONTAGENS-SEMANTICAS.md). Esses limites não devem ser simulados por posições de câmera, UUIDs
 do Three.js, arquivos gigantes ou documentação manual.
 
 ## Fora desta arquitetura

@@ -89,12 +89,12 @@ A esteira aceita nomes curtos, sem caminho nem `.js`. Execute nesta sequência:
 npm run descrever -- <nome-da-peca>
 npm run conferir:juntas -- <nome-da-peca>
 npm run ativar:bancada -- <nome-da-peca>
-node tools/mecanifica/olhar-bancada.mjs --peca=<nome-da-peca> --vistas=isometrica,frontal,superior
+npm run bancada -- <nome-da-peca> --vistas=isometrica,frontal,direita,superior --cores
 npm run exportar:step -- <nome-da-peca> --somente-validar
 ```
 
 1. `descrever` passa com código de saída 0, zero referências órfãs, zero faces sem identidade, nenhum contato fora do que a receita declarou em `contatos`, nenhum grupo de partes solto fora do que ela declarou em `ilhas` (`{ contem, motivo }`) e nenhuma parte com forma diferente da prometida. A receita que compõe por `CHAMADAS_COMPOSICOES` precisa do registro (`--composicoes=<módulo>`, o mesmo argumento de `npm run varrer`); sem ele o comando recusa dizendo o que falta.
 2. `conferir:juntas` mantém folgas e penetrações dentro da especificação.
 3. `ativar:bancada` grava `public/sessao-ativa.json` sem recusa do motor.
-4. `olhar-bancada` grava os PNG em `tools/bancadas/out/` sem erro de enquadramento.
+4. `bancada` grava os PNG em `tools/bancadas/out/` sem erro de enquadramento.
 5. `exportar:step --somente-validar` só valida a malha. O STEP físico (o mesmo comando, sem a bandeira) só se gera a pedido explícito do usuário.

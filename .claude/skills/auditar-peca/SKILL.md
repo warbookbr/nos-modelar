@@ -145,13 +145,12 @@ peça isolada e não inventa validade global de uma montagem.
    Para uma peça nova ou alterada, inclua também:
 
    ```bash
-   npm run criar -- <peca>
    npm run malha:conferir -- <peca>
    ```
 
    `porteiro`, `npm run peca` e `npm run criar` ainda podem ajudar a diagnosticar
    o visor v3, mas são compatibilidade legada, não publicação nem o gate visual
-   oficial da Mecanifica.
+   oficial da Mecanifica, e não fazem parte da auditoria.
 
 ## O que não é requisito
 

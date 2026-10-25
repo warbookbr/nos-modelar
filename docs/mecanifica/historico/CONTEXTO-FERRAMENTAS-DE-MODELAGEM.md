@@ -1,7 +1,7 @@
 # Contexto das ferramentas de modelagem
 
 Complemento do plano [as ferramentas de
-modelagem](planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), aberto quando a fatia
+modelagem](../planos/encerrados/2026-10-07-as-ferramentas-de-modelagem.md), aberto quando a fatia
 pede: o que já existe e ele reaproveita, as referências de cada fatia e o que vem
 depois dele. Saiu do plano para a leitura de quem vai mudar o Mecanifica caber no
 orçamento do roteiro `mudar`.
@@ -9,7 +9,7 @@ orçamento do roteiro `mudar`.
 ## O que já existe e o plano reaproveita
 
 A forma global N2 (`src/autoria/forma-global.js`,
-[contrato](CONTRATO-FORMA-GLOBAL-N2.md)) já é um nível de blocagem: a IA
+[contrato](../CONTRATO-FORMA-GLOBAL-N2.md)) já é um nível de blocagem: a IA
 declara um alvo e um andaime de volumes com nome, o andaime vira uma blocagem
 neutra, e o gate G01 compara envelope, pontos de referência e silhueta em três
 vistas contra o alvo. Ela aceita caixa, cilindro, prisma convexo, casco por
@@ -19,21 +19,21 @@ partes dentro do envelope dos volumes e as portas do andaime. O encaixe já tem
 contrato no núcleo e na montagem: portas publicadas, a porta conferida contra a forma (`porta-confere-forma.js`),
 vínculos de medida e posição derivada da porta na montagem v5; as portas só
 conhecem cilindro e anel. Ferramenta nova já tem formato de entrada, a [extensão
-nativa](EXTENSOES-NATIVAS-V1.md), com manifesto, teste e registro, e o exemplo
+nativa](../EXTENSOES-NATIVAS-V1.md), com manifesto, teste e registro, e o exemplo
 `procedural/extensoes/prisma-triangular`. Subgrafo reutilizável de operações já
-tem formato, a [composição procedural](COMPOSICAO-PROCEDURAL-V1.md) em
+tem formato, a [composição procedural](../COMPOSICAO-PROCEDURAL-V1.md) em
 `procedural/nucleo/composicoes.js`. A varredura de parâmetros
 (`src/autoria/varrer-parametros.js`) já mede uma peça em lote dentro das faixas
 declaradas. A conferência contra foto (`npm run conferir:referencia`), o
 contorno por parte em milímetro (`modulos/contorno-da-imagem/`), o [fluxo do
-objeto](usar/FLUXO-DO-OBJETO.md), o [aceite visual](CONTRATO-ACEITE-VISUAL.md)
-e o [filtro agent-first](AGENT-FIRST.md) já existem e governam como uma
+objeto](../usar/FLUXO-DO-OBJETO.md), o [aceite visual](../CONTRATO-ACEITE-VISUAL.md)
+e o [filtro agent-first](../AGENT-FIRST.md) já existem e governam como uma
 capacidade nova é aceita. O plano estende essas peças em vez de criar outras.
 
 ## Referências por fatia
 
-As referências de cada fatia estão na [pesquisa aberta](PESQUISA-ABERTA-2026-10.md)
-e nas [análises](ANALISES-DE-2026-10.md), e a fatia confere o link de cada uma
+As referências de cada fatia estão na [pesquisa aberta](../PESQUISA-ABERTA-2026-10.md)
+e nas [análises](../ANALISES-DE-2026-10.md), e a fatia confere o link de cada uma
 antes de usá-la, porque a maior parte não foi aberta na pesquisa. Para o contorno e
 a casca, o Solidify do Blender e o deslocamento de contorno do CAD Sketcher e do
 SolveSpace; para a verificação, o desvio contra referência do CloudCompare e o
@@ -52,7 +52,7 @@ até 23%, contra 1000 ids por passo. A casca nativa recua cada face pelo plano
 aceitável, o plano B é o [replicad](https://github.com/sgenoud/replicad) (MIT), arredondamento e
 casca exatos sobre o OpenCASCADE que o repositório já empacota, o que reabre a
 decisão do OCCT só na autoria. As outras bibliotecas avaliadas estão no [módulo
-de pesquisa](../../modulos/pesquisa/bibliotecas/BIBLIOTECAS.md).
+de pesquisa](../../../modulos/pesquisa/bibliotecas/BIBLIOTECAS.md).
 
 ## Desenho da fatia 4
 
@@ -140,7 +140,7 @@ aumentar a leitura obrigatória.
 As tarefas 1 a 3 entraram em 2026-10-11. A razão (`mede: { razao: [A, B], faixa }`) vale no módulo do esboço, na blocagem do nível
 zero, no `--medidas` e no Portão da Maquete. O veredito de `descrever` ganhou, depois do que já rodava, o G01 sobre a malha da peça
 (`REFINA.alvo`), o contorno por parte (`*.contornos.json` na pasta da peça) e as razões (`RAZOES`), e o item sem referência imprime
-"não conferido: sem referência" sem aprovar nem barrar; o uso está em [`CONFERIR-CONTRA-REFERENCIA.md`](usar/CONFERIR-CONTRA-REFERENCIA.md).
+"não conferido: sem referência" sem aprovar nem barrar; o uso está em [`CONFERIR-CONTRA-REFERENCIA.md`](../usar/CONFERIR-CONTRA-REFERENCIA.md).
 Os contornos versionados do braço moram em `procedural/pecas/braco-robotico/referencias/`, na pasta do objeto e não na de uma
 parte, e por isso nenhuma peça os recebe: medida a base contra eles (região `base` com o corpo e o pé), a razão interseção/união dá
 0,82 na lateral, 0,79 na frontal e 0,85 na lateral sem cabo, e a caixa lateral dá 0 na lateral (a foto a mostra atrás da base, o
@@ -164,7 +164,7 @@ vistas mostram fica com quem escreve a pergunta, porque nenhuma checagem sabe o
 que uma vista mostra.
 
 A tarefa 4 entrou em 2026-10-11. O conjunto mora em
-[`banco-de-provas/calibracao-do-critico/`](banco-de-provas/calibracao-do-critico/conjunto.json),
+[`banco-de-provas/calibracao-do-critico/`](../banco-de-provas/calibracao-do-critico/conjunto.json),
 no formato `mecanifica.calibracao-do-critico@1` (validador em
 `src/autoria/calibracao-do-critico.js`, gate em `tools/mecanifica/calibracao-do-critico.mjs`). Cada
 uma das doze imagens tem um id neutro (`c01` a `c12`, para o nome do arquivo que o crítico lê não
@@ -223,7 +223,7 @@ valendo, enquanto a fatia 8 não calibra o crítico; e a pessoa assina a prancha
 dos três pontos.
 
 O contrato, o validador e a chamada (tarefas 1 e 2) estão descritos em [contrato da
-família](CONTRATO-DA-FAMILIA.md). As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
+família](../CONTRATO-DA-FAMILIA.md). As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
 com faixa, restrição, `derivar` e registro explícito; (3) a varredura e o
 `descrever` enxergando o registro de composições; (4) a aprovação mecânica e o
 `familias:check`; (5) a conferência com o esboço pelo `REFINA`; (6) roda e pneu
@@ -233,7 +233,7 @@ o roupeiro, depois de conferir que a montagem v5 aceita parâmetro por instânci
 (11) o fechamento do item 7 do gate.
 
 As tarefas 1 a 5 entraram em 2026-10-11, com o contrato em
-[`CONTRATO-DA-FAMILIA.md`](CONTRATO-DA-FAMILIA.md) e o gate `familias:check`; a
+[`CONTRATO-DA-FAMILIA.md`](../CONTRATO-DA-FAMILIA.md) e o gate `familias:check`; a
 aprovação mecânica limita a parede da casca a 1,5 vez a espessura pedida e deixa
 o curso da articulação para as famílias que geram montagem.
 
@@ -241,7 +241,7 @@ As famílias roda e pneu de disco, dobradiça e cilindro hidráulico (tarefas 6,
 e 9) foram aprovadas em 2026-10-11 nas três camadas: a mecânica, o crítico com
 dois julgamentos cegos (8 nos três pontos da roda e da dobradiça; 8, 9 e 8 no
 cilindro, depois de uma rodada que prendeu os olhais por pescoço) e a pessoa, com
-as [pranchas](banco-de-provas/familias-2026-10-11/) guardadas no banco de provas.
+as [pranchas](../banco-de-provas/familias-2026-10-11/) guardadas no banco de provas.
 A chapa dobrada ganhou `origemId` e a origem estrutural (aba, dobra, lado, borda,
 tampa) e a dobradiça passou a fazer o nó com ela, em rolos de 270° com a chapa da
 folha tangente ao rolo, que dão a porta do nó e levam o curso a 180°; a aprovação mecânica foi repetida, e o crítico e a pessoa precisam julgar de novo
@@ -258,18 +258,18 @@ O roupeiro (tarefa 10) entrou em 2026-10-11 e a pessoa o aprovou no mesmo dia. A
 2.0 aos móveis de caixa da lista (guarda-roupa, armário de cozinha, cômoda, criado-mudo, estante com portas e gaveteiro): a família
 passou a se chamar `movel-de-caixa`, com o roupeiro como o perfil `roupeiro`, e ganhou gavetas com trilho e articulação prismática,
 portas sobrepostas e de correr, pés, vão aberto e nove perfis prontos. A aprovação ganhou os perfis e a conferência das aberturas
-simultâneas; o contrato está em [`CONTRATO-DA-FAMILIA.md`](CONTRATO-DA-FAMILIA.md#o-móvel-de-caixa), e o crítico e a pessoa precisam
+simultâneas; o contrato está em [`CONTRATO-DA-FAMILIA.md`](../CONTRATO-DA-FAMILIA.md#o-móvel-de-caixa), e o crítico e a pessoa precisam
 julgar a geometria nova.
 
 A `roda-pneu` ganhou a versão 2 (2026-10-11): de 50 a 2000 mm de diâmetro, com as medidas em proporção do diâmetro, quatro bandas
 (pneumática, maciça, sem pneu com friso e com relevo), a raiada de duas flanges e sete perfis prontos (carro, bicicleta, carrinho de
 mão, rodízio, trator, trem e carroça). O contrato da família ganhou o campo `perfis`, a chamada `{ perfil }`, a unidade `razao` e o
 produto de dois parâmetros no mapa do esboço, e a aprovação mecânica passou a medir cada perfil e a varrer a escala dele. O crítico e
-a pessoa precisam julgar de novo, e a descrição está em [CONTRATO-DA-FAMILIA.md](CONTRATO-DA-FAMILIA.md#a-família-roda-pneu).
+a pessoa precisam julgar de novo, e a descrição está em [CONTRATO-DA-FAMILIA.md](../CONTRATO-DA-FAMILIA.md#a-família-roda-pneu).
 
 ## Pendências da camada de features
 
-O [suporte de tubo](banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
+O [suporte de tubo](../banco-de-provas/suporte-tubo-2026-10-10/README.md) provou o
 item 4 do gate de saída e mostrou duas limitações do `arredondarAresta`, que a
 pessoa mandou corrigir antes de qualquer peça de chapa com furo. A aresta da
 tampa de um perfil com furo ou de um contorno por trechos, que saía em leque de
@@ -347,7 +347,7 @@ canto, e a receita do suporte já segue essa ordem (cadeia, laterais, cantos liv
 
 A biblioteca de famílias cresce a cada família nova, com o ajuste numérico dos
 parâmetros contra o contorno da referência, que junta o catálogo de famílias e o
-[modelador inverso](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
+[modelador inverso](../planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
 numa camada só. As ferramentas seguintes da contagem por objeto, as quatro
 lacunas dos modificadores do Blender (deformação por gaiola, projeção sobre
 superfície, Cast e controle de normais), a tabela única de normas e as medidas
@@ -356,9 +356,9 @@ movimento. Os geradores novos das análises e da pesquisa: a divisão por regras
 do CityEngine, a distribuição com espaçamento mínimo, o Wave Function Collapse,
 os campos implícitos do libfive, o Tissue, o Plating Generator e o MAP-Elites
 para gerar variantes de uma família. [As partes do
-braço](planos/congelados/2026-09-26-as-partes-do-braco.md) continuam congeladas.
+braço](../planos/congelados/2026-09-26-as-partes-do-braco.md) continuam congeladas.
 
-O plano seguinte é [o que o avião pede](planos/encerrados/2026-10-11-o-que-o-aviao-pede.md),
+O plano seguinte é [o que o avião pede](../planos/encerrados/2026-10-11-o-que-o-aviao-pede.md),
 que leva estes candidatos na lista de sucessão. Candidatos apontados pela pessoa em 2026-10-11: o carrinho de
 mão como família de objeto (chassi, caçamba e a roda no perfil de carrinho de mão,
 a partir do carrinho azul aprovado), a bacia em casca como primitiva (a caçamba
@@ -366,5 +366,5 @@ generalizada, com parede inclinada e contorno em D ou retangular), a dobradiça 
 caneco para a porta sobreposta passar de 90° e as ressalvas do fechamento.
 
 A carcaça da empilhadeira volta com a casca nativa da fatia 6, pelo
-[alinhamento](banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
+[alinhamento](../banco-de-provas/empilhadeira-2026-10-09/ALINHAMENTO.md) já
 começado com a pessoa, que parou na ordem de montagem.

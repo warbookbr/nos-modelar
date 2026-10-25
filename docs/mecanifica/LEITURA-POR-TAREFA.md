@@ -3,7 +3,7 @@
 Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre a pergunta. Cada roteiro já diz o que ler antes de começar.
 
 
-- Estado, objetivo e horizonte: `VISAO.md`, este índice e `planos/README.md`.
+- Estado, objetivo e horizonte: `VISAO.md`, `INDEX.md` e `planos/README.md`.
 - **O que já existe, antes de propor ferramenta ou capacidade:** as operações do
   núcleo no catálogo gerado, [`gerado/CATALOGO-CAPACIDADES.md`](gerado/CATALOGO-CAPACIDADES.md);
   as formas, o posicionamento, os componentes e os comandos do esboço em
@@ -43,12 +43,12 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   classifique com evidência e só então abra recorte de implementação.
 - Descoberta MCP: `SERVICOS-PROCEDURAL-V1.md`; leia o catálogo, combine e valide
   em memória antes de propor extensão ou registrar lacuna.
-- Peça nova ou refinamento: `AUTORIA-IA.md`, `PERFIS-DE-AUTORIA.md`,
-  `INTENCAO-PECA-V1.md`, `REFERENCIA-E-CRITICA-VISUAL.md`,
-  `FLUXO-MODELAGEM-IA.md` e `BANCADA-E-APRESENTACAO.md`.
+- Peça nova ou refinamento: o que ler sai de `npm run comecar -- modelar/peca`;
+  por assunto, a direção da autoria está em `AUTORIA-IA.md` e
+  `PERFIS-DE-AUTORIA.md`, e o fluxo antigo em `FLUXO-MODELAGEM-IA.md`.
 - **Bancada — contexto visual, arquitetura, e o laço de desenhar e absorver:**
   `BANCADA-E-APRESENTACAO.md` separa o que é de `src/bancada/` do que é de
   `src/autoria/`; o procedimento está em `usar/AJUSTE-DA-BANCADA.md`.
 - Homologação: `HOMOLOGACAO-FLUXO-IA.md` e `FLUXO-MODELAGEM-IA.md`.
-- Freio ou roda: a prancha correspondente e o protocolo visual.
+- Freio ou roda: a família `roda-pneu` (`procedural/familias/roda-pneu/`) e, no esboço, `.claude/skills/esboco-detalhado/faixas-rodas-discos.md`.
 - Trabalho histórico: o README da zona histórica antes de abrir evidências.

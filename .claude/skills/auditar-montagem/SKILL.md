@@ -83,9 +83,11 @@ obrigatória.
 `descrever_montagem` só fornece contexto estrutural. `revisar_montagem`, quando
 disponível, também audita pares de peças-folha por contenção e malha. Registre
 para cada par `interpenetram`, `encostam`, `separadas` ou `inconclusivo`, o método,
-as expectativas associadas e a cobertura. Interpenetração reprova a revisão;
-`inconclusivo`, foco parcial ou vista indisponível deixam-na incompleta. Uma
-expectativa explica a intenção, mas nunca apaga um achado. Não chame isso de
+as expectativas associadas e a cobertura. O par que se toca fora das
+expectativas declaradas reprova a revisão, e o par declarado deixa de reprovar
+mas continua listado no relatório; `inconclusivo`, foco parcial ou vista
+indisponível deixam-na incompleta. A expectativa é declarada antes de medir, e
+declarar depois de ver a reprovação é calar o defeito. Não chame isso de
 solver, folga universal, movimento ou aprovação completa.
 
 No serviço local, foco `incidente` testa o alvo contra toda a raiz; foco

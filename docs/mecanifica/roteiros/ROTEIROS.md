@@ -53,7 +53,6 @@ Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 b
 
 Abrir só quando a condição aparecer:
 
-- `docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md`, quando a tarefa pede o que o último plano deixou, as referências ou o que vem depois dele.
 - `comunicacao.md`, quando o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção.
 - `docs/mecanifica/ARQUITETURA.md`, quando a mudança atravessa camadas.
 - `docs/mecanifica/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.

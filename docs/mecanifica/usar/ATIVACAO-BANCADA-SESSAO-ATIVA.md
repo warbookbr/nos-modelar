@@ -31,7 +31,7 @@ Clientes MCP (como agentes de IA) ativam receitas diretamente através da ferram
 
 Para ativar qualquer receita ou montagem na bancada via terminal:
 
-```powershell
+```bash
 npm run ativar:bancada -- --arquivo=procedural/pecas/<peca>/receita.js
 ```
 
@@ -90,40 +90,19 @@ Com o servidor de desenvolvimento ativo (`npm run dev`):
 
 ## Revisão visual headless da sessão ativa
 
-Até esta correção, `olhar-bancada` (e por consequência o `renderizar_vistas` do
-MCP) não conseguia revisar peça nenhuma — nem fixture, nem sessão ativa. Quatro
-defeitos empilhados, todos corrigidos:
+`olhar-bancada` (e o `renderizar_vistas` do MCP) revisa a sessão ativa sem
+interface: espera o modelo entrar na cena (`carregado === true`), lê a ponte
+`window.__mecanificaBancada` por getters, ancora o caminho da sessão na base da
+aplicação e enquadra a peça na primeira entrega. A história das quatro correções
+que levaram a isso está no histórico do git deste arquivo.
 
-1. **A ponte não publicava o que o leitor consome.**
-   `window.__mecanificaBancada` expunha `peca()`, `estado()` e `enquadrar()`, mas
-   o leitor headless procurava `partes`, `estatisticas`, `diagnosticos`,
-   `selecaoIgnorada` e `enquadramento()` — que não existiam. O resultado era
-   `estatisticas` nulo e a revisão morria em `facesNeutras`. Agora são
-   **getters** (não valores congelados), porque a ponte é montada uma vez no fim
-   da inicialização e o modelo troca depois.
-
-2. **O leitor lia antes do modelo entrar na cena.**
-   A peça da sessão ativa chega pelo *polling* do sincronizador, segundos após o
-   `load`. `olhar-bancada` agora espera `carregado === true`.
-
-3. **O caminho da sessão era relativo à página, não à aplicação.**
-   O harness dos gates vive em `tools/bancadas/`, então `./sessao-ativa.json`
-   resolvia para um sessao-ativa.json dentro de `tools/bancadas/`, que nunca existiu (404) e a sessão nunca subia
-   em modo headless. O `fetch` passou a ancorar em `import.meta.env.BASE_URL`.
-
-4. **A câmera nunca enquadrava a peça da sessão.**
-   `preservarCamera` existe para não arrancar o enquadramento de quem edita ao
-   vivo, mas na **primeira** entrega não há câmera a preservar: o enquadramento
-   em vigor foi calculado com a cena vazia. Agora só preserva se já houver
-   modelo.
-
-Além disso, `--saida` deixou de exigir `--peca`: a peça em trabalho, por
+`--saida` não exige `--peca`: a peça em trabalho, por
 definição, ainda não está no catálogo publicado, e exigir nome tornava impossível
 salvar justamente a revisão do trabalho em curso. O nome do arquivo sai do rótulo
 do modelo carregado, normalizado por `apelidoDeArquivo`.
 
 ```bash
-node tools/mecanifica/ativar-bancada.mjs --arquivo=procedural/pecas/<peca>.js
+node tools/mecanifica/ativar-bancada.mjs --arquivo=procedural/pecas/<peca>/receita.js
 node tools/mecanifica/olhar-bancada.mjs --vistas=direita,frontal,isometrica --saida=tmp/<peca>
 ```
 

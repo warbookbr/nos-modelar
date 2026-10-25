@@ -27,8 +27,8 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
 | Perspectiva bonita compensando ortográfica ruim | Uma câmera pode esconder erros fundamentais. | As vistas ortográficas críticas têm veto independente; perspectiva é auxiliar. |
 | Mudança por métrica sem reabertura visual | Um número melhora enquanto a forma piora. | Toda alteração que muda geometria regenera e reinspeciona todas as vistas afetadas. |
 | Métrica que muda com a densidade da malha | Diedro, segunda diferença e curvatura por vértice medem o PASSO da amostragem, não a forma. A mesma superfície troca de veredito só refinando. | Toda métrica angular normaliza pelo comprimento da aresta, ou o corpus é reamostrado para densidade comum antes de comparar. |
-| Detector que devolve `passa` fora do seu escopo | Aprovação por vacuidade: o gate fica verde porque não tinha o que medir. | Fora de escopo devolve `naoAvaliavel` com motivo. Nunca `passa`. |
-| Crítico recebendo só o render | Sem o alvo ao lado, a única pergunta possível é "isso parece um carro?", e a resposta não aponta contra o quê. | Crítico recebe alvo, modelo e sobreposição, nos três caminhos. |
+| Detector que devolve `passa` fora do seu escopo | Aprovação por vacuidade: o gate fica verde porque não tinha o que medir. | Fora de escopo devolve `indeterminado` ou "não conferido", com o motivo. Nunca `passa`. |
+| Crítico recebendo só o render | Sem o alvo ao lado, a única pergunta possível é "isso parece um carro?", e a resposta não aponta contra o quê. | Crítico recebe o alvo ao lado do modelo, no pedido de `npm run vistas:critica` ([O laço do crítico](REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)). |
 | Alvo inventado pela IA usado como referência | Um número que a IA escolheu vira "medida" na rodada seguinte e ninguém confere. | Alvo sem procedência medida é `não vinculante` no próprio documento. |
 | Método diagnóstico aplicado a problema generativo | Sempre acha um defeito, então dá sensação de progresso enquanto a forma não anda. | Sintoma de parada: os achados encolhem e a nota não sobe. Ver `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. |
 | Relação semântica confundida com apoio físico | `pai:` organiza a árvore sem prender nada: nome certo, peça flutuando. Vale para painel no chassi, braço no ombro, cabeçote na coluna. | Apoio, encaixe, folga e eixo são declarados por geometria e validados depois da resolução, nunca pela hierarquia. |
@@ -37,7 +37,6 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
 | Resolução escolhida sem olhar a silhueta | Receita válida e curva facetada: 16 lados passam no teste e aparecem na vista. | Lados escolhidos por raio, curvatura e peso na silhueta; toda curva protagonista inspecionada em ortográfica e em aproximação. |
 | Booleana entre superfícies quase rentes | A malha sai fechada e o `descrever` verde, mas a costura pula entre as facetas das duas superfícies e deixa degraus, leques e sombra manchada. No ombro de 2026-09-29 o defeito foi atribuído ao núcleo antes de ser medido. | Unir só superfícies que se cruzam com ângulo franco, ou deixar uma inteira dentro da outra; conferir em arame e em zoom a 1600 px. Caso completo em `GOTCHAS-POR-OPERACAO.md`. |
 | Detalhe antes do envelope funcional | Detalhe dá sensação de avanço enquanto a proporção ainda está errada, e depois trava a correção. | Ordem obrigatória: envelope e escala, volumes estruturais, interfaces, só então detalhe. |
-| ~~`npm run criar` com receita v3~~ | `criar.mjs` e `visor.html` tentavam `mod.construir` e `mod.meta.tipo` legados, falhando com `Cannot read properties of undefined` em receitas v3 (`export const receita = { PASSOS, ... }`). | **Resolvido**: `criar.mjs` e `visor.html` foram atualizados para desempacotar receitas v3 e carregar a malha via `procedural/nucleo/executor.js`, funcionando de ponta a ponta (núcleo, porteiro e renders de evidência). |
 ## Pipeline mínimo que vem antes de modelar
 
 1. **Contrato da família.** Declarar os componentes que tornam o objeto
@@ -45,8 +44,10 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
 2. **Alvo por vista.** Vincular cada referência individual a hash, enquadramento
    e pergunta visual. Não usar uma prancha como evidência.
 3. **Crítico visual bloqueante.** Para cada vista, extrair e comparar marcos
-   semânticos da referência e do render. O crítico deve emitir `aprovar`,
-   `reprovar` ou `indeterminado`; `indeterminado` bloqueia promoção.
+   semânticos da referência e do render. O crítico devolve o veredito com nota
+   e defeitos de [O laço do crítico](REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico),
+   e a rodada só fecha com nota 8 sem defeito; imagem cortada ou ilegível é dita
+   antes da nota e bloqueia.
 4. **Bloco semântico inteiro.** Criar o corpo conectado do objeto, não uma
    coleção de primitivos. Para veículo: carroceria, cabine, quatro rodas dentro
    dos arcos, frente e traseira diferentes. Para humanoide: tronco, pescoço,
@@ -54,10 +55,10 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
    interfaces e vazios requeridos.
 5. **Evidência pareada.** Gerar para cada vista: referência, render, diferença
    e registro textual dos achados. Cada arquivo é aberto individualmente.
-6. **Veto e correção localizada.** Um reprovado identifica o marco e a vista
+6. **Veto e correção localizada.** Cada defeito identifica a parte e a vista
    que falharam; corrige-se esse contrato, não se aplica “suavização” global.
 7. **Aprovação humana somente depois.** O usuário valida direção e intenção
-   após o crítico automático não encontrar veto. A aprovação não substitui o
+   depois que a rodada do crítico fecha. A aprovação não substitui o
    histórico de evidências.
 ## Crítico visual: responsabilidades e limites
 
@@ -76,16 +77,16 @@ do veredito. Métricas de distância, IoU, diedro ou continuidade complementam o
 diagnóstico, nos termos da regra de `LACO-VISUAL.md` de que métrica não aprova forma.
 ## Política de parada e rastreabilidade
 
-- Toda rodada começa `em-avaliação`; não existe sucesso implícito por gerar
-  arquivos.
-- Qualquer veto visual muda a rodada para `reprovada` e bloqueia as etapas
+- Não existe sucesso implícito por gerar arquivos: a rodada só fecha com o
+  veredito do crítico, e a medição reprovada nem chega a ele.
+- Qualquer defeito apontado mantém a rodada aberta e bloqueia as etapas
   dependentes.
 - A tentativa reprovada permanece rastreável, mas não é reutilizada como base
   geométrica sem uma decisão explícita que identifique o defeito corrigido.
 - Um novo gerador ou uma nova família começa com um caso canário pequeno, mas
   completo, e precisa passar os marcos mínimos em vistas individuais antes de
   receber mais detalhe.
-- “Sem evidência” e “não foi possível avaliar” significam `indeterminado`, não
+- “Sem evidência” e “não foi possível avaliar” deixam a rodada aberta, não são
   aprovação condicional.
 ## Registro consolidado de problemas já encontrados
 
@@ -94,7 +95,7 @@ As trinta e oito falhas medidas (V-01 a V-38) moram em
 Elas saíram daqui por pesarem 15,6 dos 35,8 KB deste documento de leitura
 obrigatória; a maior parte é o programa de carroceria N6, congelado.
 
-**Vá lá antes de abrir experimento de forma.** Redescobrir por conta própria algo
+**Consulte-a pelo roteiro `pesquisar` antes de abrir experimento de forma**; ela é evidência do que já se mediu, não regra. Redescobrir por conta própria algo
 que aquela tabela já mediu é a falha V-31, e ela custou uma rodada inteira: o
 canário N6 chegou a "silhueta não carrega topologia automotiva" construindo um
 casco por interseção, quando `prova-secoes-por-medida` já tinha medido isso.

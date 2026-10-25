@@ -53,7 +53,7 @@ inspecionou.
 
 ## Atritos
 
-Quando a ferramenta ou a skill atrapalhar, anote em `ATRITOS.md`, na pasta que
+Quando a ferramenta ou a skill atrapalhar, anote num `ATRITOS.md` que você cria na pasta que
 lhe deram, o que aconteceu e o comando exato que reproduz. Atrito sem comando
 não é reproduzível e não vale.
 

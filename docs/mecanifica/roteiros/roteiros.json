@@ -117,10 +117,6 @@
       ],
       "sobDemanda": [
         {
-          "arquivo": "docs/mecanifica/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md",
-          "quando": "a tarefa pede o que o último plano deixou, as referências ou o que vem depois dele"
-        },
-        {
           "arquivo": "comunicacao.md",
           "quando": "o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção"
         },

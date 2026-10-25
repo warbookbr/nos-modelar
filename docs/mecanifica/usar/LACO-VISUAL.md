@@ -44,8 +44,8 @@ isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto um
 1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
 2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
    do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
-3. despache o agente `critico-visual` passando os **três** caminhos — alvo,
-   modelo e sobreposição. Crítico que recebe só o render dá opinião.
+3. despache o agente `critico-visual` com o alvo ao lado do modelo, no pedido
+   que `npm run vistas:critica` monta. Crítico que recebe só o render dá opinião.
 
 Sem alvo desenhado, desenhe antes: veja
 [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md). Quando o que
@@ -68,9 +68,9 @@ que lê a receita volta a julgar a intenção em vez do resultado, que é
 exatamente o defeito que este papel existe para cobrir. Papel separado dentro da
 mesma sessão é ficção: quem modelou tem a narrativa e não consegue não tê-la.
 
-A forma padrão é legibilidade cega: entregue a imagem sem dizer o que é e
-pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
-teste não exige gosto — só verifica se a forma comunica.
+Quando a forma vai à pessoa, a legibilidade cega roda antes: entregue a imagem
+sem dizer o que é e pergunte "o que é isto?". Se a resposta não bate com a
+intenção, é achado, e o teste não exige gosto — só verifica se a forma comunica.
 
 Três limites, todos inegociáveis:
 

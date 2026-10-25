@@ -283,16 +283,10 @@ Confere relações mecânicas declaradas:
 
 ### 4. Validação de montagem e movimento
 
-Quando o projeto alcançar essa capacidade, confere relações que dependem de
-pose ou movimento:
-
-- curso;
-- rotação;
-- esterçamento;
-- abertura;
-- interferência ao longo do movimento;
-- limites e batentes;
-- espaço varrido.
+Confere relações que dependem de pose ou movimento. Hoje a articulação de
+revolução e a prismática amostram o curso em poses discretas, com limites e
+batentes e a interferência em cada pose (`usar/MONTAGENS-SEMANTICAS.md`); o
+espaço varrido contínuo ainda não existe.
 
 ### 5. Inspeção visual
 
@@ -314,8 +308,8 @@ incorretas ou desalinhamentos.
 
 ## Fluxo de autoria esperado
 
-Sem fixar ainda comandos ou formato de arquivo, o fluxo de uma tarefa deve
-preservar esta sequência:
+Os comandos de cada passo estão na esteira de `GUIA-AUTORIA-IA.md` e na skill
+`criar-peca`; a ordem que eles preservam é esta:
 
 1. identificar o alvo pelo mapa semântico;
 2. carregar a receita ou montagem responsável;
