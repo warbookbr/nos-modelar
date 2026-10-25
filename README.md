@@ -26,26 +26,20 @@ ele. A definição completa está em
   tópico com `npm run esboco -- --ajuda`.
 - **motor de prancha** (`tools/mecanifica/prancha/prancha.mjs`, skill
   `desenhar-prancha`): desenha em 2D o contorno de referência de um invólucro
-  antes de existir geometria 3D, e `tools/mecanifica/comparar-alvo.mjs` o
-  sobrepõe ao resultado modelado.
+  antes de existir geometria 3D, e `prancha-referencia.mjs` compara a silhueta
+  modelada com ela em milímetro.
 - **crítico visual** (`.claude/agents/critico-visual.md`): agente sem contexto
   que só olha imagem e diz se o modelo bate com o alvo.
 - [`contorno-da-imagem`](modulos/contorno-da-imagem/): tira de uma imagem de
   referência o contorno de cada parte, em milímetro.
-- [`desenho-por-restricoes`](modulos/desenho-por-restricoes/): desenha a vista de
-  um objeto sem imagem de referência, a partir de partes, pontos e relações em
-  milímetro resolvidos pelo planegcs, e grava os contornos no formato dos da
-  imagem (`npm run desenho`).
 - [`exportador-cad`](modulos/exportador-cad/) e
   [`exportador-obj`](modulos/exportador-obj/): exportam a malha neutra para STEP
   e para OBJ com partes nomeadas.
 - [`textura`](modulos/textura/): gera em JavaScript a imagem de cor de um
   material (madeira e liso) como tile contínuo.
-- [`otimizador-malha`](modulos/otimizador-malha/),
-  [`preparo-micropoligono`](modulos/preparo-micropoligono/) e
-  [`topologia`](modulos/topologia/): reduzem a malha sem mudar a silhueta,
-  preparam malha densa para motores de micropolígono e apontam defeitos de
-  traçado.
+- [`topologia`](modulos/topologia/): aponta defeitos de traçado da malha, e com
+  a triangulação ligada também a face torta e o triângulo de área nula
+  (`npm run malha:conferir`).
 
 Os módulos em `modulos/` têm `package.json`, `src/` e `tests/` próprios e não
 importam o núcleo procedural, exceto o esboço, que lê o avaliador de expressões.

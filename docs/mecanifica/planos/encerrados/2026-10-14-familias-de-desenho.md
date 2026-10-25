@@ -87,9 +87,9 @@ só a saída para a pessoa e o crítico.
    faixas e a ligação ao formato do módulo, escrito a partir dos dois ajustes.
 4. **Famílias.** As famílias da carcaça e do braço, com a faixa de cada parâmetro
    e a prova nos extremos, um agente para cada, em paralelo. Feitas em 2026-10-14, em
-   [`procedural/familias-de-desenho/`](../../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md):
+   `procedural/familias-de-desenho/` (pasta removida em 2026-10-25):
    a carcaça com 15 parâmetros, três peças e 33 conjuntos provados, o perfil de
-   referência em 0,9941; o [braço](../../../../procedural/familias-de-desenho/braco-colaborativo/README.md)
+   referência em 0,9941; o braço (pasta removida em 2026-10-25)
    com 9 parâmetros, quatro peças e 21 conjuntos, em 0,9540. O crítico, olhando o
    mínimo, o médio e o máximo contra a referência, deu 9 à carcaça (faltam uma linha
    fina na base da lateral e o fim da linha do aro) e 8 ao braço (o elo da coluna
@@ -113,7 +113,7 @@ só a saída para a pessoa e o crítico.
    `npm run desenho -- familia --ajustar`, e a prova ganhou o sorteio de conjuntos
    nas faixas (`--provar --sorteio`), porque a prova de pares não via três
    parâmetros que se contradizem juntos. A
-   [família da carcaça](../../../../procedural/familias-de-desenho/carcaca-empilhadeira/README.md)
+   família da carcaça (pasta removida em 2026-10-25)
    passou à versão 2.0.0, com as faixas das duas empilhadeiras: 0,9943 contra a
    referência antiga e 0,9230 contra a nova, 335 conjuntos desenhados na prova e
    nenhuma reprovação em 1500 sorteados. O crítico deu 7 nas duas rodadas, a

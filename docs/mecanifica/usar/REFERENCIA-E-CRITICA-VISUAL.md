@@ -188,7 +188,7 @@ que a planta era 500 mm mais larga que o alvo na ponta.
 4. Permitir revisão do usuário quando o resultado visual for subjetivo.
 5. Modelar envelope e interfaces; depois, uma região por vez.
 6. Renderizar vistas canônicas equivalentes às referências, **e sobrepor ao
-   alvo** com `comparar:alvo` antes de julgar qualquer coisa.
+   alvo**, como no passo 2 da seção 2 de `LACO-VISUAL.md`, antes de julgar qualquer coisa.
 7. Rodar a crítica **por despacho**, como em [O laço do crítico](#o-laço-do-crítico),
    depois que a prova determinística estiver limpa.
 8. Corrigir os defeitos do veredito, cada um na parte e na vista que ele aponta.

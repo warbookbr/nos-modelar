@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1592 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1523 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -60,10 +60,6 @@
 ## .claude/skills/desenhar-prancha/
 
 - `SKILL.md` — Desenha a prancha ortográfica alvo (silhueta, aberturas, painéis e cotas nas vistas lateral, frontal, traseira e superior). Use para produzir ou corrigir o d…
-
-## .claude/skills/desenho-por-restricoes/
-
-- `SKILL.md` — Desenha a vista de um objeto sem imagem de referência, por partes, pontos e relações em milímetro que um resolvedor transforma em contorno. Use quando só há …
 
 ## .claude/skills/esbocar-opcoes/
 
@@ -129,7 +125,6 @@
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `LEITURA-POR-TAREFA.md` — Leitura por tarefa
-- `LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md` — Levantamento: desenho sem referência
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
@@ -442,7 +437,9 @@
 - `EXPERIMENTO-CARRO-SEM-APOIO.md` — Carro modelado do zero, sem o motor da Mecanifica
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
+- `IMPORTADORES-COMO-RECRIAR.md` — Importadores de objeto de código: como recriar
 - `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
+- `LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md` — Levantamento: desenho sem referência
 - `LEVANTAMENTO-IA-3D-2026-10.md` — Levantamento: IAs que geram 3D e o lugar do Mecanifica (2026-10-05)
 - `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
@@ -683,54 +680,6 @@
 - `contorno.test.js` — contorno.test.js — cada peça do módulo vista num caso construído de propósito: duas partes do mesmo cinza separadas pela semente, a pintura com a opacidade p…
 - `forma-declarada.test.js` — forma-declarada.test.js — o desenhador declara que um trecho da borda é reta, curva ou detalhe; a ferramenta ajusta quando a imagem concorda e avisa, sem aju…
 
-## modulos/desenho-por-restricoes/
-
-- `README.md` — @mecanifica/desenho-por-restricoes
-
-## modulos/desenho-por-restricoes/src/
-
-- `ajuda.js` — ajuda.js — o texto de ajuda do desenho por restrições: o formato `mecanifica.desenho@3` (o @2 e o @1 seguem aceitos), as relações, o lado, os parâmetros, as …
-- `ajuste.js` — ajuste.js — a família de desenho ajustada a uma referência: os valores dos parâmetros que dão a maior razão interseção/união contra o contorno dela, e quais …
-- `booleanas.js` — booleanas.js — união, diferença, interseção, área e deslocamento de listas de anéis em milímetro, sobre a `CrossSection` da Manifold (`manifold-3d`, WebAssem…
-- `canto.js` — canto.js — onde fica o centro do arco que arredonda um canto.
-- `contornos.js` — contornos.js — a saída no formato `mecanifica.contornos@1`, o mesmo que o contorno da imagem grava, para o esboço, a prancha e o crítico lerem como leem o de…
-- `desenhar.js` — desenhar.js — o caminho inteiro de uma descrição até o relatório, os contornos e a vista em traço.
-- `expandir.js` — expandir.js — o `mecanifica.desenho@3` antes da validação: parâmetros com nome, expressões e peças de desenho.
-- `familia.js` — familia.js — a família de desenho: um desenho `mecanifica.desenho@3` parametrizado, com a faixa de cada parâmetro e a prova de que ele resolve nos extremos e…
-- `formato.js` — formato.js — o formato salvo `mecanifica.desenho@3` (`<vista>.desenho.json`) e a validação que diz, em texto, o que corrigir. A versão 2 acrescentou à `barra…
-- `geometria.js` — geometria.js — da geometria resolvida a anéis em milímetro e às medidas derivadas.
-- `index.js` — index.js — a porta do módulo desenho-por-restricoes: a descrição de uma vista entra, o relatório, os contornos e a vista em traço saem.
-- `orientacao.js` — orientacao.js — a peça usada com a orientação errada.
-- `palavras.js` — palavras.js — as palavras fechadas do formato que dizem de que lado uma relação vale: o `lado` (acima, abaixo, esquerda, direita), o `por` da tangência entre…
-- `razao.js` — razao.js — a razão interseção/união (IoU) entre dois contornos, para medir um desenho contra uma referência que o desenhista não viu.
-- `relatorio.js` — relatorio.js — o relatório que volta à IA, em português: o estado do desenho, o que corrigir e as medidas que ela não escreveu.
-- `resolver.js` — resolver.js — resolve o desenho com o planegcs 1.3.0 (o resolvedor do Sketcher do FreeCAD compilado para WebAssembly) e lê o que ele diz, em palavras da desc…
-- `traco.js` — traco.js — a vista em traço do desenho, em SVG: o contorno de cada parte e a silhueta, com os nomes das partes numa coluna de cada lado, fora do desenho, lig…
-- `traducao.js` — traducao.js — a descrição normalizada vira a lista de primitivas e restrições do planegcs.
-
-## modulos/desenho-por-restricoes/tests/
-
-- `ajuste.test.js` — ajuste.test.js — a família ajustada ao contorno de uma referência (`ajustarFamilia`): com a referência desenhada pela própria família em valores conhecidos, …
-- `cantos.test.js` — cantos.test.js — o canto arredondado (`raioDoCanto` do polígono e da barra): o arco sai tangente às duas arestas e com o raio dado, a cápsula é uma barra com…
-- `carrinho.js` — carrinho.js — a lateral de um carrinho de mão, a descrição que os testes do desenho por restrições usam: 17 relações que fecham o desenho sem grau de liberda…
-- `carrinho.test.js` — carrinho.test.js — o carrinho de mão resolve nos valores em que quatro resolvedores concordaram, os quatro cenários (completo, conflito, faltando, redundante…
-- `compat.test.js` — compat.test.js — o `mecanifica.desenho@3` não muda o que o @1 e o @2 davam. Os hashes abaixo são os do contorno, da vista em traço e do texto do relatório qu…
-- `contornos.test.js` — contornos.test.js — a saída é o formato dos contornos da imagem com `origem`, a mesma descrição dá o mesmo arquivo byte a byte, a parte escondida fica com o …
-- `familia.test.js` — familia.test.js — a família de desenho (`mecanifica.familia-de-desenho@1`): o arquivo com o desenho parametrizado e a faixa de cada parâmetro, os valores que…
-- `formas.js` — formas.js — objetos sintéticos pequenos para os testes do desenho por restrições: uma chapa com furo e trava (polígono, círculo, barra e as relações paralela…
-- `formas.test.js` — formas.test.js — as outras relações e partes do formato (arco, círculo, barra, polígono, paralela, perpendicular, igual, ângulo, sobre um círculo e tangência…
-- `formato.test.js` — formato.test.js — a validação do `mecanifica.desenho@2` (e do @1 e do @3, que seguem aceitos) recusa cada erro dizendo o nome do que está errado e como corri…
-- `modulo.test.js` — modulo.test.js — o módulo fica isolado (não importa Three.js, o núcleo de autoria nem outro módulo; do núcleo do repositório lê só a gramática de expressões,…
-- `orientacao.test.js` — orientacao.test.js — a peça recebe a orientação do uso: o `lado`, o `eixo` e o `por` de uma relação aceitam o nome de um parâmetro de palavra, o `lado` de um…
-- `parametros.test.js` — parametros.test.js — o `mecanifica.desenho@3`: parâmetros com nome e expressões em qualquer campo numérico. O desenho com parâmetros dá os mesmos contornos q…
-- `pecas.js` — pecas.js — duas peças de desenho e uma família sintética que as usa, para os testes de peça e de família. As peças são as formas que as notas dos ajustes à r…
-- `pecas.test.js` — pecas.test.js — a peça de desenho: um trecho do formato com parâmetros de entrada e pontos de ligação, chamado por um desenho com valores. As duas peças de e…
-- `porco.test.js` — porco.test.js — o desenho de uma folha de instruções escritas (o exercício 1 das instruções de trabalho padronizado), que dá um porco. `porco/pedido.txt` gua…
-- `razao.test.js` — razao.test.js — a razão interseção/união entre dois contornos, sem alinhar, alinhada por um ponto declarado e pela melhor translação, e as duas medidas do ar…
-- `relacoes-novas.test.js` — relacoes-novas.test.js — o que o `mecanifica.desenho@3` acrescenta às relações: a simetria entre pontos e entre partes em relação a uma reta, a geometria de …
-- `restricoes-da-familia.test.js` — restricoes-da-familia.test.js — o que a família de desenho declara além dos parâmetros: o catálogo de peças que usa (caminho relativo ao arquivo da família),…
-- `traco.test.js` — traco.test.js — todo texto da vista em traço cabe na folha: com um subtítulo, um título e uma legenda das referências mais largos que o desenho, nenhum texto…
-
 ## modulos/esboco/
 
 - `README.md` — @mecanifica/esboco
@@ -881,14 +830,6 @@
 - `textura.test.js` — textura.test.js — material por parte, arquivo .mtl, usemtl, coordenadas vt em mapeamento planar e recusas.
 - `tolerancia.test.js` — tolerancia.test.js — tolerância de triângulo degenerado e regressão de saída sem texturas.
 
-## modulos/otimizador-malha/src/
-
-- `otimizar.js` — otimizar.js — reduz malha na CAMADA DE SAÍDA, sem mover um único ponto.
-
-## modulos/otimizador-malha/tests/
-
-- `otimizar.test.js` — otimizar.test.js — o invariante é a coisa a provar, não o ganho.
-
 ## modulos/pesquisa/
 
 - `README.md` — Pesquisa
@@ -896,14 +837,6 @@
 ## modulos/pesquisa/bibliotecas/
 
 - `BIBLIOTECAS.md` — Bibliotecas avaliadas e ainda fora
-
-## modulos/preparo-micropoligono/src/
-
-- `preparar.js` — preparar.js — deixa a malha pronta para pipeline de micropolígono.
-
-## modulos/preparo-micropoligono/tests/
-
-- `preparar.test.js` — preparar.test.js — cada requisito é visto reprovando o seu defeito.
 
 ## modulos/textura/
 
@@ -988,14 +921,6 @@
 
 - `familias.test.js` — familias.test.js — o registro explícito de famílias e a porta `chamar` ponta a ponta: uma receita com `get CHAMADAS_COMPOSICOES` chama a família de prova, ex…
 - `index.js` — index.js — o registro explícito das famílias e a porta de entrada `chamar`.
-
-## procedural/familias-de-desenho/braco-colaborativo/
-
-- `README.md` — Família de desenho do braço colaborativo
-
-## procedural/familias-de-desenho/carcaca-empilhadeira/
-
-- `README.md` — Família de desenho da carcaça de empilhadeira
 
 ## procedural/familias/aparelho-de-caixa/
 
@@ -2230,7 +2155,6 @@
 - `alisar-numerico.mjs` — alisar-numerico.mjs — a álgebra e a geometria pequenas da ferramenta de alisamento.
 - `alisar-rede.test.mjs` — alisar-rede.test.mjs — a ferramenta de alisamento sobre a gaiola por rede de curvas.
 - `alterar-montagem.test.ts` — alterar-montagem.test.ts — alteração semântica compacta de montagem.
-- `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `analise-da-peca.mjs` — analise-da-peca.mjs — o passo "Pare e analise": a matriz de vistas que a IA precisa olhar antes de declarar uma forma pronta, o manifesto que prova que ela f…
 - `analise-da-peca.test.mjs` — analise-da-peca.test.mjs — a matriz do "Pare e analise", o manifesto e o zoom.
 - `aprovacao-da-familia.mjs` — aprovacao-da-familia.mjs — a camada mecânica da aprovação de uma família, sem gastar token.
@@ -2263,7 +2187,6 @@
 - `cilindro-hidraulico-aprovacao.test.mjs` — cilindro-hidraulico-aprovacao.test.mjs — a aprovação mecânica de uma família que gera montagem: o curso da articulação é conferido contra as malhas da camisa…
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
 - `comecar.test.mjs` — comecar.test.mjs — a entrada por intenção: a pergunta inicial com o estado, a pergunta de cada grupo da árvore, cada folha com a sua leitura, as seções entre…
-- `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
 - `comparar-silhueta.mjs` — comparar-silhueta.mjs — compara a silhueta de uma receita do acervo com a de um modelo de referência medido por `modelo-de-referencia.mjs`.
 - `comparar-silhueta.test.mjs` — Cabine mais estreita que a da fonte (600 contra 900 de meia largura): o perfil lateral e a planta do corpo não mudam, só a seção da estufa.
 - `composicao-na-varredura.test.mjs` — A varredura de parâmetros, o `descrever` e o Envelope do Condutor enxergam o registro de composições.
@@ -2271,7 +2194,7 @@
 - `conferir-contra-referencia.test.mjs` — A REFERÊNCIA É A SILHUETA DA PRÓPRIA PEÇA DE PROVA, desenhada a partir da malha dela e guardada ao lado da receita. Uma foto de conteúdo faria este teste dep…
 - `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
-- `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
+- `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
@@ -2290,8 +2213,6 @@
 - `descrever-montagem.mjs` — descrever-montagem.mjs — lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. Não abre renderizador, não aplica pose e não conhece automóve…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
-- `desenho.mjs` — desenho.mjs — a porta de linha de comando do módulo `modulos/desenho-por-restricoes`, que desenha a vista de um objeto sem imagem de referência: a IA declara…
-- `desenho.test.mjs` — desenho.test.mjs — a porta `npm run desenho`: resolve e grava os contornos e a vista em traço com a mesma saída byte a byte, não grava nos estados que não re…
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
@@ -2310,13 +2231,6 @@
 - `esboco-condutor-nivel-zero.test.mjs` — O Condutor lendo o nível zero, com o adaptador de verdade (`esboco-nivel-zero.mjs`) entregue como porta: - o percurso completo da moto-curvas (Portões, Marco…
 - `esboco-familias.mjs` — esboco-familias.mjs — o adaptador que entrega ao esboço as famílias procedurais.
 - `esboco-familias.test.mjs` — A ponte das famílias procedurais para o esboço (`esboco-familias.mjs` e `modulos/esboco/src/familia.js`), com a roda 2.0 e o cilindro hidráulico de verdade: …
-- `esboco-importar-csg-conferir.mjs` — Conferência numérica da importação de `.csg`: o volume que o esboço importado desenha contra a malha que o próprio OpenSCAD exporta do mesmo objeto (`opensca…
-- `esboco-importar-csg.mjs` — Importador de `.csg` do OpenSCAD para `.esboco.json`.
-- `esboco-importar-csg.test.mjs` — O importador de .csg: a fixture sintética escrita à mão cobre cada nó, e o resultado é medido pelo próprio esboço (a caixa de cada forma depois de posta e re…
-- `esboco-importar-step.mjs` — Importador de STEP para `.esboco.json`.
-- `esboco-importar-step.test.mjs` — O importador de STEP: a fixture sintética (gerada com o OpenCascade WASM por `gerar-sintetico.mjs`) tem uma peça de cada tipo de forma, e cada peça é medida …
-- `esboco-importar-stl.mjs` — Importador de STL para `.esboco.json`.
-- `esboco-importar-stl.test.mjs` — O importador de STL: a fixture sintética (o STEP sintético do importador de STEP, tesselado pelo OpenCascade, ver FONTE.md) dá uma peça de cada tipo de forma…
 - `esboco-medidas-no-andaime.test.mjs` — A prova das medidas do `plano.medidas` lidas na blocagem do nível zero, sobre os esboços do módulo e do banco de provas que as declaram: a leitura na blocage…
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
@@ -2362,14 +2276,10 @@
 - `frente-da-fonte.test.mjs` — Testes de frente-da-fonte.mjs: a frente lida pelas rodas, faróis e para-brisa nomeados, a declaração obrigatória quando a malha é uma peça só, a recusa da fr…
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
-- `importar-csg.mjs` — Linha de comando do importador de `.csg` do OpenSCAD para `.esboco.json`. Uso: npm run importar-csg -- <arquivo.csg> [--saida <arquivo.esboco.json>] [--frent…
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
-- `importar-step.mjs` — Linha de comando do importador de STEP para `.esboco.json`. Uso: npm run importar-step -- <arquivo.step> [--saida <arquivo.esboco.json>] [--frente +y|-y|+x|-…
-- `importar-stl.mjs` — Linha de comando do importador de STL para `.esboco.json`. Uso: npm run importar-stl -- <pasta-ou-arquivos.stl...> [--saida <arquivo.esboco.json>] [--escala …
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
-- `malha-para-esboco.mjs` — O que o importador de STEP e o de STL têm em comum: a malha de um sólido (vértices, triângulos e normais, no quadro do esboço) vira a forma mais simples que …
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
 - `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.
@@ -2403,8 +2313,6 @@
 - `partes-de-objeto.test.mjs` — partes-de-objeto.test.mjs — um objeto de várias partes é uma pasta com as partes dentro de `partes/`, e cada ferramenta acha a parte pelo nome curto `objeto/…
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
-- `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
-- `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
 - `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
 - `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
@@ -2486,17 +2394,6 @@
 
 - `braco-sintetico.mjs` — braco-sintetico.mjs — as duas imagens sintéticas, desenhadas por código, com que o teste do contorno da imagem prova a ferramenta: uma vista lateral de um br…
 
-## tools/mecanifica/fixtures/importar-step/
-
-- `FONTE.md` — Fixtures do importador de STEP
-- `gerar-sintetico.mjs` — Gera `sintetico.step`, a fixture do importador de STEP, com o próprio OpenCascade WASM do repositório (`occt-wasm`). Uso: node tools/mecanifica/fixtures/impo…
-
-## tools/mecanifica/fixtures/importar-stl/
-
-- `FONTE.md` — Fixtures do importador de STL
-- `gerar-denso.mjs` — Gera a fixture de malha densa do importador de STL: um anel de 32 mm de diâmetro externo, 31 mm de diâmetro interno e 9,5 mm de espessura, com o eixo em z, 2…
-- `gerar-sintetico.mjs` — Gera a fixture sintética do importador de STL a partir da do importador de STEP: cada sólido de `../importar-step/sintetico.step` vira um STL, tesselado pelo…
-
 ## tools/mecanifica/fixtures/receita-externa-cadeiras/
 
 - `LEIA-ME.md` — Cadeiras escolhidas como alvo de forma (2026-10-19)
@@ -2526,8 +2423,6 @@
 - `prancha-dos-contornos.mjs` — prancha-dos-contornos.mjs — a prancha de uma vista desenhada com os contornos que `npm run contorno` tirou da imagem de referência, em milímetro.
 - `prancha-dos-contornos.test.mjs` — prancha-dos-contornos.test.mjs — a prancha da lateral do braço sai dos contornos gravados, sem parte fora da silhueta e sem a parte fora do modelo.
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
-- `prancha-r4-independente.mjs` — Prancha R4, escrita sem reutilizar as receitas P0 ou cupê. É um briefing ficcional completo: o arquivo é a autoria declarativa, não uma malha.
-- `prancha-r4-independente.test.mjs` — prancha-r4-independente.test.mjs — prova fria e mutações da prancha R4.
 - `prancha-referencia.mjs` — prancha-referencia.mjs — lê uma prancha rasterizada de referência, calibra pixel→milímetro por duas medidas conhecidas e extrai a silhueta como polilinha em …
 - `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
 - `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…

@@ -1,17 +1,13 @@
 #!/usr/bin/env node
-/* conferir-malha.mjs — um comando que responde as três perguntas de malha sobre
- * uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor
- * de micropolígono.
+/* conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação,
+ * face de área nula, face fina, face torta e triângulo de área nula na triangulação do leque, vértice no meio de aresta e o
+ * resto que `modulos/topologia` confere. A face torta e o triângulo da triangulação vinham do preparo de micropolígono, e a
+ * redução sem perda do otimizador de malha; os dois módulos saíram em 2026-10-25 e as duas verificações úteis passaram à
+ * topologia.
  *
- * Existe porque as três respostas vivem em módulos separados, e separado está
- * certo — cada um tem contrato e teste próprios. O que estava faltando era a
- * porta: uma IA no meio de uma modelagem não deve precisar escrever três
- * importações para saber se acabou de produzir uma malha furada.
+ * Ele NÃO conserta nada e não escreve arquivo. Diz o que há, e quem conserta é quem autora.
  *
- * Ele NÃO conserta nada e não escreve arquivo. Diz o que há, e quem conserta é
- * quem autora — a mesma fronteira que os módulos respeitam.
- *
- *   node tools/mecanifica/conferir-malha.mjs <receita.js> [--unidade=m] [--json]
+ *   node tools/mecanifica/conferir-malha.mjs <receita.js> [--json]
  */
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -22,14 +18,13 @@ const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 
 function uso(mensagem) {
   console.error(`conferir-malha: ${mensagem}`);
-  console.error('uso: node tools/mecanifica/conferir-malha.mjs <receita.js> [--unidade=m] [--json]');
+  console.error('uso: node tools/mecanifica/conferir-malha.mjs <receita.js> [--json]');
   process.exit(2);
 }
 
 const args = process.argv.slice(2);
 const alvo = args.find((a) => !a.startsWith('--'));
 const json = args.includes('--json');
-const unidade = args.find((a) => a.startsWith('--unidade='))?.slice('--unidade='.length) ?? 'm';
 if (!alvo) uso('falta o caminho da receita.');
 
 /* Nome curto OU caminho. A skill `criar-peca` manda escrever
@@ -47,8 +42,6 @@ if (!existsSync(absoluto)) uso(`receita não encontrada: ${alvo}`);
 
 const { executarReceita } = await import(pathToFileURL(path.join(REPO, 'src/autoria/executar-receita.js')).href);
 const { analisarTopologia } = await import(pathToFileURL(path.join(REPO, 'modulos/topologia/src/analisar.js')).href);
-const { otimizarMalha } = await import(pathToFileURL(path.join(REPO, 'modulos/otimizador-malha/src/otimizar.js')).href);
-const { prepararParaMicropoligono } = await import(pathToFileURL(path.join(REPO, 'modulos/preparo-micropoligono/src/preparar.js')).href);
 
 const modulo = await import(pathToFileURL(absoluto).href);
 const receita = modulo.default ?? Object.values(modulo).find((v) => v && typeof v === 'object' && v.PASSOS);
@@ -64,18 +57,16 @@ const malha = { vertices: neutro.V, faces: neutro.F };
    despercebido aqui, com a mensagem certa já escrita e ninguém para mostrá-la. */
 const gritos = neutro.orfaos ?? [];
 
-const topologia = analisarTopologia(malha);
-const otimizacao = otimizarMalha(malha);
-const micro = prepararParaMicropoligono(malha, { unidadeEntrada: unidade, unidadeSaida: 'cm' });
+const topologia = analisarTopologia(malha, { triangulacao: true });
 
 if (json) {
-  console.log(JSON.stringify({ receita: alvo, gritos, topologia, otimizacao: { ganho: otimizacao.ganho, operacoes: otimizacao.operacoes }, micropoligono: micro }, null, 2));
-  process.exit(gritos.length || topologia.veredito === 'reprova' || micro.veredito === 'reprova' ? 1 : 0);
+  console.log(JSON.stringify({ receita: alvo, gritos, topologia }, null, 2));
+  process.exit(gritos.length || topologia.veredito === 'reprova' ? 1 : 0);
 }
 
 const simbolo = { aprova: '✓', alerta: '!', reprova: '✗' };
 console.log(`\n${receita.meta?.nome ?? alvo}`);
-console.log(`  ${otimizacao.antes.vertices} vértices · ${otimizacao.antes.faces} faces · ${otimizacao.antes.triangulos} triângulos · ${topologia.resumo.componentes} corpo(s)`);
+console.log(`  ${topologia.resumo.vertices} vértices · ${topologia.resumo.faces} faces · ${topologia.resumo.componentes} corpo(s)`);
 
 if (gritos.length) {
   console.log(`\n✗ a receita reclamou de ${gritos.length} coisa(s) ao executar:`);
@@ -93,23 +84,6 @@ for (const a of topologia.achados) {
 for (const [codigo, d] of porCodigo) console.log(`    ${d.sev === 'reprova' ? '✗' : '!'} ${codigo} ×${d.n} — ${d.ex}`);
 if (!porCodigo.size) console.log('    sem achados');
 
-console.log(`\n  redução sem perda: ${otimizacao.ganho.faces} face(s), ${otimizacao.ganho.triangulos} triângulo(s)`);
-console.log(`    soldou ${otimizacao.operacoes.soldados}, fundiu ${otimizacao.operacoes.fundidas}, descartou ${otimizacao.operacoes.descartados}`);
-if (otimizacao.ganho.triangulos === 0) {
-  /* Dito sempre que o ganho é zero, porque ganho zero aqui não é falha da
-     ferramenta: é a geometria já estar mínima, e a próxima redução ser decisão
-     de receita. Sem esta linha, alguém lê zero e procura defeito no otimizador. */
-  console.log('    contagem de triângulo intacta — reduzir mais é decisão de receita, não de saída');
-}
-
-console.log(`\n${simbolo[micro.veredito]} micropolígono: ${micro.veredito} (${micro.resumo.triangulos} triângulos, ${unidade}→cm)`);
-/* Ordenado do PIOR para o melhor, e não na ordem em que apareceram. Com a ordem
-   de chegada eu li os cinco primeiros desvios desta lista, todos brandos, e
-   concluí que a lâmina estava sã — quando a pior face dela torce 25%. Lista
-   cortada em cinco tem de mostrar os cinco que importam. */
-const piores = [...micro.achados].sort((a, b) => (b.onde?.desvio ?? 0) - (a.onde?.desvio ?? 0));
-for (const a of piores.slice(0, 5)) console.log(`    ${a.severidade === 'reprova' ? '✗' : '!'} ${a.mensagem}`);
-console.log(`    não cobre: ${micro.naoCoberto.join('; ')}`);
 console.log('');
 
-process.exit(gritos.length || topologia.veredito === 'reprova' || micro.veredito === 'reprova' ? 1 : 0);
+process.exit(gritos.length || topologia.veredito === 'reprova' ? 1 : 0);

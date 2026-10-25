@@ -10,7 +10,10 @@ import { definicaoAdensada } from './fixtures/gaiola-por-estacoes-prova.js';
 import { area, cruzamentos, distancias, triangulos, volume } from './fixtures/medidas-de-malha.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
-import { prepararParaMicropoligono } from '../../modulos/preparo-micropoligono/src/preparar.js';
+
+/* O que o motor de micropolígono recusaria: casca aberta, não-manifold, orientação incoerente e triângulo de área nula. */
+const RECUSA_DE_SAIDA = ['malha-aberta', 'nao-manifold', 'orientacao-incoerente', 'canto-repetido', 'area-nula', 'triangulo-degenerado'];
+const recusasDeSaida = (malha) => analisarTopologia(malha, { triangulacao: true }).achados.filter((a) => RECUSA_DE_SAIDA.includes(a.codigo)).map((a) => a.mensagem);
 import { auditarParDeSolidos, prepararSolido } from '../../src/autoria/contato-de-solidos.js';
 
 const quadrado = { vertices: [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]], faces: [[0, 1, 2, 3]] };
@@ -174,7 +177,7 @@ describe('forma de prova com espessura', () => {
     expect(topologia.veredito).toBe('aprova');
     expect(topologia.resumo.bordas).toBe(0);
     expect(topologia.resumo.componentes).toBe(1);
-    expect(prepararParaMicropoligono({ vertices: solido.V, faces: solido.F }, { unidadeEntrada: 'm', unidadeSaida: 'cm' }).veredito).not.toBe('reprova');
+    expect(recusasDeSaida({ vertices: solido.V, faces: solido.F })).toEqual([]);
   });
 
   it('o volume é a área da face externa vezes a espessura, a 2%', () => {

@@ -16,7 +16,10 @@ import { neutroCanonico, nucleo } from './entrada.js';
 import { cruzamentos, triangulos, volume } from './fixtures/medidas-de-malha.js';
 import * as prova from './fixtures/aba-prova.js';
 import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
-import { prepararParaMicropoligono } from '../../modulos/preparo-micropoligono/src/preparar.js';
+
+/* O que o motor de micropolígono recusaria: casca aberta, não-manifold, orientação incoerente e triângulo de área nula. */
+const RECUSA_DE_SAIDA = ['malha-aberta', 'nao-manifold', 'orientacao-incoerente', 'canto-repetido', 'area-nula', 'triangulo-degenerado'];
+const recusasDeSaida = (malha) => analisarTopologia(malha, { triangulacao: true }).achados.filter((a) => RECUSA_DE_SAIDA.includes(a.codigo)).map((a) => a.mensagem);
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -217,7 +220,7 @@ describe('gate: a aba na borda do vão da chapa curva', () => {
     const todo = topologia({ vertices: neutro.V, faces: neutro.F });
     expect(todo.achados.map((a) => a.codigo)).toEqual(['ilhas']);
     expect(todo.resumo.componentes).toBe(2);
-    expect(prepararParaMicropoligono({ vertices: neutro.V, faces: neutro.F }, { unidadeEntrada: 'm', unidadeSaida: 'cm' }).veredito).not.toBe('reprova');
+    expect(recusasDeSaida({ vertices: neutro.V, faces: neutro.F })).toEqual([]);
     expect(cruzamentos(aba.vertices, aba.faces, 0.01)).toEqual([]);
     /* a seção da aba numa estação reta (a do meio de um lado do vão) tem a área do perfil declarado, a 0,1%, e o sólido tem volume positivo */
     const perfil = perfilDaAba({ espessura: prova.ESPESSURA, raio: prova.ABA.raio, largura: prova.ABA.largura, angulo: prova.ABA.angulo, segmentosPorQuarto: 4 });

@@ -14,7 +14,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TESTES_LENTOS = [
-  'modulos/desenho-por-restricoes/tests/familia.test.js',
   'modulos/esboco/tests/brief-do-critico.test.js',
   'modulos/esboco/tests/camada-sem-perfil.test.js',
   'modulos/esboco/tests/condutor.test.js',
@@ -71,14 +70,11 @@ export const TESTES_LENTOS = [
   'tools/mecanifica/calibracao-do-critico.test.mjs',
   'tools/mecanifica/capturar-montagem.test.ts',
   'tools/mecanifica/cilindro-hidraulico-aprovacao.test.mjs',
-  'tools/mecanifica/desenho.test.mjs',
   'tools/mecanifica/esboco-blocagem-casos.test.mjs',
   'tools/mecanifica/esboco-blocagem.test.mjs',
   'tools/mecanifica/esboco-composta.test.mjs',
   'tools/mecanifica/esboco-condutor-nivel-zero.test.mjs',
   'tools/mecanifica/esboco-familias.test.mjs',
-  'tools/mecanifica/esboco-importar-step.test.mjs',
-  'tools/mecanifica/esboco-importar-stl.test.mjs',
   'tools/mecanifica/familia.test.mjs',
   'tools/mecanifica/forma-do-esboco.test.mjs',
   'tools/mecanifica/guardas/guarda-acervo.test.mjs',

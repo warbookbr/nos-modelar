@@ -12,7 +12,10 @@ import { neutroCanonico, nucleo } from './entrada.js';
 import { area, cruzamentos, distancias, pontoTriangulo, triangulos, volume } from './fixtures/medidas-de-malha.js';
 import * as prova from './fixtures/friso-prova.js';
 import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
-import { prepararParaMicropoligono } from '../../modulos/preparo-micropoligono/src/preparar.js';
+
+/* O que o motor de micropolígono recusaria: casca aberta, não-manifold, orientação incoerente e triângulo de área nula. */
+const RECUSA_DE_SAIDA = ['malha-aberta', 'nao-manifold', 'orientacao-incoerente', 'canto-repetido', 'area-nula', 'triangulo-degenerado'];
+const recusasDeSaida = (malha) => analisarTopologia(malha, { triangulacao: true }).achados.filter((a) => RECUSA_DE_SAIDA.includes(a.codigo)).map((a) => a.mensagem);
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -189,7 +192,7 @@ describe('gate da fatia 13: o friso sobre a chapa curva com vão', () => {
     expect(top.achados.map((a) => a.codigo)).toEqual(['ilhas']);
     expect(top.resumo.componentes).toBe(4);
     for (const parte of ['chapa', 'voltaDoVao', 'nervura', 'aba']) expect(analisarTopologia(malhaDaParte(neutro, parte)).achados).toEqual([]);
-    expect(prepararParaMicropoligono({ vertices: neutro.V, faces: neutro.F }, { unidadeEntrada: 'm', unidadeSaida: 'cm' }).veredito).not.toBe('reprova');
+    expect(recusasDeSaida({ vertices: neutro.V, faces: neutro.F })).toEqual([]);
   });
 
   it('o tubo em volta do vão de cantos vivos acompanha a linha limite a menos de 0,5 mm, com os quatro cantos de 90 graus', () => {

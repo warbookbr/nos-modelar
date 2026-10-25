@@ -223,3 +223,25 @@ describe('face fina e vértice no meio de aresta', () => {
     expect(cods(analisarTopologia(cuboSao()))).not.toContain('dobra');
   });
 });
+
+describe('a face torta e o triângulo de área nula da triangulação', () => {
+  it('alerta a face torta com a triangulação ligada, e ignora o ruído de ponto flutuante', () => {
+    const m = cuboSao();
+    m.vertices.set(6, [1, 1, 1 + 1e-16]);
+    expect(cods(analisarTopologia(m, { triangulacao: true }))).not.toContain('face-torta');
+    m.vertices.set(6, [1, 1, 1.02]);
+    expect(cods(analisarTopologia(m))).not.toContain('face-torta');
+    const r = analisarTopologia(m, { triangulacao: true });
+    expect(cods(r)).toContain('face-torta');
+    expect(r.achados.find((a) => a.codigo === 'face-torta').severidade).toBe('alerta');
+  });
+
+  it('reprova o canto colinear que dá triângulo de área nula na triangulação de uma face sã', () => {
+    const r = analisarTopologia({
+      vertices: new Map([[0, [0, 0, 0]], [1, [0.5, 0, 0]], [2, [1, 0, 0]], [3, [1, 1, 0]], [4, [0, 1, 0]]]),
+      faces: new Map([[0, { vs: [0, 1, 2, 3, 4] }]]),
+    }, { triangulacao: true });
+    expect(cods(r)).toContain('triangulo-degenerado');
+    expect(cods(r)).not.toContain('area-nula');
+  });
+});

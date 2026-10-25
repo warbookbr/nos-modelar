@@ -42,8 +42,10 @@ isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto um
 única vez, e o crítico visual recebendo só o render.
 
 1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
-2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
-   do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
+2. ponha o modelo sobre o alvo, em milímetros e na mesma origem: contra foto,
+   `npm run conferir:referencia` mede a borda; contra o esboço, o pedido de
+   `npm run vistas:critica` traz a sobreposição dos cortes; contra prancha, a
+   comparação por número da skill `desenhar-prancha`;
 3. despache o agente `critico-visual` com o alvo ao lado do modelo, no pedido
    que `npm run vistas:critica` monta. Crítico que recebe só o render dá opinião.
 

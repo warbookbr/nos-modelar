@@ -28,6 +28,11 @@ const EPS_POS = 1e-9;
 /* Distância, em unidade da malha, abaixo da qual um vértice está sobre a aresta. */
 const EPS_EM_ARESTA = 1e-6;
 export const LIMITE_DE_FACE_FINA = 0.003;
+/* Desvio máximo de uma face ao próprio plano, como fração do tamanho dela. No acervo medido a distribuição tem dois grupos sem
+   meio-termo: face de caixa desvia 1e-17 (ruído) e face de loft que torce desvia de 1e-2 para cima; 1e-9 fica longe dos dois. */
+const TOLERANCIA_PLANARIDADE = 1e-9;
+/* Área mínima de um triângulo da triangulação da face, em unidade da malha ao quadrado (1e-14 cm² com a malha em metro). */
+const EPS_AREA_TRIANGULO = 1e-18;
 
 export class ErroTopologia extends Error {
   constructor(codigo, mensagem, detalhes = null) {
@@ -90,11 +95,56 @@ function areaDaFace(vertices, vs) {
   return Math.hypot(nx, ny, nz) / 2;
 }
 
+function areaTriangulo(a, b, c) {
+  const ux = b[0] - a[0]; const uy = b[1] - a[1]; const uz = b[2] - a[2];
+  const vx = c[0] - a[0]; const vy = c[1] - a[1]; const vz = c[2] - a[2];
+  return Math.hypot(uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx) / 2;
+}
+
+/* Desvio máximo dos cantos ao plano dos três primeiros, relativo ao tamanho da face. */
+function planaridade(vertices, vs) {
+  const a = vertices.get(vs[0]); const b = vertices.get(vs[1]); const c = vertices.get(vs[2]);
+  const ux = b[0] - a[0]; const uy = b[1] - a[1]; const uz = b[2] - a[2];
+  const vx = c[0] - a[0]; const vy = c[1] - a[1]; const vz = c[2] - a[2];
+  let nx = uy * vz - uz * vy; let ny = uz * vx - ux * vz; let nz = ux * vy - uy * vx;
+  const n = Math.hypot(nx, ny, nz);
+  if (n <= 0) return Infinity;
+  nx /= n; ny /= n; nz /= n;
+  let maior = 0; let escala = 0;
+  for (const id of vs) {
+    const p = vertices.get(id);
+    maior = Math.max(maior, Math.abs(nx * (p[0] - a[0]) + ny * (p[1] - a[1]) + nz * (p[2] - a[2])));
+    escala = Math.max(escala, Math.hypot(p[0] - a[0], p[1] - a[1], p[2] - a[2]));
+  }
+  return escala > 0 ? maior / escala : 0;
+}
+
+/* Qual diagonal do quadrilátero usar: 0 para a do primeiro canto, 1 para a outra. Só serve a diagonal cujas duas metades
+   apontam para o mesmo lado (a outra passa por fora num quad côncavo); entre as que servem, a mais curta. */
+export function melhorDiagonal(vertices, vs) {
+  const p = vs.map((v) => vertices.get(v));
+  const cruz = (a, b, c) => {
+    const ux = b[0] - a[0]; const uy = b[1] - a[1]; const uz = b[2] - a[2];
+    const vx = c[0] - a[0]; const vy = c[1] - a[1]; const vz = c[2] - a[2];
+    return [uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx];
+  };
+  const soma = [0, 0, 0];
+  for (let k = 0; k < 4; k++) { const n = cruz(p[k], p[(k + 1) % 4], p[(k + 2) % 4]); for (let e = 0; e < 3; e++) soma[e] += n[e]; }
+  const dentro = (i) => [[p[i], p[(i + 1) % 4], p[(i + 2) % 4]], [p[i], p[(i + 2) % 4], p[(i + 3) % 4]]].every((t) => {
+    const n = cruz(t[0], t[1], t[2]);
+    return n[0] * soma[0] + n[1] * soma[1] + n[2] * soma[2] > 0;
+  });
+  const d = (i, j) => Math.hypot(p[i][0] - p[j][0], p[i][1] - p[j][1], p[i][2] - p[j][2]);
+  const ok0 = dentro(0); const ok1 = dentro(1);
+  if (ok0 !== ok1) return ok0 ? 0 : 1;
+  return d(1, 3) < d(0, 2) ? 1 : 0;
+}
+
 function chaveAresta(a, b) {
   return a < b ? `${a}:${b}` : `${b}:${a}`;
 }
 
-export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxima = 4, limiteDeFace = LIMITE_DE_FACE_FINA } = {}) {
+export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxima = 4, limiteDeFace = LIMITE_DE_FACE_FINA, triangulacao = false } = {}) {
   const { vertices, faces } = normalizarMalha(malhaBruta);
   const achados = [];
   const anota = (severidade, codigo, mensagem, onde) => achados.push({ severidade, codigo, mensagem, onde });
@@ -111,6 +161,27 @@ export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxim
     }
     if (areaDaFace(vertices, f.vs) <= EPS_AREA) {
       anota('reprova', 'area-nula', `Face ${f.id} tem área nula.`, { face: f.id });
+      continue;
+    }
+    /* --- face torta e triângulo de área nula na triangulação ---
+       Vieram do preparo de micropolígono, que saiu em 2026-10-25. Face torta triangulada em leque produz silhueta que depende
+       de qual canto virou o centro do leque; e um canto colinear dentro de uma face sã produz, no leque, um triângulo de área
+       nula que um exportador descarta ou escreve como lixo. O quadrilátero usa a diagonal que fica dentro da face. Só com
+       `triangulacao: true`, que o `conferir-malha` liga: a face torta é legítima numa varredura, e quem pergunta pela topologia
+       da forma não pergunta pela saída triangulada. */
+    if (triangulacao && f.vs.length >= 4) {
+      const desvio = planaridade(vertices, f.vs);
+      if (desvio > TOLERANCIA_PLANARIDADE) {
+        anota('alerta', 'face-torta', `Face ${f.id} desvia ${desvio.toExponential(2)} do próprio plano; o leque de triangulação vira escolha, não consequência.`, { face: f.id, desvio });
+      }
+      const giro = f.vs.length === 4 ? melhorDiagonal(vertices, f.vs) : 0;
+      const vs = giro ? [...f.vs.slice(giro), ...f.vs.slice(0, giro)] : f.vs;
+      for (let k = 1; k < vs.length - 1; k++) {
+        if (areaTriangulo(vertices.get(vs[0]), vertices.get(vs[k]), vertices.get(vs[k + 1])) <= EPS_AREA_TRIANGULO) {
+          anota('reprova', 'triangulo-degenerado', `A face ${f.id} produz um triângulo de área nula na triangulação.`, { face: f.id, triangulo: [vs[0], vs[k], vs[k + 1]] });
+          break;
+        }
+      }
     }
   }
 

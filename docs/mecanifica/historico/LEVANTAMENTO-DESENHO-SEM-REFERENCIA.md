@@ -1,6 +1,6 @@
 # Levantamento: desenho sem referência
 
-Fatia 1 do plano [desenho sem referência](planos/encerrados/2026-10-13-desenho-sem-referencia.md), feita em 2026-10-14 por um agente em Opus 5.5 no ramo `claude/revisar-plano-ativo-cyj8c3`. Tudo o que foi instalado, compilado e executado ficou fora do repositório, numa pasta de trabalho temporária; o anexo traz os comandos. Cada afirmação diz de onde vem: verificado em execução neste contêiner, verificado em página ou código aberto, ou de memória e de resumo de busca, que não foram conferidos.
+Fatia 1 do plano [desenho sem referência](../planos/encerrados/2026-10-13-desenho-sem-referencia.md), feita em 2026-10-14 por um agente em Opus 5.5 no ramo `claude/revisar-plano-ativo-cyj8c3`. Tudo o que foi instalado, compilado e executado ficou fora do repositório, numa pasta de trabalho temporária; o anexo traz os comandos. Cada afirmação diz de onde vem: verificado em execução neste contêiner, verificado em página ou código aberto, ou de memória e de resumo de busca, que não foram conferidos.
 
 ## Sumário e recomendação
 

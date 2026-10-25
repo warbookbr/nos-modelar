@@ -1,7 +1,0 @@
-{
-  "private": true,
-  "name": "@mecanifica/desenho-por-restricoes",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "Desenha a vista de um objeto sem imagem de referência: a IA declara partes, pontos nomeados e relações em milímetro, um resolvedor de restrições dá a geometria, e a saída vai no formato dos contornos da imagem, com o relatório de graus de liberdade, conflito e lado trocado que volta a ela."
-}

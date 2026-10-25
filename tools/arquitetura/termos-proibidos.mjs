@@ -49,28 +49,10 @@ export const EXTENSOES_DE_MALHA_OU_CENA = new Set([
 ]);
 const COMPRESSAO = /\.(gz|xz|bz2|zst|zip|7z)$/i;
 
-const SINTETICO_STL = 'STL sintético do teste do importador de STL, tesselado por `gerar-sintetico.mjs` do sintetico.step (FONTE.md ao lado)';
 /* Cada exceção vale para um caminho e um objeto do índice (`git ls-files -s`): trocar o conteúdo do arquivo reprova até a
    exceção ser revista, e a exceção cujo arquivo saiu do índice também reprova. */
-export const EXCECOES_DE_MALHA = [
-  {
-    caminho: 'tools/mecanifica/fixtures/importar-step/sintetico.step',
-    blob: '88d04780cd08009f8f04200a253df6ca81235612',
-    motivo: 'STEP sintético do teste do importador de STEP, dez sólidos desenhados por código e gravados pelo OpenCascade do repositório com `gerar-sintetico.mjs` (FONTE.md ao lado)',
-  },
-  {
-    caminho: 'tools/mecanifica/fixtures/importar-stl/denso/anel_espacador.stl.gz',
-    blob: '8b0046098e6766fbaac5493934640db8929a0f62',
-    motivo: 'STL sintético do teste do importador de STL, um anel de 252 lados e uns 28 mil triângulos gerado por `gerar-denso.mjs` (FONTE.md ao lado)',
-  },
-  ...[
-    ['blocoFuroCego', '06556e14f0295e46ec03dd2b59fa271930612246'], ['cantoneira', 'e911894cd89586a1da14c2867d7ea308d93067a5'],
-    ['escareada', 'c082671bd8453271034b326e678b62bf9bfcccb7'], ['garfo', 'a659cd4ca80cfd931dc659512a0dcba3754f4be6'],
-    ['pino_e_bucha', '41fa513955453b0d39cf249bc1064ce93103a712'], ['placa', 'cb38e1d64985de7c2f86c1cad7f2939f8d321688'],
-    ['pontaFenda', '6e4fc125c9edb0a94c356955e10b855dfa16df69'], ['ponteira', '4d6eeb03d2d3c29824629465439106a37220da5d'],
-    ['sapata', 'e5b852d7858e1dd19addb946e4a8c8df53dab801'],
-  ].map(([nome, blob]) => ({ caminho: `tools/mecanifica/fixtures/importar-stl/sintetico/${nome}.stl.gz`, blob, motivo: SINTETICO_STL })),
-];
+/* Os STEP e STL sintéticos dos importadores saíram com eles em 2026-10-25, e hoje não há exceção. */
+export const EXCECOES_DE_MALHA = [];
 
 /* lê a chave do ambiente: a variável com a chave, ou o arquivo apontado; devolve null quando nenhuma das duas existe */
 export function lerChave(ambiente = process.env) {
