@@ -1,0 +1,9 @@
+# Resultado da medida de leitura
+
+Medidas do [roteiro](ROTEIRO.md). Os agentes foram de uso geral, do mesmo modelo da sessão que conduziu, cada um numa cópia de trabalho própria.
+
+## Antes, 2026-10-25, commit c63295c8
+
+Na tarefa de corrigir, a IA leu 43.740 bytes de texto em 9 chamadas até o primeiro passo, que foi o 10º turno, com 69.784 tokens de contexto nesse turno. Ela rodou o `comecar -- mudar`, leu o `INDEX.md` e o índice dos planos, a operação, a implementação e o teste, viu o teste falhar e corrigiu o sinal. A cópia ficou igual ao commit de base, sem erro dos gates nem desvio. O trabalho todo levou 20 turnos, 1,32 milhão de tokens de entrada somada e 5 mil de saída. Uma primeira tentativa, com o defeito fora de commit, foi descartada, porque a IA o achou pelo `git diff` sem ler nada.
+
+Na tarefa de modelar, a IA leu 158.796 bytes de texto em 27 chamadas até o primeiro passo, que foi o 26º turno, com 130.403 tokens de contexto nesse turno. Até ali ela rodou o `comecar -- modelar/peca` e leu as skills do laço de modelagem e de criar peça, o documento das famílias, partes dos guias de autoria, de parâmetros vivos e de parada, a família de aparelhos inteira, três receitas do acervo como exemplo, o README da textura e o código de chamada de família. O trabalho todo levou 78 turnos, 11,2 milhões de tokens de entrada somada, 41 mil de saída e 6 imagens abertas. A peça saiu pela família, com as medidas pedidas, e o crítico deu nota 8, com a fresta de 1 a 1,5 mm entre a porta e o corpo como defeito. `npm run malha:conferir` reprova a peça com 9 faces finas. Os dois defeitos vêm da família, e não da receita, e estão no backlog com o terceiro que a IA achou, o contato não decidido entre partes fundidas.

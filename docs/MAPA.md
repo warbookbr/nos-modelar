@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1633 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1634 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -343,6 +343,7 @@
 
 ## docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10/
 
+- `RESULTADO.md` — Resultado da medida de leitura
 - `ROTEIRO.md` — Medida de leitura da leitura por demanda
 - `tarefa-corrigir.md` — Tarefa de corrigir
 - `tarefa-modelar.md` — Tarefa de modelar

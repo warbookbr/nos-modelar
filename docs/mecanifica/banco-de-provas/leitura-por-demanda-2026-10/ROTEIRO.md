@@ -27,4 +27,4 @@ Os erros contam na cópia, depois que o agente entrega. São as falhas de `npm r
 
 ## Registrar
 
-O resultado de cada rodada vai para `RESULTADO.md` nesta pasta, com o commit medido, o modelo do agente, os números de cada tarefa e os arquivos que ele leu até o primeiro passo. As transcrições e as cópias ficam fora do repositório. O gate 1 do plano compara o depois com o antes: o caminho novo lê pelo menos 60% menos até o primeiro passo e não erra mais.
+O resultado de cada rodada vai para o [`RESULTADO.md`](RESULTADO.md) desta pasta, com o commit medido, o tipo do agente, os números de cada tarefa e os arquivos que ele leu até o primeiro passo. As transcrições e as cópias ficam fora do repositório. O gate 1 do plano compara o depois com o antes: o caminho novo lê pelo menos 60% menos até o primeiro passo e não erra mais.

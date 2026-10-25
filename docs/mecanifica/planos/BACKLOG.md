@@ -63,6 +63,9 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Ângulo da aba fora de 80 a 90 graus | a `aba` do `friso` abaixo de 80 graus se divide em duas dobras rasas, abaixo do limiar de 40 graus, e acima de 90 graus a perna passa sob a chapa e é recusada; a aba de canto fechado ou aberto pede outra montagem |
 | Parte renomeada na conferência entre rodadas | `conferir-refino.py` compara por nome de parte, e uma parte da lataria renomeada entre rodadas sai como nova e sumida e escapa da medida |
 | Resolução do pacote cego | os cortes ampliados resolvem o detalhe onde a região é declarada, mas nenhum gate confere que o menor detalhe que o crítico aponta cabe na resolução do pacote |
+| Fresta entre a porta e o corpo na família de aparelhos | na medida de leitura de 2026-10-25, a peça feita pela família `aparelho-de-caixa` saiu com uma fresta de 1 a 1,5 mm, na altura inteira, entre a porta e o painel e a frente do corpo, onde a cavidade corta as quinas arredondadas; o crítico e o modelador a viram, e nenhuma medida automática a acusa. Corrigir muda a geometria aprovada e pede novo aceite da pessoa |
+| Faces finas na cavidade da família de aparelhos | o piso e o teto da cavidade da família `aparelho-de-caixa` saem com triângulos finos, e `npm run malha:conferir` reprova a peça (9 faces no forno da medida de leitura, de 4 a 21 nos perfis da família); a aprovação da família não roda a conferência de malha, e por isso não pegou |
+| Contato declarado entre partes fundidas | a família `aparelho-de-caixa` funde as partes num sólido só, a medida de contato não decide nenhum par, e a ferramenta conta o contato declarado e não decidido como contato que não acontece, reprovando a peça; o `descrever` só avisa dos pares não decididos, e a peça passa sem prova de junta |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro
