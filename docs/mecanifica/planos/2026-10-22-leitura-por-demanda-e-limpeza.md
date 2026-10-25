@@ -68,3 +68,5 @@ O risco maior é uma regra sumir na mudança e voltar a falhar em silêncio; o i
 ## Andamento
 
 Escrito em 2026-10-22 a partir dos inventários de leitura e de código, sem implementação. Ativado em 2026-10-25, depois do fechamento do plano da rede de curvas.
+
+Fatia 1 em curso em 2026-10-25. As tarefas, o defeito injetado e o modo de medir estão no [roteiro da medida](../banco-de-provas/leitura-por-demanda-2026-10/ROTEIRO.md), e `npm run medir:transcricao` passou a contar o que a IA lê até o primeiro passo.
