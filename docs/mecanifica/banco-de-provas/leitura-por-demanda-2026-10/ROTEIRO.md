@@ -10,8 +10,10 @@ Cada tarefa roda numa cópia de trabalho própria, fora do repositório principa
 C=/tmp/medida-leitura/<tarefa>
 git worktree add --detach $C <commit>
 rm -rf $C/docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10
-ln -s "$PWD/node_modules" $C/node_modules
+cp -al node_modules $C/node_modules
 ```
+
+A cópia por ligação física das dependências não ocupa disco. Um link simbólico para elas faz o servidor das vistas recusar o `.wasm`, fora da pasta que ele serve, e o porteiro e as vistas falharam assim na medida de antes.
 
 Na tarefa de corrigir, aplique o defeito na cópia com `git -C $C apply "$PWD/docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10/defeito.patch"` e faça um commit dele na cópia com a mensagem "Estado da medida". Ele troca o sinal da folga no passo `encostar`. Sem o commit, `git diff` mostra o defeito à IA, e a primeira tentativa de 2026-10-25 achou-o assim, sem ler nada, e foi descartada. Se o patch não aplicar mais, porque o código em volta mudou, refaça a mesma troca à mão e registre isso no resultado.
 
