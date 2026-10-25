@@ -91,14 +91,20 @@ export const origemEstrutural = (x) => objetoPlano(x) && Object.hasOwn(x, 'op') 
  * Devolve `[{ forma, rotulo, ids }]`, onde `ids` é quanto id aquela chave
  * carrega (nunca menos que 1 quando a chave existe).
  */
+/* As ops em que uma chave da lista DECLARA geometria em vez de citá-la: os `pontos` e as `faces` da `subdivisao` são a
+   gaiola, coordenadas e índices nos pontos que o próprio passo traz, e não ids da malha que outro passo construiu. Contá-las fazia
+   a carenagem de prova, que define a gaiola inteira assim, ter 524 ids posicionais. */
+export const CHAVES_QUE_DECLARAM = Object.freeze({ subdivisao: Object.freeze(['faces', 'pontos']) });
+
 export function ocorrenciasDoPasso(passo) {
   const a = Array.isArray(passo) ? passo[1] : null;
   if (!objetoPlano(a)) return [];
   const achados = [];
+  const declara = CHAVES_QUE_DECLARAM[passo[0]] ?? [];
   const anotar = (forma, ids) => achados.push({ forma, rotulo: ROTULO[forma], ids });
-  if (Object.hasOwn(a, 'faces')) anotar('faces', contarIds(a.faces));
+  if (Object.hasOwn(a, 'faces') && !declara.includes('faces')) anotar('faces', contarIds(a.faces));
   if (Object.hasOwn(a, 'vs')) anotar('vs', contarIds(a.vs));
-  if (Object.hasOwn(a, 'pontos')) anotar('pontos', contarPontos(a.pontos));
+  if (Object.hasOwn(a, 'pontos') && !declara.includes('pontos')) anotar('pontos', contarPontos(a.pontos));
   if (Object.hasOwn(a, 'de') && !origemEstrutural(a.de)) anotar('mesclaDe', contarIds(a.de));
   /* TODA chave que carrega SELEÇÃO conta, não só `sel`. O `encostar` tem dois
      lados — `sel` move e `referencia` fica parada —, e as duas falam a mesma

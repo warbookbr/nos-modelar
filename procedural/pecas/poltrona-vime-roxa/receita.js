@@ -166,8 +166,6 @@ export const CONTATOS = [
   { par: ['almofadaAssento', 'almofadaEncosto'], motivo: 'a almofada do encosto fica atrás do assento e embute o canto de baixo na almofada do assento' },
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'poltrona-vime-roxa', desc: 'poltrona de vime com base baixa, braços, encosto alto e almofadas de tecido' },
   PARAMS: TABELA,
@@ -203,7 +201,7 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

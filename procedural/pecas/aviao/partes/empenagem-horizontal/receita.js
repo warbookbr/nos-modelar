@@ -633,6 +633,7 @@ const receita = {
      dianteira do vão, 9 mm adiante do nariz do profundor) e no profundor, os três suportes entram no estabilizador e, pela ponta de
      trás, na face de baixo do profundor, e o eixo toca só o suporte 3 (4 mm), porque os suportes 1 e 2 ficam abaixo da haste. O
      estabilizador e o profundor não se tocam, pela fresta. */
+  ilhas: [{ contem: 'estabilizadorD', motivo: 'o estabilizador direito se liga ao esquerdo pela fuselagem, que é outra parte da montagem do avião' }],
   contatos: porLado((L, l, nome) => [
     { par: [`eixoProfundor${L}`, `profundor${L}`], motivo: `o eixo corre na dobradiça do profundor ${nome}` },
     { par: [`compensador${L}`, `profundor${L}`], motivo: `a alma do compensador entra na parede dianteira do rasgo do profundor ${nome}, que o segura` },

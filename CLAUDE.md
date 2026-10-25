@@ -14,8 +14,6 @@ dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP
 <!-- invariantes:inicio -->
 ## Regras
 
-- IDs internos, índices de arrays e posições de passos nunca são identidade
-  persistida.
 - Conteúdo salvo é determinístico, versionado, reexecutável e validável.
 - Modele e revise peças na bancada neutra antes de levá-las ao produto. Nenhuma
   métrica aprova forma sozinha, e quem aprova forma é a pessoa.

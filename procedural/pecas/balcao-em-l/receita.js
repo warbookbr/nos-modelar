@@ -94,8 +94,6 @@ export const CONTATOS = [
   { par: ['corpo', 'tampo'], motivo: 'a face de cima do corpo, de y 1100, recebe a face de baixo do tampo, que passa 15 mm para dentro do corpo' },
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'balcao-em-l', desc: 'balcão de canto em L, de quatro camadas extrudadas do mesmo contorno em L, com tampo de 15 mm de balanço interno' },
   PARAMS: TABELA,
@@ -121,7 +119,7 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

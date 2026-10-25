@@ -232,8 +232,6 @@ export const CONTATOS = [
   ]),
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 /* Os pontos declarados, em milímetro, medidos contra a malha; saem da TABELA para a medida e o ponto mudarem juntos. */
 export const PONTOS = [
   /* o máximo do teto está na aresta de baixo da face inclinada da frente, em y = teto_y - espessura */
@@ -293,7 +291,7 @@ const receita = {
   contatos: CONTATOS,
   PONTOS,
   ALIASES,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

@@ -350,8 +350,6 @@ export function pontosDeclarados(T = TABELA) {
   ];
 }
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'onibus-urbano', desc: 'ônibus urbano de 11,5 m, de carroceria verde com fileira de janelas entre colunas, frente de vidro que dá a volta no canto, arcos de roda com caixa, rodas octogonais e retrovisores de lâmina' },
   PARAMS: TABELA,
@@ -401,7 +399,7 @@ const receita = {
   contatos: CONTATOS,
   PONTOS: pontosDeclarados(TABELA),
   ALIASES,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

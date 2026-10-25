@@ -803,6 +803,7 @@ const receita = {
   /* Os contatos que o esboço mostra. O eixo passa 20 mm além de cada seção do comando e entra na parede do vão da asa nas duas
      pontas. O suporte sai da asa e entra 10 mm na face de baixo do comando; ele fica a 22 mm abaixo do eixo, e o par suporte e eixo,
      que o plano declarava, não se toca no esboço e por isso não está aqui. */
+  ilhas: [{ contem: 'asaD', motivo: 'a asa direita se liga à esquerda pela fuselagem, que é outra parte da montagem do avião' }],
   contatos: porLado((L, l, nome) => [
     { par: [`ponta${L}`, `asa${L}`], motivo: `a ponta ${nome} continua a metade da asa` },
     { par: [`eixoFlap${L}`, `flap${L}`], motivo: `o eixo corre na dobradiça do flap ${nome}` },

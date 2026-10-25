@@ -14,6 +14,7 @@ import { describe, expect, it } from 'vitest';
 import { descreverPecaReutilizavel } from '../descrever-peca.mjs';
 import {
   conferirAcervo, DECLARACAO_DE_VAZIO, emArquivoSolto, pecasDoAcervo, vazioDeclarado,
+  faltasDaCadeia,
 } from './guarda-acervo.mjs';
 
 const MOTIVO = 'as duas metades são soldadas uma na outra';
@@ -99,6 +100,18 @@ describe('veredito de contato do acervo', () => {
     expect(medida.stderr).toMatch(/direita/);
   });
 
+  it('REPROVA parte solta que não toca nenhuma outra, e aceita a ilha declarada com o motivo', async () => {
+    const solta = await medir(duasPartes({ distancia: 3, contatos: null }));
+    expect(solta.ok).toBe(false);
+    expect(solta.stderr).toMatch(/PARTE\(S\) OU GRUPO\(S\) SOLTO\(S\)[\s\S]*não toca nenhuma parte/);
+    const declarada = duasPartes({ distancia: 3, contatos: null });
+    declarada.default.ilhas = [{ contem: 'direita', motivo: 'a direita se liga à esquerda por outra peça da montagem' }];
+    expect((await medir(declarada)).stderr).not.toMatch(/SOLTO/);
+    const ficcao = duasPartes({ distancia: 0.4, contatos: [{ par: ['esquerda', 'direita'], motivo: MOTIVO }] });
+    ficcao.default.ilhas = [{ contem: 'direita', motivo: 'x' }];
+    expect((await medir(ficcao)).stderr).toContain("a ilha declarada por 'direita' não está solta");
+  });
+
   it('peça de ensaio sem plano continua mensurável; o acervo é que exige plano', async () => {
     const medida = await medir(duasPartes({
       distancia: 0.4, contatos: [{ par: ['esquerda', 'direita'], motivo: MOTIVO }],
@@ -146,6 +159,32 @@ describe('veredito de contato do acervo', () => {
     } finally {
       rmSync(caminho, { force: true });
     }
+  });
+
+  it('REPROVA a receita cujos PASSOS não saem da tabela a cada leitura, e aceita a cadeia inteira', () => {
+    const gerarPassos = (t) => [['cubo', { larg: t.lado / 1000 }]];
+    const base = { TABELA: { lado: 400 }, derivar: (t) => t, gerarPassos };
+    const inteira = { ...base, default: { PARAMS: base.TABELA, get PASSOS() { return gerarPassos(this.PARAMS); } } };
+    expect(faltasDaCadeia(inteira)).toEqual([]);
+    const congelada = { ...base, default: { PARAMS: base.TABELA, PASSOS: gerarPassos(base.TABELA) } };
+    expect(faltasDaCadeia(congelada).join('\n')).toContain('`PASSOS` é um valor calculado uma vez');
+    expect(faltasDaCadeia({ default: { PARAMS: {} } }).join('\n')).toMatch(/não exporta `TABELA`[\s\S]*`derivar\(\)`[\s\S]*`gerarPassos\(\)`/);
+  });
+
+  it('a regra da identidade que a guarda aplica acha o id posicional por passo e não conta a gaiola da subdivisão', async () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'acervo-idcru-'));
+    mkdirSync(join(pasta, 'cubo-cru'));
+    const receita = join(pasta, 'cubo-cru', 'receita.js');
+    writeFileSync(receita, `export const TABELA = { lado: 400 };
+export function derivar(t) { return { lado: t.lado / 1000 }; }
+export function gerarPassos(t) { const d = derivar(t); return [['cubo', { origemId: 1, larg: d.lado, alt: d.lado, prof: d.lado }], ['material', { faces: [0, 1], usa: 'a' }]]; }
+export default { PARAMS: TABELA, get PASSOS() { return gerarPassos(this.PARAMS); } };
+`);
+    const { ocorrenciasPosicionais } = await import('../../../procedural/nucleo/referencia-posicional.js');
+    const modulo = await import(receita);
+    expect(ocorrenciasPosicionais(modulo.default.PASSOS)).toEqual([{ passo: 1, forma: 'faces', rotulo: 'faces:[ids]', ids: 2 }]);
+    expect(ocorrenciasPosicionais([['subdivisao', { pontos: [[0, 0, 0]], faces: [[0, 1, 2, 3]] }]])).toEqual([]);
+    rmSync(pasta, { recursive: true, force: true });
   });
 
   it('peça em pasta não é acusada de forma antiga', () => {

@@ -370,8 +370,6 @@ export function pontosDeclarados(T = TABELA) {
   ];
 }
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'lavadora-secadora-branca', desc: 'lavadora e secadora de roupa branca de porta frontal, com caixa, painel escuro em rebaixo, seletor, porta redonda com aro e vidro, tampa do filtro, rasgos laterais e quatro pés' },
   PARAMS: TABELA,
@@ -415,7 +413,7 @@ const receita = {
   contatos: CONTATOS,
   PONTOS: pontosDeclarados(TABELA),
   ALIASES,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

@@ -411,8 +411,6 @@ export function pontosDeclarados(T = TABELA) {
   ];
 }
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'lava-loucas-compacta-branca', desc: 'lava-louças compacta branca, com caixa, porta, painel de controle com botões e pontos, puxador de aço, borracha, rodapé e duas pecinhas em L' },
   PARAMS: TABELA,
@@ -460,7 +458,7 @@ const receita = {
   contatos: CONTATOS,
   PONTOS: pontosDeclarados(TABELA),
   ALIASES,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

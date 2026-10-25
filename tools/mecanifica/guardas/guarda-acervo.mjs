@@ -24,6 +24,7 @@ import { normalizarPlanoDeModelagem } from '../../../src/autoria/plano-de-modela
 import { descreverPecaReutilizavel } from '../descrever-peca.mjs';
 import { caminhosDaReferencia } from '../../../src/autoria/plano-de-modelagem.js';
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
+import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/nucleo/referencia-posicional.js';
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 
@@ -133,6 +134,27 @@ export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
   return estado === 'fixa' ? null : { montagem: relative(raiz, arquivo).replaceAll('\\', '/'), instancia: instancia.id };
 }
 
+/* A CADEIA DA RECEITA. A receita do acervo escreve as medidas uma vez, na `TABELA`
+   em milímetro, e os passos saem dela: `derivar()` converte, `gerarPassos()`
+   escreve, e `PASSOS` é um getter que lê `this.PARAMS`. Com `PASSOS` calculado
+   uma vez na carga do módulo, o diagnóstico de parâmetros, o ajuste da bancada e
+   quem copia a receita com outra tabela recebem os passos da tabela velha, e a
+   peça não muda sem nada acusar; 14 receitas do acervo estavam assim em
+   2026-10-25. Devolve a lista do que falta, vazia quando a cadeia está inteira. */
+export function faltasDaCadeia(modulo) {
+  const receita = modulo.default ?? modulo.receita;
+  const faltas = [];
+  if (!modulo.TABELA || typeof modulo.TABELA !== 'object') faltas.push('a receita não exporta `TABELA`, a tabela das medidas em milímetro');
+  if (typeof modulo.derivar !== 'function') faltas.push('a receita não exporta `derivar()`, que converte a tabela');
+  if (typeof modulo.gerarPassos !== 'function') faltas.push('a receita não exporta `gerarPassos()`, que escreve os passos');
+  if (!receita?.PARAMS) faltas.push('a receita não tem `PARAMS`, a tabela que os passos leem');
+  const descritor = receita && Object.getOwnPropertyDescriptor(receita, 'PASSOS');
+  if (descritor && typeof descritor.get !== 'function') {
+    faltas.push('`PASSOS` é um valor calculado uma vez; escreva `get PASSOS() { return gerarPassos(this.PARAMS); }`');
+  }
+  return faltas;
+}
+
 async function receitaSemPasso(peca) {
   const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
   const receita = modulo.default ?? modulo.receita;
@@ -191,10 +213,28 @@ export async function conferirAcervo(pecas = pecasDoAcervo()) {
       });
       continue;
     }
-    /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
-       porta e nunca olha a malha. */
     const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
     const receita = modulo.default ?? modulo.receita;
+    const faltas = faltasDaCadeia(modulo);
+    if (faltas.length) {
+      reprovadas.push({ peca, motivo: `CADEIA DA RECEITA INCOMPLETA\n${faltas.map((f) => `  ${f}`).join('\n')}\n  A tabela é a única fonte das medidas, e os passos precisam sair dela a cada leitura.` });
+      continue;
+    }
+    /* IDENTIDADE POR NOME. Id da malha, índice de array ou posição de passo não
+       é identidade persistida; a regra que diz o que é id posicional mora em
+       `procedural/nucleo/referencia-posicional.js`, e o gate que a cobrava saiu
+       em 2026-08-17 com o acervo antigo e voltou aqui em 2026-10-25. */
+    const posicionais = ocorrenciasPosicionais(receita.PASSOS);
+    if (posicionais.length) {
+      reprovadas.push({
+        peca,
+        motivo: `${posicionais.length} REFERÊNCIA(S) POR ID POSICIONAL\n${rotularOcorrencias(posicionais).map((l) => `  ${l}`).join('\n')}`
+          + '\n  Endereçe por nome: sel:{grupo|alias|origem|regiao|onde|porta}, origemId e publicarPorta.',
+      });
+      continue;
+    }
+    /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
+       porta e nunca olha a malha. */
     const portas = conferirPortasNaForma(nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []));
     if (portas.length) {
       reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });

@@ -106,6 +106,38 @@ function amostraDeOrfaos(neutro) {
  * processo. `partes` é uma lista explícita; `subarvore`, quando presente,
  * continua usando a hierarquia publicada pelo mesmo neutro.
  */
+/* Os grupos de partes ligadas por contato (ou por par que a medida não decidiu) e o que a receita declara em `ilhas`:
+   { grupos, problemas }. Cada grupo além de um precisa de uma declaração `{ contem, motivo }` com uma parte
+   dele, e a declaração que não cai num grupo separado também é problema, porque descreve o que não existe. Fica como a peça
+   o maior grupo que não foi declarado; declarar todos os grupos também é problema. */
+export function ilhasDaPeca(contatos, receita = {}) {
+  const pai = new Map(contatos.partes.map((x) => [x, x]));
+  const raiz = (x) => { while (pai.get(x) !== x) x = pai.get(x); return x; };
+  for (const [a, b] of [...contatos.paresEmContato.map((q) => q.par), ...contatos.cobertura.inconclusivos.map((q) => q.par)]) pai.set(raiz(a), raiz(b));
+  const porRaiz = new Map();
+  for (const x of contatos.partes) porRaiz.set(raiz(x), [...(porRaiz.get(raiz(x)) ?? []), x]);
+  const grupos = [...porRaiz.values()].sort((a, b) => b.length - a.length || a[0].localeCompare(b[0]));
+  const declaradas = Array.isArray(receita.ilhas) ? receita.ilhas : [];
+  const problemas = [];
+  if (receita.ilhas !== undefined && !Array.isArray(receita.ilhas)) problemas.push('`ilhas` precisa ser uma lista de { contem, motivo }.');
+  const cobertos = new Set();
+  for (const d of declaradas) {
+    const grupo = grupos.findIndex((g) => g.includes(d?.contem));
+    if (typeof d?.motivo !== 'string' || d.motivo.trim() === '') problemas.push(`a ilha declarada por '${d?.contem}' não diz o motivo.`);
+    if (grupo < 0) problemas.push(`a ilha declarada por '${d?.contem}' cita parte que a peça não tem.`);
+    else if (grupos.length === 1) problemas.push(`a ilha declarada por '${d?.contem}' não está solta: todas as partes se ligam.`);
+    else cobertos.add(grupo);
+  }
+  const soltos = grupos.map((g, i) => i).filter((i) => !cobertos.has(i));
+  if (grupos.length > 1 && soltos.length === 0) problemas.push('todas as ilhas foram declaradas, e nenhum grupo ficou como a peça: tire a declaração do grupo principal.');
+  for (const i of soltos.slice(1)) {
+    const g = grupos[i];
+    problemas.push(`${g.length === 1 ? `a parte ${g[0]} não toca` : `o grupo ${g.join(', ')} não toca`} nenhuma parte de ${grupos[soltos[0]].slice(0, 3).join(', ')}${grupos[soltos[0]].length > 3 ? '…' : ''};`
+      + ' encoste as partes, ou declare a ilha em `ilhas` da receita com { contem: <uma parte dela>, motivo }.');
+  }
+  return { grupos, problemas };
+}
+
 export async function descreverPecaReutilizavel({
   peca,
   modulo: moduloFornecido = null,
@@ -390,6 +422,17 @@ export async function descreverPecaReutilizavel({
           .join('\n')
         + '\n  Se o contato é intencional, declare-o em `contatos` da receita,'
         + '\n  com o motivo. Se não é, a geometria está errada.\n';
+      falhou = true;
+    }
+    /* PARTE SOLTA. Contato não declarado e declarado que não acontece só olham
+       pares que se tocam; um grupo de partes que não toca nenhuma das outras
+       passava limpo, flutuando no ar. Os grupos saem dos pares em contato e dos
+       que a medida não decidiu, e todo grupo fora do maior precisa estar em
+       `ilhas` da receita, por uma parte dele e com o motivo, como a asa direita
+       que só se liga à esquerda pela fuselagem da montagem. */
+    const ilhas = ilhasDaPeca(contatos, receita);
+    if (ilhas.problemas.length) {
+      stderr += `\n${ilhas.problemas.length} PARTE(S) OU GRUPO(S) SOLTO(S)\n${ilhas.problemas.map((t) => `  ${t}`).join('\n')}\n`;
       falhou = true;
     }
     /* FORMA PROMETIDA CONTRA ENTREGUE. Existe porque contato não basta: se o

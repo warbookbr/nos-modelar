@@ -149,8 +149,6 @@ export const CONTATOS = [
   { par: ['puxadorEsq', 'portaEsq'], motivo: 'a face de trás do puxador encosta na face de frente da porta esquerda' },
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'balcao-de-bar-escuro', desc: 'balcão de bar de madeira escura, com corpo fechado por duas portas, rodapé recuado, tampo e dois puxadores' },
   PARAMS: TABELA,
@@ -185,7 +183,7 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

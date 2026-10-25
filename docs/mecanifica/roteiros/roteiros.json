@@ -16,8 +16,8 @@
     {
       "id": "identidade",
       "secao": "regras",
-      "texto": "IDs internos, índices de arrays e posições de passos nunca são identidade persistida.",
-      "gate": null
+      "texto": "IDs internos, índices de arrays e posições de passos nunca são identidade persistida; a receita do acervo que endereça a malha por id posicional é recusada.",
+      "gate": "guarda:acervo"
     },
     {
       "id": "conteudo-salvo",

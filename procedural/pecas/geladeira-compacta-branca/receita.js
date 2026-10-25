@@ -293,8 +293,6 @@ export function pontosDeclarados(T = TABELA) {
   ];
 }
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'geladeira-compacta-branca', desc: 'frigobar alto branco de uma porta, com caixa, porta, puxador de topo com canaleta na face de cima, dobradiça superior e quatro pés' },
   PARAMS: TABELA,
@@ -331,7 +329,7 @@ const receita = {
   contatos: CONTATOS,
   PONTOS: pontosDeclarados(TABELA),
   ALIASES,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

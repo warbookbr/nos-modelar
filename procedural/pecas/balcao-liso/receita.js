@@ -83,8 +83,6 @@ export const CONTATOS = [
   { par: ['corpo', 'tampo'], motivo: 'a face de cima do corpo, em y 835, recebe a face de baixo do tampo, que passa 20 mm do corpo em x e à frente' },
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'balcao-liso', desc: 'balcão liso de três partes: rodapé, corpo e tampo, todos caixas retas' },
   PARAMS: TABELA,
@@ -110,7 +108,7 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

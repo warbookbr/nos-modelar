@@ -212,8 +212,6 @@ export const CONTATOS = [
   { par: ['gradeQuatro', 'corpo'], motivo: 'a face de frente da grade, em z -488, encosta na face de trás do corpo, e a grade sai 14 mm para trás' },
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'freezer-horizontal', desc: 'freezer horizontal de tampo branco, com corpo arredondado, junta escura, tampo, puxador frontal, duas dobradiças traseiras e quatro grades de ventilação' },
   PARAMS: TABELA,
@@ -249,7 +247,7 @@ const receita = {
   },
   contatos: CONTATOS,
   ALIASES,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

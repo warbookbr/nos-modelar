@@ -395,6 +395,7 @@ export default {
      esboço. O eixo atravessa as duas placas do garfo, e o garfo passa pela coroa até a perna. Os pinos de cima do compasso e o do
      atuador entram na face da frente e na de trás da perna (o do meio do compasso, no joelho, fica fora dela); o de baixo fica na
      junção da perna com a coroa e entra na face da frente da coroa. As hastes se encontram nos centros dos pinos e uma na outra. */
+  ilhas: [{ contem: 'pernaPrincipalD', motivo: 'o trem direito se liga ao esquerdo pela fuselagem, que é outra parte da montagem do avião' }],
   contatos: LADOS.flatMap(([L, lado]) => [
     { par: [`pernaPrincipal${L}`, `pinoPivoPrincipal${L}`], motivo: `a perna do lado ${lado} gira no pino do pivô` },
     { par: [`coroaPrincipal${L}`, `pernaPrincipal${L}`], motivo: `a coroa fica no pé da perna do lado ${lado}` },

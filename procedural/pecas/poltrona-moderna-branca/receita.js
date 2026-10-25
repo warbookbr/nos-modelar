@@ -167,8 +167,6 @@ export const CONTATOS = [
   { par: ['assento', 'encosto'], motivo: 'a costas do assento encosta na frente do encosto, em z -120' },
 ];
 
-export const PASSOS = gerarPassos(TABELA);
-
 const receita = {
   meta: { nome: 'poltrona-moderna-branca', desc: 'poltrona de estofado com dois braços, assento e encosto sobre base e quatro pés de madeira' },
   PARAMS: TABELA,
@@ -202,7 +200,7 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
-  PASSOS,
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;

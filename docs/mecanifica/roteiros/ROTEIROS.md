@@ -36,6 +36,8 @@ Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no moment
 
 - O núcleo de autoria é independente de Three.js e do domínio automotivo. O teste
   `tools/arquitetura/nucleo-sem-three.test.mjs`, do gate `test`, confere.
+- IDs internos, índices de arrays e posições de passos nunca são identidade persistida; a receita do
+  acervo que endereça a malha por id posicional é recusada. O gate `guarda:acervo` confere.
 - Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode `npm run mapa`. O gate
   `mapa:check` confere.
 

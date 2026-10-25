@@ -381,7 +381,7 @@ const receita = {
   contatos: CONTATOS,
   PONTOS: pontosDeclarados(TABELA),
   ALIASES,
-  PASSOS: gerarPassos(TABELA),
+  get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
 export default receita;
