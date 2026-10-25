@@ -58,7 +58,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { criarResolverNumerico } from '../../procedural/nucleo/expressoes.js';
-import { capturarGaiolas } from '../../procedural/nucleo/gaiola-por-estacoes.js';
+import { assinaturaDaRede, capturarGaiolas, comDivisoesFixas, divisoesDasRedes } from '../../procedural/nucleo/gaiola-captura.js';
 import { operadorDasMedidas, subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
 import { PADROES, donoNaGaiola, ondulacaoDaSuperficie, superficiesDaReceita } from './ondulacao-da-superficie.mjs';
 import { indiceEspacial, minimosQuadradosComBolas } from './alisar-numerico.mjs';
@@ -177,6 +177,14 @@ function avaliador(receita, nomes) {
   };
 }
 
+/* A entrada da rede de curvas em nomes: o ponto-chave de uma curva ({ curva, pontoChave, eixo }) ou o nó dado por coordenada ({ no, eixo });
+   a entrada da gaiola por estações já se cita pelo id, e fica sem referência. */
+function referenciaDaEntrada(e) {
+  if (e.tipo === 'chave') return { curva: e.curva, pontoChave: e.pontoChave, eixo: e.eixo };
+  if (e.tipo === 'no') return { no: e.no, eixo: e.eixo };
+  return null;
+}
+
 /**
  * descobrirEditaveis(receita, raizes, sup) -> { folhas, recusadas }
  * Sonda cada folha numérica das raízes: o passo anda um pouco, a receita roda e a diferença das posições dos pontos da gaiola
@@ -188,7 +196,7 @@ export function descobrirEditaveis(receita, raizes, sup) {
   const avaliar = avaliador(receita, nomes);
   const base = avaliar();
   const estruturaBase = base.g ? JSON.stringify(base.g.estrutura) : null;
-  const naCostura = nomes.map((_, k) => (base.pos[k] ? Math.abs(base.pos[k][0]) <= 1e-9 : false));
+  const naCostura = nomes.map((_, k) => (sup.simetria && base.pos[k] ? Math.abs(base.pos[k][0]) <= 1e-9 : false));
   const folhas = []; const recusadas = [];
   for (const raiz of raizes) {
     for (const f of folhasDe(raiz.objeto, raiz.nome)) {
@@ -214,12 +222,12 @@ export function descobrirEditaveis(receita, raizes, sup) {
       if (base.g) {
         const a = base.g.entradas, b = ev.g.entradas;
         if (a.length !== b.length) { recusadas.push({ folha: rotuloDaFolha(f), motivo: 'muda a lista de entradas da gaiola' }); continue; }
-        a.forEach((e, i) => { if (Math.abs(b[i].valor - e.valor) > 1e-15) entradas.push({ id: e.id, d: Math.abs(b[i].valor - e.valor) / h }); });
+        a.forEach((e, i) => { if (Math.abs(b[i].valor - e.valor) > 1e-15) entradas.push({ id: e.id, d: Math.abs(b[i].valor - e.valor) / h, onde: referenciaDaEntrada(e) }); });
         if (!entradas.length) { recusadas.push({ folha: rotuloDaFolha(f), motivo: 'move pontos da gaiola sem passar por entrada editável' }); continue; }
         escalaMm = Math.max(...entradas.map((e) => e.d)) * MM;
       }
       const pontos = mov.map(({ k, d }) => ({ nome: nomes[k], m: Math.max(Math.abs(d[0]), Math.abs(d[1]), Math.abs(d[2])) })).sort((x, y) => y.m - x.m).slice(0, 3).map((p) => p.nome);
-      folhas.push({ ...f, h, mov, escalaMm, entradas: entradas.map((e) => e.id), pontos });
+      folhas.push({ ...f, h, mov, escalaMm, entradas: entradas.map((e) => e.id), onde: entradas.map((e) => e.onde).filter(Boolean), pontos });
     }
   }
   return { folhas, recusadas, rastreada: base.g !== null };
@@ -306,6 +314,9 @@ function umaRodada({ receita, raizes, o, toleranciaMm, pontosDeCorte, fixo, orig
       const vistos = new Set();
       for (const m of [...sup.medidas].sort((a, b) => a.indice - b.indice)) {
         if (m.indice >= nDecl || typeof sup.declarados[m.indice] !== 'string' || vistos.has(m.indice)) continue;
+        /* o ponto de dentro de um retalho da rede de curvas não é leitura: é o preenchimento das curvas, que a cota dele só prende à
+           superfície, e a edição o move junto com as curvas */
+        if (sup.origemDe?.(m.indice)?.tipo === 'retalho') continue;
         vistos.add(m.indice);
         fixo.alvos.push({ indice: m.indice, nome: sup.declarados[m.indice], alvo: [...sup.declaradaCheia.vertices[m.indice]] });
       }
@@ -471,7 +482,7 @@ function umaRodada({ receita, raizes, o, toleranciaMm, pontosDeCorte, fixo, orig
       if (novoExato === f.valor) return;
       edicoes.push({
         folhaRef: f, tabela: f.chave, indice: f.indice, raiz: f.nomeDaRaiz, antigo: f.valor, novoExato,
-        deslocamentoMm: arred((novoExato - f.valor) * f.escalaMm, 2), escalaMm: f.escalaMm, entradas: f.entradas,
+        deslocamentoMm: arred((novoExato - f.valor) * f.escalaMm, 2), escalaMm: f.escalaMm, entradas: f.entradas, onde: f.onde,
       });
     });
 
@@ -559,6 +570,33 @@ function umaRodada({ receita, raizes, o, toleranciaMm, pontosDeCorte, fixo, orig
   };
 }
 
+/* A receita com as edições acumuladas, sem fixar as divisões. Devolve se a malha é a mesma e, se não for, quantos arcos mudaram de
+   divisão e as falhas de ondulação que a malha nova tem. A TABELA volta como estava. */
+function conferirSemFixar({ receita, raizes, acumulado, fixas, leituraDaGaiola, o }) {
+  if (!fixas.size || !acumulado.length) return { malhaIgual: true };
+  const alvos = acumulado.map((a) => {
+    const objeto = raizes.find((r) => r.nome === a.raiz).objeto;
+    return { objeto, tabela: a.tabela, indice: a.indice, novo: a.novo };
+  });
+  const antes = alvos.map((a) => (a.indice === null ? a.objeto[a.tabela] : a.objeto[a.tabela][a.indice]));
+  const pr = (a, v) => { if (a.indice === null) a.objeto[a.tabela] = v; else a.objeto[a.tabela][a.indice] = v; };
+  alvos.forEach((a) => pr(a, a.novo));
+  try {
+    let arcos = 0;
+    for (const g of leituraDaGaiola()) {
+      const fixa = g.estrutura?.definicao ? fixas.get(assinaturaDaRede(g.estrutura.definicao)) : null;
+      if (!fixa) continue;
+      for (const [arco, n] of Object.entries(g.estrutura.divisoes)) if (fixa.divisoes[arco] !== n) arcos += 1;
+    }
+    if (!arcos) return { malhaIgual: true };
+    const sup = superficiesDaReceita(receita)[o.passo];
+    const ond = ondulacaoDaSuperficie(sup, opcoesDeOndulacao(o));
+    return { malhaIgual: false, arcosComOutraDivisao: arcos, vertices: sup.calculados.length, falhas: ond.falhas.length, maiorAmplitudeMm: ond.falhas.length ? Math.max(...ond.falhas.map((f) => f.amplitudeMm)) : 0 };
+  } finally {
+    alvos.forEach((a, k) => pr(a, antes[k]));
+  }
+}
+
 /**
  * alisarReceita({ receita, tabela }, opcoes) -> o relatório do alisamento.
  * `tabela` é o objeto de números que a receita lê e que a ferramenta edita no lugar (e devolve como estava ao fim): a TABELA do
@@ -588,14 +626,21 @@ export function alisarReceita({ receita, tabela = null }, opcoes = {}) {
   const toleranciaMm = o.toleranciaMm ?? (erros.length ? erros[Math.floor((erros.length - 1) / 2)] : 2);
   const tempo = {};
   const rodadas = []; let fixo = null;
+  /* A rede de curvas decide as divisões de cada arco pelo comprimento dele, e um décimo de milímetro a mais pode mudar a malha. Aqui as
+     divisões que a receita tem agora ficam fixas em todas as rodadas, para que a malha seja a mesma antes e depois de mexer nos números;
+     a conferência no fim roda a receita sem fixar nada, que é o que a pessoa vai ter. */
+  const leituraDaGaiola = () => capturarGaiolas(() => ({ ...(receita.PARAMS ?? {}), ...(receita.TOPO ?? {}) })).gaiolas;
+  const fixas = divisoesDasRedes(leituraDaGaiola());
   try {
-    for (let rodada = 0; rodada < o.rodadas; rodada++) {
-      const r = umaRodada({ receita, raizes, o, toleranciaMm, pontosDeCorte, fixo, original, tempo });
-      fixo = r.fixo;
-      rodadas.push(r);
-      if (!r.edicoes.length || r.alisavel || rodada + 1 === o.rodadas) break;
-      for (const e of r.edicoes) escrever(e.folhaRef, e.novoExato);
-    }
+    comDivisoesFixas(fixas, () => {
+      for (let rodada = 0; rodada < o.rodadas; rodada++) {
+        const r = umaRodada({ receita, raizes, o, toleranciaMm, pontosDeCorte, fixo, original, tempo });
+        fixo = r.fixo;
+        rodadas.push(r);
+        if (!r.edicoes.length || r.alisavel || rodada + 1 === o.rodadas) break;
+        for (const e of r.edicoes) escrever(e.folhaRef, e.novoExato);
+      }
+    });
   } finally {
     /* a TABELA volta ao que era; as edições saem no relatório e `gravarCopia` as põe numa cópia */
     restaurar();
@@ -611,20 +656,30 @@ export function alisarReceita({ receita, tabela = null }, opcoes = {}) {
   const acumulado = new Map();
   for (const r of rodadas.slice(0, k + 1)) for (const e of r.edicoes) {
     const chave = `${e.raiz}.${e.indice === null ? e.tabela : `${e.tabela}[${e.indice}]`}`;
-    const a = acumulado.get(chave) ?? { tabela: e.tabela, indice: e.indice, antigo: original.get(chave), entradas: e.entradas, escalaMm: e.escalaMm };
+    const a = acumulado.get(chave) ?? { raiz: e.raiz, tabela: e.tabela, indice: e.indice, antigo: original.get(chave), entradas: e.entradas, onde: e.onde, escalaMm: e.escalaMm };
     a.novo = e.novoExato;
     acumulado.set(chave, a);
   }
   const edicoes = [...acumulado.values()].map((a) => ({
     tabela: a.tabela, ...(a.indice === null ? {} : { indice: a.indice }), antigo: a.antigo, novo: a.novo, deslocamentoMm: arred((a.novo - a.antigo) * a.escalaMm, 2), entradas: a.entradas,
+    ...(a.onde?.length ? { onde: a.onde } : {}),
   })).filter((e) => e.deslocamentoMm !== 0)
     .sort((a, b) => Math.abs(b.deslocamentoMm) - Math.abs(a.deslocamentoMm) || (a.tabela < b.tabela ? -1 : a.tabela > b.tabela ? 1 : (a.indice ?? 0) - (b.indice ?? 0)));
+  /* a conferência sem fixar as divisões: a receita com as edições, como a pessoa a vai rodar. Se a rede refez a divisão de algum arco, a
+     malha é outra e a leitura de ondulação dela é que vale. */
+  const malha = conferirSemFixar({ receita, raizes, acumulado: [...acumulado.values()], fixas, leituraDaGaiola, o });
+  const semFalhaNaMalhaNova = malha.malhaIgual || malha.falhas === 0;
+  const alisavel = final.alisavel && semFalhaNaMalhaNova;
+  const motivo = final.alisavel && !semFalhaNaMalhaNova
+    ? `com as edições a rede refaz as divisões de ${malha.arcosComOutraDivisao} arco(s), e a malha nova tem ${malha.falhas} falha(s) de ondulação; rode de novo com --rodadas=2 a partir dela`
+    : final.motivo;
   const resultado = {
     tolerancia: { medidasMm: arred(toleranciaMm, 2), limiarMm: o.limiarMm },
     antes: rodadas[0].antes,
     depois: final.depois,
-    alisavel: final.alisavel,
-    ...(final.alisavel ? {} : { motivo: final.motivo, sobram: final.sobram }),
+    alisavel,
+    ...(alisavel ? {} : { motivo, sobram: final.sobram }),
+    ...(malha.malhaIgual ? {} : { malhaNova: malha }),
     edicoes,
     medidas: { antes: rodadas[0].medidasAntes, depois: final.medidasDepois, piores: final.pioresMedidas },
     ...(cortesJson ? { cortes: { antes: rodadas[0].cortesAntes, depois: final.cortesDepois, porCorte: final.porCorte } } : {}),

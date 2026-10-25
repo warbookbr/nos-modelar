@@ -73,12 +73,26 @@
  * Os vértices extraordinários (valência diferente de 4 no interior, de 2 a 3 na borda) saem declarados, pelo nome, em `extraordinarios`:
  * os nós onde três ou cinco retalhos se encontram, os centros dos retalhos de n lados e o que a borda deixar.
  *
+ * ORIGENS, ENTRADAS E ESTRUTURA. Informação a mais na saída, para quem edita a gaiola por nome (as ferramentas de alisamento, de ondulação e de
+ * vincos), como em `gaiolaPorEstacoes`, sem mudar a gaiola, a malha nem o passo. `origens` dá, de cada ponto, de onde ele vem:
+ * { tipo: 'chave', no, entrada, curvas: [{ curva, pontoChave }] } para o ponto-chave declarado (o nó dado por coordenada, ou a ponta de curva escrita
+ * em coordenada); { tipo: 'noNaCurva', no, curva, fracao, pontosChave } para o nó dado por { curva, fracao }; { tipo: 'curva', curva, fracao, entre,
+ * pontosChave } para o ponto amostrado dentro de um arco de curva (`entre` são os dois pontos-chave que o cercam); { tipo: 'retalho', retalho,
+ * curvas, pontosChave } para o ponto de dentro de um retalho, que sai do preenchimento das curvas da borda dele. `pontosChave` são as
+ * entradas de que o ponto depende, por nome. `entradas` lista os valores editáveis, em metro como `pontos`: cada coordenada do ponto-chave
+ * escrito em coordenada numa curva ('curva[k].x', com k a posição na lista de pontos da curva) e de cada nó dado por coordenada
+ * ('no:nome.x'); o nó dado por { curva, fracao } e o ponto de dentro de um arco ou de um retalho não têm entrada própria. `estrutura`
+ * é o resumo do que não é entrada (a definição sem as coordenadas, as divisões de cada arco e as curvas de cada nó), para comparar duas
+ * execuções. `fixacao` traz as divisões de cada arco e a posição relativa de cada ponto dentro do arco, que `comDivisoesFixas` (`gaiola-captura.js`) devolve
+ * à rede para ela sair com a mesma malha depois de mexer nas entradas. `capturarGaiolas(fn)` (`gaiola-captura.js`) devolve as saídas montadas durante `fn`.
+ *
  * gaiolaPorRede(definicao) -> { pontos, passo, linha(curva, de?, ate?), pontoDaCurva(curva, fracao), linhas, nos, curvas, retalhos, densidades, extraordinarios,
- *                               cantos, continuidade, alisamento, avisos }
+ *                               cantos, continuidade, alisamento, avisos, origens, entradas, estrutura }
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`. `linha(curva, de, ate)` devolve os nomes dos pontos ao longo da
  * curva (da fechada inteira, com o primeiro repetido no fim): é a linha que o `friso` percorre. Os nomes dos pontos de dentro de um arco
  * dependem da densidade, e por isso a receita não os cita: cita a curva, o nó ou o retalho. */
 
+import { alteracoesDaRede, assinaturaDaRede, divisoesFixadas, registrarGaiola } from './gaiola-captura.js';
 import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal } from './gaiola-por-rede-liso.js';
@@ -405,7 +419,21 @@ function resolverSistema(variaveis, linhas, alvos, pesos, minimos, nomeDe) {
 
 /* ----------------------------------------------------------------- função */
 
-export function gaiolaPorRede(definicao) {
+export function gaiolaPorRede(definicaoDada) {
+  /* uma alteração de teste (a ferramenta de vincos) põe vinco em curvas e canto em nós da definição sem escrever na receita */
+  const alt = alteracoesDaRede();
+  const definicao = alt && definicaoDada && Array.isArray(definicaoDada.curvas) && Array.isArray(definicaoDada.retalhos)
+    ? {
+      ...definicaoDada,
+      curvas: [
+        ...definicaoDada.curvas.map((c) => (c && alt.vincos && alt.vincos[c.nome] !== undefined ? { ...c, vinco: alt.vincos[c.nome] } : c)),
+        ...(alt.acrescentar?.curvas ?? []),
+      ],
+      ...(alt.cantos?.length ? { cantos: [...new Set([...(definicaoDada.cantos ?? []), ...alt.cantos.filter((n) => definicaoDada.nos && n in definicaoDada.nos)])] } : {}),
+      ...(alt.acrescentar?.nos ? { nos: { ...(definicaoDada.nos ?? {}), ...alt.acrescentar.nos } } : {}),
+      retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
+    }
+    : definicaoDada;
   exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo'], 'a definição da rede');
   const { simetria = null, prefixo = '' } = definicao;
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
@@ -472,6 +500,8 @@ export function gaiolaPorRede(definicao) {
     if (!porPosicao.has(chaveDaPosicao(pos))) porPosicao.set(chaveDaPosicao(pos), id);
     return no;
   };
+  const literaisDoNo = new Map(); // nó -> [{ curva, pontoChave }] das pontas de curva escritas em coordenada que o criaram ou se fundiram a ele
+  const literalDoNo = (id, curva, pontoChave) => { if (!literaisDoNo.has(id)) literaisDoNo.set(id, []); literaisDoNo.get(id).push({ curva, pontoChave }); };
   const noNaCurva = (id, curvaNome, f) => {
     const no = nos.get(id);
     const lista = nosDaCurva.get(curvaNome);
@@ -503,8 +533,8 @@ export function gaiolaPorRede(definicao) {
       const chave = c.decl.pontos[k];
       if (typeof chave === 'string') continue;
       const existente = porPosicao.get(chaveDaPosicao(pos));
-      if (existente !== undefined) noNaCurva(existente, nome, f);
-      else { novoNo(idAnonimo, pos); noNaCurva(idAnonimo, nome, f); }
+      if (existente !== undefined) { noNaCurva(existente, nome, f); literalDoNo(existente, nome, k); }
+      else { novoNo(idAnonimo, pos); noNaCurva(idAnonimo, nome, f); literalDoNo(idAnonimo, nome, k); }
     }
   }
 
@@ -680,8 +710,22 @@ export function gaiolaPorRede(definicao) {
       vizinhasDaCurva.push({ a: a.id, b: b.id, la: a.comprimento, lb: b.comprimento });
     }
   }
-  const divisoes = resolverSistema(variaveis, linhas, alvos, pesosDoCusto, minimosDosArcos, nomeDaVariavel);
-  for (const a of usados) a.n = divisoes.get(a.id);
+  const chaveDoArco = (a) => `${a.curva}:${a.de}>${a.ate}`;
+  const semCoordenadas = {
+    ...definicao,
+    curvas: definicao.curvas.map((c) => ({ ...c, pontos: c.pontos.map((p) => (typeof p === 'string' ? p : null)) })),
+    ...(definicao.nos ? { nos: Object.fromEntries(Object.entries(definicao.nos).map(([n, d]) => [n, Array.isArray(d) ? null : d])) } : {}),
+  };
+  /* a ferramenta que mede o que um ponto-chave move fixa as divisões de cada arco e a posição relativa de cada ponto dentro do arco: a
+     malha fica a mesma e os pontos acompanham a curva sem o deslize que o espaçamento por curvatura daria a cada milímetro movido */
+  const fixas = divisoesFixadas(assinaturaDaRede(semCoordenadas));
+  const fixadas = fixas && usados.every((a) => Number.isInteger(fixas.divisoes[chaveDoArco(a)]) && fixas.divisoes[chaveDoArco(a)] >= 1);
+  if (fixadas) {
+    for (const a of usados) a.n = fixas.divisoes[chaveDoArco(a)];
+  } else {
+    const divisoes = resolverSistema(variaveis, linhas, alvos, pesosDoCusto, minimosDosArcos, nomeDaVariavel);
+    for (const a of usados) a.n = divisoes.get(a.id);
+  }
 
   /* ---- os vértices dos arcos ---- */
   const posicao = new Map(); const ordemDosVertices = [];
@@ -692,6 +736,7 @@ export function gaiolaPorRede(definicao) {
   const nomeDoNo = (id) => pref(id);
   for (const a of usados) for (const id of [a.de, a.ate]) if (!posicao.has(nomeDoNo(id))) novoVertice(nomeDoNo(id), [...nos.get(id).pos]);
   const verticesDoArco = new Map(); // id -> nomes, de `de` a `ate`
+  const fracaoDoVertice = new Map(); // nome do ponto de dentro de um arco -> { curva, fracao }
   const contadorDaCurva = new Map();
   for (const a of usados) {
     const c = curvas.get(a.curva);
@@ -699,7 +744,10 @@ export function gaiolaPorRede(definicao) {
     for (let k = 1; k < a.n; k++) {
       const i = (contadorDaCurva.get(a.curva) ?? 0) + 1; contadorDaCurva.set(a.curva, i);
       const id = pref(`${a.curva}.${i}`);
-      novoVertice(id, c.em(c.monitor.fracaoDaIntegral(c.monitor.integral(a.f0) + (c.monitor.integral(a.f1) - c.monitor.integral(a.f0)) * k / a.n)));
+      const fixa = fixadas ? fixas.fracoes[id] : undefined;
+      const fr = fixa !== undefined ? a.f0 + fixa * (a.f1 - a.f0) : c.monitor.fracaoDaIntegral(c.monitor.integral(a.f0) + (c.monitor.integral(a.f1) - c.monitor.integral(a.f0)) * k / a.n);
+      novoVertice(id, c.em(fr));
+      fracaoDoVertice.set(id, { curva: a.curva, fracao: c.fechada ? fr - Math.floor(fr) : fr, noArco: (fr - a.f0) / (a.f1 - a.f0) });
       ids.push(id);
     }
     ids.push(nomeDoNo(a.ate));
@@ -1095,8 +1143,7 @@ export function gaiolaPorRede(definicao) {
   }
   const densidades = {};
   for (const a of usados) {
-    const chaveDoArco = `${a.curva}:${a.de}>${a.ate}`;
-    densidades[chaveDoArco] = { curva: a.curva, de: a.de, ate: a.ate, divisoes: a.n, alvo: Math.round(a.alvo * 100) / 100, comprimentoMm: Math.round(a.comprimento * 100) / 100, espacamentoMm: Math.round(a.comprimento / a.n * 100) / 100 };
+    densidades[chaveDoArco(a)] = { curva: a.curva, de: a.de, ate: a.ate, divisoes: a.n, alvo: Math.round(a.alvo * 100) / 100, comprimentoMm: Math.round(a.comprimento * 100) / 100, espacamentoMm: Math.round(a.comprimento / a.n * 100) / 100 };
     if ((a.n > 3 * a.alvo && a.n > a.alvo + 4) || a.n < a.alvo / 2 - 1e-9) {
       avisos.push({
         ref: 'densidadeForaDoAlvo', curva: a.curva, de: a.de, ate: a.ate, divisoes: a.n, alvo: Math.round(a.alvo * 10) / 10,
@@ -1109,23 +1156,95 @@ export function gaiolaPorRede(definicao) {
   const curvasSaida = {};
   for (const [nome, c] of curvas) {
     const { ordem, arcos: lista2 } = arcosDaCurva.get(nome);
-    curvasSaida[nome] = { comprimentoMm: Math.round(c.comprimento * 100) / 100, fechada: c.fechada, nos: ordem.map((x) => x.no), arcos: lista2.map((a) => ({ de: a.de, ate: a.ate, divisoes: a.usos.length ? a.n : null, retalhos: [...a.usos] })) };
+    curvasSaida[nome] = { comprimentoMm: Math.round(c.comprimento * 100) / 100, fechada: c.fechada, nos: ordem.map((x) => x.no), nosPontos: ordem.map((x) => nomeDoNo(x.no)), arcos: lista2.map((a) => ({ de: a.de, ate: a.ate, divisoes: a.usos.length ? a.n : null, retalhos: [...a.usos], pontos: a.usos.length ? [...verticesDoArco.get(a.id)] : null })) };
   }
+  /* a fração do comprimento da curva em cada ponto do lado, na ordem do lado (na curva fechada pode passar de 1, em volta) */
+  const fracoesDoLado = (lado) => {
+    const fr = [];
+    for (const { arco, dir } of lado.arcos) {
+      const v = verticesDoArco.get(arco.id);
+      const f = v.map((id, i) => (i === 0 ? arco.f0 : i === v.length - 1 ? arco.f1 : arco.f0 + fracaoDoVertice.get(id).noArco * (arco.f1 - arco.f0)));
+      const seq = dir === 1 ? f : [...f].reverse();
+      fr.push(...(fr.length ? seq.slice(1) : seq));
+    }
+    return fr.map((x) => Math.round(x * 1e6) / 1e6);
+  };
   const retalhosSaida = {};
+  let faceInicial = 0;
   for (const r of retalhos) {
     const lados = r.cadeia.map(ladoEmVertices);
     retalhosSaida[r.nome] = {
+      bordas: r.cadeia.map((l, j) => ({ curva: l.curva, de: l.de, ate: l.ate, pontos: lados[j], fracoes: fracoesDoLado(l) })), faceInicial,
       cantos: r.cantos, angulosGraus: angulosDosCantos.get(r.nome).map((g) => Math.round(g * 10) / 10), lados: r.cadeia.length, divisoes: r.cadeia.length === 4 ? [lados[0].length - 1, lados[1].length - 1] : lados[0].length - 1,
       faces: facesDoRetalho.get(r.nome).length, ...(centros.has(r.nome) ? { centro: centros.get(r.nome) } : {}), virado: estado.get(r.nome) === 1,
     };
+    faceInicial += facesDoRetalho.get(r.nome).length;
   }
   const pontoDaCurva = (curvaNome, fracao) => {
     if (!curvas.has(curvaNome)) falha(`pontoDaCurva(): a curva ${citar(curvaNome)} não existe`);
     if (typeof fracao !== 'number' || !(fracao >= 0 && fracao <= 1)) falha('pontoDaCurva(): a fração precisa ficar entre 0 e 1 do comprimento da curva');
     return curvas.get(curvaNome).em(fracao).map((x) => x / MM);
   };
-  return {
-    pontos, passo, linha, pontoDaCurva, linhas: linhasDasCurvas, nos: nosSaida, curvas: curvasSaida, retalhos: retalhosSaida, densidades,
-    extraordinarios: extra, cantos: cantosAchados, continuidade, alisamento, avisos,
+
+  /* ---- origens, entradas e estrutura ---- */
+  const EIXOS = ['x', 'y', 'z'];
+  const entradas = [];
+  for (const [nome, c] of curvas) {
+    c.decl.pontos.forEach((p, k) => {
+      if (typeof p !== 'string') p.forEach((v, q) => entradas.push({ id: `${nome}[${k}].${EIXOS[q]}`, tipo: 'chave', curva: nome, pontoChave: k, eixo: EIXOS[q], valor: v / MM }));
+    });
+  }
+  for (const [nome, d] of nosDeclarados) if (d.tipo === 'ponto') d.p.forEach((v, q) => entradas.push({ id: `no:${nome}.${EIXOS[q]}`, tipo: 'no', no: nome, eixo: EIXOS[q], valor: v / MM }));
+  /* a entrada (sem o eixo) do k-ésimo ponto-chave de uma curva: o nó dado por coordenada, ou a coordenada escrita na curva */
+  const entradaDoPontoChave = (curvaNome, k) => {
+    const p = declaradas.get(curvaNome).pontos[k];
+    if (typeof p === 'string') return nosDeclarados.get(p)?.tipo === 'ponto' ? `no:${p}` : null;
+    return `${curvaNome}[${k}]`;
   };
+  const chavesDaCurva = new Map();
+  for (const [nome, c] of curvas) chavesDaCurva.set(nome, [...new Set(c.decl.pontos.map((_, k) => entradaDoPontoChave(nome, k)).filter((x) => x !== null))]);
+  const chavesDoRetalho = (r) => [...new Set(r.cadeia.flatMap((l) => chavesDaCurva.get(l.curva)))];
+  const origens = {};
+  for (const [id, no] of nos) {
+    const nome = nomeDoNo(id);
+    if (!posicao.has(nome)) continue;
+    const d = nosDeclarados.get(id);
+    if (d?.tipo === 'ponto') {
+      const usos = [];
+      for (const [cn, c] of curvas) c.decl.pontos.forEach((p, k) => { if (p === id) usos.push({ curva: cn, pontoChave: k }); });
+      origens[nome] = { tipo: 'chave', no: id, entrada: `no:${id}`, curvas: usos };
+    } else if (literaisDoNo.has(id)) {
+      const lit = literaisDoNo.get(id);
+      origens[nome] = { tipo: 'chave', no: id, entrada: `${lit[0].curva}[${lit[0].pontoChave}]`, curvas: lit };
+    } else {
+      const [cn, f] = d?.tipo === 'curva' ? [d.curva, d.fracao] : [[...no.curvas.keys()][0], [...no.curvas.values()][0]];
+      origens[nome] = { tipo: 'noNaCurva', no: id, curva: cn, fracao: Math.round(f * 1e6) / 1e6, pontosChave: chavesDaCurva.get(cn) };
+    }
+  }
+  for (const [id, { curva: cn, fracao }] of fracaoDoVertice) {
+    const c = curvas.get(cn);
+    const trechos = c.fechada ? c.chaves.length : c.chaves.length - 1;
+    let k = 0;
+    while (k + 1 < trechos && c.fracaoDaChave(k + 1) <= fracao) k++;
+    const entre = [entradaDoPontoChave(cn, k), entradaDoPontoChave(cn, (k + 1) % c.chaves.length)];
+    origens[id] = { tipo: 'curva', curva: cn, fracao: Math.round(fracao * 1e6) / 1e6, entre, pontosChave: chavesDaCurva.get(cn) };
+  }
+  for (const r of retalhos) {
+    const chaves = chavesDoRetalho(r); const curvasDele = [...new Set(r.cadeia.map((l) => l.curva))];
+    for (const id of interiorDoRetalho.get(r.nome)) origens[id] = { tipo: 'retalho', retalho: r.nome, curvas: curvasDele, pontosChave: chaves };
+  }
+  const ordenadas = {};
+  for (const id of ordemDosVertices) ordenadas[id] = origens[id];
+  const fixacao = { divisoes: Object.fromEntries(usados.map((a) => [chaveDoArco(a), a.n])), fracoes: Object.fromEntries([...fracaoDoVertice].map(([id, v]) => [id, v.noArco])) };
+  const estrutura = {
+    definicao: semCoordenadas,
+    divisoes: Object.fromEntries(usados.map((a) => [chaveDoArco(a), a.n])),
+    nos: Object.fromEntries([...nos].map(([id, no]) => [id, [...no.curvas.keys()]])),
+  };
+  const saida = {
+    pontos, passo, linha, pontoDaCurva, linhas: linhasDasCurvas, nos: nosSaida, curvas: curvasSaida, retalhos: retalhosSaida, densidades,
+    extraordinarios: extra, cantos: cantosAchados, continuidade, alisamento, avisos, origens: ordenadas, entradas, estrutura, fixacao,
+  };
+  registrarGaiola(saida);
+  return saida;
 }

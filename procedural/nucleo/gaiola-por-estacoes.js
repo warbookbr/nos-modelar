@@ -92,6 +92,7 @@
  * estação, cada uma com as que ela fecha contra a frente aberta, da primeira coluna à última, e as do fechamento do
  * anel por último; vincos, cantos e medidas na ordem declarada e dos pontos. */
 
+import { capturarGaiolas, registrarGaiola } from './gaiola-captura.js';
 import { chaveDaColuna, entradasDaDefinicao, expandirEstacoes } from './gaiola-interpolada.js';
 import { construirAneis, extraordinarios, lerAneis } from './gaiola-aneis.js';
 
@@ -608,14 +609,7 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis, leitu
   return vertices.filter((p) => marcados.has(p)).map((p) => (pesos.get(p).valor !== Infinity ? { ponto: p, peso: pesos.get(p).valor } : p));
 }
 
-let capturando = null;
-
-/** capturarGaiolas(fn) -> { resultado, gaiolas }: as saídas de `gaiolaPorEstacoes` das chamadas feitas por `fn`, na ordem. */
-export function capturarGaiolas(fn) {
-  const anterior = capturando; const gaiolas = [];
-  capturando = gaiolas;
-  try { return { resultado: fn(), gaiolas }; } finally { capturando = anterior; }
-}
+export { capturarGaiolas };
 
 /**
  * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, aneis, vincos, cantos, medidas, leitura, simetria, virar, prefixo, curvas, interpolar })
@@ -850,6 +844,6 @@ export function gaiolaPorEstacoes(definicao) {
   }
   if (avisos) saida.avisos = avisos;
   if (chaves) saida.estacoes = lidas.map((e) => ({ nome: e.nome, em: e.em, tipo: expandida.tipos.get(e.nome) }));
-  if (capturando) capturando.push(saida);
+  registrarGaiola(saida);
   return saida;
 }
