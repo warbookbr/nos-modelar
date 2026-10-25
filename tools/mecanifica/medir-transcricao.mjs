@@ -11,10 +11,11 @@
  * entrada somada vêm do `usage` da API e são exatos, e a entrada vem também dividida em nova, gravada no cache e lida do
  * cache, porque a leitura de cache custa uma fração da entrada nova e a mesma soma de tokens pode custar bem diferente.
  *
- * O primeiro passo é a primeira chamada que escreve um arquivo (Write, Edit ou NotebookEdit). Até ele, a medição soma os bytes
+ * O primeiro passo é a primeira chamada que escreve um arquivo: Write, Edit, NotebookEdit ou um comando de shell que edita no
+ * lugar (`sed -i`, `perl -i`, `git apply`) ou redireciona para um caminho relativo ou dentro da raiz dada por `--raiz`. Até ele, a medição soma os bytes
  * de texto que voltaram das ferramentas, as imagens e as chamadas, e guarda o contexto do turno que deu o passo, que inclui o
  * que o agente recebe sem pedir (instruções, `CLAUDE.md`, skills listadas). É a medida de leitura do plano da leitura por
- * demanda; um passo dado só por comando de shell não conta, e a tarefa medida deve pedir uma escrita. */
+ * demanda. Sem `--raiz`, o redirecionamento conta para todo caminho fora de `/tmp` e `/dev`. */
 import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -48,11 +49,25 @@ export function etapaDaChamada(nome, entrada = {}) {
 
 const tokensDeTexto = (texto) => String(texto ?? '').length / CARACTERES_POR_TOKEN;
 const ESCRITAS = new Set(['Write', 'Edit', 'NotebookEdit']);
+const EDITA_NO_LUGAR = /\b(?:sed\s+(?:-[a-zA-Z]*\s+)*-[a-zA-Z]*i|perl\s+-[a-zA-Z]*i|git\s+(?:-C\s+\S+\s+)?apply)\b/;
+
+/* Se um comando de shell escreve arquivo: edição no lugar, ou redirecionamento (`>`, `>>`, `tee`) para um caminho relativo ou
+   dentro da raiz; sem raiz, para todo caminho fora de /tmp e /dev. */
+export function comandoEscreve(comando, raiz = null) {
+  if (EDITA_NO_LUGAR.test(comando)) return true;
+  for (const m of String(comando).matchAll(/(?:(?:^|[^0-9&>\-])>{1,2}|\btee(?:\s+-a)?)\s*([^\s;&|<>()]+)/g)) {
+    const alvo = m[1].replace(/^['"]|['"]$/g, '');
+    if (alvo.startsWith('&') || alvo.startsWith('/dev/')) continue;
+    if (!alvo.startsWith('/')) return true;
+    if (raiz ? alvo === raiz || alvo.startsWith(`${raiz.replace(/\/$/, '')}/`) : !alvo.startsWith('/tmp/')) return true;
+  }
+  return false;
+}
 
 /* A medição de uma transcrição, dada como texto JSONL: { turnos, entradaSomada, entradaNova, cacheGravado, cacheLido,
    saida, contextoFinal, etapas: { etapa: { tokens, chamadas } }, primeiroPasso }, com primeiroPasso nulo quando nada foi escrito
    e, quando houve escrita, { turno, contexto, bytes, imagens, chamadas, arquivos: { caminho: bytes } }. Uma mensagem da API que aparece em várias linhas (uma por bloco) conta uma vez. */
-export function medirTranscricao(jsonl) {
+export function medirTranscricao(jsonl, { raiz = null } = {}) {
   const vistos = new Set();
   const etapaPorChamada = new Map();
   const etapas = new Map();
@@ -84,7 +99,8 @@ export function medirTranscricao(jsonl) {
           const etapa = etapaDaChamada(b.name, b.input);
           etapaPorChamada.set(b.id, etapa);
           somar(etapa, etapa.startsWith('escrita') ? tokensDeTexto(JSON.stringify(b.input ?? {})) : 0, 1);
-          if (!primeiroPasso && ESCRITAS.has(b.name)) primeiroPasso = { turno: turnos, contexto: contextoDoTurno, ...ate, arquivos: { ...ate.arquivos } };
+          const escreve = ESCRITAS.has(b.name) || (b.name === 'Bash' && comandoEscreve(b.input?.command ?? '', raiz));
+          if (!primeiroPasso && escreve) primeiroPasso = { turno: turnos, contexto: contextoDoTurno, ...ate, arquivos: { ...ate.arquivos } };
           else if (!primeiroPasso) { ate.chamadas += 1; if (b.name === 'Read' && b.input?.file_path) leituraPorChamada.set(b.id, b.input.file_path); }
         } else if (b?.type === 'text') {
           somar('texto da IA', tokensDeTexto(b.text));
@@ -142,13 +158,16 @@ export function textoDaMedicao(medicoes) {
   return `${linhas.join('\n')}\n`;
 }
 
-function executar(arquivos) {
-  if (arquivos.length === 0) {
-    process.stderr.write('uso: npm run medir:transcricao -- <transcrição.jsonl> [...]\n');
+function executar(args) {
+  const i = args.indexOf('--raiz');
+  const raiz = i >= 0 ? args[i + 1] : null;
+  const arquivos = i >= 0 ? args.filter((_, j) => j !== i && j !== i + 1) : args;
+  if (arquivos.length === 0 || (i >= 0 && !raiz)) {
+    process.stderr.write('uso: npm run medir:transcricao -- [--raiz <cópia>] <transcrição.jsonl> [...]\n');
     process.exitCode = 1;
     return;
   }
-  const medicoes = arquivos.map((a) => ({ nome: basename(a), medicao: medirTranscricao(readFileSync(a, 'utf8')) }));
+  const medicoes = arquivos.map((a) => ({ nome: basename(a), medicao: medirTranscricao(readFileSync(a, 'utf8'), { raiz }) }));
   process.stdout.write(textoDaMedicao(medicoes));
 }
 

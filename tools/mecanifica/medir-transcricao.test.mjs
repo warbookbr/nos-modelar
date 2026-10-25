@@ -1,7 +1,7 @@
 /* medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem),
    cada resultado de ferramenta na etapa da sua chamada, imagem pelo valor fixo, e a soma de várias transcrições. */
 import { describe, expect, it } from 'vitest';
-import { CARACTERES_POR_TOKEN, etapaDaChamada, medirTranscricao, textoDaMedicao, TOKENS_POR_IMAGEM } from './medir-transcricao.mjs';
+import { CARACTERES_POR_TOKEN, comandoEscreve, etapaDaChamada, medirTranscricao, textoDaMedicao, TOKENS_POR_IMAGEM } from './medir-transcricao.mjs';
 
 const assistente = (id, usage, content) => JSON.stringify({ type: 'assistant', message: { id, usage, content } });
 const usuario = (content) => JSON.stringify({ type: 'user', message: { content } });
@@ -62,5 +62,21 @@ describe('medirTranscricao', () => {
     expect(m.primeiroPasso).toEqual({ turno: 3, contexto: 1510, bytes: 50, imagens: 1, chamadas: 2, arquivos: { '/r/CLAUDE.md': 20 } });
     expect(textoDaMedicao([{ nome: 't', medicao: m }])).toContain('até o primeiro passo (turno 3): 50 bytes de texto, 1 imagens, 2 chamadas, contexto 1.510');
     expect(medirTranscricao(TRANSCRICAO).primeiroPasso).toBeNull();
+  });
+
+  it('conta como passo o comando de shell que edita no lugar ou redireciona para a cópia, e não para fora dela', () => {
+    expect(comandoEscreve("cd /c && sed -i 's/a/b/' x.js")).toBe(true);
+    expect(comandoEscreve('git -C /c apply p.patch')).toBe(true);
+    expect(comandoEscreve('cat > receita.js <<EOF')).toBe(true);
+    expect(comandoEscreve('npm test 2>&1 | tee -a /tmp/c/log.txt', '/tmp/c')).toBe(true);
+    expect(comandoEscreve('npm test > /tmp/fora.log 2>&1', '/tmp/c')).toBe(false);
+    expect(comandoEscreve('npm test > /dev/null 2>&1; sed -n 1,9p a.js')).toBe(false);
+    expect(comandoEscreve('[ $a -gt 3 ] && echo x > /tmp/y')).toBe(false);
+    const t = [
+      assistente('a1', uso(10, 1000, 5), [{ type: 'tool_use', id: 'b1', name: 'Bash', input: { command: 'cd /c && grep -n x a.js' } }]),
+      usuario([{ type: 'tool_result', tool_use_id: 'b1', content: 'x'.repeat(40) }]),
+      assistente('a2', uso(10, 1100, 5), [{ type: 'tool_use', id: 'b2', name: 'Bash', input: { command: "cd /c && sed -i 's/+/-/' a.js" } }]),
+    ].join('\n');
+    expect(medirTranscricao(t, { raiz: '/c' }).primeiroPasso).toMatchObject({ turno: 2, bytes: 40, chamadas: 1 });
   });
 });

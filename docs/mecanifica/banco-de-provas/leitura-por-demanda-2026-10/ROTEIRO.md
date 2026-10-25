@@ -13,7 +13,7 @@ rm -rf $C/docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10
 ln -s "$PWD/node_modules" $C/node_modules
 ```
 
-Na tarefa de corrigir, aplique o defeito na cópia com `git -C $C apply "$PWD/docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10/defeito.patch"`. Ele troca o sinal da folga no passo `encostar`. Se o patch não aplicar mais, porque o código em volta mudou, refaça a mesma troca à mão e registre isso no resultado.
+Na tarefa de corrigir, aplique o defeito na cópia com `git -C $C apply "$PWD/docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10/defeito.patch"` e faça um commit dele na cópia com a mensagem "Estado da medida". Ele troca o sinal da folga no passo `encostar`. Sem o commit, `git diff` mostra o defeito à IA, e a primeira tentativa de 2026-10-25 achou-o assim, sem ler nada, e foi descartada. Se o patch não aplicar mais, porque o código em volta mudou, refaça a mesma troca à mão e registre isso no resultado.
 
 ## Despachar
 
@@ -21,7 +21,7 @@ Despache um agente de uso geral, novo, sem `SendMessage` e sem nenhuma outra ins
 
 ## Medir
 
-A transcrição do agente é o arquivo JSONL que o Claude Code grava para ele. `npm run medir:transcricao -- <transcrição.jsonl>` dá os turnos, os tokens e, na linha "até o primeiro passo", os bytes de texto que voltaram das ferramentas, as imagens e as chamadas até a primeira escrita de arquivo, com os arquivos lidos e o contexto do turno que escreveu. O contexto inclui o que o agente recebe sem pedir, como o `CLAUDE.md`.
+A transcrição do agente é o arquivo JSONL que o Claude Code grava para ele. `npm run medir:transcricao -- --raiz <C> <transcrição.jsonl>` dá os turnos, os tokens e, na linha "até o primeiro passo", os bytes de texto que voltaram das ferramentas, as imagens e as chamadas até a primeira escrita de arquivo na cópia (pela ferramenta de edição ou por comando de shell que edita no lugar ou redireciona para ela), com os arquivos lidos e o contexto do turno que escreveu. O contexto inclui o que o agente recebe sem pedir, como o `CLAUDE.md`.
 
 Os erros contam na cópia, depois que o agente entrega. São as falhas de `npm run gates` e, na tarefa de modelar, também os achados de `npm run descrever -- <peça>` e a nota e os defeitos do crítico cego sobre as vistas da bancada. Na tarefa de corrigir, conta também se a correção é a do defeito ou um desvio dele, como trocar o teste ou mexer noutro lugar.
 
