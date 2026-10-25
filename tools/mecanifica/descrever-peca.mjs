@@ -7,7 +7,7 @@
  * A medição continua usando o mesmo núcleo neutro que alimenta a bancada.
  */
 import { existsSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import {
@@ -429,11 +429,14 @@ export async function descreverPecaReutilizavel({
        passava limpo, flutuando no ar. Os grupos saem dos pares em contato e dos
        que a medida não decidiu, e todo grupo fora do maior precisa estar em
        `ilhas` da receita, por uma parte dele e com o motivo, como a asa direita
-       que só se liga à esquerda pela fuselagem da montagem. */
+       que só se liga à esquerda pela fuselagem da montagem. Reprova a peça do
+       acervo (`procedural/pecas/`) e aparece como aviso na receita de ensaio,
+       que tem parte solta de propósito. */
+    const ilhasReprovam = Boolean(caminhoReceita) && relative(join(REPO, 'procedural/pecas'), caminhoReceita).split(/[\\/]/)[0] !== '..';
     const ilhas = ilhasDaPeca(contatos, receita);
     if (ilhas.problemas.length) {
-      stderr += `\n${ilhas.problemas.length} PARTE(S) OU GRUPO(S) SOLTO(S)\n${ilhas.problemas.map((t) => `  ${t}`).join('\n')}\n`;
-      falhou = true;
+      const texto = `\n${ilhas.problemas.length} PARTE(S) OU GRUPO(S) SOLTO(S)${ilhasReprovam ? '' : ' (aviso; a guarda do acervo reprova)'}\n${ilhas.problemas.map((t) => `  ${t}`).join('\n')}\n`;
+      if (ilhasReprovam) { stderr += texto; falhou = true; } else stdout += texto;
     }
     /* FORMA PROMETIDA CONTRA ENTREGUE. Existe porque contato não basta: se o
        pneu sai maciço e aro, cubo e raios não chegam a ser modelados, não há

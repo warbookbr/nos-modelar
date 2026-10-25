@@ -141,6 +141,9 @@ export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
    quem copia a receita com outra tabela recebem os passos da tabela velha, e a
    peça não muda sem nada acusar; 14 receitas do acervo estavam assim em
    2026-10-25. Devolve a lista do que falta, vazia quando a cadeia está inteira. */
+/* A peça mora no acervo de `procedural/pecas/`, e não numa pasta de ensaio que um teste passa à guarda. */
+const doAcervo = (peca) => !relative(ACERVO, resolverCaminhoReceita(peca)).startsWith('..');
+
 export function faltasDaCadeia(modulo) {
   const receita = modulo.default ?? modulo.receita;
   const faltas = [];
@@ -215,7 +218,7 @@ export async function conferirAcervo(pecas = pecasDoAcervo()) {
     }
     const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
     const receita = modulo.default ?? modulo.receita;
-    const faltas = faltasDaCadeia(modulo);
+    const faltas = doAcervo(peca) ? faltasDaCadeia(modulo) : [];
     if (faltas.length) {
       reprovadas.push({ peca, motivo: `CADEIA DA RECEITA INCOMPLETA\n${faltas.map((f) => `  ${f}`).join('\n')}\n  A tabela é a única fonte das medidas, e os passos precisam sair dela a cada leitura.` });
       continue;

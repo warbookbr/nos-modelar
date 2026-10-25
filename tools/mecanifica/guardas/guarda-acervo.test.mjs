@@ -100,16 +100,19 @@ describe('veredito de contato do acervo', () => {
     expect(medida.stderr).toMatch(/direita/);
   });
 
-  it('REPROVA parte solta que não toca nenhuma outra, e aceita a ilha declarada com o motivo', async () => {
+  it('a parte solta que não toca nenhuma outra sai no aviso da receita de ensaio, e a ilha declarada com o motivo não', async () => {
+    /* Fora do acervo, a receita de ensaio só recebe o aviso; a peça do acervo reprova, e o acervo de hoje passa. */
     const solta = await medir(duasPartes({ distancia: 3, contatos: null }));
-    expect(solta.ok).toBe(false);
-    expect(solta.stderr).toMatch(/PARTE\(S\) OU GRUPO\(S\) SOLTO\(S\)[\s\S]*não toca nenhuma parte/);
+    expect(solta.stdout).toMatch(/PARTE\(S\) OU GRUPO\(S\) SOLTO\(S\) \(aviso; a guarda do acervo reprova\)[\s\S]*não toca nenhuma parte/);
+    const { ilhasDaPeca } = await import('../descrever-peca.mjs');
+    const contatos = { partes: ['a', 'b'], paresEmContato: [], cobertura: { inconclusivos: [] } };
+    expect(ilhasDaPeca(contatos).problemas).toEqual(["a parte b não toca nenhuma parte de a; encoste as partes, ou declare a ilha em `ilhas` da receita com { contem: <uma parte dela>, motivo }."]);
     const declarada = duasPartes({ distancia: 3, contatos: null });
     declarada.default.ilhas = [{ contem: 'direita', motivo: 'a direita se liga à esquerda por outra peça da montagem' }];
-    expect((await medir(declarada)).stderr).not.toMatch(/SOLTO/);
+    expect((await medir(declarada)).stdout).not.toMatch(/SOLTO/);
     const ficcao = duasPartes({ distancia: 0.4, contatos: [{ par: ['esquerda', 'direita'], motivo: MOTIVO }] });
     ficcao.default.ilhas = [{ contem: 'direita', motivo: 'x' }];
-    expect((await medir(ficcao)).stderr).toContain("a ilha declarada por 'direita' não está solta");
+    expect((await medir(ficcao)).stdout).toContain("a ilha declarada por 'direita' não está solta");
   });
 
   it('peça de ensaio sem plano continua mensurável; o acervo é que exige plano', async () => {
