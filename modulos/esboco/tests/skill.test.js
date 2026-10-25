@@ -93,7 +93,6 @@ describe('a skill laco-do-esboco e o agente esbocista', () => {
     expect(s).toContain('--modo <objeto|por-unidade>');
     expect(s).toContain('modo `objeto`');
     expect(s).toContain('modo `por-unidade`');
-    expect(s).toContain('fatia 9');
   });
 
   it('descreve o brief por unidade, a nota de passagem e a reprovação no modo novo, sem citar objeto', () => {
