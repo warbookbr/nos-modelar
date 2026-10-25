@@ -56,11 +56,13 @@ milímetro contra a foto; o contrato e os limites estão em
 ## 3. Despachar o crítico, sem contexto
 
 Em marco — antes de propor promoção, publicação ou de levar o resultado ao
-usuário — despache um subagente como **crítico visual**. O protocolo está em
-[`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md).
+usuário — despache um subagente como **crítico visual**. O que ele recebe, o
+veredito que devolve e o limite de rodadas estão definidos num lugar só, em
+[O laço do crítico](REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico).
 
-Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
-relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
+Passe as imagens e a pergunta, como `npm run vistas:critica` as monta. **Não
+passe receita, código, passos, relatório, o seu raciocínio nem o histórico de
+construção.** O crítico é para
 VER a imagem — revisão de receita é outro trabalho, com outro dono, e um crítico
 que lê a receita volta a julgar a intenção em vez do resultado, que é
 exatamente o defeito que este papel existe para cobrir. Papel separado dentro da

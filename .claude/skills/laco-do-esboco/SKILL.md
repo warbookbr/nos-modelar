@@ -15,6 +15,10 @@ O fluxo do esboço, as ferramentas e o formato estão na skill
 [`esboco-detalhado`](../esboco-detalhado/SKILL.md), que o `esbocista` lê. Aqui
 está só o que a sessão principal faz em volta dele.
 
+O que o crítico recebe, o veredito e a regra de 8 com três rodadas por unidade
+estão definidos em [O laço do crítico](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico);
+aqui está como o laço do esboço os aplica.
+
 ## Os dois modos de condução
 
 O laço opera em dois modos de execução, configurados no Condutor por `npm run

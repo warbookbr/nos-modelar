@@ -12,6 +12,41 @@ caso aplicado da roda dianteira e a regra de quando um guia vira skill estão em
 [`CRITICA-VISUAL-CONTRATO-E-CASOS.md`](CRITICA-VISUAL-CONTRATO-E-CASOS.md). São
 consulta; este documento é o que se lê antes de julgar.
 
+## O laço do crítico
+
+Esta seção é a definição única do que o crítico recebe, de como ele responde e de
+quantas rodadas o laço tem; as skills dos laços, o `LACO-VISUAL.md` e o resto
+deste documento apontam para ela, e a definição do agente `critico-visual` é a
+mesma.
+
+O crítico é o agente `critico-visual`, despachado sem contexto em marco: antes de
+levar uma forma à pessoa, de fechar uma etapa ou de propor publicação, e depois
+que descrição, medidas e gates estão limpos. Ele recebe o pedido que
+`npm run vistas:critica` monta na pasta da rodada: as vistas da peça e de cada
+parte em arquivos separados, o alvo ou a referência quando existem, as partes
+que o plano promete com a forma e a técnica, os critérios de reprovação e as
+perguntas. Ele não recebe receita, código, passos, medidas, o raciocínio de quem
+modelou nem o histórico da construção. Quando a forma vai à pessoa sem alvo, a
+legibilidade cega (só a imagem e "o que é isto?") roda antes.
+
+Ele responde com o veredito `mecanifica.veredito-de-forma` em bloco JSON:
+`alvo`, `nota` de 0 a 10, `observacao` de até 240 caracteres e `defeitos`, cada
+um com `parte`, `tipo`, `onde`, `sentido` e `evidencia` (de 15 a 240
+caracteres). Os tipos e sentidos são fechados: `angulo` e `comprimento` (maior,
+menor), `posicao` (adiantada, atrasada, alta, baixa), `espessura` (maior,
+menor), `ausencia` (faltando), `uniao` (afastado, atravessando), `superficie`
+(anguloso, segmentado, facetado) e `cota` (faltando, mal_posta, sobreposta), e
+`src/autoria/veredito-de-forma.js` recusa o que sair disso. O veredito é achado,
+nunca aprovação: quem aprova forma é a pessoa.
+
+A rodada fecha com nota 8 ou mais e nenhum defeito. No laço de uma peça
+(`rodada-de-modelagem`), o limite é de 6 rodadas, e o laço para antes se 3
+rodadas seguidas não reduzem os defeitos; passar disso é decisão da pessoa,
+gravada no `limite.json` da pasta de rodadas da peça, com quem decidiu e por quê. No laço do esboço, cada unidade tem 3
+rodadas para chegar a 8, e a quarta só com o sim da pessoa, registrado pelo
+Condutor. O veredito entra no registro como o crítico o devolveu, e quem conduz
+o laço não edita a nota nem os defeitos.
+
 ## Princípio
 
 Uma referência visual não deve virar uma ordem genérica como “faça mais
@@ -110,17 +145,8 @@ Além de "achado, nunca aprovação" (`LACO-VISUAL.md`, seção 3), o papel obed
 - **cada despacho é partida fria** e reconstrói contexto;
 - **não edita.** Aponta e prova; quem corrige é o modelador.
 
-O crítico aponta no máximo cinco divergências prioritárias. Para cada uma,
-informa:
-
-- região e vista em que aparece;
-- evidência visual observável;
-- impacto em silhueta, proporção, profundidade, transição ou fabricação;
-- classificação provável: ajuste, remodelagem local ou capacidade ausente;
-- condição visual de aceite, sem prescrever uma sequência rígida de comandos.
-
-Uma segunda passada opcional pode receber o vocabulário disponível para revisar
-a classificação de viabilidade. O crítico não edita a peça.
+O que o crítico devolve é o veredito descrito em [O laço do crítico](#o-laço-do-crítico),
+com a vista e a região de cada defeito na `evidencia`. O crítico não edita a peça.
 ## Pergunta-base para o crítico
 
 Para legibilidade cega, sem referência e sem dizer o que é:

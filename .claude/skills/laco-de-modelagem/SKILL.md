@@ -115,8 +115,8 @@ sobreposição dos cortes do modelo com os do sólido do esboço, e o relatório
 diferença do esboço vai à pessoa, que decide se a receita a corrige. Quando a peça é instância de `<objeto>/montagem.json`, as
 vistas montadas saem com o quadro na caixa da peça e as etapas já construídas em volta: duas vezes o crítico errou por ver a peça
 pequena demais no conjunto, e o relatório diz quanto do quadro ela ocupa. Se a peça ainda não está entre as etapas construídas, o
-relatório avisa que não há vista montada. O que não se manda ao crítico está na seção 3 de
-[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md); aqui vale também
+relatório avisa que não há vista montada. O que o crítico recebe e não recebe, o veredito e o limite de rodadas estão em
+[O laço do crítico](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico); aqui vale também
 não mandar o que mudou, porque contar como foi feito faz revisão virar
 concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem inventar nota.
 
