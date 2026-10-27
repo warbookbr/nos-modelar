@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1478 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1480 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -954,6 +954,11 @@
 - `geometria.js` — geometria.js — as medidas da dobradiça de abas a partir dos parâmetros da família, em metro.
 - `index.js` — index.js — a família `dobradica` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defin…
 - `montagem.js` — montagem.js — a mini-montagem v5 que a família gera: o pino e as duas folhas como peças soltas, ligadas por uma articulação de revolução com o curso declarad…
+
+## procedural/familias/exemplo/
+
+- `exemplo.test.js` — O exemplo de peça de família que o ramo `modelar/peca/familia` entrega: ele executa, cada parte da família sai com material, e o PLANO é válido. Exemplo que …
+- `receita.js` — exemplo/receita.js — a receita mínima de uma peça que sai de uma família, para copiar.
 
 ## procedural/familias/movel-de-caixa/
 

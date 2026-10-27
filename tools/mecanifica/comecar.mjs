@@ -121,7 +121,7 @@ function disponivel(roteiro, raiz) {
   return [];
 }
 
-/* O estado do trabalho que vale para a lista e para o roteiro `mudar`. */
+/* O estado do trabalho que vale para a lista e para o roteiro `mudar/plano`. */
 function estadoGeral(raiz) {
   const plano = planoAtivo(raiz);
   const tarefas = tarefasAbertas(raiz);
@@ -248,7 +248,7 @@ export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ 
   let estadoTexto = [];
   let passo = r.passo;
   let condutor = null;
-  if (r.id === 'mudar') {
+  if (r.id === 'mudar/plano') {
     estadoTexto = estado.linhas;
     passo = passoDeMudar(estado, r);
   } else if (r.id === 'modelar/esboco' || r.id === 'modelar/laco-do-esboco') {

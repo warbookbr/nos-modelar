@@ -6,7 +6,8 @@ gerado de operações, que os roteiros entregam.
 
 A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
 `npm run comecar -- <roteiro>`, que diz o que ler. Quem vai **mudar** o
-Mecanifica (núcleo, gates, arquitetura, plano) segue o roteiro `mudar`.
+Mecanifica (núcleo, gates, arquitetura, plano) segue o roteiro `mudar`, que separa
+o trabalho do plano da correção de um defeito.
 
 ## Por onde começar
 

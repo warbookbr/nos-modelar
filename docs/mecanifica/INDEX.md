@@ -14,7 +14,7 @@ aplicação publicada aqui.
 
 A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
 `npm run comecar -- <roteiro>`, que diz o que ler. Este índice é a leitura do
-roteiro `mudar`; criar, inspecionar, corrigir ou auditar uma peça segue o
+roteiro `mudar/plano`; criar, inspecionar, corrigir ou auditar uma peça segue o
 roteiro de modelar e a porta [`usar/README.md`](usar/README.md). O que está
 encerrado vive em
 [`historico/README.md`](historico/README.md)
@@ -136,6 +136,17 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 O gate de vazamento (`tools/arquitetura/termos-proibidos.test.mjs`) pede a chave
 da lista em `MECANIFICA_CHAVE_TERMOS_ARQUIVO=<arquivo fora do repositório>`; sem
 ela, ignora esses casos com aviso, e o CI reprova.
+
+## Corrigir um defeito
+
+Um defeito relatado no núcleo, numa ferramenta ou num gate se corrige sem plano
+quando a correção devolve o que o código e a documentação já prometem. Primeiro
+vem o teste que falha pelo defeito, o que já existe ou um novo ao lado do código
+(`procedural/nucleo/operacoes/<operação>.test.ts` no núcleo); depois a correção
+na origem, sem mudar o teste para caber nela, e o teste passando. `docs/MAPA.md`
+diz o que cada arquivo faz. Se a correção muda o que uma peça do acervo gera, ou
+pede um comportamento que nada prometia, ela vira plano. O relato diz se o
+processo teria pego o defeito sozinho e, quando não, o que falta.
 
 ## Pendências atuais
 

@@ -49,7 +49,7 @@ describe('comecar sem roteiro', () => {
     const r = comecar();
     expect(r).toMatchObject({ ok: true, codigo: 0 });
     expect(r.resultado.roteiros.map((x) => x.id)).toEqual(['mudar', 'documentar', 'pesquisar', 'modelar']);
-    expect(r.texto).toContain(roteiros.find((x) => x.id === 'mudar').quando);
+    expect(r.texto).toContain(`${perguntas.mudar} (npm run comecar -- mudar)`);
     expect(r.texto).toContain(`${perguntas.modelar} (npm run comecar -- modelar)`);
     expect(r.texto).toMatch(/Estado:\n {2}(plano ativo|nenhum plano ativo)/);
     expect(r.resultado.passo).toContain('npm run comecar -- <ramo>');
@@ -121,11 +121,19 @@ describe('o passo seguinte lido do estado', () => {
   it('mudar aponta a primeira fatia que não está feita do plano ativo', () => {
     const raiz = repositorio({ plano: PLANO });
     expect(planoAtivo(raiz)).toEqual({ arquivo: PLANO_DE_TESTE, titulo: 'O plano de teste', fatiaAberta: { numero: 2, texto: 'Cortar o README em tópicos.' } });
-    expect(comecar({ roteiro: 'mudar', raiz }).resultado.passo).toBe(`Trabalhe na fatia 2 de ${PLANO_DE_TESTE}.`);
+    expect(comecar({ roteiro: 'mudar/plano', raiz }).resultado.passo).toBe(`Trabalhe na fatia 2 de ${PLANO_DE_TESTE}.`);
+  });
+
+  it('mudar pergunta entre o plano e o defeito, e o defeito não manda ler os índices nem o estado do plano', () => {
+    expect(comecar({ roteiro: 'mudar' }).resultado.roteiros.map((x) => x.id)).toEqual(['mudar/plano', 'mudar/defeito']);
+    const r = comecar({ roteiro: 'mudar/defeito', raiz: repositorio({ plano: PLANO }) });
+    expect(r.resultado.ler).not.toContain('docs/mecanifica/INDEX.md');
+    expect(r.resultado.estado).toEqual([]);
+    expect(r.resultado.passo).toContain('teste que falha pelo defeito');
   });
 
   it('mudar sem plano ativo pede um plano antes de implementar', () => {
-    const r = comecar({ roteiro: 'mudar', raiz: repositorio() });
+    const r = comecar({ roteiro: 'mudar/plano', raiz: repositorio() });
     expect(r.resultado.passo).toContain('Sem plano ativo, proponha um plano');
     expect(r.texto).toContain('nenhum plano ativo: o backlog não autoriza implementação');
   });
@@ -135,7 +143,7 @@ describe('o passo seguinte lido do estado', () => {
     for (const [status, esperado] of [['aberta', 'está com a outra IA (aberta)'], ['feita', 'Revise o relatório da T020'], ['bloqueada', 'Resolva o bloqueio da T020']]) {
       const raiz = repositorio({ plano: PLANO, tarefas: tarefa(status) });
       expect(tarefasAbertas(raiz)).toEqual([{ id: 'T020', titulo: 'Algo', status }]);
-      expect(comecar({ roteiro: 'mudar', raiz }).resultado.passo).toContain(esperado);
+      expect(comecar({ roteiro: 'mudar/plano', raiz }).resultado.passo).toContain(esperado);
     }
   });
 

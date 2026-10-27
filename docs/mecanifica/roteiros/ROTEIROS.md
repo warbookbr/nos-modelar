@@ -12,7 +12,8 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 
 | roteiro | intenção | quando |
 | --- | --- | --- |
-| `mudar` | trabalhar no projeto | Mudar núcleo, gate, arquitetura, ferramenta ou plano. |
+| `mudar/plano` | trabalhar no projeto | Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia do plano ativo. |
+| `mudar/defeito` | trabalhar no projeto | Um comportamento relatado contradiz o que o código ou a documentação promete. |
 | `documentar` | trabalhar na documentação | Escrever, mover ou cortar documento, fora de um plano. |
 | `pesquisar` | pesquisar | Saber o que já se tentou, mediu ou pesquisou antes de propor algo. |
 | `modelar/peca/familia` | modelar | A peça é um caso de uma família que já existe, como aparelho, móvel, cadeira ou roda. |
@@ -27,6 +28,7 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 
 Sem roteiro, ou com o nome de um grupo, o `comecar` faz a pergunta do grupo e lista os ramos:
 
+- `mudar`: A mudança segue o plano ativo ou corrige um defeito pontual?
 - `modelar`: A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?
 - `modelar/peca`: A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?
 
@@ -41,9 +43,9 @@ Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no moment
 - Não edite `docs/MAPA.md` à mão; depois de mexer em documentação, rode `npm run mapa`. O gate
   `mapa:check` confere.
 
-## mudar: Mudar o Mecanifica
+## mudar/plano: Mudar pelo plano
 
-Mudar núcleo, gate, arquitetura, ferramenta ou plano.
+Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia do plano ativo.
 
 Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
@@ -63,6 +65,26 @@ Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
 Passo seguinte, sem estado lido: Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.
 
 Conferido no fim: npm run gates, com a bateria completa quando muda código.
+
+## mudar/defeito: Corrigir um defeito
+
+Um comportamento relatado contradiz o que o código ou a documentação promete.
+
+Ler antes de começar, num orçamento de 6.000 bytes (linha de base de 17.443 bytes em 2026-10-27):
+
+- `CLAUDE.md`
+- `docs/mecanifica/INDEX.md#corrigir-um-defeito`
+
+Abrir só quando a condição aparecer:
+
+- `docs/mecanifica/ARQUITETURA.md`, quando a correção atravessa camadas.
+- `docs/mecanifica/planos/README.md`, quando a correção vira plano.
+
+Comandos: `npm run test -- <arquivo de teste>`, `npm run gates -- --completo`.
+
+Passo seguinte, sem estado lido: Ache o teste que falha pelo defeito, ou escreva um, corrija na origem e veja o teste passar.
+
+Conferido no fim: O teste do defeito passando e npm run gates -- --completo.
 
 ## documentar: Escrever ou reorganizar documentação
 
@@ -117,6 +139,7 @@ Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 b
 - `CLAUDE.md`
 - `.claude/skills/criar-peca/SKILL.md`
 - `docs/mecanifica/usar/AUTORIA-DE-PECA.md#peça-de-uma-família`
+- `procedural/familias/exemplo/receita.js`
 - `docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
 
 Lista gerada na hora: familias.

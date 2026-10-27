@@ -2,6 +2,7 @@
   "versao": 1,
   "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
   "perguntas": {
+    "mudar": "A mudança segue o plano ativo ou corrige um defeito pontual?",
     "modelar": "A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?",
     "modelar/peca": "A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?"
   },
@@ -106,10 +107,10 @@
   ],
   "roteiros": [
     {
-      "id": "mudar",
+      "id": "mudar/plano",
       "intencao": "trabalhar no projeto",
-      "titulo": "Mudar o Mecanifica",
-      "quando": "Mudar núcleo, gate, arquitetura, ferramenta ou plano.",
+      "titulo": "Mudar pelo plano",
+      "quando": "Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia do plano ativo.",
       "ler": [
         "CLAUDE.md",
         "docs/mecanifica/INDEX.md",
@@ -145,6 +146,38 @@
       "linhaDeBase": {
         "bytes": 59061,
         "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "mudar/defeito",
+      "intencao": "trabalhar no projeto",
+      "titulo": "Corrigir um defeito",
+      "quando": "Um comportamento relatado contradiz o que o código ou a documentação promete.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/mecanifica/INDEX.md#corrigir-um-defeito"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/mecanifica/ARQUITETURA.md",
+          "quando": "a correção atravessa camadas"
+        },
+        {
+          "arquivo": "docs/mecanifica/planos/README.md",
+          "quando": "a correção vira plano"
+        }
+      ],
+      "skill": null,
+      "comandos": [
+        "npm run test -- <arquivo de teste>",
+        "npm run gates -- --completo"
+      ],
+      "passo": "Ache o teste que falha pelo defeito, ou escreva um, corrija na origem e veja o teste passar.",
+      "conferido": "O teste do defeito passando e npm run gates -- --completo.",
+      "orcamentoBytes": 6000,
+      "linhaDeBase": {
+        "bytes": 17443,
+        "data": "2026-10-27"
       }
     },
     {
@@ -241,6 +274,7 @@
         "CLAUDE.md",
         ".claude/skills/criar-peca/SKILL.md",
         "docs/mecanifica/usar/AUTORIA-DE-PECA.md#peça-de-uma-família",
+        "procedural/familias/exemplo/receita.js",
         "docs/mecanifica/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto"
       ],
       "sobDemanda": [

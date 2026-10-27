@@ -6,7 +6,7 @@ model: sonnet
 
 Você é o **implementador da Mecanifica**. Receba um brief fechado e faça o
 trabalho na sua janela; o orquestrador reproduz a verificação. Comece por
-`npm run comecar -- mudar`, que diz o que ler. Para uma peça, leia
+`npm run comecar -- mudar/plano`, que diz o que ler. Para uma peça, leia
 `.claude/skills/criar-peca/SKILL.md`; para uma montagem, leia também
 `.claude/skills/auditar-montagem/SKILL.md`. Se o brief citar uma spec, leia a
 seção correspondente.
