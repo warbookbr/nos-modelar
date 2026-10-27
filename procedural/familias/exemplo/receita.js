@@ -46,6 +46,7 @@ const receita = {
   meta: { nome: 'exemplo', desc: 'forninho pela família aparelho-de-caixa' },
   PARAMS: TABELA,
   MATERIAIS,
+  TOPO: { origem: 'chão sob o centro, y para cima, frente em +z' },
   /* `partes` com os nomes que a família dá; cada critério se vê nas vistas. */
   PLANO: {
     objeto: 'forninho elétrico de bancada com porta de visor, puxador horizontal e painel à direita com dois botões giratórios',

@@ -125,9 +125,9 @@ pede o registro de fora (`--composicoes`), e a guarda do acervo não o tem.
 ## Peça de uma família
 
 Quando a forma é um caso de uma família registrada em `procedural/familias/`, a
-receita não refaz a geometria: chama a família com os parâmetros da `TABELA` e
-acrescenta só o que é da peça, como o material de cada parte. A receita mínima,
-executada por teste, é [`procedural/familias/exemplo/receita.js`](../../../procedural/familias/exemplo/receita.js).
+receita chama a família com a `TABELA` e acrescenta só o material de cada
+parte. A receita mínima, executada por teste, é
+[`procedural/familias/exemplo/receita.js`](../../../procedural/familias/exemplo/receita.js).
 O que falta na forma se corrige na família, com novo aceite da pessoa.
 
 ## Identidade estável
