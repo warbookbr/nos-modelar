@@ -8,7 +8,7 @@
  * Uma forma com uma dobra real, a cintura e a coluna sem o vinco declarado, sai como não alisável dentro da tolerância, com as falhas
  * que sobram. As conferências não usam o modelo da ferramenta: aplicam as edições a uma TABELA nova e rodam a receita e a leitura de
  * ondulação, sem fixar divisão nenhuma. */
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -33,17 +33,30 @@ function lerComEdicoes(opcoes, edicoes) {
 describe('alisamento da chapa por rede de curvas', () => {
   let antes, relatorio, cli, tabelaDepois, relatorioDobra;
 
-  beforeAll(() => {
+  /* A linha de comando roda num processo à parte AO MESMO TEMPO que o alisamento no processo do teste: as duas contas são a
+     mesma e independentes, e em série elas somavam metade do tempo do arquivo (medido em 2026-10-27: 64 s cada). */
+  function linhaDeComando() {
+    return new Promise((resolver, recusar) => {
+      const filho = spawn(process.execPath, ['tools/mecanifica/alisar-a-superficie.mjs', 'tools/mecanifica/fixtures/alisar-rede-prova.js'], { cwd: REPO });
+      let saida = ''; let erro = '';
+      filho.stdout.on('data', (d) => { saida += d; });
+      filho.stderr.on('data', (d) => { erro += d; });
+      filho.on('close', (codigo) => (codigo === 0 ? resolver(JSON.parse(saida)) : recusar(new Error(`a linha de comando falhou: ${erro}`))));
+    });
+  }
+
+  beforeAll(async () => {
+    const pelaLinha = linhaDeComando();
     const { receita, TABELA } = receitaDeProva(PLANTADA);
     antes = ondulacaoDaSuperficie(superficiesDaReceita(receita)[0]);
     const copia = JSON.stringify(TABELA);
     relatorio = alisarReceita({ receita, tabela: TABELA });
     tabelaDepois = JSON.stringify(TABELA) === copia;
-    const r = spawnSync(process.execPath, ['tools/mecanifica/alisar-a-superficie.mjs', 'tools/mecanifica/fixtures/alisar-rede-prova.js'], { cwd: REPO, encoding: 'utf8', timeout: 600000, maxBuffer: 1 << 26 });
-    if (r.status !== 0) throw new Error(`a linha de comando falhou: ${r.stderr}`);
-    cli = JSON.parse(r.stdout);
     const d = receitaDeProva({ dobra: true });
-    relatorioDobra = alisarReceita({ receita: d.receita, tabela: d.TABELA }, { toleranciaMm: 1 });
+    /* Uma regularização só: o caso da dobra prova que a ferramenta diz "não alisável" com as falhas que sobram, e com as três
+       regularizações do padrão ou com uma a conclusão, as falhas e os pontos que impedem saem os mesmos (medido em 2026-10-27). */
+    relatorioDobra = alisarReceita({ receita: d.receita, tabela: d.TABELA }, { toleranciaMm: 1, regularizacoes: [0.03] });
+    cli = await pelaLinha;
   }, 900000);
 
   it('a ondulação plantada passa do limiar, em calombos das três ligações, e a origem dos pontos vem da rede', () => {

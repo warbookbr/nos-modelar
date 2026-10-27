@@ -529,11 +529,13 @@ describe('a ponta levantada acima de 60 graus', () => {
       parametros.raioDoCantoDeAtaque = raio;
       parametros.raioDoCantoDeFuga = raio / 2;
       let erro = null;
-      try { rodar(parametros); } catch (e) { erro = e; }
+      let aceita = null;
+      try { aceita = rodar(parametros); } catch (e) { erro = e; }
       /* o encontro das duas metades na raiz de uma asa torcida e enflechada pode se atravessar sem ponta levantada nenhuma: essas amostras não medem a ponta */
       if (atravessamentos(rodarSemContrato({ ...parametros, pontaLevantada: 0, comprimentoDaTampa: 0, raioDoCantoDeAtaque: 0, raioDoCantoDeFuga: 0 }).neutro, 'fixa') > 0) continue;
       if (!erro) {
-        const { neutro } = rodar(parametros);
+        /* a malha da tentativa aceita é a que se confere: gerá-la de novo dobrava o custo de cada amostra aceita */
+        const { neutro } = aceita;
         expect(malhaAberta(neutro), JSON.stringify(parametros)).toEqual([]);
         expect(atravessamentos(neutro, 'fixa'), JSON.stringify(parametros)).toBe(0);
         aceitas += 1;

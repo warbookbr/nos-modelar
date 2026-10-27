@@ -178,6 +178,21 @@ export const RECURSOS_DO_GATE = {
   'guarda:portas': ['cache-vite'],
 };
 
+/* O PESO DE CADA GATE NA MÁQUINA.
+ *
+ * Medido em 2026-10-27: os gates rodavam quatro de cada vez numa máquina de quatro processadores, mas os testes rápidos sozinhos
+ * abrem quatro trabalhadores e os lentos dois, e os gates de navegador sobem cada um um Chromium e um servidor. Com tudo junto
+ * havia dez ou mais processos pesados disputando quatro processadores, e cada teste ficava duas a três vezes mais lento do que
+ * sozinho (a blocagem do esboço, 130 s sozinha e 336 s na bateria; o alisamento da rede, 260 s e 447 s). Contar só quantos gates
+ * rodam não via isso. Cada gate declara aqui quantos processadores ocupa (o padrão é 1), e o agendador só começa um gate quando
+ * a soma dos que estão rodando mais o dele cabe na máquina; um gate mais pesado que a máquina roda sozinho. */
+export const PESO_DO_GATE = {
+  'test:rapidos': 4,
+  'test:lentos': 2,
+  'mcp:visual:check': 2,
+};
+const ORCAMENTO_DA_MAQUINA = Math.max(2, availableParallelism());
+
 /* BATERIA CURTA QUANDO SÓ MUDOU PEÇA OU DOCUMENTO.
  *
  * Contado em 2026-09-24: numa conversa de autoria do braço robótico a bateria
@@ -304,7 +319,9 @@ async function executar() {
   const porGate = new Map();
   const fila = [...bateria];
   const ocupados = new Set();
+  let pesoEmUso = 0;
   let abortado = false;
+  const pesoDe = (gate) => PESO_DO_GATE[gate] ?? 1;
 
   /* Tira da fila o primeiro gate liberado: recursos livres e dependência já
      terminada. Devolver `null` com a fila cheia quer dizer que só sobrou gate
@@ -313,6 +330,7 @@ async function executar() {
     const posicao = fila.findIndex((gate) => {
       const anterior = DEPENDE_DE[gate];
       if (anterior && !porGate.has(anterior)) return false;
+      if (pesoEmUso > 0 && pesoEmUso + pesoDe(gate) > ORCAMENTO_DA_MAQUINA) return false;
       return (RECURSOS_DO_GATE[gate] ?? []).every((recurso) => !ocupados.has(recurso));
     });
     return posicao === -1 ? null : fila.splice(posicao, 1)[0];
@@ -324,11 +342,13 @@ async function executar() {
       if (!gate) { await new Promise((r) => { setTimeout(r, 50); }); continue; }
       const recursos = RECURSOS_DO_GATE[gate] ?? [];
       for (const recurso of recursos) ocupados.add(recurso);
+      pesoEmUso += pesoDe(gate);
       try {
         const resultado = await rodarGate(gate, { silencioso });
         porGate.set(gate, resultado);
         if (resultado.codigo !== 0 && pararNoPrimeiro) abortado = true;
       } finally {
+        pesoEmUso -= pesoDe(gate);
         for (const recurso of recursos) ocupados.delete(recurso);
       }
     }

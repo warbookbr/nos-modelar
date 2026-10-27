@@ -16,7 +16,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEPENDE_DE, GATES, RECURSOS_DO_GATE } from '../gates.mjs';
+import { DEPENDE_DE, GATES, PESO_DO_GATE, RECURSOS_DO_GATE } from '../gates.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -61,6 +61,7 @@ describe('npm run gates espelha o CI', () => {
   it('recurso e dependência só nomeiam gates da lista', () => {
     const fora = [
       ...Object.keys(RECURSOS_DO_GATE),
+      ...Object.keys(PESO_DO_GATE),
       ...Object.keys(DEPENDE_DE),
       ...Object.values(DEPENDE_DE),
     ].filter((nome) => !GATES.includes(nome));
