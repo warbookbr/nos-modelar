@@ -1,6 +1,6 @@
 # Medida de leitura da leitura por demanda
 
-Roteiro das fatias 1 e 9 do plano da [leitura por demanda e limpeza](../../planos/2026-10-22-leitura-por-demanda-e-limpeza.md). Duas tarefas pequenas e fixas são feitas, cada uma, por uma IA nova, sem memória e sem a conversa de quem conduz, uma vez pelo caminho de leitura de antes e uma vez pelo de depois. Mede-se quanto ela lê até o primeiro passo, quantos tokens gasta no total e quantos erros os gates e o crítico acham no que ela entrega. As tarefas estão em [`tarefa-modelar.md`](tarefa-modelar.md) e [`tarefa-corrigir.md`](tarefa-corrigir.md), e o texto delas vai ao agente sem mudança.
+Roteiro das fatias 1 e 9 do plano da [leitura por demanda e limpeza](../../planos/encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md). Duas tarefas pequenas e fixas são feitas, cada uma, por uma IA nova, sem memória e sem a conversa de quem conduz, uma vez pelo caminho de leitura de antes e uma vez pelo de depois. Mede-se quanto ela lê até o primeiro passo, quantos tokens gasta no total e quantos erros os gates e o crítico acham no que ela entrega. As tarefas estão em [`tarefa-modelar.md`](tarefa-modelar.md) e [`tarefa-corrigir.md`](tarefa-corrigir.md), e o texto delas vai ao agente sem mudança.
 
 ## Preparar a cópia
 

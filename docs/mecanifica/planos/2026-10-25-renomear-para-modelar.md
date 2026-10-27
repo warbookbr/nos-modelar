@@ -1,10 +1,10 @@
 # Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** Claude, com a pessoa trocando o segredo do CI e a chave fora do repositório na fatia 3
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [leitura por demanda e limpeza](2026-10-22-leitura-por-demanda-e-limpeza.md), que remove antes o código e os documentos sem uso
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [leitura por demanda e limpeza](encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md), que remove antes o código e os documentos sem uso
 
 ## Problema observado
 
@@ -54,4 +54,4 @@ O risco maior é um caminho antigo citado por texto que nenhum gate lê, como um
 
 ## Andamento
 
-Escrito em 2026-10-25 a partir do mapa das menções, sem implementação.
+Escrito em 2026-10-25 a partir do mapa das menções, sem implementação. Ativado em 2026-10-27, com o fechamento do plano da leitura por demanda.

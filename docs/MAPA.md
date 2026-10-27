@@ -489,7 +489,6 @@
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
-- `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
 - `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 - `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — o gate que falha avisa em segundos e o que não mudou não roda de novo
 - `BACKLOG.md` — Backlog aberto
@@ -613,6 +612,7 @@
 - `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo da pessoa e geração de textura em Node
 - `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
 - `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
+- `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
 - `2026-10-23-gaiola-que-segue-as-feicoes.md` — Gaiola que segue as feições — anéis de gaiola em volta de vãos e arcos para a carroceria ter moldura, calha e lábio
 - `2026-10-24-carroceria-por-rede-de-curvas.md` — Carroceria por rede de curvas — a superfície preenchida entre curvas de feição nomeadas, com o detalhe lido em cortes ampliados
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada

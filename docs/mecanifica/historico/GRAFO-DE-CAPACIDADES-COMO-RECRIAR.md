@@ -1,6 +1,6 @@
 # Grafo de capacidades: o que era e como recriar
 
-O grafo de capacidades saiu do repositório em 2026-10-27, por decisão da pessoa no plano da [leitura por demanda e limpeza](../planos/2026-10-22-leitura-por-demanda-e-limpeza.md). Ele nasceu em agosto, no plano da plataforma procedural extensível, para que um agente descobrisse pelo servidor MCP que sequência de operações leva de um tipo de dado a outro e onde falta uma operação.
+O grafo de capacidades saiu do repositório em 2026-10-27, por decisão da pessoa no plano da [leitura por demanda e limpeza](../planos/encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md). Ele nasceu em agosto, no plano da plataforma procedural extensível, para que um agente descobrisse pelo servidor MCP que sequência de operações leva de um tipo de dado a outro e onde falta uma operação.
 
 Ele era um hipergrafo direcionado derivado do catálogo de operações: um nó por tipo de artefato e um por operação, e uma hiperaresta por operação ligando os artefatos que ela recebe aos que entrega. Não era um grafo acíclico, porque a malha entra e sai da mesma operação. A função `hipergrafoDeCapacidades(catalogo)` em `procedural/nucleo/catalogo.js` o montava, `npm run catalogo:gerar` o gravava em `docs/mecanifica/gerado/grafo-capacidades.json` com o esquema ao lado, e o servidor MCP o entregava no recurso `mecanifica://procedural/grafo`.
 
