@@ -51,5 +51,3 @@ Há 39 operações em 1 módulo(s).
 ## Como usar
 
 Consulte o catálogo para descobrir contratos disponíveis. Para argumentos, pré-condições, limites e exemplo executável, use `schemas-operacoes.json` ou `descrever_capacidade` no MCP. A validação de uma receita concreta continua sendo feita pelo executor e pelos gates.
-
-O arquivo `grafo-capacidades.json` é um **hipergrafo direcionado**: uma operação pode consumir e produzir o mesmo tipo de artefato. Por isso ele não finge ser um DAG; um DAG nessa projeção apagaria ciclos reais de transformação.

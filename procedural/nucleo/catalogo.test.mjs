@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { OPS, REGISTRO_OPERACOES, nucleo } from './entrada.js';
-import { buscarCapacidades, catalogoDeCapacidades, explicarCapacidade, hipergrafoDeCapacidades } from './catalogo.js';
+import { buscarCapacidades, catalogoDeCapacidades, explicarCapacidade } from './catalogo.js';
 import { sha256Hex } from './sha256.js';
 
 describe('catálogo de capacidades — R05', () => {
@@ -36,10 +36,6 @@ describe('catálogo de capacidades — R05', () => {
        MCP junto; fica registrado como atrito, e o teto deixa folga para quatro
        operações do tamanho da maior: 32 574 + 4 × 1 100 ≈ 37 000. */
     expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(37_000);
-    /* O hipergrafo custa cerca de 260 bytes por operação (a hiperaresta e o nó do contrato). Medido em 2026-10-22: com
-       a operação friso, 39 operações somam 10 078 bytes, e o teto antigo de 10 000 não tinha folga; o novo deixa
-       folga para quatro operações. */
-    expect(Buffer.byteLength(JSON.stringify(hipergrafoDeCapacidades(catalogo)))).toBeLessThan(11_200);
   });
 
   it('busca por efeito, artefato e identidade sem executar receita', () => {
@@ -65,14 +61,5 @@ describe('catálogo de capacidades — R05', () => {
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
     expect(primeira).toMatchObject({ total: 39, retornadas: 3, truncado: true, omitidas: 36 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
-  });
-
-  it('representa contratos como hipergrafo, sem afirmar DAG onde a malha se preserva', () => {
-    const grafo = hipergrafoDeCapacidades(catalogo);
-    expect(grafo.nos).toContainEqual({ id: 'artefato:mecanifica.malha-poligonal@1', tipo: 'artefato', artefato: 'mecanifica.malha-poligonal@1' });
-    expect(grafo.hiperarestas.find(({ operacao }) => operacao === 'mecanifica.operacao.transladar')).toEqual({
-      id: 'contrato:mecanifica.operacao.transladar', operacao: 'mecanifica.operacao.transladar',
-      entra: ['artefato:mecanifica.malha-poligonal@1'], sai: ['artefato:mecanifica.malha-poligonal@1'],
-    });
   });
 });

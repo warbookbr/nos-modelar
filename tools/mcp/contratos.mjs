@@ -1,6 +1,6 @@
 /* contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura. */
 import { z } from 'zod';
-export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v6';
+export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v7';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 

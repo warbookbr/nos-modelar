@@ -9,7 +9,7 @@ receitas. MCP, CLI ou API devem chamar este serviço, nunca copiar sua lógica.
 
 `criarServicoDescobertaProcedural` entrega uma configuração imutável com:
 
-- catálogo e hipergrafo derivados do registro;
+- catálogo derivado do registro;
 - schema da lacuna e índice dos schemas de operação;
 - busca e descrição de capacidades;
 - planejamento de cadeia estrutural;
@@ -24,7 +24,6 @@ executa geometria, não aprova estética e não publica receita.
 O perfil MCP padrão publica os recursos abaixo, todos somente leitura:
 
 - `mecanifica://procedural/catalogo`;
-- `mecanifica://procedural/grafo`;
 - `mecanifica://procedural/schemas`.
 
 E as ferramentas: `buscar_capacidades`, `descrever_capacidade`,

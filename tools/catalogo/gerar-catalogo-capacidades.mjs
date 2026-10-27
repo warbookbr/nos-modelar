@@ -4,13 +4,12 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
-import { catalogoDeCapacidades, hipergrafoDeCapacidades } from '../../procedural/nucleo/catalogo.js';
+import { catalogoDeCapacidades } from '../../procedural/nucleo/catalogo.js';
 import { schemaDaLacunaCapacidade } from '../../procedural/nucleo/lacunas.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const DESTINO = join(RAIZ, 'docs/mecanifica/gerado');
 const catalogo = catalogoDeCapacidades(REGISTRO_OPERACOES);
-const grafo = hipergrafoDeCapacidades(catalogo);
 const esquemaLacuna = schemaDaLacunaCapacidade();
 const usosOperacoes = {
   formato: 'mecanifica.schemas-operacoes@1', assinatura: REGISTRO_OPERACOES.assinatura,
@@ -54,15 +53,6 @@ const esquemaCatalogo = {
     operacoes: { type: 'array', items: esquemaOperacaoCatalogo },
   },
 };
-const esquemaGrafo = {
-  $schema: 'https://json-schema.org/draft/2020-12/schema', $id: 'mecanifica.hipergrafo-capacidades@1',
-  type: 'object', required: ['formato', 'assinatura', 'nos', 'hiperarestas'], additionalProperties: false,
-  properties: {
-    formato: { const: 'mecanifica.hipergrafo-capacidades@1' }, assinatura: { type: 'string', pattern: '^sha256:[a-f0-9]{64}$' },
-    nos: { type: 'array', items: { type: 'object', required: ['id', 'tipo'], properties: { id: { type: 'string' }, tipo: { enum: ['artefato', 'operacao'] }, artefato: { type: 'string' }, nome: { type: 'string' } } } },
-    hiperarestas: { type: 'array', items: { type: 'object', required: ['id', 'operacao', 'entra', 'sai'], additionalProperties: false, properties: { id: { type: 'string' }, operacao: { type: 'string' }, entra: { type: 'array', items: { type: 'string' } }, sai: { type: 'array', items: { type: 'string' } } } } },
-  },
-};
 function markdown() {
   const linhas = [
     '# Catálogo de capacidades procedural', '',
@@ -72,20 +62,17 @@ function markdown() {
     '| operação | intenção | entra/sai | interfaces | custo | schema |', '|---|---|---|---|---:|---|',
     ...catalogo.operacoes.map((operacao) => `| \`${operacao.nome}\` | ${operacao.uso?.intencao ?? '—'} | ${operacao.artefatos.entra.map((item) => `\`${item}\``).join(', ') || '—'} → ${operacao.artefatos.sai.map((item) => `\`${item}\``).join(', ') || '—'} | ${operacao.interfaces.entra.map((item) => `\`${item}\``).join(', ') || '—'} → ${operacao.interfaces.sai.map((item) => `\`${item}\``).join(', ') || '—'} | ${operacao.custo} | \`${operacao.uso?.schema ?? '—'}\` |`),
     '', '## Como usar', '',
-    'Consulte o catálogo para descobrir contratos disponíveis. Para argumentos, pré-condições, limites e exemplo executável, use `schemas-operacoes.json` ou `descrever_capacidade` no MCP. A validação de uma receita concreta continua sendo feita pelo executor e pelos gates.', '',
-    'O arquivo `grafo-capacidades.json` é um **hipergrafo direcionado**: uma operação pode consumir e produzir o mesmo tipo de artefato. Por isso ele não finge ser um DAG; um DAG nessa projeção apagaria ciclos reais de transformação.',
+    'Consulte o catálogo para descobrir contratos disponíveis. Para argumentos, pré-condições, limites e exemplo executável, use `schemas-operacoes.json` ou `descrever_capacidade` no MCP. A validação de uma receita concreta continua sendo feita pelo executor e pelos gates.',
   ];
   return `${linhas.join('\n')}\n`;
 }
 function indice() {
-  return `# Artefatos gerados do catálogo procedural\n\n> Gerado por \`npm run catalogo:gerar\`; não edite à mão.\n\n- [Catálogo legível](CATALOGO-CAPACIDADES.md)\n- [Catálogo JSON](catalogo-capacidades.json)\n- [Schema do catálogo](catalogo-capacidades.schema.json)\n- [Contratos executáveis das operações](schemas-operacoes.json)\n- [Hipergrafo de capacidades](grafo-capacidades.json)\n- [Schema do hipergrafo](grafo-capacidades.schema.json)\n- [Schema de lacuna de capacidade](lacuna-capacidade.schema.json)\n\nO catálogo descreve capacidades registradas; a validação de receita concreta continua no executor.\n`;
+  return `# Artefatos gerados do catálogo procedural\n\n> Gerado por \`npm run catalogo:gerar\`; não edite à mão.\n\n- [Catálogo legível](CATALOGO-CAPACIDADES.md)\n- [Catálogo JSON](catalogo-capacidades.json)\n- [Schema do catálogo](catalogo-capacidades.schema.json)\n- [Contratos executáveis das operações](schemas-operacoes.json)\n- [Schema de lacuna de capacidade](lacuna-capacidade.schema.json)\n\nO catálogo descreve capacidades registradas; a validação de receita concreta continua no executor.\n`;
 }
 const arquivos = new Map([
   ['catalogo-capacidades.json', `${JSON.stringify(catalogo, null, 2)}\n`],
   ['catalogo-capacidades.schema.json', `${JSON.stringify(esquemaCatalogo, null, 2)}\n`],
   ['schemas-operacoes.json', `${JSON.stringify(usosOperacoes, null, 2)}\n`],
-  ['grafo-capacidades.json', `${JSON.stringify(grafo, null, 2)}\n`],
-  ['grafo-capacidades.schema.json', `${JSON.stringify(esquemaGrafo, null, 2)}\n`],
   ['lacuna-capacidade.schema.json', `${JSON.stringify(esquemaLacuna, null, 2)}\n`],
   ['CATALOGO-CAPACIDADES.md', markdown()],
   ['INDEX.md', indice()],

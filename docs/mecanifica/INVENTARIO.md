@@ -158,8 +158,7 @@ em [historico/README](historico/README.md).
   `docs/mecanifica/COORDENACAO-REPOS.md` para decisões entre repositórios.
 13. `docs/nos-herdado/oficina-contrato.md` para o vocabulário procedural vigente.
 14. [`gerado/INDEX.md`](gerado/INDEX.md) para o catálogo, schemas, contratos de
-    uso e hipergrafo
-    de capacidades atuais.
+    uso de capacidades atuais.
 15. [`COMPOSICAO-PROCEDURAL-V1.md`](COMPOSICAO-PROCEDURAL-V1.md) para
     reutilização declarativa dentro de receitas.
 16. [`EXTENSOES-NATIVAS-V1.md`](EXTENSOES-NATIVAS-V1.md) para extensões nativas.

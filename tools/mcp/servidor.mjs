@@ -181,12 +181,6 @@ function registrarRecursos(server, {
     async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(servicoProcedural.catalogo()) }] }),
   );
   server.registerResource(
-    'grafo-procedural',
-    'mecanifica://procedural/grafo',
-    { title: 'Hipergrafo procedural', description: 'Relações de consumo e produção entre artefatos e operações registradas.', mimeType: 'application/json' },
-    async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(servicoProcedural.hipergrafo()) }] }),
-  );
-  server.registerResource(
     'schemas-procedurais',
     'mecanifica://procedural/schemas',
     { title: 'Schemas procedurais', description: 'Schemas serializáveis dos contratos procedurais expostos pelo servidor.', mimeType: 'application/json' },

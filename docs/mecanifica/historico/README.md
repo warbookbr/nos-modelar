@@ -19,6 +19,7 @@ humana, o Playground e a aplicação jogável, que não existem mais aqui.
 | [`RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) | evidência da ponte entre receita procedural e apresentação |
 | [`OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) | análise histórica de dependências e candidatos |
 | [`EXPERIMENTO-CARRO-SEM-APOIO.md`](EXPERIMENTO-CARRO-SEM-APOIO.md) | o que outra IA fez ao modelar um carro do zero, sem o núcleo procedural, e por que o código dela saiu do repositório |
+| [`GRAFO-DE-CAPACIDADES-COMO-RECRIAR.md`](GRAFO-DE-CAPACIDADES-COMO-RECRIAR.md) | o grafo de capacidades do catálogo, que saiu em 2026-10-27, por que saiu e o commit que guarda o código |
 | [`IMPORTADORES-COMO-RECRIAR.md`](IMPORTADORES-COMO-RECRIAR.md) | o desenho dos importadores de OpenSCAD, STEP e STL, que saíram em 2026-10-25, e o commit que guarda o código |
 | [`VEICULOS-PRIMEIRA-LEVA-2026-10.md`](VEICULOS-PRIMEIRA-LEVA-2026-10.md) | o diagnóstico da primeira leva de veículos de referência livre e o experimento da perua pelas três vistas |
 

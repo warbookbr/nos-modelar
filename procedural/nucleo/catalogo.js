@@ -1,7 +1,6 @@
 /* catálogo.js — projeções puras e determinísticas do registro de operações.
    Não executa receita, não lê arquivos e não conhece visor, MCP ou domínio. */
 const FORMATO_CATALOGO = 'mecanifica.catalogo-capacidades@1';
-const FORMATO_HIPERGRAFO = 'mecanifica.hipergrafo-capacidades@1';
 
 function comparar(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
 function texto(valor, nome) {
@@ -162,20 +161,4 @@ export function explicarCapacidade(catalogo, identificador, { registro = null } 
   };
 }
 
-/* O tipo da malha entra e sai de transformações; a projeção por arcos teria
-   ciclos. O contrato correto é, portanto, hipergrafo direcionado, não DAG falso. */
-export function hipergrafoDeCapacidades(catalogo) {
-  conferirCatalogo(catalogo);
-  const tipos = new Set(catalogo.operacoes.flatMap((operacao) => [...operacao.artefatos.entra, ...operacao.artefatos.sai]));
-  const nos = [
-    ...[...tipos].sort(comparar).map((tipo) => ({ id: `artefato:${tipo}`, tipo: 'artefato', artefato: tipo })),
-    ...catalogo.operacoes.map((operacao) => ({ id: operacao.id, tipo: 'operacao', nome: operacao.nome })),
-  ].sort((a, b) => comparar(a.id, b.id));
-  const hiperarestas = catalogo.operacoes.map((operacao) => ({
-    id: `contrato:${operacao.id}`, operacao: operacao.id,
-    entra: operacao.artefatos.entra.map((tipo) => `artefato:${tipo}`), sai: operacao.artefatos.sai.map((tipo) => `artefato:${tipo}`),
-  })).sort((a, b) => comparar(a.id, b.id));
-  return { formato: FORMATO_HIPERGRAFO, assinatura: catalogo.assinatura, nos, hiperarestas };
-}
-
-export { FORMATO_CATALOGO, FORMATO_HIPERGRAFO };
+export { FORMATO_CATALOGO };

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1481 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1482 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -437,6 +437,7 @@
 - `EXPERIMENTO-CARRO-SEM-APOIO.md` — Carro modelado do zero, sem o motor da Mecanifica
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
+- `GRAFO-DE-CAPACIDADES-COMO-RECRIAR.md` — Grafo de capacidades: o que era e como recriar
 - `IMPORTADORES-COMO-RECRIAR.md` — Importadores de objeto de código: como recriar
 - `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
 - `LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md` — Levantamento: desenho sem referência

@@ -215,10 +215,10 @@ describe('servidor MCP local — perfil revisao', () => {
       }
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
-        'mecanifica://estado', 'mecanifica://procedural/catalogo', 'mecanifica://procedural/grafo', 'mecanifica://procedural/schemas', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
+        'mecanifica://estado', 'mecanifica://procedural/catalogo', 'mecanifica://procedural/schemas', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
         'mecanifica://pacotes', 'mecanifica://montagens', 'mecanifica://pecas', 'mecanifica://autoria',
       ]);
-      expect(recursos.result.resources).toHaveLength(10);
+      expect(recursos.result.resources).toHaveLength(9);
     } finally {
       await cliente.fechar();
     }
@@ -319,7 +319,6 @@ describe('servidor MCP local — perfil revisao', () => {
     try {
       const estado = await cliente.enviar('resources/read', { uri: 'mecanifica://estado' });
       const catalogoProcedural = await cliente.enviar('resources/read', { uri: 'mecanifica://procedural/catalogo' });
-      const grafoProcedural = await cliente.enviar('resources/read', { uri: 'mecanifica://procedural/grafo' });
       const schemasProcedurais = await cliente.enviar('resources/read', { uri: 'mecanifica://procedural/schemas' });
       const capacidades = await cliente.enviar('resources/read', { uri: 'mecanifica://capacidades/modelagem' });
       const pacotes = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
@@ -328,7 +327,6 @@ describe('servidor MCP local — perfil revisao', () => {
       const pecas = await cliente.enviar('resources/read', { uri: 'mecanifica://pecas' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
       const catalogoProceduralValor = JSON.parse(catalogoProcedural.result.contents[0].text);
-      const grafoProceduralValor = JSON.parse(grafoProcedural.result.contents[0].text);
       const schemasProceduraisValor = JSON.parse(schemasProcedurais.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
       const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
@@ -336,7 +334,7 @@ describe('servidor MCP local — perfil revisao', () => {
       const montagensValor = JSON.parse(montagens.result.contents[0].text);
       const pecasValor = JSON.parse(pecas.result.contents[0].text);
       expect(estadoValor).toMatchObject({
-        perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v6',
+        perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v7',
         catalogoMontagensConfigurado: true, universoDependenciasConfigurado: true,
       });
       expect(estadoValor.ferramentas).toEqual([
@@ -354,9 +352,8 @@ describe('servidor MCP local — perfil revisao', () => {
       );
       expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
       expect(catalogoProceduralValor).toMatchObject({ formato: 'mecanifica.catalogo-capacidades@1', operacoes: expect.any(Array) });
-      expect(grafoProceduralValor).toMatchObject({ formato: 'mecanifica.hipergrafo-capacidades@1', hiperarestas: expect.any(Array) });
       expect(schemasProceduraisValor).toMatchObject({ lacuna: { $id: 'mecanifica.lacuna-capacidade@1' } });
-      expect(JSON.stringify({ catalogoProceduralValor, grafoProceduralValor, schemasProceduraisValor })).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
+      expect(JSON.stringify({ catalogoProceduralValor, schemasProceduraisValor })).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
       expect(JSON.stringify(pacotesValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
       expect(dependenciasValor).toMatchObject({
         formato: 'mecanifica.resumo-dependencias-global', configurado: true,
