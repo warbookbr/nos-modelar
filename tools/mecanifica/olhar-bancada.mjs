@@ -159,10 +159,6 @@ async function fecharRecursos({ browser, vite }) {
   return limpeza;
 }
 
-function urlPublicadaDa(url) {
-  return `https://warbookbr.github.io/nos-modelar/bancada.html${new URL(url).search}`;
-}
-
 function erroDeTempo(timeoutMs) {
   const erro = new Error(`A bancada excedeu o limite de ${timeoutMs} ms.`);
   erro.codigo = 'tempo_esgotado';
@@ -389,10 +385,8 @@ export async function olharBancada({
     const { port } = vite.httpServer.address();
     /* A entrada publicada pode estar legitimamente vazia. A ferramenta de
        inspeção, porém, precisa de uma peça para provar geometria; por isso usa
-       o harness privado, que injeta um catálogo explícito de fixtures. A URL
-       pública continua sendo reportada como referência de produto. */
+       o harness privado, que injeta um catálogo explícito de fixtures. */
     const base = `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html`;
-    const basePublicada = 'https://warbookbr.github.io/nos-modelar/bancada.html';
     const carregarPlaywright = dependencias.carregarPlaywright
       ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
     const pw = await carregarPlaywright();
@@ -662,7 +656,6 @@ export async function olharBancada({
           }
         }
         registrar(relato, logger, 'stdout', `            local: ${urlReproduzivel}`);
-        registrar(relato, logger, 'stdout', `            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);
       }
     }
     /* R02 — A VISTA DO PAR ACUSADO SAI COMO IMAGEM, junto das que foram pedidas.

@@ -188,7 +188,7 @@ export const RECURSOS_DO_GATE = {
  * a soma dos que estão rodando mais o dele cabe na máquina; um gate mais pesado que a máquina roda sozinho. */
 export const PESO_DO_GATE = {
   'test:rapidos': 4,
-  'test:lentos': 2,
+  'test:lentos': 4,
   'mcp:visual:check': 2,
 };
 const ORCAMENTO_DA_MAQUINA = Math.max(2, availableParallelism());

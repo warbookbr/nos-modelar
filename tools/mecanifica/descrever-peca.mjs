@@ -293,7 +293,7 @@ export async function descreverPecaReutilizavel({
     stdout += `CONSULTA DE SUBÁRVORE\n`
       + `  raiz: ${consultaDeSubarvore.raiz}\n`
       + `  partes (${selecionadas.length}): ${selecionadas.join(', ')}\n`
-      + `  bancada: https://warbookbr.github.io/nos-modelar/bancada.html?${params}\n\n`;
+      + `  bancada: http://localhost:5173/nos-modelar/bancada.html?${params} (npm run dev)\n\n`;
   }
   stdout += formatarDescricao(descricao, { peca, casas, resumo });
 

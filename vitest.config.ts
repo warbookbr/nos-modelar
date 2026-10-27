@@ -53,8 +53,10 @@ export default defineConfig({
        de arquivos; isolados e com dois trabalhadores, ambos continuam
        rápidos. Dois preserva paralelismo sem transformar contenção de CPU e
        disco em falso vermelho. A bateria dos rápidos, sem os lentos, usa
-       quatro (plano gates em poucos minutos, 2026-10-16). */
-    maxWorkers: MODO === 'rapidos' ? 4 : 2,
+       quatro (plano gates em poucos minutos, 2026-10-16). Desde 2026-10-27 os lentos também usam quatro: a bateria os
+       agenda sozinhos na máquina (`PESO_DO_GATE` em tools/gates.mjs), e com dois a bateria completa esperava 17 minutos por
+       eles enquanto dois processadores ficavam parados. `npm test`, que roda tudo de uma vez, continua com dois. */
+    maxWorkers: MODO === 'rapidos' || MODO === 'lentos' ? 4 : 2,
 
     /* O segundo repórter grava a duração de cada arquivo em
        `tmp/gates/duracoes-dos-testes.json`, que o `tools/gates.mjs` lê para

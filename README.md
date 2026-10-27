@@ -3,8 +3,8 @@
 Oficina procedural para IA criar, organizar, inspecionar, medir e corrigir
 objetos 3D mecânicos: núcleo geométrico, receitas determinísticas, bancada de
 inspeção e ferramentas de validação.
-[Abrir a bancada](https://warbookbr.github.io/nos-modelar/bancada.html), a
-única aplicação publicada.
+A bancada, a única aplicação, roda localmente (`npm run dev`, abaixo); a
+publicação no GitHub Pages saiu em 2026-10-27, porque o repositório é privado.
 
 ## Como se trabalha
 
