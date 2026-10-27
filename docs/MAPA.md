@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1482 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1483 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2017,6 +2017,7 @@
 ## tools/mapa/
 
 - `citacoes.mjs` — citacoes.mjs — documento de leitura obrigatória não pode mandar abrir arquivo que não existe.
+- `citacoes.test.mjs` — citacoes.test.mjs — o nome do que saiu só aparece em documento vivo numa frase que diz que saiu, e o repositório passa.
 - `descricoes.test.mjs` — descricoes.test.mjs — a descrição do cabeçalho entra em toda sessão.
 - `estrutura-docs.mjs` — estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
 - `estrutura-docs.test.mjs` — estrutura-docs.test.mjs — cada gate é visto REPROVANDO antes de ser aceito.

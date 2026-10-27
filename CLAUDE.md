@@ -2,18 +2,19 @@
 
 Só o que nenhuma ferramenta confere; a regra que um gate cobra chega como recusa
 dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP
-`comecar`) diz o que ler, a skill, os comandos e o passo seguinte.
+`comecar`) diz o que ler, a skill e o passo seguinte.
 
 <!-- roteiros:inicio -->
 - `mudar`: A mudança segue o plano ativo ou corrige um defeito pontual?
 - `documentar`: Escrever, mover ou cortar documento, fora de um plano.
 - `pesquisar`: Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
-- `modelar`: A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?
+- `modelar`: A tarefa é uma peça, um esboço sem referência ou uma auditoria?
 <!-- roteiros:fim -->
 
 <!-- invariantes:inicio -->
 ## Regras
 
+- O núcleo não conhece veículo nem outro domínio de objeto.
 - Conteúdo salvo é determinístico, versionado, reexecutável e validável.
 - Modele e revise peças na bancada neutra antes de levá-las ao produto. Nenhuma
   métrica aprova forma sozinha, e quem aprova forma é a pessoa.

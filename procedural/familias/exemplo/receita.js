@@ -25,7 +25,7 @@ export const MATERIAIS = {
   aco: { tipo: 'metal', cor: '#b9bdc3', acabamento: 'escovado' },
 };
 
-/* Parte sem material aqui é erro. */
+/* Parte sem material é erro. */
 export const MATERIAL_DA_PARTE = {
   corpo: 'corpo', porta: 'corpo', painel: 'corpo', vidro: 'vidro', botao: 'escuro', indicador: 'corpo', pes: 'escuro',
   grelha: 'aco', puxador: 'aco',

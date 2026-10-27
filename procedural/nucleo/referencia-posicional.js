@@ -11,8 +11,8 @@
    diverge de novo; a cura é uma fonte só.
 
    ONDE ELA MORA: aqui, junto do formato que classifica. A Oficina humana e seu
-   harness foram retirados da Mecanifica; hoje o consumidor de produção é o
-   gate `id-cru`. Este arquivo não importa nada — nem Three.js, nem o núcleo —
+   harness foram retirados da Mecanifica; hoje o consumidor de produção é a
+   guarda do acervo (`tools/mecanifica/guardas/guarda-acervo.mjs`). Este arquivo não importa nada — nem Three.js, nem o núcleo —
    e continua portátil para uma futura extração ao NÓS.
 
    O QUE A REGRA DIZ. O formato salvo aceita SEIS formas de COLEÇÃO de id cru.

@@ -26,8 +26,14 @@ que descrição, medidas e gates estão limpos. Ele recebe o pedido que
 parte em arquivos separados, o alvo ou a referência quando existem, as partes
 que o plano promete com a forma e a técnica, os critérios de reprovação e as
 perguntas. Ele não recebe receita, código, passos, medidas, o raciocínio de quem
-modelou nem o histórico da construção. Quando a forma vai à pessoa sem alvo, a
+modelou nem o histórico da construção. Sempre que a forma vai à pessoa, a
 legibilidade cega (só a imagem e "o que é isto?") roda antes.
+
+Três laços usam outro pacote, sem receita, código nem medidas e com o mesmo
+veredito: o refino de carroceria, com o pacote cego e as rodadas além da
+primeira com a pessoa; o
+processo leve, com a prancha dos perfis (skill `laco-de-modelagem`); e o esboço,
+com o brief do Condutor (skill `laco-do-esboco`).
 
 Ele responde com o veredito `mecanifica.veredito-de-forma` em bloco JSON:
 `alvo`, `nota` de 0 a 10, `observacao` de até 240 caracteres e `defeitos`, cada
@@ -122,27 +128,15 @@ pareamento e o crítico registra os hashes de ambos os lados da comparação.
 
 O que se despacha ao crítico é a imagem, e a pergunta é sobre o que ela
 mostra. Receita, código, passos, contrato e relatório não vão para ele, pelo
-motivo dado na seção 3 de [`LACO-VISUAL.md`](LACO-VISUAL.md), com a única
-exceção da forma 3 abaixo.
+motivo dado na seção 3 de [`LACO-VISUAL.md`](LACO-VISUAL.md), e o crítico não
+recebe medida nenhuma. Duas perguntas valem sobre a imagem: a legibilidade cega,
+só o PNG e "o que é isto?", que roda sempre que uma forma vai à pessoa, porque é
+barata e é a única defesa contra entregar algo que o autor já não consegue
+enxergar; e as condições de rejeição declaradas, perguntando quais estão
+violadas no que se vê, sem o motivo de cada escolha, que ancora. Esta roda em
+marco e depois da medida limpa, porque gastá-la no que a medida já reprova é
+desperdício. Além de "achado, nunca aprovação" (`LACO-VISUAL.md`, seção 3):
 
-Três formas de despacho, da mais forte para a mais fraca:
-
-1. **Legibilidade cega.** Entregue só o PNG, sem dizer o que é, e pergunte
-   "o que é isto?". Se a resposta não bate com a intenção, é achado — e o teste
-   não exige gosto nenhum, só verifica se a forma comunica. É a forma padrão.
-2. **Condições de rejeição sobre a imagem.** Entregue o PNG e a lista de
-   condições de rejeição declaradas, e pergunte quais estão violadas **no que se
-   vê**. Omita o motivo de cada escolha: o motivo é justamente o que ancora.
-3. **Reinterpretação da medida.** Entregue o relatório numérico junto do PNG e
-   peça a leitura independente. Pega o caso em que o autor explica um alerta em
-   vez de corrigir. É a forma mais fraca porque reintroduz números.
-
-Além de "achado, nunca aprovação" (`LACO-VISUAL.md`, seção 3), o papel obedece a estes:
-
-- **legibilidade cega roda sempre que uma forma vai ao usuário.** É barata e é
-  a única defesa contra entregar algo que o autor já não consegue enxergar. As
-  formas 2 e 3, essas sim, rodam em marco e depois da medida limpa: são caras e
-  gastá-las no que a medida já reprova é desperdício;
 - **cada despacho é partida fria** e reconstrói contexto;
 - **não edita.** Aponta e prova; quem corrige é o modelador.
 
@@ -156,14 +150,9 @@ Para legibilidade cega, sem referência e sem dizer o que é:
 > que na forma sustenta essa leitura? Se algo na imagem contradiz a leitura que
 > você deu, aponte.
 
-Para comparação contra referência:
-
-> Compare a peça atual com as referências considerando silhueta, proporções,
-> continuidade entre superfícies, espessura, profundidade, acabamento de bordas
-> e detalhes funcionais. Liste no máximo cinco divergências que mais impedem
-> atingir o nível de realismo solicitado. Para cada uma, indique a região
-> visual, a evidência observável, a condição de aceite e se a correção parece
-> exigir ajuste, remodelagem local ou capacidade ausente.
+Para comparação contra referência, o pedido do `npm run vistas:critica` já traz
+a pergunta, e a resposta é o veredito de [O laço do crítico](#o-laço-do-crítico),
+com defeitos tipados no lugar de uma lista livre de divergências.
 
 Uma crítica sem referência pode ser usada depois para perguntar o que parece
 artificial, desconectado ou estruturalmente improvável. Ela não substitui a

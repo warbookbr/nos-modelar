@@ -77,7 +77,7 @@ o núcleo nem define o modelo de autoria.
 | `modulos/` | ferramentas isoladas (esboço, contorno da imagem, exportadores), cada uma com o próprio README |
 | `bancada.html`, `src/bancada/` | bancada: inspeção para a IA, edição para a pessoa |
 | `src/autoria/` | núcleo headless: topologia, alvo, descrição do gesto, adaptadores |
-| `tools/bancadas/` | porteiro, criação, exportação e gabaritos |
+| `tools/bancadas/` | porteiro e harness de render das fixtures |
 | `tools/mecanifica/` | gates da bancada, revisão e contratos |
 | `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
 | `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |

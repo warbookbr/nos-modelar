@@ -135,8 +135,8 @@ export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
 }
 
 /* A CADEIA DA RECEITA. A receita do acervo escreve as medidas uma vez, na `TABELA`
-   em milímetro, e os passos saem dela: `derivar()` converte, `gerarPassos()`
-   escreve, e `PASSOS` é um getter que lê `this.PARAMS`. Com `PASSOS` calculado
+   em milímetro, e os passos saem dela: `derivar()` calcula, `gerarPassos()`
+   converte e escreve, e `PASSOS` é um getter que lê `this.PARAMS`. Com `PASSOS` calculado
    uma vez na carga do módulo, o diagnóstico de parâmetros, o ajuste da bancada e
    quem copia a receita com outra tabela recebem os passos da tabela velha, e a
    peça não muda sem nada acusar; 14 receitas do acervo estavam assim em

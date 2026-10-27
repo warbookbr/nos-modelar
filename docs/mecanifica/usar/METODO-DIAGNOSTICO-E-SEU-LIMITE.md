@@ -89,8 +89,6 @@ hipótese, é preferência.
 
 - **use** para defeito, regressão, contradição entre medida e imagem, e para a
   meta-pergunta "por que esta abordagem não funciona";
-- **use** no gate de calibração do canal de percepção: separar artefato
-  reprovado de superfície sã é pergunta diagnóstica pura;
 - **não use** para decidir forma, proporção ou caráter. Aí valem referência
   medida, restrição declarada, solver e busca;
 - **pare** quando os achados encolherem e a nota não subir.

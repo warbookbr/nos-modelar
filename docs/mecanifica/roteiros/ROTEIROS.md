@@ -29,14 +29,14 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 Sem roteiro, ou com o nome de um grupo, o `comecar` faz a pergunta do grupo e lista os ramos:
 
 - `mudar`: A mudança segue o plano ativo ou corrige um defeito pontual?
-- `modelar`: A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?
+- `modelar`: A tarefa é uma peça, um esboço sem referência ou uma auditoria?
 - `modelar/peca`: A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?
 
 ## Regras cobradas por gate
 
 Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no momento do erro:
 
-- O núcleo de autoria é independente de Three.js e do domínio automotivo. O teste
+- O núcleo de autoria é independente de Three.js. O teste
   `tools/arquitetura/nucleo-sem-three.test.mjs`, do gate `test`, confere.
 - IDs internos, índices de arrays e posições de passos nunca são identidade persistida; a receita do
   acervo que endereça a malha por id posicional é recusada. O gate `guarda:acervo` confere.

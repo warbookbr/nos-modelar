@@ -77,16 +77,17 @@ fundir todos os objetos em uma receita única.
 
 A plataforma procedural extensível, de um plano já encerrado, acrescentou uma
 fronteira interna a essa direção: o núcleo executa um registro explícito de módulos e
-operações; contratos executáveis derivam catálogo, schemas, documentação e
-grafos de capacidades; subgrafos declarativos e extensões nativas confinadas
+operações; contratos executáveis derivam catálogo, schemas e documentação;
+subgrafos declarativos e extensões nativas confinadas
 ampliam o vocabulário sem concentrá-lo novamente num arquivo único. A
 `entrada.js` é a entrada canônica pequena, e não a dona das implementações.
 
-Capacidades, procedimento e montagem possuem grafos diferentes. O grafo de
-capacidades explica disponibilidade e dependências do motor; o procedural
-registra execução e procedência da peça; o de montagem preserva composição e
-relações entre instâncias. Todos são derivados de dados executáveis, não de
-diagramas mantidos à mão.
+Capacidades, procedimento e montagem têm registros diferentes. O catálogo de
+capacidades diz o que o motor oferece (o grafo de capacidades derivado dele
+saiu em 2026-10-27, porque ninguém o lia); o procedural registra execução e
+procedência da peça; o de montagem preserva composição e relações entre
+instâncias. Todos são derivados de dados executáveis, não de diagramas mantidos
+à mão.
 
 A regra de direção é:
 

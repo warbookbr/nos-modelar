@@ -3,16 +3,22 @@
   "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
   "perguntas": {
     "mudar": "A mudança segue o plano ativo ou corrige um defeito pontual?",
-    "modelar": "A tarefa é uma peça (receita), um esboço sem referência, ou a auditoria de uma peça ou de uma montagem?",
+    "modelar": "A tarefa é uma peça, um esboço sem referência ou uma auditoria?",
     "modelar/peca": "A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?"
   },
   "invariantes": [
     {
       "id": "nucleo-independente",
       "secao": "regras",
-      "texto": "O núcleo de autoria é independente de Three.js e do domínio automotivo.",
+      "texto": "O núcleo de autoria é independente de Three.js.",
       "gate": "test",
       "teste": "tools/arquitetura/nucleo-sem-three.test.mjs"
+    },
+    {
+      "id": "nucleo-sem-dominio",
+      "secao": "regras",
+      "texto": "O núcleo não conhece veículo nem outro domínio de objeto.",
+      "gate": null
     },
     {
       "id": "identidade",

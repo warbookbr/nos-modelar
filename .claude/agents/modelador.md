@@ -57,7 +57,8 @@ contrato de autoria que ela aponta. Além dele, estas regras deste papel:
   contra a declaração da própria peça. Quem pega isso hoje é
   `guarda:referencial`, depois da geometria escrita.
 - **Nenhuma posição é digitada à mão.** A `TABELA`, em milímetros, carrega a
-  medida e `derivar()` calcula a posição em metro, como manda a cadeia de
+  medida, `derivar()` calcula a posição e `gerarPassos()` a converte para metro
+  com `m()`, como manda a cadeia de
   [`AUTORIA-DE-PECA.md`](../../docs/mecanifica/usar/AUTORIA-DE-PECA.md).
 - **Declare os contatos antes de medir**, com motivo escrito. Declarar depois de
   ver o vermelho transforma o veredito em carimbo.

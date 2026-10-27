@@ -90,8 +90,8 @@ conferente.
 
 **1. `loft` sem polo sai TUBO ABERTO.** Uma seção `{pos, raio: 0}` em cada ponta
 fecha a forma. Sem isso a lâmina da espada entrou com 24 arestas de borda — que
-é buraco, e buraco reprova no preparo para micropolígono. O polo da base pode
-ficar enterrado dentro da peça vizinha; ele existe para fechar, não para
+é buraco, e buraco reprova na conferência de topologia
+(`npm run malha:conferir`). O polo da base pode ficar enterrado dentro da peça vizinha; ele existe para fechar, não para
 aparecer.
 
 **2. Quad de `loft` só sai PLANO quando as duas seções são SEMELHANTES** — mesma

@@ -27,8 +27,8 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de 
    objeto, e os comandos a chamam por `<objeto>/<parte>`.
 3. A receita segue a cadeia do contrato
    [`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
-   `TABELA` em milímetros exportada como `PARAMS`, `derivar()` que converte
-   para metro, `gerarPassos()` que escreve os passos, e
+   `TABELA` em milímetros exportada como `PARAMS`, `derivar()` que calcula,
+   `gerarPassos()` que converte com `m()` e escreve, e
    `get PASSOS() { return gerarPassos(this.PARAMS); }`. Nenhuma posição é
    digitada no passo; `npm run parametros -- <peça>` diz quais parâmetros
    estão ligados.

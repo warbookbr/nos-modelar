@@ -11,7 +11,7 @@ humana, o Playground e a aplicação jogável, que não existem mais aqui.
 
 | Arquivo | O que prova |
 |---|---|
-| [`REGISTRO-FALHAS-AUTORIA-V.md`](REGISTRO-FALHAS-AUTORIA-V.md) | as 38 falhas medidas da autoria (V-01 a V-38); leitura obrigatória antes de reabrir hipótese de forma |
+| [`REGISTRO-FALHAS-AUTORIA-V.md`](REGISTRO-FALHAS-AUTORIA-V.md) | as 38 falhas medidas da autoria (V-01 a V-38); evidência para consultar antes de reabrir uma hipótese de forma, sem valor de regra |
 | [`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) | medição cega do efeito do fluxo sobre modeladores |
 | [`EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) | prova isolada do perfil de autoria realista |
 | [`CADEIRA-REALISTA-NOTAS.md`](CADEIRA-REALISTA-NOTAS.md) | diário da cadeira contra foto, com os limites de motor; a receita foi apagada e o documento saiu de `usar/` em 2026-09-23 |

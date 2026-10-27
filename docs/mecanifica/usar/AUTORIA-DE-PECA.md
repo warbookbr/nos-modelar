@@ -81,20 +81,23 @@ repetir:
 
 1. a `TABELA`, em milímetros, é o que se mede e se edita; a receita a exporta
    como `PARAMS`;
-2. `derivar(tabela)` converte para metro e calcula posições, ângulos e
+2. `derivar(tabela)` calcula, ainda em milímetro, posições, ângulos e
    comprimentos que dependem de mais de uma medida;
-3. `gerarPassos(tabela)` escreve os passos já em metro, sem nenhum número que
-   não venha de `derivar`;
+3. `gerarPassos(tabela)` escreve os passos em metro, convertendo o que vem de
+   `derivar` com uma função só (`m()`), sem nenhum número que não venha dele;
 4. `get PASSOS() { return gerarPassos(this.PARAMS); }` liga a lista de passos à
    tabela, para mudar a tabela mudar a peça.
 
 Milímetro é a unidade em que peça mecânica se mede e se desenha. Metro é a
-unidade da malha, do visor e dos formatos 3D, e a conversão acontece num lugar
-só, dentro de `derivar`. Um estilo mais antigo põe `PARAMS` em metro e cita o
+unidade da malha e dos formatos 3D, e a conversão acontece num lugar só, a
+função `m()` que `gerarPassos` usa, como no exemplo canônico do
+[`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), que um teste executa. Um estilo mais antigo põe `PARAMS` em metro e cita o
 parâmetro pelo nome dentro do passo; ele ainda existe em fixtures, e não é o
 padrão de receita nova. Quando uma montagem v5 deriva um parâmetro da porta de
 uma vizinha, o vínculo declara a unidade do parâmetro, porque a medida da porta
-vem sempre em metro. Hoje nenhum gate confere esta cadeia.
+vem sempre em metro. A guarda do acervo recusa a receita do acervo sem a
+cadeia inteira (`TABELA`, `derivar`, `gerarPassos` e `PASSOS` como getter); que
+nenhuma posição seja digitada no passo ela não confere.
 
 A receita que parte de um andaime da forma global N2 declara isso em `REFINA`, ao
 lado de `PLANO`: o caminho do andaime, o volume que cada parte refina e a

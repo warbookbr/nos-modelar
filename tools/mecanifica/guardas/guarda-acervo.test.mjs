@@ -190,6 +190,41 @@ export default { PARAMS: TABELA, get PASSOS() { return gerarPassos(this.PARAMS);
     rmSync(pasta, { recursive: true, force: true });
   });
 
+  /* AS TRÊS REGRAS NUMA PEÇA DO ACERVO DE VERDADE. Os casos acima provam cada regra pela função; estes escrevem uma peça na
+     pasta do acervo, com plano válido, e provam que a guarda a reprova pelo motivo da regra e por nenhum outro. Sem eles,
+     um ramo da guarda que deixasse de chamar a função passaria com o acervo de hoje inteiro limpo. */
+  async function reprovacaoDe(nome, corpo) {
+    const pasta = join(ACERVO, nome);
+    mkdirSync(join(pasta, 'referencias'), { recursive: true });
+    writeFileSync(join(pasta, 'referencias', 'alvo.md'), '# alvo de ensaio\n', 'utf8');
+    writeFileSync(join(pasta, 'receita.js'), corpo, 'utf8');
+    try {
+      const { reprovadas } = await conferirAcervo([nome]);
+      return reprovadas.map((r) => r.motivo).join('\n');
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  }
+  const PLANO_DE_ENSAIO = (partes) => `PLANO: { objeto: 'peça de ensaio da guarda do acervo', referencias: ['referencias/alvo.md'], escala: { medida: 'lado', milimetros: 400 }, partes: ${JSON.stringify(partes.map((nome) => ({ nome, forma: `cubo de ensaio ${nome}`, tecnica: 'cubo do núcleo' })))}, criteriosDeReprovacao: ['a peça não sai como dois cubos de ensaio'] }`;
+  const CONTATO = "contatos: [{ par: ['base', 'tampa'], motivo: 'os dois cubos de ensaio se apoiam lado a lado' }],";
+  const cadeia = (passos, extra = CONTATO) => `export const TABELA = { lado: 400, vao: 0 };
+export function derivar(t) { return { lado: t.lado, vao: t.vao }; }
+const m = (mm) => mm / 1000;
+export function gerarPassos(t) { const d = derivar(t); return ${passos}; }
+export default { meta: { nome: 'ensaio' }, PARAMS: TABELA, MATERIAIS: { a: { tipo: 'liso', cor: '#888888' } }, ${PLANO_DE_ENSAIO(['base', 'tampa'])}, ${extra} get PASSOS() { return gerarPassos(this.PARAMS); } };
+`;
+  const DOIS_CUBOS = (vao) => `[['cubo', { origemId: 1, larg: m(d.lado), alt: m(d.lado), prof: m(d.lado), em: [0, m(d.lado) / 2, 0] }], ['cubo', { origemId: 2, larg: m(d.lado), alt: m(d.lado), prof: m(d.lado), em: [m(d.lado + ${vao}), m(d.lado) / 2, 0] }], ['parte', { nome: 'base', sel: { origem: { op: 'cubo', id: 1 } } }], ['parte', { nome: 'tampa', sel: { origem: { op: 'cubo', id: 2 } } }]]`;
+
+  it('REPROVA no acervo a receita com PASSOS calculado uma vez, a que endereça por id posicional e a de parte solta', async () => {
+    const congelada = cadeia(DOIS_CUBOS(0)).replace("get PASSOS() { return gerarPassos(this.PARAMS); }", 'PASSOS: gerarPassos(TABELA)');
+    expect(await reprovacaoDe('ensaio-guarda-cadeia', congelada)).toMatch(/CADEIA DA RECEITA INCOMPLETA/);
+    const posicional = cadeia(`[...${DOIS_CUBOS(0)}, ['material', { faces: [0, 1], usa: 'a' }]]`);
+    expect(await reprovacaoDe('ensaio-guarda-posicional', posicional)).toMatch(/REFERÊNCIA\(S\) POR ID POSICIONAL/);
+    expect(await reprovacaoDe('ensaio-guarda-solta', cadeia(DOIS_CUBOS(300), ''))).toMatch(/PARTE\(S\) OU GRUPO\(S\) SOLTO\(S\)/);
+    /* A mesma peça com os cubos encostados e por nome passa: o motivo é a regra, e não o resto da peça de ensaio. */
+    expect(await reprovacaoDe('ensaio-guarda-limpa', cadeia(DOIS_CUBOS(0)))).toBe('');
+  }, 120000);
+
   it('peça em pasta não é acusada de forma antiga', () => {
     for (const peca of pecasDoAcervo()) expect(emArquivoSolto(peca), peca).toBe(false);
     /* Peça que não existe não é acusada: quem reclama de nome inexistente é o
