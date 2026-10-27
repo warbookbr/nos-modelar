@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação,
  * face de área nula, face fina, face torta e triângulo de área nula na triangulação do leque, vértice no meio de aresta e o
- * resto que `modulos/topologia` confere. A face torta e o triângulo da triangulação vinham do preparo de micropolígono, e a
+ * resto que `procedural/nucleo/topologia.js` confere. A face torta e o triângulo da triangulação vinham do preparo de micropolígono, e a
  * redução sem perda do otimizador de malha; os dois módulos saíram em 2026-10-25 e as duas verificações úteis passaram à
  * topologia.
  *
@@ -41,7 +41,7 @@ try {
 if (!existsSync(absoluto)) uso(`receita não encontrada: ${alvo}`);
 
 const { executarReceita } = await import(pathToFileURL(path.join(REPO, 'src/autoria/executar-receita.js')).href);
-const { analisarTopologia } = await import(pathToFileURL(path.join(REPO, 'modulos/topologia/src/analisar.js')).href);
+const { analisarTopologia } = await import(pathToFileURL(path.join(REPO, 'procedural/nucleo/topologia.js')).href);
 
 const modulo = await import(pathToFileURL(absoluto).href);
 const receita = modulo.default ?? Object.values(modulo).find((v) => v && typeof v === 'object' && v.PASSOS);

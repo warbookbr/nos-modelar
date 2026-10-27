@@ -867,14 +867,6 @@
 - `metal-tecido.test.js` — Testes de metal e tecido: determinismo, tile contínuo, efeito de cada campo, e regressão de madeira e liso.
 - `textura.test.js` — Testes do gerador de textura: determinismo, tile contínuo, veio, tábuas, liso e recusas.
 
-## modulos/topologia/src/
-
-- `analisar.js` — analisar.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve.
-
-## modulos/topologia/tests/
-
-- `analisar.test.js` — analisar.test.js — cada regra é vista REPROVANDO um defeito construído de propósito, e APROVANDO a malha sã correspondente.
-
 ## procedural/
 
 - `README.md` — procedural — núcleo, receitas, famílias e extensões
@@ -959,7 +951,7 @@
 
 ## procedural/familias/exemplo/
 
-- `exemplo.test.js` — O exemplo de peça de família que o ramo `modelar/peca/familia` entrega: ele executa, cada parte da família sai com material, e o PLANO é válido. Exemplo que …
+- `exemplo.test.js` — O exemplo de peça de família que o ramo `modelar/peca/familia` entrega: ele executa, cada parte da família sai com material, o PLANO é válido e o referencial…
 - `receita.js` — exemplo/receita.js — a receita mínima de uma peça que sai de uma família, para copiar.
 
 ## procedural/familias/movel-de-caixa/
@@ -1068,6 +1060,8 @@
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
+- `topologia.js` — topologia.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve. Até 2026-10-27 morava em `modulos/topologia/`; …
+- `topologia.test.js` — topologia.test.js — cada regra é vista REPROVANDO um defeito construído de propósito, e APROVANDO a malha sã correspondente.
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
 

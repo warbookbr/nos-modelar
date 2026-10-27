@@ -52,7 +52,7 @@ Nenhuma regra some: cada regra que sai de um documento passa a outro lugar dito 
 8. **Tempo da bateria.** `mcp:check` entra em `mcp:visual:check`, e o teste que varre o acervo é medido por etapa e reorganizado sem perder o que prova. Feita em 2026-10-25.
 9. **Medida de depois.** As tarefas da fatia 1 são refeitas por IAs novas pelo caminho novo, e o gate 1 é medido; o inventário de regras é refeito. Feita em 2026-10-25, sem passar o gate 1; o inventário fica para a fatia 11.
 10. **Caminho de correção e exemplo de família.** A medida de depois leu 22% e 24% menos, contra os 60% do gate 1 (decisão 6). O `mudar` vira grupo, com um ramo para seguir o plano e outro para corrigir um defeito pontual, que não manda ler os índices; o ramo de peça de família entrega uma receita curta de exemplo, executada por teste, no lugar da receita da hélice de 15 KB. Pronto quando os dois ramos passam no gate da árvore e o exemplo roda. Feita em 2026-10-27.
-11. **Medida de depois, de novo.** As duas tarefas refeitas por IAs novas, uma vez, pelo roteiro da medida; o resultado entra no `RESULTADO.md` e o gate 1 é julgado com ele. O inventário de regras é refeito. Sai também o grafo de capacidades do catálogo, que nenhum fluxo lia, com o documento de como recriá-lo (decisão 7).
+11. **Medida de depois, de novo.** As duas tarefas refeitas por IAs novas, uma vez, pelo roteiro da medida; o resultado entra no `RESULTADO.md` e o gate 1 é julgado com ele. O inventário de regras é refeito. Sai também o grafo de capacidades do catálogo, que nenhum fluxo lia, com o documento de como recriá-lo (decisão 7). A conferência de topologia sai de `modulos/topologia/` para `procedural/nucleo/topologia.js`, porque é análise do núcleo e não módulo à parte (decisão 8).
 12. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o de [renomear para Modelar](2026-10-25-renomear-para-modelar.md), depois o da bateria rápida e retorno cedo, e então o de ajustes no núcleo dos veículos.
 
 ## Decisões da pessoa
@@ -64,6 +64,7 @@ Nenhuma regra some: cada regra que sai de um documento passa a outro lugar dito 
 5. **Áreas a investigar.** Decidida em 2026-10-25, na fatia 7: saem o visor e as bancadas herdados do NÓS e os três estudos de campo de agosto que rodavam como teste; ficam o tradutor de receitas externas, a revalidação em cascata com a autoria por MCP e as três famílias que nenhuma peça do acervo chama.
 6. **Uma fatia a mais para o gate 1.** Aprovada em 2026-10-27: a leitura caiu menos que o pedido, e o plano ganha o ramo de correção, o exemplo de família e uma nova medida; se ainda não chegar a 60%, o plano fecha registrando o gate 1 como não atingido.
 7. **Grafo de capacidades.** Aprovada em 2026-10-27: sai, com o recurso do MCP e os arquivos gerados, e o documento de como recriá-lo fica no histórico.
+8. **Topologia no núcleo.** Aprovada em 2026-10-27: o analisador de topologia muda para o núcleo, com o mesmo formato de resultado, e o pacote `@mecanifica/topologia` deixa de existir.
 
 ## Riscos e parada
 

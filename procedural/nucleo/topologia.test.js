@@ -1,4 +1,4 @@
-/* analisar.test.js — cada regra é vista REPROVANDO um defeito construído de
+/* topologia.test.js — cada regra é vista REPROVANDO um defeito construído de
  * propósito, e APROVANDO a malha sã correspondente.
  *
  * Detector que só foi visto aprovando é aprovação por vacuidade: ele pode estar
@@ -6,7 +6,7 @@
  * ("detector que devolve `passa` fora do seu escopo"), então aqui cada achado
  * tem o seu par: um caso que o dispara e um que não. */
 import { describe, expect, it } from 'vitest';
-import { analisarTopologia, verticesCoincidentes, ErroTopologia } from '../src/analisar.js';
+import { analisarTopologia, verticesCoincidentes, ErroTopologia } from './topologia.js';
 
 /* Cubo fechado, orientação coerente, tudo quadrilátero: a malha sã de
    referência. Cantos em ordem anti-horária vistos de fora. */

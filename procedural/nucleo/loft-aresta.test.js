@@ -2,7 +2,7 @@
    sem leque nem triângulo dobrado. */
 import { describe, expect, it } from 'vitest';
 import { nucleo } from './nucleo.js';
-import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from './topologia.js';
 
 
 function executar(passos) {

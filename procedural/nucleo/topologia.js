@@ -1,5 +1,6 @@
-/* analisar.js — organizador de topologia: diz o que há de errado no traçado de
- * uma malha, e nunca a reescreve.
+/* topologia.js — organizador de topologia: diz o que há de errado no traçado de
+ * uma malha, e nunca a reescreve. Até 2026-10-27 morava em `modulos/topologia/`;
+ * veio para o núcleo porque é geometria que vira veredito, como a espessura.
  *
  * POR QUE SÓ VEREDITO. A arquitetura deste repositório fixa que geometria→número
  * ou veredito cabe no núcleo, e geometria→geometria nova não, porque a

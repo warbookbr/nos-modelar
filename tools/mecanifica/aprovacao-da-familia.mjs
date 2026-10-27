@@ -25,7 +25,7 @@
  * `conferirAprovacao` (o gate `familias:check`): o hash dos três pontos tem de continuar batendo. */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from '../../procedural/nucleo/topologia.js';
 import {
   REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes, expandirChamadasDeComposicao, neutroCanonico,
 } from '../../procedural/nucleo/entrada.js';

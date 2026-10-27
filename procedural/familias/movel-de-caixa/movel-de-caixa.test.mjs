@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
-import { analisarTopologia } from '../../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from '../../nucleo/topologia.js';
 import { conferirAberturasSimultaneas, conferirArticulacao } from '../../../src/autoria/conferir-articulacao.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';

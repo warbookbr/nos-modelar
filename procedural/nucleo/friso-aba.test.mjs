@@ -15,7 +15,7 @@ import { ajustarGaiolaAsMedidas, subdividirCatmullClark } from './subdivisao.js'
 import { neutroCanonico, nucleo } from './entrada.js';
 import { cruzamentos, triangulos, volume } from './fixtures/medidas-de-malha.js';
 import * as prova from './fixtures/aba-prova.js';
-import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from './topologia.js';
 
 /* O que o motor de micropolígono recusaria: casca aberta, não-manifold, orientação incoerente e triângulo de área nula. */
 const RECUSA_DE_SAIDA = ['malha-aberta', 'nao-manifold', 'orientacao-incoerente', 'canto-repetido', 'area-nula', 'triangulo-degenerado'];

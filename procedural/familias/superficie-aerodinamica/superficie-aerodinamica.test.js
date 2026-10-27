@@ -11,7 +11,7 @@ import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { auditarParDeSolidos, prepararSolido } from '../../../src/autoria/contato-de-solidos.js';
 import { aprovarFamilia, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/mecanifica/aprovacao-da-familia.mjs';
-import { analisarTopologia } from '../../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from '../../nucleo/topologia.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
 import { FAMILIAS, ErroChamadaDeFamilia, chamar, criarRegistroDeFamilias } from '../index.js';

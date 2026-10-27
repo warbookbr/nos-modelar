@@ -7,7 +7,7 @@
    êmbolo, o anel do olhal tem raio de 0,55 do êmbolo e o corpo da haste acaba a 0,85 do êmbolo do pino dianteiro, onde o
    colar do terminal começa. */
 import { describe, expect, it } from 'vitest';
-import { analisarTopologia } from '../../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from '../../nucleo/topologia.js';
 import { ErroArticulacao } from '../../extensoes/articulacao/declaracao.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { conferirArticulacao } from '../../../src/autoria/conferir-articulacao.js';

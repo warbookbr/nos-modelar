@@ -1,4 +1,4 @@
-import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from '../../procedural/nucleo/topologia.js';
 
 /* forma-da-parte — a peça saiu com a forma que a receita prometeu?
  *

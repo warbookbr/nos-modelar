@@ -37,9 +37,9 @@ ele. A definição completa está em
   e para OBJ com partes nomeadas.
 - [`textura`](modulos/textura/): gera em JavaScript a imagem de cor de um
   material (madeira e liso) como tile contínuo.
-- [`topologia`](modulos/topologia/): aponta defeitos de traçado da malha, e com
-  a triangulação ligada também a face torta e o triângulo de área nula
-  (`npm run malha:conferir`).
+- **conferência de topologia** (`procedural/nucleo/topologia.js`): aponta
+  defeitos de traçado da malha, e com a triangulação ligada também a face torta
+  e o triângulo de área nula (`npm run malha:conferir`).
 
 Os módulos em `modulos/` têm `package.json`, `src/` e `tests/` próprios e não
 importam o núcleo procedural, exceto o esboço, que lê o avaliador de expressões.

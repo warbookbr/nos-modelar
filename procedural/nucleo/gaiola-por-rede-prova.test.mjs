@@ -17,7 +17,7 @@ import { nucleo } from './entrada.js';
 import { distancias, triangulos, volume } from './fixtures/medidas-de-malha.js';
 import { sha256Hex } from './sha256.js';
 import { COMPRIMENTO, GOTA, altura, contornoDaGota, definicao, montagem, receitaComMoldura } from './fixtures/gaiola-por-rede-prova.js';
-import { analisarTopologia } from '../../modulos/topologia/src/analisar.js';
+import { analisarTopologia } from './topologia.js';
 
 const MM = 1000;
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
