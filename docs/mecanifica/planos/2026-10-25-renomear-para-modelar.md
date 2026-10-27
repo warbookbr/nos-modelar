@@ -42,7 +42,7 @@ As peças do acervo regeneram iguais. Nenhum formato salvo muda de identificador
 1. **Nome, texto e endereço.** O nome no texto corrido, nos títulos, no `CLAUDE.md`, no `package.json`, no servidor MCP e nos documentos de coordenação; a base do Vite e os caminhos `/nos-mecanifica/` da página publicada e dos testes; o remoto git. Pronto quando a página abre no endereço novo e o texto corrido fora do histórico não tem o nome antigo.
 2. **Pastas.** `docs/mecanifica/` vira `docs/modelar/`, `tools/mecanifica/` vira `tools/modelar/` e os módulos `@mecanifica/*` mudam de escopo, com os imports, os scripts, os gates ancorados por caminho, os links e as páginas geradas refeitos numa passada só. Os links dos documentos encerrados são corrigidos sem mudar o texto deles. Pronto quando os gates de links, citações, estrutura e mapa passam.
 3. **Variáveis e gate do nome.** As variáveis `MECANIFICA_*` viram `MODELAR_*`, e o código aceita o nome antigo com aviso até o fechamento do plano seguinte; a pessoa troca o segredo do CI e o arquivo da chave fora do repositório. Entra o gate que recusa o nome antigo fora das exceções (formatos, banco local, histórico, aviso de leitura). Pronto quando o CI passa pelo nome novo.
-4. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o plano de ajustes no núcleo dos veículos volta a ser o seguinte.
+4. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o da [bateria rápida e retorno cedo](2026-10-27-bateria-rapida-e-retorno-cedo.md), e depois dele o de ajustes no núcleo dos veículos.
 
 ## Decisões da pessoa
 

@@ -53,7 +53,7 @@ Nenhuma regra some: cada regra que sai de um documento passa a outro lugar dito 
 9. **Medida de depois.** As tarefas da fatia 1 são refeitas por IAs novas pelo caminho novo, e o gate 1 é medido; o inventário de regras é refeito. Feita em 2026-10-25, sem passar o gate 1; o inventário fica para a fatia 11.
 10. **Caminho de correção e exemplo de família.** A medida de depois leu 22% e 24% menos, contra os 60% do gate 1 (decisão 6). O `mudar` vira grupo, com um ramo para seguir o plano e outro para corrigir um defeito pontual, que não manda ler os índices; o ramo de peça de família entrega uma receita curta de exemplo, executada por teste, no lugar da receita da hélice de 15 KB. Pronto quando os dois ramos passam no gate da árvore e o exemplo roda. Feita em 2026-10-27.
 11. **Medida de depois, de novo.** As duas tarefas refeitas por IAs novas, uma vez, pelo roteiro da medida; o resultado entra no `RESULTADO.md` e o gate 1 é julgado com ele. O inventário de regras é refeito.
-12. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o de [renomear para Modelar](2026-10-25-renomear-para-modelar.md), e depois dele o de ajustes no núcleo dos veículos.
+12. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o de [renomear para Modelar](2026-10-25-renomear-para-modelar.md), depois o da bateria rápida e retorno cedo, e então o de ajustes no núcleo dos veículos.
 
 ## Decisões da pessoa
 
