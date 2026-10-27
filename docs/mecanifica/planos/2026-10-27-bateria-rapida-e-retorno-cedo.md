@@ -33,7 +33,7 @@ Nenhum gate deixa de rodar no CI, que roda tudo sem resultado guardado. Nada ent
 ## Gate de saída
 
 1. Uma mudança só de documento roda a bateria local em menos de 30 s, e uma mudança num módulo só em menos de 90 s, medidas em três mudanças reais de cada tipo.
-2. A segunda rodada, depois de corrigir um gate, roda só o que a correção tocou.
+2. A segunda rodada, depois de corrigir um gate, roda só o que a correção tocou, e com o vigia ligado a bateria antes do envio sai em menos de 10 s depois de uma edição num módulo.
 3. A bateria completa no CI termina em menos de 5 minutos de relógio.
 4. Uma mutação plantada em cada área (núcleo, peça, família, esboço, documento, bancada, MCP) é pega pela bateria local, e a mesma mudança corrigida passa.
 5. Uma mudança com um teste lento quebrado plantado é barrada antes da main, e corrigida entra sozinha.
@@ -42,14 +42,16 @@ Nenhum gate deixa de rodar no CI, que roda tudo sem resultado guardado. Nada ent
 
 1. **Medida e ordem.** O tempo de cada gate e de cada arquivo de teste nas rodadas registradas, e o que cada gate lê; as conferências de menos de cinco segundos rodam primeiro e a bateria para no primeiro erro. Pronto quando uma falha de documento aparece em menos de 30 s.
 2. **Seletor.** O módulo que vai dos arquivos mudados aos gates e testes afetados, com o motivo de cada um, a declaração do que cada gate lê e a recusa do que lê sem declarar; o resultado guardado pela impressão digital. Pronto quando o gate 2 passa e as mutações plantadas da área de documento e de núcleo são pegas.
-3. **Bancada compartilhada e testes lentos.** Um Chromium e um servidor para os gates da bancada, e os dez arquivos de teste mais lentos medidos por etapa e encurtados sem perder o que conferem. Pronto quando os gates da bancada levam menos da metade e nenhum arquivo de teste passa de 60 s.
-4. **CI dividido e envio por ramo.** A bateria completa dividida entre máquinas no GitHub Actions; o envio vai a um ramo e a junção à main só com o CI verde. Pronto quando os gates 3 e 5 passam. Para se a pessoa não quiser dar a permissão de fila ou de proteção da main.
-5. **Fechamento.** As mutações plantadas de todas as áreas, a medida dos gates 1 a 3, backlog e o plano movido para `encerrados/`; o seguinte é o de [renomear para Modelar](2026-10-25-renomear-para-modelar.md), a partir da fatia 2, e depois o de ajustes no núcleo dos veículos.
+3. **Vigia contínuo.** Um processo em segundo plano, que sobe com a sessão, vigia o disco do repositório e, a cada arquivo gravado, roda na hora os gates e testes que o seletor diz afetados, guardando o resultado verde pela impressão digital. Ele espera um ou dois segundos de silêncio antes de rodar, cancela e recomeça quando um arquivo muda no meio, e roda com prioridade baixa para não disputar a máquina. A bateria antes do envio continua sendo a prova: confere a impressão digital de cada arquivo contra o resultado guardado e roda o que o vigia não cobriu. Pronto quando, depois de uma edição num módulo, a bateria antes do envio sai em menos de 10 s, e uma edição feita com o vigia parado é conferida pela bateria do mesmo jeito.
+4. **Bancada compartilhada e testes lentos.** Um Chromium e um servidor para os gates da bancada, e os dez arquivos de teste mais lentos medidos por etapa e encurtados sem perder o que conferem. Pronto quando os gates da bancada levam menos da metade e nenhum arquivo de teste passa de 60 s.
+5. **CI dividido e envio por ramo.** A bateria completa dividida entre máquinas no GitHub Actions; o envio vai a um ramo e a junção à main só com o CI verde. Pronto quando os gates 3 e 5 passam. Para se a pessoa não quiser dar a permissão de fila ou de proteção da main.
+6. **Fechamento.** As mutações plantadas de todas as áreas, a medida dos gates 1 a 3, backlog e o plano movido para `encerrados/`; o seguinte é o de [renomear para Modelar](2026-10-25-renomear-para-modelar.md), a partir da fatia 2, e depois o de ajustes no núcleo dos veículos.
 
 ## Decisões da pessoa
 
 1. **Antes da renomeação.** Aprovada em 2026-10-27: este plano passa à frente da renomeação, que fica pausada depois da fatia 1.
 2. **Meta e envio por ramo.** Aprovada em 2026-10-27: a meta é a bateria local abaixo de um minuto e a completa abaixo de cinco no CI, com o seletor no centro e o envio por ramo.
+3. **Vigia contínuo.** Aprovada em 2026-10-27: um vigia em segundo plano roda o que cada arquivo gravado afeta enquanto o trabalho acontece, e a bateria antes do envio só confere o que ele não cobriu.
 
 ## Riscos e parada
 
@@ -57,4 +59,4 @@ O risco é um gate ou teste pulado que deveria ter rodado; a recusa do que lê s
 
 ## Andamento
 
-Escrito em 2026-10-27 a partir da conversa com a pessoa sobre o tempo e o retorno da bateria, e reescrito no mesmo dia com a meta mais ambiciosa, o seletor no centro, a divisão da completa no CI e o encurtamento dos testes lentos. Ativado em 2026-10-27.
+Escrito em 2026-10-27 a partir da conversa com a pessoa sobre o tempo e o retorno da bateria, e reescrito no mesmo dia com a meta mais ambiciosa, o seletor no centro, a divisão da completa no CI e o encurtamento dos testes lentos. Ativado em 2026-10-27. A fatia 3, do vigia contínuo, entrou no mesmo dia a pedido da pessoa.
