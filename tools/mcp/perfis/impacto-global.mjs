@@ -26,7 +26,7 @@ export async function consultarImpacto(input, { universo }) {
     return respostaOk(0, { impacto: await universo.consultar(alvo) });
   } catch (erro) {
     if (erro?.codigo) return falhaConhecida(erro);
-    process.stderr.write(`mecanifica-mcp: consultar_impacto_global: falha interna (${erro?.name ?? 'Error'}).\n`);
+    process.stderr.write(`modelar-mcp: consultar_impacto_global: falha interna (${erro?.name ?? 'Error'}).\n`);
     return respostaErro(1, erroAcionavel(
       'falha_interna', 'A consulta de impacto não conseguiu concluir.',
       'Inspecione a configuração confiável e os documentos persistidos do servidor.',

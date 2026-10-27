@@ -1,4 +1,4 @@
-/* argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a
+/* argumentos.mjs — leitura de linha de comando dos CLIs do Modelar, com a
    MESMA lei que o núcleo de autoria aplica a uma referência: bandeira
    desconhecida, ambígua ou vazia FALHA com diagnóstico, nunca vira no-op
    silencioso (CLAUDE.md, "Regras de autoria").

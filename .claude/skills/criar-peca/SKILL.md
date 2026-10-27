@@ -1,6 +1,6 @@
 ---
 name: criar-peca
-description: Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objetiva.
+description: Criar ou refinar uma peça 3D procedural do Modelar como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objetiva.
 ---
 
 # Criar peça

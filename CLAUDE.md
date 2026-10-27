@@ -1,4 +1,4 @@
-# Mecanifica — contrato mínimo
+# Modelar — contrato mínimo
 
 Só o que nenhuma ferramenta confere; a regra que um gate cobra chega como recusa
 dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP

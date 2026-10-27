@@ -1,4 +1,4 @@
-# tools/ — ferramentas da Mecanifica e do núcleo herdado
+# tools/ — ferramentas do Modelar e do núcleo herdado
 
 ```
 tools/
@@ -12,7 +12,7 @@ tools/
                (uso em docs/mecanifica/blender/REGUA-E-PACOTE-CEGO.md)
   mapa/        mapa.mjs (docs/MAPA.md gerado dos cabeçalhos + gate mapa:check),
                links.mjs (referências + alcançabilidade a partir do índice da
-               Mecanifica) e toc.mjs (índice de docs/oficina.md)
+               Modelar) e toc.mjs (índice de docs/oficina.md)
   mecanifica/  Testes vitest dos contratos novos: ponte Three.js, semântica do
                drone e estado reproduzível da bancada
   oficina/     Testes vitest do núcleo procedural (motor/oficina.js)

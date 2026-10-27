@@ -1,13 +1,13 @@
 # Autoria assistida por IA
 
 > **Definição de direção, não plano de implementação.** Este documento registra
-> como a autoria deve funcionar quando a Mecanifica crescer de peças isoladas
+> como a autoria deve funcionar quando o Modelar crescer de peças isoladas
 > para máquinas compostas inteiras. As seções de
 > estado atual dizem o que existe hoje. As seções de direção definem o modelo a
 > preservar, sem afirmar que todas as capacidades já estão implementadas.
 ## Objetivo
 
-A Mecanifica deve permitir que uma IA crie, refine, inspecione e corrija objetos
+O Modelar deve permitir que uma IA crie, refine, inspecione e corrija objetos
 3D mecânicos de complexidade crescente:
 
 1. peças isoladas;
@@ -301,7 +301,7 @@ exata dessas ferramentas ainda não estão decididos.
 
 ## Síntese canônica
 
-A Mecanifica deve permitir que uma IA construa máquinas complexas sem tratá-las
+O Modelar deve permitir que uma IA construa máquinas complexas sem tratá-las
 como uma massa única.
 
 A unidade geométrica editável é a peça. A unidade de composição é a montagem.
@@ -325,4 +325,4 @@ validação em camadas, fluxo esperado, invariantes e desvios a evitar — está
 
 Este documento ficou com o que explica **por que** o modelo é assim: objetivo,
 estado, decisões tomadas, estrutura recursiva, papel dos testes e do MCP. Serve
-a quem muda o Mecanifica, não a quem o usa.
+a quem muda o Modelar, não a quem o usa.

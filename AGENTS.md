@@ -1,4 +1,4 @@
-# Mecanifica — instruções para agentes
+# Modelar — instruções para agentes
 
 Comece pelo [`CLAUDE.md`](CLAUDE.md), o contrato mínimo que vale para qualquer
 agente, e rode `npm run comecar -- <roteiro>`, que diz o que ler para a tarefa.

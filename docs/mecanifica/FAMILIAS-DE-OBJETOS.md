@@ -1,6 +1,6 @@
-# Famílias de objetos que o Mecanifica deve cobrir
+# Famílias de objetos que o Modelar deve cobrir
 
-O Mecanifica é para modelagem geral, e a IA é sempre a usuária. Esta lista diz o
+O Modelar é para modelagem geral, e a IA é sempre a usuária. Esta lista diz o
 que vai ser modelado, para que as capacidades saiam da cobertura do que existe e
 não só do problema da vez. Cada objeto dela recebe, em
 [ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md), as ferramentas que deixariam

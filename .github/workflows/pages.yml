@@ -1,4 +1,4 @@
-name: Deploy Mecanifica no Pages
+name: Deploy Modelar no Pages
 
 on:
   push:
@@ -42,7 +42,7 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Construir Mecanifica
+      - name: Construir Modelar
         run: npm run build
 
       - name: Desativar processamento Jekyll

@@ -1,6 +1,6 @@
 # Análises de 2026-10
 
-Duas análises feitas em 2026-10-07 por subagentes, a partir da [pesquisa aberta](PESQUISA-ABERTA-2026-10.md), da [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e do repositório. A primeira responde que conjunto a mais seria bom para modelar em 3D; a segunda avalia o Mecanifica como projeto, frente ao objetivo de uma IA modelar em 3D melhor, mais barato e com mais confiança, com as premissas fixas de que a IA é a usuária, confere o resultado também por imagem e o conteúdo é determinístico e reexecutável. As duas aguardam a leitura da pessoa e não autorizam implementação.
+Duas análises feitas em 2026-10-07 por subagentes, a partir da [pesquisa aberta](PESQUISA-ABERTA-2026-10.md), da [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e do repositório. A primeira responde que conjunto a mais seria bom para modelar em 3D; a segunda avalia o Modelar como projeto, frente ao objetivo de uma IA modelar em 3D melhor, mais barato e com mais confiança, com as premissas fixas de que a IA é a usuária, confere o resultado também por imagem e o conteúdo é determinístico e reexecutável. As duas aguardam a leitura da pessoa e não autorizam implementação.
 
 
 ## Conjunto a mais para modelar em 3D
@@ -59,7 +59,7 @@ Primeiro as quatro fundações do grupo 1, porque 125 objetos da lista dependem 
 
 Quase tudo que a pesquisa cita não foi aberto; os projetos acima (CadQuery, build123d, BOSL2, URDF e MJCF, Tissue, Gridfinity, Manifold, CloudCompare) vêm de lá e precisam de conferência do link antes de servirem de base. As lacunas do núcleo (perfil sem furo, ausência de curva livre, `casca` inexistente) vêm do README do esboço e do catálogo de capacidades, que lista 36 operações e nenhuma de casca, offset, curva, seleção geométrica ou medida de massa.
 
-## Avaliação da estrutura do Mecanifica
+## Avaliação da estrutura do Modelar
 
 Avaliação feita em 2026-10-07 a partir de `docs/mecanifica/INDEX.md`, `VISAO.md`, `ARQUITETURA.md`, o dossiê do modelador inverso, o plano ativo do catálogo de famílias, o plano do braço robótico, o README do módulo de esboço, o catálogo gerado de capacidades, `procedural/nucleo/manifold.js` e a receita do ombro do braço. Nenhum arquivo do repositório foi alterado. O que está marcado como hipótese é inferência sobre o desenho e diz em que arquivo se apoia.
 

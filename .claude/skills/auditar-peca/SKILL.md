@@ -1,6 +1,6 @@
 ---
 name: auditar-peca
-description: Verificar uma peça da Mecanifica pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
+description: Verificar uma peça do Modelar pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
 ---
 
 # Verificar peça
@@ -149,7 +149,7 @@ peça isolada e não inventa validade global de uma montagem.
    ```
 
    `porteiro` ajuda a diagnosticar a bancada, mas não é publicação nem o gate
-   visual oficial da Mecanifica, e não faz parte da auditoria.
+   visual oficial do Modelar, e não faz parte da auditoria.
 
 ## O que não é requisito
 

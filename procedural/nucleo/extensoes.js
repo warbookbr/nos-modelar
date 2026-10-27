@@ -14,7 +14,7 @@ function conferir(manifesto, implementacao) {
 export function criarOperacaoNativa(manifesto, implementacao) {
   conferir(manifesto, implementacao);
   const executar = (contexto, argumentos) => implementacao(contexto, argumentos);
-  Object.defineProperty(executar, 'nativaMecanifica', { value: true });
+  Object.defineProperty(executar, 'nativaModelar', { value: true });
   return Object.freeze({ ...manifesto.operacao, executar, extensao: manifesto.id });
 }
 export function criarRegistroComExtensoes({ registroBase, extensoes } = {}) {

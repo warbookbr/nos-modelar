@@ -1,4 +1,4 @@
-# Mecanifica — entrada atual
+# Modelar — entrada atual
 
 Este repositório mantém a oficina procedural para IA: núcleo geométrico,
 receitas determinísticas de peças, bancada de inspeção e ferramentas de medição,

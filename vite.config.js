@@ -1,5 +1,5 @@
 /* vite.config.js — build estático da BANCADA de autoria, publicada em
-   warbookbr/nos-mecanifica no GitHub Pages. O produto que o cliente abre
+   warbookbr/nos-modelar no GitHub Pages. O produto que o cliente abre
    vive em warbookbr/mecanica e se constrói de lá. */
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
@@ -16,7 +16,7 @@ const VERSAO_DA_BANCADA = descreverVersao(lerVersaoPublicada({
 }));
 
 export default defineConfig({
-  base: '/nos-mecanifica/',
+  base: '/nos-modelar/',
   define: { __VERSAO_DA_BANCADA__: JSON.stringify(VERSAO_DA_BANCADA) },
   /* Só no servidor de desenvolvimento: a página publicada não escreve arquivo
      nenhum, e quem a abre não tem o repositório para escrever nele. */

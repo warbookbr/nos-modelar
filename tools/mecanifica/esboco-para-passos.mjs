@@ -1,8 +1,8 @@
-/* esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Mecanifica (`cubo`, `chamferBox`, `cilindro`, `extrusao`,
+/* esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Modelar (`cubo`, `chamferBox`, `cilindro`, `extrusao`,
    `rotaciona` e `parte`), sem agente: a conversão é mecânica e cada forma é conferida contra o esboço antes de entrar.
 
    Por que existe. Um objeto que veio como esboço (por exemplo, das receitas do externo traduzidas por `receita-externa.mjs`) vira receita do
-   Mecanifica por esta conversão, em vez de ser modelado de novo. A receita herda a forma do esboço, inclusive o que ele tem de errado; os
+   Modelar por esta conversão, em vez de ser modelado de novo. A receita herda a forma do esboço, inclusive o que ele tem de errado; os
    ajustes entram depois como passos explícitos sobre ela.
 
    O que converte. `caixa` (com `chanfro` vira `chamferBox`), `cilindro`, `cone` não (recusado), `extrusao`, e a rotação de qualquer uma delas

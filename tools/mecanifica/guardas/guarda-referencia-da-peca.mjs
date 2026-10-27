@@ -33,7 +33,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
 const OUT = join(REPO, 'tools/bancadas/out');
-const BASE = '/nos-mecanifica/';
+const BASE = '/nos-modelar/';
 const PECA = 'peca-de-prova';
 
 const TIPOS = {

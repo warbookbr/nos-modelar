@@ -1,4 +1,4 @@
-# MAPA — inventário da Mecanifica, arquivo por arquivo
+# MAPA — inventário do Modelar, arquivo por arquivo
 
 > **GERADO** por `npm run mapa` — não edite à mão. O resumo de cada arquivo
 > mora no próprio arquivo (primeiro comentário; H1 nos `.md`); isto é a
@@ -9,14 +9,14 @@
 
 ## (raiz)
 
-- `AGENTS.md` — Mecanifica — instruções para agentes
-- `CLAUDE.md` — Mecanifica — contrato mínimo
-- `README.md` — Mecanifica
+- `AGENTS.md` — Modelar — instruções para agentes
+- `CLAUDE.md` — Modelar — contrato mínimo
+- `README.md` — Modelar
 - `THIRD-PARTY-NOTICES.md` — Avisos de terceiros
 - `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
 - `comunicacao.md` — Comunicação entre IAs
-- `vite.config.js` — vite.config.js — build estático da BANCADA de autoria, publicada em warbookbr/nos-mecanifica no GitHub Pages. O produto que o cliente abre vive em warbookbr/…
-- `vitest.config.ts` — Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**.
+- `vite.config.js` — vite.config.js — build estático da BANCADA de autoria, publicada em warbookbr/nos-modelar no GitHub Pages. O produto que o cliente abre vive em warbookbr/mec…
+- `vitest.config.ts` — Config do Vitest: cobre os contratos do Modelar e os núcleos herdados em tools/**.
 
 ## .claude/agents/
 
@@ -24,9 +24,9 @@
 - `desenhador-de-contorno.md` — Põe as sementes que mapeiam as partes da imagem de referência e gera o pacote do crítico com `npm run contorno`. Depois corrige só as sementes que o crítico …
 - `desenhista-de-prancha.md` — Decide cotas, calibração e o que a imagem esconde no `<imagem>.prancha.json` e gera com `npm run contorno:prancha`. Depois corrige só o que o crítico apontou…
 - `esbocista.md` — Esboça um objeto ou unidade pela skill esboco-detalhado, parando a cada --feito até a nota do crítico. Opcional: só sem forma de referência e por escolha da …
-- `implementador.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
+- `implementador.md` — Implementa mudanças delimitadas no Modelar, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um brief…
 - `modelador.md` — Escreve e corrige a receita procedural de UMA peça a partir do plano e, depois, do veredito de defeitos. Não julga o próprio resultado nem decide quando para…
-- `revisor-adversarial.md` — Revisor adversarial da Mecanifica: tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quando a mudança…
+- `revisor-adversarial.md` — Revisor adversarial do Modelar: tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quando a mudança te…
 
 ## .claude/skills/absorver-ajuste-da-bancada/
 
@@ -38,11 +38,11 @@
 
 ## .claude/skills/auditar-montagem/
 
-- `SKILL.md` — Auditar uma montagem persistida da Mecanifica por contexto semântico, relações, impacto de revalidação e vistas visuais. Use quando a tarefa envolver composi…
+- `SKILL.md` — Auditar uma montagem persistida do Modelar por contexto semântico, relações, impacto de revalidação e vistas visuais. Use quando a tarefa envolver composição…
 
 ## .claude/skills/auditar-peca/
 
-- `SKILL.md` — Verificar uma peça da Mecanifica pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
+- `SKILL.md` — Verificar uma peça do Modelar pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
 
 ## .claude/skills/contorno-da-imagem/
 
@@ -50,7 +50,7 @@
 
 ## .claude/skills/criar-peca/
 
-- `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
+- `SKILL.md` — Criar ou refinar uma peça 3D procedural do Modelar como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objetiva.
 
 ## .claude/skills/criar-peca/references/
 
@@ -107,21 +107,21 @@
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
-- `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
+- `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural do Modelar
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
-- `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
+- `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Modelar
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
-- `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Mecanifica deve cobrir
+- `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Modelar deve cobrir
 - `FERRAMENTAS-POR-OBJETO.md` — Ferramentas por objeto
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
-- `INDEX.md` — Mecanifica — entrada atual
+- `INDEX.md` — Modelar — entrada atual
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `LEITURA-POR-TAREFA.md` — Leitura por tarefa
@@ -135,7 +135,7 @@
 - `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
-- `VISAO.md` — Visão da Mecanifica
+- `VISAO.md` — Visão do Modelar
 - `modelar-carroceria.md` — Modelar carroceria de chapa contínua
 - `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
@@ -406,7 +406,7 @@
 - `COMO-COMECAR.md` — Como começar com o Blender
 - `FLUXO-GENERICO.md` — Fluxo genérico de modelagem com Blender
 - `INSTALAR-E-CONVERTER.md` — Instalar o Blender e converter para GLB
-- `README.md` — Blender com o Mecanifica
+- `README.md` — Blender com o Modelar
 - `REGUA-E-PACOTE-CEGO.md` — Régua, pacote cego e oráculo da subdivisão
 - `USOS-E-LIMITES.md` — Usos do Blender, limites e regras
 
@@ -650,7 +650,7 @@
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `PARAMETROS-VIVOS.md` — Parâmetro vivo e parâmetro decorativo
 - `PARE-E-ANALISE.md` — Pare e analise
-- `README.md` — Usar o Mecanifica
+- `README.md` — Usar o Modelar
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RODADA-DE-ALINHAMENTO-EXEMPLO.md` — Rodada de alinhamento, preenchida: o quadro de bicicleta
 
@@ -855,7 +855,7 @@
 - `desgaste.js` — Camada de uso por cima da cor base (porte de `_aplicar_desgaste` do Blender, em linear): tinta amarelada, encardido, escorridos, ferrugem e tinta lascada.
 - `erro.js` — Erro de entrada ou de tipo de material que o gerador ainda não cobre.
 - `estrago.js` — Estrago por cima do material (porte de `_aplicar_estrago` do Blender, sem `podre`, que é da madeira): manchas irregulares com auréola amarelada de umidade e …
-- `index.js` — Gerador determinístico da imagem de cor de um material, em JavaScript puro (sem Blender, sem Three.js e sem o núcleo do Mecanifica). A entrada é o material n…
+- `index.js` — Gerador determinístico da imagem de cor de um material, em JavaScript puro (sem Blender, sem Three.js e sem o núcleo do Modelar). A entrada é o material no f…
 - `liso.js` — Cor chapada de tinta ou plástico com variação suave e ruído fraco (porte de `_liso` do Blender).
 - `madeira.js` — Madeira (porte de `_madeira` do Blender para um tile contínuo).
 - `metal.js` — Metal (porte de `_metal` do Blender para um tile contínuo).
@@ -1634,7 +1634,7 @@
 - `base-forma-global.js` — Base comum da forma global N2: o erro com código e caminho, e as duas verificações de estrutura que todo normalizador usa. Fica à parte para que o contrato (…
 - `calibracao-do-critico.js` — calibracao-do-critico.js — o formato `mecanifica.calibracao-do-critico@1`: o conjunto de imagens com defeito conhecido em que o crítico visual é medido.
 - `calibracao-do-critico.test.js` — calibracao-do-critico.test.js — o formato do conjunto de calibração do crítico: o que ele aceita e o que recusa.
-- `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural da Mecanifica.
+- `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural do Modelar.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
 - `chamar-familia.js` — chamar-familia.js — a porta de entrada de uma família: `chamar(familia, id, parametros)`.
@@ -1786,7 +1786,7 @@
 
 ## tools/
 
-- `README.md` — tools/ — ferramentas da Mecanifica e do núcleo herdado
+- `README.md` — tools/ — ferramentas do Modelar e do núcleo herdado
 - `gates.mjs` — gates.mjs — roda TODOS os gates e relata TODOS, em vez de parar no primeiro.
 - `testes-lentos.mjs` — testes-lentos.mjs — a lista dos arquivos de teste que saem da bateria padrão, e o comando que roda cada uma das duas.
 - `testes-lentos.test.mjs` — testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa.
@@ -2101,7 +2101,7 @@
 - `analise-da-peca.test.mjs` — analise-da-peca.test.mjs — a matriz do "Pare e analise", o manifesto e o zoom.
 - `aprovacao-da-familia.mjs` — aprovacao-da-familia.mjs — a camada mecânica da aprovação de uma família, sem gastar token.
 - `aprovacao-da-familia.test.mjs` — aprovacao-da-familia.test.mjs — a camada mecânica da aprovação de uma família e o hash preso ao `aprovacao.json`. A prova: a família de fixture aprovada; a b…
-- `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
+- `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs do Modelar, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, amb…
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
 - `articulacao-na-montagem.test.mjs` — articulacao-na-montagem.test.mjs — a articulação sobre uma montagem v5 real: a folha da porta não declara pose, a posição sai do encaixe da porta `eixo-da-do…
 - `ativar-bancada.mjs` — ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D.
@@ -2177,7 +2177,7 @@
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
 - `esboco-para-andaime.test.mjs` — A prova do tradutor do nível zero sobre os esboços do módulo e do banco de provas: o andaime é aceito por `normalizarAndaimeGlobal`, a blocagem compila e fec…
-- `esboco-para-passos.mjs` — esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Mecanifica (`cubo`, `chamferBox`, `cilindro`, `extrusao`, `rotaciona` e …
+- `esboco-para-passos.mjs` — esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Modelar (`cubo`, `chamferBox`, `cilindro`, `extrusao`, `rotaciona` e `pa…
 - `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núcl…
 - `esboco-proximo-mede-antes.test.mjs` — O --proximo do esboço só gera o brief do crítico depois das medidas do plano aprovadas, as em milímetro e as razões. O brief do objeto inteiro sai quando o P…
 - `esboco-recorte-no-andaime.test.mjs` — O recorte (`subtrai`) na blocagem do nível zero: a N2 não subtrai um volume de outro, então a forma recortada vai ao andaime inteira e a perda entra no relat…
@@ -2261,7 +2261,7 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
-- `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Mecanifica, e o…
+- `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Modelar, e o ca…
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `receita-planejada.mjs` — receita-planejada.mjs — grava a receita planejada de uma peça a partir de uma unidade do esboço aprovado.
 - `receita-planejada.test.mjs` — receita-planejada.test.mjs — a receita planejada que o comando grava a partir de uma unidade do esboço.
@@ -2304,7 +2304,7 @@
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
 - `vistas-da-receita.mjs` — vistas-da-receita.mjs — a folha de seis vistas de uma receita `.js` do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes.
 - `vistas-da-receita.test.mjs` — Testes de vistas-da-receita.mjs: os polígonos da receita em milímetro com as partes na ordem de aparição e a folha de seis vistas pela linha de comando.
-- `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Mecanifica, para conferir o que a conversão e os ajustes fizeram.
+- `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
 - `vistas-texturizadas.mjs` — vistas-texturizadas.mjs — três vistas de uma peça do acervo COM a textura que a exportação OBJ gera, para quem precisa julgar o acabamento (eletrodoméstico, …

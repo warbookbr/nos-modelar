@@ -202,7 +202,7 @@ describe('cada captura lê a sessão que é dela', () => {
       const { arquivoDaSessao } = registro.ativacoes.find((x) => x.rotulo === rotulo);
       const pagina = registro.paginas.find((x) => x.rotulo === rotulo);
       const url = new URL(pagina.url);
-      expect(url.pathname).toBe('/nos-mecanifica/tools/bancadas/harness.html');
+      expect(url.pathname).toBe('/nos-modelar/tools/bancadas/harness.html');
       expect(url.searchParams.get('sessao')).toBe(relative(REPO, arquivoDaSessao).replaceAll('\\', '/'));
       expect(pagina.arquivoExistiaAoAbrir).toBe(true);
     }

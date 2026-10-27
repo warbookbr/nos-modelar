@@ -172,7 +172,7 @@ export function calibrarPorRodas(env, ret, {
   return { mmPorPx, chao, centrosPx: centros, zMeioPx: (centros[0] + centros[centros.length - 1]) / 2, residuo };
 }
 
-/* Envelope em pixel → polilinha em milímetro, na convenção da Mecanifica:
+/* Envelope em pixel → polilinha em milímetro, na convenção do Modelar:
    z cresce para a frente, y cresce para cima, origem no meio do entre-eixos e no
    solo. `frenteAEsquerda` espelha pranchas desenhadas com o nariz à esquerda. */
 export function paraMilimetros(env, cal, { qual = 'topo', frenteAEsquerda = true } = {}) {

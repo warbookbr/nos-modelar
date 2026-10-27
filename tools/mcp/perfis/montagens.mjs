@@ -43,7 +43,7 @@ function falhaConhecida(erro) {
 }
 
 function falhaInterna(nome, erro) {
-  process.stderr.write(`mecanifica-mcp: ${nome}: falha interna (${erro?.name ?? 'Error'}).\n`);
+  process.stderr.write(`modelar-mcp: ${nome}: falha interna (${erro?.name ?? 'Error'}).\n`);
   return respostaErro(1, erroAcionavel(
     'falha_interna',
     'A ferramenta não conseguiu concluir a operação.',

@@ -21,7 +21,7 @@ import { pecasDaMalha } from './malha.js';
 import { pecasRecortadas } from './recorte.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
-/* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
+/* Contrato de declaração herdado do Modelar (`MINIMO_DO_MOTIVO` em
    src/autoria/contatos-da-peca.js): toda exceção declara POR QUE, e um motivo curto
    é declaração que ninguém confere. O valor é copiado em número porque este módulo
    não importa o núcleo. */

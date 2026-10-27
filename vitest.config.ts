@@ -1,4 +1,4 @@
-/* Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**. */
+/* Config do Vitest: cobre os contratos do Modelar e os núcleos herdados em tools/**. */
 import { configDefaults, defineConfig } from 'vitest/config';
 import { TESTES_LENTOS } from './tools/testes-lentos.mjs';
 

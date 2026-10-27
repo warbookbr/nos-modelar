@@ -131,7 +131,7 @@ describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
   });
 });
 
-describe('skills ativas x fluxo Mecanifica', () => {
+describe('skills ativas x fluxo Modelar', () => {
   it('não transforma paleta em requisito', () => {
     expect(AUDITORIA).toMatch(/paleta não é gate atual/i);
     expect(AUDITORIA).not.toMatch(/Resurrect64.*(?:obrigat|exig|gate)/i);

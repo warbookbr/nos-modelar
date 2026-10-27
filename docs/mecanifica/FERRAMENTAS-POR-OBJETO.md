@@ -2,7 +2,7 @@
 
 <!-- Gerado por `npm run ferramentas:gerar` a partir de `ferramentas-por-objeto.json`. Não edite à mão; `ferramentas:check` reprova a divergência. -->
 
-Este documento responde que ferramentas o Mecanifica precisa ter para a IA modelar os objetos da [lista de famílias](FAMILIAS-DE-OBJETOS.md) sem reconstruir cada forma a partir de primitivas. Cada um dos 369 objetos das 28 famílias da fase atual recebeu as ferramentas que tirariam dela a maior parte do trabalho, e as ferramentas estão ordenadas pelo número de objetos que atendem. A referência diz de onde vem a ideia (addon ou modificador do Blender, CAD por código, bancada de CAD ou catálogo), e a coluna "aqui" diz o que o esboço e o núcleo já fazem. Os dados estão em [`ferramentas-por-objeto.json`](ferramentas-por-objeto.json).
+Este documento responde que ferramentas o Modelar precisa ter para a IA modelar os objetos da [lista de famílias](FAMILIAS-DE-OBJETOS.md) sem reconstruir cada forma a partir de primitivas. Cada um dos 369 objetos das 28 famílias da fase atual recebeu as ferramentas que tirariam dela a maior parte do trabalho, e as ferramentas estão ordenadas pelo número de objetos que atendem. A referência diz de onde vem a ideia (addon ou modificador do Blender, CAD por código, bancada de CAD ou catálogo), e a coluna "aqui" diz o que o esboço e o núcleo já fazem. Os dados estão em [`ferramentas-por-objeto.json`](ferramentas-por-objeto.json).
 
 Cada objeto da fase atual recebe as ferramentas que tirariam da IA a maior parte do trabalho de modelá-lo. Uma ferramenta entra no objeto quando sem ela a IA teria de reconstruir a forma a partir de primitivas; operações que todo objeto usa um pouco (espelho, arredondar uma aresta) só entram quando definem o objeto.
 

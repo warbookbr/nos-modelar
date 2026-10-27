@@ -12,7 +12,7 @@ function entradaRecusada() {
 }
 function executar(nome, tarefa) {
   try { return respostaOk(0, tarefa()); } catch (erro) {
-    process.stderr.write(`mecanifica-mcp: ${nome}: falha controlada (${erro?.name ?? 'Error'}).\n`);
+    process.stderr.write(`modelar-mcp: ${nome}: falha controlada (${erro?.name ?? 'Error'}).\n`);
     return respostaErro(1, erroAcionavel(
       erro?.codigo ?? 'operacao_recusada',
       String(erro?.message ?? 'A operação foi recusada.'),

@@ -1,4 +1,4 @@
-# Ambiente de desenvolvimento — Mecanifica
+# Ambiente de desenvolvimento — Modelar
 
 - Node.js 22 LTS (>= 22.12; não use Node.js 24 enquanto o transporte MCP por
   stdio não for homologado nessa linha).

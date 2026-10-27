@@ -179,7 +179,7 @@ export async function ativarReceitaBancada({
     query = `?selecionadas=${encodeURIComponent(focar)}&modo=${encodeURIComponent(modoEfetivo)}&focar=true`;
   }
 
-  const url = `http://localhost:${porta}/nos-mecanifica/bancada.html${query}`;
+  const url = `http://localhost:${porta}/nos-modelar/bancada.html${query}`;
 
   return {
     ok: true,
@@ -253,7 +253,7 @@ Opcoes:
     console.log(`\nURL da Bancada:`);
     console.log(`  ${res.url}`);
     if (res.porta !== '5173') {
-      console.log(`  (Se a porta 5174 estiver ocupada, tente http://localhost:5173/nos-mecanifica/bancada.html${res.query})`);
+      console.log(`  (Se a porta 5174 estiver ocupada, tente http://localhost:5173/nos-modelar/bancada.html${res.query})`);
     }
     fechar({
       codigo: 0,

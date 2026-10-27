@@ -6,7 +6,7 @@
    diferentes, que divergiram DUAS vezes na mesma chave. O contrato permanece
    aqui em uma fixture mínima, sem depender de peça ou catálogo.
 
-   A interface humana foi retirada da Mecanifica. Este arquivo conserva a prova
+   A interface humana foi retirada do Modelar. Este arquivo conserva a prova
    que ainda importa aqui: o gate usa a regra única e ela classifica certo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo do motor v3, em JS sem tipos.

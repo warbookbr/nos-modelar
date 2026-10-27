@@ -1,6 +1,6 @@
 ---
 name: auditar-montagem
-description: Auditar uma montagem persistida da Mecanifica por contexto semântico, relações, impacto de revalidação e vistas visuais. Use quando a tarefa envolver composição de peças, submontagens, encaixes, dependências ou revisão de um conjunto.
+description: Auditar uma montagem persistida do Modelar por contexto semântico, relações, impacto de revalidação e vistas visuais. Use quando a tarefa envolver composição de peças, submontagens, encaixes, dependências ou revisão de um conjunto.
 ---
 
 # Auditar montagem

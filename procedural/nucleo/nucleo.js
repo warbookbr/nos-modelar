@@ -3447,7 +3447,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const pose = lerPoseDeCriacao(st, i, op, args);
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
-    if (fn.nativaMecanifica) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
+    if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
     else fn(st, args, i);
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
     const mudou = (antes, depois) => [...depois].filter(([id, valor]) => antes.get(id) !== JSON.stringify(valor)).map(([id]) => id).sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);

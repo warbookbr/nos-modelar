@@ -1,5 +1,5 @@
 ﻿/* caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais
-   simétricos para a primitiva `loft` no motor procedural da Mecanifica. */
+   simétricos para a primitiva `loft` no motor procedural do Modelar. */
 
 /**
  * Constrói uma sequência simétrica bilateral de seções para 'loft' a partir

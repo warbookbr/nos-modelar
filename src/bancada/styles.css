@@ -1252,7 +1252,7 @@ body.modal-aberto {
   * { scroll-behavior: auto !important; }
 }
 
-/* Mecanifica UI refresh */
+/* Modelar UI refresh */
 :root {
   font-family: "Aptos", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --painel: rgba(14, 22, 18, 0.95);

@@ -7,7 +7,7 @@
     "types": ["node"],
 
     "strict": true,
-    // desligado de propósito (D-110, fase 2b): o gate cobre testes da Mecanifica
+    // desligado de propósito (D-110, fase 2b): o gate cobre testes do Modelar
     // e do núcleo herdado sobre módulos .js sem tipos. Checar todo acesso por
     // índice (arr[i]/Map.get) só geraria ruído; `strict` continua ligado.
     "noUncheckedIndexedAccess": false,

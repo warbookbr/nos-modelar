@@ -11,7 +11,7 @@ e câmera contra evidência calibrada e só depois expõe edição por intençã
 O produto continua nativo ao repositório. Algoritmos publicados e ativos com
 licença compatível podem ser estudados ou ingeridos como fonte com procedência;
 nenhum software de modelagem externo vira dependência de execução. O formato
-canônico, o compilador, o ajuste, a validação e o MCP pertencem à Mecanifica.
+canônico, o compilador, o ajuste, a validação e o MCP pertencem ao Modelar.
 
 ## O que é evidência hoje
 

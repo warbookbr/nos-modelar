@@ -1,6 +1,6 @@
 # Recursos e portas de entrada
 
-Este índice descreve o estado atual da Mecanifica. A aplicação publicada deste
+Este índice descreve o estado atual do Modelar. A aplicação publicada deste
 repositório é `bancada.html`; a aplicação do cliente vive em
 `warbookbr/mecanica`. A antiga aplicação jogável, Oficina humana e som foram
 removidos e aparecem somente no histórico.

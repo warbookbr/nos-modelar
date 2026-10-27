@@ -1,9 +1,9 @@
-# Continuidade arquitetural da Mecanifica
+# Continuidade arquitetural do Modelar
 
 ## Objetivo
 
 Este documento preserva a **calibração de julgamento arquitetural** acumulada
-durante a evolução da Mecanifica. Ele existe para que uma nova sessão, pessoa ou
+durante a evolução do Modelar. Ele existe para que uma nova sessão, pessoa ou
 agente consiga retomar o projeto sem depender de uma janela de contexto antiga e
 sem transformar decisões passadas em dogmas.
 
@@ -37,7 +37,7 @@ mudança de contexto. Não proteja a conclusão apenas porque ela já foi aceita
 
 ## Postura arquitetural
 
-A Mecanifica deve ser conservadora **com complexidade**, não conservadora **com
+O Modelar deve ser conservadora **com complexidade**, não conservadora **com
 mudança**.
 
 A regra não é:

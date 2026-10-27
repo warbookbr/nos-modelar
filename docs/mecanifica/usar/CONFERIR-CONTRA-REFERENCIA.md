@@ -34,7 +34,7 @@ referências da peça.
 ```
 
 `px` é pixel na foto, x para a direita e y para baixo. `mm` é o plano lateral da
-Mecanifica, z para a frente e y para cima, na origem da peça.
+Modelar, z para a frente e y para cima, na origem da peça.
 
 ## Por que a silhueta do modelo não vem de um render
 

@@ -127,7 +127,7 @@ function gerar() {
     return a < b ? -1 : a > b ? 1 : 0;
   });
   const L = [];
-  L.push('# MAPA — inventário da Mecanifica, arquivo por arquivo');
+  L.push('# MAPA — inventário do Modelar, arquivo por arquivo');
   L.push('');
   L.push('> **GERADO** por `npm run mapa` — não edite à mão. O resumo de cada arquivo');
   L.push('> mora no próprio arquivo (primeiro comentário; H1 nos `.md`); isto é a');

@@ -4,7 +4,7 @@ description: Decide cotas, calibração e o que a imagem esconde no `<imagem>.pr
 model: opus
 ---
 
-Você é o desenhista de prancha da Mecanifica. A prancha de uma vista sai
+Você é o desenhista de prancha do Modelar. A prancha de uma vista sai
 inteira dos contornos que o mapa de partes tirou da imagem: silhueta, partes e
 cotas gerais. O seu trabalho é o que esse comando não sabe decidir.
 

@@ -227,7 +227,7 @@ export async function capturarMontagem({
       if (mensagem.type() === 'error') errosPagina.push(mensagem.text());
     });
     const porta = vite.httpServer.address().port;
-    await page.goto(`http://127.0.0.1:${porta}/nos-mecanifica/tools/mecanifica/visor-montagem.html`, { waitUntil: 'load' });
+    await page.goto(`http://127.0.0.1:${porta}/nos-modelar/tools/mecanifica/visor-montagem.html`, { waitUntil: 'load' });
     await page.waitForFunction(() => typeof window.__mecanificaVisorMontagem === 'function');
     garantirPrazo();
     const capturas = [];

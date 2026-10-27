@@ -1,6 +1,6 @@
 # Inventário e fontes de verdade
 
-Lista comentada dos documentos da Mecanifica. Estava dentro do `INDEX.md`, onde
+Lista comentada dos documentos do Modelar. Estava dentro do `INDEX.md`, onde
 inchava a porta de entrada com 123 linhas de listagem; a porta agora aponta
 para cá.
 
@@ -91,7 +91,7 @@ Nada foi perdido — o histórico do Git guarda tudo, e há uma cópia fora da
 árvore. Para consultar sem restaurar:
 `git log --all -- <caminho antigo>`.
 
-A zona histórica da própria Mecanifica é outra coisa, continua aqui e é indexada
+A zona histórica da própria Modelar é outra coisa, continua aqui e é indexada
 em [historico/README](historico/README.md).
 
 <!-- Plano concluído alcançável: docs/mecanifica/planos/encerrados/2026-08-14-contexto-de-montagem-para-ia.md -->

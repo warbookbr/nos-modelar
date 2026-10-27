@@ -30,7 +30,7 @@ const PULAR = new Set(['node_modules', 'dist', '.git', '.claude', 'coverage', 't
 
 function exigirRaiz() {
   const pacote = join(RAIZ, 'package.json');
-  if (!existsSync(pacote) || JSON.parse(readFileSync(pacote, 'utf8')).name !== 'mecanifica') {
+  if (!existsSync(pacote) || JSON.parse(readFileSync(pacote, 'utf8')).name !== 'modelar') {
     throw new Error(`o teste precisa rodar da raiz do repositório; rodou de ${RAIZ}.`);
   }
 }

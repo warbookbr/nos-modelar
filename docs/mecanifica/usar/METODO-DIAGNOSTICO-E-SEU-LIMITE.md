@@ -1,6 +1,6 @@
 # Método diagnóstico, e onde ele para
 
-Este documento fixa o método de investigação da Mecanifica **e a fronteira dele**.
+Este documento fixa o método de investigação do Modelar **e a fronteira dele**.
 Ele existe porque o método funcionou perfeitamente e, ainda assim, doze rodadas
 de carroceria terminaram reprovadas — e entender por quê vale mais que o método.
 

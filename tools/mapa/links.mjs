@@ -149,7 +149,7 @@ for (const arquivo of rastreados.filter((f) => f.endsWith('.md') && !ehZonaHisto
   }
 }
 
-/* --- alcançabilidade: todo doc parte do índice curado da Mecanifica --- */
+/* --- alcançabilidade: todo doc parte do índice curado do Modelar --- */
 const PORTA_ENTRADA = 'docs/mecanifica/INDEX.md';
 
 /* Citar uma PASTA cobre o que está dentro dela. A lista é EXPLÍCITA, e não

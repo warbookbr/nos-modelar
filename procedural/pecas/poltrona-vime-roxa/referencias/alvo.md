@@ -4,4 +4,4 @@ Não há imagem de referência: o alvo é a medida. Caixa total x ±480, y 0 a 7
 
 Dez partes: quatro pés, uma base de vime de 270 mm de altura entre as faces externas dos braços, dois braços de 130 mm, um encosto de vime de 700 por 350 por 150 mm entre os braços com topo em y 670, uma almofada de assento de 140 mm de espessura e uma almofada de encosto de 680 por 300 por 160 mm girada 12 graus para trás em torno de um eixo x, com o centro em (0, 570, -175).
 
-A forma veio de uma receita externa de poltrona de vime, convertida pelo esboço do Mecanifica e refeita em passos do núcleo. A pessoa aprova a forma.
+A forma veio de uma receita externa de poltrona de vime, convertida pelo esboço do Modelar e refeita em passos do núcleo. A pessoa aprova a forma.

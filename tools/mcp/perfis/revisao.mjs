@@ -54,7 +54,7 @@ function entradaRecusada() {
 
 function falhaInterna(nome, erro) {
   const tipo = erro?.name ?? 'Error';
-  process.stderr.write(`mecanifica-mcp: ${nome}: falha interna (${tipo}).\n`);
+  process.stderr.write(`modelar-mcp: ${nome}: falha interna (${tipo}).\n`);
   return respostaErro(1, erroAcionavel(
     'falha_interna',
     'A ferramenta não conseguiu concluir a operação.',

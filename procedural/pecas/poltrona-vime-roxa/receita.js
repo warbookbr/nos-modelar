@@ -6,7 +6,7 @@
  * em caixas, e `gerarPassos` escreve, por parte, uma `chamferBox`, o giro quando a caixa tem um, a `parte` com o nome e o
  * material que a parte usa.
  *
- * Forma e medidas: receita externa de poltrona de vime, convertida pelo esboço do Mecanifica e refeita em passos. Esta
+ * Forma e medidas: receita externa de poltrona de vime, convertida pelo esboço do Modelar e refeita em passos. Esta
  * reescrita mantém a forma da base, com diferença de 0,00 mm nas medidas de cada caixa e na caixa total (x ±480, y 0 a 726,7,
  * z -430 a 350). Mudanças em relação à base: os nomes das partes passam para camelCase sem underscore (pes -> pesFrenteEsq e
  * assim por diante, braco_esq -> bracoEsq), a caixa da almofada do encosto passa a ter o pivô e o giro na TABELA, e cada parte

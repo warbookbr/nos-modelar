@@ -28,7 +28,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
-const BASE = '/nos-mecanifica/';
+const BASE = '/nos-modelar/';
 const PECA = 'peca-de-prova';
 /* A ponteira esquerda: onde o balanço inferior e o superior do lado esquerdo se
    encontram. É o canto que o autor tentou mover. */

@@ -44,7 +44,7 @@ try {
   const erros = [];
   pagina.on('pageerror', (erro) => erros.push(erro.message));
 
-  await pagina.goto(`http://127.0.0.1:${port}/nos-mecanifica/bancada.html`, { waitUntil: 'load' });
+  await pagina.goto(`http://127.0.0.1:${port}/nos-modelar/bancada.html`, { waitUntil: 'load' });
   await pagina.waitForFunction(
     () => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null,
     { timeout: 20000 },

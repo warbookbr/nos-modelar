@@ -1,6 +1,6 @@
 /**
  * Gerador determinístico da imagem de cor de um material, em JavaScript puro (sem Blender, sem Three.js
- * e sem o núcleo do Mecanifica). A entrada é o material no formato do bloco `materiais` do esboço.
+ * e sem o núcleo do Modelar). A entrada é o material no formato do bloco `materiais` do esboço.
  */
 import { PNG } from 'pngjs';
 import { linearParaSrgb255 } from './cor.js';

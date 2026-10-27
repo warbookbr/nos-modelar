@@ -1,7 +1,7 @@
 /* parametros.mjs — ferramentas MCP da varredura paramétrica.
  *
  * Expõe pelo MCP as duas CLIs do plano "parâmetro que move a peça". Sem isto,
- * um agente que fale com o Mecanifica por MCP em vez de terminal não enxerga
+ * um agente que fale com o Modelar por MCP em vez de terminal não enxerga
  * nenhuma das duas: ele continua alterando número no escuro e remedindo, que é
  * exatamente o desperdício que elas existem para cortar.
  *

@@ -1,12 +1,12 @@
-# Usar o Mecanifica
+# Usar o Modelar
 
-Esta pasta é para quem vai **usar** o Mecanifica: criar, inspecionar, corrigir
+Esta pasta é para quem vai **usar** o Modelar: criar, inspecionar, corrigir
 ou auditar uma peça. Fora dela, a leitura de uso são as skills e o catálogo
 gerado de operações, que os roteiros entregam.
 
 A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
 `npm run comecar -- <roteiro>`, que diz o que ler. Quem vai **mudar** o
-Mecanifica (núcleo, gates, arquitetura, plano) segue o roteiro `mudar`, que separa
+Modelar (núcleo, gates, arquitetura, plano) segue o roteiro `mudar`, que separa
 o trabalho do plano da correção de um defeito.
 
 ## Por onde começar

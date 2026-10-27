@@ -114,7 +114,7 @@ export async function executarAtivarBancada(input, { raizSessao = REPO } = {}) {
       query = `?selecionadas=${encodeURIComponent(input.focar)}&modo=${encodeURIComponent(modo)}&focar=true`;
     }
 
-    const url = `http://localhost:${porta}/nos-mecanifica/bancada.html${query}`;
+    const url = `http://localhost:${porta}/nos-modelar/bancada.html${query}`;
 
     return respostaOk({
       alvo: nomeAlvo,

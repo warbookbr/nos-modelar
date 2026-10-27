@@ -1,4 +1,4 @@
-# Coordenação entre os repositórios Mecanifica
+# Coordenação entre os repositórios Modelar
 
 ## Canais
 
@@ -6,9 +6,9 @@ A caixa postal local entre agentes (`npm run coord`) saiu em 2026-10-08, sem
 uso. O trabalho dividido entre duas IAs neste repositório passa por
 `comunicacao.md`, com uma tarefa por seção.
 
-Decisões duráveis entre `warbookbr/nos-mecanifica` e
+Decisões duráveis entre `warbookbr/nos-modelar` e
 `brigsd/nos-mecanifica` ficam na
-[issue de coordenação](https://github.com/warbookbr/nos-mecanifica/issues/3).
+[issue de coordenação](https://github.com/warbookbr/nos-modelar/issues/3).
 
 Este arquivo define o protocolo estável. Ele não é um diário de mensagens.
 
@@ -71,8 +71,8 @@ identidade de quem a registrou.
 
 ## Decisões consolidadas em 2 de agosto de 2026
 
-1. `warbookbr/nos-mecanifica` é a base de integração e a fonte de verdade da
-   autoria Mecanifica. `brigsd/nos-mecanifica` permanece uma frente upstream;
+1. `warbookbr/nos-modelar` é a base de integração e a fonte de verdade da
+   autoria Modelar. `brigsd/nos-mecanifica` permanece uma frente upstream;
    avanços entram no warbook por diff, revisão e PR, não por dois planos ativos.
 2. A convergência usa a `main` do warbook como base e traz enxertos pequenos do
    brigsd. A integração A-60 encerrou a branch paralela anterior.

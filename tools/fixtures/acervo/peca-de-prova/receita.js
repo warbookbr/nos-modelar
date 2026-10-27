@@ -140,7 +140,7 @@ export const receitaPecaDeProva = {
   meta: {
     nome: 'Peça de prova das guardas',
     versao: '1.0.0',
-    autor: 'Mecanifica',
+    autor: 'Modelar',
     desc: 'fixture das guardas de navegador; não é conteúdo do acervo',
   },
   PARAMS: TABELA,

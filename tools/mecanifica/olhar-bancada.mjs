@@ -160,7 +160,7 @@ async function fecharRecursos({ browser, vite }) {
 }
 
 function urlPublicadaDa(url) {
-  return `https://warbookbr.github.io/nos-mecanifica/bancada.html${new URL(url).search}`;
+  return `https://warbookbr.github.io/nos-modelar/bancada.html${new URL(url).search}`;
 }
 
 function erroDeTempo(timeoutMs) {
@@ -391,8 +391,8 @@ export async function olharBancada({
        inspeção, porém, precisa de uma peça para provar geometria; por isso usa
        o harness privado, que injeta um catálogo explícito de fixtures. A URL
        pública continua sendo reportada como referência de produto. */
-    const base = `http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html`;
-    const basePublicada = 'https://warbookbr.github.io/nos-mecanifica/bancada.html';
+    const base = `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html`;
+    const basePublicada = 'https://warbookbr.github.io/nos-modelar/bancada.html';
     const carregarPlaywright = dependencias.carregarPlaywright
       ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
     const pw = await carregarPlaywright();

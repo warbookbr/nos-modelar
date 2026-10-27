@@ -172,7 +172,7 @@ describe('servidor MCP local — perfil revisao', () => {
     });
     try {
       await client.connect(transport);
-      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.6.0' });
+      expect(client.getServerVersion()).toEqual({ name: 'modelar-mcp', version: '0.6.0' });
       expect(client.getNegotiatedProtocolVersion()).toBe(LATEST_PROTOCOL_VERSION);
       expect(client.getServerCapabilities()).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
@@ -185,7 +185,7 @@ describe('servidor MCP local — perfil revisao', () => {
   it('faz handshake bruto, anuncia ferramentas e recursos somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
-      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.6.0' });
+      expect(inicializacao.result.serverInfo).toEqual({ name: 'modelar-mcp', version: '0.6.0' });
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
@@ -1198,7 +1198,7 @@ describe('servidor MCP local — perfil revisao', () => {
           selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
           estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
         };
-        if (fonte.includes('.url()')) return 'http://127.0.0.1:4173/nos-mecanifica/bancada.html';
+        if (fonte.includes('.url()')) return 'http://127.0.0.1:4173/nos-modelar/bancada.html';
         if (fonte.includes('.enquadramento()')) return { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false };
         /* O MODO DE REVISÃO LIGA A AUDITORIA, porque é a imagem da revisão que
            vai ao crítico e ela não leva a interface junto. A página falsa

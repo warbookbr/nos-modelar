@@ -3,7 +3,7 @@
  * A mesma função de `npm run comecar`: sem roteiro, a pergunta inicial da árvore com o estado do trabalho; com um grupo, a
  * pergunta dele e os ramos; com uma folha, a leitura com as seções entregues ali, o que abrir só quando a condição aparecer, a
  * skill, os comandos, a lista gerada e o passo seguinte lido do estado; com outro nome, os títulos de documento mais perto, e
- * com `arquivo#âncora`, a seção. Um agente que fala com o Mecanifica por MCP começa por aqui em vez de abrir documentos para descobrir por onde
+ * com `arquivo#âncora`, a seção. Um agente que fala com o Modelar por MCP começa por aqui em vez de abrir documentos para descobrir por onde
  * entrar. Só lê.
  */
 import { z } from 'zod';
@@ -20,7 +20,7 @@ export function criarFerramentasComecar() {
     {
       nome: 'comecar',
       descricao:
-        'Por onde começar uma tarefa no Mecanifica, por perguntas. Sem roteiro, pergunta pela tarefa (mudar, documentar, pesquisar, '
+        'Por onde começar uma tarefa no Modelar, por perguntas. Sem roteiro, pergunta pela tarefa (mudar, documentar, pesquisar, '
         + 'modelar) e dá o estado do trabalho; com um grupo (modelar, modelar/peca), faz a pergunta dele e lista os ramos. Com uma '
         + 'folha, devolve a leitura com as seções entregues, o que abrir só quando a condição aparecer, a skill, os comandos, a lista '
         + 'gerada (famílias, peças, operações) e o passo seguinte, lido do plano ativo, de comunicacao.md ou, com arquivo, do Condutor '

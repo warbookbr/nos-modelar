@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este documento fixa o critério usado para avaliar capacidades da Mecanifica sob
+Este documento fixa o critério usado para avaliar capacidades do Modelar sob
 a ótica do agente que vai modelar, compor, inspecionar, corrigir e manter
 sistemas mecânicos 3D.
 

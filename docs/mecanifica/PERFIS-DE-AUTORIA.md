@@ -69,7 +69,7 @@ faceteamento coerente e orçamento respeitado.
 
 ### `tecnicoDidatico`
 
-É o padrão recomendado para a Mecanifica enquanto o pedido não exigir outra
+É o padrão recomendado para o Modelar enquanto o pedido não exigir outra
 direção. Prioriza construção mecânica legível, partes isoláveis e detalhe
 suficiente para explicar montagem e funcionamento.
 
@@ -177,7 +177,7 @@ automotivo antes de serem tratadas como capacidade geral concluída.
 ## Decisão atual
 
 - a roda experimental permanece isolada e não substitui a roda da aplicação;
-- o perfil padrão da Mecanifica é `tecnicoDidatico`;
+- o perfil padrão do Modelar é `tecnicoDidatico`;
 - uma próxima peça de aproximação deve declarar o perfil antes da modelagem;
 - se ela exigir `realistaApresentacao`, a sessão deve conferir primeiro se as
   capacidades necessárias existem e registrar qualquer redução de escopo;

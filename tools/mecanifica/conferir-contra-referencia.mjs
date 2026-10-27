@@ -32,7 +32,7 @@
  *     "recorte": [182, 40, 340, 210], "qual": "topo", "tolerancia": 25,
  *     "partes": ["tuboSuperior"] }
  *   `px` é pixel na foto, x para a direita e y para baixo. `mm` é o plano
- *   lateral da Mecanifica, z para a frente e y para cima, na mesma origem da
+ *   lateral do Modelar, z para a frente e y para cima, na mesma origem da
  *   peça. Bandeira na linha de comando vence o que está no arquivo.
  */
 

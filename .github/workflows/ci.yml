@@ -80,7 +80,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: npm run test:lentos
 
-      - name: Build da Mecanifica
+      - name: Build do Modelar
         run: npm run build
 
       - name: Firewall entre núcleo e catálogo

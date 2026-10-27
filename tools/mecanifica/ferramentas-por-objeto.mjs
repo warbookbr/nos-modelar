@@ -70,7 +70,7 @@ export function gerar(dados) {
   L.push('');
   L.push('<!-- Gerado por `npm run ferramentas:gerar` a partir de `ferramentas-por-objeto.json`. Não edite à mão; `ferramentas:check` reprova a divergência. -->');
   L.push('');
-  L.push(`Este documento responde que ferramentas o Mecanifica precisa ter para a IA modelar os objetos da [lista de famílias](FAMILIAS-DE-OBJETOS.md) sem reconstruir cada forma a partir de primitivas. Cada um dos ${total} objetos das ${nFamilias} famílias da fase atual recebeu as ferramentas que tirariam dela a maior parte do trabalho, e as ferramentas estão ordenadas pelo número de objetos que atendem. A referência diz de onde vem a ideia (addon ou modificador do Blender, CAD por código, bancada de CAD ou catálogo), e a coluna "aqui" diz o que o esboço e o núcleo já fazem. Os dados estão em [\`ferramentas-por-objeto.json\`](ferramentas-por-objeto.json).`);
+  L.push(`Este documento responde que ferramentas o Modelar precisa ter para a IA modelar os objetos da [lista de famílias](FAMILIAS-DE-OBJETOS.md) sem reconstruir cada forma a partir de primitivas. Cada um dos ${total} objetos das ${nFamilias} famílias da fase atual recebeu as ferramentas que tirariam dela a maior parte do trabalho, e as ferramentas estão ordenadas pelo número de objetos que atendem. A referência diz de onde vem a ideia (addon ou modificador do Blender, CAD por código, bancada de CAD ou catálogo), e a coluna "aqui" diz o que o esboço e o núcleo já fazem. Os dados estão em [\`ferramentas-por-objeto.json\`](ferramentas-por-objeto.json).`);
   L.push('');
   L.push(dados.criterio);
   L.push('');

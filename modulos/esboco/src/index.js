@@ -862,7 +862,7 @@ const unit = (v) => { const n = Math.hypot(...v); return v.map((c) => c / n); };
 const escalarV = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
 /* Rotação de Rodrigues que leva o unitário `a` ao unitário `b` pelo menor ângulo (a mesma
-   regra de `poseQueEncaixa`, copiada: o arquivo dela importa outros módulos do Mecanifica).
+   regra de `poseQueEncaixa`, copiada: o arquivo dela importa outros módulos do Modelar).
    Devolve null quando já coincidem, como `matrizRotacao` sem rotação. */
 function rotacaoEntre(a, b) {
   const c = escalarV(a, b);

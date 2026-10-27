@@ -37,7 +37,7 @@ import { ativarReceitaBancada } from '../ativar-bancada.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
-const BASE = '/nos-mecanifica/';
+const BASE = '/nos-modelar/';
 const NOME_DO_ARQUIVO = 'PEÇA DA SESSÃO';
 const RECEITA_DA_SESSAO = 'tools/fixtures/acervo/peca-de-prova/receita.js';
 const INTERVALO_DE_LEITURA = 1500;

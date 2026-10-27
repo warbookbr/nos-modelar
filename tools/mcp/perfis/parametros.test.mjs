@@ -1,6 +1,6 @@
 /* As duas ferramentas da varredura vistas pela porta MCP.
  *
- * Um agente que fala com o Mecanifica por MCP não roda `npm run`. Se a porta
+ * Um agente que fala com o Modelar por MCP não roda `npm run`. Se a porta
  * não anunciar estas duas, ele continua alterando número no escuro — que é o
  * desperdício que elas cortam. Este arquivo prova que ela anuncia, que elas
  * respondem, e que não escrevem nada.

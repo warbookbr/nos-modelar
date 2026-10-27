@@ -1,6 +1,6 @@
 # procedural — núcleo, receitas, famílias e extensões
 
-Este diretório guarda o núcleo procedural da Mecanifica e o que ele executa. A
+Este diretório guarda o núcleo procedural do Modelar e o que ele executa. A
 superfície visual é a bancada, em `/bancada.html`, que lê a malha neutra do
 núcleo por um adaptador para Three.js; o núcleo não importa Three.js nem nada do
 domínio automotivo.

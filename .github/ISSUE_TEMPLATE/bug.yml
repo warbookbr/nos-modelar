@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Obrigado por ajudar a melhorar a Mecanifica.
+        Obrigado por ajudar a melhorar o Modelar.
   - type: textarea
     id: ocorrido
     attributes:

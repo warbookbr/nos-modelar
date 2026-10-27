@@ -1,7 +1,7 @@
 /* Parâmetros, expressões, formas herdadas da raiz e arranjos: a etapa que transforma o JSON
    declarado num JSON simples, só com números, antes de qualquer outra leitura. Um arquivo sem
    nenhum desses recursos sai com os mesmos valores. `criarResolverNumerico` é a única importação
-   do núcleo do Mecanifica (92 linhas, nenhum import). Não lê nem grava arquivo. */
+   do núcleo do Modelar (92 linhas, nenhum import). Não lê nem grava arquivo. */
 import { criarResolverNumerico } from '../../../procedural/nucleo/expressoes.js';
 import { ErroDeEsboco } from './index.js';
 import { catalogoDe, expandirComponentes } from './componentes.js';

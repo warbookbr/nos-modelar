@@ -40,6 +40,7 @@ function coordenadaDeTextura(p, eixo, metrosPorTile) {
 export function gerarObjTexto({ malha, corpos, unidade = 'mm', escala = 1000, nome = 'modelo', texturas = null, nomeMtl = null }) {
   const comTextura = texturas instanceof Map && texturas.size > 0;
   const linhas = [
+    /* O cabeçalho é marca do formato exportado, como os ids `mecanifica.*`, e fica com o nome antigo (plano renomear para Modelar, decisão 1). */
     `# Mecanifica Wavefront OBJ Exporter v1.0`,
     `# Modelo: ${nome}`,
     `# Unidade: ${unidade} (fator de escala: ${escala})`,

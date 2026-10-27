@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Mecanifica, para conferir o que a conversão e os ajustes fizeram.
+/* vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.
 
    Uso: node tools/mecanifica/vistas-de-passos.mjs <receita.json | esboco.json> [--alinhar] [--ajustes <ajustes.json>] [--saida <pasta>]
 

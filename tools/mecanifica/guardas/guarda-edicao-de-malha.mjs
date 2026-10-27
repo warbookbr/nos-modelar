@@ -28,7 +28,7 @@ import { decodePng } from '../../bancadas/bench/pngstats.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
-const BASE = '/nos-mecanifica/';
+const BASE = '/nos-modelar/';
 const PECA = 'peca-de-prova';
 /* O valor digitado no movimento, em unidades da peça. Grande o bastante para a
    medida não se confundir com ruído de arredondamento da malha. */

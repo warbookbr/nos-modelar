@@ -1,7 +1,7 @@
 # comum.py — o que regua.py, pacote-cego.py e olhar-candidata.py dividem: argumentos, leitura de malha, recorte exato pelos
 # planos de uma caixa, visibilidade pelo lado de fora, painéis, componentes, bordas e render. Roda dentro do Blender.
 #
-# Quadro: o das peças da Mecanifica, em metro, y para cima e frente em +z. OBJ é lido cru; GLB volta ao quadro do glTF
+# Quadro: o das peças do Modelar, em metro, y para cima e frente em +z. OBJ é lido cru; GLB volta ao quadro do glTF
 # (y para cima), desfazendo a troca de eixos do importador; .blend é lido no quadro do arquivo, e --z-cima o converte como
 # o exportador de glTF converteria.
 import bpy, bmesh, json, math, os, subprocess, sys

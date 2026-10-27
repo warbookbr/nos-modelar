@@ -25,7 +25,7 @@ import {
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 import { criarServicoDescobertaProcedural } from '../../procedural/servicos/descoberta.js';
 
-const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.6.0' });
+const IDENTIDADE = Object.freeze({ name: 'modelar-mcp', version: '0.6.0' });
 export const INSTRUCOES_AGENTE = [
   REGRA_ESCOPO_CATALOGO,
   'Para descobrir o vocabulário procedural, leia mecanifica://procedural/catalogo ou use buscar_capacidades. Combine e valide contratos antes de propor extensão; uma lacuna ou extensão ausente não é autorização para instalar, escrever ou promover código.',
@@ -111,7 +111,7 @@ function textoDaResposta(nome, resposta) {
 }
 
 function respostaFalhaInterna(nome, erro) {
-  process.stderr.write(`mecanifica-mcp: ${nome}: falha interna (${erro?.name ?? 'Error'}).\n`);
+  process.stderr.write(`modelar-mcp: ${nome}: falha interna (${erro?.name ?? 'Error'}).\n`);
   return {
     ok: false,
     codigo: 1,
@@ -171,7 +171,7 @@ function registrarRecursos(server, {
   server.registerResource(
     'estado',
     'mecanifica://estado',
-    { title: 'Estado do servidor Mecanifica', description: 'Contrato e capacidades ativas.', mimeType: 'application/json' },
+    { title: 'Estado do servidor Modelar', description: 'Contrato e capacidades ativas.', mimeType: 'application/json' },
     async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(estado) }] }),
   );
   server.registerResource(
@@ -362,7 +362,7 @@ export function iniciarServidor() {
   // este resume, o processo stdio pode encerrar limpo antes do `initialize`.
   process.stdin.resume();
   return serveStdio(() => criarServidor(), {
-    onerror: (erro) => process.stderr.write(`mecanifica-mcp: ${erro.message}\n`),
+    onerror: (erro) => process.stderr.write(`modelar-mcp: ${erro.message}\n`),
   });
 }
 

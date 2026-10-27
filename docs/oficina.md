@@ -1,6 +1,6 @@
 # A Oficina — índice do design
 
-> **Documento do Atelier herdado.** Para o produto Mecanifica, comece em
+> **Documento do Atelier herdado.** Para o produto Modelar, comece em
 > [`docs/mecanifica/INDEX.md`](./mecanifica/INDEX.md). Os estados “atual” e
 > “planejado” abaixo se referem ao NÓS no momento da clonagem.
 >
@@ -26,7 +26,7 @@
 | [`docs/nos-herdado/oficina-projeto.md`](./nos-herdado/oficina-projeto.md) | o racional do que já foi construído + a Ordem de construção encerrada | 7 |
 
 A referência curta de uso diário é [`docs/nos-herdado/oficina-referencia.md`](./nos-herdado/oficina-referencia.md).
-O roteiro vigente da Mecanifica é [`docs/mecanifica/historico/PLANO.md`](mecanifica/historico/PLANO.md).
+O roteiro vigente do Modelar é [`docs/mecanifica/historico/PLANO.md`](mecanifica/historico/PLANO.md).
 
 O roteiro herdado do NÓS e o que foi projetado e não construído saíram do
 repositório em 2026-09-07, junto com o resto da zona que não autorizava trabalho

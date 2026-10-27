@@ -1,6 +1,6 @@
 # Oficina — contrato procedural preservado
 
-> **Mecanifica:** a interface humana `oficina.html`, a aba de som e a ponte
+> **Modelar:** a interface humana `oficina.html`, a aba de som e a ponte
 > sonora de runtime foram removidas no commit `be157c6`. Não use este documento
 > como porta de entrada do produto: para o fluxo atual, comece em
 > [`docs/mecanifica/INDEX.md`](../mecanifica/INDEX.md). A gramática procedural
@@ -369,7 +369,7 @@ adiciona cada vértice dentro da caixa inclusiva — é o comportamento históri
 algum vértice citado; `regiao` alcança a face conforme `modo`: `'contem'`
 (DEFAULT) exige **todos** os cantos dentro da caixa — evita pintar/materializar
 meia face por acidente — e `'toca'` basta **um** canto dentro. Qualquer outro
-valor de `modo` GRITA (O-3 do plano da Mecanifica).
+valor de `modo` GRITA (O-3 do plano do Modelar).
 
 A assimetria entre os dois eixos é antiga e agora está dita: vértice sempre
 entrou por TOQUE, face só por CONTENÇÃO, de modo que a MESMA caixa selecionava

@@ -1,9 +1,9 @@
-# Mecanifica
+# Modelar
 
 Oficina procedural para IA criar, organizar, inspecionar, medir e corrigir
 objetos 3D mecânicos: núcleo geométrico, receitas determinísticas, bancada de
 inspeção e ferramentas de validação.
-[Abrir a bancada](https://warbookbr.github.io/nos-mecanifica/bancada.html), a
+[Abrir a bancada](https://warbookbr.github.io/nos-modelar/bancada.html), a
 única aplicação publicada.
 
 ## Como se trabalha
@@ -97,7 +97,7 @@ npm run descrever -- <nome-da-peca>
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 
-Abra `http://localhost:5173/nos-mecanifica/bancada.html`. A leitura de cada
+Abra `http://localhost:5173/nos-modelar/bancada.html`. A leitura de cada
 tarefa está nos [roteiros](docs/mecanifica/roteiros/ROTEIROS.md), a entrada de
 quem muda o projeto é [`docs/mecanifica/INDEX.md`](docs/mecanifica/INDEX.md) e o
 inventário completo é [`docs/MAPA.md`](docs/MAPA.md). Os documentos de

@@ -30,7 +30,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
-const BASE = '/nos-mecanifica/';
+const BASE = '/nos-modelar/';
 const PECA = 'peca-de-prova';
 const PARTE = 'tuboDeitado';
 /* O quanto a parte anda, em unidades da peça, e o mesmo número em milímetro.

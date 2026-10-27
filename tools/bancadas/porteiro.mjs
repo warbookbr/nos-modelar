@@ -23,7 +23,7 @@ const vite = await createServer({
   logLevel: 'error',
 });
 await vite.listen();
-const base = `http://127.0.0.1:${vite.httpServer.address().port}/nos-mecanifica/tools/bancadas/harness.html`;
+const base = `http://127.0.0.1:${vite.httpServer.address().port}/nos-modelar/tools/bancadas/harness.html`;
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(2); }

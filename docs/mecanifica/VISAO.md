@@ -1,4 +1,4 @@
-# Visão da Mecanifica
+# Visão do Modelar
 
 ## A frase
 
@@ -23,7 +23,7 @@ interface externa não é, por si só, objetivo deste repositório.
 
 ## O que a IA deve conseguir fazer
 
-A Mecanifica deve permitir que a IA:
+O Modelar deve permitir que a IA:
 
 - entenda qual definição é responsável por uma forma;
 - crie uma nova peça sem depender apenas de moldes preparados;

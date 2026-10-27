@@ -12,7 +12,7 @@ export const README_DO_ESBOCO = fileURLToPath(new URL('../../modulos/esboco/READ
 const PALAVRAS_VAZIAS = new Set(['o', 'a', 'os', 'as', 'um', 'uma', 'de', 'do', 'da', 'dos', 'das', 'e', 'em', 'para', 'por', 'com', 'no', 'na', 'nos', 'nas', 'ao', 'aos', 'sem', 'contra', 'ou', 'sobre', 'que', 'cada', 'isso', 'isto']);
 
 export const FRASES = {
-  independencia: 'Por que o módulo não importa o núcleo do Mecanifica, e as exceções de leitura.',
+  independencia: 'Por que o módulo não importa o núcleo do Modelar, e as exceções de leitura.',
   'como-escrever': 'O arquivo, a raiz do JSON, as opções e um exemplo mínimo.',
   'como-rodar': 'Todos os comandos da linha de comando, com as flags.',
   ajuda: 'O `--ajuda` por tópico e a imagem composta das quatro vistas (`--composta`).',

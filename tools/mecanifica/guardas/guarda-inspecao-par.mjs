@@ -50,7 +50,7 @@ async function abrir(page, url) {
 }
 
 async function provarPar(page, { peca, partes }) {
-  const url = `http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html?peca=${peca}`
+  const url = `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html?peca=${peca}`
     + `&selecionadas=${partes.join(',')}&modo=isolar&projecao=ortografica`;
   ok(`${peca}: a bancada abre`, await abrir(page, url));
   const resultado = await page.evaluate((pedidas) => window.__mecanificaBancada.inspecionarPar(pedidas), partes);

@@ -8,7 +8,7 @@ Este documento registra o procedimento oficial para carregar e inspecionar qualq
 
 A bancada possui um catálogo homologado deliberadamente vazio para evitar publicação de protótipos privados. 
 
-Para a co-modelagem em tempo real entre a IA e o operador, a bancada consome o arquivo de sincronização `public/sessao-ativa.json` (servido pelo Vite na raiz `/nos-mecanifica/sessao-ativa.json`).
+Para a co-modelagem em tempo real entre a IA e o operador, a bancada consome o arquivo de sincronização `public/sessao-ativa.json` (servido pelo Vite na raiz `/nos-modelar/sessao-ativa.json`).
 
 Quando `public/sessao-ativa.json` é atualizado, a bancada em execução detecta a mudança via polling e recarrega instantaneamente a geometria, as partes e os materiais na cena 3D.
 
@@ -51,9 +51,9 @@ npm run ativar:bancada -- --arquivo=procedural/pecas/<peca>/receita.js
 Com o servidor de desenvolvimento ativo (`npm run dev`):
 
 - **Visualização Completa:**
-  [http://localhost:5174/nos-mecanifica/bancada.html](http://localhost:5174/nos-mecanifica/bancada.html)
+  [http://localhost:5174/nos-modelar/bancada.html](http://localhost:5174/nos-modelar/bancada.html)
 - **Foco / Isolamento Direto de Peça:**
-  [http://localhost:5174/nos-mecanifica/bancada.html?selecionadas=motorEletrico&modo=isolar&focar=true](http://localhost:5174/nos-mecanifica/bancada.html?selecionadas=motorEletrico&modo=isolar&focar=true)
+  [http://localhost:5174/nos-modelar/bancada.html?selecionadas=motorEletrico&modo=isolar&focar=true](http://localhost:5174/nos-modelar/bancada.html?selecionadas=motorEletrico&modo=isolar&focar=true)
 
 ---
 

@@ -47,4 +47,4 @@ O comando gera `vistas.png` e `partes.json` na pasta de saída. O valor de `--fr
 
 ## O que não entra no repositório
 
-Nem o Blender, nem o tarball, nem `.blend`, `.obj`, `.mtl` ou GLB de terceiros são versionados. Entram só as imagens de referência e as medidas em JSON que o Mecanifica gera, como já faz o acervo de veículos.
+Nem o Blender, nem o tarball, nem `.blend`, `.obj`, `.mtl` ou GLB de terceiros são versionados. Entram só as imagens de referência e as medidas em JSON que o Modelar gera, como já faz o acervo de veículos.
