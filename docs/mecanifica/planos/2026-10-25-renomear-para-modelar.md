@@ -1,6 +1,6 @@
 # Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 
-**Estado:** ativo
+**Estado:** pronto
 
 **Responsável:** Claude, com a pessoa trocando o segredo do CI e a chave fora do repositório na fatia 3
 
@@ -39,10 +39,10 @@ As peças do acervo regeneram iguais. Nenhum formato salvo muda de identificador
 
 ## Fatias
 
-1. **Nome, texto e endereço.** O nome no texto corrido, nos títulos, no `CLAUDE.md`, no `package.json`, no servidor MCP e nos documentos de coordenação; a base do Vite e os caminhos `/nos-mecanifica/` da página publicada e dos testes; o remoto git. Pronto quando a página abre no endereço novo e o texto corrido fora do histórico não tem o nome antigo.
+1. **Nome, texto e endereço.** O nome no texto corrido, nos títulos, no `CLAUDE.md`, no `package.json`, no servidor MCP e nos documentos de coordenação; a base do Vite e os caminhos `/nos-mecanifica/` da página publicada e dos testes; o remoto git. Pronto quando a página abre no endereço novo e o texto corrido fora do histórico não tem o nome antigo. Feita em 2026-10-27.
 2. **Pastas.** `docs/mecanifica/` vira `docs/modelar/`, `tools/mecanifica/` vira `tools/modelar/` e os módulos `@mecanifica/*` mudam de escopo, com os imports, os scripts, os gates ancorados por caminho, os links e as páginas geradas refeitos numa passada só. Os links dos documentos encerrados são corrigidos sem mudar o texto deles. Pronto quando os gates de links, citações, estrutura e mapa passam.
 3. **Variáveis e gate do nome.** As variáveis `MECANIFICA_*` viram `MODELAR_*`, e o código aceita o nome antigo com aviso até o fechamento do plano seguinte; a pessoa troca o segredo do CI e o arquivo da chave fora do repositório. Entra o gate que recusa o nome antigo fora das exceções (formatos, banco local, histórico, aviso de leitura). Pronto quando o CI passa pelo nome novo.
-4. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o da [bateria rápida e retorno cedo](2026-10-27-bateria-rapida-e-retorno-cedo.md), e depois dele o de ajustes no núcleo dos veículos.
+4. **Fechamento.** `UPSTREAM-NOS.md`, backlog, `npm run gates -- --completo` e o plano movido para `encerrados/`; o seguinte é o de ajustes no núcleo dos veículos.
 
 ## Decisões da pessoa
 
@@ -55,3 +55,7 @@ O risco maior é um caminho antigo citado por texto que nenhum gate lê, como um
 ## Andamento
 
 Escrito em 2026-10-25 a partir do mapa das menções, sem implementação. Ativado em 2026-10-27, com o fechamento do plano da leitura por demanda.
+
+Fatia 1 feita em 2026-10-27. O nome entrou no texto corrido, nos títulos e no contrato, com o artigo trocado ("do Modelar" no lugar de "da Mecanifica"), em 83 arquivos; o pacote e o servidor MCP passaram a `modelar` e `modelar-mcp`, e a base do Vite, os endereços da bancada nas ferramentas e os links do repositório, a `/nos-modelar/`, em 21 arquivos. Os achados, cada um com a resposta se o processo o teria pego. A troca por script alterou a definição do agente crítico, que não pode mudar, e o `calibracao:check` pegou; ela voltou ao texto antigo e fica como exceção do gate do nome na fatia 3. Trocou também o cabeçalho dos arquivos OBJ e MTL que o exportador grava, que é marca do formato salvo como os ids `mecanifica.*` (decisão 1); o teste de hash do exportador pegou, e o cabeçalho voltou ao nome antigo com o motivo no código. Dois testes conferiam o nome do pacote, e os testes rápidos pegaram. A bateria padrão desta fatia levou o tempo da completa, porque os testes lentos rodam por impacto e a fatia tocou o repositório inteiro; com o aceite da pessoa, o envio foi feito com os testes rápidos e as conferências que tinham falhado, e os lentos ficaram para o CI.
+
+Pausado em 2026-10-27, com a fatia 1 enviada: a pessoa trouxe o plano da [bateria rápida e retorno cedo](2026-10-27-bateria-rapida-e-retorno-cedo.md) para antes, porque cada envio desta renomeação esperava a bateria inteira. A fatia 2 recomeça quando ele fechar.

@@ -490,7 +490,7 @@
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 - `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
-- `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — o gate que falha avisa em segundos e o que não mudou não roda de novo
+- `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — a bateria local abaixo de um minuto e a completa abaixo de cinco no CI
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
