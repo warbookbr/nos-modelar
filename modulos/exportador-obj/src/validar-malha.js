@@ -1,5 +1,6 @@
 ﻿/* validar-malha.js — validação e normalização de malha neutra para exportação OBJ. */
 import { ErroExportacaoObj } from './contrato.js';
+import { triangulosDaFace } from '../../exportador-cad/src/triangular-faces.js';
 
 function erro(codigo, mensagem, detalhes) {
   throw new ErroExportacaoObj(codigo, mensagem, detalhes);
@@ -77,10 +78,11 @@ export function validarMalhaObj(neutro, { tolerancia = 0.001, exigirFechado = fa
     });
 
     const limiteDegenerado = tolerancia * FRACAO_DA_TOLERANCIA_PARA_DEGENERADO;
-    for (let i = 1; i < pontos.length - 1; i++) {
-      if (alturaMinima(pontos[0], pontos[i], pontos[i + 1]) <= limiteDegenerado) {
-        erro('face-degenerada', 'Face tem triângulo sem área (altura abaixo da tolerância).', { face: id });
-      }
+    /* O leque do canto 0 é a triangulação de sempre; com canto colinear ele tem triângulo sem área, e então a face vale se outro
+       leque ou as orelhas não têm nenhum. */
+    const triangulos = triangulosDaFace({ vs }, vertices, (a, b, c) => alturaMinima(a, b, c) <= limiteDegenerado);
+    if (!triangulos) {
+      erro('face-degenerada', 'Face tem triângulo sem área (altura abaixo da tolerância).', { face: id });
     }
 
     for (let i = 0; i < vs.length; i++) {
@@ -93,7 +95,7 @@ export function validarMalhaObj(neutro, { tolerancia = 0.001, exigirFechado = fa
     }
 
     const material = typeof face.material === 'string' && face.material.trim() ? face.material.trim() : null;
-    faces.push({ id, vs: vs.slice(), parte: face.parte.trim(), material });
+    faces.push({ id, vs: vs.slice(), parte: face.parte.trim(), material, triangulos });
   }
 
   if (exigirFechado) {

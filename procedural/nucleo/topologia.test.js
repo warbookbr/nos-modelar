@@ -236,12 +236,12 @@ describe('a face torta e o triângulo de área nula da triangulação', () => {
     expect(r.achados.find((a) => a.codigo === 'face-torta').severidade).toBe('alerta');
   });
 
-  it('reprova o canto colinear que dá triângulo de área nula na triangulação de uma face sã', () => {
+  it('aceita o canto colinear de uma face sã: a triangulação troca de leque e não tem triângulo de área nula', () => {
     const r = analisarTopologia({
       vertices: new Map([[0, [0, 0, 0]], [1, [0.5, 0, 0]], [2, [1, 0, 0]], [3, [1, 1, 0]], [4, [0, 1, 0]]]),
       faces: new Map([[0, { vs: [0, 1, 2, 3, 4] }]]),
     }, { triangulacao: true });
-    expect(cods(r)).toContain('triangulo-degenerado');
+    expect(cods(r)).not.toContain('triangulo-degenerado');
     expect(cods(r)).not.toContain('area-nula');
   });
 });

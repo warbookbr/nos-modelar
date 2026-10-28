@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1520 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1523 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -805,7 +805,7 @@
 - `contrato.js` — contrato.js — contrato e validação de opções do exportador CAD.
 - `index.js` — index.js — porta pública do módulo exportador CAD.
 - `separar-corpos.js` — separar-corpos.js — separação determinística de componentes conexos por parte.
-- `triangular-faces.js` — triangular-faces.js — decomposição determinística de faces poligonais em triângulos.
+- `triangular-faces.js` — triangular-faces.js — decomposição determinística de faces poligonais em triângulos. O leque a partir do primeiro canto é a triangulação de sempre; ele só mu…
 - `validar-malha.js` — validar-malha.js — validação pura de integridade e topologia da malha neutra.
 
 ## modulos/exportador-cad/src/backends/
@@ -814,6 +814,7 @@
 
 ## modulos/exportador-cad/tests/
 
+- `canto-colinear.test.js` — canto-colinear.test.js — perfil de extrusão com um vértice no meio de uma aresta (caso 2 do plano dos veículos), no STEP.
 - `exportador-cad.test.js` — exportador-cad.test.js — suíte de testes do exportador CAD cobrindo R01, R02 e R04.
 
 ## modulos/exportador-obj/
@@ -830,6 +831,7 @@
 
 ## modulos/exportador-obj/tests/
 
+- `canto-colinear.test.js` — canto-colinear.test.js — perfil de extrusão com um vértice no meio de uma aresta (caso 2 do plano dos veículos). O polígono é válido; o leque do canto 0 o tr…
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
 - `textura.test.js` — textura.test.js — material por parte, arquivo .mtl, usemtl, coordenadas vt em mapeamento planar e recusas.
 - `tolerancia.test.js` — tolerancia.test.js — tolerância de triângulo degenerado e regressão de saída sem texturas.
@@ -1068,6 +1070,7 @@
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
 - `topologia.js` — topologia.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve. Até 2026-10-27 morava em `modulos/topologia/`; …
 - `topologia.test.js` — topologia.test.js — cada regra é vista REPROVANDO um defeito construído de propósito, e APROVANDO a malha sã correspondente.
+- `triangulacao-colinear.test.mjs` — triangulacao-colinear.test.mjs — face com canto colinear não sai em triângulo de área nula. O polígono com um canto no meio de uma aresta é válido (a boolean…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
 

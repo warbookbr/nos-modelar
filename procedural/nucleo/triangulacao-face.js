@@ -10,7 +10,13 @@
    (triangularFace) e a côncava fica com o triangulador dela
    (triangularConvexa devolve null). A
    fronteira do polígono não muda, então casca fechada, ids e manifold seguem
-   iguais. Função pura: mesma entrada, mesma saída. */
+   iguais. Função pura: mesma entrada, mesma saída.
+
+   Face com canto colinear (um polígono válido: o vértice que a booleana deixa no meio de uma aresta, o ponto médio de um
+   perfil de extrusão) dá no leque do canto 0 um triângulo de área nula quando o canto 0 vizinho é o colinear.
+   `triangularSemDegenerado` devolve o mesmo leque quando ele não tem triângulo degenerado, e só quando tem procura outro:
+   o leque a partir de outro canto, e por último as orelhas. Quem valida e quem exporta usam a mesma função com o mesmo
+   critério de degenerado, e por isso o leque do canto 0 que já saía sem defeito sai bit a bit igual. */
 
 const MIN_CANTOS = 8;
 const GRANDE = 1e30;
@@ -29,7 +35,68 @@ function leque(n) {
 /* pts: posições 3D dos cantos, em ordem. Devolve triplas de índices de pts,
    com o mesmo sentido de giro do polígono. */
 export function triangularFace(pts) {
-  return triangularConvexa(pts) ?? leque(pts.length);
+  return triangularConvexa(pts) ?? triangularSemDegenerado(pts) ?? leque(pts.length);
+}
+
+/* Área e normal de Newell do polígono; a normal tem o comprimento do dobro da área. */
+function normalDeNewell(pts) {
+  let nm = [0, 0, 0];
+  for (let i = 0; i < pts.length; i++) {
+    const c = cruz(pts[i], pts[(i + 1) % pts.length]);
+    nm = [nm[0] + c[0], nm[1] + c[1], nm[2] + c[2]];
+  }
+  return nm;
+}
+
+/* Critério de degenerado de quem não declara o seu: área abaixo de 1e-12 do quadrado da maior aresta da face, o mesmo
+   limite que `triangularConvexa` usa para recusar o apice de lasca. */
+function degeneradoPorEscala(pts) {
+  let escala = 0;
+  for (let i = 0; i < pts.length; i++) { const d = sub(pts[(i + 1) % pts.length], pts[i]); escala = Math.max(escala, Math.hypot(d[0], d[1], d[2])); }
+  const limite = 1e-12 * escala * escala;
+  return (a, b, c) => Math.hypot(...cruz(sub(b, a), sub(c, a))) / 2 <= limite;
+}
+
+/* Orelhas com área positiva sobre a normal da face e sem outro canto dentro ou sobre a diagonal. */
+function orelhas(pts, nm, degenerado) {
+  const resto = pts.map((_, i) => i);
+  const saida = [];
+  const dentro = (p, a, b, c) => [[a, b], [b, c], [c, a]].every(([u, v]) => dot(cruz(sub(v, u), sub(p, u)), nm) >= 0);
+  while (resto.length > 3) {
+    let achou = -1;
+    for (let k = 0; k < resto.length && achou < 0; k++) {
+      const i = resto[(k + resto.length - 1) % resto.length], j = resto[k], l = resto[(k + 1) % resto.length];
+      const [a, b, c] = [pts[i], pts[j], pts[l]];
+      if (degenerado(a, b, c) || !(dot(cruz(sub(b, a), sub(c, a)), nm) > 0)) continue;
+      if (resto.some((m) => m !== i && m !== j && m !== l && dentro(pts[m], a, b, c))) continue;
+      achou = k;
+    }
+    if (achou < 0) return null;
+    const m = resto.length;
+    saida.push([resto[(achou + m - 1) % m], resto[achou], resto[(achou + 1) % m]]);
+    resto.splice(achou, 1);
+  }
+  if (degenerado(pts[resto[0]], pts[resto[1]], pts[resto[2]])) return null;
+  saida.push([resto[0], resto[1], resto[2]]);
+  return saida;
+}
+
+/* Triplas de índices de pts, com o sentido de giro do polígono e nenhum triângulo degenerado, ou null quando nenhuma
+   triangulação serve. O leque do canto 0 é a primeira escolha; se ele tem triângulo degenerado, o leque a partir do
+   primeiro outro canto cujos triângulos todos têm área positiva sobre a normal da face; por fim as orelhas.
+   `degenerado(a, b, c)` diz se o triângulo dos três pontos não vale: sem ele, vale o limite relativo à maior aresta. */
+export function triangularSemDegenerado(pts, degenerado = null) {
+  const n = pts.length;
+  if (n < 3) return null;
+  const eDegenerado = degenerado ?? degeneradoPorEscala(pts);
+  const nm = normalDeNewell(pts);
+  const dele = (c) => { const t = []; for (let k = 1; k < n - 1; k++) t.push([c, (c + k) % n, (c + k + 1) % n]); return t; };
+  const serve = (t, exigeGiro) => t.every(([i, j, k]) => !eDegenerado(pts[i], pts[j], pts[k])
+    && (!exigeGiro || dot(cruz(sub(pts[j], pts[i]), sub(pts[k], pts[i])), nm) > 0));
+  const zero = dele(0);
+  if (serve(zero, false)) return zero;
+  for (let c = 1; c < n; c++) { const t = dele(c); if (serve(t, true)) return t; }
+  return orelhas(pts, nm, eDegenerado);
 }
 
 /* igual a triangularFace, mas devolve null quando a face é pequena ou côncava
