@@ -14,7 +14,7 @@ const DOC = ['docs', 'x.md'].join('/');
 const NOVO = ['docs', 'novo.md'].join('/');
 
 describe('registro de leituras', () => {
-  it('anota o arquivo lido, a pasta listada, a leitura do processo node filho e o git como quem lê tudo', () => {
+  it('anota o arquivo lido, a pasta listada, a leitura do processo node filho, a pasta do arquivo dado a outro programa e o git que lê conteúdo como quem lê tudo', () => {
     const dir = mkdtempSync(join(tmpdir(), 'leituras-'));
     const destino = join(dir, 'x.jsonl');
     const roteiro = `
@@ -25,11 +25,13 @@ describe('registro de leituras', () => {
       const cp = await import('node:child_process');
       fs.readFileSync('package.json'); fs.readdirSync('docs'); fs.readFileSync('node_modules/vitest/package.json');
       cp.execFileSync(process.execPath, ['-e', "require('fs').readFileSync('CLAUDE.md')"]);
-      cp.spawnSync('git', ['status', '--short']);`;
+      cp.spawnSync('git', ['status', '--short']);
+      cp.spawnSync('python3', ['-c', 'pass', 'package.json']);
+      cp.spawnSync('git', ['log', '-1']);`;
     execFileSync(process.execPath, ['--input-type=module', '-e', roteiro], { cwd: RAIZ, env: { ...process.env, GATES_LEITURAS_DESTINO: '' } });
     const registro = lerLeituras(dir)['tools/x.test.mjs'];
     expect([...registro.arquivos].sort()).toEqual(['CLAUDE.md', 'package.json']);
-    expect([...registro.pastas]).toEqual(['docs']);
+    expect([...registro.pastas].sort()).toEqual(['', 'docs']);
     expect(registro.tudo).toBe(true);
     expect(readFileSync(destino, 'utf8')).not.toContain('node_modules');
     rmSync(dir, { recursive: true, force: true });

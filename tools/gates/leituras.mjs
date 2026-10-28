@@ -27,6 +27,8 @@ export const ehNavegador = (programa) => /^(headless_shell|chrome|chromium|chrom
 const RAIZ = resolve(dirname(ESTE_ARQUIVO), '../..');
 const FORA = /^(node_modules|\.git|tmp|dist)(\/|$)/;
 
+const GIT_SEM_CONTEUDO = ['status', 'rev-parse', 'config', '--version'];
+
 export const arquivoDoRegistro = (diretorio, teste) => join(diretorio, `${createHash('sha1').update(teste).digest('hex').slice(0, 16)}.jsonl`);
 
 /* Instala as anotações neste processo. `destino` é o .jsonl do arquivo de teste. */
@@ -82,9 +84,21 @@ export function instalar(destino) {
   const ehNode = (programa) => ['node', 'npm', 'npx', 'vitest', 'vite', 'tsx'].includes(basename(programa).replace(/\.(cmd|exe)$/, '')) || programa === process.execPath;
   const examinar = (comando, args, opcoes) => {
     const naRaiz = relativoDaRaiz(opcoes?.cwd ?? process.cwd()) !== null || resolve(opcoes?.cwd ?? process.cwd()) === RAIZ;
-    const programa = String(comando).trim().split(/\s+/)[0];
-    if (!ehNode(programa) && !ehNavegador(programa) && naRaiz) anotar('t', `${basename(programa)}`);
-    for (const a of args ?? []) { const rel = typeof a === 'string' && !a.startsWith('-') ? relativoDaRaiz(resolve(opcoes?.cwd ?? process.cwd(), a)) : null; if (rel && existe(join(RAIZ, rel))) anotar('a', rel); }
+    const palavras = String(comando).trim().split(/\s+/);
+    const programa = palavras[0];
+    const todos = [...palavras.slice(1), ...(args ?? [])].filter((a) => typeof a === 'string');
+    /* `git status` e `git rev-parse` dizem o estado da árvore, e o teste que os usa compara antes e depois; o resto do git na raiz
+       lê conteúdo que não dá para ver daqui. */
+    if (basename(programa) === 'git') { if (naRaiz && !GIT_SEM_CONTEUDO.includes(todos.find((a) => !a.startsWith('-')))) anotar('t', `git ${todos[0] ?? ''}`); }
+    /* Outro programa (Python, Blender) lê o arquivo que recebe e os vizinhos dele: medido em 2026-10-28, os scripts de
+       `tools/blender` abrem o que vem no argumento e o `grade.json` ou o `.json` ao lado. Vale o arquivo e a pasta dele. */
+    const outro = !ehNode(programa) && !ehNavegador(programa) && basename(programa) !== 'git';
+    for (const a of todos) {
+      const rel = !a.startsWith('-') ? relativoDaRaiz(resolve(opcoes?.cwd ?? process.cwd(), a)) : null;
+      if (!rel || !existe(join(RAIZ, rel))) continue;
+      anotar('a', rel);
+      if (outro) anotar('d', dirname(rel) === '.' ? '' : dirname(rel));
+    }
   };
   for (const nome of ['spawn', 'spawnSync', 'execFile', 'execFileSync']) {
     const original = childProcess[nome];
@@ -128,8 +142,8 @@ export function lerLeituras(diretorio) {
       try {
         const l = JSON.parse(linha);
         if (l.teste) teste = l.teste;
-        else if (l.a) entrada.arquivos.add(l.a);
-        else if (l.d) entrada.pastas.add(l.d);
+        else if ('a' in l) entrada.arquivos.add(l.a);
+        else if ('d' in l) entrada.pastas.add(l.d);
         else if (l.t && !ehNavegador(l.t)) entrada.tudo = true;
       } catch { entrada.tudo = true; }
     }
