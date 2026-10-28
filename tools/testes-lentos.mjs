@@ -9,7 +9,7 @@
  * (variável GATES_COMPLETO=1), no CI (variável CI) e quando não dá para saber o ramo remoto. Assim nenhum teste deixa de rodar
  * antes de chegar à main. `npm test` continua rodando a suíte inteira de uma vez. */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -150,17 +150,56 @@ export function argumentosDoVitest(modo, { ambiente = process.env, remoto = ramo
   return { args: ['run', '--changed', base, '--passWithNoTests'], motivo: `os lentos ligados ao que mudou desde ${base}` };
 }
 
-/* No CI os testes lentos rodam divididos entre máquinas: GATES_PARTE=2/5 roda a segunda de cinco partes (`vitest --shard`). */
-export function comParte(args, ambiente = process.env) {
-  const parte = ambiente.GATES_PARTE;
-  if (!parte) return args;
-  if (!/^\d+\/\d+$/.test(parte)) throw new Error(`GATES_PARTE='${parte}' não é parte/total, como 2/5`);
-  return [...args, `--shard=${parte}`];
+/* No CI os testes lentos rodam divididos entre máquinas: GATES_PARTE=2/5 roda a segunda de cinco partes.
+ *
+ * Medido em 2026-10-28: o `--shard` do vitest divide pelo número de arquivos, e duas das cinco partes levavam 4,5 e 5 minutos
+ * enquanto as outras levavam 2, porque os arquivos mais pesados caíram juntos. Os lentos se dividem pelo peso medido de cada
+ * arquivo (`testes-lentos-pesos.json`), o mais pesado primeiro na parte mais leve; o arquivo sem peso medido entra com a
+ * mediana. O peso só muda o equilíbrio, nunca quem roda: todo arquivo da lista cai em exatamente uma parte. Para renovar os pesos
+ * depois de uma rodada inteira dos lentos: `node tools/testes-lentos.mjs --pesos`. */
+export const ARQUIVO_DOS_PESOS = join(dirname(fileURLToPath(import.meta.url)), 'testes-lentos-pesos.json');
+
+export function lerParte(parte) {
+  const m = /^(\d+)\/(\d+)$/.exec(parte ?? '');
+  if (!m || Number(m[1]) < 1 || Number(m[1]) > Number(m[2])) throw new Error(`GATES_PARTE='${parte}' não é parte/total, como 2/5`);
+  return { indice: Number(m[1]), total: Number(m[2]) };
+}
+
+export function partesPorPeso(arquivos, pesos, total) {
+  const medidos = arquivos.map((a) => pesos[a]).filter((p) => p > 0).sort((x, y) => x - y);
+  const mediana = medidos.length ? medidos[Math.floor(medidos.length / 2)] : 1;
+  const partes = Array.from({ length: total }, () => ({ peso: 0, arquivos: [] }));
+  const ordem = [...arquivos].sort((a, b) => (pesos[b] ?? mediana) - (pesos[a] ?? mediana) || a.localeCompare(b));
+  for (const arquivo of ordem) {
+    const leve = partes.reduce((min, p) => (p.peso < min.peso ? p : min));
+    leve.peso += pesos[arquivo] ?? mediana;
+    leve.arquivos.push(arquivo);
+  }
+  return partes.map((p) => p.arquivos.sort());
+}
+
+function lerPesos() {
+  try { return JSON.parse(readFileSync(ARQUIVO_DOS_PESOS, 'utf8')).segundos ?? {}; } catch { return {}; }
+}
+
+export function comParte(args, ambiente = process.env, modo = 'lentos', pesos = lerPesos()) {
+  if (!ambiente.GATES_PARTE) return args;
+  const { indice, total } = lerParte(ambiente.GATES_PARTE);
+  if (modo === 'lentos' && args.length === 1 && args[0] === 'run') return ['run', ...partesPorPeso(TESTES_LENTOS, pesos, total)[indice - 1]];
+  return [...args, `--shard=${indice}/${total}`];
+}
+
+function gravarPesos(raiz) {
+  const { gravado, duracoes } = JSON.parse(readFileSync(join(raiz, 'tmp', 'gates', 'duracoes-dos-testes-lentos.json'), 'utf8'));
+  const medidos = Object.fromEntries(duracoes.map(({ arquivo, ms }) => [arquivo, Math.max(1, Math.round(ms / 1000))]));
+  const segundos = Object.fromEntries(TESTES_LENTOS.filter((a) => a in medidos).map((a) => [a, medidos[a]]));
+  writeFileSync(ARQUIVO_DOS_PESOS, `${JSON.stringify({ medido: `${gravado.slice(0, 10)}; só a proporção entre os arquivos importa`, segundos }, null, 1)}\n`);
+  console.log(`testes-lentos — ${Object.keys(segundos).length} pesos gravados em ${ARQUIVO_DOS_PESOS}.`);
 }
 
 function rodar(modo) {
   const { args: semParte, motivo } = argumentosDoVitest(modo);
-  const args = comParte(semParte);
+  const args = comParte(semParte, process.env, modo);
   console.log(`test:${modo} — ${motivo}${process.env.GATES_PARTE ? `, parte ${process.env.GATES_PARTE}` : ''}.`);
   const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
   const inicio = Date.now();
@@ -185,6 +224,7 @@ function rodar(modo) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  if (process.argv.includes('--pesos')) { gravarPesos(join(dirname(fileURLToPath(import.meta.url)), '..')); process.exit(0); }
   const modo = process.argv.includes('--lentos') ? 'lentos' : process.argv.includes('--rapidos') ? 'rapidos' : null;
   if (!modo) { console.error('uso: node tools/testes-lentos.mjs --rapidos | --lentos'); process.exit(2); }
   rodar(modo);

@@ -1,9 +1,9 @@
 /* testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa. */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { acimaDoTeto, argumentosDoVitest, comParte, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
+import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -39,12 +39,35 @@ describe('a lista dos testes lentos', () => {
 });
 
 describe('a parte dos lentos que cada máquina do CI roda', () => {
-  it('acrescenta o --shard do vitest quando GATES_PARTE vem', () => {
-    expect(comParte(['run'], { GATES_PARTE: '2/5' })).toEqual(['run', '--shard=2/5']);
-    expect(comParte(['run'], {})).toEqual(['run']);
+  it('cada lento cai em exatamente uma parte, e as partes ficam com peso parecido', () => {
+    const pesos = { a: 10, b: 9, c: 1, d: 1, e: 1 };
+    const partes = partesPorPeso(['a', 'b', 'c', 'd', 'e', 'f'], pesos, 2);
+    expect(partes.flat().sort()).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+    expect(partes).toEqual([['a', 'd', 'f'], ['b', 'c', 'e']]);
+    const reais = partesPorPeso(TESTES_LENTOS, {}, 5);
+    expect(reais.flat().sort()).toEqual([...TESTES_LENTOS].sort());
+  });
+
+  it('GATES_PARTE escolhe a parte pelo peso nos lentos e o --shard nos rápidos', () => {
+    const args = comParte(['run'], { GATES_PARTE: '1/2' }, 'lentos', {});
+    expect(args[0]).toBe('run');
+    expect(args.length).toBeGreaterThan(1);
+    expect(comParte(['run'], { GATES_PARTE: '2/5' }, 'rapidos')).toEqual(['run', '--shard=2/5']);
+    expect(comParte(['run'], {}, 'lentos')).toEqual(['run']);
   });
 
   it('recusa a parte mal escrita', () => {
     expect(() => comParte(['run'], { GATES_PARTE: 'dois' })).toThrow(/parte\/total/);
+    expect(() => comParte(['run'], { GATES_PARTE: '6/5' })).toThrow(/parte\/total/);
+  });
+
+  it('o nome de cada lento, como filtro do vitest, só pega ele mesmo', () => {
+    const ambiguos = TESTES_LENTOS.filter((f) => TESTES_LENTOS.filter((g) => g.includes(f)).length !== 1);
+    expect(ambiguos).toEqual([]);
+  });
+
+  it('os pesos só nomeiam arquivos da lista dos lentos', () => {
+    const { segundos } = JSON.parse(readFileSync(ARQUIVO_DOS_PESOS, 'utf8'));
+    expect(Object.keys(segundos).filter((a) => !TESTES_LENTOS.includes(a))).toEqual([]);
   });
 });
