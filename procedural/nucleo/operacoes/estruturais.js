@@ -1,6 +1,7 @@
 /* estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 import { criarArestasEmGrupos, grupoCoplanar, indiceDeArestas } from './arestas-em-grupos.js';
 import { criarArestasEmCadeia, lerCadeia } from './arestas-em-cadeia.js';
+import { desvioDeFacePlana } from './face-plana.js';
 
 export function criarOperacoesEstruturais(servicos) {
   const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
@@ -1012,11 +1013,33 @@ export function criarOperacoesEstruturais(servicos) {
     };
 
     const Pk = [v0], Qk = [v1];
+    const novos = new Map([[v0, tangA0], [v1, tangA1]]);
     for (let k = 1; k <= paineis; k++) {
       const idP = b + (k - 1) * 2, idQ = idP + 1;
-      addV(st, idP, noArco(rAP, rBP, centroP, k));
-      addV(st, idQ, noArco(rAQ, rBQ, centroQ, k));
+      novos.set(idP, noArco(rAP, rBP, centroP, k));
+      novos.set(idQ, noArco(rAQ, rBQ, centroQ, k));
       Pk.push(idP); Qk.push(idQ);
+    }
+    /* O arco anda no plano perpendicular à aresta, e o canto da ponta anda junto: a face da ponta só continua plana se o plano
+       dela contém essa direção, isto é, se é perpendicular à aresta. Numa forma facetada (a lateral de um prisma de vários lados)
+       não é, e a face vizinha sairia torta sem que nada dissesse. Confere, antes de escrever, as faces que o passo altera. A face
+       de canto do `chamferBox` (ponta composta) fica de fora: ela é a costura das duas tangências, torta por contrato do Escopo B
+       (a esquadria do canto composto), e a recusa dela mudaria esse contrato. */
+    const aposOPasso = [
+      [faceAId, faceA.vs],
+      [faceBId, faceB.vs.map((v) => (v === v0 ? Pk[paineis] : v === v1 ? Qk[paineis] : v))],
+    ];
+    if (ponta0.tipo === 'simples') aposOPasso.push([ponta0.face.id, ponta0.face.vs.flatMap((v) => (v === v0 ? [...Pk.slice(1).reverse(), v0] : [v]))]);
+    if (ponta1.tipo === 'simples') aposOPasso.push([ponta1.face.id, ponta1.face.vs.flatMap((v) => (v === v1 ? [v1, ...Qk.slice(1)] : [v]))]);
+    for (const [fid, vs] of aposOPasso) {
+      const torta = desvioDeFacePlana(vs.map((v) => novos.get(v) ?? st.V.get(v)));
+      if (torta) {
+        return grita(st, i, 'arredondarAresta', 'aresta', `a face ${fid} ficaria torta: o canto ${vs[torta.canto]} a ${torta.desvio.toExponential(2)} do plano médio (tolerância ${torta.tolerancia.toExponential(1)}). O arco anda no plano perpendicular à aresta, e a face ${fid} não é perpendicular a ela (forma facetada, como a lateral de um prisma de vários lados); arredonde onde a face vizinha é perpendicular, ou modele o canto arredondado no perfil`);
+      }
+    }
+    for (let k = 1; k <= paineis; k++) {
+      addV(st, Pk[k], novos.get(Pk[k]));
+      addV(st, Qk[k], novos.get(Qk[k]));
     }
     st.V.set(v0, tangA0); st.V.set(v1, tangA1);
     const paineisIds = [];
