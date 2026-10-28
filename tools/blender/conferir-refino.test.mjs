@@ -11,7 +11,7 @@
    pedido o canto é acusado, com --todas-as-partes o friso (4 mm) é acusado, e a abertura que desce 45 mm é acusada de
    qualquer modo. Com OBJ, que não traz partes, a saída diz que a comparação inclui tudo.
 
-   Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
+   Só roda com MODELAR_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
    inteiro se ignora. */
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -20,8 +20,9 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CALOMBO, CAIXA, abaixo, obj } from './chapa-com-abertura-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
-const BLENDER = process.env.MECANIFICA_BLENDER;
+const BLENDER = doAmbiente('BLENDER');
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const RECEITA_LISA = join(AQUI, '../modelar/fixtures/ondulacao-prova-lisa.js');
 const RODADA = (n) => join(AQUI, `receitas-de-prova/chapa-rodada-${n}.js`);
@@ -74,7 +75,7 @@ describe.skipIf(!BLENDER)('conferir-refino: a zona dada como certa que o refino 
   });
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

@@ -216,7 +216,7 @@ function rodar(modo) {
   console.log(`test:${modo} — ${motivo}${process.env.GATES_PARTE ? `, parte ${process.env.GATES_PARTE}` : ''}.`);
   const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
   const inicio = Date.now();
-  const r = spawnSync('npx', ['vitest', ...args], { cwd: raiz, stdio: 'inherit', shell: true, env: { ...process.env, MECANIFICA_TESTES: modo } });
+  const r = spawnSync('npx', ['vitest', ...args], { cwd: raiz, stdio: 'inherit', shell: true, env: { ...process.env, MODELAR_TESTES: modo } });
   process.exitCode = r.status ?? 1;
   const caminho = join(raiz, 'tmp', 'gates', `duracoes-dos-testes-${modo}.json`);
   if (!existsSync(caminho)) return;

@@ -35,7 +35,7 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
       stderr: 'pipe',
       env: {
         ...process.env,
-        MECANIFICA_CATALOGO_MONTAGENS: CONFIGURACAO,
+        MODELAR_CATALOGO_MONTAGENS: CONFIGURACAO,
       },
     });
 
@@ -172,7 +172,7 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
       stderr: 'pipe',
       env: {
         ...process.env,
-        MECANIFICA_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo-falha.json'),
+        MODELAR_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo-falha.json'),
       },
     });
     try {
@@ -209,7 +209,7 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
       stderr: 'pipe',
       env: {
         ...process.env,
-        MECANIFICA_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo.json'),
+        MODELAR_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo.json'),
       },
     });
     try {
@@ -240,7 +240,7 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
       stderr: 'pipe',
       env: {
         ...process.env,
-        MECANIFICA_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo.json'),
+        MODELAR_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo.json'),
       },
     });
     try {

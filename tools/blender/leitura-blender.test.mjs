@@ -7,7 +7,7 @@
    total e em 3D, acusa o vinco do chanfro ausente no lado, no topo e em 3D, e não na frente, acusa o mesmo vinco 5 mm acima
    com o desvio de 5 mm, e conta o vinco que um .blend declara numa forma que não o tem pela dobra.
 
-   Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
+   Só roda com MODELAR_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
    se ignora. A prova sem Blender, sobre um pacote desenhado pelo imagens.py, está em leitura-do-pacote.test.mjs. */
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
@@ -17,8 +17,9 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CAIXA, bordaDeCorte, corte, meioDoArredondamento, obj, projetar, visivel, vincos } from './prisma-de-prova.mjs';
 import { estatisticas, pontosDe, distancias, distanciasA } from './distancias-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
-const BLENDER = process.env.MECANIFICA_BLENDER;
+const BLENDER = doAmbiente('BLENDER');
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const CORTES = [{ nome: 'secao', eixo: 'z', valor: 0.5 }, { nome: 'longitudinal', eixo: 'x', valor: 0.15 }];
 const DIRECOES = { frente: [0, 0, -1], lado: [-1, 0, 0], topo: [0, -1, 0] };
@@ -60,10 +61,10 @@ describe.skipIf(!BLENDER)('leitura de um pacote cego feito pelo Blender', () => 
     lidoCorte = JSON.parse(readFileSync(p('corte.json'), 'utf8'));
     lidoLinhas = JSON.parse(readFileSync(p('linhas.json'), 'utf8'));
   }, 600000);
-  // MECANIFICA_BLENDER_GUARDAR=1 guarda a pasta com o pacote e as leituras para olhar depois
+  // MODELAR_BLENDER_GUARDAR=1 guarda a pasta com o pacote e as leituras para olhar depois
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

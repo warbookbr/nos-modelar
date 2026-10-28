@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
+import { doAmbiente } from '../ambiente.mjs';
 import { criarFerramentasRevisao } from './perfis/revisao.mjs';
 import { criarFerramentasMontagem } from './perfis/montagens.mjs';
 import { criarFerramentasImpactoGlobal } from './perfis/impacto-global.mjs';
@@ -289,9 +290,9 @@ function registrarRecursos(server, {
 }
 
 function autoriaDoAmbiente(catalogoMontagens, universoDependencias, ambiente = process.env) {
-  const raizRepositorio = ambiente?.MECANIFICA_REPOSITORIO_AUTORIA;
+  const raizRepositorio = doAmbiente('REPOSITORIO_AUTORIA', ambiente);
   if (!raizRepositorio || (!catalogoMontagens.configurado && !universoDependencias.configurado)) return { configurado: false };
-  const receitasAutorizadas = new Set(String(ambiente?.MECANIFICA_RECEITAS_AUTORIZADAS ?? '')
+  const receitasAutorizadas = new Set(String(doAmbiente('RECEITAS_AUTORIZADAS', ambiente) ?? '')
     .split(',').map((item) => item.trim()).filter((item) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item)));
   return { configurado: true, raizRepositorio, catalogo: catalogoMontagens, receitasAutorizadas };
 }
@@ -299,7 +300,7 @@ function autoriaDoAmbiente(catalogoMontagens, universoDependencias, ambiente = p
 export function criarServidor({
   catalogoMontagens = catalogoMontagensDoAmbiente(),
   universoDependencias = universoDependenciasDoAmbiente(),
-  perfil = process.env.MECANIFICA_PERFIL ?? PERFIL,
+  perfil = doAmbiente('PERFIL') ?? PERFIL,
   autoria = autoriaDoAmbiente(catalogoMontagens, universoDependencias),
 } = {}) {
   const server = new McpServer(IDENTIDADE, { instructions: INSTRUCOES_AGENTE });

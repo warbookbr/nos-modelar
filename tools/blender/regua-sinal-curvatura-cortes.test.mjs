@@ -5,7 +5,7 @@
    enquanto a distância mediana nem nota a aba; os cortes declarados, sem diferença para a forma contra ela mesma e com 20 mm
    no topo da aba que falta; e a contagem de falhas de ondulação da receita.
 
-   Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
+   Só roda com MODELAR_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
    inteiro se ignora. */
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -14,8 +14,9 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CAIXA, obj } from './placa-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
-const BLENDER = process.env.MECANIFICA_BLENDER;
+const BLENDER = doAmbiente('BLENDER');
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const FIXTURE_ONDULACAO = join(AQUI, '../modelar/fixtures/ondulacao-prova.js');
 const FIXTURE_LISA = join(AQUI, '../modelar/fixtures/ondulacao-prova-lisa.js');
@@ -61,7 +62,7 @@ describe.skipIf(!BLENDER)('régua: mapa com sinal, curvatura comparada, cortes e
   });
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

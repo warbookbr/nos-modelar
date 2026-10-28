@@ -2,7 +2,7 @@
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   carregarCatalogoMontagens, catalogoMontagensDoAmbiente,
   criarCatalogoMontagensVazio, VARIAVEL_CATALOGO_MCP_MONTAGENS,
@@ -107,6 +107,15 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
     const catalogo = catalogoMontagensDoAmbiente({ [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO });
     expect(catalogo).toMatchObject({ configurado: true });
     expect(() => carregarCatalogoMontagens('relativo.json')).toThrowError(expect.objectContaining({ codigo: 'configuracao-invalida' }));
+  });
+
+  it('aceita o nome antigo da variável, com aviso do novo', () => {
+    const escrita = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const catalogo = catalogoMontagensDoAmbiente({ MECANIFICA_CATALOGO_MONTAGENS: CONFIGURACAO });
+      expect(catalogo).toMatchObject({ configurado: true });
+      expect(escrita.mock.calls.map(([texto]) => String(texto)).join('')).toContain(VARIAVEL_CATALOGO_MCP_MONTAGENS);
+    } finally { escrita.mockRestore(); }
   });
 
   it.skipIf(!SYMLINK.disponivel)('recusa vínculo simbólico mesmo quando a raiz foi explicitamente listada', async () => {

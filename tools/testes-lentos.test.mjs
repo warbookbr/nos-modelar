@@ -1,6 +1,7 @@
 /* testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa. */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
@@ -69,5 +70,20 @@ describe('a parte dos lentos que cada máquina do CI roda', () => {
   it('os pesos só nomeiam arquivos da lista dos lentos', () => {
     const { segundos } = JSON.parse(readFileSync(ARQUIVO_DOS_PESOS, 'utf8'));
     expect(Object.keys(segundos).filter((a) => !TESTES_LENTOS.includes(a))).toEqual([]);
+  });
+});
+
+describe('a variável que escolhe a bateria (MODELAR_TESTES)', () => {
+  const arquivoDasDuracoes = (env) => spawnSync(process.execPath, [
+    '--input-type=module', '-e', "import { arquivoDasDuracoes } from './tools/vitest-duracoes.mjs'; console.log(arquivoDasDuracoes());",
+  ], { cwd: RAIZ, encoding: 'utf8', env: { PATH: process.env.PATH, ...env } });
+
+  it('o nome novo escolhe o arquivo das durações, e o nome antigo ainda vale com aviso do novo', () => {
+    const novo = arquivoDasDuracoes({ MODELAR_TESTES: 'rapidos' });
+    expect(novo.stdout.trim()).toBe(join('tmp', 'gates', 'duracoes-dos-testes-rapidos.json'));
+    expect(novo.stderr).toBe('');
+    const antigo = arquivoDasDuracoes({ MECANIFICA_TESTES: 'lentos' });
+    expect(antigo.stdout.trim()).toBe(join('tmp', 'gates', 'duracoes-dos-testes-lentos.json'));
+    expect(antigo.stderr).toContain('use MODELAR_TESTES');
   });
 });

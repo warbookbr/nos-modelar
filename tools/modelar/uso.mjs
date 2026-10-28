@@ -8,24 +8,26 @@
  * `npm run uso` resume: tópicos mais pedidos, tópicos não encontrados, roteiros pedidos e recusas repetidas.
  *
  * O registro mede a ferramenta, nunca o agente, e não pode atrapalhar o comando que registra: qualquer falha de escrita é
- * ignorada, nada sai em stdout e o código de saída não muda. Desligar: `MECANIFICA_USO=0`. Redirecionar:
- * `MECANIFICA_USO_ARQUIVO=<caminho>`. Sob o vitest ele fica calado, para a suíte não encher o registro de quem trabalha com
+ * ignorada, nada sai em stdout e o código de saída não muda. Desligar: `MODELAR_USO=0`. Redirecionar:
+ * `MODELAR_USO_ARQUIVO=<caminho>`. Sob o vitest ele fica calado, para a suíte não encher o registro de quem trabalha com
  * linhas de fixture, a menos que o teste redirecione o arquivo de propósito.
  */
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { doAmbiente } from '../ambiente.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const TAMANHO_DA_MENSAGEM = 300;
 
 export function caminhoDoUso(env = process.env) {
-  return env.MECANIFICA_USO_ARQUIVO ? resolve(env.MECANIFICA_USO_ARQUIVO) : resolve(REPO, '.diario/uso.jsonl');
+  const arquivo = doAmbiente('USO_ARQUIVO', env);
+  return arquivo ? resolve(arquivo) : resolve(REPO, '.diario/uso.jsonl');
 }
 
 function ligado(env) {
-  if (env.MECANIFICA_USO === '0') return false;
-  if (env.MECANIFICA_USO_ARQUIVO) return true;
+  if (doAmbiente('USO', env) === '0') return false;
+  if (doAmbiente('USO_ARQUIVO', env)) return true;
   return !env.VITEST;
 }
 

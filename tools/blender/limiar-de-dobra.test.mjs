@@ -9,7 +9,7 @@
    mesmo limiar, dá a cobertura da régua a 0,02, relata o comprimento da dobra de 30 graus como rasa e, com o limiar baixado a
    25 graus, devolve a medida de antes, em que as duas ferramentas contam as duas dobras.
 
-   Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco se
+   Só roda com MODELAR_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco se
    ignora. A classificação das curvas lidas do pacote está em leitura-do-pacote.test.mjs, sem Blender. */
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -18,8 +18,9 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import earcut from 'earcut';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { doAmbiente } from '../ambiente.mjs';
 
-const BLENDER = process.env.MECANIFICA_BLENDER;
+const BLENDER = doAmbiente('BLENDER');
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 /** A caixa do pacote e da régua: x de -0,4 a 0,4, y de -0,1 a 0,4 e z de 0,2 a 0,8, onde só as duas dobras da rampa aparecem. */
 const CAIXA = '-0.4,0.4,-0.1,0.4,0.2,0.8';
@@ -75,7 +76,7 @@ describe.skipIf(!BLENDER)('comparar-vincos e régua pelo mesmo limiar de dobra',
   }, 600000);
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

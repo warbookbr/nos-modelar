@@ -7,10 +7,11 @@ import { lerUniversoAutoria } from '../../src/autoria/ler-universo-autoria.js';
 import { criarSnapshotUniversoAutoria, serializarCanonico } from '../../src/autoria/snapshot-universo-autoria.js';
 import { criarProvedoresAutoriaInativa } from '../modelar/autoria-ativa.mjs';
 import { criarCarregadoresUniverso, sha256Canonico } from '../modelar/universo-autoria.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
 export const FORMATO_UNIVERSO_MCP_DEPENDENCIAS = 'mecanifica.universo-mcp-dependencias';
 export const VERSAO_UNIVERSO_MCP_DEPENDENCIAS = 1;
-export const VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS = 'MECANIFICA_UNIVERSO_DEPENDENCIAS';
+export const VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS = 'MODELAR_UNIVERSO_DEPENDENCIAS';
 
 export class ErroUniversoMcpDependencias extends Error {
   constructor(codigo, mensagem, acao) {
@@ -163,6 +164,6 @@ export function carregarUniversoDependencias(caminhoConfiguracao) {
 }
 
 export function universoDependenciasDoAmbiente(ambiente = process.env) {
-  const caminho = ambiente?.[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS];
+  const caminho = doAmbiente('UNIVERSO_DEPENDENCIAS', ambiente);
   return caminho ? carregarUniversoDependencias(caminho) : criarUniversoDependenciasVazio();
 }

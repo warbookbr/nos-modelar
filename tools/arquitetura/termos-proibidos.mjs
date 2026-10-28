@@ -1,8 +1,8 @@
 /* termos-proibidos.mjs — normalização e varredura do gate de vazamento (termos proibidos e malha ou cena no índice).
 
    O gate compara o HMAC-SHA256 de cada palavra, par e trio de palavras consecutivas com a lista embaralhada em
-   `termos-proibidos.hashes.json`. A chave do HMAC vem de `MECANIFICA_CHAVE_TERMOS` (no CI, o segredo do repositório com esse
-   nome) ou do arquivo apontado por `MECANIFICA_CHAVE_TERMOS_ARQUIVO`, fora do repositório; sem ela a lista não diz nada, porque
+   `termos-proibidos.hashes.json`. A chave do HMAC vem de `MODELAR_CHAVE_TERMOS` (no CI, o segredo do repositório com esse
+   nome) ou do arquivo apontado por `MODELAR_CHAVE_TERMOS_ARQUIVO`, fora do repositório; sem ela a lista não diz nada, porque
    o repositório é público e um sha256 simples de palavra comum se desfaz por dicionário. A lista guarda também o HMAC de um
    texto fixo, o verificador, para que chave errada falhe com aviso, no lugar de deixar o gate verde sem achar nada. Nem este
    arquivo nem a lista trazem o termo em claro, e a varredura devolve só caminho e linha, commit e linha da mensagem, ou o
@@ -24,10 +24,11 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { doAmbiente } from '../ambiente.mjs';
 
 export const LIMITE_DE_PALAVRAS = 3;
-export const VARIAVEL_DA_CHAVE = 'MECANIFICA_CHAVE_TERMOS';
-export const VARIAVEL_DO_ARQUIVO_DA_CHAVE = 'MECANIFICA_CHAVE_TERMOS_ARQUIVO';
+export const VARIAVEL_DA_CHAVE = 'MODELAR_CHAVE_TERMOS';
+export const VARIAVEL_DO_ARQUIVO_DA_CHAVE = 'MODELAR_CHAVE_TERMOS_ARQUIVO';
 export const TEXTO_DO_VERIFICADOR = 'mecanifica:termos-proibidos:verificador';
 export const ARQUIVO_DA_LISTA = join(dirname(fileURLToPath(import.meta.url)), 'termos-proibidos.hashes.json');
 export const COMO_FORNECER_A_CHAVE =
@@ -56,9 +57,9 @@ export const EXCECOES_DE_MALHA = [];
 
 /* lê a chave do ambiente: a variável com a chave, ou o arquivo apontado; devolve null quando nenhuma das duas existe */
 export function lerChave(ambiente = process.env) {
-  const direta = (ambiente[VARIAVEL_DA_CHAVE] ?? '').trim();
+  const direta = (doAmbiente('CHAVE_TERMOS', ambiente) ?? '').trim();
   if (direta) return direta;
-  const arquivo = (ambiente[VARIAVEL_DO_ARQUIVO_DA_CHAVE] ?? '').trim().replace(/^~(?=\/)/, ambiente.HOME ?? '~');
+  const arquivo = (doAmbiente('CHAVE_TERMOS_ARQUIVO', ambiente) ?? '').trim().replace(/^~(?=\/)/, ambiente.HOME ?? '~');
   if (!arquivo) return null;
   if (!existsSync(arquivo)) throw new Error(`${VARIAVEL_DO_ARQUIVO_DA_CHAVE} aponta um arquivo que não existe: ${arquivo}`);
   const chave = readFileSync(arquivo, 'utf8').trim();

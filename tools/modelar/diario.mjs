@@ -25,13 +25,14 @@
  * de qualidade do agente dentro da ferramenta que ele usa enviesa o trabalho na
  * direção da métrica.
  *
- * Desligar: `MECANIFICA_DIARIO=0`. Nenhum resultado muda — o diário nunca
+ * Desligar: `MODELAR_DIARIO=0`. Nenhum resultado muda — o diário nunca
  * escreve em stdout, nunca altera código de saída e engole os próprios erros.
  * Instrumento que derruba a ferramenta medida não é instrumento.
  */
 import { appendFileSync, existsSync, mkdirSync, statSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { doAmbiente } from '../ambiente.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -40,15 +41,14 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
    trabalhando. Poluir o registro com linhas de fixture estraga exatamente a
    leitura que ele existe para dar. */
 export function caminhoDoDiario() {
-  return process.env.MECANIFICA_DIARIO_ARQUIVO
-    ? resolve(process.env.MECANIFICA_DIARIO_ARQUIVO)
-    : resolve(REPO, '.diario/oficina.jsonl');
+  const arquivo = doAmbiente('DIARIO_ARQUIVO');
+  return arquivo ? resolve(arquivo) : resolve(REPO, '.diario/oficina.jsonl');
 }
 
 export const CAMINHO_DIARIO = caminhoDoDiario();
 
 function ligado() {
-  if (process.env.MECANIFICA_DIARIO === '0') return false;
+  if (doAmbiente('DIARIO') === '0') return false;
   /* Sob teste, calado por padrão.
    *
    * A suíte roda as CLIs de verdade — inclusive as fixtures que existem

@@ -95,7 +95,7 @@ function ms(n) {
 function executar() {
   const linhas = lerDiario();
   if (linhas.length === 0) {
-    console.log('diário vazio — nenhuma ferramenta do laço rodou ainda, ou está desligado (MECANIFICA_DIARIO=0).');
+    console.log('diário vazio — nenhuma ferramenta do laço rodou ainda, ou está desligado (MODELAR_DIARIO=0).');
     return;
   }
   const { porComando, repeticoes, erros, silenciosos, total } = resumir(linhas);

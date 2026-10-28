@@ -1,6 +1,6 @@
 /* termos-proibidos.test.mjs — gate de vazamento: o repositório não recebe menção aos termos da lista embaralhada, nem em
    arquivo, caminho, mensagem de commit ou nome de ramo e tag, e o índice não recebe malha nem cena fora das exceções.
-   A lista (`termos-proibidos.hashes.json`) guarda só HMAC-SHA256 com a chave `MECANIFICA_CHAVE_TERMOS`, e a mensagem de falha
+   A lista (`termos-proibidos.hashes.json`) guarda só HMAC-SHA256 com a chave `MODELAR_CHAVE_TERMOS`, e a mensagem de falha
    traz caminho e linha, commit e linha, ou o objeto do ramo, nunca o trecho. Sem a chave, os casos da lista real ficam
    ignorados com o aviso de como fornecê-la, e no CI a falta reprova. */
 import { execFileSync } from 'node:child_process';
@@ -8,7 +8,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   COMO_FORNECER_A_CHAVE, EXCECOES_DE_MALHA, TEXTO_DO_VERIFICADOR, carregarLista, ehMalhaOuCena, embaralhar, hashesDoTermo, lerChave,
   linhasProibidas, malhasNoIndice, montarLista, palavras, proibidosDaLista, varrerMensagens, varrerReferencias,
@@ -73,11 +73,20 @@ describe('gate de vazamento: normalização e lista', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'chave-termos-'));
     try {
       writeFileSync(join(pasta, 'chave'), 'abc123\n');
-      expect(lerChave({ MECANIFICA_CHAVE_TERMOS: ' xyz ' })).toBe('xyz');
-      expect(lerChave({ MECANIFICA_CHAVE_TERMOS_ARQUIVO: join(pasta, 'chave') })).toBe('abc123');
+      expect(lerChave({ MODELAR_CHAVE_TERMOS: ' xyz ' })).toBe('xyz');
+      expect(lerChave({ MODELAR_CHAVE_TERMOS_ARQUIVO: join(pasta, 'chave') })).toBe('abc123');
       expect(lerChave({})).toBeNull();
-      expect(() => lerChave({ MECANIFICA_CHAVE_TERMOS_ARQUIVO: join(pasta, 'nao-existe') })).toThrow(/não existe/);
-      expect(() => proibidosDaLista(lista, null)).toThrow(/MECANIFICA_CHAVE_TERMOS_ARQUIVO/);
+      const escrita = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      try {
+        expect(lerChave({ MECANIFICA_CHAVE_TERMOS: ' velha ' })).toBe('velha');
+        expect(lerChave({ MECANIFICA_CHAVE_TERMOS_ARQUIVO: join(pasta, 'chave') })).toBe('abc123');
+        expect(lerChave({ MODELAR_CHAVE_TERMOS: 'nova', MECANIFICA_CHAVE_TERMOS: 'velha' })).toBe('nova');
+        const avisos = escrita.mock.calls.map(([texto]) => String(texto)).join('');
+        expect(avisos).toContain('use MODELAR_CHAVE_TERMOS (');
+        expect(avisos).toContain('use MODELAR_CHAVE_TERMOS_ARQUIVO');
+      } finally { escrita.mockRestore(); }
+      expect(() => lerChave({ MODELAR_CHAVE_TERMOS_ARQUIVO: join(pasta, 'nao-existe') })).toThrow(/não existe/);
+      expect(() => proibidosDaLista(lista, null)).toThrow(/MODELAR_CHAVE_TERMOS_ARQUIVO/);
     } finally {
       rmSync(pasta, { recursive: true, force: true });
     }

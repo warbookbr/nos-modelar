@@ -8,10 +8,11 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { doAmbiente } from './ambiente.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 /* Um arquivo por bateria, porque `test:rapidos` e `test:lentos` rodam ao mesmo tempo no `npm run gates`. */
-export const arquivoDasDuracoes = (modo = process.env.MECANIFICA_TESTES) => join('tmp', 'gates', `duracoes-dos-testes${modo ? `-${modo}` : ''}.json`);
+export const arquivoDasDuracoes = (modo = doAmbiente('TESTES')) => join('tmp', 'gates', `duracoes-dos-testes${modo ? `-${modo}` : ''}.json`);
 export const ARQUIVO_DAS_DURACOES = join('tmp', 'gates', 'duracoes-dos-testes.json');
 
 export default class DuracoesDosTestes {
