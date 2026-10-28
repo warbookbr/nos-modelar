@@ -85,6 +85,8 @@
     "exportar:obj": "node tools/modelar/exportar-obj.mjs",
     "ativar:bancada": "node tools/modelar/ativar-bancada.mjs",
     "malha:conferir": "node tools/modelar/conferir-malha.mjs",
+    "malha:lascas": "node tools/modelar/lasca.mjs",
+    "retrato:acervo": "node tools/modelar/retrato-do-acervo.mjs",
     "ondulacao": "node tools/modelar/ondulacao-da-superficie.mjs",
     "alisar": "node tools/modelar/alisar-a-superficie.mjs",
     "vincos-das-linhas": "node tools/modelar/vincos-das-linhas.mjs",
