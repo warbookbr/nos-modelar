@@ -59,14 +59,14 @@ export function criarVigia({
     for (const gate of gates) {
       if (sinal.aborted) break;
       if (DEPENDE_DE[gate] && falhos.has(DEPENDE_DE[gate])) continue;
-      const decisao = decidir(gate, foto, lerVerdes(raiz), gate.startsWith('test:') ? lerLeiturasDoGate(raiz, gate) : null);
+      const decisao = decidir(gate, foto, lerVerdes(raiz), gate.startsWith('test:') ? lerLeiturasDoGate(raiz, gate) : null, raiz);
       if (!decisao.rodar) { resumo.guardados.push(gate); continue; }
       resumo.rodaram.push(gate);
       const resultado = await rodar(gate, { testes: decisao.testes ?? null, sinal });
       if (sinal.aborted || resultado.cancelado) break;
       if (resultado.codigo === 0) {
         resumo.passaram.push(gate);
-        const registro = rodouInteiro(gate, decisao.testes ?? null, false) && registroVerde(gate, foto, { testes: decisao.testes ?? null, anterior: lerVerdes(raiz)[gate] });
+        const registro = rodouInteiro(gate, decisao.testes ?? null, false) && registroVerde(gate, foto, { testes: decisao.testes ?? null, anterior: lerVerdes(raiz)[gate], raiz });
         if (registro) gravarVerdes(raiz, { ...lerVerdes(raiz), [gate]: registro });
       } else {
         falhos.add(gate);

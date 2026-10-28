@@ -47,6 +47,51 @@ export const LE_O_GATE = {
   'arquitetura:motor:check': CODIGO,
 };
 
+/* Os gates que rodam um programa sobre o código declaram as ENTRADAS dele, e leem o fecho dos imports estáticos delas, mais o que
+   carregam pelo caminho (TAMBEM). Medido em 2026-10-28: com o padrão largo de código, uma mudança em `tools/testes-lentos.mjs`
+   rodava as dez guardas da bancada (142 s) e a prova visual do MCP (64 s), que não importam esse arquivo. Import com caminho
+   calculado não entra no fecho; o que um gate carrega assim vai no TAMBEM. */
+const DO_NAVEGADOR = [/\.html$/, /^public\//, /^vite\.config\.js$/, /^package(-lock)?\.json$/, /^procedural\/(pecas|familias)\//, /(^|\/)fixtures?\//];
+export const ENTRADAS_DO_GATE = {
+  'bancada:guardas': {
+    entradas: ['src/bancada/entrada.js', 'tools/mecanifica/guardas/rodar-guardas.mjs', 'tools/bancadas/porteiro.mjs',
+      ...['bancada-vazia', 'portas-bancada', 'camera-livre', 'inspecao-par', 'referencia-da-peca', 'escolha-da-peca', 'junta-da-bancada',
+        'gesto', 'edicao-de-malha'].map((g) => `tools/mecanifica/guardas/guarda-${g}.mjs`)],
+    tambem: [...DO_NAVEGADOR, /^tools\/bancadas\//],
+  },
+  'mcp:visual:check': {
+    entradas: ['src/bancada/entrada.js', 'tools/mcp/mcp.test.mjs', 'tools/mcp/procedural.test.mjs', 'tools/mcp/perfis/autoria-execucao.test.mjs',
+      'tools/mcp/perfis/parametros.test.mjs'],
+    tambem: [...DO_NAVEGADOR, /^tools\/mcp\//],
+  },
+};
+
+const IMPORTS = /(?:import|export)\s[^'"`;]*?from\s*['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)|import\s+['"]([^'"]+)['"]|require\(\s*['"]([^'"]+)['"]\s*\)/g;
+
+export function fechoDosImports(raiz, entradas, foto) {
+  const vistos = new Set();
+  const pilha = entradas.filter((e) => foto[e]);
+  const resolver = (de, alvo) => {
+    if (!alvo.startsWith('.') && !alvo.startsWith('/')) return null;
+    const base = alvo.startsWith('/') ? alvo.slice(1) : join(dirname(de), alvo).split('\\').join('/');
+    for (const c of [base, `${base}.js`, `${base}.mjs`, `${base}.ts`, `${base}/index.js`, `${base}/index.mjs`]) if (foto[c]) return c;
+    return null;
+  };
+  while (pilha.length) {
+    const arquivo = pilha.pop();
+    if (vistos.has(arquivo)) continue;
+    vistos.add(arquivo);
+    if (!/\.(m?js|ts)$/.test(arquivo)) continue;
+    let texto = '';
+    try { texto = readFileSync(join(raiz, arquivo), 'utf8'); } catch { continue; }
+    for (const m of texto.matchAll(IMPORTS)) {
+      const alvo = resolver(arquivo, m[1] ?? m[2] ?? m[3] ?? m[4]);
+      if (alvo && !vistos.has(alvo)) pilha.push(alvo);
+    }
+  }
+  return vistos;
+}
+
 const git = (raiz, args, input) => spawnSync('git', args, { cwd: raiz, encoding: 'utf8', input, maxBuffer: 1 << 28 });
 
 /* A foto: o blob de cada arquivo rastreado ou solto, com o que está no disco agora (modificado, novo ou apagado). */
@@ -75,9 +120,13 @@ export function mudadosEntre(antes, agora) {
   return [...caminhos].filter((c) => antes[c] !== agora[c]).sort();
 }
 
-export function impressaoDoGate(gate, foto) {
-  const padroes = LE_O_GATE[gate];
-  const linhas = Object.keys(foto).filter((c) => padroes.some((re) => re.test(c))).sort().map((c) => `${c} ${foto[c]}`);
+export function impressaoDoGate(gate, foto, raiz = '.') {
+  const declarado = ENTRADAS_DO_GATE[gate];
+  /* O que o gate carrega pelo caminho (as receitas que a bancada acha por `import.meta.glob`) também importa código: o fecho
+     parte das entradas e desses arquivos. */
+  const fecho = declarado ? fechoDosImports(raiz, [...declarado.entradas, ...Object.keys(foto).filter((c) => declarado.tambem.some((re) => re.test(c)))], foto) : null;
+  const padroes = declarado ? declarado.tambem : LE_O_GATE[gate];
+  const linhas = Object.keys(foto).filter((c) => fecho?.has(c) || padroes.some((re) => re.test(c))).sort().map((c) => `${c} ${foto[c]}`);
   return createHash('sha256').update(linhas.join('\n')).digest('hex');
 }
 
@@ -97,14 +146,14 @@ export function gravarVerdes(raiz, verdes) {
 
 /* O que o gate precisa fazer agora: { rodar: false, motivo } quando nada do que ele lê mudou desde a última vez verde, ou
    { rodar: true, motivo, testes? } com, nos gates de teste, a lista de arquivos para o `vitest related` (null = o modo inteiro). */
-export function decidir(gate, foto, verdes, leituras = null) {
-  const d = decidirSemNota(gate, foto, verdes, leituras);
+export function decidir(gate, foto, verdes, leituras = null, raiz = '.') {
+  const d = decidirSemNota(gate, foto, verdes, leituras, raiz);
   /* O "modo inteiro" do test:lentos fora do --completo são os ligados ao que mudou desde o ramo remoto (ver rodouInteiro). */
   if (gate === 'test:lentos' && d.rodar && d.testes === null) return { ...d, motivo: d.motivo.replace('roda o modo inteiro', 'roda os ligados ao que mudou desde o ramo remoto, sem gravar verde (o --completo e o CI rodam todos)') };
   return d;
 }
 
-function decidirSemNota(gate, foto, verdes, leituras) {
+function decidirSemNota(gate, foto, verdes, leituras, raiz) {
   const verde = verdes[gate];
   if (gate === 'test:rapidos' || gate === 'test:lentos') {
     if (!verde?.foto) return { rodar: true, motivo: 'sem rodada verde guardada, roda o modo inteiro', testes: null };
@@ -125,7 +174,7 @@ function decidirSemNota(gate, foto, verdes, leituras) {
     return { rodar: true, motivo: `${codigo.length} arquivo(s) de código mudaram e ${queLeem.length} teste(s) leem os ${foraDoGrafo.length} arquivo(s) de dados mudados`, testes };
   }
   if (!LE_O_GATE[gate]) return { rodar: true, motivo: 'não declara o que lê' };
-  if (verde?.impressao && verde.impressao === impressaoDoGate(gate, foto)) return { rodar: false, motivo: 'nada do que ele lê mudou desde a última rodada verde' };
+  if (verde?.impressao && verde.impressao === impressaoDoGate(gate, foto, raiz)) return { rodar: false, motivo: 'nada do que ele lê mudou desde a última rodada verde' };
   return { rodar: true, motivo: verde ? 'algo do que ele lê mudou' : 'sem rodada verde guardada' };
 }
 
@@ -138,10 +187,10 @@ export function rodouInteiro(gate, testes, completo) {
 
 /* O registro da rodada verde: a foto inteira nos gates de teste, que precisam saber QUAIS arquivos mudaram, e a impressão nos
    outros, que só precisam saber SE mudou. */
-export function registroVerde(gate, foto, { testes = null, anterior = null } = {}) {
+export function registroVerde(gate, foto, { testes = null, anterior = null, raiz = '.' } = {}) {
   /* O registro de leituras fica completo depois de uma rodada do modo inteiro com a anotação ligada, e continua completo
      nas rodadas parciais, que só renovam o registro dos testes que rodaram. */
   if (gate === 'test:rapidos' || gate === 'test:lentos') return { foto, leiturasCompletas: testes === null || Boolean(anterior?.leiturasCompletas), quando: new Date().toISOString() };
-  if (LE_O_GATE[gate]) return { impressao: impressaoDoGate(gate, foto), quando: new Date().toISOString() };
+  if (LE_O_GATE[gate]) return { impressao: impressaoDoGate(gate, foto, raiz), quando: new Date().toISOString() };
   return null;
 }

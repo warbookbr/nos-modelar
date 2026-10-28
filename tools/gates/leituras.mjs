@@ -75,10 +75,13 @@ export function instalar(destino) {
     return { ...base, GATES_LEITURAS_DESTINO: destinoAtual, NODE_OPTIONS: opcoes.includes(gancho) ? opcoes : `${opcoes} ${gancho}`.trim() };
   };
   const ehNode = (programa) => ['node', 'npm', 'npx', 'vitest', 'vite', 'tsx'].includes(basename(programa).replace(/\.(cmd|exe)$/, '')) || programa === process.execPath;
+  /* O Chromium do Playwright não lê arquivo do repositório sozinho: recebe a página do teste ou do servidor de desenvolvimento,
+     que é node e é anotado. Medido em 2026-10-28: contá-lo como quem lê tudo punha 21 dos 24 lentos em toda mudança de dado. */
+  const ehNavegador = (programa) => /^(headless_shell|chrome|chromium|chrome-headless-shell)$/.test(basename(programa)) || /ms-playwright/.test(programa);
   const examinar = (comando, args, opcoes) => {
     const naRaiz = relativoDaRaiz(opcoes?.cwd ?? process.cwd()) !== null || resolve(opcoes?.cwd ?? process.cwd()) === RAIZ;
     const programa = String(comando).trim().split(/\s+/)[0];
-    if (!ehNode(programa) && naRaiz) anotar('t', `${basename(programa)}`);
+    if (!ehNode(programa) && !ehNavegador(programa) && naRaiz) anotar('t', `${basename(programa)}`);
     for (const a of args ?? []) { const rel = typeof a === 'string' && !a.startsWith('-') ? relativoDaRaiz(resolve(opcoes?.cwd ?? process.cwd(), a)) : null; if (rel && existe(join(RAIZ, rel))) anotar('a', rel); }
   };
   for (const nome of ['spawn', 'spawnSync', 'execFile', 'execFileSync']) {

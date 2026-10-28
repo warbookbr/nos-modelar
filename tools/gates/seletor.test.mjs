@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { decidir, fotografar, mudadosEntre, registroVerde, rodouInteiro, visivelNoGrafo } from './seletor.mjs';
+import { decidir, fechoDosImports, fotografar, mudadosEntre, registroVerde, rodouInteiro, visivelNoGrafo } from './seletor.mjs';
 
 /* montado por partes para o gate de links não tomar o arquivo do repositório de ensaio por citação */
 const DOC = ['docs', 'x.md'].join('/');
@@ -94,5 +94,15 @@ describe('seletor de gates', () => {
     expect(rodouInteiro('test:lentos', null, true)).toBe(true);
     expect(rodouInteiro('test:lentos', ['src/a.js'], false)).toBe(true);
     expect(rodouInteiro('test:rapidos', null, false)).toBe(true);
+  });
+
+  it('o fecho dos imports segue import, export, import dinâmico com texto fixo e caminho absoluto do servidor', () => {
+    const raiz = repositorio({
+      'src/e.js': "import { a } from './a.js';\nexport * from '../lib/b';\nconst c = () => import('/src/c.js');",
+      'src/a.js': "import x from 'three';", 'lib/b/index.js': "export const b = 1;", 'src/c.js': '', 'src/solto.js': '',
+    });
+    const fecho = fechoDosImports(raiz, ['src/e.js'], fotografar(raiz));
+    expect([...fecho].sort()).toEqual(['lib/b/index.js', 'src/a.js', 'src/c.js', 'src/e.js']);
+    rmSync(raiz, { recursive: true, force: true });
   });
 });
