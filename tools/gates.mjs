@@ -16,6 +16,10 @@
  *
  * `--parar-no-primeiro` recupera o comportamento antigo para quem quiser um
  * laço curto enquanto conserta um gate específico.
+ *
+ * Desde 2026-10-28 os gates baratos rodam antes, todos, e uma falha entre eles
+ * para a bateria ali (ver `separarEstagios`): o relatório de todos continua
+ * valendo dentro de cada estágio.
  */
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -259,6 +263,32 @@ function arquivosAlterados() {
   return [...new Set(lista)];
 }
 
+/* OS BARATOS PRIMEIRO, E A BATERIA PARA SE UM DELES FALHAR.
+ *
+ * Medido em 2026-10-27: o mapa de arquivos desatualizado e um script fora da lista de réguas, conferências de menos de um
+ * segundo, apareceram depois de 21 minutos, no fim da bateria, porque o relatório só sai quando o último gate termina e os
+ * baratos esperavam na fila atrás dos testes. Cada gate grava a duração da última rodada em `tmp/gates/duracoes-dos-gates.json`;
+ * os que levaram menos de `TETO_DO_ESTAGIO_BARATO_MS` rodam primeiro, todos, e se algum falha a bateria para ali, com o relatório
+ * deles, sem começar os caros. Os caros rodam do mais longo para o mais curto, que é a ordem que termina primeiro com a máquina
+ * cheia, e os que nunca foram medidos vão à frente, porque podem ser longos. Gate que depende de um caro é caro também, senão
+ * esperaria um gate que só começa depois dele. */
+export const TETO_DO_ESTAGIO_BARATO_MS = 5_000;
+export const ARQUIVO_DAS_DURACOES_DOS_GATES = join('tmp', 'gates', 'duracoes-dos-gates.json');
+
+export function separarEstagios(lista, duracoes, teto = TETO_DO_ESTAGIO_BARATO_MS) {
+  const barato = (g) => duracoes[g] !== undefined && duracoes[g] < teto && (!DEPENDE_DE[g] || barato(DEPENDE_DE[g]));
+  const baratos = lista.filter(barato);
+  const caros = lista.filter((g) => !barato(g))
+    .map((g, i) => ({ g, i, ms: duracoes[g] ?? Infinity }))
+    .sort((a, b) => b.ms - a.ms || a.i - b.i)
+    .map(({ g }) => g);
+  return { baratos, caros };
+}
+
+function lerDuracoesDosGates(raiz = RAIZ) {
+  try { return JSON.parse(readFileSync(join(raiz, ARQUIVO_DAS_DURACOES_DOS_GATES), 'utf8')); } catch { return {}; }
+}
+
 /* Quem lê `dist/` só pode começar depois de quem escreve. */
 export const DEPENDE_DE = Object.fromEntries(
   ['guarda:edicao', 'guarda:escolha', 'guarda:gesto', 'guarda:junta', 'guarda:referencia']
@@ -352,7 +382,9 @@ async function executar() {
 
   const porGate = new Map();
   for (const gate of guardados) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, guardado: true });
-  const fila = bateria.filter((g) => !guardados.includes(g));
+  const duracoesDosGates = lerDuracoesDosGates();
+  const estagios = separarEstagios(bateria.filter((g) => !guardados.includes(g)), duracoesDosGates);
+  let fila = [];
   const ocupados = new Set();
   let pesoEmUso = 0;
   let abortado = false;
@@ -381,6 +413,7 @@ async function executar() {
       try {
         const resultado = await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
         porGate.set(gate, resultado);
+        duracoesDosGates[gate] = resultado.duracao;
         if (comSeletor && resultado.codigo === 0) { const r = registroVerde(gate, foto); if (r) verdes[gate] = r; }
         if (resultado.codigo !== 0 && pararNoPrimeiro) abortado = true;
       } finally {
@@ -391,9 +424,15 @@ async function executar() {
   }
 
   const relogio = Date.now();
-  await Promise.all(Array.from({ length: concorrencia }, trabalhador));
+  const rodarEstagio = async (lista) => { fila = [...lista]; await Promise.all(Array.from({ length: concorrencia }, trabalhador)); };
+  await rodarEstagio(estagios.baratos);
+  const baratoFalhou = estagios.baratos.some((g) => porGate.get(g)?.codigo);
+  if (baratoFalhou) console.log(`\ngates — um gate barato falhou; os caros (${estagios.caros.join(', ')}) não começaram.`);
+  else await rodarEstagio(estagios.caros);
   const decorrido = Date.now() - relogio;
   if (comSeletor) gravarVerdes('.', verdes);
+  mkdirSync(join(RAIZ, DIRETORIO_DAS_SAIDAS), { recursive: true });
+  writeFileSync(join(RAIZ, ARQUIVO_DAS_DURACOES_DOS_GATES), JSON.stringify(duracoesDosGates));
 
   /* A ORDEM DO RELATÓRIO É A DA LISTA, e não a de quem terminou primeiro: a
      lista é a mesma do `ci.yml`, e comparar as duas a olho exige que sejam
@@ -421,7 +460,7 @@ async function executar() {
     `${resultados.length - falhos.length}/${bateria.length} gates verdes${bateria.length === GATES.length ? '' : ` (de ${GATES.length})`} em ${Math.round(decorrido / 1000)}s`
     + (concorrencia > 1 ? ` (${Math.round(total / 1000)}s somados, ${concorrencia} de cada vez)` : '')
     + (falhos.length ? ` — falharam: ${falhos.map((r) => r.gate).join(', ')}` : '')
-    + (naoRodados ? ` — ${naoRodados} não rodaram (--parar-no-primeiro)` : ''),
+    + (naoRodados ? ` — ${naoRodados} não rodaram (${baratoFalhou ? 'um gate barato falhou' : '--parar-no-primeiro'})` : ''),
   );
 
   process.exitCode = falhos.length ? 1 : 0;
