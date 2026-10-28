@@ -9,26 +9,20 @@ import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pngStats } from './bench/pngstats.mjs';
+import { abrirNavegador, ARGS_DO_NAVEGADOR, subirVite } from './ambiente-das-guardas.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 let alvos = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 if (!alvos.length) alvos = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas', 'fixture-uniao'];
 
-const { createServer } = await import('vite');
-const vite = await createServer({
-  root: REPO,
-  configFile: join(REPO, 'vite.config.js'),
-  server: { host: '127.0.0.1', port: 0 },
-  logLevel: 'error',
-});
-await vite.listen();
-const base = `http://127.0.0.1:${vite.httpServer.address().port}/nos-modelar/tools/bancadas/harness.html`;
+const vite = await subirVite(REPO);
+const base = `http://127.0.0.1:${vite.port}/nos-modelar/tools/bancadas/harness.html`;
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(2); }
 const pw = (await import(pathToFileURL(PW).href)).default;
-const browser = await pw.chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
+const browser = await abrirNavegador(pw, { args: ARGS_DO_NAVEGADOR });
 
 let falhas = 0;
 for (const nome of alvos) {

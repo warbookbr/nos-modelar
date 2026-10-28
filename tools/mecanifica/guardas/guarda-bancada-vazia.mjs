@@ -10,9 +10,9 @@ import assert from 'node:assert/strict';
 import { existsSync, renameSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { abrirNavegador, ARGS_DO_NAVEGADOR, subirVite } from '../../bancadas/ambiente-das-guardas.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
-const vite = await import('vite');
 const playwright = await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href);
 
 const arquivosSessao = [
@@ -29,17 +29,9 @@ for (const item of arquivosSessao) {
 let servidor;
 let navegador;
 try {
-  servidor = await vite.createServer({
-    root: REPO,
-    configFile: join(REPO, 'vite.config.js'),
-    server: { host: '127.0.0.1', port: 0 },
-    logLevel: 'error',
-  });
-  await servidor.listen();
-  const { port } = servidor.httpServer.address();
-  navegador = await playwright.default.chromium.launch({
-    args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
-  });
+  servidor = await subirVite(REPO);
+  const { port } = servidor;
+  navegador = await abrirNavegador(playwright.default, { args: ARGS_DO_NAVEGADOR });
   const pagina = await navegador.newPage({ viewport: { width: 1280, height: 720 } });
   const erros = [];
   pagina.on('pageerror', (erro) => erros.push(erro.message));

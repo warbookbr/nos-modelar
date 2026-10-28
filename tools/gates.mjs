@@ -93,8 +93,11 @@ function lerDuracoesDosTestes(gate, desde, raiz = RAIZ) {
 export const GATES = [
   'typecheck', 'test:rapidos', 'test:lentos', 'mcp:visual:check', 'build',
   'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check',
-  'bancada:vazia:check', 'porteiro', 'exportar:check',
-  'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:referencia', 'guarda:escolha', 'guarda:junta', 'guarda:edicao', 'guarda:gesto', 'guarda:acervo', 'guarda:referencial', 'origens:check',
+  /* As dez guardas que abrem a bancada (porteiro, bancada:vazia:check, guarda:portas, :camera, :par, :referencia, :escolha, :junta,
+     :edicao e :gesto) rodam aqui dentro, num Chromium e num servidor do Vite só (tools/mecanifica/guardas/rodar-guardas.mjs). Cada
+     uma continua sendo um script que roda sozinho, e o relatório do gate diz o nome e o veredito de cada uma. */
+  'bancada:guardas', 'exportar:check',
+  'guarda:acervo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',
@@ -162,7 +165,8 @@ export const GATES = [
  * é o que serve para quem está consertando um gate específico. */
 const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
 
-/* Os recursos que cada gate ocupa sozinho. Os ausentes não disputam nada.
+/* Os recursos que cada gate ocupa sozinho. Os ausentes não disputam nada. As guardas da bancada, que eram oito gates com um
+   servidor do Vite cada, são um gate só (`bancada:guardas`) com um servidor para todas, e é ele que ocupa o cache.
    Os de MCP aparecem nos dois grupos: além de rodarem os mesmos arquivos
    de teste, a promoção de autoria de montagem faz inspeção visual, que sobe
    servidor de desenvolvimento por `capturar-montagem.mjs`. Isso foi medido:
@@ -172,11 +176,7 @@ const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
 export const RECURSOS_DO_GATE = {
   'test:lentos': ['suite-mcp', 'cache-vite'],
   'mcp:visual:check': ['suite-mcp', 'cache-vite'],
-  porteiro: ['cache-vite'],
-  'bancada:vazia:check': ['cache-vite'],
-  'guarda:camera': ['cache-vite'],
-  'guarda:par': ['cache-vite'],
-  'guarda:portas': ['cache-vite'],
+  'bancada:guardas': ['cache-vite'],
 };
 
 /* O PESO DE CADA GATE NA MÁQUINA.
@@ -191,6 +191,7 @@ export const PESO_DO_GATE = {
   'test:rapidos': 4,
   'test:lentos': 4,
   'mcp:visual:check': 2,
+  'bancada:guardas': 2,
 };
 const ORCAMENTO_DA_MAQUINA = Math.max(2, availableParallelism());
 
@@ -261,7 +262,7 @@ function arquivosAlterados() {
 
 /* Quem lê `dist/` só pode começar depois de quem escreve. */
 export const DEPENDE_DE = Object.fromEntries(
-  ['guarda:edicao', 'guarda:escolha', 'guarda:gesto', 'guarda:junta', 'guarda:referencia']
+  ['bancada:guardas']
     .map((gate) => [gate, 'build']),
 );
 

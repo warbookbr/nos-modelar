@@ -32,6 +32,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { abrirNavegador } from '../../bancadas/ambiente-das-guardas.mjs';
 import { ativarReceitaBancada } from '../ativar-bancada.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -91,7 +92,7 @@ await new Promise((r) => servidor.listen(0, '127.0.0.1', r));
 const { port } = servidor.address();
 
 const pw = (await import(pathToFileURL(PW).href)).default;
-const navegador = await pw.chromium.launch();
+const navegador = await abrirNavegador(pw);
 const pagina = await navegador.newPage({ viewport: { width: 1280, height: 760 } });
 const naTela = () => pagina.$eval('#fixtureAtual', (el) => el.textContent.trim());
 

@@ -39,6 +39,7 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { abrirNavegador, ARGS_DO_NAVEGADOR, subirVite } from '../../bancadas/ambiente-das-guardas.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
@@ -76,21 +77,12 @@ const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci'); process.exit(1); }
 
-const { createServer } = await import('vite');
-const vite = await createServer({
-  root: REPO,
-  configFile: join(REPO, 'vite.config.js'),
-  server: { host: '127.0.0.1', port: 0 },
-  logLevel: 'error',
-});
-await vite.listen();
-const { port } = vite.httpServer.address();
+const vite = await subirVite(REPO);
+const { port } = vite;
 const base = `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html`;
 
 const pw = (await import(pathToFileURL(PW).href)).default;
-const browser = await pw.chromium.launch({
-  args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
-});
+const browser = await abrirNavegador(pw, { args: ARGS_DO_NAVEGADOR });
 mkdirSync(OUT, { recursive: true });
 
 /* abre a bancada PELA URL e devolve o que o DOM mostra do painel de portas.
