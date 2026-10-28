@@ -7,7 +7,7 @@
 #       (--candidata <cand.obj|.glb|.blend> [--objeto <nome>] [--z-cima] [--blender <executável>] | --vincos-candidata <json>) \
 #       [--vista frente,lado] [--passo-mm 1] [--sem-3d] [--tolerancia-3d-mm 3] [--sem-cortes] [--angulo-vinco 40]
 #
-# Com --candidata, roda olhar-candidata.py no Blender (--blender ou a variável MECANIFICA_BLENDER) com o pacote, o que recorta
+# Com --candidata, roda olhar-candidata.py no Blender (--blender ou a variável MODELAR_BLENDER) com o pacote, o que recorta
 # a candidata pela caixa do pacote e grava em <saida>/candidata-vincos.json o traço preto dela em 3D: as arestas com diedro
 # acima do angulo_feicao do pacote, as bordas livres e os vincos que a malha declara (no .blend, as arestas com vinco de
 # subdivisão ou marcadas como vivas), trecho a trecho, com o que se vê em cada vista e em alguma delas; com --vincos-candidata,
@@ -39,6 +39,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 import imagens as IM
 import leitura as L
+from ambiente import do_ambiente
 import limiares
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -67,9 +68,9 @@ if not nomes:
 if 'vincos_candidata' in a:
     arq_v = a['vincos_candidata']
 elif 'candidata' in a:
-    blender = a.get('blender') or os.environ.get('MECANIFICA_BLENDER')
+    blender = a.get('blender') or do_ambiente('BLENDER')
     if not blender or blender is True:
-        L.erro('para olhar a candidata, dê --blender <executável> ou a variável MECANIFICA_BLENDER; ou --vincos-candidata')
+        L.erro('para olhar a candidata, dê --blender <executável> ou a variável MODELAR_BLENDER; ou --vincos-candidata')
     raiz = os.path.dirname(pasta)
     prefixo = os.path.join(os.path.abspath(a['saida']), 'candidata-')
     cmd = [blender, '-b', '--factory-startup', '--python', os.path.join(AQUI, 'olhar-candidata.py'), '--',

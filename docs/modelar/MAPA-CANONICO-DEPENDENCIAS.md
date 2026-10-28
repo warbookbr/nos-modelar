@@ -105,7 +105,7 @@ duplicidade, identidade divergente e ciclo.
 O servidor MCP anuncia sempre `mecanifica://dependencias`. Quando o host ainda
 não definiu um universo, o recurso responde apenas que ele não está
 configurado. Para habilitar a leitura global, o host define
-`MECANIFICA_UNIVERSO_DEPENDENCIAS` como caminho absoluto para um arquivo comum
+`MODELAR_UNIVERSO_DEPENDENCIAS` como caminho absoluto para um arquivo comum
 com este contrato local:
 
 ```json

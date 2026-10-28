@@ -14,6 +14,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 if AQUI not in sys.path:
     sys.path.insert(0, AQUI)
 import limiares
+from ambiente import do_ambiente  # noqa: E402  (fica fora deste arquivo para rodar sem o Blender)
 DESLOCAMENTO = 2e-4  # o raio de visibilidade sai 0,2 mm fora da face para não bater nela mesma
 TOL_PLANO = 1e-6
 
@@ -633,7 +634,7 @@ def ondulacao_da_receita(receita):
     if not os.path.exists(receita):
         erro(f'--receita {receita}: o arquivo não existe')
     raiz = os.path.dirname(os.path.dirname(AQUI))
-    r = subprocess.run([os.environ.get('MECANIFICA_NODE', 'node'), os.path.join(raiz, 'tools', 'modelar', 'ondulacao-da-superficie.mjs'),
+    r = subprocess.run([do_ambiente('NODE', 'node'), os.path.join(raiz, 'tools', 'modelar', 'ondulacao-da-superficie.mjs'),
                         receita], capture_output=True, text=True, cwd=raiz)
     if r.returncode != 0:
         erro(f'ondulacao-da-superficie.mjs saiu com {r.returncode}:\n{r.stderr[-1500:]}')
@@ -994,7 +995,7 @@ def fracao_de_avesso(arquivo, avesso):
 
 
 def python_do_sistema():
-    return os.environ.get('MECANIFICA_PYTHON', 'python3')
+    return do_ambiente('PYTHON', 'python3')
 
 
 def imagens(*args):

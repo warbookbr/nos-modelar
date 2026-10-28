@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1510 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1511 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1841,6 +1841,7 @@
 
 ## tools/blender/
 
+- `ambiente-python.test.mjs` — ambiente-python.test.mjs — do_ambiente (tools/blender/ambiente.py), o par em Python de doAmbiente: o nome novo vale, o antigo vale com um aviso só por nome n…
 - `blender.test.mjs` — blender.test.mjs — as ferramentas opcionais do Blender em tools/blender: o oráculo da subdivisão regera a fixture, a régua dá zero na identidade, acusa a ver…
 - `caixa-de-prova.mjs` — caixa-de-prova.mjs — a forma simétrica em x, desenhada por código, com que se prova que o pacote cego sai simétrico: uma caixa oca de chapa sem espessura, co…
 - `chapa-com-abertura-de-prova.mjs` — chapa-com-abertura-de-prova.mjs — a forma desenhada por código com que se prova a conferência do refino: uma chapa plana de 1 m (x) por 0,6 m (y), com a face…

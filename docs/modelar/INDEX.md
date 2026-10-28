@@ -118,7 +118,7 @@ npm run diario
 
 `npm run diario` lê o diário da oficina, que as ferramentas do laço gravam
 sozinhas: onde o tempo foi, o que foi repetido sem a receita mudar, que erro se
-repete e o que saiu 0 sem entregar. Desligar: `MECANIFICA_DIARIO=0`.
+repete e o que saiu 0 sem entregar. Desligar: `MODELAR_DIARIO=0`.
 
 Antes de tornar o repositório público, ou depois de reescrever o histórico,
 `npm run historico:conferir` lê cada versão de cada arquivo que algum ref
@@ -141,7 +141,7 @@ ramo `claude/**` ou `envio/**`; o CI roda a lista inteira dividida entre
 máquinas e só então avança a main.
 
 O gate de vazamento (`tools/arquitetura/termos-proibidos.test.mjs`) pede a chave
-da lista em `MECANIFICA_CHAVE_TERMOS_ARQUIVO=<arquivo fora do repositório>`; sem
+da lista em `MODELAR_CHAVE_TERMOS_ARQUIVO=<arquivo fora do repositório>`; sem
 ela, ignora esses casos com aviso, e o CI reprova.
 
 ## Corrigir um defeito
