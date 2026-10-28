@@ -490,7 +490,6 @@
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 - `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
-- `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — a bateria local abaixo de um minuto e a completa abaixo de cinco no CI
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -615,6 +614,7 @@
 - `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
 - `2026-10-23-gaiola-que-segue-as-feicoes.md` — Gaiola que segue as feições — anéis de gaiola em volta de vãos e arcos para a carroceria ter moldura, calha e lábio
 - `2026-10-24-carroceria-por-rede-de-curvas.md` — Carroceria por rede de curvas — a superfície preenchida entre curvas de feição nomeadas, com o detalhe lido em cortes ampliados
+- `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — a bateria local abaixo de um minuto e a completa abaixo de cinco no CI
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

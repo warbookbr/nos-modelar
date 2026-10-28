@@ -1,6 +1,6 @@
 # Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** Claude, com a pessoa trocando o segredo do CI e a chave fora do repositório na fatia 3
 
@@ -58,4 +58,6 @@ Escrito em 2026-10-25 a partir do mapa das menções, sem implementação. Ativa
 
 Fatia 1 feita em 2026-10-27. O nome entrou no texto corrido, nos títulos e no contrato, com o artigo trocado ("do Modelar" no lugar de "da Mecanifica"), em 83 arquivos; o pacote e o servidor MCP passaram a `modelar` e `modelar-mcp`, e a base do Vite, os endereços da bancada nas ferramentas e os links do repositório, a `/nos-modelar/`, em 21 arquivos. Os achados, cada um com a resposta se o processo o teria pego. A troca por script alterou a definição do agente crítico, que não pode mudar, e o `calibracao:check` pegou; ela voltou ao texto antigo e fica como exceção do gate do nome na fatia 3. Trocou também o cabeçalho dos arquivos OBJ e MTL que o exportador grava, que é marca do formato salvo como os ids `mecanifica.*` (decisão 1); o teste de hash do exportador pegou, e o cabeçalho voltou ao nome antigo com o motivo no código. Dois testes conferiam o nome do pacote, e os testes rápidos pegaram. A bateria padrão desta fatia levou o tempo da completa, porque os testes lentos rodam por impacto e a fatia tocou o repositório inteiro; com o aceite da pessoa, o envio foi feito com os testes rápidos e as conferências que tinham falhado, e os lentos ficaram para o CI.
 
-Pausado em 2026-10-27, com a fatia 1 enviada: a pessoa trouxe o plano da [bateria rápida e retorno cedo](2026-10-27-bateria-rapida-e-retorno-cedo.md) para antes, porque cada envio desta renomeação esperava a bateria inteira. A fatia 2 recomeça quando ele fechar.
+Pausado em 2026-10-27, com a fatia 1 enviada: a pessoa trouxe o plano da [bateria rápida e retorno cedo](encerrados/2026-10-27-bateria-rapida-e-retorno-cedo.md) para antes, porque cada envio desta renomeação esperava a bateria inteira. A fatia 2 recomeça quando ele fechar.
+
+Reativado em 2026-10-28, com o fechamento do plano da bateria rápida, a partir da fatia 2. O envio passa a ir ao ramo `claude/**`, e o CI junta à main com tudo verde.

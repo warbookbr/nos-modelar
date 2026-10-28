@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** [bateria rápida e retorno cedo](2026-10-27-bateria-rapida-e-retorno-cedo.md) (2026-10-27-bateria-rapida-e-retorno-cedo.md), ativado em 2026-10-27: um seletor que roda só os gates e testes que a mudança afeta, com a bateria local abaixo de um minuto e a completa dividida no CI. Seguinte: [renomear para Modelar](2026-10-25-renomear-para-modelar.md), pausado depois da fatia 1; e então [ajustes no núcleo dos veículos](2026-10-21-ajustes-no-nucleo-dos-veiculos.md).
+**Plano ativo:** [renomear para Modelar](2026-10-25-renomear-para-modelar.md) (2026-10-25-renomear-para-modelar.md), a partir da fatia 2. Seguinte: [ajustes no núcleo dos veículos](2026-10-21-ajustes-no-nucleo-dos-veiculos.md).
 
 [Leitura por demanda e limpeza](encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md) fechou em 2026-10-27, com a entrada por perguntas e o repositório sem as áreas que ninguém usava; o gate de 60% menos leitura não passou (19% na correção, 49% na modelagem).
 
