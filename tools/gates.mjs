@@ -290,6 +290,15 @@ function lerDuracoesDosGates(raiz = RAIZ) {
   try { return JSON.parse(readFileSync(join(raiz, ARQUIVO_DAS_DURACOES_DOS_GATES), 'utf8')); } catch { return {}; }
 }
 
+/* O PESADO FICA PARA O CI.
+ *
+ * Medido em 2026-10-28: uma linha mudada no núcleo de geometria fez a bateria local rodar quase tudo, 23 minutos nesta máquina
+ * de quatro processadores, enquanto o CI roda a lista inteira em oito máquinas em 5 minutos e só deixa a main andar com ela
+ * verde. A pessoa decidiu no mesmo dia: a bateria local roda as conferências baratas e os testes rápidos ligados à mudança, e
+ * os gates abaixo, quando algo do que leem mudou, ficam para o CI, ditos no relatório. `--com-pesados` e `--completo` os rodam
+ * aqui. */
+export const PESADOS_PARA_O_CI = ['test:lentos', 'mcp:visual:check', 'bancada:guardas', 'guarda:acervo', 'guarda:referencial', 'familias:check'];
+
 /* Quem lê `dist/` só pode começar depois de quem escreve. */
 export const DEPENDE_DE = Object.fromEntries(
   ['bancada:guardas']
@@ -385,10 +394,15 @@ async function executar() {
     if (d?.rodar) console.log(`gates — ${gate}: ${d.motivo}.`);
   }
 
+  const comPesados = completo || Boolean(process.env.CI) || process.argv.includes('--com-pesados');
+  const paraOCi = comPesados ? [] : bateria.filter((g) => PESADOS_PARA_O_CI.includes(g) && !guardados.includes(g));
+  if (paraOCi.length) console.log(`gates — ficam para o CI, que roda tudo antes de a main andar: ${paraOCi.join(', ')} (--com-pesados os roda aqui).`);
+
   const porGate = new Map();
   for (const gate of guardados) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, guardado: true });
+  for (const gate of paraOCi) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, paraOCi: true });
   const duracoesDosGates = lerDuracoesDosGates();
-  const estagios = separarEstagios(bateria.filter((g) => !guardados.includes(g)), duracoesDosGates);
+  const estagios = separarEstagios(bateria.filter((g) => !guardados.includes(g) && !paraOCi.includes(g)), duracoesDosGates);
   let fila = [];
   const ocupados = new Set();
   let pesoEmUso = 0;
@@ -453,6 +467,7 @@ async function executar() {
   console.log(`\n${'─'.repeat(52)}`);
   for (const { gate, codigo, duracao, arquivo, guardado } of resultados) {
     if (guardado) { console.log(`= ${gate.padEnd(24)}  guardado`); continue; }
+    if (porGate.get(gate).paraOCi) { console.log(`→ ${gate.padEnd(24)}  fica para o CI`); continue; }
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);
   }
@@ -465,7 +480,7 @@ async function executar() {
   const naoRodados = bateria.length - resultados.length;
   console.log('─'.repeat(52));
   console.log(
-    `${resultados.length - falhos.length}/${bateria.length} gates verdes${bateria.length === GATES.length ? '' : ` (de ${GATES.length})`} em ${Math.round(decorrido / 1000)}s`
+    `${resultados.length - falhos.length - paraOCi.length}/${bateria.length} gates verdes${bateria.length === GATES.length ? '' : ` (de ${GATES.length})`}${paraOCi.length ? `, ${paraOCi.length} para o CI` : ''} em ${Math.round(decorrido / 1000)}s`
     + (concorrencia > 1 ? ` (${Math.round(total / 1000)}s somados, ${concorrencia} de cada vez)` : '')
     + (falhos.length ? ` — falharam: ${falhos.map((r) => r.gate).join(', ')}` : '')
     + (naoRodados ? ` — ${naoRodados} não rodaram (${baratoFalhou ? 'um gate barato falhou' : '--parar-no-primeiro'})` : ''),

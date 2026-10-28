@@ -134,7 +134,8 @@ npm run gates
 
 A lista vive em `tools/gates.mjs`, conferida contra o `ci.yml`. Cada gate roda
 só se algo do que ele lê mudou desde a última rodada verde dele, os baratos
-antes, e uma falha entre eles para a bateria; `--completo` roda tudo, e
+antes, e uma falha entre eles para a bateria; o pesado fica para o CI;
+`--completo` roda tudo, e
 `npm run gates:vigiar` adianta o trabalho enquanto se edita. O envio vai a um
 ramo `claude/**` ou `envio/**`; o CI roda a lista inteira dividida entre
 máquinas e só então avança a main.

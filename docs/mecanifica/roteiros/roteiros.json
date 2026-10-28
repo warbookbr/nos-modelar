@@ -89,7 +89,7 @@
     {
       "id": "gates",
       "secao": "qualidade",
-      "texto": "Rode `npm run gates` antes de enviar (`--completo` e o CI rodam todos os testes lentos). Agente despachado não o roda; quem integra roda uma vez.",
+      "texto": "Rode `npm run gates` antes de enviar; o pesado fica para o CI, que só junta à main com tudo verde. Agente despachado não o roda.",
       "gate": null
     },
     {

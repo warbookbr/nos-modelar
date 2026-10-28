@@ -15,7 +15,7 @@ import { mkdirSync, watch, writeFileSync } from 'node:fs';
 import { setPriority } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { DEPENDE_DE, GATES, rodarGate } from '../gates.mjs';
+import { DEPENDE_DE, GATES, PESADOS_PARA_O_CI, rodarGate } from '../gates.mjs';
 import { decidir, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde, rodouInteiro } from './seletor.mjs';
 
 export const ARQUIVO_DO_ESTADO = join('tmp', 'gates', 'vigia.json');
@@ -28,7 +28,8 @@ export function ignorado(caminho) {
   return partes.length === 0 || IGNORADOS.has(partes[0]) || (partes[0] === '.claude' && partes[1] === 'worktrees');
 }
 
-export const GATES_DO_VIGIA = GATES.filter((g) => registroVerde(g, {}) !== null);
+/* Os pesados ficam para o CI (PESADOS_PARA_O_CI em tools/gates.mjs), e o vigia não os adianta: a bateria não os roda. */
+export const GATES_DO_VIGIA = GATES.filter((g) => registroVerde(g, {}) !== null && !PESADOS_PARA_O_CI.includes(g));
 
 export function criarVigia({
   raiz = '.',

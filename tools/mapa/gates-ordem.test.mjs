@@ -25,3 +25,11 @@ describe('separarEstagios', () => {
     expect(separarEstagios(['x', 'y'], {})).toEqual({ baratos: [], caros: ['x', 'y'] });
   });
 });
+
+describe('o pesado fica para o CI', () => {
+  it('só nomeia gates da lista, e a lista do CI continua tendo todos', async () => {
+    const { GATES, PESADOS_PARA_O_CI } = await import('../gates.mjs');
+    expect(PESADOS_PARA_O_CI.filter((g) => !GATES.includes(g))).toEqual([]);
+    expect(PESADOS_PARA_O_CI).toContain('test:lentos');
+  });
+});
