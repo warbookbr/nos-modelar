@@ -351,36 +351,75 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     return [...grupos.values()];
   }
 
+  /* A face vizinha de cada face por cada lado e a distância entre os centros das duas, calculadas uma vez: a busca de
+     vizinhança passa por cada face milhares de vezes (uma por vértice) e refazia a chave da aresta, as consultas ao
+     conjunto das declaradas e ao mapa das arestas, e a distância, que dependem só da face. -1 marca o lado que a busca
+     não atravessa (aresta declarada ou sem face do outro lado). */
+  const vizinhaPorLado = F.map((fv, f) => Int32Array.from(fv, (a, k) => {
+    const c = chave(a, fv[(k + 1) % fv.length]); if (declarada.has(c)) return -1;
+    const e = arestas.get(c); const g = e.faces[0] === f ? e.faces[1] : e.faces[0];
+    return g === undefined ? -1 : g;
+  }));
+  const distanciaAoLado = F.map((fv, f) => Float64Array.from(fv, (_, k) => { const g = vizinhaPorLado[f][k]; return g < 0 ? 0 : dist(centro[f], centro[g]); }));
   const marcaF = new Int32Array(F.length).fill(-1); const marcaV = new Int32Array(nV).fill(-1); const geo = new Float64Array(F.length); const fechadaF = new Int32Array(F.length).fill(-1); let selo = 0;
   /* vizinhança de um setor: as faces a até o raio pelo caminho de centro em centro, de face em face por aresta não
      declarada (Dijkstra, com empate pelo índice), e os vértices delas a até o raio. O caminho, e não a distância em
      linha reta, impede que a vizinhança contorne a ponta de um vinco e pegue o outro lado dele. */
+  /* A fila é um monte binário em dois vetores de números (o caminho e a face), reaproveitados entre as chamadas: a ordem de saída é a
+     da ordem total (caminho, depois índice da face) que a versão com pares usava, então a vizinhança sai a mesma, sem alocar um par
+     por empurrão. Cada face entra no máximo uma vez por lado dela, mais as de partida. */
+  const montD = new Float64Array(4 * F.length + 64); const montF = new Int32Array(4 * F.length + 64);
   function vizinhanca(v, faces0, R, limite = amostra) {
-    selo += 1; const p = V[v]; const heap = []; const pts = []; const faces = [];
-    /* fila de prioridade de pares [caminho, face], o menor caminho primeiro e o empate pelo índice da face */
-    const menor = (x, y) => x[0] < y[0] || (x[0] === y[0] && x[1] < y[1]);
-    const empurrar = (item) => { heap.push(item); let k = heap.length - 1; while (k > 0) { const m = (k - 1) >> 1; if (!menor(heap[k], heap[m])) break; [heap[k], heap[m]] = [heap[m], heap[k]]; k = m; } };
-    const tirar = () => { const primeiro = heap[0]; const ult = heap.pop(); if (heap.length) { heap[0] = ult; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && menor(heap[l], heap[m])) m = l; if (r < heap.length && menor(heap[r], heap[m])) m = r; if (m === k) break; [heap[k], heap[m]] = [heap[m], heap[k]]; k = m; } } return primeiro; };
-    for (const f of faces0) { marcaF[f] = selo; geo[f] = dist(centro[f], p); empurrar([geo[f], f]); }
-    while (heap.length) {
-      const [df, f] = tirar(); if (fechadaF[f] === selo || df > geo[f]) continue; fechadaF[f] = selo; faces.push(f);
+    selo += 1; const p = V[v]; const pts = []; const dpts = []; const faces = [];
+    let n = 0;
+    const empurrar = (d, f) => {
+      let k = n++;
+      while (k > 0) {
+        const m = (k - 1) >> 1;
+        if (!(d < montD[m] || (d === montD[m] && f < montF[m]))) break;
+        montD[k] = montD[m]; montF[k] = montF[m]; k = m;
+      }
+      montD[k] = d; montF[k] = f;
+    };
+    /* tira o menor e deixa em `saidaD`/`saidaF` */
+    let saidaD = 0; let saidaF = 0;
+    const tirar = () => {
+      saidaD = montD[0]; saidaF = montF[0];
+      n -= 1;
+      if (n > 0) {
+        const d = montD[n]; const f = montF[n]; let k = 0;
+        for (;;) {
+          const l = 2 * k + 1;
+          if (l >= n) break;
+          let m = l; const r = l + 1;
+          if (r < n && (montD[r] < montD[l] || (montD[r] === montD[l] && montF[r] < montF[l]))) m = r;
+          if (!(montD[m] < d || (montD[m] === d && montF[m] < f))) break;
+          montD[k] = montD[m]; montF[k] = montF[m]; k = m;
+        }
+        montD[k] = d; montF[k] = f;
+      }
+    };
+    for (const f of faces0) { marcaF[f] = selo; geo[f] = dist(centro[f], p); empurrar(geo[f], f); }
+    while (n > 0) {
+      tirar(); const df = saidaD; const f = saidaF;
+      if (fechadaF[f] === selo || df > geo[f]) continue; fechadaF[f] = selo; faces.push(f);
       const fv = F[f];
       for (let k = 0; k < fv.length; k++) {
-        const a = fv[k]; if (marcaV[a] !== selo) { marcaV[a] = selo; if (a < limite && dist(V[a], p) <= R) pts.push(a); }
-        const c = chave(a, fv[(k + 1) % fv.length]); if (declarada.has(c)) continue;
-        const e = arestas.get(c); const g = e.faces[0] === f ? e.faces[1] : e.faces[0];
-        if (g === undefined || fechadaF[g] === selo) continue;
-        const d = df + dist(centro[f], centro[g]);
+        const a = fv[k];
+        if (marcaV[a] !== selo) { marcaV[a] = selo; if (a < limite) { const da = dist(V[a], p); if (da <= R) { pts.push(a); dpts.push(da); } } }
+        const g = vizinhaPorLado[f][k];
+        if (g < 0 || fechadaF[g] === selo) continue;
+        const d = df + distanciaAoLado[f][k];
         if (d > R) continue;
-        if (marcaF[g] !== selo || d < geo[g]) { marcaF[g] = selo; geo[g] = d; empurrar([d, g]); }
+        if (marcaF[g] !== selo || d < geo[g]) { marcaF[g] = selo; geo[g] = d; empurrar(d, g); }
       }
     }
-    return { pts, faces };
+    return { pts, dpts, faces };
   }
 
   /* desvio do vértice à versão suavizada local de um setor, com o ajuste para as curvaturas */
   function desvioNoSetor(v, faces0, R) {
-    const { pts, faces } = vizinhanca(v, faces0, R);
+    const { pts, dpts, faces } = vizinhanca(v, faces0, R);
     if (pts.length < 8) return null;
     const p = V[v]; const sigma = R / 2;
     const n = [0, 0, 0];
@@ -389,7 +428,7 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     const ref = Math.abs(nz[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
     const e1 = unit(cross(ref, nz)); const e2 = cross(nz, e1);
     const loc = pts.map((a) => { const d = sub(V[a], p); return [dot(d, e1) / R, dot(d, e2) / R, dot(d, nz) / R]; });
-    const g = pts.map((a) => Math.exp(-((dist(V[a], p) / sigma) ** 2)));
+    const g = dpts.map((da) => Math.exp(-((da / sigma) ** 2)));
     const base = pts.length >= 20 ? BASE_CUBICA : BASE_QUADRATICA;
     const phi = loc.map((q) => base(q[0], q[1])); const z = loc.map((q) => q[2]);
     let pesos = g; let c = null; let usados = g;

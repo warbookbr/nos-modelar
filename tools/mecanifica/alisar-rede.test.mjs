@@ -7,7 +7,17 @@
  * edições por curva e ponto-chave; dá as mesmas edições em duas execuções (uma pela linha de comando) e devolve a TABELA como estava.
  * Uma forma com uma dobra real, a cintura e a coluna sem o vinco declarado, sai como não alisável dentro da tolerância, com as falhas
  * que sobram. As conferências não usam o modelo da ferramenta: aplicam as edições a uma TABELA nova e rodam a receita e a leitura de
- * ondulação, sem fixar divisão nenhuma. */
+ * ondulação, sem fixar divisão nenhuma.
+ *
+ * TEMPO (plano da bateria rápida, fatia 1, 2026-10-28). Sozinho, o arquivo levava 174 s: o alisamento da chapa, o da dobra, a linha de
+ * comando, a leitura da chapa com o erro, a conferência com as edições e o caso sem falha rodavam um depois do outro, e cada um é só
+ * CPU. Agora o alisamento no processo do teste, a linha de comando, o caso da dobra e a leitura da chapa com o caso sem falha rodam ao
+ * mesmo tempo, em quatro processos, e a conferência com as edições segue o alisamento no processo do teste. A ferramenta ficou mais
+ * rápida sem mudar o que devolve (`procedural/nucleo/gaiola-por-rede-liso.test.mjs`, `src/autoria/contato-de-solidos-equivalencia.test.mjs`
+ * e `procedural/nucleo/subdivisao.test.mjs` provam os trechos trocados contra o código anterior, bit a bit): o gradiente conjugado do
+ * miolo trabalha sobre vetores de números, a substituição da fatoração LU lê índices contíguos e a busca de vizinhança da leitura de
+ * ondulação consulta a vizinhança de cada face calculada uma vez. Medida: de antes e de depois no registro do plano. Continua
+ * conferindo tudo o que está acima, com os mesmos limites. */
 import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,32 +41,37 @@ function lerComEdicoes(opcoes, edicoes) {
 }
 
 describe('alisamento da chapa por rede de curvas', () => {
-  let antes, relatorio, cli, tabelaDepois, relatorioDobra;
+  let antes, relatorio, cli, tabelaDepois, relatorioDobra, lido, semFalha;
 
-  /* A linha de comando roda num processo à parte AO MESMO TEMPO que o alisamento no processo do teste: as duas contas são a
-     mesma e independentes, e em série elas somavam metade do tempo do arquivo (medido em 2026-10-27: 64 s cada). */
-  function linhaDeComando() {
+  /* Os processos à parte rodam AO MESMO TEMPO que o alisamento no processo do teste: as contas são independentes, e em série elas
+     somavam quase todo o tempo do arquivo (medido em 2026-10-27: 64 s a linha de comando e 64 s o alisamento sozinhos). */
+  function emProcesso(argumentos) {
     return new Promise((resolver, recusar) => {
-      const filho = spawn(process.execPath, ['tools/mecanifica/alisar-a-superficie.mjs', 'tools/mecanifica/fixtures/alisar-rede-prova.js'], { cwd: REPO });
+      const filho = spawn(process.execPath, argumentos, { cwd: REPO });
       let saida = ''; let erro = '';
       filho.stdout.on('data', (d) => { saida += d; });
       filho.stderr.on('data', (d) => { erro += d; });
-      filho.on('close', (codigo) => (codigo === 0 ? resolver(JSON.parse(saida)) : recusar(new Error(`a linha de comando falhou: ${erro}`))));
+      filho.on('close', (codigo) => (codigo === 0 ? resolver(JSON.parse(saida)) : recusar(new Error(`${argumentos.join(' ')} falhou: ${erro}`))));
     });
   }
+  const linhaDeComando = () => emProcesso(['tools/mecanifica/alisar-a-superficie.mjs', 'tools/mecanifica/fixtures/alisar-rede-prova.js']);
+  const casos = (nomes) => emProcesso(['tools/mecanifica/fixtures/alisar-rede-prova-casos.mjs', nomes]);
 
   beforeAll(async () => {
     const pelaLinha = linhaDeComando();
+    const pelaDobra = casos('dobra');
+    const pelosLeves = casos('antes,sem-falha');
     const { receita, TABELA } = receitaDeProva(PLANTADA);
-    antes = ondulacaoDaSuperficie(superficiesDaReceita(receita)[0]);
     const copia = JSON.stringify(TABELA);
     relatorio = alisarReceita({ receita, tabela: TABELA });
     tabelaDepois = JSON.stringify(TABELA) === copia;
-    const d = receitaDeProva({ dobra: true });
-    /* Uma regularização só: o caso da dobra prova que a ferramenta diz "não alisável" com as falhas que sobram, e com as três
-       regularizações do padrão ou com uma a conclusão, as falhas e os pontos que impedem saem os mesmos (medido em 2026-10-27). */
-    relatorioDobra = alisarReceita({ receita: d.receita, tabela: d.TABELA }, { toleranciaMm: 1, regularizacoes: [0.03] });
+    /* a conferência com as edições segue o alisamento (depende dele) e roda enquanto os outros processos terminam */
+    lido = lerComEdicoes(PLANTADA, relatorio.edicoes);
     cli = await pelaLinha;
+    relatorioDobra = (await pelaDobra).dobra;
+    const leves = await pelosLeves;
+    antes = leves.antes;
+    semFalha = leves['sem-falha'];
   }, 900000);
 
   it('a ondulação plantada passa do limiar, em calombos das três ligações, e a origem dos pontos vem da rede', () => {
@@ -75,7 +90,7 @@ describe('alisamento da chapa por rede de curvas', () => {
     expect(relatorio.depois.falhas).toBe(0);
     expect(relatorio.edicoes.length).toBeGreaterThan(20);
     /* conferência independente do modelo: as edições numa TABELA nova, a receita rodada e lida, sem fixar divisão nenhuma */
-    const { sup, ond, TABELA } = lerComEdicoes(PLANTADA, relatorio.edicoes);
+    const { sup, ond, TABELA } = lido;
     expect(ond.falhas).toEqual([]);
     expect(ond.desvioMm.maximo).toBeLessThan(0.3);
     const original = derivar(tabelaDeProva(PLANTADA));
@@ -156,15 +171,11 @@ describe('alisamento da chapa por rede de curvas', () => {
     /* a falha está junto da dobra: a cintura ou a coluna */
     expect(maior.pontos.some((p) => /^(cintura|colunaB|coluna|baixo|ponta|ligL2|atrasDaColuna)/.test(p))).toBe(true);
   });
-});
 
-describe('chapa por rede sem falha', () => {
-  it('não edita nada e diz que não há o que alisar', () => {
-    const { receita, TABELA } = receitaDeProva({ ruido: 0 });
-    const r = alisarReceita({ receita, tabela: TABELA });
-    expect(r.antes.falhas).toBe(0);
-    expect(r.alisavel).toBe(true);
-    expect(r.edicoes).toEqual([]);
-    expect(r.modelo.semFalhas).toBe(true);
-  }, 120000);
+  it('a chapa por rede sem falha não edita nada e diz que não há o que alisar', () => {
+    expect(semFalha.antes.falhas).toBe(0);
+    expect(semFalha.alisavel).toBe(true);
+    expect(semFalha.edicoes).toEqual([]);
+    expect(semFalha.modelo.semFalhas).toBe(true);
+  });
 });

@@ -27,6 +27,8 @@
  * [vértice, aresta seguinte, face, aresta anterior], com a orientação da face de origem.
  */
 
+import { memoizarPura } from './memoria-de-pura.js';
+
 export const NITIDEZ_INFINITA = Infinity;
 export const NITIDEZ_VIVA = 10;
 
@@ -170,7 +172,7 @@ function nitidezDosVincos(faces, vincos) {
  * maior que zero, como [a, b, viva], em que viva diz que a nitidez é infinita (o vinco vivo, que fica dobra na superfície
  * limite); o vinco de nitidez finita se apaga no refino e a superfície fica lisa por cima dele. A ordem segue a das
  * arestas da malha varrendo as faces, e a geometria não muda. */
-export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave', aoLimite = false, comVincos = false }) {
+function subdividirSemMemoria({ vertices, faces, vincos = [], niveis = 1, cantos = [], borda = 'suave', aoLimite = false, comVincos = false }) {
   validar(vertices, faces, vincos, niveis);
   if (borda !== 'suave' && borda !== 'cantos') throw new TypeError("subdivisão: borda precisa ser 'suave' ou 'cantos'");
   let nitidez = nitidezDosVincos(faces, vincos);
@@ -190,6 +192,13 @@ export function subdividirCatmullClark({ vertices, faces, vincos = [], niveis = 
     .map((e) => [e.a, e.b, nitidez.get(chave(e.a, e.b)) === NITIDEZ_INFINITA]);
   return { vertices: V, faces: F, vincos: saida };
 }
+
+/* A leitura da superfície de uma receita pede o refino com os mesmos argumentos que o passo `subdivisao` já usou; a memória das
+ * últimas chamadas (`memoria-de-pura.js`) devolve a cópia do resultado e poupa a segunda conta. Só a chamada com `comVincos`
+ * entra na memória, que é a do passo e a da leitura; as outras (o refino de uma sonda, de uma estrela) rodam direto. Os
+ * parâmetros ausentes ficam como a função os assume, então a chamada sem um padrão e a que o escreve são duas chaves, e as duas
+ * dão o mesmo resultado. */
+export const subdividirCatmullClark = memoizarPura(subdividirSemMemoria, { quando: (gaiola) => gaiola?.comVincos === true });
 
 /* ---- ponto limite e medidas ----
  *
@@ -252,24 +261,38 @@ export function fatorarLU(A) {
   return { M, perm, singularEm: -1 };
 }
 
-/* As posições não nulas de L e de U por linha, em ordem crescente de coluna, guardadas na fatoração na primeira vez. */
+/* As posições não nulas de L e de U por linha, em ordem crescente de coluna, guardadas na fatoração na primeira vez, junto
+   com o valor de cada uma, em vetores de números: a substituição lê índices e valores contíguos, sem a lista de colunas por
+   linha nem a busca na linha densa (a resolução repetida por centenas de lados direitos era a maior parte do tempo do
+   alisamento sobre a rede de curvas, medido em 2026-10-28). */
 function naoNulos(lu) {
   if (!lu.nz) {
     const n = lu.M.length;
-    lu.nz = lu.M.map((linha, r) => {
-      const L = [], U = [];
-      for (let c = 0; c < r; c++) if (linha[c] !== 0) L.push(c);
-      for (let c = r + 1; c < n; c++) if (linha[c] !== 0) U.push(c);
-      return { L, U };
+    const inicioL = new Int32Array(n + 1); const inicioU = new Int32Array(n + 1);
+    const colunasL = []; const valoresL = []; const colunasU = []; const valoresU = []; const diagonal = new Float64Array(n);
+    lu.M.forEach((linha, r) => {
+      for (let c = 0; c < r; c++) if (linha[c] !== 0) { colunasL.push(c); valoresL.push(linha[c]); }
+      for (let c = r + 1; c < n; c++) if (linha[c] !== 0) { colunasU.push(c); valoresU.push(linha[c]); }
+      inicioL[r + 1] = colunasL.length; inicioU[r + 1] = colunasU.length; diagonal[r] = linha[r];
     });
+    lu.nz = { inicioL, inicioU, colunasL: Int32Array.from(colunasL), valoresL: Float64Array.from(valoresL), colunasU: Int32Array.from(colunasU), valoresU: Float64Array.from(valoresU), diagonal };
   }
   return lu.nz;
 }
 
 export function resolverLU(lu, b) {
-  const { M, perm } = lu; const n = M.length; const y = perm.map((i) => b[i]); const nz = naoNulos(lu);
-  for (let r = 0; r < n; r++) for (const c of nz[r].L) y[r] -= M[r][c] * y[c];
-  for (let r = n - 1; r >= 0; r--) { for (const c of nz[r].U) y[r] -= M[r][c] * y[c]; y[r] /= M[r][r]; }
+  const { M, perm } = lu; const n = M.length; const y = perm.map((i) => b[i]);
+  const { inicioL, inicioU, colunasL, valoresL, colunasU, valoresU, diagonal } = naoNulos(lu);
+  for (let r = 0; r < n; r++) {
+    let t = y[r];
+    for (let k = inicioL[r]; k < inicioL[r + 1]; k++) t -= valoresL[k] * y[colunasL[k]];
+    y[r] = t;
+  }
+  for (let r = n - 1; r >= 0; r--) {
+    let t = y[r];
+    for (let k = inicioU[r]; k < inicioU[r + 1]; k++) t -= valoresU[k] * y[colunasU[k]];
+    y[r] = t / diagonal[r];
+  }
   return y;
 }
 
@@ -475,7 +498,7 @@ export function ajustarGaiolaAsMedidas(gaiola, medidas) {
  * pontos em ordem crescente de índice), bit a bit. O ganho é o mesmo das medidas exatas: o maior fator pelo qual um erro
  * nas cotas vira deslocamento de um ponto da gaiola, ‖∂x_U/∂a‖∞, calculado resolvendo o sistema para cada cota; acima de
  * GANHO_MAXIMO_DAS_MEDIDAS falha com os pontos que mais pesam, e o sistema singular falha com os pontos do vetor nulo. */
-export function ajustarGaiolaAsMedidasComPeso(gaiola, medidas) {
+function ajustarComPesoSemMemoria(gaiola, medidas) {
   const { nitidez, C, facesDoV } = prepararLimite(gaiola);
   const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
   if (!Array.isArray(medidas)) throw new TypeError('subdivisão: medidas precisa ser lista de { indice, peso }');
@@ -555,6 +578,9 @@ export function ajustarGaiolaAsMedidasComPeso(gaiola, medidas) {
   if (fora.length) throw new ErroDasMedidas(`a superfície limite não chegou a ${TOLERANCIA_DAS_MEDIDAS} m das medidas exatas`, fora);
   return { vertices: V, ganho, residuos, medidas: M };
 }
+
+/* O mesmo ajuste com os mesmos argumentos sai da memória (ver `subdividirCatmullClark`): é a conta mais cara da leitura da superfície. */
+export const ajustarGaiolaAsMedidasComPeso = memoizarPura(ajustarComPesoSemMemoria);
 
 /**
  * operadorDasMedidas(gaiola, medidas) -> { aplicar(delta), exato }
