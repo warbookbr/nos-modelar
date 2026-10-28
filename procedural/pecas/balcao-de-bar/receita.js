@@ -28,7 +28,7 @@
 
 export const TABELA = {
   tampo_meia_x: 523.5,
-  tampo_espessura: 107,
+  tampo_espessura: 117,
   tampo_meia_z: 311,
   tampo_chanfro: 8,
 

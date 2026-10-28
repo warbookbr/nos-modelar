@@ -15,7 +15,7 @@ aplicação publicada aqui.
 A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
 `npm run comecar -- <roteiro>`, que diz o que ler. Este índice é a leitura do
 roteiro `mudar/plano`; criar, inspecionar, corrigir ou auditar uma peça segue o
-roteiro de modelar e a porta [`usar/README.md`](usar/README.md). O que está
+roteiro de modelar e a porta [`usar/README.md`](usar/LEIAME.md). O que está
 encerrado vive em
 [`historico/README.md`](historico/README.md)
 (`docs/mecanifica/historico/README.md`) e não governa trabalho novo.

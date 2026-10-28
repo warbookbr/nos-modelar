@@ -249,7 +249,7 @@ export function decomporConvexo(perfil) {
 
 /* Peças convexas de uma forma resolvida. A forma que subtrai outra (`subtrai`) leva as peças do que sobra do recorte (ver `recorte.js`). */
 export function pecasDe(r) {
-  if (!memoPecas.has(r)) memoPecas.set(r, r.subtrai ? pecasRecortadas(r) : pecasSemMemoria(r));
+  if (!memoPecas.has(r)) memoPecas.set(r, pecasSemMemoria(r));
   return memoPecas.get(r);
 }
 

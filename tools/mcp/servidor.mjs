@@ -128,7 +128,7 @@ function respostaFalhaInterna(nome, erro) {
 }
 
 function registrarPerfil(server, ferramentas) {
-  for (const ferramenta of ferramentas) {
+  for (const ferramenta of ferramentas.slice(1)) {
     server.registerTool(
       ferramenta.nome,
       {

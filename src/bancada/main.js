@@ -483,7 +483,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     aplicarModelo({
       nome: modeloAtual?.nome ?? nomePecaAtual,
       rotulo,
-      medida: { partes: caixas, facesSemParte, portas: portasPublicadas(deformado) },
+      medida: { partes: caixas, facesSemParte, portas: [] },
       neutro: deformado,
       materiais: materiaisDaPeca,
       ...adaptado,

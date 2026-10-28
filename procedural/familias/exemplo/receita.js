@@ -8,7 +8,7 @@
 import { chamar, criarRegistroDeFamilias } from '../index.js';
 import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 
-export const TABELA = { perfil: 'forninho-eletrico', largura: 480, altura: 290, profundidade: 380, botoesGiratorios: 2 };
+export const TABELA = { perfil: 'forninho-eletrico', largura: 480, altura: 310, profundidade: 380, botoesGiratorios: 2 };
 
 let registro = null;
 const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
