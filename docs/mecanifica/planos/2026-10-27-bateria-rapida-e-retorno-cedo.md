@@ -54,6 +54,7 @@ Nenhum gate deixa de rodar no CI, que roda tudo sem resultado guardado. Nada ent
 2. **Meta e envio por ramo.** Aprovada em 2026-10-27: a meta é a bateria local abaixo de um minuto e a completa abaixo de cinco no CI, com o seletor no centro e o envio por ramo.
 3. **Vigia contínuo.** Aprovada em 2026-10-27: um vigia em segundo plano roda o que cada arquivo gravado afeta enquanto o trabalho acontece, e a bateria antes do envio só confere o que ele não cobriu.
 4. **Os testes pesados primeiro.** Aprovada em 2026-10-27: a primeira fatia encurta os testes mais pesados, que são o maior ganho com o menor trabalho.
+5. **O pesado fica para o CI.** Aprovada em 2026-10-28, depois de uma linha no núcleo levar 23 minutos na bateria local e a completa levar 5 no CI dividido: a bateria local roda as conferências baratas e os testes rápidos ligados à mudança, e os testes lentos, o acervo, o referencial, as famílias, as guardas da bancada e a prova visual do MCP ficam para o CI, que só junta à main com tudo verde. O gate de saída 4 passa a valer para a bateria local e o CI juntos, antes da main.
 
 ## Riscos e parada
 
