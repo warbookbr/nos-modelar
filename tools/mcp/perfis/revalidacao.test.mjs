@@ -34,7 +34,7 @@ const identidade = (documento) => documento.identidade;
 
 describe('perfil MCP de revalidação — R04', () => {
   it('retoma resumo em nova sessão, sem expor raiz ou caminhos internos', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-mcp-r04-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-mcp-r04-'));
     try {
       const documento = campanha();
       await persistirCampanhaRevalidacao({ raiz, campanha: documento });
@@ -52,7 +52,7 @@ describe('perfil MCP de revalidação — R04', () => {
   });
 
   it('mantém escrita opt-in e registra resultado usando identidade e CAS', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-mcp-r04-escrita-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-mcp-r04-escrita-'));
     try {
       const documento = campanha();
       await persistirCampanhaRevalidacao({ raiz, campanha: documento });

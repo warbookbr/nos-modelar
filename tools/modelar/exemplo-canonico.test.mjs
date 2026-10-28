@@ -53,7 +53,7 @@ afterEach(() => {
 /* A pasta da peça vive dentro de um acervo de ensaio, com a referência do
    plano ao lado, como no acervo real. */
 function pastaDaPeca(codigo) {
-  const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-exemplo-'));
+  const raiz = mkdtempSync(join(tmpdir(), 'modelar-exemplo-'));
   temporarias.push(raiz);
   const pasta = join(raiz, 'exemplo');
   mkdirSync(join(pasta, 'referencias'), { recursive: true });

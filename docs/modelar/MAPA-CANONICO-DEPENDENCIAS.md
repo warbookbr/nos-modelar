@@ -133,7 +133,7 @@ ativas autorizadas alimentam o mesmo snapshot; a ausência delas mantém o
 fallback estático.
 
 A superfície MCP passou para `mecanifica.mcp.revisao.v5` e o servidor
-`mecanifica-mcp` 0.5.0. O contrato anterior v4 não anuncia essa ferramenta nem
+o servidor MCP na versão 0.5.0. O contrato anterior v4 não anuncia essa ferramenta nem
 o recurso de dependências.
 
 O R04 acrescenta, quando o host configura uma raiz de autoria, consulta de

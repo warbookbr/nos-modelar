@@ -1,6 +1,6 @@
 # Programa MCP — índice de planos
 
-Este arquivo coordena as etapas em que serviços da Mecanifica são expostos por
+Este arquivo coordena as etapas em que serviços do Modelar são expostos por
 MCP. Ele é um painel de programa, não um plano executivo e não autoriza
 implementar todas as etapas.
 
@@ -30,7 +30,7 @@ protocolo em limitação do núcleo.
 ## Visão macro do programa
 
 O programa busca oferecer uma interface MCP segura e econômica para capacidades
-já comprovadas da Mecanifica.
+já comprovadas do Modelar.
 
 | Módulo | Finalidade | Etapas deste painel |
 |---|---|---|

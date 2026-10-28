@@ -33,7 +33,7 @@ export function criarSincronizadorSessao({
 
   try {
     if (typeof BroadcastChannel !== 'undefined') {
-      canalBroadcast = new BroadcastChannel('mecanifica-sessao-ativa');
+      canalBroadcast = new BroadcastChannel('modelar-sessao-ativa');
       canalBroadcast.onmessage = (evento) => {
         if (evento.data?.tipo === 'ATUALIZAR_SESSAO' && evento.data.payload) {
           aplicarPayload(evento.data.payload, { fonte: 'broadcast' });

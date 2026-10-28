@@ -21,7 +21,7 @@ function correr(args: string[]) {
 }
 
 function temporario() {
-  const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-contexto-'));
+  const raiz = mkdtempSync(join(tmpdir(), 'modelar-contexto-'));
   temporarios.push(raiz);
   const montagens = join(raiz, 'montagens');
   const pecas = join(raiz, 'pecas');

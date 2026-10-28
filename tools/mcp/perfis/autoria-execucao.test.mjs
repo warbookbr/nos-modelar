@@ -11,7 +11,7 @@ import {
   executarExportarObj,
 } from './autoria-execucao.mjs';
 
-const SESSAO_TESTE = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-sessao-'));
+const SESSAO_TESTE = mkdtempSync(join(tmpdir(), 'modelar-mcp-sessao-'));
 
 /* `executarAtivarBancada`/`executarExportarStep`/`executarExportarObj` exigem
    caminho confinado dentro do repositório, então a fixture precisa de arquivo

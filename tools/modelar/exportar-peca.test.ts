@@ -90,7 +90,7 @@ describe('exportação e manifesto vazio', () => {
   });
 
   it('grava catálogo vazio sem apagar nem inventar artefatos', async () => {
-    const destino = mkdtempSync(`${tmpdir()}/mecanifica-exportacao-`);
+    const destino = mkdtempSync(`${tmpdir()}/modelar-exportacao-`);
     try {
       await gravarPublicadas([], destino);
       expect(readdirSync(destino)).toEqual(['manifesto.json']);

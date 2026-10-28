@@ -95,7 +95,7 @@ describe('fatia preparatória do Degrau 1', () => {
   });
 
   it('não grava saída durante importação e não depende de arquivos de teste', () => {
-    const pasta = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-import-'));
+    const pasta = mkdtempSync(join(tmpdir(), 'modelar-mcp-import-'));
     try {
       const script = `await import(${JSON.stringify(OLHAR.href)});`;
       execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: pasta, encoding: 'utf8' });

@@ -19,7 +19,7 @@ import { resumir } from './ler-diario.mjs';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
 const DESCREVER = join(AQUI, 'descrever-peca.mjs');
-const AREA = mkdtempSync(join(tmpdir(), 'mecanifica-diario-teste-'));
+const AREA = mkdtempSync(join(tmpdir(), 'modelar-diario-teste-'));
 /* O diário do teste mora aqui, nunca no de quem está trabalhando. */
 const DIARIO = join(AREA, 'oficina.jsonl');
 process.env.MODELAR_DIARIO_ARQUIVO = DIARIO;

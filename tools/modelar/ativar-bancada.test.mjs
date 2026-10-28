@@ -42,7 +42,7 @@ const AREA = mkdtempSync(join(REPO, 'tmp', 'teste-ativar-bancada-'));
 /* A sessão de teste é gravada AQUI, não no `public/sessao-ativa.json` do
    repositório: o arquivo real diz qual peça está na bancada de quem está
    trabalhando, e teste não desmonta o trabalho de ninguém. */
-const AREA_SESSAO = mkdtempSync(join(tmpdir(), 'mecanifica-sessao-teste-'));
+const AREA_SESSAO = mkdtempSync(join(tmpdir(), 'modelar-sessao-teste-'));
 const SESSAO = join(AREA_SESSAO, 'public/sessao-ativa.json');
 const temporarias = [];
 function receitaTemporaria(nome, corpo) {

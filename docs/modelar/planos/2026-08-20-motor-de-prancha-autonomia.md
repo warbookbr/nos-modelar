@@ -4,7 +4,7 @@
 
 **Responsável:** Codex
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, `5ac6201`
+**Repositório e base:** `warbookbr/nos-modelar`, `5ac6201`
 
 ## Mandato
 
@@ -196,4 +196,4 @@ para reativar P2 do chassi.
 - **R2 — 2026-08-20:** concluída com decisão `aprovar`: contrato `mecanifica.prancha-autoria@1` explicita intenção, procedência, confiança, incerteza e bloqueio; evidência em `../RELATORIO-MOTOR-DE-PRANCHA-R2.md`.
 - **R3 — 2026-08-20:** concluída com decisão `aprovar`: corpus reexecutado, sem mecanismo adicional não justificado; evidência em `../RELATORIO-MOTOR-DE-PRANCHA-R3.md`.
 - **R4 — 2026-08-20:** autoria independente, inspeção raster e mutações foram provadas em `../RELATORIO-MOTOR-DE-PRANCHA-R4.md`; não há modelo 3D comparável, portanto o impacto do alvo não foi demonstrado.
-- **Congelamento — 2026-08-20:** por decisão do usuário, fica em `pronto` sem R5; R0–R3 aprovadas e R4 parcial transferem a validação de valor para `2026-08-20-validacao-integrada-mecanifica.md`, sem alegar autonomia integral ou reativar P2.
+- **Congelamento — 2026-08-20:** por decisão do usuário, fica em `pronto` sem R5; R0–R3 aprovadas e R4 parcial transferem a validação de valor para `2026-08-20-validacao-integrada-modelar.md`, sem alegar autonomia integral ou reativar P2.

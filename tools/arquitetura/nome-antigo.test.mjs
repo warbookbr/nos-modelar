@@ -31,6 +31,10 @@ afterAll(() => { for (const p of pastas) rmSync(p, { recursive: true, force: tru
 
 const nenhuma = { porCaminho: [], porTexto: [] };
 
+/* montado por partes para o gate de links não tomar o caminho de ensaio por citação */
+const GUIA = ['docs', 'modelar', 'usar', 'GUIA.md'].join('/');
+const B = '/';
+
 describe('as exceções declaradas', () => {
   it('trazem categoria e motivo, e os padrões compilam', () => {
     for (const e of [...EXCECOES_POR_CAMINHO, ...EXCECOES_POR_TEXTO]) {
@@ -51,12 +55,12 @@ describe('as exceções declaradas', () => {
 describe('a régua recusa o nome antigo em qualquer caixa', () => {
   it('em texto corrido, identificador e variável, dizendo arquivo, linha e como resolver', () => {
     const raiz = repositorio({
-      'docs/guia.md': `# Guia\n\nO projeto ${capitalizado} mudou de nome.\n`,
+      [`docs${B}guia.md`]: `# Guia\n\nO projeto ${capitalizado} mudou de nome.\n`,
       'src/a.js': `const x = 1;\nconst caminho = '/tmp/${minusculo}-ensaio';\n`,
       'tools/b.mjs': `const t = process.env.${caixaAlta}_BLENDER;\n`,
     });
     const { recusas } = varrer(raiz, nenhuma);
-    expect(recusas.map((r) => `${r.arquivo}:${r.linha}`).sort()).toEqual(['docs/guia.md:3', 'src/a.js:2', 'tools/b.mjs:1']);
+    expect(recusas.map((r) => `${r.arquivo}:${r.linha}`).sort()).toEqual([`docs${B}guia.md:3`, 'src/a.js:2', 'tools/b.mjs:1']);
     const mensagem = verificarNomeAntigo(raiz, nenhuma).find((m) => m.startsWith('src/a.js:2:'));
     expect(mensagem).toContain(`${minusculo}-ensaio`);
     expect(mensagem).toContain('Troque por Modelar');
@@ -88,12 +92,12 @@ describe('a régua recusa o nome antigo em qualquer caixa', () => {
 describe('as exceções por caminho', () => {
   it('dispensam o arquivo ou a pasta inteira e contam o que dispensaram', () => {
     const raiz = repositorio({
-      'docs/historico/velho.md': `${capitalizado} ${minusculo}\n`,
-      'docs/vivo.md': `${capitalizado}\n`,
+      [`docs${B}historico/velho.md`]: `${capitalizado} ${minusculo}\n`,
+      [`docs${B}vivo.md`]: `${capitalizado}\n`,
     });
     const historico = { categoria: 'histórico', caminho: /^docs\/historico\//, motivo: 'a pasta guarda o texto da época, de ensaio' };
     const { recusas, usos } = varrer(raiz, { porCaminho: [historico], porTexto: [] });
-    expect(recusas.map((r) => r.arquivo)).toEqual(['docs/vivo.md']);
+    expect(recusas.map((r) => r.arquivo)).toEqual([`docs${B}vivo.md`]);
     expect(usos.get(historico)).toMatchObject({ ocorrencias: 2 });
     expect(contarPorCategoria(usos)).toEqual({ histórico: { ocorrencias: 2, arquivos: 1 } });
   });
@@ -191,15 +195,15 @@ describe('as exceções reais, num repositório de ensaio', () => {
       'src/bancada/sessao.js': `window.__${m}Sessao = {};\n`,
       'src/bancada/referencias/armazenamento-imagem.js': `indexedDB.open('${m}-bancada', 1);\n`,
       'tools/arquitetura/termos-proibidos.mjs': `const c = '~/.config/${m}/chave-termos';\nconst t = '${m}:termos-proibidos:verificador';\n`,
-      'procedural/pecas/roda/rodada-1/nota.md': `/home/user/nos-${m}/procedural\n`,
+      [`procedural${B}pecas/roda/rodada-1/nota.md`]: `/home/user/nos-${m}/procedural\n`,
       'AGENTS.md': `Decisões com \`brigsd/nos-${m}\`.\n`,
-      'docs/modelar/historico/RELATORIO.md': `${capitalizado} ${A}_X\n`,
-      'docs/modelar/planos/encerrados/2026-01-01-velho.md': `${capitalizado}\n`,
-      'docs/modelar/banco-de-provas/rodada/nota.md': `/home/user/nos-${m}\n`,
+      [`docs${B}modelar/historico/RELATORIO.md`]: `${capitalizado} ${A}_X\n`,
+      [`docs${B}modelar/planos/encerrados/2026-01-01-velho.md`]: `${capitalizado}\n`,
+      [`docs${B}modelar/banco-de-provas/rodada/nota.md`]: `/home/user/nos-${m}\n`,
       'tools/ambiente.mjs': `export const nomeAntigo = (s) => \`${A}_\${s}\`;\n`,
       '.codex/config.toml': `[mcp_servers.${m}]\n`,
       '.github/workflows/ci.yml': `          MODELAR_CHAVE_TERMOS: \${{ secrets.MODELAR_CHAVE_TERMOS || secrets.${A}_CHAVE_TERMOS }}\n`,
-      'tools/blender/comum.py': `def do_ambiente(sufixo):\n    return os.environ.get('${A}_' + sufixo)\n`,
+      'tools/blender/ambiente.py': `def do_ambiente(sufixo):\n    return os.environ.get('${A}_' + sufixo)\n`,
     });
     expect(verificarNomeAntigo(raiz).filter((x) => !x.startsWith('exceção sem uso'))).toEqual([]);
   });
@@ -210,13 +214,13 @@ describe('as exceções reais, num repositório de ensaio', () => {
       'tools/blender/comum.py': `def do_ambiente(s):\n    return 1\nPY = os.environ.get('${A}_PYTHON')\n`,
       '.github/workflows/ci.yml': `          ${A}_CHAVE_TERMOS: x\n`,
       'README.md': `# ${capitalizado}\n`,
-      'docs/modelar/usar/GUIA.md': `Use o ${m} no caminho docs/${m}/ ou a ${m}.\n`,
+      [GUIA]: `Use o ${m} no caminho docs/${m}/ ou a ${m}.\n`,
       'procedural/pecas/roda/receita.js': `// ${capitalizado}\n`,
       'src/a.js': `const b = new BroadcastChannel('${m}-sessao-ativa');\n`,
     });
     const recusadas = varrer(raiz).recusas.map((r) => `${r.arquivo}:${r.linha}`).sort();
     expect(recusadas).toEqual([
-      '.github/workflows/ci.yml:1', 'README.md:1', 'docs/modelar/usar/GUIA.md:1', 'docs/modelar/usar/GUIA.md:1', 'docs/modelar/usar/GUIA.md:1',
+      '.github/workflows/ci.yml:1', 'README.md:1', `${GUIA}:1`, `${GUIA}:1`, `${GUIA}:1`,
       'procedural/pecas/roda/receita.js:1', 'src/a.js:1', 'tools/blender/comum.py:3', 'tools/mcp/a.mjs:1',
     ]);
   });

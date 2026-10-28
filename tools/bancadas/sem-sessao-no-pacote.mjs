@@ -14,7 +14,7 @@ export const ARQUIVO_DA_SESSAO = 'sessao-ativa.json';
 
 export function semSessaoNoPacote({ saida = 'dist' } = {}) {
   return {
-    name: 'mecanifica-sem-sessao-no-pacote',
+    name: 'modelar-sem-sessao-no-pacote',
     apply: 'build',
     closeBundle() {
       const arquivo = join(saida, ARQUIVO_DA_SESSAO);

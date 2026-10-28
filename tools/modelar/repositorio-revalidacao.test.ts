@@ -31,7 +31,7 @@ function campanhaBase() {
 }
 
 async function raizTemporaria() {
-  return mkdtemp(join(tmpdir(), 'mecanifica-revalidacao-r01-'));
+  return mkdtemp(join(tmpdir(), 'modelar-revalidacao-r01-'));
 }
 
 describe('repositório de revalidação — R01', () => {

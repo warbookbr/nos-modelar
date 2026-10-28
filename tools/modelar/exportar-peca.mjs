@@ -1,7 +1,7 @@
 /* exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto
    só lê.
 
-   O CLIENTE DA MECANIFICA OLHA A PEÇA. Ele gira, explode e isola. Não muda
+   O CLIENTE DO MODELAR OLHA A PEÇA. Ele gira, explode e isola. Não muda
    medida. Nenhuma dessas quatro coisas precisa reexecutar a receita: girar é
    câmera, e explodir e isolar mexem em PARTES, cujo nome já viaja dentro da
    face. Então mandar `PASSOS` e o núcleo inteiro para o navegador do cliente é

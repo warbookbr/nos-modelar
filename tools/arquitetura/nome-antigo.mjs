@@ -52,7 +52,8 @@ export const EXCECOES_POR_TEXTO = [
   { categoria: 'caminho absoluto gravado', padrao: /\/home\/user\/nos-mecanifica(?![\w-])/, em: /^procedural\/pecas\//, motivo: 'caminho absoluto da cópia local gravado nas rodadas de peça; é registro do que foi medido' },
   { categoria: 'texto preso por hash', padrao: /mecanifica:termos-proibidos:verificador/, em: /^tools\/arquitetura\/termos-proibidos\.mjs$/, motivo: 'texto fixo cujo HMAC está gravado em termos-proibidos.hashes.json; mudá-lo invalida o verificador da lista, que só se refaz com a chave, fora do repositório' },
   { categoria: 'repositório de outra pessoa', padrao: /brigsd\/nos-mecanifica(?![\w-])/, motivo: 'nome do repositório upstream, que é de outra pessoa e continua com esse nome' },
-  { categoria: 'aviso de leitura', padrao: /MECANIFICA_[A-Z0-9_]*/, em: /^tools\/blender\/comum\.py$/, dentroDe: { abre: /^def do_ambiente\b/, fecha: /^\S/ }, motivo: 'o do_ambiente lê o nome antigo de propósito, com aviso, até o fechamento do plano da renomeação' },
+  { categoria: 'aviso de leitura', padrao: /MECANIFICA_[A-Z0-9_]*/, em: /^tools\/blender\/ambiente\.py$/, motivo: 'o do_ambiente dos scripts Python lê o nome antigo de propósito, com aviso, até o fechamento do plano seguinte ao da renomeação' },
+  { categoria: 'prova do aviso', padrao: /MECANIFICA_[A-Z0-9_]*/, em: /^tools\/(?:mcp\/(?:mcp|catalogo-montagens|universo-dependencias)|modelar\/(?:uso|diario)|testes-lentos|arquitetura\/termos-proibidos|blender\/(?:blender|ambiente-python))\.test\.mjs$/, motivo: 'testes que passam o nome antigo de propósito para provar que ele ainda vale com aviso; saem junto com o aviso' },
   { categoria: 'aviso de leitura', padrao: /secrets\.MECANIFICA_[A-Z][A-Z0-9_]*/, em: /^\.github\/workflows\/ci\.yml$/, motivo: 'o passo que aceita o segredo antigo do CI enquanto a pessoa não o troca' },
 ];
 

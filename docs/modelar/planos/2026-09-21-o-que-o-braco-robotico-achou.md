@@ -4,7 +4,7 @@
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, base `fb382368` na main.
+**Repositório e base:** `warbookbr/nos-modelar`, base `fb382368` na main.
 
 ## Por que este plano existe
 

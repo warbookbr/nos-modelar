@@ -145,7 +145,7 @@ async function conectado() {
   const inicializacao = await cliente.enviar('initialize', {
     protocolVersion: LATEST_PROTOCOL_VERSION,
     capabilities: {},
-    clientInfo: { name: 'teste-mecanifica', version: '1' },
+    clientInfo: { name: 'teste-modelar', version: '1' },
   });
   cliente.notificar('notifications/initialized');
   return { cliente, inicializacao };
@@ -162,7 +162,7 @@ describe('servidor MCP local — perfil revisao', () => {
   });
 
   it('valida initialize com o cliente oficial e a versão oficial do protocolo', async () => {
-    const client = new Client({ name: 'teste-mecanifica', version: '1' });
+    const client = new Client({ name: 'teste-modelar', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
       env: {
@@ -183,7 +183,7 @@ describe('servidor MCP local — perfil revisao', () => {
   });
 
   it('aceita os nomes antigos das variáveis (MECANIFICA_*) e avisa o nome novo na saída de erro', async () => {
-    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-nome-antigo-'));
+    const repositorio = mkdtempSync(join(tmpdir(), 'modelar-mcp-nome-antigo-'));
     const client = new Client({ name: 'teste-nome-antigo', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
@@ -601,7 +601,7 @@ describe('servidor MCP local — perfil revisao', () => {
   });
 
   it('reconstrói impacto global em nova sessão após publicar uma revisão ativa e mede economia de contexto', async () => {
-    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-mapa-r05-'));
+    const repositorio = mkdtempSync(join(tmpdir(), 'modelar-mcp-mapa-r05-'));
     const ambiente = {
       ...process.env,
       [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_CATALOGO_MAPA,
@@ -679,7 +679,7 @@ describe('servidor MCP local — perfil revisao', () => {
   }, 180_000);
 
   it('consumidor caixa-preta conclui autoria por MCP sem shell nem paths', async () => {
-    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-r05-'));
+    const repositorio = mkdtempSync(join(tmpdir(), 'modelar-mcp-r05-'));
     const client = new Client({ name: 'consumidor-autoria-caixa-preta', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
@@ -833,7 +833,7 @@ describe('servidor MCP local — perfil revisao', () => {
   }, 180_000);
 
   it('consumidor MCP recusa eixo inválido e publica a correção declarativa', async () => {
-    const temporario = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-receita-r01-'));
+    const temporario = mkdtempSync(join(tmpdir(), 'modelar-mcp-receita-r01-'));
     const catalogoLocal = join(temporario, 'catalogo');
     const repositorio = join(temporario, 'repositorio');
     const preparado = spawnSync(process.execPath, [MATERIALIZAR_CATALOGO_AUTORIA, catalogoLocal], { cwd: RAIZ, encoding: 'utf8' });
@@ -934,8 +934,8 @@ describe('servidor MCP local — perfil revisao', () => {
 
   describe('listarCatalogoDePacotes — ordenação, filtragem e confinamento (fixture isolada)', () => {
     function comPacotesTemporarios(fabrica) {
-      const raizPacotes = mkdtempSync(join(tmpdir(), 'mecanifica-pacotes-'));
-      const fora = mkdtempSync(join(tmpdir(), 'mecanifica-fora-'));
+      const raizPacotes = mkdtempSync(join(tmpdir(), 'modelar-pacotes-'));
+      const fora = mkdtempSync(join(tmpdir(), 'modelar-fora-'));
       try {
         fabrica(raizPacotes, fora);
         return listarCatalogoDePacotes({ raizPacotes });
@@ -1188,7 +1188,7 @@ describe('servidor MCP local — perfil revisao', () => {
     });
 
     it('devolve lista vazia, sem lançar, quando a raiz de pacotes não existe', () => {
-      expect(listarCatalogoDePacotes({ raizPacotes: join(tmpdir(), 'mecanifica-raiz-inexistente-xyz') })).toEqual([]);
+      expect(listarCatalogoDePacotes({ raizPacotes: join(tmpdir(), 'modelar-raiz-inexistente-xyz') })).toEqual([]);
     });
   });
 
@@ -1314,7 +1314,7 @@ describe('servidor MCP local — perfil revisao', () => {
   const testeVisualReal = process.env.MCP_VISUAL_REAL === '1' ? it : it.skip;
   testeVisualReal('consumidor zerado respeita catálogo procedural e prova quatro vistas quando há peça publicada', async () => {
     const antes = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
-    const client = new Client({ name: 'consumidor-visual-mecanifica', version: '1' });
+    const client = new Client({ name: 'consumidor-visual-modelar', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
     });

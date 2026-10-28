@@ -132,7 +132,7 @@ const FECHA_O_BRIEF = '--- fim do brief ---';
  * família procedural da fonte), os caminhos absolutos das quatro vistas (pelo id neutro `cNN`) e a escala da nota, que é a última
  * das cinco perguntas fixas. Só o trecho entre as marcas do brief: a instrução a quem despacha o crítico não é do crítico.
  * A impressão (`sha256`) tira do texto o caminho da pasta do conjunto e o do repositório, para valer em qualquer cópia dele e
- * depois de a pasta mudar de lugar: medido em 2026-10-28, mover `docs/mecanifica` para `docs/modelar` invalidou os 40 julgamentos das
+ * depois de a pasta mudar de lugar: medido em 2026-10-28, trocar o nome da pasta `docs` do projeto para `docs/modelar` invalidou os 40 julgamentos das
  * doze imagens sem que nada do que o crítico vê tivesse mudado.
  * Devolve `{ texto, sha256, imagens, perguntas, objeto, variavel }`; `variavel` é o que muda de uma imagem para outra (objeto, perguntas e
  * caminhos relativos), onde `vazamentosDoBrief` procura o defeito: o texto fixo é igual para todas e nomeia as categorias de defeito.

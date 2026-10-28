@@ -9,7 +9,7 @@ import { SYMLINK, avisarSymlinkAusente } from '../modelar/capacidade-symlink.mjs
 avisarSymlinkAusente();
 
 function ambiente() {
-  const pai = mkdtempSync(join(tmpdir(), 'mecanifica-caminho-'));
+  const pai = mkdtempSync(join(tmpdir(), 'modelar-caminho-'));
   const raiz = join(pai, 'repositorio');
   const irmao = join(pai, 'repositorio-externo');
   mkdirSync(raiz);

@@ -1,14 +1,14 @@
-# Validação integrada da Mecanifica — valor Agent-First
+# Validação integrada do Modelar — valor Agent-First
 
 **Estado:** pronto
 
 **Responsável:** Codex
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, `aef33b5`
+**Repositório e base:** `warbookbr/nos-modelar`, `aef33b5`
 
 ## Problema observado
 
-A Mecanifica já provou ferramentas isoladas: autoria declarativa, execução
+O Modelar já provou ferramentas isoladas: autoria declarativa, execução
 procedural, montagem persistida, descoberta, revisão, revalidação, prancha e
 crítica visual. Ainda não provou que o conjunto permite a um agente criar e
 corrigir um objeto mecânico melhor do que uma linha de base equivalente. A R4

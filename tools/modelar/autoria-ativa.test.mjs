@@ -22,7 +22,7 @@ const montagem = {
 
 describe('provedores de autoria ativa', () => {
   it('entregam somente revisões autorizadas e anunciam sua origem', async () => {
-    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-autoria-ativa-'));
+    const raiz = mkdtempSync(join(tmpdir(), 'modelar-autoria-ativa-'));
     try {
       const planoReceita = planejarAutoriaReceita({ receita });
       const planoMontagem = planejarAutoriaMontagem({ entidade: 'conjunto-eixo', montagem });
@@ -47,7 +47,7 @@ describe('provedores de autoria ativa', () => {
   });
 
   it('não mascara snapshot ativo inválido com ausência de revisão', async () => {
-    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-autoria-ativa-'));
+    const raiz = mkdtempSync(join(tmpdir(), 'modelar-autoria-ativa-'));
     try {
       const invalido = planejarRevisaoAutoria({
         entidade: 'receita-eixo-guia',

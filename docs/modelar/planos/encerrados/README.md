@@ -213,8 +213,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/historico/RELATORIO-MOTOR-DE-PRANCHA-R3.md`. A R4 parcial está em
   `docs/modelar/historico/RELATORIO-MOTOR-DE-PRANCHA-R4.md`; R5 não executa neste
   recorte.
-- O plano de [validação integrada do valor Agent-First](../2026-08-20-validacao-integrada-mecanifica.md)
-  (`docs/modelar/planos/2026-08-20-validacao-integrada-mecanifica.md`) está
+- O plano de [validação integrada do valor Agent-First](../2026-08-20-validacao-integrada-modelar.md)
+  (`docs/modelar/planos/2026-08-20-validacao-integrada-modelar.md`) está
   **congelado em `pronto` antes de R0**. Seu comparativo da trava só pode ser
   retomado se a auditoria ativa mantiver válidas suas premissas e métricas.
 - O plano de [auditoria das práticas de autoria 3D](./2026-08-20-auditoria-praticas-autoria-3d.md)
@@ -720,7 +720,7 @@ foi concluída com decisão `corrigir`. Ela preserva a base semântica e congela
 P2 e a validação integrada até uma prova privada ligar o aceite visual ao
 fechamento e exercitar seções de caráter declaradas.
 
-A [validação integrada do valor Agent-First](../2026-08-20-validacao-integrada-mecanifica.md)
+A [validação integrada do valor Agent-First](../2026-08-20-validacao-integrada-modelar.md)
 está **congelada em `pronto` antes de R0**. O comparativo da trava pode ser
 retomado somente depois que a auditoria decidir se sua premissa e suas métricas
 continuam válidas.

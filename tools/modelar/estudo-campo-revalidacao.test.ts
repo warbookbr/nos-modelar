@@ -85,7 +85,7 @@ function ferramenta(ferramentas: any[], nome: string) {
 
 describe('estudo de campo R05 — cascata persistida', () => {
   it('rederiva campanha, obsoleta a anterior e retoma resultados em nova sessão', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-r05-campo-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-r05-campo-'));
     try {
       const mapaAntigo = await mapaCom(criarProvedoresAutoriaInativa());
       const antiga = derivarCampanhaDeImpacto(contextoCampanha(mapaAntigo));

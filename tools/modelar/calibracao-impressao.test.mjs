@@ -1,5 +1,5 @@
 /* calibracao-impressao.test.mjs — a impressão do brief do crítico não muda quando a pasta do conjunto ou o repositório mudam de lugar
-   (tools/modelar/calibracao-do-critico.mjs, impressaoDoBrief). Em 2026-10-28, mover docs/mecanifica para docs/modelar invalidou os
+   (tools/modelar/calibracao-do-critico.mjs, impressaoDoBrief). Em 2026-10-28, trocar o nome da pasta docs do projeto para docs/modelar invalidou os
    julgamentos das doze imagens sem que nada do que o crítico vê tivesse mudado. */
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';

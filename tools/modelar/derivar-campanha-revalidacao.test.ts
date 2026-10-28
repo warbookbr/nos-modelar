@@ -38,7 +38,7 @@ async function contexto(alvo: { tipo: string; id: string }) {
   };
 }
 
-const raizTemporaria = () => mkdtemp(join(tmpdir(), 'mecanifica-r02-'));
+const raizTemporaria = () => mkdtemp(join(tmpdir(), 'modelar-r02-'));
 
 describe('derivação de campanha por impacto — R02', () => {
   it('mantém uma ocorrência semântica por montagem compartilhada em duas raízes', async () => {

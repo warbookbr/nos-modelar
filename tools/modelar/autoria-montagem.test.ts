@@ -16,7 +16,7 @@ const carregadores = {
 
 describe('autoria interna de montagem R02', () => {
   it('planeja sem escrever e produz confirmação vinculada aos bytes', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-r02-plano-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-r02-plano-'));
     const plano: any = planejarAutoriaMontagem({ entidade: 'montagem-a', montagem });
     expect(await readdir(raiz)).toEqual([]);
     expect(plano.resumo).toMatchObject({ operacao: 'criacao', montagem: 'duas-pecas', versao: 1 });
@@ -32,7 +32,7 @@ describe('autoria interna de montagem R02', () => {
   });
 
   it('valida referências, materializa criação e observa a revisão ativa', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-r02-criacao-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-r02-criacao-'));
     const plano: any = confirmarAutoriaMontagem(planejarAutoriaMontagem({ entidade: 'montagem-a', montagem }));
     await expect(validarAutoriaMontagem(plano, carregadores)).resolves.toMatchObject({ estado: 'validado', resumo: { operacao: 'criacao' } });
     const resultado: any = await materializarAutoriaMontagem({ raiz, plano, ...carregadores });
@@ -43,7 +43,7 @@ describe('autoria interna de montagem R02', () => {
   });
 
   it('materializa alteração e diagnostica candidato sem referência', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-r02-alteracao-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-r02-alteracao-'));
     const inicial: any = confirmarAutoriaMontagem(planejarAutoriaMontagem({ entidade: 'montagem-a', montagem }));
     await materializarAutoriaMontagem({ raiz, plano: inicial, ...carregadores });
     const alterada = { ...montagem, id: 'duas-pecas-alterada', instancias: montagem.instancias.slice(0, 1) };
@@ -71,7 +71,7 @@ describe('autoria interna de montagem R02', () => {
   });
 
   it('promove somente após duas vistas semânticas consistentes', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-r03-promocao-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-r03-promocao-'));
     const plano: any = confirmarAutoriaMontagem(planejarAutoriaMontagem({ entidade: 'montagem-v3', montagem: montagemV3 }));
     const fases: string[] = [];
     const capturarVistas = async ({ fase }: { fase: string }) => { fases.push(fase); return { ok: true, resultado: { capturas: [

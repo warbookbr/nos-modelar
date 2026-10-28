@@ -486,13 +486,13 @@
 - `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
-- `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 - `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
-- `README.md` — Planos da Mecanifica
+- `README.md` — Planos do Modelar
 
 ## docs/modelar/planos/concluidos/
 

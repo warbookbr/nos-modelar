@@ -12,7 +12,7 @@ avisarSymlinkAusente();
 
 describe('repositório de autoria imutável', () => {
   it('planeja sem escrever e publica somente após o commit completo', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-'));
     const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { 'montagem.json': '{"versao":3}' } });
     expect(await readdir(raiz)).toEqual([]);
     await publicarRevisaoAutoria({ raiz, plano });
@@ -22,7 +22,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('falha antes do commit deixa objeto órfão invisível e nenhuma revisão parcial', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-falha-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-falha-'));
     const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { a: 'bytes' } });
     await expect(publicarRevisaoAutoria({ raiz, plano, falhaInjetada(etapa: string) {
       if (etapa === 'antes-publicar-commit') throw new Error('queda simulada');
@@ -31,7 +31,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('duas revisões do mesmo pai viram conflito explícito sem sobrescrita', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-conflito-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-conflito-'));
     const a = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     const b = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 2 } });
     await Promise.all([publicarRevisaoAutoria({ raiz, plano: a }), publicarRevisaoAutoria({ raiz, plano: b })]);
@@ -42,7 +42,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('recusa plano adulterado e valor fora de JSON antes de escrever', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-adulterada-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-adulterada-'));
     const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await expect(publicarRevisaoAutoria({ raiz, plano: { ...plano, commitBytes: `${plano.commitBytes} ` } }))
       .rejects.toMatchObject({ codigo: 'plano-divergente' });
@@ -52,7 +52,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('materializa criação e alteração, lê somente a revisão ativa e registra métricas', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-ativa-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-ativa-'));
     const eventos: any[] = [];
     const inicial = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await materializarRevisaoAutoria({ raiz, plano: inicial, telemetria: (evento: any) => eventos.push(evento) });
@@ -68,7 +68,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('recusa revisão velha e mantém a revisão ativa após falha antes da transição', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-stale-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-stale-'));
     const inicial = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await materializarRevisaoAutoria({ raiz, plano: inicial });
     const alteracao = planejarRevisaoAutoria({ entidade: 'montagem-a', pai: inicial.commit, conteudo: { valor: 2 } });
@@ -80,7 +80,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('permite somente um vencedor para cem alterações concorrentes do mesmo pai', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-corrida-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-corrida-'));
     const inicial = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 0 } });
     await materializarRevisaoAutoria({ raiz, plano: inicial });
     const planos = Array.from({ length: 100 }, (_, valor) => planejarRevisaoAutoria({ entidade: 'montagem-a', pai: inicial.commit, conteudo: { valor: valor + 1 } }));
@@ -93,24 +93,24 @@ describe('repositório de autoria imutável', () => {
   });
 
   it.skipIf(!SYMLINK.disponivel)('recusa raiz symlink, filesystem sem hard link e objeto adulterado', async () => {
-    const real = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-raiz-'));
+    const real = await mkdtemp(join(tmpdir(), 'modelar-autoria-raiz-'));
     const raizSymlink = join(real, 'atalho');
     await symlink(real, raizSymlink);
     const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await expect(materializarRevisaoAutoria({ raiz: raizSymlink, plano })).rejects.toMatchObject({ codigo: 'raiz-insegura' });
 
-    const raizFs = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-fs-'));
+    const raizFs = await mkdtemp(join(tmpdir(), 'modelar-autoria-fs-'));
     const semHardLink = { link: async () => { const erro: any = new Error('cross-device'); erro.code = 'EXDEV'; throw erro; } };
     await expect(materializarRevisaoAutoria({ raiz: raizFs, plano, fs: semHardLink })).rejects.toMatchObject({ codigo: 'filesystem-inadequado' });
 
-    const raizAdulterada = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-hash-'));
+    const raizAdulterada = await mkdtemp(join(tmpdir(), 'modelar-autoria-hash-'));
     await materializarRevisaoAutoria({ raiz: raizAdulterada, plano });
     await writeFile(join(raizAdulterada, 'objetos', `${plano.objeto}.json`), 'adulterado\n');
     await expect(lerRevisaoAtivaAutoria(raizAdulterada, 'montagem-a')).rejects.toMatchObject({ codigo: 'objeto-adulterado' });
   });
 
   it('reaplica o vencedor sem escrever e recusa proposta com pai antigo', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-idempotente-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-idempotente-'));
     const inicial = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await materializarRevisaoAutoria({ raiz, plano: inicial });
     const antes = await Promise.all((await readdir(join(raiz, 'objetos'))).map(async (nome) => [nome, await readFile(join(raiz, 'objetos', nome), 'utf8')]));
@@ -124,7 +124,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it.skipIf(!SYMLINK.disponivel)('falha fechado para transição malformada e symlink interno', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-transicao-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-transicao-'));
     const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await materializarRevisaoAutoria({ raiz, plano });
     const transicao = join(raiz, 'transicoes', 'montagem-a', 'raiz.json');
@@ -140,7 +140,7 @@ describe('repositório de autoria imutável', () => {
   });
 
   it('simula e remove apenas snapshots órfãos após validar as transições', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-limpeza-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-autoria-limpeza-'));
     const ativo = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     const orfao = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 2 } });
     await materializarRevisaoAutoria({ raiz, plano: ativo });

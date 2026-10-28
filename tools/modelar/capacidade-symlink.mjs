@@ -23,7 +23,7 @@ import { join } from 'node:path';
 function medir() {
   let base = null;
   try {
-    base = mkdtempSync(join(tmpdir(), 'mecanifica-cap-symlink-'));
+    base = mkdtempSync(join(tmpdir(), 'modelar-cap-symlink-'));
     const alvo = join(base, 'alvo.txt');
     writeFileSync(alvo, 'x', 'utf8');
     symlinkSync(alvo, join(base, 'atalho.txt'), 'file');

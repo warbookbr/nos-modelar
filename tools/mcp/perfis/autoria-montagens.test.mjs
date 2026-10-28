@@ -11,7 +11,7 @@ const peca = JSON.parse(readFileSync(new URL('../../modelar/fixtures/pecas-resol
 
 describe('perfil MCP opt-in de autoria', () => {
   it('planeja, inspeciona e aplica por ID sem expor o caminho do host', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-mcp-autoria-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-mcp-autoria-'));
     const autoria = {
       configurado: true, raizRepositorio: raiz,
       catalogo: { tem: (id) => id === 'gabarito-separacao-direcional', carregadores: () => ({ carregarPeca: async () => peca }) },
@@ -35,7 +35,7 @@ describe('perfil MCP opt-in de autoria', () => {
   });
 
   it('recusa ID fora do catálogo e revisão observada velha sem escrever', async () => {
-    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-mcp-autoria-'));
+    const raiz = await mkdtemp(join(tmpdir(), 'modelar-mcp-autoria-'));
     const autoria = { configurado: true, raizRepositorio: raiz, catalogo: { tem: () => false, carregadores: () => ({ carregarPeca: async () => peca }) } };
     await expect(observarAutoria({ id: 'nao-autorizada' }, { autoria })).resolves.toMatchObject({ ok: false, erro: { codigo: 'montagem_nao_encontrada' } });
     const permitida = { ...autoria, catalogo: { ...autoria.catalogo, tem: () => true } };

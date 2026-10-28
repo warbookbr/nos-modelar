@@ -10,7 +10,7 @@ export const ARQUIVO_DOS_AVISOS = 'THIRD-PARTY-NOTICES.md';
 
 export function avisosDeTerceiros({ raiz = process.cwd(), saida = 'dist' } = {}) {
   return {
-    name: 'mecanifica-avisos-de-terceiros',
+    name: 'modelar-avisos-de-terceiros',
     apply: 'build',
     closeBundle() {
       const origem = join(raiz, ARQUIVO_DOS_AVISOS);

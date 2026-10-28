@@ -9,7 +9,7 @@ import { conferirPlanoAtivoNosIndices, conferirPlanos } from './planos.mjs';
 const temporarias = [];
 
 function ambiente(indice = '**Plano ativo:** nenhum.\n') {
-  const pasta = mkdtempSync(join(tmpdir(), 'mecanifica-planos-'));
+  const pasta = mkdtempSync(join(tmpdir(), 'modelar-planos-'));
   temporarias.push(pasta);
   mkdirSync(pasta, { recursive: true });
   writeFileSync(join(pasta, 'README.md'), indice);
@@ -70,7 +70,7 @@ describe('gate do plano ativo nos três índices', () => {
   const nome = '2026-10-21-a.md';
 
   function tres({ raiz, indice, planos }) {
-    const pasta = mkdtempSync(join(tmpdir(), 'mecanifica-ativo-'));
+    const pasta = mkdtempSync(join(tmpdir(), 'modelar-ativo-'));
     temporarias.push(pasta);
     writeFileSync(join(pasta, 'raiz.md'), raiz);
     writeFileSync(join(pasta, 'indice.md'), indice);

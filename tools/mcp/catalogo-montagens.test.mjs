@@ -119,8 +119,8 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
   });
 
   it.skipIf(!SYMLINK.disponivel)('recusa vínculo simbólico mesmo quando a raiz foi explicitamente listada', async () => {
-    const temp = mkdtempSync(join(tmpdir(), 'mecanifica-catalogo-mcp-'));
-    const fora = mkdtempSync(join(tmpdir(), 'mecanifica-catalogo-fora-'));
+    const temp = mkdtempSync(join(tmpdir(), 'modelar-catalogo-mcp-'));
+    const fora = mkdtempSync(join(tmpdir(), 'modelar-catalogo-fora-'));
     try {
       mkdirSync(join(temp, 'montagens'));
       mkdirSync(join(temp, 'pecas'));

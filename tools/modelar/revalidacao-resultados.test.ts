@@ -36,7 +36,7 @@ function resultado(campanha: any, estado = 'aprovado', revisao = campanha.itens[
   };
 }
 
-const raizTemporaria = () => mkdtemp(join(tmpdir(), 'mecanifica-r03-'));
+const raizTemporaria = () => mkdtemp(join(tmpdir(), 'modelar-r03-'));
 
 describe('resultados persistidos de revalidação — R03', () => {
   it('registra aprovação na revisão exata e repete idempotentemente', async () => {

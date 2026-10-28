@@ -31,7 +31,7 @@ describe('autoria declarativa de receita', () => {
   });
 
   it('planeja sem escrita, confirma, inspeciona e aplica revisão imutável', async () => {
-    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-receita-'));
+    const raiz = mkdtempSync(join(tmpdir(), 'modelar-receita-'));
     try {
       const plano = planejarAutoriaReceita({ receita: receita() });
       expect(await observarAutoriaReceita({ raiz, id: 'eixo-guia' })).toEqual({ revisao: null, receita: null });
@@ -52,7 +52,7 @@ describe('autoria declarativa de receita', () => {
   });
 
   it('bloqueia publicação quando dependente falha', async () => {
-    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-receita-'));
+    const raiz = mkdtempSync(join(tmpdir(), 'modelar-receita-'));
     try {
       const plano = confirmarAutoriaReceita(planejarAutoriaReceita({ receita: receita(0.035) }));
       await expect(aplicarAutoriaReceita({ raiz, plano, capturar, revalidar: async () => ({ cobertura: 'catalogo-explicito', raizes: [{ id: 'conjunto', estado: 'falhou' }] }) })).rejects.toMatchObject({ codigo: 'revalidacao-recusada' });

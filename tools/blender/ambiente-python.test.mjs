@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 
 const roda = (codigo, env) => {
-  const limpo = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(MODELAR|MECANIFICA)_/.test(k)));
+  const limpo = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('MODELAR_') && !k.startsWith('MECANIFICA_')));
   const r = spawnSync('python3', ['-c', codigo, AQUI], { env: { ...limpo, ...env }, encoding: 'utf8' });
   expect(r.status, r.stderr).toBe(0);
   return r;

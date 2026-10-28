@@ -18,7 +18,7 @@ function contexto(raiz, autorizadas = ['eixo-guia']) {
 
 describe('perfil MCP de autoria de receitas', () => {
   it('observa e planeja sem expor bytes privados ou caminhos', async () => {
-    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-receita-'));
+    const raiz = mkdtempSync(join(tmpdir(), 'modelar-mcp-receita-'));
     try {
       expect(await observarReceita({ id: 'eixo-guia' }, contexto(raiz))).toMatchObject({ ok: true, resultado: { revisao: null } });
       const resultado = await planejarReceita({ id: 'eixo-guia', revisaoObservada: null, receita: documento }, contexto(raiz));
@@ -29,7 +29,7 @@ describe('perfil MCP de autoria de receitas', () => {
   });
 
   it('recusa id não autorizado e documento com identidade divergente', async () => {
-    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-receita-'));
+    const raiz = mkdtempSync(join(tmpdir(), 'modelar-mcp-receita-'));
     try {
       expect(await observarReceita({ id: 'eixo-guia' }, contexto(raiz, []))).toMatchObject({ ok: false, erro: { codigo: 'receita_nao_autorizada' } });
       expect(await planejarReceita({ id: 'outra', revisaoObservada: null, receita: documento }, contexto(raiz, ['outra']))).toMatchObject({ ok: false, erro: { codigo: 'identidade_divergente' } });
