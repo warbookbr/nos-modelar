@@ -201,9 +201,14 @@ por três pontos colineares ou repetidos, raio de concordância maior que o reto
 por centro com ângulo 0 ou de 360 ou mais, spline com um ponto só ou com pontos
 consecutivos repetidos, trecho desconhecido e `segmentosArco` ou `segmentosSpline`
 que não é inteiro >= 1. Um contorno que se cruza é recusado pelo `montarPerfil`
-como polígono não simples. O lathe ainda lê `perfil` como lista de pontos
+como polígono não simples, com o índice do ponto repetido ou das arestas que se
+cruzam; `limparContorno(pontos, { colineares, repetidos, tolerancia })`, de
+`procedural/nucleo/contorno.js`, tira o repetido quando a receita quer, e o núcleo nunca a chama. O
+lathe ainda lê `perfil` como lista de pontos
 `[raio, y]` (com a concordância própria do terceiro número); o `{contorno}` vale
-nos `furos` dele.
+nos `furos` dele. A polilinha que não toca o eixo nas duas pontas nem volta ao
+primeiro ponto é recusada; `furos: []` a trata como seção, e `superficie: true`
+declara a casca aberta.
 
 Na origem, `sel:{origem:{op:'extrusao',id,...}}` sem eixo é o sólido inteiro
 (laterais e as duas tampas), ao contrário do `cilindro`, e as booleanas o aceitam

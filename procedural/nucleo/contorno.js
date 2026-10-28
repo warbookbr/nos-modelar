@@ -13,7 +13,9 @@
    `deslocarContorno` NÃO delega a ela de propósito: ele devolve um ponto por vértice, na mesma ordem (o `loft` com casca
    precisa dessa correspondência entre as seções) e é puro, sem WebAssembly. O teste de perfil2d.test.mjs confere que os
    dois dão os mesmos vértices na esquadria de um polígono convexo.
-   ehSimples: polígono simples (convexo ou côncavo), sem ponto repetido, área nula nem arestas que se cruzem ou se toquem. */
+   ehSimples: polígono simples (convexo ou côncavo), sem ponto repetido, área nula nem arestas que se cruzem ou se toquem.
+   diagnosticarContorno: o irmão de `ehSimples` que diz qual ponto se repete ou quais arestas se cruzam, para a mensagem de recusa.
+   limparContorno: tira ponto repetido (e, se pedido, ponto colinear) e devolve lista nova; o núcleo não a chama, a receita sim. */
 
 const EPS = 1e-9;
 const SEGMENTOS_PADRAO = 4;
@@ -193,4 +195,102 @@ export function ehSimples(perfil) {
     }
   }
   return true;
+}
+
+const ptoTexto = (p) => `[${Number(p[0].toPrecision(10))}, ${Number(p[1].toPrecision(10))}]`;
+const AJUDA_REPETIDO = 'Causa provável: o contorno foi espelhado sobre um eixo e o ponto que está no eixo entrou nas duas metades, ou dois arcos'
+  + ' se juntam repetindo o ponto de encontro. Escreva esse ponto uma vez só, ou passe a lista por limparContorno(pontos)'
+  + ' (procedural/nucleo/contorno.js), que tira os repetidos.';
+
+/* Por que o contorno não é um polígono simples: o irmão de `ehSimples` que diz o ponto ou as arestas. Devolve null quando
+   `ehSimples` devolve true, e senão {motivo, indices, pontos, mensagem}:
+     - 'poucos-pontos': menos de 3 pontos;
+     - 'ponto-repetido': `indices` são os dois pontos que coincidem (a menos de 1e-9), do menor para o maior;
+     - 'area-nula': todos os pontos ficam numa reta (ou a área sai abaixo de 1e-9);
+     - 'arestas-se-cruzam': `indices` são os pontos de partida das duas arestas que se cruzam ou se tocam (a aresta k vai do
+       ponto k ao ponto k+1, e a última volta ao 0).
+   Os índices contam da lista recebida, a partir de 0. A mensagem já traz a causa provável e a correção. */
+export function diagnosticarContorno(perfil) {
+  const n = perfil.length;
+  if (n < 3) return { motivo: 'poucos-pontos', indices: [], pontos: [], mensagem: `o contorno tem ${n} ponto(s) e precisa de 3 ou mais` };
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (Math.hypot(perfil[j][0] - perfil[i][0], perfil[j][1] - perfil[i][1]) < 1e-9) {
+        const seguidos = j === i + 1 || (i === 0 && j === n - 1);
+        return {
+          motivo: 'ponto-repetido',
+          indices: [i, j],
+          pontos: [perfil[i], perfil[j]],
+          mensagem: `o ponto ${i} e o ponto ${j} são o mesmo ponto ${ptoTexto(perfil[i])}${seguidos ? ' e estão em seguida' : ''}, o que deixa uma aresta de comprimento zero ou faz o contorno tocar a si mesmo. ${AJUDA_REPETIDO}`,
+        };
+      }
+    }
+  }
+  const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+  const noSegmento = (a, b, c) => Math.min(a[0], b[0]) <= c[0] && c[0] <= Math.max(a[0], b[0]) && Math.min(a[1], b[1]) <= c[1] && c[1] <= Math.max(a[1], b[1]);
+  const cruza = (a, b, c, d) => {
+    const o1 = orient(a, b, c); const o2 = orient(a, b, d); const o3 = orient(c, d, a); const o4 = orient(c, d, b);
+    if (o1 !== o2 && o3 !== o4) return true;
+    return (o1 === 0 && noSegmento(a, b, c)) || (o2 === 0 && noSegmento(a, b, d)) || (o3 === 0 && noSegmento(c, d, a)) || (o4 === 0 && noSegmento(c, d, b));
+  };
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (j === i + 1 || (i === 0 && j === n - 1)) continue;
+      if (cruza(perfil[i], perfil[(i + 1) % n], perfil[j], perfil[(j + 1) % n])) {
+        return {
+          motivo: 'arestas-se-cruzam',
+          indices: [i, j],
+          pontos: [perfil[i], perfil[(i + 1) % n], perfil[j], perfil[(j + 1) % n]],
+          mensagem: `a aresta ${i} (do ponto ${i} ${ptoTexto(perfil[i])} ao ponto ${(i + 1) % n} ${ptoTexto(perfil[(i + 1) % n])}) cruza ou toca a aresta ${j} (do ponto ${j} ${ptoTexto(perfil[j])} ao ponto ${(j + 1) % n} ${ptoTexto(perfil[(j + 1) % n])}); reordene os pontos ou afaste a ponta que invade a outra aresta`,
+        };
+      }
+    }
+  }
+  const area = perfil.reduce((acc, q, i) => acc + q[0] * perfil[(i + 1) % n][1] - perfil[(i + 1) % n][0] * q[1], 0);
+  if (Math.abs(area) < 1e-9) {
+    return { motivo: 'area-nula', indices: [], pontos: [], mensagem: `os ${n} pontos ficam numa reta e o contorno não tem área; confira se uma das coordenadas foi copiada no lugar da outra` };
+  }
+  return null;
+}
+
+/* Tira do contorno o que o torna inválido sem mudar a forma, e devolve uma lista nova (a entrada não é alterada):
+     - repetidos (padrão true): de dois pontos a menos de `tolerancia` um do outro, em seguida, fica o primeiro; o último ponto
+       igual ao primeiro, de contorno escrito fechado, sai também;
+     - colineares (padrão false): o ponto que fica a menos de `tolerancia` da reta entre os vizinhos, e entre eles, sai. O ponto
+       colinear de uma extrusão dá uma lateral própria, que é endereço salvo, por isso é opt-in;
+     - tolerancia (padrão 1e-9, em unidades do contorno): número finito, zero ou maior.
+   A função é pura e o núcleo nunca a chama: deduplicar sozinho dentro de `extrusao` renumeraria as laterais e esconderia o erro de
+   quem espelhou o contorno. A receita chama quando quer. Recusa o contorno que fica com menos de 3 pontos. */
+export function limparContorno(pontos, { colineares = false, repetidos = true, tolerancia = EPS } = {}) {
+  exigirPoligono(pontos, 'limparContorno');
+  if (!ehNumero(tolerancia) || tolerancia < 0) throw new Error(`limparContorno: "tolerancia" precisa ser um número finito maior ou igual a zero (veio ${tolerancia})`);
+  let lista = pontos.map((p) => [p[0], p[1]]);
+  if (repetidos) {
+    const seguinte = [];
+    for (const p of lista) {
+      const anterior = seguinte[seguinte.length - 1];
+      if (anterior && Math.hypot(p[0] - anterior[0], p[1] - anterior[1]) <= tolerancia) continue;
+      seguinte.push(p);
+    }
+    while (seguinte.length > 1 && Math.hypot(seguinte[0][0] - seguinte[seguinte.length - 1][0], seguinte[0][1] - seguinte[seguinte.length - 1][1]) <= tolerancia) seguinte.pop();
+    lista = seguinte;
+  }
+  if (colineares) {
+    let mudou = true;
+    while (mudou && lista.length > 3) {
+      mudou = false;
+      for (let i = 0; i < lista.length && lista.length > 3; i++) {
+        const a = lista[(i - 1 + lista.length) % lista.length];
+        const p = lista[i];
+        const b = lista[(i + 1) % lista.length];
+        const ab = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        if (ab === 0) continue;
+        const desvio = Math.abs((b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])) / ab;
+        const entre = (p[0] - a[0]) * (b[0] - p[0]) + (p[1] - a[1]) * (b[1] - p[1]) > 0;
+        if (desvio <= tolerancia && entre) { lista.splice(i, 1); mudou = true; i--; }
+      }
+    }
+  }
+  if (lista.length < 3) throw new Error(`limparContorno: o contorno ficou com ${lista.length} ponto(s) depois de tirar repetidos${colineares ? ' e colineares' : ''}; ele não tem forma`);
+  return lista;
 }

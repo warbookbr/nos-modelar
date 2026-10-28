@@ -1121,7 +1121,7 @@ describe('P2 — lathe (perfil de revolução)', () => {
   });
 
   it('numeração EXATA num perfil SÓ-ANÉIS (sem polo nenhum): vira uma faixa cilíndrica só de quads', () => {
-    const { V, F, orfaos } = nucleo([['lathe', { id: 0, perfil: [[1, 0], [2, 1]], lados: 4 }]], {}, {});
+    const { V, F, orfaos } = nucleo([['lathe', { id: 0, perfil: [[1, 0], [2, 1]], lados: 4, superficie: true }]], {}, {});
     expect(orfaos).toHaveLength(0);
     expect(V.size).toBe(8);    // 2 anéis × 4 lados, nenhum polo
     expect(F.size).toBe(4);    // 1 segmento × 4 lados
@@ -1282,7 +1282,7 @@ describe('P2 — lathe (perfil de revolução)', () => {
 
   it('polo↔polo adjacente GRITA (perfil degenerado): só AQUELE segmento fica sem face — o resto do perfil segue normal', () => {
     // dois polos seguidos (y diferentes) + 1 anel: só o segmento polo-polo não gera face
-    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [0, 1], [1, 2]], lados: 4 }]], {}, {});
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [0, 1], [1, 2]], lados: 4, superficie: true }]], {}, {});
     expect(n.orfaos).toHaveLength(1);
     expect(n.orfaos[0]).toMatchObject({ op: 'lathe', ref: 0 });
     expect(n.orfaos[0].motivo).toMatch(/polo.*polo|degenerado/i);
@@ -1293,14 +1293,14 @@ describe('P2 — lathe (perfil de revolução)', () => {
 
   it('guarda de overflow (D3) no limite EXATO — vértice (perfil só-anéis) e face (perfil alternando polo/anel) de forma independente', () => {
     // limite de VÉRTICE: 2 anéis × lados=500 -> 1000 vértices exatos (passa); 501 -> 1002 (estoura)
-    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 500 }]], {}, {})).not.toThrow();
-    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 501 }]], {}, {})).toThrow(/estoura o bloco/);
+    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 500, superficie: true }]], {}, {})).not.toThrow();
+    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 501, superficie: true }]], {}, {})).toThrow(/estoura o bloco/);
     // limite de FACE, independente do de vértice: perfil ALTERNANDO anel/polo (barato em vértice, caro em face —
     // todo segmento é anel<->polo, nunca degenerado) com lados=8. N=126 pontos (63 anéis+63 polos) -> 567 V / 1000 F exatos (passa);
     // N=127 -> 575 V / 1008 F (a guarda de FACE estoura primeiro, o vértice nem chegou perto do bloco)
     const alternado = (nPontos: number) => Array.from({ length: nPontos }, (_, k) => (k % 2 === 0 ? [1, k] : [0, k]));
-    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(126), lados: 8 }]], {}, {})).not.toThrow();
-    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(127), lados: 8 }]], {}, {})).toThrow(/estoura o bloco/);
+    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(126), lados: 8, superficie: true }]], {}, {})).not.toThrow();
+    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(127), lados: 8, superficie: true }]], {}, {})).toThrow(/estoura o bloco/);
   });
 
   it('params por NOME (raio e y) resolvem como nas outras ops; mudar o VALOR do PARAM não renumera', () => {
@@ -3501,7 +3501,7 @@ describe('D-128 — transladar (posiciona uma seleção; o que faltava pra compo
 describe('Fase 4 — sel.origem para lathe (mesmo contrato do loft: faixa × lado)', () => {
   // perfil [[1,y]] com y=0..4 -> 5 pontos, todos anel (raio>0): 4 segmentos anel<->anel = 4 faixas de `lados` faces cada
   const perfil = [0, 1, 2, 3, 4].map((y) => [1, y]);
-  const lathe = (id: number, origemId = 1000): any => ['lathe', { id, origemId, lados: 4, perfil }];
+  const lathe = (id: number, origemId = 1000): any => ['lathe', { id, origemId, lados: 4, perfil, superficie: true }];
   const pintaOrigem = (extra: any = {}): any => ['pincel', { modo: 'face', sel: { origem: { op: 'lathe', id: 1000, ...extra } }, cor: '#123456' }];
   const pintados = (n: any) => [...n.F.values()].filter((f: any) => f.cor === '#123456').map((f: any) => f.id).sort((a: number, b: number) => a - b);
 
@@ -3569,11 +3569,11 @@ describe('Fase 4 — sel.origem para lathe (mesmo contrato do loft: faixa × lad
     // perfil polo(y=0) -> polo(y=1) -> anel(y=2) -> anel(y=3): o segmento 0 (polo<->polo) não emite
     // face -> faixas[0] fica vazia; segmento 1 (polo->anel) e segmento 2 (anel->anel) emitem normal
     const perfilComPolo = [[0, 0], [0, 1], [1, 2], [1, 3]];
-    const n = nucleo([['lathe', { id: 0, origemId: 1000, lados: 4, perfil: perfilComPolo }], pintaOrigem()], {}, {});
+    const n = nucleo([['lathe', { id: 0, origemId: 1000, lados: 4, perfil: perfilComPolo, superficie: true }], pintaOrigem()], {}, {});
     expect(n.orfaos.some((o: any) => o.op === 'lathe' && /polo↔polo/.test(o.motivo))).toBe(true); // o próprio lathe já grita o segmento degenerado
     expect(pintados(n)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]); // a união pula o segmento 0 (vazio), pega os segmentos 1 e 2
 
-    const explicito = nucleo([['lathe', { id: 0, origemId: 1000, lados: 4, perfil: perfilComPolo }], pintaOrigem({ faixa: 0 })], {}, {});
+    const explicito = nucleo([['lathe', { id: 0, origemId: 1000, lados: 4, perfil: perfilComPolo, superficie: true }], pintaOrigem({ faixa: 0 })], {}, {});
     expect(explicito.orfaos.some((o: any) => o.op === 'pincel' && /não tem faces laterais/.test(o.motivo))).toBe(true);
   });
 });

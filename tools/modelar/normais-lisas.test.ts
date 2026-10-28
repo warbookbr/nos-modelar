@@ -298,7 +298,7 @@ describe('a soma das normais lisas é pesada pela ÁREA de cada triângulo', () 
      No anel que as duas dividem, a área do barril é ~350× a da abinha. */
   const CASCA = 80;
   const casca = nucleo([
-    ['lathe', { origemId: CASCA, lados: LADOS, perfil: [[1, 0], [1, 10], [1.02, 10.02]] }],
+    ['lathe', { origemId: CASCA, lados: LADOS, perfil: [[1, 0], [1, 10], [1.02, 10.02]], superficie: true }],
     ['parte', { nome: 'casca', sel: { origem: { op: 'lathe', id: CASCA } } }],
     ['liso', { sel: { origem: { op: 'lathe', id: CASCA } } }],
   ], {}, {});

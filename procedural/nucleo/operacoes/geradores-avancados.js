@@ -99,6 +99,24 @@ export function criarOperacoesGeradoresAvancados(servicos) {
        mesma coordenada, porque ela vem do mesmo PARAM. */
     const fechadoDe = (pontos) => pontos.length >= 3 && pontos[0].raio === pontos[pontos.length - 1].raio && pontos[0].y === pontos[pontos.length - 1].y;
 
+    /* PERFIL ABERTO SÓ POR DECLARAÇÃO. A polilinha que não toca o eixo nas duas pontas e não volta ao primeiro ponto revoluciona em
+       casca aberta: a ponta fora do eixo fica sem tampa, e o `descrever` saía com 0 enquanto o `conferir-malha` reprovava a casca.
+       Quem quer a casca aberta de propósito (uma superfície, uma tira) escreve `superficie: true`; quem quis um sólido fecha o
+       perfil, põe as pontas no eixo ou passa `furos: []`, que trata o perfil como seção fechada pelo eixo. */
+    if (a.superficie != null && typeof a.superficie !== 'boolean') return grita(st, i, 'lathe', 'superficie', `superficie precisa ser true ou false (veio ${JSON.stringify(a.superficie)})`);
+    if (a.superficie === true && modoSecao) return grita(st, i, 'lathe', 'superficie', 'superficie: true não vale com furos ou deslocar, porque a seção já é fechada pelo eixo; tire um dos dois');
+    if (!modoSecao && a.superficie !== true) {
+      const pontos = lacos[0];
+      const primeiro = pontos[0], ultimo = pontos[pontos.length - 1];
+      if (!fechadoDe(pontos) && !(primeiro.polo && ultimo.polo)) {
+        const pontas = [];
+        if (!primeiro.polo) pontas.push(`o ponto 0 (raio ${primeiro.raio}, y ${primeiro.y})`);
+        if (!ultimo.polo) pontas.push(`o último ponto (raio ${ultimo.raio}, y ${ultimo.y})`);
+        return grita(st, i, 'lathe', 'perfil', `perfil aberto: ${pontas.join(' e ')} fica${pontas.length > 1 ? 'm' : ''} fora do eixo e o perfil não volta ao primeiro ponto, então a revolução sai em casca aberta, sem tampa nessa ponta. `
+          + 'Feche o perfil (repita o primeiro ponto no fim, ou ponha as pontas em raio 0), passe furos: [] para tratá-lo como seção fechada pelo eixo, ou declare superficie: true se a casca aberta é o que se quer');
+      }
+    }
+
     // guarda de overflow (D3): soma EXATA — segmento polo<->polo não soma face — ANTES de inserir
     let nV = 0, nF = 0;
     for (const pontos of lacos) {

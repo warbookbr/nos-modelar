@@ -25,6 +25,7 @@ import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
+import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { conferirFormaDoEsbocoDaReceita, conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
@@ -240,6 +241,16 @@ export async function descreverPecaReutilizavel({
       `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS nem CHAMADAS_COMPOSICOES.`
       + '\n  esta régua só mede peça escrita pelo contrato procedural da Oficina.',
     );
+  }
+
+  /* AS REFERÊNCIAS DO PLANO EXISTEM, ANTES DE EXECUTAR. O `alvo.md` ausente só aparecia na `vistas:critica`, depois de a forma estar
+     pronta. O plano inválido segue para a mensagem própria dele mais abaixo, e a receita entregue já carregada não tem pasta para
+     resolver caminho relativo, então só a lida do disco é conferida. */
+  if (!semVeredito && caminhoReceita) {
+    let planoDeReferencias = null;
+    try { planoDeReferencias = normalizarPlanoDeModelagem(receita.PLANO); } catch { planoDeReferencias = null; }
+    const { ausentes } = referenciasDoPlano(planoDeReferencias, { pastaDaReceita: dirname(caminhoReceita) });
+    if (ausentes.length) return falha(`REFERÊNCIA DO PLANO AUSENTE\n  ${peca}: ${mensagemDeReferenciasAusentes(ausentes)}`);
   }
 
   let execucao = { registroOperacoes, registroComposicoes, orcamentoComposicoes };

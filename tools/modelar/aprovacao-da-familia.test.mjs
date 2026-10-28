@@ -412,7 +412,7 @@ describe('o que reprova um ponto', () => {
     const aberta = definirFamilia({
       contrato: tubo.contrato,
       composicoes: COMPOSICOES_DO_TUBO.map((c) => (c.id === ID_BARRA
-        ? { ...c, nos: c.nos.map((no) => (no.operacao === 'lathe' ? { ...no, argumentos: { ...no.argumentos, perfil: no.argumentos.perfil.slice(0, 3) } } : no)) }
+        ? { ...c, nos: c.nos.map((no) => (no.operacao === 'lathe' ? { ...no, argumentos: { ...no.argumentos, perfil: no.argumentos.perfil.slice(0, 3), superficie: true } } : no)) }
         : c)),
       derivar: tubo.derivar,
     });
