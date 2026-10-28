@@ -49,7 +49,7 @@
 #     traz mais candidatas só para os cortes. As imagens são cortes/corte-<nome>.png (o corte inteiro) e
 #     corte-<nome>-ampliado.png (grade de 10 mm em volta de `ampliar` [u0, u1, v0, v1] em mm da configuração do corte, ou do
 #     ponto de maior diferença, numa janela de ampliacao_mm de largura), com a referência em preto.
-#   ondulacao_da_receita: com --receita <receita.js>, roda tools/modelar/ondulacao-da-superficie.mjs (MECANIFICA_NODE
+#   ondulacao_da_receita: com --receita <receita.js>, roda tools/modelar/ondulacao-da-superficie.mjs (MODELAR_NODE
 #     escolhe o node) e grava as falhas abertas (fora dos vincos declarados) e a maior amplitude em mm.
 # Grava em <saida>/: metricas.json e, sem --sem-imagens, as imagens de cada linha e vista, folha.png e, por vista,
 # vista-<vista>.png: referência em listras, candidata em listras e mapa com sinal lado a lado, a resolucao_vista

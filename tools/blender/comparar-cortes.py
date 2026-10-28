@@ -6,7 +6,7 @@
 #       (--candidata <cand.obj|.glb|.blend> [--objeto <nome>] [--z-cima] [--blender <executável>] | --contornos-candidata <json>) \
 #       [--corte nome,nome] [--passo-mm 0.5]
 #
-# Com --candidata, roda olhar-candidata.py no Blender (--blender ou a variável MECANIFICA_BLENDER) com o pacote, o que
+# Com --candidata, roda olhar-candidata.py no Blender (--blender ou a variável MODELAR_BLENDER) com o pacote, o que
 # recorta a candidata pela caixa do pacote, desenha os cortes dela no mesmo quadro (<saida>/candidata-cortes/) e grava o
 # contorno exato dela em mm (<saida>/candidata-cortes/contornos.json); com --contornos-candidata, usa um contornos.json já
 # feito, sem Blender. Grava <saida>/comparacao.json, com, por corte, a média, o p95 e a máxima da distância do pacote para a
@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from PIL import Image, ImageDraw
 import imagens as IM
 import leitura as L
+from ambiente import do_ambiente
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 COR_PACOTE, COR_CAND = (0, 0, 0), (230, 110, 0)
@@ -38,9 +39,9 @@ nomes = [s for s in a['corte'].split(',') if s] if isinstance(a.get('corte'), st
 if 'contornos_candidata' in a:
     arq_c = a['contornos_candidata']
 elif 'candidata' in a:
-    blender = a.get('blender') or os.environ.get('MECANIFICA_BLENDER')
+    blender = a.get('blender') or do_ambiente('BLENDER')
     if not blender or blender is True:
-        L.erro('para renderizar a candidata, dê --blender <executável> ou a variável MECANIFICA_BLENDER; ou --contornos-candidata')
+        L.erro('para renderizar a candidata, dê --blender <executável> ou a variável MODELAR_BLENDER; ou --contornos-candidata')
     raiz = os.path.dirname(vistas) if os.path.basename(vistas) == 'vistas' else os.path.dirname(pasta_cortes)
     prefixo = os.path.join(os.path.abspath(a['saida']), 'candidata-')
     cmd = [blender, '-b', '--factory-startup', '--python', os.path.join(AQUI, 'olhar-candidata.py'), '--',
