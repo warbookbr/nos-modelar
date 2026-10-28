@@ -1,9 +1,10 @@
 name: CI
 
 # A bateria completa roda em cada envio, dividida entre máquinas que rodam ao mesmo tempo: os testes rápidos com as
-# conferências de documento e de arquivo gerado, os testes lentos em cinco partes, as guardas que abrem a bancada e os que
+# conferências de documento e de arquivo gerado, os testes lentos em dez partes, as guardas que abrem a bancada e os que
 # geram o acervo. Medido em 2026-10-28 numa máquina só: 19 minutos, 11 deles nos testes lentos. O repositório é público e os
-# minutos do GitHub Actions não acabam mais, então a bateria lenta deixou de ser diária.
+# minutos do GitHub Actions não acabam mais, então a bateria lenta deixou de ser diária. São quatorze máquinas ao mesmo tempo,
+# dentro das vinte do plano gratuito; cada uma leva uns 30 s se preparando, e dividir mais deixa de compensar.
 #
 # O ENVIO VAI A UM RAMO, E A MAIN SÓ ANDA COM O CI VERDE. Um envio a `claude/**` ou `envio/**` roda a bateria, e o passo
 # `juntar` avança a main até ele quando todas as máquinas passaram e a main não andou desde a base do ramo; se andou, ele
@@ -167,7 +168,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        parte: [ 1/5, 2/5, 3/5, 4/5, 5/5 ]
+        parte: [ 1/10, 2/10, 3/10, 4/10, 5/10, 6/10, 7/10, 8/10, 9/10, 10/10 ]
     steps:
       # O histórico inteiro, com ramos e tags, porque o gate de vazamento
       # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
