@@ -21,6 +21,21 @@ function blocoDeOrigem(texto) {
 }
 const pasta = (peca) => `procedural/pecas/${peca}/referencias`;
 
+/* O primeiro comentário de bloco da receita: é onde ela diz de que modelo e de que pacote foi recriada. */
+function cabecalhoDaReceita(texto) {
+  const bloco = /^\s*\/\*[\s\S]*?\*\//.exec(texto);
+  return bloco ? bloco[0] : '';
+}
+/* O mesmo contrato do alvo.md: cita o autor que o pacote exige, nenhum autor de outro pacote, e o pacote ou o modelo. Devolve os problemas, vazio se estiver certo. */
+function problemasDoCabecalho(cabecalho, p, pacote) {
+  const problemas = [];
+  if (cabecalho === '') return [`${p.peca}: a receita não abre com um comentário de cabeçalho`];
+  for (const exigida of pacote.exige) if (!cabecalho.includes(exigida)) problemas.push(`${p.peca}: o cabeçalho não cita ${exigida}`);
+  for (const proibida of pacote.proibe) if (cabecalho.includes(proibida)) problemas.push(`${p.peca}: o cabeçalho cita ${proibida}, de outro pacote`);
+  if (!cabecalho.includes(pacote.nome) && !cabecalho.includes(p.modelo)) problemas.push(`${p.peca}: o cabeçalho não cita o pacote "${pacote.nome}" nem o modelo "${p.modelo}"`);
+  return problemas;
+}
+
 describe('origem das fontes de veículo', () => {
   it('a tabela tem as 27 peças, cada uma com pacote conhecido', () => {
     expect(TABELA.pecas).toHaveLength(27);
@@ -54,6 +69,25 @@ describe('origem das fontes de veículo', () => {
       for (const proibida of pacote.proibe) expect(alvoOrigem, `${p.peca}: a origem cita ${proibida}, de outro pacote`).not.toContain(proibida);
       expect(alvoOrigem.includes(pacote.nome) || alvoOrigem.includes(p.modelo), `${p.peca}: a origem não cita o pacote "${pacote.nome}" nem o modelo "${p.modelo}"`).toBe(true);
     }
+  });
+
+  it('o cabeçalho de cada receita.js cita o autor do pacote certo, o pacote ou o modelo, e nenhum outro autor', () => {
+    for (const p of TABELA.pecas) {
+      const problemas = problemasDoCabecalho(cabecalhoDaReceita(ler(`procedural/pecas/${p.peca}/receita.js`)), p, TABELA.pacotes[p.pacote]);
+      expect(problemas, problemas.join('; ')).toEqual([]);
+    }
+  });
+
+  it('o cabeçalho da perua trocado para o pacote A é acusado', () => {
+    /* A cópia em fixture é o cabeçalho real da perua com "autor D" e "pacote D" trocados por "autor A" e "pacote A": exatamente o erro que o alvo.md já
+       chegou a ter. A perua é do pacote D; o teste acima não pega o cabeçalho da cópia porque ele só lê as receitas do acervo. */
+    const perua = TABELA.pecas.find((p) => p.peca === 'carro-perua');
+    expect(perua.pacote).toBe('pacote-d');
+    const problemas = problemasDoCabecalho(cabecalhoDaReceita(ler('tools/modelar/fixtures/origem-das-fontes/carro-perua-cabecalho-trocado.txt')), perua, TABELA.pacotes[perua.pacote]);
+    expect(problemas).toContain('carro-perua: o cabeçalho não cita autor D');
+    expect(problemas).toContain('carro-perua: o cabeçalho cita autor A, de outro pacote');
+    /* e o cabeçalho de verdade, o da receita do acervo, não tem problema */
+    expect(problemasDoCabecalho(cabecalhoDaReceita(ler('procedural/pecas/carro-perua/receita.js')), perua, TABELA.pacotes[perua.pacote])).toEqual([]);
   });
 
   it('nenhuma peça com referencias/fonte-partes.json fica fora da tabela', () => {

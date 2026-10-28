@@ -1,0 +1,24 @@
+/* carro-perua — perua (station wagon) de facetas retas: capô baixo e inclinado, para-brisa em rampa, teto longo e quase plano até uma traseira
+ * curta e vertical, três vãos de vidro na lateral separados por duas colunas, cabine que afunila para dentro até o teto, vinco na cintura e
+ * saia que recolhe embaixo, rodas octogonais que aparecem dentro de arcos. Recriada em primitivas do núcleo a partir do modelo "Wagon" do
+ * pacote pacote A, de autor A, publicado em repositório de modelos livres sob licença livre sem exigência de crédito:
+ * endereço omitido. A malha original NÃO está no repositório. O que entra aqui é a silhueta medida dela
+ * (referencias/fonte-partes.json) e as quatro vistas (referencias/fonte-vistas.png). As diferenças estão em referencias/alvo.md.
+ *
+ * Referencial do acervo: Y para cima, o chão em y = 0, a frente do carro em +z e x para a direita de quem olha de frente, centrada em x e z.
+ * A caixa total fica em x de -1017 a 1017 (as calotas), y de 0 a 1580 e z de -2350 a 2350 mm, como na fonte.
+ *
+ * A TABELA, em milímetro, é a única fonte das medidas e `m` a única conversão para metro. A carroceria sai da interseção de dois prismas e de
+ * uma caixa de recorte por parte: o perfil lateral (z, y) extrudado em x, que dá capô, para-brisa, teto e traseira, e a seção frontal (x, y)
+ * extrudada em z, que dá o vinco da cintura, o afunilamento da cabine e a saia recolhida. Como todas as partes saem dos mesmos dois prismas,
+ * as faces em que elas se encontram são o mesmo plano de corte (a cintura, a base do teto, os planos das colunas) e o contato fecha exato.
+ * Os arcos das rodas são recortados no próprio perfil lateral, antes da extrusão, e cada caixa de roda fecha o arco entre as faces de dentro
+ * dos pneus. Nenhuma booleana corta a carroceria. Os contornos saem no sentido anti-horário. Na extrusão em x o núcleo põe [u, v] em
+ * y = -u e z = v; na extrusão em z põe em x = u e y = -v.
+ *
+ * Partes: carroceria (de y 198 à cintura), vidroFrente, vidroMeio e vidroTras (a estufa entre a cintura e a base do teto, em vidro, porque
+ * nesta fonte o vidro é a própria face da estufa), colunaB e colunaC (da cor da carroceria), teto, duas caixas de roda, quatro pneus
+ * octogonais com calota, dois faróis e duas lanternas.
+ *
+ * Não modelado: maçanetas, frisos e a sombra da grade, que a fonte não separa em malha.
+ */

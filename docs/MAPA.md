@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1518 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1519 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1651,6 +1651,7 @@
 - `contato-de-solidos-em-milimetro.test.mjs` — contato-de-solidos-em-milimetro.test.mjs — o contato de sólidos numa peça de milímetros (a metro por unidade). Três tolerâncias absolutas do módulo deixavam …
 - `contato-de-solidos-equivalencia.test.mjs` — contato-de-solidos-equivalencia.test.mjs — a contenção de ponto e o cruzamento de malhas, depois de os dados de cada triângulo passarem a ser calculados uma …
 - `contato-de-solidos.js` — contato-de-solidos — o núcleo geométrico que decide se dois sólidos se separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
+- `contato-em-plano-inclinado.test.mjs` — contato-em-plano-inclinado.test.mjs — o vidro sobre face inclinada fecha por vértice novo de booleana ou de interseção de perfis, e esse vértice volta a pouc…
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
 - `contatos-da-peca.test.mjs` — contatos-da-peca.test.mjs — a medida só vale se ela REPROVAR alguma coisa.
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.

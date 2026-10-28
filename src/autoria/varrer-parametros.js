@@ -64,7 +64,7 @@ export function lerCriterio(declarado) {
       unidade: 'mm',
       escala: 1000,
       avaliar: (d) => {
-        const folgas = d.relacoes.filter((r) => r.tipo === 'folga').map((r) => r.distancia);
+        const folgas = d.relacoes.filter((r) => r.tipo === 'folga' && r.distancia !== null).map((r) => r.distancia);
         return folgas.length ? Math.min(...folgas) : null;
       },
     };
@@ -203,7 +203,7 @@ export function relacoesPioradas(base, candidato, { minimo = EPSILON_EFEITO } = 
     if (!depois) { pioradas += 1; continue; }
     if (antes.tipo === 'encosta' && depois.tipo === 'folga') { pioradas += 1; continue; }
     if (antes.tipo !== 'interpenetra' && depois.tipo === 'interpenetra') { pioradas += 1; continue; }
-    if (antes.tipo === 'folga' && depois.tipo === 'folga' && depois.distancia > antes.distancia + minimo) {
+    if (antes.tipo === 'folga' && depois.tipo === 'folga' && antes.distancia !== null && depois.distancia !== null && depois.distancia > antes.distancia + minimo) {
       pioradas += 1;
     }
   }
