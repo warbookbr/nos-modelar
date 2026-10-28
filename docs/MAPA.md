@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1520 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1525 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -805,7 +805,7 @@
 - `contrato.js` — contrato.js — contrato e validação de opções do exportador CAD.
 - `index.js` — index.js — porta pública do módulo exportador CAD.
 - `separar-corpos.js` — separar-corpos.js — separação determinística de componentes conexos por parte.
-- `triangular-faces.js` — triangular-faces.js — decomposição determinística de faces poligonais em triângulos.
+- `triangular-faces.js` — triangular-faces.js — decomposição determinística de faces poligonais em triângulos. O leque a partir do primeiro canto é a triangulação de sempre; ele só mu…
 - `validar-malha.js` — validar-malha.js — validação pura de integridade e topologia da malha neutra.
 
 ## modulos/exportador-cad/src/backends/
@@ -814,6 +814,7 @@
 
 ## modulos/exportador-cad/tests/
 
+- `canto-colinear.test.js` — canto-colinear.test.js — perfil de extrusão com um vértice no meio de uma aresta (caso 2 do plano dos veículos), no STEP.
 - `exportador-cad.test.js` — exportador-cad.test.js — suíte de testes do exportador CAD cobrindo R01, R02 e R04.
 
 ## modulos/exportador-obj/
@@ -830,6 +831,7 @@
 
 ## modulos/exportador-obj/tests/
 
+- `canto-colinear.test.js` — canto-colinear.test.js — perfil de extrusão com um vértice no meio de uma aresta (caso 2 do plano dos veículos). O polígono é válido; o leque do canto 0 o tr…
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
 - `textura.test.js` — textura.test.js — material por parte, arquivo .mtl, usemtl, coordenadas vt em mapeamento planar e recusas.
 - `tolerancia.test.js` — tolerancia.test.js — tolerância de triângulo degenerado e regressão de saída sem texturas.
@@ -1068,6 +1070,7 @@
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
 - `topologia.js` — topologia.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve. Até 2026-10-27 morava em `modulos/topologia/`; …
 - `topologia.test.js` — topologia.test.js — cada regra é vista REPROVANDO um defeito construído de propósito, e APROVANDO a malha sã correspondente.
+- `triangulacao-colinear.test.mjs` — triangulacao-colinear.test.mjs — face com canto colinear não sai em triângulo de área nula. O polígono com um canto no meio de uma aresta é válido (a boolean…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
 
@@ -1095,6 +1098,7 @@
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
+- `arredondar-facetado.test.ts` — arredondar-facetado.test.ts — arredondarAresta numa forma facetada não devolve a face vizinha torta. O arco anda no plano perpendicular à aresta e o canto da…
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `aviso-de-degrau.test.ts` — aviso-de-degrau.test.ts — o arredondamento que termina em degrau não passa mais calado.
@@ -1109,6 +1113,7 @@
 - `estouro-de-bloco.test.ts` — estouro-de-bloco.test.ts — nenhum passo que passa de BLOCO ids lança erro: espelha, arranja, furo e os geradores com lados:{desvio} continuam na faixa estend…
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `extrusao-de-perfil.test.ts` — extrusao-de-perfil.test.ts — `extrusao` e o `lathe` com `furos` e `deslocar`: perfil 2D com furo e deslocamento de contorno, levantado ou revolucionado em só…
+- `face-plana.js` — face-plana.js — a face continua plana depois de mover os cantos? A operação que move cantos compartilhados (arredondarAresta) altera faces que ela não declar…
 - `friso.js` — friso.js (operação) — nervura, tubo ou friso que segue uma linha nomeada, com perfil declarado. A linha é uma sequência de pontos nomeados da gaiola de um pa…
 - `furo-raio-por-grupo.test.ts` — furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode declarar raio e, em furo cego, profundidade próprios, e receber um nome semântico pa…
 - `geradores-avancados.js` — geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo.

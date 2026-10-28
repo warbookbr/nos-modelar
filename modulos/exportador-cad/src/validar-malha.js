@@ -1,5 +1,6 @@
 /* validar-malha.js — validação pura de integridade e topologia da malha neutra. */
 import { ErroExportacaoCad } from './contrato.js';
+import { triangulosDaFace } from './triangular-faces.js';
 
 function erro(codigo, mensagem, detalhes) {
   throw new ErroExportacaoCad(codigo, mensagem, detalhes);
@@ -37,14 +38,17 @@ export function validarMalha(neutro, { tolerancia }) {
       if (!vertices.has(vertice)) erro('vertice-ausente', 'Face referencia vértice inexistente.', { face: id, vertice });
       return vertices.get(vertice);
     });
-    for (let i = 1; i < pontos.length - 1; i++) if (areaTriangular(pontos[0], pontos[i], pontos[i + 1]) <= tolerancia * tolerancia) erro('face-degenerada', 'Face tem área abaixo da tolerância.', { face: id });
+    /* A face vale se alguma triangulação dela tem todos os triângulos acima da tolerância: o leque do canto 0, que o corpo de
+       sempre usa, e só quando ele tem triângulo sem área, o leque de outro canto ou as orelhas. */
+    const triangulos = triangulosDaFace({ vs }, vertices, (a, b, c) => areaTriangular(a, b, c) <= tolerancia * tolerancia);
+    if (!triangulos) erro('face-degenerada', 'Face tem área abaixo da tolerância.', { face: id });
     for (let i = 0; i < vs.length; i++) {
       const a = vs[i], b = vs[(i + 1) % vs.length], chave = aresta(a, b);
       const lista = incidencias.get(chave) ?? [];
       lista.push({ face: id, sentido: `${a}:${b}` });
       incidencias.set(chave, lista);
     }
-    faces.push({ id, vs: vs.slice(), parte: face.parte.trim() });
+    faces.push({ id, vs: vs.slice(), parte: face.parte.trim(), triangulos });
   }
   for (const [chave, lista] of incidencias) {
     if (lista.length === 1) erro('borda-aberta', 'Aresta pertence a uma única face.', { aresta: chave, face: lista[0].face });

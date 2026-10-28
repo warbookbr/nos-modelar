@@ -21,6 +21,7 @@
  * polo de valência alta, ilha solta. Um n-gon plano não impede nada; ele impede
  * subdividir bem, e por isso avisa em vez de barrar.
  */
+import { triangularSemDegenerado } from './triangulacao-face.js';
 
 export const FORMATO = 'mecanifica.topologia@1';
 
@@ -166,10 +167,10 @@ export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxim
     }
     /* --- face torta e triângulo de área nula na triangulação ---
        Vieram do preparo de micropolígono, que saiu em 2026-10-25. Face torta triangulada em leque produz silhueta que depende
-       de qual canto virou o centro do leque; e um canto colinear dentro de uma face sã produz, no leque, um triângulo de área
-       nula que um exportador descarta ou escreve como lixo. O quadrilátero usa a diagonal que fica dentro da face. Só com
-       `triangulacao: true`, que o `conferir-malha` liga: a face torta é legítima numa varredura, e quem pergunta pela topologia
-       da forma não pergunta pela saída triangulada. */
+       de qual canto virou o centro do leque; e um canto colinear dentro de uma face sã produz, no leque do primeiro canto, um
+       triângulo de área nula, que os exportadores evitam trocando de leque. O quadrilátero usa a diagonal que fica dentro da
+       face. Só com `triangulacao: true`, que o `conferir-malha` liga: a face torta é legítima numa varredura, e quem pergunta
+       pela topologia da forma não pergunta pela saída triangulada. */
     if (triangulacao && f.vs.length >= 4) {
       const desvio = planaridade(vertices, f.vs);
       if (desvio > TOLERANCIA_PLANARIDADE) {
@@ -177,11 +178,13 @@ export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxim
       }
       const giro = f.vs.length === 4 ? melhorDiagonal(vertices, f.vs) : 0;
       const vs = giro ? [...f.vs.slice(giro), ...f.vs.slice(0, giro)] : f.vs;
-      for (let k = 1; k < vs.length - 1; k++) {
-        if (areaTriangulo(vertices.get(vs[0]), vertices.get(vs[k]), vertices.get(vs[k + 1])) <= EPS_AREA_TRIANGULO) {
-          anota('reprova', 'triangulo-degenerado', `A face ${f.id} produz um triângulo de área nula na triangulação.`, { face: f.id, triangulo: [vs[0], vs[k], vs[k + 1]] });
-          break;
-        }
+      /* O leque do primeiro canto com triângulo de área nula não reprova mais por si: `triangularSemDegenerado`, a função que os
+         exportadores usam, acha outro leque ou as orelhas. Reprova a face que nenhuma triangulação serve. */
+      const pontos = vs.map((id) => vertices.get(id));
+      const degenerado = (a, b, c) => areaTriangulo(a, b, c) <= EPS_AREA_TRIANGULO;
+      if (!triangularSemDegenerado(pontos, degenerado)) {
+        const k = pontos.findIndex((_, i) => i >= 1 && i < pontos.length - 1 && degenerado(pontos[0], pontos[i], pontos[i + 1]));
+        anota('reprova', 'triangulo-degenerado', `A face ${f.id} produz um triângulo de área nula na triangulação.`, { face: f.id, triangulo: [vs[0], vs[Math.max(k, 1)], vs[Math.max(k, 1) + 1]] });
       }
     }
   }
