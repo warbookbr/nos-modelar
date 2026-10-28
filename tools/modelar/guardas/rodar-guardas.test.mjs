@@ -105,7 +105,7 @@ describe('a lista de guardas', () => {
 
   it('toda guarda de navegador do package.json está na lista, porque senão nenhum gate a roda', () => {
     const scriptsDeGuarda = Object.entries(pacote.scripts)
-      .filter(([, comando]) => /node tools\/(mecanifica\/guardas\/guarda-|bancadas\/porteiro)/.test(comando))
+      .filter(([, comando]) => /node tools\/(modelar\/guardas\/guarda-|bancadas\/porteiro)/.test(comando))
       .map(([nome]) => nome);
     /* `guarda:acervo` e `guarda:referencial` não abrem navegador e têm gate próprio. */
     const semNavegador = ['guarda:acervo', 'guarda:referencial'];
