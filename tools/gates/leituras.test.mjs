@@ -23,7 +23,7 @@ describe('registro de leituras', () => {
       fs.writeFileSync(${JSON.stringify(destino)}, JSON.stringify({ teste: 'tools/x.test.mjs' }) + '\\n');
       instalar(${JSON.stringify(destino)});
       const cp = await import('node:child_process');
-      fs.readFileSync('package.json'); fs.readdirSync('docs'); fs.readFileSync('node_modules/vitest/package.json');
+      fs.readFileSync('package.json'); fs.readdirSync('docs'); fs.existsSync('README.md'); fs.readFileSync('node_modules/vitest/package.json');
       cp.execFileSync(process.execPath, ['-e', "require('fs').readFileSync('CLAUDE.md')"]);
       cp.spawnSync('git', ['status', '--short']);
       cp.spawnSync('python3', ['-c', 'pass', 'package.json']);
@@ -32,16 +32,18 @@ describe('registro de leituras', () => {
     execFileSync(process.execPath, ['--input-type=module', '-e', roteiro], { cwd: RAIZ, env: { ...process.env, GATES_LEITURAS_DESTINO: '' } });
     const registro = lerLeituras(dir)['tools/x.test.mjs'];
     expect([...registro.arquivos].sort()).toEqual(['CLAUDE.md', 'package.json']);
+    expect([...registro.existencias]).toEqual(['README.md']);
     expect([...registro.pastas].sort()).toEqual(['', 'docs']);
     expect(registro.tudo).toBe(true);
     expect(readFileSync(destino, 'utf8')).not.toContain('node_modules');
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it('o teste que lê o arquivo, ou lista a pasta dele, ou lê tudo, é escolhido', () => {
+  it('o arquivo mudado escolhe quem lê o conteúdo; o que aparece ou some, também quem o consulta ou lista a pasta dele', () => {
     const r = (arquivos, pastas, tudo = false) => ({ arquivos: new Set(arquivos), pastas: new Set(pastas), tudo });
-    const registro = { a: r([DOC], []), b: r([], ['docs']), c: r(['package.json'], []), d: r([], [], true) };
-    expect(testesQueLeem(registro, [DOC])).toEqual(['a', 'b', 'd']);
+    const registro = { a: r([DOC], []), b: r([], ['docs']), c: r(['package.json'], []), d: r([], [], true), e: { ...r([], []), existencias: new Set([DOC]) } };
+    expect(testesQueLeem(registro, [DOC], [])).toEqual(['a', 'd']);
+    expect(testesQueLeem(registro, [DOC], [DOC])).toEqual(['a', 'b', 'd', 'e']);
     expect(testesQueLeem(registro, [NOVO])).toEqual(['b', 'd']);
   });
 });

@@ -71,7 +71,10 @@ describe('seletor de gates', () => {
     writeFileSync(join(raiz, DOC), 'x2');
     const soDoc = { ...fotografar(raiz), 'tools/le-doc.test.mjs': '1', 'tools/lista-docs.test.mjs': '2', 'tools/nada.test.mjs': '3' };
     const v = { 'test:lentos': registroVerde('test:lentos', comTestes) };
-    expect(decidir('test:lentos', soDoc, v, leituras)).toMatchObject({ rodar: true, testes: ['tools/le-doc.test.mjs', 'tools/lista-docs.test.mjs'] });
+    /* o documento só mudou de conteúdo: quem lista a pasta dele não muda de resposta */
+    expect(decidir('test:lentos', soDoc, v, leituras)).toMatchObject({ rodar: true, testes: ['tools/le-doc.test.mjs'] });
+    const novo = { ...soDoc, 'docs/novo.json': '9' };
+    expect(decidir('test:lentos', novo, v, leituras)).toMatchObject({ rodar: true, testes: ['tools/le-doc.test.mjs', 'tools/lista-docs.test.mjs'] });
     expect(decidir('test:lentos', soDoc, v, {})).toMatchObject({ rodar: false });
     expect(decidir('test:lentos', soDoc, { 'test:lentos': { ...v['test:lentos'], leiturasCompletas: false } }, leituras)).toMatchObject({ testes: null });
     writeFileSync(join(raiz, 'tools/blender/c.py'), 'c2');

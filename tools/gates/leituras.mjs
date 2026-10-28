@@ -76,9 +76,15 @@ export function instalar(destino) {
       };
     }
   };
-  embrulhar(fs, ['readFileSync', 'readFile', 'existsSync', 'statSync', 'lstatSync', 'stat', 'lstat', 'accessSync', 'access', 'openSync', 'open', 'createReadStream'], 'a');
+  /* Três tipos: 'a' lê o conteúdo, 'e' só consulta se existe (stat, exists, access) e 'd' lista a pasta. A consulta e a listagem
+     só mudam de resposta quando um arquivo aparece ou some. Medido em 2026-10-28: o servidor do Vite que os testes do MCP sobem
+     percorre o repositório inteiro e consulta 14 mil caminhos sem ler nenhum documento, e isso punha os dois testes, 60 s, em
+     toda mudança de documento. */
+  embrulhar(fs, ['readFileSync', 'readFile', 'openSync', 'open', 'createReadStream'], 'a');
+  embrulhar(fs, ['existsSync', 'statSync', 'lstatSync', 'stat', 'lstat', 'accessSync', 'access'], 'e');
   embrulhar(fs, ['readdirSync', 'readdir', 'opendirSync', 'opendir'], 'd');
-  embrulhar(fs.promises, ['readFile', 'stat', 'lstat', 'access', 'open'], 'a');
+  embrulhar(fs.promises, ['readFile', 'open'], 'a');
+  embrulhar(fs.promises, ['stat', 'lstat', 'access'], 'e');
   embrulhar(fs.promises, ['readdir', 'opendir'], 'd');
 
   /* Os processos filhos: node herda a anotação; git na raiz e qualquer outro programa contam como quem lê tudo. */
@@ -141,13 +147,14 @@ export function lerLeituras(diretorio) {
   let nomes = [];
   try { nomes = fs.readdirSync(diretorio).filter((n) => n.endsWith('.jsonl')); } catch { return registro; }
   for (const nome of nomes) {
-    let teste = null; const entrada = { arquivos: new Set(), pastas: new Set(), tudo: false };
+    let teste = null; const entrada = { arquivos: new Set(), existencias: new Set(), pastas: new Set(), tudo: false };
     for (const linha of fs.readFileSync(join(diretorio, nome), 'utf8').split('\n')) {
       if (!linha) continue;
       try {
         const l = JSON.parse(linha);
         if (l.teste) teste = l.teste;
         else if ('a' in l) entrada.arquivos.add(l.a);
+        else if ('e' in l) entrada.existencias.add(l.e);
         else if ('d' in l) entrada.pastas.add(l.d);
         else if (l.t && !ehNavegador(l.t) && !(l.t.startsWith('git ') && !gitLeConteudo(l.t.split(' ').slice(1)))) entrada.tudo = true;
       } catch { entrada.tudo = true; }
@@ -157,10 +164,13 @@ export function lerLeituras(diretorio) {
   return registro;
 }
 
-/* Os testes cujo registro diz ler algum dos caminhos: o próprio arquivo, a pasta dele listada, ou tudo. */
-export function testesQueLeem(registro, caminhos) {
+/* Os testes cujo registro diz ler algum dos caminhos: o conteúdo dele, ou, se ele apareceu ou sumiu (`estruturais`), a
+   consulta a ele ou a listagem da pasta dele; ou quem lê tudo. */
+export function testesQueLeem(registro, caminhos, estruturais = caminhos) {
+  const pasta = (c) => (dirname(c) === '.' ? '' : dirname(c));
   return Object.keys(registro).filter((teste) => {
     const r = registro[teste];
-    return r.tudo || caminhos.some((c) => r.arquivos.has(c) || r.pastas.has(dirname(c)) || (dirname(c) === '.' && r.pastas.has('')));
+    return r.tudo || caminhos.some((c) => r.arquivos.has(c)
+      || (estruturais.includes(c) && ((r.existencias?.has(c) ?? false) || r.pastas.has(pasta(c)))));
   }).sort();
 }

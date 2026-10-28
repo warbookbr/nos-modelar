@@ -168,7 +168,8 @@ function decidirSemNota(gate, foto, verdes, leituras, raiz) {
     const naoDado = foraDoGrafo.find((c) => !DADOS_LIDOS_PELO_FS.test(c));
     if (naoDado) return { rodar: true, motivo: `'${naoDado}' mudou e nem o grafo de imports nem o registro de leituras o acompanham, roda o modo inteiro`, testes: null };
     if (!verde.leiturasCompletas || !leituras) return { rodar: true, motivo: `'${foraDoGrafo[0]}' mudou e ainda não há registro de leituras de todos os testes, roda o modo inteiro`, testes: null };
-    const queLeem = testesQueLeem(leituras, foraDoGrafo).filter((t) => foto[t]);
+    const estruturais = foraDoGrafo.filter((c) => !verde.foto[c] || !foto[c]);
+    const queLeem = testesQueLeem(leituras, foraDoGrafo, estruturais).filter((t) => foto[t]);
     const testes = [...new Set([...codigo, ...queLeem])];
     if (!testes.length) return { rodar: false, motivo: `nenhum teste lê os ${foraDoGrafo.length} arquivo(s) de dados mudados` };
     return { rodar: true, motivo: `${codigo.length} arquivo(s) de código mudaram e ${queLeem.length} teste(s) leem os ${foraDoGrafo.length} arquivo(s) de dados mudados`, testes };
