@@ -63,7 +63,7 @@ revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo,
 `procedural/pecas/`, tem veículos, eletrodomésticos, móveis, o avião e o braço
 robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
-divergem. O plano ativo é [renomear para Modelar](docs/modelar/planos/2026-10-25-renomear-para-modelar.md).
+divergem. O plano ativo é [ajustes no núcleo dos veículos](docs/modelar/planos/2026-10-21-ajustes-no-nucleo-dos-veiculos.md).
 Já fecharam [veículos de referência livre](docs/modelar/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
 como famílias](docs/modelar/planos/encerrados/2026-10-19-objetos-externos-como-familias.md) em 2026-10-20; [receitas com material e
 textura](docs/modelar/planos/encerrados/2026-10-19-receitas-com-material-e-textura.md) em 2026-10-19; [aparelhos de

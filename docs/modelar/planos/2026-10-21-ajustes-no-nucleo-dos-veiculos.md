@@ -1,6 +1,6 @@
 # Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** Claude, com a pessoa decidindo as quatro escolhas da seção de decisões
 

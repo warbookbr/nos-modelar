@@ -33,7 +33,6 @@ export const EXCECOES_POR_CAMINHO = [
   { categoria: 'histórico', caminho: /^docs\/modelar\/historico\//, motivo: 'o histórico guarda o texto da época, com o nome da época; reescrevê-lo seria falsificar o registro' },
   { categoria: 'histórico', caminho: /^docs\/modelar\/planos\/(?:encerrados|concluidos|congelados)\//, motivo: 'planos encerrados, concluídos ou congelados guardam evidência com hash e já não governam trabalho novo' },
   { categoria: 'histórico', caminho: /^docs\/modelar\/banco-de-provas\//, motivo: 'o banco de provas guarda rodadas medidas, com caminhos absolutos e impressões de hash gravados; mudar o texto invalida a prova' },
-  { categoria: 'plano ativo', caminho: /^docs\/modelar\/planos\/2026-10-25-renomear-para-modelar\.md$/, motivo: 'o plano da renomeação descreve o nome antigo para explicar a troca; sai desta lista quando o plano for movido para encerrados' },
   { categoria: 'aviso de leitura', caminho: /^tools\/ambiente\.(?:mjs|test\.mjs)$/, motivo: 'lê a variável MECANIFICA_* de propósito, com aviso, para o CI e o ambiente da pessoa mudarem sem quebrar' },
   { categoria: 'a régua', caminho: /^tools\/arquitetura\/nome-antigo(?:\.test)?\.mjs$/, motivo: 'a régua define o nome antigo para recusá-lo, e o teste dela o escreve em repositório de ensaio' },
   { categoria: 'configuração', caminho: /^\.codex\/config\.toml$/, motivo: 'a configuração do Codex da pessoa registra o servidor MCP pelo nome com que foi instalado; trocá-lo desliga o servidor até a pessoa reinstalar' },
