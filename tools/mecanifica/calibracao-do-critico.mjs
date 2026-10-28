@@ -366,6 +366,24 @@ export function prepararImagem(imagem, conjunto, raiz = RAIZ) {
   return preparada;
 }
 
+/* O que `prepararImagem` devolve depende só da fonte, do objeto da imagem, das medidas que o conjunto declara para a família, da raiz e,
+   numa fonte de esboço, do texto do arquivo; o resto é código, que não muda num processo. Preparar uma imagem é o que o gate mais gasta
+   (de 1 a 3 s por imagem, 12 imagens), e quem o chama várias vezes no mesmo processo (os testes do gate, que chamam o conferir com um
+   conjunto novo a cada caso) repetia a conta com as mesmas entradas. A chave leva todas essas entradas, e a imagem de outra fonte, de
+   outro remendo ou de outro arquivo é preparada de novo. O resultado guardado só é lido, nunca alterado, por quem o recebe. */
+const IMAGENS_PREPARADAS = new Map();
+export function prepararImagemGuardada(imagem, conjunto, raiz = RAIZ) {
+  const { fonte } = imagem;
+  let arquivo = null;
+  if (fonte.tipo === 'esboco') {
+    const caminho = resolve(raiz, fonte.arquivo);
+    arquivo = existsSync(caminho) ? sha256(semCR(readFileSync(caminho, 'utf8'))) : null;
+  }
+  const chave = JSON.stringify([fonte, imagem.objeto ?? null, conjunto.medidas?.familias?.[fonte.familia] ?? null, raiz, arquivo]);
+  if (!IMAGENS_PREPARADAS.has(chave)) IMAGENS_PREPARADAS.set(chave, prepararImagem(imagem, conjunto, raiz));
+  return IMAGENS_PREPARADAS.get(chave);
+}
+
 /** O que a imagem é, em uma frase: a fonte e a mutação declaradas. */
 export function descreverFonte(fonte) {
   if (fonte.tipo === 'esboco') {
@@ -449,7 +467,7 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
     if (ids && !ids.includes(imagem.id)) continue;
     const quem = `${imagem.id} ${imagem.nome}`;
     let p;
-    try { p = prepararImagem(imagem, conj, raiz); } catch (erro) {
+    try { p = prepararImagemGuardada(imagem, conj, raiz); } catch (erro) {
       if (!(erro instanceof ErroDaFonte || erro instanceof ErroDeCalibracao || (erro && erro.name === 'ErroChamadaDeFamilia') || (erro && erro.name === 'ErroFamilia') || (erro && erro.name === 'ErroDeEsboco'))) throw erro;
       reprovar(quem, 'fonte-nao-reproduz', erro.message);
       continue;

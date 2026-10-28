@@ -56,6 +56,20 @@ describe('o registro de famílias', () => {
     expect(outro.registroComposicoes).not.toBe(registro.registroComposicoes);
     expect(outro.registroComposicoes.assinatura).toBe(registro.registroComposicoes.assinatura);
   });
+
+  it('o registro das famílias do produto é montado uma vez por processo e é o mesmo que um registro novo da mesma lista', () => {
+    const doProduto = criarRegistroDeFamilias();
+    expect(criarRegistroDeFamilias()).toBe(doProduto);
+    expect(criarRegistroDeFamilias({ familias: FAMILIAS })).toBe(doProduto);
+    expect(Object.isFrozen(doProduto)).toBe(true);
+    /* outra lista com as mesmas famílias não é a do produto: monta um registro novo, e ele é igual ao guardado */
+    const novo = criarRegistroDeFamilias({ familias: [...FAMILIAS] });
+    expect(novo).not.toBe(doProduto);
+    expect(novo.familias).toEqual(doProduto.familias);
+    expect(novo.registroComposicoes.assinatura).toBe(doProduto.registroComposicoes.assinatura);
+    expect(novo.registroOperacoes.listar().map(({ id }) => id)).toEqual(doProduto.registroOperacoes.listar().map(({ id }) => id));
+    expect(JSON.stringify(novo.registroComposicoes.manifesto)).toBe(JSON.stringify(doProduto.registroComposicoes.manifesto));
+  });
 });
 
 describe('uma receita que chama a família', () => {
