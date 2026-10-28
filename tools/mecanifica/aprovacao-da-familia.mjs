@@ -24,6 +24,7 @@
  * esvazia o que o crítico e a pessoa tinham julgado, porque eles julgaram outra forma. Quem confere depois é
  * `conferirAprovacao` (o gate `familias:check`): o hash dos três pontos tem de continuar batendo. */
 import { fork } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { basename, join } from 'node:path';
@@ -32,7 +33,6 @@ import { analisarTopologia } from '../../procedural/nucleo/topologia.js';
 import {
   REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes, expandirChamadasDeComposicao, neutroCanonico,
 } from '../../procedural/nucleo/entrada.js';
-import { sha256Hex } from '../../procedural/nucleo/sha256.js';
 import { TOLERANCIA_CASCA, calcularCasca } from '../../procedural/nucleo/casca.js';
 import { medidasDaChapa } from '../../procedural/extensoes/chapa-dobrada/index.js';
 import { descreverEstrutura } from '../../procedural/extensoes/estrutura-de-barras/estrutura.js';
@@ -66,7 +66,7 @@ const CODIGOS_DE_MALHA_ABERTA = Object.freeze(['casca-aberta', 'aresta-nao-manif
 
 /* a impressão da geometria de uma peça executada, a que o `aprovacao.json` guarda por ponto (o conjunto de calibração do
    crítico a usa para conferir que o controle é a geometria aprovada) */
-export const hashDe = (neutro) => `sha256:${sha256Hex(JSON.stringify(neutroCanonico(neutro)))}`;
+export const hashDe = (neutro) => `sha256:${createHash('sha256').update(JSON.stringify(neutroCanonico(neutro))).digest('hex')}`;
 const numero = (valor) => (typeof valor === 'number' && Number.isFinite(valor) ? valor : null);
 const problema = (codigo, mensagem, extra = {}) => ({ codigo, mensagem, ...extra });
 /* doze algarismos significativos: tira o ruído de ponto flutuante do que vai para o arquivo, sem mexer em medida real */
@@ -190,14 +190,31 @@ export function extensoesMedidas(coletor) {
   });
 }
 
-/* Os registros de uma execução. Sem `medir`, as extensões são as nativas, sem embrulho. Cada execução recebe registros
-   novos: nada é guardado entre pontos. */
+/* O registro de composições de uma família é um valor imutável (as composições ficam congeladas e `resolver` devolve cópia) que
+   depende só das composições e das interfaces das operações, e montá-lo de novo a cada execução custava de 25% a 30% da
+   aprovação de uma família grande (13 s dos 47 s de `roda-pneu`). Cada família guarda o seu, um para as extensões medidas e um para as
+   nativas, e a guarda vale enquanto as composições da família são as mesmas (o mesmo objeto, na mesma ordem). */
+const REGISTROS_DE_COMPOSICOES = new WeakMap();
+
+function registroDeComposicoes(familia, medir, registroOperacoes) {
+  const guardado = REGISTROS_DE_COMPOSICOES.get(familia);
+  const composicoes = familia.composicoes;
+  const valido = guardado && guardado.composicoes.length === composicoes.length && guardado.composicoes.every((composicao, i) => composicao === composicoes[i]);
+  const entrada = valido ? guardado : { composicoes: [...composicoes], medido: null, nativo: null };
+  const chave = medir ? 'medido' : 'nativo';
+  if (!entrada[chave]) entrada[chave] = criarRegistroComposicoes({ composicoes: [...composicoes], resolverOperacao: registroOperacoes.resolver });
+  REGISTROS_DE_COMPOSICOES.set(familia, entrada);
+  return entrada[chave];
+}
+
+/* Os registros de uma execução. Sem `medir`, as extensões são as nativas, sem embrulho. O registro de operações é novo a cada
+   execução, com o coletor dela: nada que uma execução mede é guardado para a seguinte. */
 export function ambienteDaExecucao(familia, { medir }) {
   const coletor = [];
   const registroOperacoes = criarRegistroComExtensoes({
     registroBase: REGISTRO_OPERACOES, extensoes: medir ? extensoesMedidas(coletor) : [...EXTENSOES_NATIVAS],
   });
-  const registroComposicoes = criarRegistroComposicoes({ composicoes: [...familia.composicoes], resolverOperacao: registroOperacoes.resolver });
+  const registroComposicoes = registroDeComposicoes(familia, medir, registroOperacoes);
   return { coletor, execucao: execucaoDe({ registroComposicoes, registroOperacoes }) };
 }
 

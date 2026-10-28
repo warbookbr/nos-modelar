@@ -10,8 +10,8 @@ import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { medidasEsperadas } from '../../src/autoria/calibracao-do-critico.js';
 import {
   RAIZ, ErroDaFonte, brief, briefDaImagem, caminhoDoConjunto, chamadaDaFonte, conferir, conferirConjunto, descreverFonte, esbocoDaFonte, executarChamada,
-  faltaNoAgente, hashDaImagem, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, migrarImagemDosJulgamentos, modeloDoBrief, principal, registrar,
-  resumo, vazamentosDoBrief, vocabularioDoAgente,
+  faltaNoAgente, hashDaImagem, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, migrarImagemDosJulgamentos, modeloDoBrief, prepararImagem,
+  prepararImagemGuardada, principal, registrar, resumo, vazamentosDoBrief, vocabularioDoAgente,
 } from './calibracao-do-critico.mjs';
 import { hashDe } from './aprovacao-da-familia.mjs';
 import { linhasDoBriefDoObjeto } from './esboco.mjs';
@@ -477,5 +477,28 @@ describe('a pontuação no gate', () => {
     c.resultados.find((r) => r.imagem === 'c05').julgamentos[0].briefSha256 = SHA_FALSO;
     const r = conferirConjunto({ conjunto: c, so: 'c05' });
     expect(codigos(r)).toEqual(['julgamento-de-outro-brief']);
+  });
+});
+
+describe('a imagem preparada guardada', () => {
+  it('é a que prepararImagem calcula, na fonte de esboço, na de família e na de família mutada, e outra fonte dá outra imagem', () => {
+    const c = conjuntoNovo();
+    for (const nome of ['picape-baixa', 'facetado', 'controle-dobradica']) {
+      const img = imagem(c, nome);
+      const guardada = prepararImagemGuardada(img, c);
+      expect(JSON.stringify(guardada)).toBe(JSON.stringify(prepararImagem(img, c)));
+      expect(prepararImagemGuardada(structuredClone(img), c)).toBe(guardada);
+    }
+    const mutada = structuredClone(imagem(c, 'facetado'));
+    mutada.fonte.argumentos[0].valor = 16;
+    const outra = prepararImagemGuardada(mutada, c);
+    expect(outra).not.toBe(prepararImagemGuardada(imagem(c, 'facetado'), c));
+    expect(JSON.stringify(outra)).toBe(JSON.stringify(prepararImagem(mutada, c)));
+    expect(outra.fonteSha256).not.toBe(prepararImagemGuardada(imagem(c, 'facetado'), c).fonteSha256);
+    /* o remendo do esboço entra na chave: o desenho muda com ele */
+    const remendada = structuredClone(imagem(c, 'dobradicas-por-fora'));
+    const original = prepararImagemGuardada(remendada, c);
+    remendada.fonte.remendo = { plano: { familia: 'movel-de-caixa' }, parametros: { alturaPorta: 1700 } };
+    expect(prepararImagemGuardada(remendada, c).desenho).not.toBe(original.desenho);
   });
 });

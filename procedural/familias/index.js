@@ -43,8 +43,20 @@ export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,
  * registroOperacoes, registroComposicoes }`; `obter(id)` devolve a família ou lança `ErroFamilia` dizendo as que
  * existem. Recusa lista vazia e id de família repetido; composição repetida é recusada por `criarRegistroComposicoes`.
+ *
+ * O registro é um valor imutável (as composições ficam congeladas e os registros são `Object.freeze`), e o das famílias do produto
+ * (`FAMILIAS`, o padrão) é montado uma vez por processo: cada receita do acervo que chama as famílias o pedia de novo, e montá-lo
+ * (validar e copiar as composições das sete famílias) custava 0,25 s por receita, um quarto da varredura do acervo.
  */
+let registroDasFamiliasDoProduto = null;
 export function criarRegistroDeFamilias({ familias = FAMILIAS } = {}) {
+  if (familias === FAMILIAS && registroDasFamiliasDoProduto) return registroDasFamiliasDoProduto;
+  const registro = montarRegistroDeFamilias(familias);
+  if (familias === FAMILIAS) registroDasFamiliasDoProduto = registro;
+  return registro;
+}
+
+function montarRegistroDeFamilias(familias) {
   if (!Array.isArray(familias) || !familias.length) {
     throw new ErroFamilia({ campo: 'familias', valor: familias, aceito: 'lista com ao menos uma família carregada por definirFamilia' });
   }

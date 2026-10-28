@@ -2,14 +2,16 @@
    A prova: a família de fixture aprovada; a bucha com o raio da porta errado reprovada pela porta; a caixa de parede
    uniforme aprovada e a de entalhe reprovada pela parede da casca; o suporte com chapa e barras lido pelo planificado e
    pelo corte; e a família alterada depois da aprovação reprovada pelo conferir, dizendo qual ponto mudou. */
+import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { PASSOS as PASSOS_DA_ARTICULACAO } from '../../procedural/extensoes/articulacao/fixture.js';
 import {
-  REGISTRO_OPERACOES, criarRegistroComExtensoes,
+  REGISTRO_OPERACOES, criarRegistroComExtensoes, neutroCanonico,
 } from '../../procedural/nucleo/entrada.js';
+import { sha256Hex } from '../../procedural/nucleo/sha256.js';
 import { definirFamilia } from '../../src/autoria/chamar-familia.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { TUBO_DE_PROVA } from '../fixtures/familia-chamavel/familia.js';
@@ -19,7 +21,7 @@ import { criarSuporte } from '../fixtures/familia-com-chapa-e-barras/familia.js'
 import { criarCaixaOca } from '../fixtures/familia-com-casca/familia.js';
 import { COMPOSICOES as COMPOSICOES_DA_BUCHA, criarBucha } from '../fixtures/familia-com-porta/familia.js';
 import {
-  FORMATO_APROVACAO, LIMITE_DA_PAREDE_MAXIMA, aprovarFamilia, aprovarFamiliaEmParalelo, conferirAprovacao, escalasDosPerfis, extensoesMedidas, medicoesDaAprovacao,
+  FORMATO_APROVACAO, LIMITE_DA_PAREDE_MAXIMA, aprovarFamilia, aprovarFamiliaEmParalelo, ambienteDaExecucao, conferirAprovacao, escalasDosPerfis, extensoesMedidas, hashDe, medicoesDaAprovacao,
   medirPonto, pontosDaFamilia, pontosDosPerfis, varreduraDaFamilia,
 } from './aprovacao-da-familia.mjs';
 
@@ -89,6 +91,42 @@ describe('a aprovação com os pontos medidos em processos à parte', () => {
   it('o processo que cai com uma medição na mão faz a aprovação recusar, em vez de seguir sem ela', async () => {
     await expect(aprovarFamiliaEmParalelo(TUBO_DE_PROVA, { gravar: false, origem: { modulo: 'file:///nao/existe/familia.js', exportacao: 'X' }, fios: 2 })).rejects.toThrow(/o processo de medição terminou/);
   }, 120_000);
+});
+
+describe('o registro de composições guardado por família', () => {
+  /* `{ ...TUBO_DE_PROVA }` é outro objeto, sem registro guardado, e monta os registros como a aprovação os montava a cada execução */
+  const semGuardado = () => ({ ...TUBO_DE_PROVA });
+
+  it('é guardado por família e por modo de execução, e só enquanto as composições são as mesmas', () => {
+    const a = ambienteDaExecucao(TUBO_DE_PROVA, { medir: false }).execucao.registroComposicoes;
+    expect(ambienteDaExecucao(TUBO_DE_PROVA, { medir: false }).execucao.registroComposicoes).toBe(a);
+    const medido = ambienteDaExecucao(TUBO_DE_PROVA, { medir: true }).execucao.registroComposicoes;
+    expect(medido).not.toBe(a);
+    expect(ambienteDaExecucao(TUBO_DE_PROVA, { medir: true }).execucao.registroComposicoes).toBe(medido);
+    expect(medido.assinatura).toBe(a.assinatura);
+    const outra = semGuardado();
+    expect(ambienteDaExecucao(outra, { medir: false }).execucao.registroComposicoes).not.toBe(a);
+    expect(ambienteDaExecucao(outra, { medir: false }).execucao.registroComposicoes.assinatura).toBe(a.assinatura);
+    const trocada = { ...TUBO_DE_PROVA, composicoes: [...TUBO_DE_PROVA.composicoes] };
+    const antes = ambienteDaExecucao(trocada, { medir: false }).execucao.registroComposicoes;
+    trocada.composicoes = trocada.composicoes.slice(0, 1);
+    const depois = ambienteDaExecucao(trocada, { medir: false }).execucao.registroComposicoes;
+    expect(depois).not.toBe(antes);
+    expect(depois.assinatura).not.toBe(antes.assinatura);
+    expect(depois.manifesto).toHaveLength(1);
+  });
+
+  it('a aprovação com o registro guardado dá o resultado da que o monta a cada execução, bit a bit, e o hash é o do sha256 do núcleo', () => {
+    const guardado = JSON.stringify([aprovarFamilia(TUBO_DE_PROVA, { gravar: false }), aprovarFamilia(TUBO_DE_PROVA, { gravar: false })]);
+    const novo = JSON.stringify([aprovarFamilia(semGuardado(), { gravar: false }), aprovarFamilia(semGuardado(), { gravar: false })]);
+    expect(guardado).toBe(novo);
+    const { neutro } = executarReceita(
+      { PASSOS: [['cubo', { origemId: 1, larg: 0.2, alt: 0.1, prof: 0.3 }]], PARAMS: {}, TOPO: {}, ALIASES: [], MATERIAIS: {} },
+      { registroOperacoes: REGISTRO_OPERACOES },
+    );
+    expect(hashDe(neutro)).toBe(`sha256:${sha256Hex(JSON.stringify(neutroCanonico(neutro)))}`);
+    expect(hashDe(neutro)).toBe(`sha256:${createHash('sha256').update(JSON.stringify(neutroCanonico(neutro))).digest('hex')}`);
+  });
 });
 
 describe('os perfis da família: um ponto por perfil e a escala varrida', () => {
