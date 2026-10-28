@@ -83,6 +83,53 @@ describe('descrever-partes — régua headless', () => {
     }
   });
 
+  /* O vidro sobre a face inclinada: a cunha tem a hipotenusa em x + y = 1, e a placa assenta nela. As caixas se sobrepõem (a da placa entra na da cunha),
+     mas os sólidos só se tocam no plano inclinado. A tabela dizia `interpenetra` pela caixa; agora diz o que o sólido diz. `afastar` desloca a placa
+     ao longo da normal do plano: positivo afasta, negativo a enterra na cunha. */
+  const cunhaEPlaca = ({ afastar = 0 } = {}) => {
+    const e = 0.1 / Math.SQRT2;
+    const d = afastar / Math.SQRT2;
+    return nucleo([
+      ['extrusao', { origemId: 40, eixo: 'z', altura: 1, em: [0, 0, 0], perfil: [[0, 0], [1, 0], [0, 1]] }],
+      ['parte', { nome: 'cunha', sel: { origem: { op: 'extrusao', id: 40 } } }],
+      ['extrusao', { origemId: 41, eixo: 'z', altura: 1, em: [0, 0, 0], perfil: [[1 + d, 0 + d], [1 + d + e, d + e], [d + e, 1 + d + e], [d, 1 + d]] }],
+      ['parte', { nome: 'placa', sel: { origem: { op: 'extrusao', id: 41 } } }],
+    ], {}, {}, {}, null, []);
+  };
+  const relacaoDe = (neutro: any) => descreverPeca(neutro).relacoes[0];
+
+  it('a placa assentada na face inclinada encosta pelo sólido, embora as caixas se sobreponham', () => {
+    const r = relacaoDe(cunhaEPlaca());
+    expect(r.caixa.tipo).toBe('interpenetra');
+    expect(r.solido).toBe('encostam');
+    expect(r).toMatchObject({ tipo: 'encosta', distancia: 0 });
+  });
+
+  it('a placa afastada da face inclinada é folga pelo sólido, sem distância inventada', () => {
+    const r = relacaoDe(cunhaEPlaca({ afastar: 0.05 }));
+    expect(r.caixa.tipo).toBe('interpenetra');
+    expect(r.solido).toBe('separadas');
+    expect(r).toMatchObject({ tipo: 'folga', distancia: null });
+    const texto = formatarDescricao(descreverPeca(cunhaEPlaca({ afastar: 0.05 })), { peca: 'cunha' });
+    expect(texto).toMatch(/cunha\s+placa\s+folga\s+interpenetra/);
+  });
+
+  it('a placa enterrada na cunha continua interpenetra, e a caixa vira coluna própria', () => {
+    const neutro = cunhaEPlaca({ afastar: -0.05 });
+    const r = relacaoDe(neutro);
+    expect(r.solido).toBe('interpenetram');
+    expect(r.tipo).toBe('interpenetra');
+    expect(r.distancia).toBeGreaterThan(0);
+    expect(formatarDescricao(descreverPeca(neutro), { peca: 'cunha' })).toMatch(/a\s+b\s+relação\s+caixa\s+eixo/);
+  });
+
+  it('o par que a caixa já dava como folga ou encosta não é medido de novo nos sólidos', () => {
+    const r = descreverPeca(doisCubos({ dx: 0.9 })).relacoes[0];
+    expect(r.tipo).toBe('folga');
+    expect(r.caixa.tipo).toBe('folga');
+    expect('solido' in r).toBe(false);
+  });
+
   it('recusa consulta inválida em vez de devolver medição vazia', () => {
     const neutro = doisCubos();
     expect(() => caixaDaParte(neutro, 'ausente')).toThrow(/não tem parte/);

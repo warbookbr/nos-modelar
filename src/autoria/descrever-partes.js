@@ -38,13 +38,21 @@
    vez de virar segunda coluna: duas verdades sobre a mesma pergunta é o defeito,
    não a cura.
 
-   A medida é conservadora, e sempre para o MESMO lado: a caixa de um corpo é
-   maior ou igual ao corpo, então `folga` é limite inferior da folga real e
-   `interpenetra` pode ser das caixas sem que os sólidos se cruzem. A garantia
-   que importa é a inversa: `folga` e `encosta` NUNCA escondem invasão real —
-   se as caixas estão separadas, os sólidos também estão. Ela responde
-   "encosta? tem vão? se invadem? de quanto?", não substitui interseção de
-   sólidos.
+   A medida da caixa é conservadora, e sempre para o MESMO lado: a caixa de um
+   corpo é maior ou igual ao corpo, então `folga` é limite inferior da folga
+   real e a sobreposição de caixas pode existir sem que os sólidos se cruzem. A
+   garantia que importa é a inversa: `folga` e `encosta` NUNCA escondem invasão
+   real — se as caixas estão separadas, os sólidos também estão.
+
+   POR ISSO `interpenetra` SÓ SAI QUANDO O SÓLIDO CONFIRMA. O par cujas caixas
+   se sobrepõem é medido de novo pelo MESMO teste de sólidos do contato
+   declarado (`auditarParDeSolidos`, parte contra parte): se os sólidos
+   `encostam`, a relação sai `encosta`; se estão `separadas` (o vidro sobre uma
+   face inclinada, cuja caixa entra na do corpo e cujo sólido só toca o plano),
+   sai `folga`, sem distância medida (`distancia: null`); só `interpenetram` —
+   ou um sólido que a medida não decide, malha aberta — fica `interpenetra`. A
+   caixa não some: `caixa` guarda a relação das caixas e `solido` o estado
+   medido nos sólidos, para quem quiser ver os dois.
 
    Determinismo: nomes ordenados por ponto de código (nunca `localeCompare`, que
    depende do ICU do sistema), faces varridas em ordem de id, pares em ordem
@@ -72,6 +80,7 @@
    uma origem, a mesma de `sel:{origem}` e de `origemId`. */
 
 import { sha256Hex } from './assinatura-geometria.js';
+import { auditarParDeSolidos, prepararSolido } from './contato-de-solidos.js';
 
 /** Vão abaixo do qual duas caixas são consideradas encostadas (erro de ponto flutuante). */
 export const TOLERANCIA_CONTATO = 1e-9;
@@ -514,6 +523,51 @@ function relacaoEntrePartes(a, b, tolerancia) {
   return { a: a.nome, b: b.nome, ...classificar(vencedor[1], tolerancia) };
 }
 
+/* Os sólidos das partes, preparados sob demanda: uma parte só vira sólido quando um par dela tem caixas que se sobrepõem. Cada parte leva as faces dela
+   e os vértices que essas faces usam, a mesma decomposição de `solidosPorParte` (contatos-da-peca.js). Malha que o preparo recusa vira `null`: a relação
+   fica como a das caixas, nunca como folga inventada. */
+function solidosSobDemanda(neutro) {
+  const facesPorParte = new Map();
+  for (const face of neutro.F.values()) {
+    if (typeof face.parte !== 'string' || face.parte === '') continue;
+    if (!facesPorParte.has(face.parte)) facesPorParte.set(face.parte, []);
+    facesPorParte.get(face.parte).push(face);
+  }
+  const prontos = new Map();
+  return (nome) => {
+    if (!prontos.has(nome)) {
+      let solido = null;
+      try {
+        const V = new Map();
+        const F = new Map();
+        for (const face of facesPorParte.get(nome) ?? []) {
+          F.set(face.id, face);
+          for (const id of face.vs ?? []) if (!V.has(id)) V.set(id, neutro.V.get(id));
+        }
+        solido = prepararSolido({ V, F }, undefined, nome);
+      } catch { solido = null; }
+      prontos.set(nome, solido);
+    }
+    return prontos.get(nome);
+  };
+}
+
+/* A relação da caixa, corrigida pelo sólido quando a caixa diz `interpenetra`. */
+function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia) {
+  const { tipo, distancia, eixo, porEixo } = relacao;
+  const caixa = { tipo, distancia, eixo };
+  if (tipo !== 'interpenetra') return { ...relacao, caixa };
+  const sa = solidoDe(relacao.a);
+  const sb = solidoDe(relacao.b);
+  let estado = 'inconclusivo';
+  if (sa && sb) {
+    try { estado = auditarParDeSolidos(sa, sb, tolerancia).estado; } catch { estado = 'inconclusivo'; }
+  }
+  if (estado === 'encostam') return { ...relacao, tipo: 'encosta', distancia: 0, caixa, solido: estado };
+  if (estado === 'separadas') return { ...relacao, tipo: 'folga', distancia: null, porEixo, caixa, solido: estado };
+  return { ...relacao, caixa, solido: estado };
+}
+
 function selecionarNomes(partes, filtro, quem) {
   if (filtro === undefined || filtro === null) return [...partes.keys()];
   if (!Array.isArray(filtro)) {
@@ -647,9 +701,10 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
   const hierarquia = hierarquiaDasPartes(neutro, [...medido.partes.keys()], quem);
 
   const relacoes = [];
+  const solidoDe = solidosSobDemanda(neutro);
   for (let i = 0; i < escolhidas.length; i++) {
     for (let j = i + 1; j < escolhidas.length; j++) {
-      relacoes.push(relacaoEntrePartes(escolhidas[i], escolhidas[j], tolerancia));
+      relacoes.push(relacaoConfirmadaPorSolido(relacaoEntrePartes(escolhidas[i], escolhidas[j], tolerancia), solidoDe, tolerancia));
     }
   }
 
@@ -812,16 +867,19 @@ export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = 
 
   linhas.push('RELAÇÃO ENTRE PARTES — medida corpo a corpo, pelo par de corpos que decide');
   linhas.push(
-    'vão por eixo: positivo é folga, negativo é sobreposição. distância: em '
-    + '`folga` é a distância entre os corpos; em `interpenetra` é a menor '
-    + 'profundidade que separa os dois. Medida por caixa de corpo: `folga` é '
-    + 'limite inferior e `interpenetra` pode ser das caixas, não dos sólidos — '
-    + 'mas `folga` e `encosta` nunca escondem invasão real.',
+    'vão por eixo: positivo é folga, negativo é sobreposição, e é sempre o da caixa. '
+    + 'distância: em `folga` é a distância entre os corpos; em `interpenetra` é a menor '
+    + 'profundidade que separa as caixas dos dois. relação: das caixas, e corrigida pelo '
+    + 'sólido quando as caixas se sobrepõem — `interpenetra` só sai se os sólidos se cruzam '
+    + '(ou se a medida de sólidos não decide); sólidos que só se tocam saem `encosta`, e '
+    + 'sólidos afastados saem `folga` sem distância (—). caixa: o que as caixas diziam. '
+    + '`folga` e `encosta` nunca escondem invasão real.',
   );
   const colunasRelacao = [
     { titulo: 'a' },
     { titulo: 'b' },
     { titulo: 'relação' },
+    { titulo: 'caixa' },
     { titulo: 'eixo', direita: true },
     { titulo: 'distância', direita: true },
     { titulo: 'vão x', direita: true },
@@ -841,14 +899,15 @@ export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = 
   const relacoesMostradas = resumo
     ? (() => {
       const contato = descricao.relacoes.filter((r) => r.tipo !== 'folga');
+      /* a folga sem distância (sólidos afastados com as caixas se sobrepondo) vem antes: é a mais próxima que existe */
       const folgas = descricao.relacoes.filter((r) => r.tipo === 'folga')
-        .sort((a, b) => a.distancia - b.distancia);
+        .sort((a, b) => (a.distancia ?? 0) - (b.distancia ?? 0));
       return { itens: [...contato, ...folgas.slice(0, FOLGAS_NO_RESUMO)], omitidas: Math.max(0, folgas.length - FOLGAS_NO_RESUMO) };
     })()
     : { itens: descricao.relacoes, omitidas: 0 };
 
   const linhasRelacao = relacoesMostradas.itens.map((relacao) => [
-    relacao.a, relacao.b, relacao.tipo, relacao.eixo, n(relacao.distancia),
+    relacao.a, relacao.b, relacao.tipo, relacao.caixa?.tipo ?? relacao.tipo, relacao.eixo, relacao.distancia === null ? '—' : n(relacao.distancia),
     n(relacao.porEixo[0]), n(relacao.porEixo[1]), n(relacao.porEixo[2]),
   ]);
   linhas.push(...(linhasRelacao.length ? tabela(colunasRelacao, linhasRelacao) : ['(nenhum par)']));

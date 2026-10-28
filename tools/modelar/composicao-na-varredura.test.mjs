@@ -92,7 +92,7 @@ describe('o descrever de uma receita que compõe', () => {
     expect(porModulo.stdout).toBe(porObjeto.stdout);
     expect(porModulo.stdout).toBe(outraVez.stdout);
     expect(porModulo.resultado.descricao.totais).toMatchObject({ partes: 2, orfaos: 0, facesSemParte: 0 });
-    expect(porModulo.stdout).toMatch(/base\s+pilar\s+folga\s+y\s+0\.010000/);
+    expect(porModulo.stdout).toMatch(/base\s+pilar\s+folga\s+folga\s+y\s+0\.010000/);
   });
 
   it('sem o registro, recusa dizendo o que falta', async () => {
