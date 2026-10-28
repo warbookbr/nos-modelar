@@ -76,6 +76,14 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run bancada:fronteira:check
 
+      # O nome anterior do projeto só fica onde é dado gravado ou aviso de
+      # leitura, e cada exceção está declarada com o motivo em
+      # `tools/arquitetura/nome-antigo.mjs`; sem este passo o nome volta por um
+      # comando de skill ou uma mensagem de erro que nenhum outro gate lê.
+      - name: O nome antigo do projeto só fica nas exceções declaradas
+        if: ${{ !cancelled() }}
+        run: npm run nome:check
+
       # A-60. Sem este passo o gate existiria e nunca rodaria, que é a mesma
       # armadilha que o comentário de `vitest.config.ts` já descreve: o arquivo
       # está lá, ninguém o executa, e a cobertura é impressão. Ele é o ÚNICO

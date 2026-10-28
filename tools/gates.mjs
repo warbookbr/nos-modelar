@@ -96,7 +96,7 @@ function lerDuracoesDosTestes(gate, desde, raiz = RAIZ) {
    exatamente o buraco que ele existe para tapar. */
 export const GATES = [
   'typecheck', 'test:rapidos', 'test:lentos', 'mcp:visual:check', 'build',
-  'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check',
+  'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check', 'nome:check',
   /* As dez guardas que abrem a bancada (porteiro, bancada:vazia:check, guarda:portas, :camera, :par, :referencia, :escolha, :junta,
      :edicao e :gesto) rodam aqui dentro, num Chromium e num servidor do Vite só (tools/modelar/guardas/rodar-guardas.mjs). Cada
      uma continua sendo um script que roda sozinho, e o relatório do gate diz o nome e o veredito de cada uma. */
