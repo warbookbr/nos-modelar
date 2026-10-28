@@ -19,8 +19,8 @@ import { criarSuporte } from '../fixtures/familia-com-chapa-e-barras/familia.js'
 import { criarCaixaOca } from '../fixtures/familia-com-casca/familia.js';
 import { COMPOSICOES as COMPOSICOES_DA_BUCHA, criarBucha } from '../fixtures/familia-com-porta/familia.js';
 import {
-  FORMATO_APROVACAO, LIMITE_DA_PAREDE_MAXIMA, aprovarFamilia, conferirAprovacao, escalasDosPerfis, extensoesMedidas, medirPonto, pontosDaFamilia,
-  pontosDosPerfis, varreduraDaFamilia,
+  FORMATO_APROVACAO, LIMITE_DA_PAREDE_MAXIMA, aprovarFamilia, aprovarFamiliaEmParalelo, conferirAprovacao, escalasDosPerfis, extensoesMedidas, medicoesDaAprovacao,
+  medirPonto, pontosDaFamilia, pontosDosPerfis, varreduraDaFamilia,
 } from './aprovacao-da-familia.mjs';
 
 const raizes = [];
@@ -54,6 +54,41 @@ describe('os pontos e a varredura saem do contrato', () => {
     expect(sondas.map(({ rotulo }) => rotulo)).toEqual(['comprimento=20', 'comprimento=500', 'diametro=10', 'diametro=200', 'lados=8', 'lados=64', 'parede=0', 'parede=40']);
     expect(sondas[3].parametros).toEqual({ comprimento: 120, diametro: 200, lados: 24, parede: 3 });
   });
+});
+
+describe('a aprovação com os pontos medidos em processos à parte', () => {
+  const origem = { modulo: new URL('../fixtures/familia-chamavel/familia.js', import.meta.url).href, exportacao: 'TUBO_DE_PROVA' };
+
+  it('dá o mesmo resultado da aprovação num processo só, bit a bit, e as medições são as que a aprovação pede, na ordem', async () => {
+    const sincrono = aprovarFamilia(TUBO_DE_PROVA, { gravar: false });
+    const paralelo = await aprovarFamiliaEmParalelo(TUBO_DE_PROVA, { gravar: false, origem, fios: 3 });
+    expect(paralelo.aprovada).toBe(true);
+    expect(JSON.stringify(paralelo)).toBe(JSON.stringify(sincrono));
+    expect(medicoesDaAprovacao(TUBO_DE_PROVA.contrato).map(({ rotulo }) => rotulo)).toEqual([
+      'minimo', 'medio', 'maximo', 'comprimento=20', 'comprimento=500', 'diametro=10', 'diametro=200', 'lados=8', 'lados=64', 'parede=0', 'parede=40',
+    ]);
+  }, 120_000);
+
+  it('grava a aprovação como a de um processo só', async () => {
+    const pasta = pastaDa(TUBO_DE_PROVA);
+    const resultado = await aprovarFamiliaEmParalelo(TUBO_DE_PROVA, { pasta, data: '2026-10-28', origem, fios: 2 });
+    expect(resultado.gravada).toBe(true);
+    const outra = pastaDa(TUBO_DE_PROVA);
+    aprovarFamilia(TUBO_DE_PROVA, { pasta: outra, data: '2026-10-28' });
+    expect(lerAprovacao(pasta)).toEqual(lerAprovacao(outra));
+  }, 120_000);
+
+  it('sem origem, ou com um fio só, mede no próprio processo; contrato inválido volta como a aprovação o devolve', async () => {
+    const sincrono = aprovarFamilia(TUBO_DE_PROVA, { gravar: false });
+    expect(JSON.stringify(await aprovarFamiliaEmParalelo(TUBO_DE_PROVA, { gravar: false }))).toBe(JSON.stringify(sincrono));
+    expect(JSON.stringify(await aprovarFamiliaEmParalelo(TUBO_DE_PROVA, { gravar: false, origem, fios: 1 }))).toBe(JSON.stringify(sincrono));
+    const invalida = { contrato: { id: 'x' }, composicoes: [], derivar: () => ({}) };
+    expect((await aprovarFamiliaEmParalelo(invalida, { gravar: false, origem, fios: 3 })).problemas[0].codigo).toBe('contrato-invalido');
+  }, 120_000);
+
+  it('o processo que cai com uma medição na mão faz a aprovação recusar, em vez de seguir sem ela', async () => {
+    await expect(aprovarFamiliaEmParalelo(TUBO_DE_PROVA, { gravar: false, origem: { modulo: 'file:///nao/existe/familia.js', exportacao: 'X' }, fios: 2 })).rejects.toThrow(/o processo de medição terminou/);
+  }, 120_000);
 });
 
 describe('os perfis da família: um ponto por perfil e a escala varrida', () => {

@@ -4,13 +4,24 @@
    do teto, a tampa declarada, os cantos arredondados e a malha que não se atravessa); o
    comando (a fresta, o giro em torno do eixo da dobradiça, o curso sem tocar a parte fixa, o aileron diferencial); a hélice (as
    pás equiespaçadas, a raiz dentro do cubo, o cone de ogiva); as portas; cada restrição do contrato e os cinco perfis chamados só
-   pelo nome. A camada mecânica da aprovação, que mede os três pontos, os perfis e a escala deles, roda uma vez no fim. */
+   pelo nome. A camada mecânica da aprovação, que mede os três pontos, os perfis e a escala deles, roda uma vez no fim.
+
+   TEMPO (plano da bateria rápida, fatia 1, 2026-10-28). Sozinho, o arquivo levava 173 s (o caso das 36 asas sorteadas 82 s, a aprovação
+   mecânica 33 s e a hélice de nove pás 22 s) e agora leva 38 s e 38 s em duas medidas seguidas, com carga 2 em 4 processadores. Onde o
+   tempo ia: a medida de contato (`contato-de-solidos.js`, que a hélice de nove pás e a aprovação usam) refazia a conta de cada triângulo
+   por ponto, e o ajudante `atravessamentos` do teste comparava cada triângulo com todos os outros (13 s dos 18 que as 36 asas levam
+   agora); o núcleo serializava a malha inteira duas vezes por passo; e a aprovação media os 86 pontos um depois do outro, cada um
+   executando a família duas vezes. O ajudante varre em x e testa os mesmos pares (comparado com a versão de antes em todas as 76
+   chamadas do arquivo, 8 delas com atravessamento, com o mesmo resultado), o contato e o núcleo ficaram mais rápidos sem mudar o
+   resultado, e a aprovação mede os pontos em processos à parte (`aprovarFamiliaEmParalelo`, de `aprovacao-da-familia.mjs`, que dá o
+   mesmo resultado de `aprovarFamilia`, provado em `aprovacao-da-familia.test.mjs`). O arquivo continua conferindo tudo o que está
+   acima, com as mesmas amostras (36 asas, as 9 pás) e os mesmos limites. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever-partes.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { auditarParDeSolidos, prepararSolido } from '../../../src/autoria/contato-de-solidos.js';
-import { aprovarFamilia, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/mecanifica/aprovacao-da-familia.mjs';
+import { aprovarFamiliaEmParalelo, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/mecanifica/aprovacao-da-familia.mjs';
 import { analisarTopologia } from '../../nucleo/topologia.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
@@ -343,7 +354,10 @@ function triangulosSeCortam(a, b, folga) {
   return Boolean(ta && tb) && Math.min(ta[1], tb[1]) - Math.max(ta[0], tb[0]) > folga;
 }
 
-/** Quantos pares de triângulos da parte, sem vértice em comum, se cortam (a malha atravessa a si mesma). Para na `maximo`-ésima. */
+/** Quantos pares de triângulos da parte, sem vértice em comum, se cortam (a malha atravessa a si mesma). Para na `maximo`-ésima.
+ *  Os pares que se testam são os mesmos de antes (os de caixas que se tocam, dentro da folga, e sem vértice em comum), cada um com os
+ *  triângulos na ordem em que a parte os lista; a varredura em x só poupa as comparações de caixa dos que estão longe em x, que eram o
+ *  quadrado do número de triângulos (13 s das 36 asas sorteadas, medido em 2026-10-28, de um teste de 18 s). */
 function atravessamentos(neutro, nome, maximo = 1) {
   const triangulos = [];
   for (const face of neutro.F.values()) {
@@ -353,9 +367,15 @@ function atravessamentos(neutro, nome, maximo = 1) {
   const pontos = triangulos.map((t) => t.map((id) => neutro.V.get(id)));
   const caixas = pontos.map((t) => [0, 1, 2].map((e) => [Math.min(...t.map((p) => p[e])), Math.max(...t.map((p) => p[e]))]));
   const folga = 1e-7;
+  const porX = triangulos.map((_, i) => i).sort((a, b) => caixas[a][0][0] - caixas[b][0][0] || a - b);
   let achados = 0;
-  for (let i = 0; i < triangulos.length && achados < maximo; i++) {
-    for (let j = i + 1; j < triangulos.length && achados < maximo; j++) {
+  for (let p = 0; p < porX.length && achados < maximo; p++) {
+    const a = porX[p];
+    for (let q = p + 1; q < porX.length && achados < maximo; q++) {
+      const b = porX[q];
+      /* os seguintes começam em x depois do início deste: se um começa além do fim dele (mais a folga), os demais também */
+      if (caixas[b][0][0] > caixas[a][0][1] + folga) break;
+      const [i, j] = a < b ? [a, b] : [b, a];
       if (caixas[i].some(([min, max], e) => max < caixas[j][e][0] - folga || caixas[j][e][1] < min - folga)) continue;
       if (triangulos[i].some((id) => triangulos[j].includes(id))) continue;
       if (triangulosSeCortam(pontos[i], pontos[j], folga)) achados += 1;
@@ -1044,8 +1064,9 @@ describe('a camada mecânica da aprovação', () => {
     }
   }, 180_000);
 
-  it('a aprovação mecânica passa nos três pontos, nos cinco perfis, na varredura e na escala dos perfis', () => {
-    const resultado = aprovarFamilia(F, { gravar: false });
+  it('a aprovação mecânica passa nos três pontos, nos cinco perfis, na varredura e na escala dos perfis', async () => {
+    /* os pontos são medidos ao mesmo tempo, em processos que carregam a família deste módulo; o resultado é o de `aprovarFamilia` */
+    const resultado = await aprovarFamiliaEmParalelo(F, { gravar: false, origem: { modulo: new URL('./index.js', import.meta.url).href, exportacao: 'SUPERFICIE_AERODINAMICA' } });
     expect(resultado.problemas).toEqual([]);
     expect(resultado.aprovada).toBe(true);
     expect(Object.keys(resultado.perfis).sort()).toEqual(NOMES_DOS_PERFIS);

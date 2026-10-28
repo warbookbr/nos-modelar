@@ -34,10 +34,10 @@
    `esboco-silhueta.mjs`); 127 s com o casco convexo do recorte guardado pelos pontos (`cascoConvexo`, `recorte.js`).
 
    Plano da bateria rápida, fatia 1 (2026-10-28): de 130 s sozinho (medido em 2026-10-27; 159 s em 2026-10-28, com outra bateria na
-   máquina) para 50 s em duas medidas seguidas, com a máquina dividida com outra bateria (carga de 7 a 10 em 4 processadores). O
-   que se tirou, medido por etapa num processo só (142 s de CPU antes, 96 s depois): o SVG que a máscara não lê (`soCamada` em
-   `CAMADA_DA_SILHUETA`, ver `desenharEsboco` e `desenharBlocagem`; 20 s), a resolução da mesma opção refeita doze vezes por
-   esboço (`resolverOpcaoGuardada`; 15 s) e a blocagem, os 8 desenhos de cada opção e as 4 máscaras da blocagem passaram para
+   máquina) para 52 s e 52 s em duas medidas seguidas, com a máquina dividida com outra bateria (carga de 5 a 6 em 4 processadores). O
+   que se tirou, medido por etapa num processo só (142 s de CPU antes, 96 s depois, 46 s deles nos desenhos): o SVG que a máscara
+   não lê (`soCamada` em `CAMADA_DA_SILHUETA`, ver `desenharEsboco` e `desenharBlocagem`) e a resolução da mesma opção refeita doze
+   vezes por esboço (`resolverOpcaoGuardada`); e a blocagem, os 8 desenhos de cada opção e as 4 máscaras da blocagem passaram para
    processos à parte (`esboco-blocagem-medidas.mjs`), que começam antes dos outros testes e trabalham enquanto eles rodam, com os
    esboços repartidos por fila (o maior primeiro), porque o avião da segunda rodada sozinho leva 20 s e uma divisão fixa deixaria um
    processo com ele. Cada processo repete a decomposição convexa das malhas de família que toca (cerca de 40 s de CPU somados), e

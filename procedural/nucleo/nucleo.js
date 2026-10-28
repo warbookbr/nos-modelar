@@ -3360,6 +3360,8 @@ function portasDoNucleo(portas) {
    a serialização, e só a que mudou é serializada de novo. Valor que não é dado simples (Map, função, `toJSON`) nunca
    reaproveita nada, e a comparação em dúvida (NaN, por exemplo) conta como mudança, então o resultado é sempre o da
    serialização direta. */
+const NAO_COPIAVEL = Symbol('nao-copiavel');
+const CHAVES = Symbol('chaves');
 function copiaSimples(valor) {
   if (valor === null || typeof valor !== 'object') return typeof valor === 'function' || typeof valor === 'symbol' ? NAO_COPIAVEL : valor;
   if (Array.isArray(valor)) {
@@ -3374,47 +3376,58 @@ function copiaSimples(valor) {
   const proto = Object.getPrototypeOf(valor);
   if ((proto !== Object.prototype && proto !== null) || typeof valor.toJSON === 'function') return NAO_COPIAVEL;
   const saida = {};
-  for (const chave of Object.keys(valor)) {
+  const chaves = Object.keys(valor);
+  for (const chave of chaves) {
     const item = copiaSimples(valor[chave]);
     if (item === NAO_COPIAVEL) return NAO_COPIAVEL;
     saida[chave] = item;
   }
+  /* a ordem das chaves fica na própria cópia, sob um símbolo (que nem `Object.keys` nem `for...in` listam) */
+  saida[CHAVES] = chaves;
   return saida;
 }
-const NAO_COPIAVEL = Symbol('nao-copiavel');
 function igualASimples(copia, valor) {
   if (copia === valor) return true;
   if (copia === null || valor === null || typeof copia !== 'object' || typeof valor !== 'object') return false;
   if (Array.isArray(copia)) {
     if (!Array.isArray(valor) || copia.length !== valor.length) return false;
-    for (let i = 0; i < copia.length; i += 1) if (!igualASimples(copia[i], valor[i])) return false;
+    for (let i = 0; i < copia.length; i += 1) {
+      const a = copia[i]; const b = valor[i];
+      if (a !== b && !igualASimples(a, b)) return false;
+    }
     return true;
   }
   if (Array.isArray(valor)) return false;
   const proto = Object.getPrototypeOf(valor);
   if ((proto !== Object.prototype && proto !== null) || typeof valor.toJSON === 'function') return false;
-  const chaves = Object.keys(copia);
-  const chavesDoValor = Object.keys(valor);
-  if (chaves.length !== chavesDoValor.length) return false;
-  for (let i = 0; i < chaves.length; i += 1) {
-    if (chaves[i] !== chavesDoValor[i] || !igualASimples(copia[chaves[i]], valor[chaves[i]])) return false;
+  /* as chaves de `valor`, na ordem de `for...in` (a de `Object.keys`, porque o protótipo é o dos objetos simples), contra as da cópia */
+  const chaves = copia[CHAVES];
+  let i = 0;
+  for (const chave in valor) {
+    if (i >= chaves.length || chaves[i] !== chave || !igualASimples(copia[chave], valor[chave])) return false;
+    i += 1;
   }
-  return true;
+  return i === chaves.length;
 }
 export function retratarEntradas(mapa, anterior) {
   const retrato = new Map();
   for (const [id, valor] of mapa) {
     const antigo = anterior?.get(id);
-    if (antigo && antigo.copia !== NAO_COPIAVEL && igualASimples(antigo.copia, valor)) { retrato.set(id, antigo); continue; }
+    if (antigo !== undefined && antigo.copia !== NAO_COPIAVEL && igualASimples(antigo.copia, valor)) { retrato.set(id, antigo); continue; }
     retrato.set(id, { copia: copiaSimples(valor), json: JSON.stringify(valor) });
   }
   return retrato;
 }
 
-/* Os ids cuja entrada do retrato `depois` difere da de `antes`, em ordem de id (a ordem que a procedência sempre teve). */
+/* Os ids cuja entrada do retrato `depois` difere da de `antes`, em ordem de id (a ordem que a procedência sempre teve). A entrada
+   que é o mesmo objeto nos dois retratos é a que `retratarEntradas` reaproveitou, e não mudou. */
 export function idsMudados(antes, depois) {
-  return [...depois].filter(([id, { json }]) => antes.get(id)?.json !== json).map(([id]) => id)
-    .sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
+  const mudados = [];
+  for (const [id, entrada] of depois) {
+    const anterior = antes.get(id);
+    if (anterior !== entrada && anterior?.json !== entrada.json) mudados.push(id);
+  }
+  return mudados.sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
 }
 
 /* ----------------------------------------------------------------------------

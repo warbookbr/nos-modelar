@@ -9,15 +9,18 @@
  * que sobram. As conferências não usam o modelo da ferramenta: aplicam as edições a uma TABELA nova e rodam a receita e a leitura de
  * ondulação, sem fixar divisão nenhuma.
  *
- * TEMPO (plano da bateria rápida, fatia 1, 2026-10-28). Sozinho, o arquivo levava 174 s: o alisamento da chapa, o da dobra, a linha de
- * comando, a leitura da chapa com o erro, a conferência com as edições e o caso sem falha rodavam um depois do outro, e cada um é só
- * CPU. Agora o alisamento no processo do teste, a linha de comando, o caso da dobra e a leitura da chapa com o caso sem falha rodam ao
- * mesmo tempo, em quatro processos, e a conferência com as edições segue o alisamento no processo do teste. A ferramenta ficou mais
- * rápida sem mudar o que devolve (`procedural/nucleo/gaiola-por-rede-liso.test.mjs`, `src/autoria/contato-de-solidos-equivalencia.test.mjs`
- * e `procedural/nucleo/subdivisao.test.mjs` provam os trechos trocados contra o código anterior, bit a bit): o gradiente conjugado do
- * miolo trabalha sobre vetores de números, a substituição da fatoração LU lê índices contíguos e a busca de vizinhança da leitura de
- * ondulação consulta a vizinhança de cada face calculada uma vez. Medida: de antes e de depois no registro do plano. Continua
- * conferindo tudo o que está acima, com os mesmos limites. */
+ * TEMPO (plano da bateria rápida, fatia 1, 2026-10-28). Sozinho, o arquivo levava 174 s (medido em 2026-10-27): o alisamento da chapa, o
+ * da dobra, a linha de comando, a leitura da chapa com o erro, a conferência com as edições e o caso sem falha rodavam um depois do
+ * outro, e cada um é só CPU. Agora ele leva 49 s e 48 s em duas medidas seguidas, com carga 3 em 4 processadores: o alisamento no
+ * processo do teste, a linha de comando, o caso da dobra e a leitura da chapa com o caso sem falha rodam ao mesmo tempo, em quatro
+ * processos (`fixtures/alisar-rede-prova-casos.mjs`), e a conferência com as edições segue o alisamento no processo do teste. A
+ * ferramenta ficou mais rápida sem mudar o que devolve: o alisamento da chapa passou de 86 s para 32 s e o da dobra de 100 s para 40 s
+ * num processo só, e o relatório de cada um sai idêntico ao de antes (verificado com o relatório inteiro, bit a bit). O que mudou:
+ * o gradiente conjugado e a montagem do sistema do miolo trabalham sobre vetores de números
+ * (`procedural/nucleo/gaiola-por-rede-liso.test.mjs`), a substituição da fatoração LU lê índices contíguos
+ * (`procedural/nucleo/subdivisao.test.mjs`), a leitura de ondulação consulta a vizinhança de cada face calculada uma vez, a gaiola por
+ * rede guarda as curvas e os monitores que não mudam entre uma sonda e outra, e o ajuste com peso e o refino repetidos na leitura saem
+ * da memória (`procedural/nucleo/memoria-de-pura.test.mjs`). Continua conferindo tudo o que está acima, com os mesmos limites. */
 import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
