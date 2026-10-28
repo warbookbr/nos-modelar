@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1513 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1518 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2269,6 +2269,8 @@
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
+- `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
+- `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha as duas lascas da subtração de dois cilindros de 8 lados num perfil de perua, e diz a parte, a razão, os cantos …
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
@@ -2322,6 +2324,8 @@
 - `repositorio-revalidacao.test.ts` — Provas R01: persistência canônica, retomada, idempotência e conflito.
 - `resolver-caminho-receita.mjs` — resolver-caminho-receita.mjs — localizador flexível de receitas com confinamento seguro
 - `resolver-caminho-receita.test.mjs` — resolver-caminho-receita.test.mjs — testes unitários para resolução flexível e segura de receitas procedurais.
+- `retrato-do-acervo.mjs` — retrato-do-acervo.mjs — mede cada peça do acervo e compara dois retratos, para saber o que uma mudança no núcleo fez com as peças que já estavam aprovadas.
+- `retrato-do-acervo.test.mjs` — retrato-do-acervo.test.mjs — o retrato é determinístico, a comparação reprova a peça de ensaio de caixa alterada dizendo qual peça e o que mudou, e a linha d…
 - `revalidacao-cascata-r00.test.ts` — Provas executáveis da R00: identidade, estados, obsolescência e concorrência.
 - `revalidacao-resultados.test.ts` — Provas R03: resultado vinculado, histórico, obsolescência e CAS persistidos.
 - `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
@@ -2385,6 +2389,10 @@
 ## tools/modelar/fixtures/contorno-da-imagem/
 
 - `braco-sintetico.mjs` — braco-sintetico.mjs — as duas imagens sintéticas, desenhadas por código, com que o teste do contorno da imagem prova a ferramenta: uma vista lateral de um br…
+
+## tools/modelar/fixtures/lasca/
+
+- `receita.js` — Peça de ensaio da ferramenta `lasca`: o perfil lateral de uma perua, extrudado em x, menos dois cilindros de 8 lados com o eixo em x. Com o eixo a 390 mm de …
 
 ## tools/modelar/fixtures/receita-externa-cadeiras/
 
