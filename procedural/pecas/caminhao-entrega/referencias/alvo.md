@@ -7,7 +7,7 @@
 - Pacote: pacote A, arquivo `delivery.glb` (seis malhas: corpo, porta de trás e quatro rodas).
 - Licença: licença livre sem exigência de crédito, declarada no `License.txt` do pacote.
 - Página: endereço omitido
-- A malha não está no repositório (`importados/veiculos-livres/pacote-a/delivery.glb`, ignorado pelo git). `docs/mecanifica/veiculos-referencias.json` confirma o pacote.
+- A malha não está no repositório (`importados/veiculos-livres/pacote-a/delivery.glb`, ignorado pelo git). `docs/modelar/veiculos-referencias.json` confirma o pacote.
 - Referências versionadas: `fonte-vistas.png` e `fonte-partes.json` (em metro, escala 1,765, comprimento de 5,736 m). A frente está em +z e à esquerda na vista lateral, sem giro.
 - Sem texto nem marca: só cores e formas.
 

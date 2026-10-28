@@ -3,7 +3,7 @@
  * O gate da fatia 1 do plano da gaiola que segue as feições: numa chapa curva com um vão de cantos arredondados (50 mm) e um
  * arco recortado na borda, os anéis seguem a borda a menos de 0,5 mm, a malha sai só de quadriláteros fora dos vértices
  * extraordinários declarados, a moldura em relevo de 10 mm aparece com o diedro pedido, e duas execuções dão a mesma malha. A
- * leitura de ondulação da mesma chapa está em `tools/mecanifica/ondulacao-aneis.test.mjs`. */
+ * leitura de ondulação da mesma chapa está em `tools/modelar/ondulacao-aneis.test.mjs`. */
 import { describe, expect, it } from 'vitest';
 import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
 import { extraordinarios } from './gaiola-aneis.js';

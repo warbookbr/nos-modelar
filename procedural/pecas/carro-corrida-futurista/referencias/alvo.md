@@ -7,7 +7,7 @@
 - Pacote: pacote A, com o arquivo `race-future.glb` (cinco malhas: monocoque com asas e quatro rodas).
 - Licença: licença livre sem exigência de crédito, declarada no `License.txt` do pacote.
 - Página: endereço omitido
-- A malha não está no repositório (`importados/veiculos-livres/pacote-a/race-future.glb`, ignorado pelo git). A tabela `docs/mecanifica/veiculos-referencias.json` confirma o pacote.
+- A malha não está no repositório (`importados/veiculos-livres/pacote-a/race-future.glb`, ignorado pelo git). A tabela `docs/modelar/veiculos-referencias.json` confirma o pacote.
 - Referências versionadas: `fonte-vistas.png` e `fonte-partes.json` (em metro, escala 1,765, comprimento de 4,694 m, frente em +z).
 
 ## Medidas contra a fonte

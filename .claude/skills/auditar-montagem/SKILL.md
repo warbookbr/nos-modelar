@@ -13,7 +13,7 @@ o estado existente e não constrói: construir parte por parte é o laço de
 medidas de relação, interseção e impacto em cada junta.
 
 O contrato que ela aplica é
-[`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md):
+[`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md):
 distinção entre peça e montagem, composição recursiva, relações, propagação de
 alteração, invariantes e níveis de maturidade. Leia antes de julgar se uma
 montagem está certa — o que conta como erro está definido lá, não aqui.
@@ -100,7 +100,7 @@ Para uma montagem v5 construída por etapas, que ainda não está publicada,
 geometria e roda a mesma auditoria de interseções, com a profundidade de cada
 invasão, mais o apoio no chão quando a montagem declara `apoioNoChao`; o formato,
 as saídas e os limites estão em
-[`AUDITORIA-DA-MONTAGEM.md`](../../../docs/mecanifica/usar/AUDITORIA-DA-MONTAGEM.md).
+[`AUDITORIA-DA-MONTAGEM.md`](../../../docs/modelar/usar/AUDITORIA-DA-MONTAGEM.md).
 É o único comando que mede o apoio no chão.
 
 Para comparar poses, prefira alterações compactas endereçadas pelo id da

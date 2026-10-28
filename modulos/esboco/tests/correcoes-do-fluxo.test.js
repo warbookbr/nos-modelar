@@ -14,7 +14,7 @@ import { desenharEsboco } from '../src/index.js';
 import { medirEsboco } from '../src/descrever.js';
 import { editarEsboco } from '../src/editar.js';
 import { serializarComoOriginal } from '../src/ajustar.js';
-import { condutorArquivo, detalharArquivo, editarArquivo, integrarArquivo, lerArgumentos } from '../../../tools/mecanifica/esboco.mjs';
+import { condutorArquivo, detalharArquivo, editarArquivo, integrarArquivo, lerArgumentos } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const textoDaFixture = (nome) => readFileSync(new URL(nome, pasta), 'utf8');

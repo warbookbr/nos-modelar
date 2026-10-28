@@ -7,7 +7,7 @@ description: Transforma ajuste da bancada em receita: reescreve TABELA e mede se
 
 O contrato desta rodada — o que o arquivo salvo contém, por que a tolerância é
 meio milímetro e o que `ORIGENS` exige — está em
-[`docs/mecanifica/usar/AJUSTE-DA-BANCADA.md`](../../../docs/mecanifica/usar/AJUSTE-DA-BANCADA.md).
+[`docs/modelar/usar/AJUSTE-DA-BANCADA.md`](../../../docs/modelar/usar/AJUSTE-DA-BANCADA.md).
 
 A bancada é o espaço da pessoa e a receita é o que a IA lê. Esta rodada é a
 tradução entre os dois, e ela existe porque as duas coisas brigavam: para a

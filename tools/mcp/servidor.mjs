@@ -18,7 +18,7 @@ import { catalogoMontagensDoAmbiente, REGRA_ESCOPO_CATALOGO } from './catalogo-m
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
   criarProvedoresAutoriaAtiva, criarProvedoresAutoriaInativa,
-} from '../mecanifica/autoria-ativa.mjs';
+} from '../modelar/autoria-ativa.mjs';
 import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';

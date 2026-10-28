@@ -15,7 +15,7 @@ import {
   ANGULO_DE_ARESTA, ESTACOES_MAXIMAS, ladosDoContorno, passoAngularDe, segmentosDoCanto, TOLERANCIA_RELATIVA, toleranciaDe,
   densificar, densificarPerfil, normaisSuavesDasFaixas,
 } from '../src/suave.js';
-import { renderizarCamada } from '../../../tools/mecanifica/esboco.mjs';
+import { renderizarCamada } from '../../../tools/modelar/esboco.mjs';
 
 const resolver = (formas) => Object.fromEntries(resolverOpcao({ formas }).map((r) => [r.id, r]));
 const recusa = (formas, trecho) => {

@@ -2,7 +2,7 @@
  * suportes, na pose de pouso, com as superfícies de comando neutras.
  *
  * Quarta etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `asas` do esboço
- * aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
+ * aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
  * `aviao-detalhe-asas.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA).
  *
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada
@@ -34,7 +34,7 @@ import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.j
 import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';
 import { nucleo } from '../../../../../nucleo/entrada.js';
 
-const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const LADOS = [['D', 'd', 'direito'], ['E', 'e', 'esquerdo']];
 const porLado = (fazer) => LADOS.flatMap(([L, l, nome]) => fazer(L, l, nome));
 
@@ -531,10 +531,10 @@ const receita = {
   PLANO: {
     objeto: 'asa baixa de um avião monomotor de pequeno porte: as duas metades, cada uma com a ponta levantada, o flap e o aileron no bordo de fuga, os eixos deles e os suportes que os prendem',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
     ],
     escala: { medida: 'envergadura no esboço, de ponta a ponta das pontas levantadas', milimetros: 12825 },
     partes: [

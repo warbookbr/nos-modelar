@@ -7,7 +7,7 @@ import { carregarUniversoDependencias, criarUniversoDependencias } from './unive
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const CONFIGURACAO = join(RAIZ, 'tools/mcp/fixtures/universo-dependencias.json');
-const DIRETORIO_FIXTURE = join(RAIZ, 'tools/mecanifica/fixtures/mapa-dependencias');
+const DIRETORIO_FIXTURE = join(RAIZ, 'tools/modelar/fixtures/mapa-dependencias');
 
 describe('universo MCP de dependências', () => {
   it('resume o mapa completo sem transportar o mapa nem caminhos locais', async () => {

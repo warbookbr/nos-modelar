@@ -12,7 +12,7 @@
  * a cantoneira tem o ângulo reto na quina entre a face interna do pé (x ou z ±360) e a face de baixo da saia (y 565), e as duas
  * pernas de 50 mm encostam nelas.
  *
- * Origem: a forma e as medidas vêm da receita do externo `mesa_pes_recortados_escura` (tools/mecanifica/fixtures/receita-externa-balcoes),
+ * Origem: a forma e as medidas vêm da receita do externo `mesa_pes_recortados_escura` (tools/modelar/fixtures/receita-externa-balcoes),
  * convertida por `passosDoEsboco` e guardada como base no scratchpad. Esta reescrita mantém cada parte da base com diferença máxima
  * de 0,5 mm na caixa. A simetria em x e em z é exata: a base já era simétrica, e a tabela escreve os quatro quadrantes a partir do
  * mesmo número.

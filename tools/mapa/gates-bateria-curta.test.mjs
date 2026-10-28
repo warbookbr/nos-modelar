@@ -15,7 +15,7 @@ describe('escolha da bateria de gates', () => {
   });
 
   it('núcleo, ferramenta ou não saber o que mudou rodam tudo', () => {
-    expect(escolherBateria(['docs/mecanifica/INDEX.md', 'procedural/nucleo/nucleo.js']).bateria).toBe(GATES);
+    expect(escolherBateria(['docs/modelar/INDEX.md', 'procedural/nucleo/nucleo.js']).bateria).toBe(GATES);
     expect(escolherBateria(['tools/gates.mjs']).bateria).toBe(GATES);
     expect(escolherBateria(null).bateria).toBe(GATES);
     expect(escolherBateria([]).bateria).toBe(GATES);
@@ -26,7 +26,7 @@ describe('gates que só rodam quando muda o que conferem', async () => {
   const { filtrarPorCaminho } = await import('../gates.mjs');
   it('a guarda do acervo sai quando só mudou documento ou ferramenta alheia, e fica quando mudou peça, núcleo ou não se sabe', () => {
     const bateria = ['test:rapidos', 'guarda:acervo'];
-    expect(filtrarPorCaminho(bateria, ['docs/mecanifica/INDEX.md', 'tools/gates.mjs']).pulados).toEqual(['guarda:acervo']);
+    expect(filtrarPorCaminho(bateria, ['docs/modelar/INDEX.md', 'tools/gates.mjs']).pulados).toEqual(['guarda:acervo']);
     expect(filtrarPorCaminho(bateria, []).pulados).toEqual(['guarda:acervo']);
     expect(filtrarPorCaminho(bateria, ['procedural/pecas/aviao/asas/receita.js']).pulados).toEqual([]);
     expect(filtrarPorCaminho(bateria, ['src/autoria/x.js']).pulados).toEqual([]);

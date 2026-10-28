@@ -10,7 +10,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { usoDaOperacao } from '../../procedural/nucleo/uso-operacoes.js';
-import { receitaDoModulo } from '../mecanifica/importar-receita.mjs';
+import { receitaDoModulo } from '../modelar/importar-receita.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 /* As duas raizes que guardam receita: o acervo publicado e as fixtures de

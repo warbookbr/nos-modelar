@@ -1,7 +1,7 @@
 /* Fixture de teste: a família `bucha-de-prova`, um anel de revolução que publica a porta `assento` (anel que ocupa) na
    parede externa. `criarBucha({ erroDoRaioMm })` devolve a família com o raio da porta declarado errado por esse valor,
    para provar que a aprovação mecânica reprova a porta que não confere com a malha. Quem a usa é
-   `tools/mecanifica/aprovacao-da-familia.test.mjs`; mudar qualquer arquivo desta pasta muda o que ele prova. */
+   `tools/modelar/aprovacao-da-familia.test.mjs`; mudar qualquer arquivo desta pasta muda o que ele prova. */
 import { readFileSync } from 'node:fs';
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../procedural/nucleo/entrada.js';
 import { definirFamilia } from '../../../src/autoria/chamar-familia.js';

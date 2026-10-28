@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/empenagem-vertical-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-receita-2026-10-15/alvos/empenagem-vertical-composta.png",
     "nota": 9,
     "defeitos": [
       {
@@ -111,7 +111,7 @@
         {
           "tipo": "+",
           "linha": 5,
-          "texto": " * do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+          "texto": " * do esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
         },
         {
           "tipo": "+",
@@ -161,7 +161,7 @@
         {
           "tipo": "+",
           "linha": 15,
-          "texto": " * (`docs/mecanifica/usar/AUTORIA-DE-PECA.md`) com os parâmetros do módulo `derivaVertical` do esboço, e cortada na raiz e no vão do"
+          "texto": " * (`docs/modelar/usar/AUTORIA-DE-PECA.md`) com os parâmetros do módulo `derivaVertical` do esboço, e cortada na raiz e no vão do"
         },
         {
           "tipo": "+",
@@ -356,7 +356,7 @@
         {
           "tipo": "+",
           "linha": 54,
-          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+          "texto": "const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
         },
         {
           "tipo": "+",

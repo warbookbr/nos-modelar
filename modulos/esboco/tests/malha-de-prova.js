@@ -25,7 +25,7 @@ export function tuboOco({ n = 32, rExt = 20, rInt = 10, comprimento = 100, centr
 
 /* Um sólido por seções planas, como a asa: `secoes` seções elípticas de `n` pontos em planos de x constante, de raio que afina e centro
    que se desloca em y (a flecha, só depois de 40% da envergadura: a quebra torna a asa côncava), com as tampas das pontas. Cada seção tem dezenas de pontos exatamente no mesmo plano, a situação que
-   desempatava mal no casco incremental da asa de verdade (`tools/mecanifica/esboco-familias.test.mjs` a mede com a família). */
+   desempatava mal no casco incremental da asa de verdade (`tools/modelar/esboco-familias.test.mjs` a mede com a família). */
 export function asaDeSecoes({ secoes = 14, n = 60, envergadura = 12000, corda = 700, espessura = 160, afilamento = 0.5, flecha = 1800 } = {}) {
   const vertices = [];
   for (let k = 0; k < secoes; k++) {

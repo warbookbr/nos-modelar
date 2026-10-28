@@ -15,7 +15,7 @@ import { lerMontagemPersistida } from '../../../src/autoria/ler-montagem-persist
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { execucaoDe } from '../../../src/autoria/varrer-parametros.js';
-import { conferirMontagemDaFamilia, resolverMontagemDaFamilia } from '../../../tools/mecanifica/montagem-da-familia.mjs';
+import { conferirMontagemDaFamilia, resolverMontagemDaFamilia } from '../../../tools/modelar/montagem-da-familia.mjs';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { lerFamilia } from '../../../src/autoria/familia.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';

@@ -17,7 +17,7 @@
  *   `src/autoria/` não importa `src/bancada/`. O núcleo é headless e não
  *   conhece interface.
  *
- *   As ferramentas da IA — `tools/mecanifica/`, `tools/mcp/`, `tools/autoria/` —
+ *   As ferramentas da IA — `tools/modelar/`, `tools/mcp/`, `tools/autoria/` —
  *   também não. Elas rodam em terminal e em integração contínua, onde a bancada
  *   não existe.
  *
@@ -37,7 +37,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const PROIBIDO_IMPORTAR_BANCADA = ['src/autoria', 'tools/mecanifica', 'tools/mcp', 'tools/autoria'];
+const PROIBIDO_IMPORTAR_BANCADA = ['src/autoria', 'tools/modelar', 'tools/mcp', 'tools/autoria'];
 const EXTENSOES = ['.js', '.mjs', '.ts'];
 const ehTeste = (caminho) => /\.(test|spec)\.[^.]+$/.test(caminho);
 

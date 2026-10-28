@@ -11,7 +11,7 @@ import { area, volume } from '../../nucleo/fixtures/medidas-de-malha.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { receitaComParametros } from '../../../src/autoria/parametros-vivos.js';
 import { analisarTopologia } from '../../nucleo/topologia.js';
-import { ondulacaoDaReceita } from '../../../tools/mecanifica/ondulacao-da-superficie.mjs';
+import { ondulacaoDaReceita } from '../../../tools/modelar/ondulacao-da-superficie.mjs';
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const malha = (neutro) => {

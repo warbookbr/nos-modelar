@@ -14,7 +14,7 @@
 
    Segunda checagem: a ALCANÇABILIDADE. Todo `.md` sob `docs/` precisa ser
    alcançável, direta ou transitivamente, a partir de
-   `docs/mecanifica/INDEX.md`. Assim a porta de entrada pode ser curta e delegar
+   `docs/modelar/INDEX.md`. Assim a porta de entrada pode ser curta e delegar
    inventário e legado a índices especializados sem esconder documentação. */
 
 import { execFileSync } from 'node:child_process';
@@ -53,11 +53,11 @@ const ALLOWLIST = new Map([
   ['docs/nos-herdado/walkthrough_colaborador4.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
   ['docs/nos-herdado/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
   /* Registro de crítica gravado do ciclo 6. A prancha do freio virou referência
-     por peça e mudou para `docs/mecanifica/pecas/` em 2026-08-31; o registro
+     por peça e mudou para `docs/modelar/pecas/` em 2026-08-31; o registro
      preserva o caminho como era no dia da crítica. Corrigir o caminho aqui
      seria reescrever evidência encerrada, que é a linha que a reorganização se
      proibiu de cruzar. */
-  ['docs/mecanifica/historico/ciclo6/criticas.json:docs/mecanifica/PRANCHA-FREIO-DISCO.md', 'evidência congelada preserva o caminho da época; a folha vive hoje em docs/mecanifica/pecas/'],
+  ['docs/modelar/historico/ciclo6/criticas.json:docs/modelar/PRANCHA-FREIO-DISCO.md', 'evidência congelada preserva o caminho da época; a folha vive hoje em docs/modelar/pecas/'],
 ]);
 
 let saidaGit;
@@ -150,7 +150,7 @@ for (const arquivo of rastreados.filter((f) => f.endsWith('.md') && !ehZonaHisto
 }
 
 /* --- alcançabilidade: todo doc parte do índice curado do Modelar --- */
-const PORTA_ENTRADA = 'docs/mecanifica/INDEX.md';
+const PORTA_ENTRADA = 'docs/modelar/INDEX.md';
 
 /* Citar uma PASTA cobre o que está dentro dela. A lista é EXPLÍCITA, e não
    uma regra geral de "pasta citada cobre o conteúdo", porque títulos de seção
@@ -166,7 +166,7 @@ function referenciasDocsDe(arquivo) {
     if (todosDocsMd.includes(m[0])) refs.add(m[0]);
   }
   /* Link relativo também liga um documento ao outro. Contar só o caminho
-     absoluto obrigaria todo doc a repetir `docs/mecanifica/...` no texto só
+     absoluto obrigaria todo doc a repetir `docs/modelar/...` no texto só
      para o gate enxergar — e um índice que aponta os seus vizinhos com
      `](./X.md)`, que é o normal, apareceria como se não apontasse ninguém. */
   PADRAO_RELATIVO.lastIndex = 0;

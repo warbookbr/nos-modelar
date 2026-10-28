@@ -23,7 +23,7 @@ import { CALOMBO, CAIXA, abaixo, obj } from './chapa-com-abertura-de-prova.mjs';
 
 const BLENDER = process.env.MECANIFICA_BLENDER;
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
-const RECEITA_LISA = join(AQUI, '../mecanifica/fixtures/ondulacao-prova-lisa.js');
+const RECEITA_LISA = join(AQUI, '../modelar/fixtures/ondulacao-prova-lisa.js');
 const RODADA = (n) => join(AQUI, `receitas-de-prova/chapa-rodada-${n}.js`);
 
 // a abertura com folga em volta, pela posição que a primeira versão dá a ela, e o calombo, e um trecho que ninguém mexe

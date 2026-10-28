@@ -14,14 +14,14 @@ O laço começa depois da rodada de
 cumprir nem contra o que julgar.
 
 Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de declarar pronto ou pedir o aceite, faça o passo de
-[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
+[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
 
 
 ## O processo leve, para objeto de uma família
 
 Medido nos aparelhos de caixa (2026-10-16): uma família que já cobre o objeto, com perfis, torna o laço completo desnecessário. Use o processo leve quando o objeto é um perfil de uma família existente, ou uma família nova de forma simples, de uma caixa com frente (porta, painel, botões, puxador, pés). Não o use quando o objeto exige geometria que nenhuma família tem, quando tem partes que se movem ou quando a pessoa pediu o laço completo.
 
-O processo leve não depende de laço por unidade. Um `modelador` escreve a família e os perfis, o `critico-visual` cego olha uma prancha com os perfis lado a lado em uma ou duas rodadas, e o processo para na terceira rodada sem chegar a 8; o laço completo de uma peça vai até 6 rodadas, como diz a definição única em `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`. A forma continua sendo aprovada pela pessoa em imagem, com `npm run familia -- aprovar <id>`.
+O processo leve não depende de laço por unidade. Um `modelador` escreve a família e os perfis, o `critico-visual` cego olha uma prancha com os perfis lado a lado em uma ou duas rodadas, e o processo para na terceira rodada sem chegar a 8; o laço completo de uma peça vai até 6 rodadas, como diz a definição única em `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md`. A forma continua sendo aprovada pela pessoa em imagem, com `npm run familia -- aprovar <id>`.
 
 Ao mudar uma faixa ou uma opção da família depois da aprovação, o hash dos pontos extremos muda e a aprovação da pessoa se esvazia. Termine as mudanças de faixa antes de pedir o aceite, e peça o aceite uma vez só, com a prancha final.
 
@@ -31,7 +31,7 @@ O custo medido: a família levou cerca de 294 mil tokens (91 chamadas, 100 mil s
 
 Um objeto de várias partes é construído uma etapa por vez, na ordem de
 `etapas` da montagem v5
-([`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md)).
+([`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md)).
 Cada etapa é uma parte: ela nasce com o tamanho e a posição que os vínculos e
 as posições por porta tiram das partes já fixas, e a junta com elas é medida
 quando ela entra. Uma peça de uma parte só é uma etapa só.
@@ -79,7 +79,7 @@ está fixa e etapa que tem posterior fixa ou quebrada; nesse caso reabra da
 Pergunte a ação antes de qualquer coisa, sempre:
 
 ```bash
-node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
+node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
 ```
 
 **modelar** — despache o modelador com o plano, os contatos e, da segunda
@@ -95,7 +95,7 @@ o `atrito` da rodada.
 prancha, o modelador e o crítico recebem as mesmas três imagens, nesta ordem:
 a imagem de referência, a prancha com as cotas e o mapa de partes
 com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
-uma, e `docs/mecanifica/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
+uma, e `docs/modelar/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
 crítico sem contar como a peça foi feita.
 
 **revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que grava as
@@ -116,7 +116,7 @@ diferença do esboço vai à pessoa, que decide se a receita a corrige. Quando a
 vistas montadas saem com o quadro na caixa da peça e as etapas já construídas em volta: duas vezes o crítico errou por ver a peça
 pequena demais no conjunto, e o relatório diz quanto do quadro ela ocupa. Se a peça ainda não está entre as etapas construídas, o
 relatório avisa que não há vista montada. O que o crítico recebe e não recebe, o veredito e o limite de rodadas estão em
-[O laço do crítico](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico); aqui vale também
+[O laço do crítico](../../../docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico); aqui vale também
 não mandar o que mudou, porque contar como foi feito faz revisão virar
 concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem inventar nota.
 
@@ -138,7 +138,7 @@ plano, e o comando reconhece o formato sozinho. Dele sai o último bloco ```json
 do último texto do assistente:
 
 ```bash
-node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar \
+node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar \
   --modelador <arquivo do modelador> --critico <arquivo do crítico> \
   --atrito "o defeito foi do plano: a referência não mostra a fenda"
 ```
@@ -165,7 +165,7 @@ cat > /tmp/rodada.json <<'JSON'
   "notaDePassagem": "folga de 0,2 no furo porque o pino e retificado"
 }
 JSON
-node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
+node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
 ```
 
 A rodada não fecha sem `partes`; `nota` é número de 0 a 10 e `observacao` não
@@ -197,7 +197,7 @@ blender -b --factory-startup --python tools/blender/conferir-refino.py -- \
 
 Com a receita (`.js`) nas duas rodadas, a conferência compara só as partes que estão nas duas, que são a lataria que o crítico julgou, e não acusa a peça que a rodada de refino acrescentou por cima (um friso de lábio, uma moldura em volta do vão): ela sai à parte, em `conferencia-notas.md`, como parte nova, com a zona em que cai, e a que sumiu sai do mesmo modo. `--partes chapa,teto` escolhe as partes por nome e `--todas-as-partes` compara tudo. Com OBJ, que não traz partes, a comparação inclui tudo e a nota diz isso; nesse caso o friso acrescentado aparece como superfície nova na zona, e convém dar a conferência com a receita. As notas são suas e não vão ao modelador nem ao crítico. Se uma parte nova e uma sumida caem na mesma zona, pode ser a lataria renomeada, e você roda de novo com `--todas-as-partes`.
 
-A conferência devolve em `conferencia.json` o deslocamento entre as duas superfícies, no total e por zona, e em `mexidas` cada zona certa em que a superfície andou mais que a tolerância (3 mm por padrão, declarável no arquivo, na zona ou na linha de comando), com o lugar e o quanto; `conferencia-<vista>.png` traz o mapa do deslocamento com sinal e as zonas desenhadas. As opções, o sinal e o que ela não enxerga estão em [`REGUA-E-PACOTE-CEGO.md`](../../../docs/mecanifica/blender/REGUA-E-PACOTE-CEGO.md). Se alguma zona saiu mexida, você não chama o crítico: devolve ao modelador o texto de `conferencia.md`, que diz a zona, o quanto, onde e para que lado, pede a zona de volta à posição anterior e roda a conferência de novo sobre a candidata que ele devolver. O crítico só é chamado quando nenhuma zona está mexida, e não recebe a conferência nem a lista de zonas, porque contar como a rodada foi conduzida faz revisão virar concordância. Se o modelador responde que a zona teve de andar para corrigir outro defeito, você não decide: registra a zona, o quanto e o motivo dele no `atrito` da rodada e leva o caso à pessoa. Escreva no mesmo `atrito` quantas devoluções a rodada teve.
+A conferência devolve em `conferencia.json` o deslocamento entre as duas superfícies, no total e por zona, e em `mexidas` cada zona certa em que a superfície andou mais que a tolerância (3 mm por padrão, declarável no arquivo, na zona ou na linha de comando), com o lugar e o quanto; `conferencia-<vista>.png` traz o mapa do deslocamento com sinal e as zonas desenhadas. As opções, o sinal e o que ela não enxerga estão em [`REGUA-E-PACOTE-CEGO.md`](../../../docs/modelar/blender/REGUA-E-PACOTE-CEGO.md). Se alguma zona saiu mexida, você não chama o crítico: devolve ao modelador o texto de `conferencia.md`, que diz a zona, o quanto, onde e para que lado, pede a zona de volta à posição anterior e roda a conferência de novo sobre a candidata que ele devolver. O crítico só é chamado quando nenhuma zona está mexida, e não recebe a conferência nem a lista de zonas, porque contar como a rodada foi conduzida faz revisão virar concordância. Se o modelador responde que a zona teve de andar para corrigir outro defeito, você não decide: registra a zona, o quanto e o motivo dele no `atrito` da rodada e leva o caso à pessoa. Escreva no mesmo `atrito` quantas devoluções a rodada teve.
 
 ## Antes de corrigir, atribua o defeito
 

@@ -21,7 +21,7 @@ import {
 const VISTAS = ['isometrica', 'frontal', 'direita', 'superior'];
 const REVISAO = /^r[0-9]+$/;
 const TEMPO_LIMITE_BANCADA = 90_000;
-const OLHAR_BANCADA = join(RAIZ_REPOSITORIO, 'tools/mecanifica/olhar-bancada.mjs');
+const OLHAR_BANCADA = join(RAIZ_REPOSITORIO, 'tools/modelar/olhar-bancada.mjs');
 const PLATAFORMAS_POSIX = new Set([
   'aix', 'android', 'darwin', 'freebsd', 'linux', 'netbsd', 'openbsd', 'sunos',
 ]);

@@ -4,7 +4,7 @@
  * integração contínua: o núcleo procedural (`procedural/nucleo/`), as receitas (`procedural/pecas/`), as extensões e os
  * serviços de `procedural/`, os módulos (`modulos/`) e a autoria (`src/autoria/`). Three.js entra só no adaptador de
  * inspeção, que converte o neutro para a bancada, e na bancada (`src/bancada/`), que a fronteira da bancada
- * (`npm run bancada:fronteira:check`) já separa da autoria. O texto de `docs/mecanifica/ARQUITETURA.md` diz o mesmo: o
+ * (`npm run bancada:fronteira:check`) já separa da autoria. O texto de `docs/modelar/ARQUITETURA.md` diz o mesmo: o
  * núcleo "resolve parâmetros, topologia, identidades, portas, materiais declarados e malha neutra sem conhecer Three.js".
  *
  * A metade "e do domínio automotivo" do invariante não se confere por máquina: o que é caso especial de carro depende do

@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { desenharEsboco, ErroDeEsboco, explodir, resolverOpcao } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
 import { descreverGrupoDaProjecao, descreverProjecao, FATORES_DA_SUGESTAO, FOLGA_MINIMA_PADRAO, MAXIMO_PADRAO, medirProjecaoDaOpcao, relatarOpcao, TIPO_DO_ACHADO, verificarProjecao } from '../src/projecao.js';
-import { analisarEsboco, ESCALA_RELATIVA_MINIMA, variante } from '../../../tools/mecanifica/esboco.mjs';
+import { analisarEsboco, ESCALA_RELATIVA_MINIMA, variante } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });
 const esboco = (formas, contato = {}, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], contato: { usar: true, folga: 500, ...contato }, ...extra });
@@ -211,18 +211,18 @@ describe('sobreposição na projeção', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'projecao-'));
     const arq = join(pasta, 'p.esboco.json');
     writeFileSync(arq, JSON.stringify(esboco(ladoALado(), { tolerancia: 10 })));
-    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--estrito'], { encoding: 'utf8' });
+    const r = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq, '--estrito'], { encoding: 'utf8' });
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('sobreposição na projeção (limiar 15%, informativo): aviso');
     expect(r.stdout).toContain('[T] sobreposição na projeção: na vista lateral, b cobre a em 100% (a folga real entre elas é 10,0 mm); na vista frontal elas não se cobrem');
     expect(r.stdout.indexOf('contato (')).toBeLessThan(r.stdout.indexOf('sobreposição na projeção ('));
     writeFileSync(arq, JSON.stringify(esboco(ladoALado(), { tolerancia: 10, projecao: { reprova: true } })));
-    const rr = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--estrito'], { encoding: 'utf8' });
+    const rr = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq, '--estrito'], { encoding: 'utf8' });
     expect(rr.status).toBe(1);
     expect(rr.stdout).toContain('reprova): reprovado');
     const desligado = join(pasta, 'd.esboco.json');
     writeFileSync(desligado, JSON.stringify({ opcoes: [{ formas: ladoALado() }] }));
-    expect(spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', desligado], { encoding: 'utf8' }).stdout).not.toContain('projeção');
+    expect(spawnSync(process.execPath, ['tools/modelar/esboco.mjs', desligado], { encoding: 'utf8' }).stdout).not.toContain('projeção');
   }, 120000);
 
   it('a análise grava projecao no manifesto, gera as variantes explodida e transparente e não gera sem achado', async () => {
@@ -373,11 +373,11 @@ describe('ruído da projeção', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'ruido-'));
     const arq = join(pasta, 'n.esboco.json');
     writeFileSync(arq, JSON.stringify(esboco(ladoALado(30, 5, 5), { folga: 500 }, { contato: { usar: true, folga: 500, projecao: { folgaMinima: 0 } } })));
-    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--analise', '--rapido', '--sugerir'], { encoding: 'utf8' });
+    const r = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq, '--analise', '--rapido', '--sugerir'], { encoding: 'utf8' });
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('AVISO: a explosão sugerida não converge, e 1 dos 2 achados continuam com ela');
     writeFileSync(arq, JSON.stringify(esboco(ladoALado(30, 30, 30))));
-    const bom = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--analise', '--rapido', '--sugerir'], { encoding: 'utf8' });
+    const bom = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq, '--analise', '--rapido', '--sugerir'], { encoding: 'utf8' });
     expect(bom.stdout).toContain('explosão sugerida [T]');
     expect(bom.stdout).not.toContain('não converge');
   }, 120000);
@@ -386,7 +386,7 @@ describe('ruído da projeção', () => {
     const pasta = mkdtempSync(join(tmpdir(), 'ruido-'));
     const arq = join(pasta, 'f.esboco.json');
     writeFileSync(arq, JSON.stringify(esboco(Array.from({ length: 14 }, (_, k) => caixa(`f${k}`, [k * 30, 0, 0])), { folga: 500 })));
-    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq, '--analise', '--rapido'], { encoding: 'utf8' });
+    const r = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq, '--analise', '--rapido'], { encoding: 'utf8' });
     expect(r.status).toBe(0);
     const linhas = r.stdout.split('\n').filter((l) => l.includes('sobreposição na projeção: na vista'));
     expect(linhas).toHaveLength(10);

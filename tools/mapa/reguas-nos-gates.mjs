@@ -23,7 +23,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GATES } from '../gates.mjs';
-import { GUARDAS } from '../mecanifica/guardas/rodar-guardas.mjs';
+import { GUARDAS } from '../modelar/guardas/rodar-guardas.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -51,7 +51,7 @@ export const FORA_DOS_GATES = new Map([
      quem quer rodar uma sozinha. A lista é a do próprio runner, então guarda nova entra nos dois lugares de uma vez. */
   ...GUARDAS.filter((g) => ehRegua(g.nome)).map((g) => [
     g.nome,
-    'roda dentro do gate `bancada:guardas` (tools/mecanifica/guardas/rodar-guardas.mjs), que divide um navegador e um servidor '
+    'roda dentro do gate `bancada:guardas` (tools/modelar/guardas/rodar-guardas.mjs), que divide um navegador e um servidor '
     + 'entre as guardas da bancada; fica como script para quem quer rodar só esta',
   ]),
 ]);

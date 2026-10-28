@@ -10,7 +10,7 @@ import { ErroDeEsboco, resolverOpcao } from '../src/index.js';
 import { expandirEsboco } from '../src/expandir.js';
 import { descreverEsboco, formatarDescricao, formatarForma, formatarResumo, medirEsboco } from '../src/descrever.js';
 import { imagemDoAchado, pontoDoAchado } from '../src/achado.js';
-import { achadoArquivo, analisarEsboco, descreverArquivo, lerArgumentos } from '../../../tools/mecanifica/esboco.mjs';
+import { achadoArquivo, analisarEsboco, descreverArquivo, lerArgumentos } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const caminho = (nome) => fileURLToPath(new URL(nome, pasta));

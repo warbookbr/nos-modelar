@@ -7,7 +7,7 @@ import {
   carregarCatalogoMontagens, catalogoMontagensDoAmbiente,
   criarCatalogoMontagensVazio, VARIAVEL_CATALOGO_MCP_MONTAGENS,
 } from './catalogo-montagens.mjs';
-import { SYMLINK, avisarSymlinkAusente } from '../mecanifica/capacidade-symlink.mjs';
+import { SYMLINK, avisarSymlinkAusente } from '../modelar/capacidade-symlink.mjs';
 
 avisarSymlinkAusente();
 
@@ -37,7 +37,7 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
 
   it('revalida peça candidata somente nas raízes explicitamente autorizadas', async () => {
     const catalogo = carregarCatalogoMontagens(CONFIGURACAO);
-    const candidata = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
+    const candidata = JSON.parse(readFileSync(resolve('tools/modelar/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
     const resultado = await catalogo.revalidarPeca('bloco-gabarito', candidata);
     expect(resultado.cobertura).toBe('catalogo-explicito');
     expect(resultado.raizes.map(({ id, usa, estado }) => ({ id, usa, estado }))).toEqual([
@@ -48,9 +48,9 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
 
   it('compõe raiz e peça ativas sobre a base estática sem confundir ID com arquivo', async () => {
     const base = carregarCatalogoMontagens(CONFIGURACAO);
-    const montagemAtiva = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+    const montagemAtiva = JSON.parse(readFileSync(resolve('tools/modelar/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
     montagemAtiva.instancias.find(({ id }) => id === 'movel').pose.deslocamento[1] = 1.04;
-    const pecaAtiva = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
+    const pecaAtiva = JSON.parse(readFileSync(resolve('tools/modelar/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
     pecaAtiva.V = pecaAtiva.V.map(([id, x, y, z]) => [id, x, y * 0.5, z]);
     const chamadas = [];
     const catalogo = base.comProvedores({
@@ -83,9 +83,9 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
 
   it('revalida a candidata contra a montagem ativa, não contra uma raiz obsoleta', async () => {
     const base = carregarCatalogoMontagens(CONFIGURACAO);
-    const montagemAtiva = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+    const montagemAtiva = JSON.parse(readFileSync(resolve('tools/modelar/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
     montagemAtiva.instancias.find(({ id }) => id === 'movel').pose.deslocamento[1] = 1.01;
-    const candidata = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
+    const candidata = JSON.parse(readFileSync(resolve('tools/modelar/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
     const catalogo = base.comProvedores({
       async carregarMontagem(id) { return id === 'gabarito-separacao-direcional' ? montagemAtiva : null; },
     });

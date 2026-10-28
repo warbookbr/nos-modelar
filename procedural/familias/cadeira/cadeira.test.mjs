@@ -14,7 +14,7 @@ import { CADEIRA, CONTRATO_DA_CADEIRA } from './index.js';
 import { COMPOSICOES, combinacoes } from './composicoes.js';
 import { combinacaoDaCadeira, contatoEntreCaixas, degrausEntreCaixas, envolventeDasCaixas, geometriaDaCadeira, idDaCadeira } from './geometria.js';
 import { criarRegistroDeFamilias } from '../index.js';
-import { ALVOS, compararPerfil } from '../../../tools/mecanifica/cadeiras-medida.mjs';
+import { ALVOS, compararPerfil } from '../../../tools/modelar/cadeiras-medida.mjs';
 
 const registro = criarRegistroDeFamilias({ familias: [CADEIRA] });
 const rodar = (parametros) => executarReceita({ get CHAMADAS_COMPOSICOES() { return [chamar(CADEIRA, 'corpo', parametros)]; } }, registro);

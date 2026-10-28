@@ -7,7 +7,7 @@ import {
 } from './calibracao-do-critico.js';
 import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
 
-const CONJUNTO = new URL('../../docs/mecanifica/banco-de-provas/calibracao-do-critico/conjunto.json', import.meta.url);
+const CONJUNTO = new URL('../../docs/modelar/banco-de-provas/calibracao-do-critico/conjunto.json', import.meta.url);
 const lido = () => JSON.parse(readFileSync(CONJUNTO, 'utf8'));
 /* o conjunto versionado com `resultados` esvaziado: o estado vazio não depende do que já foi julgado */
 const lidoSemResultados = () => ({ ...lido(), resultados: [] });

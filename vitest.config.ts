@@ -8,7 +8,7 @@ const MODO = process.env.MECANIFICA_TESTES;
 
 export default defineConfig({
   test: {
-    /* `.mjs` também. A regra nasceu de `tools/mecanifica/sistema-freio.test.mjs`,
+    /* `.mjs` também. A regra nasceu de `tools/modelar/sistema-freio.test.mjs`,
        que existia desde a Fase 4 e NUNCA rodou, porque o include só aceitava
        `.test.ts`. Arquivo de teste que o runner não enxerga é pior que teste
        nenhum — dá a impressão de cobertura que não existe.

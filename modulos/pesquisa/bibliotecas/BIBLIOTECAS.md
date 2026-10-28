@@ -6,7 +6,7 @@ exportação STEP). Licença e data foram conferidas no registro do pacote quand
 indicado; o resto ficou sem conferir e precisa ser visto antes de qualquer uso.
 O que entrou no plano ativo (a `CrossSection` e o `levelSet` do Manifold, e o
 replicad como plano B da casca) está no [contexto do
-plano](../../../docs/mecanifica/historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md).
+plano](../../../docs/modelar/historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md).
 
 | Biblioteca | Licença | O que faz | Recomendação |
 |---|---|---|---|

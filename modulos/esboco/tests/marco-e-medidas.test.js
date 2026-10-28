@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { avancar, criarEstado, registrarVeredito, unidadesNovasDoMarco } from '../src/condutor.js';
-import { briefDoMarco, condutorArquivo, medidasArquivo, PERGUNTAS_DO_MARCO } from '../../../tools/mecanifica/esboco.mjs';
+import { briefDoMarco, condutorArquivo, medidasArquivo, PERGUNTAS_DO_MARCO } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });
 const medida = (nome, valor, mede, extra = {}) => ({ nome, valor, unidade: 'mm', origem: 'ficha', tolerancia: 1, mede, ...extra });

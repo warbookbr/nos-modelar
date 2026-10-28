@@ -11,9 +11,9 @@ import { expandirEsboco } from '../src/expandir.js';
 import { perguntasDoComponente, perguntasDoEsboco } from '../src/perguntas.js';
 import { CRITERIOS } from '../../../procedural/criterios/index.js';
 import { PERGUNTA_ABERTA, TETO_POR_COMPONENTE, TETO_POR_FAMILIA, linhasDasPerguntas, lerPerguntasDoComponente } from '../../../src/autoria/perguntas-do-critico.js';
-import { PERGUNTAS_DO_CRITICO, PERGUNTAS_DO_OBJETO, briefDoObjeto } from '../../../tools/mecanifica/esboco.mjs';
+import { PERGUNTAS_DO_CRITICO, PERGUNTAS_DO_OBJETO, briefDoObjeto } from '../../../tools/modelar/esboco.mjs';
 
-const GUARDA_ROUPA = new URL('../../../docs/mecanifica/banco-de-provas/rodada-2026-10-08/guarda-roupa/guarda-roupa.esboco.json', import.meta.url);
+const GUARDA_ROUPA = new URL('../../../docs/modelar/banco-de-provas/rodada-2026-10-08/guarda-roupa/guarda-roupa.esboco.json', import.meta.url);
 const guardaRoupa = (familia = 'movel-de-caixa') => {
   const e = JSON.parse(readFileSync(GUARDA_ROUPA, 'utf8'));
   if (familia !== null) e.plano.familia = familia;

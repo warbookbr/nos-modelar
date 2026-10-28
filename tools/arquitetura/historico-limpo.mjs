@@ -26,7 +26,7 @@ const AQUI = dirname(fileURLToPath(import.meta.url));
 export const ARQUIVO_DOS_CAMINHOS = join(AQUI, 'caminhos-proibidos.hashes.json');
 
 /* Malhas que o próprio projeto gerou por código, como fixturas dos importadores que saíram em 2026-10-25: não são de terceiros. */
-export const MALHAS_SINTETICAS = [/^tools\/mecanifica\/fixtures\/importar-(step|stl)\//];
+export const MALHAS_SINTETICAS = [/^tools\/modelar\/fixtures\/importar-(step|stl)\//];
 
 export const hashDoCaminho = (caminho) => createHash('sha256').update(caminho).digest('hex');
 

@@ -7,7 +7,7 @@
 - Pacote: pacote A, com o arquivo `garbage-truck.glb` (sete malhas: braço, caçamba de lixo, carroceria e quatro rodas).
 - Licença: licença livre sem exigência de crédito, declarada no `License.txt` do pacote.
 - Página: endereço omitido
-- A malha não está no repositório (`importados/veiculos-livres/pacote-a/garbage-truck.glb`, ignorado pelo git). `docs/mecanifica/veiculos-referencias.json` confirma o pacote (`pacote-a`, modelo `garbage-truck`).
+- A malha não está no repositório (`importados/veiculos-livres/pacote-a/garbage-truck.glb`, ignorado pelo git). `docs/modelar/veiculos-referencias.json` confirma o pacote (`pacote-a`, modelo `garbage-truck`).
 - Referências versionadas: `fonte-vistas.png` (quatro vistas), `fonte-partes.json` (silhuetas em fatias, em metro, escala 1,765, 6089 mm de comprimento) e `folha-comparativa.png`.
 - Orientação: a frente do caminhão está em +z e na lateral da fonte fica à esquerda; não foi preciso girar.
 

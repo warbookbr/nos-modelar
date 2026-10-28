@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — exportador MJS exercitado pela fixture privada.
-import { exportarPeca } from '../mecanifica/exportar-peca.mjs';
+import { exportarPeca } from '../modelar/exportar-peca.mjs';
 import placaBase from './fixtures/ensaio-ponta-a-ponta/receitas/placa-base.mjs';
 import suportePortas from './fixtures/ensaio-ponta-a-ponta/receitas/suporte-portas.mjs';
 import pinoGuia from './fixtures/ensaio-ponta-a-ponta/receitas/pino-guia.mjs';

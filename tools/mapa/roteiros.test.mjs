@@ -120,9 +120,9 @@ describe('o gate leitura:obrigatoria recusa', () => {
       return d;
     });
     /* Montado por partes para o gate de links não tomar o documento de mentira por citação quebrada. */
-    const solto = ['docs', 'mecanifica', 'usar', 'SOLTO.md'].join('/');
+    const solto = ['docs', 'modelar', 'usar', 'SOLTO.md'].join('/');
     gravar(solto, '# Solto\n');
-    gravar('docs/mecanifica/usar/README.md', '# Usar\n');
+    gravar('docs/modelar/usar/README.md', '# Usar\n');
     const problemas = conferirLeituraObrigatoria(raiz).problemas.join('\n');
     expect(problemas).toContain('grupo modelar: falta a pergunta em "perguntas"');
     expect(problemas).toContain('pergunta "voar": não há grupo com esse nome');

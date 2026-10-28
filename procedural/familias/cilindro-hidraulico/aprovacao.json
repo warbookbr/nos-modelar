@@ -264,7 +264,7 @@
   },
   "critico": {
     "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
     "julgamentos": 2,
     "regra": "menor nota de dois críticos cegos independentes, por ponto",
     "rodadas": [
@@ -302,7 +302,7 @@
   "pessoa": {
     "data": "2026-10-11",
     "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
     "pontos": {
       "minimo": {
         "hash": "sha256:72650b64fe9e4d75fdbeccc2ff09722102f8ebbd439cfc863234890a6eac42ec"

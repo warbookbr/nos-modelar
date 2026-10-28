@@ -28,7 +28,7 @@ declara reta uma prancha torta, e o defeito sobrevive à revisão.
 Você é despachado para UMA etapa e não toca nas partes já fixas. A parte desta
 etapa nasce encostada nelas: o tamanho de cada encaixe vem de um vínculo de
 medida, e a posição vem do encaixe de porta, na montagem v5 descrita em
-[`MONTAGENS-SEMANTICAS.md`](../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md).
 Nenhum número de encaixe é digitado na receita. Se a parte fixa não publica a
 porta de que você precisa, diga isso em vez de contornar.
 
@@ -59,7 +59,7 @@ contrato de autoria que ela aponta. Além dele, estas regras deste papel:
 - **Nenhuma posição é digitada à mão.** A `TABELA`, em milímetros, carrega a
   medida, `derivar()` calcula a posição e `gerarPassos()` a converte para metro
   com `m()`, como manda a cadeia de
-  [`AUTORIA-DE-PECA.md`](../../docs/mecanifica/usar/AUTORIA-DE-PECA.md).
+  [`AUTORIA-DE-PECA.md`](../../docs/modelar/usar/AUTORIA-DE-PECA.md).
 - **Declare os contatos antes de medir**, com motivo escrito. Declarar depois de
   ver o vermelho transforma o veredito em carimbo.
 
@@ -67,7 +67,7 @@ Prove com os comandos do repositório antes de devolver:
 
 ```bash
 npm run descrever -- <peça>
-node tools/mecanifica/conferir-pontos.mjs <peça>
+node tools/modelar/conferir-pontos.mjs <peça>
 npm run guarda:acervo
 npm run guarda:referencial
 ```

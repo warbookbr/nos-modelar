@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { criarCampanhaRevalidacao } from '../../../src/autoria/protocolo-revalidacao.js';
-import { persistirCampanhaRevalidacao } from '../../mecanifica/repositorio-revalidacao.mjs';
+import { persistirCampanhaRevalidacao } from '../../modelar/repositorio-revalidacao.mjs';
 import { criarFerramentasRevalidacao } from './revalidacao.mjs';
 
 const hash = (letra) => `sha256:${letra.repeat(64)}`;

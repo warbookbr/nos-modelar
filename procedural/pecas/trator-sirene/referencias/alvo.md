@@ -2,7 +2,7 @@
 
 ## Origem
 
-Modelo "tractor-police" do pacote A, de autor A, pacote pacote-a, arquivo `tractor-police.glb`. Autor: autor A. Licença livre sem exigência de crédito (declarada no `License.txt` do pacote). Página: endereço omitido. A malha não está no repositório (`importados/veiculos-livres/pacote-a/tractor-police.glb`, ignorado pelo git). Referências versionadas: `fonte-vistas.png` e `fonte-partes.json` (escala 1,765, caixa centrada em z 0). A origem confere com `docs/mecanifica/veiculos-referencias.json` (pacote A, tractor-police). Sem texto, marca nem brasão: só cores e as lentes da sirene. Na lateral da fonte a frente está à esquerda.
+Modelo "tractor-police" do pacote A, de autor A, pacote pacote-a, arquivo `tractor-police.glb`. Autor: autor A. Licença livre sem exigência de crédito (declarada no `License.txt` do pacote). Página: endereço omitido. A malha não está no repositório (`importados/veiculos-livres/pacote-a/tractor-police.glb`, ignorado pelo git). Referências versionadas: `fonte-vistas.png` e `fonte-partes.json` (escala 1,765, caixa centrada em z 0). A origem confere com `docs/modelar/veiculos-referencias.json` (pacote A, tractor-police). Sem texto, marca nem brasão: só cores e as lentes da sirene. Na lateral da fonte a frente está à esquerda.
 
 ## Medidas contra a fonte
 

@@ -2,7 +2,7 @@
    que o andaime tem de dar, a rotação que gira o perfil, as aproximações com o relatório de perdas (loft, casca, inclinação,
    caixa com raio ou chanfro, cilindro achatado e o componente recolhido), o que fica de fora com o motivo, os ids em slug, as
    regiões, a recusa do conjunto no modo estrito e a determinação. A prova sobre as fixtures do esboço está em
-   `tools/mecanifica/esboco-para-andaime.test.mjs`. */
+   `tools/modelar/esboco-para-andaime.test.mjs`. */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { normalizarAndaimeGlobal } from './forma-global.js';

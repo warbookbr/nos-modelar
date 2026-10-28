@@ -3,7 +3,7 @@
  * Medido em 2026-10-28: as dez guardas que abrem a bancada (`porteiro`, `bancada:vazia:check` e as oito `guarda:*` de navegador)
  * subiam cada uma o próprio Chromium e, cinco delas, o próprio servidor do Vite, e somavam uns 250 s. O cache de
  * pré-empacotamento do Vite é um só em `node_modules/.vite`, e dois servidores subindo juntos reescreviam o cache um do outro.
- * O gate `bancada:guardas` (tools/mecanifica/guardas/rodar-guardas.mjs) sobe um servidor e um navegador uma vez e roda as
+ * O gate `bancada:guardas` (tools/modelar/guardas/rodar-guardas.mjs) sobe um servidor e um navegador uma vez e roda as
  * guardas em sequência, cada uma no próprio processo e na própria página; ele avisa o ambiente pelas duas variáveis abaixo.
  *
  * Sem as variáveis (a guarda rodada sozinha, por `npm run guarda:camera`, por exemplo) tudo continua como antes: cada guarda sobe

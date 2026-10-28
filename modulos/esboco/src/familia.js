@@ -5,7 +5,7 @@
    (E7 do `ATRITOS.md`), que não alcançava a roda 2.0 nem o cilindro hidráulico pelo JSON e usou o componente `roda` e cilindros por
    `ligar`, e a asa e a hélice de `superficie-aerodinamica` passam pela mesma porta.
 
-   O módulo não importa o núcleo, nem a família, nem Three.js: quem conhece as famílias é um adaptador (`tools/mecanifica/
+   O módulo não importa o núcleo, nem a família, nem Three.js: quem conhece as famílias é um adaptador (`tools/modelar/
    esboco-familias.mjs`), que chama `chamar`, executa a receita e entrega ao módulo o dado `mecanifica.malha@1` (ver `malha.js`): a
    superfície do sólido em milímetro, as partes da família e as portas dela como âncoras. O adaptador entra por
    `definirProvedorDeFamilias`, a mesma ideia da porta de injeção do nível zero do Condutor, mas guardada aqui porque a geometria da

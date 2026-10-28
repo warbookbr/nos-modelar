@@ -1,14 +1,14 @@
 /* ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 
    POR QUE ESTE ARQUIVO EXISTE SEPARADO. O escritor mora em
-   `tools/mecanifica/exportar-peca.mjs` e importa `node:fs`, `node:path` e
+   `tools/modelar/exportar-peca.mjs` e importa `node:fs`, `node:path` e
    `node:crypto`: ele grava arquivo, e isso é trabalho de bancada. O leitor roda
    no NAVEGADOR do cliente e não pode arrastar nada disso junto.
 
    Então o formato tem duas pontas em arquivos diferentes, e essa separação é
    uma dívida que precisa de disciplina: quem mudar o formato tem de mexer nos
    dois. O que segura isso é o teste de ida-e-volta em
-   `tools/mecanifica/exportar-peca.test.ts`, que escreve com um e lê com o
+   `tools/modelar/exportar-peca.test.ts`, que escreve com um e lê com o
    outro, e compara o triângulo desenhado no fim.
 
    ESTE MÓDULO É PURO. Sem `node:`, sem Three.js, sem DOM. É o que permite ele

@@ -165,10 +165,10 @@ def ler_zonas(caminho):
 
 
 def receita_para_obj(caminho):
-    """Exporta a receita (.js/.mjs) para um OBJ em metro, numa pasta temporária, com tools/mecanifica/exportar-obj.mjs."""
+    """Exporta a receita (.js/.mjs) para um OBJ em metro, numa pasta temporária, com tools/modelar/exportar-obj.mjs."""
     destino = tempfile.mkdtemp(prefix='refino-')
     obj = os.path.join(destino, os.path.splitext(os.path.basename(caminho))[0] + '.obj')
-    r = subprocess.run([os.environ.get('MECANIFICA_NODE', 'node'), os.path.join(RAIZ, 'tools', 'mecanifica', 'exportar-obj.mjs'),
+    r = subprocess.run([os.environ.get('MECANIFICA_NODE', 'node'), os.path.join(RAIZ, 'tools', 'modelar', 'exportar-obj.mjs'),
                         f'--arquivo={os.path.abspath(caminho)}', f'--saida={obj}', '--sobrescrever'],
                        capture_output=True, text=True, cwd=RAIZ)
     if r.returncode != 0:

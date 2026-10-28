@@ -8,8 +8,8 @@ import { expandirEsboco } from '../src/expandir.js';
 import { medirPar, pecasDe, verificarContato } from '../src/contato.js';
 import { descreverEsboco, formatarDescricao } from '../src/descrever.js';
 import { retanguloArredondado } from '../../../procedural/nucleo/contorno.js';
-import { ajuda, TETO_DO_TOPICO } from '../../../tools/mecanifica/esboco-ajuda.mjs';
-import { textoDaRecusa, topicoDaRecusa } from '../../../tools/mecanifica/esboco-recusa.mjs';
+import { ajuda, TETO_DO_TOPICO } from '../../../tools/modelar/esboco-ajuda.mjs';
+import { textoDaRecusa, topicoDaRecusa } from '../../../tools/modelar/esboco-recusa.mjs';
 
 const resolver = (formas) => Object.fromEntries(resolverOpcao({ formas }).map((r) => [r.id, r]));
 /* resolve as formas de um esboço com parâmetros e expressões, como o desenho as lê */

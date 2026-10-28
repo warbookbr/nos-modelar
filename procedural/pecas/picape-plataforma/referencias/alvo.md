@@ -1,6 +1,6 @@
 # Alvo: picape-plataforma
 
-Origem: modelo `truck-flat` do pacote A, de autor A, licença livre sem exigência de crédito, endereço omitido (confirmado em docs/mecanifica/veiculos-referencias.json). A malha fica fora do repositório, em importados/veiculos-livres/pacote-a/truck-flat.glb. Em referencias/ ficam fonte-vistas.png e fonte-partes.json (metro, escala 1,765). Frente em +z, à esquerda na lateral.
+Origem: modelo `truck-flat` do pacote A, de autor A, licença livre sem exigência de crédito, endereço omitido (confirmado em docs/modelar/veiculos-referencias.json). A malha fica fora do repositório, em importados/veiculos-livres/pacote-a/truck-flat.glb. Em referencias/ ficam fonte-vistas.png e fonte-partes.json (metro, escala 1,765). Frente em +z, à esquerda na lateral.
 
 Medidas: 4846 mm de comprimento, 2648 mm de largura com espelhos, 2295 mm de altura; rodas de 1060 mm de diâmetro em z 1381 e -1125. As faces da malha foram lidas em milímetro para o corpo, a saia, as abas dos arcos, a borda da caçamba e a cabine (meia largura 971 mm na base e 794 mm no teto).
 

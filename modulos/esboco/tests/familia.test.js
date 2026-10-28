@@ -1,7 +1,7 @@
 /* A forma de família do esboço (`tipo: "familia"`, `src/familia.js`): o módulo recebe a malha de um provedor injetado e a trata como
    as outras formas, em cada leitura (posição por âncora e relação, desenho, gate de contato, medidas, descrever, formas resolvidas).
    O provedor aqui é de mentira, um tubo de parede com uma porta na boca, para provar o módulo sem importar o núcleo; a prova com a
-   roda 2.0 e o cilindro hidráulico de verdade está em `tools/mecanifica/esboco-familias.test.mjs` (o caso do trem do avião, E7 do
+   roda 2.0 e o cilindro hidráulico de verdade está em `tools/modelar/esboco-familias.test.mjs` (o caso do trem do avião, E7 do
    `ATRITOS.md`). */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ancorasDe, desenharEsboco, ErroDeEsboco, nomesDeAncoras, resolverOpcao } from '../src/index.js';

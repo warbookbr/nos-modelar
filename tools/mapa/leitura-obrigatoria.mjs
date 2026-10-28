@@ -7,7 +7,7 @@
  * criar uma peça.
  *
  * As listas moram nos roteiros por intenção, em
- * `docs/mecanifica/roteiros/roteiros.json`: cada roteiro diz o que se lê antes
+ * `docs/modelar/roteiros/roteiros.json`: cada roteiro diz o que se lê antes
  * de começar (soma no orçamento) e o que se abre só quando a condição aparece
  * (não soma). A lista é explícita de propósito. Derivá-la de links
  * transformaria o número no tamanho do grafo inteiro, que é justamente a

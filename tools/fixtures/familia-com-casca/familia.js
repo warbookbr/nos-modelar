@@ -2,7 +2,7 @@
    `comEntalhe: false` (a família que a aprovação mecânica aprova) só há a caixa de seis faces, de parede uniforme. Com
    `comEntalhe: true` o parâmetro `entalhe` (0 ou 1) escolhe uma caixa com um entalhe em V de 60 graus, e no ponto
    máximo a quina reentrante engrossa a parede da casca até cerca de duas vezes a pedida, acima do limite da aprovação.
-   Quem a usa é `tools/mecanifica/aprovacao-da-familia.test.mjs`; mudar qualquer arquivo desta pasta muda o que ele prova. */
+   Quem a usa é `tools/modelar/aprovacao-da-familia.test.mjs`; mudar qualquer arquivo desta pasta muda o que ele prova. */
 import { readFileSync } from 'node:fs';
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../procedural/nucleo/entrada.js';
 import { definirFamilia } from '../../../src/autoria/chamar-familia.js';

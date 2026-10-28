@@ -1,5 +1,5 @@
 /* `perfilDosTracos: false`: a camada das formas sem o perfil das fitas, para quem mede só a área das faces (a silhueta de
-   `tools/mecanifica/esboco-silhueta.mjs`).
+   `tools/modelar/esboco-silhueta.mjs`).
 
    O perfil (`inclinarTracos`) é a maior parte do custo da camada de um esboço grande e não entra na área que as faces cobrem. A
    prova é a igualdade: com e sem o perfil, em toda vista, as formas da camada têm as mesmas faces e os mesmos traços (pontos e

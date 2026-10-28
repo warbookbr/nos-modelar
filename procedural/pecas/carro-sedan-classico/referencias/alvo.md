@@ -1,6 +1,6 @@
 # Alvo: pacote B
 
-Origem: modelo "pacote B", de autor B, publicado em repositório de modelos livres em endereço omitido, sob licença livre sem exigência de crédito. Pacote de origem: `pacote-b` da tabela `docs/mecanifica/veiculos-referencias.json`, com a malha `pacote-b.obj` (dois objetos: "Cylinder", as quatro rodas, e "Cube", a carroceria). A malha fica em `importados/veiculos-livres/pacote-b/pacote-b.obj`, ignorada pelo git, e não entra no repositório.
+Origem: modelo "pacote B", de autor B, publicado em repositório de modelos livres em endereço omitido, sob licença livre sem exigência de crédito. Pacote de origem: `pacote-b` da tabela `docs/modelar/veiculos-referencias.json`, com a malha `pacote-b.obj` (dois objetos: "Cylinder", as quatro rodas, e "Cube", a carroceria). A malha fica em `importados/veiculos-livres/pacote-b/pacote-b.obj`, ignorada pelo git, e não entra no repositório.
 
 A pasta guarda `fonte-vistas.png` (isométrica frente-direita, lateral direita com a frente à esquerda, frontal e de cima com a frente embaixo) e `fonte-partes.json` (caixas e silhuetas em fatias, em metro, frente em +z, chão em y = 0, escala 4,4 m). A orientação foi conferida: frente em +z, à esquerda na lateral e embaixo na planta, sem giro. `vistas.png` e `vistas-textura.png` são da receita.
 

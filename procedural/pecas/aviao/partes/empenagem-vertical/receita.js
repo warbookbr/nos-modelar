@@ -2,7 +2,7 @@
  * com o leme neutro.
  *
  * Sexta etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `empenagem-vertical`
- * do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
+ * do esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
  * `aviao-detalhe-empenagem-vertical.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA).
  *
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. A
@@ -12,7 +12,7 @@
  * ponto: `deriva` é a forma `deriva.fin` e `dorsal` é a `deriva.dorsal`.
  *
  * A deriva é a superfície da família `superficie-aerodinamica`, perfil `deriva`, expandida dentro dos PASSOS
- * (`docs/mecanifica/usar/AUTORIA-DE-PECA.md`) com os parâmetros do módulo `derivaVertical` do esboço, e cortada na raiz e no vão do
+ * (`docs/modelar/usar/AUTORIA-DE-PECA.md`) com os parâmetros do módulo `derivaVertical` do esboço, e cortada na raiz e no vão do
  * leme (`deriva.corteRaiz` e `vaoDoLeme`). A corda da raiz é 0,995 da altura, acima do teto de 0,8 da família para a semi-superfície,
  * e por isso o esboço chama a família com `simetria` 1, de envergadura o dobro da altura (a razão cai a 0,50), e corta a metade de
  * baixo com a caixa `corteRaiz`; a receita faz o mesmo. A família gera a superfície na pose dela, com a raiz na origem e a envergadura
@@ -46,7 +46,7 @@ import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 import { nucleo } from '../../../../nucleo/entrada.js';
 
-const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const DOBRADICAS = [1, 2, 3].flatMap((n) => [['D', 'd', 'direita'], ['E', 'e', 'esquerda']].map(([L, l, lado]) => ({ n, L, l, lado })));
 
 const VOLUMES = {
@@ -732,7 +732,7 @@ const receita = {
   PLANO: {
     objeto: 'empenagem vertical de um avião monomotor de pequeno porte: a deriva sobre a cauda, a dorsal que a liga ao dorso da fuselagem, o leme no bordo de fuga, o eixo dele e três pares de dobradiças',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
     ],
     escala: { medida: 'altura da deriva com o leme no esboço, da raiz em y 2225 ao topo do leme em y 4185', milimetros: 1960 },
     partes: [

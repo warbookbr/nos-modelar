@@ -2,13 +2,13 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../../mecanifica/descrever-peca.mjs';
-import { olharBancada } from '../../mecanifica/olhar-bancada.mjs';
+import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../../modelar/descrever-peca.mjs';
+import { olharBancada } from '../../modelar/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../../modelagem/revisao-modelagem.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../../src/autoria/descrever-partes.js';
 import { identidadeTransformacaoRigida } from '../../../src/autoria/transformacao-rigida.js';
-import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
+import { capturarMontagem } from '../../modelar/capturar-montagem.mjs';
 import {
   RAIZ_PACOTES, REVISOES, caminhoDentro, caminhoPacote,
 } from '../../modelagem/formato-pacote.mjs';

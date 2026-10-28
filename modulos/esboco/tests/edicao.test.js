@@ -17,12 +17,12 @@ import { GERADORES, gerarPerfil } from '../src/perfis.js';
 import { conferirEnvelope, criarEstado, formatarEnvelope, portaoDoEstagio, planoDeDetalhe } from '../src/condutor.js';
 import { detalharUnidade } from '../src/detalhe.js';
 import { conferirPlano, lerPlano } from '../src/plano.js';
-import { descreverArquivo, editarArquivo, lerArgumentos, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { descreverArquivo, editarArquivo, lerArgumentos, unidadeArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const caminho = (nome) => fileURLToPath(new URL(nome, pasta));
 const fixture = (nome) => JSON.parse(readFileSync(caminho(nome), 'utf8'));
-const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
+const cli = fileURLToPath(new URL('../../../tools/modelar/esboco.mjs', import.meta.url));
 const sha = (t) => createHash('sha256').update(t).digest('hex');
 const formasDe = (e, i = 0) => expandirEsboco(e).opcoes[i].formas;
 const formaDe = (e, id) => formasDe(e).find((f) => f.id === id);

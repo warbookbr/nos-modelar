@@ -862,7 +862,7 @@
   },
   "critico": {
     "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
     "julgamentos": 2,
     "regra": "menor nota de dois críticos cegos independentes, por perfil; numa família com perfis o crítico aprova os perfis, e os três pontos de extremo, que combinam proporções que nenhum objeto usa, ficam na camada mecânica",
     "perfis": {
@@ -896,7 +896,7 @@
       }
     },
     "pontosDeExtremo": {
-      "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-v2-pontos-prancha.png",
+      "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-pontos-prancha.png",
       "notas": {
         "minimo": 7,
         "medio": 8,
@@ -914,7 +914,7 @@
   "pessoa": {
     "data": "2026-10-11",
     "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
     "perfis": {
       "bicicleta": {
         "hash": "sha256:ffbbcfc5dc126e938e49a9ba750284ce4d1a6c621184a0f87d42551f313a38b4"

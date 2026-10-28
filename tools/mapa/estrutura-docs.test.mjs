@@ -22,15 +22,15 @@ const temporarios = [];
 function repoFalso({ docsUsar = {}, skill = '', index = '# INDEX\n', portaUsar }) {
   const raiz = mkdtempSync(path.join(tmpdir(), 'estrutura-'));
   temporarios.push(raiz);
-  mkdirSync(path.join(raiz, 'docs/mecanifica/usar'), { recursive: true });
+  mkdirSync(path.join(raiz, 'docs/modelar/usar'), { recursive: true });
   mkdirSync(path.join(raiz, '.claude/skills/alguma'), { recursive: true });
-  writeFileSync(path.join(raiz, 'docs/mecanifica/INDEX.md'), index);
+  writeFileSync(path.join(raiz, 'docs/modelar/INDEX.md'), index);
   writeFileSync(
-    path.join(raiz, 'docs/mecanifica/usar/README.md'),
+    path.join(raiz, 'docs/modelar/usar/README.md'),
     portaUsar ?? '# Usar\n\nporta curta.\n',
   );
   for (const [nome, conteudo] of Object.entries(docsUsar)) {
-    writeFileSync(path.join(raiz, 'docs/mecanifica/usar', nome), conteudo);
+    writeFileSync(path.join(raiz, 'docs/modelar/usar', nome), conteudo);
   }
   writeFileSync(path.join(raiz, '.claude/skills/alguma/SKILL.md'), skill || '# skill\n');
   execFileSync('git', ['init', '-q'], { cwd: raiz });
@@ -102,8 +102,8 @@ describe('gates de estrutura da documentação', () => {
   it('reprova quando a pasta de uso some', () => {
     const raiz = mkdtempSync(path.join(tmpdir(), 'estrutura-vazia-'));
     temporarios.push(raiz);
-    mkdirSync(path.join(raiz, 'docs/mecanifica'), { recursive: true });
-    writeFileSync(path.join(raiz, 'docs/mecanifica/INDEX.md'), '# INDEX\n');
+    mkdirSync(path.join(raiz, 'docs/modelar'), { recursive: true });
+    writeFileSync(path.join(raiz, 'docs/modelar/INDEX.md'), '# INDEX\n');
     execFileSync('git', ['init', '-q'], { cwd: raiz });
     execFileSync('git', ['add', '-A'], { cwd: raiz });
     const { codigo, saida } = rodar(raiz);

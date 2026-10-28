@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, mkdtempSync, readFileSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { lerArgumentos, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { lerArgumentos, unidadeArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 const roda = (extra = {}) => ({

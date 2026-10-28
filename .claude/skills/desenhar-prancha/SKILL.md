@@ -10,9 +10,9 @@ medida. Não produz malha, não toca o núcleo procedural e não substitui a
 bancada.
 
 Ferramentas:
-`tools/mecanifica/prancha/prancha.mjs` (motor) e
-`tools/mecanifica/prancha/prancha-geometria.mjs` (traçado e medida).
-Exemplo de uso do motor: `tools/mecanifica/prancha/prancha-dos-contornos.mjs`. A
+`tools/modelar/prancha/prancha.mjs` (motor) e
+`tools/modelar/prancha/prancha-geometria.mjs` (traçado e medida).
+Exemplo de uso do motor: `tools/modelar/prancha/prancha-dos-contornos.mjs`. A
 prancha de um chassi de agosto (P0, já fora do repositório) teve os landmarks
 inventados e usados como alvo por rodadas, e o perfil
 medido de um cupê real põe o alto do nariz 321 mm abaixo do que o P0 declarava
@@ -22,7 +22,7 @@ para qualquer carenagem ou invólucro.
 ## Porta zero: declarar se o alvo pode existir
 
 Antes de traçar, inclua `autoria` conforme o
-[`CONTRATO-AUTORIA-PRANCHA.md`](../../../docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md):
+[`CONTRATO-AUTORIA-PRANCHA.md`](../../../docs/modelar/usar/CONTRATO-AUTORIA-PRANCHA.md):
 intenção, fonte com evidência, confiança e incertezas. Sem medida independente
 ou quatro vistas coerentes, declare `estado: 'bloqueada'`, confiança baixa e a
 incerteza que bloqueia. O motor desenha o diagnóstico, mas ele **não** pode
@@ -153,7 +153,7 @@ Por vista, o relatório também dá `contornoFechado` e `pontosForaDoContorno`.
 ## 7. Rodar, ler o relatório, só então olhar
 
 ```bash
-node tools/mecanifica/<especificacao>.mjs
+node tools/modelar/<especificacao>.mjs
 ```
 
 O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
@@ -168,7 +168,7 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
 ## 8. Comparar com a referência por número
 
 Se existe prancha de referência rasterizada, pare de comparar de olho. Use
-`tools/mecanifica/prancha/prancha-referencia.mjs`:
+`tools/modelar/prancha/prancha-referencia.mjs`:
 
 ```js
 const img = lerPng(caminho);
@@ -191,7 +191,7 @@ ter capô perfeito e traseira 112 mm alta.
 **Dois limites que valem mais que o resultado:**
 
 - a imagem de referência não entra no repositório, só as coordenadas derivadas.
-  Ver `docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md`;
+  Ver `docs/modelar/usar/CONTRATO-AUTORIA-PRANCHA.md`;
 - **desvio é confiável, curvatura de raster não é.** Numa prancha de 736 px, o
   desvio médio é estável sob suavização e a contagem de inversões varia de 31 a
   51 sem convergir. Julgue proporção e posição pela referência; julgue caráter
@@ -208,16 +208,16 @@ medida ganha.
 Rasterize as vistas e leia o PNG como imagem antes de julgar, de despachar o
 crítico e de levar a prancha ao usuário. O comando, a captura em modo de
 auditoria e o caso que motivou a regra estão em
-[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), seção 1.
+[`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md), seção 1.
 
 ## 9. Despachar o crítico, sem contexto
 
 Despache o `critico-visual` quando o relatório determinístico estiver limpo e
 antes de levar a prancha ao usuário. O que se passa a ele (só a imagem), a forma
 padrão de legibilidade cega e os limites do papel estão em
-[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), seção 3, e o
+[`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md), seção 3, e o
 protocolo completo em
-[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 Com o relatório ainda acusando, corrija primeiro: o crítico é caro e não
 determinístico, e a medida é grátis e determinística.
 
@@ -259,6 +259,6 @@ Se a prancha for referência vinculante de um plano, diga explicitamente que ela
 Abrir o alvo e sobrepor a silhueta do modelo a ele antes de qualquer julgamento
 (seção 2), e saber onde o método diagnóstico para de render (seção 4, com o
 detalhe em
-[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md)),
-estão em [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md). Sem
+[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md)),
+estão em [`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md). Sem
 alvo desenhado, esta skill é o que o produz.

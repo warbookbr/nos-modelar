@@ -21,7 +21,7 @@ import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever-partes.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { auditarParDeSolidos, prepararSolido } from '../../../src/autoria/contato-de-solidos.js';
-import { aprovarFamiliaEmParalelo, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/mecanifica/aprovacao-da-familia.mjs';
+import { aprovarFamiliaEmParalelo, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/modelar/aprovacao-da-familia.mjs';
 import { analisarTopologia } from '../../nucleo/topologia.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';

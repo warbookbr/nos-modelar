@@ -33,7 +33,7 @@ describe('histórico limpo', () => {
       ['ok.md', 'nada aqui\n'],
       [VELHO, 'linha\numa palavra vetada aqui\n'],
       ['refs/carro.obj', 'v 0 0 0\n'],
-      ['tools/mecanifica/fixtures/importar-stl/sintetico/peca.stl.gz', 'x'],
+      ['tools/modelar/fixtures/importar-stl/sintetico/peca.stl.gz', 'x'],
       ['docs/silhueta.json', '{}\n'],
     ]);
     const r = varrerHistorico(raiz, { proibidos, caminhosProibidos: new Set([hashDoCaminho('docs/silhueta.json')]) });

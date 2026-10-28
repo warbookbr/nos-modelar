@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/asas-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-receita-2026-10-15/alvos/asas-composta.png",
     "nota": 9,
     "defeitos": [],
     "observacao": "Silhueta e partes batem com o alvo nas quatro vistas. Fresta e junção ponta/asa não são legíveis nas vistas de conjunto, e dois trechos cinza no flanco, atrás do bordo de fuga (superior do montado), ficaram sem explicação."
@@ -153,7 +153,7 @@
         {
           "tipo": "+",
           "linha": 5,
-          "texto": " * aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+          "texto": " * aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
         },
         {
           "tipo": "+",
@@ -313,7 +313,7 @@
         {
           "tipo": "+",
           "linha": 37,
-          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+          "texto": "const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
         },
         {
           "tipo": "+",

@@ -13,11 +13,11 @@ import { verificarContato } from '../src/contato.js';
 import { expandirEsboco } from '../src/expandir.js';
 import { desenharEsboco, ErroDeEsboco } from '../src/index.js';
 import { medirEsboco } from '../src/descrever.js';
-import { condutorArquivo, detalharArquivo, integrarArquivo, resolverCaminho } from '../../../tools/mecanifica/esboco.mjs';
+import { condutorArquivo, detalharArquivo, integrarArquivo, resolverCaminho } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const fixture = (nome) => JSON.parse(readFileSync(new URL(nome, pasta), 'utf8'));
-const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
+const cli = fileURLToPath(new URL('../../../tools/modelar/esboco.mjs', import.meta.url));
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 const motivo = 'as formas se separam por outra razão neste teste';
 const esboco = (formas, contato = {}) => ({ contato: { usar: true, ...contato }, opcoes: [{ titulo: 'T', formas }] });

@@ -1,7 +1,7 @@
 /* Fixture de teste: a família `suporte-de-prova`. O parâmetro `estrutura` escolhe a composição: 0 é uma chapa dobrada em
    L (a extensão `chapaDobrada`), 1 é um quadro de quatro barras de tubo quadrado (a extensão `estruturaDeBarras`). Serve
    para provar que a aprovação mecânica lê o planificado da chapa e o corte das barras. Quem a usa é
-   `tools/mecanifica/aprovacao-da-familia.test.mjs`; mudar qualquer arquivo desta pasta muda o que ele prova. */
+   `tools/modelar/aprovacao-da-familia.test.mjs`; mudar qualquer arquivo desta pasta muda o que ele prova. */
 import { readFileSync } from 'node:fs';
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../procedural/nucleo/entrada.js';
 import { definirFamilia } from '../../../src/autoria/chamar-familia.js';

@@ -2,7 +2,7 @@
    `nivelZero(bruto)`. Aqui a porta é uma função de mentira, para provar o que o Condutor faz com o que ela devolve: as medidas do
    plano vêm da leitura na blocagem (a que a porta não leu continua no esboço), o andaime que não compila reprova a Maquete, as
    perdas aparecem na situação, só os estágios Maquete e Conferência da maquete consultam a porta e, sem ela, nada muda. A prova
-   com o adaptador de verdade (moto, `--medidas`, REFINA) está em tools/mecanifica/esboco-condutor-nivel-zero.test.mjs. */
+   com o adaptador de verdade (moto, `--medidas`, REFINA) está em tools/modelar/esboco-condutor-nivel-zero.test.mjs. */
 import { describe, expect, it } from 'vitest';
 import { avancar, criarEstado, formatarSituacao, LINHAS_DE_PERDA_POR_OPCAO, portaoDoEstagio, textoDoNivelZero } from '../src/condutor.js';
 

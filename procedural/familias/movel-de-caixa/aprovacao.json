@@ -1882,7 +1882,7 @@
   },
   "critico": {
     "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
     "julgamentos": 2,
     "regra": "menor nota de dois críticos cegos independentes, por perfil; família com perfis, julgada pelos perfis",
     "rodadas": [
@@ -1944,7 +1944,7 @@
   "pessoa": {
     "data": "2026-10-11",
     "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
     "perfis": {
       "armario-de-cozinha-aereo": {
         "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a"

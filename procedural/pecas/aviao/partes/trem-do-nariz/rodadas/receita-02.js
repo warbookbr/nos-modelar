@@ -2,7 +2,7 @@
  * alavanca e o atuador, o compasso, a perna, o pistão, o garfo, o eixo e a roda.
  *
  * Sétima etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `trem-do-nariz` do
- * esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
+ * esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
  * `aviao-detalhe-trem-do-nariz.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA).
  *
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. A TABELA
@@ -31,7 +31,7 @@
 import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';
 
-const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const slug = (id) => id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
 /* parte -> [forma prometida, técnica], no nome da forma do esboço */
@@ -369,9 +369,9 @@ export default {
   PLANO: {
     objeto: 'trem do nariz de um avião monomotor de pequeno porte, baixado: a perna presa ao pivô sob o nariz, com o atuador, o compasso, o pistão, o garfo e a roda no chão',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
     ],
     escala: { medida: 'altura do trem do nariz no esboço, do pé da roda ao alto da carenagem', milimetros: 773 },
     partes: NOMES.map((nome) => ({ nome, forma: PARTES[nome][0], tecnica: PARTES[nome][1] })),

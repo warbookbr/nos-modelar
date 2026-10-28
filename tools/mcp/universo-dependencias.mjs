@@ -5,8 +5,8 @@ import { consultarImpactoGlobal } from '../../src/autoria/consultar-impacto-glob
 import { derivarMapaDependencias } from '../../src/autoria/derivar-mapa-dependencias.js';
 import { lerUniversoAutoria } from '../../src/autoria/ler-universo-autoria.js';
 import { criarSnapshotUniversoAutoria, serializarCanonico } from '../../src/autoria/snapshot-universo-autoria.js';
-import { criarProvedoresAutoriaInativa } from '../mecanifica/autoria-ativa.mjs';
-import { criarCarregadoresUniverso, sha256Canonico } from '../mecanifica/universo-autoria.mjs';
+import { criarProvedoresAutoriaInativa } from '../modelar/autoria-ativa.mjs';
+import { criarCarregadoresUniverso, sha256Canonico } from '../modelar/universo-autoria.mjs';
 
 export const FORMATO_UNIVERSO_MCP_DEPENDENCIAS = 'mecanifica.universo-mcp-dependencias';
 export const VERSAO_UNIVERSO_MCP_DEPENDENCIAS = 1;

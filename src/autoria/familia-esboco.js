@@ -8,7 +8,7 @@
  * (`refinamento-global.js`), que mede o envelope de cada parte e a interface de cada porta.
  *
  * O que ele não faz: expandir o esboço, traduzi-lo para o andaime nem executar a família. Isso é do adaptador
- * `tools/mecanifica/familia-com-esboco.mjs`, porque o módulo do esboço não importa o núcleo e o núcleo não importa o módulo.
+ * `tools/modelar/familia-com-esboco.mjs`, porque o módulo do esboço não importa o núcleo e o núcleo não importa o módulo.
  *
  * AS PORTAS. O esboço não declara porta, então a interface vem da geometria do volume que o contrato liga a ela, na face
  * do `lado` escolhido, que fica sobre o eixo do volume: `eixo` é a normal de saída da face (sinal do lado), `centro` é o

@@ -7,7 +7,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../src/index.js';
-import { lerArgumentos, lerCorteDaLinha, unidadeArquivo, vistasArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { lerArgumentos, lerCorteDaLinha, unidadeArquivo, vistasArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const esboco = (formas, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], ...extra });
 const caixa = (id, centro, l, a, p, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });

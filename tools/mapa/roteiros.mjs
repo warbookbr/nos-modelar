@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
  *
- * A fonte é `docs/mecanifica/roteiros/roteiros.json`. Dela saem a página gerada
+ * A fonte é `docs/modelar/roteiros/roteiros.json`. Dela saem a página gerada
  * `ROTEIROS.md` (o que cada intenção lê antes, o que abre só quando a condição
  * aparece, a skill, os comandos e o que se confere no fim) e dois blocos do
  * `CLAUDE.md`, entre marcadores: as regras (os invariantes) e a linha de cada
@@ -17,7 +17,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-export const PASTA = 'docs/mecanifica/roteiros';
+export const PASTA = 'docs/modelar/roteiros';
 export const CAMINHO_JSON = `${PASTA}/roteiros.json`;
 export const CAMINHO_ROTEIROS = `${PASTA}/ROTEIROS.md`;
 export const CAMINHO_CLAUDE = 'CLAUDE.md';
@@ -106,8 +106,8 @@ export function filhosDoNo(roteiros, prefixo) {
   return filhos;
 }
 
-/* Os documentos de uso que um nó precisa entregar: cada `.md` de `docs/mecanifica/usar/`, menos o README. */
-const PASTA_USAR = 'docs/mecanifica/usar';
+/* Os documentos de uso que um nó precisa entregar: cada `.md` de `docs/modelar/usar/`, menos o README. */
+const PASTA_USAR = 'docs/modelar/usar';
 
 /* As listas que o `comecar` gera na hora para uma folha, do acervo e dos registros, nunca escritas à mão. */
 export const LISTAS = ['familias', 'pecas', 'operacoes'];

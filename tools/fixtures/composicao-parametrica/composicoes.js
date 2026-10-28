@@ -1,5 +1,5 @@
 /* Fixture de teste: uma composição procedural mínima (um bloco identificado) e o
-   registro que a executa. Quem a usa é `tools/mecanifica/composicao-na-varredura.test.mjs`,
+   registro que a executa. Quem a usa é `tools/modelar/composicao-na-varredura.test.mjs`,
    e mudar qualquer arquivo desta pasta muda o que esse teste prova. */
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../procedural/nucleo/entrada.js';
 

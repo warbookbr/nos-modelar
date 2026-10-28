@@ -1,6 +1,6 @@
 /* familia-esboco.test.js — a parte pura da conferência da família com o esboço: a dispensa, os três pontos, o esboço mínimo,
    o mapa de parâmetros e os achados que não dependem da peça executada (volume que o componente não tem). A conferência de
-   verdade, com a família executada e o andaime traduzido do esboço, está em `tools/mecanifica/familia-com-esboco.test.mjs`. */
+   verdade, com a família executada e o andaime traduzido do esboço, está em `tools/modelar/familia-com-esboco.test.mjs`. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { lerFamilia } from './familia.js';

@@ -281,7 +281,7 @@
   },
   "critico": {
     "data": "2026-10-11",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
     "julgamentos": 2,
     "regra": "menor nota de dois críticos cegos independentes, por ponto",
     "pontos": {
@@ -307,7 +307,7 @@
   "pessoa": {
     "data": "2026-10-11",
     "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
     "pontos": {
       "minimo": {
         "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33"

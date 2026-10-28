@@ -627,13 +627,13 @@ def distancia_a_polilinhas(P, cadeias):
 
 
 def ondulacao_da_receita(receita):
-    """Roda tools/mecanifica/ondulacao-da-superficie.mjs na receita e devolve as falhas abertas (as que não estão junto de
+    """Roda tools/modelar/ondulacao-da-superficie.mjs na receita e devolve as falhas abertas (as que não estão junto de
     vinco, borda ou canto declarados), a maior amplitude em mm e as cinco maiores, com os pontos da gaiola a mexer."""
     receita = os.path.abspath(receita)
     if not os.path.exists(receita):
         erro(f'--receita {receita}: o arquivo não existe')
     raiz = os.path.dirname(os.path.dirname(AQUI))
-    r = subprocess.run([os.environ.get('MECANIFICA_NODE', 'node'), os.path.join(raiz, 'tools', 'mecanifica', 'ondulacao-da-superficie.mjs'),
+    r = subprocess.run([os.environ.get('MECANIFICA_NODE', 'node'), os.path.join(raiz, 'tools', 'modelar', 'ondulacao-da-superficie.mjs'),
                         receita], capture_output=True, text=True, cwd=raiz)
     if r.returncode != 0:
         erro(f'ondulacao-da-superficie.mjs saiu com {r.returncode}:\n{r.stderr[-1500:]}')

@@ -5,7 +5,7 @@
  * coluna inclinada, declarada por 19 curvas e 10 retalhos, dois deles de cinco lados. A superfície passa pelas curvas a menos de 0,5 mm,
  * sai só de quadriláteros, a borda da janela é um laço de arestas da malha, a tangente não quebra nas curvas compartilhadas que não são
  * vinco e a moldura de 10 mm como `friso` sobre a curva da janela fecha sólida. A leitura de ondulação da mesma chapa, sem falha fora de
- * `junto` e sem face virada, está em `tools/mecanifica/ondulacao-rede.test.mjs`, e o contato da moldura com a chapa, medido em
+ * `junto` e sem face virada, está em `tools/modelar/ondulacao-rede.test.mjs`, e o contato da moldura com a chapa, medido em
  * `gaiola-por-rede-contato.test.mjs`. Nenhum número vem de referência externa. */
 import { describe, expect, it } from 'vitest';
 import { gaiolaPorRede } from './gaiola-por-rede.js';

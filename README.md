@@ -15,7 +15,7 @@ reduzido, observa os componentes que escolhe, mantém as dependências e
 revalida as montagens afetadas depois de cada alteração. Composição, relações e
 dependências são dado estruturado do sistema, e MCP, CLI e API são portas para
 ele. A definição completa está em
-[`docs/mecanifica/AUTORIA-IA.md`](docs/mecanifica/AUTORIA-IA.md).
+[`docs/modelar/AUTORIA-IA.md`](docs/modelar/AUTORIA-IA.md).
 
 ## Ferramentas
 
@@ -24,7 +24,7 @@ ele. A definição completa está em
   primitivas a partir de um JSON, com gate de contato, Condutor por estágios e
   crítico cego, antes da peça procedural; a referência do JSON se consulta por
   tópico com `npm run esboco -- --ajuda`.
-- **motor de prancha** (`tools/mecanifica/prancha/prancha.mjs`, skill
+- **motor de prancha** (`tools/modelar/prancha/prancha.mjs`, skill
   `desenhar-prancha`): desenha em 2D o contorno de referência de um invólucro
   antes de existir geometria 3D, e `prancha-referencia.mjs` compara a silhueta
   modelada com ela em milímetro.
@@ -47,15 +47,15 @@ importam o núcleo procedural, exceto o esboço, que lê o avaliador de express�
 ## Estado
 
 As operações do motor estão em
-[`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
+[`docs/modelar/gerado/CATALOGO-CAPACIDADES.md`](docs/modelar/gerado/CATALOGO-CAPACIDADES.md),
 gerado do registro do motor, e o catálogo é a fonte da convenção de cada uma.
 Não existem ainda solver geral de encaixe, verificação de colisão em movimento
 nem material PBR (o material é escolha por peça, com textura gerada); a superfície
 subdividida existe no núcleo (`subdivisao`), e o resto do vocabulário poligonal da
 bancada (bisel, corte em anel) está num
-[plano congelado](docs/mecanifica/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md).
+[plano congelado](docs/modelar/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md).
 Intenção que o catálogo não resolve vira registro de lacuna pelo formato de
-[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md),
+[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/modelar/LACUNAS-DE-CAPACIDADE-V1.md),
 e não operação inventada dentro da receita.
 
 Além da peça existem a montagem persistida, o mapa canônico de dependências, a
@@ -63,14 +63,14 @@ revalidação em cascata e um perfil MCP de escrita que vem desligado. O acervo,
 `procedural/pecas/`, tem veículos, eletrodomésticos, móveis, o avião e o braço
 robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gates rodam de uma
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
-divergem. O plano ativo é [renomear para Modelar](docs/mecanifica/planos/2026-10-25-renomear-para-modelar.md).
-Já fecharam [veículos de referência livre](docs/mecanifica/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
-como famílias](docs/mecanifica/planos/encerrados/2026-10-19-objetos-externos-como-familias.md) em 2026-10-20; [receitas com material e
-textura](docs/mecanifica/planos/encerrados/2026-10-19-receitas-com-material-e-textura.md) em 2026-10-19; [aparelhos de
-caixa](docs/mecanifica/planos/encerrados/2026-10-16-aparelhos-de-caixa.md) em 2026-10-19; [importar objeto de
-código](docs/mecanifica/planos/encerrados/2026-10-15-importar-objeto-de-codigo.md) e [gates em poucos
-minutos](docs/mecanifica/planos/encerrados/2026-10-16-gates-em-poucos-minutos.md) em 2026-10-16; o anterior, [o avião do esboço à
-receita](docs/mecanifica/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md), fechou em
+divergem. O plano ativo é [renomear para Modelar](docs/modelar/planos/2026-10-25-renomear-para-modelar.md).
+Já fecharam [veículos de referência livre](docs/modelar/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
+como famílias](docs/modelar/planos/encerrados/2026-10-19-objetos-externos-como-familias.md) em 2026-10-20; [receitas com material e
+textura](docs/modelar/planos/encerrados/2026-10-19-receitas-com-material-e-textura.md) em 2026-10-19; [aparelhos de
+caixa](docs/modelar/planos/encerrados/2026-10-16-aparelhos-de-caixa.md) em 2026-10-19; [importar objeto de
+código](docs/modelar/planos/encerrados/2026-10-15-importar-objeto-de-codigo.md) e [gates em poucos
+minutos](docs/modelar/planos/encerrados/2026-10-16-gates-em-poucos-minutos.md) em 2026-10-16; o anterior, [o avião do esboço à
+receita](docs/modelar/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md), fechou em
 2026-10-16 com o avião aprovado pela pessoa.
 
 ## Peças são exemplos
@@ -98,10 +98,10 @@ npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=
 ```
 
 Abra `http://localhost:5173/nos-modelar/bancada.html`. A leitura de cada
-tarefa está nos [roteiros](docs/mecanifica/roteiros/ROTEIROS.md), a entrada de
-quem muda o projeto é [`docs/mecanifica/INDEX.md`](docs/mecanifica/INDEX.md) e o
+tarefa está nos [roteiros](docs/modelar/roteiros/ROTEIROS.md), a entrada de
+quem muda o projeto é [`docs/modelar/INDEX.md`](docs/modelar/INDEX.md) e o
 inventário completo é [`docs/MAPA.md`](docs/MAPA.md). Os documentos de
-`docs/nos-herdado/` e de `docs/mecanifica/historico/` descrevem o NÓS e
+`docs/nos-herdado/` e de `docs/modelar/historico/` descrevem o NÓS e
 resultados já medidos e não autorizam trabalho novo.
 
 ## Licença e origem

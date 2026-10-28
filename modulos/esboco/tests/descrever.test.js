@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ancorasDe, desenharEsboco, ErroDeEsboco, resolverOpcao } from '../src/index.js';
 import { descreverEsboco, diferenca, formatarDescricao } from '../src/descrever.js';
-import { descreverArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { descreverArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const fixture = (nome) => fileURLToPath(new URL(`./fixtures/${nome}`, import.meta.url));
 const pequeno = () => ({

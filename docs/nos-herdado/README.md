@@ -4,7 +4,7 @@ Esta pasta guarda documentos do projeto de onde o Modelar foi clonada. Eles
 descrevem a Oficina humana, o Playground e a aplicação jogável — coisas que
 **não existem mais neste repositório**. Chamava-se `docs/historico/`, e o nome
 confundia com o histórico da própria Modelar, que é outra coisa e fica em
-[`../mecanifica/historico/README.md`](../mecanifica/historico/README.md): lá
+[`../modelar/historico/README.md`](../modelar/historico/README.md): lá
 estão os relatórios e experimentos deste produto.
 
 A distinção importa porque as duas zonas têm o mesmo peso — nenhuma governa

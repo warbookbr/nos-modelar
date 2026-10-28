@@ -17,7 +17,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
 import { desenharEsboco, fatiarForma, resolverOpcao, VISTAS } from '../src/index.js';
 import { AMOSTRAS_DO_PERFIL, inclinacaoDaFace } from '../src/camada.js';
-import { renderizarCamada } from '../../../tools/mecanifica/esboco.mjs';
+import { renderizarCamada } from '../../../tools/modelar/esboco.mjs';
 
 let navegador;
 beforeAll(async () => { navegador = await (await import('playwright')).default.chromium.launch(); });

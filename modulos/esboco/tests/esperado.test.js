@@ -11,7 +11,7 @@ import { desenharEsboco } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
 import { medirEsboco } from '../src/descrever.js';
 import { avancar, conferirEnvelope, criarEstado, marcarFeito, portaoDoEstagio, registrarEnvelope } from '../src/condutor.js';
-import { descreverArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { descreverArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const caminho = (nome) => fileURLToPath(new URL(nome, pasta));

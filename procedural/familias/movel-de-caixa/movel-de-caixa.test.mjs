@@ -15,8 +15,8 @@ import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { execucaoDe, invariantesDe } from '../../../src/autoria/varrer-parametros.js';
 import { descreverPeca } from '../../../src/autoria/descrever-partes.js';
-import { medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/mecanifica/aprovacao-da-familia.mjs';
-import { resolverMontagemDaFamilia } from '../../../tools/mecanifica/montagem-da-familia.mjs';
+import { medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/modelar/aprovacao-da-familia.mjs';
+import { resolverMontagemDaFamilia } from '../../../tools/modelar/montagem-da-familia.mjs';
 import { ErroChamadaDeFamilia, FAMILIAS, chamar, criarRegistroDeFamilias } from '../index.js';
 import { DOBRADICA } from '../dobradica/index.js';
 import { MOVEL_DE_CAIXA } from './index.js';

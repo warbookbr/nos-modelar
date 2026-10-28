@@ -1,12 +1,12 @@
 # Avião de pequeno porte — o objeto no núcleo
 
 Registro da passagem do avião do esboço à receita, fatia 1 do plano [o avião do esboço
-à receita](../../../docs/mecanifica/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md),
+à receita](../../../docs/modelar/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md),
 em 2026-10-15. O objeto, a escala, as partes, o que se move, o realismo e o que
 reprova foram combinados com a pessoa no
-[alinhamento do avião](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/ALINHAMENTO.md),
+[alinhamento do avião](../../../docs/modelar/banco-de-provas/aviao-2026-10-11/ALINHAMENTO.md),
 e a forma foi aprovada por ela no [esboço da segunda
-rodada](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json)
+rodada](../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json)
 em 2026-10-13. Este arquivo não refaz nada disso: diz como o esboço vira peças do
 núcleo. As referências continuam no banco de provas, apontadas por
 [`referencias.json`](referencias.json), com os contornos e as pranchas aceitos.
@@ -16,7 +16,7 @@ núcleo. As referências continuam no banco de provas, apontadas por
 Cada unidade do esboço vira uma peça, com a receita em `partes/<parte>/receita.js` e o
 mesmo nome da unidade, e as formas da unidade viram as partes da receita. A receita
 refina o [andaime](andaime.json) que o esboço traduz, gravado com
-`npm run esboco -- docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json --andaime procedural/pecas/aviao/andaime.json`,
+`npm run esboco -- docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json --andaime procedural/pecas/aviao/andaime.json`,
 e declara em `REFINA.partes` qual volume do andaime cada parte dela refina.
 
 | peça | o que é, pelas formas do esboço |
@@ -63,7 +63,7 @@ lugar.
 
 ## A tradução
 
-A [tradução](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/TRADUCAO.md)
+A [tradução](../../../docs/modelar/banco-de-provas/aviao-receita-2026-10-15/TRADUCAO.md)
 mostrou que a fuselagem, o motor e os trens saem no andaime com o envelope do
 esboço, e que as asas, as empenagens e a hélice não: a N2 não subtrai o recorte e
 não inclina o sólido. A fuselagem é a primeira peça; as superfícies esperam a decisão
@@ -73,7 +73,7 @@ da pessoa sobre o que falta ao contrato.
 
 É a primeira etapa. A receita fica em `partes/fuselagem/receita.js`, com o nome
 `aviao/fuselagem`, e as formas e as medidas vêm da unidade `fuselagem` do esboço
-aprovado; o [detalhe da unidade](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-fuselagem.esboco.json)
+aprovado; o [detalhe da unidade](../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-fuselagem.esboco.json)
 e o mestre trazem as seções, os cortes e as posições.
 
 - `fuselagem`: o casco por seções, com as 20 seções de retângulo arredondado do
@@ -120,7 +120,7 @@ novo nessa ordem.
 
 É a segunda etapa. A receita fica em `partes/motor/receita.js`, com o nome
 `aviao/motor`, e as formas vêm da unidade `motor` do esboço aprovado (o mestre e o
-[detalhe](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor.esboco.json)).
+[detalhe](../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor.esboco.json)).
 
 - `capo`: o capô por seções, liso, da face da frente da fuselagem até o cone da
   hélice, com a boca de ar recortada embaixo.
@@ -147,7 +147,7 @@ esboço tem um leque de frisos, ficam como pendência.
 
 É a terceira etapa. A receita fica em `partes/helice/receita.js`, com o nome
 `aviao/helice`, e as formas vêm da unidade `helice` do esboço aprovado (o mestre e o
-[detalhe](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-helice.esboco.json)).
+[detalhe](../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-helice.esboco.json)).
 
 - `cone`: o cone da hélice, de revolução em torno do eixo z pelo perfil do esboço, liso,
   da proa em z 8 até dentro do lábio do capô.
@@ -155,7 +155,7 @@ esboço tem um leque de frisos, ficam como pendência.
   perfil `pa-de-helice` e os parâmetros do esboço (envergadura de 912 mm e as cordas
   dele), a raiz dentro do cone e as cinco em arranjo radial de 72 graus em torno do eixo
   da hélice, na pose do esboço. A família entra pelos `PASSOS`, como diz a
-  [autoria de peça](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md).
+  [autoria de peça](../../../docs/modelar/usar/AUTORIA-DE-PECA.md).
 
 O `REFINA` aponta `../../andaime.json` e liga o `cone` ao volume `cone` e a `pa1` ao
 volume `helice-pa`, com a tolerância de 5 mm. As outras quatro pás não têm volume,
@@ -178,7 +178,7 @@ do motor, que foram reabertos e vêm antes na ordem.
 
 É a quarta etapa. A receita fica em `partes/asas/receita.js`, com o nome `aviao/asas`,
 e as formas vêm da unidade `asas` do esboço aprovado (o mestre e o
-[detalhe](../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-asas.esboco.json)),
+[detalhe](../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-asas.esboco.json)),
 com as 20 formas visíveis, dez de cada lado, o esquerdo espelhado em x.
 
 - `asaD` e `asaE`: as metades da asa, a superfície da família `superficie-aerodinamica`
@@ -236,7 +236,7 @@ do mínimo.
 
 As asas fecharam na primeira rodada com nota 9 sem defeito e a pessoa as aceitou em
 2026-10-15. O crítico achou o esboço diferente da referência real em quatro pontos, e a
-pessoa, vendo a [comparação](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-asas.png),
+pessoa, vendo a [comparação](../../../docs/modelar/banco-de-provas/aviao-receita-2026-10-15/comparacao-asas.png),
 pediu os quatro na rodada de ajustes antes da aprovação do avião inteiro.
 
 ## A rodada de ajustes
@@ -277,7 +277,7 @@ foram reabertos só pela ordem das etapas e não mudaram, foram aceitos de novo,
 estão fixas.
 
 As duas empenagens fecharam na primeira rodada com nota 9 e a pessoa as aceitou em
-2026-10-15, vendo a [comparação com a referência real](../../../docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/comparacao-empenagens.png);
+2026-10-15, vendo a [comparação com a referência real](../../../docs/modelar/banco-de-provas/aviao-receita-2026-10-15/comparacao-empenagens.png);
 na vertical, o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que
 contorna o canto solto da booleana, e fica como pendência.
 

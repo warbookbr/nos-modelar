@@ -11,8 +11,8 @@ import { conferirReferenciaNaOpcao, lerPlano, visiveisDoEsboco } from '../src/pl
 import { EIXOS_DA_VISTA, formatarConferencia, formatarMedidasDaReferencia, lerContornos, medidasDaReferencia, sobreposicaoDaReferencia, vistaDoMesmoOlho } from '../src/referencia.js';
 import { formatarResumo, medirEsboco } from '../src/descrever.js';
 import { avancar, criarEstado, portaoDoEstagio, registrarVeredito } from '../src/condutor.js';
-import { lerArgumentos, medidasDaReferenciaArquivo, referenciaArquivo } from '../../../tools/mecanifica/esboco.mjs';
-import { referenciasDoEsboco, vistaDoNome } from '../../../tools/mecanifica/esboco-referencia.mjs';
+import { lerArgumentos, medidasDaReferenciaArquivo, referenciaArquivo } from '../../../tools/modelar/esboco.mjs';
+import { referenciasDoEsboco, vistaDoNome } from '../../../tools/modelar/esboco-referencia.mjs';
 
 const caixa = (id, centro, l, a, p, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 /* A base vai de x -50 a 50, y 0 a 100 e z 0 a 400; a coluna, de x 30 a 70, y 100 a 300 e z 300 a 400, pousa sobre a ponta da

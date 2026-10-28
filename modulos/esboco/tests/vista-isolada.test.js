@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const CLI = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
+const CLI = fileURLToPath(new URL('../../../tools/modelar/esboco.mjs', import.meta.url));
 const FIXTURE = fileURLToPath(new URL('./fixtures/teste-cubo.esboco.json', import.meta.url));
 
 describe('--vista sozinho', () => {

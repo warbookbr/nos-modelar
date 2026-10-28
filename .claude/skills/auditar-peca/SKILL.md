@@ -10,7 +10,7 @@ peça. O fluxo atual é semântico e visual; não depende do jogo antigo nem de 
 paleta fixa.
 
 Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de declarar pronto ou pedir o aceite, faça o passo de
-[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
+[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
 
 
 ## Fluxo oficial
@@ -52,7 +52,7 @@ peça isolada e não inventa validade global de uma montagem.
    O catálogo homologado da bancada publicada pode estar vazio — isso é
    proposital, não defeito. Para carregar a peça sem publicá-la, use a sessão
    ativa: o procedimento está em
-   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](../../../docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md).
+   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](../../../docs/modelar/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md).
 
    Não use uma URL
    pública com `?peca=` para validar receita privada; use um pacote de modelagem,
@@ -110,7 +110,7 @@ peça isolada e não inventa validade global de uma montagem.
    `--minimizar` ou `--alvo=`) ela compara candidatos em lote. Ela **não aplica**
    o vencedor: relate o candidato e a evidência, e decida com a imagem.
    Critérios, objetivos e limites em
-   [`PARAMETROS-VIVOS.md`](../../../docs/mecanifica/usar/PARAMETROS-VIVOS.md).
+   [`PARAMETROS-VIVOS.md`](../../../docs/modelar/usar/PARAMETROS-VIVOS.md).
 
 5. **Conferência de Juntas e Contato:**
    Para peças com múltiplos corpos ou encaixes (como marcenaria ou mecânica),
@@ -175,12 +175,12 @@ peça ou simular a capacidade.
 Olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto e reconhecer o
 limite do método diagnóstico valem em toda tarefa que produz forma. As quatro
 regras estão em
-[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), e estavam
+[`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md), e estavam
 copiadas palavra por palavra aqui e na outra skill — regra duplicada envelhece
 em lugares diferentes.
 
 Quando precisar EMITIR um achado em formato reexecutável — ou consultar o caso
 aplicado da roda dianteira —, o contrato está em
-[`CRITICA-VISUAL-CONTRATO-E-CASOS.md`](../../../docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md).
+[`CRITICA-VISUAL-CONTRATO-E-CASOS.md`](../../../docs/modelar/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md).
 É consulta: o esquema JSON de um achado não é coisa que se leia para decidir uma
 proporção.

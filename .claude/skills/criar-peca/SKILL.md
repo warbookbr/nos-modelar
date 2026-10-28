@@ -13,7 +13,7 @@ cada regra abaixo está em [`references/por-que.md`](references/por-que.md), par
 consultar quando uma regra parecer arbitrária.
 
 Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de declarar pronto ou pedir o aceite, faça o passo de
-[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
+[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
 
 
 ## Antes do primeiro passo
@@ -26,14 +26,14 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de 
    `procedural/pecas/<objeto>/partes/<parte>/`, com a montagem na pasta do
    objeto, e os comandos a chamam por `<objeto>/<parte>`.
 3. A receita segue a cadeia do contrato
-   [`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
+   [`AUTORIA-DE-PECA.md`](../../../docs/modelar/usar/AUTORIA-DE-PECA.md):
    `TABELA` em milímetros exportada como `PARAMS`, `derivar()` que calcula,
    `gerarPassos()` que converte com `m()` e escreve, e
    `get PASSOS() { return gerarPassos(this.PARAMS); }`. Nenhuma posição é
    digitada no passo; `npm run parametros -- <peça>` diz quais parâmetros
    estão ligados.
 4. Toda operação usada vem do
-   [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
+   [catálogo gerado](../../../docs/modelar/gerado/CATALOGO-CAPACIDADES.md),
    lida por `descrever_capacidade` no MCP procedural. As receitas do acervo são
    aprovadas e provam capacidades do núcleo, mas não são molde de forma, que
    vem da referência e do plano. A peça de prova em
@@ -119,21 +119,21 @@ desenhada com `desenhar-prancha` ou as coordenadas derivadas dela.
 vistas da bancada.
 
 O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto)
-mora em [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md).
+mora em [`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md).
 
 ## Consulta
 
 O que ler antes e o que abrir só quando a condição aparece está no roteiro
 `modelar/peca` (`npm run comecar -- modelar/peca`), com
-[`GUIA-AUTORIA-IA.md`](../../../docs/mecanifica/usar/GUIA-AUTORIA-IA.md) (a anatomia
+[`GUIA-AUTORIA-IA.md`](../../../docs/modelar/usar/GUIA-AUTORIA-IA.md) (a anatomia
 da receita e a esteira de comandos) e
-[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md)
+[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md)
 (o que já falhou ao gerar forma),
-[`INTENCAO-PECA-V1.md`](../../../docs/mecanifica/usar/INTENCAO-PECA-V1.md) (o
+[`INTENCAO-PECA-V1.md`](../../../docs/modelar/usar/INTENCAO-PECA-V1.md) (o
 contrato opcional `INTENCAO`, para quando a função não é óbvia pela geometria),
-[`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md)
+[`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md)
 (a receita como dado JSON, usada pela autoria por MCP) e
-[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md)
+[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
 (a borda da peça contra a foto). Para curva bilateral contínua,
 `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` garante a
 simetria sem fresta nas pontas.

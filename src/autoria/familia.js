@@ -8,7 +8,7 @@
 
    O vocabulário das portas é o do núcleo (`interfaces-montagem.js`): `tipo` é a forma da interface e `papel` é o
    papel dela. A tabela abaixo repete esse vocabulário porque o arquivo não importa nada; o teste da família a confere
-   contra o núcleo. O vocabulário das ferramentas é o de `docs/mecanifica/ferramentas-por-objeto.json`, conferido do
+   contra o núcleo. O vocabulário das ferramentas é o de `docs/modelar/ferramentas-por-objeto.json`, conferido do
    mesmo modo. */
 
 export const FORMATO_FAMILIA = 'mecanifica.familia@1';

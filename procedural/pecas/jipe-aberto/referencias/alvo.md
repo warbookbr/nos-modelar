@@ -1,6 +1,6 @@
 # Alvo do jipe-aberto
 
-Origem: modelo "Jipe" (Jipe.fbx) do pacote D, de autor D, publicado em repositório de modelos livres sob licença livre sem exigência de crédito, em endereço omitido. O pacote é o pacote-d, conforme docs/mecanifica/veiculos-referencias.json. A malha fica fora do repositório, em importados/veiculos-livres/pacote-d/Jipe.fbx, ignorada pelo git. Em referencias/ ficam fonte-vistas.png (quatro vistas ortográficas) e fonte-partes.json (caixa e silhuetas em fatias, em metro, com 3,9 m de comprimento). A frente da fonte está em +z, conferida na lateral (frente à esquerda) e na planta (frente embaixo), sem giro.
+Origem: modelo "Jipe" (Jipe.fbx) do pacote D, de autor D, publicado em repositório de modelos livres sob licença livre sem exigência de crédito, em endereço omitido. O pacote é o pacote-d, conforme docs/modelar/veiculos-referencias.json. A malha fica fora do repositório, em importados/veiculos-livres/pacote-d/Jipe.fbx, ignorada pelo git. Em referencias/ ficam fonte-vistas.png (quatro vistas ortográficas) e fonte-partes.json (caixa e silhuetas em fatias, em metro, com 3,9 m de comprimento). A frente da fonte está em +z, conferida na lateral (frente à esquerda) e na planta (frente embaixo), sem giro.
 
 A caixa da receita é de 2586 por 1898 por 3900 mm, com diferença de 0 mm nos três eixos. As medidas da TABELA vêm dos vértices da malha, lidos fora do repositório: casco e capô de meia largura 1020, pneus de x 892 a 1258, faixas dos para-lamas até x 1293, arco de segurança em x 644 a 843.
 

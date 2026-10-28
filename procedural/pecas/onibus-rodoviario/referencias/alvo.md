@@ -1,6 +1,6 @@
 # alvo: onibus-rodoviario
 
-Origem do modelo: "pacote C", de autor C, publicado em repositório de modelos livres sob licença livre sem exigência de crédito. Pacote `pacote-c` da tabela `docs/mecanifica/veiculos-referencias.json` (modelo BUS, arquivo BUS.obj). Página: endereço omitido. A malha (cinco malhas: a carroceria e quatro rodas) fica em `importados/veiculos-livres/pacote-c/`, ignorada pelo git, e não entra no repositório. Só as medidas lidas dela entram aqui.
+Origem do modelo: "pacote C", de autor C, publicado em repositório de modelos livres sob licença livre sem exigência de crédito. Pacote `pacote-c` da tabela `docs/modelar/veiculos-referencias.json` (modelo BUS, arquivo BUS.obj). Página: endereço omitido. A malha (cinco malhas: a carroceria e quatro rodas) fica em `importados/veiculos-livres/pacote-c/`, ignorada pelo git, e não entra no repositório. Só as medidas lidas dela entram aqui.
 
 Orientação: a malha de origem tem a frente em -z. `fonte-partes.json` e `fonte-vistas.png` foram gerados com `--girar 180` e trazem a frente em +z (campo `frente` do JSON), que é a convenção do acervo. A vista lateral da fonte mostra a frente à esquerda e a vista de cima mostra a frente embaixo.
 

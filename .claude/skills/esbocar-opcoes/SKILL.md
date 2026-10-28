@@ -17,7 +17,7 @@ skill [`esboco-detalhado`](../esboco-detalhado/SKILL.md).
 
 ## Pare e planeje
 
-Antes de escrever o JSON, decida por escrito, em um parágrafo curto por decisão, o que segue. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto; os campos do `plano` de um esboço detalhado estão na skill `esboco-detalhado`. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+Antes de escrever o JSON, decida por escrito, em um parágrafo curto por decisão, o que segue. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto; os campos do `plano` de um esboço detalhado estão na skill `esboco-detalhado`. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md).
 
 ## Escrever e rodar
 
@@ -80,7 +80,7 @@ disputa e divida em vários esboços quando ainda assim ficar cheio.
 Abra o PNG com `Read`. Para qualquer esboço que vá à pessoa, rode
 `npm run esboco -- <arquivo> --analise` (8 imagens, sem linhas de centro, mais 4 ou 8 quando há sobreposição na projeção; num esboço denso `--analise --rapido` confere contato e projeção só em texto, sem imagem, enquanto você corrige, e `--sugerir` liga a busca de explosão, que custa mais; acrescente `--centros` só se a pessoa quiser vê-las, o que gera 16 e as variantes) e leia as imagens conforme a seção
 Esboço de
-[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md):
+[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md):
 legenda que cruza, balão no elemento errado, escala pequena, oclusão errada e
 rotação no sentido errado. Relate os defeitos por vista e região e o que não
 foi conferido. Havendo foto, a conferência numérica contra ela

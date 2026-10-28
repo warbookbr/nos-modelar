@@ -31,7 +31,7 @@
 # cada um, com 3 a 8 pixels por milímetro (padrão 4), a mesma calibração, grade, cotas, recorte e visibilidade, e o contorno
 # cortado pela janela: cortes/<corte>-<região>.png, o quadro deles em cortes/quadro-detalhe.json, as cotas em
 # cortes/cotas-detalhe.md e, em pacote.json, a lista `detalhes`. O formato da declaração está em comum.planejar_detalhes, e o
-# uso, em docs/mecanifica/blender/REGUA-E-PACOTE-CEGO.md. ler-corte.py e ler-perfil.py leem esses cortes.
+# uso, em docs/modelar/blender/REGUA-E-PACOTE-CEGO.md. ler-corte.py e ler-perfil.py leem esses cortes.
 #
 # Grava em <saida>/: vistas/<vista>-cinza.png e vistas/<vista>-zebra.png, vistas/camera.json (centro, escala, tamanho e eixos
 # de cada câmera, para olhar-candidata.py), vistas/grade.json (passo, rótulos e barra de cada imagem) e pacote.json (caixa,

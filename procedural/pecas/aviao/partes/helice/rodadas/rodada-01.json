@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/helice-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-receita-2026-10-15/alvos/helice-composta.png",
     "nota": 9,
     "defeitos": [
       {
@@ -86,7 +86,7 @@
         {
           "tipo": "+",
           "linha": 4,
-          "texto": " * aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+          "texto": " * aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
         },
         {
           "tipo": "+",
@@ -226,7 +226,7 @@
         {
           "tipo": "+",
           "linha": 32,
-          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+          "texto": "const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
         },
         {
           "tipo": "+",

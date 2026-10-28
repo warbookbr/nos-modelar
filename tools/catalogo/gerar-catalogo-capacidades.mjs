@@ -8,7 +8,7 @@ import { catalogoDeCapacidades } from '../../procedural/nucleo/catalogo.js';
 import { schemaDaLacunaCapacidade } from '../../procedural/nucleo/lacunas.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
-const DESTINO = join(RAIZ, 'docs/mecanifica/gerado');
+const DESTINO = join(RAIZ, 'docs/modelar/gerado');
 const catalogo = catalogoDeCapacidades(REGISTRO_OPERACOES);
 const esquemaLacuna = schemaDaLacunaCapacidade();
 const usosOperacoes = {
@@ -85,7 +85,7 @@ for (const [nome, conteudo] of arquivos) {
   try { atual = readFileSync(arquivo, 'utf8'); } catch { /* arquivo ausente também é divergência */ }
   if (atual === conteudo) continue;
   divergente = true;
-  if (conferir) console.error(`gerado desatualizado: docs/mecanifica/gerado/${nome}`);
-  else { mkdirSync(DESTINO, { recursive: true }); writeFileSync(arquivo, conteudo); console.log(`gerado: docs/mecanifica/gerado/${nome}`); }
+  if (conferir) console.error(`gerado desatualizado: docs/modelar/gerado/${nome}`);
+  else { mkdirSync(DESTINO, { recursive: true }); writeFileSync(arquivo, conteudo); console.log(`gerado: docs/modelar/gerado/${nome}`); }
 }
 if (conferir && divergente) process.exit(1);

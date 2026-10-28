@@ -11,7 +11,7 @@ import { nucleo } from '../entrada.js';
 // @ts-expect-error — serviço JavaScript puro da fronteira de autoria.
 import { descreverPeca, formatarDescricao } from '../../../src/autoria/descrever-partes.js';
 // @ts-expect-error — serviço MJS.
-import { descreverPecaReutilizavel } from '../../../tools/mecanifica/descrever-peca.mjs';
+import { descreverPecaReutilizavel } from '../../../tools/modelar/descrever-peca.mjs';
 
 type Passo = [string, Record<string, unknown>];
 const mm = (x: number) => x / 1000;

@@ -1,0 +1,252 @@
+{
+ "descricao": "Tabela fonte -> pacote das 27 referências de veículos. É a verdade que o teste tools/modelar/origem-das-fontes.test.mjs confere contra a tabela do plano, o campo `arquivo` de cada fonte-partes.json e a linha de origem de cada alvo.md. Uma peça nova entra aqui, no plano e na pasta referencias/ juntas.",
+ "pacotes": {
+  "pacote-a": {
+   "nome": "pacote A",
+   "autor": "autor A",
+   "pagina": "endereço omitido",
+   "licenca": "livre sem exigência de crédito",
+   "exige": [
+    "autor A"
+   ],
+   "proibe": [
+    "autor D",
+    "autor B",
+    "autor C"
+   ]
+  },
+  "pacote-b": {
+   "nome": "pacote B",
+   "autor": "autor B",
+   "pagina": "endereço omitido",
+   "licenca": "livre sem exigência de crédito",
+   "exige": [
+    "autor B"
+   ],
+   "proibe": [
+    "autor D",
+    "autor A",
+    "autor C"
+   ]
+  },
+  "pacote-c": {
+   "nome": "pacote C",
+   "autor": "autor C",
+   "pagina": "endereço omitido",
+   "licenca": "livre sem exigência de crédito",
+   "exige": [
+    "autor C"
+   ],
+   "proibe": [
+    "autor D",
+    "autor A",
+    "autor B"
+   ]
+  },
+  "pacote-d": {
+   "nome": "pacote D",
+   "autor": "autor D",
+   "pagina": "endereço omitido",
+   "licenca": "livre sem exigência de crédito",
+   "exige": [
+    "autor D"
+   ],
+   "proibe": [
+    "autor A",
+    "autor B",
+    "autor C"
+   ]
+  }
+ },
+ "pecas": [
+  {
+   "peca": "carro-sedan-compacto",
+   "pacote": "pacote-a",
+   "modelo": "sedan",
+   "arquivo": "sedan.glb",
+   "origemNoPlano": "pacote A, sedan"
+  },
+  {
+   "peca": "carro-esportivo-sedan",
+   "pacote": "pacote-a",
+   "modelo": "sedan-sports",
+   "arquivo": "sedan-sports.glb",
+   "origemNoPlano": "pacote A, sedan-sports"
+  },
+  {
+   "peca": "carro-esportivo-hatch",
+   "pacote": "pacote-a",
+   "modelo": "hatchback-sports",
+   "arquivo": "hatchback-sports.glb",
+   "origemNoPlano": "pacote A, hatchback-sports"
+  },
+  {
+   "peca": "carro-suv",
+   "pacote": "pacote-a",
+   "modelo": "suv",
+   "arquivo": "suv.glb",
+   "origemNoPlano": "pacote A, suv"
+  },
+  {
+   "peca": "carro-suv-luxo",
+   "pacote": "pacote-a",
+   "modelo": "suv-luxury",
+   "arquivo": "suv-luxury.glb",
+   "origemNoPlano": "pacote A, suv-luxury"
+  },
+  {
+   "peca": "carro-taxi",
+   "pacote": "pacote-a",
+   "modelo": "taxi",
+   "arquivo": "taxi.glb",
+   "origemNoPlano": "pacote A, taxi"
+  },
+  {
+   "peca": "carro-policia",
+   "pacote": "pacote-a",
+   "modelo": "police",
+   "arquivo": "police.glb",
+   "origemNoPlano": "pacote A, police"
+  },
+  {
+   "peca": "furgao",
+   "pacote": "pacote-a",
+   "modelo": "van",
+   "arquivo": "van.glb",
+   "origemNoPlano": "pacote A, van"
+  },
+  {
+   "peca": "picape-compacta",
+   "pacote": "pacote-a",
+   "modelo": "truck",
+   "arquivo": "truck.glb",
+   "origemNoPlano": "pacote A, truck"
+  },
+  {
+   "peca": "picape-plataforma",
+   "pacote": "pacote-a",
+   "modelo": "truck-flat",
+   "arquivo": "truck-flat.glb",
+   "origemNoPlano": "pacote A, truck-flat"
+  },
+  {
+   "peca": "caminhao-entrega",
+   "pacote": "pacote-a",
+   "modelo": "delivery",
+   "arquivo": "delivery.glb",
+   "origemNoPlano": "pacote A, delivery"
+  },
+  {
+   "peca": "caminhao-entrega-aberto",
+   "pacote": "pacote-a",
+   "modelo": "delivery-flat",
+   "arquivo": "delivery-flat.glb",
+   "origemNoPlano": "pacote A, delivery-flat"
+  },
+  {
+   "peca": "ambulancia",
+   "pacote": "pacote-a",
+   "modelo": "ambulance",
+   "arquivo": "ambulance.glb",
+   "origemNoPlano": "pacote A, ambulance"
+  },
+  {
+   "peca": "caminhao-bombeiro",
+   "pacote": "pacote-a",
+   "modelo": "firetruck",
+   "arquivo": "firetruck.glb",
+   "origemNoPlano": "pacote A, firetruck"
+  },
+  {
+   "peca": "caminhao-lixo",
+   "pacote": "pacote-a",
+   "modelo": "garbage-truck",
+   "arquivo": "garbage-truck.glb",
+   "origemNoPlano": "pacote A, garbage-truck"
+  },
+  {
+   "peca": "trator",
+   "pacote": "pacote-a",
+   "modelo": "tractor",
+   "arquivo": "tractor.glb",
+   "origemNoPlano": "pacote A, tractor"
+  },
+  {
+   "peca": "trator-pa",
+   "pacote": "pacote-a",
+   "modelo": "tractor-shovel",
+   "arquivo": "tractor-shovel.glb",
+   "origemNoPlano": "pacote A, tractor-shovel"
+  },
+  {
+   "peca": "trator-sirene",
+   "pacote": "pacote-a",
+   "modelo": "tractor-police",
+   "arquivo": "tractor-police.glb",
+   "origemNoPlano": "pacote A, tractor-police"
+  },
+  {
+   "peca": "carro-corrida",
+   "pacote": "pacote-a",
+   "modelo": "race",
+   "arquivo": "race.glb",
+   "origemNoPlano": "pacote A, race"
+  },
+  {
+   "peca": "carro-corrida-futurista",
+   "pacote": "pacote-a",
+   "modelo": "race-future",
+   "arquivo": "race-future.glb",
+   "origemNoPlano": "pacote A, race-future"
+  },
+  {
+   "peca": "carro-sedan-classico",
+   "pacote": "pacote-b",
+   "modelo": "pacote B",
+   "arquivo": "pacote-b.obj",
+   "origemNoPlano": "pacote B"
+  },
+  {
+   "peca": "onibus-rodoviario",
+   "pacote": "pacote-c",
+   "modelo": "BUS",
+   "arquivo": "BUS.obj",
+   "origemNoPlano": "pacote C"
+  },
+  {
+   "peca": "carro-sedan-angular",
+   "pacote": "pacote-d",
+   "modelo": "Sedan",
+   "arquivo": "Sedan.fbx",
+   "origemNoPlano": "pacote D, Sedan"
+  },
+  {
+   "peca": "jipe-aberto",
+   "pacote": "pacote-d",
+   "modelo": "Jipe",
+   "arquivo": "Jipe.fbx",
+   "origemNoPlano": "pacote D, Jipe"
+  },
+  {
+   "peca": "picape-angular",
+   "pacote": "pacote-d",
+   "modelo": "Pickup",
+   "arquivo": "Pickup.fbx",
+   "origemNoPlano": "pacote D, Pickup"
+  },
+  {
+   "peca": "carro-perua",
+   "pacote": "pacote-d",
+   "modelo": "Wagon",
+   "arquivo": "Wagon.fbx",
+   "origemNoPlano": "pacote D, Wagon"
+  },
+  {
+   "peca": "onibus-urbano",
+   "pacote": "pacote-d",
+   "modelo": "Bus",
+   "arquivo": "Bus.fbx",
+   "origemNoPlano": "pacote D, Bus"
+  }
+ ]
+}

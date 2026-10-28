@@ -2,7 +2,7 @@
    recebe como dado, com a oclusão por pixel da camada, a cor de cada volume e o mesmo quadro do desenho das formas.
 
    O módulo não importa o núcleo: quem liga o esboço à blocagem (o tradutor do nível zero, em `src/autoria`) fica em
-   `tools/mecanifica/esboco-blocagem.mjs`, que entrega aqui, por opção, a malha (`{ vertices: [[x, y, z]], faces: [{ vertices:
+   `tools/modelar/esboco-blocagem.mjs`, que entrega aqui, por opção, a malha (`{ vertices: [[x, y, z]], faces: [{ vertices:
    [i, j, k], volume }] }`, triângulos anti-horários vistos de fora) e a lista de volumes a desenhar, na ordem do desenho
    (`{ id, cor, opacidade? }`; um volume que não está na lista não é desenhado, e é assim que a unidade isolada e os volumes
    vizinhos em contorno claro se escolhem). A mesma entrada dá o mesmo desenho, byte a byte.

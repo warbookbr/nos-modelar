@@ -13,7 +13,7 @@ import { conferirPlano, visiveisDoEsboco } from '../src/plano.js';
 import { detalharUnidade, integrarUnidade } from '../src/detalhe.js';
 import { editarEsboco } from '../src/editar.js';
 import { conferirEnvelope, criarEstado, formatarSituacao, planoDeDetalhe, refazerEnvelope } from '../src/condutor.js';
-import { condutorArquivo, detalharArquivo, editarArquivo, integrarArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { condutorArquivo, detalharArquivo, editarArquivo, integrarArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const clone = (v) => JSON.parse(JSON.stringify(v));

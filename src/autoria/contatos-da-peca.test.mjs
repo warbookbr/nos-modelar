@@ -13,7 +13,7 @@ import {
   solidosPorParte,
 } from './contatos-da-peca.js';
 
-const RAIZ_FIXTURES = '../../tools/mecanifica/fixtures/contatos';
+const RAIZ_FIXTURES = '../../tools/modelar/fixtures/contatos';
 
 async function medir(nome) {
   const mod = await import(`${RAIZ_FIXTURES}/${nome}.js`);
@@ -126,7 +126,7 @@ describe('o veredito sai no CÓDIGO DE SAÍDA, que filtro nenhum descarta', () =
      amanhã o texto mudar, o contrato que importa continua provado. */
   async function estrito(nome) {
     const modulo = await import(`${RAIZ_FIXTURES}/${nome}.js`);
-    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
     return descreverPecaReutilizavel({ peca: nome, modulo, estrito: true });
   }
 
@@ -155,7 +155,7 @@ describe('o veredito sai no CÓDIGO DE SAÍDA, que filtro nenhum descarta', () =
      Esquecer precisa falhar. */
   it('sem bandeira nenhuma, o contato não declarado reprova', async () => {
     const modulo = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
-    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
     const r = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo });
     expect(r.codigo).toBe(1);
     expect(r.resultado.contatos).not.toBeNull();
@@ -163,7 +163,7 @@ describe('o veredito sai no CÓDIGO DE SAÍDA, que filtro nenhum descarta', () =
 
   it('--estrito continua aceito e não muda mais nada', async () => {
     const modulo = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
-    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
     const comBandeira = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo, estrito: true });
     const semBandeira = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo });
     expect(comBandeira.codigo).toBe(semBandeira.codigo);
@@ -173,7 +173,7 @@ describe('o veredito sai no CÓDIGO DE SAÍDA, que filtro nenhum descarta', () =
      uma aprovação: a execução relaxada se anuncia na própria saída. */
   it('--sem-veredito aprova, não mede, e diz na saída que não mediu', async () => {
     const modulo = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
-    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
     const r = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo, semVeredito: true });
     expect(r.codigo).toBe(0);
     expect(r.resultado.contatos).toBeNull();

@@ -2,7 +2,7 @@
 import { lstatSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
-import { verificarCaminhoConfinado } from '../mecanifica/caminho-confinado.mjs';
+import { verificarCaminhoConfinado } from '../modelar/caminho-confinado.mjs';
 
 export const FORMATO_CATALOGO_MCP_MONTAGENS = 'mecanifica.catalogo-mcp-montagens';
 export const VERSAO_CATALOGO_MCP_MONTAGENS = 1;

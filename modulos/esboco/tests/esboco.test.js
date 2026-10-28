@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, resolverOpcao, ErroDeEsboco, faces } from '../src/index.js';
 import { fileURLToPath } from 'node:url';
-import { gerarEsboco, analisarEsboco, variante, lerZoomDoEsboco, VISTAS_DA_ANALISE } from '../../../tools/mecanifica/esboco.mjs';
+import { gerarEsboco, analisarEsboco, variante, lerZoomDoEsboco, VISTAS_DA_ANALISE } from '../../../tools/modelar/esboco.mjs';
 
 const deitadoSobreAnel = {
   opcoes: [{

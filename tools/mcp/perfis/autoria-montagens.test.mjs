@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { aplicarAutoria, inspecionarAutoria, observarAutoria, planejarAutoria } from './autoria-montagens.mjs';
 
-const montagem = JSON.parse(readFileSync(new URL('../../mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json', import.meta.url), 'utf8'));
-const peca = JSON.parse(readFileSync(new URL('../../mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json', import.meta.url), 'utf8'));
+const montagem = JSON.parse(readFileSync(new URL('../../modelar/fixtures/montagens-persistidas/v3-separacao-direcional.json', import.meta.url), 'utf8'));
+const peca = JSON.parse(readFileSync(new URL('../../modelar/fixtures/pecas-resolvidas/bloco-gabarito.json', import.meta.url), 'utf8'));
 
 describe('perfil MCP opt-in de autoria', () => {
   it('planeja, inspeciona e aplica por ID sem expor o caminho do host', async () => {

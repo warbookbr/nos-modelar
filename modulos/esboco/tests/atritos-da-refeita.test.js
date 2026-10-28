@@ -15,9 +15,9 @@ import { medirEsboco } from '../src/descrever.js';
 import { editarEsboco, formatarMudancas } from '../src/editar.js';
 import { detalharUnidade } from '../src/detalhe.js';
 import { visiveisDoEsboco } from '../src/plano.js';
-import { detalharArquivo, editarArquivo, integrarArquivo, lerArgumentos } from '../../../tools/mecanifica/esboco.mjs';
+import { detalharArquivo, editarArquivo, integrarArquivo, lerArgumentos } from '../../../tools/modelar/esboco.mjs';
 
-const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
+const cli = fileURLToPath(new URL('../../../tools/modelar/esboco.mjs', import.meta.url));
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const dirTemp = () => mkdtempSync(join(tmpdir(), 'esboco-atritos-'));
 const gravar = (dir, nome, obj) => { const caminho = join(dir, nome); writeFileSync(caminho, `${JSON.stringify(obj, null, 2)}\n`); return caminho; };

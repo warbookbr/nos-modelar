@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@mecanifica/pesquisa",
+  "name": "@modelar/pesquisa",
   "version": "1.0.0",
   "type": "module",
   "description": "Pesquisa: o que foi avaliado e ainda não entra no código, com a recomendação de quando voltar."

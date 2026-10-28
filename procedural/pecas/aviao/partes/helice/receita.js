@@ -1,7 +1,7 @@
 /* aviao/helice — o cone e as cinco pás da hélice do avião de pequeno porte, parada na pose do esboço.
  *
  * Terceira etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `helice` do esboço
- * aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
+ * aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
  * `aviao-detalhe-helice.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA).
  *
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. O
@@ -29,7 +29,7 @@ import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 import { nucleo } from '../../../../nucleo/entrada.js';
 
-const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const PAS = ['pa1', 'pa2', 'pa3', 'pa4', 'pa5'];
 const FORMA_DA_PA = { pa1: 'helicePa', pa2: 'helicePa1', pa3: 'helicePa2', pa4: 'helicePa3', pa5: 'helicePa4' };
 
@@ -224,7 +224,7 @@ const receita = {
   PLANO: {
     objeto: 'hélice de cinco pás de um avião monomotor de pequeno porte, parada: o cone na frente do capô e as cinco pás saindo dele em arranjo radial',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
     ],
     escala: { medida: 'diâmetro da hélice no esboço, de ponta a ponta das pás (o dobro de 1090 mm do eixo à ponta)', milimetros: 2180 },
     partes: [

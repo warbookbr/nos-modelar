@@ -10,7 +10,7 @@ import { verificarContato } from '../src/contato.js';
 import { deslocamentoQueZera, medirProjecaoDaOpcao, verificarProjecao } from '../src/projecao.js';
 import { ajustarEsboco, aplicarDeslocamento } from '../src/ajustar.js';
 import { descreverEsboco, formatarDescricao } from '../src/descrever.js';
-import { ajustarArquivo, analisarEsboco } from '../../../tools/mecanifica/esboco.mjs';
+import { ajustarArquivo, analisarEsboco } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, ...(centro ? { centro } : {}), ...extra });
 const esboco = (formas, contato = {}, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], contato: { usar: true, tolerancia: 1, folga: 50, ...contato }, ...extra });
@@ -231,7 +231,7 @@ describe('--ajustar', () => {
     const origem = join(dir, 'moto.esboco.json');
     const texto = readFileSync(new URL('moto.esboco.json', pasta), 'utf8');
     writeFileSync(origem, texto);
-    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', origem, '--ajustar'], { encoding: 'utf8' });
+    const r = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', origem, '--ajustar'], { encoding: 'utf8' });
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('rodada 1: 1 achados viram 0');
     expect(r.stdout).toContain('moveu banco [A. Naked] em [0 0 -13] mm: centro [0,650,-330] -> [0,650,-343]');
@@ -242,7 +242,7 @@ describe('--ajustar', () => {
     const linhas = novo.split('\n'); const velhas = texto.split('\n');
     expect(linhas).toHaveLength(velhas.length);
     expect(linhas.filter((l, i) => l !== velhas[i])).toEqual(['            -343']);
-    const de = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', join(dir, 'moto.ajustado.esboco.json'), '--ajustar'], { encoding: 'utf8' });
+    const de = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', join(dir, 'moto.ajustado.esboco.json'), '--ajustar'], { encoding: 'utf8' });
     expect(de.stdout).toContain('o gate já aprovava; nada a ajustar');
     expect(existsSync(join(dir, 'moto.ajustado.ajustado.esboco.json'))).toBe(false);
   }, 120000);

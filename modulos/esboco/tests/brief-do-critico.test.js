@@ -9,9 +9,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { avancar, criarEstado } from '../src/condutor.js';
-import { briefArquivo, briefDoCritico, briefDoMarco, briefDoObjeto, condutorArquivo, esbocoIsolado, lerArgumentos, PERGUNTAS_DO_CRITICO, variante, vistasArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { briefArquivo, briefDoCritico, briefDoMarco, briefDoObjeto, condutorArquivo, esbocoIsolado, lerArgumentos, PERGUNTAS_DO_CRITICO, variante, vistasArquivo } from '../../../tools/modelar/esboco.mjs';
 import { linhasDasPerguntas } from '../../../src/autoria/perguntas-do-critico.js';
-import { calibracaoDoContorno, caixaNaImagem, FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, pngDoContorno, recortarPng, referenciaDoBrief } from '../../../tools/mecanifica/esboco-brief.mjs';
+import { calibracaoDoContorno, caixaNaImagem, FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, pngDoContorno, recortarPng, referenciaDoBrief } from '../../../tools/modelar/esboco-brief.mjs';
 import { desenharEsboco } from '../src/index.js';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });

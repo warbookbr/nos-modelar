@@ -3,7 +3,7 @@
  * retrovisores e quatro rodas de pneu com aro de raios e cubo.
  *
  * Origem: "pacote B", de autor B, publicado em repositório de modelos livres sob licença livre sem exigência de crédito, pacote "pacote-b" da tabela
- * docs/mecanifica/veiculos-referencias.json, página endereço omitido. A malha (pacote-b.obj, com dois objetos: "Cylinder",
+ * docs/modelar/veiculos-referencias.json, página endereço omitido. A malha (pacote-b.obj, com dois objetos: "Cylinder",
  * as quatro rodas, e "Cube", a carroceria) NÃO está no repositório: fica em importados/veiculos-livres/pacote-b/pacote-b.obj, ignorada pelo git.
  * Daqui vêm só as medidas de referencias/fonte-partes.json (caixas e silhuetas em fatias, em metro) e as vistas de
  * referencias/fonte-vistas.png. O que não ficou igual à fonte está em referencias/alvo.md.

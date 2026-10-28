@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/trens-principais-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-receita-2026-10-15/alvos/trens-principais-composta.png",
     "nota": 7,
     "defeitos": [
       {
@@ -244,7 +244,7 @@
         {
           "tipo": "+",
           "linha": 5,
-          "texto": " * do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+          "texto": " * do esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
         },
         {
           "tipo": "+",
@@ -364,7 +364,7 @@
         {
           "tipo": "+",
           "linha": 29,
-          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+          "texto": "const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
         },
         {
           "tipo": "+",

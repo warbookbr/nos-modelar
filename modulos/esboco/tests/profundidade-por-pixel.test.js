@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { desenharEsboco, VISTAS } from '../src/index.js';
 import { passoDeDesempate } from '../src/camada.js';
-import { desenhoParaPng, svgParaPng } from '../../../tools/mecanifica/esboco.mjs';
+import { desenhoParaPng, svgParaPng } from '../../../tools/modelar/esboco.mjs';
 
 let navegador;
 let pasta;

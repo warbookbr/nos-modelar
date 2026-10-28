@@ -13,7 +13,7 @@ import {
   lerFormasDeclaradas,
 } from './forma-da-parte.js';
 
-const RAIZ_FIXTURES = '../../tools/mecanifica/fixtures/contatos';
+const RAIZ_FIXTURES = '../../tools/modelar/fixtures/contatos';
 
 async function medir(nome) {
   const mod = await import(`${RAIZ_FIXTURES}/${nome}.js`);
@@ -118,7 +118,7 @@ describe('lerFormasDeclaradas', () => {
 describe('o veredito sai no CÓDIGO DE SAÍDA', () => {
   async function estrito(nome) {
     const modulo = await import(`${RAIZ_FIXTURES}/${nome}.js`);
-    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
     return descreverPecaReutilizavel({ peca: nome, modulo, estrito: true });
   }
 

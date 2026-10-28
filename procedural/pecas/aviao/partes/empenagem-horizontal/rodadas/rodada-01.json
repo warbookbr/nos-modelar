@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/empenagem-horizontal-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-receita-2026-10-15/alvos/empenagem-horizontal-composta.png",
     "nota": 9,
     "defeitos": [],
     "observacao": "Modelo reproduz o alvo em planta, diedro, vão, eixo e suportes. O alvo é que se afasta do real (afilamento, recorte da ponta, bordo de fuga). Junção com a cauda ilegível nas vistas do conjunto."
@@ -113,7 +113,7 @@
         {
           "tipo": "+",
           "linha": 5,
-          "texto": " * `empenagem-horizontal` do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre"
+          "texto": " * `empenagem-horizontal` do esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre"
         },
         {
           "tipo": "+",
@@ -283,7 +283,7 @@
         {
           "tipo": "+",
           "linha": 39,
-          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+          "texto": "const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
         },
         {
           "tipo": "+",

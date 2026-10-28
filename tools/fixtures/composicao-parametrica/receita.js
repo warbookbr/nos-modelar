@@ -1,7 +1,7 @@
 /* Fixture de teste: receita que compõe por `CHAMADAS_COMPOSICOES` e deriva as
    chamadas de `PARAMS`. Uma base e um pilar com `folga` entre eles; `largura` e
    `altura` movem as caixas, `folga` move a relação, e `inerte` não entra na
-   geometria. Usada por `tools/mecanifica/composicao-na-varredura.test.mjs`. */
+   geometria. Usada por `tools/modelar/composicao-na-varredura.test.mjs`. */
 import { ID_BLOCO } from './composicoes.js';
 
 export const receita = {

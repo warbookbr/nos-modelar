@@ -9,7 +9,7 @@ import { ancorasDe, desenharEsboco, ErroDeEsboco, resolverOpcao } from '../src/i
 import { expandirEsboco } from '../src/expandir.js';
 import { herdarDoEspelho, verificarContato } from '../src/contato.js';
 import { descreverEsboco, formatarDescricao, diferenca } from '../src/descrever.js';
-import { analisarEsboco } from '../../../tools/mecanifica/esboco.mjs';
+import { analisarEsboco } from '../../../tools/modelar/esboco.mjs';
 
 const fixture = (nome) => fileURLToPath(new URL(`./fixtures/${nome}`, import.meta.url));
 const lerFixture = (nome) => JSON.parse(readFileSync(fixture(nome), 'utf8'));

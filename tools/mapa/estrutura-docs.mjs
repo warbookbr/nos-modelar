@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
  *
- * A pasta `docs/mecanifica/usar/` existe para que uma IA que só vai criar,
+ * A pasta `docs/modelar/usar/` existe para que uma IA que só vai criar,
  * inspecionar ou auditar uma peça não atravesse o material de desenvolvimento.
  * Separar as pastas uma vez não mantém isso: basta uma citação nova para a
  * fronteira vazar, e ninguém percebe até o acervo estar misturado de novo.
@@ -26,7 +26,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const PASTA_USAR = 'docs/mecanifica/usar';
+const PASTA_USAR = 'docs/modelar/usar';
 const PASTA_SKILLS = '.claude/skills';
 
 /* Allowlist fechada por par arquivo→destino, com motivo. Estas duas apontam
@@ -35,7 +35,7 @@ const PASTA_SKILLS = '.claude/skills';
    escrita à mão e revisável. */
 export const ALLOWLIST_G1 = new Map([
   [
-    'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md',
+    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/usar/GOTCHAS-POR-OPERACAO.md',
     'as armadilhas de loft, inflate, cilindro, arranja e furo viraram os `limites` de cada '
     + 'operação, que chegam por `descrever_capacidade` no momento em que a operação é '
     + 'escolhida; o ponteiro guarda o CASO de cada uma — a peça, o número medido, a rodada '
@@ -44,30 +44,30 @@ export const ALLOWLIST_G1 = new Map([
     + 'usar cilindro não tinha como chegar nelas',
   ],
   [
-    'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/mecanifica/ATRITOS-AUTORIA.md',
+    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/ATRITOS-AUTORIA.md',
     'aponta a lista detalhada e a evidência de cada atrito; a regra continua sendo a tabela local',
   ],
   [
-    'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/mecanifica/historico/REGISTRO-FALHAS-AUTORIA-V.md',
+    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md',
     'as 38 falhas medidas saíram daqui: eram 15,6 dos 35,8 KB de um documento de leitura '
     + 'obrigatória, e a maior parte é arqueologia do N6 congelado. Quem vai modelar uma peça '
     + 'não precisa delas; quem vai reabrir hipótese de forma precisa de todas, e o ponteiro '
     + 'existe para isso — redescobrir o que a tabela já mediu é a própria falha V-31',
   ],
   [
-    'docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md:docs/mecanifica/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md',
+    'docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md:docs/modelar/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md',
     'cita plano encerrado como registro do caso que originou o método; plano encerrado não governa',
   ],
   [
-    'docs/mecanifica/usar/README.md:docs/mecanifica/INDEX.md',
+    'docs/modelar/usar/README.md:docs/modelar/INDEX.md',
     'a porta manda quem vai DESENVOLVER sair daqui; apontar a saída é o oposto de depender dela',
   ],
   [
-    'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md:docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md',
+    'docs/modelar/usar/MONTAGENS-SEMANTICAS.md:docs/modelar/MONTAGEM-PERSISTIDA-V1.md',
     'aponta o recorte executável do contrato; candidato a vir para usar/ quando alguma skill precisar dele',
   ],
   [
-    'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md:docs/mecanifica/planos/BACKLOG.md',
+    'docs/modelar/usar/MONTAGENS-SEMANTICAS.md:docs/modelar/planos/BACKLOG.md',
     'manda a questão em aberto para onde questão em aberto mora, em vez de deliberar dentro do contrato',
   ],
 ]);
@@ -79,8 +79,8 @@ export const ALLOWLIST_G1 = new Map([
    então e caiu para a meta assim que o conteúdo saiu, em vez de o número ser
    afrouxado para o gate ficar verde. */
 export const TETO_PORTAS = new Map([
-  ['docs/mecanifica/usar/README.md', 60],
-  ['docs/mecanifica/INDEX.md', 200],
+  ['docs/modelar/usar/README.md', 60],
+  ['docs/modelar/INDEX.md', 200],
 ]);
 
 /* A raiz é parâmetro, não constante derivada da localização do script: sem isso

@@ -3,7 +3,7 @@
  */
 import { iniciar } from '../../src/bancada/main.js';
 import { hierarquia, portas, portasComJunta, semPortas, uniao, visual } from './fixtures/catalogo-visual.js';
-import ombroUniao from '../mecanifica/fixtures/fixture-ombro-uniao.js';
+import ombroUniao from '../modelar/fixtures/fixture-ombro-uniao.js';
 
 const catalogo = [
   { id: 'fixture-visual', carregar: async () => visual },

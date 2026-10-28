@@ -2,10 +2,10 @@
 
 Leia esta referência quando a tarefa exigir uma operação específica. O catálogo
 de operações é gerado do registro do núcleo: rode `npm run catalogo:gerar` e
-consulte [`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](../../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md).
+consulte [`docs/modelar/gerado/CATALOGO-CAPACIDADES.md`](../../../../docs/modelar/gerado/CATALOGO-CAPACIDADES.md).
 Cada operação publica também schema de argumentos, exemplo executável,
 pré-condições, limites e diagnóstico em
-[`schemas-operacoes.json`](../../../../docs/mecanifica/gerado/schemas-operacoes.json).
+[`schemas-operacoes.json`](../../../../docs/modelar/gerado/schemas-operacoes.json).
 Pelo MCP, prefira `descrever_capacidade`: ele entrega somente o contrato completo
 da operação pedida. O executor continua sendo a autoridade final para validar
 uma receita concreta e produzir recusas ligadas ao estado real da malha.
@@ -23,7 +23,7 @@ cada operação vem do catálogo, e não de receita antiga.
 - seleção semântica, identidade e limites: seção de seleção;
 - proveniência de `origem`, rotação e exemplos: detalhes de seleção;
 - aliases, atributos e animação: bloco de aliases e leis do núcleo.
-- o caso de cada armadilha de operação, com a peça e o número medido: `docs/mecanifica/usar/GOTCHAS-POR-OPERACAO.md`.
+- o caso de cada armadilha de operação, com a peça e o número medido: `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`.
 
 ## Operações disponíveis
 
@@ -442,7 +442,7 @@ ponto ao longo do eixo. O ponto se chama `estacao_coluna`, e o ajudante devolve
 e `passo`, que se espalha no passo. Em `PARAMS` os pontos ficariam fixos desde a
 carga do módulo, e mudar a `TABELA` não moveria a gaiola; o exemplo completo é
 `procedural/pecas/carenagem-de-prova/`, e o fluxo está em
-`docs/mecanifica/modelar-carroceria.md`:
+`docs/modelar/modelar-carroceria.md`:
 
 ```js
 const coluna = (nome, u, v) => ({ nome, em: [u, v] });
@@ -773,7 +773,7 @@ por código com todos os pontos medidos, a forma lisa fica abaixo de 0,23 mm e a
 ondulação de 1 mm plantada entre dois pontos vizinhos sai com 0,88 mm e esses
 dois pontos à frente. Com `medidas`, os pontos citados são os da gaiola
 ajustada, e mexer no ponto declarado move o ajustado. A função
-`ondulacaoDaReceita`, de `tools/mecanifica/ondulacao-da-superficie.mjs`, faz o
+`ondulacaoDaReceita`, de `tools/modelar/ondulacao-da-superficie.mjs`, faz o
 mesmo num teste. Uma feição desenhada mais estreita que três espaçamentos da
 gaiola sai acusada mesmo com a superfície sobre a forma; alargue a feição ou
 adense as colunas ao redor dela. Na carenagem de prova, colunas a 175 mm longe do
@@ -782,7 +782,7 @@ forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra continua para a
 pessoa e o crítico conferirem.
 
 Para a falha de mais de três espaçamentos, rode `npm run alisar --
-<receita.js>` (`tools/mecanifica/alisar-a-superficie.mjs`) em vez de rodadas de
+<receita.js>` (`tools/modelar/alisar-a-superficie.mjs`) em vez de rodadas de
 ponto a ponto: o fluxo é rodar a ondulação, alisar, aplicar e conferir. A
 ferramenta resolve de uma vez, por mínimos quadrados com regularização, o
 deslocamento dos números da `TABELA` que movem uma coluna escrita numa
@@ -911,7 +911,7 @@ O interior de um retalho de quatro lados é a interpolação transfinita de Coon
 
 A curva pode ser `vinco` (nitidez de 0 a 1 ou `'viva'`, que vira vinco nomeado ao longo de todas as arestas dela) e pode levar `peso` ou `exata: true`. As curvas e os pontos de dentro entram em `medidas` (curva exata por padrão, interior com o peso 1 de `interior`), e `leitura: true` faz a cota da curva sem peso ganhar o peso da leitura, com aviso dos pontos-chave mais perto do que o erro sustenta, como na gaiola por estações. O canto vivo da borda (desvio de direção acima de `anguloDeCanto`, 35 graus) sai sozinho em `passo.cantos`. A moldura é um `friso` com `linha: { nome, pontos: rede.linha('janela') }`, e a linha da curva fechada repete o primeiro ponto no fim. Três coisas gritam ou avisam com o nome: o canto quase reto ou agudo que dobra o preenchimento de Coons (`cantoQuaseReto`, `cantoAgudo`, ou grito se uma face dobra), o arco que vira mais de 22,5 graus numa divisão só (`curvaturaConcentrada`, que pede um nó onde a curvatura muda, como a emenda de um arco com uma reta) e o espaçamento que salta de um arco ao vizinho mais de três vezes (`gradacaoBrusca`).
 
-Na chapa de prova de 1000 × 600 mm (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`), com a janela em gota de 230 mm na parte larga e ponta de raio 20 mm, o arco de roda de raio 140 mm e a coluna inclinada, 19 curvas e 10 retalhos (8 de quatro lados e 2 de cinco) dão 654 pontos de gaiola e, em nível 2, 9.480 vértices só de quadriláteros. A superfície passa pelas curvas a até 0,26 mm, os vértices extraordinários são 3 de valência 5 no interior (2 centros e um nó) e 2 nós de borda, a borda da janela é um laço de arestas da malha, o salto de normal da superfície nas curvas lisas compartilhadas fica em até 0,96 grau e na cintura vincada em 12, e `npm run ondulacao` sai sem falha e sem face virada, com o desvio máximo de 0,17 mm; sem o alisamento sai um calombo de 0,43 mm. A moldura de 10 mm como `friso` sobre a curva da janela fecha sólida e interpenetra a chapa de 1,5 mm de espessura. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/mecanifica/ondulacao-rede.test.mjs`.
+Na chapa de prova de 1000 × 600 mm (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`), com a janela em gota de 230 mm na parte larga e ponta de raio 20 mm, o arco de roda de raio 140 mm e a coluna inclinada, 19 curvas e 10 retalhos (8 de quatro lados e 2 de cinco) dão 654 pontos de gaiola e, em nível 2, 9.480 vértices só de quadriláteros. A superfície passa pelas curvas a até 0,26 mm, os vértices extraordinários são 3 de valência 5 no interior (2 centros e um nó) e 2 nós de borda, a borda da janela é um laço de arestas da malha, o salto de normal da superfície nas curvas lisas compartilhadas fica em até 0,96 grau e na cintura vincada em 12, e `npm run ondulacao` sai sem falha e sem face virada, com o desvio máximo de 0,17 mm; sem o alisamento sai um calombo de 0,43 mm. A moldura de 10 mm como `friso` sobre a curva da janela fecha sólida e interpenetra a chapa de 1,5 mm de espessura. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/modelar/ondulacao-rede.test.mjs`.
 
 ## Friso ao longo de curva: `friso`
 
@@ -945,7 +945,7 @@ largura do perfil); `[inicio, fim]` escolhe cada ponta, e a volta não tem ponta
 Sem `superficie`, a linha é uma polilinha de pontos nomeados de `PARAMS` ou
 `[x,y,z]`, com `normal` declarada. O perfil de um detalhe de borda que um pacote
 cego mostra em corte se lê em milímetro, nesta convenção, com `ler-perfil`
-(`docs/mecanifica/modelar-carroceria.md`), em vez de se desenhar à mão.
+(`docs/modelar/modelar-carroceria.md`), em vez de se desenhar à mão.
 
 O friso é um sólido próprio que entra na chapa, e não uma fusão: a booleana sobre
 a superfície subdividida ficou de fora do plano que criou a operação, e o friso
@@ -1356,4 +1356,4 @@ está no catálogo gerado (`descrever_capacidade`).
 
 `inflate` continua blocky; o `filete` tem os limites declarados no catálogo;
 JS puro não tem replay canônico. Superfície lisa de chapa é a `subdivisao`, com a
-técnica de `docs/mecanifica/modelar-carroceria.md`. Não declare uma forma coberta sem evidência visual e estrutural.
+técnica de `docs/modelar/modelar-carroceria.md`. Não declare uma forma coberta sem evidência visual e estrutural.

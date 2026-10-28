@@ -20,7 +20,7 @@ const banco = [
   'rodada-2026-10-08/carrinho-de-mao/carrinho-de-mao',
   'carrinho-refeito-2026-10-08/carrinho-casca',
   'carrinho-refeito-2026-10-08/chassi-e-cacamba',
-].map((n) => [`${n.split('/').pop()}.esboco.json`, lerJson(new URL(`docs/mecanifica/banco-de-provas/${n}.esboco.json`, raiz))]);
+].map((n) => [`${n.split('/').pop()}.esboco.json`, lerJson(new URL(`docs/modelar/banco-de-provas/${n}.esboco.json`, raiz))]);
 const fixtures = [...doModulo, ...banco];
 
 const EIXOS = ['x', 'y', 'z'];

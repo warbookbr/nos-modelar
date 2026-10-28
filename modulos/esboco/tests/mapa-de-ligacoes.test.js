@@ -7,12 +7,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formatarLigacoes, mapaDeLigacoes } from '../src/mapa-de-ligacoes.js';
-import { ligacoesArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { ligacoesArquivo } from '../../../tools/modelar/esboco.mjs';
 import { verificarContato } from '../src/contato.js';
 import { conferirPlano, visiveisDoEsboco } from '../src/plano.js';
 import { expandirEsboco } from '../src/expandir.js';
 
-const cli = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
+const cli = fileURLToPath(new URL('../../../tools/modelar/esboco.mjs', import.meta.url));
 const caixa = (id, centro, l, a, p, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 
 /* chão, dois pés, placa, antena de tubo com a ponta no ar e uma caixa longe de tudo */

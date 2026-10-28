@@ -3,7 +3,7 @@ import { z } from 'zod';
 import {
   aplicarAutoriaReceita, confirmarAutoriaReceita, inspecionarAutoriaReceita,
   observarAutoriaReceita, planejarAutoriaReceita,
-} from '../../mecanifica/autoria-receita.mjs';
+} from '../../modelar/autoria-receita.mjs';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const hash = z.string().regex(/^[a-f0-9]{64}$/);

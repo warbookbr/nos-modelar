@@ -3674,7 +3674,7 @@ describe('Fase 4 — sel.origem para cilindro (lado numérico + tampa nominal)',
   });
 });
 
-/* O-2 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md, Faixa 1) — reatribuir `parte`
+/* O-2 (docs/modelar/historico/OFICINA-OTIMIZACOES.md, Faixa 1) — reatribuir `parte`
    passa a GRITAR. Era a pior classe de defeito do vocabulário: resultado errado
    que PASSA. Duas seleções sobrepostas, a parte declarada antes perde faces sem
    nada reclamar, e a bancada só mostra a contagem de faces SEM nome — nunca as
@@ -4076,7 +4076,7 @@ describe('as mensagens de seleção ensinam os OITO seletores', () => {
 });
 
 /* ---------------------------------------------------------------------------
-   Endereços semânticos v1 — A-18, A-19 e A-20 de docs/mecanifica/ATRITOS-AUTORIA.md.
+   Endereços semânticos v1 — A-18, A-19 e A-20 de docs/modelar/ATRITOS-AUTORIA.md.
    Cada bloco abaixo falha no código anterior a esta rodada: os três geradores
    só sabiam citar a primitiva inteira (A-18), o eixo só aceitava inteiro
    literal (A-19) e `nucleo` não devolvia as portas (A-20).

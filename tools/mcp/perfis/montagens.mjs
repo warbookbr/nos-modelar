@@ -4,7 +4,7 @@ import { derivarCatalogoMontagens } from '../../../src/autoria/derivar-catalogo-
 import { derivarRoteiroRevalidacao } from '../../../src/autoria/derivar-roteiro-revalidacao.js';
 import { descreverMontagemResolvida } from '../../../src/autoria/descrever-montagem-resolvida.js';
 import { auditarIntersecoesMontagem } from '../../../src/autoria/auditar-intersecoes-montagem.js';
-import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
+import { capturarMontagem } from '../../modelar/capturar-montagem.mjs';
 import { ErroCatalogoMcpMontagens, REGRA_ESCOPO_CATALOGO } from '../catalogo-montagens.mjs';
 import {
   catalogarMontagensEntrada, catalogarMontagensSaida,

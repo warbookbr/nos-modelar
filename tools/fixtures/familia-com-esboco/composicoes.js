@@ -1,6 +1,6 @@
 /* Fixture de teste: a composição da família `roda-com-esboco`, uma roda de eixo em x com pneu, disco e dois cubos, cada um
    uma revolução, e duas portas (o assento do pneu e o cubo da direita). Quem a usa é `src/autoria/familia-esboco.test.js` e
-   `tools/mecanifica/familia-com-esboco.test.mjs`; mudar qualquer arquivo desta pasta muda o que eles provam. Ela fica em
+   `tools/modelar/familia-com-esboco.test.mjs`; mudar qualquer arquivo desta pasta muda o que eles provam. Ela fica em
    `tools/fixtures` e não em `procedural/familias` para o registro do produto só conter famílias reais. */
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../procedural/nucleo/entrada.js';
 

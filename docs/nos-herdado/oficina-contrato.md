@@ -3,7 +3,7 @@
 > **Modelar:** a interface humana `oficina.html`, a aba de som e a ponte
 > sonora de runtime foram removidas no commit `be157c6`. Não use este documento
 > como porta de entrada do produto: para o fluxo atual, comece em
-> [`docs/mecanifica/INDEX.md`](../mecanifica/INDEX.md). A gramática procedural
+> [`docs/modelar/INDEX.md`](../modelar/INDEX.md). A gramática procedural
 > que ele registra continua presente e é consumida pela bancada neutra.
 
 Recorte histórico de `docs/oficina.md` com o formato salvo, a identidade de
@@ -270,7 +270,7 @@ Sem o servidor no ar, cai pro download comum — funciona, mas você move o arqu
 
 ## Lista de operações
 
-A lista operacional não é mantida neste contrato herdado. Ela é uma projeção do registro explícito do motor: gere-a com `npm run catalogo:gerar` e consulte [`CATALOGO-CAPACIDADES.md`](../mecanifica/gerado/CATALOGO-CAPACIDADES.md). O catálogo informa operações, artefatos, efeitos e identidade; a execução ainda valida cada receita concreta.
+A lista operacional não é mantida neste contrato herdado. Ela é uma projeção do registro explícito do motor: gere-a com `npm run catalogo:gerar` e consulte [`CATALOGO-CAPACIDADES.md`](../modelar/gerado/CATALOGO-CAPACIDADES.md). O catálogo informa operações, artefatos, efeitos e identidade; a execução ainda valida cada receita concreta.
 
 Em `lathe`, no `contorno` do `loft` e nos dois contornos de `inflate`, o terceiro elemento do ponto aceita `[a,b,raio]` ou `[a,b,{raio,segmentos}]`. A primeira forma usa `segmentosCurva` do passo; a segunda usa a contagem local. `raio` e `segmentos` podem citar PARAM; `segmentos` é inteiro de 1 a 1000. Forma malformada falha antes de criar geometria; a contagem local é TOPO e pode renumerar o restante do passo.
 

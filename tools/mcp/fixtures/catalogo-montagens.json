@@ -1,8 +1,8 @@
 {
   "formato": "mecanifica.catalogo-mcp-montagens",
   "versao": 1,
-  "raizMontagens": "../../mecanifica/fixtures/montagens-persistidas",
-  "raizPecas": "../../mecanifica/fixtures/pecas-resolvidas",
+  "raizMontagens": "../../modelar/fixtures/montagens-persistidas",
+  "raizPecas": "../../modelar/fixtures/pecas-resolvidas",
   "raizes": [
     { "id": "gabarito-separacao-direcional", "ref": "v3-separacao-direcional" },
     { "id": "gabarito-unitario", "ref": "gabarito-unitario" }

@@ -6,7 +6,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { avancar, criarEstado, liberar, marcarFeito, registrarVeredito } from '../src/condutor.js';
-import { condutorArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { condutorArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });
 const medida = (nome, valor, mede) => ({ nome, valor, unidade: 'mm', origem: 'ficha', tolerancia: 1, mede });

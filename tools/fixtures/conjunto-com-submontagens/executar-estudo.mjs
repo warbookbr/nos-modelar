@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Fixture de teste: um conjunto de seis peças em duas submontagens, com relações diretas e indiretas. Quem a usa é `tools/mecanifica/contexto-montagem-estudo.test.ts`, e mudar
+/* Fixture de teste: um conjunto de seis peças em duas submontagens, com relações diretas e indiretas. Quem a usa é `tools/modelar/contexto-montagem-estudo.test.ts`, e mudar
    qualquer arquivo desta pasta muda o que esse teste prova. Até 2026-09-22 ela
    morava em `autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/`. */
 /* Executa a montagem do estudo sem criar uma porta nova no produto. */

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@mecanifica/esboco",
+  "name": "@modelar/esboco",
   "version": "1.0.0",
   "type": "module",
   "description": "Desenha opções de forma lado a lado, na mesma escala, a partir de um JSON declarativo de cilindros, anéis e caixas em milímetro, para a pessoa escolher vendo durante o alinhamento."

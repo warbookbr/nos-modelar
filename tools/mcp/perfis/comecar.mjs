@@ -7,7 +7,7 @@
  * entrar. Só lê.
  */
 import { z } from 'zod';
-import { comecar } from '../../mecanifica/comecar.mjs';
+import { comecar } from '../../modelar/comecar.mjs';
 
 export const comecarEntrada = z.object({
   roteiro: z.string().min(1).optional(),

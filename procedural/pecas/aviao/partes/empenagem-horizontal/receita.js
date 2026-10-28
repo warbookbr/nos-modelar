@@ -2,7 +2,7 @@
  * suportes, na pose de pouso, com os profundores neutros.
  *
  * Quinta etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade
- * `empenagem-horizontal` do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre
+ * `empenagem-horizontal` do esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre
  * e `aviao-detalhe-empenagem-horizontal.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA).
  *
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada
@@ -44,7 +44,7 @@ import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 import { nucleo } from '../../../../nucleo/entrada.js';
 
-const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const LADOS = [['D', 'd', 'direito'], ['E', 'e', 'esquerdo']];
 const porLado = (fazer) => LADOS.flatMap(([L, l, nome]) => fazer(L, l, nome));
 
@@ -596,7 +596,7 @@ const receita = {
   PLANO: {
     objeto: 'empenagem horizontal de um avião monomotor de pequeno porte: as duas metades do estabilizador na cauda, cada uma com o profundor no bordo de fuga, o eixo dele e três suportes',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
     ],
     escala: { medida: 'envergadura do estabilizador no esboço, de ponta a ponta', milimetros: 4780 },
     partes: porLado((L, l, nome) => [

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, ErroDeEsboco } from '../src/index.js';
 import { descreverAchado, descreverAtravessamento, descreverSilenciado, MINIMO_DO_MOTIVO, verificarContato } from '../src/contato.js';
-import { analisarEsboco } from '../../../tools/mecanifica/esboco.mjs';
+import { analisarEsboco } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
 const esboco = (formas, contato = {}, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], contato: { usar: true, tolerancia: 1, folga: 50, ...contato }, ...extra });
@@ -170,7 +170,7 @@ describe('contato do esboço', () => {
       const pasta = mkdtempSync(join(tmpdir(), 'contato-'));
       const arq = join(pasta, 'r.esboco.json');
       writeFileSync(arq, JSON.stringify(esboco(dois, { pares: [{ a: 'a', b: 'b', tipo: 'atravessa', max: 15 }] })));
-      const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq], { encoding: 'utf8' });
+      const r = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq], { encoding: 'utf8' });
       expect(r.status).toBe(1);
       expect(r.stderr).toMatch(/^esboço recusado: .*a ↔ b.*falta o campo "motivo".*Exemplo:/);
     }, 60000);
@@ -192,7 +192,7 @@ describe('contato do esboço', () => {
     const arq = join(pasta, 'l.esboco.json');
     const f = [caixa('a', [0, 0, 0]), caixa('b', [10, 0, 0]), caixa('c', [20, 0, 0])];
     writeFileSync(arq, JSON.stringify(esboco(f, { pares: [atravessa('a', 'b', 12), livre('a', 'c', { motivo: 'a peça c só ilustra o remate' })] })));
-    const r = spawnSync(process.execPath, ['tools/mecanifica/esboco.mjs', arq], { encoding: 'utf8' });
+    const r = spawnSync(process.execPath, ['tools/modelar/esboco.mjs', arq], { encoding: 'utf8' });
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('atravessamentos declarados:\n  [T] a e b se atravessam 10,0 mm (máximo declarado 12,0 mm)\npares silenciados:\n  [T] a e c ignorados (livre): a peça c só ilustra o remate\n');
     const { manifesto } = await analisarEsboco(arq);

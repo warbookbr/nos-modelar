@@ -195,7 +195,7 @@
   "pessoa": {
     "data": "2026-10-16",
     "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png",
     "perfis": {
       "air-fryer-de-forno": {
         "hash": "sha256:7c7c5e6aa96ee2ab4ad0254f00d6692d46fe3a3f1750ee592252b110bc93e269"

@@ -80,7 +80,7 @@ describe('gate do plano ativo nos três índices', () => {
 
   it('aceita os três apontando o mesmo plano', () => {
     const caminhos = tres({
-      raiz: `O plano ativo é [A](docs/mecanifica/planos/${nome}).\n`,
+      raiz: `O plano ativo é [A](docs/modelar/planos/${nome}).\n`,
       indice: `- Ativo: [A](planos/${nome}); pronto: outro.\n`,
       planos: `**Plano ativo:** [A](${nome}) (${nome}), ativado.\n`,
     });
@@ -109,7 +109,7 @@ describe('gate do plano ativo nos três índices', () => {
 
   it('recusa índices que apontam planos diferentes', () => {
     const caminhos = tres({
-      raiz: `O plano ativo é [A](docs/mecanifica/planos/${nome}).\n`,
+      raiz: `O plano ativo é [A](docs/modelar/planos/${nome}).\n`,
       indice: '- Ativo: [B](planos/2026-10-22-b.md).\n',
       planos: `**Plano ativo:** [A](${nome}) (${nome}).\n`,
     });

@@ -18,10 +18,10 @@ import { expandirEsboco } from '../src/expandir.js';
 import { detalharUnidade, integrarUnidade } from '../src/detalhe.js';
 import { editarEsboco } from '../src/editar.js';
 import { desenharEsboco, resolverOpcao } from '../src/index.js';
-import { briefDoCritico, cursoArquivo, descreverArquivo, editarArquivo, esbocoIsolado, variante } from '../../../tools/mecanifica/esboco.mjs';
-import { FIM_DO_BRIEF, MARCA_DO_BRIEF } from '../../../tools/mecanifica/esboco-brief.mjs';
+import { briefDoCritico, cursoArquivo, descreverArquivo, editarArquivo, esbocoIsolado, variante } from '../../../tools/modelar/esboco.mjs';
+import { FIM_DO_BRIEF, MARCA_DO_BRIEF } from '../../../tools/modelar/esboco-brief.mjs';
 
-const CLI = fileURLToPath(new URL('../../../tools/mecanifica/esboco.mjs', import.meta.url));
+const CLI = fileURLToPath(new URL('../../../tools/modelar/esboco.mjs', import.meta.url));
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const caixa = (id, x, y, z, w, h, d, extra = {}) => ({ id, tipo: 'caixa', largura: w, altura: h, profundidade: d, centro: [x, y, z], ...extra });
 

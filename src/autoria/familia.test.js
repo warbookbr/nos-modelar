@@ -384,7 +384,7 @@ describe('familia — vocabulário conferido contra o núcleo e os documentos', 
   });
 
   it('as ferramentas são exatamente as de ferramentas-por-objeto.json', () => {
-    const doc = ler('../../docs/mecanifica/ferramentas-por-objeto.json');
+    const doc = ler('../../docs/modelar/ferramentas-por-objeto.json');
     expect([...FERRAMENTAS_DE_FAMILIA]).toEqual(Object.keys(doc.ferramentas).sort());
   });
 });

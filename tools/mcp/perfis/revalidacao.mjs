@@ -6,7 +6,7 @@ import {
   obsoletarCampanhaRevalidacao,
   obsoletarItemRevalidacao,
   registrarResultadoRevalidacao,
-} from '../../mecanifica/repositorio-revalidacao.mjs';
+} from '../../modelar/repositorio-revalidacao.mjs';
 
 const slug = z.string().regex(/^[a-z0-9][a-z0-9._-]*$/);
 const sha256 = z.string().regex(/^sha256:[a-f0-9]{64}$/);

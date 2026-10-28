@@ -8,12 +8,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
-import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
+import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../modelar/descrever-peca.mjs';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../src/autoria/catalogo-pecas.js';
 
 /* O que a bancada PUBLICA, que é o que uma prova visual pode renderizar. */
 const PECAS_PUBLICADAS = idsDoCatalogo(CATALOGO_HOMOLOGADO);
-import { olharBancada } from '../mecanifica/olhar-bancada.mjs';
+import { olharBancada } from '../modelar/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../modelagem/revisao-modelagem.mjs';
 import { listarCatalogoDePacotes, RAIZ_PACOTES, serializarCanonico } from '../modelagem/formato-pacote.mjs';
@@ -40,8 +40,8 @@ const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
 const CONFIGURACAO_MONTAGENS = join(RAIZ, 'tools/mcp/fixtures/catalogo-montagens.json');
 const CONFIGURACAO_UNIVERSO = join(RAIZ, 'tools/mcp/fixtures/universo-dependencias.json');
 const CONFIGURACAO_CATALOGO_MAPA = join(RAIZ, 'tools/mcp/fixtures/catalogo-mapa-dependencias.json');
-const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
-const MONTAGEM_SISTEMA_A = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/mapa-dependencias/montagens/sistema-a.json'), 'utf8'));
+const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/modelar/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+const MONTAGEM_SISTEMA_A = JSON.parse(readFileSync(join(RAIZ, 'tools/modelar/fixtures/mapa-dependencias/montagens/sistema-a.json'), 'utf8'));
 /* O conjunto do eixo mora em `tools/fixtures/conjunto-do-eixo/`. Até
    2026-09-22 ele ficava em `autoria-assistida/`, e o teste que o publica ficou
    desligado com `it.skip` de 2026-08-31 a 2026-09-22 porque um commit apagou

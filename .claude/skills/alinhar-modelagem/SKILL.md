@@ -9,7 +9,7 @@ O produto desta rodada é um arquivo, e não um acordo de conversa: o `PLANO`
 exportado pela receita, validado por
 [`src/autoria/plano-de-modelagem.js`](../../../src/autoria/plano-de-modelagem.js) e
 cobrado por `npm run guarda:acervo`. Uma rodada inteira respondida está em
-[`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](../../../docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md).
+[`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](../../../docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md).
 
 Pergunte uma coisa por vez e escreva o que for decidido. Resposta vaga não
 avança: se a pessoa não souber, ofereça duas opções concretas. Quando a escolha
@@ -85,7 +85,7 @@ relativas à pasta da peça. Quando o objeto é de uma família com critérios
 delas. Num objeto de várias partes, a ordem do passo 1 vai
 para `etapas` da montagem v5, e cada encaixe anotado vira um vínculo de medida
 ou uma posição por porta, conforme
-[`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md).
 O alinhamento parte da forma de referência ou da medida; o esboço detalhado é opcional e só serve sem referência. Quando a peça nasce de uma unidade de esboço aprovado, rode primeiro
 `npm run receita:planejada -- <esboço.esboco.json> --unidade <unidade> --peca <objeto>/<peça>`.
 Ele grava a receita planejada com a `TABELA`, os `PONTOS`, o `REFINA`, os `contatos`,

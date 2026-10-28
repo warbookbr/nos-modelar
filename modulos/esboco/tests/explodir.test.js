@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { expandirEsboco } from '../src/expandir.js';
 import { desenharEsboco, eixoDaExplosao, ErroDeEsboco, explodir, lerExplosao, resolverOpcao } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
-import { lerArgumentos, lerExplosaoDaLinha, unidadeArquivo, vistasArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { lerArgumentos, lerExplosaoDaLinha, unidadeArquivo, vistasArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 40, altura: 40, profundidade: 40, centro, ...extra });
 const esboco = (formas, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], ...extra });

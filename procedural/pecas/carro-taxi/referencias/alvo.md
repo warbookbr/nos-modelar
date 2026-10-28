@@ -2,7 +2,7 @@
 
 ## Origem
 
-Modelo "taxi" do pacote A, de autor A (pacote pacote-a, arquivo taxi.glb), autor autor A, licença livre sem exigência de crédito (declarada no License.txt do pacote), página endereço omitido. A malha não entra no repositório: fica em `importados/veiculos-livres/pacote-a/taxi.glb`, que o git ignora. Do modelo saem só as medidas em `fonte-partes.json` (escala 1,765, gerado por `modelo-de-referencia.mjs`) e as quatro vistas em `fonte-vistas.png`. A origem confere com a tabela `docs/mecanifica/veiculos-referencias.json` (pacote A, taxi). Na vista lateral da fonte a frente está à esquerda, como o acervo pede.
+Modelo "taxi" do pacote A, de autor A (pacote pacote-a, arquivo taxi.glb), autor autor A, licença livre sem exigência de crédito (declarada no License.txt do pacote), página endereço omitido. A malha não entra no repositório: fica em `importados/veiculos-livres/pacote-a/taxi.glb`, que o git ignora. Do modelo saem só as medidas em `fonte-partes.json` (escala 1,765, gerado por `modelo-de-referencia.mjs`) e as quatro vistas em `fonte-vistas.png`. A origem confere com a tabela `docs/modelar/veiculos-referencias.json` (pacote A, taxi). Na vista lateral da fonte a frente está à esquerda, como o acervo pede.
 
 ## Medida de referência
 

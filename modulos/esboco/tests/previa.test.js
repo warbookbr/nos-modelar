@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
-import { lerArgumentos, unidadeArquivo, vistasArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { lerArgumentos, unidadeArquivo, vistasArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const fixture = (nome) => JSON.parse(readFileSync(new URL(`./fixtures/${nome}`, import.meta.url), 'utf8'));
 const esboco = (formas, extra = {}) => ({ opcoes: [{ titulo: 'Opção A', formas }], ...extra });

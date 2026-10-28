@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1507 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1508 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -95,7 +95,7 @@
 - `RECURSOS.md` — Recursos e portas de entrada
 - `oficina.md` — A Oficina — índice do design
 
-## docs/mecanifica/
+## docs/modelar/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
 - `ANALISES-DE-2026-10.md` — Análises de 2026-10
@@ -139,209 +139,209 @@
 - `modelar-carroceria.md` — Modelar carroceria de chapa contínua
 - `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
-## docs/mecanifica/banco-de-provas/
+## docs/modelar/banco-de-provas/
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 - `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
 - `ALINHAMENTO.md` — Avião de pequeno porte: alinhamento
 - `ATRITOS.md` — Avião de pequeno porte: atritos
 - `CLASSIFICACAO.md` — Avião de pequeno porte: classificação dos atritos
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/
 
 - `ATRITOS.md` — Atritos do esboço do avião
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/
 
 - `ATRITOS.md` — Avião de pequeno porte, segunda rodada: atritos da maquete e do plano de detalhe
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-asas/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-asas/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-empenagem-horizontal/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-empenagem-horizontal/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-empenagem-vertical/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-empenagem-vertical/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-fuselagem/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-fuselagem/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-100/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-100/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-50/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-50/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-75/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-marco-75/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trem-do-nariz/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trem-do-nariz/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trens-principais/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-critico-trens-principais/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-asas/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-asas/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-empenagem-horizontal/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-empenagem-horizontal/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-fuselagem/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-helice/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-helice/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-100/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-100/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-25/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-25/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-50/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-50/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-75/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-marco-75/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-motor/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trem-do-nariz/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trem-do-nariz/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trens-principais/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/esboco/aviao-critico-trens-principais/
 
 - `brief.md` — --- brief para o crítico cego ---
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/frontal.pacote/
 
 - `roteiro.md` — Roteiro da análise
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.pacote/
 
 - `roteiro.md` — Roteiro da análise
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.pacote/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.pacote/
 
 - `roteiro.md` — Roteiro da crítica da prancha
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.pacote/
 
 - `roteiro.md` — Roteiro da análise
 
-## docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.pacote/
+## docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.pacote/
 
 - `roteiro.md` — Roteiro da crítica da prancha
 
-## docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/
+## docs/modelar/banco-de-provas/aviao-receita-2026-10-15/
 
 - `TRADUCAO.md` — O esboço do avião traduzido para o andaime
 
-## docs/mecanifica/banco-de-provas/cadeiras-2026-10-19/
+## docs/modelar/banco-de-provas/cadeiras-2026-10-19/
 
 - `medidas.md` — Cadeira: regras construtivas e medida de proporção contra o alvo
 
-## docs/mecanifica/banco-de-provas/carrinho-refeito-2026-10-08/
+## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
 
-## docs/mecanifica/banco-de-provas/desenho-braco-2026-10-14/
+## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
 - `DESCRICAO.md` — Braço robótico, vista lateral: a descrição
 - `RESULTADO.md` — Braço robótico, vista lateral: o resultado da prova
 - `coordenadas.mjs` — coordenadas.mjs — o caminho da IA que desenha por coordenadas, sem resolvedor: lê <vista>.partes.json, com cada parte como um polígono em milímetro escrito à…
 
-## docs/mecanifica/banco-de-provas/desenho-braco-2026-10-14/coordenadas/
+## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/coordenadas/
 
 - `gera.mjs` — gera.mjs — o gerador que a IA do desenho por coordenadas escreveu para os polígonos do braço (cantos arredondados e círculos em mm), guardado com o resultado…
 
-## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/
+## docs/modelar/banco-de-provas/desenho-carcaca-2026-10-14/
 
 - `DESCRICAO.md` — Carcaça da empilhadeira, vista lateral: a descrição
 - `RESULTADO.md` — Carcaça da empilhadeira, vista lateral: o resultado da prova
 
-## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas/
+## docs/modelar/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas/
 
 - `gera.mjs` — gera.mjs — gera lateral.partes.json da carcaça da empilhadeira (vista lateral, frente à esquerda, base em v = 0) por coordenadas escritas à mão a partir só d…
 
-## docs/mecanifica/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas-r2/
+## docs/modelar/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas-r2/
 
 - `gera.mjs` — gera.mjs — gera lateral.partes.json da carcaça da empilhadeira (vista lateral, frente à esquerda, base em v = 0) por coordenadas escritas à mão a partir só d…
 
-## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/
+## docs/modelar/banco-de-provas/empilhadeira-2026-10-09/
 
 - `ALINHAMENTO.md` — Carcaça da empilhadeira: alinhamento
 
-## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/
+## docs/modelar/banco-de-provas/empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/
 
 - `roteiro.md` — Roteiro da análise
 
-## docs/mecanifica/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/
+## docs/modelar/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/
 
 - `roteiro.md` — Roteiro da análise
 
-## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/braco/
+## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 
 - `NOTAS.md` — Braço robótico, vista lateral: o desenho por restrições ajustado à referência
 
-## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/carcaca/
+## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/carcaca/
 
 - `NOTAS.md` — Carcaça da empilhadeira, vista lateral: o desenho por restrições ajustado à referência
 
-## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/
+## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/prova/
 
 - `DESCRICAO.md` — Carcaça da empilhadeira nova, vista lateral: a descrição
 - `RESULTADO.md` — Carcaça da empilhadeira nova pela família de desenho: o resultado da prova
 
-## docs/mecanifica/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/
+## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/
 
 - `NOTAS.md` — A carcaça da descrição pela família de desenho
 
-## docs/mecanifica/banco-de-provas/importar-objeto-2026-10-15/
+## docs/modelar/banco-de-provas/importar-objeto-2026-10-15/
 
 - `FONTE.md` — Fonte do objeto-prova da importação de código
 
-## docs/mecanifica/banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/
+## docs/modelar/banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/
 
 - `SONDAS.md` — Sondas de importação de 2026-10-16
 
-## docs/mecanifica/banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/blendnet/
+## docs/modelar/banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/blendnet/
 
 - `RESULTADO.md` — BlendNet para esboço: sonda de tradução barata e determinística
 
-## docs/mecanifica/banco-de-provas/leitura-por-demanda-2026-10/
+## docs/modelar/banco-de-provas/leitura-por-demanda-2026-10/
 
 - `RESULTADO.md` — Resultado da medida de leitura
 - `ROTEIRO.md` — Medida de leitura da leitura por demanda
 - `tarefa-corrigir.md` — Tarefa de corrigir
 - `tarefa-modelar.md` — Tarefa de modelar
 
-## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/
+## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/
 
 - `README.md` — Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)
 - `levantamento-do-repo-externo.md` — O que o repositório do projeto externo da pessoa tem de objetos extraídos
@@ -349,7 +349,7 @@
 - `triagem.md` — Triagem das 66 receitas por família candidata
 - `triagem.mjs` — Triagem das receitas do externo por família candidata, sem modelar nada: `node triagem.mjs <pasta de receitas expandidas> > triagem.md`. Mede a caixa envolve…
 
-## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/cadeiras-ajustadas/
+## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/cadeiras-ajustadas/
 
 - `README.md` — Cadeiras ajustadas (2026-10-19)
 - `cadeira_almofadada_clara.md` — cadeira_almofadada_clara: ajustes
@@ -364,7 +364,7 @@
 - `cadeira_ripada_marrom.md` — cadeira_ripada_marrom: ajustes de construção
 - `cadeira_ripada_simples.md` — cadeira_ripada_simples: ajustes de construção
 
-## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/defeitos-marcados/
+## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/defeitos-marcados/
 
 - `README.md` — Defeitos marcados nas cadeiras (2026-10-19)
 - `cadeira_almofadada_clara.md` — Defeitos marcados em cadeira_almofadada_clara
@@ -379,29 +379,29 @@
 - `cadeira_ripada_marrom.md` — Defeitos marcados em cadeira_ripada_marrom
 - `cadeira_ripada_simples.md` — Defeitos marcados em cadeira_ripada_simples
 
-## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/
+## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/
 
 - `RELATORIO.md` — cadeira_ripada_simples: remodelagem em PASSOS
 - `cadeira_ripada_simples.receita.mjs` — cadeira_ripada_simples.receita.mjs — cadeira de madeira simples (4 pernas, assento, saia, 2 postes de encosto, travessa alta e baixa, 5 ripas), remodelada do…
 - `conferir.mjs` — conferir.mjs — executa a receita de cadeira_ripada_simples pelo executor do repositório e confere: (a) caixa total contra o alvo, (b) simetria esquerda/direi…
 - `vistas.mjs` — vistas.mjs — as seis vistas de cadeira_ripada_simples (isométricas frente-direita, trás-esquerda e frente-esquerda, frontal, lateral direita e superior) em c…
 
-## docs/mecanifica/banco-de-provas/receitas-externas-2026-10-19/sonda-passos/
+## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/sonda-passos/
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
 - `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
 
-## docs/mecanifica/banco-de-provas/suporte-tubo-2026-10-10/
+## docs/modelar/banco-de-provas/suporte-tubo-2026-10-10/
 
 - `README.md` — Suporte de tubo sem identificador numérico
 - `alvo.md` — Alvo do suporte-tubo
 - `receita.js` — suporte-tubo — suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede.
 
-## docs/mecanifica/banco-de-provas/textura-2026-10-19/
+## docs/modelar/banco-de-provas/textura-2026-10-19/
 
 - `README.md` — Madeira em Node ao lado da do Blender (2026-10-19)
 
-## docs/mecanifica/blender/
+## docs/modelar/blender/
 
 - `COMO-COMECAR.md` — Como começar com o Blender
 - `FLUXO-GENERICO.md` — Fluxo genérico de modelagem com Blender
@@ -410,12 +410,12 @@
 - `REGUA-E-PACOTE-CEGO.md` — Régua, pacote cego e oráculo da subdivisão
 - `USOS-E-LIMITES.md` — Usos do Blender, limites e regras
 
-## docs/mecanifica/gerado/
+## docs/modelar/gerado/
 
 - `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
 - `INDEX.md` — Artefatos gerados do catálogo procedural
 
-## docs/mecanifica/historico/
+## docs/modelar/historico/
 
 - `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
 - `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
@@ -445,7 +445,7 @@
 - `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
-- `PLANO-ESTADO-DA-ARTE-ESBOCO.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
+- `PLANO-ESTADO-DA-ARTE-ESBOCO.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@modelar/esboco`
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `README.md` — Histórico da Mecanifica
@@ -481,7 +481,7 @@
 - `REVISAO-DE-RUMO-2026-10.md` — Revisão de rumo do Mecanifica (2026-10-06)
 - `VEICULOS-PRIMEIRA-LEVA-2026-10.md` — Veículos de referência livre: o diagnóstico da primeira leva
 
-## docs/mecanifica/planos/
+## docs/modelar/planos/
 
 - `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
@@ -494,7 +494,7 @@
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
 
-## docs/mecanifica/planos/concluidos/
+## docs/modelar/planos/concluidos/
 
 - `2026-08-02-assentamento-anular.md` — AUT-2026-11 — assentamento anular declarado
 - `2026-08-02-camera-livre-reproduzivel.md` — AUT-2026-05 — câmera livre reproduzível
@@ -517,7 +517,7 @@
 - `2026-08-03-selecao-subarvore-semantica.md` — AUT-2026-17 — seleção de subárvore semântica
 - `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
 
-## docs/mecanifica/planos/congelados/
+## docs/modelar/planos/congelados/
 
 - `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — execução do P0
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
@@ -526,7 +526,7 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `README.md` — Planos congelados
 
-## docs/mecanifica/planos/encerrados/
+## docs/modelar/planos/encerrados/
 
 - `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
 - `2026-08-05-mcp-autoria-controlada.md` — MCP — autoria controlada de pacotes
@@ -618,19 +618,19 @@
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
-## docs/mecanifica/planos/mcp/
+## docs/modelar/planos/mcp/
 
 - `INDEX.md` — Programa MCP — índice de planos
 
-## docs/mecanifica/planos/mcp/concluidos/
+## docs/modelar/planos/mcp/concluidos/
 
 - `01-fatia-1a-piloto-leitura.md` — MCP — encerramento da Fatia 1A somente leitura
 
-## docs/mecanifica/roteiros/
+## docs/modelar/roteiros/
 
 - `ROTEIROS.md` — Roteiros de leitura por intenção
 
-## docs/mecanifica/usar/
+## docs/modelar/usar/
 
 - `AJUSTE-DA-BANCADA.md` — Ajuste da bancada
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
@@ -684,7 +684,7 @@
 
 ## modulos/esboco/
 
-- `README.md` — @mecanifica/esboco
+- `README.md` — @modelar/esboco
 
 ## modulos/esboco/componentes/
 
@@ -737,7 +737,7 @@
 - `atritos-do-aviao.test.js` — Os atritos do esboço do avião que são do gate de contato e dos miúdos do esboço (plano "O que o avião pede", fatia 5, onda 1): o `contrato.fixa` com face con…
 - `biblioteca.test.js` — Biblioteca genérica de componentes de arquivo: parafuso, mola, engrenagem, rolamento, perfil estrutural e dobradiça. Cada um tem teste de expansão (ids, parâ…
 - `brief-do-critico.test.js` — O processo do crítico do esboço depois do avião (atritos 9, 11, 12, 20, 21, 25, 29, 31 e 33): o brief da unidade, do Marco e do objeto vai para `brief.md` e …
-- `camada-sem-perfil.test.js` — `perfilDosTracos: false`: a camada das formas sem o perfil das fitas, para quem mede só a área das faces (a silhueta de `tools/mecanifica/esboco-silhueta.mjs`).
+- `camada-sem-perfil.test.js` — `perfilDosTracos: false`: a camada das formas sem o perfil das fitas, para quem mede só a área das faces (a silhueta de `tools/modelar/esboco-silhueta.mjs`).
 - `casca.test.js` — O loft com seção "arredondado" e com "casca": a caçamba de um carrinho de mão (bacia oca de parede inclinada, boca em D com cantos arredondados, fundo menor …
 - `componentes.test.js` — Componentes parametrizados (`usa`): expansão com ids prefixados, parâmetros no escopo do componente, entradas, âncoras expostas, pares do gate, espelho de in…
 - `condutor-nivel-zero.test.js` — O Condutor lendo o nível zero por uma porta de injeção: o módulo não importa o núcleo, e quem chama passa a função `nivelZero(bruto)`. Aqui a porta é uma fun…
@@ -793,7 +793,7 @@
 - `rotacao-da-instancia.test.js` — A instância de componente com `rotacao` (atrito 43 do avião): o trem principal recolhe girando em torno de z, a instância da `roda` não girava, e foi preciso…
 - `silhueta-sobre-as-faces.test.js` — O traço da silhueta de uma forma côncava ou recortada (`subtrai`) vai por cima de todas as faces dela. O desenho pintava cada face e logo depois as linhas de…
 - `skill.test.js` — As skills `esboco-detalhado`, `laco-do-esboco` e `esbocar-opcoes` e o `PARE-E-ANALISE.md` dizem o fluxo, o nível de detalhe e a proibição de auditar por imag…
-- `so-camada.test.js` — `soCamada: true`: a camada das formas sem montar o SVG, para quem mede só a silhueta (`tools/mecanifica/esboco-silhueta.mjs`).
+- `so-camada.test.js` — `soCamada: true`: a camada das formas sem montar o SVG, para quem mede só a silhueta (`tools/modelar/esboco-silhueta.mjs`).
 - `suave.test.js` — A superfície suave por seções (`suave: true` no loft e na revolução, `suave.js`): a curva passa pelas seções declaradas com tangente contínua, sem passar do …
 - `unidades.test.js` — A unidade declarada (`unidade` na forma, na instância e no espelho), a junta dentro da mesma unidade sem declaração, o gate que ignora forma oculta, `--mover…
 - `vista-isolada.test.js` — `--vista <vista>` sozinho grava a vista isolada do esboço inteiro na pasta de `--saida`. Antes a linha caía na leitura padrão, imprimia o gate e não gravava …
@@ -1102,7 +1102,7 @@
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
-- `booleanas.test.ts` — booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos" (docs/mecanifica/planos/encerrados/2026-09-28-uniao-de-solidos.md). A fixture é neutra: dois cub…
+- `booleanas.test.ts` — booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos" (docs/modelar/planos/encerrados/2026-09-28-uniao-de-solidos.md). A fixture é neutra: dois cubos …
 - `cantos-arredondados.js` — cantos-arredondados.js — o remate do vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
@@ -1883,13 +1883,13 @@
 
 ## tools/fixtures/composicao-parametrica/
 
-- `composicoes.js` — Fixture de teste: uma composição procedural mínima (um bloco identificado) e o registro que a executa. Quem a usa é `tools/mecanifica/composicao-na-varredura…
+- `composicoes.js` — Fixture de teste: uma composição procedural mínima (um bloco identificado) e o registro que a executa. Quem a usa é `tools/modelar/composicao-na-varredura.te…
 - `configuracao.mjs` — Configuração explícita do registro de composições da fixture: é o que `--composicoes=tools/fixtures/composicao-parametrica/configuracao.mjs` aponta.
 - `receita.js` — Fixture de teste: receita que compõe por `CHAMADAS_COMPOSICOES` e deriva as chamadas de `PARAMS`. Uma base e um pilar com `folga` entre eles; `largura` e `al…
 
 ## tools/fixtures/conjunto-com-submontagens/
 
-- `executar-estudo.mjs` — Fixture de teste: um conjunto de seis peças em duas submontagens, com relações diretas e indiretas. Quem a usa é `tools/mecanifica/contexto-montagem-estudo.t…
+- `executar-estudo.mjs` — Fixture de teste: um conjunto de seis peças em duas submontagens, com relações diretas e indiretas. Quem a usa é `tools/modelar/contexto-montagem-estudo.test…
 
 ## tools/fixtures/conjunto-com-submontagens/receitas/
 
@@ -2105,7 +2105,26 @@
 - `revalidacao.test.mjs` — Prova R04: consumidor caixa-preta, nova sessão e escrita segura por IDs.
 - `revisao.mjs` — revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem.
 
-## tools/mecanifica/
+## tools/modelagem/
+
+- `aceite-visual-regional.mjs` — aceite-visual-regional.mjs — v2 do aceite: evidência por região e papel. A v1 continua em aceite-visual.mjs, com suas quatro vistas globais intactas.
+- `aceite-visual-regional.test.mjs` — aceite-visual-regional.test.mjs — prova cobertura regional, hashes e crítica obrigatória no aceite v2.
+- `aceite-visual.mjs` — aceite-visual.mjs — porteiro de vínculo entre revisão, briefing e evidências visuais.
+- `aceite-visual.test.mjs` — aceite-visual.test.mjs — corpus de vínculo, bytes e reprovações visuais.
+- `caminho-repositorio.mjs` — caminho-repositorio.mjs — resolução portátil e confinada de repo://.
+- `caminho-repositorio.test.mjs` — caminho-repositorio.test.mjs — confinamento de evidências repo:// portátil.
+- `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
+- `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
+- `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
+- `fechar-aceite-visual.mjs` — fechar-aceite-visual.mjs — fecha tecnicamente uma revisão privada só após conferir briefing, modelo, arquivos e crítica pelo porteiro visual.
+- `fechar-aceite-visual.test.mjs` — fechar-aceite-visual.test.mjs — o fechamento não concede aceite retroativo.
+- `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
+- `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
+- `revisao-modelagem.mjs` — Revisão de modelagem — núcleo puro do ciclo assistido por IA.
+- `revisar-pacote.mjs` — revisar-pacote.mjs — marco 2 do fluxo assistido: a única ponte entre o pacote, a régua headless e as quatro câmeras da bancada.
+- `validar-pacote.mjs` — validar-pacote.mjs — porta fail-closed do marco 1. Lê, exige bytes canônicos e confere o alvo com a régua headless assim que a fonte canônica existir.
+
+## tools/modelar/
 
 - `absorver-ajuste.mjs` — absorver-ajuste.mjs — a régua da rodada de absorção.
 - `acervo-real.test.mjs` — A varredura do acervo REAL, inteiro, uma vez.
@@ -2141,6 +2160,7 @@
 - `cadeiras-medida.mjs` — cadeiras-medida.mjs — a medida da família `cadeira` contra o esboço alvo de cada perfil, e a prancha com os dois lado a lado.
 - `calibracao-do-critico.mjs` — calibracao-do-critico.mjs — o conjunto de calibração do crítico visual e o gate `calibracao:check`.
 - `calibracao-do-critico.test.mjs` — calibracao-do-critico.test.mjs — o gate `calibracao:check`: o conjunto versionado passa, e cada coisa que ele confere reprova quando muda.
+- `calibracao-impressao.test.mjs` — calibracao-impressao.test.mjs — a impressão do brief do crítico não muda quando a pasta do conjunto ou o repositório mudam de lugar (tools/modelar/calibracao…
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz procedural é neutra: não volta a `fps`, que era o nome do jogo removido, nem a `prototipos`, que dizia experimento sobre …
@@ -2229,7 +2249,7 @@
 - `familia-com-esboco.test.mjs` — familia-com-esboco.test.mjs — a conferência da família com o componente do esboço de mesmo nome, ponta a ponta: o componente `roda` do esboço expandido nos p…
 - `familia.mjs` — familia.mjs — a aprovação mecânica das famílias e o gate que a confere.
 - `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
-- `ferramentas-por-objeto.mjs` — Gera docs/mecanifica/FERRAMENTAS-POR-OBJETO.md a partir de docs/mecanifica/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE…
+- `ferramentas-por-objeto.mjs` — Gera docs/modelar/FERRAMENTAS-POR-OBJETO.md a partir de docs/modelar/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE-OBJET…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `folha-comparativa.mjs` — folha-comparativa.mjs — a fonte e a receita lado a lado, nas MESMAS câmeras e na MESMA escala, e a vista de diferença que marca onde a receita sobra ou falta.
 - `folha-comparativa.test.mjs` — Testes de folha-comparativa.mjs: as câmeras são as de modelo-de-referencia, a receita igual à fonte não deixa sobra nem falta, e a cabine mais estreita ou o …
@@ -2271,7 +2291,7 @@
 - `ondulacao-gota.test.mjs` — ondulacao-gota.test.mjs — a leitura de ondulação das chapas com anel no vão real: a gota estreita e o vão aberto pelas colunas que terminam e começam
 - `ondulacao-leitura.test.mjs` — ondulacao-leitura.test.mjs — o dado lido com peso, o aviso de estações próximas e a face virada na ferramenta de ondulação
 - `ondulacao-rede.test.mjs` — ondulacao-rede.test.mjs — a leitura de ondulação da chapa lateral montada por rede de curvas
-- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/mecanifica/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente e…
+- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/modelar/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente escr…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
@@ -2333,7 +2353,7 @@
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
 - `vistas-texturizadas.mjs` — vistas-texturizadas.mjs — três vistas de uma peça do acervo COM a textura que a exportação OBJ gera, para quem precisa julgar o acabamento (eletrodoméstico, …
 
-## tools/mecanifica/fixtures/
+## tools/modelar/fixtures/
 
 - `alisar-prova.js` — alisar-prova.js — a chapa desenhada por código para o teste da ferramenta de alisamento.
 - `alisar-rede-prova-casos.mjs` — alisar-rede-prova-casos.mjs — os casos independentes do teste do alisamento sobre a rede, rodados em processo à parte.
@@ -2349,7 +2369,7 @@
 - `vincos-das-linhas-chaves-prova.js` — vincos-das-linhas-chaves-prova.js — a forma desenhada por código e as linhas 3D sintéticas do teste de `vincos-das-linhas.mjs` sobre uma gaiola com estações …
 - `vincos-das-linhas-prova.js` — vincos-das-linhas-prova.js — a forma desenhada por código e o pacote sintético de linhas 3D do teste de `vincos-das-linhas.mjs`.
 
-## tools/mecanifica/fixtures/contatos/
+## tools/modelar/fixtures/contatos/
 
 - `fixture-contato-declarado.js` — Duas partes que se encostam, e a receita DIZ que se encostam. Passa. É a metade do gate que impede a medida de condenar peça correta.
 - `fixture-contato-nao-declarado.js` — A MESMA geometria da fixture declarada, sem a declaração. Reprova. O par é idêntico: o que muda é só a receita ter dito ou não.
@@ -2357,19 +2377,19 @@
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.
 
-## tools/mecanifica/fixtures/contorno-da-imagem/
+## tools/modelar/fixtures/contorno-da-imagem/
 
 - `braco-sintetico.mjs` — braco-sintetico.mjs — as duas imagens sintéticas, desenhadas por código, com que o teste do contorno da imagem prova a ferramenta: uma vista lateral de um br…
 
-## tools/mecanifica/fixtures/receita-externa-cadeiras/
+## tools/modelar/fixtures/receita-externa-cadeiras/
 
 - `LEIA-ME.md` — Cadeiras escolhidas como alvo de forma (2026-10-19)
 
-## tools/mecanifica/fixtures/veiculo-caixa/
+## tools/modelar/fixtures/veiculo-caixa/
 
 - `receita.js` — veiculo-caixa — um veículo de caixas, só para os testes das ferramentas que comparam uma receita com uma fonte de referência (comparar-silhueta, folha-compar…
 
-## tools/mecanifica/guardas/
+## tools/modelar/guardas/
 
 - `guarda-acervo.mjs` — guarda-acervo.mjs — roda o veredito completo sobre TODO o acervo.
 - `guarda-acervo.test.mjs` — guarda-acervo.test.mjs — a polaridade do veredito de contato.
@@ -2386,7 +2406,7 @@
 - `rodar-guardas.mjs` — rodar-guardas.mjs — o gate `bancada:guardas`: as guardas que abrem a bancada num navegador só e, quando precisam, num servidor só.
 - `rodar-guardas.test.mjs` — rodar-guardas.test.mjs — o gate `bancada:guardas` roda cada guarda no processo dela, diz o nome e o veredito de cada uma, e a falha de uma não esconde as out…
 
-## tools/mecanifica/prancha/
+## tools/modelar/prancha/
 
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
 - `prancha-dos-contornos.mjs` — prancha-dos-contornos.mjs — a prancha de uma vista desenhada com os contornos que `npm run contorno` tirou da imagem de referência, em milímetro.
@@ -2396,25 +2416,6 @@
 - `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
 - `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
 - `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
-
-## tools/modelagem/
-
-- `aceite-visual-regional.mjs` — aceite-visual-regional.mjs — v2 do aceite: evidência por região e papel. A v1 continua em aceite-visual.mjs, com suas quatro vistas globais intactas.
-- `aceite-visual-regional.test.mjs` — aceite-visual-regional.test.mjs — prova cobertura regional, hashes e crítica obrigatória no aceite v2.
-- `aceite-visual.mjs` — aceite-visual.mjs — porteiro de vínculo entre revisão, briefing e evidências visuais.
-- `aceite-visual.test.mjs` — aceite-visual.test.mjs — corpus de vínculo, bytes e reprovações visuais.
-- `caminho-repositorio.mjs` — caminho-repositorio.mjs — resolução portátil e confinada de repo://.
-- `caminho-repositorio.test.mjs` — caminho-repositorio.test.mjs — confinamento de evidências repo:// portátil.
-- `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
-- `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
-- `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
-- `fechar-aceite-visual.mjs` — fechar-aceite-visual.mjs — fecha tecnicamente uma revisão privada só após conferir briefing, modelo, arquivos e crítica pelo porteiro visual.
-- `fechar-aceite-visual.test.mjs` — fechar-aceite-visual.test.mjs — o fechamento não concede aceite retroativo.
-- `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
-- `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
-- `revisao-modelagem.mjs` — Revisão de modelagem — núcleo puro do ciclo assistido por IA.
-- `revisar-pacote.mjs` — revisar-pacote.mjs — marco 2 do fluxo assistido: a única ponte entre o pacote, a régua headless e as quatro câmeras da bancada.
-- `validar-pacote.mjs` — validar-pacote.mjs — porta fail-closed do marco 1. Lê, exige bytes canônicos e confere o alvo com a régua headless assim que a fonte canônica existir.
 
 ## tools/oficina/
 

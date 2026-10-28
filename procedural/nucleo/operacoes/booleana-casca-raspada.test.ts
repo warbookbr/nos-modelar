@@ -19,7 +19,7 @@ import { carregarManifold, nucleo } from '../entrada.js';
 // @ts-expect-error — serviço de autoria em JavaScript.
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 // @ts-expect-error — ferramenta MJS.
-import { conferirPontos } from '../../../tools/mecanifica/conferir-pontos.mjs';
+import { conferirPontos } from '../../../tools/modelar/conferir-pontos.mjs';
 import { arestasSemPar, vinculosNaoManifold } from '../../../tools/oficina/conferir-malha';
 
 const m = (mm: number) => mm / 1000;

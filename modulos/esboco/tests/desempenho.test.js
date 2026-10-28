@@ -9,7 +9,7 @@ import { desenharEsboco, ErroDeEsboco, explodir, FLECHA_PX, ladosPorEscala, reso
 import { medirProjecaoDaOpcao, verificarProjecao } from '../src/projecao.js';
 import { verificarContato } from '../src/contato.js';
 import { expandirEsboco } from '../src/expandir.js';
-import { analisarEsboco, gerarEsboco } from '../../../tools/mecanifica/esboco.mjs';
+import { analisarEsboco, gerarEsboco } from '../../../tools/modelar/esboco.mjs';
 
 const fixture = (nome) => JSON.parse(readFileSync(new URL(`./fixtures/${nome}.esboco.json`, import.meta.url), 'utf8'));
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });

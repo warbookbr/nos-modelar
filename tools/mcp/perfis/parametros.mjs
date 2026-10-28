@@ -10,8 +10,8 @@
  * de cada um; escolher continua sendo de quem chama.
  */
 import { z } from 'zod';
-import { parametrosReutilizavel } from '../../mecanifica/parametros-peca.mjs';
-import { varrerReutilizavel } from '../../mecanifica/varrer-peca.mjs';
+import { parametrosReutilizavel } from '../../modelar/parametros-peca.mjs';
+import { varrerReutilizavel } from '../../modelar/varrer-peca.mjs';
 import { ORCAMENTO_PADRAO } from '../../../src/autoria/varrer-parametros.js';
 
 export const diagnosticarParametrosEntrada = z.object({

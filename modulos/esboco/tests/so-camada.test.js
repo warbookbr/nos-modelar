@@ -1,4 +1,4 @@
-/* `soCamada: true`: a camada das formas sem montar o SVG, para quem mede só a silhueta (`tools/mecanifica/esboco-silhueta.mjs`).
+/* `soCamada: true`: a camada das formas sem montar o SVG, para quem mede só a silhueta (`tools/modelar/esboco-silhueta.mjs`).
 
    O SVG (título, legendas, rótulos, linhas de centro, barra de escala e o traço de cada forma) é a parte do desenho que a máscara da
    silhueta não lê, e passava de um quinto do custo de uma bateria de silhuetas. A prova é a igualdade: com e sem `soCamada`, em toda

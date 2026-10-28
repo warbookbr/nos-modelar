@@ -10,7 +10,7 @@
  * defeito estrutural de 5 a 7. Quatro imagens são as chaves e recebem cinco julgamentos cegos; as outras recebem três.
  *
  * O validador é puro: lê o JSON e recusa o que o formato não aceita, com o campo, o valor e o que era aceito. Os hashes, as
- * imagens e as medidas são conferidos por `tools/mecanifica/calibracao-do-critico.mjs`, que é o gate `calibracao:check`. O campo
+ * imagens e as medidas são conferidos por `tools/modelar/calibracao-do-critico.mjs`, que é o gate `calibracao:check`. O campo
  * `resultados` fica vazio até a primeira rodada de julgamentos, e vazio o conjunto diz "calibração não medida". Cada julgamento
  * guarda a nota, os defeitos que o crítico apontou, a impressão do brief exato, a impressão das quatro vistas que ele viu e a data; `extrairVeredito` lê a resposta do crítico
  * e `pontuarImagem` e `pontuarConjunto` dizem se a imagem e o conjunto acertam, pela regra da tarefa 6 do desenho da fatia 8. */

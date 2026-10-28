@@ -2,7 +2,7 @@
 
 ## Origem
 
-Modelo `suv-luxury` do pacote A, de autor A (endereço omitido), licença livre sem exigência de crédito (declarada no License.txt do pacote). A tabela `docs/mecanifica/veiculos-referencias.json` confirma o pacote e o arquivo `suv-luxury.glb`. A malha original fica em `importados/veiculos-livres/pacote-a/suv-luxury.glb`, fora do repositório. Aqui entram só as medidas (`fonte-partes.json`, escala 1,765) e as vistas (`fonte-vistas.png`). Na fonte a frente fica à esquerda na lateral e embaixo na vista de cima, então não há giro a aplicar.
+Modelo `suv-luxury` do pacote A, de autor A (endereço omitido), licença livre sem exigência de crédito (declarada no License.txt do pacote). A tabela `docs/modelar/veiculos-referencias.json` confirma o pacote e o arquivo `suv-luxury.glb`. A malha original fica em `importados/veiculos-livres/pacote-a/suv-luxury.glb`, fora do repositório. Aqui entram só as medidas (`fonte-partes.json`, escala 1,765) e as vistas (`fonte-vistas.png`). Na fonte a frente fica à esquerda na lateral e embaixo na vista de cima, então não há giro a aplicar.
 
 ## O que a fonte mostra
 

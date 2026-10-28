@@ -2,7 +2,7 @@
  * do pivô, a coroa, o garfo de dois lados, o eixo, a roda, o compasso e o atuador.
  *
  * Oitava etapa do avião (`../../montagem.json`): o plano está em `../../ALINHAMENTO.md` e as formas vêm da unidade `trens-principais`
- * do esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
+ * do esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e
  * `aviao-detalhe-trens-principais.esboco.json`). A receita refina o andaime `../../andaime.json` (REFINA).
  *
  * Referencial do acervo e do esboço: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a cauda para +z. Cada
@@ -32,7 +32,7 @@
 import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 
-const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
 const slug = (id) => id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
 /* base do nome -> [forma prometida, técnica], sem o lado */
@@ -379,7 +379,7 @@ export default {
   PLANO: {
     objeto: 'trens principais de um avião monomotor de pequeno porte, baixados: de cada lado, a perna presa ao pivô sob a asa, com a coroa, o garfo, o eixo, a roda no chão, o compasso e o atuador',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
     ],
     escala: { medida: 'altura do trem principal no esboço, do pé da roda ao alto do pivô', milimetros: 1198 },
     partes: NOMES.map((nome) => ({ nome, forma: `${BASES[baseDe(nome)][0]}, do lado ${ladoDe(nome)}`, tecnica: BASES[baseDe(nome)][1] })),

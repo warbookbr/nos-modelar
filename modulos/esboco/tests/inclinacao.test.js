@@ -6,8 +6,8 @@ import { ancorasDe, desenharEsboco, ErroDeEsboco, fatiarForma, resolverOpcao } f
 import { expandirEsboco } from '../src/expandir.js';
 import { medirPar, pecasDe, verificarContato } from '../src/contato.js';
 import { descreverEsboco, formatarDescricao } from '../src/descrever.js';
-import { ajuda, TETO_DO_TOPICO } from '../../../tools/mecanifica/esboco-ajuda.mjs';
-import { textoDaRecusa, topicoDaRecusa } from '../../../tools/mecanifica/esboco-recusa.mjs';
+import { ajuda, TETO_DO_TOPICO } from '../../../tools/modelar/esboco-ajuda.mjs';
+import { textoDaRecusa, topicoDaRecusa } from '../../../tools/modelar/esboco-recusa.mjs';
 
 const resolver = (formas) => Object.fromEntries(resolverOpcao({ formas }).map((r) => [r.id, r]));
 const resolverEsboco = (e) => { const x = expandirEsboco(e); return Object.fromEntries(resolverOpcao(x.opcoes[0], 'opção', x.pontos).map((r) => [r.id, r])); };

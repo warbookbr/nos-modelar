@@ -209,7 +209,7 @@ jobs:
         run: npm run build
 
       # As dez guardas que abrem a bancada num navegador de verdade rodam num
-      # Chromium e num servidor do Vite só, em `tools/mecanifica/guardas/rodar-guardas.mjs`,
+      # Chromium e num servidor do Vite só, em `tools/modelar/guardas/rodar-guardas.mjs`,
       # e o relatório diz o nome e o veredito de cada uma; a falha de uma não
       # esconde as outras. Cada uma continua sendo um script que roda sozinho.
       #   bancada:vazia:check  a bancada publicada sobe sem catálogo, sem peça

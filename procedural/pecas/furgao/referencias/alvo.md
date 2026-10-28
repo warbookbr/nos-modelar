@@ -4,7 +4,7 @@
 
 - Modelo: "van" do pacote A, de autor A.
 - Autor: autor A.
-- Pacote: pacote A, com o arquivo `van.glb` (cinco malhas: carroceria e quatro rodas). A tabela `docs/mecanifica/veiculos-referencias.json` confirma o pacote `pacote-a`.
+- Pacote: pacote A, com o arquivo `van.glb` (cinco malhas: carroceria e quatro rodas). A tabela `docs/modelar/veiculos-referencias.json` confirma o pacote `pacote-a`.
 - Licença: licença livre sem exigência de crédito, declarada no `License.txt` do pacote.
 - Página: endereço omitido
 - A malha não está no repositório (`importados/veiculos-livres/pacote-a/van.glb`, ignorado pelo git).

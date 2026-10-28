@@ -5,10 +5,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { z } from 'zod';
 import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever-partes.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
-import { exportarArquivoStep } from '../../mecanifica/exportar-step.mjs';
-import { exportarArquivoObj } from '../../mecanifica/exportar-obj.mjs';
-import { ErroDeConfinamento, verificarCaminhoConfinado } from '../../mecanifica/caminho-confinado.mjs';
-import { importarReceita } from '../../mecanifica/importar-receita.mjs';
+import { exportarArquivoStep } from '../../modelar/exportar-step.mjs';
+import { exportarArquivoObj } from '../../modelar/exportar-obj.mjs';
+import { ErroDeConfinamento, verificarCaminhoConfinado } from '../../modelar/caminho-confinado.mjs';
+import { importarReceita } from '../../modelar/importar-receita.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');

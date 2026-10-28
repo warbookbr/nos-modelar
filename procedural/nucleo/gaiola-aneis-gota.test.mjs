@@ -6,7 +6,7 @@
  * de altura na estação larga e 10 mm na ponta (`procedural/nucleo/fixtures/gaiola-gota-prova.js`), e o anel faz três coisas: tem recuo diferente em
  * cada lado do vão, sai da própria borda da abertura (recuo 0, com as voltas crescendo para fora, sobre a grade) e aceita o vão que a borda
  * livre das colunas que terminam e começam deixa (`gaiola-borda-livre-prova.js`). A leitura de ondulação das mesmas chapas está em
- * `tools/mecanifica/ondulacao-gota.test.mjs`. Nenhum número vem de referência externa. */
+ * `tools/modelar/ondulacao-gota.test.mjs`. Nenhum número vem de referência externa. */
 import { describe, expect, it } from 'vitest';
 import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
 import { extraordinarios } from './gaiola-aneis.js';

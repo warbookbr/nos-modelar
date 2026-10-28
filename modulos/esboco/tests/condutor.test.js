@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ErroDeEsboco } from '../src/index.js';
 import { avancar, conferirEnvelope, criarEstado, liberar, registrarVeredito, UNIDADE_DO_OBJETO, custoDe, definirModo, ESTAGIOS_POR_NIVEL, formatarEnvelope, formatarSituacao, gravarNotaDePassagem, LIMITE_DA_FUNCAO, LIMITE_DA_NOTA_DE_PASSAGEM, marcarFeito, MODOS, MODO_PADRAO, moverForma, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, textoDoEnvelope } from '../src/condutor.js';
-import { condutorArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { condutorArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
 const fixture = (nome) => JSON.parse(readFileSync(new URL(nome, pasta), 'utf8'));

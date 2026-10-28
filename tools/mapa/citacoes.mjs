@@ -28,7 +28,7 @@ const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 /* O caminho que uma sessão percorre antes de escrever a primeira linha. Não é
    o acervo inteiro de documentação: é o que a porta e as skills mandam ler. */
 const PORTAS = ['README.md', 'CLAUDE.md', 'AGENTS.md'];
-const PASTAS = ['docs/mecanifica/usar', '.claude/skills'];
+const PASTAS = ['docs/modelar/usar', '.claude/skills'];
 
 /* Pastas onde uma receita citada pelo nome curto pode morar. */
 const PASTAS_RECEITA = [
@@ -63,8 +63,8 @@ export const NOMES_REMOVIDOS = [
 ];
 const DIZ_QUE_SAIU = /\bsa(?:iu|íram|iram|em)\b|removid|retirad|apagad|deixou de existir|deixaram de existir|não existe/i;
 /* Os documentos vivos que a árvore entrega ou que coordenam o trabalho, além das portas e das pastas acima. */
-const VIVOS = ['docs/mecanifica/INDEX.md', 'docs/mecanifica/planos/README.md', 'docs/mecanifica/UPSTREAM-NOS.md',
-  'docs/mecanifica/ARQUITETURA.md', 'docs/mecanifica/modelar-veiculos.md', 'docs/mecanifica/modelar-carroceria.md'];
+const VIVOS = ['docs/modelar/INDEX.md', 'docs/modelar/planos/README.md', 'docs/modelar/UPSTREAM-NOS.md',
+  'docs/modelar/ARQUITETURA.md', 'docs/modelar/modelar-veiculos.md', 'docs/modelar/modelar-carroceria.md'];
 const PASTAS_VIVAS = ['.claude/agents'];
 
 export function nomesRemovidosCitados(texto, nomes = NOMES_REMOVIDOS) {

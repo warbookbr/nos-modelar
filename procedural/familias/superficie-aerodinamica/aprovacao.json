@@ -360,7 +360,7 @@
   },
   "critico": {
     "data": "2026-10-12",
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-12/superficie-aerodinamica-perfis-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-12/superficie-aerodinamica-perfis-prancha.png",
     "julgamentos": 1,
     "regra": "nota da terceira rodada de um crítico cego, por perfil, depois de duas rodadas corrigidas; numa família com perfis o crítico aprova os perfis, e os três pontos de extremo ficam na camada mecânica",
     "perfis": {
@@ -386,7 +386,7 @@
       }
     },
     "pontosDeExtremo": {
-      "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-12/superficie-aerodinamica-pontos-prancha.png",
+      "prancha": "docs/modelar/banco-de-provas/familias-2026-10-12/superficie-aerodinamica-pontos-prancha.png",
       "notas": {
         "minimo": 6,
         "medio": 8,
@@ -402,7 +402,7 @@
   "pessoa": {
     "data": "2026-10-12",
     "aprovou": true,
-    "prancha": "docs/mecanifica/banco-de-provas/familias-2026-10-12/superficie-aerodinamica-perfis-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-12/superficie-aerodinamica-perfis-prancha.png",
     "perfis": {
       "asa": {
         "hash": "sha256:850d5ff186334c7c2b930911d5f09428fe9dee28475043c212214538548c4487"

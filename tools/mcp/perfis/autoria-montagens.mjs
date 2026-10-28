@@ -1,12 +1,12 @@
 /* autoria-montagens.mjs — porta MCP opt-in, fina sobre a autoria interna. */
 import { z } from 'zod';
-import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
+import { capturarMontagem } from '../../modelar/capturar-montagem.mjs';
 import {
   ARQUIVO_MONTAGEM, confirmarAutoriaMontagem, observarAutoriaMontagem, planejarAutoriaMontagem,
   prepararPromocaoAutoriaMontagem, promoverAutoriaMontagem,
-} from '../../mecanifica/autoria-montagem.mjs';
+} from '../../modelar/autoria-montagem.mjs';
 import { alterarMontagem, diferencaMontagem } from '../../../src/autoria/alterar-montagem.js';
-import { lerCadeiaAutoria } from '../../mecanifica/repositorio-autoria.mjs';
+import { lerCadeiaAutoria } from '../../modelar/repositorio-autoria.mjs';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const hash = z.string().regex(/^[a-f0-9]{64}$/);

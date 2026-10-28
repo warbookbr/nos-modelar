@@ -7,7 +7,7 @@
  * a única fonte das medidas; `derivar` transforma a tabela em caixas e `gerarPassos` escreve, por parte, a forma, a `parte` e o
  * `material` que a parte usa. Nenhuma posição é digitada nos passos.
  *
- * Forma e medidas de partida: a base é a receita original (tools/mecanifica/fixtures/receita-externa-eletro/microondas_suspenso_branco.receita.json)
+ * Forma e medidas de partida: a base é a receita original (tools/modelar/fixtures/receita-externa-eletro/microondas_suspenso_branco.receita.json)
  * convertida em passos, com o corpo de 638 por 470 por 435 mm, a base de 598 por 21 por 395 mm e as oito grades nas laterais. O eixo de
  * simetria das grades cai em x 0 e o centro do corpo cai em x 0 e z 0. A pessoa aprovou essa forma e pediu quatro mudanças.
  *

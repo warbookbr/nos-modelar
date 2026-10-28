@@ -8,7 +8,7 @@
    Three.js, freio, carro nem interface. A caixa do `adaptarThree` é por MALHA e
    depende de Three — esta é por PARTE SEMÂNTICA e roda em qualquer lugar.
 
-   Consumidores: o CLI `tools/mecanifica/descrever-peca.mjs` (`npm run descrever`)
+   Consumidores: o CLI `tools/modelar/descrever-peca.mjs` (`npm run descrever`)
    e o painel de diagnóstico da bancada — uma verdade só sobre a mesma medida.
 
    ESCOPO: caixa, dimensão e componentes conexos são observações geométricas

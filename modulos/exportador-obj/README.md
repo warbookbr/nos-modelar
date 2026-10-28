@@ -16,8 +16,8 @@ As coordenadas são planares. Cada triângulo se projeta no plano do eixo domina
 
 Sem `texturas` (ou com o objeto vazio), a saída é a de antes, byte a byte: sem `mtllib`, sem `vt`, com `v//vn`. Com `texturas`, toda face precisa de material com entrada declarada; a exportação recusa com `material-sem-textura` ou `face-sem-material` caso contrário.
 
-O módulo só escreve a referência ao arquivo. Não gera nem grava a imagem. Quem grava o `.mtl` e a imagem ao lado do `.obj` é a linha de comando `tools/mecanifica/exportar-obj.mjs` com `--com-textura`, que importa `modulos/textura/src/index.js` quando existe e recusa com mensagem clara quando não existe.
+O módulo só escreve a referência ao arquivo. Não gera nem grava a imagem. Quem grava o `.mtl` e a imagem ao lado do `.obj` é a linha de comando `tools/modelar/exportar-obj.mjs` com `--com-textura`, que importa `modulos/textura/src/index.js` quando existe e recusa com mensagem clara quando não existe.
 
 ## Testes
 
-Os testes ficam em `tests/`: `exportador-obj.test.js` (contrato original), `tolerancia.test.js` (canto arredondado, degenerada e regressão por hash), e `textura.test.js` (`.mtl`, `usemtl`, `vt` por eixo dominante e recusas). A prova no Blender está em `docs/mecanifica/banco-de-provas/exportacao-2026-10-19/provar_blender.py`.
+Os testes ficam em `tests/`: `exportador-obj.test.js` (contrato original), `tolerancia.test.js` (canto arredondado, degenerada e regressão por hash), e `textura.test.js` (`.mtl`, `usemtl`, `vt` por eixo dominante e recusas). A prova no Blender está em `docs/modelar/banco-de-provas/exportacao-2026-10-19/provar_blender.py`.

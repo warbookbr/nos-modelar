@@ -17,9 +17,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { criarFerramentasParametros } from './parametros.mjs';
-import { parametrosReutilizavel } from '../../mecanifica/parametros-peca.mjs';
-import { montarAcervoReduzido } from '../../mecanifica/acervo-reduzido.mjs';
-import { REPO } from '../../mecanifica/resolver-caminho-receita.mjs';
+import { parametrosReutilizavel } from '../../modelar/parametros-peca.mjs';
+import { montarAcervoReduzido } from '../../modelar/acervo-reduzido.mjs';
+import { REPO } from '../../modelar/resolver-caminho-receita.mjs';
 
 const ferramentas = criarFerramentasParametros();
 const pegar = (nome) => ferramentas.find((f) => f.nome === nome);
@@ -34,7 +34,7 @@ async function chamar(nome, entrada) {
    `haste/hub` pelo mesmo tanto — encolher fecha os seis pares e o mínimo
    salta para um sétimo par (`trackA`/`trackB`), que também reage a `w` e a
    `esp`. Ver o mesmo desenho, com a mesma explicação, em
-   `tools/mecanifica/varrer-peca.test.mjs`. */
+   `tools/modelar/varrer-peca.test.mjs`. */
 const WREF = 0.040;
 const ESPREF = 0.020;
 const OFFSET = 0.017;
@@ -153,7 +153,7 @@ describe('porta MCP da varredura', () => {
 
     /* Acervo reduzido (3 peças pequenas, opção `raiz`): o teste prova o
        encanamento da porta e não pode custar o que o acervo real custa. O real
-       inteiro é conferido uma vez, por `tools/mecanifica/acervo-real.test.mjs`. */
+       inteiro é conferido uma vez, por `tools/modelar/acervo-real.test.mjs`. */
     const todos = await chamar('diagnosticar_parametros', { acervo: true, raiz: REDUZIDO.raiz });
     /* A porta MCP e a CLI leem a mesma varredura, então o total do acervo que
        uma devolve é o que a outra devolve na mesma árvore. O número não é

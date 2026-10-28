@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { descreverPeca } from '../../../src/autoria/descrever-partes.js';
 import { normalizarPlanoDeModelagem } from '../../../src/autoria/plano-de-modelagem.js';
-import { EIXO_VERTICAL, FOLGA_DO_CHAO, fundoDaPeca, verticalDeclarada } from '../../../tools/mecanifica/guardas/guarda-referencial.mjs';
+import { EIXO_VERTICAL, FOLGA_DO_CHAO, fundoDaPeca, verticalDeclarada } from '../../../tools/modelar/guardas/guarda-referencial.mjs';
 import receita, { MATERIAL_DA_PARTE } from './receita.js';
 
 describe('exemplo de peça de família', () => {

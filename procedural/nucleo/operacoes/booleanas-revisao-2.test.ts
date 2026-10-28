@@ -6,9 +6,9 @@ import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo herdado em JavaScript.
 import { BASE_ESTENDIDA, BLOCO, FAIXA_ESTENDIDA, adaptarV3, idDoPasso, neutroCanonico, nucleo } from '../entrada.js';
 // @ts-expect-error — fixture JavaScript.
-import { TABELA, gerarPassos } from '../../../tools/mecanifica/fixtures/fixture-ombro-uniao.js';
+import { TABELA, gerarPassos } from '../../../tools/modelar/fixtures/fixture-ombro-uniao.js';
 // @ts-expect-error — serviço MJS.
-import { exportarPeca, lerPecaResolvida } from '../../../tools/mecanifica/exportar-peca.mjs';
+import { exportarPeca, lerPecaResolvida } from '../../../tools/modelar/exportar-peca.mjs';
 import { conferirMalha, vinculosNaoManifold } from '../../../tools/oficina/conferir-malha';
 
 const lat = (id: number, eixo: string, R: number, h: number, L: number, em: number[]) => ['lathe', { origemId: id, eixo, lados: L, em, perfil: [[0, 0], [R, 0], [R, h], [0, h]] }];

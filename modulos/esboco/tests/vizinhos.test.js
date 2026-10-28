@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { briefDoCritico, lerArgumentos, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { briefDoCritico, lerArgumentos, unidadeArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 40, altura: 20, profundidade: 20, centro, ...extra });
 /* a unidade "esteira" (duas caixas) toca só a viga do "chassi"; a roda do chassi e a caixa "longe" não a tocam */

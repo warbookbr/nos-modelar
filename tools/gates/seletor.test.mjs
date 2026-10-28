@@ -22,10 +22,10 @@ function repositorio(arquivos) {
 describe('seletor de gates', () => {
   it('o grafo de imports acompanha o código, e não a receita, a fixtura, o JSON nem o documento', () => {
     expect(visivelNoGrafo('procedural/nucleo/friso.js')).toBe(true);
-    expect(visivelNoGrafo('tools/mecanifica/descrever-peca.mjs')).toBe(true);
+    expect(visivelNoGrafo('tools/modelar/descrever-peca.mjs')).toBe(true);
     expect(visivelNoGrafo('procedural/pecas/trator/receita.js')).toBe(false);
-    expect(visivelNoGrafo('tools/mecanifica/fixtures/x.js')).toBe(false);
-    expect(visivelNoGrafo('docs/mecanifica/INDEX.md')).toBe(false);
+    expect(visivelNoGrafo('tools/modelar/fixtures/x.js')).toBe(false);
+    expect(visivelNoGrafo('docs/modelar/INDEX.md')).toBe(false);
     expect(visivelNoGrafo('package.json')).toBe(false);
   });
 

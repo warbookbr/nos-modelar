@@ -14,7 +14,7 @@ const menosJson = ler('.claude/skills/esboco-detalhado/escrever-menos-json.md');
 const laco = ler('.claude/skills/laco-do-esboco/SKILL.md');
 const esbocista = ler('.claude/agents/esbocista.md');
 const opcoes = ler('.claude/skills/esbocar-opcoes/SKILL.md');
-const pare = ler('docs/mecanifica/usar/PARE-E-ANALISE.md');
+const pare = ler('docs/modelar/usar/PARE-E-ANALISE.md');
 
 const secao = (texto, titulo) => {
   const i = texto.indexOf(`## ${titulo}`);

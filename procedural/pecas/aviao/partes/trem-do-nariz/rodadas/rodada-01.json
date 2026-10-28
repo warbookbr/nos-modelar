@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-receita-2026-10-15/alvos/trem-do-nariz-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-receita-2026-10-15/alvos/trem-do-nariz-composta.png",
     "nota": 8,
     "defeitos": [],
     "observacao": "Sem defeito estrutural visível; lista vazia não é aprovação. Recorte da carenagem e ligação longitudinal do atuador só aparecem no raio-x de frente; detalhe do pneu na frontal do alvo ficou sem resolução."
@@ -145,7 +145,7 @@
         {
           "tipo": "+",
           "linha": 5,
-          "texto": " * esboço aprovado da segunda rodada (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
+          "texto": " * esboço aprovado da segunda rodada (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/`, o mestre e"
         },
         {
           "tipo": "+",
@@ -280,7 +280,7 @@
         {
           "tipo": "+",
           "linha": 32,
-          "texto": "const ESBOCO = '../../../../../docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
+          "texto": "const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';"
         },
         {
           "tipo": "+",

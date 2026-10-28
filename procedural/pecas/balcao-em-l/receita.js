@@ -11,7 +11,7 @@
  * dentro), corpo (y 100 a 1100) e tampo (y 1100 a 1200, 15 mm para dentro). "Para fora" é a face que dá para o exterior do L; "para dentro" é a
  * face que dá para o canto aberto, entre os dois braços. Nas faces externas, o tampo e o rodape ficam no mesmo plano do corpo.
  *
- * Origem: receita de externo de balcão de canto (quatro camadas em oito caixas), convertida em `tools/mecanifica/fixtures/receita-externa-balcoes`.
+ * Origem: receita de externo de balcão de canto (quatro camadas em oito caixas), convertida em `tools/modelar/fixtures/receita-externa-balcoes`.
  * As oito caixas da origem começam o rodapé em y 0, por baixo da placa de base; aqui o rodapé começa em y 20, sobre a placa, para não haver
  * sobreposição. A caixa total é a mesma da origem: x -462 a 512, y 0 a 1200, z -462 a 512.
  */

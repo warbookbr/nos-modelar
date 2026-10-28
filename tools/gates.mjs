@@ -98,7 +98,7 @@ export const GATES = [
   'typecheck', 'test:rapidos', 'test:lentos', 'mcp:visual:check', 'build',
   'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check',
   /* As dez guardas que abrem a bancada (porteiro, bancada:vazia:check, guarda:portas, :camera, :par, :referencia, :escolha, :junta,
-     :edicao e :gesto) rodam aqui dentro, num Chromium e num servidor do Vite só (tools/mecanifica/guardas/rodar-guardas.mjs). Cada
+     :edicao e :gesto) rodam aqui dentro, num Chromium e num servidor do Vite só (tools/modelar/guardas/rodar-guardas.mjs). Cada
      uma continua sendo um script que roda sozinho, e o relatório do gate diz o nome e o veredito de cada uma. */
   'bancada:guardas', 'exportar:check',
   'guarda:acervo', 'guarda:referencial', 'origens:check',
@@ -239,9 +239,9 @@ export function escolherBateria(alterados) {
  * isso fica de fora da bateria local quando nada desses caminhos mudou; roda com `--completo`, quando não dá para saber o que
  * mudou, e sempre no CI, que chama o script direto. */
 export const GATES_POR_CAMINHO = {
-  'guarda:acervo': [/^procedural\//, /^src\//, /^tools\/mecanifica\/(guardas\/|descrever-peca|resolver-caminho-receita)/, /^package(-lock)?\.json$/],
+  'guarda:acervo': [/^procedural\//, /^src\//, /^tools\/modelar\/(guardas\/|descrever-peca|resolver-caminho-receita)/, /^package(-lock)?\.json$/],
   /* As duas conferências de família, medidas na mesma rodada em 133 s e 116 s, seguem a mesma regra pelo que importam. */
-  'familias:check': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/mecanifica\/(familia|aprovacao-da-familia|importar-receita|resolver-caminho-receita|montagem-da-familia)/, /^package(-lock)?\.json$/],
+  'familias:check': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/modelar\/(familia|aprovacao-da-familia|importar-receita|resolver-caminho-receita|montagem-da-familia)/, /^package(-lock)?\.json$/],
 };
 
 export function filtrarPorCaminho(bateria, alterados) {

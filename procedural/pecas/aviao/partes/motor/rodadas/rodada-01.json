@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor-unidade-motor-composta.png",
+    "alvo": "/home/user/nos-mecanifica/docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao-detalhe-motor-unidade-motor-composta.png",
     "nota": 7,
     "defeitos": [
       {
@@ -88,7 +88,7 @@
         {
           "tipo": "+",
           "linha": 5,
-          "texto": " * (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `aviao-detalhe-motor.esboco.json`), e a receita"
+          "texto": " * (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `aviao-detalhe-motor.esboco.json`), e a receita"
         },
         {
           "tipo": "+",

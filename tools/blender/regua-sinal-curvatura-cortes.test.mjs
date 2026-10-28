@@ -17,8 +17,8 @@ import { CAIXA, obj } from './placa-de-prova.mjs';
 
 const BLENDER = process.env.MECANIFICA_BLENDER;
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
-const FIXTURE_ONDULACAO = join(AQUI, '../mecanifica/fixtures/ondulacao-prova.js');
-const FIXTURE_LISA = join(AQUI, '../mecanifica/fixtures/ondulacao-prova-lisa.js');
+const FIXTURE_ONDULACAO = join(AQUI, '../modelar/fixtures/ondulacao-prova.js');
+const FIXTURE_LISA = join(AQUI, '../modelar/fixtures/ondulacao-prova-lisa.js');
 const ABA = { raio: 0.003, altura: 0.02 };
 
 function regua(args) {

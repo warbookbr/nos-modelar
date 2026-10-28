@@ -2,7 +2,7 @@
  *
  * Segunda etapa do avião (`../../montagem.json`). O combinado com a pessoa e o plano do motor estão em `../../ALINHAMENTO.md`; as
  * medidas vêm da unidade `motor` do esboço aprovado da segunda rodada
- * (`docs/mecanifica/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `aviao-detalhe-motor.esboco.json`), e a receita
+ * (`docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json` e `aviao-detalhe-motor.esboco.json`), e a receita
  * refina o andaime `../../andaime.json`, que é a tradução desse esboço (REFINA).
  *
  * Referencial do acervo e do esboço, o mesmo da fuselagem: Y para cima, chão em y = 0, x para a direita do piloto, a proa para -z e a
@@ -420,10 +420,10 @@ const receita = {
   PLANO: {
     objeto: 'motor de um avião monomotor de asa baixa e pequeno porte, da face da frente da fuselagem até o cone da hélice: o capô com a boca de ar, a entrada de ar sob ele e os dois escapes laterais',
     referencias: [
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
-      'docs/mecanifica/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png',
+      'docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/frontal.png',
     ],
     escala: { medida: 'comprimento do capô no esboço, de z 592 a z 2377', milimetros: 1785 },
     partes: [

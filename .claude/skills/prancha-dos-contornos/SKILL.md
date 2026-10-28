@@ -7,7 +7,7 @@ description: Faz a prancha de uma vista (lateral, topo ou frontal) pelos contorn
 
 Você conduz e não desenha. Quem escolhe é o agente `desenhista-de-prancha`, e
 quem julga é o `critico-visual`. O comando é `npm run contorno:prancha`, e a
-etapa faz parte do fluxo descrito em `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`.
+etapa faz parte do fluxo descrito em `docs/modelar/usar/FLUXO-DO-OBJETO.md`.
 
 A prancha só começa com o mapa de partes fechado (`npm run objeto -- <objeto>`
 mostra). Ela sai inteira dos contornos, e o que o agente decide é o que o

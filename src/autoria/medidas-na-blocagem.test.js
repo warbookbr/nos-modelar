@@ -2,7 +2,7 @@
    de um eixo e a distância entre faces com os valores que a blocagem tem de dar, as âncoras declaradas e os pontos, o que a
    blocagem não lê (forma sem tradução, forma recolhida, âncora fora do envelope, âncora inexistente) e o G01 com um alvo
    sintético. A prova sobre as fixtures do esboço, que compara com `--medidas`, está em
-   `tools/mecanifica/esboco-medidas-no-andaime.test.mjs`. */
+   `tools/modelar/esboco-medidas-no-andaime.test.mjs`. */
 import { describe, expect, it } from 'vitest';
 import { FORMATO_FORMAS_RESOLVIDAS, traduzirFormasParaAndaime } from './tradutor-nivel-zero.js';
 import { compararLeituras, descreverMedidasNaBlocagem, lerMedidasNaBlocagem, lerMedidasNoDado } from './medidas-na-blocagem.js';

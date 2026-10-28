@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { readFileSync } from 'node:fs';
 import { desenharEsboco, ErroDeEsboco, QUADRO, validarEsboco } from '../src/index.js';
-import { lerArgumentos, vistasArquivo, unidadeArquivo } from '../../../tools/mecanifica/esboco.mjs';
+import { lerArgumentos, vistasArquivo, unidadeArquivo } from '../../../tools/modelar/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 40, altura: 40, profundidade: 40, centro, ...extra });
 const esboco = (formas, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], ...extra });

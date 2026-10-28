@@ -51,7 +51,7 @@ function contarLinhas(texto) {
 const TETO_DE_LINHAS = 300;
 
 export function conferirPlanos({
-  pasta = join(RAIZ, 'docs/mecanifica/planos'),
+  pasta = join(RAIZ, 'docs/modelar/planos'),
   indice = join(pasta, 'README.md'),
 } = {}) {
   const problemas = [];
@@ -91,7 +91,7 @@ export function conferirPlanos({
 }
 
 /* Os três lugares que dizem qual plano está ativo (README.md da raiz,
-   docs/mecanifica/INDEX.md e o índice de planos) divergiram sem que nada
+   docs/modelar/INDEX.md e o índice de planos) divergiram sem que nada
    reprovasse: o README da raiz seguiu dizendo "nenhum plano está ativo"
    depois da ativação de um plano. Cada lugar é reduzido ao nome do arquivo
    apontado, ou a 'nenhum', e os três precisam coincidir. */
@@ -122,13 +122,13 @@ export function planoAtivoDeclarado(texto, tipo) {
 
 export function conferirPlanoAtivoNosIndices({
   readme = join(RAIZ, 'README.md'),
-  indice = join(RAIZ, 'docs/mecanifica/INDEX.md'),
-  planos = join(RAIZ, 'docs/mecanifica/planos/README.md'),
+  indice = join(RAIZ, 'docs/modelar/INDEX.md'),
+  planos = join(RAIZ, 'docs/modelar/planos/README.md'),
 } = {}) {
   const fontes = [
     ['README.md', readme, 'raiz', 'frase "O plano ativo é [..](..)" ou "Nenhum plano está ativo"'],
-    ['docs/mecanifica/INDEX.md', indice, 'indice', 'linha "- Ativo: [..](..)" ou "- Ativo: nenhum"'],
-    ['docs/mecanifica/planos/README.md', planos, 'planos', 'declaração "**Plano ativo:**"'],
+    ['docs/modelar/INDEX.md', indice, 'indice', 'linha "- Ativo: [..](..)" ou "- Ativo: nenhum"'],
+    ['docs/modelar/planos/README.md', planos, 'planos', 'declaração "**Plano ativo:**"'],
   ];
   const problemas = [];
   const declarados = [];

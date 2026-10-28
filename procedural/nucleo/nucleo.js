@@ -484,7 +484,7 @@ function distanciaDeEdicao(a, b) {
  * [1,0,0], sel }]` transladava por ZERO. Sem erro, sem órfão, sem uma linha —
  * `a.d` chegava `undefined`, virava `[0,0,0]`, e a peça saía no lugar errado
  * com todas as medidas verdes. Régua que mede a peça errada em silêncio é pior
- * do que não medir, e é exatamente a lei que `tools/mecanifica/argumentos.mjs`
+ * do que não medir, e é exatamente a lei que `tools/modelar/argumentos.mjs`
  * aplica nas CLIs: bandeira desconhecida FALHA com diagnóstico, nunca vira
  * no-op silencioso. A lei não alcançava argumento de passo.
  *
@@ -1936,7 +1936,7 @@ function confereId(st, i, op, args) {
    regra antiga: movem os vértices dentro da caixa.
 
    ASSIMETRIA de `regiao`, agora dita em voz alta (era implícita e custava
-   caro; é o O-3 de docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): um VÉRTICE entra
+   caro; é o O-3 de docs/modelar/historico/OFICINA-OTIMIZACOES.md): um VÉRTICE entra
    se ELE estiver dentro da caixa — o eixo de vértice
    sempre leu a região como "toca". Uma FACE, até aqui, só entrava com TODOS
    os cantos dentro (`f.vs.every(dentro)`). A MESMA caixa selecionava, então,

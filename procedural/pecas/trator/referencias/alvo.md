@@ -1,6 +1,6 @@
 # trator — alvo
 
-Origem: modelo "tractor" do pacote A, de autor A (endereço omitido), licença livre sem exigência de crédito. A malha original (`tractor.glb`) fica fora do repositório, em `importados/veiculos-livres/pacote-a/`. Aqui entram só as medidas (`fonte-partes.json`) e as vistas (`fonte-vistas.png`). O pacote está confirmado em `docs/mecanifica/veiculos-referencias.json`.
+Origem: modelo "tractor" do pacote A, de autor A (endereço omitido), licença livre sem exigência de crédito. A malha original (`tractor.glb`) fica fora do repositório, em `importados/veiculos-livres/pacote-a/`. Aqui entram só as medidas (`fonte-partes.json`) e as vistas (`fonte-vistas.png`). O pacote está confirmado em `docs/modelar/veiculos-referencias.json`.
 
 Escala: comprimento de 3886 mm (z -1943 a 1943), largura de 2368 mm (rodas traseiras), altura de 2828 mm. Frente em +z, conferida na lateral (frente à esquerda).
 

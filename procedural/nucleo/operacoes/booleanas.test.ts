@@ -1,5 +1,5 @@
 /* booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos"
-   (docs/mecanifica/planos/encerrados/2026-09-28-uniao-de-solidos.md). A fixture é neutra:
+   (docs/modelar/planos/encerrados/2026-09-28-uniao-de-solidos.md). A fixture é neutra:
    dois cubos de lado 1 que se cruzam num cubo de 0,5 de lado. O primeiro
    bloco é a LINHA DE BASE: sem a operação, cada cubo tem face dentro do
    outro, que é o vinco que o render mostrou no ombro. */

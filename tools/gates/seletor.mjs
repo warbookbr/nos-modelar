@@ -36,9 +36,9 @@ export function visivelNoGrafo(caminho) {
 /* O que cada gate lê, além de si mesmo. O gate que não está aqui roda sempre; um padrão largo demais só faz ele rodar mais. */
 const CODIGO = [/^src\//, /^procedural\//, /^modulos\//, /^tools\//, /^package(-lock)?\.json$/, /\.html$/, /^public\//, /^vite\.config\.js$/];
 export const LE_O_GATE = {
-  'guarda:acervo': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/mecanifica\//, /^package(-lock)?\.json$/],
-  'familias:check': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/mecanifica\//, /^package(-lock)?\.json$/],
-  'guarda:referencial': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/mecanifica\//, /^package(-lock)?\.json$/],
+  'guarda:acervo': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/modelar\//, /^package(-lock)?\.json$/],
+  'familias:check': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/modelar\//, /^package(-lock)?\.json$/],
+  'guarda:referencial': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/modelar\//, /^package(-lock)?\.json$/],
   'mcp:visual:check': CODIGO,
   build: CODIGO,
   typecheck: [...CODIGO, /^tsconfig\.json$/, /\.d\.ts$/],
@@ -55,16 +55,16 @@ export const LE_O_GATE = {
 const DO_NAVEGADOR = [/\.html$/, /^public\//, /^vite\.config\.js$/, /^package(-lock)?\.json$/, /^procedural\/(pecas|familias)\//, /(^|\/)fixtures?\//];
 export const ENTRADAS_DO_GATE = {
   'bancada:guardas': {
-    entradas: ['src/bancada/entrada.js', 'tools/mecanifica/guardas/rodar-guardas.mjs', 'tools/bancadas/porteiro.mjs',
+    entradas: ['src/bancada/entrada.js', 'tools/modelar/guardas/rodar-guardas.mjs', 'tools/bancadas/porteiro.mjs',
       ...['bancada-vazia', 'portas-bancada', 'camera-livre', 'inspecao-par', 'referencia-da-peca', 'escolha-da-peca', 'junta-da-bancada',
-        'gesto', 'edicao-de-malha'].map((g) => `tools/mecanifica/guardas/guarda-${g}.mjs`)],
+        'gesto', 'edicao-de-malha'].map((g) => `tools/modelar/guardas/guarda-${g}.mjs`)],
     tambem: [...DO_NAVEGADOR, /^tools\/bancadas\//],
   },
   /* Medido com o registro de leituras em 2026-10-28: o código dele, as imagens e fontes da calibração, o esboço da rodada do
      guarda-roupa, o agente crítico e as famílias que as fontes chamam. */
   'calibracao:check': {
-    entradas: ['tools/mecanifica/calibracao-do-critico.mjs'],
-    tambem: [/^docs\/mecanifica\/banco-de-provas\/(calibracao-do-critico|rodada-2026-10-08)\//, /^\.claude\/agents\//, /^procedural\/(pecas|familias)\//,
+    entradas: ['tools/modelar/calibracao-do-critico.mjs'],
+    tambem: [/^docs\/modelar\/banco-de-provas\/(calibracao-do-critico|rodada-2026-10-08)\//, /^\.claude\/agents\//, /^procedural\/(pecas|familias)\//,
       /(^|\/)fixtures?\//, /^package(-lock)?\.json$/, /^\.npmrc$/],
   },
   'mcp:visual:check': {
