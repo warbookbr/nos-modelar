@@ -45,6 +45,7 @@ export const LE_O_GATE = {
   'bancada:guardas': CODIGO,
   'exportar:check': CODIGO,
   'arquitetura:motor:check': CODIGO,
+  'calibracao:check': [],
 };
 
 /* Os gates que rodam um programa sobre o código declaram as ENTRADAS dele, e leem o fecho dos imports estáticos delas, mais o que
@@ -58,6 +59,13 @@ export const ENTRADAS_DO_GATE = {
       ...['bancada-vazia', 'portas-bancada', 'camera-livre', 'inspecao-par', 'referencia-da-peca', 'escolha-da-peca', 'junta-da-bancada',
         'gesto', 'edicao-de-malha'].map((g) => `tools/mecanifica/guardas/guarda-${g}.mjs`)],
     tambem: [...DO_NAVEGADOR, /^tools\/bancadas\//],
+  },
+  /* Medido com o registro de leituras em 2026-10-28: o código dele, as imagens e fontes da calibração, o esboço da rodada do
+     guarda-roupa, o agente crítico e as famílias que as fontes chamam. */
+  'calibracao:check': {
+    entradas: ['tools/mecanifica/calibracao-do-critico.mjs'],
+    tambem: [/^docs\/mecanifica\/banco-de-provas\/(calibracao-do-critico|rodada-2026-10-08)\//, /^\.claude\/agents\//, /^procedural\/(pecas|familias)\//,
+      /(^|\/)fixtures?\//, /^package(-lock)?\.json$/, /^\.npmrc$/],
   },
   'mcp:visual:check': {
     entradas: ['src/bancada/entrada.js', 'tools/mcp/mcp.test.mjs', 'tools/mcp/procedural.test.mjs', 'tools/mcp/perfis/autoria-execucao.test.mjs',
