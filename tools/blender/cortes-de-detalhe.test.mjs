@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { distancias, pontosDe } from './distancias-de-prova.mjs';
 import { py, temPillow } from './pacote-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 import {
   CALHA, CORDAO_10, contornoDoCorte, corteDe, linhaDeFeicao, montarDetalhesDaChapa, montarPacoteDaChapa, perfilEsperado, secaoDoDetalhe,
 } from './cordao-de-prova.mjs';
@@ -65,7 +66,7 @@ describe.skipIf(!temPillow)('cortes de detalhe ampliados, em chapa desenhada por
   }, 240000);
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

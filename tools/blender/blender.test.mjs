@@ -5,7 +5,7 @@
    forma simétrica em x (caixa-de-prova.mjs) sai com o recorte simétrico e as vistas de frente, traseira e topo iguais ao
    próprio espelho a até 1 px, também com a triangulação que não é espelhada.
 
-   Só roda com MECANIFICA_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
+   Só roda com MODELAR_BLENDER apontando o executável do Blender (e python3 com Pillow e numpy); sem a variável, o bloco
    inteiro se ignora, e o Blender fica fora do CI e do `--completo`. A forma medida é a forma de prova da gaiola por
    estações, desenhada por código em procedural/nucleo/fixtures/gaiola-por-estacoes-prova.js. */
 import { spawnSync } from 'node:child_process';
@@ -19,8 +19,9 @@ import { definicaoAdensada } from '../../procedural/nucleo/fixtures/gaiola-por-e
 import { nucleo } from '../../procedural/nucleo/entrada.js';
 import { FIXTURE, compararFixtures, gerarFixture } from './oraculo-subdivisao.mjs';
 import { CAIXA as CAIXA_CAIXA, obj as caixaObj } from './caixa-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
-const BLENDER = process.env.MECANIFICA_BLENDER;
+const BLENDER = doAmbiente('BLENDER');
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const CAIXA = '0,0.9,0,1.1,0.2,2.0';
 
@@ -65,6 +66,19 @@ const sem = (m) => { const { segundos_medida, segundos_total, ...resto } = m; re
 const metricas = (saida) => JSON.parse(readFileSync(join(saida, 'metricas.json'), 'utf8'));
 const cruza = (a, b) => !(a[2] <= b[0] || b[2] <= a[0] || a[3] <= b[1] || b[3] <= a[1]);
 
+describe('a variável que aponta o Blender', () => {
+  const oraculo = (env) => spawnSync(process.execPath, [join(AQUI, 'oraculo-subdivisao.mjs')], { encoding: 'utf8', env: { PATH: process.env.PATH, ...env } });
+
+  it('sem ela o oráculo pede MODELAR_BLENDER, e o nome antigo MECANIFICA_BLENDER ainda vale, com aviso do novo', () => {
+    const sem = oraculo({});
+    expect(sem.status).toBe(2);
+    expect(sem.stderr).toContain('defina MODELAR_BLENDER');
+    const antigo = oraculo({ MECANIFICA_BLENDER: join(AQUI, 'nao-existe-blender') });
+    expect(antigo.stderr).toContain('use MODELAR_BLENDER');
+    expect(antigo.stderr).not.toContain('defina MODELAR_BLENDER');
+  });
+});
+
 describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
   let dir;
   const p = (nome) => join(dir, nome);
@@ -90,10 +104,10 @@ describe.skipIf(!BLENDER)('ferramentas do Blender', () => {
     ].join('\n'));
     blender(p('decimar.py'), [p('forma.obj'), p('decimada.obj')]);
   }, 180000);
-  // MECANIFICA_BLENDER_GUARDAR=1 guarda a pasta com as malhas, as medidas e as imagens para olhar depois
+  // MODELAR_BLENDER_GUARDAR=1 guarda a pasta com as malhas, as medidas e as imagens para olhar depois
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

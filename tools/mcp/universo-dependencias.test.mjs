@@ -2,14 +2,25 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
-import { carregarUniversoDependencias, criarUniversoDependencias } from './universo-dependencias.mjs';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  carregarUniversoDependencias, criarUniversoDependencias, universoDependenciasDoAmbiente, VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS,
+} from './universo-dependencias.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const CONFIGURACAO = join(RAIZ, 'tools/mcp/fixtures/universo-dependencias.json');
 const DIRETORIO_FIXTURE = join(RAIZ, 'tools/modelar/fixtures/mapa-dependencias');
 
 describe('universo MCP de dependências', () => {
+  it('lê o caminho pelo nome novo da variável e aceita o antigo com aviso', () => {
+    expect(universoDependenciasDoAmbiente({ [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO })).toMatchObject({ configurado: true });
+    const escrita = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      expect(universoDependenciasDoAmbiente({ MECANIFICA_UNIVERSO_DEPENDENCIAS: CONFIGURACAO })).toMatchObject({ configurado: true });
+      expect(escrita.mock.calls.map(([texto]) => String(texto)).join('')).toContain(VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS);
+    } finally { escrita.mockRestore(); }
+  });
+
   it('resume o mapa completo sem transportar o mapa nem caminhos locais', async () => {
     const universo = carregarUniversoDependencias(CONFIGURACAO);
     const resumo = await universo.resumo();

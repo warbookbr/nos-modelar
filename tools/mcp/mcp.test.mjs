@@ -182,6 +182,33 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
+  it('aceita os nomes antigos das variáveis (MECANIFICA_*) e avisa o nome novo na saída de erro', async () => {
+    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-nome-antigo-'));
+    const client = new Client({ name: 'teste-nome-antigo', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        MECANIFICA_CATALOGO_MONTAGENS: CONFIGURACAO_MONTAGENS,
+        MECANIFICA_UNIVERSO_DEPENDENCIAS: CONFIGURACAO_UNIVERSO,
+        MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+        MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+      },
+    });
+    let avisos = '';
+    transport.stderr.on('data', (c) => { avisos += c; });
+    try {
+      await client.connect(transport);
+      const estado = JSON.parse((await client.readResource({ uri: 'mecanifica://estado' })).contents[0].text);
+      expect(estado).toMatchObject({ perfil: 'autoria', autoriaAtivaConfigurada: true, receitasAutorizadas: ['eixo-guia'] });
+      for (const nome of ['CATALOGO_MONTAGENS', 'UNIVERSO_DEPENDENCIAS', 'PERFIL', 'REPOSITORIO_AUTORIA', 'RECEITAS_AUTORIZADAS']) {
+        expect(avisos).toContain(`use MODELAR_${nome}`);
+      }
+    } finally {
+      await client.close();
+      rmSync(repositorio, { recursive: true, force: true });
+    }
+  });
+
   it('faz handshake bruto, anuncia ferramentas e recursos somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
@@ -579,7 +606,7 @@ describe('servidor MCP local — perfil revisao', () => {
       ...process.env,
       [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_CATALOGO_MAPA,
       [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
-      MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+      MODELAR_PERFIL: 'autoria', MODELAR_REPOSITORIO_AUTORIA: repositorio,
     };
     const escritor = new Client({ name: 'consumidor-r05-escritor', version: '1' });
     const transporteEscritor = new StdioClientTransport({
@@ -624,7 +651,7 @@ describe('servidor MCP local — perfil revisao', () => {
     const leitor = new Client({ name: 'consumidor-r05-nova-sessao', version: '1' });
     const transporteLeitor = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
-      env: { ...ambiente, MECANIFICA_PERFIL: 'revisao' },
+      env: { ...ambiente, MODELAR_PERFIL: 'revisao' },
     });
     try {
       await leitor.connect(transporteLeitor);
@@ -659,8 +686,8 @@ describe('servidor MCP local — perfil revisao', () => {
       env: {
         ...process.env,
         [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
-        MECANIFICA_PERFIL: 'autoria',
-        MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+        MODELAR_PERFIL: 'autoria',
+        MODELAR_REPOSITORIO_AUTORIA: repositorio,
       },
     });
     try {
@@ -817,8 +844,8 @@ describe('servidor MCP local — perfil revisao', () => {
       env: {
         ...process.env,
         [VARIAVEL_CATALOGO_MCP_MONTAGENS]: join(catalogoLocal, 'catalogo.json'),
-        MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
-        MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+        MODELAR_PERFIL: 'autoria', MODELAR_REPOSITORIO_AUTORIA: repositorio,
+        MODELAR_RECEITAS_AUTORIZADAS: 'eixo-guia',
       },
     });
     try {
@@ -856,8 +883,8 @@ describe('servidor MCP local — perfil revisao', () => {
         env: {
           ...process.env,
           [VARIAVEL_CATALOGO_MCP_MONTAGENS]: join(catalogoLocal, 'catalogo.json'),
-          MECANIFICA_PERFIL: 'revisao', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
-          MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+          MODELAR_PERFIL: 'revisao', MODELAR_REPOSITORIO_AUTORIA: repositorio,
+          MODELAR_RECEITAS_AUTORIZADAS: 'eixo-guia',
         },
       });
       try {

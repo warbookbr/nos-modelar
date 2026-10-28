@@ -16,6 +16,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { distancias } from './distancias-de-prova.mjs';
 import { SECAO, VERTICES, Z0, Z1, contornoDaSecao, montarPacoteDoFeixe } from './feixe-de-prova.mjs';
 import { py, temPillow } from './pacote-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const mm = (v) => v.map((x) => x * 1000);
@@ -47,7 +48,7 @@ describe.skipIf(!temPillow)('conferência das linhas 3D contra os cortes, no fei
   }, 120000);
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

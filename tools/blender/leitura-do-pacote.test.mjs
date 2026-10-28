@@ -12,6 +12,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { bordaDeCorte, corte, dobras, projetar, secao, visivel, vincos } from './prisma-de-prova.mjs';
 import { estatisticas, pontosDe, distancias, distanciasA } from './distancias-de-prova.mjs';
 import { CORTES, eixosDaVista, montarPacote, py, temPillow } from './pacote-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
 describe.skipIf(!temPillow)('leitura do pacote cego desenhado por código', () => {
   let dir;
@@ -27,10 +28,10 @@ describe.skipIf(!temPillow)('leitura do pacote cego desenhado por código', () =
     lidos.corte = JSON.parse(readFileSync(p('corte.json'), 'utf8'));
     lidos.linhas = JSON.parse(readFileSync(p('linhas.json'), 'utf8'));
   }, 120000);
-  // MECANIFICA_BLENDER_GUARDAR=1 guarda a pasta com o pacote e as leituras para olhar depois
+  // MODELAR_BLENDER_GUARDAR=1 guarda a pasta com o pacote e as leituras para olhar depois
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

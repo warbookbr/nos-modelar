@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CAIXA, visivel, vincos } from './prisma-de-prova.mjs';
 import { amostrar, montarPacote, py, temPillow } from './pacote-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 
@@ -25,10 +26,10 @@ describe.skipIf(!temPillow)('comparar-vincos sobre o pacote desenhado por códig
     dir = mkdtempSync(join(tmpdir(), 'comparar-vincos-'));
     cams = montarPacote(dir);
   }, 120000);
-  // MECANIFICA_BLENDER_GUARDAR=1 guarda a pasta com o pacote e as comparações para olhar depois
+  // MODELAR_BLENDER_GUARDAR=1 guarda a pasta com o pacote e as comparações para olhar depois
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
 

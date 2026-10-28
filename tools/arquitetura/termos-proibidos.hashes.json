@@ -1,6 +1,6 @@
 {
   "algoritmo": "hmac-sha256",
-  "chave": "MECANIFICA_CHAVE_TERMOS (ou o arquivo em MECANIFICA_CHAVE_TERMOS_ARQUIVO); fora do repositório",
+  "chave": "MODELAR_CHAVE_TERMOS (ou o arquivo em MODELAR_CHAVE_TERMOS_ARQUIVO); fora do repositório",
   "normalizacao": "minúsculas, sem acento, palavras separadas por não alfanumérico; sequências de 1 a 3 palavras; `hashes` é a forma com espaço; `unidos` a forma sem separador e `iniciais` o HMAC da primeira palavra, ambos só dos termos de mais de uma palavra (ver termos-proibidos.mjs)",
   "verificador": "200d56e52c0b4f3f68774c92da652d742ac2f1a79fb1d350e4f359a31557bdda",
   "hashes": [

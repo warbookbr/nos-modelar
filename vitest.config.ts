@@ -1,10 +1,11 @@
 /* Config do Vitest: cobre os contratos do Modelar e os núcleos herdados em tools/**. */
 import { configDefaults, defineConfig } from 'vitest/config';
 import { TESTES_LENTOS } from './tools/testes-lentos.mjs';
+import { doAmbiente } from './tools/ambiente.mjs';
 
 /* `npm run test:rapidos` e `npm run test:lentos` (tools/testes-lentos.mjs) dividem a suíte pela lista dos lentos; sem a
    variável, `npm test` roda tudo. */
-const MODO = process.env.MECANIFICA_TESTES;
+const MODO = doAmbiente('TESTES');
 
 export default defineConfig({
   test: {

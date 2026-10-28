@@ -3,10 +3,11 @@ import { lstatSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 import { verificarCaminhoConfinado } from '../modelar/caminho-confinado.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 
 export const FORMATO_CATALOGO_MCP_MONTAGENS = 'mecanifica.catalogo-mcp-montagens';
 export const VERSAO_CATALOGO_MCP_MONTAGENS = 1;
-export const VARIAVEL_CATALOGO_MCP_MONTAGENS = 'MECANIFICA_CATALOGO_MONTAGENS';
+export const VARIAVEL_CATALOGO_MCP_MONTAGENS = 'MODELAR_CATALOGO_MONTAGENS';
 export const REGRA_ESCOPO_CATALOGO = 'A presença no catálogo significa apenas que o host incluiu o ID no escopo de operações do MCP. Ela permite usar as ferramentas anunciadas pelo perfil atual; por si só, não comprova homologação, aprovação, validação completa nem ausência de falhas.';
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -265,6 +266,6 @@ export function carregarCatalogoMontagens(caminhoConfiguracao) {
 }
 
 export function catalogoMontagensDoAmbiente(ambiente = process.env) {
-  const caminho = ambiente?.[VARIAVEL_CATALOGO_MCP_MONTAGENS];
+  const caminho = doAmbiente('CATALOGO_MONTAGENS', ambiente);
   return caminho ? carregarCatalogoMontagens(caminho) : criarCatalogoMontagensVazio();
 }

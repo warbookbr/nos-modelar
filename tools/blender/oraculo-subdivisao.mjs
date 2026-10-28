@@ -3,7 +3,7 @@
    com o modificador Subdivision Surface do Blender, ou a confere contra o arquivo versionado.
 
    Uso:
-     MECANIFICA_BLENDER=<executável do blender> node tools/blender/oraculo-subdivisao.mjs [--saida <arquivo.json>] [--conferir]
+     MODELAR_BLENDER=<executável do blender> node tools/blender/oraculo-subdivisao.mjs [--saida <arquivo.json>] [--conferir]
 
    As gaiolas são desenhadas aqui por código e nada vem de fora. Em `casos` ficam gaiolas por índice com o vinco do Blender de
    0 a 1, e em `receitas` passos `subdivisao` escritos só com nomes, que este gerador traduz em índices para o Blender (a
@@ -18,6 +18,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { doAmbiente } from '../ambiente.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const FIXTURE = resolve(AQUI, '../../procedural/nucleo/fixtures/subdivisao-oraculo-blender.json');
@@ -181,8 +182,8 @@ export function compararFixtures(a, b, tol = TOLERANCIA) {
 }
 
 function principal(args) {
-  const blender = process.env.MECANIFICA_BLENDER;
-  if (!blender) { console.error('defina MECANIFICA_BLENDER com o caminho do executável do Blender'); return 2; }
+  const blender = doAmbiente('BLENDER');
+  if (!blender) { console.error('defina MODELAR_BLENDER com o caminho do executável do Blender'); return 2; }
   const i = args.indexOf('--saida');
   const saida = i >= 0 ? resolve(args[i + 1]) : FIXTURE;
   const nova = gerarFixture(blender);

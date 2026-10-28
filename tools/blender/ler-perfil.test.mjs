@@ -12,6 +12,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { nucleo } from '../../procedural/nucleo/entrada.js';
 import { distancias, pontosDe } from './distancias-de-prova.mjs';
 import { py, temPillow } from './pacote-de-prova.mjs';
+import { doAmbiente } from '../ambiente.mjs';
 import {
   CALHA, CORDAO, FI, ROLO, ROLO_CENTRO, ROLO_RAIO, SULCO, T0, W0, base, contornoDoCorte, corteDe, linhaDeFeicao, montarPacoteDaChapa, perfilEsperado, pontoEsperado,
   quadroEsperado, secaoDoDetalhe,
@@ -92,7 +93,7 @@ describe.skipIf(!temPillow)('perfil lido do corte, em chapa desenhada por códig
   }, 180000);
   afterAll(() => {
     if (!dir) return;
-    if (process.env.MECANIFICA_BLENDER_GUARDAR) console.log(`saídas em ${dir}`);
+    if (doAmbiente('BLENDER_GUARDAR')) console.log(`saídas em ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
   });
   const corte = (r, nome) => r.cortes.find((c) => c.corte === nome);

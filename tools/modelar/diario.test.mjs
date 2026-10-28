@@ -10,8 +10,8 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, describe, expect, it } from 'vitest';
-import { iniciarRegistro } from './diario.mjs';
+import { afterAll, describe, expect, it, vi } from 'vitest';
+import { caminhoDoDiario, iniciarRegistro } from './diario.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { resumir } from './ler-diario.mjs';
@@ -22,7 +22,7 @@ const DESCREVER = join(AQUI, 'descrever-peca.mjs');
 const AREA = mkdtempSync(join(tmpdir(), 'mecanifica-diario-teste-'));
 /* O diário do teste mora aqui, nunca no de quem está trabalhando. */
 const DIARIO = join(AREA, 'oficina.jsonl');
-process.env.MECANIFICA_DIARIO_ARQUIVO = DIARIO;
+process.env.MODELAR_DIARIO_ARQUIVO = DIARIO;
 
 afterAll(() => rmSync(AREA, { recursive: true, force: true }));
 
@@ -35,7 +35,7 @@ function rodar(args, env) {
   try {
     const saida = execFileSync('node', [DESCREVER, ...args], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, MECANIFICA_DIARIO_ARQUIVO: DIARIO, ...env },
+      env: { ...process.env, MODELAR_DIARIO_ARQUIVO: DIARIO, ...env },
     });
     return { codigo: 0, saida };
   } catch (falha) {
@@ -45,15 +45,37 @@ function rodar(args, env) {
 
 describe('diário da oficina', () => {
   it('ligado e desligado produzem exatamente a mesma saída e o mesmo código', () => {
-    const ligado = rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { MECANIFICA_DIARIO: '1' });
-    const desligado = rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { MECANIFICA_DIARIO: '0' });
+    const ligado = rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { MODELAR_DIARIO: '1' });
+    const desligado = rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { MODELAR_DIARIO: '0' });
     expect(desligado.saida).toBe(ligado.saida);
     expect(desligado.codigo).toBe(ligado.codigo);
   });
 
+  it('aceita os nomes antigos MECANIFICA_DIARIO e MECANIFICA_DIARIO_ARQUIVO, com aviso do novo', () => {
+    const antes = linhasDoDiario().length;
+    rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { VITEST: '', MODELAR_DIARIO: '', MECANIFICA_DIARIO: '0' });
+    expect(linhasDoDiario()).toHaveLength(antes);
+    rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { VITEST: '', MODELAR_DIARIO: '', MECANIFICA_DIARIO: '1' });
+    expect(linhasDoDiario().length).toBeGreaterThan(antes);
+
+    const outro = join(AREA, 'outro.jsonl');
+    const anterior = process.env.MODELAR_DIARIO_ARQUIVO;
+    const escrita = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      process.env.MODELAR_DIARIO_ARQUIVO = '';
+      process.env.MECANIFICA_DIARIO_ARQUIVO = outro;
+      expect(caminhoDoDiario()).toBe(outro);
+      expect(escrita.mock.calls.map(([texto]) => String(texto)).join('')).toContain('use MODELAR_DIARIO_ARQUIVO');
+    } finally {
+      process.env.MODELAR_DIARIO_ARQUIVO = anterior;
+      delete process.env.MECANIFICA_DIARIO_ARQUIVO;
+      escrita.mockRestore();
+    }
+  });
+
   it('o erro de uso continua chegando igual, com diário ou sem', () => {
-    const ligado = rodar(['nao-existe'], { MECANIFICA_DIARIO: '1' });
-    const desligado = rodar(['nao-existe'], { MECANIFICA_DIARIO: '0' });
+    const ligado = rodar(['nao-existe'], { MODELAR_DIARIO: '1' });
+    const desligado = rodar(['nao-existe'], { MODELAR_DIARIO: '0' });
     expect(desligado.codigo).toBe(ligado.codigo);
     expect(ligado.codigo).toBe(2);
   });
