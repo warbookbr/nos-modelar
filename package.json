@@ -92,6 +92,7 @@
     "mcp:visual:check": "node -e \"process.env.MCP_VISUAL_REAL='1';require('child_process').execSync('npm run mcp:check',{stdio:'inherit',env:process.env})\"",
     "docs:citacoes": "node tools/mapa/citacoes.mjs",
     "docs:citacoes:check": "node tools/mapa/citacoes.mjs --check",
+    "historico:conferir": "node tools/arquitetura/historico-limpo.mjs",
     "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs",
     "roteiros:gerar": "node tools/mapa/roteiros.mjs --gerar",
     "comecar": "node tools/mecanifica/comecar.mjs",

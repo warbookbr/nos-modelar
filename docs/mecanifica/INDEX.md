@@ -120,6 +120,12 @@ npm run diario
 sozinhas: onde o tempo foi, o que foi repetido sem a receita mudar, que erro se
 repete e o que saiu 0 sem entregar. Desligar: `MECANIFICA_DIARIO=0`.
 
+Antes de tornar o repositório público, ou depois de reescrever o histórico,
+`npm run historico:conferir` lê cada versão de cada arquivo que algum ref
+alcança e recusa termo proibido, malha 3D e caminho da lista de caminhos
+proibidos que tenha ficado num commit antigo. Ele não entra na bateria, porque lê
+o histórico inteiro (43 s em 2026-10-28).
+
 ## Gates completos
 
 ```text

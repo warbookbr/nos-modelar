@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1483 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1485 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1796,6 +1796,8 @@
 
 - `avisos-de-terceiros.test.mjs` — avisos-de-terceiros.test.mjs — toda dependência de runtime que entra no pacote da bancada tem seção em THIRD-PARTY-NOTICES.md, e o build a copia para `dist/`…
 - `fronteira-da-bancada.mjs` — fronteira-da-bancada.mjs — a bancada é um módulo, não o centro do projeto.
+- `historico-limpo.mjs` — historico-limpo.mjs — confere o histórico INTEIRO antes de o repositório ficar público.
+- `historico-limpo.test.mjs` — historico-limpo.test.mjs — o que saiu da pasta e ficou num commit antigo é achado, e o histórico limpo passa.
 - `imagem-pesada-no-git.test.mjs` — imagem-pesada-no-git.test.mjs — nenhuma imagem rastreada passa de 3 MB: o git guarda para sempre o que entra, e agentes despachados já deixaram 26 MB de amos…
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
 - `malha-fora-do-git.test.mjs` — malha-fora-do-git.test.mjs — nenhuma malha importada (.obj ou .mtl) entra no versionamento: o `.gitignore` as cobre, e nenhuma está rastreada.

@@ -1,0 +1,6 @@
+{
+  "descricao": "sha256 de cada caminho que não pode existir em nenhum commit; acrescente com node tools/arquitetura/historico-limpo.mjs --hash <caminho>",
+  "hashes": [
+    "555350d56203d4708d94e77affe989227eb8d1ac8476d77122f251e312a73144"
+  ]
+}
