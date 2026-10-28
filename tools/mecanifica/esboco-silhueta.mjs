@@ -43,7 +43,9 @@ function preencher(dados, largura, altura, aneis) {
     }
     xs.sort((p, q) => p - q);
     for (let k = 0; k + 1 < xs.length; k += 2) {
-      for (let x = Math.max(0, Math.ceil(xs[k] - 0.5)); x <= Math.min(largura - 1, Math.floor(xs[k + 1] - 0.5)); x++) dados[y * largura + x] = 1;
+      const de = Math.max(0, Math.ceil(xs[k] - 0.5));
+      const ate = Math.min(largura - 1, Math.floor(xs[k + 1] - 0.5));
+      if (de <= ate) dados.fill(1, y * largura + de, y * largura + ate + 1);
     }
   }
 }

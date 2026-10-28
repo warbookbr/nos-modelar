@@ -24,8 +24,8 @@ const lerJson = (caminho) => JSON.parse(readFileSync(caminho, 'utf8'));
 
 /* O desenho atual da opção `numero` (só ela, num painel) com as formas `ocultas` escondidas, na vista, com os lados do esboço
    (`lados: false`) ou os da ferramenta (`lados: true`, o `ladosPorEscala` do `--composta`). */
-export function desenhoAtual(bruto, numero, vista, ocultas, lados) {
-  const e = expandirEsboco(bruto);
+export function desenhoAtual(bruto, numero, vista, ocultas, lados, expandido = expandirEsboco(bruto)) {
+  const e = expandido;
   const o = { ...e.opcoes[numero - 1], formas: e.opcoes[numero - 1].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) };
   return desenharEsboco(variante({ ...e, opcoes: [o], ladosPorEscala: lados }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
 }
@@ -34,7 +34,9 @@ export function desenhoAtual(bruto, numero, vista, ocultas, lados) {
 export function medirSilhueta(caminho) {
   const bruto = lerJson(caminho);
   const b = blocagemDoEsboco(bruto);
-  const saida = { opcoesDoEsboco: expandirEsboco(bruto).opcoes.length, paineis: b.paineis.length, opcoes: [] };
+  /* o esboço expandido uma vez só: os 8 desenhos de cada opção partem dele sem alterá-lo */
+  const expandido = expandirEsboco(bruto);
+  const saida = { opcoesDoEsboco: expandido.opcoes.length, paineis: b.paineis.length, opcoes: [] };
   b.paineis.forEach((painel, i) => {
     const opcao = b.opcoes[i];
     const ocultas = opcao.semEquivalente.map((x) => x.id);
@@ -45,7 +47,7 @@ export function medirSilhueta(caminho) {
       const mascara = mascaraDaCamada(novo.camada);
       const medidas = [];
       for (const lados of [false, true]) {
-        const atual = desenhoAtual(bruto, i + 1, vista, ocultas, lados);
+        const atual = desenhoAtual(bruto, i + 1, vista, ocultas, lados, expandido);
         medidas.push({
           lados,
           iou: iou(mascara, mascaraDaCamada(atual.camada)).iou,
