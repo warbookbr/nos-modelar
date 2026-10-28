@@ -27,7 +27,14 @@ export const ehNavegador = (programa) => /^(headless_shell|chrome|chromium|chrom
 const RAIZ = resolve(dirname(ESTE_ARQUIVO), '../..');
 const FORA = /^(node_modules|\.git|tmp|dist)(\/|$)/;
 
-const GIT_SEM_CONTEUDO = ['status', 'rev-parse', 'config', '--version'];
+/* `git status`, `rev-parse` e `config` dizem o estado da árvore, e `git log` sem patch lê o histórico já gravado (a data do
+   último commit, em `tools/bancadas/versao-publicada.mjs`); nenhum lê o conteúdo de um arquivo mudado. O resto do git na raiz
+   conta como quem lê tudo. Vale também ao ler um registro gravado antes desta regra. */
+const GIT_SEM_CONTEUDO = ['status', 'rev-parse', 'config', '--version', 'log'];
+export const gitLeConteudo = (args) => {
+  const sub = args.find((a) => !a.startsWith('-'));
+  return !GIT_SEM_CONTEUDO.includes(sub) || args.some((a) => /^(-p|--patch|--stat|--numstat|-L)/.test(a));
+};
 
 export const arquivoDoRegistro = (diretorio, teste) => join(diretorio, `${createHash('sha1').update(teste).digest('hex').slice(0, 16)}.jsonl`);
 
@@ -87,9 +94,7 @@ export function instalar(destino) {
     const palavras = String(comando).trim().split(/\s+/);
     const programa = palavras[0];
     const todos = [...palavras.slice(1), ...(args ?? [])].filter((a) => typeof a === 'string');
-    /* `git status` e `git rev-parse` dizem o estado da árvore, e o teste que os usa compara antes e depois; o resto do git na raiz
-       lê conteúdo que não dá para ver daqui. */
-    if (basename(programa) === 'git') { if (naRaiz && !GIT_SEM_CONTEUDO.includes(todos.find((a) => !a.startsWith('-')))) anotar('t', `git ${todos[0] ?? ''}`); }
+    if (basename(programa) === 'git') { if (naRaiz && gitLeConteudo(todos)) anotar('t', `git ${todos.join(' ')}`.slice(0, 120)); }
     /* Outro programa (Python, Blender) lê o arquivo que recebe e os vizinhos dele: medido em 2026-10-28, os scripts de
        `tools/blender` abrem o que vem no argumento e o `grade.json` ou o `.json` ao lado. Vale o arquivo e a pasta dele. */
     const outro = !ehNode(programa) && !ehNavegador(programa) && basename(programa) !== 'git';
@@ -144,7 +149,7 @@ export function lerLeituras(diretorio) {
         if (l.teste) teste = l.teste;
         else if ('a' in l) entrada.arquivos.add(l.a);
         else if ('d' in l) entrada.pastas.add(l.d);
-        else if (l.t && !ehNavegador(l.t)) entrada.tudo = true;
+        else if (l.t && !ehNavegador(l.t) && !(l.t.startsWith('git ') && !gitLeConteudo(l.t.split(' ').slice(1)))) entrada.tudo = true;
       } catch { entrada.tudo = true; }
     }
     if (teste) registro[teste] = entrada;

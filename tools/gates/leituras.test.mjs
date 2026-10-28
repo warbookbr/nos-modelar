@@ -27,7 +27,8 @@ describe('registro de leituras', () => {
       cp.execFileSync(process.execPath, ['-e', "require('fs').readFileSync('CLAUDE.md')"]);
       cp.spawnSync('git', ['status', '--short']);
       cp.spawnSync('python3', ['-c', 'pass', 'package.json']);
-      cp.spawnSync('git', ['log', '-1']);`;
+      cp.spawnSync('git', ['log', '-1', '--format=%cI']);
+      cp.spawnSync('git', ['show', 'HEAD:package.json']);`;
     execFileSync(process.execPath, ['--input-type=module', '-e', roteiro], { cwd: RAIZ, env: { ...process.env, GATES_LEITURAS_DESTINO: '' } });
     const registro = lerLeituras(dir)['tools/x.test.mjs'];
     expect([...registro.arquivos].sort()).toEqual(['CLAUDE.md', 'package.json']);
