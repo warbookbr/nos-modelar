@@ -18,6 +18,8 @@
  * acusar.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { availableParallelism } from 'node:os';
+import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { normalizarPlanoDeModelagem } from '../../../src/autoria/plano-de-modelagem.js';
@@ -164,89 +166,151 @@ async function receitaSemPasso(peca) {
   return receita && Array.isArray(receita.PASSOS) && receita.PASSOS.length === 0 ? receita : null;
 }
 
-export async function conferirAcervo(pecas = pecasDoAcervo()) {
+/* Confere UMA peça e devolve o que ela reprovou e se ela espera a etapa. Cada peça é independente das outras (lê o próprio
+   arquivo e não escreve nada), e é essa independência que deixa a varredura repartir as peças entre processadores. */
+export async function conferirPeca(peca) {
   const reprovadas = [];
   const esperando = [];
-  for (const peca of pecas) {
-    const espera = etapaQueEspera(peca);
-    const vazia = espera && await receitaSemPasso(peca);
-    if (vazia) {
-      try {
-        const plano = normalizarPlanoDeModelagem(vazia.PLANO);
-        if (!plano) throw new Error('a receita não exporta `PLANO`.');
-        const faltando = referenciasAusentes(peca, plano);
-        if (faltando.length) throw new Error(`referência(s) declarada(s) e ausente(s): ${faltando.join(', ')}.`);
-      } catch (erro) {
-        reprovadas.push({ peca, motivo: `PARTE PLANEJADA COM PLANO INVÁLIDO\n  ${erro.message}` });
-        continue;
-      }
-      esperando.push({ peca, ...espera });
-      continue;
+  const espera = etapaQueEspera(peca);
+  const vazia = espera && await receitaSemPasso(peca);
+  if (vazia) {
+    try {
+      const plano = normalizarPlanoDeModelagem(vazia.PLANO);
+      if (!plano) throw new Error('a receita não exporta `PLANO`.');
+      const faltando = referenciasAusentes(peca, plano);
+      if (faltando.length) throw new Error(`referência(s) declarada(s) e ausente(s): ${faltando.join(', ')}.`);
+    } catch (erro) {
+      reprovadas.push({ peca, motivo: `PARTE PLANEJADA COM PLANO INVÁLIDO\n  ${erro.message}` });
+      return { reprovadas, esperando };
     }
-    if (emArquivoSolto(peca)) {
-      reprovadas.push({
-        peca,
-        motivo: 'PEÇA EM ARQUIVO SOLTO\n'
-          + `  A peça vive em '${peca}.js', e o material dela — referências, âncoras\n`
-          + '  e rodadas do laço — não tem onde morar junto.\n'
-          + `  A forma certa é a pasta: '${peca}/receita.js', com 'referencias/' ao lado.`,
-      });
-      continue;
-    }
-    const medida = await descreverPecaReutilizavel({ peca });
-    if (!medida.ok) { reprovadas.push({ peca, motivo: medida.stderr.trim() }); continue; }
-    /* A medida já validou e canonicalizou o plano, e devolve `null` quando a
-       receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
-       canônico, que carrega `formato` e `versao`. */
-    const faltando = referenciasAusentes(peca, medida.resultado.plano);
-    if (faltando.length) {
-      reprovadas.push({
-        peca,
-        motivo: `${faltando.length} REFERÊNCIA(S) DECLARADA(S) E AUSENTE(S)\n`
-          + faltando.map((r) => `    ${r}`).join('\n')
-          + '\n  O plano diz que a peça foi modelada contra estas imagens, e elas não estão lá.',
-      });
-      continue;
-    }
-    if (!medida.resultado.plano) {
-      reprovadas.push({
-        peca,
-        motivo: 'SEM PLANO DE MODELAGEM\n  A receita não exporta `PLANO`, então ninguém sabe que partes'
-          + '\n  ela deveria ter, e parte que falta não pode ser acusada por medida nenhuma.',
-      });
-      continue;
-    }
-    const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
-    const receita = modulo.default ?? modulo.receita;
-    const faltas = doAcervo(peca) ? faltasDaCadeia(modulo) : [];
-    if (faltas.length) {
-      reprovadas.push({ peca, motivo: `CADEIA DA RECEITA INCOMPLETA\n${faltas.map((f) => `  ${f}`).join('\n')}\n  A tabela é a única fonte das medidas, e os passos precisam sair dela a cada leitura.` });
-      continue;
-    }
-    /* IDENTIDADE POR NOME. Id da malha, índice de array ou posição de passo não
-       é identidade persistida; a regra que diz o que é id posicional mora em
-       `procedural/nucleo/referencia-posicional.js`, e o gate que a cobrava saiu
-       em 2026-08-17 com o acervo antigo e voltou aqui em 2026-10-25. */
-    const posicionais = ocorrenciasPosicionais(receita.PASSOS);
-    if (posicionais.length) {
-      reprovadas.push({
-        peca,
-        motivo: `${posicionais.length} REFERÊNCIA(S) POR ID POSICIONAL\n${rotularOcorrencias(posicionais).map((l) => `  ${l}`).join('\n')}`
-          + '\n  Endereçe por nome: sel:{grupo|alias|origem|regiao|onde|porta}, origemId e publicarPorta.',
-      });
-      continue;
-    }
-    /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
-       porta e nunca olha a malha. */
-    const portas = conferirPortasNaForma(nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []));
-    if (portas.length) {
-      reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });
-    }
+    esperando.push({ peca, ...espera });
+    return { reprovadas, esperando };
   }
-  return { pecas, reprovadas, esperando };
+  if (emArquivoSolto(peca)) {
+    reprovadas.push({
+      peca,
+      motivo: 'PEÇA EM ARQUIVO SOLTO\n'
+        + `  A peça vive em '${peca}.js', e o material dela — referências, âncoras\n`
+        + '  e rodadas do laço — não tem onde morar junto.\n'
+        + `  A forma certa é a pasta: '${peca}/receita.js', com 'referencias/' ao lado.`,
+    });
+    return { reprovadas, esperando };
+  }
+  const medida = await descreverPecaReutilizavel({ peca });
+  if (!medida.ok) { reprovadas.push({ peca, motivo: medida.stderr.trim() }); return { reprovadas, esperando }; }
+  /* A medida já validou e canonicalizou o plano, e devolve `null` quando a
+     receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
+     canônico, que carrega `formato` e `versao`. */
+  const faltando = referenciasAusentes(peca, medida.resultado.plano);
+  if (faltando.length) {
+    reprovadas.push({
+      peca,
+      motivo: `${faltando.length} REFERÊNCIA(S) DECLARADA(S) E AUSENTE(S)\n`
+        + faltando.map((r) => `    ${r}`).join('\n')
+        + '\n  O plano diz que a peça foi modelada contra estas imagens, e elas não estão lá.',
+    });
+    return { reprovadas, esperando };
+  }
+  if (!medida.resultado.plano) {
+    reprovadas.push({
+      peca,
+      motivo: 'SEM PLANO DE MODELAGEM\n  A receita não exporta `PLANO`, então ninguém sabe que partes'
+        + '\n  ela deveria ter, e parte que falta não pode ser acusada por medida nenhuma.',
+    });
+    return { reprovadas, esperando };
+  }
+  const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
+  const receita = modulo.default ?? modulo.receita;
+  const faltas = doAcervo(peca) ? faltasDaCadeia(modulo) : [];
+  if (faltas.length) {
+    reprovadas.push({ peca, motivo: `CADEIA DA RECEITA INCOMPLETA\n${faltas.map((f) => `  ${f}`).join('\n')}\n  A tabela é a única fonte das medidas, e os passos precisam sair dela a cada leitura.` });
+    return { reprovadas, esperando };
+  }
+  /* IDENTIDADE POR NOME. Id da malha, índice de array ou posição de passo não
+     é identidade persistida; a regra que diz o que é id posicional mora em
+     `procedural/nucleo/referencia-posicional.js`, e o gate que a cobrava saiu
+     em 2026-08-17 com o acervo antigo e voltou aqui em 2026-10-25. */
+  const posicionais = ocorrenciasPosicionais(receita.PASSOS);
+  if (posicionais.length) {
+    reprovadas.push({
+      peca,
+      motivo: `${posicionais.length} REFERÊNCIA(S) POR ID POSICIONAL\n${rotularOcorrencias(posicionais).map((l) => `  ${l}`).join('\n')}`
+        + '\n  Endereçe por nome: sel:{grupo|alias|origem|regiao|onde|porta}, origemId e publicarPorta.',
+    });
+    return { reprovadas, esperando };
+  }
+  /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
+     porta e nunca olha a malha. */
+  const portas = conferirPortasNaForma(nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []));
+  if (portas.length) {
+    reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });
+  }
+  return { reprovadas, esperando };
 }
 
-if (process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
+/* A VARREDURA REPARTE AS PEÇAS ENTRE OS PROCESSADORES. As peças do acervo não dependem umas das outras e a conta de cada
+   uma é só CPU (a malha, a medida de contato, o núcleo de novo para as portas); sequencial, o acervo inteiro levava mais
+   de dois minutos. Cada fio de trabalho pega a próxima peça da fila, e o resultado sai na ordem das peças, igual ao da
+   varredura em fila única. Lista curta (a peça de ensaio de um teste, a rodada de uma peça) roda aqui mesmo, sem fio. */
+const PECAS_PARA_REPARTIR = 6;
+
+export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = Math.min(availableParallelism(), 4) } = {}) {
+  const porPeca = pecas.length < PECAS_PARA_REPARTIR || fios < 2
+    ? await sequencial(pecas)
+    : await repartida(pecas, fios);
+  return {
+    pecas,
+    reprovadas: porPeca.flatMap((r) => r.reprovadas),
+    esperando: porPeca.flatMap((r) => r.esperando),
+  };
+}
+
+async function sequencial(pecas) {
+  const resultados = [];
+  for (const peca of pecas) resultados.push(await conferirPeca(peca));
+  return resultados;
+}
+
+function repartida(pecas, fios) {
+  const resultados = new Array(pecas.length);
+  let proxima = 0;
+  let pendentes = pecas.length;
+  return new Promise((resolver, rejeitar) => {
+    const trabalhadores = [];
+    const encerrar = (erro) => {
+      for (const t of trabalhadores) t.terminate();
+      if (erro) rejeitar(erro); else resolver(resultados);
+    };
+    const dar = (trabalhador) => {
+      if (proxima >= pecas.length) { trabalhador.terminate(); return; }
+      const indice = proxima; proxima += 1;
+      trabalhador.indice = indice;
+      trabalhador.postMessage({ peca: pecas[indice] });
+    };
+    for (let n = 0; n < Math.min(fios, pecas.length); n += 1) {
+      const trabalhador = new Worker(fileURLToPath(import.meta.url), { workerData: { fioDaGuarda: true } });
+      trabalhadores.push(trabalhador);
+      trabalhador.on('message', (mensagem) => {
+        if (mensagem.erro) { encerrar(new Error(`${pecas[trabalhador.indice]}: ${mensagem.erro}`)); return; }
+        resultados[trabalhador.indice] = mensagem.resultado;
+        pendentes -= 1;
+        if (pendentes === 0) encerrar(null); else dar(trabalhador);
+      });
+      trabalhador.on('error', encerrar);
+      dar(trabalhador);
+    }
+  });
+}
+
+/* O lado do fio: recebe o nome de uma peça, confere e devolve o resultado. */
+if (!isMainThread && workerData?.fioDaGuarda) {
+  parentPort.on('message', async ({ peca }) => {
+    try { parentPort.postMessage({ resultado: await conferirPeca(peca) }); }
+    catch (erro) { parentPort.postMessage({ erro: erro?.stack ?? String(erro) }); }
+  });
+}
+
+if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
   const { pecas, reprovadas, esperando } = await conferirAcervo();
   if (pecas.length === 0) {
     if (!vazioDeclarado()) {

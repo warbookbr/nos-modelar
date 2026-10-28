@@ -195,7 +195,7 @@ export function prepararSolido(neutro, pose, rotulo) {
   };
 }
 
-function sobreposicaoTriangulo(a, b, tolerancia) {
+export function sobreposicaoTriangulo(a, b, tolerancia) {
   const eixos = [];
   /* O eixo é o produto vetorial de dois vetores e só é descartado quando é nulo diante deles (vetores paralelos): a
      comparação é relativa ao tamanho dos dois, porque o piso absoluto de 1e-12 sobre o quadrado do eixo jogava fora os
@@ -294,22 +294,139 @@ function folgaDaCaixa(malha, tolerancia) {
   return folga;
 }
 
-function pontoDentroMalha(ponto, malha, tolerancia) {
+/* OS DADOS DE CADA TRIÂNGULO SAEM UMA VEZ POR MALHA. A contenção de um ponto percorre todos os triângulos da outra malha, e a
+   conta de cada triângulo (arestas, normal, comprimentos, o determinante do raio) não depende do ponto: refazê-la para cada
+   um dos milhares de pontos amostrados era a maior parte do tempo da varredura do acervo (2026-10-28). As funções abaixo
+   fazem as MESMAS operações de ponto flutuante, na mesma ordem, de `pontoNoTriangulo` e `raioAtravessaTriangulo`, só que
+   sobre os valores já calculados e sem alocar vetor por ponto; o teste de equivalência compara o resultado delas com o das
+   originais, bit a bit, sobre malhas sorteadas. */
+const CAMPOS = 36;
+const dadosDasMalhas = new WeakMap();
+
+function dadosDaMalha(malha) {
+  const triangulos = malha.triangulos;
+  const guardado = dadosDasMalhas.get(triangulos);
+  if (guardado && guardado.quantidade === triangulos.length) return guardado.dados;
+  const dados = new Float64Array(triangulos.length * CAMPOS);
+  triangulos.forEach(([a, b, c], indice) => {
+    const aresta1 = sub(b, a); const aresta2 = sub(c, a);
+    const normal = cross(aresta1, aresta2);
+    const tamanhoDaNormal = Math.sqrt(comprimento2(normal));
+    const h = cross(DIRECAO_RAIO, aresta2);
+    const determinante = dot(aresta1, h);
+    const paralelo = Math.abs(determinante) <= 1e-12 * Math.sqrt(comprimento2(aresta1) * comprimento2(h));
+    const bc = sub(c, b); const ca = sub(a, c);
+    const base = indice * CAMPOS;
+    dados.set(a, base); dados.set(b, base + 3); dados.set(c, base + 6);
+    dados.set(aresta1, base + 9); dados.set(aresta2, base + 12);
+    dados.set(normal, base + 15);
+    dados[base + 18] = tamanhoDaNormal;
+    dados.set(h, base + 19);
+    dados[base + 22] = paralelo ? 1 : 0;
+    dados[base + 23] = 1 / determinante;
+    dados.set(bc, base + 24); dados.set(ca, base + 27);
+    dados[base + 30] = Math.sqrt(comprimento2(aresta1));
+    dados[base + 31] = Math.sqrt(comprimento2(bc));
+    dados[base + 32] = Math.sqrt(comprimento2(ca));
+  });
+  dadosDasMalhas.set(triangulos, { quantidade: triangulos.length, dados });
+  return dados;
+}
+
+/* a distância do ponto à reta de uma aresta, com o sinal da normal, igual ao `doLado` de `pontoNoTriangulo` */
+function ladoDoPonto(d, base, deslocamentoAresta, tamanhoDaAresta, px, py, pz, ox, oy, oz) {
+  if (!(tamanhoDaAresta > 0)) return 0;
+  const e0 = d[base + deslocamentoAresta]; const e1 = d[base + deslocamentoAresta + 1]; const e2 = d[base + deslocamentoAresta + 2];
+  const s0 = px - ox; const s1 = py - oy; const s2 = pz - oz;
+  const c0 = e1 * s2 - e2 * s1; const c1 = e2 * s0 - e0 * s2; const c2 = e0 * s1 - e1 * s0;
+  return (c0 * d[base + 15] + c1 * d[base + 16] + c2 * d[base + 17]) / (d[base + 18] * tamanhoDaAresta);
+}
+
+export function pontoDentroMalha(ponto, malha, tolerancia) {
   if (malha.fechada && malha.caixa) {
     const folga = folgaDaCaixa(malha, tolerancia);
     if ([0, 1, 2].some((eixo) => ponto[eixo] < malha.caixa.min[eixo] - folga || ponto[eixo] > malha.caixa.max[eixo] + folga)) return false;
   }
+  const d = dadosDaMalha(malha);
+  const quantidade = malha.triangulos.length;
+  const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
+  const dir0 = DIRECAO_RAIO[0]; const dir1 = DIRECAO_RAIO[1]; const dir2 = DIRECAO_RAIO[2];
   let contagem = 0;
-  for (const triangulo of malha.triangulos) {
-    if (pontoNoTriangulo(ponto, triangulo, tolerancia)) return null;
-    if (raioAtravessaTriangulo(ponto, triangulo, tolerancia) !== null) contagem += 1;
+  for (let indice = 0; indice < quantidade; indice += 1) {
+    const base = indice * CAMPOS;
+    const ax = d[base]; const ay = d[base + 1]; const az = d[base + 2];
+    const s0 = px - ax; const s1 = py - ay; const s2 = pz - az;
+    const distancia = Math.abs(d[base + 15] * s0 + d[base + 16] * s1 + d[base + 17] * s2) / d[base + 18];
+    if (!(distancia > tolerancia)
+      && ladoDoPonto(d, base, 9, d[base + 30], px, py, pz, ax, ay, az) >= -tolerancia
+      && ladoDoPonto(d, base, 24, d[base + 31], px, py, pz, d[base + 3], d[base + 4], d[base + 5]) >= -tolerancia
+      && ladoDoPonto(d, base, 27, d[base + 32], px, py, pz, d[base + 6], d[base + 7], d[base + 8]) >= -tolerancia) return null;
+    if (d[base + 22] === 1) continue;
+    const inverso = d[base + 23];
+    const u = inverso * (s0 * d[base + 19] + s1 * d[base + 20] + s2 * d[base + 21]);
+    if (u < -tolerancia || u > 1 + tolerancia) continue;
+    const e0 = d[base + 9]; const e1 = d[base + 10]; const e2 = d[base + 11];
+    const q0 = s1 * e2 - s2 * e1; const q1 = s2 * e0 - s0 * e2; const q2 = s0 * e1 - s1 * e0;
+    const v = inverso * (dir0 * q0 + dir1 * q1 + dir2 * q2);
+    if (v < -tolerancia || u + v > 1 + tolerancia) continue;
+    const t = inverso * (d[base + 12] * q0 + d[base + 13] * q1 + d[base + 14] * q2);
+    if (t > tolerancia) contagem += 1;
   }
   return contagem % 2 === 1;
 }
 
-function malhasSeInterseccionam(a, b, tolerancia) {
-  for (const trianguloA of a.triangulos) for (const trianguloB of b.triangulos) {
-    if (sobreposicaoTriangulo(trianguloA, trianguloB, tolerancia)) return true;
+/* OS EIXOS PRÓPRIOS DE CADA TRIÂNGULO TAMBÉM SAEM UMA VEZ. `sobreposicaoTriangulo` separa por até dezessete eixos, e os
+   quatro de cada triângulo (a normal e as perpendiculares às arestas no plano dele) não dependem do outro triângulo. A
+   maioria dos pares que a varredura compara está longe, e um desses oito eixos já os separa; o par que sobrevive a eles
+   segue para `sobreposicaoTriangulo`, que refaz todos os eixos, de modo que o veredito é o mesmo de antes (quem separa
+   pelos eixos pré-calculados separa também lá, pela mesma conta). */
+const eixosDasMalhas = new WeakMap();
+
+function eixosDoTriangulo([a, b, c]) {
+  const arestas = [sub(b, a), sub(c, b), sub(a, c)];
+  const normal = cross(arestas[0], sub(c, a));
+  const candidatos = [];
+  const registrar = (u, v) => {
+    const eixo = cross(u, v);
+    if (comprimento2(eixo) > 1e-18 * comprimento2(u) * comprimento2(v)) candidatos.push(eixo);
+  };
+  registrar(arestas[0], sub(c, a));
+  if (comprimento2(normal) > 0) for (const aresta of arestas) registrar(normal, aresta);
+  return candidatos.map((eixo) => {
+    const norma = Math.sqrt(comprimento2(eixo));
+    const valores = [a, b, c].map((ponto) => dot(eixo, ponto) / norma);
+    return { e0: eixo[0], e1: eixo[1], e2: eixo[2], norma, min: Math.min(...valores), max: Math.max(...valores) };
+  });
+}
+
+function eixosDaMalha(malha) {
+  const triangulos = malha.triangulos;
+  const guardado = eixosDasMalhas.get(triangulos);
+  if (guardado && guardado.quantidade === triangulos.length) return guardado.eixos;
+  const eixos = triangulos.map(eixosDoTriangulo);
+  eixosDasMalhas.set(triangulos, { quantidade: triangulos.length, eixos });
+  return eixos;
+}
+
+function separadoPor(eixos, [p, q, r], tolerancia) {
+  for (const eixo of eixos) {
+    const v0 = (eixo.e0 * p[0] + eixo.e1 * p[1] + eixo.e2 * p[2]) / eixo.norma;
+    const v1 = (eixo.e0 * q[0] + eixo.e1 * q[1] + eixo.e2 * q[2]) / eixo.norma;
+    const v2 = (eixo.e0 * r[0] + eixo.e1 * r[1] + eixo.e2 * r[2]) / eixo.norma;
+    if (eixo.max < Math.min(v0, v1, v2) - tolerancia || Math.max(v0, v1, v2) < eixo.min - tolerancia) return true;
+  }
+  return false;
+}
+
+export function malhasSeInterseccionam(a, b, tolerancia) {
+  const eixosA = eixosDaMalha(a); const eixosB = eixosDaMalha(b);
+  for (let i = 0; i < a.triangulos.length; i += 1) {
+    const trianguloA = a.triangulos[i];
+    for (let j = 0; j < b.triangulos.length; j += 1) {
+      const trianguloB = b.triangulos[j];
+      if (separadoPor(eixosA[i], trianguloB, tolerancia) || separadoPor(eixosB[j], trianguloA, tolerancia)) continue;
+      if (sobreposicaoTriangulo(trianguloA, trianguloB, tolerancia)) return true;
+    }
   }
   return false;
 }

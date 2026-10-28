@@ -45,6 +45,19 @@ export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO
  * existem. Recusa lista vazia e id de família repetido; composição repetida é recusada por `criarRegistroComposicoes`.
  */
 export function criarRegistroDeFamilias({ familias = FAMILIAS } = {}) {
+  /* O REGISTRO DAS FAMÍLIAS DO PRODUTO SAI UMA VEZ. Cada `derivar` de receita pedia um registro novo, e montá-lo valida e
+     copia todas as composições; ele é congelado e sem estado, então o mesmo serve a todos. Lista que não é a do produto
+     monta o seu, como antes. */
+  if (familias === FAMILIAS) {
+    registroDoProduto ??= montarRegistroDeFamilias(familias);
+    return registroDoProduto;
+  }
+  return montarRegistroDeFamilias(familias);
+}
+
+let registroDoProduto = null;
+
+function montarRegistroDeFamilias(familias) {
   if (!Array.isArray(familias) || !familias.length) {
     throw new ErroFamilia({ campo: 'familias', valor: familias, aceito: 'lista com ao menos uma família carregada por definirFamilia' });
   }
