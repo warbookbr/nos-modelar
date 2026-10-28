@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1489 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1490 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2033,6 +2033,7 @@
 - `gates-bateria-curta.test.mjs` — gates-bateria-curta.test.mjs — a bateria curta só roda quando tudo o que mudou é peça ou documento; qualquer outro arquivo, ou não saber o que mudou, roda to…
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
 - `gates-lentos.test.mjs` — gates-lentos.test.mjs — depois do gate `test`, o resumo lista os cinco arquivos de teste mais lentos e avisa o que passa do teto, lendo a duração que o repór…
+- `gates-ordem.test.mjs` — gates-ordem.test.mjs — os gates baratos rodam antes e os caros do mais longo para o mais curto (tools/gates.mjs).
 - `gates-saida-guardada.test.mjs` — gates-saida-guardada.test.mjs — a saída inteira de um gate que falha vai para `tmp/gates/`, ignorado pelo git, e a linha de falha diz o caminho. Gate que pas…
 - `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
