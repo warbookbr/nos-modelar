@@ -109,7 +109,7 @@ describe('vigia contínuo', () => {
     const chamadas = [];
     const rodar = async (gate) => { chamadas.push(gate); return gate === 'build' ? { gate, codigo: 1, arquivo: 'tmp/gates/build.log' } : { gate, codigo: 0, arquivo: null }; };
     const rodadas = [];
-    const vigia = criarVigia({ raiz, gates: ['build', 'guarda:gesto', 'typecheck'], silencioMs: 10, rodar, aoTerminar: (r) => rodadas.push(r) });
+    const vigia = criarVigia({ raiz, gates: ['build', 'bancada:guardas', 'typecheck'], silencioMs: 10, rodar, aoTerminar: (r) => rodadas.push(r) });
     vigia.mudou('src/a.js');
     await vigia.ocioso();
     expect(chamadas).toEqual(['build', 'typecheck']);

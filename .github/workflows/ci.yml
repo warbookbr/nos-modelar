@@ -1,7 +1,7 @@
 name: CI
 
 # A bateria completa roda em cada envio, dividida entre máquinas que rodam ao mesmo tempo: os testes rápidos com as
-# conferências de documento e de arquivo gerado, os testes lentos em cinco partes, os gates que abrem a bancada e os que
+# conferências de documento e de arquivo gerado, os testes lentos em cinco partes, as guardas que abrem a bancada e os que
 # geram o acervo. Medido em 2026-10-28 numa máquina só: 19 minutos, 11 deles nos testes lentos. O repositório é público e os
 # minutos do GitHub Actions não acabam mais, então a bateria lenta deixou de ser diária.
 #
@@ -207,68 +207,33 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run build
 
-      - name: Bancada publicada com catálogo vazio
+      # As dez guardas que abrem a bancada num navegador de verdade rodam num
+      # Chromium e num servidor do Vite só, em `tools/mecanifica/guardas/rodar-guardas.mjs`,
+      # e o relatório diz o nome e o veredito de cada uma; a falha de uma não
+      # esconde as outras. Cada uma continua sendo um script que roda sozinho.
+      #   bancada:vazia:check  a bancada publicada sobe sem catálogo, sem peça
+      #                        escolhida e sem erro;
+      #   porteiro             o harness privado renderiza as fixtures;
+      #   guarda:portas        o painel de portas vive em `src/bancada/main.js`,
+      #                        que nenhum teste importa: apagá-lo inteiro passaria
+      #                        verde nos outros gates;
+      #   guarda:camera        a câmera livre é estado de autoria, e só a bancada
+      #                        real comprova a órbita e a recarga;
+      #   guarda:par           a inspeção de par mede pixels visíveis com depth
+      #                        buffer e a escolha e a recarga da URL;
+      #   guarda:referencia    a imagem da peça sai do pacote construído, e não
+      #                        de `public/`;
+      #   guarda:escolha       a bancada relê a sessão a cada segundo e meio, e a
+      #                        leitura trocava a peça que a pessoa escolhera;
+      #   guarda:junta         arrastar o canto deforma só quem passa por ele, e o
+      #                        arrasto sobrevive à reconstrução da malha;
+      #   guarda:edicao        teclado, seleção por raycast e escrita direta nos
+      #                        vértices da cena, que teste de unidade não alcança;
+      #   guarda:gesto         o caminho do desenho até a leitura: editar na tela,
+      #                        salvar, e o comando de leitura entender o arquivo.
+      - name: A bancada, no navegador, em dez guardas
         if: ${{ !cancelled() }}
-        run: npm run bancada:vazia:check
-
-      - name: Harness privado prova render de fixtures
-        if: ${{ !cancelled() }}
-        run: npm run porteiro
-
-      # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
-      # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
-      # verde nos outros gates.
-      - name: A bancada mostra as portas que a peça publica
-        if: ${{ !cancelled() }}
-        run: npm run guarda:portas
-
-      # A câmera livre é estado de autoria: o único lugar que comprova a órbita
-      # e a recarga é a bancada real, não um import de helper.
-      - name: A bancada restaura a câmera livre pela URL
-        if: ${{ !cancelled() }}
-        run: npm run guarda:camera
-
-      # A inspeção de par mede pixels realmente visíveis com depth buffer e
-      # precisa do navegador real para provar a escolha e a recarga da URL.
-      - name: A bancada inspeciona duas partes com vista reproduzível
-        if: ${{ !cancelled() }}
-        run: npm run guarda:par
-
-      # A imagem da peça sai do pacote construído, e não de `public/`. Trocar o
-      # glob que a emite deixaria a página subir, os testes verdes e a
-      # referência ausente só no endereço publicado.
-      - name: A bancada publicada mostra a referência da pasta da peça
-        if: ${{ !cancelled() }}
-        run: npm run guarda:referencia
-
-      # A bancada relê a sessão a cada segundo e meio, e a leitura trocava a
-      # peça que a pessoa tinha acabado de escolher.
-      - name: A leitura periódica não desfaz a escolha da peça
-        if: ${{ !cancelled() }}
-        run: npm run guarda:escolha
-
-      # Num quadro em treliça nenhum parâmetro empurra um tubo inteiro, então o
-      # gesto passou a ser o canto. O que só aparece no navegador é o arrasto
-      # sobreviver à reconstrução da malha que ele mesmo dispara.
-      - name: Arrastar a junta deforma só quem passa por ela
-        if: ${{ !cancelled() }}
-        run: npm run guarda:junta
-
-      # Teclado, seleção por raycast e escrita direta nos vértices da cena: três
-      # coisas que teste de unidade não alcança. Um módulo de topologia
-      # impecável convive com pontos invisíveis e movimento que não chega à
-      # geometria desenhada.
-      - name: O modo de edição aparece, seleciona, move e desfaz
-        if: ${{ !cancelled() }}
-        run: npm run guarda:edicao
-
-      # O caminho inteiro do desenho até a leitura: editar na tela, achar o
-      # botão de salvar, o arquivo sair com a descrição dentro e o comando de
-      # leitura entendê-la. Cada elo já esteve quebrado — salvar exigia ter
-      # puxado uma junta, e a base de comparação era a mesma malha viva.
-      - name: A edição sai da bancada descrita em palavras e números
-        if: ${{ !cancelled() }}
-        run: npm run guarda:gesto
+        run: npm run bancada:guardas
 
   acervo:
     name: Acervo, famílias e MCP

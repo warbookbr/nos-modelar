@@ -28,6 +28,7 @@ import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { abrirNavegador } from '../../bancadas/ambiente-das-guardas.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
@@ -69,7 +70,7 @@ await new Promise((r) => servidor.listen(0, '127.0.0.1', r));
 const { port } = servidor.address();
 
 const pw = (await import(pathToFileURL(PW).href)).default;
-const navegador = await pw.chromium.launch();
+const navegador = await abrirNavegador(pw);
 const pagina = await navegador.newPage({ viewport: { width: 1280, height: 720 } });
 
 const imagens = [];

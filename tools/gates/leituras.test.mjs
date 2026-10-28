@@ -9,6 +9,9 @@ import { lerLeituras, testesQueLeem } from './leituras.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GANCHO = pathToFileURL(join(RAIZ, 'tools/gates/leituras.mjs')).href;
+/* montados por partes para o gate de links não tomar os caminhos de ensaio por citação */
+const DOC = ['docs', 'x.md'].join('/');
+const NOVO = ['docs', 'novo.md'].join('/');
 
 describe('registro de leituras', () => {
   it('anota o arquivo lido, a pasta listada, a leitura do processo node filho e o git como quem lê tudo', () => {
@@ -34,8 +37,8 @@ describe('registro de leituras', () => {
 
   it('o teste que lê o arquivo, ou lista a pasta dele, ou lê tudo, é escolhido', () => {
     const r = (arquivos, pastas, tudo = false) => ({ arquivos: new Set(arquivos), pastas: new Set(pastas), tudo });
-    const registro = { a: r(['docs/x.md'], []), b: r([], ['docs']), c: r(['package.json'], []), d: r([], [], true) };
-    expect(testesQueLeem(registro, ['docs/x.md'])).toEqual(['a', 'b', 'd']);
-    expect(testesQueLeem(registro, ['docs/novo.md'])).toEqual(['b', 'd']);
+    const registro = { a: r([DOC], []), b: r([], ['docs']), c: r(['package.json'], []), d: r([], [], true) };
+    expect(testesQueLeem(registro, [DOC])).toEqual(['a', 'b', 'd']);
+    expect(testesQueLeem(registro, [NOVO])).toEqual(['b', 'd']);
   });
 });

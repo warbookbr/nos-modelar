@@ -3,6 +3,7 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { abrirNavegador, ARGS_DO_NAVEGADOR, subirVite } from '../../bancadas/ambiente-das-guardas.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../../..');
@@ -26,18 +27,10 @@ if (!existsSync(PLAYWRIGHT)) {
   process.exit(1);
 }
 
-const vite = await (await import('vite')).createServer({
-  root: REPO,
-  configFile: join(REPO, 'vite.config.js'),
-  server: { host: '127.0.0.1', port: 0 },
-  logLevel: 'error',
-});
-await vite.listen();
-const { port } = vite.httpServer.address();
+const vite = await subirVite(REPO);
+const { port } = vite;
 const pw = (await import(pathToFileURL(PLAYWRIGHT).href)).default;
-const browser = await pw.chromium.launch({
-  args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
-});
+const browser = await abrirNavegador(pw, { args: ARGS_DO_NAVEGADOR });
 mkdirSync(SAIDA, { recursive: true });
 
 async function abrir(page, url) {

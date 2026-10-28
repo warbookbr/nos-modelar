@@ -32,6 +32,7 @@
     "banco-de-provas:resumo": "node tools/mecanifica/banco-de-provas.mjs --resumo",
     "banco-de-provas:registrar": "node tools/mecanifica/banco-de-provas.mjs --registrar",
     "procedencia:check": "node tools/mecanifica/procedencia-check.mjs",
+    "bancada:guardas": "node tools/mecanifica/guardas/rodar-guardas.mjs",
     "bancada:vazia:check": "node tools/mecanifica/guardas/guarda-bancada-vazia.mjs",
     "test": "vitest run",
     "test:rapidos": "node tools/testes-lentos.mjs --rapidos",

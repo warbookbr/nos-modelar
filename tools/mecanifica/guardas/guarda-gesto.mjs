@@ -22,10 +22,11 @@
  */
 import { createServer } from 'node:http';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { abrirNavegador } from '../../bancadas/ambiente-das-guardas.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
@@ -69,7 +70,7 @@ await new Promise((r) => servidor.listen(0, '127.0.0.1', r));
 const { port } = servidor.address();
 
 const pw = (await import(pathToFileURL(PW).href)).default;
-const navegador = await pw.chromium.launch();
+const navegador = await abrirNavegador(pw);
 const contexto = await navegador.newContext({ viewport: { width: 1400, height: 860 }, acceptDownloads: true });
 const pagina = await contexto.newPage();
 const erros = [];
@@ -118,7 +119,7 @@ try {
   const arquivo = await baixado;
   ok('clicar em salvar baixa um arquivo', Boolean(arquivo));
   if (!arquivo) throw new Error('salvar não produziu download');
-  writeFileSync(caminhoDoAlvo, readFileSync(await arquivo.path()));
+  await arquivo.saveAs(caminhoDoAlvo);
   const alvo = JSON.parse(readFileSync(caminhoDoAlvo, 'utf8'));
 
   ok('o arquivo salvo traz a descrição do gesto', Boolean(alvo.descricaoDoGesto),
