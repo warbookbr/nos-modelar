@@ -197,6 +197,19 @@ function gravarPesos(raiz) {
   console.log(`testes-lentos — ${Object.keys(segundos).length} pesos gravados em ${ARQUIVO_DOS_PESOS}.`);
 }
 
+/* Os lentos também têm teto, mas de aviso: o plano da bateria rápida (fatia 5) pede cada arquivo abaixo de 60 s, e a parte do
+   CI que segura a rodada é a do arquivo mais longo. A lista sai no fim da saída, onde quem lê o registro do CI a encontra. */
+export const TETO_DO_LENTO_MS = 60_000;
+
+function avisarAcimaDoTetoDosLentos(caminho, inicio) {
+  const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
+  if (Date.parse(gravado) < inicio) return;
+  const acima = duracoes.filter(({ ms }) => ms > TETO_DO_LENTO_MS).sort((a, b) => b.ms - a.ms);
+  console.log(acima.length
+    ? `test:lentos — ${acima.length} arquivo(s) acima de ${TETO_DO_LENTO_MS / 1000} s: ${acima.map(({ arquivo, ms }) => `${arquivo} ${Math.round(ms / 1000)} s`).join(', ')}.`
+    : `test:lentos — nenhum arquivo acima de ${TETO_DO_LENTO_MS / 1000} s.`);
+}
+
 function rodar(modo) {
   const { args: semParte, motivo } = argumentosDoVitest(modo);
   const args = comParte(semParte, process.env, modo);
@@ -206,7 +219,8 @@ function rodar(modo) {
   const r = spawnSync('npx', ['vitest', ...args], { cwd: raiz, stdio: 'inherit', shell: true, env: { ...process.env, MECANIFICA_TESTES: modo } });
   process.exitCode = r.status ?? 1;
   const caminho = join(raiz, 'tmp', 'gates', `duracoes-dos-testes-${modo}.json`);
-  if (modo !== 'rapidos' || !existsSync(caminho)) return;
+  if (!existsSync(caminho)) return;
+  if (modo === 'lentos') { avisarAcimaDoTetoDosLentos(caminho, inicio); return; }
   const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
   if (Date.parse(gravado) < inicio) return;
   const lentos = acimaDoTeto(duracoes);
