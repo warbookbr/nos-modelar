@@ -1,10 +1,11 @@
-/* Peça de ensaio da ferramenta `lasca`: o perfil lateral de uma perua, extrudado em x, menos dois cilindros de 8 lados com o eixo
- * em x. Com o eixo a 390 mm de altura e o raio de 470 mm, a booleana devolve a faceta de cada cilindro dentro do corpo como um
- * hexágono plano de dois cantos colineares, e o núcleo o triangula em quatro faces, duas delas lascas de 2110 por 7,4 mm (razão de
- * área / maior aresta² de 1,9e-3, abaixo do limite de 3e-3). A forma está certa; o que o teste mede é a divisão em faces.
+/* Caso 1 do plano de ajustes no núcleo: o perfil lateral de uma perua, extrudado em x, menos dois cilindros de 8 lados com o eixo
+ * em x. Com o eixo a 390 mm de altura e o raio de 470 mm, a faceta de cada cilindro dentro do corpo é um hexágono plano de dois
+ * cantos colineares. Até a fatia 10 a booleana o devolvia em quatro triângulos, dois deles lascas de 2110 por 7,4 mm (razão de
+ * área / maior aresta² de 1,9e-3, abaixo do limite de 3e-3), 65 faces no total; com os pedaços coplanares fundidos a faceta é uma
+ * face só, são 49 faces e nenhuma lasca. A forma é a mesma (a booleana exata do Blender dá o mesmo volume).
  *
- * Existe só para provar a ferramenta. Quando o núcleo deixar de dividir assim, a peça passa a não ter lasca e o teste que a usa
- * (`lasca.test.mjs`) deve trocar de caso, e não relaxar o que mede.
+ * Prova a fusão da booleana (`booleana-colinear.test.mjs`). Quando o núcleo mudar a divisão em faces de novo, o teste que a usa
+ * troca o número de faces, e não relaxa o que mede: a forma igual e nenhuma lasca.
  */
 const m = (mm) => mm / 1000;
 const LADO = [[2282, 198], [2342, 724], [2342, 980], [1180, 1110], [470, 1580], [-1900, 1580], [-2342, 1190], [-2342, 724], [-2292, 198]];

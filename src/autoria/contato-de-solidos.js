@@ -101,7 +101,13 @@ function triangulacaoDaFace(pontos, caminho, piso2 = EPS) {
   for (let i = 0; i < indices.length; i += 3) {
     saida.push([pontos[indices[i]], pontos[indices[i + 1]], pontos[indices[i + 2]]]);
   }
-  return saida;
+  /* FACE COM CANTO COLINEAR. O polígono plano com três cantos seguidos na mesma reta (o vértice que a booleana deixa no meio
+     de uma aresta, fatia 10 do plano de ajustes no núcleo) sai do earcut com um triângulo de área nula entre eles. Esse
+     triângulo não cobre superfície nenhuma, e os outros já cobrem a face inteira; deixá-lo marcava a parte inteira como
+     triângulo degenerado e todo par dela como inconclusivo. Só sai o que não tem área; a face que nenhum triângulo serve
+     fica como veio, e o preparo a recusa como antes. */
+  const comArea = saida.filter(([a, b, c]) => comprimento2(cross(sub(b, a), sub(c, a))) > piso2);
+  return comArea.length > 0 ? comArea : saida;
 }
 
 function chaveAresta(a, b) {

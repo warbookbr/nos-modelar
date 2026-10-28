@@ -70,7 +70,12 @@
    reservar um id. Manifold não carregada, seleção vazia, sólido aberto,
    seleções que dividem face, resultado vazio e estouro do bloco GRITAM, e o
    passo inteiro aborta com 0 V/0 F. */
-import { areaDe, fundir, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
+import { areaDe, fundir, fundirCoplanares, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
+
+/* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
+   próprio plano, e o seno da curva para dentro que ainda se aceita num canto dele. */
+const PLANO_DA_FUSAO = 1e-9;
+const SENO_DA_FUSAO = 1e-9;
 
 export function criarOperacoesBooleanas(servicos) {
   const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold } = servicos;
@@ -831,6 +836,35 @@ export function criarOperacoesBooleanas(servicos) {
         else { cortadas.splice(k, 1); consumidas.push(fid); }
       }
       if (!tirou) break;
+    }
+    /* ---- FUSÃO DOS PEDAÇOS COPLANARES (só a booleana comum) ----
+       Os pedaços acima saem partidos além do necessário por duas causas. A face de um sólido subtraído volta da Manifold
+       virada para dentro do buraco, ao contrário da normal da face de entrada, e a fusão em `pedacosConvexos` mede a
+       convexidade contra essa normal, então a faceta de um cilindro subtraído ficava em triângulos. E o acabamento parte
+       o polígono no canto colinear que uma face vizinha usa, para o leque do primeiro canto não ter triângulo sem área,
+       o que `triangularSemDegenerado` já resolve; sobravam tiras de 8 mm por 2 m ao lado do canto. Aqui, por último, os
+       pedaços de uma mesma face de entrada que formam juntos um polígono plano e convexo, com o canto colinear mantido,
+       voltam a ser um só. Nenhum canto some e nenhuma outra face muda, então a casca continua fechada, e a superfície é a
+       mesma a até 1e-9 do tamanho da peça: o polígono fundido tem de ser plano a esse tanto, o que deixa de fora a face
+       torta de um loft, onde fundir mudaria a forma. A face cortada guarda o id, e o pedaço unido deixa de consumir id do
+       bloco. O arredondamento (`extra`) não passa por aqui. */
+    if (!extra) {
+      const valencia = new Map();
+      for (const P of [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])]) {
+        for (const v of new Set(P)) valencia.set(v, (valencia.get(v) ?? 0) + 1);
+      }
+      const porFace = new Map();
+      for (const item of cortadas) porFace.set(item[0], [{ ref: item, lista: cortadas, prioridade: true }]);
+      for (const item of pedacosNovos) {
+        if (!porFace.has(item[0])) porFace.set(item[0], []);
+        porFace.get(item[0]).push({ ref: item, lista: pedacosNovos, prioridade: false });
+      }
+      for (const grupo of porFace.values()) {
+        if (grupo.length < 2) continue;
+        for (const [, sai] of fundirCoplanares(pos, grupo, { plano: PLANO_DA_FUSAO * escalaDaPeca, seno: SENO_DA_FUSAO, valencia })) {
+          sai.lista.splice(sai.lista.indexOf(sai.ref), 1);
+        }
+      }
     }
     for (const item of [...cortadas, ...pedacosNovos]) item[1] = melhorInicio(pos, item[1]);
     if (pedacosNovos.length > BLOCO + FAIXA_ESTENDIDA) return grita(st, i, op, 'solidos', `a costura partiu faces em ${pedacosNovos.length} pedaços a mais, mais que os ${BLOCO + FAIXA_ESTENDIDA} ids do passo (bloco mais faixa estendida); divida a operação em passos menores`);

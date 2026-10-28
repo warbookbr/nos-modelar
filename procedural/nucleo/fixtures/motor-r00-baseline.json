@@ -318,9 +318,9 @@
       "operacoes": [
         "unir"
       ],
-      "hashCanonico": "7983d2662c265f06fc611d79ca6ae8d8503ef3928cf993b355d2d4374fc63b4c",
+      "hashCanonico": "c579e2742c80e5797bfec004a3d8229527a7611edb13fdef9417ec1639f120db",
       "vertices": 20,
-      "faces": 24,
+      "faces": 18,
       "diagnosticos": 0
     },
     {
@@ -328,9 +328,9 @@
       "operacoes": [
         "subtrair"
       ],
-      "hashCanonico": "36579f6a039345203a8728b0d36a8d47d0695fc7bbbb7b6ff46932ed7a488047",
+      "hashCanonico": "4e4176f1c5fd846853d39cca2733055d56feea7c8ab870c22e9b448b39ad643c",
       "vertices": 14,
-      "faces": 15,
+      "faces": 12,
       "diagnosticos": 0
     },
     {
