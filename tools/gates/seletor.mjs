@@ -98,6 +98,13 @@ export function gravarVerdes(raiz, verdes) {
 /* O que o gate precisa fazer agora: { rodar: false, motivo } quando nada do que ele lê mudou desde a última vez verde, ou
    { rodar: true, motivo, testes? } com, nos gates de teste, a lista de arquivos para o `vitest related` (null = o modo inteiro). */
 export function decidir(gate, foto, verdes, leituras = null) {
+  const d = decidirSemNota(gate, foto, verdes, leituras);
+  /* O "modo inteiro" do test:lentos fora do --completo são os ligados ao que mudou desde o ramo remoto (ver rodouInteiro). */
+  if (gate === 'test:lentos' && d.rodar && d.testes === null) return { ...d, motivo: d.motivo.replace('roda o modo inteiro', 'roda os ligados ao que mudou desde o ramo remoto, sem gravar verde (o --completo e o CI rodam todos)') };
+  return d;
+}
+
+function decidirSemNota(gate, foto, verdes, leituras) {
   const verde = verdes[gate];
   if (gate === 'test:rapidos' || gate === 'test:lentos') {
     if (!verde?.foto) return { rodar: true, motivo: 'sem rodada verde guardada, roda o modo inteiro', testes: null };
@@ -120,6 +127,13 @@ export function decidir(gate, foto, verdes, leituras = null) {
   if (!LE_O_GATE[gate]) return { rodar: true, motivo: 'não declara o que lê' };
   if (verde?.impressao && verde.impressao === impressaoDoGate(gate, foto)) return { rodar: false, motivo: 'nada do que ele lê mudou desde a última rodada verde' };
   return { rodar: true, motivo: verde ? 'algo do que ele lê mudou' : 'sem rodada verde guardada' };
+}
+
+/* Se a rodada verde cobriu o que o registro diz. Sem lista do seletor, o `test:lentos` fora do `--completo` roda só os ligados ao
+   que mudou desde o ramo remoto (tools/testes-lentos.mjs), e não o modo inteiro: medido em 2026-10-28, rodou zero arquivos e o
+   verde foi guardado como se todos tivessem passado. Essa rodada não grava verde. */
+export function rodouInteiro(gate, testes, completo) {
+  return gate !== 'test:lentos' || testes !== null || completo;
 }
 
 /* O registro da rodada verde: a foto inteira nos gates de teste, que precisam saber QUAIS arquivos mudaram, e a impressão nos

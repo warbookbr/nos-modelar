@@ -26,7 +26,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { decidir, diretorioDasLeituras, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde } from './gates/seletor.mjs';
+import { decidir, diretorioDasLeituras, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde, rodouInteiro } from './gates/seletor.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -372,8 +372,10 @@ async function executar() {
      testes só os ligados ao que mudou (tools/gates/seletor.mjs). A foto é tirada uma vez, aqui, e é ela que fica guardada como
      verde: um arquivo editado durante a bateria aparece como mudado na rodada seguinte. */
   const comSeletor = !completo && !process.env.CI && !process.argv.includes('--sem-seletor');
-  const foto = comSeletor ? fotografar('.') : null;
-  const verdes = comSeletor ? lerVerdes('.') : {};
+  /* O `--completo` roda tudo e por isso grava o verde de todos, que é a rodada que deixa o registro de leituras completo. */
+  const gravaVerdes = !process.env.CI && !process.argv.includes('--sem-seletor');
+  const foto = gravaVerdes ? fotografar('.') : null;
+  const verdes = gravaVerdes ? lerVerdes('.') : {};
   const decisoes = new Map();
   if (comSeletor) for (const gate of bateria) decisoes.set(gate, decidir(gate, foto, verdes, gate.startsWith('test:') ? lerLeiturasDoGate('.', gate) : null));
   const guardados = bateria.filter((g) => decisoes.get(g)?.rodar === false);
@@ -417,7 +419,10 @@ async function executar() {
         const resultado = await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
         porGate.set(gate, resultado);
         duracoesDosGates[gate] = resultado.duracao;
-        if (comSeletor && resultado.codigo === 0) { const r = registroVerde(gate, foto, { testes: decisoes.get(gate)?.testes ?? null, anterior: verdes[gate] }); if (r) verdes[gate] = r; }
+        if (gravaVerdes && resultado.codigo === 0 && rodouInteiro(gate, decisoes.get(gate)?.testes ?? null, completo)) {
+          const r = registroVerde(gate, foto, { testes: decisoes.get(gate)?.testes ?? null, anterior: verdes[gate] });
+          if (r) verdes[gate] = r;
+        }
         if (resultado.codigo !== 0 && pararNoPrimeiro) abortado = true;
       } finally {
         pesoEmUso -= pesoDe(gate);
@@ -433,7 +438,7 @@ async function executar() {
   if (baratoFalhou) console.log(`\ngates — um gate barato falhou; os caros (${estagios.caros.join(', ')}) não começaram.`);
   else await rodarEstagio(estagios.caros);
   const decorrido = Date.now() - relogio;
-  if (comSeletor) gravarVerdes('.', verdes);
+  if (gravaVerdes) gravarVerdes('.', verdes);
   mkdirSync(join(RAIZ, DIRETORIO_DAS_SAIDAS), { recursive: true });
   writeFileSync(join(RAIZ, ARQUIVO_DAS_DURACOES_DOS_GATES), JSON.stringify(duracoesDosGates));
 

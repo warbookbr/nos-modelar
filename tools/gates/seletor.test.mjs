@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { decidir, fotografar, mudadosEntre, registroVerde, visivelNoGrafo } from './seletor.mjs';
+import { decidir, fotografar, mudadosEntre, registroVerde, rodouInteiro, visivelNoGrafo } from './seletor.mjs';
 
 /* montado por partes para o gate de links não tomar o arquivo do repositório de ensaio por citação */
 const DOC = ['docs', 'x.md'].join('/');
@@ -87,5 +87,12 @@ describe('seletor de gates', () => {
     expect(inteiro.leiturasCompletas).toBe(true);
     expect(registroVerde('test:rapidos', {}, { testes: ['a'], anterior: inteiro }).leiturasCompletas).toBe(true);
     expect(registroVerde('test:rapidos', {}, { testes: ['a'], anterior: null }).leiturasCompletas).toBe(false);
+  });
+
+  it('o test:lentos sem lista do seletor e fora do --completo não grava verde, porque não rodou o modo inteiro', () => {
+    expect(rodouInteiro('test:lentos', null, false)).toBe(false);
+    expect(rodouInteiro('test:lentos', null, true)).toBe(true);
+    expect(rodouInteiro('test:lentos', ['src/a.js'], false)).toBe(true);
+    expect(rodouInteiro('test:rapidos', null, false)).toBe(true);
   });
 });
