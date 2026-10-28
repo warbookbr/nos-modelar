@@ -46,7 +46,7 @@ import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { vistaDoNome } from './esboco-referencia.mjs';
-import { olharBancada } from './olhar-bancada.mjs';
+import { abrirCapturaCompartilhada, olharBancada } from './olhar-bancada.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -390,6 +390,7 @@ export function montagemDaPeca(peca, { raiz = REPO } = {}) {
 export async function vistasParaCritica(peca, { logger = null, saida = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
   const dep = {
     olharBancada,
+    abrirCaptura: abrirCapturaCompartilhada,
     esbocoDeclarado: async (p) => (await import('./forma-do-esboco.mjs')).esbocoDeclarado(p),
     formasDoEsboco: async (bruto, opcao) => (await import('./esboco-solido.mjs')).formasDoEsboco(bruto, opcao),
     olharEtapas: async (arquivo, opcoes) => (await import('./etapas-da-montagem.mjs')).olharEtapas(arquivo, opcoes),
@@ -425,56 +426,64 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   limparPastaDaRodada(pasta);
   mkdirSync(pasta, { recursive: true });
 
-  const conjunto = await dep.olharBancada({ peca, revisar: true, res: RES_CONJUNTO, logger });
-  exigirCaptura(conjunto, 'conjunto');
-  exigirVistasDiferentes(conjunto, 'do conjunto');
-  /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
-     sai numa captura própria. */
-  const traseira = await dep.olharBancada({
-    peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(traseira, 'traseira');
-  /* A lateral esquerda também, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a
-     porta à esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
-  const esquerda = await dep.olharBancada({
-    peca, auditoria: true, projecao: 'ortografica', vistas: 'esquerda', res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(esquerda, 'esquerda');
+  /* O servidor e o navegador sobem uma vez para o pacote inteiro (26 capturas na perua), e a sessão e os contatos da peça são medidos
+     uma vez. Com `olharBancada` trocado por um gravador, como nos testes, nada é aberto, a não ser que o teste dê `abrirCaptura`. */
+  const compartilhada = dependencias.olharBancada && !dependencias.abrirCaptura ? null : await dep.abrirCaptura({ logger });
+  /* QUANTAS IMAGENS O PACOTE TEM E QUANTAS JÁ SAÍRAM, para a recusa de uma captura dizer o que faltava. */
+  const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + VISTAS_DO_ARAME.split(',').length + 1
+    + VISTAS_DA_PARTE.split(',').length * partes.length;
+  let feitas = 0;
+  const capturar = async (quem, opcoes) => {
+    const resposta = await dep.olharBancada({ ...opcoes, logger, ...(compartilhada ? { compartilhada } : {}) });
+    exigirCaptura(resposta, quem, { feitas, total });
+    feitas += arquivosDe(resposta).length;
+    return resposta;
+  };
 
-  /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
-     mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
-     leque de lascas saindo de um vértice só. Sombra esconde topologia. */
-  const arame = await dep.olharBancada({
-    peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(arame, 'arame');
-  exigirVistasDiferentes(arame, 'do arame');
-  /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
-     que só aparece do outro lado da peça. */
-  const raioX = await dep.olharBancada({
-    peca, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(raioX, 'raio X');
-
+  let conjunto;
+  let traseira;
+  let esquerda;
+  let arame;
+  let raioX;
   const porParte = [];
-  for (const parte of partes) {
-    const resultado = await dep.olharBancada({
-      peca,
-      selecionadas: parte,
-      modo: 'isolar',
-      focar: true,
-      /* Modo de auditoria também aqui: estas imagens vão para o crítico junto
-         com as do conjunto, e o modo de revisão, que já o liga sozinho, não
-         aceita vista escolhida à mão. */
-      auditoria: true,
-      projecao: 'ortografica',
-      vistas: VISTAS_DA_PARTE,
-      res: RES_PARTE,
-      logger,
-    });
-    exigirCaptura(resultado, `parte '${parte}'`);
-    exigirVistasDiferentes(resultado, `da parte '${parte}'`);
-    porParte.push({ parte, resultado });
+  try {
+    conjunto = await capturar('conjunto', { peca, revisar: true, res: RES_CONJUNTO });
+    exigirVistasDiferentes(conjunto, 'do conjunto');
+    /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
+       sai numa captura própria. */
+    traseira = await capturar('traseira', { peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO });
+    /* A lateral esquerda também, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a
+       porta à esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
+    esquerda = await capturar('esquerda', { peca, auditoria: true, projecao: 'ortografica', vistas: 'esquerda', res: RES_CONJUNTO });
+
+    /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
+       mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
+       leque de lascas saindo de um vértice só. Sombra esconde topologia. */
+    arame = await capturar('arame', { peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO });
+    exigirVistasDiferentes(arame, 'do arame');
+    /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
+       que só aparece do outro lado da peça. */
+    raioX = await capturar('raio X', { peca, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO });
+
+    for (const parte of partes) {
+      const resultado = await capturar(`parte '${parte}'`, {
+        peca,
+        selecionadas: parte,
+        modo: 'isolar',
+        focar: true,
+        /* Modo de auditoria também aqui: estas imagens vão para o crítico junto
+           com as do conjunto, e o modo de revisão, que já o liga sozinho, não
+           aceita vista escolhida à mão. */
+        auditoria: true,
+        projecao: 'ortografica',
+        vistas: VISTAS_DA_PARTE,
+        res: RES_PARTE,
+      });
+      exigirVistasDiferentes(resultado, `da parte '${parte}'`);
+      porParte.push({ parte, resultado });
+    }
+  } finally {
+    await compartilhada?.fechar();
   }
 
   /* O alvo vem do esboço de agora e não da imagem guardada. */
@@ -530,11 +539,13 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
    checagem de câmera do modo de revisão é exceção declarada: ela reprova
    enquadramento e ainda assim grava a imagem, e o enquadramento é assunto de
    quem conduz, não motivo para não haver pacote. */
-function exigirCaptura(resposta, quem) {
+function exigirCaptura(resposta, quem, pacote = null) {
   const arquivos = resposta?.resultado?.arquivos;
   if (Array.isArray(arquivos) && arquivos.length) return;
   const motivo = resposta?.erro?.mensagem ?? resposta?.stderr?.trim() ?? 'a bancada não disse por quê';
-  throw new Error(`a captura do ${quem} não produziu imagem: ${motivo}`);
+  /* o pacote diz quantas imagens já tinham saído, para quem lê saber se perdeu um minuto ou quase tudo */
+  const andamento = pacote ? ` Do pacote, ${pacote.feitas} de ${pacote.total} imagens já tinham saído e faltavam ${pacote.total - pacote.feitas}.` : '';
+  throw new Error(`a captura do ${quem} não produziu imagem: ${andamento ? motivo.replace(/[.\s]*$/, '.') : motivo}${andamento}`);
 }
 
 /* Duas vistas de uma captura com o mesmo conteúdo, byte a byte, são a mesma

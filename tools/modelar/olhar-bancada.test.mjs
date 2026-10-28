@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
-import { criarDicas, olharBancada } from './olhar-bancada.mjs';
+import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, criarDicas, olharBancada } from './olhar-bancada.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -239,14 +239,14 @@ describe('captura suavizada', () => {
       async waitForTimeout() {},
       async evaluate(fn) {
         const texto = String(fn);
+        if (texto.includes('__modelarQuadros')) return undefined;
         if (texto.includes('b.ready')) {
           return {
             ready: true, erro: null, peca: 'Peça falsa', partes: ['a'], selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
             estatisticas: { facesNeutras: 1, triangulos: 2 }, estado: null,
           };
         }
-        if (texto.includes('.url()')) return 'http://127.0.0.1/harness.html';
-        if (texto.includes('.enquadramento()')) return ENQUADRAMENTO;
+        if (texto.includes('.enquadramento()')) return { url: 'http://127.0.0.1/harness.html', enquadramento: ENQUADRAMENTO };
         throw new Error(`pergunta inesperada à página: ${texto}`);
       },
       async screenshot(opcoes) {
@@ -301,4 +301,108 @@ describe('captura suavizada', () => {
       rmSync(join(process.cwd(), pasta), { recursive: true, force: true });
     }
   }, 60_000);
+});
+
+/* A CARGA DA PÁGINA É UMA POR CHAMADA, NÃO UMA POR VISTA. Cada vista abria a página de novo, e a perua levou 257 s numa máquina parada
+   com 51 capturas; o contador da dependência injetada prova quantas cargas, páginas e navegadores uma ou várias chamadas pedem. */
+describe('carga da página', () => {
+  const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
+
+  function bancadaContada({ falharPonte = false } = {}) {
+    const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, esperas: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
+    const page = {
+      on() {},
+      off() {},
+      async goto(url) { if (url !== 'about:blank') contagem.cargas += 1; },
+      async waitForFunction(fn, arg, opcoes) {
+        contagem.esperas.push(opcoes);
+        if (falharPonte) {
+          const erro = new Error('page.waitForFunction: Timeout 5ms exceeded.');
+          erro.name = 'TimeoutError';
+          throw erro;
+        }
+      },
+      async waitForTimeout() {},
+      async evaluate(fn) {
+        const texto = String(fn);
+        if (texto.includes('definirVista')) { contagem.vistasTrocadas += 1; return undefined; }
+        if (texto.includes('__modelarQuadros')) return undefined;
+        if (texto.includes('b.ready')) {
+          return {
+            ready: true, erro: null, peca: 'Peça falsa', partes: ['a'], selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
+            estatisticas: { facesNeutras: 1, triangulos: 2 }, estado: null,
+          };
+        }
+        if (texto.includes('.enquadramento()')) return { url: 'http://127.0.0.1/harness.html', enquadramento: ENQUADRAMENTO };
+        if (/auditoria|selecionar|enquadrar|focar/.test(texto)) return null;
+        throw new Error(`pergunta inesperada à página: ${texto}`);
+      },
+      async screenshot() {
+        const png = new PNG({ width: 64, height: 36 });
+        png.data.fill(200);
+        return PNG.sync.write(png);
+      },
+      async close() { contagem.paginasFechadas += 1; },
+    };
+    const dependencias = {
+      createServer: async () => {
+        contagem.servidores += 1;
+        return { httpServer: { address: () => ({ port: 43123 }) }, async listen() {}, async close() {} };
+      },
+      carregarPlaywright: async () => ({
+        chromium: {
+          launch: async () => {
+            contagem.navegadores += 1;
+            return { async newPage() { contagem.paginas += 1; return page; }, async close() { contagem.navegadoresFechados += 1; } };
+          },
+        },
+      }),
+    };
+    return { contagem, dependencias };
+  }
+
+  const comum = { peca: 'fixture-visual', res: '640x360', auditoria: true, capturarEmMemoria: true };
+
+  it('várias vistas de uma chamada carregam a página uma vez e trocam a câmera pela ponte', async () => {
+    const { contagem, dependencias } = bancadaContada();
+    const resposta = await olharBancada({ ...comum, vistas: ['isometrica', 'frontal', 'direita', 'superior'], dependencias });
+    expect(resposta.ok).toBe(true);
+    expect(resposta.resultado.capturas).toHaveLength(4);
+    expect(contagem).toMatchObject({ cargas: 1, paginas: 1, vistasTrocadas: 3 });
+    expect(resposta.resultado.cargasDePagina).toBe(1);
+  });
+
+  it('com a captura compartilhada, o servidor e o navegador sobem uma vez e a página da mesma peça é reaproveitada', async () => {
+    const { contagem, dependencias } = bancadaContada();
+    const compartilhada = await abrirCapturaCompartilhada({ dependencias });
+    try {
+      for (const vistas of [['isometrica', 'frontal'], ['traseira'], ['esquerda', 'superior']]) {
+        const resposta = await olharBancada({ ...comum, vistas, compartilhada, dependencias });
+        expect(resposta.ok).toBe(true);
+      }
+      /* uma chamada com outro quadro não reaproveita a página, e abre uma nova */
+      const outroQuadro = await olharBancada({ ...comum, res: '800x450', vistas: ['direita'], compartilhada, dependencias });
+      expect(outroQuadro.ok).toBe(true);
+    } finally {
+      await compartilhada.fechar();
+    }
+    expect(contagem).toMatchObject({ servidores: 1, navegadores: 1, cargas: 2, paginas: 2, navegadoresFechados: 1 });
+    /* as duas páginas se fecharam, e o navegador só no `fechar` de quem o abriu */
+    expect(contagem.paginasFechadas).toBe(2);
+  });
+
+  it('o prazo de carga vai como opção do Playwright e o estouro diz a etapa, o tempo e quantas imagens faltavam', async () => {
+    const { contagem, dependencias } = bancadaContada({ falharPonte: true });
+    const resposta = await olharBancada({ ...comum, vistas: ['isometrica', 'frontal'], prazoDeCargaMs: 5, dependencias });
+    expect(resposta.ok).toBe(false);
+    expect(resposta.erro.codigo).toBe('tempo_esgotado');
+    expect(resposta.erro.mensagem).toMatch(/prazo de 5 ms/);
+    expect(resposta.erro.mensagem).toMatch(/etapa: esperar a ponte da bancada/);
+    expect(resposta.erro.mensagem).toMatch(/peça 'fixture-visual'/);
+    expect(resposta.erro.mensagem).toMatch(/vista 'isometrica'/);
+    expect(resposta.erro.mensagem).toMatch(/\d+ ms gastos nesta captura/);
+    expect(resposta.erro.mensagem).toMatch(/0 de 2 imagens feitas, faltavam 2/);
+    expect(contagem.esperas.every((opcoes) => opcoes.timeout === 5)).toBe(true);
+    expect(PRAZO_DE_CARGA_MS).toBeGreaterThan(30_000);
+  });
 });

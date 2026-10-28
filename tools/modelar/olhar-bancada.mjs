@@ -21,6 +21,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { analisarPeca } from './analise-da-peca.mjs';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
+import { reduzirEmParalelo } from './reduzir-em-paralelo.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -33,6 +34,60 @@ const MODOS = ['todas', 'contexto', 'isolar'];
    teto, a primeira peça grande vira um despejo que ninguém abre. Três é o que
    cabe numa leitura sem rolar a tela, e o relato diz quantos ficaram de fora. */
 const TETO_DE_PARES_POR_CHAMADA = 3;
+/* O PRAZO DE CADA CARGA DE PÁGINA É DECLARADO. A espera pela ponte levava `{ timeout: 20000 }` no lugar do argumento errado de
+   `waitForFunction` (era o argumento da função, não a opção), e a carga valia só o prazo padrão de 30 s do Playwright, que uma
+   máquina dividida com outros agentes estoura: a perua levou 257 s numa máquina parada, e quatro capturas ao mesmo tempo passam
+   dos 30 s só para abrir a página. O prazo vale por etapa da carga (abrir, ponte, modelo), por tentativa, e o erro diz qual. */
+export const PRAZO_DE_CARGA_MS = 90_000;
+/* A transição de câmera da bancada dura 280 ms (`DURACAO_TRANSICAO`, criar-ambiente.js); a espera entre uma vista e a seguinte, na
+   mesma página, acaba quando ela termina e um quadro foi desenhado depois, e nunca passa do maior entre `espera` e este limite. */
+const QUADROS_DEPOIS_DA_TRANSICAO = 1;
+const LIMITE_DA_TRANSICAO_MS = 5000;
+
+/* O LAÇO DE QUADROS DA BANCADA PARA DURANTE A FOTO. A bancada redesenha a cena a cada quadro, mesmo parada, e no Chromium sem tela
+   (`--use-gl=swiftshader`) cada quadro de 1800 por 1800 leva uns 125 ms: medido na perua, `page.screenshot` levava 1,2 s com o laço
+   ligado e 0,12 s com ele parado, e cada ordem à página esperava o quadro em curso. Parado o laço, a página mostra o último quadro
+   desenhado, que é o da câmera já quieta; a foto sai a mesma, e a prova é o hash dos 51 PNG da perua, igual com e sem a pausa.
+   Os retornos pedidos enquanto parado ficam numa fila e voltam ao navegador ao retomar, e por isso o laço da bancada, que se pede
+   de novo a cada quadro, continua de onde parou. Estas funções rodam dentro da página e não tocam o código da bancada. */
+function instalarControleDeQuadros() {
+  if (window.__modelarQuadros) return;
+  const original = window.requestAnimationFrame.bind(window);
+  let fila = null;
+  window.__modelarQuadros = {
+    pausar() {
+      if (fila) return;
+      fila = [];
+      /* números altos, para nunca coincidir com o de um quadro real em `cancelAnimationFrame` */
+      window.requestAnimationFrame = (retorno) => { fila.push(retorno); return 1_000_000_000 + fila.length; };
+    },
+    retomar() {
+      if (!fila) return;
+      const guardados = fila;
+      fila = null;
+      window.requestAnimationFrame = original;
+      for (const retorno of guardados) original(retorno);
+    },
+  };
+}
+/* Espera a transição de câmera terminar (`controls.enabled` volta a ser verdadeiro no quadro em que ela acaba) e `quadros` quadros
+   depois, e então, se `parar`, para o laço. O limite evita ficar para sempre numa câmera que não termina. */
+function esperarCameraEPararQuadros([quadros, limite, parar]) {
+  const ponte = window.__mecanificaBancada;
+  const inicio = performance.now();
+  return new Promise((resolver) => {
+    const depois = (restantes) => {
+      if (restantes <= 0) { if (parar) window.__modelarQuadros.pausar(); resolver(true); return; }
+      requestAnimationFrame(() => depois(restantes - 1));
+    };
+    const passo = () => {
+      if (ponte.ambiente().controls.enabled === true) { depois(quadros); return; }
+      if (performance.now() - inicio > limite) { if (parar) window.__modelarQuadros.pausar(); resolver(false); return; }
+      requestAnimationFrame(passo);
+    };
+    requestAnimationFrame(passo);
+  });
+}
 
 /* DICA APARECE UMA VEZ, E SÓ QUANDO SE APLICA.
    As duas dicas que existiam disparavam DENTRO do laço de vistas: numa chamada
@@ -78,6 +133,7 @@ export function criarDicas() {
   };
 }
 const PROJECOES = ['perspectiva', 'ortografica'];
+const ARGUMENTOS_DO_CHROMIUM = ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'];
 
 class ErroDeUso extends Error {
   constructor(mensagem) {
@@ -146,9 +202,11 @@ function erroEstruturado({ relato, erro, resultado = null }) {
   };
 }
 
-async function fecharRecursos({ browser, vite }) {
+async function fecharRecursos({ browser, vite, pagina = null, proprios = true }) {
   const limpeza = [];
-  for (const [recurso, instancia] of [['browser', browser], ['vite', vite]]) {
+  /* Com recursos compartilhados o navegador e o servidor são de quem os abriu, e esta chamada fecha só a página dela. */
+  const lista = proprios ? [['browser', browser], ['vite', vite]] : [['pagina', pagina]];
+  for (const [recurso, instancia] of lista) {
     if (!instancia) continue;
     try {
       await instancia.close();
@@ -159,11 +217,31 @@ async function fecharRecursos({ browser, vite }) {
   return limpeza;
 }
 
-function erroDeTempo(timeoutMs) {
-  const erro = new Error(`A bancada excedeu o limite de ${timeoutMs} ms.`);
+/* O QUE O PRAZO VENCIDO DIZ. "Timeout 30000ms exceeded" não diz o que estava carregando nem se vale repetir: quatro agentes na mesma
+   máquina o recebiam sem saber se a peça, a página ou o servidor era o lento. A mensagem traz a etapa, a peça, a vista, o tempo
+   gasto desde o começo da captura e quantas imagens ainda faltavam. */
+function descreverProgresso({ peca, etapa, vista, inicio, feitas, total }) {
+  const partes = [`etapa: ${etapa}`];
+  if (peca) partes.push(`peça '${peca}'`);
+  if (vista) partes.push(`vista '${vista}'`);
+  partes.push(`${Math.round(performance.now() - inicio)} ms gastos nesta captura`);
+  partes.push(`${feitas} de ${total} imagens feitas, faltavam ${Math.max(0, total - feitas)}`);
+  return partes.join('; ');
+}
+
+function erroDeTempo(timeoutMs, progresso) {
+  const erro = new Error(`A bancada excedeu o limite de ${timeoutMs} ms (${descreverProgresso(progresso)}).`);
   erro.codigo = 'tempo_esgotado';
   return erro;
 }
+
+function erroDeCarga(prazoMs, progresso, detalhe) {
+  const erro = new Error(`A bancada não terminou de carregar dentro do prazo de ${prazoMs} ms (${descreverProgresso(progresso)}). ${detalhe}`);
+  erro.codigo = 'tempo_esgotado';
+  return erro;
+}
+
+const ehTempoDoPlaywright = (erro) => erro?.name === 'TimeoutError' || /Timeout/i.test(erro?.message ?? '');
 
 /* Rótulo de peça vira nome de arquivo: a sessão ativa usa `meta.nome`, que tem
    acento e espaço ("Cutelo de Sucata Reforçado"). */
@@ -173,6 +251,54 @@ export function apelidoDeArquivo(nome) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'sessao-ativa';
+}
+
+/**
+ * O SERVIDOR E O NAVEGADOR DE VÁRIAS CAPTURAS SEGUIDAS. `olharBancada` sobe um servidor do Vite e um Chromium por chamada, e o pacote
+ * da `vistas:critica` faz uma chamada por parte mais cinco do conjunto (26 na perua): quem abre uma vez e passa o resultado como
+ * `compartilhada` paga a subida uma vez só. A sessão da peça (o arquivo que a página lê) e os pares acusados pela medida também
+ * ficam aqui, porque dependem só da peça, e cada chamada de uma peça os reaproveita em vez de executar a receita de novo. Quem abre
+ * é quem fecha, com `fechar()`; as chamadas fecham só a página delas.
+ */
+export async function abrirCapturaCompartilhada({ dependencias = {}, logger = null } = {}) {
+  const createServer = dependencias.createServer ?? (async (...args) => (await import('vite')).createServer(...args));
+  const carregarPlaywright = dependencias.carregarPlaywright
+    ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
+  let vite = null;
+  let browser = null;
+  try {
+    vite = await createServer({
+      root: REPO,
+      configFile: join(REPO, 'vite.config.js'),
+      server: { host: '127.0.0.1', port: 0 },
+      logLevel: 'error',
+    });
+    await vite.listen();
+    const { port } = vite.httpServer.address();
+    const pw = await carregarPlaywright();
+    browser = await pw.chromium.launch({ args: ARGUMENTOS_DO_CHROMIUM });
+    if (typeof logger === 'function') logger('info', 'Servidor e navegador abertos uma vez para as capturas seguintes.');
+    return {
+      vite,
+      browser,
+      base: `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html`,
+      sessoes: new Map(),
+      /* a página que a última chamada deixou aberta para a seguinte, e quantas páginas se carregaram ao todo */
+      pagina: null,
+      cargas: 0,
+      async fechar() {
+        const limpeza = await fecharRecursos({ browser, vite, pagina: this.pagina?.page ?? null, proprios: false });
+        limpeza.push(...await fecharRecursos({ browser, vite }));
+        this.pagina = null;
+        for (const { arquivo } of this.sessoes.values()) rmSync(arquivo, { force: true });
+        this.sessoes.clear();
+        return limpeza;
+      },
+    };
+  } catch (erro) {
+    await fecharRecursos({ browser, vite });
+    throw erro;
+  }
 }
 
 /**
@@ -202,6 +328,10 @@ export async function olharBancada({
   arame = false,
   capturarEmMemoria = false,
   timeoutMs = null,
+  /* O prazo de cada etapa da carga da página (abrir, ponte, modelo), por tentativa. */
+  prazoDeCargaMs = PRAZO_DE_CARGA_MS,
+  /* O servidor, o navegador e a sessão da peça já abertos por `abrirCapturaCompartilhada`; sem eles a chamada abre e fecha os seus. */
+  compartilhada = null,
   logger = null,
   dependencias = {},
 } = {}) {
@@ -213,9 +343,21 @@ export async function olharBancada({
   let temporizador = null;
   let encerramentoForcado = null;
   let expirou = false;
+  let progressoDoPrazo = null;
+  /* as gravações em curso (a redução de cada imagem corre fora da thread principal) */
+  const gravacoes = [];
+  /* o que o `finally` precisa saber da página para deixá-la aberta à chamada seguinte */
+  let guardarErroDaPagina = null;
+  let reaproveitavelDaChamada = false;
+  let chaveDaPaginaDaChamada = null;
+  let paginaSuja = false;
   let legendaDeAuditoria = null;
-  /* o arquivo da sessão própria desta captura (ver `ativarReceitaBancada`), apagado ao fim */
+  /* o arquivo da sessão própria desta captura (ver `ativarReceitaBancada`), apagado ao fim; com `compartilhada` ele é da peça e não
+     da chamada, e quem o apaga é `compartilhada.fechar()` */
   let sessaoDaCaptura = null;
+  let page = null;
+  /* o que a captura estava fazendo, para o prazo vencido dizer onde parou */
+  const progresso = { peca, etapa: 'preparar a captura', vista: null, inicio: performance.now(), feitas: 0, total: 0 };
   try {
     if (capturarEmMemoria && (saidaDeclarada !== null || relatorioDeclarado !== null)) {
       erroDeUso('captura em memória não aceita --saida ou --relatorio.');
@@ -226,11 +368,13 @@ export async function olharBancada({
     if (timeoutMs !== null) {
       temporizador = setTimeout(() => {
         expirou = true;
-        encerramentoForcado = fecharRecursos({ browser, vite });
+        /* o relato do prazo vencido guarda a etapa de AGORA, antes de os recursos se fecharem e a chamada em curso falhar */
+        progressoDoPrazo = { ...progresso };
+        encerramentoForcado = fecharRecursos({ browser, vite, pagina: page, proprios: !compartilhada });
       }, Number(timeoutMs));
     }
     const garantirPrazo = () => {
-      if (expirou) throw erroDeTempo(Number(timeoutMs));
+      if (expirou) throw erroDeTempo(Number(timeoutMs), progressoDoPrazo ?? progresso);
     };
     if (revisar && vistasDeclaradas !== null) erroDeUso('--revisar já define as vistas; não misture com --vistas');
     if (parPedida !== null && revisar) erroDeUso('--par é inspeção dirigida; não misture com --revisar.');
@@ -319,16 +463,23 @@ export async function olharBancada({
       }
 
       if (caminhoReceita) {
-        try {
-          const ativar = dependencias.ativarReceitaBancada ?? ativarReceitaBancada;
-          /* A SESSÃO É DESTA CAPTURA. `sessao-ativa.json` é um arquivo só por repositório, e com duas capturas de peças diferentes
-             ao mesmo tempo a segunda trocava o arquivo da primeira: a imagem de `aviao-motor` saiu com a deriva. Cada captura grava
-             a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). */
-          sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
-          await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura });
-          if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
-        } catch (erro) {
-          erroDeUso(`Falha ao ativar peça '${peca}' na bancada: ${erro.message}`);
+        const daPeca = compartilhada?.sessoes.get(peca) ?? null;
+        if (daPeca) {
+          sessaoDaCaptura = daPeca.arquivo;
+        } else {
+          try {
+            const ativar = dependencias.ativarReceitaBancada ?? ativarReceitaBancada;
+            /* A SESSÃO É DESTA CAPTURA. `sessao-ativa.json` é um arquivo só por repositório, e com duas capturas de peças diferentes
+               ao mesmo tempo a segunda trocava o arquivo da primeira: a imagem de `aviao-motor` saiu com a deriva. Cada captura grava
+               a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). Com
+               `compartilhada` o arquivo é um por peça e por conjunto de chamadas, e as chamadas seguintes da mesma peça o reusam. */
+            sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
+            await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura });
+            if (compartilhada) compartilhada.sessoes.set(peca, { arquivo: sessaoDaCaptura, pares: null });
+            if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
+          } catch (erro) {
+            erroDeUso(`Falha ao ativar peça '${peca}' na bancada: ${erro.message}`);
+          }
         }
       }
     }
@@ -361,60 +512,104 @@ export async function olharBancada({
        silêncio é declarado em vez de virar lista vazia com cara de "está tudo
        certo". */
     let paresAcusados = [];
-    if (peca && caminhoDaReceita) {
+    const sessaoDaPeca = peca && compartilhada ? compartilhada.sessoes.get(peca) ?? null : null;
+    if (sessaoDaPeca?.pares) {
+      paresAcusados = sessaoDaPeca.pares;
+    } else if (peca && caminhoDaReceita) {
+      progresso.etapa = 'medir os contatos da peça';
       try {
         const moduloDaPeca = await importarReceita(caminhoDaReceita);
         const receitaDaPeca = receitaDoModulo(moduloDaPeca);
         const { neutro } = executarReceita(receitaDaPeca);
         paresAcusados = contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
+        if (sessaoDaPeca) sessaoDaPeca.pares = paresAcusados;
       } catch (erro) {
         registrar(relato, logger, 'stdout',
           `(não consegui medir os contatos desta peça: ${erro.message.split('\n')[0]})`);
       }
     }
 
-    const createServer = dependencias.createServer ?? (async (...args) => (await import('vite')).createServer(...args));
-    vite = await createServer({
-      root: REPO,
-      configFile: join(REPO, 'vite.config.js'),
-      server: { host: '127.0.0.1', port: 0 },
-      logLevel: 'error',
-    });
-    await vite.listen();
-    garantirPrazo();
-    const { port } = vite.httpServer.address();
     /* A entrada publicada pode estar legitimamente vazia. A ferramenta de
        inspeção, porém, precisa de uma peça para provar geometria; por isso usa
        o harness privado, que injeta um catálogo explícito de fixtures. */
-    const base = `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html`;
-    const carregarPlaywright = dependencias.carregarPlaywright
-      ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
-    const pw = await carregarPlaywright();
-    browser = await pw.chromium.launch({
-      args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
-    });
+    let base;
+    if (compartilhada) {
+      ({ vite, browser, base } = compartilhada);
+    } else {
+      progresso.etapa = 'subir o servidor';
+      const createServer = dependencias.createServer ?? (async (...args) => (await import('vite')).createServer(...args));
+      vite = await createServer({
+        root: REPO,
+        configFile: join(REPO, 'vite.config.js'),
+        server: { host: '127.0.0.1', port: 0 },
+        logLevel: 'error',
+      });
+      await vite.listen();
+      garantirPrazo();
+      const { port } = vite.httpServer.address();
+      base = `http://127.0.0.1:${port}/nos-modelar/tools/bancadas/harness.html`;
+      progresso.etapa = 'abrir o navegador';
+      const carregarPlaywright = dependencias.carregarPlaywright
+        ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
+      const pw = await carregarPlaywright();
+      browser = await pw.chromium.launch({ args: ARGUMENTOS_DO_CHROMIUM });
+    }
     garantirPrazo();
     /* BORDA SUAVIZADA: a página abre com `deviceScaleFactor` igual ao fator de amostragem, a bancada já desenha o buffer em
        `devicePixelRatio` (criar-ambiente.js), e `fotografar` devolve o PNG reduzido ao tamanho do viewport. A razão e a escolha do
        filtro estão em `FATOR_DE_AMOSTRAGEM`, em capturar-montagem.mjs. O layout continua em pixel CSS, e por isso a imagem final
        tem o tamanho de sempre. */
-    const page = await browser.newPage({ viewport: { width: largura, height: altura }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
+    /* A PÁGINA DA CHAMADA ANTERIOR SERVE À SEGUINTE. As 26 chamadas da `vistas:critica` da perua diferem na seleção, no arame e nas
+       cores, que o controlador de partes calcula por inteiro do estado que se lhe dá (`aplicarVisual`), e no quadro, que a página
+       não troca. Com `compartilhada`, uma chamada que terminou bem deixa a página aberta, e a próxima da mesma peça, do mesmo quadro,
+       da mesma projeção e da mesma explosão reaplica a auditoria, a seleção e o modo pela ponte, como a primeira já fazia por cima
+       da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova. */
+    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar;
+    const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao });
+    chaveDaPaginaDaChamada = chaveDaPagina;
+    reaproveitavelDaChamada = reaproveitavel;
+    let paginaNova = true;
+    if (compartilhada?.pagina) {
+      const guardada = compartilhada.pagina;
+      compartilhada.pagina = null;
+      if (reaproveitavel && guardada.chave === chaveDaPagina) {
+        page = guardada.page;
+        paginaNova = false;
+      } else {
+        await guardada.page.close().catch(() => {});
+      }
+    }
+    if (paginaNova) {
+      page = await browser.newPage({ viewport: { width: largura, height: altura }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
+    }
     const fotografar = async () => reduzirPorMedia(await page.screenshot({ type: 'png' }));
+    /* Em arquivo, a redução de cada imagem corre numa thread enquanto a página segue para a vista seguinte; a gravação espera o fim. */
+    const fotografarParaArquivo = async (arquivo) => {
+      const bruto = await page.screenshot({ type: 'png' });
+      gravacoes.push(reduzirEmParalelo(bruto).then((reduzido) => writeFileSync(arquivo, reduzido)));
+    };
     const errosDaPagina = [];
-    page.on('pageerror', (erro) => errosDaPagina.push(erro.message));
+    guardarErroDaPagina = (erro) => errosDaPagina.push(erro.message);
+    page.on('pageerror', guardarErroDaPagina);
+    let cargasDePagina = 0;
+    const TENTATIVAS_DE_CARGA = 2;
     const abrirComRepeticao = async (url) => {
-      for (let tentativa = 1; tentativa <= 2; tentativa++) {
+      for (let tentativa = 1; tentativa <= TENTATIVAS_DE_CARGA; tentativa++) {
         try {
-          await page.goto(url, { waitUntil: 'load' });
+          progresso.etapa = 'abrir a página';
+          await page.goto(url, { waitUntil: 'load', timeout: prazoDeCargaMs });
+          progresso.etapa = 'esperar a ponte da bancada';
           await page.waitForFunction(
             () => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null,
-            { timeout: 20000 },
+            undefined,
+            { timeout: prazoDeCargaMs },
           );
           /* A ponte existir não significa que há modelo. A peça da sessão ativa
              chega pelo POLLING do sincronizador, depois do load — ler antes
              devolvia estatísticas nulas e derrubava a revisão visual. Espera o
              modelo de fato entrar na cena; `listar` não precisa de modelo. */
           if (!listar) {
+            progresso.etapa = 'esperar o modelo entrar na cena';
             await page.waitForFunction(
               () => {
                 const b = window.__mecanificaBancada;
@@ -422,17 +617,37 @@ export async function olharBancada({
                 if (b.erro) throw new Error(String(b.erro));
                 return b.carregado === true;
               },
-              { timeout: 20000 },
+              undefined,
+              { timeout: prazoDeCargaMs },
             );
           }
+          await page.evaluate(instalarControleDeQuadros);
+          cargasDePagina += 1;
+          if (compartilhada) compartilhada.cargas += 1;
           return tentativa;
         } catch (erro) {
-          const expirou = erro?.name === 'TimeoutError' || /Timeout/i.test(erro?.message ?? '');
-          if (!expirou || tentativa === 2) throw erro;
+          if (!ehTempoDoPlaywright(erro)) throw erro;
+          if (tentativa === TENTATIVAS_DE_CARGA) {
+            throw erroDeCarga(prazoDeCargaMs, progresso,
+              `Tentativa ${tentativa} de ${TENTATIVAS_DE_CARGA}; endereço ${url}. ${String(erro.message).split('\n')[0]}`);
+          }
           await page.goto('about:blank', { waitUntil: 'load' });
         }
       }
-      return 2;
+      return TENTATIVAS_DE_CARGA;
+    };
+    /* A VISTA SEGUINTE TROCA NA PÁGINA JÁ ABERTA. Cada vista abria a página de novo, e cada abertura executava a receita no
+       navegador e refazia o modelo: das 51 imagens da `vistas:critica` da perua, 26 chamadas eram só carga. A vista vem pelo
+       `ambiente` da ponte, em modo instantâneo como a URL faz na subida, e o enquadramento que se segue é o mesmo de uma página
+       nova, porque `enquadrar`, `focar` e `focarContato` refazem centro, raio e caixa fixada por inteiro. A espera entre duas vistas
+       da mesma página acaba quando a transição de câmera termina e dois quadros foram desenhados, e não passa do prazo da carga. */
+    /* Só a imagem de auditoria para o laço: a interface da bancada (`--tela`) tem aviso e animação que andam por quadro, e parados
+       a foto sairia sem o que ela mostraria. */
+    const pararQuadros = async () => { if (auditoriaEfetiva) await page.evaluate(() => window.__modelarQuadros?.pausar()); };
+    const aguardarCameraQuieta = async () => {
+      progresso.etapa = 'esperar a câmera parar';
+      const terminou = await page.evaluate(esperarCameraEPararQuadros, [QUADROS_DEPOIS_DA_TRANSICAO, Math.max(espera, LIMITE_DA_TRANSICAO_MS), auditoriaEfetiva]);
+      if (!terminou) await page.waitForTimeout(espera);
     };
     const urlDa = (vista, sobrepor = {}) => {
       const alvos = sobrepor.selecionadas ?? selecionadas;
@@ -455,12 +670,27 @@ export async function olharBancada({
     const dicas = criarDicas();
     const anotarDica = (chave, texto, vista = null) => dicas.anotar(chave, texto, vista);
     let pecaRelatada = null;
+    progresso.total = vistas.length;
+    let dadoDaChamada = null;
     for (const [indice, vista] of vistas.entries()) {
+      progresso.vista = vista;
       const url = urlDa(vista);
-      const tentativaDeAbertura = await abrirComRepeticao(url);
-      garantirPrazo();
-      if (tentativaDeAbertura > 1) registrar(relato, logger, 'stdout', `ferramenta: ${vista} abriu após repetição automática`);
-      const dado = await page.evaluate(() => {
+      /* a primeira vista de uma página é a que a abre; as seguintes só trocam a câmera */
+      const primeiraDaPagina = paginaNova && cargasDePagina === 0;
+      if (primeiraDaPagina) {
+        const tentativaDeAbertura = await abrirComRepeticao(url);
+        garantirPrazo();
+        if (tentativaDeAbertura > 1) registrar(relato, logger, 'stdout', `ferramenta: ${vista} abriu após repetição automática`);
+      } else {
+        progresso.etapa = 'trocar a vista na página aberta';
+        await page.evaluate((alvo) => {
+          window.__modelarQuadros?.retomar();
+          window.__mecanificaBancada.ambiente().definirVista(alvo, { instantaneo: true });
+        }, vista);
+      }
+      progresso.etapa = 'ler o estado da bancada';
+      /* o que se lê da peça não muda de uma vista para a seguinte da mesma chamada */
+      const dado = dadoDaChamada ?? await page.evaluate(() => {
         const b = window.__mecanificaBancada;
         return {
           ready: b.ready,
@@ -472,6 +702,7 @@ export async function olharBancada({
           estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null,
         };
       });
+      dadoDaChamada = dado;
       if (!dado.ready) {
         registrar(relato, logger, 'stderr', `\nBANCADA NÃO SUBIU\n  ${dado.erro}\n  ${url}`);
         falhou = true;
@@ -488,8 +719,10 @@ export async function olharBancada({
         registrar(relato, logger, 'stdout', `peça: ${dado.peca}`);
         registrar(relato, logger, 'stdout', `partes (${dado.partes.length}): ${dado.partes.join(', ')}`);
         registrar(relato, logger, 'stdout', `malha: ${dado.estatisticas.facesNeutras} faces, ${dado.estatisticas.triangulos} triângulos, ${semParte} sem identidade`);
-        if (dado.selecaoIgnorada.length) {
-          registrar(relato, logger, 'stderr', `\nNOME DE PARTE INEXISTENTE: ${dado.selecaoIgnorada.join(', ')}\n  a peça expõe: ${dado.partes.join(', ')}`);
+        /* a ponte confere os nomes que a URL da subida trouxe; numa página reaproveitada a seleção veio de fora da URL, e a conferência é daqui */
+        const selecaoIgnorada = paginaNova ? dado.selecaoIgnorada : selecionadas.filter((nome) => !dado.partes.includes(nome));
+        if (selecaoIgnorada.length) {
+          registrar(relato, logger, 'stderr', `\nNOME DE PARTE INEXISTENTE: ${selecaoIgnorada.join(', ')}\n  a peça expõe: ${dado.partes.join(', ')}`);
           falhou = true;
           falhasRelatadas.push({ categoria: 'modelo', codigo: 'parte_inexistente', vista: null, mensagem: 'A seleção pediu parte que a peça não publica.', acao: 'Corrija o nome semântico; não substitua por índice ou UUID.' });
           break;
@@ -523,7 +756,8 @@ export async function olharBancada({
           falhasRelatadas.push({ categoria: 'camera', codigo: 'par_sem_vista_legivel', vista: vistaRelatada, mensagem: 'Nenhuma vista canônica mostrou as duas partes com leitura suficiente.', acao: 'Escolha uma vista explicitamente ou revise a peça; a ferramenta não moverá componentes.' });
         }
       }
-      if (focar) {
+      /* Numa página já em auditoria o foco desta posição seria refeito logo abaixo pelo enquadramento da auditoria, que o repete. */
+      if (focar && (primeiraDaPagina || !auditoriaEfetiva)) {
         /* Depois da escolha de vista, e não em vez dela: a vista decide de ONDE
            olhar, o foco decide de QUÃO PERTO. São perguntas diferentes.
            No par, o foco é no CONTATO e não na união — a união de duas partes
@@ -558,7 +792,8 @@ export async function olharBancada({
          mexe no tamanho do canvas (o cromo sai e o desenho ocupa tudo), e mudar
          isso depois da espera capturaria o quadro do layout velho. */
       if (auditoriaEfetiva) {
-        legendaDeAuditoria = await page.evaluate(
+        /* O modo de auditoria, as cores, o arame e a seleção valem para todas as vistas da chamada: ficam da primeira. */
+        if (indice === 0) legendaDeAuditoria = await page.evaluate(
           ([cores, ar]) => window.__mecanificaBancada.auditoria({ cores, arame: ar }),
           [coresPorParte, arame],
         );
@@ -572,7 +807,8 @@ export async function olharBancada({
            refeito com ela — levando junto a seleção que a URL tinha pedido. Em
            auditoria isso aparecia como uma imagem sem foco e sem fantasma, com o
            argumento aceito e ignorado em silêncio. */
-        if (selecionadas.length) {
+        /* numa página reaproveitada a seleção anterior precisa sair, e por isso a ordem vai também com a lista vazia */
+        if (indice === 0 && (selecionadas.length || !paginaNova)) {
           await page.evaluate(([nomes, m]) => {
             window.__mecanificaBancada.selecionar(nomes);
             window.__mecanificaBancada.modo(m);
@@ -591,10 +827,19 @@ export async function olharBancada({
           await page.evaluate(() => window.__mecanificaBancada.enquadrar());
         }
       }
-      await page.waitForTimeout(espera);
+      if (primeiraDaPagina) {
+        progresso.etapa = 'esperar a página assentar';
+        await page.waitForTimeout(espera);
+        await pararQuadros();
+      } else {
+        await aguardarCameraQuieta();
+      }
       garantirPrazo();
-      const urlReproduzivel = await page.evaluate(() => window.__mecanificaBancada.url());
-      const enquadramento = await page.evaluate(() => window.__mecanificaBancada.enquadramento());
+      progresso.etapa = 'medir o enquadramento';
+      const { url: urlReproduzivel, enquadramento } = await page.evaluate(() => {
+        const b = window.__mecanificaBancada;
+        return { url: b.url(), enquadramento: b.enquadramento() };
+      });
       /* Silhueta claramente vertical num quadro deitado: a peça cabe pela
          altura e sobra fundo dos dois lados. O enquadramento está CERTO — quem
          está errado é a proporção do quadro —, então isto é dica, não falha:
@@ -624,16 +869,19 @@ export async function olharBancada({
         ...(resultadoPar ? { inspecaoDePar: { partes: resultadoPar.partes, vistaEscolhida: resultadoPar.vistaEscolhida, pixels: resultadoPar.pixels, legivel: resultadoPar.legivel } } : {}),
       });
       pecaRelatada = dado.peca;
+      progresso.etapa = 'fotografar a vista';
       if (capturarEmMemoria) {
         const dados = await fotografar();
         garantirPrazo();
+        progresso.feitas += 1;
         capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
       } else {
         const apelidoEfetivo = apelidoDeArquivo(peca ?? dado.peca);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-${vista}${sufixo}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        writeFileSync(arquivo, await fotografar());
+        await fotografarParaArquivo(arquivo);
+        progresso.feitas += 1;
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
         if (legendaDeAuditoria?.cores) {
           const legenda = legendaDeAuditoria.legenda.map((e) => `${e.parte}=${e.cor}`).join(' ');
@@ -670,10 +918,15 @@ export async function olharBancada({
     if (!falhou && !listar && !par && paresAcusados.length && !capturarEmMemoria) {
       const doTeto = paresAcusados.slice(0, TETO_DE_PARES_POR_CHAMADA);
       const excedente = paresAcusados.length - doTeto.length;
+      progresso.total += doTeto.length;
       registrar(relato, logger, 'stdout',
         `\npares acusados pela medida (${paresAcusados.length}): capturando ${doTeto.length}`
         + `${excedente > 0 ? `, ${excedente} além do teto de ${TETO_DE_PARES_POR_CHAMADA}` : ''}`);
       for (const alvo of doTeto) {
+        /* Esta imagem recarrega a página: a seleção e o isolamento do par vêm da URL, como sempre vieram, e a inspeção mede os
+           pixels de cada vista com a interface ainda ligada. Reusar a página de uma vista em auditoria mudaria essa medida. */
+        progresso.vista = `par ${alvo.join(' + ')}`;
+        paginaSuja = true;
         const urlPar = urlDa('isometrica', { selecionadas: alvo, modo: 'isolar' });
         await abrirComRepeticao(urlPar);
         garantirPrazo();
@@ -700,16 +953,22 @@ export async function olharBancada({
         }, [alvo]);
         const contato = await page.evaluate((partes) => window.__mecanificaBancada.focarContato(partes), alvo);
         await page.waitForTimeout(espera);
+        await pararQuadros();
         garantirPrazo();
         const apelidoEfetivo = apelidoDeArquivo(peca ?? pecaRelatada);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-par-${alvo.map(apelidoDeArquivo).join('+')}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        writeFileSync(arquivo, await fotografar());
+        await fotografarParaArquivo(arquivo);
+        progresso.feitas += 1;
         paresCapturados.push({ par: alvo, vista: inspecao.vistaEscolhida, arquivo, enquadrado: Boolean(contato?.valida) });
         registrar(relato, logger, 'stdout',
           `  ${alvo.join(' ↔ ')} (${inspecao.vistaEscolhida})${contato?.valida ? '' : ' — sem foco de contato'}: ${arquivo}`);
       }
     }
+
+    progresso.etapa = 'reduzir e gravar as imagens';
+    await Promise.all(gravacoes);
+    garantirPrazo();
 
     /* A DICA QUE SÓ EXISTE SE TIVER O QUE DIZER. O plano que abriu esta rodada
        classificou a dica como a mais fraca das três defesas, e ela só se paga
@@ -752,7 +1011,7 @@ export async function olharBancada({
     }
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
-      paresAcusados, paresCapturados,
+      paresAcusados, paresCapturados, cargasDePagina,
       dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
     };
@@ -762,16 +1021,27 @@ export async function olharBancada({
     };
   } catch (erro) {
     if (expirou || erro?.codigo === 'tempo_esgotado') {
-      resposta = erroEstruturado({ relato, erro: erroDeTempo(Number(timeoutMs)), resultado: { falhas: falhasRelatadas } });
+      /* O prazo global derruba a chamada em curso com um erro de página fechada; a mensagem que vale é a do prazo, com a etapa em
+         que ele venceu. O prazo de carga já traz a própria. */
+      const doPrazo = expirou ? erroDeTempo(Number(timeoutMs), progressoDoPrazo ?? progresso) : erro;
+      resposta = erroEstruturado({ relato, erro: doPrazo, resultado: { falhas: falhasRelatadas, progresso: { ...progresso } } });
       resposta.erro.codigo = 'tempo_esgotado';
     } else {
       resposta = erroEstruturado({ relato, erro, resultado: { falhas: falhasRelatadas } });
     }
   } finally {
     if (temporizador) clearTimeout(temporizador);
+    await Promise.allSettled(gravacoes);
     const limpezaForcada = encerramentoForcado ? await encerramentoForcado : [];
-    const limpeza = [...limpezaForcada, ...await fecharRecursos({ browser, vite })];
-    if (sessaoDaCaptura) rmSync(sessaoDaCaptura, { force: true });
+    if (page && guardarErroDaPagina && typeof page.off === 'function') page.off('pageerror', guardarErroDaPagina);
+    /* a página fica para a chamada seguinte só se esta terminou sem falha nem prazo e não a deixou em outro estado */
+    const deixarAberta = Boolean(compartilhada && page && !paginaSuja && !expirou && resposta?.ok && reaproveitavelDaChamada);
+    if (deixarAberta) compartilhada.pagina = { page, chave: chaveDaPaginaDaChamada };
+    const limpeza = [
+      ...limpezaForcada,
+      ...await fecharRecursos({ browser, vite, pagina: deixarAberta ? null : page, proprios: !compartilhada }),
+    ];
+    if (sessaoDaCaptura && !compartilhada) rmSync(sessaoDaCaptura, { force: true });
     if (limpeza.length) {
       resposta ??= erroEstruturado({ relato, erro: new Error('A bancada falhou ao fechar seus recursos.') });
       resposta.ok = false;
