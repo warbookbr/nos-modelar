@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1487 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1489 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2020,6 +2020,8 @@
 
 - `seletor.mjs` — seletor.mjs — decide o que cada gate precisa rodar, comparando o repositório de agora com o da última vez que o gate passou.
 - `seletor.test.mjs` — seletor.test.mjs — o gate roda só se algo do que ele lê mudou desde a última rodada verde, e os testes vão pelo grafo de imports só quando tudo o que mudou é…
+- `vigia.mjs` — vigia.mjs — o vigia contínuo: um processo em segundo plano que roda os gates que a edição afeta enquanto o trabalho acontece.
+- `vigia.test.mjs` — vigia.test.mjs — o vigia junta uma rajada de gravações numa rodada, cancela e recomeça quando um arquivo muda no meio, e o verde que ele grava faz o seletor …
 
 ## tools/mapa/
 

@@ -278,7 +278,9 @@ function limiteDeConcorrencia() {
 
 const ambienteDosGates = {};
 
-function rodarGate(gate, { silencioso, testes = null }) {
+/* `sinal` (opcional) cancela o gate: o grupo de processos inteiro recebe SIGTERM e o resultado volta com `cancelado`, sem deixar
+   saída guardada. Quem não passa `sinal` (a bateria) tem o comportamento de sempre. */
+export function rodarGate(gate, { silencioso, testes = null, sinal = null }) {
   return new Promise((resolver) => {
     const inicio = Date.now();
     /* Os arquivos de teste que o seletor ligou ao que mudou vão por arquivo, porque a lista pode ser longa para o ambiente. */
@@ -291,12 +293,20 @@ function rodarGate(gate, { silencioso, testes = null }) {
     }
     /* `shell: true` porque no Windows `npm` é um .cmd; sem isso o spawn não
        encontra o executável e todo gate "falha" pelo motivo errado. */
-    const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true, env: ambienteDoGate });
+    const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true, env: ambienteDoGate, detached: Boolean(sinal) && process.platform !== 'win32' });
+    let cancelado = false;
+    const cancelar = () => {
+      cancelado = true;
+      try { if (process.platform === 'win32' || !processo.pid) processo.kill('SIGTERM'); else process.kill(-processo.pid, 'SIGTERM'); } catch { /* já terminou */ }
+    };
+    if (sinal) { if (sinal.aborted) cancelar(); else sinal.addEventListener('abort', cancelar, { once: true }); }
     const pedacos = [];
     processo.stdout.on('data', (d) => pedacos.push(d));
     processo.stderr.on('data', (d) => pedacos.push(d));
     processo.on('close', (status) => {
+      sinal?.removeEventListener('abort', cancelar);
       const duracao = Date.now() - inicio;
+      if (cancelado) { resolver({ gate, codigo: status ?? 1, duracao, arquivo: null, lentos: null, cancelado: true }); return; }
       const codigo = status ?? 1;
       const saida = Buffer.concat(pedacos).toString();
       const arquivo = guardarSaidaDoGate(gate, saida, codigo);

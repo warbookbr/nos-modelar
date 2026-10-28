@@ -89,6 +89,7 @@
     "vincos-das-linhas": "node tools/mecanifica/vincos-das-linhas.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
     "gates": "node tools/gates.mjs",
+    "gates:vigiar": "node tools/gates/vigia.mjs",
     "mcp:visual:check": "node -e \"process.env.MCP_VISUAL_REAL='1';require('child_process').execSync('npm run mcp:check',{stdio:'inherit',env:process.env})\"",
     "docs:citacoes": "node tools/mapa/citacoes.mjs",
     "docs:citacoes:check": "node tools/mapa/citacoes.mjs --check",
