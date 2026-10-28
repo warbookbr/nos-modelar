@@ -54,8 +54,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run test:rapidos
         env:
-          # O segredo novo vale quando existir; até lá o antigo cobre, e o nome antigo da variável também é aceito pelo código.
-          MODELAR_CHAVE_TERMOS: ${{ secrets.MODELAR_CHAVE_TERMOS || secrets.MECANIFICA_CHAVE_TERMOS }}
+          MODELAR_CHAVE_TERMOS: ${{ secrets.MODELAR_CHAVE_TERMOS }}
 
       - name: Firewall entre núcleo e catálogo
         if: ${{ !cancelled() }}

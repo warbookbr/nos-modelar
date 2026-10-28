@@ -202,7 +202,6 @@ describe('as exceções reais, num repositório de ensaio', () => {
       [`docs${B}modelar/banco-de-provas/rodada/nota.md`]: `/home/user/nos-${m}\n`,
       'tools/ambiente.mjs': `export const nomeAntigo = (s) => \`${A}_\${s}\`;\n`,
       '.codex/config.toml': `[mcp_servers.${m}]\n`,
-      '.github/workflows/ci.yml': `          MODELAR_CHAVE_TERMOS: \${{ secrets.MODELAR_CHAVE_TERMOS || secrets.${A}_CHAVE_TERMOS }}\n`,
       'tools/blender/ambiente.py': `def do_ambiente(sufixo):\n    return os.environ.get('${A}_' + sufixo)\n`,
     });
     expect(verificarNomeAntigo(raiz).filter((x) => !x.startsWith('exceção sem uso'))).toEqual([]);

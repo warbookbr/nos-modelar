@@ -54,7 +54,6 @@ export const EXCECOES_POR_TEXTO = [
   { categoria: 'repositório de outra pessoa', padrao: /brigsd\/nos-mecanifica(?![\w-])/, motivo: 'nome do repositório upstream, que é de outra pessoa e continua com esse nome' },
   { categoria: 'aviso de leitura', padrao: /MECANIFICA_[A-Z0-9_]*/, em: /^tools\/blender\/ambiente\.py$/, motivo: 'o do_ambiente dos scripts Python lê o nome antigo de propósito, com aviso, até o fechamento do plano seguinte ao da renomeação' },
   { categoria: 'prova do aviso', padrao: /MECANIFICA_[A-Z0-9_]*/, em: /^tools\/(?:mcp\/(?:mcp|catalogo-montagens|universo-dependencias)|modelar\/(?:uso|diario)|testes-lentos|arquitetura\/termos-proibidos|blender\/(?:blender|ambiente-python))\.test\.mjs$/, motivo: 'testes que passam o nome antigo de propósito para provar que ele ainda vale com aviso; saem junto com o aviso' },
-  { categoria: 'aviso de leitura', padrao: /secrets\.MECANIFICA_[A-Z][A-Z0-9_]*/, em: /^\.github\/workflows\/ci\.yml$/, motivo: 'o passo que aceita o segredo antigo do CI enquanto a pessoa não o troca' },
 ];
 
 /* O que seria renomeável por um plano próprio, e o que custa. A régua não decide: só registra a recomendação. */
