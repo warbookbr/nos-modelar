@@ -2,13 +2,13 @@
 
 Medidas do [roteiro](ROTEIRO.md). Os agentes foram de uso geral, do mesmo modelo da sessão que conduziu, cada um numa cópia de trabalho própria.
 
-## Antes, 2026-10-25, commit c63295c8
+## Antes, 2026-10-25, commit b97a67b9
 
 Na tarefa de corrigir, a IA leu 43.740 bytes de texto em 9 chamadas até o primeiro passo, que foi o 10º turno, com 69.784 tokens de contexto nesse turno. Ela rodou o `comecar -- mudar`, leu o `INDEX.md` e o índice dos planos, a operação, a implementação e o teste, viu o teste falhar e corrigiu o sinal. A cópia ficou igual ao commit de base, sem erro dos gates nem desvio. O trabalho todo levou 20 turnos, 1,32 milhão de tokens de entrada somada e 5 mil de saída. Uma primeira tentativa, com o defeito fora de commit, foi descartada, porque a IA o achou pelo `git diff` sem ler nada.
 
 Na tarefa de modelar, a IA leu 158.796 bytes de texto em 27 chamadas até o primeiro passo, que foi o 26º turno, com 130.403 tokens de contexto nesse turno. Até ali ela rodou o `comecar -- modelar/peca` e leu as skills do laço de modelagem e de criar peça, o documento das famílias, partes dos guias de autoria, de parâmetros vivos e de parada, a família de aparelhos inteira, três receitas do acervo como exemplo, o README da textura e o código de chamada de família. O trabalho todo levou 78 turnos, 11,2 milhões de tokens de entrada somada, 41 mil de saída e 6 imagens abertas. A peça saiu pela família, com as medidas pedidas, e o crítico deu nota 8, com a fresta de 1 a 1,5 mm entre a porta e o corpo como defeito. `npm run malha:conferir` reprova a peça com 9 faces finas. `npm run gates` na cópia falhou só no que não é da IA: o orçamento de leitura do roteiro de documentar, que o commit de base passava por 10 bytes, e o porteiro e as vistas, porque a cópia tinha as dependências num link simbólico. Os dois defeitos vêm da família, e não da receita, e estão no backlog com o terceiro que a IA achou, o contato não decidido entre partes fundidas.
 
-## Depois, 2026-10-25, commit e11e6643
+## Depois, 2026-10-25, commit eb455a1b
 
 Na tarefa de corrigir, a IA leu 34.029 bytes de texto em 6 chamadas até o primeiro passo, que foi o 7º turno, com 63.497 tokens de contexto nesse turno, 22% menos que antes. Ela rodou o `comecar -- mudar`, leu o `INDEX.md` e o índice dos planos, que o ramo manda ler e somam 14.878 bytes sem servir a uma correção pontual, depois a operação, o teste e a implementação, viu o teste falhar e corrigiu o sinal. A cópia ficou igual ao commit de base, sem desvio. O trabalho todo levou 11 turnos, 646 mil tokens de entrada somada e 3 mil de saída.
 
@@ -16,7 +16,7 @@ Na tarefa de modelar, a IA leu 120.722 bytes de texto em 29 chamadas até o prim
 
 O gate 1 não passa: a leitura caiu 22% e 24%, contra os 60% pedidos. Os erros não cresceram na correção; na modelagem os defeitos são os mesmos três da família que já estão no backlog, mais o visor, que vem de um critério que o projeto não consegue cumprir.
 
-## Depois, de novo, 2026-10-27, commit f801b942
+## Depois, de novo, 2026-10-27, commit a215891d
 
 Depois da fatia 10, que separou o ramo de correção de defeito e deu ao ramo de peça de família um exemplo executado, as duas tarefas foram refeitas por IAs novas.
 
