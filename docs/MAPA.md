@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1510 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1512 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1813,6 +1813,8 @@
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.
 - `mapear-motor-procedural.test.mjs` — Guarda que o mapa R00 continue descrevendo a fachada procedural real.
 - `navegador-sem-node.test.mjs` — navegador-sem-node.test.mjs — o código que a bancada publicada empacota não importa módulo do Node. Em 2026-10-15 as famílias `movel-de-caixa`, `dobradica` e…
+- `nome-antigo.mjs` — nome-antigo.mjs — o nome antigo do projeto não aparece em arquivo rastreado, fora das exceções declaradas.
+- `nome-antigo.test.mjs` — nome-antigo.test.mjs — a régua que recusa o nome antigo do projeto, conferida em repositórios de ensaio (git init numa pasta temporária), e não no repositóri…
 - `nucleo-sem-three.mjs` — nucleo-sem-three.mjs — o núcleo de autoria é independente de Three.js.
 - `nucleo-sem-three.test.mjs` — nucleo-sem-three.test.mjs — o invariante "o núcleo de autoria é independente de Three.js", conferido por máquina: o núcleo real não importa Three.js, e um ar…
 - `termos-proibidos.mjs` — termos-proibidos.mjs — normalização e varredura do gate de vazamento (termos proibidos e malha ou cena no índice).

@@ -109,6 +109,7 @@
     "guarda:gesto": "node tools/modelar/guardas/guarda-gesto.mjs",
     "guarda:edicao": "node tools/modelar/guardas/guarda-edicao-de-malha.mjs",
     "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs",
+    "nome:check": "node tools/arquitetura/nome-antigo.mjs",
     "contorno": "node tools/modelar/contorno-da-imagem.mjs",
     "esboco": "node tools/modelar/esboco.mjs",
     "contorno:prancha": "node tools/modelar/prancha/prancha-dos-contornos.mjs",
