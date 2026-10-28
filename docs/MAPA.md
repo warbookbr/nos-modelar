@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1508 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1510 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1794,6 +1794,8 @@
 ## tools/
 
 - `README.md` — tools/ — ferramentas do Modelar e do núcleo herdado
+- `ambiente.mjs` — ambiente.mjs — lê uma variável de ambiente pelo nome novo (`MODELAR_*`) e aceita o antigo (`MECANIFICA_*`) com aviso.
+- `ambiente.test.mjs` — ambiente.test.mjs — o nome novo vale, o antigo vale com um aviso só por nome, e o vazio conta como ausente.
 - `gates.mjs` — gates.mjs — roda TODOS os gates e relata TODOS, em vez de parar no primeiro.
 - `testes-lentos.mjs` — testes-lentos.mjs — a lista dos arquivos de teste que saem da bateria padrão, e o comando que roda cada uma das duas.
 - `testes-lentos.test.mjs` — testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa.
