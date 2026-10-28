@@ -5,7 +5,17 @@
  * entrega espaço entre as partes passava com código zero, e foi assim que uma
  * bicicleta saiu com os balancos soltos no ar sem nada acusar. Declarar um
  * contato é prometer geometria; promessa não cumprida é defeito, não folga.
- */
+ *
+ * TEMPO (plano da bateria rápida, fatia 1, 2026-10-28). A varredura do acervo (o caso 'a guarda varre o acervo e o acervo de hoje
+ * passa') levava 118 s sozinha (143 s medida em 2026-10-28, com outra bateria na máquina) e agora leva 31 s e 31 s em duas medidas
+ * seguidas, com carga de 2 a 5 em 4 processadores. O perfil de CPU mostrou o tempo em três lugares, e nenhum é uma conferência: a
+ * medida de contato refazia a conta de cada triângulo para cada ponto amostrado (`src/autoria/contato-de-solidos.js`; a equivalência
+ * com a conta de antes está em `contato-de-solidos-equivalencia.test.mjs`), o núcleo serializava a malha inteira duas vezes por passo
+ * para dizer à procedência o que o passo mudou (`retratarEntradas`; `procedural/nucleo/retrato-de-passo.test.mjs`), e as 54 peças
+ * eram medidas uma depois da outra, sendo independentes (`conferirAcervo` reparte as peças entre fios de trabalho, na ordem delas).
+ * Continua conferindo o que conferia: o veredito de contato nas duas faces, o plano, as referências, a cadeia da receita, o id
+ * posicional, as portas e que o acervo de hoje passa inteiro, com a mesma recusa e a mesma mensagem. O resultado da medida de cada peça
+ * (a saída de `descreverPecaReutilizavel`) é idêntico ao de antes nas 54 peças do acervo, verificado com um hash do resultado. */
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';

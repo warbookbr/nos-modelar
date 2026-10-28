@@ -23,8 +23,11 @@
  * dos três pontos e a data, e as camadas do crítico e da pessoa vazias (`null`). Reaprovar uma geometria diferente
  * esvazia o que o crítico e a pessoa tinham julgado, porque eles julgaram outra forma. Quem confere depois é
  * `conferirAprovacao` (o gate `familias:check`): o hash dos três pontos tem de continuar batendo. */
+import { fork } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { availableParallelism } from 'node:os';
 import { basename, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { analisarTopologia } from '../../procedural/nucleo/topologia.js';
 import {
   REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes, expandirChamadasDeComposicao, neutroCanonico,
@@ -360,7 +363,8 @@ function pontoGravado(ponto) {
  * falso). Devolve `{ aprovada, familia, pontos, varredura, problemas, gravada, esvaziou }`. `data` é o dia da aprovação
  * (padrão: hoje). Quem chama escolhe a pasta; o gate usa `procedural/familias/<id>`.
  */
-export function aprovarFamilia(familia, { pasta = null, data = null, gravar = true } = {}) {
+export function aprovarFamilia(familia, { pasta = null, data = null, gravar = true, medidor = null } = {}) {
+  const medir = medidor ?? ((parametros, rotulo, opcoes) => medirPonto(familia, parametros, rotulo, opcoes));
   const problemas = [];
   const id = familia?.contrato?.id;
   try {
@@ -369,27 +373,27 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
     return { aprovada: false, familia: id ?? null, pontos: {}, varredura: [], problemas: [problema('contrato-invalido', erro.message)], gravada: false, esvaziou: false };
   }
   const definidos = pontosDaFamilia(familia.contrato);
-  const pontos = Object.fromEntries(NOMES_DOS_PONTOS.map((nome) => [nome, medirPonto(familia, definidos[nome], nome)]));
+  const pontos = Object.fromEntries(NOMES_DOS_PONTOS.map((nome) => [nome, medir(definidos[nome], nome)]));
   for (const ponto of Object.values(pontos)) {
     if (ponto.estado === 'recusa-declarada') {
       problemas.push({ ponto: ponto.rotulo, ...problema('ponto-aprovado-recusado', `o ponto '${ponto.rotulo}' é recusado pela restrição '${ponto.restricao}': ${ponto.motivo}`) });
     }
     for (const p of ponto.problemas) problemas.push({ ponto: ponto.rotulo, ...p });
   }
-  const varredura = varreduraDaFamilia(familia.contrato).map((sonda) => ({ ...medirPonto(familia, sonda.parametros, sonda.rotulo, { montagem: 'nenhuma' }), parametro: sonda.parametro, extremo: sonda.extremo }));
+  const varredura = varreduraDaFamilia(familia.contrato).map((sonda) => ({ ...medir(sonda.parametros, sonda.rotulo, { montagem: 'nenhuma' }), parametro: sonda.parametro, extremo: sonda.extremo }));
   for (const ponto of varredura) {
     for (const p of ponto.problemas) problemas.push({ ponto: `varredura ${ponto.rotulo}`, ...p });
   }
   /* os perfis: cada um é uma chamada que a família tem de aceitar e medir como um dos três pontos, e a escala deles varre o
      diâmetro; a recusa por restrição declarada vale nas sondas de escala, e no ponto do perfil reprova */
-  const perfis = Object.fromEntries(Object.entries(pontosDosPerfis(familia.contrato)).map(([nome, parametros]) => [nome, medirPonto(familia, parametros, `perfil ${nome}`)]));
+  const perfis = Object.fromEntries(Object.entries(pontosDosPerfis(familia.contrato)).map(([nome, parametros]) => [nome, medir(parametros, `perfil ${nome}`)]));
   for (const ponto of Object.values(perfis)) {
     if (ponto.estado === 'recusa-declarada') {
       problemas.push({ ponto: ponto.rotulo, ...problema('ponto-aprovado-recusado', `o ${ponto.rotulo} é recusado pela restrição '${ponto.restricao}': ${ponto.motivo}`) });
     }
     for (const p of ponto.problemas) problemas.push({ ponto: ponto.rotulo, ...p });
   }
-  const escalas = escalasDosPerfis(familia.contrato).map((sonda) => ({ ...medirPonto(familia, sonda.parametros, sonda.rotulo, { montagem: 'nenhuma' }), perfil: sonda.perfil, parametro: sonda.parametro, extremo: sonda.extremo }));
+  const escalas = escalasDosPerfis(familia.contrato).map((sonda) => ({ ...medir(sonda.parametros, sonda.rotulo, { montagem: 'nenhuma' }), perfil: sonda.perfil, parametro: sonda.parametro, extremo: sonda.extremo }));
   for (const ponto of escalas) {
     for (const p of ponto.problemas) problemas.push({ ponto: `escala ${ponto.rotulo}`, ...p });
   }
@@ -426,6 +430,78 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
   };
   writeFileSync(join(pasta, ARQUIVO_APROVACAO), `${JSON.stringify(aprovacao, null, 2)}\n`, 'utf8');
   return { ...resultado, gravada: true, esvaziou: Boolean(anterior) && !mesmaGeometria && Boolean(anterior.critico || anterior.pessoa) };
+}
+
+/** As medições que `aprovarFamilia` pede, na ordem em que as pede: os três pontos, a varredura, os perfis e a escala deles. */
+export function medicoesDaAprovacao(contrato) {
+  const definidos = pontosDaFamilia(contrato);
+  return [
+    ...NOMES_DOS_PONTOS.map((nome) => ({ parametros: definidos[nome], rotulo: nome, opcoes: undefined })),
+    ...varreduraDaFamilia(contrato).map((sonda) => ({ parametros: sonda.parametros, rotulo: sonda.rotulo, opcoes: { montagem: 'nenhuma' } })),
+    ...Object.entries(pontosDosPerfis(contrato)).map(([nome, parametros]) => ({ parametros, rotulo: `perfil ${nome}`, opcoes: undefined })),
+    ...escalasDosPerfis(contrato).map((sonda) => ({ parametros: sonda.parametros, rotulo: sonda.rotulo, opcoes: { montagem: 'nenhuma' } })),
+  ];
+}
+
+const chaveDaMedicao = (parametros, rotulo, opcoes) => JSON.stringify([parametros, rotulo, opcoes ?? null]);
+
+/**
+ * O mesmo que `aprovarFamilia`, com os pontos medidos ao mesmo tempo em `fios` processos. Os pontos não dependem uns dos outros
+ * (cada um executa a família duas vezes e confere o resultado), e a aprovação de uma família grande levava de 30 a 80 s num
+ * processo só. Cada processo carrega a família de `origem` ({ modulo: URL do módulo, exportacao: nome do export }), porque a família
+ * tem funções e não atravessa a fronteira de um processo. O resultado é o de `aprovarFamilia`: a medição de cada ponto é determinística
+ * e a montagem do resultado é a mesma função, na mesma ordem. Sem `origem` ou com um fio só, mede no próprio processo.
+ */
+export async function aprovarFamiliaEmParalelo(familia, { origem = null, fios = Math.min(availableParallelism(), 4), ...opcoes } = {}) {
+  try { lerFamilia(familia.contrato); } catch { return aprovarFamilia(familia, opcoes); }
+  if (!origem || fios < 2) return aprovarFamilia(familia, opcoes);
+  const medicoes = medicoesDaAprovacao(familia.contrato);
+  const resultados = new Map();
+  const fila = medicoes.map((m, indice) => ({ ...m, indice }));
+  const guardar = (indice, resultado) => {
+    const { parametros, rotulo, opcoes: o } = medicoes[indice];
+    resultados.set(chaveDaMedicao(parametros, rotulo, o), resultado);
+  };
+  const processos = [];
+  /* o processo de quem chama também mede, entre uma mensagem e outra dos outros, e já tem a família carregada: os `fios` contam ele */
+  const proprio = (async () => {
+    for (let proxima = fila.shift(); proxima; proxima = fila.shift()) {
+      guardar(proxima.indice, medirPonto(familia, proxima.parametros, proxima.rotulo, proxima.opcoes));
+      await new Promise((continuar) => setImmediate(continuar));
+    }
+  })();
+  const dosOutros = new Promise((resolver, rejeitar) => {
+    let ativos = 0;
+    const terminou = (erro) => { if (erro) { for (const p of processos) p.kill(); rejeitar(erro); } };
+    const dar = (processo) => {
+      const proxima = fila.shift();
+      if (!proxima) { processo.emTrabalho = null; processo.kill(); return; }
+      processo.emTrabalho = proxima.indice;
+      processo.send(proxima);
+    };
+    const quantos = Math.min(Math.max(1, fios - 1), fila.length);
+    ativos = quantos;
+    for (let n = 0; n < quantos; n++) {
+      const processo = fork(fileURLToPath(new URL('./aprovacao-da-familia-fio.mjs', import.meta.url)), [origem.modulo, origem.exportacao], { serialization: 'advanced', stdio: ['ignore', 'inherit', 'pipe', 'ipc'] });
+      processo.erroEscrito = '';
+      processo.stderr.on('data', (pedaco) => { processo.erroEscrito = `${processo.erroEscrito}${pedaco}`.slice(-1500); });
+      processos.push(processo);
+      processo.on('message', (mensagem) => {
+        if (mensagem.erro) { terminou(new Error(`medição ${medicoes[mensagem.indice].rotulo}: ${mensagem.erro}`)); return; }
+        guardar(mensagem.indice, mensagem.resultado);
+        processo.emTrabalho = null;
+        dar(processo);
+      });
+      processo.on('exit', (codigo, sinal) => {
+        if (processo.emTrabalho !== null && processo.emTrabalho !== undefined) terminou(new Error(`o processo de medição terminou (código ${codigo}, sinal ${sinal}) com a medição ${medicoes[processo.emTrabalho].rotulo} na mão${processo.erroEscrito ? `:\n${processo.erroEscrito}` : ''}`));
+        ativos -= 1;
+        if (ativos === 0) resolver();
+      });
+      dar(processo);
+    }
+  });
+  try { await Promise.all([proprio, dosOutros]); } finally { for (const p of processos) p.kill(); }
+  return aprovarFamilia(familia, { ...opcoes, medidor: (parametros, rotulo, o) => resultados.get(chaveDaMedicao(parametros, rotulo, o)) });
 }
 
 /**

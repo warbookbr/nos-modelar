@@ -30,9 +30,12 @@ function prepararReceita(modulo, {
   orcamentoComposicoes = null,
 } = {}) {
   validarReceita(modulo);
+  /* `CHAMADAS_COMPOSICOES` pode ser um `get` que monta a chamada (e recusa) a cada leitura: lê-se uma vez aqui, depois da leitura
+     que `validarReceita` faz, e o valor serve às três vezes seguintes */
+  const chamadas = modulo.CHAMADAS_COMPOSICOES;
   let passos = modulo.PASSOS;
   let expansao = null;
-  if (Array.isArray(modulo.CHAMADAS_COMPOSICOES)) {
+  if (Array.isArray(chamadas)) {
     if (!registroComposicoes) {
       throw new TypeError(
         'receita: CHAMADAS_COMPOSICOES exige registroComposicoes explícito.',
@@ -40,7 +43,7 @@ function prepararReceita(modulo, {
     }
     expansao = expandirChamadasDeComposicao(
       registroComposicoes,
-      modulo.CHAMADAS_COMPOSICOES,
+      chamadas,
       orcamentoComposicoes ? { orcamento: orcamentoComposicoes } : {},
     );
     passos = expansao.passos;
@@ -62,7 +65,7 @@ function prepararReceita(modulo, {
   if (expansao) {
     entrada.COMPOSICAO = {
       registro: registroComposicoes.assinatura,
-      chamadas: modulo.CHAMADAS_COMPOSICOES,
+      chamadas,
     };
   }
   return { entrada, expansao };

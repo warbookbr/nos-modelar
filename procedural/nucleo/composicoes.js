@@ -137,9 +137,14 @@ export function criarRegistroComposicoes({ composicoes, resolverOperacao } = {})
     if (naoProduzidos.length) throw new ErroComposicaoProcedural(`composição '${composicao.id}' declara saída não produzida: ${naoProduzidos.join(', ')}`);
   }
   const manifesto = [...porId.values()].map((composicao) => copia(composicao)).sort((a, b) => comparar(a.id, b.id));
+  /* as composições guardadas só se leem daqui para a frente (`resolver` e `listar` devolvem cópia, `resolverParaLeitura` a própria): congeladas, a leitura sem cópia não tem como alterar o registro */
+  const congelar = (valor) => { if (valor && typeof valor === 'object' && !Object.isFrozen(valor)) { Object.values(valor).forEach(congelar); Object.freeze(valor); } return valor; };
+  for (const composicao of porId.values()) congelar(composicao);
   return Object.freeze({
     formato: FORMATO_COMPOSICAO_PROCEDURAL, assinatura: assinaturaDas(manifesto), manifesto: Object.freeze(manifesto),
     resolver(id, versaoDesejada = null) { const encontrada = porId.get(id) ?? null; return encontrada && (versaoDesejada == null || encontrada.versao === versaoDesejada) ? copia(encontrada) : null; },
+    /* a mesma composição, sem a cópia: para quem só a lê (a expansão), que não a altera */
+    resolverParaLeitura(id) { return porId.get(id) ?? null; },
     listar() { return Object.freeze(manifesto.map(copia)); },
   });
 }
@@ -181,7 +186,7 @@ export function expandirComposicao(registro, id, argumentos = {}, opcoes = {}) {
   const passos = [], proveniencia = [];
   const expandir = (composicaoId, entrada, caminho, profundidade) => {
     if (profundidade > limites.maxProfundidade) throw new ErroComposicaoProcedural(`orçamento excedido: profundidade máxima ${limites.maxProfundidade}`);
-    const composicao = registro.resolver(composicaoId);
+    const composicao = typeof registro.resolverParaLeitura === 'function' ? registro.resolverParaLeitura(composicaoId) : registro.resolver(composicaoId);
     if (!composicao) throw new ErroComposicaoProcedural(`composição ausente '${composicaoId}'`);
     const valores = valoresDosParametros(composicao, entrada, `chamada '${caminho}'`);
     for (const no of composicao.nos) {

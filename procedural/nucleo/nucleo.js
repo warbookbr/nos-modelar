@@ -3353,6 +3353,83 @@ function portasDoNucleo(portas) {
   }));
 }
 
+/* RETRATO DO ESTADO ENTRE DOIS PASSOS. A procedência de cada passo diz quais vértices e faces ele mudou, e para isso
+   compara o estado de antes com o de depois pela serialização de cada entrada. Serializar a malha inteira a cada passo era o
+   quadrado do tamanho da peça. O retrato guarda, para cada entrada, uma cópia do valor e a serialização dele; na vez
+   seguinte, a entrada cujo valor continua igual à cópia (mesmas chaves na mesma ordem, mesmos valores primitivos) reaproveita
+   a serialização, e só a que mudou é serializada de novo. Valor que não é dado simples (Map, função, `toJSON`) nunca
+   reaproveita nada, e a comparação em dúvida (NaN, por exemplo) conta como mudança, então o resultado é sempre o da
+   serialização direta. */
+const NAO_COPIAVEL = Symbol('nao-copiavel');
+const CHAVES = Symbol('chaves');
+function copiaSimples(valor) {
+  if (valor === null || typeof valor !== 'object') return typeof valor === 'function' || typeof valor === 'symbol' ? NAO_COPIAVEL : valor;
+  if (Array.isArray(valor)) {
+    const saida = new Array(valor.length);
+    for (let i = 0; i < valor.length; i += 1) {
+      const item = copiaSimples(valor[i]);
+      if (item === NAO_COPIAVEL) return NAO_COPIAVEL;
+      saida[i] = item;
+    }
+    return saida;
+  }
+  const proto = Object.getPrototypeOf(valor);
+  if ((proto !== Object.prototype && proto !== null) || typeof valor.toJSON === 'function') return NAO_COPIAVEL;
+  const saida = {};
+  const chaves = Object.keys(valor);
+  for (const chave of chaves) {
+    const item = copiaSimples(valor[chave]);
+    if (item === NAO_COPIAVEL) return NAO_COPIAVEL;
+    saida[chave] = item;
+  }
+  /* a ordem das chaves fica na própria cópia, sob um símbolo (que nem `Object.keys` nem `for...in` listam) */
+  saida[CHAVES] = chaves;
+  return saida;
+}
+function igualASimples(copia, valor) {
+  if (copia === valor) return true;
+  if (copia === null || valor === null || typeof copia !== 'object' || typeof valor !== 'object') return false;
+  if (Array.isArray(copia)) {
+    if (!Array.isArray(valor) || copia.length !== valor.length) return false;
+    for (let i = 0; i < copia.length; i += 1) {
+      const a = copia[i]; const b = valor[i];
+      if (a !== b && !igualASimples(a, b)) return false;
+    }
+    return true;
+  }
+  if (Array.isArray(valor)) return false;
+  const proto = Object.getPrototypeOf(valor);
+  if ((proto !== Object.prototype && proto !== null) || typeof valor.toJSON === 'function') return false;
+  /* as chaves de `valor`, na ordem de `for...in` (a de `Object.keys`, porque o protótipo é o dos objetos simples), contra as da cópia */
+  const chaves = copia[CHAVES];
+  let i = 0;
+  for (const chave in valor) {
+    if (i >= chaves.length || chaves[i] !== chave || !igualASimples(copia[chave], valor[chave])) return false;
+    i += 1;
+  }
+  return i === chaves.length;
+}
+export function retratarEntradas(mapa, anterior) {
+  const retrato = new Map();
+  for (const [id, valor] of mapa) {
+    const antigo = anterior?.get(id);
+    if (antigo !== undefined && antigo.copia !== NAO_COPIAVEL && igualASimples(antigo.copia, valor)) { retrato.set(id, antigo); continue; }
+    retrato.set(id, { copia: copiaSimples(valor), json: JSON.stringify(valor) });
+  }
+  return retrato;
+}
+
+/* Os ids cuja entrada do retrato `depois` difere da de `antes`, em ordem de id (a ordem que a procedência sempre teve). A entrada
+   que é o mesmo objeto nos dois retratos é a que `retratarEntradas` reaproveitou, e não mudou. */
+export function idsMudados(antes, depois) {
+  const mudados = [];
+  for (const [id, entrada] of depois) {
+    const anterior = antes.get(id);
+    if (anterior !== entrada && anterior?.json !== entrada.json) mudados.push(id);
+  }
+  return mudados.sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
+}
+
 /* ----------------------------------------------------------------------------
    NÚCLEO: roda a lista e devolve o NEUTRO em números. Não sabe desenhar.
    `dict` funde PARAMS e TOPO — os passos citam o NOME (raio: 'troncoR'), então
@@ -3428,6 +3505,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
   const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
+  let retrato = null;
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
     const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
@@ -3441,8 +3519,12 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
        translação seriam oito chances de divergir de sinal ou de ordem; o
        despacho aplica a MESMA transformação rígida sobre os vértices que o
        passo acabou de criar, seja qual for o gerador. */
-    const antesV = new Map([...st.V].map(([id, p]) => [id, JSON.stringify(p)]));
-    const antesF = new Map([...st.F].map(([id, f]) => [id, JSON.stringify(f)]));
+    /* O RETRATO DE ANTES É O DE DEPOIS DO PASSO ANTERIOR. Nada muda `st.V` e `st.F` entre dois passos, então o retrato
+       que a procedência tirou ao fim de um passo vale como o de antes do seguinte, e a malha deixa de ser serializada duas
+       vezes por passo (era o quadrado do tamanho da peça). Passo que sai antes do fim zera o retrato e o seguinte refaz. */
+    const antesV = retrato?.V ?? retratarEntradas(st.V, null);
+    const antesF = retrato?.F ?? retratarEntradas(st.F, null);
+    retrato = null;
     const antesPortas = new Set(st.portas.keys()), antesPartes = new Set(Object.keys(st.partes));
     const pose = lerPoseDeCriacao(st, i, op, args);
     if (pose === undefined) return;          // inválida: já gritou, nada construído
@@ -3450,11 +3532,13 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
     else fn(st, args, i);
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
-    const mudou = (antes, depois) => [...depois].filter(([id, valor]) => antes.get(id) !== JSON.stringify(valor)).map(([id]) => id).sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
+    const depoisV = retratarEntradas(st.V, antesV);
+    const depoisF = retratarEntradas(st.F, antesF);
+    retrato = { V: depoisV, F: depoisF };
     registrarProcedencia(st.procedencia, {
       passo: i, operacao: registrada.id,
       saidas: {
-        vertices: mudou(antesV, st.V), faces: mudou(antesF, st.F),
+        vertices: idsMudados(antesV, depoisV), faces: idsMudados(antesF, depoisF),
         portas: [...st.portas.keys()].filter((id) => !antesPortas.has(id)).sort(),
         partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
       },

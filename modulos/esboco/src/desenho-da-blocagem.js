@@ -121,8 +121,9 @@ function geometria(p, k, escala) {
 const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`;
 
 /* `entrada`: { vista, paineis } (ver o topo do arquivo). `camada: true` junta a camada e o `svgSobreCamada`; `perfilDosTracos: false` a entrega sem o perfil das fitas
-   (ver `formasDoPainel`), para quem mede só a área das faces. */
-export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDosTracos = true } = {}) {
+   (ver `formasDoPainel`), para quem mede só a área das faces. `soCamada: true` (com `camada`) não monta o SVG: `svg` e `svgSobreCamada`
+   saem vazios e a camada, o quadro e `paineis` saem os mesmos (ver `desenharEsboco`). */
+export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDosTracos = true, soCamada = false } = {}) {
   exigir(entrada && typeof entrada === 'object', 'desenharBlocagem: a entrada precisa ser { vista, paineis }');
   const vista = entrada.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
@@ -156,6 +157,7 @@ export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDo
     if (querCamada) {
       formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa: false, perfilDosTracos, tinta: (r, n) => tintaDaFace(r.cor, n) }));
     }
+    if (querCamada && soCamada) return;
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     if (!p.ocultos.has('titulo')) partes.push(`<text x="${x0 + QUADRO.painelL / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.titulo ?? `Opção ${k + 1}`)}</text>`);
 
@@ -184,10 +186,10 @@ export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDo
   }
   partes.push('</svg>');
 
-  const saida = { svg: partes.filter((x) => typeof x === 'string' || x.forma !== undefined).map((x) => (typeof x === 'string' ? x : x.forma)).join('\n'), largura, altura, escala };
+  const saida = { svg: querCamada && soCamada ? '' : partes.filter((x) => typeof x === 'string' || x.forma !== undefined).map((x) => (typeof x === 'string' ? x : x.forma)).join('\n'), largura, altura, escala };
   if (querCamada) {
     saida.camada = montarCamada(formasDaCamada, largura, altura);
-    saida.svgSobreCamada = partes.filter((x) => typeof x === 'string' || x.camada !== undefined).map((x) => (typeof x === 'string' ? x : `<image x="0" y="0" width="${largura}" height="${altura}" href="__CAMADA__"/>`)).join('\n');
+    saida.svgSobreCamada = soCamada ? '' : partes.filter((x) => typeof x === 'string' || x.camada !== undefined).map((x) => (typeof x === 'string' ? x : `<image x="0" y="0" width="${largura}" height="${altura}" href="__CAMADA__"/>`)).join('\n');
   }
   saida.paineis = paineis.map((p) => ({ min: p.min, max: p.max, volumes: p.itens.length, faces: p.itens.reduce((s, it) => s + it.lados.length, 0), tracos: p.itens.reduce((s, it) => s + it.linhas.length, 0) }));
   return saida;

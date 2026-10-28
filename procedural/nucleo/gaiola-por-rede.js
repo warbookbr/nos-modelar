@@ -136,7 +136,26 @@ function exigirCampos(objeto, permitidos, onde) {
 /* A curva por comprimento de arco: ponto(f) à fração f do comprimento, `fracaoDaChave(k)` a fração do k-ésimo ponto-chave. Na aberta a
    Catmull-Rom centrípeta de `gaiola-interpolada.js`; na fechada, a mesma sobre a lista estendida pelos vizinhos de cada lado, de modo
    que o trecho de volta ao começo tem os pontos vizinhos certos. */
+/* A CURVA COM OS MESMOS PONTOS-CHAVE SAI UMA VEZ. Quem edita a rede (o alisamento, a sonda de cada número) refaz a gaiola dezenas
+   de vezes mexendo num ponto-chave de cada vez, e as outras curvas voltam idênticas: a tabela de comprimentos, a Catmull-Rom e o
+   monitor delas são só função dos pontos-chave, e refazê-los era um quarto do tempo da gaiola. O que se guarda são as funções (que
+   não mudam depois de prontas); cada chamada devolve um objeto novo, porque quem chama grava `decl` e `monitor` nele. */
+const curvasFeitas = new Map();
+const CURVAS_GUARDADAS = 512;
+const chaveDaCurva = (nome, chaves, fechada, poligonal) => `${nome}|${fechada ? 1 : 0}${poligonal ? 1 : 0}|${chaves.map((p) => p.map((x) => (Object.is(x, -0) ? '-0' : String(x))).join(',')).join(';')}`;
+
 function criarCurva(nome, chaves, fechada, poligonal = false) {
+  const chave = chaveDaCurva(nome, chaves, fechada, poligonal);
+  let feita = curvasFeitas.get(chave);
+  if (!feita) {
+    feita = criarCurvaSemMemoria(nome, chaves, fechada, poligonal);
+    curvasFeitas.set(chave, feita);
+    if (curvasFeitas.size > CURVAS_GUARDADAS) curvasFeitas.delete(curvasFeitas.keys().next().value);
+  }
+  return { nome, fechada, chaves, comprimento: feita.comprimento, em: feita.em, fracaoDaChave: feita.fracaoDaChave };
+}
+
+function criarCurvaSemMemoria(nome, chaves, fechada, poligonal = false) {
   const n = chaves.length;
   let base; let primeiro; let trechos;
   if (poligonal) {
@@ -206,7 +225,19 @@ function giroDoArco(curva, f0, f1) {
 const AMOSTRAS_DO_MONITOR_POR_MM = 2;
 const GRADO = 0.4;
 
+const monitoresFeitos = new WeakMap();
+
+/* O monitor de uma curva é função dela e de dois números; a curva guardada acima tem sempre a mesma `em`, que serve de chave. */
 function criarMonitor(c, teto, anguloMaxGraus) {
+  let porNumeros = monitoresFeitos.get(c.em);
+  if (!porNumeros) { porNumeros = new Map(); monitoresFeitos.set(c.em, porNumeros); }
+  const chave = `${teto}|${anguloMaxGraus}`;
+  let monitor = porNumeros.get(chave);
+  if (!monitor) { monitor = criarMonitorSemMemoria(c, teto, anguloMaxGraus); porNumeros.set(chave, monitor); }
+  return monitor;
+}
+
+function criarMonitorSemMemoria(c, teto, anguloMaxGraus) {
   const N = Math.min(8000, Math.max(200, Math.ceil(c.comprimento * AMOSTRAS_DO_MONITOR_POR_MM)));
   const P = Array.from({ length: N + 1 }, (_, i) => c.em(i / N));
   const d = Array.from({ length: N }, (_, i) => norma(sub(P[i + 1], P[i])));
@@ -1025,11 +1056,11 @@ export function gaiolaPorRede(definicaoDada) {
     ordemDosVertices.forEach((id, i) => { if (livres.has(i)) posicao.set(id, r.posicoes[i]); });
     alisamento = { iteracoes: r.iteracoes, deslocamentoMaximoMm: Math.round(r.deslocamentoMaximo * 1000) / 1000 };
     for (const r2 of retalhos) {
-      const dobradas = facesDoRetalho.get(r2.nome).filter((f, i, todas) => {
-        const nf = (g) => { const m = [0, 0, 0]; for (let k = 0; k < g.length; k++) { const a = posicao.get(g[k]); const b = posicao.get(g[(k + 1) % g.length]); m[0] += (a[1] - b[1]) * (a[2] + b[2]); m[1] += (a[2] - b[2]) * (a[0] + b[0]); m[2] += (a[0] - b[0]) * (a[1] + b[1]); } return m; };
-        const media = todas.map(nf).reduce(soma, [0, 0, 0]);
-        return dot(nf(f), media) <= 0;
-      });
+      /* a média das normais do retalho sai uma vez (era refeita para cada face dele: o quadrado do número de faces) */
+      const nf = (g) => { const m = [0, 0, 0]; for (let k = 0; k < g.length; k++) { const a = posicao.get(g[k]); const b = posicao.get(g[(k + 1) % g.length]); m[0] += (a[1] - b[1]) * (a[2] + b[2]); m[1] += (a[2] - b[2]) * (a[0] + b[0]); m[2] += (a[0] - b[0]) * (a[1] + b[1]); } return m; };
+      const facesDele = facesDoRetalho.get(r2.nome);
+      const media = facesDele.map(nf).reduce(soma, [0, 0, 0]);
+      const dobradas = facesDele.filter((f) => dot(nf(f), media) <= 0);
       if (dobradas.length) falha(`o alisamento do miolo dobrou ${dobradas.length} face(s) do retalho ${citar(r2.nome)}; as curvas dele pedem uma superfície que o preenchimento não segue; declare liso: false, ou ponha uma curva a mais dentro do retalho`);
     }
   }
