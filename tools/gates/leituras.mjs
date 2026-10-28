@@ -19,6 +19,11 @@ import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:pat
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ESTE_ARQUIVO = fileURLToPath(import.meta.url);
+
+/* O Chromium do Playwright não lê arquivo do repositório sozinho: recebe a página do teste ou do servidor de desenvolvimento,
+   que é node e é anotado. Medido em 2026-10-28: contá-lo como quem lê tudo punha 21 dos 24 lentos em toda mudança de dado. Vale
+   também ao ler um registro gravado antes desta regra. */
+export const ehNavegador = (programa) => /^(headless_shell|chrome|chromium|chrome-headless-shell)$/.test(basename(programa)) || /ms-playwright/.test(programa);
 const RAIZ = resolve(dirname(ESTE_ARQUIVO), '../..');
 const FORA = /^(node_modules|\.git|tmp|dist)(\/|$)/;
 
@@ -75,9 +80,6 @@ export function instalar(destino) {
     return { ...base, GATES_LEITURAS_DESTINO: destinoAtual, NODE_OPTIONS: opcoes.includes(gancho) ? opcoes : `${opcoes} ${gancho}`.trim() };
   };
   const ehNode = (programa) => ['node', 'npm', 'npx', 'vitest', 'vite', 'tsx'].includes(basename(programa).replace(/\.(cmd|exe)$/, '')) || programa === process.execPath;
-  /* O Chromium do Playwright não lê arquivo do repositório sozinho: recebe a página do teste ou do servidor de desenvolvimento,
-     que é node e é anotado. Medido em 2026-10-28: contá-lo como quem lê tudo punha 21 dos 24 lentos em toda mudança de dado. */
-  const ehNavegador = (programa) => /^(headless_shell|chrome|chromium|chrome-headless-shell)$/.test(basename(programa)) || /ms-playwright/.test(programa);
   const examinar = (comando, args, opcoes) => {
     const naRaiz = relativoDaRaiz(opcoes?.cwd ?? process.cwd()) !== null || resolve(opcoes?.cwd ?? process.cwd()) === RAIZ;
     const programa = String(comando).trim().split(/\s+/)[0];
@@ -128,7 +130,7 @@ export function lerLeituras(diretorio) {
         if (l.teste) teste = l.teste;
         else if (l.a) entrada.arquivos.add(l.a);
         else if (l.d) entrada.pastas.add(l.d);
-        else if (l.t) entrada.tudo = true;
+        else if (l.t && !ehNavegador(l.t)) entrada.tudo = true;
       } catch { entrada.tudo = true; }
     }
     if (teste) registro[teste] = entrada;
