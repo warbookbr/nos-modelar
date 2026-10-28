@@ -43,7 +43,7 @@ describe('vigia contínuo', () => {
     expect(ignorado('dist/a.js')).toBe(true);
     expect(ignorado('.claude/worktrees/agent-1/src/a.js')).toBe(true);
     expect(ignorado('src/a.js')).toBe(false);
-    expect(ignorado('docs/x.md')).toBe(false);
+    expect(ignorado(['docs', 'x.md'].join('/'))).toBe(false);
   });
 
   it('uma rajada de gravações vira uma rodada só, depois do silêncio', async () => {
