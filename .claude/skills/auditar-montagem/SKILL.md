@@ -110,7 +110,7 @@ se não houve varredura, registre essa ausência em vez de inferir movimento liv
 
 ## 4. MCP de leitura
 
-Quando o host estiver configurado por `MECANIFICA_CATALOGO_MONTAGENS`, descubra
+Quando o host estiver configurado por `MODELAR_CATALOGO_MONTAGENS`, descubra
 montagens pelo recurso `mecanifica://montagens` e use somente IDs semânticos:
 
 - `descrever_montagem`: contexto inteiro ou recorte;

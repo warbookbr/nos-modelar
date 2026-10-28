@@ -38,9 +38,9 @@ e montagens, acrescenta as de autoria de montagem e, para receita, estas quatro
 - `inspecionar_proposta_receita`;
 - `aplicar_autoria_receita`.
 
-O host configura `MECANIFICA_REPOSITORIO_AUTORIA`,
-`MECANIFICA_CATALOGO_MONTAGENS` e uma lista explícita em
-`MECANIFICA_RECEITAS_AUTORIZADAS`. O recurso `mecanifica://estado` anuncia os
+O host configura `MODELAR_REPOSITORIO_AUTORIA`,
+`MODELAR_CATALOGO_MONTAGENS` e uma lista explícita em
+`MODELAR_RECEITAS_AUTORIZADAS`. O recurso `mecanifica://estado` anuncia os
 IDs autorizados. O cliente usa apenas IDs, revisão, documento e confirmação;
 nunca envia ou recebe caminhos locais.
 

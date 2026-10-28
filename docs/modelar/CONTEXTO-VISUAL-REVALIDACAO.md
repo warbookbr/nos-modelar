@@ -23,7 +23,7 @@ mas permanece separada do perfil de leitura e reutiliza o serviço transacional.
 ## MCP somente leitura
 
 O host habilita montagens com a variável
-`MECANIFICA_CATALOGO_MONTAGENS`, apontando para um JSON local absoluto. Sem ela,
+`MODELAR_CATALOGO_MONTAGENS`, apontando para um JSON local absoluto. Sem ela,
 o servidor continua funcional para peças e anuncia catálogo de montagens vazio.
 O arquivo de configuração usa este contrato:
 
