@@ -375,6 +375,31 @@ describe('o pacote de uma receita que refina um esboço', () => {
     expect(existsSync(join(pasta, 'pedido.md'))).toBe(false);
   }, 60_000);
 
+  it('abre a captura compartilhada uma vez, a passa a todas as chamadas e a fecha, e a recusa diz quantas imagens faltavam', async () => {
+    const base = mkdtempSync(join(area, 'compartilhada-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const registro = { aberturas: 0, fechamentos: 0, recebidas: [] };
+    const compartilhada = { async fechar() { registro.fechamentos += 1; } };
+    let chamada = 0;
+    const dependencias = {
+      abrirCaptura: async () => { registro.aberturas += 1; return compartilhada; },
+      olharBancada: async (opcoes) => {
+        registro.recebidas.push(opcoes.compartilhada);
+        chamada += 1;
+        /* a quarta captura (a do arame) cai: as três primeiras já tinham saído */
+        if (chamada === 4) return { ok: false, erro: { mensagem: 'prazo' }, resultado: { arquivos: [] } };
+        return bancada.fazer(opcoes);
+      },
+    };
+    await expect(vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias }))
+      .rejects.toThrow(/a captura do arame não produziu imagem: prazo\. Do pacote, 6 de \d+ imagens já tinham saído e faltavam \d+/);
+    expect(registro.aberturas).toBe(1);
+    expect(registro.fechamentos).toBe(1);
+    expect(registro.recebidas).toHaveLength(4);
+    expect(registro.recebidas.every((c) => c === compartilhada)).toBe(true);
+  }, 60_000);
+
   it('a opção do esboço que não é a primeira recusa antes de gastar captura', async () => {
     const base = mkdtempSync(join(area, 'opcao-'));
     let capturou = false;

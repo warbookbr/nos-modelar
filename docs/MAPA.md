@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1534 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1535 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2339,6 +2339,7 @@
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `receita-planejada.mjs` — receita-planejada.mjs — grava a receita planejada de uma peça a partir de uma unidade do esboço aprovado.
 - `receita-planejada.test.mjs` — receita-planejada.test.mjs — a receita planejada que o comando grava a partir de uma unidade do esboço.
+- `reduzir-em-paralelo.mjs` — reduzir-em-paralelo.mjs — `reduzirPorMedia` numa thread à parte, para a captura seguinte não esperar a redução da anterior.
 - `referencia-do-plano.test.mjs` — referencia-do-plano.test.mjs — `descrever-peca` confere logo no começo que cada caminho de `PLANO.referencias` existe.
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.

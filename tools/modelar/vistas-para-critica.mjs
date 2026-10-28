@@ -36,9 +36,10 @@
  * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] */
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, extname, isAbsolute, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { linhaDaVista } from '../../modulos/esboco/src/lados.js';
+import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { lerPlano } from '../../modulos/esboco/src/plano.js';
 import { vistaDoMesmoOlho } from '../../modulos/esboco/src/referencia.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
@@ -46,7 +47,7 @@ import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { vistaDoNome } from './esboco-referencia.mjs';
-import { olharBancada } from './olhar-bancada.mjs';
+import { abrirCapturaCompartilhada, olharBancada } from './olhar-bancada.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -182,26 +183,8 @@ export function unidadeDoAlvo(dados, ids) {
 
 /* ---------- as referências do plano ---------- */
 
-const EXTENSOES_DE_IMAGEM = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
-
-/**
- * As imagens que `PLANO.referencias` cita, com o caminho absoluto: cada caminho vale a partir da raiz do repositório e, não existindo
- * ali, a partir da pasta da receita. O que não é imagem (o andaime, o esboço) não vai ao crítico e sai em `ignoradas`, e o que não
- * existe sai em `ausentes`. `existe` é injetável para o teste.
- */
-export function referenciasDoPlano(plano, { pastaDaReceita, raiz = REPO, existe = existsSync } = {}) {
-  const imagens = [];
-  const ignoradas = [];
-  const ausentes = [];
-  for (const citada of plano?.referencias ?? []) {
-    const candidatos = isAbsolute(citada) ? [citada] : [resolve(raiz, citada), resolve(pastaDaReceita ?? raiz, citada)];
-    const achado = candidatos.find((c) => existe(c));
-    if (achado === undefined) { ausentes.push(citada); continue; }
-    if (!EXTENSOES_DE_IMAGEM.has(extname(achado).toLowerCase())) { ignoradas.push(citada); continue; }
-    imagens.push(achado);
-  }
-  return { imagens, ignoradas, ausentes };
-}
+/* As imagens que `PLANO.referencias` cita moram em `referencias-do-plano.mjs`, que o `descrever-peca` também lê sem carregar a captura. */
+export { referenciasDoPlano };
 
 /* ---------- o pedido ---------- */
 
@@ -390,6 +373,7 @@ export function montagemDaPeca(peca, { raiz = REPO } = {}) {
 export async function vistasParaCritica(peca, { logger = null, saida = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
   const dep = {
     olharBancada,
+    abrirCaptura: abrirCapturaCompartilhada,
     esbocoDeclarado: async (p) => (await import('./forma-do-esboco.mjs')).esbocoDeclarado(p),
     formasDoEsboco: async (bruto, opcao) => (await import('./esboco-solido.mjs')).formasDoEsboco(bruto, opcao),
     olharEtapas: async (arquivo, opcoes) => (await import('./etapas-da-montagem.mjs')).olharEtapas(arquivo, opcoes),
@@ -403,7 +387,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   const plano = normalizarPlanoDeModelagem(receita.PLANO);
   const referencias = referenciasDoPlano(plano, { pastaDaReceita: dirname(caminho) });
   if (referencias.ausentes.length) {
-    throw new Error(`PLANO.referencias cita imagem que não existe: ${referencias.ausentes.join(', ')}. Confira o caminho, que vale a partir da raiz do repositório ou da pasta da receita.`);
+    throw new Error(mensagemDeReferenciasAusentes(referencias.ausentes));
   }
   const declarado = await dep.esbocoDeclarado(peca);
   let bruto = null;
@@ -425,56 +409,64 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   limparPastaDaRodada(pasta);
   mkdirSync(pasta, { recursive: true });
 
-  const conjunto = await dep.olharBancada({ peca, revisar: true, res: RES_CONJUNTO, logger });
-  exigirCaptura(conjunto, 'conjunto');
-  exigirVistasDiferentes(conjunto, 'do conjunto');
-  /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
-     sai numa captura própria. */
-  const traseira = await dep.olharBancada({
-    peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(traseira, 'traseira');
-  /* A lateral esquerda também, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a
-     porta à esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
-  const esquerda = await dep.olharBancada({
-    peca, auditoria: true, projecao: 'ortografica', vistas: 'esquerda', res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(esquerda, 'esquerda');
+  /* O servidor e o navegador sobem uma vez para o pacote inteiro (26 capturas na perua), e a sessão e os contatos da peça são medidos
+     uma vez. Com `olharBancada` trocado por um gravador, como nos testes, nada é aberto, a não ser que o teste dê `abrirCaptura`. */
+  const compartilhada = dependencias.olharBancada && !dependencias.abrirCaptura ? null : await dep.abrirCaptura({ logger });
+  /* QUANTAS IMAGENS O PACOTE TEM E QUANTAS JÁ SAÍRAM, para a recusa de uma captura dizer o que faltava. */
+  const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + VISTAS_DO_ARAME.split(',').length + 1
+    + VISTAS_DA_PARTE.split(',').length * partes.length;
+  let feitas = 0;
+  const capturar = async (quem, opcoes) => {
+    const resposta = await dep.olharBancada({ ...opcoes, logger, ...(compartilhada ? { compartilhada } : {}) });
+    exigirCaptura(resposta, quem, { feitas, total });
+    feitas += arquivosDe(resposta).length;
+    return resposta;
+  };
 
-  /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
-     mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
-     leque de lascas saindo de um vértice só. Sombra esconde topologia. */
-  const arame = await dep.olharBancada({
-    peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(arame, 'arame');
-  exigirVistasDiferentes(arame, 'do arame');
-  /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
-     que só aparece do outro lado da peça. */
-  const raioX = await dep.olharBancada({
-    peca, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
-  });
-  exigirCaptura(raioX, 'raio X');
-
+  let conjunto;
+  let traseira;
+  let esquerda;
+  let arame;
+  let raioX;
   const porParte = [];
-  for (const parte of partes) {
-    const resultado = await dep.olharBancada({
-      peca,
-      selecionadas: parte,
-      modo: 'isolar',
-      focar: true,
-      /* Modo de auditoria também aqui: estas imagens vão para o crítico junto
-         com as do conjunto, e o modo de revisão, que já o liga sozinho, não
-         aceita vista escolhida à mão. */
-      auditoria: true,
-      projecao: 'ortografica',
-      vistas: VISTAS_DA_PARTE,
-      res: RES_PARTE,
-      logger,
-    });
-    exigirCaptura(resultado, `parte '${parte}'`);
-    exigirVistasDiferentes(resultado, `da parte '${parte}'`);
-    porParte.push({ parte, resultado });
+  try {
+    conjunto = await capturar('conjunto', { peca, revisar: true, res: RES_CONJUNTO });
+    exigirVistasDiferentes(conjunto, 'do conjunto');
+    /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
+       sai numa captura própria. */
+    traseira = await capturar('traseira', { peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO });
+    /* A lateral esquerda também, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a
+       porta à esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
+    esquerda = await capturar('esquerda', { peca, auditoria: true, projecao: 'ortografica', vistas: 'esquerda', res: RES_CONJUNTO });
+
+    /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
+       mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
+       leque de lascas saindo de um vértice só. Sombra esconde topologia. */
+    arame = await capturar('arame', { peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO });
+    exigirVistasDiferentes(arame, 'do arame');
+    /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
+       que só aparece do outro lado da peça. */
+    raioX = await capturar('raio X', { peca, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO });
+
+    for (const parte of partes) {
+      const resultado = await capturar(`parte '${parte}'`, {
+        peca,
+        selecionadas: parte,
+        modo: 'isolar',
+        focar: true,
+        /* Modo de auditoria também aqui: estas imagens vão para o crítico junto
+           com as do conjunto, e o modo de revisão, que já o liga sozinho, não
+           aceita vista escolhida à mão. */
+        auditoria: true,
+        projecao: 'ortografica',
+        vistas: VISTAS_DA_PARTE,
+        res: RES_PARTE,
+      });
+      exigirVistasDiferentes(resultado, `da parte '${parte}'`);
+      porParte.push({ parte, resultado });
+    }
+  } finally {
+    await compartilhada?.fechar();
   }
 
   /* O alvo vem do esboço de agora e não da imagem guardada. */
@@ -530,11 +522,13 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
    checagem de câmera do modo de revisão é exceção declarada: ela reprova
    enquadramento e ainda assim grava a imagem, e o enquadramento é assunto de
    quem conduz, não motivo para não haver pacote. */
-function exigirCaptura(resposta, quem) {
+function exigirCaptura(resposta, quem, pacote = null) {
   const arquivos = resposta?.resultado?.arquivos;
   if (Array.isArray(arquivos) && arquivos.length) return;
   const motivo = resposta?.erro?.mensagem ?? resposta?.stderr?.trim() ?? 'a bancada não disse por quê';
-  throw new Error(`a captura do ${quem} não produziu imagem: ${motivo}`);
+  /* o pacote diz quantas imagens já tinham saído, para quem lê saber se perdeu um minuto ou quase tudo */
+  const andamento = pacote ? ` Do pacote, ${pacote.feitas} de ${pacote.total} imagens já tinham saído e faltavam ${pacote.total - pacote.feitas}.` : '';
+  throw new Error(`a captura do ${quem} não produziu imagem: ${andamento ? motivo.replace(/[.\s]*$/, '.') : motivo}${andamento}`);
 }
 
 /* Duas vistas de uma captura com o mesmo conteúdo, byte a byte, são a mesma
