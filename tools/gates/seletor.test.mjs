@@ -57,4 +57,35 @@ describe('seletor de gates', () => {
     expect(decidir('test:rapidos', codigo, verdes)).toMatchObject({ rodar: true, testes: ['src/a.js'] });
     rmSync(raiz, { recursive: true, force: true });
   });
+
+  it('o dado mudado roda só os testes cujo registro diz lê-lo; código apagado e arquivo não lido pelo fs rodam o modo inteiro', () => {
+    const raiz = repositorio({ 'src/a.js': 'a', 'src/b.js': 'b', [DOC]: 'x', 'docs/y.json': '{}', 'tools/blender/c.py': 'c' });
+    const foto = fotografar(raiz);
+    const verdes = { 'test:lentos': registroVerde('test:lentos', foto) };
+    const leituras = {
+      'tools/le-doc.test.mjs': { arquivos: new Set([DOC]), pastas: new Set(), tudo: false },
+      'tools/lista-docs.test.mjs': { arquivos: new Set(), pastas: new Set(['docs']), tudo: false },
+      'tools/nada.test.mjs': { arquivos: new Set(['package.json']), pastas: new Set(), tudo: false },
+    };
+    const comTestes = { ...foto, 'tools/le-doc.test.mjs': '1', 'tools/lista-docs.test.mjs': '2', 'tools/nada.test.mjs': '3' };
+    writeFileSync(join(raiz, DOC), 'x2');
+    const soDoc = { ...fotografar(raiz), 'tools/le-doc.test.mjs': '1', 'tools/lista-docs.test.mjs': '2', 'tools/nada.test.mjs': '3' };
+    const v = { 'test:lentos': registroVerde('test:lentos', comTestes) };
+    expect(decidir('test:lentos', soDoc, v, leituras)).toMatchObject({ rodar: true, testes: ['tools/le-doc.test.mjs', 'tools/lista-docs.test.mjs'] });
+    expect(decidir('test:lentos', soDoc, v, {})).toMatchObject({ rodar: false });
+    expect(decidir('test:lentos', soDoc, { 'test:lentos': { ...v['test:lentos'], leiturasCompletas: false } }, leituras)).toMatchObject({ testes: null });
+    writeFileSync(join(raiz, 'tools/blender/c.py'), 'c2');
+    expect(decidir('test:lentos', fotografar(raiz), verdes, leituras)).toMatchObject({ rodar: true, testes: null });
+    writeFileSync(join(raiz, 'tools/blender/c.py'), 'c');
+    rmSync(join(raiz, 'src/b.js'));
+    expect(decidir('test:lentos', fotografar(raiz), verdes, leituras).motivo).toMatch(/apagado/);
+    rmSync(raiz, { recursive: true, force: true });
+  });
+
+  it('o registro de leituras fica completo depois do modo inteiro e continua completo nas rodadas parciais', () => {
+    const inteiro = registroVerde('test:rapidos', {}, { testes: null });
+    expect(inteiro.leiturasCompletas).toBe(true);
+    expect(registroVerde('test:rapidos', {}, { testes: ['a'], anterior: inteiro }).leiturasCompletas).toBe(true);
+    expect(registroVerde('test:rapidos', {}, { testes: ['a'], anterior: null }).leiturasCompletas).toBe(false);
+  });
 });

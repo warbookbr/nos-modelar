@@ -16,7 +16,7 @@ import { setPriority } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { DEPENDE_DE, GATES, rodarGate } from '../gates.mjs';
-import { decidir, fotografar, gravarVerdes, lerVerdes, registroVerde } from './seletor.mjs';
+import { decidir, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde } from './seletor.mjs';
 
 export const ARQUIVO_DO_ESTADO = join('tmp', 'gates', 'vigia.json');
 export const SILENCIO_PADRAO_MS = 1500;
@@ -59,14 +59,14 @@ export function criarVigia({
     for (const gate of gates) {
       if (sinal.aborted) break;
       if (DEPENDE_DE[gate] && falhos.has(DEPENDE_DE[gate])) continue;
-      const decisao = decidir(gate, foto, lerVerdes(raiz));
+      const decisao = decidir(gate, foto, lerVerdes(raiz), gate.startsWith('test:') ? lerLeiturasDoGate(raiz, gate) : null);
       if (!decisao.rodar) { resumo.guardados.push(gate); continue; }
       resumo.rodaram.push(gate);
       const resultado = await rodar(gate, { testes: decisao.testes ?? null, sinal });
       if (sinal.aborted || resultado.cancelado) break;
       if (resultado.codigo === 0) {
         resumo.passaram.push(gate);
-        const registro = registroVerde(gate, foto);
+        const registro = registroVerde(gate, foto, { testes: decisao.testes ?? null, anterior: lerVerdes(raiz)[gate] });
         if (registro) gravarVerdes(raiz, { ...lerVerdes(raiz), [gate]: registro });
       } else {
         falhos.add(gate);

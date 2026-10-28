@@ -26,7 +26,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { decidir, fotografar, gravarVerdes, lerVerdes, registroVerde } from './gates/seletor.mjs';
+import { decidir, diretorioDasLeituras, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde } from './gates/seletor.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -321,6 +321,8 @@ export function rodarGate(gate, { silencioso, testes = null, sinal = null }) {
       writeFileSync(lista, JSON.stringify(testes));
       ambienteDoGate.GATES_TESTES_RELACIONADOS = lista;
     }
+    /* Os testes anotam o que leem (tools/gates/leituras.mjs), fora do CI, que roda tudo. */
+    if (gate.startsWith('test:') && !process.env.CI) ambienteDoGate.GATES_LEITURAS_DIR = join(RAIZ, diretorioDasLeituras(gate));
     /* `shell: true` porque no Windows `npm` é um .cmd; sem isso o spawn não
        encontra o executável e todo gate "falha" pelo motivo errado. */
     const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true, env: ambienteDoGate, detached: Boolean(sinal) && process.platform !== 'win32' });
@@ -372,7 +374,7 @@ async function executar() {
   const foto = comSeletor ? fotografar('.') : null;
   const verdes = comSeletor ? lerVerdes('.') : {};
   const decisoes = new Map();
-  if (comSeletor) for (const gate of bateria) decisoes.set(gate, decidir(gate, foto, verdes));
+  if (comSeletor) for (const gate of bateria) decisoes.set(gate, decidir(gate, foto, verdes, gate.startsWith('test:') ? lerLeiturasDoGate('.', gate) : null));
   const guardados = bateria.filter((g) => decisoes.get(g)?.rodar === false);
   if (guardados.length) console.log(`gates — guardados, sem rodar: ${guardados.join(', ')} (nada do que conferem mudou desde a última rodada verde).`);
   for (const gate of ['test:rapidos', 'test:lentos']) {
@@ -414,7 +416,7 @@ async function executar() {
         const resultado = await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
         porGate.set(gate, resultado);
         duracoesDosGates[gate] = resultado.duracao;
-        if (comSeletor && resultado.codigo === 0) { const r = registroVerde(gate, foto); if (r) verdes[gate] = r; }
+        if (comSeletor && resultado.codigo === 0) { const r = registroVerde(gate, foto, { testes: decisoes.get(gate)?.testes ?? null, anterior: verdes[gate] }); if (r) verdes[gate] = r; }
         if (resultado.codigo !== 0 && pararNoPrimeiro) abortado = true;
       } finally {
         pesoEmUso -= pesoDe(gate);

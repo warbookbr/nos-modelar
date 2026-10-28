@@ -14,8 +14,14 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { lerLeituras, testesQueLeem } from './leituras.mjs';
 
 export const ARQUIVO_DOS_VERDES = join('tmp', 'gates', 'verdes.json');
+export const diretorioDasLeituras = (gate) => join('tmp', 'gates', `leituras-${gate.split(':')[1]}`);
+
+/* Arquivos de dados que os testes leem pelo `fs` do node, e que o registro de leituras (tools/gates/leituras.mjs) enxerga. Os
+   demais fora do grafo (receita carregada por import dinâmico, script de Blender, HTML servido) fazem o modo inteiro rodar. */
+export const DADOS_LIDOS_PELO_FS = /\.(md|json|jsonl|txt|csv|svg|png|jpe?g|webp|ya?ml)$/;
 
 /* Código cujo efeito o grafo de imports do vitest acompanha. Fica fora o que é carregado por caminho em tempo de execução: as
    receitas, famílias e fixturas, que as ferramentas importam pelo nome da peça. */
@@ -84,6 +90,10 @@ export function impressaoDoGate(gate, foto) {
   return createHash('sha256').update(linhas.join('\n')).digest('hex');
 }
 
+export function lerLeiturasDoGate(raiz, gate) {
+  return lerLeituras(join(raiz, diretorioDasLeituras(gate)));
+}
+
 export function lerVerdes(raiz) {
   try { return JSON.parse(readFileSync(join(raiz, ARQUIVO_DOS_VERDES), 'utf8')); } catch { return {}; }
 }
@@ -96,15 +106,25 @@ export function gravarVerdes(raiz, verdes) {
 
 /* O que o gate precisa fazer agora: { rodar: false, motivo } quando nada do que ele lê mudou desde a última vez verde, ou
    { rodar: true, motivo, testes? } com, nos gates de teste, a lista de arquivos para o `vitest related` (null = o modo inteiro). */
-export function decidir(gate, foto, verdes) {
+export function decidir(gate, foto, verdes, leituras = null) {
   const verde = verdes[gate];
   if (gate === 'test:rapidos' || gate === 'test:lentos') {
     if (!verde?.foto) return { rodar: true, motivo: 'sem rodada verde guardada, roda o modo inteiro', testes: null };
     const mudados = mudadosEntre(verde.foto, foto);
     if (!mudados.length) return { rodar: false, motivo: 'nada mudou desde a última rodada verde' };
+    const codigo = mudados.filter(visivelNoGrafo);
+    /* Um módulo apagado não tem mais teste ligado a ele no grafo, e o teste que o importava quebraria sem rodar. */
+    const apagado = codigo.find((c) => !foto[c]);
+    if (apagado) return { rodar: true, motivo: `'${apagado}' foi apagado e o grafo de imports não diz mais quem o usava, roda o modo inteiro`, testes: null };
     const foraDoGrafo = mudados.filter((c) => !visivelNoGrafo(c));
-    if (foraDoGrafo.length) return { rodar: true, motivo: `'${foraDoGrafo[0]}' mudou e o grafo de imports não o acompanha, roda o modo inteiro`, testes: null };
-    return { rodar: true, motivo: `${mudados.length} arquivo(s) de código mudaram, rodam os testes ligados a eles`, testes: mudados.filter((c) => foto[c]) };
+    if (!foraDoGrafo.length) return { rodar: true, motivo: `${mudados.length} arquivo(s) de código mudaram, rodam os testes ligados a eles`, testes: codigo };
+    const naoDado = foraDoGrafo.find((c) => !DADOS_LIDOS_PELO_FS.test(c));
+    if (naoDado) return { rodar: true, motivo: `'${naoDado}' mudou e nem o grafo de imports nem o registro de leituras o acompanham, roda o modo inteiro`, testes: null };
+    if (!verde.leiturasCompletas || !leituras) return { rodar: true, motivo: `'${foraDoGrafo[0]}' mudou e ainda não há registro de leituras de todos os testes, roda o modo inteiro`, testes: null };
+    const queLeem = testesQueLeem(leituras, foraDoGrafo).filter((t) => foto[t]);
+    const testes = [...new Set([...codigo, ...queLeem])];
+    if (!testes.length) return { rodar: false, motivo: `nenhum teste lê os ${foraDoGrafo.length} arquivo(s) de dados mudados` };
+    return { rodar: true, motivo: `${codigo.length} arquivo(s) de código mudaram e ${queLeem.length} teste(s) leem os ${foraDoGrafo.length} arquivo(s) de dados mudados`, testes };
   }
   if (!LE_O_GATE[gate]) return { rodar: true, motivo: 'não declara o que lê' };
   if (verde?.impressao && verde.impressao === impressaoDoGate(gate, foto)) return { rodar: false, motivo: 'nada do que ele lê mudou desde a última rodada verde' };
@@ -113,8 +133,10 @@ export function decidir(gate, foto, verdes) {
 
 /* O registro da rodada verde: a foto inteira nos gates de teste, que precisam saber QUAIS arquivos mudaram, e a impressão nos
    outros, que só precisam saber SE mudou. */
-export function registroVerde(gate, foto) {
-  if (gate === 'test:rapidos' || gate === 'test:lentos') return { foto, quando: new Date().toISOString() };
+export function registroVerde(gate, foto, { testes = null, anterior = null } = {}) {
+  /* O registro de leituras fica completo depois de uma rodada do modo inteiro com a anotação ligada, e continua completo
+     nas rodadas parciais, que só renovam o registro dos testes que rodaram. */
+  if (gate === 'test:rapidos' || gate === 'test:lentos') return { foto, leiturasCompletas: testes === null || Boolean(anterior?.leiturasCompletas), quando: new Date().toISOString() };
   if (LE_O_GATE[gate]) return { impressao: impressaoDoGate(gate, foto), quando: new Date().toISOString() };
   return null;
 }

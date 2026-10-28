@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1490 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1493 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2018,6 +2018,9 @@
 
 ## tools/gates/
 
+- `leituras-do-teste.mjs` — leituras-do-teste.mjs — setupFile do vitest: abre o registro do arquivo de teste deste processo e liga a anotação de tools/gates/leituras.mjs. Só entra na co…
+- `leituras.mjs` — leituras.mjs — anota o que cada arquivo de teste lê do repositório enquanto roda, para o seletor saber que testes uma mudança fora do grafo de imports afeta.
+- `leituras.test.mjs` — leituras.test.mjs — o registro do que cada arquivo de teste lê, observado pelo fs e pelos processos filhos.
 - `seletor.mjs` — seletor.mjs — decide o que cada gate precisa rodar, comparando o repositório de agora com o da última vez que o gate passou.
 - `seletor.test.mjs` — seletor.test.mjs — o gate roda só se algo do que ele lê mudou desde a última rodada verde, e os testes vão pelo grafo de imports só quando tudo o que mudou é…
 - `vigia.mjs` — vigia.mjs — o vigia contínuo: um processo em segundo plano que roda os gates que a edição afeta enquanto o trabalho acontece.

@@ -62,5 +62,9 @@ export default defineConfig({
        `tmp/gates/duracoes-dos-testes.json`, que o `tools/gates.mjs` lê para
        listar os arquivos mais lentos depois do gate `test`. */
     reporters: ['default', './tools/vitest-duracoes.mjs'],
+
+    /* Com GATES_LEITURAS_DIR, que a bateria liga fora do CI, cada arquivo de teste anota o que lê do repositório, e o seletor
+       roda só os testes que leem o que mudou fora do grafo de imports (tools/gates/leituras.mjs). */
+    setupFiles: process.env.GATES_LEITURAS_DIR ? ['./tools/gates/leituras-do-teste.mjs'] : [],
   },
 });
