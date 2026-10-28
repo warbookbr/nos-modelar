@@ -150,9 +150,18 @@ export function argumentosDoVitest(modo, { ambiente = process.env, remoto = ramo
   return { args: ['run', '--changed', base, '--passWithNoTests'], motivo: `os lentos ligados ao que mudou desde ${base}` };
 }
 
+/* No CI os testes lentos rodam divididos entre máquinas: GATES_PARTE=2/5 roda a segunda de cinco partes (`vitest --shard`). */
+export function comParte(args, ambiente = process.env) {
+  const parte = ambiente.GATES_PARTE;
+  if (!parte) return args;
+  if (!/^\d+\/\d+$/.test(parte)) throw new Error(`GATES_PARTE='${parte}' não é parte/total, como 2/5`);
+  return [...args, `--shard=${parte}`];
+}
+
 function rodar(modo) {
-  const { args, motivo } = argumentosDoVitest(modo);
-  console.log(`test:${modo} — ${motivo}.`);
+  const { args: semParte, motivo } = argumentosDoVitest(modo);
+  const args = comParte(semParte);
+  console.log(`test:${modo} — ${motivo}${process.env.GATES_PARTE ? `, parte ${process.env.GATES_PARTE}` : ''}.`);
   const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
   const inicio = Date.now();
   const r = spawnSync('npx', ['vitest', ...args], { cwd: raiz, stdio: 'inherit', shell: true, env: { ...process.env, MECANIFICA_TESTES: modo } });

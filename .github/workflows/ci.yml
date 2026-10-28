@@ -1,37 +1,31 @@
 name: CI
 
-# A bateria lenta leva uns 31 dos 37 minutos de uma execução, e em 2026-10-21
-# os minutos do mês do plano gratuito acabaram num só dia de pushes. Por isso
-# push e pull request rodam tudo menos a bateria lenta, e ela roda uma vez por
-# dia, só quando houve commit nas últimas 25 horas, ou à mão.
+# A bateria completa roda em cada envio, dividida entre máquinas que rodam ao mesmo tempo: os testes rápidos com as
+# conferências de documento e de arquivo gerado, os testes lentos em cinco partes, os gates que abrem a bancada e os que
+# geram o acervo. Medido em 2026-10-28 numa máquina só: 19 minutos, 11 deles nos testes lentos. O repositório é público e os
+# minutos do GitHub Actions não acabam mais, então a bateria lenta deixou de ser diária.
+#
+# O ENVIO VAI A UM RAMO, E A MAIN SÓ ANDA COM O CI VERDE. Um envio a `claude/**` ou `envio/**` roda a bateria, e o passo
+# `juntar` avança a main até ele quando todas as máquinas passaram e a main não andou desde a base do ramo; se andou, ele
+# falha dizendo isso, e quem enviou junta a main ao ramo e envia de novo. O avanço feito pelo próprio CI não roda a bateria
+# outra vez, porque o commit é o mesmo que acabou de passar.
 on:
   push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: '17 6 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
 jobs:
-  novidade:
-    if: github.event_name == 'schedule'
+  rapidos:
+    name: Testes rápidos e conferências
     runs-on: ubuntu-latest
-    outputs:
-      houve: ${{ steps.conferir.outputs.houve }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 50
-      - id: conferir
-        run: |
-          if [ -n "$(git log -1 --since='25 hours ago' --format=%H)" ]; then echo "houve=sim" >> "$GITHUB_OUTPUT"; else echo "houve=nao" >> "$GITHUB_OUTPUT"; fi
-
-  build-and-test:
-    needs: novidade
-    if: always() && (github.event_name != 'schedule' || needs.novidade.outputs.houve == 'sim')
-    runs-on: ubuntu-latest
-
     steps:
       # O histórico inteiro, com ramos e tags, porque o gate de vazamento
       # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
@@ -42,28 +36,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      # O navegador é instalado antes de qualquer gate porque a inspeção visual
-      # deixou de ser exclusiva das guardas de bancada: a promoção de autoria
-      # só aprova uma proposta depois de capturar duas vistas reais, e essa
-      # captura acontece dentro da suíte de testes. Instalar o Chromium depois
-      # de `npm run test` reprova a promoção por `inspecao-visual-falhou` e
-      # transforma falta de navegador em falso defeito de autoria.
-      - name: Navegador para as provas visuais
-        # `chromium-headless-shell` é um DOWNLOAD SEPARADO desde o Playwright
-        # 1.49, e é ele que o caminho visual do MCP lança. Instalar só
-        # `chromium` fazia a prova visual morrer em "Executable doesn't exist"
-        # enquanto as demais provas de bancada passavam, porque usam o chromium
-        # cheio — e por isso a falta ficava invisível.
-        run: npx playwright install --with-deps chromium chromium-headless-shell
+      - name: Node, dependências e navegador
+        uses: ./.github/actions/preparar
 
       - name: TypeScript Typecheck
         run: npm run typecheck
@@ -76,55 +50,8 @@ jobs:
         env:
           MECANIFICA_CHAVE_TERMOS: ${{ secrets.MECANIFICA_CHAVE_TERMOS }}
 
-      - name: Testes lentos (todos no CI)
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: npm run test:lentos
-
-      - name: Build do Modelar
-        run: npm run build
-
       - name: Firewall entre núcleo e catálogo
         run: npm run arquitetura:check
-
-      - name: Bancada publicada com catálogo vazio
-        run: npm run bancada:vazia:check
-
-      - name: Harness privado prova render de fixtures
-        run: npm run porteiro
-
-      # A-60. Sem este passo o gate existiria e nunca rodaria, que é a mesma
-      # armadilha que o comentário de `vitest.config.ts` já descreve: o arquivo
-      # está lá, ninguém o executa, e a cobertura é impressão. Ele é o ÚNICO
-      # ponto que percebe a peça ter mudado sem `pecas-resolvidas/` ser gerado
-      # de novo — e o produto que consome esses arquivos vive em outro
-      # repositório, então o defeito não aparece em nenhum teste daqui.
-      - name: Peças publicadas em dia com a receita
-        run: npm run exportar:check
-
-      # A variante visual é um SCRIPT NOMEADO, não a mesma linha com uma
-      # variável de ambiente. Com `env:` no passo, o espelho local via nome de
-      # comando não enxergava a diferença — `mcp:check` aparecia nos dois lados
-      # e o gate passava — enquanto o CI rodava um segundo conjunto de provas
-      # que ninguém rodava aqui. Foi assim que duas falhas visuais reais
-      # sobreviveram.
-      - name: MCP transporta as quatro vistas oficiais
-        run: npm run mcp:visual:check
-
-      # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
-      # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
-      # verde nos outros gates.
-      - name: A bancada mostra as portas que a peça publica
-        run: npm run guarda:portas
-
-      # A câmera livre é estado de autoria: o único lugar que comprova a órbita
-      # e a recarga é a bancada real, não um import de helper.
-      - name: A bancada restaura a câmera livre pela URL
-        run: npm run guarda:camera
-
-      # A inspeção de par mede pixels realmente visíveis com depth buffer e
-      # precisa do navegador real para provar a escolha e a recarga da URL.
-      - name: A bancada inspeciona duas partes com vista reproduzível
-        run: npm run guarda:par
 
       # Dois artefatos gerados a partir do registro do motor. O catálogo já era
       # conferido; estes dois saíam com código de erro na divergência e ninguém
@@ -139,49 +66,14 @@ jobs:
       - name: A bancada e modulo, nao dependencia de quem roda sem navegador
         run: npm run bancada:fronteira:check
 
-      # A imagem da peça sai do pacote construído, e não de `public/`. Trocar o
-      # glob que a emite deixaria a página subir, os testes verdes e a
-      # referência ausente só no endereço publicado.
-      - name: A bancada publicada mostra a referência da pasta da peça
-        run: npm run guarda:referencia
-
-      # A bancada relê a sessão a cada segundo e meio, e a leitura trocava a
-      # peça que a pessoa tinha acabado de escolher.
-      - name: A leitura periódica não desfaz a escolha da peça
-        run: npm run guarda:escolha
-
-
-      # Num quadro em treliça nenhum parâmetro empurra um tubo inteiro, então o
-      # gesto passou a ser o canto. O que só aparece no navegador é o arrasto
-      # sobreviver à reconstrução da malha que ele mesmo dispara.
-      - name: Arrastar a junta deforma só quem passa por ela
-        run: npm run guarda:junta
-
-      # Teclado, seleção por raycast e escrita direta nos vértices da cena: três
-      # coisas que teste de unidade não alcança. Um módulo de topologia
-      # impecável convive com pontos invisíveis e movimento que não chega à
-      # geometria desenhada.
-      - name: O modo de edição aparece, seleciona, move e desfaz
-        run: npm run guarda:edicao
-
-      # O caminho inteiro do desenho até a leitura: editar na tela, achar o
-      # botão de salvar, o arquivo sair com a descrição dentro e o comando de
-      # leitura entendê-la. Cada elo já esteve quebrado — salvar exigia ter
-      # puxado uma junta, e a base de comparação era a mesma malha viva.
-      - name: A edição sai da bancada descrita em palavras e números
-        run: npm run guarda:gesto
-
-      # A régua de contato existia, saía com código de erro e nenhum gate a
-      # chamava; foi assim que um quadro saiu em pedaços que não se tocavam.
-      - name: O acervo cumpre o plano e os contatos que declara
-        run: npm run guarda:acervo
-
-      # Um braço robótico passou em tudo deitado no chão: os pontos declarados
-      # ficaram a 2 mm do alvo e a peça estava virada noventa graus, porque
-      # cada régua compara a peça contra a declaração dela mesma. Só a
-      # comparação entre peças acusa referencial trocado.
-      - name: Toda peça do acervo usa o mesmo referencial
-        run: npm run guarda:referencial
+      # A-60. Sem este passo o gate existiria e nunca rodaria, que é a mesma
+      # armadilha que o comentário de `vitest.config.ts` já descreve: o arquivo
+      # está lá, ninguém o executa, e a cobertura é impressão. Ele é o ÚNICO
+      # ponto que percebe a peça ter mudado sem `pecas-resolvidas/` ser gerado
+      # de novo — e o produto que consome esses arquivos vive em outro
+      # repositório, então o defeito não aparece em nenhum teste daqui.
+      - name: Peças publicadas em dia com a receita
+        run: npm run exportar:check
 
       # A rodada de absorção acerta o desenho da pessoa reescrevendo a receita,
       # e acertaria mais fácil inventando termos até a conta fechar. Quem
@@ -248,6 +140,140 @@ jobs:
       - name: Banco de provas e registro de custo em dia com o JSON
         run: npm run banco-de-provas:check
 
+  lentos:
+    name: Testes lentos ${{ matrix.parte }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        parte: [ 1/5, 2/5, 3/5, 4/5, 5/5 ]
+    steps:
+      # O histórico inteiro, com ramos e tags, porque o gate de vazamento
+      # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
+      # commit e todo nome de ramo e tag, e reprova num checkout raso. Medido em
+      # 2026-10-21: 2.449 commits, 144 MB de pacote e 0,2 s de leitura.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node, dependências e navegador
+        uses: ./.github/actions/preparar
+
+      - name: Testes lentos, a parte desta máquina
+        run: npm run test:lentos
+        env:
+          GATES_PARTE: ${{ matrix.parte }}
+
+  bancada:
+    name: Gates da bancada
+    runs-on: ubuntu-latest
+    steps:
+      # O histórico inteiro, com ramos e tags, porque o gate de vazamento
+      # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
+      # commit e todo nome de ramo e tag, e reprova num checkout raso. Medido em
+      # 2026-10-21: 2.449 commits, 144 MB de pacote e 0,2 s de leitura.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node, dependências e navegador
+        uses: ./.github/actions/preparar
+
+      - name: Build do Modelar
+        run: npm run build
+
+      - name: Bancada publicada com catálogo vazio
+        run: npm run bancada:vazia:check
+
+      - name: Harness privado prova render de fixtures
+        run: npm run porteiro
+
+      # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
+      # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
+      # verde nos outros gates.
+      - name: A bancada mostra as portas que a peça publica
+        run: npm run guarda:portas
+
+      # A câmera livre é estado de autoria: o único lugar que comprova a órbita
+      # e a recarga é a bancada real, não um import de helper.
+      - name: A bancada restaura a câmera livre pela URL
+        run: npm run guarda:camera
+
+      # A inspeção de par mede pixels realmente visíveis com depth buffer e
+      # precisa do navegador real para provar a escolha e a recarga da URL.
+      - name: A bancada inspeciona duas partes com vista reproduzível
+        run: npm run guarda:par
+
+      # A imagem da peça sai do pacote construído, e não de `public/`. Trocar o
+      # glob que a emite deixaria a página subir, os testes verdes e a
+      # referência ausente só no endereço publicado.
+      - name: A bancada publicada mostra a referência da pasta da peça
+        run: npm run guarda:referencia
+
+      # A bancada relê a sessão a cada segundo e meio, e a leitura trocava a
+      # peça que a pessoa tinha acabado de escolher.
+      - name: A leitura periódica não desfaz a escolha da peça
+        run: npm run guarda:escolha
+
+      # Num quadro em treliça nenhum parâmetro empurra um tubo inteiro, então o
+      # gesto passou a ser o canto. O que só aparece no navegador é o arrasto
+      # sobreviver à reconstrução da malha que ele mesmo dispara.
+      - name: Arrastar a junta deforma só quem passa por ela
+        run: npm run guarda:junta
+
+      # Teclado, seleção por raycast e escrita direta nos vértices da cena: três
+      # coisas que teste de unidade não alcança. Um módulo de topologia
+      # impecável convive com pontos invisíveis e movimento que não chega à
+      # geometria desenhada.
+      - name: O modo de edição aparece, seleciona, move e desfaz
+        run: npm run guarda:edicao
+
+      # O caminho inteiro do desenho até a leitura: editar na tela, achar o
+      # botão de salvar, o arquivo sair com a descrição dentro e o comando de
+      # leitura entendê-la. Cada elo já esteve quebrado — salvar exigia ter
+      # puxado uma junta, e a base de comparação era a mesma malha viva.
+      - name: A edição sai da bancada descrita em palavras e números
+        run: npm run guarda:gesto
+
+  acervo:
+    name: Acervo, famílias e MCP
+    runs-on: ubuntu-latest
+    steps:
+      # O histórico inteiro, com ramos e tags, porque o gate de vazamento
+      # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
+      # commit e todo nome de ramo e tag, e reprova num checkout raso. Medido em
+      # 2026-10-21: 2.449 commits, 144 MB de pacote e 0,2 s de leitura.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node, dependências e navegador
+        uses: ./.github/actions/preparar
+
+      # A variante visual é um SCRIPT NOMEADO, não a mesma linha com uma
+      # variável de ambiente. Com `env:` no passo, o espelho local via nome de
+      # comando não enxergava a diferença — `mcp:check` aparecia nos dois lados
+      # e o gate passava — enquanto o CI rodava um segundo conjunto de provas
+      # que ninguém rodava aqui. Foi assim que duas falhas visuais reais
+      # sobreviveram.
+      - name: MCP transporta as quatro vistas oficiais
+        run: npm run mcp:visual:check
+
+      # A régua de contato existia, saía com código de erro e nenhum gate a
+      # chamava; foi assim que um quadro saiu em pedaços que não se tocavam.
+      - name: O acervo cumpre o plano e os contatos que declara
+        run: npm run guarda:acervo
+
+      # Um braço robótico passou em tudo deitado no chão: os pontos declarados
+      # ficaram a 2 mm do alvo e a peça estava virada noventa graus, porque
+      # cada régua compara a peça contra a declaração dela mesma. Só a
+      # comparação entre peças acusa referencial trocado.
+      - name: Toda peça do acervo usa o mesmo referencial
+        run: npm run guarda:referencial
+
       # A geometria dos três pontos de cada família registrada tem de continuar igual à da aprovação mecânica; sem
       # este passo uma família poderia mudar de forma depois de aprovada sem que ninguém reaprovasse.
       - name: Famílias registradas com a geometria igual à aprovada
@@ -257,3 +283,26 @@ jobs:
       # tem de reprovar sem o crítico o que o conjunto diz ser dela. Sem este passo o crítico poderia mudar sem remedir.
       - name: Conjunto de calibração do crítico em dia com o crítico e com as fontes
         run: npm run calibracao:check
+
+  juntar:
+    name: Juntar à main
+    needs: [ rapidos, lentos, bancada, acervo ]
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/claude/') || startsWith(github.ref, 'refs/heads/envio/'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Avança a main até o commit que passou
+        run: |
+          git fetch origin main
+          if git merge-base --is-ancestor origin/main HEAD; then
+            git push origin HEAD:main
+          else
+            echo "A main andou desde a base deste ramo; junte a main ao ramo (git merge origin/main) e envie de novo."
+            exit 1
+          fi

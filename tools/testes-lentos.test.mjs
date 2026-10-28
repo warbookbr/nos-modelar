@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { acimaDoTeto, argumentosDoVitest, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
+import { acimaDoTeto, argumentosDoVitest, comParte, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -35,5 +35,16 @@ describe('a lista dos testes lentos', () => {
     const lentos = [{ arquivo: 'a.test.mjs', ms: 35_000 }, { arquivo: 'b.test.mjs', ms: 40_000 }];
     const sozinho = { 'a.test.mjs': 5_000, 'b.test.mjs': TETO_SOZINHO_MS + 1 };
     expect(pesadosSozinhos(lentos, (f) => sozinho[f]).map((d) => [d.arquivo, d.sozinhoMs])).toEqual([['b.test.mjs', TETO_SOZINHO_MS + 1]]);
+  });
+});
+
+describe('a parte dos lentos que cada máquina do CI roda', () => {
+  it('acrescenta o --shard do vitest quando GATES_PARTE vem', () => {
+    expect(comParte(['run'], { GATES_PARTE: '2/5' })).toEqual(['run', '--shard=2/5']);
+    expect(comParte(['run'], {})).toEqual(['run']);
+  });
+
+  it('recusa a parte mal escrita', () => {
+    expect(() => comParte(['run'], { GATES_PARTE: 'dois' })).toThrow(/parte\/total/);
   });
 });

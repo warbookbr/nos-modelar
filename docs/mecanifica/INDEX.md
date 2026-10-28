@@ -132,12 +132,12 @@ o histórico inteiro (43 s em 2026-10-28).
 npm run gates
 ```
 
-Relata todos, com saída não-zero se algum falhar; a lista vive em
-`tools/gates.mjs` e é conferida contra o `ci.yml` nos dois sentidos. Quando só
-mudou peça (`procedural/pecas/`) ou documento desde o ramo remoto, roda a
-bateria curta `GATES_CURTOS`, sem os gates de navegador e de MCP; qualquer outro
-arquivo roda todos, e `--completo` força todos. O CI roda sempre a lista
-inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
+A lista vive em `tools/gates.mjs`, conferida contra o `ci.yml`. Cada gate roda
+só se algo do que ele lê mudou desde a última rodada verde dele, os baratos
+antes, e uma falha entre eles para a bateria; `--completo` roda tudo, e
+`npm run gates:vigiar` adianta o trabalho enquanto se edita. O envio vai a um
+ramo `claude/**` ou `envio/**`; o CI roda a lista inteira dividida entre
+máquinas e só então avança a main.
 
 O gate de vazamento (`tools/arquitetura/termos-proibidos.test.mjs`) pede a chave
 da lista em `MECANIFICA_CHAVE_TERMOS_ARQUIVO=<arquivo fora do repositório>`; sem
