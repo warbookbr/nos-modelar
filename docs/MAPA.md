@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1506 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1507 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -777,6 +777,7 @@
 - `modulos.test.js` — Bloco `modulos` do esboço: a IA define no próprio JSON um módulo reutilizável (parâmetros, formas e âncoras) e o usa por `usa`, pelo mesmo caminho de expansã…
 - `nota-do-critico.test.js` — A regra da nota no Condutor (plano "O esboço detalhado coerente", fatia 7): a unidade com brief (ou o Marco) cujo último veredito é menor que 8 bloqueia o --…
 - `oclusao-do-contorno.test.js` — A oclusão das linhas de uma forma recortada (`subtrai`): uma linha que corre sobre a borda de uma face não some, e uma que está de fato atrás dela continua e…
+- `ordem-das-faces.test.js` — ordem-das-faces.test.js — `ordemDasFaces` com a caixa de cada face na tela dá a mesma ordem que a conta de antes.
 - `parametros.test.js` — Parâmetros e expressões, formas herdadas da raiz, `espelha` e `arranja`, e o legado byte a byte.
 - `perguntas-do-critico.test.js` — As perguntas de forma por componente e por família de objeto no brief do crítico do esboço: o campo `perguntas` do componente e do módulo, `plano.familia` co…
 - `plano.test.js` — O `plano` estruturado: medidas nomeadas conferidas contra o esboço, contrato de relações e o esquema do JSON.

@@ -1836,8 +1836,19 @@ export function ordemDasFaces(lados, olho) {
   };
   const antes = Array.from({ length: n }, () => new Set());
   const grau = new Array(n).fill(0);
+  /* a caixa de cada face na tela: duas faces cujas caixas estão separadas por mais que a área mínima abaixo não se cobrem, e o
+     recorte de uma pela outra daria uma região vazia (ou de área nula), que o laço já descartava */
+  const caixas = polis.map((q) => {
+    let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
+    for (const p of q) { if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0]; if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1]; }
+    return [x0, y0, x1, y1];
+  });
+  const SEPARACAO = 1e-3;
   for (let a = 0; a < n; a++) {
+    const ca = caixas[a];
     for (let b = a + 1; b < n; b++) {
+      const cb = caixas[b];
+      if (ca[2] + SEPARACAO < cb[0] || cb[2] + SEPARACAO < ca[0] || ca[3] + SEPARACAO < cb[1] || cb[3] + SEPARACAO < ca[1]) continue;
       const inter = recortar(polis[a], polis[b]);
       if (inter.length < 3) continue;
       const area = Math.abs(inter.reduce((acc, q, i) => acc + q[0] * inter[(i + 1) % inter.length][1] - inter[(i + 1) % inter.length][0] * q[1], 0)) / 2;
