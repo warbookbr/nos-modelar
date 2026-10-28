@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1485 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1487 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2015,6 +2015,11 @@
 ## tools/fixtures/tres-blocos-vinculados/receitas/
 
 - `bloco.js` — bloco.js — o bloco da fixture neutra "três blocos vinculados", nas três variações que ela usa: só pino, furo e pino, e só furo. Um arquivo só gera as três, p…
+
+## tools/gates/
+
+- `seletor.mjs` — seletor.mjs — decide o que cada gate precisa rodar, comparando o repositório de agora com o da última vez que o gate passou.
+- `seletor.test.mjs` — seletor.test.mjs — o gate roda só se algo do que ele lê mudou desde a última rodada verde, e os testes vão pelo grafo de imports só quando tudo o que mudou é…
 
 ## tools/mapa/
 

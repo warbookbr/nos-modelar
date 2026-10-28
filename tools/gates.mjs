@@ -22,6 +22,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { decidir, fotografar, gravarVerdes, lerVerdes, registroVerde } from './gates/seletor.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -277,12 +278,20 @@ function limiteDeConcorrencia() {
 
 const ambienteDosGates = {};
 
-function rodarGate(gate, { silencioso }) {
+function rodarGate(gate, { silencioso, testes = null }) {
   return new Promise((resolver) => {
     const inicio = Date.now();
+    /* Os arquivos de teste que o seletor ligou ao que mudou vão por arquivo, porque a lista pode ser longa para o ambiente. */
+    const ambienteDoGate = { ...process.env, ...ambienteDosGates };
+    if (testes) {
+      const lista = join('tmp', 'gates', `relacionados-${gate.split(':')[1]}.json`);
+      mkdirSync(dirname(lista), { recursive: true });
+      writeFileSync(lista, JSON.stringify(testes));
+      ambienteDoGate.GATES_TESTES_RELACIONADOS = lista;
+    }
     /* `shell: true` porque no Windows `npm` é um .cmd; sem isso o spawn não
        encontra o executável e todo gate "falha" pelo motivo errado. */
-    const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true, env: { ...process.env, ...ambienteDosGates } });
+    const processo = spawn('npm', ['run', gate], { stdio: ['ignore', 'pipe', 'pipe'], shell: true, env: ambienteDoGate });
     const pedacos = [];
     processo.stdout.on('data', (d) => pedacos.push(d));
     processo.stderr.on('data', (d) => pedacos.push(d));
@@ -316,8 +325,24 @@ async function executar() {
   const motivo = escolha.motivo + (pulados.length ? `; fora: ${pulados.join(', ')} (nada do que conferem mudou)` : '');
   console.log(`gates — ${motivo}.`);
 
+  /* O SELETOR. Fora do CI e do `--completo`, cada gate roda só se algo do que ele lê mudou desde a última vez que passou, e os
+     testes só os ligados ao que mudou (tools/gates/seletor.mjs). A foto é tirada uma vez, aqui, e é ela que fica guardada como
+     verde: um arquivo editado durante a bateria aparece como mudado na rodada seguinte. */
+  const comSeletor = !completo && !process.env.CI && !process.argv.includes('--sem-seletor');
+  const foto = comSeletor ? fotografar('.') : null;
+  const verdes = comSeletor ? lerVerdes('.') : {};
+  const decisoes = new Map();
+  if (comSeletor) for (const gate of bateria) decisoes.set(gate, decidir(gate, foto, verdes));
+  const guardados = bateria.filter((g) => decisoes.get(g)?.rodar === false);
+  if (guardados.length) console.log(`gates — guardados, sem rodar: ${guardados.join(', ')} (nada do que conferem mudou desde a última rodada verde).`);
+  for (const gate of ['test:rapidos', 'test:lentos']) {
+    const d = decisoes.get(gate);
+    if (d?.rodar) console.log(`gates — ${gate}: ${d.motivo}.`);
+  }
+
   const porGate = new Map();
-  const fila = [...bateria];
+  for (const gate of guardados) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, guardado: true });
+  const fila = bateria.filter((g) => !guardados.includes(g));
   const ocupados = new Set();
   let pesoEmUso = 0;
   let abortado = false;
@@ -344,8 +369,9 @@ async function executar() {
       for (const recurso of recursos) ocupados.add(recurso);
       pesoEmUso += pesoDe(gate);
       try {
-        const resultado = await rodarGate(gate, { silencioso });
+        const resultado = await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
         porGate.set(gate, resultado);
+        if (comSeletor && resultado.codigo === 0) { const r = registroVerde(gate, foto); if (r) verdes[gate] = r; }
         if (resultado.codigo !== 0 && pararNoPrimeiro) abortado = true;
       } finally {
         pesoEmUso -= pesoDe(gate);
@@ -357,6 +383,7 @@ async function executar() {
   const relogio = Date.now();
   await Promise.all(Array.from({ length: concorrencia }, trabalhador));
   const decorrido = Date.now() - relogio;
+  if (comSeletor) gravarVerdes('.', verdes);
 
   /* A ORDEM DO RELATÓRIO É A DA LISTA, e não a de quem terminou primeiro: a
      lista é a mesma do `ci.yml`, e comparar as duas a olho exige que sejam
@@ -367,7 +394,8 @@ async function executar() {
   const total = resultados.reduce((soma, r) => soma + r.duracao, 0);
 
   console.log(`\n${'─'.repeat(52)}`);
-  for (const { gate, codigo, duracao, arquivo } of resultados) {
+  for (const { gate, codigo, duracao, arquivo, guardado } of resultados) {
+    if (guardado) { console.log(`= ${gate.padEnd(24)}  guardado`); continue; }
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);
   }

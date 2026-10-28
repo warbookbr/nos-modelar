@@ -137,6 +137,12 @@ function ramoRemoto() {
 }
 
 export function argumentosDoVitest(modo, { ambiente = process.env, remoto = ramoRemoto } = {}) {
+  /* A bateria, pelo seletor (tools/gates/seletor.mjs), passa os arquivos de código mudados desde a última rodada verde; o
+     `vitest related` roda só os testes que os importam, respeitando a divisão entre rápidos e lentos da configuração. */
+  if (ambiente.GATES_TESTES_RELACIONADOS && !ambiente.CI && ambiente.GATES_COMPLETO !== '1') {
+    const arquivos = JSON.parse(readFileSync(ambiente.GATES_TESTES_RELACIONADOS, 'utf8'));
+    return { args: ['related', ...arquivos, '--run', '--passWithNoTests'], motivo: `os ${modo} ligados a ${arquivos.length} arquivo(s) mudados desde a última rodada verde` };
+  }
   if (modo === 'rapidos') return { args: ['run'], motivo: 'todos os testes fora da lista dos lentos' };
   if (ambiente.CI || ambiente.GATES_COMPLETO === '1') return { args: ['run'], motivo: 'todos os lentos (CI ou --completo)' };
   const base = remoto();
