@@ -342,9 +342,14 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
      pessoa tinha acabado de recuperar — medido: apagar o tubo do selim e
      desfazer deixava a peça com sete partes. */
   let origemDaMalha = null;
+  /* `portas` segue junto, sem cópia: é o contrato que a receita declarou (id, rótulo,
+     operação de origem), não geometria, e deformar ou editar a malha não o altera.
+     Sem ele, `neutroDoArquivo` e tudo o que se reconstrói a partir dele publicavam
+     lista vazia, e o painel de portas sumia depois do primeiro gesto. */
   const fotografarMalha = (neutro) => ({
     V: new Map([...neutro.V].map(([id, p]) => [id, [...p]])),
     F: new Map([...neutro.F].map(([id, f]) => [id, { ...f, vs: [...f.vs] }])),
+    ...(neutro.portas === undefined ? {} : { portas: neutro.portas }),
   });
   /* O que o controlador de câmera usa fora do modo de edição, guardado para ser
      devolvido na saída. */

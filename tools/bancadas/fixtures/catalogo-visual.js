@@ -63,6 +63,22 @@ export const portas = {
   ],
 };
 
+/* Duas partes que se tocam num plano, com uma porta em cada: tem junta para o
+   punho pegar e porta para o painel mostrar. Serve à `guarda:portas`, que
+   afirma que o painel continua mostrando as portas depois de arrastar a junta e
+   depois de editar a malha, que reconstroem o modelo por caminhos próprios. */
+export const portasComJunta = {
+  meta: { nome: 'Fixture de portas com junta' },
+  PASSOS: [
+    ['cubo', { origemId: 130, larg: 1, alt: 0.4, prof: 0.6 }],
+    parte('corpo', { op: 'cubo', id: 130 }),
+    publicar('portaDoCorpo', { op: 'cubo', id: 130 }),
+    ['cubo', { origemId: 131, larg: 0.4, alt: 0.4, prof: 0.6, em: [0.7, 0, 0] }],
+    parte('braco', { op: 'cubo', id: 131 }),
+    publicar('portaDoBraco', { op: 'cubo', id: 131 }),
+  ],
+};
+
 export const semPortas = {
   meta: { nome: 'Fixture sem portas' },
   PASSOS: [
