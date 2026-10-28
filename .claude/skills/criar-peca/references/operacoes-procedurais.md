@@ -952,7 +952,8 @@ a superfície subdividida ficou de fora do plano que criou a operação, e o fri
 precisaria da chapa inteira como sólido de entrada. Nomeie a chapa e o friso com
 `parte` e declare o contato em `contatos` da receita, com o motivo; o
 `contatosDaPeca` mede o par como `interpenetram`, e esquecer a declaração
-reprova. Em cada junta o perfil fica no plano bissetor e se estica pela
+reprova. O contato em plano inclinado que fica a nanômetros do plano aceita
+`toleranciaNumerica` própria, de 1e-9 a 1e-7, sempre com o `motivo`. Em cada junta o perfil fica no plano bissetor e se estica pela
 esquadria, de modo que uma volta de cantos de 90 graus sai sem fresta; a curva
 fechada demais para a largura do perfil grita com o ponto da gaiola mais perto.
 A linha que muda de direção numa aresta da gaiola faz canto mesmo na chapa lisa,

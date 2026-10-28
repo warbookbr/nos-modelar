@@ -473,10 +473,23 @@ export async function descreverPecaReutilizavel({
       stderr += `\n${contatos.declaradosSemContato.length} CONTATO(S) DECLARADO(S) QUE NÃO ACONTECEM`
         + '\n  A receita disse que estas partes se tocam, e elas não se tocam:\n'
         + contatos.declaradosSemContato
-          .map(({ par, motivo }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`)
+          .map(({ par, motivo, fechaComTolerancia }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+            + (fechaComTolerancia === undefined ? '' : `\n      fecharia com tolerância de ${fechaComTolerancia}: o vão é menor que isso, do tamanho da grade de 1e-8 do perfil (\`GRADE\` de perfil2d.js), e não uma folga de forma.`))
           .join('\n')
-        + '\n  Ou a geometria não chegou onde deveria, ou a declaração está errada.\n';
+        + '\n  Ou a geometria não chegou onde deveria, ou a declaração está errada.\n'
+        + (contatos.declaradosSemContato.some((d) => d.fechaComTolerancia !== undefined)
+          ? '  Se o par encosta de verdade (por exemplo, vidro sobre plano inclinado, onde o vértice novo volta a nanômetros do plano), declare `toleranciaNumerica` (de 1e-9 a 1e-7) no contato, com o motivo.\n'
+          : '');
       falhou = true;
+    }
+    /* A tolerância de contato que a medida usou: a global, e a de cada contato que pediu a sua. Só aparece quando algum contato pede, para a saída das peças sem
+       tolerância própria continuar a mesma. */
+    const comToleranciaPropria = contatos.paresEmContato.filter((p) => p.toleranciaNumerica !== undefined)
+      .concat(contatos.declaradosSemContato.filter((p) => p.toleranciaNumerica !== undefined));
+    if (comToleranciaPropria.length) {
+      stdout += `\nTOLERÂNCIA DE CONTATO — global ${contatos.toleranciaNumerica}; ${comToleranciaPropria.length} contato(s) declarado(s) com tolerância própria\n`
+        + comToleranciaPropria.map(({ par, toleranciaNumerica, motivo }) => `  ${par[0]} ↔ ${par[1]}: ${toleranciaNumerica} — ${motivo}`).join('\n')
+        + '\n';
     }
 
     if (contatos.cobertura.inconclusivos.length) {
