@@ -30,7 +30,13 @@
    uniforme e da cordal, não faz laço nem ponta dentro de um vão. A tangente é contínua em cada ponto de passagem.
 
    O contorno devolvido mantém o sentido em que foi escrito; a conferência de polígono simples e a orientação canônica são
-   de `montarPerfil`. Sem Three.js, sem WebAssembly. */
+   de `montarPerfil`. Sem Three.js, sem WebAssembly.
+
+   `recortarArcoNoPerfil` (no fim do arquivo) é outra função pura, sobre um contorno já pronto: recorta no perfil o arco poligonal
+   de uma roda ou de um vão redondo na borda de baixo, fundindo o corte que cai perto de um vértice, para a extrusão não ganhar
+   lateral de lasca. */
+
+import { diagnosticarContorno } from './contorno.js';
 
 const EPS = 1e-9;
 export const SEGMENTOS_SPLINE_PADRAO = 8;
@@ -327,5 +333,93 @@ export function contornoPorTrechos(contorno, { campo = 'contorno', num = (x) => 
   const primeiro = saida[0], ultimo = saida[saida.length - 1];
   if (saida.length > 1 && Math.abs(primeiro[0] - ultimo[0]) <= EPS && Math.abs(primeiro[1] - ultimo[1]) <= EPS) saida.pop();
   if (saida.length < 3) throw new ErroDeCurva(`${campo}.trechos`, `o contorno ficou com ${saida.length} ponto(s); um contorno precisa de 3 ou mais`);
+  return saida;
+}
+
+/* Recorte de um arco poligonal na borda de baixo de um contorno, como o arco de roda no perfil lateral de um veículo, mas sem
+   saber de roda nem de veículo: o polígono regular de `lados` lados e `raio` em volta de `centro`, com a face plana em cima (os
+   vértices a meio passo do eixo vertical, como o cilindro de eixo horizontal de `lados` lados), é tirado do contorno onde ele
+   cruza a aresta horizontal que fica em y = `base`. Os pontos são [x, y]. O contorno pode vir em qualquer sentido e volta
+   anti-horário, na mesma ordem de partida, com o arco entre os dois pontos de corte da aresta de base.
+
+   O corte que cai a menos de `fundirAbaixoDe` do vizinho funde com ele, para a extrusão não ganhar lateral de lasca: se o ponto
+   de corte fica a menos disso do canto da aresta de base, o canto passa a ser o início do arco e o ponto de corte sai; se fica a
+   menos disso do primeiro (ou último) vértice do arco, esse vértice sai e o arco parte do ponto de corte. A forma muda no máximo
+   `fundirAbaixoDe` ali, e é a receita que escolhe quanto (padrão 0: só funde o que coincide a 1e-9). Para dois arcos na mesma
+   borda, chama-se a função duas vezes, e a segunda acha a aresta de base que sobrou. O resultado precisa ser polígono simples; se o
+   arco atravessa outra parte do contorno, a função recusa com o diagnóstico de `diagnosticarContorno`. */
+export function recortarArcoNoPerfil(perfil, { centro, raio, lados, base, fundirAbaixoDe = 0 } = {}) {
+  const campo = 'recortarArcoNoPerfil';
+  const par = (p) => Array.isArray(p) && p.length >= 2 && ehNumero(p[0]) && ehNumero(p[1]);
+  if (!Array.isArray(perfil) || perfil.length < 3 || !perfil.every(par)) throw new ErroDeCurva(campo, `"perfil" precisa ser uma lista de 3 pontos [x, y] ou mais, com números finitos (veio ${texto(perfil)})`);
+  if (!par(centro) || centro.length !== 2) throw new ErroDeCurva(campo, `"centro" precisa ser [x, y] com números finitos (veio ${texto(centro)})`);
+  if (!ehNumero(raio) || !(raio > 0)) throw new ErroDeCurva(campo, `"raio" precisa ser um número maior que zero (veio ${texto(raio)})`);
+  if (!Number.isInteger(lados) || lados < 3) throw new ErroDeCurva(campo, `"lados" precisa ser um inteiro >= 3 (veio ${texto(lados)})`);
+  if (!ehNumero(base)) throw new ErroDeCurva(campo, `"base" precisa ser o y da aresta de baixo, um número finito (veio ${texto(base)})`);
+  if (!ehNumero(fundirAbaixoDe) || fundirAbaixoDe < 0) throw new ErroDeCurva(campo, `"fundirAbaixoDe" precisa ser um número finito maior ou igual a zero (veio ${texto(fundirAbaixoDe)})`);
+
+  let P = perfil.map((p) => [p[0], p[1]]);
+  const area = P.reduce((acc, q, i) => acc + q[0] * P[(i + 1) % P.length][1] - P[(i + 1) % P.length][0] * q[1], 0);
+  if (Math.abs(area) < EPS) throw new ErroDeCurva(campo, 'o perfil não tem área');
+  if (area < 0) P = P.reverse();
+
+  /* o polígono do arco, do vértice de cima à esquerda para a direita por cima (ângulo decrescente), e a cadeia dele acima da base */
+  const passo = VOLTA / lados;
+  const W = Array.from({ length: lados }, (_, k) => { const a = Math.PI - passo / 2 - k * passo; return [centro[0] + raio * Math.cos(a), centro[1] + raio * Math.sin(a)]; });
+  const acima = W.map((q) => q[1] > base);
+  const nAcima = acima.filter(Boolean).length;
+  if (nAcima === 0 || nAcima === lados) {
+    const ys = W.map((q) => q[1]);
+    throw new ErroDeCurva(campo, `o arco (centro ${texto(centro)}, raio ${fmt(raio)}, ${lados} lados, de y ${fmt(Math.min(...ys))} a ${fmt(Math.max(...ys))}) não cruza a linha da base y = ${fmt(base)}; confira o centro, o raio e a base`);
+  }
+  const inicio = acima.findIndex((v, k) => v && !acima[(k - 1 + lados) % lados]);
+  let fim = inicio;
+  while (acima[(fim + 1) % lados]) fim = (fim + 1) % lados;
+  const cadeia = [];
+  for (let k = inicio; ; k = (k + 1) % lados) { cadeia.push(W[k]); if (k === fim) break; }
+  const corte = (a, b) => { const t = (base - a[1]) / (b[1] - a[1]); return [a[0] + t * (b[0] - a[0]), base]; };
+  const corteEsq = corte(W[(inicio - 1 + lados) % lados], W[inicio]);
+  const corteDir = corte(W[fim], W[(fim + 1) % lados]);
+
+  /* a aresta de base do perfil que contém o trecho cortado */
+  const n = P.length;
+  const folga = EPS * Math.max(1, Math.abs(base), ...P.map((p) => Math.abs(p[0])));
+  let i = -1;
+  for (let k = 0; k < n; k++) {
+    const a = P[k], b = P[(k + 1) % n];
+    if (Math.abs(a[1] - base) <= folga && Math.abs(b[1] - base) <= folga && a[0] < b[0] && corteEsq[0] >= a[0] - folga && corteDir[0] <= b[0] + folga) { i = k; break; }
+  }
+  if (i < 0) {
+    const bases = P.map((a, k) => [a, P[(k + 1) % n]]).filter(([a, b]) => Math.abs(a[1] - base) <= folga && Math.abs(b[1] - base) <= folga && a[0] < b[0]);
+    throw new ErroDeCurva(campo, `nenhuma aresta horizontal do perfil em y = ${fmt(base)} contém o trecho cortado pelo arco, de x ${fmt(corteEsq[0])} a x ${fmt(corteDir[0])}`
+      + (bases.length ? `; as arestas de base são ${bases.map(([a, b]) => `x ${fmt(a[0])} a ${fmt(b[0])}`).join(' e ')}` : '; o perfil, no sentido anti-horário, não tem aresta horizontal nessa altura'));
+  }
+  const a = P[i], b = P[(i + 1) % n];
+
+  /* a fusão com o vizinho: primeiro os vértices do arco colados no corte, depois os cantos da aresta de base */
+  const limite = Math.max(fundirAbaixoDe, EPS);
+  const arco = cadeia.map((q) => [q[0], q[1]]);
+  while (arco.length > 0 && dist(corteEsq, arco[0]) < limite) arco.shift();
+  while (arco.length > 0 && dist(corteDir, arco[arco.length - 1]) < limite) arco.pop();
+  if (arco.length === 0) throw new ErroDeCurva(campo, `o arco inteiro cabe em menos de ${fmt(fundirAbaixoDe)} de largura junto à base y = ${fmt(base)} e some na fusão; use um fundirAbaixoDe menor`);
+  const entre = [];
+  if (corteEsq[0] - a[0] >= limite) entre.push(corteEsq);
+  entre.push(...arco);
+  if (b[0] - corteDir[0] >= limite) entre.push(corteDir);
+
+  const saida = [];
+  const empurrar = (p) => {
+    const q = [arredondar(p[0]), arredondar(p[1])];
+    const u = saida[saida.length - 1];
+    if (u && Math.abs(q[0] - u[0]) <= EPS && Math.abs(q[1] - u[1]) <= EPS) return;
+    saida.push(q);
+  };
+  P.slice(0, i + 1).forEach(empurrar);
+  entre.forEach(empurrar);
+  P.slice(i + 1).forEach(empurrar);
+  const primeiro = saida[0], ultimo = saida[saida.length - 1];
+  if (saida.length > 1 && Math.abs(primeiro[0] - ultimo[0]) <= EPS && Math.abs(primeiro[1] - ultimo[1]) <= EPS) saida.pop();
+  const diagnostico = diagnosticarContorno(saida);
+  if (diagnostico) throw new ErroDeCurva(campo, `o arco recortado não deixa um polígono simples (o arco atravessa outra parte do perfil, ou o raio passa de um vizinho): ${diagnostico.mensagem}`);
   return saida;
 }

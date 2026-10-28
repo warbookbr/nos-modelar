@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:bb28a0e9f4c2522e221139e8d0721c8108cb1365f10fb282507bf2d3077b0b57",
+  "assinatura": "sha256:1baeded98be2c0d3c631e915204019afd1f20e698ad747b71d3b3503081d4716",
   "total": 39,
   "operacoes": [
     {
@@ -2575,6 +2575,10 @@
               ],
               "description": "Segmentos por vão de spline de um furo escrito como {contorno} (padrão 8)."
             },
+            "superficie": {
+              "type": "boolean",
+              "description": "true declara a casca aberta de propósito: sem ele, a polilinha que não toca o eixo nas duas pontas nem volta ao primeiro ponto é recusada."
+            },
             "em": {
               "anyOf": [
                 {
@@ -2614,7 +2618,8 @@
                     1
                   ]
                 ],
-                "lados": 8
+                "lados": 8,
+                "superficie": true
               }
             ]
           ],
@@ -2625,7 +2630,8 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "Perfil precisa ter ao menos dois pontos e raios não negativos."
+          "Perfil precisa ter ao menos dois pontos e raios não negativos.",
+          "A polilinha precisa tocar o eixo (raio 0) nas duas pontas ou voltar ao primeiro ponto; senão é recusada, a menos de furos: [] (seção fechada pelo eixo) ou superficie: true (casca aberta declarada)."
         ],
         "limites": [
           "Com furos ou deslocar o perfil é o contorno externo de uma SEÇÃO fechada (o fecho pelo eixo é implícito) e cada contorno do resultado vira um laço; as faixas se enfileiram: o externo e depois os furos, na ordem canônica de perfil2d.js. Raio negativo, furo que encosta na borda e deslocamento que apaga a seção são recusados com campo e valor."

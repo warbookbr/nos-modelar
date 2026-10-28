@@ -27,7 +27,7 @@ const LADOS = 8;
 /* seção quadrada girada: fechada repete o primeiro ponto no fim. */
 const SECAO = [[0.05, 0], [0.07, 0], [0.07, 0.02], [0.05, 0.02]];
 const torus = (fecha: boolean) => nucleo([
-  ['lathe', { origemId: 1, lados: LADOS, perfil: fecha ? [...SECAO, SECAO[0]] : SECAO }],
+  ['lathe', { origemId: 1, lados: LADOS, perfil: fecha ? [...SECAO, SECAO[0]] : SECAO, ...(fecha ? {} : { superficie: true }) }],
 ], {});
 
 /* Numa malha fechada toda aresta serve a exatamente duas faces. Aresta usada
@@ -89,7 +89,7 @@ describe('perfil fechado produz superfície fechada', () => {
 describe('o fechamento é exato, nunca aproximado', () => {
   it('ponto quase igual NÃO fecha o laço', () => {
     const quase = nucleo([
-      ['lathe', { origemId: 1, lados: LADOS, perfil: [...SECAO, [0.05, 1e-12]] }],
+      ['lathe', { origemId: 1, lados: LADOS, perfil: [...SECAO, [0.05, 1e-12]], superficie: true }],
     ], {});
     /* 5 anéis, porque o autor não escreveu o mesmo ponto — fechar por limiar
        mudaria a topologia de uma peça que não pediu isso. */
@@ -99,7 +99,7 @@ describe('o fechamento é exato, nunca aproximado', () => {
 
   it('perfil de dois pontos iguais não vira laço', () => {
     /* menos de três pontos não descreve volta nenhuma. */
-    const dois = nucleo([['lathe', { origemId: 1, lados: LADOS, perfil: [[0.05, 0], [0.05, 0]] }]], {});
+    const dois = nucleo([['lathe', { origemId: 1, lados: LADOS, perfil: [[0.05, 0], [0.05, 0]], superficie: true }]], {});
     expect(dois.V.size).toBe(2 * LADOS);
   });
 

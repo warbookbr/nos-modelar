@@ -32,7 +32,7 @@
 
    O núcleo continua sem Three.js. A Manifold vem de manifold.js, a mesma instância das booleanas. */
 import { manifoldCarregada, erroDaCargaDaManifold } from './manifold.js';
-import { areaDoContorno, ehSimples, retanguloArredondado } from './contorno.js';
+import { areaDoContorno, diagnosticarContorno, ehSimples, retanguloArredondado } from './contorno.js';
 import { ErroDeCurva, contornoPorTrechos } from './curva2d.js';
 
 export const CANTOS_DO_DESLOCAMENTO = Object.freeze(['redondo', 'reto', 'esquadria']);
@@ -79,6 +79,9 @@ function resolverCantos(cantos, campo, num) {
   if (Array.isArray(cantos)) return cantos.map((c, k) => (Array.isArray(c) ? c.map((r, j) => numeroDe(num, r, `${campo}.cantos[${k}][${j}]`)) : numeroDe(num, c, `${campo}.cantos[${k}]`)));
   return numeroDe(num, cantos, `${campo}.cantos`);
 }
+
+/* A razão da recusa de `ehSimples`, com o ponto ou as arestas (os índices contam da lista de pontos que chegou aqui, a partir de 0). */
+const porQueNaoESimples = (pontos) => diagnosticarContorno(pontos)?.mensagem ?? 'área nula, ponto repetido ou arestas que se cruzam';
 
 /* Uma forma (lista de pontos, retângulo ou círculo) vira lista de pontos [u, v] com números. */
 export function formaParaContorno(forma, campo, { num = (x) => x, segmentosArco = SEGMENTOS_ARCO_PADRAO, segmentosSpline } = {}) {
@@ -244,11 +247,11 @@ export function montarPerfil(entrada, { num = (x) => x, nomes = {}, semiPlano = 
   const segmentosSpline = inteiroDe(entrada.segmentosSpline, 'segmentosSpline', 1, SEGMENTOS_SPLINE_PADRAO);
   if (entrada.externo == null) throw new ErroDePerfil(n.externo, 'é obrigatório: lista de pontos [u, v], {retangulo} ou {circulo}');
   const externoCru = formaParaContorno(entrada.externo, n.externo, { num, segmentosArco, segmentosSpline });
-  if (!ehSimples(externoCru)) throw new ErroDePerfil(n.externo, 'o contorno não é um polígono simples (área nula, ponto repetido ou arestas que se cruzam)');
+  if (!ehSimples(externoCru)) throw new ErroDePerfil(n.externo, `o contorno não é um polígono simples: ${porQueNaoESimples(externoCru)}`);
   if (entrada.furos != null && !Array.isArray(entrada.furos)) throw new ErroDePerfil(n.furos, `precisa ser uma lista de formas (veio ${texto(entrada.furos)})`);
   const furosCrus = (entrada.furos ?? []).map((f, k) => {
     const pontos = formaParaContorno(f, `${n.furos}[${k}]`, { num, segmentosArco, segmentosSpline });
-    if (!ehSimples(pontos)) throw new ErroDePerfil(`${n.furos}[${k}]`, 'o contorno do furo não é um polígono simples (área nula, ponto repetido ou arestas que se cruzam)');
+    if (!ehSimples(pontos)) throw new ErroDePerfil(`${n.furos}[${k}]`, `o contorno do furo não é um polígono simples: ${porQueNaoESimples(pontos)}`);
     return pontos;
   });
   const deslocar = lerDeslocar(entrada.deslocar, n, num);
