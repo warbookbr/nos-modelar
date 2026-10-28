@@ -218,6 +218,7 @@ describe('a independência do módulo', () => {
       "componentes.js: ../../../src/autoria/perguntas-do-critico.js",
       "expandir.js: ../../../procedural/nucleo/expressoes.js",
       "index.js: ../../../procedural/nucleo/contorno.js",
+      "index.js: ../../../procedural/nucleo/memoria-de-pura.js",
       "perguntas.js: ../../../procedural/criterios/index.js",
       "perguntas.js: ../../../src/autoria/perguntas-do-critico.js",
       "plano.js: ../../../procedural/criterios/index.js",

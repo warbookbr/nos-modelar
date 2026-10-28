@@ -3,7 +3,7 @@
    JSON e não importa o módulo. Não desenha, não lê nem grava arquivo e não muda nada do que o módulo desenha: resolve a
    opção pelo mesmo `resolverOpcao` do desenho e só copia o resultado, sem objeto de classe, função nem referência circular
    (`JSON.parse(JSON.stringify(x))` devolve um valor igual). O formato está descrito no README, em "Formas resolvidas". */
-import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
+import { ancorasDe, ErroDeEsboco, resolverOpcaoGuardada } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { unidadesDeclaradas } from './contato.js';
 import { lerPlano } from './plano.js';
@@ -183,7 +183,7 @@ export function formasResolvidas(esboco, opcao = 1) {
     `formasResolvidas: a opção ${JSON.stringify(opcao)} não existe (o esboço tem ${expandido.opcoes.length}: número de 1 a ${expandido.opcoes.length} ou o título${expandido.opcoes.some((o) => o?.titulo) ? `, um de ${expandido.opcoes.map((o) => JSON.stringify(o.titulo)).join(', ')}` : ''})`);
   const o = expandido.opcoes[indice];
   const rotulo = `opção ${indice + 1}${o.titulo ? ` (${o.titulo})` : ''}`;
-  const resolvidas = resolverOpcao(o, rotulo, expandido.pontos);
+  const resolvidas = resolverOpcaoGuardada(o, rotulo, expandido.pontos);
   const brutas = new Map((o.formas ?? []).filter((f) => objeto(f) && typeof f.id === 'string').map((f) => [f.id, f]));
   const brutasDoEscrito = esboco.opcoes[indice]?.formas ?? esboco.formas;
   const usaDe = componentesDaOpcao(brutasDoEscrito);

@@ -46,6 +46,15 @@ describe('memoizarPura', () => {
     expect(f.chamadas).toBe(6);
   });
 
+  it('indefinido, ausente e nulo são argumentos distintos', () => {
+    const f = contada((x) => JSON.stringify(x) ?? 'nada');
+    const m = memoizarPura(f, { tamanho: 10 });
+    m({ a: undefined }); m({}); m({ a: null }); m(undefined); m(null);
+    expect(f.chamadas).toBe(5);
+    m({ a: undefined }); m({}); m(undefined);
+    expect(f.chamadas).toBe(5);
+  });
+
   it('o resultado com zero negativo e infinito volta da memória idêntico', () => {
     const m = memoizarPura(() => ({ a: -0, b: Infinity, c: NaN }));
     m();
@@ -61,6 +70,10 @@ describe('memoizarPura', () => {
     expect(m(() => 1)).toBe(1);
     expect(m(() => 2)).toBe(2);
     expect(f.chamadas).toBe(2);
+    const h = contada((texto) => texto);
+    const mh = memoizarPura(h);
+    mh('\u0000u'); mh('\u0000u');
+    expect(h.chamadas).toBe(2);
     const g = contada((mapa) => mapa.size);
     const mg = memoizarPura(g);
     mg(new Map([[1, 2]])); mg(new Map([[1, 2]]));
@@ -88,6 +101,18 @@ describe('memoizarPura', () => {
     const mg = memoizarPura(g, { quando: (x) => x > 0 });
     mg(-1); mg(-1); mg(1); mg(1);
     expect(g.chamadas).toBe(3);
+  });
+});
+
+describe('memoizarPura sem cópia', () => {
+  it('devolve o mesmo objeto guardado, e preserva o objeto de classe que a cópia perderia', () => {
+    class Malha { constructor(n) { this.n = n; } dobro() { return 2 * this.n; } }
+    const f = contada((n) => ({ malha: new Malha(n) }));
+    const m = memoizarPura(f, { copiar: false });
+    const a = m(3); const b = m(3);
+    expect(f.chamadas).toBe(1);
+    expect(b).toBe(a);
+    expect(b.malha.dobro()).toBe(6);
   });
 });
 

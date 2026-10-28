@@ -8,8 +8,9 @@
 
 /* As opções de desenho para quem mede a silhueta: a camada, sem o perfil das fitas dos traços (`perfilDosTracos: false`, ver
    `formasDoPainel` em `modulos/esboco/src/camada.js`). A máscara só lê as faces, e o perfil é a maior parte do custo da camada de
-   um esboço grande, sem mudar uma face (a bateria de `esboco-blocagem.test.mjs` passou de 517 s para 173 s). */
-export const CAMADA_DA_SILHUETA = { camada: true, perfilDosTracos: false };
+   um esboço grande, sem mudar uma face (a bateria de `esboco-blocagem.test.mjs` passou de 517 s para 173 s). `soCamada: true` também
+   dispensa o SVG, que a máscara não lê: o desenho das formas devolve `svg` vazio e a mesma camada (ver `desenharEsboco`). */
+export const CAMADA_DA_SILHUETA = { camada: true, perfilDosTracos: false, soCamada: true };
 
 /** @returns {{ largura: number, altura: number, dados: Uint8Array, area: number }} */
 export function mascaraDaCamada(camada) {

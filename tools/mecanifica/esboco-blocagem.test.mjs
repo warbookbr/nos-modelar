@@ -31,26 +31,33 @@
    Custo. A bateria varre todo esboço do banco de provas e desenha 8 vezes cada opção (4 vistas, com os lados do esboço e os da
    ferramenta), e o avião da segunda rodada e os 8 detalhes dele a levaram de 4 a 8 minutos. Medido em 2026-10-14, em 4 núcleos: 517 s
    com 69 testes; 173 s sem o perfil das fitas dos traços, que a máscara da silhueta não lê (`CAMADA_DA_SILHUETA`, de
-   `esboco-silhueta.mjs`); 127 s com o casco convexo do recorte guardado pelos pontos (`cascoConvexo`, `recorte.js`), que as 8
-   resoluções da mesma opção deixam de refazer. O que sobra é, em quase tudo, a decomposição convexa das malhas de família, que
-   é feita uma vez por malha e por processo (cerca de 35 s no primeiro detalhe do avião que a pede). O arquivo não foi dividido em
-   fatias para rodar em workers paralelos, porque cada fatia refaria essa decomposição: antes do casco guardado, os 62 esboços
-   somavam 301 s cada um em processo próprio contra 173 s todos num processo só. Com 333 arquivos disputando os 2 workers do
-   `vitest.config.ts`, o tempo da suíte é a soma da CPU dividida por 2, e a divisão aumentaria essa soma. Esboço novo e grande entra
-   na bateria sem ajuste. Se o arquivo voltar a passar de uns 3 minutos,
-   medir antes por etapa (resolver, tradução, `furosAbertos`, desenho atual, desenho da blocagem) e só então dividir. */
+   `esboco-silhueta.mjs`); 127 s com o casco convexo do recorte guardado pelos pontos (`cascoConvexo`, `recorte.js`).
+
+   Plano da bateria rápida, fatia 1 (2026-10-28): de 130 s sozinho (medido em 2026-10-27; 159 s em 2026-10-28, com outra bateria na
+   máquina) para 50 s em duas medidas seguidas, com a máquina dividida com outra bateria (carga de 7 a 10 em 4 processadores). O
+   que se tirou, medido por etapa num processo só (142 s de CPU antes, 96 s depois): o SVG que a máscara não lê (`soCamada` em
+   `CAMADA_DA_SILHUETA`, ver `desenharEsboco` e `desenharBlocagem`; 20 s), a resolução da mesma opção refeita doze vezes por
+   esboço (`resolverOpcaoGuardada`; 15 s) e a blocagem, os 8 desenhos de cada opção e as 4 máscaras da blocagem passaram para
+   processos à parte (`esboco-blocagem-medidas.mjs`), que começam antes dos outros testes e trabalham enquanto eles rodam, com os
+   esboços repartidos por fila (o maior primeiro), porque o avião da segunda rodada sozinho leva 20 s e uma divisão fixa deixaria um
+   processo com ele. Cada processo repete a decomposição convexa das malhas de família que toca (cerca de 40 s de CPU somados), e
+   mesmo assim a soma é menor que a de antes. A medida e a conferência ficaram separadas: o processo devolve IoU, razão das escalas e
+   tamanho do quadro, e as conferências abaixo são as mesmas de antes, com os mesmos mínimos e as mesmas mensagens. O mesmo conjunto de
+   medidas, antes e depois, é idêntico em todos os 69 esboços (verificado com o desenho e a camada de antes). Esboço novo e grande
+   entra na bateria sem ajuste. Se o arquivo voltar a passar de 60 s, medir antes por etapa (resolver, tradução, `furosAbertos`,
+   `recortesAbertos`, desenho atual, desenho da blocagem). */
 import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { desenharEsboco, ErroDeEsboco } from '../../modulos/esboco/src/index.js';
-import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { planoDeDetalhe } from '../../modulos/esboco/src/condutor.js';
 import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, formasVizinhas } from '../../modulos/esboco/src/detalhe.js';
 import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { blocagemDoEsboco } from './esboco-blocagem.mjs';
+import { iniciarMedicao } from './esboco-blocagem-medidas.mjs';
 import { compostaArquivo, esbocoIsolado, variante, vistasArquivo, VISTAS_DA_ANALISE } from './esboco.mjs';
 import { CAMADA_DA_SILHUETA, iou, mascaraDaCamada } from './esboco-silhueta.mjs';
 
@@ -69,63 +76,16 @@ const lerJson = (caminho) => JSON.parse(readFileSync(caminho, 'utf8'));
 /* O esboço que o próprio desenho recusa (loft vazado com seção côncava, um atrito registrado): a blocagem recusa com a mesma causa. */
 const RECUSADOS = ['atrito-loft-vazado.esboco.json'];
 
+const paraMedir = arquivos.filter((a) => !RECUSADOS.includes(nomeDe(a)));
+let medicao;
+beforeAll(() => { medicao = iniciarMedicao(paraMedir); });
+afterAll(() => medicao?.encerrar());
+
 const PASTA = mkdtempSync(join(tmpdir(), 'esboco-blocagem-'));
 afterAll(() => rmSync(PASTA, { recursive: true, force: true }));
 
 const tabela = [];
 afterAll(() => { if (process.env.ESBOCO_TABELA) console.log(tabela.join('\n')); });
-
-/* O desenho atual da opção `numero` (só ela, num painel) com as formas `ocultas` escondidas, na vista, com os lados do esboço
-   (`lados: false`) ou os da ferramenta (`lados: true`, o `ladosPorEscala` do `--composta`). */
-function desenhoAtual(bruto, numero, vista, ocultas, lados) {
-  const e = expandirEsboco(bruto);
-  const o = { ...e.opcoes[numero - 1], formas: e.opcoes[numero - 1].formas.map((f) => (ocultas.includes(f.id) ? { ...f, oculto: true } : f)) };
-  return desenharEsboco(variante({ ...e, opcoes: [o], ladosPorEscala: lados }, { vista, legendas: false, centros: false }), CAMADA_DA_SILHUETA);
-}
-
-describe('a silhueta pela blocagem coincide com a do desenho atual', () => {
-  for (const caminho of arquivos.filter((a) => !RECUSADOS.includes(nomeDe(a)))) {
-    it(`${nomeDe(caminho)}: as quatro vistas de cada opção`, () => {
-      const bruto = lerJson(caminho);
-      const b = blocagemDoEsboco(bruto);
-      expect(b.paineis).toHaveLength(expandirEsboco(bruto).opcoes.length);
-      b.paineis.forEach((painel, i) => {
-        const opcao = b.opcoes[i];
-        const ocultas = opcao.semEquivalente.map((x) => x.id);
-        const inclinada = opcao.perdas.some((p) => p.perdido.some((d) => d.codigo === 'inclinacao'));
-        const linha = [];
-        for (const vista of VISTAS_DA_ANALISE) {
-          const novo = desenharBlocagem({ vista, paineis: [painel] }, CAMADA_DA_SILHUETA);
-          const mascara = mascaraDaCamada(novo.camada);
-          expect(mascara.area, `${nomeDe(caminho)} opção ${i + 1} ${vista}: a blocagem não pintou nada`).toBeGreaterThan(0);
-          const medidas = [];
-          for (const [lados, minimo, tolEscala] of [[false, inclinada ? MINIMO_COM_INCLINACAO_DECLARADA : MINIMO_COM_AS_MESMAS_FACETAS, ESCALA_COM_AS_MESMAS_FACETAS], [true, inclinada ? MINIMO_COM_INCLINACAO_DECLARADA : MINIMO_COM_AS_FACETAS_DA_FERRAMENTA, ESCALA_COM_AS_FACETAS_DA_FERRAMENTA]]) {
-            const atual = desenhoAtual(bruto, i + 1, vista, ocultas, lados);
-            const r = iou(mascara, mascaraDaCamada(atual.camada));
-            medidas.push(r.iou.toFixed(4));
-            expect(r.iou, `${nomeDe(caminho)} opção ${i + 1} ${vista} (${lados ? 'facetas da ferramenta' : 'lados do esboço'})`).toBeGreaterThanOrEqual(minimo);
-            expect(Math.abs(novo.escala / atual.escala - 1), `${nomeDe(caminho)} opção ${i + 1} ${vista}: razão das escalas`).toBeLessThanOrEqual(tolEscala);
-            expect(novo.largura).toBe(atual.largura);
-            expect(novo.altura).toBe(atual.altura);
-          }
-          linha.push(`${vista.slice(0, 4)} ${medidas[0]} / ${medidas[1]}`);
-        }
-        tabela.push(`${nomeDe(caminho)} opção ${i + 1}${inclinada ? ' (inclinação declarada)' : ''}: ${linha.join(' | ')}`);
-      });
-    }, 240_000);
-  }
-
-  it('recusa o esboço que o desenho atual também recusa, com a mesma causa', () => {
-    for (const nome of RECUSADOS) {
-      const bruto = lerJson(arquivos.find((a) => nomeDe(a) === nome));
-      let causaAtual;
-      try { desenharEsboco(bruto); } catch (e) { causaAtual = e.message; }
-      expect(causaAtual).toBeTruthy();
-      expect(() => blocagemDoEsboco(bruto)).toThrow(ErroDeEsboco);
-      expect(() => blocagemDoEsboco(bruto)).toThrow(causaAtual);
-    }
-  });
-});
 
 describe('o isolamento por unidade pela procedência dos volumes', () => {
   const casos = [
@@ -234,4 +194,47 @@ describe('--nivel-zero na composta e nas vistas', () => {
       await expect(vistasArquivo(ARQUIVO, { vista: 'frontal', saida: pasta, nivelZero: true, ...opcao })).rejects.toThrow(/ficam no desenho das formas/);
     }
   }, 120_000);
+});
+
+/* A silhueta de cada esboço do banco de provas e das fixtures. A medida (a blocagem e os 8 desenhos de cada opção) é a parte pesada e
+   roda em processos à parte, que começam antes dos outros testes do arquivo e trabalham enquanto eles rodam; aqui ficam as conferências,
+   com os mesmos mínimos e a mesma mensagem de antes. */
+describe('a silhueta pela blocagem coincide com a do desenho atual', () => {
+  for (const caminho of paraMedir) {
+    it(`${nomeDe(caminho)}: as quatro vistas de cada opção`, async () => {
+      const resposta = await medicao.promessas.get(caminho);
+      if (resposta.erro) throw new Error(resposta.erro);
+      const m = resposta.medida;
+      expect(m.paineis).toBe(m.opcoesDoEsboco);
+      m.opcoes.forEach((opcao, i) => {
+        const { inclinada } = opcao;
+        const linha = [];
+        for (const { vista, area, medidas: porLados } of opcao.vistas) {
+          expect(area, `${nomeDe(caminho)} opção ${i + 1} ${vista}: a blocagem não pintou nada`).toBeGreaterThan(0);
+          const medidas = [];
+          for (const [lados, minimo, tolEscala] of [[false, inclinada ? MINIMO_COM_INCLINACAO_DECLARADA : MINIMO_COM_AS_MESMAS_FACETAS, ESCALA_COM_AS_MESMAS_FACETAS], [true, inclinada ? MINIMO_COM_INCLINACAO_DECLARADA : MINIMO_COM_AS_FACETAS_DA_FERRAMENTA, ESCALA_COM_AS_FACETAS_DA_FERRAMENTA]]) {
+            const r = porLados.find((x) => x.lados === lados);
+            medidas.push(r.iou.toFixed(4));
+            expect(r.iou, `${nomeDe(caminho)} opção ${i + 1} ${vista} (${lados ? 'facetas da ferramenta' : 'lados do esboço'})`).toBeGreaterThanOrEqual(minimo);
+            expect(Math.abs(r.razaoDasEscalas - 1), `${nomeDe(caminho)} opção ${i + 1} ${vista}: razão das escalas`).toBeLessThanOrEqual(tolEscala);
+            expect(r.mesmaLargura).toBe(true);
+            expect(r.mesmaAltura).toBe(true);
+          }
+          linha.push(`${vista.slice(0, 4)} ${medidas[0]} / ${medidas[1]}`);
+        }
+        tabela.push(`${nomeDe(caminho)} opção ${i + 1}${inclinada ? ' (inclinação declarada)' : ''}: ${linha.join(' | ')}`);
+      });
+    }, 240_000);
+  }
+
+  it('recusa o esboço que o desenho atual também recusa, com a mesma causa', () => {
+    for (const nome of RECUSADOS) {
+      const bruto = lerJson(arquivos.find((a) => nomeDe(a) === nome));
+      let causaAtual;
+      try { desenharEsboco(bruto); } catch (e) { causaAtual = e.message; }
+      expect(causaAtual).toBeTruthy();
+      expect(() => blocagemDoEsboco(bruto)).toThrow(ErroDeEsboco);
+      expect(() => blocagemDoEsboco(bruto)).toThrow(causaAtual);
+    }
+  });
 });
