@@ -16,6 +16,10 @@ import { ErroDeEsboco } from './index.js';
 
 /* a tolerância, em pixels do PNG, entre um traço e a aresta que ele deve cobrir (a fita tem 2 px de largura) */
 export const TOLERANCIA_DO_DESENHO = 2;
+/* o que a comparação soma à tolerância: a distância é entre centros de pixel, e o canto da fita (que passa do vértice em meia largura,
+   um pixel para o lado e dois para a frente) fica a 2,24 do pixel de aresta mais perto; sem este quarto de pixel toda quina de caixa
+   saía acusada em um ou dois pixels */
+export const FOLGA_DO_PIXEL = 0.25;
 /* amostras por lado de pixel do PNG na referência */
 export const SUPERAMOSTRAGEM_DA_REFERENCIA = 4;
 /* a fração da fita que um pixel precisa ter para ser traço */
@@ -153,8 +157,8 @@ const contar = (m) => { let n = 0; for (const x of m) n += x; return n; };
    um com `pixels`, `grupos` e a `mascara`. */
 export function compararComAReferencia({ tracos, referencia, largura, altura, tolerancia = TOLERANCIA_DO_DESENHO, origem = [0, 0] }) {
   if (tracos.length !== largura * altura || referencia.length !== largura * altura) throw new ErroDeEsboco('as máscaras do desenho e da referência precisam ter o tamanho da região');
-  const pertoDaReferencia = dilatar(referencia, largura, altura, tolerancia);
-  const pertoDoTraco = dilatar(tracos, largura, altura, tolerancia);
+  const pertoDaReferencia = dilatar(referencia, largura, altura, tolerancia + FOLGA_DO_PIXEL);
+  const pertoDoTraco = dilatar(tracos, largura, altura, tolerancia + FOLGA_DO_PIXEL);
   const vaza = new Uint8Array(tracos.length);
   const falta = new Uint8Array(tracos.length);
   for (let i = 0; i < tracos.length; i++) {

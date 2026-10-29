@@ -278,21 +278,24 @@ export function regiaoDosPaineis(quadro, paineis, W, H) {
  *  traços são os pixels que as fitas mudam: o PNG do desenho e o mesmo PNG sem os traços da camada (as faces e o resto do quadro iguais)
  *  são comparados, e o pixel é traço quando a fita cobre mais da metade dele. Assim a cor das faces (um vermelho escuro, um cinza
  *  escuro) não se confunde com a tinta do traço. Devolve o relato, a máscara de cada tipo e o PNG do desenho. */
-export async function medirDesenho({ r, triangulos, navegador, largura = LARGURA_DAS_VISTAS, tolerancia = TOLERANCIA_DO_DESENHO, superamostragem = SUPERAMOSTRAGEM_DA_REFERENCIA }) {
+export async function medirDesenho({ r, triangulos, navegador, largura = LARGURA_DAS_VISTAS, tolerancia = TOLERANCIA_DO_DESENHO, superamostragem = SUPERAMOSTRAGEM_DA_REFERENCIA, reaproveitar = null }) {
   const { png: com } = await desenhoParaBuffer(r, largura, navegador);
-  const semTracos = { ...r, camada: { ...r.camada, formas: r.camada.formas.map((f) => ({ ...f, tracos: [], inclinacoes: [] })) } };
-  const { png: sem } = await desenhoParaBuffer(semTracos, largura, navegador);
-  return medirImagem({ png: PNG.sync.read(com), semTracos: PNG.sync.read(sem), r, triangulos, navegador, tolerancia, superamostragem });
+  let semTracos = reaproveitar?.semTracos;
+  if (!semTracos) {
+    const sem = { ...r, camada: { ...r.camada, formas: r.camada.formas.map((f) => ({ ...f, tracos: [], inclinacoes: [] })) } };
+    semTracos = PNG.sync.read((await desenhoParaBuffer(sem, largura, navegador)).png);
+  }
+  return medirImagem({ png: PNG.sync.read(com), semTracos, referencia: reaproveitar?.referencia, r, triangulos, navegador, tolerancia, superamostragem });
 }
 
-/** Mede o PNG `png` do desenho, com `semTracos` o mesmo desenho sem as fitas. */
-export async function medirImagem({ png, semTracos, r, triangulos, navegador, tolerancia = TOLERANCIA_DO_DESENHO, superamostragem = SUPERAMOSTRAGEM_DA_REFERENCIA }) {
+/** Mede o PNG `png` do desenho, com `semTracos` o mesmo desenho sem as fitas (e, se já feita, a `referencia` do mesmo quadro). */
+export async function medirImagem({ png, semTracos, referencia = null, r, triangulos, navegador, tolerancia = TOLERANCIA_DO_DESENHO, superamostragem = SUPERAMOSTRAGEM_DA_REFERENCIA }) {
   const W = png.width; const H = png.height;
   const { linhas, regiao } = regiaoDosPaineis(r, null, W, H);
-  const referencia = await renderizarReferencia({ triangulos, quadro: r, W, H, linhas, escala: r.escala, navegador, ss: superamostragem });
+  referencia ??= await renderizarReferencia({ triangulos, quadro: r, W, H, linhas, escala: r.escala, navegador, ss: superamostragem });
   const tracos = mascaraDosTracos(png, semTracos, regiao);
   const comparacao = compararComAReferencia({ tracos, referencia: referencia.aresta, largura: W, altura: linhas[1] - linhas[0], tolerancia, origem: [0, linhas[0]] });
-  return { png, regiao, referencia, tolerancia, ...comparacao };
+  return { png, semTracos, regiao, referencia, tolerancia, ...comparacao };
 }
 
 /** A imagem de diagnóstico: o desenho com os vazamentos em vermelho e as falhas em azul (cada pixel com o entorno de um pixel, para
