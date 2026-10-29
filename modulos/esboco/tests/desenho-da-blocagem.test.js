@@ -125,6 +125,37 @@ describe('desenharBlocagem: faces, traços e oclusão', () => {
     expect(zDe(dois.camada.formas[1])).toBeGreaterThan(zDe(dois.camada.formas[0]));
   });
 
+  /* A caixa cortada em duas partes no plano x = 0, sem parede no corte: um sólido só, com os vértices do corte divididos pelas duas. */
+  function caixaEmDuasPartes([lx, ly, lz]) {
+    const vertices = [];
+    for (const z of [-lz / 2, lz / 2]) for (const y of [-ly / 2, ly / 2]) for (const x of [-lx / 2, 0, lx / 2]) vertices.push([x, y, z]);
+    const v = (ix, iy, iz) => iz * 6 + iy * 3 + ix;
+    const quad = (a, b, c, d, volume) => [{ vertices: [a, b, c], volume }, { vertices: [a, c, d], volume }];
+    const faces = [];
+    for (const [i, volume] of [[0, 'esquerda'], [1, 'direita']]) {
+      faces.push(...quad(v(i, 0, 1), v(i + 1, 0, 1), v(i + 1, 1, 1), v(i, 1, 1), volume)); // z +
+      faces.push(...quad(v(i, 0, 0), v(i, 1, 0), v(i + 1, 1, 0), v(i + 1, 0, 0), volume)); // z -
+      faces.push(...quad(v(i, 0, 0), v(i + 1, 0, 0), v(i + 1, 0, 1), v(i, 0, 1), volume)); // y -
+      faces.push(...quad(v(i, 1, 0), v(i, 1, 1), v(i + 1, 1, 1), v(i + 1, 1, 0), volume)); // y +
+    }
+    faces.push(...quad(v(0, 0, 0), v(0, 0, 1), v(0, 1, 1), v(0, 1, 0), 'esquerda')); // x -
+    faces.push(...quad(v(2, 0, 0), v(2, 1, 0), v(2, 1, 1), v(2, 0, 1), 'direita')); // x +
+    return { vertices, faces };
+  }
+
+  it('não traça a divisão entre duas partes da mesma face plana, e traça o vinco que passa por ela', () => {
+    const malha = caixaEmDuasPartes([100, 60, 40]);
+    expect(volumeAssinado(malha)).toBeCloseTo(100 * 60 * 40, 6);
+    const volumes = [{ id: 'esquerda', cor: 'azul' }, { id: 'direita', cor: 'verde' }];
+    /* de frente, o contorno da face z + em duas metades: seis trechos, e nenhum no corte x = 0 */
+    const frontal = desenharBlocagem({ vista: 'frontal', paineis: [painelDe(malha, volumes)] });
+    expect(frontal.paineis[0].tracos).toBe(6);
+    /* na isométrica, o vinco entre a frente e o topo atravessa o corte e fica traçado nas duas partes */
+    const iso = desenharBlocagem({ vista: 'isometrica', paineis: [painelDe(malha, volumes)] });
+    const inteira = desenharBlocagem({ vista: 'isometrica', paineis: [painelDe(caixa('a', [100, 60, 40]), [{ id: 'a', cor: 'azul' }])] });
+    expect(iso.paineis[0].tracos).toBe(inteira.paineis[0].tracos + 3);
+  });
+
   it('dá o mesmo desenho para a mesma entrada, byte a byte', () => {
     const entrada = () => ({ vista: 'isometrica', paineis: [painelDe(prismaVazado('anel', 50, 20, 40), [{ id: 'anel', cor: 'laranja' }])] });
     const a = desenharBlocagem(entrada(), { camada: true });

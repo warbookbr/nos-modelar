@@ -16,7 +16,7 @@
  *                      núcleo recusa (a lateral vizinha ficaria torta, 2,15e-2); o resultado do bevel do Blender, nesta máquina sem
  *                      Blender, ficou por registrar: rode o comando acima e anote no Andamento do plano.
  *
- * Sai com 2 sem MODELAR_BLENDER (o nome antigo MECANIFICA_BLENDER ainda vale, com aviso).
+ * Sai com 2 sem MODELAR_BLENDER.
  */
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';

@@ -3,7 +3,7 @@
   "familia": "roda-pneu",
   "versao": "2.0.0",
   "mecanica": {
-    "data": "2026-10-11",
+    "data": "2026-10-29",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -32,7 +32,7 @@
           "sulcos": 0,
           "tipo": 0
         },
-        "hash": "sha256:c5aea7081ee1ac9d26cbe9176e4d58a8947ca65a226400e59c8ee894a8e0c6ca",
+        "hash": "sha256:5ef1b731d02d951c91d650cfdd2bf90312123e8406bd81c804da18e7b10dca10",
         "medidas": []
       },
       "medio": {
@@ -62,7 +62,7 @@
           "sulcos": 24,
           "tipo": 1
         },
-        "hash": "sha256:935ccc377fcb3795f669fc2e2db5c5993b85b7a41f73975860c4ac51dfee6859",
+        "hash": "sha256:1e8029e3be4d82beb11faed691e3bc5b4f8d25951327a9f09197d888cfebd252",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -180,7 +180,7 @@
           "sulcos": 60,
           "tipo": 2
         },
-        "hash": "sha256:fa63ff799f972941c4baef5a531cd2495fbef6e45d78af018e341c4ff4c56de6",
+        "hash": "sha256:fda019991d5eebd565df05d30d3f9576e767c4faa4e2b552f9e554fa678d0a22",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -422,7 +422,7 @@
           "sulcos": 0,
           "tipo": 2
         },
-        "hash": "sha256:ffbbcfc5dc126e938e49a9ba750284ce4d1a6c621184a0f87d42551f313a38b4",
+        "hash": "sha256:27cabd8eefc1768e086e8b7d8f5df2d72ad351a2b67735c9f9b089a098f794ab",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -620,7 +620,7 @@
           "sulcos": 0,
           "tipo": 0
         },
-        "hash": "sha256:f0614bc505d166662aef498e04197d2f7faa27c23baf05fcd8682b605027dccf",
+        "hash": "sha256:bac8fc287565144647d7bc81537b24db597b651b20262625f4828ca3efae0ee6",
         "medidas": []
       },
       "carro": {
@@ -650,7 +650,7 @@
           "sulcos": 0,
           "tipo": 0
         },
-        "hash": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5",
+        "hash": "sha256:8bc2bf8d2f2d72140c5a07ea82f6be645d37ebf5eaed1da76064150a4be5bbb7",
         "medidas": []
       },
       "carroca": {
@@ -680,7 +680,7 @@
           "sulcos": 0,
           "tipo": 1
         },
-        "hash": "sha256:6e084d1fde70af3790c9f31752056f3f8a27aea043ed2bedc2d15d1b0d8c66c6",
+        "hash": "sha256:4f3dbb19889dc6be40482e4181fb03a9597e68c53a8917ab049873f4acab2380",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -778,7 +778,7 @@
           "sulcos": 0,
           "tipo": 0
         },
-        "hash": "sha256:72886f63a067260085e30f723f22d6bf5e7f7a1cc4e0b542e8d2acdeef881114",
+        "hash": "sha256:bdd200b9ff364b0d41b5b879089a4cb62864a83a31e6c7b98fc0ec18ac4722f9",
         "medidas": []
       },
       "trator": {
@@ -808,7 +808,7 @@
           "sulcos": 24,
           "tipo": 0
         },
-        "hash": "sha256:e3d092ef43eefbe8731185bf27f9e8f1f17782073e736965ebed5d4014764415",
+        "hash": "sha256:c839c93322a6cc88c293d388f11d1f8be47e3172faa65bfa4210d53339a2af1a",
         "medidas": []
       },
       "trem": {
@@ -838,7 +838,7 @@
           "sulcos": 0,
           "tipo": 0
         },
-        "hash": "sha256:f0e41f1919403a8ba5b9f8af29540d50ce7002953e076245c6f3921ce6a59b73",
+        "hash": "sha256:b5671dbb1cf6a7d504283e694774c6f5c237a34ae1d14392a4741fcf26e208b9",
         "medidas": []
       }
     },
@@ -860,84 +860,34 @@
       ]
     }
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por perfil; numa família com perfis o crítico aprova os perfis, e os três pontos de extremo, que combinam proporções que nenhum objeto usa, ficam na camada mecânica",
-    "perfis": {
-      "bicicleta": {
-        "nota": 9,
-        "hash": "sha256:ffbbcfc5dc126e938e49a9ba750284ce4d1a6c621184a0f87d42551f313a38b4"
-      },
-      "carrinho-de-mao": {
-        "nota": 8,
-        "hash": "sha256:f0614bc505d166662aef498e04197d2f7faa27c23baf05fcd8682b605027dccf"
-      },
-      "carro": {
-        "nota": 8,
-        "hash": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5"
-      },
-      "carroca": {
-        "nota": 8,
-        "hash": "sha256:6e084d1fde70af3790c9f31752056f3f8a27aea043ed2bedc2d15d1b0d8c66c6"
-      },
-      "rodizio": {
-        "nota": 8,
-        "hash": "sha256:72886f63a067260085e30f723f22d6bf5e7f7a1cc4e0b542e8d2acdeef881114"
-      },
-      "trator": {
-        "nota": 8,
-        "hash": "sha256:e3d092ef43eefbe8731185bf27f9e8f1f17782073e736965ebed5d4014764415"
-      },
-      "trem": {
-        "nota": 8,
-        "hash": "sha256:f0e41f1919403a8ba5b9f8af29540d50ce7002953e076245c6f3921ce6a59b73"
-      }
-    },
-    "pontosDeExtremo": {
-      "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-pontos-prancha.png",
-      "notas": {
-        "minimo": 7,
-        "medio": 8,
-        "maximo": 6
-      },
-      "motivo": "cubo de 1,8 mm num disco de 15 mm no mínimo e tambor de 2 m por 1,6 m com raios de 100 mm emaranhados no máximo; coerentes, mas fora de qualquer roda real"
-    },
-    "achados": [
-      "garras retas e axiais no trator, sem chevron",
-      "pneu e aro lisos, sem ressalto de talão",
-      "alma do trem e cubo da carroça sem afinamento nem bojo",
-      "desvio do disco pouco visível nas vistas da prancha"
-    ]
-  },
+  "critico": null,
   "pessoa": {
-    "data": "2026-10-11",
+    "data": "2026-10-29",
     "aprovou": true,
     "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
     "perfis": {
       "bicicleta": {
-        "hash": "sha256:ffbbcfc5dc126e938e49a9ba750284ce4d1a6c621184a0f87d42551f313a38b4"
+        "hash": "sha256:27cabd8eefc1768e086e8b7d8f5df2d72ad351a2b67735c9f9b089a098f794ab"
       },
       "carrinho-de-mao": {
-        "hash": "sha256:f0614bc505d166662aef498e04197d2f7faa27c23baf05fcd8682b605027dccf"
+        "hash": "sha256:bac8fc287565144647d7bc81537b24db597b651b20262625f4828ca3efae0ee6"
       },
       "carro": {
-        "hash": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5"
+        "hash": "sha256:8bc2bf8d2f2d72140c5a07ea82f6be645d37ebf5eaed1da76064150a4be5bbb7"
       },
       "carroca": {
-        "hash": "sha256:6e084d1fde70af3790c9f31752056f3f8a27aea043ed2bedc2d15d1b0d8c66c6"
+        "hash": "sha256:4f3dbb19889dc6be40482e4181fb03a9597e68c53a8917ab049873f4acab2380"
       },
       "rodizio": {
-        "hash": "sha256:72886f63a067260085e30f723f22d6bf5e7f7a1cc4e0b542e8d2acdeef881114"
+        "hash": "sha256:bdd200b9ff364b0d41b5b879089a4cb62864a83a31e6c7b98fc0ec18ac4722f9"
       },
       "trator": {
-        "hash": "sha256:e3d092ef43eefbe8731185bf27f9e8f1f17782073e736965ebed5d4014764415"
+        "hash": "sha256:c839c93322a6cc88c293d388f11d1f8be47e3172faa65bfa4210d53339a2af1a"
       },
       "trem": {
-        "hash": "sha256:f0e41f1919403a8ba5b9f8af29540d50ce7002953e076245c6f3921ce6a59b73"
+        "hash": "sha256:b5671dbb1cf6a7d504283e694774c6f5c237a34ae1d14392a4741fcf26e208b9"
       }
     },
-    "observacao": "a pessoa delegou a assinatura a Claude se os perfis cumprissem o propósito; os sete se leem como as rodas dos seus objetos, com as garras retas do trator como limite conhecido"
+    "observacao": "reassinada em 2026-10-29 depois da fatia 10 do plano dos ajustes no núcleo dos veículos, que funde os pedaços coplanares da booleana: só a divisão das faces planas mudou, com caixa e partes iguais e volume e área iguais a 1e-6; a pessoa aprovou vendo cada peça sólida antes e depois"
   }
 }

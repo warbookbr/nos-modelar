@@ -3,7 +3,7 @@
   "familia": "dobradica",
   "versao": "1.0.0",
   "mecanica": {
-    "data": "2026-10-11",
+    "data": "2026-10-29",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -14,7 +14,7 @@
           "larguraFolha": 15,
           "nos": 3
         },
-        "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33",
+        "hash": "sha256:1deeacafc2b9523514b4f08ade47e158680cbe9f5910cb07e37656db00cfd9a6",
         "medidas": [
           {
             "ferramenta": "chapaDobrada",
@@ -42,7 +42,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:7a5a7075b19e6cf226c1de61a908d4a13455ffffd747e6b41ae9374e764beb26",
+          "hash": "sha256:0b8a8d6a0c6c48c5f4440866c10ba85f10373099a06d27f72903d2ba6df12158",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -77,7 +77,7 @@
           "larguraFolha": 40,
           "nos": 6
         },
-        "hash": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9",
+        "hash": "sha256:7e79f240d7ebced11b93d3d491a133395b1fe3e1cd0878c67c93dc0fe25ae7c9",
         "medidas": [
           {
             "ferramenta": "chapaDobrada",
@@ -129,7 +129,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:0a879565801dbd23589c277e675f501e74bee457c0a6d01fdbe8e0e8f4fdf9f0",
+          "hash": "sha256:505c5a2bc075fdf4f638f5a293fcb2d2d79341fbaf77445412de8ebb58775577",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -164,7 +164,7 @@
           "larguraFolha": 80,
           "nos": 9
         },
-        "hash": "sha256:d27baa257a01244c12626960b6b8b4a29dd5782a7c1d28cd1aa283de0df2f4ae",
+        "hash": "sha256:a6db5aa9e900ca8ecbc7e1887a78936c5253b81d61a59a06af89dc05cb33415c",
         "medidas": [
           {
             "ferramenta": "chapaDobrada",
@@ -240,7 +240,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:9c657059297622e90db3fe16a9bbcea07609af2d109a7ed2d0dea433a20586f1",
+          "hash": "sha256:99c92fc7f5172f8d12d5e3b2959741ca0a0cdf745e5d9a18e581e8d18628baea",
           "pecas": [
             "dobradica-folha-d",
             "dobradica-folha-e",
@@ -279,46 +279,22 @@
       "plano-da-folha-e"
     ]
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por ponto",
-    "pontos": {
-      "minimo": {
-        "nota": 8,
-        "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33"
-      },
-      "medio": {
-        "nota": 8,
-        "hash": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9"
-      },
-      "maximo": {
-        "nota": 8,
-        "hash": "sha256:d27baa257a01244c12626960b6b8b4a29dd5782a7c1d28cd1aa283de0df2f4ae"
-      }
-    },
-    "achados": [
-      "isométricas mostram a folha móvel de fora e não deixam ler pino, nós nem folha fixa",
-      "junção da folha em pé com o nó no mínimo pequena demais para confirmar na resolução",
-      "furo grande para a folha de 15 mm no mínimo e pequeno para a de 80 mm no máximo, de proporção"
-    ]
-  },
+  "critico": null,
   "pessoa": {
-    "data": "2026-10-11",
+    "data": "2026-10-29",
     "aprovou": true,
     "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/dobradica-prancha.png",
     "pontos": {
       "minimo": {
-        "hash": "sha256:d9303bfb99d05ec31406e644b2e3fade511685b67a22350bdd6dbcc2e8a25f33"
+        "hash": "sha256:1deeacafc2b9523514b4f08ade47e158680cbe9f5910cb07e37656db00cfd9a6"
       },
       "medio": {
-        "hash": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9"
+        "hash": "sha256:7e79f240d7ebced11b93d3d491a133395b1fe3e1cd0878c67c93dc0fe25ae7c9"
       },
       "maximo": {
-        "hash": "sha256:d27baa257a01244c12626960b6b8b4a29dd5782a7c1d28cd1aa283de0df2f4ae"
+        "hash": "sha256:a6db5aa9e900ca8ecbc7e1887a78936c5253b81d61a59a06af89dc05cb33415c"
       }
     },
-    "observacao": "reassinada com a folha tangente ao rolo e o curso de 180 graus"
+    "observacao": "reassinada em 2026-10-29 depois da fatia 10 do plano dos ajustes no núcleo dos veículos, que funde os pedaços coplanares da booleana: só a divisão das faces planas mudou, com caixa e partes iguais e volume e área iguais a 1e-6; a pessoa aprovou vendo cada peça sólida antes e depois"
   }
 }

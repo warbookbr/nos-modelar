@@ -3,7 +3,7 @@
   "familia": "cadeira",
   "versao": "1.2.0",
   "mecanica": {
-    "data": "2026-10-19",
+    "data": "2026-10-29",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -31,7 +31,7 @@
           "topoDasRipas": 780,
           "vaoEntreRipas": 4
         },
-        "hash": "sha256:e1dab83eb0903adfec0082f257eae232a4efeb3c0c34ac438e0861e9c2f06ba3",
+        "hash": "sha256:d6bba18332efe82e502d8b29e7df59bb378a6df976bae879dd24f7f3bb382ec6",
         "medidas": []
       },
       "medio": {
@@ -60,7 +60,7 @@
           "topoDasRipas": 950,
           "vaoEntreRipas": 40
         },
-        "hash": "sha256:49f0beadb960073343aa44999ddd634293a9b78e8ccbd474c12319d6f343951e",
+        "hash": "sha256:5df61ea51e3639fab97a364150bed4e28b333a8cace148d729364188dec6bc78",
         "medidas": []
       },
       "maximo": {
@@ -89,7 +89,7 @@
           "topoDasRipas": 1100,
           "vaoEntreRipas": 90
         },
-        "hash": "sha256:ffdb871cc8558b1060888ce76636c86ff84a536e988b03e801430478d46093d2",
+        "hash": "sha256:5ab9381af61ee3f2889e5f0b0ea7c52fb5f7e87b1e01c4c4e867e41125bc2c0c",
         "medidas": []
       }
     },
@@ -166,7 +166,7 @@
           "topoDasRipas": 930,
           "vaoEntreRipas": 46
         },
-        "hash": "sha256:d35c486e80fc9637d34573e18bd1d0ccdafa653c578b762babcb8e4c37c8fb38",
+        "hash": "sha256:ff711f346e68ca024a336a76757f57ea0fdd73d6585eb869c87e327aeeff5a66",
         "medidas": []
       },
       "cadeira-branca-simples": {
@@ -195,7 +195,7 @@
           "topoDasRipas": 950,
           "vaoEntreRipas": 4
         },
-        "hash": "sha256:eac59431c217fcea32be1ba187a7bf66cafead9c10b18f23e5a304c1582e671f",
+        "hash": "sha256:827415d084001d52cb244b4f164498f12bb4a0b3d8e984e363bd0d6b3882c046",
         "medidas": []
       },
       "cadeira-de-madeira": {
@@ -224,7 +224,7 @@
           "topoDasRipas": 1020,
           "vaoEntreRipas": 45
         },
-        "hash": "sha256:b0bc2db2f87c99eac6678638a1155f589d2939d2b9ece2920a3c7119ab98807c",
+        "hash": "sha256:a5aef8a83b79bbb7bba381c286a85e24f84157fa8ab33eacda68933df32dec54",
         "medidas": []
       },
       "cadeira-rustica": {
@@ -253,7 +253,7 @@
           "topoDasRipas": 1050,
           "vaoEntreRipas": 10
         },
-        "hash": "sha256:eae88909755352538e8d498aa0d32ab70b882b6aa1b16fa693a538faea0eb44e",
+        "hash": "sha256:087e60c3b3677068bdda4625efb8f3b361ec8fbe8e520627be1ac6179a32b81d",
         "medidas": []
       },
       "cadeira-trabalhada": {
@@ -282,7 +282,7 @@
           "topoDasRipas": 792.7,
           "vaoEntreRipas": 81
         },
-        "hash": "sha256:cf5c028105bd6ec83fce312d57eb629c146dcccf4293ee76b8b252cf426417a2",
+        "hash": "sha256:16b762bbcc4845077e2f25fb088695fbd66ab756cc8f71a8e7a0af3844e657fb",
         "medidas": []
       }
     },

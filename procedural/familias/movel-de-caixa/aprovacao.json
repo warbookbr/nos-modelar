@@ -3,7 +3,7 @@
   "familia": "movel-de-caixa",
   "versao": "2.1.0",
   "mecanica": {
-    "data": "2026-10-11",
+    "data": "2026-10-29",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -58,7 +58,7 @@
           "profundidade": 500,
           "rodape": 80
         },
-        "hash": "sha256:fc5188ce874d24452b2dc9ce0271cad2771949242ca669b332cb71778285cdff",
+        "hash": "sha256:4e7a842e8f86daaa00b3509dcba8d3db5fc32bf5c73246c0dda0758bbc2939c0",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -69,7 +69,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:2bf7e8a54dd5fb04390f93877655836141209c25a4e5976ba5392f4951bb8829",
+          "hash": "sha256:5f5b9a437bfe0b0d88e8dfeb43f974f6b13f60e3a920d95b157cb5ad5bd2673b",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -213,7 +213,7 @@
           "profundidade": 800,
           "rodape": 150
         },
-        "hash": "sha256:8d1e368353ec30900f7c0c3573e7bacea8496da49d57153cb00a8f1fb07f8398",
+        "hash": "sha256:7351881a2ad19857b3d1e536fb2285e32d858e2622ba67e2b59711a47350e470",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -224,7 +224,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:c47eabbfc3533fcd4c8cbb14d13e3fd15f02deb937aed8cb0035688f425643f9",
+          "hash": "sha256:9c5d1096890402965f70fc8a3475803adbe51b574a2fd34348c7583c5dc833b3",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-gaveta-1",
@@ -521,7 +521,7 @@
           "profundidade": 330,
           "rodape": 0
         },
-        "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a",
+        "hash": "sha256:00a3db50be6d513cfc13fee2fcff6c0364340f3d947d767384481cdced216cd5",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -532,7 +532,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:9b9a1a5285b3d8eb3b30770e579b38c447170f8335fdd221b80f5a02be011475",
+          "hash": "sha256:0456b56f925b81cb837dedcb6fb7d6a80f9dd41b8518d3a0c78e0a5b03dc3925",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -622,7 +622,7 @@
           "profundidade": 560,
           "rodape": 100
         },
-        "hash": "sha256:0609893f11c1bd0098373eac65380ad4a8e2f9b3454c15ac9268ab07a47ab3e6",
+        "hash": "sha256:aeb15c6c155184d0ea98eb812af72ccece532a29a81a7c7d81db011c8d2450fd",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -633,7 +633,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:ff2366610a3c9c42b633d7f14bde2d5c7a0a4d384327f1e965b51a7d3cc9efb2",
+          "hash": "sha256:d5f596857506e9240b53b0cc52b8cecd4de2698524c0ea0e2cbeadd8112e255d",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -748,7 +748,7 @@
           "profundidade": 480,
           "rodape": 120
         },
-        "hash": "sha256:9b1f9fc27ba1ca2fb08be1ab3a0f577f29f947d57223cf69b0b967c04541681d",
+        "hash": "sha256:32318c6b82525c42f5072a6f52f6048a2f5bf1e5523d82e04a40e81009b0409d",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -759,7 +759,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:7931c8ca40889fa71dba010e65f9d9c560e31468c02b7896fb420e28a74037bc",
+          "hash": "sha256:a5c25cd9526debc5776ef03f3d42ce08f23fb4f9511c8bee30a476ac72f575e8",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-gaveta-1",
@@ -893,7 +893,7 @@
           "profundidade": 400,
           "rodape": 100
         },
-        "hash": "sha256:f96876e75f05e97d75cbd6f8807f66356ec96938fb1b6b61b88d00ac33f4b650",
+        "hash": "sha256:c15891cff1bbc038f9ac17e3f508a9d56d5a58f05c076eae055a53ca6034d185",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -904,7 +904,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:fa175c8fe543cfb7ad45e2427a8bcddf82e85e502d4e185317b7fbb782e03eef",
+          "hash": "sha256:2ccc9b67b7018d1971e9cb59c4ba47da57342dcc76b63f9b33b3b926e474bbfb",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -991,7 +991,7 @@
           "profundidade": 330,
           "rodape": 60
         },
-        "hash": "sha256:2682dc41920737231910a3795419ffd56e54bd5ff85e5600c6cacf269f3307a6",
+        "hash": "sha256:eb5d82f77de676d58cb89e5cfd9642c3012d8d75ef1ff0d9342c7d14b8fce9f2",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1002,7 +1002,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:123f4b778b2541249993fd8a9f37bd906c81fb039ed570c3f5d9133eeab063b2",
+          "hash": "sha256:0821e10760889a9cdabb44fc8b3f4ab029f187c9ccc9fef8b9447d7e7c1fd124",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -1092,7 +1092,7 @@
           "profundidade": 450,
           "rodape": 60
         },
-        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65",
+        "hash": "sha256:8a366fe654607f5640b734a308b26fbabaf3c4b35958572e9fd34770288c17d5",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1103,7 +1103,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:b61c03e283a2438073db63c948c65ae106d3b3ea45ff7034774a8963a4759791",
+          "hash": "sha256:05445b3cc72b5dd92c80863acb6e8d4e8bffb00c3ebea4c65b7462451aad6130",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-gaveta-1",
@@ -1262,7 +1262,7 @@
           "profundidade": 600,
           "rodape": 80
         },
-        "hash": "sha256:c174367e5c8f6e6685146302ada9e5258e86046f04117abba8d35b385eb26427",
+        "hash": "sha256:b44a8c88cce52c95fa23e10aee00ab18e394d3561561b079b4ee5a97ce5f152f",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1273,7 +1273,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:2ba80f1c46c9a4c902f0e9a3012dc3c74317862ef631aec79d1941580f0985f9",
+          "hash": "sha256:762de5c4fe68fec0cc37017a0073b226d59614eb84fbcadd5f9f9a7c41bd7ba1",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -1421,7 +1421,7 @@
           "profundidade": 600,
           "rodape": 80
         },
-        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8",
+        "hash": "sha256:54a7b58da9f2b158fe194b5243aa75f8acc6ab1f573f7b6ffed215733eef7f9e",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1432,7 +1432,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:d31e149d6c853b8c66ce5904167cb437759734c6275753fca316e4a4282e6197",
+          "hash": "sha256:248d6e51a8300cc2537dbc371df53cb55c07c46c1ac984e14a61dfbf2b829334",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-gaveta-1",
@@ -1591,7 +1591,7 @@
           "profundidade": 550,
           "rodape": 80
         },
-        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a",
+        "hash": "sha256:0a5f5e8273c604df920ec7b5c964e44d2d66ab9a5843bc034ed5d005e0e7b907",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1602,7 +1602,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:34313c79c2cd88e2ad42e0d0e950c491a6416d0b5e70ac5f911e65c6a619ad76",
+          "hash": "sha256:56f762c0c5e2261d7f0983a85647f5f0ea5d6f2417c0f109c658405f38b8b196",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -1880,100 +1880,40 @@
       ]
     }
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por perfil; família com perfis, julgada pelos perfis",
-    "rodadas": [
-      {
-        "rodada": 1,
-        "motivo": "dobradiça da porta sobreposta à vista na face externa da lateral, que a pessoa decidiu ser defeito; a família passou à dobradiça de pino oculta, com curso de 90 graus"
-      },
-      {
-        "rodada": 2,
-        "perfil": "roupeiro",
-        "nota": 7,
-        "motivo": "puxador lido como ausente na prancha reduzida; o recorte na resolução original o mostrou, e o crítico reviu para 9"
-      }
-    ],
-    "perfis": {
-      "armario-de-cozinha-aereo": {
-        "nota": 8,
-        "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a"
-      },
-      "armario-de-cozinha-de-chao": {
-        "nota": 8,
-        "hash": "sha256:0609893f11c1bd0098373eac65380ad4a8e2f9b3454c15ac9268ab07a47ab3e6"
-      },
-      "comoda": {
-        "nota": 8,
-        "hash": "sha256:9b1f9fc27ba1ca2fb08be1ab3a0f577f29f947d57223cf69b0b967c04541681d"
-      },
-      "criado-mudo": {
-        "nota": 8,
-        "hash": "sha256:f96876e75f05e97d75cbd6f8807f66356ec96938fb1b6b61b88d00ac33f4b650"
-      },
-      "estante-com-portas": {
-        "nota": 8,
-        "hash": "sha256:2682dc41920737231910a3795419ffd56e54bd5ff85e5600c6cacf269f3307a6"
-      },
-      "gaveteiro": {
-        "nota": 8,
-        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
-      },
-      "guarda-roupa": {
-        "nota": 8,
-        "hash": "sha256:c174367e5c8f6e6685146302ada9e5258e86046f04117abba8d35b385eb26427"
-      },
-      "guarda-roupa-de-correr": {
-        "nota": 8,
-        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
-      },
-      "roupeiro": {
-        "nota": 8,
-        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
-      }
-    },
-    "achados": [
-      "pela fresta de 4 mm entre a porta sobreposta e o corpo, a aba da dobradiça aparece quando se olha exatamente de lado",
-      "dobradiça da porta embutida visível na folga lateral, como o contrato declara",
-      "puxadores das folhas de correr e traseira das gavetas pouco legíveis na prancha reduzida"
-    ]
-  },
+  "critico": null,
   "pessoa": {
-    "data": "2026-10-11",
+    "data": "2026-10-29",
     "aprovou": true,
     "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/movel-de-caixa-prancha.png",
     "perfis": {
       "armario-de-cozinha-aereo": {
-        "hash": "sha256:a31194cce79b0cd3f75fb023f9b6ff671bf3789ef57a221d28a552060fd18c4a"
+        "hash": "sha256:00a3db50be6d513cfc13fee2fcff6c0364340f3d947d767384481cdced216cd5"
       },
       "armario-de-cozinha-de-chao": {
-        "hash": "sha256:0609893f11c1bd0098373eac65380ad4a8e2f9b3454c15ac9268ab07a47ab3e6"
+        "hash": "sha256:aeb15c6c155184d0ea98eb812af72ccece532a29a81a7c7d81db011c8d2450fd"
       },
       "comoda": {
-        "hash": "sha256:9b1f9fc27ba1ca2fb08be1ab3a0f577f29f947d57223cf69b0b967c04541681d"
+        "hash": "sha256:32318c6b82525c42f5072a6f52f6048a2f5bf1e5523d82e04a40e81009b0409d"
       },
       "criado-mudo": {
-        "hash": "sha256:f96876e75f05e97d75cbd6f8807f66356ec96938fb1b6b61b88d00ac33f4b650"
+        "hash": "sha256:c15891cff1bbc038f9ac17e3f508a9d56d5a58f05c076eae055a53ca6034d185"
       },
       "estante-com-portas": {
-        "hash": "sha256:2682dc41920737231910a3795419ffd56e54bd5ff85e5600c6cacf269f3307a6"
+        "hash": "sha256:eb5d82f77de676d58cb89e5cfd9642c3012d8d75ef1ff0d9342c7d14b8fce9f2"
       },
       "gaveteiro": {
-        "hash": "sha256:9a24b759912c751c856c645854e39648cc95ac0ff14a3a7949bc15eb3134ed65"
+        "hash": "sha256:8a366fe654607f5640b734a308b26fbabaf3c4b35958572e9fd34770288c17d5"
       },
       "guarda-roupa": {
-        "hash": "sha256:c174367e5c8f6e6685146302ada9e5258e86046f04117abba8d35b385eb26427"
+        "hash": "sha256:b44a8c88cce52c95fa23e10aee00ab18e394d3561561b079b4ee5a97ce5f152f"
       },
       "guarda-roupa-de-correr": {
-        "hash": "sha256:871f21998d7bb5f16a86b90e0afb69963376938cdc098593bcbd57fbc82db0d8"
+        "hash": "sha256:54a7b58da9f2b158fe194b5243aa75f8acc6ab1f573f7b6ffed215733eef7f9e"
       },
       "roupeiro": {
-        "hash": "sha256:31240ecdda5c68db9fcf75e8e15746657cbc1054aee7e8c8cf88c0ca07e8849a"
+        "hash": "sha256:0a5f5e8273c604df920ec7b5c964e44d2d66ab9a5843bc034ed5d005e0e7b907"
       }
     },
-    "observacao": "assinada por Claude por delegação da pessoa, depois da correção que ela pediu (dobradiça da porta sobreposta escondida); a dobradiça de caneco, que daria 110 graus, ficou de fora"
+    "observacao": "reassinada em 2026-10-29 depois da fatia 10 do plano dos ajustes no núcleo dos veículos, que funde os pedaços coplanares da booleana: só a divisão das faces planas mudou, com caixa e partes iguais e volume e área iguais a 1e-6; a pessoa aprovou vendo cada peça sólida antes e depois"
   }
 }

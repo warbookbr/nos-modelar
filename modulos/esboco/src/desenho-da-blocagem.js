@@ -41,27 +41,64 @@ function exigir(cond, msg) { if (!cond) throw new ErroDeEsboco(msg); }
 
 /* As faces e os traços de um volume para o olho dado: `lados` (as faces de frente, `{ pts, n }`), `linhas` (as arestas a traçar,
    dois pontos 3D cada, sem as que o próprio volume esconde) e os índices dos vértices, para a caixa projetada. */
-function facesDoVolume(vertices, triangulos, olho, V) {
+const chaveDaAresta = (p, q) => (p < q ? `${p}:${q}` : `${q}:${p}`);
+
+function normalDoTriangulo(vertices, [i, j, k]) {
+  const a = vertices[i];
+  const n = cruz(sub(vertices[j], a), sub(vertices[k], a));
+  return Math.hypot(...n) > AREA_MINIMA ? unitario(n) : null;
+}
+
+/* A FRONTEIRA ENTRE DUAS PARTES DA MESMA SUPERFÍCIE NÃO É ARESTA. Uma peça de família chega com um volume por parte, e as partes
+   dividem o mesmo sólido: a folha e o nó da dobradiça continuam a mesma chapa. Contadas por volume, as arestas da divisão ficavam com
+   uma face só e saíam traçadas como borda, um risco no meio da chapa e pontos onde a parte tinha um trecho de centésimo de
+   milímetro. A aresta que tem uma face em cada um de dois volumes vale como aresta interna, e o vinco e a silhueta decidem por
+   ela como decidem dentro de um volume. Volumes que não dividem vértice, como os do esboço, não mudam. */
+function vizinhosEntreVolumes(vertices, tris) {
+  const contagem = new Map();
+  tris.forEach((lista, volume) => {
+    for (const t of lista) {
+      const [i, j, k] = t;
+      for (const [p, q] of [[i, j], [j, k], [k, i]]) {
+        const chave = chaveDaAresta(p, q);
+        const e = contagem.get(chave);
+        if (e) e.push({ volume, t }); else contagem.set(chave, [{ volume, t }]);
+      }
+    }
+  });
+  const vizinho = new Map();
+  for (const [chave, fs] of contagem) {
+    if (fs.length !== 2 || fs[0].volume === fs[1].volume) continue;
+    const n0 = normalDoTriangulo(vertices, fs[0].t);
+    const n1 = normalDoTriangulo(vertices, fs[1].t);
+    if (!n0 || !n1) continue;
+    vizinho.set(`${fs[0].volume}|${chave}`, n1);
+    vizinho.set(`${fs[1].volume}|${chave}`, n0);
+  }
+  return vizinho;
+}
+
+function facesDoVolume(vertices, triangulos, olho, V, vizinhoDeFora = () => null) {
   const faces = [];
   const arestas = new Map();
   const usados = new Set();
   for (const [i, j, k] of triangulos) {
     usados.add(i); usados.add(j); usados.add(k);
-    const a = vertices[i];
-    const n = cruz(sub(vertices[j], a), sub(vertices[k], a));
-    if (!(Math.hypot(...n) > AREA_MINIMA)) continue;
-    const u = unitario(n);
+    const u = normalDoTriangulo(vertices, [i, j, k]);
+    if (!u) continue;
     const f = { ids: [i, j, k], n: u, frente: dot(u, olho) > PERFIL };
     faces.push(f);
     for (const [p, q] of [[i, j], [j, k], [k, i]]) {
-      const chave = p < q ? `${p}:${q}` : `${q}:${p}`;
+      const chave = chaveDaAresta(p, q);
       const e = arestas.get(chave);
       if (e) e.faces.push(f); else arestas.set(chave, { p, q, faces: [f] });
     }
   }
   const linhas = [];
-  for (const { p, q, faces: fs } of arestas.values()) {
-    if (!fs.some((f) => f.frente)) continue;
+  for (const [chave, { p, q, faces: original }] of arestas) {
+    const deFora = original.length === 1 ? vizinhoDeFora(chave) : null;
+    const fs = deFora ? [...original, { n: deFora, frente: dot(deFora, olho) > PERFIL }] : original;
+    if (!original.some((f) => f.frente)) continue;
     const dois = fs.length === 2;
     const traca = !dois || fs[0].frente !== fs[1].frente || dot(fs[0].n, fs[1].n) < COSSENO_DO_VINCO;
     if (traca) linhas.push([vertices[p], vertices[q]]);
@@ -90,12 +127,13 @@ function projetar(painel, V, olho) {
     const i = ordem.get(f.volume);
     if (i !== undefined) tris[i].push(f.vertices);
   }
+  const vizinhos = vizinhosEntreVolumes(vertices, tris);
   const itens = [];
   let min = [Infinity, Infinity];
   let max = [-Infinity, -Infinity];
   painel.volumes.forEach((v, i) => {
     if (tris[i].length === 0) return;
-    const { lados, linhas, usados } = facesDoVolume(vertices, tris[i], olho, V);
+    const { lados, linhas, usados } = facesDoVolume(vertices, tris[i], olho, V, (chave) => vizinhos.get(`${i}|${chave}`) ?? null);
     let centro = [0, 0, 0];
     for (const idx of usados) {
       const q = V.p(vertices[idx]);

@@ -168,19 +168,19 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c01/isometrica.png",
-          "sha256": "sha256:2e2bf6551bddfd277072649335813b4a131ba0433cfc4761a758c5ccf01dc983"
+          "sha256": "sha256:a81bca1e447b607111e28ba279dc659f168083b998302474e19b225845a68a8e"
         },
         "frontal": {
           "arquivo": "imagens/c01/frontal.png",
-          "sha256": "sha256:8b0632ce938172d7fc262a615127d24249c38faeb8ce3f3abbd3b3ff37887214"
+          "sha256": "sha256:c06a0c4917979709da38cd13896847668526a55bc69f379a3ad8f1605d178888"
         },
         "lateral": {
           "arquivo": "imagens/c01/lateral.png",
-          "sha256": "sha256:8c58802cc61ebaebacbff0f2e620f208c5404a8f5ad3eaeb7cb71e824e61cd10"
+          "sha256": "sha256:728f7d7ed373a9277fd556de6a87339dd230306a917bff1823174508aee0ab28"
         },
         "superior": {
           "arquivo": "imagens/c01/superior.png",
-          "sha256": "sha256:5004e58d8bf2b8227e40169512f784c5145216208266ca95fbe859e0b957d140"
+          "sha256": "sha256:8e52d505c15298599d410deaa065f3b0d962e29610cbe0b28bcc01463c893501"
         }
       }
     },
@@ -204,28 +204,28 @@
         "familia": "roda-pneu",
         "perfil": "carro",
         "aprovacao": "perfil",
-        "geometria": "sha256:d16f68396d35b6365587fa1f67b7ec5fc61a511f61bb5cf4f07eeeb0a301f6c5"
+        "geometria": "sha256:8bc2bf8d2f2d72140c5a07ea82f6be645d37ebf5eaed1da76064150a4be5bbb7"
       },
       "defeitos": [],
       "desenho": {
-        "hash": "sha256:5c3ea74a78338bf8144f5a76d1bff7c4ccbfc38b1bfaadcef944a2bed894bf22"
+        "hash": "sha256:0da2be34524c427d7b5240dc345be3c6f73149016f0de4c9387d2a9064cac731"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c02/isometrica.png",
-          "sha256": "sha256:9ae04ab7a2a335ccafa73e90b563716c2a52231ec24aec8d58c6b5a9058adccf"
+          "sha256": "sha256:7cb43e8a4cdc18add90411b6b14e41ea57ac7d7ff3dafc75a69300c1449db622"
         },
         "frontal": {
           "arquivo": "imagens/c02/frontal.png",
-          "sha256": "sha256:f28b736ad0ba3fa64ac3ee3983cc5906d2ce31c9c33c8244b020873c0d2ebad7"
+          "sha256": "sha256:280fc50deee72d6d268b6b86be0685fc9951450863659b2a1c3c16f68a6a3df6"
         },
         "lateral": {
           "arquivo": "imagens/c02/lateral.png",
-          "sha256": "sha256:8ff13ed081659fba9bb9cadb351a4353a2668f539d681220c2e8ec1b9ee0828b"
+          "sha256": "sha256:0bb32c38e923d84c5fba5fa6b18bcf0c02a779e759be2c42b643cac9786a281d"
         },
         "superior": {
           "arquivo": "imagens/c02/superior.png",
-          "sha256": "sha256:3d9603a4f60e60fde007a40c627f424d0e69085ba37882aadb02a491e14d6f81"
+          "sha256": "sha256:619fe32d919a0106f27dca6342981ba3928290f6fa10256258b62944e34dc850"
         }
       }
     },
@@ -300,19 +300,19 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c03/isometrica.png",
-          "sha256": "sha256:2ad5eb37bc1c28c6d2341cec84cddac529c69c39f1abbe5d5e7621d85838a10b"
+          "sha256": "sha256:5559d62375f097f6f018bcfedbaa242bdc763b74d98196c5d6ddfb3e1f69ae7b"
         },
         "frontal": {
           "arquivo": "imagens/c03/frontal.png",
-          "sha256": "sha256:356f9692bcaf5ff242cb87816967ae473c30b0dc733bb3164b82eea25986ef45"
+          "sha256": "sha256:57293f127ea002165ddbf034a8e16b6c37f15690ad3c8db9e1dd6538055aa92b"
         },
         "lateral": {
           "arquivo": "imagens/c03/lateral.png",
-          "sha256": "sha256:bc98c10e34cfd135fda9ded52226164eae8ac3512e134baf1d7c6eb205ce9f54"
+          "sha256": "sha256:c7faf5023cf08cb00a502e983d49acc416ae32c6b097dc72362e217c7cd1c1bc"
         },
         "superior": {
           "arquivo": "imagens/c03/superior.png",
-          "sha256": "sha256:781fd2c63cafae5779be013241dee9d6782627b803fd66e30bc17e0a3c2c57c8"
+          "sha256": "sha256:2e9f4d70fa351577d30cc416378733825ecd8a437590bdfca02b57d060aa2251"
         }
       }
     },
@@ -345,7 +345,7 @@
             ]
           }
         ],
-        "geometria": "sha256:0a5cc956aea9e842a3db0eb530b7d7f808dac79bf5661a6cfac31b1884e514ee"
+        "geometria": "sha256:f27dacbbeb6d87b1a7687a9ffc7e9540c4c01fea05586c414cb9395638d413c9"
       },
       "defeitos": [
         {
@@ -370,24 +370,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:fd003e48b392b8a778136e38d3ede69cecc379124fd1a4ad6beff35a8328a09f"
+        "hash": "sha256:622521308429cc1318769685de354ea5a38b3cd4cacb1e10bccd061990980c54"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c04/isometrica.png",
-          "sha256": "sha256:bb92123da53d17a9cc04f3c7998dbe97adfcfb4e1721794ea31fe144927a2ce6"
+          "sha256": "sha256:a0cb41165f2a2c0903771f60e76be235fbd78f4870ff5e85e28698796460a682"
         },
         "frontal": {
           "arquivo": "imagens/c04/frontal.png",
-          "sha256": "sha256:fb3235043821ce5fc70d0df39b02a5c6bca0da0e02e6c56f2e382769ba081e1a"
+          "sha256": "sha256:f485fa35586ca09b9bc03ae43c6416d3d7bc9731df7bc24ba246d62faf1275bc"
         },
         "lateral": {
           "arquivo": "imagens/c04/lateral.png",
-          "sha256": "sha256:8f6725a571c4128ab53b9f473b9d432b587990df231f4411b9428d191b5cb7af"
+          "sha256": "sha256:9361b2aeab48ed9884523642100e36678c57a618a442f668db3d73b30c55ff75"
         },
         "superior": {
           "arquivo": "imagens/c04/superior.png",
-          "sha256": "sha256:129dc3e48b2c69d5d4b17f99b42bd4c1cda7071303b05354a57173572a3aa5c5"
+          "sha256": "sha256:52150f2d2fcb1f229374b201db543cc9a2398ae4895085b8688cc547f2cd294c"
         }
       }
     },
@@ -420,19 +420,19 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c05/isometrica.png",
-          "sha256": "sha256:2d3d50e8a5f639ac422b6554c9164bfcddcfe217143da0925b8d8bbe197cb650"
+          "sha256": "sha256:d71efa021a8cc157524ee75244accc1fe43e1793d7ec1ac377a5feeaee89f434"
         },
         "frontal": {
           "arquivo": "imagens/c05/frontal.png",
-          "sha256": "sha256:26094e707459947c4acb5d0d94e62c29c2df98a3d227d96216b59681f46f1ffe"
+          "sha256": "sha256:b29b0df1b7f9634d8f24b743a9ad69ef5276d3ab9f9645629a0521ca007dde14"
         },
         "lateral": {
           "arquivo": "imagens/c05/lateral.png",
-          "sha256": "sha256:49c4b03df2b0d5f5905f3e19bd8706727f029d86af240b1414c94d11ad7ededb"
+          "sha256": "sha256:03415fd61b8373024a40b2faf8d2a78c5123b8ab46fd8b00c971420523a403d1"
         },
         "superior": {
           "arquivo": "imagens/c05/superior.png",
-          "sha256": "sha256:96e6fcf33bd6d6b07621a3e737a09b7553bebbd75f4fe6ecaeaaf8e02d75dcd4"
+          "sha256": "sha256:7c6508465e580735dadcf87b717e253a78c4808369f1e0beaca5917e762212cf"
         }
       }
     },
@@ -492,19 +492,19 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c06/isometrica.png",
-          "sha256": "sha256:8aa79b0dff6b360a7896d13de1f4598a92cf8165db60ac6e6743883e1c375460"
+          "sha256": "sha256:45caafe30624a5370a112bbee987736c65dc3971bfa8bba0f75365e2076c4473"
         },
         "frontal": {
           "arquivo": "imagens/c06/frontal.png",
-          "sha256": "sha256:7caee7be4b3cf8bab119d906b90a329ab443c8e691e9cc7f1ed202de6b3f472c"
+          "sha256": "sha256:f2ebe84ee1550bb58683202440708e965991b447e936f9aae7eef1fdcbc528ca"
         },
         "lateral": {
           "arquivo": "imagens/c06/lateral.png",
-          "sha256": "sha256:d98b467653e1484ac8d12f208d52a71cd59181818bd136e9e52aa36de8b92b03"
+          "sha256": "sha256:9e2591062a676d752cb669784c5f92a22659a740ac8cb5682f10c45097eaab38"
         },
         "superior": {
           "arquivo": "imagens/c06/superior.png",
-          "sha256": "sha256:b8743b086c79794f316ce830a16fc39271059ca548e45515089ff277c77a24e9"
+          "sha256": "sha256:6bd7e0ce34db632ad9084c0034010595d2bbe9a6a9db06e3ca349e2c14265b61"
         }
       }
     },
@@ -556,19 +556,19 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c07/isometrica.png",
-          "sha256": "sha256:f659df49f9d12c2b5e9b7b7a1cf41ad195f3516772e6cb547e05ae6f2d926ac8"
+          "sha256": "sha256:17ff1813a75a92e2e1f15a7f58096f81c9c0d37259596713e165107ff5e130be"
         },
         "frontal": {
           "arquivo": "imagens/c07/frontal.png",
-          "sha256": "sha256:ae9aec72a096301c5d8cab284918dc2f75edec3cf9e922cf7e2b9ba2a8b1d256"
+          "sha256": "sha256:39edfc9e3a575c4616160744080ff0712c94b2c5195df2ac78e101e722a8905e"
         },
         "lateral": {
           "arquivo": "imagens/c07/lateral.png",
-          "sha256": "sha256:a1cd810a27a35754e4bb6388f55241ef3c323541234c65adb4626fe323cda90b"
+          "sha256": "sha256:ee1b3a7bd7ce0b8c7263e36ed2baddcfc54fb66a0ae8be29bac360b4f408095d"
         },
         "superior": {
           "arquivo": "imagens/c07/superior.png",
-          "sha256": "sha256:63ac600f4a6a405fbbfa539d259f4866cee517d153d63690aab6ae417e566633"
+          "sha256": "sha256:7618d2ea9f6aafa4893c987c3476e5791f7bbdf01dc9eacab3739b4676fb4e5c"
         }
       }
     },
@@ -597,7 +597,7 @@
             "valor": 0
           }
         ],
-        "geometria": "sha256:feb569288243aa2054b4854b96f6253c1c1cb1f4255b132bf0184e0598f89c21"
+        "geometria": "sha256:40161f97f128c51e0a8dcab1e2f17ecf36899b82616d5364b7fb00a76e3e372d"
       },
       "defeitos": [
         {
@@ -616,24 +616,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:6c07da81d1613c049ec56b06e50b7529d62d72ba5ad8fd940896a76266c15184"
+        "hash": "sha256:e4112be0d1b17997dd1f98ab5f38a368c7acc0fcb17aecf3257df7012d4de0df"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c08/isometrica.png",
-          "sha256": "sha256:0da9f96dd663f6dd45ec450bd5b84c2c8d95e8452252de65e29581cd2ddcb05b"
+          "sha256": "sha256:9adddf58901d4588bbcd1f96d9c1fd45c235949e7baec2ad779db17d661174bd"
         },
         "frontal": {
           "arquivo": "imagens/c08/frontal.png",
-          "sha256": "sha256:b30804b3456e6a4c3cd49d12354df488dffb94e6486d6860a00344b927f970ae"
+          "sha256": "sha256:40afc32e49b882d8e3f93650bea64c80e48ce0c21eed1b51e8f81284cc37ac87"
         },
         "lateral": {
           "arquivo": "imagens/c08/lateral.png",
-          "sha256": "sha256:a685b2a25bfe35774e334c3729233c280f6b454e294c85d5fb929f68e80ed2cf"
+          "sha256": "sha256:58e50bfabf45b2a1f965de1dfdca9979132981f226414a989736962f3ec24306"
         },
         "superior": {
           "arquivo": "imagens/c08/superior.png",
-          "sha256": "sha256:d937f6d711708047234ebd7aa0fb6837d2cb7c05028be9ae481176751a85f6cb"
+          "sha256": "sha256:5683d12139c96e2774e8f60f211063f1b782cc69e7cb55509efc27c342978212"
         }
       }
     },
@@ -657,28 +657,28 @@
         "familia": "dobradica",
         "base": "medio",
         "aprovacao": "medio",
-        "geometria": "sha256:95cee60f0d2f2a6f317b65fa134ab1a8fde7fe9447a06a86c864dcaeea72ddd9"
+        "geometria": "sha256:7e79f240d7ebced11b93d3d491a133395b1fe3e1cd0878c67c93dc0fe25ae7c9"
       },
       "defeitos": [],
       "desenho": {
-        "hash": "sha256:158f1df03b570655090cdb1238c776c09b2791ac5e3a42c50f49ee895ab680e8"
+        "hash": "sha256:1afb0a0777a9d49c83ecee3cf4e79709482c52889d361c3c8bd5d95f022efa1c"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c09/isometrica.png",
-          "sha256": "sha256:c071cce05f6603f2346bdb50ef86aa19ad8efa0a45f8053c077661e9aac03329"
+          "sha256": "sha256:c2ed5d177561ddf8abb5fed99bedba11bb41c92406dafca07efe912341907aca"
         },
         "frontal": {
           "arquivo": "imagens/c09/frontal.png",
-          "sha256": "sha256:3024895e62273f689685831707d063f410e0701307f5a486c9713059949b3d5d"
+          "sha256": "sha256:80f52499a9ce2a60743e9c9181510c15eeb5f147a65a253bb51bec6eddee4805"
         },
         "lateral": {
           "arquivo": "imagens/c09/lateral.png",
-          "sha256": "sha256:8f6725a571c4128ab53b9f473b9d432b587990df231f4411b9428d191b5cb7af"
+          "sha256": "sha256:9361b2aeab48ed9884523642100e36678c57a618a442f668db3d73b30c55ff75"
         },
         "superior": {
           "arquivo": "imagens/c09/superior.png",
-          "sha256": "sha256:24184525e10e811e5e8e36a4ec14ff8d27de8660998d1fca4454f51cb87889f4"
+          "sha256": "sha256:1e77979f346e613c2d50f5f2c8c3cd5491fb0e0c13df1c11dc40bfa9a47868d3"
         }
       }
     },
@@ -714,7 +714,7 @@
             "fator": 0.75
           }
         ],
-        "geometria": "sha256:13c566f8e4146a821b0addf48991fb96c3dc0b6c8d3aee35434ec753e9099d24"
+        "geometria": "sha256:6e7e29c08c2301e13e83f775c692aef7f663e9879de8a65260adf1c14e08202f"
       },
       "defeitos": [
         {
@@ -733,24 +733,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:6746512db6cc76d6f434583b07a01680f833a9d78920abffdf2df0b19be38bf6"
+        "hash": "sha256:ed6e0c8e8cb6a3f307846b296b589d3f896d063c604419899ea61ccc8b893e99"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c10/isometrica.png",
-          "sha256": "sha256:b4c4f25a93dbf235c4a4d79595023afff501867cee47250178ae643214eeb767"
+          "sha256": "sha256:1baee6150350508e98ec454ce2f8921f5cd78daeaa99b10b98874fbe41907a32"
         },
         "frontal": {
           "arquivo": "imagens/c10/frontal.png",
-          "sha256": "sha256:38b2298955068be890b24022ab57cdae40c10a2cff523c83a13fe85de90b6b17"
+          "sha256": "sha256:efd99e4eac4bb2a9b7a87ba63b572bd6965d67320c73675645406c938c46b474"
         },
         "lateral": {
           "arquivo": "imagens/c10/lateral.png",
-          "sha256": "sha256:daa12323b02525eb84637d38a7278a87fbd9f8bb2d2a2ad14a102ba017448d65"
+          "sha256": "sha256:8334a044c2b4650e07a1af8e7a3acb22b30c71bd884a2a8186c001248b8b4977"
         },
         "superior": {
           "arquivo": "imagens/c10/superior.png",
-          "sha256": "sha256:169970f0e5577762d7adfb802b6ad78acb556b67ec5cc7ce7a1e65a392571fcd"
+          "sha256": "sha256:87f9f2185a515e58052885d0809392316da8fa144aeb53c667bed99d8dc7f975"
         }
       }
     },
@@ -811,19 +811,19 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c11/isometrica.png",
-          "sha256": "sha256:a05ef973ce91d10e8cb8c380e1c34fb33518ae515cb9d5a2a8384d109c7f519b"
+          "sha256": "sha256:a66affc881c55bd5c3419c24cbc12a89fb5105d392db2e067a71364565bd72bd"
         },
         "frontal": {
           "arquivo": "imagens/c11/frontal.png",
-          "sha256": "sha256:f7795405f935365565fd59512f42f3bd22cccadb4300cc33124493b280aba9dc"
+          "sha256": "sha256:50f2343ea74c883481d2f4881e5563e566d634306472d68af7713b2cbaf22bf6"
         },
         "lateral": {
           "arquivo": "imagens/c11/lateral.png",
-          "sha256": "sha256:49c4b03df2b0d5f5905f3e19bd8706727f029d86af240b1414c94d11ad7ededb"
+          "sha256": "sha256:03415fd61b8373024a40b2faf8d2a78c5123b8ab46fd8b00c971420523a403d1"
         },
         "superior": {
           "arquivo": "imagens/c11/superior.png",
-          "sha256": "sha256:b97b495c5c2e8a79d2bb8b50aca8190819a79e43f9357b2cfe5da85573548a06"
+          "sha256": "sha256:24eafbfe72104b01210b0527ade54dadd898bb3328661a22a56442936e48dad1"
         }
       }
     },
@@ -884,160 +884,24 @@
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c12/isometrica.png",
-          "sha256": "sha256:8fdbf6fc4be31f76886ad45f507bf42643b164db15f4934ac4fc29cd1b34fbeb"
+          "sha256": "sha256:4d53cfdf594081efa381eb6eb31b91f0dd967c9a9accf95de6d3572e9ec59052"
         },
         "frontal": {
           "arquivo": "imagens/c12/frontal.png",
-          "sha256": "sha256:236ba7923d8f5fe6ce943a2eb610c18bd93fd8444067ceb829a0045a22925d43"
+          "sha256": "sha256:c880f9d3f68fb8513162628d7d021e3294c5b26be0da537ffe023ecab72abead"
         },
         "lateral": {
           "arquivo": "imagens/c12/lateral.png",
-          "sha256": "sha256:2b37d83143fa9ffc9bb06ab45316015878fd5db445dd0d2157620db5b0b0609b"
+          "sha256": "sha256:58b17968c2c257c570531d6bd6857d0b0e5284305fe34674510b132706ea2745"
         },
         "superior": {
           "arquivo": "imagens/c12/superior.png",
-          "sha256": "sha256:63a8cb3622e3a5859cd89cb962f2c9a5b3df667b393c4bd033617eb3f3368cda"
+          "sha256": "sha256:521f447b4bc3bb3f0df9d7a12844dfa476c962bf0000988c490ca3d3641a28b7"
         }
       }
     }
   ],
   "resultados": [
-    {
-      "imagem": "c08",
-      "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
-      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
-      "julgamentos": [
-        {
-          "nota": 3,
-          "defeitos": [
-            {
-              "parte": "cubo",
-              "tipo": "ausencia",
-              "onde": "centro da face, sem furo nem tubo visível",
-              "sentido": "faltando",
-              "evidencia": "lateral.png e isometrica.png: o centro do disco é superfície lisa e fechada, sem furo central nem cubo distinguível"
-            },
-            {
-              "parte": "raios ou chapa do aro",
-              "tipo": "ausencia",
-              "onde": "face inteira do disco",
-              "sentido": "faltando",
-              "evidencia": "lateral.png: a face é uma única superfície fechada, sem raios, sem chapa com furos e sem fixação"
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "flanco e ombro, em todo o perfil",
-              "sentido": "anguloso",
-              "evidencia": "frontal.png e superior.png: corpo reto de lado a lado, sem bojo nem altura de flanco, com chanfrado só no ombro da ponta direita"
-            },
-            {
-              "parte": "disco fino de diâmetro maior",
-              "tipo": "uniao",
-              "onde": "ponta esquerda do perfil, x≈457–483",
-              "sentido": "afastado",
-              "evidencia": "frontal.png: disco que sobressai do corpo sem função legível como talão ou flange de cubo"
-            },
-            {
-              "parte": "arco solto na face",
-              "tipo": "uniao",
-              "onde": "arco aberto na face da isométrica, de x≈680,y≈505 a x≈515,y≈797",
-              "sentido": "afastado",
-              "evidencia": "isometrica.png: linha curva com as duas extremidades soltas, sem fechar círculo nem tocar outra peça; riscos finos soltos no flanco em frontal.png e superior.png"
-            }
-          ],
-          "briefSha256": "sha256:3e059d1058fcae39bfa8c006c651bfce7c22c816d5e3b408ae41ea745d5fb804",
-          "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
-          "data": "2026-10-12T22:54:04.783Z"
-        },
-        {
-          "nota": 3,
-          "defeitos": [
-            {
-              "parte": "cubo",
-              "tipo": "ausencia",
-              "onde": "centro da face, vista lateral e isométrica",
-              "sentido": "faltando",
-              "evidencia": "A face é um disco liso e fechado, sem furo central e sem nenhum cubo visível, nem em corte nem em relevo."
-            },
-            {
-              "parte": "furosDeFixacao",
-              "tipo": "ausencia",
-              "onde": "círculo de fixação em volta do centro da face, vista lateral",
-              "sentido": "faltando",
-              "evidencia": "Não há nenhum furo na face, nem um no topo nem em círculo."
-            },
-            {
-              "parte": "raiosOuChapa",
-              "tipo": "ausencia",
-              "onde": "entre o centro e a parede do aro, vista lateral",
-              "sentido": "faltando",
-              "evidencia": "Nenhum raio nem chapa visíveis. A face fechada cobre tudo, e o objeto lê como tambor maciço."
-            },
-            {
-              "parte": "aroEPneu",
-              "tipo": "ausencia",
-              "onde": "corpo cilíndrico, vistas de lado",
-              "sentido": "faltando",
-              "evidencia": "Aro e pneu não se distinguem entre si. Há um único cilindro liso, sem talão, sem barril e sem bojo ou ombro de pneu."
-            },
-            {
-              "parte": "corpoCilindrico",
-              "tipo": "superficie",
-              "onde": "casca cilíndrica, vistas de lado (frontal e superior)",
-              "sentido": "facetado",
-              "evidencia": "O sombreado mostra faixas horizontais regulares ao longo do corpo, o que sugere revolução com poucos lados. É detalhe de superfície."
-            }
-          ],
-          "briefSha256": "sha256:3e059d1058fcae39bfa8c006c651bfce7c22c816d5e3b408ae41ea745d5fb804",
-          "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
-          "data": "2026-10-12T22:55:21.828Z"
-        },
-        {
-          "nota": 4,
-          "defeitos": [
-            {
-              "parte": "cubo",
-              "tipo": "ausencia",
-              "onde": "centro da face, furo central",
-              "sentido": "faltando",
-              "evidencia": "lateral.png e isometrica.png: o miolo é liso e opaco, sem abertura; nenhuma vista mostra furo de ponta a ponta"
-            },
-            {
-              "parte": "furos de fixação",
-              "tipo": "ausencia",
-              "onde": "círculo de furos em volta do cubo",
-              "sentido": "faltando",
-              "evidencia": "lateral.png e isometrica.png: nenhum furo na face, nem no topo nem em volta"
-            },
-            {
-              "parte": "raios ou chapa do aro",
-              "tipo": "ausencia",
-              "onde": "face inteira entre o cubo e o aro",
-              "sentido": "faltando",
-              "evidencia": "lateral.png: face uniforme sem raios nem chapa distinguíveis; o objeto lê como disco fechado"
-            },
-            {
-              "parte": "flanges laterais",
-              "tipo": "espessura",
-              "onde": "placa do lado esquerdo do perfil",
-              "sentido": "maior",
-              "evidencia": "frontal.png e superior.png: placa de cerca de 26 px contra friso de cerca de 10 px no lado direito, e placa mais alta que o corpo (922 px contra 896 px)"
-            },
-            {
-              "parte": "face do conjunto",
-              "tipo": "superficie",
-              "onde": "arco parcial na face visível",
-              "sentido": "segmentado",
-              "evidencia": "isometrica.png: arco aberto de cerca de (680,505) a (515,797) que não fecha círculo e não corresponde a nenhuma feição legível"
-            }
-          ],
-          "briefSha256": "sha256:3e059d1058fcae39bfa8c006c651bfce7c22c816d5e3b408ae41ea745d5fb804",
-          "imagemSha256": "sha256:fbb6a86b4598ddf69183ca2d7744a1be7d3d4f623a4595c8143ebd58bb6bc9cb",
-          "data": "2026-10-12T22:56:32.398Z"
-        }
-      ]
-    },
     {
       "imagem": "c01",
       "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
@@ -1143,159 +1007,6 @@
           "briefSha256": "sha256:e39682e5a73b61a472a6018982301de9fbdc9f99c545a4a3a6bfec16ca751ff3",
           "imagemSha256": "sha256:d56effa0f30f71b2c7ee13914e030d23d915af62e275747084c8f5e06aeb876b",
           "data": "2026-10-12T22:56:37.806Z"
-        }
-      ]
-    },
-    {
-      "imagem": "c10",
-      "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
-      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
-      "julgamentos": [
-        {
-          "nota": 4,
-          "defeitos": [
-            {
-              "parte": "raios",
-              "tipo": "comprimento",
-              "onde": "extremidade externa dos 12 raios, voltada para a parede interna do barril",
-              "sentido": "menor",
-              "evidencia": "Lateral: ponta externa dos raios em r≈120 px, parede interna do barril em r≈160 px, com vão branco visível em todos os 12 (raio do topo termina em y≈500, barril em y≈462). Isométrica: vão entre a ponta do raio e a parede creme."
-            },
-            {
-              "parte": "raios",
-              "tipo": "uniao",
-              "onde": "encontro entre a ponta externa do raio e a parede interna do aro",
-              "sentido": "afastado",
-              "evidencia": "Lateral e isométrica: cubo e raios não tocam o aro, o conjunto cubo e raios fica solto e a roda não liga cubo e pneu."
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "degrau com chanfro nas duas bordas laterais da banda",
-              "sentido": "anguloso",
-              "evidencia": "Frontal e superior: degrau em x 400–414 e 686–700 nas duas pontas, quando o friso deveria estar só do lado de dentro. Na lateral aparece como anel duplo na borda externa."
-            },
-            {
-              "parte": "raios",
-              "tipo": "espessura",
-              "onde": "seção dos raios em toda a extensão",
-              "sentido": "menor",
-              "evidencia": "Lateral: raios com cerca de 4 px de espessura contra 500 px de diâmetro do pneu, leem como fios e não como raios de roda."
-            }
-          ],
-          "briefSha256": "sha256:fa35db406314863af86bed64c752c47fde83214a3d384e3e617154bded6f51ae",
-          "imagemSha256": "sha256:d781377f751c0ca01554a17c30eb3d7967b5846b935b3ac3284a44b2a9b2b012",
-          "data": "2026-10-12T22:54:12.415Z"
-        },
-        {
-          "nota": 4,
-          "defeitos": [
-            {
-              "parte": "raios",
-              "tipo": "uniao",
-              "onde": "extremidade externa dos 12 raios, voltada para a parede interna do aro",
-              "sentido": "afastado",
-              "evidencia": "Na lateral os raios terminam a cerca de 120 px do centro e a abertura do aro vai até cerca de 160 px, com vazio de uns 50 mm. Na isométrica as pontas ficam no meio da área creme, sem tocar a borda do aro."
-            },
-            {
-              "parte": "raios",
-              "tipo": "espessura",
-              "onde": "seção dos 12 raios, ao longo de todo o comprimento",
-              "sentido": "menor",
-              "evidencia": "Na lateral e na isométrica os raios têm uns 4 px, cerca de 5 mm numa roda de uns 640 mm, e leem como filetes de linha ao lado do cubo de 167 mm."
-            }
-          ],
-          "briefSha256": "sha256:fa35db406314863af86bed64c752c47fde83214a3d384e3e617154bded6f51ae",
-          "imagemSha256": "sha256:d781377f751c0ca01554a17c30eb3d7967b5846b935b3ac3284a44b2a9b2b012",
-          "data": "2026-10-12T22:56:07.052Z"
-        },
-        {
-          "nota": 5,
-          "defeitos": [
-            {
-              "parte": "raios",
-              "tipo": "comprimento",
-              "onde": "extremidade externa dos doze raios, lado do aro",
-              "sentido": "menor",
-              "evidencia": "Vista lateral: as pontas terminam a cerca de 120 px do centro e a borda interna do barril fica a cerca de 160 px, com vão branco entre elas. Na isométrica as pontas também terminam no ar, sobre a superfície creme do barril."
-            }
-          ],
-          "briefSha256": "sha256:fa35db406314863af86bed64c752c47fde83214a3d384e3e617154bded6f51ae",
-          "imagemSha256": "sha256:d781377f751c0ca01554a17c30eb3d7967b5846b935b3ac3284a44b2a9b2b012",
-          "data": "2026-10-12T22:57:13.400Z"
-        }
-      ]
-    },
-    {
-      "imagem": "c02",
-      "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
-      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
-      "julgamentos": [
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "perfil da banda, ombros nas duas pontas",
-              "sentido": "anguloso",
-              "evidencia": "frontal e superior: lados retos com degrau e chanfrado pequeno nos ombros, sem bojo; só é defeito se o parâmetro pedia pneumático"
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "face lateral do pneu, quadrante inferior direito, e banda nas vistas de perfil",
-              "sentido": "segmentado",
-              "evidencia": "lateral: crescente claro com começo e fim abruptos entre cerca de (480,805) e (738,650); frontal e superior: faixas horizontais de sombreamento na banda"
-            }
-          ],
-          "briefSha256": "sha256:186a6b0d46fa8caf3c4a6dd5c5c4f9fd66e9504997a282c5a2327d5cce6a48a0",
-          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
-          "data": "2026-10-12T22:54:12.957Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "ombros e banda, vista lateral e superior",
-              "sentido": "anguloso",
-              "evidencia": "Na lateral e na superior a banda é retângulo reto com chanfro curto de cerca de 13 px nos cantos e faixa de menor diâmetro igual nas duas faces. Não há bojo nem raio de ombro, e o pneu lê como rolo. Só vale se a variante pedida for pneumática ou com friso só interno."
-            }
-          ],
-          "briefSha256": "sha256:186a6b0d46fa8caf3c4a6dd5c5c4f9fd66e9504997a282c5a2327d5cce6a48a0",
-          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
-          "data": "2026-10-12T22:55:33.761Z"
-        },
-        {
-          "nota": 9,
-          "defeitos": [],
-          "briefSha256": "sha256:186a6b0d46fa8caf3c4a6dd5c5c4f9fd66e9504997a282c5a2327d5cce6a48a0",
-          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
-          "data": "2026-10-12T22:56:37.219Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "briefSha256": "sha256:186a6b0d46fa8caf3c4a6dd5c5c4f9fd66e9504997a282c5a2327d5cce6a48a0",
-          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
-          "data": "2026-10-12T22:57:11.743Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "banda de rodagem, vistas frontal e superior",
-              "sentido": "facetado",
-              "evidencia": "O degradê da banda sai em degraus horizontais visíveis, mais largos na metade inferior da frontal. A silhueta na lateral é lisa, então a evidência é só de sombreado."
-            }
-          ],
-          "briefSha256": "sha256:186a6b0d46fa8caf3c4a6dd5c5c4f9fd66e9504997a282c5a2327d5cce6a48a0",
-          "imagemSha256": "sha256:e88a3aaf0dd35c1fde7ac58b79027dfdf619030a895b440067cc39254af66c8e",
-          "data": "2026-10-12T22:57:16.575Z"
         }
       ]
     },
@@ -1662,135 +1373,6 @@
       ]
     },
     {
-      "imagem": "c04",
-      "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
-      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
-      "julgamentos": [
-        {
-          "nota": 4,
-          "defeitos": [
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "uniao",
-              "onde": "borda direita (x≈477 na frontal), voltada para o eixo",
-              "sentido": "afastado",
-              "evidencia": "Frontal e superior: a folha esquerda termina a cerca de 120 px (uns 26 mm) do eixo em x≈597 e não encosta em nada. Na isométrica ela flutua separada do conjunto da direita."
-            },
-            {
-              "parte": "nosDaFolhaEsquerda",
-              "tipo": "ausencia",
-              "onde": "borda direita da folha esquerda, ao longo da altura",
-              "sentido": "faltando",
-              "evidencia": "Isométrica e frontal: a folha esquerda tem borda lisa com três entalhes e nenhum nó ou aba. Os nós verdes entre os roxos (lateral, segmentos 310–465, 620–775, 930–1080) ficam do lado direito do eixo, então não há alternância entre as duas folhas."
-            },
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "ausencia",
-              "onde": "face da folha, ao longo da altura (furos de fixação)",
-              "sentido": "faltando",
-              "evidencia": "Frontal: a folha direita tem três furos inteiros em x≈712. A esquerda não tem furo nenhum, só três entalhes semicirculares na borda em x≈477, y 433, 620 e 807, que parecem furos cortados pela metade."
-            },
-            {
-              "parte": "nosVerdes",
-              "tipo": "posicao",
-              "onde": "faixa contínua do lado esquerdo da folha direita, de y≈432 a 900 na frontal",
-              "sentido": "atrasada",
-              "evidencia": "Frontal e isométrica: os três nós verdes formam uma faixa colada à borda da folha direita e descem até y≈960 na isométrica, além do último nó roxo. Pela função, deveriam pertencer à folha esquerda."
-            }
-          ],
-          "briefSha256": "sha256:cb0aa66c5a79c67474ab2f3214a95e432a0611069c1c060098ad52734de5a120",
-          "imagemSha256": "sha256:de7d77d46441bf6bdee364cf10f81c3086eb5370c8512bea5738744d4ffd27fe",
-          "data": "2026-10-12T22:54:48.047Z"
-        },
-        {
-          "nota": 3,
-          "defeitos": [
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "uniao",
-              "onde": "borda interna, voltada para o pino",
-              "sentido": "afastado",
-              "evidencia": "Frontal: borda da folha em x≈477 e conjunto de nós em x≈565, vão de ~88 px (~19 mm). Vista superior: borda a 120 px do eixo do pino em x≈597. Nada liga a folha ao pino."
-            },
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "ausencia",
-              "onde": "nós da folha esquerda ao longo da borda interna",
-              "sentido": "faltando",
-              "evidencia": "Isométrica e frontal: a folha tem só três meias-luas na borda e nenhum nó. Os três nós visíveis estão todos no conjunto da direita."
-            },
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "ausencia",
-              "onde": "furos de fixação",
-              "sentido": "faltando",
-              "evidencia": "Frontal e isométrica: a folha direita tem três furos (y≈433, 620, 807) e a esquerda nenhum."
-            },
-            {
-              "parte": "nosDaSegundaFolha",
-              "tipo": "ausencia",
-              "onde": "trechos 2, 4 e 6 ao redor do eixo",
-              "sentido": "faltando",
-              "evidencia": "Isométrica: entre os cilindros roxos só há tira verde fina e a face rosa da folha, sem cilindro nem pino. A lateral mostra seis segmentos, o que contradiz a isométrica."
-            },
-            {
-              "parte": "tiraVerde",
-              "tipo": "uniao",
-              "onde": "tira vertical x≈570–597 do pé do nó 1 até a base",
-              "sentido": "afastado",
-              "evidencia": "Frontal e isométrica: peça fina de altura quase total, com chanfro na ponta inferior (x≈580, y≈955), que não é nó, folha nem pino. Não tem ligação legível com as partes vizinhas."
-            }
-          ],
-          "briefSha256": "sha256:cb0aa66c5a79c67474ab2f3214a95e432a0611069c1c060098ad52734de5a120",
-          "imagemSha256": "sha256:de7d77d46441bf6bdee364cf10f81c3086eb5370c8512bea5738744d4ffd27fe",
-          "data": "2026-10-12T22:56:08.735Z"
-        },
-        {
-          "nota": 4,
-          "defeitos": [
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "uniao",
-              "onde": "borda direita, junto às abas e aos nós",
-              "sentido": "afastado",
-              "evidencia": "frontal: borda em x≈477 e primeira aba em x≈565, vão de ~19 mm; isométrica: a folha flutua separada do conjunto de nós"
-            },
-            {
-              "parte": "abasDosNos",
-              "tipo": "uniao",
-              "onde": "extremidade esquerda das três abas beges (x≈565)",
-              "sentido": "afastado",
-              "evidencia": "frontal e isométrica: abas com a cor da folha esquerda, coladas ao nó, com a ponta esquerda no ar sem chegar à folha"
-            },
-            {
-              "parte": "furosFolhaEsquerda",
-              "tipo": "ausencia",
-              "onde": "região central da folha esquerda, ao longo da altura",
-              "sentido": "faltando",
-              "evidencia": "frontal: a folha direita tem três furos inteiros em x≈712 e a esquerda não tem nenhum furo interno, só meias-luas na borda"
-            },
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "posicao",
-              "onde": "três entalhes semicirculares na borda direita (y≈433, 620, 807 na frontal)",
-              "sentido": "adiantada",
-              "evidencia": "frontal e isométrica: cortes de meio círculo na borda, na altura dos furos da outra folha, em vez de furos no interior da chapa"
-            },
-            {
-              "parte": "pino",
-              "tipo": "ausencia",
-              "onde": "trechos entre os nós (faixas de lacuna)",
-              "sentido": "faltando",
-              "evidencia": "isométrica e frontal: entre os nós só há tira verde fina, sem cilindro de pino; só o topo do nó superior mostra o pino (superior)"
-            }
-          ],
-          "briefSha256": "sha256:cb0aa66c5a79c67474ab2f3214a95e432a0611069c1c060098ad52734de5a120",
-          "imagemSha256": "sha256:de7d77d46441bf6bdee364cf10f81c3086eb5370c8512bea5738744d4ffd27fe",
-          "data": "2026-10-12T22:57:12.282Z"
-        }
-      ]
-    },
-    {
       "imagem": "c11",
       "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
       "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
@@ -1996,83 +1578,10 @@
           "data": "2026-10-12T22:56:59.459Z"
         }
       ]
-    },
-    {
-      "imagem": "c09",
-      "agenteSha256": "sha256:2c478bcba602b8625d6a9020fd1c08bdea744ea0b82884e54634685ae35651ac",
-      "briefSha256": "sha256:5fd91a77c6e63cf12dfe62c5cc461306305734f2a0124525ce0d4667700f078f",
-      "julgamentos": [
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "furos de fixação",
-              "tipo": "superficie",
-              "onde": "os seis furos das duas folhas",
-              "sentido": "facetado",
-              "evidencia": "Na vista frontal (x≈408 e x≈692, y≈390, 620, 852) e na isométrica, os furos são polígonos de uns 12 lados e leem como prisma, não como cilindro."
-            }
-          ],
-          "briefSha256": "sha256:02e3f648e25e562dfe2f2de9a0ab2e58b009c966fe696b39fd8b7f6f96ba1f99",
-          "imagemSha256": "sha256:f5f678f83b105717c53786e7b13fb320fdcfddddee47099fd0b851f0fac64db0",
-          "data": "2026-10-12T22:55:21.246Z"
-        },
-        {
-          "nota": 6,
-          "defeitos": [
-            {
-              "parte": "nosDaFolhaEsquerda",
-              "tipo": "espessura",
-              "onde": "os três nós verdes, seção do tambor",
-              "sentido": "menor",
-              "evidencia": "Frontal: o verde ocupa x≈515–550, só metade da largura do tambor (≈517–583), e a faixa x≈550–585 nesses trechos tem a cor da folha direita. Superior: o verde é só uma cunha no canto inferior esquerdo do pino. Isométrica: lâmina de ≈15 px contra ≈30 px dos nós roxos. Os nós verdes não envolvem o pino."
-            },
-            {
-              "parte": "folhaEsquerda",
-              "tipo": "uniao",
-              "onde": "extremidade junto ao eixo, nos trechos dos nós roxos",
-              "sentido": "atravessando",
-              "evidencia": "Superior: a folha bege termina em x≈550, embaixo do pino, dentro da área do anel roxo (parede do anel em x≈535–550, y≈638–654), sem rasgo explícito no anel. Frontal: nos trechos roxos a folha esquerda vai até x=550."
-            },
-            {
-              "parte": "pino",
-              "tipo": "uniao",
-              "onde": "trechos dos nós verdes e ponta inferior",
-              "sentido": "afastado",
-              "evidencia": "Isométrica: só a ponta superior do pino aparece. Lateral: faixa cinza-azulada x≈527–550 nos trechos verdes, que indica pino sem nó em volta. A ponta inferior não é vista em nenhuma vista."
-            },
-            {
-              "parte": "nosDaFolhaDireita",
-              "tipo": "superficie",
-              "onde": "anel roxo, quadrante inferior esquerdo",
-              "sentido": "segmentado",
-              "evidencia": "Superior: o anel roxo é aberto embaixo à esquerda (cerca de três quartos de volta), e os nós verdes são só meia seção. Os nós das duas folhas ficam assimétricos. Detalhe: furos poligonais de poucos lados na frontal e na isométrica."
-            }
-          ],
-          "briefSha256": "sha256:02e3f648e25e562dfe2f2de9a0ab2e58b009c966fe696b39fd8b7f6f96ba1f99",
-          "imagemSha256": "sha256:f5f678f83b105717c53786e7b13fb320fdcfddddee47099fd0b851f0fac64db0",
-          "data": "2026-10-12T22:56:31.818Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "furosDeFixacao",
-              "tipo": "superficie",
-              "onde": "contorno dos seis furos nas duas folhas",
-              "sentido": "facetado",
-              "evidencia": "frontal e isométrica: os furos têm contorno poligonal visível, de uns 12 a 16 lados, onde um furo redondo é o esperado"
-            }
-          ],
-          "briefSha256": "sha256:02e3f648e25e562dfe2f2de9a0ab2e58b009c966fe696b39fd8b7f6f96ba1f99",
-          "imagemSha256": "sha256:f5f678f83b105717c53786e7b13fb320fdcfddddee47099fd0b851f0fac64db0",
-          "data": "2026-10-12T22:57:32.276Z"
-        }
-      ]
     }
   ],
   "prancha": {
     "arquivo": "prancha.png",
-    "sha256": "sha256:841f11dc4fb5ade0ca229a85356419675be42639e75879717c37610bd75ea224"
+    "sha256": "sha256:d42b8ce08210563512d4583097dce4af3c68b1c47e1604224c1cb2757628876f"
   }
 }

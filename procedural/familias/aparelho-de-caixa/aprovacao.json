@@ -3,7 +3,7 @@
   "familia": "aparelho-de-caixa",
   "versao": "1.2.0",
   "mecanica": {
-    "data": "2026-10-16",
+    "data": "2026-10-29",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -23,7 +23,7 @@
           "recessoDoVidro": 3,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:ab4aa525dcc12e9ff444d07a516f9a768ce8a255eed8dbc10d3ccb7f80026e8a",
+        "hash": "sha256:1a72941e49e3ab4d00a7ca154e56627ccc1100c96f4125fdb2bd5e825a9aa2a3",
         "medidas": []
       },
       "medio": {
@@ -44,7 +44,7 @@
           "recessoDoVidro": 5,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:ba435b7f08503e0371deea23b3ed101226ca0ac01806ab76843a3d135a92c87d",
+        "hash": "sha256:ab6eef4c6e6df52e11928db2fec977778b471cd5283d930e5d28002041bf0af8",
         "medidas": []
       },
       "maximo": {
@@ -65,7 +65,7 @@
           "recessoDoVidro": 10,
           "tipoDePuxador": 2
         },
-        "hash": "sha256:be39000715d176dadd83e92451dc0e98d83c081c1e3fd19942f5875a4d8f5b02",
+        "hash": "sha256:97b69d5a866e30692b050bdca5dd73ce011dd08766f2505092393acedc4ea39e",
         "medidas": []
       }
     },
@@ -102,7 +102,7 @@
           "recessoDoVidro": 5,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:7c7c5e6aa96ee2ab4ad0254f00d6692d46fe3a3f1750ee592252b110bc93e269",
+        "hash": "sha256:f88b07ec10433b007a5c07bf9e6ddb51911a79dc5a9ba6525890df57446b3899",
         "medidas": []
       },
       "forninho-eletrico": {
@@ -123,7 +123,7 @@
           "recessoDoVidro": 5,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f",
+        "hash": "sha256:3d32c3a07525136e56021e14e3c170a26a24115f5d73c76c75b462a76bcd2b6f",
         "medidas": []
       },
       "lava-loucas-compacta": {
@@ -144,7 +144,7 @@
           "recessoDoVidro": 5,
           "tipoDePuxador": 1
         },
-        "hash": "sha256:74f072e1a142baee92a1e00b5d3b48e61ec25e6585fc528d8cef3ffc2461db3b",
+        "hash": "sha256:77ba6afdb5ad7228c2b31e04e41c169d77ae8cf70193999210ad997a4c264b01",
         "medidas": []
       },
       "micro-ondas": {
@@ -165,7 +165,7 @@
           "recessoDoVidro": 5,
           "tipoDePuxador": 2
         },
-        "hash": "sha256:d6807e4a1aeaafac662170a08f82e3462904b2986861fdff6f7dd9b8821f2514",
+        "hash": "sha256:751203c0c9d88425455285265b863deff9e0c9c640a65b687494a7d2eec66d79",
         "medidas": []
       }
     },
@@ -193,22 +193,23 @@
   },
   "critico": null,
   "pessoa": {
-    "data": "2026-10-16",
+    "data": "2026-10-29",
     "aprovou": true,
     "prancha": "docs/modelar/banco-de-provas/aparelhos-2026-10-16/aparelho-de-caixa-prancha.png",
     "perfis": {
       "air-fryer-de-forno": {
-        "hash": "sha256:7c7c5e6aa96ee2ab4ad0254f00d6692d46fe3a3f1750ee592252b110bc93e269"
+        "hash": "sha256:f88b07ec10433b007a5c07bf9e6ddb51911a79dc5a9ba6525890df57446b3899"
       },
       "forninho-eletrico": {
-        "hash": "sha256:84a4003722ac7b5391b3a462d94786a269f7b279d2343d9382e81defe02ce58f"
+        "hash": "sha256:3d32c3a07525136e56021e14e3c170a26a24115f5d73c76c75b462a76bcd2b6f"
       },
       "lava-loucas-compacta": {
-        "hash": "sha256:74f072e1a142baee92a1e00b5d3b48e61ec25e6585fc528d8cef3ffc2461db3b"
+        "hash": "sha256:77ba6afdb5ad7228c2b31e04e41c169d77ae8cf70193999210ad997a4c264b01"
       },
       "micro-ondas": {
-        "hash": "sha256:d6807e4a1aeaafac662170a08f82e3462904b2986861fdff6f7dd9b8821f2514"
+        "hash": "sha256:751203c0c9d88425455285265b863deff9e0c9c640a65b687494a7d2eec66d79"
       }
-    }
+    },
+    "observacao": "reassinada em 2026-10-29 depois da fatia 10 do plano dos ajustes no núcleo dos veículos, que funde os pedaços coplanares da booleana: só a divisão das faces planas mudou, com caixa e partes iguais e volume e área iguais a 1e-6; a pessoa aprovou vendo cada peça sólida antes e depois"
   }
 }
