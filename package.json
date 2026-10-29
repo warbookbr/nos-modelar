@@ -26,6 +26,8 @@
     "familias:check": "node tools/modelar/familia.mjs conferir",
     "calibracao": "node tools/modelar/calibracao-do-critico.mjs",
     "calibracao:check": "node tools/modelar/calibracao-do-critico.mjs conferir",
+    "desenho:medir": "node tools/modelar/medida-do-desenho.mjs medir",
+    "desenho:check": "node tools/modelar/medida-do-desenho.mjs conferir",
     "banco-de-provas": "node tools/modelar/banco-de-provas.mjs",
     "banco-de-provas:gerar": "node tools/modelar/banco-de-provas.mjs --gerar",
     "banco-de-provas:check": "node tools/modelar/banco-de-provas.mjs --check",

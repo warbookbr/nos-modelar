@@ -65,7 +65,7 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
    teste de profundidade por pixel, e o resto (título, legendas, escala, linhas de centro, superfícies de corte) vem do SVG
    por cima; `svg` rasteriza só o SVG, com o algoritmo do pintor por forma (ESBOCO_PNG=svg). O `.svg` gravado é sempre o puro. */
 export const MOTOR_DO_PNG = process.env.ESBOCO_PNG === 'svg' ? 'svg' : 'webgl';
-const OPCOES_DA_CAMADA = { camada: MOTOR_DO_PNG === 'webgl' };
+const OPCOES_DA_CAMADA = { camada: MOTOR_DO_PNG === 'webgl', tracosVisiveis: MOTOR_DO_PNG === 'webgl' };
 
 /* Roda dentro do Chromium: desenha a camada das formas com câmera ortográfica em pixels do quadro (x, y) e profundidade z
    ao longo do olho. Cores sem gestão de cor (o pixel é o hexadecimal da face), traços como fitas de 2 px com viés para a
@@ -168,10 +168,12 @@ const DESENHAR_CAMADA = async (texto) => {
   };
   const opacas = camada.formas.filter((f) => f.opacidade >= 1);
   const translucidas = camada.formas.filter((f) => f.opacidade < 1).sort((a, b) => a.prof - b.prof || a.rank - b.rank);
-  const pos = []; const col = []; const fita = [];
-  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, f.inclinacoes, fita, true); }
+  const pos = []; const col = []; const fita = []; const fitaVisivel = [];
+  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, f.inclinacoes, f.visiveis === true ? fitaVisivel : fita, true); }
   malha(pos, col, new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide }), 0);
   malha(fita, null, new T.MeshBasicMaterial({ color: preto, side: T.DoubleSide, depthWrite: false }), 1);
+  /* o traço que o desenhista já tirou do que se esconde (`visiveis`, ver camada.js) vai por cima, sem teste de profundidade */
+  malha(fitaVisivel, null, new T.MeshBasicMaterial({ color: preto, side: T.DoubleSide, depthWrite: false, depthTest: false }), 2);
   translucidas.forEach((f, i) => {
     const p = []; const c = []; const t = [];
     faces(f.faces, p, c);
@@ -200,7 +202,7 @@ export async function renderizarCamada(camada, fator = 1, navegador = null) {
 
 /* Uma página por navegador, com o Three.js servido de node_modules, reaproveitada pelas imagens seguintes. */
 const PAGINAS_DA_CAMADA = new WeakMap();
-async function paginaDaCamada(navegador) {
+export async function paginaDaCamada(navegador) {
   if (!PAGINAS_DA_CAMADA.has(navegador)) {
     const pagina = await navegador.newPage();
     const raiz = dirname(fileURLToPath(import.meta.resolve('three')));

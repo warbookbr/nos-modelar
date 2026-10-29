@@ -32,17 +32,30 @@ describe('a camada sem o perfil dos traços', () => {
   }
 
   it('o desenho da blocagem aceita a mesma opção e entrega a mesma camada, menos o perfil', () => {
-    /* a caixa de 100 x 60 x 40 mm, 12 triângulos vistos de fora, num só volume */
+    /* a caixa de 100 x 60 x 40 mm, 12 triângulos vistos de fora, num só volume, translúcido: é o volume que ainda leva o perfil, porque
+       o opaco entrega os traços já visíveis e sem ele (ver o teste seguinte) */
     const vertices = [];
     for (const sz of [-1, 1]) for (const sy of [-1, 1]) for (const sx of [-1, 1]) vertices.push([sx * 50, sy * 30, sz * 20]);
     const quad = (a, b, c, d) => [[a, b, c], [a, c, d]];
     const triangulos = [...quad(1, 0, 2, 3), ...quad(4, 5, 7, 6), ...quad(0, 1, 5, 4), ...quad(2, 6, 7, 3), ...quad(0, 4, 6, 2), ...quad(1, 3, 7, 5)];
-    const painel = { malha: { vertices, faces: triangulos.map((t) => ({ vertices: t, volume: 'v' })) }, volumes: [{ id: 'v', cor: '#999999' }] };
+    const painel = { malha: { vertices, faces: triangulos.map((t) => ({ vertices: t, volume: 'v' })) }, volumes: [{ id: 'v', cor: '#999999', opacidade: 0.5 }] };
     const com = desenharBlocagem({ vista: 'isometrica', paineis: [painel] }, { camada: true });
     const sem = desenharBlocagem({ vista: 'isometrica', paineis: [painel] }, { camada: true, perfilDosTracos: false });
     expect(com.camada.formas.every((f) => Array.isArray(f.inclinacoes))).toBe(true);
     expect(sem.camada.formas.some((f) => 'inclinacoes' in f)).toBe(false);
     expect(sem.camada).toEqual(semPerfil(com.camada));
     expect(sem.svg).toBe(com.svg);
+  });
+
+  it('o volume opaco do desenho da blocagem entrega os traços já visíveis e sem perfil, com ou sem o pedido', () => {
+    const vertices = [];
+    for (const sz of [-1, 1]) for (const sy of [-1, 1]) for (const sx of [-1, 1]) vertices.push([sx * 50, sy * 30, sz * 20]);
+    const quad = (a, b, c, d) => [[a, b, c], [a, c, d]];
+    const triangulos = [...quad(1, 0, 2, 3), ...quad(4, 5, 7, 6), ...quad(0, 1, 5, 4), ...quad(2, 6, 7, 3), ...quad(0, 4, 6, 2), ...quad(1, 3, 7, 5)];
+    const painel = { malha: { vertices, faces: triangulos.map((t) => ({ vertices: t, volume: 'v' })) }, volumes: [{ id: 'v', cor: '#999999' }] };
+    for (const opcoes of [{ camada: true }, { camada: true, perfilDosTracos: false }]) {
+      const r = desenharBlocagem({ vista: 'isometrica', paineis: [painel] }, opcoes);
+      expect(r.camada.formas.every((f) => f.visiveis === true && !('inclinacoes' in f))).toBe(true);
+    }
   });
 });

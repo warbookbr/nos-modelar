@@ -14,20 +14,26 @@
    ligado), e a tinta é a mesma (`tintaDaFace`), de modo que a mesma geometria cai nos mesmos pixels. Não há legenda, linha de
    centro, corte, explosão, zoom nem prévia: ficam no desenho das formas.
 
-   Os traços são as arestas da malha que o desenho das formas também traça: o vinco (duas faces vizinhas a mais de 30 graus uma
-   da outra) e a silhueta (uma face de frente e outra de costas para o olho) de cada volume, só onde alguma das duas faces olha
-   para o observador. A face de costas não é desenhada (o volume é fechado e a de frente a cobre), e a face de perfil não cobre
-   pixel. O que o próprio volume esconde de si (a parede do furo de um anel, vista de fora) sai pela conta que o desenho das
-   formas usa nas formas côncavas, `semOQueOVolumeEsconde` de `oclusao-das-linhas.js`. A oclusão entre volumes é a da camada: o teste de profundidade por pixel, com o viés por índice de volume que desempata
-   faces no mesmo plano em favor do volume que vem depois na lista. */
+   Os traços são decididos com todos os volumes juntos, e não por volume. As candidatas são as arestas da malha (soldadas pelas coordenadas, e
+   divididas nos vértices que caem no meio delas), com as paredes que se encostam entre dois volumes tiradas da conta, e os cruzamentos de
+   um volume com a superfície do outro, que nenhuma malha tem (`intersecao-de-volumes.js`): a aresta é o vinco (duas faces a mais de 30 graus uma
+   da outra) ou a silhueta (uma face de frente e outra de costas), só onde alguma das faces olha para o observador. O que as faces de frente
+   de todos os volumes opacos escondem sai em vetor e exatamente (`oclusaoExata`, de `oclusao-das-linhas.js`), e o que sobra só vale onde a
+   superfície que se vê de um lado da linha difere da do outro lado (`vizinhanca-na-tela.js`): a emenda de duas partes no mesmo plano e o
+   contorno de uma peça embutida à altura da face da vizinha não são aresta. A camada entrega esses traços já visíveis, e o desenhista os
+   pinta sem teste de profundidade; só o volume translúcido segue o que sempre fez (o que o próprio volume esconde, pela conta que o desenho
+   das formas usa nas formas côncavas, `semOQueOVolumeEsconde`, e o teste de profundidade por pixel da camada). A face de costas não é
+   desenhada (o volume é fechado e a de frente a cobre), e a face de perfil não cobre pixel. */
 import { barraDeEscala, ErroDeEsboco, escalaDoQuadro, QUADRO, tintaDaFace, textoDoDesenho, VISTAS } from './index.js';
 import { formasDoPainel, montarCamada } from './camada.js';
-import { semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
+import { COSSENO_DO_VINCO, DEGRAU_DE_PROFUNDIDADE, ESPACO_DAS_AMOSTRAS, FOLGA_DO_VINCO } from './limites-do-desenho.js';
+import { cruzamentosEntreVolumes } from './intersecao-de-volumes.js';
+import { oclusaoExata, semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
+import { arestasPelaVizinhanca } from './vizinhanca-na-tela.js';
 
 const { f1, esc, quebrar } = textoDoDesenho;
 
-/* o cosseno de 30 graus: duas faces vizinhas com normais mais afastadas que isso formam um vinco */
-export const COSSENO_DO_VINCO = Math.cos(Math.PI / 6);
+export { COSSENO_DO_VINCO, DEGRAU_DE_PROFUNDIDADE, FOLGA_DO_VINCO };
 /* a face cuja normal tem menos que isto de componente no olho está de perfil */
 const PERFIL = 1e-6;
 const AREA_MINIMA = 1e-9;
@@ -39,72 +45,131 @@ const unitario = (v) => { const m = Math.hypot(...v) || 1; return v.map((c) => c
 
 function exigir(cond, msg) { if (!cond) throw new ErroDeEsboco(msg); }
 
-/* As faces e os traços de um volume para o olho dado: `lados` (as faces de frente, `{ pts, n }`), `linhas` (as arestas a traçar,
-   dois pontos 3D cada, sem as que o próprio volume esconde) e os índices dos vértices, para a caixa projetada. */
-const chaveDaAresta = (p, q) => (p < q ? `${p}:${q}` : `${q}:${p}`);
-
 function normalDoTriangulo(vertices, [i, j, k]) {
   const a = vertices[i];
   const n = cruz(sub(vertices[j], a), sub(vertices[k], a));
   return Math.hypot(...n) > AREA_MINIMA ? unitario(n) : null;
 }
 
-/* A FRONTEIRA ENTRE DUAS PARTES DA MESMA SUPERFÍCIE NÃO É ARESTA. Uma peça de família chega com um volume por parte, e as partes
-   dividem o mesmo sólido: a folha e o nó da dobradiça continuam a mesma chapa. Contadas por volume, as arestas da divisão ficavam com
-   uma face só e saíam traçadas como borda, um risco no meio da chapa e pontos onde a parte tinha um trecho de centésimo de
-   milímetro. A aresta que tem uma face em cada um de dois volumes vale como aresta interna, e o vinco e a silhueta decidem por
-   ela como decidem dentro de um volume. Volumes que não dividem vértice, como os do esboço, não mudam. */
-function vizinhosEntreVolumes(vertices, tris) {
-  const contagem = new Map();
+/* os vértices a menos de 1e-5 mm um do outro são o mesmo ponto para decidir as arestas: duas peças que se tocam, cada uma com os
+   vértices dela, dividem a aresta onde as coordenadas coincidem */
+const GRADE_DA_SOLDA = 1e5;
+function soldar(vertices) {
+  const primeiro = new Map();
+  return vertices.map((p, i) => {
+    const k = `${Math.round(p[0] * GRADE_DA_SOLDA)},${Math.round(p[1] * GRADE_DA_SOLDA)},${Math.round(p[2] * GRADE_DA_SOLDA)}`;
+    if (!primeiro.has(k)) primeiro.set(k, i);
+    return primeiro.get(k);
+  });
+}
+
+/* Uma aresta que passa por um vértice de outra face (a parede de uma caixa de vinte milímetros encostada na de dez da vizinha: o
+   vértice de uma cai no meio da aresta da outra) divide-se nele, e cada pedaço leva as faces da aresta inteira; o pedaço que coincide
+   com a aresta da vizinha junta-se a ela, e as paredes que se encostam passam a ser vistas como são. Devolve a lista de arestas. */
+const TOLERANCIA_DO_ENCONTRO = 1e-4;
+function dividirNosVertices(vertices, solda, arestas) {
+  const usados = [...new Set([...arestas.values()].flatMap((a) => [a.p, a.q]))];
+  if (usados.length === 0) return [];
+  const min = [0, 1, 2].map((e) => Math.min(...usados.map((i) => vertices[i][e])));
+  const max = [0, 1, 2].map((e) => Math.max(...usados.map((i) => vertices[i][e])));
+  const lado = Math.max(...max.map((m, e) => m - min[e]), 1e-9) / 32;
+  const celula = (c, e) => Math.floor((c - min[e]) / lado);
+  const grade = new Map();
+  for (const i of usados) {
+    const k = vertices[i].map((c, e) => celula(c, e)).join(',');
+    if (!grade.has(k)) grade.set(k, []);
+    grade.get(k).push(i);
+  }
+  const saida = new Map();
+  const juntar = (p, q, faces) => {
+    const chave = p < q ? `${p}:${q}` : `${q}:${p}`;
+    const reg = saida.get(chave);
+    if (reg) reg.faces.push(...faces); else saida.set(chave, { p: Math.min(p, q), q: Math.max(p, q), faces: [...faces] });
+  };
+  for (const { p, q, faces } of arestas.values()) {
+    const a = vertices[p]; const d = sub(vertices[q], a);
+    const l2 = dot(d, d);
+    const lo = a.map((c, e) => celula(Math.min(c, vertices[q][e]) - TOLERANCIA_DO_ENCONTRO, e));
+    const hi = a.map((c, e) => celula(Math.max(c, vertices[q][e]) + TOLERANCIA_DO_ENCONTRO, e));
+    const nos = [];
+    for (let x = lo[0]; x <= hi[0]; x++) for (let y = lo[1]; y <= hi[1]; y++) for (let z = lo[2]; z <= hi[2]; z++) {
+      for (const i of grade.get(`${x},${y},${z}`) ?? []) {
+        if (i === p || i === q) continue;
+        const w = sub(vertices[i], a);
+        const t = dot(w, d) / l2;
+        if (!(t > 1e-6 && t < 1 - 1e-6)) continue;
+        if (Math.hypot(w[0] - t * d[0], w[1] - t * d[1], w[2] - t * d[2]) < TOLERANCIA_DO_ENCONTRO) nos.push({ t, i });
+      }
+    }
+    if (nos.length === 0) { juntar(p, q, faces); continue; }
+    nos.sort((u, v) => u.t - v.t);
+    const cadeia = [p, ...nos.map((n) => n.i), q];
+    for (let k = 0; k + 1 < cadeia.length; k++) if (cadeia[k] !== cadeia[k + 1]) juntar(cadeia[k], cadeia[k + 1], faces);
+  }
+  return [...saida.values()];
+}
+
+/* A CAMADA DE FACES E ARESTAS DE TODOS OS VOLUMES JUNTOS. A peça de família chega com um volume por parte, e as partes dividem o mesmo
+   sólido (a folha e o nó da dobradiça continuam a mesma chapa), ou se tocam cada uma com as suas faces (duas caixas lado a lado, com a
+   parede de uma encostada na da outra). Decidir a aresta por volume traçava a divisão entre as partes como se fosse borda: um risco no
+   meio da chapa, ou na emenda de duas faces no mesmo plano. A aresta é decidida por todas as faces que chegam nela, de todos os
+   volumes: as paredes que se encostam, com a mesma face de um lado e de outro e normais opostas, são interiores e saem da conta, e o que
+   resta decide como decide dentro de um volume: uma face só é borda, duas faces com mais de 30 graus entre si são vinco, e uma de
+   frente e outra de costas são silhueta. Só conta a aresta onde alguma das faces que sobram olha para o observador. */
+function arestasDeTodos(vertices, solda, tris, olho, opacos) {
+  const faces = [];
+  const arestas = new Map();
   tris.forEach((lista, volume) => {
     for (const t of lista) {
-      const [i, j, k] = t;
-      for (const [p, q] of [[i, j], [j, k], [k, i]]) {
-        const chave = chaveDaAresta(p, q);
-        const e = contagem.get(chave);
-        if (e) e.push({ volume, t }); else contagem.set(chave, [{ volume, t }]);
+      const n = normalDoTriangulo(vertices, t);
+      if (!n) continue;
+      const f = { ids: t, n, frente: dot(n, olho) > PERFIL, volume, opaco: opacos[volume] };
+      faces.push(f);
+      for (let e = 0; e < 3; e++) {
+        const p = solda[t[e]]; const q = solda[t[(e + 1) % 3]];
+        if (p === q) continue;
+        const chave = p < q ? `${p}:${q}` : `${q}:${p}`;
+        const entrada = { f, oposto: vertices[t[(e + 2) % 3]] };
+        const reg = arestas.get(chave);
+        if (reg) reg.faces.push(entrada); else arestas.set(chave, { p: Math.min(p, q), q: Math.max(p, q), faces: [entrada] });
       }
     }
   });
-  const vizinho = new Map();
-  for (const [chave, fs] of contagem) {
-    if (fs.length !== 2 || fs[0].volume === fs[1].volume) continue;
-    const n0 = normalDoTriangulo(vertices, fs[0].t);
-    const n1 = normalDoTriangulo(vertices, fs[1].t);
-    if (!n0 || !n1) continue;
-    vizinho.set(`${fs[0].volume}|${chave}`, n1);
-    vizinho.set(`${fs[1].volume}|${chave}`, n0);
-  }
-  return vizinho;
-}
-
-function facesDoVolume(vertices, triangulos, olho, V, vizinhoDeFora = () => null) {
-  const faces = [];
-  const arestas = new Map();
-  const usados = new Set();
-  for (const [i, j, k] of triangulos) {
-    usados.add(i); usados.add(j); usados.add(k);
-    const u = normalDoTriangulo(vertices, [i, j, k]);
-    if (!u) continue;
-    const f = { ids: [i, j, k], n: u, frente: dot(u, olho) > PERFIL };
-    faces.push(f);
-    for (const [p, q] of [[i, j], [j, k], [k, i]]) {
-      const chave = chaveDaAresta(p, q);
-      const e = arestas.get(chave);
-      if (e) e.faces.push(f); else arestas.set(chave, { p, q, faces: [f] });
+  const limite = COSSENO_DO_VINCO - FOLGA_DO_VINCO;
+  const tracos = [];
+  for (const { p, q, faces: ao } of dividirNosVertices(vertices, solda, arestas)) {
+    let resta = ao;
+    if (ao.length > 2) {
+      /* a direção de cada face a partir da aresta, no plano perpendicular a ela: duas faces de normais opostas que olham para o mesmo
+         lado são a mesma parede vista de dentro e de fora */
+      const e = unitario(sub(vertices[q], vertices[p]));
+      const para = ao.map(({ oposto }) => { const w = sub(oposto, vertices[p]); const k = dot(w, e); return unitario([w[0] - k * e[0], w[1] - k * e[1], w[2] - k * e[2]]); });
+      const fora = new Set();
+      for (let i = 0; i < ao.length; i++) {
+        if (fora.has(i)) continue;
+        for (let j = i + 1; j < ao.length; j++) {
+          if (fora.has(j) || ao[i].f.volume === ao[j].f.volume) continue;
+          if (dot(ao[i].f.n, ao[j].f.n) < -1 + 1e-6 && dot(para[i], para[j]) > 1 - 1e-6) { fora.add(i); fora.add(j); break; }
+        }
+      }
+      resta = ao.filter((_, i) => !fora.has(i));
     }
+    const fs = resta.map((x) => x.f);
+    if (!fs.some((f) => f.frente)) continue;
+    const traca = fs.length !== 2 || fs[0].frente !== fs[1].frente || dot(fs[0].n, fs[1].n) < limite;
+    if (!traca) continue;
+    /* quem leva o traço: entre os volumes das faces de frente que sobram, um opaco (o de índice maior), ou o translúcido de índice maior */
+    const dono = fs.filter((f) => f.frente).reduce((m, f) => (m === null || (f.opaco && !m.opaco) || (f.opaco === m.opaco && f.volume > m.volume) ? f : m), null).volume;
+    tracos.push({ volume: dono, linha: [vertices[p], vertices[q]], faces: fs });
   }
-  const linhas = [];
-  for (const [chave, { p, q, faces: original }] of arestas) {
-    const deFora = original.length === 1 ? vizinhoDeFora(chave) : null;
-    const fs = deFora ? [...original, { n: deFora, frente: dot(deFora, olho) > PERFIL }] : original;
-    if (!original.some((f) => f.frente)) continue;
-    const dois = fs.length === 2;
-    const traca = !dois || fs[0].frente !== fs[1].frente || dot(fs[0].n, fs[1].n) < COSSENO_DO_VINCO;
-    if (traca) linhas.push([vertices[p], vertices[q]]);
+  /* onde um volume opaco atravessa a superfície de outro: a aresta que nenhuma malha tem, quando as normais passam do vinco */
+  const dasFrentes = faces.filter((f) => f.opaco && f.frente);
+  const cruzamentos = cruzamentosEntreVolumes(dasFrentes.map((f) => ({ p: f.ids.map((i) => vertices[i]), n: f.n, volume: f.volume, ids: f.ids.map((i) => solda[i]) })));
+  for (const { a, b, de, com } of cruzamentos) {
+    const f = dasFrentes[de]; const g = dasFrentes[com];
+    if (dot(f.n, g.n) < limite) tracos.push({ volume: Math.max(f.volume, g.volume), linha: [a, b], faces: [f, g] });
   }
-  const frentes = faces.filter((f) => f.frente);
-  return { lados: frentes.map((f) => ({ pts: f.ids.map((i) => vertices[i]), n: f.n })), linhas: semOQueOVolumeEsconde(linhas, frentes, V, olho, { vertices }), usados: [...usados] };
+  return { faces, tracos };
 }
 
 /* Valida e lê um painel (uma opção). */
@@ -127,29 +192,50 @@ function projetar(painel, V, olho) {
     const i = ordem.get(f.volume);
     if (i !== undefined) tris[i].push(f.vertices);
   }
-  const vizinhos = vizinhosEntreVolumes(vertices, tris);
+  const opacos = painel.volumes.map((v) => !(v.opacidade !== undefined && v.opacidade < 1));
+  const { faces: todas, tracos } = arestasDeTodos(vertices, soldar(vertices), tris, olho, opacos);
+
+  /* o que cada volume mostra: as faces de frente dele, e os traços que lhe couberam sem o que as faces escondem. Nos volumes opacos a
+     oclusão é a exata, contra as faces de frente de todos os volumes opacos (a de outro volume esconde a linha como a do próprio), e o
+     traço sai já visível: a camada o pinta sem teste de profundidade. O translúcido segue o que sempre fez: só o que o próprio volume
+     esconde, e o teste de profundidade da camada. */
+  const frentesDoVolume = painel.volumes.map(() => []);
+  for (const f of todas) if (f.frente) frentesDoVolume[f.volume].push({ ids: f.ids, n: f.n });
+  const frentesOpacas = frentesDoVolume.flatMap((l, i) => (opacos[i] ? l : []));
+  const { visiveis, superficieEm } = oclusaoExata(frentesOpacas, V, olho, { vertices });
+  /* o plano da vista, em milímetro: a caixa de todos os vértices, que dá a escala das amostras de cada linha */
+  let extensao = 0;
+  {
+    let lo = [Infinity, Infinity]; let hi = [-Infinity, -Infinity];
+    for (const v of new Set(tris.flat(2))) { const q = V.p(vertices[v]); lo = [Math.min(lo[0], q[0]), Math.min(lo[1], q[1])]; hi = [Math.max(hi[0], q[0]), Math.max(hi[1], q[1])]; }
+    extensao = Math.max(hi[0] - lo[0], hi[1] - lo[1], 1e-9);
+  }
+  const vizinhanca = { delta: ESPACO_DAS_AMOSTRAS * extensao, passo: extensao / 60, cosseno: COSSENO_DO_VINCO - FOLGA_DO_VINCO, degrau: DEGRAU_DE_PROFUNDIDADE };
   const itens = [];
   let min = [Infinity, Infinity];
   let max = [-Infinity, -Infinity];
   painel.volumes.forEach((v, i) => {
     if (tris[i].length === 0) return;
-    const { lados, linhas, usados } = facesDoVolume(vertices, tris[i], olho, V, (chave) => vizinhos.get(`${i}|${chave}`) ?? null);
+    const usados = new Set(tris[i].flat());
+    const linhasBrutas = tracos.filter((t) => t.volume === i).map((t) => t.linha);
+    const linhas = opacos[i] ? arestasPelaVizinhanca(visiveis(linhasBrutas), V, superficieEm, vizinhanca) : semOQueOVolumeEsconde(linhasBrutas, frentesDoVolume[i], V, olho, { vertices });
+    const lados = frentesDoVolume[i].map((f) => ({ pts: f.ids.map((k) => vertices[k]), n: f.n }));
     let centro = [0, 0, 0];
     for (const idx of usados) {
       const q = V.p(vertices[idx]);
       min = [Math.min(min[0], q[0]), Math.min(min[1], q[1])];
       max = [Math.max(max[0], q[0]), Math.max(max[1], q[1])];
-      centro = centro.map((c, e) => c + vertices[idx][e] / usados.length);
+      centro = centro.map((c, e) => c + vertices[idx][e] / usados.size);
     }
     const r = { id: v.id, cor: v.cor, opacidade: v.opacidade !== undefined && v.opacidade < 1 ? v.opacidade : undefined };
-    itens.push({ r, chunks: [{ dentro: [], lados, tampas: [], arcos: [], linhas }], prof: dot(centro, olho), lados, linhas });
+    itens.push({ r, chunks: [{ dentro: [], lados, tampas: [], arcos: [], linhas }], prof: dot(centro, olho), lados, linhas, visiveis: opacos[i] });
   });
   exigir(itens.length > 0, `nenhum dos volumes pedidos tem face na malha (${painel.volumes.slice(0, 6).map((v) => v.id).join(', ')})`);
   return { itens, min, max };
 }
 
 /* Um painel de cada vez no quadro: a posição e a conversão do plano da vista (mm) para o pixel. */
-function geometria(p, k, escala) {
+export function geometria(p, k, escala) {
   const x0 = k * QUADRO.painelL;
   const cx = x0 + QUADRO.painelL / 2 - ((p.min[0] + p.max[0]) / 2) * escala;
   const cy = QUADRO.topo + QUADRO.painelA / 2 - ((p.min[1] + p.max[1]) / 2) * escala;
