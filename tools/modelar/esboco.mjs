@@ -200,7 +200,7 @@ export async function renderizarCamada(camada, fator = 1, navegador = null) {
 
 /* Uma página por navegador, com o Three.js servido de node_modules, reaproveitada pelas imagens seguintes. */
 const PAGINAS_DA_CAMADA = new WeakMap();
-async function paginaDaCamada(navegador) {
+export async function paginaDaCamada(navegador) {
   if (!PAGINAS_DA_CAMADA.has(navegador)) {
     const pagina = await navegador.newPage();
     const raiz = dirname(fileURLToPath(import.meta.resolve('three')));

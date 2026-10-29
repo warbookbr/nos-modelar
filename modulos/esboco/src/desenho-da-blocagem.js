@@ -149,7 +149,7 @@ function projetar(painel, V, olho) {
 }
 
 /* Um painel de cada vez no quadro: a posição e a conversão do plano da vista (mm) para o pixel. */
-function geometria(p, k, escala) {
+export function geometria(p, k, escala) {
   const x0 = k * QUADRO.painelL;
   const cx = x0 + QUADRO.painelL / 2 - ((p.min[0] + p.max[0]) / 2) * escala;
   const cy = QUADRO.topo + QUADRO.painelA / 2 - ((p.min[1] + p.max[1]) / 2) * escala;
