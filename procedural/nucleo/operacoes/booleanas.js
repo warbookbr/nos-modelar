@@ -917,6 +917,7 @@ export function criarOperacoesBooleanas(servicos) {
       nf.cor = f.cor; nf.material = f.material; nf.parte = f.parte; nf.liso = f.liso; nf.solido = f.solido;
       if (aux && extra.liso != null) nf.liso = extra.liso;
       if (st.parteAtribuidaEm?.has(fid)) st.parteAtribuidaEm.set(id, st.parteAtribuidaEm.get(fid));
+      (st.pedacosDe ??= new Map()).set(id, fid);
       faces.push(id);
       if (aux) facesAux.push(id); else pedacosDeEntrada.push(id);
     });

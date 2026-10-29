@@ -17,8 +17,8 @@ import { CURSO_MAXIMO, FOLGA_AXIAL, geometriaDaDobradica } from './geometria.js'
 const registro = criarRegistroDeFamilias({ familias: [DOBRADICA] });
 const execucao = execucaoDe({ registroComposicoes: registro.registroComposicoes, registroOperacoes: registro.registroOperacoes });
 const MM = 0.001;
-/* os três arcos do rolo têm o centro deslocado pelos trechos retos de 0,02 mm entre eles: o raio medido do eixo do pino varia até 0,03 mm */
-const FOLGA_DO_ROLO = 0.04 * MM;
+/* o rolo é um arco só, de 270 graus, com o centro no eixo do pino: o raio medido do eixo é exato */
+const FOLGA_DO_ROLO = 1e-9;
 const MATERIAIS = { chapa: { cor: '#808080' }, pino: { cor: '#c0c0c0' } };
 const conjunto = (parametros = {}) => executarReceita({ meta: { nome: 'dobradica' }, CHAMADAS_COMPOSICOES: [chamar(DOBRADICA, 'corpo', parametros)], MATERIAIS }, execucao).neutro;
 const hash = (neutro) => sha256Hex(JSON.stringify(neutroCanonico(neutro)));
@@ -101,6 +101,77 @@ describe('a geometria contra a conta', () => {
       const centro = [geo.mm.xDoFuro * MM, y * MM];
       const nasBordas = [...d.V.values()].filter(([px, py, pz]) => Math.abs(Math.hypot(px - centro[0], py - centro[1]) - raioDoFuro) < 1e-9 && Math.abs(Math.abs(pz - geo.mm.zDaChapa * MM) - geo.mm.espessura / 2 * MM) < 1e-9);
       expect(nasBordas).toHaveLength(24); /* o polígono de 12 lados, nas duas faces da chapa */
+    }
+  });
+});
+
+describe('a malha sem detalhes microscópicos', () => {
+  const PONTOS = Object.fromEntries(['minimo', 'medio', 'maximo'].map((nome) => [nome, Object.fromEntries(Object.entries(DOBRADICA.contrato.parametros).map(([k, v]) => [k, v[nome]]))]));
+  PONTOS.padrao = {};
+  const arestasDe = (neutro) => {
+    const arestas = new Map();
+    for (const f of neutro.F.values()) {
+      f.vs.forEach((a, i) => {
+        const b = f.vs[(i + 1) % f.vs.length], chave = a < b ? `${a}-${b}` : `${b}-${a}`;
+        if (!arestas.has(chave)) arestas.set(chave, { a, b, partes: new Set() });
+        arestas.get(chave).partes.add(f.parte);
+      });
+    }
+    return [...arestas.values()];
+  };
+  const comprimento = (neutro, { a, b }) => Math.hypot(...[0, 1, 2].map((i) => neutro.V.get(a)[i] - neutro.V.get(b)[i]));
+
+  it('nenhuma aresta das folhas tem menos de 0,5 mm: o pino, de 24 lados, é o único que a tessellation do círculo deixa mais curto', () => {
+    for (const [nome, parametros] of Object.entries(PONTOS)) {
+      const neutro = conjunto(parametros);
+      const curtas = arestasDe(neutro).filter((e) => !e.partes.has('pino') && comprimento(neutro, e) < 0.5 * MM);
+      expect(curtas, nome).toEqual([]);
+    }
+  });
+
+  it('cada folha é uma chapa dobrada só, de uma dobra de 270 graus, sem união nem sobreposição de chapas', () => {
+    for (const lado of ['d', 'e']) {
+      const passos = DOBRADICA.composicoes.find((c) => c.id === `dobradica.folha-${lado}-n5-f3`).nos;
+      const chapas = passos.filter((no) => no.operacao === 'chapaDobrada');
+      expect(chapas).toHaveLength(1);
+      expect(chapas[0].argumentos.abas.map((aba) => aba.angulo)).toEqual([-270, undefined]);
+      expect(chapas[0].argumentos.abas[1].comprimento).toBe(0);
+      expect(passos.some((no) => no.operacao === 'unir')).toBe(false);
+    }
+  });
+
+  it('os nós só têm vértices no anel do rolo, de raio exato, e a folha só na chapa plana, do lado dela', () => {
+    for (const [nome, parametros] of Object.entries(PONTOS)) {
+      const completos = { ...Object.fromEntries(Object.entries(DOBRADICA.contrato.parametros).map(([k, v]) => [k, v.padrao])), ...parametros };
+      const geo = geometriaDaDobradica(completos).mm;
+      const neutro = conjunto(parametros);
+      for (const f of neutro.F.values()) {
+        for (const id of f.vs) {
+          const [x, , z] = neutro.V.get(id).map((c) => c / MM);
+          if (f.parte === 'nosD' || f.parte === 'nosE') {
+            const r = Math.hypot(x, z);
+            expect(Math.min(Math.abs(r - geo.raioDoFuroDoNo), Math.abs(r - geo.raioDoNo)), `${nome} ${f.parte}`).toBeLessThan(1e-6);
+          }
+          if (f.parte === 'folhaD' || f.parte === 'folhaE') {
+            expect(Math.abs(z - geo.zDaChapa), `${nome} ${f.parte} z`).toBeLessThanOrEqual(geo.espessura / 2 + 1e-6);
+            expect(f.parte === 'folhaD' ? x : -x, `${nome} ${f.parte} x`).toBeGreaterThanOrEqual(-1e-6);
+          }
+        }
+      }
+    }
+  });
+
+  it('a chapa de cada folha é plana e contínua do rolo à borda: o corte dos nós da outra folha termina em raioDoCorte, sem degrau na folga entre os nós', () => {
+    const geo = geometriaDaDobradica(Object.fromEntries(Object.entries(DOBRADICA.contrato.parametros).map(([k, v]) => [k, v.medio]))).mm;
+    const neutro = conjunto(PONTOS.medio);
+    for (const [parte, sinal] of [['folhaD', 1], ['folhaE', -1]]) {
+      /* a chapa vai do ponto em que sai tangente ao rolo (x = 0) até raioDoCorte sem vértice no meio, e dali à borda da folha; os furos de
+         fixação começam depois de raioDoCorte */
+      const xs = new Set();
+      for (const f of neutro.F.values()) if (f.parte === parte) for (const id of f.vs) xs.add(Number((sinal * neutro.V.get(id)[0] / MM).toFixed(6)));
+      expect([...xs].filter((x) => x > 1e-6 && x < geo.raioDoCorte - 1e-6), parte).toEqual([]);
+      expect(Math.min(...xs)).toBeCloseTo(0, 6);
+      expect(Math.max(...xs)).toBeCloseTo(geo.xExterno, 6);
     }
   });
 });

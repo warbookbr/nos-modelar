@@ -3503,7 +3503,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
   let retrato = null;
   PASSOS.forEach((passo, i) => {
@@ -3557,7 +3557,12 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   const facesDasPortas = new Map();
   for (const [id, porta] of st.portas) {
     const r = resolverOrigem(st, porta.de);
-    if (!r.erro) facesDasPortas.set(id, [...new Set(r.faces)].filter((f) => st.F.has(f)));
+    if (r.erro) continue;
+    /* a face que uma booleana corta fica com o id num pedaço só; os outros pedaços têm id novo e a origem não os cita. Para a
+       conferência, a porta sai da face inteira, de modo que os pedaços (e os pedaços deles) entram junto, em ordem de criação */
+    const doPorta = new Set(r.faces);
+    for (const [pedaco, pai] of st.pedacosDe ?? []) if (doPorta.has(pai)) doPorta.add(pedaco);
+    facesDasPortas.set(id, [...doPorta].filter((f) => st.F.has(f)));
   }
   const saida = { ...neutro, artefato: artefatoDaMalha(neutro), procedencia: procedenciaCanonica(st.procedencia) };
   Object.defineProperty(saida, 'facesDasPortas', { value: facesDasPortas, enumerable: false });

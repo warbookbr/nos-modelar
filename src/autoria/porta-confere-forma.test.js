@@ -29,6 +29,27 @@ describe('a porta confere com a forma', () => {
     expect(codigos(cilindro(anel(0.03, 0.052)))).toEqual(['porta-com-raio-errado']);
   });
 
+  it('a face que uma booleana parte continua inteira para a porta: o pedaço novo entra nas faces dela, com a parte da face', () => {
+    /* um friso de 2 cm abre a face da frente do cubo em duas; a face fica com o id no pedaço maior (empate: o primeiro) e o outro
+       pedaço ganha id novo, que a origem do cubo não cita */
+    const passos = [
+      ['cubo', { origemId: 1, larg: 0.1, alt: 0.1, prof: 0.1 }],
+      ['cubo', { origemId: 2, larg: 0.02, alt: 0.2, prof: 0.06, em: [0, -0.05, 0.05] }],
+      ['parte', { nome: 'caixa', sel: { origem: { op: 'cubo', id: 1 } } }],
+      ['subtrair', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }],
+      ['publicarPorta', { id: 'frente', de: { op: 'cubo', id: 1, face: 'frente' }, interface: { forma: 'plano', papel: 'apoia', ponto: [0, 0.05, 0.05], normal: [0, 0, 1], extensao: [0.1, 0.1] } }],
+    ];
+    const n = nucleo(passos, {}, {}, {}, null, []);
+    expect(n.orfaos).toEqual([]);
+    const daFrente = n.facesDasPortas.get('frente');
+    expect(daFrente).toHaveLength(2);
+    for (const f of daFrente) {
+      expect(n.F.get(f).parte).toBe('caixa');
+      expect(n.F.get(f).vs.every((v) => Math.abs(n.V.get(v)[2] - 0.05) < 1e-9)).toBe(true);
+    }
+    expect(conferirPortasNaForma(n)).toEqual([]);
+  });
+
   it('as portas das partes fixas do braço passam', async () => {
     for (const parte of ['base', 'anel-cintura', 'ombro']) {
       const receita = (await import(`../../procedural/pecas/braco-robotico/partes/${parte}/receita.js`)).default;
