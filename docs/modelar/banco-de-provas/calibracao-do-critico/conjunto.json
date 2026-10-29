@@ -345,7 +345,7 @@
             ]
           }
         ],
-        "geometria": "sha256:f27dacbbeb6d87b1a7687a9ffc7e9540c4c01fea05586c414cb9395638d413c9"
+        "geometria": "sha256:62fd633316cd61d8effcb815238516da1b36db6762f6dd53f703490a67a4ec41"
       },
       "defeitos": [
         {
@@ -370,24 +370,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:622521308429cc1318769685de354ea5a38b3cd4cacb1e10bccd061990980c54"
+        "hash": "sha256:93e43a9f59b48747c8c62894ed8d845ffbfd218e7921a3d5b9ee00113a15fc29"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c04/isometrica.png",
-          "sha256": "sha256:a0cb41165f2a2c0903771f60e76be235fbd78f4870ff5e85e28698796460a682"
+          "sha256": "sha256:08aa2c153a10257c14edfbd433551554135e873bf992249915eaa264cfc8e022"
         },
         "frontal": {
           "arquivo": "imagens/c04/frontal.png",
-          "sha256": "sha256:f485fa35586ca09b9bc03ae43c6416d3d7bc9731df7bc24ba246d62faf1275bc"
+          "sha256": "sha256:2230a54e730d3069bd382db02c660c81bace5a7a757e6a6b2bfd32378a631428"
         },
         "lateral": {
           "arquivo": "imagens/c04/lateral.png",
-          "sha256": "sha256:9361b2aeab48ed9884523642100e36678c57a618a442f668db3d73b30c55ff75"
+          "sha256": "sha256:7adaa08e16a7497005f954ebebf333e3947f89bb5fb88152277196371caca3b5"
         },
         "superior": {
           "arquivo": "imagens/c04/superior.png",
-          "sha256": "sha256:52150f2d2fcb1f229374b201db543cc9a2398ae4895085b8688cc547f2cd294c"
+          "sha256": "sha256:c118b8a11cb36784e8c452d2ee72d596c5d8c5e9e72fe7e0b7f3f488367f0998"
         }
       }
     },
@@ -657,28 +657,28 @@
         "familia": "dobradica",
         "base": "medio",
         "aprovacao": "medio",
-        "geometria": "sha256:7e79f240d7ebced11b93d3d491a133395b1fe3e1cd0878c67c93dc0fe25ae7c9"
+        "geometria": "sha256:efafb07cb44c1f2cdaf14f33fb46b4926ca7cf0ba52c6f798846f225a7ef2e0c"
       },
       "defeitos": [],
       "desenho": {
-        "hash": "sha256:1afb0a0777a9d49c83ecee3cf4e79709482c52889d361c3c8bd5d95f022efa1c"
+        "hash": "sha256:5a2f8143842c6f8743c58e258feb5f328991112abcc9f3c8331943e6d7c7efb9"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c09/isometrica.png",
-          "sha256": "sha256:c2ed5d177561ddf8abb5fed99bedba11bb41c92406dafca07efe912341907aca"
+          "sha256": "sha256:be5c28f81fe8c488fe73d6cd6e0a2849143fcce34f5a0b28782b3fed8a151a3f"
         },
         "frontal": {
           "arquivo": "imagens/c09/frontal.png",
-          "sha256": "sha256:80f52499a9ce2a60743e9c9181510c15eeb5f147a65a253bb51bec6eddee4805"
+          "sha256": "sha256:ae42f2e7961781e776e9a81023ff2cc80fc4d493abc31e8939c9c07ccdf5da88"
         },
         "lateral": {
           "arquivo": "imagens/c09/lateral.png",
-          "sha256": "sha256:9361b2aeab48ed9884523642100e36678c57a618a442f668db3d73b30c55ff75"
+          "sha256": "sha256:dd92e8abef46fa85aa46e1bae209caecb81144acab97aa0aa6ef66e4f2e8adfb"
         },
         "superior": {
           "arquivo": "imagens/c09/superior.png",
-          "sha256": "sha256:1e77979f346e613c2d50f5f2c8c3cd5491fb0e0c13df1c11dc40bfa9a47868d3"
+          "sha256": "sha256:4deced905211354f601d118558dd8a2f1c10657e3a9ee8734888c68a55b2d8b2"
         }
       }
     },
@@ -1582,6 +1582,6 @@
   ],
   "prancha": {
     "arquivo": "prancha.png",
-    "sha256": "sha256:d42b8ce08210563512d4583097dce4af3c68b1c47e1604224c1cb2757628876f"
+    "sha256": "sha256:c95f4b0ee984f6d0e5308af5ecf4eedd5e3f26b1e0cbbc9780dbb6f8842ddce8"
   }
 }

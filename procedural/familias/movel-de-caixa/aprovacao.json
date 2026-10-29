@@ -1591,7 +1591,7 @@
           "profundidade": 550,
           "rodape": 80
         },
-        "hash": "sha256:0a5f5e8273c604df920ec7b5c964e44d2d66ab9a5843bc034ed5d005e0e7b907",
+        "hash": "sha256:2a00490bb01b28d48990ae1147421c352cd0a5addd098edc828c03e9cc3f0dba",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -1602,7 +1602,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:56f762c0c5e2261d7f0983a85647f5f0ea5d6f2417c0f109c658405f38b8b196",
+          "hash": "sha256:69494f7df39dc00fba1d37148e6029fcf1958968c9f084b545ebf9ed9841acc6",
           "pecas": [
             "movel-de-caixa-corpo",
             "movel-de-caixa-dobradica-1-1-d",
@@ -1638,44 +1638,7 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 70,
-              "pares": [
-                {
-                  "movel": [
-                    "dobradica-1-1-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-1-1-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                },
-                {
-                  "movel": [
-                    "dobradica-1-2-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-1-2-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                },
-                {
-                  "movel": [
-                    "dobradica-1-3-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-1-3-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                },
-                {
-                  "movel": [
-                    "dobradica-1-4-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-1-4-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                }
-              ],
+              "pares": [],
               "conferido": true
             },
             {
@@ -1690,44 +1653,7 @@
               "posicoes": 12,
               "colisoes": 0,
               "paresConferidos": 70,
-              "pares": [
-                {
-                  "movel": [
-                    "dobradica-2-1-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-2-1-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                },
-                {
-                  "movel": [
-                    "dobradica-2-2-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-2-2-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                },
-                {
-                  "movel": [
-                    "dobradica-2-3-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-2-3-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                },
-                {
-                  "movel": [
-                    "dobradica-2-4-movel"
-                  ],
-                  "fixo": [
-                    "dobradica-2-4-fixa"
-                  ],
-                  "estadoMaisGrave": "encostam"
-                }
-              ],
+              "pares": [],
               "conferido": true
             }
           ],
@@ -1911,9 +1837,9 @@
         "hash": "sha256:54a7b58da9f2b158fe194b5243aa75f8acc6ab1f573f7b6ffed215733eef7f9e"
       },
       "roupeiro": {
-        "hash": "sha256:0a5f5e8273c604df920ec7b5c964e44d2d66ab9a5843bc034ed5d005e0e7b907"
+        "hash": "sha256:2a00490bb01b28d48990ae1147421c352cd0a5addd098edc828c03e9cc3f0dba"
       }
     },
-    "observacao": "reassinada em 2026-10-29 depois da fatia 10 do plano dos ajustes no núcleo dos veículos, que funde os pedaços coplanares da booleana: só a divisão das faces planas mudou, com caixa e partes iguais e volume e área iguais a 1e-6; a pessoa aprovou vendo cada peça sólida antes e depois"
+    "observacao": "reassinada em 2026-10-29 com a dobradiça sem degraus que o móvel usa: a pessoa aprovou a forma e disse que a aprovação dela vale também pela do crítico, que não roda nesta geometria"
   }
 }
