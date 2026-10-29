@@ -23,11 +23,11 @@ export function areaDe(pos, P) {
 /* convexo em relação à normal da face de origem: nenhuma curva para o lado
    de dentro. Cantos colineares (curva zero) são aceitos — são os cantos que
    a face vizinha usa, e tirá-los abriria fenda. */
-export function convexo(pos, P, n) {
+export function convexo(pos, P, n, seno = 1e-7) {
   for (let k = 0; k < P.length; k++) {
     const a = pos(P[k]), b = pos(P[(k + 1) % P.length]), c = pos(P[(k + 2) % P.length]);
     const e1 = sub(b, a), e2 = sub(c, b);
-    const tol = 1e-7 * tamanho(e1) * tamanho(e2);
+    const tol = seno * tamanho(e1) * tamanho(e2);
     if (ponto(cruz(e1, e2), n) < -tol) return false;
   }
   return true;
@@ -90,3 +90,67 @@ export function pedacosConvexos(pos, triangulos, n, piso = 0) {
   return pecas.map((P) => melhorInicio(pos, P));
 }
 
+/* O quanto o canto mais afastado fica do plano que a soma dos triângulos define (pelo centro dos cantos). Zero para
+   triângulos coplanares. A face de entrada do núcleo só precisa ser plana a 1e-6, e fundir pedaços de uma face assim,
+   torta, mudaria a superfície (e o volume) da peça. */
+export function desvioDoPlano(pos, triangulos) {
+  const cantos = [...new Set(triangulos.flat())].map(pos);
+  const s = somaDeCruzes(pos, triangulos);
+  const l = tamanho(s);
+  if (!(l > 0)) return 0;
+  const o = [0, 1, 2].map((e) => cantos.reduce((soma, p) => soma + p[e], 0) / cantos.length);
+  let pior = 0;
+  for (const p of cantos) pior = Math.max(pior, Math.abs(ponto(sub(p, o), s)) / l);
+  return pior;
+}
+
+function somaDeCruzes(pos, triangulos) {
+  let s = [0, 0, 0];
+  for (const [a, b, c] of triangulos) {
+    const q = cruz(sub(pos(b), pos(a)), sub(pos(c), pos(a)));
+    s = [s[0] + q[0], s[1] + q[1], s[2] + q[2]];
+  }
+  return s;
+}
+
+/* O leque a partir do primeiro canto, como triângulos. */
+export const lequeDe = (P) => P.slice(1, -1).map((_, k) => [P[0], P[k + 1], P[k + 2]]);
+
+/* Une, entre os pedaços de UMA face de entrada, os pares que formam um polígono plano e convexo. `fundir(P, Q)` junta pela
+   aresta comum e mantém todos os cantos, e por isso nenhuma aresta vizinha muda e a casca continua fechada. O par só se une
+   quando o resultado fica plano a `plano` (metro) do próprio plano, para a superfície da peça não mudar, e convexo em
+   relação à própria normal, com a curva para dentro de até `seno` (o seno do giro) tolerada; o canto colinear fica.
+   `itens` são objetos `{ ref, prioridade }`, onde `ref[1]` é o polígono; o de `prioridade` verdadeira (a face cortada, que
+   guarda o id) sobrevive à fusão. Devolve os pares `[sobrevivente, fundido]` na ordem em que foram unidos, e o chamador tira
+   o fundido de onde estiver. `valencia` mapeia o canto ao número de faces da casca inteira que o usam: a fusão tira uma face
+   de cada ponta da aresta comum, e o canto que ficaria em duas faces só (um vínculo que não é laço de três) a impede. O
+   mapa é atualizado. */
+export function fundirCoplanares(pos, itens, { plano, seno, valencia }) {
+  const feitos = [];
+  const vivos = itens.slice();
+  let mudou = true;
+  while (mudou) {
+    mudou = false;
+    for (let p = 0; p < vivos.length && !mudou; p++) {
+      for (let q = p + 1; q < vivos.length; q++) {
+        const m = fundir(vivos[p].ref[1], vivos[q].ref[1]);
+        if (!m) continue;
+        const pontas = vivos[p].ref[1].filter((v) => vivos[q].ref[1].includes(v));
+        if (pontas.some((v) => (valencia.get(v) ?? 0) <= 3)) continue;
+        const leque = lequeDe(m);
+        if (desvioDoPlano(pos, leque) > plano) continue;
+        const soma = somaDeCruzes(pos, leque);
+        const l = tamanho(soma);
+        if (!(l > 0) || !convexo(pos, m, soma.map((x) => x / l), seno)) continue;
+        const [fica, sai] = vivos[q].prioridade && !vivos[p].prioridade ? [vivos[q], vivos[p]] : [vivos[p], vivos[q]];
+        for (const v of pontas) valencia.set(v, valencia.get(v) - 1);
+        fica.ref[1] = m;
+        vivos.splice(vivos.indexOf(sai), 1);
+        feitos.push([fica, sai]);
+        mudou = true;
+        break;
+      }
+    }
+  }
+  return feitos;
+}

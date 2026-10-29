@@ -469,10 +469,13 @@ describe('raioMinimo e conselhos de erro (revisão)', () => {
     const G: any[] = [cubo(1, 1, 0.3, 1, [0, 0, 0]), cubo(2, 0.5, 0.1, 0.5, [0, 0.25, 0]),
       ['rotaciona', { eixo: 'z', graus: 15, pivo: [0, 0, 0], sel: { tudo: true } }], subtrair(9, ['cubo', 1], ['cubo', 2])];
     const gira = (extra: any) => nucleo([...G, arredonda('subtrair', 9, { arestas: ['internas', 'convexas'], ...extra })]);
-    const ruim = gira({ raio: 0.005 });
+    /* o raio que gritava era 0,005; a booleana passou a fundir os pedaços coplanares (fatia 10 do plano de ajustes no
+       núcleo), a face deixou de nascer partida e o 0,005 fecha. O 0,006 e, só nas internas, o 0,009 (em lugar do 0,01) são
+       raios que ainda dão a lasca e a face sem área neste rebaixo. */
+    const ruim = gira({ raio: 0.006 });
     expect(motivos(ruim)).toMatch(/tente um raio diferente, começando por um menor/);
     expect(ruim.F.size).toBe(nucleo(G).F.size);
-    const internas = nucleo([...G, arredonda('subtrair', 9, { arestas: 'internas', raio: 0.01 })]);
+    const internas = nucleo([...G, arredonda('subtrair', 9, { arestas: 'internas', raio: 0.009 })]);
     expect(motivos(internas)).toMatch(/triângulo sem área|sem área/);
     // seguindo o conselho (raio menor que o que gritou por sobreposição ou lasca) o passo fecha
     const ok = gira({ raio: 0.01 });
