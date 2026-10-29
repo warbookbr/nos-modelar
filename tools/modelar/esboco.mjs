@@ -65,7 +65,7 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
    teste de profundidade por pixel, e o resto (título, legendas, escala, linhas de centro, superfícies de corte) vem do SVG
    por cima; `svg` rasteriza só o SVG, com o algoritmo do pintor por forma (ESBOCO_PNG=svg). O `.svg` gravado é sempre o puro. */
 export const MOTOR_DO_PNG = process.env.ESBOCO_PNG === 'svg' ? 'svg' : 'webgl';
-const OPCOES_DA_CAMADA = { camada: MOTOR_DO_PNG === 'webgl', tracosVisiveis: MOTOR_DO_PNG === 'webgl' };
+export const OPCOES_DA_CAMADA = { camada: MOTOR_DO_PNG === 'webgl', tracosVisiveis: MOTOR_DO_PNG === 'webgl' };
 
 /* Roda dentro do Chromium: desenha a camada das formas com câmera ortográfica em pixels do quadro (x, y) e profundidade z
    ao longo do olho. Cores sem gestão de cor (o pixel é o hexadecimal da face), traços como fitas de 2 px com viés para a

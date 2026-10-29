@@ -8,7 +8,7 @@ import { PNG } from 'pngjs';
 import { afterAll, describe, expect, it } from 'vitest';
 import { desenharEsboco } from '../../modulos/esboco/src/index.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
-import { compostaArquivo, desenhoParaBuffer, LARGURA_DA_COMPOSTA, MOTOR_DO_PNG, variante, VISTAS_DA_ANALISE } from './esboco.mjs';
+import { compostaArquivo, desenhoParaBuffer, LARGURA_DA_COMPOSTA, OPCOES_DA_CAMADA, variante, VISTAS_DA_ANALISE } from './esboco.mjs';
 
 const PASTA = mkdtempSync(join(tmpdir(), 'esboco-composta-'));
 afterAll(() => rmSync(PASTA, { recursive: true, force: true }));
@@ -46,7 +46,7 @@ describe('--composta', () => {
       let alturas = [0, 0];
       const vistas = [];
       for (const v of VISTAS_DA_ANALISE) {
-        const d = desenharEsboco(variante({ ...expandido, ladosPorEscala: expandido.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), { camada: MOTOR_DO_PNG === 'webgl' });
+        const d = desenharEsboco(variante({ ...expandido, ladosPorEscala: expandido.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
         const { png } = await desenhoParaBuffer(d, r.celula, navegador);
         vistas.push(PNG.sync.read(png));
       }
