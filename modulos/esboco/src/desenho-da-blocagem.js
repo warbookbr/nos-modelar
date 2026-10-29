@@ -22,6 +22,7 @@
    faces no mesmo plano em favor do volume que vem depois na lista. */
 import { barraDeEscala, ErroDeEsboco, escalaDoQuadro, QUADRO, tintaDaFace, textoDoDesenho, VISTAS } from './index.js';
 import { formasDoPainel, montarCamada } from './camada.js';
+import { cruzamentosEntreVolumes } from './intersecao-de-volumes.js';
 import { oclusaoExata, semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
 
 const { f1, esc, quebrar } = textoDoDesenho;
@@ -52,7 +53,7 @@ function normalDoTriangulo(vertices, [i, j, k]) {
 /* os vértices a menos de 1e-5 mm um do outro são o mesmo ponto para decidir as arestas: duas peças que se tocam, cada uma com os
    vértices dela, dividem a aresta onde as coordenadas coincidem */
 const GRADE_DA_SOLDA = 1e5;
-function soldar(vertices) {
+export function soldar(vertices) {
   const primeiro = new Map();
   return vertices.map((p, i) => {
     const k = `${Math.round(p[0] * GRADE_DA_SOLDA)},${Math.round(p[1] * GRADE_DA_SOLDA)},${Math.round(p[2] * GRADE_DA_SOLDA)}`;
@@ -114,7 +115,7 @@ function dividirNosVertices(vertices, solda, arestas) {
    volumes: as paredes que se encostam, com a mesma face de um lado e de outro e normais opostas, são interiores e saem da conta, e o que
    resta decide como decide dentro de um volume: uma face só é borda, duas faces com mais de 30 graus entre si são vinco, e uma de
    frente e outra de costas são silhueta. Só conta a aresta onde alguma das faces que sobram olha para o observador. */
-function arestasDeTodos(vertices, solda, tris, olho, opacos) {
+export function arestasDeTodos(vertices, solda, tris, olho, opacos) {
   const faces = [];
   const arestas = new Map();
   tris.forEach((lista, volume) => {
@@ -158,7 +159,14 @@ function arestasDeTodos(vertices, solda, tris, olho, opacos) {
     if (!traca) continue;
     /* quem leva o traço: entre os volumes das faces de frente que sobram, um opaco (o de índice maior), ou o translúcido de índice maior */
     const dono = fs.filter((f) => f.frente).reduce((m, f) => (m === null || (f.opaco && !m.opaco) || (f.opaco === m.opaco && f.volume > m.volume) ? f : m), null).volume;
-    tracos.push({ volume: dono, linha: [vertices[p], vertices[q]] });
+    tracos.push({ volume: dono, linha: [vertices[p], vertices[q]], faces: fs });
+  }
+  /* onde um volume opaco atravessa a superfície de outro: a aresta que nenhuma malha tem, quando as normais passam do vinco */
+  const dasFrentes = faces.filter((f) => f.opaco && f.frente);
+  const cruzamentos = cruzamentosEntreVolumes(dasFrentes.map((f) => ({ p: f.ids.map((i) => vertices[i]), n: f.n, volume: f.volume, ids: f.ids.map((i) => solda[i]) })));
+  for (const { a, b, de, com } of cruzamentos) {
+    const f = dasFrentes[de]; const g = dasFrentes[com];
+    if (dot(f.n, g.n) < limite) tracos.push({ volume: Math.max(f.volume, g.volume), linha: [a, b], faces: [f, g] });
   }
   return { faces, tracos };
 }

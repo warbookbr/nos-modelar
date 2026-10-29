@@ -45,7 +45,7 @@ const COSSENO_DA_REFERENCIA = COSSENO_DO_VINCO - FOLGA_DO_VINCO;
 /* a inclinação da superfície acima da qual o degrau de profundidade não é mais medido contra a inclinação (a face quase de perfil) */
 const INCLINACAO_MAXIMA_DA_REFERENCIA = 20;
 /* quanto a inclinação das duas superfícies vizinhas, vezes o passo do pixel, soma de folga ao degrau mínimo */
-const FATOR_DA_INCLINACAO = 2;
+const FATOR_DA_INCLINACAO = 0.5;
 const LINHAS_POR_FAIXA = 1200;
 
 export class ErroDeMedida extends Error {}
