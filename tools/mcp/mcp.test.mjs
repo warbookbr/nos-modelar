@@ -1220,13 +1220,18 @@ describe('servidor MCP local — perfil revisao', () => {
       async waitForTimeout() {},
       async evaluate(fn) {
         const fonte = String(fn);
+        /* a medida do enquadramento também começa por `const b =`, então vem antes da pergunta de prontidão */
+        if (fonte.includes('.enquadramento()')) return {
+          url: 'http://127.0.0.1:4173/nos-modelar/bancada.html',
+          enquadramento: { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false },
+        };
         if (fonte.includes('const b =')) return {
           ready: true, erro: null, peca: 'fixture-visual', partes: ['base'],
           selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
           estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
         };
-        if (fonte.includes('.url()')) return 'http://127.0.0.1:4173/nos-modelar/bancada.html';
-        if (fonte.includes('.enquadramento()')) return { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false };
+        /* o controle de quadros e a espera da câmera respondem vazio, e a espera cai no `waitForTimeout` */
+        if (fonte.includes('__modelarQuadros')) return undefined;
         /* O MODO DE REVISÃO LIGA A AUDITORIA, porque é a imagem da revisão que
            vai ao crítico e ela não leva a interface junto. A página falsa
            precisa conhecer as duas chamadas que isso acrescenta, senão o teste
@@ -1281,6 +1286,7 @@ describe('servidor MCP local — perfil revisao', () => {
         };
         /* O modo de revisão liga a auditoria antes da espera que estoura o
            tempo, então a página falsa precisa conhecer as duas chamadas. */
+        if (fonte.includes('__modelarQuadros')) return undefined;
         if (fonte.includes('.auditoria(')) return { auditoria: true, cores: false, arame: false, legenda: [] };
         if (fonte.includes('.enquadrar()')) return undefined;
         throw new Error(`evaluate inesperado antes do timeout: ${fonte}`);
