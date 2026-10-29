@@ -116,3 +116,110 @@ export function semOQueOVolumeEsconde(linhas, frentes, V, olho, { vertices = nul
   }
   return saida;
 }
+
+/* A oclusão exata. `semOQueOVolumeEsconde` reparte a linha em pedaços e decide cada um pelo meio dele, e o trecho escondido que cai no
+   meio de um pedaço visível (ou o contrário) passa inteiro: o traço da aresta que some atrás da própria chapa sobrava como um toco de
+   quinze pixels, e o que ia além da divisão sumia. Aqui a conta é sobre a linha inteira. Para cada triângulo de frente, a linha ao
+   longo do parâmetro `t` tem coordenadas baricêntricas e profundidade que são funções de primeiro grau de `t`: o trecho dentro do
+   triângulo é um intervalo (o corte pelos três lados), e dentro dele a linha está atrás do plano do triângulo, por mais que a folga, num
+   segundo intervalo. O escondido é a união desses intervalos de todos os triângulos, e o que fica é o visível, sem divisão arbitrária.
+
+   Serve a qualquer conjunto de faces de frente, de um volume ou de todos: o triângulo de outro volume esconde a linha como o do próprio,
+   e a linha que corre sobre a face de outro volume na mesma profundidade (a aresta da divisão, o contato) não some, porque a folga a
+   deixa. Devolve os segmentos visíveis, na ordem de entrada. É determinística. */
+const COMPRIMENTO_MINIMO_DO_TRECHO = 1e-3;
+const EMENDA_DO_ESCONDIDO = 1e-5;
+
+export function visiveisContraAsFaces(linhas, frentes, V, olho, opcoes = {}) {
+  return oclusaoExata(frentes, V, olho, opcoes)(linhas);
+}
+
+/* A mesma conta com a grade das faces montada uma vez: devolve a função que tira de um conjunto de linhas o que as faces escondem. */
+export function oclusaoExata(frentes, V, olho, { vertices = null, folga: folgaPedida = null } = {}) {
+  const tris = frentes.length === 0 ? [] : triangulosDasFaces(frentes, vertices, V, olho);
+  if (tris.length === 0) return (linhas) => linhas;
+  const x0 = Math.min(...tris.map((t) => t.caixa[0])); const y0 = Math.min(...tris.map((t) => t.caixa[1]));
+  const x1 = Math.max(...tris.map((t) => t.caixa[2])); const y1 = Math.max(...tris.map((t) => t.caixa[3]));
+  const G = Math.max(1, Math.min(CELULAS_DA_GRADE, Math.round(Math.sqrt(tris.length))));
+  const lado = Math.max(x1 - x0, y1 - y0, 1e-9) / G;
+  const celula = (v, o) => Math.max(0, Math.min(G - 1, Math.floor((v - o) / lado)));
+  const grade = new Map();
+  tris.forEach((t, k) => {
+    /* o triângulo de área nula na tela (a face de perfil) não cobre nada */
+    const [a, b, c] = t.q;
+    t.d = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]);
+    if (Math.abs(t.d) < 1e-12) return;
+    t.k = k;
+    for (let cx = celula(t.caixa[0], x0); cx <= celula(t.caixa[2], x0); cx++) {
+      for (let cy = celula(t.caixa[1], y0); cy <= celula(t.caixa[3], y0); cy++) {
+        const c2 = cy * G + cx;
+        if (!grade.has(c2)) grade.set(c2, []);
+        grade.get(c2).push(t);
+      }
+    }
+  });
+  const extensao = Math.max(x1 - x0, y1 - y0);
+  const folga = folgaPedida ?? FOLGA_DA_OCLUSAO + 1e-5 * extensao;
+  const BARI = 1e-9;
+  return (linhas) => {
+  const saida = [];
+  for (const [a, b] of linhas) {
+    const pa = V.p(a); const pb = V.p(b);
+    const za = dot(a, olho); const zb = dot(b, olho);
+    const dx = pb[0] - pa[0]; const dy = pb[1] - pa[1];
+    const comprimento = Math.hypot(dx, dy);
+    if (!(comprimento > 1e-12)) { saida.push([a, b]); continue; }
+    /* os triângulos das células que a caixa da linha toca, sem repetir */
+    const vistos = new Set(); const candidatos = [];
+    for (let cx = celula(Math.min(pa[0], pb[0]), x0); cx <= celula(Math.max(pa[0], pb[0]), x0); cx++) {
+      for (let cy = celula(Math.min(pa[1], pb[1]), y0); cy <= celula(Math.max(pa[1], pb[1]), y0); cy++) {
+        for (const t of grade.get(cy * G + cx) ?? []) if (!vistos.has(t.k)) { vistos.add(t.k); candidatos.push(t); }
+      }
+    }
+    const escondidos = [];
+    for (const t of candidatos) {
+      const [qa, qb, qc] = t.q;
+      /* as baricêntricas (u para qa, v para qb, w para qc) de P(t) = pa + t (pb - pa): alfa + beta t */
+      const ux = (qb[1] - qc[1]); const uy = (qc[0] - qb[0]);
+      const vx = (qc[1] - qa[1]); const vy = (qa[0] - qc[0]);
+      const al = [(ux * (pa[0] - qc[0]) + uy * (pa[1] - qc[1])) / t.d, (vx * (pa[0] - qc[0]) + vy * (pa[1] - qc[1])) / t.d];
+      const be = [(ux * dx + uy * dy) / t.d, (vx * dx + vy * dy) / t.d];
+      al.push(1 - al[0] - al[1]); be.push(-be[0] - be[1]);
+      let lo = 0; let hi = 1; let vazio = false;
+      for (let m = 0; m < 3 && !vazio; m++) {
+        /* al + be t >= -BARI */
+        if (Math.abs(be[m]) < 1e-14) { if (al[m] < -BARI) vazio = true; continue; }
+        const r = (-BARI - al[m]) / be[m];
+        if (be[m] > 0) lo = Math.max(lo, r); else hi = Math.min(hi, r);
+      }
+      if (vazio || !(hi > lo)) continue;
+      /* a profundidade do plano do triângulo menos a da linha: C + D t, e escondida quando passa de `folga` */
+      const A = al[0] * t.z[0] + al[1] * t.z[1] + al[2] * t.z[2];
+      const B = be[0] * t.z[0] + be[1] * t.z[1] + be[2] * t.z[2];
+      const C = A - za; const D = B - (zb - za);
+      if (Math.abs(D) < 1e-14) { if (!(C > folga)) continue; } else {
+        const r = (folga - C) / D;
+        if (D > 0) lo = Math.max(lo, r); else hi = Math.min(hi, r);
+      }
+      if (hi > lo) escondidos.push([lo, hi]);
+    }
+    if (escondidos.length === 0) { saida.push([a, b]); continue; }
+    escondidos.sort((p, q) => p[0] - q[0]);
+    const emenda = EMENDA_DO_ESCONDIDO / comprimento;
+    const unidos = [];
+    for (const iv of escondidos) {
+      const ultimo = unidos[unidos.length - 1];
+      if (ultimo && iv[0] <= ultimo[1] + emenda) ultimo[1] = Math.max(ultimo[1], iv[1]); else unidos.push([...iv]);
+    }
+    const em = (t) => a.map((c, e) => c + t * (b[e] - c));
+    const minimo = COMPRIMENTO_MINIMO_DO_TRECHO / comprimento;
+    let cursor = 0;
+    for (const [h0, h1] of unidos) {
+      if (h0 - cursor > minimo) saida.push([em(cursor), em(h0)]);
+      cursor = Math.max(cursor, h1);
+    }
+    if (1 - cursor > minimo) saida.push([em(cursor), em(1)]);
+  }
+  return saida;
+  };
+}

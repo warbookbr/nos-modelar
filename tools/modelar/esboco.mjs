@@ -168,10 +168,12 @@ const DESENHAR_CAMADA = async (texto) => {
   };
   const opacas = camada.formas.filter((f) => f.opacidade >= 1);
   const translucidas = camada.formas.filter((f) => f.opacidade < 1).sort((a, b) => a.prof - b.prof || a.rank - b.rank);
-  const pos = []; const col = []; const fita = [];
-  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, f.inclinacoes, fita, true); }
+  const pos = []; const col = []; const fita = []; const fitaVisivel = [];
+  for (const f of opacas) { faces(f.faces, pos, col); fitas(f.tracos, f.inclinacoes, f.visiveis === true ? fitaVisivel : fita, true); }
   malha(pos, col, new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide }), 0);
   malha(fita, null, new T.MeshBasicMaterial({ color: preto, side: T.DoubleSide, depthWrite: false }), 1);
+  /* o traço que o desenhista já tirou do que se esconde (`visiveis`, ver camada.js) vai por cima, sem teste de profundidade */
+  malha(fitaVisivel, null, new T.MeshBasicMaterial({ color: preto, side: T.DoubleSide, depthWrite: false, depthTest: false }), 2);
   translucidas.forEach((f, i) => {
     const p = []; const c = []; const t = [];
     faces(f.faces, p, c);

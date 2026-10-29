@@ -19,7 +19,12 @@
    milímetros de uma chapa: o traço de uma forma que está atrás de uma chapa fina atravessava a chapa. Em vez disso, cada
    segmento de traço leva o perfil da superfície sob a fita (`inclinacoes`, por traço e por segmento, ver `inclinarTracos`), e
    o desenhista deita a fita nessa superfície: ela fica na frente da própria face só pelo viés do traço, e atrás de qualquer
-   face de outra forma na mesma distância em que a própria superfície está. */
+   face de outra forma na mesma distância em que a própria superfície está.
+
+   Traço visível: o desenhista da blocagem tira os traços de cada forma que as faces de frente de todas as formas opacas escondem, em
+   vetor e exatamente (`oclusaoExata`), e entrega a forma com `visiveis`. Os traços dela já são o que se vê, e o desenhista os pinta
+   por cima das faces sem teste de profundidade, sem o perfil: a fita de 2 px não é cortada pelo que passa à frente dela em um pixel
+   nem passa à frente do que a esconde. */
 export const LARGURA_DO_TRACO = 2;
 export const COR_DO_TRACO = '#111111';
 /* inclinação máxima de uma face, em milímetro de profundidade por milímetro de tela: só evita que a conta exploda numa face quase de perfil */
@@ -97,9 +102,10 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfi
         if (!(it.r.prisma?.naoConvexo || it.r.subtrai)) for (const l of ch.linhas) tracos.push(l.map(p3));
       }
     }
-    return { id: it.r.id, rank, opacidade: it.r.opacidade !== undefined && it.r.opacidade < 1 ? it.r.opacidade : 1, prof: it.prof, faces, tracos };
+    return { id: it.r.id, rank, opacidade: it.r.opacidade !== undefined && it.r.opacidade < 1 ? it.r.opacidade : 1, prof: it.prof, faces, tracos, ...(it.visiveis === true ? { visiveis: true } : {}) };
   });
-  if (perfilDosTracos) inclinarTracos(formas, { maxima: INCLINACAO_MAXIMA / pxPorMm, maximaDaPonta: INCLINACAO_DA_PONTA / pxPorMm, maximaExterior: INCLINACAO_EXTERIOR / pxPorMm, meia: LARGURA_DO_TRACO / 2 });
+  /* o traço já visível não precisa do perfil: o desenhista o pinta sem teste de profundidade */
+  if (perfilDosTracos && formas.some((f) => f.visiveis !== true)) inclinarTracos(formas, { maxima: INCLINACAO_MAXIMA / pxPorMm, maximaDaPonta: INCLINACAO_DA_PONTA / pxPorMm, maximaExterior: INCLINACAO_EXTERIOR / pxPorMm, meia: LARGURA_DO_TRACO / 2 });
   return formas;
 }
 

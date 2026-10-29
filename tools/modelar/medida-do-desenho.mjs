@@ -27,7 +27,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import earcut from 'earcut';
 import { PNG } from 'pngjs';
 import { QUADRO, VISTAS } from '../../modulos/esboco/src/index.js';
-import { COSSENO_DO_VINCO, desenharBlocagem, geometria } from '../../modulos/esboco/src/desenho-da-blocagem.js';
+import { COSSENO_DO_VINCO, desenharBlocagem, FOLGA_DO_VINCO, geometria } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import {
   DEGRAU_MINIMO_DA_REFERENCIA, SUPERAMOSTRAGEM_DA_REFERENCIA, TOLERANCIA_DO_DESENHO, baseDaVista, compararComAReferencia, mascaraDosTracos,
   triangulosDaReferencia,
@@ -39,9 +39,9 @@ import {
   ErroDaFonte, RAIZ, PASTA_DO_CONJUNTO, chamadaDaFonte, esbocoDaFonte, executarChamada, lerConjuntoDoDisco, painelDoNeutro,
 } from './calibracao-do-critico.mjs';
 
-/* o vinco a partir do qual duas faces vizinhas formam aresta, e a folga que resolve o empate do ângulo exato (30 graus em 12 lados, por
-   exemplo, que o arredondamento de uma conta e de outra decidiria ao acaso): só conta acima de 30,02 graus */
-const COSSENO_DA_REFERENCIA = COSSENO_DO_VINCO - 2e-4;
+/* o vinco a partir do qual duas faces vizinhas formam aresta: acima de 30 graus, e o empate do ângulo exato (12 lados) é o da regra do
+   desenho (`FOLGA_DO_VINCO`), que o arredondamento de uma conta e de outra decidiria ao acaso */
+const COSSENO_DA_REFERENCIA = COSSENO_DO_VINCO - FOLGA_DO_VINCO;
 /* a inclinação da superfície acima da qual o degrau de profundidade não é mais medido contra a inclinação (a face quase de perfil) */
 const INCLINACAO_MAXIMA_DA_REFERENCIA = 20;
 /* quanto a inclinação das duas superfícies vizinhas, vezes o passo do pixel, soma de folga ao degrau mínimo */
@@ -379,11 +379,40 @@ export async function medirConjunto({ raiz = RAIZ, so = null, vista = null, tole
         mkdirSync(saida, { recursive: true });
         writeFileSync(join(saida, `${imagem.id}-${v.vista}.png`), imagemDeDiagnostico(m));
         writeFileSync(join(saida, `${imagem.id}-${v.vista}-referencia.png`), imagemDaReferencia(m));
+        writeFileSync(join(saida, `${imagem.id}-${v.vista}-desenho.png`), PNG.sync.write(m.png));
       }
       aoMedir?.(relato);
     }
   }
   return relatos;
+}
+
+/* ---------- o que traçou o grupo ---------- */
+
+/** Os segmentos de traço da camada que passam pela caixa de um grupo do PNG (com a folga da tolerância): `{ forma, traco, a, b, comprimento }`,
+ *  em pixels do PNG. É o que diz de que aresta o desenho vem o vazamento, e de que forma a falha deveria ter vindo. */
+export function tracosDoGrupo(r, grupo, largura = LARGURA_DAS_VISTAS, folga = TOLERANCIA_DO_DESENHO + 1) {
+  const fx = largura / r.largura; const fy = Math.round((r.altura * largura) / r.largura) / r.altura;
+  const [x0, y0, x1, y1] = [grupo.caixa[0] - folga, grupo.caixa[1] - folga, grupo.caixa[2] + 1 + folga, grupo.caixa[3] + 1 + folga];
+  const cruza = (a, b) => {
+    /* o segmento a-b cruza a caixa: Liang-Barsky */
+    let t0 = 0; let t1 = 1;
+    const dx = b[0] - a[0]; const dy = b[1] - a[1];
+    for (const [p, q] of [[-dx, a[0] - x0], [dx, x1 - a[0]], [-dy, a[1] - y0], [dy, y1 - a[1]]]) {
+      if (p === 0) { if (q < 0) return false; } else { const t = q / p; if (p < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; } }
+    }
+    return true;
+  };
+  const achados = [];
+  for (const f of r.camada.formas) {
+    f.tracos.forEach((t, ti) => {
+      for (let i = 0; i + 1 < t.length; i++) {
+        const a = [t[i][0] * fx, t[i][1] * fy]; const b = [t[i + 1][0] * fx, t[i + 1][1] * fy];
+        if (cruza(a, b)) achados.push({ forma: f.id, traco: ti, segmento: i, a: a.map((x) => Math.round(x * 10) / 10), b: b.map((x) => Math.round(x * 10) / 10), comprimento: Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) * 10) / 10, z: [t[i][2], t[i + 1][2]] });
+      }
+    });
+  }
+  return achados;
 }
 
 /* ---------- a tabela ---------- */
