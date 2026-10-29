@@ -1,11 +1,12 @@
 /* composicoes.js — as composições procedurais da família `dobradica`, geradas por laço porque o número de nós e de furos
    muda a quantidade de passos e a composição v1 só substitui valores.
 
-   Há três tipos. `dobradica.pino` é o pino. `dobradica.folha-<lado>-n<nós>-f<furos>` é uma folha: a chapa (um cubo
-   fino) menos o corte da altura dos nós da outra folha e menos os furos de fixação, unida aos tubos dos seus nós; a chapa
-   e os tubos têm partes próprias, porque a porta do nó mede o raio sobre a parte que a origem dela toca. E
-   `dobradica.conjunto-n<nós>-f<furos>` junta o pino e as duas folhas numa peça só, com as mesmas composições dentro, para
-   a bancada e para a aprovação mecânica olharem a dobradiça inteira; a montagem v5 usa as três peças soltas.
+   Há três tipos. `dobradica.pino` é o pino. `dobradica.folha-<lado>-n<nós>-f<furos>` é uma folha: uma chapa dobrada só, na
+   altura toda, cuja aba é a chapa plana da folha e cuja dobra de 270 graus é o rolo de todos os nós, menos o corte da altura
+   dos nós da outra folha e menos os furos de fixação; o rolo é dos nós e a chapa é da folha, porque a porta do nó mede o raio
+   sobre a parte que a origem dela toca. E `dobradica.conjunto-n<nós>-f<furos>` junta o pino e as duas folhas numa peça só, com
+   as mesmas composições dentro, para a bancada e para a aprovação mecânica olharem a dobradiça inteira; a montagem v5 usa as
+   três peças soltas.
 
    Os ids de origem de cada composição são literais e distintos entre o pino (300), a folha D (100) e a folha E (200), para
    os três caberem na mesma peça do conjunto sem repetir origem. */
@@ -63,21 +64,45 @@ export function nosDoPino() {
 export function nosDaFolha(lado, nos, furos) {
   const base = BASE[lado];
   const { d, e } = nosDasFolhas(nos);
-  const proprios = lado === 'd' ? d : e;
   const outros = lado === 'd' ? e : d;
-  const idPlaca = base + 1;
+  const idChapa = base + 20;
   const idCorte = (j) => base + 10 + j;
-  const idNo = (i) => base + 20 + i;
+  const idCorteDaAba = (j) => base + 30 + j;
   const idFuro = (k) => base + 40 + k;
   const idSubtracao = base + 60;
-  const idUniao = base + 70;
   const lista = [];
-  lista.push({ id: 'chapa', operacao: 'cubo', argumentos: { origemId: idPlaca, larg: p('larguraDaChapa'), alt: p('altura'), prof: p('espessura'), em: p('emDaChapa') } });
-  outros.forEach((_, j) => lista.push({
-    id: `corte-${j}`, operacao: 'cubo',
-    argumentos: { origemId: idCorte(j), larg: p('larguraDoCorte'), alt: p('alturaDoCorte'), prof: p('profundidadeDoCorte'), em: p(`emCorte${j}`) },
-  }));
-  for (let k = 0; k < furos; k += 1) {
+  /* A folha inteira é uma chapa dobrada só, na altura toda: a chapa plana segue a aba do rolo sem emenda, e os nós da outra folha
+     abrem o espaço deles por corte. Feita no plano x-y com a largura em z, a aba segue +x até a borda da folha e uma dobra de
+     -270 graus leva a linha média em volta de um centro um raio médio abaixo dela, de modo que a aba é tangente ao rolo e a
+     ponta livre fecha o rolo sem trecho reto. Duas rotações põem a largura em y e a dobra em z; a translação leva o centro do
+     arco para o eixo do pino. */
+  lista.push({
+    id: 'chapa', operacao: 'chapaDobrada',
+    argumentos: {
+      origemId: idChapa, espessura: p('espessura'), raioInterno: p('raioInternoDoNo'), largura: p('altura'), segmentosPorQuarto: p('segmentosDoRolo'), tampas: 'em-tiras',
+      abas: [{ comprimento: p('abaDaChapa'), angulo: -270 }, { comprimento: 0 }],
+    },
+  });
+  const dela = { origem: { op: 'chapaDobrada', id: idChapa } };
+  lista.push({ id: 'chapa-em-pe', operacao: 'rotaciona', argumentos: { eixo: 'x', graus: 90, pivo: [0, 0, 0], sel: dela } });
+  if (lado === 'd') lista.push({ id: 'chapa-para-a-direita', operacao: 'rotaciona', argumentos: { eixo: 'z', graus: 180, pivo: [0, 0, 0], sel: dela } });
+  lista.push({ id: 'chapa-no-eixo', operacao: 'transladar', argumentos: { d: p('emDaChapa'), sel: dela } });
+  /* O corte de cada nó da outra folha vai de uma folga axial antes dele a uma depois, o que deixa à chapa exatamente o espaço dos
+     nós desta folha, e da borda do rolo oposta ao corte até a folga do corte. São dois cubos de mesma altura: o da aba, que
+     vem primeiro e cobre a aba até a folga do corte, e o do rolo, que cobre o rolo e a aba. As faces de cima e de baixo do corte
+     são a secção de fim do nó, e a face onde os dois cubos coincidem sai com o nome do primeiro: a aba vai para a folha e o
+     resto da secção, o rolo, para os nós. */
+  outros.forEach((_, j) => {
+    lista.push({
+      id: `corte-da-aba-${j}`, operacao: 'cubo',
+      argumentos: { origemId: idCorteDaAba(j), larg: p('larguraDoCorteDaAba'), alt: p('alturaDoCorte'), prof: p('profundidadeDoCorteDaAba'), em: p(`emCorteDaAba${j}`) },
+    });
+    lista.push({
+      id: `corte-${j}`, operacao: 'cubo',
+      argumentos: { origemId: idCorte(j), larg: p('larguraDoCorte'), alt: p('alturaDoCorte'), prof: p('profundidadeDoCorte'), em: p(`emCorte${j}`) },
+    });
+  });
+  for (let k = 0; k < furos; k++) {
     lista.push({
       id: `furo-${k}`, operacao: 'lathe',
       argumentos: {
@@ -87,47 +112,32 @@ export function nosDaFolha(lado, nos, furos) {
       },
     });
   }
+  /* a chapa plana é a aba, com as tampas dela e a borda do começo, e é da folha, e o que o corte da aba e o furo abrem nela também; o
+     rolo é dos nós, com a secção de fim que o corte do rolo abre nele: todos os vértices do que fica neles estão no anel do rolo, e
+     é neles que a porta mede o raio. As partes são declaradas antes da subtração, que leva o nome delas às faces que sobram */
+  const citar = (citacao) => ({ origem: { op: 'chapaDobrada', id: idChapa, ...citacao } });
+  const DA_FOLHA = [['aba', { aba: 'primeira' }], ['tampa-menos', { aba: 'primeira', tampa: 'menos' }], ['tampa-mais', { aba: 'primeira', tampa: 'mais' }], ['borda', { borda: 'inicio' }]];
+  const DOS_NOS = [['rolo', { dobra: 'primeira' }], ['rolo-tampa-menos', { dobra: 'primeira', tampa: 'menos' }], ['rolo-tampa-mais', { dobra: 'primeira', tampa: 'mais' }], ['ponta', { borda: 'fim' }]];
+  for (const [nome, citacao] of DA_FOLHA) lista.push({ id: `parte-${nome}`, operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: citar(citacao) } });
+  for (const [nome, citacao] of DOS_NOS) lista.push({ id: `parte-${nome}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: citar(citacao) } });
+  outros.forEach((_, j) => {
+    lista.push({ id: `parte-do-corte-da-aba-${j}`, operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: origem('cubo', idCorteDaAba(j)) } });
+    lista.push({ id: `parte-do-corte-${j}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: origem('cubo', idCorte(j)) } });
+  });
+  for (let k = 0; k < furos; k++) lista.push({ id: `parte-do-furo-${k}`, operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: origem('lathe', idFuro(k)) } });
   lista.push({
     id: 'chapa-recortada', operacao: 'subtrair',
     argumentos: {
       origemId: idSubtracao,
-      solidos: [origem('cubo', idPlaca), ...outros.map((_, j) => origem('cubo', idCorte(j))), ...Array.from({ length: furos }, (_, k) => origem('lathe', idFuro(k)))],
+      solidos: [origem('chapaDobrada', idChapa), ...outros.flatMap((_, j) => [origem('cubo', idCorteDaAba(j)), origem('cubo', idCorte(j))]), ...Array.from({ length: furos }, (_, k) => origem('lathe', idFuro(k)))],
     },
   });
-  proprios.forEach((_, i) => {
-    const dele = { origem: { op: 'chapaDobrada', id: idNo(i) } };
-    const trecho = () => ({ comprimento: p('trechoDoRolo') });
-    const aba = { comprimento: p('abaDoNo') };
-    lista.push({
-      id: `no-${i}`, operacao: 'chapaDobrada',
-      argumentos: {
-        origemId: idNo(i), espessura: p('espessura'), raioInterno: p('raioInternoDoNo'), largura: p('comprimentoDoNo'), segmentosPorQuarto: p('segmentosDoRolo'), tampas: 'em-tiras',
-        abas: [{ ...aba, angulo: -90 }, { ...trecho(), angulo: -90 }, { ...trecho(), angulo: -90 }, trecho()],
-      },
-    });
-    lista.push({ id: `no-${i}-em-pe`, operacao: 'rotaciona', argumentos: { eixo: 'x', graus: 90, pivo: [0, 0, 0], sel: dele } });
-    if (lado === 'd') lista.push({ id: `no-${i}-para-a-direita`, operacao: 'rotaciona', argumentos: { eixo: 'z', graus: 180, pivo: [0, 0, 0], sel: dele } });
-    lista.push({ id: `no-${i}-no-eixo`, operacao: 'transladar', argumentos: { d: p(`emNo${i}`), sel: dele } });
-  });
-  lista.push({ id: 'parte-da-chapa', operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: origem('subtrair', idSubtracao) } });
-  /* a chapa de cada nó é parte do nó, menos a aba que sai tangente ao rolo (a primeira, com as tampas dela e a borda do começo),
-     que é da folha: todos os vértices do que fica no nó estão no anel do rolo, e é neles que a porta mede o raio */
-  const DA_FOLHA = [['aba', { aba: 'primeira' }], ['tampa-menos', { aba: 'primeira', tampa: 'menos' }], ['tampa-mais', { aba: 'primeira', tampa: 'mais' }], ['borda', { borda: 'inicio' }]];
-  proprios.forEach((_, i) => {
-    const citar = (citacao) => ({ origem: { op: 'chapaDobrada', id: idNo(i), ...citacao } });
-    lista.push({ id: `parte-do-no-${i}`, operacao: 'parte', argumentos: { nome: NOME_DOS_NOS[lado], sel: citar({}) } });
-    for (const [nome, citacao] of DA_FOLHA) lista.push({ id: `parte-${nome}-${i}`, operacao: 'parte', argumentos: { nome: NOME_DA_PARTE[lado], sel: citar(citacao), substituir: true } });
-  });
-  lista.push({
-    id: 'uniao', operacao: 'unir',
-    argumentos: { origemId: idUniao, solidos: [origem('subtrair', idSubtracao), ...proprios.map((_, i) => origem('chapaDobrada', idNo(i)))] },
-  });
-  lista.push({ id: 'material-da-folha', operacao: 'material', argumentos: { usa: 'chapa', sel: origem('unir', idUniao) } });
-  lista.push({ id: 'solido-da-folha', operacao: 'solido', argumentos: { sel: origem('unir', idUniao) } });
+  lista.push({ id: 'material-da-folha', operacao: 'material', argumentos: { usa: 'chapa', sel: origem('subtrair', idSubtracao) } });
+  lista.push({ id: 'solido-da-folha', operacao: 'solido', argumentos: { sel: origem('subtrair', idSubtracao) } });
   lista.push({
     id: 'porta-dos-nos', operacao: 'publicarPorta',
     argumentos: {
-      id: `nos-da-folha-${lado}`, de: { op: 'chapaDobrada', id: idNo(0), dobra: { passo: 1, fase: 0 } },
+      id: `nos-da-folha-${lado}`, de: { op: 'chapaDobrada', id: idChapa, dobra: 'primeira' },
       interface: {
         forma: 'anel', papel: 'recebe', eixo: EIXO_DAS_PORTAS, centro: p('centroDaPorta'),
         raioInterno: p('raioInternoDoNo'), raioExterno: p('raioExternoDoNo'), inicio: p('comprimentoDoNoNegativo'), fim: 0,
@@ -137,7 +147,7 @@ export function nosDaFolha(lado, nos, furos) {
   lista.push({
     id: 'porta-do-plano', operacao: 'publicarPorta',
     argumentos: {
-      id: `plano-da-folha-${lado}`, de: { op: 'unir', id: idUniao },
+      id: `plano-da-folha-${lado}`, de: { op: 'subtrair', id: idSubtracao },
       interface: { forma: 'plano', papel: 'apoia', ponto: p('pontoDoPlano'), normal: [0, 0, 1], extensao: [p('extensaoLargura'), p('extensaoAltura')] },
     },
   });

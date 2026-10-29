@@ -160,12 +160,12 @@ describe('o roupeiro continua chamável como antes', () => {
      malha tem os mesmos cantos e o mesmo volume, com até quatro vértices a menos nas faces onde as prateleiras encontram a parede */
   const ANTES = {
     padrao: { parametros: {}, volume: 308266.41, caixa: [[-800, 800], [0, 2200], [-275, 295]] },
-    quatro: { parametros: QUATRO, volume: 374826.181, caixa: [[-1200, 1200], [0, 2000], [-275, 295]], impressao: 'c49e3e12b7c4a82e' },
+    quatro: { parametros: QUATRO, volume: 374826.181, caixa: [[-1200, 1200], [0, 2000], [-275, 295]], impressao: '90beec1509365c18' },
     tres: { parametros: { portas: 3, largura: 2400 }, volume: 433407.591, caixa: [[-1200, 1200], [0, 2200], [-275, 295]] },
     leve: { parametros: LEVE_EMBUTIDA, volume: 99299.551, caixa: [[-300, 300], [0, 1500], [-275, 295]] },
-    minimo: { parametros: { largura: 400, altura: 1200, profundidade: 350, painel: 15, portas: 1, prateleiras: 0, rodape: 40, cabideiro: 0 }, volume: 32680.009, caixa: [[-200, 200], [0, 1200], [-175, 195]], impressao: '54931ec86bc8fa0b' },
+    minimo: { parametros: { largura: 400, altura: 1200, profundidade: 350, painel: 15, portas: 1, prateleiras: 0, rodape: 40, cabideiro: 0 }, volume: 32680.009, caixa: [[-200, 200], [0, 1200], [-175, 195]], impressao: '9ecabfbe5e398a4f' },
     medio: { parametros: { largura: 1600, altura: 2200, profundidade: 600, painel: 18, portas: 2, prateleiras: 4, rodape: 80, cabideiro: 1 }, volume: 326784.01, caixa: [[-800, 800], [0, 2200], [-300, 320]] },
-    maximo: { parametros: { largura: 3000, altura: 2600, profundidade: 800, painel: 25, portas: 4, prateleiras: 8, rodape: 150, cabideiro: 1 }, volume: 1155762.775, caixa: [[-1500, 1500], [0, 2600], [-400, 420]], impressao: 'd9a78bbd1104efd4' },
+    maximo: { parametros: { largura: 3000, altura: 2600, profundidade: 800, painel: 25, portas: 4, prateleiras: 8, rodape: 150, cabideiro: 1 }, volume: 1155762.775, caixa: [[-1500, 1500], [0, 2600], [-400, 420]], impressao: '0207602efdfb2cbb' },
   };
 
   it('os parâmetros de antes, e o perfil roupeiro, dão o mesmo móvel: mesma caixa, mesmo volume, e a mesma impressão onde a costura é a mesma', () => {

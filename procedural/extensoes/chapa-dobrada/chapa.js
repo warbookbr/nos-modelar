@@ -11,10 +11,14 @@
      dobra em raio + espessura/2 e a face de fora em raio + espessura. Raio 0 dá canto vivo por dentro e raio externo igual
      à espessura.
    - `abas` descreve a chapa por aba: `comprimento` é o trecho RETO da aba (sem as dobras das pontas) e `angulo` é quanto a
-     chapa gira depois dela; a última aba não leva `angulo`. `perfil` descreve a mesma chapa pelos pontos da linha média
-     onde cada dobra se cruzaria sem raio (o vértice virtual), e então o trecho reto é o que sobra do segmento depois do
-     recuo das dobras das duas pontas. As duas formas dão a mesma chapa, vértice por vértice.
-   - Recuo da dobra: (raio + espessura/2) · tan(|ângulo|/2), a distância do vértice virtual ao começo do arco na linha média.
+     chapa gira depois dela, de 0 a 360 graus sem os extremos (uma dobra sozinha faz um rolo de 270, por exemplo); a última aba
+     não leva `angulo`. O trecho reto pode ser 0 em toda aba menos a primeira: 0 liga duas dobras sem trecho reto entre elas, e
+     0 na última aba fecha a chapa na ponta do arco, sem trecho reto sobrando. `perfil` descreve a mesma chapa pelos pontos da
+     linha média onde cada dobra se cruzaria sem raio (o vértice virtual), e então o trecho reto é o que sobra do segmento
+     depois do recuo das dobras das duas pontas; o vértice virtual só existe abaixo de 180 graus, e por isso `perfil` não dá
+     dobra de 180 ou mais. As duas formas dão a mesma chapa, vértice por vértice, onde ambas valem.
+   - Recuo da dobra: (raio + espessura/2) · tan(|ângulo|/2), a distância do vértice virtual ao começo do arco na linha média;
+     abaixo de 180 graus. De 180 em diante não há vértice virtual, e a medida `recuo` da dobra sai `null`.
    - Desenvolvimento da dobra (a folga de dobra, `bend allowance`): |ângulo| · (raio + fatorK · espessura), com o ângulo em
      radianos. Comprimento planificado: soma dos trechos retos mais o desenvolvimento de cada dobra. O fator K é a posição
      da linha neutra na espessura, contada da face de dentro: 0 é a face de dentro e 1 a de fora. Com K = 0,5 a linha neutra
@@ -48,11 +52,12 @@ const rotacionar = ([x, y], graus) => { const c = Math.cos(graus), s = Math.sin(
 const esquerda = ([x, y]) => [-y, x];
 
 /* Retângulo do trecho reto de cada aba (a linha média com meia espessura de cada lado) e o primeiro par de abas não vizinhas
-   cujos retângulos se cruzam ou se encostam, por eixos separadores; o diagnóstico só roda quando o contorno já falhou. */
-function abasQueSeEncostam(pontos, recuos, retos, direcoes, meia) {
-  const retangulos = retos.map((_, i) => {
-    const inicio = i > 0 ? recuos[i - 1] : 0, fim = i < recuos.length ? recuos[i] : 0, p = pontos[i], q = pontos[i + 1], d = direcoes[i], n = esquerda(d);
-    const a = [p[0] + d[0] * inicio, p[1] + d[1] * inicio], b = [q[0] - d[0] * fim, q[1] - d[1] * fim];
+   cujos retângulos se cruzam ou se encostam, por eixos separadores; o diagnóstico só roda quando o contorno já falhou. `pontas[i]`
+   são o começo e o fim do trecho reto da aba i; a aba de comprimento zero não tem retângulo. */
+function abasQueSeEncostam(pontas, direcoes, meia) {
+  const retangulos = pontas.map(([a, b], i) => {
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) <= EPS) return null;
+    const n = esquerda(direcoes[i]);
     return [[a[0] + n[0] * meia, a[1] + n[1] * meia], [b[0] + n[0] * meia, b[1] + n[1] * meia], [b[0] - n[0] * meia, b[1] - n[1] * meia], [a[0] - n[0] * meia, a[1] - n[1] * meia]];
   });
   const separados = (r, s) => [...r, ...s].some((_, k) => {
@@ -60,7 +65,7 @@ function abasQueSeEncostam(pontos, recuos, retos, direcoes, meia) {
     const projetar = (q) => q[0] * eixo[0] + q[1] * eixo[1], pr = r.map(projetar), ps = s.map(projetar);
     return Math.min(...pr) > Math.max(...ps) + EPS || Math.min(...ps) > Math.max(...pr) + EPS;
   });
-  for (let i = 0; i < retangulos.length; i++) for (let j = i + 2; j < retangulos.length; j++) if (!separados(retangulos[i], retangulos[j])) return [i, j];
+  for (let i = 0; i < retangulos.length; i++) for (let j = i + 2; j < retangulos.length; j++) if (retangulos[i] && retangulos[j] && !separados(retangulos[i], retangulos[j])) return [i, j];
   return null;
 }
 
@@ -83,6 +88,11 @@ function lerParametros(argumentos, resolver) {
   return { espessura, raioInterno, fatorK, largura, segmentosPorQuarto, tampas: argumentos.tampas ?? 'inteiras' };
 }
 
+/* A linha média, na forma que o contorno lê, venha de `abas` ou de `perfil`: `direcoes[i]` é a direção do trecho reto i,
+   `pontas[i]` o começo e o fim dele, `inicios[k]` onde começa o arco da dobra k (o fim do trecho reto que a precede), `giros[k]` o
+   giro dela em radianos com sinal, e `fim` a ponta livre da chapa. Nada aqui usa o vértice virtual onde a dobra se cruzaria sem
+   raio, de modo que a dobra pode passar de 180 graus, quando esse vértice deixa de existir. */
+
 /* Linha média a partir de `abas`: trechos retos e giros (em radianos, com sinal) entre elas. */
 function linhaPorAbas(abas, resolver, raioMedio) {
   if (!Array.isArray(abas) || abas.length < 2 || abas.length > MAXIMO_DE_ABAS) recusar('abas', abas, `uma lista de 2 a ${MAXIMO_DE_ABAS} abas {comprimento, angulo}; a última aba não leva angulo`);
@@ -91,28 +101,34 @@ function linhaPorAbas(abas, resolver, raioMedio) {
     const campo = `abas[${i}]`, ultima = i === abas.length - 1;
     if (!plano(aba)) recusar(campo, aba, ultima ? '{comprimento}' : '{comprimento, angulo}');
     for (const chave of Object.keys(aba)) if (chave !== 'comprimento' && chave !== 'angulo') recusar(`${campo}.${chave}`, aba[chave], 'apenas comprimento e angulo');
-    const comprimento = numero(resolver, `${campo}.comprimento`, aba.comprimento, 'o trecho reto da aba em número maior que 0');
-    if (!(comprimento > EPS)) recusar(`${campo}.comprimento`, aba.comprimento, 'o trecho reto da aba, maior que 0 (sem contar as dobras das pontas)');
+    const comprimento = numero(resolver, `${campo}.comprimento`, aba.comprimento, i === 0 ? 'o trecho reto da aba em número maior que 0' : 'o trecho reto da aba em número maior ou igual a 0');
+    if (i === 0 ? !(comprimento > EPS) : !(comprimento >= 0)) {
+      recusar(`${campo}.comprimento`, aba.comprimento, i === 0 ? 'o trecho reto da aba, maior que 0 (sem contar as dobras das pontas)'
+        : 'o trecho reto da aba, maior ou igual a 0 (0 liga a dobra à seguinte, ou fecha a chapa na ponta do arco, sem trecho reto)');
+    }
     retos.push(comprimento);
     if (ultima) {
       if (aba.angulo !== undefined) recusar(`${campo}.angulo`, aba.angulo, 'nenhum: a última aba não tem dobra depois dela');
       return;
     }
-    if (aba.angulo === undefined) recusar(`${campo}.angulo`, undefined, 'o ângulo da dobra depois desta aba, em graus, entre -180 e 180 sem os extremos e sem 0');
-    const graus = numero(resolver, `${campo}.angulo`, aba.angulo, 'graus entre -180 e 180, sem 0');
-    if (!(Math.abs(graus) > EPS && Math.abs(graus) < 180 - EPS)) recusar(`${campo}.angulo`, aba.angulo, 'graus com módulo maior que 0 e menor que 180 (0 não é dobra: junte as duas abas num comprimento só; 180 fecha a chapa sobre si mesma)');
+    if (aba.angulo === undefined) recusar(`${campo}.angulo`, undefined, 'o ângulo da dobra depois desta aba, em graus, entre -360 e 360 sem os extremos e sem 0');
+    const graus = numero(resolver, `${campo}.angulo`, aba.angulo, 'graus entre -360 e 360, sem 0');
+    if (!(Math.abs(graus) > EPS && Math.abs(graus) < 360 - EPS)) recusar(`${campo}.angulo`, aba.angulo, 'graus com módulo maior que 0 e menor que 360 (0 não é dobra: junte as duas abas num comprimento só; 360 fecha a chapa sobre si mesma)');
     giros.push(graus * RAD);
   });
-  const recuos = giros.map((g) => raioMedio * Math.tan(Math.abs(g) / 2));
-  const pontos = [[0, 0]];
-  let direcao = [1, 0];
+  const direcoes = [], pontas = [], inicios = [];
+  let ponto = [0, 0], direcao = [1, 0];
   retos.forEach((reto, i) => {
-    const comprimento = reto + (i > 0 ? recuos[i - 1] : 0) + (i < recuos.length ? recuos[i] : 0);
-    const p = pontos[i];
-    pontos.push([p[0] + direcao[0] * comprimento, p[1] + direcao[1] * comprimento]);
-    if (i < giros.length) direcao = rotacionar(direcao, giros[i]);
+    const fim = [ponto[0] + direcao[0] * reto, ponto[1] + direcao[1] * reto];
+    direcoes.push(direcao); pontas.push([ponto, fim]);
+    if (i === giros.length) { ponto = fim; return; }
+    inicios.push(fim);
+    const n = esquerda(direcao), sinal = Math.sign(giros[i]);
+    const centro = [fim[0] + n[0] * raioMedio * sinal, fim[1] + n[1] * raioMedio * sinal], r = rotacionar([fim[0] - centro[0], fim[1] - centro[1]], giros[i]);
+    ponto = [centro[0] + r[0], centro[1] + r[1]];
+    direcao = rotacionar(direcao, giros[i]);
   });
-  return { pontos, giros, recuos, retos, nome: (i) => `abas[${i}]` };
+  return { giros, retos, direcoes, pontas, inicios, fim: ponto, nome: (i) => `abas[${i}]` };
 }
 
 /* Linha média a partir de `perfil`: os giros saem dos pontos e o trecho reto é o que o recuo das pontas deixa. */
@@ -122,20 +138,20 @@ function linhaPorPerfil(perfil, resolver, raioMedio) {
     if (!Array.isArray(p) || p.length !== 2) recusar(`perfil[${i}]`, p, 'um ponto [u, v]');
     return [numero(resolver, `perfil[${i}][0]`, p[0], 'um número'), numero(resolver, `perfil[${i}][1]`, p[1], 'um número')];
   });
-  const direcoes = pontos.slice(0, -1).map((p, i) => {
+  const segmentos = pontos.slice(0, -1).map((p, i) => {
     const dx = pontos[i + 1][0] - p[0], dy = pontos[i + 1][1] - p[1], t = Math.hypot(dx, dy);
     if (!(t > EPS)) recusar(`perfil[${i + 1}]`, perfil[i + 1], `um ponto diferente de perfil[${i}] (${mostrar(perfil[i])})`);
     return { u: [dx / t, dy / t], comprimento: t };
   });
   const giros = [];
   for (let i = 1; i < pontos.length - 1; i++) {
-    const a = direcoes[i - 1].u, b = direcoes[i].u, g = Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1]);
+    const a = segmentos[i - 1].u, b = segmentos[i].u, g = Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1]);
     if (Math.abs(g) < 1e-6) recusar(`perfil[${i}]`, perfil[i], 'um ponto onde a linha dobra; este é colinear com os vizinhos, retire-o');
     if (Math.abs(g) > Math.PI - 1e-6) recusar(`perfil[${i}]`, perfil[i], 'um ponto onde a linha dobra menos de 180 graus; este volta sobre o trecho anterior');
     giros.push(g);
   }
   const recuos = giros.map((g) => raioMedio * Math.tan(Math.abs(g) / 2));
-  const retos = direcoes.map((d, i) => {
+  const retos = segmentos.map((d, i) => {
     const tomado = (i > 0 ? recuos[i - 1] : 0) + (i < recuos.length ? recuos[i] : 0), reto = d.comprimento - tomado;
     if (!(reto > EPS)) {
       recusar(`perfil[${i}]..perfil[${i + 1}]`, [perfil[i], perfil[i + 1]],
@@ -143,7 +159,12 @@ function linhaPorPerfil(perfil, resolver, raioMedio) {
     }
     return reto;
   });
-  return { pontos, giros, recuos, retos, nome: (i) => `perfil[${i}]..perfil[${i + 1}]` };
+  const direcoes = segmentos.map((d) => d.u);
+  const pontas = segmentos.map((d, i) => [
+    i > 0 ? [pontos[i][0] + d.u[0] * recuos[i - 1], pontos[i][1] + d.u[1] * recuos[i - 1]] : pontos[0],
+    i < recuos.length ? [pontos[i + 1][0] - d.u[0] * recuos[i], pontos[i + 1][1] - d.u[1] * recuos[i]] : pontos[pontos.length - 1],
+  ]);
+  return { giros, retos, direcoes, pontas, inicios: giros.map((_, k) => pontas[k][1]), fim: pontos[pontos.length - 1], nome: (i) => `perfil[${i}]..perfil[${i + 1}]` };
 }
 
 /* Interpreta e valida os argumentos e devolve tudo o que a malha e as medidas precisam. `resolver` é o `numero` do contexto da
@@ -153,18 +174,16 @@ export function construirChapa(argumentos, resolver = (v) => v) {
   if ((argumentos.abas === undefined) === (argumentos.perfil === undefined)) recusar(argumentos.abas === undefined ? 'abas' : 'perfil', undefined, 'exatamente um entre abas (comprimento reto e ângulo de cada aba) e perfil (pontos da linha média); vieram os dois ou nenhum');
   const h = espessura / 2, raioMedio = raioInterno + h;
   const linha = argumentos.abas !== undefined ? linhaPorAbas(argumentos.abas, resolver, raioMedio) : linhaPorPerfil(argumentos.perfil, resolver, raioMedio);
-  const { pontos, giros, recuos, retos, nome } = linha;
-  const direcoes = pontos.slice(0, -1).map((p, i) => { const q = pontos[i + 1], t = Math.hypot(q[0] - p[0], q[1] - p[1]); return [(q[0] - p[0]) / t, (q[1] - p[1]) / t]; });
+  const { giros, retos, direcoes, pontas, inicios, fim, nome } = linha;
 
   // contorno: a face da direita indo, a da esquerda voltando (anti-horário); os arcos são cortados em segmentos de ângulo igual.
   // `trecho` leva, junto de cada estação, o que é o segmento que sai dela: uma aba reta ou um pedaço do arco de uma dobra.
   const esq = [], dir = [], trecho = [];
   const empurrar = (p, d, seguinte) => { const n = esquerda(d); esq.push([p[0] + n[0] * h, p[1] + n[1] * h]); dir.push([p[0] - n[0] * h, p[1] - n[1] * h]); trecho.push(seguinte); };
-  empurrar(pontos[0], direcoes[0], { aba: 0 });
+  empurrar(pontas[0][0], direcoes[0], { aba: 0 });
   const divisoes = [];
   giros.forEach((giro, k) => {
-    const entra = direcoes[k], recuo = recuos[k], v = pontos[k + 1], sinal = Math.sign(giro);
-    const inicio = [v[0] - entra[0] * recuo, v[1] - entra[1] * recuo], n = esquerda(entra);
+    const entra = direcoes[k], inicio = inicios[k], sinal = Math.sign(giro), n = esquerda(entra);
     const centro = [inicio[0] + n[0] * raioMedio * sinal, inicio[1] + n[1] * raioMedio * sinal], raio = [inicio[0] - centro[0], inicio[1] - centro[1]];
     const partes = Math.max(1, Math.ceil((Math.abs(giro) / RAD) * segmentosPorQuarto / 90 - 1e-9));
     divisoes.push(partes);
@@ -173,7 +192,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
       empurrar([centro[0] + r[0], centro[1] + r[1]], rotacionar(entra, a), s < partes ? { dobra: k } : { aba: k + 1 });
     }
   });
-  empurrar(pontos[pontos.length - 1], direcoes[direcoes.length - 1], null);
+  empurrar(fim, direcoes[direcoes.length - 1], null);
 
   // as arestas do contorno, na ordem dele: a aresta i sai do vértice i e dá o lado i da peça; cada uma diz de que é
   const m = dir.length, bruto = [], rotulos = [];
@@ -191,7 +210,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
     recusar('segmentosPorQuarto', segmentosPorQuarto, `um valor que mantenha o contorno em ${MAXIMO_DE_VERTICES_NO_CONTORNO} vértices ou menos (este dá ${contorno.length}); reduza segmentosPorQuarto ou o número de dobras`);
   }
   if (!ehSimples(contorno)) {
-    const par = abasQueSeEncostam(pontos, recuos, retos, direcoes, h);
+    const par = abasQueSeEncostam(pontas, direcoes, h);
     if (par) recusar(`${nome(par[0])} e ${nome(par[1])}`, 'abas que se cruzam ou se encostam', `abas separadas por folga positiva (a espessura é ${espessura}); mude comprimentos ou ângulos`);
     recusar('abas', 'contorno que se cruza ou se toca', 'abas e dobras que não se cruzem nem se encostem (as dobras vizinhas ou uma aba e uma dobra de outra se atravessam); mude comprimentos, ângulos, raioInterno ou espessura');
   }
@@ -199,7 +218,7 @@ export function construirChapa(argumentos, resolver = (v) => v) {
 
   const dobras = giros.map((giro, k) => ({
     angulo: arredondar(giro / RAD), raioInterno, raioExterno: arredondar(raioInterno + espessura),
-    recuo: arredondar(recuos[k]), desenvolvimento: arredondar(Math.abs(giro) * (raioInterno + fatorK * espessura)),
+    recuo: Math.abs(giro) < Math.PI - EPS ? arredondar(raioMedio * Math.tan(Math.abs(giro) / 2)) : null, desenvolvimento: arredondar(Math.abs(giro) * (raioInterno + fatorK * espessura)),
   }));
   const comprimentoReto = retos.reduce((a, b) => a + b, 0), comprimentoDasDobras = dobras.reduce((a, d) => a + d.desenvolvimento, 0);
   const comprimentoPlanificado = arredondar(comprimentoReto + comprimentoDasDobras);

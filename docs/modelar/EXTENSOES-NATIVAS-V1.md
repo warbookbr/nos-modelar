@@ -100,11 +100,17 @@ z = -largura/2 e +largura/2; com `aba` ou `dobra` e `tampas: 'em-tiras'`, só as
 tiras que ficam sob ela). `borda` não combina com os outros eixos, `tampa` não
 combina com `lado` e `aba` não combina com `dobra`; sem eixo são todas as faces. O significado de cada
 grupo é fixo, não posição na malha. Uma porta de plano sai de uma aba, e um rolo
-de 270° (três dobras de 90° com trechos retos de 0,02 mm entre elas, porque uma
-dobra sozinha vai até 180°) dá a porta de anel ou de cilindro pela citação das
-dobras, com o raio medido só nas faces do rolo e não na aba plana. Sem `origemId`
-a peça sai byte a byte como antes (o hash do canônico de L, U, Z e ponta viva
-não mudou). Para isso `declararOrigem` passou a existir no contexto de toda
+de 270° (uma dobra de -270°, que a chapa aceita porque o ângulo vai até 360° sem o
+extremo) dá a porta de anel ou de cilindro pela citação da dobra, com o raio medido
+só nas faces do rolo e não na aba plana. O ângulo de uma dobra de `abas` é de 0 a
+360° sem os extremos; `perfil` continua abaixo de 180°, porque descreve a dobra pelo
+vértice onde ela se cruzaria sem raio, que não existe a partir de 180°, e o `recuo`
+da dobra de 180° ou mais sai `null` nas medidas. O trecho reto de uma aba pode ser
+0 em toda aba menos a primeira: 0 liga duas dobras sem trecho reto entre elas, ou
+fecha a chapa na ponta do arco quando é a última (a aba de comprimento zero conta
+como aba, mas não tem face, e citá-la por `sel` diz que não há face viva). Sem
+`origemId` a peça sai byte a byte como antes (o hash do canônico de L, U, Z e ponta
+viva não mudou). Para isso `declararOrigem` passou a existir no contexto de toda
 extensão nativa, com ou sem leitura de malha, e o núcleo ganhou
 `CONTRATOS_ORIGEM.chapaDobrada`.
 

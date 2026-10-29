@@ -212,6 +212,71 @@ describe('chapa dobrada — determinismo e registro', () => {
   });
 });
 
+const ROLO = { espessura: 2, raioInterno: 3, largura: 10, segmentosPorQuarto: 4, abas: [{ comprimento: 20, angulo: -270 }, { comprimento: 0 }] };
+const ROLO_EM_TRES = { ...ROLO, abas: [{ comprimento: 20, angulo: -90 }, { comprimento: 0, angulo: -90 }, { comprimento: 0, angulo: -90 }, { comprimento: 0 }] };
+
+describe('chapa dobrada — dobra de 180 graus ou mais e trecho reto de comprimento zero', () => {
+  it('uma dobra de 270 graus faz o rolo de uma vez, com um centro só e sem trecho reto nenhum na ponta', () => {
+    const r = executar(ROLO), m = malha(r);
+    expect(r.orfaos).toEqual([]);
+    expect(fechadaEOrientada(m)).toBe(true);
+    // 1 estação do começo da aba, 13 do arco de 12 divisões e a ponta livre, que coincide com a última do arco: 14 por lado
+    expect(anel(m)).toHaveLength(28);
+    expect(quase(volume(m), (2 * 20 + areaDoArco(270, 12, 3, 2)) * 10, 1e-6)).toBe(true);
+    const raios = raiosMedidos(m, 5);
+    // os raios de 3 e de 5 aparecem nos 11 vértices interiores do arco de cada face; a tripla que cruza a espessura da ponta dá um terceiro
+    expect(raios.get('3.000000')).toBe(11);
+    expect(raios.get('5.000000')).toBe(11);
+    const medidas = medidasDaChapa(ROLO);
+    expect(medidas.dobras).toEqual([{ angulo: -270, raioInterno: 3, raioExterno: 5, recuo: null, desenvolvimento: Number(desenvolvimento(270, 3, 2).toFixed(9)) }]);
+    expect(quase(medidas.comprimentoPlanificado, 20 + desenvolvimento(270, 3, 2), 1e-8)).toBe(true);
+    expect(medidas.abas).toEqual([{ comprimentoReto: 20 }, { comprimentoReto: 0 }]);
+    // o rolo de 270 graus tem a ponta livre a um raio médio do começo do arco, para o lado oposto à aba: x de 20 - 4 a 20 + 4
+    const { x, y } = caixa(m);
+    expect(quase(Math.min(...[x[0]]), 0, 1e-9) && quase(x[1], 20 + 4 + 1, 1e-6)).toBe(true);
+    expect(quase(y[1], 1, 1e-6)).toBe(true);
+    expect(quase(y[0], -(8 + 1), 1e-6)).toBe(true);
+  });
+  it('três dobras de 90 graus ligadas sem trecho reto dão a mesma chapa que uma de 270', () => {
+    const r = executar(ROLO_EM_TRES), m = malha(r);
+    expect(r.orfaos).toEqual([]);
+    expect(fechadaEOrientada(m)).toBe(true);
+    expect(anel(m)).toHaveLength(28);
+    expect(quase(volume(m), volume(malha(executar(ROLO))), 1e-9)).toBe(true);
+    expect(quase(medidasDaChapa(ROLO_EM_TRES).comprimentoPlanificado, medidasDaChapa(ROLO).comprimentoPlanificado, 1e-8)).toBe(true);
+    expect(medidasDaChapa(ROLO_EM_TRES).dobras.map((d) => d.recuo)).toEqual([3 + 1, 3 + 1, 3 + 1].map((v) => Number(v.toFixed(9))));
+  });
+  it('a dobra de 180 graus é aceita e sai sem recuo, com as duas abas separadas por duas vezes o raio médio', () => {
+    const volta = { espessura: 2, raioInterno: 2, largura: 8, abas: [{ comprimento: 30, angulo: 180 }, { comprimento: 30 }] };
+    const r = executar(volta), m = malha(r);
+    expect(r.orfaos).toEqual([]);
+    expect(fechadaEOrientada(m)).toBe(true);
+    expect(medidasDaChapa(volta).dobras[0]).toMatchObject({ angulo: 180, recuo: null });
+    expect(quase(volume(m), (2 * 60 + areaDoArco(180, 12, 2, 2)) * 8, 1e-6)).toBe(true);
+    const { y } = caixa(m);
+    expect(quase(y[1] - y[0], 2 * (2 + 1) + 2, 1e-6)).toBe(true);
+  });
+  it('as faces do rolo e da aba seguem citáveis e o trecho de comprimento zero fica sem faces', () => {
+    const r = nucleo([['chapaDobrada', { ...ROLO, origemId: 7 }]], {}, {}, {}, null, [], { registroOperacoes: registro });
+    expect(r.orfaos).toEqual([]);
+    expect(r.V.size).toBe(56);
+    const partes = nucleo([['chapaDobrada', { ...ROLO, origemId: 7, tampas: 'em-tiras' }], ['parte', { nome: 'rolo', sel: { origem: { op: 'chapaDobrada', id: 7, dobra: 0 } } }], ['parte', { nome: 'aba', sel: { origem: { op: 'chapaDobrada', id: 7, aba: 'primeira' } } }]], {}, {}, {}, null, [], { registroOperacoes: registro });
+    expect(partes.orfaos).toEqual([]);
+    const porParte = new Map();
+    for (const f of partes.F.values()) porParte.set(f.parte, (porParte.get(f.parte) ?? 0) + 1);
+    expect(porParte.get('rolo')).toBe(24); /* os 12 pedaços do arco, dentro e fora */
+    expect(porParte.get('aba')).toBe(2);
+  });
+  it('a aba de comprimento zero conta como aba mas não tem face: citá-la diz isso, em vez de cair na aba de antes', () => {
+    const r = nucleo([['chapaDobrada', { ...ROLO, origemId: 7 }], ['parte', { nome: 'ponta', sel: { origem: { op: 'chapaDobrada', id: 7, aba: 'ultima' } } }]], {}, {}, {}, null, [], { registroOperacoes: registro });
+    expect(r.orfaos.map((o) => o.motivo ?? o.mensagem ?? JSON.stringify(o)).join('\n')).toMatch(/origem chapaDobrada:7 não tem nenhuma face viva nessa citação/);
+    expect([...r.F.values()].filter((f) => f.parte === 'ponta')).toEqual([]);
+  });
+  it('mesma receita, mesma saída, byte a byte', () => {
+    expect(JSON.stringify(malha(executar(ROLO)))).toBe(JSON.stringify(malha(executar(ROLO))));
+  });
+});
+
 describe('chapa dobrada — recusas', () => {
   const casos = [
     ['raio menor que zero', { ...L, raioInterno: -0.5 }, /raioInterno: veio -0\.5; aceito um número maior ou igual a 0/],
@@ -220,8 +285,10 @@ describe('chapa dobrada — recusas', () => {
     ['fator K fora de 0 a 1', { ...L, fatorK: 1.5 }, /fatorK: veio 1\.5; aceito um número de 0 a 1 \(padrão 0\.44\)/],
     ['segmentos fora da faixa', { ...L, segmentosPorQuarto: 100 }, /segmentosPorQuarto: veio 100; aceito um inteiro de 1 a 64/],
     ['aba de comprimento zero', { ...L, abas: [{ comprimento: 0, angulo: 90 }, { comprimento: 30 }] }, /abas\[0\]\.comprimento: veio 0; aceito o trecho reto da aba, maior que 0/],
-    ['ângulo zero', { ...L, abas: [{ comprimento: 40, angulo: 0 }, { comprimento: 30 }] }, /abas\[0\]\.angulo: veio 0; aceito graus com módulo maior que 0 e menor que 180/],
-    ['ângulo de 180', { ...L, abas: [{ comprimento: 40, angulo: 180 }, { comprimento: 30 }] }, /abas\[0\]\.angulo: veio 180/],
+    ['ângulo zero', { ...L, abas: [{ comprimento: 40, angulo: 0 }, { comprimento: 30 }] }, /abas\[0\]\.angulo: veio 0; aceito graus com módulo maior que 0 e menor que 360/],
+    ['ângulo de 360', { ...L, abas: [{ comprimento: 40, angulo: 360 }, { comprimento: 30 }] }, /abas\[0\]\.angulo: veio 360; aceito graus com módulo maior que 0 e menor que 360/],
+    ['aba com comprimento negativo', { ...L, abas: [{ comprimento: 40, angulo: 90 }, { comprimento: -1 }] }, /abas\[1\]\.comprimento: veio -1; aceito o trecho reto da aba, maior ou igual a 0/],
+    ['rolo que fecha sobre a própria aba', { espessura: 2, raioInterno: 3, largura: 10, abas: [{ comprimento: 20, angulo: -359 }, { comprimento: 0 }] }, /abas: veio "contorno que se cruza ou se toca"/],
     ['ângulo na última aba', { ...L, abas: [{ comprimento: 40, angulo: 90 }, { comprimento: 30, angulo: 90 }] }, /abas\[1\]\.angulo: veio 90; aceito nenhum/],
     ['aba sem ângulo antes da última', { ...L, abas: [{ comprimento: 40 }, { comprimento: 30 }] }, /abas\[0\]\.angulo: veio undefined/],
     ['uma aba só', { ...L, abas: [{ comprimento: 40 }] }, /abas: veio .*aceito uma lista de 2 a 32 abas/],
